@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="torch5spro" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/cb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/cb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../../../extras/jpeg/CMakeLists.txt" />
+		<Unit filename="../../../extras/jpeg/cderror.h" />
+		<Unit filename="../../../extras/jpeg/cdjpeg.h" />
+		<Unit filename="../../../extras/jpeg/jcapimin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcapistd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jccoefct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jccolor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcdctmgr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jchuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jchuff.h" />
+		<Unit filename="../../../extras/jpeg/jcinit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcmainct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcmarker.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcmaster.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcomapi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jconfig.h" />
+		<Unit filename="../../../extras/jpeg/jcparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcphuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcprepct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jcsample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jctrans.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdapimin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdapistd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdatadst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdatasrc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdcoefct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdcolor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdct.h" />
+		<Unit filename="../../../extras/jpeg/jddctmgr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdhuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdhuff.h" />
+		<Unit filename="../../../extras/jpeg/jdinput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdmainct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdmarker.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdmaster.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdmerge.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdphuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdpostct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdsample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jdtrans.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jerror.h" />
+		<Unit filename="../../../extras/jpeg/jfdctflt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jfdctfst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jfdctint.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jidctflt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jidctfst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jidctint.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jidctred.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jinclude.h" />
+		<Unit filename="../../../extras/jpeg/jmemmgr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jmemnobs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jmemsys.h" />
+		<Unit filename="../../../extras/jpeg/jmorecfg.h" />
+		<Unit filename="../../../extras/jpeg/jpegint.h" />
+		<Unit filename="../../../extras/jpeg/jpeglib.h" />
+		<Unit filename="../../../extras/jpeg/jpeglib_sys.h" />
+		<Unit filename="../../../extras/jpeg/jquant1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jquant2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jutils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/jpeg/jversion.h" />
+		<Unit filename="../../../extras/jpeg/transupp.h" />
+		<Unit filename="../../CMakeLists.txt" />
+		<Unit filename="../../ap/CMakeLists.txt" />
+		<Unit filename="../../core/CMakeLists.txt" />
+		<Unit filename="../../core/DataSet.cc" />
+		<Unit filename="../../core/DataSet.h" />
+		<Unit filename="../../core/File.cc" />
+		<Unit filename="../../core/File.h" />
+		<Unit filename="../../core/Machine.cc" />
+		<Unit filename="../../core/Machine.h" />
+		<Unit filename="../../core/MemoryDataSet.cc" />
+		<Unit filename="../../core/MemoryDataSet.h" />
+		<Unit filename="../../core/Object.cc" />
+		<Unit filename="../../core/Object.h" />
+		<Unit filename="../../core/Tensor.cc" />
+		<Unit filename="../../core/Tensor.h" />
+		<Unit filename="../../core/TensorGen.cc" />
+		<Unit filename="../../core/TensorGen.h" />
+		<Unit filename="../../core/Trainer.cc" />
+		<Unit filename="../../core/Trainer.h" />
+		<Unit filename="../../core/apCore.cc" />
+		<Unit filename="../../core/apCore.h" />
+		<Unit filename="../../core/general.cc" />
+		<Unit filename="../../core/general.h" />
+		<Unit filename="../../core/ipCore.cc" />
+		<Unit filename="../../core/ipCore.h" />
+		<Unit filename="../../core/ipSubWindow.cc" />
+		<Unit filename="../../core/ipSubWindow.h" />
+		<Unit filename="../../core/spCore.cc" />
+		<Unit filename="../../core/spCore.h" />
+		<Unit filename="../../ip/CMakeLists.txt" />
+		<Unit filename="../../ip/Color.cc" />
+		<Unit filename="../../ip/Color.h" />
+		<Unit filename="../../ip/Complex.cc" />
+		<Unit filename="../../ip/Complex.h" />
+		<Unit filename="../../ip/Convert.cc" />
+		<Unit filename="../../ip/Convert.h" />
+		<Unit filename="../../ip/Image.cc" />
+		<Unit filename="../../ip/Image.h" />
+		<Unit filename="../../ip/ImageFile.cc" />
+		<Unit filename="../../ip/ImageFile.h" />
+		<Unit filename="../../ip/imagefiles/CMakeLists.txt" />
+		<Unit filename="../../ip/imagefiles/gifImageFile.cc" />
+		<Unit filename="../../ip/imagefiles/gifImageFile.h" />
+		<Unit filename="../../ip/imagefiles/jpegImageFile.cc" />
+		<Unit filename="../../ip/imagefiles/jpegImageFile.h" />
+		<Unit filename="../../ip/imagefiles/pgmImageFile.cc" />
+		<Unit filename="../../ip/imagefiles/pgmImageFile.h" />
+		<Unit filename="../../ip/imagefiles/ppmImageFile.cc" />
+		<Unit filename="../../ip/imagefiles/ppmImageFile.h" />
+		<Unit filename="../../ip/imagefiles/tiffImageFile.cc" />
+		<Unit filename="../../ip/imagefiles/tiffImageFile.h" />
+		<Unit filename="../../ip/ipCrop.cc" />
+		<Unit filename="../../ip/ipCrop.h" />
+		<Unit filename="../../ip/ipIntegralImage.cc" />
+		<Unit filename="../../ip/ipIntegralImage.h" />
+		<Unit filename="../../ip/ipLBP.cc" />
+		<Unit filename="../../ip/ipLBP.h" />
+		<Unit filename="../../ip/ipLBP4R.cc" />
+		<Unit filename="../../ip/ipLBP4R.h" />
+		<Unit filename="../../ip/ipLBP8R.cc" />
+		<Unit filename="../../ip/ipLBP8R.h" />
+		<Unit filename="../../ip/ipScaleYX.cc" />
+		<Unit filename="../../ip/ipScaleYX.h" />
+		<Unit filename="../../ip/vision.cc" />
+		<Unit filename="../../ip/vision.h" />
+		<Unit filename="../../ip/xtprobeImageFile.cc" />
+		<Unit filename="../../ip/xtprobeImageFile.h" />
+		<Unit filename="../../machine/CMakeLists.txt" />
+		<Unit filename="../../machine/CascadeMachine.cc" />
+		<Unit filename="../../machine/CascadeMachine.h" />
+		<Unit filename="../../machine/LBPMachine.cc" />
+		<Unit filename="../../machine/LBPMachine.h" />
+		<Unit filename="../../scanning/CMakeLists.txt" />
+		<Unit filename="../../scanning/ConfidenceDistribution.cc" />
+		<Unit filename="../../scanning/ConfidenceDistribution.h" />
+		<Unit filename="../../scanning/Explorer.cc" />
+		<Unit filename="../../scanning/Explorer.h" />
+		<Unit filename="../../scanning/Pattern.cc" />
+		<Unit filename="../../scanning/Pattern.h" />
+		<Unit filename="../../scanning/ScaleExplorer.cc" />
+		<Unit filename="../../scanning/ScaleExplorer.h" />
+		<Unit filename="../../scanning/Scanner.cc" />
+		<Unit filename="../../scanning/Scanner.h" />
+		<Unit filename="../../scanning/Selector.cc" />
+		<Unit filename="../../scanning/Selector.h" />
+		<Unit filename="../../scanning/evaluators/CMakeLists.txt" />
+		<Unit filename="../../scanning/evaluators/ipSWDummyEvaluator.cc" />
+		<Unit filename="../../scanning/evaluators/ipSWDummyEvaluator.h" />
+		<Unit filename="../../scanning/explorers/CMakeLists.txt" />
+		<Unit filename="../../scanning/explorers/ExhaustiveScaleExplorer.cc" />
+		<Unit filename="../../scanning/explorers/ExhaustiveScaleExplorer.h" />
+		<Unit filename="../../scanning/explorers/GreedyExplorer.cc" />
+		<Unit filename="../../scanning/explorers/GreedyExplorer.h" />
+		<Unit filename="../../scanning/explorers/MSExplorer.cc" />
+		<Unit filename="../../scanning/explorers/MSExplorer.h" />
+		<Unit filename="../../scanning/explorers/PyramidExplorer.cc" />
+		<Unit filename="../../scanning/explorers/PyramidExplorer.h" />
+		<Unit filename="../../scanning/explorers/RandomScaleExplorer.cc" />
+		<Unit filename="../../scanning/explorers/RandomScaleExplorer.h" />
+		<Unit filename="../../scanning/explorers/SpiralScaleExplorer.cc" />
+		<Unit filename="../../scanning/explorers/SpiralScaleExplorer.h" />
+		<Unit filename="../../scanning/ipSWEvaluator.cc" />
+		<Unit filename="../../scanning/ipSWEvaluator.h" />
+		<Unit filename="../../scanning/ipSWPruner.cc" />
+		<Unit filename="../../scanning/ipSWPruner.h" />
+		<Unit filename="../../scanning/pruners/CMakeLists.txt" />
+		<Unit filename="../../scanning/pruners/ipSWDummyPruner.cc" />
+		<Unit filename="../../scanning/pruners/ipSWDummyPruner.h" />
+		<Unit filename="../../scanning/selectors/CMakeLists.txt" />
+		<Unit filename="../../scanning/selectors/DummySelector.cc" />
+		<Unit filename="../../scanning/selectors/DummySelector.h" />
+		<Unit filename="../../sp/CMakeLists.txt" />
+		<Unit filename="../../th/CMakeLists.txt" />
+		<Unit filename="../../th/COPYRIGHT.txt" />
+		<Unit filename="../../th/TH.h" />
+		<Unit filename="../../th/THBlas.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THBlas.h" />
+		<Unit filename="../../th/THCBlas.h" />
+		<Unit filename="../../th/THGeneral.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THGeneral.h" />
+		<Unit filename="../../th/THLogAdd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THLogAdd.h" />
+		<Unit filename="../../th/THRandom.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THRandom.h" />
+		<Unit filename="../../th/THStorage.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THStorage.h" />
+		<Unit filename="../../th/THStorageGen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THStorageGen.h" />
+		<Unit filename="../../th/THTensor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THTensor.h" />
+		<Unit filename="../../th/THTensorApply.h" />
+		<Unit filename="../../th/THTensorDimApply.h" />
+		<Unit filename="../../th/THTensorGen.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THTensorGen.h" />
+		<Unit filename="../../th/THTensorMath.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../th/THTensorMath.h" />
+		<Unit filename="../../trainer/CMakeLists.txt" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

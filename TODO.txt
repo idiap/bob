@@ -1,0 +1,9 @@
+
+Cosmin: test scanning with LBP/MCT face detection cascade
+
+Seb: fix Trainer and DataSet
+
+Venky: add Boosting of weak classifiers
+
+Ani: help Venky with Haar features
+

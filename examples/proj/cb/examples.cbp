@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="examples" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/cb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="../../../src/core" />
+					<Add directory="../../../src/ip/" />
+					<Add directory="../../../src/ip/formats" />
+					<Add directory="../../../src/th" />
+					<Add directory="../../../../torch5/torch/libraries/TH" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/cb" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../../README.txt" />
+		<Unit filename="../../dataset/CMakeLists.txt" />
+		<Unit filename="../../dataset/make.csh" />
+		<Unit filename="../../dataset/memorydataset.cc" />
+		<Unit filename="../../images/CMakeLists.txt" />
+		<Unit filename="../../images/README.txt" />
+		<Unit filename="../../images/imageformats.cc" />
+		<Unit filename="../../images/make.csh" />
+		<Unit filename="../../ip/CMakeLists.txt" />
+		<Unit filename="../../ip/README.txt" />
+		<Unit filename="../../ip/crop.cc" />
+		<Unit filename="../../ip/iimage.cc" />
+		<Unit filename="../../ip/lbp.cc" />
+		<Unit filename="../../ip/make.csh" />
+		<Unit filename="../../ip/scale.cc" />
+		<Unit filename="../../machines/CMakeLists.txt" />
+		<Unit filename="../../machines/convert3to5models.cc" />
+		<Unit filename="../../machines/make.csh" />
+		<Unit filename="../../machines/test19x19models.cc" />
+		<Unit filename="../../options/CMakeLists.txt" />
+		<Unit filename="../../options/README.txt" />
+		<Unit filename="../../options/make.csh" />
+		<Unit filename="../../options/options.cc" />
+		<Unit filename="../../scanning/CMakeLists.txt" />
+		<Unit filename="../../scanning/make.csh" />
+		<Unit filename="../../scanning/scanning.cc" />
+		<Unit filename="../../scanning/testPatternList.cc" />
+		<Unit filename="../../tensors/CMakeLists.txt" />
+		<Unit filename="../../tensors/README.txt" />
+		<Unit filename="../../tensors/bigtest.cc" />
+		<Unit filename="../../tensors/make.csh" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

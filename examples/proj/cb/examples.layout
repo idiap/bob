@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="../../README.txt" open="0" top="0" tabpos="1">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="../../images/imageformats.cc" open="1" top="0" tabpos="6">
+		<Cursor position="2174" topLine="73" />
+	</File>
+	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="3">
+		<Cursor position="339" topLine="0" />
+	</File>
+	<File name="../../ip/crop.cc" open="1" top="0" tabpos="2">
+		<Cursor position="736" topLine="4" />
+	</File>
+	<File name="../../ip/iimage.cc" open="1" top="0" tabpos="5">
+		<Cursor position="443" topLine="16" />
+	</File>
+	<File name="../../ip/lbp.cc" open="0" top="0" tabpos="8">
+		<Cursor position="1131" topLine="0" />
+	</File>
+	<File name="../../ip/scale.cc" open="1" top="0" tabpos="4">
+		<Cursor position="932" topLine="0" />
+	</File>
+	<File name="../../machines/CMakeLists.txt" open="0" top="0" tabpos="0">
+		<Cursor position="349" topLine="0" />
+	</File>
+	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="8">
+		<Cursor position="1392" topLine="24" />
+	</File>
+	<File name="../../machines/test19x19models.cc" open="1" top="1" tabpos="9">
+		<Cursor position="1741" topLine="18" />
+	</File>
+	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="7">
+		<Cursor position="521" topLine="0" />
+	</File>
+	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="1">
+		<Cursor position="6092" topLine="174" />
+	</File>
+</CodeBlocks_layout_file>
