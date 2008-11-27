@@ -255,8 +255,11 @@
 		<Unit filename="../../machine/CMakeLists.txt" />
 		<Unit filename="../../machine/CascadeMachine.cc" />
 		<Unit filename="../../machine/CascadeMachine.h" />
+		<Unit filename="../../machine/GradientMachine.cc" />
+		<Unit filename="../../machine/GradientMachine.h" />
 		<Unit filename="../../machine/LBPMachine.cc" />
 		<Unit filename="../../machine/LBPMachine.h" />
+		<Unit filename="../../machine/Machines.h" />
 		<Unit filename="../../scanning/CMakeLists.txt" />
 		<Unit filename="../../scanning/ConfidenceDistribution.cc" />
 		<Unit filename="../../scanning/ConfidenceDistribution.h" />

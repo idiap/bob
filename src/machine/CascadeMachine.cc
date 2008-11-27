@@ -148,6 +148,8 @@ CascadeMachine::CascadeMachine()
 		m_stages(0), m_n_stages(0),
 		m_isPattern(false)
 {
+        // Allocate the output
+	m_output = new DoubleTensor(1);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -156,6 +158,7 @@ CascadeMachine::CascadeMachine()
 CascadeMachine::~CascadeMachine()
 {
 	deallocate();
+	delete m_output;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -196,10 +199,11 @@ bool CascadeMachine::forward(const Tensor& input)
 				Torch::message("CascadeMachine::forward - error running the machine!\n");
 				return false;
 			}
-			output += machine->getOutput() * stage.m_weights[n];
+			output += machine->getOutput().get(0) * stage.m_weights[n];
 		}
 
 		// Check if rejected
+		m_output->set(0, output);
 		if (output < stage.m_threshold)
 		{
 		        m_isPattern = false;

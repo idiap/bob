@@ -66,6 +66,10 @@
 		<Unit filename="../../scanning/testPatternList.cc" />
 		<Unit filename="../../tensors/CMakeLists.txt" />
 		<Unit filename="../../tensors/README.txt" />
+		<Unit filename="../../tensors/THTensor.cc" />
+		<Unit filename="../../tensors/THTensorC.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../tensors/bigtest.cc" />
 		<Unit filename="../../tensors/make.csh" />
 		<Extensions>

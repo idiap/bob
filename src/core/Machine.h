@@ -6,6 +6,7 @@
 namespace Torch {
 
 	class Tensor;
+	class DoubleTensor;
 	class Machine;
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -69,6 +70,11 @@ namespace Torch {
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::Machine:
+	//      Process some input using a model (loaded from some file).
+	//      The output is a DoubleTensor!
+	//
+	//      NB: The ouput should be allocated and deallocated by each Machine implementation!
+	//
 	//	EACH MACHINE SHOULD REGISTER
 	//		==> MachineManager::GetInstance().add(new XXXMachine) <==
 	//	TO THE MACHINEMANAGER CLASS!!!
@@ -104,7 +110,7 @@ namespace Torch {
 
 		int			getModelWidth() const { return m_model_w; }
 		int			getModelHeight() const { return m_model_h; }
-		double			getOutput() const { return m_output; }
+		const DoubleTensor&     getOutput() const;
 
 		///////////////////////////////////////////////////////////
 
@@ -117,7 +123,7 @@ namespace Torch {
 		int			m_model_w, m_model_h;
 
 		// The result when run on some data
-		double			m_output;
+		DoubleTensor*		m_output;
 	};
 
 }

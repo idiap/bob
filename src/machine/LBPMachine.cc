@@ -15,6 +15,9 @@ LBPMachine::LBPMachine(LBPType lbp_type)
 		m_lbp_type(lbp_type), m_ip_lbp(0)
 {
 	setLBPType(lbp_type);
+
+	// Allocate the output
+	m_output = new DoubleTensor(1);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -22,8 +25,10 @@ LBPMachine::LBPMachine(LBPType lbp_type)
 
 LBPMachine::~LBPMachine()
 {
+        // Cleanup
 	delete[] m_lut;
 	delete m_ip_lbp;
+	delete m_output;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -262,7 +267,7 @@ bool LBPMachine::forward(const Tensor& input)
 
 	// OK
 	const int lbp = m_ip_lbp->getLBP();
-	m_output = m_lut[lbp];
+	m_output->set(0, m_lut[lbp]);
 	return true;
 }
 

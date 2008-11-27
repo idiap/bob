@@ -9,7 +9,7 @@ namespace Torch {
 Machine::Machine()
 	: 	Object(),
 		m_model_w(0), m_model_h(0),
-		m_output(0.0)
+		m_output(0)
 {
 }
 
@@ -34,6 +34,19 @@ bool Machine::setModelSize(int model_w, int model_h)
 	m_model_w = model_w;
 	m_model_h = model_h;
 	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Get the model's output
+
+const DoubleTensor& Machine::getOutput() const
+{
+        if (m_output == 0)
+        {
+                Torch::error("Machine::getOutput - invalid DoubleTensor!\n");
+        }
+
+        return *m_output;
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -16,11 +16,11 @@
 	<File name="../../ip/iimage.cc" open="1" top="0" tabpos="5">
 		<Cursor position="443" topLine="16" />
 	</File>
-	<File name="../../ip/lbp.cc" open="0" top="0" tabpos="8">
-		<Cursor position="1131" topLine="0" />
+	<File name="../../ip/lbp.cc" open="1" top="0" tabpos="10">
+		<Cursor position="2540" topLine="38" />
 	</File>
-	<File name="../../ip/scale.cc" open="1" top="0" tabpos="4">
-		<Cursor position="932" topLine="0" />
+	<File name="../../ip/scale.cc" open="1" top="1" tabpos="4">
+		<Cursor position="1086" topLine="12" />
 	</File>
 	<File name="../../machines/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="349" topLine="0" />
@@ -28,8 +28,8 @@
 	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="8">
 		<Cursor position="1392" topLine="24" />
 	</File>
-	<File name="../../machines/test19x19models.cc" open="1" top="1" tabpos="9">
-		<Cursor position="1741" topLine="18" />
+	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="9">
+		<Cursor position="1741" topLine="90" />
 	</File>
 	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="7">
 		<Cursor position="521" topLine="0" />
