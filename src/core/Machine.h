@@ -35,12 +35,16 @@ namespace Torch {
 		}
 
 		// Register a new <Machine> with a given ID (supposed to be unique)
-		bool			add(Machine* machine);
+		bool			add(Machine* machine, const char* name);
 
 		// Get a copy of the <Machine> (empty, no parameters set) for the given ID
 		// (returns NULL/0 if the <id> is invalid)
 		// The new Machine is allocated and should be deallocated by the user!
-		Machine*		get(int id);
+		Machine*		get(int id) const;
+
+		// Get the generic name for the given id
+		// (returns NULL/0 if the <id> is invalid)
+		const char*             getName(int id) const;
 
 		// Get the number of registered machines
 		int                     getNoMachines() const { return m_size; }
@@ -56,14 +60,15 @@ namespace Torch {
 		// Resize the IDs to fit the new <increment>
 		void			resize(int increment);
 
-		// Returns NULL or the pointer to the Machine with the given ID
-		const Machine*		find(int id) const;
+		// Returns the machine's index with the given ID (or -1, if not found)
+		int     		find(int id) const;
 
 		///////////////////////////////////////////////////////////////
 		// Attributes
 
 		// Machine prototypes for each ID
 		Machine**		m_machines;
+		char**                  m_names;        // Generic name for each machine
 		int			m_size;		// Number of IDs actually used
 		int			m_capacity;	// Number of IDs allocated
 	};

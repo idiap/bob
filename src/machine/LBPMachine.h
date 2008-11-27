@@ -109,7 +109,8 @@ namespace Torch
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // REGISTER this machine to the <MachineManager>
-        const bool lbp_machine_registered = MachineManager::getInstance().add(new LBPMachine());
+        const bool lbp_machine_registered = MachineManager::getInstance().add(
+                new LBPMachine(), "LBPMachine");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 

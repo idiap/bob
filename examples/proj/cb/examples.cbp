@@ -72,6 +72,7 @@
 		</Unit>
 		<Unit filename="../../tensors/bigtest.cc" />
 		<Unit filename="../../tensors/make.csh" />
+		<Unit filename="../../../src/machine/Machines.cpp" />
 		<Extensions>
 			<envvars />
 			<code_completion />

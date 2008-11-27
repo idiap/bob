@@ -8,7 +8,7 @@ SET(	ip_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/Convert.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Image.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ImageFile.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipIntegralImage.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ipIntegral.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/xtprobeImageFile.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipScaleYX.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipCrop.cc"

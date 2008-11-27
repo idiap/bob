@@ -60,7 +60,7 @@ MachineManager::~MachineManager()
 ///////////////////////////////////////////////////////////////////////////
 // Register a new <Machine> with a given ID (supposed to be unique)
 
-bool MachineManager::add(Machine* machine)
+bool MachineManager::add(Machine* machine, const char* name)
 {
         // Check first if the parameters are ok
 	if (machine == 0 || machine->getID() < 1)
@@ -71,7 +71,7 @@ bool MachineManager::add(Machine* machine)
 	}
 
 	// Check if the <id> is taken
-	if (find(machine->getID()) != 0) // the <id> is taken
+	if (find(machine->getID()) >= 0) // the <id> is taken
 	{
 	        delete machine;
 		//Torch::message("MachineManager::add - the ID is taken!\n");
@@ -86,6 +86,8 @@ bool MachineManager::add(Machine* machine)
 
 	// Add the Machine
 	m_machines[m_size] = machine;
+	m_names[m_size] = new char[strlen(name) + 1];
+	strcpy(m_names[m_size], name);
 	m_size ++;
 	return true;
 }
@@ -95,17 +97,27 @@ bool MachineManager::add(Machine* machine)
 // (returns NULL/0 if the <id> is invalid)
 // The new Machine is allocated and should be deallocated by the user!
 
-Machine* MachineManager::get(int id)
+Machine* MachineManager::get(int id) const
 {
-	const Machine* proto = find(id);
-	return proto == 0 ? 0 : proto->getAnInstance();
+        const int index = find(id);
+        return index < 0 ? 0 : m_machines[index]->getAnInstance();
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Get the generic name for the given id
+// (returns NULL/0 if the <id> is invalid)
+
+const char* MachineManager::getName(int id) const
+{
+        const int index = find(id);
+        return index < 0 ? 0 : m_names[index];
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // Constructor
 
 MachineManager::MachineManager()
-	:	m_machines(0),
+	:	m_machines(0), m_names(0),
 		m_size(0),
 		m_capacity(0)
 {
@@ -119,9 +131,12 @@ void MachineManager::deallocate()
 	for (int i = 0; i < m_size; i ++)
 	{
 		delete m_machines[i];
+		delete[] m_names[i];
 	}
 	delete[] m_machines;
+	delete[] m_names;
 	m_machines = 0;
+	m_names = 0;
 
 	m_size = 0;
 	m_capacity = 0;
@@ -134,32 +149,36 @@ void MachineManager::resize(int increment)
 {
 	// Allocate new memory
 	Machine** new_machines = new Machine*[m_capacity + increment];
+	char** new_names = new char*[m_capacity + increment];
 
 	// Copy the old data
 	for (int i = 0; i < m_size; i ++)
 	{
 		new_machines[i] = m_machines[i];
+		new_names[i] = m_names[i];
 	}
 
 	// Deallocate the old data
 	delete[] m_machines;
+	delete[] m_names;
 
 	// OK
 	m_machines = new_machines;
+	m_names = new_names;
 	m_capacity += increment;
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// Returns NULL or the pointer to the Machine with the given ID
+// Returns the machine's index with the given ID (or -1, if not found)
 
-const Machine* MachineManager::find(int id) const
+int MachineManager::find(int id) const
 {
 	for (int i = 0; i < m_size; i ++)
 		if (m_machines[i]->getID() == id)
 		{
-			return m_machines[i];
+			return i;
 		}
-	return 0;
+	return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////

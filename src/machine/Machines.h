@@ -8,6 +8,18 @@
 #include "LBPMachine.h"
 #include "CascadeMachine.h"
 
+namespace Torch
+{
+        ///////////////////////////////////////////////////////////////////////////
+
+        // Load a generic machine from some file
+        // Returns <0/NULL> if some error,
+        //      otherwise you are responsible for deallocating the Machine
+        Machine*                loadMachineFromFile(const char* filename);
+
+        ///////////////////////////////////////////////////////////////////////////
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 
 #endif

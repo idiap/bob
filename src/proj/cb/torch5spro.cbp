@@ -259,6 +259,7 @@
 		<Unit filename="../../machine/GradientMachine.h" />
 		<Unit filename="../../machine/LBPMachine.cc" />
 		<Unit filename="../../machine/LBPMachine.h" />
+		<Unit filename="../../machine/Machines.cc" />
 		<Unit filename="../../machine/Machines.h" />
 		<Unit filename="../../scanning/CMakeLists.txt" />
 		<Unit filename="../../scanning/ConfidenceDistribution.cc" />

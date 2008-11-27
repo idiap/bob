@@ -72,8 +72,7 @@ namespace Torch
 		const Machine*		getMachine(int i_stage, int i_machine) const;
 		double			getWeight(int i_stage, int i_machine) const;
 		double			getThreshold(int i_stage) const;
-
-		bool			isPattern() const { return m_isPattern; }
+		bool                    isPattern() const { return m_isPattern; }
 
 		///////////////////////////////////////////////////////////
 
@@ -134,12 +133,14 @@ namespace Torch
 		Stage*			m_stages;
 		int			m_n_stages;
 
-		int			m_isPattern;
+		// Decision: the input tensor contains a pattern or not
+		bool                    m_isPattern;
 	};
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // REGISTER this machine to the <MachineManager>
-        const bool cascade_machine_registered = MachineManager::getInstance().add(new CascadeMachine());
+        const bool cascade_machine_registered = MachineManager::getInstance().add(
+                new CascadeMachine(), "CascadeMachine");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 }
