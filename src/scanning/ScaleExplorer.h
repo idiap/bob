@@ -46,7 +46,7 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 
 		// Initialize the evaluator and pruners to some sub-window
-		static void		initSW(	int sw_x, int sw_y, int sw_w, int sw_h,
+		static bool		initSW(	int sw_x, int sw_y, int sw_w, int sw_h,
 						ExplorerData& explorerData);
 
 		// Process some sub-window (already set for evaluator and pruners)

@@ -160,11 +160,12 @@ bool Explorer::setScaleExplorer(int index_scale, ScaleExplorer* scaleExplorer)
 /////////////////////////////////////////////////////////////////////////
 // Set the features to use for the scales (different or the same)
 //	(for prunning and pattern evaluation)
+// (If they are 0/NULL, then the original input tensor will be used!)
 
 bool Explorer::setScalePruneIp(ipCore* scalePruneIp)
 {
 	// Check parameters
-	if (	m_n_scales < 1 || m_scales == 0 || scalePruneIp == 0)
+	if (	m_n_scales < 1 || m_scales == 0)
 	{
 		Torch::message("Explorer::setScalePruneIp - invalid parameters!\n");
 		return false;
@@ -181,7 +182,7 @@ bool Explorer::setScalePruneIp(ipCore* scalePruneIp)
 bool Explorer::setScalePruneIp(int index_scale, ipCore* scalePruneIp)
 {
 	// Check parameters
-	if (	m_n_scales < 1 || m_scales == 0 || scalePruneIp == 0 ||
+	if (	m_n_scales < 1 || m_scales == 0 ||
 		index_scale < 0 || index_scale >= m_n_scales)
 	{
 		Torch::message("Explorer::setScalePruneIp - invalid parameters!\n");
@@ -196,7 +197,7 @@ bool Explorer::setScalePruneIp(int index_scale, ipCore* scalePruneIp)
 bool Explorer::setScaleEvaluationIp(ipCore* scaleEvaluationIp)
 {
 	// Check parameters
-	if (	m_n_scales < 1 || m_scales == 0 || scaleEvaluationIp == 0)
+	if (	m_n_scales < 1 || m_scales == 0)
 	{
 		Torch::message("Explorer::setScaleEvaluationIp - invalid parameters!\n");
 		return false;
@@ -213,7 +214,7 @@ bool Explorer::setScaleEvaluationIp(ipCore* scaleEvaluationIp)
 bool Explorer::setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp)
 {
 	// Check parameters
-	if (	m_n_scales < 1 || m_scales == 0 || scaleEvaluationIp == 0 ||
+	if (	m_n_scales < 1 || m_scales == 0 ||
 		index_scale < 0 || index_scale >= m_n_scales)
 	{
 		Torch::message("Explorer::setScaleEvaluationIp - invalid parameters!\n");

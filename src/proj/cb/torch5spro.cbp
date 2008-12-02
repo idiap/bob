@@ -238,8 +238,8 @@
 		<Unit filename="../../ip/imagefiles/tiffImageFile.h" />
 		<Unit filename="../../ip/ipCrop.cc" />
 		<Unit filename="../../ip/ipCrop.h" />
-		<Unit filename="../../ip/ipIntegralImage.cc" />
-		<Unit filename="../../ip/ipIntegralImage.h" />
+		<Unit filename="../../ip/ipIntegral.cc" />
+		<Unit filename="../../ip/ipIntegral.h" />
 		<Unit filename="../../ip/ipLBP.cc" />
 		<Unit filename="../../ip/ipLBP.h" />
 		<Unit filename="../../ip/ipLBP4R.cc" />
@@ -255,6 +255,8 @@
 		<Unit filename="../../machine/CMakeLists.txt" />
 		<Unit filename="../../machine/CascadeMachine.cc" />
 		<Unit filename="../../machine/CascadeMachine.h" />
+		<Unit filename="../../machine/Classifier.cc" />
+		<Unit filename="../../machine/Classifier.h" />
 		<Unit filename="../../machine/GradientMachine.cc" />
 		<Unit filename="../../machine/GradientMachine.h" />
 		<Unit filename="../../machine/LBPMachine.cc" />
@@ -274,9 +276,6 @@
 		<Unit filename="../../scanning/Scanner.h" />
 		<Unit filename="../../scanning/Selector.cc" />
 		<Unit filename="../../scanning/Selector.h" />
-		<Unit filename="../../scanning/evaluators/CMakeLists.txt" />
-		<Unit filename="../../scanning/evaluators/ipSWDummyEvaluator.cc" />
-		<Unit filename="../../scanning/evaluators/ipSWDummyEvaluator.h" />
 		<Unit filename="../../scanning/explorers/CMakeLists.txt" />
 		<Unit filename="../../scanning/explorers/ExhaustiveScaleExplorer.cc" />
 		<Unit filename="../../scanning/explorers/ExhaustiveScaleExplorer.h" />

@@ -1,7 +1,8 @@
 #include "PyramidExplorer.h"
 #include "ScaleExplorer.h"
-#include "ipCore.h"
+#include "ipSWEvaluator.h"
 #include "Image.h"
+#include "xtprobeImageFile.h"
 #include "ipScaleYX.h"
 
 namespace Torch {
@@ -11,8 +12,7 @@ namespace Torch {
 
 PyramidExplorerData::PyramidExplorerData(ipSWEvaluator* swEvaluator)
 	: 	ExplorerData(swEvaluator),
-		m_inv_scale_w(1.0f),
-		m_inv_scale_h(1.0f)
+		m_inv_scale(1.0f)
 {
 }
 
@@ -28,10 +28,10 @@ PyramidExplorerData::~PyramidExplorerData()
 
 void PyramidExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, float confidence)
 {
-	m_patternSpace.add(Pattern(	(int)(0.5f + m_inv_scale_w * sw_x * m_image_w),
-					(int)(0.5f + m_inv_scale_h * sw_y * m_image_h),
-					(int)(0.5f + m_inv_scale_w * sw_w * m_image_w),
-					(int)(0.5f + m_inv_scale_h * sw_h * m_image_h),
+        m_patternSpace.add(Pattern(	(int)(0.5f + m_inv_scale * sw_x),
+					(int)(0.5f + m_inv_scale * sw_y),
+					(int)(0.5f + m_inv_scale * sw_w),
+					(int)(0.5f + m_inv_scale * sw_h),
 					confidence));
 }
 
@@ -41,17 +41,22 @@ void PyramidExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, f
 void PyramidExplorerData::setScale(const sSize& scale)
 {
 	m_scale = scale;
-	m_inv_scale_w = 1.0f / (m_scale.w + 0.0f);
-	m_inv_scale_h = 1.0f / (m_scale.h + 0.0f);
+	m_inv_scale = 0.5f * (  (m_image_w + 0.0f) / (m_scale.w + 0.0f) +
+                                (m_image_h + 0.0f) / (m_scale.h + 0.0f));
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
 PyramidExplorer::PyramidExplorer(ipSWEvaluator* swEvaluator)
-	: 	Explorer(swEvaluator)
+	: 	Explorer(swEvaluator),
+                m_scaling_ips(0),
+                m_scale_prune_tensors(0),
+                m_scale_evaluation_tensors(0)
 {
 	m_data = new PyramidExplorerData(swEvaluator);
+
+	addBOption("savePyramidsToJpg", false, "save the scaled images to JPEG");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -59,6 +64,21 @@ PyramidExplorer::PyramidExplorer(ipSWEvaluator* swEvaluator)
 
 PyramidExplorer::~PyramidExplorer()
 {
+        deallocateScaleTensors();
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Deallocate the tensors for each scale
+
+void PyramidExplorer::deallocateScaleTensors()
+{
+        delete[] m_scale_prune_tensors;
+        delete[] m_scale_evaluation_tensors;
+        delete[] m_scaling_ips;
+
+        m_scale_prune_tensors = 0;
+        m_scale_evaluation_tensors = 0;
+        m_scaling_ips = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -107,14 +127,15 @@ bool PyramidExplorer::init(int image_w, int image_h)
 	const int min_patt_h = getInRange(getIOption("min_patt_h"), model_h, image_h);
 	const int max_patt_h = getInRange(getIOption("max_patt_h"), model_h, image_h);
 
-	// Compute the min/max scale (variance)
-	const float min_scale = max((min_patt_w + 0.0f) / (model_w + 0.0f), (min_patt_h + 0.0f) / (model_h + 0.0f));
-	const float max_scale = min((max_patt_w + 0.0f) / (model_w + 0.0f), (max_patt_h + 0.0f) / (model_h + 0.0f));
-	const float ds = getInRange(getFOption("ds"), 1.0f / (min(model_w, model_h) + 0.0f), 1.0f);
+	// Compute the min/max and scale variance (relative to the image size)
+	const float min_scale = max((model_w + 0.0f) / (max_patt_w + 0.0f), (model_h + 0.0f) / (max_patt_h + 0.0f));
+	const float max_scale = min((model_w + 0.0f) / (min_patt_w + 0.0f), (model_h + 0.0f) / (min_patt_h + 0.0f));
+	const float ds = min((model_w + 0.0f) / (image_w + 0.0f), (model_h + 0.0f) / (image_h + 0.0f)) *
+                        getInRange(getFOption("ds"), 1.0f / (min(image_w, image_h) + 0.0f), 1.0f);
 
 	const bool verbose = getBOption("verbose");
 
-	// Compute the number of scales
+	// Compute the number of scales (relative to the image size)
 	int n_scales = 0;
 	for (float scale = min_scale; scale < max_scale; scale += ds, n_scales ++)
 	{
@@ -122,13 +143,17 @@ bool PyramidExplorer::init(int image_w, int image_h)
 
 	// Resize the scale information
 	resizeScales(n_scales);
+	deallocateScaleTensors();
+	m_scale_prune_tensors = new const Tensor*[n_scales];
+	m_scale_evaluation_tensors = new const Tensor*[n_scales];
+	m_scaling_ips = new ipScaleYX[n_scales];
 
-	// Compute the scales
+	// Compute the scales (relative to the image size)
 	int i = 0;
 	for (float scale = min_scale; scale < max_scale; scale += ds, i ++)
 	{
-		m_scales[i].w = (int)(0.5f + scale * model_w);
-		m_scales[i].h = (int)(0.5f + scale * model_h);
+		m_scales[i].w = (int)(0.5f + scale * image_w);
+		m_scales[i].h = (int)(0.5f + scale * image_h);
 
 		// ... debug message
 		if (verbose == true)
@@ -191,13 +216,7 @@ bool PyramidExplorer::preprocess(const Image& image)
 		return false;
 	}
 
-	// Initialize the scalling object
-	ipScaleYX ip_scale;
-	if (ip_scale.setInputSize(image.getWidth(), image.getHeight()) == false)
-	{
-		Torch::message("PyramidExplorer::preprocess - failed to initialize scalling object!\n");
-		return false;
-	}
+	const bool save_pyramids = getBOption("savePyramidsToJpg");
 
 	// Run the <ipCore>s for prunning and evaluation for each scale
 	for (int i = 0; i < m_n_scales; i ++)
@@ -205,15 +224,13 @@ bool PyramidExplorer::preprocess(const Image& image)
 		const int scale_w = m_scales[i].w;
 		const int scale_h = m_scales[i].h;
 
-		ipCore* ip_prune = m_scale_prune_ips[i];
-		ipCore* ip_evaluation = m_scale_evaluation_ips[i];
-
-		if (ip_prune == 0 || ip_evaluation == 0)
-		{
-			Torch::message("PyramidExplorer::preprocess - invalid <ipCore> for scale [%d/%d]!\n",
-					i + 1, m_n_scales);
-			return false;
-		}
+                // Initialize the scalling object
+                ipScaleYX& ip_scale = m_scaling_ips[i];
+                if (ip_scale.setInputSize(image.getWidth(), image.getHeight()) == false)
+                {
+                        Torch::message("PyramidExplorer::preprocess - failed to initialize scalling object!\n");
+                        return false;
+                }
 
 		// Scale the image to the current scale
 		if (	ip_scale.setOutputSize(scale_w, scale_h) == false ||
@@ -224,26 +241,71 @@ bool PyramidExplorer::preprocess(const Image& image)
 			return false;
 		}
 
-		// Run the prune <ipCore> on the scaled image
-		if (	ip_prune->setInputSize(scale_w, scale_h) == false ||
-			ip_prune->process(ip_scale.getOutput(0)) == false)
+		// Save the scaled image
+		if (save_pyramids == true)
 		{
-			Torch::message("PyramidExplorer::preprocess - \
-					failed to run the pruning <ipCore> for scale [%d/%d]!\n",
-					i + 1, m_n_scales);
-			return false;
+                        Image scaled_image;
+                        if (    scaled_image.resize(scale_w, scale_h, image.getNPlanes()) == true &&
+                                scaled_image.copyFrom(ip_scale.getOutput(0)) == true)
+                        {
+                                char str[200];
+                                sprintf(str, "Pyramid_%dx%d.jpg", scale_w, scale_h);
+
+                                xtprobeImageFile xtprobe;
+                                if (xtprobe.open(str, "w+") == true)
+                                {
+                                        scaled_image.saveImage(xtprobe);
+                                }
+                        }
 		}
 
-		// Run the evaluation <ipCore> on the scaled image
-		if (ip_evaluation != ip_prune)	// but check maybe it's the same processing!
+		ipCore* ip_prune = m_scale_prune_ips[i];
+		ipCore* ip_evaluation = m_scale_evaluation_ips[i];
+
+		// Compute the prunning features for the scaled image
+		if (ip_prune == 0)
 		{
-			if (	ip_evaluation->setInputSize(scale_w, scale_h) == false ||
-				ip_evaluation->process(ip_scale.getOutput(0)) == false)
-			{
-				Torch::message("PyramidExplorer::preprocess - \
-						failed to run the evaluation <ipCore> for scale [%d/%d]!\n",
-						i + 1, m_n_scales);
-				return false;
+		        // The prune tensor is the scaled image!
+		        m_scale_prune_tensors[i] = &ip_scale.getOutput(0);
+		}
+		else
+		{
+		        // The prune tensor uses features from the scaled image!
+		        if (    ip_prune->setInputSize(scale_w, scale_h) == false ||
+                                ip_prune->process(ip_scale.getOutput(0)) == false)
+                        {
+                                Torch::message("PyramidExplorer::preprocess - \
+                                                failed to run the pruning <ipCore> for scale [%d/%d]!\n",
+                                                i + 1, m_n_scales);
+                                return false;
+                        }
+                        m_scale_prune_tensors[i] = &ip_prune->getOutput(0);
+		}
+
+		// Compute the evaluation features for the scaled image
+		if (ip_evaluation == 0)
+		{
+		        // The evaluation tensor is the scaled image!
+		        m_scale_evaluation_tensors[i] = &ip_scale.getOutput(0);
+		}
+		else
+		{
+		        // The evaluation tensor uses features from the scaled image!
+                        if (ip_evaluation == ip_prune)// but check maybe it's the same processing!
+                        {
+                                m_scale_evaluation_tensors[i] = &ip_prune->getOutput(0);
+                        }
+                        else
+                        {
+                                if (    ip_evaluation->setInputSize(scale_w, scale_h) == false ||
+                                        ip_evaluation->process(ip_scale.getOutput(0)) == false)
+                                {
+                                        Torch::message("PyramidExplorer::preprocess - \
+                                                        failed to run the evaluation <ipCore> for scale [%d/%d]!\n",
+                                                        i + 1, m_n_scales);
+                                        return false;
+                                }
+                                m_scale_evaluation_tensors[i] = &ip_evaluation->getOutput(0);
 			}
 		}
 	}
@@ -293,6 +355,13 @@ bool PyramidExplorer::process()
 			return false;
 		}
 
+		// Initialize the evaluator/classifier for this scale
+		if (m_data->m_swEvaluator->init(*m_scale_evaluation_tensors[i]) == false)
+		{
+		        Torch::message("MSExplorer::process - cannot initialize the evaluator!\n");
+		        return false;
+		}
+
 		// Debug message
 		if (verbose == true)
 		{
@@ -307,11 +376,10 @@ bool PyramidExplorer::process()
 					i + 1, m_n_scales);
 			return false;
 		}
-		//	!!! make sure to give the preprocessed scaled image to the <ScaleExplorer> !!!
-		if (scaleExplorer->process(	m_scale_prune_ips[i]->getOutput(0),
-						m_scale_evaluation_ips[i]->getOutput(0),
-						*m_data,
-						stopAtFirstDetection) == false)
+                if (scaleExplorer->process(     *m_scale_prune_tensors[i],
+                                                *m_scale_evaluation_tensors[i],
+                                                *m_data,
+                                                stopAtFirstDetection) == false)
 		{
 			Torch::message("PyramidExplorer::process - failed to run scale explorer [%d/%d]!\n",
 					i + 1, m_n_scales);

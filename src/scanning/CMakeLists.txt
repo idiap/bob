@@ -19,7 +19,6 @@ SET(	scanning_INCLUDE
 SET(scanning_SUBDIRS
 	explorers
 	pruners
-	evaluators
 	selectors)
 
 FOREACH(subdir ${scanning_SUBDIRS})

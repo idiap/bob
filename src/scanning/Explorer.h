@@ -117,6 +117,7 @@ namespace Torch
 
 		// Set the features to use for the scales (different or the same)
 		//	(for prunning and pattern evaluation)
+		// (If they are 0/NULL, then the original input tensor will be used!)
 		virtual bool		setScalePruneIp(ipCore* scalePruneIp);
 		virtual bool		setScalePruneIp(int index_scale, ipCore* scalePruneIp);
 		virtual bool		setScaleEvaluationIp(ipCore* scaleEvaluationIp);

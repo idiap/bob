@@ -1,6 +1,6 @@
 #include "MSExplorer.h"
 #include "ScaleExplorer.h"
-#include "ipCore.h"
+#include "ipSWEvaluator.h"
 #include "Image.h"
 
 namespace Torch {
@@ -32,7 +32,9 @@ void MSExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, float 
 // Constructor
 
 MSExplorer::MSExplorer(ipSWEvaluator* swEvaluator)
-	: 	Explorer(swEvaluator)
+	: 	Explorer(swEvaluator),
+                m_prune_itensor(0),
+                m_evaluation_itensor(0)
 {
 	m_data = new MSExplorerData(swEvaluator);
 }
@@ -90,14 +92,14 @@ bool MSExplorer::init(int image_w, int image_h)
 	const int min_patt_h = getInRange(getIOption("min_patt_h"), model_h, image_h);
 	const int max_patt_h = getInRange(getIOption("max_patt_h"), model_h, image_h);
 
-	// Compute the min/max scale (variance)
+	// Compute the min/max and scale variance (relative the model size)
 	const float min_scale = max((min_patt_w + 0.0f) / (model_w + 0.0f), (min_patt_h + 0.0f) / (model_h + 0.0f));
 	const float max_scale = min((max_patt_w + 0.0f) / (model_w + 0.0f), (max_patt_h + 0.0f) / (model_h + 0.0f));
 	const float ds = getInRange(getFOption("ds"), 1.0f / (min(model_w, model_h) + 0.0f), 1.0f);
 
 	const bool verbose = getBOption("verbose");
 
-	// Compute the number of scales
+	// Compute the number of scales (relative to the model size)
 	int n_scales = 0;
 	for (float scale = min_scale; scale < max_scale; scale += ds, n_scales ++)
 	{
@@ -106,7 +108,7 @@ bool MSExplorer::init(int image_w, int image_h)
 	// Resize the scale information
 	resizeScales(n_scales);
 
-	// Compute the scales
+	// Compute the scales (relative to the model size)
 	int i = 0;
 	for (float scale = min_scale; scale < max_scale; scale += ds, i ++)
 	{
@@ -161,32 +163,81 @@ bool MSExplorer::preprocess(const Image& image)
 	ipCore* ip_prune = m_scale_prune_ips[0];
 	ipCore* ip_evaluation = m_scale_evaluation_ips[0];
 
+	const Tensor* prune_tensor = 0;
+	const Tensor* evaluation_tensor = 0;
+
 	// Check parameters
-	if (m_n_scales < 1 || ip_prune == 0 || ip_evaluation == 0)
+	if (m_n_scales < 1)
 	{
 		Torch::message("MSExplorer::preprocess - invalid <ipCore>s for pruning or evaluation!\n");
 		return false;
 	}
 
-	// Run the prune <ipCore> for the whole image
-	if (	ip_prune->setInputSize(image.getWidth(), image.getHeight()) == false ||
-		ip_prune->process(image) == false)
+	// Compute the prune features for the whole image
+	if (ip_prune == 0)
 	{
-		Torch::message("MSExplorer::preprocess - failed to run the pruning <ipCore>!\n");
-		return false;
+	        // The initial image!
+                prune_tensor = &image;
+	}
+	else
+	{
+	        // Some features need to be extracted!
+                if (	ip_prune->setInputSize(image.getWidth(), image.getHeight()) == false ||
+                        ip_prune->process(image) == false)
+                {
+                        Torch::message("MSExplorer::preprocess - failed to run the pruning <ipCore>!\n");
+                        return false;
+                }
+                prune_tensor = &ip_prune->getOutput(0);
 	}
 
-	// Run the evaluation <ipCore> for the whole image
-	if (ip_evaluation != ip_prune)
+	// Compute the evaluation features for the whole image
+	if (ip_evaluation == 0)
 	{
-		// but check maybe it's the same processing!
-		if (	ip_evaluation->setInputSize(image.getWidth(), image.getHeight()) == false ||
-			ip_evaluation->process(image) == false)
-		{
-			Torch::message("MSExplorer::preprocess - failed to run the evaluation <ipCore>!\n");
-			return false;
-		}
+	        // The initial image!
+	        evaluation_tensor = &image;
 	}
+	else
+	{
+	        // Some features need to be extracted!
+	        if (ip_evaluation == ip_prune)  // but check maybe it's the same processing!
+	        {
+	                evaluation_tensor = &ip_prune->getOutput(0);
+	        }
+	        else
+	        {
+			if (	ip_evaluation->setInputSize(image.getWidth(), image.getHeight()) == false ||
+                                ip_evaluation->process(image) == false)
+                        {
+                                Torch::message("MSExplorer::preprocess - failed to run the evaluation <ipCore>!\n");
+                                return false;
+                        }
+                        evaluation_tensor = &ip_evaluation->getOutput(0);
+	        }
+	}
+
+	// Compute the integral image for the prunning and evaluation tensors
+        if (    m_ipi_prune.setInputSize(image.getWidth(), image.getHeight()) == false ||
+                m_ipi_prune.process(*prune_tensor) == false)
+        {
+                Torch::message("MSExplorer::preprocess - failed to compute the prune integral image!");
+                return false;
+        }
+        if (evaluation_tensor != prune_tensor)  // but check maybe it's the same processing!
+        {
+                if (    m_ipi_evaluation.setInputSize(image.getWidth(), image.getHeight()) == false ||
+                        m_ipi_evaluation.process(*evaluation_tensor) == false)
+                {
+                        Torch::message("MSExplorer::preprocess - failed to compute the evaluation integral image!");
+                        return false;
+                }
+        }
+
+        // Set the final integral tensor for prunning and evaluation
+        m_prune_itensor = &m_ipi_prune.getOutput(0);
+        m_evaluation_itensor = evaluation_tensor != prune_tensor ?
+                                        &m_ipi_evaluation.getOutput(0) :
+                                        m_prune_itensor;
 
 	//OK
 	return true;
@@ -226,6 +277,13 @@ bool MSExplorer::process()
 			return false;
 		}
 
+		// Initialize the evaluator/classifier for this scale
+		if (m_data->m_swEvaluator->init(*m_evaluation_itensor) == false)
+		{
+		        Torch::message("MSExplorer::process - failed to initialize the evaluator!\n");
+		        return false;
+		}
+
 		// Debug message
 		if (verbose == true)
 		{
@@ -240,8 +298,9 @@ bool MSExplorer::process()
 					i + 1, m_n_scales);
 			return false;
 		}
-		if (scaleExplorer->process(	m_scale_prune_ips[0]->getOutput(0),
-						m_scale_evaluation_ips[0]->getOutput(0),
+		//      ... process the integral images of the prune and evaluation tensors
+		if (scaleExplorer->process(	*m_prune_itensor,
+                                                *m_evaluation_itensor,
 						*m_data,
 						stopAtFirstDetection) == false)
 		{

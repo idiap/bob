@@ -23,9 +23,9 @@ ipSubWindow::~ipSubWindow()
 
 bool ipSubWindow::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
 {
-	if (	sw_x < 0 || sw_y < 0 || sw_w < 0 || sw_h < 0 ||
-		sw_x + sw_w >= getInputWidth() ||
-		sw_y + sw_h >= getInputHeight())
+	if (	sw_x < 0 || sw_y < 0 || sw_w <= 0 || sw_h <= 0 ||
+		sw_x + sw_w > getInputWidth() ||
+		sw_y + sw_h > getInputHeight())
 	{
 		return false;
 	}

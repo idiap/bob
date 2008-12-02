@@ -5,6 +5,9 @@
 
 namespace Torch
 {
+        class ipScaleYX;
+        class Tensor;
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::PyramidExplorerData:
 	//	- implementation of <ExplorerData>, just modifying the way
@@ -33,14 +36,16 @@ namespace Torch
 
 		// Current scaled image size
 		sSize			m_scale;
-		float			m_inv_scale_w;
-		float			m_inv_scale_h;
+		float			m_inv_scale;
 	};
 
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::PyramidExplorer
 	//	- builds a pyramid of image at different scales, while keeping the model
 	//		at a fixed size
+	//
+	//      - PARAMETERS (name, type, default value, description):
+	//		"savePyramidsToJpg"	bool    false   "save the scaled images to JPEG"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -100,10 +105,21 @@ namespace Torch
 
 	protected:
 
+                /////////////////////////////////////////////////////////////////
+
+                // Deallocate the tensors for each scale
+                void                    deallocateScaleTensors();
+
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-		//
+		// <ipScaleYX>s for scalling the original image
+		ipScaleYX*              m_scaling_ips;
+
+                // Input tensors for each scale, for prunning and evaluation
+                //      (they are just pointers to the actual tensors)
+		const Tensor**          m_scale_prune_tensors;
+		const Tensor**          m_scale_evaluation_tensors;
 	};
 }
 

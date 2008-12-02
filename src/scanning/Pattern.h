@@ -15,7 +15,7 @@ namespace Torch
 	{
 		// Constructor
 		Pattern(	int x = 0, int y = 0, int w = 0, int h = 0,
-				float confidence = 0.0f)
+				double confidence = 0.0)
 			: 	m_x(x), m_y(y), m_w(w), m_h(h),
 				m_confidence(confidence)
 		{
@@ -39,7 +39,7 @@ namespace Torch
 		int		m_w, m_h;
 
 		// Model confidence
-		float		m_confidence;
+		double		m_confidence;
 	};
 
 	/////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ namespace Torch
 		//	- new model threshold
 		//	- number of best points to keep track of
 		// <clear> is called!
-		bool			reset(int image_w, int image_h, float model_threshold);
+		bool			reset(int image_w, int image_h, double model_threshold);
 		bool			reset(int n_best);
 
 		// Delete all stored patterns (but it's not deallocating the memory)
@@ -195,6 +195,9 @@ namespace Torch
 		int			getMaxNoBest() const { return m_patterns.getMaxNoBest(); }
 		int			getNoBest() const { return m_patterns.getNoBest(); }
 		const Pattern&		getBest(int index) const { return m_patterns.getBest(index); }
+		const PatternList&      getPatternList() const { return m_patterns; }
+		int**                   getConfidenceMap() const { return m_table_confidence; }
+		unsigned char**         getUsageMap() const { return m_table_usage; }
 
 		/////////////////////////////////////////////////////////////////////////
 
@@ -203,15 +206,15 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////////////
 
 		// Normalize&Scale some model confidence
-		int			normScaleConfidence(float confidence) const
+		int			normScaleConfidence(double confidence) const
 		{
-			return (int)(0.5f + (confidence - m_model_threshold) * 100.0f);
+			return (int)(0.5 + (confidence - m_model_threshold) * 100.0);
 		}
 
 		// Rescale&UnNormalize some model confidence
-		float			unNormScaleConfidence(int ns_confidence) const
+		double			unNormScaleConfidence(int ns_confidence) const
 		{
-			return m_model_threshold + ns_confidence * 0.01f;
+			return m_model_threshold + ns_confidence * 0.01;
 		}
 
 		// Deallocate the allocated tables and pattern list
@@ -227,14 +230,14 @@ namespace Torch
 		int			m_image_w, m_image_h;
 
 		// Model threshold: used for normalizing and scalling the model output
-		float			m_model_threshold;
+		double			m_model_threshold;
 
 		// All patterns (also keeps track of the best patterns)
 		PatternList		m_patterns;
 
 		// Tables: normalized summed confidence, used sub-window positions
 		int**			m_table_confidence;	// [m_image_w x m_image_h]
-		unsigned char**		m_table_used_xy;	// [m_image_w x m_image_h]
+		unsigned char**		m_table_usage;	        // [m_image_w x m_image_h]
 	};
 }
 

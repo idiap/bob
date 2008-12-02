@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_CASCADE_MACHINE_H_
 #define _TORCH5SPRO_CASCADE_MACHINE_H_
 
-#include "Machine.h"	// CascadeMachine is a <Machine>
+#include "Classifier.h"	// <CascadeMachine> is a <Classifier>
 
 namespace Torch
 {
@@ -24,7 +24,7 @@ namespace Torch
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class CascadeMachine : public Machine
+	class CascadeMachine : public Classifier
 	{
 	public:
 
@@ -72,7 +72,9 @@ namespace Torch
 		const Machine*		getMachine(int i_stage, int i_machine) const;
 		double			getWeight(int i_stage, int i_machine) const;
 		double			getThreshold(int i_stage) const;
-		bool                    isPattern() const { return m_isPattern; }
+
+		//      ... overriden, guaranties that each confidence is greater than this threshold
+		virtual  double         getThreshold() const;
 
 		///////////////////////////////////////////////////////////
 
@@ -133,8 +135,8 @@ namespace Torch
 		Stage*			m_stages;
 		int			m_n_stages;
 
-		// Decision: the input tensor contains a pattern or not
-		bool                    m_isPattern;
+		// The minimum stage threshold
+		double                  m_minThreshold;
 	};
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

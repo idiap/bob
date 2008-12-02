@@ -61,36 +61,36 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 
 		// Initialize the scanning 4D space (random or using a fixed grid ?!)
-		bool				initSearch();
+		bool			initSearch();
 
 		// Refine the search around the best points
-		bool				refineSearch();
+		bool			refineSearch();
 
 		// Check if the search should be stopped
 		//	(it is becoming too fine or no pattern found so far?!)
-		bool				shouldSearchMode(int old_n_candidates = -1) const;
+		bool			shouldSearchMode(int old_n_candidates = -1) const;
 
 		// Search around some point in the position and scale space
-		bool				searchAround(int x, int y, float scale);
+		bool			searchAround(int x, int y, float scale);
 
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
 		// Flag to check if more steps are needed
-		bool				m_hasMoreSteps;
+		bool			m_hasMoreSteps;
 
 		// Current search parameters
-		int				m_search_dx;
-		int				m_search_dy;
-		float				m_search_ds;
+		int			m_search_dx;
+		int			m_search_dy;
+		float			m_search_ds;
 
 		// Minimum values for the search parameters (need to check if the search should be stopped)
-		int				m_search_min_dx;
-		int				m_search_min_dy;
-		float				m_search_min_ds;
+		int			m_search_min_dx;
+		int			m_search_min_dy;
+		float			m_search_min_ds;
 
 		// Keep a copy of the best patterns at some step
-		Pattern*			m_best_patterns;
+		Pattern*		m_best_patterns;
 	};
 }
 

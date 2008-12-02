@@ -1,6 +1,7 @@
 #include "Image.h"
 #include "ImageFile.h"
 #include "Color.h"
+#include "vision.h"
 
 namespace Torch {
 
@@ -55,7 +56,7 @@ bool Image::copyFrom(const Tensor& data)
 	if (	ShortTensor::t == 0 ||
 		data.nDimension() != nDimension())
 	{
-		Torch::message("Torch::Image::copyFrom - invalid parameters or image not allocated!\n");
+		Torch::message("Torch::Image::copyFrom - invalid parameters!\n");
 		return false;
 	}
 	for (int i = 0; i < data.nDimension(); i ++)
@@ -76,7 +77,50 @@ bool Image::copyFrom(const Tensor& data)
 
 bool Image::copyFrom(const Image& image)
 {
-	return ShortTensor::t != 0 && copyFrom(image);
+        // Check parameters
+	if (    ShortTensor::t == 0 || image.t == 0 ||
+                getWidth() != image.getWidth() ||
+                getHeight() != image.getHeight())
+	{
+	        Torch::message("Torch::Image::copyFrom - invalid image!\n");
+		return false;
+	}
+
+        // Copy the image
+        const int w = getWidth();
+        const int h = getHeight();
+        if (getNPlanes() == image.getNPlanes())
+        {
+                // The same number of planes!
+                ShortTensor::copy(&image);
+        }
+        else if (getNPlanes() == 1)
+        {
+                // RGB to gray
+                for (int y = 0; y < h; y ++)
+                        for (int x = 0; x < w; x ++)
+                        {
+                                set(y, x, 0, rgb_to_gray(
+                                        image.get(y, x, 0),
+                                        image.get(y, x, 1),
+                                        image.get(y, x, 2)));
+                        }
+        }
+        else if (getNPlanes() == 3)
+        {
+                // gray to RGB
+                for (int y = 0; y < h; y ++)
+                        for (int x = 0; x < w; x ++)
+                        {
+                                const short gray = image.get(y, x, 0);
+                                set(y, x, 0, gray);
+                                set(y, x, 1, gray);
+                                set(y, x, 2, gray);
+                        }
+        }
+
+        // OK
+        return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -182,6 +226,22 @@ void Image::drawLine(int x1, int y1, int x2, int y2, const Color& color)
                 drawPixel(x,j >> 16,color);
                 j-=decInc;
         }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// Draw a rectangle in the image.
+
+void Image::drawRect(int x, int y, int w, int h, const Color& color)
+{
+        drawLine(x, y, x + w, y, color);
+        drawLine(x + w, y, x + w, y + h, color);
+        drawLine(x + w, y + h, x, y + h, color);
+        drawLine(x, y + h, x, y, color);
+}
+
+void Image::drawRect(const sRect2D& rect, const Color& color)
+{
+        return drawRect(rect.x, rect.y, rect.w, rect.h, color);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -63,7 +63,12 @@ bool RandomScaleExplorer::process(	const Tensor& input_prune,
 		const int sw_y = sw_min_y + rand() % (sw_max_y - sw_min_y);
 
 		// Initialize the prunners and evaluator to this sub-window
-		ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData);
+		if (ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
+		{
+		       Torch::message("RandomScaleExplorer::process \
+					- could not initialize some sub-window!\n");
+			return false;
+		}
 
 		// Process the sub-window
 		if (ScaleExplorer::processSW(input_prune, input_evaluation, explorerData) == false)

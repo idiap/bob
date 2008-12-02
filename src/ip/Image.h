@@ -7,6 +7,7 @@ namespace Torch {
 
 	class ImageFile;
 	class Color;
+	struct sRect2D;
 
 	/** This class is designed to handle images.
 		An image is stored as a 3D tensor of short with the dimensions:
@@ -79,6 +80,14 @@ namespace Torch {
 		    @param color is the color to draw
 		*/
 		void			drawLine(int x1, int y1, int x2, int y2, const Color& color);
+
+		/** draw a rectangle in the image.
+
+		    @param color is the color to draw
+		*/
+		void			drawRect(int x, int y, int w, int h, const Color& color);
+		void			drawRect(const sRect2D& rect, const Color& color);
+		//@}
 
 		/////////////////////////////////////////////////////////////////////////////////////////
 		/// Access functions

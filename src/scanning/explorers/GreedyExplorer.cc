@@ -1,5 +1,5 @@
 #include "GreedyExplorer.h"
-#include "ipSWDummyEvaluator.h"
+#include "ipSWEvaluator.h"
 #include "ScaleExplorer.h"
 
 namespace Torch
@@ -286,9 +286,14 @@ bool GreedyExplorer::searchAround(int x, int y, float scale)
 				const int sw_y = y + (iy - 1) * m_search_dy;
 
 				// Process the computed sub-window
-				ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, *m_data);
-				if (ScaleExplorer::processSW(	m_scale_prune_ips[0]->getOutput(0),
-								m_scale_evaluation_ips[0]->getOutput(0),
+				if (ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, *m_data) == false)
+				{
+				        Torch::message("GreedyExplorer::searchAround -\
+						error initializing some sub-window!\n");
+					return false;
+				}
+				if (ScaleExplorer::processSW(	*m_prune_itensor,
+								*m_evaluation_itensor,
 								*m_data) == false)
 				{
 					Torch::message("GreedyExplorer::searchAround -\

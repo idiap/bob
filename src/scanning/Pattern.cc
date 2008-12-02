@@ -319,7 +319,7 @@ Pattern& PatternList::Node::add(const Pattern& pattern)
 PatternSpace::PatternSpace()
 	:	m_image_w(0), m_image_h(0), m_model_threshold(0.0f),
 		m_patterns(true),	// <true> for keeping track of the best patterns
-		m_table_confidence(0), m_table_used_xy(0)
+		m_table_confidence(0), m_table_usage(0)
 {
 }
 
@@ -340,12 +340,12 @@ void PatternSpace::deallocateTables()
 	for (int i = 0; i < m_image_w; i ++)
 	{
 		delete[] m_table_confidence[i];
-		delete[] m_table_used_xy[i];
+		delete[] m_table_usage[i];
 	}
 	delete[] m_table_confidence;
-	delete[] m_table_used_xy;
+	delete[] m_table_usage;
 	m_table_confidence = 0;
-	m_table_used_xy = 0;
+	m_table_usage = 0;
 }
 
 void PatternSpace::deallocatePatterns()
@@ -363,7 +363,7 @@ void PatternSpace::clear()
 		for (int j = 0; j < m_image_h; j ++)
 		{
 			m_table_confidence[i][j] = 0;
-			m_table_used_xy[i][j] = 0;
+			m_table_usage[i][j] = 0;
 		}
 
 	// Delete patterns
@@ -376,7 +376,7 @@ void PatternSpace::clear()
 //	- new model threshold
 //	- number of best points to keep track of
 
-bool PatternSpace::reset(int image_w, int image_h, float model_threshold)
+bool PatternSpace::reset(int image_w, int image_h, double model_threshold)
 {
 	// Check if the tables should be resized
 	if (image_w != m_image_w || image_h != m_image_h)
@@ -391,11 +391,11 @@ bool PatternSpace::reset(int image_w, int image_h, float model_threshold)
 			m_image_h = image_h;
 
 			m_table_confidence = new int*[m_image_w];
-			m_table_used_xy = new unsigned char*[m_image_w];
+			m_table_usage = new unsigned char*[m_image_w];
 			for (int i = 0; i < m_image_w; i ++)
 			{
 				m_table_confidence[i] = new int[m_image_h];
-				m_table_used_xy[i] = new unsigned char[m_image_h];
+				m_table_usage[i] = new unsigned char[m_image_h];
 			}
 		}
 		else
@@ -425,15 +425,13 @@ void PatternSpace::add(const Pattern& pattern)
 	const int sw_w = pattern.m_w;
 	const int sw_h = pattern.m_h;
 
-	// Mark this point (top, left) as used
-	m_table_used_xy[sw_x][sw_y] = 0x01;
-
-	// Update the (normalized&scaled) confidence table
+	// Update the (normalized&scaled) confidence and usage tables
 	const int ns_confidence = normScaleConfidence(pattern.m_confidence);
 	for (int i = 0; i < sw_w; i ++)
 		for (int j = 0; j < sw_h; j ++)
 		{
 			m_table_confidence[sw_x + i][sw_y + j] += ns_confidence;
+			m_table_usage[sw_x + i][sw_y + j] = 0x01;
 		}
 
 	// One more pattern is stored

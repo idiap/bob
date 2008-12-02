@@ -63,8 +63,13 @@ bool ExhaustiveScaleExplorer::process(	const Tensor& input_prune,
 	for (int sw_x = sw_min_x; sw_x <= sw_max_x; sw_x += dx)
 		for (int sw_y = sw_min_y; sw_y <= sw_max_y; sw_y += dy)
 		{
-			// Initialize the prunners and evaluator to this sub-window
-			ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData);
+		        // Initialize the prunners and evaluator to this sub-window
+			if (ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
+			{
+			        Torch::message("ExhaustiveScaleExplorer::process \
+						- could not initialize some sub-window!\n");
+				return false;
+			}
 
 			// Process the sub-window
 			if (ScaleExplorer::processSW(input_prune, input_evaluation, explorerData) == false)

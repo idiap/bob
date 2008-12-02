@@ -43,7 +43,7 @@ bool ScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
 /////////////////////////////////////////////////////////////////////////
 // Initialize the evaluator and pruners to some sub-window
 
-void ScaleExplorer::initSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerData& explorerData)
+bool ScaleExplorer::initSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerData& explorerData)
 {
 	for (int i = 0; i < explorerData.m_nSWPruners; i ++)
 		explorerData.m_swPruners[i]->setSubWindow(sw_x, sw_y, sw_w, sw_h);

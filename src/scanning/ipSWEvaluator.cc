@@ -1,4 +1,302 @@
 #include "ipSWEvaluator.h"
+#include "Classifier.h"
+#include "Machines.h"
+#include "Tensor.h"
+#include "Image.h"
+#include "xtprobeImageFile.h"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to allocate a 2D/3D buffer tensor of the model size
+//      and compute the matching indexes with the input tensor
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_ALLOC(tensorType)                                                       \
+{                                                                                       \
+        if (input.nDimension() == 3)                                                    \
+        {                                                                               \
+                SW_EVAL_ALLOC_3D(tensorType);                                           \
+        }                                                                               \
+        else                                                                            \
+        {                                                                               \
+                SW_EVAL_ALLOC_2D(tensorType);                                           \
+        }                                                                               \
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to allocate a 3D buffer tensor of the model size
+//      and compute the matching indexes with the input tensor
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_ALLOC_3D(tensorType)                                                    \
+{                                                                                       \
+        const int n_planes = input.size(2);                                             \
+                                                                                        \
+        const tensorType* t_src = (tensorType*)&input;                                  \
+                                                                                        \
+        const int src_stride_h = t_src->t->stride[0];	                                \
+	const int src_stride_w = t_src->t->stride[1];	                                \
+	const int src_stride_p = t_src->t->stride[2];	                                \
+	m_input_stride_h = src_stride_h;                                                \
+	m_input_stride_w = src_stride_w;                                                \
+	m_input_stride_p = src_stride_p;                                                \
+                                                                                        \
+        tensorType* t_dst = new tensorType(model_h, model_w, n_planes);                 \
+        m_buffTensor = t_dst;                                                           \
+                                                                                        \
+        const int dst_stride_h = t_dst->t->stride[0];                                   \
+        const int dst_stride_w = t_dst->t->stride[1];                                   \
+        const int dst_stride_p = t_dst->t->stride[2];                                   \
+                                                                                        \
+        m_buff_n_indexes = model_h * model_w * n_planes;                                \
+        m_copy_indexes = new int[m_buff_n_indexes];                                     \
+        m_buff_indexes = new int[m_buff_n_indexes];                                     \
+                                                                                        \
+        int index = 0;                                                                  \
+        for (int y = 0; y < model_h; y ++)                                              \
+                for (int x = 0; x < model_w; x ++)                                      \
+                        for (int p = 0; p < n_planes; p ++)                             \
+                        {                                                               \
+                                m_copy_indexes[index] =                                 \
+                                        y * src_stride_h +                              \
+                                        x * src_stride_w +                              \
+                                        p * src_stride_p;                               \
+                                m_buff_indexes[index] =                                 \
+                                        y * dst_stride_h +                              \
+                                        x * dst_stride_w +                              \
+                                        p * dst_stride_p;                               \
+                                                                                        \
+                                index ++;                                               \
+                        }                                                               \
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to allocate a 2D buffer tensor of the model size
+//      and compute the matching indexes with the input tensor
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_ALLOC_2D(tensorType)                                                    \
+{                                                                                       \
+        const tensorType* t_src = (tensorType*)&input;                                  \
+                                                                                        \
+        const int src_stride_h = t_src->t->stride[0];	                                \
+	const int src_stride_w = t_src->t->stride[1];	                                \
+	m_input_stride_h = src_stride_h;                                                \
+	m_input_stride_w = src_stride_w;                                                \
+                                                                                        \
+        tensorType* t_dst = new tensorType(model_h, model_w);                           \
+        m_buffTensor = t_dst;                                                           \
+                                                                                        \
+        const int dst_stride_h = t_dst->t->stride[0];                                   \
+        const int dst_stride_w = t_dst->t->stride[1];                                   \
+                                                                                        \
+        m_buff_n_indexes = model_h * model_w;                                           \
+        m_copy_indexes = new int[m_buff_n_indexes];                                     \
+        m_buff_indexes = new int[m_buff_n_indexes];                                     \
+                                                                                        \
+        int index = 0;                                                                  \
+        for (int y = 0; y < model_h; y ++)                                              \
+                for (int x = 0; x < model_w; x ++)                                      \
+                {                                                                       \
+                        m_copy_indexes[index] =                                         \
+                                y * src_stride_h +                                      \
+                                x * src_stride_w;                                       \
+                        m_buff_indexes[index] =                                         \
+                                y * dst_stride_h +                                      \
+                                x * dst_stride_w;                                       \
+                                                                                        \
+                        index ++;                                                       \
+                }                                                                       \
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to copy a 2D/3D tensor to the buffer tensor of the model size
+//      using the precomputed indexes
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_COPY(tensorType, dataType)                                              \
+{                                                                                       \
+        const tensorType* t_src = (tensorType*)&input;                                  \
+        const dataType* src = t_src->t->storage->data + t_src->t->storageOffset;        \
+                                                                                        \
+        tensorType* t_dst = (tensorType*)m_buffTensor;                                  \
+        dataType* dst = t_dst->t->storage->data + t_dst->t->storageOffset;              \
+                                                                                        \
+        const int offset = m_sw_y * m_input_stride_h + m_sw_x * m_input_stride_w;       \
+                                                                                        \
+        for (int i = 0; i < m_buff_n_indexes; i ++)                                     \
+        {                                                                               \
+                dst[m_buff_indexes[i]] = src[m_copy_indexes[i] + offset];               \
+        }                                                                               \
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to compute the scalling coefficients for a 2D/3D buffer tensor
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_PRESCALE(tensorType)                                                    \
+{                                                                                       \
+        if (m_buffTensor->size(2) == 3)                                                 \
+        {                                                                               \
+                SW_EVAL_PRESCALE_3D(tensorType);                                        \
+        }                                                                               \
+        else                                                                            \
+        {                                                                               \
+                SW_EVAL_PRESCALE_2D(tensorType);                                        \
+        }                                                                               \
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to compute the scalling coefficients for a 3D buffer tensor
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_PRESCALE_3D(tensorType)                                                 \
+{                                                                                       \
+        const int n_planes = m_buffTensor->size(2);                                     \
+        const tensorType* t_dst = (tensorType*)m_buffTensor;                            \
+                                                                                        \
+        m_scale_br_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_tl_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_tr_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_bl_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_cell_sizes = new int[m_buff_n_indexes];                                 \
+                                                                                        \
+        const int model_w = m_classifier->getModelWidth();                              \
+        const int model_h = m_classifier->getModelHeight();                             \
+        const double inv_model_w = 1.0 / (model_w + 0.0);                               \
+        const double inv_model_h = 1.0 / (model_h + 0.0);                               \
+                                                                                        \
+        const double scale_w = (sw_w + 0.0) / (model_w + 0.0);                          \
+        const double scale_h = (sw_h + 0.0) / (model_h + 0.0);                          \
+                                                                                        \
+        int index = 0;                                                                  \
+        for (int y = 0; y < model_h; y ++)                                              \
+                for (int x = 0; x < model_w; x ++)                                      \
+                {                                                                       \
+                        const double x_in_sw = (x + 0.5) * inv_model_w * sw_w;          \
+                        const double y_in_sw = (y + 0.5) * inv_model_h * sw_h;          \
+                                                                                        \
+                        const double min_x_in_sw = x_in_sw - scale_w;                   \
+                        const double max_x_in_sw = x_in_sw + scale_w;                   \
+                        const double min_y_in_sw = y_in_sw - scale_h;                   \
+                        const double max_y_in_sw = y_in_sw + scale_h;                   \
+                                                                                        \
+                        const int l = getInRange((int)(min_x_in_sw), 0, sw_w - 1);      \
+                        const int r = getInRange((int)(max_x_in_sw + 0.5), 0, sw_w - 1);\
+                        const int t = getInRange((int)(min_y_in_sw), 0, sw_h - 1);      \
+                        const int b = getInRange((int)(max_y_in_sw + 0.5), 0, sw_h - 1);\
+                                                                                        \
+                        const int cell_size = (b - t) * (r - b);                        \
+                                                                                        \
+                        for (int p = 0; p < n_planes; p ++)                             \
+                        {                                                               \
+                                m_scale_br_indexes[index] =                             \
+                                        b * m_input_stride_h +                          \
+                                        r * m_input_stride_w +                          \
+                                        p * m_input_stride_p;                           \
+                                m_scale_tl_indexes[index] =                             \
+                                        t * m_input_stride_h +                          \
+                                        l * m_input_stride_w +                          \
+                                        p * m_input_stride_p;                           \
+                                m_scale_tr_indexes[index] =                             \
+                                        t * m_input_stride_h +                          \
+                                        r * m_input_stride_w +                          \
+                                        p * m_input_stride_p;                           \
+                                m_scale_bl_indexes[index] =                             \
+                                        b * m_input_stride_h +                          \
+                                        l * m_input_stride_w +                          \
+                                        p * m_input_stride_p;                           \
+                                m_scale_cell_sizes[index] = cell_size;                  \
+                                                                                        \
+                                index ++;                                               \
+                        }                                                               \
+                }                                                                       \
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to compute the scalling coefficients for a 2D buffer tensor
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_PRESCALE_2D(tensorType)                                                 \
+{                                                                                       \
+        const tensorType* t_dst = (tensorType*)m_buffTensor;                            \
+                                                                                        \
+        m_scale_br_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_tl_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_tr_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_bl_indexes = new int[m_buff_n_indexes];                                 \
+        m_scale_cell_sizes = new int[m_buff_n_indexes];                                 \
+                                                                                        \
+        const int model_w = m_classifier->getModelWidth();                              \
+        const int model_h = m_classifier->getModelHeight();                             \
+        const double inv_model_w = 1.0 / (model_w + 0.0);                               \
+        const double inv_model_h = 1.0 / (model_h + 0.0);                               \
+                                                                                        \
+        const double scale_w = (sw_w + 0.0) / (model_w + 0.0);                          \
+        const double scale_h = (sw_h + 0.0) / (model_h + 0.0);                          \
+                                                                                        \
+        int index = 0;                                                                  \
+        for (int y = 0; y < model_h; y ++)                                              \
+                for (int x = 0; x < model_w; x ++)                                      \
+                {                                                                       \
+                        const double x_in_sw = (x + 0.5) * inv_model_w * sw_w;          \
+                        const double y_in_sw = (y + 0.5) * inv_model_h * sw_h;          \
+                                                                                        \
+                        const double min_x_in_sw = x_in_sw - scale_w;                   \
+                        const double max_x_in_sw = x_in_sw + scale_w;                   \
+                        const double min_y_in_sw = y_in_sw - scale_h;                   \
+                        const double max_y_in_sw = y_in_sw + scale_h;                   \
+                                                                                        \
+                        const int l = getInRange((int)(min_x_in_sw), 0, sw_w - 1);      \
+                        const int r = getInRange((int)(max_x_in_sw + 0.5), 0, sw_w - 1);\
+                        const int t = getInRange((int)(min_y_in_sw), 0, sw_h - 1);      \
+                        const int b = getInRange((int)(max_y_in_sw + 0.5), 0, sw_h - 1);\
+                                                                                        \
+                        const int cell_size = (b - t) * (r - b);                        \
+                                                                                        \
+                        m_scale_br_indexes[index] =                                     \
+                                b * m_input_stride_h +                                  \
+                                r * m_input_stride_w;                                   \
+                        m_scale_tl_indexes[index] =                                     \
+                                t * m_input_stride_h +                                  \
+                                l * m_input_stride_w;                                   \
+                        m_scale_tr_indexes[index] =                                     \
+                                t * m_input_stride_h +                                  \
+                                r * m_input_stride_w;                                   \
+                        m_scale_bl_indexes[index] =                                     \
+                                b * m_input_stride_h +                                  \
+                                l * m_input_stride_w;                                   \
+                        m_scale_cell_sizes[index] = cell_size;                          \
+                                                                                        \
+                        index ++;                                                       \
+                }                                                                       \
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to scale a 2D/3D tensor to the buffer tensor of the model size
+//      using the precomputed indexes
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define SW_EVAL_SCALE(tensorType, dataType)                                             \
+{                                                                                       \
+        const tensorType* t_src = (tensorType*)&input;                                  \
+        const dataType* src = t_src->t->storage->data + t_src->t->storageOffset;        \
+                                                                                        \
+        tensorType* t_dst = (tensorType*)m_buffTensor;                                  \
+        dataType* dst = t_dst->t->storage->data + t_dst->t->storageOffset;              \
+                                                                                        \
+        const int offset = m_sw_y * m_input_stride_h + m_sw_x * m_input_stride_w;       \
+                                                                                        \
+        for (int i = 0; i < m_buff_n_indexes; i ++)                                     \
+        {                                                                               \
+                dst[m_buff_indexes[i]] =                                                \
+                        (       src[m_scale_br_indexes[i] + offset] +                   \
+                                src[m_scale_tl_indexes[i] + offset] -                   \
+                                src[m_scale_tr_indexes[i] + offset] -                   \
+                                src[m_scale_bl_indexes[i] + offset])    /               \
+                        m_scale_cell_sizes[i];                                          \
+        }                                                                               \
+}
+
 
 namespace Torch
 {
@@ -8,8 +306,24 @@ namespace Torch
 
 ipSWEvaluator::ipSWEvaluator()
 	: 	ipSubWindow(),
-		m_isPattern(false), m_confidence(0.0f)
+                m_classifier(0),
+
+                m_buffTensor(0),
+                m_buff_indexes(0), m_buff_n_indexes(0),
+
+                m_input_stride_w(0), m_input_stride_h(0), m_input_stride_p(0),
+
+                m_copy_indexes(0),
+
+                m_scale_br_indexes(0),
+                m_scale_tl_indexes(0),
+                m_scale_tr_indexes(0),
+                m_scale_bl_indexes(0),
+                m_scale_cell_sizes(0),
+
+                m_save_buffTensor(false)
 {
+        addBOption("saveBuffTensorToJpg", false, "save the buffer tensor to JPEG");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -17,6 +331,383 @@ ipSWEvaluator::ipSWEvaluator()
 
 ipSWEvaluator::~ipSWEvaluator()
 {
+        delete m_classifier;
+
+        delete m_buffTensor;
+        delete[] m_buff_indexes;
+
+        delete[] m_copy_indexes;
+
+        delete[] m_scale_br_indexes;
+        delete[] m_scale_tl_indexes;
+        delete[] m_scale_tr_indexes;
+        delete[] m_scale_bl_indexes;
+        delete[] m_scale_cell_sizes;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// called when some option was changed - overriden
+
+void ipSWEvaluator::optionChanged(const char* name)
+{
+        m_save_buffTensor = getBOption("saveBuffTensorToJpg");
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Set the classifier to load from some file
+
+bool ipSWEvaluator::setClassifier(const char* filename)
+{
+        // Load the machine
+        Machine* machine = Torch::loadMachineFromFile(filename);
+        if (machine == 0)
+        {
+                Torch::message("ipSWEvaluator::setClassifier - invalid model file!\n");
+                return false;
+        }
+
+        // Check if it's really a classifier
+        Classifier* classifier = dynamic_cast<Classifier*>(machine);
+        if (classifier == 0)
+        {
+                delete machine;
+                Torch::message("ipSWEvaluator::setClassifier - the loaded model is not a classifier!\n");
+                return false;
+        }
+
+        // OK
+        m_classifier = classifier;
+        return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Access functions
+
+bool ipSWEvaluator::isPattern() const
+{
+        if (m_classifier == 0)
+        {
+                Torch::error("ipSWEvaluator::isPattern - no valid classifier specified!\n");
+        }
+        return m_classifier->isPattern();
+}
+
+double ipSWEvaluator::getConfidence() const
+{
+        if (m_classifier == 0)
+        {
+                Torch::error("ipSWEvaluator::getConfidence - no valid classifier specified!\n");
+        }
+        return m_classifier->getConfidence();
+}
+
+int ipSWEvaluator::getModelWidth() const
+{
+        if (m_classifier == 0)
+        {
+                Torch::error("ipSWEvaluator::getModelWidth - no valid classifier specified!\n");
+        }
+        return m_classifier->getModelWidth();
+}
+
+int ipSWEvaluator::getModelHeight() const
+{
+        if (m_classifier == 0)
+        {
+                Torch::error("ipSWEvaluator::getModelHeight - no valid classifier specified!\n");
+        }
+        return m_classifier->getModelHeight();
+}
+
+double ipSWEvaluator::getModelThreshold() const
+{
+        // TODO: how to do it?!
+        return 0.0;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Check if the input tensor has the right dimensions and type - overriden
+
+bool ipSWEvaluator::checkInput(const Tensor& input) const
+{
+        return  m_classifier != 0 &&
+                m_buffTensor != 0 &&
+                (input.nDimension() == 2 || input.nDimension() == 3) &&
+                input.size(0) == m_inputSize.h &&
+                input.size(1) == m_inputSize.w;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Allocate (if needed) the output tensors given the input tensor dimensions - overriden
+
+bool ipSWEvaluator::allocateOutput(const Tensor& input)
+{
+        // No output is generated, the Machine has the output!
+        return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Process some input tensor (the input is checked, the outputs are allocated) - overriden
+
+bool ipSWEvaluator::processInput(const Tensor& input)
+{
+        // If the sub-window has the size of the machine,
+        //      then forward to the classifier the sub-window area of the input
+        if (    m_sw_w == m_classifier->getModelWidth() &&
+                m_sw_h == m_classifier->getModelHeight())
+        {
+                cropInput(input);
+        }
+
+        // Otherwise, need to rescale the sub-window and forward this to the classifier
+        // (the input tensor is considered and integral image of some features)
+        else
+        {
+                iscaleInput(input);
+        }
+
+        // Just forward the buffer tensor to the classifier
+        const bool processed = m_classifier->forward(*m_buffTensor);
+
+        // Save the buffer tensor if contains a pattern (if requested)
+        if (    m_save_buffTensor == true &&
+                m_buffTensor->nDimension() == 3 &&
+                processed == true &&
+                m_classifier->isPattern() == true)
+        {
+                Image image;
+                if (    image.resize(   m_buffTensor->size(0),
+                                        m_buffTensor->size(1),
+                                        m_buffTensor->size(2)) == true &&
+                        image.copyFrom(*m_buffTensor) == true)
+                {
+                        char str[200];
+                        sprintf(str, "BuffTensor_sw_%d_%d_%dx%d_input_%dx%d.jpg",
+                                m_sw_x, m_sw_y, m_sw_w, m_sw_h,
+                                m_inputSize.w, m_inputSize.h);
+
+                        xtprobeImageFile xtprobe;
+                        if (xtprobe.open(str, "w+") == true)
+                        {
+                                image.saveImage(xtprobe);
+                        }
+                }
+        }
+
+        // OK
+        return processed;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Crop some input tensor to the model size (it's actually just copying)
+
+void ipSWEvaluator::cropInput(const Tensor& input)
+{
+        switch (input.getDatatype())
+        {
+        case Tensor::Char:
+                SW_EVAL_COPY(CharTensor, char);
+                break;
+
+        case Tensor::Short:
+                SW_EVAL_COPY(ShortTensor, short);
+                break;
+
+        case Tensor::Int:
+                SW_EVAL_COPY(IntTensor, int);
+                break;
+
+        case Tensor::Long:
+                SW_EVAL_COPY(LongTensor, long);
+                break;
+
+        case Tensor::Float:
+                SW_EVAL_COPY(FloatTensor, float);
+                break;
+
+        case Tensor::Double:
+                SW_EVAL_COPY(DoubleTensor, double);
+                break;
+        }
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Scale some input tensor (considered integral image) to the model size
+
+void ipSWEvaluator::iscaleInput(const Tensor& input)
+{
+        switch (input.getDatatype())
+        {
+        case Tensor::Char:
+                SW_EVAL_SCALE(CharTensor, char);
+                break;
+
+        case Tensor::Short:
+                SW_EVAL_SCALE(ShortTensor, short);
+                break;
+
+        case Tensor::Int:
+                SW_EVAL_SCALE(IntTensor, int);
+                break;
+
+        case Tensor::Long:
+                SW_EVAL_SCALE(LongTensor, long);
+                break;
+
+        case Tensor::Float:
+                SW_EVAL_SCALE(FloatTensor, float);
+                break;
+
+        case Tensor::Double:
+                SW_EVAL_SCALE(DoubleTensor, double);
+                break;
+        }
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Initialize the buffer tensor to the given input type&size
+// (the classifier should be loaded first)
+
+bool ipSWEvaluator::init(const Tensor& input)
+{
+        // Check parameters
+        if (input.nDimension() != 2 && input.nDimension() != 3)
+        {
+                Torch::message("ipSWEvaluator::init - only 2D/3D input tensors are supported!\n");
+                return false;
+        }
+        if (m_classifier == 0)
+        {
+                Torch::message("ipSWEvaluator::init - no classifier specified!\n");
+                return false;
+        }
+
+        // Set the input size (for ipCore)
+        if (setInputSize(input.size(1), input.size(0)) == false)
+        {
+                return false;
+        }
+
+        // Cleanup
+        delete m_buffTensor;
+        delete[] m_buff_indexes;
+        m_buffTensor = 0;
+        m_buff_indexes = 0;
+        m_buff_n_indexes = 0;
+
+        delete[] m_copy_indexes;
+        m_copy_indexes = 0;
+        m_input_stride_w = 0;
+        m_input_stride_h = 0;
+        m_input_stride_p = 0;
+
+        const int model_w = m_classifier->getModelWidth();
+        const int model_h = m_classifier->getModelHeight();
+
+        // Allocate the buffer tensor as to have the model size
+        //      and the input type and number of planes
+        //      and compute the indexes between the input tensor and the buffered one
+        switch (input.getDatatype())
+        {
+        case Tensor::Char:
+                SW_EVAL_ALLOC(CharTensor);
+                break;
+
+        case Tensor::Short:
+                SW_EVAL_ALLOC(ShortTensor);
+                break;
+
+        case Tensor::Int:
+                SW_EVAL_ALLOC(IntTensor);
+                break;
+
+        case Tensor::Long:
+                SW_EVAL_ALLOC(LongTensor);
+                break;
+
+        case Tensor::Float:
+                SW_EVAL_ALLOC(FloatTensor);
+                break;
+
+        case Tensor::Double:
+                SW_EVAL_ALLOC(DoubleTensor);
+                break;
+
+        default:
+                return false;
+        }
+
+        // OK
+        return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+/// Change the sub-window to process in - overriden
+
+bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
+{
+        // Set the sub-window
+        const bool changed = m_sw_w != sw_w || m_sw_h != sw_h;
+        if (    m_classifier == 0 ||
+                m_buffTensor == 0 ||
+                ipSubWindow::setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
+        {
+                print("ipSubWindow::setSubWindow returned false\n");
+                return false;
+        }
+
+        // If the sub-window size is changed and on the multiscale part
+        //      (the sub-window is different from the classifier's size),
+        //      then the scalling coefficients should be recomputed!
+        if (    changed == true &&
+                (sw_w != m_classifier->getModelWidth() || sw_h != m_classifier->getModelHeight()))
+        {
+                // Cleanup
+                delete[] m_scale_br_indexes;
+                delete[] m_scale_tl_indexes;
+                delete[] m_scale_tr_indexes;
+                delete[] m_scale_bl_indexes;
+                delete[] m_scale_cell_sizes;
+                m_scale_br_indexes = 0;
+                m_scale_tl_indexes = 0;
+                m_scale_tr_indexes = 0;
+                m_scale_bl_indexes = 0;
+                m_scale_cell_sizes = 0;
+
+                // Do the prescalling
+                switch (m_buffTensor->getDatatype())
+                {
+                case Tensor::Char:
+                        SW_EVAL_PRESCALE(CharTensor);
+                        break;
+
+                 case Tensor::Short:
+                        SW_EVAL_PRESCALE(ShortTensor);
+                        break;
+
+                 case Tensor::Int:
+                        SW_EVAL_PRESCALE(IntTensor);
+                        break;
+
+                 case Tensor::Long:
+                        SW_EVAL_PRESCALE(LongTensor);
+                        break;
+
+                 case Tensor::Float:
+                        SW_EVAL_PRESCALE(FloatTensor);
+                        break;
+
+                 case Tensor::Double:
+                        SW_EVAL_PRESCALE(DoubleTensor);
+                        break;
+
+                default:
+                        return false;
+                }
+        }
+
+        // OK
+        return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
