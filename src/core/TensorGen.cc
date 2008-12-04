@@ -181,10 +181,10 @@ void TENSOR_CLASS(Tensor)::print(const char *name) const
   if(name != NULL) Torch::print("Tensor %s:\n", name);
   Tprint((TENSOR_CLASS(Tensor) *)this);
 }
-	
+
 void TENSOR_CLASS(Tensor)::sprint(const char *name, ...) const
 {
-  if(name != NULL) 
+  if(name != NULL)
   {
 	char _msg[512];
 
@@ -232,22 +232,22 @@ TYPE TENSOR_CLASS(Tensor)::get(long x0, long x1, long x2, long x3) const
 }
 
 
-void TENSOR_CLASS(Tensor)::set(long x0, TYPE v)
+void TENSOR_CLASS(Tensor)::setValue(long x0, TYPE v)
 {
   TENSOR_FUNC(set1d)(t, x0, v);
 }
 
-void TENSOR_CLASS(Tensor)::set(long x0, long x1, TYPE v)
+void TENSOR_CLASS(Tensor)::setValue(long x0, long x1, TYPE v)
 {
   TENSOR_FUNC(set2d)(t, x0, x1, v);
 }
 
-void TENSOR_CLASS(Tensor)::set(long x0, long x1, long x2, TYPE v)
+void TENSOR_CLASS(Tensor)::setValue(long x0, long x1, long x2, TYPE v)
 {
   TENSOR_FUNC(set3d)(t, x0, x1, x2, v);
 }
 
-void TENSOR_CLASS(Tensor)::set(long x0, long x1, long x2, long x3, TYPE v)
+void TENSOR_CLASS(Tensor)::setValue(long x0, long x1, long x2, long x3, TYPE v)
 {
   TENSOR_FUNC(set4d)(t, x0, x1, x2, x3, v);
 }

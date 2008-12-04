@@ -70,6 +70,41 @@ namespace Torch {
 
 		//---
 
+		/////////////////////////////////////////////////////////////////////
+		// SET functions for each possible type
+
+		virtual void set(long, char) = 0;
+                virtual void set(long, long, char) = 0;
+                virtual void set(long, long, long, char) = 0;
+                virtual void set(long, long, long, long, char) = 0;
+
+                virtual void set(long, short) = 0;
+                virtual void set(long, long, short) = 0;
+                virtual void set(long, long, long, short) = 0;
+                virtual void set(long, long, long, long, short) = 0;
+
+                virtual void set(long, int) = 0;
+                virtual void set(long, long, int) = 0;
+                virtual void set(long, long, long, int) = 0;
+                virtual void set(long, long, long, long, int) = 0;
+
+                virtual void set(long, long) = 0;
+                virtual void set(long, long, long) = 0;
+                virtual void set(long, long, long, long) = 0;
+                virtual void set(long, long, long, long, long) = 0;
+
+                virtual void set(long, float) = 0;
+                virtual void set(long, long, float) = 0;
+                virtual void set(long, long, long, float) = 0;
+                virtual void set(long, long, long, long, float) = 0;
+
+                virtual void set(long, double) = 0;
+                virtual void set(long, long, double) = 0;
+                virtual void set(long, long, long, double) = 0;
+                virtual void set(long, long, long, long, double) = 0;
+
+                /////////////////////////////////////////////////////////////////////
+
 		virtual ~Tensor() {};
 	};
 
