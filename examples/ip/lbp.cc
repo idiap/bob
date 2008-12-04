@@ -24,10 +24,12 @@ int main()
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
 	// Build the <ipLBP> objects to play with
-	const int n_ip_lbps = 9;
+	const int n_ip_lbps = 12;
 	const char* str_ip_lbps[n_ip_lbps] =
 		{
 			"4R", "4R_avg", "4R_avg_add_bit",
+			"4R_ri", "4R_avg_u2", "4R_u2ri",
+
 			"8R", "8R_avg", "8R_avg_add_bit",
 			"8R_ri", "8R_u2", "8R_u2ri",
 		};
@@ -35,7 +37,7 @@ int main()
 	// Run each LBP type
 	for (int i = 0; i < n_ip_lbps; i ++)
 	{
-		ipLBP* ip_lbp = (i < 3) ? ((ipLBP*)new ipLBP4R(1)) : ((ipLBP*)new ipLBP8R(1));
+		ipLBP* ip_lbp = (i < 6) ? ((ipLBP*)new ipLBP4R(1)) : ((ipLBP*)new ipLBP8R(1));
 
 		// Initialize the <ipLBP>
 		const int w = image.getWidth();
@@ -43,10 +45,10 @@ int main()
 		assert(ip_lbp->setInputSize(w, h) == true);
 
 		// Set the parameters for this <ipLBP>
-		const bool param_avg = i == 1 || i == 2 || i == 4 || i == 5;
-		const bool param_avg_add_bit = i == 2 || i == 5;
-		const bool param_uniform = i == 7 || i == 8;
-		const bool param_rot_invariant = i == 6 || i == 8;
+		const bool param_avg = i == 1 || i == 2 || i == 7 || i == 8;
+		const bool param_avg_add_bit = i == 2 || i == 8;
+		const bool param_uniform = i == 4 || i == 5 || i == 10 || i == 11;
+		const bool param_rot_invariant = i == 3 || i == 5 || i == 9 || i == 11;
 
 		assert(ip_lbp->setBOption("ToAverage", param_avg) == true);
 		assert(ip_lbp->setBOption("AddAvgBit", param_avg_add_bit) == true);

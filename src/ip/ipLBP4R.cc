@@ -94,7 +94,7 @@ int ipLBP4R::getMaxLabel()
 	return	m_rot_invariant ?
 			(m_uniform ? 	6 	// Rotation invariant + uniform
 					:
-					5)	// Rotation invariant
+					6)	// Rotation invariant
 			:
 			(m_uniform ?	15	// Uniform
 					:
