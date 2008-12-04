@@ -14,7 +14,7 @@ namespace Torch
 	//
 	//	- PARAMETERS (name, type, default value, description):
 	//		"ToAverage"	bool	false	"compute the LBP code to the average"
-	//		"AddAvgBit"	bool	false	"add to the LBP code the center (considering the average)"
+	//		"AddAvgBit"	bool	false	"add the center bit to the LBP code (considering the average)"
 	//		"Uniform"	bool	false	"uniform patterns (at most two bitwise 0-1 or 1-0 transitions)"
 	//		"RotInvariant"	bool	false	"rotation invariant patterns"
 	//

@@ -8,7 +8,7 @@ namespace Torch
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::ipLBP4R
 	//	This class implements LBP4R operators, where R is the radius.
-	//	Doesn't use the "Uniform" and "RotInvariant" boolean options.
+	//	Uses the "Uniform" and "RotInvariant" boolean options.
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -39,10 +39,21 @@ namespace Torch
 
 	private:
 
+		//////////////////////////////////////////////////////////
+		// Initialize the conversion table for rotation invariant and uniform LBP patterns
+
+		void			init_lut_RI();
+		void			init_lut_U2();
+		void			init_lut_U2RI();
+
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-		//
+		// Conversion tables (to label uniform & rotation invariant LBP patterns)
+		unsigned char*		m_lut_RI;
+		unsigned char*		m_lut_U2;
+		unsigned char*		m_lut_U2RI;
+
 	};
 }
 
