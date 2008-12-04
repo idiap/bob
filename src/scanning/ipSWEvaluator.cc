@@ -135,7 +135,7 @@
 
 #define SW_EVAL_PRESCALE(tensorType)                                                    \
 {                                                                                       \
-        if (m_buffTensor->size(2) == 3)                                                 \
+        if (m_buffTensor->nDimension() == 3)                                            \
         {                                                                               \
                 SW_EVAL_PRESCALE_3D(tensorType);                                        \
         }                                                                               \
@@ -165,8 +165,8 @@
         const double inv_model_w = 1.0 / (model_w + 0.0);                               \
         const double inv_model_h = 1.0 / (model_h + 0.0);                               \
                                                                                         \
-        const double scale_w = (sw_w + 0.0) / (model_w + 0.0);                          \
-        const double scale_h = (sw_h + 0.0) / (model_h + 0.0);                          \
+        const double scale_w = 0.5 * (sw_w + 0.0) / (model_w + 0.0);                    \
+        const double scale_h = 0.5 * (sw_h + 0.0) / (model_h + 0.0);                    \
                                                                                         \
         int index = 0;                                                                  \
         for (int y = 0; y < model_h; y ++)                                              \
@@ -175,17 +175,17 @@
                         const double x_in_sw = (x + 0.5) * inv_model_w * sw_w;          \
                         const double y_in_sw = (y + 0.5) * inv_model_h * sw_h;          \
                                                                                         \
-                        const double min_x_in_sw = x_in_sw - scale_w;                   \
-                        const double max_x_in_sw = x_in_sw + scale_w;                   \
-                        const double min_y_in_sw = y_in_sw - scale_h;                   \
-                        const double max_y_in_sw = y_in_sw + scale_h;                   \
+                        const double min_x_in_sw = x_in_sw - scale_w - 0.5;             \
+                        const double max_x_in_sw = x_in_sw + scale_w + 0.5;             \
+                        const double min_y_in_sw = y_in_sw - scale_h - 0.5;             \
+                        const double max_y_in_sw = y_in_sw + scale_h + 0.5;             \
                                                                                         \
                         const int l = getInRange((int)(min_x_in_sw), 0, sw_w - 1);      \
                         const int r = getInRange((int)(max_x_in_sw + 0.5), 0, sw_w - 1);\
                         const int t = getInRange((int)(min_y_in_sw), 0, sw_h - 1);      \
                         const int b = getInRange((int)(max_y_in_sw + 0.5), 0, sw_h - 1);\
                                                                                         \
-                        const int cell_size = (b - t) * (r - b);                        \
+                        const int cell_size = (b - t) * (r - l);                        \
                                                                                         \
                         for (int p = 0; p < n_planes; p ++)                             \
                         {                                                               \
@@ -231,8 +231,8 @@
         const double inv_model_w = 1.0 / (model_w + 0.0);                               \
         const double inv_model_h = 1.0 / (model_h + 0.0);                               \
                                                                                         \
-        const double scale_w = (sw_w + 0.0) / (model_w + 0.0);                          \
-        const double scale_h = (sw_h + 0.0) / (model_h + 0.0);                          \
+        const double scale_w = 0.5 * (sw_w + 0.0) / (model_w + 0.0);                    \
+        const double scale_h = 0.5 * (sw_h + 0.0) / (model_h + 0.0);                    \
                                                                                         \
         int index = 0;                                                                  \
         for (int y = 0; y < model_h; y ++)                                              \
@@ -241,17 +241,17 @@
                         const double x_in_sw = (x + 0.5) * inv_model_w * sw_w;          \
                         const double y_in_sw = (y + 0.5) * inv_model_h * sw_h;          \
                                                                                         \
-                        const double min_x_in_sw = x_in_sw - scale_w;                   \
-                        const double max_x_in_sw = x_in_sw + scale_w;                   \
-                        const double min_y_in_sw = y_in_sw - scale_h;                   \
-                        const double max_y_in_sw = y_in_sw + scale_h;                   \
+                        const double min_x_in_sw = x_in_sw - scale_w - 0.5;             \
+                        const double max_x_in_sw = x_in_sw + scale_w + 0.5;             \
+                        const double min_y_in_sw = y_in_sw - scale_h - 0.5;             \
+                        const double max_y_in_sw = y_in_sw + scale_h + 0.5;             \
                                                                                         \
                         const int l = getInRange((int)(min_x_in_sw), 0, sw_w - 1);      \
                         const int r = getInRange((int)(max_x_in_sw + 0.5), 0, sw_w - 1);\
                         const int t = getInRange((int)(min_y_in_sw), 0, sw_h - 1);      \
                         const int b = getInRange((int)(max_y_in_sw + 0.5), 0, sw_h - 1);\
                                                                                         \
-                        const int cell_size = (b - t) * (r - b);                        \
+                        const int cell_size = (b - t) * (r - l);                        \
                                                                                         \
                         m_scale_br_indexes[index] =                                     \
                                 b * m_input_stride_h +                                  \
@@ -618,7 +618,7 @@ bool ipSWEvaluator::init(const Tensor& input)
                 break;
 
         case Tensor::Int:
-                SW_EVAL_ALLOC(IntTensor);
+		SW_EVAL_ALLOC(IntTensor);
                 break;
 
         case Tensor::Long:
@@ -652,7 +652,6 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
                 m_buffTensor == 0 ||
                 ipSubWindow::setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
         {
-                print("ipSubWindow::setSubWindow returned false\n");
                 return false;
         }
 
@@ -662,7 +661,7 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
         if (    changed == true &&
                 (sw_w != m_classifier->getModelWidth() || sw_h != m_classifier->getModelHeight()))
         {
-                // Cleanup
+        	// Cleanup
                 delete[] m_scale_br_indexes;
                 delete[] m_scale_tl_indexes;
                 delete[] m_scale_tr_indexes;
@@ -686,7 +685,7 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
                         break;
 
                  case Tensor::Int:
-                        SW_EVAL_PRESCALE(IntTensor);
+			SW_EVAL_PRESCALE(IntTensor);
                         break;
 
                  case Tensor::Long:

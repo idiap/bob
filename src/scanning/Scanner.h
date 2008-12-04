@@ -35,6 +35,7 @@ namespace Torch
 		// Modify the ROIs
 
 		bool				addROI(const sRect2D& roi);
+		bool				addROI(int x, int y, int w, int h);
 		bool				deleteROI(int index);
 		void				deleteAllROIs();
 

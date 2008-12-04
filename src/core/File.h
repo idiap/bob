@@ -21,6 +21,9 @@ namespace Torch
 		/// Open "file_name" with the flags #open_flags#
 		virtual bool		open(const char* file_name, const char* open_flags);
 
+		/// Use the already given FILE object
+		virtual bool		open(FILE* file);
+
 		/// Close the file (if opened)
 		void			close();
 
@@ -74,7 +77,8 @@ namespace Torch
 		///////////////////////////////////////////////////////////
 		// Attributes
 
-		FILE*				m_file;
+		FILE*			m_file;
+		bool			m_shouldClose;
 	};
 }
 

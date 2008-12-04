@@ -66,16 +66,14 @@ bool ExhaustiveScaleExplorer::process(	const Tensor& input_prune,
 		        // Initialize the prunners and evaluator to this sub-window
 			if (ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
 			{
-			        Torch::message("ExhaustiveScaleExplorer::process \
-						- could not initialize some sub-window!\n");
+			        Torch::message("ExhaustiveScaleExplorer::process - failed to initialize some sub-window!\n");
 				return false;
 			}
 
 			// Process the sub-window
 			if (ScaleExplorer::processSW(input_prune, input_evaluation, explorerData) == false)
 			{
-				Torch::message("ExhaustiveScaleExplorer::process \
-						- could not process some sub-window!\n");
+				Torch::message("ExhaustiveScaleExplorer::process - failed to process some sub-window!\n");
 				return false;
 			}
 

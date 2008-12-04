@@ -14,6 +14,10 @@ SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/Trainer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Machine.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Tensor.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/CmdOption.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/FileListCmdOption.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/CmdLine.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/CmdFile.cc"
 	CACHE INTERNAL "sources")
 
 SET(	core_INCLUDE

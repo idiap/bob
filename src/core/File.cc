@@ -30,7 +30,26 @@ namespace Torch
 		{
 		        fseek(m_file, 0, SEEK_SET);
 		}
+		m_shouldClose = true;
 		return isOpened();
+	}
+
+	///////////////////////////////////////////////////////////
+	// Use the already given FILE object
+
+	bool File::open(FILE* file)
+	{
+                if (file == 0)
+                {
+                        return false;
+                }
+
+                close();
+
+		// If it's an external FILE don't close it, it may be managed externally!
+                m_file = file;
+                m_shouldClose = false;
+                return true;
 	}
 
 	///////////////////////////////////////////////////////////
@@ -38,8 +57,7 @@ namespace Torch
 
 	void File::close()
 	{
-
-		if (m_file != 0)
+		if (m_file != 0 && m_shouldClose == true)
 		{
 			fclose(m_file);
 			m_file = 0;

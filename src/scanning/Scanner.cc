@@ -30,8 +30,13 @@ Scanner::~Scanner()
 
 bool Scanner::addROI(const sRect2D& roi)
 {
+	return addROI(roi.x, roi.y, roi.w, roi.h);
+}
+
+bool Scanner::addROI(int x, int y, int w, int h)
+{
 	// Check parameters
-	if (!	(roi.x >= 0 && roi.w > 0 && roi.y >= 0 && roi.h > 0))
+	if (!	(x >= 0 && w > 0 && y >= 0 && h > 0))
 	{
 		Torch::message("Scanner::addROI - invalid parameters!\n");
 		return false;
@@ -45,7 +50,13 @@ bool Scanner::addROI(const sRect2D& roi)
 	}
 	delete[] m_rois;
 	m_rois = temp;
-	m_rois[m_n_rois ++] = roi;
+
+	m_rois[m_n_rois].x = x;
+	m_rois[m_n_rois].y = y;
+	m_rois[m_n_rois].w = w;
+	m_rois[m_n_rois].h = h;
+
+	m_n_rois ++;
 	return true;
 }
 

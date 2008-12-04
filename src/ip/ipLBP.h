@@ -8,7 +8,9 @@ namespace Torch
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::ipLBP
 	//	This class computes the LBP code at a given location in the image.
+	//	The input tensor can be a 2D/3D tensor of any type.
 	//	The result is a 1D IntTensor with a single value (the LBP code).
+	//      For 3D tensors only the first plane is used.
 	//
 	//	- PARAMETERS (name, type, default value, description):
 	//		"ToAverage"	bool	false	"compute the LBP code to the average"
@@ -59,8 +61,23 @@ namespace Torch
 		/// called when some option was changed - overriden
 		virtual void		optionChanged(const char* name);
 
-		// Bilinear interpolation
+		// Bilinear interpolation (for different tensor types)
+		char			bilinear_interpolation(	const char* src,
+								int stride_w, int stride_h,
+								float x, float y);
 		short			bilinear_interpolation(	const short* src,
+								int stride_w, int stride_h,
+								float x, float y);
+                int			bilinear_interpolation(	const int* src,
+								int stride_w, int stride_h,
+								float x, float y);
+		long			bilinear_interpolation(	const long* src,
+								int stride_w, int stride_h,
+								float x, float y);
+		float			bilinear_interpolation(	const float* src,
+								int stride_w, int stride_h,
+								float x, float y);
+		double			bilinear_interpolation(	const double* src,
 								int stride_w, int stride_h,
 								float x, float y);
 

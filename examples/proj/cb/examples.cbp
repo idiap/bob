@@ -62,7 +62,7 @@
 		<Unit filename="../../options/options.cc" />
 		<Unit filename="../../scanning/CMakeLists.txt" />
 		<Unit filename="../../scanning/make.csh" />
-		<Unit filename="../../scanning/pyramidScanning.cc" />
+		<Unit filename="../../scanning/scanning.cc" />
 		<Unit filename="../../scanning/testPatternList.cc" />
 		<Unit filename="../../tensors/CMakeLists.txt" />
 		<Unit filename="../../tensors/README.txt" />

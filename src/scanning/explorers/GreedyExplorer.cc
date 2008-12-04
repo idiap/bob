@@ -147,9 +147,9 @@ bool GreedyExplorer::process()
 		if (m_hasMoreSteps == true)
 		{
 			// Refine the searching parameters for each axis (if it's possible)
-			m_search_ds = min(m_search_ds * 0.5f, m_search_min_ds);
-			m_search_dx = min(m_search_dx / 2, m_search_min_dx);
-			m_search_dy = min(m_search_dy / 2, m_search_min_dy);
+			m_search_ds = max(m_search_ds * 0.5f, m_search_min_ds);
+			m_search_dx = max(m_search_dx / 2, m_search_min_dx);
+			m_search_dy = max(m_search_dy / 2, m_search_min_dy);
 
 			// Debug message
 			if (verbose == true)
@@ -206,6 +206,7 @@ bool GreedyExplorer::refineSearch()
 	for (int i = 0; i < n_best_points; i ++)
 	{
 		m_best_patterns[i].copy(m_data->m_patternSpace.getBest(i));
+
 	}
 
 	// Search around each best pattern point
@@ -244,10 +245,10 @@ bool GreedyExplorer::shouldSearchMode(int old_n_candidates) const
 		return false;
 	}
 
-	// If search parameters are ALL to small, ...
+	// If search parameters are ALL too small, ...
 	if (	m_search_dx == m_search_min_dx &&
 		m_search_dy == m_search_min_dy &&
-		fabs(m_search_ds - m_search_min_ds) < 0.001f)
+		m_search_ds < 2.0 * m_search_min_ds)
 	{
 		return false;
 	}

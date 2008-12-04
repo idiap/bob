@@ -71,8 +71,8 @@ bool ipLBP::setR(int R)
 
 bool ipLBP::checkInput(const Tensor& input) const
 {
-	if (	input.nDimension() != 3 ||
-		input.getDatatype() != Tensor::Short)
+	if (	input.nDimension() != 2 &&
+		input.nDimension() != 3)
 	{
 		return false;
 	}
@@ -108,6 +108,21 @@ bool ipLBP::allocateOutput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Bilinear interpolation
 
+char ipLBP::bilinear_interpolation(const char* src, int stride_w, int stride_h, float x, float y)
+{
+	int xl = (int) floor(x);
+	int yl = (int) floor(y);
+	int xh = (int) ceil(x);
+	int yh = (int) ceil(y);
+
+	const float Il = src[xl * stride_w + yl * stride_h] + (x - xl) *
+			(src[xh * stride_w + yl * stride_h] - src[xl * stride_w + yl * stride_h]);
+	const float Ih = src[xl * stride_w + yh * stride_h] + (x - xl) *
+			(src[xh * stride_w + yh * stride_h] - src[xl * stride_w + yh * stride_h]);
+
+	return (char)(Il + (y - yl) * (Ih - Il) + 0.5f);
+}
+
 short ipLBP::bilinear_interpolation(const short* src, int stride_w, int stride_h, float x, float y)
 {
 	int xl = (int) floor(x);
@@ -121,6 +136,66 @@ short ipLBP::bilinear_interpolation(const short* src, int stride_w, int stride_h
 			(src[xh * stride_w + yh * stride_h] - src[xl * stride_w + yh * stride_h]);
 
 	return (short)(Il + (y - yl) * (Ih - Il) + 0.5f);
+}
+
+int ipLBP::bilinear_interpolation(const int* src, int stride_w, int stride_h, float x, float y)
+{
+	int xl = (int) floor(x);
+	int yl = (int) floor(y);
+	int xh = (int) ceil(x);
+	int yh = (int) ceil(y);
+
+	const float Il = src[xl * stride_w + yl * stride_h] + (x - xl) *
+			(src[xh * stride_w + yl * stride_h] - src[xl * stride_w + yl * stride_h]);
+	const float Ih = src[xl * stride_w + yh * stride_h] + (x - xl) *
+			(src[xh * stride_w + yh * stride_h] - src[xl * stride_w + yh * stride_h]);
+
+	return (int)(Il + (y - yl) * (Ih - Il) + 0.5f);
+}
+
+long ipLBP::bilinear_interpolation(const long* src, int stride_w, int stride_h, float x, float y)
+{
+	int xl = (int) floor(x);
+	int yl = (int) floor(y);
+	int xh = (int) ceil(x);
+	int yh = (int) ceil(y);
+
+	const float Il = src[xl * stride_w + yl * stride_h] + (x - xl) *
+			(src[xh * stride_w + yl * stride_h] - src[xl * stride_w + yl * stride_h]);
+	const float Ih = src[xl * stride_w + yh * stride_h] + (x - xl) *
+			(src[xh * stride_w + yh * stride_h] - src[xl * stride_w + yh * stride_h]);
+
+	return (long)(Il + (y - yl) * (Ih - Il) + 0.5f);
+}
+
+float ipLBP::bilinear_interpolation(const float* src, int stride_w, int stride_h, float x, float y)
+{
+	int xl = (int) floor(x);
+	int yl = (int) floor(y);
+	int xh = (int) ceil(x);
+	int yh = (int) ceil(y);
+
+	const float Il = src[xl * stride_w + yl * stride_h] + (x - xl) *
+			(src[xh * stride_w + yl * stride_h] - src[xl * stride_w + yl * stride_h]);
+	const float Ih = src[xl * stride_w + yh * stride_h] + (x - xl) *
+			(src[xh * stride_w + yh * stride_h] - src[xl * stride_w + yh * stride_h]);
+
+	return Il + (y - yl) * (Ih - Il);
+}
+
+double ipLBP::bilinear_interpolation(const double* src, int stride_w, int stride_h, float x, float y)
+{
+	int xl = (int) floor(x);
+	int yl = (int) floor(y);
+	int xh = (int) ceil(x);
+	int yh = (int) ceil(y);
+
+	const double Il = src[xl * stride_w + yl * stride_h] + (x - xl) *
+			(src[xh * stride_w + yl * stride_h] - src[xl * stride_w + yl * stride_h]);
+	const double Ih = src[xl * stride_w + yh * stride_h] + (x - xl) *
+			(src[xh * stride_w + yh * stride_h] - src[xl * stride_w + yh * stride_h]);
+
+	return Il + (y - yl) * (Ih - Il);
 }
 
 /////////////////////////////////////////////////////////////////////////
