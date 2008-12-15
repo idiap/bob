@@ -33,27 +33,55 @@
 	const int height = m_inputSize.h;                                               \
 	const int n_planes = input.size(2);                                             \
                                                                                         \
-        dst[0] = src[0];                                                                \
-        for (int x = 1; x < width; x ++)                                                \
-        {                                                                               \
-                const int baseindex = x * stride_w;                                     \
-                dst[baseindex] = dst[baseindex - stride_w] + src[baseindex];            \
-        }                                                                               \
-                                                                                        \
-        for (int y = 1; y < height; y ++)                                               \
-        {                                                                               \
-                int baseindex = y * stride_h;                                           \
-                outType line = src[baseindex];                                          \
-                                                                                        \
-                dst[baseindex] = dst[baseindex - stride_h] + line;                      \
-                baseindex += stride_w;                                                  \
-                                                                                        \
-                for (int x = 1; x < width; x ++, baseindex += stride_w)                 \
+	if (m_pixelOp == 0)                                                             \
+	{                                                                               \
+                dst[0] = src[0];                                                        \
+                for (int x = 1; x < width; x ++)                                        \
                 {                                                                       \
-                        line += src[baseindex];                                         \
-                        dst[baseindex] = dst[baseindex - stride_h] + line;              \
+                        const int baseindex = x * stride_w;                             \
+                        dst[baseindex] = dst[baseindex - stride_w] + src[baseindex];    \
                 }                                                                       \
-        }                                                                               \
+                                                                                        \
+                for (int y = 1; y < height; y ++)                                       \
+                {                                                                       \
+                        int baseindex = y * stride_h;                                   \
+                        outType line = src[baseindex];                                  \
+                                                                                        \
+                        dst[baseindex] = dst[baseindex - stride_h] + line;              \
+                        baseindex += stride_w;                                          \
+                                                                                        \
+                        for (int x = 1; x < width; x ++, baseindex += stride_w)         \
+                        {                                                               \
+                                line += src[baseindex];                                 \
+                                dst[baseindex] = dst[baseindex - stride_h] + line;      \
+                        }                                                               \
+                }                                                                       \
+	}                                                                               \
+                                                                                        \
+	else                                                                            \
+	{                                                                               \
+	        dst[0] = m_pixelOp->compute(src[0]);                                    \
+                for (int x = 1; x < width; x ++)                                        \
+                {                                                                       \
+                        const int baseindex = x * stride_w;                             \
+                        dst[baseindex] = dst[baseindex - stride_w] + m_pixelOp->compute(src[baseindex]);    \
+                }                                                                       \
+                                                                                        \
+                for (int y = 1; y < height; y ++)                                       \
+                {                                                                       \
+                        int baseindex = y * stride_h;                                   \
+                        outType line = m_pixelOp->compute(src[baseindex]);              \
+                                                                                        \
+                        dst[baseindex] = dst[baseindex - stride_h] + line;              \
+                        baseindex += stride_w;                                          \
+                                                                                        \
+                        for (int x = 1; x < width; x ++, baseindex += stride_w)         \
+                        {                                                               \
+                                line += m_pixelOp->compute(src[baseindex]);             \
+                                dst[baseindex] = dst[baseindex - stride_h] + line;      \
+                        }                                                               \
+                }                                                                       \
+	}                                                                               \
 }
 
 // II_3D_FOR_TYPE - compute the integral (image) for any 3D tensor type!
@@ -73,32 +101,65 @@
 	const int height = m_inputSize.h;                                               \
 	const int n_planes = input.size(2);                                             \
                                                                                         \
-	for (int p = 0; p < n_planes; p ++)                                             \
+        if (m_pixelOp == 0)                                                             \
 	{                                                                               \
-		const int dp = p * stride_p;                                            \
-                                                                                        \
-		dst[dp] = src[dp];                                                      \
-		for (int x = 1; x < width; x ++)                                        \
-		{                                                                       \
-			const int baseindex = x * stride_w + dp;                        \
-			dst[baseindex] = dst[baseindex - stride_w] + src[baseindex];    \
-		}                                                                       \
-                                                                                        \
-		for (int y = 1; y < height; y ++)                                       \
-		{                                                                       \
-			int baseindex = y * stride_h + dp;                              \
-			outType line = src[baseindex];                                  \
-                                                                                        \
-			dst[baseindex] = dst[baseindex - stride_h] + line;              \
-			baseindex += stride_w;                                          \
-                                                                                        \
-			for (int x = 1; x < width; x ++, baseindex += stride_w)         \
-			{                                                               \
-				line += src[baseindex];                                 \
-				dst[baseindex] = dst[baseindex - stride_h] + line;      \
-			}                                                               \
-		}                                                                       \
+                for (int p = 0; p < n_planes; p ++)                                     \
+                {                                                                       \
+                        const int dp = p * stride_p;                                            \
+                                                                                                \
+                        dst[dp] = src[dp];                                                      \
+                        for (int x = 1; x < width; x ++)                                        \
+                        {                                                                       \
+                                const int baseindex = x * stride_w + dp;                        \
+                                dst[baseindex] = dst[baseindex - stride_w] + src[baseindex];    \
+                        }                                                                       \
+                                                                                                \
+                        for (int y = 1; y < height; y ++)                                       \
+                        {                                                                       \
+                                int baseindex = y * stride_h + dp;                              \
+                                outType line = src[baseindex];                                  \
+                                                                                                \
+                                dst[baseindex] = dst[baseindex - stride_h] + line;              \
+                                baseindex += stride_w;                                          \
+                                                                                                \
+                                for (int x = 1; x < width; x ++, baseindex += stride_w)         \
+                                {                                                               \
+                                        line += src[baseindex];                                 \
+                                        dst[baseindex] = dst[baseindex - stride_h] + line;      \
+                                }                                                               \
+                        }                                                                       \
+                }                                                                       \
 	}                                                                               \
+                                                                                        \
+	else                                                                            \
+	{                                                                               \
+                for (int p = 0; p < n_planes; p ++)                                     \
+                {                                                                       \
+                        const int dp = p * stride_p;                                            \
+                                                                                                \
+                        dst[dp] = m_pixelOp->compute(src[dp]);                                  \
+                        for (int x = 1; x < width; x ++)                                        \
+                        {                                                                       \
+                                const int baseindex = x * stride_w + dp;                        \
+                                dst[baseindex] = dst[baseindex - stride_w] + m_pixelOp->compute(src[baseindex]);    \
+                        }                                                                       \
+                                                                                                \
+                        for (int y = 1; y < height; y ++)                                       \
+                        {                                                                       \
+                                int baseindex = y * stride_h + dp;                              \
+                                outType line = m_pixelOp->compute(src[baseindex]);              \
+                                                                                                \
+                                dst[baseindex] = dst[baseindex - stride_h] + line;              \
+                                baseindex += stride_w;                                          \
+                                                                                                \
+                                for (int x = 1; x < width; x ++, baseindex += stride_w)         \
+                                {                                                               \
+                                        line += m_pixelOp->compute(src[baseindex]);             \
+                                        dst[baseindex] = dst[baseindex - stride_h] + line;      \
+                                }                                                               \
+                        }                                                                       \
+                }                                                                       \
+        }                                                                               \
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -109,7 +170,8 @@ namespace Torch {
 // Constructor
 
 ipIntegral::ipIntegral()
-	:	ipCore()
+	:	ipCore(),
+                m_pixelOp(0)
 {
 }
 
@@ -118,6 +180,14 @@ ipIntegral::ipIntegral()
 
 ipIntegral::~ipIntegral()
 {
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Set the pixel (NULL means the actual pixel value will be used)
+
+bool ipIntegral::setPixelOperator(PixelOperator* pixelOp)
+{
+        m_pixelOp = pixelOp;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -181,8 +251,6 @@ bool ipIntegral::allocateOutput(const Tensor& input)
                 default:
                         return false;
                 }
-
-		return true;
 	}
 
 	return true;
@@ -193,7 +261,7 @@ bool ipIntegral::allocateOutput(const Tensor& input)
 
 bool ipIntegral::processInput(const Tensor& input)
 {
-         switch (input.getDatatype())
+        switch (input.getDatatype())
         {
         case Tensor::Char:      // Char         -> Int
                 II_FOR_TYPE(CharTensor, IntTensor, char, int);
@@ -205,6 +273,10 @@ bool ipIntegral::processInput(const Tensor& input)
 
         case Tensor::Int:       // Int          -> Int
                 II_FOR_TYPE(IntTensor, IntTensor, int, int);
+                break;
+
+        case Tensor::Long:      // Long         -> Long
+                II_FOR_TYPE(LongTensor, LongTensor, long, long);
                 break;
 
         case Tensor::Float:    // Float         -> Double

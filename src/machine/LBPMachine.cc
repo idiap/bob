@@ -119,12 +119,60 @@ ipLBP* LBPMachine::makeIpLBP(LBPType lbp_type)
 		ip_lbp->setBOption("RotInvariant", false);
 		break;
 
+        case LBP4RCenter_RI:	// 4R LBP compared to the center value, rotation invariant
+		ip_lbp = new ipLBP4R;
+		ip_lbp->setBOption("ToAverage", false);
+		ip_lbp->setBOption("AddAvgBit", false);
+		ip_lbp->setBOption("Uniform", false);
+		ip_lbp->setBOption("RotInvariant", true);
+		break;
+
+        case LBP4RCenter_U2:	// 4R LBP compared to the center value, uniform
+		ip_lbp = new ipLBP4R;
+		ip_lbp->setBOption("ToAverage", false);
+		ip_lbp->setBOption("AddAvgBit", false);
+		ip_lbp->setBOption("Uniform", true);
+		ip_lbp->setBOption("RotInvariant", false);
+		break;
+
+        case LBP4RCenter_U2RI:	// 4R LBP compared to the center value, rotation invariant + uniform
+		ip_lbp = new ipLBP4R;
+		ip_lbp->setBOption("ToAverage", false);
+		ip_lbp->setBOption("AddAvgBit", false);
+		ip_lbp->setBOption("Uniform", true);
+		ip_lbp->setBOption("RotInvariant", true);
+		break;
+
 	case LBP4RAverage:	// 4R LBP compared to the average value
 		ip_lbp = new ipLBP4R;
 		ip_lbp->setBOption("ToAverage", true);
 		ip_lbp->setBOption("AddAvgBit", false);
 		ip_lbp->setBOption("Uniform", false);
 		ip_lbp->setBOption("RotInvariant", false);
+		break;
+
+        case LBP4RAverage_RI:	// 4R LBP compared to the average value, rotation invariant
+		ip_lbp = new ipLBP4R;
+		ip_lbp->setBOption("ToAverage", true);
+		ip_lbp->setBOption("AddAvgBit", false);
+		ip_lbp->setBOption("Uniform", false);
+		ip_lbp->setBOption("RotInvariant", true);
+		break;
+
+        case LBP4RAverage_U2:	// 4R LBP compared to the average value, uniform
+		ip_lbp = new ipLBP4R;
+		ip_lbp->setBOption("ToAverage", true);
+		ip_lbp->setBOption("AddAvgBit", false);
+		ip_lbp->setBOption("Uniform", true);
+		ip_lbp->setBOption("RotInvariant", false);
+		break;
+
+        case LBP4RAverage_U2RI:	// 4R LBP compared to the average value, rotation invariant + uniform
+		ip_lbp = new ipLBP4R;
+		ip_lbp->setBOption("ToAverage", true);
+		ip_lbp->setBOption("AddAvgBit", false);
+		ip_lbp->setBOption("Uniform", true);
+		ip_lbp->setBOption("RotInvariant", true);
 		break;
 
 	case LBP4RAverageAddBit:// 4R LBP compared to the average value + extra bit

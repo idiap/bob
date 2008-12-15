@@ -28,19 +28,9 @@ namespace Torch
 		// Destructor
 		virtual ~SpiralScaleExplorer();
 
-		/////////////////////////////////////////////////////////////////
-		// Process functions
-
-		// Initialize the scanning process (scanning sub-window size, ROI)
-		virtual bool		init(int sw_w, int sw_h, const sRect2D& roi);
-
-		// Process the image (check for pattern's sub-windows)
-		virtual bool		process(const Tensor& input_prune,
-						const Tensor& input_evaluation,
-						ExplorerData& explorerData,
+		// Process the scale, searching for patterns at different sub-windows
+		virtual bool		process(ExplorerData& explorerData,
 						bool stopAtFirstDetecton);
-
-		/////////////////////////////////////////////////////////////////
 
 	protected:
 

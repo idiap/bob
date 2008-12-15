@@ -112,32 +112,45 @@ bool PyramidExplorer::setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluat
 
 bool PyramidExplorer::init(int image_w, int image_h)
 {
+	// Check parameters
 	if (Explorer::init(image_w, image_h) == false)
 	{
 		return false;
 	}
+
+	const int param_min_patt_w = getIOption("min_patt_w");
+	const int param_max_patt_w = getIOption("max_patt_w");
+	const int param_min_patt_h = getIOption("min_patt_h");
+	const int param_max_patt_h = getIOption("max_patt_h");
+	if (    param_max_patt_w < param_min_patt_w ||
+                param_max_patt_h < param_min_patt_h)
+        {
+                Torch::message("MSExplorer::init - invalid pattern size!\n");
+                return false;
+        }
 
 	// Model size
 	const int model_w = getModelWidth();
 	const int model_h = getModelHeight();
 
 	// Get the min/max pattern width/height
-	const int min_patt_w = getInRange(getIOption("min_patt_w"), model_w, image_w);
-	const int max_patt_w = getInRange(getIOption("max_patt_w"), model_w, image_w);
-	const int min_patt_h = getInRange(getIOption("min_patt_h"), model_h, image_h);
-	const int max_patt_h = getInRange(getIOption("max_patt_h"), model_h, image_h);
+	const int min_patt_w = getInRange(param_min_patt_w, model_w, image_w);
+	const int max_patt_w = getInRange(param_max_patt_w, model_w, image_w);
+	const int min_patt_h = getInRange(param_min_patt_h, model_h, image_h);
+	const int max_patt_h = getInRange(param_max_patt_h, model_h, image_h);
 
-	// Compute the min/max and scale variance (relative to the image size)
+        // Compute the min/max and scale variance (relative to the image size)
 	const float min_scale = max((model_w + 0.0f) / (max_patt_w + 0.0f), (model_h + 0.0f) / (max_patt_h + 0.0f));
 	const float max_scale = min((model_w + 0.0f) / (min_patt_w + 0.0f), (model_h + 0.0f) / (min_patt_h + 0.0f));
-	const float ds = min((model_w + 0.0f) / (image_w + 0.0f), (model_h + 0.0f) / (image_h + 0.0f)) *
-                        getInRange(getFOption("ds"), 1.0f / (min(image_w, image_h) + 0.0f), 1.0f);
+	const float ds = getInRange(    getFOption("ds"),
+                                        1.0f + 1.0f / (model_w + 0.0f),
+                                        (max_patt_w + 0.0f) / (min_patt_w + 0.0f) + 2.0f / model_w + 0.0f);
 
 	const bool verbose = getBOption("verbose");
 
 	// Compute the number of scales (relative to the image size)
 	int n_scales = 0;
-	for (float scale = min_scale; scale < max_scale; scale += ds, n_scales ++)
+	for (double scale = max_scale; scale >= min_scale; scale /= ds, n_scales ++)
 	{
 	}
 
@@ -150,10 +163,10 @@ bool PyramidExplorer::init(int image_w, int image_h)
 
 	// Compute the scales (relative to the image size)
 	int i = 0;
-	for (float scale = min_scale; scale < max_scale; scale += ds, i ++)
+	for (double scale = max_scale; scale >= min_scale; scale /= ds, i ++)
 	{
-		m_scales[i].w = (int)(0.5f + scale * image_w);
-		m_scales[i].h = (int)(0.5f + scale * image_h);
+	        m_scales[i].w = (int)(0.5 + scale * image_w);
+		m_scales[i].h = (int)(0.5 + scale * image_h);
 
 		// ... debug message
 		if (verbose == true)
@@ -356,9 +369,9 @@ bool PyramidExplorer::process()
 		}
 
 		// Initialize the evaluator/classifier for this scale
-		if (m_data->m_swEvaluator->init(*m_scale_evaluation_tensors[i]) == false)
+		if (m_data->init(*m_scale_prune_tensors[i], *m_scale_evaluation_tensors[i]) == false)
 		{
-		        Torch::message("MSExplorer::process - cannot initialize the evaluator!\n");
+		        Torch::message("PyramidExplorer::process - failed to initialize the pruners & classifier!\n");
 		        return false;
 		}
 
@@ -376,10 +389,7 @@ bool PyramidExplorer::process()
 					i + 1, m_n_scales);
 			return false;
 		}
-                if (scaleExplorer->process(     *m_scale_prune_tensors[i],
-                                                *m_scale_evaluation_tensors[i],
-                                                *m_data,
-                                                stopAtFirstDetection) == false)
+                if (scaleExplorer->process(*m_data, stopAtFirstDetection) == false)
 		{
 			Torch::message("PyramidExplorer::process - failed to run scale explorer [%d/%d]!\n",
 					i + 1, m_n_scales);

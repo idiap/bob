@@ -32,10 +32,13 @@
 		<Cursor position="1444" topLine="23" />
 	</File>
 	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="56">
-		<Cursor position="895" topLine="0" />
+		<Cursor position="867" topLine="0" />
 	</File>
 	<File name="../../scanning/scanning.cc" open="1" top="1" tabpos="1">
-		<Cursor position="489" topLine="0" />
+		<Cursor position="1809" topLine="42" />
+	</File>
+	<File name="../../scanning/test_scanning.sh" open="1" top="0" tabpos="2">
+		<Cursor position="39" topLine="0" />
 	</File>
 	<File name="../../tensors/bigtest.cc" open="0" top="0" tabpos="60">
 		<Cursor position="3695" topLine="148" />

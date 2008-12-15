@@ -425,16 +425,21 @@ void PatternSpace::add(const Pattern& pattern)
 	const int sw_w = pattern.m_w;
 	const int sw_h = pattern.m_h;
 
-	// Update the (normalized&scaled) confidence and usage tables
+	// Update the (normalized&scaled) confidence table
 	const int ns_confidence = normScaleConfidence(pattern.m_confidence);
 	for (int i = 0; i < sw_w; i ++)
 		for (int j = 0; j < sw_h; j ++)
 		{
 			m_table_confidence[sw_x + i][sw_y + j] += ns_confidence;
-			m_table_usage[sw_x + i][sw_y + j] = 0x01;
 		}
 
-	// One more pattern is stored
+	// Update the usage table
+	m_table_usage[sw_x][sw_y] = 0x01;
+        m_table_usage[sw_x + sw_w][sw_y] = 0x01;
+        m_table_usage[sw_x + sw_w][sw_y + sw_h] = 0x01;
+        m_table_usage[sw_x][sw_y + sw_h] = 0x01;
+
+        // One more pattern is stored
 	m_patterns.add(pattern);
 }
 
@@ -443,9 +448,24 @@ void PatternSpace::add(const Pattern& pattern)
 
 bool PatternSpace::hasPoint(int sw_x, int sw_y, int sw_w, int sw_h)
 {
-	// TODO: maybe we can use some properties similar to the ones for integral image!
+        // Check each detection (reliable, but slow)
+        for (int i = 0; i < m_patterns.size(); i ++)
+        {
+                const Pattern& pattern = m_patterns.get(i);
+                if (    pattern.m_x == sw_x ||
+                        pattern.m_y == sw_y ||
+                        pattern.m_w == sw_w ||
+                        pattern.m_h == sw_h)
+                {
+                        return true;
+                }
+        }
+        return false;
 
-	return false;
+        // Not reliable, but fast!
+        return  m_table_usage[sw_x][sw_y] == 0x01 &&
+                m_table_usage[sw_x + sw_w][sw_y + sw_h] == 0x01 &&
+                m_table_confidence[sw_x][sw_y] == m_table_confidence[sw_x + sw_w][sw_y + sw_h];
 }
 
 /////////////////////////////////////////////////////////////////////////

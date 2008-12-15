@@ -139,6 +139,10 @@ bool xtprobeImageFile::open(const char* file_name, const char* open_flags)
 			return false;
 		}
 	}
+	else
+	{
+		return false;
+	}
 
 	// OK, try to open the file with the choosen loader
 	return m_loader->open(file_name, open_flags);

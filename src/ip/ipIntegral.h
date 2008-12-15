@@ -5,14 +5,9 @@
 
 namespace Torch
 {
-        class CharTensor;
-        class ShortTensor;
-        class IntTensor;
-        class LongTensor;
-        class FloatTensor;
-        class DoubleTensor;
+        class Tensor;
 
-	/////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
 	// Torch::ipIntegral:
 	//	This class is designed to compute the integral image of any 2D/3D tensor type:
 	//              (height x width [x color channels/modes])
@@ -38,7 +33,7 @@ namespace Torch
     	//	\begin{verbatim}
         //		+---+          +--------------+         +---+
 	//		|XXX|	       |              |         |XXX|
-	//		|XXX|   ---->  |  ipIdentity  | ---->   |XXX|
+	//		|XXX|   ---->  |  ipIntegral  | ---->   |XXX|
 	//		|XXX|          |              |         |XXX|
 	//		+---+          +--------------+         +---+
 	//		image                                integral image
@@ -51,11 +46,39 @@ namespace Torch
 	{
 	public:
 
+                ////////////////////////////////////////////////////////////////
+                // Operator to modify the pixel value that it is to be stored
+                //      by the integral image
+                //
+                //      II(x,y) = \sum_{i=1}^{x-1} \sum_{j=1}^{y-1} PixelOperator(I(i,j))
+                ////////////////////////////////////////////////////////////////
+                struct PixelOperator
+                {
+                public:
+                        // Constructor
+                        PixelOperator() { }
+
+                        // Destructor
+                        virtual ~PixelOperator() { }
+
+                        // Process some pixel - should be overriden
+                        virtual int     compute(char px) { return px; }
+                        virtual int     compute(short px) { return px; }
+                        virtual int     compute(int px) { return px; }
+                        virtual long    compute(long px) { return px; }
+                        virtual double  compute(float px) { return px; }
+                        virtual double  compute(double px) { return px; }
+                };
+                ////////////////////////////////////////////////////////////////
+
 		// Constructor
 		ipIntegral();
 
 		// Destructor
 		virtual ~ipIntegral();
+
+		// Set the pixel (NULL means the actual pixel value will be used)
+		bool            setPixelOperator(PixelOperator* pixelOp);
 
 	protected:
 
@@ -77,7 +100,7 @@ namespace Torch
                 /////////////////////////////////////////////////////////////////
 		// Attributes
 
-		//
+		PixelOperator*  m_pixelOp;
 	};
 }
 

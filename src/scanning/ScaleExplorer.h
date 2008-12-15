@@ -13,8 +13,7 @@ namespace Torch
 	// Torch::ScaleExplorer
 	//	- scan some image (+ additional data, like integral image or edge maps)
 	//			at a given scale
-	//	- to evaluate any sub-window use the PUBLIC and STATIC functions:
-	//		<initSW> and <processSW>,
+	//	- to evaluate any sub-window use the PUBLIC and STATIC function <processSW>,
 	//		which will take care of prunning, evaluation and storing
 	//		candidate sub-window patterns
 	//
@@ -35,24 +34,15 @@ namespace Torch
 		// Process functions
 
 		// Initialize the scanning process (scanning sub-window size, ROI)
-		virtual bool		init(int sw_w, int sw_h, const sRect2D& roi);
+		bool	        	init(int sw_w, int sw_h, const sRect2D& roi);
 
-		// Process the image (check for pattern's sub-windows)
-		virtual bool		process(const Tensor& input_prune,
-						const Tensor& input_evaluation,
-						ExplorerData& explorerData,
+		// Process the scale, searching for patterns at different sub-windows
+		virtual bool		process(ExplorerData& explorerData,
 						bool stopAtFirstDetection) = 0;
 
-		/////////////////////////////////////////////////////////////////
-
-		// Initialize the evaluator and pruners to some sub-window
-		static bool		initSW(	int sw_x, int sw_y, int sw_w, int sw_h,
-						ExplorerData& explorerData);
-
-		// Process some sub-window (already set for evaluator and pruners)
-		static bool		processSW(	const Tensor& input_prune,
-							const Tensor& input_evaluation,
-							ExplorerData& explorerData);
+		// Process some sub-window
+		static bool		processSW(      int sw_x, int sw_y, int sw_w, int sw_h,
+                                                        ExplorerData& explorerData);
 
 		/////////////////////////////////////////////////////////////////
 

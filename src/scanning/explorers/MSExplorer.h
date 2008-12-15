@@ -92,14 +92,13 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-                // <ipIntegral> to compute the integral image for the prune/evaluation tensors
+                // <ipIntegral> to compute the integral image for the evaluation tensor
                 // (Needed to fast scale the scanning sub-window to the model size)
-		ipIntegral              m_ipi_prune;
 		ipIntegral              m_ipi_evaluation;
 
-		// Integral tensors (features) for the pruning and evaluation
-		// (for the whole image, pointing to <ipIntegral>s above)
-		const Tensor*           m_prune_itensor;
+		// (Integral) tensors (features) for the pruning and evaluation
+		// (the evaluation one is pointing to <ipIntegral> above)
+		const Tensor*           m_prune_tensor;
 		const Tensor*           m_evaluation_itensor;
 	};
 }

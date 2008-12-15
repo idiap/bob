@@ -7,10 +7,16 @@ namespace Torch
 {
    	/////////////////////////////////////////////////////////////////////////
 	// Torch::GreedyExplorer
-	//	- searches the 4D scanning space using a greedy method to detect local maximas
+	//	- searches the 4D scanning space using a greedy method to refine
+	//              the search around the best sub-windows
+	//              (relative to the model confidence)
 	//
 	//	- PARAMETERS (name, type, default value, description):
 	//		"Nbest"		int	128	"best N candidate patterns to consider/step"
+	//              "SWdx"          int     10      "% of the sub-window width to vary Ox when refining the search"
+	//              "SWdy"          int     10      "% of the sub-window height to vary Oy when refining the search"
+	//              "SWds"          int     10      "% of the sub-window size to vary scale when refining the search"
+	//              "NoSteps"       int     5       "number of iterations"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -39,17 +45,8 @@ namespace Torch
 		//		process ()
 		// --------------------------------
 
-		// Initialize the scanning process with the given image size
-		virtual bool		init(int image_w, int image_h);
-
-		// Initialize the scanning process for a specific ROI
-		virtual bool		init(const sRect2D& roi);
-
 		// Check if the scanning can continue (or the space was explored enough)
 		virtual bool		hasMoreSteps() const;
-
-		// Preprocess the image (extract features ...) => store data in <prune_ips> and <evaluation_ips>
-		virtual bool		preprocess(const Image& image);
 
 		// Process the image (check for pattern's sub-windows)
 		virtual bool		process();
@@ -59,6 +56,9 @@ namespace Torch
 	protected:
 
 		/////////////////////////////////////////////////////////////////
+
+		/// called when some option was changed - overriden
+		virtual void		optionChanged(const char* name);
 
 		// Initialize the scanning 4D space (random or using a fixed grid ?!)
 		bool			initSearch();
@@ -70,24 +70,17 @@ namespace Torch
 		//	(it is becoming too fine or no pattern found so far?!)
 		bool			shouldSearchMode(int old_n_candidates = -1) const;
 
-		// Search around some point in the position and scale space
-		bool			searchAround(int x, int y, float scale);
+		// Search around some point in the position and scale space (= sub-window)
+		bool			searchAround(const Pattern& candidate);
 
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-		// Flag to check if more steps are needed
-		bool			m_hasMoreSteps;
-
 		// Current search parameters
-		int			m_search_dx;
-		int			m_search_dy;
-		float			m_search_ds;
-
-		// Minimum values for the search parameters (need to check if the search should be stopped)
-		int			m_search_min_dx;
-		int			m_search_min_dy;
-		float			m_search_min_ds;
+		float                   m_search_per_dx;
+		float                   m_search_per_dy;
+		float                   m_search_per_ds;
+		int                     m_search_no_steps;
 
 		// Keep a copy of the best patterns at some step
 		Pattern*		m_best_patterns;

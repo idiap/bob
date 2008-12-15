@@ -39,6 +39,21 @@ void ExplorerData::clear()
 }
 
 /////////////////////////////////////////////////////////////////////////
+// Initialize the (evaluator + pruners) processing for these tensors
+
+bool ExplorerData::init(const Tensor& input_prune, const Tensor& input_evaluation)
+{
+        for (int i = 0; i < m_nSWPruners; i ++)
+        {
+                if (m_swPruners[i]->process(input_prune) == false)
+                {
+                        return false;
+                }
+        }
+        return m_swEvaluator->process(input_evaluation);
+}
+
+/////////////////////////////////////////////////////////////////////////
 // Constructor
 
 Explorer::Explorer(ipSWEvaluator* swEvaluator)
@@ -56,6 +71,7 @@ Explorer::Explorer(ipSWEvaluator* swEvaluator)
 	addIOption("max_patt_w", 4096, "pattern maximum allowed width");
 	addIOption("min_patt_h", 0, "pattern minimum allowed height");
 	addIOption("max_patt_h", 4096, "pattern maximum allowed height");
+	addFOption("ds", 1.25f, "scale variation from the smallest to the largest window size");
 	addFOption("ds", 0.1f, "scale variation");
 	addBOption("StopAtFirstDetection", false, "stop at the first candidate patterns");
 	addBOption("StartWithLargeScales", false, "large to small scales scanning");

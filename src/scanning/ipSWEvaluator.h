@@ -38,12 +38,8 @@ namespace Torch
 		// Set the classifier to load from some file
 		bool                    setClassifier(const char* filename);
 
-		// Initialize the buffer tensor to the given input type&size
-		// (the classifier should be loaded first)
-		bool                    init(const Tensor& input);
-
 		/// Change the sub-window to process in - overriden
-		// NB: should be called after the <init> to initialize the buffer tensor!
+		/// Checks also if there is some pattern in this sub-window
 		virtual bool		setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h);
 
 		/////////////////////////////////////////////////////////////////
@@ -72,6 +68,7 @@ namespace Torch
 		virtual bool		allocateOutput(const Tensor& input);
 
 		/// Process some input tensor (the input is checked, the outputs are allocated) - overriden
+		/// The classifier should be loaded first!
 		virtual bool		processInput(const Tensor& input);
 
 		/// called when some option was changed - overriden
@@ -121,6 +118,9 @@ namespace Torch
 
 		// Save buffered tensor to jpeg
 		bool                    m_save_buffTensor;
+
+		// Keep a copy of the input tensor (to pass to setSubWindow)
+                const Tensor*           m_input_copy;
 	};
 }
 

@@ -33,7 +33,7 @@ void MSExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, float 
 
 MSExplorer::MSExplorer(ipSWEvaluator* swEvaluator)
 	: 	Explorer(swEvaluator),
-                m_prune_itensor(0),
+                m_prune_tensor(0),
                 m_evaluation_itensor(0)
 {
 	m_data = new MSExplorerData(swEvaluator);
@@ -77,31 +77,45 @@ bool MSExplorer::setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp
 
 bool MSExplorer::init(int image_w, int image_h)
 {
+        // Check parameters
 	if (Explorer::init(image_w, image_h) == false)
 	{
 		return false;
 	}
+
+	const int param_min_patt_w = getIOption("min_patt_w");
+	const int param_max_patt_w = getIOption("max_patt_w");
+	const int param_min_patt_h = getIOption("min_patt_h");
+	const int param_max_patt_h = getIOption("max_patt_h");
+	if (    param_max_patt_w < param_min_patt_w ||
+                param_max_patt_h < param_min_patt_h)
+        {
+                Torch::message("MSExplorer::init - invalid pattern size!\n");
+                return false;
+        }
 
 	// Model size
 	const int model_w = getModelWidth();
 	const int model_h = getModelHeight();
 
 	// Get the min/max pattern width/height
-	const int min_patt_w = getInRange(getIOption("min_patt_w"), model_w, image_w);
-	const int max_patt_w = getInRange(getIOption("max_patt_w"), model_w, image_w);
-	const int min_patt_h = getInRange(getIOption("min_patt_h"), model_h, image_h);
-	const int max_patt_h = getInRange(getIOption("max_patt_h"), model_h, image_h);
+	const int min_patt_w = getInRange(param_min_patt_w, model_w, image_w);
+	const int max_patt_w = getInRange(param_max_patt_w, model_w, image_w);
+	const int min_patt_h = getInRange(param_min_patt_h, model_h, image_h);
+	const int max_patt_h = getInRange(param_max_patt_h, model_h, image_h);
 
 	// Compute the min/max and scale variance (relative the model size)
-	const float min_scale = max((min_patt_w + 0.0f) / (model_w + 0.0f), (min_patt_h + 0.0f) / (model_h + 0.0f));
-	const float max_scale = min((max_patt_w + 0.0f) / (model_w + 0.0f), (max_patt_h + 0.0f) / (model_h + 0.0f));
-	const float ds = getInRange(getFOption("ds"), 1.0f / (min(model_w, model_h) + 0.0f), 1.0f);
+	const double min_scale = max((min_patt_w + 0.0) / (model_w + 0.0), (min_patt_h + 0.0) / (model_h + 0.0));
+	const double max_scale = min((max_patt_w + 0.0) / (model_w + 0.0), (max_patt_h + 0.0) / (model_h + 0.0));
+	const double ds = getInRange(   getFOption("ds"),
+                                        1.0 + 1.0 / (model_w + 0.0),
+                                        (max_patt_w + 0.0) / (min_patt_w + 0.0) + 2.0 / model_w + 0.0);
 
-	const bool verbose = getBOption("verbose");
+        const bool verbose = getBOption("verbose");
 
 	// Compute the number of scales (relative to the model size)
 	int n_scales = 0;
-	for (float scale = min_scale; scale < max_scale; scale += ds, n_scales ++)
+	for (double scale = min_scale; scale <= max_scale; scale *= ds, n_scales ++)
 	{
 	}
 
@@ -110,10 +124,10 @@ bool MSExplorer::init(int image_w, int image_h)
 
 	// Compute the scales (relative to the model size)
 	int i = 0;
-	for (float scale = min_scale; scale < max_scale; scale += ds, i ++)
+	for (double scale = min_scale; scale <= max_scale; scale *= ds, i ++)
 	{
-		m_scales[i].w = (int)(0.5f + scale * model_w);
-		m_scales[i].h = (int)(0.5f + scale * model_h);
+	        m_scales[i].w = (int)(0.5 + scale * model_w);
+		m_scales[i].h = (int)(0.5 + scale * model_h);
 
 		// ... debug message
 		if (verbose == true)
@@ -177,7 +191,7 @@ bool MSExplorer::preprocess(const Image& image)
 	if (ip_prune == 0)
 	{
 	        // The initial image!
-                prune_tensor = &image;
+                m_prune_tensor = &image;
 	}
 	else
 	{
@@ -188,7 +202,7 @@ bool MSExplorer::preprocess(const Image& image)
                         Torch::message("MSExplorer::preprocess - failed to run the pruning <ipCore>!\n");
                         return false;
                 }
-                prune_tensor = &ip_prune->getOutput(0);
+                m_prune_tensor = &ip_prune->getOutput(0);
 	}
 
 	// Compute the evaluation features for the whole image
@@ -216,28 +230,16 @@ bool MSExplorer::preprocess(const Image& image)
 	        }
 	}
 
-	// Compute the integral image for the prunning and evaluation tensors
-        if (    m_ipi_prune.setInputSize(image.getWidth(), image.getHeight()) == false ||
-                m_ipi_prune.process(*prune_tensor) == false)
+	// Compute the integral image for the evaluation tensor
+        if (    m_ipi_evaluation.setInputSize(image.getWidth(), image.getHeight()) == false ||
+                m_ipi_evaluation.process(*evaluation_tensor) == false)
         {
-                Torch::message("MSExplorer::preprocess - failed to compute the prune integral image!");
+                Torch::message("MSExplorer::preprocess - failed to compute the evaluation integral image!");
                 return false;
         }
-        if (evaluation_tensor != prune_tensor)  // but check maybe it's the same processing!
-        {
-                if (    m_ipi_evaluation.setInputSize(image.getWidth(), image.getHeight()) == false ||
-                        m_ipi_evaluation.process(*evaluation_tensor) == false)
-                {
-                        Torch::message("MSExplorer::preprocess - failed to compute the evaluation integral image!");
-                        return false;
-                }
-        }
 
-        // Set the final integral tensor for prunning and evaluation
-        m_prune_itensor = &m_ipi_prune.getOutput(0);
-        m_evaluation_itensor = evaluation_tensor != prune_tensor ?
-                                        &m_ipi_evaluation.getOutput(0) :
-                                        m_prune_itensor;
+        // Set the final tensor for evaluation
+        m_evaluation_itensor = &m_ipi_evaluation.getOutput(0);
 
 	//OK
 	return true;
@@ -264,6 +266,13 @@ bool MSExplorer::process()
 	const int last_scale_index = startWithLargeScales == true ? -1 : m_n_scales;
 	const int delta_scale_index = startWithLargeScales == true ? -1 : 1;
 
+	// Initialize the pruners&classifier for this scale
+        if (m_data->init(*m_prune_tensor, *m_evaluation_itensor) == false)
+        {
+                Torch::message("MSExplorer::process - failed to initialize the pruners & classifier!\n");
+                return false;
+        }
+
 	// Run for each scale the associated ScaleExplorer
 	for (int i = first_scale_index; i != last_scale_index; i += delta_scale_index)
 	{
@@ -275,13 +284,6 @@ bool MSExplorer::process()
 			Torch::message("MSExplorer::process - invalid scale explorer [%d/%d]!\n",
 					i + 1, m_n_scales);
 			return false;
-		}
-
-		// Initialize the evaluator/classifier for this scale
-		if (m_data->m_swEvaluator->init(*m_evaluation_itensor) == false)
-		{
-		        Torch::message("MSExplorer::process - failed to initialize the evaluator!\n");
-		        return false;
 		}
 
 		// Debug message
@@ -299,10 +301,7 @@ bool MSExplorer::process()
 			return false;
 		}
 		//      ... process the integral images of the prune and evaluation tensors
-		if (scaleExplorer->process(	*m_prune_itensor,
-                                                *m_evaluation_itensor,
-						*m_data,
-						stopAtFirstDetection) == false)
+		if (scaleExplorer->process(*m_data, stopAtFirstDetection) == false)
 		{
 			Torch::message("MSExplorer::process - failed to run scale explorer [%d/%d]!\n",
 					i + 1, m_n_scales);

@@ -261,7 +261,7 @@ bool CascadeMachine::loadFile(File& file)
         }
 
 	// For each stage ...
-	m_minThreshold = 10000000000000.0;
+	m_minThreshold = 10000000000.0;
 	for (int s = 0; s < n_stages; s ++)
 	{
 		// Threshold
@@ -436,7 +436,7 @@ bool CascadeMachine::resize(int n_stages)
 	}
 
 	deallocate();
-	m_minThreshold = 100000000000000.0;
+	m_minThreshold = 100000000000.0;
 
 	// OK
 	m_n_stages = n_stages;

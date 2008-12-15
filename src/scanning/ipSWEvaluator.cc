@@ -321,7 +321,9 @@ ipSWEvaluator::ipSWEvaluator()
                 m_scale_bl_indexes(0),
                 m_scale_cell_sizes(0),
 
-                m_save_buffTensor(false)
+                m_save_buffTensor(false),
+
+                m_input_copy(0)
 {
         addBOption("saveBuffTensorToJpg", false, "save the buffer tensor to JPEG");
 }
@@ -421,8 +423,7 @@ int ipSWEvaluator::getModelHeight() const
 
 double ipSWEvaluator::getModelThreshold() const
 {
-        // TODO: how to do it?!
-        return 0.0;
+        return m_classifier->getThreshold();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -431,10 +432,7 @@ double ipSWEvaluator::getModelThreshold() const
 bool ipSWEvaluator::checkInput(const Tensor& input) const
 {
         return  m_classifier != 0 &&
-                m_buffTensor != 0 &&
-                (input.nDimension() == 2 || input.nDimension() == 3) &&
-                input.size(0) == m_inputSize.h &&
-                input.size(1) == m_inputSize.w;
+                (input.nDimension() == 2 || input.nDimension() == 3);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -451,51 +449,65 @@ bool ipSWEvaluator::allocateOutput(const Tensor& input)
 
 bool ipSWEvaluator::processInput(const Tensor& input)
 {
-        // If the sub-window has the size of the machine,
-        //      then forward to the classifier the sub-window area of the input
-        if (    m_sw_w == m_classifier->getModelWidth() &&
-                m_sw_h == m_classifier->getModelHeight())
+        if (setInputSize(input.size(1), input.size(0)) == false)
         {
-                cropInput(input);
+                return false;
         }
 
-        // Otherwise, need to rescale the sub-window and forward this to the classifier
-        // (the input tensor is considered and integral image of some features)
-        else
+        // Cleanup
+        delete m_buffTensor;
+        delete[] m_buff_indexes;
+        m_buffTensor = 0;
+        m_buff_indexes = 0;
+        m_buff_n_indexes = 0;
+
+        delete[] m_copy_indexes;
+        m_copy_indexes = 0;
+        m_input_stride_w = 0;
+        m_input_stride_h = 0;
+        m_input_stride_p = 0;
+
+        const int model_w = m_classifier->getModelWidth();
+        const int model_h = m_classifier->getModelHeight();
+
+        // Allocate the buffer tensor as to have the model size
+        //      and the input type and number of planes
+        //      and compute the indexes between the input tensor and the buffered one
+        switch (input.getDatatype())
         {
-                iscaleInput(input);
+        case Tensor::Char:
+                SW_EVAL_ALLOC(CharTensor);
+                break;
+
+        case Tensor::Short:
+                SW_EVAL_ALLOC(ShortTensor);
+                break;
+
+        case Tensor::Int:
+		SW_EVAL_ALLOC(IntTensor);
+                break;
+
+        case Tensor::Long:
+                SW_EVAL_ALLOC(LongTensor);
+                break;
+
+        case Tensor::Float:
+                SW_EVAL_ALLOC(FloatTensor);
+                break;
+
+        case Tensor::Double:
+                SW_EVAL_ALLOC(DoubleTensor);
+                break;
+
+        default:
+                return false;
         }
 
-        // Just forward the buffer tensor to the classifier
-        const bool processed = m_classifier->forward(*m_buffTensor);
-
-        // Save the buffer tensor if contains a pattern (if requested)
-        if (    m_save_buffTensor == true &&
-                m_buffTensor->nDimension() == 3 &&
-                processed == true &&
-                m_classifier->isPattern() == true)
-        {
-                Image image;
-                if (    image.resize(   m_buffTensor->size(0),
-                                        m_buffTensor->size(1),
-                                        m_buffTensor->size(2)) == true &&
-                        image.copyFrom(*m_buffTensor) == true)
-                {
-                        char str[200];
-                        sprintf(str, "BuffTensor_sw_%d_%d_%dx%d_input_%dx%d.jpg",
-                                m_sw_x, m_sw_y, m_sw_w, m_sw_h,
-                                m_inputSize.w, m_inputSize.h);
-
-                        xtprobeImageFile xtprobe;
-                        if (xtprobe.open(str, "w+") == true)
-                        {
-                                image.saveImage(xtprobe);
-                        }
-                }
-        }
+        // Keep a copy of the input tensor
+        m_input_copy = &input;
 
         // OK
-        return processed;
+        return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -565,84 +577,8 @@ void ipSWEvaluator::iscaleInput(const Tensor& input)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Initialize the buffer tensor to the given input type&size
-// (the classifier should be loaded first)
-
-bool ipSWEvaluator::init(const Tensor& input)
-{
-        // Check parameters
-        if (input.nDimension() != 2 && input.nDimension() != 3)
-        {
-                Torch::message("ipSWEvaluator::init - only 2D/3D input tensors are supported!\n");
-                return false;
-        }
-        if (m_classifier == 0)
-        {
-                Torch::message("ipSWEvaluator::init - no classifier specified!\n");
-                return false;
-        }
-
-        // Set the input size (for ipCore)
-        if (setInputSize(input.size(1), input.size(0)) == false)
-        {
-                return false;
-        }
-
-        // Cleanup
-        delete m_buffTensor;
-        delete[] m_buff_indexes;
-        m_buffTensor = 0;
-        m_buff_indexes = 0;
-        m_buff_n_indexes = 0;
-
-        delete[] m_copy_indexes;
-        m_copy_indexes = 0;
-        m_input_stride_w = 0;
-        m_input_stride_h = 0;
-        m_input_stride_p = 0;
-
-        const int model_w = m_classifier->getModelWidth();
-        const int model_h = m_classifier->getModelHeight();
-
-        // Allocate the buffer tensor as to have the model size
-        //      and the input type and number of planes
-        //      and compute the indexes between the input tensor and the buffered one
-        switch (input.getDatatype())
-        {
-        case Tensor::Char:
-                SW_EVAL_ALLOC(CharTensor);
-                break;
-
-        case Tensor::Short:
-                SW_EVAL_ALLOC(ShortTensor);
-                break;
-
-        case Tensor::Int:
-		SW_EVAL_ALLOC(IntTensor);
-                break;
-
-        case Tensor::Long:
-                SW_EVAL_ALLOC(LongTensor);
-                break;
-
-        case Tensor::Float:
-                SW_EVAL_ALLOC(FloatTensor);
-                break;
-
-        case Tensor::Double:
-                SW_EVAL_ALLOC(DoubleTensor);
-                break;
-
-        default:
-                return false;
-        }
-
-        // OK
-        return true;
-}
-
-/////////////////////////////////////////////////////////////////////////
 /// Change the sub-window to process in - overriden
+/// Checks also if there is some pattern in this sub-window
 
 bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
 {
@@ -705,8 +641,78 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
                 }
         }
 
+        // If the sub-window has the size of the machine,
+        //      then forward to the classifier the sub-window area of the input
+        if (    m_sw_w == m_classifier->getModelWidth() &&
+                m_sw_h == m_classifier->getModelHeight())
+        {
+                cropInput(*m_input_copy);
+        }
+
+        // Otherwise, need to rescale the sub-window and forward this to the classifier
+        // (the input tensor is considered and integral image of some features)
+        else
+        {
+                iscaleInput(*m_input_copy);
+        }
+
+        // Just forward the buffer tensor to the classifier
+        const bool processed = m_classifier->forward(*m_buffTensor);
+
+        // Save the buffer tensor if contains a pattern (if requested)
+        if (    m_save_buffTensor == true &&
+                m_buffTensor->nDimension() == 3 &&
+                processed == true &&
+                m_classifier->isPattern() == true)
+        {
+                Image image;
+                if (    image.resize(   m_buffTensor->size(0),
+                                        m_buffTensor->size(1),
+                                        m_buffTensor->size(2)) == true &&
+                        image.copyFrom(*m_buffTensor) == true)
+                {
+                        char str[200];
+                        sprintf(str, "BuffTensor_sw_%d_%d_%dx%d_input_%dx%d.jpg",
+                                m_sw_x, m_sw_y, m_sw_w, m_sw_h,
+                                m_inputSize.w, m_inputSize.h);
+
+                        xtprobeImageFile xtprobe;
+                        if (xtprobe.open(str, "w+") == true)
+                        {
+                               image.saveImage(xtprobe);
+                        }
+
+                        /*
+                        // Save also the image as the bindata (with the model confidence in the name)
+                        sprintf(str, "BuffTensor_sw_%d_%d_%dx%d_input_%dx%d_conf_%f.bindata",
+                                m_sw_x, m_sw_y, m_sw_w, m_sw_h,
+                                m_inputSize.w, m_inputSize.h,
+                                m_classifier->getConfidence());
+
+                        const int n_samples = 1;
+                        const int sample_size = m_classifier->getModelWidth() * m_classifier->getModelHeight();
+
+                        File bindata;
+                        if (    bindata.open(str, "w+") == true &&
+                                bindata.write(&n_samples, sizeof(int), 1) == 1 &&
+                                bindata.write(&sample_size, sizeof(int), 1) == 1)
+                        {
+                                ShortTensor* tensor = (ShortTensor*)m_buffTensor;
+                                const float inv_grey = 1.0f / 255.0f;
+
+                                for (int y = 0; y < m_classifier->getModelHeight(); y ++)
+                                        for (int x = 0; x < m_classifier->getModelWidth(); x ++)
+                                        {
+                                                const float value = inv_grey * tensor->get(y, x, 0);
+                                                bindata.write(&value, sizeof(float), 1);
+                                        }
+                        }
+                        */
+                }
+        }
+
         // OK
-        return true;
+        return processed;
 }
 
 /////////////////////////////////////////////////////////////////////////

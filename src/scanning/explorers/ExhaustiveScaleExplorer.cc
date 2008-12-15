@@ -10,8 +10,8 @@ namespace Torch
 ExhaustiveScaleExplorer::ExhaustiveScaleExplorer()
 	: 	ScaleExplorer()
 {
-	addFOption("dx", 0.1f, "OX variation of the pattern width");
-	addFOption("dy", 0.1f, "OY variation of the pattern height");
+	addFOption("dx", 0.1f, "OX variation of the scanning sub-window width");
+	addFOption("dy", 0.1f, "OY variation of the scanning sub-window height");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -22,35 +22,25 @@ ExhaustiveScaleExplorer::~ExhaustiveScaleExplorer()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Initialize the scanning process (scanning sub-window size, ROI)
+// Process the scale, searching for patterns at different sub-windows
 
-bool ExhaustiveScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
-{
-	return ScaleExplorer::init(sw_w, sw_h, roi);
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Process the image (check for pattern's sub-windows)
-
-bool ExhaustiveScaleExplorer::process(	const Tensor& input_prune,
-					const Tensor& input_evaluation,
-					ExplorerData& explorerData,
+bool ExhaustiveScaleExplorer::process(	ExplorerData& explorerData,
 					bool stopAtFirstDetection)
 {
-	// Compute the location variance (related to the model size)
+        const int sw_w = m_sw_size.w;
+	const int sw_h = m_sw_size.h;
+
+	// Compute the location variance (related to the subwindow size)
 	const int model_w = explorerData.m_swEvaluator->getModelWidth();
 	const int model_h = explorerData.m_swEvaluator->getModelHeight();
 
-	const int dx = getInRange((int)(0.5f + getFOption("dx") * model_w), 1, model_w);
-	const int dy = getInRange((int)(0.5f + getFOption("dy") * model_h), 1, model_h);
+	const int dx = getInRange((int)(0.5f + getFOption("dx") * sw_w), 1, sw_w);
+	const int dy = getInRange((int)(0.5f + getFOption("dy") * sw_h), 1, sw_h);
 
 	const bool verbose = getBOption("verbose");
 
 	///////////////////////////////////////////////////////////////////////
 	// Generate all possible sub-windows to scan
-
-	const int sw_w = m_sw_size.w;
-	const int sw_h = m_sw_size.h;
 
 	// ... compute the range in which the position can vary
 	const int sw_min_x = m_roi.x;
@@ -60,18 +50,11 @@ bool ExhaustiveScaleExplorer::process(	const Tensor& input_prune,
 
 	// ... and vary the position
 	int count = 0;
-	for (int sw_x = sw_min_x; sw_x <= sw_max_x; sw_x += dx)
-		for (int sw_y = sw_min_y; sw_y <= sw_max_y; sw_y += dy)
+	for (int sw_x = sw_min_x; sw_x < sw_max_x; sw_x += dx)
+		for (int sw_y = sw_min_y; sw_y < sw_max_y; sw_y += dy)
 		{
-		        // Initialize the prunners and evaluator to this sub-window
-			if (ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
-			{
-			        Torch::message("ExhaustiveScaleExplorer::process - failed to initialize some sub-window!\n");
-				return false;
-			}
-
-			// Process the sub-window
-			if (ScaleExplorer::processSW(input_prune, input_evaluation, explorerData) == false)
+		        // Process the sub-window
+			if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
 			{
 				Torch::message("ExhaustiveScaleExplorer::process - failed to process some sub-window!\n");
 				return false;

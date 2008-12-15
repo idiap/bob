@@ -1,4 +1,5 @@
 #include "ipSWPruner.h"
+#include "Tensor.h"
 
 namespace Torch
 {

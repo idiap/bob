@@ -31,7 +31,15 @@ namespace Torch
 		enum LBPType
 		{
 			LBP4RCenter,
+			LBP4RCenter_RI,
+			LBP4RCenter_U2,
+			LBP4RCenter_U2RI,
+
 			LBP4RAverage,
+			LBP4RAverage_RI,
+			LBP4RAverage_U2,
+			LBP4RAverage_U2RI,
+
 			LBP4RAverageAddBit,
 
 			LBP8RCenter,

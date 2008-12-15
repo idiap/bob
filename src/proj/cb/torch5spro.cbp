@@ -302,8 +302,8 @@
 		<Unit filename="../../scanning/ipSWPruner.cc" />
 		<Unit filename="../../scanning/ipSWPruner.h" />
 		<Unit filename="../../scanning/pruners/CMakeLists.txt" />
-		<Unit filename="../../scanning/pruners/ipSWDummyPruner.cc" />
-		<Unit filename="../../scanning/pruners/ipSWDummyPruner.h" />
+		<Unit filename="../../scanning/pruners/ipSWVariancePruner.cc" />
+		<Unit filename="../../scanning/pruners/ipSWVariancePruner.h" />
 		<Unit filename="../../scanning/selectors/CMakeLists.txt" />
 		<Unit filename="../../scanning/selectors/DummySelector.cc" />
 		<Unit filename="../../scanning/selectors/DummySelector.h" />

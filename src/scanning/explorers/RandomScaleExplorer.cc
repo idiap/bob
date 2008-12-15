@@ -23,19 +23,9 @@ RandomScaleExplorer::~RandomScaleExplorer()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Initialize the scanning process (scanning sub-window size, ROI)
+// Process the scale, searching for patterns at different sub-windows
 
-bool RandomScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
-{
-	return ScaleExplorer::init(sw_w, sw_h, roi);
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Process the image (check for pattern's sub-windows)
-
-bool RandomScaleExplorer::process(	const Tensor& input_prune,
-					const Tensor& input_evaluation,
-					ExplorerData& explorerData,
+bool RandomScaleExplorer::process(	ExplorerData& explorerData,
 					bool stopAtFirstDetection)
 {
 	const bool verbose = getBOption("verbose");
@@ -62,19 +52,10 @@ bool RandomScaleExplorer::process(	const Tensor& input_prune,
 		const int sw_x = sw_min_x + rand() % (sw_max_x - sw_min_x);
 		const int sw_y = sw_min_y + rand() % (sw_max_y - sw_min_y);
 
-		// Initialize the prunners and evaluator to this sub-window
-		if (ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
-		{
-		       Torch::message("RandomScaleExplorer::process \
-					- could not initialize some sub-window!\n");
-			return false;
-		}
-
 		// Process the sub-window
-		if (ScaleExplorer::processSW(input_prune, input_evaluation, explorerData) == false)
+		if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
 		{
-			Torch::message("RandomScaleExplorer::process \
-					- could not process some sub-window!\n");
+			Torch::message("RandomScaleExplorer::process - could not process some sub-window!\n");
 			return false;
 		}
 

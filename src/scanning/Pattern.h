@@ -208,13 +208,13 @@ namespace Torch
 		// Normalize&Scale some model confidence
 		int			normScaleConfidence(double confidence) const
 		{
-			return (int)(0.5 + (confidence - m_model_threshold) * 100.0);
+			return (int)(0.5 + (confidence - m_model_threshold) * 1000.0);
 		}
 
 		// Rescale&UnNormalize some model confidence
 		double			unNormScaleConfidence(int ns_confidence) const
 		{
-			return m_model_threshold + ns_confidence * 0.01;
+			return m_model_threshold + ns_confidence * 0.001;
 		}
 
 		// Deallocate the allocated tables and pattern list

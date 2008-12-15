@@ -64,6 +64,7 @@
 		<Unit filename="../../scanning/make.csh" />
 		<Unit filename="../../scanning/scanning.cc" />
 		<Unit filename="../../scanning/testPatternList.cc" />
+		<Unit filename="../../scanning/test_scanning.sh" />
 		<Unit filename="../../tensors/CMakeLists.txt" />
 		<Unit filename="../../tensors/README.txt" />
 		<Unit filename="../../tensors/THTensor.cc" />

@@ -12,6 +12,7 @@ namespace Torch
 	class ipSWEvaluator;
 	class ipCore;
 	class ScaleExplorer;
+	class Tensor;
 
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::ExplorerData:
@@ -33,6 +34,10 @@ namespace Torch
 
 		// Destructor
 		virtual ~ExplorerData();
+
+		// Initialize the (evaluator + pruners) processing for these tensors
+		bool                    init(   const Tensor& input_prune,
+                                                const Tensor& input_evaluation);
 
 		// Delete all the detections so far
 		void			clear();
@@ -72,13 +77,16 @@ namespace Torch
 	//	- explore the 4D (position + scale + model confidence) scanning space!
 	//	- decide what sub-windows to scan the next step
 	//	- decide when to stop
+	//      - if the <ipCore>s for prunning and evaluation at scales is NULL then
+	//              the original (scaled) image will be used
 	//
 	//	- PARAMETERS (name, type, default value, description):
 	//		"min_patt_w"		integer		0	"pattern min allowed width"
 	//		"max_patt_w"		integer		4096	"pattern max allowed width"
 	//		"min_patt_h"		integer		0	"pattern min allowed height"
 	//		"max_patt_h"		integer		4096	"pattern max allowed height"
-	//		"ds"			float		0.1	"scale variation"
+	//		"ds"			float		1.25	"scale variation from the smallest to the largest window size"
+        //                            (1 < ds < inf BUT IN REALITY (max_window_size / min_window_size))
 	//		"StopAtFirstDetection"	bool		false	"stop at the first candidate patterns"
 	//		"StartWithLargeScales"	bool		false	"large to small scales scanning"
 	//

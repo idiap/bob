@@ -12,8 +12,8 @@ namespace Torch
 	//		(dx and dy parameters)
 	//
 	//	- PARAMETERS (name, type, default value, description):
-	//		"dx"	float	0.1	"OX variation of the pattern width"
-	//		"dy"	float	0.1	"OY variation of the pattern height"
+	//		"dx"	float	0.1	"OX variation of the scanning sub-window width"
+	//		"dy"	float	0.1	"OY variation of the scanning sub-window height"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -28,19 +28,9 @@ namespace Torch
 		// Destructor
 		virtual ~ExhaustiveScaleExplorer();
 
-		/////////////////////////////////////////////////////////////////
-		// Process functions
-
-		// Initialize the scanning process (scanning sub-window size, ROI)
-		virtual bool		init(int sw_w, int sw_h, const sRect2D& roi);
-
-		// Process the image (check for pattern's sub-windows)
-		virtual bool		process(const Tensor& input_prune,
-						const Tensor& input_evaluation,
-						ExplorerData& explorerData,
+		// Process the scale, searching for patterns at different sub-windows
+		virtual bool		process(ExplorerData& explorerData,
 						bool stopAtFirstDetection);
-
-		/////////////////////////////////////////////////////////////////
 
 	protected:
 

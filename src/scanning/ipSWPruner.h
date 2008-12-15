@@ -7,7 +7,7 @@ namespace Torch
 {
    	/////////////////////////////////////////////////////////////////////////
 	// Torch::ipSWPruner
-	//	- rejects some sub-window (e.g. based on the pixel variance
+	//	- rejects some sub-window (e.g. based on the pixel/edge variance
 	//		- too smooth or too noisy)
 	//
 	// TODO: doxygen header!

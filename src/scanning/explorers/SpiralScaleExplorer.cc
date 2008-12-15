@@ -22,75 +22,77 @@ SpiralScaleExplorer::~SpiralScaleExplorer()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Initialize the scanning process (scanning sub-window size, ROI)
+// Process the scale, searching for patterns at different sub-windows
 
-bool SpiralScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
-{
-	return ScaleExplorer::init(sw_w, sw_h, roi);
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Process the image (check for pattern's sub-windows)
-
-bool SpiralScaleExplorer::process(	const Tensor& input_prune,
-					const Tensor& input_evaluation,
-					ExplorerData& explorerData,
+bool SpiralScaleExplorer::process(	ExplorerData& explorerData,
 					bool stopAtFirstDetection)
 {
-	// Compute the location variance (related to the model size)
+	const int sw_w = m_sw_size.w;
+	const int sw_h = m_sw_size.h;
+
+	// Compute the location variance (related to the subwindow size)
 	const int model_w = explorerData.m_swEvaluator->getModelWidth();
 	const int model_h = explorerData.m_swEvaluator->getModelHeight();
 
-	const int dx = getInRange((int)(0.5f + getFOption("dx") * model_w), 1, model_w);
-	const int dy = getInRange((int)(0.5f + getFOption("dy") * model_h), 1, model_h);
+	const int dx = getInRange((int)(0.5f + getFOption("dx") * sw_w), 1, sw_w);
+	const int dy = getInRange((int)(0.5f + getFOption("dy") * sw_h), 1, sw_h);
 
 	const bool verbose = getBOption("verbose");
 
 	///////////////////////////////////////////////////////////////////////
 	// Generate all possible sub-windows to scan
 
-	const int sw_w = m_sw_size.w;
-	const int sw_h = m_sw_size.h;
+	const int sw_center_x = m_roi.x + m_roi.w / 2;
+	const int sw_center_y = m_roi.y + m_roi.h / 2;
 
-	// ... compute the range in which the position can vary
-	const int sw_min_x = m_roi.x;
-	const int sw_max_x = m_roi.x + m_roi.w - sw_w;
-	const int sw_min_y = m_roi.y;
-	const int sw_max_y = m_roi.y + m_roi.h - sw_h;
+	const int n_spirales = min(     (m_roi.w - sw_w) / dx,
+                                        (m_roi.h - sw_h) / dy);
 
-	// ... and vary the position
+	// Vary the radius to the center of ROI ...
 	int count = 0;
-	/* TODO
-	for (int sw_x = sw_min_x; sw_x <= sw_max_x; sw_x += dx)
-		for (int sw_y = sw_min_y; sw_y <= sw_max_y; sw_y += dy)
-		{
-			// Initialize the prunners and evaluator to this sub-window
-			if (ScaleExplorer::initSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
-			{
-                                Torch::message("SpiralScaleExplorer::process \
-						- could not initialize some sub-window!\n");
-				return false;
-			}
+	for (int i = 0; i < n_spirales; i ++)
+	{
+	        // Compute the radius and the angle variation
+	        const int radius_x = dx * i;
+	        const int radius_y = dy * i;
+	        const double theta = i == 0 ? 0.0 : (2.0 * asin(1.0 / (2.0 * i)));
+	        const int n_thetas = i == 0 ? 1 : (int)(0.5 + (2.0 * M_PI) / theta);
 
-			// Process the sub-window
-			if (ScaleExplorer::processSW(input_prune, input_evaluation, explorerData) == false)
-			{
-				Torch::message("SpiralScaleExplorer::process \
-						- could not process some sub-window!\n");
-				return false;
-			}
+	        print ("[%d/%d]: radius_x = %d, radius_y = %d, theta = %f, n_thetas = %d\n",
+                        i + 1, n_spirales, radius_x, radius_y, theta, n_thetas);
 
-			// Stop at the first detection if asked
-			if (stopAtFirstDetection && explorerData.m_patternSpace.isEmpty() == false)
-			{
-				// This will exit gracelly the double <for>
-				sw_x = sw_max_x + 1;
-				sw_y = sw_max_y + 1;
-			}
+                // Generate the sub-windows by varying the angle at the computed radius
+                for (int j = 0; j < n_thetas; j ++)
+                {
+                        const double angle = theta * j;
+                        const int center_x = sw_center_x + (int)(0.5 + cos(angle) * radius_x);
+                        const int center_y = sw_center_y + (int)(0.5 + sin(angle) * radius_y);
 
-			count ++;
-		}
-	*/
+                        const int sw_x = center_x - sw_w / 2;
+                        const int sw_y = center_y - sw_h / 2;
+                        if (sw_x < m_roi.x || sw_y < m_roi.y || sw_x + sw_w >= m_roi.w || sw_y + sw_h >= m_roi.h)
+                        {
+                                continue;
+                        }
+
+                        // Process the sub-window
+                        if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
+                        {
+                                Torch::message("SpiralScaleExplorer::process - failed to process some sub-window!\n");
+                                return false;
+                        }
+
+                        // Stop at the first detection if asked
+                        if (stopAtFirstDetection && explorerData.m_patternSpace.isEmpty() == false)
+                        {
+                                // This will exit gracefully the double <for>
+                                j = n_thetas;
+                                i = n_spirales;
+                        }
+
+                        count ++;
+                }
+	}
 
 	// ... debug message
 	if (verbose == true)
