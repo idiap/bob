@@ -48,4 +48,10 @@ TH_API void THTensor_addT1outT1(THTensor *tensor, double alpha, THTensor *vec1, 
 TH_API void THTensor_addT2outT2(THTensor *tensor, double alpha, THTensor *m1, THTensor *m2);
 TH_API void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor *m2);
 
+TH_API int THIntTensor_sum(THIntTensor *tensor);
+TH_API short int THShortTensor_sum(THShortTensor *tensor);
+TH_API long int THLongTensor_sum(THLongTensor *tensor);
+TH_API char THCharTensor_sum(THCharTensor *tensor);
+TH_API float THFloatTensor_sum(THFloatTensor *tensor);
+
 #endif

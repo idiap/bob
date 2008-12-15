@@ -1,44 +1,49 @@
-#ifndef GRADIENT_MACHINE_INC
-#define GRADIENT_MACHINE_INC
+#ifndef _TORCH5SPRO_GRADIENT_MACHINE_H_
+#define _TORCH5SPRO_GRADIENT_MACHINE_H_
 
-#include "Machine.h"
+#include "Machine.h"	// GradientMachine is a <Machine>
 
-namespace Torch {
+namespace Torch
+{
+        //////////////////////////////////////////////////////////////////////////////////////
+	// Torch::GradientMachine:
+	//
+	// TODO: doxygen header!
+	//////////////////////////////////////////////////////////////////////////////////////
 
 	class GradientMachine : public Machine
 	{
 	public:
 
-		/// Constructor assuming input/output tensors of dimension 1
-		GradientMachine(unsigned int input_size_, unsigned int output_size_, unsigned int n_parameters_ = 0);
+		/// Constructor
+		GradientMachine(const int n_inputs_, const int n_outputs_, const int n_parameters_ = 0);
 
 		/// Destructor
 		virtual ~GradientMachine();
 
-		/// Forward the input tensor into the machine
-		virtual bool 		forward(const DoubleTensor *input);
-		virtual bool 		forward(int t, double *input, double *output);
+		///////////////////////////////////////////////////////////
 
-		/// Backward the input tensor into the machine with alpha
-		virtual bool 		backward(const DoubleTensor *input, const DoubleTensor *alpha);
-		virtual bool 		backward(int t, double *input, double *beta, double *output, double* alpha);
+		/// Process the input tensor
+		virtual bool 		forward(const Tensor& input);
+
+		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		virtual bool		loadFile(File& file);
+		virtual bool		saveFile(File& file) const;
+
+		///////////////////////////////////////////////////////////
 
 	protected:
 
 		///////////////////////////////////////////////////////////////
-		/// Attributes
+		// Attributes
 
-		///
-		unsigned int input_size;
+		int n_inputs;
+		int n_outputs;
 
-		///
-		unsigned int output_size;
-
-		/// Contains the derivative with respect to the input
-		DoubleTensor		*beta;
-
-		/// Derivative of the parameters of the machine
-		double			*der_parameters;
+		// Parameters
+		int n_parameters;
+		double*			m_parameters;		// The parameters of the gradient machine
+		double*			m_der_parameters;	// The derivatives of the parameters
 	};
 
 }

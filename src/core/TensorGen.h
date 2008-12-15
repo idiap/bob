@@ -91,6 +91,12 @@ public:
 	void fill(TYPE value);
 
 	//
+	virtual void resize(long) const;
+	virtual void resize(long, long) const;
+	virtual void resize(long, long, long) const;
+	virtual void resize(long, long, long, long) const;
+
+	///
 	TYPE get(long) const;
 	TYPE get(long, long) const;
 	TYPE get(long, long, long) const;

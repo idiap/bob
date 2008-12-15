@@ -9,13 +9,17 @@ namespace Torch
 	{
 	public:
 		///
-		MemoryDataSet();
+		MemoryDataSet(Tensor::Type example_type_ = Tensor::Double, Tensor::Type target_type_ = Tensor::Short);
 
 		///
-		MemoryDataSet(int n_examples, bool has_targets = false);
+		MemoryDataSet(int n_examples_, Tensor::Type example_type_ = Tensor::Double, bool has_targets = false, Tensor::Type target_type_ = Tensor::Short);
 
-		/// 
-		virtual TensorPair &operator()(long) const;
+		///
+		virtual Tensor* getExample(long);
+		virtual Tensor &operator()(long);
+
+		///
+		virtual Tensor* getTarget(long);
 
 		///
 		virtual ~MemoryDataSet();
@@ -27,7 +31,8 @@ namespace Torch
 
 	private:
 		///
-		TensorPair *examples;
+		Tensor **examples;
+		Tensor **targets;
 	};
 
 }

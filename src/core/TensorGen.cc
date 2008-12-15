@@ -203,6 +203,26 @@ void TENSOR_CLASS(Tensor)::fill(TYPE value)
   TENSOR_FUNC(fill)(t, value);
 }
 
+void TENSOR_CLASS(Tensor)::resize(long dim0) const
+{
+  TENSOR_FUNC(resize4d)(t, dim0, -1, -1, -1);
+}
+
+void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1) const
+{
+  TENSOR_FUNC(resize4d)(t, dim0, dim1, -1, -1);
+}
+
+void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2) const
+{
+  TENSOR_FUNC(resize4d)(t, dim0, dim1, dim2, -1);
+}
+
+void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2, long dim3) const
+{
+  TENSOR_FUNC(resize4d)(t, dim0, dim1, dim2, dim3);
+}
+
 TYPE TENSOR_CLASS(Tensor)::get(long x0) const
 {
   TYPE v = TENSOR_FUNC(get1d)(t, x0);

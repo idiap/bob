@@ -543,6 +543,30 @@ int main()
   THFree(target_one_label);
   THFree(target_one_hot_encoding);
 
+  print("Testing Tensor resizing ...\n");
+  
+  print("new empty DoubleTensor ...\n");
+  DoubleTensor *resizable_dt = new DoubleTensor();
+  resizable_dt->fill(0);
+  resizable_dt->print("resizable Tensor");
+
+  print("resizing to 3D ...\n");
+  resizable_dt->resize(5, 4, 3);
+  resizable_dt->fill(3);
+  resizable_dt->print("resized Tensor");
+
+  print("resizing to 2D ...\n");
+  resizable_dt->resize(5, 4);
+  resizable_dt->fill(2);
+  resizable_dt->print("resized Tensor");
+
+  print("resizing to 1D ...\n");
+  resizable_dt->resize(5);
+  resizable_dt->fill(1);
+  resizable_dt->print("resized Tensor");
+
+  delete resizable_dt;
+
   return 0;
 }
 

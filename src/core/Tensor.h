@@ -7,6 +7,56 @@
 
 namespace Torch {
 
+   	struct TensorSize
+	{
+		TensorSize()
+		{
+			n_dimensions = 0;
+			size[0] = 0;
+			size[1] = 0;
+			size[2] = 0;
+			size[3] = 0;
+		}
+		TensorSize(long dim0)
+		{
+			n_dimensions = 1;
+			size[0] = dim0;
+			size[1] = 0;
+			size[2] = 0;
+			size[3] = 0;
+		}
+
+		TensorSize(long dim0, long dim1)
+		{
+			n_dimensions = 2;
+			size[0] = dim0;
+			size[1] = dim1;
+			size[2] = 0;
+			size[3] = 0;
+		}
+
+		TensorSize(long dim0, long dim1, long dim2)
+		{
+			n_dimensions = 3;
+			size[0] = dim0;
+			size[1] = dim1;
+			size[2] = dim2;
+			size[3] = 0;
+		}
+
+		TensorSize(long dim0, long dim1, long dim2, long dim3)
+		{
+			n_dimensions = 4;
+			size[0] = dim0;
+			size[1] = dim1;
+			size[2] = dim2;
+			size[3] = dim3;
+		}
+
+		int n_dimensions;
+		long size[4];
+	};
+
 	class Tensor
 	{
 	public:
@@ -69,6 +119,18 @@ namespace Torch {
 		virtual void sprint(const char *name, ...) const = 0;
 
 		//---
+
+		//
+		virtual void resize(long dim0_) const = 0;
+
+		//
+		virtual void resize(long dim0_, long dim1_) const = 0;
+
+		//
+		virtual void resize(long dim0_, long dim1_, long dim2_) const = 0;
+
+		//
+		virtual void resize(long dim0_, long dim1_, long dim2_, long dim3_) const = 0;
 
 		/////////////////////////////////////////////////////////////////////
 		// SET functions for each possible type

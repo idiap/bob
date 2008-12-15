@@ -35,7 +35,8 @@ SET(TORCH5SPRO_SUBDIRS
 	core
 	ip
 	scanning
-	machine)
+	machine
+	trainer)
 
 FOREACH(subdir ${TORCH5SPRO_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})

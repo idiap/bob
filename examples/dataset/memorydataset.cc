@@ -79,14 +79,19 @@ short nine[5][4] = {	{1,1,1,1},
 
 int main()
 {
-	Tensor *input = NULL;
-	Tensor *target = NULL;
-
    	//---
 	{
-		// Handle an empty dataset$
-		
-		MemoryDataSet m0;
+		// Handle an empty dataset
+		MemoryDataSet empty_dataset;
+
+		print("Empty DataSet:\n");
+		print("   n_examples = %d\n", empty_dataset.getNumberOfExamples());
+
+	}
+
+	{
+		//
+		MemoryDataSet m0(10, Tensor::Double);
 
 		print("DataSet m0:\n");
 		print("   n_examples = %d\n", m0.getNumberOfExamples());
@@ -94,84 +99,58 @@ int main()
 		// loop on examples to print them
 		for(int t = 0 ; t < m0.getNumberOfExamples() ; t++)
 		{
-			TensorPair example = m0(t);
-		
-			input = example.input;
-			target = example.target;
-
-			if(input != NULL) input->sprint("input %d", t); 
-			if(target != NULL) target->sprint("target %d", t); 
+			DoubleTensor *input = (DoubleTensor *) m0.getExample(t);
+			input->resize(10);
+			input->fill(1);
+			input->sprint("input %d", t); 
 		}
 
+		print("DataSet m0 done.\n");
 	}
 
 	//---
 	{
 		// Handle a dataset of 10 examples of 1D input and target tensors
-
-		MemoryDataSet m1(10);
+		MemoryDataSet m1(10, Tensor::Double, true, Tensor::Short);
 
 		print("DataSet m1:\n");
 		print("   n_examples = %d\n", m1.getNumberOfExamples());
 
-		// loop on examples to print them
-		for(int t = 0 ; t < m1.getNumberOfExamples() ; t++)
-		{
-			TensorPair example = m1(t);
-		
-			input = example.input;
-			target = example.target;
-
-			if(input != NULL) input->sprint("input %d", t); 
-			if(target != NULL) target->sprint("target %d", t); 
-		}
-
 		// loop on examples to allocate them
 		for(int t = 0 ; t < m1.getNumberOfExamples() ; t++)
 		{
-			TensorPair &example = m1(t);
+			DoubleTensor *input = (DoubleTensor *) m1.getExample(t);
+			input->resize(2,4);
+			input->fill(t);
 
-			example.input = new DoubleTensor(2);
-			example.target = new DoubleTensor(1);
-
-			DoubleTensor &input_ = *((DoubleTensor*)(example.input));
-			DoubleTensor *target_ = (DoubleTensor*) example.target;
-
-			input_(0) = t;
-			input_(1) = t;
-
-			target_->fill(t);
+			ShortTensor *target = (ShortTensor *) m1.getTarget(t);
+			target->resize(1);
+			target->fill(t);
 		}
 
 		// loop on examples to print them again
 		for(int t = 0 ; t < m1.getNumberOfExamples() ; t++)
 		{
-			TensorPair example = m1(t);
-		
-			input = example.input;
-			target = example.target;
-
-			if(input != NULL) input->sprint("input %d", t); 
-			if(target != NULL) target->sprint("target %d", t); 
-
-			delete example.input;
-			delete example.target;
+			m1.getExample(t)->sprint("input %d", t); 
+			m1.getTarget(t)->sprint("target %d", t); 
 		}
-	}
 
+		print("DataSet m1 done.\n");
+	}
+/*
 	//---
 	{
-		/* Handle the XOR dataset: 4 examples of 1D input tensor of size 2 and 1D target tensor of size 1
+		// Handle the XOR dataset: 4 examples of 1D input tensor of size 2 and 1D target tensor of size 1
+		//
+		//   	input	target
+		//   	0 0	0
+		//	0 1	1
+		//	1 0	1
+		//	1 1	1
+		//
+		//
 		
-		   	input	target
-		   	0 0	0
-			0 1	1
-			1 0	1
-			1 1	1
-
-		*/
-		
-		MemoryDataSet m2(4);
+		MemoryDataSet m2(4, Tensor::Double, true, Tensor::Short);
 
 		print("DataSet m2:\n");
 		print("   n_examples = %d\n", m2.getNumberOfExamples());
@@ -181,9 +160,7 @@ int main()
 		ShortTensor *target1 = new ShortTensor(1); target1->fill(1);
 
 		// set the example 0
-		TensorPair &example0 = m2(0);
-		example0.input = new DoubleTensor(2);
-		DoubleTensor &input0 = *((DoubleTensor*)(example0.input));
+		DoubleTensor &input0 = *((DoubleTensor*)(m2.getExample(0)));
 		input0(0) = 0; input0(1) = 0;
 		example0.target = target0;
 
@@ -232,15 +209,15 @@ int main()
 
 	//---
 	{
-		/* Handle a dataset of digits (2D input tensors of size 5x4) for classification (1D target tensor of size 1)
-		
-		   	.oo.  ..oo  oooo  oooo  o...  oooo  oooo  oooo  oooo  oooo   
-			o  o  .o.o  ...o  ...o  o.o.  o...  o...  ...o  o..o  o..o
-			o  o  ...o  .oo.  .ooo  oooo  oooo  oooo  .oo.  .oo.  oooo
-			o  o  ...o  o...  ...o  ..o.  ...o  o..o  ..o.  o..o  ...o
-			.oo.  ...o  oooo  oooo  ..o.  oooo  oooo  .o..  oooo  ...o
-
-		*/
+		// Handle a dataset of digits (2D input tensors of size 5x4) for classification (1D target tensor of size 1)
+		//		
+		//		   	.oo.  ..oo  oooo  oooo  o...  oooo  oooo  oooo  oooo  oooo   
+		//			o  o  .o.o  ...o  ...o  o.o.  o...  o...  ...o  o..o  o..o
+		//			o  o  ...o  .oo.  .ooo  oooo  oooo  oooo  .oo.  .oo.  oooo
+		//			o  o  ...o  o...  ...o  ..o.  ...o  o..o  ..o.  o..o  ...o
+		//			.oo.  ...o  oooo  oooo  ..o.  oooo  oooo  .o..  oooo  ...o
+		//
+		//
 
 	   	int n_targets = 10;
 		int n_examples_per_digit = 10;
@@ -341,8 +318,9 @@ int main()
 
 	//---
 	{
-		/* Handle a dataset of points for distribution modelling */
+		// Handle a dataset of points for distribution modelling
 	}
+*/
 
 	return 0;
 }
