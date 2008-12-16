@@ -97,6 +97,7 @@ public:
 	virtual void resize(long, long, long, long) const;
 
 	///
+	TYPE sum() const;
 	TYPE get(long) const;
 	TYPE get(long, long) const;
 	TYPE get(long, long, long) const;
