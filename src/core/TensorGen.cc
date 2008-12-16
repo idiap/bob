@@ -181,6 +181,7 @@ void TENSOR_CLASS(Tensor)::print(const char *name) const
   if(name != NULL) Torch::print("Tensor %s:\n", name);
   Tprint((TENSOR_CLASS(Tensor) *)this);
 }
+
 TYPE TENSOR_CLASS(Tensor)::sum() const
 {
    TYPE sum_ = TENSOR_FUNC(sum)(t);
