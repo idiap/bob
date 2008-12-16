@@ -126,7 +126,11 @@ bool ipCrop::processInput(const Tensor& input)
 
 	const int n_planes = input.size(2);
 
-	// To be optimized!
+	// Cosmin: To be optimized!
+	//
+	// Seb: Yes, this can be optimized later using 2 times the Tensor:narrow
+	// function assuming that the resulting crop tensor will not be
+	// modified (boolean option in the constructor)
 	for (int p = 0; p < n_planes; p ++)
 	{
 		for (int y = 0; y < m_cropArea.h; y ++)
