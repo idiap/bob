@@ -21,9 +21,10 @@ SET(	ip_INCLUDE
 		${CMAKE_CURRENT_SOURCE_DIR}
 	CACHE INTERNAL "includes")
 
-# Add some sub-directories (different file formats)
+# Add some sub-directories
 SET(ip_SUBDIRS
-	imagefiles)
+	imagefiles
+	shape)
 
 FOREACH(subdir ${ip_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})

@@ -6,10 +6,10 @@ PROJECT(JPEG)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # Set the compiler flags and build type(release or debug)
-SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -ffast-math")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g -ffast-math")
-#SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+SET(CMAKE_BUILD_TYPE RELEASE)
+#SET(CMAKE_BUILD_TYPE DEBUG)
 
 ########################################################
 # Build the library

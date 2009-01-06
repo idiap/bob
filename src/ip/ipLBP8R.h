@@ -23,6 +23,9 @@ namespace Torch
 		// Destructor
 		virtual ~ipLBP8R();
 
+		// Set the radius value of the LBP operator
+		virtual bool		setR(int R);
+
 		// Get the maximum possible label
 		virtual int		getMaxLabel();
 
@@ -30,18 +33,18 @@ namespace Torch
 
 	protected:
 
-		//////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////
 
 		/// Process some input tensor (the input is checked, the outputs are allocated) - overriden
 		virtual bool		processInput(const Tensor& input);
 
-		//////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////
 
 	private:
 
-		//////////////////////////////////////////////////////////
-		// Initialize the conversion table for rotation invariant and uniform LBP patterns
+		/////////////////////////////////////////////////////////////////
 
+		// Initialize the conversion table for rotation invariant and uniform LBP patterns
 		void			init_lut_RI();
 		void			init_lut_U2();
 		void			init_lut_U2RI();
@@ -49,12 +52,7 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-		// Conversion tables (to label uniform & rotation invariant LBP patterns)
-		unsigned char*		m_lut_RI;
-		unsigned char*		m_lut_U2;
-		unsigned char*		m_lut_U2RI;
-
-		float			m_r;
+		float 			m_r;
 	};
 }
 

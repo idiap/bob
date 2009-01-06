@@ -137,6 +137,9 @@ namespace Torch
 
 		// The minimum stage threshold
 		double                  m_minThreshold;
+
+		// Fast access to the output
+		double*			m_fast_output;	// Pointer to the DoubleTensor
 	};
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

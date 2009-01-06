@@ -6,7 +6,7 @@ PROJECT(TORCH5SPRO)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # Set the compiler flags and build type(release or debug)
-SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "-g")
 #SET(CMAKE_BUILD_TYPE RELEASE)
 SET(CMAKE_BUILD_TYPE DEBUG)
@@ -36,7 +36,9 @@ SET(TORCH5SPRO_SUBDIRS
 	ip
 	scanning
 	machine
-	trainer)
+	trainer
+	matrix
+	geometry)
 
 FOREACH(subdir ${TORCH5SPRO_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})

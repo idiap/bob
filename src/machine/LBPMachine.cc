@@ -12,12 +12,15 @@ namespace Torch {
 LBPMachine::LBPMachine(LBPType lbp_type)
 	:	Machine(),
 		m_lut(0), m_lut_size(0), m_x(0), m_y(0),
-		m_lbp_type(lbp_type), m_ip_lbp(0)
+		m_lbp_type(lbp_type), m_ip_lbp(0),
+		m_fast_output(0)
 {
 	setLBPType(lbp_type);
 
 	// Allocate the output
 	m_output = new DoubleTensor(1);
+	const DoubleTensor* t_output = (DoubleTensor*)m_output;
+	m_fast_output = t_output->t->storage->data + t_output->t->storageOffset;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -314,8 +317,7 @@ bool LBPMachine::forward(const Tensor& input)
 	}
 
 	// OK
-	const int lbp = m_ip_lbp->getLBP();
-	m_output->set(0, m_lut[lbp]);
+	*m_fast_output = m_lut[m_ip_lbp->getLBP()];
 	return true;
 }
 

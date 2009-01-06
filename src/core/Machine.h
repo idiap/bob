@@ -130,7 +130,6 @@ namespace Torch {
 		// The result when run on some data
 		DoubleTensor*		m_output;
 	};
-
 }
 
 #endif

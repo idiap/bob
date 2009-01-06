@@ -44,9 +44,7 @@
 		if (center > cmp_point) lbp ++;                                                 \
 	}                                                                                       \
                                                                                                 \
-	*m_lbp = m_rot_invariant ?                                                              \
-			(m_uniform ? m_lut_U2RI[lbp] : m_lut_RI[lbp]) :                         \
-			(m_uniform ? m_lut_U2[lbp] : lbp);                                      \
+	*m_lbp = m_crt_lut[lbp];								\
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,20 +55,29 @@ namespace Torch {
 // Constructor
 
 ipLBP4R::ipLBP4R(int R)
-	:	ipLBP(4, R),
-                m_lut_RI (0),
-		m_lut_U2 (0),
-		m_lut_U2RI (0)
+	:	ipLBP(4, R)
 {
-        m_lut_RI = new unsigned char [16];
-	m_lut_U2 = new unsigned char [16];
-	m_lut_U2RI = new unsigned char [16];
-	for (int i=0; i<16; i++)
+        m_lut_RI = new unsigned short [16];
+	m_lut_U2 = new unsigned short [16];
+	m_lut_U2RI = new unsigned short [16];
+	m_lut_addAvgBit = new unsigned short [32];
+	m_lut_normal = new unsigned short [16];
+
+	for (int i = 0; i < 16; i ++)
 	{
 		m_lut_RI[i] = 0;
 		m_lut_U2[i] = 0;
 		m_lut_U2RI[i] = 0;
 	}
+	for (int i = 0; i < 16; i ++)
+	{
+		m_lut_normal[i] = i;
+	}
+	for (int i = 0; i < 32; i ++)
+	{
+		m_lut_addAvgBit[i] = i;
+	}
+
 	init_lut_RI();
 	init_lut_U2();
 	init_lut_U2RI();
@@ -81,9 +88,6 @@ ipLBP4R::ipLBP4R(int R)
 
 ipLBP4R::~ipLBP4R()
 {
-        delete[] m_lut_RI;
-	delete[] m_lut_U2;
-	delete[] m_lut_U2RI;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

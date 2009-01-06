@@ -34,8 +34,8 @@ bool SpiralScaleExplorer::process(	ExplorerData& explorerData,
 	const int model_w = explorerData.m_swEvaluator->getModelWidth();
 	const int model_h = explorerData.m_swEvaluator->getModelHeight();
 
-	const int dx = getInRange((int)(0.5f + getFOption("dx") * sw_w), 1, sw_w);
-	const int dy = getInRange((int)(0.5f + getFOption("dy") * sw_h), 1, sw_h);
+	const int dx = getInRange((int)(getFOption("dx") * sw_w), 1, sw_w);
+	const int dy = getInRange((int)(getFOption("dy") * sw_h), 1, sw_h);
 
 	const bool verbose = getBOption("verbose");
 

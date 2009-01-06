@@ -112,6 +112,9 @@ namespace Torch
 		// Object to compute the required LBP features
 		LBPType			m_lbp_type;
 		ipLBP*			m_ip_lbp;
+
+		// Fast access to the output value
+		double*			m_fast_output;	// Pointer to the DoubleTensor
 	};
 
 

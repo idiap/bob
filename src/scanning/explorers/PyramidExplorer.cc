@@ -143,15 +143,24 @@ bool PyramidExplorer::init(int image_w, int image_h)
 	const float min_scale = max((model_w + 0.0f) / (max_patt_w + 0.0f), (model_h + 0.0f) / (max_patt_h + 0.0f));
 	const float max_scale = min((model_w + 0.0f) / (min_patt_w + 0.0f), (model_h + 0.0f) / (min_patt_h + 0.0f));
 	const float ds = getInRange(    getFOption("ds"),
-                                        1.0f + 1.0f / (model_w + 0.0f),
-                                        (max_patt_w + 0.0f) / (min_patt_w + 0.0f) + 2.0f / model_w + 0.0f);
+                                        1.0f + 1.0f / (image_w + 0.0f),
+                                        (max_patt_w + 0.0f) / (min_patt_w + 0.0f) + 2.0f / (image_w + 0.0f));
 
 	const bool verbose = getBOption("verbose");
 
 	// Compute the number of scales (relative to the image size)
 	int n_scales = 0;
-	for (double scale = max_scale; scale >= min_scale; scale /= ds, n_scales ++)
+	int last_scale_w = -1;
+	for (double scale = max_scale; scale >= min_scale; scale /= ds)
 	{
+		const int scale_w = (int)(0.5 + scale * image_w);
+		if (scale_w == last_scale_w)
+		{
+			continue;
+		}
+
+		last_scale_w = scale_w;
+		n_scales ++;
 	}
 
 	// Resize the scale information
@@ -163,9 +172,16 @@ bool PyramidExplorer::init(int image_w, int image_h)
 
 	// Compute the scales (relative to the image size)
 	int i = 0;
-	for (double scale = max_scale; scale >= min_scale; scale /= ds, i ++)
+	last_scale_w = -1;
+	for (double scale = max_scale; scale >= min_scale; scale /= ds)
 	{
-	        m_scales[i].w = (int)(0.5 + scale * image_w);
+		const int scale_w = (int)(0.5 + scale * image_w);
+		if (scale_w == last_scale_w)
+		{
+			continue;
+		}
+
+		m_scales[i].w = (int)(0.5 + scale * image_w);
 		m_scales[i].h = (int)(0.5 + scale * image_h);
 
 		// ... debug message
@@ -174,6 +190,9 @@ bool PyramidExplorer::init(int image_w, int image_h)
 			Torch::print("[PyramidExplorer]: - generating the [%d/%d] scale: %dx%d\n",
 				i + 1, m_n_scales, m_scales[i].w, m_scales[i].h);
 		}
+
+		last_scale_w = scale_w;
+		i ++;
 	}
 
 	// OK

@@ -31,6 +31,9 @@ namespace Torch
 			m_confidence = other.m_confidence;
 		}
 
+		// Returns the percentage of the overlapping area of intersection with another one
+		int		getOverlap(const Pattern& other) const;
+
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
@@ -40,6 +43,117 @@ namespace Torch
 
 		// Model confidence
 		double		m_confidence;
+	};
+
+	/////////////////////////////////////////////////////////////////////////
+	// Torch::Scanning::PatternMerger
+	//	- generic class for merging a list of patterns
+	//
+	// TODO: doxygen header!
+	/////////////////////////////////////////////////////////////////////////
+
+	class PatternMerger
+	{
+	public:
+		// Constructor
+		PatternMerger() { }
+
+		// Destructor
+		virtual ~PatternMerger() { }
+
+		// Reset the merging
+		virtual void		reset() = 0;
+
+		// Accumulate some pattern (from the merging list?!)
+		virtual void		add(const Pattern& pattern) = 0;
+
+		// Copy the merged result to the given pattern
+		virtual void		merge(Pattern& pattern) const = 0;
+	};
+
+	class AveragePatternMerger : public PatternMerger
+	{
+	public:
+		// Constructor
+		AveragePatternMerger();
+
+		// Destructor
+		virtual ~AveragePatternMerger();
+
+		// Reset the merging
+		virtual void		reset();
+
+		// Accumulate some pattern (from the merging list?!)
+		virtual void		add(const Pattern& pattern);
+
+		// Copy the merged result to the given pattern
+		virtual void		merge(Pattern& pattern) const;
+
+	private:
+
+		//////////////////////////////////////////////////////////////////
+		// Attributes
+
+		double			m_sum_cx, m_sum_cy;
+		double			m_sum_w, m_sum_h;
+		double			m_sum_confidence;
+		int			m_count;
+	};
+
+	class ConfWeightedPatternMerger : public PatternMerger
+	{
+	public:
+		// Constructor
+		ConfWeightedPatternMerger();
+
+		// Destructor
+		virtual ~ConfWeightedPatternMerger();
+
+		// Reset the merging
+		virtual void		reset();
+
+		// Accumulate some pattern (from the merging list?!)
+		virtual void		add(const Pattern& pattern);
+
+		// Copy the merged result to the given pattern
+		virtual void		merge(Pattern& pattern) const;
+
+	private:
+
+		//////////////////////////////////////////////////////////////////
+		// Attributes
+
+		double			m_sum_cx, m_sum_cy;
+		double			m_sum_w, m_sum_h;
+		double			m_sum_confidence;
+		int			m_count;
+	};
+
+	class MaxConfPatternMerger : public PatternMerger
+	{
+	public:
+		// Constructor
+		MaxConfPatternMerger();
+
+		// Destructor
+		virtual ~MaxConfPatternMerger();
+
+		// Reset the merging
+		virtual void		reset();
+
+		// Accumulate some pattern (from the merging list?!)
+		virtual void		add(const Pattern& pattern);
+
+		// Copy the merged result to the given pattern
+		virtual void		merge(Pattern& pattern) const;
+
+	private:
+
+		//////////////////////////////////////////////////////////////////
+		// Attributes
+
+		double			m_max_confidence;
+		Pattern			m_pattern;
 	};
 
 	/////////////////////////////////////////////////////////////////

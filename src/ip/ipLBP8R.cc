@@ -12,42 +12,46 @@
                                                                                                                 \
 	const int in_stride_h = t_input->t->stride[0];	                                                        \
 	const int in_stride_w = t_input->t->stride[1];	                                                        \
-                                                                                                                \
-	dataType tab[8];                                                                                        \
-	tab[1] = src[(m_y - m_R) * in_stride_h + m_x * in_stride_w];                                            \
-	tab[3] = src[m_y * in_stride_h + (m_x + m_R) * in_stride_w];                                            \
-	tab[5] = src[(m_y + m_R) * in_stride_h + m_x * in_stride_w];                                            \
-	tab[7] = src[m_y * in_stride_h + (m_x - m_R) * in_stride_w];                                            \
-                                                                                                                \
+														\
+	const int offset_center = m_y * in_stride_h + m_x * in_stride_w;					\
+														\
+	dataType tab[8];                                                                                 	\
+	tab[1] = src[offset_center - m_R * in_stride_h];							\
+	tab[3] = src[offset_center + m_R * in_stride_w];                                        		\
+	tab[5] = src[offset_center + m_R * in_stride_h];                                        		\
+	tab[7] = src[offset_center - m_R * in_stride_w];                                        		\
+														\
 	switch (m_R)                                                                                            \
 	{                                                                                                       \
 		case 1:                                                                                         \
-			tab[0] = src[(m_y - 1) * in_stride_h + (m_x - 1) * in_stride_w];                        \
-			tab[2] = src[(m_y - 1) * in_stride_h + (m_x + 1) * in_stride_w];                        \
-			tab[4] = src[(m_y + 1) * in_stride_h + (m_x + 1) * in_stride_w];                        \
-			tab[6] = src[(m_y + 1) * in_stride_h + (m_x - 1) * in_stride_w];                        \
+			tab[0] = src[offset_center - in_stride_h - in_stride_w];                        	\
+			tab[2] = src[offset_center - in_stride_h + in_stride_w];                        	\
+			tab[4] = src[offset_center + in_stride_h + in_stride_w];                        	\
+			tab[6] = src[offset_center + in_stride_h - in_stride_w];                        	\
 			break;                                                                                  \
+														\
 		case 2:                                                                                         \
-			tab[0] = (	src[(m_y - 2) * in_stride_h + (m_x - 2) * in_stride_w] +                \
-					src[(m_y - 2) * in_stride_h + (m_x - 1) * in_stride_w] +                \
-					src[(m_y - 1) * in_stride_h + (m_x - 2) * in_stride_w] +                \
-					src[(m_y - 1) * in_stride_h + (m_x - 1) * in_stride_w]) / 4;            \
+			tab[0] = (	src[offset_center - 2 * in_stride_h - 2 * in_stride_w] +                \
+					src[offset_center - 2 * in_stride_h - 1 * in_stride_w] +                \
+					src[offset_center - 1 * in_stride_h - 2 * in_stride_w] +                \
+					src[offset_center - 1 * in_stride_h - 1 * in_stride_w]) / 4;            \
                                                                                                                 \
-			tab[2] = (	src[(m_y - 2) * in_stride_h + (m_x + 2) * in_stride_w] +                \
-					src[(m_y - 2) * in_stride_h + (m_x + 1) * in_stride_w] +                \
-					src[(m_y - 1) * in_stride_h + (m_x + 2) * in_stride_w] +                \
-					src[(m_y - 1) * in_stride_h + (m_x + 1) * in_stride_w]) / 4;            \
+			tab[2] = (	src[offset_center - 2 * in_stride_h + 2 * in_stride_w] +                \
+					src[offset_center - 2 * in_stride_h + 1 * in_stride_w] +                \
+					src[offset_center - 1 * in_stride_h + 2 * in_stride_w] +                \
+					src[offset_center - 1 * in_stride_h + 1 * in_stride_w]) / 4;            \
                                                                                                                 \
-			tab[4] = (	src[(m_y + 2) * in_stride_h + (m_x + 2) * in_stride_w] +                \
-					src[(m_y + 2) * in_stride_h + (m_x + 1) * in_stride_w] +                \
-					src[(m_y + 1) * in_stride_h + (m_x + 2) * in_stride_w] +                \
-					src[(m_y + 1) * in_stride_h + (m_x + 1) * in_stride_w]) / 4;            \
+			tab[4] = (	src[offset_center + 2 * in_stride_h + 2 * in_stride_w] +                \
+					src[offset_center + 2 * in_stride_h + 1 * in_stride_w] +                \
+					src[offset_center + 1 * in_stride_h + 2 * in_stride_w] +                \
+					src[offset_center + 1 * in_stride_h + 1 * in_stride_w]) / 4;            \
                                                                                                                 \
-			tab[6] = (	src[(m_y + 2) * in_stride_h + (m_x - 2) * in_stride_w] +                \
-					src[(m_y + 2) * in_stride_h + (m_x - 1) * in_stride_w] +                \
-					src[(m_y + 1) * in_stride_h + (m_x - 2) * in_stride_w] +                \
-					src[(m_y + 1) * in_stride_h + (m_x - 1) * in_stride_w]) / 4;            \
+			tab[6] = (	src[offset_center + 2 * in_stride_h - 2 * in_stride_w] +                \
+					src[offset_center + 2 * in_stride_h - 1 * in_stride_w] +                \
+					src[offset_center + 1 * in_stride_h - 2 * in_stride_w] +                \
+					src[offset_center + 1 * in_stride_h - 1 * in_stride_w]) / 4;            \
 			break;                                                                                  \
+														\
 		default:                                                                                        \
 			tab[0] = bilinear_interpolation(src, in_stride_w, in_stride_h, m_x - m_r, m_y - m_r);   \
 			tab[2] = bilinear_interpolation(src, in_stride_w, in_stride_h, m_x + m_r, m_y - m_r);   \
@@ -56,13 +60,13 @@
 			break;                                                                                  \
 	}                                                                                                       \
                                                                                                                 \
-	const dataType center = src[m_y * in_stride_h + m_x * in_stride_w];                                     \
+	const dataType center = src[offset_center];                                     			\
                                                                                                                 \
 	const dataType cmp_point = m_toAverage ?                                                                \
 		(dataType)                                                                                      \
                         (0.5 + 0.111111 *                                                                       \
                                 (tab[0] + tab[1] + tab[2] + tab[3] + tab[4] + tab[5] + tab[6] + tab[7]          \
-                                        + center + 0.0))                                                        \
+                                        + center))                                                        	\
 		:                                                                                               \
 		center;                                                                                         \
                                                                                                                 \
@@ -90,9 +94,7 @@
 		if (center > cmp_point) lbp ++;                                                                 \
 	}                                                                                                       \
                                                                                                                 \
-        *m_lbp = m_rot_invariant ?                                                                              \
-			(m_uniform ? m_lut_U2RI[lbp] : m_lut_RI[lbp]) :                                         \
-			(m_uniform ? m_lut_U2[lbp] : lbp);                                                      \
+        *m_lbp = m_crt_lut[lbp];										\
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,20 +106,28 @@ namespace Torch {
 
 ipLBP8R::ipLBP8R(int R)
 	:	ipLBP(8, R),
-		m_lut_RI(0),
-		m_lut_U2(0),
-		m_lut_U2RI(0),
 		m_r(sqrt(0.5) * R)
 {
 	// Initialize the conversion tables
-	m_lut_RI = new unsigned char[256];	// 2^8
-	m_lut_U2 = new unsigned char[256];	// 2^8
-	m_lut_U2RI = new unsigned char[256];	// 2^8
+	m_lut_RI = new unsigned short[256];		// 2^8
+	m_lut_U2 = new unsigned short[256];		// 2^8
+	m_lut_U2RI = new unsigned short[256];		// 2^8
+	m_lut_addAvgBit = new unsigned short [512];	// 2^9
+	m_lut_normal = new unsigned short [256];	// 2^8
+
 	for (int i = 0; i < 256; i ++)
 	{
 		m_lut_RI[i] = 0;
 		m_lut_U2[i] = 0;
 		m_lut_U2RI[i] = 0;
+	}
+	for (int i = 0; i < 256; i ++)
+	{
+		m_lut_normal[i] = i;
+	}
+	for (int i = 0; i < 512; i ++)
+	{
+		m_lut_addAvgBit[i] = i;
 	}
 
 	init_lut_RI();
@@ -130,9 +140,19 @@ ipLBP8R::ipLBP8R(int R)
 
 ipLBP8R::~ipLBP8R()
 {
-	delete[] m_lut_RI;
-	delete[] m_lut_U2;
-	delete[] m_lut_U2RI;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Set the radius value of the LBP operator
+
+bool ipLBP8R::setR(int R)
+{
+	if (ipLBP::setR(R) == true)
+	{
+		m_r = sqrt(0.5) * R;
+		return true;
+	}
+	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

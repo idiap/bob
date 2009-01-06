@@ -50,6 +50,10 @@ void print(const char* fmt, ...);
 #define	getInRange(v,m,M) ((v) < (m) ? (m) : ((v) > (M) ? (M) : (v)))
 #endif
 
+#define IS_NEAR(var, value, delta) ((var >= (value - delta)) && (var <= (value + delta)))
+
+#define FixI(v) (int) (v+0.5)
+
 }
 
 #endif

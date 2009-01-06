@@ -285,7 +285,7 @@
         dataType* dst = t_dst->t->storage->data + t_dst->t->storageOffset;              \
                                                                                         \
         const int offset = m_sw_y * m_input_stride_h + m_sw_x * m_input_stride_w;       \
-                                                                                        \
+											\
         for (int i = 0; i < m_buff_n_indexes; i ++)                                     \
         {                                                                               \
                 dst[m_buff_indexes[i]] =                                                \
@@ -296,7 +296,6 @@
                         m_scale_cell_sizes[i];                                          \
         }                                                                               \
 }
-
 
 namespace Torch
 {
@@ -378,6 +377,7 @@ bool ipSWEvaluator::setClassifier(const char* filename)
         }
 
         // OK
+        delete m_classifier;
         m_classifier = classifier;
         return true;
 }
@@ -583,7 +583,7 @@ void ipSWEvaluator::iscaleInput(const Tensor& input)
 bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
 {
         // Set the sub-window
-        const bool changed = m_sw_w != sw_w || m_sw_h != sw_h;
+        const bool changed_size = m_sw_w != sw_w || m_sw_h != sw_h;
         if (    m_classifier == 0 ||
                 m_buffTensor == 0 ||
                 ipSubWindow::setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
@@ -594,7 +594,7 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
         // If the sub-window size is changed and on the multiscale part
         //      (the sub-window is different from the classifier's size),
         //      then the scalling coefficients should be recomputed!
-        if (    changed == true &&
+        if (    changed_size == true &&
                 (sw_w != m_classifier->getModelWidth() || sw_h != m_classifier->getModelHeight()))
         {
         	// Cleanup

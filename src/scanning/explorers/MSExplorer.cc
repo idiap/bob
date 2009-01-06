@@ -108,15 +108,24 @@ bool MSExplorer::init(int image_w, int image_h)
 	const double min_scale = max((min_patt_w + 0.0) / (model_w + 0.0), (min_patt_h + 0.0) / (model_h + 0.0));
 	const double max_scale = min((max_patt_w + 0.0) / (model_w + 0.0), (max_patt_h + 0.0) / (model_h + 0.0));
 	const double ds = getInRange(   getFOption("ds"),
-                                        1.0 + 1.0 / (model_w + 0.0),
-                                        (max_patt_w + 0.0) / (min_patt_w + 0.0) + 2.0 / model_w + 0.0);
+                                        1.0 + 1.0 / (image_w + 0.0),
+                                        (max_patt_w + 0.0) / (min_patt_w + 0.0) + 2.0 / (image_w + 0.0));
 
         const bool verbose = getBOption("verbose");
 
 	// Compute the number of scales (relative to the model size)
 	int n_scales = 0;
-	for (double scale = min_scale; scale <= max_scale; scale *= ds, n_scales ++)
+	int last_scale_w = -1;
+	for (double scale = min_scale; scale <= max_scale; scale *= ds)
 	{
+		const int scale_w = (int)(0.5 + scale * model_w);
+		if (scale_w == last_scale_w)
+		{
+			continue;
+		}
+
+		last_scale_w = scale_w;
+		n_scales ++;
 	}
 
 	// Resize the scale information
@@ -124,8 +133,15 @@ bool MSExplorer::init(int image_w, int image_h)
 
 	// Compute the scales (relative to the model size)
 	int i = 0;
-	for (double scale = min_scale; scale <= max_scale; scale *= ds, i ++)
+	last_scale_w = -1;
+	for (double scale = min_scale; scale <= max_scale; scale *= ds)
 	{
+		const int scale_w = (int)(0.5 + scale * model_w);
+		if (scale_w == last_scale_w)
+		{
+			continue;
+		}
+
 	        m_scales[i].w = (int)(0.5 + scale * model_w);
 		m_scales[i].h = (int)(0.5 + scale * model_h);
 
@@ -135,6 +151,9 @@ bool MSExplorer::init(int image_w, int image_h)
 			Torch::print("[MSExplorer]: - generating the [%d/%d] scale: %dx%d\n",
 				i + 1, m_n_scales, m_scales[i].w, m_scales[i].h);
 		}
+
+		last_scale_w = scale_w;
+		i ++;
 	}
 
 	// OK

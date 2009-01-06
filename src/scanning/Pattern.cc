@@ -5,6 +5,270 @@ namespace Torch
 {
 
 /////////////////////////////////////////////////////////////////////////
+// Returns the percentage of the overlapping area of intersection with another one
+
+int Pattern::getOverlap(const Pattern& other) const
+{
+	int x_min, y_min;
+	int x_max, y_max;
+	int overlap_x_min, overlap_y_min;
+	int overlap_x_max, overlap_y_max;
+
+	// Check the corners - left
+	if (m_x <= other.m_x)
+	{
+		x_min = m_x;
+		overlap_x_min = other.m_x;
+	}
+	else
+	{
+		x_min = other.m_x;
+		overlap_x_min = m_x;
+	}
+
+	// Check the corners - top
+	if (m_y <= other.m_y)
+	{
+		y_min = m_y;
+		overlap_y_min = other.m_y;
+	}
+	else
+	{
+		y_min = other.m_y;
+		overlap_y_min = m_y;
+	}
+
+	// Check the corners - right
+	if ((m_x + m_w) >= (other.m_x + other.m_w))
+	{
+		x_max = m_x + m_w;
+		overlap_x_max = other.m_x + other.m_w;
+	}
+	else
+	{
+		x_max = other.m_x + other.m_w;
+		overlap_x_max = m_x + m_w;
+	}
+
+	// Check the corners - bottom
+	if ((m_y + m_h) >= (other.m_y + other.m_h))
+	{
+		y_max = m_y + m_h;
+		overlap_y_max = other.m_y + other.m_h;
+	}
+	else
+	{
+		y_max = other.m_y + other.m_h;
+		overlap_y_max = m_y + m_h;
+	}
+
+	// No intersection
+	if ((overlap_x_max < overlap_x_min) || (overlap_y_max < overlap_y_min))
+	{
+		return 0;
+	}
+	else if (x_max - x_min > m_w + other.m_w || y_max - y_min > m_h + other.m_h)
+	{
+	   	return 0;
+	}
+
+	// Inclusion
+	else if (	(x_max - x_min == m_w && y_max - y_min == m_h) ||
+			(x_max - x_min == other.m_w && y_max - y_min == other.m_h))
+	{
+		return 100;
+	}
+
+	// Some intersection
+	else
+	{
+		if (other.m_h * other.m_w > m_h * m_w)
+		{
+			return 100 * (overlap_x_max - overlap_x_min) * (overlap_y_max - overlap_y_min) /
+					(other.m_h * other.m_w);
+		}
+	   	else
+	   	{
+			return 100 * (overlap_x_max - overlap_x_min) * (overlap_y_max - overlap_y_min) /
+					(m_h * m_w);
+	    	}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Constructor
+
+AveragePatternMerger::AveragePatternMerger()
+	:	m_sum_cx(0.0),
+		m_sum_cy(0.0),
+		m_sum_w(0.0),
+		m_sum_h(0.0),
+		m_sum_confidence(0.0),
+		m_count(0)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Destructor
+
+AveragePatternMerger::~AveragePatternMerger()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Reset the merging
+
+void AveragePatternMerger::reset()
+{
+	m_sum_cx = 0.0;
+	m_sum_cy = 0.0;
+	m_sum_w = 0.0;
+	m_sum_h = 0.0;
+	m_sum_confidence = 0.0;
+	m_count = 0;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Accumulate some pattern (from the merging list?!)
+
+void AveragePatternMerger::add(const Pattern& pattern)
+{
+	m_sum_cx += pattern.m_x + 0.5 * pattern.m_w;
+	m_sum_cy += pattern.m_y + 0.5 * pattern.m_h;
+	m_sum_w += pattern.m_w;
+	m_sum_h += pattern.m_h;
+	m_sum_confidence += pattern.m_confidence;
+	m_count ++;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Copy the merged result to the given pattern
+
+void AveragePatternMerger::merge(Pattern& pattern) const
+{
+	if (m_count > 0)
+	{
+		const double inv = 1.0 / m_count;
+		pattern.m_x = FixI(inv * (m_sum_cx - m_sum_w * 0.5));
+		pattern.m_y = FixI(inv * (m_sum_cy - m_sum_h * 0.5));
+		pattern.m_w = FixI(inv * m_sum_w);
+		pattern.m_h = FixI(inv * m_sum_h);
+		pattern.m_confidence = inv * m_sum_confidence;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Constructor
+
+ConfWeightedPatternMerger::ConfWeightedPatternMerger()
+	:	m_sum_cx(0.0),
+		m_sum_cy(0.0),
+		m_sum_w(0.0),
+		m_sum_h(0.0),
+		m_sum_confidence(0.0),
+		m_count(0)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Destructor
+
+ConfWeightedPatternMerger::~ConfWeightedPatternMerger()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Reset the merging
+
+void ConfWeightedPatternMerger::reset()
+{
+	m_sum_cx = 0.0;
+	m_sum_cy = 0.0;
+	m_sum_w = 0.0;
+	m_sum_h = 0.0;
+	m_sum_confidence = 0.0;
+	m_count = 0;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Accumulate some pattern (from the merging list?!)
+
+void ConfWeightedPatternMerger::add(const Pattern& pattern)
+{
+	// Try to avoid the cases where the confidence is 0.0
+	static const double delta_confidence = 10000.0;
+	const double confidence = delta_confidence + pattern.m_confidence;
+
+	m_sum_cx += confidence * (pattern.m_x + 0.5 * pattern.m_w);
+	m_sum_cy += confidence * (pattern.m_y + 0.5 * pattern.m_h);
+	m_sum_w += confidence * pattern.m_w;
+	m_sum_h += confidence * pattern.m_h;
+	m_sum_confidence += confidence;
+	m_count ++;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Copy the merged result to the given pattern
+
+void ConfWeightedPatternMerger::merge(Pattern& pattern) const
+{
+	if (m_count > 0)
+	{
+		static const double delta_confidence = 10000.0;
+
+		const double inv = 1.0 / m_sum_confidence;
+		pattern.m_x = FixI(inv * (m_sum_cx - m_sum_w * 0.5));
+		pattern.m_y = FixI(inv * (m_sum_cy - m_sum_h * 0.5));
+		pattern.m_w = FixI(inv * m_sum_w);
+		pattern.m_h = FixI(inv * m_sum_h);
+		pattern.m_confidence = m_sum_confidence / m_count - delta_confidence;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Constructor
+
+MaxConfPatternMerger::MaxConfPatternMerger()
+	:	m_max_confidence(-100000.0)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Destructor
+
+MaxConfPatternMerger::~MaxConfPatternMerger()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Reset the merging
+
+void MaxConfPatternMerger::reset()
+{
+	m_max_confidence = -100000.0;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Accumulate some pattern (from the merging list?!)
+
+void MaxConfPatternMerger::add(const Pattern& pattern)
+{
+	if (pattern.m_confidence > m_max_confidence)
+	{
+		m_max_confidence = pattern.m_confidence;
+		m_pattern.copy(pattern);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Copy the merged result to the given pattern
+
+void MaxConfPatternMerger::merge(Pattern& pattern) const
+{
+	pattern.copy(m_pattern);
+}
+
+/////////////////////////////////////////////////////////////////////////
 // Constructor
 
 PatternList::PatternList(bool trackBestPatterns, int maxBestPatterns)
@@ -434,10 +698,15 @@ void PatternSpace::add(const Pattern& pattern)
 		}
 
 	// Update the usage table
-	m_table_usage[sw_x][sw_y] = 0x01;
+	m_table_usage[sw_x][sw_y] = 0x01;				// corners
         m_table_usage[sw_x + sw_w][sw_y] = 0x01;
         m_table_usage[sw_x + sw_w][sw_y + sw_h] = 0x01;
         m_table_usage[sw_x][sw_y + sw_h] = 0x01;
+
+        m_table_usage[sw_x + sw_w / 2][sw_y + sw_h / 2] = 0x01;		// center
+
+        // Update the local minimas
+        // TODO
 
         // One more pattern is stored
 	m_patterns.add(pattern);

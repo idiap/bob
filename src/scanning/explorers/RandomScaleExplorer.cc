@@ -1,7 +1,7 @@
 #include "RandomScaleExplorer.h"
 #include "ipSWEvaluator.h"
 
-#include <cstdlib>
+#include <stdlib.h>
 
 namespace Torch
 {

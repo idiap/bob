@@ -35,7 +35,7 @@ namespace Torch
 		bool			setXY(int x, int y);
 
 		// Set the radius value of the LBP operator
-		bool			setR(int R);
+		virtual bool		setR(int R);
 
 		// Get the maximum possible label
 		virtual int		getMaxLabel() = 0;
@@ -50,7 +50,7 @@ namespace Torch
 
 	protected:
 
-		//////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////
 
 		/// Check if the input tensor has the right dimensions and type - overriden
 		virtual bool		checkInput(const Tensor& input) const;
@@ -81,7 +81,7 @@ namespace Torch
 								int stride_w, int stride_h,
 								float x, float y);
 
-		//////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////
 
 	protected:
 
@@ -96,6 +96,17 @@ namespace Torch
 
 		// Direct (&fast) access to the LBP code
 		int*			m_lbp;
+
+		// Conversion tables (to label uniform & rotation invariant,
+		//	adding the average bit or normal LBP patterns)
+		unsigned short*		m_lut_RI;
+		unsigned short*		m_lut_U2;
+		unsigned short*		m_lut_U2RI;
+		unsigned short*		m_lut_addAvgBit;	// 2 ^ (P + 1)
+		unsigned short*		m_lut_normal;		// 2 ^ P
+
+		// Current selected conversion table (for fast accessing)
+		unsigned short*		m_crt_lut;
 
 		// Different parameters for computing LBPs (not using <getOption> to speed up computation)
 		bool			m_toAverage;

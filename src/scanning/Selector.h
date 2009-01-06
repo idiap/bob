@@ -6,7 +6,7 @@
 
 namespace Torch
 {
-   	/////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
 	// Torch::Scanning::Selector
 	//	- given a list of candidate sub-windows and possible a ConfidenceDistribution,
 	//		it will select just some of these sub-windows as the best ones!
@@ -42,6 +42,8 @@ namespace Torch
 		// Result: best pattern selected from the candidates (the 4D scanning space)
 		PatternList			m_patterns;
 	};
+
+	/////////////////////////////////////////////////////////////////////////
 }
 
 #endif

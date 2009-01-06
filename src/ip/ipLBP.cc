@@ -11,6 +11,12 @@ ipLBP::ipLBP(int P, int R)
 		m_P(P), m_R(R),
 		m_x(0), m_y(0),
 		m_lbp(0),
+		m_lut_RI(0),
+		m_lut_U2(0),
+		m_lut_U2RI(0),
+		m_lut_addAvgBit(0),
+		m_lut_normal(0),
+		m_crt_lut(0),
 		m_toAverage(false), m_addAvgBit(false), m_uniform(0), m_rot_invariant(false)
 {
 	addBOption("ToAverage", false, "compute the LBP code to the average");
@@ -24,6 +30,11 @@ ipLBP::ipLBP(int P, int R)
 
 ipLBP::~ipLBP()
 {
+	delete[] m_lut_RI;
+	delete[] m_lut_U2;
+	delete[] m_lut_U2RI;
+	delete[] m_lut_addAvgBit;
+	delete[] m_lut_normal;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -36,6 +47,37 @@ void ipLBP::optionChanged(const char* name)
 	m_addAvgBit = getBOption("AddAvgBit");
 	m_uniform = getBOption("Uniform");
 	m_rot_invariant = getBOption("RotInvariant");
+
+	// Set the current conversion table
+	if (m_rot_invariant == true)
+	{
+		if (m_uniform == true)
+		{
+			m_crt_lut = m_lut_U2RI;
+		}
+		else
+		{
+			m_crt_lut = m_lut_RI;
+		}
+	}
+	else
+	{
+		if (m_uniform == true)
+		{
+			m_crt_lut = m_lut_U2;
+		}
+		else
+		{
+			if (m_addAvgBit == true && m_toAverage == true)
+			{
+				m_crt_lut = m_lut_addAvgBit;
+			}
+			else
+			{
+				m_crt_lut = m_lut_normal;
+			}
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
