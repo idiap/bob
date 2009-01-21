@@ -389,6 +389,8 @@
 		<Unit filename="../../scanning/selectors/CMakeLists.txt" />
 		<Unit filename="../../scanning/selectors/DummySelector.cc" />
 		<Unit filename="../../scanning/selectors/DummySelector.h" />
+		<Unit filename="../../scanning/selectors/MeanShiftSelector.cc" />
+		<Unit filename="../../scanning/selectors/MeanShiftSelector.h" />
 		<Unit filename="../../scanning/selectors/OverlapSelector.cc" />
 		<Unit filename="../../scanning/selectors/OverlapSelector.h" />
 		<Unit filename="../../sp/CMakeLists.txt" />

@@ -36,11 +36,15 @@ bool Image::resize(int width, int height, int n_planes)
 		return false;
 	}
 
-	cleanup();
+	// Resize only if needed
+	if (getWidth() != width || getHeight() != height)
+	{
+		cleanup();
 
-	// Allocate the tensor, fill it black and set the callback to change the pixels
-	ShortTensor::t = THShortTensor_newWithSize3d(height, width, n_planes);
-	m_setPixelCallback = n_planes == 1 ? setPixel1DChar : setPixel3DChar;
+		// Allocate the tensor, fill it black and set the callback to change the pixels
+		ShortTensor::t = THShortTensor_newWithSize3d(height, width, n_planes);
+		m_setPixelCallback = n_planes == 1 ? setPixel1DChar : setPixel3DChar;
+	}
 
 	// OK
 	return true;

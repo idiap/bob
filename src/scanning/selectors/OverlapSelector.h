@@ -11,7 +11,11 @@ namespace Torch
 	//		~ clustering using the degree of overlapping between candidate sub-windows
 	//
         //      - PARAMETERS (name, type, default value, description):
-        //		"iterative"	bool	false	"merge the sub-windows in one pass or iteratively"
+        //		"minSurfOverlap"	int	60	"minimum surface overlapping for merging"
+        //		"iterative"		bool	false	"merge the sub-windows in one pass or iteratively"
+        //		"onlySurfOverlaps"	bool	false	"keep only sub-windows that overlap with at least another one"
+        //		"onlyMaxSurf"		bool	false	"keep only the merged sub-window with the maximum surface"
+        //		"onlyMaxConf"		bool	false	"keep only the merged sub-window with the maximum confidence"
         //
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -42,7 +46,7 @@ namespace Torch
 		void			resize(int new_size);
 
 		// Initialize buffers from some pattern list
-		void			init(const PatternList& patterns);
+		void			init(const PatternList& patterns, int minSurfOverlap, bool ignoreInclusion);
 
 		// Deallocate buffers
 		void			deallocate();
@@ -73,7 +77,8 @@ namespace Torch
 			}
 
 			// Add a new pattern, if it overlaps enough
-			void		add(const Pattern& source, const Pattern& test_patt, int index_patt);
+			void		add(const Pattern& source, const Pattern& test_patt, int index_patt,
+						bool ignoreInclusion);
 
 			// Returns the index where to insert a new pattern given its surface overlapping
 			// (as to have them ordered descending over the ovelapping surface)
@@ -99,9 +104,6 @@ namespace Torch
 		unsigned char*		m_patternTags;	// keep track of the merged patterns!
 		int			m_n_patterns;
 		int			m_n_allocated_patterns;
-
-		// Surface overlapping threshold (in percentage)
-		int			m_surf_threshold;
 
 		// Merging strategy for the overlapping patterns
 		PatternMerger*		m_merger;

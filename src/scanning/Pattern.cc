@@ -7,7 +7,7 @@ namespace Torch
 /////////////////////////////////////////////////////////////////////////
 // Returns the percentage of the overlapping area of intersection with another one
 
-int Pattern::getOverlap(const Pattern& other) const
+int Pattern::getOverlap(const Pattern& other, bool ignoreInclusion) const
 {
 	int x_min, y_min;
 	int x_max, y_max;
@@ -73,8 +73,9 @@ int Pattern::getOverlap(const Pattern& other) const
 	}
 
 	// Inclusion
-	else if (	(x_max - x_min == m_w && y_max - y_min == m_h) ||
-			(x_max - x_min == other.m_w && y_max - y_min == other.m_h))
+	else if (	ignoreInclusion == false &&
+			((x_max - x_min == m_w && y_max - y_min == m_h) ||
+			(x_max - x_min == other.m_w && y_max - y_min == other.m_h)))
 	{
 		return 100;
 	}
@@ -154,6 +155,7 @@ void AveragePatternMerger::merge(Pattern& pattern) const
 		pattern.m_w = FixI(inv * m_sum_w);
 		pattern.m_h = FixI(inv * m_sum_h);
 		pattern.m_confidence = inv * m_sum_confidence;
+		pattern.m_activation = m_count;
 	}
 }
 
@@ -222,6 +224,7 @@ void ConfWeightedPatternMerger::merge(Pattern& pattern) const
 		pattern.m_w = FixI(inv * m_sum_w);
 		pattern.m_h = FixI(inv * m_sum_h);
 		pattern.m_confidence = m_sum_confidence / m_count - delta_confidence;
+		pattern.m_activation = m_count;
 	}
 }
 
@@ -246,6 +249,7 @@ MaxConfPatternMerger::~MaxConfPatternMerger()
 void MaxConfPatternMerger::reset()
 {
 	m_max_confidence = -100000.0;
+	m_pattern.m_activation = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -256,7 +260,9 @@ void MaxConfPatternMerger::add(const Pattern& pattern)
 	if (pattern.m_confidence > m_max_confidence)
 	{
 		m_max_confidence = pattern.m_confidence;
+		const short last_activation = m_pattern.m_activation;
 		m_pattern.copy(pattern);
+		m_pattern.m_activation = last_activation + 1;
 	}
 }
 
@@ -368,6 +374,18 @@ Pattern& PatternList::add(const Pattern& pattern)
 	// Add it to the last node (it has enough allocated memory)
 	m_n_used_patterns ++;
 	return add_node->add(pattern);
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Add a pattern list
+
+void PatternList::add(const PatternList& lpatterns)
+{
+	const int n_patterns = lpatterns.size();
+	for (int i = 0; i < n_patterns; i ++)
+	{
+		add(lpatterns.get(i));
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -583,7 +601,9 @@ Pattern& PatternList::Node::add(const Pattern& pattern)
 PatternSpace::PatternSpace()
 	:	m_image_w(0), m_image_h(0), m_model_threshold(0.0f),
 		m_patterns(true),	// <true> for keeping track of the best patterns
-		m_table_confidence(0), m_table_usage(0)
+		m_table_confidence(0),
+		m_table_usage(0),
+		m_table_hits(0)
 {
 }
 
@@ -605,11 +625,14 @@ void PatternSpace::deallocateTables()
 	{
 		delete[] m_table_confidence[i];
 		delete[] m_table_usage[i];
+		delete[] m_table_hits[i];
 	}
 	delete[] m_table_confidence;
 	delete[] m_table_usage;
+	delete[] m_table_hits;
 	m_table_confidence = 0;
 	m_table_usage = 0;
+	m_table_hits = 0;
 }
 
 void PatternSpace::deallocatePatterns()
@@ -628,6 +651,7 @@ void PatternSpace::clear()
 		{
 			m_table_confidence[i][j] = 0;
 			m_table_usage[i][j] = 0;
+			m_table_hits[i][j] = 0;
 		}
 
 	// Delete patterns
@@ -656,10 +680,12 @@ bool PatternSpace::reset(int image_w, int image_h, double model_threshold)
 
 			m_table_confidence = new int*[m_image_w];
 			m_table_usage = new unsigned char*[m_image_w];
+			m_table_hits = new int*[m_image_w];
 			for (int i = 0; i < m_image_w; i ++)
 			{
 				m_table_confidence[i] = new int[m_image_h];
 				m_table_usage[i] = new unsigned char[m_image_h];
+				m_table_hits[i] = new int[m_image_h];
 			}
 		}
 		else
@@ -705,8 +731,12 @@ void PatternSpace::add(const Pattern& pattern)
 
         m_table_usage[sw_x + sw_w / 2][sw_y + sw_h / 2] = 0x01;		// center
 
-        // Update the local minimas
-        // TODO
+        // Update the hits count table
+        for (int i = 0; i < sw_w; i ++)
+		for (int j = 0; j < sw_h; j ++)
+		{
+			m_table_hits[sw_x + i][sw_y + j] ++;
+		}
 
         // One more pattern is stored
 	m_patterns.add(pattern);

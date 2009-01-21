@@ -84,6 +84,7 @@ bool Scanner::deleteROI(int index)
 void Scanner::deleteAllROIs()
 {
 	delete[] m_rois;
+	m_rois = 0;
 	m_n_rois = 0;
 }
 

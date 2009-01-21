@@ -14,10 +14,12 @@ namespace Torch
 	struct Pattern
 	{
 		// Constructor
-		Pattern(	int x = 0, int y = 0, int w = 0, int h = 0,
-				double confidence = 0.0)
+		Pattern(	short x = 0, short y = 0, short w = 0, short h = 0,
+				double confidence = 0.0,
+				short activation = 1)
 			: 	m_x(x), m_y(y), m_w(w), m_h(h),
-				m_confidence(confidence)
+				m_confidence(confidence),
+				m_activation(activation)
 		{
 		}
 
@@ -29,20 +31,28 @@ namespace Torch
 			m_w = other.m_w;
 			m_h = other.m_h;
 			m_confidence = other.m_confidence;
+			m_activation = other.m_activation;
 		}
 
 		// Returns the percentage of the overlapping area of intersection with another one
-		int		getOverlap(const Pattern& other) const;
+		int		getOverlap(const Pattern& other, bool ignoreInclusion = true) const;
+
+		// Compute the center of the SW
+		int		getCenterX() const { return m_x + m_w / 2; }
+		int		getCenterY() const { return m_y + m_h / 2; }
 
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
 		// Position: location + scale (top, left, width, height)
-		int		m_x, m_y;
-		int		m_w, m_h;
+		short		m_x, m_y;
+		short		m_w, m_h;
 
 		// Model confidence
 		double		m_confidence;
+
+		// Model activation (if merged, from how many SWs)
+		short		m_activation;
 	};
 
 	/////////////////////////////////////////////////////////////////////////
@@ -179,6 +189,9 @@ namespace Torch
 		// Add a new pattern - returns a reference to the stored pattern
 		Pattern&		add(const Pattern& pattern);
 
+		// Add a pattern list
+		void			add(const PatternList& lpatterns);
+
 		// Invalidates all stored patterns (they are not deallocated, but ready to be used again)
 		void			clear();
 
@@ -268,9 +281,8 @@ namespace Torch
 
 	/////////////////////////////////////////////////////////////////
 	// Torch::PatternSpace
-	//	- 4D pattern space representation (position + scale + pattern confidence),
-	//		used for fast retrieving the patterns close to some specific point
-	//		either in space or scale
+	//	- contains the list of candidate patterns, plus other representations
+	//		(confidence map, usage map, hits map ...) automatically updated
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////
@@ -312,6 +324,9 @@ namespace Torch
 		const PatternList&      getPatternList() const { return m_patterns; }
 		int**                   getConfidenceMap() const { return m_table_confidence; }
 		unsigned char**         getUsageMap() const { return m_table_usage; }
+		int**			getHitsMap() const { return m_table_hits; }
+		int			getImageW() const { return m_image_w; }
+		int			getImageH() const { return m_image_h; }
 
 		/////////////////////////////////////////////////////////////////////////
 
@@ -349,9 +364,10 @@ namespace Torch
 		// All patterns (also keeps track of the best patterns)
 		PatternList		m_patterns;
 
-		// Tables: normalized summed confidence, used sub-window positions
+		// Tables: normalized summed confidence, used sub-window corners&centers, hit counts
 		int**			m_table_confidence;	// [m_image_w x m_image_h]
 		unsigned char**		m_table_usage;	        // [m_image_w x m_image_h]
+		int**			m_table_hits;
 	};
 }
 

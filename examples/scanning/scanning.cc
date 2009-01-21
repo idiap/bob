@@ -13,6 +13,7 @@
 #include "ipSWVariancePruner.h"
 
 #include "OverlapSelector.h"
+#include "MeanShiftSelector.h"
 
 // Utilities, image processing
 #include "CmdLine.h"
@@ -70,6 +71,7 @@ struct Params
 	int select_type;		// 0 - Overlap
 	int select_merge_type;		// Merge type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence
 	bool select_overlap_iterative;	// Overlap: Iterative/One step
+	int select_min_surf_overlap;	// Overlap: Minimum surface overlap to merge
 
         // Debug & log
         bool verbose;			// General verbose flag
@@ -154,23 +156,27 @@ void saveResults(       const PatternList& detections,
 			detections, "detections",
 			basename, "detections.jpg");
 
-        // Get the confidence and the usage maps
+        // Get the confidence, usage and hit counts maps
         int** confidence_map = patt_space.getConfidenceMap();
         unsigned char** usage_map = patt_space.getUsageMap();
+        int** hits_map = patt_space.getHitsMap();
 
         int max_confidence_map = 0;
+        int max_hits_map = 0;
         for (int i = 0; i < image_w; i ++)
                 for (int j = 0; j < image_h; j ++)
                 {
                         max_confidence_map = max(max_confidence_map, confidence_map[i][j]);
+                        max_hits_map = max(max_hits_map, hits_map[i][j]);
                 }
         const double scale_confidence_map = 255.0 / (max_confidence_map + 1.0);
+        const double scale_hits_map = 255.0 / (max_hits_map + 1.0);
 
         // Output the usage map
 	for (int i = 0; i < image_w; i ++)
                 for (int j = 0; j < image_h; j ++)
                 {
-                        const short value = FixI(scale_confidence_map * confidence_map[i][j]);
+                        const short value = usage_map[i][j] == 0x01 ? 255 : 0;
                         save_image.set(j, i, 0, value);
 			save_image.set(j, i, 1, value);
 			save_image.set(j, i, 2, value);
@@ -181,46 +187,23 @@ void saveResults(       const PatternList& detections,
         for (int i = 0; i < image_w; i ++)
                 for (int j = 0; j < image_h; j ++)
                 {
-                	const short value = usage_map[i][j] == 0x01 ? 255 : 0;
+                	const short value = FixI(scale_confidence_map * confidence_map[i][j]);
                         save_image.set(j, i, 0, value);
 			save_image.set(j, i, 1, value);
 			save_image.set(j, i, 2, value);
                 }
 	saveImage(save_image, xtprobe, basename, "confidence_map.jpg");
 
-        // Output the gradients of the confidence map
-        Image grad_ox_conf_image(image_w, image_h, 1);
-        Image grad_oy_conf_image(image_w, image_h, 1);
-        Image magn_conf_image(image_w, image_h, 1);
-
-	for (int i = 1; i < image_w - 1; i ++)
-	{
-                for (int j = 1; j < image_h - 1; j ++)
+	// Output the hits map
+	for (int i = 0; i < image_w; i ++)
+                for (int j = 0; j < image_h; j ++)
                 {
-                	int cell[9];
-
-                	cell[0] = save_image.get(j - 1, i - 1, 0);
-                	cell[1] = save_image.get(j - 1, i, 0);
-                	cell[2] = save_image.get(j - 1, i + 1, 0);
-                	cell[3] = save_image.get(j, i - 1, 0);
-                	cell[4] = save_image.get(j, i, 0);
-                	cell[5] = save_image.get(j, i + 1, 0);
-                	cell[6] = save_image.get(j + 1, i - 1, 0);
-                	cell[7] = save_image.get(j + 1, i, 0);
-                	cell[8] = save_image.get(j + 1, i + 1, 0);
-
-                	const int grad_x = (cell[2] - cell[0] + 2 * (cell[5] - cell[3]) + cell[8] - cell[6]) / 4;
-                	const int grad_y = (cell[6] - cell[0] + 2 * (cell[7] - cell[1]) + cell[8] - cell[2]) / 4;
-
-                	grad_ox_conf_image.set(j, i, 0, (255 + grad_x) / 2);
-                	grad_oy_conf_image.set(j, i, 0,	(255 + grad_y) / 2);
-                	magn_conf_image.set(j, i, 0, getInRange(4 * (abs(grad_x) + abs(grad_y)), 0, 255));
+                	const short value = FixI(scale_hits_map * hits_map[i][j]);
+                        save_image.set(j, i, 0, value);
+			save_image.set(j, i, 1, value);
+			save_image.set(j, i, 2, value);
                 }
-	}
-
-        saveImage(grad_ox_conf_image, xtprobe, basename, "grad_ox_confidence_map.jpg");
-        saveImage(grad_oy_conf_image, xtprobe, basename, "grad_oy_confidence_map.jpg");
-        saveImage(magn_conf_image, xtprobe, basename, "magn_confidence_map.jpg");
+	saveImage(save_image, xtprobe, basename, "hits_map.jpg");
 }
 
 /////////////////////////////////////////////////////////////
@@ -298,6 +281,7 @@ int main(int argc, char* argv[])
 	cmd.addICmdOption("-select_type", &params.select_type, 0, "selector type: 0 - Overlap");
 	cmd.addICmdOption("-select_merge_type", &params.select_merge_type, 0, "selector's merging type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence");
 	cmd.addBCmdOption("-select_overlap_iterative", &params.select_overlap_iterative, false, "Overlap: Iterative/One step");
+	cmd.addICmdOption("-select_min_surf_overlap", &params.select_min_surf_overlap, 60, "Overlap: minimum surface overlap to merge");
 
         cmd.addText("\nGeneral options:");
 	cmd.addBCmdOption("-verbose", &params.verbose, false, "verbose");
@@ -337,10 +321,11 @@ int main(int argc, char* argv[])
                         params.prune_min_mean, params.prune_max_mean,
                         params.prune_min_stdev, params.prune_max_stdev);
 		print("-----------------------------------------------------------------------------\n");
-                print(">>> select: type = %d, merge = %d, overlap iterative = %s\n",
+                print(">>> select: type = %d, merge = %d, overlap iterative = %s, minSurfOverlap = %d\n",
                         params.select_type,
                         params.select_merge_type,
-                        params.select_overlap_iterative ? "true" : "false");
+                        params.select_overlap_iterative ? "true" : "false",
+                        params.select_min_surf_overlap);
 		print("-----------------------------------------------------------------------------\n");
 		print(">>> verbose: [%s]\n", params.verbose == true ? "true" : "false");
 		print(">>> save: evaluator2jpg: [%s]\n", params.save_evaluator_jpg == true ? "true" : "false");
@@ -461,8 +446,14 @@ int main(int argc, char* argv[])
 	// Selectors - select the best pattern sub-windows from the candidates
 	OverlapSelector selector;
 	selector.setMerger(pattern_mergers[params.select_merge_type]);
-	CHECK(selector.setBOption("verbose", params.verbose) == true);
+	CHECK(selector.setIOption("minSurfOverlap", params.select_min_surf_overlap) == true);
 	CHECK(selector.setBOption("iterative", params.select_overlap_iterative) == true);
+	CHECK(selector.setBOption("verbose", params.verbose) == true);
+	CHECK(selector.setBOption("onlySurfOverlaps", true) == true);
+	CHECK(selector.setBOption("onlyMaxSurf", false) == true);
+	CHECK(selector.setBOption("onlyMaxConf", false) == true);
+	//MeanShiftSelector selector;
+	//CHECK(selector.setBOption("verbose", params.verbose) == true);
 
 	// Scanner - main scanning object, contains the ROIs
 	Scanner scanner;

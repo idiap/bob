@@ -11,10 +11,13 @@ OverlapSelector::OverlapSelector(PatternMerger* merger)
 		m_patternBuffer(0),
 		m_patternTags(0),
 		m_n_allocated_patterns(0),
-		m_surf_threshold(60),
 		m_merger(merger)
 {
+	addIOption("minSurfOverlap", 60, "minimum surface overlapping for merging");
 	addBOption("iterative", false, "merge the sub-windows in one pass or iteratively");
+	addBOption("onlySurfOverlaps", false, "keep only sub-windows that overlap with at least another one");
+	addBOption("onlyMaxSurf", false, "keep only the merged sub-window with the maximum surface");
+	addBOption("onlyMaxConf", false, "keep only the merged sub-window with the maximum confidence");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -92,7 +95,7 @@ int sortConfDesc(const void* sw1, const void* sw2)
 		(patt1->m_confidence > patt2->m_confidence ? -1 : 0);
 }
 
-void OverlapSelector::init(const PatternList& patterns)
+void OverlapSelector::init(const PatternList& patterns, int minSurfOverlap, bool ignoreInclusion)
 {
 	const int n_patterns = patterns.size();
 	resize(n_patterns);
@@ -111,11 +114,11 @@ void OverlapSelector::init(const PatternList& patterns)
 		const Pattern& source = m_patternBuffer[i];
 		OverlapInfo& info = m_overlappingTable[i];
 
-		info.reset(m_surf_threshold);
+		info.reset(minSurfOverlap);
 		for (int j = 0; j < n_patterns; j ++)
 			if (i != j)
 		{
-			info.add(source, m_patternBuffer[j], j);
+			info.add(source, m_patternBuffer[j], j, ignoreInclusion);
 		}
 	}
 }
@@ -123,9 +126,10 @@ void OverlapSelector::init(const PatternList& patterns)
 /////////////////////////////////////////////////////////////////////////
 // Add a new pattern, if it overlaps enough
 
-void OverlapSelector::OverlapInfo::add(const Pattern& source, const Pattern& test_patt, int index_patt)
+void OverlapSelector::OverlapInfo::add(const Pattern& source, const Pattern& test_patt, int index_patt,
+					bool ignoreInclusion)
 {
-	const int surf = source.getOverlap(test_patt);
+	const int surf = source.getOverlap(test_patt, ignoreInclusion);
 	if (surf >= m_surf_threshold)
 	{
 		// Keep the overlapping pattern list ordered descending over the overlapping percentage
@@ -208,6 +212,13 @@ void OverlapSelector::printOverlapTable() const
 
 bool OverlapSelector::process(const PatternSpace& candidates)
 {
+	const bool verbose = getBOption("verbose");
+	const bool iterative = getBOption("iterative");
+	const int minSurfOverlap = getInRange(getIOption("minSurfOverlap"), 0, 100);
+	const bool onlySurfOverlaps = getBOption("onlySurfOverlaps");
+	const bool onlyMaxSurf = getBOption("onlyMaxSurf");
+	const bool onlyMaxConf = onlyMaxSurf == false && getBOption("onlyMaxConf");
+
 	// Check parameters
 	if (m_merger == 0)
 	{
@@ -216,23 +227,28 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 	}
 	if (candidates.isEmpty() == true)
 	{
-		Torch::message("OverlapSelector::process - the pattern space is empty!\n");
-		return true;	//
+		if (verbose == true)
+		{
+			Torch::message("OverlapSelector::process - the pattern space is empty!\n");
+		}
+		return true;
 	}
 
-	const bool verbose = getBOption("verbose");
-	const bool iterative = getBOption("iterative");
-
-	Pattern pattern;
+	Pattern merge_pattern;
+	PatternList lpatterns;
 
 	// Initialize the buffers (sort a copy descending, build the overlapping table ...)
-	init(candidates.getPatternList());
+	init(candidates.getPatternList(), minSurfOverlap, true);
 	if (verbose == true)
 	{
 		printOverlapTable();
 	}
 
+	///////////////////////////////////////////////////////////////////////////
 	// Merge detections ... until all the candidates are covered
+	//	(inclusion is ignored)
+	///////////////////////////////////////////////////////////////////////////
+
 	int n_steps = 0;
 	bool stop = false;
 	while (stop == false)
@@ -243,13 +259,17 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 			print("OverlapSelector: step no. [%d] ...\n", n_steps);
 		}
 
-		// Delete the old merged patterns (if any), it's used also as a temporary list!
-		m_patterns.clear();
+		// Delete the old merged patterns (if any)
+		lpatterns.clear();
 
 		// Merge the overlapping detections
 		int n_merged_patterns = 0;
 		for (int i = 0; i < m_n_patterns; i ++)
-			if (m_patternTags[i] == false)
+			if (	// Check if the SW was already merged
+				m_patternTags[i] == false
+				&&
+				// Check option condition
+				(onlySurfOverlaps == false || n_steps > 1 || m_overlappingTable[i].m_n_overlaps > 0))
 		{
 			// Tag the detection, it should not be considered one more time!
 			m_patternTags[i] = true;
@@ -259,7 +279,7 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 			if (info.m_n_overlaps == 0)
 			{
 				// Nothing to merge!
-				m_patterns.add(m_patternBuffer[i]);
+				lpatterns.add(m_patternBuffer[i]);
 			}
 			else
 			{
@@ -282,9 +302,9 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 						n_merged_patterns ++;
 					}
 				}
-				m_merger->merge(pattern);
+				m_merger->merge(merge_pattern);
 
-				m_patterns.add(pattern);
+				lpatterns.add(merge_pattern);
 			}
 		}
 
@@ -294,7 +314,7 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 		}
 
 		// Re-initialize the buffers (as above, but now from the temporary list)
-		init(m_patterns);
+		init(lpatterns, minSurfOverlap, true);
 		if (verbose == true)
 		{
 			printOverlapTable();
@@ -309,6 +329,112 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 				break;
 			}
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	// Prune the merged SWs,
+	//	check if any intersection (with inclusion too)
+	//	-> choose the ones with the maximum activation!
+	///////////////////////////////////////////////////////////////////////////
+
+	stop = false;
+	while (stop == false)
+	{
+		// Initialize the overlapping table (with the inclusion test)
+		init(lpatterns, minSurfOverlap / 10, false);	// Very little intersection + inclusion
+
+		// Delete the old merged patterns (if any)
+		lpatterns.clear();
+
+		// Prune the overlapping detections ...
+		int n_pruned_patterns = 0;
+		for (int i = 0; i < m_n_patterns; i ++)
+			if (	m_patternTags[i] == false)
+		{
+			OverlapInfo& info = m_overlappingTable[i];
+
+			if (info.m_n_overlaps == 0)
+			{
+				// No intersection, just add it!
+				lpatterns.add(m_patternBuffer[i]);
+				m_patternTags[i] = true;
+			}
+			else
+			{
+				const int crt_activation = m_patternBuffer[i].m_activation;
+
+				// Check if it's the one with the maximum activation from the list of the overlapping ones!
+				bool its_max = true;
+				for (int j = 0; j < info.m_n_overlaps; j ++)
+				{
+					const int k = info.m_overlaps[j].m_index;
+					if (m_patternBuffer[k].m_activation > crt_activation)
+					{
+						its_max = false;
+						break;
+					}
+				}
+
+				// Keep it, if yes!
+				if (its_max = true)
+				{
+					m_patternTags[i] = true;
+					for (int j = 0; j < info.m_n_overlaps; j ++)
+					{
+						const int k = info.m_overlaps[j].m_index;
+						m_patternTags[k] = true;
+					}
+
+					lpatterns.add(m_patternBuffer[i]);
+					n_pruned_patterns ++;
+				}
+			}
+		}
+
+		// Check if more patterns must be pruned
+		stop = n_pruned_patterns == 0;
+	}
+
+	// Keep only the merged sub-window with the maximum surface
+	if (onlyMaxSurf == true && lpatterns.isEmpty() == false)
+	{
+		Pattern max_surf_pattern;
+
+		const int n_patterns = lpatterns.size();
+		for (int i = 0; i < n_patterns; i ++)
+		{
+			const Pattern& pattern = lpatterns.get(i);
+			if (pattern.m_w * pattern.m_h > max_surf_pattern.m_w * max_surf_pattern.m_h)
+			{
+				max_surf_pattern.copy(pattern);
+			}
+		}
+
+		lpatterns.clear();
+		lpatterns.add(max_surf_pattern);
+	}
+
+	// Keep only the merged sub-window with the maximum confidence
+	else if (onlyMaxConf == true && lpatterns.isEmpty() == false)
+	{
+		Pattern max_conf_pattern;
+		max_conf_pattern.m_confidence = -100000.0;
+
+		const int n_patterns = lpatterns.size();
+		for (int i = 0; i < n_patterns; i ++)
+		{
+			const Pattern& pattern = lpatterns.get(i);
+			if (pattern.m_confidence > max_conf_pattern.m_confidence)
+			{
+				max_conf_pattern.copy(pattern);
+			}
+		}
+
+		lpatterns.clear();
+		lpatterns.add(max_conf_pattern);
+	}
+
+	// Accumulate the detections to the result
+	m_patterns.add(lpatterns);
 
 	// OK
 	return true;

@@ -26,7 +26,7 @@ ScaleExplorer::~ScaleExplorer()
 bool ScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
 {
 	// Check parameters
-	if (	sw_w < 1 || sw_h < 1 || sw_w > roi.w || sw_h > roi.h ||
+	if (	sw_w < 1 || sw_h < 1 || //sw_w > roi.w || sw_h > roi.h ||
 		roi.x < 0 || roi.y < 0)
 	{
 		Torch::message("ScaleExplorer::init - invalid parameters!\n");

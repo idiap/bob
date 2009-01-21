@@ -31,7 +31,7 @@
 	<File name="../../core/DataSet.h" open="0" top="0" tabpos="13">
 		<Cursor position="383" topLine="18" />
 	</File>
-	<File name="../../core/File.cc" open="1" top="1" tabpos="49">
+	<File name="../../core/File.cc" open="1" top="0" tabpos="49">
 		<Cursor position="3361" topLine="146" />
 	</File>
 	<File name="../../core/File.h" open="1" top="0" tabpos="48">
@@ -388,11 +388,11 @@
 	<File name="../../scanning/Explorer.h" open="0" top="0" tabpos="26">
 		<Cursor position="4607" topLine="145" />
 	</File>
-	<File name="../../scanning/Pattern.cc" open="0" top="0" tabpos="0">
-		<Cursor position="10357" topLine="409" />
+	<File name="../../scanning/Pattern.cc" open="1" top="0" tabpos="54">
+		<Cursor position="1350" topLine="48" />
 	</File>
-	<File name="../../scanning/Pattern.h" open="0" top="0" tabpos="43">
-		<Cursor position="6837" topLine="198" />
+	<File name="../../scanning/Pattern.h" open="1" top="0" tabpos="55">
+		<Cursor position="1036" topLine="21" />
 	</File>
 	<File name="../../scanning/ScaleExplorer.cc" open="0" top="0" tabpos="42">
 		<Cursor position="1914" topLine="39" />
@@ -471,6 +471,18 @@
 	</File>
 	<File name="../../scanning/selectors/CMakeLists.txt" open="0" top="0" tabpos="50">
 		<Cursor position="185" topLine="0" />
+	</File>
+	<File name="../../scanning/selectors/MeanShiftSelector.cc" open="1" top="0" tabpos="50">
+		<Cursor position="5610" topLine="226" />
+	</File>
+	<File name="../../scanning/selectors/MeanShiftSelector.h" open="1" top="0" tabpos="51">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="../../scanning/selectors/OverlapSelector.cc" open="1" top="0" tabpos="52">
+		<Cursor position="10651" topLine="349" />
+	</File>
+	<File name="../../scanning/selectors/OverlapSelector.h" open="1" top="0" tabpos="53">
+		<Cursor position="1805" topLine="41" />
 	</File>
 	<File name="../../th/THGeneral.h" open="0" top="0" tabpos="54">
 		<Cursor position="557" topLine="4" />

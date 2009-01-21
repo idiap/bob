@@ -96,6 +96,8 @@ namespace Torch
 
 		LBPType			getLBPType() const { return m_lbp_type; }
 		int			getLBPRadius() const;
+		int			getX() const { return m_x; }
+		int			getY() const { return m_y; }
 
 		///////////////////////////////////////////////////////////
 
