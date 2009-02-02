@@ -4,6 +4,9 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="1">
 		<Cursor position="0" topLine="0" />
 	</File>
+	<File name="../../boosting/Mcttrain.cc" open="1" top="1" tabpos="1">
+		<Cursor position="196" topLine="0" />
+	</File>
 	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="446" topLine="0" />
 	</File>

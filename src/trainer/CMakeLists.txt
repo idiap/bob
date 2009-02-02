@@ -2,7 +2,6 @@
 # Add the source files to the list of files to be added to the library
 #
 SET(	trainer_SRC
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileBinDataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/MctLbpTrainer.cc"
 	CACHE INTERNAL "sources")
 
