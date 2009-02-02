@@ -13,8 +13,8 @@
 	<File name="../../../extras/jpeg/jerror.h" open="0" top="0" tabpos="48">
 		<Cursor position="6996" topLine="120" />
 	</File>
-	<File name="../../CMakeLists.txt" open="1" top="0" tabpos="15">
-		<Cursor position="952" topLine="0" />
+	<File name="../../CMakeLists.txt" open="1" top="1" tabpos="7">
+		<Cursor position="579" topLine="0" />
 	</File>
 	<File name="../../core/CMakeLists.txt" open="0" top="0" tabpos="6">
 		<Cursor position="651" topLine="0" />
@@ -271,7 +271,7 @@
 	<File name="../../ip/shape/ShapeModel.h" open="0" top="0" tabpos="30">
 		<Cursor position="490" topLine="0" />
 	</File>
-	<File name="../../ip/vision.h" open="1" top="0" tabpos="4">
+	<File name="../../ip/vision.h" open="1" top="0" tabpos="1">
 		<Cursor position="1493" topLine="69" />
 	</File>
 	<File name="../../ip/xtprobeImageFile.cc" open="0" top="0" tabpos="48">
@@ -400,13 +400,13 @@
 	<File name="../../scanning/ScaleExplorer.h" open="0" top="0" tabpos="41">
 		<Cursor position="1467" topLine="16" />
 	</File>
-	<File name="../../scanning/Scanner.cc" open="1" top="0" tabpos="14">
+	<File name="../../scanning/Scanner.cc" open="1" top="0" tabpos="6">
 		<Cursor position="342" topLine="12" />
 	</File>
-	<File name="../../scanning/Scanner.h" open="1" top="0" tabpos="13">
+	<File name="../../scanning/Scanner.h" open="1" top="0" tabpos="5">
 		<Cursor position="3026" topLine="63" />
 	</File>
-	<File name="../../scanning/Selector.h" open="1" top="0" tabpos="12">
+	<File name="../../scanning/Selector.h" open="1" top="0" tabpos="4">
 		<Cursor position="1066" topLine="2" />
 	</File>
 	<File name="../../scanning/explorers/CMakeLists.txt" open="0" top="0" tabpos="8">
@@ -418,10 +418,10 @@
 	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.h" open="0" top="0" tabpos="34">
 		<Cursor position="903" topLine="0" />
 	</File>
-	<File name="../../scanning/explorers/GreedyExplorer.cc" open="1" top="0" tabpos="11">
+	<File name="../../scanning/explorers/GreedyExplorer.cc" open="1" top="0" tabpos="3">
 		<Cursor position="4626" topLine="162" />
 	</File>
-	<File name="../../scanning/explorers/GreedyExplorer.h" open="1" top="0" tabpos="10">
+	<File name="../../scanning/explorers/GreedyExplorer.h" open="1" top="0" tabpos="2">
 		<Cursor position="2367" topLine="42" />
 	</File>
 	<File name="../../scanning/explorers/MSExplorer.cc" open="0" top="0" tabpos="24">
@@ -472,10 +472,10 @@
 	<File name="../../scanning/selectors/CMakeLists.txt" open="0" top="0" tabpos="50">
 		<Cursor position="185" topLine="0" />
 	</File>
-	<File name="../../scanning/selectors/MeanShiftSelector.cc" open="1" top="0" tabpos="19">
+	<File name="../../scanning/selectors/MeanShiftSelector.cc" open="1" top="0" tabpos="9">
 		<Cursor position="7944" topLine="256" />
 	</File>
-	<File name="../../scanning/selectors/MeanShiftSelector.h" open="1" top="0" tabpos="18">
+	<File name="../../scanning/selectors/MeanShiftSelector.h" open="1" top="0" tabpos="8">
 		<Cursor position="867" topLine="0" />
 	</File>
 	<File name="../../scanning/selectors/OverlapSelector.cc" open="0" top="0" tabpos="52">
