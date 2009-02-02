@@ -2,21 +2,17 @@
 #define _TORCHVISION_SCANNING_GREEDY_EXPLORER_H_
 
 #include "MSExplorer.h"		// <GreedyExplorer> is a <MSExplorer>
+#include "MeanShiftSelector.h"
 
 namespace Torch
 {
-   	/////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
 	// Torch::GreedyExplorer
 	//	- searches the 4D scanning space using a greedy method to refine
 	//              the search around the best sub-windows
 	//              (relative to the model confidence)
 	//
 	//	- PARAMETERS (name, type, default value, description):
-	//		"Nbest"		int	128	"best N candidate patterns to consider/step"
-	//              "SWdx"          int     10      "% of the sub-window width to vary Ox when refining the search"
-	//              "SWdy"          int     10      "% of the sub-window height to vary Oy when refining the search"
-	//              "SWds"          int     10      "% of the sub-window size to vary scale when refining the search"
-	//              "NoSteps"       int     5       "number of iterations"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -25,8 +21,26 @@ namespace Torch
 	{
 	public:
 
+		// Running mode
+		enum Mode
+		{
+			Scanning,	// Iterative & greedy scanning (using the trained model for FAs)
+			Profiling	// Generates profiles and saves them to output file
+		};
+
+		// Profiling constants
+		static const int	NoVarX = 3;	// No. of steps on Ox
+		static const int	NoVarY = 3;	// No. of steps on Oy
+		static const int 	NoVarS = 3;	// No. of steps on scale
+		static const int	VarX = 5;	// %/step variation on Ox
+		static const int	VarY = 5;	// %/step variation on Oy
+		static const int	VarS = 5;	// %/step variation on scales
+		static const int	NoConfigs = 	(2 * NoVarX + 1) *
+							(2 * NoVarY + 1) *
+							(2 * NoVarS + 1);
+
 		// Constructor
-		GreedyExplorer(ipSWEvaluator* swEvaluator = 0);
+		GreedyExplorer(ipSWEvaluator* swEvaluator = 0, Mode = Scanning);
 
 		// Destructor
 		virtual ~GreedyExplorer();
@@ -41,15 +55,21 @@ namespace Torch
 		// preprocess(image)
 		// for each ROI
 		//	init (ROI)
-		// 	while (hasMoreSteps())
-		//		process ()
+		// 	process ()
 		// --------------------------------
-
-		// Check if the scanning can continue (or the space was explored enough)
-		virtual bool		hasMoreSteps() const;
 
 		// Process the image (check for pattern's sub-windows)
 		virtual bool		process();
+
+		// Profile some SW - fill the profile around it
+		bool			profileSW(int sw_x, int sw_y, int sw_w, int sw_h);
+		bool			profileSW(const Pattern& pattern);
+
+		// Access functions
+		void			setMode(Mode mode) { m_mode = mode; }
+		Mode 			getMode() const { return m_mode; }
+		const unsigned char*	getProfileFlags() const { return m_profileFlags; }
+		const double*		getProfileScores() const { return m_profileScores; }
 
 		/////////////////////////////////////////////////////////////////
 
@@ -60,9 +80,6 @@ namespace Torch
 		/// called when some option was changed - overriden
 		virtual void		optionChanged(const char* name);
 
-		// Initialize the scanning 4D space (random or using a fixed grid ?!)
-		bool			initSearch();
-
 		// Refine the search around the best points
 		bool			refineSearch();
 
@@ -70,20 +87,18 @@ namespace Torch
 		//	(it is becoming too fine or no pattern found so far?!)
 		bool			shouldSearchMode(int old_n_candidates = -1) const;
 
-		// Search around some point in the position and scale space (= sub-window)
-		bool			searchAround(const Pattern& candidate);
-
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-		// Current search parameters
-		float                   m_search_per_dx;
-		float                   m_search_per_dy;
-		float                   m_search_per_ds;
-		int                     m_search_no_steps;
+		// Current working mode
+		Mode 			m_mode;
 
-		// Keep a copy of the best patterns at some step
-		Pattern*		m_best_patterns;
+		// Algorithm for clustering sub-windows
+		MeanShiftSelector	m_clusterAlgo;
+
+		// Profile buffers (detection flag + score)
+		unsigned char		m_profileFlags[NoConfigs];
+		double			m_profileScores[NoConfigs];
 	};
 }
 

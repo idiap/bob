@@ -73,9 +73,6 @@ namespace Torch
 		double			getWeight(int i_stage, int i_machine) const;
 		double			getThreshold(int i_stage) const;
 
-		//      ... overriden, guaranties that each confidence is greater than this threshold
-		virtual  double         getThreshold() const;
-
 		///////////////////////////////////////////////////////////
 
 	protected:
@@ -134,9 +131,6 @@ namespace Torch
 		// The <Stage>s that compose the cascade
 		Stage*			m_stages;
 		int			m_n_stages;
-
-		// The minimum stage threshold
-		double                  m_minThreshold;
 
 		// Fast access to the output
 		double*			m_fast_output;	// Pointer to the DoubleTensor

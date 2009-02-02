@@ -15,7 +15,7 @@ ExplorerData::ExplorerData(ipSWEvaluator* swEvaluator)
 		m_swPruners(0), m_nSWPruners(0),
 		m_image_w(0), m_image_h(0),
 		m_stat_scanned(0), m_stat_prunned(0), m_stat_accepted(0),
-		m_patternSpace()
+		m_patterns()
 {
 }
 
@@ -35,7 +35,7 @@ void ExplorerData::clear()
 	m_stat_scanned = 0;
 	m_stat_prunned = 0;
 	m_stat_accepted = 0;
-	m_patternSpace.clear();
+	m_patterns.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -63,8 +63,7 @@ Explorer::Explorer(ipSWEvaluator* swEvaluator)
 		m_scale_prune_ips(0),
 		m_scale_evaluation_ips(0),
 		m_scale_rois(0),
-		m_n_scales(0),
-		m_stepCounter(0)
+		m_n_scales(0)
 {
 	// Set the default parameters
 	addIOption("min_patt_w", 0, "pattern minimum allowed width");
@@ -243,6 +242,14 @@ bool Explorer::setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp)
 }
 
 /////////////////////////////////////////////////////////////////
+// Delete old detections (if any)
+
+void Explorer::clear()
+{
+	m_data->clear();
+}
+
+/////////////////////////////////////////////////////////////////
 // Initialize the scanning process with the given image size
 
 bool Explorer::init(int image_w, int image_h)
@@ -267,9 +274,6 @@ bool Explorer::init(int image_w, int image_h)
 	// Clear the old detections
 	m_data->clear();
 
-	// Resize the pattern space (will also clear old detections)
-	m_data->m_patternSpace.reset(image_w, image_h, m_data->m_swEvaluator->getModelThreshold());
-
 	// Delete old scales (new ones should be computed by the specific implementations)
 	deallocateScales();
 
@@ -284,21 +288,10 @@ bool Explorer::init(int image_w, int image_h)
 
 bool Explorer::init(const sRect2D& roi)
 {
-	// Reset processing steps
-	m_stepCounter = 0;
-
 	// NB: The ROIs for each scale will be computed at the XXXExplorer::init(roi) implementation!
 
 	// OK
 	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Check if the scanning can continue (or the space was explored enough)
-
-bool Explorer::hasMoreSteps() const
-{
-	return m_stepCounter == 0;
 }
 
 /////////////////////////////////////////////////////////////////////////

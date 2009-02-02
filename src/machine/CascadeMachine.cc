@@ -146,7 +146,6 @@ const Machine* CascadeMachine::Stage::getMachine(int i_machine) const
 CascadeMachine::CascadeMachine()
 	:	Classifier(),
 		m_stages(0), m_n_stages(0),
-                m_minThreshold(10000000.0),
                 m_fast_output(0)
 {
         // Allocate the output
@@ -264,7 +263,6 @@ bool CascadeMachine::loadFile(File& file)
         }
 
 	// For each stage ...
-	m_minThreshold = 10000000000.0;
 	for (int s = 0; s < n_stages; s ++)
 	{
 		// Threshold
@@ -278,7 +276,6 @@ bool CascadeMachine::loadFile(File& file)
 		{
 			return false;
 		}
-		m_minThreshold = min(m_minThreshold, threshold);
 
 		// Number of machines per stage
 		int n_trainers;
@@ -439,7 +436,6 @@ bool CascadeMachine::resize(int n_stages)
 	}
 
 	deallocate();
-	m_minThreshold = 100000000000.0;
 
 	// OK
 	m_n_stages = n_stages;
@@ -502,7 +498,6 @@ bool CascadeMachine::setThreshold(int i_stage, double threshold)
 
 	// OK
 	m_stages[i_stage].m_threshold = threshold;
-	m_minThreshold = min(m_minThreshold, threshold);
 	return true;
 }
 
@@ -557,12 +552,6 @@ double CascadeMachine::getThreshold(int i_stage) const
 	}
 
 	return m_stages[i_stage].m_threshold;
-}
-
-double CascadeMachine::getThreshold() const
-{
-        // Return the minimum stage threshold
-        return m_minThreshold;
 }
 
 //////////////////////////////////////////////////////////////////////////

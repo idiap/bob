@@ -125,10 +125,10 @@ bool Scanner::setSelector(Selector* selector)
 
 bool Scanner::init(const Image& image)
 {
-	// Check if any explorer/selector was set
-	if (m_explorer == 0 || m_selector == 0)
+	// Check if any explorer was set
+	if (m_explorer == 0)
 	{
-		Torch::message("Scanner::process - invalid explorer or selector!\n");
+		Torch::message("Scanner::process - invalid explorer!\n");
 		return false;
 	}
 
@@ -157,11 +157,34 @@ bool Scanner::init(const Image& image)
 }
 
 /////////////////////////////////////////////////////////////////
+// Preprocess the image (store features in the explorer)
+
+bool Scanner::preprocess(const Image& image)
+{
+	// Check if any explorer was set
+	if (m_explorer == 0)
+	{
+		Torch::message("Scanner::preprocess - invalid explorer!\n");
+		return false;
+	}
+
+	// Preprocess the image
+	if (m_explorer->preprocess(image) == false)
+	{
+		Torch::message("Scanner::preprocess - explorer failed to preprocess the image!\n");
+		return false;
+	}
+
+	// OK
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////
 // Process some image to scan for patterns
 
 bool Scanner::process(const Image& image)
 {
-	// Check if any preprocesing/explorer/selector was set
+	// Check if any explorer or selector was set
 	if (m_explorer == 0 || m_selector == 0)
 	{
 		Torch::message("Scanner::process - invalid explorer or selector!\n");
@@ -173,6 +196,7 @@ bool Scanner::process(const Image& image)
 	m_stat_prunned = 0;
 	m_stat_accepted = 0;
 	m_selector->clear();
+	m_explorer->clear();
 
 	// If no ROI specified, set the whole image as the single ROI
 	const int image_w = image.getWidth();
@@ -196,13 +220,6 @@ bool Scanner::process(const Image& image)
 
 	const bool verbose = getBOption("verbose");
 
-	// Preprocess the image
-	if (m_explorer->preprocess(image) == false)
-	{
-		Torch::message("Scanner::process - explorer failed to preprocess the image!\n");
-		return false;
-	}
-
 	// Scan the image for each ROI
 	for (int i = 0; i < m_n_rois; i ++)
 	{
@@ -219,20 +236,11 @@ bool Scanner::process(const Image& image)
 			Torch::print("[Scanner]: ROI [%d/%d] ... \n", i + 1, m_n_rois);
 		}
 
-		// ... scanning may have multiple steps
-		while (m_explorer->hasMoreSteps() == true)
+		// ... run the explorer
+		if (m_explorer->process() == false)
 		{
-			// ... debug
-			if (verbose == true)
-			{
-				Torch::print("[Scanner]: calling explorer one more time... \n");
-			}
-
-			if (m_explorer->process() == false)
-			{
-				Torch::message("Scanner::process - failed to run the explorer!\n");
-				return false;
-			}
+			Torch::message("Scanner::process - failed to run the explorer!\n");
+			return false;
 		}
 
 		// ... debug
@@ -242,7 +250,7 @@ bool Scanner::process(const Image& image)
 		}
 
 		// Select (and accumulate) the best patterns
-		if (m_selector->process(m_explorer->getPatternSpace()) == false)
+		if (m_selector->process(m_explorer->getPatterns()) == false)
 		{
 			Torch::message("Scanner::process - failed to run the selector!\n");
 			return false;
@@ -319,7 +327,9 @@ const PatternList& Scanner::getPatterns() const
 	// Check parameters
 	if (m_selector == 0)
 	{
-		Torch::error("Scanner::getPatterns - invalid selector!\n");
+		Torch::message("Scanner::getPatterns - invalid selector!\n");
+		static const PatternList lpatterns;
+		return lpatterns;
 	}
 
 	// OK

@@ -26,13 +26,13 @@ PyramidExplorerData::~PyramidExplorerData()
 /////////////////////////////////////////////////////////////////////////
 // Store some pattern - need to be rescaled first!
 
-void PyramidExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, float confidence)
+void PyramidExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, double confidence)
 {
-        m_patternSpace.add(Pattern(	(int)(0.5f + m_inv_scale * sw_x),
-					(int)(0.5f + m_inv_scale * sw_y),
-					(int)(0.5f + m_inv_scale * sw_w),
-					(int)(0.5f + m_inv_scale * sw_h),
-					confidence));
+        m_patterns.add(Pattern(	FixI(m_inv_scale * sw_x),
+				FixI(m_inv_scale * sw_y),
+				FixI(m_inv_scale * sw_w),
+				FixI(m_inv_scale * sw_h),
+				confidence));
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -229,14 +229,6 @@ bool PyramidExplorer::init(const sRect2D& roi)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Check if the scanning can continue (or the space was explored enough)
-
-bool PyramidExplorer::hasMoreSteps() const
-{
-	return Explorer::hasMoreSteps();
-}
-
-/////////////////////////////////////////////////////////////////////////
 // Preprocess the image (extract features ...) => store data in <prune_ips> and <evaluation_ips>
 
 bool PyramidExplorer::preprocess(const Image& image)
@@ -351,13 +343,6 @@ bool PyramidExplorer::preprocess(const Image& image)
 
 bool PyramidExplorer::process()
 {
-	// Already finished!
-	if (m_stepCounter > 0)
-	{
-		Torch::message("PyramidExplorer::process - the processing already finished!");
-		return false;
-	}
-
 	const int model_w = getModelWidth();
 	const int model_h = getModelHeight();
 
@@ -416,7 +401,7 @@ bool PyramidExplorer::process()
 		}
 
 		// Check if we should stop at the first detection
-		if (stopAtFirstDetection == true && m_data->m_patternSpace.isEmpty() == false)
+		if (stopAtFirstDetection == true && m_data->m_patterns.isEmpty() == false)
 		{
 			// Debug message
 			if (verbose == true)
@@ -429,7 +414,6 @@ bool PyramidExplorer::process()
 	}
 
 	// OK
-	m_stepCounter ++;
 	return true;
 }
 

@@ -19,7 +19,7 @@ namespace Torch
 	//	- groups the objects needed for the scanning:
 	//		- 1 x evaluator
 	//		- N x pruners
-	//		- 1 x pattern space
+	//		- 1 x pattern list
 	//		- additional statistical information
 	//	- used for passing this information to the <ScaleExplorer>s
 	//	- store some pattern
@@ -43,10 +43,9 @@ namespace Torch
 		void			clear();
 
 		// Store some pattern (may need rescalling the sub-window!)
-		// NB: the MS approach should just copy it, the pyramid should rescalling it
-		//	before storing the PatternSpace
+		// NB: the MS approach should just copy it, the pyramid should rescalling it before storing
 		virtual void		storePattern(	int sw_x, int sw_y, int sw_w, int sw_h,
-							float confidence) = 0;
+							double confidence) = 0;
 
 		//////////////////////////////////////////////////////////////////
 		// Attributes
@@ -69,7 +68,7 @@ namespace Torch
 			// Total number of investigated sub-windows = m_stat_scanned + m_stat_prunned
 			// m_stat_scanned >= m_stat_accepted
 
-		PatternSpace		m_patternSpace;
+		PatternList		m_patterns;
 	};
 
 	/////////////////////////////////////////////////////////////////////////
@@ -141,18 +140,17 @@ namespace Torch
 		// preprocess(image)
 		// for each ROI
 		//	init (ROI)
-		// 	while (hasMoreSteps())
-		//		process ()
+		// 	process ()
 		// --------------------------------
+
+		// Delete old detections (if any)
+		void			clear();
 
 		// Initialize the scanning process with the given image size
 		virtual bool		init(int image_w, int image_h);
 
 		// Initialize the scanning process for a specific ROI
 		virtual bool		init(const sRect2D& roi);
-
-		// Check if the scanning can continue (or the space was explored enough)
-		virtual bool		hasMoreSteps() const;
 
 		// Preprocess the image (extract features ...) => store data in <prune_ips> and <evaluation_ips>
 		virtual bool		preprocess(const Image& image) = 0;
@@ -166,7 +164,7 @@ namespace Torch
 		int			getNoScannedSWs() const { return m_data->m_stat_scanned; }
 		int			getNoPrunnedSWs() const { return m_data->m_stat_prunned; }
 		int			getNoAcceptedSWs() const { return m_data->m_stat_accepted; }
-		const PatternSpace&	getPatternSpace() const { return m_data->m_patternSpace; }
+		const PatternList&	getPatterns() const { return m_data->m_patterns; }
 		int			getModelWidth() const;
 		int			getModelHeight() const;
 		int			getNoScales() const { return m_n_scales; }
@@ -198,9 +196,6 @@ namespace Torch
 		ipCore**		m_scale_evaluation_ips;
 		sRect2D*		m_scale_rois;
 		int			m_n_scales;
-
-		// Keep track of how many steps to get the result
-		int			m_stepCounter;
 	};
 }
 

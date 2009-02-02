@@ -33,28 +33,6 @@ void checkPattern(const Pattern& pattern, int p)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Get the best stored patterns and check they are ordered
-//////////////////////////////////////////////////////////////////////////
-
-void checkBestPatterns(const PatternList& pattlist)
-{
-	const int n_best = pattlist.getNoBest();
-	assert(n_best > 0);
-
-	float last_confidence = 0.0f;
-	for (int i = 0; i < n_best; i ++)
-	{
-		const Pattern& pattern = pattlist.getBest(i);
-		if (i > 0)
-		{
-			assert(pattern.m_confidence <= last_confidence);
-		}
-
-		last_confidence = pattern.m_confidence;
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////
 // Main
 //////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +40,6 @@ int main()
 {
 	const int n_tests = 100;
 	const int n_patts_per_test = 1000000;
-	const int n_best_patterns = 128;
 
 	PatternList pattlist;
 	assert(pattlist.size() == 0);
@@ -102,35 +79,6 @@ int main()
 
 		print("\tPASSED add/get: [%d/%d]\r", t + 1, n_tests);
 	}
-	print("\n");
-
-	// Do the tests ...
-	for (int t = 0; t < n_tests; t ++)
-	{
-		// Invalidate any patterns already stored
-		pattlist.clear();
-		assert(pattlist.size() == 0);
-		assert(pattlist.isEmpty() == true);
-
-		// Set the pattern list to keep track of the best patterns
-		assert(pattlist.resetBestPatterns(true, n_best_patterns) == true);
-		assert(pattlist.getMaxNoBest() == n_best_patterns);
-		assert(pattlist.getNoBest() == 0);
-
-		// Add some patterns (and check they are actually added)
-		for (int p = 0; p < n_patts_per_test; p ++)
-		{
-			buildPattern(pattern, p);
-			checkPattern(pattlist.add(pattern), p);
-		}
-		assert(pattlist.size() == n_patts_per_test);
-
-		// Now retrieve the best ones and check they are ordered
-		checkBestPatterns(pattlist);
-
-		print("\tPASSED best:    [%d/%d]\r", t + 1, n_tests);
-	}
-
 	print("\nOK\n");
 
 	return 0;

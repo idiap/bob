@@ -34,8 +34,8 @@ bool ExhaustiveScaleExplorer::process(	ExplorerData& explorerData,
 	const int model_w = explorerData.m_swEvaluator->getModelWidth();
 	const int model_h = explorerData.m_swEvaluator->getModelHeight();
 
-	const int dx = getInRange((int)(getFOption("dx") * sw_w), 1, sw_w);
-	const int dy = getInRange((int)(getFOption("dy") * sw_h), 1, sw_h);
+	const int dx = getInRange(FixI(getFOption("dx") * sw_w), 1, sw_w);
+	const int dy = getInRange(FixI(getFOption("dy") * sw_h), 1, sw_h);
 
 	const bool verbose = getBOption("verbose");
 
@@ -61,7 +61,7 @@ bool ExhaustiveScaleExplorer::process(	ExplorerData& explorerData,
 			}
 
 			// Stop at the first detection if asked
-			if (stopAtFirstDetection && explorerData.m_patternSpace.isEmpty() == false)
+			if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
 			{
 				// This will exit gracefully the double <for>
 				sw_x = sw_max_x + 1;

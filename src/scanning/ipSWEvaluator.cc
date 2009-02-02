@@ -421,11 +421,6 @@ int ipSWEvaluator::getModelHeight() const
         return m_classifier->getModelHeight();
 }
 
-double ipSWEvaluator::getModelThreshold() const
-{
-        return m_classifier->getThreshold();
-}
-
 /////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type - overriden
 

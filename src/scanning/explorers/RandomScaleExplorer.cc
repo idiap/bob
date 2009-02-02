@@ -60,7 +60,7 @@ bool RandomScaleExplorer::process(	ExplorerData& explorerData,
 		}
 
 		// Stop at the first detection if asked
-		if (stopAtFirstDetection && explorerData.m_patternSpace.isEmpty() == false)
+		if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
 		{
 			break;
 		}

@@ -29,7 +29,7 @@ namespace Torch
 
 		// Process the list of candidate sub-windows and select the best ones
 		// (this will accumulate them to the pattern list)
-		virtual bool			process(const PatternSpace& candidates) = 0;
+		virtual bool			process(const PatternList& candidates) = 0;
 
 		// Return the result
 		const PatternList&		getPatterns() const { return m_patterns; }

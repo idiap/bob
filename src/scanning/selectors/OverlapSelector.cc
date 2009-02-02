@@ -210,7 +210,7 @@ void OverlapSelector::printOverlapTable() const
 // Process the list of candidate sub-windows and select the best ones
 // (this will accumulate them to the pattern list)
 
-bool OverlapSelector::process(const PatternSpace& candidates)
+bool OverlapSelector::process(const PatternList& candidates)
 {
 	const bool verbose = getBOption("verbose");
 	const bool iterative = getBOption("iterative");
@@ -234,11 +234,11 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 		return true;
 	}
 
-	Pattern merge_pattern;
+	Pattern merged_pattern;
 	PatternList lpatterns;
 
 	// Initialize the buffers (sort a copy descending, build the overlapping table ...)
-	init(candidates.getPatternList(), minSurfOverlap, true);
+	init(candidates, minSurfOverlap, true);
 	if (verbose == true)
 	{
 		printOverlapTable();
@@ -302,9 +302,9 @@ bool OverlapSelector::process(const PatternSpace& candidates)
 						n_merged_patterns ++;
 					}
 				}
-				m_merger->merge(merge_pattern);
+				m_merger->merge(merged_pattern);
 
-				lpatterns.add(merge_pattern);
+				lpatterns.add(merged_pattern);
 			}
 		}
 
