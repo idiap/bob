@@ -22,11 +22,7 @@ int main()
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
-	// Build the cropper
 	ipCrop cropper;
-	assert(cropper.setInputSize(image.getWidth(), image.getHeight()) == true);
-	assert(cropper.getInputWidth() == image.getWidth());
-	assert(cropper.getInputHeight() == image.getHeight());
 
 	// Crop some random parts
 	const int n_tests = 3;

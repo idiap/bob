@@ -15,18 +15,14 @@ namespace Torch {
 		/// Destructor
 		virtual ~ipSubWindow();
 
-		/// Change the input image size - overriden (it will reset the sub-window)
-		virtual bool		setInputSize(const sSize& new_size);
-		virtual bool		setInputSize(int new_w, int new_h);
-
 		/// Change the sub-window to process in
 		virtual bool		setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h);
 
 		/// Retrieve the sub-window to process in
-		int			getSubWindowX() const;
-		int			getSubWindowY() const;
-		int			getSubWindowW() const;
-		int			getSubWindowH() const;
+		int			getSubWindowX() const { return m_sw_x; }
+		int			getSubWindowY() const { return m_sw_y; }
+		int			getSubWindowW() const { return m_sw_w; }
+		int			getSubWindowH() const { return m_sw_h; }
 
 	protected:
 

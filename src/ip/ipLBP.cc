@@ -85,8 +85,8 @@ void ipLBP::optionChanged(const char* name)
 
 bool ipLBP::setXY(int x, int y)
 {
-	if (	x >= m_R && x + m_R < m_inputSize.w &&
-		y >= m_R && y + m_R < m_inputSize.h)
+	if (	x >= m_R &&
+		y >= m_R)
 	{
 		m_x = x;
 		m_y = y;
@@ -100,7 +100,7 @@ bool ipLBP::setXY(int x, int y)
 
 bool ipLBP::setR(int R)
 {
-	if (	R > 0 && R < m_inputSize.w / 2 && R < m_inputSize.h / 2)
+	if (	R > 0)
 	{
 		m_R = R;
 		return true;
@@ -115,13 +115,6 @@ bool ipLBP::checkInput(const Tensor& input) const
 {
 	if (	input.nDimension() != 2 &&
 		input.nDimension() != 3)
-	{
-		return false;
-	}
-
-	// Accept only tensors having the set image size
-	if (	input.size(0) != m_inputSize.h ||
-		input.size(1) != m_inputSize.w)
 	{
 		return false;
 	}

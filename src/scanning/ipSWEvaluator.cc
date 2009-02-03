@@ -444,11 +444,6 @@ bool ipSWEvaluator::allocateOutput(const Tensor& input)
 
 bool ipSWEvaluator::processInput(const Tensor& input)
 {
-        if (setInputSize(input.size(1), input.size(0)) == false)
-        {
-                return false;
-        }
-
         // Cleanup
         delete m_buffTensor;
         delete[] m_buff_indexes;
@@ -667,9 +662,8 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
                         image.copyFrom(*m_buffTensor) == true)
                 {
                         char str[200];
-                        sprintf(str, "BuffTensor_sw_%d_%d_%dx%d_input_%dx%d.jpg",
-                                m_sw_x, m_sw_y, m_sw_w, m_sw_h,
-                                m_inputSize.w, m_inputSize.h);
+                        sprintf(str, "BuffTensor_sw_%d_%d_%dx%d.jpg",
+                                m_sw_x, m_sw_y, m_sw_w, m_sw_h);
 
                         xtprobeImageFile xtprobe;
                         if (xtprobe.open(str, "w+") == true)

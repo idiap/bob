@@ -207,8 +207,7 @@ bool MSExplorer::preprocess(const Image& image)
 	else
 	{
 	        // Some features need to be extracted!
-                if (	ip_prune->setInputSize(image.getWidth(), image.getHeight()) == false ||
-                        ip_prune->process(image) == false)
+                if (ip_prune->process(image) == false)
                 {
                         Torch::message("MSExplorer::preprocess - failed to run the pruning <ipCore>!\n");
                         return false;
@@ -231,8 +230,7 @@ bool MSExplorer::preprocess(const Image& image)
 	        }
 	        else
 	        {
-			if (	ip_evaluation->setInputSize(image.getWidth(), image.getHeight()) == false ||
-                                ip_evaluation->process(image) == false)
+			if (ip_evaluation->process(image) == false)
                         {
                                 Torch::message("MSExplorer::preprocess - failed to run the evaluation <ipCore>!\n");
                                 return false;
@@ -242,8 +240,7 @@ bool MSExplorer::preprocess(const Image& image)
 	}
 
 	// Compute the integral image for the evaluation tensor
-        if (    m_ipi_evaluation.setInputSize(image.getWidth(), image.getHeight()) == false ||
-                m_ipi_evaluation.process(*evaluation_tensor) == false)
+        if (m_ipi_evaluation.process(*evaluation_tensor) == false)
         {
                 Torch::message("MSExplorer::preprocess - failed to compute the evaluation integral image!");
                 return false;

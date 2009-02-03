@@ -29,9 +29,8 @@
 	const int stride_h = t_input->t->stride[0];	                                \
 	const int stride_w = t_input->t->stride[1];	                                \
                                                                                         \
-	const int width = m_inputSize.w;                                                \
-	const int height = m_inputSize.h;                                               \
-	const int n_planes = input.size(2);                                             \
+	const int width = input.size(1);                                                \
+	const int height = input.size(0);						\
                                                                                         \
 	if (m_pixelOp == 0)                                                             \
 	{                                                                               \
@@ -97,8 +96,8 @@
 	const int stride_w = t_input->t->stride[1];	                                \
 	const int stride_p = t_input->t->stride[2];	                                \
                                                                                         \
-	const int width = m_inputSize.w;                                                \
-	const int height = m_inputSize.h;                                               \
+	const int width = input.size(1);                                                \
+	const int height = input.size(0);                                               \
 	const int n_planes = input.size(2);                                             \
                                                                                         \
         if (m_pixelOp == 0)                                                             \
@@ -202,13 +201,6 @@ bool ipIntegral::checkInput(const Tensor& input) const
 	        return false;
 	}
 
-	// Accept only tensors having the set input size
-	if (	input.size(0) != m_inputSize.h ||
-		input.size(1) != m_inputSize.w)
-	{
-	        return false;
-	}
-
 	// OK
 	return true;
 }
@@ -220,8 +212,8 @@ bool ipIntegral::allocateOutput(const Tensor& input)
 {
         if (	m_output == 0 ||
 		m_output[0]->nDimension() != input.nDimension() ||
-		m_output[0]->size(0) != m_inputSize.h ||
-		m_output[0]->size(1) != m_inputSize.w ||
+		m_output[0]->size(0) != input.size(0) ||
+		m_output[0]->size(1) != input.size(1) ||
 		(input.nDimension() == 2 && m_output[0]->size(2) != input.size(2)))
 	{
 		cleanup();
@@ -237,15 +229,15 @@ bool ipIntegral::allocateOutput(const Tensor& input)
                 case Tensor::Short:     // Short        -> Int
                 case Tensor::Int:       // Int          -> Int
                         m_output[0] = input.nDimension() == 3 ?
-                                new IntTensor(m_inputSize.h, m_inputSize.w, input.size(2)) :
-                                new IntTensor(m_inputSize.h, m_inputSize.w);
+                                new IntTensor(input.size(0), input.size(1), input.size(2)) :
+                                new IntTensor(input.size(0), input.size(1));
                         break;
 
                 case Tensor::Float:    // Float         -> Double
                 case Tensor::Double:   // Float         -> Double
                         m_output[0] = input.nDimension() == 3 ?
-                                new DoubleTensor(m_inputSize.h, m_inputSize.w, input.size(2)) :
-                                new DoubleTensor(m_inputSize.h, m_inputSize.w);
+                                new DoubleTensor(input.size(0), input.size(1), input.size(2)) :
+                                new DoubleTensor(input.size(0), input.size(1));
                         break;
 
                 default:

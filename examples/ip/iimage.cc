@@ -105,8 +105,6 @@ int main()
 		const int w = widths[n];
 		const int h = heights[n];
 
-		assert(ipii.setInputSize(w, h) == true);
-
 		// Generate a random tensor of this size
 		Tensor* input = 0;
 		if (n == 0)

@@ -248,15 +248,9 @@ bool PyramidExplorer::preprocess(const Image& image)
 		const int scale_w = m_scales[i].w;
 		const int scale_h = m_scales[i].h;
 
-                // Initialize the scalling object
                 ipScaleYX& ip_scale = m_scaling_ips[i];
-                if (ip_scale.setInputSize(image.getWidth(), image.getHeight()) == false)
-                {
-                        Torch::message("PyramidExplorer::preprocess - failed to initialize scalling object!\n");
-                        return false;
-                }
 
-		// Scale the image to the current scale
+                // Scale the image to the current scale
 		if (	ip_scale.setOutputSize(scale_w, scale_h) == false ||
 			ip_scale.process(image) == false)
 		{
@@ -295,8 +289,7 @@ bool PyramidExplorer::preprocess(const Image& image)
 		else
 		{
 		        // The prune tensor uses features from the scaled image!
-		        if (    ip_prune->setInputSize(scale_w, scale_h) == false ||
-                                ip_prune->process(ip_scale.getOutput(0)) == false)
+		        if (ip_prune->process(ip_scale.getOutput(0)) == false)
                         {
                                 Torch::message("PyramidExplorer::preprocess - \
                                                 failed to run the pruning <ipCore> for scale [%d/%d]!\n",
@@ -321,8 +314,7 @@ bool PyramidExplorer::preprocess(const Image& image)
                         }
                         else
                         {
-                                if (    ip_evaluation->setInputSize(scale_w, scale_h) == false ||
-                                        ip_evaluation->process(ip_scale.getOutput(0)) == false)
+                                if (ip_evaluation->process(ip_scale.getOutput(0)) == false)
                                 {
                                         Torch::message("PyramidExplorer::preprocess - \
                                                         failed to run the evaluation <ipCore> for scale [%d/%d]!\n",

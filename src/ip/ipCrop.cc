@@ -23,9 +23,7 @@ ipCrop::~ipCrop()
 
 bool ipCrop::setCropArea(int x, int y, int w, int h)
 {
-	if (	x >= 0 && y >= 0 && w > 0 && h > 0 &&
-		x + w <= m_inputSize.w &&
-		y + h <= m_inputSize.h)
+	if (	x >= 0 && y >= 0 && w > 0 && h > 0)
 	{
 		if (	m_cropArea.x != x ||
 			m_cropArea.y != y ||
@@ -65,13 +63,6 @@ bool ipCrop::checkInput(const Tensor& input) const
 	// Accept only 3D tensors of Torch::Image type
 	if (	input.nDimension() != 3 ||
 		input.getDatatype() != Tensor::Short)
-	{
-		return false;
-	}
-
-	// Accept only tensors having the set image size
-	if (	input.size(0) != m_inputSize.h ||
-		input.size(1) != m_inputSize.w)
 	{
 		return false;
 	}

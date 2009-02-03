@@ -186,14 +186,8 @@ bool ipSWVariancePruner::allocateOutput(const Tensor& input)
 
 bool ipSWVariancePruner::processInput(const Tensor& input)
 {
-        if (setInputSize(input.size(1), input.size(0)) == false)
-        {
-                return false;
-        }
-
         // Compute the integral image
-        if (    m_ipi_average.setInputSize(m_inputSize) == false ||
-                m_ipi_average.process(input) == false)
+        if (m_ipi_average.process(input) == false)
         {
                 Torch::message("ipSWVariancePruner::processInput - failed to compute the integral!\n");
                 return false;
@@ -201,8 +195,7 @@ bool ipSWVariancePruner::processInput(const Tensor& input)
 
         // Compute the square integral image
         m_ipi_square.setPixelOperator(m_square_pxOp);
-        if (    m_ipi_square.setInputSize(m_inputSize) == false ||
-                m_ipi_square.process(input) == false)
+        if (m_ipi_square.process(input) == false)
         {
                 Torch::message("ipSWVariancePruner::processInput - failed to compute the square integral!\n");
                 return false;

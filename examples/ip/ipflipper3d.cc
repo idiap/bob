@@ -21,9 +21,7 @@ int main()
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
-	// Build the flipper
 	ipFlip flipper;
-	assert(flipper.setInputSize(image.getWidth(), image.getHeight()) == true);
 
 	// Flip the image
 	print("flip\n");

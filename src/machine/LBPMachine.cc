@@ -49,7 +49,6 @@ bool LBPMachine::setLBPType(LBPType lbp_type)
 	// Create the new ipLBP and allocate the LUT accordingly
 	m_ip_lbp = makeIpLBP(lbp_type);
 	m_lbp_type = lbp_type;
-	m_ip_lbp->setInputSize(m_model_w, m_model_h);
 
 	m_lut_size = m_ip_lbp->getMaxLabel();
 	m_lut = new double[m_lut_size];
@@ -84,10 +83,6 @@ bool LBPMachine::setModelSize(int model_w, int model_h)
 	}
 
 	// OK
-	if (m_ip_lbp != 0)
-	{
-		m_ip_lbp->setInputSize(model_w, model_h);
-	}
 	return true;
 }
 

@@ -82,13 +82,6 @@ bool ipScaleYX::checkInput(const Tensor& input) const
 		return false;
 	}
 
-	// Accept only tensors having the set image size
-	if (	input.size(0) != m_inputSize.h ||
-		input.size(1) != m_inputSize.w)
-	{
-		return false;
-	}
-
 	// OK
 	return true;
 }
@@ -100,8 +93,8 @@ bool ipScaleYX::allocateOutput(const Tensor& input)
 {
 	if (	m_output == 0 ||
 		m_output[0]->nDimension() != 3 ||
-		m_output[0]->size(0) != m_inputSize.h ||
-		m_output[0]->size(1) != m_inputSize.w ||
+		m_output[0]->size(0) != input.size(0) ||
+		m_output[0]->size(1) != input.size(1) ||
 		m_output[0]->size(2) != input.size(2))
 	{
 		cleanup();
@@ -133,8 +126,8 @@ bool ipScaleYX::processInput(const Tensor& input)
 	const int in_stride_w = t_input->t->stride[1];	// width
 	const int in_stride_p = t_input->t->stride[2];	// no planes
 
-	const int in_width = m_inputSize.w;
-	const int in_height = m_inputSize.h;
+	const int in_width = input.size(1);
+	const int in_height = input.size(0);
 
 	const int out_stride_h = t_output->t->stride[0];	// height
 	const int out_stride_w = t_output->t->stride[1];	// width

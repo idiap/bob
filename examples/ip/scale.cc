@@ -22,10 +22,7 @@ int main()
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
-	// Build the scaling objects
 	ipScaleYX scaler;
-	assert(scaler.setInputSize(image.getWidth(), image.getHeight()) == true);
-	assert(scaler.getInputHeight() == image.getHeight());
 
 	// Crop some random parts
 	const int n_tests = 10;

@@ -39,10 +39,8 @@ int main()
 	{
 		ipLBP* ip_lbp = (i < 6) ? ((ipLBP*)new ipLBP4R(1)) : ((ipLBP*)new ipLBP8R(1));
 
-		// Initialize the <ipLBP>
 		const int w = image.getWidth();
 		const int h = image.getHeight();
-		assert(ip_lbp->setInputSize(w, h) == true);
 
 		// Set the parameters for this <ipLBP>
 		const bool param_avg = i == 1 || i == 2 || i == 7 || i == 8;

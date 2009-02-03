@@ -26,7 +26,6 @@ int main()
 	st.print("original");
 
 	ipFlip ipflipper;
-	ipflipper.setInputSize(10, 15);
 
 	ipflipper.setFlipVer();
 	ipflipper.process(st);

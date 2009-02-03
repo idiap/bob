@@ -371,10 +371,7 @@ namespace Torch
         LBPvalue = new IntTensor(height,width,n_examples);
         LBPvalue->fill(0);
 
-
-
         print("N_examples %d\n",n_examples);
-        assert(ip_lbp->setInputSize(height, width) == true);
         for (int nexmp=0;nexmp<n_examples;nexmp++)
         {
             lbpimg->narrow(data->short_example,2,nexmp,1);
@@ -385,8 +382,8 @@ namespace Torch
                 {
                     // get LBP code for each location and store in LBPvalue
 
-                    assert(ip_lbp->setXY(y, x) == true);
-                    assert(ip_lbp->process(*lbpimg) == true);
+                    ip_lbp->setXY(y, x);
+                    ip_lbp->process(*lbpimg);
                     (*LBPvalue)(y,x,nexmp) = ip_lbp->getLBP();
 
                 }//end of for int y

@@ -9,7 +9,7 @@ params_general="-dx 0.1 -dy 0.1 -ds 1.1 -min_patt_w 0 -max_patt_w 10000 -min_pat
 params=$params_prune" "$params_select" "$params_general" -verbose"
 
 # Multiscale
-./Linux_i686/scanning $image $model -explorer_type 1 -scale_explorer_type 0 $params
+./`uname -s`_`uname -m`/scanning $image $model -explorer_type 1 -scale_explorer_type 0 $params
 
 # Pyramid
-#./Linux_i686/scanning $image $model -explorer_type 0 -scale_explorer_type 0 $params
+#./`uname -s`_`uname -m`/scanning $image $model -explorer_type 0 -scale_explorer_type 0 $params
