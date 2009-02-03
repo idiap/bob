@@ -9,6 +9,12 @@ ipFFT::ipFFT(bool inverse_)
 	:	ipCore()
 {
 	inverse = inverse_;
+			
+	R = new FloatTensor;
+	I = new FloatTensor;
+	tmp1 = NULL;
+	tmp2 = NULL;
+	T = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -16,7 +22,9 @@ ipFFT::ipFFT(bool inverse_)
 
 ipFFT::~ipFFT()
 {
-	delete tmp1;
+	if(tmp1 != NULL) delete tmp1;
+	if(tmp2 != NULL) delete tmp2;
+	if(T != NULL) delete T;
 	delete I;
 	delete R;
 }
@@ -148,6 +156,10 @@ bool ipFFT::allocateOutput(const Tensor& input)
 	if (	m_output == 0 )
 	{
 		cleanup();
+	
+		if(tmp1 != NULL) delete tmp1;
+		if(tmp2 != NULL) delete tmp2;
+		if(T != NULL) delete T;
 
 		if (input.nDimension() == 1)
 		{
@@ -159,8 +171,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 			m_output = new Tensor*[m_n_outputs];
 			m_output[0] = new FloatTensor(N, 2);
 		
-			R = new FloatTensor;
-			I = new FloatTensor;
 			tmp1 = new DoubleTensor(2*N+1);
 		}
 		else if (input.nDimension() == 2)
@@ -175,8 +185,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 				m_output = new Tensor*[m_n_outputs];
 				m_output[0] = new FloatTensor(N);
 		
-				R = new FloatTensor;
-				I = new FloatTensor;
 				tmp1 = new DoubleTensor(2*N+1);
 			}
 			else
@@ -190,8 +198,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 				m_output = new Tensor*[m_n_outputs];
 				m_output[0] = new FloatTensor(H,W,2);
 		
-				R = new FloatTensor;
-				I = new FloatTensor;
 				tmp1 = new DoubleTensor(2*W+1);
 				tmp2 = new DoubleTensor(2*H+1);
 				T = new FloatTensor(2*H+1,W);
@@ -208,8 +214,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 			m_output = new Tensor*[m_n_outputs];
 			m_output[0] = new FloatTensor(H,W);
 		
-			R = new FloatTensor;
-			I = new FloatTensor;
 			tmp1 = new DoubleTensor(2*W+1);
 			tmp2 = new DoubleTensor(2*H+1);
 			T = new FloatTensor(2*H+1,W);
@@ -308,16 +312,18 @@ void interlace(int N, double *data_, FloatTensor *R, FloatTensor *I)
 */
 void desinterlace(int N, double *data_, FloatTensor *F)
 {
-	float *data_r_ = (F->t->storage->data+F->t->storageOffset);
-	float *data_i_ = &((F->t->storage->data+F->t->storageOffset)[F->t->stride[1]]);
+	//float *data_r_ = (F->t->storage->data+F->t->storageOffset);
+	//float *data_i_ = &((F->t->storage->data+F->t->storageOffset)[F->t->stride[1]]);
 
 	double *r_ = &data_[1];
 	double *i_ = &data_[2];
 
 	for(int i = 0 ; i < N ; i++)
 	{
-		data_r_[i] = *r_;
-		data_i_[i] = *i_;
+		//data_r_[i] = *r_;
+		//data_i_[i] = *i_;
+		(*F)(i,0) = *r_;
+		(*F)(i,1) = *i_;
 
 		r_ += 2;
 		i_ += 2;
@@ -341,13 +347,14 @@ void desinterlace(int N, double *data_, FloatTensor *F)
 */
 void desinterlace_inverse(int N, double *data_, FloatTensor *F, double norm)
 {
-	float *data_r_ = (F->t->storage->data+F->t->storageOffset);
+	//float *data_r_ = (F->t->storage->data+F->t->storageOffset);
 
 	double *r_ = &data_[1];
 
 	for(int i = 0 ; i < N ; i++)
 	{
-		data_r_[i] = *r_ / norm;
+		//data_r_[i] = *r_ / norm;
+		(*F)(i) = *r_ / norm;
 
 		r_ += 2;
 	}
