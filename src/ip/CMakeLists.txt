@@ -24,6 +24,7 @@ SET(	ip_INCLUDE
 # Add some sub-directories
 SET(ip_SUBDIRS
 	imagefiles
+	transforms
 	shape)
 
 FOREACH(subdir ${ip_SUBDIRS})

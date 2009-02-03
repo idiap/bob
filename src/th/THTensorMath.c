@@ -412,27 +412,27 @@ void THTensor_addT4dotT2(THTensor *tensor, double alpha, THTensor *t4, THTensor 
   else
   {
     double *pt = THTensor_dataPtr(tensor);
+    long t2sz0 = t2->size[0];
+    long t2sz1 = t2->size[1];
     long t2st0 = t2->stride[0];
     long t2st1 = t2->stride[1];
-    long t4st0 = t4->stride[0];
-    long t4st1 = t4->stride[1];
-    long t4sz0 = t4->size[0];
-    long t4sz1 = t4->size[1];
-    for(l = 0; l < tensor->size[1]; l++)
+    long t4st2 = t4->stride[2];
+    long t4st3 = t4->stride[3];
+    for(j = 0; j < tensor->size[1]; j++)
     {
-      for(k = 0; k < tensor->size[0]; k++)
+      for(i = 0; i < tensor->size[0]; i++)
       {
         double sum = 0;
+        double *pt4 = THTensor_dataPtr4d(t4, i, j, 0, 0);
         double *pt2 = THTensor_dataPtr(t2);
-        double *pt4 = THTensor_dataPtr4d(t4, 0, 0, k, l);
-        for(j = 0; j < t4sz1; j++)
+        for(l = 0; l < t2sz1; l++)
         {
-          for(i = 0; i < t4sz0; i++)
-            sum += pt2[i*t2st0]*pt4[i*t4st0];
+          for(k = 0; k < t2sz0; k++)
+            sum += pt4[k*t4st2]*pt2[k*t2st0];
           pt2 += t2st1;
-          pt4 += t4st1;
+          pt4 += t4st3;
         }
-        pt[k*tensor->stride[0]] += alpha*sum;
+        pt[i*tensor->stride[0]] += alpha*sum;
       }
       pt += tensor->stride[1];
     }
@@ -765,10 +765,10 @@ void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor 
       {
         for(c = 0; c < tensor->size[1]; c++)
         {
-          THBlas_matVec(0, tensor->size[0], m1->size[1], alpha, 
-                       THTensor_dataPtr(m1), m1->stride[1],
-                       THTensor_selectPtr(m2, 1, c), m2->stride[0],
-                       1, THTensor_selectPtr(tensor, 1, c), tensor->stride[0]);
+          THBlas_matVec(0, m1->size[0], m1->size[1], alpha, 
+                        THTensor_dataPtr(m1), m1->stride[1],
+                        THTensor_selectPtr(m2, 1, c), m2->stride[0],
+                        1, THTensor_selectPtr(tensor, 1, c), tensor->stride[0]);
         }
       }
     }
@@ -792,10 +792,10 @@ void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor 
       {
         for(c = 0; c < tensor->size[1]; c++)
         {
-          THBlas_matVec(1, tensor->size[0], m1->size[1], alpha, 
-                       THTensor_dataPtr(tensor), m1->stride[0],
-                       THTensor_selectPtr(tensor, 1, c), m2->stride[0],
-                       1, THTensor_selectPtr(tensor, 1, c), tensor->stride[0]);
+          THBlas_matVec(1, m1->size[1], m1->size[0], alpha, 
+                        THTensor_dataPtr(m1), m1->stride[0],
+                        THTensor_selectPtr(m2, 1, c), m2->stride[0],
+                        1, THTensor_selectPtr(tensor, 1, c), tensor->stride[0]);
         }
       }
     }
@@ -805,11 +805,11 @@ void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor 
       {
         for(r = 0; r < tensor->size[0]; r++)
         {
-          THBlas_matVec(1, tensor->size[1], m1->size[1], alpha, 
-                       THTensor_dataPtr(m2), m2->stride[1],
-                       THTensor_selectPtr(m1, 0, r), m1->stride[1],
-                       1, THTensor_selectPtr(tensor, 0, r), tensor->stride[1]);
-        }        
+          THBlas_matVec(1, m2->size[0], m2->size[1], alpha, 
+                        THTensor_dataPtr(m2), m2->stride[1],
+                        THTensor_selectPtr(m1, 0, r), m1->stride[1],
+                        1, THTensor_selectPtr(tensor, 0, r), tensor->stride[1]);
+        }
       }
       else if(m2->stride[1] == 1)
       {
@@ -882,10 +882,10 @@ void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor 
       {
         for(r = 0; r < tensor->size[0]; r++)
         {
-          THBlas_matVec(1, tensor->size[1], m2->size[0], alpha, 
-                       THTensor_dataPtr(tensor), m2->stride[1],
-                       THTensor_selectPtr(tensor, 0, r), m1->stride[1],
-                       1, THTensor_selectPtr(tensor, 0, r), tensor->stride[1]);
+          THBlas_matVec(1, m2->size[0], m2->size[1], alpha, 
+                        THTensor_dataPtr(m2), m2->stride[1],
+                        THTensor_selectPtr(m1, 0, r), m1->stride[1],
+                        1, THTensor_selectPtr(tensor, 0, r), tensor->stride[1]);
         }
       }
     }
@@ -893,13 +893,13 @@ void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor 
     {
       if(m1->stride[1] == 1)
       {
-        for(r = 0; r < tensor->size[1]; r++)
+        for(c = 0; c < tensor->size[1]; c++)
         {
-          THBlas_matVec(1, tensor->size[0], m2->size[0], alpha, 
-                       THTensor_dataPtr(m1), m1->stride[0],
-                       THTensor_selectPtr(m2, 1, r), m2->stride[0],
-                       1, THTensor_selectPtr(tensor, 1, r), tensor->stride[0]);
-        }        
+          THBlas_matVec(1, m1->size[1], m1->size[0], alpha, 
+                        THTensor_dataPtr(m1), m1->stride[0],
+                        THTensor_selectPtr(m2, 1, c), m2->stride[0],
+                        1, THTensor_selectPtr(tensor, 1, c), tensor->stride[0]);
+        }
       }
       else if(m1->stride[0] == 1)
       {
@@ -928,22 +928,22 @@ void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor 
 /*******/
     if(m1->stride[1] == 1)
     {
-      for(r = 0; r < tensor->size[1]; r++)
+      for(c = 0; c < tensor->size[1]; c++)
       {
-        THBlas_matVec(1, tensor->size[0], m2->size[0], alpha, 
-                     THTensor_dataPtr(m1), m1->stride[0],
-                     THTensor_selectPtr(m2, 1, r), m2->stride[0],
-                     1, THTensor_selectPtr(tensor, 1, r), tensor->stride[0]);
-      }        
+        THBlas_matVec(1, m1->size[1], m1->size[0], alpha, 
+                      THTensor_dataPtr(m1), m1->stride[0],
+                      THTensor_selectPtr(m2, 1, c), m2->stride[0],
+                      1, THTensor_selectPtr(tensor, 1, c), tensor->stride[0]);
+      }
     }
     else if(m2->stride[0] == 1)
     {
       for(r = 0; r < tensor->size[0]; r++)
       {
-        THBlas_matVec(1, tensor->size[1], m1->size[1], alpha, 
-                     THTensor_dataPtr(m2), m2->stride[1],
-                     THTensor_selectPtr(m1, 0, r), m1->stride[1],
-                     1, THTensor_selectPtr(tensor, 0, r), tensor->stride[1]);
+        THBlas_matVec(1, m2->size[0], m2->size[1], alpha, 
+                      THTensor_dataPtr(m2), m2->stride[1],
+                      THTensor_selectPtr(m1, 0, r), m1->stride[1],
+                      1, THTensor_selectPtr(tensor, 0, r), tensor->stride[1]);
       }        
     }
     else
@@ -959,40 +959,5 @@ void THTensor_addT2dotT2(THTensor *tensor, double alpha, THTensor *m1, THTensor 
   }
 } 
 
-// Sum functions for any types added by Venkatesh
-int THIntTensor_sum(THIntTensor *tensor)
-{
-  int sum = 0;
-  TH_TENSOR_APPLY(int, tensor, sum += *tensor_p;);
-  return sum;
-}
-
-char THCharTensor_sum(THCharTensor *tensor)
-{
-  char sum = 0;
-  TH_TENSOR_APPLY(char, tensor, sum += *tensor_p;);
-  return sum;
-}
-
-short int THShortTensor_sum(THShortTensor *tensor)
-{
-  short int sum = 0;
-  TH_TENSOR_APPLY(short int, tensor, sum += *tensor_p;);
-  return sum;
-}
-
-long int THLongTensor_sum(THLongTensor *tensor)
-{
-  long int sum = 0;
-  TH_TENSOR_APPLY(long int, tensor, sum += *tensor_p;);
-  return sum;
-}
-
-float THFloatTensor_sum(THFloatTensor *tensor)
-{
-  float sum = 0;
-  TH_TENSOR_APPLY(float, tensor, sum += *tensor_p;);
-  return sum;
-}
-// End of addition from Venkatesh
+#include "THTensorMathAddons.c"
 

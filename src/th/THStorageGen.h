@@ -13,10 +13,12 @@ typedef struct STORAGE_FUNC(_)
     TYPE *data;
     long size;
     int refcount;
+    char isMapped;
 } STORAGE;
 
 TH_API STORAGE* STORAGE_FUNC(new)(void);
 TH_API STORAGE* STORAGE_FUNC(newWithSize)(long size);
+TH_API STORAGE* STORAGE_FUNC(newWithMapping)(const char *fileName, int isShared);
 TH_API void STORAGE_FUNC(retain)(STORAGE *storage);
 TH_API void STORAGE_FUNC(free)(STORAGE *storage);
 TH_API void STORAGE_FUNC(resize)(STORAGE *storage, long size, int keepContent);

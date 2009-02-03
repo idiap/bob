@@ -51,7 +51,7 @@
           break; \
       } \
     } \
-    TENSOR1##_counter = THAlloc(sizeof(long)*(TENSOR1->nDimension-TENSOR1##_dim)); \
+    TENSOR1##_counter = (long*)THAlloc(sizeof(long)*(TENSOR1->nDimension-TENSOR1##_dim)); \
     for(TENSOR1##_i = 0; TENSOR1##_i < TENSOR1->nDimension-TENSOR1##_dim; TENSOR1##_i++) \
       TENSOR1##_counter[TENSOR1##_i] = 0; \
 \
@@ -73,7 +73,7 @@
           break; \
       } \
     } \
-    TENSOR2##_counter = THAlloc(sizeof(long)*(TENSOR2->nDimension-TENSOR2##_dim)); \
+    TENSOR2##_counter = (long*)THAlloc(sizeof(long)*(TENSOR2->nDimension-TENSOR2##_dim)); \
     for(TENSOR2##_i = 0; TENSOR2##_i < TENSOR2->nDimension-TENSOR2##_dim; TENSOR2##_i++) \
       TENSOR2##_counter[TENSOR2##_i] = 0; \
 \
@@ -95,7 +95,7 @@
           break; \
       } \
     } \
-    TENSOR3##_counter = THAlloc(sizeof(long)*(TENSOR3->nDimension-TENSOR3##_dim)); \
+    TENSOR3##_counter = (long*)THAlloc(sizeof(long)*(TENSOR3->nDimension-TENSOR3##_dim)); \
     for(TENSOR3##_i = 0; TENSOR3##_i < TENSOR3->nDimension-TENSOR3##_dim; TENSOR3##_i++) \
       TENSOR3##_counter[TENSOR3##_i] = 0; \
   } \
@@ -248,7 +248,7 @@
           break; \
       } \
     } \
-    TENSOR1##_counter = THAlloc(sizeof(long)*(TENSOR1->nDimension-TENSOR1##_dim)); \
+    TENSOR1##_counter = (long*)THAlloc(sizeof(long)*(TENSOR1->nDimension-TENSOR1##_dim)); \
     for(TENSOR1##_i = 0; TENSOR1##_i < TENSOR1->nDimension-TENSOR1##_dim; TENSOR1##_i++) \
       TENSOR1##_counter[TENSOR1##_i] = 0; \
 \
@@ -270,7 +270,7 @@
           break; \
       } \
     } \
-    TENSOR2##_counter = THAlloc(sizeof(long)*(TENSOR2->nDimension-TENSOR2##_dim)); \
+    TENSOR2##_counter = (long*)THAlloc(sizeof(long)*(TENSOR2->nDimension-TENSOR2##_dim)); \
     for(TENSOR2##_i = 0; TENSOR2##_i < TENSOR2->nDimension-TENSOR2##_dim; TENSOR2##_i++) \
       TENSOR2##_counter[TENSOR2##_i] = 0; \
   } \
@@ -377,7 +377,7 @@
           break; \
       } \
     } \
-    TENSOR##_counter = THAlloc(sizeof(long)*(TENSOR->nDimension-TENSOR##_dim)); \
+    TENSOR##_counter = (long*)THAlloc(sizeof(long)*(TENSOR->nDimension-TENSOR##_dim)); \
     for(TENSOR##_i = 0; TENSOR##_i < TENSOR->nDimension-TENSOR##_dim; TENSOR##_i++) \
       TENSOR##_counter[TENSOR##_i] = 0; \
   } \

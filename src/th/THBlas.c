@@ -1,11 +1,17 @@
 #include "THBlas.h"
-//#include "THCBlas.h"
+#include "THCBlas.h"
 
 #define USE_DOUBLE
 #define real double
 
 void THBlas_swap(long size, real *x, long xStride, real *y, long yStride)
 {
+  if(size == 1)
+  {
+    xStride = 1;
+    yStride = 1;
+  }
+
 #if USE_CBLAS
   if( (size < INT_MAX) && (xStride < INT_MAX) && (yStride < INT_MAX) )
   {
@@ -30,6 +36,9 @@ void THBlas_swap(long size, real *x, long xStride, real *y, long yStride)
 
 void THBlas_scale(long size, real alpha, real *y, long yStride)
 {
+  if(size == 1)
+    yStride = 1;
+
 #if USE_CBLAS
   if( (size < INT_MAX) && (yStride < INT_MAX) )
   {
@@ -50,6 +59,12 @@ void THBlas_scale(long size, real alpha, real *y, long yStride)
 
 void THBlas_copy(long size, const real *x, long xStride, real *y, long yStride)
 {
+  if(size == 1)
+  {
+    xStride = 1;
+    yStride = 1;
+  }
+
 #if USE_CBLAS
   if( (size < INT_MAX) && (xStride < INT_MAX) && (yStride < INT_MAX) )
   {
@@ -70,6 +85,12 @@ void THBlas_copy(long size, const real *x, long xStride, real *y, long yStride)
 
 void THBlas_add(long size, real alpha, real *x, long xStride, real *y, long yStride)
 {
+  if(size == 1)
+  {
+    xStride = 1;
+    yStride = 1;
+  }
+
 #if USE_CBLAS
   if( (size < INT_MAX) && (xStride < INT_MAX) && (yStride < INT_MAX) )
   {
@@ -90,6 +111,12 @@ void THBlas_add(long size, real alpha, real *x, long xStride, real *y, long yStr
 
 real THBlas_dot(long size, real *x, long xStride, real *y, long yStride)
 {
+  if(size == 1)
+  {
+    xStride = 1;
+    yStride = 1;
+  }
+
 #if USE_CBLAS
   if( (size < INT_MAX) && (xStride < INT_MAX) && (yStride < INT_MAX) )
   {
@@ -111,16 +138,8 @@ real THBlas_dot(long size, real *x, long xStride, real *y, long yStride)
 
 void THBlas_matVec(int trans, long nRow, long nColumn, real alpha, real *m, long mStride, real *x, long xStride, real beta, real *y, long yStride)
 {
-  if(trans)
-  {
-    if(nRow == 1)
-      mStride = nColumn;
-  }
-  else
-  {
-    if(nColumn == 1)
-      mStride = nRow;
-  }
+  if(nColumn == 1)
+    mStride = nRow;
   
 #if USE_CBLAS
   if( (nRow < INT_MAX) && (nColumn < INT_MAX) && (mStride < INT_MAX)  && (xStride < INT_MAX) && (yStride < INT_MAX) )

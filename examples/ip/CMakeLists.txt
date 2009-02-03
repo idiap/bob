@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
 			"${TORCH5SPRO_DIR}/src/th/"
 			"${TORCH5SPRO_DIR}/src/ip/"
 			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
+			"${TORCH5SPRO_DIR}/src/ip/transforms/"
 			"${TORCH5SPRO_DIR}/extras/jpeg/")
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
 		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
@@ -35,6 +36,7 @@ SET(EXAMPLE_SRC
 	iimage.cc
 	crop.cc
 	scale.cc
+	fft.cc
 	lbp.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
