@@ -35,7 +35,9 @@ SET(EXAMPLE_SRC
 	iimage.cc
 	crop.cc
 	scale.cc
-	lbp.cc)
+	lbp.cc
+	histo.cc
+	smoothGaussian.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

@@ -287,6 +287,8 @@
 		<Unit filename="../../ip/imagefiles/tiffImageFile.h" />
 		<Unit filename="../../ip/ipCrop.cc" />
 		<Unit filename="../../ip/ipCrop.h" />
+		<Unit filename="../../ip/ipHisto.cc" />
+		<Unit filename="../../ip/ipHisto.h" />
 		<Unit filename="../../ip/ipIntegral.cc" />
 		<Unit filename="../../ip/ipIntegral.h" />
 		<Unit filename="../../ip/ipLBP.cc" />

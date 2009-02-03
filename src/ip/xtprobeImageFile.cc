@@ -167,6 +167,10 @@ int FindImageFormat(const char *filename)
 
 	//extension = (char *) rindex(filename, '.');
 	extension = strrchr(str, '.');
+	if (extension == NULL)
+	{
+		return -1;
+	}
 	extension++;
 
 	if(verbose == true)
