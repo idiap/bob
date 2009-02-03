@@ -11,6 +11,7 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
 			"${TORCH5SPRO_DIR}/src/th/"
 			"${TORCH5SPRO_DIR}/src/ip/"
 			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
+			"${TORCH5SPRO_DIR}/src/ip/transforms/"
 			"${TORCH5SPRO_DIR}/extras/jpeg/")
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
 		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
@@ -37,7 +38,8 @@ SET(EXAMPLE_SRC
 	scale.cc
 	lbp.cc
 	histo.cc
-	smoothGaussian.cc)
+	smoothGaussian.cc
+	fft.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

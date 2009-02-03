@@ -1,5 +1,19 @@
 #include "THStorage.h"
 
+/* Stuff for mapped files */
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#if HAVE_MMAP
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+/* End of stuff for mapped files */
+
 #define TYPE char
 #define CAP_TYPE Char
 #include "THStorageGen.c"

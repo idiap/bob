@@ -29,7 +29,7 @@
       THError("inconsistent tensor sizes"); \
   } \
 \
-  TH_TENSOR_DIM_APPLY_counter = THAlloc(sizeof(long)*(TENSOR1->nDimension)); \
+  TH_TENSOR_DIM_APPLY_counter = (long*)THAlloc(sizeof(long)*(TENSOR1->nDimension)); \
   for(TH_TENSOR_DIM_APPLY_i = 0; TH_TENSOR_DIM_APPLY_i < TENSOR1->nDimension; TH_TENSOR_DIM_APPLY_i++) \
     TH_TENSOR_DIM_APPLY_counter[TH_TENSOR_DIM_APPLY_i] = 0; \
 \
@@ -113,7 +113,7 @@
       THError("inconsistent tensor sizes"); \
   } \
 \
-  TH_TENSOR_DIM_APPLY_counter = THAlloc(sizeof(long)*(TENSOR1->nDimension)); \
+  TH_TENSOR_DIM_APPLY_counter = (long*)THAlloc(sizeof(long)*(TENSOR1->nDimension)); \
   for(TH_TENSOR_DIM_APPLY_i = 0; TH_TENSOR_DIM_APPLY_i < TENSOR1->nDimension; TH_TENSOR_DIM_APPLY_i++) \
     TH_TENSOR_DIM_APPLY_counter[TH_TENSOR_DIM_APPLY_i] = 0; \
 \
@@ -183,7 +183,7 @@
   TENSOR##_p = (TENSOR)->storage->data+(TENSOR)->storageOffset; \
   TENSOR##_stride = (TENSOR)->stride[DIMENSION]; \
   TENSOR##_size = TENSOR->size[DIMENSION]; \
-  TH_TENSOR_DIM_APPLY_counter = THAlloc(sizeof(long)*(TENSOR->nDimension)); \
+  TH_TENSOR_DIM_APPLY_counter = (long*)THAlloc(sizeof(long)*(TENSOR->nDimension)); \
   for(TH_TENSOR_DIM_APPLY_i = 0; TH_TENSOR_DIM_APPLY_i < TENSOR->nDimension; TH_TENSOR_DIM_APPLY_i++) \
     TH_TENSOR_DIM_APPLY_counter[TH_TENSOR_DIM_APPLY_i] = 0; \
 \

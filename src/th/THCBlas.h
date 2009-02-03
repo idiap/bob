@@ -1,8 +1,8 @@
 /* -*- C -*- */
 
-/* #undef USE_CBLAS */
+#define USE_CBLAS 0
 
 #if USE_CBLAS
-# include "vecLib/vecLib.h"
+# include "cblas.h"
 #endif
 
