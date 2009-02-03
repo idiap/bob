@@ -23,9 +23,9 @@ MSExplorerData::~MSExplorerData()
 /////////////////////////////////////////////////////////////////////////
 // Store some pattern - just copy it!
 
-void MSExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, float confidence)
+void MSExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, double confidence)
 {
-	m_patternSpace.add(Pattern(sw_x, sw_y, sw_w, sw_h, confidence));
+	m_patterns.add(Pattern(sw_x, sw_y, sw_w, sw_h, confidence));
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -181,14 +181,6 @@ bool MSExplorer::init(const sRect2D& roi)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Check if the scanning can continue (or the space was explored enough)
-
-bool MSExplorer::hasMoreSteps() const
-{
-	return Explorer::hasMoreSteps();
-}
-
-/////////////////////////////////////////////////////////////////////////
 // Preprocess the image (extract features ...) => store data in <prune_ips> and <evaluation_ips>
 
 bool MSExplorer::preprocess(const Image& image)
@@ -269,13 +261,6 @@ bool MSExplorer::preprocess(const Image& image)
 
 bool MSExplorer::process()
 {
-	// Already finished!
-	if (m_stepCounter > 0)
-	{
-		Torch::message("MSExplorer::process - the processing already finished!");
-		return false;
-	}
-
 	// Get parameters
 	const bool verbose = getBOption("verbose");
 	const bool stopAtFirstDetection = getBOption("StopAtFirstDetection");
@@ -328,7 +313,7 @@ bool MSExplorer::process()
 		}
 
 		// Check if we should stop at the first detection
-		if (stopAtFirstDetection == true && m_data->m_patternSpace.isEmpty() == false)
+		if (stopAtFirstDetection == true && m_data->m_patterns.isEmpty() == false)
 		{
 			// Debug message
 			if (verbose == true)
@@ -341,7 +326,6 @@ bool MSExplorer::process()
 	}
 
 	// OK
-	m_stepCounter ++;
 	return true;
 }
 

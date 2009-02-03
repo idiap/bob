@@ -34,8 +34,8 @@ bool SpiralScaleExplorer::process(	ExplorerData& explorerData,
 	const int model_w = explorerData.m_swEvaluator->getModelWidth();
 	const int model_h = explorerData.m_swEvaluator->getModelHeight();
 
-	const int dx = getInRange((int)(getFOption("dx") * sw_w), 1, sw_w);
-	const int dy = getInRange((int)(getFOption("dy") * sw_h), 1, sw_h);
+	const int dx = getInRange(FixI(getFOption("dx") * sw_w), 1, sw_w);
+	const int dy = getInRange(FixI(getFOption("dy") * sw_h), 1, sw_h);
 
 	const bool verbose = getBOption("verbose");
 
@@ -58,8 +58,8 @@ bool SpiralScaleExplorer::process(	ExplorerData& explorerData,
 	        const double theta = i == 0 ? 0.0 : (2.0 * asin(1.0 / (2.0 * i)));
 	        const int n_thetas = i == 0 ? 1 : (int)(0.5 + (2.0 * M_PI) / theta);
 
-	        print ("[%d/%d]: radius_x = %d, radius_y = %d, theta = %f, n_thetas = %d\n",
-                        i + 1, n_spirales, radius_x, radius_y, theta, n_thetas);
+	        //print ("[%d/%d]: radius_x = %d, radius_y = %d, theta = %f, n_thetas = %d\n",
+                //      i + 1, n_spirales, radius_x, radius_y, theta, n_thetas);
 
                 // Generate the sub-windows by varying the angle at the computed radius
                 for (int j = 0; j < n_thetas; j ++)
@@ -83,7 +83,7 @@ bool SpiralScaleExplorer::process(	ExplorerData& explorerData,
                         }
 
                         // Stop at the first detection if asked
-                        if (stopAtFirstDetection && explorerData.m_patternSpace.isEmpty() == false)
+                        if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
                         {
                                 // This will exit gracefully the double <for>
                                 j = n_thetas;

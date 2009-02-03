@@ -26,7 +26,7 @@ namespace Torch
 
 		// Store some pattern - just copy it!
 		virtual void		storePattern(	int sw_x, int sw_y, int sw_w, int sw_h,
-							float confidence);
+							double confidence);
 
 		// Set the current scanning scale
 		void			setScale(const sSize& scale);
@@ -82,8 +82,7 @@ namespace Torch
 		// preprocess(image)
 		// for each ROI
 		//	init (ROI)
-		// 	while (hasMoreSteps())
-		//		process ()
+		// 	process ()
 		// --------------------------------
 
 		// Initialize the scanning process with the given image size
@@ -91,9 +90,6 @@ namespace Torch
 
 		// Initialize the scanning process for a specific ROI
 		virtual bool		init(const sRect2D& roi);
-
-		// Check if the scanning can continue (or the space was explored enough)
-		virtual bool		hasMoreSteps() const;
 
 		// Preprocess the image (extract features ...) => store data in <prune_ips> and <evaluation_ips>
 		virtual bool		preprocess(const Image& image);

@@ -4,6 +4,9 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="1">
 		<Cursor position="0" topLine="0" />
 	</File>
+	<File name="../../boosting/Mcttrain.cc" open="1" top="1" tabpos="1">
+		<Cursor position="196" topLine="0" />
+	</File>
 	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="446" topLine="0" />
 	</File>
@@ -43,10 +46,10 @@
 	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="56">
 		<Cursor position="818" topLine="0" />
 	</File>
-	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="1">
+	<File name="../../scanning/scanning.cc" open="0" top="0" tabpos="1">
 		<Cursor position="19468" topLine="203" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="1" top="1" tabpos="2">
+	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="2">
 		<Cursor position="529" topLine="0" />
 	</File>
 	<File name="../../tensors/CMakeLists.txt" open="0" top="0" tabpos="0">

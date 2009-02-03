@@ -39,9 +39,12 @@ void FileListCmdOption::read(int *argc_, char ***argv_)
 
 	/// Read the contents of the file...
 	File file;
-	file.open(argv[0], "r");
+	if (file.open(argv[0], "r") == false)
+	{
+		error("FileListCmdOption: cannot open file <%s>", argv[0]);
+	}
 
-	char *melanie = new char[1024];
+	char melanie[1204];
 	file.read(melanie, 1, 1024);
 	melanie[1023] = '\0';
 	file.rewind();
@@ -70,8 +73,6 @@ void FileListCmdOption::read(int *argc_, char ***argv_)
 		file_names[i] = new char[strlen(melanie)+1];
 		strcpy(file_names[i], melanie);
 	}
-
-	delete[] melanie;
 
 	////////////////////////////////////
 

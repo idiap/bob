@@ -14,7 +14,7 @@ namespace Torch
 		///
 		FileBinDataSet();
 
-		void setData(char *filename, Tensor::Type , Tensor::Type, int width, int height);
+		void setData(const char *filename, Tensor::Type , Tensor::Type, int width, int height);
 
 		virtual Tensor* getExample(long);
 		virtual Tensor& operator()(long);

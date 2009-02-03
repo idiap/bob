@@ -50,10 +50,9 @@ namespace Torch
 		//	... get the model confidence of this
 		double			getConfidence() const;
 
-		// Get the model size/threshold
+		// Get the model size
 		int		        getModelWidth() const;
 		int	        	getModelHeight() const;
-		double   		getModelThreshold() const;
 
 		/////////////////////////////////////////////////////////////////
 

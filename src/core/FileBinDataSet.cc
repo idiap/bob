@@ -2,13 +2,13 @@
 
 namespace Torch
 {
-   
+
 FileBinDataSet::FileBinDataSet()
     : DataSet(Tensor::Short, Tensor::Short)
 {
 }
 
-void FileBinDataSet::setData(char *filename, Tensor::Type type_inp, Tensor::Type type_tar , int width, int height)
+void FileBinDataSet::setData(const char *filename, Tensor::Type type_inp, Tensor::Type type_tar , int width, int height)
 {
         int n_files;
         char binfiles[1000][1000];

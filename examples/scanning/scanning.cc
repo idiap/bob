@@ -50,7 +50,6 @@ struct Params
         bool start_with_large_scales;   // Flag
 
         // Greedy specific
-        int greedy_nbest;
         int greedy_perdx;
         int greedy_perdy;
         int greedy_perds;
@@ -68,7 +67,7 @@ struct Params
 	double prune_max_stdev;         // Prune using stdev: max value
 
 	// Detection merging
-	int select_type;		// 0 - Overlap
+	int select_type;		// 0 - Overlap, 1 - MeanShift
 	int select_merge_type;		// Merge type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence
 	bool select_overlap_iterative;	// Overlap: Iterative/One step
 	int select_min_surf_overlap;	// Overlap: Minimum surface overlap to merge
@@ -140,7 +139,7 @@ void savePatterns(	Image& save_image,
 //////////////////////////////////////////////////////////////////////////
 
 void saveResults(       const PatternList& detections,
-			const PatternSpace& patt_space,
+			const PatternList& candidates,
 			const Image& image, int image_w, int image_h,
 			xtprobeImageFile& xtprobe,
 			const char* basename)
@@ -149,61 +148,12 @@ void saveResults(       const PatternList& detections,
 
         // Print and draw the candidate patterns and the detections
         savePatterns(	save_image, image, xtprobe,
-			patt_space.getPatternList(), "candidates",
+			candidates, "candidates",
 			basename, "candidates.jpg");
 
         savePatterns(	save_image, image, xtprobe,
 			detections, "detections",
 			basename, "detections.jpg");
-
-        // Get the confidence, usage and hit counts maps
-        int** confidence_map = patt_space.getConfidenceMap();
-        unsigned char** usage_map = patt_space.getUsageMap();
-        int** hits_map = patt_space.getHitsMap();
-
-        int max_confidence_map = 0;
-        int max_hits_map = 0;
-        for (int i = 0; i < image_w; i ++)
-                for (int j = 0; j < image_h; j ++)
-                {
-                        max_confidence_map = max(max_confidence_map, confidence_map[i][j]);
-                        max_hits_map = max(max_hits_map, hits_map[i][j]);
-                }
-        const double scale_confidence_map = 255.0 / (max_confidence_map + 1.0);
-        const double scale_hits_map = 255.0 / (max_hits_map + 1.0);
-
-        // Output the usage map
-	for (int i = 0; i < image_w; i ++)
-                for (int j = 0; j < image_h; j ++)
-                {
-                        const short value = usage_map[i][j] == 0x01 ? 255 : 0;
-                        save_image.set(j, i, 0, value);
-			save_image.set(j, i, 1, value);
-			save_image.set(j, i, 2, value);
-                }
-	saveImage(save_image, xtprobe, basename, "usage_map.jpg");
-
-	// Output the confidence map
-        for (int i = 0; i < image_w; i ++)
-                for (int j = 0; j < image_h; j ++)
-                {
-                	const short value = FixI(scale_confidence_map * confidence_map[i][j]);
-                        save_image.set(j, i, 0, value);
-			save_image.set(j, i, 1, value);
-			save_image.set(j, i, 2, value);
-                }
-	saveImage(save_image, xtprobe, basename, "confidence_map.jpg");
-
-	// Output the hits map
-	for (int i = 0; i < image_w; i ++)
-                for (int j = 0; j < image_h; j ++)
-                {
-                	const short value = FixI(scale_hits_map * hits_map[i][j]);
-                        save_image.set(j, i, 0, value);
-			save_image.set(j, i, 1, value);
-			save_image.set(j, i, 2, value);
-                }
-	saveImage(save_image, xtprobe, basename, "hits_map.jpg");
 }
 
 /////////////////////////////////////////////////////////////
@@ -262,7 +212,6 @@ int main(int argc, char* argv[])
 	cmd.addFCmdOption("-ds", &params.ds, 1.25f, "Sub-window scale variation");
 	cmd.addBCmdOption("-stop_at_first_detection", &params.stop_at_first_detection, false, "stop at first detection");
 	cmd.addBCmdOption("-start_with_large_scale", &params.start_with_large_scales, false, "start with large scales");
-	cmd.addICmdOption("-greedy_nbest", &params.greedy_nbest, 128, "greedy explorer: number of best detections to refine");
 	cmd.addICmdOption("-greedy_perdx", &params.greedy_perdx, 10, "greedy explorer: percentage of Ox candidate's position to vary");
 	cmd.addICmdOption("-greedy_perdy", &params.greedy_perdy, 10, "greedy explorer: percentage of Oy candidate's position to vary");
 	cmd.addICmdOption("-greedy_perds", &params.greedy_perds, 10, "greedy explorer: percentage of candidate's scale to vary");
@@ -278,7 +227,7 @@ int main(int argc, char* argv[])
 	cmd.addDCmdOption("-prune_max_stdev", &params.prune_max_stdev, 125.0, "prune using the stdev: max value");
 
 	cmd.addText("\nCandidate selection options:");
-	cmd.addICmdOption("-select_type", &params.select_type, 0, "selector type: 0 - Overlap");
+	cmd.addICmdOption("-select_type", &params.select_type, 1, "selector type: 0 - Overlap, 1 - MeanShift");
 	cmd.addICmdOption("-select_merge_type", &params.select_merge_type, 0, "selector's merging type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence");
 	cmd.addBCmdOption("-select_overlap_iterative", &params.select_overlap_iterative, false, "Overlap: Iterative/One step");
 	cmd.addICmdOption("-select_min_surf_overlap", &params.select_min_surf_overlap, 60, "Overlap: minimum surface overlap to merge");
@@ -309,8 +258,8 @@ int main(int argc, char* argv[])
                 print(">>> dx = %f, dy = %f, ds = %f\n", params.dx, params.dy, params.ds);
                 print(">>> stop at first detection = %s\n", params.stop_at_first_detection ? "true" : "false");
                 print(">>> start with large scales = %s\n", params.start_with_large_scales ? "true" : "false");
-                print(">>> greedy: nbest = %d, dx = %d, dy = %d, ds = %d, nsteps = %d\n",
-			params.greedy_nbest, params.greedy_perdx, params.greedy_perdy, params.greedy_perds,
+                print(">>> greedy: dx = %d, dy = %d, ds = %d, nsteps = %d\n",
+			params.greedy_perdx, params.greedy_perdy, params.greedy_perds,
 			params.greedy_nsteps);
 		print(">>> random: nsamples = %d\n", params.random_nsamples);
                 print("-----------------------------------------------------------------------------\n");
@@ -337,7 +286,7 @@ int main(int argc, char* argv[])
 	params.explorer_type = getInRange(params.explorer_type, 0, 2);
 	params.scale_explorer_type = getInRange(params.scale_explorer_type, 0, 2);
 
-	params.select_type = getInRange(params.select_type, 0, 0);
+	params.select_type = getInRange(params.select_type, 0, 1);
 	params.select_merge_type = getInRange(params.select_merge_type, 0, 2);
 
 	///////////////////////////////////////////////////////////////////
@@ -394,8 +343,7 @@ int main(int argc, char* argv[])
 	case 2: // Greedy
 	default:
 		explorer = new GreedyExplorer;
-		CHECK(explorer->setIOption("Nbest", params.greedy_nbest) == true);
-                CHECK(explorer->setIOption("SWdx", params.greedy_perdx) == true);
+		CHECK(explorer->setIOption("SWdx", params.greedy_perdx) == true);
                 CHECK(explorer->setIOption("SWdy", params.greedy_perdy) == true);
                 CHECK(explorer->setIOption("SWds", params.greedy_perds) == true);
                 CHECK(explorer->setIOption("NoSteps", params.greedy_nsteps) == true);
@@ -421,7 +369,9 @@ int main(int argc, char* argv[])
 	const int n_scale_explorers = 3;
 	ScaleExplorer* scale_explorers[n_scale_explorers] =
 		{
-			&scale_explorer_ex, &scale_explorer_sp, &scale_explorer_rd
+			&scale_explorer_ex,
+			&scale_explorer_sp,
+			&scale_explorer_rd
 		};
 	const char* str_scale_explorers[n_scale_explorers] =
 		{
@@ -436,24 +386,30 @@ int main(int argc, char* argv[])
 	const int n_pattern_mergers = 3;
 	PatternMerger* pattern_mergers[n_pattern_mergers] =
 		{
-			&pattern_merge_avg, &pattern_merge_confWeighted, &pattern_merge_maxConf
-		};
-	const char* str_pattern_mergers[n_pattern_mergers] =
-		{
-			"Average", "Confidence Weighted", "Maximum Confidence"
+			&pattern_merge_avg,
+			&pattern_merge_confWeighted,
+			&pattern_merge_maxConf
 		};
 
 	// Selectors - select the best pattern sub-windows from the candidates
-	OverlapSelector selector;
-	selector.setMerger(pattern_mergers[params.select_merge_type]);
-	CHECK(selector.setIOption("minSurfOverlap", params.select_min_surf_overlap) == true);
-	CHECK(selector.setBOption("iterative", params.select_overlap_iterative) == true);
-	CHECK(selector.setBOption("verbose", params.verbose) == true);
-	CHECK(selector.setBOption("onlySurfOverlaps", true) == true);
-	CHECK(selector.setBOption("onlyMaxSurf", false) == true);
-	CHECK(selector.setBOption("onlyMaxConf", false) == true);
-	//MeanShiftSelector selector;
-	//CHECK(selector.setBOption("verbose", params.verbose) == true);
+	OverlapSelector selector_ov;
+	selector_ov.setMerger(pattern_mergers[params.select_merge_type]);
+	CHECK(selector_ov.setIOption("minSurfOverlap", params.select_min_surf_overlap) == true);
+	CHECK(selector_ov.setBOption("iterative", params.select_overlap_iterative) == true);
+	CHECK(selector_ov.setBOption("verbose", params.verbose) == true);
+	CHECK(selector_ov.setBOption("onlySurfOverlaps", true) == true);
+	CHECK(selector_ov.setBOption("onlyMaxSurf", false) == true);
+	CHECK(selector_ov.setBOption("onlyMaxConf", false) == true);
+
+	MeanShiftSelector selector_ms;
+	CHECK(selector_ms.setBOption("verbose", params.verbose) == true);
+
+	const int n_selectors = 2;
+	Selector* selectors[n_selectors] =
+		{
+			&selector_ov,
+			&selector_ms
+		};
 
 	// Scanner - main scanning object, contains the ROIs
 	Scanner scanner;
@@ -477,7 +433,7 @@ int main(int argc, char* argv[])
 	CHECK(explorer->addSWPruner(&pruner) == true);
 
 	CHECK(scanner.setExplorer(explorer) == true);
-	CHECK(scanner.setSelector(&selector) == true);
+	CHECK(scanner.setSelector(selectors[params.select_type]) == true);
 
 	// Initialize processing
 	CHECK(scanner.init(image) == true);
@@ -533,6 +489,7 @@ int main(int argc, char* argv[])
         }
 
         // Scan the image and get the results
+        CHECK(scanner.preprocess(image) == true);
         CHECK(scanner.process(image) == true);
 
         print("No of sub-windows: pruned = %d, scanned = %d, accepted = %d\n",
@@ -558,8 +515,8 @@ int main(int argc, char* argv[])
 		(params.explorer_type == 0) ?
 			"pyramid" : ((params.explorer_type == 1) ? "multiscale" : "greedy"));
 
-        saveResults(	selector.getPatterns(),		// final patterns
-			explorer->getPatternSpace(),	// pattern space from where the final patterns where selected
+        saveResults(	selectors[params.select_type]->getPatterns(),		// final patterns
+			explorer->getPatterns(),	// pattern space from where the final patterns where selected
 			image, image_w, image_h,
 			xtprobe,
 			save_basename);

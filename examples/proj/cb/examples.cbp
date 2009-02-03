@@ -38,6 +38,10 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="../../README.txt" />
+		<Unit filename="../../boosting/CMakeLists.txt" />
+		<Unit filename="../../boosting/Mcttrain.cc" />
+		<Unit filename="../../boosting/bindata.list" />
+		<Unit filename="../../boosting/make.csh" />
 		<Unit filename="../../dataset/CMakeLists.txt" />
 		<Unit filename="../../dataset/make.csh" />
 		<Unit filename="../../dataset/memorydataset.cc" />

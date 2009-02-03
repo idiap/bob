@@ -11,6 +11,15 @@ namespace Torch
 	class Explorer;
 	class Selector;
 
+	// HOW TO USE:
+	// --------------------------------
+	// init(image)
+	// ... setScaleXXX as wanted
+	// setROIs
+	// preprocess(image)
+	// process(image)
+	// --------------------------------
+
    	/////////////////////////////////////////////////////////////////////////
 	// Torch::Scanner
 	//	- scan an image for rectangular patterns in 4D
@@ -51,6 +60,9 @@ namespace Torch
 
 		// Initialize the scanning (check parameters/objects, initialize explorer)
 		bool				init(const Image& image);
+
+		// Preprocess the image (store features in the explorer)
+		bool				preprocess(const Image& image);
 
 		// Process some image to scan for patterns
 		bool	 			process(const Image& image);

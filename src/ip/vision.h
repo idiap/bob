@@ -91,8 +91,8 @@ struct sPoint2Dpolar
 struct sRect2D
 {
 	// Constructor
-	sRect2D()
-		: x(0), y(0), w(0), h(0)
+	sRect2D(int x_ = 0, int y_ = 0, int w_ = 0, int h_ = 0)
+		: x(x_), y(y_), w(w_), h(h_)
 	{
 	}
 

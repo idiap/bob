@@ -35,7 +35,7 @@ namespace Torch
 
 		// Process the list of candidate sub-windows and select the best ones
 		// (this will accumulate them to the pattern list)
-		virtual bool		process(const PatternSpace& candidates);
+		virtual bool		process(const PatternList& candidates);
 
 		// Change the merging strategy
 		bool			setMerger(PatternMerger* merger);
