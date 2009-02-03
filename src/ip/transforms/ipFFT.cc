@@ -184,7 +184,7 @@ bool ipFFT::allocateOutput(const Tensor& input)
 				print("ipFFT::allocateOutput() assuming FFT 2D ...\n");
 
 				H = input.size(0);
-				W = input.size(0);
+				W = input.size(1);
 
 				m_n_outputs = 1;
 				m_output = new Tensor*[m_n_outputs];
@@ -202,7 +202,7 @@ bool ipFFT::allocateOutput(const Tensor& input)
 			print("ipFFT::allocateOutput() assuming inverse FFT 2D ...\n");
 
 			H = input.size(0);
-			W = input.size(0);
+			W = input.size(1);
 
 			m_n_outputs = 1;
 			m_output = new Tensor*[m_n_outputs];

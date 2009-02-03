@@ -45,7 +45,7 @@ int main()
 	print("\n\nTesting 2D FFT\n\n");
 
 	//
-	int H = 4;
+	int H = 8;
 	int W = 4;
 	FloatTensor image(H, W);
 
