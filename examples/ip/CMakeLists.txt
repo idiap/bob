@@ -39,7 +39,10 @@ SET(EXAMPLE_SRC
 	lbp.cc
 	histo.cc
 	smoothGaussian.cc
-	fft.cc)
+	fft.cc
+	sobel.cc
+	ipflipper2d.cc
+	ipflipper3d.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

@@ -82,7 +82,7 @@
 	<File name="../../core/ipCore.cc" open="0" top="0" tabpos="36">
 		<Cursor position="1295" topLine="37" />
 	</File>
-	<File name="../../core/ipCore.h" open="1" top="1" tabpos="35">
+	<File name="../../core/ipCore.h" open="1" top="0" tabpos="35">
 		<Cursor position="490" topLine="0" />
 	</File>
 	<File name="../../core/ipSubWindow.cc" open="0" top="0" tabpos="46">
@@ -94,8 +94,8 @@
 	<File name="../../core/spCore.cc" open="0" top="0" tabpos="63">
 		<Cursor position="0" topLine="18" />
 	</File>
-	<File name="../../core/spCore.h" open="0" top="0" tabpos="34">
-		<Cursor position="717" topLine="6" />
+	<File name="../../core/spCore.h" open="1" top="0" tabpos="69">
+		<Cursor position="303" topLine="0" />
 	</File>
 	<File name="../../geometry/Circle2D.cc" open="0" top="0" tabpos="8">
 		<Cursor position="3222" topLine="146" />
@@ -164,7 +164,7 @@
 		<Cursor position="463" topLine="0" />
 	</File>
 	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="32">
-		<Cursor position="692" topLine="0" />
+		<Cursor position="829" topLine="0" />
 	</File>
 	<File name="../../ip/Color.cc" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
@@ -197,10 +197,10 @@
 		<Cursor position="1523" topLine="19" />
 	</File>
 	<File name="../../ip/ipHisto.cc" open="1" top="0" tabpos="31">
-		<Cursor position="3750" topLine="125" />
+		<Cursor position="1721" topLine="38" />
 	</File>
 	<File name="../../ip/ipHisto.h" open="1" top="0" tabpos="30">
-		<Cursor position="630" topLine="6" />
+		<Cursor position="831" topLine="0" />
 	</File>
 	<File name="../../ip/ipIntegral.cc" open="0" top="0" tabpos="29">
 		<Cursor position="13524" topLine="47" />
@@ -212,7 +212,7 @@
 		<Cursor position="19" topLine="0" />
 	</File>
 	<File name="../../ip/ipLBP.h" open="1" top="0" tabpos="14">
-		<Cursor position="540" topLine="3" />
+		<Cursor position="845" topLine="3" />
 	</File>
 	<File name="../../ip/ipLBP4R.cc" open="0" top="0" tabpos="10">
 		<Cursor position="3926" topLine="89" />
@@ -223,14 +223,26 @@
 	<File name="../../ip/ipLBP8R.cc" open="0" top="0" tabpos="11">
 		<Cursor position="1283" topLine="105" />
 	</File>
-	<File name="../../ip/ipLBP8R.h" open="0" top="0" tabpos="8">
-		<Cursor position="759" topLine="9" />
+	<File name="../../ip/ipLBP8R.h" open="1" top="0" tabpos="63">
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="../../ip/ipScaleYX.cc" open="0" top="0" tabpos="33">
 		<Cursor position="3510" topLine="126" />
 	</File>
 	<File name="../../ip/ipScaleYX.h" open="0" top="0" tabpos="34">
 		<Cursor position="2445" topLine="53" />
+	</File>
+	<File name="../../ip/ipSmoothGaussian.cc" open="1" top="0" tabpos="65">
+		<Cursor position="2572" topLine="76" />
+	</File>
+	<File name="../../ip/ipSmoothGaussian.h" open="1" top="0" tabpos="64">
+		<Cursor position="1363" topLine="38" />
+	</File>
+	<File name="../../ip/ipSobel.cc" open="1" top="1" tabpos="72">
+		<Cursor position="5615" topLine="158" />
+	</File>
+	<File name="../../ip/ipSobel.h" open="1" top="0" tabpos="71">
+		<Cursor position="1426" topLine="19" />
 	</File>
 	<File name="../../ip/shape/CMakeLists.txt" open="0" top="0" tabpos="29">
 		<Cursor position="440" topLine="0" />
@@ -295,11 +307,11 @@
 	<File name="../../machine/CMakeLists.txt" open="0" top="0" tabpos="60">
 		<Cursor position="183" topLine="0" />
 	</File>
-	<File name="../../machine/CascadeMachine.cc" open="0" top="0" tabpos="2">
-		<Cursor position="4843" topLine="189" />
+	<File name="../../machine/CascadeMachine.cc" open="1" top="0" tabpos="70">
+		<Cursor position="289" topLine="0" />
 	</File>
 	<File name="../../machine/CascadeMachine.h" open="1" top="0" tabpos="17">
-		<Cursor position="1334" topLine="29" />
+		<Cursor position="1695" topLine="29" />
 	</File>
 	<File name="../../machine/Classifier.h" open="0" top="0" tabpos="0">
 		<Cursor position="631" topLine="6" />
@@ -503,7 +515,7 @@
 		<Cursor position="369" topLine="0" />
 	</File>
 	<File name="../../th/THStorageGen.h" open="1" top="0" tabpos="23">
-		<Cursor position="1684" topLine="0" />
+		<Cursor position="1684" topLine="4" />
 	</File>
 	<File name="../../th/THTensor.h" open="1" top="0" tabpos="21">
 		<Cursor position="349" topLine="0" />
@@ -518,7 +530,7 @@
 		<Cursor position="0" topLine="42" />
 	</File>
 	<File name="../../th/THTensorGen.h" open="1" top="0" tabpos="22">
-		<Cursor position="6197" topLine="101" />
+		<Cursor position="6197" topLine="102" />
 	</File>
 	<File name="../../th/THTensorMath.h" open="0" top="0" tabpos="57">
 		<Cursor position="0" topLine="2" />

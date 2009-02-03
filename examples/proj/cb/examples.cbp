@@ -54,9 +54,13 @@
 		<Unit filename="../../ip/crop.cc" />
 		<Unit filename="../../ip/histo.cc" />
 		<Unit filename="../../ip/iimage.cc" />
+		<Unit filename="../../ip/ipflipper2d.cc" />
+		<Unit filename="../../ip/ipflipper3d.cc" />
 		<Unit filename="../../ip/lbp.cc" />
 		<Unit filename="../../ip/make.csh" />
 		<Unit filename="../../ip/scale.cc" />
+		<Unit filename="../../ip/smoothGaussian.cc" />
+		<Unit filename="../../ip/sobel.cc" />
 		<Unit filename="../../machines/CMakeLists.txt" />
 		<Unit filename="../../machines/convert3to5models.cc" />
 		<Unit filename="../../machines/make.csh" />

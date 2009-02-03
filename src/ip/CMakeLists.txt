@@ -17,6 +17,8 @@ SET(	ip_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipLBP8R.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipHisto.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipSmoothGaussian.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ipSobel.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ipFlip.cc"
 	CACHE INTERNAL "sources")
 
 SET(	ip_INCLUDE

@@ -287,6 +287,8 @@
 		<Unit filename="../../ip/imagefiles/tiffImageFile.h" />
 		<Unit filename="../../ip/ipCrop.cc" />
 		<Unit filename="../../ip/ipCrop.h" />
+		<Unit filename="../../ip/ipFlip.cc" />
+		<Unit filename="../../ip/ipFlip.h" />
 		<Unit filename="../../ip/ipHisto.cc" />
 		<Unit filename="../../ip/ipHisto.h" />
 		<Unit filename="../../ip/ipIntegral.cc" />
@@ -299,6 +301,10 @@
 		<Unit filename="../../ip/ipLBP8R.h" />
 		<Unit filename="../../ip/ipScaleYX.cc" />
 		<Unit filename="../../ip/ipScaleYX.h" />
+		<Unit filename="../../ip/ipSmoothGaussian.cc" />
+		<Unit filename="../../ip/ipSmoothGaussian.h" />
+		<Unit filename="../../ip/ipSobel.cc" />
+		<Unit filename="../../ip/ipSobel.h" />
 		<Unit filename="../../ip/shape/CMakeLists.txt" />
 		<Unit filename="../../ip/shape/FaceModel.cc" />
 		<Unit filename="../../ip/shape/FaceModel.h" />
