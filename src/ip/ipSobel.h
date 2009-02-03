@@ -45,12 +45,11 @@ namespace Torch
 
 		/////////////////////////////////////////////////////////////////
 		// Attributes
-        int width;
-        int height;
-        IntTensor *Sx;
-        IntTensor *Sy;
 
-        void createMask();
+		IntTensor *Sx;
+		IntTensor *Sy;
+
+		void createMask();
 
 	};
 }

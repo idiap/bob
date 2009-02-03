@@ -89,18 +89,16 @@ namespace Torch
         t_Gx_output->fill(0);
         t_Gy_output->fill(0);
         t_Mag_output->fill(0);
-        width = input.size(1);
-        height = input.size(0);
-        int mask_w;
-        int mask_h;
+        const int width = input.size(1);
+        const int height = input.size(0);
 
         //Create the mask
         //probably you can have different mask and compute the convolution
         //Assuming the mask sizes are all odd
 
 
-        mask_h = Sx->size(0);
-        mask_w = Sx->size(1);
+        const int mask_h = Sx->size(0);
+        const int mask_w = Sx->size(1);
 
         int mh = mask_h/2; // be carefull
         int mw = mask_w/2;
@@ -167,7 +165,6 @@ namespace Torch
 
     void ipSobel::createMask()
     {
-
         Sx = new IntTensor(3,3);
         Sy = new IntTensor(3,3);
 
