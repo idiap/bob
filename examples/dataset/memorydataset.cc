@@ -102,7 +102,7 @@ int main()
 			DoubleTensor *input = (DoubleTensor *) m0.getExample(t);
 			input->resize(10);
 			input->fill(1);
-			input->sprint("input %d", t); 
+			input->sprint("input %d", t);
 		}
 
 		print("DataSet m0 done.\n");
@@ -131,8 +131,8 @@ int main()
 		// loop on examples to print them again
 		for(int t = 0 ; t < m1.getNumberOfExamples() ; t++)
 		{
-			m1.getExample(t)->sprint("input %d", t); 
-			m1.getTarget(t)->sprint("target %d", t); 
+			m1.getExample(t)->sprint("input %d", t);
+			m1.getTarget(t)->sprint("target %d", t);
 		}
 
 		print("DataSet m1 done.\n");
@@ -149,7 +149,7 @@ int main()
 		//	1 1	1
 		//
 		//
-		
+
 		MemoryDataSet m2(4, Tensor::Double, true, Tensor::Short);
 
 		print("DataSet m2:\n");
@@ -190,18 +190,18 @@ int main()
 		for(int t = 0 ; t < m2.getNumberOfExamples() ; t++)
 		{
 			TensorPair example = m2(t);
-		
+
 			input = example.input;
 			target = example.target;
 
-			if(input != NULL) input->sprint("input %d", t); 
-			if(target != NULL) target->sprint("target %d", t); 
+			if(input != NULL) input->sprint("input %d", t);
+			if(target != NULL) target->sprint("target %d", t);
 		}
 
 		// delete the two target Tensors
 		delete target0;
 		delete target1;
-		
+
 		// delete the only input Tensor allocated
 		delete example0.input;
 
@@ -210,8 +210,8 @@ int main()
 	//---
 	{
 		// Handle a dataset of digits (2D input tensors of size 5x4) for classification (1D target tensor of size 1)
-		//		
-		//		   	.oo.  ..oo  oooo  oooo  o...  oooo  oooo  oooo  oooo  oooo   
+		//
+		//		   	.oo.  ..oo  oooo  oooo  o...  oooo  oooo  oooo  oooo  oooo
 		//			o  o  .o.o  ...o  ...o  o.o.  o...  o...  ...o  o..o  o..o
 		//			o  o  ...o  .oo.  .ooo  oooo  oooo  oooo  .oo.  .oo.  oooo
 		//			o  o  ...o  o...  ...o  ..o.  ...o  o..o  ..o.  o..o  ...o

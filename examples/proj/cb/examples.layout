@@ -10,6 +10,9 @@
 	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="446" topLine="0" />
 	</File>
+	<File name="../../dataset/memorydataset.cc" open="1" top="0" tabpos="18">
+		<Cursor position="1315" topLine="80" />
+	</File>
 	<File name="../../images/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="632" topLine="0" />
 	</File>
@@ -19,7 +22,7 @@
 	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="8">
 		<Cursor position="1353" topLine="6" />
 	</File>
-	<File name="../../ip/crop.cc" open="1" top="0" tabpos="31">
+	<File name="../../ip/crop.cc" open="1" top="0" tabpos="14">
 		<Cursor position="697" topLine="1" />
 	</File>
 	<File name="../../ip/histo.cc" open="1" top="0" tabpos="9">
@@ -28,10 +31,10 @@
 	<File name="../../ip/iimage.cc" open="1" top="0" tabpos="7">
 		<Cursor position="3812" topLine="80" />
 	</File>
-	<File name="../../ip/ipflipper2d.cc" open="1" top="0" tabpos="32">
+	<File name="../../ip/ipflipper2d.cc" open="1" top="0" tabpos="15">
 		<Cursor position="721" topLine="0" />
 	</File>
-	<File name="../../ip/ipflipper3d.cc" open="1" top="0" tabpos="33">
+	<File name="../../ip/ipflipper3d.cc" open="1" top="0" tabpos="16">
 		<Cursor position="680" topLine="0" />
 	</File>
 	<File name="../../ip/lbp.cc" open="1" top="0" tabpos="13">
@@ -58,8 +61,8 @@
 	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="56">
 		<Cursor position="818" topLine="0" />
 	</File>
-	<File name="../../scanning/scanning.cc" open="1" top="1" tabpos="34">
-		<Cursor position="13889" topLine="283" />
+	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="17">
+		<Cursor position="13889" topLine="289" />
 	</File>
 	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="2">
 		<Cursor position="529" topLine="0" />
@@ -71,7 +74,7 @@
 		<Cursor position="10" topLine="0" />
 	</File>
 	<File name="../../tensors/THTensorC.c" open="1" top="0" tabpos="5">
-		<Cursor position="3616" topLine="133" />
+		<Cursor position="3616" topLine="132" />
 	</File>
 	<File name="../../tensors/bigtest.cc" open="1" top="0" tabpos="3">
 		<Cursor position="4718" topLine="214" />

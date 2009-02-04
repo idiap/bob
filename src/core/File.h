@@ -16,7 +16,7 @@ namespace Torch
 		File();
 
 		// Destructor
-		~File();
+		virtual ~File();
 
 		/// Open "file_name" with the flags #open_flags#
 		virtual bool		open(const char* file_name, const char* open_flags);

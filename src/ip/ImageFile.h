@@ -1,5 +1,5 @@
-#ifndef IMAGE_FILE_INC
-#define IMAGE_FILE_INC
+#ifndef _TORCH5SPRO_IMAGE_FILE_H_
+#define _TORCH5SPRO_IMAGE_FILE_H_
 
 #include "File.h"
 

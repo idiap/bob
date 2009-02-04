@@ -1,5 +1,5 @@
-#ifndef _TORCHVISION_IP_LBP_H_
-#define _TORCHVISION_IP_LBP_H_
+#ifndef _TORCH5SPRO_IP_LBP_H_
+#define _TORCH5SPRO_IP_LBP_H_
 
 #include "ipCore.h"		// <ipLBP> is an <ipCore>
 

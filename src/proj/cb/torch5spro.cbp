@@ -196,6 +196,8 @@
 		<Unit filename="../../core/CmdOption.h" />
 		<Unit filename="../../core/DataSet.cc" />
 		<Unit filename="../../core/DataSet.h" />
+		<Unit filename="../../core/DiskDataSet.cc" />
+		<Unit filename="../../core/DiskDataSet.h" />
 		<Unit filename="../../core/File.cc" />
 		<Unit filename="../../core/File.h" />
 		<Unit filename="../../core/FileBinDataSet.cc" />
@@ -212,6 +214,8 @@
 		<Unit filename="../../core/Object.h" />
 		<Unit filename="../../core/Tensor.cc" />
 		<Unit filename="../../core/Tensor.h" />
+		<Unit filename="../../core/TensorFile.cc" />
+		<Unit filename="../../core/TensorFile.h" />
 		<Unit filename="../../core/TensorGen.cc" />
 		<Unit filename="../../core/TensorGen.h" />
 		<Unit filename="../../core/Trainer.cc" />
