@@ -4,6 +4,15 @@ namespace Torch {
 
 const char *str_datatype[] = {"char", "short", "int", "long", "float", "double"};
 
+// Get the number of elements (over all dimensions)
+long Tensor::size() const
+{
+	long count = 1;
+	for (int i = 0; i < nDimension(); i ++)
+		count *= size(i);
+	return count;
+}
+
 #define DATATYPE 0
 #define TYPE char
 #define CAP_TYPE Char

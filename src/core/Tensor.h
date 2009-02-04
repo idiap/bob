@@ -95,13 +95,7 @@ namespace Torch {
 		virtual long size(int dimension_) const = 0;
 
 		// Get the number of elements (over all dimensions)
-		virtual long size() const
-		{
-			long count = 1;
-			for (int i = 0; i < nDimension(); i ++)
-				count *= size(i);
-			return count;
-		}
+		long size() const;
 
 		// set the tensor from another tensor (same type) - this will create a reference
 		virtual void setTensor(const Tensor *src) = 0;
@@ -128,7 +122,8 @@ namespace Torch {
 		virtual void sprint(const char *name, ...) const = 0;
 
 		// Access to the raw data
-		virtual void* data() = 0;
+		virtual void* dataW() = 0;
+		virtual const void* dataR() const = 0;
 
 		// Get the size of an element
 		virtual int typeSize() const = 0;

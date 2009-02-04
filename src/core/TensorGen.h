@@ -86,7 +86,8 @@ public:
 	virtual void sprint(const char *name, ...) const;
 
 	// Access to the raw data
-	virtual void* data() { return (t->storage->data+t->storageOffset); }
+	virtual void* dataW() { return (t->storage->data+t->storageOffset); }
+	virtual const void* dataR() const { return (t->storage->data+t->storageOffset); }
 
 	// Get the size of an element
 	virtual int typeSize() const { return sizeof(TYPE); }
