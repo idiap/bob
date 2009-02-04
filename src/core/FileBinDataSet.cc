@@ -2,7 +2,7 @@
 
 namespace Torch
 {
-
+/*
 FileBinDataSet::FileBinDataSet()
     : DataSet(Tensor::Short, Tensor::Short)
 {
@@ -140,6 +140,6 @@ Tensor* FileBinDataSet::getTarget(long k)
 FileBinDataSet::~FileBinDataSet()
 {
 }
-
+*/
 }
 

@@ -2,7 +2,7 @@
 #include "Tensor.h"
 
 namespace Torch {
-
+/*
 MemoryDataSet::MemoryDataSet(Tensor::Type example_type_, Tensor::Type target_type_)
 	: DataSet(example_type_, target_type_)
 {
@@ -92,5 +92,5 @@ MemoryDataSet::~MemoryDataSet()
 {
 	cleanup();
 }
-
+*/
 }
