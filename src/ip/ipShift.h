@@ -1,35 +1,36 @@
-#ifndef _TORCHVISION_IP_FLIP_H_
-#define _TORCHVISION_IP_FLIP_H_
+#ifndef _TORCHVISION_IP_SHIFT_H_
+#define _TORCHVISION_IP_SHIFT_H_
 
-#include "ipCore.h"		// <ipFlip> is a <Torch::ipCore>
-#include "vision.h"		// <sRect2D> definition
+#include "ipCore.h"		// <ipShift> is a <Torch::ipCore>
 
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipFlip
-	//	This class is designed to crop an image.
-	//	The result is a tensor of the same storage type.
+	// Torch::ipShift
+	//	This class is designed to shift an image.
+	//	The result is a tensor of the same storage type and the same size.
 	//
 	//	- PARAMETERS (name, type, default value, description):
-	//		"vertical"	bool	false	"direction of the flipping (default vertical)"
+	//		"shiftx"	int	0	"variation on Ox axis"
+	//		"shifty"	int	0	"variation on Oy axis"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ipFlip : public ipCore
+	class ipShift : public ipCore
 	{
 	public:
 
 		// Constructor
-		ipFlip();
+		ipShift();
 
 		// Destructor
-		virtual ~ipFlip();
+		virtual ~ipShift();
 
 	protected:
 
 		//////////////////////////////////////////////////////////
+
 		/// Check if the input tensor has the right dimensions and type - overriden
 		virtual bool		checkInput(const Tensor& input) const;
 
@@ -42,6 +43,9 @@ namespace Torch
 		//////////////////////////////////////////////////////////
 
 	private:
+
+		/////////////////////////////////////////////////////////////////
+		// Attributes
 
 		//
 	};
