@@ -7,21 +7,6 @@ Octon2D::~Octon2D()
 {
 }
 
-void Octon2D::saveFile(File *file)
-{
-}
-
-void Octon2D::loadFile(File *file)
-{
-}
-
-const char *Octon2D::sprint()
-{
-	sprintf(buf_sprint, "(%d, %d, %d, %d) " , octon.x_min, octon.x_min, octon.width, octon.height);
-
-	return buf_sprint;
-}
-
 void Octon2D::draw(Image *image, Color color)
 {
 	int y_min, y_max;
@@ -80,17 +65,18 @@ void Octon2D::xdraw(Display *pDisplay, Pixmap pixmap, GC gc, unsigned long color
 }
 #endif
 
-bool Octon2D::inside(Point2D P_)
+bool Octon2D::inside(const Point2D& P_)
 {
 	bool bInOcton;
         int ypx, ymx;
 
         bInOcton = false;
 
-        if((P_.y >= octon.y_min) && (P_.y <= octon.y_max) && (P_.x >= octon.x_min) && (P_.x <= octon.x_max))
+        if(	(P_.get(1) >= octon.y_min) && (P_.get(1) <= octon.y_max) &&
+		(P_.get(0) >= octon.x_min) && (P_.get(1) <= octon.x_max))
         {
-                ypx = (int) (P_.y + P_.x);
-                ymx = (int) (P_.y - P_.x);
+                ypx = (int) (P_.get(1) + P_.get(0));
+                ymx = (int) (P_.get(1) - P_.get(0));
 
                 bInOcton = true;
 

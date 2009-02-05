@@ -11,7 +11,7 @@
 		<Cursor position="446" topLine="0" />
 	</File>
 	<File name="../../dataset/memorydataset.cc" open="1" top="0" tabpos="18">
-		<Cursor position="1315" topLine="80" />
+		<Cursor position="1941" topLine="80" />
 	</File>
 	<File name="../../images/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="632" topLine="0" />
@@ -20,7 +20,7 @@
 		<Cursor position="2068" topLine="89" />
 	</File>
 	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="8">
-		<Cursor position="1353" topLine="6" />
+		<Cursor position="1281" topLine="6" />
 	</File>
 	<File name="../../ip/crop.cc" open="1" top="0" tabpos="14">
 		<Cursor position="697" topLine="1" />
@@ -40,8 +40,14 @@
 	<File name="../../ip/lbp.cc" open="1" top="0" tabpos="13">
 		<Cursor position="1177" topLine="40" />
 	</File>
+	<File name="../../ip/rotate.cc" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
 	<File name="../../ip/scale.cc" open="1" top="0" tabpos="12">
 		<Cursor position="702" topLine="20" />
+	</File>
+	<File name="../../ip/shift.cc" open="1" top="0" tabpos="19">
+		<Cursor position="1203" topLine="23" />
 	</File>
 	<File name="../../ip/smoothGaussian.cc" open="1" top="0" tabpos="11">
 		<Cursor position="1122" topLine="16" />
@@ -62,7 +68,7 @@
 		<Cursor position="818" topLine="0" />
 	</File>
 	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="17">
-		<Cursor position="13889" topLine="289" />
+		<Cursor position="13889" topLine="295" />
 	</File>
 	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="2">
 		<Cursor position="529" topLine="0" />

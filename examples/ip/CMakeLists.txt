@@ -10,6 +10,7 @@ SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
 			"${TORCH5SPRO_DIR}/src/th/"
 			"${TORCH5SPRO_DIR}/src/ip/"
+			"${TORCH5SPRO_DIR}/src/geometry/"
 			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
 			"${TORCH5SPRO_DIR}/src/ip/transforms/"
 			"${TORCH5SPRO_DIR}/extras/jpeg/")
@@ -42,7 +43,9 @@ SET(EXAMPLE_SRC
 	fft.cc
 	sobel.cc
 	ipflipper2d.cc
-	ipflipper3d.cc)
+	ipflipper3d.cc
+	shift.cc
+	rotate.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

@@ -7,47 +7,47 @@
 
 namespace Torch {
 
-/** This class is designed to handle 2D affine (rotation, scale and translation) transformations
+	/** This class is designed to handle 2D affine (rotation, scale and translation) transformations
 
-    @author Sebastien Marcel (marcel@idiap.ch)
-    @version 2.0
-    \Date
-    @since 1.0
-*/
-class Affine2D
-{
-public:
-   	/// rotation/scale matrix
-   	Matrix2D rs;
-
-	/// translation vector
-	Vector2D t;
-
-	//-----
-	
-	/** constructor
-	
-	    @param rs_ is a rotation/scale matrix
-	    @param r_ is a translation vector
+	    @author Sebastien Marcel (marcel@idiap.ch)
+	    @version 2.0
+	    \Date
+	    @since 1.0
 	*/
-	Affine2D(Matrix2D &rs_, Vector2D &t_);
+	class Affine2D
+	{
+	public:
+		/// rotation/scale matrix
+		Matrix2D rs;
 
-	/// destructor
-	~Affine2D() {};
+		/// translation vector
+		Vector2D t;
 
-	/** @name affine transformation (#v# - #t#) * #rs#
-	*/
-	//@{
-	///
-	Point2D operator*(Point2D &p);
+		//-----
 
-	///
-	Vector2D operator*(Vector2D &v);
+		/** constructor
 
-	///
-	Rectangle2D operator*(Rectangle2D &v);
-	//@}
-};
+		    @param rs_ is a rotation/scale matrix
+		    @param r_ is a translation vector
+		*/
+		Affine2D(Matrix2D &rs_, Vector2D &t_);
+
+		/// destructor
+		~Affine2D() {};
+
+		/** @name affine transformation (#v# - #t#) * #rs#
+		*/
+		//@{
+		///
+		Point2D operator*(Point2D &p);
+
+		///
+		Vector2D operator*(Vector2D &v);
+
+		///
+		Rectangle2D operator*(Rectangle2D &v);
+		//@}
+	};
 
 }
 

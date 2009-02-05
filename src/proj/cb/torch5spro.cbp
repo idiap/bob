@@ -293,6 +293,8 @@
 		<Unit filename="../../ip/ipCrop.h" />
 		<Unit filename="../../ip/ipFlip.cc" />
 		<Unit filename="../../ip/ipFlip.h" />
+		<Unit filename="../../ip/ipGeomNorm.cc" />
+		<Unit filename="../../ip/ipGeomNorm.h" />
 		<Unit filename="../../ip/ipHisto.cc" />
 		<Unit filename="../../ip/ipHisto.h" />
 		<Unit filename="../../ip/ipIntegral.cc" />
@@ -303,8 +305,12 @@
 		<Unit filename="../../ip/ipLBP4R.h" />
 		<Unit filename="../../ip/ipLBP8R.cc" />
 		<Unit filename="../../ip/ipLBP8R.h" />
+		<Unit filename="../../ip/ipRotate.cc" />
+		<Unit filename="../../ip/ipRotate.h" />
 		<Unit filename="../../ip/ipScaleYX.cc" />
 		<Unit filename="../../ip/ipScaleYX.h" />
+		<Unit filename="../../ip/ipShift.cc" />
+		<Unit filename="../../ip/ipShift.h" />
 		<Unit filename="../../ip/ipSmoothGaussian.cc" />
 		<Unit filename="../../ip/ipSmoothGaussian.h" />
 		<Unit filename="../../ip/ipSobel.cc" />
@@ -341,32 +347,6 @@
 		<Unit filename="../../machine/LBPMachine.h" />
 		<Unit filename="../../machine/Machines.cc" />
 		<Unit filename="../../machine/Machines.h" />
-		<Unit filename="../../matrix/CMakeLists.txt" />
-		<Unit filename="../../matrix/Mat.cc" />
-		<Unit filename="../../matrix/Mat.h" />
-		<Unit filename="../../matrix/Mat_operations.cc" />
-		<Unit filename="../../matrix/Mat_operations.h" />
-		<Unit filename="../../matrix/Perm.cc" />
-		<Unit filename="../../matrix/Perm.h" />
-		<Unit filename="../../matrix/Perm_operations.cc" />
-		<Unit filename="../../matrix/Perm_operations.h" />
-		<Unit filename="../../matrix/Vec.cc" />
-		<Unit filename="../../matrix/Vec.h" />
-		<Unit filename="../../matrix/matrix.h" />
-		<Unit filename="../../matrix/mx_givens.cc" />
-		<Unit filename="../../matrix/mx_givens.h" />
-		<Unit filename="../../matrix/mx_hessenberg.cc" />
-		<Unit filename="../../matrix/mx_hessenberg.h" />
-		<Unit filename="../../matrix/mx_householder.cc" />
-		<Unit filename="../../matrix/mx_householder.h" />
-		<Unit filename="../../matrix/mx_low_level.cc" />
-		<Unit filename="../../matrix/mx_low_level.h" />
-		<Unit filename="../../matrix/mx_lu_factor.cc" />
-		<Unit filename="../../matrix/mx_lu_factor.h" />
-		<Unit filename="../../matrix/mx_solve.cc" />
-		<Unit filename="../../matrix/mx_solve.h" />
-		<Unit filename="../../matrix/mx_sym_eig.cc" />
-		<Unit filename="../../matrix/mx_sym_eig.h" />
 		<Unit filename="../../scanning/CMakeLists.txt" />
 		<Unit filename="../../scanning/ConfidenceDistribution.cc" />
 		<Unit filename="../../scanning/ConfidenceDistribution.h" />
@@ -450,6 +430,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../th/THTensorMath.h" />
+		<Unit filename="../../th/THTensorMathAddons.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../trainer/CMakeLists.txt" />
 		<Unit filename="../../trainer/MctLbpTrainer.cc" />
 		<Unit filename="../../trainer/MctLbpTrainer.h" />

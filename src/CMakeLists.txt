@@ -37,7 +37,6 @@ SET(TORCH5SPRO_SUBDIRS
 	scanning
 	machine
 	trainer
-	matrix
 	geometry)
 
 FOREACH(subdir ${TORCH5SPRO_SUBDIRS})

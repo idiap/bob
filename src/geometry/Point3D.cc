@@ -5,30 +5,53 @@
 namespace Torch {
 
 //------------------------------------------------------------------
-// IO streams
-//------------------------------------------------------------------
+// Constructors
 
-// Write output Point3D
-void Point3D::saveFile(File *file)
+Point3D::Point3D() : DoubleTensor(3)
 {
-	file->write(&x, sizeof(double), 1);
-	file->write(&y, sizeof(double), 1);
-	file->write(&z, sizeof(double), 1);
+	fill(0.0);
 }
 
-// Read input Point3D format
-void Point3D::loadFile(File *file)
+Point3D::Point3D(int a) : DoubleTensor(3)
 {
-	file->read(&x, sizeof(double), 1);
-	file->read(&y, sizeof(double), 1);
-	file->read(&z, sizeof(double), 1);
+	set(0, a);
+	set(1, a);
+	set(2, 0.0);
 }
 
-const char * Point3D::sprint()
+Point3D::Point3D(double a) : DoubleTensor(3)
 {
-	sprintf(buf_sprint, "(%g, %g, %g)", x, y, z);
+	set(0, a);
+	set(1, a);
+	set(2, 0.0);
+}
 
-	return buf_sprint;
+Point3D::Point3D(int a, int b) : DoubleTensor(3)
+{
+	set(0, a);
+	set(1, b);
+	set(2, 0.0);
+}
+
+Point3D::Point3D(double a, double b) : DoubleTensor(3)
+{
+	set(0, a);
+	set(1, b);
+	set(2, 0.0);
+}
+
+Point3D::Point3D(int a, int b, int c) : DoubleTensor(3)
+{
+	set(0, a);
+	set(1, b);
+	set(2, c);
+}
+
+Point3D::Point3D(double a, double b, double c) : DoubleTensor(3)
+{
+	set(0, a);
+	set(1, b);
+	set(2, c);
 }
 
 void Point3D::draw(Image *image, Color color)
@@ -40,60 +63,54 @@ void Point3D::draw(Image *image, Color color)
 // Comparison
 //------------------------------------------------------------------
 
-int Point3D::operator==(Point3D Q)
+int Point3D::operator==(const Point3D& Q)
 {
-	return (x==Q.x && y==Q.y && z==Q.z);
+	return (get(0)==Q.get(0) && get(1)==Q.get(1) && get(2)==Q.get(2));
 }
 
-int Point3D::operator!=(Point3D Q)
+int Point3D::operator!=(const Point3D& Q)
 {
-	return (x!=Q.x || y!=Q.y || z!=Q.z);
+	return (get(0)!=Q.get(0) || get(1)!=Q.get(1) || get(2)!=Q.get(2));
 }
 
 //------------------------------------------------------------------
 // Point3D Vector3D Operations
 //------------------------------------------------------------------
 
-Vector3D Point3D::operator-(Point3D Q)        // Vector diff of Points
+Vector3D Point3D::operator-(const Point3D& Q)        // Vector diff of Points
 {
-	Vector3D v;
-	v.x = x - Q.x;
-	v.y = y - Q.y;
-	v.z = z - Q.z;
-	return v;
+	return Vector3D(get(0) - Q.get(0),
+			get(1) - Q.get(1),
+			get(2) - Q.get(2));
 }
 
-Point3D Point3D::operator+(Vector3D v)        // +ve translation
+Point3D Point3D::operator+(const Vector3D& v)        // +ve translation
 {
-	Point3D P;
-	P.x = x + v.x;
-	P.y = y + v.y;
-	P.z = z + v.z;
-	return P;
+	return Point3D(	get(0) + v.get(0),
+			get(1) + v.get(1),
+			get(2) + v.get(2));
 }
 
-Point3D Point3D::operator-(Vector3D v)        // -ve translation
+Point3D Point3D::operator-(const Vector3D& v)        // -ve translation
 {
-	Point3D P;
-	P.x = x - v.x;
-	P.y = y - v.y;
-	P.z = z - v.z;
-	return P;
+	return Point3D(	get(0) - v.get(0),
+			get(1) - v.get(1),
+			get(2) - v.get(2));
 }
 
-Point3D& Point3D::operator+=(Vector3D v)        // +ve translation
+Point3D& Point3D::operator+=(const Vector3D& v)        // +ve translation
 {
-	x += v.x;
-	y += v.y;
-	z += v.z;
+	set(0, get(0) + v.get(0));
+	set(1, get(1) + v.get(1));
+	set(2, get(2) + v.get(2));
 	return *this;
 }
 
-Point3D& Point3D::operator-=(Vector3D v)        // -ve translation
+Point3D& Point3D::operator-=(const Vector3D& v)        // -ve translation
 {
-	x -= v.x;
-	y -= v.y;
-	z -= v.z;
+	set(0, get(0) - v.get(0));
+	set(1, get(1) - v.get(1));
+	set(2, get(2) - v.get(2));
 	return *this;
 }
 
@@ -106,58 +123,46 @@ Point3D& Point3D::operator-=(Vector3D v)        // -ve translation
 //        The programmer must enforce this (if they want to).
 //------------------------------------------------------------------
 
-Point3D operator*(int c, Point3D Q)
+Point3D operator*(int c, const Point3D& Q)
 {
-	Point3D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	P.z = c * Q.z;
-	return P;
+	return Point3D(	c * Q.get(0),
+			c * Q.get(1),
+			c * Q.get(2));
 }
 
-Point3D operator*(double c, Point3D Q)
+Point3D operator*(double c, const Point3D& Q)
 {
-	Point3D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	P.z = c * Q.z;
-	return P;
+	return Point3D(	c * Q.get(0),
+			c * Q.get(1),
+			c * Q.get(2));
 }
 
-Point3D operator*(Point3D Q, int c)
+Point3D operator*(const Point3D& Q, int c)
 {
-	Point3D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	P.z = c * Q.z;
-	return P;
+	return Point3D(	c * Q.get(0),
+			c * Q.get(1),
+			c * Q.get(2));
 }
 
-Point3D operator*(Point3D Q, double c)
+Point3D operator*(const Point3D& Q, double c)
 {
-	Point3D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	P.z = c * Q.z;
-	return P;
+	return Point3D(	c * Q.get(0),
+			c * Q.get(1),
+			c * Q.get(2));
 }
 
-Point3D operator/(Point3D Q, int c)
+Point3D operator/(const Point3D& Q, int c)
 {
-	Point3D P;
-	P.x = Q.x / c;
-	P.y = Q.y / c;
-	P.z = Q.z / c;
-	return P;
+	return Point3D(	Q.get(0) / c,
+			Q.get(1) / c,
+			Q.get(2) / c);
 }
 
-Point3D operator/(Point3D Q, double c)
+Point3D operator/(const Point3D& Q, double c)
 {
-	Point3D P;
-	P.x = Q.x / c;
-	P.y = Q.y / c;
-	P.z = Q.z / c;
-	return P;
+	return Point3D(	Q.get(0) / c,
+			Q.get(1) / c,
+			Q.get(2) / c);
 }
 
 //------------------------------------------------------------------
@@ -166,13 +171,11 @@ Point3D operator/(Point3D Q, double c)
 //    The programmer must enforce this (if they want to).
 //------------------------------------------------------------------
 
-Point3D operator+(Point3D Q, Point3D R)
+Point3D operator+(const Point3D& Q, const Point3D& R)
 {
-	Point3D P;
-	P.x = Q.x + R.x;
-	P.y = Q.y + R.y;
-	P.z = Q.z + R.z;
-	return P;
+	return Point3D(	Q.get(0) + R.get(0),
+			Q.get(1) + R.get(1),
+			Q.get(2) + R.get(2));
 }
 
 //------------------------------------------------------------------
@@ -181,7 +184,7 @@ Point3D operator+(Point3D Q, Point3D R)
 // Tests if coeffs add to 1.  If not, sets: err = Esum.
 //------------------------------------------------------------------
 
-Point3D asum(int n, int *c, Point3D *Q)
+Point3D asum(int n, int *c, const Point3D *Q)
 {
 	int        cs = 0;
 	Point3D      P;
@@ -193,14 +196,14 @@ Point3D asum(int n, int *c, Point3D *Q)
 
 	for (int i=0; i<n; i++)
 	{
-		P.x += c[i] * Q[i].x;
-		P.y += c[i] * Q[i].y;
-		P.z += c[i] * Q[i].z;
+		P.set(0, P.get(0) + c[i] * Q[i].get(0));
+		P.set(1, P.get(1) + c[i] * Q[i].get(1));
+		P.set(2, P.get(2) + c[i] * Q[i].get(2));
 	}
 	return P;
 }
 
-Point3D asum(int n, double *c, Point3D *Q)
+Point3D asum(int n, double *c, const Point3D *Q)
 {
 	double     cs = 0.0;
 	Point3D      P;
@@ -212,9 +215,9 @@ Point3D asum(int n, double *c, Point3D *Q)
 
 	for (int i=0; i<n; i++)
 	{
-		P.x += c[i] * Q[i].x;
-		P.y += c[i] * Q[i].y;
-		P.z += c[i] * Q[i].z;
+		P.set(0, P.get(0) + c[i] * Q[i].get(0));
+		P.set(1, P.get(1) + c[i] * Q[i].get(1));
+		P.set(2, P.get(2) + c[i] * Q[i].get(2));
 	}
 	return P;
 }
@@ -223,19 +226,19 @@ Point3D asum(int n, double *c, Point3D *Q)
 // Distance between Points
 //------------------------------------------------------------------
 
-double d(Point3D P, Point3D Q)
+double d(const Point3D& P, const Point3D& Q)
 {      // Euclidean distance
-	double dx = P.x - Q.x;
-	double dy = P.y - Q.y;
-	double dz = P.z - Q.z;
+	double dx = P.get(0) - Q.get(0);
+	double dy = P.get(1) - Q.get(1);
+	double dz = P.get(2) - Q.get(2);
 	return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
-double d2(Point3D P, Point3D Q)
+double d2(const Point3D& P, const Point3D& Q)
 {     // squared distance (more efficient)
-	double dx = P.x - Q.x;
-	double dy = P.y - Q.y;
-	double dz = P.z - Q.z;
+	double dx = P.get(0) - Q.get(0);
+	double dy = P.get(1) - Q.get(1);
+	double dz = P.get(2) - Q.get(2);
 	return (dx*dx + dy*dy + dz*dz);
 }
 

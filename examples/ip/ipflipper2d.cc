@@ -27,11 +27,11 @@ int main()
 
 	ipFlip ipflipper;
 
-	ipflipper.setFlipVer();
+	assert(ipflipper.setBOption("vertical", true) == true);
 	ipflipper.process(st);
 	ipflipper.getOutput(0).print("flipped over vertical");
 
-	ipflipper.setFlipHor();
+	assert(ipflipper.setBOption("vertical", false) == true);
 	ipflipper.process(st);
 	ipflipper.getOutput(0).print("flipped over horizontal");
 

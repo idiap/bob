@@ -25,6 +25,7 @@ int main()
 
 	// Flip the image
 	print("flip\n");
+	assert(flipper.setBOption("vertical", true) == true);
 	assert(flipper.process(image) == true);
 	assert(flipper.getNOutputs() == 1);
 
@@ -40,7 +41,7 @@ int main()
 
 	// Flip the image over hor
 	print("flip\n");
-	flipper.setFlipHor();
+	assert(flipper.setBOption("vertical", false) == true);
 	assert(flipper.process(image) == true);
 	assert(flipper.getNOutputs() == 1);
 

@@ -4,23 +4,32 @@
 namespace Torch {
 
 //------------------------------------------------------------------
+// vector length
+
+double Vector2D::len()
+{
+	return sqrt(get(0) * get(0) + get(1) * Point2D::get(1));
+}
+
+double Vector2D::len2()
+{
+	return get(0) * get(0) + get(1) * get(1);
+}
+
+//------------------------------------------------------------------
 //  Unary Ops
 //------------------------------------------------------------------
 
 // Unary minus
-Vector2D Vector2D::operator-() 
+Vector2D Vector2D::operator-()
 {
-	Vector2D v;
-	v.x = -x; v.y = -y;
-	return v;
+	return Vector2D(-get(0), -get(1));
 }
 
 // Unary 2D perp operator
-Vector2D Vector2D::operator~() 
+Vector2D Vector2D::operator~()
 {
-	Vector2D v;
-	v.x = -y; v.y = x;
-	return v;
+	return Vector2D(-get(1), get(0));
 }
 
 //------------------------------------------------------------------
@@ -28,73 +37,51 @@ Vector2D Vector2D::operator~()
 //------------------------------------------------------------------
 
 // Scalar multiplication
-Vector2D operator*(int c, Vector2D w) 
+Vector2D operator*(int c, const Vector2D& w)
 {
-	Vector2D v;
-	v.x = c * w.x;
-	v.y = c * w.y;
-	return v;
+	return Vector2D(c * w.get(0), c * w.get(1));
 }
 
-Vector2D operator*(double c, Vector2D w) 
+Vector2D operator*(double c, const Vector2D& w)
 {
-	Vector2D v;
-	v.x = c * w.x;
-	v.y = c * w.y;
-	return v;
+	return Vector2D(c * w.get(0), c * w.get(1));
 }
 
-Vector2D operator*(Vector2D w, int c) 
+Vector2D operator*(const Vector2D& w, int c)
 {
-	Vector2D v;
-	v.x = c * w.x;
-	v.y = c * w.y;
-	return v;
+	return Vector2D(c * w.get(0), c * w.get(1));
 }
 
-Vector2D operator*(Vector2D w, double c) 
+Vector2D operator*(const Vector2D& w, double c)
 {
-	Vector2D v;
-	v.x = c * w.x;
-	v.y = c * w.y;
-	return v;
+	return Vector2D(c * w.get(0), c * w.get(1));
 }
 
 // Scalar division
-Vector2D operator/(Vector2D w, int c) 
+Vector2D operator/(const Vector2D& w, int c)
 {
-	Vector2D v;
-	v.x = w.x / c;
-	v.y = w.y / c;
-	return v;
+	return Vector2D(w.get(0) / c, w.get(1) / c);
 }
 
-Vector2D operator/(Vector2D w, double c) 
+Vector2D operator/(const Vector2D& w, double c)
 {
-	Vector2D v;
-	v.x = w.x / c;
-	v.y = w.y / c;
-	return v;
+	return Vector2D(w.get(0) / c, w.get(1) / c);
 }
 
 //------------------------------------------------------------------
 //  Arithmetic Ops
 //------------------------------------------------------------------
 
-Vector2D Vector2D::operator+(Vector2D w) 
+Vector2D Vector2D::operator+(const Vector2D& w)
 {
-	Vector2D v;
-	v.x = x + w.x;
-	v.y = y + w.y;
-	return v;
+	return Vector2D(get(0) + w.get(0),
+			get(1) + w.get(1));
 }
 
-Vector2D Vector2D::operator-(Vector2D w) 
+Vector2D Vector2D::operator-(const Vector2D& w)
 {
-	Vector2D v;
-	v.x = x - w.x;
-	v.y = y - w.y;
-	return v;
+	return Vector2D(get(0) - w.get(0),
+			get(1) - w.get(1));
 }
 
 //------------------------------------------------------------------
@@ -102,100 +89,95 @@ Vector2D Vector2D::operator-(Vector2D w)
 //------------------------------------------------------------------
 
 // Inner Dot Product
-double Vector2D::operator*(Vector2D w) 
+double Vector2D::operator*(const Vector2D& w)
 {
-	return (x * w.x + y * w.y);
+	return get(0) * w.get(0) + get(1) * w.get(1);
 }
 
 // 2D Exterior Perp Product
-double Vector2D::operator|(Vector2D w) 
+double Vector2D::operator|(const Vector2D& w)
 {
-	return (x * w.y - y * w.x);
+	return get(0) * w.get(1) - get(1) * w.get(0);
 }
 
 //------------------------------------------------------------------
 //  Shorthand Ops
 //------------------------------------------------------------------
 
-Vector2D& Vector2D::operator*=(double c) 
+Vector2D& Vector2D::operator*=(double c)
 {        // vector scalar mult
-	x *= c;
-	y *= c;
+	set(0, get(0) * c);
+	set(1, get(1) * c);
 	return *this;
 }
 
-Vector2D& Vector2D::operator/=(double c) 
+Vector2D& Vector2D::operator/=(double c)
 {        // vector scalar div
-	x /= c;
-	y /= c;
+	set(0, get(0) / c);
+	set(1, get(1) / c);
 	return *this;
 }
 
-Vector2D& Vector2D::operator+=(Vector2D w) 
+Vector2D& Vector2D::operator+=(const Vector2D& w)
 {        // vector increment
-	x += w.x;
-	y += w.y;
+	set(0, get(0) + w.get(0));
+	set(1, get(1) + w.get(1));
 	return *this;
 }
 
-Vector2D& Vector2D::operator-=(Vector2D w) 
+Vector2D& Vector2D::operator-=(const Vector2D& w)
 {        // vector decrement
-	x -= w.x;
-	y -= w.y;
+	set(0, get(0) - w.get(0));
+	set(1, get(1) - w.get(1));
 	return *this;
 }
 
-Vector2D operator*(Vector2D w, Matrix2D m)
+Vector2D operator*(const Vector2D& w, const Matrix2D& m)
 {
-	Vector2D v;
-	
-	v.x = m.ptr[0][0] * w.x + m.ptr[1][0] * w.y;
-	v.y = m.ptr[0][1] * w.x + m.ptr[1][1] * w.y;
-
-	return v;
+	return Vector2D(	m.get(0, 0) * w.get(0) + m.get(1, 0) * w.get(1),
+				m.get(0, 1) * w.get(0) + m.get(1, 1) * w.get(1));
 }
 
 //------------------------------------------------------------------
 //  Special Operations
 //------------------------------------------------------------------
 
-void Vector2D::normalize() 
+void Vector2D::normalize()
 {                      // convert to unit length
-	double ln = sqrt(x*x + y*y);
+	double ln = len();
 	if (ln == 0) return;                    // do nothing for nothing
-	x /= ln;
-	y /= ln;
+	operator/=(ln);
 }
 
-Vector2D sum(int n, int *c, Vector2D *w) 
+Vector2D sum(int n, int *c, const Vector2D *w)
 {     // vector sum
 	Vector2D  v;
 
-	for (int i=0; i<n; i++) 
+	for (int i=0; i<n; i++)
 	{
-		v.x += c[i] * w[i].x;
-		v.y += c[i] * w[i].y;
+		v.set(0, v.get(0) + c[i] * w[i].get(0));
+		v.set(1, v.get(1) + c[i] * w[i].get(1));
 	}
 	return v;
 }
 
-Vector2D sum(int n, double *c, Vector2D *w) 
+Vector2D sum(int n, double *c, const Vector2D *w)
 {  // vector sum
 	Vector2D  v;
 
-	for (int i=0; i<n; i++) 
+	for (int i=0; i<n; i++)
 	{
-		v.x += c[i] * w[i].x;
-		v.y += c[i] * w[i].y;
+		v.set(0, v.get(0) + c[i] * w[i].get(0));
+		v.set(1, v.get(1) + c[i] * w[i].get(1));
 	}
 	return v;
 }
 
-/** Get the angle (in radian) in the  range [-PI...PI] with the horizontal (x axes) 
+/** Get the angle (in radian) in the  range [-PI...PI] with the horizontal (x axes)
 */
 double Vector2D::angle()
 {
-	return atan2(y, x);
+	return atan2(get(1), get(0));
 }
 
 }
