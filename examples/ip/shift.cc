@@ -2,7 +2,6 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 #include "CmdLine.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -24,8 +23,8 @@ int main(int argc, char* argv[])
 	// Load the image
 	Image image(1, 1, 3);
 	xtprobeImageFile xtprobe;
-	assert(xtprobe.open(image_filename, "r") == true);
-	assert(image.loadImage(xtprobe) == true);
+	CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
+	CHECK_FATAL(image.loadImage(xtprobe) == true);
 	xtprobe.close();
 
 	print("Processing image [width = %d, height = %d, nplanes = %d] ...\n",
@@ -43,18 +42,18 @@ int main(int argc, char* argv[])
 		const int dy = rand() % (image.size(0) / 4) - (image.size(0) / 8);
 
 		print("[%d/%d]: shifting with [%d - %d]...\n", i + 1, n_tests, dx, dy);
-		assert(shifter.setIOption("shiftx", dx) == true);
-		assert(shifter.setIOption("shifty", dy) == true);
-		assert(shifter.process(image) == true);
-		assert(shifter.getNOutputs() == 1);
-		assert(shifter.getOutput(0).getDatatype() == Tensor::Short);
+		CHECK_FATAL(shifter.setIOption("shiftx", dx) == true);
+		CHECK_FATAL(shifter.setIOption("shifty", dy) == true);
+		CHECK_FATAL(shifter.process(image) == true);
+		CHECK_FATAL(shifter.getNOutputs() == 1);
+		CHECK_FATAL(shifter.getOutput(0).getDatatype() == Tensor::Short);
 
 		// Save the shifted image
 		char str[256];
 		sprintf(str, "shift_%d_%d.jpg", dx, dy);
-		assert(shifted_image.copyFrom(shifter.getOutput(0)) == true);
-		assert(xtprobe.open(str, "w") == true);
-		assert(shifted_image.saveImage(xtprobe) == true);
+		CHECK_FATAL(shifted_image.copyFrom(shifter.getOutput(0)) == true);
+		CHECK_FATAL(xtprobe.open(str, "w") == true);
+		CHECK_FATAL(shifted_image.saveImage(xtprobe) == true);
 		xtprobe.close();
 	}
 

@@ -165,8 +165,8 @@ void unrotate(int x, int y, int *X, int *Y, const RotationMatrix2D *rim)
 	yr = rim->dSinOpposite * xo + rim->dCosOpposite * yo;
 
    	// Changing coordinate system from unity circle to src image
-  	*X = (int) (xr + rim->xc);
-	*Y = (int) (yr + rim->yc);
+  	*X = FixI (xr + rim->xc);
+	*Y = FixI (yr + rim->yc);
 }
 
 void unrotate(double x, double y, double *X, double *Y, const RotationMatrix2D *rim)

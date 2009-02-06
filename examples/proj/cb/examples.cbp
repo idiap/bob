@@ -52,6 +52,7 @@
 		<Unit filename="../../ip/CMakeLists.txt" />
 		<Unit filename="../../ip/README.txt" />
 		<Unit filename="../../ip/crop.cc" />
+		<Unit filename="../../ip/geomNorm.cc" />
 		<Unit filename="../../ip/histo.cc" />
 		<Unit filename="../../ip/iimage.cc" />
 		<Unit filename="../../ip/ipflipper2d.cc" />

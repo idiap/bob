@@ -50,9 +50,36 @@ void print(const char* fmt, ...);
 #define	getInRange(v,m,M) ((v) < (m) ? (m) : ((v) > (M) ? (M) : (v)))
 #endif
 
+#ifndef isIndex
+/// The isIndex function checks if some value is an index
+#define	isIndex(v,N) ((v) >= 0 && (v) < (N))
+#endif
+
 #define IS_NEAR(var, value, delta) ((var >= (value - delta)) && (var <= (value + delta)))
 
 #define FixI(v) (int) (v+0.5)
+
+/// Macros to check for errors (fatal -> force exit, error -> return false)
+#define CHECK_FATAL(expression)					\
+{								\
+	const bool condition = (expression);			\
+	if (condition == false)					\
+	{							\
+		error("Error: in file [%s] at line [%d]!\n",	\
+			__FILE__, __LINE__);			\
+	}							\
+}
+
+#define CHECK_ERROR(expression)					\
+{								\
+	const bool condition = (expression);			\
+	if (condition == false)					\
+	{							\
+		message("Error: in file [%s] at line [%d]!\n",	\
+			__FILE__, __LINE__);			\
+		return false;					\
+	}							\
+}
 
 }
 

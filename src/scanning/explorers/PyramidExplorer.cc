@@ -251,7 +251,8 @@ bool PyramidExplorer::preprocess(const Image& image)
                 ipScaleYX& ip_scale = m_scaling_ips[i];
 
                 // Scale the image to the current scale
-		if (	ip_scale.setOutputSize(scale_w, scale_h) == false ||
+		if (	ip_scale.setIOption("width", scale_w) == false ||
+			ip_scale.setIOption("height", scale_h) == false ||
 			ip_scale.process(image) == false)
 		{
 			Torch::message("PyramidExplorer::preprocess - failed to run the scalling object for scale [%d/%d]!\n",

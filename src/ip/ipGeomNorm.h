@@ -28,8 +28,8 @@ namespace Torch
 	//		"cropDy"	integer 0	"crop: Oy offset of the (CP1, CP2) center in the normalized image"
 	//		"cropW"		integer 0	"crop: width of the base normalized image (without border)"
 	//		"cropH"		integer 0	"crop: height of the base normalized image (without border)"
-	//		"cropOffsetX"	integer 0	"crop: Ox border of the  normalized image around the cropping center"
-	//		"cropOffsetY"	integer 0	"crop: Oy border of the  normalized image around the cropping center"
+	//		"cropBorderX"	integer 0	"crop: Ox border of the  normalized image around the cropping center"
+	//		"cropBorderY"	integer 0	"crop: Oy border of the  normalized image around the cropping center"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////

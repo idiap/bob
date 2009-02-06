@@ -6,7 +6,6 @@
 #include "jpegImageFile.h"
 #include "tiffImageFile.h"
 #include "Color.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -107,8 +106,8 @@ int main()
 
 		// Load the image
 		ImageFile* iloader = BuildImageFile(input_type);
-		assert(iloader->open(imagefiles[index_input], "r") == true);
-		assert(image.loadImage(*iloader) == true);
+		CHECK_FATAL(iloader->open(imagefiles[index_input], "r") == true);
+		CHECK_FATAL(image.loadImage(*iloader) == true);
 		delete iloader;
 
 		// Draw something on the image
@@ -124,8 +123,8 @@ int main()
 		// Save the image to a random format
 		ImageFile* isaver = BuildImageFile(output_type);
 		sprintf(filename, "image.%d.%s", t + 1, ImageTypeExt[output_type]);
-		assert(isaver->open(filename, "w") == true);
-		assert(image.saveImage(*isaver) == true);
+		CHECK_FATAL(isaver->open(filename, "w") == true);
+		CHECK_FATAL(image.saveImage(*isaver) == true);
 		delete isaver;
 
 		print("\txxxImageFile PASSED: [%d/%d] \r", t + 1, n_tests);
@@ -137,8 +136,8 @@ int main()
 	xtprobeImageFile xtprobe;
 	for (int t = 0; t < n_tests; t ++)
 	{
-		assert(xtprobe.open(imagefiles[t % n_images], "r") == true);
-		assert(image.loadImage(xtprobe) == true);
+		CHECK_FATAL(xtprobe.open(imagefiles[t % n_images], "r") == true);
+		CHECK_FATAL(image.loadImage(xtprobe) == true);
 		xtprobe.close();
 
 		print("\txtprobeImageFile PASSED: [%d/%d] \r", t + 1, n_tests);
