@@ -1,1 +1,0 @@
-/usr/bin/c++   -g   CMakeFiles/sobel.dir/sobel.o  -o sobel -rdynamic ../../../build_Linux_x86_64/libtorch5spro.a ../../../extras/jpeg/build_Linux_x86_64/libjpeg.a 
