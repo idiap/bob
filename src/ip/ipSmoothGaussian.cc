@@ -145,7 +145,7 @@ bool ipSmoothGaussian::processInput(const Tensor& input)
 
 		for (int y = start_y; y < stop_y; y ++)
 		{
-			short* dst_row = &dst_plane[y * stride_h];
+			short* dst_row = &dst_plane[y * stride_h + start_x * stride_w];
 			for (int x = start_x; x < stop_x; x ++, dst_row += stride_w)
 			{
 				// Apply the kernel for the <y, x> pixel

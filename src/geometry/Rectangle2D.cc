@@ -4,17 +4,17 @@
 
 namespace Torch {
 
-Rectangle2D::Rectangle2D(Point2D P0_, int w_, int h_)
+Rectangle2D::Rectangle2D(const Point2D& P0_, int w_, int h_)
 {
 	P0 = P0_;
 	P1 = P0_;
 	P2 = P0_;
 	P3 = P0_;
 
-	P1.x += w_;
-	P2.x += w_;
-	P2.y += h_;
-	P3.y += h_;
+	P1.set(0, P1.get(0) + w_);
+	P2.set(0, P2.get(0) + w_);
+	P2.set(1, P2.get(1) + h_);
+	P3.set(1, P3.get(1) + h_);
 }
 
 Rectangle2D::Rectangle2D(int x_, int y_, int w_, int h_)
@@ -24,26 +24,26 @@ Rectangle2D::Rectangle2D(int x_, int y_, int w_, int h_)
 	P2.reset(x_, y_);
 	P3.reset(x_, y_);
 
-	P1.x += w_;
-	P2.x += w_;
-	P2.y += h_;
-	P3.y += h_;
+	P1.set(0, P1.get(0) + w_);
+	P2.set(0, P2.get(0) + w_);
+	P2.set(1, P2.get(1) + h_);
+	P3.set(1, P3.get(1) + h_);
 }
 
-Rectangle2D::Rectangle2D(sRect2D r)
+Rectangle2D::Rectangle2D(const sRect2D& r)
 {
 	P0.reset(r.x, r.y);
 	P1.reset(r.x, r.y);
 	P2.reset(r.x, r.y);
 	P3.reset(r.x, r.y);
 
-	P1.x += r.w;
-	P2.x += r.w;
-	P2.y += r.h;
-	P3.y += r.h;
+	P1.set(0, P1.get(0) + r.w);
+	P2.set(0, P2.get(0) + r.w);
+	P2.set(1, P2.get(1) + r.h);
+	P3.set(1, P3.get(1) + r.h);
 }
 
-void Rectangle2D::reset(Point2D P0_, Point2D P1_, Point2D P2_, Point2D P3_)
+void Rectangle2D::reset(const Point2D& P0_, const Point2D& P1_, const Point2D& P2_, const Point2D& P3_)
 {
 	P0 = P0_;
 	P1 = P1_;
@@ -51,17 +51,17 @@ void Rectangle2D::reset(Point2D P0_, Point2D P1_, Point2D P2_, Point2D P3_)
 	P3 = P3_;
 }
 
-void Rectangle2D::reset(Point2D P0_, int w_, int h_)
+void Rectangle2D::reset(const Point2D& P0_, int w_, int h_)
 {
 	P0 = P0_;
 	P1 = P0_;
 	P2 = P0_;
 	P3 = P0_;
 
-	P1.x += w_;
-	P2.x += w_;
-	P2.y += h_;
-	P3.y += h_;
+	P1.set(0, P1.get(0) + w_);
+	P2.set(0, P2.get(0) + w_);
+	P2.set(1, P2.get(1) + h_);
+	P3.set(1, P3.get(1) + h_);
 }
 
 void Rectangle2D::reset(int x_, int y_, int w_, int h_)
@@ -71,58 +71,31 @@ void Rectangle2D::reset(int x_, int y_, int w_, int h_)
 	P2.reset(x_, y_);
 	P3.reset(x_, y_);
 
-	P1.x += w_;
-	P2.x += w_;
-	P2.y += h_;
-	P3.y += h_;
+	P1.set(0, P1.get(0) + w_);
+	P2.set(0, P2.get(0) + w_);
+	P2.set(1, P2.get(1) + h_);
+	P3.set(1, P3.get(1) + h_);
 }
 
-void Rectangle2D::reset(sRect2D r)
+void Rectangle2D::reset(const sRect2D& r)
 {
 	P0.reset(r.x, r.y);
 	P1.reset(r.x, r.y);
 	P2.reset(r.x, r.y);
 	P3.reset(r.x, r.y);
 
-	P1.x += r.w;
-	P2.x += r.w;
-	P2.y += r.h;
-	P3.y += r.h;
-}
-
-void Rectangle2D::saveFile(File *file)
-{
-   	P0.saveFile(file);
-   	P1.saveFile(file);
-   	P2.saveFile(file);
-   	P3.saveFile(file);
-}
-
-void Rectangle2D::loadFile(File *file)
-{
-   	P0.loadFile(file);
-   	P1.loadFile(file);
-   	P2.loadFile(file);
-   	P3.loadFile(file);
-}
-
-const char *Rectangle2D::sprint()
-{
-	sprintf(buf_sprint, "[(%g, %g) (%g, %g) (%g, %g) (%g, %g)]",
-	      		P0.x, P0.y,
-			P1.x, P1.y,
-			P2.x, P2.y,
-			P3.x, P3.y);
-
-	return buf_sprint;
+	P1.set(0, P1.get(0) + r.w);
+	P2.set(0, P2.get(0) + r.w);
+	P2.set(1, P2.get(1) + r.h);
+	P3.set(1, P3.get(1) + r.h);
 }
 
 void Rectangle2D::draw(Image *image, Color color)
 {
-	image->drawLine((int)P0.x, (int)P0.y, (int)P1.x, (int)P1.y, color);
-	image->drawLine((int)P1.x, (int)P1.y, (int)P2.x, (int)P2.y, color);
-	image->drawLine((int)P2.x, (int)P2.y, (int)P3.x, (int)P3.y, color);
-	image->drawLine((int)P3.x, (int)P3.y, (int)P0.x, (int)P0.y, color);
+	image->drawLine((int)P0.get(0), (int)P0.get(1), (int)P1.get(0), (int)P1.get(1), color);
+	image->drawLine((int)P1.get(0), (int)P1.get(1), (int)P2.get(0), (int)P2.get(1), color);
+	image->drawLine((int)P2.get(0), (int)P2.get(1), (int)P3.get(0), (int)P3.get(1), color);
+	image->drawLine((int)P3.get(0), (int)P3.get(1), (int)P0.get(0), (int)P0.get(1), color);
 }
 
 #ifdef HAVE_X11
@@ -173,43 +146,31 @@ void Rectangle2D::fixI()
 	P3.fixI();
 }
 
-Rectangle2D Rectangle2D::operator+(Vector2D v)
+Rectangle2D Rectangle2D::operator+(const Vector2D& v)
 {
-	Rectangle2D R;
-
-	R.P0 = P0 + v;
-	R.P1 = P1 + v;
-	R.P2 = P2 + v;
-	R.P3 = P3 + v;
-
-	return R;
+	return Rectangle2D(	P0 + v,
+				P1 + v,
+				P2 + v,
+				P3 + v);
 }
 
-Rectangle2D Rectangle2D::operator-(Vector2D v)
+Rectangle2D Rectangle2D::operator-(const Vector2D& v)
 {
-	Rectangle2D R;
-
-	R.P0 = P0 - v;
-	R.P1 = P1 - v;
-	R.P2 = P2 - v;
-	R.P3 = P3 - v;
-
-	return R;
+	return Rectangle2D(	P0 - v,
+				P1 - v,
+				P2 - v,
+				P3 - v);
 }
 
-Rectangle2D operator*(Rectangle2D rs, Matrix2D m)
+Rectangle2D operator*(const Rectangle2D& rs, const Matrix2D& m)
 {
-	Rectangle2D rd;
-
-	rd.P0 = rs.P0 * m;
-	rd.P1 = rs.P1 * m;
-	rd.P2 = rs.P2 * m;
-	rd.P3 = rs.P3 * m;
-
-	return rd;
+	return Rectangle2D(	rs.P0 * m,
+				rs.P1 * m,
+				rs.P2 * m,
+				rs.P3 * m);
 }
 
-bool isInRect(int x_, int y_, sRect2D r_)
+bool isInRect(int x_, int y_, const sRect2D& r_)
 {
    	if((x_ >= r_.x) && (x_ <= r_.x+r_.w) && (y_ >= r_.y) && (y_ <= r_.y+r_.h)) return true;
 

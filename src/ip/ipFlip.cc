@@ -7,15 +7,17 @@ namespace Torch {
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-ipFlip::ipFlip() : ipCore() 
-{ 
-	m_vert = true;
+ipFlip::ipFlip() : ipCore()
+{
+	addBOption("vertical", false, "direction of the flipping (default vertical)");
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-ipFlip::~ipFlip() { }
+ipFlip::~ipFlip()
+{
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type
@@ -23,7 +25,9 @@ ipFlip::~ipFlip() { }
 bool ipFlip::checkInput(const Tensor& input) const
 {
 	// Torch::Image type
-	if (input.getDatatype() != Tensor::Short) {
+	if (input.getDatatype() != Tensor::Short &&
+		input.nDimension() != 3)
+	{
 		return false;
 	}
 
@@ -57,7 +61,7 @@ bool ipFlip::allocateOutput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated)
 
-static int getMirror(int val, int max) 
+static int getMirror(int val, int max)
 {
 	return (max - val);
 }
@@ -69,6 +73,8 @@ static int getNormal(int val, int max)
 
 bool ipFlip::processInput(const Tensor& input)
 {
+	const bool vertical = getBOption("vertical");
+
 	// downcast to "image" and note down size and type
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
@@ -77,20 +83,23 @@ bool ipFlip::processInput(const Tensor& input)
 	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
 	short* dst = t_output->t->storage->data + t_output->t->storageOffset;
 
-	// the indexing of the data 
+	// the indexing of the data
 	const int stride_h = t_input->t->stride[0];        // height
 	const int stride_w = t_input->t->stride[1];        // width
 	const int in_x_max = input.size(0);
 	const int in_y_max = input.size(1);
 
 	// difference between 2d and 3d
-	int stride_p;        
+	int stride_p;
 	int n_planes;
-	if (3 == t_input->nDimension()) {
-		stride_p = t_input->t->stride[2];      
+	if (3 == t_input->nDimension())
+	{
+		stride_p = t_input->t->stride[2];
 		n_planes = input.size(2);
-	} else {
-		stride_p = 0;        
+	}
+	else
+	{
+		stride_p = 0;
 		n_planes = 1;
 	}
 
@@ -99,11 +108,14 @@ bool ipFlip::processInput(const Tensor& input)
 	int (* fp_x) (int, int);
 	int (* fp_y) (int, int);
 
-	if (true == m_vert) {
+	if (vertical == true)
+	{
 		// flip over horizontal axis
 		fp_x = getNormal;
 		fp_y = getMirror;
-	} else {
+	}
+	else
+	{
 		// flip over vertical axis
 		fp_x = getMirror;
 		fp_y = getNormal;
@@ -111,7 +123,7 @@ bool ipFlip::processInput(const Tensor& input)
 
 
 	// main algorithm
-	for (int p = 0; p < n_planes; ++p) { 
+	for (int p = 0; p < n_planes; ++p) {
 
 		for (int in_x = 0; in_x < in_x_max; ++in_x) {
 
@@ -120,7 +132,7 @@ bool ipFlip::processInput(const Tensor& input)
 				// normal
 				int in_index = in_x * stride_h + in_y * stride_w + p * stride_p;
 
-				// flip 
+				// flip
 				int out_x = fp_x(in_x, in_x_max - 1);
 				int out_y = fp_y(in_y, in_y_max - 1);
 				int out_index = out_x * stride_h + out_y * stride_w + p * stride_p;
@@ -132,22 +144,6 @@ bool ipFlip::processInput(const Tensor& input)
 
 	// OK
 	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Indicate that we want to do a vertical flip 
-
-void ipFlip::setFlipVer() 
-{
-	m_vert = true;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Indicate that we want to do a horizontal flip 
-
-void ipFlip::setFlipHor() 
-{
-	m_vert = false;
 }
 
 /////////////////////////////////////////////////////////////////////////

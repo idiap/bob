@@ -1,33 +1,31 @@
-#ifndef _TORCHVISION_IP_CROP_H_
-#define _TORCHVISION_IP_CROP_H_
+#ifndef _TORCHVISION_IP_SHIFT_H_
+#define _TORCHVISION_IP_SHIFT_H_
 
-#include "ipCore.h"		// <ipCrop> is a <Torch::ipCore>
+#include "ipCore.h"		// <ipShift> is a <Torch::ipCore>
 
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipCrop
-	//	This class is designed to crop an image.
-	//	The result is a tensor of the same storage type.
+	// Torch::ipShift
+	//	This class is designed to shift an image.
+	//	The result is a tensor of the same storage type and the same size.
 	//
 	//	- PARAMETERS (name, type, default value, description):
-	//		"x"	int	0	"Ox coordinate of the top left corner of the cropping area"
-	//		"y"	int	0	"Oy coordinate of the top left corner of the cropping area"
-	//		"w"	int	0	"desired width of the cropped image"
-	//		"h"	int	0	"desired height of the cropped image"
+	//		"shiftx"	int	0	"variation on Ox axis"
+	//		"shifty"	int	0	"variation on Oy axis"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ipCrop : public ipCore
+	class ipShift : public ipCore
 	{
 	public:
 
 		// Constructor
-		ipCrop();
+		ipShift();
 
 		// Destructor
-		virtual ~ipCrop();
+		virtual ~ipShift();
 
 	protected:
 

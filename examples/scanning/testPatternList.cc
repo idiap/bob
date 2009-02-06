@@ -1,6 +1,6 @@
 #include "Pattern.h"
 #include "general.h"
-#include <cassert>
+#include <cCHECK_FATAL>
 #include <cstdlib>
 
 using namespace Torch;
@@ -26,10 +26,10 @@ void buildPattern(Pattern& pattern, int p)
 
 void checkPattern(const Pattern& pattern, int p)
 {
-	assert(pattern.m_x == p);
-	assert(pattern.m_y == p + 1);
-	assert(pattern.m_w == 2 * p + 3);
-	assert(pattern.m_h == p + 4);
+	CHECK_FATAL(pattern.m_x == p);
+	CHECK_FATAL(pattern.m_y == p + 1);
+	CHECK_FATAL(pattern.m_w == 2 * p + 3);
+	CHECK_FATAL(pattern.m_h == p + 4);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -42,8 +42,8 @@ int main()
 	const int n_patts_per_test = 1000000;
 
 	PatternList pattlist;
-	assert(pattlist.size() == 0);
-	assert(pattlist.isEmpty() == true);
+	CHECK_FATAL(pattlist.size() == 0);
+	CHECK_FATAL(pattlist.isEmpty() == true);
 
 	Pattern pattern;
 
@@ -54,8 +54,8 @@ int main()
 	{
 		// Invalidate any patterns already stored
 		pattlist.clear();
-		assert(pattlist.size() == 0);
-		assert(pattlist.isEmpty() == true);
+		CHECK_FATAL(pattlist.size() == 0);
+		CHECK_FATAL(pattlist.isEmpty() == true);
 
 		// Add some patterns (and check they are actually added)
 		for (int p = 0; p < n_patts_per_test; p ++)
@@ -63,10 +63,10 @@ int main()
 			buildPattern(pattern, p);
 			checkPattern(pattlist.add(pattern), p);
 		}
-		assert(pattlist.size() == n_patts_per_test);
+		CHECK_FATAL(pattlist.size() == n_patts_per_test);
 
 		// Now retrieve them and check that we have the same patterns
-		assert(pattlist.isEmpty() == false);
+		CHECK_FATAL(pattlist.isEmpty() == false);
 		if (pattlist.isEmpty() == false)
 		{
 			for (int p = 0; p < n_patts_per_test; p ++)
@@ -74,7 +74,7 @@ int main()
 				checkPattern(pattlist.get(p), p);
 			}
 
-			assert(pattlist.size() == n_patts_per_test);
+			CHECK_FATAL(pattlist.size() == n_patts_per_test);
 		}
 
 		print("\tPASSED add/get: [%d/%d]\r", t + 1, n_tests);

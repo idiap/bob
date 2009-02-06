@@ -2,7 +2,7 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 #include "Machines.h"
-#include <cassert>
+#include <cCHECK_FATAL>
 
 using namespace Torch;
 
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
                 }
                 print("Cascade [%s]: width = %d, height = %d\n",
                         model_filenames[i], cascade->getModelWidth(), cascade->getModelHeight());
-                assert(image.resize(cascade->getModelWidth(), cascade->getModelHeight(), 1) == true);
+                CHECK_FATAL(image.resize(cascade->getModelWidth(), cascade->getModelHeight(), 1) == true);
 
                 // Load the bindata header
                 File file;

@@ -6,98 +6,104 @@
 namespace Torch {
 
 //------------------------------------------------------------------
-// IO streams
-//------------------------------------------------------------------
+// Constructors
 
-// Write output Point2D
-void Point2D::saveFile(File *file)
+Point2D::Point2D() : DoubleTensor(2)
 {
-	file->write(&x, sizeof(double), 1);
-	file->write(&y, sizeof(double), 1);
+	fill(0.0);
 }
 
-// Read input Point2D format
-void Point2D::loadFile(File *file)
+Point2D::Point2D(int a) : DoubleTensor(2)
 {
-	file->read(&x, sizeof(double), 1);
-	file->read(&y, sizeof(double), 1);
+	fill(a);
 }
 
-const char * Point2D::sprint()
+Point2D::Point2D(double a) : DoubleTensor(2)
 {
-	sprintf(buf_sprint, "(%g, %g)", x, y);
+	fill(a);
+}
 
-	return buf_sprint;
+Point2D::Point2D(int a, int b) : DoubleTensor(2)
+{
+	set(0, a);
+	set(1, b);
+}
+
+Point2D::Point2D(double a, double b) : DoubleTensor(2)
+{
+	set(0, a);
+	set(1, b);
+}
+
+Point2D::Point2D(const sPoint2D& p) : DoubleTensor(2)
+{
+	set(0, p.x);
+	set(1, p.y);
+}
+
+Point2D::Point2D(const sPoint2D* p) : DoubleTensor(2)
+{
+	set(0, p->x);
+	set(1, p->y);
 }
 
 void Point2D::draw(Image *image, Color color)
 {
-   	image->drawPixel((int) x, (int) y, color);
+   	image->drawPixel((int) get(0), (int) get(1), color);
 }
 
 //------------------------------------------------------------------
 // Comparison
 //------------------------------------------------------------------
 
-int Point2D::operator==(Point2D Q)
+int Point2D::operator==(const Point2D& Q)
 {
-	return (x==Q.x && y==Q.y);
+	return (get(0)==Q.get(0) && get(1)==Q.get(1));
 }
 
-int Point2D::operator!=(Point2D Q)
+int Point2D::operator!=(const Point2D& Q)
 {
-	return (x!=Q.x || y!=Q.y);
+	return (get(0)!=Q.get(0) || get(1)!=Q.get(1));
 }
 
-sPoint2D Point2D::get()
+sPoint2D Point2D::getPoint()
 {
-	sPoint2D sp;
-
-	sp.x = x;
-	sp.y = y;
-
-	return sp;
+	return sPoint2D(get(0), get(1));
 }
 
 //------------------------------------------------------------------
 // Point2D Vector Operations
 //------------------------------------------------------------------
 
-Vector2D Point2D::operator-(Point2D Q)        // Vector diff of Points
+Vector2D Point2D::operator-(const Point2D& Q)        // Vector diff of Points
 {
-	Vector2D v;
-	v.x = x - Q.x;
-	v.y = y - Q.y;
-	return v;
+	return Vector2D(get(0) - Q.get(0),
+			get(1) - Q.get(1));
 }
 
-Point2D Point2D::operator+(Vector2D v)        // +ve translation
+Point2D Point2D::operator+(const Vector2D& v)        // +ve translation
 {
-	Point2D P;
-	P.x = x + v.x;
-	P.y = y + v.y;
-	return P;
+	return Vector2D(get(0) + v.get(0),
+			get(1) + v.get(1));
 }
 
-Point2D Point2D::operator-(Vector2D v)        // -ve translation
+Point2D Point2D::operator-(const Vector2D& v)        // -ve translation
 {
-	Point2D P;
-	P.x = x - v.x;
-	P.y = y - v.y;
-	return P;
+	return Vector2D(get(0) - v.get(0),
+			get(1) - v.get(1));
 }
 
-Point2D& Point2D::operator+=(Vector2D v)        // +ve translation
+Point2D& Point2D::operator+=(const Vector2D& v)        // +ve translation
 {
-	x += v.x;
-	y += v.y;
+	set(0, get(0) + v.get(0));
+	set(1, get(1) + v.get(1));
 	return *this;
 }
 
-Point2D& Point2D::operator-=(Vector2D v)        // -ve translation
+Point2D& Point2D::operator-=(const Vector2D& v)        // -ve translation
 {
-	x -= v.x;
-	y -= v.y;
+	set(0, get(0) - v.get(0));
+	set(1, get(1) - v.get(1));
 	return *this;
 }
 
@@ -110,52 +116,40 @@ Point2D& Point2D::operator-=(Vector2D v)        // -ve translation
 //        The programmer must enforce this (if they want to).
 //------------------------------------------------------------------
 
-Point2D operator*(int c, Point2D Q)
+Point2D operator*(int c, const Point2D& Q)
 {
-	Point2D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	return P;
+	return Point2D(	c * Q.get(0),
+			c * Q.get(1));
 }
 
-Point2D operator*(double c, Point2D Q)
+Point2D operator*(double c, const Point2D& Q)
 {
-	Point2D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	return P;
+	return Point2D(	c * Q.get(0),
+			c * Q.get(1));
 }
 
-Point2D operator*(Point2D Q, int c)
+Point2D operator*(const Point2D& Q, int c)
 {
-	Point2D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	return P;
+	return Point2D(	c * Q.get(0),
+			c * Q.get(1));
 }
 
-Point2D operator*(Point2D Q, double c)
+Point2D operator*(const Point2D& Q, double c)
 {
-	Point2D P;
-	P.x = c * Q.x;
-	P.y = c * Q.y;
-	return P;
+	return Point2D(	c * Q.get(0),
+			c * Q.get(1));
 }
 
-Point2D operator/(Point2D Q, int c)
+Point2D operator/(const Point2D& Q, int c)
 {
-	Point2D P;
-	P.x = Q.x / c;
-	P.y = Q.y / c;
-	return P;
+	return Point2D(	Q.get(0) / c,
+			Q.get(1) / c);
 }
 
-Point2D operator/(Point2D Q, double c)
+Point2D operator/(const Point2D& Q, double c)
 {
-	Point2D P;
-	P.x = Q.x / c;
-	P.y = Q.y / c;
-	return P;
+	return Point2D(	Q.get(0) / c,
+			Q.get(1) / c);
 }
 
 //------------------------------------------------------------------
@@ -164,22 +158,16 @@ Point2D operator/(Point2D Q, double c)
 //    The programmer must enforce this (if they want to).
 //------------------------------------------------------------------
 
-Point2D operator+(Point2D Q, Point2D R)
+Point2D operator+(const Point2D& Q, const Point2D& R)
 {
-	Point2D P;
-	P.x = Q.x + R.x;
-	P.y = Q.y + R.y;
-	return P;
+	return Point2D(	Q.get(0) + R.get(0),
+			Q.get(1) + R.get(1));
 }
 
-Point2D operator*(Point2D x, Matrix2D m)
+Point2D operator*(const Point2D& x, const Matrix2D& m)
 {
-	Point2D w;
-
-	w.x = m.ptr[0][0] * x.x + m.ptr[1][0] * x.y;
-	w.y = m.ptr[0][1] * x.x + m.ptr[1][1] * x.y;
-
-	return w;
+	return Point2D(	m.get(0, 0) * x.get(0) + m.get(1, 0) * x.get(1),
+			m.get(0, 1) * x.get(0) + m.get(1, 1) * x.get(1));
 }
 
 
@@ -189,7 +177,7 @@ Point2D operator*(Point2D x, Matrix2D m)
 // Tests if coeffs add to 1.
 //------------------------------------------------------------------
 
-Point2D asum(int n, int *c, Point2D *Q)
+Point2D asum(int n, int *c, const Point2D *Q)
 {
 	int        cs = 0;
 	Point2D      P;
@@ -203,13 +191,13 @@ Point2D asum(int n, int *c, Point2D *Q)
 
 	for (int i=0; i<n; i++)
 	{
-		P.x += c[i] * Q[i].x;
-		P.y += c[i] * Q[i].y;
+		P.set(0, P.get(0) + c[i] * Q[i].get(0));
+		P.set(1, P.get(1) + c[i] * Q[i].get(1));
 	}
 	return P;
 }
 
-Point2D asum(int n, double *c, Point2D *Q)
+Point2D asum(int n, double *c, const Point2D *Q)
 {
 	double     cs = 0.0;
 	Point2D      P;
@@ -223,8 +211,8 @@ Point2D asum(int n, double *c, Point2D *Q)
 
 	for (int i=0; i<n; i++)
 	{
-		P.x += c[i] * Q[i].x;
-		P.y += c[i] * Q[i].y;
+		P.set(0, P.get(0) + c[i] * Q[i].get(0));
+		P.set(1, P.get(1) + c[i] * Q[i].get(1));
 	}
 	return P;
 }
@@ -233,17 +221,17 @@ Point2D asum(int n, double *c, Point2D *Q)
 // Distance between Points
 //------------------------------------------------------------------
 
-double d(Point2D P, Point2D Q)
+double d(const Point2D& P, const Point2D& Q)
 {      // Euclidean distance
-	double dx = P.x - Q.x;
-	double dy = P.y - Q.y;
+	const double dx = P.get(0) - Q.get(0);
+	const double dy = P.get(1) - Q.get(1);
 	return sqrt(dx*dx + dy*dy);
 }
 
-double d2(Point2D P, Point2D Q)
+double d2(const Point2D& P, const Point2D& Q)
 {     // squared distance (more efficient)
-	double dx = P.x - Q.x;
-	double dy = P.y - Q.y;
+	const double dx = P.get(0) - Q.get(0);
+	const double dy = P.get(1) - Q.get(1);
 	return (dx*dx + dy*dy);
 }
 
@@ -252,9 +240,10 @@ double d2(Point2D P, Point2D Q)
 //        - makes sense in 2D only
 //------------------------------------------------------------------
 
-double Point2D::isLeft(Point2D P1, Point2D P2)
+double Point2D::isLeft(const Point2D& P1, const Point2D& P2)
 {
-	return ((P1.x - x) * (P2.y - y) - (P2.x - x) * (P1.y - y));
+	return 	(P1.get(0) - get(0)) * (P2.get(1) - get(1)) -
+		(P2.get(0) - get(0)) * (P1.get(1) - get(1));
 }
 
 /** isLeft(): tests if a point is Left|On|Right of an infinite line
@@ -268,19 +257,20 @@ double Point2D::isLeft(Point2D P1, Point2D P2)
 	@see Point2D::isLeft(Point2D P1, Point2D P2)
 
 */
-int isLeft(Point2D P0, Point2D P1, Point2D P2)
+int isLeft(const Point2D& P0, const Point2D& P1, const Point2D& P2)
 {
-	return (int) ((P1.x - P0.x) * (P2.y - P0.y) - (P2.x - P0.x) * (P1.y - P0.y));
+	return 	(P1.get(0) - P0.get(0)) * (P2.get(1) - P0.get(1)) -
+		(P2.get(0) - P0.get(0)) * (P1.get(1) - P0.get(1));
 }
 
 /** Get the angle (in radian) of a line (P1,P2) with the horizontal axis
 */
-double angle(Point2D P1, Point2D P2)
+double angle(const Point2D& P1, const Point2D& P2)
 {
-   	if(P1.y == P2.y) return 0.0;
+   	if(P1.get(1) == P2.get(1)) return 0.0;
 
-   	double deltax = (P2.x - P1.x);
-	double deltay = (P2.y - P1.y);
+   	double deltax = (P2.get(0) - P1.get(0));
+	double deltay = (P2.get(1) - P1.get(1));
 	double r = sqrt(deltax*deltax + deltay*deltay);
 
 	return M_PI_2 - asin(abs(deltax) / r);
@@ -289,7 +279,7 @@ double angle(Point2D P1, Point2D P2)
 
 /** Get the angle (in radian) of 2 lines (P0,P1) and (P0,P2)
 */
-double angle(Point2D P0, Point2D P1, Point2D P2)
+double angle(const Point2D& P0, const Point2D& P1, const Point2D& P2)
 {
 	double alpha = d(P0, P1);
 	double beta = d(P1, P2);
@@ -305,18 +295,15 @@ double angle(Point2D P0, Point2D P1, Point2D P2)
               =0 for none (degenerate)
               <0 for clockwise
 */
-int ccw(Point2D V0, Point2D V1, Point2D V2)
+int ccw(const Point2D& V0, const Point2D& V1, const Point2D& V2)
 {
 	return isLeft(V0, V1, V2);
 }
 
 void Point2D::fixI()
 {
-	int X_ = (int) (x + 0.5);
-	int Y_ = (int) (y + 0.5);
-
-	x = X_;
-	y = Y_;
+	set(0, FixI(get(0)));
+	set(1, FixI(get(1)));
 }
 
 }

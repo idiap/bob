@@ -1,6 +1,5 @@
 #include "ipIntegral.h"
 #include "Tensor.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -136,8 +135,8 @@ int main()
 		const int ntests = n_tests[n];
 		for (int t = 0; t < ntests; t ++)
 		{
-			assert(ipii.process(*input) == true);
-			assert(ipii.getNOutputs() == 1);
+			CHECK_FATAL(ipii.process(*input) == true);
+			CHECK_FATAL(ipii.getNOutputs() == 1);
 
 			if (n == 0)
 			{

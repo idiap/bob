@@ -11,7 +11,6 @@ SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipSubWindow.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/DataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/MemoryDataSet.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/FileBinDataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Trainer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Machine.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Tensor.cc"

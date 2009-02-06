@@ -11,6 +11,8 @@ ipScaleYX::ipScaleYX()
 		m_buffer(0),
 		m_buffer_size(0)
 {
+	addIOption("width", 0, "width of the scaled tensor");
+	addIOption("height", 0,	"height of the scaled tensor");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -19,55 +21,6 @@ ipScaleYX::ipScaleYX()
 ipScaleYX::~ipScaleYX()
 {
 	delete[] m_buffer;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Change the output image size
-
-bool ipScaleYX::setOutputSize(const sSize& new_size)
-{
-	if (new_size.w > 0 && new_size.h > 0)
-	{
-		if (	m_outputSize.w != new_size.w ||
-			m_outputSize.h != new_size.h)
-		{
-			// Delete the old tensors (if any)
-			cleanup();
-			m_outputSize = new_size;
-		}
-		return true;
-	}
-	return false;
-}
-
-bool ipScaleYX::setOutputSize(int new_w, int new_h)
-{
-	if (new_w > 0 && new_h > 0)
-	{
-		if (	m_outputSize.w != new_w ||
-			m_outputSize.h != new_h)
-		{
-			// Delete the old tensors (if any)
-			cleanup();
-			m_outputSize.w = new_w;
-			m_outputSize.h = new_h;
-		}
-		return true;
-	}
-	return false;
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Retrieve the input image size
-
-int ipScaleYX::getOutputWidth() const
-{
-	return m_outputSize.w;
-}
-
-int ipScaleYX::getOutputHeight() const
-{
-	return m_outputSize.h;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -91,10 +44,13 @@ bool ipScaleYX::checkInput(const Tensor& input) const
 
 bool ipScaleYX::allocateOutput(const Tensor& input)
 {
+	const int out_width = getIOption("width");
+	const int out_height = getIOption("height");
+
 	if (	m_output == 0 ||
 		m_output[0]->nDimension() != 3 ||
-		m_output[0]->size(0) != input.size(0) ||
-		m_output[0]->size(1) != input.size(1) ||
+		m_output[0]->size(0) != out_height ||
+		m_output[0]->size(1) != out_width ||
 		m_output[0]->size(2) != input.size(2))
 	{
 		cleanup();
@@ -102,7 +58,7 @@ bool ipScaleYX::allocateOutput(const Tensor& input)
 		// Need allocation
 		m_n_outputs = 1;
 		m_output = new Tensor*[m_n_outputs];
-		m_output[0] = new ShortTensor(m_outputSize.h, m_outputSize.w, input.size(2));
+		m_output[0] = new ShortTensor(out_height, out_width, input.size(2));
 		return true;
 	}
 
@@ -114,6 +70,9 @@ bool ipScaleYX::allocateOutput(const Tensor& input)
 
 bool ipScaleYX::processInput(const Tensor& input)
 {
+	const int out_width = getIOption("width");
+	const int out_height = getIOption("height");
+
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
@@ -122,21 +81,17 @@ bool ipScaleYX::processInput(const Tensor& input)
 	short* dst = t_output->t->storage->data + t_output->t->storageOffset;
 
 	// Prepare the input/output dimensions
+	const int in_height = input.size(0);
+	const int in_width = input.size(1);
+	const int n_planes = input.size(2);
+
 	const int in_stride_h = t_input->t->stride[0];	// height
 	const int in_stride_w = t_input->t->stride[1];	// width
 	const int in_stride_p = t_input->t->stride[2];	// no planes
 
-	const int in_width = input.size(1);
-	const int in_height = input.size(0);
-
 	const int out_stride_h = t_output->t->stride[0];	// height
 	const int out_stride_w = t_output->t->stride[1];	// width
 	const int out_stride_p = t_output->t->stride[2];	// no planes
-
-	const int out_width = m_outputSize.w;
-	const int out_height = m_outputSize.h;
-
-	const int n_planes = input.size(2);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
@@ -172,7 +127,7 @@ bool ipScaleYX::processInput(const Tensor& input)
 
 	// TODO: need coments here (for every step of the algorithm)!
 	// What is the name of this algorithm, a website, some pseudo-code and online explanations?!!
-	// Scale image, firt scale the Oy axes, then Ox one
+	// Scale image, first scale the Oy axis, then Ox one
 
 	const float x_scale_const = (out_width + 0.0f) / (in_width + 0.0f);
 	const float y_scale_const = (out_height + 0.0f) / (in_height + 0.0f);

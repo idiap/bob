@@ -2,7 +2,6 @@
 #include "ipLBP8R.h"
 #include "Image.h"
 #include "xtprobeImageFile.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -17,8 +16,8 @@ int main()
 
 	// Load the image to play with
 	const char* imagefilename = "../data/images/003_1_1.pgm";
-	assert(xtprobe.open(imagefilename, "r") == true);
-	assert(image.loadImage(xtprobe) == true);
+	CHECK_FATAL(xtprobe.open(imagefilename, "r") == true);
+	CHECK_FATAL(image.loadImage(xtprobe) == true);
 	xtprobe.close();
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
@@ -48,10 +47,10 @@ int main()
 		const bool param_uniform = i == 4 || i == 5 || i == 10 || i == 11;
 		const bool param_rot_invariant = i == 3 || i == 5 || i == 9 || i == 11;
 
-		assert(ip_lbp->setBOption("ToAverage", param_avg) == true);
-		assert(ip_lbp->setBOption("AddAvgBit", param_avg_add_bit) == true);
-		assert(ip_lbp->setBOption("Uniform", param_uniform) == true);
-		assert(ip_lbp->setBOption("RotInvariant", param_rot_invariant) == true);
+		CHECK_FATAL(ip_lbp->setBOption("ToAverage", param_avg) == true);
+		CHECK_FATAL(ip_lbp->setBOption("AddAvgBit", param_avg_add_bit) == true);
+		CHECK_FATAL(ip_lbp->setBOption("Uniform", param_uniform) == true);
+		CHECK_FATAL(ip_lbp->setBOption("RotInvariant", param_rot_invariant) == true);
 
 		const int max_lbp = ip_lbp->getMaxLabel();
 		const float inv_max_lbp = 255.0f / (max_lbp + 0.0f);
@@ -63,14 +62,14 @@ int main()
 			max_lbp);
 
 		// Build the lbp image (scale each LBP code to the maximum possible value)
-		assert(lbp_image.resize(image.getWidth(), image.getHeight(), 1) == true);
+		CHECK_FATAL(lbp_image.resize(image.getWidth(), image.getHeight(), 1) == true);
 		for (int x = 1; x < w - 1; x ++)
 			for (int y = 1; y < h - 1; y ++)
 			{
-				assert(ip_lbp->setXY(x, y) == true);
-				assert(ip_lbp->process(image) == true);
-				assert(ip_lbp->getLBP() >= 0);
-				assert(ip_lbp->getLBP() < max_lbp);
+				CHECK_FATAL(ip_lbp->setXY(x, y) == true);
+				CHECK_FATAL(ip_lbp->process(image) == true);
+				CHECK_FATAL(ip_lbp->getLBP() >= 0);
+				CHECK_FATAL(ip_lbp->getLBP() < max_lbp);
 				lbp_image.set(y, x, 0, (short)(inv_max_lbp * ip_lbp->getLBP() + 0.5f));
 			}
 
@@ -78,8 +77,8 @@ int main()
 		char str[200];
 		//sprintf(str, "%s_%s.jpg", imagefilename, str_ip_lbps[i]);
 		sprintf(str, "image_%s.jpg", str_ip_lbps[i]);
-		assert(xtprobe.open(str, "w") == true);
-		assert(lbp_image.saveImage(xtprobe) == true);
+		CHECK_FATAL(xtprobe.open(str, "w") == true);
+		CHECK_FATAL(lbp_image.saveImage(xtprobe) == true);
 		xtprobe.close();
 
 		delete ip_lbp;

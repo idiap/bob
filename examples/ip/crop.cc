@@ -1,7 +1,6 @@
 #include "ipCrop.h"
 #include "Image.h"
 #include "xtprobeImageFile.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -16,8 +15,8 @@ int main()
 
 	// Load the image to play with
 	const char* imagefilename = "../data/images/1001_f_g1_s01_1001_en_1.jpeg";
-	assert(xtprobe.open(imagefilename, "r") == true);
-	assert(image.loadImage(xtprobe) == true);
+	CHECK_FATAL(xtprobe.open(imagefilename, "r") == true);
+	CHECK_FATAL(image.loadImage(xtprobe) == true);
 	xtprobe.close();
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
@@ -38,20 +37,23 @@ int main()
 		// Crop the area
 		print("[%d/%d]: cropping [%d, %d, %d, %d] area ...\n",
 			t + 1, n_tests, crop_x, crop_y, crop_w, crop_h);
-		assert(cropper.setCropArea(crop_x, crop_y, crop_w, crop_h) == true);
-		assert(cropper.process(image) == true);
-		assert(cropper.getNOutputs() == 1);
+		CHECK_FATAL(cropper.setIOption("x", crop_x) == true);
+		CHECK_FATAL(cropper.setIOption("y", crop_y) == true);
+		CHECK_FATAL(cropper.setIOption("w", crop_w) == true);
+		CHECK_FATAL(cropper.setIOption("h", crop_h) == true);
+		CHECK_FATAL(cropper.process(image) == true);
+		CHECK_FATAL(cropper.getNOutputs() == 1);
 
 		// Save it to some file
 		crop_image.resize(crop_w, crop_h, image.getNPlanes());
-		assert(crop_image.getWidth() == crop_w);
-		assert(crop_image.getHeight() == crop_h);
-		assert(crop_image.copyFrom(cropper.getOutput(0)) == true);
+		CHECK_FATAL(crop_image.getWidth() == crop_w);
+		CHECK_FATAL(crop_image.getHeight() == crop_h);
+		CHECK_FATAL(crop_image.copyFrom(cropper.getOutput(0)) == true);
 
 		char str[200];
 		sprintf(str, "crop_%d_%d_%d_%d.jpg", crop_x, crop_y, crop_w, crop_h);
-		assert(xtprobe.open(str, "w") == true);
-		assert(crop_image.saveImage(xtprobe) == true);
+		CHECK_FATAL(xtprobe.open(str, "w") == true);
+		CHECK_FATAL(crop_image.saveImage(xtprobe) == true);
 		xtprobe.close();
 	}
 

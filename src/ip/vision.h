@@ -55,6 +55,10 @@ struct sPixYUV
 */
 struct sPoint2D
 {
+	sPoint2D(double x_ = 0, double y_ = 0) : x(x_), y(y_)
+	{
+	}
+
 	double x, y;
 };
 

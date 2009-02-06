@@ -2,7 +2,6 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 #include "CmdLine.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -30,8 +29,8 @@ int main(int argc, char* argv[])
 	case 0:	// Image
 		{
 			xtprobeImageFile xtprobe;
-			assert(xtprobe.open(image_filename, "r") == true);
-			assert(image.loadImage(xtprobe) == true);
+			CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
+			CHECK_FATAL(image.loadImage(xtprobe) == true);
 			xtprobe.close();
 		}
 		break;
@@ -43,7 +42,7 @@ int main(int argc, char* argv[])
 			const int px = rand() % 256;
 			print("Generating a homogenous image with pixel value = %d, \n", px);
 
-			assert(image.resize(32, 32, 1) == true);
+			CHECK_FATAL(image.resize(32, 32, 1) == true);
 			image.fill(px);
 		}
 		break;
@@ -55,9 +54,9 @@ int main(int argc, char* argv[])
 
 	// Process the image and get the results
 	ipHisto ip_histo;
-	assert(ip_histo.process(image) == true);
-	assert(ip_histo.getNOutputs() == 1);
-	assert(ip_histo.getOutput(0).getDatatype() == Tensor::Int);
+	CHECK_FATAL(ip_histo.process(image) == true);
+	CHECK_FATAL(ip_histo.getNOutputs() == 1);
+	CHECK_FATAL(ip_histo.getOutput(0).getDatatype() == Tensor::Int);
 	const IntTensor& out_histo = (const IntTensor&) ip_histo.getOutput(0);
 
 	// Print the histogram
@@ -92,7 +91,7 @@ int main(int argc, char* argv[])
 			sum_histo += out_histo.get(i, p);
 		}
 	}
-	assert(sum_histo == n_pixels);
+	CHECK_FATAL(sum_histo == n_pixels);
 
 	print("\nOK\n");
 

@@ -9,7 +9,7 @@ Circle2D::Circle2D()
 	V = NULL;
 }
 
-Circle2D::Circle2D(sPoint2D center_, double radius_)
+Circle2D::Circle2D(const sPoint2D& center_, double radius_)
 {
 	double step = 0.5;
 
@@ -25,15 +25,15 @@ Circle2D::Circle2D(sPoint2D center_, double radius_)
 
 	int i = 0;
 
-	V[i++].reset(center.x + radius, center.y);
+	V[i++].reset(center.get(0) + radius, center.get(1));
 	d_angle += step;
 
 	r_angle = degree2radian(d_angle);
-	V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+	V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 	while(d_angle <= 360.0)
 	{
 		r_angle = degree2radian(d_angle);
-		V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+		V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 		d_angle += step;
 	}
 }
@@ -47,28 +47,27 @@ Circle2D::Circle2D(int xc_, int yc_, double radius_)
 
 	//
 	radius = radius_;
-	center.x = center.x;
-	center.y = center.y;
+	center.reset(xc_, yc_);
 
 	double d_angle = 0.0;
 	double r_angle;
 
 	int i = 0;
 
-	V[i++].reset(center.x + radius, center.y);
+	V[i++].reset(center.get(0) + radius, center.get(1));
 	d_angle += step;
 
 	r_angle = degree2radian(d_angle);
-	V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+	V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 	while(d_angle <= 360.0)
 	{
 		r_angle = degree2radian(d_angle);
-		V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+		V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 		d_angle += step;
 	}
 }
 
-void Circle2D::reset(sPoint2D center_, double radius_)
+void Circle2D::reset(const sPoint2D& center_, double radius_)
 {
 	double step = 0.5;
 
@@ -85,15 +84,15 @@ void Circle2D::reset(sPoint2D center_, double radius_)
 
 	int i = 0;
 
-	V[i++].reset(center.x + radius, center.y);
+	V[i++].reset(center.get(0) + radius, center.get(1));
 	d_angle += step;
 
 	r_angle = degree2radian(d_angle);
-	V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+	V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 	while(d_angle <= 360.0)
 	{
 		r_angle = degree2radian(d_angle);
-		V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+		V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 		d_angle += step;
 	}
 }
@@ -108,23 +107,22 @@ void Circle2D::reset(int xc_, int yc_, double radius_)
 
 	//
 	radius = radius_;
-	center.x = xc_;
-	center.y = yc_;
+	center.reset(xc_, yc_);
 
 	double d_angle = 0.0;
 	double r_angle;
 
 	int i = 0;
 
-	V[i++].reset(center.x + radius, center.y);
+	V[i++].reset(center.get(0) + radius, center.get(1));
 	d_angle += step;
 
 	r_angle = degree2radian(d_angle);
-	V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+	V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 	while(d_angle <= 360.0)
 	{
 		r_angle = degree2radian(d_angle);
-		V[i++].reset(center.x + radius * cos(r_angle), center.y + radius * sin(r_angle));
+		V[i++].reset(center.get(0) + radius * cos(r_angle), center.get(1) + radius * sin(r_angle));
 		d_angle += step;
 	}
 }
@@ -134,40 +132,11 @@ Circle2D::~Circle2D()
 	if(V != NULL) delete [] V;
 }
 
-void Circle2D::saveFile(File *file)
-{
-   	file->write(&n, sizeof(int), 1);
-	for(int i = 0 ; i < n ; i++) V[i].saveFile(file);
-}
-
-void Circle2D::loadFile(File *file)
-{
-   	file->read(&n, sizeof(int), 1);
-
-	for(int i = 0 ; i < n ; i++) V[i].loadFile(file);
-}
-
-const char *Circle2D::sprint()
-{
-   	char str_[250];
-
-	strcpy(buf_sprint, "{ ");
-
-	for(int i = 0 ; i < n ; i++)
-	{
-		sprintf(str_, "(%g, %g) " , V[i].x, V[i].y);
-		strcat(buf_sprint, str_);
-	}
-
-	strcat(buf_sprint, "}");
-
-	return buf_sprint;
-}
-
 void Circle2D::draw(Image *image, Color color)
 {
    	for(int i = 0 ; i < n-1 ; i++)
-		image->drawLine((int)V[i].x, (int)V[i].y, (int)V[i+1].x, (int)V[i+1].y, color);
+		image->drawLine((int)V[i].get(0), (int)V[i].get(1),
+				(int)V[i+1].get(0), (int)V[i+1].get(1), color);
 }
 
 #ifdef HAVE_X11
@@ -210,22 +179,22 @@ void Circle2D::xdraw(Display *pDisplay, Pixmap pixmap, GC gc, unsigned long colo
 	@author softSurfer (www.softsurfer.com)
 	@see http://geometryalgorithms.com/Archive/algorithm_0103/algorithm_0103.htm
  */
-int Circle2D::wn_PnPoly(Point2D P_)
+int Circle2D::wn_PnPoly(const Point2D& P_)
 {
 	int wn = 0;    // the winding number counter
 
 	// loop through all edges of the polygon
 	for (int i=0; i<n; i++)
 	{ // edge from V[i] to V[i+1]
-		if (V[i].y <= P_.y)
+		if (V[i].get(1) <= P_.get(1))
 		{ // start y <= P.y
-			if (V[i+1].y > P_.y)      // an upward crossing
+			if (V[i+1].get(1) > P_.get(1))      // an upward crossing
 				if (isLeft(V[i], V[i+1], P_) > 0)  // P left of edge
 					++wn;            // have a valid up intersect
 		}
 		else
 		{ // start y > P.y (no test needed)
-			if (V[i+1].y <= P_.y)     // a downward crossing
+			if (V[i+1].get(1) <= P_.get(1))     // a downward crossing
 				if (isLeft(V[i], V[i+1], P_) < 0)  // P right of edge
 					--wn;            // have a valid down intersect
 		}

@@ -1,14 +1,14 @@
 #include "ipScaleYX.h"
 #include "Image.h"
 #include "xtprobeImageFile.h"
-#include <cassert>
 
 using namespace Torch;
 
 ///////////////////////////////////////////////////////////////////////////
 // Main
 ///////////////////////////////////////////////////////////////////////////
-int main()
+
+int main(int argc, char* argv[])
 {
 	xtprobeImageFile xtprobe;
 	Image image(1, 1, 3);
@@ -16,8 +16,8 @@ int main()
 
 	// Load the image to play with
 	const char* imagefilename = "../data/images/1001_f_g1_s01_1001_en_1.jpeg";
-	assert(xtprobe.open(imagefilename, "r") == true);
-	assert(image.loadImage(xtprobe) == true);
+	CHECK_FATAL(xtprobe.open(imagefilename, "r") == true);
+	CHECK_FATAL(image.loadImage(xtprobe) == true);
 	xtprobe.close();
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
@@ -36,20 +36,21 @@ int main()
 		// Scale to this size
 		print("[%d/%d]: scaling [%d x %d] => [%d, %d] ...\n",
 			t + 1, n_tests, image.getWidth(), image.getHeight(), scale_w, scale_h);
-		assert(scaler.setOutputSize(scale_w, scale_h) == true);
-		assert(scaler.process(image) == true);
-		assert(scaler.getNOutputs() == 1);
+		CHECK_FATAL(scaler.setIOption("width", scale_w) == true);
+		CHECK_FATAL(scaler.setIOption("height", scale_h) == true);
+		CHECK_FATAL(scaler.process(image) == true);
+		CHECK_FATAL(scaler.getNOutputs() == 1);
 
 		// Save it to some file
 		scale_image.resize(scale_w, scale_h, image.getNPlanes());
-		assert(scale_image.getWidth() == scale_w);
-		assert(scale_image.getHeight() == scale_h);
-		assert(scale_image.copyFrom(scaler.getOutput(0)) == true);
+		CHECK_FATAL(scale_image.getWidth() == scale_w);
+		CHECK_FATAL(scale_image.getHeight() == scale_h);
+		CHECK_FATAL(scale_image.copyFrom(scaler.getOutput(0)) == true);
 
 		char str[200];
 		sprintf(str, "scale_%d_%d.jpg", scale_w, scale_h);
-		assert(xtprobe.open(str, "w") == true);
-		assert(scale_image.saveImage(xtprobe) == true);
+		CHECK_FATAL(xtprobe.open(str, "w") == true);
+		CHECK_FATAL(scale_image.saveImage(xtprobe) == true);
 		xtprobe.close();
 	}
 

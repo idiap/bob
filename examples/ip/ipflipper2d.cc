@@ -1,6 +1,4 @@
-#include "ipIntegral.h"
 #include "Tensor.h"
-#include <cassert>
 #include "ipFlip.h"
 
 using namespace Torch;
@@ -27,11 +25,11 @@ int main()
 
 	ipFlip ipflipper;
 
-	ipflipper.setFlipVer();
+	CHECK_FATAL(ipflipper.setBOption("vertical", true) == true);
 	ipflipper.process(st);
 	ipflipper.getOutput(0).print("flipped over vertical");
 
-	ipflipper.setFlipHor();
+	CHECK_FATAL(ipflipper.setBOption("vertical", false) == true);
 	ipflipper.process(st);
 	ipflipper.getOutput(0).print("flipped over horizontal");
 

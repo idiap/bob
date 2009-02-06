@@ -11,6 +11,9 @@ namespace Torch
 	//	This class is designed to crop an image.
 	//	The result is a tensor of the same storage type.
 	//
+	//	- PARAMETERS (name, type, default value, description):
+	//		"vertical"	bool	false	"direction of the flipping (default vertical)"
+	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
@@ -23,11 +26,6 @@ namespace Torch
 
 		// Destructor
 		virtual ~ipFlip();
-
-		// 
-		void setFlipVer();
-
-		void setFlipHor();
 
 	protected:
 
@@ -42,8 +40,10 @@ namespace Torch
 		virtual bool		processInput(const Tensor& input);
 
 		//////////////////////////////////////////////////////////
+
 	private:
-		bool m_vert;
+
+		//
 	};
 }
 

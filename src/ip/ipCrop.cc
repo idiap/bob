@@ -9,6 +9,10 @@ namespace Torch {
 ipCrop::ipCrop()
 	:	ipCore()
 {
+	addIOption("x", 0, "Ox coordinate of the top left corner of the cropping area");
+	addIOption("y", 0, "Oy coordinate of the top left corner of the cropping area");
+	addIOption("w", 0, "desired width of the cropped image");
+	addIOption("h", 0, "desired height of the cropped image");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -16,43 +20,6 @@ ipCrop::ipCrop()
 
 ipCrop::~ipCrop()
 {
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Change the cropping area
-
-bool ipCrop::setCropArea(int x, int y, int w, int h)
-{
-	if (	x >= 0 && y >= 0 && w > 0 && h > 0)
-	{
-		if (	m_cropArea.x != x ||
-			m_cropArea.y != y ||
-			m_cropArea.w != w ||
-			m_cropArea.h != h)
-		{
-			// Delete the old tensors (if any)
-			cleanup();
-			m_cropArea.x = x;
-			m_cropArea.y = y;
-			m_cropArea.w = w;
-			m_cropArea.h = h;
-		}
-		return true;
-	}
-	return false;
-}
-
-bool ipCrop::setCropArea(const sRect2D& area)
-{
-	return setCropArea(area.x, area.y, area.w, area.h);
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Retrieve the cropping area
-
-const sRect2D& ipCrop::getCropArea() const
-{
-	return m_cropArea;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -76,10 +43,24 @@ bool ipCrop::checkInput(const Tensor& input) const
 
 bool ipCrop::allocateOutput(const Tensor& input)
 {
+	const int crop_x = getIOption("x");
+	const int crop_y = getIOption("y");
+	const int crop_w = getIOption("w");
+	const int crop_h = getIOption("h");
+
+	// Check parameters
+	if (	crop_x < 0 || crop_y < 0 || crop_w < 0 || crop_h < 0 ||
+		crop_x + crop_w > input.size(1) ||
+		crop_y + crop_h > input.size(0))
+	{
+		return false;
+	}
+
+	// Allocate output if required
 	if (	m_output == 0 ||
 		m_output[0]->nDimension() != 3 ||
-		m_output[0]->size(0) != m_cropArea.h ||
-		m_output[0]->size(1) != m_cropArea.w ||
+		m_output[0]->size(0) != crop_h ||
+		m_output[0]->size(1) != crop_w ||
 		m_output[0]->size(2) != input.size(2))
 	{
 		cleanup();
@@ -87,7 +68,7 @@ bool ipCrop::allocateOutput(const Tensor& input)
 		// Need allocation
 		m_n_outputs = 1;
 		m_output = new Tensor*[m_n_outputs];
-		m_output[0] = new ShortTensor(m_cropArea.h, m_cropArea.w, input.size(2));
+		m_output[0] = new ShortTensor(crop_h, crop_w, input.size(2));
 		return true;
 	}
 
@@ -99,38 +80,47 @@ bool ipCrop::allocateOutput(const Tensor& input)
 
 bool ipCrop::processInput(const Tensor& input)
 {
+	// Get parameters
+	const int crop_x = getIOption("x");
+	const int crop_y = getIOption("y");
+	const int crop_w = getIOption("w");
+	const int crop_h = getIOption("h");
+
+	// Prepare direct access to data
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	//const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-	//short* dst = t_output->t->storage->data + t_output->t->storageOffset;
+	const short* src = (const short*)t_input->dataR();
+	short* dst = (short*)t_output->dataW();
 
-	//const int in_stride_h = t_input->t->stride[0];	// height
-	//const int in_stride_w = t_input->t->stride[1];	// width
-	//const int in_stride_p = t_input->t->stride[2];	// no planes
+	const int src_stride_h = t_input->t->stride[0];	// height
+	const int src_stride_w = t_input->t->stride[1];	// width
+	const int src_stride_p = t_input->t->stride[2];	// no planes
 
-	//const int out_stride_h = t_output->t->stride[0];	// height
-	//const int out_stride_w = t_output->t->stride[1];	// width
-	//const int out_stride_p = t_output->t->stride[2];	// no planes
+	const int dst_stride_h = t_output->t->stride[0];// height
+	const int dst_stride_w = t_output->t->stride[1];// width
+	const int dst_stride_p = t_output->t->stride[2];// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
+	const int src_height = t_input->size(0);
+	const int src_width = t_input->size(1);
 	const int n_planes = input.size(2);
 
-	// Cosmin: To be optimized!
-	//
-	// Seb: Yes, this can be optimized later using 2 times the Tensor:narrow
-	// function assuming that the resulting crop tensor will not be
-	// modified (boolean option in the constructor)
+	// Cropping - just copy pixels in the given range
 	for (int p = 0; p < n_planes; p ++)
 	{
-		for (int y = 0; y < m_cropArea.h; y ++)
+		const short* src_plane = &src[p * src_stride_p];
+		short* dst_plane = &dst[p * dst_stride_p];
+
+		for (int y = 0; y < crop_h; y ++)
 		{
-			const int in_y = y + m_cropArea.y;
-			for (int x = 0; x < m_cropArea.w; x ++)
+			const short* src_row = &src_plane[(crop_y + y) * src_stride_h + crop_x * src_stride_w];
+			short* dst_row = &dst_plane[y * dst_stride_h];
+
+			for (int x = 0; x < crop_w; x ++, src_row += src_stride_w, dst_row += dst_stride_w)
 			{
-				const int in_x = x + m_cropArea.x;
-				t_output->set(y, x, p, t_input->get(in_y, in_x, p));
+				*dst_row = *src_row;
 			}
 		}
 	}

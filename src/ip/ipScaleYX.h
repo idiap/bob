@@ -22,6 +22,10 @@ namespace Torch
 	//
 	//	\end{verbatim}
 	//
+	//	- PARAMETERS (name, type, default value, description):
+	//		"width"		int	0	"width of the scaled tensor"
+	//		"height"	int	0	"height of the scaled tensor"
+	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
@@ -34,14 +38,6 @@ namespace Torch
 
 		// Destructor
 		virtual ~ipScaleYX();
-
-		/// Change the output image size
-		bool			setOutputSize(const sSize& new_size);
-		bool			setOutputSize(int new_w, int new_h);
-
-		/// Retrieve the output image size
-		int			getOutputWidth() const;
-		int			getOutputHeight() const;
 
 	protected:
 

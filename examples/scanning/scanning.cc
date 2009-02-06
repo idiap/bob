@@ -23,13 +23,13 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 
-// <assert> definition
-#include <cassert>
+// <CHECK_FATAL> definition
+#include <cCHECK_FATAL>
 
 #define CHECK(Test) 				\
 {						\
 	const bool ret = (Test);		\
-	assert(ret == true);			\
+	CHECK_FATAL(ret == true);			\
 }
 
 using namespace Torch;

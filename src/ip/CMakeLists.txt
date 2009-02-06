@@ -19,6 +19,9 @@ SET(	ip_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipSmoothGaussian.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipSobel.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipFlip.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ipRotate.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ipShift.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ipGeomNorm.cc"
 	CACHE INTERNAL "sources")
 
 SET(	ip_INCLUDE

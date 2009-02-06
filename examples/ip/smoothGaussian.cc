@@ -2,7 +2,6 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 #include "CmdLine.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -31,25 +30,25 @@ int main(int argc, char* argv[])
 	xtprobeImageFile xtprobe;
 	Image image(1, 1, 3);
 
-	assert(xtprobe.open(image_filename, "r") == true);
-	assert(image.loadImage(xtprobe) == true);
+	CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
+	CHECK_FATAL(image.loadImage(xtprobe) == true);
 	xtprobe.close();
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
 	// Set the Gaussian filter and smooth the image
 	ipSmoothGaussian gaussian;
-	assert(gaussian.setIOption("RadiusX", radius_x) == true);
-	assert(gaussian.setIOption("RadiusY", radius_y) == true);
-	assert(gaussian.setDOption("Sigma", sigma) == true);
-	assert(gaussian.process(image) == true);
-	assert(gaussian.getNOutputs() == 1);
-	assert(gaussian.getOutput(0).getDatatype() == Tensor::Short);
+	CHECK_FATAL(gaussian.setIOption("RadiusX", radius_x) == true);
+	CHECK_FATAL(gaussian.setIOption("RadiusY", radius_y) == true);
+	CHECK_FATAL(gaussian.setDOption("Sigma", sigma) == true);
+	CHECK_FATAL(gaussian.process(image) == true);
+	CHECK_FATAL(gaussian.getNOutputs() == 1);
+	CHECK_FATAL(gaussian.getOutput(0).getDatatype() == Tensor::Short);
 
 	// Save the smoothed image
-	assert(image.copyFrom(gaussian.getOutput(0)) == true);
-	assert(xtprobe.open("smoothed.jpg", "w+") == true);
-	assert(image.saveImage(xtprobe) == true);
+	CHECK_FATAL(image.copyFrom(gaussian.getOutput(0)) == true);
+	CHECK_FATAL(xtprobe.open("smoothed.jpg", "w+") == true);
+	CHECK_FATAL(image.saveImage(xtprobe) == true);
 	xtprobe.close();
 
 	print("\nOK\n");
