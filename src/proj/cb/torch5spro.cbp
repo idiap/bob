@@ -200,8 +200,6 @@
 		<Unit filename="../../core/DiskDataSet.h" />
 		<Unit filename="../../core/File.cc" />
 		<Unit filename="../../core/File.h" />
-		<Unit filename="../../core/FileBinDataSet.cc" />
-		<Unit filename="../../core/FileBinDataSet.h" />
 		<Unit filename="../../core/FileListCmdOption.cc" />
 		<Unit filename="../../core/FileListCmdOption.h" />
 		<Unit filename="../../core/MTimer.cc" />
@@ -437,8 +435,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../trainer/CMakeLists.txt" />
-		<Unit filename="../../trainer/MctLbpTrainer.cc" />
-		<Unit filename="../../trainer/MctLbpTrainer.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

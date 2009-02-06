@@ -4,9 +4,6 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="1">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../boosting/Mcttrain.cc" open="0" top="0" tabpos="1">
-		<Cursor position="68" topLine="0" />
-	</File>
 	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="446" topLine="0" />
 	</File>
@@ -25,7 +22,7 @@
 	<File name="../../ip/crop.cc" open="1" top="0" tabpos="14">
 		<Cursor position="697" topLine="1" />
 	</File>
-	<File name="../../ip/geomNorm.cc" open="1" top="1" tabpos="0">
+	<File name="../../ip/geomNorm.cc" open="1" top="0" tabpos="0">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="../../ip/histo.cc" open="1" top="0" tabpos="9">
