@@ -1,5 +1,5 @@
-#ifndef _TORCHSPRO_IP_FFT_H_
-#define _TORCHSPRO_IP_FFT_H_
+#ifndef _TORCHSPRO_IP_DCT_H_
+#define _TORCHSPRO_IP_DCT_H_
 
 #include "Tensor.h"
 #include "ipCore.h"		// <ipCrop> is a <Torch::ipCore>
@@ -8,22 +8,22 @@
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipFFT
-	//	This class is designed to perform FFT.
+	// Torch::ipDCT
+	//	This class is designed to perform DCT.
 	//	The result is a tensor of the same storage type.
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ipFFT : public ipCore
+	class ipDCT : public ipCore
 	{
 	public:
 
 		// Constructor
-		ipFFT(bool inverse_ = false);
+		ipDCT(bool inverse_ = false);
 
 		// Destructor
-		virtual ~ipFFT();
+		virtual ~ipDCT();
 
 	protected:
 
@@ -48,10 +48,10 @@ namespace Torch
 		bool inverse;
 
 		int N;
-		int H,W;
+		int H;
+		int W;
 
 		FloatTensor *R;
-		FloatTensor *I;
 	};
 }
 

@@ -1,4 +1,7 @@
 #include "ipFFT.h"
+#include "ooura.h"
+
+#define MAX(x,y) ((x) > (y) ? (x) : (y))
 
 namespace Torch {
 
@@ -12,9 +15,6 @@ ipFFT::ipFFT(bool inverse_)
 			
 	R = new FloatTensor;
 	I = new FloatTensor;
-	tmp1 = NULL;
-	tmp2 = NULL;
-	T = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -22,20 +22,8 @@ ipFFT::ipFFT(bool inverse_)
 
 ipFFT::~ipFFT()
 {
-	if(tmp1 != NULL) delete tmp1;
-	if(tmp2 != NULL) delete tmp2;
-	if(T != NULL) delete T;
 	delete I;
 	delete R;
-}
-
-unsigned int nexthigher(unsigned int k) 
-{
-	if (k == 0) return 1;
-	k--;	           
-	for (int i=1; i<sizeof(unsigned int)*8; i<<=1)
-		k = k | k >> i;
-	return k+1;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -157,10 +145,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 	{
 		cleanup();
 	
-		if(tmp1 != NULL) delete tmp1;
-		if(tmp2 != NULL) delete tmp2;
-		if(T != NULL) delete T;
-
 		if (input.nDimension() == 1)
 		{
 			print("ipFFT::allocateOutput() assuming FFT 1D ...\n");
@@ -170,8 +154,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 			m_n_outputs = 1;
 			m_output = new Tensor*[m_n_outputs];
 			m_output[0] = new FloatTensor(N, 2);
-		
-			tmp1 = new DoubleTensor(2*N+1);
 		}
 		else if (input.nDimension() == 2)
 		{
@@ -184,8 +166,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 				m_n_outputs = 1;
 				m_output = new Tensor*[m_n_outputs];
 				m_output[0] = new FloatTensor(N);
-		
-				tmp1 = new DoubleTensor(2*N+1);
 			}
 			else
 			{
@@ -197,10 +177,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 				m_n_outputs = 1;
 				m_output = new Tensor*[m_n_outputs];
 				m_output[0] = new FloatTensor(H,W,2);
-		
-				tmp1 = new DoubleTensor(2*W+1);
-				tmp2 = new DoubleTensor(2*H+1);
-				T = new FloatTensor(2*H+1,W);
 			}
 		}
 		else if (input.nDimension() == 3)
@@ -213,10 +189,6 @@ bool ipFFT::allocateOutput(const Tensor& input)
 			m_n_outputs = 1;
 			m_output = new Tensor*[m_n_outputs];
 			m_output[0] = new FloatTensor(H,W);
-		
-			tmp1 = new DoubleTensor(2*W+1);
-			tmp2 = new DoubleTensor(2*H+1);
-			T = new FloatTensor(2*H+1,W);
 		}
 	}
 
@@ -226,160 +198,47 @@ bool ipFFT::allocateOutput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated)
 
-#define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr
-
-void four1(double *data, int nn, int isign)
-{
-	int n, mmax, m, j, istep, i;
-	double wtemp, wr, wpr, wpi, wi, theta;
-	double tempr, tempi;
-
-	n = nn << 1;
-	j = 1;
-	for (i=1;i<n;i+=2) {
-		if (j > i) {
-			SWAP(data[j],data[i]);
-			SWAP(data[j+1],data[i+1]);
-		}
-		m = n >> 1;
-		while (m >= 2 && j > m) {
-			j -= m;
-			m >>= 1;
-		}
-		j += m;
-	}
-	mmax = 2;
-	while (n > mmax) {
-		istep = 2*mmax;
-		theta = 6.28318530717959/(isign*mmax);
-		wtemp = sin(0.5*theta);
-		wpr = -2.0*wtemp*wtemp;
-		wpi = sin(theta);
-		wr = 1.0;
-		wi = 0.0;
-		for (m=1;m<mmax;m+=2) {
-			for (i=m;i<=n;i+=istep) {
-				j = i+mmax;
-				tempr = wr*data[j]-wi*data[j+1];
-				tempi = wr*data[j+1]+wi*data[j];
-				data[j] = data[i]-tempr;
-				data[j+1] = data[i+1]-tempi;
-				data[i] += tempr;
-				data[i+1] += tempi;
-			}
-			wr = (wtemp=wr)*wpr-wi*wpi+wr;
-			wi = wi*wpr+wtemp*wpi+wi;
-		}
-		mmax = istep;
-	}
-}
-
-/* interlace function
-
-   copy the real and imag part from 2 1D tensors (R and I) with running index [0 .. N-1]
-   to a single double-precision data vector with a running index [1 .. N]
-
-	data : [0 R I R I ... R I]
-
-*/
-void interlace(int N, double *data_, FloatTensor *R, FloatTensor *I)
-{
-	double *r_ = &data_[1];
-	double *i_ = &data_[2];
-
-	for(int i = 0 ; i < N ; i++)
-	{
-		*r_ = (*R)(i); 
-	  	*i_ = (*I)(i); 
-
-		r_ += 2;
-		i_ += 2;
-	}
-}
-
-/* desinterlace function
-
-   copy the real and imag part from a single double-precision data vector with a running index [1 .. N]
-   to a single 2D tensors (F containing the real and imag part as the second dimension) with running index [0 .. N-1] on the first dimension
-
-	data : [0 R I R I ... R I]
-
-	F : [ R I
-	      R I
-	      ... 
-	      R I ]
-
-*/
-void desinterlace(int N, double *data_, FloatTensor *F)
-{
-	//float *data_r_ = (F->t->storage->data+F->t->storageOffset);
-	//float *data_i_ = &((F->t->storage->data+F->t->storageOffset)[F->t->stride[1]]);
-
-	double *r_ = &data_[1];
-	double *i_ = &data_[2];
-
-	for(int i = 0 ; i < N ; i++)
-	{
-		//data_r_[i] = *r_;
-		//data_i_[i] = *i_;
-		(*F)(i,0) = *r_;
-		(*F)(i,1) = *i_;
-
-		r_ += 2;
-		i_ += 2;
-	}
-}
-
-/* desinterlace function
-
-   copy the real part ONLY from a single double-precision data vector with a running index [1 .. N]
-   to a single 1D tensor (F containing the real part) with running index [0 .. N-1]
-
-   a normalisation factor is given as this function is mainly used for inverse purposes
-
-	data : [0 R I R I ... R I]
-
-	F : [ R
-	      R
-	      ... 
-	      R ]
-
-*/
-void desinterlace_inverse(int N, double *data_, FloatTensor *F, double norm)
-{
-	//float *data_r_ = (F->t->storage->data+F->t->storageOffset);
-
-	double *r_ = &data_[1];
-
-	for(int i = 0 ; i < N ; i++)
-	{
-		//data_r_[i] = *r_ / norm;
-		(*F)(i) = *r_ / norm;
-
-		r_ += 2;
-	}
-}
-
 bool ipFFT::processInput(const Tensor& input)
 {
 	const FloatTensor* t_input = (FloatTensor*)&input;
 
 	if (input.nDimension() == 1)
 	{
-		FloatTensor *RI = new FloatTensor(N, 2);
+		FloatTensor *RI = new FloatTensor(N);
 
-		R->select(RI, 1, 0);
-		R->copy(t_input);
-		I->select(RI, 1, 1);
-		I->fill(0.0);
+		RI->copy(t_input);
 
-		double *data_ = (double *)(tmp1->t->storage->data+tmp1->t->storageOffset);
-		interlace(N, data_, R, I);
-		
-		four1(data_, N, 1);
+#ifdef HAVE_OOURAFFT
+		// Workspace of Ooura FFT
+		int *ip;
+		double *w;
+		double *a;
 
+		// Alloc workspace
+		a = alloc_1d_double(2*N);
+		ip = alloc_1d_int(2 + (int) sqrt(N + 0.5));
+		w = alloc_1d_double(N * 5 / 4);
+  
+		// Init workspace
+		ip[0] = 0;
+		for(int i=0; i < N; i++) a[i] = (*RI)(i);
+
+		// Complex Discrete Fourier Transform routine
+		cdft(N, 1, a, ip, w);
+
+		//
 		FloatTensor *F = (FloatTensor *) m_output[0];
-		desinterlace(N, data_, F);
+		for(int i=0; i < N; i++)
+		{
+			(*F)(i,0) = a[2*i];
+			(*F)(i,1) = a[2*i+1];
+		}
+
+		// Free workspace
+		free_1d_double(a);
+		free_1d_int(ip);
+		free_1d_double(w);
+#endif
 
 		delete RI;
 	}
@@ -390,69 +249,81 @@ bool ipFFT::processInput(const Tensor& input)
 			R->select(t_input, 1, 0);
 			I->select(t_input, 1, 1);
 
-			double *data_ = (double *)(tmp1->t->storage->data+tmp1->t->storageOffset);
-			interlace(N, data_, R, I);
+#ifdef HAVE_OOURAFFT
+			// Workspace for Ooura FFT
+			int *ip;
+			double *w;
+			double *a;
 			
-			four1(data_, N, -1);
+			// Alloc workspace
+			a = alloc_1d_double(2*N);
+			ip = alloc_1d_int(2 + (int) sqrt(N + 0.5));
+			w = alloc_1d_double(N * 5 / 4);
+  
+			// Init workspace
+			ip[0] = 0;
+			for(int i=0; i < N; i++)
+			{
+				a[2*i] = (*R)(i);
+				a[2*i+1] = (*I)(i);
+			}
 
-			FloatTensor *iF = (FloatTensor *) m_output[0];
-			desinterlace_inverse(N, data_, iF, (double) N);
+			// Complex Discrete Fourier Transform routine (in inverse mode)
+			cdft(N, -1, a, ip, w);
+
+			FloatTensor *F = (FloatTensor *) m_output[0];
+			for(int i=0; i < N; i++)
+				(*F)(i) = 2.0 * a[i] / N;
+
+			// Free workspace
+			free_1d_int(ip);
+			free_1d_double(w);
+			free_1d_double(a);
+#endif
 		}
 		else
 		{
-			FloatTensor *RI = new FloatTensor(H, W, 2);
-			R->select(RI, 2, 0);
-			R->copy(t_input); 
-			I->select(RI, 2, 1);
-			I->fill(0.0);
+			FloatTensor *RI = new FloatTensor(H, W);
+			
+			RI->copy(t_input); 
 
-			FloatTensor *subR = new FloatTensor();
-			FloatTensor *subI = new FloatTensor();
-			FloatTensor *subT = new FloatTensor();
-			FloatTensor *subF = new FloatTensor();
+#ifdef HAVE_OOURAFFT
+			// Workspace for Ooura FFT
+			int *ip;
+			double *w;
+			double **a;
+			int n;
 
-			T->fill(0.0);
+			// Alloc workspace
+			a = alloc_2d_double(H, W*2);
+			n = MAX(H, W / 2);
+			ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
+			n = MAX(H, W) * 3 / 2;
+			w = alloc_1d_double(n);
 
-			double *data_ = (double *)(tmp1->t->storage->data+tmp1->t->storageOffset);
+			// Init workspace
+			ip[0] = 0;
 
-        		for(int i=1 ; i <= H ; i++) 
-			{
-			   	subR->select(R, 0, i-1);
-			   	subI->select(I, 0, i-1);
+			for(int i = 0 ; i < H ; i++)
+				for(int j = 0 ; j < W ; j++) a[i][j] = (*RI)(i,j);
 
-			   	interlace(W, data_, subR, subI);
-
-        			four1(data_, W, 1);
-			    
-        		    	for (int j=1 ; j <= W ; j++) 
-			    	{
-        		        	(*T)(i*2-1,j-1) = (*tmp1)(j*2-1);
-        		        	(*T)(i*2,j-1) = (*tmp1)(j*2);
-        		    	}
-        		}
-
-			data_ = (double *)(tmp2->t->storage->data+tmp2->t->storageOffset);
+			// Complex Discrete Fourier Transform 2D
+			cdft2d(H, W, 1, a, NULL, ip, w);
 
 			FloatTensor *F = (FloatTensor *) m_output[0];
+			for(int i = 0 ; i < H ; i++)
+				for(int j = 0 ; j < W ; j++)
+				{
+					(*F)(i,j,0) = a[i][2*j];
+					(*F)(i,j,1) = a[i][2*j+1];
+				}
 
-        		for(int i=1 ; i <= W ; i++) 
-			{
-        		    	for (int j=1 ; j <= H ; j++) 
-			    	{
-        		        	(*tmp2)(j*2-1) = (*T)(j*2-1,i-1);
-        		        	(*tmp2)(j*2) = (*T)(j*2,i-1);
-        		    	}
 
-        			four1(data_, H, 1);
-			    
-			   	subF->select(F, 1, i-1);
-				desinterlace(H, data_, subF);
-        		}
-
-			delete subF;
-			delete subT;
-			delete subR;
-			delete subI;
+			// Free workspace
+			free_1d_int(ip);
+			free_1d_double(w);
+			free_2d_double(a);
+#endif
 			delete RI;
 		}
 	}
@@ -463,53 +334,45 @@ bool ipFFT::processInput(const Tensor& input)
 			R->select(t_input, 2, 0);
 			I->select(t_input, 2, 1);
 
-			FloatTensor *subR = new FloatTensor();
-			FloatTensor *subI = new FloatTensor();
-			FloatTensor *subT = new FloatTensor();
-			FloatTensor *subF = new FloatTensor();
+#ifdef HAVE_OOURAFFT
+			// Workspace for Ooura FFT
+			int *ip;
+			double *w;
+			double **a;
+			int n;
 
-			T->fill(0.0);
+			// Alloc workspace
+			a = alloc_2d_double(H, W*2);
+			n = MAX(H, W / 2);
+			ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
+			n = MAX(H, W) * 3 / 2;
+			w = alloc_1d_double(n);
 
-			double *data_ = (double *)(tmp1->t->storage->data+tmp1->t->storageOffset);
+			// Init workspace
+			ip[0] = 0;
 
-        		for(int i=1 ; i <= H ; i++) 
-			{
-			   	subR->select(R, 0, i-1);
-			   	subI->select(I, 0, i-1);
+			for(int i = 0 ; i < H ; i++)
+				for(int j = 0 ; j < W ; j++)
+				{
+					a[i][2*j] = (*R)(i,j);
+					a[i][2*j+1] = (*I)(i,j);
+				}
 
-			   	interlace(W, data_, subR, subI);
+			// Complex Discrete Fourier Transform 2D (in inverse mode)
+			cdft2d(H, W, -1, a, NULL, ip, w);
 
-        			four1(data_, W, -1);
-			    
-        		    	for (int j=1 ; j <= W ; j++) 
-			    	{
-        		        	(*T)(i*2-1,j-1) = (*tmp1)(j*2-1);
-        		        	(*T)(i*2,j-1) = (*tmp1)(j*2);
-        		    	}
-        		}
-
+			//
 			FloatTensor *iF = (FloatTensor *) m_output[0];
+			double scale = 2.0 / ((double) H*W);
+			for(int i = 0 ; i < H ; i++)
+				for(int j = 0 ; j < W ; j++)
+					(*iF)(i,j) = scale * a[i][j];
 
-			data_ = (double *)(tmp2->t->storage->data+tmp2->t->storageOffset);
-
-        		for(int i=1 ; i <= W ; i++) 
-			{
-        		    	for (int j=1 ; j <= H ; j++) 
-			    	{
-        		        	(*tmp2)(j*2-1) = (*T)(j*2-1,i-1);
-        		        	(*tmp2)(j*2) = (*T)(j*2,i-1);
-        		    	}
-
-        			four1(data_, H, -1);
-			    
-			   	subF->select(iF, 1, i-1);
-				desinterlace_inverse(H, data_, subF, (double) (H*W));
-        		}
-
-			delete subF;
-			delete subT;
-			delete subR;
-			delete subI;
+			// Free workspace
+			free_1d_int(ip);
+			free_1d_double(w);
+			free_2d_double(a);
+#endif
 		}
 	}
 
