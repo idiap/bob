@@ -44,6 +44,7 @@
 		<Unit filename="../../dataset/CMakeLists.txt" />
 		<Unit filename="../../dataset/make.csh" />
 		<Unit filename="../../dataset/memorydataset.cc" />
+		<Unit filename="../../dataset/tensorfiles.cc" />
 		<Unit filename="../../images/CMakeLists.txt" />
 		<Unit filename="../../images/README.txt" />
 		<Unit filename="../../images/imageformats.cc" />

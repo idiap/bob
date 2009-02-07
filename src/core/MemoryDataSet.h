@@ -2,42 +2,42 @@
 #define MEMORY_DATA_SET_INC
 
 #include "DataSet.h"
+#include "Tensor.h"
 
 namespace Torch
 {
 	class MemoryDataSet : public DataSet
 	{
-	public:
+		public:
 
-		// Constructor
-		MemoryDataSet(	int n_examples,
-				Tensor::Type example_type_ = Tensor::Double,
-				Tensor::Type target_type_ = Tensor::Short);
+			// Constructor
+			MemoryDataSet(	int n_examples,
+					Tensor::Type example_type_ = Tensor::Double );
 
-		// Destructor
-		virtual ~MemoryDataSet();
+			// Destructor
+			virtual ~MemoryDataSet();
 
-		// Reinitialize the dataset
-		void		reset(	int n_examples,
-					Tensor::Type example_type_ = Tensor::Double,
-					Tensor::Type target_type_ = Tensor::Short);
+			// Reinitialize the dataset
+			void		reset(	int n_examples,
+					Tensor::Type example_type_ = Tensor::Double );
 
-		// Access examples
-		virtual Tensor* getExample(long index);
-		virtual Tensor&	operator()(long index);
+			// Access examples
+			virtual Tensor* getExample(long index);
+			virtual Tensor&	operator()(long index);
 
-		// Access targets
-		virtual Tensor* getTarget(long index) = 0;
-		virtual void	setTarget(long index, Tensor* target) = 0;
+			// Access targets
+			virtual Tensor* getTarget(long index);
+			virtual void	setTarget(long index, Tensor* target);
 
-	private:
+		private:
 
-		/// Delete the allocated tensors
-		void 		cleanup();
+			/// Delete the allocated tensors
+			void 		cleanup();
+			bool		isInRange(long index);
 
-		/// Allocated examples and targets
-		Tensor**	m_examples;	// Array of allocated tensors
-		Tensor**	m_targets;	// Array of pointers to external tensors
+			/// Allocated examples and targets
+			Tensor**	m_examples;	// Array of allocated tensors
+			Tensor**	m_targets;	// Array of pointers to external tensors
 	};
 
 }

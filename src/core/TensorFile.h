@@ -17,30 +17,35 @@ namespace Torch
 	{
 	public:
 
+		// Header information
 		struct Header
 		{
+			// Get the index of some tensor in the file
+			int		getTensorIndex(int tensor_index);
+
+			// Update internal information
+			void		update();
+
+			// Attributes
 			Tensor::Type	m_type;
 			int		m_n_samples;
 			int		m_n_dimensions;
-			int		m_size0;
-			int		m_size1;
-			int		m_size2;
-			int		m_size3;
+			int		m_size[4];
+			int		m_tensorSize;
 		};
 
 		// Constructor
 		TensorFile();
 
-		// Open a data file for reading
+		// Destructor
+		~TensorFile();
+
+		// Open a data file for reading / writing and appending
 		bool 			openRead(const char* file_name);
-
-		// Open a data file for writing
-		bool			openWrite(const char* file_name,
-						Tensor::Type type, int n_samples,
-						int n_dimensions,
-						int size0, int size1 = 0, int size2 = 0, int size3 = 0);
-
-		// Open a data file for appending
+		bool			openWrite(	const char* file_name,
+							Tensor::Type type,
+							int n_dimensions,
+							int size0, int size1 = 0, int size2 = 0, int size3 = 0);
 		bool			openAppend(const char* file_name);
 
 		// Close the file (if opened)
@@ -52,13 +57,11 @@ namespace Torch
 		// Load next tensor (returns NULL at the end or some reading error)
 		// NB: The tensor should be deallocated outside this class!
 		Tensor*			load();
+		Tensor*			load(int index);			// Load some tensor index
 
 		// Load next tensor to a buffer (returns false at the end or some reading error)
 		bool			load(Tensor& tensor);
-
-		// Load a tensor at some index
-		Tensor*			load(int index);
-		bool			load(Tensor& tensor, int index);
+		bool			load(Tensor& tensor, int index);	// Load some tensor index
 
 		// Save a tensor to the file (returns false if data mismatch or some writing error)
 		bool			save(const Tensor& tensor);
@@ -71,10 +74,24 @@ namespace Torch
 	private:
 
 		///////////////////////////////////////////////////////////
+		// Header processing functions
+
+		bool			read_header();
+		bool			write_header();
+		bool			header_ok();
+
+		///////////////////////////////////////////////////////////
 		// Attributes
 
-		File			m_file;			//
+		enum Mode
+		{
+			Read,
+			Write
+		};
+
+		File			m_file;			// File to operate on
 		Header			m_header;		// Header information
+		Mode 			m_mode;			// Opening mode
 	};
 }
 

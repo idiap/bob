@@ -10,8 +10,7 @@ namespace Torch
 	{
 	public:
 		// Constructor
-		DataSet(	Tensor::Type example_type_ = Tensor::Double,
-				Tensor::Type target_type_ = Tensor::Short);
+		DataSet( Tensor::Type example_type_ = Tensor::Double );
 
 		// Destructor
 		virtual ~DataSet();
@@ -25,15 +24,19 @@ namespace Torch
 		virtual void	setTarget(long, Tensor*) = 0;
 
 		/// Query the number of examples in the dataset
-		int 		getNumberOfExamples() const { return m_n_examples; };
+		int 		getNumberOfExamples() const { return m_size; };
+
 
 	protected:
 
 		// Number of examples in the dataset.
-		long 		m_n_examples;
+		long 		m_size;
 
 		Tensor::Type 	m_example_type;
 		Tensor::Type 	m_target_type;
+
+	private:
+		bool isInRange(long index);
 
 	};
 

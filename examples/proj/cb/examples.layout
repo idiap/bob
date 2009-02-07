@@ -4,56 +4,59 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="1">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="0">
-		<Cursor position="446" topLine="0" />
+	<File name="../../dataset/CMakeLists.txt" open="1" top="0" tabpos="19">
+		<Cursor position="269" topLine="0" />
 	</File>
 	<File name="../../dataset/memorydataset.cc" open="0" top="0" tabpos="18">
 		<Cursor position="1941" topLine="80" />
 	</File>
+	<File name="../../dataset/tensorfiles.cc" open="1" top="1" tabpos="20">
+		<Cursor position="2838" topLine="71" />
+	</File>
 	<File name="../../images/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="632" topLine="0" />
 	</File>
-	<File name="../../images/imageformats.cc" open="1" top="0" tabpos="6">
-		<Cursor position="2068" topLine="89" />
+	<File name="../../images/imageformats.cc" open="1" top="0" tabpos="3">
+		<Cursor position="199" topLine="0" />
 	</File>
-	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="8">
-		<Cursor position="334" topLine="0" />
+	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="2">
+		<Cursor position="1056" topLine="0" />
 	</File>
-	<File name="../../ip/crop.cc" open="1" top="0" tabpos="14">
-		<Cursor position="697" topLine="1" />
+	<File name="../../ip/crop.cc" open="1" top="0" tabpos="4">
+		<Cursor position="1367" topLine="3" />
 	</File>
-	<File name="../../ip/geomNorm.cc" open="1" top="0" tabpos="0">
+	<File name="../../ip/geomNorm.cc" open="1" top="0" tabpos="1">
+		<Cursor position="6902" topLine="199" />
+	</File>
+	<File name="../../ip/histo.cc" open="1" top="0" tabpos="5">
+		<Cursor position="91" topLine="0" />
+	</File>
+	<File name="../../ip/iimage.cc" open="1" top="0" tabpos="6">
+		<Cursor position="44" topLine="0" />
+	</File>
+	<File name="../../ip/ipflipper2d.cc" open="1" top="0" tabpos="7">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../ip/histo.cc" open="1" top="0" tabpos="9">
-		<Cursor position="650" topLine="0" />
+	<File name="../../ip/ipflipper3d.cc" open="1" top="0" tabpos="8">
+		<Cursor position="69" topLine="0" />
 	</File>
-	<File name="../../ip/iimage.cc" open="1" top="0" tabpos="7">
-		<Cursor position="3812" topLine="80" />
+	<File name="../../ip/lbp.cc" open="1" top="0" tabpos="9">
+		<Cursor position="90" topLine="0" />
 	</File>
-	<File name="../../ip/ipflipper2d.cc" open="1" top="0" tabpos="15">
-		<Cursor position="760" topLine="0" />
+	<File name="../../ip/rotate.cc" open="1" top="0" tabpos="10">
+		<Cursor position="91" topLine="0" />
 	</File>
-	<File name="../../ip/ipflipper3d.cc" open="1" top="0" tabpos="16">
-		<Cursor position="1534" topLine="16" />
+	<File name="../../ip/scale.cc" open="1" top="0" tabpos="11">
+		<Cursor position="289" topLine="7" />
 	</File>
-	<File name="../../ip/lbp.cc" open="1" top="0" tabpos="13">
-		<Cursor position="1177" topLine="40" />
+	<File name="../../ip/shift.cc" open="1" top="0" tabpos="12">
+		<Cursor position="90" topLine="0" />
 	</File>
-	<File name="../../ip/rotate.cc" open="1" top="0" tabpos="20">
-		<Cursor position="1746" topLine="14" />
+	<File name="../../ip/smoothGaussian.cc" open="1" top="0" tabpos="13">
+		<Cursor position="99" topLine="0" />
 	</File>
-	<File name="../../ip/scale.cc" open="1" top="0" tabpos="12">
-		<Cursor position="702" topLine="20" />
-	</File>
-	<File name="../../ip/shift.cc" open="1" top="0" tabpos="19">
-		<Cursor position="1363" topLine="24" />
-	</File>
-	<File name="../../ip/smoothGaussian.cc" open="1" top="0" tabpos="11">
-		<Cursor position="1122" topLine="16" />
-	</File>
-	<File name="../../ip/sobel.cc" open="1" top="0" tabpos="0">
-		<Cursor position="0" topLine="0" />
+	<File name="../../ip/sobel.cc" open="1" top="0" tabpos="14">
+		<Cursor position="1906" topLine="29" />
 	</File>
 	<File name="../../machines/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="766" topLine="0" />
@@ -61,23 +64,23 @@
 	<File name="../../machines/convert3to5models.cc" open="0" top="0" tabpos="57">
 		<Cursor position="1392" topLine="24" />
 	</File>
-	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="10">
-		<Cursor position="317" topLine="0" />
+	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="15">
+		<Cursor position="1667" topLine="4" />
 	</File>
 	<File name="../../options/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="414" topLine="0" />
 	</File>
-	<File name="../../options/options.cc" open="1" top="0" tabpos="0">
-		<Cursor position="0" topLine="0" />
+	<File name="../../options/options.cc" open="1" top="0" tabpos="16">
+		<Cursor position="2139" topLine="25" />
 	</File>
 	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="56">
 		<Cursor position="818" topLine="0" />
 	</File>
 	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="17">
-		<Cursor position="13889" topLine="307" />
+		<Cursor position="651" topLine="25" />
 	</File>
-	<File name="../../scanning/testPatternList.cc" open="1" top="0" tabpos="0">
-		<Cursor position="0" topLine="0" />
+	<File name="../../scanning/testPatternList.cc" open="1" top="0" tabpos="18">
+		<Cursor position="2043" topLine="36" />
 	</File>
 	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="2">
 		<Cursor position="529" topLine="0" />

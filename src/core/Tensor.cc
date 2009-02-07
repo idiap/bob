@@ -5,7 +5,7 @@ namespace Torch {
 const char *str_datatype[] = {"char", "short", "int", "long", "float", "double"};
 
 // Get the number of elements (over all dimensions)
-long Tensor::size() const
+long Tensor::sizeAll() const
 {
 	long count = 1;
 	for (int i = 0; i < nDimension(); i ++)

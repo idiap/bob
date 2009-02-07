@@ -95,7 +95,7 @@ namespace Torch {
 		virtual long size(int dimension_) const = 0;
 
 		// Get the number of elements (over all dimensions)
-		long size() const;
+		long sizeAll() const;
 
 		// set the tensor from another tensor (same type) - this will create a reference
 		virtual void setTensor(const Tensor *src) = 0;
