@@ -68,6 +68,7 @@
 		<Unit filename="../../machines/CMakeLists.txt" />
 		<Unit filename="../../machines/convert3to5models.cc" />
 		<Unit filename="../../machines/make.csh" />
+		<Unit filename="../../machines/run_convert.sh" />
 		<Unit filename="../../machines/test19x19models.cc" />
 		<Unit filename="../../options/CMakeLists.txt" />
 		<Unit filename="../../options/README.txt" />

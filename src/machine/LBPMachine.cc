@@ -75,9 +75,9 @@ bool LBPMachine::setLBPRadius(int lbp_radius)
 //////////////////////////////////////////////////////////////////////////
 // Change the model size (need to set the model size to the <ipLBP>) - overriden
 
-bool LBPMachine::setModelSize(int model_w, int model_h)
+bool LBPMachine::setInputSize(const TensorSize& inputSize)
 {
-	if (Machine::setModelSize(model_w, model_h) == false)
+	if (Machine::setInputSize(inputSize) == false)
 	{
 		return false;
 	}

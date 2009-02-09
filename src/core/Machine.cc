@@ -8,7 +8,7 @@ namespace Torch {
 
 Machine::Machine()
 	: 	Object(),
-		m_model_w(0), m_model_h(0),
+		m_inputSize(),
 		m_output(0)
 {
 }
@@ -21,18 +21,11 @@ Machine::~Machine()
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// Set the model size to use
+// Set the input size to use
 
-bool Machine::setModelSize(int model_w, int model_h)
+bool Machine::setInputSize(const TensorSize& inputSize)
 {
-	if (model_w < 1 || model_h < 1)
-	{
-		return false;
-	}
-
-	// OK
-	m_model_w = model_w;
-	m_model_h = model_h;
+	m_inputSize = inputSize;
 	return true;
 }
 

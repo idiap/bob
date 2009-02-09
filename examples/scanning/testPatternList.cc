@@ -1,6 +1,5 @@
 #include "Pattern.h"
 #include "general.h"
-#include <cCHECK_FATAL>
 #include <cstdlib>
 
 using namespace Torch;
