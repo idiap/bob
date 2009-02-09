@@ -4,9 +4,9 @@
 namespace Torch {
 
 	//////////////////////////////////////////////////////////////////////////////
-	// \breif Constructor 
+	// \breif Constructor
 	//
-	MemoryDataSet::MemoryDataSet(int n_examples_, Tensor::Type example_type_) 
+	MemoryDataSet::MemoryDataSet(int n_examples_, Tensor::Type example_type_)
 		: DataSet(example_type_)
 	{
 		// indicate that the dataset is empty so far
@@ -15,13 +15,12 @@ namespace Torch {
 
 		// allocated the data set by using reset
 		reset(n_examples_, example_type_);
-
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
 	// \breif getExample
 
-	MemoryDataSet::~MemoryDataSet() 
+	MemoryDataSet::~MemoryDataSet()
 	{
 		// free all allocated memory
 		cleanup();
@@ -29,61 +28,56 @@ namespace Torch {
 
 	//////////////////////////////////////////////////////////////////////////////
 	// \breif getExample
-	// \param[in] 	index  	Which element do you want a pointer to  
+	// \param[in] 	index  	Which element do you want a pointer to
 	// \param[out] 	Tensor* Pointer to example
 
 	Tensor* MemoryDataSet::getExample(long index)
 	{
-		if(m_examples == NULL) 
+		if(m_examples == NULL)
 			error("MemoryDataSet(): no examples in memory.");
 
 		// make sure that the index is in range
-		if(!isInRange(index)) 
-			error("MemoryDataSet(): example (%d) out-of-range [0-%d].", index, m_size - 1);
+		if(!isIndex(index, m_n_examples))
+			error("MemoryDataSet(): example (%d) out-of-range [0-%d].", index, m_n_examples - 1);
 
 		return m_examples[index];
 	}
 
-	//////////////////////////////////////////////////////////////////////////////
-	// \breif isInRange 
-	// \param[in] 	index	Does the index make sence
-	// \param[out]	bool	True or False
-
-	bool MemoryDataSet::isInRange(long index) 
+	Tensor& MemoryDataSet::operator()(long index)
 	{
-		return (index >= 0 && index < m_size) ? true : false; 
+		return *getExample(index);
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	// \breif getTarget 
+	// \breif getTarget
 
 	Tensor* MemoryDataSet::getTarget(long index)
 	{
-		if(m_targets == NULL) 
+		if(m_targets == NULL)
 			error("MemoryDataSet(): no examples in memory.");
 
-		if(!isInRange(index)) 
-			error("MemoryDataSet(): target (%d) out-of-range [0-%d].", index, m_size - 1);
+		if(!isIndex(index, m_n_examples))
+			error("MemoryDataSet(): target (%d) out-of-range [0-%d].", index, m_n_examples - 1);
 
 		return m_targets[index];
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////////////
-	// \breif getTarget 
+	// \breif getTarget
 
 	void MemoryDataSet::setTarget(long index, Tensor* target)
 	{
-		if(m_targets == NULL) 
+		if(m_targets == NULL)
 			error("MemoryDataSet(): no examples in memory.");
 
-		if(!isInRange(index)) 
-			error("MemoryDataSet(): target (%d) out-of-range [0-%d].", index, m_size - 1);
+		if(!isIndex(index, m_n_examples))
+			error("MemoryDataSet(): target (%d) out-of-range [0-%d].", index, m_n_examples - 1);
 
 		m_targets[index] = target;
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	// \breif getTarget 
+	// \breif getTarget
 
 	void MemoryDataSet::reset(int n_examples, Tensor::Type example_type_ )
 	{
@@ -91,118 +85,89 @@ namespace Torch {
 		cleanup();
 
 		// register the size of the DataSet
-		m_size = n_examples;
+		m_n_examples = n_examples;
 
 		// create the two main arrays of pointers.
-		m_examples 	= new Tensor* [m_size];
-		m_targets	= new Tensor* [m_size];
+		m_examples 	= new Tensor* [m_n_examples];
+		m_targets	= new Tensor* [m_n_examples];
 
 		// swith over typ of tensor and size of tensor
-		switch(example_type_) {
+		switch (example_type_)
+		{
+		case Tensor::Char:	// Char
+			for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+			{
+				m_examples[cnt] = new CharTensor;
+			}
+			break;
 
-			case Tensor::Char:
+		case Tensor::Short:	// Short
+			for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+			{
+				m_examples[cnt] = new ShortTensor;
+			}
+			break;
 
-				// allocate a ton of Char tensors
-				for (int cnt = 0; cnt < m_size; ++cnt) {
-					m_examples[cnt] = new CharTensor;
-				}
-				break;
+		case Tensor::Int:	// Int
+			for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+			{
+				m_examples[cnt] = new IntTensor;
+			}
+			break;
 
-			case Tensor::Short:
+		case Tensor::Long:	// Long
+			for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+			{
+				m_examples[cnt] = new LongTensor;
+			}
+			break;
 
-				// allocate a ton of Short tensors
-				for (int cnt = 0; cnt < m_size; ++cnt) {
-					m_examples[cnt] = new ShortTensor;
-				}
-				break;
+		case Tensor::Float:	// Float
+			for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+			{
+				m_examples[cnt] = new FloatTensor;
+			}
+			break;
 
-			case Tensor::Int:
+		case Tensor::Double:	// Double
+			for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+			{
+				m_examples[cnt] = new DoubleTensor;
+			}
+			break;
 
-				// allocate a ton of Int tensors
-				for (int cnt = 0; cnt < m_size; ++cnt) {
-					m_examples[cnt] = new IntTensor;
-				}
-				break;
-
-			case Tensor::Long:
-
-				// allocate a ton of Long tensors
-				for (int cnt = 0; cnt < m_size; ++cnt) {
-					m_examples[cnt] = new LongTensor;
-				}
-				break;
-
-
-			case Tensor::Float:
-
-				// allocate a ton of Float tensors
-				for (int cnt = 0; cnt < m_size; ++cnt) {
-					m_examples[cnt] = new FloatTensor;
-				}
-				break;
-
-			case Tensor::Double:
-
-				// allocate a ton of Double tensors
-				for (int cnt = 0; cnt < m_size; ++cnt) {
-					m_examples[cnt] = new DoubleTensor;
-				}
-				break;
-
-
-			default:
-				// error
-				error("MemoryDataSet: sorry target type not supported yet");
-
-				for (int cnt = 0; cnt < m_size; ++cnt) {
-					m_examples[cnt] = NULL;
-				}
+		default:		// ???
+			message("MemoryDataSet: sorry target type not supported yet");
+			for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+			{
+				m_examples[cnt] = NULL;
+			}
 		}
 
 		// set all the target pointers to NULL
-		for (int cnt = 0; cnt < m_size; ++cnt) {
+		for (int cnt = 0; cnt < m_n_examples; ++ cnt)
+		{
 			m_targets[cnt]  = NULL;
 		}
 	}
 
 
 	//////////////////////////////////////////////////////////////////////////////
-	// \breif getTarget 
+	// \breif getTarget
 
 	void MemoryDataSet::cleanup()
 	{
-		if (NULL != m_examples) {
-
-			// remove all the examples
-			for(int i = 0 ; i < m_size ; i++) 
+		if (NULL != m_examples)
+		{
+			for (int i = 0 ; i < m_n_examples; i++)
 				delete m_examples[i];
 
-			// free 
-			delete [] m_examples;
+			delete[] m_examples;
 		}
 
-		if (NULL != m_targets) {
-
-			// remove all the targets
-			for(int i = 0 ; i < m_size ; i++) 
-				delete m_targets[i];
-
-			// free
-			delete [] m_targets;
+		if (NULL != m_targets)
+		{
+			delete[] m_targets;
 		}
-	}
-
-	//////////////////////////////////////////////////////////////////////////////
-	// \breif getTarget 
-
-	Tensor &MemoryDataSet::operator()(long index)
-	{
-		if(m_examples == NULL) 
-			error("MemoryDataSet(): no examples in memory.");
-
-		if(!isInRange(index))
-			error("MemoryDataSet(): example (%d) out-of-range [0-%d].", index , m_size - 1);
-
-		return *(m_examples[index]);
 	}
 }

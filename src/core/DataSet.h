@@ -24,20 +24,15 @@ namespace Torch
 		virtual void	setTarget(long, Tensor*) = 0;
 
 		/// Query the number of examples in the dataset
-		int 		getNumberOfExamples() const { return m_size; };
-
+		int 		getNoExamples() const { return m_n_examples; };
 
 	protected:
 
 		// Number of examples in the dataset.
-		long 		m_size;
+		long 		m_n_examples;
 
+		// Type of the examples
 		Tensor::Type 	m_example_type;
-		Tensor::Type 	m_target_type;
-
-	private:
-		bool isInRange(long index);
-
 	};
 
 }

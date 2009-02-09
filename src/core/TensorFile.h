@@ -13,7 +13,7 @@ namespace Torch
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class TensorFile : public Object
+	class TensorFile
 	{
 	public:
 

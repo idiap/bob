@@ -8,36 +8,33 @@ namespace Torch
 {
 	class MemoryDataSet : public DataSet
 	{
-		public:
+	public:
 
-			// Constructor
-			MemoryDataSet(	int n_examples,
-					Tensor::Type example_type_ = Tensor::Double );
+		// Constructor
+		MemoryDataSet(int n_examples = 0, Tensor::Type example_type_ = Tensor::Double);
 
-			// Destructor
-			virtual ~MemoryDataSet();
+		// Destructor
+		virtual ~MemoryDataSet();
 
-			// Reinitialize the dataset
-			void		reset(	int n_examples,
-					Tensor::Type example_type_ = Tensor::Double );
+		// Reinitialize the dataset
+		void		reset(int n_examples, Tensor::Type example_type_ = Tensor::Double);
 
-			// Access examples
-			virtual Tensor* getExample(long index);
-			virtual Tensor&	operator()(long index);
+		// Access examples
+		virtual Tensor* getExample(long index);
+		virtual Tensor&	operator()(long index);
 
-			// Access targets
-			virtual Tensor* getTarget(long index);
-			virtual void	setTarget(long index, Tensor* target);
+		// Access targets
+		virtual Tensor* getTarget(long index);
+		virtual void	setTarget(long index, Tensor* target);
 
-		private:
+	private:
 
-			/// Delete the allocated tensors
-			void 		cleanup();
-			bool		isInRange(long index);
+		/// Delete the allocated tensors
+		void 		cleanup();
 
-			/// Allocated examples and targets
-			Tensor**	m_examples;	// Array of allocated tensors
-			Tensor**	m_targets;	// Array of pointers to external tensors
+		/// Allocated examples and targets
+		Tensor**	m_examples;	// Array of allocated tensors
+		Tensor**	m_targets;	// Array of pointers to external tensors
 	};
 
 }

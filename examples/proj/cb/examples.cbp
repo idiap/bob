@@ -42,6 +42,7 @@
 		<Unit filename="../../boosting/bindata.list" />
 		<Unit filename="../../boosting/make.csh" />
 		<Unit filename="../../dataset/CMakeLists.txt" />
+		<Unit filename="../../dataset/diskdataset.cc" />
 		<Unit filename="../../dataset/make.csh" />
 		<Unit filename="../../dataset/memorydataset.cc" />
 		<Unit filename="../../dataset/tensorfiles.cc" />
