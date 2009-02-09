@@ -1,4 +1,4 @@
-#include "ipFFT.h"
+#include "spFFT.h"
 #include "ooura.h"
 
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
@@ -8,8 +8,8 @@ namespace Torch {
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-ipFFT::ipFFT(bool inverse_)
-	:	ipCore()
+spFFT::spFFT(bool inverse_)
+	:	spCore()
 {
 	inverse = inverse_;
 			
@@ -20,7 +20,7 @@ ipFFT::ipFFT(bool inverse_)
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-ipFFT::~ipFFT()
+spFFT::~spFFT()
 {
 	delete I;
 	delete R;
@@ -29,7 +29,7 @@ ipFFT::~ipFFT()
 //////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type
 
-bool ipFFT::checkInput(const Tensor& input) const
+bool spFFT::checkInput(const Tensor& input) const
 {
 	// Accept only tensors of Torch::Float
 	if (input.getDatatype() != Tensor::Float) return false;
@@ -46,11 +46,11 @@ bool ipFFT::checkInput(const Tensor& input) const
 
 	if (input.nDimension() == 1)
 	{
-		print("ipFFT::checkInput() assuming FFT 1D ...\n");
+		print("spFFT::checkInput() assuming FFT 1D ...\n");
 
 	   	if(inverse)
 		{
-			warning("ipFFT(): impossible to handle inverse mode with 1D input tensor.");
+			warning("spFFT(): impossible to handle inverse mode with 1D input tensor.");
 			return false;
 		}
 
@@ -60,7 +60,7 @@ bool ipFFT::checkInput(const Tensor& input) const
 		
 		if(N_ != (int) nn)
 		{
-			warning("ipFFT(): size(0) is not a power of 2.");
+			warning("spFFT(): size(0) is not a power of 2.");
 			return false;
 		}
 	}
@@ -69,32 +69,32 @@ bool ipFFT::checkInput(const Tensor& input) const
 	{
 	   	if(inverse)
 		{
-			print("ipFFT::checkInput() assuming inverse FFT 1D ...\n");
+			print("spFFT::checkInput() assuming inverse FFT 1D ...\n");
 
 			int N_ = input.size(0);
 			unsigned int nn = nexthigher(N_); 
 			if(N_ != (int) nn)
 			{
-				warning("ipFFT(): size(0) is not a power of 2.");
+				warning("spFFT(): size(0) is not a power of 2.");
 				return false;
 			}
 		}
 		else
 		{
-			print("ipFFT::checkInput() assuming FFT 2D ...\n");
+			print("spFFT::checkInput() assuming FFT 2D ...\n");
 
 			int N_ = input.size(0);
 			unsigned int nn = nexthigher(N_); 
 			if(N_ != (int) nn)
 			{
-				warning("ipFFT(): size(0) is not a power of 2.");
+				warning("spFFT(): size(0) is not a power of 2.");
 				return false;
 			}
 			N_ = input.size(1);
 			nn = nexthigher(N_); 
 			if(N_ != (int) nn)
 			{
-				warning("ipFFT(): size(1) is not a power of 2.");
+				warning("spFFT(): size(1) is not a power of 2.");
 				return false;
 			}
 		}
@@ -102,17 +102,17 @@ bool ipFFT::checkInput(const Tensor& input) const
 	
 	if (input.nDimension() == 3)
 	{
-		print("ipFFT::checkInput() assuming inverse FFT 2D ...\n");
+		print("spFFT::checkInput() assuming inverse FFT 2D ...\n");
 
 	   	if(inverse == false)
 		{
-			warning("ipFFT(): impossible to handle forward mode with 3D input tensor.");
+			warning("spFFT(): impossible to handle forward mode with 3D input tensor.");
 			return false;
 		}
 
 		if(input.size(2) != 2)
 		{
-			warning("ipFFT(): size(2) is not 2 (necessary to handle real and imag parts).");
+			warning("spFFT(): size(2) is not 2 (necessary to handle real and imag parts).");
 			return false;
 		}
 
@@ -120,14 +120,14 @@ bool ipFFT::checkInput(const Tensor& input) const
 		unsigned int nn = nexthigher(N_); 
 		if(N_ != (int) nn)
 		{
-			warning("ipFFT(): size(0) is not a power of 2.");
+			warning("spFFT(): size(0) is not a power of 2.");
 			return false;
 		}
 		N_ = input.size(1);
 		nn = nexthigher(N_); 
 		if(N_ != (int) nn)
 		{
-			warning("ipFFT(): size(1) is not a power of 2.");
+			warning("spFFT(): size(1) is not a power of 2.");
 			return false;
 		}
 	}
@@ -139,7 +139,7 @@ bool ipFFT::checkInput(const Tensor& input) const
 /////////////////////////////////////////////////////////////////////////
 // Allocate (if needed) the output tensors given the input tensor dimensions
 
-bool ipFFT::allocateOutput(const Tensor& input)
+bool spFFT::allocateOutput(const Tensor& input)
 {
 	if (	m_output == 0 )
 	{
@@ -147,7 +147,7 @@ bool ipFFT::allocateOutput(const Tensor& input)
 	
 		if (input.nDimension() == 1)
 		{
-			print("ipFFT::allocateOutput() assuming FFT 1D ...\n");
+			print("spFFT::allocateOutput() assuming FFT 1D ...\n");
 
 			N = input.size(0);
 
@@ -159,7 +159,7 @@ bool ipFFT::allocateOutput(const Tensor& input)
 		{
 		   	if(inverse)
 			{
-				print("ipFFT::allocateOutput() assuming inverse FFT 1D ...\n");
+				print("spFFT::allocateOutput() assuming inverse FFT 1D ...\n");
 
 				N = input.size(0);
 
@@ -169,7 +169,7 @@ bool ipFFT::allocateOutput(const Tensor& input)
 			}
 			else
 			{
-				print("ipFFT::allocateOutput() assuming FFT 2D ...\n");
+				print("spFFT::allocateOutput() assuming FFT 2D ...\n");
 
 				H = input.size(0);
 				W = input.size(1);
@@ -181,7 +181,7 @@ bool ipFFT::allocateOutput(const Tensor& input)
 		}
 		else if (input.nDimension() == 3)
 		{
-			print("ipFFT::allocateOutput() assuming inverse FFT 2D ...\n");
+			print("spFFT::allocateOutput() assuming inverse FFT 2D ...\n");
 
 			H = input.size(0);
 			W = input.size(1);
@@ -198,7 +198,7 @@ bool ipFFT::allocateOutput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated)
 
-bool ipFFT::processInput(const Tensor& input)
+bool spFFT::processInput(const Tensor& input)
 {
 	const FloatTensor* t_input = (FloatTensor*)&input;
 

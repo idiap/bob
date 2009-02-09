@@ -1,29 +1,28 @@
-#ifndef _TORCHSPRO_IP_DCT_H_
-#define _TORCHSPRO_IP_DCT_H_
+#ifndef _TORCHSPRO_SP_FFT_H_
+#define _TORCHSPRO_SP_FFT_H_
 
 #include "Tensor.h"
-#include "ipCore.h"		// <ipCrop> is a <Torch::ipCore>
-#include "vision.h"		// <sRect2D> definition
+#include "spCore.h"		// <ipCrop> is a <Torch::ipCore>
 
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipDCT
-	//	This class is designed to perform DCT.
+	// Torch::spFFT
+	//	This class is designed to perform FFT.
 	//	The result is a tensor of the same storage type.
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ipDCT : public ipCore
+	class spFFT : public spCore
 	{
 	public:
 
 		// Constructor
-		ipDCT(bool inverse_ = false);
+		spFFT(bool inverse_ = false);
 
 		// Destructor
-		virtual ~ipDCT();
+		virtual ~spFFT();
 
 	protected:
 
@@ -48,10 +47,10 @@ namespace Torch
 		bool inverse;
 
 		int N;
-		int H;
-		int W;
+		int H,W;
 
 		FloatTensor *R;
+		FloatTensor *I;
 	};
 }
 

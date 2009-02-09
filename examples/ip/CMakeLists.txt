@@ -13,11 +13,9 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
 			"${TORCH5SPRO_DIR}/src/ip/shape/"
 			"${TORCH5SPRO_DIR}/src/geometry/"
 			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
-			"${TORCH5SPRO_DIR}/src/ip/transforms/"
 			"${TORCH5SPRO_DIR}/extras/jpeg/")
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
-		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a"
-		"${TORCH5SPRO_DIR}/extras/oourafft/build_${TORCH_OS}_${TORCH_ARCH}/liboourafft.a")
+		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
 
 # Set the compiler flags and build type (release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -42,10 +40,6 @@ SET(EXAMPLE_SRC
 	lbp.cc
 	histo.cc
 	smoothGaussian.cc
-	fft1d.cc
-	dct1d.cc
-	fft2d.cc
-	dct2d.cc
 	sobel.cc
 	ipflipper2d.cc
 	ipflipper3d.cc
