@@ -72,8 +72,8 @@ namespace Torch
 		bool			setLUT(double* lut, int lut_size);
 		bool			setXY(int x, int y);
 
-		// Change the model size (need to set the model size to the <ipLBP>) - overriden
-		virtual bool		setModelSize(int model_w, int model_h);
+		// Change the input size (need to set the model size to the <ipLBP>) - overriden
+		virtual bool		setInputSize(const TensorSize& inputSize);
 
 		///////////////////////////////////////////////////////////
 

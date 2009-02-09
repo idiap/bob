@@ -82,11 +82,11 @@ bool CascadeMachine::Stage::setWeight(int i_machine, double weight)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Change the model size (need to set the model size to each <Machine>) - overriden
+// Set the input size to use (need to set the model size to each <Machine>) - overriden
 
-bool CascadeMachine::setModelSize(int model_w, int model_h)
+bool CascadeMachine::setInputSize(const TensorSize& inputSize)
 {
-	if (Machine::setModelSize(model_w, model_h) == false)
+	if (Machine::setInputSize(inputSize) == false)
 	{
 		return false;
 	}
@@ -100,7 +100,7 @@ bool CascadeMachine::setModelSize(int model_w, int model_h)
 			Machine* machine = stage.m_machines[n];
 			if (machine != 0)
 			{
-				machine->setModelSize(model_w, model_h);
+				machine->setInputSize(inputSize);
 			}
 		}
 	}
@@ -238,16 +238,11 @@ bool CascadeMachine::loadFile(File& file)
 	}
 
 	// Get the model size
-	int model_w, model_h;
-	if (file.taggedRead(&model_w, sizeof(int), 1, "WIDTH") != 1)
+	TensorSize inputSize;
+	if (file.taggedRead(&inputSize, sizeof(TensorSize), 1, "INPUT_SIZE") != 1)
 	{
-		Torch::message("CascadeMachine::load - failed to read <WIDTH> field!\n");
+		Torch::message("CascadeMachine::load - failed to read <INPUT_SIZE> field!\n");
 		return false;
-	}
-        if (file.taggedRead(&model_h, sizeof(int), 1, "HEIGHT") != 1)
-        {
-        	Torch::message("CascadeMachine::load - failed to read <HEIGHT> field!\n");
-        	return false;
 	}
 
 	// Create the machine stages
@@ -304,7 +299,7 @@ bool CascadeMachine::loadFile(File& file)
 				Torch::message("CascadeMachine::load - invalid machine ID!\n");
 				return false;
 			}
-			if (machine->setModelSize(model_w, model_h) == false)
+			if (machine->setInputSize(inputSize) == false)
 			{
 			        delete machine;
 			        Torch::message("CascadeMachine::load - could not set the machine's model size!\n");
@@ -339,7 +334,7 @@ bool CascadeMachine::loadFile(File& file)
 	}
 
 	// OK, force the model size to all Machines
-	return setModelSize(model_w, model_h);
+	return setInputSize(inputSize);
 }
 
 bool CascadeMachine::saveFile(File& file) const
@@ -353,15 +348,10 @@ bool CascadeMachine::saveFile(File& file) const
 	}
 
 	// Write the model size
-	if (file.taggedWrite(&m_model_w, sizeof(int), 1, "WIDTH") != 1)
+	if (file.taggedWrite(&m_inputSize, sizeof(TensorSize), 1, "INPUT_SIZE") != 1)
 	{
-		Torch::message("CascadeMachine::save - failed to write <WIDTH> field!\n");
+		Torch::message("CascadeMachine::save - failed to write <INPUT_SIZE> field!\n");
 		return false;
-	}
-        if (file.taggedWrite(&m_model_h, sizeof(int), 1, "HEIGHT") != 1)
-        {
-        	Torch::message("CascadeMachine::save - failed to write <HEIGHT> field!\n");
-        	return false;
 	}
 
 	// Write the number of stages
@@ -469,7 +459,7 @@ bool CascadeMachine::setMachine(int i_stage, int i_machine, Machine* machine)
 	if (stage.setMachine(i_machine, machine))
 	{
 		// Don't forget to set the model size to this machine too
-		machine->setModelSize(m_model_w, m_model_h);
+		machine->setInputSize(m_inputSize);
 		return true;
 	}
 	return false;

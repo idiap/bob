@@ -23,15 +23,6 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 
-// <CHECK_FATAL> definition
-#include <cCHECK_FATAL>
-
-#define CHECK(Test) 				\
-{						\
-	const bool ret = (Test);		\
-	CHECK_FATAL(ret == true);			\
-}
-
 using namespace Torch;
 
 //////////////////////////////////////////////////////////////////////////
@@ -84,14 +75,14 @@ struct Params
 
 void setGeneralOptions(Explorer* explorer, const Params& params)
 {
-	CHECK(explorer->setIOption("min_patt_w", params.min_patt_w) == true);
-	CHECK(explorer->setIOption("max_patt_w", params.max_patt_w) == true);
-	CHECK(explorer->setIOption("min_patt_h", params.min_patt_h) == true);
-	CHECK(explorer->setIOption("max_patt_h", params.max_patt_h) == true);
-	CHECK(explorer->setFOption("ds", params.ds) == true);
-	CHECK(explorer->setBOption("StopAtFirstDetection", params.stop_at_first_detection) == true);
-	CHECK(explorer->setBOption("StartWithLargeScales", params.start_with_large_scales) == true);
-	CHECK(explorer->setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(explorer->setIOption("min_patt_w", params.min_patt_w) == true);
+	CHECK_FATAL(explorer->setIOption("max_patt_w", params.max_patt_w) == true);
+	CHECK_FATAL(explorer->setIOption("min_patt_h", params.min_patt_h) == true);
+	CHECK_FATAL(explorer->setIOption("max_patt_h", params.max_patt_h) == true);
+	CHECK_FATAL(explorer->setFOption("ds", params.ds) == true);
+	CHECK_FATAL(explorer->setBOption("StopAtFirstDetection", params.stop_at_first_detection) == true);
+	CHECK_FATAL(explorer->setBOption("StartWithLargeScales", params.start_with_large_scales) == true);
+	CHECK_FATAL(explorer->setBOption("verbose", params.verbose) == true);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -105,8 +96,8 @@ void saveImage(	const Image& image, xtprobeImageFile& xtprobe,
 	char str[1024];
 	sprintf(str, "%s_%s", basename, filename);
 
-        CHECK(xtprobe.open(str, "w+") == true);
-        CHECK(image.saveImage(xtprobe));
+        CHECK_FATAL(xtprobe.open(str, "w+") == true);
+        CHECK_FATAL(image.saveImage(xtprobe));
         xtprobe.close();
 }
 
@@ -296,8 +287,8 @@ int main(int argc, char* argv[])
         Image image(1, 1, 1);
 
         xtprobeImageFile xtprobe;
-        CHECK(xtprobe.open(filename_image, "r") == true);
-        CHECK(image.loadImage(xtprobe) == true);
+        CHECK_FATAL(xtprobe.open(filename_image, "r") == true);
+        CHECK_FATAL(image.loadImage(xtprobe) == true);
         xtprobe.close();
 
 	const int image_w = image.getWidth();
@@ -314,14 +305,14 @@ int main(int argc, char* argv[])
 
         // Evaluator - checks if some sub-window contains a pattern
         ipSWEvaluator evaluator;
-        CHECK(evaluator.setClassifier(filename_model) == true);
-        CHECK(evaluator.setBOption("verbose", params.verbose) == true);
-	CHECK(evaluator.setBOption("saveBuffTensorToJpg", params.save_evaluator_jpg) == true);
+        CHECK_FATAL(evaluator.setClassifier(filename_model) == true);
+        CHECK_FATAL(evaluator.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(evaluator.setBOption("saveBuffTensorToJpg", params.save_evaluator_jpg) == true);
 
         // Pruners - rejects some sub-windows before actually checking is they contain a pattern
 	ipSWVariancePruner pruner;
-	CHECK(pruner.setBOption("UseMean", params.prune_use_mean) == true);
-	CHECK(pruner.setBOption("UseStdev", params.prune_use_stdev) == true);
+	CHECK_FATAL(pruner.setBOption("UseMean", params.prune_use_mean) == true);
+	CHECK_FATAL(pruner.setBOption("UseStdev", params.prune_use_stdev) == true);
 	pruner.setMinMean(params.prune_min_mean);
 	pruner.setMaxMean(params.prune_max_mean);
 	pruner.setMinStdev(params.prune_min_stdev);
@@ -333,7 +324,7 @@ int main(int argc, char* argv[])
 	{
 	case 0:	// Pyramid
 		explorer = new PyramidExplorer;
-		CHECK(explorer->setBOption("savePyramidsToJpg", params.save_pyramid_jpg) == true);
+		CHECK_FATAL(explorer->setBOption("savePyramidsToJpg", params.save_pyramid_jpg) == true);
 		break;
 
 	case 1:	// Multiscale
@@ -343,28 +334,28 @@ int main(int argc, char* argv[])
 	case 2: // Greedy
 	default:
 		explorer = new GreedyExplorer;
-		CHECK(explorer->setIOption("SWdx", params.greedy_perdx) == true);
-                CHECK(explorer->setIOption("SWdy", params.greedy_perdy) == true);
-                CHECK(explorer->setIOption("SWds", params.greedy_perds) == true);
-                CHECK(explorer->setIOption("NoSteps", params.greedy_nsteps) == true);
+		CHECK_FATAL(explorer->setIOption("SWdx", params.greedy_perdx) == true);
+                CHECK_FATAL(explorer->setIOption("SWdy", params.greedy_perdy) == true);
+                CHECK_FATAL(explorer->setIOption("SWds", params.greedy_perds) == true);
+                CHECK_FATAL(explorer->setIOption("NoSteps", params.greedy_nsteps) == true);
 		break;
 	}
 	setGeneralOptions(explorer, params);
 
 	// ScaleExplorers - fixed scale scanning methods
 	ExhaustiveScaleExplorer scale_explorer_ex;
-	CHECK(scale_explorer_ex.setFOption("dx", params.dx) == true);
-	CHECK(scale_explorer_ex.setFOption("dy", params.dy) == true);
-	CHECK(scale_explorer_ex.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(scale_explorer_ex.setFOption("dx", params.dx) == true);
+	CHECK_FATAL(scale_explorer_ex.setFOption("dy", params.dy) == true);
+	CHECK_FATAL(scale_explorer_ex.setBOption("verbose", params.verbose) == true);
 
 	SpiralScaleExplorer scale_explorer_sp;
-	CHECK(scale_explorer_sp.setFOption("dx", params.dx) == true);
-	CHECK(scale_explorer_sp.setFOption("dy", params.dy) == true);
-	CHECK(scale_explorer_sp.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(scale_explorer_sp.setFOption("dx", params.dx) == true);
+	CHECK_FATAL(scale_explorer_sp.setFOption("dy", params.dy) == true);
+	CHECK_FATAL(scale_explorer_sp.setBOption("verbose", params.verbose) == true);
 
 	RandomScaleExplorer scale_explorer_rd;
-	CHECK(scale_explorer_rd.setIOption("NSamples", params.random_nsamples) == true);
-	CHECK(scale_explorer_rd.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(scale_explorer_rd.setIOption("NSamples", params.random_nsamples) == true);
+	CHECK_FATAL(scale_explorer_rd.setBOption("verbose", params.verbose) == true);
 
 	const int n_scale_explorers = 3;
 	ScaleExplorer* scale_explorers[n_scale_explorers] =
@@ -394,15 +385,15 @@ int main(int argc, char* argv[])
 	// Selectors - select the best pattern sub-windows from the candidates
 	OverlapSelector selector_ov;
 	selector_ov.setMerger(pattern_mergers[params.select_merge_type]);
-	CHECK(selector_ov.setIOption("minSurfOverlap", params.select_min_surf_overlap) == true);
-	CHECK(selector_ov.setBOption("iterative", params.select_overlap_iterative) == true);
-	CHECK(selector_ov.setBOption("verbose", params.verbose) == true);
-	CHECK(selector_ov.setBOption("onlySurfOverlaps", true) == true);
-	CHECK(selector_ov.setBOption("onlyMaxSurf", false) == true);
-	CHECK(selector_ov.setBOption("onlyMaxConf", false) == true);
+	CHECK_FATAL(selector_ov.setIOption("minSurfOverlap", params.select_min_surf_overlap) == true);
+	CHECK_FATAL(selector_ov.setBOption("iterative", params.select_overlap_iterative) == true);
+	CHECK_FATAL(selector_ov.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(selector_ov.setBOption("onlySurfOverlaps", true) == true);
+	CHECK_FATAL(selector_ov.setBOption("onlyMaxSurf", false) == true);
+	CHECK_FATAL(selector_ov.setBOption("onlyMaxConf", false) == true);
 
 	MeanShiftSelector selector_ms;
-	CHECK(selector_ms.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(selector_ms.setBOption("verbose", params.verbose) == true);
 
 	const int n_selectors = 2;
 	Selector* selectors[n_selectors] =
@@ -413,11 +404,11 @@ int main(int argc, char* argv[])
 
 	// Scanner - main scanning object, contains the ROIs
 	Scanner scanner;
-	CHECK(scanner.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(scanner.setBOption("verbose", params.verbose) == true);
         scanner.deleteAllROIs();
-	CHECK(scanner.getNoROIs() == 0);
-	//CHECK(scanner.addROI(0, 0, 400, 400) == true);
-	//CHECK(scanner.getNoROIs() == 1);
+	CHECK_FATAL(scanner.getNoROIs() == 0);
+	//CHECK_FATAL(scanner.addROI(0, 0, 400, 400) == true);
+	//CHECK_FATAL(scanner.getNoROIs() == 1);
 
 	///////////////////////////////////////////////////////////////////
 	// Assembly the scanning object and process the image
@@ -429,14 +420,14 @@ int main(int argc, char* argv[])
 
 	// Assembly the main scanning object as desired
 	explorer->deleteAllSWPruners();
-	CHECK(explorer->setSWEvaluator(&evaluator) == true);
-	CHECK(explorer->addSWPruner(&pruner) == true);
+	CHECK_FATAL(explorer->setSWEvaluator(&evaluator) == true);
+	CHECK_FATAL(explorer->addSWPruner(&pruner) == true);
 
-	CHECK(scanner.setExplorer(explorer) == true);
-	CHECK(scanner.setSelector(selectors[params.select_type]) == true);
+	CHECK_FATAL(scanner.setExplorer(explorer) == true);
+	CHECK_FATAL(scanner.setSelector(selectors[params.select_type]) == true);
 
 	// Initialize processing
-	CHECK(scanner.init(image) == true);
+	CHECK_FATAL(scanner.init(image) == true);
 	const int n_scales = explorer->getNoScales();
 
         // Set for each scale the feature extractors (<ipCore>s)
@@ -446,16 +437,16 @@ int main(int argc, char* argv[])
 	case 0:	// Pyramid
                 for (int j = 0; j < n_scales; j ++)
                 {
-                        CHECK(explorer->setScalePruneIp(j, 0) == true);
-                        CHECK(explorer->setScaleEvaluationIp(j, 0) == true);
+                        CHECK_FATAL(explorer->setScalePruneIp(j, 0) == true);
+                        CHECK_FATAL(explorer->setScaleEvaluationIp(j, 0) == true);
                 }
 		break;
 
 	case 1:	// Multiscale
 	case 2: // Greedy
 	default:
-		CHECK(explorer->setScalePruneIp(0) == true);
-                CHECK(explorer->setScaleEvaluationIp(0) == true);
+		CHECK_FATAL(explorer->setScalePruneIp(0) == true);
+                CHECK_FATAL(explorer->setScaleEvaluationIp(0) == true);
 		break;
 	}
 
@@ -482,15 +473,15 @@ int main(int argc, char* argv[])
 			index = rand() % n_scale_explorers;
 			break;
         	}
-                CHECK(explorer->setScaleExplorer(j, scale_explorers[index]) == true);
+                CHECK_FATAL(explorer->setScaleExplorer(j, scale_explorers[index]) == true);
 
 		const sSize& scale = explorer->getScale(j);
 		print(">>> scale [%dx%d] -> %s\n", scale.w, scale.h, str_scale_explorers[index]);
         }
 
         // Scan the image and get the results
-        CHECK(scanner.preprocess(image) == true);
-        CHECK(scanner.process(image) == true);
+        CHECK_FATAL(scanner.preprocess(image) == true);
+        CHECK_FATAL(scanner.process(image) == true);
 
         print("No of sub-windows: pruned = %d, scanned = %d, accepted = %d\n",
                 scanner.getNoPrunnedSWs(),

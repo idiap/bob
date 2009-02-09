@@ -44,8 +44,8 @@ namespace Torch
 		bool			setWeight(int i_stage, int i_machine, double weight);
 		bool			setThreshold(int i_stage, double threshold);
 
-		// Change the model size (need to set the model size to each <Machine>) - overriden
-		virtual bool		setModelSize(int model_w, int model_h);
+		// Set the input size to use (need to set the model size to each <Machine>) - overriden
+		virtual bool		setInputSize(const TensorSize& inputSize);
 
 		///////////////////////////////////////////////////////////
 

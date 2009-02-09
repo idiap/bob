@@ -160,8 +160,8 @@
         m_scale_bl_indexes = new int[m_buff_n_indexes];                                 \
         m_scale_cell_sizes = new int[m_buff_n_indexes];                                 \
                                                                                         \
-        const int model_w = m_classifier->getModelWidth();                              \
-        const int model_h = m_classifier->getModelHeight();                             \
+        const int model_w = getModelWidth();                              		\
+        const int model_h = getModelHeight();                             		\
         const double inv_model_w = 1.0 / (model_w + 0.0);                               \
         const double inv_model_h = 1.0 / (model_h + 0.0);                               \
                                                                                         \
@@ -226,8 +226,8 @@
         m_scale_bl_indexes = new int[m_buff_n_indexes];                                 \
         m_scale_cell_sizes = new int[m_buff_n_indexes];                                 \
                                                                                         \
-        const int model_w = m_classifier->getModelWidth();                              \
-        const int model_h = m_classifier->getModelHeight();                             \
+        const int model_w = getModelWidth();                              		\
+        const int model_h = getModelHeight();                             		\
         const double inv_model_w = 1.0 / (model_w + 0.0);                               \
         const double inv_model_h = 1.0 / (model_h + 0.0);                               \
                                                                                         \
@@ -385,7 +385,7 @@ bool ipSWEvaluator::setClassifier(const char* filename)
 /////////////////////////////////////////////////////////////////////////
 // Access functions
 
-bool ipSWEvaluator::isPattern() const
+inline bool ipSWEvaluator::isPattern() const
 {
         if (m_classifier == 0)
         {
@@ -394,7 +394,7 @@ bool ipSWEvaluator::isPattern() const
         return m_classifier->isPattern();
 }
 
-double ipSWEvaluator::getConfidence() const
+inline double ipSWEvaluator::getConfidence() const
 {
         if (m_classifier == 0)
         {
@@ -403,22 +403,22 @@ double ipSWEvaluator::getConfidence() const
         return m_classifier->getConfidence();
 }
 
-int ipSWEvaluator::getModelWidth() const
+inline int ipSWEvaluator::getModelWidth() const
 {
         if (m_classifier == 0)
         {
                 Torch::error("ipSWEvaluator::getModelWidth - no valid classifier specified!\n");
         }
-        return m_classifier->getModelWidth();
+        return m_classifier->getInputSize().size[1];
 }
 
-int ipSWEvaluator::getModelHeight() const
+inline int ipSWEvaluator::getModelHeight() const
 {
         if (m_classifier == 0)
         {
                 Torch::error("ipSWEvaluator::getModelHeight - no valid classifier specified!\n");
         }
-        return m_classifier->getModelHeight();
+        return m_classifier->getInputSize().size[0];
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -457,8 +457,8 @@ bool ipSWEvaluator::processInput(const Tensor& input)
         m_input_stride_h = 0;
         m_input_stride_p = 0;
 
-        const int model_w = m_classifier->getModelWidth();
-        const int model_h = m_classifier->getModelHeight();
+        const int model_w = getModelWidth();
+        const int model_h = getModelHeight();
 
         // Allocate the buffer tensor as to have the model size
         //      and the input type and number of planes
@@ -585,7 +585,7 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
         //      (the sub-window is different from the classifier's size),
         //      then the scalling coefficients should be recomputed!
         if (    changed_size == true &&
-                (sw_w != m_classifier->getModelWidth() || sw_h != m_classifier->getModelHeight()))
+                (sw_w != getModelWidth() || sw_h != getModelHeight()))
         {
         	// Cleanup
                 delete[] m_scale_br_indexes;
@@ -633,8 +633,7 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
 
         // If the sub-window has the size of the machine,
         //      then forward to the classifier the sub-window area of the input
-        if (    m_sw_w == m_classifier->getModelWidth() &&
-                m_sw_h == m_classifier->getModelHeight())
+        if (m_sw_w == getModelWidth() && m_sw_h == getModelHeight())
         {
                 cropInput(*m_input_copy);
         }

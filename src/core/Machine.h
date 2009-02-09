@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_MACHINE_H_
 
 #include "Object.h"
+#include "Tensor.h"
 
 namespace Torch {
 
@@ -104,8 +105,8 @@ namespace Torch {
 		/// (used by <MachineManager>, this object should be deallocated by the user)
 		virtual Machine*	getAnInstance() const = 0;
 
-		// Set the model size to use
-		virtual bool		setModelSize(int model_w, int model_h);
+		// Set the input size to use
+		virtual bool		setInputSize(const TensorSize& inputSize);
 
 		// Get the ID specific to each Machine
 		virtual int		getID() const = 0;
@@ -113,8 +114,7 @@ namespace Torch {
 		///////////////////////////////////////////////////////////
 		// Access functions
 
-		int			getModelWidth() const { return m_model_w; }
-		int			getModelHeight() const { return m_model_h; }
+		const TensorSize&	getInputSize() const { return m_inputSize; }
 		const DoubleTensor&     getOutput() const;
 
 		///////////////////////////////////////////////////////////
@@ -124,8 +124,8 @@ namespace Torch {
 		///////////////////////////////////////////////////////////////
 		// Attributes
 
-		// Model size
-		int			m_model_w, m_model_h;
+		// Model size (size of the input tensor to process)
+		TensorSize		m_inputSize;
 
 		// The result when run on some data
 		DoubleTensor*		m_output;
