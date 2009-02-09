@@ -38,6 +38,7 @@ SET(TORCH5SPRO_SUBDIRS
 	th
 	core
 	sp
+	ap
 	ip
 	scanning
 	machine
