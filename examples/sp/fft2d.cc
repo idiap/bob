@@ -1,4 +1,4 @@
-#include "ipFFT.h"
+#include "spFFT.h"
 #include "Tensor.h"
 #include <cassert>
 
@@ -29,14 +29,14 @@ int main()
 	image.print("x");
 	
 	//
-	ipFFT fft2d;
+	spFFT fft2d;
 	print("Computing the FFT of x ...\n");
 	fft2d.process(image);
 	assert(fft2d.getNOutputs() == 1);
 	fft2d.getOutput(0).print("F[x]");
 
 	//
-	ipFFT ifft2d(true);
+	spFFT ifft2d(true);
 	print("Computing the iFFT of F[x]...\n");
 	ifft2d.process(fft2d.getOutput(0));
 	assert(ifft2d.getNOutputs() == 1);
@@ -68,13 +68,13 @@ int main()
 			//image.print("x");
 			
 			//
-			ipFFT fft2d;
+			spFFT fft2d;
 			print("  Computing the FFT of x ...\n");
 			fft2d.process(image);
 			//fft2d.getOutput(0).print("F[x]");
 
 			//
-			ipFFT ifft2d(true);
+			spFFT ifft2d(true);
 			print("  Computing the iFFT of F[x]...\n");
 			ifft2d.process(fft2d.getOutput(0));
 			//ifft2d.getOutput(0).print("inverse F[x]");

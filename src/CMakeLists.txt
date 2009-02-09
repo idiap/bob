@@ -37,6 +37,7 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/oourafft")
 SET(TORCH5SPRO_SUBDIRS
 	th
 	core
+	sp
 	ip
 	scanning
 	machine

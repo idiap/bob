@@ -1,4 +1,4 @@
-#include "ipDCT.h"
+#include "spDCT.h"
 #include "Tensor.h"
 #include <cassert>
 
@@ -29,14 +29,14 @@ int main()
 	image.print("x");
 	
 	//
-	ipDCT dct2d;
+	spDCT dct2d;
 	print("Computing the DCT of x ...\n");
 	dct2d.process(image);
 	assert(dct2d.getNOutputs() == 1);
 	dct2d.getOutput(0).print("F[x]");
 
 	//
-	ipDCT idct2d(true);
+	spDCT idct2d(true);
 	print("Computing the iDCT of F[x]...\n");
 	idct2d.process(dct2d.getOutput(0));
 	assert(idct2d.getNOutputs() == 1);
@@ -68,12 +68,12 @@ int main()
 				}
 
 			//
-			ipDCT dct2d;
+			spDCT dct2d;
 			print("Computing the DCT of x ...\n");
 			dct2d.process(x);
 
 			//
-			ipDCT idct2d(true);
+			spDCT idct2d(true);
 			print("Computing the iDCT of F[x]...\n");
 			idct2d.process(dct2d.getOutput(0));
 

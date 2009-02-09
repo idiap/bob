@@ -1,4 +1,4 @@
-#include "ipFFT.h"
+#include "spDCT.h"
 #include "Tensor.h"
 #include <cassert>
 
@@ -12,10 +12,11 @@ int main()
 
    	THRandom_manualSeed(950305);
 
-	print("\n\nTesting 1D FFT\n\n");
+	print("\n\nTesting 1D DCT\n\n");
 
 	//
-	int N = 8;
+	int N = 4;
+
 	FloatTensor data(N);
 
 	for(int i = 0 ; i < N ; i++)
@@ -27,18 +28,19 @@ int main()
 	data.print("x");
 	
 	//
-	ipFFT fft1d;
-	print("Computing the FFT of x ...\n");
-	fft1d.process(data);
-	assert(fft1d.getNOutputs() == 1);
-	fft1d.getOutput(0).print("F[x]");
+	spDCT dct1d;
+	print("Computing the DCT of x ...\n");
+	dct1d.process(data);
+	assert(dct1d.getNOutputs() == 1);
+	dct1d.getOutput(0).print("F[x]");
 
 	//
-	ipFFT ifft1d(true);
-	print("Computing the iFFT of F[x]...\n");
-	ifft1d.process(fft1d.getOutput(0));
-	assert(ifft1d.getNOutputs() == 1);
-	ifft1d.getOutput(0).print("inverse F[x]");
+	spDCT idct1d(true);
+	print("Computing the iDCT of F[x]...\n");
+	idct1d.process(dct1d.getOutput(0));
+	assert(idct1d.getNOutputs() == 1);
+	idct1d.getOutput(0).print("inverse F[x]");
+
 
 	//
 	const int n_tests = 11;
@@ -46,32 +48,29 @@ int main()
 
 	for(int t = 0 ; t < n_tests ; t++)
 	{
-		print("Testing %d-points 1D FFT\n", n_tests_N[t]);
+		print("Testing %d-points 1D DCT\n", n_tests_N[t]);
 
 		N = n_tests_N[t];
+
 		FloatTensor x(N);
 
 		for(int i = 0 ; i < N ; i++)
 		{
 			double random_ = THRandom_uniform(0, 255);
-	        	x(i) = random_;
+		        x(i) = random_;
 		}
 
-		//x.print("x");
-	
 		//
-		ipFFT fft1d;
-		print("  Computing the FFT of x ...\n");
-		fft1d.process(x);
-		//fft1d.getOutput(0).print("F[x]");
+		spDCT dct1d;
+		print("Computing the DCT of x ...\n");
+		dct1d.process(x);
 
 		//
-		ipFFT ifft1d(true);
-		print("  Computing the iFFT of F[x]...\n");
-		ifft1d.process(fft1d.getOutput(0));
-		//ifft1d.getOutput(0).print("inverse F[x]");
+		spDCT idct1d(true);
+		print("Computing the iDCT of F[x]...\n");
+		idct1d.process(dct1d.getOutput(0));
 
-		const FloatTensor& out = (const FloatTensor&) ifft1d.getOutput(0);
+		const FloatTensor& out = (const FloatTensor&) idct1d.getOutput(0);
 
 		double rmse = 0.0;
 		for(int i = 0 ; i < N ; i++)

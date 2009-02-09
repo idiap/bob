@@ -1,4 +1,4 @@
-#include "ipDCT.h"
+#include "spDCT.h"
 #include "ooura.h"
 
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
@@ -8,8 +8,8 @@ namespace Torch {
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-ipDCT::ipDCT(bool inverse_)
-	:	ipCore()
+spDCT::spDCT(bool inverse_)
+	:	spCore()
 {
 	inverse = inverse_;
 	R = NULL;
@@ -18,7 +18,7 @@ ipDCT::ipDCT(bool inverse_)
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-ipDCT::~ipDCT()
+spDCT::~spDCT()
 {
 	if(R != NULL) delete R;
 }
@@ -26,7 +26,7 @@ ipDCT::~ipDCT()
 //////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type
 
-bool ipDCT::checkInput(const Tensor& input) const
+bool spDCT::checkInput(const Tensor& input) const
 {
 	// Accept only tensors of Torch::Float
 	if (input.getDatatype() != Tensor::Float) return false;
@@ -34,8 +34,8 @@ bool ipDCT::checkInput(const Tensor& input) const
 
 	if (input.nDimension() == 1)
 	{
-	   	if(inverse) print("ipDCT::checkInput() inverse DCT 1D ...\n");
-		else print("ipDCT::checkInput() DCT 1D ...\n");
+	   	if(inverse) print("spDCT::checkInput() inverse DCT 1D ...\n");
+		else print("spDCT::checkInput() DCT 1D ...\n");
 
 		int N_ = input.size(0);
 
@@ -43,28 +43,28 @@ bool ipDCT::checkInput(const Tensor& input) const
 		
 		if(N_ != (int) nn)
 		{
-			warning("ipDCT(): size(0) is not a power of 2.");
+			warning("spDCT(): size(0) is not a power of 2.");
 			return false;
 		}
 	}
 	
 	if (input.nDimension() == 2)
 	{
-	   	if(inverse) print("ipDCT::checkInput() inverse DCT 2D ...\n");
-		else print("ipDCT::checkInput() DCT 2D ...\n");
+	   	if(inverse) print("spDCT::checkInput() inverse DCT 2D ...\n");
+		else print("spDCT::checkInput() DCT 2D ...\n");
 
 		int N_ = input.size(0);
 		unsigned int nn = nexthigher(N_); 
 		if(N_ != (int) nn)
 		{
-			warning("ipDCT(): size(0) is not a power of 2.");
+			warning("spDCT(): size(0) is not a power of 2.");
 			return false;
 		}
 		N_ = input.size(1);
 		nn = nexthigher(N_); 
 		if(N_ != (int) nn)
 		{
-			warning("ipDCT(): size(1) is not a power of 2.");
+			warning("spDCT(): size(1) is not a power of 2.");
 			return false;
 		}
 	}
@@ -76,7 +76,7 @@ bool ipDCT::checkInput(const Tensor& input) const
 /////////////////////////////////////////////////////////////////////////
 // Allocate (if needed) the output tensors given the input tensor dimensions
 
-bool ipDCT::allocateOutput(const Tensor& input)
+bool spDCT::allocateOutput(const Tensor& input)
 {
 	if (	m_output == 0 )
 	{
@@ -86,7 +86,7 @@ bool ipDCT::allocateOutput(const Tensor& input)
 
 		if (input.nDimension() == 1)
 		{
-			print("ipDCT::allocateOutput() DCT 1D ...\n");
+			print("spDCT::allocateOutput() DCT 1D ...\n");
 
 			N = input.size(0);
 
@@ -98,7 +98,7 @@ bool ipDCT::allocateOutput(const Tensor& input)
 		}
 		else if (input.nDimension() == 2)
 		{
-			print("ipDCT::allocateOutput() DCT 2D ...\n");
+			print("spDCT::allocateOutput() DCT 2D ...\n");
 
 			H = input.size(0);
 			W = input.size(1);
@@ -117,7 +117,7 @@ bool ipDCT::allocateOutput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated)
 
-bool ipDCT::processInput(const Tensor& input)
+bool spDCT::processInput(const Tensor& input)
 {
 	const FloatTensor* t_input = (FloatTensor*)&input;
 
