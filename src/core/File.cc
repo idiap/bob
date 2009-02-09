@@ -81,6 +81,7 @@ namespace Torch
 	{
 		// TODO: check that the <read>s actually read all the bytes correctly
 
+
 		int tag_size = 0;
 		read(&tag_size, sizeof(int), 1);
 		if (tag_size != (int)strlen(tag))

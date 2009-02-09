@@ -185,6 +185,21 @@
 		</Unit>
 		<Unit filename="../../../extras/jpeg/jversion.h" />
 		<Unit filename="../../../extras/jpeg/transupp.h" />
+		<Unit filename="../../../extras/oourafft/CMakeLists.txt" />
+		<Unit filename="../../../extras/oourafft/alloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/oourafft/alloc.h" />
+		<Unit filename="../../../extras/oourafft/fftsg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/oourafft/fftsg2d.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/oourafft/makeoourafft.csh" />
+		<Unit filename="../../../extras/oourafft/shrtdct.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../CMakeLists.txt" />
 		<Unit filename="../../ap/CMakeLists.txt" />
 		<Unit filename="../../core/CMakeLists.txt" />
@@ -389,6 +404,12 @@
 		<Unit filename="../../scanning/selectors/OverlapSelector.cc" />
 		<Unit filename="../../scanning/selectors/OverlapSelector.h" />
 		<Unit filename="../../sp/CMakeLists.txt" />
+		<Unit filename="../../sp/ooura.cc" />
+		<Unit filename="../../sp/ooura.h" />
+		<Unit filename="../../sp/spDCT.cc" />
+		<Unit filename="../../sp/spDCT.h" />
+		<Unit filename="../../sp/spFFT.cc" />
+		<Unit filename="../../sp/spFFT.h" />
 		<Unit filename="../../th/CMakeLists.txt" />
 		<Unit filename="../../th/COPYRIGHT.txt" />
 		<Unit filename="../../th/TH.h" />

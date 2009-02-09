@@ -1,4 +1,3 @@
-#include <cassert>
 #include "DiskDataSet.h"
 #include "Tensor.h"
 
