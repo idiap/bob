@@ -135,7 +135,6 @@ namespace Torch
 
 	int File::read(void* ptr, int block_size, int n_blocks)
 	{
-
 		return fread(ptr, block_size, n_blocks, m_file);
 	}
 

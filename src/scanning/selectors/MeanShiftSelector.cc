@@ -267,8 +267,9 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 {
 	// Get parameters
 	const bool verbose = getBOption("verbose");
-	const int max_n_iters = 100;	// Maximum number of iterations
-	const float kclosest_factor = 5.0f;
+	const int max_n_iters = 100;		// Maximum number of iterations
+	const float kclosest_max_var = 3.0f;	// Maximum variation (avg +/- n * stdev) to find kclosest
+	const float inv_kclosest_max_var = 1.0f / kclosest_max_var;
 
 	// Check parameters
 	if (candidates.isEmpty() == true)
@@ -315,7 +316,7 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 			float crt_w = crt_pattern.m_w;
 			float crt_h = crt_pattern.m_h;
 
-			// Set the bandwidth as the distance to the kclosest point
+			// Compute the distances and sort them
 			static float distances[MaxNoClosestPoints];
 			static float buffer[MaxNoClosestPoints];
 
@@ -330,16 +331,29 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 
 			qsort(distances, n_closest_points, sizeof(float), compare_floats);
 
-			int index = 2;
-			for ( ; index < n_closest_points &&
-				distances[index] < distances[index - 1] * kclosest_factor;
-				index ++)
-			{
-				;
-			}
-			index --;
+			// Choose the kclosest points as to have the given maximum variance
+			float sum = distances[0] + distances[1];
+			float sum_square = distances[0] * distances[0] + distances[1] * distances[1];
 
-			bandwidths[i] = distances[index];
+			int kclosest = 1;
+			while (kclosest + 1 < n_closest_points)
+			{
+				const float inv = 1.0f / (kclosest + 1.0f);
+				const float inv_square = inv * inv;
+
+				const float diff = inv_kclosest_max_var * (distances[kclosest + 1] - inv * sum);
+				if (inv * sum_square - inv_square * sum * sum < diff * diff)
+				{
+					break;
+				}
+
+				kclosest ++;
+				sum += distances[kclosest];
+				sum_square += distances[kclosest] * distances[kclosest];
+			}
+
+			// Set the bandwidth as the distance to the kclosest point
+			bandwidths[i] = distances[kclosest];
 			inv_bandwidths[i] = bandwidths[i] == 0.0f ? 1.0f : 1.0f / bandwidths[i];
 		}
 	}

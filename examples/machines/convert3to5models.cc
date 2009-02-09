@@ -1,6 +1,5 @@
 #include "File.h"
 #include "Machines.h"
-#include <cassert>
 
 using namespace Torch;
 
@@ -45,7 +44,7 @@ void initMCT_to_LBP()
         }
 
         //print("sum_lbp = %d, should be = %d\n", sum_lbp, 512 * 511/ 2);
-        assert(sum_lbp == 512 * 511/ 2);
+        CHECK_FATAL(sum_lbp == 512 * 511/ 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -62,11 +61,10 @@ bool convert(File& file_in, File& file_out)
 	{
 	        return false;
 	}
-        if (file_in.taggedRead(&model_h, sizeof(int), 1, "HEIGHT") != 1)
+	if (file_in.taggedRead(&model_h, sizeof(int), 1, "HEIGHT") != 1)
         {
         	return false;
 	}
-	print("WIDTH = %d, HEIGHT = %d\n", model_w, model_h);
 
 	// Create the machine stages
 	int n_stages;
@@ -190,7 +188,7 @@ bool convert(File& file_in, File& file_out)
 	}
 
 	// Force the model size to all Machines
-	if (cascade_machine.setInputSize(TensorSize(model_h, model_w)) == false)
+	if (cascade_machine.setInputSize(TensorSize(model_h, model_w, 1)) == false)
 	{
 	        return false;
 	}
@@ -220,8 +218,8 @@ int main(int argc, char* argv[])
 	const char* out_filename = argv[2];
 
 	// Open the input/output file
-	assert(file_in.open(in_filename, "r") == true);
-	assert(file_out.open(out_filename, "w+") == true);
+	CHECK_FATAL(file_in.open(in_filename, "r") == true);
+	CHECK_FATAL(file_out.open(out_filename, "w+") == true);
 
 	// Debug
 	print("---------------------------------------------------\n");
