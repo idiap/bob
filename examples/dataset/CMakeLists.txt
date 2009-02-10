@@ -28,6 +28,8 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
+	readtensor.cc
+	bindata2tensor.cc
 	tensorfiles.cc
 	memorydataset.cc
 	diskdataset.cc)
