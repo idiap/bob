@@ -35,12 +35,53 @@ static struct imageformat_ imageformat[] = {	{"ppm", "rgb", 3},
 
 int FindImageFormat(const char *filename);
 
+ImageFile* GetImageFile(const char* filename)
+{
+	const int i = FindImageFormat(filename);
+	if (i != -1)
+	{
+        	switch(i)
+		{
+		case 0:
+			return new ppmImageFile();
+
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+			return new jpegImageFile();
+
+		case 5:
+		case 6:
+		   	return new gifImageFile();
+
+		case 7:
+		   	return new pgmImageFile();
+
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		   	return new tiffImageFile();
+			break;
+
+		default:
+			warning("xtprobeImageFile::open (%s) Impossible to probe image format from extension.",
+				filename);
+			return 0;
+		}
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 // Constructor
 
 xtprobeImageFile::xtprobeImageFile()
-	:	ImageFile(),
-		m_loader(0)
+	:	m_loader(0)
 {
 }
 
@@ -53,99 +94,31 @@ xtprobeImageFile::~xtprobeImageFile()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
-// Read the image header
+// Save an image
 
-bool xtprobeImageFile::readHeader(Image& image)
+bool xtprobeImageFile::save(const Image& image, const char* filename)
 {
-	return 	m_loader != 0 &&
-		m_loader->isOpened() &&
-		m_loader->readHeader(image);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Read the image pixmap
-
-bool xtprobeImageFile::readPixmap(Image& image)
-{
-	return 	m_loader != 0 &&
-		m_loader->isOpened() &&
-		m_loader->readPixmap(image);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Write the image header
-
-bool xtprobeImageFile::writeHeader(const Image& image)
-{
-	return	m_loader != 0 &&
-		m_loader->isOpened() &&
-		m_loader->writeHeader(image);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Write the image pixmap
-
-bool xtprobeImageFile::writePixmap(const Image& image)
-{
-	return 	m_loader != 0 &&
-		m_loader->isOpened() &&
-		m_loader->writePixmap(image);
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Loads some file and check for its image format - overriden
-
-bool xtprobeImageFile::open(const char* file_name, const char* open_flags)
-{
-	File::close();
 	delete m_loader;
-	m_loader = 0;
-
-	// Check the image format
-	const int i = FindImageFormat(file_name);
-	if (i != -1)
-	{
-        	//const char* coding = imageformat[i].coding;
-		//const int n_planes = imageformat[i].n_planes;
-
-		switch(i)
-		{
-		case 0:
-			m_loader = new ppmImageFile();
-		   	break;
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-			m_loader = new jpegImageFile();
-			break;
-		case 5:
-		case 6:
-		   	m_loader = new gifImageFile();
-			break;
-		case 7:
-		   	m_loader = new pgmImageFile();
-			break;
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		   	m_loader = new tiffImageFile();
-			break;
-
-		default:
-			warning("xtprobeImageFile::open (%s) Impossible to probe image format from extension.",
-				file_name);
-			return false;
-		}
-	}
-	else
+	m_loader = GetImageFile(filename);
+	if (m_loader == 0)
 	{
 		return false;
 	}
+	return m_loader->save(image, filename);
+}
 
-	// OK, try to open the file with the choosen loader
-	return m_loader->open(file_name, open_flags);
+//////////////////////////////////////////////////////////////////////////////////////
+// Load an image
+
+bool xtprobeImageFile::load(Image& image, const char* filename)
+{
+	delete m_loader;
+	m_loader = GetImageFile(filename);
+	if (m_loader == 0)
+	{
+		return false;
+	}
+	return m_loader->load(image, filename);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

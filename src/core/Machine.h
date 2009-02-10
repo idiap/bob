@@ -9,6 +9,7 @@ namespace Torch {
 	class Tensor;
 	class DoubleTensor;
 	class Machine;
+	class File;
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::MachineManager:
@@ -110,6 +111,10 @@ namespace Torch {
 
 		// Get the ID specific to each Machine
 		virtual int		getID() const = 0;
+
+		/// Loading/Saving the content from files (\emph{not the options})
+		virtual bool		loadFile(File& file) = 0;
+		virtual bool		saveFile(File& file) const = 0;
 
 		///////////////////////////////////////////////////////////
 		// Access functions

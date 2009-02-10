@@ -31,6 +31,8 @@ extern "C"
 		// Destructor
 		virtual ~jpegImageFile();
 
+	protected:
+
 		/**@name read/write image header and image pixmap */
 		//@{
 		/** read the image header from the file.

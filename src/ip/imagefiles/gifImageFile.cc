@@ -45,7 +45,7 @@ bool gifImageFile::readHeader(Image& image)
    	unsigned char	buf[16];
 	char		version[4];
 
-	if(!read(buf, 6, 1))
+	if(!m_file.read(buf, 6, 1))
 	{
 		print("gifImageFile::readHeader - reading magic number\n");
 		return false;
@@ -66,7 +66,7 @@ bool gifImageFile::readHeader(Image& image)
 		return false;
 	}
 
-	if(!read(buf, 7, 1))
+	if(!m_file.read(buf, 7, 1))
 	{
 		print("gifImageFile::readHeader - failed to read screen descriptor\n");
 		return false;
@@ -115,7 +115,7 @@ bool gifImageFile::readPixmap(Image& image)
 
 	unsigned char* pixmap = new unsigned char[3 * width * height];
 
-	const bool verbose = Object::getBOption("verbose");
+	const bool verbose = false;
 
 	unsigned char	buf[16];
 	unsigned char	c;
@@ -126,7 +126,7 @@ bool gifImageFile::readPixmap(Image& image)
 
 	for(;;)
 	{
-		if(!read(&c, 1, 1))
+		if(!m_file.read(&c, 1, 1))
 		{
 			print("gifImageFile::readPixmap - EOF / read error on image data\n");
 			delete[] pixmap;
@@ -147,7 +147,7 @@ bool gifImageFile::readPixmap(Image& image)
 
 		if(c == '!')
 		{ 	/* Extension */
-			if(!read(&c, 1, 1))
+			if(!m_file.read(&c, 1, 1))
 			{
 				print("gifImageFile::readPixmap - OF / read error on extention function code\n");
 				delete[] pixmap;
@@ -166,7 +166,7 @@ bool gifImageFile::readPixmap(Image& image)
 
 		++imageCount;
 
-		if(!read(buf, 9, 1))
+		if(!m_file.read(buf, 9, 1))
 		{
 			print("gifImageFile::readPixmap - couldn't read left/top/width/height\n");
 			delete[] pixmap;
@@ -246,7 +246,7 @@ int gifImageFile::ReadColorMap(int number, unsigned char buffer[3][MAXCOLORMAPSI
 
 	for (int i = 0; i < number; ++i)
 	{
-		if(!read(rgb, sizeof(rgb), 1))
+		if(!m_file.read(rgb, sizeof(rgb), 1))
 			print("Error: bad colormap\n");
 
 		buffer[CM_RED][i] = rgb[0];
@@ -262,7 +262,7 @@ int gifImageFile::DoExtension(int label)
 	static char buf[256];
 	const char *str;
 
-	const bool verbose = Object::getBOption("verbose");
+	const bool verbose = false;
 
 	switch (label)
 	{
@@ -310,7 +310,7 @@ int gifImageFile::GetDataBlock(unsigned char *buf)
 {
 	unsigned char count;
 
-	if(!read(&count, 1, 1))
+	if(!m_file.read(&count, 1, 1))
 	{
 		print("Error: getting DataBlock size\n");
 
@@ -319,7 +319,7 @@ int gifImageFile::GetDataBlock(unsigned char *buf)
 
 	ZeroDataBlock = count == 0;
 
-	if ((count != 0) && (!read(buf, count, 1)))
+	if ((count != 0) && (!m_file.read(buf, count, 1)))
 	{
 		print("Error: reading DataBlock\n");
 		return -1;
@@ -505,7 +505,7 @@ bool gifImageFile::read_rgbimage_from_gif(unsigned char* pixmap,
 	/*
 	**  Initialize the Compression routines
 	*/
-	if(!read(&c, 1, 1))
+	if(!m_file.read(&c, 1, 1))
 	{
 		print("Error: EOF / read error on image data\n");
 
@@ -519,7 +519,7 @@ bool gifImageFile::read_rgbimage_from_gif(unsigned char* pixmap,
 		return false;
 	}
 
-	const bool verbose = Object::getBOption("verbose");
+	const bool verbose = false;
 	if (verbose)
 		message("reading %d by %d%s GIF image",
 			width, height, interlace ? " interlaced" : "" );

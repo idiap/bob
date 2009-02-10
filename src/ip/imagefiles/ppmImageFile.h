@@ -25,6 +25,8 @@ namespace Torch {
 		virtual ~ppmImageFile();
 		//@}
 
+	protected:
+
 		/**@name read/write image header and image pixmap */
 		//@{
 		/** read the image header from the file.

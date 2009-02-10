@@ -30,9 +30,7 @@ int main(int argc, char* argv[])
 	xtprobeImageFile xtprobe;
 	Image image(1, 1, 3);
 
-	CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
-	CHECK_FATAL(image.loadImage(xtprobe) == true);
-	xtprobe.close();
+	CHECK_FATAL(xtprobe.load(image, image_filename) == true);
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
@@ -47,9 +45,7 @@ int main(int argc, char* argv[])
 
 	// Save the smoothed image
 	CHECK_FATAL(image.copyFrom(gaussian.getOutput(0)) == true);
-	CHECK_FATAL(xtprobe.open("smoothed.jpg", "w+") == true);
-	CHECK_FATAL(image.saveImage(xtprobe) == true);
-	xtprobe.close();
+	CHECK_FATAL(xtprobe.save(image, "smoothed.jpg") == true);
 
 	print("\nOK\n");
 

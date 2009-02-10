@@ -46,21 +46,6 @@ namespace Torch {
 		///	- all planes are copied
 		bool			copyFrom(const Image& image);
 
-		/**@name load/save methods */
-		//@{
-		/** save the image using an ImageFile.
-
-		    @param file is the ImageFile to use to save the image
-		*/
-		bool 			saveImage(ImageFile& file) const;
-
-		/** load the image using an ImageFile.
-
-		    @param file is the ImageFile to use to load the image
-		*/
-		bool			loadImage(ImageFile& file);
-		//@}
-
 		/**@name drawing methods */
 		//@{
 		/** draw a pixel in the image.

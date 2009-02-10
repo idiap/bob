@@ -79,6 +79,10 @@
 		<Unit filename="../../scanning/testPatternList.cc" />
 		<Unit filename="../../scanning/test_scanning_all.sh" />
 		<Unit filename="../../scanning/test_scanning_one.sh" />
+		<Unit filename="../../sp/dct1d.cc" />
+		<Unit filename="../../sp/dct2d.cc" />
+		<Unit filename="../../sp/fft1d.cc" />
+		<Unit filename="../../sp/fft2d.cc" />
 		<Unit filename="../../tensors/CMakeLists.txt" />
 		<Unit filename="../../tensors/README.txt" />
 		<Unit filename="../../tensors/THTensor.cc" />

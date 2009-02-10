@@ -665,10 +665,7 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
                                 m_sw_x, m_sw_y, m_sw_w, m_sw_h);
 
                         xtprobeImageFile xtprobe;
-                        if (xtprobe.open(str, "w+") == true)
-                        {
-                               image.saveImage(xtprobe);
-                        }
+                        xtprobe.save(image, str);
 
                         /*
                         // Save also the image as the bindata (with the model confidence in the name)

@@ -5,6 +5,8 @@
 
 namespace Torch
 {
+	class File;
+
 	////////////////////////////////////////////////////////////////////////////////////
 	/** This class defines an option for the command line.
 	    If you need special command line arguments/options,
@@ -36,6 +38,10 @@ namespace Torch
 		    option after that.
 		*/
 		virtual void read(int *argc_, char ***argv_) {};
+
+		/// Loading/Saving the content from files (\emph{not the options})
+		virtual bool loadFile(File& file) { return true; }
+		virtual bool saveFile(File& file) const { return true; }
 
 		////////////////////////////////////////////////////////////////////////////////////
 

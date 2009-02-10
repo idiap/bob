@@ -15,9 +15,7 @@ int main()
 
 	// Load the image to play with
 	const char* imagefilename = "../data/images/1001_f_g1_s01_1001_en_1.jpeg";
-	CHECK_FATAL(xtprobe.open(imagefilename, "r") == true);
-	CHECK_FATAL(image.loadImage(xtprobe) == true);
-	xtprobe.close();
+	CHECK_FATAL(xtprobe.load(image, imagefilename) == true);
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
@@ -52,9 +50,7 @@ int main()
 
 		char str[200];
 		sprintf(str, "crop_%d_%d_%d_%d.jpg", crop_x, crop_y, crop_w, crop_h);
-		CHECK_FATAL(xtprobe.open(str, "w") == true);
-		CHECK_FATAL(crop_image.saveImage(xtprobe) == true);
-		xtprobe.close();
+		CHECK_FATAL(xtprobe.save(crop_image, str) == true);
 	}
 
 	print("\nOK\n");

@@ -271,10 +271,7 @@ bool PyramidExplorer::preprocess(const Image& image)
                                 sprintf(str, "Pyramid_%dx%d.jpg", scale_w, scale_h);
 
                                 xtprobeImageFile xtprobe;
-                                if (xtprobe.open(str, "w+") == true)
-                                {
-                                        scaled_image.saveImage(xtprobe);
-                                }
+                                xtprobe.save(scaled_image, str);
                         }
 		}
 

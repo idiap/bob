@@ -5,7 +5,6 @@
 
 namespace Torch
 {
-	class File;
 	class OptionImpl;
 
 	/** Almost all classes in Torch should be a sub-class of this class.
@@ -54,16 +53,6 @@ namespace Torch
 		int			getIOption(const char* name, bool* ok = 0);
 		float			getFOption(const char* name, bool* ok = 0);
 		double			getDOption(const char* name, bool* ok = 0);
-
-		///////////////////////////////////////////////////////////
-		/// Loading/Saving the content from files (\emph{not the options})
-
-		bool	        	load(const char* filename);
-		bool    		save(const char* filename) const;
-
-		/// --- should be implemented by the derived classes
-		virtual bool		loadFile(File& file);
-		virtual bool		saveFile(File& file) const;
 
 	protected:
 

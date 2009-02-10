@@ -482,30 +482,3 @@ double Torch::Object::getDOption(const char* name, bool* ok)
 }
 
 ///////////////////////////////////////////////////////////
-// Loading/Saving the content from files (\emph{not the options})
-
-bool Torch::Object::load(const char* filename)
-{
-	File file;
-	return file.open(filename, "r") && loadFile(file);
-}
-
-bool Torch::Object::save(const char* filename) const
-{
-	File file;
-	return file.open(filename, "w+") && saveFile(file);
-}
-
-bool Torch::Object::loadFile(File& file)
-{
-	// Nothing to do!
-	return true;
-}
-
-bool Torch::Object::saveFile(File& file) const
-{
-	// Nothing to do!
-	return true;
-}
-
-///////////////////////////////////////////////////////////

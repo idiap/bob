@@ -26,7 +26,7 @@ bool ppmImageFile::readHeader(Image& image)
 	char buffer[200];
 
    	// Reads Magic Number
-	if(!gets(buffer, 200))
+	if(!m_file.gets(buffer, 200))
 	{
 		Torch::print("ppmImageFile::readHeader - not enable to read ppm file\n");
 		return false;
@@ -39,14 +39,14 @@ bool ppmImageFile::readHeader(Image& image)
 	}
 
 	// Reads comments
-	if(!gets(buffer, 200))
+	if(!m_file.gets(buffer, 200))
 	{
 		Torch::print("ppmImageFile::readHeader - not enable to read ppm file\n");
 		return false;
 	}
 	//while(buffer[0] == '#')
 	while(buffer[0] == '#' || buffer[0] == '\n')
-		if(!gets(buffer, 200))
+		if(!m_file.gets(buffer, 200))
 		{
 			Torch::print("ppmImageFile::readHeader - not enable to read ppm file\n");
 			return false;
@@ -69,7 +69,7 @@ bool ppmImageFile::readHeader(Image& image)
 
 	//
 	// Reads resolution
-	if(!gets(buffer, 200))
+	if(!m_file.gets(buffer, 200))
 	{
 		Torch::print("ppmImageFile::readHeader - not enable to read ppm file\n");
 		return false;
@@ -96,7 +96,7 @@ bool ppmImageFile::readPixmap(Image& image)
 
 	// Read the pixmap
 	unsigned char* pixmap = new unsigned char[n_bytes];
-	if (read(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
+	if (m_file.read(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
 	{
 		delete[] pixmap;
 		return false;
@@ -113,14 +113,14 @@ bool ppmImageFile::readPixmap(Image& image)
 
 bool ppmImageFile::writeHeader(const Image& image)
 {
-	printf("P6\n");
-	printf("#\n");
-	printf("# Image generated using Torch vision\n");
-	printf("# (c) 2004-2008 Sebastien Marcel marcel@idiap.ch\n");
-	printf("# IDIAP Research Institute\n");
-	printf("#\n");
-	printf("%d %d\n", image.getWidth(), image.getHeight());
-	printf("255\n");
+	m_file.printf("P6\n");
+	m_file.printf("#\n");
+	m_file.printf("# Image generated using Torch vision\n");
+	m_file.printf("# (c) 2004-2008 Sebastien Marcel marcel@idiap.ch\n");
+	m_file.printf("# IDIAP Research Institute\n");
+	m_file.printf("#\n");
+	m_file.printf("%d %d\n", image.getWidth(), image.getHeight());
+	m_file.printf("255\n");
 
 	return true;
 }
@@ -139,7 +139,7 @@ bool ppmImageFile::writePixmap(const Image& image)
 	ImageFile::fillPixmap(pixmap, 3, image);
 
 	// Write the pixmap
-	if (write(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
+	if (m_file.write(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
 	{
 		delete[] pixmap;
 		return false;

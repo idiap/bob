@@ -23,9 +23,7 @@ int main(int argc, char* argv[])
 	// Load the image
 	Image image(1, 1, 3);
 	xtprobeImageFile xtprobe;
-	CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
-	CHECK_FATAL(image.loadImage(xtprobe) == true);
-	xtprobe.close();
+	CHECK_FATAL(xtprobe.load(image, image_filename) == true);
 
 	print("Processing image [width = %d, height = %d, nplanes = %d] ...\n",
 		image.size(1), image.size(0), image.size(2));
@@ -56,9 +54,7 @@ int main(int argc, char* argv[])
 		sprintf(str, "rotate_%g_%d_%d.jpg", angle, cx, cy);
 		CHECK_FATAL(rotated_image.resize(output.size(1), output.size(0), output.size(2)) == true);
 		CHECK_FATAL(rotated_image.copyFrom(output) == true);
-		CHECK_FATAL(xtprobe.open(str, "w") == true);
-		CHECK_FATAL(rotated_image.saveImage(xtprobe) == true);
-		xtprobe.close();
+		CHECK_FATAL(xtprobe.save(rotated_image, str) == true);
 
 		angle += dangle;
 	}

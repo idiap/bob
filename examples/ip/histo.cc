@@ -29,9 +29,7 @@ int main(int argc, char* argv[])
 	case 0:	// Image
 		{
 			xtprobeImageFile xtprobe;
-			CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
-			CHECK_FATAL(image.loadImage(xtprobe) == true);
-			xtprobe.close();
+			CHECK_FATAL(xtprobe.load(image, image_filename) == true);
 		}
 		break;
 

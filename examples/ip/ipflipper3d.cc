@@ -14,9 +14,7 @@ int main()
 
 	// Load the image to play with
 	const char* imagefilename = "../data/images/1001_f_g1_s01_1001_en_1.jpeg";
-	CHECK_FATAL(xtprobe.open(imagefilename, "r") == true);
-	CHECK_FATAL(image.loadImage(xtprobe) == true);
-	xtprobe.close();
+	CHECK_FATAL(xtprobe.load(image, imagefilename) == true);
 	print("Loaded image of size [%dx%d] with [%d] planes.\n\n",
 		image.getWidth(), image.getHeight(), image.getNPlanes());
 
@@ -33,10 +31,7 @@ int main()
 	CHECK_FATAL(flipImg.copyFrom(flipper.getOutput(0)) == true);
 
 	const char* file_out = "1001_f_g1_s01_1001_en_1-vert.jpeg";
-	CHECK_FATAL(xtprobe.open(file_out, "w") == true);
-	CHECK_FATAL(flipImg.saveImage(xtprobe) == true);
-	xtprobe.close();
-
+	CHECK_FATAL(xtprobe.save(flipImg, file_out) == true);
 
 	// Flip the image over hor
 	print("flip\n");
@@ -49,10 +44,7 @@ int main()
 	CHECK_FATAL(flipImg.copyFrom(flipper.getOutput(0)) == true);
 
 	const char *file_out2 = "1001_f_g1_s01_1001_en_1-hori.jpeg";
-	CHECK_FATAL(xtprobe.open(file_out2, "w") == true);
-	CHECK_FATAL(flipImg.saveImage(xtprobe) == true);
-	xtprobe.close();
-
+	CHECK_FATAL(xtprobe.save(flipImg, file_out2) == true);
 
 	print("\nOK\n");
 

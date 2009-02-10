@@ -5,6 +5,8 @@
 
 namespace Torch {
 
+	class ImageFile;
+
 	/** This class is designed to load an image from the disk using
 		the extension of filename to probe the format.
 
@@ -13,7 +15,7 @@ namespace Torch {
 	    \Date
 	    @since 1.0
 	*/
-	class xtprobeImageFile : public ImageFile
+	class xtprobeImageFile
 	{
 	public:
 		/**@name constructor and destructor */
@@ -26,25 +28,11 @@ namespace Torch {
 		virtual ~xtprobeImageFile();
 		//@}
 
-		/**@name read/write image header and image pixmap */
-		//@{
-		/** read the image header from the file.
-		*/
-		virtual bool 		readHeader(Image& image);
+		// Save an image
+		bool			save(const Image& image, const char* filename);
 
-		/// read the image pixmap from the file
-		virtual bool 		readPixmap(Image& image);
-
-		/** write the image header to a file.
-		*/
-		virtual bool 		writeHeader(const Image& image);
-
-		/// write the #pixmap_# into the file
-		virtual bool 		writePixmap(const Image& pixmap);
-		//@}
-
-		/// loads some file and check for its image format - overriden
-		virtual bool		open(const char* file_name, const char* open_flags);
+		// Load an image
+		bool			load(Image& image, const char* filename);
 
 	private:
 

@@ -1,5 +1,4 @@
 #include "Image.h"
-#include "ImageFile.h"
 #include "Color.h"
 #include "vision.h"
 
@@ -125,24 +124,6 @@ bool Image::copyFrom(const Image& image)
 
         // OK
         return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-// Save the image using an ImageFile
-
-bool Image::saveImage(ImageFile& file) const
-{
-   	return 	file.writeHeader(*this) &&
-		file.writePixmap(*this);
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-// Load the image using an ImageFile
-
-bool Image::loadImage(ImageFile& file)
-{
-	return 	file.readHeader(*this) &&
-		file.readPixmap(*this);
 }
 
 /////////////////////////////////////////////////////////////////////////////////

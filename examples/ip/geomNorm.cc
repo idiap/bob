@@ -161,9 +161,7 @@ void saveImageGTPts(	const ShortTensor& timage, const sPoint2D* gt_pts, int n_gt
 	}
 
 	xtprobeImageFile xtprobe;
-	xtprobe.open(filename, "w");
-	image.saveImage(xtprobe);
-	xtprobe.close();
+	xtprobe.save(image, filename);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -194,9 +192,7 @@ int main(int argc, char* argv[])
 
 	Image image(1, 1, 3);
 	xtprobeImageFile xtprobe;
-	CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
-	CHECK_FATAL(image.loadImage(xtprobe) == true);
-	xtprobe.close();
+	CHECK_FATAL(xtprobe.save(image, image_filename) == true);
 
 	print("Processing image [width = %d, height = %d, nplanes = %d] ...\n",
 		image.size(1), image.size(0), image.size(2));

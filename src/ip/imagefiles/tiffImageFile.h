@@ -27,6 +27,14 @@ namespace Torch {
 		// Destructor
 		virtual ~tiffImageFile();
 
+		// Save an image - overriden
+		virtual bool		save(const Image& image, const char* filename);
+
+		// Load an image - overriden
+		virtual bool		load(Image& image, const char* filename);
+
+	protected:
+
 		/**@name read/write image header and image pixmap */
 		//@{
 		/** read the image header from the file.
@@ -43,9 +51,6 @@ namespace Torch {
 		/// write the #pixmap_# into the file
 		virtual bool 		writePixmap(const Image& image);
 		//@}
-
-		/// opens some file - overriden
-		virtual bool		open(const char* file_name, const char* open_flags);
 
 	private:
 

@@ -29,9 +29,9 @@ tiffImageFile::~tiffImageFile()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-// loads some file - overriden
+// Save an image
 
-bool tiffImageFile::open(const char* file_name, const char* open_flags)
+bool tiffImageFile::save(const Image& image, const char* filename)
 {
 #ifdef HAVE_TIFF
 
@@ -39,26 +39,40 @@ bool tiffImageFile::open(const char* file_name, const char* open_flags)
 	{
 		TIFFClose(tif);
 	}
-	tif = 0;
-
-	if(!strcmp(open_flags, "r"))
+	tif = TIFFOpen(filename, "w");
+	if (tif == 0)
 	{
-		tif = TIFFOpen(file_name, "r");
-		scanline_buf = NULL;
-		return true;
-	}
-	else if(!strcmp(open_flags, "w"))
-	{
-		tif = TIFFOpen(file_name, "w");
-		scanline_buf = NULL;
-		bpp = 3;
-		return true;
-	}
-	else
-	{
-		message("tiffImageFile::load(%s, %s) incorrect open flag.", file_name, open_flags);
 		return false;
 	}
+
+	scanline_buf = NULL;
+	bpp = 3;
+	return writeHeader(image) && writePixmap(image);
+#else
+	message("tiffImageFile::save TIFF format not supported.");
+	return false;
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Load an image
+
+bool tiffImageFile::load(Image& image, const char* filename)
+{
+#ifdef HAVE_TIFF
+
+	if (tif != 0)
+	{
+		TIFFClose(tif);
+	}
+	tif = TIFFOpen(filename, "r");
+	if (tif == 0)
+	{
+		return false;
+	}
+
+	scanline_buf = NULL;
+	return readHeader(image) && readPixmap(image);
 #else
 	message("tiffImageFile::load TIFF format not supported.");
 	return false;
@@ -70,11 +84,6 @@ bool tiffImageFile::open(const char* file_name, const char* open_flags)
 
 bool tiffImageFile::readHeader(Image& image)
 {
-	if (isOpened() == false)
-	{
-		return false;
-	}
-
 #ifdef HAVE_TIFF
 	int width, height;
 	TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &width);
@@ -96,13 +105,7 @@ bool tiffImageFile::readHeader(Image& image)
 
 bool tiffImageFile::readPixmap(Image& image)
 {
-	if (isOpened() == false)
-	{
-		return false;
-	}
-
 #ifdef HAVE_TIFF
-
 	const int width = image.getWidth();
 	const int height = image.getHeight();
 	unsigned char* pixmap = new unsigned char[3 * width * height];
@@ -134,7 +137,6 @@ bool tiffImageFile::readPixmap(Image& image)
 bool tiffImageFile::writeHeader(const Image& image)
 {
 #ifdef HAVE_TIFF
-
 	const int width = image.getWidth();
 	const int height = image.getHeight();
 	const unsigned int scanline_size = bpp * width;
@@ -167,7 +169,6 @@ bool tiffImageFile::writeHeader(const Image& image)
 bool tiffImageFile::writePixmap(const Image& image)
 {
 #ifdef HAVE_TIFF
-
 	const int width = image.getWidth();
 	const int height = image.getHeight();
 

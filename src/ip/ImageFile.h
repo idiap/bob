@@ -3,8 +3,8 @@
 
 #include "File.h"
 
-namespace Torch {
-
+namespace Torch
+{
 	class Image;
 
 	/** This class is designed to handle an image file on the disk.
@@ -14,7 +14,7 @@ namespace Torch {
 		\Date
 		@since 1.0
 	*/
-	class ImageFile : public File
+	class ImageFile
 	{
 	public:
 		// Constructor
@@ -22,6 +22,14 @@ namespace Torch {
 
 		// Destructor
 		virtual ~ImageFile();
+
+		// Save an image
+		virtual bool		save(const Image& image, const char* filename);
+
+		// Load an image
+		virtual bool		load(Image& image, const char* filename);
+
+	protected:
 
 		/**@name read/write image header and image pixmap */
 		//@{
@@ -40,8 +48,6 @@ namespace Torch {
 		virtual bool 		writePixmap(const Image& image) = 0;
 		//@}
 
-	protected:
-
 		///////////////////////////////////////////////////////////////////
 
 		// Fills a pixmap from an image object
@@ -55,7 +61,7 @@ namespace Torch {
 		///////////////////////////////////////////////////////////////////
 		// Attributes
 
-		//
+		File			m_file;
 	};
 
 }

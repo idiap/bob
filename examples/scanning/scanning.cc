@@ -96,9 +96,7 @@ void saveImage(	const Image& image, xtprobeImageFile& xtprobe,
 	char str[1024];
 	sprintf(str, "%s_%s", basename, filename);
 
-        CHECK_FATAL(xtprobe.open(str, "w+") == true);
-        CHECK_FATAL(image.saveImage(xtprobe));
-        xtprobe.close();
+        CHECK_FATAL(xtprobe.save(image, str) == true);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -287,9 +285,7 @@ int main(int argc, char* argv[])
         Image image(1, 1, 1);
 
         xtprobeImageFile xtprobe;
-        CHECK_FATAL(xtprobe.open(filename_image, "r") == true);
-        CHECK_FATAL(image.loadImage(xtprobe) == true);
-        xtprobe.close();
+        CHECK_FATAL(xtprobe.load(image, filename_image) == true);
 
 	const int image_w = image.getWidth();
 	const int image_h = image.getHeight();

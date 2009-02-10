@@ -26,7 +26,7 @@ bool pgmImageFile::readHeader(Image& image)
 	char buffer[200];
 
    	// Reads Magic Number
-	if(!gets(buffer, 200))
+	if(!m_file.gets(buffer, 200))
 	{
 		Torch::print("pgmImageFile::readHeader - [magic number] not enable to read pgm file\n");
 		return false;
@@ -38,14 +38,14 @@ bool pgmImageFile::readHeader(Image& image)
 	}
 
 	// Reads comments
-	if(!gets(buffer, 200))
+	if(!m_file.gets(buffer, 200))
 	{
 		Torch::print("pgmImageFile::readHeader - [comments] not enable to read pgm file\n");
 		return false;
 	}
 	//while(buffer[0] == '#')
 	while(buffer[0] == '#' || buffer[0] == '\n')
-		if(!gets(buffer, 200))
+		if(!m_file.gets(buffer, 200))
 		{
 			Torch::print("pgmImageFile::readHeader - [comments] not enable to read pgm in file\n");
 			return false;
@@ -59,7 +59,7 @@ bool pgmImageFile::readHeader(Image& image)
    	sscanf(buffer, "%d %d\n", &width, &height);
 	if(height == 0)
 	{
-		if(!gets(buffer, 200))
+		if(!m_file.gets(buffer, 200))
 		{
 			Torch::print("pgmImageFile::readHeader - [image size] not enable to read pgm file\n");
 			return false;
@@ -80,7 +80,7 @@ bool pgmImageFile::readHeader(Image& image)
 
 	//
 	// Reads resolution
-	if(!gets(buffer, 200))
+	if(!m_file.gets(buffer, 200))
 	{
 		Torch::print("pgmImageFile::readHeader - [depth] not enable to read pgm file\n");
 		return false;
@@ -106,7 +106,7 @@ bool pgmImageFile::readPixmap(Image& image)
 
 	// Read the pixmap
 	unsigned char* pixmap = new unsigned char[n_bytes];
-	if (read(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
+	if (m_file.read(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
 	{
 		delete[] pixmap;
 		return false;
@@ -123,14 +123,14 @@ bool pgmImageFile::readPixmap(Image& image)
 
 bool pgmImageFile::writeHeader(const Image& image)
 {
-	printf("P5\n");
-	printf("#\n");
-	printf("# Image generated using Torch vision\n");
-	printf("# (c) 2004-2008 Sebastien Marcel marcel@idiap.ch\n");
-	printf("# IDIAP Research Institute\n");
-	printf("#\n");
-	printf("%d %d\n", image.getWidth(), image.getHeight());
-	printf("255\n");
+	m_file.printf("P5\n");
+	m_file.printf("#\n");
+	m_file.printf("# Image generated using Torch vision\n");
+	m_file.printf("# (c) 2004-2008 Sebastien Marcel marcel@idiap.ch\n");
+	m_file.printf("# IDIAP Research Institute\n");
+	m_file.printf("#\n");
+	m_file.printf("%d %d\n", image.getWidth(), image.getHeight());
+	m_file.printf("255\n");
 
 	return true;
 }
@@ -149,7 +149,7 @@ bool pgmImageFile::writePixmap(const Image& image)
 	ImageFile::fillPixmap(pixmap, 1, image);
 
 	// Write the pixmap
-	if (write(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
+	if (m_file.write(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)
 	{
 		delete[] pixmap;
 		return false;

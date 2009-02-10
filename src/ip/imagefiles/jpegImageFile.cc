@@ -104,9 +104,9 @@ bool jpegImageFile::readPixmap(Image& image)
 
 	jpeg_create_decompress(&dinfo);
 
-	if (m_file != NULL)
+	if (m_file.m_file != NULL)
 	{
-		jpeg_stdio_src(&dinfo, m_file);
+		jpeg_stdio_src(&dinfo, m_file.m_file);
 	}
 	else
 	{
@@ -221,7 +221,7 @@ bool jpegImageFile::writePixmap(const Image& image)
 
 	// Initialize the encoding
 	jpeg_create_compress(&cinfo);
-	jpeg_stdio_dest(&cinfo, m_file);
+	jpeg_stdio_dest(&cinfo, m_file.m_file);
 
 	int quality = 95;
   	jpeg_set_quality(&cinfo, quality, true);

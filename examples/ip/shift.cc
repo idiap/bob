@@ -23,9 +23,7 @@ int main(int argc, char* argv[])
 	// Load the image
 	Image image(1, 1, 3);
 	xtprobeImageFile xtprobe;
-	CHECK_FATAL(xtprobe.open(image_filename, "r") == true);
-	CHECK_FATAL(image.loadImage(xtprobe) == true);
-	xtprobe.close();
+	CHECK_FATAL(xtprobe.load(image, image_filename) == true);
 
 	print("Processing image [width = %d, height = %d, nplanes = %d] ...\n",
 		image.size(1), image.size(0), image.size(2));
@@ -52,9 +50,7 @@ int main(int argc, char* argv[])
 		char str[256];
 		sprintf(str, "shift_%d_%d.jpg", dx, dy);
 		CHECK_FATAL(shifted_image.copyFrom(shifter.getOutput(0)) == true);
-		CHECK_FATAL(xtprobe.open(str, "w") == true);
-		CHECK_FATAL(shifted_image.saveImage(xtprobe) == true);
-		xtprobe.close();
+		CHECK_FATAL(xtprobe.save(shifted_image, str) == true);
 	}
 
 	print("\nOK\n");
