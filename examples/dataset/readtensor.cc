@@ -48,18 +48,34 @@ int main(int argc, char* argv[])
 	print(" size[2]:      [%d]\n", header.m_size[2]);
 	print(" size[3]:      [%d]\n", header.m_size[3]);
 
+	/*
+	// This works but is not practical as it needs to know the type and the size on a first hand
+	Tensor *tensor = new FloatTensor(5120);
+	int i = 0;
+	tf.load(*tensor);
+	if(verbose) tensor->sprint("Tensor %d", i);
+	i++;
+	while (tf.load(*tensor) != false)
+	{
+		if(verbose) tensor->sprint("Tensor %d", i);
+		i++;
+	}
+	*/
+
+	// This is the more general way to do it
 	Tensor *tensor = NULL;
 	int i = 0;
 	tensor = tf.load();
-	if(verbose) tensor->sprint("Tensor %d:", i);
+	if(verbose) tensor->sprint("%d", i);
 	delete tensor;
 	i++;
 	while ((tensor = tf.load()) != 0)
 	{
-		if(verbose) tensor->sprint("Tensor %d:", i);
+		if(verbose) tensor->sprint("%d", i);
 		delete tensor;
 		i++;
 	}
+
 	tf.close();
 
         // OK

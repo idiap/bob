@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 	{
 		file.read(tensor->dataW(), sizeof(float), frame_size);
 
-		if(verbose) tensor->sprint("Tensor %d", i);
+		if(verbose) tensor->sprint("%d", i);
 
 		tf.save(*tensor);
 	}
