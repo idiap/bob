@@ -11,13 +11,13 @@ namespace Torch
 	public:
 
 		// Constructor
-		MemoryDataSet(int n_examples = 0, Tensor::Type example_type_ = Tensor::Double);
+		MemoryDataSet(int n_examples = 0, Tensor::Type example_type_ = Tensor::Double, bool has_targets_ = false, Tensor::Type target_type_ = Tensor::Short);
 
 		// Destructor
 		virtual ~MemoryDataSet();
 
 		// Reinitialize the dataset
-		void		reset(int n_examples, Tensor::Type example_type_ = Tensor::Double);
+		void		reset(int n_examples, Tensor::Type example_type_ = Tensor::Double, bool has_targets_ = false, Tensor::Type target_type_ = Tensor::Short);
 
 		// Access examples
 		virtual Tensor* getExample(long index);

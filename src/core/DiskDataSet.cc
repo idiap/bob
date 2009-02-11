@@ -3,8 +3,8 @@
 
 namespace Torch {
 
-DiskDataSet::DiskDataSet(Tensor::Type example_type_)
-	: 	DataSet(example_type_),
+DiskDataSet::DiskDataSet(Tensor::Type example_type_, bool has_targets_, Tensor::Type target_type_)
+	: 	DataSet(example_type_, has_targets_, target_type_),
 		m_buffer(0), m_targets(0),
 		m_files(0),
 		m_n_files(0)
@@ -19,7 +19,8 @@ DiskDataSet::~DiskDataSet()
 void DiskDataSet::cleanup()
 {
 	delete m_buffer;
-	delete[] m_targets;
+	if (NULL != m_targets)
+		delete[] m_targets;
 
 	for (int i = 0; i < m_n_files; i ++)
 	{
@@ -113,18 +114,21 @@ bool DiskDataSet::load(const char* filename)
 	delete[] m_files;
 	m_files = new_files;
 
-	// Make room for new targes
-	Tensor** new_targets = new Tensor*[m_n_examples + tf->getHeader().m_n_samples];
-	for (int i = 0; i < m_n_examples; i ++)
+	if(m_has_targets)
 	{
-		new_targets[i] = m_targets[i];
+		// Make room for new targes
+		Tensor** new_targets = new Tensor*[m_n_examples + tf->getHeader().m_n_samples];
+		for (int i = 0; i < m_n_examples; i ++)
+		{
+			new_targets[i] = m_targets[i];
+		}
+		for (int i = 0; i < tf->getHeader().m_n_samples; i ++)
+		{
+			new_targets[i + m_n_examples] = NULL;
+		}
+		delete[] m_targets;
+		m_targets = new_targets;
 	}
-	for (int i = 0; i < tf->getHeader().m_n_samples; i ++)
-	{
-		new_targets[i + m_n_examples] = NULL;
-	}
-	delete[] m_targets;
-	m_targets = new_targets;
 
 	// OK
 	m_n_examples += tf->getHeader().m_n_samples;

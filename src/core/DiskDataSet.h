@@ -11,7 +11,7 @@ namespace Torch
 	public:
 
 		// Constructor
-		DiskDataSet(Tensor::Type example_type_ = Tensor::Double);
+		DiskDataSet(Tensor::Type example_type_ = Tensor::Double, bool has_targets_ = false, Tensor::Type target_type_ = Tensor::Short);
 
 		// Destructor
 		virtual ~DiskDataSet();

@@ -1,9 +1,72 @@
+---
+NOT ASSIGNED
+---
 
-Cosmin: test scanning with LBP/MCT face detection cascade
+	Ground Truth file loader
+		GTFile
+		|	virtual sPoint2D *load() = 0;
+		|	virtual bool load(sPoint2D &) = 0;
+		|	virtual char *getLabel(int) = 0;
+		|	virtual char *getName() = 0;
+		|
+		|
+		|__ eyecenterGTFile   // IDIAP 2 points format
+		|
+		|__ eyecornersGTFile  // IDIAP 4 points format
+		|
+		|__ bancaGTFile       // BANCA format (10 points ?)
+		|
+		|__ umanGTFile        // Tim Cootes ASM format (68 or more points)
+		|
+		|__ mobioGTFile       // MOBIO format
 
-Seb: fix Trainer and DataSet
 
-Venky: add Boosting of weak classifiers
+	faceextract.cc	Face extraction from list of pairs (image, gt) -> tensor
 
-Ani: help Venky with Haar features
+	tensor2pgm.cc	
+
+	xvtensor.cc	Visualization of tensor as 2D images (grayscale, color, )
+
+	ImageScanDataSet
+
+	ipBlock
+
+	ipConvolution
+
+	tensor2dct.cc
+
+---
+ASSIGNED
+---
+
+Seb: 
+	fix Trainer and DataSet
+	GMM, HMM
+	NN, MLP
+	KSOM
+
+Venky + Ani: 
+	Boosting of Haar-like features
+
+Ani: 
+	Boosting of HLBP features
+
+Venky: 
+	Boosting of Ferns and LBP features
+
+Nik:
+	PCA/LDA face recognition components linked with CBLAS for
+	matrix (2D tensor) routines (inversion, eigen decomposition) ?
+	
+Cosmin:
+	?
+
+---
+DONE
+---
+	Tensor
+	TensorFile
+	DataSet
+	MemoryDataSet
+	Scanning
 
