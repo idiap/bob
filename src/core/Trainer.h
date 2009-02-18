@@ -2,11 +2,10 @@
 #define TRAINER_INC
 
 #include "Object.h"
+#include "DataSet.h"
+#include "Machine.h"
 
 namespace Torch {
-
-	class Machine;
-	class DataSet;
 
 	class Trainer : public Object
 	{
@@ -26,6 +25,8 @@ namespace Torch {
 
 		/// Set the Machine to train
 		bool 		setMachine(Machine *m_machine_);
+
+		Machine* 	getMachine() const { return m_machine; } 
 
 	protected:
 		////////////////////////////////////////////////////

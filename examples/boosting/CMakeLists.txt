@@ -8,6 +8,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 # Set the include directories and linking libraries
 SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
+                        "${TORCH5SPRO_DIR}/src/sp/"
                         "${TORCH5SPRO_DIR}/src/ip/"
                         "${TORCH5SPRO_DIR}/src/ip/imagefiles/"
                         "${TORCH5SPRO_DIR}/extras/jpeg/"
@@ -35,8 +36,8 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
-	boosting.cc
-	boostTest.cc)
+	boosting.cc)
+#	boostTest.cc)
 #	Mcttrain.cc)
 
 FOREACH(file ${EXAMPLE_SRC})

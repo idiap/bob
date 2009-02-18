@@ -4,6 +4,17 @@ namespace Torch {
 
 char msg[10000];
 
+void fatalerror(const char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+  vsprintf(msg, fmt, args);
+  printf("\n$ Fatal Error: %s\n\n", msg);
+  fflush(stdout);
+  va_end(args);
+  exit(-1);
+}
+
 void error(const char *fmt, ...)
 {
   va_list args;
@@ -12,7 +23,6 @@ void error(const char *fmt, ...)
   printf("\n$ Error: %s\n\n", msg);
   fflush(stdout);
   va_end(args);
-  exit(-1);
 }
 
 void warning(const char *fmt, ...)
