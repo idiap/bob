@@ -73,7 +73,7 @@ void print(const char* fmt, ...);
 	const bool condition = (expression);			\
 	if (condition == false)					\
 	{							\
-		error("Error: in file [%s] at line [%d]!\n",	\
+		fatalerror("Error: in file [%s] at line [%d]!\n",	\
 			__FILE__, __LINE__);			\
 	}							\
 }

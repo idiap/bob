@@ -79,6 +79,11 @@ const Tensor& spCore::getOutput(int index) const
 
 ////////////////////////////////////////////////////////////////////
 
+bool spCore::saveFile(File& file) const
+{
+	return true;
+}
+		
 }
 
 

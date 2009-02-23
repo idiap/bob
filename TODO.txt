@@ -40,7 +40,7 @@ ASSIGNED
 ---
 
 Seb: 
-	fix Trainer and DataSet
+	fix Boosting framework (StumpMachine, ...)
 	GMM, HMM
 	NN, MLP
 	KSOM

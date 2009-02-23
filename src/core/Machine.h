@@ -135,6 +135,13 @@ namespace Torch {
 		// The result when run on some data
 		DoubleTensor*		m_output;
 	};
+
+
+#define LBP_MACHINE_ID 1
+#define CASCADE_MACHINE_ID 2
+#define STUMP_MACHINE_ID 3
+#define LUT_MACHINE_ID 4
+
 }
 
 #endif
