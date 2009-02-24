@@ -22,6 +22,9 @@ namespace Torch {
 //-----------------------------------
 
 /// Print an error message. The program will exit.
+void fatalerror(const char* fmt, ...);
+
+/// Print an error message. The program will NOT exit.
 void error(const char* fmt, ...);
 
 /// Print a warning message.
@@ -70,7 +73,7 @@ void print(const char* fmt, ...);
 	const bool condition = (expression);			\
 	if (condition == false)					\
 	{							\
-		error("Error: in file [%s] at line [%d]!\n",	\
+		fatalerror("Error: in file [%s] at line [%d]!\n",	\
 			__FILE__, __LINE__);			\
 	}							\
 }

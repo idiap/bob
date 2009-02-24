@@ -52,7 +52,7 @@ int main()
 
   for(int i = 0 ; i < 6 ; i++)
     {
-      print("Tensor of %s:\n", str_datatype[tarray[i]->getDatatype()]);
+      print("Tensor of %s:\n", str_TensorTypeName[tarray[i]->getDatatype()]);
       print("   dimension = %d\n", tarray[i]->nDimension());
       for(int j = 0 ; j < tarray[i]->nDimension() ; j++)
 	print("   size of dimension %d = %d\n", j, tarray[i]->size(j));
@@ -355,6 +355,27 @@ int main()
   delete unfold_sequence2;
   delete sequence;
   
+  print("Building a image sequence...\n");
+  int seqi_h = 4;
+  int seqi_w = 3;
+  FloatTensor *seqimage = new FloatTensor(seqi_h * seqi_w);
+
+  print("Init sequence ...\n");
+  for(long i = 0 ; i < seqi_h * seqi_w ; i++)
+  	seqimage->set(i, i+1);
+
+  seqimage->sprint("image sequence (%d x %d)", seqi_h, seqi_w);
+  
+  FloatTensor *unfold_seqimage = new FloatTensor();
+
+  unfold_seqimage->unfold(sequence, 0, seqi_w, seqi_w);
+  unfold_seqimage->sprint("unfolded image sequence along dim 0 from 1D (size %d) to 2D (size %d) with a step of %d", seqi_h * seqi_w, seqi_w, seqi_w);
+
+  print("Free images sequences ...\n");
+  delete unfold_seqimage;
+  delete seqimage;
+  
+
 
   
   print("Building a sequence of 7 concatenated 3D frames ...\n");
@@ -397,7 +418,7 @@ int main()
   print("Building a new sequence, i.e. a FloatTensor of 2 dimensions (t, coefficients) ...\n");
   sequence = new FloatTensor(2000000,20);
 
-  print("Tensor of %s:\n", str_datatype[sequence->getDatatype()]);
+  print("Tensor of %s:\n", str_TensorTypeName[sequence->getDatatype()]);
   print("   dimension = %d\n", sequence->nDimension());
   for(int j = 0 ; j < sequence->nDimension() ; j++)
 	print("   size of dimension %d = %d\n", j, sequence->size(j));

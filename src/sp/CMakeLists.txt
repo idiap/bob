@@ -4,6 +4,7 @@
 SET(	sp_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/spFFT.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/spDCT.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/spDeltaOne.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ooura.cc"
 	CACHE INTERNAL "sources")
 

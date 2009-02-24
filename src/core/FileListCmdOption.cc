@@ -110,11 +110,12 @@ bool FileListCmdOption::saveFile(File& file) const
 
 FileListCmdOption::~FileListCmdOption()
 {
-	for (int i = 0; i < n_files; i ++)
+   	if(file_names != NULL)
 	{
-		delete[] file_names[i];
+		for (int i = 0; i < n_files; i ++)
+			delete[] file_names[i];
+		delete[] file_names;
 	}
-	delete[] file_names;
 }
 
 }

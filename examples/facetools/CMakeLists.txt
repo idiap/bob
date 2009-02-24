@@ -8,20 +8,17 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 # Set the include directories and linking libraries
 SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
-                        "${TORCH5SPRO_DIR}/src/sp/"
-                        "${TORCH5SPRO_DIR}/src/ip/"
-                        "${TORCH5SPRO_DIR}/src/ip/imagefiles/"
-                        "${TORCH5SPRO_DIR}/extras/jpeg/"
-                        "${TORCH5SPRO_DIR}/src/th/"
-			"${TORCH5SPRO_DIR}/src/machine/"
-			"${TORCH5SPRO_DIR}/src/trainer/"
-			"${TORCH5SPRO_DIR}/src/measurer/"
-			"${TORCH5SPRO_DIR}/src/boosting/")
+			"${TORCH5SPRO_DIR}/src/th/"
+			"${TORCH5SPRO_DIR}/src/ip/"
+			"${TORCH5SPRO_DIR}/src/ip/shape/"
+			"${TORCH5SPRO_DIR}/src/geometry/"
+			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
+			"${TORCH5SPRO_DIR}/extras/jpeg/")
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
-                "${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
+		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
 
 # Set the compiler flags and build type (release or debug)
-SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "-g")
 #SET(CMAKE_BUILD_TYPE RELEASE)
 SET(CMAKE_BUILD_TYPE DEBUG)
@@ -37,9 +34,7 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
-	boosting.cc)
-#	boostTest.cc)
-#	Mcttrain.cc)
+	filelist.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

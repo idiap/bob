@@ -61,7 +61,7 @@ namespace Torch
 		virtual Machine*	getAnInstance() const { return new CascadeMachine(); }
 
 		// Get the ID specific to each Machine - overriden
-		virtual int		getID() const { return 2; }
+		virtual int		getID() const { return CASCADE_MACHINE_ID; }
 
 		///////////////////////////////////////////////////////////
 		// Access functions

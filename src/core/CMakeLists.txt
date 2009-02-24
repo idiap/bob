@@ -19,6 +19,7 @@ SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/MTimer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/CmdOption.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/FileListCmdOption.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/FileList.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/CmdLine.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/CmdFile.cc"
 	CACHE INTERNAL "sources")

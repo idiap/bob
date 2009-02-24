@@ -13,6 +13,9 @@ int main(int argc, char* argv[])
 	const int n_max_examples = 1000;
 	const int width = 320;
 	const int height = 240;
+	//bool has_targets = true;
+	bool has_targets = false;
+
 	ShortTensor timage(height, width);
 
 	// Create some targets
@@ -54,7 +57,7 @@ int main(int argc, char* argv[])
 	print("\nOK\n");
 
 	// Load the files into some DiskDataSet
-	DiskDataSet ddataset(Tensor::Short);
+	DiskDataSet ddataset(Tensor::Short, has_targets);
 	for (int i = 0; i < n_files; i ++)
 	{
 		CHECK_FATAL(ddataset.load(filenames[i]) == true);
@@ -65,13 +68,16 @@ int main(int argc, char* argv[])
 
 	print("\nOK\n");
 
-	// Assign some targets
-	print("Assigning [%d] targets ...\n", n_examples);
-	for (int i = 0; i < n_examples; i ++)
+	if(has_targets)
 	{
-		Tensor* target = ddataset.getTarget(i);
-		CHECK_FATAL(target == 0);
-		ddataset.setTarget(i, &targets[i % n_targets]);
+		// Assign some targets
+		print("Assigning [%d] targets ...\n", n_examples);
+		for (int i = 0; i < n_examples; i ++)
+		{
+			Tensor* target = ddataset.getTarget(i);
+			CHECK_FATAL(target == 0);
+			ddataset.setTarget(i, &targets[i % n_targets]);
+		}
 	}
 
 	print("\nOK\n");
@@ -85,10 +91,13 @@ int main(int argc, char* argv[])
 		CHECK_FATAL(example->getDatatype() == Tensor::Short);
 		CHECK_FATAL(((ShortTensor*)example)->get(0, 0) == i);
 
-		Tensor* target = ddataset.getTarget(i);
-		CHECK_FATAL(target != 0);
-		CHECK_FATAL(target->getDatatype() == Tensor::Short);
-		CHECK_FATAL(((ShortTensor*)target)->get(0) == i % n_targets);
+		if(has_targets)
+		{
+			Tensor* target = ddataset.getTarget(i);
+			CHECK_FATAL(target != 0);
+			CHECK_FATAL(target->getDatatype() == Tensor::Short);
+			CHECK_FATAL(((ShortTensor*)target)->get(0) == i % n_targets);
+		}
 	}
 
 	print("\nOK\n");

@@ -89,7 +89,7 @@ namespace Torch
 		virtual Machine*	getAnInstance() const { return new LBPMachine(); }
 
 		// Get the ID specific to each Machine - overriden
-		virtual int		getID() const { return 1; }
+		virtual int		getID() const { return LBP_MACHINE_ID; }
 
 		///////////////////////////////////////////////////////////
 		// Access functions

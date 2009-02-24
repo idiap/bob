@@ -2,7 +2,7 @@
 
 namespace Torch {
 
-const char *str_datatype[] = {"char", "short", "int", "long", "float", "double"};
+const char *str_TensorTypeName[] = {"char", "short", "int", "long", "float", "double"};
 
 // Get the number of elements (over all dimensions)
 long Tensor::sizeAll() const

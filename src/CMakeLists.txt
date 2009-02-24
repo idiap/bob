@@ -43,6 +43,8 @@ SET(TORCH5SPRO_SUBDIRS
 	scanning
 	machine
 	trainer
+	boosting
+	measurer	
 	geometry)
 
 FOREACH(subdir ${TORCH5SPRO_SUBDIRS})

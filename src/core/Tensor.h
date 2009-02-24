@@ -180,7 +180,7 @@ namespace Torch {
 		virtual ~Tensor() {};
 	};
 
-extern const char *str_datatype[];
+extern const char *str_TensorTypeName[];
 
 extern "C"
 {

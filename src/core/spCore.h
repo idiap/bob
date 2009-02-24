@@ -2,6 +2,7 @@
 #define SPCORE_INC
 
 #include "Object.h"
+#include "File.h"
 
 namespace Torch
 {
@@ -23,6 +24,8 @@ namespace Torch
 		int			getNOutputs() const;
 		const Tensor&		getOutput(int index) const;
 
+		virtual bool saveFile(File& file) const;
+		
 	protected:
 
 		//////////////////////////////////////////////////////////
