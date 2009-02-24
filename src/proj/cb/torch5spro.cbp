@@ -404,6 +404,8 @@
 		<Unit filename="../../scanning/profile/LRTrainer.h" />
 		<Unit filename="../../scanning/profile/ProfileDataSet.cc" />
 		<Unit filename="../../scanning/profile/ProfileDataSet.h" />
+		<Unit filename="../../scanning/profile/ProfileMachine.cc" />
+		<Unit filename="../../scanning/profile/ProfileMachine.h" />
 		<Unit filename="../../scanning/profile/Sample.cc" />
 		<Unit filename="../../scanning/profile/Sample.h" />
 		<Unit filename="../../scanning/profile/mat.cc" />
