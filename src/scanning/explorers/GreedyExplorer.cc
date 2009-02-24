@@ -10,7 +10,9 @@ namespace Torch
 
 GreedyExplorer::GreedyExplorer(ipSWEvaluator* swEvaluator, Mode mode)
 	: 	MSExplorer(swEvaluator),
-		m_mode(mode)
+		m_mode(mode),
+		m_profileFlags(new unsigned char[NoConfigs]),
+		m_profileScores(new double[NoConfigs])
 {
 }
 
@@ -19,6 +21,8 @@ GreedyExplorer::GreedyExplorer(ipSWEvaluator* swEvaluator, Mode mode)
 
 GreedyExplorer::~GreedyExplorer()
 {
+	delete[] m_profileFlags;
+	delete[] m_profileScores;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -168,8 +172,8 @@ bool GreedyExplorer::shouldSearchMode(int old_n_candidates) const
 
 bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 {
-	const int dx = min(FixI(0.01f * (VarX + 0.0f) * sw_w), 1);
-	const int dy = min(FixI(0.01f * (VarY + 0.0f) * sw_h), 1);
+	const float dx = 0.01f * (VarX + 0.0f) * sw_w;
+	const float dy = 0.01f * (VarY + 0.0f) * sw_h;
 
 	// Vary the scale ...
 	int index = 0;
@@ -181,10 +185,12 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 
 		// Vary the position ...
 		for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+		{
+			const int new_sw_x = sw_x + FixI(dx * ix);
+
 			for (int iy = -NoVarY; iy <= NoVarY; iy ++)
 			{
-				const int new_sw_x = sw_x + ix * dx;
-				const int new_sw_y = sw_y + iy * dy;
+				const int new_sw_y = sw_y + FixI(dy * iy);
 
 				// Default profile: no detection, low score
 				m_profileFlags[index] = 0x00;
@@ -193,18 +199,17 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 				// Process the sub-window, ignore if some error
 				//      (the coordinates may fall out of the image)
 				const int old_size = m_data->m_patterns.size();
-				if (ScaleExplorer::processSW(new_sw_x, new_sw_y, new_sw_w, new_sw_h, *m_data) == true)
+				if (	ScaleExplorer::processSW(new_sw_x, new_sw_y, new_sw_w, new_sw_h, *m_data) &&
+					m_data->m_patterns.size() != old_size)
 				{
-                                        if (m_data->m_patterns.size() != old_size)
-                                        {
-						m_profileScores[index] = m_data->m_patterns.get(old_size).m_confidence;
-						m_profileFlags[index] = 0x01;
-                                        }
+					m_profileScores[index] = m_data->m_patterns.get(old_size).m_confidence;
+					m_profileFlags[index] = 0x01;
 				}
 
 				// Next profile
 				index ++;
 			}
+		}
 	}
 
 	// OK

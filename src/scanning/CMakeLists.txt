@@ -19,7 +19,8 @@ SET(	scanning_INCLUDE
 SET(scanning_SUBDIRS
 	explorers
 	pruners
-	selectors)
+	selectors
+	profile)
 
 FOREACH(subdir ${scanning_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})

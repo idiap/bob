@@ -52,7 +52,7 @@ bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerDa
 
                 if (swPruner->setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
 		{
-			Torch::message("ScaleExplore::processSW - error calling some pruner!\n");
+			//Torch::message("ScaleExplore::processSW - error calling some pruner!\n");
 			return false;
 		}
 
@@ -68,7 +68,7 @@ bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerDa
 	ipSWEvaluator* swEvaluator = explorerData.m_swEvaluator;
 	if (swEvaluator->setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
 	{
-		Torch::message("ScaleExplorer::processSW - error calling the evaluator!\n");
+		//Torch::message("ScaleExplorer::processSW - error calling the evaluator!\n");
 		return false;
 	}
 

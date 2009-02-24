@@ -1,0 +1,63 @@
+#include "FLDAMachine.h"
+
+namespace Torch
+{
+namespace Profile
+{
+
+/////////////////////////////////////////////////////////////////////////
+// Constructor
+
+FLDAMachine::FLDAMachine()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Destructor
+
+FLDAMachine::~FLDAMachine()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Process the input tensor
+
+bool FLDAMachine::forward(const Tensor& input)
+{
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Constructs an empty Machine of this kind
+// (used by <MachineManager>, this object should be deallocated by the user)
+
+Machine* FLDAMachine::getAnInstance() const
+{
+	return new FLDAMachine();
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Get the ID specific to each Machine
+
+int FLDAMachine::getID() const
+{
+	return 1001;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Loading/Saving the content from files (\emph{not the options})
+
+bool FLDAMachine::loadFile(File& file)
+{
+	return false;
+}
+
+bool FLDAMachine::saveFile(File& file) const
+{
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+}
+}

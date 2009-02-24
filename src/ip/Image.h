@@ -66,6 +66,15 @@ namespace Torch {
 		*/
 		void			drawLine(int x1, int y1, int x2, int y2, const Color& color);
 
+		/** draw a cross of some radius centered in the given point P.
+
+		    @param x is the #x# coordinate of #P#
+		    @param y is the #y# coordinate of #P#
+		    @param r is the radius
+		    @param color is the color to draw
+		*/
+		void			drawCross(int x, int y, int r, const Color& color);
+
 		/** draw a rectangle in the image.
 
 		    @param color is the color to draw

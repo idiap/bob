@@ -7,6 +7,10 @@ namespace Torch
 // Constructor
 
 MeanShiftSelector::MeanShiftSelector()
+	:	m_bandwidthsComputed(false),
+		m_bandwidths(0),
+		m_inv_bandwidths(0),
+		m_candidates(0)
 {
 }
 
@@ -15,6 +19,8 @@ MeanShiftSelector::MeanShiftSelector()
 
 MeanShiftSelector::~MeanShiftSelector()
 {
+	delete[] m_bandwidths;
+	delete[] m_inv_bandwidths;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -187,7 +193,7 @@ int MeanShiftSelector::getClosest(float cx, float cy, float w, float h)
 	const int y_index = getInRange(FixI((cy - m_grid.m_y) * m_grid.m_inv_dy), 0, GridSize - 1);
 
 	// Start from the corresponding center cell and increase radius until some non-empty cell is found ...
-	int isize = addClosest(m_grid.m_cells[x_index][y_index], 0);
+	int isize = addClosest(m_grid.m_cells[x_index][y_index], 0, cx, cy, w, h);
 	int radius = 1;
 	do
 	{
@@ -200,13 +206,13 @@ int MeanShiftSelector::getClosest(float cx, float cy, float w, float h)
 		// Add the cells having <radius> distance to the center
 		for (int x = x_min_index; x <= x_max_index; x ++)
 		{
-			isize = addClosest(m_grid.m_cells[x][y_min_index], isize);
-			isize = addClosest(m_grid.m_cells[x][y_max_index], isize);
+			isize = addClosest(m_grid.m_cells[x][y_min_index], isize, cx, cy, w, h);
+			isize = addClosest(m_grid.m_cells[x][y_max_index], isize, cx, cy, w, h);
 		}
 		for (int y = y_min_index + 1; y < y_max_index; y ++)
 		{
-			isize = addClosest(m_grid.m_cells[x_min_index][y], isize);
-			isize = addClosest(m_grid.m_cells[x_max_index][y], isize);
+			isize = addClosest(m_grid.m_cells[x_min_index][y], isize, cx, cy, w, h);
+			isize = addClosest(m_grid.m_cells[x_max_index][y], isize, cx, cy, w, h);
 		}
 
 		radius ++;
@@ -217,11 +223,30 @@ int MeanShiftSelector::getClosest(float cx, float cy, float w, float h)
 	return isize;
 }
 
-int MeanShiftSelector::addClosest(const Grid::Cell& cell, int isize)
+int MeanShiftSelector::addClosest(const Grid::Cell& cell, int isize, float cx, float cy, float w, float h)
 {
-	for (int k = 0; k < cell.m_size && isize < MaxNoClosestPoints; k ++)
+	if (m_bandwidthsComputed == false)
 	{
-		m_iclosest[isize ++] = cell.m_indexes[k];
+		// Just add all the points in the cell - the bandwidths are not computed yet!
+		for (int k = 0; k < cell.m_size && isize < MaxNoClosestPoints; k ++)
+		{
+			m_iclosest[isize] = cell.m_indexes[k];
+			m_iDistClosest[isize ++] = 0.0f;
+		}
+	}
+	else
+	{
+		// Add only the points in the cell within the bandwidth
+		for (int k = 0; k < cell.m_size && isize < MaxNoClosestPoints; k ++)
+		{
+			const int index = cell.m_indexes[k];
+			const float distance = getDistance(m_candidates->get(index), cx, cy, w, h);
+			if (distance < m_bandwidths[index])
+			{
+				m_iclosest[isize] = index;
+				m_iDistClosest[isize ++] = distance;
+			}
+		}
 	}
 	return isize;
 }
@@ -285,16 +310,30 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 	// Cluster the patterns using AMS (Adaptive Bandwidth Mean Shift)
 	//	and a grid structure to fast retrieve the closest points
 
+	// Allocate bandwidths and other buffers
+	const int n_patterns = candidates.size();
+	delete[] m_bandwidths;
+	delete[] m_inv_bandwidths;
+	m_bandwidths = new float[n_patterns];
+	m_inv_bandwidths = new float[n_patterns];
+	m_bandwidthsComputed = false;
+
+	for (int i = 0; i < n_patterns; i ++)
+	{
+		m_bandwidths[i] = 10000000.0f;
+	}
+
+	m_candidates = &candidates;
+
+	static float distances[MaxNoClosestPoints];
+	static float buffer[MaxNoClosestPoints];
+
 	// Grid structure (initialization)
 	m_grid.init(candidates);
 	if (verbose == true)
 	{
 		m_grid.print();
 	}
-
-	const int n_patterns = candidates.size();
-	float* bandwidths = new float[n_patterns];
-	float* inv_bandwidths = new float[n_patterns];
 
 	srand((unsigned int)time(0));
 
@@ -307,7 +346,7 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 		int n_closest_points = getClosest(crt_pattern);
 		if (n_closest_points <= 1)
 		{
-			bandwidths[i] = 0.0f;
+			m_bandwidths[i] = 0.0f;
 		}
 		else
 		{
@@ -317,8 +356,6 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 			float crt_h = crt_pattern.m_h;
 
 			// Compute the distances and sort them
-			static float distances[MaxNoClosestPoints];
-			static float buffer[MaxNoClosestPoints];
 
 			for (int j = 0; j < n_closest_points; j ++)
 			{
@@ -353,10 +390,12 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 			}
 
 			// Set the bandwidth as the distance to the kclosest point
-			bandwidths[i] = distances[kclosest];
-			inv_bandwidths[i] = bandwidths[i] == 0.0f ? 1.0f : 1.0f / bandwidths[i];
+			m_bandwidths[i] = distances[kclosest];
+			m_inv_bandwidths[i] = m_bandwidths[i] == 0.0f ? 1.0f : 1.0f / m_bandwidths[i];
 		}
 	}
+
+	m_bandwidthsComputed = true;
 
 	// AMS (for each point until convergence)
 	int sum_n_iters = 0;
@@ -386,18 +425,17 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 			for (int j = 0; j < n_closest_points; j ++)
 			{
 				const int k = m_iclosest[j];
+
+				const float distance = m_iDistClosest[j];
+				const float weight = m_inv_bandwidths[k] * getKernel(distance, m_bandwidths[k]);
+
 				const Pattern& pattern = candidates.get(k);
-				const float distance = getDistance(pattern, crt_cx, crt_cy, crt_w, crt_h);
-				if (distance < bandwidths[k])
-				{
-					const float weight = inv_bandwidths[k] * getKernel(distance, bandwidths[k]);
-					sum_cx += weight * pattern.getCenterX();
-					sum_cy += weight * pattern.getCenterY();
-					sum_w += weight * pattern.m_w;
-					sum_h += weight * pattern.m_h;
-					sum_weights += weight;
-					cnt ++;
-				}
+				sum_cx += weight * pattern.getCenterX();
+				sum_cy += weight * pattern.getCenterY();
+				sum_w += weight * pattern.m_w;
+				sum_h += weight * pattern.m_h;
+				sum_weights += weight;
+				cnt ++;
 			}
 
 			// Update the current position (if not converged yet)
@@ -453,6 +491,12 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 		print("Adaptive Mean Shift clustering: average number of iterations = %f\n",
 			(sum_n_iters + 0.0f) / (cnt_n_iters == 0 ? 1.0f : (cnt_n_iters + 0.0f)));
 	}
+
+	// Cleanup
+	delete[] m_bandwidths;
+	delete[] m_inv_bandwidths;
+	m_bandwidths = 0;
+	m_inv_bandwidths = 0;
 
 	// OK
 	return true;

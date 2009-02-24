@@ -29,9 +29,9 @@ namespace Torch
 		};
 
 		// Profiling constants
-		static const int	NoVarX = 3;	// No. of steps on Ox
-		static const int	NoVarY = 3;	// No. of steps on Oy
-		static const int 	NoVarS = 3;	// No. of steps on scale
+		static const int	NoVarX = 6;	// No. of steps on Ox
+		static const int	NoVarY = 6;	// No. of steps on Oy
+		static const int 	NoVarS = 7;	// No. of steps on scale
 		static const int	VarX = 5;	// %/step variation on Ox
 		static const int	VarY = 5;	// %/step variation on Oy
 		static const int	VarS = 5;	// %/step variation on scales
@@ -97,8 +97,8 @@ namespace Torch
 		MeanShiftSelector	m_clusterAlgo;
 
 		// Profile buffers (detection flag + score)
-		unsigned char		m_profileFlags[NoConfigs];
-		double			m_profileScores[NoConfigs];
+		unsigned char*		m_profileFlags;
+		double*			m_profileScores;
 	};
 }
 

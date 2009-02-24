@@ -150,6 +150,15 @@ void Image::setPixel3DChar(ShortTensor* data, int x, int y, const Color& color)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
+// Draw a cross centered in the given point with the given radius
+
+void Image::drawCross(int x, int y, int r, const Color& color)
+{
+	drawLine(x - r, y, x + r, y, green);
+	drawLine(x, y - r, x, y + r, green);
+}
+
+/////////////////////////////////////////////////////////////////////////////////
 // Draw a line P1-P2 in the image
 
 void Image::drawLine(int x1, int y1, int x2, int y2, const Color& color)

@@ -279,10 +279,10 @@
 #define SW_EVAL_SCALE(tensorType, dataType)                                             \
 {                                                                                       \
         const tensorType* t_src = (tensorType*)&input;                                  \
-        const dataType* src = t_src->t->storage->data + t_src->t->storageOffset;        \
+        const dataType* src = (const dataType*)t_src->dataR();        			\
                                                                                         \
         tensorType* t_dst = (tensorType*)m_buffTensor;                                  \
-        dataType* dst = t_dst->t->storage->data + t_dst->t->storageOffset;              \
+        dataType* dst = (dataType*)t_dst->dataW();					\
                                                                                         \
         const int offset = m_sw_y * m_input_stride_h + m_sw_x * m_input_stride_w;       \
 											\
@@ -576,6 +576,9 @@ bool ipSWEvaluator::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
         const bool changed_size = m_sw_w != sw_w || m_sw_h != sw_h;
         if (    m_classifier == 0 ||
                 m_buffTensor == 0 ||
+                sw_x < 0 || sw_y < 0 || sw_w <= 0 || sw_h <= 0 ||
+                sw_x + sw_w >= m_input_copy->size(1) ||
+                sw_y + sw_h >= m_input_copy->size(0) ||
                 ipSubWindow::setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
         {
                 return false;

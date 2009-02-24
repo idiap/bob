@@ -1,0 +1,63 @@
+#include "LRMachine.h"
+
+namespace Torch
+{
+namespace Profile
+{
+
+/////////////////////////////////////////////////////////////////////////
+// Constructor
+
+LRMachine::LRMachine()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Destructor
+
+LRMachine::~LRMachine()
+{
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Process the input tensor
+
+bool LRMachine::forward(const Tensor& input)
+{
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Constructs an empty Machine of this kind
+// (used by <MachineManager>, this object should be deallocated by the user)
+
+Machine* LRMachine::getAnInstance() const
+{
+	return new LRMachine();
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Get the ID specific to each Machine
+
+int LRMachine::getID() const
+{
+	return 1002;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Loading/Saving the content from files (\emph{not the options})
+
+bool LRMachine::loadFile(File& file)
+{
+	return false;
+}
+
+bool LRMachine::saveFile(File& file) const
+{
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+}
+}

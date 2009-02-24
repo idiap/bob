@@ -59,7 +59,7 @@ namespace Torch
 		// Coarse grid structure to fast retrieve the nearest neighbours to some point
 
 		static const int 	GridSize = 32;
-		static const int 	MaxNoClosestPoints = 64;
+		static const int 	MaxNoClosestPoints = 1024;
 
 		struct Grid
 		{
@@ -104,7 +104,7 @@ namespace Torch
 		};
 
 		// Add a cell (with SW indexes) to the buffer of the closest points
-		int			addClosest(const Grid::Cell& cell, int isize);
+		int			addClosest(const Grid::Cell& cell, int isize, float cx, float cy, float w, float h);
 
 		/////////////////////////////////////////////////////////////////
 		// Attributes
@@ -114,6 +114,14 @@ namespace Torch
 
 		// Buffer to copy the indexes of the closest points
 		int 			m_iclosest[MaxNoClosestPoints];
+		float			m_iDistClosest[MaxNoClosestPoints];
+
+		// Bandwidths computed for each candidates SW
+		bool			m_bandwidthsComputed;
+		float*			m_bandwidths;
+		float*			m_inv_bandwidths;
+
+		const PatternList*	m_candidates;
 	};
 }
 
