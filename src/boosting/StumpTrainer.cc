@@ -176,8 +176,9 @@ namespace Torch
 			//
 			for(int i = 0; i < n_examples ; i++)
 			{
-			   	ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
-				short target_value = (*target)(i);
+			   	int index = m_shuffledindex_dataset[i]; 
+			   	ShortTensor *target = (ShortTensor *) m_dataset->getTarget(index);
+				short target_value = (*target)(0);
 
 				float z = features_values[i] - min_;
 

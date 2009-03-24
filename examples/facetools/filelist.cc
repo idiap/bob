@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
 	   	//
 		print("%s\n", file_list->file_names[i]);
 
-		char *image_filename = new char [strlen(image_pathname) + strlen(file_list->file_names[i])];
-		char *gt_filename = new char [strlen(gt_pathname) + strlen(file_list->file_names[i])];
+		char *image_filename = new char [strlen(image_pathname) + strlen(file_list->file_names[i]) + 3 + strlen(image_ext)];
+		char *gt_filename = new char [strlen(gt_pathname) + strlen(file_list->file_names[i]) + 3 + strlen(gt_ext)];
 
 		sprintf(image_filename, "%s/%s.%s", image_pathname, file_list->file_names[i], image_ext);
 		sprintf(gt_filename, "%s/%s.%s", gt_pathname, file_list->file_names[i], gt_ext);

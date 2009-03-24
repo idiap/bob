@@ -313,6 +313,24 @@ int main(int argc, char* argv[])
 	boosting.setData(&mdataset);
 	boosting.train();
 
+	/*
+	for(int i = 0 ; i < mdataset.getNoExamples() ; i++)
+	{
+		Tensor *t = mdataset.getExample(i);
+	
+		double z = 0;
+		for( int j = 0; j < n_classifiers; j++)
+		{
+			print("weight = %g\n", stump_trainers[j]->getWeight());
+			stump_machines[j]->forward(t);
+
+			DoubleTensor o = stump_machines[j]->getOutput();
+
+			z += stump_trainers[j]->getWeight() * (double) o(0); 
+		}
+		print("> %g", z);
+	}
+	*/
 
 	// Saving ...
 	print("Saving model ...\n");
