@@ -2,7 +2,7 @@
 # Add the source files to the list of files to be added to the library
 #
 SET(	trainer_SRC
-#		"${CMAKE_CURRENT_SOURCE_DIR}/GTFile.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/GTFile.cc"
 #		"${CMAKE_CURRENT_SOURCE_DIR}/EMTrainer.cc"
 	CACHE INTERNAL "sources")
 
@@ -12,8 +12,7 @@ SET(	trainer_INCLUDE
 
 # Add some sub-directories
 SET(trainer_SUBDIRS
-)
-#	gtfiles)
+	gtfiles)
 
 FOREACH(subdir ${trainer_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})

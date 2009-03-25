@@ -1,0 +1,32 @@
+#include "GTFile.h"
+
+namespace Torch {
+
+///////////////////////////////////////////////////////////////////////////////
+// Constructor
+
+GTFile::GTFile(int n_points_)
+{
+   	m_n_points = 0;
+	m_points = NULL;
+   	if(n_points_ > 0)
+	{
+   		m_n_points = n_points_;
+		m_points = new sPoint2D [m_n_points];
+	}
+	
+	addBOption("verbose", false, "verbose");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Destructor
+
+GTFile::~GTFile()
+{
+	if(m_points != NULL)
+		delete []m_points;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+}

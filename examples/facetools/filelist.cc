@@ -1,5 +1,12 @@
 #include "CmdLine.h"
 #include "FileList.h"
+#include "eyecenterGTFile.h"
+#include "eyecornerGTFile.h"
+#include "bancaGTFile.h"
+#include "cootesGTFile.h"
+#include "frontalEyeNoseChinGTFile.h"
+#include "halfprofileEyeNoseChinGTFile.h"
+#include "profileEyeNoseChinGTFile.h"
 
 using namespace Torch;
 
@@ -15,7 +22,9 @@ int main(int argc, char* argv[])
 	char *gt_pathname;
 	char *image_ext;
 	char *gt_ext;
+	int  gt_format;
 	bool verbose;
+	bool one_gt_object;
 
 	// Build the command line object
 	CmdLine cmd;
@@ -31,16 +40,51 @@ int main(int argc, char* argv[])
 	cmd.addText("\nOptions:");
 	cmd.addSCmdOption("-image_ext", &image_ext, "pgm", "image file extension");
 	cmd.addSCmdOption("-gt_ext", &gt_ext, "pos", "gt file extension");
+	cmd.addICmdOption("-gt_format", &gt_format, 1, "gt format (1=eyes center, 2=banca format, 3=eyes corners, 4=eye corners + nose tip + chin, 5=left eye corners + right eye center + nose tip + chin, 6=left eye center + nose tip + chin, 7=Tim Cootes's markup 68 pts)");
+	cmd.addBCmdOption("-one_gt_object", &one_gt_object, false, "if true then considers that the gt file contains one object, otherwise assumes that the first line of the file contains the number of objects");
 	cmd.addBCmdOption("-verbose", &verbose, false, "verbose");
 
 	// Parse the command line
 	if (cmd.read(argc, argv) < 0)
 	{
-		return 0;
+		return 1;
 	}
 
+	GTFile *gt_loader = NULL;
+	switch(gt_format)
+	{
+	case 1:
+		gt_loader = new eyecenterGTFile();
+		break;
+	case 2:
+		gt_loader = new eyecornerGTFile();
+		break;
+	case 3:
+		gt_loader = new bancaGTFile();
+		break;
+	case 4:
+		gt_loader = new frontalEyeNoseChinGTFile();
+		break;
+	case 5:
+		gt_loader = new halfprofileEyeNoseChinGTFile();
+		break;
+	case 6:
+		gt_loader = new profileEyeNoseChinGTFile();
+		break;
+	case 7:
+		gt_loader = new cootesGTFile();
+		break;
+	default:
+	   	warning("GT format not implemented.");
+	   	return 1;
+		break;
+	}
+	gt_loader->setBOption("verbose", verbose);
+
+	if(one_gt_object) message("One object in GT file.");
+
 	FileList *file_list = new FileList(list_filename);
-	
+
 	print("Number of files:%d\n", file_list->n_files);
 	for(int i = 0 ; i < file_list->n_files ; i++)
 	{
@@ -56,11 +100,27 @@ int main(int argc, char* argv[])
 		print("> %s\n", image_filename);
 		print("> %s\n", gt_filename);
 
+		//
+		File gt_file;
+		gt_file.open(gt_filename, "r");
+		if(one_gt_object) gt_loader->load(&gt_file);
+		else
+		{
+		   	int n;
+		   	gt_file.scanf("%d", &n);
+			print("Number of objects: %d\n", n);
+			for(int j = 0 ; j < n ; j++)
+				gt_loader->load(&gt_file);
+		}
+		gt_file.close();
+
+		//
 		delete [] gt_filename;
 		delete [] image_filename;
 	}
 
 	delete file_list;
+	delete gt_loader;
 
         // OK
 	return 0;

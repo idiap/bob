@@ -1,5 +1,10 @@
 #include "ipGeomNorm.h"
-#include "FrontalFace64x80.h"
+
+//#include "FrontalFace64x80.h"
+#include "eyecenterGTFile.h"
+#include "bancaGTFile.h"
+#include "cootesGTFile.h"
+
 #include "Image.h"
 #include "xtprobeImageFile.h"
 #include "CmdLine.h"
@@ -174,6 +179,8 @@ int main(int argc, char* argv[])
 	char* gt_pts_filename = 0;
 	char* cfg_norm_filename = 0;
 	char* norm_image_filename = 0;
+	int gt_format;
+	bool verbose;
 
 	// Read the command line
 	CmdLine cmd;
@@ -182,6 +189,9 @@ int main(int argc, char* argv[])
 	cmd.addSCmdArg("ground truth positions", &gt_pts_filename, "input ground truth positions");
 	cmd.addSCmdArg("configuration", &cfg_norm_filename, "input normalization configuration file");
 	cmd.addSCmdArg("normalized image", &norm_image_filename, "normalized image file");
+	cmd.addText("\nOptions:");
+	cmd.addICmdOption("-gt_format", &gt_format, 1, "gt format (1=eyes center, 2=banca format, 3=eyes corners, 4=eye corners + nose tip + chin, 5=left eye corners + right eye center + nose tip + chin, 6=left eye center + nose tip + chin, 7=Tim Cootes's markup 68 pts)");
+	cmd.addBCmdOption("-verbose", &verbose, false, "verbose");
 
 	cmd.read(argc, argv);
 
@@ -192,7 +202,7 @@ int main(int argc, char* argv[])
 
 	Image image(1, 1, 3);
 	xtprobeImageFile xtprobe;
-	CHECK_FATAL(xtprobe.save(image, image_filename) == true);
+	CHECK_FATAL(xtprobe.load(image, image_filename) == true);
 
 	print("Processing image [width = %d, height = %d, nplanes = %d] ...\n",
 		image.size(1), image.size(0), image.size(2));
@@ -203,13 +213,40 @@ int main(int argc, char* argv[])
 	File file;
 	CHECK_FATAL(file.open(gt_pts_filename, "r") == true);
 
-	const int postype = 68;
-	FrontalFace64x80 face_model(postype);
-	face_model.loadFile(&file);
+	GTFile *gt_loader = NULL;
+	switch(gt_format)
+	{
+	case 1:
+		gt_loader = new eyecenterGTFile();
+		break;
+	case 3:
+		gt_loader = new bancaGTFile();
+		break;
+	case 7:
+		gt_loader = new cootesGTFile();
+		break;
+	default:
+	   	warning("GT format not implemented.");
+	   	return 1;
+		break;
+	}
+	gt_loader->setBOption("verbose", verbose);
+
+	gt_loader->load(&file);
+
+	//const int postype = 68;
+	//FrontalFace64x80 face_model(postype);
+	//face_model.loadFile(&file);
+
 	file.close();
 
-	print("Loaded [%d] ground truth points ...\n",
-		face_model.n_ldm_points);
+	//print("Loaded [%d] ground truth points ...\n", face_model.n_ldm_points);
+	print("Loaded [%d] ground truth points ...\n", gt_loader->getNPoints());
+
+	//int n_ldm_points = face_model.n_ldm_points;
+	//sPoint2D *ldm_points = face_model.ldm_points;
+	int n_ldm_points = gt_loader->getNPoints();
+	sPoint2D *ldm_points = gt_loader->getPoints();
 
 	///////////////////////////////////////////////////////////////////
 	// Parse the configuration file and set the parameters to ipGeomNorm
@@ -221,13 +258,15 @@ int main(int argc, char* argv[])
 	///////////////////////////////////////////////////////////////////
 	// Geometric normalize the image and save the result
 
-	CHECK_FATAL(gnormalizer.setGTPoints(face_model.ldm_points, face_model.n_ldm_points) == true);
+	CHECK_FATAL(gnormalizer.setGTPoints(ldm_points, n_ldm_points) == true);
 	CHECK_FATAL(gnormalizer.process(image) == true);
 
 	const ShortTensor& norm_timage = (const ShortTensor&)gnormalizer.getOutput(0);
-	saveImageGTPts(image, face_model.ldm_points, face_model.n_ldm_points, "original.jpg");
-	saveImageGTPts(norm_timage, gnormalizer.getNMPoints(), face_model.n_ldm_points, "final.jpg");
+	saveImageGTPts(image, ldm_points, n_ldm_points, "original.jpg");
+	saveImageGTPts(norm_timage, gnormalizer.getNMPoints(), n_ldm_points, "final.jpg");
 	saveImageGTPts(norm_timage, 0, 0, norm_image_filename);
+
+	delete gt_loader;
 
 	print("\nOK\n");
 

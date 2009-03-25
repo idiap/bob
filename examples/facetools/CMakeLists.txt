@@ -11,6 +11,8 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
 			"${TORCH5SPRO_DIR}/src/th/"
 			"${TORCH5SPRO_DIR}/src/ip/"
 			"${TORCH5SPRO_DIR}/src/ip/shape/"
+			"${TORCH5SPRO_DIR}/src/trainer/"
+			"${TORCH5SPRO_DIR}/src/trainer/gtfiles/"
 			"${TORCH5SPRO_DIR}/src/geometry/"
 			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
 			"${TORCH5SPRO_DIR}/extras/jpeg/")
