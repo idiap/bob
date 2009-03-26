@@ -40,14 +40,14 @@ bool eyecenterGTFile::load(File* file)
 	return true;
 }
 
-char *eyecenterGTFile::getLabel(int i)
+const char* eyecenterGTFile::getLabel(int i)
 {
    	if(i < 0 || i >= m_n_points) return "Out of range label index";
 	if(i == 0) return "Left Eye Center";
 	else if(i == 1) return "Right Eye Center";
 }
 
-char *eyecenterGTFile::getName()
+const char* eyecenterGTFile::getName()
 {
 	return "Idiap Eye Centers";
 }

@@ -20,10 +20,10 @@ namespace Torch
 		virtual bool		load(File* file);
 
 		// Get the name of the label of a point
-		virtual char *		getLabel(int);
+		virtual const char*	getLabel(int);
 
 		// Get the name of the GT file format
-		virtual char *		getName();
+		virtual const char*	getName();
 	};
 
 }

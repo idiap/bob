@@ -65,7 +65,7 @@ bool halfprofileEyeNoseChinGTFile::load(File* file)
 	return true;
 }
 
-char *halfprofileEyeNoseChinGTFile::getLabel(int i)
+const char* halfprofileEyeNoseChinGTFile::getLabel(int i)
 {
    	if(i < 0 || i >= m_n_points) return "Out of range label index";
    	switch(i)
@@ -80,7 +80,7 @@ char *halfprofileEyeNoseChinGTFile::getLabel(int i)
 	}
 }
 
-char *halfprofileEyeNoseChinGTFile::getName()
+const char* halfprofileEyeNoseChinGTFile::getName()
 {
 	return "Left Eye Corners + Right Eye Center + Nose Tip + Chin + computed Left Eye Center (half profile)";
 }

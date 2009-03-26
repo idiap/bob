@@ -51,7 +51,7 @@ bool eyecornerGTFile::load(File* file)
 	return true;
 }
 
-char *eyecornerGTFile::getLabel(int i)
+const char* eyecornerGTFile::getLabel(int i)
 {
    	if(i < 0 || i >= m_n_points) return "Out of range label index";
    	switch(i)
@@ -66,7 +66,7 @@ char *eyecornerGTFile::getLabel(int i)
 	}
 }
 
-char *eyecornerGTFile::getName()
+const char* eyecornerGTFile::getName()
 {
 	return "Eye Corners + computed Eye Centers";
 }

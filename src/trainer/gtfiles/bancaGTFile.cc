@@ -33,7 +33,7 @@ bool bancaGTFile::load(File* file)
 	return true;
 }
 
-char *bancaGTFile::getLabel(int i)
+const char* bancaGTFile::getLabel(int i)
 {
    	if(i < 0 || i >= m_n_points) return "Out of range label index";
    	switch(i)
@@ -52,7 +52,7 @@ char *bancaGTFile::getLabel(int i)
 	}
 }
 
-char *bancaGTFile::getName()
+const char* bancaGTFile::getName()
 {
 	return "BANCA format";
 }

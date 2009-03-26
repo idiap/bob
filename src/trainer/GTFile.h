@@ -27,10 +27,10 @@ namespace Torch
 		sPoint2D*		getPoints() const { return m_points; }
 
 		// Get the name of the label of a point
-		virtual char *		getLabel(int) = 0;
+		virtual const char*	getLabel(int) = 0;
 
 		// Get the name of the GT file format
-		virtual char *		getName() = 0;
+		virtual const char*	getName() = 0;
 
 	protected:
 

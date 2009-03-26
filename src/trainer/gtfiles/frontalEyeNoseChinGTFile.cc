@@ -73,7 +73,7 @@ bool frontalEyeNoseChinGTFile::load(File* file)
 	return true;
 }
 
-char *frontalEyeNoseChinGTFile::getLabel(int i)
+const char* frontalEyeNoseChinGTFile::getLabel(int i)
 {
    	if(i < 0 || i >= m_n_points) return "Out of range label index";
    	switch(i)
@@ -90,7 +90,7 @@ char *frontalEyeNoseChinGTFile::getLabel(int i)
 	}
 }
 
-char *frontalEyeNoseChinGTFile::getName()
+const char* frontalEyeNoseChinGTFile::getName()
 {
 	return "Eye Corners + computed Eye Centers + Nose tip + Chin";
 }

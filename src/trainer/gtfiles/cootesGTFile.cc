@@ -37,7 +37,7 @@ bool cootesGTFile::load(File* file)
 	return true;
 }
 
-char *cootesGTFile::getLabel(int i)
+const char* cootesGTFile::getLabel(int i)
 {
    	if(i < 0 || i >= m_n_points) return "Out of range label index";
    	switch(i)
@@ -48,7 +48,7 @@ char *cootesGTFile::getLabel(int i)
 	}
 }
 
-char *cootesGTFile::getName()
+const char* cootesGTFile::getName()
 {
 	return "Tim Cootes format";
 }

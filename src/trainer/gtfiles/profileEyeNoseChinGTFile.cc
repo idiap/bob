@@ -50,7 +50,7 @@ bool profileEyeNoseChinGTFile::load(File* file)
 	return true;
 }
 
-char *profileEyeNoseChinGTFile::getLabel(int i)
+const char* profileEyeNoseChinGTFile::getLabel(int i)
 {
    	if(i < 0 || i >= m_n_points) return "Out of range label index";
    	switch(i)
@@ -62,7 +62,7 @@ char *profileEyeNoseChinGTFile::getLabel(int i)
 	}
 }
 
-char *profileEyeNoseChinGTFile::getName()
+const char* profileEyeNoseChinGTFile::getName()
 {
 	return "Left Eye Center + Nose Tip + Chin (profile)";
 }
