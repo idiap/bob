@@ -2,25 +2,6 @@
 NOT ASSIGNED
 ---
 
-	Ground Truth file loader
-		GTFile
-		|	virtual sPoint2D *load() = 0;
-		|	virtual bool load(sPoint2D &) = 0;
-		|	virtual char *getLabel(int) = 0;
-		|	virtual char *getName() = 0;
-		|
-		|
-		|__ eyecenterGTFile   // IDIAP 2 points format
-		|
-		|__ eyecornersGTFile  // IDIAP 4 points format
-		|
-		|__ bancaGTFile       // BANCA format (10 points ?)
-		|
-		|__ umanGTFile        // Tim Cootes ASM format (68 or more points)
-		|
-		|__ mobioGTFile       // MOBIO format
-
-
 	faceextract.cc	Face extraction from list of pairs (image, gt) -> tensor
 
 	tensor2pgm.cc	
@@ -69,4 +50,16 @@ DONE
 	DataSet
 	MemoryDataSet
 	Scanning
+	Ground Truth file loader
+		GTFile
+		|	virtual bool load() = 0;
+		|	virtual sPoint2D* getPoints() = 0;
+		|	virtual const char *getLabel(int) = 0;
+		|	virtual const char *getName() = 0;
+		|
+		|__ eyecenterGTFile   // IDIAP 2 points format
+		|__ eyecornersGTFile  // IDIAP 4 points format
+		|__ bancaGTFile       // BANCA format (10 points ?)
+		|__ cootesGTFile      // Tim Cootes ASM format (68 or more points ?)
+		|__ ...
 

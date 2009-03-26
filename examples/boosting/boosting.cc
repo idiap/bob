@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
 	int max_features;
 	int n_classifiers;
 	bool verbose;
+	bool unfold;
 	int width;
 	int height;
 
@@ -44,6 +45,7 @@ int main(int argc, char* argv[])
 
 	cmd.addText("\nOptions:");
 	cmd.addBCmdOption("-verbose", &verbose, false, "print Tensor values");
+	cmd.addBCmdOption("-unfold", &unfold, false, "unfold a 1D tensor to a 2D tensor");
 	cmd.addICmdOption("-wc", &n_classifiers, 10, "number of weak classifiers");
 	cmd.addICmdOption("-maxE", &max_examples, -1, "maximum number of examples to load");
 	cmd.addICmdOption("-maxF", &max_features, -1, "maximum number of features to process");
@@ -106,14 +108,18 @@ int main(int argc, char* argv[])
 	n_examples = n_examples_0 + n_examples_1;
 	n_features = header0.m_size[0];
 
+	Tensor *tensor = NULL;
 	if(width > 0 && height > 0) 
 	{
 	   	print("Width = %d\n", width);
 	   	print("Height = %d\n", height);
 		CHECK_FATAL(n_features == (width * height));
-	}
 
-	Tensor *tensor = new FloatTensor(n_features);
+		tensor = new FloatTensor(height, width);
+	}
+	else tensor = new FloatTensor(n_features);
+
+	//Tensor *tensor = new FloatTensor(n_features);
 	FloatTensor *unfoldtensor = new FloatTensor;
 	ShortTensor *target0 = new ShortTensor(1); target0->fill(0);
 	ShortTensor *target1 = new ShortTensor(1); target1->fill(1);
@@ -129,14 +135,15 @@ int main(int argc, char* argv[])
 	for(int i = 0 ; i < n_examples_0 ; i++)
 	{
 	   	// memory allocation for the current tensor example
-		if(width > 0 && height > 0) mdataset.getExample(i)->resize(width, height);
+		if(width > 0 && height > 0) mdataset.getExample(i)->resize(height, width);
 		else mdataset.getExample(i)->resize(n_features);
 
 		// load a tensor from the file (assuming same type and size)
 	   	tf0.load(*tensor);
 
 		// copy the tensor read from the file into the current tensor example (thus supporting type conversion)
-		if(width > 0 && height > 0)
+		//if(width > 0 && height > 0)
+		if(unfold)
 		{
 			unfoldtensor->unfold(tensor, 0, width, width);
 			mdataset.getExample(i)->copy(unfoldtensor);
@@ -152,14 +159,15 @@ int main(int argc, char* argv[])
 	for(int i = n_examples_0 ; i < n_examples ; i++)
 	{
 	   	// memory allocation for the current tensor example
-		if(width > 0 && height > 0) mdataset.getExample(i)->resize(width, height);
+		if(width > 0 && height > 0) mdataset.getExample(i)->resize(height, width);
 		else mdataset.getExample(i)->resize(n_features);
 
 		// load a tensor from the file (assuming same type and size)
 	   	tf1.load(*tensor);
 
 		// copy the tensor read from the file into the current tensor example (thus supporting type conversion)
-		if(width > 0 && height > 0)
+		//if(width > 0 && height > 0)
+		if(unfold)
 		{
 			unfoldtensor->unfold(tensor, 0, width, width);
 			mdataset.getExample(i)->copy(unfoldtensor);

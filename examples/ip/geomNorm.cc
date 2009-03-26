@@ -1,6 +1,5 @@
 #include "ipGeomNorm.h"
 
-//#include "FrontalFace64x80.h"
 #include "eyecenterGTFile.h"
 #include "bancaGTFile.h"
 #include "cootesGTFile.h"
@@ -234,17 +233,10 @@ int main(int argc, char* argv[])
 
 	gt_loader->load(&file);
 
-	//const int postype = 68;
-	//FrontalFace64x80 face_model(postype);
-	//face_model.loadFile(&file);
-
 	file.close();
 
-	//print("Loaded [%d] ground truth points ...\n", face_model.n_ldm_points);
 	print("Loaded [%d] ground truth points ...\n", gt_loader->getNPoints());
 
-	//int n_ldm_points = face_model.n_ldm_points;
-	//sPoint2D *ldm_points = face_model.ldm_points;
 	int n_ldm_points = gt_loader->getNPoints();
 	sPoint2D *ldm_points = gt_loader->getPoints();
 
