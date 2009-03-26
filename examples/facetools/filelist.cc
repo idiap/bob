@@ -1,5 +1,5 @@
-#include "CmdLine.h"
 #include "FileList.h"
+
 #include "eyecenterGTFile.h"
 #include "eyecornerGTFile.h"
 #include "bancaGTFile.h"
@@ -8,8 +8,12 @@
 #include "halfprofileEyeNoseChinGTFile.h"
 #include "profileEyeNoseChinGTFile.h"
 
-using namespace Torch;
+#include "Image.h"
+#include "xtprobeImageFile.h"
 
+#include "CmdLine.h"
+
+using namespace Torch;
 
 int main(int argc, char* argv[])
 {
@@ -97,10 +101,20 @@ int main(int argc, char* argv[])
 		sprintf(image_filename, "%s/%s.%s", image_pathname, file_list->file_names[i], image_ext);
 		sprintf(gt_filename, "%s/%s.%s", gt_pathname, file_list->file_names[i], gt_ext);
 
-		print("> %s\n", image_filename);
-		print("> %s\n", gt_filename);
+		//
+		print("Image file: %s\n", image_filename);
+
+		Image image(1, 1, 3);
+		xtprobeImageFile xtprobe;
+		CHECK_FATAL(xtprobe.load(image, image_filename) == true);
+
+		print("   width   = %d\n", image.size(1));
+		print("   height  = %d\n", image.size(0));
+		print("   nplanes = %d\n", image.size(2));
 
 		//
+		print("GT file: %s\n", gt_filename);
+
 		File gt_file;
 		gt_file.open(gt_filename, "r");
 		if(one_gt_object) gt_loader->load(&gt_file);

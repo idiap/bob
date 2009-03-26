@@ -5,7 +5,7 @@ filelist xm2vts.list ../data/images ../data/gt/eyecenter -image_ext pgm -gt_ext 
 filelist xm2vts.list ../data/images ../data/gt/markup68pt -image_ext pgm -gt_ext pts -gt_format 7 -one_gt_object -verbose
 
 #
-filelist cmu.list ../data/images ../data/gt/eyecenter -image_ext pgm -gt_ext pos -gt_format 1 -verbose
+filelist cmu.list ../data/cmu_faces ../data/gt/eyecenter -image_ext pgm -gt_ext pos -gt_format 1 -verbose
 
 #
 filelist banca.list ../data/images ../data/gt/banca -image_ext jpeg -gt_ext pos -gt_format 2 -one_gt_object -verbose
