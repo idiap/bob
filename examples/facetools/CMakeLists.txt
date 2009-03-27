@@ -11,6 +11,8 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
 			"${TORCH5SPRO_DIR}/src/th/"
 			"${TORCH5SPRO_DIR}/src/ip/"
 			"${TORCH5SPRO_DIR}/src/ip/shape/"
+			"${TORCH5SPRO_DIR}/src/trainer/"
+			"${TORCH5SPRO_DIR}/src/trainer/gtfiles/"
 			"${TORCH5SPRO_DIR}/src/geometry/"
 			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
 			"${TORCH5SPRO_DIR}/extras/jpeg/")
@@ -34,7 +36,8 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
-	filelist.cc)
+	filelist.cc
+	gtimageextract.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

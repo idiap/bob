@@ -90,7 +90,7 @@ xtprobeImageFile::xtprobeImageFile()
 
 xtprobeImageFile::~xtprobeImageFile()
 {
-	delete m_loader;
+	if(m_loader != 0) delete m_loader;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +102,7 @@ bool xtprobeImageFile::save(const Image& image, const char* filename)
 	m_loader = GetImageFile(filename);
 	if (m_loader == 0)
 	{
+	   	warning("xtprobeImageFile::save(): failed to allocate image loader.");
 		return false;
 	}
 	return m_loader->save(image, filename);
@@ -116,6 +117,7 @@ bool xtprobeImageFile::load(Image& image, const char* filename)
 	m_loader = GetImageFile(filename);
 	if (m_loader == 0)
 	{
+	   	warning("xtprobeImageFile::load(): failed to allocate image loader.");
 		return false;
 	}
 	return m_loader->load(image, filename);

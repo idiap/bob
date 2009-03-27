@@ -30,6 +30,7 @@ bool ipRotate::checkInput(const Tensor& input) const
 	if (	input.nDimension() != 3 ||
 		input.getDatatype() != Tensor::Short)
 	{
+	   	warning("ipRotate::checkInput(): Incorrect Tensor type and dimension.");
 		return false;
 	}
 
@@ -167,6 +168,7 @@ bool ipRotate::processInput(const Tensor& input)
 	if (	cx < 0 || cx > input.size(1) ||
 		cy < 0 || cy > input.size(0))
 	{
+	   	warning("ipRotate::processInput(): center of rotation (%d %d) out of the image (%d %d).", cx, cy, input.size(1), input.size(0));
 		return false;
 	}
 

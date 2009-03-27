@@ -1,0 +1,30 @@
+#
+filelist xm2vts.list ../data/images ../data/gt/eyecenter -image_ext pgm -gt_ext pos -gt_format 1 -one_gt_object -verbose
+
+#
+filelist xm2vts.list ../data/images ../data/gt/markup68pt -image_ext pgm -gt_ext pts -gt_format 7 -one_gt_object -verbose
+
+#
+filelist cmu.list ../data/cmu_faces ../data/gt/eyecenter -image_ext pgm -gt_ext pos -gt_format 1 -verbose
+
+#
+filelist banca.list ../data/images ../data/gt/banca -image_ext jpeg -gt_ext pos -gt_format 2 -one_gt_object -verbose
+
+#
+filelist eyenosechin_profile.list ../data/images ../data/gt/eyesnosechin -image_ext ppm -gt_ext pos -gt_format 6 -one_gt_object -verbose
+
+#
+filelist eyenosechin_halfprofile.list ../data/images ../data/gt/eyesnosechin -image_ext ppm -gt_ext pos -gt_format 5 -one_gt_object  -verbose
+
+#
+filelist eyenosechin_frontal.list ../data/images ../data/gt/eyesnosechin -image_ext ppm -gt_ext pos -gt_format 4 -one_gt_object -verbose
+
+#
+gtimageextract xm2vts.list ../data/images ../data/gt/markup68pt frontalface64x80.geom.norm.cfg -image_ext pgm -gt_ext pts -gt_format 7 -one_gt_object
+
+# BUG with too many files !!!
+gtimageextract xm2vts-all.list /idiap/common_vision/visidiap/databases/xm2vts/normal/images_gray /idiap/common_vision/visidiap/databases/groundtruth/xm2vts/normal/aam-cootes-markup68pt frontalface19x19.geom.norm.cfg -image_ext pgm -gt_ext pts -gt_format 7 -one_gt_object -onetensor
+
+# BUT it works with this program ?
+filelist xm2vts-all.list /idiap/common_vision/visidiap/databases/xm2vts/normal/images_gray /idiap/common_vision/visidiap/databases/groundtruth/xm2vts/normal/aam-cootes-markup68pt -image_ext pgm -gt_ext pts -gt_format 7 -one_gt_object
+

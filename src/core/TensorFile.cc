@@ -400,6 +400,11 @@ bool TensorFile::save(const Tensor& tensor)
 	if ( 	tensor.getDatatype() 	!= m_header.m_type 	||
 		tensor.nDimension() 	!= m_header.m_n_dimensions )
 	{
+	   	warning("TensorFile::save() incorrect data type or number of dimensions.");
+
+		//print(" > %d == %d ?\n", tensor.getDatatype(), m_header.m_type);
+		//print(" > %d == %D ?\n", tensor.nDimension(), m_header.m_n_dimensions);
+		
 		return false;
 	}
 
@@ -408,6 +413,10 @@ bool TensorFile::save(const Tensor& tensor)
 	{
 		if ( tensor.size(cnt) != m_header.m_size[cnt] )
 		{
+	   		warning("TensorFile::save() incorrect sizes.");
+		
+			//print(" > %d == %d ?\n", tensor.size(cnt), m_header.m_size[cnt]);
+
 			return false;
 		}
 	}
@@ -415,6 +424,7 @@ bool TensorFile::save(const Tensor& tensor)
 	// Write down tensor
 	if (m_file.write(tensor.dataR(), tensor.typeSize(), tensor.sizeAll()) != tensor.sizeAll())
 	{
+	   	warning("TensorFile::save() incorrect write.");
 		return false;
 	}
 

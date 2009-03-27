@@ -32,6 +32,7 @@ ipGeomNorm::ipGeomNorm()
 	addIOption("cropH", 0, "crop: height of the base normalized image (without border)");
 	addIOption("cropBorderX", 0, "crop: Ox border of the  normalized image around the cropping center");
 	addIOption("cropBorderY", 0, "crop: Oy border of the  normalized image around the cropping center");
+	addBOption("verbose", false, "verbose");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -70,6 +71,7 @@ bool ipGeomNorm::checkInput(const Tensor& input) const
 	if (	input.getDatatype() != Tensor::Short ||
 		input.nDimension() != 3)
 	{
+	   	warning("ipGeomNorm::checkInput(): Incorrect Tensor type and dimension.");
 		return false;
 	}
 
@@ -112,6 +114,8 @@ bool ipGeomNorm::allocateOutput(const Tensor& input)
 
 bool ipGeomNorm::processInput(const Tensor& input)
 {
+	const bool verbose = getBOption("verbose");
+
 	// Get parameters
 	const int rotIdx1 = getIOption("rotIdx1");
 	const int rotIdx2 = getIOption("rotIdx2");
@@ -146,6 +150,7 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		cropDy < -cropH || cropDy > cropH ||
 		cropBorderX < 0 || cropBorderY < 0)
 	{
+	   	warning("ipGeomNorm::processInput(): incorrect parameters.");
 		return false;
 	}
 
@@ -167,6 +172,7 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		m_ip_rotate.setIOption("centery", ip_rot_cy) == false ||
 		m_ip_rotate.process(input) == false)
 	{
+	   	warning("ipGeomNorm::processInput(): incorrect rotation parameters or rotation failure.");
 		return false;
 	}
 
@@ -214,6 +220,7 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		m_ip_scale.setIOption("height", scaleH) == false ||
 		m_ip_scale.process(m_ip_rotate.getOutput(0)) == false)
 	{
+	   	warning("ipGeomNorm::processInput(): incorrect scaling parameters or scaling failure.");
 		return false;
 	}
 
@@ -244,6 +251,7 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		ip_crop_x + ip_crop_w > m_ip_scale.getOutput(0).size(1) ||
 		ip_crop_y + ip_crop_h > m_ip_scale.getOutput(0).size(0))
 	{
+	   	warning("ipGeomNorm::processInput(): incorrect crop parameters.");
 		return false;
 	}
 
@@ -254,6 +262,7 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		m_ip_crop.setIOption("h", ip_crop_h) == false ||
 		m_ip_crop.process(m_ip_scale.getOutput(0)) == false)
 	{
+	   	warning("ipGeomNorm::processInput(): crop failure.");
 		return false;
 	}
 
