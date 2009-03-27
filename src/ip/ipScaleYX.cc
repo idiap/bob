@@ -98,9 +98,9 @@ bool ipScaleYX::processInput(const Tensor& input)
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	// Allocate buffer (if needed)
-	if (m_buffer_size != n_planes * (3 * in_width + out_width))
+	if (m_buffer_size != n_planes * (3 * in_width + max(in_width, out_width)))
 	{
-		m_buffer_size = n_planes * (3 * in_width + out_width);
+		m_buffer_size = n_planes * (3 * in_width + max(in_width, out_width));
 		delete[] m_buffer;
 		m_buffer = new float[m_buffer_size];
 	}

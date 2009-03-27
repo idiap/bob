@@ -475,6 +475,23 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../trainer/CMakeLists.txt" />
+		<Unit filename="../../trainer/GTFile.cc" />
+		<Unit filename="../../trainer/GTFile.h" />
+		<Unit filename="../../trainer/gtfiles/CMakeLists.txt" />
+		<Unit filename="../../trainer/gtfiles/bancaGTFile.cc" />
+		<Unit filename="../../trainer/gtfiles/bancaGTFile.h" />
+		<Unit filename="../../trainer/gtfiles/cootesGTFile.cc" />
+		<Unit filename="../../trainer/gtfiles/cootesGTFile.h" />
+		<Unit filename="../../trainer/gtfiles/eyecenterGTFile.cc" />
+		<Unit filename="../../trainer/gtfiles/eyecenterGTFile.h" />
+		<Unit filename="../../trainer/gtfiles/eyecornerGTFile.cc" />
+		<Unit filename="../../trainer/gtfiles/eyecornerGTFile.h" />
+		<Unit filename="../../trainer/gtfiles/frontalEyeNoseChinGTFile.cc" />
+		<Unit filename="../../trainer/gtfiles/frontalEyeNoseChinGTFile.h" />
+		<Unit filename="../../trainer/gtfiles/halfprofileEyeNoseChinGTFile.cc" />
+		<Unit filename="../../trainer/gtfiles/halfprofileEyeNoseChinGTFile.h" />
+		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.cc" />
+		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

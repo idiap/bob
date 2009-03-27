@@ -556,4 +556,10 @@
 	<File name="../../trainer/CMakeLists.txt" open="0" top="0" tabpos="31">
 		<Cursor position="339" topLine="0" />
 	</File>
+	<File name="../../trainer/gtfiles/bancaGTFile.h" open="1" top="0" tabpos="45">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="../../trainer/gtfiles/eyecenterGTFile.h" open="1" top="0" tabpos="44">
+		<Cursor position="0" topLine="0" />
+	</File>
 </CodeBlocks_layout_file>
