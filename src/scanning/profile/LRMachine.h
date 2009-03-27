@@ -5,10 +5,8 @@
 
 namespace Torch
 {
-namespace Profile
-{
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::Profile::LRMachine:
+	// Torch::LRMachine:
 	//	- implements Logistic Regression Linear Discriminant Analysis (generic,
 	//		but used with profiling scanning)
 	//
@@ -18,40 +16,56 @@ namespace Profile
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class LRMachine : public Machine
+	class LRMachine : public Torch::Machine
 	{
 	public:
 
 		// Constructor
-		LRMachine();
+		LRMachine(int size = 1);
 
 		// Destructor
 		virtual ~LRMachine();
 
-		/// Process the input tensor
-		virtual bool 		forward(const Tensor& input);
+		// Process the input tensor
+		virtual bool 	forward(const Tensor& input);
 
-		/// Constructs an empty Machine of this kind
-		/// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine*	getAnInstance() const;
+		// Constructs an empty Machine of this kind
+		// (used by <MachineManager>, this object should be deallocated by the user)
+		virtual Machine* getAnInstance() const { return new LRMachine; }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const;
+		virtual int	getID() const { return 10002; }
 
-		/// Loading/Saving the content from files (\emph{not the options})
-		virtual bool		loadFile(File& file);
-		virtual bool		saveFile(File& file) const;
+		// Loading/Saving the content from files (\emph{not the options})
+		virtual bool	loadFile(File& file);
+		virtual bool	saveFile(File& file) const;
+
+		// Resize
+		bool		resize(int size);
+
+		// Set machine's parameters
+		void		setThreshold(double threshold);
+		void		setWeights(const double* weights);
+
+		// Access functions
+		double		getThreshold() const { return m_threshold; }
+
+		// Apply the sigmoid function on some data
+		static double	sigmoid(const double* data, const double* weights, int size);
 
 		/////////////////////////////////////////////////////////////////
 
         private:
 
-                /////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////
                 // Attributes
 
-		//
+                double*		m_poutput;	// Direct access to the machine's output
+
+                int		m_size;		// Number of dimensions
+		double*		m_weights;	// [N+1]-dimensional weights
+		double		m_threshold;	// Tunned threshold (default 0.5)
 	};
-}
 }
 
 #endif

@@ -242,7 +242,9 @@ int main(int argc, char* argv[])
 
 		// Test the loading
 		{
-			if (CascadeMachine().load(out_filename) == true)
+			CascadeMachine cascade;
+			CHECK_FATAL(file_in.open(out_filename, "r") == true);
+			if (cascade.loadFile(file_in) == true)
 			{
 				print(">>>>>>>>>>>>>> CHECKED! <<<<<<<<<<<<<<<\n\n");
 			}
@@ -250,6 +252,7 @@ int main(int argc, char* argv[])
 			{
 				print(">>>>>>>>>>>>>> The converted file model is NOT valid! <<<<<<<<<<<<<<\n\n");
 			}
+			file_in.close();
 		}
 	}
 	print("---------------------------------------------------\n");

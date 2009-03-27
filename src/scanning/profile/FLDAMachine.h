@@ -5,12 +5,12 @@
 
 namespace Torch
 {
-namespace Profile
-{
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::Profile::FLDAMachine:
+	// Torch::FLDAMachine:
 	//	- implements Fisher Linear Discriminant Analysis (generic,
 	//		but used with profiling scanning)
+	//	- <getOutput> will return a 1x1D DoubleTensor with the score
+	//	- it processes only DoubleTensors having the same size as set with <resize>
 	//
 	//      - PARAMETERS (name, type, default value, description):
         //		//
@@ -18,40 +18,52 @@ namespace Profile
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class FLDAMachine : public Machine
+	class FLDAMachine : public Torch::Machine
 	{
 	public:
 
 		// Constructor
-		FLDAMachine();
+		FLDAMachine(int size = 1);
 
 		// Destructor
 		virtual ~FLDAMachine();
 
-		/// Process the input tensor
-		virtual bool 		forward(const Tensor& input);
+		// Process the input tensor
+		virtual bool 	forward(const Tensor& input);
 
-		/// Constructs an empty Machine of this kind
-		/// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine*	getAnInstance() const;
+		// Constructs an empty Machine of this kind
+		// (used by <MachineManager>, this object should be deallocated by the user)
+		virtual Machine* getAnInstance() const { return new FLDAMachine; }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const;
+		virtual int	getID() const { return 10001; }
 
-		/// Loading/Saving the content from files (\emph{not the options})
-		virtual bool		loadFile(File& file);
-		virtual bool		saveFile(File& file) const;
+		// Loading/Saving the content from files (\emph{not the options})
+		virtual bool	loadFile(File& file);
+		virtual bool	saveFile(File& file) const;
 
-		/////////////////////////////////////////////////////////////////
+		// Resize
+		bool		resize(int size);
 
-        private:
+		// Set machine's parameters
+		void		setThreshold(double threshold);
+		void		setProjection(const double* proj, double proj_avg);
 
-                /////////////////////////////////////////////////////////////////
-                // Attributes
+		// Access functions
+		double		getThreshold() const { return m_threshold; }
 
-		//
+	private:
+
+		/////////////////////////////////////////////////////////////
+		// Attributes
+
+		double*		m_poutput;	// Direct access to the machine's output
+
+		int		m_size;		// Number of dimensions
+		double*		m_proj;		// N-dimensional projection vector
+		double		m_proj_avg;	// 1-dimensional projected average vector
+		double		m_threshold;	// Tunned threshold (default 0.0)
 	};
-}
 }
 
 #endif

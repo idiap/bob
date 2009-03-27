@@ -336,6 +336,30 @@ const PatternList& Scanner::getPatterns() const
 	return m_selector->getPatterns();
 }
 
+const Explorer&	Scanner::getExplorer() const
+{
+	// Check parameters
+	if (m_explorer == 0)
+	{
+		Torch::error("Scanner::getExplorer - invalid explorer!\n");
+	}
+
+	// OK
+	return *m_explorer;
+}
+
+Explorer& Scanner::getExplorer()
+{
+	// Check parameters
+	if (m_explorer == 0)
+	{
+		Torch::error("Scanner::getExplorer - invalid explorer!\n");
+	}
+
+	// OK
+	return *m_explorer;
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 }

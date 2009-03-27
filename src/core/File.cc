@@ -79,9 +79,6 @@ namespace Torch
 
 	int File::taggedRead(void* ptr, int block_size, int n_blocks, const char* tag)
 	{
-		// TODO: check that the <read>s actually read all the bytes correctly
-
-
 		int tag_size = 0;
 		read(&tag_size, sizeof(int), 1);
 		if (tag_size != (int)strlen(tag))
@@ -92,24 +89,37 @@ namespace Torch
 
 		char* tag_ = new char[tag_size + 1];
 		tag_[tag_size] = '\0';
-		read(tag_, 1, tag_size);
+		if (read(tag_, 1, tag_size) != tag_size)
+		{
+			Torch::message("File: sorry, the tag <%s> cannot be read!", tag);
+			delete[] tag_;
+			return 0;
+		}
 
 		if (strcmp(tag, tag_) != 0)
 		{
-			Torch::message("XFile: tag <%s> not found!", tag);
-			delete tag_;
+			Torch::message("File: tag <%s> not found!", tag);
+			delete[] tag_;
 			return 0;
 		}
 		delete[] tag_;
 
 		int block_size_;
 		int n_blocks_;
-		read(&block_size_, sizeof(int), 1);
-		read(&n_blocks_, sizeof(int), 1);
+		if (read(&block_size_, sizeof(int), 1) != 1)
+		{
+			Torch::message("File: sorry, invalid block size!");
+			return 0;
+		}
+		if (read(&n_blocks_, sizeof(int), 1) != 1)
+		{
+			Torch::message("File: sorry, invalid no of blocks!");
+			return 0;
+		}
 
 		if( (block_size_ != block_size) || (n_blocks_ != n_blocks) )
 		{
-			Torch::message("XFile: tag <%s> has a corrupted size!", tag);
+			Torch::message("File: tag <%s> has a corrupted size!", tag);
 			return 0;
 		}
 
@@ -121,13 +131,23 @@ namespace Torch
 
 	int File::taggedWrite(const void* ptr, int block_size, int n_blocks, const char* tag)
 	{
-		// TODO: check that the first 4 <write>s actually write all the bytes correctly
-
 		int tag_size = strlen(tag);
-		write(&tag_size, sizeof(int), 1);
-		write((char *)tag, 1, tag_size);
-		write(&block_size, sizeof(int), 1);
-		write(&n_blocks, sizeof(int), 1);
+		if (write(&tag_size, sizeof(int), 1) != 1)
+		{
+			return 0;
+		}
+		if (write((char *)tag, 1, tag_size) != tag_size)
+		{
+			return 0;
+		}
+		if (write(&block_size, sizeof(int), 1) != 1)
+		{
+			return 0;
+		}
+		if (write(&n_blocks, sizeof(int), 1) != 1)
+		{
+			return 0;
+		}
 		return write(ptr, block_size, n_blocks);
 	}
 

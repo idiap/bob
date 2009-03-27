@@ -3,8 +3,6 @@
 
 namespace Torch
 {
-namespace Profile
-{
 	//////////////////////////////////////////////////////////////////////////
 	// Matrix operations - numerical recipes & JAMA package
 	//////////////////////////////////////////////////////////////////////////
@@ -17,7 +15,6 @@ namespace Profile
 
 	// Computes the square root of some symetrical matrix
 	bool mat_sqrt_sym(double** mat, double** sqrt_mat, int size);
-}
 }
 
 #endif

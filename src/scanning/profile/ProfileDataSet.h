@@ -2,15 +2,13 @@
 #define _TORCHVISION_SCANNING_PROFILE_DATA_SET_H_
 
 #include "DataSet.h"		// <ProfileDataSet> is a <DataSet>
-#include "Sample.h"
+#include "Profile.h"
 
 namespace Torch
 {
-namespace Profile
-{
-       /////////////////////////////////////////////////////////////////////////
-	// Torch::Profile::ProfileDataSet:
-	//	- implementation of the DataSet over some Profile::Distribution
+	/////////////////////////////////////////////////////////////////////////
+	// Torch::ProfileDataSet:
+	//	- implementation of the DataSet over some Distribution
 	//		and some profile feature
 	//	- returns 1D DoubleTensor of the size given by the profile feature size
 	//		(check Sample.h header for FeatureSizes[])
@@ -24,41 +22,68 @@ namespace Profile
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ProfileDataSet : public DataSet
+	class ProfileDataSet : public Torch::DataSet
 	{
 	public:
 
 		// Constructor
-		ProfileDataSet(const Profile::Distribution& pf_distr, int pf_feature);
+		ProfileDataSet(int pf_feature = 0);
 
 		// Destructor
 		virtual ~ProfileDataSet();
 
-		// Access examples
+		// Access examples - overriden
 		virtual Tensor* 	getExample(long index);
 		virtual Tensor&		operator()(long index);
 
-		// Access targets
+		// Access targets - overriden
 		virtual Tensor* 	getTarget(long index);
-		virtual void		setTarget(long index, Tensor* index);
+		virtual void		setTarget(long index, Tensor* target);
 
-		/////////////////////////////////////////////////////////////////
+		// Reset to a new profile feature
+		void			reset(int pf_feature);
+
+		// Distribution manipulation
+		void			clear();
+		void			cumulate(bool positive, const Profile& profile);
+		void			cumulate(const Profile& gt_profile);
+		const Profile*		getProfile(long index) const;
+		bool			isPosProfile(long index) const;
+
+		// Save the distribution
+		void			save(const char* dir_data, const char* name) const;
 
 	private:
 
-                /////////////////////////////////////////////////////////////////
+		// Save some distribution
+		void			save(const char* basename, unsigned char mask) const;
+
+		// Resize some distribution to fit new samples
+		static Profile**	resize(Profile** old_data, int capacity, int increment);
+		static unsigned char*	resize(unsigned char* old_data, int capacity, int increment);
+
+		enum Mask
+		{
+			Positive = 0x00,
+			Negative,
+			GroundTruth
+		};
+
+		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-		const Profile::Distribution&	m_distribution;
-		int			m_feature;	// Feature to extract from the distribution
+		// Feature to extract from the distribution
+		int			m_feature;
 
-		DoubleTensor		m_example;	// Current buffered example
-		double*			m_pexample;	// Fast access to example
+		// Profile distribution
+		Profile**		m_profiles;		// Profiles
+		unsigned char*		m_masks;		// Negative, positive or ground truth
+		int			m_capacity;		// Allocated profiles
 
-		DoubleTensor		m_target_pos;	// Targets: positive and negative
+		// Targets: positive and negative
 		DoubleTensor		m_target_neg;
+		DoubleTensor		m_target_pos;
 	};
-}
 }
 
 #endif

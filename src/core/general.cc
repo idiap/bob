@@ -55,4 +55,21 @@ void print(const char *fmt, ...)
   va_end(args);
 }
 
+/// Functions used for sorting arrays with <qsort>
+int compare_floats(const void* a, const void* b)
+{
+	const float* da = (const float*) a;
+	const float* db = (const float*) b;
+
+	return (*da > *db) - (*da < *db);
+}
+
+int compare_doubles(const void* a, const void* b)
+{
+	const double* da = (const double*) a;
+	const double* db = (const double*) b;
+
+	return (*da > *db) - (*da < *db);
+}
+
 }

@@ -266,9 +266,9 @@ bool ipRotate::processInput(const Tensor& input)
 
 void ipRotate::HorizSkew(const ShortTensor& src, ShortTensor& dst, int uRow, int iOffset, double dWeight)
 {
-	const int src_height = src.size(0);
+	//const int src_height = src.size(0);
 	const int src_width = src.size(1);
-	const int dst_height = dst.size(0);
+	//const int dst_height = dst.size(0);
 	const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
@@ -355,9 +355,9 @@ void ipRotate::HorizSkew(const ShortTensor& src, ShortTensor& dst, int uRow, int
 void ipRotate::VertSkew(const ShortTensor& src, ShortTensor& dst, int uCol, int iOffset, double dWeight)
 {
 	const int src_height = src.size(0);
-	const int src_width = src.size(1);
+	//const int src_width = src.size(1);
 	const int dst_height = dst.size(0);
-	const int dst_width = dst.size(1);
+	//const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
 	const int src_stride_h = src.t->stride[0];
@@ -444,7 +444,7 @@ bool ipRotate::rotateimage90(const ShortTensor& src, ShortTensor& dst)
 	const int src_height = src.size(0);
 	const int src_width = src.size(1);
 	const int dst_height = dst.size(0);
-	const int dst_width = dst.size(1);
+	//const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
 	const int src_stride_h = src.t->stride[0];
@@ -529,8 +529,8 @@ bool ipRotate::rotateimage270(const ShortTensor& src, ShortTensor& dst)
 {
     	const int src_height = src.size(0);
 	const int src_width = src.size(1);
-	const int dst_height = dst.size(0);
-	const int dst_width = dst.size(1);
+	//const int dst_height = dst.size(0);
+	//const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
 	const int src_stride_h = src.t->stride[0];
@@ -574,15 +574,15 @@ bool ipRotate::rotateimage270(const ShortTensor& src, ShortTensor& dst)
 
 bool ipRotate::rotateimage45(const ShortTensor& src, ShortTensor& dst, double angle)
 {
-	const int src_height = src.size(0);
+	//const int src_height = src.size(0);
 	const int src_width = src.size(1);
 	const int dst_height = dst.size(0);
-	const int dst_width = dst.size(1);
+	//const int dst_width = dst.size(1);
 
 	// Use pixmap (2) and (3) as buffers
 	const int height2 = m_pixmap2.size(0);
-	const int width2 = m_pixmap2.size(1);
-	const int height3 = m_pixmap3.size(0);
+	//const int width2 = m_pixmap2.size(1);
+	//const int height3 = m_pixmap3.size(0);
 	const int width3 = m_pixmap3.size(1);
 
 	// Perform 1st shear (horizontal)

@@ -94,8 +94,7 @@ int main(int argc, char* argv[])
 			sprintf(str, "input.%d.jpg", j);
 
 			xtprobeImageFile ifile;
-			ifile.open(str, "w");
-			image.saveImage(ifile);
+			ifile.save(image, str);
 		}
 
 		// Run the cascade

@@ -5,8 +5,6 @@ using namespace Torch;
 
 namespace Torch
 {
-namespace Profile
-{
 	// Source: Numerical recipes!
 	bool mat_ludcmp(double** a, int n, int* indx, double* d)
 	{
@@ -38,7 +36,7 @@ namespace Profile
 			}
 
 			double big = 0.0;
-			int imax;
+			int imax = 0;
 			for (int i = j; i < n; i ++)
 			{
 				double sum = a[i][j];
@@ -466,7 +464,7 @@ namespace Profile
 		for (int i = 0; i < size; i ++)
 			for (int j = 0; j < size; j ++)
 			{
-				CHECK_FATAL(fabs(mat[i][j] - mat[j][i]) < 0.000005);
+				CHECK_FATAL(fabs(mat[i][j] - mat[j][i]) < 0.000002);
 			}
 
 		// Copy the initial matrix
@@ -495,7 +493,7 @@ namespace Profile
 		// Check the eigen vectors
 		for (int e = 0; e < size - 1; e ++)
 		{
-			CHECK_FATAL(evalues[e] < evalues[e + 1]);
+			CHECK_FATAL(evalues[e] <= evalues[e + 1]);
 		}
 		for (int e = 0; e < size; e ++)
 		{
@@ -526,7 +524,7 @@ namespace Profile
 		for (int i = 0; i < size; i ++)
 			for (int j = 0; j < size; j ++)
 			{
-				CHECK_FATAL(mat[i][j] == mat[j][i]);
+				CHECK_FATAL(fabs(mat[i][j] - mat[j][i]) < 0.000002);
 			}
 
 		// Copy the initial matrix
@@ -604,5 +602,4 @@ namespace Profile
 		delete[] evalues;
 		return true;
 	}
-}
 }

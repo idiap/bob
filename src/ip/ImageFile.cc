@@ -59,8 +59,6 @@ void ImageFile::fillPixmap(unsigned char* pixmap, int n_planes_pixmap, const Ima
 	const int width = image.getWidth();
 	const int height = image.getHeight();
 
-	unsigned char* ppixmap = pixmap;
-
 	// Grayscale image
 	if (image.getNPlanes() == 1)
 	{
@@ -125,8 +123,6 @@ void ImageFile::fillImage(const unsigned char* pixmap, int n_planes_pixmap, Imag
 	const int width = image.getWidth();
 	const int height = image.getHeight();
 
-	const unsigned char* ppixmap = pixmap;
-
 	// Grayscale image
 	if (image.getNPlanes() == 1)
 	{
@@ -146,8 +142,10 @@ void ImageFile::fillImage(const unsigned char* pixmap, int n_planes_pixmap, Imag
 			for (int j = 0; j < height; j ++)
 				for (int i = 0; i < width; i ++)
 				{
-					image.set(j, i, 0, (short)
-						rgb_to_gray(*(pixmap ++), *(pixmap ++), *(pixmap ++)));
+					const unsigned char r = *(pixmap ++);
+					const unsigned char g = *(pixmap ++);
+					const unsigned char b = *(pixmap ++);
+					image.set(j, i, 0, (short)rgb_to_gray(r, g, b));
 				}
 		}
 	}

@@ -1,15 +1,22 @@
 #include "LRMachine.h"
+#include "File.h"
 
 namespace Torch
-{
-namespace Profile
 {
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-LRMachine::LRMachine()
+LRMachine::LRMachine(int size)
+	:	Machine(),
+		m_size(0),
+		m_weights(0),
+		m_threshold(0.5)
 {
+	m_output = new DoubleTensor(1);
+	m_poutput = (double*)m_output->dataW();
+
+	resize(size);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -17,6 +24,48 @@ LRMachine::LRMachine()
 
 LRMachine::~LRMachine()
 {
+	delete m_output;
+	delete[] m_weights;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Resize
+
+bool LRMachine::resize(int size)
+{
+	if (size < 1)
+	{
+		return false;
+	}
+
+	if (m_size != size)
+	{
+		m_size = size;
+		delete[] m_weights;
+		m_weights = new double[m_size + 1];
+		for (int i = 0; i <= m_size; i ++)
+		{
+			m_weights[i] = 0.0;
+		}
+	}
+
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Set machine's parameters
+
+void LRMachine::setThreshold(double threshold)
+{
+	m_threshold = threshold;
+}
+
+void LRMachine::setWeights(const double* weights)
+{
+	for (int i = 0; i <= m_size; i ++)
+	{
+		m_weights[i] = weights[i];
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -24,24 +73,33 @@ LRMachine::~LRMachine()
 
 bool LRMachine::forward(const Tensor& input)
 {
+	// Check input type
+	if (	input.getDatatype() != Tensor::Double ||
+		input.nDimension() != 1 ||
+		input.size(0) != m_size)
+	{
+		message("LRMachine::forward - invalid input tensor!\n");
+		return false;
+	}
+
+	// OK
+	const double* data = (const double*)input.dataR();
+	*m_poutput = sigmoid(data, m_weights, m_size);
 	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Constructs an empty Machine of this kind
-// (used by <MachineManager>, this object should be deallocated by the user)
+// Apply the sigmoid function on some data
 
-Machine* LRMachine::getAnInstance() const
+double LRMachine::sigmoid(const double* data, const double* weights, int size)
 {
-	return new LRMachine();
-}
+	double sum = weights[size];
+	for (int i = 0; i < size; i ++)
+	{
+		sum += data[i] * weights[i];
+	}
 
-/////////////////////////////////////////////////////////////////////////
-// Get the ID specific to each Machine
-
-int LRMachine::getID() const
-{
-	return 1002;
+	return 1.0 / (1.0 + exp(-sum));
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -49,15 +107,85 @@ int LRMachine::getID() const
 
 bool LRMachine::loadFile(File& file)
 {
-	return false;
+	// Check the ID
+	int id;
+	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	{
+		Torch::message("LRMachine::load - failed to read <ID> field!\n");
+		return false;
+	}
+	if (id != getID())
+	{
+		Torch::message("LRMachine::load - invalid <ID>, this is not a LRMachine model!\n");
+		return false;
+	}
+
+	// Read the size
+	int size;
+	if (file.taggedRead(&size, sizeof(int), 1, "SIZE") != 1)
+	{
+		Torch::message("LRMachine::load - failed to read <SIZE> field!\n");
+		return false;
+	}
+	if (resize(size) == false)
+	{
+		Torch::message("LRMachine::load - invalid <SIZE> field!\n");
+		return false;
+	}
+
+	// Read the weights
+	if (file.taggedRead(m_weights, sizeof(double), m_size + 1, "WEIGHTS") != m_size + 1)
+	{
+		Torch::message("LRMachine::load - failed to read <WEIGHTS> field!\n");
+		return false;
+	}
+
+	// Read the threshold
+	if (file.taggedRead(&m_threshold, sizeof(double), 1, "THRESHOLD") != 1)
+	{
+		Torch::message("LRMachine::load - failed to read <THRESHOLD> field!\n");
+		return false;
+	}
+
+	// OK
+	return true;
 }
 
 bool LRMachine::saveFile(File& file) const
 {
-	return false;
+	// Write the ID
+	int id = getID();
+	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	{
+		Torch::message("LRMachine::save - failed to write <ID> field!\n");
+		return false;
+	}
+
+	// Write the size
+	if (file.taggedWrite(&m_size, sizeof(int), 1, "SIZE") != 1)
+	{
+		Torch::message("LRMachine::save - failed to write <SIZE> field!\n");
+		return false;
+	}
+
+	// Write the weights
+	if (file.taggedWrite(m_weights, sizeof(double), m_size + 1, "WEIGHTS") != m_size + 1)
+	{
+		Torch::message("LRMachine::save - failed to write <WEIGHTS> field!\n");
+		return false;
+	}
+
+	// Write the threshold
+	if (file.taggedWrite(&m_threshold, sizeof(double), 1, "THRESHOLD") != 1)
+	{
+		Torch::message("LRMachine::save - failed to write <THRESHOLD> field!\n");
+		return false;
+	}
+
+	// OK
+	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
 
-}
 }

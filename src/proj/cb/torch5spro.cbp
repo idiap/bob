@@ -335,6 +335,8 @@
 		<Unit filename="../../ip/shape/FrontalFace15x20.h" />
 		<Unit filename="../../ip/shape/FrontalFace19x19.cc" />
 		<Unit filename="../../ip/shape/FrontalFace19x19.h" />
+		<Unit filename="../../ip/shape/FrontalFace20x20_OpenCV.cc" />
+		<Unit filename="../../ip/shape/FrontalFace20x20_OpenCV.h" />
 		<Unit filename="../../ip/shape/FrontalFace64x40.cc" />
 		<Unit filename="../../ip/shape/FrontalFace64x40.h" />
 		<Unit filename="../../ip/shape/FrontalFace64x56.cc" />
@@ -346,8 +348,6 @@
 		<Unit filename="../../ip/shape/ShapeModel.cc" />
 		<Unit filename="../../ip/shape/ShapeModel.h" />
 		<Unit filename="../../ip/transforms/CMakeLists.txt" />
-		<Unit filename="../../ip/transforms/ipFFT.cc" />
-		<Unit filename="../../ip/transforms/ipFFT.h" />
 		<Unit filename="../../ip/vision.cc" />
 		<Unit filename="../../ip/vision.h" />
 		<Unit filename="../../ip/xtprobeImageFile.cc" />
@@ -402,12 +402,14 @@
 		<Unit filename="../../scanning/profile/LRMachine.h" />
 		<Unit filename="../../scanning/profile/LRTrainer.cc" />
 		<Unit filename="../../scanning/profile/LRTrainer.h" />
+		<Unit filename="../../scanning/profile/Profile.cc" />
+		<Unit filename="../../scanning/profile/Profile.h" />
 		<Unit filename="../../scanning/profile/ProfileDataSet.cc" />
 		<Unit filename="../../scanning/profile/ProfileDataSet.h" />
 		<Unit filename="../../scanning/profile/ProfileMachine.cc" />
 		<Unit filename="../../scanning/profile/ProfileMachine.h" />
-		<Unit filename="../../scanning/profile/Sample.cc" />
-		<Unit filename="../../scanning/profile/Sample.h" />
+		<Unit filename="../../scanning/profile/ProfileTrainer.cc" />
+		<Unit filename="../../scanning/profile/ProfileTrainer.h" />
 		<Unit filename="../../scanning/profile/mat.cc" />
 		<Unit filename="../../scanning/profile/mat.h" />
 		<Unit filename="../../scanning/pruners/CMakeLists.txt" />

@@ -102,9 +102,8 @@ bool ipCrop::processInput(const Tensor& input)
 	const int dst_stride_p = t_output->t->stride[2];// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-
-	const int src_height = t_input->size(0);
-	const int src_width = t_input->size(1);
+	//const int src_height = t_input->size(0);
+	//const int src_width = t_input->size(1);
 	const int n_planes = input.size(2);
 
 	// Cropping - just copy pixels in the given range

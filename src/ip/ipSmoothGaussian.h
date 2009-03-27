@@ -13,7 +13,7 @@ namespace Torch {
 	//
 	//	\TEX{
 	//	\begin{eqnarray}
-	//		O(x,y) = G(x,y) * I(x,y) \\
+	//		O(x,y) = G(x,y) * I(x,y)
 	//		G(x,y) = \frac{exp(x^2 + y^2)}{\sigma}
 	//	\end{eqnarray}
 	//

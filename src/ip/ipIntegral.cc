@@ -187,6 +187,7 @@ ipIntegral::~ipIntegral()
 bool ipIntegral::setPixelOperator(PixelOperator* pixelOp)
 {
         m_pixelOp = pixelOp;
+        return true;
 }
 
 /////////////////////////////////////////////////////////////////////////

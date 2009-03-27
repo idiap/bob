@@ -36,10 +36,10 @@ namespace Torch
 		virtual bool		setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h);
 
 		// Set prunning parameters
-		double                  setMinMean(double min_mean) { m_min_mean = min_mean; }
-		double                  setMaxMean(double max_mean) { m_max_mean = max_mean; }
-		double                  setMinStdev(double min_stdev) { m_min_stdev = min_stdev; }
-		double                  setMaxStdev(double max_stdev) { m_max_stdev = max_stdev; }
+		void                  	setMinMean(double min_mean) { m_min_mean = min_mean; }
+		void                 	setMaxMean(double max_mean) { m_max_mean = max_mean; }
+		void			setMinStdev(double min_stdev) { m_min_stdev = min_stdev; }
+		void			setMaxStdev(double max_stdev) { m_max_stdev = max_stdev; }
 
         protected:
 

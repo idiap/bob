@@ -54,6 +54,9 @@ namespace Torch
 		int		        getModelWidth() const;
 		int	        	getModelHeight() const;
 
+		const Classifier&	getClassifier() const;
+		Classifier&		getClassifier();
+
 		/////////////////////////////////////////////////////////////////
 
 	protected:

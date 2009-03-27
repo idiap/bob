@@ -25,7 +25,7 @@ Machine* loadMachineFromFile(const char* filename)
                 return 0;
         }
 
-        // Get the machine for this id
+	// Get the machine for this id
         Machine* machine = MachineManager::getInstance().get(id);
         if (machine == 0)
         {

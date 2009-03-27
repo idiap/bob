@@ -55,7 +55,7 @@ MachineManager::~MachineManager()
 
 bool MachineManager::add(Machine* machine, const char* name)
 {
-        // Check first if the parameters are ok
+	// Check first if the parameters are ok
 	if (machine == 0 || machine->getID() < 1)
 	{
 	        delete machine;

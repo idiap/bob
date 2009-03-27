@@ -76,6 +76,8 @@ namespace Torch
 		int				getNoPrunnedSWs() const { return m_stat_prunned; }
 		int				getNoAcceptedSWs() const { return m_stat_accepted; }
 		const PatternList&		getPatterns() const;
+		const Explorer&			getExplorer() const;
+		Explorer&			getExplorer();
 
 	protected:
 

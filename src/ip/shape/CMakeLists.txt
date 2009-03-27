@@ -9,6 +9,7 @@ SET(	shape_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/FrontalFace64x40.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/FrontalFace64x56.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/FrontalFace64x80.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/FrontalFace20x20_OpenCV.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/NonFrontalFace19x19.cc"
 	CACHE INTERNAL "sources")
 

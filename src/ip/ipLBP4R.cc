@@ -12,7 +12,6 @@
 												\
 	const int in_stride_h = t_input->t->stride[0];						\
 	const int in_stride_w = t_input->t->stride[1];						\
-	const int in_stride_p = t_input->t->stride[2];						\
 												\
 	dataType tab[4];									\
 	tab[0] = src[(m_y - m_R) * in_stride_h + m_x * in_stride_w];				\

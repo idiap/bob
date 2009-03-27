@@ -188,7 +188,6 @@ bool MSExplorer::preprocess(const Image& image)
 	ipCore* ip_prune = m_scale_prune_ips[0];
 	ipCore* ip_evaluation = m_scale_evaluation_ips[0];
 
-	const Tensor* prune_tensor = 0;
 	const Tensor* evaluation_tensor = 0;
 
 	// Check parameters

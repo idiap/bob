@@ -31,8 +31,8 @@ bool ExhaustiveScaleExplorer::process(	ExplorerData& explorerData,
 	const int sw_h = m_sw_size.h;
 
 	// Compute the location variance (related to the subwindow size)
-	const int model_w = explorerData.m_swEvaluator->getModelWidth();
-	const int model_h = explorerData.m_swEvaluator->getModelHeight();
+	//const int model_w = explorerData.m_swEvaluator->getModelWidth();
+	//const int model_h = explorerData.m_swEvaluator->getModelHeight();
 
 	const int dx = getInRange(FixI(getFOption("dx") * sw_w), 1, sw_w);
 	const int dy = getInRange(FixI(getFOption("dy") * sw_h), 1, sw_h);

@@ -3,6 +3,7 @@
 
 #include "MSExplorer.h"		// <GreedyExplorer> is a <MSExplorer>
 #include "MeanShiftSelector.h"
+#include "ProfileMachine.h"
 
 namespace Torch
 {
@@ -65,6 +66,9 @@ namespace Torch
 		bool			profileSW(int sw_x, int sw_y, int sw_w, int sw_h);
 		bool			profileSW(const Pattern& pattern);
 
+		// Set the profile classifier
+		bool			setClassifier(const char* filename);
+
 		// Access functions
 		void			setMode(Mode mode) { m_mode = mode; }
 		Mode 			getMode() const { return m_mode; }
@@ -95,6 +99,9 @@ namespace Torch
 
 		// Algorithm for clustering sub-windows
 		MeanShiftSelector	m_clusterAlgo;
+
+		// Profiling machine
+		ProfileMachine		m_profileModel;
 
 		// Profile buffers (detection flag + score)
 		unsigned char*		m_profileFlags;

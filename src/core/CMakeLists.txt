@@ -27,6 +27,3 @@ SET(	core_SRC
 SET(	core_INCLUDE
 		${CMAKE_CURRENT_SOURCE_DIR}
 	CACHE INTERNAL "includes")
-
-#"${CMAKE_CURRENT_SOURCE_DIR}/MemoryDataSet.cc"
-#"${CMAKE_CURRENT_SOURCE_DIR}/DiskDataSet.cc"

@@ -39,36 +39,36 @@ bool spDCT::checkInput(const Tensor& input) const
 
 		int N_ = input.size(0);
 
-		unsigned int nn = nexthigher(N_); 
-		
+		unsigned int nn = nexthigher(N_);
+
 		if(N_ != (int) nn)
 		{
 			warning("spDCT(): size(0) is not a power of 2.");
 			return false;
 		}
 	}
-	
+
 	if (input.nDimension() == 2)
 	{
 	   	if(inverse) print("spDCT::checkInput() inverse DCT 2D ...\n");
 		else print("spDCT::checkInput() DCT 2D ...\n");
 
 		int N_ = input.size(0);
-		unsigned int nn = nexthigher(N_); 
+		unsigned int nn = nexthigher(N_);
 		if(N_ != (int) nn)
 		{
 			warning("spDCT(): size(0) is not a power of 2.");
 			return false;
 		}
 		N_ = input.size(1);
-		nn = nexthigher(N_); 
+		nn = nexthigher(N_);
 		if(N_ != (int) nn)
 		{
 			warning("spDCT(): size(1) is not a power of 2.");
 			return false;
 		}
 	}
-	
+
 	// OK
 	return true;
 }
@@ -81,7 +81,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 	if (	m_output == 0 )
 	{
 		cleanup();
-	
+
 		if(R != NULL) delete R;
 
 		if (input.nDimension() == 1)
@@ -93,7 +93,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 			m_n_outputs = 1;
 			m_output = new Tensor*[m_n_outputs];
 			m_output[0] = new FloatTensor(N);
-		
+
 			R = new FloatTensor(N);
 		}
 		else if (input.nDimension() == 2)
@@ -106,7 +106,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 			m_n_outputs = 1;
 			m_output = new Tensor*[m_n_outputs];
 			m_output[0] = new FloatTensor(H,W);
-		
+
 			R = new FloatTensor(H,W);
 		}
 	}
@@ -129,15 +129,15 @@ bool spDCT::processInput(const Tensor& input)
 		if(inverse)
 		{
 		   	//
-			int *ip, n;
+			int *ip;
 			double *w;
 			double *a;
-			
+
 			//
 			a = alloc_1d_double(N);
 			ip = alloc_1d_int(2 + (int) sqrt(N + 0.5));
 			w = alloc_1d_double(N * 3 / 2);
-  
+
 			//
 			ip[0] = 0;
 
@@ -160,7 +160,7 @@ bool spDCT::processInput(const Tensor& input)
 		else
 		{
 		   	//
-			int *ip, n;
+			int *ip;
 			double *w;
 			double *a;
 
@@ -168,7 +168,7 @@ bool spDCT::processInput(const Tensor& input)
 			a = alloc_1d_double(N);
 			ip = alloc_1d_int(2 + (int) sqrt(N + 0.5));
 			w = alloc_1d_double(N * 3 / 2);
-  
+
 			//
 			ip[0] = 0;
 			for(int i=0; i < N; i++) a[i] = (*R)(i);
@@ -228,7 +228,7 @@ bool spDCT::processInput(const Tensor& input)
 				ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
 				n = MAX(H, W) * 3 / 2;
 				w = alloc_1d_double(n);
-   
+
 				//
 				ip[0] = 0;
 
@@ -287,13 +287,13 @@ bool spDCT::processInput(const Tensor& input)
 				ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
 				n = MAX(H, W) * 3 / 2;
 				w = alloc_1d_double(n);
-   
+
 				//
 				ip[0] = 0;
 
 				//
 				ddct2d(H, W, 1, a, NULL, ip, w);
-   
+
 				//
 				FloatTensor *F = (FloatTensor *) m_output[0];
 				for(int i=0; i < H; i++)
@@ -305,7 +305,7 @@ bool spDCT::processInput(const Tensor& input)
 
 			}
 
-			//	
+			//
 			free_2d_double(a);
 		}
 #endif

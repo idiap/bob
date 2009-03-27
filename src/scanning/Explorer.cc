@@ -54,6 +54,14 @@ bool ExplorerData::init(const Tensor& input_prune, const Tensor& input_evaluatio
 }
 
 /////////////////////////////////////////////////////////////////////////
+// Stores some new pattern
+
+void ExplorerData::storePattern(const Pattern& p)
+{
+	return storePattern(p.m_x, p.m_y, p.m_w, p.m_h, p.m_confidence);
+}
+
+/////////////////////////////////////////////////////////////////////////
 // Constructor
 
 Explorer::Explorer(ipSWEvaluator* swEvaluator)

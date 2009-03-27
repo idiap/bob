@@ -60,6 +60,7 @@ void ShapeModel::drawBBX(Image *image)
 ShapeModel::~ShapeModel()
 {
 	delete[] bbx_points;
+	delete[] ldm_points;
 }
 
 }

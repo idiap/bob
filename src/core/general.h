@@ -36,6 +36,10 @@ void message(const char* fmt, ...);
 /// Like printf.
 void print(const char* fmt, ...);
 
+/// Functions used for sorting arrays with <qsort>
+int compare_floats(const void* a, const void* b);
+int compare_doubles(const void* a, const void* b);
+
 //-----------------------------------
 
 #ifndef min

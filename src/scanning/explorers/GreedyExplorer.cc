@@ -34,11 +34,21 @@ void GreedyExplorer::optionChanged(const char* name)
 }
 
 /////////////////////////////////////////////////////////////////////////
+// Set the profile classifier
+
+bool GreedyExplorer::setClassifier(const char* filename)
+{
+	File file;
+	return 	file.open(filename, "r") &&
+		m_profileModel.loadFile(file);
+}
+
+/////////////////////////////////////////////////////////////////////////
 // Process the image (check for pattern's sub-windows)
 
 bool GreedyExplorer::process()
 {
-	const bool verbose = getBOption("verbose");
+	//const bool verbose = getBOption("verbose");
 
 	// Don't want to stop at the first iteration or to scale from large to small windows
 	setBOption("StopAtFirstDetection", false);
@@ -57,9 +67,8 @@ bool GreedyExplorer::process()
 		// Object detection
 	case Scanning:
 		{
-			/*
-			const PatternList& lpatterns = m_clusterAlgo.getPatterns();
-			const int n_patterns = lpatterns.size();
+			Profile profile;
+			DoubleTensor pf_tensor;
 
 			// Cluster the SWs generated from MSExplorer
 			m_clusterAlgo.clear();
@@ -69,6 +78,42 @@ bool GreedyExplorer::process()
 				return false;
 			}
 
+			// Test each SW against the profile model
+			const PatternList& sws = m_clusterAlgo.getPatterns();
+			PatternList tempSws;
+			for (int i = 0; i < sws.size(); i ++)
+			{
+				const Pattern& sw = sws.get(i);
+				m_data->clear();
+				if (profileSW(sw) == false)
+				{
+					Torch::message("GreedyExplorer::process - error profiling a SW!\n");
+					return false;
+				}
+
+				profile.reset(sw, m_profileFlags, m_profileScores);
+				profile.copyTo(pf_tensor);
+
+				if (m_profileModel.forward(pf_tensor) == false)
+				{
+					Torch::message("GreedyExplorer::process - failed to run the profile model!\n");
+					return false;
+				}
+
+				if (m_profileModel.isPattern() == true)
+				{
+					tempSws.add(sw);
+				}
+			}
+
+			// Add the collected patterns to the buffer
+			m_data->clear();
+			for (int i = 0; i < tempSws.size(); i ++)
+			{
+				m_data->storePattern(tempSws.get(i));
+			}
+
+			/*
 			// Refine the search around the best points til it's possible
 			const int old_n_candidates = m_data->m_patterns.size();
 			while (true)
@@ -107,7 +152,7 @@ bool GreedyExplorer::process()
 		// Profiling along candidate SWs
 	case Profiling:
 		{
-			// Nothing to do - the user should retrieve the profiles by <profileSW>!
+			// Nothing to do - the user should retrieves the profiles by <profileSW>!
 		}
 		break;
 	}

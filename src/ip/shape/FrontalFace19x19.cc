@@ -25,7 +25,7 @@ bool FrontalFace19x19::ldm2bbx()
 
 	// The face is non oriented
 	if(!IS_NEAR(EEy, 0, 0.001))
-	   	warning("FrontalFace19x19: y coordinates of eyes should be equal");
+	   	;//warning("FrontalFace19x19: y coordinates of eyes should be equal");
 
 	c0x = l_eye.x + EEx / 2.0;
 	c0y = l_eye.y + EEy / 2.0;
@@ -39,7 +39,7 @@ bool FrontalFace19x19::ldm2bbx()
 	bbx_height = bbx_width;
 
 	if(bbx_width < 19)
-		warning("FrontalFace19x19::fromEyesCenter() width=%d < 19", bbx_width);
+		;//warning("FrontalFace19x19::fromEyesCenter() width=%d < 19", bbx_width);
 
 	int upperleft_x;
 	int upperleft_y;
@@ -102,13 +102,13 @@ bool FrontalFace19x19::bbx2ldm(int n_bbx_points_, sPoint2D *bbx_points_, int n_l
 {
 	if(n_ldm_points_ != 2)
 	{
-		warning("FrontalFace19x19::bbx2ldm() n_ldm_points_ != 2.");
+		//warning("FrontalFace19x19::bbx2ldm() n_ldm_points_ != 2.");
 		return false;
 	}
 
 	if(n_bbx_points_ != 4)
 	{
-		warning("FrontalFace19x19::to() n_bbx_points_ != 4.");
+		//warning("FrontalFace19x19::to() n_bbx_points_ != 4.");
 		return false;
 	}
 

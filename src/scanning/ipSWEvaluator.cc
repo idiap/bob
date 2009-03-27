@@ -152,7 +152,6 @@
 #define SW_EVAL_PRESCALE_3D(tensorType)                                                 \
 {                                                                                       \
         const int n_planes = m_buffTensor->size(2);                                     \
-        const tensorType* t_dst = (tensorType*)m_buffTensor;                            \
                                                                                         \
         m_scale_br_indexes = new int[m_buff_n_indexes];                                 \
         m_scale_tl_indexes = new int[m_buff_n_indexes];                                 \
@@ -218,8 +217,6 @@
 
 #define SW_EVAL_PRESCALE_2D(tensorType)                                                 \
 {                                                                                       \
-        const tensorType* t_dst = (tensorType*)m_buffTensor;                            \
-                                                                                        \
         m_scale_br_indexes = new int[m_buff_n_indexes];                                 \
         m_scale_tl_indexes = new int[m_buff_n_indexes];                                 \
         m_scale_tr_indexes = new int[m_buff_n_indexes];                                 \
@@ -419,6 +416,24 @@ inline int ipSWEvaluator::getModelHeight() const
                 Torch::error("ipSWEvaluator::getModelHeight - no valid classifier specified!\n");
         }
         return m_classifier->getInputSize().size[0];
+}
+
+const Classifier& ipSWEvaluator::getClassifier() const
+{
+	if (m_classifier == 0)
+        {
+                Torch::error("ipSWEvaluator::getClassifier - no valid classifier specified!\n");
+        }
+        return *m_classifier;
+}
+
+Classifier& ipSWEvaluator::getClassifier()
+{
+	if (m_classifier == 0)
+        {
+                Torch::error("ipSWEvaluator::getClassifier - no valid classifier specified!\n");
+        }
+        return *m_classifier;
 }
 
 /////////////////////////////////////////////////////////////////////////

@@ -26,7 +26,7 @@ bool FrontalFace64x80::ldm2bbx()
 
 	// The face is non oriented
 	if((int) r_eye.y != (int) l_eye.y)
-	   	warning("FrontalFace64x80: y coordinates of eyes should be equal (%d == %d)", (int) r_eye.y, (int) l_eye.y);
+	   	;//warning("FrontalFace64x80: y coordinates of eyes should be equal (%d == %d)", (int) r_eye.y, (int) l_eye.y);
 
 	c0x = l_eye.x + EEx / 2.0;
 	c0y = l_eye.y + EEy / 2.0;
@@ -79,13 +79,13 @@ bool FrontalFace64x80::ldm2bbx()
 
 bool FrontalFace64x80::bbx2ldm()
 {
-	warning("FrontalFace64x80::bbx2ldm() not implemented.");
+	;//warning("FrontalFace64x80::bbx2ldm() not implemented.");
 	return false;
 }
 
 bool FrontalFace64x80::bbx2ldm(int n_bbx_points_, sPoint2D *bbx_points_, int n_ldm_points_, sPoint2D *ldm_points_)
 {
-	warning("FrontalFace64x80::bbx2ldm(...) not implemented.");
+	;//warning("FrontalFace64x80::bbx2ldm(...) not implemented.");
 	return false;
 }
 

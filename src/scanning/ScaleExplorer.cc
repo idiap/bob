@@ -46,29 +46,32 @@ bool ScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
 bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerData& explorerData)
 {
         // Check if the subwindow should be prunned ...
-	for (int i = 0; i < explorerData.m_nSWPruners; i ++)
-	{
-	        ipSWPruner* swPruner = explorerData.m_swPruners[i];
-
-                if (swPruner->setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
+        if (explorerData.m_nSWPruners > 0)
+        {
+		for (int i = 0; i < explorerData.m_nSWPruners; i ++)
 		{
-			//Torch::message("ScaleExplore::processSW - error calling some pruner!\n");
-			return false;
-		}
+			ipSWPruner* swPruner = explorerData.m_swPruners[i];
 
-		// If rejected, then there is no point in running the pattern model!
-		if (swPruner->isRejected() == true)
-		{
-			explorerData.m_stat_prunned ++;	// Update statistics
-			return true;
+			if (swPruner->setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
+			{
+				//Torch::message("ScaleExplore::processSW - error calling some pruner!\n");
+				return false;
+			}
+
+			// If rejected, then there is no point in running the pattern model!
+			if (swPruner->isRejected() == true)
+			{
+				explorerData.m_stat_prunned ++;	// Update statistics
+				return true;
+			}
 		}
-	}
+        }
 
 	// Not rejected, so run the pattern model (evaluator) on this sub-window
 	ipSWEvaluator* swEvaluator = explorerData.m_swEvaluator;
 	if (swEvaluator->setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
 	{
-		//Torch::message("ScaleExplorer::processSW - error calling the evaluator!\n");
+//		//Torch::message("ScaleExplorer::processSW - error calling the evaluator!\n");
 		return false;
 	}
 

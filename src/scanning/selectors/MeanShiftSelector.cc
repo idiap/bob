@@ -32,269 +32,112 @@ void MeanShiftSelector::clear()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Constructor
-
-MeanShiftSelector::Grid::Cell::Cell()
-	:	m_indexes(0),
-		m_size(0), m_capacity(0)
-{
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Destructor
-
-MeanShiftSelector::Grid::Cell::~Cell()
-{
-	delete[] m_indexes;
-	m_indexes = 0;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Add a new index
-
-void MeanShiftSelector::Grid::Cell::add(int index_pattern)
-{
-	// Check if this index is already registered - binary search
-	for (int i = 0; i < m_size; i ++)
-		if (m_indexes[i] == index_pattern)
-		{
-			return;	// Already added!
-		}
-
-	// OK, add it
-	if (m_size >= m_capacity)
-	{
-		resize();
-	}
-	m_indexes[m_size ++] = index_pattern;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Resize the indexes already stored to accomodate new ones
-
-void MeanShiftSelector::Grid::Cell::resize()
-{
-	const int delta = m_size * 8 / 5 + 1;
-
-	int* new_indexes = new int[m_size + delta];
-	for (int i = 0; i < m_size; i ++)
-	{
-		new_indexes[i] = m_indexes[i];
-	}
-	delete[] m_indexes;
-	m_indexes = new_indexes;
-
-	m_capacity += delta;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Initialize the grid structure with the given points
-
-void MeanShiftSelector::Grid::init(const PatternList& lpatterns)
-{
-	// Clear old indexes
-	for (int i = 0; i < GridSize; i ++)
-		for (int j = 0; j < GridSize; j ++)
-		{
-			m_cells[i][j].m_size = 0;
-		}
-
-	// Estimate the grid coordinates and cell size
-	const int n_patterns = lpatterns.size();
-
-	int x_min = 100000, x_max = 0;
-	int y_min = 100000, y_max = 0;
-	for (int i = 0; i < n_patterns; i ++)
-	{
-		const Pattern& pattern = lpatterns.get(i);
-
-		x_min = min(x_min, pattern.m_x);
-		x_max = max(x_max, pattern.m_x + pattern.m_w);
-
-		y_min = min(y_min, pattern.m_y);
-		y_max = max(y_max, pattern.m_y + pattern.m_h);
-	}
-
-	x_min --; x_max ++;
-	y_min --; y_max ++;
-
-	m_x = x_min;
-	m_y = y_min;
-
-	m_dx = FixI((x_max - x_min + 0.0f) / (GridSize + 0.0f));
-	m_dy = FixI((y_max - y_min + 0.0f) / (GridSize + 0.0f));
-	m_inv_dx = 1.0f / m_dx;
-	m_inv_dy = 1.0f / m_dy;
-
-	// Add each point to its cell
-	for (int i = 0; i < n_patterns; i ++)
-	{
-		getCell(lpatterns.get(i)).add(i);
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Print the grid structure
-
-void MeanShiftSelector::Grid::print() const
-{
-	Torch::print("*** Grid partition ***************************************\n");
-	for (int i = 0; i < GridSize; i ++)
-		for (int j = 0; j < GridSize; j ++)
-		{
-			const Grid::Cell& cell = m_cells[i][j];
-			if (cell.m_size > 0)
-			{
-				Torch::print("\t[%d/%d] hash has [%d] indexes: ", i + 1, j + 1, cell.m_size);
-				for (int k = 0; k < cell.m_size; k ++)
-				{
-					Torch::print("%d, ", cell.m_indexes[k]);
-				}
-				Torch::print("\n");
-			}
-		}
-	Torch::print("**********************************************************\n");
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Get the associated value for some point
-
-MeanShiftSelector::Grid::Cell& MeanShiftSelector::Grid::getCell(const Pattern& pattern)
-{
-	return getCell(pattern.getCenterX(),
-			pattern.getCenterY(),
-			pattern.m_w,
-			pattern.m_h);
-}
-
-MeanShiftSelector::Grid::Cell& MeanShiftSelector::Grid::getCell(float cx, float cy, float w, float h)
-{
-	const int x_index = getInRange(FixI((cx - m_x) * m_inv_dx), 0, GridSize - 1);
-	const int y_index = getInRange(FixI((cy - m_y) * m_inv_dy), 0, GridSize - 1);
-
-	return m_cells[x_index][y_index];
-}
-
-/////////////////////////////////////////////////////////////////////////
 // Get the closest points to the given one (using LSH table)
 // Returns the number of found points
 
-int MeanShiftSelector::getClosest(const Pattern& pattern)
+inline int MeanShiftSelector::getClosest(const Pattern& pattern)
 {
-	return getClosest(	(float)pattern.getCenterX(),
-				(float)pattern.getCenterY(),
-				(float)pattern.m_w,
-				(float)pattern.m_h);
+	return getClosest(	(double)pattern.getCenterX(),
+				(double)pattern.getCenterY(),
+				(double)pattern.m_w,
+				(double)pattern.m_h);
 }
 
-int MeanShiftSelector::getClosest(float cx, float cy, float w, float h)
+int MeanShiftSelector::getClosest(double cx, double cy, double w, double h)
 {
-	const int x_index = getInRange(FixI((cx - m_grid.m_x) * m_grid.m_inv_dx), 0, GridSize - 1);
-	const int y_index = getInRange(FixI((cy - m_grid.m_y) * m_grid.m_inv_dy), 0, GridSize - 1);
+	const int n_patterns = m_candidates->size();
+	int isize = 0;
 
-	// Start from the corresponding center cell and increase radius until some non-empty cell is found ...
-	int isize = addClosest(m_grid.m_cells[x_index][y_index], 0, cx, cy, w, h);
-	int radius = 1;
-	do
-	{
-		const int x_min_index = getInRange(x_index - radius, 0, GridSize - 1);
-		const int x_max_index = getInRange(x_index + radius, 0, GridSize - 1);
-
-		const int y_min_index = getInRange(y_index - radius, 0, GridSize - 1);
-		const int y_max_index = getInRange(y_index + radius, 0, GridSize - 1);
-
-		// Add the cells having <radius> distance to the center
-		for (int x = x_min_index; x <= x_max_index; x ++)
-		{
-			isize = addClosest(m_grid.m_cells[x][y_min_index], isize, cx, cy, w, h);
-			isize = addClosest(m_grid.m_cells[x][y_max_index], isize, cx, cy, w, h);
-		}
-		for (int y = y_min_index + 1; y < y_max_index; y ++)
-		{
-			isize = addClosest(m_grid.m_cells[x_min_index][y], isize, cx, cy, w, h);
-			isize = addClosest(m_grid.m_cells[x_max_index][y], isize, cx, cy, w, h);
-		}
-
-		radius ++;
-	}
-	while (isize < MaxNoClosestPoints && radius < GridSize / 2);
-
-	// Return the number of closest points
-	return isize;
-}
-
-int MeanShiftSelector::addClosest(const Grid::Cell& cell, int isize, float cx, float cy, float w, float h)
-{
 	if (m_bandwidthsComputed == false)
 	{
-		// Just add all the points in the cell - the bandwidths are not computed yet!
-		for (int k = 0; k < cell.m_size && isize < MaxNoClosestPoints; k ++)
+		// Add to the list each sub-window with at least some intersection!
+		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
 		{
-			m_iclosest[isize] = cell.m_indexes[k];
-			m_iDistClosest[isize ++] = 0.0f;
-		}
-	}
-	else
-	{
-		// Add only the points in the cell within the bandwidth
-		for (int k = 0; k < cell.m_size && isize < MaxNoClosestPoints; k ++)
-		{
-			const int index = cell.m_indexes[k];
-			const float distance = getDistance(m_candidates->get(index), cx, cy, w, h);
-			if (distance < m_bandwidths[index])
+			const double distance = getDistance(m_candidates->get(i), cx, cy, w, h);
+			if (distance < 1.0)
 			{
-				m_iclosest[isize] = index;
+				m_iclosest[isize] = i;
 				m_iDistClosest[isize ++] = distance;
 			}
 		}
 	}
+	else
+	{
+		// Add to the list each sub-window within its bandwidth!
+		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
+		{
+			const double distance = getDistance(m_candidates->get(i), cx, cy, w, h);
+			if (distance < m_bandwidths[i])
+			{
+				m_iclosest[isize] = i;
+				m_iDistClosest[isize ++] = distance;
+			}
+		}
+	}
+
 	return isize;
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Get the distance between two points (cx, cy, w, h)
 
-float MeanShiftSelector::getDistance(const Pattern& pattern, float cx, float cy, float w, float h)
+static double sw_intersection(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
+				double sw2_x, double sw2_y, double sw2_w, double sw2_h)
 {
-	const float diff_cx = pattern.getCenterX() - cx;
-	const float diff_cy = pattern.getCenterY() - cy;
-	const float diff_w = pattern.m_w - w;
-	const float diff_h = pattern.m_h - h;
+	// Check for intersection
+	if (	sw2_x <= sw1_x + sw1_w &&
+		sw2_x + sw2_w >= sw1_x &&
+		sw2_y <= sw1_y + sw1_h &&
+		sw2_y + sw2_h >= sw1_y)
+	{
+		// Intersection - compute distance
+		const double x_min = max(sw1_x, sw2_x);
+		const double x_max = min(sw1_x + sw1_w, sw2_x + sw2_w);
 
-	return diff_cx * diff_cx + diff_cy * diff_cy + diff_w * diff_w + diff_h * diff_h;
+		const double y_min = max(sw1_y, sw2_y);
+		const double y_max = min(sw1_y + sw1_h, sw2_y + sw2_h);
+
+		return (x_max - x_min) * (y_max - y_min);
+	}
+	else
+	{
+		// No intersection
+		return 0.0;
+	}
 }
 
-float MeanShiftSelector::getDistance(	float cx1, float cy1, float w1, float h1,
-					float cx2, float cy2, float w2, float h2)
+static double sw_distance(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
+				double sw2_x, double sw2_y, double sw2_w, double sw2_h)
 {
-	const float diff_cx = cx1 - cx2;
-	const float diff_cy = cy1 - cy2;
-	const float diff_w = w1 - w2;
-	const float diff_h = h1 - h2;
+	// http://en.wikipedia.org/wiki/Jaccard_index
+	const double inters = sw_intersection(sw1_x, sw1_y, sw1_w, sw1_h, sw2_x, sw2_y, sw2_w, sw2_h);
+	return 1.0 - inters / (sw1_w * sw1_h + sw2_w * sw2_h - inters);
+}
 
-	return diff_cx * diff_cx + diff_cy * diff_cy + diff_w * diff_w + diff_h * diff_h;
+inline double MeanShiftSelector::getDistance(const Pattern& pattern, double cx, double cy, double w, double h)
+{
+	return getDistance(	(double)pattern.getCenterX(), (double)pattern.getCenterY(),
+				(double)pattern.m_w, (double)pattern.m_h,
+				cx, cy, w, h);
+}
+inline double MeanShiftSelector::getDistance(	double cx1, double cy1, double w1, double h1,
+						double cx2, double cy2, double w2, double h2)
+{
+	return sw_distance(	cx1 - 0.5 * w1, cy1 - 0.5 * h1, w1, h1,
+				cx2 - 0.5 * w2, cy2 - 0.5 * h2, w2, h2);
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Process the list of candidate sub-windows and select the best ones
 // (this will accumulate them to the pattern list)
 
-int compare_floats(const void* a, const void* b)
-{
-	const float* da = (const float*) a;
-	const float* db = (const float*) b;
-
-	return (*da > *db) - (*da < *db);
-}
-
-
 bool MeanShiftSelector::process(const PatternList& candidates)
 {
 	// Get parameters
 	const bool verbose = getBOption("verbose");
 	const int max_n_iters = 100;		// Maximum number of iterations
-	const float kclosest_max_var = 3.0f;	// Maximum variation (avg +/- n * stdev) to find kclosest
-	const float inv_kclosest_max_var = 1.0f / kclosest_max_var;
+	const double kclosest_max_var = 3.0;	// Maximum variation (avg +/- n * stdev) to find kclosest
+	const double inv_kclosest_max_var = 1.0 / kclosest_max_var;
 
 	// Check parameters
 	if (candidates.isEmpty() == true)
@@ -314,28 +157,16 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 	const int n_patterns = candidates.size();
 	delete[] m_bandwidths;
 	delete[] m_inv_bandwidths;
-	m_bandwidths = new float[n_patterns];
-	m_inv_bandwidths = new float[n_patterns];
+	m_bandwidths = new double[n_patterns];
+	m_inv_bandwidths = new double[n_patterns];
 	m_bandwidthsComputed = false;
 
 	for (int i = 0; i < n_patterns; i ++)
 	{
-		m_bandwidths[i] = 10000000.0f;
+		m_bandwidths[i] = 10000000.0;
 	}
 
 	m_candidates = &candidates;
-
-	static float distances[MaxNoClosestPoints];
-	static float buffer[MaxNoClosestPoints];
-
-	// Grid structure (initialization)
-	m_grid.init(candidates);
-	if (verbose == true)
-	{
-		m_grid.print();
-	}
-
-	srand((unsigned int)time(0));
 
 	// AMS: compute the adaptive bandwidth for each point/pattern/SW
 	for (int i = 0; i < n_patterns; i ++)
@@ -346,52 +177,57 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 		int n_closest_points = getClosest(crt_pattern);
 		if (n_closest_points <= 1)
 		{
-			m_bandwidths[i] = 0.0f;
+			m_bandwidths[i] = 0.0;
+			m_inv_bandwidths[i] = 1.0;
 		}
 		else
 		{
-			float crt_cx = crt_pattern.getCenterX();
-			float crt_cy = crt_pattern.getCenterY();
-			float crt_w = crt_pattern.m_w;
-			float crt_h = crt_pattern.m_h;
+			// Sort them after the distance
+			qsort(m_iDistClosest, n_closest_points, sizeof(double), compare_doubles);
 
-			// Compute the distances and sort them
-
-			for (int j = 0; j < n_closest_points; j ++)
-			{
-				const Pattern& pattern = candidates.get(m_iclosest[j]);
-				distances[j] = getDistance(pattern, crt_cx, crt_cy, crt_w, crt_h);
-			}
-
-			//const int kth = getInRange(kclosest, 1, n_closest_points);
-			//bandwidths[i] = kth_element(distances, n_closest_points, kth, buffer);
-
-			qsort(distances, n_closest_points, sizeof(float), compare_floats);
+//			print("DISTANCES: ");
+//			for (int j = 0; j < n_closest_points; j ++)
+//			{
+//				print("%4.3f, ", m_iDistClosest[j]);
+//			}
+//			print("\n");
 
 			// Choose the kclosest points as to have the given maximum variance
-			float sum = distances[0] + distances[1];
-			float sum_square = distances[0] * distances[0] + distances[1] * distances[1];
+			double sum = m_iDistClosest[0] + m_iDistClosest[1];
+			double sum_square = m_iDistClosest[0] * m_iDistClosest[0] + m_iDistClosest[1] * m_iDistClosest[1];
 
 			int kclosest = 1;
-			while (kclosest + 1 < n_closest_points)
+			if (m_iDistClosest[kclosest] > 0.99)
 			{
-				const float inv = 1.0f / (kclosest + 1.0f);
-				const float inv_square = inv * inv;
-
-				const float diff = inv_kclosest_max_var * (distances[kclosest + 1] - inv * sum);
-				if (inv * sum_square - inv_square * sum * sum < diff * diff)
+				// If the closest point has no intersection, than the bandwidth should be zero!
+				kclosest = 0;
+			}
+			else
+			{
+				// Search the closest points that are within average +/- 3 * sigma from the previous ones
+				while (	kclosest + 1 < n_closest_points &&
+					m_iDistClosest[kclosest + 1] < 0.99)
 				{
-					break;
-				}
+					const double inv = 1.0 / (kclosest + 1.0);
+					const double inv_square = inv * inv;
 
-				kclosest ++;
-				sum += distances[kclosest];
-				sum_square += distances[kclosest] * distances[kclosest];
+					const double diff = inv_kclosest_max_var * (m_iDistClosest[kclosest + 1] - inv * sum);
+					if (inv * sum_square - inv_square * sum * sum < diff * diff)
+					{
+						break;
+					}
+
+					kclosest ++;
+					sum += m_iDistClosest[kclosest];
+					sum_square += m_iDistClosest[kclosest] * m_iDistClosest[kclosest];
+				}
 			}
 
 			// Set the bandwidth as the distance to the kclosest point
-			m_bandwidths[i] = distances[kclosest];
-			m_inv_bandwidths[i] = m_bandwidths[i] == 0.0f ? 1.0f : 1.0f / m_bandwidths[i];
+			m_bandwidths[i] = m_iDistClosest[kclosest];
+			m_inv_bandwidths[i] = m_bandwidths[i] == 0.0 ? 1.0 : 1.0 / pow(m_bandwidths[i], 6.0);
+//			print("[%d]: bandwidth = %f, inv_bandwidth = %f\n", i, m_bandwidths[i], m_inv_bandwidths[i]);
+//			print("\n");
 		}
 	}
 
@@ -402,12 +238,19 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 	int cnt_n_iters = 0;
 	for (int i = 0; i < n_patterns; i ++)
 	{
-		const Pattern& crt_pattern = candidates.get(i);
+		// Uncorrelated subwindow
+		if (m_bandwidths[i] == 0.0)
+		{
+			m_patterns.add(candidates.get(i));
+			continue;
+		}
 
-		float crt_cx = crt_pattern.getCenterX();
-		float crt_cy = crt_pattern.getCenterY();
-		float crt_w = crt_pattern.m_w;
-		float crt_h = crt_pattern.m_h;
+		// Need to find the subwindow's cluster
+		const Pattern& crt_pattern = candidates.get(i);
+		double crt_cx = crt_pattern.getCenterX();
+		double crt_cy = crt_pattern.getCenterY();
+		double crt_w = crt_pattern.m_w;
+		double crt_h = crt_pattern.m_h;
 
 		// Iterate until convergence (or the maximum number of iterations was reached)
 		int n_iters = 0;
@@ -415,26 +258,27 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 		//print("------------------------\n");
 		while ((n_iters ++) < max_n_iters)
 		{
-			float sum_cx = 0.0f, sum_cy = 0.0f;
-			float sum_w = 0.0f, sum_h = 0.0f;
-			float sum_weights = 0.0f;
+			double sum_cx = 0.0, sum_cy = 0.0;
+			double sum_w = 0.0, sum_h = 0.0;
+			double sum_weights = 0.0;
 			cnt = 0;
 
 			// Compute the mean shift looking for neighbour patterns
-			int n_closest_points = getClosest(crt_cx, crt_cy, crt_w, crt_h);
+			const int n_closest_points = getClosest(crt_cx, crt_cy, crt_w, crt_h);
 			for (int j = 0; j < n_closest_points; j ++)
 			{
 				const int k = m_iclosest[j];
+				const double distance = m_iDistClosest[j];
 
-				const float distance = m_iDistClosest[j];
-				const float weight = m_inv_bandwidths[k] * getKernel(distance, m_bandwidths[k]);
-
+				const double weight = m_inv_bandwidths[k] * getKernel(distance, m_bandwidths[k]);
 				const Pattern& pattern = candidates.get(k);
+
 				sum_cx += weight * pattern.getCenterX();
 				sum_cy += weight * pattern.getCenterY();
 				sum_w += weight * pattern.m_w;
 				sum_h += weight * pattern.m_h;
 				sum_weights += weight;
+
 				cnt ++;
 			}
 
@@ -444,14 +288,14 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 				break;
 			}
 
-			const float inv = 1.0f / sum_weights;
-			const float new_crt_cx = inv * sum_cx;
-			const float new_crt_cy = inv * sum_cy;
-			const float new_crt_w = inv * sum_w;
-			const float new_crt_h = inv * sum_h;
+			const double inv = 1.0 / sum_weights;
+			const double new_crt_cx = inv * sum_cx;
+			const double new_crt_cy = inv * sum_cy;
+			const double new_crt_w = inv * sum_w;
+			const double new_crt_h = inv * sum_h;
 
-			static const float eps = 0.00005f;
-			const float dist = getDistance(	new_crt_cx, new_crt_cy, new_crt_w, new_crt_h,
+			static const double eps = 0.000001;
+			const double dist = getDistance(new_crt_cx, new_crt_cy, new_crt_w, new_crt_h,
 							crt_cx, crt_cy, crt_w, crt_h);
 			//print("\t>>> dist = %f, cnt = %d\n", dist, cnt);
 			if (dist < eps)
@@ -466,8 +310,8 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 		}
 
 		// Add the converged point (~ density mode) to the list
-		m_patterns.add(Pattern(	FixI(crt_cx - 0.5f * crt_w),
-					FixI(crt_cy - 0.5f * crt_h),
+		m_patterns.add(Pattern(	FixI(crt_cx - 0.5 * crt_w),
+					FixI(crt_cy - 0.5 * crt_h),
 					FixI(crt_w),
 					FixI(crt_h),
 					crt_pattern.m_confidence),
@@ -489,7 +333,7 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 	if (verbose == true)
 	{
 		print("Adaptive Mean Shift clustering: average number of iterations = %f\n",
-			(sum_n_iters + 0.0f) / (cnt_n_iters == 0 ? 1.0f : (cnt_n_iters + 0.0f)));
+			(sum_n_iters + 0.0) / (cnt_n_iters == 0 ? 1.0 : (cnt_n_iters + 0.0)));
 	}
 
 	// Cleanup
@@ -507,7 +351,7 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 // http://valis.cs.uiuc.edu/~sariel/research/CG/applets/linear_prog/median.html
 // (std::nth_element function from STL does the same thing!!!)
 
-float MeanShiftSelector::kth_element(float* data, int size, int kth, float* buffer)
+static double kth_element(double* data, int size, int kth, double* buffer)
 {
 	// Trivial cases: 1 or 2 elements
 	if (size == 1)
@@ -520,7 +364,7 @@ float MeanShiftSelector::kth_element(float* data, int size, int kth, float* buff
 	}
 
 	// Put the values less than <test_val> at the begining and greater at the end
-	const float test_val = data[rand() % size];
+	const double test_val = data[rand() % size];
 	int iless = 0, igreater = 0, iequal = 0;
 	for (int i = 0; i < size; i ++)
 	{

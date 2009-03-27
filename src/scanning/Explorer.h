@@ -46,6 +46,7 @@ namespace Torch
 		// NB: the MS approach should just copy it, the pyramid should rescalling it before storing
 		virtual void		storePattern(	int sw_x, int sw_y, int sw_w, int sw_h,
 							double confidence) = 0;
+		void			storePattern(const Pattern& p);
 
 		//////////////////////////////////////////////////////////////////
 		// Attributes
