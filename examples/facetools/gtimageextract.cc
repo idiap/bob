@@ -168,6 +168,24 @@ int main(int argc, char* argv[])
 	//
 	FileList *file_list = new FileList(list_filename);
 
+
+	//
+	TensorFile *onetensor_file;
+	const char *onetensor_filename = "onetensor.tensor";
+	if(onetensor)
+	{
+	   	onetensor_file = new TensorFile;
+		CHECK_FATAL(onetensor_file->openWrite(onetensor_filename, Tensor::Short, 2, params.m_cropH, params.m_cropW, 0, 0));
+
+		const TensorFile::Header& onetensor_header = onetensor_file->getHeader();
+		print("One tensor file:\n");
+		print(" type:         [%s]\n", str_TensorTypeName[onetensor_header.m_type]);
+		print(" n_dimensions: [%d]\n", onetensor_header.m_n_dimensions);
+		print(" size[0]:      [%d]\n", onetensor_header.m_size[0]);
+		print(" size[1]:      [%d]\n", onetensor_header.m_size[1]);
+		print(" size[2]:      [%d]\n", onetensor_header.m_size[2]);
+	}
+
 	print("Number of files:%d\n", file_list->n_files);
 	for(int i = 0 ; i < file_list->n_files ; i++)
 	{
@@ -216,43 +234,50 @@ int main(int argc, char* argv[])
 
 		const ShortTensor& norm_timage = (const ShortTensor&)gnormalizer.getOutput(0);
 
+		print("Output image size:\n");
+		print("   width   = %d\n", norm_timage.size(1));
+		print("   height  = %d\n", norm_timage.size(0));
+
 		// Convert the output color image (3D tensor RGB) to a grayscale image (3D gray)
 		Image imagegray(norm_timage.size(1), norm_timage.size(0), 1);
 		imagegray.copyFrom((Image &)norm_timage); // the cast is necessary other copyFrom will not consider it as an image and will not convert it to grayscal
         
 		//
-		TensorFile tf;
+		if(onetensor)
+		{
+			// Select the grayscale channel as a 2D tensor and save it !
+			ShortTensor *t_ = new ShortTensor();
+			t_->select(&imagegray, 2, 0);
+			onetensor_file->save(*t_);
+			delete t_;
+		}
+		else
+		{
+			TensorFile tensor_file;
 
-		print("Writing tensor file ...\n");
-		char* tensor_filename= new char [strlen(file_list->file_names[i]) + 7];
-		sprintf(tensor_filename, "%s.tensor", file_list->file_names[i]);
-		CHECK_FATAL(tf.openWrite(tensor_filename, Tensor::Short, 2, norm_timage.size(0), norm_timage.size(1), 0, 0));
-		//CHECK_FATAL(tf.openWrite(tensor_filename, Tensor::Short, 3, norm_timage.size(0), norm_timage.size(1), 1, 0));
+			print("Writing tensor file ...\n");
+			char* tensor_filename = new char [strlen(file_list->file_names[i]) + 8];
+			sprintf(tensor_filename, "%s.tensor", file_list->file_names[i]);
+			CHECK_FATAL(tensor_file.openWrite(tensor_filename, Tensor::Short, 2, norm_timage.size(0), norm_timage.size(1), 0, 0));
 
-		const TensorFile::Header& header = tf.getHeader();
-		int n_examples = 1;
-		print("Tensor file:\n");
-		print(" type:         [%s]\n", str_TensorTypeName[header.m_type]);
-		//print(" n_tensors:    [%d]\n", header.m_n_samples);
-		print(" n_tensors:    [%d]\n", n_examples);
-		print(" n_dimensions: [%d]\n", header.m_n_dimensions);
-		print(" size[0]:      [%d]\n", header.m_size[0]);
-		print(" size[1]:      [%d]\n", header.m_size[1]);
-		print(" size[2]:      [%d]\n", header.m_size[2]);
-		print(" size[3]:      [%d]\n", header.m_size[3]);
+			const TensorFile::Header& header = tensor_file.getHeader();
+			print("Tensor file:\n");
+			print(" type:         [%s]\n", str_TensorTypeName[header.m_type]);
+			print(" n_dimensions: [%d]\n", header.m_n_dimensions);
+			print(" size[0]:      [%d]\n", header.m_size[0]);
+			print(" size[1]:      [%d]\n", header.m_size[1]);
+			print(" size[2]:      [%d]\n", header.m_size[2]);
+			//print(" size[3]:      [%d]\n", header.m_size[3]);
 
-		// Select the grayscale channel as a 2D tensor and save it !
-		ShortTensor *t_ = new ShortTensor();
-		t_->select(&imagegray, 2, 0);
-		for(int p = 0 ; p < n_examples ; p++)
-			tf.save(*t_);
-			//tf.save(imagegray);
+			// Select the grayscale channel as a 2D tensor and save it !
+			ShortTensor *t_ = new ShortTensor();
+			t_->select(&imagegray, 2, 0);
+			tensor_file.save(*t_);
+			delete t_;
 
-		delete t_;
-
-		tf.close();
-
-		delete [] tensor_filename;
+			tensor_file.close();
+			delete [] tensor_filename;
+		}
 
 		if(oimage)
 		{
@@ -269,6 +294,12 @@ int main(int argc, char* argv[])
 		//
 		delete [] gt_filename;
 		delete [] image_filename;
+	}
+
+	if(onetensor)
+	{
+		onetensor_file->close();
+		delete onetensor_file;
 	}
 
 	delete file_list;
