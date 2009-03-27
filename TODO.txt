@@ -2,13 +2,9 @@
 NOT ASSIGNED
 ---
 
-	faceextract.cc	Face extraction from list of pairs (image, gt) -> tensor
-
 	tensor2pgm.cc	
 
 	xvtensor.cc	Visualization of tensor as 2D images (grayscale, color, )
-
-	ImageScanDataSet
 
 	ipBlock
 
@@ -41,10 +37,14 @@ Nik:
 	
 Cosmin:
 	?
+	ImageScanDataSet
+
 
 ---
 DONE
 ---
+Src:
+
 	Tensor
 	TensorFile
 	DataSet
@@ -62,4 +62,9 @@ DONE
 		|__ bancaGTFile       // BANCA format (10 points ?)
 		|__ cootesGTFile      // Tim Cootes ASM format (68 or more points ?)
 		|__ ...
+
+Examples:
+	gtimageextract.cc (examples/facetools) : object (face, ...) extraction from list of pairs (image, gt) -> tensor
+	readtensor.cc     (examples/dataset)
+	bindata2tensor.cc (examples/dataset)
 
