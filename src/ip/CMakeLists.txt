@@ -31,8 +31,7 @@ SET(	ip_INCLUDE
 
 # Add some sub-directories
 SET(ip_SUBDIRS
-	imagefiles
-	shape)
+	imagefiles)
 
 FOREACH(subdir ${ip_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})
