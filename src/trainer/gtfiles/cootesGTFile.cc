@@ -4,6 +4,8 @@ namespace Torch {
 
 cootesGTFile::cootesGTFile() : GTFile(68)
 {
+	CHECK_FATAL(setLabel(31, "leye_center") == true);
+	CHECK_FATAL(setLabel(36, "reye_center") == true);
 }
 
 bool cootesGTFile::load(File* file)
@@ -31,21 +33,10 @@ bool cootesGTFile::load(File* file)
 	{
 		message("%s", getName());
 		for(int i = 0 ; i < 68 ; i++)
-			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), getPoints()[i].x, getPoints()[i].y);
+			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), m_points[i].x, m_points[i].y);
 	}
 
 	return true;
-}
-
-const char* cootesGTFile::getLabel(int i)
-{
-   	if(i < 0 || i >= m_n_points) return "Out of range label index";
-   	switch(i)
-	{
-	case 31: return "Left Eye Center";
-	case 36: return "Right Eye Center";
-	default: return "Undefined Label";
-	}
 }
 
 const char* cootesGTFile::getName()

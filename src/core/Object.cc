@@ -20,7 +20,8 @@ namespace Torch
 				TypeBool,
 				TypeInt,
 				TypeFloat,
-				TypeDouble
+				TypeDouble,
+				TypeString
 			};
 
 			// Constructor - default
@@ -93,6 +94,21 @@ namespace Torch
 				m_value = new double(init_value);
 			}
 
+			// Initialize the object - string
+			void			init(const char* name, const char* help, const char* init_value)
+			{
+				cleanup();
+
+				m_name = new char[strlen(name) + 1];
+				m_help = new char[strlen(help) + 1];
+				strcpy(m_name, name);
+				strcpy(m_help, help);
+
+				m_type = TypeString;
+				m_value = new char[strlen(init_value) + 1];
+				strcpy((char*)m_value, init_value);
+			}
+
 			// Initialize the object - from another
 			void			init(const Option& other)
 			{
@@ -123,6 +139,11 @@ namespace Torch
 					m_value = new double(*((double*)other.m_value));
 					break;
 
+				case TypeString:
+					m_value = new char[strlen((const char*)other.m_value) + 1];
+					strcpy((char*)m_value, (const char*)other.m_value);
+					break;
+
 				case TypeNothing:
 				default:
 					break;
@@ -151,6 +172,10 @@ namespace Torch
 
 				case TypeDouble:
 					delete (double*)m_value;
+					break;
+
+				case TypeString:
+					delete[] (char*)m_value;
 					break;
 
 				case TypeNothing:
@@ -226,6 +251,16 @@ namespace Torch
 			m_options[m_size ++].init(name, help, init_value);
 			return true;
 		}
+		bool				addSOption(const char* name, const char* init_value, const char* help = "")
+		{
+			if (search(name) >= 0)
+			{
+				return false; 	// The name is already taken
+			}
+			resize();
+			m_options[m_size ++].init(name, help, init_value);
+			return true;
+		}
 
 		///////////////////////////////////////////////////////////
 		// Option management functions - changing their values
@@ -268,6 +303,18 @@ namespace Torch
 				return false;
 			}
 			*((double*)m_options[index].m_value) = new_value;
+			return true;
+		}
+		bool				setSOption(const char* name, const char* new_value)
+		{
+			const int index = search(name);
+			if (index < 0 || m_options[index].m_type != Option::TypeString)
+			{
+				return false;
+			}
+			delete[] (char*)m_options[index].m_value;
+			m_options[index].m_value = new char[strlen(new_value) + 1];
+			strcpy((char*)m_options[index].m_value, new_value);
 			return true;
 		}
 
@@ -321,6 +368,18 @@ namespace Torch
 
 			setOK(ok, true);
 			return *((double*)m_options[index].m_value);
+		}
+		const char*			getSOption(const char* name, bool* ok = 0)
+		{
+			const int index = search(name);
+			if (index < 0 || m_options[index].m_type != Option::TypeString)
+			{
+				setOK(ok, false);
+				return 0;
+			}
+
+			setOK(ok, true);
+			return (const char*)m_options[index].m_value;
 		}
 
 	private:
@@ -424,6 +483,10 @@ bool Torch::Object::addDOption(const char* name, double init_value, const char* 
 {
 	return m_optionImpl->addDOption(name, init_value, help);
 }
+bool Torch::Object::addSOption(const char* name, const char* init_value, const char* help)
+{
+	return m_optionImpl->addSOption(name, init_value, help);
+}
 
 // setXOption
 bool Torch::Object::setBOption(const char* name, bool new_value)
@@ -462,6 +525,15 @@ bool Torch::Object::setDOption(const char* name, double new_value)
 	}
 	return false;
 }
+bool Torch::Object::setSOption(const char* name, const char* new_value)
+{
+	if (m_optionImpl->setSOption(name, new_value) == true)
+	{
+		optionChanged(name);
+		return true;
+	}
+	return false;
+}
 
 // getXOption
 bool Torch::Object::getBOption(const char* name, bool* ok)
@@ -479,6 +551,10 @@ float Torch::Object::getFOption(const char* name, bool* ok)
 double Torch::Object::getDOption(const char* name, bool* ok)
 {
 	return m_optionImpl->getDOption(name, ok);
+}
+const char* Torch::Object::getSOption(const char* name, bool* ok)
+{
+	return m_optionImpl->getSOption(name, ok);
 }
 
 ///////////////////////////////////////////////////////////

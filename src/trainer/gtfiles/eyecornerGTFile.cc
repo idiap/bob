@@ -4,6 +4,12 @@ namespace Torch {
 
 eyecornerGTFile::eyecornerGTFile() : GTFile(6)
 {
+	CHECK_FATAL(setLabel(0, "leye_ocorner") == true);
+	CHECK_FATAL(setLabel(1, "leye_icorner") == true);
+	CHECK_FATAL(setLabel(2, "reye_ocorner") == true);
+	CHECK_FATAL(setLabel(3, "reye_icorner") == true);
+	CHECK_FATAL(setLabel(4, "leye_center") == true);
+	CHECK_FATAL(setLabel(5, "reye_center") == true);
 }
 
 bool eyecornerGTFile::load(File* file)
@@ -45,25 +51,10 @@ bool eyecornerGTFile::load(File* file)
 	{
 		message("%s", getName());
 		for(int i = 0 ; i < 6 ; i++)
-			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), getPoints()[i].x, getPoints()[i].y);
+			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), m_points[i].x, m_points[i].y);
 	}
 
 	return true;
-}
-
-const char* eyecornerGTFile::getLabel(int i)
-{
-   	if(i < 0 || i >= m_n_points) return "Out of range label index";
-   	switch(i)
-	{
-	case 0: return "Outer Left Eye Corner";
-	case 1: return "Inner Left Eye Corner";
-	case 2: return "Outer Right Eye Corner";
-	case 3: return "Inner Right Eye Corner";
-	case 4: return "Left Eye Center";
-	case 5: return "Right Eye Center";
-	default: return "Undefined Label";
-	}
 }
 
 const char* eyecornerGTFile::getName()

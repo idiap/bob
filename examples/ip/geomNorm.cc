@@ -12,135 +12,6 @@
 using namespace Torch;
 
 ///////////////////////////////////////////////////////////////////////////
-// Geometric normalization parameters (check ipGeomNorm's options)
-///////////////////////////////////////////////////////////////////////////
-
-struct GeomNormParams
-{
-	// Constructor
-	GeomNormParams()
-		:	m_rotIdx1(0), m_rotIdx2(0), m_rotAngle(0.0),
-			m_scaleIdx1(0), m_scaleIdx2(0), m_scaleDist(0),
-			m_cropIdx1(0), m_cropIdx2(0), m_cropDx(0), m_cropDy(0),
-			m_cropW(0), m_cropH(0), m_cropBorderX(0), m_cropBorderY(0)
-	{
-	}
-
-	// Set the parameters as options to some ipGeomNorm
-	bool		set(ipGeomNorm& gnormalizer)
-	{
-		CHECK_ERROR(gnormalizer.setIOption("rotIdx1", m_rotIdx1));
-		CHECK_ERROR(gnormalizer.setIOption("rotIdx2", m_rotIdx2));
-		CHECK_ERROR(gnormalizer.setDOption("rotAngle", m_rotAngle));
-		CHECK_ERROR(gnormalizer.setIOption("scaleIdx1", m_scaleIdx1));
-		CHECK_ERROR(gnormalizer.setIOption("scaleIdx2", m_scaleIdx2));
-		CHECK_ERROR(gnormalizer.setIOption("scaleDist", m_scaleDist));
-		CHECK_ERROR(gnormalizer.setIOption("cropIdx1", m_cropIdx1));
-		CHECK_ERROR(gnormalizer.setIOption("cropIdx2", m_cropIdx2));
-		CHECK_ERROR(gnormalizer.setIOption("cropDx", m_cropDx));
-		CHECK_ERROR(gnormalizer.setIOption("cropDy", m_cropDy));
-		CHECK_ERROR(gnormalizer.setIOption("cropW", m_cropW));
-		CHECK_ERROR(gnormalizer.setIOption("cropH", m_cropH));
-		CHECK_ERROR(gnormalizer.setIOption("cropBorderX", m_cropBorderX));
-		CHECK_ERROR(gnormalizer.setIOption("cropBorderY", m_cropBorderY));
-
-		return true;
-	}
-
-	///////////////////////////////////////////////////////////////////
-	// Attributes
-
-	// Rotation
-	int 		m_rotIdx1, m_rotIdx2;
-	double		m_rotAngle;
-
-	// Scalling
-	int		m_scaleIdx1, m_scaleIdx2;
-	int		m_scaleDist;
-
-	// Cropping
-	int		m_cropIdx1, m_cropIdx2;
-	int		m_cropDx, m_cropDy;
-	int		m_cropW, m_cropH;
-	int		m_cropBorderX, m_cropBorderY;
-};
-
-///////////////////////////////////////////////////////////////////////////
-// Parse a geometrical normalization configuration file
-///////////////////////////////////////////////////////////////////////////
-
-const char* normString(const char* str)
-{
-	const char* ret = str;
-	while (*ret != '\0' && *ret != ':')
-	{
-		ret ++;
-	}
-	if (*ret == ':')
-	{
-		ret ++;
-	}
-	return ret;
-}
-
-bool loadGeomNormCfg(const char* filename, GeomNormParams& params)
-{
-	// Open the file
-	File file;
-	if (file.open(filename, "r") == false)
-	{
-		return false;
-	}
-
-	const int sizeBuf = 512;
-	char str[sizeBuf];
-
-	// Read the rotation parameters
-	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%d %d %lf",
-			&params.m_rotIdx1, &params.m_rotIdx2, &params.m_rotAngle) != 3)
-	{
-		print("[%s] - [%s]\n", str, normString(str));
-		return false;
-	}
-
-	// Read the scalling parameters
-	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%d %d %d",
-			&params.m_scaleIdx1, &params.m_scaleIdx2, &params.m_scaleDist) != 3)
-	{
-		print("[%s] - [%s]\n", str, normString(str));
-		return false;
-	}
-
-	// Read the cropping parameters
-	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%d %d %d %d %d %d %d %d",
-			&params.m_cropIdx1, &params.m_cropIdx2,
-			&params.m_cropDx, &params.m_cropDy,
-			&params.m_cropW, &params.m_cropH,
-			&params.m_cropBorderX, &params.m_cropBorderY) != 8)
-	{
-		print("[%s] - [%s]\n", str, normString(str));
-		return false;
-	}
-
-	file.close();
-
-	// Verbose
-	print("\nRotation: pt1 = %d, pt2 = %d, angle = %lf\n",
-		params.m_rotIdx1, params.m_rotIdx2, params.m_rotAngle);
-	print("Scalling: pt1 = %d, pt2 = %d, distance = %d\n",
-		params.m_scaleIdx1, params.m_scaleIdx2, params.m_scaleDist);
-	print("Cropping: pt1 = %d, pt2 = %d, dx = %d, dy = %d, w = %d, h = %d, borderx = %d, bordery = %d\n",
-		params.m_cropIdx1, params.m_cropIdx2, params.m_cropDx, params.m_cropDy,
-		params.m_cropW, params.m_cropH, params.m_cropBorderX, params.m_cropBorderY);
-
-	// OK
-	return true;
-}
-
-///////////////////////////////////////////////////////////////////////////
 // Save an image and draw the ground truth on top
 ///////////////////////////////////////////////////////////////////////////
 
@@ -195,6 +66,7 @@ int main(int argc, char* argv[])
 	cmd.read(argc, argv);
 
 	ipGeomNorm gnormalizer;
+	CHECK_FATAL(gnormalizer.setBOption("verbose", verbose) == true);
 
 	///////////////////////////////////////////////////////////////////
 	// Load the image
@@ -237,20 +109,18 @@ int main(int argc, char* argv[])
 
 	print("Loaded [%d] ground truth points ...\n", gt_loader->getNPoints());
 
-	int n_ldm_points = gt_loader->getNPoints();
-	sPoint2D *ldm_points = gt_loader->getPoints();
+	const int n_ldm_points = gt_loader->getNPoints();
+	const sPoint2D *ldm_points = gt_loader->getPoints();
 
 	///////////////////////////////////////////////////////////////////
 	// Parse the configuration file and set the parameters to ipGeomNorm
 
-	GeomNormParams params;
-	CHECK_FATAL(loadGeomNormCfg(cfg_norm_filename, params) == true);
-	CHECK_FATAL(params.set(gnormalizer) == true);
+	CHECK_FATAL(gnormalizer.loadCfg(cfg_norm_filename) == true);
+	CHECK_FATAL(gnormalizer.setGTFile(gt_loader) == true);
 
 	///////////////////////////////////////////////////////////////////
 	// Geometric normalize the image and save the result
 
-	CHECK_FATAL(gnormalizer.setGTPoints(ldm_points, n_ldm_points) == true);
 	CHECK_FATAL(gnormalizer.process(image) == true);
 
 	const ShortTensor& norm_timage = (const ShortTensor&)gnormalizer.getOutput(0);

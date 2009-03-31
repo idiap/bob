@@ -4,6 +4,9 @@ namespace Torch {
 
 profileEyeNoseChinGTFile::profileEyeNoseChinGTFile() : GTFile(3)
 {
+	CHECK_FATAL(setLabel(0, "leye_center") == true);
+	CHECK_FATAL(setLabel(1, "nose_tip") == true);
+	CHECK_FATAL(setLabel(2, "chin") == true);
 }
 
 bool profileEyeNoseChinGTFile::load(File* file)
@@ -44,22 +47,10 @@ bool profileEyeNoseChinGTFile::load(File* file)
 	{
 		message("%s", getName());
 		for(int i = 0 ; i < m_n_points ; i++)
-			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), getPoints()[i].x, getPoints()[i].y);
+			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), m_points[i].x, m_points[i].y);
 	}
 
 	return true;
-}
-
-const char* profileEyeNoseChinGTFile::getLabel(int i)
-{
-   	if(i < 0 || i >= m_n_points) return "Out of range label index";
-   	switch(i)
-	{
-	case 0: return "Left Eye Center";
-	case 1: return "Nose Tip";
-	case 2: return "Chin";
-	default: return "Undefined Label";
-	}
 }
 
 const char* profileEyeNoseChinGTFile::getName()

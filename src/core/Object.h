@@ -34,6 +34,7 @@ namespace Torch
 		bool			addIOption(const char* name, int init_value, const char* help = "");
 		bool			addFOption(const char* name, float init_value, const char* help = "");
 		bool			addDOption(const char* name, double init_value, const char* help = "");
+		bool			addSOption(const char* name, const char* init_value, const char* help = "");
 
 		///////////////////////////////////////////////////////////
 		/// Option management functions - changing their values
@@ -43,6 +44,7 @@ namespace Torch
 		bool			setIOption(const char* name, int new_value);
 		bool			setFOption(const char* name, float new_value);
 		bool			setDOption(const char* name, double new_value);
+		bool			setSOption(const char* name, const char* new_value);
 
 		///////////////////////////////////////////////////////////
 		/// Option management functions - retrieving alues
@@ -53,6 +55,7 @@ namespace Torch
 		int			getIOption(const char* name, bool* ok = 0);
 		float			getFOption(const char* name, bool* ok = 0);
 		double			getDOption(const char* name, bool* ok = 0);
+		const char*		getSOption(const char* name, bool* ok = 0);
 
 	protected:
 

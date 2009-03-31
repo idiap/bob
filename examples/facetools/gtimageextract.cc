@@ -20,61 +20,6 @@
 
 using namespace Torch;
 
-///////////////////////////////////////////////////////////////////////////
-// Geometric normalization parameters (check ipGeomNorm's options)
-///////////////////////////////////////////////////////////////////////////
-
-struct GeomNormParams
-{
-	// Constructor
-	GeomNormParams()
-		:	m_rotIdx1(0), m_rotIdx2(0), m_rotAngle(0.0),
-			m_scaleIdx1(0), m_scaleIdx2(0), m_scaleDist(0),
-			m_cropIdx1(0), m_cropIdx2(0), m_cropDx(0), m_cropDy(0),
-			m_cropW(0), m_cropH(0), m_cropBorderX(0), m_cropBorderY(0)
-	{
-	}
-
-	// Set the parameters as options to some ipGeomNorm
-	bool		set(ipGeomNorm& gnormalizer)
-	{
-		CHECK_ERROR(gnormalizer.setIOption("rotIdx1", m_rotIdx1));
-		CHECK_ERROR(gnormalizer.setIOption("rotIdx2", m_rotIdx2));
-		CHECK_ERROR(gnormalizer.setDOption("rotAngle", m_rotAngle));
-		CHECK_ERROR(gnormalizer.setIOption("scaleIdx1", m_scaleIdx1));
-		CHECK_ERROR(gnormalizer.setIOption("scaleIdx2", m_scaleIdx2));
-		CHECK_ERROR(gnormalizer.setIOption("scaleDist", m_scaleDist));
-		CHECK_ERROR(gnormalizer.setIOption("cropIdx1", m_cropIdx1));
-		CHECK_ERROR(gnormalizer.setIOption("cropIdx2", m_cropIdx2));
-		CHECK_ERROR(gnormalizer.setIOption("cropDx", m_cropDx));
-		CHECK_ERROR(gnormalizer.setIOption("cropDy", m_cropDy));
-		CHECK_ERROR(gnormalizer.setIOption("cropW", m_cropW));
-		CHECK_ERROR(gnormalizer.setIOption("cropH", m_cropH));
-		CHECK_ERROR(gnormalizer.setIOption("cropBorderX", m_cropBorderX));
-		CHECK_ERROR(gnormalizer.setIOption("cropBorderY", m_cropBorderY));
-
-		return true;
-	}
-
-	///////////////////////////////////////////////////////////////////
-	// Attributes
-
-	// Rotation
-	int 		m_rotIdx1, m_rotIdx2;
-	double		m_rotAngle;
-
-	// Scalling
-	int		m_scaleIdx1, m_scaleIdx2;
-	int		m_scaleDist;
-
-	// Cropping
-	int		m_cropIdx1, m_cropIdx2;
-	int		m_cropDx, m_cropDy;
-	int		m_cropW, m_cropH;
-	int		m_cropBorderX, m_cropBorderY;
-};
-
-bool loadGeomNormCfg(const char* filename, GeomNormParams& params);
 void saveImageGTPts(	const ShortTensor& timage, const sPoint2D* gt_pts, int n_gt_pts, const char* filename);
 
 int main(int argc, char* argv[])
@@ -161,30 +106,15 @@ int main(int argc, char* argv[])
 	///////////////////////////////////////////////////////////////////
 	// Parse the configuration file and set the parameters to ipGeomNorm
 
-	GeomNormParams params;
-	CHECK_FATAL(loadGeomNormCfg(cfg_norm_filename, params) == true);
-	CHECK_FATAL(params.set(gnormalizer) == true);
+	CHECK_FATAL(gnormalizer.loadCfg(cfg_norm_filename) == true);
 
 	//
 	FileList *file_list = new FileList(list_filename);
 
 
 	//
-	TensorFile *onetensor_file;
+	TensorFile *onetensor_file = 0;
 	const char *onetensor_filename = "onetensor.tensor";
-	if(onetensor)
-	{
-	   	onetensor_file = new TensorFile;
-		CHECK_FATAL(onetensor_file->openWrite(onetensor_filename, Tensor::Short, 2, params.m_cropH, params.m_cropW, 0, 0));
-
-		const TensorFile::Header& onetensor_header = onetensor_file->getHeader();
-		print("One tensor file:\n");
-		print(" type:         [%s]\n", str_TensorTypeName[onetensor_header.m_type]);
-		print(" n_dimensions: [%d]\n", onetensor_header.m_n_dimensions);
-		print(" size[0]:      [%d]\n", onetensor_header.m_size[0]);
-		print(" size[1]:      [%d]\n", onetensor_header.m_size[1]);
-		print(" size[2]:      [%d]\n", onetensor_header.m_size[2]);
-	}
 
 	print("Number of files:%d\n", file_list->n_files);
 	for(int i = 0 ; i < file_list->n_files ; i++)
@@ -229,7 +159,7 @@ int main(int argc, char* argv[])
 		///////////////////////////////////////////////////////////////////
 		// Geometric normalize the image and save the result
 
-		CHECK_FATAL(gnormalizer.setGTPoints(gt_loader->getPoints(), gt_loader->getNPoints()) == true);
+		CHECK_FATAL(gnormalizer.setGTFile(gt_loader) == true);
 		CHECK_FATAL(gnormalizer.process(image) == true);
 
 		const ShortTensor& norm_timage = (const ShortTensor&)gnormalizer.getOutput(0);
@@ -241,10 +171,27 @@ int main(int argc, char* argv[])
 		// Convert the output color image (3D tensor RGB) to a grayscale image (3D gray)
 		Image imagegray(norm_timage.size(1), norm_timage.size(0), 1);
 		imagegray.copyFrom((Image &)norm_timage); // the cast is necessary other copyFrom will not consider it as an image and will not convert it to grayscal
-        
+
 		//
 		if(onetensor)
 		{
+			if (onetensor_file == 0)
+			{
+				onetensor_file = new TensorFile;
+				CHECK_FATAL(onetensor_file->openWrite(
+						onetensor_filename,
+						Tensor::Short, 2,
+						norm_timage.size(0), norm_timage.size(1), 0, 0));
+
+				const TensorFile::Header& onetensor_header = onetensor_file->getHeader();
+				print("One tensor file:\n");
+				print(" type:         [%s]\n", str_TensorTypeName[onetensor_header.m_type]);
+				print(" n_dimensions: [%d]\n", onetensor_header.m_n_dimensions);
+				print(" size[0]:      [%d]\n", onetensor_header.m_size[0]);
+				print(" size[1]:      [%d]\n", onetensor_header.m_size[1]);
+				print(" size[2]:      [%d]\n", onetensor_header.m_size[2]);
+			}
+
 			// Select the grayscale channel as a 2D tensor and save it !
 			ShortTensor *t_ = new ShortTensor();
 			t_->select(&imagegray, 2, 0);
@@ -258,7 +205,10 @@ int main(int argc, char* argv[])
 			print("Writing tensor file ...\n");
 			char* tensor_filename = new char [strlen(file_list->file_names[i]) + 8];
 			sprintf(tensor_filename, "%s.tensor", file_list->file_names[i]);
-			CHECK_FATAL(tensor_file.openWrite(tensor_filename, Tensor::Short, 2, norm_timage.size(0), norm_timage.size(1), 0, 0));
+			CHECK_FATAL(tensor_file.openWrite(
+						tensor_filename,
+						Tensor::Short, 2,
+						norm_timage.size(0), norm_timage.size(1), 0, 0));
 
 			const TensorFile::Header& header = tensor_file.getHeader();
 			print("Tensor file:\n");
@@ -307,81 +257,6 @@ int main(int argc, char* argv[])
 
         // OK
 	return 0;
-}
-
-///////////////////////////////////////////////////////////////////////////
-// Parse a geometrical normalization configuration file
-///////////////////////////////////////////////////////////////////////////
-
-const char* normString(const char* str)
-{
-	const char* ret = str;
-	while (*ret != '\0' && *ret != ':')
-	{
-		ret ++;
-	}
-	if (*ret == ':')
-	{
-		ret ++;
-	}
-	return ret;
-}
-
-bool loadGeomNormCfg(const char* filename, GeomNormParams& params)
-{
-	// Open the file
-	File file;
-	if (file.open(filename, "r") == false)
-	{
-		return false;
-	}
-
-	const int sizeBuf = 512;
-	char str[sizeBuf];
-
-	// Read the rotation parameters
-	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%d %d %lf",
-			&params.m_rotIdx1, &params.m_rotIdx2, &params.m_rotAngle) != 3)
-	{
-		print("[%s] - [%s]\n", str, normString(str));
-		return false;
-	}
-
-	// Read the scalling parameters
-	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%d %d %d",
-			&params.m_scaleIdx1, &params.m_scaleIdx2, &params.m_scaleDist) != 3)
-	{
-		print("[%s] - [%s]\n", str, normString(str));
-		return false;
-	}
-
-	// Read the cropping parameters
-	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%d %d %d %d %d %d %d %d",
-			&params.m_cropIdx1, &params.m_cropIdx2,
-			&params.m_cropDx, &params.m_cropDy,
-			&params.m_cropW, &params.m_cropH,
-			&params.m_cropBorderX, &params.m_cropBorderY) != 8)
-	{
-		print("[%s] - [%s]\n", str, normString(str));
-		return false;
-	}
-
-	file.close();
-
-	// Verbose
-	print("\nRotation: pt1 = %d, pt2 = %d, angle = %lf\n",
-		params.m_rotIdx1, params.m_rotIdx2, params.m_rotAngle);
-	print("Scalling: pt1 = %d, pt2 = %d, distance = %d\n",
-		params.m_scaleIdx1, params.m_scaleIdx2, params.m_scaleDist);
-	print("Cropping: pt1 = %d, pt2 = %d, dx = %d, dy = %d, w = %d, h = %d, borderx = %d, bordery = %d\n",
-		params.m_cropIdx1, params.m_cropIdx2, params.m_cropDx, params.m_cropDy,
-		params.m_cropW, params.m_cropH, params.m_cropBorderX, params.m_cropBorderY);
-
-	// OK
-	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////

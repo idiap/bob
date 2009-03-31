@@ -4,6 +4,8 @@ namespace Torch {
 
 eyecenterGTFile::eyecenterGTFile() : GTFile(2)
 {
+	CHECK_FATAL(setLabel(0, "leye_center") == true);
+	CHECK_FATAL(setLabel(1, "reye_center") == true);
 }
 
 bool eyecenterGTFile::load(File* file)
@@ -34,17 +36,10 @@ bool eyecenterGTFile::load(File* file)
 	{
 		message("%s", getName());
 		for(int i = 0 ; i < m_n_points ; i++)
-			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), getPoints()[i].x, getPoints()[i].y);
+			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), m_points[i].x, m_points[i].y);
 	}
 
 	return true;
-}
-
-const char* eyecenterGTFile::getLabel(int i)
-{
-   	if(i < 0 || i >= m_n_points) return "Out of range label index";
-	if(i == 0) return "Left Eye Center";
-	else if(i == 1) return "Right Eye Center";
 }
 
 const char* eyecenterGTFile::getName()

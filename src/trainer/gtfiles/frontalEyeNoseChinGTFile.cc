@@ -4,6 +4,14 @@ namespace Torch {
 
 frontalEyeNoseChinGTFile::frontalEyeNoseChinGTFile() : GTFile(8)
 {
+	CHECK_FATAL(setLabel(0, "leye_ocorner") == true);
+	CHECK_FATAL(setLabel(1, "leye_icorner") == true);
+	CHECK_FATAL(setLabel(2, "reye_ocorner") == true);
+	CHECK_FATAL(setLabel(3, "reye_icorner") == true);
+	CHECK_FATAL(setLabel(4, "nose_tip") == true);
+	CHECK_FATAL(setLabel(5, "chin") == true);
+	CHECK_FATAL(setLabel(6, "leye_center") == true);
+	CHECK_FATAL(setLabel(7, "reye_center") == true);
 }
 
 bool frontalEyeNoseChinGTFile::load(File* file)
@@ -67,27 +75,10 @@ bool frontalEyeNoseChinGTFile::load(File* file)
 	{
 		message("%s", getName());
 		for(int i = 0 ; i < m_n_points ; i++)
-			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), getPoints()[i].x, getPoints()[i].y);
+			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), m_points[i].x, m_points[i].y);
 	}
 
 	return true;
-}
-
-const char* frontalEyeNoseChinGTFile::getLabel(int i)
-{
-   	if(i < 0 || i >= m_n_points) return "Out of range label index";
-   	switch(i)
-	{
-	case 0: return "Outer Left Eye Corner";
-	case 1: return "Inner Left Eye Corner";
-	case 2: return "Inner Right Eye Corner";
-	case 3: return "Outer Right Eye Corner";
-	case 4: return "Nose Tip";
-	case 5: return "Chin";
-	case 6: return "Left Eye Center";
-	case 7: return "Right Eye Center";
-	default: return "Undefined Label";
-	}
 }
 
 const char* frontalEyeNoseChinGTFile::getName()

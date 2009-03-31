@@ -9,6 +9,8 @@
 
 namespace Torch
 {
+	class GTFile;
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::ipGeomNorm
 	//	This class is designed to geometrically normalize a 2D/3D tensor,
@@ -16,20 +18,21 @@ namespace Torch
 	//	The normalized tensor has the same storage type and is of required size.
 	//
 	//	- PARAMETERS (name, type, default value, description):
-	//		"rotIdx1"	integer	0	"rotation: index of the first point to define the rotation axis - RP1"
-	//		"rotIdx2"	integer	0	"rotation: index of the second point to define the rotation axis - RP2"
+	//		"rotPoint1"	string	""	"rotation: first point to define the rotation axis - RP1"
+	//		"rotPoint2"	string	""	"rotation: second point to define the rotation axis - RP2"
 	//		"rotAngle"	double	0.0	"rotation: desired angle of the RP1-RP2 in the normalized image"
-	//		"scaleIdx1"	integer 0	"scale: index of the first point to define the scalling factor - SP1"
-	//		"scaleIdx2"	integer 0	"scale: index of the second point to define the scalling factor - SP2"
+	//		"scalePoint1"	string 	""	"scale: first point to define the scalling factor - SP1"
+	//		"scalePoint2"	string 	""	"scale: second point to define the scalling factor - SP2"
 	//		"scaleDist"	integer 0	"scale: desired distance (SP1, SP2) in the normalized image"
-	//		"cropIdx1"	integer 0	"crop: index of the first point to define the cropping center - CP1"
-	//		"cropIdx2"	integer 0	"crop: index of the second point to define the cropping center - CP2"
+	//		"cropPoint1"	string 	""	"crop: first point to define the cropping center - CP1"
+	//		"cropPoint2"	string 	""	"crop: second point to define the cropping center - CP2"
 	//		"cropDx"	integer 0	"crop: Ox offset of the (CP1, CP2) center in the normalized image"
 	//		"cropDy"	integer 0	"crop: Oy offset of the (CP1, CP2) center in the normalized image"
 	//		"cropW"		integer 0	"crop: width of the base normalized image (without border)"
 	//		"cropH"		integer 0	"crop: height of the base normalized image (without border)"
 	//		"cropBorderX"	integer 0	"crop: Ox border of the  normalized image around the cropping center"
 	//		"cropBorderY"	integer 0	"crop: Oy border of the  normalized image around the cropping center"
+	//		"finalRotAngle"	double	0.0	"final rotation: final rotation angle of the center"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -44,8 +47,11 @@ namespace Torch
 		// Destructor
 		virtual ~ipGeomNorm();
 
+		// Load the configuration parameters from a text file
+		bool			loadCfg(const char* filename);
+
 		// Change the ground truth points to use for normalization
-		bool			setGTPoints(const sPoint2D* gt_pts, int n_gt_pts);
+		bool			setGTFile(const GTFile* gt_file);
 
 		// Access the normalized points
 		const sPoint2D*		getNMPoints() const { return m_nm_pts; }
@@ -71,9 +77,8 @@ namespace Torch
 		// Attributes
 
 		// Ground truth and normalized points
-		const sPoint2D*		m_gt_pts;
+		const GTFile*		m_gt_file;
 		sPoint2D*		m_nm_pts;
-		int			m_n_gt_pts;
 
 		// <ipCore>s for rotation, scalling and cropping
 		ipRotate		m_ip_rotate;

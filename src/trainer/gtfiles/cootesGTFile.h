@@ -5,7 +5,7 @@
 
 namespace Torch
 {
-	/** 
+	/**
 	*/
 	class cootesGTFile : public GTFile
 	{
@@ -16,11 +16,8 @@ namespace Torch
 		// Destructor
 		virtual ~cootesGTFile();
 
-		// Load an image
+		// Load points from some file
 		virtual bool		load(File* file);
-
-		// Get the name of the label of a point
-		virtual const char*	getLabel(int);
 
 		// Get the name of the GT file format
 		virtual const char*	getName();

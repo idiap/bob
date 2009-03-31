@@ -4,6 +4,8 @@ namespace Torch {
 
 bancaGTFile::bancaGTFile() : GTFile(10)
 {
+	CHECK_FATAL(setLabel(1, "leye_center") == true);
+	CHECK_FATAL(setLabel(4, "reye_center") == true);
 }
 
 bool bancaGTFile::load(File* file)
@@ -27,29 +29,10 @@ bool bancaGTFile::load(File* file)
 	{
 		message("%s", getName());
 		for(int i = 0 ; i < m_n_points ; i++)
-			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), getPoints()[i].x, getPoints()[i].y);
+			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), m_points[i].x, m_points[i].y);
 	}
 
 	return true;
-}
-
-const char* bancaGTFile::getLabel(int i)
-{
-   	if(i < 0 || i >= m_n_points) return "Out of range label index";
-   	switch(i)
-	{
-	case 0: return "Undefined Label";
-	case 1: return "Left Eye Center";
-	case 2: return "Undefined Label";
-	case 3: return "Undefined Label";
-	case 4: return "Right Eye Center";
-	case 5: return "Undefined Label";
-	case 6: return "Undefined Label";
-	case 7: return "Undefined Label";
-	case 8: return "Undefined Label";
-	case 9: return "Undefined Label";
-	default: return "Undefined Label";
-	}
 }
 
 const char* bancaGTFile::getName()

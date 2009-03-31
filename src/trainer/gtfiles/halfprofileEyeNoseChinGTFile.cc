@@ -4,6 +4,12 @@ namespace Torch {
 
 halfprofileEyeNoseChinGTFile::halfprofileEyeNoseChinGTFile() : GTFile(6)
 {
+	CHECK_FATAL(setLabel(0, "leye_ocorner") == true);
+	CHECK_FATAL(setLabel(1, "leye_icorner") == true);
+	CHECK_FATAL(setLabel(2, "reye_center") == true);
+	CHECK_FATAL(setLabel(3, "nose_tip") == true);
+	CHECK_FATAL(setLabel(4, "chin") == true);
+	CHECK_FATAL(setLabel(5, "leye_center") == true);
 }
 
 bool halfprofileEyeNoseChinGTFile::load(File* file)
@@ -59,25 +65,10 @@ bool halfprofileEyeNoseChinGTFile::load(File* file)
 	{
 		message("%s", getName());
 		for(int i = 0 ; i < m_n_points ; i++)
-			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), getPoints()[i].x, getPoints()[i].y);
+			print(" [%d] %s (%.1f-%.1f)\n", i, getLabel(i), m_points[i].x, m_points[i].y);
 	}
 
 	return true;
-}
-
-const char* halfprofileEyeNoseChinGTFile::getLabel(int i)
-{
-   	if(i < 0 || i >= m_n_points) return "Out of range label index";
-   	switch(i)
-	{
-	case 0: return "Outer Left Eye Corner";
-	case 1: return "Inner Left Eye Corner";
-	case 2: return "Right Eye Center";
-	case 3: return "Nose Tip";
-	case 4: return "Chin";
-	case 5: return "Left Eye Center";
-	default: return "Undefined Label";
-	}
 }
 
 const char* halfprofileEyeNoseChinGTFile::getName()

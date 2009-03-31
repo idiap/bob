@@ -7,7 +7,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # Set the compiler flags and build type(release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer -msse2")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+#SET(CMAKE_CXX_FLAGS_DEBUG "-g")
 SET(CMAKE_BUILD_TYPE RELEASE)
 #SET(CMAKE_BUILD_TYPE DEBUG)
 
