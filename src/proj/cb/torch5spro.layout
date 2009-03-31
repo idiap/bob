@@ -244,11 +244,11 @@
 	<File name="../../ip/ipLBP8R.h" open="1" top="0" tabpos="14">
 		<Cursor position="581" topLine="0" />
 	</File>
-	<File name="../../ip/ipScaleYX.cc" open="0" top="0" tabpos="33">
-		<Cursor position="3510" topLine="126" />
+	<File name="../../ip/ipScaleYX.cc" open="1" top="0" tabpos="47">
+		<Cursor position="3046" topLine="72" />
 	</File>
-	<File name="../../ip/ipScaleYX.h" open="0" top="0" tabpos="34">
-		<Cursor position="2445" topLine="53" />
+	<File name="../../ip/ipScaleYX.h" open="1" top="0" tabpos="46">
+		<Cursor position="1957" topLine="36" />
 	</File>
 	<File name="../../ip/shape/CMakeLists.txt" open="0" top="0" tabpos="92">
 		<Cursor position="495" topLine="0" />
@@ -556,10 +556,10 @@
 	<File name="../../trainer/CMakeLists.txt" open="0" top="0" tabpos="31">
 		<Cursor position="339" topLine="0" />
 	</File>
-	<File name="../../trainer/gtfiles/bancaGTFile.h" open="1" top="0" tabpos="45">
+	<File name="../../trainer/gtfiles/bancaGTFile.h" open="1" top="0" tabpos="28">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../trainer/gtfiles/eyecenterGTFile.h" open="1" top="0" tabpos="44">
+	<File name="../../trainer/gtfiles/eyecenterGTFile.h" open="1" top="0" tabpos="27">
 		<Cursor position="0" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

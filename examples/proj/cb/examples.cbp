@@ -46,6 +46,19 @@
 		<Unit filename="../../dataset/make.csh" />
 		<Unit filename="../../dataset/memorydataset.cc" />
 		<Unit filename="../../dataset/tensorfiles.cc" />
+		<Unit filename="../../facetools/CMakeLists.txt" />
+		<Unit filename="../../facetools/README" />
+		<Unit filename="../../facetools/banca.list" />
+		<Unit filename="../../facetools/cmu.list" />
+		<Unit filename="../../facetools/eyenosechin_frontal.list" />
+		<Unit filename="../../facetools/eyenosechin_halfprofile.list" />
+		<Unit filename="../../facetools/eyenosechin_profile.list" />
+		<Unit filename="../../facetools/filelist.cc" />
+		<Unit filename="../../facetools/frontalface19x19.geom.norm.cfg" />
+		<Unit filename="../../facetools/frontalface64x80.geom.norm.cfg" />
+		<Unit filename="../../facetools/gtimageextract.cc" />
+		<Unit filename="../../facetools/make.csh" />
+		<Unit filename="../../facetools/xm2vts.list" />
 		<Unit filename="../../images/CMakeLists.txt" />
 		<Unit filename="../../images/README.txt" />
 		<Unit filename="../../images/imageformats.cc" />
@@ -53,6 +66,7 @@
 		<Unit filename="../../ip/CMakeLists.txt" />
 		<Unit filename="../../ip/README.txt" />
 		<Unit filename="../../ip/crop.cc" />
+		<Unit filename="../../ip/geom.norm.cfg" />
 		<Unit filename="../../ip/geomNorm.cc" />
 		<Unit filename="../../ip/histo.cc" />
 		<Unit filename="../../ip/iimage.cc" />
