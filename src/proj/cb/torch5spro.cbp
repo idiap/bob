@@ -202,6 +202,21 @@
 		</Unit>
 		<Unit filename="../../CMakeLists.txt" />
 		<Unit filename="../../ap/CMakeLists.txt" />
+		<Unit filename="../../boosting/BoostingTrainer.cc" />
+		<Unit filename="../../boosting/BoostingTrainer.h" />
+		<Unit filename="../../boosting/CMakeLists.txt" />
+		<Unit filename="../../boosting/LutMachine.cc" />
+		<Unit filename="../../boosting/LutMachine.h" />
+		<Unit filename="../../boosting/LutTrainer.cc" />
+		<Unit filename="../../boosting/LutTrainer.h" />
+		<Unit filename="../../boosting/StumpMachine.cc" />
+		<Unit filename="../../boosting/StumpMachine.h" />
+		<Unit filename="../../boosting/StumpTrainer.cc" />
+		<Unit filename="../../boosting/StumpTrainer.h" />
+		<Unit filename="../../boosting/WeakLearner.cc" />
+		<Unit filename="../../boosting/WeakLearner.h" />
+		<Unit filename="../../boosting/spCoreMachine.cc" />
+		<Unit filename="../../boosting/spCoreMachine.h" />
 		<Unit filename="../../core/CMakeLists.txt" />
 		<Unit filename="../../core/CmdFile.cc" />
 		<Unit filename="../../core/CmdFile.h" />

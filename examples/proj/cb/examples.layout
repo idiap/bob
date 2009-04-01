@@ -10,13 +10,13 @@
 	<File name="../../dataset/memorydataset.cc" open="0" top="0" tabpos="1">
 		<Cursor position="1392" topLine="0" />
 	</File>
-	<File name="../../facetools/filelist.cc" open="1" top="0" tabpos="18">
+	<File name="../../facetools/filelist.cc" open="1" top="0" tabpos="10">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../facetools/frontalface19x19.geom.norm.cfg" open="1" top="0" tabpos="20">
+	<File name="../../facetools/frontalface19x19.geom.norm.cfg" open="1" top="0" tabpos="12">
 		<Cursor position="223" topLine="0" />
 	</File>
-	<File name="../../facetools/gtimageextract.cc" open="1" top="1" tabpos="19">
+	<File name="../../facetools/gtimageextract.cc" open="1" top="0" tabpos="11">
 		<Cursor position="6525" topLine="28" />
 	</File>
 	<File name="../../images/CMakeLists.txt" open="0" top="0" tabpos="0">

@@ -207,7 +207,28 @@ bool ipGeomNorm::checkInput(const Tensor& input) const
 
 bool ipGeomNorm::allocateOutput(const Tensor& input)
 {
-	// We don't know here the output size, because of the final rotation!
+	const int cropW = getIOption("cropW");
+        const int cropH = getIOption("cropH");
+        const int cropBorderX = getIOption("cropBorderX");
+        const int cropBorderY = getIOption("cropBorderY");
+
+        const int normW = cropW + 2 * cropBorderX;
+        const int normH = cropH + 2 * cropBorderY;
+
+        if (    m_output == 0 ||
+                m_output[0]->nDimension() != 3 ||
+                m_output[0]->size(0) != normH ||
+                m_output[0]->size(1) != normW ||
+                m_output[0]->size(2) != input.size(2))
+        {
+                cleanup();
+
+                // Need allocation
+                m_n_outputs = 1;
+                m_output = new Tensor*[m_n_outputs];
+                m_output[0] = new ShortTensor(normH, normW, input.size(2));
+        }
+
 	return true;
 }
 
@@ -350,24 +371,61 @@ bool ipGeomNorm::processInput(const Tensor& input)
 	}
 
 	////////////////////////////////////////////////////////////
-	// Crop: the scaled & rotated image and the scaled & rotated ground truth points
+	// Rotate: the scaled image around the center of croped area
 
-	// Compute the cropping area
+	// Compute the cropping points and their middle
 	const sPoint2D& cropP1 = m_nm_pts[cropIdx1];
 	const sPoint2D& cropP2 = m_nm_pts[cropIdx2];
 
-	const double cropP12x = 0.5 * (cropP1.x + cropP2.x);
-	const double cropP12y = 0.5 * (cropP1.y + cropP2.y);
+	const double cropP12x = 0.5 * (cropP1.x + cropP2.x) - (cropBorderX + cropDx) + normW / 2;
+	const double cropP12y = 0.5 * (cropP1.y + cropP2.y) - (cropBorderY + cropDy) + normH / 2;
 
-	const int ip_crop_x = cropP12x - (cropBorderX + cropDx);
-	const int ip_crop_y = cropP12y - (cropBorderY + cropDy);
+	// Rotate the image around this point
+	if (    m_ip_rotate.setDOption("angle", finalRotAngle) == false ||
+                m_ip_rotate.setIOption("centerx", cropP12x) == false ||
+                m_ip_rotate.setIOption("centery", cropP12y) == false ||
+                m_ip_rotate.process(m_ip_scale.getOutput(0)) == false)
+        {
+                warning("ipGeomNorm::processInput(): incorrect final rotation parameters or rotation failure.");
+                return false;
+        }
+
+        // Rotate the center of croped area
+        rm.reset(-finalRotAngle);
+	rm.xc = cropP12x;
+	rm.yc = cropP12y;
+	rm.XC = m_ip_rotate.getOutput(0).size(1) / 2;
+	rm.YC = m_ip_rotate.getOutput(0).size(0) / 2;
+	rotate(	cropP12x, cropP12y,
+		&ip_rot_rot_cx, &ip_rot_rot_cy,
+		&rm);
+
+	// Rotate the ground truth points too
+        rm.reset(-finalRotAngle);
+        rm.xc = cropP12x;
+        rm.yc = cropP12y;
+	rm.XC = ip_rot_rot_cx;
+	rm.YC = ip_rot_rot_cy;
+	for (int i = 0; i < n_gt_pts; i ++)
+	{
+		rotate(	m_nm_pts[i].x, m_nm_pts[i].y,
+			&m_nm_pts[i].x, &m_nm_pts[i].y,
+			&rm);
+	}
+
+	////////////////////////////////////////////////////////////
+	// Crop: the scaled & rotated image and the scaled & rotated ground truth points
+
+	// Compute the cropping area
+	const int ip_crop_x = ip_rot_rot_cx - normW / 2;
+	const int ip_crop_y = ip_rot_rot_cy - normH / 2;
 	const int ip_crop_w = normW;
 	const int ip_crop_h = normH;
 
 	if (	ip_crop_x < 0 || ip_crop_y < 0 ||
 		ip_crop_w < 0 || ip_crop_h < 0 ||
-		ip_crop_x + ip_crop_w > m_ip_scale.getOutput(0).size(1) ||
-		ip_crop_y + ip_crop_h > m_ip_scale.getOutput(0).size(0))
+		ip_crop_x + ip_crop_w > m_ip_rotate.getOutput(0).size(1) ||
+		ip_crop_y + ip_crop_h > m_ip_rotate.getOutput(0).size(0))
 	{
 	   	warning("ipGeomNorm::processInput(): incorrect crop parameters.");
 		return false;
@@ -378,7 +436,7 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		m_ip_crop.setIOption("y", ip_crop_y) == false ||
 		m_ip_crop.setIOption("w", ip_crop_w) == false ||
 		m_ip_crop.setIOption("h", ip_crop_h) == false ||
-		m_ip_crop.process(m_ip_scale.getOutput(0)) == false)
+		m_ip_crop.process(m_ip_rotate.getOutput(0)) == false)
 	{
 	   	warning("ipGeomNorm::processInput(): crop failure.");
 		return false;
@@ -392,42 +450,9 @@ bool ipGeomNorm::processInput(const Tensor& input)
 	}
 
 	////////////////////////////////////////////////////////////////
-	// Final rotation: rotate the cropped image around its center
+	// FINISH: Just copy the pixel from the cropped image
 
-	// Rotate the cropped image
-	if (	m_ip_rotate.setDOption("angle", finalRotAngle) == false ||
-		m_ip_rotate.setIOption("centerx", ip_crop_w / 2) == false ||
-		m_ip_rotate.setIOption("centery", ip_crop_h / 2) == false ||
-		m_ip_rotate.process(m_ip_crop.getOutput(0)) == false)
-	{
-	   	warning("ipGeomNorm::processInput(): incorrect final rotation parameters or rotation failure.");
-		return false;
-	}
-
-	// Rotate the ground truth points too
-	rm.reset(-finalRotAngle);
-	rm.xc = ip_crop_w / 2;
-	rm.yc = ip_crop_h / 2;
-	rm.XC = m_ip_rotate.getOutput(0).size(1) / 2;
-	rm.YC = m_ip_rotate.getOutput(0).size(0) / 2;
-
-	for (int i = 0; i < n_gt_pts; i ++)
-	{
-		rotate(	m_nm_pts[i].x, m_nm_pts[i].y,
-			&m_nm_pts[i].x, &m_nm_pts[i].y,
-			&rm);
-	}
-
-	////////////////////////////////////////////////////////////////
-	// FINISH: Just copy the pixel from the ipRotate to the output
-
-	const Tensor& result = m_ip_rotate.getOutput(0);
-
-	cleanup();
-	m_n_outputs = 1;
-	m_output = new Tensor*[m_n_outputs];
-	m_output[0] = new ShortTensor(result.size(0), result.size(1), result.size(2));
-	m_output[0]->copy(&result);
+	m_output[0]->copy(&m_ip_crop.getOutput(0));
 
 	// OK
 	return true;
