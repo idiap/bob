@@ -8,6 +8,7 @@
 #include "xtprobeImageFile.h"
 #include "GTFile.h"
 
+
 namespace Torch {
 
 /////////////////////////////////////////////////////////////////////////
@@ -136,7 +137,7 @@ bool ipGeomNorm::loadCfg(const char* filename)
 
 	file.close();
 
-	// Verbose
+    // Verbose
 	if (verbose == true)
 	{
 		print("\nRotation: pt1 = %s, pt2 = %s, angle = %lf\n",
@@ -252,12 +253,14 @@ bool ipGeomNorm::processInput(const Tensor& input)
 	const int cropDy = getIOption("cropDy");
 	const int cropW = getIOption("cropW");
 	const int cropH = getIOption("cropH");
-	const int cropBorderX = getIOption("borderX");
-	const int cropBorderY = getIOption("borderY");
+	const int cropBorderX = getIOption("cropBorderX");
+	const int cropBorderY = getIOption("cropBorderY");
 	const double finalRotAngle = getDOption("finalRotAngle");
 
 	const int normW = cropW + 2 * cropBorderX;
+
 	const int normH = cropH + 2 * cropBorderY;
+
 
 	// Check parameters
 	if (	m_gt_file == 0 ||
@@ -301,59 +304,80 @@ bool ipGeomNorm::processInput(const Tensor& input)
 	const sPoint2D& rotP2 = gt_pts[rotIdx2];
 	const double rot_P12_angle = Torch::angle(Point2D(rotP1), Point2D(rotP2));
 
-	const double ip_rot_angle = rotAngle - radian2degree(rot_P12_angle);
-	const int ip_rot_cx = FixI(0.5 * (rotP1.x + rotP2.x));
-	const int ip_rot_cy = FixI(0.5 * (rotP1.y + rotP2.y));
+	 double ip_rot_angle = rotAngle - radian2degree(rot_P12_angle);
+
+	//
+	double v_rot_cx = (rotP1.x + rotP2.x)/2;
+	double v_rot_cy = (rotP1.y + rotP2.y)/2;
+
+	//rotate the point just to find the center
+	RotationMatrix2D rm;
+	rm.reset(ip_rot_angle);
+	rm.xc = v_rot_cx;
+	rm.yc = v_rot_cy;
+	rm.XC = v_rot_cx;
+	rm.YC = v_rot_cy;
+
+	// Compute the size of the scaled image using the two reference points
+	const sPoint2D& scaleP1 =gt_pts[scaleIdx1];
+	const sPoint2D& scaleP2 = gt_pts[scaleIdx2];
+
+	const double distP12 = d(Point2D(scaleP1), Point2D(scaleP2));
+	const double scaleFactor = distP12 == 0.0 ? 1.0 :   distP12/(scaleDist + 0.0) ;
+	// print("Scaledistance %d\n",scaleDist);
+	double px1,px2,py1,py2;
+	rotate(	gt_pts[cropIdx1].x, gt_pts[cropIdx1].y,
+		&px1, &py1,
+		&rm);
+	rotate(	gt_pts[cropIdx2].x, gt_pts[cropIdx2].y,
+		&px2, &py2,
+		&rm);
+	//now you have rotated points of those two points which are used for croping
+	// find the center now in rotated coordinate.
+	double Cx,Cy;
+	Cx = (px1+px2 + (cropW-2*cropDx)*scaleFactor)/2;
+	Cy = (py1+py2 + (cropH-2*cropDy)*scaleFactor)/2;
+
+	rm.reset(-ip_rot_angle);
+	rm.xc = v_rot_cx;
+	rm.yc = v_rot_cy;
+	rm.XC = v_rot_cx;
+	rm.YC = v_rot_cy;
+	//now we obtain the centers in original image.
+	rotate(	Cx, Cy,
+		&px1, &py1,
+		&rm);
+
+	int nCx = (int) px1;
+	int nCy = (int) py1;
+	print("The centers %d %d\n",nCx,nCy);
+	ip_rot_angle += finalRotAngle;
 
 	// Rotate the image
 	if (	m_ip_rotate.setDOption("angle", ip_rot_angle) == false ||
-		m_ip_rotate.setIOption("centerx", ip_rot_cx) == false ||
-		m_ip_rotate.setIOption("centery", ip_rot_cy) == false ||
+		m_ip_rotate.setIOption("centerx", nCx) == false ||
+		m_ip_rotate.setIOption("centery", nCy) == false ||
 		m_ip_rotate.process(input) == false)
 	{
 	   	warning("ipGeomNorm::processInput(): incorrect rotation parameters or rotation failure.");
 		return false;
 	}
 
-	// Rotate the center of the rotation -> (ip_rot_rot_cx, ip_rot_rot_cy)
-	RotationMatrix2D rm;
+	//rotate all the points
 	rm.reset(ip_rot_angle);
-	rm.xc = ip_rot_cx;
-	rm.yc = ip_rot_cy;
-	rm.XC = m_ip_rotate.getOutput(0).size(1) / 2;
-	rm.YC = m_ip_rotate.getOutput(0).size(0) / 2;
-
-	int ip_rot_rot_cx, ip_rot_rot_cy;
-	rotate(	ip_rot_cx, ip_rot_cy,
-		&ip_rot_rot_cx, &ip_rot_rot_cy,
-		&rm);
-
-	// Rotate the ground truth points too
-	rm.reset(ip_rot_angle);
-	rm.xc = ip_rot_cx;
-	rm.yc = ip_rot_cy;
-	rm.XC = ip_rot_rot_cx;
-	rm.YC = ip_rot_rot_cy;
+	rm.xc = px1;
+	rm.yc = py1;
+	rm.XC = m_ip_rotate.getOutput(0).size(1)/2;
+	rm.YC = m_ip_rotate.getOutput(0).size(0)/2;
 	for (int i = 0; i < n_gt_pts; i ++)
 	{
 		rotate(	gt_pts[i].x, gt_pts[i].y,
 			&m_nm_pts[i].x, &m_nm_pts[i].y,
 			&rm);
 	}
-
-	////////////////////////////////////////////////////////////
-	// Scale: the rotate image and the rotated ground truth points
-
-	// Compute the size of the scaled image using the two reference points
-	const sPoint2D& scaleP1 = m_nm_pts[scaleIdx1];
-	const sPoint2D& scaleP2 = m_nm_pts[scaleIdx2];
-
-	const double distP12 = d(Point2D(scaleP1), Point2D(scaleP2));
-	const double scaleFactor = distP12 == 0.0 ? 1.0 : (scaleDist + 0.0) / distP12;
-
-	const int scaleH = FixI(scaleFactor * m_ip_rotate.getOutput(0).size(0));
-	const int scaleW = FixI(scaleFactor * m_ip_rotate.getOutput(0).size(1));
-
+	const int scaleH = FixI(m_ip_rotate.getOutput(0).size(0)/scaleFactor);
+	const int scaleW = FixI(m_ip_rotate.getOutput(0).size(1)/scaleFactor);
+	// print("Scale  = %f %d %d\n",scaleFactor,scaleH,scaleW);
 	// Scale the rotated image
 	if (	m_ip_scale.setIOption("width", scaleW) == false ||
 		m_ip_scale.setIOption("height", scaleH) == false ||
@@ -363,80 +387,37 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		return false;
 	}
 
-	// Scale the rotated ground truth points
 	for (int i = 0; i < n_gt_pts; i ++)
 	{
-		m_nm_pts[i].x *= scaleFactor;
-		m_nm_pts[i].y *= scaleFactor;
+            m_nm_pts[i].x = m_nm_pts[i].x/scaleFactor;
+             m_nm_pts[i].y = m_nm_pts[i].y/scaleFactor;
+
 	}
-
-	////////////////////////////////////////////////////////////
-	// Rotate: the scaled image around the center of croped area
-
-	// Compute the cropping points and their middle
-	const sPoint2D& cropP1 = m_nm_pts[cropIdx1];
-	const sPoint2D& cropP2 = m_nm_pts[cropIdx2];
-
-	const double cropP12x = 0.5 * (cropP1.x + cropP2.x) - (cropBorderX + cropDx) + normW / 2;
-	const double cropP12y = 0.5 * (cropP1.y + cropP2.y) - (cropBorderY + cropDy) + normH / 2;
-
-	// Rotate the image around this point
-	if (    m_ip_rotate.setDOption("angle", finalRotAngle) == false ||
-                m_ip_rotate.setIOption("centerx", cropP12x) == false ||
-                m_ip_rotate.setIOption("centery", cropP12y) == false ||
-                m_ip_rotate.process(m_ip_scale.getOutput(0)) == false)
-        {
-                warning("ipGeomNorm::processInput(): incorrect final rotation parameters or rotation failure.");
-                return false;
-        }
-
-        // Rotate the center of croped area
-        rm.reset(-finalRotAngle);
-	rm.xc = cropP12x;
-	rm.yc = cropP12y;
-	rm.XC = m_ip_rotate.getOutput(0).size(1) / 2;
-	rm.YC = m_ip_rotate.getOutput(0).size(0) / 2;
-	rotate(	cropP12x, cropP12y,
-		&ip_rot_rot_cx, &ip_rot_rot_cy,
-		&rm);
-
-	// Rotate the ground truth points too
-        rm.reset(-finalRotAngle);
-        rm.xc = cropP12x;
-        rm.yc = cropP12y;
-	rm.XC = ip_rot_rot_cx;
-	rm.YC = ip_rot_rot_cy;
-	for (int i = 0; i < n_gt_pts; i ++)
-	{
-		rotate(	m_nm_pts[i].x, m_nm_pts[i].y,
-			&m_nm_pts[i].x, &m_nm_pts[i].y,
-			&rm);
-	}
-
 	////////////////////////////////////////////////////////////
 	// Crop: the scaled & rotated image and the scaled & rotated ground truth points
 
 	// Compute the cropping area
-	const int ip_crop_x = ip_rot_rot_cx - normW / 2;
-	const int ip_crop_y = ip_rot_rot_cy - normH / 2;
+	const int ip_crop_x =  FixI((m_ip_scale.getOutput(0).size(1) - cropW)/2)-cropBorderX;
+	const int ip_crop_y = FixI((m_ip_scale.getOutput(0).size(0) - cropH)/2)-cropBorderY;
 	const int ip_crop_w = normW;
 	const int ip_crop_h = normH;
 
 	if (	ip_crop_x < 0 || ip_crop_y < 0 ||
 		ip_crop_w < 0 || ip_crop_h < 0 ||
-		ip_crop_x + ip_crop_w > m_ip_rotate.getOutput(0).size(1) ||
-		ip_crop_y + ip_crop_h > m_ip_rotate.getOutput(0).size(0))
+		ip_crop_x + ip_crop_w > m_ip_scale.getOutput(0).size(1) ||
+		ip_crop_y + ip_crop_h > m_ip_scale.getOutput(0).size(0))
 	{
 	   	warning("ipGeomNorm::processInput(): incorrect crop parameters.");
 		return false;
 	}
+
 
 	// Crop the image
 	if (	m_ip_crop.setIOption("x", ip_crop_x) == false ||
 		m_ip_crop.setIOption("y", ip_crop_y) == false ||
 		m_ip_crop.setIOption("w", ip_crop_w) == false ||
 		m_ip_crop.setIOption("h", ip_crop_h) == false ||
-		m_ip_crop.process(m_ip_rotate.getOutput(0)) == false)
+		m_ip_crop.process(m_ip_scale.getOutput(0)) == false)
 	{
 	   	warning("ipGeomNorm::processInput(): crop failure.");
 		return false;
@@ -452,11 +433,13 @@ bool ipGeomNorm::processInput(const Tensor& input)
 	////////////////////////////////////////////////////////////////
 	// FINISH: Just copy the pixel from the cropped image
 
+
 	m_output[0]->copy(&m_ip_crop.getOutput(0));
 
 	// OK
 	return true;
 }
+
 
 /////////////////////////////////////////////////////////////////////////
 
