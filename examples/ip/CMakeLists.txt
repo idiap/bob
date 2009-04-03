@@ -47,6 +47,7 @@ SET(EXAMPLE_SRC
 	ipflipper3d.cc
 	shift.cc
 	rotate.cc
+	blocks.cc
 	geomNorm.cc)
 
 FOREACH(file ${EXAMPLE_SRC})

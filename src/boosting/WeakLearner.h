@@ -22,7 +22,7 @@ namespace Torch {
 		bool setDataWeights(double *weights_dataset_);
 
 		///
-		bool setWeight(double weight_) { m_weight = weight_; }
+		bool setWeight(double weight_) { m_weight = weight_; return true; }
 
 		///
 		double getWeight() { return m_weight; }
