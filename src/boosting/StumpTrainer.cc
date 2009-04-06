@@ -161,8 +161,8 @@ namespace Torch
 				features_values[i] = z;
 
 				//
-			   	ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
-				short target_value = (*target)(i);
+			   	//ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
+				//short target_value = (*target)(i);
 
 				//
 				if(z < min_) min_ = z;
