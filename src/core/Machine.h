@@ -6,10 +6,9 @@
 
 namespace Torch {
 
-	class Tensor;
-	class DoubleTensor;
 	class Machine;
 	class File;
+	class spCore;
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::MachineManager:
@@ -78,6 +77,7 @@ namespace Torch {
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::Machine:
 	//      Process some input using a model (loaded from some file).
+	//	May use some spCore object to extract features.
 	//      The output is a DoubleTensor!
 	//
 	//      NB: The ouput should be allocated and deallocated by each Machine implementation!
@@ -106,8 +106,14 @@ namespace Torch {
 		/// (used by <MachineManager>, this object should be deallocated by the user)
 		virtual Machine*	getAnInstance() const = 0;
 
-		// Set the input size to use
-		virtual bool		setInputSize(const TensorSize& inputSize);
+		// Set the model size to use
+		virtual void		setSize(const TensorSize& size);
+
+		// Set the region to process (for the spCore, if needed)
+		virtual void		setRegion(const TensorRegion& region);
+
+		// Set the spCore to use for feature extraction (if needed)
+		virtual void		setCore(spCore* core = 0);
 
 		// Get the ID specific to each Machine
 		virtual int		getID() const = 0;
@@ -119,7 +125,7 @@ namespace Torch {
 		///////////////////////////////////////////////////////////
 		// Access functions
 
-		const TensorSize&	getInputSize() const { return m_inputSize; }
+		const TensorSize&	getSize() const { return m_size; }
 		const DoubleTensor&     getOutput() const;
 
 		///////////////////////////////////////////////////////////
@@ -129,8 +135,12 @@ namespace Torch {
 		///////////////////////////////////////////////////////////////
 		// Attributes
 
-		// Model size (size of the input tensor to process)
-		TensorSize		m_inputSize;
+		// Model size
+		TensorSize		m_size;
+
+		// <spCore> to extract some features (if needed)
+		spCore*			m_core;
+		TensorRegion		m_region;	// Region where to process
 
 		// The result when run on some data
 		DoubleTensor*		m_output;

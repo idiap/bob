@@ -74,7 +74,7 @@ bool ipHaar::processInput(const Tensor& input)
 
 	double white_sum = 0;
 	double black_sum = 0;
-	
+
 	if(type == 1)
 	{
 	   	// Vertical Haar (2 bands)
@@ -174,16 +174,6 @@ bool ipHaar::processInput(const Tensor& input)
 	return true;
 }
 
-bool ipHaar::saveFile(File& file) const
-{
-  	print("ipHaar()::saveFile()\n");
-  	print("   Type = %d\n", type);
-  	print("   X-Y = (%d-%d)\n", x, y);
-  	print("   WxH = [%dx%d]\n", w, h);
-
-	return true;
-}
-		
 /////////////////////////////////////////////////////////////////////////
 
 }

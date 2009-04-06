@@ -73,7 +73,7 @@ namespace Torch
 		bool			setXY(int x, int y);
 
 		// Change the input size (need to set the model size to the <ipLBP>) - overriden
-		virtual bool		setInputSize(const TensorSize& inputSize);
+		virtual void		setSize(const TensorSize& size);
 
 		///////////////////////////////////////////////////////////
 

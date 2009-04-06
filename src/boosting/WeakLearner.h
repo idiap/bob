@@ -3,17 +3,15 @@
 
 #include "Trainer.h"
 #include "spCore.h"
-#include "spCoreMachine.h"
+#include "Machine.h"
 
 namespace Torch {
-
-	class spCoreMachine;
 
 	class WeakLearner : public Trainer
 	{
 	public:
 		/// Constructor
-		WeakLearner(spCoreMachine *weak_classifier_, int n_features_, spCore **features_ = NULL);
+		WeakLearner(Machine *weak_classifier_, int n_features_, spCore **features_ = NULL);
 
 		///
 		bool setDataShuffledIndex(long *shuffledindex_dataset_);
@@ -35,18 +33,18 @@ namespace Torch {
 		////////////////////////////////////////////////////
 		/// Attributes
 
-		// 
+		//
 		long 	*m_shuffledindex_dataset;
 
 		//
 		double	*m_weights_dataset;
 
 		// The machine that will be trained
-		spCoreMachine 	*m_weak_classifier;
+		Machine 	*m_weak_classifier;
 
 		// The weight associated to the weak classifier
 		double m_weight;
-	
+
 		///
         	int m_n_features;
 

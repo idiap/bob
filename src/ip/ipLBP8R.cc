@@ -6,62 +6,204 @@
 
 #define COMPUTE_LBP8R(tensorType, dataType)                                                                     \
 {                                                                                                               \
-        const tensorType* t_input = (tensorType*)&input;                                                        \
-                                                                                                                \
-	const dataType* src = t_input->t->storage->data + t_input->t->storageOffset;                            \
-                                                                                                                \
-	const int in_stride_h = t_input->t->stride[0];	                                                        \
-	const int in_stride_w = t_input->t->stride[1];	                                                        \
-														\
-	const int offset_center = m_y * in_stride_h + m_x * in_stride_w;					\
+	const dataType* src = (const dataType*)input.dataR();							\
+	const int offset_center = 	(m_region.pos[0] + m_y) * m_input_stride_h +				\
+					(m_region.pos[1] + m_x) * m_input_stride_w;				\
 														\
 	dataType tab[8];                                                                                 	\
-	tab[1] = src[offset_center - m_R * in_stride_h];							\
-	tab[3] = src[offset_center + m_R * in_stride_w];                                        		\
-	tab[5] = src[offset_center + m_R * in_stride_h];                                        		\
-	tab[7] = src[offset_center - m_R * in_stride_w];                                        		\
+	tab[1] = src[offset_center - m_R * m_input_stride_h];							\
+	tab[3] = src[offset_center + m_R * m_input_stride_w];                                        		\
+	tab[5] = src[offset_center + m_R * m_input_stride_h];                                        		\
+	tab[7] = src[offset_center - m_R * m_input_stride_w];                                        		\
 														\
 	switch (m_R)                                                                                            \
 	{                                                                                                       \
 		case 1:                                                                                         \
-			tab[0] = src[offset_center - in_stride_h - in_stride_w];                        	\
-			tab[2] = src[offset_center - in_stride_h + in_stride_w];                        	\
-			tab[4] = src[offset_center + in_stride_h + in_stride_w];                        	\
-			tab[6] = src[offset_center + in_stride_h - in_stride_w];                        	\
+			tab[0] = src[offset_center - m_input_stride_h - m_input_stride_w];                      \
+			tab[2] = src[offset_center - m_input_stride_h + m_input_stride_w];                      \
+			tab[4] = src[offset_center + m_input_stride_h + m_input_stride_w];                      \
+			tab[6] = src[offset_center + m_input_stride_h - m_input_stride_w];                      \
 			break;                                                                                  \
 														\
 		case 2:                                                                                         \
-			tab[0] = (	src[offset_center - 2 * in_stride_h - 2 * in_stride_w] +                \
-					src[offset_center - 2 * in_stride_h - 1 * in_stride_w] +                \
-					src[offset_center - 1 * in_stride_h - 2 * in_stride_w] +                \
-					src[offset_center - 1 * in_stride_h - 1 * in_stride_w]) / 4;            \
+			tab[0] = (	src[offset_center - 2 * m_input_stride_h - 2 * m_input_stride_w] +      \
+					src[offset_center - 2 * m_input_stride_h - 1 * m_input_stride_w] +      \
+					src[offset_center - 1 * m_input_stride_h - 2 * m_input_stride_w] +      \
+					src[offset_center - 1 * m_input_stride_h - 1 * m_input_stride_w]) / 4;  \
                                                                                                                 \
-			tab[2] = (	src[offset_center - 2 * in_stride_h + 2 * in_stride_w] +                \
-					src[offset_center - 2 * in_stride_h + 1 * in_stride_w] +                \
-					src[offset_center - 1 * in_stride_h + 2 * in_stride_w] +                \
-					src[offset_center - 1 * in_stride_h + 1 * in_stride_w]) / 4;            \
+			tab[2] = (	src[offset_center - 2 * m_input_stride_h + 2 * m_input_stride_w] +      \
+					src[offset_center - 2 * m_input_stride_h + 1 * m_input_stride_w] +      \
+					src[offset_center - 1 * m_input_stride_h + 2 * m_input_stride_w] +      \
+					src[offset_center - 1 * m_input_stride_h + 1 * m_input_stride_w]) / 4;  \
                                                                                                                 \
-			tab[4] = (	src[offset_center + 2 * in_stride_h + 2 * in_stride_w] +                \
-					src[offset_center + 2 * in_stride_h + 1 * in_stride_w] +                \
-					src[offset_center + 1 * in_stride_h + 2 * in_stride_w] +                \
-					src[offset_center + 1 * in_stride_h + 1 * in_stride_w]) / 4;            \
+			tab[4] = (	src[offset_center + 2 * m_input_stride_h + 2 * m_input_stride_w] +      \
+					src[offset_center + 2 * m_input_stride_h + 1 * m_input_stride_w] +      \
+					src[offset_center + 1 * m_input_stride_h + 2 * m_input_stride_w] +      \
+					src[offset_center + 1 * m_input_stride_h + 1 * m_input_stride_w]) / 4;  \
                                                                                                                 \
-			tab[6] = (	src[offset_center + 2 * in_stride_h - 2 * in_stride_w] +                \
-					src[offset_center + 2 * in_stride_h - 1 * in_stride_w] +                \
-					src[offset_center + 1 * in_stride_h - 2 * in_stride_w] +                \
-					src[offset_center + 1 * in_stride_h - 1 * in_stride_w]) / 4;            \
+			tab[6] = (	src[offset_center + 2 * m_input_stride_h - 2 * m_input_stride_w] +      \
+					src[offset_center + 2 * m_input_stride_h - 1 * m_input_stride_w] +      \
+					src[offset_center + 1 * m_input_stride_h - 2 * m_input_stride_w] +      \
+					src[offset_center + 1 * m_input_stride_h - 1 * m_input_stride_w]) / 4;  \
 			break;                                                                                  \
 														\
 		default:                                                                                        \
-			tab[0] = bilinear_interpolation(src, in_stride_w, in_stride_h, m_x - m_r, m_y - m_r);   \
-			tab[2] = bilinear_interpolation(src, in_stride_w, in_stride_h, m_x + m_r, m_y - m_r);   \
-			tab[4] = bilinear_interpolation(src, in_stride_w, in_stride_h, m_x + m_r, m_y + m_r);   \
-			tab[6] = bilinear_interpolation(src, in_stride_w, in_stride_h, m_x - m_r, m_y + m_r);   \
+			tab[0] = bilinear_interpolation(src, m_input_stride_w, m_input_stride_h, m_x - m_r, m_y - m_r);   \
+			tab[2] = bilinear_interpolation(src, m_input_stride_w, m_input_stride_h, m_x + m_r, m_y - m_r);   \
+			tab[4] = bilinear_interpolation(src, m_input_stride_w, m_input_stride_h, m_x + m_r, m_y + m_r);   \
+			tab[6] = bilinear_interpolation(src, m_input_stride_w, m_input_stride_h, m_x - m_r, m_y + m_r);   \
 			break;                                                                                  \
 	}                                                                                                       \
                                                                                                                 \
 	const dataType center = src[offset_center];                                     			\
                                                                                                                 \
+	const dataType cmp_point = m_toAverage ?                                                                \
+		(dataType)                                                                                      \
+                        (0.5 + 0.111111 *                                                                       \
+                                (tab[0] + tab[1] + tab[2] + tab[3] + tab[4] + tab[5] + tab[6] + tab[7]          \
+                                        + center))                                                        	\
+		:                                                                                               \
+		center;                                                                                         \
+                                                                                                                \
+	unsigned int lbp = 0;                                                                                   \
+                                                                                                                \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[0] > cmp_point) lbp ++;                                                                         \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[1] > cmp_point) lbp ++;                                                                         \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[2] > cmp_point) lbp ++;                                                                         \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[3] > cmp_point) lbp ++;                                                                         \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[4] > cmp_point) lbp ++;                                                                         \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[5] > cmp_point) lbp ++;                                                                         \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[6] > cmp_point) lbp ++;                                                                         \
+	lbp = lbp << 1;                                                                                         \
+	if (tab[7] > cmp_point) lbp ++;                                                                         \
+	if (m_addAvgBit == true && m_rot_invariant == false && m_uniform == false)                              \
+	{                                                                                                       \
+		lbp = lbp << 1;                                                                                 \
+		if (center > cmp_point) lbp ++;                                                                 \
+	}                                                                                                       \
+                                                                                                                \
+        *m_lbp = m_crt_lut[lbp];										\
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute the 8R LBP code for a generic tensor using integral images
+
+#define COMPUTE_LBP8R_INTEGRAL(tensorType, dataType)                                                            \
+{                                                                                                               \
+	const dataType* src = (const dataType*)input.dataR();							\
+	const int offset_sw 	= 	m_region.pos[0] * m_input_stride_h +					\
+					m_region.pos[1] * m_input_stride_w;					\
+														\
+	dataType tab[8];                                                                                 	\
+	tab[1] = 	(	src[offset_sw + m_ii_tl[m_x][m_y - m_R]] +					\
+				src[offset_sw + m_ii_br[m_x][m_y - m_R]] -					\
+				src[offset_sw + m_ii_tr[m_x][m_y - m_R]] -					\
+				src[offset_sw + m_ii_bl[m_x][m_y - m_R]]) /					\
+				m_ii_cell_size[m_x][m_y - m_R];							\
+														\
+	tab[3] = 	(	src[offset_sw + m_ii_tl[m_x + m_R][m_y]] +					\
+				src[offset_sw + m_ii_br[m_x + m_R][m_y]] -					\
+				src[offset_sw + m_ii_tr[m_x + m_R][m_y]] -					\
+				src[offset_sw + m_ii_bl[m_x + m_R][m_y]]) /					\
+				m_ii_cell_size[m_x + m_R][m_y];							\
+														\
+	tab[5] = 	(	src[offset_sw + m_ii_tl[m_x][m_y + m_R]] +					\
+				src[offset_sw + m_ii_br[m_x][m_y + m_R]] -					\
+				src[offset_sw + m_ii_tr[m_x][m_y + m_R]] -					\
+				src[offset_sw + m_ii_bl[m_x][m_y + m_R]]) /					\
+				m_ii_cell_size[m_x][m_y + m_R];							\
+														\
+	tab[7] = 	(	src[offset_sw + m_ii_tl[m_x - m_R][m_y]] +					\
+				src[offset_sw + m_ii_br[m_x - m_R][m_y]] -					\
+				src[offset_sw + m_ii_tr[m_x - m_R][m_y]] -					\
+				src[offset_sw + m_ii_bl[m_x - m_R][m_y]]) /					\
+				m_ii_cell_size[m_x - m_R][m_y];							\
+	switch (m_R)                                                                                            \
+	{                                                                                                       \
+		case 1:                                                                                         \
+			tab[0] = 	(	src[offset_sw + m_ii_tl[m_x - 1][m_y - 1]] +			\
+						src[offset_sw + m_ii_br[m_x - 1][m_y - 1]] -			\
+						src[offset_sw + m_ii_tr[m_x - 1][m_y - 1]] -			\
+						src[offset_sw + m_ii_bl[m_x - 1][m_y - 1]]) /			\
+						m_ii_cell_size[m_x - 1][m_y - 1];				\
+														\
+			tab[2] = 	(	src[offset_sw + m_ii_tl[m_x + 1][m_y - 1]] +			\
+						src[offset_sw + m_ii_br[m_x + 1][m_y - 1]] -			\
+						src[offset_sw + m_ii_tr[m_x + 1][m_y - 1]] -			\
+						src[offset_sw + m_ii_bl[m_x + 1][m_y - 1]]) /			\
+						m_ii_cell_size[m_x + 1][m_y - 1];				\
+														\
+			tab[4] = 	(	src[offset_sw + m_ii_tl[m_x + 1][m_y + 1]] +			\
+						src[offset_sw + m_ii_br[m_x + 1][m_y + 1]] -			\
+						src[offset_sw + m_ii_tr[m_x + 1][m_y + 1]] -			\
+						src[offset_sw + m_ii_bl[m_x + 1][m_y + 1]]) /			\
+						m_ii_cell_size[m_x + 1][m_y + 1];				\
+														\
+			tab[6] = 	(	src[offset_sw + m_ii_tl[m_x - 1][m_y + 1]] +			\
+						src[offset_sw + m_ii_br[m_x - 1][m_y + 1]] -			\
+						src[offset_sw + m_ii_tr[m_x - 1][m_y + 1]] -			\
+						src[offset_sw + m_ii_bl[m_x - 1][m_y + 1]]) /			\
+						m_ii_cell_size[m_x - 1][m_y + 1];				\
+			break;                                                                                  \
+														\
+		case 2:                                                                                         \
+			tab[0] = 	(	src[offset_sw + m_ii_tl[m_x - 2][m_y - 2]] +			\
+						src[offset_sw + m_ii_br[m_x][m_y]] -				\
+						src[offset_sw + m_ii_tr[m_x][m_y - 2]] -			\
+						src[offset_sw + m_ii_bl[m_x - 2][m_y]]) /			\
+						(	m_ii_cell_size[m_x - 1][m_y - 1] + 			\
+							m_ii_cell_size[m_x - 2][m_y - 2] + 			\
+							m_ii_cell_size[m_x - 1][m_y - 2] + 			\
+							m_ii_cell_size[m_x - 2][m_y - 1]);			\
+														\
+			tab[2] = 	(	src[offset_sw + m_ii_tl[m_x + 2][m_y - 2]] +			\
+						src[offset_sw + m_ii_br[m_x][m_y]] -				\
+						src[offset_sw + m_ii_tr[m_x][m_y - 2]] -			\
+						src[offset_sw + m_ii_bl[m_x + 2][m_y]]) /			\
+						(	m_ii_cell_size[m_x + 1][m_y - 1] + 			\
+							m_ii_cell_size[m_x + 2][m_y - 2] + 			\
+							m_ii_cell_size[m_x + 1][m_y - 2] + 			\
+							m_ii_cell_size[m_x + 2][m_y - 1]);			\
+														\
+			tab[4] = 	(	src[offset_sw + m_ii_tl[m_x + 2][m_y + 2]] +			\
+						src[offset_sw + m_ii_br[m_x][m_y]] -				\
+						src[offset_sw + m_ii_tr[m_x][m_y + 2]] -			\
+						src[offset_sw + m_ii_bl[m_x + 2][m_y]]) /			\
+						(	m_ii_cell_size[m_x + 1][m_y + 1] + 			\
+							m_ii_cell_size[m_x + 2][m_y + 2] + 			\
+							m_ii_cell_size[m_x + 1][m_y + 2] + 			\
+							m_ii_cell_size[m_x + 2][m_y + 1]);			\
+														\
+			tab[6] = 	(	src[offset_sw + m_ii_tl[m_x - 2][m_y + 2]] +			\
+						src[offset_sw + m_ii_br[m_x][m_y]] -				\
+						src[offset_sw + m_ii_tr[m_x][m_y + 2]] -			\
+						src[offset_sw + m_ii_bl[m_x - 2][m_y]]) /			\
+						(	m_ii_cell_size[m_x - 1][m_y + 1] + 			\
+							m_ii_cell_size[m_x - 2][m_y + 2] + 			\
+							m_ii_cell_size[m_x - 1][m_y + 2] + 			\
+							m_ii_cell_size[m_x - 2][m_y + 1]);			\
+			break;                                                                                  \
+														\
+		default:                                                                                        \
+			CHECK_FATAL(false == true);								\
+			tab[0] = tab[2] = tab[4] = tab[6] = 0;							\
+			break;                                                                                  \
+	}                                                                                                       \
+                                                                                                                \
+	const dataType center = 										\
+			(	src[offset_sw + m_ii_tl[m_x][m_y]] +						\
+				src[offset_sw + m_ii_br[m_x][m_y]] -						\
+				src[offset_sw + m_ii_tr[m_x][m_y]] -						\
+				src[offset_sw + m_ii_bl[m_x][m_y]]) /						\
+				m_ii_cell_size[m_x][m_y];							\
+														\
 	const dataType cmp_point = m_toAverage ?                                                                \
 		(dataType)                                                                                      \
                         (0.5 + 0.111111 *                                                                       \
@@ -179,31 +321,67 @@ int ipLBP8R::getMaxLabel()
 
 bool ipLBP8R::processInput(const Tensor& input)
 {
-	switch (input.getDatatype())
+	// No interpolation needed, the model size is the same as the region size to process!
+	if (	m_modelSize.size[0] == m_region.size[0] &&
+		m_modelSize.size[1] == m_region.size[1])
 	{
-	case Tensor::Char:
-		COMPUTE_LBP8R(CharTensor, char);
-		break;
+		switch (input.getDatatype())
+		{
+		case Tensor::Char:
+			COMPUTE_LBP8R(CharTensor, char);
+			break;
 
-	case Tensor::Short:
-		COMPUTE_LBP8R(ShortTensor, short);
-		break;
+		case Tensor::Short:
+			COMPUTE_LBP8R(ShortTensor, short);
+			break;
 
-	case Tensor::Int:
-		COMPUTE_LBP8R(IntTensor, int);
-		break;
+		case Tensor::Int:
+			COMPUTE_LBP8R(IntTensor, int);
+			break;
 
-	case Tensor::Long:
-		COMPUTE_LBP8R(LongTensor, long);
-		break;
+		case Tensor::Long:
+			COMPUTE_LBP8R(LongTensor, long);
+			break;
 
-	case Tensor::Float:
-		COMPUTE_LBP8R(FloatTensor, float);
-		break;
+		case Tensor::Float:
+			COMPUTE_LBP8R(FloatTensor, float);
+			break;
 
-	case Tensor::Double:
-		COMPUTE_LBP8R(DoubleTensor, double);
-		break;
+		case Tensor::Double:
+			COMPUTE_LBP8R(DoubleTensor, double);
+			break;
+		}
+	}
+
+	// Interpolation needed!
+	else
+	{
+		switch (input.getDatatype())
+		{
+		case Tensor::Char:
+			COMPUTE_LBP8R_INTEGRAL(CharTensor, char);
+			break;
+
+		case Tensor::Short:
+			COMPUTE_LBP8R_INTEGRAL(ShortTensor, short);
+			break;
+
+		case Tensor::Int:
+			COMPUTE_LBP8R_INTEGRAL(IntTensor, int);
+			break;
+
+		case Tensor::Long:
+			COMPUTE_LBP8R_INTEGRAL(LongTensor, long);
+			break;
+
+		case Tensor::Float:
+			COMPUTE_LBP8R_INTEGRAL(FloatTensor, float);
+			break;
+
+		case Tensor::Double:
+			COMPUTE_LBP8R_INTEGRAL(DoubleTensor, double);
+			break;
+		}
 	}
 
 	return true;

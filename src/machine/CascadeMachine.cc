@@ -82,14 +82,11 @@ bool CascadeMachine::Stage::setWeight(int i_machine, double weight)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Set the input size to use (need to set the model size to each <Machine>) - overriden
+// Set the model size to use (need to set the model size to each <Machine>) - overriden
 
-bool CascadeMachine::setInputSize(const TensorSize& inputSize)
+void CascadeMachine::setSize(const TensorSize& size)
 {
-	if (Machine::setInputSize(inputSize) == false)
-	{
-		return false;
-	}
+	Machine::setSize(size);
 
 	// OK, set the model size to each <Machine>
 	for (int s = 0; s < m_n_stages; s ++)
@@ -100,11 +97,10 @@ bool CascadeMachine::setInputSize(const TensorSize& inputSize)
 			Machine* machine = stage.m_machines[n];
 			if (machine != 0)
 			{
-				machine->setInputSize(inputSize);
+				machine->setSize(size);
 			}
 		}
 	}
-	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -197,6 +193,7 @@ bool CascadeMachine::forward(const Tensor& input)
 				Torch::message("CascadeMachine::forward - invalid machine!\n");
 				return false;
 			}
+			machine->setRegion(m_region);
 			if (machine->forward(input) == false)
 			{
 				Torch::message("CascadeMachine::forward - error running the machine!\n");
@@ -299,12 +296,6 @@ bool CascadeMachine::loadFile(File& file)
 				Torch::message("CascadeMachine::load - invalid machine ID!\n");
 				return false;
 			}
-			if (machine->setInputSize(inputSize) == false)
-			{
-			        delete machine;
-			        Torch::message("CascadeMachine::load - could not set the machine's model size!\n");
-				return false;
-                        }
 
 			// Load the machine's parameters
 			if (machine->loadFile(file) == false)
@@ -334,7 +325,8 @@ bool CascadeMachine::loadFile(File& file)
 	}
 
 	// OK, force the model size to all Machines
-	return setInputSize(inputSize);
+	setSize(inputSize);
+	return true;
 }
 
 bool CascadeMachine::saveFile(File& file) const
@@ -348,7 +340,7 @@ bool CascadeMachine::saveFile(File& file) const
 	}
 
 	// Write the model size
-	if (file.taggedWrite(&m_inputSize, sizeof(TensorSize), 1, "INPUT_SIZE") != 1)
+	if (file.taggedWrite(&m_size, sizeof(TensorSize), 1, "INPUT_SIZE") != 1)
 	{
 		Torch::message("CascadeMachine::save - failed to write <INPUT_SIZE> field!\n");
 		return false;
@@ -459,7 +451,7 @@ bool CascadeMachine::setMachine(int i_stage, int i_machine, Machine* machine)
 	if (stage.setMachine(i_machine, machine))
 	{
 		// Don't forget to set the model size to this machine too
-		machine->setInputSize(m_inputSize);
+		machine->setSize(m_size);
 		return true;
 	}
 	return false;

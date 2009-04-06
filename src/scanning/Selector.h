@@ -8,7 +8,7 @@ namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::Scanning::Selector
-	//	- given a list of candidate sub-windows and possible a ConfidenceDistribution,
+	//	- given a list of candidate sub-windows,
 	//		it will select just some of these sub-windows as the best ones!
 	//
 	// TODO: doxygen header!

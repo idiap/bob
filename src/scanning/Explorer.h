@@ -102,7 +102,7 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 
 		// Constructor
-		Explorer(ipSWEvaluator* swEvaluator = 0);
+		Explorer();
 
 		// Destructor
 		virtual ~Explorer();

@@ -55,27 +55,23 @@ void ipSWVariancePruner::optionChanged(const char* name)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Change the sub-window to process in - overriden
-// Checks also if the sub-window is rejected
+/// Change the region of the input tensor to process
 
-bool ipSWVariancePruner::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
+void ipSWVariancePruner::setRegion(const TensorRegion& region)
 {
-        // If the sub-window size is changed, then update the precomputed factors
-        if (sw_w != m_sw_w || sw_h != m_sw_h)
+	// If the sub-window size is changed, then update the precomputed factors
+        if (	m_region.size[0] != region.size[0] ||
+		m_region.size[1] != region.size[1])
         {
-                m_sw_size = sw_w * sw_h;
+                m_sw_size = region.size[0] * region.size[1];
                 m_scaled_min_mean = m_min_mean * m_sw_size;
                 m_scaled_max_mean = m_max_mean * m_sw_size;
                 m_square_min_stdev = m_min_stdev * m_min_stdev * m_sw_size * m_sw_size;
                 m_square_max_stdev = m_max_stdev * m_max_stdev * m_sw_size * m_sw_size;
         }
 
-        // Set the sub-window coordinates (it will check the coordinates too)
-        if (ipSWPruner::setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
-        {
-                return false;
-        }
-
+	// Set the region (subwindow) to process
+	setRegion(region);
         m_isRejected = false;
 
         // Compute the sum and the square sum if required
@@ -94,8 +90,6 @@ bool ipSWVariancePruner::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
                 const double square_stdev = square_sum * m_sw_size - sum * sum;
                 m_isRejected = square_stdev < m_square_min_stdev || square_stdev > m_square_max_stdev;
         }
-
-        return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -103,6 +97,11 @@ bool ipSWVariancePruner::setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h)
 
 double ipSWVariancePruner::getSumII(const ipIntegral& ipi)
 {
+	const int sw_x = m_region.pos[1];
+	const int sw_y = m_region.pos[0];
+	const int sw_w = m_region.size[1];
+	const int sw_h = m_region.size[0];
+
         const Tensor& ii = ipi.getOutput(0);
         switch (ii.getDatatype())
         {
@@ -112,13 +111,13 @@ double ipSWVariancePruner::getSumII(const ipIntegral& ipi)
 
                         if (data.nDimension() == 2)
                         {
-                                return  (data.get(m_sw_y, m_sw_x) + data.get(m_sw_y + m_sw_h, m_sw_x + m_sw_w)) -
-                                        (data.get(m_sw_y + m_sw_h, m_sw_x) + data.get(m_sw_y, m_sw_x + m_sw_w));
+                                return  (data.get(sw_y, sw_x) + data.get(sw_y + sw_h, sw_x + sw_w)) -
+                                        (data.get(sw_y + sw_h, sw_x) + data.get(sw_y, sw_x + sw_w));
                         }
                         else
                         {
-                                return  (data.get(m_sw_y, m_sw_x, 0) + data.get(m_sw_y + m_sw_h, m_sw_x + m_sw_w, 0)) -
-                                        (data.get(m_sw_y + m_sw_h, m_sw_x, 0) + data.get(m_sw_y, m_sw_x + m_sw_w, 0));
+                                return  (data.get(sw_y, sw_x, 0) + data.get(sw_y + sw_h, sw_x + sw_w, 0)) -
+                                        (data.get(sw_y + sw_h, sw_x, 0) + data.get(sw_y, sw_x + sw_w, 0));
                         }
                 }
                 break;
@@ -129,13 +128,13 @@ double ipSWVariancePruner::getSumII(const ipIntegral& ipi)
 
                         if (data.nDimension() == 2)
                         {
-                                return  (data.get(m_sw_y, m_sw_x) + data.get(m_sw_y + m_sw_h, m_sw_x + m_sw_w)) -
-                                        (data.get(m_sw_y + m_sw_h, m_sw_x) + data.get(m_sw_y, m_sw_x + m_sw_w));
+                                return  (data.get(sw_y, sw_x) + data.get(sw_y + sw_h, sw_x + sw_w)) -
+                                        (data.get(sw_y + sw_h, sw_x) + data.get(sw_y, sw_x + sw_w));
                         }
                         else
                         {
-                                return  (data.get(m_sw_y, m_sw_x, 0) + data.get(m_sw_y + m_sw_h, m_sw_x + m_sw_w, 0)) -
-                                        (data.get(m_sw_y + m_sw_h, m_sw_x, 0) + data.get(m_sw_y, m_sw_x + m_sw_w, 0));
+                                return  (data.get(sw_y, sw_x, 0) + data.get(sw_y + sw_h, sw_x + sw_w, 0)) -
+                                        (data.get(sw_y + sw_h, sw_x, 0) + data.get(sw_y, sw_x + sw_w, 0));
                         }
                 }
                 break;
@@ -146,13 +145,13 @@ double ipSWVariancePruner::getSumII(const ipIntegral& ipi)
 
                         if (data.nDimension() == 2)
                         {
-                                return  (data.get(m_sw_y, m_sw_x) + data.get(m_sw_y + m_sw_h, m_sw_x + m_sw_w)) -
-                                        (data.get(m_sw_y + m_sw_h, m_sw_x) + data.get(m_sw_y, m_sw_x + m_sw_w));
+                                return  (data.get(sw_y, sw_x) + data.get(sw_y + sw_h, sw_x + sw_w)) -
+                                        (data.get(sw_y + sw_h, sw_x) + data.get(sw_y, sw_x + sw_w));
                         }
                         else
                         {
-                                return  (data.get(m_sw_y, m_sw_x, 0) + data.get(m_sw_y + m_sw_h, m_sw_x + m_sw_w, 0)) -
-                                        (data.get(m_sw_y + m_sw_h, m_sw_x, 0) + data.get(m_sw_y, m_sw_x + m_sw_w, 0));
+                                return  (data.get(sw_y, sw_x, 0) + data.get(sw_y + sw_h, sw_x + sw_w, 0)) -
+                                        (data.get(sw_y + sw_h, sw_x, 0) + data.get(sw_y, sw_x + sw_w, 0));
                         }
                 }
                 break;

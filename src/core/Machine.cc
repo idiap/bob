@@ -1,5 +1,6 @@
 #include "Machine.h"
 #include "Tensor.h"
+#include "spCore.h"
 
 namespace Torch {
 
@@ -8,7 +9,8 @@ namespace Torch {
 
 Machine::Machine()
 	: 	Object(),
-		m_inputSize(),
+		m_size(),
+		m_core(0),
 		m_output(0)
 {
 }
@@ -21,12 +23,31 @@ Machine::~Machine()
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// Set the input size to use
+// Set the model size to use
 
-bool Machine::setInputSize(const TensorSize& inputSize)
+void Machine::setSize(const TensorSize& size)
 {
-	m_inputSize = inputSize;
-	return true;
+	m_size = size;
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Set the region to process (for the spCore, if needed)
+
+void Machine::setRegion(const TensorRegion& region)
+{
+	m_region = region;
+	if (m_core != 0)
+	{
+		m_core->setRegion(region);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+// Set the spCore to use for feature extraction (if needed)
+
+void Machine::setCore(spCore* core)
+{
+	m_core = core;
 }
 
 ///////////////////////////////////////////////////////////////////////////

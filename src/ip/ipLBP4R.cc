@@ -6,20 +6,83 @@
 
 #define COMPUTE_LBP4R(tensorType, dataType)							\
 {												\
-	const tensorType* t_input = (tensorType*)&input;					\
-												\
-	const dataType* src = t_input->t->storage->data + t_input->t->storageOffset;		\
-												\
-	const int in_stride_h = t_input->t->stride[0];						\
-	const int in_stride_w = t_input->t->stride[1];						\
+	const dataType* src = (const dataType*)input.dataR();					\
+	const int offset_center = 	(m_region.pos[0] + m_y) * m_input_stride_h +		\
+					(m_region.pos[1] + m_x) * m_input_stride_w;		\
 												\
 	dataType tab[4];									\
-	tab[0] = src[(m_y - m_R) * in_stride_h + m_x * in_stride_w];				\
-	tab[1] = src[m_y * in_stride_h + (m_x + m_R) * in_stride_w];				\
-	tab[2] = src[(m_y + m_R) * in_stride_h + m_x * in_stride_w];				\
-	tab[3] = src[m_y * in_stride_h + (m_x - m_R) * in_stride_w];				\
+	tab[0] = src[offset_center - m_R * m_input_stride_h];					\
+	tab[1] = src[offset_center + m_R * m_input_stride_w];					\
+	tab[2] = src[offset_center + m_R * m_input_stride_h];					\
+	tab[3] = src[offset_center - m_R * m_input_stride_w];					\
 												\
-	const dataType center = src[m_y * in_stride_h + m_x * in_stride_w];			\
+	const dataType center = src[offset_center];						\
+												\
+	const dataType cmp_point = m_toAverage ?						\
+		(dataType)									\
+                        (0.5 + 0.2 * (tab[0] + tab[1] + tab[2] + tab[3] + center + 0.0))	\
+		:										\
+		center;										\
+												\
+	unsigned char lbp = 0;									\
+												\
+	lbp = lbp << 1;										\
+	if (tab[0] > cmp_point) lbp ++;								\
+	lbp = lbp << 1;										\
+	if (tab[1] > cmp_point) lbp ++;								\
+	lbp = lbp << 1;										\
+	if (tab[2] > cmp_point) lbp ++;								\
+	lbp = lbp << 1;										\
+	if (tab[3] > cmp_point) lbp ++;								\
+	if (m_addAvgBit == true && m_rot_invariant == false && m_uniform == false)              \
+	{                                                                                       \
+		lbp = lbp << 1;                                                                 \
+		if (center > cmp_point) lbp ++;                                                 \
+	}                                                                                       \
+                                                                                                \
+	*m_lbp = m_crt_lut[lbp];								\
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute the 4R LBP code for a generic tensor (by interpolating using an integral image)
+
+#define COMPUTE_LBP4R_INTEGRAL(tensorType, dataType)						\
+{												\
+	const dataType* src = (const dataType*)input.dataR();					\
+	const int offset_sw 	= 	m_region.pos[0] * m_input_stride_h +			\
+					m_region.pos[1] * m_input_stride_w;			\
+												\
+	dataType tab[4];									\
+	tab[0] = 	(	src[offset_sw + m_ii_tl[m_x][m_y - m_R]] +			\
+				src[offset_sw + m_ii_br[m_x][m_y - m_R]] -			\
+				src[offset_sw + m_ii_tr[m_x][m_y - m_R]] -			\
+				src[offset_sw + m_ii_bl[m_x][m_y - m_R]]) /			\
+				m_ii_cell_size[m_x][m_y - m_R];					\
+												\
+	tab[1] = 	(	src[offset_sw + m_ii_tl[m_x + m_R][m_y]] +			\
+				src[offset_sw + m_ii_br[m_x + m_R][m_y]] -			\
+				src[offset_sw + m_ii_tr[m_x + m_R][m_y]] -			\
+				src[offset_sw + m_ii_bl[m_x + m_R][m_y]]) /			\
+				m_ii_cell_size[m_x + m_R][m_y];					\
+												\
+	tab[2] = 	(	src[offset_sw + m_ii_tl[m_x][m_y + m_R]] +			\
+				src[offset_sw + m_ii_br[m_x][m_y + m_R]] -			\
+				src[offset_sw + m_ii_tr[m_x][m_y + m_R]] -			\
+				src[offset_sw + m_ii_bl[m_x][m_y + m_R]]) /			\
+				m_ii_cell_size[m_x][m_y + m_R];					\
+												\
+	tab[3] = 	(	src[offset_sw + m_ii_tl[m_x - m_R][m_y]] +			\
+				src[offset_sw + m_ii_br[m_x - m_R][m_y]] -			\
+				src[offset_sw + m_ii_tr[m_x - m_R][m_y]] -			\
+				src[offset_sw + m_ii_bl[m_x - m_R][m_y]]) /			\
+				m_ii_cell_size[m_x - m_R][m_y];					\
+												\
+	const dataType center = 								\
+			(	src[offset_sw + m_ii_tl[m_x][m_y]] +				\
+				src[offset_sw + m_ii_br[m_x][m_y]] -				\
+				src[offset_sw + m_ii_tr[m_x][m_y]] -				\
+				src[offset_sw + m_ii_bl[m_x][m_y]]) /				\
+				m_ii_cell_size[m_x][m_y];					\
 												\
 	const dataType cmp_point = m_toAverage ?						\
 		(dataType)									\
@@ -113,31 +176,67 @@ int ipLBP4R::getMaxLabel()
 
 bool ipLBP4R::processInput(const Tensor& input)
 {
-	switch (input.getDatatype())
+	// No interpolation needed, the model size is the same as the region size to process!
+	if (	m_modelSize.size[0] == m_region.size[0] &&
+		m_modelSize.size[1] == m_region.size[1])
 	{
-	case Tensor::Char:
-		COMPUTE_LBP4R(CharTensor, char);
-		break;
+		switch (input.getDatatype())
+		{
+		case Tensor::Char:
+			COMPUTE_LBP4R(CharTensor, char);
+			break;
 
-	case Tensor::Short:
-		COMPUTE_LBP4R(ShortTensor, short);
-		break;
+		case Tensor::Short:
+			COMPUTE_LBP4R(ShortTensor, short);
+			break;
 
-	case Tensor::Int:
-		COMPUTE_LBP4R(IntTensor, int);
-		break;
+		case Tensor::Int:
+			COMPUTE_LBP4R(IntTensor, int);
+			break;
 
-	case Tensor::Long:
-		COMPUTE_LBP4R(LongTensor, long);
-		break;
+		case Tensor::Long:
+			COMPUTE_LBP4R(LongTensor, long);
+			break;
 
-	case Tensor::Float:
-		COMPUTE_LBP4R(FloatTensor, float);
-		break;
+		case Tensor::Float:
+			COMPUTE_LBP4R(FloatTensor, float);
+			break;
 
-	case Tensor::Double:
-		COMPUTE_LBP4R(DoubleTensor, double);
-		break;
+		case Tensor::Double:
+			COMPUTE_LBP4R(DoubleTensor, double);
+			break;
+		}
+	}
+
+	// Interpolation needed!
+	else
+	{
+		switch (input.getDatatype())
+		{
+		case Tensor::Char:
+			COMPUTE_LBP4R_INTEGRAL(CharTensor, char);
+			break;
+
+		case Tensor::Short:
+			COMPUTE_LBP4R_INTEGRAL(ShortTensor, short);
+			break;
+
+		case Tensor::Int:
+			COMPUTE_LBP4R_INTEGRAL(IntTensor, int);
+			break;
+
+		case Tensor::Long:
+			COMPUTE_LBP4R_INTEGRAL(LongTensor, long);
+			break;
+
+		case Tensor::Float:
+			COMPUTE_LBP4R_INTEGRAL(FloatTensor, float);
+			break;
+
+		case Tensor::Double:
+			COMPUTE_LBP4R_INTEGRAL(DoubleTensor, double);
+			break;
+		}
 	}
 
 	return true;

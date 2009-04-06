@@ -1,5 +1,4 @@
 #include "ipSWPruner.h"
-#include "Tensor.h"
 
 namespace Torch
 {
@@ -8,7 +7,7 @@ namespace Torch
 // Constructor
 
 ipSWPruner::ipSWPruner()
-	:	ipSubWindow(),
+	:	ipCore(),
 		m_isRejected(false)
 {
 }

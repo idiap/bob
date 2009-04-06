@@ -45,18 +45,18 @@ bool ScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
 
 bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerData& explorerData)
 {
+	static TensorRegion subwindow(0, 0, 0, 0);
+
+	subwindow.pos[0] = sw_y; subwindow.size[0] = sw_h;
+	subwindow.pos[1] = sw_x; subwindow.size[1] = sw_w;
+
         // Check if the subwindow should be prunned ...
         if (explorerData.m_nSWPruners > 0)
         {
 		for (int i = 0; i < explorerData.m_nSWPruners; i ++)
 		{
 			ipSWPruner* swPruner = explorerData.m_swPruners[i];
-
-			if (swPruner->setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
-			{
-				//Torch::message("ScaleExplore::processSW - error calling some pruner!\n");
-				return false;
-			}
+			swPruner->setRegion(subwindow);
 
 			// If rejected, then there is no point in running the pattern model!
 			if (swPruner->isRejected() == true)
@@ -69,11 +69,7 @@ bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerDa
 
 	// Not rejected, so run the pattern model (evaluator) on this sub-window
 	ipSWEvaluator* swEvaluator = explorerData.m_swEvaluator;
-	if (swEvaluator->setSubWindow(sw_x, sw_y, sw_w, sw_h) == false)
-	{
-//		//Torch::message("ScaleExplorer::processSW - error calling the evaluator!\n");
-		return false;
-	}
+	swEvaluator->setRegion(subwindow);
 
 	// OK, update statistics and keep the sub-window if accepted
 	explorerData.m_stat_scanned ++;
@@ -86,10 +82,7 @@ bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerDa
 		//	(for pyramid scanning approach, these sub-windows may need rescalling first,
 		//	and <storePattern> will take care of this)
 		explorerData.storePattern(
-				swEvaluator->getSubWindowX(),
-				swEvaluator->getSubWindowY(),
-				swEvaluator->getSubWindowW(),
-				swEvaluator->getSubWindowH(),
+				sw_x, sw_y, sw_w, sw_h,
 				swEvaluator->getConfidence());
 	}
 

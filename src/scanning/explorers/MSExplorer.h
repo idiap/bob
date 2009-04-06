@@ -39,7 +39,7 @@ namespace Torch
 	{
 	public:
 		// Constructor
-		MSExplorer(ipSWEvaluator* swEvaluator = 0);
+		MSExplorer();
 
 		// Destructor
 		virtual ~MSExplorer();

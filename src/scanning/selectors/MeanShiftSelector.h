@@ -34,23 +34,10 @@ namespace Torch
 
 		/////////////////////////////////////////////////////////////////
 
-		// Get the closest points to the given one (using LSH table)
+		// Get the closest points to the given one
 		// Returns the number of found points
 		int			getClosest(const Pattern& pattern);
-		int			getClosest(double cx, double cy, double w, double h);
-
-		// Get the distance between two points (cx, cy, w, h)
-		static double		getDistance(const Pattern& pattern, double cx, double cy, double w, double h);
-		static double		getDistance(	double cx1, double cy1, double w1, double h1,
-							double cx2, double cy2, double w2, double h2);
-
-		// Compute the kernel function
-		static double		getKernel(double distance, double bandwidth)
-		{
-			return 1.0;
-			const double inv = distance / bandwidth;
-			return inv * inv;
-		}
+		int			getClosest(double x, double y, double w, double h);
 
 		static const int 	MaxNoClosestPoints = 1024;
 

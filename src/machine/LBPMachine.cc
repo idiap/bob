@@ -48,6 +48,7 @@ bool LBPMachine::setLBPType(LBPType lbp_type)
 
 	// Create the new ipLBP and allocate the LUT accordingly
 	m_ip_lbp = makeIpLBP(lbp_type);
+	m_ip_lbp->setModelSize(m_size);
 	m_lbp_type = lbp_type;
 
 	m_lut_size = m_ip_lbp->getMaxLabel();
@@ -75,15 +76,13 @@ bool LBPMachine::setLBPRadius(int lbp_radius)
 //////////////////////////////////////////////////////////////////////////
 // Change the model size (need to set the model size to the <ipLBP>) - overriden
 
-bool LBPMachine::setInputSize(const TensorSize& inputSize)
+void LBPMachine::setSize(const TensorSize& size)
 {
-	if (Machine::setInputSize(inputSize) == false)
+	Machine::setSize(size);
+	if (m_ip_lbp != 0)
 	{
-		return false;
+		m_ip_lbp->setModelSize(size);
 	}
-
-	// OK
-	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -298,6 +297,7 @@ bool LBPMachine::forward(const Tensor& input)
 	}
 
 	// Initialize the ipLBP (the input size was already set in the <setModelSize> and <setLBPType> functions!)
+	m_ip_lbp->setRegion(m_region);
 	if (m_ip_lbp->setXY(m_x, m_y) == false)
 	{
 	        Torch::message("LBPMachine::forward - failed to initialize the ipLBP!\n");

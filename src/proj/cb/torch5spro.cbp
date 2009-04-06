@@ -215,8 +215,6 @@
 		<Unit filename="../../boosting/StumpTrainer.h" />
 		<Unit filename="../../boosting/WeakLearner.cc" />
 		<Unit filename="../../boosting/WeakLearner.h" />
-		<Unit filename="../../boosting/spCoreMachine.cc" />
-		<Unit filename="../../boosting/spCoreMachine.h" />
 		<Unit filename="../../core/CMakeLists.txt" />
 		<Unit filename="../../core/CmdFile.cc" />
 		<Unit filename="../../core/CmdFile.h" />
@@ -230,6 +228,8 @@
 		<Unit filename="../../core/DiskDataSet.h" />
 		<Unit filename="../../core/File.cc" />
 		<Unit filename="../../core/File.h" />
+		<Unit filename="../../core/FileList.cc" />
+		<Unit filename="../../core/FileList.h" />
 		<Unit filename="../../core/FileListCmdOption.cc" />
 		<Unit filename="../../core/FileListCmdOption.h" />
 		<Unit filename="../../core/MTimer.cc" />
@@ -254,8 +254,6 @@
 		<Unit filename="../../core/general.h" />
 		<Unit filename="../../core/ipCore.cc" />
 		<Unit filename="../../core/ipCore.h" />
-		<Unit filename="../../core/ipSubWindow.cc" />
-		<Unit filename="../../core/ipSubWindow.h" />
 		<Unit filename="../../core/spCore.cc" />
 		<Unit filename="../../core/spCore.h" />
 		<Unit filename="../../geometry/Affine2D.cc" />
@@ -323,6 +321,8 @@
 		<Unit filename="../../ip/ipFlip.h" />
 		<Unit filename="../../ip/ipGeomNorm.cc" />
 		<Unit filename="../../ip/ipGeomNorm.h" />
+		<Unit filename="../../ip/ipHaar.cc" />
+		<Unit filename="../../ip/ipHaar.h" />
 		<Unit filename="../../ip/ipHisto.cc" />
 		<Unit filename="../../ip/ipHisto.h" />
 		<Unit filename="../../ip/ipIntegral.cc" />
@@ -359,9 +359,10 @@
 		<Unit filename="../../machine/LBPMachine.h" />
 		<Unit filename="../../machine/Machines.cc" />
 		<Unit filename="../../machine/Machines.h" />
+		<Unit filename="../../measurer/CMakeLists.txt" />
+		<Unit filename="../../measurer/measurer.cc" />
+		<Unit filename="../../measurer/measurer.h" />
 		<Unit filename="../../scanning/CMakeLists.txt" />
-		<Unit filename="../../scanning/ConfidenceDistribution.cc" />
-		<Unit filename="../../scanning/ConfidenceDistribution.h" />
 		<Unit filename="../../scanning/Explorer.cc" />
 		<Unit filename="../../scanning/Explorer.h" />
 		<Unit filename="../../scanning/Pattern.cc" />

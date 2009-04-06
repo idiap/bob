@@ -55,7 +55,7 @@ namespace Torch
 	public:
 
 		// Constructor
-		PyramidExplorer(ipSWEvaluator* swEvaluator = 0);
+		PyramidExplorer();
 
 		// Destructor
 		virtual ~PyramidExplorer();
