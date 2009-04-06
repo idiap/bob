@@ -8,8 +8,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 # Set the include directories and linking libraries
 SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
-			"${TORCH5SPRO_DIR}/src/th/")
-LINK_LIBRARIES("${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a")
+			"${TORCH5SPRO_DIR}/src/th/"
+			"${TORCH5SPRO_DIR}/src/ip/"
+			"${TORCH5SPRO_DIR}/src/ip/imagefiles/"
+			"${TORCH5SPRO_DIR}/extras/jpeg/")
+LINK_LIBRARIES("${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
+		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
 
 # Set the compiler flags and build type (release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -29,6 +33,7 @@ MESSAGE("---------------------------------------------" "")
 
 SET(EXAMPLE_SRC
 	readtensor.cc
+	tensor2image.cc
 	bindata2tensor.cc
 	tensorfiles.cc
 	largememorydataset.cc
