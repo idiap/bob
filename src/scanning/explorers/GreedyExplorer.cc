@@ -1,6 +1,7 @@
 #include "GreedyExplorer.h"
 #include "ipSWEvaluator.h"
 #include "ScaleExplorer.h"
+#include "File.h"
 
 namespace Torch
 {
@@ -8,8 +9,8 @@ namespace Torch
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-GreedyExplorer::GreedyExplorer(ipSWEvaluator* swEvaluator, Mode mode)
-	: 	MSExplorer(swEvaluator),
+GreedyExplorer::GreedyExplorer(Mode mode)
+	: 	MSExplorer(),
 		m_mode(mode),
 		m_profileFlags(new unsigned char[NoConfigs]),
 		m_profileScores(new double[NoConfigs])

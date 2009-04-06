@@ -2,7 +2,7 @@
 
 namespace Torch
 {
-	WeakLearner::WeakLearner(spCoreMachine *weak_classifier_, int n_features_, spCore **features_)
+	WeakLearner::WeakLearner(Machine *weak_classifier_, int n_features_, spCore **features_)
 	{
         	m_shuffledindex_dataset = NULL;
         	m_weights_dataset = NULL;

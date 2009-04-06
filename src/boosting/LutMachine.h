@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_LUT_MACHINE_H_
 #define _TORCH5SPRO_LUT_MACHINE_H_
 
-#include "spCoreMachine.h"
+#include "Machine.h"
 
 namespace Torch {
 
@@ -20,7 +20,7 @@ namespace Torch {
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class LutMachine : public spCoreMachine
+	class LutMachine : public Machine
 	{
 
 	public:

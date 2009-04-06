@@ -8,7 +8,6 @@ SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/spCore.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipCore.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/apCore.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipSubWindow.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/DataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/MemoryDataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/DiskDataSet.cc"

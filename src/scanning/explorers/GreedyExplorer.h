@@ -41,7 +41,7 @@ namespace Torch
 							(2 * NoVarS + 1);
 
 		// Constructor
-		GreedyExplorer(ipSWEvaluator* swEvaluator = 0, Mode = Scanning);
+		GreedyExplorer(Mode = Scanning);
 
 		// Destructor
 		virtual ~GreedyExplorer();

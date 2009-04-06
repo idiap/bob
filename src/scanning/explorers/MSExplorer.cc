@@ -31,12 +31,12 @@ void MSExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, double
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-MSExplorer::MSExplorer(ipSWEvaluator* swEvaluator)
-	: 	Explorer(swEvaluator),
+MSExplorer::MSExplorer()
+	: 	Explorer(),
                 m_prune_tensor(0),
                 m_evaluation_itensor(0)
 {
-	m_data = new MSExplorerData(swEvaluator);
+	m_data = new MSExplorerData();
 }
 
 /////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_IP_HAAR_H_
 #define _TORCH5SPRO_IP_HAAR_H_
 
-#include "ipCore.h"	
+#include "ipCore.h"
 #include "Tensor.h"
 
 namespace Torch
@@ -36,8 +36,6 @@ namespace Torch
 
 		/// Process some input tensor (the input is checked, the outputs are allocated) - overriden
 		virtual bool		processInput(const Tensor& input);
-
-		virtual bool 		saveFile(File& file) const;
 
 		/////////////////////////////////////////////////////////////////
 

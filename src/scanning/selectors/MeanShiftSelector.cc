@@ -32,54 +32,17 @@ void MeanShiftSelector::clear()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Get the closest points to the given one (using LSH table)
-// Returns the number of found points
+// Compute the kernel function (actual the derivate)
 
-inline int MeanShiftSelector::getClosest(const Pattern& pattern)
+static double kernel(double distance, double bandwidth)
 {
-	return getClosest(	(double)pattern.getCenterX(),
-				(double)pattern.getCenterY(),
-				(double)pattern.m_w,
-				(double)pattern.m_h);
-}
-
-int MeanShiftSelector::getClosest(double cx, double cy, double w, double h)
-{
-	const int n_patterns = m_candidates->size();
-	int isize = 0;
-
-	if (m_bandwidthsComputed == false)
-	{
-		// Add to the list each sub-window with at least some intersection!
-		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
-		{
-			const double distance = getDistance(m_candidates->get(i), cx, cy, w, h);
-			if (distance < 1.0)
-			{
-				m_iclosest[isize] = i;
-				m_iDistClosest[isize ++] = distance;
-			}
-		}
-	}
-	else
-	{
-		// Add to the list each sub-window within its bandwidth!
-		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
-		{
-			const double distance = getDistance(m_candidates->get(i), cx, cy, w, h);
-			if (distance < m_bandwidths[i])
-			{
-				m_iclosest[isize] = i;
-				m_iDistClosest[isize ++] = distance;
-			}
-		}
-	}
-
-	return isize;
+	return 1.0;
+	const double inv = distance / bandwidth;
+	return inv * inv;
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Get the distance between two points (cx, cy, w, h)
+// Get the distance between two points (x, y, w, h)
 
 static double sw_intersection(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
 				double sw2_x, double sw2_y, double sw2_w, double sw2_h)
@@ -106,25 +69,98 @@ static double sw_intersection(	double sw1_x, double sw1_y, double sw1_w, double 
 	}
 }
 
-static double sw_distance(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
-				double sw2_x, double sw2_y, double sw2_w, double sw2_h)
+inline double sw_dist(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
+			double sw2_x, double sw2_y, double sw2_w, double sw2_h)
 {
 	// http://en.wikipedia.org/wiki/Jaccard_index
 	const double inters = sw_intersection(sw1_x, sw1_y, sw1_w, sw1_h, sw2_x, sw2_y, sw2_w, sw2_h);
 	return 1.0 - inters / (sw1_w * sw1_h + sw2_w * sw2_h - inters);
+
+	// http://en.wikipedia.org/wiki/Dice%27s_coefficient
+	//return 1.0 - 2.0 * inters / (sw1_w * sw1_h + sw2_w * sw2_h);
+
+	// Overlap distance: 1 - inters / min (x, y) ?!
+	//return 1.0 - inters / min(sw1_w * sw1_h, sw2_w * sw2_h);
 }
 
-inline double MeanShiftSelector::getDistance(const Pattern& pattern, double cx, double cy, double w, double h)
+inline double sw_dist(const Pattern& pattern, double x, double y, double w, double h)
 {
-	return getDistance(	(double)pattern.getCenterX(), (double)pattern.getCenterY(),
-				(double)pattern.m_w, (double)pattern.m_h,
-				cx, cy, w, h);
+	return sw_dist(	(double)pattern.m_x, (double)pattern.m_y,
+			(double)pattern.m_w, (double)pattern.m_h,
+			x, y, w, h);
 }
-inline double MeanShiftSelector::getDistance(	double cx1, double cy1, double w1, double h1,
-						double cx2, double cy2, double w2, double h2)
+
+inline void sw_dist_deriv(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
+				double sw2_x, double sw2_y, double sw2_w, double sw2_h,
+				double& deriv_x, double& deriv_y, double& deriv_w, double& deriv_h)
 {
-	return sw_distance(	cx1 - 0.5 * w1, cy1 - 0.5 * h1, w1, h1,
-				cx2 - 0.5 * w2, cy2 - 0.5 * h2, w2, h2);
+	// NB: the second subwindow is considered the point where the derivate is taken!
+
+	// Dice-based distance derivate
+	const double inters = sw_intersection(sw1_x, sw1_y, sw1_w, sw1_h, sw2_x, sw2_y, sw2_w, sw2_h);
+	const double inv = 1.0 / (sw1_w * sw1_h + sw2_w * sw2_h);
+	const double dist = 1.0 - 2.0 * inters * inv;
+
+	deriv_x = 2 * dist * inv * (sw2_x - 2.0 * sw1_x - sw2_x * dist);
+	deriv_y = 2 * dist * inv * (sw2_y - 2.0 * sw1_y - sw2_y * dist);
+	deriv_w = 2 * dist * inv * (sw2_w - 2.0 * sw1_w - sw2_w * dist);
+	deriv_h = 2 * dist * inv * (sw2_h - 2.0 * sw1_h - sw2_h * dist);
+}
+
+inline void sw_dist_deriv(	const Pattern& pattern, double x, double y, double w, double h,
+				double& deriv_x, double& deriv_y, double& deriv_w, double& deriv_h)
+{
+	sw_dist_deriv(	(double)pattern.m_x, (double)pattern.m_y,
+			(double)pattern.m_w, (double)pattern.m_h,
+			x, y, w, h,
+			deriv_x, deriv_y, deriv_w, deriv_h);
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Get the closest points to the given one
+// Returns the number of found points
+
+inline int MeanShiftSelector::getClosest(const Pattern& pattern)
+{
+	return getClosest(	(double)pattern.m_x,
+				(double)pattern.m_y,
+				(double)pattern.m_w,
+				(double)pattern.m_h);
+}
+
+int MeanShiftSelector::getClosest(double x, double y, double w, double h)
+{
+	const int n_patterns = m_candidates->size();
+	int isize = 0;
+
+	if (m_bandwidthsComputed == false)
+	{
+		// Add to the list each sub-window with at least some intersection!
+		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
+		{
+			const double distance = sw_dist(m_candidates->get(i), x, y, w, h);
+			if (distance < 1.0)
+			{
+				m_iclosest[isize] = i;
+				m_iDistClosest[isize ++] = distance;
+			}
+		}
+	}
+	else
+	{
+		// Add to the list each sub-window within its bandwidth!
+		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
+		{
+			const double distance = sw_dist(m_candidates->get(i), x, y, w, h);
+			if (distance < m_bandwidths[i])
+			{
+				m_iclosest[isize] = i;
+				m_iDistClosest[isize ++] = distance;
+			}
+		}
+	}
+
+	return isize;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -247,8 +283,8 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 
 		// Need to find the subwindow's cluster
 		const Pattern& crt_pattern = candidates.get(i);
-		double crt_cx = crt_pattern.getCenterX();
-		double crt_cy = crt_pattern.getCenterY();
+		double crt_x = crt_pattern.m_x;
+		double crt_y = crt_pattern.m_y;
 		double crt_w = crt_pattern.m_w;
 		double crt_h = crt_pattern.m_h;
 
@@ -258,23 +294,30 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 		//print("------------------------\n");
 		while ((n_iters ++) < max_n_iters)
 		{
-			double sum_cx = 0.0, sum_cy = 0.0;
+			double sum_x = 0.0, sum_y = 0.0;
 			double sum_w = 0.0, sum_h = 0.0;
 			double sum_weights = 0.0;
 			cnt = 0;
 
 			// Compute the mean shift looking for neighbour patterns
-			const int n_closest_points = getClosest(crt_cx, crt_cy, crt_w, crt_h);
+			const int n_closest_points = getClosest(crt_x, crt_y, crt_w, crt_h);
 			for (int j = 0; j < n_closest_points; j ++)
 			{
 				const int k = m_iclosest[j];
-				const double distance = m_iDistClosest[j];
-
-				const double weight = m_inv_bandwidths[k] * getKernel(distance, m_bandwidths[k]);
 				const Pattern& pattern = candidates.get(k);
 
-				sum_cx += weight * pattern.getCenterX();
-				sum_cy += weight * pattern.getCenterY();
+				const double distance = m_iDistClosest[j];
+				const double weight = m_inv_bandwidths[k] * kernel(distance, m_bandwidths[k]);
+
+				//const double weight = kernel(distance, m_bandwidths[k]);
+				//
+				//double deriv_x, deriv_y, deriv_w, deriv_h;
+				//sw_dist_deriv(	pattern, crt_x, crt_y, crt_w, crt_h,
+				//		deriv_x, deriv_y, deriv_w, deriv_h);
+				//print("\tderiv = (%f, %f, %f, %f)\n", deriv_x, deriv_y, deriv_w, deriv_h);
+
+				sum_x += weight * pattern.m_x;
+				sum_y += weight * pattern.m_y;
 				sum_w += weight * pattern.m_w;
 				sum_h += weight * pattern.m_h;
 				sum_weights += weight;
@@ -289,29 +332,31 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 			}
 
 			const double inv = 1.0 / sum_weights;
-			const double new_crt_cx = inv * sum_cx;
-			const double new_crt_cy = inv * sum_cy;
+			const double new_crt_x = inv * sum_x;
+			const double new_crt_y = inv * sum_y;
 			const double new_crt_w = inv * sum_w;
 			const double new_crt_h = inv * sum_h;
 
+			//print("iters[%d]: (%f, %f, %f, %f)\n", n_iters, new_crt_x, new_crt_y, new_crt_w, new_crt_h);
+
 			static const double eps = 0.000001;
-			const double dist = getDistance(new_crt_cx, new_crt_cy, new_crt_w, new_crt_h,
-							crt_cx, crt_cy, crt_w, crt_h);
+			const double dist = sw_dist(	new_crt_x, new_crt_y, new_crt_w, new_crt_h,
+							crt_x, crt_y, crt_w, crt_h);
 			//print("\t>>> dist = %f, cnt = %d\n", dist, cnt);
 			if (dist < eps)
 			{
 				break;
 			}
 
-			crt_cx = new_crt_cx;
-			crt_cy = new_crt_cy;
+			crt_x = new_crt_x;
+			crt_y = new_crt_y;
 			crt_w = new_crt_w;
 			crt_h = new_crt_h;
 		}
 
 		// Add the converged point (~ density mode) to the list
-		m_patterns.add(Pattern(	FixI(crt_cx - 0.5 * crt_w),
-					FixI(crt_cy - 0.5 * crt_h),
+		m_patterns.add(Pattern(	FixI(crt_x),
+					FixI(crt_y),
 					FixI(crt_w),
 					FixI(crt_h),
 					crt_pattern.m_confidence),

@@ -12,7 +12,8 @@ namespace Torch
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::ipSWVariancePruner
 	//	- rejects a sub-window based on the pixel/edge variance
-	//              (generally too smooth sub-windows)
+	//              (generally too smooth or too noisy sub-windows)
+	//	- the actual processing is done in <setRegion> for efficiency reasons!
 	//
 	//	- PARAMETERS (name, type, default value, description):
 	//		"UseMean"	bool    true    "prune using the mean"
@@ -31,9 +32,8 @@ namespace Torch
 		// Destructor
 		virtual ~ipSWVariancePruner();
 
-		/// Change the sub-window to process in - overriden
-		/// Checks also if the sub-window is rejected
-		virtual bool		setSubWindow(int sw_x, int sw_y, int sw_w, int sw_h);
+		/// Change the region of the input tensor to process
+		void			setRegion(const TensorRegion& region);
 
 		// Set prunning parameters
 		void                  	setMinMean(double min_mean) { m_min_mean = min_mean; }

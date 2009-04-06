@@ -65,7 +65,6 @@ struct Params
 
         // Debug & log
         bool verbose;			// General verbose flag
-	bool save_evaluator_jpg;	// Save candidate sub-windows accepted by the evaluator to jpg
 	bool save_pyramid_jpg;		// Save the pyramid images to jpg
 };
 
@@ -223,7 +222,6 @@ int main(int argc, char* argv[])
 
         cmd.addText("\nGeneral options:");
 	cmd.addBCmdOption("-verbose", &params.verbose, false, "verbose");
-	cmd.addBCmdOption("-save_evaluator_jpg", &params.save_evaluator_jpg, false, "save sub-window candidates to jpg ");
 	cmd.addBCmdOption("-save_pyramid_jpg", &params.save_pyramid_jpg, false, "save pyramid levels to jpg");
 
 	// Parse the command line
@@ -266,7 +264,6 @@ int main(int argc, char* argv[])
                         params.select_min_surf_overlap);
 		print("-----------------------------------------------------------------------------\n");
 		print(">>> verbose: [%s]\n", params.verbose == true ? "true" : "false");
-		print(">>> save: evaluator2jpg: [%s]\n", params.save_evaluator_jpg == true ? "true" : "false");
 		print(">>> save: pyramid2jpg: [%s]\n", params.save_pyramid_jpg == true ? "true" : "false");
 		print("-----------------------------------------------------------------------------\n");
 		print("\n");
@@ -303,7 +300,6 @@ int main(int argc, char* argv[])
         ipSWEvaluator evaluator;
         CHECK_FATAL(evaluator.setClassifier(filename_model) == true);
         CHECK_FATAL(evaluator.setBOption("verbose", params.verbose) == true);
-	CHECK_FATAL(evaluator.setBOption("saveBuffTensorToJpg", params.save_evaluator_jpg) == true);
 
         // Pruners - rejects some sub-windows before actually checking is they contain a pattern
 	ipSWVariancePruner pruner;

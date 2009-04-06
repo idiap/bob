@@ -10,6 +10,8 @@ ipLBP::ipLBP(int P, int R)
 	:	ipCore(),
 		m_P(P), m_R(R),
 		m_x(0), m_y(0),
+		m_input_w(0), m_input_h(0), m_input_stride_w(0), m_input_stride_h(0),
+		m_ii_tl(0), m_ii_tr(0), m_ii_bl(0), m_ii_br(0), m_ii_cell_size(0),
 		m_lbp(0),
 		m_lut_RI(0),
 		m_lut_U2(0),
@@ -35,6 +37,20 @@ ipLBP::~ipLBP()
 	delete[] m_lut_U2RI;
 	delete[] m_lut_addAvgBit;
 	delete[] m_lut_normal;
+
+	for (int i = 0; i < m_modelSize.size[1]; i ++)
+	{
+		delete[] m_ii_tl[i];
+		delete[] m_ii_tr[i];
+		delete[] m_ii_bl[i];
+		delete[] m_ii_br[i];
+		delete[] m_ii_cell_size[i];
+	}
+	delete[] m_ii_tl;
+	delete[] m_ii_tr;
+	delete[] m_ii_bl;
+	delete[] m_ii_br;
+	delete[] m_ii_cell_size;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -109,6 +125,124 @@ bool ipLBP::setR(int R)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Change the region of the input tensor to process - overriden
+
+void ipLBP::setRegion(const TensorRegion& region)
+{
+	const bool changed = 	m_region.size[0] != region.size[0] ||
+				m_region.size[1] != region.size[1];
+
+	ipCore::setRegion(region);
+	if (changed == true)
+	{
+		updateIntegralFactors();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// Change the model size (if used with some machine) - overriden
+
+void ipLBP::setModelSize(const TensorSize& modelSize)
+{
+	const bool changed = 	m_modelSize.size[0] != modelSize.size[0] ||
+				m_modelSize.size[1] != modelSize.size[1];
+
+	if (changed == true)
+	{
+		// Delete old indexes
+		for (int i = 0; i < m_modelSize.size[1]; i ++)
+		{
+			delete[] m_ii_tl[i];
+			delete[] m_ii_tr[i];
+			delete[] m_ii_bl[i];
+			delete[] m_ii_br[i];
+			delete[] m_ii_cell_size[i];
+		}
+		delete[] m_ii_tl;
+		delete[] m_ii_tr;
+		delete[] m_ii_bl;
+		delete[] m_ii_br;
+		delete[] m_ii_cell_size;
+	}
+
+	ipCore::setModelSize(modelSize);
+
+	if (changed == true)
+	{
+		const int model_w = m_modelSize.size[1];
+		const int model_h = m_modelSize.size[0];
+
+		// Allocate new indexes
+		m_ii_tl = new int*[model_w];
+		m_ii_tr = new int*[model_w];
+		m_ii_bl = new int*[model_w];
+		m_ii_br = new int*[model_w];
+		m_ii_cell_size = new int*[model_w];
+
+		for (int i = 0; i < model_w; i ++)
+		{
+			m_ii_tl[i] = new int[model_h];
+			m_ii_tr[i] = new int[model_h];
+			m_ii_bl[i] = new int[model_h];
+			m_ii_br[i] = new int[model_h];
+			m_ii_cell_size[i] = new int[model_h];
+		}
+
+		updateIntegralFactors();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Compute the scalling factors needed to interpolate using integral images
+
+void ipLBP::updateIntegralFactors()
+{
+	const int model_w = m_modelSize.size[1];
+	const int model_h = m_modelSize.size[0];
+
+	if (	m_input_w == 0 || m_input_h == 0 ||
+		model_w == 0 || model_h == 0)
+	{
+		return;
+	}
+
+	const int sw_w = m_region.size[1];
+	const int sw_h = m_region.size[0];
+
+	// Scalling factors
+	const double inv_model_w = 1.0 / (model_w + 0.0);
+        const double inv_model_h = 1.0 / (model_h + 0.0);
+	const double scale_w = 0.5 * (sw_w + 0.0) / (model_w + 0.0);
+        const double scale_h = 0.5 * (sw_h + 0.0) / (model_h + 0.0);
+
+	// Compute the new indexes
+	for (int i = 0; i < model_w; i ++)
+	{
+		for (int j = 0; j < model_h; j ++)
+		{
+                        const double x_in_sw = (i + 0.5) * inv_model_w * sw_w;
+                        const double y_in_sw = (j + 0.5) * inv_model_h * sw_h;
+
+                        const double min_x_in_sw = x_in_sw - scale_w - 0.5;
+                        const double max_x_in_sw = x_in_sw + scale_w + 0.5;
+                        const double min_y_in_sw = y_in_sw - scale_h - 0.5;
+                        const double max_y_in_sw = y_in_sw + scale_h + 0.5;
+
+                        const int l = getInRange((int)(min_x_in_sw), 0, sw_w - 1);
+                        const int r = getInRange((int)(max_x_in_sw + 0.5), 0, sw_w - 1);
+                        const int t = getInRange((int)(min_y_in_sw), 0, sw_h - 1);
+                        const int b = getInRange((int)(max_y_in_sw + 0.5), 0, sw_h - 1);
+
+                        m_ii_tl[i][j] = t * m_input_stride_h + l * m_input_stride_w;
+			m_ii_tr[i][j] = t * m_input_stride_h + r * m_input_stride_w;
+			m_ii_bl[i][j] = b * m_input_stride_h + l * m_input_stride_w;
+                        m_ii_br[i][j] = b * m_input_stride_h + r * m_input_stride_w;
+                        m_ii_cell_size[i][j] = (b - t) * (r - l);
+                }
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type - overriden
 
 bool ipLBP::checkInput(const Tensor& input) const
@@ -137,6 +271,51 @@ bool ipLBP::allocateOutput(const Tensor& input)
                 const IntTensor* t_output = (IntTensor*)m_output[0];
                 m_lbp = t_output->t->storage->data + t_output->t->storageOffset;
 	}
+
+	// If the input tensor size was modified, update the scalling factors
+	if (	input.size(0) != m_input_h ||
+		input.size(1) != m_input_w)
+	{
+		m_input_h = input.size(0);
+		m_input_w = input.size(1);
+
+		// Compute the strides of the input tensor
+		switch (input.getDatatype())
+		{
+		case Tensor::Char:
+			m_input_stride_h = ((const CharTensor*)&input)->t->stride[0];
+			m_input_stride_w = ((const CharTensor*)&input)->t->stride[1];
+			break;
+
+		case Tensor::Short:
+			m_input_stride_h = ((const ShortTensor*)&input)->t->stride[0];
+			m_input_stride_w = ((const ShortTensor*)&input)->t->stride[1];
+			break;
+
+		case Tensor::Int:
+			m_input_stride_h = ((const IntTensor*)&input)->t->stride[0];
+			m_input_stride_w = ((const IntTensor*)&input)->t->stride[1];
+			break;
+
+		case Tensor::Long:
+			m_input_stride_h = ((const LongTensor*)&input)->t->stride[0];
+			m_input_stride_w = ((const LongTensor*)&input)->t->stride[1];
+			break;
+
+		case Tensor::Float:
+			m_input_stride_h = ((const FloatTensor*)&input)->t->stride[0];
+			m_input_stride_w = ((const FloatTensor*)&input)->t->stride[1];
+			break;
+
+		case Tensor::Double:
+			m_input_stride_h = ((const DoubleTensor*)&input)->t->stride[0];
+			m_input_stride_w = ((const DoubleTensor*)&input)->t->stride[1];
+			break;
+		}
+
+		updateIntegralFactors();
+	}
+
 	return true;
 }
 

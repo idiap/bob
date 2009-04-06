@@ -37,6 +37,12 @@ namespace Torch
 		// Set the radius value of the LBP operator
 		virtual bool		setR(int R);
 
+		/// Change the region of the input tensor to process - overriden
+		void			setRegion(const TensorRegion& region);
+
+		/// Change the model size (if used with some machine) - overriden
+		void			setModelSize(const TensorSize& modelSize);
+
 		// Get the maximum possible label
 		virtual int		getMaxLabel() = 0;
 
@@ -81,6 +87,9 @@ namespace Torch
 								int stride_w, int stride_h,
 								float x, float y);
 
+		// Compute the scalling factors needed to interpolate using integral images
+		void			updateIntegralFactors();
+
 		/////////////////////////////////////////////////////////////////
 
 	protected:
@@ -93,6 +102,17 @@ namespace Torch
 
 		// LBP operator location
 		int			m_x, m_y;
+
+		// Input tensor size (to pre-compute the scalling factors)
+		int			m_input_w, m_input_h;
+		int			m_input_stride_w, m_input_stride_h;
+
+		// Precomputed coordinates to interpolate fast using integral images
+		int**			m_ii_tl;	// top left: [m_model_w]x[m_model_h]
+		int**			m_ii_tr;	// top right: [m_model_w]x[m_model_h]
+		int**			m_ii_bl;	// bottom left: [m_model_w]x[m_model_h]
+		int**			m_ii_br;	// bottom right: [m_model_w]x[m_model_h]
+		int**			m_ii_cell_size;	// [m_model_w]x[m_model_h]
 
 		// Direct (&fast) access to the LBP code
 		int*			m_lbp;

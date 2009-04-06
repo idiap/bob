@@ -64,7 +64,7 @@ void ExplorerData::storePattern(const Pattern& p)
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-Explorer::Explorer(ipSWEvaluator* swEvaluator)
+Explorer::Explorer()
 	: 	m_data(0),
 		m_scales(0),
 		m_scale_explorers(0),

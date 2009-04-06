@@ -48,13 +48,13 @@ void PyramidExplorerData::setScale(const sSize& scale)
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-PyramidExplorer::PyramidExplorer(ipSWEvaluator* swEvaluator)
-	: 	Explorer(swEvaluator),
+PyramidExplorer::PyramidExplorer()
+	: 	Explorer(),
                 m_scaling_ips(0),
                 m_scale_prune_tensors(0),
                 m_scale_evaluation_tensors(0)
 {
-	m_data = new PyramidExplorerData(swEvaluator);
+	m_data = new PyramidExplorerData();
 
 	addBOption("savePyramidsToJpg", false, "save the scaled images to JPEG");
 }

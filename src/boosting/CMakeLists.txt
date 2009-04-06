@@ -4,7 +4,6 @@
 SET(	boosting_SRC
 	"${CMAKE_CURRENT_SOURCE_DIR}/BoostingTrainer.cc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/WeakLearner.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/spCoreMachine.cc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/StumpMachine.cc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/StumpTrainer.cc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/LutMachine.cc"

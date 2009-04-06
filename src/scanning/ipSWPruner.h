@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_IP_SW_PRUNER_H_
 #define _TORCHVISION_SCANNING_IP_SW_PRUNER_H_
 
-#include "ipSubWindow.h"	// <ipSWPruner> is a <ipSubWindow>
+#include "ipCore.h"		// <ipSWPruner> is an <ipCore>
 
 namespace Torch
 {
@@ -13,7 +13,7 @@ namespace Torch
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ipSWPruner : public ipSubWindow
+	class ipSWPruner : public ipCore
 	{
 	public:
 

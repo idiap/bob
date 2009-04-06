@@ -1,11 +1,12 @@
 #include "LutMachine.h"
+#include "spCore.h"
 
 namespace Torch {
 
 ///////////////////////////////////////////////////////////////////////////
 // Constructor
 
-LutMachine::LutMachine() : spCoreMachine()
+LutMachine::LutMachine() : Machine()
 {
    	n_bins = 0;
 	lut = NULL;
@@ -21,19 +22,19 @@ bool LutMachine::forward(const Tensor& input)
 		return false;
 	}
 
-   	if(core == NULL)
+   	if(m_core == NULL)
 	{
 	   	Torch::error("LutMachine::forward() no core available.");
 		return false;
 	}
 
-	if(core->process(input) == false)
+	if(m_core->process(input) == false)
 	{
 	   	Torch::error("LutMachine::forward() core failed.");
 		return false;
 	}
 
-	DoubleTensor *core_t_output = (DoubleTensor*) &core->getOutput(0);
+	DoubleTensor *core_t_output = (DoubleTensor*) &m_core->getOutput(0);
 
 	double feature = core_t_output->get(0);
 
@@ -41,15 +42,15 @@ bool LutMachine::forward(const Tensor& input)
 
 	if(feature < min) lut_output_ = lut[0];
 	else if(feature > max) lut_output_ = lut[n_bins-1];
-	else 
+	else
 	{
 		int index = (int) floor(n_bins * (feature - min) / (max - min));
 		lut_output_ = lut[index];
 	}
-	
+
 	DoubleTensor* t_output = (DoubleTensor*) m_output;
 	(*t_output)(0) = lut_output_;
-   	
+
 	return true;
 }
 

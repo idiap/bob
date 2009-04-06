@@ -78,12 +78,36 @@ const Tensor& spCore::getOutput(int index) const
 }
 
 ////////////////////////////////////////////////////////////////////
+// Change the region of the input tensor to process
+
+void spCore::setRegion(const TensorRegion& region)
+{
+	m_region = region;
+}
+
+////////////////////////////////////////////////////////////////////
+// Change the model size (if used with some machine)
+
+void spCore::setModelSize(const TensorSize& modelSize)
+{
+	m_modelSize = modelSize;
+}
+
+////////////////////////////////////////////////////////////////////
+/// Loading/Saving the content from files (\emph{not the options})
+
+bool spCore::loadFile(File& file)
+{
+	return true;
+}
 
 bool spCore::saveFile(File& file) const
 {
 	return true;
 }
-		
+
+////////////////////////////////////////////////////////////////////
+
 }
 
 
