@@ -13,6 +13,7 @@ ipBlock::ipBlock()
 	addIOption("h", 0, "height of the block");
 	addIOption("ox", 0, "number of overlapping pixels for blocks on the x axis");
 	addIOption("oy", 0, "number of overlapping pixels for blocks on the y axis");
+	addBOption("rcoutput", false, "creates a rows X columns output (for grayscale input only) and thus a single 4D output tensor");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -71,9 +72,23 @@ bool ipBlock::allocateOutput(const Tensor& input)
 	int image_w = input.size(1);
 	int image_h = input.size(0);
 
-	int n_blocks_columns = image_w / block_w;
-	int n_blocks_rows = image_h / block_h;
-	int n_blocks = n_blocks_columns * n_blocks_rows;
+	delta_block_overlap_x = block_w - overlap_x;
+	delta_block_overlap_y = block_h - overlap_y;
+	
+	n_blocks_rows = 0;
+	n_blocks_columns = 0;
+	int r, c;
+
+	for(r = 1 ; r <= image_h - (block_h - 1) ; r += delta_block_overlap_y) n_blocks_rows++;
+	for(c = 1 ; c <= image_w - (block_w - 1) ; c += delta_block_overlap_x) n_blocks_columns++;
+	
+	int extra_rows = image_h - (r - delta_block_overlap_y + (block_h-1));
+	int extra_cols = image_w - (c - delta_block_overlap_x + (block_w-1));
+	
+	row_offset = extra_rows/2;
+	col_offset = extra_cols/2;
+
+	n_blocks = n_blocks_columns * n_blocks_rows;
 
 	print("ipBlock::allocateOutput()\n", n_blocks);
 	print("   image width: %d\n", image_w);
@@ -84,6 +99,8 @@ bool ipBlock::allocateOutput(const Tensor& input)
 	print("   overlap y: %d\n", overlap_y);
 	print("\n");
 	print("   number of blocks determined: %d\n", n_blocks);
+	print("   number of row blocks: %d\n", n_blocks_rows);
+	print("   number of column blocks: %d\n", n_blocks_columns);
 
 	// Allocate output if required
 	cleanup();
@@ -93,11 +110,29 @@ bool ipBlock::allocateOutput(const Tensor& input)
 	/*
 		optionally it might be better to output a 4D tensor: n_blocks_rows X n_blocks_cols X block_h X block_w
 	*/
+	const bool rcoutput = getBOption("rcoutput");
+	if(rcoutput)
+	{
+		if(input.size(2) != 1)
+		{
+			warning("Impossible to create row X columns output for color images."); 
+			return false;
+		}
 
-	m_n_outputs = n_blocks;
-	m_output = new Tensor*[m_n_outputs];
-	for(int i = 0 ; i < n_blocks ; i++)
-		m_output[i] = new ShortTensor(block_h, block_w, input.size(2));
+		message("Building row X columns output."); 
+
+		m_n_outputs = 1;
+		m_output = new Tensor*[1];
+		m_output[0] = new ShortTensor(n_blocks_rows, n_blocks_columns, block_h, block_w);
+	}
+	else
+	{
+		m_n_outputs = n_blocks;
+		m_output = new Tensor*[m_n_outputs];
+		for(int i = 0 ; i < n_blocks ; i++)
+			m_output[i] = new ShortTensor(block_h, block_w, input.size(2));
+	}
+
 	return true;
 }
 
@@ -107,14 +142,66 @@ bool ipBlock::allocateOutput(const Tensor& input)
 bool ipBlock::processInput(const Tensor& input)
 {
 	// Get parameters
-	const int overlap_x = getIOption("ox");
-	const int overlap_y = getIOption("oy");
 	const int block_w = getIOption("w");
 	const int block_h = getIOption("h");
+	const bool rcoutput = getBOption("rcoutput");
 
 	// Prepare direct access to data
 	const ShortTensor* t_input = (ShortTensor*)&input;
-	ShortTensor* t_output = (ShortTensor*)m_output[0];
+				
+  	ShortTensor *t_input_narrow_rows = new ShortTensor();
+  	ShortTensor *t_input_narrow_cols = new ShortTensor();
+
+	ShortTensor* t_rcoutput = (ShortTensor*)m_output[0];
+  	ShortTensor *t_rcoutput_narrow_rows = NULL;
+  	ShortTensor *t_rcoutput_narrow_cols = NULL;
+
+	if(rcoutput)
+	{
+  		t_rcoutput_narrow_rows = new ShortTensor();
+  		t_rcoutput_narrow_cols = new ShortTensor();
+	}
+
+	for(int r = 0; r < n_blocks_rows; r++)
+	{
+		int row = row_offset + r * delta_block_overlap_y;
+		t_input_narrow_rows->narrow(t_input, 0, row, block_h);
+
+		if(rcoutput)
+			t_rcoutput_narrow_rows->narrow(t_rcoutput, 0, r, 1);
+
+	   	for(int c = 0; c < n_blocks_columns; c++) 
+		{
+			int col = col_offset + c * delta_block_overlap_x;
+
+			t_input_narrow_cols->narrow(t_input_narrow_rows, 1, col, block_w);
+
+
+			if(rcoutput)
+			{
+				t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
+			
+				t_rcoutput_narrow_cols->copy(t_input_narrow_cols);
+			}
+			else
+			{
+				// Storing blocks as [colblock][rowblock] (i.e. [x][y])
+		   		int index_block = c + r * n_blocks_columns;
+
+				ShortTensor* t_output = (ShortTensor*)m_output[index_block];
+			
+				t_output->copy(t_input_narrow_cols);
+			}
+		}
+	}
+
+	if(rcoutput)
+	{
+		delete t_rcoutput_narrow_cols;
+		delete t_rcoutput_narrow_rows;
+	}
+	delete t_input_narrow_cols;
+	delete t_input_narrow_rows;
 
 	// OK
 	return true;

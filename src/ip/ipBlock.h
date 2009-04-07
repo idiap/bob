@@ -50,6 +50,14 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
+		int delta_block_overlap_x;
+		int delta_block_overlap_y;
+		int row_offset;
+		int col_offset;
+		int n_blocks_rows;
+		int n_blocks_columns;
+		int n_blocks;
+
 		//
 	};
 }
