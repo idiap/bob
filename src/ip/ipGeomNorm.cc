@@ -91,7 +91,7 @@ bool ipGeomNorm::loadCfg(const char* filename)
 
 	// Read the rotation parameters
 	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%s %s %lf", &rotPoint1, &rotPoint2, &rotAngle) != 3)
+		sscanf(normString(str), "%s %s %lf", rotPoint1, rotPoint2, &rotAngle) != 3)
 	{
 		if (verbose == true)
 		{
@@ -102,7 +102,7 @@ bool ipGeomNorm::loadCfg(const char* filename)
 
 	// Read the scalling parameters
 	if (	file.gets(str, sizeBuf) == 0 ||
-		sscanf(normString(str), "%s %s %d", &scalePoint1, &scalePoint2, &scaleDist) != 3)
+		sscanf(normString(str), "%s %s %d", scalePoint1, scalePoint2, &scaleDist) != 3)
 	{
 		if (verbose == true)
 		{
@@ -114,7 +114,7 @@ bool ipGeomNorm::loadCfg(const char* filename)
 	// Read the cropping parameters
 	if (	file.gets(str, sizeBuf) == 0 ||
 		sscanf(normString(str), "%s %s %d %d %d %d %d %d",
-			&cropPoint1, &cropPoint2,
+			cropPoint1, cropPoint2,
 			&cropDx, &cropDy, &cropW, &cropH, &cropBorderX, &cropBorderY) != 8)
 	{
 		if (verbose == true)
