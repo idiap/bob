@@ -11,6 +11,7 @@ SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/DataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/MemoryDataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/DiskDataSet.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ImageScanDataSet.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Trainer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Machine.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Tensor.cc"

@@ -44,10 +44,10 @@
 		<Cursor position="0" topLine="9" />
 	</File>
 	<File name="../../core/CMakeLists.txt" open="1" top="0" tabpos="20">
-		<Cursor position="611" topLine="0" />
+		<Cursor position="519" topLine="0" />
 	</File>
-	<File name="../../core/CmdFile.cc" open="0" top="0" tabpos="84">
-		<Cursor position="9602" topLine="374" />
+	<File name="../../core/CmdFile.cc" open="1" top="0" tabpos="102">
+		<Cursor position="624" topLine="11" />
 	</File>
 	<File name="../../core/CmdLine.h" open="0" top="0" tabpos="3">
 		<Cursor position="6037" topLine="111" />
@@ -58,14 +58,17 @@
 	<File name="../../core/CmdOption.h" open="0" top="0" tabpos="1">
 		<Cursor position="3164" topLine="80" />
 	</File>
-	<File name="../../core/DataSet.h" open="1" top="0" tabpos="93">
-		<Cursor position="327" topLine="0" />
+	<File name="../../core/DataSet.cc" open="1" top="0" tabpos="100">
+		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../core/DiskDataSet.cc" open="1" top="0" tabpos="95">
+	<File name="../../core/DataSet.h" open="1" top="0" tabpos="71">
+		<Cursor position="579" topLine="0" />
+	</File>
+	<File name="../../core/DiskDataSet.cc" open="1" top="0" tabpos="73">
 		<Cursor position="421" topLine="9" />
 	</File>
-	<File name="../../core/DiskDataSet.h" open="1" top="0" tabpos="94">
-		<Cursor position="574" topLine="0" />
+	<File name="../../core/DiskDataSet.h" open="1" top="0" tabpos="72">
+		<Cursor position="356" topLine="0" />
 	</File>
 	<File name="../../core/File.cc" open="0" top="0" tabpos="76">
 		<Cursor position="3573" topLine="155" />
@@ -73,17 +76,26 @@
 	<File name="../../core/File.h" open="0" top="0" tabpos="63">
 		<Cursor position="864" topLine="36" />
 	</File>
+	<File name="../../core/FileListCmdOption.h" open="1" top="0" tabpos="99">
+		<Cursor position="0" topLine="12" />
+	</File>
+	<File name="../../core/ImageScanDataSet.cc" open="1" top="1" tabpos="98">
+		<Cursor position="1697" topLine="39" />
+	</File>
+	<File name="../../core/ImageScanDataSet.h" open="1" top="0" tabpos="97">
+		<Cursor position="2394" topLine="56" />
+	</File>
 	<File name="../../core/Machine.cc" open="1" top="0" tabpos="6">
 		<Cursor position="746" topLine="15" />
 	</File>
 	<File name="../../core/Machine.h" open="1" top="0" tabpos="5">
-		<Cursor position="3574" topLine="97" />
+		<Cursor position="2664" topLine="64" />
 	</File>
 	<File name="../../core/MemoryDataSet.cc" open="0" top="0" tabpos="48">
 		<Cursor position="883" topLine="27" />
 	</File>
-	<File name="../../core/MemoryDataSet.h" open="1" top="0" tabpos="92">
-		<Cursor position="763" topLine="0" />
+	<File name="../../core/MemoryDataSet.h" open="1" top="0" tabpos="70">
+		<Cursor position="791" topLine="0" />
 	</File>
 	<File name="../../core/Object.cc" open="1" top="0" tabpos="48">
 		<Cursor position="8319" topLine="342" />
@@ -95,16 +107,16 @@
 		<Cursor position="0" topLine="20" />
 	</File>
 	<File name="../../core/Tensor.h" open="1" top="0" tabpos="56">
-		<Cursor position="2381" topLine="69" />
+		<Cursor position="2381" topLine="144" />
 	</File>
-	<File name="../../core/TensorFile.h" open="1" top="0" tabpos="91">
+	<File name="../../core/TensorFile.h" open="1" top="0" tabpos="69">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="../../core/TensorGen.cc" open="0" top="0" tabpos="50">
 		<Cursor position="6011" topLine="202" />
 	</File>
-	<File name="../../core/TensorGen.h" open="0" top="0" tabpos="50">
-		<Cursor position="465" topLine="90" />
+	<File name="../../core/TensorGen.h" open="1" top="0" tabpos="101">
+		<Cursor position="465" topLine="15" />
 	</File>
 	<File name="../../core/Trainer.cc" open="0" top="0" tabpos="45">
 		<Cursor position="0" topLine="0" />
@@ -272,7 +284,7 @@
 		<Cursor position="3046" topLine="72" />
 	</File>
 	<File name="../../ip/ipScaleYX.h" open="1" top="0" tabpos="27">
-		<Cursor position="1957" topLine="36" />
+		<Cursor position="1957" topLine="12" />
 	</File>
 	<File name="../../ip/vision.h" open="1" top="0" tabpos="44">
 		<Cursor position="1493" topLine="0" />
@@ -310,7 +322,7 @@
 	<File name="../../machine/Machines.h" open="1" top="0" tabpos="4">
 		<Cursor position="373" topLine="0" />
 	</File>
-	<File name="../../scanning/CMakeLists.txt" open="1" top="1" tabpos="97">
+	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="75">
 		<Cursor position="587" topLine="0" />
 	</File>
 	<File name="../../scanning/Explorer.cc" open="0" top="0" tabpos="67">
@@ -337,7 +349,7 @@
 	<File name="../../scanning/Scanner.h" open="1" top="0" tabpos="64">
 		<Cursor position="2400" topLine="31" />
 	</File>
-	<File name="../../scanning/Selector.h" open="1" top="0" tabpos="96">
+	<File name="../../scanning/Selector.h" open="1" top="0" tabpos="74">
 		<Cursor position="353" topLine="0" />
 	</File>
 	<File name="../../scanning/explorers/CMakeLists.txt" open="0" top="0" tabpos="8">
@@ -466,10 +478,10 @@
 	<File name="../../scanning/selectors/DummySelector.h" open="0" top="0" tabpos="85">
 		<Cursor position="800" topLine="0" />
 	</File>
-	<File name="../../scanning/selectors/MeanShiftSelector.cc" open="1" top="0" tabpos="90">
+	<File name="../../scanning/selectors/MeanShiftSelector.cc" open="1" top="0" tabpos="68">
 		<Cursor position="10038" topLine="303" />
 	</File>
-	<File name="../../scanning/selectors/MeanShiftSelector.h" open="1" top="0" tabpos="89">
+	<File name="../../scanning/selectors/MeanShiftSelector.h" open="1" top="0" tabpos="67">
 		<Cursor position="1172" topLine="12" />
 	</File>
 	<File name="../../scanning/selectors/OverlapSelector.cc" open="0" top="0" tabpos="80">

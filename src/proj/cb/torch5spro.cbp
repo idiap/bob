@@ -232,6 +232,8 @@
 		<Unit filename="../../core/FileList.h" />
 		<Unit filename="../../core/FileListCmdOption.cc" />
 		<Unit filename="../../core/FileListCmdOption.h" />
+		<Unit filename="../../core/ImageScanDataSet.cc" />
+		<Unit filename="../../core/ImageScanDataSet.h" />
 		<Unit filename="../../core/MTimer.cc" />
 		<Unit filename="../../core/MTimer.h" />
 		<Unit filename="../../core/Machine.cc" />

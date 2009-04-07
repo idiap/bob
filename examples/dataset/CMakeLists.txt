@@ -18,8 +18,8 @@ LINK_LIBRARIES("${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.
 # Set the compiler flags and build type (release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "-g")
-#SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_BUILD_TYPE RELEASE)
+#SET(CMAKE_BUILD_TYPE DEBUG)
 
 MESSAGE("---------------------------------------------" "")
 MESSAGE("CXX RELEASE FLAGS: " "${CMAKE_CXX_FLAGS_RELEASE}")
@@ -38,7 +38,10 @@ SET(EXAMPLE_SRC
 	tensorfiles.cc
 	largememorydataset.cc
 	memorydataset.cc
-	diskdataset.cc)
+	diskdataset.cc
+	makeWnds.cc
+	readWnds.cc
+	imagescandataset.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

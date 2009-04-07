@@ -77,7 +77,7 @@ namespace Torch {
 			pos[3] = 0; size[3] = 0;
 		}
 		TensorRegion(long x0, long size0)
-			: n_dimensions(0)
+			: n_dimensions(1)
 		{
 			pos[0] = x0; size[0] = size0;
 			pos[1] = 0; size[1] = 0;
@@ -85,7 +85,7 @@ namespace Torch {
 			pos[3] = 0; size[3] = 0;
 		}
 		TensorRegion(long x0, long x1, long size0, long size1)
-			: n_dimensions(0)
+			: n_dimensions(2)
 		{
 			pos[0] = x0; size[0] = size0;
 			pos[1] = x1; size[1] = size1;
@@ -93,7 +93,7 @@ namespace Torch {
 			pos[3] = 0; size[3] = 0;
 		}
 		TensorRegion(long x0, long x1, long x2, long size0, long size1, long size2)
-			: n_dimensions(0)
+			: n_dimensions(3)
 		{
 			pos[0] = x0; size[0] = size0;
 			pos[1] = x1; size[1] = size1;
@@ -101,7 +101,7 @@ namespace Torch {
 			pos[3] = 0; size[3] = 0;
 		}
 		TensorRegion(long x0, long x1, long x2, long x3, long size0, long size1, long size2, long size3)
-			: n_dimensions(0)
+			: n_dimensions(4)
 		{
 			pos[0] = x0; size[0] = size0;
 			pos[1] = x1; size[1] = size1;
