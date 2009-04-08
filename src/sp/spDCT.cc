@@ -13,6 +13,8 @@ spDCT::spDCT(bool inverse_)
 {
 	inverse = inverse_;
 	R = NULL;
+
+	addBOption("verbose", false, "verbose");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -29,13 +31,12 @@ spDCT::~spDCT()
 bool spDCT::checkInput(const Tensor& input) const
 {
 	// Accept only tensors of Torch::Float
-	if (input.getDatatype() != Tensor::Float) return false;
-
+	//if (input.getDatatype() != Tensor::Float) return false;
 
 	if (input.nDimension() == 1)
 	{
-	   	if(inverse) print("spDCT::checkInput() inverse DCT 1D ...\n");
-		else print("spDCT::checkInput() DCT 1D ...\n");
+	   	//if(inverse) print("spDCT::checkInput() inverse DCT 1D ...\n");
+		//else print("spDCT::checkInput() DCT 1D ...\n");
 
 		int N_ = input.size(0);
 
@@ -47,11 +48,10 @@ bool spDCT::checkInput(const Tensor& input) const
 			return false;
 		}
 	}
-
-	if (input.nDimension() == 2)
+	else if (input.nDimension() == 2)
 	{
-	   	if(inverse) print("spDCT::checkInput() inverse DCT 2D ...\n");
-		else print("spDCT::checkInput() DCT 2D ...\n");
+	   	//if(inverse) print("spDCT::checkInput() inverse DCT 2D ...\n");
+		//else print("spDCT::checkInput() DCT 2D ...\n");
 
 		int N_ = input.size(0);
 		unsigned int nn = nexthigher(N_);
@@ -68,6 +68,11 @@ bool spDCT::checkInput(const Tensor& input) const
 			return false;
 		}
 	}
+	else
+	{
+		warning("spDCT(): incorrect number of dimensions for the input tensor.");
+		return false;
+	}
 
 	// OK
 	return true;
@@ -78,6 +83,8 @@ bool spDCT::checkInput(const Tensor& input) const
 
 bool spDCT::allocateOutput(const Tensor& input)
 {
+	bool verbose = getBOption("verbose");
+
 	if (	m_output == 0 )
 	{
 		cleanup();
@@ -86,7 +93,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 
 		if (input.nDimension() == 1)
 		{
-			print("spDCT::allocateOutput() DCT 1D ...\n");
+			if(verbose) print("spDCT::allocateOutput() DCT 1D ...\n");
 
 			N = input.size(0);
 
@@ -98,7 +105,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 		}
 		else if (input.nDimension() == 2)
 		{
-			print("spDCT::allocateOutput() DCT 2D ...\n");
+			if(verbose) print("spDCT::allocateOutput() DCT 2D ...\n");
 
 			H = input.size(0);
 			W = input.size(1);
@@ -119,11 +126,12 @@ bool spDCT::allocateOutput(const Tensor& input)
 
 bool spDCT::processInput(const Tensor& input)
 {
-	const FloatTensor* t_input = (FloatTensor*)&input;
+	//const FloatTensor* t_input = (FloatTensor*)&input;
 
 	if (input.nDimension() == 1)
 	{
-		R->copy(t_input);
+		//R->copy(t_input);
+		R->copy(&input);
 
 #ifdef HAVE_OOURAFFT
 		if(inverse)
@@ -189,7 +197,8 @@ bool spDCT::processInput(const Tensor& input)
 	}
 	else if (input.nDimension() == 2)
 	{
-		R->copy(t_input);
+		//R->copy(t_input);
+		R->copy(&input);
 
 #ifdef HAVE_OOURAFFT
 		if(inverse)

@@ -306,7 +306,8 @@ TENSOR_CLASS(Tensor)::~TENSOR_CLASS(Tensor)()
 
 void Tprint(const TENSOR_CLASS(Tensor) *T)
 {
-  if(T->nDimension() == 1)
+  if(T->nDimension() == 0) print("Oups !! I can't print a 0D tensor :-(\n");
+  else if(T->nDimension() == 1)
     {
       for(int y = 0 ; y < T->size(0) ; y++)
 	{
@@ -347,6 +348,7 @@ void Tprint(const TENSOR_CLASS(Tensor) *T)
 	  print("\n");
 	}
     }
+  else if(T->nDimension() == 4) print("Sorry I don't know how to print a 4D tensor :-)\n");
 }
 
 #undef TENSOR_T_

@@ -165,23 +165,48 @@ bool ipBlock::processInput(const Tensor& input)
 	for(int r = 0; r < n_blocks_rows; r++)
 	{
 		int row = row_offset + r * delta_block_overlap_y;
+
+		// narrow the tensor t_input along rows (dimension 0) at row #row# and length #block_h#
 		t_input_narrow_rows->narrow(t_input, 0, row, block_h);
 
 		if(rcoutput)
+			// narrow the tensor t_rcoutput along block rows (dimension 0) at row #r# and length 1
 			t_rcoutput_narrow_rows->narrow(t_rcoutput, 0, r, 1);
 
 	   	for(int c = 0; c < n_blocks_columns; c++) 
 		{
 			int col = col_offset + c * delta_block_overlap_x;
 
+			// narrow the tensor t_input_narrow_rows along columns (dimension 1) at column #col# and length #block_w#
 			t_input_narrow_cols->narrow(t_input_narrow_rows, 1, col, block_w);
-
 
 			if(rcoutput)
 			{
+				// narrow the tensor t_rcoutput along block rows (dimension 0) at row #r# and length 1
 				t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
-			
+	
+				/*
+					Warning: t_rcoutput_narrow_cols is a 4D tensor and t_input_narrow_cols a 3D tensor
+
+					However as the lenght of narrow along each dim is 1 we don't need to do any selects
+				*/
+
+				// copy the block #t_input_narrow_cols# (3D tensor) into t_rcoutput_narrow_cols (4D tensor) 
 				t_rcoutput_narrow_cols->copy(t_input_narrow_cols);
+
+				/*
+					Normally, we should do:
+
+					a select on t_input_narrow_cols to return a 2D tensor
+						src_->select(t_input_narrow_cols, 2, 0)
+
+					2 selects on t_rcoutput_narrow_cols to return a 2D tensor
+						dst__->select(t_rcoutput_narrow_cols, 0, 0)
+						dst_->select(dct_, 0, 0)
+
+					and then a copy
+						dst_->copy(src_)
+				*/
 			}
 			else
 			{
@@ -189,7 +214,8 @@ bool ipBlock::processInput(const Tensor& input)
 		   		int index_block = c + r * n_blocks_columns;
 
 				ShortTensor* t_output = (ShortTensor*)m_output[index_block];
-			
+		
+				// copy he block #t_input_narrow_cols# (3D tensor) into the current output tensor (3D as well)
 				t_output->copy(t_input_narrow_cols);
 			}
 		}
