@@ -54,6 +54,7 @@ TH_API short int THShortTensor_sum(THShortTensor *tensor);
 TH_API long int THLongTensor_sum(THLongTensor *tensor);
 TH_API char THCharTensor_sum(THCharTensor *tensor);
 TH_API float THFloatTensor_sum(THFloatTensor *tensor);
+TH_API void THFloatTensor_mul(THFloatTensor *tensor, float value);
 // End of addons
 
 #endif

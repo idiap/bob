@@ -14,6 +14,7 @@ ipBlock::ipBlock()
 	addIOption("ox", 0, "number of overlapping pixels for blocks on the x axis");
 	addIOption("oy", 0, "number of overlapping pixels for blocks on the y axis");
 	addBOption("rcoutput", false, "creates a rows X columns output (for grayscale input only) and thus a single 4D output tensor");
+	addBOption("verbose", false, "verbose");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -48,6 +49,7 @@ bool ipBlock::allocateOutput(const Tensor& input)
 	const int overlap_y = getIOption("oy");
 	const int block_w = getIOption("w");
 	const int block_h = getIOption("h");
+	const bool verbose = getBOption("verbose");
 
 	// Check parameters
 	if (	block_w < 0 || block_h < 0 ||
@@ -90,17 +92,20 @@ bool ipBlock::allocateOutput(const Tensor& input)
 
 	n_blocks = n_blocks_columns * n_blocks_rows;
 
-	print("ipBlock::allocateOutput()\n", n_blocks);
-	print("   image width: %d\n", image_w);
-	print("   image height: %d\n", image_h);
-	print("   block width: %d\n", block_w);
-	print("   block height: %d\n", block_h);
-	print("   overlap x: %d\n", overlap_x);
-	print("   overlap y: %d\n", overlap_y);
-	print("\n");
-	print("   number of blocks determined: %d\n", n_blocks);
-	print("   number of row blocks: %d\n", n_blocks_rows);
-	print("   number of column blocks: %d\n", n_blocks_columns);
+	if(verbose)
+	{
+		print("ipBlock::allocateOutput()\n", n_blocks);
+		print("   image width: %d\n", image_w);
+		print("   image height: %d\n", image_h);
+		print("   block width: %d\n", block_w);
+		print("   block height: %d\n", block_h);
+		print("   overlap x: %d\n", overlap_x);
+		print("   overlap y: %d\n", overlap_y);
+		print("\n");
+		print("   number of blocks determined: %d\n", n_blocks);
+		print("   number of row blocks: %d\n", n_blocks_rows);
+		print("   number of column blocks: %d\n", n_blocks_columns);
+	}
 
 	// Allocate output if required
 	cleanup();
@@ -119,7 +124,7 @@ bool ipBlock::allocateOutput(const Tensor& input)
 			return false;
 		}
 
-		message("Building row X columns output."); 
+		if(verbose) message("Building row X columns output."); 
 
 		m_n_outputs = 1;
 		m_output = new Tensor*[1];
@@ -155,11 +160,13 @@ bool ipBlock::processInput(const Tensor& input)
 	ShortTensor* t_rcoutput = (ShortTensor*)m_output[0];
   	ShortTensor *t_rcoutput_narrow_rows = NULL;
   	ShortTensor *t_rcoutput_narrow_cols = NULL;
+  	ShortTensor *t_ = NULL;
 
 	if(rcoutput)
 	{
   		t_rcoutput_narrow_rows = new ShortTensor();
   		t_rcoutput_narrow_cols = new ShortTensor();
+  		t_ = new ShortTensor();
 	}
 
 	for(int r = 0; r < n_blocks_rows; r++)
@@ -170,8 +177,13 @@ bool ipBlock::processInput(const Tensor& input)
 		t_input_narrow_rows->narrow(t_input, 0, row, block_h);
 
 		if(rcoutput)
+		{
 			// narrow the tensor t_rcoutput along block rows (dimension 0) at row #r# and length 1
-			t_rcoutput_narrow_rows->narrow(t_rcoutput, 0, r, 1);
+			//t_rcoutput_narrow_rows->narrow(t_rcoutput, 0, r, 1);
+
+		   	// but better to use a select to return a sub-tensor
+			t_rcoutput_narrow_rows->select(t_rcoutput, 0, r);
+		}
 
 	   	for(int c = 0; c < n_blocks_columns; c++) 
 		{
@@ -182,31 +194,27 @@ bool ipBlock::processInput(const Tensor& input)
 
 			if(rcoutput)
 			{
-				// narrow the tensor t_rcoutput along block rows (dimension 0) at row #r# and length 1
-				t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
-	
 				/*
 					Warning: t_rcoutput_narrow_cols is a 4D tensor and t_input_narrow_cols a 3D tensor
 
 					However as the lenght of narrow along each dim is 1 we don't need to do any selects
 				*/
 
+				// narrow the tensor t_rcoutput along block rows (dimension 0) at row #r# and length 1
+				//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
+		   		
+				// but better to use a select to return a sub-tensor
+				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c); // here we should refer to 0 as we are using a 3D tensor now 
+	
+				//print("select col: %dD -> %dD\n", t_rcoutput_narrow_rows->nDimension(), t_rcoutput_narrow_cols->nDimension());
+
+
 				// copy the block #t_input_narrow_cols# (3D tensor) into t_rcoutput_narrow_cols (4D tensor) 
-				t_rcoutput_narrow_cols->copy(t_input_narrow_cols);
+				//t_rcoutput_narrow_cols->copy(t_input_narrow_cols);
 
-				/*
-					Normally, we should do:
-
-					a select on t_input_narrow_cols to return a 2D tensor
-						src_->select(t_input_narrow_cols, 2, 0)
-
-					2 selects on t_rcoutput_narrow_cols to return a 2D tensor
-						dst__->select(t_rcoutput_narrow_cols, 0, 0)
-						dst_->select(dct_, 0, 0)
-
-					and then a copy
-						dst_->copy(src_)
-				*/
+				// but better to use a select to return a sub-tensor and copy it
+				t_->select(t_input_narrow_cols, 2, 0);
+				t_rcoutput_narrow_cols->copy(t_);
 			}
 			else
 			{
@@ -223,6 +231,7 @@ bool ipBlock::processInput(const Tensor& input)
 
 	if(rcoutput)
 	{
+		delete t_;
 		delete t_rcoutput_narrow_cols;
 		delete t_rcoutput_narrow_rows;
 	}

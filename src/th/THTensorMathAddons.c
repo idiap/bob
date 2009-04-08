@@ -34,5 +34,10 @@ float THFloatTensor_sum(THFloatTensor *tensor)
   TH_TENSOR_APPLY(float, tensor, sum += *tensor_p;);
   return sum;
 }
+
+void THFloatTensor_mul(THFloatTensor *tensor, float value)
+{
+  TH_TENSOR_APPLY(float, tensor, *tensor_p *= value;);
+}
 // End of addons
 

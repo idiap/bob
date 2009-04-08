@@ -148,11 +148,13 @@ int main(int argc, char* argv[])
 		
 		for(int r = 0; r < n_rows; r++)
 		{
-			t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
+			//t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
+			t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
 
 		   	for(int c = 0; c < n_cols; c++) 
 			{
-				t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
+				//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
+				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
 				
 				t_block->copy(t_rcoutput_narrow_cols);
 

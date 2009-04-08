@@ -109,6 +109,7 @@ int main(int argc, char* argv[])
 	//
 	ipBlock ipblock;
 
+	ipblock.setBOption("verbose", verbose);
 	ipblock.setBOption("rcoutput", true);
 	ipblock.setIOption("ox", block_overlap_w);
 	ipblock.setIOption("oy", block_overlap_h);
@@ -135,7 +136,7 @@ int main(int argc, char* argv[])
 
 		ipblock.process(imagegray);
 
-		print("Number of output blocks: %d\n", ipblock.getNOutputs());
+		if(verbose) print("Number of output blocks: %d\n", ipblock.getNOutputs());
 
 		ShortTensor &t_rcoutput = (ShortTensor &) ipblock.getOutput(0);
 		int n_rows = t_rcoutput.size(0);
@@ -148,20 +149,14 @@ int main(int argc, char* argv[])
 
 		for(int r = 0; r < n_rows; r++)
 		{
-			t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
+			//t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
+			t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
 
 		   	for(int c = 0; c < n_cols; c++) 
 			{
-				t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
+				//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
+				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
 
-				/* normally here we should not be able to this as
-					t_rcoutput_narrow_cols is a 4D tensor and t_block is a 2D tensor
-
-				   however, as t_rcoutput_narrow_cols is narrowed along row and col to a lenght of 1
-				   it is possible.
-
-				   For more details, look at src/ip/ipBlock.cc
-				*/
 				t_block->copy(t_rcoutput_narrow_cols);
 
 				dct.process(*t_block);
