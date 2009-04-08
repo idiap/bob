@@ -2,15 +2,8 @@
 NOT ASSIGNED
 ---
 
-	tensor2pgm.cc	
-
 	xvtensor.cc	Visualization of tensor as 2D images (grayscale, color, )
-
-	ipBlock
-
 	ipConvolution
-
-	tensor2dct.cc
 
 ---
 ASSIGNED
@@ -36,9 +29,6 @@ Nik:
 	matrix (2D tensor) routines (inversion, eigen decomposition) ?
 	
 Cosmin:
-	?
-	ImageScanDataSet
-
 
 ---
 DONE
@@ -62,9 +52,15 @@ Src:
 		|__ bancaGTFile       // BANCA format (10 points ?)
 		|__ cootesGTFile      // Tim Cootes ASM format (68 or more points ?)
 		|__ ...
+	ImageScanDataSet
+	ipBlock
 
 Examples:
 	gtimageextract.cc (examples/facetools) : object (face, ...) extraction from list of pairs (image, gt) -> tensor
 	readtensor.cc     (examples/dataset)
 	bindata2tensor.cc (examples/dataset)
+	tensor2image.cc	
+	tensor2block.cc	
+	tensor2dct.cc	
+
 
