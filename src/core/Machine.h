@@ -151,6 +151,8 @@ namespace Torch {
 #define CASCADE_MACHINE_ID 2
 #define STUMP_MACHINE_ID 3
 #define LUT_MACHINE_ID 4
+#define DIAG_GMM_MACHINE_ID 5
+#define MLP_MACHINE_ID 6
 
 }
 

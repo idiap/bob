@@ -11,8 +11,13 @@ StumpMachine::StumpMachine() : Machine()
 	//feature_id = -1;
 	threshold = 0.0;
 	direction = 0;
+	m_output = new DoubleTensor(1);
 }
-
+//void StumpMachine::setCore(spCore* core)
+//{
+//	m_core = core;
+//	print("you are here\n");
+//}
 bool StumpMachine::forward(const Tensor& input)
 {
    	if(m_core == NULL)
@@ -33,6 +38,7 @@ bool StumpMachine::forward(const Tensor& input)
 
 	double feature = core_t_output->get(0);
 
+  //  print("....feature......%f\n",feature);
 	double stump_output_;
 
 	if(direction == 1)
@@ -54,14 +60,72 @@ bool StumpMachine::forward(const Tensor& input)
 
 bool StumpMachine::loadFile(File& file)
 {
+    int id;
+    if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	{
+		Torch::message("StumpMachine::load - failed to Read <ID> field!\n");
+		return false;
+	}
+
+
+    if (file.taggedRead(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
+	{
+		Torch::message("StumpMachine::load - failed to read <threshold> field!\n");
+		return false;
+	}
+
+
+     if (file.taggedRead(&direction, sizeof(int), 1, "DIRECTION") != 1)
+	{
+		Torch::message("StumpMachine::load - failed to read <direction> field!\n");
+		return false;
+	}
+
+    int idCore;
+    if (file.taggedRead(&idCore, sizeof(int), 1, "CoreID") != 1)
+	{
+		Torch::message("StumpMachine::load - failed to read <CoreID> field!\n");
+		return false;
+	}
+
+    print("StumpMachine::LoadFile()\n");
+	print("   threshold = %g\n", threshold);
+	print("   direction = %d\n", direction);
+	print("   idCore = %d\n",idCore);
+	spCoreManager* spC = new spCoreManager();
+	m_core = spC->getCore(idCore);
+	m_core->loadFile(file);
+	delete spC;
 	return true;
 }
 
 bool StumpMachine::saveFile(File& file) const
 {
+    const int id = getID();
+	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	{
+		Torch::message("StumpMachine::save - failed to write <ID> field!\n");
+		return false;
+	}
+	print("ID of the machine : %d\n",id);
+    if (file.taggedWrite(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
+	{
+		Torch::message("StumpMachine::save - failed to write <threshold> field!\n");
+		return false;
+	}
+
+	 if (file.taggedWrite(&direction, sizeof(int), 1, "DIRECTION") != 1)
+	{
+		Torch::message("StumpMachine::save - failed to write <direction> field!\n");
+		return false;
+	}
    	print("StumpMachine::saveFile()\n");
 	print("   threshold = %g\n", threshold);
 	print("   direction = %d\n", direction);
+
+
+
+	m_core->saveFile(file);
 
 	return true;
 }

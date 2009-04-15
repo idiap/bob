@@ -19,7 +19,7 @@ namespace Torch
 
 	///
         virtual ~StumpTrainer();
-	
+
     private:
 
 	//

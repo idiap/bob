@@ -12,6 +12,7 @@ namespace Torch
 
 		m_n_features = n_features_;
 		m_features = features_;
+		m_mask =false;
 	}
 
 	bool WeakLearner::setDataShuffledIndex(long *shuffledindex_dataset_)

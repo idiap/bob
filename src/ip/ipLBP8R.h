@@ -2,6 +2,7 @@
 #define _TORCHVISION_IP_LBP_8R_H_
 
 #include "ipLBP.h"		// <ipLBP8R> is an <ipLBP>
+#include "ipCore.h"
 
 namespace Torch
 {
@@ -12,6 +13,7 @@ namespace Torch
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
+	//class ipCore;
 
 	class ipLBP8R : public ipLBP
 	{
@@ -28,6 +30,10 @@ namespace Torch
 
 		// Get the maximum possible label
 		virtual int		getMaxLabel();
+		/// Loading/Saving the content from files (\emph{not the options})
+		virtual bool		loadFile(File& file);
+		virtual bool		saveFile(File& file) const;
+
 
 		/////////////////////////////////////////////////////////////////
 

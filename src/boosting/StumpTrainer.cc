@@ -2,17 +2,17 @@
 
 namespace Torch
 {
-        StumpTrainer::StumpTrainer(StumpMachine *stump_machine_, int n_features_, spCore **features_) 
+        StumpTrainer::StumpTrainer(StumpMachine *stump_machine_, int n_features_, spCore **features_)
 	   : WeakLearner(stump_machine_, n_features_, features_)
 	{
 	   	m_stump_machine = stump_machine_;
 
 		n_bins = 100;
-	
+
 		histogram = new float* [2];
-		histogram[0] = new float [n_bins];
+		histogram[0] = new float [n_bins]; //for -ve patterns
 		histogram[1] = new float [n_bins];
-		
+
 		cumulative_histogram = new float* [2];
 		cumulative_histogram[0] = new float [n_bins];
 		cumulative_histogram[1] = new float [n_bins];
@@ -77,6 +77,8 @@ namespace Torch
 		// test target type, size and value
 		for(int i = 0; i < n_examples ; i++)
 		{
+		   // DoubleTensor *dt = (DoubleTensor*)m_dataset->getExample(i);
+		 //   Tprint(dt);
 			Tensor *tensor = m_dataset->getTarget(i);
 
 			// test the type
@@ -109,7 +111,7 @@ namespace Torch
 
 			if(target_value != 0 && target_value != 1)
 			{
-			  	Torch::error("StumpTrainer::train() target values should be 0 or 1.");
+			  	Torch::error("StumpTrainer::train() target values should be -1 or 1.");
 
 				return false;
 			}
@@ -123,11 +125,19 @@ namespace Torch
 		int bestFeature = -1;
 		float bestThreshold = 0.0;
 		int bestDirection = 0;
+		float max__, min__;
+		float *hp = new float [n_bins]; //for -ve patterns
+		float *hn = new float [n_bins];
+		int n_positive = 0;
+			int n_negative = 0;
+			max__ = 0;
+			min__=0;
+
 
 		for(int f = 0; f < m_n_features ; f++)
 		{
 		   	// compute the distribution of the current feature value across the dataset
-	
+
 			for(int i = 0; i < n_bins ; i++)
 			{
 		   		histogram[0][i] = 0.0;
@@ -140,15 +150,18 @@ namespace Torch
 			float min_ = FLT_MAX;
 			float max_ = -FLT_MAX;
 
-			int n_positive = 0;
-			int n_negative = 0;
+
+			 n_positive = 0;
+			n_negative = 0;
 
         		//print("computing the feature %d for all examples ...\n", f);
 
+
 			for(int i = 0; i < n_examples ; i++)
 			{
-			   	int index = m_shuffledindex_dataset[i]; 
+			   	int index = m_shuffledindex_dataset[i];
 			   	Tensor *example = m_dataset->getExample(index);
+
 
 
 				// here we should test first the type and size of the returned tensor
@@ -159,6 +172,7 @@ namespace Torch
 				// store the features for more efficiency
 				float z = (*feature_value)(0);
 				features_values[i] = z;
+				//print("Feature value %f\n",z);
 
 				//
 			   	//ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
@@ -176,7 +190,7 @@ namespace Torch
 			//
 			for(int i = 0; i < n_examples ; i++)
 			{
-			   	int index = m_shuffledindex_dataset[i]; 
+			    int index = m_shuffledindex_dataset[i];
 			   	ShortTensor *target = (ShortTensor *) m_dataset->getTarget(index);
 				short target_value = (*target)(0);
 
@@ -199,7 +213,7 @@ namespace Torch
 				else if(target_value == 0)
 				{
 					// negative class
-				   	
+
 				   	// binning
 				   	int bin = (int) floor(z / bin_size);
 					if(bin < 0) bin = 0;
@@ -257,13 +271,36 @@ namespace Torch
 					bestFeature = f;
 					bestThreshold = (i+1) * bin_size + min_;
 					bestDirection = direction;
+					max__ = max_;
+					min__ = min_;
+					for(int hm = 0;hm<n_bins;hm++)
+                        {
+                            hp[hm] = histogram[1][hm];
+                            hn[hm] = histogram[0][hm];
+                        }
 				}
 			}
 		}
 
+            print("Max and Min of Stump Machine : %f, %f\n",max__,min__);
+
         	print("   Selected feature (%d, %g, %d) E = %g.\n", bestFeature, bestThreshold, bestDirection, min_error);
+        	print(" N neg %d, N pos %d, N Examples %d\n",n_negative,n_positive, n_examples);
+        	//print to a file the histogram of best feature
+        //	File f1;
+//        	char filname[100];
+//        	 sprintf(filname,"hist%d.data",bestFeature);
+//        	print("filename of histogram %s\n",filname);
+//        	f1.open(filname,"w");
+//        	for(int i=0;i<n_bins;i++)
+//                f1.printf("%g\n",hp[i]);
+//                for(int i=0;i<n_bins;i++)
+//                f1.printf("%g\n",hn[i]);
+//                f1.close();
+
 
 		m_weak_classifier->setCore(m_features[bestFeature]);
+		//m_stump_machine->setCore(m_features[bestFeature]);
 		m_stump_machine->setParams(bestDirection, bestThreshold);
 
         	print("\n");

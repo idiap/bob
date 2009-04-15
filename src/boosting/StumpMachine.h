@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_STUMP_MACHINE_H_
 
 #include "Machine.h"
+#include "spCoreManager.h"
 
 namespace Torch {
 
@@ -45,6 +46,8 @@ namespace Torch {
 		// Get the ID specific to each Machine
 		virtual int		getID() const { return STUMP_MACHINE_ID; }
 
+		// virtual void		setCore(spCore* core);
+
 		///////////////////////////////////////////////////////////
 		// Access functions
 
@@ -64,6 +67,12 @@ namespace Torch {
 		float threshold;
 		int direction;
 	};
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // REGISTER this machine to the <MachineManager>
+        const bool stump_machine_registered = MachineManager::getInstance().add(
+                new StumpMachine(), "StumpMachine");
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 #endif

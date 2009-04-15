@@ -2,7 +2,7 @@
 #define _TORCH5SPRO_IP_LBP_H_
 
 #include "ipCore.h"		// <ipLBP> is an <ipCore>
-
+#include "Tensor.h"
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
@@ -51,6 +51,9 @@ namespace Torch
 
 		// Get the LBP code (fast & direct) access
 		int			getLBP() const { return *m_lbp; }
+		/// Loading/Saving the content from files (\emph{not the options})
+	//	virtual bool		loadFile(File& file) =0 ;
+	//	virtual bool		saveFile(File& file) const =0 ;
 
 		/////////////////////////////////////////////////////////////////
 
