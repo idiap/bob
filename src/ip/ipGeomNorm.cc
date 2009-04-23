@@ -302,9 +302,13 @@ bool ipGeomNorm::processInput(const Tensor& input)
 	// Compute the rotation parameters
 	const sPoint2D& rotP1 = gt_pts[rotIdx1];
 	const sPoint2D& rotP2 = gt_pts[rotIdx2];
-	const double rot_P12_angle = Torch::angle(Point2D(rotP1), Point2D(rotP2));
+	double rot_P12_angle = Torch::angle(Point2D(rotP1), Point2D(rotP2));
 
-	 double ip_rot_angle = rotAngle - radian2degree(rot_P12_angle);
+
+	if(gt_pts[rotIdx1].y < gt_pts[rotIdx2].y)
+		rot_P12_angle = -rot_P12_angle;
+
+        double ip_rot_angle = -rotAngle + radian2degree(rot_P12_angle);
 
 	//
 	double v_rot_cx = (rotP1.x + rotP2.x)/2;
@@ -334,6 +338,7 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		&rm);
 	//now you have rotated points of those two points which are used for croping
 	// find the center now in rotated coordinate.
+	//if(verbose) print("The y coordinate %f %f, %f, %f, angle %f\n",gt_pts[cropIdx1].y, gt_pts[cropIdx2].y,py1,py2, ip_rot_angle);
 	double Cx,Cy;
 	Cx = (px1+px2 + (cropW-2*cropDx)*scaleFactor)/2;
 	Cy = (py1+py2 + (cropH-2*cropDy)*scaleFactor)/2;
@@ -348,10 +353,10 @@ bool ipGeomNorm::processInput(const Tensor& input)
 		&px1, &py1,
 		&rm);
 
-	int nCx = (int) px1;
-	int nCy = (int) py1;
+	int nCx = (int)( px1+0.5);
+	int nCy = (int) (py1+0.5);
 	print("The centers %d %d\n",nCx,nCy);
-	ip_rot_angle += finalRotAngle;
+	ip_rot_angle = finalRotAngle-ip_rot_angle;
 
 	// Rotate the image
 	if (	m_ip_rotate.setDOption("angle", ip_rot_angle) == false ||

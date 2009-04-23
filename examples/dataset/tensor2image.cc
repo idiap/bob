@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
         char* image_extension;
         char* image_basename;
 	bool verbose;
+	int n_images;
 
 	// Build the command line object
 	CmdLine cmd;
@@ -31,6 +32,7 @@ int main(int argc, char* argv[])
 	cmd.addBCmdOption("-verbose", &verbose, false, "print Tensor values");
 	cmd.addSCmdOption("-xt", &image_extension, "pgm", "image extension");
 	cmd.addSCmdOption("-base", &image_basename, "tensor", "image basename");
+	cmd.addICmdOption("-I", &n_images, -1, "number of images to process");
 
 	// Parse the command line
 	if (cmd.read(argc, argv) < 0)
@@ -53,6 +55,8 @@ int main(int argc, char* argv[])
 	print(" size[1]:      [%d]\n", header.m_size[1]);
 	print(" size[2]:      [%d]\n", header.m_size[2]);
 	print(" size[3]:      [%d]\n", header.m_size[3]);
+
+	if(n_images == -1) n_images = header.m_n_samples;
 
 	if(header.m_type != Tensor::Short)
 	{
@@ -87,6 +91,7 @@ int main(int argc, char* argv[])
 	i++;
 	while ((tensor = tf.load()) != 0)
 	{
+	   	if(i == n_images) break; 
 		if(verbose) tensor->sprint("%d", i);
 		Image imagegray(tensor->size(1), tensor->size(0), 1);
 		ShortTensor *t_ = new ShortTensor();

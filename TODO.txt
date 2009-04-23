@@ -15,8 +15,8 @@ Seb:
 	NN, MLP
 	KSOM
 
-Venky + Ani: 
-	Boosting of Haar-like features
+Venky: 
+	Boosting of Haar-like + MCT/LBP features
 
 Ani: 
 	Boosting of HLBP features
