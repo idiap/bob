@@ -35,6 +35,7 @@ SET(EXAMPLE_SRC
 	readtensor.cc
 	tensor2image.cc
 	bindata2tensor.cc
+	tensor2bindata.cc
 	tensorfiles.cc
 	largememorydataset.cc
 	memorydataset.cc

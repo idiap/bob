@@ -59,6 +59,7 @@ Examples:
 	gtimageextract.cc (examples/facetools) : object (face, ...) extraction from list of pairs (image, gt) -> tensor
 	readtensor.cc     (examples/dataset)
 	bindata2tensor.cc (examples/dataset)
+	tensor2bindata.cc
 	tensor2image.cc	
 	tensor2block.cc	
 	tensor2dct.cc	
