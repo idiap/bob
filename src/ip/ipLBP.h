@@ -38,10 +38,10 @@ namespace Torch
 		virtual bool		setR(int R);
 
 		/// Change the region of the input tensor to process - overriden
-		void			setRegion(const TensorRegion& region);
+		virtual void		setRegion(const TensorRegion& region);
 
 		/// Change the model size (if used with some machine) - overriden
-		void			setModelSize(const TensorSize& modelSize);
+		virtual void		setModelSize(const TensorSize& modelSize);
 
 		// Get the maximum possible label
 		virtual int		getMaxLabel() = 0;
@@ -51,9 +51,6 @@ namespace Torch
 
 		// Get the LBP code (fast & direct) access
 		int			getLBP() const { return *m_lbp; }
-		/// Loading/Saving the content from files (\emph{not the options})
-	//	virtual bool		loadFile(File& file) =0 ;
-	//	virtual bool		saveFile(File& file) const =0 ;
 
 		/////////////////////////////////////////////////////////////////
 

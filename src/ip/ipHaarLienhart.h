@@ -24,11 +24,11 @@ namespace Torch
         bool setNoRec(int noRecs_); //set the number of rectangles
         bool setRec(int Rec_,double weight_, int x_, int y_, int w_, int h_);
 
-/// Change the region of the input tensor to process - overriden
-        void			setRegion(const TensorRegion& region);
+	/// Change the region of the input tensor to process - overriden
+        virtual void			setRegion(const TensorRegion& region);
 
         /// Change the model size (if used with some machine) - overriden
-       void			setModelSize(const TensorSize& modelSize);
+	virtual void			setModelSize(const TensorSize& modelSize);
 
         // Destructor
         virtual ~ipHaarLienhart();

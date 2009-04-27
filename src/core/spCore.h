@@ -26,10 +26,10 @@ namespace Torch
 		bool	 		process(const Tensor& input);
 
 		/// Change the region of the input tensor to process
-		void			setRegion(const TensorRegion& region);
+		virtual void		setRegion(const TensorRegion& region);
 
 		/// Change the model size (if used with some machine)
-		void			setModelSize(const TensorSize& modelSize);
+		virtual void		setModelSize(const TensorSize& modelSize);
 
 		/// Access the results
 		int			getNOutputs() const;

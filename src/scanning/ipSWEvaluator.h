@@ -35,7 +35,7 @@ namespace Torch
 		bool                    setClassifier(const char* filename);
 
 		/// Change the region of the input tensor to process
-		void			setRegion(const TensorRegion& region);
+		virtual void		setRegion(const TensorRegion& region);
 
 		/////////////////////////////////////////////////////////////////
 		// Access functions

@@ -30,6 +30,7 @@ namespace Torch
 
 		// Get the maximum possible label
 		virtual int		getMaxLabel();
+
 		/// Loading/Saving the content from files (\emph{not the options})
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;

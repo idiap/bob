@@ -33,7 +33,7 @@ namespace Torch
 		virtual ~ipSWVariancePruner();
 
 		/// Change the region of the input tensor to process
-		void			setRegion(const TensorRegion& region);
+		virtual void		setRegion(const TensorRegion& region);
 
 		// Set prunning parameters
 		void                  	setMinMean(double min_mean) { m_min_mean = min_mean; }

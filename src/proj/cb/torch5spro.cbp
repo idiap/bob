@@ -202,9 +202,17 @@
 		</Unit>
 		<Unit filename="../../CMakeLists.txt" />
 		<Unit filename="../../ap/CMakeLists.txt" />
+		<Unit filename="../../boosting/BoostingRoundLBPTrainer.cc" />
+		<Unit filename="../../boosting/BoostingRoundLBPTrainer.h" />
+		<Unit filename="../../boosting/BoostingRoundTrainer.cc" />
+		<Unit filename="../../boosting/BoostingRoundTrainer.h" />
 		<Unit filename="../../boosting/BoostingTrainer.cc" />
 		<Unit filename="../../boosting/BoostingTrainer.h" />
 		<Unit filename="../../boosting/CMakeLists.txt" />
+		<Unit filename="../../boosting/LBPMachine.cc" />
+		<Unit filename="../../boosting/LBPMachine.h" />
+		<Unit filename="../../boosting/LBPRoundTrainer.cc" />
+		<Unit filename="../../boosting/LBPRoundTrainer.h" />
 		<Unit filename="../../boosting/LutMachine.cc" />
 		<Unit filename="../../boosting/LutMachine.h" />
 		<Unit filename="../../boosting/LutTrainer.cc" />
@@ -317,6 +325,8 @@
 		<Unit filename="../../ip/imagefiles/ppmImageFile.h" />
 		<Unit filename="../../ip/imagefiles/tiffImageFile.cc" />
 		<Unit filename="../../ip/imagefiles/tiffImageFile.h" />
+		<Unit filename="../../ip/ipBlock.cc" />
+		<Unit filename="../../ip/ipBlock.h" />
 		<Unit filename="../../ip/ipCrop.cc" />
 		<Unit filename="../../ip/ipCrop.h" />
 		<Unit filename="../../ip/ipFlip.cc" />
@@ -325,6 +335,8 @@
 		<Unit filename="../../ip/ipGeomNorm.h" />
 		<Unit filename="../../ip/ipHaar.cc" />
 		<Unit filename="../../ip/ipHaar.h" />
+		<Unit filename="../../ip/ipHaarLienhart.cc" />
+		<Unit filename="../../ip/ipHaarLienhart.h" />
 		<Unit filename="../../ip/ipHisto.cc" />
 		<Unit filename="../../ip/ipHisto.h" />
 		<Unit filename="../../ip/ipIntegral.cc" />
