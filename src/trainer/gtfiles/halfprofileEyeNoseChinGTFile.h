@@ -6,6 +6,10 @@
 namespace Torch
 {
 	/**
+		Labels: leye_ocorner, leye_icorner
+			reye_center, nose_tip
+			chin, leye_center
+
 	*/
 	class halfprofileEyeNoseChinGTFile : public GTFile
 	{

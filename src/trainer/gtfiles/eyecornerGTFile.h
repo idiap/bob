@@ -6,6 +6,10 @@
 namespace Torch
 {
 	/**
+		Labels: leye_ocorner, leye_icorner
+			reye_ocorner, reye_icorner
+			leye_center, reye_center
+
 	*/
 	class eyecornerGTFile : public GTFile
 	{

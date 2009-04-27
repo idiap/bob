@@ -6,6 +6,8 @@
 namespace Torch
 {
 	/**
+		Labels: leye_center, nose_tip, chin
+
 	*/
 	class profileEyeNoseChinGTFile : public GTFile
 	{

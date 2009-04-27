@@ -71,7 +71,7 @@ void ipSWVariancePruner::setRegion(const TensorRegion& region)
         }
 
 	// Set the region (subwindow) to process
-	setRegion(region);
+	ipSWPruner::setRegion(region);
         m_isRejected = false;
 
         // Compute the sum and the square sum if required

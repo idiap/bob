@@ -6,6 +6,8 @@
 namespace Torch
 {
 	/**
+		Labels: leye_center, reye_center
+
 	*/
 	class cootesGTFile : public GTFile
 	{
