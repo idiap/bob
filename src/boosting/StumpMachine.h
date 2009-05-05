@@ -2,7 +2,7 @@
 #define _TORCH5SPRO_STUMP_MACHINE_H_
 
 #include "Machine.h"
-#include "spCoreManager.h"
+#include "Machines.h"
 
 namespace Torch {
 

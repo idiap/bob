@@ -12,15 +12,16 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
                         "${TORCH5SPRO_DIR}/src/ip/imagefiles/"
                         "${TORCH5SPRO_DIR}/extras/jpeg/"
                         "${TORCH5SPRO_DIR}/src/th/"
-			"${TORCH5SPRO_DIR}/src/machine/")
+			"${TORCH5SPRO_DIR}/src/machine/"
+			"${TORCH5SPRO_DIR}/src/boosting/")
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
                 "${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
 
 # Set the compiler flags and build type (release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer -msse2")
 SET(CMAKE_CXX_FLAGS_DEBUG "-g")
-SET(CMAKE_BUILD_TYPE RELEASE)
-#SET(CMAKE_BUILD_TYPE DEBUG)
+#SET(CMAKE_BUILD_TYPE RELEASE)
+SET(CMAKE_BUILD_TYPE DEBUG)
 
 MESSAGE("---------------------------------------------" "")
 MESSAGE("CXX RELEASE FLAGS: " "${CMAKE_CXX_FLAGS_RELEASE}")

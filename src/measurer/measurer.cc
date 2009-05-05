@@ -6,12 +6,21 @@ extern "C" int cmp_labelledmeasure(const void *p1, const void *p2)
 {
 	LabelledMeasure v1 = *((LabelledMeasure *)p1);
 	LabelledMeasure v2 = *((LabelledMeasure *)p2);
-  
+
 	if(v1.measure > v2.measure) return 1;
   	if(v1.measure < v2.measure) return -1;
 
 	return 0;
 }
+double computeTH(LabelledMeasure* measures, int n_size, double dr)
+{
+   qsort(measures,n_size,sizeof(LabelledMeasure),cmp_labelledmeasure);
+int n;
+    n =(int)((1-dr)*n_size);
+return measures[n].measure;
+}
+
+
 
 double computeEER(LabelledMeasure* measures, int n, double* frr, double* far, int number_of_positives_, bool sort)
 {
@@ -54,7 +63,7 @@ double computeEER(LabelledMeasure* measures, int n, double* frr, double* far, in
 			else
 				thrd_min = current_thrd;
 		}
-	}  
+	}
 	return (thrd_min);
 }
 
@@ -99,7 +108,7 @@ double computeHTER(LabelledMeasure* measures, int n, double* frr, double* far, i
 			else
 				thrd_min = current_thrd;
 		}
-	}  
+	}
 	return (thrd_min);
 }
 
@@ -118,7 +127,7 @@ double computeHTER(LabelledMeasure* measures, int n, double* frr, double* far, i
 					number_of_clients++;
 		}else
 			number_of_clients = number_of_clients_;
-		int number_of_impostors = n - number_of_clients;	
+		int number_of_impostors = n - number_of_clients;
 
 		int n_i = number_of_impostors;
 		int n_c = 0;

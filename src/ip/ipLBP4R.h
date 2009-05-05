@@ -2,6 +2,7 @@
 #define _TORCHVISION_IP_LBP_4R_H_
 
 #include "ipLBP.h"		// <ipLBP4R> is an <ipLBP>
+#include "spCores.h"
 
 namespace Torch
 {
@@ -30,6 +31,12 @@ namespace Torch
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 
+		// Get the ID specific to each spCore - overriden
+		virtual int		getID() const { return IP_LBP_4R_ID; }
+
+		/// Constructs an empty spCore of this kind - overriden
+		/// (used by <spCoreManager>, this object should be deallocated by the user)
+		virtual spCore*		getAnInstance() const { return new ipLBP4R(); }
 
 		/////////////////////////////////////////////////////////////////
 
@@ -56,6 +63,12 @@ namespace Torch
 
 		//
 	};
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // REGISTER this spCore to the <spCoreManager>
+        const bool ip_lbp_4r_registered = spCoreManager::getInstance().add(
+                new ipLBP4R(), "LBP 4R");
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 #endif

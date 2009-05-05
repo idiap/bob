@@ -110,10 +110,28 @@ namespace Torch
 //
 //        print("\n\n");
 //    }
+
+    double BoostingRoundLBPTrainer::forward(Tensor *example)
+    {
+        //   print("BoostingRoundLBPTrainer::forward()\n");
+        double s = 0.0;
+        for (int j = 0 ; j < m_n_classifiers ; j++)
+        {
+            Machine *m_ = m_weak_learners[j]->getMachine();
+            m_->forward(*example);
+            DoubleTensor *t_output = (DoubleTensor *) &m_->getOutput();
+
+            s +=  1.0*(*t_output)(0);
+
+        }
+        // print("Score %f\n",s);
+        return s;
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     bool BoostingRoundLBPTrainer::train()
     {
-        print("BoostingTrainer::train() ...\n");
+        print("BoostingRoundLBPTrainer::train() ...\n");
 
         //
         bool useSampling = getBOption("boosting_by_sampling");
@@ -134,6 +152,7 @@ namespace Torch
             m_features = m_weak_learners[0]->getmnFeatures();
 
         m_featuremask =new int[m_features];
+        trackfeatures = new int[m_nrounds];
 
         for (int i=0;i<m_features;i++)
             m_featuremask[i] = 0;
@@ -215,7 +234,7 @@ namespace Torch
 
 
 
-
+            trackfeatures[m_n_classifiers_trained] = featureID;
 
 
             updateWeights(); // update weights for all examples
@@ -228,7 +247,7 @@ namespace Torch
         double z_ = 0.0;
         for (int j = 0 ; j < m_nrounds ; j++)
         {
-            print("> %g\n", m_weights[j]);
+            // print("> %g\n", m_weights[j]);
             z_ += exp(m_weights[j]);
         }
 
@@ -236,7 +255,7 @@ namespace Torch
         {
             m_weights[j] = exp(m_weights[j]) / z_;
             m_weak_learners[j]->setWeight(m_weights[j]);
-            print("< %g\n", m_weights[j]);
+            // print("< %g\n", m_weights[j]);
         }
 
         //
@@ -286,114 +305,98 @@ namespace Torch
 
         print("   Mean negative = %g \t Mean Positive = %g\n", mean_negative / (double) n_negative, mean_positive / (double) n_positive);
 
+        compressmachines();
+
+        return true;
+    }
+//////////////////////////////////////////////////////////////////////////////////////////
+    void BoostingRoundLBPTrainer::compressmachines()
+    {
+// first map the featureid to first m_n_classifiers
+        int c=0;
+        int max_bins = 512;
+        int bins;
+        int *bintrack=new int[m_n_classifiers];
+        double **lut_t1= new double*[m_n_classifiers];
+        double *lut_t2;
+        for (int i=0;i<m_n_classifiers;i++)
+        {
+            lut_t1[i] = new double[max_bins];
+            for (int j=0;j<max_bins;j++)
+                lut_t1[i][j] = 0;
+        }
+
+
+        for (int i=0;i<m_n_examples;i++)
+        {
+            if (m_featuremask[i]==1)
+            {
+                m_featuremask[i] = c;
+                c++;
+            }
+
+        }
+
+// now you have to get the lut and
+        int track;
+        int *trackf = new int[m_n_classifiers];
+        for (int i=0;i<m_nrounds;i++)
+        {
+            bins =  ((LBPRoundTrainer*)m_weak_learners[i])->getLUTSize();
+            lut_t2 = ((LBPRoundTrainer*)m_weak_learners[i])->getLUT();
+            track  = m_featuremask[trackfeatures[i]];
+            bintrack[track] = bins;
+            trackf[track] = trackfeatures[i];
+            for (int j=0;j<bins;j++)
+            {
+
+                lut_t1[track][j] += m_weights[i]*lut_t2[j];
+            }
+
+
+        }
+
+//so finally we get the lut for a single feature
+//now set the first m_n_classifiers machines to this new lut
+        for (int i=0;i<m_n_classifiers;i++)
+        {
+            bins = bintrack[i];
+            ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setCore( m_weak_learners[i]->m_features[trackf[i]]);
+            ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setParams(bins, lut_t1[i]);
+
+        }
+
+        //    for (int i=0;i<m_n_classifiers;i++)
+        ////        delete lut_t1[i];
+        //   delete [] lut_t1;
+
+    }
+//double BoostingRoundLBPTrainer::forward(Tensor *example_)
+//{
+//    return 1.0;
+//}
+
+
+    bool BoostingRoundLBPTrainer::setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_)
+    {
+        m_n_classifiers = n_classifiers_;
+        m_weak_learners = weak_learners_;
+
+        BoostingTrainer::cleanup();
+        m_nrounds = getIOption("number_of_rounds");
+        m_weights = new double [m_nrounds];
+
         return true;
     }
 
-//    void BoostingRoundTrainer::cleanup()
-//    {
-//        if (m_weights == NULL) delete []m_weights;
-//        if (m_weights_samples == NULL) delete []m_weights_samples;
-//        if (m_label_samples == NULL) delete []m_label_samples;
-//        if (m_shuffledindex_dataset == NULL) delete []m_shuffledindex_dataset;
-//        if (m_repartition == NULL) delete []m_repartition;
-//        if (m_labelledmeasure == NULL) delete []m_labelledmeasure;
-//    }
-// void BoostingRoundLBPTrainer::updateWeights()
-//    {
-//        print("   BoostingLBPTrainer::updateWeights()\n");
-//
-//        int fa = 0;
-//        int fr = 0;
-//        int np = 0;
-//        int nn = 0;
-//
-//        double error_ = 0.0;
-//
-//        //
-//        Machine *m_ = m_weak_learners[m_n_classifiers_trained]->getMachine();
-//       // TensorRegion *tr = new TensorRegion(0,0,19,19);
-//       // m_->setRegion(*tr);
-//
-//        print("Number of examples in updateweights %d\n",m_n_examples);
-//        for (int i=0 ; i<m_n_examples ; i++)
-//        {
-//            Tensor *example = m_dataset->getExample(i);
-//
-//          //  print("1 ..........\n");
-//            m_->forward(*example);
-//           // print("2 ..........\n");
-//            ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
-//            short target_value = (*target)(0);
-//           DoubleTensor *t_output = (DoubleTensor *) &m_->getOutput();
-//           // print("3 ..........\n");
-//            m_labelledmeasure[i].measure = (*t_output)(0);
-//          //  print("machine feature value %f\n",(*t_output)(0));
-//            m_labelledmeasure[i].label = target_value;
-//
-//            m_label_samples[i] = 0;
-//          //  print("4 ..........\n");
-//            if (target_value == 0)
-//            {
-//                if ((*t_output)(0) > 0)
-//                {
-//                    fa++;
-//                    error_ += m_weights_samples[i];
-//                    m_label_samples[i] = 1;
-//                }
-//                else m_label_samples[i] = -1;
-//
-//                nn++;
-//            }
-//            else if (target_value == 1)
-//            {
-//                if ((*t_output)(0) < 0)
-//                {
-//                    fr++;
-//                    error_ += m_weights_samples[i];
-//                    m_label_samples[i] = 1;
-//                }
-//                else m_label_samples[i] = -1;
-//                np++;
-//
-//            }
-//        }
-//
-//        print("   error = %g \t FAR = %g \t FRR = %g\n", error_, ((float) fa * 100.0 / (float) nn), ((float) fr * 100.0 / (float) np));
-//
-//        double frr = 0.0;
-//        double far = 0.0;
-//        double threshold = computeEER(m_labelledmeasure, m_n_examples, &frr, &far);
-//
-//        print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
-//
-//        double beta = error_ / (1.0 - error_);
-//
-//        //
-//        m_weights[m_n_classifiers_trained] = -log(beta); // log(1 / beta)
-//
-//        print("   Machine weights = %g\n", m_weights[m_n_classifiers_trained]);
-//
-//        //
-//        double z_ = 0.0;
-//        for (int i=0 ; i<m_n_examples ; i++)
-//        {
-//            if (m_label_samples[i] < 0)
-//                m_weights_samples[i] *= beta; // in fact exp(log(beta) * I{classification error})
-//            z_ += m_weights_samples[i];
-//        }
-//        for (int i=0 ; i<m_n_examples ; i++) m_weights_samples[i] /= z_;
-//
-//
-//        print("\n\n");
-//    }
     ////////////////////////////////////////
     BoostingRoundLBPTrainer::~BoostingRoundLBPTrainer()
     {
         cleanup();
-     //   print("ffgjsdfs\n");
+        //   print("ffgjsdfs\n");
         if (m_featuremask ==NULL)
             delete []m_featuremask;
-       // print("ffgjsdfs\n");
+        // print("ffgjsdfs\n");
     }
 
 }

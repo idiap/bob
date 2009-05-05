@@ -1,7 +1,7 @@
 #!/bin/sh
 
 image_dir="/idiap/common_vision/visidiap/databases/cmu-test/images_gray"
-model="/idiap/catana/bin/models/face_model.mct4.cascade"
+model="../data/models/facedetection/frontal/mct4.cascade"
 
 params_prune=""	#-prune_use_mean -prune_use_stdev"
 params_select="-select_type 1 -select_merge_type 1 -select_min_surf_overlap 60" #-select_overlap_iterative

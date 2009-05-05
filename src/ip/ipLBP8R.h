@@ -2,7 +2,7 @@
 #define _TORCHVISION_IP_LBP_8R_H_
 
 #include "ipLBP.h"		// <ipLBP8R> is an <ipLBP>
-#include "ipCore.h"
+#include "spCores.h"
 
 namespace Torch
 {
@@ -13,7 +13,6 @@ namespace Torch
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
-	//class ipCore;
 
 	class ipLBP8R : public ipLBP
 	{
@@ -35,6 +34,12 @@ namespace Torch
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 
+		// Get the ID specific to each spCore - overriden
+		virtual int		getID() const { return IP_LBP_8R_ID; }
+
+		/// Constructs an empty spCore of this kind - overriden
+		/// (used by <spCoreManager>, this object should be deallocated by the user)
+		virtual spCore*		getAnInstance() const { return new ipLBP8R(); }
 
 		/////////////////////////////////////////////////////////////////
 
@@ -61,6 +66,12 @@ namespace Torch
 
 		float 			m_r;
 	};
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // REGISTER this spCore to the <spCoreManager>
+        const bool ip_lbp_8r_registered = spCoreManager::getInstance().add(
+                new ipLBP8R(), "LBP 8R");
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 #endif

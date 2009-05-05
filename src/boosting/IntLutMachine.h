@@ -1,7 +1,8 @@
-#ifndef _TORCH5SPRO_LUT_MACHINE_H_
-#define _TORCH5SPRO_LUT_MACHINE_H_
+#ifndef _TORCH5SPRO_INTLUT_MACHINE_H_
+#define _TORCH5SPRO_INTLUT_MACHINE_H_
 
 #include "Machine.h"
+#include "Machines.h"
 
 namespace Torch {
 
@@ -20,16 +21,16 @@ namespace Torch {
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class LutMachine : public Machine
+	class IntLutMachine : public Machine
 	{
 
 	public:
 
 		/// Constructor
-		LutMachine();
+		IntLutMachine();
 
 		/// Destructor
-		virtual ~LutMachine();
+		virtual ~IntLutMachine();
 
 		/// Process the input tensor
 		virtual bool 		forward(const Tensor& input);
@@ -40,15 +41,15 @@ namespace Torch {
 
 		/// Constructs an empty Machine of this kind
 		/// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine*	getAnInstance() const { return new LutMachine(); }
+		virtual Machine*	getAnInstance() const { return new IntLutMachine(); }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const { return LUT_MACHINE_ID; }
+		virtual int		getID() const { return INT_LUT_MACHINE_ID; }
 
 		///////////////////////////////////////////////////////////
 		// Access functions
 
-		void 			setParams(double min_, double max_, int n_bins_, double *lut_);
+		void 			setParams(int n_bins_, double *lut_);
 
 		///////////////////////////////////////////////////////////
 
@@ -58,10 +59,17 @@ namespace Torch {
 		// Attributes
 
 		// parameters of the machine
-		double min, max;
+		//double min, max;
 		int n_bins;
 		double *lut;
 	};
+
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // REGISTER this machine to the <MachineManager>
+        const bool intlut_machine_registered = MachineManager::getInstance().add(
+		new IntLutMachine(), "IntLutMachine");
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 #endif

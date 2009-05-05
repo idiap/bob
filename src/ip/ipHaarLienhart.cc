@@ -34,12 +34,12 @@ namespace Torch
 
     ipHaarLienhart::~ipHaarLienhart()
     {
-        delete parameters;
-        delete weight;
+        delete[] parameters;
+        delete[] weight;
         delete t_;
         delete t__;
-        delete u_parameters;
-        delete u_weight;
+        delete[] u_parameters;
+        delete[] u_weight;
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -439,12 +439,10 @@ if(u_x<0 || u_y <0)
         u_x =0;
         u_y=0;
         //.....here call setregion with 0,0,w,h
-        TensorRegion *temp_region= new TensorRegion(0,0,width,height);
+        setRegion(TensorRegion(0,0,width,height));
 
-        setRegion(*temp_region);
-
-        print("ipHaarLienhart()::loadFile()\n");
-        print("   Number of Rectangles = %d\n", noRecs);
+        //print("ipHaarLienhart()::loadFile()\n");
+        //print("   Number of Rectangles = %d\n", noRecs);
 
 
         return true;
@@ -453,7 +451,7 @@ if(u_x<0 || u_y <0)
 
     bool ipHaarLienhart::saveFile(File& file) const
     {
-        int idCore =2;
+        int idCore = getID();
         if (file.taggedWrite(&idCore, sizeof(int), 1, "CoreID") != 1)
         {
             Torch::message("ipHaarLienhart::save - failed to write <CoreID> field!\n");
@@ -494,8 +492,8 @@ if(u_x<0 || u_y <0)
         }
 
 
-        print("ipHaarLienhart()::saveFile()\n");
-        print("   Number of Rectangles = %d\n", noRecs);
+        //print("ipHaarLienhart()::saveFile()\n");
+        //print("   Number of Rectangles = %d\n", noRecs);
         // print("   X-Y = (%d-%d)\n", x, y);
         // print("   WxH = [%dx%d]\n", w, h);
 

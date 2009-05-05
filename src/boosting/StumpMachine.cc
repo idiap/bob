@@ -60,61 +60,78 @@ bool StumpMachine::forward(const Tensor& input)
 
 bool StumpMachine::loadFile(File& file)
 {
-    int id;
-    if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	int id;
+	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
 	{
 		Torch::message("StumpMachine::load - failed to Read <ID> field!\n");
 		return false;
 	}
+	if (id != getID())
+	{
+		Torch::message("StumpMachine::load - invalid <ID>, this is not a StumpMachine model!\n");
+		return false;
+	}
 
-
-    if (file.taggedRead(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
+	if (file.taggedRead(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
 	{
 		Torch::message("StumpMachine::load - failed to read <threshold> field!\n");
 		return false;
 	}
 
 
-     if (file.taggedRead(&direction, sizeof(int), 1, "DIRECTION") != 1)
+	if (file.taggedRead(&direction, sizeof(int), 1, "DIRECTION") != 1)
 	{
 		Torch::message("StumpMachine::load - failed to read <direction> field!\n");
 		return false;
 	}
 
-    int idCore;
-    if (file.taggedRead(&idCore, sizeof(int), 1, "CoreID") != 1)
+	int idCore;
+	if (file.taggedRead(&idCore, sizeof(int), 1, "CoreID") != 1)
 	{
 		Torch::message("StumpMachine::load - failed to read <CoreID> field!\n");
 		return false;
 	}
 
-    print("StumpMachine::LoadFile()\n");
+	print("StumpMachine::LoadFile()\n");
 	print("   threshold = %g\n", threshold);
 	print("   direction = %d\n", direction);
 	print("   idCore = %d\n",idCore);
-	spCoreManager* spC = new spCoreManager();
-	m_core = spC->getCore(idCore);
-	m_core->loadFile(file);
-	delete spC;
+
+	delete m_core;
+	m_core = 0;
+
+	m_core = spCoreManager::getInstance().get(idCore);
+	if (m_core == 0)
+	{
+		Torch::message("StumpMachine::load - invalid <CoreID> field!\n");
+		return false;
+	}
+
+	if (m_core->loadFile(file) == false)
+	{
+		Torch::message("StumpMachine::load - the spCore cannot be loaded!\n");
+		return false;
+	}
+
 	return true;
 }
 
 bool StumpMachine::saveFile(File& file) const
 {
-    const int id = getID();
+	const int id = getID();
 	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
 	{
 		Torch::message("StumpMachine::save - failed to write <ID> field!\n");
 		return false;
 	}
 	print("ID of the machine : %d\n",id);
-    if (file.taggedWrite(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
+	if (file.taggedWrite(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
 	{
 		Torch::message("StumpMachine::save - failed to write <threshold> field!\n");
 		return false;
 	}
 
-	 if (file.taggedWrite(&direction, sizeof(int), 1, "DIRECTION") != 1)
+	if (file.taggedWrite(&direction, sizeof(int), 1, "DIRECTION") != 1)
 	{
 		Torch::message("StumpMachine::save - failed to write <direction> field!\n");
 		return false;
@@ -123,9 +140,11 @@ bool StumpMachine::saveFile(File& file) const
 	print("   threshold = %g\n", threshold);
 	print("   direction = %d\n", direction);
 
-
-
-	m_core->saveFile(file);
+	if (m_core->saveFile(file) == false)
+	{
+		Torch::message("StumpMachine::save - the spCore cannot be saved!\n");
+		return false;
+	}
 
 	return true;
 }

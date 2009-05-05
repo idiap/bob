@@ -61,14 +61,14 @@
 	<File name="../../ip/scale.cc" open="0" top="0" tabpos="53">
 		<Cursor position="1086" topLine="12" />
 	</File>
-	<File name="../../machines/CMakeLists.txt" open="0" top="0" tabpos="5">
-		<Cursor position="766" topLine="0" />
+	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="15">
+		<Cursor position="885" topLine="0" />
 	</File>
-	<File name="../../machines/convert3to5models.cc" open="0" top="0" tabpos="6">
-		<Cursor position="7710" topLine="0" />
+	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="13">
+		<Cursor position="3748" topLine="189" />
 	</File>
-	<File name="../../machines/test19x19models.cc" open="0" top="0" tabpos="7">
-		<Cursor position="2663" topLine="58" />
+	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="14">
+		<Cursor position="1147" topLine="27" />
 	</File>
 	<File name="../../options/CMakeLists.txt" open="0" top="0" tabpos="12">
 		<Cursor position="414" topLine="0" />
@@ -76,17 +76,17 @@
 	<File name="../../options/make.csh" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="12">
-		<Cursor position="937" topLine="0" />
+	<File name="../../scanning/CMakeLists.txt" open="1" top="1" tabpos="18">
+		<Cursor position="370" topLine="0" />
 	</File>
 	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="1">
-		<Cursor position="19340" topLine="395" />
+		<Cursor position="564" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_all.sh" open="0" top="0" tabpos="5">
-		<Cursor position="339" topLine="0" />
+	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="16">
+		<Cursor position="84" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="8">
-		<Cursor position="596" topLine="0" />
+	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="17">
+		<Cursor position="155" topLine="0" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="10">
 		<Cursor position="0" topLine="27" />

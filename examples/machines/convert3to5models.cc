@@ -1,5 +1,6 @@
 #include "File.h"
 #include "Machines.h"
+#include "spCores.h"
 
 using namespace Torch;
 
@@ -66,6 +67,9 @@ bool convert(File& file_in, File& file_out)
         	return false;
 	}
 
+	TensorSize modelsize(model_h, model_w);
+	TensorRegion tregion(0, 0, model_h, model_w);
+
 	// Create the machine stages
 	int n_stages;
         if (file_in.taggedRead(&n_stages, sizeof(int), 1, "N_STAGES") != 1)
@@ -128,9 +132,18 @@ bool convert(File& file_in, File& file_out)
 		// Load the machines
 		for (int n = 0; n < n_trainers; n ++)
 		{
-                        LBPMachine* lbp_machine = new LBPMachine;
-                        lbp_machine->setLBPRadius(1);
-                        lbp_machine->setLBPType(LBPMachine::LBP8RAverageAddBit);
+                        IntLutMachine* lbp_machine = new IntLutMachine;
+                        ipLBP8R* iplbp = new ipLBP8R;
+			if (	iplbp->setBOption("ToAverage", true) == false ||
+				iplbp->setBOption("AddAvgBit", true) == false ||
+				iplbp->setBOption("Uniform", false) == false ||
+				iplbp->setBOption("RotInvariant", false) == false)
+			{
+				return false;
+			}
+
+			iplbp->setModelSize(modelsize);
+			iplbp->setRegion(tregion);
 
                         // Read XY position
                         int pos_xy;
@@ -169,14 +182,9 @@ bool convert(File& file_in, File& file_out)
                         delete[] lut;
 
                         // Configure the LBP machine
-                        if (    lbp_machine->setXY(pos_x, pos_y) == false ||
-                                lbp_machine->setLUT(lut_double, n_lbp_kernels) == false)
-                        {
-                                delete[] lut_double;
-                                delete lbp_machine;
-                                return false;
-                        }
-                        delete[] lut_double;
+			iplbp->setXY(pos_x, pos_y);
+			lbp_machine->setParams(n_lbp_kernels, lut_double);
+			lbp_machine->setCore(iplbp);
 
                         // Add the LBP machine to the cascade
                         if (cascade_machine.setMachine(s, n, lbp_machine) == false)
@@ -188,7 +196,7 @@ bool convert(File& file_in, File& file_out)
 	}
 
 	// Force the model size to all Machines
-	cascade_machine.setSize(TensorSize(model_h, model_w, 1));
+	cascade_machine.setSize(modelsize);
 
 	// OK, just let the CascadeMachine object to write his structure to the output file
         return cascade_machine.saveFile(file_out);
@@ -258,4 +266,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-

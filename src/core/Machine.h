@@ -10,74 +10,19 @@ namespace Torch {
 	class File;
 	class spCore;
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// Torch::MachineManager:
-	//	Keeps track of the IDs of each Machine.
-	//	Given some ID (e.g. found in a model file), it's possible to retrieve a
-	//		machine associated with this ID.
-	//
-	//	NB: the <Machine>s are deallocated from the MachineManager.
-	//
-	// TODO: doxygen header!
-	//////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////
 
-	class MachineManager
-	{
-	public:
+        // Load a generic machine from some file
+        // Returns <0/NULL> if some error,
+        //      otherwise you are responsible for deallocating the Machine
+        Machine*                loadMachineFromFile(const char* filename);
 
-		// Destructor
-		~MachineManager();
-
-		// Access to the single instance of this object
-		static MachineManager&	getInstance()
-		{
-			static MachineManager manager;
-			return manager;
-		}
-
-		// Register a new <Machine> with a given ID (supposed to be unique)
-		bool			add(Machine* machine, const char* name);
-
-		// Get a copy of the <Machine> (empty, no parameters set) for the given ID
-		// (returns NULL/0 if the <id> is invalid)
-		// The new Machine is allocated and should be deallocated by the user!
-		Machine*		get(int id) const;
-
-		// Get the generic name for the given id
-		// (returns NULL/0 if the <id> is invalid)
-		const char*             getName(int id) const;
-
-		// Get the number of registered machines
-		int                     getNoMachines() const { return m_size; }
-
-	private:
-
-		// Constructor
-		MachineManager();
-
-		// Deallocate memory
-		void			deallocate();
-
-		// Resize the IDs to fit the new <increment>
-		void			resize(int increment);
-
-		// Returns the machine's index with the given ID (or -1, if not found)
-		int     		find(int id) const;
-
-		///////////////////////////////////////////////////////////////
-		// Attributes
-
-		// Machine prototypes for each ID
-		Machine**		m_machines;
-		char**                  m_names;        // Generic name for each machine
-		int			m_size;		// Number of IDs actually used
-		int			m_capacity;	// Number of IDs allocated
-	};
+        ///////////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::Machine:
 	//      Process some input using a model (loaded from some file).
-	//	May use some spCore object to extract features.
+	//	May use some spCore object to extract features. It deallocates the given spCore.
 	//      The output is a DoubleTensor!
 	//
 	//      NB: The ouput should be allocated and deallocated by each Machine implementation!
@@ -146,14 +91,69 @@ namespace Torch {
 		DoubleTensor*		m_output;
 	};
 
+	//////////////////////////////////////////////////////////////////////////////////////
+	// Torch::MachineManager:
+	//	Keeps track of the IDs of each Machine.
+	//	Given some ID (e.g. found in a model file), it's possible to retrieve a
+	//		machine associated with this ID.
+	//
+	//	NB: the <Machine>s are deallocated from the MachineManager.
+	//
+	// TODO: doxygen header!
+	//////////////////////////////////////////////////////////////////////////////////////
 
-#define LBP_MACHINE_ID 1
-#define CASCADE_MACHINE_ID 2
-#define STUMP_MACHINE_ID 3
-#define LUT_MACHINE_ID 4
-#define DIAG_GMM_MACHINE_ID 5
-#define MLP_MACHINE_ID 6
+	class MachineManager
+	{
+	public:
 
+		// Destructor
+		~MachineManager();
+
+		// Access to the single instance of this object
+		static MachineManager&	getInstance()
+		{
+			static MachineManager manager;
+			return manager;
+		}
+
+		// Register a new <Machine> with a given ID (supposed to be unique)
+		bool			add(Machine* machine, const char* name);
+
+		// Get a copy of the <Machine> (empty, no parameters set) for the given ID
+		// (returns NULL/0 if the <id> is invalid)
+		// The new Machine is allocated and should be deallocated by the user!
+		Machine*		get(int id) const;
+
+		// Get the generic name for the given id
+		// (returns NULL/0 if the <id> is invalid)
+		const char*             getName(int id) const;
+
+		// Get the number of registered machines
+		int                     getNoMachines() const { return m_size; }
+
+	private:
+
+		// Constructor
+		MachineManager();
+
+		// Deallocate memory
+		void			deallocate();
+
+		// Resize the IDs to fit the new <increment>
+		void			resize(int increment);
+
+		// Returns the machine's index with the given ID (or -1, if not found)
+		int     		find(int id) const;
+
+		///////////////////////////////////////////////////////////////
+		// Attributes
+
+		// Machine prototypes for each ID
+		Machine**		m_machines;
+		char**                  m_names;        // Generic name for each machine
+		int			m_size;		// Number of IDs actually used
+		int			m_capacity;	// Number of IDs allocated
+	};
 }
 
 #endif

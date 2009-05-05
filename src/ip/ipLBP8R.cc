@@ -863,7 +863,7 @@ namespace Torch {
 ///////////////////////////////////////////////////////////////////////////////////////
     bool ipLBP8R::saveFile(File& file) const
     {
-        int idCore =4; //should be written somewhere
+        int idCore = getID();
         if (file.taggedWrite(&idCore, sizeof(int), 1, "CoreID") != 1)
         {
             Torch::message("ipLBP4R::save - failed to write <CoreID> field!\n");
@@ -945,8 +945,8 @@ namespace Torch {
 
 
 
-        print("ipHLBP8R()::saveFile()\n");
-        print("LBP P,R = %d %d, m_x, m_y = %d %d\n", m_P,m_R,m_x,m_y);
+        //print("ipHLBP8R()::saveFile()\n");
+        //print("LBP P,R = %d %d, m_x, m_y = %d %d\n", m_P,m_R,m_x,m_y);
         // print("   X-Y = (%d-%d)\n", x, y);
         // print("   WxH = [%dx%d]\n", w, h);
 
@@ -979,10 +979,7 @@ namespace Torch {
             return false;
         }
 
-        TensorSize *ms = new TensorSize(h,w);
-        setModelSize(*ms);
-
-
+        setModelSize(TensorSize(h,w));
 
         //m_P
         if (file.taggedRead(&m_P, sizeof(int), 1, "P") != 1)
@@ -1049,8 +1046,8 @@ namespace Torch {
         setBOption("Uniform", muni);
         setBOption("RotInvariant", mroti);
 
-        print("ipLBP8R()::loadFile()\n");
-         print("LBP P,R = %d %d, m_x, m_y = %d %d\n", m_P,m_R,m_x,m_y);
+        //print("ipLBP8R()::loadFile()\n");
+         //print("LBP P,R = %d %d, m_x, m_y = %d %d\n", m_P,m_R,m_x,m_y);
         // print("   X-Y = (%d-%d)\n", x, y);
         // print("   WxH = [%dx%d]\n", w, h);
 

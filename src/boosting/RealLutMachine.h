@@ -1,8 +1,9 @@
-#ifndef _TORCH5SPRO_LBP_MACHINE_H_
-#define _TORCH5SPRO_LBP_MACHINE_H_
+#ifndef _TORCH5SPRO_REALLUT_MACHINE_H_
+#define _TORCH5SPRO_REALLUT_MACHINE_H_
 
 #include "Machine.h"
-#include "spCoreManager.h"
+#include "Machines.h"
+
 namespace Torch {
 
 
@@ -20,16 +21,16 @@ namespace Torch {
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class LBPMachine : public Machine
+	class RealLutMachine : public Machine
 	{
 
 	public:
 
 		/// Constructor
-		LBPMachine();
+		RealLutMachine();
 
 		/// Destructor
-		virtual ~LBPMachine();
+		virtual ~RealLutMachine();
 
 		/// Process the input tensor
 		virtual bool 		forward(const Tensor& input);
@@ -40,15 +41,15 @@ namespace Torch {
 
 		/// Constructs an empty Machine of this kind
 		/// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine*	getAnInstance() const { return new LBPMachine(); }
+		virtual Machine*	getAnInstance() const { return new RealLutMachine(); }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const { return LBP_MACHINE_ID; }
+		virtual int		getID() const { return REAL_LUT_MACHINE_ID; }
 
 		///////////////////////////////////////////////////////////
 		// Access functions
 
-		void 			setParams(int n_bins_, double *lut_);
+		void 			setParams(double min_, double max_, int n_bins_, double *lut_);
 
 		///////////////////////////////////////////////////////////
 
@@ -58,15 +59,15 @@ namespace Torch {
 		// Attributes
 
 		// parameters of the machine
-		//double min, max;
+		double min, max;
 		int n_bins;
 		double *lut;
 	};
 
-
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // REGISTER this machine to the <MachineManager>
-        const bool lbp_machine_registered = MachineManager::getInstance().add(new LBPMachine(), "LBPMachine");
+        const bool real_lut_machine_registered = MachineManager::getInstance().add(
+		new RealLutMachine(), "RealLutMachine");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 

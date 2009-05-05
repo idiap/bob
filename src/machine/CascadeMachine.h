@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_CASCADE_MACHINE_H_
 
 #include "Classifier.h"	// <CascadeMachine> is a <Classifier>
+#include "Machines.h"
 
 namespace Torch
 {

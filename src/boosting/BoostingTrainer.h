@@ -4,22 +4,23 @@
 #include "DataSet.h"
 #include "WeakLearner.h"
 #include "measurer.h"
+#include "FTrainer.h"
 
 namespace Torch
 {
 
-    class BoostingTrainer : public Trainer
+    class BoostingTrainer : public FTrainer
     {
     public:
         ///
         BoostingTrainer();
 
         ///
-        bool setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_);
+        virtual bool setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_);
 
         ///
         virtual bool train();
-
+        virtual double forward(Tensor *example_);
         ///
         virtual void initWeights();
         virtual void updateWeights();

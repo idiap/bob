@@ -23,6 +23,9 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 
+#include "Machines.h"
+#include "spCores.h"
+
 using namespace Torch;
 
 //////////////////////////////////////////////////////////////////////////

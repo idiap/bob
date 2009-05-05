@@ -2,6 +2,7 @@
 #include "Image.h"
 #include "xtprobeImageFile.h"
 #include "Machines.h"
+#include "spCores.h"
 
 using namespace Torch;
 
@@ -32,6 +33,7 @@ int main(int argc, char* argv[])
 	const int model_w = cascade->getSize().size[1];
 	print("Cascade [%s]: width = %d, height = %d\n", model_filename, model_w, model_h);
 	CHECK_FATAL(image.resize(model_h, model_w, 1) == true);
+	cascade->setRegion(TensorRegion(0, 0, model_h, model_w));
 
 	// Load the bindata header
 	File file;

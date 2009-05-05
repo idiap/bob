@@ -1,8 +1,9 @@
 #include "LBPRoundTrainer.h"
+#include "ipLBP.h"
 
 namespace Torch
 {
-    LBPRoundTrainer::LBPRoundTrainer(LBPMachine *lbp_machine_, int n_features_, spCore **features_)
+    LBPRoundTrainer::LBPRoundTrainer(IntLutMachine *lbp_machine_, int n_features_, spCore **features_)
             : WeakLearner(lbp_machine_, n_features_, features_)
     {
         m_lbp_machine = lbp_machine_;
@@ -19,7 +20,10 @@ namespace Torch
 
         features_values = NULL;
     }
-
+//double LBPRoundTrainer::forward(Tensor *example_)
+//{
+//    return 1.0;
+//}
     bool LBPRoundTrainer::train()
     {
         print("\n");
@@ -114,18 +118,18 @@ namespace Torch
                 return false;
             }
         }
-        // print(" 2.........\n");
+       //  print(" 2.........\n");
         if (features_values != NULL) delete []features_values;
         features_values = new int [n_examples];
         double *lut_ = new double [n_bins];
-        double *bestlut_ = new double [n_bins];
+        bestlut_ = new double [n_bins];
         double min_error = 999999999.0;
         // double bmin_, bmax_;
         int lutsize; //should be able to compute lut for different types of LBP.
-        int b_lutsize=-1;
+         b_lutsize=-1;
 
         int bestFeature = -1;
-        // print(" 3.........\n");
+      //   print(" 3.........\n");
         bool passthrough;
         int lbp_code;
         Tensor *example;
@@ -285,8 +289,17 @@ namespace Torch
 
         return true;
     }
+////////////////////////////////////////////////
+ int LBPRoundTrainer::getLUTSize()
+ {
+return b_lutsize;
+ }
 
-
+ double * LBPRoundTrainer::getLUT()
+ {
+     return bestlut_;
+ }
+ /////////////////////////
     LBPRoundTrainer::~LBPRoundTrainer()
     {
     }

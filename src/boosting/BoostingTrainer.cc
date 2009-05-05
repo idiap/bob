@@ -34,7 +34,12 @@ namespace Torch
 
         return true;
     }
-
+    ////////////////////////////////////////////////////////////////////
+    double BoostingTrainer::forward(Tensor *example_)
+    {
+        return 1.0;
+    }
+/////////////////////////////////////////////////////////////////////////////
     bool BoostingTrainer::randomSampling()
     {
         print("   BoostingTrainer::randomSampling()\n");
@@ -261,7 +266,7 @@ namespace Torch
         double z_ = 0.0;
         for (int j = 0 ; j < m_n_classifiers ; j++)
         {
-            print("> %g\n", m_weights[j]);
+           // print("> %g\n", m_weights[j]);
             z_ += exp(m_weights[j]);
         }
 
@@ -269,7 +274,7 @@ namespace Torch
         {
             m_weights[j] = exp(m_weights[j]) / z_;
             m_weak_learners[j]->setWeight(m_weights[j]);
-            print("< %g\n", m_weights[j]);
+           // print("< %g\n", m_weights[j]);
         }
 
         //

@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_WEAK_LEARNER_H_
 #define _TORCH5SPRO_WEAK_LEARNER_H_
 
-#include "Trainer.h"
+#include "FTrainer.h"
 #include "spCore.h"
 #include "Machine.h"
 
@@ -37,6 +37,9 @@ namespace Torch {
         //..........................................................................
 		/// Destructor
 		virtual ~WeakLearner();
+		Machine 	*m_weak_classifier;
+		// The bank of all possible features
+		spCore **m_features;
 
 	protected:
 
@@ -50,7 +53,7 @@ namespace Torch {
 		double	*m_weights_dataset;
 
 		// The machine that will be trained
-		Machine 	*m_weak_classifier;
+
 
 		// The weight associated to the weak classifier
 		double m_weight;
@@ -65,7 +68,7 @@ namespace Torch {
         	int m_n_features;
 
 		// The bank of all possible features
-		spCore **m_features;
+	//	spCore **m_features;
 	};
 
 }
