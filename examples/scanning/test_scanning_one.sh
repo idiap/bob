@@ -10,6 +10,7 @@ params=$params_prune" "$params_select" "$params_general" -verbose"
 
 # Multiscale
 ./`uname -s`_`uname -m`/scanning $image $model -explorer_type 1 -scale_explorer_type 0 $params
+#gdb --args
 
 # Pyramid
 #./`uname -s`_`uname -m`/scanning $image $model -explorer_type 0 -scale_explorer_type 0 $params

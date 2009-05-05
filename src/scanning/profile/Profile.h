@@ -17,29 +17,37 @@ namespace Torch
 		Feature_Counts_Oxs,
 		Feature_Counts_Oys,
 
-		Feature_Scores_MinMax_All,
-		Feature_Scores_MinMax_Ox,
-		Feature_Scores_MinMax_Oy,
-		Feature_Scores_MinMax_Os,
-		Feature_Scores_MinMax_Oxy,
-		Feature_Scores_MinMax_Oxs,
-		Feature_Scores_MinMax_Oys,
+		Feature_Scores_Ampl_All,
+		Feature_Scores_Ampl_Ox,
+		Feature_Scores_Ampl_Oy,
+		Feature_Scores_Ampl_Os,
+		Feature_Scores_Ampl_Oxy,
+		Feature_Scores_Ampl_Oxs,
+		Feature_Scores_Ampl_Oys,
 
-		Feature_Hits_MinMax_All,
-		Feature_Hits_MinMax_Ox,
-		Feature_Hits_MinMax_Oy,
-		Feature_Hits_MinMax_Os,
-		Feature_Hits_MinMax_Oxy,
-		Feature_Hits_MinMax_Oxs,
-		Feature_Hits_MinMax_Oys,
+		Feature_Scores_Stdev_All,
+		Feature_Scores_Stdev_Ox,
+		Feature_Scores_Stdev_Oy,
+		Feature_Scores_Stdev_Os,
+		Feature_Scores_Stdev_Oxy,
+		Feature_Scores_Stdev_Oxs,
+		Feature_Scores_Stdev_Oys,
 
-		Feature_Hits_Diff_All,
-		Feature_Hits_Diff_Ox,
-		Feature_Hits_Diff_Oy,
-		Feature_Hits_Diff_Os,
-		Feature_Hits_Diff_Oxy,
-		Feature_Hits_Diff_Oxs,
-		Feature_Hits_Diff_Oys,
+		Feature_Hits_Ampl_All,
+		Feature_Hits_Ampl_Ox,
+		Feature_Hits_Ampl_Oy,
+		Feature_Hits_Ampl_Os,
+		Feature_Hits_Ampl_Oxy,
+		Feature_Hits_Ampl_Oxs,
+		Feature_Hits_Ampl_Oys,
+
+		Feature_Hits_Stdev_All,
+		Feature_Hits_Stdev_Ox,
+		Feature_Hits_Stdev_Oy,
+		Feature_Hits_Stdev_Os,
+		Feature_Hits_Stdev_Oxy,
+		Feature_Hits_Stdev_Oxs,
+		Feature_Hits_Stdev_Oys,
 
 		NoFeatures
 	};
@@ -50,25 +58,30 @@ namespace Torch
 		"counts_ox", "counts_oy", "counts_os",
 		"counts_oxy", "counts_oxs", "counts_oys",
 
-		"scores_minmax_all",
-		"scores_minmax_ox", "scores_minmax_oy", "scores_minmax_os",
-		"scores_minmax_oxy", "scores_minmax_oxs", "scores_minmax_oys",
+		"scores_ampl_all",
+		"scores_ampl_ox", "scores_ampl_oy", "scores_ampl_os",
+		"scores_ampl_oxy", "scores_ampl_oxs", "scores_ampl_oys",
 
-		"hits_minmax_all",
-		"hits_minmax_ox", "hits_minmax_oy", "hits_minmax_os",
-		"hits_minmax_oxy", "hits_minmax_oxs", "hits_minmax_oys",
+		"scores_stdev_all",
+		"scores_stdev_ox", "scores_stdev_oy", "scores_stdev_os",
+		"scores_stdev_oxy", "scores_stdev_oxs", "scores_stdev_oys",
 
-		"hits_diff_all",
-		"hits_diff_ox", "hits_diff_oy", "hits_diff_os",
-		"hits_diff_oxy", "hits_diff_oxs", "hits_diff_oys"
+		"hits_ampl_all",
+		"hits_ampl_ox", "hits_ampl_oy", "hits_ampl_os",
+		"hits_ampl_oxy", "hits_ampl_oxs", "hits_ampl_oys",
+
+		"hits_stdev_all",
+		"hits_stdev_ox", "hits_stdev_oy", "hits_stdev_os",
+		"hits_stdev_oxy", "hits_stdev_oxs", "hits_stdev_oys"
 	};
 
 	const int FeatureSizes[NoFeatures] =
 	{
 		1, 1, 1, 1, 1, 1, 1,	// Counts - 1D data
-		2, 2, 2, 2, 2, 2, 2,	// Scores + min-max - 2D data
-		6, 2, 2, 2, 4, 4, 4,	// Hits + min-max - 2-6D data
-		3, 1, 1, 1, 2, 2, 2	// Hits + diff - 1-3D data
+		1, 1, 1, 1, 1, 1, 1,	// Score amplitude - 1D data
+		1, 1, 1, 1, 1, 1, 1,	// Score standard deviation - 1D data
+		3, 1, 1, 1, 2, 2, 2,	// Hits amplitude - 1-3D data
+		3, 1, 1, 1, 2, 2, 2	// Hits standard deviation - 1-3D data
 	};
 
         /////////////////////////////////////////////////////////////////////////
@@ -125,7 +138,7 @@ namespace Torch
 		/////////////////////////////////////////////////////////////
 		// Attributes
 
-		static const int 	MaxNoDimensions = 6;
+		static const int 	MaxNoDimensions = 3;
 
 		Pattern			m_pattern;		// Sub-window seed
 		DoubleTensor*		m_features;		// [NoFeatures] - Extracted feature values

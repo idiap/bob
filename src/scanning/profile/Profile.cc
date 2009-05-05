@@ -155,166 +155,156 @@ Profile& Profile::operator=(const Profile& other)
 /////////////////////////////////////////////////////////////////////////
 // Reset to a new sub-window profile
 
+enum Axis
+{
+	All = 0,
+	Ox, Oy, Os,
+	Oxy, Oxs, Oys,
+	NoAxis
+};
+
 void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const double* pf_scores)
 {
-	static const Private::ProfileIndexes& pfi = Private::ProfileIndexes::getInstance();
-
 	m_pattern.copy(pattern);
 
-	// Reset some features
-	for (int f = Feature_Counts_All; f <= Feature_Counts_Oys; f ++)
+	// Reset feature values
+	for (int f = 0; f < NoFeatures; f ++)
 	{
 		m_features[f].fill(0.0);
 	}
-	for (int f = Feature_Scores_MinMax_All; f <= Feature_Scores_MinMax_Oys; f ++)
+
+	// Functions to check axis indexes
+	typedef bool (* FnCheckAxis)(int);
+	FnCheckAxis axis_checks[NoAxis] =
 	{
-		m_features[f].set(0, +100.0);
-		m_features[f].set(1, -100.0);
-	}
-	for (int f = Feature_Hits_Diff_All; f <= Feature_Hits_Diff_Oys; f ++)
+		Private::isProfileOxys,
+		Private::isProfileOx,
+		Private::isProfileOy,
+		Private::isProfileOs,
+		Private::isProfileOxy,
+		Private::isProfileOxs,
+		Private::isProfileOys
+	};
+
+	// Number of axis
+	int axis_no[NoAxis] =
 	{
-		m_features[f].fill(0.0);
-	}
-		// Hits minmax: extreme values for each axis
-	m_features[Feature_Hits_MinMax_All].set(0, GreedyExplorer::NoVarX);
-	m_features[Feature_Hits_MinMax_All].set(1, -GreedyExplorer::NoVarX);
-	m_features[Feature_Hits_MinMax_All].set(2, GreedyExplorer::NoVarY);
-	m_features[Feature_Hits_MinMax_All].set(3, -GreedyExplorer::NoVarY);
-	m_features[Feature_Hits_MinMax_All].set(4, GreedyExplorer::NoVarS);
-	m_features[Feature_Hits_MinMax_All].set(5, -GreedyExplorer::NoVarS);
+		3, 1, 1, 1, 2, 2, 2
+	};
 
-	m_features[Feature_Hits_MinMax_Ox].set(0, GreedyExplorer::NoVarX);
-	m_features[Feature_Hits_MinMax_Ox].set(1, -GreedyExplorer::NoVarX);
-
-	m_features[Feature_Hits_MinMax_Oy].set(0, GreedyExplorer::NoVarY);
-	m_features[Feature_Hits_MinMax_Oy].set(1, -GreedyExplorer::NoVarY);
-
-	m_features[Feature_Hits_MinMax_Os].set(0, GreedyExplorer::NoVarS);
-	m_features[Feature_Hits_MinMax_Os].set(1, -GreedyExplorer::NoVarS);
-
-	m_features[Feature_Hits_MinMax_Oxy].set(0, GreedyExplorer::NoVarX);
-	m_features[Feature_Hits_MinMax_Oxy].set(1, -GreedyExplorer::NoVarX);
-	m_features[Feature_Hits_MinMax_Oxy].set(2, GreedyExplorer::NoVarY);
-	m_features[Feature_Hits_MinMax_Oxy].set(3, -GreedyExplorer::NoVarY);
-
-	m_features[Feature_Hits_MinMax_Oxs].set(0, GreedyExplorer::NoVarX);
-	m_features[Feature_Hits_MinMax_Oxs].set(1, -GreedyExplorer::NoVarX);
-	m_features[Feature_Hits_MinMax_Oxs].set(2, GreedyExplorer::NoVarS);
-	m_features[Feature_Hits_MinMax_Oxs].set(3, -GreedyExplorer::NoVarS);
-
-	m_features[Feature_Hits_MinMax_Oys].set(0, GreedyExplorer::NoVarY);
-	m_features[Feature_Hits_MinMax_Oys].set(1, -GreedyExplorer::NoVarY);
-	m_features[Feature_Hits_MinMax_Oys].set(2, GreedyExplorer::NoVarS);
-	m_features[Feature_Hits_MinMax_Oys].set(3, -GreedyExplorer::NoVarS);
-
-	// Extract features from each detection in the profile
-	for (int i = 0; i < Private::ProfileSize; i ++)
-		if (pf_flags[i] != 0x00)
+	// Axis indexes
+	static const Private::ProfileIndexes& pfi = Private::ProfileIndexes::getInstance();
+	int* axis_indexes[NoAxis][3] =
 	{
-		const int ox = pfi.m_ox[i];
-		const int oy = pfi.m_oy[i];
-		const int os = pfi.m_os[i];
-		const double score = pf_scores[i];
+		{ pfi.m_ox, pfi.m_oy, pfi.m_os },
+		{ pfi.m_ox, 0, 0 },
+		{ pfi.m_oy, 0, 0 },
+		{ pfi.m_os, 0, 0 },
+		{ pfi.m_ox, pfi.m_oy, 0 },
+		{ pfi.m_ox, pfi.m_os, 0 },
+		{ pfi.m_oy, pfi.m_os, 0 }
+	};
 
-		// Features that use 3 axis
-		increment(Feature_Counts_All);
-		update_min(Feature_Scores_MinMax_All, 0, score);
-		update_max(Feature_Scores_MinMax_All, 1, score);
+	// Extract feature values - counts & scores
+	for (int a = All; a < NoAxis; a ++)
+	{
+		int** axis_indexes_a = axis_indexes[a];
+		FnCheckAxis axis_check_a = axis_checks[a];
+		const int axis_no_a = axis_no[a];
 
-		update_min(Feature_Hits_MinMax_All, 0, ox);
-		update_max(Feature_Hits_MinMax_All, 1, ox);
-		update_min(Feature_Hits_MinMax_All, 2, oy);
-		update_max(Feature_Hits_MinMax_All, 3, oy);
-		update_min(Feature_Hits_MinMax_All, 4, os);
-		update_max(Feature_Hits_MinMax_All, 5, os);
+		// Counts
+		for (int i = 0; i < Private::ProfileSize; i ++)
+			if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+			{
+				increment(Feature_Counts_All + a);
+			}
 
-		update_dif(Feature_Hits_Diff_All, 0, Feature_Hits_MinMax_All, 1, 0);
-		update_dif(Feature_Hits_Diff_All, 1, Feature_Hits_MinMax_All, 3, 2);
-		update_dif(Feature_Hits_Diff_All, 2, Feature_Hits_MinMax_All, 5, 4);
+		// Score amplitude - find the extreme scores for this axis
+		double min_score = 10000.0, max_score = -10000.0;
+		double sum_score = 0.0;
+		int cnt = 0;
+		for (int i = 0; i < Private::ProfileSize; i ++)
+			if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+			{
+				const double score = pf_scores[i];
+				min_score = min(min_score, score);
+				max_score = max(max_score, score);
+				sum_score += score;
+				cnt ++;
+			}
 
-		// Features that use 1 axis
-		if (Private::isProfileOx(i) == true)
+		// Score amplitude - set the value
+		if (cnt > 0)
 		{
-			// Ox
-			increment(Feature_Counts_Ox);
-			update_min(Feature_Scores_MinMax_Ox, 0, score);
-			update_max(Feature_Scores_MinMax_Ox, 1, score);
-
-			update_min(Feature_Hits_MinMax_Ox, 0, ox);
-			update_max(Feature_Hits_MinMax_Ox, 1, ox);
-
-			update_dif(Feature_Hits_Diff_Ox, 0, Feature_Hits_MinMax_Ox, 1, 0);
-		}
-		if (Private::isProfileOy(i) == true)
-		{
-			// Oy
-			increment(Feature_Counts_Oy);
-			update_min(Feature_Scores_MinMax_Oy, 0, score);
-			update_max(Feature_Scores_MinMax_Oy, 1, score);
-
-			update_min(Feature_Hits_MinMax_Oy, 0, oy);
-			update_max(Feature_Hits_MinMax_Oy, 1, oy);
-
-			update_dif(Feature_Hits_Diff_Oy, 0, Feature_Hits_MinMax_Oy, 1, 0);
-		}
-		if (Private::isProfileOs(i) == true)
-		{
-			// Os
-			increment(Feature_Counts_Os);
-			update_min(Feature_Scores_MinMax_Os, 0, score);
-			update_max(Feature_Scores_MinMax_Os, 1, score);
-
-			update_min(Feature_Hits_MinMax_Os, 0, os);
-			update_max(Feature_Hits_MinMax_Os, 1, os);
-
-			update_dif(Feature_Hits_Diff_Os, 0, Feature_Hits_MinMax_Os, 1, 0);
+			m_features[Feature_Scores_Ampl_All + a].set(0, max_score - min_score);
 		}
 
-		// Features that use 2 axis
-		if (Private::isProfileOxy(i) == true)
+		// Score standard deviation - set the value
+		if (cnt > 1)
 		{
-			// Oxy
-			increment(Feature_Counts_Oxy);
-			update_min(Feature_Scores_MinMax_Oxy, 0, score);
-			update_max(Feature_Scores_MinMax_Oxy, 1, score);
+			const double avg_score = sum_score / cnt;
+			sum_score = 0.0;
 
-			update_min(Feature_Hits_MinMax_Oxy, 0, ox);
-			update_max(Feature_Hits_MinMax_Oxy, 1, ox);
-			update_min(Feature_Hits_MinMax_Oxy, 2, oy);
-			update_max(Feature_Hits_MinMax_Oxy, 3, oy);
+			for (int i = 0; i < Private::ProfileSize; i ++)
+				if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+				{
+					const double diff = pf_scores[i] - avg_score;
+					sum_score += diff * diff;
+				}
 
-			update_dif(Feature_Hits_Diff_Oxy, 0, Feature_Hits_MinMax_Oxy, 1, 0);
-			update_dif(Feature_Hits_Diff_Oxy, 1, Feature_Hits_MinMax_Oxy, 3, 2);
+			m_features[Feature_Scores_Stdev_All + a].set(0, sqrt(sum_score / cnt));
 		}
-		if (Private::isProfileOxs(i) == true)
+
+		// Hit amplitude - find the extreme hits for this axis
+		int min_hits[3], max_hits[3];
+		double sum_hits[3];
+		for (int j = 0; j < axis_no_a; j ++)
 		{
-			// Oxs
-			increment(Feature_Counts_Oxs);
-			update_min(Feature_Scores_MinMax_Oxs, 0, score);
-			update_max(Feature_Scores_MinMax_Oxs, 1, score);
-
-			update_min(Feature_Hits_MinMax_Oxs, 0, ox);
-			update_max(Feature_Hits_MinMax_Oxs, 1, ox);
-			update_min(Feature_Hits_MinMax_Oxs, 2, os);
-			update_max(Feature_Hits_MinMax_Oxs, 3, os);
-
-			update_dif(Feature_Hits_Diff_Oxs, 0, Feature_Hits_MinMax_Oxs, 1, 0);
-			update_dif(Feature_Hits_Diff_Oxs, 1, Feature_Hits_MinMax_Oxs, 3, 2);
+			min_hits[j] = 10000;
+			max_hits[j] = -10000;
+			sum_hits[j] = 0.0;
 		}
-		if (Private::isProfileOys(i) == true)
+
+		cnt = 0;
+		for (int i = 0; i < Private::ProfileSize; i ++)
+			if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+			{
+				for (int j = 0; j < axis_no_a; j ++)
+				{
+					min_hits[j] = min(min_hits[j], axis_indexes_a[j][i]);
+					max_hits[j] = max(max_hits[j], axis_indexes_a[j][i]);
+					sum_hits[j] += axis_indexes_a[j][i];
+				}
+
+				cnt ++;
+			}
+
+		// Hit amplitude - set the value
+		if (cnt > 0)
 		{
-			// Oys
-			increment(Feature_Counts_Oys);
-			update_min(Feature_Scores_MinMax_Oys, 0, score);
-			update_max(Feature_Scores_MinMax_Oys, 1, score);
+			for (int j = 0; j < axis_no_a; j ++)
+			{
+				m_features[Feature_Hits_Ampl_All + a].set(j, max_hits[j] - min_hits[j]);
+			}
+		}
 
-			update_min(Feature_Hits_MinMax_Oys, 0, oy);
-			update_max(Feature_Hits_MinMax_Oys, 1, oy);
-			update_min(Feature_Hits_MinMax_Oys, 2, os);
-			update_max(Feature_Hits_MinMax_Oys, 3, os);
+		// Hit standard deviation - set the value
+		if (cnt > 0)
+		{
+			for (int j = 0; j < axis_no_a; j ++)
+			{
+				const double avg_hits = sum_hits[j] / cnt;
+				sum_hits[j] = 0.0;
 
-			update_dif(Feature_Hits_Diff_Oys, 0, Feature_Hits_MinMax_Oys, 1, 0);
-			update_dif(Feature_Hits_Diff_Oys, 1, Feature_Hits_MinMax_Oys, 3, 2);
+				for (int i = 0; i < Private::ProfileSize; i ++)
+					if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+					{
+						const double diff = axis_indexes_a[j][i] - avg_hits;
+						sum_hits[j] += diff * diff;
+					}
+
+				m_features[Feature_Hits_Stdev_All + a].set(j, sqrt(sum_hits[j] / cnt));
+			}
 		}
 	}
 }

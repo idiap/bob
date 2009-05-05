@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="../../README.txt" open="0" top="0" tabpos="1">
+	<File name="../../README.txt" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../dataset/CMakeLists.txt" open="1" top="0" tabpos="1">
+	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="1">
 		<Cursor position="706" topLine="0" />
 	</File>
-	<File name="../../dataset/diskdataset.cc" open="1" top="0" tabpos="3">
-		<Cursor position="2295" topLine="59" />
+	<File name="../../dataset/diskdataset.cc" open="0" top="0" tabpos="3">
+		<Cursor position="2295" topLine="43" />
 	</File>
-	<File name="../../dataset/imagescandataset.cc" open="1" top="0" tabpos="2">
-		<Cursor position="3253" topLine="81" />
+	<File name="../../dataset/imagescandataset.cc" open="0" top="0" tabpos="2">
+		<Cursor position="3253" topLine="70" />
 	</File>
-	<File name="../../dataset/makeWnds.cc" open="1" top="0" tabpos="5">
-		<Cursor position="1851" topLine="46" />
+	<File name="../../dataset/makeWnds.cc" open="0" top="0" tabpos="5">
+		<Cursor position="1165" topLine="1" />
 	</File>
 	<File name="../../dataset/memorydataset.cc" open="0" top="0" tabpos="1">
 		<Cursor position="1392" topLine="0" />
 	</File>
-	<File name="../../dataset/readWnds.cc" open="1" top="0" tabpos="4">
+	<File name="../../dataset/readWnds.cc" open="0" top="0" tabpos="4">
 		<Cursor position="701" topLine="0" />
 	</File>
 	<File name="../../dataset/tensorfiles.cc" open="0" top="0" tabpos="0">
@@ -31,8 +31,8 @@
 	<File name="../../facetools/frontalface19x19.geom.norm.cfg" open="1" top="0" tabpos="12">
 		<Cursor position="223" topLine="0" />
 	</File>
-	<File name="../../facetools/gtimageextract.cc" open="0" top="0" tabpos="11">
-		<Cursor position="6525" topLine="28" />
+	<File name="../../facetools/gtimageextract.cc" open="0" top="0" tabpos="25">
+		<Cursor position="6525" topLine="10" />
 	</File>
 	<File name="../../images/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="632" topLine="0" />
@@ -40,17 +40,17 @@
 	<File name="../../images/imageformats.cc" open="0" top="0" tabpos="55">
 		<Cursor position="2174" topLine="73" />
 	</File>
-	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="6">
-		<Cursor position="1488" topLine="1" />
+	<File name="../../ip/CMakeLists.txt" open="0" top="0" tabpos="6">
+		<Cursor position="1488" topLine="0" />
 	</File>
-	<File name="../../ip/blocks.cc" open="1" top="1" tabpos="7">
+	<File name="../../ip/blocks.cc" open="0" top="0" tabpos="7">
 		<Cursor position="0" topLine="45" />
 	</File>
 	<File name="../../ip/crop.cc" open="0" top="0" tabpos="51">
 		<Cursor position="736" topLine="4" />
 	</File>
-	<File name="../../ip/geomNorm.cc" open="0" top="0" tabpos="8">
-		<Cursor position="3487" topLine="87" />
+	<File name="../../ip/geomNorm.cc" open="0" top="0" tabpos="14">
+		<Cursor position="2070" topLine="51" />
 	</File>
 	<File name="../../ip/iimage.cc" open="0" top="0" tabpos="54">
 		<Cursor position="4819" topLine="78" />
@@ -76,17 +76,23 @@
 	<File name="../../options/make.csh" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="1">
-		<Cursor position="906" topLine="0" />
+	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="12">
+		<Cursor position="937" topLine="0" />
 	</File>
-	<File name="../../scanning/scanning.cc" open="0" top="0" tabpos="2">
-		<Cursor position="9328" topLine="185" />
+	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="1">
+		<Cursor position="19340" topLine="395" />
 	</File>
 	<File name="../../scanning/test_scanning_all.sh" open="0" top="0" tabpos="5">
 		<Cursor position="339" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="3">
-		<Cursor position="353" topLine="0" />
+	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="8">
+		<Cursor position="596" topLine="0" />
+	</File>
+	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="10">
+		<Cursor position="0" topLine="27" />
+	</File>
+	<File name="../../sp/fft2d.cc" open="0" top="0" tabpos="11">
+		<Cursor position="0" topLine="38" />
 	</File>
 	<File name="../../tensors/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="446" topLine="0" />

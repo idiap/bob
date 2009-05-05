@@ -188,10 +188,7 @@ bool convert(File& file_in, File& file_out)
 	}
 
 	// Force the model size to all Machines
-	if (cascade_machine.setInputSize(TensorSize(model_h, model_w, 1)) == false)
-	{
-	        return false;
-	}
+	cascade_machine.setSize(TensorSize(model_h, model_w, 1));
 
 	// OK, just let the CascadeMachine object to write his structure to the output file
         return cascade_machine.saveFile(file_out);

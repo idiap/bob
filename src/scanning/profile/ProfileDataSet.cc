@@ -132,6 +132,7 @@ void ProfileDataSet::cumulate(const Profile& gt_profile)
 {
 	static const int increment = 1024;
 
+	// Add the detection
 	if (m_n_examples >= m_capacity)
 	{
 		m_profiles = resize(m_profiles, m_capacity, increment);
@@ -187,15 +188,15 @@ void ProfileDataSet::save(const char* dir_data, const char* name) const
 	char str[512];
 
 	// Negative samples
-	sprintf(str, "%s/%s_neg", dir_data, name);
+	sprintf(str, "%s_%s_neg", dir_data, name);
 	save(str, Negative);
 
 	// Positive samples
-	sprintf(str, "%s/%s_pos", dir_data, name);
+	sprintf(str, "%s_%s_pos", dir_data, name);
 	save(str, Positive);
 
 	// Ground truth samples
-	sprintf(str, "%s/%s_gt", dir_data, name);
+	sprintf(str, "%s_%s_gt", dir_data, name);
 	save(str, GroundTruth);
 }
 

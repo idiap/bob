@@ -218,9 +218,6 @@ bool GreedyExplorer::shouldSearchMode(int old_n_candidates) const
 
 bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 {
-	const float dx = 0.01f * (VarX + 0.0f) * sw_w;
-	const float dy = 0.01f * (VarY + 0.0f) * sw_h;
-
 	// Vary the scale ...
 	int index = 0;
 	for (int is = -NoVarS; is <= NoVarS; is ++)
@@ -228,6 +225,8 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 		const float scale = 1.0f + 0.01f * (VarS + 0.0f) * is;
 		const int new_sw_w = FixI(scale * sw_w);
 		const int new_sw_h = FixI(scale * sw_h);
+		const float dx = 0.01f * (VarX + 0.0f) * new_sw_w;
+		const float dy = 0.01f * (VarY + 0.0f) * new_sw_h;
 
 		// Vary the position ...
 		for (int ix = -NoVarX; ix <= NoVarX; ix ++)

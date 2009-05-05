@@ -45,6 +45,14 @@ bool ScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
 
 bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerData& explorerData)
 {
+	// Check parameters
+	if (	sw_x < 0 || sw_y < 0 || sw_w < 0 || sw_h < 0 ||
+		sw_x + sw_w >= explorerData.m_image_w || sw_y + sw_h >= explorerData.m_image_h)
+	{
+		return false;
+	}
+
+	// Build the region structure
 	static TensorRegion subwindow(0, 0, 0, 0);
 
 	subwindow.pos[0] = sw_y; subwindow.size[0] = sw_h;

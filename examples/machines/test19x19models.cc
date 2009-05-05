@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
 		print("ERROR: loading model [%s]!\n", model_filename);
 		return 1;
 	}
-	const int model_h = cascade->getInputSize().size[0];
-	const int model_w = cascade->getInputSize().size[1];
+	const int model_h = cascade->getSize().size[0];
+	const int model_w = cascade->getSize().size[1];
 	print("Cascade [%s]: width = %d, height = %d\n", model_filename, model_w, model_h);
 	CHECK_FATAL(image.resize(model_h, model_w, 1) == true);
 

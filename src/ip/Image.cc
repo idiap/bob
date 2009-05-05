@@ -227,10 +227,13 @@ void Image::drawLine(int x1, int y1, int x2, int y2, const Color& color)
 
 void Image::drawRect(int x, int y, int w, int h, const Color& color)
 {
-        drawLine(x, y, x + w, y, color);
-        drawLine(x + w, y, x + w, y + h, color);
-        drawLine(x + w, y + h, x, y + h, color);
-        drawLine(x, y + h, x, y, color);
+	if (x >= 0 && y >= 0 && x + w < getWidth() && y + h < getHeight())
+	{
+		drawLine(x, y, x + w, y, color);
+		drawLine(x + w, y, x + w, y + h, color);
+		drawLine(x + w, y + h, x, y + h, color);
+		drawLine(x, y + h, x, y, color);
+	}
 }
 
 void Image::drawRect(const sRect2D& rect, const Color& color)

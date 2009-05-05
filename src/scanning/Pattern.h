@@ -269,12 +269,6 @@ namespace Torch
 		int			m_idx_last_node;
 		int			m_n_allocated_nodes;
 
-		// Best patterns
-		bool			m_best_activated;	// Flag: should keep track of the best patterns
-		int*			m_best_indexes;		// Best N patterns kept as indexes
-		int			m_best_size;		// Actual number of stored best patterns
-		int			m_best_max_size;	// Maximum number of best patterns to keep track of
-
 		// Some statistics
 		int			m_n_used_patterns;	// Total number of used patterns
 		int			m_n_allocated_patterns;	// Total number of allocated patterns
