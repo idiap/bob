@@ -76,6 +76,8 @@ MESSAGE("INCLUDES:" "${TORCH5SPRO_INCLUDE}")
 MESSAGE("---------------------------------------------" "")
 MESSAGE("CXX RELEASE FLAGS: " "${CMAKE_CXX_FLAGS_RELEASE}")
 MESSAGE("CXX DEBUG FLAGS:   " "${CMAKE_CXX_FLAGS_DEBUG}")
+MESSAGE("C RELEASE FLAGS: " "${CMAKE_C_FLAGS_RELEASE}")
+MESSAGE("C DEBUG FLAGS:   " "${CMAKE_C_FLAGS_DEBUG}")
 MESSAGE("BUILD TYPE:        " "${CMAKE_BUILD_TYPE}")
 MESSAGE("---------------------------------------------" "")
 
