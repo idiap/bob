@@ -61,13 +61,13 @@
 	<File name="../../ip/scale.cc" open="0" top="0" tabpos="53">
 		<Cursor position="1086" topLine="12" />
 	</File>
-	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="15">
+	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="4">
 		<Cursor position="885" topLine="0" />
 	</File>
-	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="13">
+	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="2">
 		<Cursor position="3748" topLine="189" />
 	</File>
-	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="14">
+	<File name="../../machines/test19x19models.cc" open="1" top="1" tabpos="3">
 		<Cursor position="1147" topLine="27" />
 	</File>
 	<File name="../../options/CMakeLists.txt" open="0" top="0" tabpos="12">
@@ -76,16 +76,16 @@
 	<File name="../../options/make.csh" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../scanning/CMakeLists.txt" open="1" top="1" tabpos="18">
+	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="7">
 		<Cursor position="370" topLine="0" />
 	</File>
 	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="1">
 		<Cursor position="564" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="16">
+	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="5">
 		<Cursor position="84" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="17">
+	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="6">
 		<Cursor position="155" topLine="0" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="10">

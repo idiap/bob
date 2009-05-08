@@ -2,6 +2,17 @@
 
 namespace Torch
 {
+
+    extern "C" int cmp_value(const void *p1, const void *p2)
+    {
+	int v1 = *((int *)p1);
+	int v2 = *((int *)p2);
+
+	if(v1 > v2) return 1;
+  	if(v1 < v2) return -1;
+
+	return 0;
+}
     CascadeTrainer::CascadeTrainer()
     {
         //addBOption("boosting_by_sampling",	false,	"use sampling based on weights");
@@ -47,14 +58,6 @@ namespace Torch
 //
 //
 //        // first get the count of +ve examples which have target = 1
-        ShortTensor *target0 = new ShortTensor(1);
-        target0->fill(0);
-        ShortTensor *target1 = new ShortTensor(1);
-        target1->fill(1);
-        // Test the targets (rejection of samples)
-        DoubleTensor reject_target(1), accept_target(1);
-        reject_target.fill(-1.0);
-        accept_target.fill(1.0);
 
 
         Tensor *tensor;
@@ -103,6 +106,15 @@ namespace Torch
             //now create a new dataset
             n_examples = 2*p_count;
             m_dataset = 	new MemoryDataSet(n_examples, Tensor::Double, true, Tensor::Short);
+            ShortTensor *target0 = new ShortTensor(1);
+            target0->fill(0);
+            ShortTensor *target1 = new ShortTensor(1);
+            target1->fill(1);
+            // Test the targets (rejection of samples)
+            DoubleTensor reject_target(1), accept_target(1);
+            reject_target.fill(-1.0);
+            accept_target.fill(1.0);
+
 
             //first fill with positive patterns
 
@@ -129,30 +141,120 @@ namespace Torch
             //double imgtarget;
             //is it possible to make it random here to get ramdom patterns
             n_count =0;
-            for (long i=0;i<n_scanexamples;i++)
+            for (int i=0;i<n_scanexamples;i++)
             {
                 //have to check if the target is +1 and fill withit
                 if (((DoubleTensor*)m_imagescandataset->getTarget(i))->get(0)>0.0)
                 {
 
-                    m_dataset->getExample(p_count+n_count)->resize(height, width);
-                    example = m_imagescandataset->getExample(i);
-                    m_dataset->getExample(p_count+n_count)->copy(example);
-                    m_dataset->setTarget(p_count+n_count, target0);
+                  //  m_dataset->getExample(p_count+n_count)->resize(height, width);
+                  //  example = m_imagescandataset->getExample(i);
+                  //  m_dataset->getExample(p_count+n_count)->copy(example);
+                //m_dataset->setTarget(p_count+n_count, target0);
                     n_count++;
 
-                    if (n_count>=p_count)
-                        break;
+                  //  if (n_count>=p_count)
+                    //    break;
 
 
                 }
 
             }
-            if (n_count<p_count)
+
+            int pnCount;
+            pnCount = int(1.5*p_count);
+            if (n_count< pnCount)
             {
                 print("There are not enough -ve patterns for training Aborting\n");
+                delete m_dataset;
                 return false;
             }
+            // now do the random selection
+            print("Number 1: \n");
+            int *randSelect = new int[pnCount];
+            short *randTrack = new short[pnCount];
+            for(int i=0;i<pnCount;i++)
+                randTrack[i]=0;
+            for(int i=0;i<pnCount;i++)
+            {
+                double z = THRandom_uniform(0, n_count);
+                randSelect[i]=int(z);
+
+            }
+
+            qsort(randSelect, pnCount, sizeof(int), cmp_value);
+
+
+            //check for any duplicate values
+            for(int i=1;i<pnCount;i++)
+                {
+                    if(randSelect[i] == randSelect[i-1])
+                        randTrack[i]=1;
+                }
+                 int k;
+                 k=0;
+            for(int i=0;i<pnCount;i++)
+            {
+                if(randTrack[i]==0)
+                    {
+                        randSelect[k] = randSelect[i];
+                        k++;
+                    }
+            }
+            print("k= %d P_count %d\n",k,p_count);
+
+            if(k<p_count)
+            {
+                print("Number of -ve patterns randomly selected are not unique\n");
+                return false;
+            }
+
+            //now fill the memdataset
+            print("Number 3: \n");
+
+            k=0;
+            n_count=0;
+            for (int i=0;i<n_scanexamples;i++)
+            {
+                //have to check if the target is +1 and fill withit
+                if (((DoubleTensor*)m_imagescandataset->getTarget(i))->get(0)>0.0)
+                {
+                    if(randSelect[k]==n_count)
+                    {
+
+                    m_dataset->getExample(p_count+k)->resize(height, width);
+                    example = m_imagescandataset->getExample(i);
+                    m_dataset->getExample(p_count+k)->copy(example);
+                m_dataset->setTarget(p_count+k, target0);
+                k++;
+                if(k==p_count)
+                    break;
+                    }
+                    n_count++;
+
+                  //  if (n_count>=p_count)
+                    //    break;
+
+
+                }
+
+            }
+            print("k= %d P_count %d\n",k,p_count);
+            print("Number 2: \n");
+            // do a check if the memory dataset has target set
+            for(int i=0;i<n_examples;i++)
+            {
+                ShortTensor *t_target = (ShortTensor*)m_dataset->getTarget(i);
+                if((*t_target)(0) != 0 && (*t_target)(0) != 1)
+                {
+                    print("The memory data set does not have proper target\n");
+                    return false;
+                }
+            }
+
+
+
+
             //---------------finished copying data to memory------------
 //
             print("Cascade iteration number %d\n",mt);
@@ -163,31 +265,14 @@ namespace Torch
 
 
 //obtain the threshold
-            if (m_labelledmeasure !=NULL) delete m_labelledmeasure;
-            m_labelledmeasure = new LabelledMeasure[p_count];
-            print("Obtaining Threshold\n");
+
+            //  print("Obtaining Threshold\n");
             getThreshold(m_valid_dataset);
             updateDataSet(mt,m_pos_dataset,"training");
             updateDataSet(mt,m_valid_dataset,"validation");
             updateImageScanDataSet(mt);
-//
-//
-//
-//
-//
-//
-//        //---------------obtain the threshold--------------------
-//        // as of now estimate on the +ve training dataset
-//        // later can pass validation dataset for obtaining the threshold.
-//
-//
-//        //update the +ve training patterns
-//        //update the Imagescan data set with this threshold
-//        ...
-//
-//
-//
-//
+            delete[] randSelect;
+
         }//end of for mt
 
         return true;
@@ -195,9 +280,11 @@ namespace Torch
     //////////////
     void CascadeTrainer::getThreshold(DataSet *m_data)
     {
-       // Torch::print("CascadeTrainer::getThrehsold()\n");
+        // Torch::print("CascadeTrainer::getThrehsold()\n");
 
         int tp_examples = m_data->getNoExamples();
+        if (m_labelledmeasure !=NULL) delete m_labelledmeasure;
+            m_labelledmeasure = new LabelledMeasure[tp_examples];
         int count = 0;
         for (int i=0;i<tp_examples;i++)
         {
@@ -205,21 +292,16 @@ namespace Torch
             short target_value = (*target)(0);
             if (target_value == 1)
             {
-                //m_dataset->getExample(p_count)->resize(height, width);
-                // example = m_pos_dataset->getExample(i);
-                //  m_dataset->getExample(p_count)->copy(example);
-                //m_dataset->setTarget(p_count, target1);
-                //  p_count++;
+
                 Tensor *example = m_data->getExample(i);
                 m_labelledmeasure[count].measure = m_ftrainer[current_cascade]->forward(example);
 
-                // print("Score %f\n",m_labelledmeasure[count].measure);
                 m_labelledmeasure[count].label = target_value;
                 count++;
 
             }
         }
-    // Torch::print("CascadeTrainer::getThrehsold 2()\n");
+
 
 
         threshold[current_cascade]= computeTH(m_labelledmeasure, count, m_detection_rate[current_cascade]);
@@ -263,7 +345,7 @@ namespace Torch
                     m_imagescandataset->setTarget(i, &reject_target);
 
             }
-            if(i%1000001 == 0)
+            if (i%1000001 == 0)
                 print("%d ..",i);
 
         }

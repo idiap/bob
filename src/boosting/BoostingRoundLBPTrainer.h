@@ -7,6 +7,7 @@
 #include "BoostingTrainer.h"
 #include "LBPRoundTrainer.h"
 #include "IntLutMachine.h"
+#include "Machine.h"
 
 namespace Torch
 {
@@ -17,12 +18,12 @@ namespace Torch
     class BoostingRoundLBPTrainer : public BoostingTrainer
     {
     public:
-            BoostingRoundLBPTrainer();
-            virtual bool train();
+        BoostingRoundLBPTrainer();
+        virtual bool train();
         virtual double forward(Tensor *example_);
-            virtual ~BoostingRoundLBPTrainer();
-            virtual bool setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_);
-         //    virtual void updateWeights();
+        virtual ~BoostingRoundLBPTrainer();
+        virtual bool setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_);
+        //    virtual void updateWeights();
     private:
         int m_nrounds; //number of weakclassifiers are set in BoostingTrainer
         int *m_featuremask;   // list of features that has to used for selecting best weakfeature
@@ -31,8 +32,9 @@ namespace Torch
         int *trackfeatures;
         //void cleanup();
         void compressmachines();
+        double **lut_t1;
 
-};
+    };
 
 
 

@@ -317,7 +317,7 @@ namespace Torch
         int max_bins = 512;
         int bins;
         int *bintrack=new int[m_n_classifiers];
-        double **lut_t1= new double*[m_n_classifiers];
+        lut_t1= new double*[m_n_classifiers];
         double *lut_t2;
         for (int i=0;i<m_n_classifiers;i++)
         {
@@ -358,10 +358,13 @@ namespace Torch
 
 //so finally we get the lut for a single feature
 //now set the first m_n_classifiers machines to this new lut
+
         for (int i=0;i<m_n_classifiers;i++)
         {
             bins = bintrack[i];
+         //   print("%d\n",trackf[i]);
             ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setCore( m_weak_learners[i]->m_features[trackf[i]]);
+
             ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setParams(bins, lut_t1[i]);
 
         }
@@ -371,10 +374,7 @@ namespace Torch
         //   delete [] lut_t1;
 
     }
-//double BoostingRoundLBPTrainer::forward(Tensor *example_)
-//{
-//    return 1.0;
-//}
+
 
 
     bool BoostingRoundLBPTrainer::setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_)

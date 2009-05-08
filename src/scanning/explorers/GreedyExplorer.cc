@@ -218,6 +218,12 @@ bool GreedyExplorer::shouldSearchMode(int old_n_candidates) const
 
 bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 {
+	const int image_w = m_data->m_image_w;
+	const int image_h = m_data->m_image_h;
+
+	const int model_w = m_data->m_swEvaluator->getModelWidth();
+	const int model_h = m_data->m_swEvaluator->getModelHeight();
+
 	// Vary the scale ...
 	int index = 0;
 	for (int is = -NoVarS; is <= NoVarS; is ++)
@@ -227,6 +233,10 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 		const int new_sw_h = FixI(scale * sw_h);
 		const float dx = 0.01f * (VarX + 0.0f) * new_sw_w;
 		const float dy = 0.01f * (VarY + 0.0f) * new_sw_h;
+
+		// Check if the subwindow's size is too large or too small
+		const bool valid = 	new_sw_w >= model_w && new_sw_h >= model_h &&
+					new_sw_w < image_w && new_sw_h < image_h;
 
 		// Vary the position ...
 		for (int ix = -NoVarX; ix <= NoVarX; ix ++)
@@ -243,12 +253,15 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 
 				// Process the sub-window, ignore if some error
 				//      (the coordinates may fall out of the image)
-				const int old_size = m_data->m_patterns.size();
-				if (	ScaleExplorer::processSW(new_sw_x, new_sw_y, new_sw_w, new_sw_h, *m_data) &&
-					m_data->m_patterns.size() != old_size)
+				if (valid == true)
 				{
-					m_profileScores[index] = m_data->m_patterns.get(old_size).m_confidence;
-					m_profileFlags[index] = 0x01;
+					const int old_size = m_data->m_patterns.size();
+					if (	ScaleExplorer::processSW(new_sw_x, new_sw_y, new_sw_w, new_sw_h, *m_data) &&
+						m_data->m_patterns.size() != old_size)
+					{
+						m_profileScores[index] = m_data->m_patterns.get(old_size).m_confidence;
+						m_profileFlags[index] = 0x01;
+					}
 				}
 
 				// Next profile

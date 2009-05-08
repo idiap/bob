@@ -6,7 +6,7 @@
 #include "measurer.h"
 #include "MemoryDataSet.h"
 #include "FTrainer.h"
-
+#include "general.h"
 namespace Torch
 {
 
@@ -59,7 +59,7 @@ namespace Torch
 
     };
 
-
+extern "C" int cmp_value(const void *p1, const void *p2);
 
 }
 
