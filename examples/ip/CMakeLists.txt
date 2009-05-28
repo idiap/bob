@@ -48,7 +48,8 @@ SET(EXAMPLE_SRC
 	shift.cc
 	rotate.cc
 	blocks.cc
-	geomNorm.cc)
+	geomNorm.cc
+	memtest.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

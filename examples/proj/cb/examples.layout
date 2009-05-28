@@ -40,8 +40,8 @@
 	<File name="../../images/imageformats.cc" open="0" top="0" tabpos="55">
 		<Cursor position="2174" topLine="73" />
 	</File>
-	<File name="../../ip/CMakeLists.txt" open="0" top="0" tabpos="6">
-		<Cursor position="1488" topLine="0" />
+	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="10">
+		<Cursor position="1514" topLine="0" />
 	</File>
 	<File name="../../ip/blocks.cc" open="0" top="0" tabpos="7">
 		<Cursor position="0" topLine="45" />
@@ -58,6 +58,12 @@
 	<File name="../../ip/lbp.cc" open="0" top="0" tabpos="4">
 		<Cursor position="2522" topLine="23" />
 	</File>
+	<File name="../../ip/make.csh" open="1" top="0" tabpos="9">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="../../ip/memtest.cc" open="1" top="1" tabpos="26">
+		<Cursor position="2076" topLine="77" />
+	</File>
 	<File name="../../ip/scale.cc" open="0" top="0" tabpos="53">
 		<Cursor position="1086" topLine="12" />
 	</File>
@@ -67,10 +73,10 @@
 	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="2">
 		<Cursor position="3748" topLine="189" />
 	</File>
-	<File name="../../machines/test19x19models.cc" open="1" top="1" tabpos="3">
+	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="3">
 		<Cursor position="1147" topLine="27" />
 	</File>
-	<File name="../../options/CMakeLists.txt" open="0" top="0" tabpos="12">
+	<File name="../../options/CMakeLists.txt" open="1" top="0" tabpos="8">
 		<Cursor position="414" topLine="0" />
 	</File>
 	<File name="../../options/make.csh" open="0" top="0" tabpos="13">

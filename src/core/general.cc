@@ -71,5 +71,4 @@ int compare_doubles(const void* a, const void* b)
 
 	return (*da > *db) - (*da < *db);
 }
-
 }

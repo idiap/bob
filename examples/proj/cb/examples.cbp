@@ -82,6 +82,7 @@
 		<Unit filename="../../ip/ipflipper3d.cc" />
 		<Unit filename="../../ip/lbp.cc" />
 		<Unit filename="../../ip/make.csh" />
+		<Unit filename="../../ip/memtest.cc" />
 		<Unit filename="../../ip/rotate.cc" />
 		<Unit filename="../../ip/scale.cc" />
 		<Unit filename="../../ip/shift.cc" />
