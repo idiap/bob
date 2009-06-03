@@ -258,6 +258,8 @@
 		<Unit filename="../../core/TensorFile.h" />
 		<Unit filename="../../core/TensorGen.cc" />
 		<Unit filename="../../core/TensorGen.h" />
+		<Unit filename="../../core/TensorList.cc" />
+		<Unit filename="../../core/TensorList.h" />
 		<Unit filename="../../core/Trainer.cc" />
 		<Unit filename="../../core/Trainer.h" />
 		<Unit filename="../../core/apCore.cc" />
@@ -368,8 +370,12 @@
 		<Unit filename="../../machine/CascadeMachine.h" />
 		<Unit filename="../../machine/Classifier.cc" />
 		<Unit filename="../../machine/Classifier.h" />
+		<Unit filename="../../machine/FLDAMachine.cc" />
+		<Unit filename="../../machine/FLDAMachine.h" />
 		<Unit filename="../../machine/GradientMachine.cc" />
 		<Unit filename="../../machine/GradientMachine.h" />
+		<Unit filename="../../machine/LRMachine.cc" />
+		<Unit filename="../../machine/LRMachine.h" />
 		<Unit filename="../../machine/Machines.h" />
 		<Unit filename="../../measurer/CMakeLists.txt" />
 		<Unit filename="../../measurer/measurer.cc" />
@@ -403,14 +409,6 @@
 		<Unit filename="../../scanning/ipSWPruner.cc" />
 		<Unit filename="../../scanning/ipSWPruner.h" />
 		<Unit filename="../../scanning/profile/CMakeLists.txt" />
-		<Unit filename="../../scanning/profile/FLDAMachine.cc" />
-		<Unit filename="../../scanning/profile/FLDAMachine.h" />
-		<Unit filename="../../scanning/profile/FLDATrainer.cc" />
-		<Unit filename="../../scanning/profile/FLDATrainer.h" />
-		<Unit filename="../../scanning/profile/LRMachine.cc" />
-		<Unit filename="../../scanning/profile/LRMachine.h" />
-		<Unit filename="../../scanning/profile/LRTrainer.cc" />
-		<Unit filename="../../scanning/profile/LRTrainer.h" />
 		<Unit filename="../../scanning/profile/Profile.cc" />
 		<Unit filename="../../scanning/profile/Profile.h" />
 		<Unit filename="../../scanning/profile/ProfileDataSet.cc" />
@@ -484,8 +482,12 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../trainer/CMakeLists.txt" />
+		<Unit filename="../../trainer/FLDATrainer.cc" />
+		<Unit filename="../../trainer/FLDATrainer.h" />
 		<Unit filename="../../trainer/GTFile.cc" />
 		<Unit filename="../../trainer/GTFile.h" />
+		<Unit filename="../../trainer/LRTrainer.cc" />
+		<Unit filename="../../trainer/LRTrainer.h" />
 		<Unit filename="../../trainer/gtfiles/CMakeLists.txt" />
 		<Unit filename="../../trainer/gtfiles/bancaGTFile.cc" />
 		<Unit filename="../../trainer/gtfiles/bancaGTFile.h" />

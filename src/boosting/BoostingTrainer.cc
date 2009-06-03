@@ -93,7 +93,7 @@ namespace Torch
         }
         else Torch::error("BoostingTrainer::initWeights() no examples to initialize the weights.");
     }
-
+/////////////////////////////////////////////////////////////////////////////////////////////////
     void BoostingTrainer::updateWeights()
     {
         print("   BoostingTrainer::updateWeights()\n");
@@ -102,7 +102,7 @@ namespace Torch
         int fr = 0;
         int np = 0;
         int nn = 0;
-
+        bool t;
         double error_ = 0.0;
 
         //
@@ -116,13 +116,16 @@ namespace Torch
             Tensor *example = m_dataset->getExample(i);
 
           //  print("1 ..........\n");
-            m_->forward(*example);
+           t= m_->forward(*example);
+           if(t==false)
+            print("there is a bug in forward machine \n");
            // print("2 ..........\n");
             ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
             short target_value = (*target)(0);
             DoubleTensor *t_output = (DoubleTensor *) &m_->getOutput();
            // print("3 ..........\n");
-            m_labelledmeasure[i].measure = (*t_output)(0);
+          //  m_labelledmeasure[i].measure = (*t_output)(0);
+            m_labelledmeasure[i].measure = t_output->get(0);
           //  print("machine feature value %f\n",(*t_output)(0));
             m_labelledmeasure[i].label = target_value;
 
@@ -154,7 +157,7 @@ namespace Torch
             }
         }
 
-        print("   error = %g \t FAR = %g \t FRR = %g\n", error_, ((float) fa * 100.0 / (float) nn), ((float) fr * 100.0 / (float) np));
+        print("   error = %g \t FAR = %g \t FRR = %g\n", error_, ((float) fa * 100.0 / (float) (nn+1)), ((float) fr * 100.0 / (float) (np+1)));
 
         double frr = 0.0;
         double far = 0.0;
@@ -329,12 +332,19 @@ namespace Torch
 
     void BoostingTrainer::cleanup()
     {
-        if (m_weights == NULL) delete []m_weights;
-        if (m_weights_samples == NULL) delete []m_weights_samples;
-        if (m_label_samples == NULL) delete []m_label_samples;
-        if (m_shuffledindex_dataset == NULL) delete []m_shuffledindex_dataset;
-        if (m_repartition == NULL) delete []m_repartition;
-        if (m_labelledmeasure == NULL) delete []m_labelledmeasure;
+        delete []m_weights;
+        delete []m_weights_samples;
+        delete []m_label_samples;
+        delete []m_shuffledindex_dataset;
+        delete []m_repartition;
+        delete []m_labelledmeasure;
+
+        m_weights = NULL;
+        m_weights_samples = NULL;
+        m_label_samples = NULL;
+        m_shuffledindex_dataset = NULL;
+        m_repartition = NULL;
+        m_labelledmeasure = NULL;
     }
 
     BoostingTrainer::~BoostingTrainer()

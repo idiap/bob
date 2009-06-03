@@ -3,6 +3,8 @@
 #
 SET(	trainer_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/GTFile.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/LRTrainer.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/FLDATrainer.cc"
 #		"${CMAKE_CURRENT_SOURCE_DIR}/EMTrainer.cc"
 	CACHE INTERNAL "sources")
 

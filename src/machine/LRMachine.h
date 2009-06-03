@@ -1,14 +1,16 @@
-#ifndef _TORCHVISION_SCANNING_PROFILE_LR_MACHINE_H_
-#define _TORCHVISION_SCANNING_PROFILE_LR_MACHINE_H_
+#ifndef _TORCHVISION_LR_MACHINE_H_
+#define _TORCHVISION_LR_MACHINE_H_
 
 #include "Machine.h"			// <LRMachine> is a <Machine>
+#include "Machines.h"
 
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::LRMachine:
-	//	- implements Logistic Regression Linear Discriminant Analysis (generic,
-	//		but used with profiling scanning)
+	//	- implements Logistic Regression Linear Discriminant Analysis
+	//	- <getOutput> will return a 1x1D DoubleTensor with the score
+	//	- it processes only DoubleTensors having the same size as set with <resize>
 	//
 	//      - PARAMETERS (name, type, default value, description):
         //		//
@@ -30,11 +32,11 @@ namespace Torch
 		virtual bool 	forward(const Tensor& input);
 
 		// Constructs an empty Machine of this kind
-		// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine* getAnInstance() const { return new LRMachine; }
+		// (used by <MachineManager>, this object is automatically deallocated)
+		virtual Machine* getAnInstance() const { return manage(new LRMachine); }
 
 		// Get the ID specific to each Machine
-		virtual int	getID() const { return 10002; }
+		virtual int	getID() const { return LR_MACHINE_ID; }
 
 		// Loading/Saving the content from files (\emph{not the options})
 		virtual bool	loadFile(File& file);

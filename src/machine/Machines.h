@@ -12,6 +12,12 @@
 #define INT_LUT_MACHINE_ID 21
 #define REAL_LUT_MACHINE_ID 22
 
+// Logistic regression
+#define LR_MACHINE_ID	10002
+
+// Fisher Linear Discriminant Analysis
+#define FLDA_MACHINE_ID	10003
+
 #include "CascadeMachine.h"
 #include "StumpMachine.h"
 #include "IntLutMachine.h"

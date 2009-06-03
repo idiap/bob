@@ -42,6 +42,11 @@ namespace Torch
         MemoryDataSet *m_dataset; //can we change the size of memory data set  by deleting and recreating it
 
 
+        ShortTensor m_target0;
+	ShortTensor m_target1;
+
+
+
 
 	// Number of examples
 	int p_examples;
@@ -52,7 +57,8 @@ namespace Torch
 
 
     void updateImageScanDataSet(int trainer_i);
-    void updateDataSet(int trainer_i, DataSet *mdata_,char *str1);
+    void updateImageScanDataSet_check(int trainer_i);
+    void updateDataSet(int trainer_i, DataSet *mdata_,const char *str1);
     void getThreshold(DataSet *m_data);
 
 

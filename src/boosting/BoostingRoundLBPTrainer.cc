@@ -152,7 +152,7 @@ namespace Torch
             m_features = m_weak_learners[0]->getmnFeatures();
 
         m_featuremask =new int[m_features];
-        trackfeatures = new int[m_nrounds];
+        m_trackfeatures = new int[m_nrounds];
 
         for (int i=0;i<m_features;i++)
             m_featuremask[i] = 0;
@@ -234,7 +234,7 @@ namespace Torch
 
 
 
-            trackfeatures[m_n_classifiers_trained] = featureID;
+            m_trackfeatures[m_n_classifiers_trained] = featureID;
 
 
             updateWeights(); // update weights for all examples
@@ -307,6 +307,8 @@ namespace Torch
 
         compressmachines();
 
+        delete [] m_trackfeatures;
+
         return true;
     }
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -317,17 +319,17 @@ namespace Torch
         int max_bins = 512;
         int bins;
         int *bintrack=new int[m_n_classifiers];
-        lut_t1= new double*[m_n_classifiers];
+        m_lut_t1= new double*[m_n_classifiers];
         double *lut_t2;
         for (int i=0;i<m_n_classifiers;i++)
         {
-            lut_t1[i] = new double[max_bins];
+            m_lut_t1[i] = new double[max_bins];
             for (int j=0;j<max_bins;j++)
-                lut_t1[i][j] = 0;
+                m_lut_t1[i][j] = 0;
         }
 
 
-        for (int i=0;i<m_n_examples;i++)
+        for (int i=0;i<m_features;i++)
         {
             if (m_featuremask[i]==1)
             {
@@ -344,13 +346,13 @@ namespace Torch
         {
             bins =  ((LBPRoundTrainer*)m_weak_learners[i])->getLUTSize();
             lut_t2 = ((LBPRoundTrainer*)m_weak_learners[i])->getLUT();
-            track  = m_featuremask[trackfeatures[i]];
+            track  = m_featuremask[m_trackfeatures[i]];
             bintrack[track] = bins;
-            trackf[track] = trackfeatures[i];
+            trackf[track] = m_trackfeatures[i];
             for (int j=0;j<bins;j++)
             {
 
-                lut_t1[track][j] += m_weights[i]*lut_t2[j];
+                m_lut_t1[track][j] += m_weights[i]*lut_t2[j];
             }
 
 
@@ -365,13 +367,16 @@ namespace Torch
          //   print("%d\n",trackf[i]);
             ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setCore( m_weak_learners[i]->m_features[trackf[i]]);
 
-            ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setParams(bins, lut_t1[i]);
+            ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setParams(bins, m_lut_t1[i]);
 
         }
 
         //    for (int i=0;i<m_n_classifiers;i++)
-        ////        delete lut_t1[i];
-        //   delete [] lut_t1;
+        ////        delete m_lut_t1[i];
+        //   delete [] m_lut_t1;
+        delete[] trackf;
+        delete [] bintrack;
+        //delete []
 
     }
 
@@ -382,8 +387,8 @@ namespace Torch
         m_n_classifiers = n_classifiers_;
         m_weak_learners = weak_learners_;
 
-        BoostingTrainer::cleanup();
         m_nrounds = getIOption("number_of_rounds");
+	delete []m_weights;
         m_weights = new double [m_nrounds];
 
         return true;
@@ -392,11 +397,15 @@ namespace Torch
     ////////////////////////////////////////
     BoostingRoundLBPTrainer::~BoostingRoundLBPTrainer()
     {
-        cleanup();
         //   print("ffgjsdfs\n");
-        if (m_featuremask ==NULL)
-            delete []m_featuremask;
-        // print("ffgjsdfs\n");
+        delete []m_featuremask;
+
+         for ( int i = 0; i < m_n_classifiers; i++)
+	{
+		delete [] m_lut_t1[i];
+	}
+	delete [] m_lut_t1;
+
     }
 
 }

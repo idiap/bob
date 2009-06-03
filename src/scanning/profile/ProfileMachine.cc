@@ -12,8 +12,8 @@ ProfileMachine::ProfileMachine()
 		m_fmodels(new FLDAMachine[NoFeatures]),
 		m_fselected(new unsigned char[NoFeatures])
 {
-	m_output = new DoubleTensor(1);
-	m_poutput = (double*)m_output->dataW();
+	m_output.resize(1);
+	m_poutput = (double*)m_output.dataW();
 
 	for (int f = 0; f < NoFeatures; f ++)
 	{
@@ -26,7 +26,6 @@ ProfileMachine::ProfileMachine()
 
 ProfileMachine::~ProfileMachine()
 {
-	delete m_output;
 	delete[] m_fmodels;
 	delete[] m_fselected;
 }

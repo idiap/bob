@@ -38,10 +38,6 @@ bool CascadeMachine::Stage::resize(int n_machines)
 
 void CascadeMachine::Stage::deallocate()
 {
-	for (int i = 0; i < m_n_machines; i ++)
-	{
-		delete m_machines[i];
-	}
 	delete[] m_machines;
 	delete[] m_weights;
 	m_machines = 0;
@@ -60,7 +56,6 @@ bool CascadeMachine::Stage::setMachine(int i_machine, Machine* machine)
 	}
 
 	// OK
-	delete m_machines[i_machine];
 	m_machines[i_machine] = machine;
 	return true;
 }
@@ -145,8 +140,8 @@ CascadeMachine::CascadeMachine()
                 m_fast_output(0)
 {
         // Allocate the output
-	m_output = new DoubleTensor(1);
-	const DoubleTensor* t_output = (DoubleTensor*)m_output;
+	m_output.resize(1);
+	const DoubleTensor* t_output = (DoubleTensor*)&m_output;
 	m_fast_output = t_output->t->storage->data + t_output->t->storageOffset;
 }
 
@@ -156,7 +151,6 @@ CascadeMachine::CascadeMachine()
 CascadeMachine::~CascadeMachine()
 {
 	deallocate();
-	delete m_output;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -302,8 +296,7 @@ bool CascadeMachine::loadFile(File& file)
 			{
 			        Torch::message("CascadeMachine::load - the [%d/%d]-[%d/%d] machine could not be loaded!\n",
                                         s + 1, n_stages, n + 1, n_trainers);
-			        delete machine;
-				return false;
+			        return false;
 			}
 			if (setMachine(s, n, machine) == false)
 			{

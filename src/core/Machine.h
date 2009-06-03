@@ -22,10 +22,8 @@ namespace Torch {
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::Machine:
 	//      Process some input using a model (loaded from some file).
-	//	May use some spCore object to extract features. It deallocates the given spCore.
+	//	May use some spCore object to extract features. It doesn't deallocate the given spCore.
 	//      The output is a DoubleTensor!
-	//
-	//      NB: The ouput should be allocated and deallocated by each Machine implementation!
 	//
 	//	EACH MACHINE SHOULD REGISTER
 	//		==> MachineManager::GetInstance().add(new XXXMachine) <==
@@ -48,7 +46,7 @@ namespace Torch {
 		virtual bool 		forward(const Tensor& input) = 0;
 
 		/// Constructs an empty Machine of this kind
-		/// (used by <MachineManager>, this object should be deallocated by the user)
+		/// (used by <MachineManager>, this object is automatically deallocated)
 		virtual Machine*	getAnInstance() const = 0;
 
 		// Set the model size to use
@@ -71,7 +69,8 @@ namespace Torch {
 		// Access functions
 
 		const TensorSize&	getSize() const { return m_size; }
-		const DoubleTensor&     getOutput() const;
+		const DoubleTensor&     getOutput() const { return m_output; }
+		spCore*			getCore() { return m_core; }
 
 		///////////////////////////////////////////////////////////
 
@@ -88,7 +87,7 @@ namespace Torch {
 		TensorRegion		m_region;	// Region where to process
 
 		// The result when run on some data
-		DoubleTensor*		m_output;
+		DoubleTensor		m_output;
 	};
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -121,7 +120,7 @@ namespace Torch {
 
 		// Get a copy of the <Machine> (empty, no parameters set) for the given ID
 		// (returns NULL/0 if the <id> is invalid)
-		// The new Machine is allocated and should be deallocated by the user!
+		// The new Machine will be automatic deallocated!
 		Machine*		get(int id) const;
 
 		// Get the generic name for the given id

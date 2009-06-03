@@ -13,8 +13,8 @@ LRMachine::LRMachine(int size)
 		m_weights(0),
 		m_threshold(0.5)
 {
-	m_output = new DoubleTensor(1);
-	m_poutput = (double*)m_output->dataW();
+	m_output.resize(1);
+	m_poutput = (double*)m_output.dataW();
 
 	resize(size);
 }
@@ -24,7 +24,6 @@ LRMachine::LRMachine(int size)
 
 LRMachine::~LRMachine()
 {
-	delete m_output;
 	delete[] m_weights;
 }
 

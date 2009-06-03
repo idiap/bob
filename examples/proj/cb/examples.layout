@@ -4,6 +4,18 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
+	<File name="../../boosting/ConvertCascade.cc" open="1" top="0" tabpos="31">
+		<Cursor position="8979" topLine="288" />
+	</File>
+	<File name="../../boosting/LBPtrainCascade.cc" open="1" top="1" tabpos="34">
+		<Cursor position="9905" topLine="298" />
+	</File>
+	<File name="../../boosting/README.txt" open="1" top="0" tabpos="32">
+		<Cursor position="2317" topLine="24" />
+	</File>
+	<File name="../../boosting/boostingLBPRound.cc" open="1" top="0" tabpos="33">
+		<Cursor position="5532" topLine="176" />
+	</File>
 	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="1">
 		<Cursor position="706" topLine="0" />
 	</File>
@@ -16,8 +28,8 @@
 	<File name="../../dataset/makeWnds.cc" open="0" top="0" tabpos="5">
 		<Cursor position="1165" topLine="1" />
 	</File>
-	<File name="../../dataset/memorydataset.cc" open="0" top="0" tabpos="1">
-		<Cursor position="1392" topLine="0" />
+	<File name="../../dataset/memorydataset.cc" open="1" top="0" tabpos="29">
+		<Cursor position="1582" topLine="21" />
 	</File>
 	<File name="../../dataset/readWnds.cc" open="0" top="0" tabpos="4">
 		<Cursor position="701" topLine="0" />
@@ -61,20 +73,29 @@
 	<File name="../../ip/make.csh" open="1" top="0" tabpos="9">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../ip/memtest.cc" open="1" top="1" tabpos="26">
-		<Cursor position="2076" topLine="77" />
+	<File name="../../ip/memtest.cc" open="1" top="0" tabpos="11">
+		<Cursor position="1679" topLine="59" />
 	</File>
 	<File name="../../ip/scale.cc" open="0" top="0" tabpos="53">
 		<Cursor position="1086" topLine="12" />
 	</File>
 	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="4">
-		<Cursor position="885" topLine="0" />
+		<Cursor position="1510" topLine="0" />
 	</File>
 	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="2">
 		<Cursor position="3748" topLine="189" />
 	</File>
+	<File name="../../machines/make.csh" open="1" top="0" tabpos="27">
+		<Cursor position="0" topLine="0" />
+	</File>
 	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="3">
 		<Cursor position="1147" topLine="27" />
+	</File>
+	<File name="../../machines/trainFLDA.cc" open="1" top="0" tabpos="28">
+		<Cursor position="840" topLine="5" />
+	</File>
+	<File name="../../machines/trainLR.cc" open="1" top="0" tabpos="30">
+		<Cursor position="3795" topLine="103" />
 	</File>
 	<File name="../../options/CMakeLists.txt" open="1" top="0" tabpos="8">
 		<Cursor position="414" topLine="0" />

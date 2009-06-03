@@ -11,13 +11,13 @@ GradientMachine::GradientMachine(int n_inputs_, int n_outputs_, int n_parameters
    	: Machine(), n_inputs(n_inputs_), n_outputs(n_outputs_), n_parameters(n_parameters_)
 {
 	// Allocate the output
-	m_output = new DoubleTensor(n_outputs);
+	m_output.resize(n_outputs);
 	m_parameters = NULL;
 	m_der_parameters = NULL;
 	if(n_parameters > 0)
 	{
-		m_parameters = new double [n_parameters]; 
-		m_der_parameters = new double [n_der_parameters]; 
+		m_parameters = new double [n_parameters];
+		m_der_parameters = new double [n_der_parameters];
 	}
 }
 
@@ -29,7 +29,6 @@ GradientMachine::~GradientMachine()
         // Cleanup
 	if(m_parameters != NULL) delete[] m_parameters;
 	if(m_der_parameters != NULL) delete[] m_der_parameters;
-	delete m_output;
 }
 
 

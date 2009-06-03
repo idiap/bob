@@ -37,7 +37,6 @@ Machine* loadMachineFromFile(const char* filename)
         file.rewind();
         if (machine->loadFile(file) == false)
         {
-                delete machine;
                 Torch::message("Torch::loadMachineFromFile - failed to load the model file!\n");
                 return 0;
         }
@@ -56,7 +55,7 @@ Machine::Machine()
 	: 	Object(),
 		m_size(),
 		m_core(0),
-		m_output(0)
+		m_output(1)
 {
 }
 
@@ -65,7 +64,6 @@ Machine::Machine()
 
 Machine::~Machine()
 {
-	delete m_core;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -93,21 +91,7 @@ void Machine::setRegion(const TensorRegion& region)
 
 void Machine::setCore(spCore* core)
 {
-	delete m_core;
 	m_core = core;
-}
-
-///////////////////////////////////////////////////////////////////////////
-// Get the model's output
-
-const DoubleTensor& Machine::getOutput() const
-{
-        if (m_output == 0)
-        {
-                Torch::error("Machine::getOutput - invalid DoubleTensor!\n");
-        }
-
-        return *m_output;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -126,7 +110,7 @@ bool MachineManager::add(Machine* machine, const char* name)
 	// Check first if the parameters are ok
 	if (machine == 0 || machine->getID() < 1)
 	{
-	        delete machine;
+		delete machine;
 		//Torch::message("MachineManager::add - invalid parameters!\n");
 		return false;
 	}
@@ -134,7 +118,7 @@ bool MachineManager::add(Machine* machine, const char* name)
 	// Check if the <id> is taken
 	if (find(machine->getID()) >= 0) // the <id> is taken
 	{
-	        delete machine;
+		delete machine;
 		//Torch::message("MachineManager::add - the ID is taken!\n");
 		return false;
 	}

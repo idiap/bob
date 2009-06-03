@@ -13,8 +13,8 @@ FLDAMachine::FLDAMachine(int size)
 		m_proj(0), m_proj_avg(0.0),
 		m_threshold(0.0)
 {
-	m_output = new DoubleTensor(1);
-	m_poutput = (double*)m_output->dataW();
+	m_output.resize(1);
+	m_poutput = (double*)m_output.dataW();
 
 	resize(size);
 }
@@ -24,7 +24,6 @@ FLDAMachine::FLDAMachine(int size)
 
 FLDAMachine::~FLDAMachine()
 {
-	delete m_output;
 	delete[] m_proj;
 }
 

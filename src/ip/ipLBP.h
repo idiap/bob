@@ -43,6 +43,9 @@ namespace Torch
 		/// Change the model size (if used with some machine) - overriden
 		virtual void		setModelSize(const TensorSize& modelSize);
 
+		/////////////////////////////////////////////
+		// Access functions
+
 		// Get the maximum possible label
 		virtual int		getMaxLabel() = 0;
 
@@ -51,6 +54,9 @@ namespace Torch
 
 		// Get the LBP code (fast & direct) access
 		int			getLBP() const { return *m_lbp; }
+
+		int			getX() const { return m_x; }
+		int			getY() const { return m_y; }
 
 		/////////////////////////////////////////////////////////////////
 

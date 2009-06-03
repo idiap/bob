@@ -40,13 +40,11 @@ namespace Torch {
 		virtual bool		saveFile(File& file) const;
 
 		/// Constructs an empty Machine of this kind
-		/// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine*	getAnInstance() const { return new StumpMachine(); }
+		/// (used by <MachineManager>, this object is automatically deallocated)
+		virtual Machine*	getAnInstance() const { return manage(new StumpMachine()); }
 
 		// Get the ID specific to each Machine
 		virtual int		getID() const { return STUMP_MACHINE_ID; }
-
-		// virtual void		setCore(spCore* core);
 
 		///////////////////////////////////////////////////////////
 		// Access functions

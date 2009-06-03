@@ -14,8 +14,13 @@ namespace Torch
 	return 0;
 }
     CascadeTrainer::CascadeTrainer()
+	:	m_target0(1),
+		m_target1(1)
     {
         //addBOption("boosting_by_sampling",	false,	"use sampling based on weights");
+
+        m_target0.fill(0);
+        m_target1.fill(1);
 
         p_examples = 0;
         n_examples =0;
@@ -106,10 +111,6 @@ namespace Torch
             //now create a new dataset
             n_examples = 2*p_count;
             m_dataset = 	new MemoryDataSet(n_examples, Tensor::Double, true, Tensor::Short);
-            ShortTensor *target0 = new ShortTensor(1);
-            target0->fill(0);
-            ShortTensor *target1 = new ShortTensor(1);
-            target1->fill(1);
             // Test the targets (rejection of samples)
             DoubleTensor reject_target(1), accept_target(1);
             reject_target.fill(-1.0);
@@ -129,7 +130,7 @@ namespace Torch
                     m_dataset->getExample(p_count)->resize(height, width);
                     example = m_pos_dataset->getExample(i);
                     m_dataset->getExample(p_count)->copy(example);
-                    m_dataset->setTarget(p_count, target1);
+                    m_dataset->setTarget(p_count, &m_target1);
                     p_count++;
                 }
             }
@@ -225,7 +226,7 @@ namespace Torch
                     m_dataset->getExample(p_count+k)->resize(height, width);
                     example = m_imagescandataset->getExample(i);
                     m_dataset->getExample(p_count+k)->copy(example);
-                m_dataset->setTarget(p_count+k, target0);
+                m_dataset->setTarget(p_count+k, &m_target0);
                 k++;
                 if(k==p_count)
                     break;
@@ -270,9 +271,11 @@ namespace Torch
             getThreshold(m_valid_dataset);
             updateDataSet(mt,m_pos_dataset,"training");
             updateDataSet(mt,m_valid_dataset,"validation");
-            updateImageScanDataSet(mt);
+           // updateImageScanDataSet(mt);
+            updateImageScanDataSet_check(mt);
             delete[] randSelect;
 
+            delete [] randTrack;
         }//end of for mt
 
         return true;
@@ -283,7 +286,7 @@ namespace Torch
         // Torch::print("CascadeTrainer::getThrehsold()\n");
 
         int tp_examples = m_data->getNoExamples();
-        if (m_labelledmeasure !=NULL) delete m_labelledmeasure;
+        delete [] m_labelledmeasure;
             m_labelledmeasure = new LabelledMeasure[tp_examples];
         int count = 0;
         for (int i=0;i<tp_examples;i++)
@@ -353,21 +356,67 @@ namespace Torch
         print("Number of -ve patterns left = %ld\n",nc);
 
     }
+
+    //////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+    void CascadeTrainer::updateImageScanDataSet_check(int trainer_i)
+    {
+        long n_scanexamples = m_imagescandataset->getNoExamples();
+        //next fill with negative patterns
+        //double imgtarget;
+        //is it possible to make it random here to get ramdom patterns
+        int nc =0;
+        Tensor *example;
+        double score;
+        DoubleTensor reject_target(1);
+
+        reject_target.fill(-1.0);
+
+        for (long i=0;i<n_scanexamples;i++)
+        {
+            //have to check if the target is +1 and fill withit
+            if (((DoubleTensor*)m_imagescandataset->getTarget(i))->get(0)>0.0)
+            {
+
+
+            double z = THRandom_uniform(0, 1);
+                //   m_dataset->getExample(p_count+n_count)->resize(height, width);
+              //  example = m_imagescandataset->getExample(i);
+                // m_dataset->getExample(p_count+n_count)->copy(example);
+                //  n_count++;
+                //  if(n_count>=p_count)
+                //      break;
+              //  score=m_ftrainer[trainer_i]->forward(example);
+                if (z>0.5)
+                    // set the pattern to reject
+                {
+                    nc++;
+                }
+                else
+
+                    m_imagescandataset->setTarget(i, &reject_target);
+
+            }
+            if (i%1000001 == 0)
+                print("%d ..",i);
+
+        }
+
+        print("Number of -ve patterns left = %ld\n",nc);
+
+    }
     double CascadeTrainer::forward(Tensor *example_)
     {
         return 1.0;
     }
 
     ////////////////////////////////////////////////////////////////////////////////
-    void CascadeTrainer::updateDataSet(int trainer_i, DataSet *mdata_,char *str1)
+    void CascadeTrainer::updateDataSet(int trainer_i, DataSet *mdata_,const char *str1)
     {
 
         //update the positive training and/or validation dataset
 
         //get the target value and only process it is = 1
-        ShortTensor *target0 = new ShortTensor(1);
-        target0->fill(0);
-
         int tp_examples = mdata_->getNoExamples();
         int count = 0;
         for (int i=0;i<tp_examples;i++)
@@ -385,7 +434,7 @@ namespace Torch
                 if (m_ftrainer[current_cascade]->forward(example)<threshold[current_cascade])
                 {
 
-                    mdata_->setTarget(i, target0);
+                    mdata_->setTarget(i, &m_target0);
                     // print("Score %f\n",m_labelledmeasure[count].measure);
 
                     count++;
@@ -395,7 +444,6 @@ namespace Torch
         }
         print("Number of %s examples rejected  = %d\n",str1,count);
 
-
     }
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -403,6 +451,9 @@ namespace Torch
     CascadeTrainer::~CascadeTrainer()
     {
         //  cleanup();
+        delete[] threshold;
+        delete m_dataset;
+        delete [] m_labelledmeasure;
     }
 
 }

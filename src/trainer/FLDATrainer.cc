@@ -9,6 +9,7 @@ namespace Torch
 // Constructor
 
 FLDATrainer::FLDATrainer()
+	:	m_validation_dataset(0)
 {
 }
 
@@ -17,6 +18,15 @@ FLDATrainer::FLDATrainer()
 
 FLDATrainer::~FLDATrainer()
 {
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Set the validation dataset
+
+bool FLDATrainer::setValidationData(DataSet* dataset)
+{
+	m_validation_dataset = dataset;
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +81,7 @@ bool FLDATrainer::train()
 		}
 	}
 
-	const int n_samples = m_dataset->getNoExamples();
+	const long n_samples = m_dataset->getNoExamples();
 
 	// Estimate the average within classes
 	int n_pos = 0, n_neg = 0;

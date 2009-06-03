@@ -24,7 +24,7 @@ namespace Torch
 		virtual void	setTarget(long, Tensor*) = 0;
 
 		/// Query the number of examples in the dataset
-		int 		getNoExamples() const { return m_n_examples; };
+		long 		getNoExamples() const { return m_n_examples; };
 
 		/// Query if the DataSet has targets
 		bool 		hasTargets() const { return m_has_targets; };
