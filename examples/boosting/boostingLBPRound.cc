@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     TensorList *tensorList_n= manage(new TensorList()); //for validation
 
 
-    if (tensorList_p->process(p_tensor_files,target1)==false)
+    if (tensorList_p->process(p_tensor_files,target1,Tensor::Double)==false)
     {
         print("Error in reading +ve training patterns - Tensor list\n");
         return 1;
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
     pDataSet = tensorList_p->getOutput();
 
 
-    if (tensorList_n->process(n_tensor_files,target0)==false)
+    if (tensorList_n->process(n_tensor_files,target0,Tensor::Double)==false)
     {
         print("Error in reading -ve patterns - Tensor list\n");
         return 1;

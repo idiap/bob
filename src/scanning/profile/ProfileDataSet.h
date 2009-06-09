@@ -13,7 +13,7 @@ namespace Torch
 	//	- returns 1D DoubleTensor of the size given by the profile feature size
 	//		(check Sample.h header for FeatureSizes[])
 	//
-	//	NB: the targets will be automatically assigned to 1x1 DoubleTensors (-1, +1)
+	//	NB: the targets will be automatically assigned to 1x1 DoubleTensors (0, +1)
 	//		using the given profile distribution!
 	//		=> <setTarget> won't do anything!
 	//
@@ -50,17 +50,23 @@ namespace Torch
 		const Profile*		getProfile(long index) const;
 		bool			isPosProfile(long index) const;
 
-		// Save the distribution
-		void			save(const char* dir_data, const char* name) const;
+		// Save the distributions
+		bool			save(const char* dir_data, const char* name) const;
+
+		// Load the distributions
+		bool			load(const char* dir_data, const char* name);
 
 	private:
 
 		// Save some distribution
-		void			save(const char* basename, unsigned char mask) const;
+		bool			save(const char* basename, unsigned char mask) const;
 
 		// Resize some distribution to fit new samples
-		static Profile**	resize(Profile** old_data, int capacity, int increment);
-		static unsigned char*	resize(unsigned char* old_data, int capacity, int increment);
+		static Profile**	resize(Profile** old_data, long capacity, long increment);
+		static unsigned char*	resize(unsigned char* old_data, long capacity, long increment);
+
+		// Delete stored profiles
+		void			cleanup();
 
 		enum Mask
 		{
@@ -76,9 +82,9 @@ namespace Torch
 		int			m_feature;
 
 		// Profile distribution
-		Profile**		m_profiles;		// Profiles
+		Profile**		m_profiles;		// [No. examples] x [No. features]
 		unsigned char*		m_masks;		// Negative, positive or ground truth
-		int			m_capacity;		// Allocated profiles
+		long			m_capacity;		// Allocated profiles
 
 		// Targets: positive and negative
 		DoubleTensor		m_target_neg;

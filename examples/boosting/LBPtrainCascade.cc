@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
     TensorList *tensorList_p= manage(new TensorList()); //for positive
     TensorList *tensorList_v= manage(new TensorList()); //for validation
 
-    if (tensorList_p->process(p_tensor_files,target1)==false)
+    if (tensorList_p->process(p_tensor_files,target1,Tensor::Double)==false)
     {
         print("Error in reading +ve training pattern Tensor list\n");
         return 1;
@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
     pDataSet = tensorList_p->getOutput();
 
 
-    if (tensorList_v->process(v_tensor_files,target1)==false)
+    if (tensorList_v->process(v_tensor_files,target1,Tensor::Double)==false)
     {
         print("Error in reading +ve valid pattern Tensor list\n");
         return 1;
@@ -305,7 +305,7 @@ int main(int argc, char* argv[])
     t=CT->setData(pDataSet,vDataSet,&iscandataset);
     t=CT->train();
 
-
+    double *threshold = CT->getStageThreshold();
     CascadeMachine* CM = manage(new CascadeMachine());
     CM->resize(n_stages);
     CM->setSize(*modelsize);
@@ -321,7 +321,7 @@ int main(int argc, char* argv[])
 
         }
 
-        t=CM->setThreshold(k,CT->threshold[k]);
+        t=CM->setThreshold(k,threshold[k]);
 
     }
 

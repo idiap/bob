@@ -12,7 +12,8 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
                         "${TORCH5SPRO_DIR}/src/ip/imagefiles/"
                         "${TORCH5SPRO_DIR}/extras/jpeg/"
                         "${TORCH5SPRO_DIR}/src/th/"
-			"${TORCH5SPRO_DIR}/src/machine/"
+                        "${TORCH5SPRO_DIR}/src/machine/"
+			"${TORCH5SPRO_DIR}/src/scanning/profile/"
 			"${TORCH5SPRO_DIR}/src/trainer/"
 			"${TORCH5SPRO_DIR}/src/boosting/")
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
@@ -37,8 +38,7 @@ MESSAGE("---------------------------------------------" "")
 SET(EXAMPLE_SRC
 	test19x19models.cc
 	convert3to5models.cc
-	trainLR.cc
-	trainFLDA.cc)
+	trainLR.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

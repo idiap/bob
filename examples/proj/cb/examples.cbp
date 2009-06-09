@@ -39,11 +39,13 @@
 		</Compiler>
 		<Unit filename="../../README.txt" />
 		<Unit filename="../../boosting/CMakeLists.txt" />
-		<Unit filename="../../boosting/ConvertCascade.cc" />
+		<Unit filename="../../boosting/IntegraltrainCascade.cc" />
 		<Unit filename="../../boosting/LBPtrainCascade.cc" />
 		<Unit filename="../../boosting/README.txt" />
 		<Unit filename="../../boosting/boostingLBPRound.cc" />
+		<Unit filename="../../boosting/boostingintegral.cc" />
 		<Unit filename="../../boosting/boosttest.cc" />
+		<Unit filename="../../boosting/boosttestintegral.cc" />
 		<Unit filename="../../boosting/make.csh" />
 		<Unit filename="../../dataset/CMakeLists.txt" />
 		<Unit filename="../../dataset/README.txt" />
@@ -96,7 +98,6 @@
 		<Unit filename="../../machines/convert3to5models.cc" />
 		<Unit filename="../../machines/make.csh" />
 		<Unit filename="../../machines/test19x19models.cc" />
-		<Unit filename="../../machines/trainFLDA.cc" />
 		<Unit filename="../../machines/trainLR.cc" />
 		<Unit filename="../../options/CMakeLists.txt" />
 		<Unit filename="../../options/README.txt" />

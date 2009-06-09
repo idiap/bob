@@ -209,6 +209,8 @@
 		<Unit filename="../../boosting/BoostingTrainer.cc" />
 		<Unit filename="../../boosting/BoostingTrainer.h" />
 		<Unit filename="../../boosting/CMakeLists.txt" />
+		<Unit filename="../../boosting/CascadeIntegralTrainer.cc" />
+		<Unit filename="../../boosting/CascadeIntegralTrainer.h" />
 		<Unit filename="../../boosting/CascadeTrainer.cc" />
 		<Unit filename="../../boosting/CascadeTrainer.h" />
 		<Unit filename="../../boosting/FTrainer.cc" />
@@ -370,12 +372,8 @@
 		<Unit filename="../../machine/CascadeMachine.h" />
 		<Unit filename="../../machine/Classifier.cc" />
 		<Unit filename="../../machine/Classifier.h" />
-		<Unit filename="../../machine/FLDAMachine.cc" />
-		<Unit filename="../../machine/FLDAMachine.h" />
 		<Unit filename="../../machine/GradientMachine.cc" />
 		<Unit filename="../../machine/GradientMachine.h" />
-		<Unit filename="../../machine/LRMachine.cc" />
-		<Unit filename="../../machine/LRMachine.h" />
 		<Unit filename="../../machine/Machines.h" />
 		<Unit filename="../../measurer/CMakeLists.txt" />
 		<Unit filename="../../measurer/measurer.cc" />
@@ -409,6 +407,10 @@
 		<Unit filename="../../scanning/ipSWPruner.cc" />
 		<Unit filename="../../scanning/ipSWPruner.h" />
 		<Unit filename="../../scanning/profile/CMakeLists.txt" />
+		<Unit filename="../../scanning/profile/LRMachine.cc" />
+		<Unit filename="../../scanning/profile/LRMachine.h" />
+		<Unit filename="../../scanning/profile/LRTrainer.cc" />
+		<Unit filename="../../scanning/profile/LRTrainer.h" />
 		<Unit filename="../../scanning/profile/Profile.cc" />
 		<Unit filename="../../scanning/profile/Profile.h" />
 		<Unit filename="../../scanning/profile/ProfileDataSet.cc" />
@@ -417,8 +419,6 @@
 		<Unit filename="../../scanning/profile/ProfileMachine.h" />
 		<Unit filename="../../scanning/profile/ProfileTrainer.cc" />
 		<Unit filename="../../scanning/profile/ProfileTrainer.h" />
-		<Unit filename="../../scanning/profile/mat.cc" />
-		<Unit filename="../../scanning/profile/mat.h" />
 		<Unit filename="../../scanning/pruners/CMakeLists.txt" />
 		<Unit filename="../../scanning/pruners/ipSWVariancePruner.cc" />
 		<Unit filename="../../scanning/pruners/ipSWVariancePruner.h" />
@@ -482,12 +482,8 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../trainer/CMakeLists.txt" />
-		<Unit filename="../../trainer/FLDATrainer.cc" />
-		<Unit filename="../../trainer/FLDATrainer.h" />
 		<Unit filename="../../trainer/GTFile.cc" />
 		<Unit filename="../../trainer/GTFile.h" />
-		<Unit filename="../../trainer/LRTrainer.cc" />
-		<Unit filename="../../trainer/LRTrainer.h" />
 		<Unit filename="../../trainer/gtfiles/CMakeLists.txt" />
 		<Unit filename="../../trainer/gtfiles/bancaGTFile.cc" />
 		<Unit filename="../../trainer/gtfiles/bancaGTFile.h" />

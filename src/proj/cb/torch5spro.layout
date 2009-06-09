@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug" />
+	<ActiveTarget name="Release" />
 	<File name="../../../extras/jpeg/CMakeLists.txt" open="0" top="0" tabpos="45">
 		<Cursor position="249" topLine="0" />
 	</File>
@@ -28,79 +28,82 @@
 	<File name="../../../extras/oourafft/CMakeLists.txt" open="0" top="0" tabpos="46">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../CMakeLists.txt" open="1" top="0" tabpos="46">
-		<Cursor position="255" topLine="0" />
+	<File name="../../CMakeLists.txt" open="1" top="0" tabpos="27">
+		<Cursor position="285" topLine="0" />
 	</File>
-	<File name="../../boosting/BoostingRoundLBPTrainer.cc" open="1" top="0" tabpos="110">
-		<Cursor position="10184" topLine="283" />
+	<File name="../../boosting/BoostingRoundLBPTrainer.cc" open="0" top="0" tabpos="77">
+		<Cursor position="1319" topLine="22" />
 	</File>
-	<File name="../../boosting/BoostingRoundLBPTrainer.h" open="1" top="0" tabpos="109">
+	<File name="../../boosting/BoostingRoundLBPTrainer.h" open="1" top="0" tabpos="52">
 		<Cursor position="1211" topLine="0" />
 	</File>
-	<File name="../../boosting/BoostingRoundTrainer.cc" open="1" top="0" tabpos="117">
+	<File name="../../boosting/BoostingRoundTrainer.cc" open="0" top="0" tabpos="84">
 		<Cursor position="414" topLine="0" />
 	</File>
-	<File name="../../boosting/BoostingRoundTrainer.h" open="1" top="0" tabpos="112">
+	<File name="../../boosting/BoostingRoundTrainer.h" open="1" top="0" tabpos="53">
 		<Cursor position="420" topLine="0" />
 	</File>
-	<File name="../../boosting/BoostingTrainer.cc" open="1" top="0" tabpos="111">
-		<Cursor position="10768" topLine="317" />
+	<File name="../../boosting/BoostingTrainer.cc" open="0" top="0" tabpos="78">
+		<Cursor position="10768" topLine="312" />
 	</File>
-	<File name="../../boosting/BoostingTrainer.h" open="1" top="0" tabpos="105">
-		<Cursor position="1042" topLine="34" />
+	<File name="../../boosting/BoostingTrainer.h" open="1" top="0" tabpos="54">
+		<Cursor position="1042" topLine="0" />
 	</File>
-	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="18">
-		<Cursor position="434" topLine="0" />
+	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="67">
+		<Cursor position="632" topLine="0" />
 	</File>
-	<File name="../../boosting/CascadeTrainer.cc" open="1" top="0" tabpos="96">
-		<Cursor position="14602" topLine="420" />
+	<File name="../../boosting/CascadeIntegralTrainer.h" open="1" top="0" tabpos="68">
+		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../boosting/CascadeTrainer.h" open="1" top="0" tabpos="45">
-		<Cursor position="434" topLine="8" />
+	<File name="../../boosting/CascadeTrainer.cc" open="1" top="0" tabpos="66">
+		<Cursor position="738" topLine="0" />
 	</File>
-	<File name="../../boosting/FTrainer.cc" open="1" top="0" tabpos="114">
+	<File name="../../boosting/CascadeTrainer.h" open="1" top="0" tabpos="55">
+		<Cursor position="1573" topLine="19" />
+	</File>
+	<File name="../../boosting/FTrainer.cc" open="0" top="0" tabpos="81">
 		<Cursor position="196" topLine="0" />
 	</File>
-	<File name="../../boosting/FTrainer.h" open="1" top="0" tabpos="113">
+	<File name="../../boosting/FTrainer.h" open="1" top="0" tabpos="56">
 		<Cursor position="288" topLine="0" />
 	</File>
-	<File name="../../boosting/IntLutMachine.cc" open="1" top="0" tabpos="40">
+	<File name="../../boosting/IntLutMachine.cc" open="0" top="0" tabpos="40">
 		<Cursor position="3554" topLine="105" />
 	</File>
-	<File name="../../boosting/IntLutMachine.h" open="1" top="0" tabpos="39">
-		<Cursor position="1769" topLine="40" />
+	<File name="../../boosting/IntLutMachine.h" open="1" top="0" tabpos="57">
+		<Cursor position="1769" topLine="35" />
 	</File>
-	<File name="../../boosting/LBPRoundTrainer.cc" open="1" top="0" tabpos="43">
+	<File name="../../boosting/LBPRoundTrainer.cc" open="0" top="0" tabpos="43">
 		<Cursor position="6798" topLine="255" />
 	</File>
-	<File name="../../boosting/LBPRoundTrainer.h" open="1" top="0" tabpos="42">
+	<File name="../../boosting/LBPRoundTrainer.h" open="1" top="0" tabpos="58">
 		<Cursor position="608" topLine="0" />
 	</File>
-	<File name="../../boosting/RealLutMachine.cc" open="1" top="0" tabpos="37">
+	<File name="../../boosting/RealLutMachine.cc" open="0" top="0" tabpos="37">
 		<Cursor position="4003" topLine="150" />
 	</File>
-	<File name="../../boosting/RealLutMachine.h" open="1" top="0" tabpos="38">
-		<Cursor position="1781" topLine="36" />
+	<File name="../../boosting/RealLutMachine.h" open="1" top="0" tabpos="59">
+		<Cursor position="1781" topLine="31" />
 	</File>
-	<File name="../../boosting/StumpMachine.cc" open="1" top="0" tabpos="36">
+	<File name="../../boosting/StumpMachine.cc" open="0" top="0" tabpos="36">
 		<Cursor position="3052" topLine="108" />
 	</File>
-	<File name="../../boosting/StumpMachine.h" open="1" top="0" tabpos="17">
-		<Cursor position="1719" topLine="38" />
+	<File name="../../boosting/StumpMachine.h" open="1" top="0" tabpos="60">
+		<Cursor position="1719" topLine="33" />
 	</File>
-	<File name="../../boosting/StumpTrainer.cc" open="1" top="0" tabpos="118">
+	<File name="../../boosting/StumpTrainer.cc" open="0" top="0" tabpos="85">
 		<Cursor position="658" topLine="24" />
 	</File>
-	<File name="../../boosting/StumpTrainer.h" open="1" top="0" tabpos="41">
+	<File name="../../boosting/StumpTrainer.h" open="1" top="0" tabpos="61">
 		<Cursor position="211" topLine="0" />
 	</File>
-	<File name="../../boosting/WeakLearner.cc" open="1" top="0" tabpos="119">
-		<Cursor position="134" topLine="1" />
+	<File name="../../boosting/WeakLearner.cc" open="0" top="0" tabpos="86">
+		<Cursor position="134" topLine="0" />
 	</File>
-	<File name="../../boosting/WeakLearner.h" open="1" top="0" tabpos="44">
-		<Cursor position="618" topLine="44" />
+	<File name="../../boosting/WeakLearner.h" open="1" top="0" tabpos="62">
+		<Cursor position="618" topLine="0" />
 	</File>
-	<File name="../../core/CMakeLists.txt" open="1" top="0" tabpos="33">
+	<File name="../../core/CMakeLists.txt" open="0" top="0" tabpos="33">
 		<Cursor position="746" topLine="0" />
 	</File>
 	<File name="../../core/CmdFile.cc" open="0" top="0" tabpos="102">
@@ -118,20 +121,20 @@
 	<File name="../../core/DataSet.cc" open="0" top="0" tabpos="100">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../core/DataSet.h" open="1" top="0" tabpos="95">
-		<Cursor position="841" topLine="0" />
+	<File name="../../core/DataSet.h" open="1" top="0" tabpos="35">
+		<Cursor position="291" topLine="0" />
 	</File>
 	<File name="../../core/DiskDataSet.cc" open="0" top="0" tabpos="73">
 		<Cursor position="908" topLine="15" />
 	</File>
-	<File name="../../core/DiskDataSet.h" open="0" top="0" tabpos="72">
+	<File name="../../core/DiskDataSet.h" open="1" top="0" tabpos="34">
 		<Cursor position="537" topLine="0" />
 	</File>
 	<File name="../../core/File.cc" open="0" top="0" tabpos="76">
 		<Cursor position="3573" topLine="155" />
 	</File>
-	<File name="../../core/File.h" open="0" top="0" tabpos="63">
-		<Cursor position="1177" topLine="18" />
+	<File name="../../core/File.h" open="1" top="0" tabpos="39">
+		<Cursor position="769" topLine="14" />
 	</File>
 	<File name="../../core/FileListCmdOption.h" open="0" top="0" tabpos="99">
 		<Cursor position="0" topLine="12" />
@@ -145,64 +148,67 @@
 	<File name="../../core/MTimer.h" open="0" top="0" tabpos="4">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../core/Machine.cc" open="1" top="0" tabpos="27">
-		<Cursor position="4486" topLine="194" />
+	<File name="../../core/Machine.cc" open="1" top="0" tabpos="44">
+		<Cursor position="3796" topLine="123" />
 	</File>
-	<File name="../../core/Machine.h" open="1" top="0" tabpos="11">
-		<Cursor position="4324" topLine="120" />
+	<File name="../../core/Machine.h" open="1" top="0" tabpos="45">
+		<Cursor position="3301" topLine="46" />
 	</File>
-	<File name="../../core/MemoryDataSet.cc" open="1" top="0" tabpos="99">
+	<File name="../../core/MemoryDataSet.cc" open="0" top="0" tabpos="72">
 		<Cursor position="3933" topLine="123" />
 	</File>
-	<File name="../../core/MemoryDataSet.h" open="1" top="0" tabpos="98">
+	<File name="../../core/MemoryDataSet.h" open="0" top="0" tabpos="71">
 		<Cursor position="713" topLine="0" />
 	</File>
-	<File name="../../core/Object.cc" open="1" top="1" tabpos="122">
+	<File name="../../core/Object.cc" open="0" top="0" tabpos="88">
 		<Cursor position="10165" topLine="437" />
 	</File>
-	<File name="../../core/Object.h" open="1" top="0" tabpos="121">
+	<File name="../../core/Object.h" open="0" top="0" tabpos="87">
 		<Cursor position="457" topLine="27" />
 	</File>
 	<File name="../../core/Tensor.cc" open="0" top="0" tabpos="49">
 		<Cursor position="0" topLine="20" />
 	</File>
-	<File name="../../core/Tensor.h" open="1" top="0" tabpos="49">
-		<Cursor position="4588" topLine="171" />
+	<File name="../../core/Tensor.h" open="1" top="0" tabpos="38">
+		<Cursor position="4588" topLine="162" />
 	</File>
-	<File name="../../core/TensorFile.h" open="0" top="0" tabpos="69">
-		<Cursor position="0" topLine="0" />
+	<File name="../../core/TensorFile.h" open="1" top="0" tabpos="51">
+		<Cursor position="0" topLine="55" />
 	</File>
 	<File name="../../core/TensorGen.cc" open="0" top="0" tabpos="50">
 		<Cursor position="6011" topLine="202" />
 	</File>
-	<File name="../../core/TensorGen.h" open="1" top="0" tabpos="55">
+	<File name="../../core/TensorGen.h" open="1" top="0" tabpos="50">
 		<Cursor position="465" topLine="72" />
+	</File>
+	<File name="../../core/TensorList.h" open="1" top="0" tabpos="49">
+		<Cursor position="325" topLine="0" />
 	</File>
 	<File name="../../core/Trainer.cc" open="0" top="0" tabpos="45">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../core/Trainer.h" open="1" top="0" tabpos="102">
+	<File name="../../core/Trainer.h" open="0" top="0" tabpos="73">
 		<Cursor position="684" topLine="0" />
 	</File>
-	<File name="../../core/general.cc" open="1" top="0" tabpos="53">
+	<File name="../../core/general.cc" open="0" top="0" tabpos="53">
 		<Cursor position="1315" topLine="10" />
 	</File>
-	<File name="../../core/general.h" open="1" top="0" tabpos="52">
+	<File name="../../core/general.h" open="0" top="0" tabpos="52">
 		<Cursor position="7094" topLine="248" />
 	</File>
-	<File name="../../core/ipCore.cc" open="1" top="0" tabpos="29">
+	<File name="../../core/ipCore.cc" open="0" top="0" tabpos="29">
 		<Cursor position="358" topLine="0" />
 	</File>
-	<File name="../../core/ipCore.h" open="1" top="0" tabpos="28">
+	<File name="../../core/ipCore.h" open="0" top="0" tabpos="28">
 		<Cursor position="590" topLine="0" />
 	</File>
-	<File name="../../core/spCore.cc" open="1" top="0" tabpos="30">
+	<File name="../../core/spCore.cc" open="0" top="0" tabpos="30">
 		<Cursor position="529" topLine="19" />
 	</File>
-	<File name="../../core/spCore.h" open="1" top="0" tabpos="24">
+	<File name="../../core/spCore.h" open="0" top="0" tabpos="24">
 		<Cursor position="2178" topLine="60" />
 	</File>
-	<File name="../../core/spCores.h" open="1" top="0" tabpos="32">
+	<File name="../../core/spCores.h" open="1" top="0" tabpos="43">
 		<Cursor position="392" topLine="0" />
 	</File>
 	<File name="../../geometry/Circle2D.cc" open="0" top="0" tabpos="8">
@@ -274,7 +280,7 @@
 	<File name="../../geometry/Triangle2D.h" open="0" top="0" tabpos="27">
 		<Cursor position="463" topLine="0" />
 	</File>
-	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="34">
+	<File name="../../ip/CMakeLists.txt" open="0" top="0" tabpos="34">
 		<Cursor position="572" topLine="0" />
 	</File>
 	<File name="../../ip/Color.cc" open="0" top="0" tabpos="3">
@@ -286,7 +292,7 @@
 	<File name="../../ip/Image.cc" open="0" top="0" tabpos="97">
 		<Cursor position="4767" topLine="145" />
 	</File>
-	<File name="../../ip/Image.h" open="1" top="0" tabpos="54">
+	<File name="../../ip/Image.h" open="0" top="0" tabpos="54">
 		<Cursor position="2190" topLine="0" />
 	</File>
 	<File name="../../ip/ImageFile.cc" open="0" top="0" tabpos="45">
@@ -319,10 +325,10 @@
 	<File name="../../ip/ipGeomNorm.h" open="0" top="0" tabpos="10">
 		<Cursor position="2806" topLine="26" />
 	</File>
-	<File name="../../ip/ipHaarLienhart.cc" open="1" top="0" tabpos="22">
+	<File name="../../ip/ipHaarLienhart.cc" open="0" top="0" tabpos="22">
 		<Cursor position="15050" topLine="442" />
 	</File>
-	<File name="../../ip/ipHaarLienhart.h" open="1" top="0" tabpos="21">
+	<File name="../../ip/ipHaarLienhart.h" open="0" top="0" tabpos="21">
 		<Cursor position="2669" topLine="1" />
 	</File>
 	<File name="../../ip/ipIntegral.cc" open="0" top="0" tabpos="29">
@@ -331,22 +337,22 @@
 	<File name="../../ip/ipIntegral.h" open="0" top="0" tabpos="28">
 		<Cursor position="3210" topLine="58" />
 	</File>
-	<File name="../../ip/ipLBP.cc" open="1" top="0" tabpos="20">
+	<File name="../../ip/ipLBP.cc" open="0" top="0" tabpos="20">
 		<Cursor position="3258" topLine="122" />
 	</File>
-	<File name="../../ip/ipLBP.h" open="1" top="0" tabpos="19">
+	<File name="../../ip/ipLBP.h" open="0" top="0" tabpos="19">
 		<Cursor position="1831" topLine="15" />
 	</File>
-	<File name="../../ip/ipLBP4R.cc" open="1" top="0" tabpos="13">
+	<File name="../../ip/ipLBP4R.cc" open="0" top="0" tabpos="13">
 		<Cursor position="11081" topLine="319" />
 	</File>
-	<File name="../../ip/ipLBP4R.h" open="1" top="0" tabpos="12">
+	<File name="../../ip/ipLBP4R.h" open="0" top="0" tabpos="12">
 		<Cursor position="2067" topLine="23" />
 	</File>
-	<File name="../../ip/ipLBP8R.cc" open="1" top="0" tabpos="31">
+	<File name="../../ip/ipLBP8R.cc" open="0" top="0" tabpos="31">
 		<Cursor position="20343" topLine="308" />
 	</File>
-	<File name="../../ip/ipLBP8R.h" open="1" top="0" tabpos="23">
+	<File name="../../ip/ipLBP8R.h" open="0" top="0" tabpos="23">
 		<Cursor position="1193" topLine="13" />
 	</File>
 	<File name="../../ip/ipRotate.cc" open="0" top="0" tabpos="51">
@@ -370,40 +376,28 @@
 	<File name="../../ip/xtprobeImageFile.h" open="0" top="0" tabpos="47">
 		<Cursor position="593" topLine="0" />
 	</File>
-	<File name="../../machine/CMakeLists.txt" open="1" top="0" tabpos="35">
-		<Cursor position="202" topLine="0" />
+	<File name="../../machine/CMakeLists.txt" open="1" top="0" tabpos="7">
+		<Cursor position="201" topLine="0" />
 	</File>
-	<File name="../../machine/CascadeMachine.cc" open="1" top="0" tabpos="10">
+	<File name="../../machine/CascadeMachine.cc" open="0" top="0" tabpos="10">
 		<Cursor position="3180" topLine="130" />
 	</File>
-	<File name="../../machine/CascadeMachine.h" open="1" top="0" tabpos="9">
-		<Cursor position="4376" topLine="109" />
+	<File name="../../machine/CascadeMachine.h" open="1" top="0" tabpos="46">
+		<Cursor position="2116" topLine="32" />
 	</File>
-	<File name="../../machine/Classifier.h" open="1" top="0" tabpos="26">
+	<File name="../../machine/Classifier.h" open="0" top="0" tabpos="26">
 		<Cursor position="137" topLine="0" />
 	</File>
-	<File name="../../machine/FLDAMachine.cc" open="1" top="0" tabpos="93">
-		<Cursor position="287" topLine="4" />
-	</File>
-	<File name="../../machine/FLDAMachine.h" open="1" top="0" tabpos="58">
-		<Cursor position="469" topLine="7" />
-	</File>
-	<File name="../../machine/GradientMachine.cc" open="1" top="0" tabpos="115">
+	<File name="../../machine/GradientMachine.cc" open="0" top="0" tabpos="82">
 		<Cursor position="1023" topLine="31" />
 	</File>
-	<File name="../../machine/GradientMachine.h" open="1" top="0" tabpos="25">
-		<Cursor position="1094" topLine="0" />
+	<File name="../../machine/GradientMachine.h" open="0" top="0" tabpos="25">
+		<Cursor position="1094" topLine="8" />
 	</File>
-	<File name="../../machine/LRMachine.cc" open="1" top="0" tabpos="104">
-		<Cursor position="442" topLine="14" />
+	<File name="../../machine/Machines.h" open="1" top="0" tabpos="13">
+		<Cursor position="495" topLine="0" />
 	</File>
-	<File name="../../machine/LRMachine.h" open="1" top="0" tabpos="57">
-		<Cursor position="1020" topLine="35" />
-	</File>
-	<File name="../../machine/Machines.h" open="1" top="0" tabpos="16">
-		<Cursor position="726" topLine="0" />
-	</File>
-	<File name="../../measurer/measurer.h" open="1" top="0" tabpos="6">
+	<File name="../../measurer/measurer.h" open="0" top="0" tabpos="6">
 		<Cursor position="536" topLine="0" />
 	</File>
 	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="75">
@@ -412,14 +406,14 @@
 	<File name="../../scanning/Explorer.cc" open="0" top="0" tabpos="67">
 		<Cursor position="1552" topLine="138" />
 	</File>
-	<File name="../../scanning/Explorer.h" open="1" top="0" tabpos="5">
+	<File name="../../scanning/Explorer.h" open="0" top="0" tabpos="5">
 		<Cursor position="4691" topLine="101" />
 	</File>
 	<File name="../../scanning/Pattern.cc" open="0" top="0" tabpos="24">
 		<Cursor position="1472" topLine="60" />
 	</File>
-	<File name="../../scanning/Pattern.h" open="0" top="0" tabpos="102">
-		<Cursor position="6520" topLine="215" />
+	<File name="../../scanning/Pattern.h" open="1" top="0" tabpos="36">
+		<Cursor position="6520" topLine="32" />
 	</File>
 	<File name="../../scanning/ScaleExplorer.cc" open="0" top="0" tabpos="56">
 		<Cursor position="1252" topLine="38" />
@@ -439,22 +433,22 @@
 	<File name="../../scanning/explorers/CMakeLists.txt" open="0" top="0" tabpos="8">
 		<Cursor position="304" topLine="0" />
 	</File>
-	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.cc" open="1" top="0" tabpos="51">
+	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.cc" open="0" top="0" tabpos="51">
 		<Cursor position="1163" topLine="0" />
 	</File>
-	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.h" open="1" top="0" tabpos="50">
+	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.h" open="0" top="0" tabpos="50">
 		<Cursor position="903" topLine="0" />
 	</File>
-	<File name="../../scanning/explorers/GreedyExplorer.cc" open="1" top="0" tabpos="2">
-		<Cursor position="1586" topLine="45" />
+	<File name="../../scanning/explorers/GreedyExplorer.cc" open="1" top="0" tabpos="33">
+		<Cursor position="2620" topLine="66" />
 	</File>
-	<File name="../../scanning/explorers/GreedyExplorer.h" open="1" top="0" tabpos="1">
-		<Cursor position="1384" topLine="6" />
+	<File name="../../scanning/explorers/GreedyExplorer.h" open="1" top="0" tabpos="32">
+		<Cursor position="1188" topLine="6" />
 	</File>
-	<File name="../../scanning/explorers/MSExplorer.cc" open="1" top="0" tabpos="4">
+	<File name="../../scanning/explorers/MSExplorer.cc" open="0" top="0" tabpos="4">
 		<Cursor position="7033" topLine="148" />
 	</File>
-	<File name="../../scanning/explorers/MSExplorer.h" open="1" top="0" tabpos="3">
+	<File name="../../scanning/explorers/MSExplorer.h" open="0" top="0" tabpos="3">
 		<Cursor position="2517" topLine="38" />
 	</File>
 	<File name="../../scanning/explorers/PyramidExplorer.cc" open="0" top="0" tabpos="44">
@@ -475,10 +469,10 @@
 	<File name="../../scanning/explorers/SpiralScaleExplorer.h" open="0" top="0" tabpos="38">
 		<Cursor position="836" topLine="0" />
 	</File>
-	<File name="../../scanning/ipSWEvaluator.cc" open="1" top="0" tabpos="15">
+	<File name="../../scanning/ipSWEvaluator.cc" open="0" top="0" tabpos="15">
 		<Cursor position="1222" topLine="12" />
 	</File>
-	<File name="../../scanning/ipSWEvaluator.h" open="1" top="0" tabpos="14">
+	<File name="../../scanning/ipSWEvaluator.h" open="0" top="0" tabpos="14">
 		<Cursor position="1571" topLine="17" />
 	</File>
 	<File name="../../scanning/ipSWPruner.cc" open="0" top="0" tabpos="27">
@@ -487,38 +481,44 @@
 	<File name="../../scanning/ipSWPruner.h" open="0" top="0" tabpos="23">
 		<Cursor position="818" topLine="0" />
 	</File>
-	<File name="../../scanning/profile/CMakeLists.txt" open="1" top="0" tabpos="61">
-		<Cursor position="431" topLine="0" />
+	<File name="../../scanning/profile/CMakeLists.txt" open="1" top="0" tabpos="9">
+		<Cursor position="187" topLine="0" />
 	</File>
-	<File name="../../scanning/profile/Profile.cc" open="1" top="0" tabpos="8">
-		<Cursor position="7292" topLine="254" />
+	<File name="../../scanning/profile/LRMachine.cc" open="1" top="0" tabpos="41">
+		<Cursor position="0" topLine="147" />
 	</File>
-	<File name="../../scanning/profile/Profile.h" open="1" top="0" tabpos="7">
-		<Cursor position="2082" topLine="0" />
+	<File name="../../scanning/profile/LRMachine.h" open="1" top="0" tabpos="12">
+		<Cursor position="808" topLine="27" />
 	</File>
-	<File name="../../scanning/profile/ProfileDataSet.cc" open="0" top="0" tabpos="58">
-		<Cursor position="3067" topLine="108" />
+	<File name="../../scanning/profile/LRTrainer.cc" open="1" top="0" tabpos="17">
+		<Cursor position="8453" topLine="276" />
 	</File>
-	<File name="../../scanning/profile/ProfileDataSet.h" open="0" top="0" tabpos="57">
-		<Cursor position="1461" topLine="25" />
+	<File name="../../scanning/profile/LRTrainer.h" open="1" top="0" tabpos="11">
+		<Cursor position="1009" topLine="6" />
 	</File>
-	<File name="../../scanning/profile/ProfileMachine.cc" open="1" top="0" tabpos="116">
-		<Cursor position="566" topLine="16" />
+	<File name="../../scanning/profile/Profile.cc" open="1" top="0" tabpos="37">
+		<Cursor position="2866" topLine="87" />
 	</File>
-	<File name="../../scanning/profile/ProfileMachine.h" open="0" top="0" tabpos="91">
-		<Cursor position="838" topLine="6" />
+	<File name="../../scanning/profile/Profile.h" open="1" top="0" tabpos="6">
+		<Cursor position="3338" topLine="99" />
 	</File>
-	<File name="../../scanning/profile/ProfileTrainer.cc" open="1" top="0" tabpos="48">
-		<Cursor position="1159" topLine="20" />
+	<File name="../../scanning/profile/ProfileDataSet.cc" open="1" top="0" tabpos="19">
+		<Cursor position="9119" topLine="348" />
 	</File>
-	<File name="../../scanning/profile/ProfileTrainer.h" open="1" top="0" tabpos="47">
-		<Cursor position="1287" topLine="0" />
+	<File name="../../scanning/profile/ProfileDataSet.h" open="1" top="0" tabpos="18">
+		<Cursor position="2461" topLine="52" />
 	</File>
-	<File name="../../scanning/profile/mat.cc" open="0" top="0" tabpos="96">
-		<Cursor position="2717" topLine="116" />
+	<File name="../../scanning/profile/ProfileMachine.cc" open="1" top="0" tabpos="14">
+		<Cursor position="1674" topLine="30" />
 	</File>
-	<File name="../../scanning/profile/mat.h" open="0" top="0" tabpos="95">
-		<Cursor position="700" topLine="0" />
+	<File name="../../scanning/profile/ProfileMachine.h" open="1" top="0" tabpos="10">
+		<Cursor position="1748" topLine="26" />
+	</File>
+	<File name="../../scanning/profile/ProfileTrainer.cc" open="1" top="0" tabpos="16">
+		<Cursor position="1994" topLine="39" />
+	</File>
+	<File name="../../scanning/profile/ProfileTrainer.h" open="1" top="0" tabpos="15">
+		<Cursor position="898" topLine="7" />
 	</File>
 	<File name="../../scanning/pruners/CMakeLists.txt" open="0" top="0" tabpos="31">
 		<Cursor position="127" topLine="0" />
@@ -538,11 +538,11 @@
 	<File name="../../scanning/selectors/DummySelector.h" open="0" top="0" tabpos="85">
 		<Cursor position="800" topLine="0" />
 	</File>
-	<File name="../../scanning/selectors/MeanShiftSelector.cc" open="0" top="0" tabpos="86">
-		<Cursor position="10209" topLine="162" />
+	<File name="../../scanning/selectors/MeanShiftSelector.cc" open="1" top="1" tabpos="64">
+		<Cursor position="7030" topLine="186" />
 	</File>
-	<File name="../../scanning/selectors/MeanShiftSelector.h" open="0" top="0" tabpos="85">
-		<Cursor position="1339" topLine="0" />
+	<File name="../../scanning/selectors/MeanShiftSelector.h" open="1" top="0" tabpos="63">
+		<Cursor position="2658" topLine="42" />
 	</File>
 	<File name="../../scanning/selectors/OverlapSelector.cc" open="0" top="0" tabpos="80">
 		<Cursor position="5393" topLine="14" />
@@ -553,19 +553,19 @@
 	<File name="../../sp/CMakeLists.txt" open="0" top="0" tabpos="32">
 		<Cursor position="170" topLine="0" />
 	</File>
-	<File name="../../th/CMakeLists.txt" open="1" top="0" tabpos="62">
+	<File name="../../th/CMakeLists.txt" open="0" top="0" tabpos="62">
 		<Cursor position="87" topLine="0" />
 	</File>
 	<File name="../../th/TH.h" open="0" top="0" tabpos="51">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../th/THBlas.c" open="1" top="0" tabpos="63">
+	<File name="../../th/THBlas.c" open="0" top="0" tabpos="63">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../th/THBlas.h" open="1" top="0" tabpos="64">
+	<File name="../../th/THBlas.h" open="0" top="0" tabpos="64">
 		<Cursor position="1262" topLine="0" />
 	</File>
-	<File name="../../th/THCBlas.h" open="1" top="0" tabpos="94">
+	<File name="../../th/THCBlas.h" open="0" top="0" tabpos="67">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="../../th/THGeneral.h" open="0" top="0" tabpos="52">
@@ -601,26 +601,14 @@
 	<File name="../../th/THTensorMath.h" open="0" top="0" tabpos="57">
 		<Cursor position="0" topLine="2" />
 	</File>
-	<File name="../../trainer/CMakeLists.txt" open="1" top="0" tabpos="56">
-		<Cursor position="214" topLine="0" />
-	</File>
-	<File name="../../trainer/FLDATrainer.cc" open="1" top="0" tabpos="65">
-		<Cursor position="2906" topLine="9" />
-	</File>
-	<File name="../../trainer/FLDATrainer.h" open="1" top="0" tabpos="59">
-		<Cursor position="1022" topLine="0" />
+	<File name="../../trainer/CMakeLists.txt" open="1" top="0" tabpos="8">
+		<Cursor position="135" topLine="0" />
 	</File>
 	<File name="../../trainer/GTFile.cc" open="0" top="0" tabpos="31">
 		<Cursor position="1864" topLine="49" />
 	</File>
 	<File name="../../trainer/GTFile.h" open="0" top="0" tabpos="38">
 		<Cursor position="821" topLine="0" />
-	</File>
-	<File name="../../trainer/LRTrainer.cc" open="1" top="0" tabpos="97">
-		<Cursor position="3787" topLine="106" />
-	</File>
-	<File name="../../trainer/LRTrainer.h" open="1" top="0" tabpos="60">
-		<Cursor position="1248" topLine="0" />
 	</File>
 	<File name="../../trainer/gtfiles/bancaGTFile.cc" open="0" top="0" tabpos="46">
 		<Cursor position="124" topLine="0" />

@@ -56,15 +56,6 @@ MemoryDataSet* buildSamples(long n_samples, int n_dims, double* weights, double 
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// Checks if some target value is positive or not
-///////////////////////////////////////////////////////////////////////////
-
-bool isPositive(double value)
-{
-	return value >= 0.0;
-}
-
-///////////////////////////////////////////////////////////////////////////
 // Count how many positive and negative samples are in a dataset
 ///////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +64,7 @@ int countPositive(MemoryDataSet* samples)
 	int cnt = 0;
 	for (long s = 0; s < samples->getNoExamples(); s ++)
 	{
-		if (isPositive(((DoubleTensor*)samples->getTarget(s))->get(0) - 0.5) == true)
+		if (((DoubleTensor*)samples->getTarget(s))->get(0) > 0.05)
 		{
 			cnt ++;
 		}
@@ -85,31 +76,6 @@ int countPositive(MemoryDataSet* samples)
 int countNegative(MemoryDataSet* samples)
 {
 	return samples->getNoExamples() - countPositive(samples);
-}
-
-///////////////////////////////////////////////////////////////////////////
-// Compute the detection rate on some dataset
-///////////////////////////////////////////////////////////////////////////
-
-double getDetectionRate(LRMachine& machine, MemoryDataSet* samples)
-{
-	const double* machine_output = (const double*)(machine.getOutput().dataR());
-	const double threshold = machine.getThreshold();
-
-	int error = 0;
-	for (long s = 0; s < samples->getNoExamples(); s ++)
-	{
-		const DoubleTensor* example = (const DoubleTensor*)samples->getExample(s);
-		CHECK_FATAL(machine.forward(*example) == true);
-
-		if (	isPositive(((DoubleTensor*)samples->getTarget(s))->get(0) - threshold) !=
-			isPositive(*machine_output - threshold))
-		{
-			error ++;
-		}
-	}
-
-	return 100.0 * (1.0 - (error + 0.0) / (samples->getNoExamples() + 0.0));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -162,17 +128,19 @@ int main(int argc, char* argv[])
 	CHECK_FATAL(trainer.setMachine(&machine) == true);
 	CHECK_FATAL(trainer.setData(train_samples) == true);
 	CHECK_FATAL(trainer.setValidationData(valid_samples) == true);
+	CHECK_FATAL(trainer.setBOption("verbose", true) == true);
 	CHECK_FATAL(trainer.train() == true);
+
 	print("--------------------------------------------------------------------\n");
 
 	// Test LR
 	print("Testing Logistic Regression (LR)\n");
 	print("\t[%d] training samples: detection rate = %lf%%\n",
-		n_train_samples, getDetectionRate(machine, train_samples));
+		n_train_samples, LRTrainer::test(&machine, train_samples));
 	print("\t[%d] validation samples: detection rate = %lf%%\n",
-		n_valid_samples, getDetectionRate(machine, valid_samples));
+		n_valid_samples, LRTrainer::test(&machine, valid_samples));
 	print("\t[%d] testing samples: detection rate = %lf%%\n",
-		n_test_samples, getDetectionRate(machine, test_samples));
+		n_test_samples, LRTrainer::test(&machine, test_samples));
 	print("--------------------------------------------------------------------\n");
 
 	return 0;

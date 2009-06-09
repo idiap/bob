@@ -9,6 +9,7 @@
 #include "StumpMachine.h"
 #include "IntLutMachine.h"
 #include "Image.h"
+#include "ipIntegral.h"
 
 #include "spDeltaOne.h"
 #include "CascadeMachine.h"
@@ -60,9 +61,9 @@ int main(int argc, char* argv[])
 
 
 
-    ShortTensor *target1 = new ShortTensor(1);
+    ShortTensor *target1 = manage(new ShortTensor(1));
     target1->fill(1);
- DataSet *mdataset;
+    DataSet *mdataset;
     TensorList *tensorList = manage(new TensorList());
     if (tensorList->process(tensor_files,target1,Tensor::Double)==false)
     {
@@ -81,7 +82,7 @@ int main(int argc, char* argv[])
     //
     print("Test Model ...\n");
     Tensor *st = mdataset->getExample(0);
-Tprint((DoubleTensor*)st);
+
     int w = st->size(1);
     int h = st->size(0);
 
@@ -89,7 +90,22 @@ Tprint((DoubleTensor*)st);
     ofile.open("scores.out","w");
     int n_examples = mdataset->getNoExamples();
     int count =0;
+    ipIntegral *ipI = manage(new ipIntegral());
+    DoubleTensor *temptensor = manage(new DoubleTensor());
 
+    for (int e=0;e<n_examples;e++)
+    {
+
+        temptensor = (DoubleTensor*)mdataset->getExample(e);
+        //   if(e==0)
+        //           Tprint(temptensor);
+        bool t = ipI->process(*temptensor);
+        temptensor = (DoubleTensor*) &ipI->getOutput(0);
+        //    if(e==0)
+        //   Tprint(temptensor);
+
+        mdataset->getExample(e)->copy(temptensor);
+    }
     print("\n\n\n\n\n...................Loading the model\n");
     CascadeMachine* cascade = manage((CascadeMachine*)Torch::loadMachineFromFile(modelfilename));
     if (cascade == 0)
@@ -98,7 +114,7 @@ Tprint((DoubleTensor*)st);
         return 1;
     }
 
-    TensorRegion *tr = new TensorRegion(0,0,h,w);
+    TensorRegion *tr = manage(new TensorRegion(0,0,h,w));
     for (int i=0;i<n_examples;i++)
     {
         Tensor *st = mdataset->getExample(i);

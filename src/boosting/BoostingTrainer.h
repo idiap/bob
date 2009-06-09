@@ -66,6 +66,8 @@ namespace Torch
 
 		// Weak learners (to train weak classifiers)
 		WeakLearner **m_weak_learners;
+
+		bool verbose;
 	};
 }
 

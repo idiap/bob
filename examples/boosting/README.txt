@@ -3,19 +3,40 @@ The input to the machine/trainer is integral image.
 This particular version trains Haar features.
 
 usage:
-to train
-./Linux_i686/boostingintegral ../dataset/facetrain.tensor ../dataset/nonfacetrain.tensor -wc 5 -width 19 -height 19 -maxE 200
+to train with large dataset
+./Linux_i686/boostingintegral -one_file /home/temp3/bvenka/data09/face/tensors/facetrain.tensor -one_file /home/tem    p3/bvenka/data09/nonface/tensor/nonfacetrain.tensor  -wc 5
 
 	//// after training model.wsm file is created
 
 to test:
-./Linux_i686/boottestintergral ../dataset/facetrain.tensor ../dataset/nonfacetrain.tensor -width 19 -height 19 -maxE 200
+./Linux_i686/boottestintergral -one_file ../dataset/facetrain.tensor model.wsm
 
-	///// the test program loads automatically model.wsm file.
+# To do small quick check
+valgrind --tool=memcheck --leak-check=full ./Linux_i686/boostingintegral-one_file /home/temp3/bvenka/data09/face/tensors/ftrain_200.tensor -one_file /home/temp3/bvenka/data09/nonface/tensor/nonftrain_200.tensor -wc 5
 
 the output is confidence score
 should be > 0 or <0 for a particular class.
+##############################################################
 
+# 1(b) # Cascade Stump Haar
+
+::training
+
+nohup nice ./Linux_i686/LBPtrainCascade /home/temp3/bvenka/data09/face/scripts/ptrain-deye-10.list /home/temp3/bvenka/data09/face/scripts/valid-deye-10.list parameter_haar.data /home/temp3/bvenka/data09/nonface/scripts/nonface-small.list /home/temp3/bvenka/data09/nonface/scripts/nonface-small.list /home/temp3/bvenka/data09/nonface/pgm pgm /home/temp3/bvenka/data09/nonface/wnd > log.out &  
+
+
+
+::parameter file
+The Parameter file contains the dats for each stage of cascade.
+first line: height and width
+second Line: number of stages
+for each stage mention 
+		number of classifiers
+		detection rate
+
+
+
+to test: the same as boosttestintegral
 
 ###############################################################
 
@@ -51,7 +72,7 @@ valgrind --tool=memcheck --leak-check=full ./Linux_i686/LBPtrainCascade -one_fil
 
 
 The Parameter file contains the dats for each stage of cascade.
-firt line: height and width
+first line: height and width
 second Line: number of stages
 for each stage mention 
 		number of classifiers

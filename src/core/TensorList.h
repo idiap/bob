@@ -14,7 +14,7 @@ namespace Torch
 	public:
 	TensorList();
 	~TensorList();
-	bool process(FileListCmdOption *tensorList_files,ShortTensor *target);
+	bool process(FileListCmdOption *tensorList_files,ShortTensor *target,Tensor::Type mType);
 	DataSet *getOutput();
 
 	private:

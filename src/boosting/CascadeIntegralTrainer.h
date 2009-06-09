@@ -1,5 +1,5 @@
-#ifndef _TORCH5SPRO_CASCADE_TRAINER_H_
-#define _TORCH5SPRO_CASCADE_TRAINER_H_
+#ifndef _TORCH5SPRO_CASCADE_INTEGRAL_TRAINER_H_
+#define _TORCH5SPRO_CASCADE_INTEGRAL_TRAINER_H_
 
 #include "DataSet.h"
 #include "ImageScanDataSet.h"
@@ -7,14 +7,15 @@
 #include "MemoryDataSet.h"
 #include "FTrainer.h"
 #include "general.h"
+#include "ipIntegral.h"
 namespace Torch
 {
 
-    class CascadeTrainer : public FTrainer
+    class CascadeIntegralTrainer : public FTrainer
     {
     public:
         ///
-        CascadeTrainer();
+        CascadeIntegralTrainer();
 
         ///
         bool setTrainers(FTrainer **m_ftrainer_, int n_cascade,  double * m_detection_rate_);
@@ -24,7 +25,7 @@ namespace Torch
         virtual double forward(Tensor *example_);
 
         ///
-        virtual ~CascadeTrainer();
+        virtual ~CascadeIntegralTrainer();
         double *getStageThreshold()
         {
             return m_threshold;
@@ -67,6 +68,7 @@ namespace Torch
         LabelledMeasure *m_labelledmeasure;
         bool verbose;
 
+        int height, width;
 
 
 

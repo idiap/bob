@@ -5,16 +5,16 @@
 
 namespace Torch
 {
+	class ProfileMachine;
+	class ProfileDataSet;
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::ProfileTrainer:
-	//	- trains ProfileMachine using ProfileDataSet objects:
-	//		- one for training profile feature models (Trainer::setData)
-	//		- one for selecting the best features and training the combined classifier
-	//			(ProfileTrainer::setValidationData)
+	//	- trains ProfileMachine using two ProfileDataSets:
+	//		- one for training and one for validation
         //
         //      - PARAMETERS (name, type, default value, description):
-        //		"FMinTAR"	float	0.85	"Minimum TAR for some profile feature model"
-        //		"FMinTRR"	float	0.85	"Minimum TRR for some profile feature model"
+        //		//
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -34,6 +34,9 @@ namespace Torch
 
 		// Set the validation dataset
 		bool			setValidationData(DataSet* dataset);
+
+		// Test the Profile machine (returns the detection rate in percentages)
+		static double		test(ProfileMachine* machine, ProfileDataSet* samples);
 
         private:
 

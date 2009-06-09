@@ -9,16 +9,10 @@ namespace Torch
 
 ProfileMachine::ProfileMachine()
 	:	m_foutputs(NoFeatures),
-		m_fmodels(new FLDAMachine[NoFeatures]),
-		m_fselected(new unsigned char[NoFeatures])
+		m_fmodels(new LRMachine[NoFeatures])
 {
 	m_output.resize(1);
 	m_poutput = (double*)m_output.dataW();
-
-	for (int f = 0; f < NoFeatures; f ++)
-	{
-		m_fselected[f] = 0x01;
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -27,24 +21,6 @@ ProfileMachine::ProfileMachine()
 ProfileMachine::~ProfileMachine()
 {
 	delete[] m_fmodels;
-	delete[] m_fselected;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Change the selection state for some profile model
-
-void ProfileMachine::setFSelected(int f, bool selected)
-{
-	m_fselected[f] = selected ? 0x01 : 0x00;
-
-	// Resize the buffer
-	int n_selected = 0;
-	for (int f = 0; f < NoFeatures; f ++)
-		if (isFSelected(f) == true)
-	{
-		n_selected ++;
-	}
-	m_foutputs.resize(n_selected);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -61,22 +37,19 @@ bool ProfileMachine::forward(const Tensor& input)
 	}
 
 	// Pass the features to the feature models
-	int index = 0;
 	for (int f = 0; f < NoFeatures; f ++)
-		if (isFSelected(f) == true)
+	{
+		if (m_fmodels[f].forward(m_profile.m_features[f]) == false)
 		{
-			if (m_fmodels[f].forward(m_profile.m_features[f]) == false)
-			{
-				Torch::message("ProfileMachine::forward - failed to run some feature model!\n");
-				return false;
-			}
-
-			const double score = ((const DoubleTensor&)m_fmodels[f].getOutput()).get(0);
-			m_foutputs.set(index, score >= m_fmodels[f].getThreshold() ? 1.0 : -1.0);
-			index ++;
+			Torch::message("ProfileMachine::forward - failed to run some feature model!\n");
+			return false;
 		}
 
-	// Final decision: run the classifier
+		const double score = ((const DoubleTensor&)m_fmodels[f].getOutput()).get(0);
+		m_foutputs.set(f, score >= m_fmodels[f].getThreshold() ? 1.0 : -1.0);
+	}
+
+	// Final decision: run the combined classifier
 	m_patternClass = 0;
 
 	if (m_cmodel.forward(m_foutputs) == false)
@@ -112,32 +85,26 @@ bool ProfileMachine::loadFile(File& file)
 		return false;
 	}
 
-	// Load the selected profile features
-	if (file.taggedRead(m_fselected, sizeof(unsigned char), NoFeatures, "SELECTED") != NoFeatures)
-	{
-		Torch::message("ProfileMachine::load - invalid <SELECTED> field!\n");
-		return false;
-	}
-	int n_selected = 0;
-	for (int f = 0; f < NoFeatures; f ++)
-		if (isFSelected(f) == true)
-	{
-		n_selected ++;
-	}
-	m_foutputs.resize(n_selected);
-
 	// Load the profile feature models
 	for (int f = 0; f < NoFeatures; f ++)
 	{
 		if (m_fmodels[f].loadFile(file) == false)
 		{
-			print("ProfileMachine::loadFile - step3.1\n");
+			message("ProfileMachine::loadFile - invalid feature model [%d/%d]!\n",
+				f + 1, NoFeatures);
 			return false;
 		}
 	}
 
 	// Load the combined classifier
-	return m_cmodel.loadFile(file);
+	if (m_cmodel.loadFile(file) == false)
+	{
+		message("ProfileMachine::loadFile - invalid combined model!\n");
+		return false;
+	}
+
+	// OK
+	return true;
 }
 
 bool ProfileMachine::saveFile(File& file) const
@@ -150,24 +117,26 @@ bool ProfileMachine::saveFile(File& file) const
 		return false;
 	}
 
-	// Write the selected profile features
-	if (file.taggedWrite(m_fselected, sizeof(unsigned char), NoFeatures, "SELECTED") != NoFeatures)
-	{
-		Torch::message("ProfileMachine::save - failed to write <SELECTED> field!\n");
-		return false;
-	}
-
 	// Write the profile feature models
 	for (int f = 0; f < NoFeatures; f ++)
 	{
 		if (m_fmodels[f].saveFile(file) == false)
 		{
+			Torch::message("ProfileMachine::save - failed to write the feature model [%d/%d]!\n",
+				f + 1, NoFeatures);
 			return false;
 		}
 	}
 
 	// Write the combined classifier
-	return m_cmodel.saveFile(file);
+	if (m_cmodel.saveFile(file) == false)
+	{
+		Torch::message("ProfileMachine::save - failed to write the combined model!\n");
+		return true;
+	}
+
+	// OK
+	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////

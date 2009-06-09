@@ -16,7 +16,7 @@ namespace Torch
 
     }
 
-    bool TensorList::process(FileListCmdOption *tensorList_files, ShortTensor *target)
+    bool TensorList::process(FileListCmdOption *tensorList_files, ShortTensor *target,Tensor::Type mtype)
     {
 
 
@@ -45,7 +45,7 @@ namespace Torch
         if (m_data !=NULL)
             delete m_data;
 
-        m_data = new MemoryDataSet(n_examples, m_type, true, Tensor::Short);
+        m_data = new MemoryDataSet(n_examples, mtype, true, Tensor::Short);
 
 
         switch (m_type)
