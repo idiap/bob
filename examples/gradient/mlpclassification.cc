@@ -190,12 +190,13 @@ int main(int argc, char* argv[])
 
 	trainer->train();
 
-	//
+	/*
 	print("Saving model file ...\n");
 	File ofile;
 	ofile.open("test.mlp", "w");
 	mlp->saveFile(ofile);	
 	ofile.close();
+	*/
 
 		
 	/*

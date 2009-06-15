@@ -9,7 +9,6 @@ namespace Torch {
 
 GradientMachine::GradientMachine()
 {
-	m_output = NULL;
 	m_beta = NULL;
 
 	n_inputs = 0;
@@ -27,7 +26,6 @@ GradientMachine::GradientMachine()
 
 GradientMachine::GradientMachine(const int n_inputs_, const int n_outputs_, const int n_parameters_)
 {
-	m_output = NULL;
 	m_beta = NULL;
 
 	n_inputs = 0;
@@ -60,7 +58,6 @@ GradientMachine::GradientMachine(const int n_inputs_, const int n_outputs_, cons
 GradientMachine::~GradientMachine()
 {
         // Cleanup
-	delete m_output;
 	delete m_beta;
 }
 
@@ -77,14 +74,7 @@ bool GradientMachine::prepare()
    
 bool GradientMachine::resize(int n_inputs_, int n_outputs_, int n_parameters_)
 {
-	// Free
-	if(m_output != NULL) 
-	{
-		delete m_output;
-		m_output = NULL;
-	}
-	// Reallocate
-	m_output = new DoubleTensor(n_outputs_);
+	m_output.resize(n_outputs_);
 
 	// Free
 	if(m_beta != NULL) 

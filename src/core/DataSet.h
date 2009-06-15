@@ -29,6 +29,10 @@ namespace Torch
 		/// Query if the DataSet has targets
 		bool 		hasTargets() const { return m_has_targets; };
 
+		/// Query examples & targets types
+		Tensor::Type	getExampleType() const { return m_example_type; }
+		Tensor::Type	getTargetType() const { return m_target_type; }
+
 	protected:
 		//
 		bool m_has_targets;

@@ -1,4 +1,4 @@
-#include "CascadeTrainer.h"
+#include "CascadeIntegralTrainer.h"
 
 namespace Torch
 {
@@ -14,7 +14,7 @@ namespace Torch
         return 0;
     }
 ////////////////////////////////////////////////////////////////////////////////////////////
-    CascadeTrainer::CascadeTrainer()
+    CascadeIntegralTrainer::CascadeIntegralTrainer()
             :	m_target0(1),
             m_target1(1)
     {
@@ -36,7 +36,7 @@ namespace Torch
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-    bool CascadeTrainer::setTrainers(FTrainer **m_ftrainer_,int n_cascade_, double *m_detection_rate_)
+    bool CascadeIntegralTrainer::setTrainers(FTrainer **m_ftrainer_,int n_cascade_, double *m_detection_rate_)
     {
         m_ftrainer = m_ftrainer_;
         m_n_cascade = n_cascade_;
@@ -45,7 +45,7 @@ namespace Torch
         return true;
     }
 //////////////////////////////////////////////////////////////////////////////////////////////
-    bool CascadeTrainer::setData(DataSet *m_pos_dataset_,DataSet *m_valid_dataset_,ImageScanDataSet *m_imagescandataset_)
+    bool CascadeIntegralTrainer::setData(DataSet *m_pos_dataset_,DataSet *m_valid_dataset_,ImageScanDataSet *m_imagescandataset_)
     {
 
         m_pos_dataset  = m_pos_dataset_;
@@ -55,9 +55,9 @@ namespace Torch
 
     }
 //////////////////////////////////////////////////////////////////////////////////////////////
-    bool CascadeTrainer::train()
+    bool CascadeIntegralTrainer::train()
     {
-             verbose = getBOption("verbose");
+        verbose = getBOption("verbose");
         if (verbose)
             print("CascadeTrainer::train() ...\n");
 
@@ -69,8 +69,9 @@ namespace Torch
 
         Tensor *tensor;
         int tp_examples = m_pos_dataset->getNoExamples();
+        int tv_examples = m_valid_dataset->getNoExamples();
         //height and width can be obtained by looking at the size
-        int height, width;
+        //int height, width;
         int p_count;
         int n_examples;
 
@@ -83,7 +84,31 @@ namespace Torch
         int n_count;
         m_threshold = new double[m_n_cascade];
 
+//precalculating integral image
+        ipIntegral *ipI = new ipIntegral();
+        DoubleTensor *temptensor = new DoubleTensor();
 
+        for (int e=0;e<tp_examples;e++)
+        {
+
+            temptensor = (DoubleTensor*)m_pos_dataset->getExample(e);
+
+            ipI->process(*temptensor);
+            temptensor = (DoubleTensor*) &ipI->getOutput(0);
+            m_pos_dataset->getExample(e)->copy(temptensor);
+        }
+
+
+        for (int e=0;e<tv_examples;e++)
+        {
+
+            temptensor = (DoubleTensor*)m_valid_dataset->getExample(e);
+
+            ipI->process(*temptensor);
+            temptensor = (DoubleTensor*) &ipI->getOutput(0);
+            m_valid_dataset->getExample(e)->copy(temptensor);
+        }
+////////////////////
 
 
         for (int mt = 0;mt< m_n_cascade;mt++)
@@ -133,7 +158,8 @@ namespace Torch
 
 
             n_scanexamples = m_imagescandataset->getNoExamples();
-            print("Number of Positive patterns remaining: %d\n",p_count);
+            if (verbose)
+                print("Number of Positive patterns remaining: %d\n",p_count);
             //next fill with negative patterns
 
             n_count =0;
@@ -208,10 +234,6 @@ namespace Torch
 
             k=0;
             n_count=0;
-            example = m_imagescandataset->getExample(0);
-            int height1,width1;
-            height1 = example->size(0);
-            width1 = example->size(1);
             for (int i=0;i<n_scanexamples;i++)
             {
                 //have to check if the target is +1 and fill withit
@@ -220,10 +242,16 @@ namespace Torch
                     if (randSelect[k]==n_count)
                     {
 
-                        m_dataset->getExample(p_count+k)->resize(height1, width1);
+                        m_dataset->getExample(p_count+k)->resize(height, width);
                         example = m_imagescandataset->getExample(i);
                         m_dataset->getExample(p_count+k)->copy(example);
                         m_dataset->setTarget(p_count+k, &m_target0);
+                        temptensor = (DoubleTensor*)m_dataset->getExample(p_count+k);
+                        //compute integral image
+                        ipI->process(*temptensor);
+                        temptensor = (DoubleTensor*) &ipI->getOutput(0);
+                        m_dataset->getExample(p_count+k)->copy(temptensor);
+
                         k++;
                         if (k==p_count)
                             break;
@@ -265,18 +293,21 @@ namespace Torch
             getThreshold(m_valid_dataset);
             updateDataSet(mt,m_pos_dataset,"training");
             updateDataSet(mt,m_valid_dataset,"validation");
-            if(mt<m_n_cascade-1)
-            updateImageScanDataSet(mt);
+            if (mt<m_n_cascade-1)
+                updateImageScanDataSet(mt);
             // updateImageScanDataSet_check(mt);
             delete[] randSelect;
 
             delete [] randTrack;
+
+            //  delete temptensor;
+            //  delete ipI;
         }//end of for mt
 
         return true;
     }
     //////////////
-    void CascadeTrainer::getThreshold(DataSet *m_data)
+    void CascadeIntegralTrainer::getThreshold(DataSet *m_data)
     {
         // Torch::print("CascadeTrainer::getThrehsold()\n");
 
@@ -308,18 +339,22 @@ namespace Torch
 
     }
 ////////////////////////////////////////////////////////////////////////////////
-    void CascadeTrainer::updateImageScanDataSet(int trainer_i)
+    void CascadeIntegralTrainer::updateImageScanDataSet(int trainer_i)
     {
         long n_scanexamples = m_imagescandataset->getNoExamples();
         //next fill with negative patterns
         //double imgtarget;
         //is it possible to make it random here to get ramdom patterns
         int nc =0;
-        Tensor *example;
+        //  Tensor *example;
         double score;
         DoubleTensor reject_target(1);
-
+        MemoryDataSet *m_tempmemory = 	new MemoryDataSet(1, Tensor::Double, true, Tensor::Short);
+        m_tempmemory->getExample(0)->resize(height, width);
         reject_target.fill(-1.0);
+
+        ipIntegral *ipI = new ipIntegral();
+        DoubleTensor *temptensor = new DoubleTensor();
 
         for (long i=0;i<n_scanexamples;i++)
         {
@@ -328,8 +363,16 @@ namespace Torch
             {
 
 
-                example = m_imagescandataset->getExample(i);
+                Tensor *example = m_imagescandataset->getExample(i);
+                m_tempmemory->getExample(0)->copy(example);
+                //here have to compute integral image
+                temptensor =  (DoubleTensor*)m_tempmemory->getExample(0);
 
+                ipI->process(*temptensor);
+
+                // temptensor = (DoubleTensor*) &ipI->getOutput(0);
+                m_tempmemory->getExample(0)->copy(&ipI->getOutput(0));
+                example = m_tempmemory->getExample(0);
                 score=m_ftrainer[trainer_i]->forward(example);
                 if (score>m_threshold[m_current_cascade])
                     // set the pattern to reject
@@ -350,11 +393,15 @@ namespace Torch
         if (verbose)
             print("Number of -ve patterns left = %ld\n",nc);
 
+        //  delete ipI;
+        // delete temptensor;
+        delete m_tempmemory;
+
     }
 
     //////////////////////
     ////////////////////////////////////////////////////////////////////////////////
-    void CascadeTrainer::updateImageScanDataSet_check(int trainer_i)
+    void CascadeIntegralTrainer::updateImageScanDataSet_check(int trainer_i)
     {
         long n_scanexamples = m_imagescandataset->getNoExamples();
         //next fill with negative patterns
@@ -398,13 +445,14 @@ namespace Torch
     }
 
 //////////////////////////////////////////////////////////////////////////////
-    double CascadeTrainer::forward(Tensor *example_)
+    double CascadeIntegralTrainer::forward(Tensor *example_)
     {
+        print("************ Nothing Implemented yet *******************\n");
         return 1.0;
     }
 
 ////////////////////////////////////////////////////////////////////////////////
-    void CascadeTrainer::updateDataSet(int trainer_i, DataSet *mdata_,const char *string_text)
+    void CascadeIntegralTrainer::updateDataSet(int trainer_i, DataSet *mdata_,const char *string_text)
     {
 
         //update the positive training and/or validation dataset
@@ -436,7 +484,7 @@ namespace Torch
 ////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-    CascadeTrainer::~CascadeTrainer()
+    CascadeIntegralTrainer::~CascadeIntegralTrainer()
     {
 
         delete[] m_threshold;

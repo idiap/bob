@@ -11,7 +11,7 @@ StumpMachine::StumpMachine() : Machine()
 	//feature_id = -1;
 	threshold = 0.0;
 	direction = 0;
-	m_output = new DoubleTensor(1);
+	m_output.resize(1);
 }
 //void StumpMachine::setCore(spCore* core)
 //{
@@ -52,8 +52,7 @@ bool StumpMachine::forward(const Tensor& input)
 		else stump_output_ = -1.0;
 	}
 
-	DoubleTensor* t_output = (DoubleTensor*) m_output;
-	(*t_output)(0) = stump_output_;
+	m_output.set(0, stump_output_);
 
 	return true;
 }
@@ -97,9 +96,6 @@ bool StumpMachine::loadFile(File& file)
 	print("   direction = %d\n", direction);
 	print("   idCore = %d\n",idCore);
 
-	delete m_core;
-	m_core = 0;
-
 	m_core = spCoreManager::getInstance().get(idCore);
 	if (m_core == 0)
 	{
@@ -140,7 +136,7 @@ bool StumpMachine::saveFile(File& file) const
 	print("   threshold = %g\n", threshold);
 	print("   direction = %d\n", direction);
 
-	if (m_core->saveFile(file) == false)
+	if (m_core == NULL ||  m_core->saveFile(file) == false)
 	{
 		Torch::message("StumpMachine::save - the spCore cannot be saved!\n");
 		return false;

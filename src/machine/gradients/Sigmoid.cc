@@ -26,7 +26,7 @@ Sigmoid::~Sigmoid()
 bool Sigmoid::forward(const DoubleTensor *input)
 {
 	THTensor *src = input->t;
-	THTensor *dst = m_output->t;
+	THTensor *dst = m_output.t;
 	
 	TH_TENSOR_APPLY2(double, dst, double, src, *dst_p = (1./(1. + exp(-*src_p))););
 
@@ -39,7 +39,7 @@ bool Sigmoid::backward(const DoubleTensor *input, const DoubleTensor *alpha)
 
 	double *beta_ = (double *) m_beta->dataW();
 	double *alpha_ = (double *) alpha->dataR();
-	double *output_ = (double *) m_output->dataR();
+	double *output_ = (double *) m_output.dataR();
 
 	for(int i = 0; i < n_outputs; i++)
 	{

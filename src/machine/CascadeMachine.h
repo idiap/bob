@@ -19,8 +19,7 @@ namespace Torch
 	//	Beside the cascade structure, in the model file there is saved (and load):
 	//		- the id of the used machine (for creating the appropriate <xxxMachine> objects)
 	//
-	// 	NB: The Cascade will take care of deallocating the machines given
-	//		with <setXXX> functions!
+	// 	NB: The Cascade will not deallocate the given machines with <setXXX> functions!
 	//
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -58,8 +57,8 @@ namespace Torch
 		virtual bool		saveFile(File& file) const;
 
 		/// Constructs an empty Machine of this kind - overriden
-		/// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine*	getAnInstance() const { return new CascadeMachine(); }
+		/// (used by <MachineManager>, this object is automatically deallocated)
+		virtual Machine*	getAnInstance() const { return manage(new CascadeMachine()); }
 
 		// Get the ID specific to each Machine - overriden
 		virtual int		getID() const { return CASCADE_MACHINE_ID; }

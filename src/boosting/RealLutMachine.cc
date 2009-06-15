@@ -48,8 +48,7 @@ bool RealLutMachine::forward(const Tensor& input)
 		lut_output_ = lut[index];
 	}
 
-	DoubleTensor* t_output = (DoubleTensor*) m_output;
-	(*t_output)(0) = lut_output_;
+	m_output.set(0, lut_output_);
 
 	return true;
 }
@@ -78,6 +77,7 @@ bool RealLutMachine::loadFile(File& file)
             return false;
         }
 
+	delete[] lut;
         lut = new double [n_bins];
 
         if (file.taggedRead(lut, sizeof(double), n_bins, "Lut") != n_bins)
@@ -110,9 +110,6 @@ bool RealLutMachine::loadFile(File& file)
         }
 
         print("RealLutMachine::LoadFile()\n");
-
-         delete m_core;
-	m_core = 0;
 
 	m_core = spCoreManager::getInstance().get(idCore);
 	if (m_core == 0)
@@ -174,7 +171,7 @@ bool RealLutMachine::saveFile(File& file) const
 
 
 
-	 if ( m_core->saveFile(file) == false)
+	 if (m_core == NULL ||  m_core->saveFile(file) == false)
        {
 		Torch::message("RealLutMachine::save - cannot save spCore!\n");
 		return false;
@@ -196,8 +193,7 @@ void RealLutMachine::setParams(double min_, double max_, int n_bins_, double *lu
 
 RealLutMachine::~RealLutMachine()
 {
-    if(lut !=NULL)
-    delete lut;
+    delete[] lut;
 }
 
 }

@@ -199,20 +199,8 @@ namespace Torch
         return true;
     }
 
-//    void BoostingRoundTrainer::cleanup()
-//    {
-//        if (m_weights == NULL) delete []m_weights;
-//        if (m_weights_samples == NULL) delete []m_weights_samples;
-//        if (m_label_samples == NULL) delete []m_label_samples;
-//        if (m_shuffledindex_dataset == NULL) delete []m_shuffledindex_dataset;
-//        if (m_repartition == NULL) delete []m_repartition;
-//        if (m_labelledmeasure == NULL) delete []m_labelledmeasure;
-//    }
-
     BoostingRoundTrainer::~BoostingRoundTrainer()
     {
-        cleanup();
-        if(m_featuremask !=NULL)
         delete m_featuremask;
     }
 

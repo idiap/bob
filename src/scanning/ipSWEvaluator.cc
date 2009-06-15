@@ -21,7 +21,6 @@ ipSWEvaluator::ipSWEvaluator()
 
 ipSWEvaluator::~ipSWEvaluator()
 {
-        delete m_classifier;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -41,13 +40,11 @@ bool ipSWEvaluator::setClassifier(const char* filename)
         Classifier* classifier = dynamic_cast<Classifier*>(machine);
         if (classifier == 0)
         {
-                delete machine;
                 Torch::message("ipSWEvaluator::setClassifier - the loaded model is not a classifier!\n");
                 return false;
         }
 
         // OK
-        delete m_classifier;
         m_classifier = classifier;
         return true;
 }

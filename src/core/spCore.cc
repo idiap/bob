@@ -122,7 +122,6 @@ bool spCoreManager::add(spCore* core, const char* name)
 	// Check first if the parameters are ok
 	if (core == 0 || core->getID() < 1)
 	{
-	        delete core;
 		//Torch::message("spCoreManager::add - invalid parameters!\n");
 		return false;
 	}
@@ -130,7 +129,6 @@ bool spCoreManager::add(spCore* core, const char* name)
 	// Check if the <id> is taken
 	if (find(core->getID()) >= 0) // the <id> is taken
 	{
-	        delete core;
 		//Torch::message("spCoreManager::add - the ID is taken!\n");
 		return false;
 	}
@@ -152,7 +150,7 @@ bool spCoreManager::add(spCore* core, const char* name)
 ///////////////////////////////////////////////////////////////////////////
 // Get a copy of the <spCore> (empty, no parameters set) for the given ID
 // (returns NULL/0 if the <id> is invalid)
-// The new spCore is allocated and should be deallocated by the user!
+// The new spCore is automatically deallocated!
 
 spCore* spCoreManager::get(int id) const
 {
@@ -187,7 +185,6 @@ void spCoreManager::deallocate()
 {
 	for (int i = 0; i < m_size; i ++)
 	{
-		delete m_spcores[i];
 		delete[] m_names[i];
 	}
 	delete[] m_spcores;

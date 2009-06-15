@@ -4,6 +4,18 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
+	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="20">
+		<Cursor position="1498" topLine="7" />
+	</File>
+	<File name="../../boosting/LBPtrainCascade.cc" open="1" top="1" tabpos="22">
+		<Cursor position="9043" topLine="272" />
+	</File>
+	<File name="../../boosting/README.txt" open="0" top="0" tabpos="17">
+		<Cursor position="2317" topLine="21" />
+	</File>
+	<File name="../../boosting/boostingLBPRound.cc" open="0" top="0" tabpos="18">
+		<Cursor position="5532" topLine="176" />
+	</File>
 	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="1">
 		<Cursor position="706" topLine="0" />
 	</File>
@@ -16,8 +28,8 @@
 	<File name="../../dataset/makeWnds.cc" open="0" top="0" tabpos="5">
 		<Cursor position="1165" topLine="1" />
 	</File>
-	<File name="../../dataset/memorydataset.cc" open="0" top="0" tabpos="1">
-		<Cursor position="1392" topLine="0" />
+	<File name="../../dataset/memorydataset.cc" open="0" top="0" tabpos="14">
+		<Cursor position="1582" topLine="21" />
 	</File>
 	<File name="../../dataset/readWnds.cc" open="0" top="0" tabpos="4">
 		<Cursor position="701" topLine="0" />
@@ -40,7 +52,7 @@
 	<File name="../../images/imageformats.cc" open="0" top="0" tabpos="55">
 		<Cursor position="2174" topLine="73" />
 	</File>
-	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="10">
+	<File name="../../ip/CMakeLists.txt" open="0" top="0" tabpos="10">
 		<Cursor position="1514" topLine="0" />
 	</File>
 	<File name="../../ip/blocks.cc" open="0" top="0" tabpos="7">
@@ -58,41 +70,47 @@
 	<File name="../../ip/lbp.cc" open="0" top="0" tabpos="4">
 		<Cursor position="2522" topLine="23" />
 	</File>
-	<File name="../../ip/make.csh" open="1" top="0" tabpos="9">
+	<File name="../../ip/make.csh" open="0" top="0" tabpos="9">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../ip/memtest.cc" open="1" top="1" tabpos="26">
-		<Cursor position="2076" topLine="77" />
+	<File name="../../ip/memtest.cc" open="0" top="0" tabpos="11">
+		<Cursor position="1679" topLine="59" />
 	</File>
 	<File name="../../ip/scale.cc" open="0" top="0" tabpos="53">
 		<Cursor position="1086" topLine="12" />
 	</File>
-	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="4">
-		<Cursor position="885" topLine="0" />
+	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="6">
+		<Cursor position="516" topLine="4" />
 	</File>
-	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="2">
+	<File name="../../machines/convert3to5models.cc" open="0" top="0" tabpos="2">
 		<Cursor position="3748" topLine="189" />
 	</File>
-	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="3">
+	<File name="../../machines/make.csh" open="0" top="0" tabpos="12">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="../../machines/test19x19models.cc" open="0" top="0" tabpos="3">
 		<Cursor position="1147" topLine="27" />
 	</File>
-	<File name="../../options/CMakeLists.txt" open="1" top="0" tabpos="8">
+	<File name="../../machines/trainLR.cc" open="1" top="0" tabpos="7">
+		<Cursor position="2675" topLine="80" />
+	</File>
+	<File name="../../options/CMakeLists.txt" open="0" top="0" tabpos="8">
 		<Cursor position="414" topLine="0" />
 	</File>
 	<File name="../../options/make.csh" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="7">
+	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="7">
 		<Cursor position="370" topLine="0" />
 	</File>
-	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="1">
+	<File name="../../scanning/scanning.cc" open="0" top="0" tabpos="1">
 		<Cursor position="564" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="5">
+	<File name="../../scanning/test_scanning_all.sh" open="0" top="0" tabpos="5">
 		<Cursor position="84" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="6">
-		<Cursor position="155" topLine="0" />
+	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="21">
+		<Cursor position="743" topLine="0" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="10">
 		<Cursor position="0" topLine="27" />

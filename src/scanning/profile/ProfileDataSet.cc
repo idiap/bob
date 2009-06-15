@@ -8,14 +8,15 @@ namespace Torch
 // Constructor
 
 ProfileDataSet::ProfileDataSet(int pf_feature)
-	: 	m_feature(pf_feature),
+	: 	DataSet(Tensor::Double, true, Tensor::Double),
+		m_feature(pf_feature),
 		m_profiles(0),
 		m_masks(0),
 		m_capacity(0),
 		m_target_neg(1),
 		m_target_pos(1)
 {
-	m_target_neg.fill(-1.0);
+	m_target_neg.fill(0.0);
 	m_target_pos.fill(1.0);
 
 	reset(pf_feature);
@@ -26,12 +27,26 @@ ProfileDataSet::ProfileDataSet(int pf_feature)
 
 ProfileDataSet::~ProfileDataSet()
 {
-	for (int i = 0; i < m_capacity; i ++)
+	cleanup();
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Delete stored profiles
+
+void ProfileDataSet::cleanup()
+{
+	for (long i = 0; i < m_capacity; i ++)
 	{
 		delete m_profiles[i];
 	}
 	delete[] m_profiles;
+	m_profiles = 0;
+
 	delete[] m_masks;
+	m_masks = 0;
+
+	m_capacity = 0;
+	m_n_examples = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -148,14 +163,14 @@ void ProfileDataSet::cumulate(const Profile& gt_profile)
 /////////////////////////////////////////////////////////////////////////
 // Resize some distribution to fit new samples
 
-Profile** ProfileDataSet::resize(Profile** old_data, int capacity, int increment)
+Profile** ProfileDataSet::resize(Profile** old_data, long capacity, long increment)
 {
 	Profile** new_data = new Profile*[capacity + increment];
-	for (int i = 0; i < capacity; i ++)
+	for (long i = 0; i < capacity; i ++)
 	{
 		new_data[i] = old_data[i];
 	}
-	for (int i = 0; i < increment; i ++)
+	for (long i = 0; i < increment; i ++)
 	{
 		new_data[capacity + i] = new Profile;
 	}
@@ -164,14 +179,14 @@ Profile** ProfileDataSet::resize(Profile** old_data, int capacity, int increment
 	return new_data;
 }
 
-unsigned char* ProfileDataSet::resize(unsigned char* old_data, int capacity, int increment)
+unsigned char* ProfileDataSet::resize(unsigned char* old_data, long capacity, long increment)
 {
 	unsigned char* new_data = new unsigned char[capacity + increment];
-	for (int i = 0; i < capacity; i ++)
+	for (long i = 0; i < capacity; i ++)
 	{
 		new_data[i] = old_data[i];
 	}
-	for (int i = 0; i < increment; i ++)
+	for (long i = 0; i < increment; i ++)
 	{
 		new_data[capacity + i] = 0x00;
 	}
@@ -183,29 +198,98 @@ unsigned char* ProfileDataSet::resize(unsigned char* old_data, int capacity, int
 /////////////////////////////////////////////////////////////////////////
 // Save the distribution
 
-void ProfileDataSet::save(const char* dir_data, const char* name) const
+bool ProfileDataSet::save(const char* dir_data, const char* name) const
 {
-	char str[512];
+	char str[1024];
 
-	// Negative samples
-	sprintf(str, "%s_%s_neg", dir_data, name);
-	save(str, Negative);
+	// Save separate profiles for plotting
+	{
+		// Negative samples
+		sprintf(str, "%s_%s_neg", dir_data, name);
+		if (save(str, Negative) == false)
+		{
+			return false;
+		}
 
-	// Positive samples
-	sprintf(str, "%s_%s_pos", dir_data, name);
-	save(str, Positive);
+		// Positive samples
+		sprintf(str, "%s_%s_pos", dir_data, name);
+		if (save(str, Positive) == false)
+		{
+			return false;
+		}
 
-	// Ground truth samples
-	sprintf(str, "%s_%s_gt", dir_data, name);
-	save(str, GroundTruth);
+		// Ground truth samples
+		sprintf(str, "%s_%s_gt", dir_data, name);
+		if (save(str, GroundTruth) == false)
+		{
+			return false;
+		}
+	}
+
+	// Save altogether in a binary format
+	{
+		// Open the file
+		File file;
+		sprintf(str, "%s_%s.distribution", dir_data, name);
+		if (file.open(str, "w") == false)
+		{
+			return false;
+		}
+
+		// Write the number of samples
+		if (file.taggedWrite(&m_n_examples, sizeof(long), 1, "NO") != 1)
+		{
+			print("ProfileDataSet::save - failed to write <NO> tag!\n");
+			return false;
+		}
+
+		// Write the masks (positive, negative, ground truth)
+		if (file.taggedWrite(m_masks, sizeof(unsigned char), m_n_examples, "MASKS") != m_n_examples)
+		{
+			print("ProfileDataSet::save - failed to write <MASKS> tag!\n");
+			return false;
+		}
+
+		// Write each profile
+		for (long s = 0; s < m_n_examples; s ++)
+		{
+			const Profile* profile = m_profiles[s];
+
+			if (	file.write(&profile->m_pattern.m_x, sizeof(short), 1) != 1 ||
+				file.write(&profile->m_pattern.m_y, sizeof(short), 1) != 1 ||
+				file.write(&profile->m_pattern.m_w, sizeof(short), 1) != 1 ||
+				file.write(&profile->m_pattern.m_h, sizeof(short), 1) != 1 ||
+				file.write(&profile->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
+				file.write(&profile->m_pattern.m_activation, sizeof(short), 1) != 1)
+			{
+				print("ProfileDataSet::save - failed to write profile [%d/%d]!\n", s + 1, m_n_examples);
+				return false;
+			}
+
+			for (int f = 0; f < NoFeatures; f ++)
+			{
+				if (file.write(	profile->m_features[f].dataR(), sizeof(double), FeatureSizes[f])
+						!= FeatureSizes[f])
+				{
+					print("ProfileDataSet::save - failed to write profile [%d/%d]!\n", s + 1, m_n_examples);
+					return false;
+				}
+			}
+		}
+
+		file.close();
+	}
+
+	// OK
+	return true;
 }
 
-void ProfileDataSet::save(const char* basename, unsigned char mask) const
+bool ProfileDataSet::save(const char* basename, unsigned char mask) const
 {
 	// Open the files
 	for (int f = 0; f < NoFeatures; f ++)
 	{
-		char str[512];
+		char str[1024];
 		sprintf(str, "%s_%s.data", basename, FeatureNames[f]);
 
 		File file;
@@ -225,6 +309,81 @@ void ProfileDataSet::save(const char* basename, unsigned char mask) const
 
 		file.close();
 	}
+
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Load the distribution
+
+bool ProfileDataSet::load(const char* dir_data, const char* name)
+{
+	cleanup();
+
+	// Open the file
+	char str[1024];
+	File file;
+	sprintf(str, "%s_%s.distribution", dir_data, name);
+	if (file.open(str, "r") == false)
+	{
+		return false;
+	}
+
+	// Read the number of samples
+	if (file.taggedRead(&m_n_examples, sizeof(long), 1, "NO") != 1)
+	{
+		print("ProfileDataSet::save - failed to read <NO> tag!\n");
+		return false;
+	}
+
+	// Allocate data
+	m_masks = new unsigned char[m_n_examples];
+	m_profiles = new Profile*[m_n_examples];
+	for (long s = 0; s < m_n_examples; s ++)
+	{
+		m_profiles[s] = new Profile;
+	}
+	m_capacity = m_n_examples;
+
+	// Read the masks (positive, negative, ground truth
+	if (file.taggedRead(m_masks, sizeof(unsigned char), m_n_examples, "MASKS") != m_n_examples)
+	{
+		print("ProfileDataSet::save - failed to read <MASKS> tag!\n");
+		return false;
+	}
+
+	// Read each profile
+	for (long s = 0; s < m_n_examples; s ++)
+	{
+		Profile* profile = m_profiles[s];
+
+		if (	file.read(&profile->m_pattern.m_x, sizeof(short), 1) != 1 ||
+			file.read(&profile->m_pattern.m_y, sizeof(short), 1) != 1 ||
+			file.read(&profile->m_pattern.m_w, sizeof(short), 1) != 1 ||
+			file.read(&profile->m_pattern.m_h, sizeof(short), 1) != 1 ||
+			file.read(&profile->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
+			file.read(&profile->m_pattern.m_activation, sizeof(short), 1) != 1)
+		{
+			print("ProfileDataSet::save - failed to read profile [%d/%d]!\n", s + 1, m_n_examples);
+			return false;
+		}
+
+		for (int f = 0; f < NoFeatures; f ++)
+		{
+			if (file.read(	profile->m_features[f].dataW(),
+					sizeof(double),
+					FeatureSizes[f]) != FeatureSizes[f])
+			{
+				print("ProfileDataSet::save - failed to read profile [%d/%d]!\n", s + 1, m_n_examples);
+				return false;
+			}
+		}
+	}
+
+	file.close();
+
+	// OK
+	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////

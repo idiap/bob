@@ -29,10 +29,10 @@ namespace Torch
         int *m_featuremask;   // list of features that has to used for selecting best weakfeature
         bool m_mask;            // says wether to use the mask or not.
         int m_features;
-        int *trackfeatures;
+        int *m_trackfeatures;
         //void cleanup();
         void compressmachines();
-        double **lut_t1;
+        double ** m_lut_t1;
 
     };
 

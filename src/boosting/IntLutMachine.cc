@@ -11,9 +11,10 @@ namespace Torch
     {
         n_bins = 0;
         lut = NULL;
-        m_output = new DoubleTensor(1);
+        m_output.resize(1);
 
     }
+////////////////////////////////////////////////
 
     bool IntLutMachine::forward(const Tensor& input)
     {
@@ -36,21 +37,10 @@ namespace Torch
         }
 
         IntTensor *core_t_output = (IntTensor*) &m_core->getOutput(0);
-        //Torch::print("LBPMachine::forward().");
-        int feature = core_t_output->get(0);
 
-        //  print("feature %d\n",feature);
-        double lut_output_;
+        int feature = (*core_t_output)(0);
 
-
-        //{
-        //int index = (int) floor(n_bins * (feature - min) / (max - min));
-
-        lut_output_ = lut[feature];
-        //}
-
-        DoubleTensor* t_output = (DoubleTensor*) m_output;
-        (*t_output)(0) = lut_output_;
+        m_output.set(0, lut[feature]);
 
         return true;
     }
@@ -67,8 +57,8 @@ namespace Torch
 
         if (id != getID())
         {
-        	Torch::message("IntLutMachine::load - invalid <ID>, this is not an IntLutMachine model!\n");
-		return false;
+            Torch::message("IntLutMachine::load - invalid <ID>, this is not an IntLutMachine model!\n");
+            return false;
         }
 
 
@@ -79,7 +69,7 @@ namespace Torch
             return false;
         }
 
-	delete[] lut;
+        delete[] lut;
         lut = new double [n_bins];
 
         if (file.taggedRead(lut, sizeof(double), n_bins, "Lut") != n_bins)
@@ -101,23 +91,20 @@ namespace Torch
 
         //print("IntLutMachine::LoadFile()\n");
 
-        delete m_core;
-	m_core = 0;
+        m_core = spCoreManager::getInstance().get(idCore);
+        if (m_core == 0)
+        {
+            Torch::message("IntLutMachine::load - invalid <CoreID> field!\n");
+            return false;
+        }
 
-	m_core = spCoreManager::getInstance().get(idCore);
-	if (m_core == 0)
-	{
-		Torch::message("IntLutMachine::load - invalid <CoreID> field!\n");
-		return false;
-	}
+        if (m_core->loadFile(file) == false)
+        {
+            Torch::message("IntLutMachine::load - the spCore cannot be loaded!\n");
+            return false;
+        }
 
-	if (m_core->loadFile(file) == false)
-	{
-		Torch::message("IntLutMachine::load - the spCore cannot be loaded!\n");
-		return false;
-	}
-
-	return true;
+        return true;
 
     }
 
@@ -146,46 +133,29 @@ namespace Torch
             return false;
         }
 
-//	 if (file.taggedWrite(&min, sizeof(double), 1, "min") != 1)
-//	{
-//		Torch::message("LutMachine::save - failed to write <min> field!\n");
-//		return false;
-//	}
-//
-//	 if (file.taggedWrite(&max, sizeof(double), 1, "max") != 1)
-//	{
-//		Torch::message("LBPMachine::save - failed to write <max> field!\n");
-//		return false;
-//	}
-
-
-        //print("IntLutMachine::saveFile()\n");
-
-        //print("  max = %g\n",max);
-
-       if ( m_core->saveFile(file) == false)
-       {
-		Torch::message("IntLutMachine::save - cannot save spCore!\n");
-		return false;
-       }
+        if (m_core == NULL || m_core->saveFile(file) == false)
+        {
+            Torch::message("IntLutMachine::save - cannot save spCore!\n");
+            return false;
+        }
 
         return true;
     }
 
     void IntLutMachine::setParams(int n_bins_, double *lut_)
     {
-        //Torch::print("   IntLutMachine::setParams()\n");
-
-        //min = min_;
-        //max = max_;
         n_bins = n_bins_;
-        lut = lut_;
+        delete[] lut;
+        lut = new double [n_bins];
+        for (int i = 0; i < n_bins; i ++)
+        {
+                lut[i] = lut_[i];
+        }
     }
 
     IntLutMachine::~IntLutMachine()
     {
-        if(lut !=NULL)
-            delete lut;
+        delete[] lut;
     }
 
 }

@@ -23,7 +23,7 @@ namespace Torch
         // Constructor
         ipHaarLienhart();//int width_, int height_);
         bool setNoRec(int noRecs_); //set the number of rectangles
-        bool setRec(int Rec_,double weight_, int x_, int y_, int w_, int h_);
+        bool setRec(int Rec_,double weight_, int y_, int x_, int h_, int w_);
 
 	/// Change the region of the input tensor to process - overriden
         virtual void		setRegion(const TensorRegion& region);
@@ -35,8 +35,8 @@ namespace Torch
 	virtual int		getID() const { return IP_HAAR_LIENHART_ID; }
 
 	/// Constructs an empty spCore of this kind - overriden
-	/// (used by <spCoreManager>, this object should be deallocated by the user)
-	virtual spCore*		getAnInstance() const { return new ipHaarLienhart(); }
+	/// (used by <spCoreManager>, this object is automatically deallocated)
+	virtual spCore*		getAnInstance() const { return manage(new ipHaarLienhart()); }
 
         // Destructor
         virtual ~ipHaarLienhart();
@@ -63,25 +63,22 @@ namespace Torch
 
     protected:
 
+        void updateParameters();
         /////////////////////////////////////////////////////////////////
         // Attributes
-        int noRecs; //Number of Rectangles
+        int m_noRecs; //Number of Rectangles
 
 
-        int width;
-        int height;
-//		int type;
-//		int x;
-//		int y;
-//		int w;
-//		int h;
-        int nparams;
-        int *parameters;
+        int m_width;
+        int m_height;
+
+        int m_nparams;
+        int *m_parameters;
         // Format for parameters
 
-        double *weight;
-        DoubleTensor *t_;
-        DoubleTensor *t__;
+        double *m_weight;
+    //    DoubleTensor *t_;
+      //  DoubleTensor *t__;
 
 
 
@@ -90,14 +87,14 @@ namespace Torch
         int u_size_z,u_z; //for selecting the dimension
         int *u_parameters;
         double *u_weight;
-        void updateParameters();
+
 
     };
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // REGISTER this spCore to the <spCoreManager>
         const bool ip_haar_lienhart_registered = spCoreManager::getInstance().add(
-                new ipHaarLienhart(), "Lienhart Haar");
+                manage(new ipHaarLienhart()), "Lienhart Haar");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 

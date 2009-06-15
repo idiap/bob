@@ -10,14 +10,12 @@ MeanVarNorm::MeanVarNorm()
 {
    	n_inputs = 0;
 	n_outputs = 0;
-	m_output = NULL;
 	m_mean = NULL;
 	m_stdv = NULL;
 }
 
 MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 {
-	m_output = NULL;
 	m_mean = NULL;
 	m_stdv = NULL;
 
@@ -75,14 +73,7 @@ bool MeanVarNorm::resize(const int n_inputs_)
 	n_inputs = n_inputs_;
 	n_outputs = n_inputs;
 
-	// Free
-	if(m_output != NULL) 
-	{
-		delete m_output;
-		m_output = NULL;
-	}
-	// Reallocate
-	m_output = new DoubleTensor(n_outputs);
+	m_output.resize(n_outputs);
 
 	if(m_mean != NULL)
 	{
@@ -101,6 +92,8 @@ bool MeanVarNorm::resize(const int n_inputs_)
 		m_mean[i] = 0.0;
 		m_stdv[i] = 0.0;
 	}
+
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -108,11 +101,6 @@ bool MeanVarNorm::resize(const int n_inputs_)
 
 MeanVarNorm::~MeanVarNorm()
 {
-	if(m_output != NULL) 
-	{
-		delete m_output;
-		m_output = NULL;
-	}
 	if(m_mean != NULL)
 	{
 		delete [] m_mean;
@@ -144,7 +132,7 @@ bool MeanVarNorm::forward(const Tensor& input)
 	DoubleTensor *t_input = (DoubleTensor *) &input;
 
 	double *src = (double *) t_input->dataR();
-	double *dst = (double *) m_output->dataW();
+	double *dst = (double *) m_output.dataW();
 	
 	for(int i = 0 ; i < n_inputs ; i++)
 		dst[i] = (src[i] - m_mean[i]) / m_stdv[i];

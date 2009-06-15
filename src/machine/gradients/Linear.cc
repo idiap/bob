@@ -122,7 +122,7 @@ bool Linear::forward(const DoubleTensor *input)
 	//int n_outputs = m_parameters->getI("n_outputs");
 
 	double *src = (double *) input->dataR();
-	double *dst = (double *) m_output->dataW();
+	double *dst = (double *) m_output.dataW();
 
 	double *weights_ = weights;
 	for(int i = 0; i < n_outputs; i++)

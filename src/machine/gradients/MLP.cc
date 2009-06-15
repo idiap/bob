@@ -105,7 +105,7 @@ bool MLP::forward(const DoubleTensor *input)
 	//int n_outputs = m_parameters->getI("n_outputs");
 
 	double *src = (double *) gm[3]->getOutput().dataR();
-	double *dst = (double *) m_output->dataW();
+	double *dst = (double *) m_output.dataW();
 
 	for(int i = 0; i < n_outputs; i++) dst[i] = src[i];
 
@@ -114,7 +114,7 @@ bool MLP::forward(const DoubleTensor *input)
 
 bool MLP::backward(const DoubleTensor *input, const DoubleTensor *alpha)
 {
-	double *alpha_ = (double *) alpha->dataR();
+	//double *alpha_ = (double *) alpha->dataR();
 
 	//
 	// backward alpha (criterion's output) to the connected machines

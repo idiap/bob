@@ -2,6 +2,7 @@
 
 namespace Torch
 {
+/////////////////////////////////////////////////////////////////////////////////////////
     BoostingTrainer::BoostingTrainer()
     {
         addBOption("boosting_by_sampling",	false,	"use sampling based on weights");
@@ -16,11 +17,14 @@ namespace Torch
         m_shuffledindex_dataset = NULL;
         m_repartition = NULL;
         m_labelledmeasure = NULL;
+        verbose = getBOption("verbose");
     }
-
+/////////////////////////////////////////////////////////////////////////////////////////
     bool BoostingTrainer::noSampling()
     {
-        print("   BoostingTrainer::noSampling()\n");
+        verbose = getBOption("verbose");
+        if (verbose)
+            print("   BoostingTrainer::noSampling()\n");
 
         if (m_n_examples <= 0)
         {
@@ -34,15 +38,28 @@ namespace Torch
 
         return true;
     }
-    ////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
     double BoostingTrainer::forward(Tensor *example_)
     {
-        return 1.0;
+        double s = 0.0;
+        for (int j = 0 ; j < m_n_classifiers ; j++)
+        {
+            Machine *m_ = m_weak_learners[j]->getMachine();
+            m_->forward(*example_);
+            DoubleTensor *t_output = (DoubleTensor *) &m_->getOutput();
+
+            s +=  m_weak_learners[j]->getWeight()*(*t_output)(0);
+
+        }
+
+        return s;
     }
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
     bool BoostingTrainer::randomSampling()
     {
-        print("   BoostingTrainer::randomSampling()\n");
+        verbose = getBOption("verbose");
+        if (verbose)
+            print("   BoostingTrainer::randomSampling()\n");
 
 
         if (m_n_examples <= 0)
@@ -76,10 +93,12 @@ namespace Torch
 
         return true;
     }
-
+/////////////////////////////////////////////////////////////////////////////////////
     void BoostingTrainer::initWeights()
     {
-        print("   BoostingTrainer::initWeights()\n");
+        verbose = getBOption("verbose");
+        if (verbose)
+            print("   BoostingTrainer::initWeights()\n");
 
         if (m_n_examples > 0)
         {
@@ -93,41 +112,46 @@ namespace Torch
         }
         else Torch::error("BoostingTrainer::initWeights() no examples to initialize the weights.");
     }
-
+/////////////////////////////////////////////////////////////////////////////////////////////////
     void BoostingTrainer::updateWeights()
     {
-        print("   BoostingTrainer::updateWeights()\n");
+        if (verbose)
+            print("   BoostingTrainer::updateWeights()\n");
 
         int fa = 0;
         int fr = 0;
         int np = 0;
         int nn = 0;
-
+        bool t;
         double error_ = 0.0;
 
         //
         Machine *m_ = m_weak_learners[m_n_classifiers_trained]->getMachine();
-       // TensorRegion *tr = new TensorRegion(0,0,19,19);
-       // m_->setRegion(*tr);
 
-        print("Number of examples in updateweights %d\n",m_n_examples);
+        if (verbose)
+            print("Number of examples in updateweights %d\n",m_n_examples);
+
+
         for (int i=0 ; i<m_n_examples ; i++)
         {
             Tensor *example = m_dataset->getExample(i);
 
-          //  print("1 ..........\n");
-            m_->forward(*example);
-           // print("2 ..........\n");
+
+            t= m_->forward(*example);
+
+            if (t==false)
+                print("BoostingTrainer::updateWeights There is a bug in forward machine \n");
+
             ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
             short target_value = (*target)(0);
             DoubleTensor *t_output = (DoubleTensor *) &m_->getOutput();
-           // print("3 ..........\n");
-            m_labelledmeasure[i].measure = (*t_output)(0);
-          //  print("machine feature value %f\n",(*t_output)(0));
+
+            m_labelledmeasure[i].measure = t_output->get(0);
+
             m_labelledmeasure[i].label = target_value;
 
             m_label_samples[i] = 0;
-          //  print("4 ..........\n");
+
             if (target_value == 0)
             {
                 if ((*t_output)(0) > 0)
@@ -154,20 +178,22 @@ namespace Torch
             }
         }
 
-        print("   error = %g \t FAR = %g \t FRR = %g\n", error_, ((float) fa * 100.0 / (float) nn), ((float) fr * 100.0 / (float) np));
+        if (verbose)
+            print("   error = %g \t FAR = %g \t FRR = %g\n", error_, ((float) fa * 100.0 / (float) (nn+1)), ((float) fr * 100.0 / (float) (np+1)));
 
         double frr = 0.0;
         double far = 0.0;
         double threshold = computeEER(m_labelledmeasure, m_n_examples, &frr, &far);
-
-        print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
+        if (verbose)
+            print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
 
         double beta = error_ / (1.0 - error_);
 
         //
         m_weights[m_n_classifiers_trained] = -log(beta); // log(1 / beta)
 
-        print("   Machine weights = %g\n", m_weights[m_n_classifiers_trained]);
+        if (verbose)
+            print("   Machine weights = %g\n", m_weights[m_n_classifiers_trained]);
 
         //
         double z_ = 0.0;
@@ -179,10 +205,14 @@ namespace Torch
         }
         for (int i=0 ; i<m_n_examples ; i++) m_weights_samples[i] /= z_;
 
+        if (verbose)
+            print("\n\n");
 
-        print("\n\n");
+
     }
 
+
+//////////////////////////////////////////////////////////////////////////////////////
     bool BoostingTrainer::setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_)
     {
         m_n_classifiers = n_classifiers_;
@@ -194,10 +224,12 @@ namespace Torch
 
         return true;
     }
-
+///////////////////////////////////////////////////////////////////////////////////////////
     bool BoostingTrainer::train()
     {
-        print("BoostingTrainer::train() ...\n");
+        verbose = getBOption("verbose");
+        if (verbose)
+            print("BoostingTrainer::train() ...\n");
 
         //
         bool useSampling = getBOption("boosting_by_sampling");
@@ -214,9 +246,11 @@ namespace Torch
             return false;
         }
 
-        //
-        print(" + Number of weak classifiers: %d\n", m_n_classifiers);
-        print(" + Number of examples: %d\n", m_n_examples);
+        if (verbose)
+        {
+            print(" + Number of weak classifiers: %d\n", m_n_classifiers);
+            print(" + Number of examples: %d\n", m_n_examples);
+        }
 
         m_weights_samples = new double [m_n_examples];
         m_label_samples = new short [m_n_examples];
@@ -249,14 +283,16 @@ namespace Torch
 
             if (m_weak_learners[classifierNo]->train() == false) return false;
 
-            //
-            File filn;
-            char fil[200];
-            sprintf(fil,"weight%d.data",classifierNo);
-            filn.open(fil,"w");
-            for (int pk =0;pk<m_n_examples;pk++)
-                filn.printf("%g\n",m_weights_samples[pk]);
-            filn.close();
+            //........saving weights at each iteration.......
+            //  File filn;
+            // char fil[200];
+            //  sprintf(fil,"weight%d.data",classifierNo);
+            //  filn.open(fil,"w");
+            //  for (int pk =0;pk<m_n_examples;pk++)
+            //   filn.printf("%g\n",m_weights_samples[pk]);
+            //  filn.close();
+
+
             updateWeights(); // update weights for all examples
 
             m_n_classifiers_trained++;
@@ -266,7 +302,6 @@ namespace Torch
         double z_ = 0.0;
         for (int j = 0 ; j < m_n_classifiers ; j++)
         {
-           // print("> %g\n", m_weights[j]);
             z_ += exp(m_weights[j]);
         }
 
@@ -274,7 +309,7 @@ namespace Torch
         {
             m_weights[j] = exp(m_weights[j]) / z_;
             m_weak_learners[j]->setWeight(m_weights[j]);
-           // print("< %g\n", m_weights[j]);
+
         }
 
         //
@@ -303,7 +338,7 @@ namespace Torch
             m_labelledmeasure[i].measure = s;
             m_labelledmeasure[i].label = target_value;
 
-            //print(" %g %d\n", s, target_value);
+
             if (target_value > 0)
             {
                 mean_positive += s;
@@ -320,23 +355,33 @@ namespace Torch
         double far = 0.0;
         double threshold = computeEER(m_labelledmeasure, m_n_examples, &frr, &far);
 
-        print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
+        if (verbose)
+        {
+            print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
 
-        print("   Mean negative = %g \t Mean Positive = %g\n", mean_negative / (double) n_negative, mean_positive / (double) n_positive);
+            print("   Mean negative = %g \t Mean Positive = %g\n", mean_negative / (double) n_negative, mean_positive / (double) n_positive);
+        }
 
         return true;
     }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
     void BoostingTrainer::cleanup()
     {
-        if (m_weights == NULL) delete []m_weights;
-        if (m_weights_samples == NULL) delete []m_weights_samples;
-        if (m_label_samples == NULL) delete []m_label_samples;
-        if (m_shuffledindex_dataset == NULL) delete []m_shuffledindex_dataset;
-        if (m_repartition == NULL) delete []m_repartition;
-        if (m_labelledmeasure == NULL) delete []m_labelledmeasure;
-    }
+        delete []m_weights;
+        delete []m_weights_samples;
+        delete []m_label_samples;
+        delete []m_shuffledindex_dataset;
+        delete []m_repartition;
+        delete []m_labelledmeasure;
 
+        m_weights = NULL;
+        m_weights_samples = NULL;
+        m_label_samples = NULL;
+        m_shuffledindex_dataset = NULL;
+        m_repartition = NULL;
+        m_labelledmeasure = NULL;
+    }
+////////////////////////////////////////////////////////////////////////////////////////////////////////
     BoostingTrainer::~BoostingTrainer()
     {
         cleanup();

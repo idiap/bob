@@ -18,19 +18,20 @@ namespace Torch
 
         ///
         virtual ~LBPRoundTrainer();
-        int getLUTSize();
-        double *getLUT();
+        int getLUTSize() { return m_b_lutsize;}
+
+        double *getLUT() { return m_bestlut_; }
 
     private:
 
-        int *features_values;
-        int n_bins;
-        float **histogram;
+        int *m_features_values;
+        int m_n_bins;
+        float **m_histogram;
         //double *lut_;
         //
         IntLutMachine *m_lbp_machine;
-        int b_lutsize;
-        double *bestlut_;
+        int m_b_lutsize;
+        double *m_bestlut_;
     };
 
 }

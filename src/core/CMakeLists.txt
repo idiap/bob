@@ -18,6 +18,7 @@ SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/Machine.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Tensor.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/TensorFile.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/TensorList.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/MTimer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/CmdOption.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/FileListCmdOption.cc"
