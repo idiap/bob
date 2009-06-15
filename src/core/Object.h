@@ -2,20 +2,12 @@
 #define _TORCH5SPRO_OBJECT_H_
 
 #include "general.h"
+#include "VariableCollector.h"
 
 namespace Torch
 {
-	class OptionImpl;
+   	class VariableCollector;
 
-	/** Almost all classes in Torch should be a sub-class of this class.
-	    It provides a useful interface to manage options and to load and save
-	    its content from/to files.
-
-	    By default, the following options are added to any <Object>:
-		-	"verbose", boolean, default value = [false], "verbose flag"
-
-	    @author Ronan Collobert (collober@idiap.ch)
-	*/
 	class Object
 	{
 	public:
@@ -67,7 +59,7 @@ namespace Torch
 		///////////////////////////////////////////////////////////
 		/// Attributes
 
-		OptionImpl*		m_optionImpl;		// Implementation details (not exposed in the interface)
+		VariableCollector*	m_optionImpl;		// Implementation details (not exposed in the interface)
 	};
 }
 

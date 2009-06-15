@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_MACHINE_H_
 
 #include "Object.h"
+#include "Parameters.h"
 #include "Tensor.h"
 
 namespace Torch {
@@ -74,6 +75,9 @@ namespace Torch {
 		const DoubleTensor&     getOutput() const;
 
 		///////////////////////////////////////////////////////////
+
+		// Parameters of the machine
+		Parameters*		m_parameters;
 
 	protected:
 

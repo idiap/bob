@@ -7,18 +7,51 @@ namespace Torch {
 //////////////////////////////////////////////////////////////////////////
 // Constructor
 
-GradientMachine::GradientMachine(int n_inputs_, int n_outputs_, int n_parameters_)
-   	: Machine(), n_inputs(n_inputs_), n_outputs(n_outputs_), n_parameters(n_parameters_)
+GradientMachine::GradientMachine()
 {
-	// Allocate the output
-	m_output = new DoubleTensor(n_outputs);
-	m_parameters = NULL;
-	m_der_parameters = NULL;
-	if(n_parameters > 0)
+	m_output = NULL;
+	m_beta = NULL;
+
+	n_inputs = 0;
+	n_outputs = 0;
+	n_parameters = 0;
+	parameters = NULL;
+	der_parameters = NULL;
+
+	m_parameters->addI("n_inputs", 0, "number of inputs of the gradient machine");
+	m_parameters->addI("n_outputs", 0, "number of outputs of the gradient machine");
+	m_parameters->addI("n_parameters", 0, "number of parameters of the gradient machine");
+	m_parameters->addDarray("parameters", 0, 0, "parameters of the gradient machine");
+	m_parameters->addDarray("der_parameters", 0, 0, "derivatives of the parameters of the gradient machine");
+}
+
+GradientMachine::GradientMachine(const int n_inputs_, const int n_outputs_, const int n_parameters_)
+{
+	m_output = NULL;
+	m_beta = NULL;
+
+	n_inputs = 0;
+	n_outputs = 0;
+	n_parameters = 0;
+	parameters = NULL;
+	der_parameters = NULL;
+
+	m_parameters->addI("n_inputs", 0, "number of inputs of the gradient machine");
+	m_parameters->addI("n_outputs", 0, "number of outputs of the gradient machine");
+	if(n_parameters_ > 0)
 	{
-		m_parameters = new double [n_parameters]; 
-		m_der_parameters = new double [n_der_parameters]; 
+		m_parameters->addI("n_parameters", n_parameters_, "number of parameters of the gradient machine");
+		m_parameters->addDarray("parameters", n_parameters_, 0, "parameters of the gradient machine");
+		m_parameters->addDarray("der_parameters", n_parameters_, 0, "derivatives of the parameters of the gradient machine");
 	}
+	else
+	{
+		m_parameters->addI("n_parameters", 0, "number of parameters of the gradient machine");
+		m_parameters->addDarray("parameters", 0, 0, "parameters of the gradient machine");
+		m_parameters->addDarray("der_parameters", 0, 0, "derivatives of the parameters of the gradient machine");
+	}
+
+	resize(n_inputs_, n_outputs_);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -27,26 +60,103 @@ GradientMachine::GradientMachine(int n_inputs_, int n_outputs_, int n_parameters
 GradientMachine::~GradientMachine()
 {
         // Cleanup
-	if(m_parameters != NULL) delete[] m_parameters;
-	if(m_der_parameters != NULL) delete[] m_der_parameters;
 	delete m_output;
+	delete m_beta;
 }
 
+bool GradientMachine::prepare()
+{ 
+	n_inputs = m_parameters->getI("n_inputs");
+	n_outputs = m_parameters->getI("n_outputs");
+	n_parameters = m_parameters->getI("n_parameters");
+	parameters = m_parameters->getDarray("parameters");
+	der_parameters = m_parameters->getDarray("der_parameters");
+
+	return true; 
+}
+   
+bool GradientMachine::resize(int n_inputs_, int n_outputs_, int n_parameters_)
+{
+	// Free
+	if(m_output != NULL) 
+	{
+		delete m_output;
+		m_output = NULL;
+	}
+	// Reallocate
+	m_output = new DoubleTensor(n_outputs_);
+
+	// Free
+	if(m_beta != NULL) 
+	{
+		delete m_beta;
+		m_beta = NULL;
+	}
+	// Reallocate
+	m_beta = new DoubleTensor(n_inputs_);
+
+	//
+	m_parameters->setI("n_inputs", n_inputs_);
+	n_inputs = n_inputs_;
+	m_parameters->setI("n_outputs", n_outputs_);
+	n_outputs = n_outputs_;
+	if(n_parameters_ > 0)
+	{
+		m_parameters->setI("n_parameters", n_parameters_);
+		n_parameters = n_parameters_;
+		m_parameters->setDarray("parameters", n_parameters_);
+		parameters = m_parameters->getDarray("parameters");
+		m_parameters->setDarray("der_parameters", n_parameters_);
+		der_parameters = m_parameters->getDarray("der_parameters");
+	}
+
+	return true;
+}
 
 bool GradientMachine::forward(const Tensor& input)
 {
-   	/*
-		unroll the input tensor:
-			if 1D then process as one frame
-			if 2D then process as a sequence of frames
-			if 3D ???
-	*/
+	//int n_inputs = m_parameters->getI("n_inputs");
+	
+	// Accept only 1D tensors of Double
+	if (	input.nDimension() != 1 || input.getDatatype() != Tensor::Double)
+	{
+		warning("GradientMachine::forward() : incorrect number of dimensions or type.");
+		
+		return false;
+	}
+	if (	input.size(0) != n_inputs)
+	{
+		warning("GradientMachine::forward() : incorrect input size along dimension 0 (%d != %d).", input.size(0), n_inputs);
+		
+		return false;
+	}
 
-	//m_output->set(0, m_lut[lbp]);
-	//m_output->zero();
-	//m_output->one();
-	//m_output->fill();
-	return true;
+	DoubleTensor *t_input = (DoubleTensor *) &input;
+
+	return forward(t_input);
+}
+
+bool GradientMachine::backward(const Tensor& input, const DoubleTensor *alpha)
+{
+	//int n_inputs = m_parameters->getI("n_inputs");
+
+	// Accept only 1D tensors of Double
+	if (	input.nDimension() != 1 || input.getDatatype() != Tensor::Double)
+	{
+		warning("GradientMachine::backward() : incorrect number of dimensions or type.");
+		
+		return false;
+	}
+	if (	input.size(0) != n_inputs)
+	{
+		warning("GradientMachine::backward() : incorrect input size along dimension 0 (%d != %d).", input.size(0), n_inputs);
+		
+		return false;
+	}
+
+	DoubleTensor *t_input = (DoubleTensor *) &input;
+
+	return backward(t_input, alpha);
 }
 
 ///////////////////////////////////////////////////////////
@@ -67,13 +177,16 @@ bool GradientMachine::loadFile(File& file)
 		return false;
 	}
 
-	// Read the machine parameters
-	const int ret = file.taggedRead(m_parameters, sizeof(double), m_parameters, "PARAMETERS");
-	if (ret != m_parameters)
+	if(m_parameters->loadFile(file) == false)
 	{
-	        Torch::message("GradientMachine::load - failed to read <PARAMETERS> field!\n");
+	        Torch::message("GradientMachine::load - failed to load parameters\n");
 		return false;
 	}
+
+	int n_inputs_ = m_parameters->getI("n_inputs");
+	int n_outputs_ = m_parameters->getI("n_outputs");
+
+	resize(n_inputs_, n_outputs_);
 
 	// OK
 	return true;
@@ -89,10 +202,9 @@ bool GradientMachine::saveFile(File& file) const
 		return false;
 	}
 
-	// Write the machine parameters
-	if (file.taggedWrite(m_parameters, sizeof(double), m_parameters, "PARAMETERS") != m_parameters)
+	if(m_parameters->saveFile(file) == false)
 	{
-		Torch::message("GradientMachine::save - failed to write <PARAMETERS> field!\n");
+	        Torch::message("GradientMachine::load - failed to write parameters\n");
 		return false;
 	}
 

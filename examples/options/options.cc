@@ -1,5 +1,4 @@
 #include "Object.h"
-#include <cCHECK_FATAL>
 
 using namespace Torch;
 

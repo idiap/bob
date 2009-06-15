@@ -1,0 +1,2 @@
+../dataset/tensor/face_train.tensor
+../dataset/tensor/nonface_train.tensor
