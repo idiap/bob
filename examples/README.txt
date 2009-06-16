@@ -10,3 +10,5 @@ images/  	: program examples to test and manipulate images from files
 
 ip/  		: program examples of various Image Processing (ipCore)
 
+gradients/	: program examples for Gradient Machines and training by Gradient Descent
+

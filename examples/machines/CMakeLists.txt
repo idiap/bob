@@ -13,6 +13,8 @@ INCLUDE_DIRECTORIES(	"${TORCH5SPRO_DIR}/src/core/"
                         "${TORCH5SPRO_DIR}/extras/jpeg/"
                         "${TORCH5SPRO_DIR}/src/th/"
                         "${TORCH5SPRO_DIR}/src/machine/"
+                        "${TORCH5SPRO_DIR}/src/machine/gradients"
+                        "${TORCH5SPRO_DIR}/src/machine/normalisations"
 			"${TORCH5SPRO_DIR}/src/scanning/profile/"
 			"${TORCH5SPRO_DIR}/src/trainer/"
 			"${TORCH5SPRO_DIR}/src/boosting/")
