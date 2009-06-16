@@ -53,9 +53,9 @@ Machine* loadMachineFromFile(const char* filename)
 
 Machine::Machine()
 	: 	Object(),
+		m_parameters(new Parameters()),
 		m_size(),
 		m_core(0),
-		m_parameters(new Parameters()),
 		m_output(1)
 {
 }
