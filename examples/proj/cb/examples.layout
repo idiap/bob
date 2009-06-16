@@ -4,10 +4,10 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="20">
+	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="3">
 		<Cursor position="1498" topLine="7" />
 	</File>
-	<File name="../../boosting/LBPtrainCascade.cc" open="1" top="1" tabpos="22">
+	<File name="../../boosting/LBPtrainCascade.cc" open="1" top="0" tabpos="5">
 		<Cursor position="9043" topLine="272" />
 	</File>
 	<File name="../../boosting/README.txt" open="0" top="0" tabpos="17">
@@ -79,7 +79,7 @@
 	<File name="../../ip/scale.cc" open="0" top="0" tabpos="53">
 		<Cursor position="1086" topLine="12" />
 	</File>
-	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="6">
+	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="1">
 		<Cursor position="516" topLine="4" />
 	</File>
 	<File name="../../machines/convert3to5models.cc" open="0" top="0" tabpos="2">
@@ -91,7 +91,7 @@
 	<File name="../../machines/test19x19models.cc" open="0" top="0" tabpos="3">
 		<Cursor position="1147" topLine="27" />
 	</File>
-	<File name="../../machines/trainLR.cc" open="1" top="0" tabpos="7">
+	<File name="../../machines/trainLR.cc" open="1" top="0" tabpos="2">
 		<Cursor position="2675" topLine="80" />
 	</File>
 	<File name="../../options/CMakeLists.txt" open="0" top="0" tabpos="8">
@@ -106,11 +106,11 @@
 	<File name="../../scanning/scanning.cc" open="0" top="0" tabpos="1">
 		<Cursor position="564" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_all.sh" open="0" top="0" tabpos="5">
-		<Cursor position="84" topLine="0" />
+	<File name="../../scanning/test_scanning_all.sh" open="1" top="1" tabpos="23">
+		<Cursor position="772" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="21">
-		<Cursor position="743" topLine="0" />
+	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="4">
+		<Cursor position="353" topLine="0" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="10">
 		<Cursor position="0" topLine="27" />

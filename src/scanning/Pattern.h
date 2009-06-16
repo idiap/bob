@@ -35,12 +35,17 @@ namespace Torch
 		}
 
 		// Check if it has the same sub-window as another pattern
-		bool		isEqual(const Pattern& other) const
+		bool		isEqual(const Pattern& other, int radius = 2) const
 		{
-			return 	m_x == other.m_x &&
-				m_y == other.m_y &&
-				m_w == other.m_w &&
-				m_h == other.m_h;
+//			return 	m_x == other.m_x &&
+//				m_y == other.m_y &&
+//				m_w == other.m_w &&
+//				m_h == other.m_h;
+
+			return 	m_x >= other.m_x - radius && m_x <= other.m_x + radius &&
+				m_y >= other.m_y - radius && m_y <= other.m_y + radius &&
+				m_w >= other.m_w - radius && m_w <= other.m_w + radius &&
+				m_h >= other.m_h - radius && m_h <= other.m_h + radius;
 		}
 
 		// Returns the percentage of the overlapping area of intersection with another one
