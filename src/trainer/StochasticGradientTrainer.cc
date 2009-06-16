@@ -95,7 +95,7 @@ namespace Torch
 	//
 	int max_iter = getIOption("max iter");
 	float end_accuracy = getFOption("end accuracy");
-	int early_stopping = getIOption("early stopping");
+	//int early_stopping = getIOption("early stopping");
 	float learning_rate = getFOption("learning rate");
 	float learning_rate_decay = getFOption("learning rate decay");
 	float weight_decay = getFOption("weight decay");
@@ -111,9 +111,9 @@ namespace Torch
 
 	g_machine->shuffle();
 
-	int n_parameters_ = g_machine->m_parameters->getI("n_parameters");
-	double *parameters_ = g_machine->m_parameters->getDarray("parameters");
-	double *der_parameters_ = g_machine->m_parameters->getDarray("der_parameters");
+	//int n_parameters_ = g_machine->m_parameters->getI("n_parameters");
+	//double *parameters_ = g_machine->m_parameters->getDarray("parameters");
+	//double *der_parameters_ = g_machine->m_parameters->getDarray("der_parameters");
 																		                
 	//
 	double current_learning_rate = learning_rate;

@@ -55,8 +55,8 @@ Machine::Machine()
 	: 	Object(),
 		m_size(),
 		m_core(0),
-		m_output(1),
-		m_parameters(new Parameters())
+		m_parameters(new Parameters()),
+		m_output(1)
 {
 }
 

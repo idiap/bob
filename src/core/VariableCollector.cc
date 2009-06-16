@@ -393,21 +393,6 @@ namespace Torch
 
 			for (int i = 0; i < m_size; i ++)
 			{
-				/*
-			   	int type_;
-				if (file.taggedRead(&type_, sizeof(int), 1, "TYPE") != 1)
-				{
-					Torch::message("VariableCollector::load - failed to load the type of the parameter <%s>!\n", m_variables[i].m_name);
-					Torch::print("> %d\n", type_);
-					return false;
-				}
-				Variable::Type type__ = (Variable::Type) type_;
-				if(type__ != m_variables[i].m_type)
-				{
-					Torch::message("VariableCollector::load - incorrect type of the parameter <%s>!\n", m_variables[i].m_name);
-					return false;
-				}
-				*/
 				//
 				char *str_ = new char [strlen(m_variables[i].m_name)+1];
 				int n_values_;
@@ -442,9 +427,6 @@ namespace Torch
 						return false;
 					}
 					setIarray(m_variables[i].m_name, n_values_);
-					//if(m_variables[i].m_value != NULL) delete[] (int*)m_variables[i].m_value;
-					//m_variables[i].m_value = new int[n_values_];
-					//m_variables[i].m_n_values = n_values_;
 					if (file.taggedRead((int *) m_variables[i].m_value, sizeof(int), m_variables[i].m_n_values, m_variables[i].m_name) != m_variables[i].m_n_values)
 					{
 						Torch::message("VariableCollector::load - failed to read <%s> field!\n", m_variables[i].m_name);
@@ -459,9 +441,6 @@ namespace Torch
 						return false;
 					}
 					setFarray(m_variables[i].m_name, n_values_);
-					//if(m_variables[i].m_value != NULL) delete[] (float*)m_variables[i].m_value;
-					//m_variables[i].m_value = new float[n_values_];
-					//m_variables[i].m_n_values = n_values_;
 					if (file.taggedRead((float *) m_variables[i].m_value, sizeof(float), m_variables[i].m_n_values, m_variables[i].m_name) != m_variables[i].m_n_values)
 					{
 						Torch::message("VariableCollector::load - failed to read <%s> field!\n", m_variables[i].m_name);
@@ -476,14 +455,16 @@ namespace Torch
 						return false;
 					}
 					setDarray(m_variables[i].m_name, n_values_);
-					//if(m_variables[i].m_value != NULL) delete[] (double*)m_variables[i].m_value;
-					//m_variables[i].m_value = new double[n_values_];
-					//m_variables[i].m_n_values = n_values_;
 					if (file.taggedRead((double *) m_variables[i].m_value, sizeof(double), m_variables[i].m_n_values, m_variables[i].m_name) != m_variables[i].m_n_values)
 					{
 						Torch::message("VariableCollector::load - failed to read <%s> field!\n", m_variables[i].m_name);
 						return false;
 					}
+					break;
+				case Variable::TypeNothing:
+				case Variable::TypeBool:
+				case Variable::TypeString:
+					Torch::message("VariableCollector::load - not handling this type yet sorry :-(\n");
 					break;
 				}
 				delete [] str_;
@@ -501,15 +482,6 @@ namespace Torch
 			}
 			for (int i = 0; i < m_size; i ++)
 			{
-			   	/*
-			   	int type_ = (int) m_variables[i].m_type;
-				Torch::print("> %d\n", type_);
-				if (file.taggedWrite(&type_, sizeof(int), 1, "TYPE") != 1)
-				{
-					Torch::message("VariableCollector::save - failed to write the type of the parameter <%s>!\n", m_variables[i].m_name);
-					return false;
-				}
-				*/
 				char *str_ = new char [strlen(m_variables[i].m_name)+1];
 				switch(m_variables[i].m_type)
 				{
@@ -573,6 +545,10 @@ namespace Torch
 						return false;
 					}
 					break;
+				case Variable::TypeNothing:
+				case Variable::TypeBool:
+				case Variable::TypeString:
+					Torch::message("VariableCollector::save - not handling this type yet sorry :-(\n");
 				}
 				delete []str_;
 			}
