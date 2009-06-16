@@ -12,6 +12,8 @@ namespace Torch {
 */
 class MultiVariateDiagonalGaussianDistribution : public MultiVariateNormalDistribution
 {
+	bool use_log;
+
 	double *posterior_numerator;
 	double *g_norm;
 
@@ -39,14 +41,24 @@ public:
 	///
 	virtual bool 		EMupdate();
 		
-	///
-	virtual bool 		forward(const DoubleTensor *input);
+	//
+	virtual double 		sampleProbabilityOneGaussian(double *sample_, int g);
 
 	//
-	virtual double 		sampleProbabilityOneGaussian(double *sample_, int g_);
+	virtual double 		sampleProbability(double *sample_);
 
+		/// Constructs an empty Machine of this kind - overriden
+		/// (used by <MachineManager>, this object should be deallocated by the user)
+		virtual Machine*	getAnInstance() const { return new MultiVariateDiagonalGaussianDistribution(); }
+
+		// Get the ID specific to each Machine - overriden
+		virtual int		getID() const { return MULTIVARIATE_DIAGONAL_GAUSSIAN_DISTRIBUTION_MACHINE_ID; }
 };
 	
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // REGISTER this machine to the <MachineManager>
+        const bool multivariate_diagonal_gaussian_machine_registered = MachineManager::getInstance().add(new MultiVariateDiagonalGaussianDistribution(), "MultiVariateDiagonalGaussianDistribution");
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 #endif

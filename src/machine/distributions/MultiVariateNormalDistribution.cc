@@ -74,6 +74,16 @@ MultiVariateNormalDistribution::~MultiVariateNormalDistribution()
 	THFree(means);
 }
 
+bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
+{
+	double *src = (double *) input->dataR();
+	double *dst = (double *) m_output.dataW();
+
+	dst[0] = sampleProbability(src);
+
+	return true;
+}
+
 /*
 void MultiVariateNormalDistribution::initMeans(real **means_)
 {
@@ -170,21 +180,29 @@ void MultiVariateNormalDistribution::initVariances(int n_data_, real **data_, re
 
 bool MultiVariateNormalDistribution::shuffle()
 {
+   	m_parameters->print("MultiVariateNormalDistribution parameters");
+	
    	double z = 0.0;
 
+	Torch::print("n_gaussians = %d\n", n_gaussians);
+	Torch::print("n_inputs = %d\n", n_inputs);
+	      
 	for(int j = 0 ; j < n_gaussians ; j++)
 	{
-		weights[j] = THRandom_uniform(0, 1);
-		z += weights[j];
+	   	//Torch::print("w[%d] = %g\n", j, weights[j]);
+		//weights[j] = THRandom_uniform(0, 1);
+		//z += weights[j];
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-			means[j][k] = THRandom_uniform(0, 1);
-			variances[j][k] = THRandom_uniform(0, 1);
+			//means[j][k] = THRandom_uniform(0, 1);
+			//variances[j][k] = THRandom_uniform(0, 1);
 		}
 	}
 
-	for(int j = 0 ; j < n_gaussians ; j++) weights[j] /= z;
+	//for(int j = 0 ; j < n_gaussians ; j++) weights[j] /= z;
+
+   	m_parameters->print("MultiVariateNormalDistribution parameters");
 
 	return true;
 }

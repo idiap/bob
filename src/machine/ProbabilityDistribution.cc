@@ -27,8 +27,8 @@ ProbabilityDistribution::ProbabilityDistribution(const int n_inputs_, const int 
 	m_parameters->addI("n_inputs", 0, "number of inputs of the probability distribution");
 	if(n_parameters_ > 0)
 	{
-		m_parameters->addI("n_parameters", n_parameters, "number of parameters of the probability distribution");
-		m_parameters->addDarray("parameters", n_parameters, 0, "parameters of the probability distribution");
+		m_parameters->addI("n_parameters", n_parameters_, "number of parameters of the probability distribution");
+		m_parameters->addDarray("parameters", n_parameters_, 0, "parameters of the probability distribution");
 	}
 	else
 	{
