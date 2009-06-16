@@ -3,7 +3,9 @@
 #
 SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/general.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/VariableCollector.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Object.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/Parameters.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/File.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/spCore.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipCore.cc"

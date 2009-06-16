@@ -53,6 +53,7 @@ Machine* loadMachineFromFile(const char* filename)
 
 Machine::Machine()
 	: 	Object(),
+		m_parameters(new Parameters()),
 		m_size(),
 		m_core(0),
 		m_output(1)
@@ -64,6 +65,8 @@ Machine::Machine()
 
 Machine::~Machine()
 {
+   	delete m_parameters;
+	delete m_core;
 }
 
 ///////////////////////////////////////////////////////////////////////////

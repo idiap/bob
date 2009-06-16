@@ -10,21 +10,25 @@ ASSIGNED
 ---
 
 Seb: 
-	fix Boosting framework (StumpMachine, ...)
-	GMM, HMM
-	NN, MLP
+	KMeans
+	GMM
+	HMM
+	MLP + StochasticTrainer
 	KSOM
+
+	Finds an elegant way to handle parameters (weigths, derivative, stump thresholds and dir, mean, stdv, ...)
+	of any type in the Machine class. Using for instance the OptionImpl scheme
+	but saving/loading them and adding vectors of any type !
 
 Venky: 
 	Boosting of Haar-like + MCT/LBP features
+	Boosting of Ferns and LBP features
+	fix Boosting framework (StumpMachine, ...)
 
 Ani: 
 	Boosting of HLBP features
 
-Venky: 
-	Boosting of Ferns and LBP features
-
-Nik:
+Nik: ?
 	PCA/LDA face recognition components linked with CBLAS for
 	matrix (2D tensor) routines (inversion, eigen decomposition) ?
 	
@@ -54,6 +58,16 @@ Src:
 		|__ ...
 	ImageScanDataSet
 	ipBlock
+	GradientMachine
+		Exp
+		Log
+		Sigmoid
+		Tanh
+		Linear
+	Criterion
+		MSECriterion
+	Normalisation
+		MeanVarNorm
 
 Examples:
 	gtimageextract.cc (examples/facetools) : object (face, ...) extraction from list of pairs (image, gt) -> tensor

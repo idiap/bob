@@ -26,6 +26,7 @@ namespace Torch {
 		/// Set the Machine to train
 		bool 		setMachine(Machine *m_machine_);
 
+		///
 		Machine* 	getMachine() const { return m_machine; } 
 
 	protected:

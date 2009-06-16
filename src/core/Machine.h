@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_MACHINE_H_
 
 #include "Object.h"
+#include "Parameters.h"
 #include "Tensor.h"
 
 namespace Torch {
@@ -73,6 +74,9 @@ namespace Torch {
 		spCore*			getCore() { return m_core; }
 
 		///////////////////////////////////////////////////////////
+
+		// Parameters of the machine
+		Parameters*		m_parameters;
 
 	protected:
 
