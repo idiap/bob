@@ -1,4 +1,4 @@
-#include "DiskDataSet.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

@@ -1,7 +1,4 @@
-#include "CmdLine.h"
-
-#include "Machines.h"
-#include "MSECriterion.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -31,7 +28,7 @@ int main(int argc, char* argv[])
 
 	GradientMachine *gm;
 	const DoubleTensor *input;
-	
+
 	for(int t = 0 ; t < n_t ; t++)
 	{
 		for(int j = 0 ; j < n_input ; j++)

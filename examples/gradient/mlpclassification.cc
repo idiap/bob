@@ -1,15 +1,4 @@
-#include "CmdLine.h"
-#include "FileList.h"
-#include "TensorFile.h"
-#include "MemoryDataSet.h"
-
-#include "MeanVarNorm.h"
-
-#include "MLP.h"
-#include "MSECriterion.h"
-#include "TwoClassNLLCriterion.h"
-#include "GradientTrainer.h"
-#include "StochasticGradientTrainer.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -74,7 +63,7 @@ int main(int argc, char* argv[])
 	if(n_targets <= 1)
 	{
 		warning("Not enough targets (at least 2).");
-		
+
 		delete file_list_train;
 
 		return 1;
@@ -84,7 +73,7 @@ int main(int argc, char* argv[])
 	if(n_targets != file_list_test->n_files)
 	{
 		warning("Different number of targets between the training and the test set :-(");
-		
+
 		delete file_list_test;
 		delete file_list_train;
 
@@ -103,7 +92,7 @@ int main(int argc, char* argv[])
 	if(loadDataSet(&mdataset_train, targets, &n_inputs, file_list_train) == false)
 	{
 		warning("Impossible to load the training dataset.");
-		
+
 		delete file_list_train;
 
 		return 1;
@@ -115,7 +104,7 @@ int main(int argc, char* argv[])
 	if(loadDataSet(&mdataset_test, targets, &n_inputs, file_list_test) == false)
 	{
 		warning("Impossible to load the testing dataset.");
-		
+
 		delete file_list_test;
 
 		return 1;
@@ -165,13 +154,13 @@ int main(int argc, char* argv[])
 
 	//
 	Trainer *trainer;
-	
-	if(stochastic) 
+
+	if(stochastic)
 	{
 		trainer = new StochasticGradientTrainer();
 		((StochasticGradientTrainer *) trainer)->setCriterion(criterion);
 	}
-	else 
+	else
 	{
 		trainer = new GradientTrainer();
 		((GradientTrainer *) trainer)->setCriterion(criterion);
@@ -194,18 +183,18 @@ int main(int argc, char* argv[])
 	print("Saving model file ...\n");
 	File ofile;
 	ofile.open("test.mlp", "w");
-	mlp->saveFile(ofile);	
+	mlp->saveFile(ofile);
 	ofile.close();
 	*/
 
-		
+
 	/*
 	print("Loading model file ...\n");
 	delete mlp; mlp = NULL;
 	mlp = new MLP();
 	File ifile;
 	ifile.open("test.mlp", "r");
-	mlp->loadFile(ifile);	
+	mlp->loadFile(ifile);
 	ifile.close();
 	*/
 
@@ -237,7 +226,7 @@ bool testDataSet(MemoryDataSet *mdataset, GradientMachine *mlp, bool one_hot_enc
 
 	double mean_P_output = 0.0;
 	double mean_N_output = 0.0;
-	
+
 	long n_examples = mdataset->getNoExamples();
 
 	for (long i=0 ; i<n_examples ; i++)
@@ -251,37 +240,37 @@ bool testDataSet(MemoryDataSet *mdataset, GradientMachine *mlp, bool one_hot_enc
 
 		//o->print("output");
 		//t->print("target");
-		
+
 		// here a target decoding class will be interesting to compute
 		// all possible errors: targetDecoding(n_targets, targets, one_hot_encoding);
 		if(one_hot_encoding)
 		{
 			warning("sorry I don't know yet how to evaluate errors with one hot encoding :-(");
 
-			if(t->get(0) > 0) 
+			if(t->get(0) > 0)
 			{
 				nP++;
 			}
 
-			if(t->get(0) < 0) 
+			if(t->get(0) < 0)
 			{
 				nN++;
 			}
 		}
 		else
 		{
-			if(t->get(0) > 0) 
+			if(t->get(0) > 0)
 			{
 				if(o->get(0) > 0) true_accept++;
-				else false_reject++; 
+				else false_reject++;
 				nP++;
 				mean_P_output += o->get(0);
 			}
 
-			if(t->get(0) < 0) 
+			if(t->get(0) < 0)
 			{
 				if(o->get(0) < 0) true_reject++;
-				else false_accept++; 
+				else false_accept++;
 				nN++;
 				mean_N_output += o->get(0);
 			}
@@ -408,7 +397,7 @@ bool loadDataSet(MemoryDataSet *mdataset, FloatTensor *targets, int *n_inputs, F
 
 			// to support type conversion
 			example->copy(tensor);
-			
+
 			//tf.load(*example);
 
 			delete tensor;

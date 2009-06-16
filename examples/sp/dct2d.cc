@@ -1,5 +1,4 @@
-#include "spDCT.h"
-#include "Tensor.h"
+#include "torch5spro.h"
 #include <cassert>
 
 using namespace Torch;
@@ -27,7 +26,7 @@ int main()
 		}
 
 	image.print("x");
-	
+
 	//
 	spDCT dct2d;
 	print("Computing the DCT of x ...\n");

@@ -1,6 +1,4 @@
-#include "File.h"
-#include "Machines.h"
-#include "spCores.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

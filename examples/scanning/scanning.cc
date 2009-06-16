@@ -1,30 +1,4 @@
-// Scanning objects
-#include "Scanner.h"
-
-#include "PyramidExplorer.h"
-#include "MSExplorer.h"
-#include "GreedyExplorer.h"
-
-#include "ExhaustiveScaleExplorer.h"
-#include "RandomScaleExplorer.h"
-#include "SpiralScaleExplorer.h"
-
-#include "ipSWEvaluator.h"
-#include "ipSWVariancePruner.h"
-
-#include "OverlapSelector.h"
-#include "MeanShiftSelector.h"
-
-// Utilities, image processing
-#include "CmdLine.h"
-#include "FileListCmdOption.h"
-#include "Color.h"
-#include "general.h"
-#include "Image.h"
-#include "xtprobeImageFile.h"
-
-#include "Machines.h"
-#include "spCores.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

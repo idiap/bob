@@ -1,5 +1,4 @@
-#include "spFFT.h"
-#include "Tensor.h"
+#include "torch5spro.h"
 #include <cassert>
 
 using namespace Torch;
@@ -25,7 +24,7 @@ int main()
 	}
 
 	data.print("x");
-	
+
 	//
 	spFFT fft1d;
 	print("Computing the FFT of x ...\n");
@@ -58,7 +57,7 @@ int main()
 		}
 
 		//x.print("x");
-	
+
 		//
 		spFFT fft1d;
 		print("  Computing the FFT of x ...\n");

@@ -66,6 +66,14 @@ ADD_LIBRARY(torch5spro ${TORCH5SPRO_SRC})
 
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
 
+# Prepare the main header
+EXECUTE_PROCESS(COMMAND "../makeincludeh.csh"
+			"${TORCH5SPRO_INCLUDE}"
+			"${CMAKE_CURRENT_SOURCE_DIR}/../include"
+			"../torch5spro.h"
+			"include"
+			"TensorGen.h THTensorGen.h THStorageGen.h")
+
 ########################################################
 # Make it verbose
 

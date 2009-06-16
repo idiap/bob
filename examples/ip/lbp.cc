@@ -1,7 +1,4 @@
-#include "ipLBP4R.h"
-#include "ipLBP8R.h"
-#include "Image.h"
-#include "xtprobeImageFile.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

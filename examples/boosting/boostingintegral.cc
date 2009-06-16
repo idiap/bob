@@ -1,22 +1,6 @@
-#include "CmdLine.h"
+#include "torch5spro.h"
 
-#include "TensorList.h"
-#include "MemoryDataSet.h"
-
-#include "BoostingTrainer.h"
-#include "StumpTrainer.h"
-#include "StumpMachine.h"
-#include "WeakLearner.h"
-#include "ipHaarLienhart.h"
-#include "ipIntegral.h"
-
-#include "spDeltaOne.h"
-#include "CascadeMachine.h"
-#include "Machines.h"
-#include "spCore.h"
-#include "spCores.h"
 using namespace Torch;
-
 
 int main(int argc, char* argv[])
 {

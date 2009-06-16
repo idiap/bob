@@ -1,6 +1,4 @@
-#include "LRMachine.h"
-#include "LRTrainer.h"
-#include "MemoryDataSet.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

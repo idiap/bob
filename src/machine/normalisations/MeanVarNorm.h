@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_MEANVAR_NORM_H_
 
 #include "Machines.h"
+#include "Machine.h"
 #include "DataSet.h"
 
 namespace Torch
@@ -18,9 +19,9 @@ namespace Torch
 
 		/// Constructors
 		MeanVarNorm();
-		
+
 		MeanVarNorm(const int n_inputs_, DataSet *dataset);
-		
+
 		/// Destructor
 		virtual ~MeanVarNorm();
 

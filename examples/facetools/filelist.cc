@@ -1,17 +1,4 @@
-#include "FileList.h"
-
-#include "eyecenterGTFile.h"
-#include "eyecornerGTFile.h"
-#include "bancaGTFile.h"
-#include "cootesGTFile.h"
-#include "frontalEyeNoseChinGTFile.h"
-#include "halfprofileEyeNoseChinGTFile.h"
-#include "profileEyeNoseChinGTFile.h"
-
-#include "Image.h"
-#include "xtprobeImageFile.h"
-
-#include "CmdLine.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

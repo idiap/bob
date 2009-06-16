@@ -1,8 +1,4 @@
-#include "File.h"
-#include "Image.h"
-#include "xtprobeImageFile.h"
-#include "Machines.h"
-#include "spCores.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

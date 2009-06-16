@@ -1,4 +1,4 @@
-#include "MemoryDataSet.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	}
 
 	MemoryDataSet mdataset;
-			
+
 	print("MemoryDataSet with [%d] examples of ShortTensor[%dx%d] and [%d] targets ...\n", n_examples, size0, size1, n_targets);
 
 	// Resize

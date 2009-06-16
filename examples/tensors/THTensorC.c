@@ -1,4 +1,4 @@
-#include "TH.h"
+#include "torch5spro.h"
 
 void print(const char *fmt, ...)
 {

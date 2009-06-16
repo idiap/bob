@@ -7,10 +7,9 @@ namespace Torch
 // Constructor
 
 MeanShiftSelector::MeanShiftSelector()
-	:	m_bandwidthsComputed(false),
-		m_bandwidths(0),
-		m_inv_bandwidths(0),
-		m_candidates(0)
+	:	m_iclosest(0), m_iDistClosest(0), m_kclosest(0),
+		m_bandwidthsComputed(false), m_bandwidths(0), m_inv_bandwidths2(0), m_inv_bandwidths6(0),
+		m_n_allocated(0)
 {
 }
 
@@ -19,8 +18,12 @@ MeanShiftSelector::MeanShiftSelector()
 
 MeanShiftSelector::~MeanShiftSelector()
 {
+	delete[] m_iclosest;
+	delete[] m_iDistClosest;
+	delete[] m_kclosest;
 	delete[] m_bandwidths;
-	delete[] m_inv_bandwidths;
+	delete[] m_inv_bandwidths2;
+	delete[] m_inv_bandwidths6;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -32,21 +35,62 @@ void MeanShiftSelector::clear()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Compute the kernel function (actual the derivate)
+// Check if two sub-window intersects
 
-static double kernel(double distance, double bandwidth)
+static bool areSWIntersected(	double sw1_cx, double sw1_cy, double sw1_w, double sw1_h,
+				double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
 {
-	return 1.0;
-	const double inv = distance / bandwidth;
-	return inv * inv;
+	const double sw1_x = sw1_cx - 0.5 * sw1_w;
+	const double sw1_y = sw1_cy - 0.5 * sw1_h;
+
+	const double sw2_x = sw2_cx - 0.5 * sw2_w;
+	const double sw2_y = sw2_cy - 0.5 * sw2_h;
+
+	return 	sw2_x <= sw1_x + sw1_w &&
+		sw2_x + sw2_w >= sw1_x &&
+		sw2_y <= sw1_y + sw1_h &&
+		sw2_y + sw2_h >= sw1_y;
+
+//	// Check the corners - left
+//	const double x_min = min(sw1_x, sw2_x);
+//	const double overlap_x_min = max(sw1_x, sw2_x);
+//
+//	// Check the corners - top
+//	const double y_min = min(sw1_y, sw2_y);
+//	const double overlap_y_min = max(sw1_y, sw2_y);
+//
+//	// Check the corners - right
+//	const double x_max = max(sw1_x + sw1_w, sw2_x + sw2_w);
+//	const double overlap_x_max = min(sw1_x + sw1_w, sw2_x + sw2_w);
+//
+//	// Check the corners - bottom
+//	const double y_max = max(sw1_y + sw1_h, sw2_y + sw2_h);
+//	const double overlap_y_max = min(sw1_y + sw1_h, sw2_y + sw2_h);
+//
+//	// No intersection
+//	return  !(	overlap_x_max < overlap_x_min || overlap_y_max < overlap_y_min ||
+//			x_max - x_min > sw1_w + sw2_w || y_max - y_min > sw1_h + sw2_h);
+}
+
+static bool areSWIntersected(	const Pattern& pattern,
+				double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
+{
+	return areSWIntersected(pattern.getCenterX(), pattern.getCenterY(), pattern.m_w, pattern.m_h,
+				sw2_cx, sw2_cy, sw2_w, sw2_h);
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Get the distance between two points (x, y, w, h)
+// Compute the Jaccard distance between two subwindows
 
-static double sw_intersection(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
-				double sw2_x, double sw2_y, double sw2_w, double sw2_h)
+static double Jaccard(	double sw1_cx, double sw1_cy, double sw1_w, double sw1_h,
+			double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
 {
+	const double sw1_x = sw1_cx - 0.5 * sw1_w;
+	const double sw1_y = sw1_cy - 0.5 * sw1_h;
+
+	const double sw2_x = sw2_cx - 0.5 * sw2_w;
+	const double sw2_y = sw2_cy - 0.5 * sw2_h;
+
 	// Check for intersection
 	if (	sw2_x <= sw1_x + sw1_w &&
 		sw2_x + sw2_w >= sw1_x &&
@@ -60,107 +104,23 @@ static double sw_intersection(	double sw1_x, double sw1_y, double sw1_w, double 
 		const double y_min = max(sw1_y, sw2_y);
 		const double y_max = min(sw1_y + sw1_h, sw2_y + sw2_h);
 
-		return (x_max - x_min) * (y_max - y_min);
+		const double inters = (x_max - x_min) * (y_max - y_min);
+
+		// http://en.wikipedia.org/wiki/Jaccard_index
+		return 1.0 - inters / (sw1_w * sw1_h + sw2_w * sw2_h - inters);
 	}
 	else
 	{
 		// No intersection
-		return 0.0;
+		return 1.0;
 	}
 }
 
-inline double sw_dist(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
-			double sw2_x, double sw2_y, double sw2_w, double sw2_h)
+static double Jaccard(	const Pattern& pattern,
+			double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
 {
-	// http://en.wikipedia.org/wiki/Jaccard_index
-	const double inters = sw_intersection(sw1_x, sw1_y, sw1_w, sw1_h, sw2_x, sw2_y, sw2_w, sw2_h);
-	return 1.0 - inters / (sw1_w * sw1_h + sw2_w * sw2_h - inters);
-
-	// http://en.wikipedia.org/wiki/Dice%27s_coefficient
-	//return 1.0 - 2.0 * inters / (sw1_w * sw1_h + sw2_w * sw2_h);
-
-	// Overlap distance: 1 - inters / min (x, y) ?!
-	//return 1.0 - inters / min(sw1_w * sw1_h, sw2_w * sw2_h);
-}
-
-inline double sw_dist(const Pattern& pattern, double x, double y, double w, double h)
-{
-	return sw_dist(	(double)pattern.m_x, (double)pattern.m_y,
-			(double)pattern.m_w, (double)pattern.m_h,
-			x, y, w, h);
-}
-
-inline void sw_dist_deriv(	double sw1_x, double sw1_y, double sw1_w, double sw1_h,
-				double sw2_x, double sw2_y, double sw2_w, double sw2_h,
-				double& deriv_x, double& deriv_y, double& deriv_w, double& deriv_h)
-{
-	// NB: the second subwindow is considered the point where the derivate is taken!
-
-	// Dice-based distance derivate
-	const double inters = sw_intersection(sw1_x, sw1_y, sw1_w, sw1_h, sw2_x, sw2_y, sw2_w, sw2_h);
-	const double inv = 1.0 / (sw1_w * sw1_h + sw2_w * sw2_h);
-	const double dist = 1.0 - 2.0 * inters * inv;
-
-	deriv_x = 2 * dist * inv * (sw2_x - 2.0 * sw1_x - sw2_x * dist);
-	deriv_y = 2 * dist * inv * (sw2_y - 2.0 * sw1_y - sw2_y * dist);
-	deriv_w = 2 * dist * inv * (sw2_w - 2.0 * sw1_w - sw2_w * dist);
-	deriv_h = 2 * dist * inv * (sw2_h - 2.0 * sw1_h - sw2_h * dist);
-}
-
-inline void sw_dist_deriv(	const Pattern& pattern, double x, double y, double w, double h,
-				double& deriv_x, double& deriv_y, double& deriv_w, double& deriv_h)
-{
-	sw_dist_deriv(	(double)pattern.m_x, (double)pattern.m_y,
-			(double)pattern.m_w, (double)pattern.m_h,
-			x, y, w, h,
-			deriv_x, deriv_y, deriv_w, deriv_h);
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Get the closest points to the given one
-// Returns the number of found points
-
-inline int MeanShiftSelector::getClosest(const Pattern& pattern)
-{
-	return getClosest(	(double)pattern.m_x,
-				(double)pattern.m_y,
-				(double)pattern.m_w,
-				(double)pattern.m_h);
-}
-
-int MeanShiftSelector::getClosest(double x, double y, double w, double h)
-{
-	const int n_patterns = m_candidates->size();
-	int isize = 0;
-
-	if (m_bandwidthsComputed == false)
-	{
-		// Add to the list each sub-window with at least some intersection!
-		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
-		{
-			const double distance = sw_dist(m_candidates->get(i), x, y, w, h);
-			if (distance < 1.0)
-			{
-				m_iclosest[isize] = i;
-				m_iDistClosest[isize ++] = distance;
-			}
-		}
-	}
-	else
-	{
-		// Add to the list each sub-window within its bandwidth!
-		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
-		{
-			const double distance = sw_dist(m_candidates->get(i), x, y, w, h);
-			if (distance < m_bandwidths[i])
-			{
-				m_iclosest[isize] = i;
-				m_iDistClosest[isize ++] = distance;
-			}
-		}
-	}
-
-	return isize;
+	return Jaccard(	pattern.getCenterX(), pattern.getCenterY(), pattern.m_w, pattern.m_h,
+			sw2_cx, sw2_cy, sw2_w, sw2_h);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -169,11 +129,7 @@ int MeanShiftSelector::getClosest(double x, double y, double w, double h)
 
 bool MeanShiftSelector::process(const PatternList& candidates)
 {
-	// Get parameters
 	const bool verbose = getBOption("verbose");
-	const int max_n_iters = 100;		// Maximum number of iterations
-	const double kclosest_max_var = 3.0;	// Maximum variation (avg +/- n * stdev) to find kclosest
-	const double inv_kclosest_max_var = 1.0 / kclosest_max_var;
 
 	// Check parameters
 	if (candidates.isEmpty() == true)
@@ -185,178 +141,203 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 		return true;
 	}
 
+//	// Cluster in two steps:
+//	//	- first the width and height of the sub-windows
+//	//	- second the center of the sub-windows
+//	PatternList temp_patterns;
+//	const double avg_iters_wh = cluster(	candidates, temp_patterns,
+//						false, false, true, true,
+//						getESquareDistWH, getESquareDistWH,
+//						getLinearKernel,
+//						verbose);
+//
+//	const double avg_iters_cxy = cluster(	temp_patterns, m_patterns,
+//						true, true, false, false,
+//						getESquareDistCxCy, getESquareDistCxCy,
+//						getLinearKernel,
+//						verbose);
+
+	// AMS clustering
+	const double avg_iters = cluster(	candidates, m_patterns,
+						true, true, true, true,
+						getESquareDistAll, getESquareDistAll,
+						getLinearKernel,
+						verbose);
+
+	// Debug
+	if (verbose == true)
+	{
+//		print("Adaptive Mean Shift clustering - average number of iterations: step1 = %lf, step2 = %lf\n",
+//			avg_iters_wh, avg_iters_cxy);
+		print("Adaptive Mean Shift clustering - average number of iterations = %lf.\n",
+			avg_iters);
+	}
+
+	// OK
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Estimate the bandwidth of some point using the kclosest distance
+// marking the border of the variance in the (avg +/- n * stdev) domain
+//		(== the k+1 point will have a too high variance!!! ==)
+
+double MeanShiftSelector::getBandwidth(double* distances, int size, int& kclosest)
+{
+	static const double eps = 0.000001;
+
+	if (size <= 1)
+	{
+		// An unrelated sub-window
+		kclosest = 0;
+		return 0.0;
+	}
+
+	else
+	{
+		static const double kclosest_max_var = 3.0;	// Maximum variation (avg +/- n * stdev) to find kclosest
+		static const double inv_kclosest_max_var = 1.0 / kclosest_max_var;
+
+		// Choose the kclosest points as to have the given maximum variance
+		double sum = distances[0] + distances[1];
+		double sum_square = distances[0] * distances[0] + distances[1] * distances[1];
+
+		// Search the closest points that are within average +/- N * sigma from the previous ones
+		kclosest = 1;
+		while (kclosest + 1 < size)
+		{
+			const double inv = 1.0 / (kclosest + 1.0);
+			const double average = inv * sum;
+			const double diff = inv_kclosest_max_var * (distances[kclosest + 1] - average);
+
+			if (	distances[kclosest] > eps &&
+				sum_square - average * average < diff * diff * kclosest)
+			{
+				break;
+			}
+
+			kclosest ++;
+			sum += distances[kclosest];
+			sum_square += distances[kclosest] * distances[kclosest];
+		}
+
+		return distances[kclosest];
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Cluster using AMS (in 2 dimensions) the given subwindows
+// - returns the average number of iterations
+
+double MeanShiftSelector::cluster(	const PatternList& candidates, PatternList& clusters,
+					bool mask_cx, bool mask_cy, bool mask_w, bool mask_h,
+					FnGetESquareDist fn_esquare, FnGetESquareDist_P fn_esquare_p,
+					FnGetKernel fn_kernel,
+					bool verbose)
+{
+	static const double eps = 0.000001;
+
 	////////////////////////////////////////////////////////////////
 	// Cluster the patterns using AMS (Adaptive Bandwidth Mean Shift)
-	//	and a grid structure to fast retrieve the closest points
 
-	// Allocate bandwidths and other buffers
+	// Allocate buffers
 	const int n_patterns = candidates.size();
-	delete[] m_bandwidths;
-	delete[] m_inv_bandwidths;
-	m_bandwidths = new double[n_patterns];
-	m_inv_bandwidths = new double[n_patterns];
-	m_bandwidthsComputed = false;
-
-	for (int i = 0; i < n_patterns; i ++)
+	if (n_patterns > m_n_allocated)
 	{
-		m_bandwidths[i] = 10000000.0;
+		delete[] m_iclosest;
+		delete[] m_iDistClosest;
+		delete[] m_kclosest;
+		delete[] m_bandwidths;
+		delete[] m_inv_bandwidths2;
+		delete[] m_inv_bandwidths6;
+
+		m_n_allocated = n_patterns;
+
+		m_iclosest = new int[m_n_allocated * MaxNoClosestPoints];
+		m_iDistClosest = new double[m_n_allocated * MaxNoClosestPoints];
+		m_kclosest = new int[m_n_allocated];
+		m_bandwidths = new double[m_n_allocated];
+		m_inv_bandwidths2 = new double[m_n_allocated];
+		m_inv_bandwidths6 = new double[m_n_allocated];
 	}
 
-	m_candidates = &candidates;
-
-	// AMS: compute the adaptive bandwidth for each point/pattern/SW
+	// AMS: initialize bandwidths as the kclosest distance with an intersected subwindow
+	m_bandwidthsComputed = false;
 	for (int i = 0; i < n_patterns; i ++)
 	{
-		const Pattern& crt_pattern = candidates.get(i);
+		int* idx_closest = &m_iclosest[i * MaxNoClosestPoints];
+		double* dist_closest = &m_iDistClosest[i * MaxNoClosestPoints];
 
-		// Get the closest points to estimate the bandwidth
-		int n_closest_points = getClosest(crt_pattern);
-		if (n_closest_points <= 1)
+		const int n_closest = getClosest(	candidates, candidates.get(i),
+							idx_closest, dist_closest,
+							fn_esquare_p);
+
+		m_bandwidths[i] = getBandwidth(dist_closest, n_closest, m_kclosest[i]);
+	}
+
+	// AMS: adjust the bandwidths
+	bool changed = true;
+	while (changed == true)
+	{
+		changed = false;
+		for (int i = 0; i < n_patterns; i ++)
 		{
-			m_bandwidths[i] = 0.0;
-			m_inv_bandwidths[i] = 1.0;
-		}
-		else
-		{
-			// Sort them after the distance
-			qsort(m_iDistClosest, n_closest_points, sizeof(double), compare_doubles);
+			int* idx_closest = &m_iclosest[i * MaxNoClosestPoints];
+			double* dist_closest = &m_iDistClosest[i * MaxNoClosestPoints];
+			const int kclosest = m_kclosest[i];
 
-//			print("DISTANCES: ");
-//			for (int j = 0; j < n_closest_points; j ++)
-//			{
-//				print("%4.3f, ", m_iDistClosest[j]);
-//			}
-//			print("\n");
-
-			// Choose the kclosest points as to have the given maximum variance
-			double sum = m_iDistClosest[0] + m_iDistClosest[1];
-			double sum_square = m_iDistClosest[0] * m_iDistClosest[0] + m_iDistClosest[1] * m_iDistClosest[1];
-
-			int kclosest = 1;
-			if (m_iDistClosest[kclosest] > 0.99)
+			// An unrelated sub-window
+			if (kclosest == 0)
 			{
-				// If the closest point has no intersection, than the bandwidth should be zero!
-				kclosest = 0;
+				continue;
 			}
-			else
+
+			// Relax the bandwidth if there is with kclosest subwindow having the bandwidth
+			//	smaller than the distance to the current point
+			// => implies that the current point is not correlated with some of the kclosest points
+			for (int k = 0; k < kclosest; k ++)
 			{
-				// Search the closest points that are within average +/- 3 * sigma from the previous ones
-				while (	kclosest + 1 < n_closest_points &&
-					m_iDistClosest[kclosest + 1] < 0.99)
+				const int j = idx_closest[k];
+				if (m_bandwidths[j] + eps < dist_closest[k])
 				{
-					const double inv = 1.0 / (kclosest + 1.0);
-					const double inv_square = inv * inv;
-
-					const double diff = inv_kclosest_max_var * (m_iDistClosest[kclosest + 1] - inv * sum);
-					if (inv * sum_square - inv_square * sum * sum < diff * diff)
-					{
-						break;
-					}
-
-					kclosest ++;
-					sum += m_iDistClosest[kclosest];
-					sum_square += m_iDistClosest[kclosest] * m_iDistClosest[kclosest];
+					m_kclosest[i] = kclosest - 1;
+					m_bandwidths[i] = dist_closest[kclosest - 1];
+					changed = true;
+					break;
 				}
 			}
-
-			// Set the bandwidth as the distance to the kclosest point
-			m_bandwidths[i] = m_iDistClosest[kclosest];
-			m_inv_bandwidths[i] = m_bandwidths[i] == 0.0 ? 1.0 : 1.0 / pow(m_bandwidths[i], 6.0);
-//			print("[%d]: bandwidth = %f, inv_bandwidth = %f\n", i, m_bandwidths[i], m_inv_bandwidths[i]);
-//			print("\n");
 		}
 	}
-
 	m_bandwidthsComputed = true;
 
-	// AMS (for each point until convergence)
-	int sum_n_iters = 0;
-	int cnt_n_iters = 0;
+	// AMS: precompute the inverses of the bandwidths
 	for (int i = 0; i < n_patterns; i ++)
 	{
-		// Uncorrelated subwindow
-		if (m_bandwidths[i] == 0.0)
-		{
-			m_patterns.add(candidates.get(i));
-			continue;
-		}
+		m_bandwidths[i] += 1.0;
+		m_inv_bandwidths2[i] = 1.0 / m_bandwidths[i];
+		m_inv_bandwidths6[i] = m_inv_bandwidths2[i] * m_inv_bandwidths2[i] * m_inv_bandwidths2[i];
+	}
 
-		// Need to find the subwindow's cluster
+	// AMS: converge each point to its cluster
+	int sum_n_iters = 0;
+	int cnt_n_iters = 0;
+	srand((unsigned int)time(0));
+	for (int i = 0; i < n_patterns; i ++)
+	{
+		// Find its stationary point
 		const Pattern& crt_pattern = candidates.get(i);
-		double crt_x = crt_pattern.m_x;
-		double crt_y = crt_pattern.m_y;
+		double crt_cx = crt_pattern.getCenterX();
+		double crt_cy = crt_pattern.getCenterY();
 		double crt_w = crt_pattern.m_w;
 		double crt_h = crt_pattern.m_h;
-
-		// Iterate until convergence (or the maximum number of iterations was reached)
-		int n_iters = 0;
-		int cnt = 0;
-		//print("------------------------\n");
-		while ((n_iters ++) < max_n_iters)
-		{
-			double sum_x = 0.0, sum_y = 0.0;
-			double sum_w = 0.0, sum_h = 0.0;
-			double sum_weights = 0.0;
-			cnt = 0;
-
-			// Compute the mean shift looking for neighbour patterns
-			const int n_closest_points = getClosest(crt_x, crt_y, crt_w, crt_h);
-			for (int j = 0; j < n_closest_points; j ++)
-			{
-				const int k = m_iclosest[j];
-				const Pattern& pattern = candidates.get(k);
-
-				const double distance = m_iDistClosest[j];
-				const double weight = m_inv_bandwidths[k] * kernel(distance, m_bandwidths[k]);
-
-				//const double weight = kernel(distance, m_bandwidths[k]);
-				//
-				//double deriv_x, deriv_y, deriv_w, deriv_h;
-				//sw_dist_deriv(	pattern, crt_x, crt_y, crt_w, crt_h,
-				//		deriv_x, deriv_y, deriv_w, deriv_h);
-				//print("\tderiv = (%f, %f, %f, %f)\n", deriv_x, deriv_y, deriv_w, deriv_h);
-
-				sum_x += weight * pattern.m_x;
-				sum_y += weight * pattern.m_y;
-				sum_w += weight * pattern.m_w;
-				sum_h += weight * pattern.m_h;
-				sum_weights += weight;
-
-				cnt ++;
-			}
-
-			// Update the current position (if not converged yet)
-			if (cnt <= 1)
-			{
-				break;
-			}
-
-			const double inv = 1.0 / sum_weights;
-			const double new_crt_x = inv * sum_x;
-			const double new_crt_y = inv * sum_y;
-			const double new_crt_w = inv * sum_w;
-			const double new_crt_h = inv * sum_h;
-
-			//print("iters[%d]: (%f, %f, %f, %f)\n", n_iters, new_crt_x, new_crt_y, new_crt_w, new_crt_h);
-
-			static const double eps = 0.000001;
-			const double dist = sw_dist(	new_crt_x, new_crt_y, new_crt_w, new_crt_h,
-							crt_x, crt_y, crt_w, crt_h);
-			//print("\t>>> dist = %f, cnt = %d\n", dist, cnt);
-			if (dist < eps)
-			{
-				break;
-			}
-
-			crt_x = new_crt_x;
-			crt_y = new_crt_y;
-			crt_w = new_crt_w;
-			crt_h = new_crt_h;
-		}
+		const int n_iters = converge(	crt_cx, crt_cy, crt_w, crt_h,
+						mask_cx, mask_cy, mask_w, mask_h,
+						candidates,
+						fn_esquare, fn_esquare_p, fn_kernel);
 
 		// Add the converged point (~ density mode) to the list
-		m_patterns.add(Pattern(	FixI(crt_x),
-					FixI(crt_y),
+		clusters.add(Pattern(	FixI(crt_cx) - FixI(crt_w) / 2,
+					FixI(crt_cy) - FixI(crt_h) / 2,
 					FixI(crt_w),
 					FixI(crt_h),
 					crt_pattern.m_confidence),
@@ -364,85 +345,134 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 
 		sum_n_iters += n_iters;
 		cnt_n_iters ++;
-
-		//print("[(%d, %d) - %dx%d] --->>> [(%d, %d) - %dx%d]\n",
-		//	crt_pattern.getCenterX(), crt_pattern.getCenterY(),
-		//	crt_pattern.m_w, crt_pattern.m_h,
-		//	FixI(crt_cx - 0.5f * crt_w),
-		//	FixI(crt_cy - 0.5f * crt_h),
-		//	FixI(crt_w),
-		//	FixI(crt_h));
 	}
 
-	// Debug
-	if (verbose == true)
-	{
-		print("Adaptive Mean Shift clustering: average number of iterations = %f\n",
-			(sum_n_iters + 0.0) / (cnt_n_iters == 0 ? 1.0 : (cnt_n_iters + 0.0)));
-	}
-
-	// Cleanup
-	delete[] m_bandwidths;
-	delete[] m_inv_bandwidths;
-	m_bandwidths = 0;
-	m_inv_bandwidths = 0;
-
-	// OK
-	return true;
+	return (sum_n_iters + 0.0) / (cnt_n_iters == 0 ? 1.0 : (cnt_n_iters + 0.0));
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Fast (linear time) median search (kth-element, more general)
-// http://valis.cs.uiuc.edu/~sariel/research/CG/applets/linear_prog/median.html
-// (std::nth_element function from STL does the same thing!!!)
+// Converge a given point using AMS
+// - returns the number of iterations
 
-static double kth_element(double* data, int size, int kth, double* buffer)
+int MeanShiftSelector::converge(double& crt_cx, double& crt_cy, double& crt_w, double& crt_h,
+				bool mask_cx, bool mask_cy, bool mask_w, bool mask_h,
+				const PatternList& candidates,
+				FnGetESquareDist fn_esquare, FnGetESquareDist_P fn_esquare_p,
+				FnGetKernel fn_kernel)
 {
-	// Trivial cases: 1 or 2 elements
-	if (size == 1)
+	static const double eps = 0.000001;
+	const int max_n_iters = 100;
+
+	// Iterate until convergence (or the maximum number of iterations was reached)
+	int n_iters = 0;
+	while ((n_iters ++) < max_n_iters)
 	{
-		return data[0];
-	}
-	else if (size == 2)
-	{
-		return kth == 0 ? min(data[0], data[1]) : max(data[0], data[1]);
+		double sum_cx = 0.0, sum_cy = 0.0;
+		double sum_w = 0.0, sum_h = 0.0;
+		double sum_weights = 0.0;
+
+		// Compute the mean shift looking for neighbour patterns
+		const int n_closest = getClosest(	candidates, crt_cx, crt_cy, crt_w, crt_h,
+							m_iclosest, m_iDistClosest,
+							fn_esquare_p);
+		for (int j = 0; j < n_closest; j ++)
+		{
+			const int k = m_iclosest[j];
+			const Pattern& pattern = candidates.get(k);
+
+			const double distance = m_iDistClosest[j];
+			const double weight = m_inv_bandwidths6[k] * (*fn_kernel)(distance, m_inv_bandwidths2[k]);
+
+			sum_cx += weight * pattern.getCenterX();
+			sum_cy += weight * pattern.getCenterY();
+			sum_w += weight * pattern.m_w;
+			sum_h += weight * pattern.m_h;
+			sum_weights += weight;
+		}
+
+		// Update the current position (if not converged already)
+		if (n_closest <= 1)
+		{
+			break;
+		}
+
+		const double inv = 1.0 / sum_weights;
+		const double new_crt_cx = mask_cx == true ? inv * sum_cx : crt_cx;
+		const double new_crt_cy = mask_cy == true ? inv * sum_cy : crt_cy;
+		const double new_crt_w = mask_w == true ? inv * sum_w : crt_w;
+		const double new_crt_h = mask_h == true ? inv * sum_h : crt_h;
+
+		if ((*fn_esquare)(	new_crt_cx, new_crt_cy, new_crt_w, new_crt_h,
+					crt_cx, crt_cy, crt_w, crt_h) < eps)
+		{
+			// Convergence: the new sub-window is overlapping almost perfectly the one at the last iteration!
+			break;
+		}
+
+		crt_cx = new_crt_cx;
+		crt_cy = new_crt_cy;
+		crt_w = new_crt_w;
+		crt_h = new_crt_h;
 	}
 
-	// Put the values less than <test_val> at the begining and greater at the end
-	const double test_val = data[rand() % size];
-	int iless = 0, igreater = 0, iequal = 0;
-	for (int i = 0; i < size; i ++)
-	{
-		if (data[i] < test_val)
-		{
-			buffer[iless ++] = data[i];
-		}
-		else if (data[i] > test_val)
-		{
-			buffer[size - (1 + igreater ++)] = data[i];
-		}
-		else
-		{
-			iequal ++;
-		}
-	}
+	return n_iters;
+}
 
-	// Decision
-	if (iless <= kth && kth <= iless + iequal)
+/////////////////////////////////////////////////////////////////////////
+// Get the closest points to the given one
+// - returns the number of found points
+
+int MeanShiftSelector::getClosest(	const PatternList& candidates,
+					double cx, double cy, double w, double h,
+					int* idx_closest, double* dist_closest,
+					FnGetESquareDist_P fn_esquare_p)
+{
+	static const double max_jaccard = 0.7;
+
+	const int n_patterns = candidates.size();
+
+	int isize = 0;
+	if (m_bandwidthsComputed == false)
 	{
-		// Found it!
-		return test_val;
-	}
-	else if (iless < kth)
-	{
-		// Search in the list of the greater values
-		return kth_element(&buffer[iless + iequal], igreater, kth - (iless + iequal), data);
+		// Add to the list each sub-window with at least some intersection!
+		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
+			if (	areSWIntersected(candidates.get(i), cx, cy, w, h) == true &&
+				Jaccard(candidates.get(i), cx, cy, w, h) < max_jaccard)
+			{
+				idx_closest[isize] = i;
+				dist_closest[isize ++] = (*fn_esquare_p)(candidates.get(i), cx, cy, w, h);
+			}
+
+		// Sort the distances keeping the indexes
+		for (int i = 0; i < isize; i ++)
+			for (int j = i + 1; j < isize; j ++)
+				if (dist_closest[i] > dist_closest[j])
+				{
+					double temp_distance = dist_closest[i];
+					dist_closest[i] = dist_closest[j];
+					dist_closest[j] = temp_distance;
+
+					int temp_index = idx_closest[i];
+					idx_closest[i] = idx_closest[j];
+					idx_closest[j] = temp_index;
+				}
 	}
 	else
 	{
-		// Search in the list of the smaller values
-		return kth_element(buffer, iless, kth, data);
+		// Add to the list each sub-window within its bandwidth!
+		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
+			if (areSWIntersected(candidates.get(i), cx, cy, w, h) == true)
+			{
+				const double distance = (*fn_esquare_p)(candidates.get(i), cx, cy, w, h);
+				if (distance < m_bandwidths[i])
+				{
+					idx_closest[isize] = i;
+					dist_closest[isize ++] = distance;
+				}
+			}
 	}
+
+	return isize;
 }
 
 /////////////////////////////////////////////////////////////////////////
