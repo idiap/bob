@@ -1,8 +1,4 @@
-#include "CmdLine.h"
-
-#include "TensorFile.h"
-
-#include "Machines.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -44,12 +40,12 @@ int main(int argc, char* argv[])
 	  	T->set(j, random_);
 	  }
 
-	  if(verbose) 
+	  if(verbose)
 	  	T->print("Input Tensor");
 
 	  gm[0]->forward(*T);
 
-	  if(verbose) 
+	  if(verbose)
 	  	gm[0]->getOutput().sprint("Output %d", 0);
 
 	  for(int i = 1 ; i < n_gm ; i++)
@@ -59,7 +55,7 @@ int main(int argc, char* argv[])
 
 		gm[i]->forward(gm[i-1]->getOutput());
 
-	  	if(verbose) 
+	  	if(verbose)
 			gm[i]->getOutput().sprint("Output %d", i);
 	  }
 
@@ -68,15 +64,15 @@ int main(int argc, char* argv[])
 	  linear->prepare();
 	  linear->shuffle();
 	  linear->forward(gm[n_gm-1]->getOutput());
-	  if(verbose) 
+	  if(verbose)
 	  	linear->getOutput().print("Output linear");
-		
+
 	  delete T;
 	}
 
 	for(int i = 0 ; i < n_gm ; i++) delete gm[i];
 	delete [] gm;
-	   
+
 	// OK
 	print("OK.\n");
 

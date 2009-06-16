@@ -1,5 +1,4 @@
-#include "spFFT.h"
-#include "Tensor.h"
+#include "torch5spro.h"
 #include <cassert>
 
 using namespace Torch;
@@ -27,7 +26,7 @@ int main()
 		}
 
 	image.print("x");
-	
+
 	//
 	spFFT fft2d;
 	print("Computing the FFT of x ...\n");
@@ -66,7 +65,7 @@ int main()
 				}
 
 			//image.print("x");
-			
+
 			//
 			spFFT fft2d;
 			print("  Computing the FFT of x ...\n");
@@ -78,7 +77,7 @@ int main()
 			print("  Computing the iFFT of F[x]...\n");
 			ifft2d.process(fft2d.getOutput(0));
 			//ifft2d.getOutput(0).print("inverse F[x]");
-			
+
 			const FloatTensor& out = (const FloatTensor&) ifft2d.getOutput(0);
 
 			double rmse = 0.0;

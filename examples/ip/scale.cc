@@ -1,6 +1,4 @@
-#include "ipScaleYX.h"
-#include "Image.h"
-#include "xtprobeImageFile.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

@@ -1,5 +1,4 @@
-#include "CmdLine.h"
-#include "TensorFile.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -17,7 +16,7 @@ int main(int argc, char* argv[])
 	bool verbose;
 	int ttype_out;
 	int unfold;
-			
+
 	// Build the command line object
 	CmdLine cmd;
 	cmd.setBOption("write log", false);
@@ -141,14 +140,14 @@ int main(int argc, char* argv[])
 
 		if(verbose) tensor->sprint("%d", i);
 
-		if(unfold > 1) 
+		if(unfold > 1)
 		{
 			unfoldtensor->unfold(tensor, 0, width, width);
-		
+
 			otensor->copy(unfoldtensor);
 		}
 		else otensor->copy(tensor);
-		
+
 		tf.save(*otensor);
 	}
 

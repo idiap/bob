@@ -1,11 +1,4 @@
-#include "Image.h"
-#include "xtprobeImageFile.h"
-#include "pgmImageFile.h"
-#include "ppmImageFile.h"
-#include "gifImageFile.h"
-#include "jpegImageFile.h"
-#include "tiffImageFile.h"
-#include "Color.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

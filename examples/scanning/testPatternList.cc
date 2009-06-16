@@ -1,5 +1,4 @@
-#include "Pattern.h"
-#include "general.h"
+#include "torch5spro.h"
 #include <cstdlib>
 
 using namespace Torch;

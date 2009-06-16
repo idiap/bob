@@ -1,4 +1,6 @@
 #include "MLP.h"
+#include "Linear.h"
+#include "Tanh.h"
 
 namespace Torch {
 
@@ -129,7 +131,7 @@ bool MLP::backward(const DoubleTensor *input, const DoubleTensor *alpha)
 bool MLP::loadFile(File& file)
 {
    	print("Loading MLP from file ...\n");
-	
+
 	// Check the ID
 	int id;
 	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
@@ -161,7 +163,7 @@ bool MLP::loadFile(File& file)
 bool MLP::saveFile(File& file) const
 {
    	print("Saving MLP from file ...\n");
-	
+
 	// Write the machine ID
 	const int id = getID();
 	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)

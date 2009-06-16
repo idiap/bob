@@ -1,5 +1,4 @@
-#include "ipIntegral.h"
-#include "Tensor.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

@@ -1,8 +1,4 @@
-#include "CmdLine.h"
-
-#include "Machines.h"
-#include "MSECriterion.h"
-#include "TwoClassNLLCriterion.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -94,7 +90,7 @@ int main(int argc, char* argv[])
 
 			input = data[t];
 
-			if(verbose) 
+			if(verbose)
 				input->sprint("data[%d]", t);
 
 			// Forward
@@ -116,13 +112,13 @@ int main(int argc, char* argv[])
 			gm = gm_nonlinear_2;
 			gm->forward(*input);
 			if(verbose) gm->getOutput().sprint("NonLinear 2");
-			
-			if(verbose) 
+
+			if(verbose)
 				gm->getOutput().sprint("output");
 
 			criterion->forward(&gm->getOutput(), target[t]);
 
-			if(verbose) 
+			if(verbose)
 			{
 				criterion->m_target->print("target");
 				criterion->m_error->print("MSE");
@@ -173,7 +169,7 @@ int main(int argc, char* argv[])
 		input = &gm->getOutput();
 		gm = gm_nonlinear_2;
 		gm->forward(*input);
-			
+
 		gm->getOutput().sprint("output");
 		target[t]->print("target");
 	}

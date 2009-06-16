@@ -1,13 +1,4 @@
-#include "ipGeomNorm.h"
-
-#include "eyecenterGTFile.h"
-#include "bancaGTFile.h"
-#include "cootesGTFile.h"
-
-#include "Image.h"
-#include "xtprobeImageFile.h"
-#include "CmdLine.h"
-#include "Color.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

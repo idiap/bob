@@ -1,9 +1,4 @@
-#include "Image.h"
-#include "xtprobeImageFile.h"
-#include "TensorFile.h"
-#include "spDCT.h"
-#include "ipBlock.h"
-#include "CmdLine.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -115,7 +110,7 @@ int main(int argc, char* argv[])
 	ipblock.setIOption("oy", block_overlap_h);
 	ipblock.setIOption("w", block_size_w);
 	ipblock.setIOption("h", block_size_h);
-		
+
 	//
 	Tensor *tensor = NULL;
 	char ofilename[250];
@@ -152,7 +147,7 @@ int main(int argc, char* argv[])
 			//t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
 			t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
 
-		   	for(int c = 0; c < n_cols; c++) 
+		   	for(int c = 0; c < n_cols; c++)
 			{
 				//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
 				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
@@ -160,11 +155,11 @@ int main(int argc, char* argv[])
 				t_block->copy(t_rcoutput_narrow_cols);
 
 				dct.process(*t_block);
-				
+
 				const FloatTensor& out = (const FloatTensor&) dct.getOutput(0);
 
 				retainDC(&out, n_dc, t_dc, dc_zigzag_index);
-				
+
 				ofile->save(*t_dc);
 			}
 		}
@@ -192,8 +187,8 @@ int main(int argc, char* argv[])
 void retainDC(const FloatTensor *dct2d_in, int n_dc, FloatTensor *dc_out, zigzagDCT *index)
 {
 	//dct2d_in->print("DCT 2D");
-	
-	for(int i = 0 ; i < n_dc ; i++) 
+
+	for(int i = 0 ; i < n_dc ; i++)
 	{
 		float z = dct2d_in->get(index[i].y, index[i].x);
 		dc_out->set(i, z);
@@ -206,22 +201,22 @@ void retainDC(const FloatTensor *dct2d_in, int n_dc, FloatTensor *dc_out, zigzag
 void compute_zigzag(int block_size_h, int block_size_w, zigzagDCT *index)
 {
    	print("Computing zig-zag pattern for DCT ...\n");
-	
+
 	int x = 0, y = 0;
 	int id = 0;
 
 	index[id].x = x;
 	index[id++].y = y;
-	
+
 	for(;;)
 	{
 		/* right or down ?  */
 		if(x != block_size_w-1) x = x + 1;
 		else y = y + 1;
-		
+
 		index[id].x = x;
 		index[id++].y = y;
-		
+
 		/* now down left..  */
 		while(x != 0 && y != block_size_h-1)
 		{
@@ -259,7 +254,7 @@ void compute_zigzag(int block_size_h, int block_size_w, zigzagDCT *index)
 	ShortTensor t_zigzag(block_size_h, block_size_w);
 
 	//print("Zig-Zag pattern:\n");
-	for(int i = 0 ; i < block_size_h * block_size_w ; i++) 
+	for(int i = 0 ; i < block_size_h * block_size_w ; i++)
 	{
 		//print("DCT %d: x=%d y=%d\n", i, index[i].x, index[i].y);
 		t_zigzag(index[i].y, index[i].x) = i+1;

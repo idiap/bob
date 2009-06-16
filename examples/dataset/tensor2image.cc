@@ -1,7 +1,4 @@
-#include "CmdLine.h"
-#include "Image.h"
-#include "xtprobeImageFile.h"
-#include "TensorFile.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -76,7 +73,7 @@ int main(int argc, char* argv[])
 	Tensor *tensor = NULL;
 	int i = 0;
 	char image_filename[250];
-	
+
 	tensor = tf.load();
 	if(verbose) tensor->sprint("%d", i);
 	Image imagegray(tensor->size(1), tensor->size(0), 1);
@@ -91,7 +88,7 @@ int main(int argc, char* argv[])
 	i++;
 	while ((tensor = tf.load()) != 0)
 	{
-	   	if(i == n_images) break; 
+	   	if(i == n_images) break;
 		if(verbose) tensor->sprint("%d", i);
 		Image imagegray(tensor->size(1), tensor->size(0), 1);
 		ShortTensor *t_ = new ShortTensor();

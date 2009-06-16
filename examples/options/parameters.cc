@@ -1,5 +1,4 @@
-#include "Parameters.h"
-#include "THRandom.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -48,7 +47,7 @@ int main()
 
 	File ofile;
 	ofile.open("test.params", "w");
-	p.saveFile(ofile);	
+	p.saveFile(ofile);
 	ofile.close();
 
 	for (int t = 0; t < n_tests; t++)
@@ -109,7 +108,7 @@ int main()
 
 	File ifile;
 	ifile.open("test.params", "r");
-	p.loadFile(ifile);	
+	p.loadFile(ifile);
 	ifile.close();
 
 	p.print("Loaded parameters");
@@ -143,10 +142,10 @@ int main()
 	}
 
 	q.print("Parameters to load");
-	
+
 	File ifile2;
 	ifile2.open("test.params", "r");
-	q.loadFile(ifile2);	
+	q.loadFile(ifile2);
 	ifile2.close();
 
 	q.print("Re-Loaded parameters");

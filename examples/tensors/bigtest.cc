@@ -1,6 +1,4 @@
-#include <stdio.h>
-
-#include "Tensor.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -330,7 +328,7 @@ int main()
 
 
   //---
-  
+
   print("Building a simple sequence of numbers ...\n");
   FloatTensor *sequence = new FloatTensor(7);
 
@@ -339,12 +337,12 @@ int main()
   	sequence->set(i, i+1);
 
   sequence->print("sequence of numbers");
-  
+
   FloatTensor *unfold_sequence1 = new FloatTensor();
 
   unfold_sequence1->unfold(sequence, 0, 2, 1);
   unfold_sequence1->print("unfolded sequence of numbers along dim 0 from 1D to 2D with a step of 1");
-  
+
   FloatTensor *unfold_sequence2 = new FloatTensor();
 
   unfold_sequence2->unfold(sequence, 0, 2, 2);
@@ -354,7 +352,7 @@ int main()
   delete unfold_sequence1;
   delete unfold_sequence2;
   delete sequence;
-  
+
   print("Building a image sequence...\n");
   int seqi_h = 4;
   int seqi_w = 3;
@@ -365,7 +363,7 @@ int main()
   	seqimage->set(i, i+1);
 
   seqimage->sprint("image sequence (%d x %d)", seqi_h, seqi_w);
-  
+
   FloatTensor *unfold_seqimage = new FloatTensor();
 
   unfold_seqimage->unfold(sequence, 0, seqi_w, seqi_w);
@@ -374,10 +372,10 @@ int main()
   print("Free images sequences ...\n");
   delete unfold_seqimage;
   delete seqimage;
-  
 
 
-  
+
+
   print("Building a sequence of 7 concatenated 3D frames ...\n");
   sequence = new FloatTensor(21);
 
@@ -386,7 +384,7 @@ int main()
   	sequence->set(i, i+1);
 
   sequence->print("sequence of frames");
-  
+
   unfold_sequence2 = new FloatTensor();
   unfold_sequence2->unfold(sequence, 0, 3, 3);
   unfold_sequence2->print("unfolded concatenated sequence along dim 0 from 1D (size 21) to 2D (size 3) with a step of 3");
@@ -394,7 +392,7 @@ int main()
   print("Free sequences ...\n");
   delete unfold_sequence2;
   delete sequence;
- 
+
 
   print("Building a sequence of 100 concatenated 20D frames ...\n");
   sequence = new FloatTensor(200);
@@ -404,7 +402,7 @@ int main()
   	sequence->set(i, i+1);
 
   sequence->print("sequence of frames");
-  
+
   unfold_sequence2 = new FloatTensor();
   unfold_sequence2->unfold(sequence, 0, 20, 20);
   unfold_sequence2->print("unfolded concatenated sequence along dim 0 from 1D (size 200) to 2D (size 20) with a step of 20");
@@ -412,9 +410,9 @@ int main()
   print("Free sequences ...\n");
   delete unfold_sequence2;
   delete sequence;
-  
+
   //---
-  
+
   print("Building a new sequence, i.e. a FloatTensor of 2 dimensions (t, coefficients) ...\n");
   sequence = new FloatTensor(2000000,20);
 
@@ -478,7 +476,7 @@ int main()
   long n_examples_per_class = 5000;
   long n_examples = n_examples_per_class * n_classes;
   long inputsize = 10;
-  
+
   DoubleTensor **examples = (DoubleTensor **) THAlloc(n_examples*sizeof(DoubleTensor));
   IntTensor **targets = (IntTensor **) THAlloc(n_examples*sizeof(IntTensor));
   DoubleTensor **means = (DoubleTensor **) THAlloc(n_classes*sizeof(DoubleTensor));
@@ -529,7 +527,7 @@ int main()
 
 	means[c]->print("mean");
 	variances[c]->print("variance");
-	
+
   	for(long j = 0 ; j < inputsize ; j++)
 	{
 		m(j) /= (double) n_examples_per_class;
@@ -550,7 +548,7 @@ int main()
   */
 
   for(int i = 0 ; i < n_examples ; i++) delete examples[i];
-  for(int i = 0 ; i < n_classes ; i++) 
+  for(int i = 0 ; i < n_classes ; i++)
   {
   	delete means[i];
   	delete variances[i];
@@ -565,7 +563,7 @@ int main()
   THFree(target_one_hot_encoding);
 
   print("Testing Tensor resizing ...\n");
-  
+
   print("new empty DoubleTensor ...\n");
   DoubleTensor *resizable_dt = new DoubleTensor();
   resizable_dt->fill(0);

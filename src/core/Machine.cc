@@ -66,7 +66,6 @@ Machine::Machine()
 Machine::~Machine()
 {
    	delete m_parameters;
-	delete m_core;
 }
 
 ///////////////////////////////////////////////////////////////////////////

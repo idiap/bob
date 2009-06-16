@@ -1,19 +1,4 @@
-#include "CmdLine.h"
-
-#include "TensorFile.h"
-#include "MemoryDataSet.h"
-#include "TensorList.h"
-#include "BoostingTrainer.h"
-#include "FileListCmdOption.h"
-//#include "StumpTrainer.h"
-#include "StumpMachine.h"
-#include "IntLutMachine.h"
-#include "Image.h"
-
-#include "spDeltaOne.h"
-#include "CascadeMachine.h"
-#include "Machines.h"
-#include "spCores.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

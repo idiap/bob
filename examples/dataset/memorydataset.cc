@@ -1,4 +1,4 @@
-#include "MemoryDataSet.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

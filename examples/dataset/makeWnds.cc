@@ -1,7 +1,4 @@
-#include "xtprobeImageFile.h"
-#include "Image.h"
-#include "FileListCmdOption.h"
-#include "CmdLine.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

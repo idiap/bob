@@ -1,25 +1,4 @@
-#include "CmdLine.h"
-
-
-#include "TensorList.h"
-#include "MemoryDataSet.h"
-
-#include "BoostingRoundLBPTrainer.h"
-#include "LBPRoundTrainer.h"
-#include "IntLutMachine.h"
-#include "Image.h"
-
-//#include "LBPStumpMachine.h"
-#include "ipLBP8R.h"
-#include "ipLBP4R.h"
-#include "ipLBP.h"
-//#include "ipHaarLienhart.h"
-//#include "ipIntegral.h"
-#include "spDeltaOne.h"
-#include "CascadeMachine.h"
-#include "Machines.h"
-#include "spCore.h"
-#include "spCores.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 

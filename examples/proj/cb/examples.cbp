@@ -58,6 +58,7 @@
 		<Unit filename="../../dataset/memorydataset.cc" />
 		<Unit filename="../../dataset/readWnds.cc" />
 		<Unit filename="../../dataset/readtensor.cc" />
+		<Unit filename="../../dataset/tensor2bindata.cc" />
 		<Unit filename="../../dataset/tensor2image.cc" />
 		<Unit filename="../../dataset/tensorfiles.cc" />
 		<Unit filename="../../facetools/CMakeLists.txt" />
@@ -68,11 +69,19 @@
 		<Unit filename="../../facetools/eyenosechin_halfprofile.list" />
 		<Unit filename="../../facetools/eyenosechin_profile.list" />
 		<Unit filename="../../facetools/filelist.cc" />
-		<Unit filename="../../facetools/frontalface19x19.geom.norm.cfg" />
-		<Unit filename="../../facetools/frontalface64x80.geom.norm.cfg" />
 		<Unit filename="../../facetools/gtimageextract.cc" />
 		<Unit filename="../../facetools/make.csh" />
+		<Unit filename="../../facetools/tensor2blocks.cc" />
+		<Unit filename="../../facetools/tensor2dct.cc" />
 		<Unit filename="../../facetools/xm2vts.list" />
+		<Unit filename="../../gradient/CMakeLists.txt" />
+		<Unit filename="../../gradient/README.csh" />
+		<Unit filename="../../gradient/gradientmachines.cc" />
+		<Unit filename="../../gradient/make.csh" />
+		<Unit filename="../../gradient/mlpclassification.cc" />
+		<Unit filename="../../gradient/mlpforward1.cc" />
+		<Unit filename="../../gradient/mlpforward2.cc" />
+		<Unit filename="../../gradient/xor.cc" />
 		<Unit filename="../../images/CMakeLists.txt" />
 		<Unit filename="../../images/README.txt" />
 		<Unit filename="../../images/imageformats.cc" />
@@ -103,6 +112,7 @@
 		<Unit filename="../../options/README.txt" />
 		<Unit filename="../../options/make.csh" />
 		<Unit filename="../../options/options.cc" />
+		<Unit filename="../../options/parameters.cc" />
 		<Unit filename="../../scanning/CMakeLists.txt" />
 		<Unit filename="../../scanning/make.csh" />
 		<Unit filename="../../scanning/scanning.cc" />

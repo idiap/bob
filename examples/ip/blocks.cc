@@ -1,7 +1,4 @@
-#include "ipBlock.h"
-#include "Image.h"
-#include "xtprobeImageFile.h"
-#include "CmdLine.h"
+#include "torch5spro.h"
 
 using namespace Torch;
 
@@ -61,7 +58,7 @@ int main(int argc, char* argv[])
 		CHECK_FATAL(ipblock.setIOption("w", block_w) == true);
 		CHECK_FATAL(ipblock.setIOption("h", block_h) == true);
 		CHECK_FATAL(ipblock.process(image1) == true);
-		
+
 		print("Number of output blocks: %d\n", ipblock.getNOutputs());
 
 		// Save blocks to images
@@ -92,7 +89,7 @@ int main(int argc, char* argv[])
 		CHECK_FATAL(ipblock.setIOption("w", block_w) == true);
 		CHECK_FATAL(ipblock.setIOption("h", block_h) == true);
 		CHECK_FATAL(ipblock.process(image2) == true);
-		
+
 		print("Number of output blocks: %d\n", ipblock.getNOutputs());
 
 		// Save blocks to images
@@ -120,11 +117,11 @@ int main(int argc, char* argv[])
 		CHECK_FATAL(ipblock.setIOption("w", block_w) == true);
 		CHECK_FATAL(ipblock.setIOption("h", block_h) == true);
 		CHECK_FATAL(ipblock.process(image2) == true);
-		
+
 		print("Number of output blocks: %d\n", ipblock.getNOutputs());
 
 		ShortTensor &t_rcoutput = (ShortTensor &) ipblock.getOutput(0);
-		
+
 		print("   n_dimensions: [%d]\n", t_rcoutput.nDimension());
 		print("   size[0]:      [%d]\n", t_rcoutput.size(0));
 		print("   size[1]:      [%d]\n", t_rcoutput.size(1));
@@ -133,7 +130,7 @@ int main(int argc, char* argv[])
 
 		CHECK_FATAL(t_rcoutput.size(2) == block_h);
 		CHECK_FATAL(t_rcoutput.size(3) == block_w);
-		
+
 		int n_rows = t_rcoutput.size(0);
 		int n_cols = t_rcoutput.size(1);
 
@@ -145,17 +142,17 @@ int main(int argc, char* argv[])
 		ShortTensor *t_block = new ShortTensor();
 
 		t_block->select(&block_image, 2, 0);
-		
+
 		for(int r = 0; r < n_rows; r++)
 		{
 			//t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
 			t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
 
-		   	for(int c = 0; c < n_cols; c++) 
+		   	for(int c = 0; c < n_cols; c++)
 			{
 				//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
 				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
-				
+
 				t_block->copy(t_rcoutput_narrow_cols);
 
 				if(save)
@@ -166,7 +163,7 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
-	
+
 		delete t_block;
 		delete t_rcoutput_narrow_cols;
 		delete t_rcoutput_narrow_rows;

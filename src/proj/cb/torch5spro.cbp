@@ -200,6 +200,8 @@
 		<Unit filename="../../../extras/oourafft/shrtdct.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../makeall.csh" />
+		<Unit filename="../../../makeincludeh.csh" />
 		<Unit filename="../../CMakeLists.txt" />
 		<Unit filename="../../ap/CMakeLists.txt" />
 		<Unit filename="../../boosting/BoostingRoundLBPTrainer.cc" />
@@ -254,6 +256,8 @@
 		<Unit filename="../../core/MemoryDataSet.h" />
 		<Unit filename="../../core/Object.cc" />
 		<Unit filename="../../core/Object.h" />
+		<Unit filename="../../core/Parameters.cc" />
+		<Unit filename="../../core/Parameters.h" />
 		<Unit filename="../../core/Tensor.cc" />
 		<Unit filename="../../core/Tensor.h" />
 		<Unit filename="../../core/TensorFile.cc" />
@@ -264,6 +268,8 @@
 		<Unit filename="../../core/TensorList.h" />
 		<Unit filename="../../core/Trainer.cc" />
 		<Unit filename="../../core/Trainer.h" />
+		<Unit filename="../../core/VariableCollector.cc" />
+		<Unit filename="../../core/VariableCollector.h" />
 		<Unit filename="../../core/apCore.cc" />
 		<Unit filename="../../core/apCore.h" />
 		<Unit filename="../../core/general.cc" />
@@ -372,9 +378,39 @@
 		<Unit filename="../../machine/CascadeMachine.h" />
 		<Unit filename="../../machine/Classifier.cc" />
 		<Unit filename="../../machine/Classifier.h" />
+		<Unit filename="../../machine/Criterion.cc" />
+		<Unit filename="../../machine/Criterion.h" />
 		<Unit filename="../../machine/GradientMachine.cc" />
 		<Unit filename="../../machine/GradientMachine.h" />
 		<Unit filename="../../machine/Machines.h" />
+		<Unit filename="../../machine/ProbabilityDistribution.cc" />
+		<Unit filename="../../machine/ProbabilityDistribution.h" />
+		<Unit filename="../../machine/criterions/CMakeLists.txt" />
+		<Unit filename="../../machine/criterions/MSECriterion.cc" />
+		<Unit filename="../../machine/criterions/MSECriterion.h" />
+		<Unit filename="../../machine/criterions/TwoClassNLLCriterion.cc" />
+		<Unit filename="../../machine/criterions/TwoClassNLLCriterion.h" />
+		<Unit filename="../../machine/distributions/CMakeLists.txt" />
+		<Unit filename="../../machine/distributions/MultiVariateDiagonalGaussianDistribution.cc" />
+		<Unit filename="../../machine/distributions/MultiVariateDiagonalGaussianDistribution.h" />
+		<Unit filename="../../machine/distributions/MultiVariateNormalDistribution.cc" />
+		<Unit filename="../../machine/distributions/MultiVariateNormalDistribution.h" />
+		<Unit filename="../../machine/gradients/CMakeLists.txt" />
+		<Unit filename="../../machine/gradients/Exp.cc" />
+		<Unit filename="../../machine/gradients/Exp.h" />
+		<Unit filename="../../machine/gradients/Linear.cc" />
+		<Unit filename="../../machine/gradients/Linear.h" />
+		<Unit filename="../../machine/gradients/Log.cc" />
+		<Unit filename="../../machine/gradients/Log.h" />
+		<Unit filename="../../machine/gradients/MLP.cc" />
+		<Unit filename="../../machine/gradients/MLP.h" />
+		<Unit filename="../../machine/gradients/Sigmoid.cc" />
+		<Unit filename="../../machine/gradients/Sigmoid.h" />
+		<Unit filename="../../machine/gradients/Tanh.cc" />
+		<Unit filename="../../machine/gradients/Tanh.h" />
+		<Unit filename="../../machine/normalisations/CMakeLists.txt" />
+		<Unit filename="../../machine/normalisations/MeanVarNorm.cc" />
+		<Unit filename="../../machine/normalisations/MeanVarNorm.h" />
 		<Unit filename="../../measurer/CMakeLists.txt" />
 		<Unit filename="../../measurer/measurer.cc" />
 		<Unit filename="../../measurer/measurer.h" />
@@ -484,6 +520,10 @@
 		<Unit filename="../../trainer/CMakeLists.txt" />
 		<Unit filename="../../trainer/GTFile.cc" />
 		<Unit filename="../../trainer/GTFile.h" />
+		<Unit filename="../../trainer/GradientTrainer.cc" />
+		<Unit filename="../../trainer/GradientTrainer.h" />
+		<Unit filename="../../trainer/StochasticGradientTrainer.cc" />
+		<Unit filename="../../trainer/StochasticGradientTrainer.h" />
 		<Unit filename="../../trainer/gtfiles/CMakeLists.txt" />
 		<Unit filename="../../trainer/gtfiles/bancaGTFile.cc" />
 		<Unit filename="../../trainer/gtfiles/bancaGTFile.h" />
@@ -499,6 +539,7 @@
 		<Unit filename="../../trainer/gtfiles/halfprofileEyeNoseChinGTFile.h" />
 		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.cc" />
 		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.h" />
+		<Unit filename="../../../torch5spro.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />
