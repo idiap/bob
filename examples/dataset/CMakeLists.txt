@@ -35,7 +35,7 @@ SET(EXAMPLE_SRC
 	tensorfiles.cc
 	largememorydataset.cc
 	memorydataset.cc
-#	seqdataset.cc
+	seqdataset.cc
 	diskdataset.cc
 	makeWnds.cc
 	readWnds.cc
