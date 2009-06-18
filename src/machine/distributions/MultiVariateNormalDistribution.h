@@ -2,7 +2,6 @@
 #define _TORCH5SPRO_MULTIVARIATE_NORMAL_DISTRIBUTION_MACHINE_H_
 
 #include "ProbabilityDistribution.h"
-#include "Machines.h"
 
 namespace Torch {
 
@@ -37,14 +36,11 @@ public:
 	virtual bool 		EMupdate() = 0;
 		
 	///
-	///virtual bool 		forward(const DoubleTensor *input);
-
-	/// Loading/Saving the content from files (\emph{not the options}) - overriden
-	virtual bool		loadFile(File& file);
-	virtual bool		saveFile(File& file) const;
+	virtual bool 		forward(const DoubleTensor *input);
 
 	//
-	virtual double sampleProbabilityOneGaussian(double *sample_, int g_) = 0;
+	virtual double sampleProbabilityOneGaussian(double *sample_, int g) = 0;
+	virtual double sampleProbability(double *sample_) = 0;
 
 	/*
 	virtual void initMeans(double **means_);

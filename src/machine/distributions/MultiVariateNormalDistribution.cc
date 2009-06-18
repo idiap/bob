@@ -32,13 +32,15 @@ MultiVariateNormalDistribution::MultiVariateNormalDistribution(int n_inputs_, in
 	buffer_acc_posteriors_variances = NULL;
 	acc_posteriors_variances = NULL;
 
+	double *parameters_ = m_parameters->getDarray("parameters");
+
 	//
-	weights = parameters;
+	weights = parameters_;
 
 	//
 	means = (double **) THAlloc(n_gaussians * sizeof(double *));
 	variances = (double **) THAlloc(n_gaussians * sizeof(double *));
-	double *p = &parameters[n_gaussians];
+	double *p = &parameters_[n_gaussians];
 	for(int j = 0 ; j < n_gaussians ; j++)
 	{
 		means[j] = p; p += n_inputs;
@@ -72,6 +74,16 @@ MultiVariateNormalDistribution::~MultiVariateNormalDistribution()
 	THFree(threshold_variances);
 	THFree(variances);
 	THFree(means);
+}
+
+bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
+{
+	double *src = (double *) input->dataR();
+	double *dst = (double *) m_output.dataW();
+
+	dst[0] = sampleProbability(src);
+
+	return true;
 }
 
 /*
@@ -170,10 +182,16 @@ void MultiVariateNormalDistribution::initVariances(int n_data_, real **data_, re
 
 bool MultiVariateNormalDistribution::shuffle()
 {
+   	m_parameters->print("MultiVariateNormalDistribution parameters");
+	
    	double z = 0.0;
 
+	Torch::print("n_gaussians = %d\n", n_gaussians);
+	Torch::print("n_inputs = %d\n", n_inputs);
+	     
 	for(int j = 0 ; j < n_gaussians ; j++)
 	{
+	   	Torch::print("w[%d] = %g\n", j, weights[j]);
 		weights[j] = THRandom_uniform(0, 1);
 		z += weights[j];
 
@@ -185,6 +203,8 @@ bool MultiVariateNormalDistribution::shuffle()
 	}
 
 	for(int j = 0 ; j < n_gaussians ; j++) weights[j] /= z;
+
+   	m_parameters->print("MultiVariateNormalDistribution parameters");
 
 	return true;
 }
