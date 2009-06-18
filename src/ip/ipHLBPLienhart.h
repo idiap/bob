@@ -1,5 +1,5 @@
-#ifndef _TORCH5SPRO_IP_HAAR_LIENHART_H_
-#define _TORCH5SPRO_IP_HAAR_LIENHART_H_
+#ifndef _TORCH5SPRO_IP_HLBP_LIENHART_H_
+#define _TORCH5SPRO_IP_HLBP_LIENHART_H_
 
 #include "ipCore.h"
 #include "Tensor.h"
@@ -8,7 +8,7 @@
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ipHaar_Lienhart
+	// Torch::ipHLBP_Lienhart
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -16,14 +16,14 @@ namespace Torch
 	// One is take the offset from ipSubwindow, and take the width and height from the feature extraction.
 	// Other option is to take the  window width and height and resize to model width and height and then extract feature
 
-	class ipHaarLienhart : public ipCore
+	class ipHLBPLienhart : public ipCore
 	{
 	public:
 
 		// Constructor
-		ipHaarLienhart();//int width_, int height_);
+		ipHLBPLienhart();//int width_, int height_);
 		bool setNoRec(int noRecs_); //set the number of rectangles
-		bool setRec(int Rec_,double weight_, int y_, int x_, int h_, int w_);
+		bool setRec(int Rec_,double weight_, int x_, int y_, int w_, int h_);
 
 		/// Change the region of the input tensor to process - overriden
 		virtual void		setRegion(const TensorRegion& region);
@@ -32,19 +32,23 @@ namespace Torch
 		virtual void		setModelSize(const TensorSize& modelSize);
 
 		// Get the ID specific to each spCore - overriden
-		virtual int		getID() const { return IP_HAAR_LIENHART_ID; }
+		virtual int		getID() const {
+			return IP_HLBP_LIENHART_ID;
+		}
 
 		/// Constructs an empty spCore of this kind - overriden
 		/// (used by <spCoreManager>, this object is automatically deallocated)
-		virtual spCore*		getAnInstance() const { return manage(new ipHaarLienhart()); }
+		virtual spCore*		getAnInstance() const {
+			return manage(new ipHLBPLienhart());
+		}
 
 		// Destructor
-		virtual ~ipHaarLienhart();
+		virtual ~ipHLBPLienhart();
 
 		/////////////////////////////////////////////////////////////////
 		virtual bool 		saveFile(File& file) const;
 		virtual bool 		loadFile(File& file);
-		protected:
+	protected:
 
 		/////////////////////////////////////////////////////////////////
 
@@ -56,6 +60,8 @@ namespace Torch
 
 		/// Process some input tensor (the input is checked, the outputs are allocated) - overriden
 		virtual bool		processInput(const Tensor& input);
+
+
 
 		/////////////////////////////////////////////////////////////////
 
@@ -78,16 +84,21 @@ namespace Torch
 		//    DoubleTensor *t_;
 		//  DoubleTensor *t__;
 
+
+
+
 		int u_x,u_y, u_size_x,u_size_y;
 		int u_size_z,u_z; //for selecting the dimension
 		int *u_parameters;
 		double *u_weight;
+
+
 	};
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// REGISTER this spCore to the <spCoreManager>
-	const bool ip_haar_lienhart_registered = spCoreManager::getInstance().add(
-		manage(new ipHaarLienhart()), "Lienhart Haar");
+	const bool ip_hlbp_lienhart_registered = spCoreManager::getInstance().add(
+				manage(new ipHLBPLienhart()), "Lienhart HLBP");
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 

@@ -28,6 +28,8 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
+	HLBPboostingintegral.cc
+	HLBPboosttestintegral.cc
 	IntegraltrainCascade.cc
 	LBPtrainCascade.cc
 	boostingLBPRound.cc

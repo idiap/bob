@@ -9,55 +9,7 @@ namespace Private
 	// Functions to get the variation axis/planes for some index in the profile
 	//////////////////////////////////////////////////////////////////////////
 
-	const int ProfileSize =	(2 * Torch::GreedyExplorer::NoVarX + 1) *
-				(2 * Torch::GreedyExplorer::NoVarY + 1) *
-				(2 * Torch::GreedyExplorer::NoVarS + 1);
-
-	const int base_s = (2 * Torch::GreedyExplorer::NoVarX + 1) * (2 * Torch::GreedyExplorer::NoVarY + 1);
-	const int base_x = (2 * Torch::GreedyExplorer::NoVarY + 1);
-	const int base_y = 1;
-
-	int getOsIndex(int index) { return index / base_s; }
-	int getOxIndex(int index) { return (index - getOsIndex(index) * base_s) / base_x; }
-	int getOyIndex(int index) { return (index - getOsIndex(index) * base_s - getOxIndex(index) * base_x) / base_y; }
-
-	bool isProfileOxys(int index)
-	{
-		return true;
-	}
-
-	bool isProfileOs(int index)
-	{
-		return 	getOxIndex(index) == GreedyExplorer::NoVarX &&
-			getOyIndex(index) == GreedyExplorer::NoVarY;
-	}
-
-	bool isProfileOx(int index)
-	{
-		return 	getOsIndex(index) == GreedyExplorer::NoVarS &&
-			getOyIndex(index) == GreedyExplorer::NoVarY;
-	}
-
-	bool isProfileOy(int index)
-	{
-		return 	getOsIndex(index) == GreedyExplorer::NoVarS &&
-			getOxIndex(index) == GreedyExplorer::NoVarX;
-	}
-
-	bool isProfileOxy(int index)
-	{
-		return 	getOsIndex(index) == GreedyExplorer::NoVarS;
-	}
-
-	bool isProfileOxs(int index)
-	{
-		return 	getOyIndex(index) == GreedyExplorer::NoVarY;
-	}
-
-	bool isProfileOys(int index)
-	{
-		return 	getOxIndex(index) == GreedyExplorer::NoVarX;
-	}
+	const int ProfileSize =	Torch::GreedyExplorer::NoConfigs;
 
 	struct ProfileIndexes
 	{
@@ -68,11 +20,21 @@ namespace Private
 				m_oy(new int[ProfileSize]),
 				m_os(new int[ProfileSize])
 		{
-			for (int i = 0; i < ProfileSize; i ++)
+
+			// Initialize 3D axis coordinates for each profile linear index
+			int index = 0;
+			for (int is = -Torch::GreedyExplorer::NoVarS; is <= Torch::GreedyExplorer::NoVarS; is ++)
 			{
-				m_ox[i] = getOxIndex(i) - GreedyExplorer::NoVarX;
-				m_oy[i] = getOyIndex(i) - GreedyExplorer::NoVarY;
-				m_os[i] = getOsIndex(i) - GreedyExplorer::NoVarS;
+				for (int ix = -Torch::GreedyExplorer::NoVarX; ix <= Torch::GreedyExplorer::NoVarX; ix ++)
+				{
+					for (int iy = -Torch::GreedyExplorer::NoVarY; iy <= Torch::GreedyExplorer::NoVarY; iy ++)
+					{
+						m_ox[index] = ix;
+						m_oy[index] = iy;
+						m_os[index] = is;
+						index ++;
+					}
+				}
 			}
 		}
 
@@ -100,6 +62,47 @@ namespace Private
 		int*			m_oy;	// [ProfileSize], <Oy> indexes from the linear index
 		int*			m_os;	// [ProfileSize], <Os> indexes from the linear index
 	};
+
+	bool isProfileOxys(int index)
+	{
+		return true;
+	}
+
+	bool isProfileOs(int index)
+	{
+		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
+		return pfi.m_ox[index] == 0 && pfi.m_oy[index] == 0;
+	}
+
+	bool isProfileOx(int index)
+	{
+		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
+		return pfi.m_oy[index] == 0 && pfi.m_os[index] == 0;
+	}
+
+	bool isProfileOy(int index)
+	{
+		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
+		return pfi.m_ox[index] == 0 && pfi.m_os[index] == 0;
+	}
+
+	bool isProfileOxy(int index)
+	{
+		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
+		return pfi.m_os[index] == 0;
+	}
+
+	bool isProfileOxs(int index)
+	{
+		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
+		return pfi.m_oy[index] == 0;
+	}
+
+	bool isProfileOys(int index)
+	{
+		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
+		return pfi.m_ox[index] == 0;
+	}
 }// End of Private
 
 /////////////////////////////////////////////////////////////////////////

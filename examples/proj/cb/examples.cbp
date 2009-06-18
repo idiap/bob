@@ -39,6 +39,8 @@
 		</Compiler>
 		<Unit filename="../../README.txt" />
 		<Unit filename="../../boosting/CMakeLists.txt" />
+		<Unit filename="../../boosting/HLBPboostingintegral.cc" />
+		<Unit filename="../../boosting/HLBPboosttestintegral.cc" />
 		<Unit filename="../../boosting/IntegraltrainCascade.cc" />
 		<Unit filename="../../boosting/LBPtrainCascade.cc" />
 		<Unit filename="../../boosting/README.txt" />
