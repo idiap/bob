@@ -61,3 +61,34 @@ for each stage mention
 
 ####################################################################################
 
+# 1 # Stump HLBP
+This particular version trains HLBP features.
+
+usage:
+# Training a Single Stage
+./Linux_i686/trainHLBPStump -one_file ../data/tensors/ftrain_200.tensor -one_file ../data/tensors/nonftrain_200.tensor ../data/models/boosting/modelHLBPSingleStage.wsm -wc 5
+
+
+# Training a Cascade
+./Linux_i686/trainHLBPCascade ../data/list/ptrain.list ../data/list/pvalid.list ../data/parameters/cascadeHaarparameters.data ../data/list/nonface-small.list ../data/list/nonface-small.list ../data/images pgm ../data/wnd ../data/models/boosting/modelHLBPCascade.wsm -verbose
+
+
+# Testing
+./Linux_i686/testBoostedClassifier ../data/list/ptrain.list ../data/models/boosting/modelHLBPCascade.wsm -hlbp -ii
+./Linux_i686/testBoostedClassifier -one_file ../data/tensors/nonfacetest.tensor ../data/models/boosting/modelHLBPCascade.wsm -hlbp -ii
+
+# Parameters HLBP
+The Parameter file contains the dats for each stage of cascade.
+first line: height and width
+second Line: number of stages
+for each stage mention
+		number of classifiers
+		detection rate
+
+
+#################################################################
+
+
+
+
+
