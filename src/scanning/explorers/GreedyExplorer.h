@@ -14,6 +14,7 @@ namespace Torch
 	//              (relative to the model confidence)
 	//
 	//	- PARAMETERS (name, type, default value, description):
+	//		"sampling"	int	0	"0 - linear, 1 - quadratic, 2 - exponential(2)"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -104,8 +105,13 @@ namespace Torch
 		ProfileMachine		m_profileModel;
 
 		// Profile buffers (detection flag + score)
-		unsigned char*		m_profileFlags;
-		double*			m_profileScores;
+		unsigned char*		m_profileFlags;		// [NoConfigs]
+		double*			m_profileScores;	// [NoConfigs]
+
+		// Sampling factors for 3D axis (position and scale)
+		double*			m_sampleOxCoefs;	// [NoConfigs]
+		double*			m_sampleOyCoefs;	// [NoConfigs]
+		double*			m_sampleOsCoefs;	// [NoConfigs]
 	};
 }
 

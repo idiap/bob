@@ -32,7 +32,9 @@ SET(EXAMPLE_SRC
 	trainLBPCascade.cc
 	trainHaarStump.cc
 	trainLBPStump.cc
+	trainHLBPStump.cc
 	testBoostedClassifier.cc)
+
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
 	ADD_EXECUTABLE(${file_exe} ${file})

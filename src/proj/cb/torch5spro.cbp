@@ -346,6 +346,8 @@
 		<Unit filename="../../ip/ipFlip.h" />
 		<Unit filename="../../ip/ipGeomNorm.cc" />
 		<Unit filename="../../ip/ipGeomNorm.h" />
+		<Unit filename="../../ip/ipHLBPLienhart.cc" />
+		<Unit filename="../../ip/ipHLBPLienhart.h" />
 		<Unit filename="../../ip/ipHaarLienhart.cc" />
 		<Unit filename="../../ip/ipHaarLienhart.h" />
 		<Unit filename="../../ip/ipHisto.cc" />
@@ -358,6 +360,8 @@
 		<Unit filename="../../ip/ipLBP4R.h" />
 		<Unit filename="../../ip/ipLBP8R.cc" />
 		<Unit filename="../../ip/ipLBP8R.h" />
+		<Unit filename="../../ip/ipLBPBitmap.cc" />
+		<Unit filename="../../ip/ipLBPBitmap.h" />
 		<Unit filename="../../ip/ipRotate.cc" />
 		<Unit filename="../../ip/ipRotate.h" />
 		<Unit filename="../../ip/ipScaleYX.cc" />

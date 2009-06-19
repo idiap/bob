@@ -42,6 +42,7 @@
 		<Unit filename="../../boosting/README.txt" />
 		<Unit filename="../../boosting/make.csh" />
 		<Unit filename="../../boosting/testBoostedClassifier.cc" />
+		<Unit filename="../../boosting/trainHLBPStump.cc" />
 		<Unit filename="../../boosting/trainHaarCascade.cc" />
 		<Unit filename="../../boosting/trainHaarStump.cc" />
 		<Unit filename="../../boosting/trainLBPCascade.cc" />
