@@ -59,9 +59,9 @@ namespace Torch
     {
         verbose = getBOption("verbose");
         if (verbose)
-            print("CascadeTrainer::train() ...\n");
+            print("CascadeIntegralTrainer::train() ...\n");
 
-        //
+
         //As of now you can either train with integral image or just
         //otherwise if we pass both then it should know which plane to operate on
         // first get the count of +ve examples which have target = 1
@@ -76,7 +76,10 @@ namespace Torch
         int n_examples;
 
         tensor = m_pos_dataset->getExample(0);
-        print("height %d, width %d\n",tensor->size(0),tensor->size(1));
+
+        if (verbose)
+            print("height %d, width %d\n",tensor->size(0),tensor->size(1));
+
         height = tensor->size(0);
         width = tensor->size(1);
         Tensor *example;
@@ -84,7 +87,7 @@ namespace Torch
         int n_count;
         m_threshold = new double[m_n_cascade];
 
-//precalculating integral image
+        //precalculating integral image
         ipIntegral *ipI = new ipIntegral();
         DoubleTensor *temptensor = new DoubleTensor();
 
@@ -108,7 +111,7 @@ namespace Torch
             temptensor = (DoubleTensor*) &ipI->getOutput(0);
             m_valid_dataset->getExample(e)->copy(temptensor);
         }
-////////////////////
+        ////////////////////
 
 
         for (int mt = 0;mt< m_n_cascade;mt++)
@@ -300,9 +303,12 @@ namespace Torch
 
             delete [] randTrack;
 
-            //  delete temptensor;
-            //  delete ipI;
+            //
         }//end of for mt
+      //  delete temptensor;
+       // delete ipI;
+       // ipI= NULL;
+       // temptensor=NULL;
 
         return true;
     }
@@ -310,7 +316,7 @@ namespace Torch
     void CascadeIntegralTrainer::getThreshold(DataSet *m_data)
     {
         // Torch::print("CascadeTrainer::getThrehsold()\n");
-
+        verbose = getBOption("verbose");
         int tp_examples = m_data->getNoExamples();
         delete [] m_labelledmeasure;
         m_labelledmeasure = new LabelledMeasure[tp_examples];
@@ -344,7 +350,7 @@ namespace Torch
         long n_scanexamples = m_imagescandataset->getNoExamples();
         //next fill with negative patterns
         //double imgtarget;
-        //is it possible to make it random here to get ramdom patterns
+        verbose = getBOption("verbose");
         int nc =0;
         //  Tensor *example;
         double score;
@@ -393,8 +399,10 @@ namespace Torch
         if (verbose)
             print("Number of -ve patterns left = %ld\n",nc);
 
-        //  delete ipI;
-        // delete temptensor;
+       // delete ipI;
+       // delete temptensor;
+       // ipI = NULL;
+       // temptensor=NULL;
         delete m_tempmemory;
 
     }
@@ -408,7 +416,7 @@ namespace Torch
 
         //is it possible to make it random here to get ramdom patterns
         int nc =0;
-
+        verbose = getBOption("verbose");
         DoubleTensor reject_target(1);
 
         reject_target.fill(-1.0);
@@ -458,6 +466,7 @@ namespace Torch
         //update the positive training and/or validation dataset
 
         //get the target value and only process it is = 1
+        verbose = getBOption("verbose");
         int tp_examples = mdata_->getNoExamples();
         int count = 0;
         for (int i=0;i<tp_examples;i++)

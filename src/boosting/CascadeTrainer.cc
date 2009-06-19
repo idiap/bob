@@ -57,7 +57,7 @@ namespace Torch
 //////////////////////////////////////////////////////////////////////////////////////////////
     bool CascadeTrainer::train()
     {
-             verbose = getBOption("verbose");
+        verbose = getBOption("verbose");
         if (verbose)
             print("CascadeTrainer::train() ...\n");
 
@@ -75,7 +75,8 @@ namespace Torch
         int n_examples;
 
         tensor = m_pos_dataset->getExample(0);
-        print("height %d, width %d\n",tensor->size(0),tensor->size(1));
+        if (verbose)
+            print("height %d, width %d\n",tensor->size(0),tensor->size(1));
         height = tensor->size(0);
         width = tensor->size(1);
         Tensor *example;
@@ -133,7 +134,8 @@ namespace Torch
 
 
             n_scanexamples = m_imagescandataset->getNoExamples();
-            print("Number of Positive patterns remaining: %d\n",p_count);
+            if (verbose)
+                print("Number of Positive patterns remaining: %d\n",p_count);
             //next fill with negative patterns
 
             n_count =0;
@@ -265,8 +267,8 @@ namespace Torch
             getThreshold(m_valid_dataset);
             updateDataSet(mt,m_pos_dataset,"training");
             updateDataSet(mt,m_valid_dataset,"validation");
-            if(mt<m_n_cascade-1)
-            updateImageScanDataSet(mt);
+            if (mt<m_n_cascade-1)
+                updateImageScanDataSet(mt);
             // updateImageScanDataSet_check(mt);
             delete[] randSelect;
 
@@ -275,11 +277,12 @@ namespace Torch
 
         return true;
     }
-    //////////////
+///////////////////////////////////////////////////////////////////////
     void CascadeTrainer::getThreshold(DataSet *m_data)
     {
         // Torch::print("CascadeTrainer::getThrehsold()\n");
 
+        verbose = getBOption("verbose");
         int tp_examples = m_data->getNoExamples();
         delete [] m_labelledmeasure;
         m_labelledmeasure = new LabelledMeasure[tp_examples];
@@ -321,6 +324,8 @@ namespace Torch
 
         reject_target.fill(-1.0);
 
+        verbose = getBOption("verbose");
+
         for (long i=0;i<n_scanexamples;i++)
         {
             //have to check if the target is +1 and fill withit
@@ -353,7 +358,7 @@ namespace Torch
     }
 
     //////////////////////
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
     void CascadeTrainer::updateImageScanDataSet_check(int trainer_i)
     {
         long n_scanexamples = m_imagescandataset->getNoExamples();
@@ -365,7 +370,7 @@ namespace Torch
         DoubleTensor reject_target(1);
 
         reject_target.fill(-1.0);
-
+        verbose = getBOption("verbose");
         for (long i=0;i<n_scanexamples;i++)
         {
             //have to check if the target is +1 and fill withit
@@ -408,7 +413,7 @@ namespace Torch
     {
 
         //update the positive training and/or validation dataset
-
+        verbose = getBOption("verbose");
         //get the target value and only process it is = 1
         int tp_examples = mdata_->getNoExamples();
         int count = 0;

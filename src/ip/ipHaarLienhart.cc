@@ -438,6 +438,7 @@ namespace Torch
         u_size_y= m_height;
         u_x =0;
         u_y=0;
+        u_z=0;
         //.....here call setregion with 0,0,h,w
         setRegion(TensorRegion(0,0,m_height,m_width));
 

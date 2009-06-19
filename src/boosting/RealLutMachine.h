@@ -62,6 +62,7 @@ namespace Torch {
 		double min, max;
 		int n_bins;
 		double *lut;
+		bool verbose;
 	};
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

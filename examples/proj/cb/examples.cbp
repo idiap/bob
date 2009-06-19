@@ -39,14 +39,13 @@
 		</Compiler>
 		<Unit filename="../../README.txt" />
 		<Unit filename="../../boosting/CMakeLists.txt" />
-		<Unit filename="../../boosting/IntegraltrainCascade.cc" />
-		<Unit filename="../../boosting/LBPtrainCascade.cc" />
 		<Unit filename="../../boosting/README.txt" />
-		<Unit filename="../../boosting/boostingLBPRound.cc" />
-		<Unit filename="../../boosting/boostingintegral.cc" />
-		<Unit filename="../../boosting/boosttest.cc" />
-		<Unit filename="../../boosting/boosttestintegral.cc" />
 		<Unit filename="../../boosting/make.csh" />
+		<Unit filename="../../boosting/testBoostedClassifier.cc" />
+		<Unit filename="../../boosting/trainHaarCascade.cc" />
+		<Unit filename="../../boosting/trainHaarStump.cc" />
+		<Unit filename="../../boosting/trainLBPCascade.cc" />
+		<Unit filename="../../boosting/trainLBPStump.cc" />
 		<Unit filename="../../dataset/CMakeLists.txt" />
 		<Unit filename="../../dataset/README.txt" />
 		<Unit filename="../../dataset/bindata2tensor.cc" />

@@ -539,7 +539,6 @@
 		<Unit filename="../../trainer/gtfiles/halfprofileEyeNoseChinGTFile.h" />
 		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.cc" />
 		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.h" />
-		<Unit filename="../../../torch5spro.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

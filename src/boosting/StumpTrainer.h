@@ -28,7 +28,7 @@ namespace Torch
 	float **histogram;
 	float **cumulative_histogram;
 
-	//
+	bool verbose;
 	StumpMachine *m_stump_machine;
     };
 

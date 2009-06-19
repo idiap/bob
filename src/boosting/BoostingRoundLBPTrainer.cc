@@ -22,94 +22,6 @@ namespace Torch
     }
     ////////////////////////////////////////////////////////////////////////////////
 
-//     void BoostinTrainer::updateWeights()
-//    {
-//        print("   BoostingTrainer::updateWeights()\n");
-//
-//        int fa = 0;
-//        int fr = 0;
-//        int np = 0;
-//        int nn = 0;
-//
-//        double error_ = 0.0;
-//
-//        //
-//        Machine *m_ = m_weak_learners[m_n_classifiers_trained]->getMachine();
-//       // TensorRegion *tr = new TensorRegion(0,0,19,19);
-//       // m_->setRegion(*tr);
-//
-//        print("Number of examples in updateweights %d\n",m_n_examples);
-//        for (int i=0 ; i<m_n_examples ; i++)
-//        {
-//            Tensor *example = m_dataset->getExample(i);
-//
-//          //  print("1 ..........\n");
-//            m_->forward(*example);
-//           // print("2 ..........\n");
-//            ShortTensor *target = (ShortTensor *) m_dataset->getTarget(i);
-//            short target_value = (*target)(0);
-//            DoubleTensor *t_output = (DoubleTensor *) &m_->getOutput();
-//           // print("3 ..........\n");
-//            m_labelledmeasure[i].measure = (*t_output)(0);
-//          //  print("machine feature value %f\n",(*t_output)(0));
-//            m_labelledmeasure[i].label = target_value;
-//
-//            m_label_samples[i] = 0;
-//          //  print("4 ..........\n");
-//            if (target_value == 0)
-//            {
-//                if ((*t_output)(0) > 0)
-//                {
-//                    fa++;
-//                    error_ += m_weights_samples[i];
-//                    m_label_samples[i] = 1;
-//                }
-//                else m_label_samples[i] = -1;
-//
-//                nn++;
-//            }
-//            else if (target_value == 1)
-//            {
-//                if ((*t_output)(0) < 0)
-//                {
-//                    fr++;
-//                    error_ += m_weights_samples[i];
-//                    m_label_samples[i] = 1;
-//                }
-//                else m_label_samples[i] = -1;
-//                np++;
-//
-//            }
-//        }
-//
-//        print("   error = %g \t FAR = %g \t FRR = %g\n", error_, ((float) fa * 100.0 / (float) nn), ((float) fr * 100.0 / (float) np));
-//
-//        double frr = 0.0;
-//        double far = 0.0;
-//        double threshold = computeEER(m_labelledmeasure, m_n_examples, &frr, &far);
-//
-//        print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
-//
-//        double beta = error_ / (1.0 - error_);
-//
-//        //
-//        m_weights[m_n_classifiers_trained] = -log(beta); // log(1 / beta)
-//
-//        print("   Machine weights = %g\n", m_weights[m_n_classifiers_trained]);
-//
-//        //
-//        double z_ = 0.0;
-//        for (int i=0 ; i<m_n_examples ; i++)
-//        {
-//            if (m_label_samples[i] < 0)
-//                m_weights_samples[i] *= beta; // in fact exp(log(beta) * I{classification error})
-//            z_ += m_weights_samples[i];
-//        }
-//        for (int i=0 ; i<m_n_examples ; i++) m_weights_samples[i] /= z_;
-//
-//
-//        print("\n\n");
-//    }
 
     double BoostingRoundLBPTrainer::forward(Tensor *example)
     {
@@ -131,13 +43,16 @@ namespace Torch
     ////////////////////////////////////////////////////////////////////////////
     bool BoostingRoundLBPTrainer::train()
     {
+        verbose = getBOption("verbose");
+        if (verbose)
         print("BoostingRoundLBPTrainer::train() ...\n");
 
         //
         bool useSampling = getBOption("boosting_by_sampling");
         m_nrounds = getIOption("number_of_rounds");
 
-        print("number of Classifiers %d, nRounds %d\n",m_n_classifiers,m_nrounds);
+        if (verbose)
+        print("Number of Classifiers %d, nRounds %d\n",m_n_classifiers,m_nrounds);
 
         //Check if the number of rounds are greater than number of weakClassifiers
         if (m_n_classifiers> m_nrounds)
@@ -146,6 +61,7 @@ namespace Torch
 
             return false;
         }
+
         //get the number of features to initialize m_featuremask
 
         if (m_n_classifiers>0)
@@ -168,9 +84,11 @@ namespace Torch
             return false;
         }
 
-        //
-        print(" + Number of weak classifiers: %d\n", m_n_classifiers);
-        print(" + Number of examples: %d\n", m_n_examples);
+        if (verbose)
+        {
+            print(" + Number of weak classifiers: %d\n", m_n_classifiers);
+            print(" + Number of examples: %d\n", m_n_examples);
+        }
 
         m_weights_samples = new double [m_n_examples];
         m_label_samples = new short [m_n_examples];
@@ -183,8 +101,8 @@ namespace Torch
 
         //
         m_n_classifiers_trained = 0;
-        //for (int classifierNo = 0; classifierNo < m_n_classifiers; classifierNo++)
-        int  c_classifiers =0; //tracking of number of unique classifiers trained
+
+        int  c_classifiers =0;          //tracking of number of unique classifiers trained
         int featureID;
         for (int classifierNo = 0; classifierNo < m_nrounds; classifierNo++)
         {
@@ -212,16 +130,6 @@ namespace Torch
 
             if (m_weak_learners[classifierNo]->train() == false) return false;
 
-            //
-//            File filn;
-//            char fil[200];
-//            sprintf(fil,"weight%d.data",classifierNo);
-//            filn.open(fil,"w");
-//            for (int pk =0;pk<m_n_examples;pk++)
-//                filn.printf("%g\n",m_weights_samples[pk]);
-//            filn.close();
-
-
 
             //check for the unique features
             featureID = m_weak_learners[classifierNo]->getFeatureID();
@@ -239,7 +147,7 @@ namespace Torch
 
             updateWeights(); // update weights for all examples
 
-            // print(".........in this\n");
+
             m_n_classifiers_trained++;
         }
 
@@ -255,7 +163,7 @@ namespace Torch
         {
             m_weights[j] = exp(m_weights[j]) / z_;
             m_weak_learners[j]->setWeight(m_weights[j]);
-            // print("< %g\n", m_weights[j]);
+
         }
 
         //
@@ -284,7 +192,6 @@ namespace Torch
             m_labelledmeasure[i].measure = s;
             m_labelledmeasure[i].label = target_value;
 
-            //print(" %g %d\n", s, target_value);
             if (target_value > 0)
             {
                 mean_positive += s;
@@ -301,9 +208,11 @@ namespace Torch
         double far = 0.0;
         double threshold = computeEER(m_labelledmeasure, m_n_examples, &frr, &far);
 
-        print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
-
-        print("   Mean negative = %g \t Mean Positive = %g\n", mean_negative / (double) n_negative, mean_positive / (double) n_positive);
+        if (verbose)
+        {
+            print("   EER Threshold = %g \t FRR = %g \t FAR = %g\n", threshold, frr*100.0, far*100.0);
+            print("   Mean negative = %g \t Mean Positive = %g\n", mean_negative / (double) n_negative, mean_positive / (double) n_positive);
+        }
 
         compressmachines();
 
@@ -314,7 +223,7 @@ namespace Torch
 //////////////////////////////////////////////////////////////////////////////////////////
     void BoostingRoundLBPTrainer::compressmachines()
     {
-// first map the featureid to first m_n_classifiers
+        // first map the featureid to first m_n_classifiers
         int c=0;
         int max_bins = 512;
         int bins;
@@ -339,7 +248,7 @@ namespace Torch
 
         }
 
-// now you have to get the lut and
+        // now you have to get the lut and
         int track;
         int *trackf = new int[m_n_classifiers];
         for (int i=0;i<m_nrounds;i++)
@@ -358,29 +267,27 @@ namespace Torch
 
         }
 
-//so finally we get the lut for a single feature
-//now set the first m_n_classifiers machines to this new lut
+        //so finally we get the lut for a single feature
+        //now set the first m_n_classifiers machines to this new lut
 
         for (int i=0;i<m_n_classifiers;i++)
         {
             bins = bintrack[i];
-         //   print("%d\n",trackf[i]);
+            //   print("%d\n",trackf[i]);
             ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setCore( m_weak_learners[i]->m_features[trackf[i]]);
 
             ((IntLutMachine*)(m_weak_learners[i]->m_weak_classifier))->setParams(bins, m_lut_t1[i]);
 
         }
 
-        //    for (int i=0;i<m_n_classifiers;i++)
-        ////        delete m_lut_t1[i];
-        //   delete [] m_lut_t1;
+
         delete[] trackf;
         delete [] bintrack;
-        //delete []
+
 
     }
 
-
+//////////////////////////////////////////////////////////////////////////////////////////
 
     bool BoostingRoundLBPTrainer::setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_)
     {
@@ -388,24 +295,24 @@ namespace Torch
         m_weak_learners = weak_learners_;
 
         m_nrounds = getIOption("number_of_rounds");
-	delete []m_weights;
+        delete []m_weights;
         m_weights = new double [m_nrounds];
 
         return true;
     }
 
-    ////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
     BoostingRoundLBPTrainer::~BoostingRoundLBPTrainer()
     {
-        //   print("ffgjsdfs\n");
+
         delete []m_featuremask;
 
-         for ( int i = 0; i < m_n_classifiers; i++)
-	{
-		delete [] m_lut_t1[i];
-	}
-	delete [] m_lut_t1;
+        for ( int i = 0; i < m_n_classifiers; i++)
+        {
+            delete [] m_lut_t1[i];
+        }
+        delete [] m_lut_t1;
 
     }
-
+//////////////////////////////////////////////////////////////////////////////////////////
 }

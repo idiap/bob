@@ -64,6 +64,7 @@ namespace Torch {
 		// parameters of the machine
 		float threshold;
 		int direction;
+		bool verbose;
 	};
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

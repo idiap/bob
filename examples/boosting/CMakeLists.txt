@@ -28,12 +28,11 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
-	IntegraltrainCascade.cc
-	LBPtrainCascade.cc
-	boostingLBPRound.cc
-	boostingintegral.cc
-	boosttest.cc
-	boosttestintegral.cc)
+	trainHaarCascade.cc
+	trainLBPCascade.cc
+	trainHaarStump.cc
+	trainLBPStump.cc
+	testBoostedClassifier.cc)
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
 	ADD_EXECUTABLE(${file_exe} ${file})
