@@ -13,6 +13,7 @@ usage:
 
 # Testing
 ./Linux_i686/testBoostedClassifier ../data/list/ptrain.list ../data/models/boosting/modelHaarCascade.wsm -ii
+./Linux_i686/testBoostedClassifier -one_file ../data/tensors/nonfacetest.tensor ../data/models/boosting/modelHaarCascade.wsm -ii
 
 # Parameters Haar
 The Parameter file contains the dats for each stage of cascade.
@@ -44,7 +45,7 @@ usage:
 
 # Testing
 ./Linux_i686/testBoostedClassifier ../data/list/ptrain.list ../data/models/boosting/modelLBPCascade.wsm
-
+./Linux_i686/testBoostedClassifier -one_file ../data/tensors/nonfacetest.tensor ../data/models/boosting/modelLBPCascade.wsm
 
 	////view the scores.out to view confidence score of last stage
 
