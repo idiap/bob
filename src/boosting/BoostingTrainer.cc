@@ -39,7 +39,7 @@ namespace Torch
         return true;
     }
 ////////////////////////////////////////////////////////////////////////////////
-    double BoostingTrainer::forward(Tensor *example_)
+    double BoostingTrainer::forward(const Tensor *example_)
     {
         double s = 0.0;
         for (int j = 0 ; j < m_n_classifiers ; j++)

@@ -76,13 +76,29 @@ const Tensor& spCoreChain::getOutput(int index) const
 }
 
 ////////////////////////////////////////////////////////////////////
-// Process some input tensor
+/// Check if the input tensor has the right dimensions and type
 
-bool spCoreChain::process(const Tensor& input)
+bool spCoreChain::checkInput(const Tensor& input) const
+{
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////
+/// Allocate (if needed) the output tensors given the input tensor dimensions
+
+bool spCoreChain::allocateOutput(const Tensor& input)
+{
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////
+/// Process some input tensor (the input is checked, the outputs are allocated)
+
+bool spCoreChain::processInput(const Tensor& input)
 {
 	if (m_n_cores < 1)
 	{
-		error("spCoreChain::process - no spCore set!\n");
+		error("spCoreChain::processInput - no spCore set!\n");
 	}
 
 	if (m_cores[0]->process(input) == false)
@@ -91,8 +107,14 @@ bool spCoreChain::process(const Tensor& input)
 		return false;
 	}
 
-	for (int i = 1; i < m_n_cores; i ++)
+	for (int i = 0; i < m_n_cores - 1; i ++)
 	{
+		if (m_cores[i]->getNOutputs() != 1)
+		{
+			print("spCoreChain::process - expected one single output!\n");
+			return false;
+		}
+
 		if (m_cores[i + 1]->process(m_cores[i]->getOutput(0)) == false)
 		{
 			print("spCoreChain::process - failed to run process!\n");

@@ -211,8 +211,6 @@
 		<Unit filename="../../boosting/BoostingTrainer.cc" />
 		<Unit filename="../../boosting/BoostingTrainer.h" />
 		<Unit filename="../../boosting/CMakeLists.txt" />
-		<Unit filename="../../boosting/CascadeIntegralTrainer.cc" />
-		<Unit filename="../../boosting/CascadeIntegralTrainer.h" />
 		<Unit filename="../../boosting/CascadeTrainer.cc" />
 		<Unit filename="../../boosting/CascadeTrainer.h" />
 		<Unit filename="../../boosting/FTrainer.cc" />
@@ -278,6 +276,8 @@
 		<Unit filename="../../core/ipCore.h" />
 		<Unit filename="../../core/spCore.cc" />
 		<Unit filename="../../core/spCore.h" />
+		<Unit filename="../../core/spCoreChain.cc" />
+		<Unit filename="../../core/spCoreChain.h" />
 		<Unit filename="../../core/spCores.h" />
 		<Unit filename="../../geometry/Affine2D.cc" />
 		<Unit filename="../../geometry/Affine2D.h" />

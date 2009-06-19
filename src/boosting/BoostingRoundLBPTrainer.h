@@ -20,7 +20,7 @@ namespace Torch
     public:
         BoostingRoundLBPTrainer();
         virtual bool train();
-        virtual double forward(Tensor *example_);
+        virtual double forward(const Tensor *example_);
         virtual ~BoostingRoundLBPTrainer();
         virtual bool setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_);
         //    virtual void updateWeights();

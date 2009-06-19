@@ -23,7 +23,7 @@ namespace Torch
     ////////////////////////////////////////////////////////////////////////////////
 
 
-    double BoostingRoundLBPTrainer::forward(Tensor *example)
+    double BoostingRoundLBPTrainer::forward(const Tensor *example)
     {
         //   print("BoostingRoundLBPTrainer::forward()\n");
         double s = 0.0;

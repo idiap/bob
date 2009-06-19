@@ -21,13 +21,6 @@ namespace Torch
 		/// Destructor
 		virtual ~spCoreChain();
 
-		/// Loading/Saving the content from files (\emph{not the options})
-		virtual bool		loadFile(File& file);
-		virtual bool		saveFile(File& file) const;
-
-		/// Process some input tensor
-		bool	 		process(const Tensor& input);
-
 		/// Change the region of the input tensor to process
 		virtual void		setRegion(const TensorRegion& region);
 
@@ -42,7 +35,18 @@ namespace Torch
 		int			getNOutputs() const;
 		const Tensor&		getOutput(int index) const;
 
+		int			getNCores() const { return m_n_cores; }
+
 	protected:
+
+		/// Check if the input tensor has the right dimensions and type
+		virtual bool		checkInput(const Tensor& input) const;
+
+		/// Allocate (if needed) the output tensors given the input tensor dimensions
+		virtual bool		allocateOutput(const Tensor& input);
+
+		/// Process some input tensor (the input is checked, the outputs are allocated)
+		virtual bool		processInput(const Tensor& input);
 
 		//////////////////////////////////////////////////////////
 		/// Attributes

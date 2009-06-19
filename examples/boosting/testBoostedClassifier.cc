@@ -16,9 +16,8 @@ int main(int argc, char* argv[])
 	int max_features;
 	int n_classifiers;
 	bool verbose;
-	int width;
-	int height;
 	bool integral;
+	bool hlbp;
 
 	FileListCmdOption* tensor_files = new FileListCmdOption("Patterns", "Pattern List");
 	tensor_files->isArgument(true);
@@ -35,7 +34,9 @@ int main(int argc, char* argv[])
 
 	cmd.addText("\nOptions:");
 	cmd.addBCmdOption("-verbose", &verbose, false, "print values");
-	cmd.addBCmdOption("-ii", &integral, false, "use Integral image");
+	cmd.addBCmdOption("-hlbp", &hlbp, false, "use ipLBPBitmap (for HLBP)");
+	cmd.addBCmdOption("-ii", &integral, false, "use ipIntegral");
+
 
 	// Parse the command line
 	if (cmd.read(argc, argv) < 0)
@@ -77,14 +78,26 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	spCoreChain preprocessing;
+
+	if(hlbp)
+	{
+		ipLBP4R* ip_lbp = manage(new ipLBP4R(1)); // ipLBP4R, R = 1.
+		preprocessing.add(manage(new ipLBPBitmap(ip_lbp)));
+	}
+
 	if (integral)
 	{
-		ipIntegral* ipI = manage(new ipIntegral());
-		for (int i=0;i<n_examples;i++)
+		preprocessing.add(manage(new ipIntegral()));
+	}
+
+	if (preprocessing.getNCores() > 0)
+	{
+		for (long e = 0; e < mdataset->getNoExamples(); e ++)
 		{
-			DoubleTensor* example = (DoubleTensor*)mdataset->getExample(i);
-			ipI->process(*example);
-			example->copy(&ipI->getOutput(0));
+			Tensor* example = mdataset->getExample(e);
+			preprocessing.process(*example);
+			example->copy(&preprocessing.getOutput(0));
 		}
 	}
 

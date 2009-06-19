@@ -4,23 +4,29 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../boosting/CMakeLists.txt" open="1" top="1" tabpos="1">
+	<File name="../../boosting/CMakeLists.txt" open="0" top="0" tabpos="1">
 		<Cursor position="1148" topLine="2" />
 	</File>
 	<File name="../../boosting/README.txt" open="0" top="0" tabpos="62">
 		<Cursor position="1032" topLine="0" />
 	</File>
-	<File name="../../boosting/testBoostedClassifier.cc" open="0" top="0" tabpos="63">
-		<Cursor position="0" topLine="83" />
+	<File name="../../boosting/testBoostedClassifier.cc" open="1" top="0" tabpos="1">
+		<Cursor position="2379" topLine="76" />
 	</File>
-	<File name="../../boosting/trainHLBPStump.cc" open="1" top="0" tabpos="2">
-		<Cursor position="20" topLine="0" />
+	<File name="../../boosting/trainHLBPStump.cc" open="1" top="0" tabpos="4">
+		<Cursor position="3534" topLine="103" />
 	</File>
-	<File name="../../boosting/trainLBPCascade.cc" open="0" top="0" tabpos="64">
-		<Cursor position="9591" topLine="258" />
+	<File name="../../boosting/trainHaarCascade.cc" open="1" top="0" tabpos="2">
+		<Cursor position="13513" topLine="254" />
 	</File>
-	<File name="../../boosting/trainLBPStump.cc" open="0" top="0" tabpos="65">
-		<Cursor position="0" topLine="172" />
+	<File name="../../boosting/trainHaarStump.cc" open="1" top="1" tabpos="6">
+		<Cursor position="6246" topLine="206" />
+	</File>
+	<File name="../../boosting/trainLBPCascade.cc" open="1" top="0" tabpos="3">
+		<Cursor position="7606" topLine="264" />
+	</File>
+	<File name="../../boosting/trainLBPStump.cc" open="0" top="0" tabpos="27">
+		<Cursor position="3579" topLine="87" />
 	</File>
 	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="9">
 		<Cursor position="1178" topLine="1" />

@@ -429,9 +429,11 @@ int main(int argc, char* argv[])
 		boosting[i] = trainer;
 	}
 
-	CascadeIntegralTrainer *CT = manage(new CascadeIntegralTrainer());
+	CascadeTrainer *CT = manage(new CascadeTrainer());
 	CT->setTrainers(boosting, n_stages, detection_rate);
 	CT->setData(pDataSet,vDataSet,&iscandataset);
+	CT->setPreprocessor(manage(new ipIntegral));
+
 	if (verbose)
 		CT->setBOption("verbose",true);
 	CT->train();
