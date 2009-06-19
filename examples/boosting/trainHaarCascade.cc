@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 	double* detection_rate;
 	bool verbose;
 
-//..............
+	//..............
 	int n_features;
 
 
@@ -272,158 +272,130 @@ int main(int argc, char* argv[])
 
 						weakfeatures[i ++] = iph;
 					}
-
-//        //Edge feature 2
-//        for (int w_=1;w_<width;w_++)
-//            for (int h_ =2;h_<height;h_=h_+2)
-//                for (int x_=0;x_<width-w_;x_++)
-//                    for (int y_=0;y_<height-h_;y_++)
-//                    {
-//                        weakfeatures[i] = manage(new ipHaarLienhart());//width, height);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setNoRec(2);
-//                        //  t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, x_, y_, w_, h_);
-//                        // t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2, x_, y_+(h_/2), w_,(h_/2));
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, y_, x_, h_, w_);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2,  y_+(h_/2),x_,(h_/2),w_);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setModelSize(*modelsize);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setRegion(*tregion);
-//                        i++;
-//                    }
 //
-//        //  n_features++;
+//		//Edge feature 2
+//		for (int w_=1;w_<width;w_++)
+//			for (int h_ =2;h_<height;h_=h_+2)
+//				for (int x_=0;x_<width-w_;x_++)
+//					for (int y_=0;y_<height-h_;y_++)
+//					{
+//						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+//						iph->setNoRec(2);
+//						iph->setRec(0,1, y_, x_, h_, w_);
+//						iph->setRec(1,-2,  y_+(h_/2),x_,(h_/2),w_);
+//						iph->setModelSize(modelsize);
+//						iph->setRegion(tregion);
 //
+//						weakfeatures[i ++] = iph;
+//					}
 //
-//        //Line feature 1
+//		//  n_features++;
 //
-//        for (int w_=3;w_<width;w_=w_+3)
-//            for (int h_ =1;h_<height;h_++)
-//                for (int x_=0;x_<width-w_;x_++)
-//                    for (int y_=0;y_<height-h_;y_++)
-//                    {
-//                        weakfeatures[i] = manage(new ipHaarLienhart());//width, height);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setNoRec(2);
-//                        //    t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, x_, y_, w_, h_);
-//                        //   t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-3, x_+(w_/3), y_, (w_/3),h_);
+//		//Line feature 1
+//		for (int w_=3;w_<width;w_=w_+3)
+//			for (int h_ =1;h_<height;h_++)
+//				for (int x_=0;x_<width-w_;x_++)
+//					for (int y_=0;y_<height-h_;y_++)
+//					{
+//						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+//						iph->setNoRec(2);
+//						iph->setRec(0,1, y_, x_, h_, w_);
+//						iph->setRec(1,-3, y_,x_+(w_/3), h_, (w_/3));
+//						iph->setModelSize(modelsize);
+//						iph->setRegion(tregion);
 //
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, y_, x_, h_, w_);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-3, y_,x_+(w_/3), h_, (w_/3));
-//                        ((ipHaarLienhart *)weakfeatures[i])->setModelSize(*modelsize);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setRegion(*tregion);
-//                        i++;
+//						weakfeatures[i ++] = iph;
+//					}
 //
-//                    }
+//		// n_features++;
 //
-//        // n_features++;
+//		//Line feature 2
+//		for (int w_=1;w_<width;w_++)
+//			for (int h_ =3;h_<height;h_=h_+3)
+//				for (int x_=0;x_<width-w_;x_++)
+//					for (int y_=0;y_<height-h_;y_++)
+//					{
+//						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+//						iph->setNoRec(2);
+//						iph->setRec(0,1, y_, x_, h_, w_);
+//						iph->setRec(1,-3,  y_+h_/3, x_,h_/3,w_);
+//						iph->setModelSize(modelsize);
+//						iph->setRegion(tregion);
 //
+//						weakfeatures[i ++] = iph;
+//					}
 //
+//		// n_features++;
 //
-//        //Line feature 2
-//        for (int w_=1;w_<width;w_++)
-//            for (int h_ =3;h_<height;h_=h_+3)
-//                for (int x_=0;x_<width-w_;x_++)
-//                    for (int y_=0;y_<height-h_;y_++)
-//                    {
-//                        weakfeatures[i] = manage(new ipHaarLienhart());//width, height);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setNoRec(2);
-//                        //       t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, x_, y_, w_, h_);
-//                        //      t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-3, x_, y_+h_/3, w_,h_/3);
+//		//Line feature 3
+//		for (int w_=1;w_<width;w_++)
+//			for (int h_ =4;h_<height;h_=h_+4)
+//				for (int x_=0;x_<width-w_;x_++)
+//					for (int y_=0;y_<height-h_;y_++)
+//					{
+//						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+//						iph->setNoRec(2);
+//						iph->setRec(0,1, y_, x_, h_, w_);
+//						iph->setRec(1,-2, y_+h_/4,x_ ,h_/2,w_);
+//						iph->setModelSize(modelsize);
+//						iph->setRegion(tregion);
 //
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, y_, x_, h_, w_);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-3,  y_+h_/3, x_,h_/3,w_);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setModelSize(*modelsize);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setRegion(*tregion);
-//                        i++;
+//						weakfeatures[i ++] = iph;
+//					}
 //
-//                    }
-
-
-		// n_features++;
-
-//        //Line feature 3
-//        for (int w_=1;w_<width;w_++)
-//            for (int h_ =4;h_<height;h_=h_+4)
-//                for (int x_=0;x_<width-w_;x_++)
-//                    for (int y_=0;y_<height-h_;y_++)
-//                    {
-//                        weakfeatures[i] = manage(new ipHaarLienhart());//width, height);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setNoRec(2);
-//                        //    t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, x_, y_, w_, h_);
-//                        //   t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2, x_, y_+h_/4, w_,h_/2);
+//		// n_features++;
 //
+//		//Line feature 4
+//		for (int w_=4;w_<width;w_=w_+4)
+//			for (int h_ =1;h_<height;h_++)
+//				for (int x_=0;x_<width-w_;x_++)
+//					for (int y_=0;y_<height-h_;y_++)
+//					{
+//						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+//						iph->setNoRec(2);
+//						iph->setRec(0,1, y_, x_, h_, w_);
+//						iph->setRec(1,-2,y_, x_+(w_/4), h_, (w_/2));
+//						iph->setModelSize(modelsize);
+//						iph->setRegion(tregion);
 //
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, y_, x_, h_, w_);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2, y_+h_/4,x_ ,h_/2,w_);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setModelSize(*modelsize);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setRegion(*tregion);
-//                        i++;
+//						weakfeatures[i ++] = iph;
+//					}
 //
-//                    }
+//		//n_features++;
 //
-//        // n_features++;
+//		for (int w_=3;w_<width;w_=w_+3)
+//			for (int h_ =3;h_<height;h_=h_+3)
+//				for (int x_=0;x_<width-w_;x_++)
+//					for (int y_=0;y_<height-h_;y_++)
+//					{
+//						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+//						iph->setNoRec(2);
+//						iph->setRec(0,1, y_, x_, h_, w_);
+//						iph->setRec(1,-2, y_+(h_/3), x_+w_/3, (h_/3),w_/3);
+//						iph->setModelSize(modelsize);
+//						iph->setRegion(tregion);
 //
-//        //Line feature 4
-//        for (int w_=4;w_<width;w_=w_+4)
-//            for (int h_ =1;h_<height;h_++)
-//                for (int x_=0;x_<width-w_;x_++)
-//                    for (int y_=0;y_<height-h_;y_++)
-//                    {
-//                        weakfeatures[i] = manage(new ipHaarLienhart());//width, height);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setNoRec(2);
-//                        //    t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, x_, y_, w_, h_);
-//                        //   t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2, x_+(w_/4), y_, (w_/2),h_);
+//						weakfeatures[i ++] = iph;
+//					}
 //
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, y_, x_, h_, w_);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2,y_, x_+(w_/4), h_, (w_/2));
-//                        ((ipHaarLienhart *)weakfeatures[i])->setModelSize(*modelsize);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setRegion(*tregion);
-//                        i++;
+//		// n_features++;
 //
-//                    }
+//		for (int w_=2;w_<width;w_=w_+2)
+//			for (int h_ =2;h_<height;h_=h_+2)
+//				for (int x_=0;x_<width-w_;x_++)
+//					for (int y_=0;y_<height-h_;y_++)
+//						//  n_features++;
+//					{
+//						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+//						iph->setNoRec(3);
+//						iph->setRec(0,1, y_, x_, h_, w_);
+//						iph->setRec(1,-2,y_, x_+(w_/2), (h_/2),w_/2);
+//						iph->setRec(2,-2, y_+h_/2,x_, (h_/2),w_/2);
+//						iph->setModelSize(modelsize);
+//						iph->setRegion(tregion);
 //
-//
-//        //n_features++;
-//
-//        for (int w_=3;w_<width;w_=w_+3)
-//            for (int h_ =3;h_<height;h_=h_+3)
-//                for (int x_=0;x_<width-w_;x_++)
-//                    for (int y_=0;y_<height-h_;y_++)
-//                    {
-//                        weakfeatures[i] = manage(new ipHaarLienhart());//width, height);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setNoRec(2);
-//                        //             t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, x_, y_, w_, h_);
-//                        //                 t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2, x_+(w_/3), y_+h_/3, (w_/3),h_/3);
-//
-//
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, y_, x_, h_, w_);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2, y_+(h_/3), x_+w_/3, (h_/3),w_/3);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setModelSize(*modelsize);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setRegion(*tregion);
-//                        i++;
-//
-//                    }
-//
-//        // n_features++;
-//
-//        for (int w_=2;w_<width;w_=w_+2)
-//            for (int h_ =2;h_<height;h_=h_+2)
-//                for (int x_=0;x_<width-w_;x_++)
-//                    for (int y_=0;y_<height-h_;y_++)
-//                        //  n_features++;
-//                    {
-//                        weakfeatures[i] = manage(new ipHaarLienhart());//width, height);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setNoRec(3);
-//                        //      t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, x_, y_, w_, h_);
-//                        //      t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2, x_+(w_/2), y_, (w_/2),h_/2);
-//                        //        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(2,-2, x_, y_+h_/2, (w_/2),h_/2);
-//
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(0,1, y_, x_, h_, w_);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(1,-2,y_, x_+(w_/2), (h_/2),w_/2);
-//                        t= ((ipHaarLienhart *)weakfeatures[i])->setRec(2,-2, y_+h_/2,x_, (h_/2),w_/2);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setModelSize(*modelsize);
-//                        ((ipHaarLienhart *)weakfeatures[i])->setRegion(*tregion);
-//                        i++;
-//
-//                    }
+//						weakfeatures[i ++] = iph;
+//					}
 
 
 	}
