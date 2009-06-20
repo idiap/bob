@@ -177,72 +177,91 @@ int main(int argc, char* argv[])
 		print("Prepare Cascade Boosting ...\n");
 	}
 
+	
+	//=====================================
+
+	spCoreChain preprocessing;
+	ipLBP4R* ip_lbp = manage(new ipLBP4R(1)); // ipLBP4R, R = 1.
+	preprocessing.add(manage(new ipLBPBitmap(ip_lbp)));
+	preprocessing.add(manage(new ipIntegral()));
+	int nLabels = ip_lbp->getMaxLabel();
+
+	
+
 	////////////////////////////////////////////////
 	// get the number of features
 	//////////////////////////////////////////////
 	if (width>0 && height >0)
-	{
-		n_features =0;
-		//Edge feature 1
+    {
+        n_features =0;
+        //Edge feature 1
 
-		for (int w_=10;w_<width;w_=w_+2)
-			for (int h_ =10;h_<height;h_++)
-				for (int x_=0;x_<width-w_;x_++)
-					for (int y_=0;y_<height-h_;y_++)
-						n_features++;
+        for (int w_=6;w_<width-6;w_=w_+2)
+            for (int h_=6;h_<height-6;h_++)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
 
 
-         //Edge feature 2
-         for (int w_=1;w_<width;w_++)
-             for (int h_ =2;h_<height;h_=h_+2)
-                 for (int x_=0;x_<width-w_;x_++)
-                     for (int y_=0;y_<height-h_;y_++)
-                         n_features++;
- 
- 
-         //Line feature 1
- 
-         for (int w_=3;w_<width;w_=w_+3)
-             for (int h_ =1;h_<height;h_++)
-                 for (int x_=0;x_<width-w_;x_++)
-                     for (int y_=0;y_<height-h_;y_++)
-                         n_features++;
- 
- 
-         //Line feature 2
-         for (int w_=1;w_<width;w_++)
-             for (int h_ =3;h_<height;h_=h_+3)
-                 for (int x_=0;x_<width-w_;x_++)
-                     for (int y_=0;y_<height-h_;y_++)
-                         n_features++;
- 
-         //Line feature 3
-         for (int w_=1;w_<width;w_++)
-             for (int h_ =4;h_<height;h_=h_+4)
-                 for (int x_=0;x_<width-w_;x_++)
-                     for (int y_=0;y_<height-h_;y_++)
-                         n_features++;
- 
-         //Line feature 4
-         for (int w_=4;w_<width;w_=w_+4)
-             for (int h_ =1;h_<height;h_++)
-                 for (int x_=0;x_<width-w_;x_++)
-                     for (int y_=0;y_<height-h_;y_++)
-                         n_features++;
- 
-         for (int w_=3;w_<width;w_=w_+3)
-             for (int h_ =3;h_<height;h_=h_+3)
-                 for (int x_=0;x_<width-w_;x_++)
-                     for (int y_=0;y_<height-h_;y_++)
-                         n_features++;
- 
-         for (int w_=2;w_<width;w_=w_+2)
-             for (int h_ =2;h_<height;h_=h_+2)
-                 for (int x_=0;x_<width-w_;x_++)
-                     for (int y_=0;y_<height-h_;y_++)
-                         n_features++;
+        //Edge feature 2
+        for (int w_=6;w_<width-6;w_++)
+            for (int h_=6;h_<height-6;h_=h_+2)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
 
-	}
+
+        //Line feature 1
+
+        for (int w_=6;w_<width-6;w_=w_+3)
+            for (int h_=6;h_<height-6;h_++)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
+
+
+        //Line feature 2
+        for (int w_=6;w_<width-6;w_++)
+            for (int h_=6;h_<height-6;h_=h_+3)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
+
+        //Line feature 3
+        for (int w_=6;w_<width-6;w_++)
+            for (int h_=6;h_<height-6;h_=h_+4)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
+
+        //Line feature 4
+        for (int w_=6;w_<width-6;w_=w_+4)
+            for (int h_=6;h_<height-6;h_++)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
+
+        for (int w_=6;w_<width-6;w_=w_+3)
+            for (int h_=6;h_<height-6;h_=h_+3)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
+
+        for (int w_=6;w_<width-6;w_=w_+2)
+            for (int h_=6;h_<height-6;h_=h_+2)
+                for (int x_=0;x_<width-w_;x_=x_+2)
+                    for (int y_=0;y_<height-h_;y_=y_+2)
+			for (int labelNo = 0; labelNo < nLabels; labelNo++)
+                        	n_features++;
+
+    }
 
 	if (verbose)
 		print("Number of feature %d\n",n_features);
@@ -251,149 +270,156 @@ int main(int argc, char* argv[])
 	spCore **weakfeatures = manage_array(new spCore* [n_features]);
 
 	TensorSize modelsize(height,width);
-	TensorRegion tregion(0,0,height,width);
+	//TensorRegion tregion(0,0,height,width);
 
 	if (width>0 && height >0)
 	{
 		int i =0;
 
 		//Edge feature 1
-		for (int w_=10;w_<width;w_=w_+2)
-			for (int h_ =10;h_<height;h_++)
-				for (int x_=0;x_<width-w_;x_++)
-					for (int y_=0;y_<height-h_;y_++)
+		for (int w_=6;w_<width-6;w_=w_+2)
+			for (int h_=6;h_<height-6;h_++)
+				for (int x_=0;x_<width-w_;x_=x_+2)
+					for (int y_=0;y_<height-h_;y_=y_+2)
+						for (int labelNo = 0; labelNo < nLabels; labelNo++)
+						{
+							ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
+							iph->setNoRec(2);
+							iph->setRec(0,1, y_, x_, h_, w_);
+							iph->setRec(1,-2, y_,x_+(w_/2), h_,(w_/2));
+							iph->setModelSize(modelsize);
+							iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
+
+							weakfeatures[i ++] = iph;
+						}
+//
+//		//Edge feature 2
+		for (int w_=6;w_<width-6;w_++)
+			for (int h_ =6;h_<height-6;h_=h_+2)
+				for (int x_=0;x_<width-w_;x_=x_+2)
+					for (int y_=0;y_<height-h_;y_=y_+2)
+					for (int labelNo = 0; labelNo < nLabels; labelNo++)
 					{
-						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+						ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
 						iph->setNoRec(2);
 						iph->setRec(0,1, y_, x_, h_, w_);
-						iph->setRec(1,-2, y_,x_+(w_/2), h_,(w_/2));
+						iph->setRec(1,-2,  y_+(h_/2),x_,(h_/2),w_);
 						iph->setModelSize(modelsize);
-						iph->setRegion(tregion);
 
+						iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
 						weakfeatures[i ++] = iph;
 					}
- 
- 		//Edge feature 2
- 		for (int w_=1;w_<width;w_++)
- 			for (int h_ =2;h_<height;h_=h_+2)
- 				for (int x_=0;x_<width-w_;x_++)
- 					for (int y_=0;y_<height-h_;y_++)
- 					{
- 						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
- 						iph->setNoRec(2);
- 						iph->setRec(0,1, y_, x_, h_, w_);
- 						iph->setRec(1,-2,  y_+(h_/2),x_,(h_/2),w_);
- 						iph->setModelSize(modelsize);
- 						iph->setRegion(tregion);
- 
+
+		//  n_features++;
+
+		//Line feature 1
+		for (int w_=6;w_<width-6;w_=w_+3)
+			for (int h_ =6;h_<height-6;h_++)
+				for (int x_=0;x_<width-w_;x_=x_+2)
+					for (int y_=0;y_<height-h_;y_=y_+2)
+					for (int labelNo = 0; labelNo < nLabels; labelNo++)
+					{
+						ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
+						iph->setNoRec(2);
+						iph->setRec(0,1, y_, x_, h_, w_);
+						iph->setRec(1,-3, y_,x_+(w_/3), h_, (w_/3));
+						iph->setModelSize(modelsize);
+
+ 						iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
  						weakfeatures[i ++] = iph;
  					}
  
- 		//n_features++;
- 
- 		//Line feature 1
- 		for (int w_=3;w_<width;w_=w_+3)
- 			for (int h_ =1;h_<height;h_++)
- 				for (int x_=0;x_<width-w_;x_++)
- 					for (int y_=0;y_<height-h_;y_++)
- 					{
- 						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
- 						iph->setNoRec(2);
- 						iph->setRec(0,1, y_, x_, h_, w_);
- 						iph->setRec(1,-3, y_,x_+(w_/3), h_, (w_/3));
- 						iph->setModelSize(modelsize);
- 						iph->setRegion(tregion);
- 
- 						weakfeatures[i ++] = iph;
- 					}
- 
- 		//n_features++;
+ 		  //n_features++;
  
  		//Line feature 2
- 		for (int w_=1;w_<width;w_++)
- 			for (int h_ =3;h_<height;h_=h_+3)
- 				for (int x_=0;x_<width-w_;x_++)
- 					for (int y_=0;y_<height-h_;y_++)
+ 		for (int w_=6;w_<width-6;w_++)
+ 			for (int h_ =6;h_<height-6;h_=h_+3)
+ 				for (int x_=0;x_<width-w_;x_=x_+2)
+ 					for (int y_=0;y_<height-h_;y_=y_+2)
+					for (int labelNo = 0; labelNo < nLabels; labelNo++)
  					{
- 						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+ 						ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
  						iph->setNoRec(2);
  						iph->setRec(0,1, y_, x_, h_, w_);
  						iph->setRec(1,-3,  y_+h_/3, x_,h_/3,w_);
  						iph->setModelSize(modelsize);
- 						iph->setRegion(tregion);
- 
+
+ 						iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
  						weakfeatures[i ++] = iph;
  					}
  
- 		//n_features++;
+ 		  //n_features++;
  
  		//Line feature 3
- 		for (int w_=1;w_<width;w_++)
- 			for (int h_ =4;h_<height;h_=h_+4)
- 				for (int x_=0;x_<width-w_;x_++)
- 					for (int y_=0;y_<height-h_;y_++)
+ 		for (int w_=6;w_<width-6;w_++)
+ 			for (int h_ =6;h_<height-6;h_=h_+4)
+ 				for (int x_=0;x_<width-w_;x_=x_+2)
+ 					for (int y_=0;y_<height-h_;y_=y_+2)
+					for (int labelNo = 0; labelNo < nLabels; labelNo++)
  					{
- 						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+ 						ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
  						iph->setNoRec(2);
  						iph->setRec(0,1, y_, x_, h_, w_);
  						iph->setRec(1,-2, y_+h_/4,x_ ,h_/2,w_);
  						iph->setModelSize(modelsize);
- 						iph->setRegion(tregion);
- 
+
+ 						iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
  						weakfeatures[i ++] = iph;
  					}
  
- 		//n_features++;
+ 		  //n_features++;
  
  		//Line feature 4
- 		for (int w_=4;w_<width;w_=w_+4)
- 			for (int h_ =1;h_<height;h_++)
- 				for (int x_=0;x_<width-w_;x_++)
- 					for (int y_=0;y_<height-h_;y_++)
+ 		for (int w_=6;w_<width-6;w_=w_+4)
+ 			for (int h_ =6;h_<height-6;h_++)
+ 				for (int x_=0;x_<width-w_;x_=x_+2)
+ 					for (int y_=0;y_<height-h_;y_=y_+2)
+					for (int labelNo = 0; labelNo < nLabels; labelNo++)
  					{
- 						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+ 						ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
  						iph->setNoRec(2);
  						iph->setRec(0,1, y_, x_, h_, w_);
  						iph->setRec(1,-2,y_, x_+(w_/4), h_, (w_/2));
  						iph->setModelSize(modelsize);
- 						iph->setRegion(tregion);
- 
+
+ 						iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
  						weakfeatures[i ++] = iph;
  					}
  
  		//n_features++;
  
- 		for (int w_=3;w_<width;w_=w_+3)
- 			for (int h_ =3;h_<height;h_=h_+3)
- 				for (int x_=0;x_<width-w_;x_++)
- 					for (int y_=0;y_<height-h_;y_++)
+ 		for (int w_=6;w_<width-6;w_=w_+3)
+ 			for (int h_ =6;h_<height-6;h_=h_+3)
+ 				for (int x_=0;x_<width-w_;x_=x_+2)
+ 					for (int y_=0;y_<height-h_;y_=y_+2)
+					for (int labelNo = 0; labelNo < nLabels; labelNo++)
  					{
- 						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+ 						ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
  						iph->setNoRec(2);
  						iph->setRec(0,1, y_, x_, h_, w_);
  						iph->setRec(1,-2, y_+(h_/3), x_+w_/3, (h_/3),w_/3);
  						iph->setModelSize(modelsize);
- 						iph->setRegion(tregion);
- 
+
+ 						iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
  						weakfeatures[i ++] = iph;
  					}
  
- 		//n_features++;
+ 		  //n_features++;
  
- 		for (int w_=2;w_<width;w_=w_+2)
- 			for (int h_ =2;h_<height;h_=h_+2)
- 				for (int x_=0;x_<width-w_;x_++)
- 					for (int y_=0;y_<height-h_;y_++)
- 						
+ 		for (int w_=6;w_<width-6;w_=w_+2)
+ 			for (int h_ =6;h_<height-6;h_=h_+2)
+ 				for (int x_=0;x_<width-w_;x_=x_+2)
+ 					for (int y_=0;y_<height-h_;y_=y_+2)
+					for (int labelNo = 0; labelNo < nLabels; labelNo++)
  					{
- 						ipHaarLienhart* iph = manage(new ipHaarLienhart());//width, height);
+ 						ipHLBPLienhart* iph = manage(new ipHLBPLienhart());//width, height);
  						iph->setNoRec(3);
  						iph->setRec(0,1, y_, x_, h_, w_);
  						iph->setRec(1,-2,y_, x_+(w_/2), (h_/2),w_/2);
  						iph->setRec(2,-2, y_+h_/2,x_, (h_/2),w_/2);
  						iph->setModelSize(modelsize);
- 						iph->setRegion(tregion);
- 
+
+ 						iph->setRegion(TensorRegion(0,0,labelNo,height,width,1));
  						weakfeatures[i ++] = iph;
  					}
 
@@ -432,7 +458,7 @@ int main(int argc, char* argv[])
 	CascadeTrainer *CT = manage(new CascadeTrainer());
 	CT->setTrainers(boosting, n_stages, detection_rate);
 	CT->setData(pDataSet,vDataSet,&iscandataset);
-	CT->setPreprocessor(manage(new ipIntegral));
+	CT->setPreprocessor(&preprocessing);
 
 	if (verbose)
 		CT->setBOption("verbose",true);

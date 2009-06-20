@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 	target0->fill(0);
 
 	TensorList *tensorList_p= manage(new TensorList()); //for positive
-	if (tensorList_p->process(p_tensor_files,target1,Tensor::Double)==false)
+	if (tensorList_p->process(p_tensor_files,target1,Tensor::Int)==false)
 	{
 		print("Error in reading +ve training patterns - Tensor list\n");
 		return 1;
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 	DataSet *pDataSet = tensorList_p->getOutput();
 
 	TensorList *tensorList_n= manage(new TensorList()); //for validation
-	if (tensorList_n->process(n_tensor_files,target0,Tensor::Double)==false)
+	if (tensorList_n->process(n_tensor_files,target0,Tensor::Int)==false)
 	{
 		print("Error in reading -ve patterns - Tensor list\n");
 		return 1;
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	int n_examples = pDataSet->getNoExamples() + nDataSet->getNoExamples();
 	int pexamples = pDataSet->getNoExamples();
 
-	MemoryDataSet *m_dataset = manage(new MemoryDataSet(n_examples, Tensor::Double, true, Tensor::Short));
+	MemoryDataSet *m_dataset = manage(new MemoryDataSet(n_examples, Tensor::Int, true, Tensor::Short));
 	for (int i=0;i<pDataSet->getNoExamples();i++)
 	{
 		m_dataset->getExample(i)->resize(height, width);

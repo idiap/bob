@@ -46,8 +46,8 @@ namespace Torch
 		virtual spCore*		getAnInstance() const { return NULL; }
 
 		/// Access the results
-		int			getNOutputs() const;
-		const Tensor&		getOutput(int index) const;
+		virtual int		getNOutputs() const;
+		virtual const Tensor&	getOutput(int index) const;
 
 	protected:
 

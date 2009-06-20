@@ -32,8 +32,8 @@ namespace Torch
 		bool			add(spCore* core);
 
 		/// Access the results
-		int			getNOutputs() const;
-		const Tensor&		getOutput(int index) const;
+		virtual int		getNOutputs() const;
+		virtual const Tensor&	getOutput(int index) const;
 
 		int			getNCores() const { return m_n_cores; }
 

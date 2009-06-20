@@ -29,6 +29,7 @@ MESSAGE("---------------------------------------------" "")
 
 SET(EXAMPLE_SRC
 	trainHaarCascade.cc
+	trainHLBPCascade.cc
 	trainLBPCascade.cc
 	trainHaarStump.cc
 	trainLBPStump.cc

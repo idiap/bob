@@ -255,7 +255,7 @@ namespace Torch
     {
 
         //whatever has to be processed here should use u_parameters, u_x, u_y, u_weight, u_z, u_size_x, u_size_y, u_size_z
-        const DoubleTensor* t_input = (DoubleTensor*)&input;
+        const IntTensor* t_input = (IntTensor*)&input;
         DoubleTensor* t_output = (DoubleTensor*)m_output[0];
 
 
@@ -375,9 +375,10 @@ namespace Torch
                 sum += (t1[0]+t1[1]-t1[2]-t1[3]) *  u_weight[i];
             }
             (*t_output)(0) =sum;
+		//print("\nHLBP feature value : [%f]\n",sum);
         }
         delete [] t1;
-
+	//print("\nHLBP feature value : [%d]\n",sum);
         //  print(" Sum %f\n",sum);
         return true;
     }

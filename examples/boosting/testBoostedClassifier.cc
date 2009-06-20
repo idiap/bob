@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 	target1->fill(1);
 
 	TensorList *tensorList = manage(new TensorList());
-	if (tensorList->process(tensor_files,target1,Tensor::Double)==false)
+	if (tensorList->process(tensor_files,target1,Tensor::Int)==false)
 	{
 		print("Error in reading patterns - Tensor list\n");
 		return 1;
@@ -98,6 +98,10 @@ int main(int argc, char* argv[])
 			Tensor* example = mdataset->getExample(e);
 			preprocessing.process(*example);
 			example->copy(&preprocessing.getOutput(0));
+			
+			if(e==0)
+				//Tprint((IntTensor*)example);
+				print("\nDataType = %d",example->getDatatype());
 		}
 	}
 
