@@ -78,7 +78,7 @@ void CascadeTrainer::setPreprocessor(spCore* core)
         			return false;
         		}
         		if (core->getNOutputs() != 1)
-        		{
+        		{	
         			print("CascadeTrainer::train - expected just one output from the preprocessor!\n");
         			return false;
         		}
@@ -147,7 +147,7 @@ void CascadeTrainer::setPreprocessor(spCore* core)
 
             //now create a new dataset
             n_examples = 2*p_count;
-            m_dataset = 	new MemoryDataSet(n_examples, Tensor::Double, true, Tensor::Short);
+            m_dataset = 	new MemoryDataSet(n_examples, Tensor::Int, true, Tensor::Short);
             // Test the targets (rejection of samples)
             DoubleTensor reject_target(1), accept_target(1);
             reject_target.fill(-1.0);
@@ -384,6 +384,7 @@ void CascadeTrainer::setPreprocessor(spCore* core)
             if (((DoubleTensor*)m_imagescandataset->getTarget(i))->get(0)>0.0)
             {
 		const Tensor *example = m_imagescandataset->getExample(i);
+		
 
                 if (m_preprocessor != 0)
 		{
