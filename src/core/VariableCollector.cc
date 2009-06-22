@@ -680,6 +680,34 @@ namespace Torch
 		}
 	}
 
+	bool VariableCollector::copy(VariableCollector *variables_)
+	{
+	   	//Torch::print("VariableCollector::copy() ...\n");
+	   	
+		int src_size = variables_->getNvariables();
+
+		if(m_size != src_size)
+		{
+	   		Torch::warning("VariableCollector::copy() incorrect number of variables.\n");
+
+			return false;
+		}
+
+		Variable *src_variables = variables_->getVariables();
+
+		//Torch::print(" n_variables = %d\n", src_size);
+		for (int i = 0; i < src_size; i ++)
+		{
+			//Torch::print("<< PARAMETER [%d] \"%s\" \n", i, src_variables[i].m_name);
+
+			m_variables[i].init(src_variables[i]);
+
+			//Torch::print(">> PARAMETER [%d] \"%s\" \n", i, m_variables[i].m_name);
+		}
+
+		return true;
+	}
+		
 	// Loading/Saving the content from files (\emph{not the options}) - overriden
 	bool VariableCollector::loadFile(File& file)
 	{

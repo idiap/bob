@@ -56,6 +56,10 @@ namespace Torch
 
 		void print(const char *name = NULL);
 
+		VariableCollector *getVariables() { return m_parameters; };
+
+		bool copy(Parameters *parameters_);
+
 		/// Loading/Saving the content from files
 		bool		loadFile(File& file);
 		bool		saveFile(File& file) const;

@@ -14,45 +14,41 @@ namespace Torch
 	class ProbabilityDistribution : public Machine
 	{
 	public:
-		/// Constructors
+		/// Constructor
 		ProbabilityDistribution();
 
-		ProbabilityDistribution(const int n_inputs_, const int n_parameters_ = 0);
+		/// Constructor
+		ProbabilityDistribution(const int n_inputs_);//, const int n_parameters_ = 0);
 		
 		/// Destructor
 		virtual ~ProbabilityDistribution();
 
 		///
-		virtual bool 		resize(const int n_inputs_, const int n_parameters_ = 0);
-
-		///
-		virtual bool 		shuffle() { return true; };
-
-		///
-		virtual bool 		prepare();
+		virtual bool 		prepare() { return true; };
 		
 		///
 		virtual bool 		EMinit() { return true; };
 
 		///
-		virtual bool 		EMupdate() { return true; };
-		
-		///////////////////////////////////////////////////////////
+		virtual bool 		EMaccPosteriors(const DoubleTensor *input, const double input_posterior) { return true; };
 
 		///
+		virtual bool 		EMupdate() { return true; };
+		
+		///
 		virtual bool 		forward(const Tensor& input);
+
+		///
 		virtual bool 		forward(const DoubleTensor *input) = 0;
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
-		virtual bool		loadFile(File& file);
-		virtual bool		saveFile(File& file) const;
-
-		///////////////////////////////////////////////////////////
+		///
+		virtual bool 		print() { return true; };
+		
+		///
+		virtual bool 		shuffle() { return true; };
 
 	protected:
 		int n_inputs;
-		int n_parameters;
-		double *parameters;
 	};
 
 }

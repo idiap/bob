@@ -5,7 +5,7 @@ SET(	trainer_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/GTFile.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/GradientTrainer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/StochasticGradientTrainer.cc"
-#		"${CMAKE_CURRENT_SOURCE_DIR}/EMTrainer.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/EMTrainer.cc"
 	CACHE INTERNAL "sources")
 
 SET(	trainer_INCLUDE

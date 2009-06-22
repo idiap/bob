@@ -6,59 +6,95 @@
 
 namespace Torch {
 
-/** MultiVariateNormalDistribution
+/** MultiVariateDiagonalGaussianDistribution
 
 	@author Sebastien Marcel (marcel@idiap.ch)
 */
 class MultiVariateDiagonalGaussianDistribution : public MultiVariateNormalDistribution
 {
-	bool use_log;
-
-	double *posterior_numerator;
-	double *g_norm;
-
 public:	
-	//
+	///
 	MultiVariateDiagonalGaussianDistribution();
 
-	//
+	///
 	MultiVariateDiagonalGaussianDistribution(int n_inputs_, int n_gaussians_);
 
-	//
+	///
 	~MultiVariateDiagonalGaussianDistribution();
 
-	//---
-	
 	///
 	virtual bool 		prepare();
 
 	///
 	virtual bool 		EMinit();
 
-	//
-	virtual void 		EMaccPosteriors(const DoubleTensor *input);
+	///
+	virtual bool 		EMaccPosteriors(const DoubleTensor *input, const double input_posterior);
 
 	///
 	virtual bool 		EMupdate();
 		
-	//
+	///
+	virtual bool 		print();
+		
+	//---
+	
+	///
+	virtual bool 		resize(int n_inputs_, int n_means_);
+
+	///
+	virtual bool 		cleanup();
+
+	///
 	virtual double 		sampleProbabilityOneGaussian(double *sample_, int g);
 
-	//
+	///
 	virtual double 		sampleProbability(double *sample_);
 
-		/// Constructs an empty Machine of this kind - overriden
-		/// (used by <MachineManager>, this object should be deallocated by the user)
-		virtual Machine*	getAnInstance() const { return new MultiVariateDiagonalGaussianDistribution(); }
+	///
+	virtual bool		loadFile(File& file);
 
-		// Get the ID specific to each Machine - overriden
-		virtual int		getID() const { return MULTIVARIATE_DIAGONAL_GAUSSIAN_DISTRIBUTION_MACHINE_ID; }
+	///
+	virtual bool		saveFile(File& file) const;
+
+	///
+	virtual bool		setVariances(double *stdv_, double factor_variance_threshold_ = 0.1);
+
+	///
+	virtual bool		setVarianceFlooring(double *stdv_, double factor_variance_threshold_ = 0.1);
+
+	///
+	virtual bool 		shuffle();
+
+	/// Constructs an empty Machine of this kind - overriden
+	/// (used by <MachineManager>, this object should be deallocated by the user)
+	virtual Machine*	getAnInstance() const { return new MultiVariateDiagonalGaussianDistribution(); }
+
+	// Get the ID specific to each Machine - overriden
+	virtual int		getID() const { return MULTIVARIATE_DIAGONAL_GAUSSIAN_DISTRIBUTION_MACHINE_ID; }
+
+protected:
+	//
+	bool use_log;
+
+	//
+	double *posterior_numerator;
+	double *g_norm;
+
+	//
+	double **variances;
+	double *threshold_variances;
+
+	//
+	double *buffer_acc_posteriors_variances;
+	double **acc_posteriors_variances;
+
 };
 	
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // REGISTER this machine to the <MachineManager>
-        const bool multivariate_diagonal_gaussian_machine_registered = MachineManager::getInstance().add(new MultiVariateDiagonalGaussianDistribution(), "MultiVariateDiagonalGaussianDistribution");
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// REGISTER this machine to the <MachineManager>
+const bool multivariate_diagonal_gaussian_machine_registered = MachineManager::getInstance().add(new MultiVariateDiagonalGaussianDistribution(), "MultiVariateDiagonalGaussianDistribution");
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 #endif

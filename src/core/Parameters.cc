@@ -111,6 +111,11 @@ void Parameters::print(const char *name)
 	m_parameters->print();
 }
 
+bool Parameters::copy(Parameters *parameters_)
+{
+	return m_parameters->copy(parameters_->getVariables());
+}
+
 // Loading/Saving the content from files (\emph{not the options}) - overriden
 bool Parameters::loadFile(File& file)
 {
