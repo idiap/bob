@@ -34,6 +34,9 @@ struct Params
 	double prune_min_stdev;         // Prune using stdev: min value
 	double prune_max_stdev;         // Prune using stdev: max value
 
+	// Preprocessing
+	bool prep_hlpb;			// HLBP: compute LBP4R bitmaps
+
 	// Detection merging
 	int select_type;		// 0 - Overlap, 1 - MeanShift
 	int select_merge_type;		// Merge type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence
@@ -182,6 +185,9 @@ int main(int argc, char* argv[])
 	cmd.addICmdOption("-greedy_perds", &params.greedy_perds, 10, "greedy explorer: percentage of candidate's scale to vary");
 	cmd.addICmdOption("-greedy_nsteps", &params.greedy_nsteps, 10, "greedy explorer: number of steps");
 	cmd.addICmdOption("-random_nsamples", &params.random_nsamples, 1024, "random scale explorer: number of samples");
+
+	cmd.addText("\nPreprocessing options:");
+	cmd.addBCmdOption("-prep_hlbp", &params.prep_hlpb, false, "HLBP: compute LBP4R bitmaps");
 
 	cmd.addText("\nPruning options:");
 	cmd.addBCmdOption("-prune_use_mean", &params.prune_use_mean, false, "prune using the mean");
@@ -401,21 +407,26 @@ int main(int argc, char* argv[])
 
         // Set for each scale the feature extractors (<ipCore>s)
         //      [0/NULL] means the original image will be used as features!
+        ipCore* ip_prep = 0;
+        if (params.prep_hlpb == true)
+        {
+        	ip_prep = manage(new ipLBPBitmap(manage(new ipLBP4R(1))));
+        }
         switch (params.explorer_type)
 	{
 	case 0:	// Pyramid
                 for (int j = 0; j < n_scales; j ++)
                 {
-                        CHECK_FATAL(explorer->setScalePruneIp(j, 0) == true);
-                        CHECK_FATAL(explorer->setScaleEvaluationIp(j, 0) == true);
+                        CHECK_FATAL(explorer->setScalePruneIp(j, ip_prep) == true);
+                        CHECK_FATAL(explorer->setScaleEvaluationIp(j, ip_prep) == true);
                 }
 		break;
 
 	case 1:	// Multiscale
 	case 2: // Greedy
 	default:
-		CHECK_FATAL(explorer->setScalePruneIp(0) == true);
-                CHECK_FATAL(explorer->setScaleEvaluationIp(0) == true);
+		CHECK_FATAL(explorer->setScalePruneIp(ip_prep) == true);
+                CHECK_FATAL(explorer->setScaleEvaluationIp(ip_prep) == true);
 		break;
 	}
 

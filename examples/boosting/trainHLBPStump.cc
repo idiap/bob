@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 	// Set options
 	char* tensor_filename_target0;
 	char* tensor_filename_target1;
+	char* modelfilename;
 	int max_examples;
 	int max_features;
 	int n_classifiers;
@@ -36,6 +37,7 @@ int main(int argc, char* argv[])
 	cmd.addCmdOption(p_tensor_files);
 	cmd.addCmdOption(n_tensor_files);
 
+	cmd.addSCmdArg("model file name", &modelfilename, "Saving Trained model file");
 
 	cmd.addText("\nOptions:");
 	cmd.addBCmdOption("-verbose", &verbose, false, "print Tensor values");
@@ -90,44 +92,39 @@ int main(int argc, char* argv[])
 	for (int i=0;i<pDataSet->getNoExamples();i++)
 	{
 		m_dataset->getExample(i)->resize(height, width);
-		example = pDataSet->getExample(i);
-		m_dataset->getExample(i)->copy(example);
+		m_dataset->getExample(i)->copy(pDataSet->getExample(i));
 		m_dataset->setTarget(i, target1);
 	}
 	for (int i=0;i<nDataSet->getNoExamples();i++)
 	{
 		m_dataset->getExample(i+pexamples)->resize(height, width);
-		example = nDataSet->getExample(i);
-		m_dataset->getExample(i+pexamples)->copy(example);
+		m_dataset->getExample(i+pexamples)->copy(nDataSet->getExample(i));
 		m_dataset->setTarget(i+pexamples, target0);
 	}
 
 	print("Prepare Boosting ...\n");
 
-	ipIntegral *ipI = new ipIntegral();
+	ipIntegral *ipI = manage(new ipIntegral());
 
 	///////////////////////////// ADDED //////////////////////////////////////////////////////////////
 	// CREATING THE IP for LBP and HLBP.
-	ipLBP4R *ip_lbp = new ipLBP4R(1); // ipLBP4R, R = 1.
-	CHECK_FATAL(ip_lbp->setBOption("ToAverage", false) == true);
-	ipLBPBitmap *ip_hlbp = new ipLBPBitmap(ip_lbp);
+	ipLBP4R *ip_lbp = manage(new ipLBP4R(1)); // ipLBP4R, R = 1.
+	//CHECK_FATAL(ip_lbp->setBOption("ToAverage", false) == true);
+	ipLBPBitmap *ip_hlbp = manage(new ipLBPBitmap(ip_lbp));
 	int nLabels = ip_lbp->getMaxLabel();
 	int R = ip_lbp->getR();
 	//--------------
-
-
 
 	//DoubleTensor *temptensor;
 
 	for (int e=0;e<n_examples;e++)
 	{
-		DoubleTensor* example = (DoubleTensor*)m_dataset->getExample(e);
+		IntTensor* example = (IntTensor*)m_dataset->getExample(e);
 
 		ip_hlbp->process(*example);
 		ipI->process(ip_hlbp->getOutput(0));
-
-		example->resize(height, width, nLabels);
 		example->copy(&ipI->getOutput(0));
+
 		if (e==0)
 			Tprint(example);
 
@@ -535,11 +532,11 @@ int main(int argc, char* argv[])
 	printf(".....................\n");
 
 	File f1;
-	t=f1.open("model.wsm","w");
+	t=f1.open(modelfilename,"w");
 	t=CM->saveFile(f1);
 	f1.close();
 
-	CascadeMachine* cascade = manage((CascadeMachine*)Torch::loadMachineFromFile("model.wsm"));
+	CascadeMachine* cascade = manage((CascadeMachine*)Torch::loadMachineFromFile(modelfilename));
 	if (cascade == 0)
 	{
 		print("ERROR: loading model [%s]!\n", "model.wsm");
