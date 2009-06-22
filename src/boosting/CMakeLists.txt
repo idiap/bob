@@ -12,7 +12,6 @@ SET(	boosting_SRC
 	"${CMAKE_CURRENT_SOURCE_DIR}/RealLutMachine.cc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/FTrainer.cc"
 	"${CMAKE_CURRENT_SOURCE_DIR}/CascadeTrainer.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/CascadeIntegralTrainer.cc"
 	CACHE INTERNAL "sources")
 
 SET(	boosting_INCLUDE

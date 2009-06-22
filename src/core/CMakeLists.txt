@@ -8,6 +8,7 @@ SET(	core_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/Parameters.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/File.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/spCore.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/spCoreChain.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipCore.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/apCore.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/DataSet.cc"

@@ -39,7 +39,7 @@ namespace Torch
         return true;
     }
 ////////////////////////////////////////////////////////////////////////////////
-    double BoostingTrainer::forward(Tensor *example_)
+    double BoostingTrainer::forward(const Tensor *example_)
     {
         double s = 0.0;
         for (int j = 0 ; j < m_n_classifiers ; j++)
@@ -115,6 +115,7 @@ namespace Torch
 /////////////////////////////////////////////////////////////////////////////////////////////////
     void BoostingTrainer::updateWeights()
     {
+        verbose = getBOption("verbose");
         if (verbose)
             print("   BoostingTrainer::updateWeights()\n");
 
@@ -282,16 +283,6 @@ namespace Torch
             m_weak_learners[classifierNo]->setData(m_dataset);
 
             if (m_weak_learners[classifierNo]->train() == false) return false;
-
-            //........saving weights at each iteration.......
-            //  File filn;
-            // char fil[200];
-            //  sprintf(fil,"weight%d.data",classifierNo);
-            //  filn.open(fil,"w");
-            //  for (int pk =0;pk<m_n_examples;pk++)
-            //   filn.printf("%g\n",m_weights_samples[pk]);
-            //  filn.close();
-
 
             updateWeights(); // update weights for all examples
 

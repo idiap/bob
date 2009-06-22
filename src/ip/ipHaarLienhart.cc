@@ -255,7 +255,7 @@ namespace Torch
     {
 
         //whatever has to be processed here should use u_parameters, u_x, u_y, u_weight, u_z, u_size_x, u_size_y, u_size_z
-        const DoubleTensor* t_input = (DoubleTensor*)&input;
+        const IntTensor* t_input = (IntTensor*)&input;
         DoubleTensor* t_output = (DoubleTensor*)m_output[0];
 
 
@@ -438,6 +438,7 @@ namespace Torch
         u_size_y= m_height;
         u_x =0;
         u_y=0;
+        u_z=0;
         //.....here call setregion with 0,0,h,w
         setRegion(TensorRegion(0,0,m_height,m_width));
 

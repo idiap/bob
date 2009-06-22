@@ -16,9 +16,8 @@ namespace Torch
 		virtual ~FTrainer();
 
 		/// Train the given machine on the given dataset
-		virtual double forward(Tensor *example_) = 0; //get the output score for a single stage
+		virtual double forward(const Tensor *example_) = 0; //get the output score for a single stage
 	};
-
 }
 
 #endif

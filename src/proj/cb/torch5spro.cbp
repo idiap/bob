@@ -211,8 +211,6 @@
 		<Unit filename="../../boosting/BoostingTrainer.cc" />
 		<Unit filename="../../boosting/BoostingTrainer.h" />
 		<Unit filename="../../boosting/CMakeLists.txt" />
-		<Unit filename="../../boosting/CascadeIntegralTrainer.cc" />
-		<Unit filename="../../boosting/CascadeIntegralTrainer.h" />
 		<Unit filename="../../boosting/CascadeTrainer.cc" />
 		<Unit filename="../../boosting/CascadeTrainer.h" />
 		<Unit filename="../../boosting/FTrainer.cc" />
@@ -278,6 +276,8 @@
 		<Unit filename="../../core/ipCore.h" />
 		<Unit filename="../../core/spCore.cc" />
 		<Unit filename="../../core/spCore.h" />
+		<Unit filename="../../core/spCoreChain.cc" />
+		<Unit filename="../../core/spCoreChain.h" />
 		<Unit filename="../../core/spCores.h" />
 		<Unit filename="../../geometry/Affine2D.cc" />
 		<Unit filename="../../geometry/Affine2D.h" />
@@ -346,6 +346,8 @@
 		<Unit filename="../../ip/ipFlip.h" />
 		<Unit filename="../../ip/ipGeomNorm.cc" />
 		<Unit filename="../../ip/ipGeomNorm.h" />
+		<Unit filename="../../ip/ipHLBPLienhart.cc" />
+		<Unit filename="../../ip/ipHLBPLienhart.h" />
 		<Unit filename="../../ip/ipHaarLienhart.cc" />
 		<Unit filename="../../ip/ipHaarLienhart.h" />
 		<Unit filename="../../ip/ipHisto.cc" />
@@ -358,6 +360,8 @@
 		<Unit filename="../../ip/ipLBP4R.h" />
 		<Unit filename="../../ip/ipLBP8R.cc" />
 		<Unit filename="../../ip/ipLBP8R.h" />
+		<Unit filename="../../ip/ipLBPBitmap.cc" />
+		<Unit filename="../../ip/ipLBPBitmap.h" />
 		<Unit filename="../../ip/ipRotate.cc" />
 		<Unit filename="../../ip/ipRotate.h" />
 		<Unit filename="../../ip/ipScaleYX.cc" />
@@ -539,7 +543,6 @@
 		<Unit filename="../../trainer/gtfiles/halfprofileEyeNoseChinGTFile.h" />
 		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.cc" />
 		<Unit filename="../../trainer/gtfiles/profileEyeNoseChinGTFile.h" />
-		<Unit filename="../../../torch5spro.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

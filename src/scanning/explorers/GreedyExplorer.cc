@@ -13,8 +13,12 @@ GreedyExplorer::GreedyExplorer(Mode mode)
 	: 	MSExplorer(),
 		m_mode(mode),
 		m_profileFlags(new unsigned char[NoConfigs]),
-		m_profileScores(new double[NoConfigs])
+		m_profileScores(new double[NoConfigs]),
+		m_sampleOxCoefs(new double[NoConfigs]),
+		m_sampleOyCoefs(new double[NoConfigs]),
+		m_sampleOsCoefs(new double[NoConfigs])
 {
+	addIOption("sampling", 0, "0 - linear, 1 - quadratic, 2 - exponential(2)");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -24,14 +28,88 @@ GreedyExplorer::~GreedyExplorer()
 {
 	delete[] m_profileFlags;
 	delete[] m_profileScores;
+	delete[] m_sampleOxCoefs;
+	delete[] m_sampleOyCoefs;
+	delete[] m_sampleOsCoefs;
 }
 
 /////////////////////////////////////////////////////////////////////////
 // called when some option was changed - overriden
 
+static double getSign(int value)
+{
+	return value < 0 ? -1.0 : 1.0;
+}
+
 void GreedyExplorer::optionChanged(const char* name)
 {
-	MSExplorer::optionChanged(name);
+	switch (getIOption("sampling"))
+	{
+	case 0:	// Linear
+		{
+			int index = 0;
+			for (int is = -NoVarS; is <= NoVarS; is ++)
+				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
+					{
+						const double dx = 0.01 * VarX * ix;
+						const double dy = 0.01 * VarY * iy;
+						const double ds = 1.0 + 0.01 * VarS * is;
+						m_sampleOxCoefs[index] = dx;
+						m_sampleOyCoefs[index] = dy;
+						m_sampleOsCoefs[index] = ds;
+						index ++;
+					}
+		}
+		break;
+
+	case 1:	// Quadratic
+		{
+			const double norm_ox = 0.01 * VarX * NoVarX / (NoVarX * NoVarX + 0.0);
+			const double norm_oy = 0.01 * VarY * NoVarY / (NoVarY * NoVarY + 0.0);
+			const double norm_os = 0.01 * VarS * NoVarS / (NoVarS * NoVarS + 0.0);
+
+			int index = 0;
+			for (int is = -NoVarS; is <= NoVarS; is ++)
+				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
+					{
+						const double dx = norm_ox * getSign(ix) * ix * ix;
+						const double dy = norm_oy * getSign(iy) * iy * iy;
+						const double ds = 1.0 + norm_os * getSign(is) * is * is;
+						m_sampleOxCoefs[index] = dx;
+						m_sampleOyCoefs[index] = dy;
+						m_sampleOsCoefs[index] = ds;
+						index ++;
+					}
+		}
+		break;
+
+	case 2:	// Exponential(2)
+	default:
+		{
+			const double alpha = 2.0;	// exp(2t)
+
+			const double norm_ox = 0.01 * VarX * NoVarX / exp(alpha * NoVarX);
+			const double norm_oy = 0.01 * VarY * NoVarY / exp(alpha * NoVarY);
+			const double norm_os = 0.01 * VarS * NoVarS / exp(alpha * NoVarS);
+
+			int index = 0;
+			for (int is = -NoVarS; is <= NoVarS; is ++)
+				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
+					{
+						const double dx = norm_ox * getSign(ix) * exp(alpha * fabs(ix));
+						const double dy = norm_oy * getSign(iy) * exp(alpha * fabs(iy));
+						const double ds = 1.0 + norm_os * getSign(is) * exp(alpha * fabs(is));
+						m_sampleOxCoefs[index] = dx;
+						m_sampleOyCoefs[index] = dy;
+						m_sampleOsCoefs[index] = ds;
+						index ++;
+					}
+		}
+		break;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -228,11 +306,8 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 	int index = 0;
 	for (int is = -NoVarS; is <= NoVarS; is ++)
 	{
-		const float scale = 1.0f + 0.01f * (VarS + 0.0f) * is;
-		const int new_sw_w = FixI(scale * sw_w);
-		const int new_sw_h = FixI(scale * sw_h);
-		const float dx = 0.01f * (VarX + 0.0f) * new_sw_w;
-		const float dy = 0.01f * (VarY + 0.0f) * new_sw_h;
+		const int new_sw_w = FixI(m_sampleOsCoefs[index] * sw_w);
+		const int new_sw_h = FixI(m_sampleOsCoefs[index] * sw_h);
 
 		// Check if the subwindow's size is too large or too small
 		const bool valid = 	new_sw_w >= model_w && new_sw_h >= model_h &&
@@ -241,11 +316,11 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 		// Vary the position ...
 		for (int ix = -NoVarX; ix <= NoVarX; ix ++)
 		{
-			const int new_sw_x = sw_x + FixI(dx * ix);
+			const int new_sw_x = sw_x + FixI(m_sampleOxCoefs[index] * sw_w);
 
 			for (int iy = -NoVarY; iy <= NoVarY; iy ++)
 			{
-				const int new_sw_y = sw_y + FixI(dy * iy);
+				const int new_sw_y = sw_y + FixI(m_sampleOyCoefs[index] * sw_h);
 
 				// Default profile: no detection, low score
 				m_profileFlags[index] = 0x00;

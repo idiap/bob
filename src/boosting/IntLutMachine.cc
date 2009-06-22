@@ -14,7 +14,7 @@ namespace Torch
         m_output.resize(1);
 
     }
-////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
     bool IntLutMachine::forward(const Tensor& input)
     {
@@ -44,7 +44,7 @@ namespace Torch
 
         return true;
     }
-
+///////////////////////////////////////////////////////////////////////////////
     bool IntLutMachine::loadFile(File& file)
     {
 
@@ -77,9 +77,7 @@ namespace Torch
             Torch::message("IntLutMachine::load - failed to read <Lut> field!\n");
             return false;
         }
-//print("  N_Bins = %d\n", n_bins);
-//    for(int i=0;i<n_bins;i++)
-//        print("lut.......%f\n",lut[i]);
+
 
 
         int idCore;
@@ -107,7 +105,7 @@ namespace Torch
         return true;
 
     }
-
+/////////////////////////////////////////////////////////////////////////////////////////
     bool IntLutMachine::saveFile(File& file) const
     {
         const int id = getID();
@@ -141,7 +139,7 @@ namespace Torch
 
         return true;
     }
-
+//////////////////////////////////////////////////////////////////////////
     void IntLutMachine::setParams(int n_bins_, double *lut_)
     {
         n_bins = n_bins_;
@@ -149,10 +147,10 @@ namespace Torch
         lut = new double [n_bins];
         for (int i = 0; i < n_bins; i ++)
         {
-                lut[i] = lut_[i];
+            lut[i] = lut_[i];
         }
     }
-
+////////////////////////////////////////////////////////////////////////////
     IntLutMachine::~IntLutMachine()
     {
         delete[] lut;

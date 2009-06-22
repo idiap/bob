@@ -67,6 +67,28 @@ void TENSOR_CLASS(Tensor)::setTensor(const Tensor *src_)
 
 void TENSOR_CLASS(Tensor)::copy(const Tensor *src_)
 {
+	switch (src_->nDimension())
+	{
+	case 1:
+		resize(src_->size(0));
+		break;
+
+	case 2:
+		resize(src_->size(0), src_->size(1));
+		break;
+
+	case 3:
+		resize(src_->size(0), src_->size(1), src_->size(2));
+		break;
+
+	case 4:
+		resize(src_->size(0), src_->size(1), src_->size(2), src_->size(3));
+		break;
+
+	default:
+		break;
+	}
+
   short datatype_ = src_->getDatatype();
 
   switch(datatype_)

@@ -32,6 +32,7 @@ namespace Torch
         IntLutMachine *m_lbp_machine;
         int m_b_lutsize;
         double *m_bestlut_;
+        bool verbose;
     };
 
 }

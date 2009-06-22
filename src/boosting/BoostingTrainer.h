@@ -20,7 +20,7 @@ namespace Torch
 
 		///
 		virtual bool train();
-		virtual double forward(Tensor *example_);
+		virtual double forward(const Tensor *example_);
 		///
 		virtual void initWeights();
 		virtual void updateWeights();
