@@ -61,7 +61,7 @@ for each stage mention
 
 ####################################################################################
 
-# 1 # Stump HLBP
+# 3 # Stump HLBP
 This particular version trains HLBP features.
 
 usage:

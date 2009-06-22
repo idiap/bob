@@ -4,26 +4,29 @@
 	<File name="../../README.txt" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../boosting/CMakeLists.txt" open="0" top="0" tabpos="1">
-		<Cursor position="1148" topLine="2" />
+	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="8">
+		<Cursor position="557" topLine="2" />
 	</File>
-	<File name="../../boosting/README.txt" open="0" top="0" tabpos="62">
-		<Cursor position="1032" topLine="0" />
+	<File name="../../boosting/README.txt" open="1" top="0" tabpos="7">
+		<Cursor position="2954" topLine="54" />
 	</File>
 	<File name="../../boosting/testBoostedClassifier.cc" open="1" top="0" tabpos="1">
-		<Cursor position="2379" topLine="76" />
+		<Cursor position="2379" topLine="1" />
+	</File>
+	<File name="../../boosting/trainHLBPCascade.cc" open="1" top="0" tabpos="9">
+		<Cursor position="5619" topLine="156" />
 	</File>
 	<File name="../../boosting/trainHLBPStump.cc" open="1" top="0" tabpos="4">
-		<Cursor position="3534" topLine="103" />
+		<Cursor position="16687" topLine="530" />
 	</File>
 	<File name="../../boosting/trainHaarCascade.cc" open="1" top="0" tabpos="2">
-		<Cursor position="13513" topLine="254" />
+		<Cursor position="7973" topLine="416" />
 	</File>
-	<File name="../../boosting/trainHaarStump.cc" open="1" top="1" tabpos="6">
-		<Cursor position="6246" topLine="206" />
+	<File name="../../boosting/trainHaarStump.cc" open="1" top="0" tabpos="5">
+		<Cursor position="3023" topLine="75" />
 	</File>
 	<File name="../../boosting/trainLBPCascade.cc" open="1" top="0" tabpos="3">
-		<Cursor position="7606" topLine="264" />
+		<Cursor position="7606" topLine="258" />
 	</File>
 	<File name="../../boosting/trainLBPStump.cc" open="0" top="0" tabpos="27">
 		<Cursor position="3579" topLine="87" />
@@ -181,8 +184,8 @@
 	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="6">
 		<Cursor position="687" topLine="0" />
 	</File>
-	<File name="../../scanning/scanning.cc" open="0" top="0" tabpos="7">
-		<Cursor position="0" topLine="0" />
+	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="11">
+		<Cursor position="8232" topLine="159" />
 	</File>
 	<File name="../../scanning/testPatternList.cc" open="0" top="0" tabpos="8">
 		<Cursor position="24" topLine="0" />
@@ -190,8 +193,8 @@
 	<File name="../../scanning/test_scanning_all.sh" open="0" top="0" tabpos="5">
 		<Cursor position="340" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="4">
-		<Cursor position="743" topLine="0" />
+	<File name="../../scanning/test_scanning_one.sh" open="1" top="1" tabpos="10">
+		<Cursor position="746" topLine="0" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="55">
 		<Cursor position="23" topLine="0" />
