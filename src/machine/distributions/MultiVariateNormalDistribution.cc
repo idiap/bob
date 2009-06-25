@@ -4,6 +4,8 @@ namespace Torch {
 
 MultiVariateNormalDistribution::MultiVariateNormalDistribution()
 {
+	addFOption("min weights", 1e-3, "minimum weights for each mean");
+
 	//
 	n_means = 0;
 	means = NULL;
@@ -24,6 +26,8 @@ MultiVariateNormalDistribution::MultiVariateNormalDistribution()
 
 MultiVariateNormalDistribution::MultiVariateNormalDistribution(int n_inputs_, int n_means_) : ProbabilityDistribution(n_inputs_)
 {
+	addFOption("min weights", 1e-3, "minimum weights for each mean");
+
    	//
 	n_means = n_means_;
 	means = NULL;
@@ -94,10 +98,62 @@ MultiVariateNormalDistribution::~MultiVariateNormalDistribution()
 
 bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 {
-	double *src = (double *) input->dataR();
-	double *dst = (double *) m_output.dataW();
+	//
+	// If the tensor is 1D then considers it as a vector
+	if (	input->nDimension() == 1)
+	{
+		if (	input->size(0) != n_inputs)
+		{
+			warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 0 (%d != %d).", input->size(0), n_inputs);
+			
+			return false;
+		}
 
-	dst[0] = sampleProbability(src);
+		double *src = (double *) input->dataR();
+		double *dst = (double *) m_output.dataW();
+
+		dst[0] = sampleProbability(src);
+	}
+	else
+	{
+		//
+		// If the tensor is 2D/3D then considers it as a sequence along the first dimension
+
+   		if(input->nDimension() == 2)
+		{
+			if (	input->size(1) != n_inputs)
+			{
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 1 (%d != %d).", input->size(1), n_inputs);
+				
+				return false;
+			}
+		
+			int n_frames_per_sequence = input->size(0);
+
+			Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d frames of size %d\n", n_frames_per_sequence, n_inputs);
+
+		}
+		else if(input->nDimension() == 3)
+		{
+			if (	input->size(2) != n_inputs)
+			{
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 2 (%d != %d).", input->size(2), n_inputs);
+				
+				return false;
+			}
+			int n_sequences_per_sequence = input->size(0);
+			int n_frames_per_sequence = input->size(1);
+
+			Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d sequences of %d frames of size %d\n", n_sequences_per_sequence, n_frames_per_sequence, n_inputs);
+		}
+		else 
+		{
+			warning("MultiVariateNormalDistribution::forward() : don't know how to deal with %d dimensions sorry :-(", input->nDimension());
+			
+			return false;
+		}
+
+	}
 
 	return true;
 }

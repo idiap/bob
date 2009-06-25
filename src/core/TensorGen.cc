@@ -58,6 +58,8 @@ void TENSOR_CLASS(Tensor)::setTensor(const Tensor *src_)
       TENSOR_FUNC(free)(t);
       t = TENSOR_FUNC(new)();
       TENSOR_FUNC(setTensor)(t, src->t);
+
+      m_isReference = true;
     }
   else
     {
@@ -67,6 +69,8 @@ void TENSOR_CLASS(Tensor)::setTensor(const Tensor *src_)
 
 void TENSOR_CLASS(Tensor)::copy(const Tensor *src_)
 {
+   if(m_isReference == false)
+   {
 	switch (src_->nDimension())
 	{
 	case 1:
@@ -88,6 +92,7 @@ void TENSOR_CLASS(Tensor)::copy(const Tensor *src_)
 	default:
 		break;
 	}
+   }
 
   short datatype_ = src_->getDatatype();
 
@@ -139,6 +144,8 @@ void TENSOR_CLASS(Tensor)::transpose(const Tensor *src, int dimension1_, int dim
     {
       TENSOR_CLASS(Tensor) *src_ = (TENSOR_CLASS(Tensor) *) src;
       TENSOR_FUNC(transpose)(t, src_->t, dimension1_, dimension2_);
+		
+      m_isReference = true;
     }
   else
     {
@@ -154,6 +161,8 @@ void TENSOR_CLASS(Tensor)::narrow(const Tensor *src, int dimension_, long firstI
     {
       TENSOR_CLASS(Tensor) *src_ = (TENSOR_CLASS(Tensor) *) src;
       TENSOR_FUNC(narrow)(t, src_->t, dimension_, firstIndex_, size_);
+		
+      m_isReference = true;
     }
   else
     {
@@ -169,6 +178,8 @@ void TENSOR_CLASS(Tensor)::select(const Tensor *src, int dimension_, long sliceI
     {
       TENSOR_CLASS(Tensor) *src_ = (TENSOR_CLASS(Tensor) *) src;
       TENSOR_FUNC(select)(t, src_->t, dimension_, sliceIndex_);
+		
+      m_isReference = true;
     }
   else
     {
@@ -180,6 +191,9 @@ Tensor* TENSOR_CLASS(Tensor)::select(int dimension_, long sliceIndex_) const
 {
 	TENSOR_CLASS(Tensor) *dst = new TENSOR_CLASS(Tensor)();
 	TENSOR_FUNC(select)(dst->t, t, dimension_, sliceIndex_);
+		
+      	m_isReference = true;
+
 	return (Tensor*)dst;
 }
 
@@ -191,6 +205,8 @@ void TENSOR_CLASS(Tensor)::unfold(const Tensor *src, int dimension_, long size_,
     {
       TENSOR_CLASS(Tensor) *src_ = (TENSOR_CLASS(Tensor) *) src;
       TENSOR_FUNC(unfold)(t, src_->t, dimension_, size_, step_);
+		
+      m_isReference = true;
     }
   else
     {
@@ -234,21 +250,25 @@ void TENSOR_CLASS(Tensor)::fill(TYPE value)
 void TENSOR_CLASS(Tensor)::resize(long dim0) const
 {
   TENSOR_FUNC(resize4d)(t, dim0, -1, -1, -1);
+  m_isReference = false;
 }
 
 void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1) const
 {
   TENSOR_FUNC(resize4d)(t, dim0, dim1, -1, -1);
+  m_isReference = false;
 }
 
 void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2) const
 {
   TENSOR_FUNC(resize4d)(t, dim0, dim1, dim2, -1);
+  m_isReference = false;
 }
 
 void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2, long dim3) const
 {
   TENSOR_FUNC(resize4d)(t, dim0, dim1, dim2, dim3);
+  m_isReference = false;
 }
 
 TYPE TENSOR_CLASS(Tensor)::get(long x0) const

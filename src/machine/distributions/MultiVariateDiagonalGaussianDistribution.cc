@@ -165,11 +165,13 @@ bool MultiVariateDiagonalGaussianDistribution::EMinit()
 		}
 	}
 
+	float min_weights = getFOption("min weights");
+
 	acc_posteriors_sum_weights = 0.0;
 	for(int j = 0 ; j < n_means ; j++)
 	{
 		posterior_numerator[j] = 0.0;
-		acc_posteriors_weights[j] = 0.0;
+		acc_posteriors_weights[j] = min_weights;
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
@@ -261,6 +263,9 @@ bool MultiVariateDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTenso
 bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 {
 	bool variance_update = getBOption("variance update");
+
+	//Torch::print("MultiVariateDiagonalGaussianDistribution::EMupdate()\n");
+	//if(variance_update) Torch::print("Update variance\n");
 
 	for(int j = 0 ; j < n_means ; j++)
 	{
@@ -483,11 +488,15 @@ bool MultiVariateDiagonalGaussianDistribution::setVariances(double *stdv_, doubl
 	// init variances and variance flooring to the given variance
 	// Note: it could be interesting to compute the variance of samples for each cluster !
 
+	//Torch::print("MultiVariateDiagonalGaussianDistribution::setVariances() flooring = %g\n", factor_variance_threshold_);
+
 	for(int k = 0 ; k < n_inputs ; k++)
 	{
 		for(int j = 0 ; j < n_means ; j++)
 			variances[j][k] = stdv_[k];
 		threshold_variances[k] = stdv_[k] * factor_variance_threshold_;
+
+		//Torch::print("vflooring [%d] = %g\n", k, threshold_variances[k]);
 	}
 
 	return true;
@@ -495,8 +504,14 @@ bool MultiVariateDiagonalGaussianDistribution::setVariances(double *stdv_, doubl
 
 bool MultiVariateDiagonalGaussianDistribution::setVarianceFlooring(double *stdv_, double factor_variance_threshold_)
 {
+	//Torch::print("MultiVariateDiagonalGaussianDistribution::setVarianceFlooring() flooring = %g\n", factor_variance_threshold_);
+
 	for(int k = 0 ; k < n_inputs ; k++)
+	{
 		threshold_variances[k] = stdv_[k] * factor_variance_threshold_;
+
+		//Torch::print("vflooring [%d] = %g\n", k, threshold_variances[k]);
+	}
 
 	return true;
 }

@@ -30,6 +30,7 @@ public:
 		
 protected:
 	MultiVariateDiagonalGaussianDistribution *prior;
+	double **prior_means;
 
 	float map_factor;
 };

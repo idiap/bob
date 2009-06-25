@@ -13,6 +13,15 @@ MultiVariateMAPDiagonalGaussianDistribution::MultiVariateMAPDiagonalGaussianDist
 	n_inputs = prior->m_parameters->getI("n_inputs");
 	n_means = prior->m_parameters->getI("n_means");
 
+	double *means_ = prior->m_parameters->getDarray("means");
+	prior_means = (double **) THAlloc(n_means * sizeof(double *));
+	double *p = means_;
+	for(int j = 0 ; j < n_means ; j++)
+	{
+		prior_means[j] = p; 
+		p += n_inputs;
+	}
+
 	//Torch::print("MultiVariateMAPDiagonalGaussianDistribution()\n");
 	//Torch::print("   n_inputs = %d\n", n_inputs);
 	//Torch::print("   n_means = %d\n", n_means);
@@ -29,6 +38,7 @@ MultiVariateMAPDiagonalGaussianDistribution::MultiVariateMAPDiagonalGaussianDist
 
 MultiVariateMAPDiagonalGaussianDistribution::~MultiVariateMAPDiagonalGaussianDistribution()
 {
+	THFree(prior_means);
 }
 
 bool MultiVariateMAPDiagonalGaussianDistribution::prepare()
@@ -145,60 +155,26 @@ bool MultiVariateMAPDiagonalGaussianDistribution::EMupdate()
 	}
 	*/
 
+	double precision = 10 * DBL_EPSILON;
+	float min_weights = getFOption("min weights");
+
 	for(int j = 0 ; j < n_means ; j++)
 	{
-	   	/** Update rule for weights:
-			\begin{equation}
-			\lambda_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i)}{\sum_{k=1}^{n_gaussians} \sum_{i=1}^{n_samples} P(q_k | x_i)}
-			\end{equation}
-		*/
-		weights[j] = acc_posteriors_weights[j] / acc_posteriors_sum_weights;
-
-		for(int k = 0 ; k < n_inputs ; k++)
+	   	if(acc_posteriors_weights[j] <= (min_weights + precision))
 		{
-	   		/** Update rule for means:
-				\begin{equation}
-				\mu_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i) \times x_i}{\sum_{i=1}^{n_samples} P(q_j | x_i)}
-				\end{equation}
-			*/
-			means[j][k] = acc_posteriors_means[j][k] / acc_posteriors_weights[j];
-		}
-	}
-
-	/*
-	// first the gaussians
-	real* p_weights_acc = weights_acc;
-	for (int i=0;i<n_gaussians;i++,p_weights_acc++) 
-	{
-		if (*p_weights_acc == 0) 
-		{
-			warning("Gaussian %d of GMM is not used in EM",i);
+			// copy the means from the prior distribution
+			for(int k = 0 ; k < n_inputs ; k++)
+				means[j][k] = prior_means[j][k];
+			//Torch::print("=\n");
 		}
 		else
 		{
-			real* p_means_i = means[i];
-			real* p_var_i = var[i];
-			real* p_means_acc_i = means_acc[i];
-			real* p_var_acc_i = var_acc[i];
-			for (int j=0;j<n_inputs;j++) 
-			{
-				*p_means_i = *p_means_acc_i++ / *p_weights_acc;
-				real v = *p_var_acc_i++ / *p_weights_acc - *p_means_i * *p_means_i++;
-				*p_var_i++ = v >= var_threshold[j] ? v : var_threshold[j];
-			}
+			// update the means from the prior distribution
+			for(int k = 0 ; k < n_inputs ; k++)
+				means[j][k] = (map_factor * prior_means[j][k]) + ((1 - map_factor) * acc_posteriors_means[j][k] / acc_posteriors_weights[j]);
+			//Torch::print("* (%g)\n", map_factor);
 		}
 	}
-	// then the weights
-	real sum_weights_acc = 0;
-	p_weights_acc = weights_acc;
-	for (int i=0;i<n_gaussians;i++)
-		sum_weights_acc += *p_weights_acc++;
-	real *p_log_weights = log_weights;
-	real log_sum = log(sum_weights_acc);
-	p_weights_acc = weights_acc;
-	for (int i=0;i<n_gaussians;i++)
-		*p_log_weights++ = log(*p_weights_acc++) - log_sum;
-	*/
 
 	if(use_log)
 	{

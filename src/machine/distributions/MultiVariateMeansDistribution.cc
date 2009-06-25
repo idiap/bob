@@ -16,12 +16,14 @@ MultiVariateMeansDistribution::~MultiVariateMeansDistribution()
 
 bool MultiVariateMeansDistribution::EMinit()
 {
+	float min_weights = getFOption("min weights");
+
 	acc_posteriors_sum_weights = 0.0;
 	for(int j = 0 ; j < n_means ; j++)
 	{
 		acc_posteriors_weights[j] = 0.0;
 
-		for(int k = 0 ; k < n_inputs ; k++) acc_posteriors_means[j][k] = 0.0;
+		for(int k = 0 ; k < n_inputs ; k++) acc_posteriors_means[j][k] = min_weights;
 	}
 
 	return true;
