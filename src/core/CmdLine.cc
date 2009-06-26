@@ -53,6 +53,7 @@ void CmdLine::cleanup()
         	}
         	delete[] cmd_options[i];
         }
+
         delete[] n_cmd_options;
         delete[] cmd_options;
 
