@@ -241,6 +241,7 @@ BoolCmdOption::~BoolCmdOption()
 StringCmdOption::StringCmdOption(const char *name_, char **ptr_, const char *init_value_, const char *help_, bool save_)
 		: CmdOption(name_, "<string>", help_, save_)
 {
+	*ptr_ = 0;
 	ptr = ptr_;
 	init_value = new char[strlen(init_value_)+1];
 	strcpy(init_value, init_value_);
@@ -311,8 +312,9 @@ bool StringCmdOption::saveFile(File& file) const
 
 StringCmdOption::~StringCmdOption()
 {
-        delete[] *ptr;
+	delete[] *ptr;
         delete[] init_value;
+        *ptr = 0;
 }
 
 //-------------------------- double

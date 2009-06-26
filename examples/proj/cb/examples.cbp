@@ -62,6 +62,11 @@
 		<Unit filename="../../dataset/tensor2bindata.cc" />
 		<Unit filename="../../dataset/tensor2image.cc" />
 		<Unit filename="../../dataset/tensorfiles.cc" />
+		<Unit filename="../../distribution/CMakeLists.txt" />
+		<Unit filename="../../distribution/gmm.cc" />
+		<Unit filename="../../distribution/gmmdev.cc" />
+		<Unit filename="../../distribution/gmmforward.cc" />
+		<Unit filename="../../distribution/make.csh" />
 		<Unit filename="../../facetools/CMakeLists.txt" />
 		<Unit filename="../../facetools/README" />
 		<Unit filename="../../facetools/banca.list" />

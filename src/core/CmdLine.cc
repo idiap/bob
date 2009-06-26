@@ -46,14 +46,13 @@ void CmdLine::cleanup()
 	// Delete command line options
         for (int i = 0; i < n_master_switches; i ++)
         {
-        	const int size = n_cmd_options[i];
-        	for (int j = 0; j < size; j ++)
+		const int size = n_cmd_options[i];
+		for (int j = 0; j < size; j ++)
         	{
         		delete cmd_options[i][j];
         	}
         	delete[] cmd_options[i];
         }
-
         delete[] n_cmd_options;
         delete[] cmd_options;
 
@@ -73,7 +72,7 @@ void CmdLine::cleanup()
 
 void CmdLine::resizeCmdOptions()
 {
-        // Create a larger set of cmd options
+	// Create a larger set of cmd options
         int* temp_n_cmd_options = new int[n_master_switches + 1];
         CmdOption*** temp_cmd_options = new CmdOption**[n_master_switches + 1];
 
@@ -97,7 +96,7 @@ void CmdLine::resizeCmdOptions()
 
 void CmdLine::resizeCmdOptions(int n, CmdOption* option)
 {
-        // Allocate a new
+	// Allocate a new option array to fit the new one
         CmdOption** temp_cmd_options = new CmdOption*[n_cmd_options[n] + 1];
 
         for (int i = 0; i < n_cmd_options[n]; i ++)
@@ -128,7 +127,7 @@ void CmdLine::addCmdOption(CmdOption *option)
 {
 	if (option->isMasterSwitch())
 	{
-	        resizeCmdOptions();
+		resizeCmdOptions();
 	}
 
         resizeCmdOptions(n_master_switches - 1, option);

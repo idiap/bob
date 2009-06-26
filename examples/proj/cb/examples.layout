@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="../../README.txt" open="1" top="0" tabpos="18">
+	<File name="../../README.txt" open="1" top="0" tabpos="15">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="7">
 		<Cursor position="557" topLine="2" />
 	</File>
 	<File name="../../boosting/README.txt" open="1" top="0" tabpos="6">
-		<Cursor position="3083" topLine="54" />
+		<Cursor position="3083" topLine="53" />
 	</File>
 	<File name="../../boosting/testBoostedClassifier.cc" open="1" top="0" tabpos="1">
 		<Cursor position="25" topLine="0" />
@@ -66,6 +66,15 @@
 	</File>
 	<File name="../../dataset/tensorfiles.cc" open="0" top="0" tabpos="27">
 		<Cursor position="20" topLine="0" />
+	</File>
+	<File name="../../distribution/CMakeLists.txt" open="1" top="0" tabpos="23">
+		<Cursor position="1009" topLine="0" />
+	</File>
+	<File name="../../distribution/gmm.cc" open="1" top="0" tabpos="22">
+		<Cursor position="3084" topLine="58" />
+	</File>
+	<File name="../../distribution/gmmdev.cc" open="1" top="0" tabpos="21">
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="../../facetools/CMakeLists.txt" open="0" top="0" tabpos="10">
 		<Cursor position="226" topLine="0" />
@@ -182,22 +191,22 @@
 		<Cursor position="23" topLine="0" />
 	</File>
 	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="11">
-		<Cursor position="400" topLine="0" />
+		<Cursor position="544" topLine="0" />
 	</File>
-	<File name="../../scanning/make.csh" open="1" top="0" tabpos="20">
+	<File name="../../scanning/make.csh" open="1" top="0" tabpos="16">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="10">
-		<Cursor position="20923" topLine="457" />
+		<Cursor position="8495" topLine="163" />
 	</File>
 	<File name="../../scanning/testPatternList.cc" open="0" top="0" tabpos="8">
 		<Cursor position="24" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="17">
+	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="14">
 		<Cursor position="340" topLine="0" />
 	</File>
 	<File name="../../scanning/test_scanning_one.sh" open="1" top="1" tabpos="9">
-		<Cursor position="1403" topLine="0" />
+		<Cursor position="1447" topLine="0" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="55">
 		<Cursor position="23" topLine="0" />
