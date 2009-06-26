@@ -14,7 +14,7 @@ namespace Torch
 	//              (relative to the model confidence)
 	//
 	//	- PARAMETERS (name, type, default value, description):
-	//		"sampling"	int	0	"0 - linear, 1 - quadratic, 2 - exponential(2)"
+	//		"sampling"	int	0	"0 - linear, 1 - quadratic, 2 - cubic, 3 - exponential(2), 4 - exponential(4)"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////

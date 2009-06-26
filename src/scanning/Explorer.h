@@ -10,7 +10,7 @@ namespace Torch
 	class Image;
 	class ipSWPruner;
 	class ipSWEvaluator;
-	class ipCore;
+	class spCore;
 	class ScaleExplorer;
 	class Tensor;
 
@@ -126,10 +126,10 @@ namespace Torch
 		// Set the features to use for the scales (different or the same)
 		//	(for prunning and pattern evaluation)
 		// (If they are 0/NULL, then the original input tensor will be used!)
-		virtual bool		setScalePruneIp(ipCore* scalePruneIp);
-		virtual bool		setScalePruneIp(int index_scale, ipCore* scalePruneIp);
-		virtual bool		setScaleEvaluationIp(ipCore* scaleEvaluationIp);
-		virtual bool		setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp);
+		virtual bool		setScalePruneIp(spCore* scalePruneIp);
+		virtual bool		setScalePruneIp(int index_scale, spCore* scalePruneIp);
+		virtual bool		setScaleEvaluationIp(spCore* scaleEvaluationIp);
+		virtual bool		setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp);
 
 		/////////////////////////////////////////////////////////////////
 		// Process functions
@@ -193,8 +193,8 @@ namespace Torch
 		//	- ROIs
 		sSize*			m_scales;
 		ScaleExplorer**		m_scale_explorers;
-		ipCore**		m_scale_prune_ips;
-		ipCore**		m_scale_evaluation_ips;
+		spCore**		m_scale_prune_ips;
+		spCore**		m_scale_evaluation_ips;
 		sRect2D*		m_scale_rois;
 		int			m_n_scales;
 	};

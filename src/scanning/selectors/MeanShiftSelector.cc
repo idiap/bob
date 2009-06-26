@@ -438,6 +438,7 @@ int MeanShiftSelector::getClosest(	const PatternList& candidates,
 		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
 			if (	areSWIntersected(candidates.get(i), cx, cy, w, h) == true &&
 				Jaccard(candidates.get(i), cx, cy, w, h) < max_jaccard)
+			//if (areSWIntersected(candidates.get(i), cx, cy, w, h) == true)
 			{
 				idx_closest[isize] = i;
 				dist_closest[isize ++] = (*fn_esquare_p)(candidates.get(i), cx, cy, w, h);

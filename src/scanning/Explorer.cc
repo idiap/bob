@@ -130,8 +130,8 @@ bool Explorer::resizeScales(int n_scales)
 	m_n_scales = n_scales;
 	m_scales = new sSize[n_scales];
 	m_scale_explorers = new ScaleExplorer*[n_scales];
-	m_scale_prune_ips = new ipCore*[n_scales];
-	m_scale_evaluation_ips = new ipCore*[n_scales];
+	m_scale_prune_ips = new spCore*[n_scales];
+	m_scale_evaluation_ips = new spCore*[n_scales];
 	m_scale_rois = new sRect2D[n_scales];
 
 	// Initialize scales
@@ -185,7 +185,7 @@ bool Explorer::setScaleExplorer(int index_scale, ScaleExplorer* scaleExplorer)
 //	(for prunning and pattern evaluation)
 // (If they are 0/NULL, then the original input tensor will be used!)
 
-bool Explorer::setScalePruneIp(ipCore* scalePruneIp)
+bool Explorer::setScalePruneIp(spCore* scalePruneIp)
 {
 	// Check parameters
 	if (	m_n_scales < 1 || m_scales == 0)
@@ -202,7 +202,7 @@ bool Explorer::setScalePruneIp(ipCore* scalePruneIp)
 	return true;
 }
 
-bool Explorer::setScalePruneIp(int index_scale, ipCore* scalePruneIp)
+bool Explorer::setScalePruneIp(int index_scale, spCore* scalePruneIp)
 {
 	// Check parameters
 	if (	m_n_scales < 1 || m_scales == 0 ||
@@ -217,7 +217,7 @@ bool Explorer::setScalePruneIp(int index_scale, ipCore* scalePruneIp)
 	return true;
 }
 
-bool Explorer::setScaleEvaluationIp(ipCore* scaleEvaluationIp)
+bool Explorer::setScaleEvaluationIp(spCore* scaleEvaluationIp)
 {
 	// Check parameters
 	if (	m_n_scales < 1 || m_scales == 0)
@@ -234,7 +234,7 @@ bool Explorer::setScaleEvaluationIp(ipCore* scaleEvaluationIp)
 	return true;
 }
 
-bool Explorer::setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp)
+bool Explorer::setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp)
 {
 	// Check parameters
 	if (	m_n_scales < 1 || m_scales == 0 ||

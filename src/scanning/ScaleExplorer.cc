@@ -58,7 +58,7 @@ bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerDa
 	subwindow.pos[0] = sw_y; subwindow.size[0] = sw_h;
 	subwindow.pos[1] = sw_x; subwindow.size[1] = sw_w;
 
-        // Check if the subwindow should be prunned ...
+	// Check if the subwindow should be prunned ...
         if (explorerData.m_nSWPruners > 0)
         {
 		for (int i = 0; i < explorerData.m_nSWPruners; i ++)

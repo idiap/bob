@@ -2,7 +2,6 @@
 #define _TORCHVISION_SCANNING_MS_EXPLORER_H_
 
 #include "Explorer.h"		// <MSExplorer> is an <Explorer>
-#include "ipIntegral.h"         // Uses <ipIntegral> for fast scalling
 
 namespace Torch
 {
@@ -51,10 +50,10 @@ namespace Torch
 		// It's enforced to use the same pruneIp and evaluationIp!
 		//	=> the <index_scale> functions will return false!!!
 
-		virtual bool		setScalePruneIp(ipCore* scalePruneIp);
-		virtual bool		setScalePruneIp(int index_scale, ipCore* scalePruneIp);
-		virtual bool		setScaleEvaluationIp(ipCore* scaleEvaluationIp);
-		virtual bool		setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp);
+		virtual bool		setScalePruneIp(spCore* scalePruneIp);
+		virtual bool		setScalePruneIp(int index_scale, spCore* scalePruneIp);
+		virtual bool		setScaleEvaluationIp(spCore* scaleEvaluationIp);
+		virtual bool		setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp);
 
 		/////////////////////////////////////////////////////////////////
 		// Process functions
@@ -88,14 +87,9 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-                // <ipIntegral> to compute the integral image for the evaluation tensor
-                // (Needed to fast scale the scanning sub-window to the model size)
-		ipIntegral              m_ipi_evaluation;
-
-		// (Integral) tensors (features) for the pruning and evaluation
-		// (the evaluation one is pointing to <ipIntegral> above)
+		// Tensors (features) for the pruning and evaluation
 		const Tensor*           m_prune_tensor;
-		const Tensor*           m_evaluation_itensor;
+		const Tensor*           m_evaluation_tensor;
 	};
 }
 

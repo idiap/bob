@@ -34,7 +34,7 @@ void MSExplorerData::storePattern(int sw_x, int sw_y, int sw_w, int sw_h, double
 MSExplorer::MSExplorer()
 	: 	Explorer(),
                 m_prune_tensor(0),
-                m_evaluation_itensor(0)
+                m_evaluation_tensor(0)
 {
 	m_data = new MSExplorerData();
 }
@@ -52,22 +52,22 @@ MSExplorer::~MSExplorer()
 // It's enforced to use the same pruneIp and evaluationIp!
 //	=> the <index_scale> functions will return false!!!
 
-bool MSExplorer::setScalePruneIp(ipCore* scalePruneIp)
+bool MSExplorer::setScalePruneIp(spCore* scalePruneIp)
 {
 	return Explorer::setScalePruneIp(scalePruneIp);
 }
 
-bool MSExplorer::setScalePruneIp(int index_scale, ipCore* scalePruneIp)
+bool MSExplorer::setScalePruneIp(int index_scale, spCore* scalePruneIp)
 {
 	return false;
 }
 
-bool MSExplorer::setScaleEvaluationIp(ipCore* scaleEvaluationIp)
+bool MSExplorer::setScaleEvaluationIp(spCore* scaleEvaluationIp)
 {
 	return Explorer::setScaleEvaluationIp(scaleEvaluationIp);
 }
 
-bool MSExplorer::setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp)
+bool MSExplorer::setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp)
 {
 	return false;
 }
@@ -185,10 +185,8 @@ bool MSExplorer::init(const sRect2D& roi)
 
 bool MSExplorer::preprocess(const Image& image)
 {
-	ipCore* ip_prune = m_scale_prune_ips[0];
-	ipCore* ip_evaluation = m_scale_evaluation_ips[0];
-
-	const Tensor* evaluation_tensor = 0;
+	spCore* ip_prune = m_scale_prune_ips[0];
+	spCore* ip_evaluation = m_scale_evaluation_ips[0];
 
 	// Check parameters
 	if (m_n_scales < 1)
@@ -218,14 +216,14 @@ bool MSExplorer::preprocess(const Image& image)
 	if (ip_evaluation == 0)
 	{
 	        // The initial image!
-	        evaluation_tensor = &image;
+	        m_evaluation_tensor = &image;
 	}
 	else
 	{
 	        // Some features need to be extracted!
 	        if (ip_evaluation == ip_prune)  // but check maybe it's the same processing!
 	        {
-	                evaluation_tensor = &ip_prune->getOutput(0);
+	                m_evaluation_tensor = &ip_prune->getOutput(0);
 	        }
 	        else
 	        {
@@ -234,19 +232,9 @@ bool MSExplorer::preprocess(const Image& image)
                                 Torch::message("MSExplorer::preprocess - failed to run the evaluation <ipCore>!\n");
                                 return false;
                         }
-                        evaluation_tensor = &ip_evaluation->getOutput(0);
+                        m_evaluation_tensor = &ip_evaluation->getOutput(0);
 	        }
 	}
-
-	// Compute the integral image for the evaluation tensor
-        if (m_ipi_evaluation.process(*evaluation_tensor) == false)
-        {
-                Torch::message("MSExplorer::preprocess - failed to compute the evaluation integral image!");
-                return false;
-        }
-
-        // Set the final tensor for evaluation
-        m_evaluation_itensor = &m_ipi_evaluation.getOutput(0);
 
 	//OK
 	return true;
@@ -267,7 +255,7 @@ bool MSExplorer::process()
 	const int delta_scale_index = startWithLargeScales == true ? -1 : 1;
 
 	// Initialize the pruners&classifier for this scale
-        if (m_data->init(*m_prune_tensor, *m_evaluation_itensor) == false)
+        if (m_data->init(*m_prune_tensor, *m_evaluation_tensor) == false)
         {
                 Torch::message("MSExplorer::process - failed to initialize the pruners & classifier!\n");
                 return false;

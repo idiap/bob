@@ -35,6 +35,7 @@ struct Params
 	double prune_max_stdev;         // Prune using stdev: max value
 
 	// Preprocessing
+	bool prep_ii;			// Compute integral image
 	bool prep_hlpb;			// HLBP: compute LBP4R bitmaps
 
 	// Detection merging
@@ -103,7 +104,7 @@ void savePatterns(	Image& save_image,
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Save the scanning results (detections, confidence & usage maps) to jpg
+// Save the detections results (before and after merging) to jpg
 //////////////////////////////////////////////////////////////////////////
 
 void saveResults(       const PatternList& detections,
@@ -187,6 +188,7 @@ int main(int argc, char* argv[])
 	cmd.addICmdOption("-random_nsamples", &params.random_nsamples, 1024, "random scale explorer: number of samples");
 
 	cmd.addText("\nPreprocessing options:");
+	cmd.addBCmdOption("-prep_ii", &params.prep_ii, false, "Compute integral image");
 	cmd.addBCmdOption("-prep_hlbp", &params.prep_hlpb, false, "HLBP: compute LBP4R bitmaps");
 
 	cmd.addText("\nPruning options:");
@@ -407,11 +409,23 @@ int main(int argc, char* argv[])
 
         // Set for each scale the feature extractors (<ipCore>s)
         //      [0/NULL] means the original image will be used as features!
-        ipCore* ip_prep = 0;
-        if (params.prep_hlpb == true)
+	spCoreChain* ip_prep = 0;
+	if (params.prep_hlpb == true)
         {
-        	ip_prep = manage(new ipLBPBitmap(manage(new ipLBP4R(1))));
+        	if (ip_prep == 0)
+        	{
+        		ip_prep = manage(new spCoreChain);
+        	}
+        	ip_prep->add(manage(new ipLBPBitmap(manage(new ipLBP4R(1)))));
         }
+        if (params.prep_ii == true)
+	{
+		if (ip_prep == 0)
+        	{
+        		ip_prep = manage(new spCoreChain);
+        	}
+        	ip_prep->add(manage(new ipIntegral));
+	}
         switch (params.explorer_type)
 	{
 	case 0:	// Pyramid
@@ -486,8 +500,8 @@ int main(int argc, char* argv[])
 		(params.explorer_type == 0) ?
 			"pyramid" : ((params.explorer_type == 1) ? "multiscale" : "greedy"));
 
-        saveResults(	selectors[params.select_type]->getPatterns(),		// final patterns
-			explorer->getPatterns(),	// pattern space from where the final patterns where selected
+        saveResults(	scanner.getPatterns(),		// final (merged) detections
+			explorer->getPatterns(),	// candidate (not merged) detections
 			image, image_w, image_h,
 			xtprobe,
 			save_basename);

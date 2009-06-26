@@ -18,7 +18,7 @@ GreedyExplorer::GreedyExplorer(Mode mode)
 		m_sampleOyCoefs(new double[NoConfigs]),
 		m_sampleOsCoefs(new double[NoConfigs])
 {
-	addIOption("sampling", 0, "0 - linear, 1 - quadratic, 2 - exponential(2)");
+	addIOption("sampling", 0, "0 - linear, 1 - quadratic, 2 - cubic, 3 - exponential(2), 4 - exponential(4)");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -85,10 +85,56 @@ void GreedyExplorer::optionChanged(const char* name)
 		}
 		break;
 
-	case 2:	// Exponential(2)
-	default:
+	case 2:	// Cubic
+		{
+			const double norm_ox = 0.01 * VarX * NoVarX / (NoVarX * NoVarX * NoVarX + 0.0);
+			const double norm_oy = 0.01 * VarY * NoVarY / (NoVarY * NoVarY * NoVarY + 0.0);
+			const double norm_os = 0.01 * VarS * NoVarS / (NoVarS * NoVarS * NoVarS + 0.0);
+
+			int index = 0;
+			for (int is = -NoVarS; is <= NoVarS; is ++)
+				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
+					{
+						const double dx = norm_ox * getSign(ix) * ix * ix * ix;
+						const double dy = norm_oy * getSign(iy) * iy * iy * iy;
+						const double ds = 1.0 + norm_os * getSign(is) * is * is * is;
+						m_sampleOxCoefs[index] = dx;
+						m_sampleOyCoefs[index] = dy;
+						m_sampleOsCoefs[index] = ds;
+						index ++;
+					}
+		}
+		break;
+
+	case 3:	// Exponential(2)
 		{
 			const double alpha = 2.0;	// exp(2t)
+
+			const double norm_ox = 0.01 * VarX * NoVarX / exp(alpha * NoVarX);
+			const double norm_oy = 0.01 * VarY * NoVarY / exp(alpha * NoVarY);
+			const double norm_os = 0.01 * VarS * NoVarS / exp(alpha * NoVarS);
+
+			int index = 0;
+			for (int is = -NoVarS; is <= NoVarS; is ++)
+				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
+					{
+						const double dx = norm_ox * getSign(ix) * exp(alpha * fabs(ix));
+						const double dy = norm_oy * getSign(iy) * exp(alpha * fabs(iy));
+						const double ds = 1.0 + norm_os * getSign(is) * exp(alpha * fabs(is));
+						m_sampleOxCoefs[index] = dx;
+						m_sampleOyCoefs[index] = dy;
+						m_sampleOsCoefs[index] = ds;
+						index ++;
+					}
+		}
+		break;
+
+	case 4:	// Exponential(4)
+	default:
+		{
+			const double alpha = 4.0;	// exp(4t)
 
 			const double norm_ox = 0.01 * VarX * NoVarX / exp(alpha * NoVarX);
 			const double norm_oy = 0.01 * VarY * NoVarY / exp(alpha * NoVarY);
@@ -306,21 +352,19 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 	int index = 0;
 	for (int is = -NoVarS; is <= NoVarS; is ++)
 	{
-		const int new_sw_w = FixI(m_sampleOsCoefs[index] * sw_w);
-		const int new_sw_h = FixI(m_sampleOsCoefs[index] * sw_h);
-
-		// Check if the subwindow's size is too large or too small
-		const bool valid = 	new_sw_w >= model_w && new_sw_h >= model_h &&
-					new_sw_w < image_w && new_sw_h < image_h;
-
 		// Vary the position ...
 		for (int ix = -NoVarX; ix <= NoVarX; ix ++)
 		{
-			const int new_sw_x = sw_x + FixI(m_sampleOxCoefs[index] * sw_w);
-
 			for (int iy = -NoVarY; iy <= NoVarY; iy ++)
 			{
+				const int new_sw_w = FixI(m_sampleOsCoefs[index] * sw_w);
+				const int new_sw_h = FixI(m_sampleOsCoefs[index] * sw_h);
+				const int new_sw_x = sw_x + FixI(m_sampleOxCoefs[index] * sw_w);
 				const int new_sw_y = sw_y + FixI(m_sampleOyCoefs[index] * sw_h);
+
+				// Check if the subwindow's size is too large or too small
+				const bool valid = 	new_sw_w >= model_w && new_sw_h >= model_h &&
+							new_sw_w < image_w && new_sw_h < image_h;
 
 				// Default profile: no detection, low score
 				m_profileFlags[index] = 0x00;

@@ -142,6 +142,7 @@ inline bool ipSWEvaluator::processInput(const Tensor& input)
 inline void ipSWEvaluator::setRegion(const TensorRegion& region)
 {
 	m_classifier->setRegion(region);
+
 	if (m_classifier->forward(*m_input_copy) == false)
 	{
 		error("ipSWEvaluator::setRegion - the classifier cannot process the input tensor!\n");

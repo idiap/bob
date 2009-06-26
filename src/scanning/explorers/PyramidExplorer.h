@@ -7,6 +7,7 @@ namespace Torch
 {
         class ipScaleYX;
         class Tensor;
+        class Image;
 
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::PyramidExplorerData:
@@ -67,10 +68,10 @@ namespace Torch
 		// It's enforced to use one pruneIp and evaluationIp per scale!
 		//	=> the functions without <index_scale> will return false!!!
 
-		virtual bool		setScalePruneIp(ipCore* scalePruneIp);
-		virtual bool		setScalePruneIp(int index_scale, ipCore* scalePruneIp);
-		virtual bool		setScaleEvaluationIp(ipCore* scaleEvaluationIp);
-		virtual bool		setScaleEvaluationIp(int index_scale, ipCore* scaleEvaluationIp);
+		virtual bool		setScalePruneIp(spCore* scalePruneIp);
+		virtual bool		setScalePruneIp(int index_scale, spCore* scalePruneIp);
+		virtual bool		setScaleEvaluationIp(spCore* scaleEvaluationIp);
+		virtual bool		setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp);
 
 		/////////////////////////////////////////////////////////////////
 		// Process functions
@@ -101,21 +102,10 @@ namespace Torch
 
 	protected:
 
-                /////////////////////////////////////////////////////////////////
-
-                // Deallocate the tensors for each scale
-                void                    deallocateScaleTensors();
-
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
-		// <ipScaleYX>s for scalling the original image
-		ipScaleYX*              m_scaling_ips;
-
-                // Input tensors for each scale, for prunning and evaluation
-                //      (they are just pointers to the actual tensors)
-		const Tensor**          m_scale_prune_tensors;
-		const Tensor**          m_scale_evaluation_tensors;
+		const Image*		m_image;
 	};
 }
 

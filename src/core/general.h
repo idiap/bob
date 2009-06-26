@@ -97,9 +97,6 @@ int compare_doubles(const void* a, const void* b);
 	// Memory management
 	////////////////////////////////////////////////////////////////////////////////////
 
-
-
-	// Memory management
 	namespace Private
 	{
 		template <typename T>

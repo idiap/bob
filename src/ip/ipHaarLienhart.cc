@@ -23,6 +23,7 @@ namespace Torch
         u_size_z  = -1;
         u_parameters = NULL;
         u_weight = NULL;
+        invscale=1;
 
         //print("ipHaar() Type-%d (%d-%d) [%dx%d]\n", type, x, y, w, h);
 
@@ -102,13 +103,14 @@ namespace Torch
         {
             u_x= m_region.pos[1];
             u_y = m_region.pos[0];
+            u_z= 0;
             // u_size_x = m_region.size[1];
             // u_size_y = m_region.size[0];
             if ( u_size_x != m_region.size[1] || u_size_y != m_region.size[0])
             {
-                updateParameters();
                 u_size_y = m_region.size[0];
                 u_size_x = m_region.size[1];
+                updateParameters();
             }
         }
         //....for 3 dimension data
@@ -129,10 +131,10 @@ namespace Torch
             if ( u_size_x != m_region.size[1] || u_size_y != m_region.size[0])
             {
                 //update the parameters
-                updateParameters();
                 u_size_x = m_region.size[1];
                 u_size_y = m_region.size[0];
                 u_size_z = m_region.size[2]; //can be used for 3D haar - but now it is 1
+                updateParameters();
             }
 
         }
@@ -166,33 +168,31 @@ namespace Torch
         for (int i=0;i<m_noRecs;i++)
         {
             k =i*m_nparams;
-            u_parameters[k+0] = int(sH*(m_parameters[k+0]));//+0.5));
-//            if (u_parameters[k+0] != parameters[k+0])
-//                print("............they are not the same....\n");
-            u_parameters[k+1] = int(sW*(m_parameters[k+1]));//+0.5));
-            u_parameters[k+2] = int(sH*(m_parameters[k+2]));//+0.5));
-            u_parameters[k+3] = int(sW*(m_parameters[k+3]));//+0.5));
+            u_parameters[k+0] = int(sH*(m_parameters[k+0]+0.0));//+0.5));
+            u_parameters[k+1] = int(sW*(m_parameters[k+1]+0.0));//+0.5));
+            u_parameters[k+2] = int(sH*(m_parameters[k+2]+0.0));//+0.5));
+            u_parameters[k+3] = int(sW*(m_parameters[k+3]+0.0));//+0.5));
             A[i] = u_parameters[k+2] * u_parameters[k+3];
             if (m_weight[i] >0)
             {
                 pc++;
                 AP +=A[i];
-                WP += m_weight[i];
+                WP += abs(m_weight[i]);
             }
 
             else
             {
                 nc++;
                 AN += A[i];
-                WN += m_weight[i];
+                WN += abs(m_weight[i]);
             }
 
         }
 
-        //now update the weights too
+       //now update the weights too
         //keep the positive weights same and change the -ve weights
         double wr;
-        wr = WP*(AP+0.0)/(AN+0.0);
+        wr = WP/WN*(AP+0.0)/(AN+0.0);
         for (int i=0;i<m_noRecs;i++)
         {
             if (m_weight[i]<0)
@@ -201,6 +201,23 @@ namespace Torch
                 u_weight[i] = m_weight[i];
 
         }
+
+        //........................check the sum is 0.......................................
+//        double tempsum  =0;
+//        double tempsum2 =0;
+//        for (int i=0;i<m_noRecs;i++)
+//        {
+//            k =i*m_nparams;
+//            tempsum = tempsum + u_weight[i]* u_parameters[k+2] *u_parameters[k+3];
+//            tempsum2 = tempsum2 + m_weight[i]* m_parameters[k+2] *m_parameters[k+3];
+//        }
+//        //  print("Sum of area is %f\n",tempsum);
+//        if (abs(tempsum)!= 0.000)
+//            print("Sum of area is %f - number of rectangles %d Original value %f\n",tempsum, m_noRecs,tempsum2);
+
+        //......................................................................................
+
+        invscale = sW*sH;
         delete [] A;
 
     }
@@ -258,10 +275,9 @@ namespace Torch
         const IntTensor* t_input = (IntTensor*)&input;
         DoubleTensor* t_output = (DoubleTensor*)m_output[0];
 
-
         double sum=0;
         int k;
-        int *t1 = new int[4];
+        int t1[4];
         int tensor_width, tensor_height;
 
         if (u_x<0 || u_y <0)
@@ -315,7 +331,7 @@ namespace Torch
 
                 sum += (t1[0]+t1[1]-t1[2]-t1[3]) *  u_weight[i];
             }
-            (*t_output)(0) =sum;
+            (*t_output)(0) =sum/invscale;
             // print("Feature value inside %f\n",sum);
         }
 
@@ -334,9 +350,12 @@ namespace Torch
 
             for (int i=0;i<m_noRecs;i++)
             {
+
                 k=i*m_nparams;
+
 ///.........
-                if ( !( (u_y+u_parameters[k+0] + u_parameters[k+2]) <tensor_height || (u_x+u_parameters[k+1]+u_parameters[k+3])< tensor_width))
+                if ( !( (u_y+u_parameters[k+0] + u_parameters[k+2]) <tensor_height &&
+                        (u_x+u_parameters[k+1]+u_parameters[k+3])< tensor_width))
 
                 {
                     print("Error .ipHaarLienhart out of range\n");
@@ -349,15 +368,11 @@ namespace Torch
                 else
                     t1[0] = t_input->get(u_y+u_parameters[k+0]-1,u_x+u_parameters[k+1]-1,u_z);
 
-
-
 //bottom right
                 if ( (u_y+u_parameters[k+0]+u_parameters[k+2]-1)<0 || (u_x+u_parameters[k+1]+u_parameters[k+3]-1)<0)
                     t1[1]=0;
                 else
                     t1[1] = t_input->get(u_y+u_parameters[k+0]+u_parameters[k+2]-1,u_x+u_parameters[k+1]+u_parameters[k+3]-1,u_z);
-
-
 
 //bottom left
                 if ( (u_y+u_parameters[k+0]+u_parameters[k+2]-1) <0 || (u_x+u_parameters[k+1]-1) <0)
@@ -371,12 +386,11 @@ namespace Torch
                 else
                     t1[3] = t_input->get(u_y+u_parameters[k+0]-1,u_x+u_parameters[k+1]+u_parameters[k+3]-1,u_z);
 
-
                 sum += (t1[0]+t1[1]-t1[2]-t1[3]) *  u_weight[i];
             }
-            (*t_output)(0) =sum;
+            (*t_output)(0) =sum/invscale;
         }
-        delete [] t1;
+        //delete [] t1;
 
         //  print(" Sum %f\n",sum);
         return true;
