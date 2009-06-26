@@ -139,10 +139,14 @@ namespace Torch {
 
 		short datatype;
 
+	protected:
+
+		mutable bool m_isReference;
+
 	public:
 
-		Tensor(short datatype_) : datatype(datatype_) { }
-		Tensor(Tensor::Type datatype_) : datatype(datatype_ ) { }
+		Tensor(short datatype_) : datatype(datatype_) { m_isReference = false; };
+		Tensor(Tensor::Type datatype_) : datatype(datatype_ ) { m_isReference = false; };
 
 		Tensor::Type getDatatype() const { return (Tensor::Type)datatype; };
 
@@ -188,6 +192,9 @@ namespace Torch {
 
 		// Get the size of an element
 		virtual int typeSize() const = 0;
+
+		// Test if the tensor is a reference tensor
+		virtual bool isReference() { return m_isReference; };
 
 		//---
 

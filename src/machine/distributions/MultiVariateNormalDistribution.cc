@@ -4,218 +4,240 @@ namespace Torch {
 
 MultiVariateNormalDistribution::MultiVariateNormalDistribution()
 {
-	weights = NULL;
+	addFOption("min weights", 1e-3, "minimum weights for each mean");
+
+	//
+	n_means = 0;
 	means = NULL;
-	variances = NULL;
-	threshold_variances = NULL;
-	current_likelihood_one_gaussian = NULL;
+	weights = NULL;
+
+	//
 	acc_posteriors_weights = NULL;
 	buffer_acc_posteriors_means = NULL;
 	acc_posteriors_means = NULL;
-	buffer_acc_posteriors_variances = NULL;
-	acc_posteriors_variances = NULL;
+	current_likelihood_one_mean = NULL;
+
+	//
+	m_parameters->addI("n_inputs", 0, "number of dimensions of the multi-variate normal distribution");
+	m_parameters->addI("n_means", 0, "number of means of the multi-variate normal distribution");
+	m_parameters->addDarray("weigths", 0, 0.0, "weights of the multi-variate normal distribution");
+	m_parameters->addDarray("means", 0, 0.0, "means of the multi-variate normal distribution");
 }
 
-MultiVariateNormalDistribution::MultiVariateNormalDistribution(int n_inputs_, int n_gaussians_) : ProbabilityDistribution(n_inputs_, n_gaussians_ * n_inputs_ * 2 + n_gaussians_)
+MultiVariateNormalDistribution::MultiVariateNormalDistribution(int n_inputs_, int n_means_) : ProbabilityDistribution(n_inputs_)
 {
-   	//
-	n_gaussians = n_gaussians_;
+	addFOption("min weights", 1e-3, "minimum weights for each mean");
 
-	weights = NULL;
+   	//
+	n_means = n_means_;
 	means = NULL;
-	variances = NULL;
-	threshold_variances = NULL;
-	current_likelihood_one_gaussian = NULL;
+	weights = NULL;
+
 	acc_posteriors_weights = NULL;
 	buffer_acc_posteriors_means = NULL;
 	acc_posteriors_means = NULL;
-	buffer_acc_posteriors_variances = NULL;
-	acc_posteriors_variances = NULL;
-
-	double *parameters_ = m_parameters->getDarray("parameters");
+	current_likelihood_one_mean = NULL;
 
 	//
-	weights = parameters_;
+	m_parameters->addI("n_inputs", n_inputs, "number of dimensions of the multi-variate normal distribution");
+	m_parameters->addI("n_means", n_means, "number of means of the multi-variate normal distribution");
+	m_parameters->addDarray("weigths", n_means, 0.0, "weights of the multi-variate normal distribution");
+	m_parameters->addDarray("means", n_means*n_inputs, 0.0, "means of the multi-variate normal distribution");
 
 	//
-	means = (double **) THAlloc(n_gaussians * sizeof(double *));
-	variances = (double **) THAlloc(n_gaussians * sizeof(double *));
-	double *p = &parameters_[n_gaussians];
-	for(int j = 0 ; j < n_gaussians ; j++)
+	resize(n_inputs_, n_means_);
+}
+
+bool MultiVariateNormalDistribution::resize(int n_inputs_, int n_means_)
+{
+	//Torch::print("MultiVariateNormalDistribution::resize(%d, %d)\n", n_inputs_, n_means_);
+	
+	//
+	weights = m_parameters->getDarray("weigths");
+	double *means_ = m_parameters->getDarray("means");
+	means = (double **) THAlloc(n_means_ * sizeof(double *));
+	double *p = means_;
+	for(int j = 0 ; j < n_means_ ; j++)
 	{
-		means[j] = p; p += n_inputs;
-		variances[j] = p; p += n_inputs;
+		means[j] = p; 
+		p += n_inputs_;
 	}
-	
-	//
-	threshold_variances = (double *) THAlloc(n_inputs * sizeof(double));
-	for(int i = 0 ; i < n_inputs ; i++) threshold_variances[i] = 0.0;
-	
-	//
-	current_likelihood_one_gaussian = (double *) THAlloc(n_gaussians * sizeof(double));
-	for(int j = 0 ; j < n_gaussians ; j++) current_likelihood_one_gaussian[j] = 0.0;
 
 	//
-	acc_posteriors_weights = (double *) THAlloc(n_gaussians * sizeof(double));
-	buffer_acc_posteriors_means = (double *) THAlloc(n_gaussians * n_inputs * sizeof(double));
-	acc_posteriors_means = (double **) THAlloc(n_gaussians * sizeof(double *));
-	buffer_acc_posteriors_variances = (double *) THAlloc(n_gaussians * n_inputs * sizeof(double));
-	acc_posteriors_variances = (double **) THAlloc(n_gaussians * sizeof(double *));
+	current_likelihood_one_mean = (double *) THAlloc(n_means_ * sizeof(double));
+	for(int j = 0 ; j < n_means_ ; j++) current_likelihood_one_mean[j] = 0.0;
+
+	//
+	acc_posteriors_weights = (double *) THAlloc(n_means_ * sizeof(double));
+	buffer_acc_posteriors_means = (double *) THAlloc(n_means_ * n_inputs_ * sizeof(double));
+	acc_posteriors_means = (double **) THAlloc(n_means_ * sizeof(double *));
+
+	for(int j = 0 ; j < n_means_ ; j++)
+		acc_posteriors_means[j] = &buffer_acc_posteriors_means[j*n_inputs_];
+
+	return true;
+}
+
+bool MultiVariateNormalDistribution::cleanup()
+{
+	//Torch::print("MultiVariateNormalDistribution::cleanup()\n");
+
+	if(acc_posteriors_means != NULL) THFree(acc_posteriors_means);
+	if(buffer_acc_posteriors_means != NULL) THFree(buffer_acc_posteriors_means);
+	if(acc_posteriors_weights != NULL) THFree(acc_posteriors_weights);
+	if(current_likelihood_one_mean != NULL) THFree(current_likelihood_one_mean);
+	if(means != NULL) THFree(means);
+
+	return true;
 }
 
 MultiVariateNormalDistribution::~MultiVariateNormalDistribution()
-{
-	THFree(acc_posteriors_variances);
-	THFree(buffer_acc_posteriors_variances);
-	THFree(acc_posteriors_means);
-	THFree(buffer_acc_posteriors_means);
-	THFree(acc_posteriors_weights);
-	THFree(current_likelihood_one_gaussian);
-	THFree(threshold_variances);
-	THFree(variances);
-	THFree(means);
+{	
+	cleanup();
 }
 
 bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 {
-	double *src = (double *) input->dataR();
-	double *dst = (double *) m_output.dataW();
+	//
+	// If the tensor is 1D then considers it as a vector
+	if (	input->nDimension() == 1)
+	{
+		if (	input->size(0) != n_inputs)
+		{
+			warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 0 (%d != %d).", input->size(0), n_inputs);
+			
+			return false;
+		}
 
-	dst[0] = sampleProbability(src);
+		double *src = (double *) input->dataR();
+		double *dst = (double *) m_output.dataW();
+
+		dst[0] = sampleProbability(src);
+	}
+	else
+	{
+		//
+		// If the tensor is 2D/3D then considers it as a sequence along the first dimension
+
+   		if(input->nDimension() == 2)
+		{
+			if (	input->size(1) != n_inputs)
+			{
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 1 (%d != %d).", input->size(1), n_inputs);
+				
+				return false;
+			}
+		
+			int n_frames_per_sequence = input->size(0);
+
+			Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d frames of size %d\n", n_frames_per_sequence, n_inputs);
+
+		}
+		else if(input->nDimension() == 3)
+		{
+			if (	input->size(2) != n_inputs)
+			{
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 2 (%d != %d).", input->size(2), n_inputs);
+				
+				return false;
+			}
+			int n_sequences_per_sequence = input->size(0);
+			int n_frames_per_sequence = input->size(1);
+
+			Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d sequences of %d frames of size %d\n", n_sequences_per_sequence, n_frames_per_sequence, n_inputs);
+		}
+		else 
+		{
+			warning("MultiVariateNormalDistribution::forward() : don't know how to deal with %d dimensions sorry :-(", input->nDimension());
+			
+			return false;
+		}
+
+	}
 
 	return true;
 }
 
-/*
-void MultiVariateNormalDistribution::initMeans(real **means_)
+bool MultiVariateNormalDistribution::setMeans(double **means_)
 {
-	// init only the means from provided means
-	
-	for(int j = 0 ; j < n_gaussians ; j++) 
+	for(int j = 0 ; j < n_means ; j++) 
 	{
-		for(int k = 0 ; k < dim ; k++) 
-		{
-			means[j][k] = means_[j][k];
-			variances[j][k] = threshold_variances[k];
-		}
-		weights[j] = 1.0 / (real) n_gaussians;
+		for(int k = 0 ; k < n_inputs ; k++) means[j][k] = means_[j][k];
+		weights[j] = 1.0 / (double) n_means;
 	}
+
+	return true;
 }
 
-void MultiVariateNormalDistribution::initMeans(int n_data_, real **data_)
+bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 {
 	// init only means from assigning a random sample per partitions
+	
+	if(dataset_ == NULL) return false;
 
-	if(n_gaussians > n_data_) warning("There is more gaussians than samples. This could creates some troubles.");
+	int n_data = dataset_->getNoExamples();
+	if(n_means > n_data) warning("MultiVariateNormalDistribution::setMeans() There are more means than samples. This could creates some troubles.");
 
-	int n_partitions = (int)(n_data_ / (real)n_gaussians);
+	int n_partitions = (int)(n_data / (double) n_means);
 
-	for(int j = 0 ; j < n_gaussians ; j++) 
+	for(int j = 0 ; j < n_means ; j++) 
 	{
 		int offset = j*n_partitions;
-		int index = offset + (int)(Random::uniform()*(real)n_partitions);
+		int index = offset + (int)(THRandom_uniform(0, 1)*(double) n_partitions);
 
 		if(index < 0) warning("under limit");
-		if(index >= n_data_) warning("over limit");
+		if(index >= n_data) warning("over limit");
 
-		for(int k = 0 ; k < dim ; k++) 
+		Tensor *example = dataset_->getExample(index);
+		if (	example->nDimension() != 1 || example->getDatatype() != Tensor::Double)
 		{
-			means[j][k] = data_[index][k];
-			variances[j][k] = threshold_variances[k];
+			warning("MultiVariateNormalDistribution::setMeans() : incorrect number of dimensions or type.");
+			break;
 		}
-		weights[j] = 1.0 / (real) n_gaussians;
+		if (	example->size(0) != n_inputs)
+		{
+			warning("MultiVariateNormalDistribution::setMeans() : incorrect input size along dimension 0 (%d != %d).", example->size(0), n_inputs);
+			break;
+		}
+
+		DoubleTensor *t_input = (DoubleTensor *) example;
+		double *src = (double *) t_input->dataR();
+
+		for(int k = 0 ; k < n_inputs ; k++) means[j][k] = src[k];
+		weights[j] = 1.0 / (double) n_means;
 	}
 
+	return true;
 }
 
-void MultiVariateNormalDistribution::initVariances(int n_data_, real **data_, real factor_variance_threshold_)
-{
-	// init only variances to the variance of data
-	// Note: it could be interesting to compute the variance of samples for each cluster !
-
-	real *mean = (real *) allocator->alloc(dim * sizeof(real));
-
-	for(int k = 0 ; k < dim ; k++) mean[k] = threshold_variances[k] = 0.0;
-
-	for(int i = 0 ; i < n_data_ ; i++)
-	{
-		for(int k = 0 ; k < dim ; k++)
-		{
-			real z = data_[i][k];
-
-			mean[k] += z;
-			threshold_variances[k] += z*z;
-		}
-	}
-
-	for(int k = 0 ; k < dim ; k++)
-	{
-		mean[k] /= (real) n_data_;
-		threshold_variances[k] /= (real) n_data_;
-		threshold_variances[k] -= mean[k] * mean[k];
-		if(threshold_variances[k] <= 0.0) threshold_variances[k] = 1.0;
-		//else threshold_variances[k] = sqrt(threshold_variances[k]);
-	}
-
-	print("Mean of data: [ ");
-	for(int k = 0 ; k < dim ; k++) print("%g ", mean[k]);
-	print("]\n");
-
-	print("Variance of data: [ ");
-	for(int k = 0 ; k < dim ; k++) print("%g ", threshold_variances[k]);
-	print("]\n");
-
-	for(int j = 0 ; j < n_gaussians ; j++)
-		for(int k = 0 ; k < dim ; k++)
-			variances[j][k] = threshold_variances[k];
-
-	for(int k = 0 ; k < dim ; k++)
-		threshold_variances[k] *= factor_variance_threshold_;
-
-	print("Variance threshold: [ ");
-	for(int k = 0 ; k < dim ; k++) print("%g ", threshold_variances[k]);
-	print("]\n");
-
-	allocator->free(mean);
-}
-*/
 
 bool MultiVariateNormalDistribution::shuffle()
 {
-   	m_parameters->print("MultiVariateNormalDistribution parameters");
+	//Torch::print("MultiVariateNormalDistribution::shuffle()\n");
 	
    	double z = 0.0;
 
-	Torch::print("n_gaussians = %d\n", n_gaussians);
-	Torch::print("n_inputs = %d\n", n_inputs);
-	     
-	for(int j = 0 ; j < n_gaussians ; j++)
+	for(int j = 0 ; j < n_means ; j++)
 	{
-	   	Torch::print("w[%d] = %g\n", j, weights[j]);
 		weights[j] = THRandom_uniform(0, 1);
 		z += weights[j];
 
 		for(int k = 0 ; k < n_inputs ; k++)
-		{
 			means[j][k] = THRandom_uniform(0, 1);
-			variances[j][k] = THRandom_uniform(0, 1);
-		}
 	}
 
-	for(int j = 0 ; j < n_gaussians ; j++) weights[j] /= z;
-
-   	m_parameters->print("MultiVariateNormalDistribution parameters");
+	for(int j = 0 ; j < n_means ; j++) weights[j] /= z;
 
 	return true;
 }
 
-void MultiVariateNormalDistribution::print()
+bool MultiVariateNormalDistribution::print()
 {
    	double z = 0.0;
 
-	for(int j = 0 ; j < n_gaussians ; j++)
+	for(int j = 0 ; j < n_means ; j++)
 	{
-		Torch::print("Gaussian [%d]\n", j);
+		Torch::print("Mean [%d]\n", j);
 
 		Torch::print("   weight = %g\n", weights[j]);
 		z += weights[j];
@@ -223,12 +245,10 @@ void MultiVariateNormalDistribution::print()
 		Torch::print("   mean = [ ");
 		for(int k = 0 ; k < n_inputs ; k++) Torch::print("%g ", means[j][k]);
 		Torch::print("]\n");
-
-		Torch::print("   variance = [ ");
-		for(int k = 0 ; k < n_inputs ; k++) Torch::print("%g ", variances[j][k]);
-		Torch::print("]\n");
 	}
 	Torch::print("Sum weights = %g\n", z);
+
+	return true;
 }
 	
 }

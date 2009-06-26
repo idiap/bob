@@ -56,6 +56,15 @@ namespace Torch
 		bool		loadFile(File& file);
 		bool		saveFile(File& file) const;
 
+		///
+		int getNvariables() { return m_size; };
+		
+		///
+		Variable* getVariables() { return m_variables; };
+
+		///
+		bool copy(VariableCollector *variables_);
+		
 	private:
 
 		//////////////////////////////////////////////////////////////////////

@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
 	int block_size_w;
 	int block_overlap_h;
 	int block_overlap_w;
+	bool rcblocks;
 
 	// Build the command line object
 	CmdLine cmd;
@@ -32,6 +33,7 @@ int main(int argc, char* argv[])
 	cmd.addICmdOption("-sizeW", &block_size_w, 8, "block size W");
 	cmd.addICmdOption("-overlapH", &block_overlap_h, 4, "overlap H between blocks");
 	cmd.addICmdOption("-overlapW", &block_overlap_w, 4, "overlap W between blocks");
+	cmd.addBCmdOption("-rcblocks", &rcblocks, false, "returns blocks as a row X col matrix");
 
 	cmd.addText("\nOptions:");
 	cmd.addBCmdOption("-verbose", &verbose, false, "print Tensor values");
@@ -77,7 +79,7 @@ int main(int argc, char* argv[])
 	ipBlock ipblock;
 
 	ipblock.setBOption("verbose", verbose);
-	ipblock.setBOption("rcoutput", true);
+	ipblock.setBOption("rcoutput", rcblocks);
 	ipblock.setIOption("ox", block_overlap_w);
 	ipblock.setIOption("oy", block_overlap_h);
 	ipblock.setIOption("w", block_size_w);
@@ -89,50 +91,82 @@ int main(int argc, char* argv[])
 
 	TensorFile *ofile = new TensorFile;
 	sprintf(ofilename, "%s.tensor", output_basename);
-	ofile->openWrite(ofilename, Tensor::Short, 2, block_size_h, block_size_w, 0, 0);
+
+	if(rcblocks) ofile->openWrite(ofilename, Tensor::Short, 2, block_size_h, block_size_w, 0, 0);
+	else ofile->openWrite(ofilename, Tensor::Short, 2, block_size_h, block_size_w, 0, 0);
 
 	for(int t = 0 ; t < header.m_n_samples ; t++)
 	{
 		tensor = tf.load();
+		//tensor->print("loaded tensor");
 
 		Image imagegray(tensor->size(1), tensor->size(0), 1);
 		ShortTensor *t_ = new ShortTensor();
 		t_->select(&imagegray, 2, 0);
 		t_->copy(tensor);
+		//t_->print("copied tensor");
 
+		//imagegray.print("copied image");
+		
 		ipblock.process(imagegray);
 
 		if(verbose) print("Number of output blocks: %d\n", ipblock.getNOutputs());
 
-		ShortTensor &t_rcoutput = (ShortTensor &) ipblock.getOutput(0);
-		int n_rows = t_rcoutput.size(0);
-		int n_cols = t_rcoutput.size(1);
-
-		ShortTensor *t_rcoutput_narrow_rows = new ShortTensor();
-		ShortTensor *t_rcoutput_narrow_cols = new ShortTensor();
-		ShortTensor *t_block = new ShortTensor(block_size_h, block_size_w);
-
-		for(int r = 0; r < n_rows; r++)
+		if(rcblocks)
 		{
-			//t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
-			t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
+			ShortTensor &t_rcoutput = (ShortTensor &) ipblock.getOutput(0);
+			int n_rows = t_rcoutput.size(0);
+			int n_cols = t_rcoutput.size(1);
 
-		   	for(int c = 0; c < n_cols; c++)
+			ShortTensor *t_rcoutput_narrow_rows = new ShortTensor();
+			ShortTensor *t_rcoutput_narrow_cols = new ShortTensor();
+			ShortTensor *t_block = new ShortTensor(block_size_h, block_size_w);
+
+			for(int r = 0; r < n_rows; r++)
 			{
-				//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
-				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
+				//t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
+				t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
 
-				t_block->copy(t_rcoutput_narrow_cols);
+			   	for(int c = 0; c < n_cols; c++)
+				{
+					//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
+					t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
 
-				ofile->save(*t_block);
+					t_block->copy(t_rcoutput_narrow_cols);
+					//if(verbose) t_block->sprint("r=%d c=%d", r, c);
+
+					ofile->save(*t_block);
+				}
 			}
+
+			delete t_block;
+			delete t_rcoutput_narrow_cols;
+			delete t_rcoutput_narrow_rows;
+		}
+		else
+		{
+			ShortTensor *t_block = new ShortTensor(block_size_h, block_size_w);
+			ShortTensor *t_narrow_ = new ShortTensor();
+			for(int b = 0; b < ipblock.getNOutputs(); b++)
+			{
+				ShortTensor &t_output = (ShortTensor &) ipblock.getOutput(b);
+				if(verbose) t_output.sprint("o=%d", b);
+
+				t_narrow_->select(&t_output, 2, 0);
+				if(verbose) t_narrow_->sprint("b=%d", b);
+
+				//t_block->copy(t_narrow_);
+				//if(verbose) t_block->sprint("b=%d", b);
+				//ofile->save(*t_block);
+
+				ofile->save(*t_narrow_);
+			}
+			delete t_narrow_;
+			delete t_block;
 		}
 
-		delete t_block;
-		delete t_rcoutput_narrow_cols;
-		delete t_rcoutput_narrow_rows;
-
 		delete t_;
+
 		delete tensor;
 	}
 

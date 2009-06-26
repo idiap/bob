@@ -162,6 +162,8 @@ bool ipBlock::processInput(const Tensor& input)
   	ShortTensor *t_rcoutput_narrow_cols = NULL;
   	ShortTensor *t_ = NULL;
 
+	//t_input->print("input");
+	
 	if(rcoutput)
 	{
   		t_rcoutput_narrow_rows = new ShortTensor();
@@ -215,6 +217,8 @@ bool ipBlock::processInput(const Tensor& input)
 				// but better to use a select to return a sub-tensor and copy it
 				t_->select(t_input_narrow_cols, 2, 0);
 				t_rcoutput_narrow_cols->copy(t_);
+
+				//t_->print();
 			}
 			else
 			{
