@@ -18,7 +18,7 @@ namespace Torch
 		ProbabilityDistribution();
 
 		/// Constructor
-		ProbabilityDistribution(const int n_inputs_);//, const int n_parameters_ = 0);
+		ProbabilityDistribution(const int n_inputs_);
 		
 		/// Destructor
 		virtual ~ProbabilityDistribution();
@@ -47,6 +47,9 @@ namespace Torch
 		///
 		virtual bool 		shuffle() { return true; };
 
+		///
+		int			getNinputs() { return n_inputs; };
+		
 	protected:
 		int n_inputs;
 	};

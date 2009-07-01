@@ -23,9 +23,6 @@ public:
 	~MultiVariateMeansDistribution();
 
 	///
-	virtual bool 		EMinit();
-
-	///
 	virtual bool 		EMaccPosteriors(const DoubleTensor *input, const double input_posterior);
 
 	///

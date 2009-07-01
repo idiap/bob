@@ -23,6 +23,9 @@ public:
 	~MultiVariateNormalDistribution();
 
 	///
+	virtual bool 		EMinit();
+
+	///
 	virtual bool 		forward(const DoubleTensor *input);
 
 	///
@@ -42,21 +45,35 @@ public:
 	///
 	int			getNmeans() { return n_means; };
 	double **		getMeans() { return means; };
+	double **		getVariances() { return variances; };
 
 	///
 	virtual bool		setMeans(double **means_);
 
 	///
-	virtual bool 		shuffle();
+	virtual bool		setMeans(DataSet *dataset_);
 
 	///
-	virtual bool		setMeans(DataSet *dataset_);
+	virtual bool		setVariances(double **variances_);
+
+	///
+	virtual bool		setVariances(double *stdv_, double factor_variance_threshold_ = 0.1);
+
+	///
+	virtual bool		setVarianceFlooring(double *stdv_, double factor_variance_threshold_ = 0.1);
+
+	///
+	virtual bool 		shuffle();
 
 protected:
 	//
 	int n_means;
 	double **means;
 	double *weights;
+	double **variances;
+
+	//
+	double *threshold_variances;
 
 	//
 	int best_mean;
@@ -74,6 +91,8 @@ protected:
 	double *acc_posteriors_weights;
 	double *buffer_acc_posteriors_means;
 	double **acc_posteriors_means;
+	double *buffer_acc_posteriors_variances;
+	double **acc_posteriors_variances;
 };
 	
 }

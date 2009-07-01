@@ -730,7 +730,7 @@ namespace Torch
 		for (int i = 0; i < m_size; i ++)
 		{
 			//
-			char *str_ = new char [strlen(m_variables[i].m_name)+1];
+			char *str_ = new char [strlen(m_variables[i].m_name)+3];
 			int n_values_;
 			switch(m_variables[i].m_type)
 			{
@@ -818,7 +818,7 @@ namespace Torch
 		}
 		for (int i = 0; i < m_size; i ++)
 		{
-			char *str_ = new char [strlen(m_variables[i].m_name)+1];
+			char *str_ = new char [strlen(m_variables[i].m_name)+3];
 			switch(m_variables[i].m_type)
 			{
 			case Variable::TypeInt:

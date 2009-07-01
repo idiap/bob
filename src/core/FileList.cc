@@ -7,6 +7,7 @@ FileList::FileList(const char *name_)
 {
 	n_files = 0;
 	file_names = NULL;
+	allocated_file_names = NULL;
 	
 	if (name_ == NULL)
 		Torch::error("FileList: no file provided");
@@ -44,11 +45,13 @@ FileList::FileList(const char *name_)
 		{
 			// read the file
 			file_names = new char*[n_files];
+			allocated_file_names = new char*[n_files];
 			for (int i = 0; i < n_files; i++)
 			{
 				file.scanf("%s", str);
 				file_names[i] = new char[strlen(str)+1];
 				strcpy(file_names[i], str);
+				allocated_file_names[i] = file_names[i];
 			}
 		}
 	}
@@ -59,8 +62,9 @@ FileList::~FileList()
    	if(file_names != NULL)
 	{
 		for (int i = 0; i < n_files; i ++)
-			delete[] file_names[i];
+			delete[] allocated_file_names[i];
 		delete[] file_names;
+		delete[] allocated_file_names;
 	}
 }
 

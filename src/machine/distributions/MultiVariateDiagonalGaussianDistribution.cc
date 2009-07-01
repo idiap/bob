@@ -14,15 +14,6 @@ MultiVariateDiagonalGaussianDistribution::MultiVariateDiagonalGaussianDistributi
 	//
 	posterior_numerator = NULL;
 	g_norm = NULL;
-
-	//
-	variances = NULL;
-	threshold_variances = NULL;
-	buffer_acc_posteriors_variances = NULL;
-	acc_posteriors_variances = NULL;
-
-	//
-	m_parameters->addDarray("variances", 0, 0.0, "variances of the diagonal gaussian distribution");
 }
 
 MultiVariateDiagonalGaussianDistribution::MultiVariateDiagonalGaussianDistribution(int n_inputs_, int n_gaussians_) : MultiVariateNormalDistribution(n_inputs_, n_gaussians_)
@@ -38,15 +29,6 @@ MultiVariateDiagonalGaussianDistribution::MultiVariateDiagonalGaussianDistributi
 	posterior_numerator = NULL;
 	g_norm = NULL;
 
-	//
-	variances = NULL;
-	threshold_variances = NULL;
-	buffer_acc_posteriors_variances = NULL;
-	acc_posteriors_variances = NULL;
-
-	//
-	m_parameters->addDarray("variances", n_means*n_inputs, 0.0, "variances of the diagonal gaussian distribution");
-
 	resize(n_inputs_, n_gaussians_);
 }
 
@@ -54,27 +36,6 @@ bool MultiVariateDiagonalGaussianDistribution::resize(int n_inputs_, int n_means
 {
 	//Torch::print("MultiVariateDiagonalGaussianDistribution::resize(%d, %d)\n", n_inputs_, n_means_);
 	
-	double *variances_ = m_parameters->getDarray("variances");
-
-	variances = (double **) THAlloc(n_means_ * sizeof(double *));
-	double *p = variances_;
-	for(int j = 0 ; j < n_means_ ; j++)
-	{
-		variances[j] = p;
-		p += n_inputs_;
-	}
-	
-	//
-	threshold_variances = (double *) THAlloc(n_inputs_ * sizeof(double));
-	for(int i = 0 ; i < n_inputs_ ; i++) threshold_variances[i] = 0.0;
-
-	buffer_acc_posteriors_variances = (double *) THAlloc(n_means_ * n_inputs_ * sizeof(double));
-	acc_posteriors_variances = (double **) THAlloc(n_means_ * sizeof(double *));
-
-	for(int j = 0 ; j < n_means_ ; j++)
-		acc_posteriors_variances[j] = &buffer_acc_posteriors_variances[j*n_inputs_];
-
-	//
 	posterior_numerator = new double [n_means_];
 	g_norm = new double [n_means_];
 	for(int j = 0 ; j < n_means_ ; j++) g_norm[j] = 0.0;
@@ -88,10 +49,6 @@ bool MultiVariateDiagonalGaussianDistribution::cleanup()
 	
 	if(posterior_numerator != NULL) delete []posterior_numerator;
 	if(g_norm != NULL) delete []g_norm;
-	if(acc_posteriors_variances != NULL) THFree(acc_posteriors_variances);
-	if(buffer_acc_posteriors_variances != NULL) THFree(buffer_acc_posteriors_variances);
-	if(threshold_variances != NULL) THFree(threshold_variances);
-	if(variances != NULL) THFree(variances);
 
 	return true;
 }
@@ -99,34 +56,6 @@ bool MultiVariateDiagonalGaussianDistribution::cleanup()
 MultiVariateDiagonalGaussianDistribution::~MultiVariateDiagonalGaussianDistribution()
 {
 	cleanup();
-}
-
-bool MultiVariateDiagonalGaussianDistribution::shuffle()
-{
-	//Torch::print("MultiVariateDiagonalGaussianDistribution::shuffle()\n");
-	//Torch::print("   n_inputs = %d\n", n_inputs);
-	//Torch::print("   n_means = %d\n", n_means);
-	//Torch::print("   means = %d\n", means);
-	//Torch::print("   variances = %d\n", variances);
-	//Torch::print("   weights = %d\n", weights);
-	
-   	double z = 0.0;
-
-	for(int j = 0 ; j < n_means ; j++)
-	{
-		weights[j] = THRandom_uniform(0, 1);
-		z += weights[j];
-
-		for(int k = 0 ; k < n_inputs ; k++)
-		{
-			means[j][k] = THRandom_uniform(0, 1);
-			variances[j][k] = THRandom_uniform(0, 1);
-		}
-	}
-
-	for(int j = 0 ; j < n_means ; j++) weights[j] /= z;
-
-	return true;
 }
 
 bool MultiVariateDiagonalGaussianDistribution::prepare()
@@ -408,30 +337,6 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(do
 	return l;
 }
 
-bool MultiVariateDiagonalGaussianDistribution::print()
-{
-   	double z = 0.0;
-
-	for(int j = 0 ; j < n_means ; j++)
-	{
-		Torch::print("Mean [%d]\n", j);
-
-		Torch::print("   weight = %g\n", weights[j]);
-		z += weights[j];
-
-		Torch::print("   mean = [ ");
-		for(int k = 0 ; k < n_inputs ; k++) Torch::print("%g ", means[j][k]);
-		Torch::print("]\n");
-
-		Torch::print("   variance = [ ");
-		for(int k = 0 ; k < n_inputs ; k++) Torch::print("%g ", variances[j][k]);
-		Torch::print("]\n");
-	}
-	Torch::print("Sum weights = %g\n", z);
-
-	return true;
-}
-	
 bool MultiVariateDiagonalGaussianDistribution::loadFile(File& file)
 {
 	// Check the ID
@@ -478,39 +383,6 @@ bool MultiVariateDiagonalGaussianDistribution::saveFile(File& file) const
 	{
 	        Torch::message("MultiVariateDiagonalGaussianDistribution::load - failed to write parameters\n");
 		return false;
-	}
-
-	return true;
-}
-
-bool MultiVariateDiagonalGaussianDistribution::setVariances(double *stdv_, double factor_variance_threshold_)
-{
-	// init variances and variance flooring to the given variance
-	// Note: it could be interesting to compute the variance of samples for each cluster !
-
-	//Torch::print("MultiVariateDiagonalGaussianDistribution::setVariances() flooring = %g\n", factor_variance_threshold_);
-
-	for(int k = 0 ; k < n_inputs ; k++)
-	{
-		for(int j = 0 ; j < n_means ; j++)
-			variances[j][k] = stdv_[k];
-		threshold_variances[k] = stdv_[k] * factor_variance_threshold_;
-
-		//Torch::print("vflooring [%d] = %g\n", k, threshold_variances[k]);
-	}
-
-	return true;
-}
-
-bool MultiVariateDiagonalGaussianDistribution::setVarianceFlooring(double *stdv_, double factor_variance_threshold_)
-{
-	//Torch::print("MultiVariateDiagonalGaussianDistribution::setVarianceFlooring() flooring = %g\n", factor_variance_threshold_);
-
-	for(int k = 0 ; k < n_inputs ; k++)
-	{
-		threshold_variances[k] = stdv_[k] * factor_variance_threshold_;
-
-		//Torch::print("vflooring [%d] = %g\n", k, threshold_variances[k]);
 	}
 
 	return true;

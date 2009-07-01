@@ -66,6 +66,7 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 		else m_stdv[i] = sqrt(m_stdv[i]);
 	}
 
+	//for(int i = 0; i < n_inputs; i++) Torch::print(" mean[%d] = %g \t stdv[%d] = %g\n", i, m_mean[i], i, m_stdv[i]);
 }
 
 bool MeanVarNorm::resize(const int n_inputs_)

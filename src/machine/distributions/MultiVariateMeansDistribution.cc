@@ -14,21 +14,6 @@ MultiVariateMeansDistribution::~MultiVariateMeansDistribution()
 {
 }
 
-bool MultiVariateMeansDistribution::EMinit()
-{
-	float min_weights = getFOption("min weights");
-
-	acc_posteriors_sum_weights = 0.0;
-	for(int j = 0 ; j < n_means ; j++)
-	{
-		acc_posteriors_weights[j] = 0.0;
-
-		for(int k = 0 ; k < n_inputs ; k++) acc_posteriors_means[j][k] = min_weights;
-	}
-
-	return true;
-}
-
 bool MultiVariateMeansDistribution::EMaccPosteriors(const DoubleTensor *input, const double input_posterior)
 {
 	double *src = (double *) input->dataR();
@@ -36,13 +21,14 @@ bool MultiVariateMeansDistribution::EMaccPosteriors(const DoubleTensor *input, c
 	sampleProbability(src);
 
 	acc_posteriors_weights[best_mean]++;
-	acc_posteriors_sum_weights ++;
+	acc_posteriors_sum_weights++;
 
 	for(int k = 0 ; k < n_inputs ; k++) 
 	{
 		double z = src[k];
 
 		acc_posteriors_means[best_mean][k] += z;
+		acc_posteriors_variances[best_mean][k] += z * z;
 	}
 
 	return true;
@@ -62,6 +48,11 @@ bool MultiVariateMeansDistribution::EMupdate()
 				\end{equation}
 			*/
 			means[j][k] = acc_posteriors_means[j][k] / acc_posteriors_weights[j];
+
+			double v = acc_posteriors_variances[j][k] / acc_posteriors_weights[j] - means[j][k] * means[j][k];
+
+			// variance flooring
+			variances[j][k] = (v >= threshold_variances[k]) ? v : threshold_variances[k];
 		}
 	}
 
