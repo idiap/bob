@@ -1,0 +1,5 @@
+
+tensorimagenorm:
+	- HEQ + Smooth
+	- LBP ?
+	- ...
