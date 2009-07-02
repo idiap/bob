@@ -40,9 +40,9 @@ ${prerun_}/gtimageextract ./lists/xm2vts.list ../data/images ../data/gt/markup68
 set images_dir = "/idiap/common_vision/visidiap/databases/xm2vts/normal/images_gray"
 set gt_dir = "/idiap/common_vision/visidiap/databases/groundtruth/xm2vts/normal"
 #
-#${prerun_}/gtimageextract ./lists/xm2vts-small.list ${images_dir} ${gt_dir}/eyecenter ./cfg/geom.norm-64x80.cfg -image_ext pgm -gt_ext pos -gt_format 1 -one_gt_object -onetensor
-#../dataset/${exe_}/readtensor onetensor.tensor
-#../dataset/${exe_}/tensor2image onetensor.tensor -xt jpg -base xm2vts
+${prerun_}/gtimageextract ./lists/xm2vts-small.list ${images_dir} ${gt_dir}/eyecenter ./cfg/geom.norm-64x80.cfg -image_ext pgm -gt_ext pos -gt_format 1 -one_gt_object -onetensor
+../dataset/${exe_}/readtensor onetensor.tensor
+../dataset/${exe_}/tensor2image onetensor.tensor -xt jpg -base xm2vts
 \rm *.jpg
 
 #
@@ -51,9 +51,9 @@ set gt_dir = "/idiap/common_vision/visidiap/databases/groundtruth/xm2vts/normal"
 
 #
 # block decomposition
-#${prerun_}/tensor2blocks 003_1_1.tensor -verbose -sizeW 16 -sizeH 24 -overlapW 0 -overlapH 0 -o 003_1_1.blocks
-#../dataset/${exe_}/tensor2image 003_1_1.blocks.tensor -xt jpg -base 003_1_1.blocks
-#\rm *.jpg
+${prerun_}/tensor2blocks 003_1_1.tensor -verbose -sizeW 16 -sizeH 24 -overlapW 0 -overlapH 0 -o 003_1_1.blocks
+../dataset/${exe_}/tensor2image 003_1_1.blocks.tensor -xt jpg -base 003_1_1.blocks
+\rm *.jpg
 
 #
 # DCT feature extraction on a block-by-block basis, a rowblock-by-block basis or a colblock-by-block basis
@@ -62,13 +62,13 @@ mkdir -p tensor
 
 mkdir -p tensor/faces
 
-#mv onetensor.tensor tensor/faces/xm2vts-wm-face64x80.tensor
+mv onetensor.tensor tensor/faces/xm2vts-wm-face64x80.tensor
 
 foreach i (003 004)
   foreach j (train test)
 
-	#${prerun_}/gtimageextract ./lists/xm2vts-${i}-${j}.list ${images_dir} ${gt_dir}/eyecenter ./cfg/geom.norm-64x80.cfg -image_ext pgm -gt_ext pos -gt_format 1 -one_gt_object -onetensor
-	#mv onetensor.tensor tensor/faces/xm2vts-${i}-${j}-face64x80.tensor
+	${prerun_}/gtimageextract ./lists/xm2vts-${i}-${j}.list ${images_dir} ${gt_dir}/eyecenter ./cfg/geom.norm-64x80.cfg -image_ext pgm -gt_ext pos -gt_format 1 -one_gt_object -onetensor
+	mv onetensor.tensor tensor/faces/xm2vts-${i}-${j}-face64x80.tensor
   end
 end
 
