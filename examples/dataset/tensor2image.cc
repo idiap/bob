@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 	t_->select(&imagegray, 2, 0);
 	t_->copy(tensor);
 	xtprobeImageFile xtprobe;
-	sprintf(image_filename, "%s%05d.%s", image_basename, i, image_extension);
+	sprintf(image_filename, "%s_%05d.%s", image_basename, i, image_extension);
 	xtprobe.save(imagegray, image_filename);
 	delete t_;
 	delete tensor;
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 		t_->select(&imagegray, 2, 0);
 		t_->copy(tensor);
 		xtprobeImageFile xtprobe;
-		sprintf(image_filename, "%s%05d.%s", image_basename, i, image_extension);
+		sprintf(image_filename, "%s_%05d.%s", image_basename, i, image_extension);
 		xtprobe.save(imagegray, image_filename);
 		delete t_;
 		delete tensor;

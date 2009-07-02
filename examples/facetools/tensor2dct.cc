@@ -27,6 +27,9 @@ int main(int argc, char* argv[])
 	int block_overlap_h;
 	int block_overlap_w;
 	int n_dc;
+	bool blocks_to_tensor2d;
+	bool rowblocks_to_tensor3d;
+	bool colblocks_to_tensor3d;
 
 	// Build the command line object
 	CmdLine cmd;
@@ -49,7 +52,10 @@ int main(int argc, char* argv[])
 	cmd.addText("\nOptions:");
 	cmd.addBCmdOption("-verbose", &verbose, false, "print Tensor values");
 	cmd.addSCmdOption("-o", &output_basename, "dct", "basename");
-
+	cmd.addBCmdOption("-blocks_to_tensor2d", &blocks_to_tensor2d, false, "all blocks of an image are stored as one 2d tensor (dim X n_blocks)");
+	cmd.addBCmdOption("-rowblocks_to_tensor3d", &rowblocks_to_tensor3d, false, "all blocks of an image are stored as one 3d tensor (dim X n_cols X n_rows)");
+	cmd.addBCmdOption("-colblocks_to_tensor3d", &colblocks_to_tensor3d, false, "all blocks of an image are stored as one 3d tensor (dim X n_rows X n_cols)");
+	
 	// Parse the command line
 	if (cmd.read(argc, argv) < 0)
 	{
@@ -111,14 +117,19 @@ int main(int argc, char* argv[])
 	ipblock.setIOption("w", block_size_w);
 	ipblock.setIOption("h", block_size_h);
 
+	if(blocks_to_tensor2d) print("all blocks of an image are stored as one 2d tensor (dim X n_blocks)\n");
+	else if(rowblocks_to_tensor3d) print("all blocks of an image are stored as one 3d tensor (dim X n_cols X n_rows)\n");
+	else if(colblocks_to_tensor3d) print("all blocks of an image are stored as one 3d tensor (dim X n_rows X n_cols)\n");
+	else print("each block of an image is stored as one 1d tensor (dim)\n");
+
+	int n_blocks = 0;
+
 	//
 	Tensor *tensor = NULL;
 	char ofilename[250];
 
 	TensorFile *ofile = new TensorFile;
 	sprintf(ofilename, "%s.tensor", output_basename);
-	//ofile->openWrite(ofilename, Tensor::Short, 2, block_size_h, block_size_w, 0, 0);
-	ofile->openWrite(ofilename, Tensor::Float, 1, n_dc, 0, 0, 0);
 
 	for(int t = 0 ; t < header.m_n_samples ; t++)
 	{
@@ -137,19 +148,73 @@ int main(int argc, char* argv[])
 		int n_rows = t_rcoutput.size(0);
 		int n_cols = t_rcoutput.size(1);
 
+		if(t == 0)
+		{
+		   	n_blocks = n_rows * n_cols;
+
+			if(blocks_to_tensor2d)
+			{
+				ofile->openWrite(ofilename, Tensor::Float, 2, n_dc, n_blocks, 0, 0);
+			}
+			else if(rowblocks_to_tensor3d)
+			{
+				ofile->openWrite(ofilename, Tensor::Float, 3, n_dc, n_cols, n_rows, 0);
+			}
+			else if(colblocks_to_tensor3d)
+			{
+				ofile->openWrite(ofilename, Tensor::Float, 3, n_dc, n_rows, n_cols, 0);
+			}
+			else
+			{
+				ofile->openWrite(ofilename, Tensor::Float, 1, n_dc, 0, 0, 0);
+			}
+		}
+		else
+		{
+			CHECK_FATAL(n_blocks == n_rows * n_cols);
+		}
+
 		ShortTensor *t_rcoutput_narrow_rows = new ShortTensor();
 		ShortTensor *t_rcoutput_narrow_cols = new ShortTensor();
 		ShortTensor *t_block = new ShortTensor(block_size_h, block_size_w);
-		FloatTensor *t_dc = new FloatTensor(n_dc);
 
+		FloatTensor *t_seq = NULL;
+		FloatTensor *t_rcblock = NULL;
+		FloatTensor *t_dc = NULL;
+		if(blocks_to_tensor2d)
+		{
+			t_seq = new FloatTensor(n_dc, n_blocks);
+			t_seq->fill(0);
+			t_dc = new FloatTensor();
+		}
+		else if(rowblocks_to_tensor3d)
+		{
+			t_seq = new FloatTensor(n_dc, n_cols, n_rows);
+			t_seq->fill(0);
+			//t_seq->print("seq");
+			t_dc = new FloatTensor();
+			t_rcblock = new FloatTensor();
+		}
+		else if(colblocks_to_tensor3d)
+		{
+			t_seq = new FloatTensor(n_dc, n_rows, n_cols);
+			t_seq->fill(0);
+			t_dc = new FloatTensor();
+			t_rcblock = new FloatTensor();
+		}
+		else 
+		{
+			t_dc = new FloatTensor(n_dc);
+			t_dc->fill(0);
+		}
+
+		int i_block = 0;
 		for(int r = 0; r < n_rows; r++)
 		{
-			//t_rcoutput_narrow_rows->narrow(&t_rcoutput, 0, r, 1);
 			t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
 
 		   	for(int c = 0; c < n_cols; c++)
 			{
-				//t_rcoutput_narrow_cols->narrow(t_rcoutput_narrow_rows, 1, c, 1);
 				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
 
 				t_block->copy(t_rcoutput_narrow_cols);
@@ -158,13 +223,59 @@ int main(int argc, char* argv[])
 
 				const FloatTensor& out = (const FloatTensor&) dct.getOutput(0);
 
+				//print("> %g %g %g\n", out.get(0,0), out.get(0,1), out.get(1,0));
+
+				if(blocks_to_tensor2d)
+				{
+					t_dc->select(t_seq, 1, i_block);	
+				}
+				else if(rowblocks_to_tensor3d)
+				{
+					t_rcblock->select(t_seq, 2, r);	
+					t_dc->select(t_rcblock, 1, c);	
+				}
+				else if(colblocks_to_tensor3d)
+				{
+					t_rcblock->select(t_seq, 2, c);	
+					t_dc->select(t_rcblock, 1, r);	
+				}
+
 				retainDC(&out, n_dc, t_dc, dc_zigzag_index);
 
-				ofile->save(*t_dc);
+				if(!blocks_to_tensor2d && !rowblocks_to_tensor3d && !colblocks_to_tensor3d)
+				{
+					ofile->save(*t_dc);
+				}
+
+				i_block++;
 			}
 		}
 
+		if(blocks_to_tensor2d)
+		{
+			ofile->save(*t_seq);
+
+			delete t_seq;
+		}
+		else if(rowblocks_to_tensor3d)
+		{
+			//t_seq->print("seq");
+			ofile->save(*t_seq);
+
+			delete t_seq;
+			delete t_rcblock;
+		}
+		else if(colblocks_to_tensor3d)
+		{
+			//t_seq->print("seq");
+			ofile->save(*t_seq);
+
+			delete t_seq;
+			delete t_rcblock;
+		}
+		
 		delete t_dc;
+
 		delete t_block;
 		delete t_rcoutput_narrow_cols;
 		delete t_rcoutput_narrow_rows;

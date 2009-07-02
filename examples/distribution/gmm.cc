@@ -898,17 +898,19 @@ bool loadDataSet(MemoryDataSet *mdataset, int *n_inputs, FileList *file_list, bo
 			return 1;
 		}
 
-		if(header.m_n_dimensions != 1)
+		if(header.m_n_dimensions == 1 || header.m_n_dimensions == 2 || header.m_n_dimensions == 3)
 		{
-			warning("Unsupported dimensions (1 only).");
+			if(input_size == 0) input_size = header.m_size[0];
+			else if(header.m_size[0] != input_size)
+			{
+				warning("Inconsistant input size (%d).", input_size);
 
-			return 1;
+				return 1;
+			}
 		}
-
-		if(input_size == 0) input_size = header.m_size[0];
-		else if(header.m_size[0] != input_size)
+		else
 		{
-			warning("Inconsistant input size (%d).", input_size);
+			warning("Unsupported dimensions (1, 2 or 3 only).");
 
 			return 1;
 		}
@@ -992,9 +994,19 @@ bool loadDataSet(MemoryDataSet *mdataset, int *n_inputs, char *filename, bool ve
 		return 1;
 	}
 
-	if(header.m_n_dimensions != 1)
+	if(header.m_n_dimensions == 1 || header.m_n_dimensions == 2 || header.m_n_dimensions == 3)
 	{
-		warning("Unsupported dimensions (1 only).");
+		if(input_size == 0) input_size = header.m_size[0];
+		else if(header.m_size[0] != input_size)
+		{
+			warning("Inconsistant input size (%d).", input_size);
+
+			return 1;
+		}
+	}
+	else
+	{
+		warning("Unsupported dimensions (1, 2 or 3 only).");
 
 		return 1;
 	}

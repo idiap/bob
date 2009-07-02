@@ -21,6 +21,9 @@ MultiVariateNormalDistribution::MultiVariateNormalDistribution()
 	acc_posteriors_variances = NULL;
 	current_likelihood_one_mean = NULL;
 
+	frame_ = new DoubleTensor();
+	sequence_ = new DoubleTensor();
+	
 	//
 	m_parameters->addI("n_inputs", 0, "number of dimensions of the multi-variate normal distribution");
 	m_parameters->addI("n_means", 0, "number of means of the multi-variate normal distribution");
@@ -46,6 +49,9 @@ MultiVariateNormalDistribution::MultiVariateNormalDistribution(int n_inputs_, in
 	buffer_acc_posteriors_variances = NULL;
 	acc_posteriors_variances = NULL;
 	current_likelihood_one_mean = NULL;
+
+	frame_ = new DoubleTensor();
+	sequence_ = new DoubleTensor();
 
 	//
 	m_parameters->addI("n_inputs", n_inputs, "number of dimensions of the multi-variate normal distribution");
@@ -129,6 +135,8 @@ bool MultiVariateNormalDistribution::cleanup()
 MultiVariateNormalDistribution::~MultiVariateNormalDistribution()
 {	
 	cleanup();
+	delete frame_;
+	delete sequence_;
 }
 
 bool MultiVariateNormalDistribution::EMinit()
@@ -174,46 +182,60 @@ bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 
    		if(input->nDimension() == 2)
 		{
-			if (	input->size(1) != n_inputs)
+			if (	input->size(0) != n_inputs)
 			{
-				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 1 (%d != %d).", input->size(1), n_inputs);
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 1 (%d != %d).", input->size(0), n_inputs);
 				
 				return false;
 			}
 		
-			int n_frames_per_sequence = input->size(0);
+			int n_frames_per_sequence = input->size(1);
 
-			Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d frames of size %d\n", n_frames_per_sequence, n_inputs);
+			//Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d frames of size %d\n", n_frames_per_sequence, n_inputs);
 
-			DoubleTensor *frame = new DoubleTensor;
 			double ll = 0;
 			for(int f = 0 ; f < n_frames_per_sequence ; f++)
 			{
-				frame->select(input, 0, f);
-				
-				double *src = (double *) input->dataR();
+				frame_->select(input, 1, f);
+
+				double *src = (double *) frame_->dataR();
 
 				ll += sampleProbability(src);
 			}
 
 			double *dst = (double *) m_output.dataW();
 			dst[0] = ll / (double) n_frames_per_sequence;
-			
-			delete frame;
 		}
 		else if(input->nDimension() == 3)
 		{
-			if (	input->size(2) != n_inputs)
+			if (	input->size(0) != n_inputs)
 			{
-				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 2 (%d != %d).", input->size(2), n_inputs);
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 2 (%d != %d).", input->size(0), n_inputs);
 				
 				return false;
 			}
-			int n_sequences_per_sequence = input->size(0);
+			int n_sequences_per_sequence = input->size(2);
 			int n_frames_per_sequence = input->size(1);
 
-			Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d sequences of %d frames of size %d\n", n_sequences_per_sequence, n_frames_per_sequence, n_inputs);
+			//Torch::print("MultiVariateNormalDistribution::forward() processing a sequence of %d sequences of %d frames of size %d\n", n_sequences_per_sequence, n_frames_per_sequence, n_inputs);
 
+			double ll = 0;
+			for(int s = 0 ; s < n_sequences_per_sequence ; s++)
+			{
+				sequence_->select(input, 2, s);
+				
+				for(int f = 0 ; f < n_frames_per_sequence ; f++)
+				{
+					frame_->select(sequence_, 1, f);
+
+					double *src = (double *) frame_->dataR();
+
+					ll += sampleProbability(src);
+				}
+			}
+
+			double *dst = (double *) m_output.dataW();
+			dst[0] = ll / (double) (n_frames_per_sequence * n_sequences_per_sequence);
 		}
 		else 
 		{

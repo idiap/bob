@@ -254,6 +254,8 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 double MultiVariateDiagonalGaussianDistribution::sampleProbability(double *sample_)
 {
 	//Torch::print("MultiVariateDiagonalGaussianDistribution::sampleProbability()\n");
+	//for(int k = 0 ; k < n_inputs ; k++) Torch::print(" %g ", sample_[k]);
+	//Torch::print("\n");
 
 	if(use_log)
 	{

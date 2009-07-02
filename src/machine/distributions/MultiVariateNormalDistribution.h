@@ -93,6 +93,9 @@ protected:
 	double **acc_posteriors_means;
 	double *buffer_acc_posteriors_variances;
 	double **acc_posteriors_variances;
+
+	DoubleTensor *frame_;
+	DoubleTensor *sequence_;
 };
 	
 }
