@@ -152,10 +152,11 @@ bool spDCT::processInput(const Tensor& input)
 			//
 			for(int i=0; i < N; i++) a[i] = (*R)(i);
 
-			ddct(N, -1, a, ip, w);
+			a[0] *= 0.5;
+
+			ddct(N, 1, a, ip, w);
 
 			//
-			a[0] *= 0.5;
 			double scale = 2.0 / N;
 			FloatTensor *F = (FloatTensor *) m_output[0];
 			for(int i=0; i < N; i++) (*F)(i) = scale * a[i];
@@ -182,7 +183,7 @@ bool spDCT::processInput(const Tensor& input)
 			for(int i=0; i < N; i++) a[i] = (*R)(i);
 
 			//
-			ddct(N, 1, a, ip, w);
+			ddct(N, -1, a, ip, w);
 
 			//
 			FloatTensor *F = (FloatTensor *) m_output[0];
@@ -202,6 +203,67 @@ bool spDCT::processInput(const Tensor& input)
 
 #ifdef HAVE_OOURAFFT
 		if(inverse)
+		{
+		   	//
+			double **a = alloc_2d_double(H, W);
+
+			//
+			for(int i=0; i < H; i++)
+				for(int j=0; j < W; j++) a[i][j] = (*R)(i,j);
+
+		   	if(W == 8 && H == 8)
+			{
+    				ddct8x8s(1, a);
+
+				FloatTensor *F = (FloatTensor *) m_output[0];
+				for(int i=0; i < H; i++)
+					for(int j=0; j < W; j++) (*F)(i,j) = a[i][j];
+			}
+			else if(W == 16 && H == 16)
+			{
+    				ddct16x16s(1, a);
+
+				FloatTensor *F = (FloatTensor *) m_output[0];
+				for(int i=0; i < H; i++)
+					for(int j=0; j < W; j++) (*F)(i,j) = a[i][j];
+			}
+			else
+			{
+			   	//
+				int *ip, n;
+				double *w;
+
+				//
+				n = MAX(H, W / 2);
+				ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
+				n = MAX(H, W) * 3 / 2;
+				w = alloc_1d_double(n);
+
+				//
+				ip[0] = 0;
+
+				for (int i = 0; i <= H - 1; i++) a[i][0] *= 0.5;
+				for (int i = 0; i <= W - 1; i++) a[0][i] *= 0.5;
+
+				//
+				ddct2d(H, W, 1, a, NULL, ip, w);
+
+				//
+				double scale = 4.0 / (H * W);
+				FloatTensor *F = (FloatTensor *) m_output[0];
+				for(int i=0; i < H; i++)
+					for(int j=0; j < W; j++) (*F)(i,j) = scale * a[i][j];
+
+				//
+				free_1d_int(ip);
+				free_1d_double(w);
+
+			}
+
+			//
+			free_2d_double(a);
+		}
+		else
 		{
 		   	//
 			double **a = alloc_2d_double(H, W);
@@ -243,65 +305,6 @@ bool spDCT::processInput(const Tensor& input)
 
 				//
 				ddct2d(H, W, -1, a, NULL, ip, w);
-
-				//
-				for (int i = 0; i <= H - 1; i++) a[i][0] *= 0.5;
-				for (int i = 0; i <= W - 1; i++) a[0][i] *= 0.5;
-				double scale = 4.0 / (H * W);
-				FloatTensor *F = (FloatTensor *) m_output[0];
-				for(int i=0; i < H; i++)
-					for(int j=0; j < W; j++) (*F)(i,j) = scale * a[i][j];
-				//
-				free_1d_int(ip);
-				free_1d_double(w);
-
-			}
-
-			//
-			free_2d_double(a);
-		}
-		else
-		{
-		   	//
-			double **a = alloc_2d_double(H, W);
-
-			//
-			for(int i=0; i < H; i++)
-				for(int j=0; j < W; j++) a[i][j] = (*R)(i,j);
-
-		   	if(W == 8 && H == 8)
-			{
-    				ddct8x8s(1, a);
-
-				FloatTensor *F = (FloatTensor *) m_output[0];
-				for(int i=0; i < H; i++)
-					for(int j=0; j < W; j++) (*F)(i,j) = a[i][j];
-			}
-			else if(W == 16 && H == 16)
-			{
-    				ddct16x16s(1, a);
-
-				FloatTensor *F = (FloatTensor *) m_output[0];
-				for(int i=0; i < H; i++)
-					for(int j=0; j < W; j++) (*F)(i,j) = a[i][j];
-			}
-			else
-			{
-			   	//
-				int *ip, n;
-				double *w;
-
-				//
-				n = MAX(H, W / 2);
-				ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
-				n = MAX(H, W) * 3 / 2;
-				w = alloc_1d_double(n);
-
-				//
-				ip[0] = 0;
-
-				//
-				ddct2d(H, W, 1, a, NULL, ip, w);
 
 				//
 				FloatTensor *F = (FloatTensor *) m_output[0];

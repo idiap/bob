@@ -1,5 +1,5 @@
-#include "torch5spro.h"
 #include <cassert>
+#include "torch5spro.h"
 
 using namespace Torch;
 
