@@ -35,6 +35,7 @@ int main(int argc, char **argv)
 	//
 	float end_accuracy;
 	float flooring;
+	float prior_weights;
 	float map;
 	bool variance_adapt;
 	bool weight_adapt;
@@ -74,6 +75,7 @@ int main(int argc, char **argv)
 	cmd.addICmdOption("-iterg", &max_iter_gmm, 25, "max number of iterations of GMM");
 	cmd.addFCmdOption("-flooring", &flooring, 0.001, "variance flooring threshold");
 	cmd.addFCmdOption("-e", &end_accuracy, 0.00001, "end of accuracy");
+	cmd.addFCmdOption("-prior", &prior_weights, 0.001, "initial weight of Gaussians prior learning");
 
 	cmd.addText("\nMisc Options:");
 	cmd.addSCmdOption("-save", &output_model_filename, "model-train.gmm", "output model filename");
@@ -89,6 +91,7 @@ int main(int argc, char **argv)
 	cmd.addICmdOption("-iterg", &max_iter_gmm, 25, "max number of iterations of GMM");
 	cmd.addFCmdOption("-flooring", &flooring, 0.001, "variance flooring threshold");
 	cmd.addFCmdOption("-e", &end_accuracy, 0.00001, "end of accuracy");
+	cmd.addFCmdOption("-prior", &prior_weights, 0.001, "initial weight of Gaussians prior learning");
 
 	cmd.addText("\nMisc Options:");
 	cmd.addSCmdOption("-save", &output_model_filename, "model-retrain.gmm", "output model filename");
@@ -107,6 +110,7 @@ int main(int argc, char **argv)
 	cmd.addFCmdOption("-map", &map, 0.5, "adaptation factor");
 	cmd.addBCmdOption("-vadapt", &variance_adapt, false, "adapt variances");
 	cmd.addBCmdOption("-wadapt", &weight_adapt, false, "adapt weights");
+	cmd.addFCmdOption("-prior", &prior_weights, 0.001, "initial weight of Gaussians prior learning");
 
 	cmd.addText("\nMisc Options:");
 	cmd.addSCmdOption("-save", &output_model_filename, "model-adapt.gmm", "output model filename");
@@ -235,6 +239,7 @@ int main(int argc, char **argv)
 			{
    				if(verbose) print("\nInitializing the Kmeans from data ...\n");
 				kmean->setMeans(&mdataset_train);
+				kmean->setFOption("min weights", prior_weights);
 			}
 			kmean->prepare();
 			if(verbose) kmean->print();
@@ -245,6 +250,7 @@ int main(int argc, char **argv)
 		MultiVariateDiagonalGaussianDistribution *gmm = new MultiVariateDiagonalGaussianDistribution(n_inputs, n_gaussians);
 		gmm->setBOption("log mode", true);
 		gmm->setBOption("variance update", true);
+		gmm->setFOption("min weights", prior_weights);
 		gmm->prepare();
 
 		//
@@ -368,6 +374,7 @@ int main(int argc, char **argv)
 	
 		gmm->setBOption("log mode", true);
 		gmm->setBOption("variance update", true);
+		gmm->setFOption("min weights", prior_weights);
 		gmm->prepare();
 
 		//
@@ -452,6 +459,7 @@ int main(int argc, char **argv)
 		mapgmm->setFOption("map factor", map);
 		mapgmm->setBOption("variance adapt", variance_adapt);
 		mapgmm->setBOption("weight adapt", weight_adapt);
+		mapgmm->setFOption("min weights", prior_weights);
 		mapgmm->prepare();
 
 		//

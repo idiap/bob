@@ -30,7 +30,7 @@ mkdir -p scores
 
 # train WM
 echo "Training ..."
-${prerun_}/gmm lists/xm2vts-wm.list ${n_gaussians} ${norm} -seed 950305 -iterk 10 -iterg 20 -flooring 0.01 -e 1e-04 -save models/xm2vts-wm.gmm
+${prerun_}/gmm lists/xm2vts-wm.list ${n_gaussians} ${norm} -seed 950305 -iterk 10 -iterg 20 -flooring 0.01 -e 1e-04 -prior 0.1 -save models/xm2vts-wm.gmm
 #${prerun_}/gmm lists/xm2vts-train.list ${n_gaussians} ${norm} -seed 950305 -iterk 2 -iterg 2 -flooring 0.01 -e 1e-04 -save models/xm2vts-wm.gmm
 
 ${prerun_}/gmm --read models/xm2vts-wm.gmm
@@ -38,7 +38,7 @@ ${prerun_}/gmm --read models/xm2vts-wm.gmm
 # adapt ID models
 echo "Adapting ..."
 foreach i (003 004)
-	${prerun_}/gmm --adapt  models/xm2vts-wm.gmm lists/xm2vts-${i}-train.list -iterg 10 -flooring 0.01 -e 1e-04 -map 0.8 -save models/xm2vts-${i}.gmm
+	${prerun_}/gmm --adapt  models/xm2vts-wm.gmm lists/xm2vts-${i}-train.list -iterg 10 -flooring 0.01 -e 1e-04 -map 0.8  -prior 0.1 -save models/xm2vts-${i}.gmm
 
 	${prerun_}/gmm --read models/xm2vts-${i}.gmm
 end
