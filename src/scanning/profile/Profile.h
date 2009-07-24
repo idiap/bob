@@ -6,6 +6,8 @@
 
 namespace Torch
 {
+	class GreedyExplorer;
+
 	// Features
 	enum FeatureType
 	{
@@ -108,8 +110,7 @@ namespace Torch
 
 		// Reset to a new sub-window profile
 		void 			reset(	const Pattern& pattern,
-						const unsigned char* pf_flags,
-						const double* pf_scores);
+						const GreedyExplorer& explorer);
 
 		// Copy the features to 2D tensor (to be passed to machines) of [NoFeatures] x [MaxNoDimensions]
 		void			copyTo(DoubleTensor& tensor) const;

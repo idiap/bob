@@ -12,7 +12,6 @@ namespace Torch
         n_bins = 0;
         lut = NULL;
         m_output.resize(1);
-
     }
 ///////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +39,7 @@ namespace Torch
 
         int feature = (*core_t_output)(0);
 
-        m_output.set(0, lut[feature]);
+        (m_output(0)) = lut[feature];
 
         return true;
     }

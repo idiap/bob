@@ -16,8 +16,8 @@ ProfileDataSet::ProfileDataSet(int pf_feature)
 		m_target_neg(1),
 		m_target_pos(1)
 {
-	m_target_neg.fill(0.0);
-	m_target_pos.fill(1.0);
+	m_target_neg.fill(0.1);
+	m_target_pos.fill(0.9);
 
 	reset(pf_feature);
 }

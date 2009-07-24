@@ -10,6 +10,10 @@ namespace Torch
 	//	- merges and selects the final pattern sub-windows using the Mean Shift
 	//		clustering algorithm
 	//
+	//      - PARAMETERS (name, type, default value, description):
+        //		"kernel"	int	0	"0 - constant, 1 - linear, 2 - quadratic"
+	//
+	//
         // TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 

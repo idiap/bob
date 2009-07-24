@@ -91,7 +91,7 @@ namespace Torch
 		int u_size_z,u_z; //for selecting the dimension
 		int *u_parameters;
 		double *u_weight;
-
+		double invscale;
 
 	};
 

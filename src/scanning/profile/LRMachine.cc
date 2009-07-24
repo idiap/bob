@@ -101,6 +101,17 @@ double LRMachine::sigmoid(const double* data, const double* weights, int size)
 	return 1.0 / (1.0 + exp(-sum));
 }
 
+double LRMachine::sigmoidEps(const double* data, const double* weights, int size, double eps)
+{
+	double sum = weights[size];
+	for (int i = 0; i < size; i ++)
+	{
+		sum += data[i] * weights[i];
+	}
+
+	return getInRange(1.0 / (1.0 + exp(-sum)), eps, 1.0 - eps);
+}
+
 /////////////////////////////////////////////////////////////////////////
 // Loading/Saving the content from files (\emph{not the options})
 

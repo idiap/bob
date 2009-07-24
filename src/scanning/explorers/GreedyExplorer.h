@@ -2,19 +2,18 @@
 #define _TORCHVISION_SCANNING_GREEDY_EXPLORER_H_
 
 #include "MSExplorer.h"		// <GreedyExplorer> is a <MSExplorer>
-#include "MeanShiftSelector.h"
 #include "ProfileMachine.h"
 
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::GreedyExplorer
-	//	- searches the 4D scanning space using a greedy method to refine
-	//              the search around the best sub-windows
-	//              (relative to the model confidence)
+	//	- searches the 4D scanning space using a greedy method based on
+	//		a context-based (profile) model to remove false alarms
+	//		and drive iteratively the detections to better locations
 	//
 	//	- PARAMETERS (name, type, default value, description):
-	//		"sampling"	int	0	"0 - linear, 1 - quadratic, 2 - cubic, 3 - exponential(2), 4 - exponential(4)"
+	//		"ctx_type"	int	1	"0 - full context, 1 - axis context"
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -26,20 +25,16 @@ namespace Torch
 		// Running mode
 		enum Mode
 		{
-			Scanning,	// Iterative & greedy scanning (using the trained model for FAs)
-			Profiling	// Generates profiles and saves them to output file
+			Scanning,	// Greedy scanning (using the context-based model)
+			Profiling	// MS scanning (for generating profiles)
 		};
 
-		// Profiling constants
-		static const int	NoVarX = 6;	// No. of steps on Ox
-		static const int	NoVarY = 6;	// No. of steps on Oy
-		static const int 	NoVarS = 7;	// No. of steps on scale
-		static const int	VarX = 5;	// %/step variation on Ox
-		static const int	VarY = 5;	// %/step variation on Oy
-		static const int	VarS = 5;	// %/step variation on scales
-		static const int	NoConfigs = 	(2 * NoVarX + 1) *
-							(2 * NoVarY + 1) *
-							(2 * NoVarS + 1);
+		// Context type
+		enum ContextType
+		{
+			Full,
+			Axis
+		};
 
 		// Constructor
 		GreedyExplorer(Mode = Scanning);
@@ -67,51 +62,46 @@ namespace Torch
 		bool			profileSW(int sw_x, int sw_y, int sw_w, int sw_h);
 		bool			profileSW(const Pattern& pattern);
 
-		// Set the profile classifier
-		bool			setClassifier(const char* filename);
+		// Set the context classifier
+		bool			setContextModel(const char* filename);
 
 		// Access functions
 		void			setMode(Mode mode) { m_mode = mode; }
 		Mode 			getMode() const { return m_mode; }
-		const unsigned char*	getProfileFlags() const { return m_profileFlags; }
-		const double*		getProfileScores() const { return m_profileScores; }
+		const unsigned char*	getContextFlags() const { return m_ctx_flags; }
+		const double*		getContextScores() const { return m_ctx_scores; }
+		int			getContextOx(int index) const { return m_ctx_ox[index]; }
+		int			getContextOy(int index) const { return m_ctx_oy[index]; }
+		int			getContextOs(int index) const { return m_ctx_os[index]; }
+		int			getContextSize() const { return m_ctx_size; }
 
 		/////////////////////////////////////////////////////////////////
 
 	protected:
 
-		/////////////////////////////////////////////////////////////////
+		// Add a subwindow to the profile
+		void			addSWToProfile(	int sw_x, int sw_y, int sw_w, int sw_h,
+							unsigned char& flag, double& score);
 
-		/// called when some option was changed - overriden
+		/// called when some option was changed
 		virtual void		optionChanged(const char* name);
-
-		// Refine the search around the best points
-		bool			refineSearch();
-
-		// Check if the search should be stopped
-		//	(it is becoming too fine or no pattern found so far?!)
-		bool			shouldSearchMode(int old_n_candidates = -1) const;
 
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
 		// Current working mode
-		Mode 			m_mode;
+		Mode 			m_mode;		// Scanning (MS + context model), Profiling (MS)
 
-		// Algorithm for clustering sub-windows
-		MeanShiftSelector	m_clusterAlgo;
-
-		// Profiling machine
-		ProfileMachine		m_profileModel;
-
-		// Profile buffers (detection flag + score)
-		unsigned char*		m_profileFlags;		// [NoConfigs]
-		double*			m_profileScores;	// [NoConfigs]
-
-		// Sampling factors for 3D axis (position and scale)
-		double*			m_sampleOxCoefs;	// [NoConfigs]
-		double*			m_sampleOyCoefs;	// [NoConfigs]
-		double*			m_sampleOsCoefs;	// [NoConfigs]
+		// Context model, type, buffers
+		ProfileMachine		m_ctx_model;
+		ContextType		m_ctx_type;
+		int			m_ctx_size;
+		unsigned char*		m_ctx_flags;
+		double*			m_ctx_scores;
+		int*			m_ctx_ox;
+		int*			m_ctx_oy;
+		int*			m_ctx_os;
+		PatternMerger*		m_ctx_sw_merger;
 	};
 }
 

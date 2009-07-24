@@ -93,8 +93,68 @@ namespace Torch
 								int stride_w, int stride_h,
 								float x, float y);
 
-		// Compute the scalling factors needed to interpolate using integral images
-		void			updateIntegralFactors();
+		/////////////////////////////////////////////////////////////////////////
+		// IntegralFactors:
+		//	- Singleton that stores the scalling factors for some
+		//		(model size, subwindow size) pair
+		//		AND SHARED them accross multiple ipLBP instances
+		// NB: Used for speeding up the scanning process!
+		/////////////////////////////////////////////////////////////////////////
+
+		class IntegralFactors
+		{
+		public:
+			// Get the only instance
+			static IntegralFactors& getInstance()
+			{
+				static IntegralFactors instance;
+				return instance;
+			}
+
+			// Destructor
+			~IntegralFactors()
+			{
+				resizeModel(0, 0);
+			}
+
+			// Resize to a new model size
+			void			resizeModel(int model_w, int model_h);
+
+			// Resize to a new subwindow size
+			void			resizeSW(int sw_w, int sw_h, int input_stride_w, int input_stride_h);
+
+			// Access functions
+			int**			getIItl() { return m_ii_tl; }
+			int**			getIItr() { return m_ii_tr; }
+			int**			getIIbl() { return m_ii_bl; }
+			int**			getIIbr() { return m_ii_br; }
+			int**			getIIcellsize() { return m_ii_cell_size; }
+
+		private:
+
+			// Constructor
+			IntegralFactors()
+				:	m_model_w(0), m_model_h(0),
+					m_sw_w(0), m_sw_h(0),
+					m_ii_tl(0), m_ii_tr(0), m_ii_bl(0), m_ii_br(0), m_ii_cell_size(0)
+			{
+			}
+
+			// Copy constructor and assignment operator (not defined)
+			IntegralFactors(const IntegralFactors& other);
+			IntegralFactors& operator=(const IntegralFactors& other);
+
+			// Attributes
+			int			m_model_w;	// Model size
+			int			m_model_h;
+			int			m_sw_w;		// Subwindow size
+			int			m_sw_h;
+			int**			m_ii_tl;	// top left: [m_model_w]x[m_model_h]
+			int**			m_ii_tr;	// top right: [m_model_w]x[m_model_h]
+			int**			m_ii_bl;	// bottom left: [m_model_w]x[m_model_h]
+			int**			m_ii_br;	// bottom right: [m_model_w]x[m_model_h]
+			int**			m_ii_cell_size;	// [m_model_w]x[m_model_h]
+		};
 
 		/////////////////////////////////////////////////////////////////
 
@@ -112,13 +172,6 @@ namespace Torch
 		// Input tensor size (to pre-compute the scalling factors)
 		int			m_input_w, m_input_h;
 		int			m_input_stride_w, m_input_stride_h;
-
-		// Precomputed coordinates to interpolate fast using integral images
-		int**			m_ii_tl;	// top left: [m_model_w]x[m_model_h]
-		int**			m_ii_tr;	// top right: [m_model_w]x[m_model_h]
-		int**			m_ii_bl;	// bottom left: [m_model_w]x[m_model_h]
-		int**			m_ii_br;	// bottom right: [m_model_w]x[m_model_h]
-		int**			m_ii_cell_size;	// [m_model_w]x[m_model_h]
 
 		// Direct (&fast) access to the LBP code
 		int*			m_lbp;

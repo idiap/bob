@@ -14,3 +14,8 @@ cd extras/oourafft
 ./makeoourafft.csh
 cd ../..
 
+cd extras/lbfgs
+./makelbfgs.csh
+cd ../..
+
+

@@ -3,6 +3,14 @@
 #include "ScaleExplorer.h"
 #include "File.h"
 
+// Context constants
+static const int	NoVarX = 6;	// No. of steps on Ox
+static const int	NoVarY = 6;	// No. of steps on Oy
+static const int 	NoVarS = 7;	// No. of steps on scale
+static const int	VarX = 5;	// %/step variation on Ox
+static const int	VarY = 5;	// %/step variation on Oy
+static const int	VarS = 5;	// %/step variation on scales
+
 namespace Torch
 {
 
@@ -12,13 +20,12 @@ namespace Torch
 GreedyExplorer::GreedyExplorer(Mode mode)
 	: 	MSExplorer(),
 		m_mode(mode),
-		m_profileFlags(new unsigned char[NoConfigs]),
-		m_profileScores(new double[NoConfigs]),
-		m_sampleOxCoefs(new double[NoConfigs]),
-		m_sampleOyCoefs(new double[NoConfigs]),
-		m_sampleOsCoefs(new double[NoConfigs])
+		m_ctx_type(Full), m_ctx_size(0), m_ctx_flags(0), m_ctx_scores(0),
+		m_ctx_ox(0), m_ctx_oy(0), m_ctx_os(0),
+		m_ctx_sw_merger(new AveragePatternMerger)
 {
-	addIOption("sampling", 0, "0 - linear, 1 - quadratic, 2 - cubic, 3 - exponential(2), 4 - exponential(4)");
+	addIOption("ctx_type", 1, "0 - full context, 1 - axis context");
+	optionChanged(0);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -26,132 +33,90 @@ GreedyExplorer::GreedyExplorer(Mode mode)
 
 GreedyExplorer::~GreedyExplorer()
 {
-	delete[] m_profileFlags;
-	delete[] m_profileScores;
-	delete[] m_sampleOxCoefs;
-	delete[] m_sampleOyCoefs;
-	delete[] m_sampleOsCoefs;
+	delete[] m_ctx_flags;
+	delete[] m_ctx_scores;
+	delete[] m_ctx_ox;
+	delete[] m_ctx_oy;
+	delete[] m_ctx_os;
+	delete m_ctx_sw_merger;
 }
 
 /////////////////////////////////////////////////////////////////////////
-// called when some option was changed - overriden
-
-static double getSign(int value)
-{
-	return value < 0 ? -1.0 : 1.0;
-}
+/// called when some option was changed
 
 void GreedyExplorer::optionChanged(const char* name)
 {
-	switch (getIOption("sampling"))
+	switch (getIOption("ctx_type"))
 	{
-	case 0:	// Linear
+		// Axis context
+	case Axis:
+		if (m_ctx_type != Axis)
 		{
+			delete[] m_ctx_flags;
+			delete[] m_ctx_scores;
+			delete[] m_ctx_ox;
+			delete[] m_ctx_oy;
+			delete[] m_ctx_os;
+
+			m_ctx_type = Axis;
+			m_ctx_size = (2 * NoVarX + 1) + (2 * NoVarY + 1) + (2 * NoVarS + 1);
+
+			m_ctx_flags = new unsigned char[m_ctx_size];
+			m_ctx_scores = new double[m_ctx_size];
+			m_ctx_ox = new int[m_ctx_size];
+			m_ctx_oy = new int[m_ctx_size];
+			m_ctx_os = new int[m_ctx_size];
+
 			int index = 0;
-			for (int is = -NoVarS; is <= NoVarS; is ++)
-				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
-					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
-					{
-						const double dx = 0.01 * VarX * ix;
-						const double dy = 0.01 * VarY * iy;
-						const double ds = 1.0 + 0.01 * VarS * is;
-						m_sampleOxCoefs[index] = dx;
-						m_sampleOyCoefs[index] = dy;
-						m_sampleOsCoefs[index] = ds;
-						index ++;
-					}
+			for (int is = -NoVarS; is <= NoVarS; is ++, index ++)
+			{
+				m_ctx_ox[index] = 0;
+				m_ctx_oy[index] = 0;
+				m_ctx_os[index] = is;
+			}
+			for (int ix = -NoVarX; ix <= NoVarX; ix ++, index ++)
+			{
+				m_ctx_ox[index] = ix;
+				m_ctx_oy[index] = 0;
+				m_ctx_os[index] = 0;
+			}
+			for (int iy = -NoVarY; iy <= NoVarY; iy ++, index ++)
+			{
+				m_ctx_ox[index] = 0;
+				m_ctx_oy[index] = iy;
+				m_ctx_os[index] = 0;
+			}
 		}
 		break;
 
-	case 1:	// Quadratic
-		{
-			const double norm_ox = 0.01 * VarX * NoVarX / (NoVarX * NoVarX + 0.0);
-			const double norm_oy = 0.01 * VarY * NoVarY / (NoVarY * NoVarY + 0.0);
-			const double norm_os = 0.01 * VarS * NoVarS / (NoVarS * NoVarS + 0.0);
-
-			int index = 0;
-			for (int is = -NoVarS; is <= NoVarS; is ++)
-				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
-					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
-					{
-						const double dx = norm_ox * getSign(ix) * ix * ix;
-						const double dy = norm_oy * getSign(iy) * iy * iy;
-						const double ds = 1.0 + norm_os * getSign(is) * is * is;
-						m_sampleOxCoefs[index] = dx;
-						m_sampleOyCoefs[index] = dy;
-						m_sampleOsCoefs[index] = ds;
-						index ++;
-					}
-		}
-		break;
-
-	case 2:	// Cubic
-		{
-			const double norm_ox = 0.01 * VarX * NoVarX / (NoVarX * NoVarX * NoVarX + 0.0);
-			const double norm_oy = 0.01 * VarY * NoVarY / (NoVarY * NoVarY * NoVarY + 0.0);
-			const double norm_os = 0.01 * VarS * NoVarS / (NoVarS * NoVarS * NoVarS + 0.0);
-
-			int index = 0;
-			for (int is = -NoVarS; is <= NoVarS; is ++)
-				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
-					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
-					{
-						const double dx = norm_ox * getSign(ix) * ix * ix * ix;
-						const double dy = norm_oy * getSign(iy) * iy * iy * iy;
-						const double ds = 1.0 + norm_os * getSign(is) * is * is * is;
-						m_sampleOxCoefs[index] = dx;
-						m_sampleOyCoefs[index] = dy;
-						m_sampleOsCoefs[index] = ds;
-						index ++;
-					}
-		}
-		break;
-
-	case 3:	// Exponential(2)
-		{
-			const double alpha = 2.0;	// exp(2t)
-
-			const double norm_ox = 0.01 * VarX * NoVarX / exp(alpha * NoVarX);
-			const double norm_oy = 0.01 * VarY * NoVarY / exp(alpha * NoVarY);
-			const double norm_os = 0.01 * VarS * NoVarS / exp(alpha * NoVarS);
-
-			int index = 0;
-			for (int is = -NoVarS; is <= NoVarS; is ++)
-				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
-					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
-					{
-						const double dx = norm_ox * getSign(ix) * exp(alpha * fabs(ix));
-						const double dy = norm_oy * getSign(iy) * exp(alpha * fabs(iy));
-						const double ds = 1.0 + norm_os * getSign(is) * exp(alpha * fabs(is));
-						m_sampleOxCoefs[index] = dx;
-						m_sampleOyCoefs[index] = dy;
-						m_sampleOsCoefs[index] = ds;
-						index ++;
-					}
-		}
-		break;
-
-	case 4:	// Exponential(4)
+		// Full context
+	case Full:
 	default:
+		if (m_ctx_type != Full)
 		{
-			const double alpha = 4.0;	// exp(4t)
+			delete[] m_ctx_flags;
+			delete[] m_ctx_scores;
+			delete[] m_ctx_ox;
+			delete[] m_ctx_oy;
+			delete[] m_ctx_os;
 
-			const double norm_ox = 0.01 * VarX * NoVarX / exp(alpha * NoVarX);
-			const double norm_oy = 0.01 * VarY * NoVarY / exp(alpha * NoVarY);
-			const double norm_os = 0.01 * VarS * NoVarS / exp(alpha * NoVarS);
+			m_ctx_type = Full;
+			m_ctx_size = (2 * NoVarX + 1) * (2 * NoVarY + 1) * (2 * NoVarS + 1);
+
+			m_ctx_flags = new unsigned char[m_ctx_size];
+			m_ctx_scores = new double[m_ctx_size];
+			m_ctx_ox = new int[m_ctx_size];
+			m_ctx_oy = new int[m_ctx_size];
+			m_ctx_os = new int[m_ctx_size];
 
 			int index = 0;
 			for (int is = -NoVarS; is <= NoVarS; is ++)
 				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
-					for (int iy = -NoVarY; iy <= NoVarY; iy ++)
+					for (int iy = -NoVarY; iy <= NoVarY; iy ++, index ++)
 					{
-						const double dx = norm_ox * getSign(ix) * exp(alpha * fabs(ix));
-						const double dy = norm_oy * getSign(iy) * exp(alpha * fabs(iy));
-						const double ds = 1.0 + norm_os * getSign(is) * exp(alpha * fabs(is));
-						m_sampleOxCoefs[index] = dx;
-						m_sampleOyCoefs[index] = dy;
-						m_sampleOsCoefs[index] = ds;
-						index ++;
+						m_ctx_ox[index] = ix;
+						m_ctx_oy[index] = iy;
+						m_ctx_os[index] = is;
 					}
 		}
 		break;
@@ -159,13 +124,13 @@ void GreedyExplorer::optionChanged(const char* name)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Set the profile classifier
+// Set the context classifier
 
-bool GreedyExplorer::setClassifier(const char* filename)
+bool GreedyExplorer::setContextModel(const char* filename)
 {
 	File file;
 	return 	file.open(filename, "r") &&
-		m_profileModel.loadFile(file);
+		m_ctx_model.loadFile(file);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -173,11 +138,7 @@ bool GreedyExplorer::setClassifier(const char* filename)
 
 bool GreedyExplorer::process()
 {
-	//const bool verbose = getBOption("verbose");
-
-	// Don't want to stop at the first iteration or to scale from large to small windows
-	setBOption("StopAtFirstDetection", false);
-	setBOption("StartWithLargeScales", false);
+	const bool verbose = getBOption("verbose");
 
 	// Scan the image using MS
 	if (MSExplorer::process() == false)
@@ -192,148 +153,116 @@ bool GreedyExplorer::process()
 		// Object detection
 	case Scanning:
 		{
+			static const int max_n_iters = 10;
+			static const double eps_size = 0.05;
+			static const double eps_center = 0.05;
+
+			// TODO: how to check for convergence:
+			//	- all subwindows move less than a percentage (10% of their size)
+			// 	- this percentage can be made at each iteration smaller and smaller!
+			// TODO: ideas to reduce the size of the context
+			//	- make it smaller
+			//	- sample a fixed number of random locations
+			//	- sample a fixed number of learned locations
+			//	- use a different 3D representation (not a grid/cube, but like a star?!)
+			// NB: At the end the detections should be clustered using a relaxed kernel (constant)
+
+			// Buffers
 			Profile profile;
 			DoubleTensor pf_tensor;
+			Pattern sw_ctx;
 
-			// Cluster the SWs generated from MSExplorer
-			m_clusterAlgo.clear();
-			if (m_clusterAlgo.process(m_data->m_patterns) == false)
+			PatternList procSWs;			// Processed SWs
+			PatternList crtSWs;			// Current SWs
+			procSWs.add(m_data->m_patterns);
+
+			// Greedy scanning:
+			//	- MS to initialize
+			//	- repeat (until convergence):
+			//		- profile detections
+			//		- keep only detections that pass the context-based model
+			//		- move the detections to the contextual SW estimate
+			int n_iters = 0;
+			bool convergence = false;
+			while (n_iters < max_n_iters && convergence == false)
 			{
-				Torch::message("GreedyExplorer::process - error clustering SWs!\n");
-				return false;
-			}
+				crtSWs.clear();
+				crtSWs.add(procSWs);
+				procSWs.clear();
 
-			// Test each SW against the profile model
-			const PatternList& sws = m_clusterAlgo.getPatterns();
-			PatternList tempSws;
-			for (int i = 0; i < sws.size(); i ++)
-			{
-				const Pattern& sw = sws.get(i);
-				m_data->clear();
-				if (profileSW(sw) == false)
+				// Test each SW against the profile model
+				double max_diff_center = 0.0;
+				double max_diff_size = 0.0;
+				for (int i = 0; i < crtSWs.size(); i ++)
 				{
-					Torch::message("GreedyExplorer::process - error profiling a SW!\n");
-					return false;
+					m_data->clear();
+
+					const Pattern& sw = crtSWs.get(i);
+					if (profileSW(sw) == false)
+					{
+						Torch::message("GreedyExplorer::process - error profiling a SW!\n");
+						return false;
+					}
+
+					profile.reset(sw, *this);
+					profile.copyTo(pf_tensor);
+
+					if (m_ctx_model.forward(pf_tensor) == false)
+					{
+						Torch::message("GreedyExplorer::process - failed to run the profile model!\n");
+						return false;
+					}
+
+					// If it's not a false alarms, replace it with its contextual estimation
+					if (m_ctx_model.isPattern() == true)
+					{
+						m_ctx_sw_merger->merge(sw_ctx);
+						procSWs.add(	sw_ctx,
+								true);	// Remove duplicates!
+
+						// Compute how much the center and the size of the SW was changed
+						const double dw = abs(sw.m_w - sw_ctx.m_w);
+						const double dh = abs(sw.m_h - sw_ctx.m_h);
+						const double dcx = abs(sw.getCenterX() - sw_ctx.getCenterX());
+						const double dcy = abs(sw.getCenterY() - sw_ctx.getCenterY());
+
+						max_diff_size = max(max_diff_size, (dw + dh) / (sw.m_w + sw.m_h));
+						max_diff_center = max(max_diff_center, (dcx + dcy) / (sw.m_w + sw.m_h));
+					}
 				}
 
-				profile.reset(sw, m_profileFlags, m_profileScores);
-				profile.copyTo(pf_tensor);
-
-				if (m_profileModel.forward(pf_tensor) == false)
+				if (verbose == true)
 				{
-					Torch::message("GreedyExplorer::process - failed to run the profile model!\n");
-					return false;
+					print("GreedyExplorer: [%d/%d] - from %d to %d SWs, max_diff_size = %lf, max_diff_center = %lf ...\n",
+						n_iters + 1, max_n_iters,
+						crtSWs.size(), procSWs.size(),
+						max_diff_size, max_diff_center);
 				}
 
-				if (m_profileModel.isPattern() == true)
-				{
-					tempSws.add(sw);
-				}
+				// Check if convergence was reached
+				convergence = (max_diff_size < eps_size) && (max_diff_center < eps_center);
+
+				n_iters ++;
 			}
 
 			// Add the collected patterns to the buffer
 			m_data->clear();
-			for (int i = 0; i < tempSws.size(); i ++)
+			for (int i = 0; i < procSWs.size(); i ++)
 			{
-				m_data->storePattern(tempSws.get(i));
+				m_data->storePattern(procSWs.get(i));
 			}
-
-			/*
-			// Refine the search around the best points til it's possible
-			const int old_n_candidates = m_data->m_patterns.size();
-			while (true)
-			{
-				if (refineSearch() == false)
-				{
-					Torch::message("GreedyExplorer::process - error refining the search space!\n");
-					return false;
-				}
-
-				// Debug message
-				if (verbose == true)
-				{
-					Torch::print("[GreedyExplorer]: pruned = %d, scanned = %d, accepted = %d\n",
-							m_data->m_stat_prunned,
-							m_data->m_stat_scanned,
-							m_data->m_stat_accepted);
-				}
-
-				// Check the stopping criterion
-				if (shouldSearchMode(old_n_candidates) == false)
-				{
-					break;
-
-					// Debug message
-					if (verbose == true)
-					{
-						Torch::print("[GreedyExplorer]: stopping ...\n");
-					}
-				}
-			}
-			*/
 		}
 		break;
 
 		// Profiling along candidate SWs
 	case Profiling:
 		{
-			// Nothing to do - the user should retrieves the profiles by <profileSW>!
+			// Nothing to do - the user retrieves the profiles using <profileSW> function!
 		}
 		break;
 	}
 
 	// OK
-	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Refine the search around the best points
-
-bool GreedyExplorer::refineSearch()
-{
-	/*
-	// Make a copy of the best patterns (they will be modified with each <searchAround> call)
-	const int n_best_points = m_data->m_patternSpace.getNoBest();
-	for (int i = 0; i < n_best_points; i ++)
-	{
-		m_best_patterns[i].copy(m_data->m_patternSpace.getBest(i));
-
-	}
-
-	// Search around each best pattern point
-	for (int i = 0; i < n_best_points; i ++)
-	{
-		if (searchAround(m_best_patterns[i]) == false)
-		{
-			Torch::message("GreedyExplorer::refineSearch - error searching around some point!");
-			return false;
-		}
-	}
-	*/
-
-	// OK
-	return true;
-}
-
-/////////////////////////////////////////////////////////////////////////
-// Check if the search should be stopped
-//	(it is becoming too fine or no pattern found so far?!)
-
-bool GreedyExplorer::shouldSearchMode(int old_n_candidates) const
-{
-	// If no pattern found so far, then the search should be stopped
-	if (m_data->m_patterns.isEmpty() == true)
-	{
-		return false;
-	}
-
-	// If no pattern was added at the last iteration, ...
-	if (m_data->m_patterns.size() == old_n_candidates)
-	{
-		return false;
-	}
-
-	// OK, keep on searching
 	return true;
 }
 
@@ -342,51 +271,83 @@ bool GreedyExplorer::shouldSearchMode(int old_n_candidates) const
 
 bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 {
-	const int image_w = m_data->m_image_w;
-	const int image_h = m_data->m_image_h;
+	m_ctx_sw_merger->reset();
+	m_ctx_sw_merger->add(Pattern(sw_x, sw_y, sw_w, sw_h, 0.0));
 
-	const int model_w = m_data->m_swEvaluator->getModelWidth();
-	const int model_h = m_data->m_swEvaluator->getModelHeight();
+	const double center_x = sw_x + 0.5 * sw_w;
+	const double center_y = sw_y + 0.5 * sw_h;
 
-	// Vary the scale ...
 	int index = 0;
-	for (int is = -NoVarS; is <= NoVarS; is ++)
+
+	switch (m_ctx_type)
 	{
-		// Vary the position ...
-		for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+		// Axis context
+	case Axis:
 		{
-			for (int iy = -NoVarY; iy <= NoVarY; iy ++)
+			// Vary the scale
+			for (int is = -NoVarS; is <= NoVarS; is ++, index ++)
 			{
-				const int new_sw_w = FixI(m_sampleOsCoefs[index] * sw_w);
-				const int new_sw_h = FixI(m_sampleOsCoefs[index] * sw_h);
-				const int new_sw_x = sw_x + FixI(m_sampleOxCoefs[index] * sw_w);
-				const int new_sw_y = sw_y + FixI(m_sampleOyCoefs[index] * sw_h);
+				const double ds = 1.0 + 0.01 * VarS * is;
 
-				// Check if the subwindow's size is too large or too small
-				const bool valid = 	new_sw_w >= model_w && new_sw_h >= model_h &&
-							new_sw_w < image_w && new_sw_h < image_h;
+				const int new_sw_w = FixI(ds * sw_w);
+				const int new_sw_h = FixI(ds * sw_h);
+				const int new_sw_x = FixI(center_x - 0.5 * ds * sw_w);
+				const int new_sw_y = FixI(center_y - 0.5 * ds * sw_h);
 
-				// Default profile: no detection, low score
-				m_profileFlags[index] = 0x00;
-				m_profileScores[index] = -1000.0;
+				addSWToProfile(new_sw_x, new_sw_y, new_sw_w, new_sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+			}
 
-				// Process the sub-window, ignore if some error
-				//      (the coordinates may fall out of the image)
-				if (valid == true)
-				{
-					const int old_size = m_data->m_patterns.size();
-					if (	ScaleExplorer::processSW(new_sw_x, new_sw_y, new_sw_w, new_sw_h, *m_data) &&
-						m_data->m_patterns.size() != old_size)
-					{
-						m_profileScores[index] = m_data->m_patterns.get(old_size).m_confidence;
-						m_profileFlags[index] = 0x01;
-					}
-				}
+			// Vary the Ox coordinate
+			const int dx = max(FixI(0.01 * VarX * sw_w), 1);
+			for (int ix = -NoVarX; ix <= NoVarX; ix ++, index ++)
+			{
+				const int new_sw_x = sw_x + ix * dx;
 
-				// Next profile
-				index ++;
+				addSWToProfile(new_sw_x, sw_y, sw_w, sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+			}
+
+			// Vary the Oy coordinate
+			const int dy = max(FixI(0.01 * VarY * sw_h), 1);
+			for (int iy = -NoVarY; iy <= NoVarY; iy ++, index ++)
+			{
+				const int new_sw_y = sw_y + iy * dy;
+
+				addSWToProfile(sw_x, new_sw_y, sw_w, sw_h, m_ctx_flags[index], m_ctx_scores[index]);
 			}
 		}
+		break;
+
+		// Full context
+	case Full:
+		{
+			// Vary the scale
+			for (int is = -NoVarS; is <= NoVarS; is ++)
+			{
+				const double ds = 1.0 + 0.01 * VarS * is;
+				const int new_sw_w = FixI(ds * sw_w);
+				const int new_sw_h = FixI(ds * sw_h);
+
+				const int dx = max(FixI(0.01 * VarX * new_sw_w), 1);
+				const int dy = max(FixI(0.01 * VarY * new_sw_h), 1);
+
+				// Vary the Ox position
+				for (int ix = -NoVarX; ix <= NoVarX; ix ++)
+				{
+					const int new_sw_x = sw_x + ix * dx;
+
+					// Vary the Oy position
+					for (int iy = -NoVarY; iy <= NoVarY; iy ++, index ++)
+					{
+						const int new_sw_y = sw_y + iy * dy;
+
+						addSWToProfile(	new_sw_x, new_sw_y, new_sw_w, new_sw_h,
+								m_ctx_flags[index], m_ctx_scores[index]);
+					}
+				}
+			}
+
+		}
+		break;
 	}
 
 	// OK
@@ -396,6 +357,39 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 bool GreedyExplorer::profileSW(const Pattern& pattern)
 {
 	return profileSW(pattern.m_x, pattern.m_y, pattern.m_w, pattern.m_h);
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Add a subwindow to the profile
+
+void GreedyExplorer::addSWToProfile(	int sw_x, int sw_y, int sw_w, int sw_h,
+					unsigned char& flag, double& score)
+{
+	const int image_w = m_data->m_image_w;
+	const int image_h = m_data->m_image_h;
+
+	const int model_w = m_data->m_swEvaluator->getModelWidth();
+	const int model_h = m_data->m_swEvaluator->getModelHeight();
+
+	// Default profile: no detection, low score
+	flag = 0x00;
+	score = -1000.0;
+
+	// Process the sub-window, ignore if some error
+	//      (the coordinates may fall out of the image)
+	if (	sw_w >= model_w && sw_h >= model_h &&
+		sw_w < image_w && sw_h < image_h)
+	{
+		const int old_size = m_data->m_patterns.size();
+		if (	ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, *m_data) &&
+			m_data->m_patterns.size() != old_size)
+		{
+			const Pattern& det_sw = m_data->m_patterns.get(old_size);
+			flag = 0x01;
+			score = det_sw.m_confidence;
+			m_ctx_sw_merger->add(det_sw);
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////

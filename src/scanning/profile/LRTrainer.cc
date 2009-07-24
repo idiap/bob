@@ -1,6 +1,15 @@
 #include "LRTrainer.h"
 #include "LRMachine.h"
 
+#ifdef HAVE_LBFGS
+	#include "lbfgs.h"
+#endif
+
+static double getSign(double value)
+{
+	return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0);
+}
+
 namespace Torch
 {
 
@@ -76,20 +85,6 @@ bool LRTrainer::train()
 		return false;
 	}
 
-//	// TEST!!!
-//	for (long s = 0; s < m_dataset->getNoExamples(); s ++)
-//	{
-//		print("[%d/%d]: ", s, m_dataset->getNoExamples());
-//		const DoubleTensor* example = (const DoubleTensor*)m_dataset->getExample(s);
-//
-//		for (int i = 0; i < size; i ++)
-//		{
-//			print("%lf\t", example->get(i));
-//		}
-//
-//		print("-> %lf\n", ((DoubleTensor*)m_dataset->getTarget(s))->get(0));
-//	}
-
 	// Prepare buffers (weights, batch gradients, feature selection flags)
 	double*	weights = new double[size + 1];
 	double* gradients = new double[size + 1];
@@ -102,56 +97,112 @@ bool LRTrainer::train()
 	double best_L2_prior = 0.0;
 
 	// Set constants
-	const int n_L1_priors = 22;
-	const double L1_priors[n_L1_priors] = { 0.0,
-						0.001, 0.002, 0.005,
-						0.01, 0.02, 0.05,
-						0.1, 0.2, 0.5,
-						1.0, 2.0, 5.0,
-						10.0, 20.0, 50.0,
-						100.0, 200.0, 500.0,
-						1000.0, 2000.0, 5000.0 };
+	const int n_L1_priors = 7;
+	const double L1_priors[n_L1_priors] = { 0.0001,
+						0.0010,
+						0.0100,
+						0.1000,
+						1.0000,
+						10.000,
+						100.00 };
 
-	const int n_L2_priors = 22;
-	const double L2_priors[n_L2_priors] = { 0.0,
-						0.001, 0.002, 0.005,
-						0.01, 0.02, 0.05,
-						0.1, 0.2, 0.5,
-						1.0, 2.0, 5.0,
-						10.0, 20.0, 50.0,
-						100.0, 200.0, 500.0,
-						1000.0, 2000.0, 5000.0 };
+	const int n_L2_priors = 7;
+	const double L2_priors[n_L2_priors] = { 0.0001,
+						0.0010,
+						0.0100,
+						0.1000,
+						1.0000,
+						10.000,
+						100.00 };
 
-	// Vary the L1 and L2 priors and choose the best values testing against the validation dataset
+//	// Optimize L1 and L2 prior values (in the same time) against the validation dataset
+//	for (int i_l1 = 0; i_l1 < n_L1_priors; i_l1 ++)
+//	{
+//		for (int i_l2 = 0; i_l2 < n_L2_priors; i_l2 ++)
+//		{
+//			const double L1_prior = L1_priors[i_l1];
+//			const double L2_prior = L2_priors[i_l2];
+//
+//			// Train
+//			train(L1_prior, L2_prior, weights, gradients, fselected, size, verbose);
+//			lr_machine->setThreshold(0.5);
+//			lr_machine->setWeights(weights);
+//
+//			// Test if the new parameters are better
+//			const double detection_rate = test(lr_machine, m_validation_dataset);
+//			if (detection_rate > best_detection_rate)
+//			{
+//				for (int i = 0; i <= size; i ++)
+//				{
+//					best_weights[i] = weights[i];
+//					best_fselected[i] = fselected[i];
+//				}
+//
+//				best_detection_rate = detection_rate;
+//				best_L1_prior = L1_prior;
+//				best_L2_prior = L2_prior;
+//			}
+//
+//			print("LRTrainer: L1_prior = %lf, L2_prior = %lf => detection rate = %lf.\n",
+//				L1_prior, L2_prior, detection_rate);
+//		}
+//	}
+
+	// Optimize L1 prior value against the validation dataset
 	for (int i_l1 = 0; i_l1 < n_L1_priors; i_l1 ++)
-		for (int i_l2 = 0; i_l2 < n_L2_priors; i_l2 ++)
+	{
+		const double L1_prior = L1_priors[i_l1];
+
+		// Train
+		train(L1_prior, best_L2_prior, weights, gradients, fselected, size, verbose);
+		lr_machine->setThreshold(0.5);
+		lr_machine->setWeights(weights);
+
+		// Test if the new parameters are better
+		const double detection_rate = test(lr_machine, m_validation_dataset);
+		if (detection_rate > best_detection_rate)
 		{
-			const double L1_prior = L1_priors[i_l1];
-			const double L2_prior = L2_priors[i_l2];
-
-			// Train
-			train(L1_prior, L2_prior, weights, gradients, fselected, size, verbose);
-			lr_machine->setThreshold(0.5);
-			lr_machine->setWeights(weights);
-
-			// Test if the new parameters are better
-			const double detection_rate = test(lr_machine, m_validation_dataset);
-			if (detection_rate > best_detection_rate)
+			for (int i = 0; i <= size; i ++)
 			{
-				for (int i = 0; i <= size; i ++)
-				{
-					best_weights[i] = weights[i];
-					best_fselected[i] = fselected[i];
-				}
-
-				best_detection_rate = detection_rate;
-				best_L1_prior = L1_prior;
-				best_L2_prior = L2_prior;
+				best_weights[i] = weights[i];
+				best_fselected[i] = fselected[i];
 			}
 
-			print("LRTrainer: L1_prior = %lf, L2_prior = %lf => detection rate = %lf.\n",
-				L1_prior, L2_prior, detection_rate);
+			best_detection_rate = detection_rate;
+			best_L1_prior = L1_prior;
 		}
+
+		print("LRTrainer: L1_prior = %lf, L2_prior = %lf => detection rate = %lf.\n",
+			L1_prior, best_L2_prior, detection_rate);
+	}
+
+	// Optimize L2 prior value against the validation dataset
+	for (int i_l2 = 0; i_l2 < n_L2_priors; i_l2 ++)
+	{
+		const double L2_prior = L2_priors[i_l2];
+
+		// Train
+		train(best_L1_prior, L2_prior, weights, gradients, fselected, size, verbose);
+		lr_machine->setThreshold(0.5);
+		lr_machine->setWeights(weights);
+
+		// Test if the new parameters are better
+		const double detection_rate = test(lr_machine, m_validation_dataset);
+		if (detection_rate > best_detection_rate)
+		{
+			for (int i = 0; i <= size; i ++)
+			{
+				best_weights[i] = weights[i];
+				best_fselected[i] = fselected[i];
+			}
+
+			best_detection_rate = detection_rate;
+			best_L2_prior = L2_prior;
+		}
+
+		print("LRTrainer: L1_prior = %lf, L2_prior = %lf => detection rate = %lf.\n",
+			best_L1_prior, L2_prior, detection_rate);
+	}
 
 	// Debug
 	if (verbose == true)
@@ -193,6 +244,79 @@ bool LRTrainer::train()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Callback functions for the L-BFGS optimization library
+
+#ifdef HAVE_LBFGS
+
+struct LBFGS_Data
+{
+	LBFGS_Data(DataSet* dataset, bool* fselected, double l1_prior, double l2_prior)
+		:	m_dataset(dataset),
+			m_fselected(fselected),
+			m_l1_prior(l1_prior),
+			m_l2_prior(l2_prior)
+	{
+	}
+
+	DataSet*	m_dataset;
+	bool*		m_fselected;
+	double		m_l1_prior;
+	double		m_l2_prior;
+};
+
+static lbfgsfloatval_t evaluate(	void* instance,
+					const lbfgsfloatval_t* x, lbfgsfloatval_t* g, const int n,
+					const lbfgsfloatval_t step)
+{
+	LBFGS_Data* data = (LBFGS_Data*)instance;
+	const int size = n - 1;
+
+	lbfgsfloatval_t fx = 0.0;
+
+	// Compute the loss function to minimize in the <x> point: - loglikelihood
+	const long n_samples = data->m_dataset->getNoExamples();
+	for (long s = 0; s < n_samples; s ++)
+	{
+		const DoubleTensor* example = (const DoubleTensor*)data->m_dataset->getExample(s);
+
+		const double score = LRMachine::sigmoidEps((const double*)example->dataR(), x, size);
+		const double label = ((const DoubleTensor*)data->m_dataset->getTarget(s))->get(0);
+
+		fx -= label * log(score) + (1.0 - label) * log(1.0 - score);
+	}
+	fx *= n_samples == 0 ? 1.0 : 1.0 / ((double)n_samples);
+
+	// Compute the loss function to minimize in the <x> point: regularization terms
+	for (int i = 0; i <= size; i ++)
+	{
+		fx += data->m_l1_prior * getSign(x[i]) + data->m_l2_prior * x[i];
+	}
+
+	// Compute the gradient in the <x> point
+	LRTrainer::getGradient(data->m_dataset, g, x, size, data->m_l1_prior, data->m_l2_prior);
+	for (int i = 0; i <= size; i ++)
+		if (data->m_fselected[i] == false)
+		{
+			g[i] = 0.0;
+		}
+
+	return fx;
+}
+
+//static int progress(void* instance, const lbfgsfloatval_t* x, const lbfgsfloatval_t* g, const lbfgsfloatval_t fx,
+//		    const lbfgsfloatval_t xnorm, const lbfgsfloatval_t gnorm, const lbfgsfloatval_t step,
+//		    int n, int k, int ls)
+//{
+//	printf("Iteration %d:\n", k);
+////	printf("  fx = %f, x[0] = %f, x[1] = %f\n", fx, x[0], x[1]);
+////	printf("  xnorm = %f, gnorm = %f, step = %f\n", xnorm, gnorm, step);
+////	printf("\n");
+//	return 0;
+//}
+
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Train the LR machine using the given L1 and L2 priors
 
 void LRTrainer::train(	double L1_prior, double L2_prior,
@@ -210,13 +334,13 @@ void LRTrainer::train(	double L1_prior, double L2_prior,
 	while (n_fselected <= size)
 	{
 		// Get the feature with the maximum gradient
-		getGradient(gradients, weights, size, L1_prior, L2_prior);
+		getGradient(m_dataset, gradients, weights, size, L1_prior, L2_prior);
 		int i_max_gradient = 0;
 		double max_gradient = 0.0;
 		for (int i = 0; i <= size; i ++)
 			if (fselected[i] == false)
 			{
-				const double abs_gradient = abs(gradients[i]);
+				const double abs_gradient = fabs(gradients[i]);
 				if (abs_gradient > max_gradient)
 				{
 					max_gradient = abs_gradient;
@@ -244,16 +368,33 @@ void LRTrainer::train(	double L1_prior, double L2_prior,
 		///////////////////////////////////////////////////////////////////////
 		// Optimize the criterion using the selected features/weights
 
+#ifdef HAVE_LBFGS		// L-BFGS optimization
+
+		// Initialize the parameters for the L-BFGS optimization
+		lbfgs_parameter_t param;
+		lbfgs_parameter_init(&param);
+		//param.orthantwise_c = 1;
+		//param.linesearch = LBFGS_LINESEARCH_BACKTRACKING;
+
+		// Start the L-BFGS optimization; this will invoke the callback functions
+		//	evaluate() and progress() when necessary
+		lbfgsfloatval_t fx;
+		LBFGS_Data data(m_dataset, fselected, L1_prior, L2_prior);
+		lbfgs(size + 1, weights, &fx, evaluate, NULL, (void*)&data, &param);
+
+#else				// Batch gradient descent
+
+		const double eps = 0.00001;
 		const int max_n_iters = 1000;
 		double learning_rate = 0.5;
-		const double eps = 0.00001;
 
+		// Batch gradient descent ...
 		int n_iters = 0;
 		double max_diff = 10000000000.0, last_max_diff = 10000000000.0;
 		while ((n_iters ++) < max_n_iters && max_diff > eps && learning_rate > eps)
 		{
 			// Compute the gradient
-			getGradient(gradients, weights, size, L1_prior, L2_prior);
+			getGradient(m_dataset, gradients, weights, size, L1_prior, L2_prior);
 
 			// Update the weights (Batch Gradient Descent)
 			max_diff = 0.0;
@@ -262,11 +403,11 @@ void LRTrainer::train(	double L1_prior, double L2_prior,
 				{
 					const double diff = gradients[i] + 2.0 * L2_prior * weights[i];
 					weights[i] -= learning_rate * diff;
-					max_diff = max(max_diff, fabs(diff));
+					max_diff += fabs(diff);
 				}
 
 			// Decrease the learning rate if we're getting away from the solution
-			if (max_diff > last_max_diff)
+			if (max_diff > last_max_diff && n_iters > 1)
 			{
 				learning_rate *= 0.5;
 			}
@@ -279,21 +420,9 @@ void LRTrainer::train(	double L1_prior, double L2_prior,
 //					n_iters, max_n_iters, max_diff, learning_rate);
 //			}
 		}
+#endif
 		///////////////////////////////////////////////////////////////////////
 	}
-//
-//	// Debug
-//	if (verbose == true)
-//	{
-//		print("\tLRTrainer: -----------------------------------------------------------\n");
-//		print("\tLRTrainer: [%d/%d] features have been selected.\n", n_fselected, size + 1);
-//		for (int i = 0; i <= size; i ++)
-//		{
-//			print("\tLRTrainer: feature [%d/%d]: weight = %f, selected = %s\n",
-//				i + 1, size + 1, weights[i], fselected[i] == true ? "true" : "false");
-//		}
-//		print("\tLRTrainer: -----------------------------------------------------------\n");
-//	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,12 +452,7 @@ double LRTrainer::test(LRMachine* machine, DataSet* samples)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute the gradient for the Grafting method (negative loglikelihoods + regularization terms)
 
-static double getSign(double value)
-{
-	return value > 0.0 ? 1.0 : (value < 0.0 ? -1.0 : 0.0);
-}
-
-void LRTrainer::getGradient(double* gradients, const double* weights, int size, double L1_prior, double L2_prior)
+void LRTrainer::getGradient(DataSet* dataset, double* gradients, const double* weights, int size, double L1_prior, double L2_prior)
 {
 	// Initialize
 	for (int i = 0; i <= size; i ++)
@@ -337,13 +461,13 @@ void LRTrainer::getGradient(double* gradients, const double* weights, int size, 
 	}
 
 	// Add the gradient of the negative loglikelihood
-	for (long s = 0; s < m_dataset->getNoExamples(); s ++)
+	for (long s = 0; s < dataset->getNoExamples(); s ++)
 	{
-		const DoubleTensor* example = (const DoubleTensor*)m_dataset->getExample(s);
+		const DoubleTensor* example = (const DoubleTensor*)dataset->getExample(s);
 		const double* data = (const double*)example->dataR();
-		const double score = LRMachine::sigmoid(data, weights, size);
+		const double score = LRMachine::sigmoidEps(data, weights, size);
 
-		const double label = ((const DoubleTensor*)m_dataset->getTarget(s))->get(0);
+		const double label = ((const DoubleTensor*)dataset->getTarget(s))->get(0);
 
 		const double factor = - (label - score);
 		for (int i = 0; i < size; i ++)
@@ -351,6 +475,12 @@ void LRTrainer::getGradient(double* gradients, const double* weights, int size, 
 			gradients[i] += factor * data[i];
 		}
 		gradients[size] += factor * 1.0;
+	}
+
+	const double inv = dataset->getNoExamples() == 0 ? 1.0 : 1.0 / ((double)dataset->getNoExamples());
+	for (int i = 0; i <= size; i ++)
+	{
+		gradients[i] *= inv;
 	}
 
 	// Add the gradient of the L1 regularization term

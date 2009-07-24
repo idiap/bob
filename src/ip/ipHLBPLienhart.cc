@@ -23,6 +23,7 @@ namespace Torch
         u_size_z  = -1;
         u_parameters = NULL;
         u_weight = NULL;
+	invscale = 1;
 
         //print("ipHLBP() Type-%d (%d-%d) [%dx%d]\n", type, x, y, w, h);
 
@@ -106,9 +107,10 @@ namespace Torch
             // u_size_y = m_region.size[0];
             if ( u_size_x != m_region.size[1] || u_size_y != m_region.size[0])
             {
-                updateParameters();
+                
                 u_size_y = m_region.size[0];
                 u_size_x = m_region.size[1];
+		updateParameters();
             }
         }
         //....for 3 dimension data
@@ -129,10 +131,11 @@ namespace Torch
             if ( u_size_x != m_region.size[1] || u_size_y != m_region.size[0])
             {
                 //update the parameters
-                updateParameters();
+                
                 u_size_x = m_region.size[1];
                 u_size_y = m_region.size[0];
                 u_size_z = m_region.size[2]; //can be used for 3D hlbp - but now it is 1
+		updateParameters(); // changed/corrected.
             }
 
         }
@@ -166,25 +169,25 @@ namespace Torch
         for (int i=0;i<m_noRecs;i++)
         {
             k =i*m_nparams;
-            u_parameters[k+0] = int(sH*(m_parameters[k+0]));//+0.5));
+            u_parameters[k+0] = int(sH*(m_parameters[k+0]+0.0));//+0.5));
 //            if (u_parameters[k+0] != parameters[k+0])
 //                print("............they are not the same....\n");
-            u_parameters[k+1] = int(sW*(m_parameters[k+1]));//+0.5));
-            u_parameters[k+2] = int(sH*(m_parameters[k+2]));//+0.5));
-            u_parameters[k+3] = int(sW*(m_parameters[k+3]));//+0.5));
+            u_parameters[k+1] = int(sW*(m_parameters[k+1]+0.0));//+0.5));
+            u_parameters[k+2] = int(sH*(m_parameters[k+2]+0.0));//+0.5));
+            u_parameters[k+3] = int(sW*(m_parameters[k+3]+0.0));//+0.5));
             A[i] = u_parameters[k+2] * u_parameters[k+3];
             if (m_weight[i] >0)
             {
                 pc++;
                 AP +=A[i];
-                WP += m_weight[i];
+                WP += abs(m_weight[i]);
             }
 
             else
             {
                 nc++;
                 AN += A[i];
-                WN += m_weight[i];
+                WN += abs(m_weight[i]);
             }
 
         }
@@ -192,7 +195,7 @@ namespace Torch
         //now update the weights too
         //keep the positive weights same and change the -ve weights
         double wr;
-        wr = WP*(AP+0.0)/(AN+0.0);
+        wr = WP/WN*(AP+0.0)/(AN+0.0);
         for (int i=0;i<m_noRecs;i++)
         {
             if (m_weight[i]<0)
@@ -201,6 +204,7 @@ namespace Torch
                 u_weight[i] = m_weight[i];
 
         }
+	invscale = sW*sH;
         delete [] A;
 
     }
@@ -261,7 +265,7 @@ namespace Torch
 
         double sum=0;
         int k;
-        int *t1 = new int[4];
+        int t1[4];
         int tensor_width, tensor_height;
 
         if (u_x<0 || u_y <0)
@@ -315,7 +319,7 @@ namespace Torch
 
                 sum += (t1[0]+t1[1]-t1[2]-t1[3]) *  u_weight[i];
             }
-            (*t_output)(0) =sum;
+            (*t_output)(0) =sum/invscale;
             // print("Feature value inside %f\n",sum);
         }
 
@@ -374,10 +378,10 @@ namespace Torch
 
                 sum += (t1[0]+t1[1]-t1[2]-t1[3]) *  u_weight[i];
             }
-            (*t_output)(0) =sum;
+            (*t_output)(0) =sum/invscale;
 		//print("\nHLBP feature value : [%f]\n",sum);
         }
-        delete [] t1;
+       
 	//print("\nHLBP feature value : [%d]\n",sum);
         //  print(" Sum %f\n",sum);
         return true;

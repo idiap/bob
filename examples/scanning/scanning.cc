@@ -17,13 +17,7 @@ struct Params
         bool stop_at_first_detection;   // Flag
         bool start_with_large_scales;   // Flag
 
-        // Greedy specific
-        int greedy_perdx;
-        int greedy_perdy;
-        int greedy_perds;
-        int greedy_nsteps;
-
-        // Random specific
+        // Random scale explorer specific
         int random_nsamples;
 
         // Prunning
@@ -43,6 +37,10 @@ struct Params
 	int select_merge_type;		// Merge type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence
 	bool select_overlap_iterative;	// Overlap: Iterative/One step
 	int select_min_surf_overlap;	// Overlap: Minimum surface overlap to merge
+
+	// Context model
+	char* context_model;		// To remove FAs, used by GreedyExplorer
+	int context_type;		// Context type (0 - Full, 1 - Axis)
 
         // Debug & log
         bool verbose;			// General verbose flag
@@ -99,6 +97,8 @@ void savePatterns(	Image& save_image,
                 //      pattern.m_x, pattern.m_y, pattern.m_w, pattern.m_h,
                 //      pattern.m_confidence);
                 save_image.drawRect(pattern.m_x, pattern.m_y, pattern.m_w, pattern.m_h, red);
+                save_image.drawRect(pattern.m_x - 1, pattern.m_y - 1, pattern.m_w + 2, pattern.m_h + 2, red);
+                save_image.drawRect(pattern.m_x + 1, pattern.m_y + 1, pattern.m_w - 2, pattern.m_h - 2, red);
         }
         saveImage(save_image, xtprobe, basename, filename);
 }
@@ -150,7 +150,7 @@ void getBaseFileName(const char* filename, char* basename)
 
 int main(int argc, char* argv[])
 {
-        ///////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////
         // Parse the command line
         ///////////////////////////////////////////////////////////////////
 
@@ -181,10 +181,6 @@ int main(int argc, char* argv[])
 	cmd.addFCmdOption("-ds", &params.ds, 1.25f, "Sub-window scale variation");
 	cmd.addBCmdOption("-stop_at_first_detection", &params.stop_at_first_detection, false, "stop at first detection");
 	cmd.addBCmdOption("-start_with_large_scale", &params.start_with_large_scales, false, "start with large scales");
-	cmd.addICmdOption("-greedy_perdx", &params.greedy_perdx, 10, "greedy explorer: percentage of Ox candidate's position to vary");
-	cmd.addICmdOption("-greedy_perdy", &params.greedy_perdy, 10, "greedy explorer: percentage of Oy candidate's position to vary");
-	cmd.addICmdOption("-greedy_perds", &params.greedy_perds, 10, "greedy explorer: percentage of candidate's scale to vary");
-	cmd.addICmdOption("-greedy_nsteps", &params.greedy_nsteps, 10, "greedy explorer: number of steps");
 	cmd.addICmdOption("-random_nsamples", &params.random_nsamples, 1024, "random scale explorer: number of samples");
 
 	cmd.addText("\nPreprocessing options:");
@@ -204,6 +200,10 @@ int main(int argc, char* argv[])
 	cmd.addICmdOption("-select_merge_type", &params.select_merge_type, 0, "selector's merging type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence");
 	cmd.addBCmdOption("-select_overlap_iterative", &params.select_overlap_iterative, false, "Overlap: Iterative/One step");
 	cmd.addICmdOption("-select_min_surf_overlap", &params.select_min_surf_overlap, 60, "Overlap: minimum surface overlap to merge");
+
+	cmd.addText("\nContext-based model:");
+	cmd.addSCmdOption("-context_model", &params.context_model, "", "Face context-based model");
+	cmd.addICmdOption("-context_type", &params.context_type, 1, "Context type (0 - Full, 1 - Axis)");
 
         cmd.addText("\nGeneral options:");
 	cmd.addBCmdOption("-verbose", &params.verbose, false, "verbose");
@@ -230,10 +230,7 @@ int main(int argc, char* argv[])
                 print(">>> dx = %f, dy = %f, ds = %f\n", params.dx, params.dy, params.ds);
                 print(">>> stop at first detection = %s\n", params.stop_at_first_detection ? "true" : "false");
                 print(">>> start with large scales = %s\n", params.start_with_large_scales ? "true" : "false");
-                print(">>> greedy: dx = %d, dy = %d, ds = %d, nsteps = %d\n",
-			params.greedy_perdx, params.greedy_perdy, params.greedy_perds,
-			params.greedy_nsteps);
-		print(">>> random: nsamples = %d\n", params.random_nsamples);
+                print(">>> random: nsamples = %d\n", params.random_nsamples);
                 print("-----------------------------------------------------------------------------\n");
                 print(">>> prune: mean = %s, stdev = %s\n",
                         params.prune_use_mean ? "true" : "false",
@@ -247,6 +244,10 @@ int main(int argc, char* argv[])
                         params.select_merge_type,
                         params.select_overlap_iterative ? "true" : "false",
                         params.select_min_surf_overlap);
+		print("-----------------------------------------------------------------------------\n");
+		print(">>> context: model = [%s], type = [%s]\n",
+                        params.context_model,
+                        params.context_type == 0 ? "Full" : "Axis");
 		print("-----------------------------------------------------------------------------\n");
 		print(">>> verbose: [%s]\n", params.verbose == true ? "true" : "false");
 		print(">>> save: pyramid2jpg: [%s]\n", params.save_pyramid_jpg == true ? "true" : "false");
@@ -311,10 +312,9 @@ int main(int argc, char* argv[])
 	case 2: // Greedy
 	default:
 		explorer = new GreedyExplorer;
-		CHECK_FATAL(explorer->setIOption("SWdx", params.greedy_perdx) == true);
-                CHECK_FATAL(explorer->setIOption("SWdy", params.greedy_perdy) == true);
-                CHECK_FATAL(explorer->setIOption("SWds", params.greedy_perds) == true);
-                CHECK_FATAL(explorer->setIOption("NoSteps", params.greedy_nsteps) == true);
+		CHECK_FATAL(((GreedyExplorer*)explorer)->setContextModel(params.context_model) == true);
+		CHECK_FATAL(explorer->setIOption("ctx_type", params.context_type) == true);
+		((GreedyExplorer*)explorer)->setMode(GreedyExplorer::Scanning);
 		break;
 	}
 	setGeneralOptions(explorer, params);
@@ -473,10 +473,14 @@ int main(int argc, char* argv[])
 		print(">>> scale [%dx%d] -> %s\n", scale.w, scale.h, str_scale_explorers[index]);
         }
 
+        MTimer timer;
+        timer.reset();
+
         // Scan the image and get the results
         CHECK_FATAL(scanner.preprocess(image) == true);
         CHECK_FATAL(scanner.process(image) == true);
 
+        print("Scanning time: %ld usecs\n", timer.stop());
         print("No of sub-windows: pruned = %d, scanned = %d, accepted = %d\n",
                 scanner.getNoPrunnedSWs(),
                 scanner.getNoScannedSWs(),

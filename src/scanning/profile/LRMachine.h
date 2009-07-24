@@ -52,9 +52,11 @@ namespace Torch
 
 		// Access functions
 		double			getThreshold() const { return m_threshold; }
+		const double*		getWeights() const { return m_weights; }
 
 		// Apply the sigmoid function on some data
 		static double		sigmoid(const double* data, const double* weights, int size);
+		static double		sigmoidEps(const double* data, const double* weights, int size, double eps = 0.1);
 
 		/////////////////////////////////////////////////////////////////
 

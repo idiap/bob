@@ -38,6 +38,10 @@ namespace Torch
 		// Test the Profile machine (returns the detection rate in percentages)
 		static double		test(ProfileMachine* machine, ProfileDataSet* samples);
 
+		// Test the Profile machine (returns the TAR and FAR and FA)
+		static void		test(ProfileMachine* machine, ProfileDataSet* samples,
+						double& tar, double& far, long& fa);
+
         private:
 
                 /////////////////////////////////////////////////////////////////

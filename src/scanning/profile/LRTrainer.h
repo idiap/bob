@@ -40,6 +40,11 @@ namespace Torch
 		// Test the LR machine (returns the detection rate in percentages)
 		static double		test(LRMachine* machine, DataSet* samples);
 
+		// Compute the gradient for the Grafting method (negative loglikelihoods + regularization terms)
+		static void		getGradient(	DataSet* dataset,
+							double* gradients, const double* weights, int size,
+							double L1_prior, double L2_prior);
+
         private:
 
 		/////////////////////////////////////////////////////////////////
@@ -48,10 +53,6 @@ namespace Torch
 		void			train(	double L1_prior, double L2_prior,
 						double* weights, double* gradients, bool* fselected, int size,
 						bool verbose);
-
-		// Compute the gradient for the Grafting method (negative loglikelihoods + regularization terms)
-		void			getGradient(double* gradients, const double* weights, int size,
-							double L1_prior, double L2_prior);
 
                 /////////////////////////////////////////////////////////////////
       		// Attributes

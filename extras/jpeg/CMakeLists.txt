@@ -6,10 +6,10 @@ PROJECT(JPEG)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # Set the compiler flags and build type(release or debug)
-SET(CMAKE_C_FLAGS_RELEASE "-w -O3 -ffast-math -fomit-frame-pointer -msse2")	# To ignore warnings
-#SET(CMAKE_C_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer -msse2")
+SET(CMAKE_CXX_FLAGS_RELEASE "-w -O3 -ffast-math -fomit-frame-pointer -msse2")	# To ignore warnings
+#SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer -msse2")
 # For 64-bit archi forcing to emulate 32-bit
-#SET(CMAKE_C_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer -m32")
+#SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer")
 
 SET(CMAKE_BUILD_TYPE RELEASE)
 

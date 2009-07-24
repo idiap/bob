@@ -205,5 +205,45 @@ double ProfileTrainer::test(ProfileMachine* machine, ProfileDataSet* samples)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// Test the Profile machine (returns the TAR and FAR and FA)
+
+void ProfileTrainer::test(ProfileMachine* machine, ProfileDataSet* samples, double& tar, double& far, long& fa)
+{
+	tar = 0.0;
+	far = 0.0;
+	fa = 0;
+
+	long cnt_tar = 0;
+	long cnt_far = 0;
+	long cnt_pos = 0;
+	long cnt_neg = 0;
+	for (long s = 0; s < samples->getNoExamples(); s ++)
+	{
+		const bool valid = ((DoubleTensor*)samples->getTarget(s))->get(0) >= 0.5;
+
+		static DoubleTensor buf_profile;
+		samples->getProfile(s)->copyTo(buf_profile);
+		CHECK_FATAL(machine->forward(buf_profile) == true);
+
+		if (machine->isPattern() == true)
+		{
+			if (valid == true)
+				cnt_tar ++;
+			else
+				cnt_far ++;
+		}
+
+		if (valid == false)
+			cnt_neg ++;
+		else
+			cnt_pos ++;
+	}
+
+	tar = (cnt_tar + 0.0) / (cnt_pos == 0 ? 1.0 : (cnt_pos + 0.0));
+	far = (cnt_far + 0.0) / (cnt_neg == 0 ? 1.0 : (cnt_neg + 0.0));
+	fa = cnt_far;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

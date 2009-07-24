@@ -89,106 +89,113 @@
 		if (center > cmp_point) lbp ++;                                                                 \
 	}                                                                                                       \
                                                                                                                 \
-        *m_lbp = m_crt_lut[lbp];                 									\
-       }
+        *m_lbp = m_crt_lut[lbp];                 								\
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute the 8R LBP code for a generic tensor using integral images
 
 #define COMPUTE_LBP8R_INTEGRAL(tensorType, dataType)                                                            \
 {                                                                                                               \
+	static IntegralFactors& ii_factors = ipLBP::IntegralFactors::getInstance();				\
+	int** ii_tl = ii_factors.getIItl();									\
+	int** ii_tr = ii_factors.getIItr();									\
+	int** ii_bl = ii_factors.getIIbl();									\
+	int** ii_br = ii_factors.getIIbr();									\
+	int** ii_cell_size = ii_factors.getIIcellsize();							\
+														\
 	const dataType* src = (const dataType*)input.dataR();							\
 	const int offset_sw 	= 	m_region.pos[0] * m_input_stride_h +					\
 					m_region.pos[1] * m_input_stride_w;					\
 														\
 	dataType tab[8];                                                                                 	\
-	tab[1] = 	(	src[offset_sw + m_ii_tl[m_x][m_y - m_R]] +					\
-				src[offset_sw + m_ii_br[m_x][m_y - m_R]] -					\
-				src[offset_sw + m_ii_tr[m_x][m_y - m_R]] -					\
-				src[offset_sw + m_ii_bl[m_x][m_y - m_R]]) /					\
-				m_ii_cell_size[m_x][m_y - m_R];							\
+	tab[1] = 	(	src[offset_sw + ii_tl[m_x][m_y - m_R]] +					\
+				src[offset_sw + ii_br[m_x][m_y - m_R]] -					\
+				src[offset_sw + ii_tr[m_x][m_y - m_R]] -					\
+				src[offset_sw + ii_bl[m_x][m_y - m_R]]) /					\
+				ii_cell_size[m_x][m_y - m_R];							\
 														\
-	tab[3] = 	(	src[offset_sw + m_ii_tl[m_x + m_R][m_y]] +					\
-				src[offset_sw + m_ii_br[m_x + m_R][m_y]] -					\
-				src[offset_sw + m_ii_tr[m_x + m_R][m_y]] -					\
-				src[offset_sw + m_ii_bl[m_x + m_R][m_y]]) /					\
-				m_ii_cell_size[m_x + m_R][m_y];							\
+	tab[3] = 	(	src[offset_sw + ii_tl[m_x + m_R][m_y]] +					\
+				src[offset_sw + ii_br[m_x + m_R][m_y]] -					\
+				src[offset_sw + ii_tr[m_x + m_R][m_y]] -					\
+				src[offset_sw + ii_bl[m_x + m_R][m_y]]) /					\
+				ii_cell_size[m_x + m_R][m_y];							\
 														\
-	tab[5] = 	(	src[offset_sw + m_ii_tl[m_x][m_y + m_R]] +					\
-				src[offset_sw + m_ii_br[m_x][m_y + m_R]] -					\
-				src[offset_sw + m_ii_tr[m_x][m_y + m_R]] -					\
-				src[offset_sw + m_ii_bl[m_x][m_y + m_R]]) /					\
-				m_ii_cell_size[m_x][m_y + m_R];							\
+	tab[5] = 	(	src[offset_sw + ii_tl[m_x][m_y + m_R]] +					\
+				src[offset_sw + ii_br[m_x][m_y + m_R]] -					\
+				src[offset_sw + ii_tr[m_x][m_y + m_R]] -					\
+				src[offset_sw + ii_bl[m_x][m_y + m_R]]) /					\
+				ii_cell_size[m_x][m_y + m_R];							\
 														\
-	tab[7] = 	(	src[offset_sw + m_ii_tl[m_x - m_R][m_y]] +					\
-				src[offset_sw + m_ii_br[m_x - m_R][m_y]] -					\
-				src[offset_sw + m_ii_tr[m_x - m_R][m_y]] -					\
-				src[offset_sw + m_ii_bl[m_x - m_R][m_y]]) /					\
-				m_ii_cell_size[m_x - m_R][m_y];							\
+	tab[7] = 	(	src[offset_sw + ii_tl[m_x - m_R][m_y]] +					\
+				src[offset_sw + ii_br[m_x - m_R][m_y]] -					\
+				src[offset_sw + ii_tr[m_x - m_R][m_y]] -					\
+				src[offset_sw + ii_bl[m_x - m_R][m_y]]) /					\
+				ii_cell_size[m_x - m_R][m_y];							\
 	switch (m_R)                                                                                            \
 	{                                                                                                       \
 		case 1:                                                                                         \
-			tab[0] = 	(	src[offset_sw + m_ii_tl[m_x - 1][m_y - 1]] +			\
-						src[offset_sw + m_ii_br[m_x - 1][m_y - 1]] -			\
-						src[offset_sw + m_ii_tr[m_x - 1][m_y - 1]] -			\
-						src[offset_sw + m_ii_bl[m_x - 1][m_y - 1]]) /			\
-						m_ii_cell_size[m_x - 1][m_y - 1];				\
+			tab[0] = 	(	src[offset_sw + ii_tl[m_x - 1][m_y - 1]] +			\
+						src[offset_sw + ii_br[m_x - 1][m_y - 1]] -			\
+						src[offset_sw + ii_tr[m_x - 1][m_y - 1]] -			\
+						src[offset_sw + ii_bl[m_x - 1][m_y - 1]]) /			\
+						ii_cell_size[m_x - 1][m_y - 1];				\
 														\
-			tab[2] = 	(	src[offset_sw + m_ii_tl[m_x + 1][m_y - 1]] +			\
-						src[offset_sw + m_ii_br[m_x + 1][m_y - 1]] -			\
-						src[offset_sw + m_ii_tr[m_x + 1][m_y - 1]] -			\
-						src[offset_sw + m_ii_bl[m_x + 1][m_y - 1]]) /			\
-						m_ii_cell_size[m_x + 1][m_y - 1];				\
+			tab[2] = 	(	src[offset_sw + ii_tl[m_x + 1][m_y - 1]] +			\
+						src[offset_sw + ii_br[m_x + 1][m_y - 1]] -			\
+						src[offset_sw + ii_tr[m_x + 1][m_y - 1]] -			\
+						src[offset_sw + ii_bl[m_x + 1][m_y - 1]]) /			\
+						ii_cell_size[m_x + 1][m_y - 1];				\
 														\
-			tab[4] = 	(	src[offset_sw + m_ii_tl[m_x + 1][m_y + 1]] +			\
-						src[offset_sw + m_ii_br[m_x + 1][m_y + 1]] -			\
-						src[offset_sw + m_ii_tr[m_x + 1][m_y + 1]] -			\
-						src[offset_sw + m_ii_bl[m_x + 1][m_y + 1]]) /			\
-						m_ii_cell_size[m_x + 1][m_y + 1];				\
+			tab[4] = 	(	src[offset_sw + ii_tl[m_x + 1][m_y + 1]] +			\
+						src[offset_sw + ii_br[m_x + 1][m_y + 1]] -			\
+						src[offset_sw + ii_tr[m_x + 1][m_y + 1]] -			\
+						src[offset_sw + ii_bl[m_x + 1][m_y + 1]]) /			\
+						ii_cell_size[m_x + 1][m_y + 1];				\
 														\
-			tab[6] = 	(	src[offset_sw + m_ii_tl[m_x - 1][m_y + 1]] +			\
-						src[offset_sw + m_ii_br[m_x - 1][m_y + 1]] -			\
-						src[offset_sw + m_ii_tr[m_x - 1][m_y + 1]] -			\
-						src[offset_sw + m_ii_bl[m_x - 1][m_y + 1]]) /			\
-						m_ii_cell_size[m_x - 1][m_y + 1];				\
+			tab[6] = 	(	src[offset_sw + ii_tl[m_x - 1][m_y + 1]] +			\
+						src[offset_sw + ii_br[m_x - 1][m_y + 1]] -			\
+						src[offset_sw + ii_tr[m_x - 1][m_y + 1]] -			\
+						src[offset_sw + ii_bl[m_x - 1][m_y + 1]]) /			\
+						ii_cell_size[m_x - 1][m_y + 1];				\
 			break;                                                                                  \
 														\
 		case 2:                                                                                         \
-			tab[0] = 	(	src[offset_sw + m_ii_tl[m_x - 2][m_y - 2]] +			\
-						src[offset_sw + m_ii_br[m_x][m_y]] -				\
-						src[offset_sw + m_ii_tr[m_x][m_y - 2]] -			\
-						src[offset_sw + m_ii_bl[m_x - 2][m_y]]) /			\
-						(	m_ii_cell_size[m_x - 1][m_y - 1] + 			\
-							m_ii_cell_size[m_x - 2][m_y - 2] + 			\
-							m_ii_cell_size[m_x - 1][m_y - 2] + 			\
-							m_ii_cell_size[m_x - 2][m_y - 1]);			\
+			tab[0] = 	(	src[offset_sw + ii_tl[m_x - 2][m_y - 2]] +			\
+						src[offset_sw + ii_br[m_x][m_y]] -				\
+						src[offset_sw + ii_tr[m_x][m_y - 2]] -			\
+						src[offset_sw + ii_bl[m_x - 2][m_y]]) /			\
+						(	ii_cell_size[m_x - 1][m_y - 1] + 			\
+							ii_cell_size[m_x - 2][m_y - 2] + 			\
+							ii_cell_size[m_x - 1][m_y - 2] + 			\
+							ii_cell_size[m_x - 2][m_y - 1]);			\
 														\
-			tab[2] = 	(	src[offset_sw + m_ii_tl[m_x + 2][m_y - 2]] +			\
-						src[offset_sw + m_ii_br[m_x][m_y]] -				\
-						src[offset_sw + m_ii_tr[m_x][m_y - 2]] -			\
-						src[offset_sw + m_ii_bl[m_x + 2][m_y]]) /			\
-						(	m_ii_cell_size[m_x + 1][m_y - 1] + 			\
-							m_ii_cell_size[m_x + 2][m_y - 2] + 			\
-							m_ii_cell_size[m_x + 1][m_y - 2] + 			\
-							m_ii_cell_size[m_x + 2][m_y - 1]);			\
+			tab[2] = 	(	src[offset_sw + ii_tl[m_x + 2][m_y - 2]] +			\
+						src[offset_sw + ii_br[m_x][m_y]] -				\
+						src[offset_sw + ii_tr[m_x][m_y - 2]] -			\
+						src[offset_sw + ii_bl[m_x + 2][m_y]]) /			\
+						(	ii_cell_size[m_x + 1][m_y - 1] + 			\
+							ii_cell_size[m_x + 2][m_y - 2] + 			\
+							ii_cell_size[m_x + 1][m_y - 2] + 			\
+							ii_cell_size[m_x + 2][m_y - 1]);			\
 														\
-			tab[4] = 	(	src[offset_sw + m_ii_tl[m_x + 2][m_y + 2]] +			\
-						src[offset_sw + m_ii_br[m_x][m_y]] -				\
-						src[offset_sw + m_ii_tr[m_x][m_y + 2]] -			\
-						src[offset_sw + m_ii_bl[m_x + 2][m_y]]) /			\
-						(	m_ii_cell_size[m_x + 1][m_y + 1] + 			\
-							m_ii_cell_size[m_x + 2][m_y + 2] + 			\
-							m_ii_cell_size[m_x + 1][m_y + 2] + 			\
-							m_ii_cell_size[m_x + 2][m_y + 1]);			\
+			tab[4] = 	(	src[offset_sw + ii_tl[m_x + 2][m_y + 2]] +			\
+						src[offset_sw + ii_br[m_x][m_y]] -				\
+						src[offset_sw + ii_tr[m_x][m_y + 2]] -			\
+						src[offset_sw + ii_bl[m_x + 2][m_y]]) /			\
+						(	ii_cell_size[m_x + 1][m_y + 1] + 			\
+							ii_cell_size[m_x + 2][m_y + 2] + 			\
+							ii_cell_size[m_x + 1][m_y + 2] + 			\
+							ii_cell_size[m_x + 2][m_y + 1]);			\
 														\
-			tab[6] = 	(	src[offset_sw + m_ii_tl[m_x - 2][m_y + 2]] +			\
-						src[offset_sw + m_ii_br[m_x][m_y]] -				\
-						src[offset_sw + m_ii_tr[m_x][m_y + 2]] -			\
-						src[offset_sw + m_ii_bl[m_x - 2][m_y]]) /			\
-						(	m_ii_cell_size[m_x - 1][m_y + 1] + 			\
-							m_ii_cell_size[m_x - 2][m_y + 2] + 			\
-							m_ii_cell_size[m_x - 1][m_y + 2] + 			\
-							m_ii_cell_size[m_x - 2][m_y + 1]);			\
+			tab[6] = 	(	src[offset_sw + ii_tl[m_x - 2][m_y + 2]] +			\
+						src[offset_sw + ii_br[m_x][m_y]] -				\
+						src[offset_sw + ii_tr[m_x][m_y + 2]] -			\
+						src[offset_sw + ii_bl[m_x - 2][m_y]]) /			\
+						(	ii_cell_size[m_x - 1][m_y + 1] + 			\
+							ii_cell_size[m_x - 2][m_y + 2] + 			\
+							ii_cell_size[m_x - 1][m_y + 2] + 			\
+							ii_cell_size[m_x - 2][m_y + 1]);			\
 			break;                                                                                  \
 														\
 		default:                                                                                        \
@@ -198,11 +205,11 @@
 	}                                                                                                       \
                                                                                                                 \
 	const dataType center = 										\
-			(	src[offset_sw + m_ii_tl[m_x][m_y]] +						\
-				src[offset_sw + m_ii_br[m_x][m_y]] -						\
-				src[offset_sw + m_ii_tr[m_x][m_y]] -						\
-				src[offset_sw + m_ii_bl[m_x][m_y]]) /						\
-				m_ii_cell_size[m_x][m_y];							\
+			(	src[offset_sw + ii_tl[m_x][m_y]] +						\
+				src[offset_sw + ii_br[m_x][m_y]] -						\
+				src[offset_sw + ii_tr[m_x][m_y]] -						\
+				src[offset_sw + ii_bl[m_x][m_y]]) /						\
+				ii_cell_size[m_x][m_y];							\
 														\
 	const dataType cmp_point = m_toAverage ?                                                                \
 		(dataType)                                                                                      \
@@ -246,10 +253,10 @@ namespace Torch {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Constructor
 
-    ipLBP8R::ipLBP8R(int R)
-            :	ipLBP(8, R),
-            m_r(sqrt(0.5) * R)
-    {
+ipLBP8R::ipLBP8R(int R)
+	:	ipLBP(8, R),
+		m_r(sqrt(0.5) * R)
+{
         // Initialize the conversion tables
         m_lut_RI = new unsigned short[256];		// 2^8
         m_lut_U2 = new unsigned short[256];		// 2^8
@@ -325,7 +332,7 @@ bool ipLBP8R::processInput(const Tensor& input)
 {
 	// No interpolation needed, the model size is the same as the region size to process!
 	if (	m_modelSize.size[0] == m_region.size[0] &&
-			m_modelSize.size[1] == m_region.size[1])
+		m_modelSize.size[1] == m_region.size[1])
 	{
 		//  print("...1..........\n");
 		//  print("W, H, %d, %d\n",m_modelSize.size[0],m_modelSize.size[1]);

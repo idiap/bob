@@ -61,7 +61,7 @@ inline bool ipSWEvaluator::isPattern() const
         return m_classifier->isPattern();
 }
 
-inline double ipSWEvaluator::getConfidence() const
+double ipSWEvaluator::getConfidence() const
 {
         if (m_classifier == 0)
         {
@@ -70,7 +70,7 @@ inline double ipSWEvaluator::getConfidence() const
         return m_classifier->getConfidence();
 }
 
-inline int ipSWEvaluator::getModelWidth() const
+int ipSWEvaluator::getModelWidth() const
 {
         if (m_classifier == 0)
         {
@@ -79,7 +79,7 @@ inline int ipSWEvaluator::getModelWidth() const
         return m_classifier->getSize().size[1];
 }
 
-inline int ipSWEvaluator::getModelHeight() const
+int ipSWEvaluator::getModelHeight() const
 {
         if (m_classifier == 0)
         {
@@ -109,7 +109,7 @@ Classifier& ipSWEvaluator::getClassifier()
 /////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type - overriden
 
-inline bool ipSWEvaluator::checkInput(const Tensor& input) const
+bool ipSWEvaluator::checkInput(const Tensor& input) const
 {
         return  m_classifier != 0 &&
                 (input.nDimension() == 2 || input.nDimension() == 3);
@@ -118,7 +118,7 @@ inline bool ipSWEvaluator::checkInput(const Tensor& input) const
 /////////////////////////////////////////////////////////////////////////
 // Allocate (if needed) the output tensors given the input tensor dimensions - overriden
 
-inline bool ipSWEvaluator::allocateOutput(const Tensor& input)
+bool ipSWEvaluator::allocateOutput(const Tensor& input)
 {
         // No output is generated, the Machine has the output!
         return true;
@@ -127,7 +127,7 @@ inline bool ipSWEvaluator::allocateOutput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated) - overriden
 
-inline bool ipSWEvaluator::processInput(const Tensor& input)
+bool ipSWEvaluator::processInput(const Tensor& input)
 {
         // Keep a copy of the input tensor (to pass to the Classifier)
         m_input_copy = &input;
@@ -139,7 +139,7 @@ inline bool ipSWEvaluator::processInput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 /// Change the region of the input tensor to process
 
-inline void ipSWEvaluator::setRegion(const TensorRegion& region)
+void ipSWEvaluator::setRegion(const TensorRegion& region)
 {
 	m_classifier->setRegion(region);
 
