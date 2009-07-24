@@ -32,6 +32,8 @@ namespace Torch {
 
                 /// Number of files that have been read.
                 int n_files;
+	private:
+                char **allocated_file_names;
         };
 
 }

@@ -15,7 +15,7 @@ int main()
 
 	//
 	int H = 8;
-	int W = 4;
+	int W = 8;
 	FloatTensor image(H, W);
 
 	for(int i = 0 ; i < H ; i++)
@@ -40,7 +40,6 @@ int main()
 	idct2d.process(dct2d.getOutput(0));
 	assert(idct2d.getNOutputs() == 1);
 	idct2d.getOutput(0).print("inverse F[x]");
-
 
 
 	//

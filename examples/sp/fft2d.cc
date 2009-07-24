@@ -8,13 +8,15 @@ using namespace Torch;
 ///////////////////////////////////////////////////////////////////////////
 int main()
 {
+	//bool verbose = true;
+	bool verbose = false;
 
    	THRandom_manualSeed(950305);
 
 	print("\n\nTesting 2D FFT\n\n");
 
 	//
-	int H = 8;
+	int H = 4;
 	int W = 4;
 	FloatTensor image(H, W);
 
@@ -45,10 +47,12 @@ int main()
 	const int n_tests = 11;
 	const int n_tests_N[n_tests] = { 2, 4, 8, 16, 32, 64, 128, 256, 1024, 2048, 4096};
 
+	//for(int t = 0 ; t < 3 ; t++)
 	for(int t = 0 ; t < n_tests ; t++)
 	{
 		//
-		for(int tt = 0 ; tt < n_tests ; tt++)
+		for(int tt = 0 ; tt < 3 ; tt++)
+		//for(int tt = 0 ; tt < n_tests ; tt++)
 		{
 			print("Testing %dx%d 2D FFT\n", n_tests_N[t], n_tests_N[tt]);
 
@@ -64,19 +68,19 @@ int main()
 			        	image(i,j) = random_;
 				}
 
-			//image.print("x");
+			if(verbose) image.print("x");
 
 			//
 			spFFT fft2d;
 			print("  Computing the FFT of x ...\n");
 			fft2d.process(image);
-			//fft2d.getOutput(0).print("F[x]");
+			if(verbose) fft2d.getOutput(0).print("F[x]");
 
 			//
 			spFFT ifft2d(true);
 			print("  Computing the iFFT of F[x]...\n");
 			ifft2d.process(fft2d.getOutput(0));
-			//ifft2d.getOutput(0).print("inverse F[x]");
+			if(verbose) ifft2d.getOutput(0).print("inverse F[x]");
 
 			const FloatTensor& out = (const FloatTensor&) ifft2d.getOutput(0);
 

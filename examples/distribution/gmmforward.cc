@@ -5,10 +5,10 @@ using namespace Torch;
 int main(int argc, char* argv[])
 {
 	int n_t = 1;
-	int n_inputs = 4;
-	int n_gaussians = 2;
+	int n_inputs = 15;
+	int n_gaussians = 5;
 
-	bool verbose = true;
+	bool verbose = false;
 
 	unsigned long seed = THRandom_seed();
 	print("Seed = %ld\n", seed);

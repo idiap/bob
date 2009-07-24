@@ -590,6 +590,118 @@ int main()
 
   delete resizable_dt;
 
+
+
+  print("Testing Tensor dataR() dataW() methods ...\n");
+
+
+  DoubleTensor *dataT1d = NULL;
+  DoubleTensor *dataT2d = NULL;
+  DoubleTensor *dataT3d = NULL;
+  DoubleTensor *select_dataT = NULL;
+  double *ptr_dataT1d = NULL;
+  double *ptr_dataT2d = NULL;
+  double *ptr_dataT3d = NULL;
+
+  int n_dataT1d = 10;
+  dataT1d = new DoubleTensor(n_dataT1d);
+  dataT1d->fill(1);
+  dataT1d->print("dataT1d");
+  ptr_dataT1d = (double *) dataT1d->dataR();
+  print("dataR() T1d > ");
+  for(int i = 0 ; i < n_dataT1d ; i++) print("%g ", ptr_dataT1d[i]);
+  print("\n");
+  dataT1d->print("dataT1d");
+
+  delete dataT1d;
+
+  int n_dataT2d = 4;
+  dataT2d = new DoubleTensor(n_dataT1d, n_dataT2d);
+  dataT2d->fill(1);
+  dataT2d->print("dataT2d");
+  ptr_dataT2d = (double *) dataT2d->dataR();
+  print("dataR() T2d > ");
+  for(int i = 0 ; i < n_dataT1d*n_dataT2d ; i++) print("%g ", ptr_dataT2d[i]);
+  print("\n");
+
+  select_dataT = new DoubleTensor();
+  select_dataT->select(dataT2d, 0, 5);
+  select_dataT->fill(2);
+  select_dataT->print("select_dataT");
+  dataT2d->print("dataT2d");
+  ptr_dataT2d = (double *) dataT2d->dataR();
+  print("dataR() T2d > ");
+  for(int i = 0 ; i < n_dataT1d*n_dataT2d ; i++) print("%g ", ptr_dataT2d[i]);
+  print("\n");
+  
+  ptr_dataT2d = (double *) select_dataT->dataR();
+  print("dataR() select T2d > ");
+  for(int i = 0 ; i < n_dataT2d ; i++) print("%g ", ptr_dataT2d[i]);
+  print("\n");
+
+  delete select_dataT;
+  delete dataT2d;
+
+
+  print("Trying other way around\n");
+
+  dataT2d = new DoubleTensor(n_dataT2d, n_dataT1d);
+  dataT2d->fill(1);
+  dataT2d->print("dataT2d");
+  ptr_dataT2d = (double *) dataT2d->dataR();
+  print("dataR() T2d > ");
+  for(int i = 0 ; i < n_dataT2d*n_dataT1d ; i++) print("%g ", ptr_dataT2d[i]);
+  print("\n");
+
+  select_dataT = new DoubleTensor();
+  select_dataT->select(dataT2d, 1, 5);
+  select_dataT->fill(2);
+  select_dataT->print("select_dataT");
+  dataT2d->print("dataT2d");
+  ptr_dataT2d = (double *) dataT2d->dataR();
+  print("dataR() T2d > ");
+  for(int i = 0 ; i < n_dataT2d*n_dataT1d ; i++) print("%g ", ptr_dataT2d[i]);
+  print("\n");
+  
+  ptr_dataT2d = (double *) select_dataT->dataR();
+  print("dataR() select T2d > ");
+  for(int i = 0 ; i < n_dataT2d ; i++) print("%g ", ptr_dataT2d[i]);
+  print("\n");
+
+  delete select_dataT;
+  delete dataT2d;
+
+  print("It works like this. Selected data is contiguous in memory. Thus to handle sequences, the first dimension should be the frame size and the second the number of frames !\n");
+  
+  print("Trying with 3D tensors.\n");
+
+  int n_dataT3d = 2;
+  dataT3d = new DoubleTensor(n_dataT3d, n_dataT2d, n_dataT1d);
+  dataT3d->fill(1);
+  dataT3d->print("dataT3d");
+  ptr_dataT3d = (double *) dataT3d->dataR();
+  print("dataR() T3d > ");
+  for(int i = 0 ; i < n_dataT3d*n_dataT2d*n_dataT1d ; i++) print("%g ", ptr_dataT3d[i]);
+  print("\n");
+
+  select_dataT = new DoubleTensor();
+  select_dataT->select(dataT3d, 2, 5);
+  select_dataT->fill(2);
+  select_dataT->print("select_dataT");
+  dataT3d->print("dataT3d");
+  ptr_dataT3d = (double *) dataT3d->dataR();
+  print("dataR() T3d > ");
+  for(int i = 0 ; i < n_dataT3d*n_dataT2d*n_dataT1d ; i++) print("%g ", ptr_dataT3d[i]);
+  print("\n");
+  
+  ptr_dataT3d = (double *) select_dataT->dataR();
+  print("dataR() select T3d > ");
+  for(int i = 0 ; i < n_dataT3d ; i++) print("%g ", ptr_dataT3d[i]);
+  print("\n");
+
+  delete select_dataT;
+  delete dataT3d;
+
   return 0;
 }
 

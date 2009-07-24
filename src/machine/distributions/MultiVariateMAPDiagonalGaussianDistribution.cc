@@ -7,6 +7,8 @@ MultiVariateMAPDiagonalGaussianDistribution::MultiVariateMAPDiagonalGaussianDist
    	CHECK_FATAL(prior_ != NULL); 
 
 	addFOption("map factor", 0.5, "map factor");
+	addBOption("variance adapt", false, "adapt variance");
+	addBOption("weight adapt", false, "weight variance");
 
 	prior = prior_;
 
@@ -22,15 +24,7 @@ MultiVariateMAPDiagonalGaussianDistribution::MultiVariateMAPDiagonalGaussianDist
 		p += n_inputs;
 	}
 
-	//Torch::print("MultiVariateMAPDiagonalGaussianDistribution()\n");
-	//Torch::print("   n_inputs = %d\n", n_inputs);
-	//Torch::print("   n_means = %d\n", n_means);
-	
-	//prior->m_parameters->print();
-
 	m_parameters->copy(prior->m_parameters);
-
-	//m_parameters->print();
 
 	MultiVariateNormalDistribution::resize(n_inputs, n_means);
 	resize(n_inputs, n_means);
@@ -46,6 +40,13 @@ bool MultiVariateMAPDiagonalGaussianDistribution::prepare()
 	MultiVariateDiagonalGaussianDistribution::prepare();
 	
 	map_factor = getFOption("map factor");
+	
+	if(use_log == false)
+	{
+		error("MultiVariateMAPDiagonalGaussianDistribution::prepare() You have to use the log mode !!");
+		
+		return false;
+	}
 
 	return true;
 }
@@ -129,34 +130,17 @@ bool MultiVariateMAPDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTe
 
 bool MultiVariateMAPDiagonalGaussianDistribution::EMupdate()
 {
-	/*
-	real epsilon = 10*REAL_EPSILON;
-	real* p_weights_acc = weights_acc;
-	if(learn_means)
-	for (int i=0;i<n_gaussians;i++,p_weights_acc++) 
-	{
-		if (*p_weights_acc <= (prior_weights + epsilon))
-		{
-			real* p_means_prior_i = prior_distribution->means[i];
-			real* p_means_i = means[i];
-			for (int j=0;j<n_inputs;j++) 
-				*p_means_i++ = *p_means_prior_i++;
-		}
-		else
-		{
-			real* p_means_prior_i = prior_distribution->means[i];
-			real* p_means_i = means[i];
-			real* p_means_acc_i = means_acc[i];
-			for (int j=0;j<n_inputs;j++)
-			{
-				*p_means_i++ = (weight_on_prior * *p_means_prior_i++) + ((1 - weight_on_prior) * *p_means_acc_i++ / *p_weights_acc);
-			}
-		}
-	}
-	*/
-
 	double precision = 10 * DBL_EPSILON;
 	float min_weights = getFOption("min weights");
+
+	bool variance_adapt = getBOption("variance adapt");
+	bool weight_adapt = getBOption("weight adapt");
+
+	if(variance_adapt)
+		warning("MultiVariateMAPDiagonalGaussianDistribution::EMupdate() sorry variance adaptation not implemented yet");
+
+	if(weight_adapt)
+		warning("MultiVariateMAPDiagonalGaussianDistribution::EMupdate() sorry weight adaptation not implemented yet");
 
 	for(int j = 0 ; j < n_means ; j++)
 	{
@@ -165,16 +149,67 @@ bool MultiVariateMAPDiagonalGaussianDistribution::EMupdate()
 			// copy the means from the prior distribution
 			for(int k = 0 ; k < n_inputs ; k++)
 				means[j][k] = prior_means[j][k];
-			//Torch::print("=\n");
 		}
 		else
 		{
 			// update the means from the prior distribution
 			for(int k = 0 ; k < n_inputs ; k++)
-				means[j][k] = (map_factor * prior_means[j][k]) + ((1 - map_factor) * acc_posteriors_means[j][k] / acc_posteriors_weights[j]);
-			//Torch::print("* (%g)\n", map_factor);
+			{
+				//means[j][k] = (map_factor * prior_means[j][k]) + ((1 - map_factor) * acc_posteriors_means[j][k] / acc_posteriors_weights[j]);
+				means[j][k] = ((1 - map_factor) * prior_means[j][k]) + (map_factor * acc_posteriors_means[j][k] / acc_posteriors_weights[j]);
+				if(variance_adapt)
+				{
+				}
+			}
+		}
+	
+		if(weight_adapt)
+		{
 		}
 	}
+
+	if(weight_adapt)
+	{
+	}
+
+	/*
+	p_weights_acc = weights_acc;
+	for (int i=0;i<n_gaussians;i++,p_weights_acc++)
+	{
+		if (*p_weights_acc <= (prior_weights + epsilon)) 
+			warning("Gaussian %d of GMM is not used in EM",i);
+		else 
+		{
+			real* p_var_i = var[i];
+			real* p_means_acc_i = means_acc[i];
+			real* p_var_acc_i = var_acc[i];
+			real* p_means_prior_i = prior_distribution->means[i];
+			real* p_var_prior_i = prior_distribution->var[i];
+			for (int j=0;j<n_inputs;j++) 
+			{
+				real means_ml = *p_means_acc_i++ / *p_weights_acc;
+				real means_map = weight_on_prior * *p_means_prior_i + (1 - weight_on_prior) * means_ml;
+				real var_ml = *p_var_acc_i++ / *p_weights_acc - means_map * means_map;
+				real map_prior_2 = (means_map - *p_means_prior_i) * (means_map - *p_means_prior_i++);
+				real map_ml_2 = (means_map - means_ml) * (means_map - means_ml);
+				real var_map = weight_on_prior * (*p_var_prior_i++ + map_prior_2) + (1 - weight_on_prior) * (var_ml + map_ml_2);
+				*p_var_i++ = var_map >= var_threshold[j] ? var_map : var_threshold[j];
+			}
+		}
+	}
+	
+	// then the weights
+	real sum_weights_acc = 0;
+	p_weights_acc = weights_acc;
+	for (int i=0;i<n_gaussians;i++)
+		sum_weights_acc += *p_weights_acc++;
+	real *p_log_weights = log_weights;
+	real *prior_log_weights = prior_distribution->log_weights;
+	real log_sum = log(sum_weights_acc);
+	p_weights_acc = weights_acc;
+	for (int i=0;i<n_gaussians;i++)
+		*p_log_weights++ = log(weight_on_prior * exp( *prior_log_weights++) + (1-weight_on_prior) * exp(log(*p_weights_acc++) - log_sum));
+	*/
 
 	if(use_log)
 	{

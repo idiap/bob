@@ -8,6 +8,8 @@ using namespace Torch;
 ///////////////////////////////////////////////////////////////////////////
 int main()
 {
+	//bool verbose = true;
+	bool verbose = false;
 
    	THRandom_manualSeed(950305);
 
@@ -43,6 +45,7 @@ int main()
 	const int n_tests = 11;
 	const int n_tests_N[n_tests] = { 2, 4, 8, 16, 32, 64, 128, 256, 1024, 2048, 4096};
 
+	//for(int t = 0 ; t < 2 ; t++)
 	for(int t = 0 ; t < n_tests ; t++)
 	{
 		print("Testing %d-points 1D FFT\n", n_tests_N[t]);
@@ -56,19 +59,19 @@ int main()
 	        	x(i) = random_;
 		}
 
-		//x.print("x");
+		if(verbose) x.print("x");
 
 		//
 		spFFT fft1d;
 		print("  Computing the FFT of x ...\n");
 		fft1d.process(x);
-		//fft1d.getOutput(0).print("F[x]");
+		if(verbose) fft1d.getOutput(0).print("F[x]");
 
 		//
 		spFFT ifft1d(true);
 		print("  Computing the iFFT of F[x]...\n");
 		ifft1d.process(fft1d.getOutput(0));
-		//ifft1d.getOutput(0).print("inverse F[x]");
+		if(verbose) ifft1d.getOutput(0).print("inverse F[x]");
 
 		const FloatTensor& out = (const FloatTensor&) ifft1d.getOutput(0);
 

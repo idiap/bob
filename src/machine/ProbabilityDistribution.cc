@@ -50,26 +50,33 @@ bool ProbabilityDistribution::forward(const Tensor& input)
 		}
 
 		//
-		// If the tensor is 2D/3D then considers it as a sequence along the first dimension
+		// If the tensor is 2D/3D then considers it as a sequence. The first dimension should be the dimension of the frame.
 
-		//int n_frames = input.size(0);
 
 	   	if(input.nDimension() == 2)
-			if (	input.size(1) != n_inputs)
+		{
+			//int n_frames = input.size(1);
+
+			if (	input.size(0) != n_inputs)
 			{
-				warning("ProbabilityDistribution::forward() : incorrect input size along dimension 1 (%d != %d).", input.size(1), n_inputs);
+				warning("ProbabilityDistribution::forward() : incorrect input size along dimension 1 (%d != %d).", input.size(0), n_inputs);
 				
 				return false;
 			}
-	
+		}
+
 	   	if(input.nDimension() == 3)
-			if (	input.size(2) != n_inputs)
+		{
+			//int n_frames = input.size(2);
+
+			if (	input.size(0) != n_inputs)
 			{
-				warning("ProbabilityDistribution::forward() : incorrect input size along dimension 2 (%d != %d).", input.size(2), n_inputs);
+				warning("ProbabilityDistribution::forward() : incorrect input size along dimension 2 (%d != %d).", input.size(0), n_inputs);
 				
 				return false;
 			}
-	
+		}
+
 		DoubleTensor *t_input = (DoubleTensor *) &input;
 
 		return forward(t_input);

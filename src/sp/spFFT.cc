@@ -220,11 +220,13 @@ bool spFFT::processInput(const Tensor& input)
 		w = alloc_1d_double(N * 5 / 4);
   
 		// Init workspace
-		ip[0] = 0;
+		ip[0] = 0; // Possible speed up here as ip[0] == 0 is used to init the rest of ip and the workspace !!
+		
 		for(int i=0; i < N; i++) a[i] = (*RI)(i);
+		for(int i=N; i < 2*N; i++) a[i] = 0.0;
 
 		// Complex Discrete Fourier Transform routine
-		cdft(N, 1, a, ip, w);
+		cdft(N, -1, a, ip, w);
 
 		//
 		FloatTensor *F = (FloatTensor *) m_output[0];
@@ -269,7 +271,7 @@ bool spFFT::processInput(const Tensor& input)
 			}
 
 			// Complex Discrete Fourier Transform routine (in inverse mode)
-			cdft(N, -1, a, ip, w);
+			cdft(N, 1, a, ip, w);
 
 			FloatTensor *F = (FloatTensor *) m_output[0];
 			for(int i=0; i < N; i++)
@@ -305,10 +307,13 @@ bool spFFT::processInput(const Tensor& input)
 			ip[0] = 0;
 
 			for(int i = 0 ; i < H ; i++)
+			{
 				for(int j = 0 ; j < W ; j++) a[i][j] = (*RI)(i,j);
+				for(int j = W ; j < 2*W ; j++) a[i][j] = 0;
+			}
 
 			// Complex Discrete Fourier Transform 2D
-			cdft2d(H, W, 1, a, NULL, ip, w);
+			cdft2d(H, W, -1, a, NULL, ip, w);
 
 			FloatTensor *F = (FloatTensor *) m_output[0];
 			for(int i = 0 ; i < H ; i++)
@@ -359,7 +364,7 @@ bool spFFT::processInput(const Tensor& input)
 				}
 
 			// Complex Discrete Fourier Transform 2D (in inverse mode)
-			cdft2d(H, W, -1, a, NULL, ip, w);
+			cdft2d(H, W, 1, a, NULL, ip, w);
 
 			//
 			FloatTensor *iF = (FloatTensor *) m_output[0];

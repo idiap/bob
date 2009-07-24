@@ -34,9 +34,6 @@ public:
 	///
 	virtual bool 		EMupdate();
 		
-	///
-	virtual bool 		print();
-		
 	//---
 	
 	///
@@ -57,15 +54,6 @@ public:
 	///
 	virtual bool		saveFile(File& file) const;
 
-	///
-	virtual bool		setVariances(double *stdv_, double factor_variance_threshold_ = 0.1);
-
-	///
-	virtual bool		setVarianceFlooring(double *stdv_, double factor_variance_threshold_ = 0.1);
-
-	///
-	virtual bool 		shuffle();
-
 	/// Constructs an empty Machine of this kind - overriden
 	/// (used by <MachineManager>, this object should be deallocated by the user)
 	virtual Machine*	getAnInstance() const { return new MultiVariateDiagonalGaussianDistribution(); }
@@ -80,14 +68,6 @@ protected:
 	//
 	double *posterior_numerator;
 	double *g_norm;
-
-	//
-	double **variances;
-	double *threshold_variances;
-
-	//
-	double *buffer_acc_posteriors_variances;
-	double **acc_posteriors_variances;
 
 };
 	

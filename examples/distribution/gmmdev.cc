@@ -203,6 +203,7 @@ int main(int argc, char* argv[])
 	testDataSet(&mdataset_test, gmm);
 
 	//
+	delete kmean;
 	delete trainer;
 	delete gmm;
 	delete norm;

@@ -274,7 +274,7 @@ void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2, long dim3) co
 TYPE TENSOR_CLASS(Tensor)::get(long x0) const
 {
   TYPE v = TENSOR_FUNC(get1d)(t, x0);
-  // (t->storage->data+t->storageOffset)[x0*t->stride[0]]
+// (t->storage->data+t->storageOffset)[x0*t->stride[0]]
   return v;
 }
 
@@ -298,7 +298,6 @@ TYPE TENSOR_CLASS(Tensor)::get(long x0, long x1, long x2, long x3) const
   // (t->storage->data+t->storageOffset)[x0*t->stride[0]+x1*t->stride[1]+x2*t->stride[2]+x3*t->stride[3]]
   return v;
 }
-
 
 void TENSOR_CLASS(Tensor)::setValue(long x0, TYPE v)
 {
