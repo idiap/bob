@@ -11,6 +11,7 @@ MeanShiftSelector::MeanShiftSelector()
 		m_bandwidthsComputed(false), m_bandwidths(0), m_inv_bandwidths2(0), m_inv_bandwidths6(0),
 		m_n_allocated(0)
 {
+	addIOption("kernel", 0, "0 - constant, 1 - linear, 2 - quadratic");
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -82,46 +83,46 @@ static bool areSWIntersected(	const Pattern& pattern,
 /////////////////////////////////////////////////////////////////////////
 // Compute the Jaccard distance between two subwindows
 
-static double Jaccard(	double sw1_cx, double sw1_cy, double sw1_w, double sw1_h,
-			double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
-{
-	const double sw1_x = sw1_cx - 0.5 * sw1_w;
-	const double sw1_y = sw1_cy - 0.5 * sw1_h;
-
-	const double sw2_x = sw2_cx - 0.5 * sw2_w;
-	const double sw2_y = sw2_cy - 0.5 * sw2_h;
-
-	// Check for intersection
-	if (	sw2_x <= sw1_x + sw1_w &&
-		sw2_x + sw2_w >= sw1_x &&
-		sw2_y <= sw1_y + sw1_h &&
-		sw2_y + sw2_h >= sw1_y)
-	{
-		// Intersection - compute distance
-		const double x_min = max(sw1_x, sw2_x);
-		const double x_max = min(sw1_x + sw1_w, sw2_x + sw2_w);
-
-		const double y_min = max(sw1_y, sw2_y);
-		const double y_max = min(sw1_y + sw1_h, sw2_y + sw2_h);
-
-		const double inters = (x_max - x_min) * (y_max - y_min);
-
-		// http://en.wikipedia.org/wiki/Jaccard_index
-		return 1.0 - inters / (sw1_w * sw1_h + sw2_w * sw2_h - inters);
-	}
-	else
-	{
-		// No intersection
-		return 1.0;
-	}
-}
-
-static double Jaccard(	const Pattern& pattern,
-			double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
-{
-	return Jaccard(	pattern.getCenterX(), pattern.getCenterY(), pattern.m_w, pattern.m_h,
-			sw2_cx, sw2_cy, sw2_w, sw2_h);
-}
+//static double Jaccard(	double sw1_cx, double sw1_cy, double sw1_w, double sw1_h,
+//			double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
+//{
+//	const double sw1_x = sw1_cx - 0.5 * sw1_w;
+//	const double sw1_y = sw1_cy - 0.5 * sw1_h;
+//
+//	const double sw2_x = sw2_cx - 0.5 * sw2_w;
+//	const double sw2_y = sw2_cy - 0.5 * sw2_h;
+//
+//	// Check for intersection
+//	if (	sw2_x <= sw1_x + sw1_w &&
+//		sw2_x + sw2_w >= sw1_x &&
+//		sw2_y <= sw1_y + sw1_h &&
+//		sw2_y + sw2_h >= sw1_y)
+//	{
+//		// Intersection - compute distance
+//		const double x_min = max(sw1_x, sw2_x);
+//		const double x_max = min(sw1_x + sw1_w, sw2_x + sw2_w);
+//
+//		const double y_min = max(sw1_y, sw2_y);
+//		const double y_max = min(sw1_y + sw1_h, sw2_y + sw2_h);
+//
+//		const double inters = (x_max - x_min) * (y_max - y_min);
+//
+//		// http://en.wikipedia.org/wiki/Jaccard_index
+//		return 1.0 - inters / (sw1_w * sw1_h + sw2_w * sw2_h - inters);
+//	}
+//	else
+//	{
+//		// No intersection
+//		return 1.0;
+//	}
+//}
+//
+//static double Jaccard(	const Pattern& pattern,
+//			double sw2_cx, double sw2_cy, double sw2_w, double sw2_h)
+//{
+//	return Jaccard(	pattern.getCenterX(), pattern.getCenterY(), pattern.m_w, pattern.m_h,
+//			sw2_cx, sw2_cy, sw2_w, sw2_h);
+//}
 
 /////////////////////////////////////////////////////////////////////////
 // Process the list of candidate sub-windows and select the best ones
@@ -130,6 +131,16 @@ static double Jaccard(	const Pattern& pattern,
 bool MeanShiftSelector::process(const PatternList& candidates)
 {
 	const bool verbose = getBOption("verbose");
+	const int kernel_type = getInRange(getIOption("kernel"), 0, 2);
+
+	FnGetKernel fn_kernels[3] =
+	{
+		getConstantKernel,
+		getLinearKernel,
+		getQuadraticKernel
+	};
+
+	FnGetKernel fn_kernel = fn_kernels[kernel_type];
 
 	// Check parameters
 	if (candidates.isEmpty() == true)
@@ -148,20 +159,20 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 //	const double avg_iters_wh = cluster(	candidates, temp_patterns,
 //						false, false, true, true,
 //						getESquareDistWH, getESquareDistWH,
-//						getLinearKernel,
+//						fn_kernel,
 //						verbose);
 //
 //	const double avg_iters_cxy = cluster(	temp_patterns, m_patterns,
 //						true, true, false, false,
 //						getESquareDistCxCy, getESquareDistCxCy,
-//						getLinearKernel,
+//						fn_kernel,
 //						verbose);
 
 	// AMS clustering
 	const double avg_iters = cluster(	candidates, m_patterns,
 						true, true, true, true,
 						getESquareDistAll, getESquareDistAll,
-						getLinearKernel,
+						fn_kernel,
 						verbose);
 
 	// Debug
@@ -427,8 +438,6 @@ int MeanShiftSelector::getClosest(	const PatternList& candidates,
 					int* idx_closest, double* dist_closest,
 					FnGetESquareDist_P fn_esquare_p)
 {
-	static const double max_jaccard = 0.7;
-
 	const int n_patterns = candidates.size();
 
 	int isize = 0;
@@ -436,9 +445,7 @@ int MeanShiftSelector::getClosest(	const PatternList& candidates,
 	{
 		// Add to the list each sub-window with at least some intersection!
 		for (int i = 0; i < n_patterns && isize < MaxNoClosestPoints; i ++)
-			if (	areSWIntersected(candidates.get(i), cx, cy, w, h) == true &&
-				Jaccard(candidates.get(i), cx, cy, w, h) < max_jaccard)
-			//if (areSWIntersected(candidates.get(i), cx, cy, w, h) == true)
+			if (areSWIntersected(candidates.get(i), cx, cy, w, h) == true)
 			{
 				idx_closest[isize] = i;
 				dist_closest[isize ++] = (*fn_esquare_p)(candidates.get(i), cx, cy, w, h);

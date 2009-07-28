@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="../../README.txt" open="1" top="0" tabpos="15">
+	<File name="../../README.txt" open="0" top="0" tabpos="15">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="7">
-		<Cursor position="557" topLine="2" />
+	<File name="../../boosting/CMakeLists.txt" open="1" top="0" tabpos="3">
+		<Cursor position="522" topLine="0" />
 	</File>
-	<File name="../../boosting/README.txt" open="1" top="0" tabpos="6">
+	<File name="../../boosting/README.txt" open="0" top="0" tabpos="6">
 		<Cursor position="3083" topLine="53" />
 	</File>
-	<File name="../../boosting/testBoostedClassifier.cc" open="1" top="0" tabpos="1">
+	<File name="../../boosting/testBoostedClassifier.cc" open="0" top="0" tabpos="1">
 		<Cursor position="25" topLine="0" />
 	</File>
-	<File name="../../boosting/trainHLBPCascade.cc" open="1" top="0" tabpos="8">
+	<File name="../../boosting/trainHLBPCascade.cc" open="0" top="0" tabpos="8">
 		<Cursor position="5619" topLine="439" />
 	</File>
-	<File name="../../boosting/trainHLBPStump.cc" open="1" top="0" tabpos="4">
+	<File name="../../boosting/trainHLBPStump.cc" open="0" top="0" tabpos="4">
 		<Cursor position="1323" topLine="12" />
 	</File>
-	<File name="../../boosting/trainHaarCascade.cc" open="1" top="0" tabpos="2">
+	<File name="../../boosting/trainHaarCascade.cc" open="0" top="0" tabpos="2">
 		<Cursor position="7973" topLine="416" />
 	</File>
-	<File name="../../boosting/trainHaarStump.cc" open="1" top="0" tabpos="5">
+	<File name="../../boosting/trainHaarStump.cc" open="0" top="0" tabpos="5">
 		<Cursor position="9317" topLine="309" />
 	</File>
-	<File name="../../boosting/trainLBPCascade.cc" open="1" top="0" tabpos="3">
+	<File name="../../boosting/trainLBPCascade.cc" open="0" top="0" tabpos="3">
 		<Cursor position="7606" topLine="252" />
 	</File>
 	<File name="../../boosting/trainLBPStump.cc" open="0" top="0" tabpos="27">
 		<Cursor position="3579" topLine="87" />
 	</File>
-	<File name="../../dataset/CMakeLists.txt" open="0" top="0" tabpos="9">
-		<Cursor position="1178" topLine="1" />
+	<File name="../../dataset/CMakeLists.txt" open="1" top="0" tabpos="4">
+		<Cursor position="521" topLine="0" />
 	</File>
 	<File name="../../dataset/bindata2tensor.cc" open="0" top="0" tabpos="16">
 		<Cursor position="23" topLine="0" />
@@ -67,17 +67,17 @@
 	<File name="../../dataset/tensorfiles.cc" open="0" top="0" tabpos="27">
 		<Cursor position="20" topLine="0" />
 	</File>
-	<File name="../../distribution/CMakeLists.txt" open="1" top="0" tabpos="23">
-		<Cursor position="1009" topLine="0" />
+	<File name="../../distribution/CMakeLists.txt" open="1" top="0" tabpos="5">
+		<Cursor position="446" topLine="0" />
 	</File>
-	<File name="../../distribution/gmm.cc" open="1" top="0" tabpos="22">
+	<File name="../../distribution/gmm.cc" open="0" top="0" tabpos="18">
 		<Cursor position="3084" topLine="58" />
 	</File>
-	<File name="../../distribution/gmmdev.cc" open="1" top="0" tabpos="21">
+	<File name="../../distribution/gmmdev.cc" open="0" top="0" tabpos="17">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../facetools/CMakeLists.txt" open="0" top="0" tabpos="10">
-		<Cursor position="226" topLine="0" />
+	<File name="../../facetools/CMakeLists.txt" open="1" top="0" tabpos="6">
+		<Cursor position="606" topLine="0" />
 	</File>
 	<File name="../../facetools/filelist.cc" open="0" top="0" tabpos="28">
 		<Cursor position="23" topLine="0" />
@@ -91,8 +91,8 @@
 	<File name="../../facetools/tensor2dct.cc" open="0" top="0" tabpos="30">
 		<Cursor position="23" topLine="0" />
 	</File>
-	<File name="../../gradient/CMakeLists.txt" open="0" top="0" tabpos="11">
-		<Cursor position="312" topLine="0" />
+	<File name="../../gradient/CMakeLists.txt" open="1" top="0" tabpos="7">
+		<Cursor position="446" topLine="0" />
 	</File>
 	<File name="../../gradient/gradientmachines.cc" open="0" top="0" tabpos="31">
 		<Cursor position="23" topLine="0" />
@@ -109,14 +109,14 @@
 	<File name="../../gradient/xor.cc" open="0" top="0" tabpos="35">
 		<Cursor position="23" topLine="0" />
 	</File>
-	<File name="../../images/CMakeLists.txt" open="0" top="0" tabpos="12">
-		<Cursor position="226" topLine="0" />
+	<File name="../../images/CMakeLists.txt" open="1" top="0" tabpos="8">
+		<Cursor position="522" topLine="0" />
 	</File>
 	<File name="../../images/imageformats.cc" open="0" top="0" tabpos="36">
 		<Cursor position="23" topLine="0" />
 	</File>
-	<File name="../../ip/CMakeLists.txt" open="0" top="0" tabpos="13">
-		<Cursor position="976" topLine="0" />
+	<File name="../../ip/CMakeLists.txt" open="1" top="0" tabpos="9">
+		<Cursor position="522" topLine="0" />
 	</File>
 	<File name="../../ip/blocks.cc" open="0" top="0" tabpos="37">
 		<Cursor position="23" topLine="0" />
@@ -163,23 +163,23 @@
 	<File name="../../ip/sobel.cc" open="0" top="0" tabpos="50">
 		<Cursor position="23" topLine="0" />
 	</File>
-	<File name="../../machines/CMakeLists.txt" open="0" top="0" tabpos="1">
-		<Cursor position="310" topLine="0" />
+	<File name="../../machines/CMakeLists.txt" open="1" top="0" tabpos="10">
+		<Cursor position="341" topLine="0" />
 	</File>
-	<File name="../../machines/convert3to5models.cc" open="1" top="0" tabpos="13">
+	<File name="../../machines/convert3to5models.cc" open="0" top="0" tabpos="13">
 		<Cursor position="23" topLine="81" />
 	</File>
-	<File name="../../machines/make.csh" open="0" top="0" tabpos="12">
+	<File name="../../machines/make.csh" open="1" top="0" tabpos="34">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../machines/test19x19models.cc" open="1" top="0" tabpos="12">
+	<File name="../../machines/test19x19models.cc" open="0" top="0" tabpos="12">
 		<Cursor position="1644" topLine="24" />
 	</File>
-	<File name="../../machines/trainLR.cc" open="0" top="0" tabpos="2">
-		<Cursor position="23" topLine="0" />
+	<File name="../../machines/trainLR.cc" open="1" top="0" tabpos="29">
+		<Cursor position="827" topLine="105" />
 	</File>
-	<File name="../../options/CMakeLists.txt" open="0" top="0" tabpos="14">
-		<Cursor position="226" topLine="0" />
+	<File name="../../options/CMakeLists.txt" open="1" top="0" tabpos="11">
+		<Cursor position="445" topLine="0" />
 	</File>
 	<File name="../../options/make.csh" open="0" top="0" tabpos="13">
 		<Cursor position="0" topLine="0" />
@@ -190,23 +190,23 @@
 	<File name="../../options/parameters.cc" open="0" top="0" tabpos="54">
 		<Cursor position="23" topLine="0" />
 	</File>
-	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="11">
-		<Cursor position="544" topLine="0" />
+	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="1">
+		<Cursor position="359" topLine="0" />
 	</File>
-	<File name="../../scanning/make.csh" open="1" top="0" tabpos="16">
+	<File name="../../scanning/make.csh" open="1" top="0" tabpos="33">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="10">
-		<Cursor position="8495" topLine="163" />
+	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="30">
+		<Cursor position="20360" topLine="460" />
 	</File>
 	<File name="../../scanning/testPatternList.cc" open="0" top="0" tabpos="8">
 		<Cursor position="24" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="14">
-		<Cursor position="340" topLine="0" />
+	<File name="../../scanning/test_scanning_all.sh" open="0" top="0" tabpos="14">
+		<Cursor position="1623" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="1" top="1" tabpos="9">
-		<Cursor position="1447" topLine="0" />
+	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="13">
+		<Cursor position="1944" topLine="3" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="55">
 		<Cursor position="23" topLine="0" />
@@ -220,8 +220,8 @@
 	<File name="../../sp/fft2d.cc" open="0" top="0" tabpos="58">
 		<Cursor position="23" topLine="0" />
 	</File>
-	<File name="../../tensors/CMakeLists.txt" open="0" top="0" tabpos="15">
-		<Cursor position="1016" topLine="0" />
+	<File name="../../tensors/CMakeLists.txt" open="1" top="0" tabpos="12">
+		<Cursor position="445" topLine="0" />
 	</File>
 	<File name="../../tensors/THTensor.cc" open="0" top="0" tabpos="59">
 		<Cursor position="395" topLine="0" />

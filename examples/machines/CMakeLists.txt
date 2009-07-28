@@ -8,13 +8,14 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 # Set the include directories and linking libraries
 SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 INCLUDE_DIRECTORIES("${TORCH5SPRO_DIR}")
-LINK_LIBRARIES("${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a")
+LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
+		"${TORCH5SPRO_DIR}/extras/lbfgs/build_${TORCH_OS}_${TORCH_ARCH}/liblbfgs.a")
 
 # Set the compiler flags and build type (release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer -msse2")
 SET(CMAKE_CXX_FLAGS_DEBUG "-g")
-#SET(CMAKE_BUILD_TYPE RELEASE)
-SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_BUILD_TYPE RELEASE)
+#SET(CMAKE_BUILD_TYPE DEBUG)
 
 MESSAGE("---------------------------------------------" "")
 MESSAGE("CXX RELEASE FLAGS: " "${CMAKE_CXX_FLAGS_RELEASE}")

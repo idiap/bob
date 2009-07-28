@@ -185,6 +185,13 @@
 		</Unit>
 		<Unit filename="../../../extras/jpeg/jversion.h" />
 		<Unit filename="../../../extras/jpeg/transupp.h" />
+		<Unit filename="../../../extras/lbfgs/CMakeLists.txt" />
+		<Unit filename="../../../extras/lbfgs/arithmetic_ansi.h" />
+		<Unit filename="../../../extras/lbfgs/lbfgs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../extras/lbfgs/lbfgs.h" />
+		<Unit filename="../../../extras/lbfgs/makelbfgs.csh" />
 		<Unit filename="../../../extras/oourafft/CMakeLists.txt" />
 		<Unit filename="../../../extras/oourafft/alloc.c">
 			<Option compilerVar="CC" />

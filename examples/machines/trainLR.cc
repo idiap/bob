@@ -29,7 +29,7 @@ void buildTarget(const DoubleTensor* example, DoubleTensor* target,
 	sum += bias + noise_mean + (rand() % noise_variance) * (rand() % 2 == 0 ? -1 : 1);
 
 	target->resize(1);
-	target->set(0, sum > 0.0 ? 1.0 : 0.0);
+	target->set(0, sum > 0.0 ? 0.1 : 0.9);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -82,13 +82,14 @@ int countNegative(MemoryDataSet* samples)
 
 int main(int argc, char* argv[])
 {
-	srand((unsigned int)time(0));
+	//srand((unsigned int)time(0));
+	srand(0);
 
 	// Use a linear model (y = weights * random(x) + gaussian noise) to generate samples
-	const long n_train_samples = 100 + rand() % 1024;
-	const long n_valid_samples = 100 + rand() % 1024;
-	const long n_test_samples = 100 + rand() % 1024;
-	const int n_dims = 3 + rand() % 32;
+	const long n_train_samples = 3000;//100 + rand() % 1024;
+	const long n_valid_samples = 3000;//100 + rand() % 1024;
+	const long n_test_samples = 3000;//100 + rand() % 1024;
+	const int n_dims = 32;//3 + rand() % 32;
 
 	const int noise_mean = 0;
 	const int noise_variance = 1 + rand() % 5;

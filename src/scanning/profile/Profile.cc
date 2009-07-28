@@ -3,107 +3,44 @@
 
 namespace Torch
 {
-namespace Private
-{
 	//////////////////////////////////////////////////////////////////////////
 	// Functions to get the variation axis/planes for some index in the profile
 	//////////////////////////////////////////////////////////////////////////
 
-	const int ProfileSize =	Torch::GreedyExplorer::NoConfigs;
-
-	struct ProfileIndexes
-	{
-	private:
-		// Constructor
-		ProfileIndexes()
-			:	m_ox(new int[ProfileSize]),
-				m_oy(new int[ProfileSize]),
-				m_os(new int[ProfileSize])
-		{
-
-			// Initialize 3D axis coordinates for each profile linear index
-			int index = 0;
-			for (int is = -Torch::GreedyExplorer::NoVarS; is <= Torch::GreedyExplorer::NoVarS; is ++)
-			{
-				for (int ix = -Torch::GreedyExplorer::NoVarX; ix <= Torch::GreedyExplorer::NoVarX; ix ++)
-				{
-					for (int iy = -Torch::GreedyExplorer::NoVarY; iy <= Torch::GreedyExplorer::NoVarY; iy ++)
-					{
-						m_ox[index] = ix;
-						m_oy[index] = iy;
-						m_os[index] = is;
-						index ++;
-					}
-				}
-			}
-		}
-
-	public:
-
-		// Destructor
-		~ProfileIndexes()
-		{
-			delete[] m_ox;
-			delete[] m_oy;
-			delete[] m_os;
-		}
-
-		// Get the only instance
-		static const ProfileIndexes& getInstance()
-		{
-			static const ProfileIndexes pf_indexes;
-			return pf_indexes;
-		}
-
-		/////////////////////////////////////////////////////////////
-		// Attributes
-
-		int*			m_ox;	// [ProfileSize], <Ox> indexes from the linear index
-		int*			m_oy;	// [ProfileSize], <Oy> indexes from the linear index
-		int*			m_os;	// [ProfileSize], <Os> indexes from the linear index
-	};
-
-	bool isProfileOxys(int index)
+	bool isProfileOxys(const GreedyExplorer& explorer, int index)
 	{
 		return true;
 	}
 
-	bool isProfileOs(int index)
+	bool isProfileOs(const GreedyExplorer& explorer, int index)
 	{
-		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
-		return pfi.m_ox[index] == 0 && pfi.m_oy[index] == 0;
+		return explorer.getContextOx(index) == 0 && explorer.getContextOy(index) == 0;
 	}
 
-	bool isProfileOx(int index)
+	bool isProfileOx(const GreedyExplorer& explorer, int index)
 	{
-		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
-		return pfi.m_oy[index] == 0 && pfi.m_os[index] == 0;
+		return explorer.getContextOy(index) == 0 && explorer.getContextOs(index) == 0;
 	}
 
-	bool isProfileOy(int index)
+	bool isProfileOy(const GreedyExplorer& explorer, int index)
 	{
-		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
-		return pfi.m_ox[index] == 0 && pfi.m_os[index] == 0;
+		return explorer.getContextOx(index) == 0 && explorer.getContextOs(index) == 0;
 	}
 
-	bool isProfileOxy(int index)
+	bool isProfileOxy(const GreedyExplorer& explorer, int index)
 	{
-		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
-		return pfi.m_os[index] == 0;
+		return explorer.getContextOs(index) == 0;
 	}
 
-	bool isProfileOxs(int index)
+	bool isProfileOxs(const GreedyExplorer& explorer, int index)
 	{
-		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
-		return pfi.m_oy[index] == 0;
+		return explorer.getContextOy(index) == 0;
 	}
 
-	bool isProfileOys(int index)
+	bool isProfileOys(const GreedyExplorer& explorer, int index)
 	{
-		static const ProfileIndexes& pfi = ProfileIndexes::getInstance();
-		return pfi.m_ox[index] == 0;
+		return explorer.getContextOx(index) == 0;
 	}
-}// End of Private
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor
@@ -138,7 +75,7 @@ Profile::Profile(const Profile& other)
 	operator=(other);
 }
 
-////////////////homes/catana/coding/torch5spro/src/scanning/profile/ProfileMachine.h:65://////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 // Assignment operator
 
 Profile& Profile::operator=(const Profile& other)
@@ -166,7 +103,7 @@ enum Axis
 	NoAxis
 };
 
-void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const double* pf_scores)
+void Profile::reset(const Pattern& pattern, const GreedyExplorer& explorer)
 {
 	m_pattern.copy(pattern);
 
@@ -177,16 +114,16 @@ void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const
 	}
 
 	// Functions to check axis indexes
-	typedef bool (* FnCheckAxis)(int);
+	typedef bool (* FnCheckAxis)(const GreedyExplorer&, int);
 	FnCheckAxis axis_checks[NoAxis] =
 	{
-		Private::isProfileOxys,
-		Private::isProfileOx,
-		Private::isProfileOy,
-		Private::isProfileOs,
-		Private::isProfileOxy,
-		Private::isProfileOxs,
-		Private::isProfileOys
+		isProfileOxys,
+		isProfileOx,
+		isProfileOy,
+		isProfileOs,
+		isProfileOxy,
+		isProfileOxs,
+		isProfileOys
 	};
 
 	// Number of axis
@@ -196,28 +133,32 @@ void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const
 	};
 
 	// Axis indexes
-	static const Private::ProfileIndexes& pfi = Private::ProfileIndexes::getInstance();
-	int* axis_indexes[NoAxis][3] =
+	typedef int (GreedyExplorer:: *FnGetAxis)(int) const;
+	FnGetAxis axis_indexes[NoAxis][3] =
 	{
-		{ pfi.m_ox, pfi.m_oy, pfi.m_os },
-		{ pfi.m_ox, 0, 0 },
-		{ pfi.m_oy, 0, 0 },
-		{ pfi.m_os, 0, 0 },
-		{ pfi.m_ox, pfi.m_oy, 0 },
-		{ pfi.m_ox, pfi.m_os, 0 },
-		{ pfi.m_oy, pfi.m_os, 0 }
+		{ &GreedyExplorer::getContextOx, &GreedyExplorer::getContextOy, &GreedyExplorer::getContextOs },
+		{ &GreedyExplorer::getContextOx, 0, 0 },
+		{ &GreedyExplorer::getContextOy, 0, 0 },
+		{ &GreedyExplorer::getContextOs, 0, 0 },
+		{ &GreedyExplorer::getContextOx, &GreedyExplorer::getContextOy, 0 },
+		{ &GreedyExplorer::getContextOx, &GreedyExplorer::getContextOs, 0 },
+		{ &GreedyExplorer::getContextOy, &GreedyExplorer::getContextOs, 0 }
 	};
+
+	const unsigned char* ctx_flags = explorer.getContextFlags();
+	const double* ctx_scores = explorer.getContextScores();
+	const int ctx_size = explorer.getContextSize();
 
 	// Extract feature values - counts & scores
 	for (int a = All; a < NoAxis; a ++)
 	{
-		int** axis_indexes_a = axis_indexes[a];
+		FnGetAxis* axis_indexes_a = axis_indexes[a];
 		FnCheckAxis axis_check_a = axis_checks[a];
 		const int axis_no_a = axis_no[a];
 
 		// Counts
-		for (int i = 0; i < Private::ProfileSize; i ++)
-			if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+		for (int i = 0; i < ctx_size; i ++)
+			if (ctx_flags[i] != 0x00 && axis_check_a(explorer, i) == true)
 			{
 				increment(Feature_Counts_All + a);
 			}
@@ -226,10 +167,10 @@ void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const
 		double min_score = 10000.0, max_score = -10000.0;
 		double sum_score = 0.0;
 		int cnt = 0;
-		for (int i = 0; i < Private::ProfileSize; i ++)
-			if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+		for (int i = 0; i < ctx_size; i ++)
+			if (ctx_flags[i] != 0x00 && axis_check_a(explorer, i) == true)
 			{
-				const double score = pf_scores[i];
+				const double score = ctx_scores[i];
 				min_score = min(min_score, score);
 				max_score = max(max_score, score);
 				sum_score += score;
@@ -248,10 +189,10 @@ void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const
 			const double avg_score = sum_score / cnt;
 			sum_score = 0.0;
 
-			for (int i = 0; i < Private::ProfileSize; i ++)
-				if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+			for (int i = 0; i < ctx_size; i ++)
+				if (ctx_flags[i] != 0x00 && axis_check_a(explorer, i) == true)
 				{
-					const double diff = pf_scores[i] - avg_score;
+					const double diff = ctx_scores[i] - avg_score;
 					sum_score += diff * diff;
 				}
 
@@ -269,14 +210,15 @@ void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const
 		}
 
 		cnt = 0;
-		for (int i = 0; i < Private::ProfileSize; i ++)
-			if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+		for (int i = 0; i < ctx_size; i ++)
+			if (ctx_flags[i] != 0x00 && axis_check_a(explorer, i) == true)
 			{
 				for (int j = 0; j < axis_no_a; j ++)
 				{
-					min_hits[j] = min(min_hits[j], axis_indexes_a[j][i]);
-					max_hits[j] = max(max_hits[j], axis_indexes_a[j][i]);
-					sum_hits[j] += axis_indexes_a[j][i];
+					const int axis = (explorer.*axis_indexes_a[j])(i);
+					min_hits[j] = min(min_hits[j], axis);
+					max_hits[j] = max(max_hits[j], axis);
+					sum_hits[j] += axis;
 				}
 
 				cnt ++;
@@ -299,10 +241,11 @@ void Profile::reset(const Pattern& pattern, const unsigned char* pf_flags, const
 				const double avg_hits = sum_hits[j] / cnt;
 				sum_hits[j] = 0.0;
 
-				for (int i = 0; i < Private::ProfileSize; i ++)
-					if (pf_flags[i] != 0x00 && axis_check_a(i) == true)
+				for (int i = 0; i < ctx_size; i ++)
+					if (ctx_flags[i] != 0x00 && axis_check_a(explorer, i) == true)
 					{
-						const double diff = axis_indexes_a[j][i] - avg_hits;
+						const int axis = (explorer.*axis_indexes_a[j])(i);
+						const double diff = axis - avg_hits;
 						sum_hits[j] += diff * diff;
 					}
 
