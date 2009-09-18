@@ -1,43 +1,43 @@
-#include "Profile.h"
-#include "GreedyExplorer.h"
+#include "Context.h"
+#include "ContextExplorer.h"
 
 namespace Torch
 {
 	//////////////////////////////////////////////////////////////////////////
-	// Functions to get the variation axis/planes for some index in the profile
+	// Functions to get the variation axis/planes for some index in the context
 	//////////////////////////////////////////////////////////////////////////
 
-	bool isProfileOxys(const GreedyExplorer& explorer, int index)
+	bool isContextOxys(const ContextExplorer& explorer, int index)
 	{
 		return true;
 	}
 
-	bool isProfileOs(const GreedyExplorer& explorer, int index)
+	bool isContextOs(const ContextExplorer& explorer, int index)
 	{
 		return explorer.getContextOx(index) == 0 && explorer.getContextOy(index) == 0;
 	}
 
-	bool isProfileOx(const GreedyExplorer& explorer, int index)
+	bool isContextOx(const ContextExplorer& explorer, int index)
 	{
 		return explorer.getContextOy(index) == 0 && explorer.getContextOs(index) == 0;
 	}
 
-	bool isProfileOy(const GreedyExplorer& explorer, int index)
+	bool isContextOy(const ContextExplorer& explorer, int index)
 	{
 		return explorer.getContextOx(index) == 0 && explorer.getContextOs(index) == 0;
 	}
 
-	bool isProfileOxy(const GreedyExplorer& explorer, int index)
+	bool isContextOxy(const ContextExplorer& explorer, int index)
 	{
 		return explorer.getContextOs(index) == 0;
 	}
 
-	bool isProfileOxs(const GreedyExplorer& explorer, int index)
+	bool isContextOxs(const ContextExplorer& explorer, int index)
 	{
 		return explorer.getContextOy(index) == 0;
 	}
 
-	bool isProfileOys(const GreedyExplorer& explorer, int index)
+	bool isContextOys(const ContextExplorer& explorer, int index)
 	{
 		return explorer.getContextOx(index) == 0;
 	}
@@ -45,7 +45,7 @@ namespace Torch
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-Profile::Profile()
+Context::Context()
 	:	m_features(new DoubleTensor[NoFeatures])
 {
 	for (int f = 0; f < NoFeatures; f ++)
@@ -57,7 +57,7 @@ Profile::Profile()
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-Profile::~Profile()
+Context::~Context()
 {
 	delete[] m_features;
 }
@@ -65,7 +65,7 @@ Profile::~Profile()
 /////////////////////////////////////////////////////////////////////////
 // Copy constructor
 
-Profile::Profile(const Profile& other)
+Context::Context(const Context& other)
 	:	m_features(new DoubleTensor[NoFeatures])
 {
 	for (int f = 0; f < NoFeatures; f ++)
@@ -78,7 +78,7 @@ Profile::Profile(const Profile& other)
 /////////////////////////////////////////////////////////////////////////
 // Assignment operator
 
-Profile& Profile::operator=(const Profile& other)
+Context& Context::operator=(const Context& other)
 {
 	for (int f = 0; f < NoFeatures; f ++)
 	{
@@ -93,7 +93,7 @@ Profile& Profile::operator=(const Profile& other)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Reset to a new sub-window profile
+// Reset to a new sub-window context
 
 enum Axis
 {
@@ -103,7 +103,7 @@ enum Axis
 	NoAxis
 };
 
-void Profile::reset(const Pattern& pattern, const GreedyExplorer& explorer)
+void Context::reset(const Pattern& pattern, const ContextExplorer& explorer)
 {
 	m_pattern.copy(pattern);
 
@@ -114,16 +114,16 @@ void Profile::reset(const Pattern& pattern, const GreedyExplorer& explorer)
 	}
 
 	// Functions to check axis indexes
-	typedef bool (* FnCheckAxis)(const GreedyExplorer&, int);
+	typedef bool (* FnCheckAxis)(const ContextExplorer&, int);
 	FnCheckAxis axis_checks[NoAxis] =
 	{
-		isProfileOxys,
-		isProfileOx,
-		isProfileOy,
-		isProfileOs,
-		isProfileOxy,
-		isProfileOxs,
-		isProfileOys
+		isContextOxys,
+		isContextOx,
+		isContextOy,
+		isContextOs,
+		isContextOxy,
+		isContextOxs,
+		isContextOys
 	};
 
 	// Number of axis
@@ -133,16 +133,16 @@ void Profile::reset(const Pattern& pattern, const GreedyExplorer& explorer)
 	};
 
 	// Axis indexes
-	typedef int (GreedyExplorer:: *FnGetAxis)(int) const;
+	typedef int (ContextExplorer:: *FnGetAxis)(int) const;
 	FnGetAxis axis_indexes[NoAxis][3] =
 	{
-		{ &GreedyExplorer::getContextOx, &GreedyExplorer::getContextOy, &GreedyExplorer::getContextOs },
-		{ &GreedyExplorer::getContextOx, 0, 0 },
-		{ &GreedyExplorer::getContextOy, 0, 0 },
-		{ &GreedyExplorer::getContextOs, 0, 0 },
-		{ &GreedyExplorer::getContextOx, &GreedyExplorer::getContextOy, 0 },
-		{ &GreedyExplorer::getContextOx, &GreedyExplorer::getContextOs, 0 },
-		{ &GreedyExplorer::getContextOy, &GreedyExplorer::getContextOs, 0 }
+		{ &ContextExplorer::getContextOx, &ContextExplorer::getContextOy, &ContextExplorer::getContextOs },
+		{ &ContextExplorer::getContextOx, 0, 0 },
+		{ &ContextExplorer::getContextOy, 0, 0 },
+		{ &ContextExplorer::getContextOs, 0, 0 },
+		{ &ContextExplorer::getContextOx, &ContextExplorer::getContextOy, 0 },
+		{ &ContextExplorer::getContextOx, &ContextExplorer::getContextOs, 0 },
+		{ &ContextExplorer::getContextOy, &ContextExplorer::getContextOs, 0 }
 	};
 
 	const unsigned char* ctx_flags = explorer.getContextFlags();
@@ -258,7 +258,7 @@ void Profile::reset(const Pattern& pattern, const GreedyExplorer& explorer)
 /////////////////////////////////////////////////////////////////////////
 // Copy the features to 2D tensor (to be passed to machines) of [NoFeatures] x [MaxNoDimensions]
 
-void Profile::copyTo(DoubleTensor& tensor) const
+void Context::copyTo(DoubleTensor& tensor) const
 {
 	tensor.resize(NoFeatures, MaxNoDimensions);
 
@@ -275,7 +275,7 @@ void Profile::copyTo(DoubleTensor& tensor) const
 /////////////////////////////////////////////////////////////////////////
 // Copy the features from a 2D tensor of [NoFeatures] x [MaxNoDimensions]
 
-bool Profile::copyFrom(const DoubleTensor& tensor)
+bool Context::copyFrom(const DoubleTensor& tensor)
 {
 	if (	tensor.nDimension() != 2 ||
 		tensor.size(0) != NoFeatures ||

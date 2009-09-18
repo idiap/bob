@@ -1,17 +1,17 @@
-#ifndef _TORCHVISION_SCANNING_PROFILE_MACHINE_H_
-#define _TORCHVISION_SCANNING_PROFILE_MACHINE_H_
+#ifndef _TORCHVISION_SCANNING_CONTEXT_MACHINE_H_
+#define _TORCHVISION_SCANNING_CONTEXT_MACHINE_H_
 
-#include "Classifier.h"			// <ProfileMachine> is a <Classifier>
+#include "Classifier.h"			// <ContextMachine> is a <Classifier>
 #include "LRMachine.h"
-#include "Profile.h"
+#include "Context.h"
 
 namespace Torch
 {
-	#define PROFILE_MACHINE_ID	10003
+	#define CONTEXT_MACHINE_ID	10003
 
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ProfileMachine:
-	//	- implements a combination of small machines for each profile feature
+	// Torch::ContextMachine:
+	//	- implements a combination of small machines for each context feature
 	//
 	//      - PARAMETERS (name, type, default value, description):
         //		//
@@ -19,25 +19,25 @@ namespace Torch
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ProfileMachine : public Torch::Classifier
+	class ContextMachine : public Torch::Classifier
 	{
 	public:
 
 		// Constructor
-		ProfileMachine();
+		ContextMachine();
 
 		// Destructor
-		virtual ~ProfileMachine();
+		virtual ~ContextMachine();
 
 		// Process the input tensor
 		virtual bool 		forward(const Tensor& input);
 
 		// Constructs an empty Machine of this kind
 		// (used by <MachineManager>, this object is automatically deallocated)
-		virtual Machine* 	getAnInstance() const { return manage(new ProfileMachine); }
+		virtual Machine* 	getAnInstance() const { return manage(new ContextMachine); }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const { return PROFILE_MACHINE_ID; }
+		virtual int		getID() const { return CONTEXT_MACHINE_ID; }
 
 		// Loading/Saving the content from files (\emph{not the options})
 		virtual bool		loadFile(File& file);
@@ -57,12 +57,12 @@ namespace Torch
                 // Attributes
 
 		double*			m_poutput;		// Direct access to the machine's output
-		DoubleTensor		m_foutputs;		// Store outputs from profile feature models
+		DoubleTensor		m_foutputs;		// Store outputs from context feature models
 
 		LRMachine*		m_fmodels;		// Models for each feature
 		LRMachine		m_cmodel;		// Combined model
 
-		Profile			m_profile;		// Buffered sample for easily access the features
+		Context			m_context;		// Buffered sample for easily access the features
 	};
 }
 

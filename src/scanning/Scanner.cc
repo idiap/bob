@@ -2,6 +2,8 @@
 #include "Image.h"
 #include "Explorer.h"
 #include "Selector.h"
+#include "MSExplorer.h"
+#include "PyramidExplorer.h"
 
 namespace Torch
 {
@@ -99,6 +101,20 @@ bool Scanner::setExplorer(Explorer* explorer)
 		return false;
 	}
 
+	// Set the current scanning type global variable (ugly! - need a more elegant way ?!)
+	if (dynamic_cast<MSExplorer*>(explorer) != 0)
+	{
+		CurrentScanType::getInstance().set(ScanTypeMultiscale);
+	}
+	else if (dynamic_cast<PyramidExplorer*>(explorer) != 0)
+	{
+		CurrentScanType::getInstance().set(ScanTypePyramid);
+	}
+	else
+	{
+		CurrentScanType::getInstance().set(ScanTypeOther);
+	}
+
 	// OK
 	m_explorer = explorer;
 	return true;
@@ -157,29 +173,6 @@ bool Scanner::init(const Image& image)
 }
 
 /////////////////////////////////////////////////////////////////
-// Preprocess the image (store features in the explorer)
-
-bool Scanner::preprocess(const Image& image)
-{
-	// Check if any explorer was set
-	if (m_explorer == 0)
-	{
-		Torch::message("Scanner::preprocess - invalid explorer!\n");
-		return false;
-	}
-
-	// Preprocess the image
-	if (m_explorer->preprocess(image) == false)
-	{
-		Torch::message("Scanner::preprocess - explorer failed to preprocess the image!\n");
-		return false;
-	}
-
-	// OK
-	return true;
-}
-
-/////////////////////////////////////////////////////////////////
 // Process some image to scan for patterns
 
 bool Scanner::process(const Image& image)
@@ -215,6 +208,13 @@ bool Scanner::process(const Image& image)
 	if (checkParameters(image) == false)
 	{
 		Torch::message("Scanner::process - invalid parameters!\n");
+		return false;
+	}
+
+	// Preprocess the image
+	if (m_explorer->preprocess(image) == false)
+	{
+		Torch::message("Scanner::process - explorer failed to preprocess the image!\n");
 		return false;
 	}
 

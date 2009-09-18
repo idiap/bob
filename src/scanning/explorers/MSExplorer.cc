@@ -47,32 +47,6 @@ MSExplorer::~MSExplorer()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Set the features to use for the scales
-//	(for prunning and pattern evaluation)
-// It's enforced to use the same pruneIp and evaluationIp!
-//	=> the <index_scale> functions will return false!!!
-
-bool MSExplorer::setScalePruneIp(spCore* scalePruneIp)
-{
-	return Explorer::setScalePruneIp(scalePruneIp);
-}
-
-bool MSExplorer::setScalePruneIp(int index_scale, spCore* scalePruneIp)
-{
-	return false;
-}
-
-bool MSExplorer::setScaleEvaluationIp(spCore* scaleEvaluationIp)
-{
-	return Explorer::setScaleEvaluationIp(scaleEvaluationIp);
-}
-
-bool MSExplorer::setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp)
-{
-	return false;
-}
-
-/////////////////////////////////////////////////////////////////////////
 // Initialize the scanning process with the given image size
 
 bool MSExplorer::init(int image_w, int image_h)
@@ -185,9 +159,6 @@ bool MSExplorer::init(const sRect2D& roi)
 
 bool MSExplorer::preprocess(const Image& image)
 {
-	spCore* ip_prune = m_scale_prune_ips[0];
-	spCore* ip_evaluation = m_scale_evaluation_ips[0];
-
 	// Check parameters
 	if (m_n_scales < 1)
 	{
@@ -196,23 +167,10 @@ bool MSExplorer::preprocess(const Image& image)
 	}
 
 	// Compute the prune features for the whole image
-	if (ip_prune == 0)
-	{
-	        // The initial image!
-                m_prune_tensor = &image;
-	}
-	else
-	{
-	        // Some features need to be extracted!
-                if (ip_prune->process(image) == false)
-                {
-                        Torch::message("MSExplorer::preprocess - failed to run the pruning <ipCore>!\n");
-                        return false;
-                }
-                m_prune_tensor = &ip_prune->getOutput(0);
-	}
+	m_prune_tensor = &image;
 
 	// Compute the evaluation features for the whole image
+	spCore* ip_evaluation = m_scale_ips[0];
 	if (ip_evaluation == 0)
 	{
 	        // The initial image!
@@ -220,20 +178,12 @@ bool MSExplorer::preprocess(const Image& image)
 	}
 	else
 	{
-	        // Some features need to be extracted!
-	        if (ip_evaluation == ip_prune)  // but check maybe it's the same processing!
-	        {
-	                m_evaluation_tensor = &ip_prune->getOutput(0);
-	        }
-	        else
-	        {
-			if (ip_evaluation->process(image) == false)
-                        {
-                                Torch::message("MSExplorer::preprocess - failed to run the evaluation <ipCore>!\n");
-                                return false;
-                        }
-                        m_evaluation_tensor = &ip_evaluation->getOutput(0);
-	        }
+	        if (ip_evaluation->process(image) == false)
+		{
+		       Torch::message("MSExplorer::preprocess - failed to run the evaluation <ipCore>!\n");
+			return false;
+		}
+		m_evaluation_tensor = &ip_evaluation->getOutput(0);
 	}
 
 	//OK

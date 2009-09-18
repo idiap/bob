@@ -76,21 +76,18 @@ bool SpiralScaleExplorer::process(	ExplorerData& explorerData,
                         }
 
                         // Process the sub-window
-                        if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
+                        if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == true)
                         {
-                                Torch::message("SpiralScaleExplorer::process - failed to process some sub-window!\n");
-                                return false;
-                        }
+				// Stop at the first detection if asked
+				if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
+				{
+					// This will exit gracefully the double <for>
+					j = n_thetas;
+					i = n_spirales;
+				}
 
-                        // Stop at the first detection if asked
-                        if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
-                        {
-                                // This will exit gracefully the double <for>
-                                j = n_thetas;
-                                i = n_spirales;
+				count ++;
                         }
-
-                        count ++;
                 }
 	}
 

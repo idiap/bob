@@ -195,7 +195,7 @@ bool MeanShiftSelector::process(const PatternList& candidates)
 
 double MeanShiftSelector::getBandwidth(double* distances, int size, int& kclosest)
 {
-	static const double eps = 0.000001;
+//	static const double eps = 0.000001;
 
 	if (size <= 1)
 	{
@@ -206,32 +206,32 @@ double MeanShiftSelector::getBandwidth(double* distances, int size, int& kcloses
 
 	else
 	{
-		static const double kclosest_max_var = 3.0;	// Maximum variation (avg +/- n * stdev) to find kclosest
-		static const double inv_kclosest_max_var = 1.0 / kclosest_max_var;
+//		static const double kclosest_max_var = 3.0;	// Maximum variation (avg +/- n * stdev) to find kclosest
+//		static const double inv_kclosest_max_var = 1.0 / kclosest_max_var;
+//
+//		// Search the closest points that are within average +/- N * sigma from the previous ones
+//		double sum = distances[kclosest] + distances[kclosest + 1];
+//		double sum_square = distances[kclosest] * distances[kclosest] + distances[kclosest + 1] * distances[kclosest + 1];
+//
+//		kclosest = 1;
+//		while (kclosest + 1 < size)
+//		{
+//			const double inv = 1.0 / (kclosest + 1.0);
+//			const double average = inv * sum;
+//			const double diff = inv_kclosest_max_var * (distances[kclosest + 1] - average);
+//
+//			if (	distances[kclosest] > eps &&
+//				sum_square - kclosest * average * average < diff * diff * kclosest)
+//			{
+//				break;
+//			}
+//
+//			kclosest ++;
+//			sum += distances[kclosest];
+//			sum_square += distances[kclosest] * distances[kclosest];
+//		}
 
-		// Choose the kclosest points as to have the given maximum variance
-		double sum = distances[0] + distances[1];
-		double sum_square = distances[0] * distances[0] + distances[1] * distances[1];
-
-		// Search the closest points that are within average +/- N * sigma from the previous ones
-		kclosest = 1;
-		while (kclosest + 1 < size)
-		{
-			const double inv = 1.0 / (kclosest + 1.0);
-			const double average = inv * sum;
-			const double diff = inv_kclosest_max_var * (distances[kclosest + 1] - average);
-
-			if (	distances[kclosest] > eps &&
-				sum_square - average * average < diff * diff * kclosest)
-			{
-				break;
-			}
-
-			kclosest ++;
-			sum += distances[kclosest];
-			sum_square += distances[kclosest] * distances[kclosest];
-		}
-
+		kclosest = size - 1;
 		return distances[kclosest];
 	}
 }
@@ -246,8 +246,6 @@ double MeanShiftSelector::cluster(	const PatternList& candidates, PatternList& c
 					FnGetKernel fn_kernel,
 					bool verbose)
 {
-	static const double eps = 0.000001;
-
 	////////////////////////////////////////////////////////////////
 	// Cluster the patterns using AMS (Adaptive Bandwidth Mean Shift)
 
@@ -286,39 +284,40 @@ double MeanShiftSelector::cluster(	const PatternList& candidates, PatternList& c
 		m_bandwidths[i] = getBandwidth(dist_closest, n_closest, m_kclosest[i]);
 	}
 
-	// AMS: adjust the bandwidths
-	bool changed = true;
-	while (changed == true)
-	{
-		changed = false;
-		for (int i = 0; i < n_patterns; i ++)
-		{
-			int* idx_closest = &m_iclosest[i * MaxNoClosestPoints];
-			double* dist_closest = &m_iDistClosest[i * MaxNoClosestPoints];
-			const int kclosest = m_kclosest[i];
-
-			// An unrelated sub-window
-			if (kclosest == 0)
-			{
-				continue;
-			}
-
-			// Relax the bandwidth if there is with kclosest subwindow having the bandwidth
-			//	smaller than the distance to the current point
-			// => implies that the current point is not correlated with some of the kclosest points
-			for (int k = 0; k < kclosest; k ++)
-			{
-				const int j = idx_closest[k];
-				if (m_bandwidths[j] + eps < dist_closest[k])
-				{
-					m_kclosest[i] = kclosest - 1;
-					m_bandwidths[i] = dist_closest[kclosest - 1];
-					changed = true;
-					break;
-				}
-			}
-		}
-	}
+//	// AMS: adjust the bandwidths
+//	static const double eps = 0.000001;
+//	bool changed = true;
+//	while (changed == true)
+//	{
+//		changed = false;
+//		for (int i = 0; i < n_patterns; i ++)
+//		{
+//			int* idx_closest = &m_iclosest[i * MaxNoClosestPoints];
+//			double* dist_closest = &m_iDistClosest[i * MaxNoClosestPoints];
+//			const int kclosest = m_kclosest[i];
+//
+//			// An unrelated sub-window
+//			if (kclosest == 0)
+//			{
+//				continue;
+//			}
+//
+//			// Relax the bandwidth if there is with kclosest subwindow having the bandwidth
+//			//	smaller than the distance to the current point
+//			// => implies that the current point is not correlated with some of the kclosest points
+//			for (int k = 0; k < kclosest; k ++)
+//			{
+//				const int j = idx_closest[k];
+//				if (m_bandwidths[j] + eps < dist_closest[k])
+//				{
+//					m_kclosest[i] = kclosest - 1;
+//					m_bandwidths[i] = dist_closest[kclosest - 1];
+//					changed = true;
+//					break;
+//				}
+//			}
+//		}
+//	}
 	m_bandwidthsComputed = true;
 
 	// AMS: precompute the inverses of the bandwidths

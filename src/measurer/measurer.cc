@@ -4,8 +4,8 @@ namespace Torch {
 
 extern "C" int cmp_labelledmeasure(const void *p1, const void *p2)
 {
-	LabelledMeasure v1 = *((LabelledMeasure *)p1);
-	LabelledMeasure v2 = *((LabelledMeasure *)p2);
+	const LabelledMeasure& v1 = *((const LabelledMeasure *)p1);
+	const LabelledMeasure& v2 = *((const LabelledMeasure *)p2);
 
 	if(v1.measure > v2.measure) return 1;
   	if(v1.measure < v2.measure) return -1;

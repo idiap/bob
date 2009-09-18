@@ -132,14 +132,16 @@ int main(int argc, char* argv[])
 
 	print("--------------------------------------------------------------------\n");
 
+	double TAR, FAR, HTER;
+
 	// Test LR
 	print("Testing Logistic Regression (LR)\n");
-	print("\t[%d] training samples: detection rate = %lf%%\n",
-		n_train_samples, LRTrainer::test(&machine, train_samples));
-	print("\t[%d] validation samples: detection rate = %lf%%\n",
-		n_valid_samples, LRTrainer::test(&machine, valid_samples));
-	print("\t[%d] testing samples: detection rate = %lf%%\n",
-		n_test_samples, LRTrainer::test(&machine, test_samples));
+	LRTrainer::test(&machine, train_samples, TAR, FAR, HTER);
+	print("\t[%d] training samples: TAR = %lf, FAR = %lf, HTER = %lf\n", n_train_samples, TAR, FAR, HTER);
+	LRTrainer::test(&machine, valid_samples, TAR, FAR, HTER);
+	print("\t[%d] validation samples: detection rate = %lf%%\n", n_valid_samples, TAR, FAR, HTER);
+	LRTrainer::test(&machine, test_samples, TAR, FAR, HTER);
+	print("\t[%d] testing samples: detection rate = %lf%%\n", n_test_samples, TAR, FAR, HTER);
 	print("--------------------------------------------------------------------\n");
 
 	return 0;

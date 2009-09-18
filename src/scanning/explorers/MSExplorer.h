@@ -44,18 +44,6 @@ namespace Torch
 		virtual ~MSExplorer();
 
 		/////////////////////////////////////////////////////////////////
-
-		// Set the features to use for the scales
-		//	(for prunning and pattern evaluation)
-		// It's enforced to use the same pruneIp and evaluationIp!
-		//	=> the <index_scale> functions will return false!!!
-
-		virtual bool		setScalePruneIp(spCore* scalePruneIp);
-		virtual bool		setScalePruneIp(int index_scale, spCore* scalePruneIp);
-		virtual bool		setScaleEvaluationIp(spCore* scaleEvaluationIp);
-		virtual bool		setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp);
-
-		/////////////////////////////////////////////////////////////////
 		// Process functions
 
 		// HOW TO USE (see Scanner):

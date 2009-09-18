@@ -62,18 +62,6 @@ namespace Torch
 		virtual ~PyramidExplorer();
 
 		/////////////////////////////////////////////////////////////////
-
-		// Set the features to use for the scales
-		//	(for prunning and pattern evaluation)
-		// It's enforced to use one pruneIp and evaluationIp per scale!
-		//	=> the functions without <index_scale> will return false!!!
-
-		virtual bool		setScalePruneIp(spCore* scalePruneIp);
-		virtual bool		setScalePruneIp(int index_scale, spCore* scalePruneIp);
-		virtual bool		setScaleEvaluationIp(spCore* scaleEvaluationIp);
-		virtual bool		setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp);
-
-		/////////////////////////////////////////////////////////////////
 		// Process functions
 
 		// HOW TO USE (see Scanner):

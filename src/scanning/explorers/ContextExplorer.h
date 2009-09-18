@@ -1,15 +1,15 @@
-#ifndef _TORCHVISION_SCANNING_GREEDY_EXPLORER_H_
-#define _TORCHVISION_SCANNING_GREEDY_EXPLORER_H_
+#ifndef _TORCHVISION_SCANNING_CONTEXT_EXPLORER_H_
+#define _TORCHVISION_SCANNING_CONTEXT_EXPLORER_H_
 
-#include "MSExplorer.h"		// <GreedyExplorer> is a <MSExplorer>
-#include "ProfileMachine.h"
+#include "MSExplorer.h"		// <ContextExplorer> is a <MSExplorer>
+#include "ContextMachine.h"
 
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::GreedyExplorer
+	// Torch::ContextExplorer
 	//	- searches the 4D scanning space using a greedy method based on
-	//		a context-based (profile) model to remove false alarms
+	//		a context-based model to remove false alarms
 	//		and drive iteratively the detections to better locations
 	//
 	//	- PARAMETERS (name, type, default value, description):
@@ -18,15 +18,15 @@ namespace Torch
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class GreedyExplorer : public MSExplorer
+	class ContextExplorer : public MSExplorer
 	{
 	public:
 
 		// Running mode
 		enum Mode
 		{
-			Scanning,	// Greedy scanning (using the context-based model)
-			Profiling	// MS scanning (for generating profiles)
+			Scanning,	// Context-based greedy scanning
+			Profiling	// Initialize the scanning - used for generating contexts
 		};
 
 		// Context type
@@ -37,10 +37,10 @@ namespace Torch
 		};
 
 		// Constructor
-		GreedyExplorer(Mode = Scanning);
+		ContextExplorer(Mode mode = Scanning);
 
 		// Destructor
-		virtual ~GreedyExplorer();
+		virtual ~ContextExplorer();
 
 		/////////////////////////////////////////////////////////////////
 		// Process functions
@@ -58,9 +58,9 @@ namespace Torch
 		// Process the image (check for pattern's sub-windows)
 		virtual bool		process();
 
-		// Profile some SW - fill the profile around it
-		bool			profileSW(int sw_x, int sw_y, int sw_w, int sw_h);
-		bool			profileSW(const Pattern& pattern);
+		// Build the context for some SW
+		bool			buildSWContext(int sw_x, int sw_y, int sw_w, int sw_h);
+		bool			buildSWContext(const Pattern& pattern);
 
 		// Set the context classifier
 		bool			setContextModel(const char* filename);
@@ -79,8 +79,11 @@ namespace Torch
 
 	protected:
 
-		// Add a subwindow to the profile
-		void			addSWToProfile(	int sw_x, int sw_y, int sw_w, int sw_h,
+		// Initialize the context-based scanning
+		virtual bool		initContext();
+
+		// Test a subwindow
+		virtual void		testSW(	int sw_x, int sw_y, int sw_w, int sw_h,
 							unsigned char& flag, double& score);
 
 		/// called when some option was changed
@@ -93,7 +96,7 @@ namespace Torch
 		Mode 			m_mode;		// Scanning (MS + context model), Profiling (MS)
 
 		// Context model, type, buffers
-		ProfileMachine		m_ctx_model;
+		ContextMachine		m_ctx_model;
 		ContextType		m_ctx_type;
 		int			m_ctx_size;
 		unsigned char*		m_ctx_flags;

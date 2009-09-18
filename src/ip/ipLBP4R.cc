@@ -1,5 +1,6 @@
 #include "ipLBP4R.h"
 #include "Tensor.h"
+#include "Scanner.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute the 4R LBP code for a generic tensor
@@ -48,52 +49,51 @@
 
 #define COMPUTE_LBP4R_INTEGRAL(tensorType, dataType)						\
 {												\
-	IntegralFactors& ii_factors = ipLBP::IntegralFactors::getInstance();			\
-	int** ii_tl = ii_factors.getIItl();							\
-	int** ii_tr = ii_factors.getIItr();							\
-	int** ii_bl = ii_factors.getIIbl();							\
-	int** ii_br = ii_factors.getIIbr();							\
-	int** ii_cell_size = ii_factors.getIIcellsize();					\
+	const int& ii_dx = m_ii_factors.getDx();						\
+	const int& ii_dy = m_ii_factors.getDy();						\
+	const int& ii_w = m_ii_factors.getCellW();						\
+	const int& ii_w1 = m_ii_factors.getCellW1();						\
+	const int& ii_w12 = m_ii_factors.getCellW12();						\
+	const int& ii_h = m_ii_factors.getCellH();						\
+	const int& ii_h1 = m_ii_factors.getCellH1();						\
+	const int& ii_h12 = m_ii_factors.getCellH12();						\
 												\
-	const dataType* src = (const dataType*)input.dataR();					\
 	const int offset_sw 	= 	m_region.pos[0] * m_input_stride_h +			\
 					m_region.pos[1] * m_input_stride_w;			\
 												\
+	const dataType* src = (const dataType*)input.dataR();					\
+												\
+	const int offset1 = offset_sw + ii_dx + ii_dy;						\
+	const dataType P2 = src[offset1 + ii_w1];						\
+	const dataType P3 = src[offset1 + ii_w12];						\
+												\
+	const int offset2 = offset1 + ii_h1;							\
+	const dataType P5 = src[offset2];							\
+	const dataType P6 = src[offset2 + ii_w1];						\
+	const dataType P7 = src[offset2 + ii_w12];						\
+	const dataType P8 = src[offset2 + ii_w];						\
+												\
+	const int offset3 = offset1 + ii_h12;							\
+	const dataType P9 = src[offset3];							\
+	const dataType P10 = src[offset3 + ii_w1];						\
+	const dataType P11 = src[offset3 + ii_w12];						\
+	const dataType P12 = src[offset3 + ii_w];						\
+												\
+	const int offset4 = offset1 + ii_h;							\
+	const dataType P14 = src[offset4 + ii_w1];						\
+	const dataType P15 = src[offset4 + ii_w12];						\
+												\
 	dataType tab[4];									\
-	tab[0] = 	(	src[offset_sw + ii_tl[m_x][m_y - m_R]] +			\
-				src[offset_sw + ii_br[m_x][m_y - m_R]] -			\
-				src[offset_sw + ii_tr[m_x][m_y - m_R]] -			\
-				src[offset_sw + ii_bl[m_x][m_y - m_R]]) /			\
-				ii_cell_size[m_x][m_y - m_R];					\
+	tab[0] = P7 + P2 - P3 - P6;								\
+	tab[1] = P12 + P7 - P8 - P11;								\
+	tab[2] = P15 + P10 - P11 - P14;								\
+	tab[3] = P10 + P5 - P6 - P9;								\
 												\
-	tab[1] = 	(	src[offset_sw + ii_tl[m_x + m_R][m_y]] +			\
-				src[offset_sw + ii_br[m_x + m_R][m_y]] -			\
-				src[offset_sw + ii_tr[m_x + m_R][m_y]] -			\
-				src[offset_sw + ii_bl[m_x + m_R][m_y]]) /			\
-				ii_cell_size[m_x + m_R][m_y];					\
-												\
-	tab[2] = 	(	src[offset_sw + ii_tl[m_x][m_y + m_R]] +			\
-				src[offset_sw + ii_br[m_x][m_y + m_R]] -			\
-				src[offset_sw + ii_tr[m_x][m_y + m_R]] -			\
-				src[offset_sw + ii_bl[m_x][m_y + m_R]]) /			\
-				ii_cell_size[m_x][m_y + m_R];					\
-												\
-	tab[3] = 	(	src[offset_sw + ii_tl[m_x - m_R][m_y]] +			\
-				src[offset_sw + ii_br[m_x - m_R][m_y]] -			\
-				src[offset_sw + ii_tr[m_x - m_R][m_y]] -			\
-				src[offset_sw + ii_bl[m_x - m_R][m_y]]) /			\
-				ii_cell_size[m_x - m_R][m_y];					\
-												\
-	const dataType center = 								\
-			(	src[offset_sw + ii_tl[m_x][m_y]] +				\
-				src[offset_sw + ii_br[m_x][m_y]] -				\
-				src[offset_sw + ii_tr[m_x][m_y]] -				\
-				src[offset_sw + ii_bl[m_x][m_y]]) /				\
-				ii_cell_size[m_x][m_y];					\
+	const dataType center = P11 + P6 - P7 - P10;						\
 												\
 	const dataType cmp_point = m_toAverage ?						\
 		(dataType)									\
-                        ( 0.2 * (tab[0] + tab[1] + tab[2] + tab[3] + center + 0.0))	\
+                        (0.2 * (tab[0] + tab[1] + tab[2] + tab[3] + center + 0.0))		\
 		:										\
 		center;										\
 												\
@@ -186,9 +186,14 @@ int ipLBP4R::getMaxLabel()
 
 bool ipLBP4R::processInput(const Tensor& input)
 {
+	// Force interpolation for the multiscale even at the model size
+	if (CurrentScanType::getInstance().get() == ScanTypeMultiscale)
+	{
+		m_need_interp = true;
+	}
+
 	// No interpolation needed, the model size is the same as the region size to process!
-	if (	m_modelSize.size[0] == m_region.size[0] &&
-			m_modelSize.size[1] == m_region.size[1])
+	if (m_need_interp == false)
 	{
 		switch (input.getDatatype())
 		{

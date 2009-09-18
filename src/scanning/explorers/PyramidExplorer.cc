@@ -66,32 +66,6 @@ PyramidExplorer::~PyramidExplorer()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Set the features to use for the scales
-//	(for prunning and pattern evaluation)
-// It's enforced to use one pruneIp and evaluationIp per scale!
-//	=> the functions without <index_scale> will return false!!!
-
-bool PyramidExplorer::setScalePruneIp(spCore* scalePruneIp)
-{
-	return false;
-}
-
-bool PyramidExplorer::setScalePruneIp(int index_scale, spCore* scalePruneIp)
-{
-	return Explorer::setScalePruneIp(index_scale, scalePruneIp);
-}
-
-bool PyramidExplorer::setScaleEvaluationIp(spCore* scaleEvaluationIp)
-{
-	return false;
-}
-
-bool PyramidExplorer::setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp)
-{
-	return Explorer::setScaleEvaluationIp(index_scale, scaleEvaluationIp);
-}
-
-/////////////////////////////////////////////////////////////////////////
 // Initialize the scanning process with the given image size
 
 bool PyramidExplorer::init(int image_w, int image_h)
@@ -279,54 +253,25 @@ bool PyramidExplorer::process()
                         }
 		}
 
-		spCore* ip_prune = m_scale_prune_ips[i];
-		spCore* ip_evaluation = m_scale_evaluation_ips[i];
-
 		// Compute the prunning features for the scaled image
-		const Tensor* prune_tensor = 0;
-		if (ip_prune == 0)
-		{
-		        // The prune tensor is the scaled image!
-		        prune_tensor = &ip_scale.getOutput(0);
-		}
-		else
-		{
-		        // The prune tensor uses features from the scaled image!
-		        if (ip_prune->process(ip_scale.getOutput(0)) == false)
-                        {
-                                Torch::message("PyramidExplorer::preprocess - \
-                                                failed to run the pruning <ipCore> for scale [%d/%d]!\n",
-                                                i + 1, m_n_scales);
-                                return false;
-                        }
-                        prune_tensor = &ip_prune->getOutput(0);
-		}
+		const Tensor* prune_tensor = &ip_scale.getOutput(0);		// The prune tensor is the scaled image!
 
 		// Compute the evaluation features for the scaled image
 		const Tensor* evaluation_tensor = 0;
-		if (ip_evaluation == 0)
+		if (m_scale_ips[i] == 0)
 		{
-		        // The evaluation tensor is the scaled image!
-		       evaluation_tensor = &ip_scale.getOutput(0);
+		       evaluation_tensor = &ip_scale.getOutput(0); 		// The evaluation tensor is the scaled image!
 		}
 		else
 		{
-		        // The evaluation tensor uses features from the scaled image!
-                        if (ip_evaluation == ip_prune)// but check maybe it's the same processing!
-                        {
-                                evaluation_tensor = &ip_prune->getOutput(0);
-                        }
-                        else
-                        {
-                                if (ip_evaluation->process(ip_scale.getOutput(0)) == false)
-                                {
-                                        Torch::message("PyramidExplorer::preprocess - \
-                                                        failed to run the evaluation <ipCore> for scale [%d/%d]!\n",
-                                                        i + 1, m_n_scales);
-                                        return false;
-                                }
-                                evaluation_tensor = &ip_evaluation->getOutput(0);
+			if (m_scale_ips[i]->process(ip_scale.getOutput(0)) == false)
+			{
+				Torch::message("PyramidExplorer::preprocess - \
+						failed to run the evaluation <ipCore> for scale [%d/%d]!\n",
+						i + 1, m_n_scales);
+				return false;
 			}
+			evaluation_tensor = &m_scale_ips[i]->getOutput(0);
 		}
 
 		// Initialize the <ExplorerData> to the current scale

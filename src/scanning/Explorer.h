@@ -123,11 +123,8 @@ namespace Torch
 		bool			setScaleExplorer(ScaleExplorer* scaleExplorer);
 		bool			setScaleExplorer(int index_scale, ScaleExplorer* scaleExplorer);
 
-		// Set the features to use for the scales (different or the same)
-		//	(for prunning and pattern evaluation)
+		// Set the features to use for the scales (different or the same) (for pattern evaluation)
 		// (If they are 0/NULL, then the original input tensor will be used!)
-		virtual bool		setScalePruneIp(spCore* scalePruneIp);
-		virtual bool		setScalePruneIp(int index_scale, spCore* scalePruneIp);
 		virtual bool		setScaleEvaluationIp(spCore* scaleEvaluationIp);
 		virtual bool		setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp);
 
@@ -166,8 +163,8 @@ namespace Torch
 		int			getNoPrunnedSWs() const { return m_data->m_stat_prunned; }
 		int			getNoAcceptedSWs() const { return m_data->m_stat_accepted; }
 		const PatternList&	getPatterns() const { return m_data->m_patterns; }
-		int			getModelWidth() const;
-		int			getModelHeight() const;
+		virtual int		getModelWidth() const;
+		virtual int		getModelHeight() const;
 		int			getNoScales() const { return m_n_scales; }
 		const sSize&		getScale(int index_scale) const;
 
@@ -189,12 +186,11 @@ namespace Torch
 
 		// The scales where to scan and for each scale:
 		//	- the associated <ScaleExplorer>s
-		//	- <ipCore>s for prunning and evaluation
+		//	- <ipCore>s for evaluation
 		//	- ROIs
 		sSize*			m_scales;
 		ScaleExplorer**		m_scale_explorers;
-		spCore**		m_scale_prune_ips;
-		spCore**		m_scale_evaluation_ips;
+		spCore**		m_scale_ips;
 		sRect2D*		m_scale_rois;
 		int			m_n_scales;
 	};

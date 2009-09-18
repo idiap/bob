@@ -6,7 +6,7 @@ SET(	explorers_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/SpiralScaleExplorer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/RandomScaleExplorer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/MSExplorer.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/GreedyExplorer.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/ContextExplorer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/PyramidExplorer.cc"
 	CACHE INTERNAL "sources")
 

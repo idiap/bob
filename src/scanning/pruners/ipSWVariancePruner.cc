@@ -74,19 +74,17 @@ void ipSWVariancePruner::setRegion(const TensorRegion& region)
 	ipSWPruner::setRegion(region);
         m_isRejected = false;
 
-        // Compute the sum and the square sum if required
-        const double sum = (m_use_mean == true || m_use_stdev == true) ? getSumII(m_ipi_average) : 0.0;
-        const double square_sum = (m_use_stdev == true) ? getSumII(m_ipi_square) : 0.0;
-
         // Prune using the mean
+        const double sum = (m_use_mean == true || m_use_stdev == true) ? getSumII(m_ipi_average) : 0.0;
         if (m_use_mean == true)
         {
-                m_isRejected = sum < m_scaled_min_mean || sum > m_scaled_max_mean;
+        	m_isRejected = (sum < m_scaled_min_mean) || (sum > m_scaled_max_mean);
         }
 
         // Prune using the standard deviation
         if (m_isRejected == false && m_use_stdev == true)
         {
+        	const double square_sum = getSumII(m_ipi_square);
                 const double square_stdev = square_sum * m_sw_size - sum * sum;
                 m_isRejected = square_stdev < m_square_min_stdev || square_stdev > m_square_max_stdev;
         }
@@ -185,7 +183,7 @@ bool ipSWVariancePruner::allocateOutput(const Tensor& input)
 
 bool ipSWVariancePruner::processInput(const Tensor& input)
 {
-        // Compute the integral image
+	// Compute the integral image
         if (m_ipi_average.process(input) == false)
         {
                 Torch::message("ipSWVariancePruner::processInput - failed to compute the integral!\n");
