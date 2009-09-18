@@ -4,12 +4,14 @@
 #include "ipCore.h"		// <ipSobel> is a <Torch::ipCore>
 #include "vision.h"		// <sRect2D> definition
 #include "Tensor.h"
+
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::ipSobel
 	//	This class is designed to convolve a sobel mask with an image.
-	//	The result is a tensor of the INT storage type.
+	//	The result is 3 tensors of the INT storage type:
+	//		the Ox gradient, the Oy gradient and the edge magnitude.
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
@@ -23,8 +25,6 @@ namespace Torch
 
 		// Destructor
 		virtual ~ipSobel();
-
-
 
 	protected:
 

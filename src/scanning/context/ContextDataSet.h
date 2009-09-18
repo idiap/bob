@@ -1,20 +1,19 @@
-#ifndef _TORCHVISION_SCANNING_PROFILE_DATA_SET_H_
-#define _TORCHVISION_SCANNING_PROFILE_DATA_SET_H_
+#ifndef _TORCHVISION_SCANNING_CONTEXT_DATA_SET_H_
+#define _TORCHVISION_SCANNING_CONTEXT_DATA_SET_H_
 
-#include "DataSet.h"		// <ProfileDataSet> is a <DataSet>
-#include "Profile.h"
+#include "DataSet.h"		// <ContextDataSet> is a <DataSet>
+#include "Context.h"
 
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ProfileDataSet:
-	//	- implementation of the DataSet over some Distribution
-	//		and some profile feature
-	//	- returns 1D DoubleTensor of the size given by the profile feature size
-	//		(check Sample.h header for FeatureSizes[])
+	// Torch::ContextDataSet:
+	//	- implementation of the DataSet over context features
+	//	- returns 1D DoubleTensor of the size given by the context feature size
+	//		(check Context.h header for FeatureSizes[])
 	//
 	//	NB: the targets will be automatically assigned to 1x1 DoubleTensors (0, +1)
-	//		using the given profile distribution!
+	//		using the given context distribution!
 	//		=> <setTarget> won't do anything!
 	//
 	//	NB: the example is buffered, so don't stored it, it will be overwritten!
@@ -22,15 +21,15 @@ namespace Torch
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ProfileDataSet : public Torch::DataSet
+	class ContextDataSet : public Torch::DataSet
 	{
 	public:
 
 		// Constructor
-		ProfileDataSet(int pf_feature = 0);
+		ContextDataSet(int pf_feature = 0);
 
 		// Destructor
-		virtual ~ProfileDataSet();
+		virtual ~ContextDataSet();
 
 		// Access examples - overriden
 		virtual Tensor* 	getExample(long index);
@@ -40,15 +39,15 @@ namespace Torch
 		virtual Tensor* 	getTarget(long index);
 		virtual void		setTarget(long index, Tensor* target);
 
-		// Reset to a new profile feature
-		void			reset(int pf_feature);
+		// Reset to a new context feature
+		void			reset(int ctx_feature);
 
 		// Distribution manipulation
 		void			clear();
-		void			cumulate(bool positive, const Profile& profile);
-		void			cumulate(const Profile& gt_profile);
-		const Profile*		getProfile(long index) const;
-		bool			isPosProfile(long index) const;
+		void			cumulate(bool positive, const Context& context);
+		void			cumulate(const Context& gt_context);
+		const Context*		getContext(long index) const;
+		bool			isPosContext(long index) const;
 
 		// Save the distributions
 		bool			save(const char* dir_data, const char* name) const;
@@ -62,10 +61,10 @@ namespace Torch
 		bool			save(const char* basename, unsigned char mask) const;
 
 		// Resize some distribution to fit new samples
-		static Profile**	resize(Profile** old_data, long capacity, long increment);
+		static Context**	resize(Context** old_data, long capacity, long increment);
 		static unsigned char*	resize(unsigned char* old_data, long capacity, long increment);
 
-		// Delete stored profiles
+		// Delete stored contexts
 		void			cleanup();
 
 		enum Mask
@@ -81,10 +80,10 @@ namespace Torch
 		// Feature to extract from the distribution
 		int			m_feature;
 
-		// Profile distribution
-		Profile**		m_profiles;		// [No. examples] x [No. features]
+		// Context distribution
+		Context**		m_contexts;		// [No. examples] x [No. features]
 		unsigned char*		m_masks;		// Negative, positive or ground truth
-		long			m_capacity;		// Allocated profiles
+		long			m_capacity;		// Allocated contexts
 
 		// Targets: positive and negative
 		DoubleTensor		m_target_neg;

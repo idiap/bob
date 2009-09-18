@@ -9,7 +9,7 @@ using namespace Torch;
 struct Params
 {
         // General scanning
-        int explorer_type;		// 0 - Pyramid, 1 - Multiscale, 2 - Greedy
+        int explorer_type;		// 0 - Pyramid, 1 - Multiscale, 2 - Context
 	int scale_explorer_type;        // 0 - Exhaustive, 1 - Spiral, 2 - Random, 3 - Mixed
         int min_patt_w, max_patt_w;     // Min/max pattern width/height
         int min_patt_h, max_patt_h;
@@ -39,7 +39,7 @@ struct Params
 	int select_min_surf_overlap;	// Overlap: Minimum surface overlap to merge
 
 	// Context model
-	char* context_model;		// To remove FAs, used by GreedyExplorer
+	char* context_model;		// To remove FAs, used by ContextExplorer
 	int context_type;		// Context type (0 - Full, 1 - Axis)
 
         // Debug & log
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 	cmd.addSCmdArg("classifier model", &filename_model, "classifier model");
 
 	cmd.addText("\nScanning options:");
-	cmd.addICmdOption("-explorer_type", &params.explorer_type, 0, "explorer type: 0 - Pyramid, 1 - Multiscale, 2 - Greedy");
+	cmd.addICmdOption("-explorer_type", &params.explorer_type, 0, "explorer type: 0 - Pyramid, 1 - Multiscale, 2 - Context");
 	cmd.addICmdOption("-scale_explorer_type", &params.scale_explorer_type, 0, "scale explorer type: 0 - Exhaustive, 1 - Spiral, 2 - Random, 3 - Mixed");
 	cmd.addICmdOption("-min_patt_w", &params.min_patt_w, 19, "minimum pattern width");
 	cmd.addICmdOption("-max_patt_w", &params.max_patt_w, 190, "maximum pattern width");
@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
 	pruner.setMinStdev(params.prune_min_stdev);
 	pruner.setMaxStdev(params.prune_max_stdev);
 
-        // Explorer - strategy for scanning the image (multiscale, pyramid, greedy ...)
+        // Explorer - strategy for scanning the image (multiscale, pyramid, context ...)
 	Explorer* explorer = 0;
 	switch (params.explorer_type)
 	{
@@ -309,12 +309,12 @@ int main(int argc, char* argv[])
                 explorer = new MSExplorer;
 		break;
 
-	case 2: // Greedy
+	case 2: // Context
 	default:
-		explorer = new GreedyExplorer;
-		CHECK_FATAL(((GreedyExplorer*)explorer)->setContextModel(params.context_model) == true);
+		explorer = new ContextExplorer;
+		CHECK_FATAL(((ContextExplorer*)explorer)->setContextModel(params.context_model) == true);
 		CHECK_FATAL(explorer->setIOption("ctx_type", params.context_type) == true);
-		((GreedyExplorer*)explorer)->setMode(GreedyExplorer::Scanning);
+		((ContextExplorer*)explorer)->setMode(ContextExplorer::Scanning);
 		break;
 	}
 	setGeneralOptions(explorer, params);
@@ -371,6 +371,7 @@ int main(int argc, char* argv[])
 
 	MeanShiftSelector selector_ms;
 	CHECK_FATAL(selector_ms.setBOption("verbose", params.verbose) == true);
+	CHECK_FATAL(selector_ms.setIOption("kernel", 1) == true);	// 0 - constant, 1 - liniar, 2 - quadratic
 
 	const int n_selectors = 2;
 	Selector* selectors[n_selectors] =
@@ -426,23 +427,11 @@ int main(int argc, char* argv[])
         	}
         	ip_prep->add(manage(new ipIntegral));
 	}
-        switch (params.explorer_type)
+	for (int j = 0; j < n_scales; j ++)
 	{
-	case 0:	// Pyramid
-                for (int j = 0; j < n_scales; j ++)
-                {
-                        CHECK_FATAL(explorer->setScalePruneIp(j, ip_prep) == true);
-                        CHECK_FATAL(explorer->setScaleEvaluationIp(j, ip_prep) == true);
-                }
-		break;
-
-	case 1:	// Multiscale
-	case 2: // Greedy
-	default:
-		CHECK_FATAL(explorer->setScalePruneIp(ip_prep) == true);
-                CHECK_FATAL(explorer->setScaleEvaluationIp(ip_prep) == true);
-		break;
+		CHECK_FATAL(explorer->setScaleEvaluationIp(j, ip_prep) == true);
 	}
+	//CHECK_FATAL(explorer->setScaleEvaluationIp(ip_prep) == true);
 
         // Set for each scale the scanning type (exhaustive, random, spiral ...)
         for (int j = 0; j < n_scales; j ++)
@@ -477,7 +466,6 @@ int main(int argc, char* argv[])
         timer.reset();
 
         // Scan the image and get the results
-        CHECK_FATAL(scanner.preprocess(image) == true);
         CHECK_FATAL(scanner.process(image) == true);
 
         print("Scanning time: %ld usecs\n", timer.stop());
@@ -502,7 +490,7 @@ int main(int argc, char* argv[])
 		"%s_%s",
 		basename,
 		(params.explorer_type == 0) ?
-			"pyramid" : ((params.explorer_type == 1) ? "multiscale" : "greedy"));
+			"pyramid" : ((params.explorer_type == 1) ? "multiscale" : "context"));
 
         saveResults(	scanner.getPatterns(),		// final (merged) detections
 			explorer->getPatterns(),	// candidate (not merged) detections

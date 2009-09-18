@@ -1,4 +1,4 @@
-#include "ProfileDataSet.h"
+#include "ContextDataSet.h"
 #include "File.h"
 
 namespace Torch
@@ -7,10 +7,10 @@ namespace Torch
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-ProfileDataSet::ProfileDataSet(int pf_feature)
+ContextDataSet::ContextDataSet(int pf_feature)
 	: 	DataSet(Tensor::Double, true, Tensor::Double),
 		m_feature(pf_feature),
-		m_profiles(0),
+		m_contexts(0),
 		m_masks(0),
 		m_capacity(0),
 		m_target_neg(1),
@@ -25,22 +25,22 @@ ProfileDataSet::ProfileDataSet(int pf_feature)
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-ProfileDataSet::~ProfileDataSet()
+ContextDataSet::~ContextDataSet()
 {
 	cleanup();
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Delete stored profiles
+// Delete stored contexts
 
-void ProfileDataSet::cleanup()
+void ContextDataSet::cleanup()
 {
 	for (long i = 0; i < m_capacity; i ++)
 	{
-		delete m_profiles[i];
+		delete m_contexts[i];
 	}
-	delete[] m_profiles;
-	m_profiles = 0;
+	delete[] m_contexts;
+	m_contexts = 0;
 
 	delete[] m_masks;
 	m_masks = 0;
@@ -50,9 +50,9 @@ void ProfileDataSet::cleanup()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Reset to new profile feature
+// Reset to new context feature
 
-void ProfileDataSet::reset(int pf_feature)
+void ContextDataSet::reset(int pf_feature)
 {
 	m_feature = pf_feature;
 }
@@ -60,16 +60,16 @@ void ProfileDataSet::reset(int pf_feature)
 /////////////////////////////////////////////////////////////////////////
 // Access examples - overriden
 
-Tensor* ProfileDataSet::getExample(long index)
+Tensor* ContextDataSet::getExample(long index)
 {
 	if (isIndex(index, m_n_examples) == false)
 	{
-		error("ProfileDataSet::getExample - invalid index!\n");
+		error("ContextDataSet::getExample - invalid index!\n");
 	}
-	return &m_profiles[index]->m_features[m_feature];
+	return &m_contexts[index]->m_features[m_feature];
 }
 
-Tensor& ProfileDataSet::operator()(long index)
+Tensor& ContextDataSet::operator()(long index)
 {
 	return *getExample(index);
 }
@@ -77,85 +77,85 @@ Tensor& ProfileDataSet::operator()(long index)
 /////////////////////////////////////////////////////////////////////////
 // Access targets - overriden
 
-Tensor* ProfileDataSet::getTarget(long index)
+Tensor* ContextDataSet::getTarget(long index)
 {
 	if (isIndex(index, m_n_examples) == false)
 	{
-		error("ProfileDataSet::getTarget - invalid index!\n");
+		error("ContextDataSet::getTarget - invalid index!\n");
 	}
 
 	const unsigned char mask = m_masks[index];
 	return mask == Negative ? &m_target_neg : &m_target_pos;
 }
 
-void ProfileDataSet::setTarget(long index, Tensor* target)
+void ContextDataSet::setTarget(long index, Tensor* target)
 {
 	// Nothing to do here!
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Profile access in the distribution
+// Context access in the distribution
 
-const Profile* ProfileDataSet::getProfile(long index) const
+const Context* ContextDataSet::getContext(long index) const
 {
 	if (isIndex(index, m_n_examples) == false)
 	{
-		error("ProfileDataSet::getProfile - invalid index!\n");
+		error("ContextDataSet::getContext - invalid index!\n");
 	}
 
-	return m_profiles[index];
+	return m_contexts[index];
 }
 
-bool ProfileDataSet::isPosProfile(long index) const
+bool ContextDataSet::isPosContext(long index) const
 {
 	if (isIndex(index, m_n_examples) == false)
 	{
-		error("ProfileDataSet::isPosProfile - invalid index!\n");
+		error("ContextDataSet::isPosContext - invalid index!\n");
 	}
 
 	return m_masks[index] != Negative;
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Clear cumulated profiles
+// Clear cumulated contexts
 
-void ProfileDataSet::clear()
+void ContextDataSet::clear()
 {
 	m_n_examples = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Cumulate a new profile (negative, positive or ground truth)
+// Cumulate a new context (negative, positive or ground truth)
 
-void ProfileDataSet::cumulate(bool positive, const Profile& profile)
+void ContextDataSet::cumulate(bool positive, const Context& context)
 {
 	static const int increment = 1024;
 
 	if (m_n_examples >= m_capacity)
 	{
-		m_profiles = resize(m_profiles, m_capacity, increment);
+		m_contexts = resize(m_contexts, m_capacity, increment);
 		m_masks = resize(m_masks, m_capacity, increment);
 		m_capacity += increment;
 	}
 
-	*m_profiles[m_n_examples] = profile;
+	*m_contexts[m_n_examples] = context;
 	m_masks[m_n_examples] = positive == true ? Positive : Negative;
 	m_n_examples ++;
 }
 
-void ProfileDataSet::cumulate(const Profile& gt_profile)
+void ContextDataSet::cumulate(const Context& gt_context)
 {
 	static const int increment = 1024;
 
 	// Add the detection
 	if (m_n_examples >= m_capacity)
 	{
-		m_profiles = resize(m_profiles, m_capacity, increment);
+		m_contexts = resize(m_contexts, m_capacity, increment);
 		m_masks = resize(m_masks, m_capacity, increment);
 		m_capacity += increment;
 	}
 
-	*m_profiles[m_n_examples] = gt_profile;
+	*m_contexts[m_n_examples] = gt_context;
 	m_masks[m_n_examples] = GroundTruth;
 	m_n_examples ++;
 }
@@ -163,23 +163,23 @@ void ProfileDataSet::cumulate(const Profile& gt_profile)
 /////////////////////////////////////////////////////////////////////////
 // Resize some distribution to fit new samples
 
-Profile** ProfileDataSet::resize(Profile** old_data, long capacity, long increment)
+Context** ContextDataSet::resize(Context** old_data, long capacity, long increment)
 {
-	Profile** new_data = new Profile*[capacity + increment];
+	Context** new_data = new Context*[capacity + increment];
 	for (long i = 0; i < capacity; i ++)
 	{
 		new_data[i] = old_data[i];
 	}
 	for (long i = 0; i < increment; i ++)
 	{
-		new_data[capacity + i] = new Profile;
+		new_data[capacity + i] = new Context;
 	}
 	delete[] old_data;
 
 	return new_data;
 }
 
-unsigned char* ProfileDataSet::resize(unsigned char* old_data, long capacity, long increment)
+unsigned char* ContextDataSet::resize(unsigned char* old_data, long capacity, long increment)
 {
 	unsigned char* new_data = new unsigned char[capacity + increment];
 	for (long i = 0; i < capacity; i ++)
@@ -198,11 +198,11 @@ unsigned char* ProfileDataSet::resize(unsigned char* old_data, long capacity, lo
 /////////////////////////////////////////////////////////////////////////
 // Save the distribution
 
-bool ProfileDataSet::save(const char* dir_data, const char* name) const
+bool ContextDataSet::save(const char* dir_data, const char* name) const
 {
 	char str[1024];
 
-	// Save separate profiles for plotting
+	// Save separate contexts for plotting
 	{
 		// Negative samples
 		sprintf(str, "%s_%s_neg", dir_data, name);
@@ -239,39 +239,39 @@ bool ProfileDataSet::save(const char* dir_data, const char* name) const
 		// Write the number of samples
 		if (file.taggedWrite(&m_n_examples, sizeof(long), 1, "NO") != 1)
 		{
-			print("ProfileDataSet::save - failed to write <NO> tag!\n");
+			print("ContextDataSet::save - failed to write <NO> tag!\n");
 			return false;
 		}
 
 		// Write the masks (positive, negative, ground truth)
 		if (file.taggedWrite(m_masks, sizeof(unsigned char), m_n_examples, "MASKS") != m_n_examples)
 		{
-			print("ProfileDataSet::save - failed to write <MASKS> tag!\n");
+			print("ContextDataSet::save - failed to write <MASKS> tag!\n");
 			return false;
 		}
 
-		// Write each profile
+		// Write each context
 		for (long s = 0; s < m_n_examples; s ++)
 		{
-			const Profile* profile = m_profiles[s];
+			const Context* context = m_contexts[s];
 
-			if (	file.write(&profile->m_pattern.m_x, sizeof(short), 1) != 1 ||
-				file.write(&profile->m_pattern.m_y, sizeof(short), 1) != 1 ||
-				file.write(&profile->m_pattern.m_w, sizeof(short), 1) != 1 ||
-				file.write(&profile->m_pattern.m_h, sizeof(short), 1) != 1 ||
-				file.write(&profile->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
-				file.write(&profile->m_pattern.m_activation, sizeof(short), 1) != 1)
+			if (	file.write(&context->m_pattern.m_x, sizeof(short), 1) != 1 ||
+				file.write(&context->m_pattern.m_y, sizeof(short), 1) != 1 ||
+				file.write(&context->m_pattern.m_w, sizeof(short), 1) != 1 ||
+				file.write(&context->m_pattern.m_h, sizeof(short), 1) != 1 ||
+				file.write(&context->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
+				file.write(&context->m_pattern.m_activation, sizeof(short), 1) != 1)
 			{
-				print("ProfileDataSet::save - failed to write profile [%d/%d]!\n", s + 1, m_n_examples);
+				print("ContextDataSet::save - failed to write context [%d/%d]!\n", s + 1, m_n_examples);
 				return false;
 			}
 
 			for (int f = 0; f < NoFeatures; f ++)
 			{
-				if (file.write(	profile->m_features[f].dataR(), sizeof(double), FeatureSizes[f])
+				if (file.write(	context->m_features[f].dataR(), sizeof(double), FeatureSizes[f])
 						!= FeatureSizes[f])
 				{
-					print("ProfileDataSet::save - failed to write profile [%d/%d]!\n", s + 1, m_n_examples);
+					print("ContextDataSet::save - failed to write context [%d/%d]!\n", s + 1, m_n_examples);
 					return false;
 				}
 			}
@@ -284,7 +284,7 @@ bool ProfileDataSet::save(const char* dir_data, const char* name) const
 	return true;
 }
 
-bool ProfileDataSet::save(const char* basename, unsigned char mask) const
+bool ContextDataSet::save(const char* basename, unsigned char mask) const
 {
 	// Open the files
 	for (int f = 0; f < NoFeatures; f ++)
@@ -299,7 +299,7 @@ bool ProfileDataSet::save(const char* basename, unsigned char mask) const
 		for (int i = 0; i < m_n_examples; i ++)
 			if (m_masks[i] == mask)
 			{
-				const double* values = (const double*)m_profiles[i]->m_features[f].dataR();
+				const double* values = (const double*)m_contexts[i]->m_features[f].dataR();
 				for (int k = 0; k < fsize; k ++)
 				{
 					file.printf("%f\t", values[k]);
@@ -316,7 +316,7 @@ bool ProfileDataSet::save(const char* basename, unsigned char mask) const
 /////////////////////////////////////////////////////////////////////////
 // Load the distribution
 
-bool ProfileDataSet::load(const char* dir_data, const char* name)
+bool ContextDataSet::load(const char* dir_data, const char* name)
 {
 	cleanup();
 
@@ -332,49 +332,49 @@ bool ProfileDataSet::load(const char* dir_data, const char* name)
 	// Read the number of samples
 	if (file.taggedRead(&m_n_examples, sizeof(long), 1, "NO") != 1)
 	{
-		print("ProfileDataSet::save - failed to read <NO> tag!\n");
+		print("ContextDataSet::load - failed to read <NO> tag!\n");
 		return false;
 	}
 
 	// Allocate data
 	m_masks = new unsigned char[m_n_examples];
-	m_profiles = new Profile*[m_n_examples];
+	m_contexts = new Context*[m_n_examples];
 	for (long s = 0; s < m_n_examples; s ++)
 	{
-		m_profiles[s] = new Profile;
+		m_contexts[s] = new Context;
 	}
 	m_capacity = m_n_examples;
 
 	// Read the masks (positive, negative, ground truth
 	if (file.taggedRead(m_masks, sizeof(unsigned char), m_n_examples, "MASKS") != m_n_examples)
 	{
-		print("ProfileDataSet::save - failed to read <MASKS> tag!\n");
+		print("ContextDataSet::load - failed to read <MASKS> tag!\n");
 		return false;
 	}
 
-	// Read each profile
+	// Read each context
 	for (long s = 0; s < m_n_examples; s ++)
 	{
-		Profile* profile = m_profiles[s];
+		Context* context = m_contexts[s];
 
-		if (	file.read(&profile->m_pattern.m_x, sizeof(short), 1) != 1 ||
-			file.read(&profile->m_pattern.m_y, sizeof(short), 1) != 1 ||
-			file.read(&profile->m_pattern.m_w, sizeof(short), 1) != 1 ||
-			file.read(&profile->m_pattern.m_h, sizeof(short), 1) != 1 ||
-			file.read(&profile->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
-			file.read(&profile->m_pattern.m_activation, sizeof(short), 1) != 1)
+		if (	file.read(&context->m_pattern.m_x, sizeof(short), 1) != 1 ||
+			file.read(&context->m_pattern.m_y, sizeof(short), 1) != 1 ||
+			file.read(&context->m_pattern.m_w, sizeof(short), 1) != 1 ||
+			file.read(&context->m_pattern.m_h, sizeof(short), 1) != 1 ||
+			file.read(&context->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
+			file.read(&context->m_pattern.m_activation, sizeof(short), 1) != 1)
 		{
-			print("ProfileDataSet::save - failed to read profile [%d/%d]!\n", s + 1, m_n_examples);
+			print("ContextDataSet::load - failed to read context [%d/%d]!\n", s + 1, m_n_examples);
 			return false;
 		}
 
 		for (int f = 0; f < NoFeatures; f ++)
 		{
-			if (file.read(	profile->m_features[f].dataW(),
+			if (file.read(	context->m_features[f].dataW(),
 					sizeof(double),
 					FeatureSizes[f]) != FeatureSizes[f])
 			{
-				print("ProfileDataSet::save - failed to read profile [%d/%d]!\n", s + 1, m_n_examples);
+				print("ContextDataSet::load - failed to read context [%d/%d]!\n", s + 1, m_n_examples);
 				return false;
 			}
 		}

@@ -53,19 +53,16 @@ bool RandomScaleExplorer::process(	ExplorerData& explorerData,
 		const int sw_y = sw_min_y + rand() % (sw_max_y - sw_min_y);
 
 		// Process the sub-window
-		if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
+		if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == true)
 		{
-			Torch::message("RandomScaleExplorer::process - could not process some sub-window!\n");
-			return false;
-		}
+			// Stop at the first detection if asked
+			if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
+			{
+				break;
+			}
 
-		// Stop at the first detection if asked
-		if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
-		{
-			break;
+			count ++;
 		}
-
-		count ++;
 	}
 
 	// ... debug message

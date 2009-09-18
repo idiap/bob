@@ -1,4 +1,4 @@
-#include "ProfileMachine.h"
+#include "ContextMachine.h"
 #include "File.h"
 
 namespace Torch
@@ -7,7 +7,7 @@ namespace Torch
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-ProfileMachine::ProfileMachine()
+ContextMachine::ContextMachine()
 	:	m_foutputs(NoFeatures),
 		m_fmodels(new LRMachine[NoFeatures])
 {
@@ -18,7 +18,7 @@ ProfileMachine::ProfileMachine()
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-ProfileMachine::~ProfileMachine()
+ContextMachine::~ContextMachine()
 {
 	delete[] m_fmodels;
 }
@@ -26,27 +26,27 @@ ProfileMachine::~ProfileMachine()
 /////////////////////////////////////////////////////////////////////////
 // Process the input tensor
 
-bool ProfileMachine::forward(const Tensor& input)
+bool ContextMachine::forward(const Tensor& input)
 {
 	// Extract features from input tensor
 	if (	input.getDatatype() != Tensor::Double ||
-		m_profile.copyFrom((const DoubleTensor&)input) == false)
+		m_context.copyFrom((const DoubleTensor&)input) == false)
 	{
-		Torch::message("ProfileMachine::forward - invalid input!\n");
+		Torch::message("ContextMachine::forward - invalid input!\n");
 		return false;
 	}
 
 	// Pass the features to the feature models
 	for (int f = 0; f < NoFeatures; f ++)
 	{
-		if (m_fmodels[f].forward(m_profile.m_features[f]) == false)
+		if (m_fmodels[f].forward(m_context.m_features[f]) == false)
 		{
-			Torch::message("ProfileMachine::forward - failed to run some feature model!\n");
+			Torch::message("ContextMachine::forward - failed to run some feature model!\n");
 			return false;
 		}
 
 		const double score = ((const DoubleTensor&)m_fmodels[f].getOutput()).get(0);
-		m_foutputs.set(f, score >= m_fmodels[f].getThreshold() ? 1.0 : -1.0);
+		m_foutputs.set(f, score - m_fmodels[f].getThreshold());
 	}
 
 	// Final decision: run the combined classifier
@@ -54,7 +54,7 @@ bool ProfileMachine::forward(const Tensor& input)
 
 	if (m_cmodel.forward(m_foutputs) == false)
 	{
-		Torch::message("ProfileMachine::forward - failed to run the combined classifier!\n");
+		Torch::message("ContextMachine::forward - failed to run the combined classifier!\n");
 		return false;
 	}
 
@@ -70,27 +70,27 @@ bool ProfileMachine::forward(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Loading/Saving the content from files (\emph{not the options})
 
-bool ProfileMachine::loadFile(File& file)
+bool ContextMachine::loadFile(File& file)
 {
 	// Check the ID
 	int id;
 	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
 	{
-		Torch::message("ProfileMachine::load - failed to read <ID> field!\n");
+		Torch::message("ContextMachine::load - failed to read <ID> field!\n");
 		return false;
 	}
 	if (id != getID())
 	{
-		Torch::message("ProfileMachine::load - invalid <ID>, this is not a ProfileMachine model!\n");
+		Torch::message("ContextMachine::load - invalid <ID>, this is not a ContextMachine model!\n");
 		return false;
 	}
 
-	// Load the profile feature models
+	// Load the context feature models
 	for (int f = 0; f < NoFeatures; f ++)
 	{
 		if (m_fmodels[f].loadFile(file) == false)
 		{
-			message("ProfileMachine::loadFile - invalid feature model [%d/%d]!\n",
+			message("ContextMachine::loadFile - invalid feature model [%d/%d]!\n",
 				f + 1, NoFeatures);
 			return false;
 		}
@@ -99,7 +99,7 @@ bool ProfileMachine::loadFile(File& file)
 	// Load the combined classifier
 	if (m_cmodel.loadFile(file) == false)
 	{
-		message("ProfileMachine::loadFile - invalid combined model!\n");
+		message("ContextMachine::loadFile - invalid combined model!\n");
 		return false;
 	}
 
@@ -107,22 +107,22 @@ bool ProfileMachine::loadFile(File& file)
 	return true;
 }
 
-bool ProfileMachine::saveFile(File& file) const
+bool ContextMachine::saveFile(File& file) const
 {
 	// Write the ID
 	const int id = getID();
 	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
 	{
-		Torch::message("ProfileMachine::save - failed to write <ID> field!\n");
+		Torch::message("ContextMachine::save - failed to write <ID> field!\n");
 		return false;
 	}
 
-	// Write the profile feature models
+	// Write the context feature models
 	for (int f = 0; f < NoFeatures; f ++)
 	{
 		if (m_fmodels[f].saveFile(file) == false)
 		{
-			Torch::message("ProfileMachine::save - failed to write the feature model [%d/%d]!\n",
+			Torch::message("ContextMachine::save - failed to write the feature model [%d/%d]!\n",
 				f + 1, NoFeatures);
 			return false;
 		}
@@ -131,7 +131,7 @@ bool ProfileMachine::saveFile(File& file) const
 	// Write the combined classifier
 	if (m_cmodel.saveFile(file) == false)
 	{
-		Torch::message("ProfileMachine::save - failed to write the combined model!\n");
+		Torch::message("ContextMachine::save - failed to write the combined model!\n");
 		return true;
 	}
 

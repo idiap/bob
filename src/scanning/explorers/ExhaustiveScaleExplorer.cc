@@ -53,22 +53,18 @@ bool ExhaustiveScaleExplorer::process(	ExplorerData& explorerData,
 	for (int sw_x = sw_min_x; sw_x < sw_max_x; sw_x += dx)
 		for (int sw_y = sw_min_y; sw_y < sw_max_y; sw_y += dy)
 		{
-		        // Process the sub-window
-			if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == false)
+		        if (ScaleExplorer::processSW(sw_x, sw_y, sw_w, sw_h, explorerData) == true)
 			{
-				Torch::message("ExhaustiveScaleExplorer::process - failed to process some sub-window!\n");
-				return false;
-			}
+				// Stop at the first detection if asked
+				if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
+				{
+					// This will exit gracefully the double <for>
+					sw_x = sw_max_x + 1;
+					sw_y = sw_max_y + 1;
+				}
 
-			// Stop at the first detection if asked
-			if (stopAtFirstDetection && explorerData.m_patterns.isEmpty() == false)
-			{
-				// This will exit gracefully the double <for>
-				sw_x = sw_max_x + 1;
-				sw_y = sw_max_y + 1;
+				count ++;
 			}
-
-			count ++;
 		}
 
 	// ... debug message

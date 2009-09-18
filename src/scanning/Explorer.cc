@@ -68,8 +68,7 @@ Explorer::Explorer()
 	: 	m_data(0),
 		m_scales(0),
 		m_scale_explorers(0),
-		m_scale_prune_ips(0),
-		m_scale_evaluation_ips(0),
+		m_scale_ips(0),
 		m_scale_rois(0),
 		m_n_scales(0)
 {
@@ -79,7 +78,6 @@ Explorer::Explorer()
 	addIOption("min_patt_h", 0, "pattern minimum allowed height");
 	addIOption("max_patt_h", 4096, "pattern maximum allowed height");
 	addFOption("ds", 1.25f, "scale variation from the smallest to the largest window size");
-	addFOption("ds", 0.1f, "scale variation");
 	addBOption("StopAtFirstDetection", false, "stop at the first candidate patterns");
 	addBOption("StartWithLargeScales", false, "large to small scales scanning");
 }
@@ -101,14 +99,12 @@ void Explorer::deallocateScales()
 {
 	delete[] m_scales;
 	delete[] m_scale_explorers;
-	delete[] m_scale_prune_ips;
-	delete[] m_scale_evaluation_ips;
+	delete[] m_scale_ips;
 	delete[] m_scale_rois;
 
 	m_scales = 0;
 	m_scale_explorers = 0;
-	m_scale_prune_ips = 0;
-	m_scale_evaluation_ips = 0;
+	m_scale_ips = 0;
 	m_scale_rois = 0;
 	m_n_scales = 0;
 }
@@ -130,16 +126,14 @@ bool Explorer::resizeScales(int n_scales)
 	m_n_scales = n_scales;
 	m_scales = new sSize[n_scales];
 	m_scale_explorers = new ScaleExplorer*[n_scales];
-	m_scale_prune_ips = new spCore*[n_scales];
-	m_scale_evaluation_ips = new spCore*[n_scales];
+	m_scale_ips = new spCore*[n_scales];
 	m_scale_rois = new sRect2D[n_scales];
 
 	// Initialize scales
 	for (int i = 0; i < n_scales; i ++)
 	{
 		m_scale_explorers[i] = 0;
-		m_scale_prune_ips[i] = 0;
-		m_scale_evaluation_ips[i] = 0;
+		m_scale_ips[i] = 0;
 	}
 
 	return true;
@@ -181,41 +175,8 @@ bool Explorer::setScaleExplorer(int index_scale, ScaleExplorer* scaleExplorer)
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Set the features to use for the scales (different or the same)
-//	(for prunning and pattern evaluation)
+// Set the features to use for the scales (different or the same) (for pattern evaluation)
 // (If they are 0/NULL, then the original input tensor will be used!)
-
-bool Explorer::setScalePruneIp(spCore* scalePruneIp)
-{
-	// Check parameters
-	if (	m_n_scales < 1 || m_scales == 0)
-	{
-		Torch::message("Explorer::setScalePruneIp - invalid parameters!\n");
-		return false;
-	}
-
-	// Copy the scale pruner
-	for (int i = 0; i < m_n_scales; i ++)
-	{
-		m_scale_prune_ips[i] = scalePruneIp;
-	}
-	return true;
-}
-
-bool Explorer::setScalePruneIp(int index_scale, spCore* scalePruneIp)
-{
-	// Check parameters
-	if (	m_n_scales < 1 || m_scales == 0 ||
-		index_scale < 0 || index_scale >= m_n_scales)
-	{
-		Torch::message("Explorer::setScalePruneIp - invalid parameters!\n");
-		return false;
-	}
-
-	// Copy the scale pruner
-	m_scale_prune_ips[index_scale] = scalePruneIp;
-	return true;
-}
 
 bool Explorer::setScaleEvaluationIp(spCore* scaleEvaluationIp)
 {
@@ -229,7 +190,7 @@ bool Explorer::setScaleEvaluationIp(spCore* scaleEvaluationIp)
 	// Copy the scale evaluator
 	for (int i = 0; i < m_n_scales; i ++)
 	{
-		m_scale_evaluation_ips[i] = scaleEvaluationIp;
+		m_scale_ips[i] = scaleEvaluationIp;
 	}
 	return true;
 }
@@ -245,7 +206,7 @@ bool Explorer::setScaleEvaluationIp(int index_scale, spCore* scaleEvaluationIp)
 	}
 
 	// Copy the scale pruner
-	m_scale_evaluation_ips[index_scale] = scaleEvaluationIp;
+	m_scale_ips[index_scale] = scaleEvaluationIp;
 	return true;
 }
 

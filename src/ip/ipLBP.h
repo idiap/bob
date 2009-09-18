@@ -46,15 +46,9 @@ namespace Torch
 		/////////////////////////////////////////////
 		// Access functions
 
-		// Get the maximum possible label
 		virtual int		getMaxLabel() = 0;
-
-		// Get the radius value of the LBP operator
 		int			getR() { return m_R; };
-
-		// Get the LBP code (fast & direct) access
 		int			getLBP() const { return *m_lbp; }
-
 		int			getX() const { return m_x; }
 		int			getY() const { return m_y; }
 
@@ -104,56 +98,61 @@ namespace Torch
 		class IntegralFactors
 		{
 		public:
-			// Get the only instance
-			static IntegralFactors& getInstance()
-			{
-				static IntegralFactors instance;
-				return instance;
-			}
-
-			// Destructor
-			~IntegralFactors()
-			{
-				resizeModel(0, 0);
-			}
-
-			// Resize to a new model size
-			void			resizeModel(int model_w, int model_h);
-
-			// Resize to a new subwindow size
-			void			resizeSW(int sw_w, int sw_h, int input_stride_w, int input_stride_h);
-
-			// Access functions
-			int**			getIItl() { return m_ii_tl; }
-			int**			getIItr() { return m_ii_tr; }
-			int**			getIIbl() { return m_ii_bl; }
-			int**			getIIbr() { return m_ii_br; }
-			int**			getIIcellsize() { return m_ii_cell_size; }
-
-		private:
-
 			// Constructor
 			IntegralFactors()
 				:	m_model_w(0), m_model_h(0),
 					m_sw_w(0), m_sw_h(0),
-					m_ii_tl(0), m_ii_tr(0), m_ii_bl(0), m_ii_br(0), m_ii_cell_size(0)
+					m_dx(0), m_dy(0),
+					m_cell_w(0), m_cell_w1(0), m_cell_w12(0),
+					m_cell_h(0), m_cell_h1(0), m_cell_h12(0)
 			{
 			}
 
-			// Copy constructor and assignment operator (not defined)
-			IntegralFactors(const IntegralFactors& other);
-			IntegralFactors& operator=(const IntegralFactors& other);
+			// Resize to a new model/subwindow size
+			void			resizeModel(int model_w, int model_h);
+			void			resizeSW(int sw_w, int sw_h, int stride_w, int stride_h,
+							int mask_x, int mask_y, int mask_radius);
+
+			// Access functions
+			const int&		getDx() const { return m_dx; }
+			const int&		getDy() const { return m_dy; }
+			const int&		getCellW() const { return m_cell_w; }
+			const int&		getCellW1() const { return m_cell_w1; }
+			const int&		getCellW12() const { return m_cell_w12; }
+			const int&		getCellH() const { return m_cell_h; }
+			const int&		getCellH1() const { return m_cell_h1; }
+			const int&		getCellH12() const { return m_cell_h12; }
+
+		private:
+
+//				     <----------------->
+//				       w1     w2    w1
+//			   	     <-----><---><----->
+//			               w12
+//			   	     <----------->
+//
+//				P1 o +-----+-----+-----+ o P4		|			|
+//				     |  P2 |     | P3  |		|			|
+//				     |     |     |     |		| h1			|
+//				     |     |     |     |		|			| h12
+//				P5 o +-----+-----+-----+ o P8		|			|
+//				     |  P6 |     | P7  |			|		|
+//				     |     |     |     |			| h2 		|
+//				     |     |     |     |			|		|
+//				P9 o +-----+-----+-----+ o P12			|		|
+//				     | P10 |     | P11 |
+//				     |     |     |     |
+//				     |     |     |     |
+//				P13o +-----+-----+-----+ o P16
+//				     	P14        P15
+
 
 			// Attributes
-			int			m_model_w;	// Model size
-			int			m_model_h;
-			int			m_sw_w;		// Subwindow size
-			int			m_sw_h;
-			int**			m_ii_tl;	// top left: [m_model_w]x[m_model_h]
-			int**			m_ii_tr;	// top right: [m_model_w]x[m_model_h]
-			int**			m_ii_bl;	// bottom left: [m_model_w]x[m_model_h]
-			int**			m_ii_br;	// bottom right: [m_model_w]x[m_model_h]
-			int**			m_ii_cell_size;	// [m_model_w]x[m_model_h]
+			int			m_model_w, m_model_h;		// Model size
+			int			m_sw_w, m_sw_h;			// Subwindow size
+			int			m_dx, m_dy;			// Displacement from the subwindow top-left corner
+			int			m_cell_w, m_cell_w1, m_cell_w12;// As in the figure above
+			int			m_cell_h, m_cell_h1, m_cell_h12;// As in the figure above
 		};
 
 		/////////////////////////////////////////////////////////////////
@@ -192,6 +191,12 @@ namespace Torch
 		bool			m_addAvgBit;
 		bool			m_uniform;
 		bool			m_rot_invariant;
+
+		// Indicate if the model size is different than the subwindow size -> needing interpolation
+		bool			m_need_interp;
+
+		// Integral image scalling factors
+		IntegralFactors		m_ii_factors;
 	};
 }
 

@@ -20,7 +20,7 @@ SET(scanning_SUBDIRS
 	explorers
 	pruners
 	selectors
-	profile)
+	context)
 
 FOREACH(subdir ${scanning_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})

@@ -11,12 +11,43 @@ namespace Torch
 	class Explorer;
 	class Selector;
 
+	// Global object to "inform" ipXXX classes that they are used for multiscale, pyramid
+	//	or some other scanning procedure
+	enum ScanType
+	{
+		ScanTypeMultiscale,
+		ScanTypePyramid,
+		ScanTypeOther
+	};
+	class CurrentScanType
+	{
+	public:
+
+		static CurrentScanType& getInstance()
+		{
+			static CurrentScanType instance;
+			return instance;
+		}
+
+		~CurrentScanType() {}
+
+		ScanType	get() const { return m_value; }
+		void		set(ScanType value) { m_value = value; }
+
+	private:
+
+		CurrentScanType() : m_value(ScanTypePyramid) {}
+		CurrentScanType(const CurrentScanType& other);
+		CurrentScanType& operator=(const CurrentScanType& other);
+
+		ScanType	m_value;
+	};
+
 	// HOW TO USE:
 	// --------------------------------
 	// init(image)
 	// ... setScaleXXX as wanted
 	// setROIs
-	// preprocess(image)
 	// process(image)
 	// --------------------------------
 
@@ -60,9 +91,6 @@ namespace Torch
 
 		// Initialize the scanning (check parameters/objects, initialize explorer)
 		bool				init(const Image& image);
-
-		// Preprocess the image (store features in the explorer)
-		bool				preprocess(const Image& image);
 
 		// Process some image to scan for patterns
 		bool	 			process(const Image& image);

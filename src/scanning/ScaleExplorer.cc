@@ -45,9 +45,13 @@ bool ScaleExplorer::init(int sw_w, int sw_h, const sRect2D& roi)
 
 bool ScaleExplorer::processSW(int sw_x, int sw_y, int sw_w, int sw_h, ExplorerData& explorerData)
 {
+	const int dw = sw_w / 3;
+	const int dh = sw_h / 3;
+
 	// Check parameters
-	if (	sw_x < 0 || sw_y < 0 || sw_w < 0 || sw_h < 0 ||
-		sw_x + sw_w >= explorerData.m_image_w || sw_y + sw_h >= explorerData.m_image_h)
+	if (	sw_x < dw || sw_y < dh || sw_w < 0 || sw_h < 0 ||
+		sw_x + sw_w + dw >= explorerData.m_image_w ||
+		sw_y + sw_h + dh >= explorerData.m_image_h)
 	{
 		return false;
 	}

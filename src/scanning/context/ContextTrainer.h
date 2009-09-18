@@ -1,16 +1,16 @@
-#ifndef _TORCHVISION_SCANNING_PROFILE_TRAINER_H_
-#define _TORCHVISION_SCANNING_PROFILE_TRAINER_H_
+#ifndef _TORCHVISION_SCANNING_CONTEXT_TRAINER_H_
+#define _TORCHVISION_SCANNING_CONTEXT_TRAINER_H_
 
-#include "Trainer.h"		// <ProfileTrainer> is a <Trainer>
+#include "Trainer.h"		// <ContextTrainer> is a <Trainer>
 
 namespace Torch
 {
-	class ProfileMachine;
-	class ProfileDataSet;
+	class ContextMachine;
+	class ContextDataSet;
 
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::ProfileTrainer:
-	//	- trains ProfileMachine using two ProfileDataSets:
+	// Torch::ContextTrainer:
+	//	- trains ContextMachine using two ContextDataSets:
 	//		- one for training and one for validation
         //
         //      - PARAMETERS (name, type, default value, description):
@@ -19,15 +19,15 @@ namespace Torch
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class ProfileTrainer : public Torch::Trainer
+	class ContextTrainer : public Torch::Trainer
 	{
 	public:
 
 		// Constructor
-		ProfileTrainer();
+		ContextTrainer();
 
 		// Destructor
-		virtual ~ProfileTrainer();
+		virtual ~ContextTrainer();
 
 		// Train the given machine on the given dataset
 		virtual bool 		train();
@@ -35,12 +35,9 @@ namespace Torch
 		// Set the validation dataset
 		bool			setValidationData(DataSet* dataset);
 
-		// Test the Profile machine (returns the detection rate in percentages)
-		static double		test(ProfileMachine* machine, ProfileDataSet* samples);
-
-		// Test the Profile machine (returns the TAR and FAR and FA)
-		static void		test(ProfileMachine* machine, ProfileDataSet* samples,
-						double& tar, double& far, long& fa);
+		// Test the Context machine
+		static void		test(ContextMachine* machine, ContextDataSet* samples,
+						double& TAR, double& FAR, double& HTER);
 
         private:
 

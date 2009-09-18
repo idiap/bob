@@ -1,12 +1,12 @@
-#ifndef _TORCHVISION_SCANNING_PROFILE_SAMPLE_H_
-#define _TORCHVISION_SCANNING_PROFILE_SAMPLE_H_
+#ifndef _TORCHVISION_SCANNING_CONTEXT_SAMPLE_H_
+#define _TORCHVISION_SCANNING_CONTEXT_SAMPLE_H_
 
 #include "Pattern.h"
 #include "Tensor.h"
 
 namespace Torch
 {
-	class GreedyExplorer;
+	class ContextExplorer;
 
 	// Features
 	enum FeatureType
@@ -87,30 +87,30 @@ namespace Torch
 	};
 
         /////////////////////////////////////////////////////////////////////////
-	// Torch::Sample:
-	//	- gathers features from profile data (around some sub-window)
+	// Torch::Context:
+	//	- gathers features from context data (around some sub-window)
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	struct Profile
+	struct Context
 	{
 	public:
 		// Constructor
-		Profile();
+		Context();
 
 		// Destructor
-		~Profile();
+		~Context();
 
 		// Copy constructor
-		Profile(const Profile& other);
+		Context(const Context& other);
 
 		// Assignment operator
-		Profile& operator=(const Profile& other);
+		Context& operator=(const Context& other);
 
-		// Reset to a new sub-window profile
+		// Reset to a new sub-window context
 		void 			reset(	const Pattern& pattern,
-						const GreedyExplorer& explorer);
+						const ContextExplorer& explorer);
 
 		// Copy the features to 2D tensor (to be passed to machines) of [NoFeatures] x [MaxNoDimensions]
 		void			copyTo(DoubleTensor& tensor) const;

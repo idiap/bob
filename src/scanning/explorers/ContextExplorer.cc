@@ -1,4 +1,4 @@
-#include "GreedyExplorer.h"
+#include "ContextExplorer.h"
 #include "ipSWEvaluator.h"
 #include "ScaleExplorer.h"
 #include "File.h"
@@ -17,7 +17,7 @@ namespace Torch
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-GreedyExplorer::GreedyExplorer(Mode mode)
+ContextExplorer::ContextExplorer(Mode mode)
 	: 	MSExplorer(),
 		m_mode(mode),
 		m_ctx_type(Full), m_ctx_size(0), m_ctx_flags(0), m_ctx_scores(0),
@@ -31,7 +31,7 @@ GreedyExplorer::GreedyExplorer(Mode mode)
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-GreedyExplorer::~GreedyExplorer()
+ContextExplorer::~ContextExplorer()
 {
 	delete[] m_ctx_flags;
 	delete[] m_ctx_scores;
@@ -44,7 +44,7 @@ GreedyExplorer::~GreedyExplorer()
 /////////////////////////////////////////////////////////////////////////
 /// called when some option was changed
 
-void GreedyExplorer::optionChanged(const char* name)
+void ContextExplorer::optionChanged(const char* name)
 {
 	switch (getIOption("ctx_type"))
 	{
@@ -126,7 +126,7 @@ void GreedyExplorer::optionChanged(const char* name)
 /////////////////////////////////////////////////////////////////////////
 // Set the context classifier
 
-bool GreedyExplorer::setContextModel(const char* filename)
+bool ContextExplorer::setContextModel(const char* filename)
 {
 	File file;
 	return 	file.open(filename, "r") &&
@@ -134,16 +134,24 @@ bool GreedyExplorer::setContextModel(const char* filename)
 }
 
 /////////////////////////////////////////////////////////////////////////
+// Initialize the context-based scanning
+
+bool ContextExplorer::initContext()
+{
+	return MSExplorer::process();
+}
+
+/////////////////////////////////////////////////////////////////////////
 // Process the image (check for pattern's sub-windows)
 
-bool GreedyExplorer::process()
+bool ContextExplorer::process()
 {
 	const bool verbose = getBOption("verbose");
 
-	// Scan the image using MS
-	if (MSExplorer::process() == false)
+	// Initialize the scanning
+	if (initContext() == false)
 	{
-		Torch::message("GreedyExplorer::process - error initializing the search space!\n");
+		Torch::message("ContextExplorer::process - error initializing the search space!\n");
 		return false;
 	}
 
@@ -157,90 +165,75 @@ bool GreedyExplorer::process()
 			static const double eps_size = 0.05;
 			static const double eps_center = 0.05;
 
-			// TODO: how to check for convergence:
-			//	- all subwindows move less than a percentage (10% of their size)
-			// 	- this percentage can be made at each iteration smaller and smaller!
-			// TODO: ideas to reduce the size of the context
-			//	- make it smaller
-			//	- sample a fixed number of random locations
-			//	- sample a fixed number of learned locations
-			//	- use a different 3D representation (not a grid/cube, but like a star?!)
-			// NB: At the end the detections should be clustered using a relaxed kernel (constant)
-
 			// Buffers
-			Profile profile;
-			DoubleTensor pf_tensor;
-			Pattern sw_ctx;
+			static Context context;
+			static DoubleTensor ctx_tensor;
+			static Pattern sw_ctx;
 
-			PatternList procSWs;			// Processed SWs
-			PatternList crtSWs;			// Current SWs
+			static PatternList procSWs;		// Processed SWs
+			static PatternList crtSWs;		// Current SWs
+			procSWs.clear();
 			procSWs.add(m_data->m_patterns);
 
-			// Greedy scanning:
-			//	- MS to initialize
-			//	- repeat (until convergence):
-			//		- profile detections
-			//		- keep only detections that pass the context-based model
-			//		- move the detections to the contextual SW estimate
+			// Repeat (until convergence):
+			//	- build contexts for all detections
+			//	- keep only detections that pass the context-based model (if required)
+			//	- move the detections to the contextual SW estimate
 			int n_iters = 0;
-			bool convergence = false;
-			while (n_iters < max_n_iters && convergence == false)
+			double max_diff_center = 100000.0, max_diff_size = 100000.0;
+			while (n_iters < max_n_iters && (max_diff_size > eps_size || max_diff_center > eps_center))
 			{
 				crtSWs.clear();
 				crtSWs.add(procSWs);
 				procSWs.clear();
 
-				// Test each SW against the profile model
-				double max_diff_center = 0.0;
-				double max_diff_size = 0.0;
+				// Process eash SW
+				max_diff_center = 0.0, max_diff_size = 0.0;
 				for (int i = 0; i < crtSWs.size(); i ++)
 				{
+					// Build the context
 					m_data->clear();
-
 					const Pattern& sw = crtSWs.get(i);
-					if (profileSW(sw) == false)
+					if (buildSWContext(sw) == false)
 					{
-						Torch::message("GreedyExplorer::process - error profiling a SW!\n");
+						Torch::message("ContextExplorer::converge - error building the context!\n");
 						return false;
 					}
 
-					profile.reset(sw, *this);
-					profile.copyTo(pf_tensor);
-
-					if (m_ctx_model.forward(pf_tensor) == false)
+					// Check if the SW is a false alarm
+					context.reset(sw, *this);
+					context.copyTo(ctx_tensor);
+					if (m_ctx_model.forward(ctx_tensor) == false)
 					{
-						Torch::message("GreedyExplorer::process - failed to run the profile model!\n");
+						Torch::message("ContextExplorer::converge - failed to run the context model!\n");
 						return false;
 					}
-
-					// If it's not a false alarms, replace it with its contextual estimation
-					if (m_ctx_model.isPattern() == true)
+					if (m_ctx_model.isPattern() == false)
 					{
-						m_ctx_sw_merger->merge(sw_ctx);
-						procSWs.add(	sw_ctx,
-								true);	// Remove duplicates!
-
-						// Compute how much the center and the size of the SW was changed
-						const double dw = abs(sw.m_w - sw_ctx.m_w);
-						const double dh = abs(sw.m_h - sw_ctx.m_h);
-						const double dcx = abs(sw.getCenterX() - sw_ctx.getCenterX());
-						const double dcy = abs(sw.getCenterY() - sw_ctx.getCenterY());
-
-						max_diff_size = max(max_diff_size, (dw + dh) / (sw.m_w + sw.m_h));
-						max_diff_center = max(max_diff_center, (dcx + dcy) / (sw.m_w + sw.m_h));
+						continue;
 					}
+
+					// OK: replace it with its context prediction
+					m_ctx_sw_merger->merge(sw_ctx);
+					procSWs.add(sw_ctx, true);	// Remove duplicates!
+
+					// Compute how much the center and the size of the SW was changed
+					const double dw = abs(sw.m_w - sw_ctx.m_w);
+					const double dh = abs(sw.m_h - sw_ctx.m_h);
+					const double dcx = abs(sw.getCenterX() - sw_ctx.getCenterX());
+					const double dcy = abs(sw.getCenterY() - sw_ctx.getCenterY());
+
+					max_diff_size = max(max_diff_size, (dw + dh) / (sw.m_w + sw.m_h));
+					max_diff_center = max(max_diff_center, (dcx + dcy) / (sw.m_w + sw.m_h));
 				}
 
 				if (verbose == true)
 				{
-					print("GreedyExplorer: [%d/%d] - from %d to %d SWs, max_diff_size = %lf, max_diff_center = %lf ...\n",
+					print("ContextExplorer: [%d/%d] - from %d to %d SWs, max_diff_size = %lf, max_diff_center = %lf ...\n",
 						n_iters + 1, max_n_iters,
 						crtSWs.size(), procSWs.size(),
 						max_diff_size, max_diff_center);
 				}
-
-				// Check if convergence was reached
-				convergence = (max_diff_size < eps_size) && (max_diff_center < eps_center);
 
 				n_iters ++;
 			}
@@ -257,7 +250,7 @@ bool GreedyExplorer::process()
 		// Profiling along candidate SWs
 	case Profiling:
 		{
-			// Nothing to do - the user retrieves the profiles using <profileSW> function!
+			// Nothing to do - the user retrieves the profiles using <buildSWContext> function!
 		}
 		break;
 	}
@@ -267,9 +260,9 @@ bool GreedyExplorer::process()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Profile some SW - fill the profile around it
+// Build the context for some SW
 
-bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
+bool ContextExplorer::buildSWContext(int sw_x, int sw_y, int sw_w, int sw_h)
 {
 	m_ctx_sw_merger->reset();
 	m_ctx_sw_merger->add(Pattern(sw_x, sw_y, sw_w, sw_h, 0.0));
@@ -294,7 +287,11 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 				const int new_sw_x = FixI(center_x - 0.5 * ds * sw_w);
 				const int new_sw_y = FixI(center_y - 0.5 * ds * sw_h);
 
-				addSWToProfile(new_sw_x, new_sw_y, new_sw_w, new_sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+				testSW(new_sw_x, new_sw_y, new_sw_w, new_sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+				if (m_ctx_flags[index] != 0x00)
+				{
+					m_ctx_sw_merger->add(Pattern(new_sw_x, new_sw_y, new_sw_w, new_sw_h, m_ctx_scores[index]));
+				}
 			}
 
 			// Vary the Ox coordinate
@@ -303,7 +300,11 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 			{
 				const int new_sw_x = sw_x + ix * dx;
 
-				addSWToProfile(new_sw_x, sw_y, sw_w, sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+				testSW(new_sw_x, sw_y, sw_w, sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+				if (m_ctx_flags[index] != 0x00)
+				{
+					m_ctx_sw_merger->add(Pattern(new_sw_x, sw_y, sw_w, sw_h, m_ctx_scores[index]));
+				}
 			}
 
 			// Vary the Oy coordinate
@@ -312,7 +313,11 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 			{
 				const int new_sw_y = sw_y + iy * dy;
 
-				addSWToProfile(sw_x, new_sw_y, sw_w, sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+				testSW(sw_x, new_sw_y, sw_w, sw_h, m_ctx_flags[index], m_ctx_scores[index]);
+				if (m_ctx_flags[index] != 0x00)
+				{
+					m_ctx_sw_merger->add(Pattern(sw_x, new_sw_y, sw_w, sw_h, m_ctx_scores[index]));
+				}
 			}
 		}
 		break;
@@ -340,8 +345,14 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 					{
 						const int new_sw_y = sw_y + iy * dy;
 
-						addSWToProfile(	new_sw_x, new_sw_y, new_sw_w, new_sw_h,
-								m_ctx_flags[index], m_ctx_scores[index]);
+						testSW(	new_sw_x, new_sw_y, new_sw_w, new_sw_h,
+							m_ctx_flags[index], m_ctx_scores[index]);
+						if (m_ctx_flags[index] != 0x00)
+						{
+							m_ctx_sw_merger->add(Pattern(
+								new_sw_x, new_sw_y, new_sw_w, new_sw_h,
+								m_ctx_scores[index]));
+						}
 					}
 				}
 			}
@@ -354,15 +365,15 @@ bool GreedyExplorer::profileSW(int sw_x, int sw_y, int sw_w, int sw_h)
 	return true;
 }
 
-bool GreedyExplorer::profileSW(const Pattern& pattern)
+bool ContextExplorer::buildSWContext(const Pattern& pattern)
 {
-	return profileSW(pattern.m_x, pattern.m_y, pattern.m_w, pattern.m_h);
+	return buildSWContext(pattern.m_x, pattern.m_y, pattern.m_w, pattern.m_h);
 }
 
 /////////////////////////////////////////////////////////////////////////
-// Add a subwindow to the profile
+// Test a subwindow
 
-void GreedyExplorer::addSWToProfile(	int sw_x, int sw_y, int sw_w, int sw_h,
+void ContextExplorer::testSW(	int sw_x, int sw_y, int sw_w, int sw_h,
 					unsigned char& flag, double& score)
 {
 	const int image_w = m_data->m_image_w;
@@ -387,7 +398,6 @@ void GreedyExplorer::addSWToProfile(	int sw_x, int sw_y, int sw_w, int sw_h,
 			const Pattern& det_sw = m_data->m_patterns.get(old_size);
 			flag = 0x01;
 			score = det_sw.m_confidence;
-			m_ctx_sw_merger->add(det_sw);
 		}
 	}
 }
