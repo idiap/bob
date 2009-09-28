@@ -53,6 +53,9 @@ namespace Torch
 
 		///////////////////////////////////////////////////////////
 
+		int getNinputs() { return n_inputs; };
+		int getNoutputs() { return n_outputs; };
+
 		DoubleTensor*	m_beta; // the derivative with respect to the inputs
 
 	protected:

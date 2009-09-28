@@ -8,7 +8,6 @@ using namespace Torch;
 ///////////////////////////////////////////////////////////////////////////
 int main()
 {
-
    	THRandom_manualSeed(950305);
 
 	print("\n\nTesting 1D DCT\n\n");

@@ -178,6 +178,8 @@ bool GradientMachine::loadFile(File& file)
 
 	resize(n_inputs_, n_outputs_);
 
+	//m_parameters->print("Gradient Machine");
+
 	// OK
 	return true;
 }
@@ -197,6 +199,8 @@ bool GradientMachine::saveFile(File& file) const
 	        Torch::message("GradientMachine::load - failed to write parameters\n");
 		return false;
 	}
+
+	//m_parameters->print("Gradient Machine");
 
 	// OK
 	return true;
