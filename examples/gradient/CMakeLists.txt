@@ -27,7 +27,7 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
-	loadsave.cc gradientmachines.cc mlpforward1.cc mlpforward2.cc xor.cc mlpclassification.cc)
+	gradientmachines.cc mlpforward1.cc mlpforward2.cc xor.cc mlpclassification.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
