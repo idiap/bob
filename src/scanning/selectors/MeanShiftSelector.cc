@@ -206,10 +206,12 @@ double MeanShiftSelector::getBandwidth(double* distances, int size, int& kcloses
 
 	else
 	{
+		kclosest = size - 1;
 //		static const double kclosest_max_var = 3.0;	// Maximum variation (avg +/- n * stdev) to find kclosest
 //		static const double inv_kclosest_max_var = 1.0 / kclosest_max_var;
 //
 //		// Search the closest points that are within average +/- N * sigma from the previous ones
+//		kclosest = 0;
 //		double sum = distances[kclosest] + distances[kclosest + 1];
 //		double sum_square = distances[kclosest] * distances[kclosest] + distances[kclosest + 1] * distances[kclosest + 1];
 //
@@ -231,7 +233,6 @@ double MeanShiftSelector::getBandwidth(double* distances, int size, int& kcloses
 //			sum_square += distances[kclosest] * distances[kclosest];
 //		}
 
-		kclosest = size - 1;
 		return distances[kclosest];
 	}
 }

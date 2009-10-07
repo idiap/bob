@@ -20,6 +20,8 @@ namespace Torch
 LRTrainer::LRTrainer()
 	:	m_validation_dataset(0)
 {
+	addDOption("FARvsFRRRatio", 1.0, "FAR vs FRR ratio: between 0.0 and 1.0");
+	addBOption("useL1", false, "Use L1 norm regularization term");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +51,8 @@ bool LRTrainer::setValidationData(DataSet* dataset)
 bool LRTrainer::train()
 {
 	const bool verbose = getBOption("verbose");
+	const bool useL1 = getBOption("useL1");
+	const double FARvsFRRRatio = getDOption("FARvsFRRRatio");
 
 	// Check parameters
 	if (	m_machine == 0 ||
@@ -100,46 +104,50 @@ bool LRTrainer::train()
 	double best_threshold = 0.5;
 
 	// Set constants
-	const int n_L1_priors = 19;
+	const int n_L1_priors = 25;
 	const double L1_priors[n_L1_priors] =
 	{
-		0.0001, 0.0002, 0.0005,
-		0.0010, 0.0020, 0.0050,
-		0.0100, 0.0200, 0.0500,
-		0.1000, 0.2000, 0.5000,
-		1.0000, 2.0000, 5.0000,
-		10.000, 20.000, 50.000,
-		100.00
+		0.000001, 0.000002, 0.000005,
+		0.000010, 0.000020, 0.000050,
+		0.000100, 0.000200, 0.000500,
+		0.001000, 0.002000, 0.005000,
+		0.010000, 0.020000, 0.050000,
+		0.100000, 0.200000, 0.500000,
+		1.000000, 2.000000, 5.000000,
+		10.00000, 20.00000, 50.00000,
+		100.0000
 	};
 
-	const int n_L2_priors = 19;
+	const int n_L2_priors = 25;
 	const double L2_priors[n_L2_priors] =
 	{
-		0.0001, 0.0002, 0.0005,
-		0.0010, 0.0020, 0.0050,
-		0.0100, 0.0200, 0.0500,
-		0.1000, 0.2000, 0.5000,
-		1.0000, 2.0000, 5.0000,
-		10.000, 20.000, 50.000,
-		100.00
+		0.000001, 0.000002, 0.000005,
+		0.000010, 0.000020, 0.000050,
+		0.000100, 0.000200, 0.000500,
+		0.001000, 0.002000, 0.005000,
+		0.010000, 0.020000, 0.050000,
+		0.100000, 0.200000, 0.500000,
+		1.000000, 2.000000, 5.000000,
+		10.00000, 20.00000, 50.00000,
+		100.0000
 	};
 
-	// Optimize L1 prior value against the validation dataset
-	for (int i_l1 = 0; i_l1 < n_L1_priors; i_l1 ++)
+	// Optimize L1 prior value against the validation dataset - if required
+	for (int i_l1 = 0; i_l1 < n_L1_priors && useL1 == true; i_l1 ++)
 	{
 		const double L1_prior = L1_priors[i_l1];
 
 		// Train
-		if (train(L1_prior, best_L2_prior, weights, gradients, buf_gradients, fselected, size, verbose) == false)
+		if (train(L1_prior, best_L2_prior, FARvsFRRRatio, weights, gradients, buf_gradients, fselected, size, verbose) == false)
 		{
 			continue;
 		}
 		lr_machine->setWeights(weights);
-		optimize(lr_machine, m_validation_dataset);
+		optimize(lr_machine, m_validation_dataset, FARvsFRRRatio);
 
 		// Test if the new parameters are better
 		double TAR, FAR, HTER;
-		test(lr_machine, m_validation_dataset, TAR, FAR, HTER);
+		test(lr_machine, m_validation_dataset, TAR, FAR, HTER, FARvsFRRRatio);
 		if (HTER < best_HTER)
 		{
 			for (int i = 0; i <= size; i ++)
@@ -166,16 +174,16 @@ bool LRTrainer::train()
 		const double L2_prior = L2_priors[i_l2];
 
 		// Train
-		if (train(best_L1_prior, L2_prior, weights, gradients, buf_gradients, fselected, size, verbose) == false)
+		if (train(best_L1_prior, L2_prior, FARvsFRRRatio, weights, gradients, buf_gradients, fselected, size, verbose) == false)
 		{
 			continue;
 		}
 		lr_machine->setWeights(weights);
-		optimize(lr_machine, m_validation_dataset);
+		optimize(lr_machine, m_validation_dataset, FARvsFRRRatio);
 
 		// Test if the new parameters are better
 		double TAR, FAR, HTER;
-		test(lr_machine, m_validation_dataset, TAR, FAR, HTER);
+		test(lr_machine, m_validation_dataset, TAR, FAR, HTER, FARvsFRRRatio);
 		if (HTER < best_HTER)
 		{
 			for (int i = 0; i <= size; i ++)
@@ -243,10 +251,12 @@ bool LRTrainer::train()
 
 struct LBFGS_Data
 {
-	LBFGS_Data(	DataSet* dataset, double* buf_gradients, bool* fselected, double l1_prior, double l2_prior)
+	LBFGS_Data(	DataSet* dataset, double* buf_gradients, bool* fselected, double l1_prior, double l2_prior,
+			double FARvsFRRRatio)
 		:	m_dataset(dataset),
 			m_buf_gradients(buf_gradients), m_fselected(fselected),
-			m_l1_prior(l1_prior), m_l2_prior(l2_prior)
+			m_l1_prior(l1_prior), m_l2_prior(l2_prior),
+			m_FARvsFRRRatio(FARvsFRRRatio)
 	{
 	}
 
@@ -255,6 +265,7 @@ struct LBFGS_Data
 	bool*		m_fselected;
 	double		m_l1_prior;
 	double		m_l2_prior;
+	double		m_FARvsFRRRatio;
 };
 
 static lbfgsfloatval_t evaluate(	void* instance,
@@ -284,7 +295,7 @@ static lbfgsfloatval_t evaluate(	void* instance,
 	double inv_n_pos, inv_n_neg;
 	LRTrainer::getInvPosNeg(dataset, inv_n_pos, inv_n_neg);
 
-	fx = fx * inv_n_pos + fx_neg * inv_n_neg;
+	fx = fx * inv_n_pos + data->m_FARvsFRRRatio * fx_neg * inv_n_neg;
 
 	// Compute the loss function to minimize in the <x> point: regularization terms
 	for (int i = 0; i <= size; i ++)
@@ -293,12 +304,8 @@ static lbfgsfloatval_t evaluate(	void* instance,
 	}
 
 	// Compute the gradient in the <x> point
-	LRTrainer::getGradient(data->m_dataset, g, data->m_buf_gradients, x, size, data->m_l1_prior, data->m_l2_prior);
-	for (int i = 0; i <= size; i ++)
-		if (data->m_fselected[i] == false)
-		{
-			g[i] = 0.0;
-		}
+	LRTrainer::getGradient(data->m_dataset, g, data->m_buf_gradients, x, size,
+			data->m_l1_prior, data->m_l2_prior, data->m_FARvsFRRRatio);
 
 	return fx;
 }
@@ -319,51 +326,22 @@ static lbfgsfloatval_t evaluate(	void* instance,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Train the LR machine using the given L1 and L2 priors
 
-bool LRTrainer::train(	double L1_prior, double L2_prior,
+bool LRTrainer::train(	double L1_prior, double L2_prior, double FARvsFRRRatio,
 			double* weights,
 			double* gradients, double* buf_gradients,
 			bool* fselected, int size, bool verbose)
 {
-	// Prepare buffers (weights, batch gradients, feature selection flags)
-	for (int i = 0; i <= size; i ++)
+	// Optimize with L2 regularization term
+	if (getBOption("useL1") == false)
 	{
-		weights[i] = 0.0;
-		fselected[i] = false;
-	}
-
-	// Batch gradient descent with L1 and L2 regularization terms - Grafting method
-	int n_fselected = 0;
-	while (n_fselected <= size)
-	{
-		// Get the feature with the maximum gradient
-		getGradient(m_dataset, gradients, buf_gradients, weights, size, L1_prior, L2_prior);
-		int i_max_gradient = 0;
-		double max_gradient = 0.0;
+		// Prepare buffers (weights, batch gradients, feature selection flags)
 		for (int i = 0; i <= size; i ++)
-			if (fselected[i] == false)
-			{
-				const double abs_gradient = fabs(gradients[i]);
-				if (abs_gradient > max_gradient)
-				{
-					max_gradient = abs_gradient;
-					i_max_gradient = i;
-				}
-			}
-
-		// Convergence test
-		if (max_gradient < L1_prior)
 		{
-			break;
+			weights[i] = 0.0;
+			fselected[i] = true;
 		}
 
-		// Select the feature with the maximum gradient
-		fselected[i_max_gradient] = true;
-		n_fselected ++;
-
-		///////////////////////////////////////////////////////////////////////
-		// Optimize the criterion using the selected features/weights
-
-#ifdef HAVE_LBFGS		// L-BFGS optimization
+	#ifdef HAVE_LBFGS
 
 		// Initialize the parameters for the L-BFGS optimization
 		lbfgs_parameter_t param;
@@ -374,59 +352,85 @@ bool LRTrainer::train(	double L1_prior, double L2_prior,
 		// Start the L-BFGS optimization; this will invoke the callback functions
 		//	evaluate() and progress() when necessary
 		lbfgsfloatval_t fx;
-		LBFGS_Data data(m_dataset, buf_gradients, fselected, L1_prior, L2_prior);
+		LBFGS_Data data(m_dataset, buf_gradients, fselected, L1_prior, L2_prior, FARvsFRRRatio);
 		lbfgs(size + 1, weights, &fx, evaluate, NULL, (void*)&data, &param);
 
-#else				// Batch gradient descent
+	#else
 
-		const double eps = 0.00001;
-		const int max_n_iters = 1000;
-		double learning_rate = 0.5;
+		CHECK_FATAL(false);
 
-		// Batch gradient descent ...
-		int n_iters = 0;
-		double max_diff = 10000000000.0, last_max_diff = 10000000000.0;
-		while ((n_iters ++) < max_n_iters && max_diff > eps && learning_rate > eps)
-		{
-			// Compute the gradient
-			getGradient(m_dataset, gradients, buf_gradients, weights, size, L1_prior, L2_prior);
+	#endif
 
-			// Update the weights (Batch Gradient Descent)
-			max_diff = 0.0;
-			for (int i = 0; i <= size; i ++)
-				if (fselected[i] == true)
-				{
-					const double diff = gradients[i] + 2.0 * L2_prior * weights[i];
-					weights[i] -= learning_rate * diff;
-					max_diff += fabs(diff);
-				}
-
-			// Decrease the learning rate if we're getting away from the solution
-			if (max_diff > last_max_diff && n_iters > 1)
-			{
-				learning_rate *= 0.5;
-			}
-			last_max_diff = max_diff;
-
-//			// Debug
-//			if (verbose == true)
-//			{
-//				print("\tLRTrainer: [%d/%d] iters - max_diff = %lf, learning_rate = %lf\n",
-//					n_iters, max_n_iters, max_diff, learning_rate);
-//			}
-		}
-#endif
-
-		///////////////////////////////////////////////////////////////////////
+		return true;
 	}
 
-	return n_fselected > 0;
+	// Optimize with L1 and L2 regularization terms - Grafting method
+	else
+	{
+		// Prepare buffers (weights, batch gradients, feature selection flags)
+		for (int i = 0; i <= size; i ++)
+		{
+			weights[i] = 0.0;
+			fselected[i] = false;
+		}
+
+		int n_fselected = 0;
+		while (n_fselected <= size)
+		{
+			// Get the feature with the maximum gradient
+			getGradient(m_dataset, gradients, buf_gradients, weights, size, L1_prior, L2_prior, FARvsFRRRatio);
+			int i_max_gradient = 0;
+			double max_gradient = 0.0;
+			for (int i = 0; i <= size; i ++)
+				if (fselected[i] == false)
+				{
+					const double abs_gradient = fabs(gradients[i]);
+					if (abs_gradient > max_gradient)
+					{
+						max_gradient = abs_gradient;
+						i_max_gradient = i;
+					}
+				}
+
+			// Convergence test
+			if (max_gradient < L1_prior)
+			{
+				break;
+			}
+
+			// Select the feature with the maximum gradient
+			fselected[i_max_gradient] = true;
+			n_fselected ++;
+
+		#ifdef HAVE_LBFGS
+
+			// Initialize the parameters for the L-BFGS optimization
+			lbfgs_parameter_t param;
+			lbfgs_parameter_init(&param);
+			//param.orthantwise_c = 1;
+			//param.linesearch = LBFGS_LINESEARCH_BACKTRACKING;
+
+			// Start the L-BFGS optimization; this will invoke the callback functions
+			//	evaluate() and progress() when necessary
+			lbfgsfloatval_t fx;
+			LBFGS_Data data(m_dataset, buf_gradients, fselected, L1_prior, L2_prior, FARvsFRRRatio);
+			lbfgs(size + 1, weights, &fx, evaluate, NULL, (void*)&data, &param);
+
+		#else
+
+			CHECK_FATAL(false);
+
+		#endif
+		}
+
+		return n_fselected > 0;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Test the LR machine
 
-void LRTrainer::test(LRMachine* machine, DataSet* samples, double& TAR, double& FAR, double& HTER)
+void LRTrainer::test(LRMachine* machine, DataSet* samples, double& TAR, double& FAR, double& HTER, double FARvsFRRRatio)
 {
 	const double* machine_output = (const double*)(machine->getOutput().dataR());
 	const double threshold = machine->getThreshold();
@@ -450,21 +454,14 @@ void LRTrainer::test(LRMachine* machine, DataSet* samples, double& TAR, double& 
 	TAR = (double)passed_pos * inv_n_pos;
 	FAR = (double)passed_neg * inv_n_neg;
 	const double FRR = 1.0 - TAR;
-	HTER = (getFARvsFRRRatio() * FAR + FRR) / (getFARvsFRRRatio() + 1.0);
+	HTER = (FARvsFRRRatio * FAR + FRR) / (FARvsFRRRatio + 1.0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Optimize the LR machine - the optimum threshold is set to the machine!
 
-void LRTrainer::optimize(LRMachine* machine, DataSet* samples)
+void LRTrainer::optimize(LRMachine* machine, DataSet* samples, double FARvsFRRRatio)
 {
-//	{
-//		double TAR, FAR, HTER;
-//		machine->setThreshold(0.5);
-//		test(machine, samples, TAR, FAR, HTER);
-//		print("\tBEFORE: TAR = %lf, FAR = %lf, HTER = %lf\n", TAR, FAR, HTER);
-//	}
-
 	const long n_samples = samples->getNoExamples();
 	const double* machine_output = (const double*)(machine->getOutput().dataR());
 
@@ -494,7 +491,7 @@ void LRTrainer::optimize(LRMachine* machine, DataSet* samples)
 		const double threshold = 0.5 * (scores[s].measure + last_score);
 		const double FAR = (double)(n_neg - not_passed_neg) * inv_n_neg;
 		const double FRR = (double)(not_passed_pos) * inv_n_pos;
-		const double HTER = (getFARvsFRRRatio() * FAR + FRR) / (getFARvsFRRRatio() + 1.0);
+		const double HTER = (FARvsFRRRatio * FAR + FRR) / (FARvsFRRRatio + 1.0);
 
 		if (HTER < best_HTER)
 		{
@@ -511,13 +508,6 @@ void LRTrainer::optimize(LRMachine* machine, DataSet* samples)
 
 	// Cleanup
 	delete[] scores;
-
-//	{
-//		double TAR, FAR, HTER;
-//		machine->setThreshold(best_threshold);
-//		test(machine, samples, TAR, FAR, HTER);
-//		print("\tAFTER: TAR = %lf, FAR = %lf, HTER = %lf\n", TAR, FAR, HTER);
-//	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -540,7 +530,8 @@ void LRTrainer::getInvPosNeg(DataSet* dataset, double& inv_n_pos, double& inv_n_
 // Compute the gradient for the Grafting method (negative loglikelihoods + regularization terms)
 
 void LRTrainer::getGradient(DataSet* dataset, double* gradients, double* buf_gradients,
-				const double* weights, int size, double L1_prior, double L2_prior)
+				const double* weights, int size,
+				double L1_prior, double L2_prior, double FARvsFRRRatio)
 {
 	// Initialize
 	for (int i = 0; i <= size; i ++)
@@ -573,7 +564,7 @@ void LRTrainer::getGradient(DataSet* dataset, double* gradients, double* buf_gra
 
 	for (int i = 0; i <= size; i ++)
 	{
-		gradients[i] = gradients[i] * inv_n_pos + buf_gradients[i] * inv_n_neg;
+		gradients[i] = gradients[i] * inv_n_pos + FARvsFRRRatio * buf_gradients[i] * inv_n_neg;
 	}
 
 	// Add the gradient of the L1 regularization term

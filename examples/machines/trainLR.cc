@@ -62,7 +62,7 @@ int countPositive(MemoryDataSet* samples)
 	int cnt = 0;
 	for (long s = 0; s < samples->getNoExamples(); s ++)
 	{
-		if (((DoubleTensor*)samples->getTarget(s))->get(0) > 0.05)
+		if (((DoubleTensor*)samples->getTarget(s))->get(0) > 0.5)
 		{
 			cnt ++;
 		}
@@ -128,6 +128,8 @@ int main(int argc, char* argv[])
 	CHECK_FATAL(trainer.setData(train_samples) == true);
 	CHECK_FATAL(trainer.setValidationData(valid_samples) == true);
 	CHECK_FATAL(trainer.setBOption("verbose", true) == true);
+	CHECK_FATAL(trainer.setBOption("useL1", false) == true);
+	CHECK_FATAL(trainer.setDOption("FARvsFRRRatio", 1.0) == true);
 	CHECK_FATAL(trainer.train() == true);
 
 	print("--------------------------------------------------------------------\n");
@@ -136,12 +138,12 @@ int main(int argc, char* argv[])
 
 	// Test LR
 	print("Testing Logistic Regression (LR)\n");
-	LRTrainer::test(&machine, train_samples, TAR, FAR, HTER);
+	LRTrainer::test(&machine, train_samples, TAR, FAR, HTER, 1.0);
 	print("\t[%d] training samples: TAR = %lf, FAR = %lf, HTER = %lf\n", n_train_samples, TAR, FAR, HTER);
-	LRTrainer::test(&machine, valid_samples, TAR, FAR, HTER);
-	print("\t[%d] validation samples: detection rate = %lf%%\n", n_valid_samples, TAR, FAR, HTER);
-	LRTrainer::test(&machine, test_samples, TAR, FAR, HTER);
-	print("\t[%d] testing samples: detection rate = %lf%%\n", n_test_samples, TAR, FAR, HTER);
+	LRTrainer::test(&machine, valid_samples, TAR, FAR, HTER, 1.0);
+	print("\t[%d] validation samples: TAR = %lf, FAR = %lf, HTER = %lf\n", n_valid_samples, TAR, FAR, HTER);
+	LRTrainer::test(&machine, test_samples, TAR, FAR, HTER, 1.0);
+	print("\t[%d] testing samples: TAR = %lf, FAR = %lf, HTER = %lf\n", n_test_samples, TAR, FAR, HTER);
 	print("--------------------------------------------------------------------\n");
 
 	return 0;

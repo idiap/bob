@@ -13,7 +13,6 @@ namespace Torch
 	//      - PARAMETERS (name, type, default value, description):
         //		"kernel"	int	0	"0 - constant, 1 - linear, 2 - quadratic"
 	//
-	//
         // TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 

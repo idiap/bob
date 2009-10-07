@@ -4,6 +4,11 @@
 #include "LRTrainer.h"
 #include "MemoryDataSet.h"
 
+static double getFARvsFRRRatio()
+{
+	return 0.3;
+}
+
 namespace Torch
 {
 
@@ -120,6 +125,8 @@ bool ContextTrainer::train()
 
 	LRTrainer lr_trainer;
 	lr_trainer.setBOption("verbose", verbose);
+	lr_trainer.setDOption("FARvsFRRRatio", getFARvsFRRRatio());
+	lr_trainer.setBOption("useL1", false);
 
 	for (int f = 0; f < NoFeatures; f ++)
 	{
@@ -161,6 +168,9 @@ bool ContextTrainer::train()
 	buildCDataSet(c_valid_dataset, valid_dataset, ctx_machine);
 
 	// Train the combined classifier using these datasets
+	lr_trainer.setDOption("FARvsFRRRatio", getFARvsFRRRatio());
+	lr_trainer.setBOption("useL1", true);
+
 	if (verbose == true)
 	{
 		print("ContextTrainer::train - LR training the combined classifier ...\n");
@@ -215,7 +225,7 @@ void ContextTrainer::test(ContextMachine* machine, ContextDataSet* samples, doub
 	TAR = (double)passed_pos / (cnt_pos == 0 ? 1.0 : (cnt_pos + 0.0));
 	FAR = (double)passed_neg / (cnt_neg == 0 ? 1.0 : (cnt_neg + 0.0));
 	const double FRR = 1.0 - TAR;
-	HTER = (LRTrainer::getFARvsFRRRatio() * FAR + FRR) / (LRTrainer::getFARvsFRRRatio() + 1.0);
+	HTER = (getFARvsFRRRatio() * FAR + FRR) / (getFARvsFRRRatio() + 1.0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
