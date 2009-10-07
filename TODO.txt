@@ -10,15 +10,10 @@ ASSIGNED
 ---
 
 Seb: 
-	KMeans
-	GMM
-	HMM
-	MLP + StochasticTrainer
+	MVSECriterion
 	KSOM
-
-	Finds an elegant way to handle parameters (weigths, derivative, stump thresholds and dir, mean, stdv, ...)
-	of any type in the Machine class. Using for instance the OptionImpl scheme
-	but saving/loading them and adding vectors of any type !
+	HMM (1D, 2D)
+	BN
 
 Venky: 
 	Boosting of Haar-like + MCT/LBP features
@@ -64,10 +59,16 @@ Src:
 		Sigmoid
 		Tanh
 		Linear
+		MLP
+	Trainer
+		StochasticTrainer
 	Criterion
 		MSECriterion
 	Normalisation
 		MeanVarNorm
+	Distribution
+		KMeans
+		GMM
 
 Examples:
 	gtimageextract.cc (examples/facetools) : object (face, ...) extraction from list of pairs (image, gt) -> tensor

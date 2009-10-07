@@ -7,7 +7,7 @@ progname: gmm.cc\n\
 code2html: This program perform the training and the test of the Gaussian Mixture Model (GMM).\n\
 version: Torch5spro\n\
 date: June 2009\n\
-author: Sebastien Marcel (marcel@idiap.ch) 2005-2006\n";
+author: Sebastien Marcel (marcel@idiap.ch) 2009\n";
 
 using namespace Torch;
 

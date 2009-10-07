@@ -10,6 +10,10 @@ Linear::Linear() : GradientMachine()
 	addFOption("weight decay", 0.0, "Weight decay");
 	addFOption("momentum", 0.0, "Inertia momentum");
 
+	weights = NULL;
+	bias = NULL;
+	der_weights = NULL;
+	der_bias = NULL;
 	delta_parameters = NULL;
 }
 
@@ -40,6 +44,24 @@ Linear::~Linear()
 
 
 //////////////////////////////////////////////////////////////////////////
+
+bool Linear::resize(int n_inputs_, int n_outputs_, int n_parameters_)
+{
+   	GradientMachine::resize(n_inputs_, n_outputs_, n_parameters_);
+
+	double *parameters_ = m_parameters->getDarray("parameters");
+	double *der_parameters_ = m_parameters->getDarray("der_parameters");
+
+	weights = parameters_;
+	bias = parameters_ + n_inputs_*n_outputs_;
+	der_weights = der_parameters_;
+	der_bias = der_parameters_ + n_inputs_*n_outputs_;
+
+	if(delta_parameters != NULL) delete [] delta_parameters;
+	delta_parameters = new double [(n_inputs_+1)*n_outputs_];
+
+	return true;
+}
 
 bool Linear::shuffle()
 {
@@ -105,7 +127,6 @@ bool Linear::Gupdate(double learning_rate)
 		double z = parameters[i];
 		parameters[i] -= learning_rate * der_parameters[i];
 
-
 		if(momentum != 0)
 		{
 			delta_parameters[i] = (parameters[i] - z);
@@ -123,8 +144,8 @@ bool Linear::forward(const DoubleTensor *input)
 
 	double *src = (double *) input->dataR();
 	double *dst = (double *) m_output.dataW();
-
 	double *weights_ = weights;
+
 	for(int i = 0; i < n_outputs; i++)
 	{
 		double z = bias[i];

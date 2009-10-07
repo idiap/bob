@@ -27,6 +27,9 @@ namespace Torch
 		///////////////////////////////////////////////////////////
 
 		///
+		virtual bool 		resize(const int n_inputs_, const int n_outputs_, const int n_parameters_ = 0);
+
+		///
 		virtual bool 		prepare();
 
 		///

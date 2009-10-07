@@ -4,6 +4,7 @@
 SET(	criterions_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/MSECriterion.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/TwoClassNLLCriterion.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/MVSECriterion.cc"
 	CACHE INTERNAL "sources")
 
 SET(	criterions_INCLUDE

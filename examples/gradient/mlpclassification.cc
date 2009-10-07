@@ -26,6 +26,9 @@ int main(int argc, char* argv[])
 	float learning_rate_decay;
 	float weight_decay;
 	float momentum;
+	long long seed;
+	bool norm;
+	int criterion_type;
 
 
 	// Build the command line object
@@ -39,9 +42,11 @@ int main(int argc, char* argv[])
 	cmd.addSCmdArg("list of tensor filesi for testing", &list_tensor_filename_test, "list of tensor files to load for testing");
 
 	cmd.addText("\nOptions:");
+	cmd.addBCmdOption("-norm", &norm, false, "norm");
 	cmd.addBCmdOption("-verbose", &verbose, false, "verbose");
 	cmd.addBCmdOption("-one_hot_encoding", &one_hot_encoding, false, "one hot encoding");
 	cmd.addBCmdOption("-stochastic", &stochastic, false, "perform stochastic gradient descent");
+	cmd.addICmdOption("-criterion", &criterion_type, 0, "type of criterion (0=MSE, 1=NLL-2class, 2=MVSE)");
 	cmd.addICmdOption("-nhu", &nhu, 3, "number of hidden units");
 	cmd.addICmdOption("-max_iter", &max_iter, 10, "maximum number of iterations");
 	cmd.addFCmdOption("-end_accuracy", &end_accuracy, 0.0001, "end accuracy");
@@ -50,6 +55,7 @@ int main(int argc, char* argv[])
 	cmd.addFCmdOption("-learning_rate_decay", &learning_rate_decay, 0.0, "learning rate decay");
 	cmd.addFCmdOption("-weight_decay", &weight_decay, 0.0, "weight decay");
 	cmd.addFCmdOption("-momentum", &momentum, 0.0, "inertia momentum");
+	cmd.addLLCmdOption("-seed", &seed, -1, "seed for random generator");
 
 	// Parse the command line
 	if (cmd.read(argc, argv) < 0)
@@ -114,29 +120,43 @@ int main(int argc, char* argv[])
 	delete file_list_test;
 
 	// Normalization
-	print("Computing normalisation parameters ...\n");
-	MeanVarNorm *norm = new MeanVarNorm(n_inputs, &mdataset_train);
+	MeanVarNorm *mv_norm = NULL;
 
-	long n_examples_train = mdataset_train.getNoExamples();
-	for (long i=0 ; i<n_examples_train ; i++)
+	if(norm)
 	{
-		Tensor *x = mdataset_train.getExample(i);
-		norm->forward(*x);
-		x->copy(&norm->getOutput());
-	}
+		print("Computing normalisation parameters ...\n");
+		mv_norm = new MeanVarNorm(n_inputs, &mdataset_train);
 
-	long n_examples_test = mdataset_test.getNoExamples();
-	for (long i=0 ; i<n_examples_test ; i++)
-	{
-		Tensor *x = mdataset_test.getExample(i);
-		norm->forward(*x);
-		x->copy(&norm->getOutput());
+		long n_examples_train = mdataset_train.getNoExamples();
+		for (long i=0 ; i<n_examples_train ; i++)
+		{
+			Tensor *x = mdataset_train.getExample(i);
+			mv_norm->forward(*x);
+			x->copy(&mv_norm->getOutput());
+		}
+
+		long n_examples_test = mdataset_test.getNoExamples();
+		for (long i=0 ; i<n_examples_test ; i++)
+		{
+			Tensor *x = mdataset_test.getExample(i);
+			mv_norm->forward(*x);
+			x->copy(&mv_norm->getOutput());
+		}
 	}
 
 	//
-	//unsigned long seed = THRandom_seed();
-	//print("Seed = %ld\n", seed);
-	THRandom_manualSeed(950305);
+	// init random generator
+   	if(verbose) print("\nInitializing the random generator ...\n");
+	if(seed == -1) 
+	{
+		seed = THRandom_seed();
+		print("Random seed = %ld\n", seed);
+	}
+	else 
+	{
+		THRandom_manualSeed(seed);
+		print("Manual seed = %ld\n", seed);
+	}
 
 	int n_outputs;
 
@@ -146,11 +166,28 @@ int main(int argc, char* argv[])
 	//
 	print("Building the MLP %d x %d x %d ...\n", n_inputs, nhu, n_outputs);
 	GradientMachine *mlp = new MLP(n_inputs, nhu, n_outputs);
+	print("Gradient Machine:\n");
+	print(" n_inputs: %d\n", mlp->getNinputs());
+	print(" n_outputs: %d\n", mlp->getNoutputs());
 
 	//
-	Criterion *criterion = new MSECriterion(n_outputs);
-	//if(!one_hot_encoding)
-	//Criterion *criterion = new TwoClassNLLCriterion();
+	print("Calculating performance on the train set ...\n");
+	testDataSet(&mdataset_train, mlp, one_hot_encoding);
+
+	print("Calculating performance on the test set ...\n");
+	testDataSet(&mdataset_test, mlp, one_hot_encoding);
+
+	//
+	Criterion *criterion = NULL;
+
+	if(one_hot_encoding) criterion = new MSECriterion(n_outputs);
+	else
+	{
+		if(criterion_type == 0) criterion = new MSECriterion(n_outputs);
+		else if(criterion_type == 1) criterion = new TwoClassNLLCriterion();
+		else if(criterion_type == 2) criterion = new MVSECriterion(n_outputs);
+		else criterion = new MSECriterion(n_outputs);
+	}
 
 	//
 	Trainer *trainer;
@@ -179,16 +216,22 @@ int main(int argc, char* argv[])
 
 	trainer->train();
 
-	/*
+	//
+	print("Calculating performance on the train set ...\n");
+	testDataSet(&mdataset_train, mlp, one_hot_encoding);
+
+	print("Calculating performance on the test set ...\n");
+	testDataSet(&mdataset_test, mlp, one_hot_encoding);
+
+	//
 	print("Saving model file ...\n");
 	File ofile;
 	ofile.open("test.mlp", "w");
 	mlp->saveFile(ofile);
 	ofile.close();
-	*/
 
 
-	/*
+	//
 	print("Loading model file ...\n");
 	delete mlp; mlp = NULL;
 	mlp = new MLP();
@@ -196,7 +239,8 @@ int main(int argc, char* argv[])
 	ifile.open("test.mlp", "r");
 	mlp->loadFile(ifile);
 	ifile.close();
-	*/
+
+	mlp->prepare();
 
 	//
 	print("Calculating performance on the train set ...\n");
@@ -209,7 +253,8 @@ int main(int argc, char* argv[])
 	delete trainer;
 	delete criterion;
 	delete mlp;
-	delete norm;
+	if(norm)
+		delete mv_norm;
 
         // OK
 	return 0;
@@ -229,6 +274,7 @@ bool testDataSet(MemoryDataSet *mdataset, GradientMachine *mlp, bool one_hot_enc
 
 	long n_examples = mdataset->getNoExamples();
 
+	//
 	for (long i=0 ; i<n_examples ; i++)
 	{
 		Tensor *x = mdataset->getExample(i);
@@ -245,16 +291,43 @@ bool testDataSet(MemoryDataSet *mdataset, GradientMachine *mlp, bool one_hot_enc
 		// all possible errors: targetDecoding(n_targets, targets, one_hot_encoding);
 		if(one_hot_encoding)
 		{
-			warning("sorry I don't know yet how to evaluate errors with one hot encoding :-(");
+			// we should compute the confusion matrix !!!
 
-			if(t->get(0) > 0)
+		   	// find the argmax of the mlp output
+			int argmax_o = 0;
+			float max_o = o->get(0);
+			for(int j = 1 ; j < mlp->getNoutputs() ; j++)
 			{
-				nP++;
+			   	float z = o->get(j);
+				if(z > max_o)
+				{
+					argmax_o = j;
+					max_o = z;
+				}
+			}
+			
+		   	// find the argmax of the target
+			int argmax_t = 0;
+			float max_t = t->get(0);
+			for(int j = 1 ; j < mlp->getNoutputs() ; j++)
+			{
+			   	float z = t->get(j);
+				if(z > max_t)
+				{
+					argmax_t = j;
+					max_t = z;
+				}
 			}
 
-			if(t->get(0) < 0)
+			if(argmax_o == argmax_t)
+			{
+				nP++;
+				mean_P_output += o->get(argmax_o);
+			}
+			else
 			{
 				nN++;
+				mean_N_output += o->get(argmax_o);
 			}
 		}
 		else
@@ -277,22 +350,40 @@ bool testDataSet(MemoryDataSet *mdataset, GradientMachine *mlp, bool one_hot_enc
 		}
 	}
 
-	print("\n");
-	print("Number of positives = %d\n", nP);
-	mean_P_output /= (double) nP;
-	print("   mean output of positives = %g\n", mean_P_output);
-	print("   true accept (true positive) = %d\n", true_accept);
-	print("   false reject (false negative) = %d\n", false_reject);
+	if(one_hot_encoding)
+	{
+		print("\n");
+		print("Number of correct classifications = %d / %d\n", nP, n_examples);
+		mean_P_output /= (double) nP;
+		print("   mean output of positives = %g\n", mean_P_output);
 
-	print("\n");
-	print("Number of negatives = %d\n", nN);
-	mean_N_output /= (double) nN;
-	print("   mean output of negatives = %g\n", mean_N_output);
-	print("   true reject (true negative) = %d\n", true_reject);
-	print("   false accept (false positive) = %d\n", false_accept);
+		print("\n");
+		print("Number of incorrect classifications = %d / %d\n", nN, n_examples);
+		mean_N_output /= (double) nN;
+		print("   mean output of negatives = %g\n", mean_N_output);
 
-	double hter = (((double) false_accept / nN) + ((double) false_reject / nP)) / 2.0;
-	print("   HTER = %g\n", hter*100.0);
+		double err = ((double) nN / n_examples);
+		print("   Error = %g\n", err*100.0);
+	}
+	else
+	{
+		print("\n");
+		print("Number of positives = %d\n", nP);
+		mean_P_output /= (double) nP;
+		print("   mean output of positives = %g\n", mean_P_output);
+		print("   true accept (true positive) = %d\n", true_accept);
+		print("   false reject (false negative) = %d\n", false_reject);
+
+		print("\n");
+		print("Number of negatives = %d\n", nN);
+		mean_N_output /= (double) nN;
+		print("   mean output of negatives = %g\n", mean_N_output);
+		print("   true reject (true negative) = %d\n", true_reject);
+		print("   false accept (false positive) = %d\n", false_accept);
+
+		double hter = (((double) false_accept / nN) + ((double) false_reject / nP)) / 2.0;
+		print("   HTER = %g\n", hter*100.0);
+	}
 
 	return true;
 }
