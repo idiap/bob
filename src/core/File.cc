@@ -1,4 +1,5 @@
 #include "File.h"
+#include "Tensor.h"
 
 namespace Torch
 {
@@ -73,82 +74,377 @@ namespace Torch
 	}
 
 	///////////////////////////////////////////////////////////
-	// Read and check the tag/the size. To be used with #taggedWrite()#.
-	//	If the tag and the size readed doesn't correspond to the given
-	//	tag and size, an error will occur.
+	// Read/Writes some tag in the file
 
-	int File::taggedRead(void* ptr, int block_size, int n_blocks, const char* tag)
+	bool File::readTag(const char* tag)
 	{
-		int tag_size = 0;
-		read(&tag_size, sizeof(int), 1);
-		if (tag_size != (int)strlen(tag))
-		{
-			Torch::message("File: sorry, the tag <%s> cannot be read!", tag);
-			return 0;
-		}
-
+		// Read the tag
+		const int tag_size = strlen(tag);
 		char* tag_ = new char[tag_size + 1];
 		tag_[tag_size] = '\0';
-		if (read(tag_, 1, tag_size) != tag_size)
+		if (scanf("%s", tag_) != 1)
 		{
 			Torch::message("File: sorry, the tag <%s> cannot be read!", tag);
 			delete[] tag_;
-			return 0;
+			return false;
 		}
 
+		// Check the tag
 		if (strcmp(tag, tag_) != 0)
 		{
 			Torch::message("File: tag <%s> not found!", tag);
 			delete[] tag_;
-			return 0;
+			return false;
 		}
 		delete[] tag_;
 
-		int block_size_;
-		int n_blocks_;
-		if (read(&block_size_, sizeof(int), 1) != 1)
+		// OK
+		return true;
+	}
+
+	bool File::writeTag(const char* tag)
+	{
+		if (printf("%s ", tag) != (int)strlen(tag) + 1)
 		{
-			Torch::message("File: sorry, invalid block size!");
-			return 0;
-		}
-		if (read(&n_blocks_, sizeof(int), 1) != 1)
-		{
-			Torch::message("File: sorry, invalid no of blocks!");
-			return 0;
+			Torch::message("File: sorry, the tag <%s> cannot be written!", tag);
+			return false;
 		}
 
-		if( (block_size_ != block_size) || (n_blocks_ != n_blocks) )
-		{
-			Torch::message("File: tag <%s> has a corrupted size!", tag);
-			return 0;
-		}
-
-		return read(ptr, block_size, n_blocks);
+		// OK
+		return true;
 	}
 
 	///////////////////////////////////////////////////////////
-	// Write and write the tag/the size.
+	// Reads/Writes some text value in the file
 
-	int File::taggedWrite(const void* ptr, int block_size, int n_blocks, const char* tag)
+	bool File::readValue(unsigned char* value)
 	{
-		int tag_size = strlen(tag);
-		if (write(&tag_size, sizeof(int), 1) != 1)
+		return scanf("%uc", value) > 0;
+	}
+	bool File::readValue(bool* value)
+	{
+		int temp;
+		if (readValue(&temp) == false)
+		{
+			return false;
+		}
+		*value = (temp != 0);
+		return true;
+	}
+	bool File::readValue(char* value)
+	{
+		return scanf("%c", value) > 0;
+	}
+	bool File::readValue(short* value)
+	{
+		return scanf("%d", value) > 0;
+	}
+	bool File::readValue(int* value)
+	{
+		return scanf("%d", value) > 0;
+	}
+	bool File::readValue(long long* value)
+	{
+		return scanf("%ld", value) > 0;
+	}
+	bool File::readValue(float* value)
+	{
+		return scanf("%f", value) > 0;
+	}
+	bool File::readValue(double* value)
+	{
+		return scanf("%lf", value) > 0;
+	}
+
+	bool File::writeValue(const unsigned char* value)
+	{
+		return printf("%uc ", *value) > 0;
+	}
+	bool File::writeValue(const bool* value)
+	{
+		const int temp = (*value == true) ? 1 : 0;
+		return printf("%d ", temp) > 0;
+	}
+	bool File::writeValue(const char* value)
+	{
+		return printf("%c ", *value) > 0;
+	}
+	bool File::writeValue(const short* value)
+	{
+		return printf("%d ", *value) > 0;
+	}
+	bool File::writeValue(const int* value)
+	{
+		return printf("%d ", *value) > 0;
+	}
+	bool File::writeValue(const long long* value)
+	{
+		return printf("%ld ", *value) > 0;
+	}
+	bool File::writeValue(const float* value)
+	{
+		return printf("%f ", *value) > 0;
+	}
+	bool File::writeValue(const double* value)
+	{
+		return printf("%lf ", *value) > 0;
+	}
+
+	///////////////////////////////////////////////////////////
+	// Reads and checks the number of elements
+
+	bool File::readNElements(int n)
+	{
+		int n_ = 0;
+		if (readValue(&n_) == false)
+		{
+			Torch::message("File:: cannot read the number of elements!\n");
+			return false;
+		}
+		if (n_ != n)
+		{
+			Torch::message("File: read <%d> elements and was given <%d> elements!\n", n_, n);
+			return false;
+		}
+
+		return true;
+	}
+
+	///////////////////////////////////////////////////////////
+	/// Read and check the tag & the number of elements. To be used with #taggedWrite()#.
+	///	If the tag and the number of elements read don't correspond an error will occur.
+
+	int File::taggedRead(TensorSize* ptr, const char* tag)
+	{
+		if (readTag(tag) == false)
 		{
 			return 0;
 		}
-		if (write((char *)tag, 1, tag_size) != tag_size)
+
+		return 	(readValue(&ptr->n_dimensions) == 1 &&
+			readValue(&ptr->size[0]) == 1 &&
+			readValue(&ptr->size[1]) == 1 &&
+			readValue(&ptr->size[2]) == 1 &&
+			readValue(&ptr->size[3]) == 1) ? 1 : 0;
+	}
+	int File::taggedRead(unsigned char* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
 		{
 			return 0;
 		}
-		if (write(&block_size, sizeof(int), 1) != 1)
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		return i;
+	}
+	int File::taggedRead(bool* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
 		{
 			return 0;
 		}
-		if (write(&n_blocks, sizeof(int), 1) != 1)
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		return i;
+	}
+	int File::taggedRead(char* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
 		{
 			return 0;
 		}
-		return write(ptr, block_size, n_blocks);
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		ptr[i] = '\0';
+		return i;
+	}
+	int File::taggedRead(short* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		return i;
+	}
+	int File::taggedRead(int* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		return i;
+	}
+	int File::taggedRead(long long* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		return i;
+	}
+	int File::taggedRead(float* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		return i;
+	}
+	int File::taggedRead(double* ptr, int n, const char* tag)
+	{
+		if (readTag(tag) == false || readNElements(n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && readValue(&ptr[i]) == true; i ++)
+			;
+		return i;
+	}
+
+	///////////////////////////////////////////////////////////
+	/// Write the tag & the number of elements
+
+	int File::taggedWrite(const TensorSize* ptr, const char* tag)
+	{
+		if (writeTag(tag) == false)
+		{
+			return 0;
+		}
+
+		return (writeValue(&ptr->n_dimensions) == 1 &&
+			writeValue(&ptr->size[0]) == 1 &&
+			writeValue(&ptr->size[1]) == 1 &&
+			writeValue(&ptr->size[2]) == 1 &&
+			writeValue(&ptr->size[3]) == 1 &&
+			printf("\n") > 0) ? 1 : 0;
+	}
+	int File::taggedWrite(const unsigned char* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
+	}
+	int File::taggedWrite(const bool* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
+	}
+	int File::taggedWrite(const char* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
+	}
+	int File::taggedWrite(const short* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
+	}
+	int File::taggedWrite(const int* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
+	}
+	int File::taggedWrite(const long long* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
+	}
+	int File::taggedWrite(const float* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
+	}
+	int File::taggedWrite(const double* ptr, int n, const char* tag)
+	{
+		if (writeTag(tag) == false || writeValue(&n) == false)
+		{
+			return 0;
+		}
+
+		int i = 0;
+		for ( ; i < n && writeValue(&ptr[i]) == true; i ++)
+			;
+		printf("\n");
+		return i;
 	}
 
 	///////////////////////////////////////////////////////////

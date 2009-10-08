@@ -404,7 +404,7 @@ bool TensorFile::save(const Tensor& tensor)
 
 		//print(" > %d == %d ?\n", tensor.getDatatype(), m_header.m_type);
 		//print(" > %d == %D ?\n", tensor.nDimension(), m_header.m_n_dimensions);
-		
+
 		return false;
 	}
 
@@ -414,7 +414,7 @@ bool TensorFile::save(const Tensor& tensor)
 		if ( tensor.size(cnt) != m_header.m_size[cnt] )
 		{
 	   		warning("TensorFile::save() incorrect sizes.");
-		
+
 			//print(" > %d == %d ?\n", tensor.size(cnt), m_header.m_size[cnt]);
 
 			return false;

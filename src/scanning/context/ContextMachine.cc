@@ -74,7 +74,7 @@ bool ContextMachine::loadFile(File& file)
 {
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("ContextMachine::load - failed to read <ID> field!\n");
 		return false;
@@ -111,7 +111,7 @@ bool ContextMachine::saveFile(File& file) const
 {
 	// Write the ID
 	const int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("ContextMachine::save - failed to write <ID> field!\n");
 		return false;

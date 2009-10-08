@@ -59,7 +59,7 @@ namespace Torch
 
         verbose = getBOption("verbose");
         int id;
-        if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+        if (file.taggedRead(&id, 1, "ID") != 1)
         {
             Torch::message("RealLutMachine::load - failed to Read <ID> field!\n");
             return false;
@@ -73,7 +73,7 @@ namespace Torch
 
 
 
-        if (file.taggedRead(&n_bins, sizeof(int), 1, "N_BINS") != 1)
+        if (file.taggedRead(&n_bins, 1, "N_BINS") != 1)
         {
             Torch::message("RealLutMachine::load - failed to read <n_bins> field!\n");
             return false;
@@ -82,19 +82,19 @@ namespace Torch
         delete[] lut;
         lut = new double [n_bins];
 
-        if (file.taggedRead(lut, sizeof(double), n_bins, "Lut") != n_bins)
+        if (file.taggedRead(lut, n_bins, "Lut") != n_bins)
         {
             Torch::message("RealLutMachine::load - failed to read <Lut> field!\n");
             return false;
         }
 
-        if (file.taggedRead(&min, sizeof(double), 1, "min") != 1)
+        if (file.taggedRead(&min, 1, "min") != 1)
         {
             Torch::message("RealLutMachine::load - failed to Read <min> field!\n");
             return false;
         }
 //
-        if (file.taggedRead(&max, sizeof(double), 1, "max") != 1)
+        if (file.taggedRead(&max, 1, "max") != 1)
         {
             Torch::message("RealLutMachine::load - failed to Read <max> field!\n");
             return false;
@@ -103,7 +103,7 @@ namespace Torch
 
 
         int idCore;
-        if (file.taggedRead(&idCore, sizeof(int), 1, "CoreID") != 1)
+        if (file.taggedRead(&idCore, 1, "CoreID") != 1)
         {
             Torch::message("RealLutMachine::load - failed to read <CoreID> field!\n");
             return false;
@@ -134,7 +134,7 @@ namespace Torch
 
 
         const int id = getID();
-        if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+        if (file.taggedWrite(&id, 1, "ID") != 1)
         {
             Torch::message("RealLutMachine::save - failed to write <ID> field!\n");
             return false;
@@ -142,7 +142,7 @@ namespace Torch
         if (verbose);
         print("ID of the machine : %d\n",id);
 
-        if (file.taggedWrite(&n_bins, sizeof(int), 1, "N_BINS") != 1)
+        if (file.taggedWrite(&n_bins, 1, "N_BINS") != 1)
         {
             Torch::message("RealLutMachine::save - failed to write <n_bins> field!\n");
             return false;
@@ -150,19 +150,19 @@ namespace Torch
 
 
         // print("size of Lut %d\n",sizeof(lut));
-        if (file.taggedWrite(lut, sizeof(double), n_bins, "Lut") != n_bins)
+        if (file.taggedWrite(lut, n_bins, "Lut") != n_bins)
         {
             Torch::message("RealLutMachine::save - failed to write <Lut> field!\n");
             return false;
         }
 
-        if (file.taggedWrite(&min, sizeof(double), 1, "min") != 1)
+        if (file.taggedWrite(&min, 1, "min") != 1)
         {
             Torch::message("RealLutMachine::save - failed to write <min> field!\n");
             return false;
         }
 //
-        if (file.taggedWrite(&max, sizeof(double), 1, "max") != 1)
+        if (file.taggedWrite(&max, 1, "max") != 1)
         {
             Torch::message("RealLutMachine::save - failed to write <max> field!\n");
             return false;

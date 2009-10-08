@@ -5,6 +5,8 @@
 
 namespace Torch
 {
+	struct TensorSize;
+
 	/** A file on the disk.
 		@author Ronan Collobert (collober@idiap.ch)
 	*/
@@ -30,13 +32,28 @@ namespace Torch
 		/// Check if the file is opened
 		bool			isOpened() const;
 
-		/// Read and check the tag/the size. To be used with #taggedWrite()#.
-		///	If the tag and the size readed doesn't correspond to the given
-		///	tag and size, an error will occur.
-		int			taggedRead(void* ptr, int block_size, int n_blocks, const char* tag);
+		/// Read and check the tag & the number of elements. To be used with #taggedWrite()#.
+		///	If the tag and the number of elements read don't correspond an error will occur.
+		int			taggedRead(TensorSize* ptr, const char* tag);
+		int			taggedRead(unsigned char* ptr, int n, const char* tag);
+		int			taggedRead(bool* ptr, int n, const char* tag);
+		int			taggedRead(char* ptr, int n, const char* tag);
+		int			taggedRead(short* ptr, int n, const char* tag);
+		int			taggedRead(int* ptr, int n, const char* tag);
+		int			taggedRead(long long* ptr, int n, const char* tag);
+		int			taggedRead(float* ptr, int n, const char* tag);
+		int			taggedRead(double* ptr, int n, const char* tag);
 
-		/// Write and write the tag/the size.
-		int			taggedWrite(const void* ptr, int block_size, int n_blocks, const char* tag);
+		/// Write the tag & the number of elements
+		int			taggedWrite(const TensorSize* ptr, const char* tag);
+		int			taggedWrite(const unsigned char* ptr, int n, const char* tag);
+		int			taggedWrite(const bool* ptr, int n, const char* tag);
+		int			taggedWrite(const char* ptr, int n, const char* tag);
+		int			taggedWrite(const short* ptr, int n, const char* tag);
+		int			taggedWrite(const int* ptr, int n, const char* tag);
+		int			taggedWrite(const long long* ptr, int n, const char* tag);
+		int			taggedWrite(const float* ptr, int n, const char* tag);
+		int			taggedWrite(const double* ptr, int n, const char* tag);
 
 		//////////////////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +88,34 @@ namespace Torch
 		char*			gets(char* dest, int size_);
 
 		//////////////////////////////////////////////////////////////////////////////////////
+
+	private:
+
+		// Read/Writes some tag in the file
+		bool			readTag(const char* tag);
+		bool			writeTag(const char* tag);
+
+		// Reads/Writes some text value in the file
+		bool			readValue(unsigned char* value);
+		bool			readValue(bool* value);
+		bool			readValue(char* value);
+		bool			readValue(short* value);
+		bool			readValue(int* value);
+		bool			readValue(long long* value);
+		bool			readValue(float* value);
+		bool			readValue(double* value);
+
+		bool			writeValue(const unsigned char* value);
+		bool			writeValue(const bool* value);
+		bool			writeValue(const char* value);
+		bool			writeValue(const short* value);
+		bool			writeValue(const int* value);
+		bool			writeValue(const long long* value);
+		bool			writeValue(const float* value);
+		bool			writeValue(const double* value);
+
+		// Reads and checks the number of elements
+		bool			readNElements(int n);
 
 	public:
 

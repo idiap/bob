@@ -796,7 +796,7 @@ void ipLBP8R::init_lut_U2RI()
 bool ipLBP8R::saveFile(File& file) const
 {
 	int idCore = getID();
-	if (file.taggedWrite(&idCore, sizeof(int), 1, "CoreID") != 1)
+	if (file.taggedWrite(&idCore, 1, "CoreID") != 1)
 	{
 		Torch::message("ipLBP4R::save - failed to write <CoreID> field!\n");
 		return false;
@@ -804,13 +804,13 @@ bool ipLBP8R::saveFile(File& file) const
 
 
 	//  m_modelSize[0]
-	if (file.taggedWrite(&m_modelSize.size[1], sizeof(int), 1, "Width") != 1)
+	if (file.taggedWrite(&m_modelSize.size[1], 1, "Width") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <Width> field!\n");
 		return false;
 	}
 
-	if (file.taggedWrite(&m_modelSize.size[0], sizeof(int), 1, "Height") != 1)
+	if (file.taggedWrite(&m_modelSize.size[0], 1, "Height") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <height> field!\n");
 		return false;
@@ -818,28 +818,28 @@ bool ipLBP8R::saveFile(File& file) const
 
 
 	//m_P
-	if (file.taggedWrite(&m_P, sizeof(int), 1, "P") != 1)
+	if (file.taggedWrite(&m_P, 1, "P") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <P> field!\n");
 		return false;
 	}
 
 	//m_R
-	if (file.taggedWrite(&m_R, sizeof(int), 1, "Radius") != 1)
+	if (file.taggedWrite(&m_R, 1, "Radius") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <Radius> field!\n");
 		return false;
 	}
 
 	//m_x
-	if (file.taggedWrite(&m_x, sizeof(int), 1, "LocationX") != 1)
+	if (file.taggedWrite(&m_x, 1, "LocationX") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <LocationX> field!\n");
 		return false;
 	}
 
 	//m_y
-	if (file.taggedWrite(&m_y, sizeof(int), 1, "LocationY") != 1)
+	if (file.taggedWrite(&m_y, 1, "LocationY") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <LocationY> field!\n");
 		return false;
@@ -847,7 +847,7 @@ bool ipLBP8R::saveFile(File& file) const
 
 
 	//m_toAverage
-	if (file.taggedWrite(&m_toAverage, sizeof(bool), 1, "m_toAverage") != 1)
+	if (file.taggedWrite(&m_toAverage, 1, "m_toAverage") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <m_toAverage> field!\n");
 		return false;
@@ -855,20 +855,20 @@ bool ipLBP8R::saveFile(File& file) const
 
 
 	//m_addAvgBit
-	if (file.taggedWrite(&m_addAvgBit, sizeof(bool), 1, "m_addAvgBit") != 1)
+	if (file.taggedWrite(&m_addAvgBit, 1, "m_addAvgBit") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <m_addAvgBit> field!\n");
 		return false;
 	}
 
 	//m_toAverage
-	if (file.taggedWrite(&m_uniform, sizeof(bool), 1, "m_uniform") != 1)
+	if (file.taggedWrite(&m_uniform, 1, "m_uniform") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <m_uniform> field!\n");
 		return false;
 	}
 	//m_rot_invariant
-	if (file.taggedWrite(&m_rot_invariant, sizeof(bool), 1, "m_rot_invariant") != 1)
+	if (file.taggedWrite(&m_rot_invariant, 1, "m_rot_invariant") != 1)
 	{
 		Torch::message("ipLBP8R::save - failed to write <m_rot_invariant> field!\n");
 		return false;
@@ -899,13 +899,13 @@ bool ipLBP8R::loadFile(File& file)
 
 
 	//  m_modelSize[0]
-	if (file.taggedRead(&w, sizeof(int), 1, "Width") != 1)
+	if (file.taggedRead(&w, 1, "Width") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <Width> field!\n");
 		return false;
 	}
 
-	if (file.taggedRead(&h, sizeof(int), 1, "Height") != 1)
+	if (file.taggedRead(&h, 1, "Height") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <height> field!\n");
 		return false;
@@ -914,28 +914,28 @@ bool ipLBP8R::loadFile(File& file)
 	setModelSize(TensorSize(h,w));
 
 	//m_P
-	if (file.taggedRead(&m_P, sizeof(int), 1, "P") != 1)
+	if (file.taggedRead(&m_P, 1, "P") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <P> field!\n");
 		return false;
 	}
 
 	//m_R
-	if (file.taggedRead(&m_R, sizeof(int), 1, "Radius") != 1)
+	if (file.taggedRead(&m_R, 1, "Radius") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <Radius> field!\n");
 		return false;
 	}
 
 	//m_x
-	if (file.taggedRead(&m_x, sizeof(int), 1, "LocationX") != 1)
+	if (file.taggedRead(&m_x, 1, "LocationX") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <LocationX> field!\n");
 		return false;
 	}
 
 	//m_y
-	if (file.taggedRead(&m_y, sizeof(int), 1, "LocationY") != 1)
+	if (file.taggedRead(&m_y, 1, "LocationY") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <LocationY> field!\n");
 		return false;
@@ -945,7 +945,7 @@ bool ipLBP8R::loadFile(File& file)
 
 	bool mavg, maddavg, muni, mroti;
 	//m_toAverage
-	if (file.taggedRead(&mavg, sizeof(bool), 1, "m_toAverage") != 1)
+	if (file.taggedRead(&mavg, 1, "m_toAverage") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed toRead <m_toAverage> field!\n");
 		return false;
@@ -953,20 +953,20 @@ bool ipLBP8R::loadFile(File& file)
 
 
 	//m_addAvgBit
-	if (file.taggedRead(&maddavg, sizeof(bool), 1, "m_addAvgBit") != 1)
+	if (file.taggedRead(&maddavg, 1, "m_addAvgBit") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <m_addAvgBit> field!\n");
 		return false;
 	}
 
 	//m_toAverage
-	if (file.taggedRead(&muni, sizeof(bool), 1, "m_uniform") != 1)
+	if (file.taggedRead(&muni, 1, "m_uniform") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <m_uniform> field!\n");
 		return false;
 	}
 	//m_rot_invariant
-	if (file.taggedRead(&mroti, sizeof(bool), 1, "m_rot_invariant") != 1)
+	if (file.taggedRead(&mroti, 1, "m_rot_invariant") != 1)
 	{
 		Torch::message("ipLBP8R::load - failed to Read <m_rot_invariant> field!\n");
 		return false;

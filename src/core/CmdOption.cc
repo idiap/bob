@@ -134,12 +134,12 @@ void IntCmdOption::read(int *argc_, char ***argv_)
 
 bool IntCmdOption::loadFile(File& file)
 {
-	return file.taggedRead(ptr, sizeof(int), 1, name) == 1;
+	return file.taggedRead(ptr, 1, name) == 1;
 }
 
 bool IntCmdOption::saveFile(File& file) const
 {
-	return file.taggedWrite(ptr, sizeof(int), 1, name) == 1;
+	return file.taggedWrite(ptr, 1, name) == 1;
 }
 
 IntCmdOption::~IntCmdOption()
@@ -187,12 +187,12 @@ void FloatCmdOption::read(int *argc_, char ***argv_)
 
 bool FloatCmdOption::loadFile(File& file)
 {
-	return file.taggedRead(ptr, sizeof(float), 1, name) == 1;
+	return file.taggedRead(ptr, 1, name) == 1;
 }
 
 bool FloatCmdOption::saveFile(File& file) const
 {
-	return file.taggedWrite(ptr, sizeof(float), 1, name) == 1;
+	return file.taggedWrite(ptr, 1, name) == 1;
 }
 
 FloatCmdOption::~FloatCmdOption()
@@ -221,7 +221,7 @@ void BoolCmdOption::read(int *argc_, char ***argv_)
 bool BoolCmdOption::loadFile(File& file)
 {
 	int melanie;
-	const bool ret = file.taggedRead(&melanie, sizeof(int), 1, name) == 1;
+	const bool ret = file.taggedRead(&melanie, 1, name) == 1;
 	*ptr = (melanie ? 1 : 0);
 	return ret;
 }
@@ -229,7 +229,7 @@ bool BoolCmdOption::loadFile(File& file)
 bool BoolCmdOption::saveFile(File& file) const
 {
 	int melanie = (*ptr ? 1 : 0);
-	return file.taggedWrite(&melanie, sizeof(int), 1, name) == 1;
+	return file.taggedWrite(&melanie, 1, name) == 1;
 }
 
 BoolCmdOption::~BoolCmdOption()
@@ -280,12 +280,12 @@ void StringCmdOption::read(int *argc_, char ***argv_)
 bool StringCmdOption::loadFile(File& file)
 {
 	int melanie;
-	if (file.taggedRead(&melanie, sizeof(int), 1, "SIZE") != 1)
+	if (file.taggedRead(&melanie, 1, "SIZE") != 1)
 	{
                 return false;
         }
 	*ptr = new char[melanie];
-	if (file.taggedRead(*ptr, sizeof(char), melanie, name) != melanie)
+	if (file.taggedRead(*ptr,  melanie, name) != melanie)
 	{
 	        return false;
 	}
@@ -297,11 +297,11 @@ bool StringCmdOption::loadFile(File& file)
 bool StringCmdOption::saveFile(File& file) const
 {
 	int melanie = strlen(*ptr)+1;
-	if (file.taggedWrite(&melanie, sizeof(int), 1, "SIZE") != 1)
+	if (file.taggedWrite(&melanie, 1, "SIZE") != 1)
 	{
 	        return false;
 	}
-	if (file.taggedWrite(*ptr, 1, melanie, name) != melanie)
+	if (file.taggedWrite(*ptr, melanie, name) != melanie)
 	{
 	        return false;
 	}
@@ -358,12 +358,12 @@ void DoubleCmdOption::read(int *argc_, char ***argv_)
 
 bool DoubleCmdOption::loadFile(File& file)
 {
-	return file.taggedRead(ptr, sizeof(double), 1, name) == 1;
+	return file.taggedRead(ptr, 1, name) == 1;
 }
 
 bool DoubleCmdOption::saveFile(File& file) const
 {
-	return file.taggedWrite(ptr, sizeof(double), 1, name) == 1;
+	return file.taggedWrite(ptr, 1, name) == 1;
 }
 
 DoubleCmdOption::~DoubleCmdOption()
@@ -412,12 +412,12 @@ void LongLongCmdOption::read(int *argc_, char ***argv_)
 
 bool LongLongCmdOption::loadFile(File& file)
 {
-	return file.taggedRead(ptr, sizeof(long long), 1, name) == 1;
+	return file.taggedRead(ptr, 1, name) == 1;
 }
 
 bool LongLongCmdOption::saveFile(File& file) const
 {
-	return file.taggedWrite(ptr, sizeof(long long), 1, name) == 1;
+	return file.taggedWrite(ptr, 1, name) == 1;
 }
 
 LongLongCmdOption::~LongLongCmdOption()

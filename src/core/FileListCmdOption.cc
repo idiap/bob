@@ -82,14 +82,14 @@ void FileListCmdOption::read(int *argc_, char ***argv_)
 
 bool FileListCmdOption::loadFile(File& file)
 {
-	file.taggedRead(&n_files, sizeof(int), 1, "NFILES");
+	file.taggedRead(&n_files, 1, "NFILES");
 	file_names = new char*[n_files];
 	for (int i = 0; i < n_files; i++)
 	{
 		int melanie;
-		file.taggedRead(&melanie, sizeof(int), 1, "SIZE");
+		file.taggedRead(&melanie, 1, "SIZE");
 		file_names[i] = new char[melanie];
-		file.taggedRead(file_names[i], 1, melanie, "FILE");
+		file.taggedRead(file_names[i], melanie, "FILE");
 	}
 
 	return true;
@@ -97,12 +97,12 @@ bool FileListCmdOption::loadFile(File& file)
 
 bool FileListCmdOption::saveFile(File& file) const
 {
-	file.taggedWrite(&n_files, sizeof(int), 1, "NFILES");
+	file.taggedWrite(&n_files, 1, "NFILES");
 	for (int i = 0; i < n_files; i++)
 	{
 		int melanie = strlen(file_names[i])+1;
-		file.taggedWrite(&melanie, sizeof(int), 1, "SIZE");
-		file.taggedWrite(file_names[i], 1, melanie, "FILE");
+		file.taggedWrite(&melanie, 1, "SIZE");
+		file.taggedWrite(file_names[i], melanie, "FILE");
 	}
 
 	return true;

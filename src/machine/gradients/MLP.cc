@@ -134,7 +134,7 @@ bool MLP::loadFile(File& file)
 
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("MLP::load - failed to read <ID> field!\n");
 		return false;
@@ -166,7 +166,7 @@ bool MLP::saveFile(File& file) const
 
 	// Write the machine ID
 	const int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("MLP::save - failed to write <ID> field!\n");
 		return false;

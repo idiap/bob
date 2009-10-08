@@ -119,7 +119,7 @@ bool LRMachine::loadFile(File& file)
 {
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("LRMachine::load - failed to read <ID> field!\n");
 		return false;
@@ -132,7 +132,7 @@ bool LRMachine::loadFile(File& file)
 
 	// Read the size
 	int size;
-	if (file.taggedRead(&size, sizeof(int), 1, "SIZE") != 1)
+	if (file.taggedRead(&size, 1, "SIZE") != 1)
 	{
 		Torch::message("LRMachine::load - failed to read <SIZE> field!\n");
 		return false;
@@ -144,14 +144,14 @@ bool LRMachine::loadFile(File& file)
 	}
 
 	// Read the weights
-	if (file.taggedRead(m_weights, sizeof(double), m_size + 1, "WEIGHTS") != m_size + 1)
+	if (file.taggedRead(m_weights, m_size + 1, "WEIGHTS") != m_size + 1)
 	{
 		Torch::message("LRMachine::load - failed to read <WEIGHTS> field!\n");
 		return false;
 	}
 
 	// Read the threshold
-	if (file.taggedRead(&m_threshold, sizeof(double), 1, "THRESHOLD") != 1)
+	if (file.taggedRead(&m_threshold, 1, "THRESHOLD") != 1)
 	{
 		Torch::message("LRMachine::load - failed to read <THRESHOLD> field!\n");
 		return false;
@@ -165,28 +165,28 @@ bool LRMachine::saveFile(File& file) const
 {
 	// Write the ID
 	int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("LRMachine::save - failed to write <ID> field!\n");
 		return false;
 	}
 
 	// Write the size
-	if (file.taggedWrite(&m_size, sizeof(int), 1, "SIZE") != 1)
+	if (file.taggedWrite(&m_size, 1, "SIZE") != 1)
 	{
 		Torch::message("LRMachine::save - failed to write <SIZE> field!\n");
 		return false;
 	}
 
 	// Write the weights
-	if (file.taggedWrite(m_weights, sizeof(double), m_size + 1, "WEIGHTS") != m_size + 1)
+	if (file.taggedWrite(m_weights, m_size + 1, "WEIGHTS") != m_size + 1)
 	{
 		Torch::message("LRMachine::save - failed to write <WEIGHTS> field!\n");
 		return false;
 	}
 
 	// Write the threshold
-	if (file.taggedWrite(&m_threshold, sizeof(double), 1, "THRESHOLD") != 1)
+	if (file.taggedWrite(&m_threshold, 1, "THRESHOLD") != 1)
 	{
 		Torch::message("LRMachine::save - failed to write <THRESHOLD> field!\n");
 		return false;

@@ -50,17 +50,88 @@ void initMCT_to_LBP()
 // Convert the Torch3 cascade model file to the torch5spro model
 ///////////////////////////////////////////////////////////////////////////
 
+int oldTaggedRead(File& file, void* ptr, int block_size, int n_blocks, const char* tag)
+{
+	int tag_size = 0;
+	file.read(&tag_size, sizeof(int), 1);
+	if (tag_size != (int)strlen(tag))
+	{
+		Torch::message("File: sorry, the tag <%s> cannot be read!", tag);
+		return 0;
+	}
+
+	char* tag_ = new char[tag_size + 1];
+	tag_[tag_size] = '\0';
+	if (file.read(tag_, 1, tag_size) != tag_size)
+	{
+		Torch::message("File: sorry, the tag <%s> cannot be read!", tag);
+		delete[] tag_;
+		return 0;
+	}
+
+	if (strcmp(tag, tag_) != 0)
+	{
+		Torch::message("File: tag <%s> not found!", tag);
+		delete[] tag_;
+		return 0;
+	}
+	delete[] tag_;
+
+	int block_size_;
+	int n_blocks_;
+	if (file.read(&block_size_, sizeof(int), 1) != 1)
+	{
+		Torch::message("File: sorry, invalid block size!");
+		return 0;
+	}
+	if (file.read(&n_blocks_, sizeof(int), 1) != 1)
+	{
+		Torch::message("File: sorry, invalid no of blocks!");
+		return 0;
+	}
+
+	if( (block_size_ != block_size) || (n_blocks_ != n_blocks) )
+	{
+		Torch::message("File: tag <%s> has a corrupted size!", tag);
+		return 0;
+	}
+
+	return file.read(ptr, block_size, n_blocks);
+}
+
+int oldTaggedWrite(File& file, const void* ptr, int block_size, int n_blocks, const char* tag)
+{
+	int tag_size = strlen(tag);
+	if (file.write(&tag_size, sizeof(int), 1) != 1)
+	{
+		return 0;
+	}
+	if (file.write((char *)tag, 1, tag_size) != tag_size)
+	{
+		return 0;
+	}
+	if (file.write(&block_size, sizeof(int), 1) != 1)
+	{
+		return 0;
+	}
+	if (file.write(&n_blocks, sizeof(int), 1) != 1)
+	{
+		return 0;
+	}
+	return file.write(ptr, block_size, n_blocks);
+}
+
 bool convert(File& file_in, File& file_out)
 {
         CascadeMachine cascade_machine;
 
         // Get the model size
 	int model_w, model_h;
-	if (file_in.taggedRead(&model_w, sizeof(int), 1, "WIDTH") != 1)
+	if (oldTaggedRead(file_in, &model_w, sizeof(int), 1, "WIDTH") != 1)
 	{
 	        return false;
 	}
-	if (file_in.taggedRead(&model_h, sizeof(int), 1, "HEIGHT") != 1)
+	if (oldTaggedRead(file_in, &model_h, sizeof(int), 1, "HEIGHT") != 1)
         {
         	return false;
 	}
@@ -70,7 +141,7 @@ bool convert(File& file_in, File& file_out)
 
 	// Create the machine stages
 	int n_stages;
-        if (file_in.taggedRead(&n_stages, sizeof(int), 1, "N_STAGES") != 1)
+        if (oldTaggedRead(file_in, &n_stages, sizeof(int), 1, "N_STAGES") != 1)
         {
         	return false;
         }
@@ -85,7 +156,7 @@ bool convert(File& file_in, File& file_out)
         {
                 // Threshold
 		float threshold;
-		if (file_in.taggedRead(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
+		if (oldTaggedRead(file_in, &threshold, sizeof(float), 1, "THRESHOLD") != 1)
 		{
 			return false;
 		}
@@ -97,7 +168,7 @@ bool convert(File& file_in, File& file_out)
 
 		// Number of machines per stage
 		int n_trainers;
-		if (file_in.taggedRead(&n_trainers, sizeof(int), 1, "N_TRAINERS") != 1)
+		if (oldTaggedRead(file_in, &n_trainers, sizeof(int), 1, "N_TRAINERS") != 1)
 		{
 			return false;
 		}
@@ -115,7 +186,7 @@ bool convert(File& file_in, File& file_out)
                 float* weights = new float[n_trainers];
 
 		// Read the weights
-		if (file_in.taggedRead(weights, sizeof(float), n_trainers, "WEIGHTS") != n_trainers)
+		if (oldTaggedRead(file_in, weights, sizeof(float), n_trainers, "WEIGHTS") != n_trainers)
 		{
 		        delete[] weights;
 			return false;
@@ -145,7 +216,7 @@ bool convert(File& file_in, File& file_out)
 
                         // Read XY position
                         int pos_xy;
-                        if (file_in.taggedRead(&pos_xy, sizeof(int), 1, "LOCATION") != 1)
+                        if (oldTaggedRead(file_in, &pos_xy, sizeof(int), 1, "LOCATION") != 1)
                         {
                                 delete lbp_machine;
                                 return false;
@@ -161,7 +232,7 @@ bool convert(File& file_in, File& file_out)
                         // Read LUT
                         const int n_lbp_kernels = 512;
                         float* lut = new float[n_lbp_kernels];
-                        if (file_in.taggedRead(lut, sizeof(float), n_lbp_kernels, "LUT") != n_lbp_kernels)
+                        if (oldTaggedRead(file_in, lut, sizeof(float), n_lbp_kernels, "LUT") != n_lbp_kernels)
                         {
                                 delete[] lut;
                                 delete lbp_machine;

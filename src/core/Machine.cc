@@ -19,7 +19,7 @@ Machine* loadMachineFromFile(const char* filename)
                 return 0;
         }
         int id;
-        if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+        if (file.taggedRead(&id, 1, "ID") != 1)
         {
                 Torch::message("Torch::loadMachineFromFile - cannot read the <ID> tag!\n");
                 return 0;

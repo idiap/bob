@@ -237,14 +237,14 @@ bool ContextDataSet::save(const char* dir_data, const char* name) const
 		}
 
 		// Write the number of samples
-		if (file.taggedWrite(&m_n_examples, sizeof(long), 1, "NO") != 1)
+		if (file.taggedWrite(&m_n_examples, 1, "NO") != 1)
 		{
 			print("ContextDataSet::save - failed to write <NO> tag!\n");
 			return false;
 		}
 
 		// Write the masks (positive, negative, ground truth)
-		if (file.taggedWrite(m_masks, sizeof(unsigned char), m_n_examples, "MASKS") != m_n_examples)
+		if (file.taggedWrite(m_masks, m_n_examples, "MASKS") != m_n_examples)
 		{
 			print("ContextDataSet::save - failed to write <MASKS> tag!\n");
 			return false;
@@ -255,24 +255,18 @@ bool ContextDataSet::save(const char* dir_data, const char* name) const
 		{
 			const Context* context = m_contexts[s];
 
-			if (	file.write(&context->m_pattern.m_x, sizeof(short), 1) != 1 ||
-				file.write(&context->m_pattern.m_y, sizeof(short), 1) != 1 ||
-				file.write(&context->m_pattern.m_w, sizeof(short), 1) != 1 ||
-				file.write(&context->m_pattern.m_h, sizeof(short), 1) != 1 ||
-				file.write(&context->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
-				file.write(&context->m_pattern.m_activation, sizeof(short), 1) != 1)
-			{
-				print("ContextDataSet::save - failed to write context [%d/%d]!\n", s + 1, m_n_examples);
-				return false;
-			}
+			file.printf("%d %d %d %d %lf %d ",
+				context->m_pattern.m_x, context->m_pattern.m_y,
+				context->m_pattern.m_w, context->m_pattern.m_h,
+				context->m_pattern.m_confidence, context->m_pattern.m_activation);
 
 			for (int f = 0; f < NoFeatures; f ++)
 			{
-				if (file.write(	context->m_features[f].dataR(), sizeof(double), FeatureSizes[f])
-						!= FeatureSizes[f])
+				const int size = FeatureSizes[f];
+				const double* data = (const double*)context->m_features[f].dataR();
+				for (int k = 0; k < size; k ++)
 				{
-					print("ContextDataSet::save - failed to write context [%d/%d]!\n", s + 1, m_n_examples);
-					return false;
+					file.printf("%lf ", data[k]);
 				}
 			}
 		}
@@ -330,7 +324,7 @@ bool ContextDataSet::load(const char* dir_data, const char* name)
 	}
 
 	// Read the number of samples
-	if (file.taggedRead(&m_n_examples, sizeof(long), 1, "NO") != 1)
+	if (file.taggedRead(&m_n_examples, 1, "NO") != 1)
 	{
 		print("ContextDataSet::load - failed to read <NO> tag!\n");
 		return false;
@@ -346,7 +340,7 @@ bool ContextDataSet::load(const char* dir_data, const char* name)
 	m_capacity = m_n_examples;
 
 	// Read the masks (positive, negative, ground truth
-	if (file.taggedRead(m_masks, sizeof(unsigned char), m_n_examples, "MASKS") != m_n_examples)
+	if (file.taggedRead(m_masks, m_n_examples, "MASKS") != m_n_examples)
 	{
 		print("ContextDataSet::load - failed to read <MASKS> tag!\n");
 		return false;
@@ -357,12 +351,12 @@ bool ContextDataSet::load(const char* dir_data, const char* name)
 	{
 		Context* context = m_contexts[s];
 
-		if (	file.read(&context->m_pattern.m_x, sizeof(short), 1) != 1 ||
-			file.read(&context->m_pattern.m_y, sizeof(short), 1) != 1 ||
-			file.read(&context->m_pattern.m_w, sizeof(short), 1) != 1 ||
-			file.read(&context->m_pattern.m_h, sizeof(short), 1) != 1 ||
-			file.read(&context->m_pattern.m_confidence, sizeof(double), 1) != 1 ||
-			file.read(&context->m_pattern.m_activation, sizeof(short), 1) != 1)
+		if (	file.scanf("%d", &context->m_pattern.m_x) != 1 ||
+			file.scanf("%d", &context->m_pattern.m_y) != 1 ||
+			file.scanf("%d", &context->m_pattern.m_w) != 1 ||
+			file.scanf("%d", &context->m_pattern.m_h) != 1 ||
+			file.scanf("%lf", &context->m_pattern.m_confidence) != 1 ||
+			file.scanf("%d", &context->m_pattern.m_activation) != 1)
 		{
 			print("ContextDataSet::load - failed to read context [%d/%d]!\n", s + 1, m_n_examples);
 			return false;
@@ -370,12 +364,15 @@ bool ContextDataSet::load(const char* dir_data, const char* name)
 
 		for (int f = 0; f < NoFeatures; f ++)
 		{
-			if (file.read(	context->m_features[f].dataW(),
-					sizeof(double),
-					FeatureSizes[f]) != FeatureSizes[f])
+			const int size = FeatureSizes[f];
+			double* data = (double*)context->m_features[f].dataW();
+			for (int k = 0; k < size; k ++)
 			{
-				print("ContextDataSet::load - failed to read context [%d/%d]!\n", s + 1, m_n_examples);
-				return false;
+				if (file.scanf("%lf", &data[k]) != 1)
+				{
+					print("ContextDataSet::load - failed to read context [%d/%d]!\n", s + 1, m_n_examples);
+					return false;
+				}
 			}
 		}
 	}

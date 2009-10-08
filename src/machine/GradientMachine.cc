@@ -62,22 +62,22 @@ GradientMachine::~GradientMachine()
 }
 
 bool GradientMachine::prepare()
-{ 
+{
 	n_inputs = m_parameters->getI("n_inputs");
 	n_outputs = m_parameters->getI("n_outputs");
 	n_parameters = m_parameters->getI("n_parameters");
 	parameters = m_parameters->getDarray("parameters");
 	der_parameters = m_parameters->getDarray("der_parameters");
 
-	return true; 
+	return true;
 }
-   
+
 bool GradientMachine::resize(int n_inputs_, int n_outputs_, int n_parameters_)
 {
 	m_output.resize(n_outputs_);
 
 	// Free
-	if(m_beta != NULL) 
+	if(m_beta != NULL)
 	{
 		delete m_beta;
 		m_beta = NULL;
@@ -106,18 +106,18 @@ bool GradientMachine::resize(int n_inputs_, int n_outputs_, int n_parameters_)
 bool GradientMachine::forward(const Tensor& input)
 {
 	//int n_inputs = m_parameters->getI("n_inputs");
-	
+
 	// Accept only 1D tensors of Double
 	if (	input.nDimension() != 1 || input.getDatatype() != Tensor::Double)
 	{
 		warning("GradientMachine::forward() : incorrect number of dimensions or type.");
-		
+
 		return false;
 	}
 	if (	input.size(0) != n_inputs)
 	{
 		warning("GradientMachine::forward() : incorrect input size along dimension 0 (%d != %d).", input.size(0), n_inputs);
-		
+
 		return false;
 	}
 
@@ -134,13 +134,13 @@ bool GradientMachine::backward(const Tensor& input, const DoubleTensor *alpha)
 	if (	input.nDimension() != 1 || input.getDatatype() != Tensor::Double)
 	{
 		warning("GradientMachine::backward() : incorrect number of dimensions or type.");
-		
+
 		return false;
 	}
 	if (	input.size(0) != n_inputs)
 	{
 		warning("GradientMachine::backward() : incorrect input size along dimension 0 (%d != %d).", input.size(0), n_inputs);
-		
+
 		return false;
 	}
 
@@ -156,7 +156,7 @@ bool GradientMachine::loadFile(File& file)
 {
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("GradientMachine::load - failed to read <ID> field!\n");
 		return false;
@@ -188,7 +188,7 @@ bool GradientMachine::saveFile(File& file) const
 {
 	// Write the machine ID
 	const int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("GradientMachine::save - failed to write <ID> field!\n");
 		return false;

@@ -37,7 +37,7 @@ void checkPattern(const Pattern& pattern, int p)
 int main()
 {
 	const int n_tests = 100;
-	const int n_patts_per_test = 1000000;
+	const int n_patts_per_test = 10000;
 
 	PatternList pattlist;
 	CHECK_FATAL(pattlist.size() == 0);

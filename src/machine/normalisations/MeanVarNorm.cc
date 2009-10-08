@@ -86,8 +86,8 @@ bool MeanVarNorm::resize(const int n_inputs_)
 		delete [] m_stdv;
 		m_stdv = NULL;
 	}
-	m_mean = new double [n_inputs]; 
-	m_stdv = new double [n_inputs]; 
+	m_mean = new double [n_inputs];
+	m_stdv = new double [n_inputs];
 	for(int i = 0 ; i < n_inputs ; i++)
 	{
 		m_mean[i] = 0.0;
@@ -120,13 +120,13 @@ bool MeanVarNorm::forward(const Tensor& input)
 	if (	input.nDimension() != 1 || input.getDatatype() != Tensor::Double)
 	{
 		warning("MeanVarNorm::forward() : incorrect number of dimensions or type.");
-		
+
 		return false;
 	}
 	if (	input.size(0) != n_inputs)
 	{
 		warning("MeanVarNorm::forward() : incorrect input size along dimension 0 (%d != %d).", input.size(0), n_inputs);
-		
+
 		return false;
 	}
 
@@ -134,7 +134,7 @@ bool MeanVarNorm::forward(const Tensor& input)
 
 	double *src = (double *) t_input->dataR();
 	double *dst = (double *) m_output.dataW();
-	
+
 	for(int i = 0 ; i < n_inputs ; i++)
 		dst[i] = (src[i] - m_mean[i]) / m_stdv[i];
 
@@ -148,7 +148,7 @@ bool MeanVarNorm::loadFile(File& file)
 {
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("MeanVarNorm::load - failed to read <ID> field!\n");
 		return false;
@@ -161,7 +161,7 @@ bool MeanVarNorm::loadFile(File& file)
 
 	int n_inputs_;
 
-	if (file.taggedRead(&n_inputs_, sizeof(int), 1, "N_INPUTS") != 1)
+	if (file.taggedRead(&n_inputs_, 1, "N_INPUTS") != 1)
 	{
 		Torch::message("MeanVarNorm::load - failed to read <N_INPUTS> field!\n");
 		return false;
@@ -170,7 +170,7 @@ bool MeanVarNorm::loadFile(File& file)
 	resize(n_inputs_);
 
 	// Read the machine parameters
-	const int ret1 = file.taggedRead(m_mean, sizeof(double), n_inputs, "MEAN");
+	const int ret1 = file.taggedRead(m_mean, n_inputs, "MEAN");
 	if (ret1 != n_inputs)
 	{
 	        Torch::message("MeanVarNorm::load - failed to read <MEAN> field!\n");
@@ -178,7 +178,7 @@ bool MeanVarNorm::loadFile(File& file)
 	}
 
 	// Read the machine parameters
-	const int ret2 = file.taggedRead(m_stdv, sizeof(double), n_inputs, "STDV");
+	const int ret2 = file.taggedRead(m_stdv, n_inputs, "STDV");
 	if (ret2 != n_inputs)
 	{
 	        Torch::message("MeanVarNorm::load - failed to read <MEAN> field!\n");
@@ -193,28 +193,28 @@ bool MeanVarNorm::saveFile(File& file) const
 {
 	// Write the machine ID
 	const int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("MeanVarNorm::save - failed to write <ID> field!\n");
 		return false;
 	}
 
 	// Write the input size
-	if (file.taggedWrite(&n_inputs, sizeof(int), 1, "N_INPUTS") != 1)
+	if (file.taggedWrite(&n_inputs, 1, "N_INPUTS") != 1)
 	{
 		Torch::message("MeanVarNorm::save - failed to write <N_INPUTS> field!\n");
 		return false;
 	}
 
 	// Write the mean
-	if (file.taggedWrite(m_mean, sizeof(double), n_inputs, "MEAN") != n_inputs)
+	if (file.taggedWrite(m_mean, n_inputs, "MEAN") != n_inputs)
 	{
 		Torch::message("MeanVarNorm::save - failed to write <MEAN> field!\n");
 		return false;
 	}
 
 	// Write the stdv
-	if (file.taggedWrite(m_stdv, sizeof(double), n_inputs, "STDV") != n_inputs)
+	if (file.taggedWrite(m_stdv, n_inputs, "STDV") != n_inputs)
 	{
 		Torch::message("MeanVarNorm::save - failed to write <STDV> field!\n");
 		return false;

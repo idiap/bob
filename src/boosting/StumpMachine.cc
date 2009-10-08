@@ -59,7 +59,7 @@ namespace Torch
         int id;
 
         verbose = getBOption("verbose");
-        if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+        if (file.taggedRead(&id, 1, "ID") != 1)
         {
             Torch::message("StumpMachine::load - failed to Read <ID> field!\n");
             return false;
@@ -70,21 +70,21 @@ namespace Torch
             return false;
         }
 
-        if (file.taggedRead(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
+        if (file.taggedRead(&threshold, 1, "THRESHOLD") != 1)
         {
             Torch::message("StumpMachine::load - failed to read <threshold> field!\n");
             return false;
         }
 
 
-        if (file.taggedRead(&direction, sizeof(int), 1, "DIRECTION") != 1)
+        if (file.taggedRead(&direction, 1, "DIRECTION") != 1)
         {
             Torch::message("StumpMachine::load - failed to read <direction> field!\n");
             return false;
         }
 
         int idCore;
-        if (file.taggedRead(&idCore, sizeof(int), 1, "CoreID") != 1)
+        if (file.taggedRead(&idCore, 1, "CoreID") != 1)
         {
             Torch::message("StumpMachine::load - failed to read <CoreID> field!\n");
             return false;
@@ -118,7 +118,7 @@ namespace Torch
     {
 
         const int id = getID();
-        if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+        if (file.taggedWrite(&id, 1, "ID") != 1)
         {
             Torch::message("StumpMachine::save - failed to write <ID> field!\n");
             return false;
@@ -126,13 +126,13 @@ namespace Torch
 
         if (verbose)
             print("ID of the machine : %d\n",id);
-        if (file.taggedWrite(&threshold, sizeof(float), 1, "THRESHOLD") != 1)
+        if (file.taggedWrite(&threshold, 1, "THRESHOLD") != 1)
         {
             Torch::message("StumpMachine::save - failed to write <threshold> field!\n");
             return false;
         }
 
-        if (file.taggedWrite(&direction, sizeof(int), 1, "DIRECTION") != 1)
+        if (file.taggedWrite(&direction, 1, "DIRECTION") != 1)
         {
             Torch::message("StumpMachine::save - failed to write <direction> field!\n");
             return false;

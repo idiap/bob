@@ -10,7 +10,7 @@ MultiVariateDiagonalGaussianDistribution::MultiVariateDiagonalGaussianDistributi
 
 	//
 	use_log = false;
-	
+
 	//
 	posterior_numerator = NULL;
 	g_norm = NULL;
@@ -21,7 +21,7 @@ MultiVariateDiagonalGaussianDistribution::MultiVariateDiagonalGaussianDistributi
    	//
 	addBOption("variance update", false, "update variances");
 	addBOption("log mode", false, "use log for computing");
-	
+
 	//
 	use_log = false;
 
@@ -35,7 +35,7 @@ MultiVariateDiagonalGaussianDistribution::MultiVariateDiagonalGaussianDistributi
 bool MultiVariateDiagonalGaussianDistribution::resize(int n_inputs_, int n_means_)
 {
 	//Torch::print("MultiVariateDiagonalGaussianDistribution::resize(%d, %d)\n", n_inputs_, n_means_);
-	
+
 	posterior_numerator = new double [n_means_];
 	g_norm = new double [n_means_];
 	for(int j = 0 ; j < n_means_ ; j++) g_norm[j] = 0.0;
@@ -46,7 +46,7 @@ bool MultiVariateDiagonalGaussianDistribution::resize(int n_inputs_, int n_means
 bool MultiVariateDiagonalGaussianDistribution::cleanup()
 {
 	//Torch::print("MultiVariateDiagonalGaussianDistribution::cleanup()\n");
-	
+
 	if(posterior_numerator != NULL) delete []posterior_numerator;
 	if(g_norm != NULL) delete []g_norm;
 
@@ -61,18 +61,18 @@ MultiVariateDiagonalGaussianDistribution::~MultiVariateDiagonalGaussianDistribut
 bool MultiVariateDiagonalGaussianDistribution::prepare()
 {
 	//Torch::print("MultiVariateDiagonalGaussianDistribution::prepare()\n");
-	
+
 	use_log = getBOption("log mode");
 
 	if(use_log)
 	{
 		// pre-compute constants
 		double cst_ = n_inputs * THLog2Pi;
-		for(int j = 0 ; j < n_means ; j++) 
+		for(int j = 0 ; j < n_means ; j++)
 		{
 			double log_det = 0.0;
 			for(int k = 0 ; k < n_inputs ; k++) log_det += log(variances[j][k]);
-			
+
 			g_norm[j] = cst_ + log_det;
 		}
 	}
@@ -86,7 +86,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMinit()
 	{
 		// pre-compute constants
 		double cst_ = n_inputs * THLog2Pi;
-		for(int j = 0 ; j < n_means ; j++) 
+		for(int j = 0 ; j < n_means ; j++)
 		{
 			double log_det = 0.0;
 			for(int k = 0 ; k < n_inputs ; k++) log_det += log(variances[j][k]);
@@ -135,9 +135,9 @@ bool MultiVariateDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTenso
 	{
    		posterior_denominator = 0.0;
 
-		for(int j = 0 ; j < n_means ; j++) 
+		for(int j = 0 ; j < n_means ; j++)
 		{
-			posterior_numerator[j] = weights[j] * sampleProbabilityOneGaussian(src, j); 
+			posterior_numerator[j] = weights[j] * sampleProbabilityOneGaussian(src, j);
 			posterior_denominator += posterior_numerator[j];
 		}
 	}
@@ -176,7 +176,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTenso
 		acc_posteriors_weights[j] += posterior_j;
 		acc_posteriors_sum_weights += posterior_j;
 
-		for(int k = 0 ; k < n_inputs ; k++) 
+		for(int k = 0 ; k < n_inputs ; k++)
 		{
 			double z = src[k];
 
@@ -222,7 +222,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 					\end{equation}
 				*/
 				//double v = acc_posteriors_variances[j][k] / acc_posteriors_weights[j];
-	   		
+
 				/** Update rule (2) for variances:
 					\begin{equation}
 					\sigma_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i) \times x_i^2}{\sum_{i=1}^{n_samples} P(q_j | x_i)} - \mu_j^2
@@ -240,7 +240,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 	{
 		// pre-compute constants
 		double cst_ = n_inputs * THLog2Pi;
-		for(int j = 0 ; j < n_means ; j++) 
+		for(int j = 0 ; j < n_means ; j++)
 		{
 			double log_det = 0.0;
 			for(int k = 0 ; k < n_inputs ; k++) log_det += log(variances[j][k]);
@@ -250,7 +250,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 
 	return true;
 }
-	
+
 double MultiVariateDiagonalGaussianDistribution::sampleProbability(double *sample_)
 {
 	//Torch::print("MultiVariateDiagonalGaussianDistribution::sampleProbability()\n");
@@ -268,7 +268,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbability(double *sampl
 			sampleProbabilityOneGaussian(sample_, j);
 
 		   	current_likelihood = THLogAdd(current_likelihood, log(weights[j]) + current_likelihood_one_mean[j]);
-			
+
 			if(current_likelihood_one_mean[j] > max_)
 			{
 				max_ = current_likelihood_one_mean[j];
@@ -311,7 +311,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(do
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
 			double zz = sample_[k] - means[g][k];
-			
+
 			z += zz*zz / variances[g][k];
 		}
 
@@ -324,7 +324,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(do
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
 			double zz = sample_[k] - means[g][k];
-			
+
 			z += zz*zz / variances[g][k];
 			det *= variances[g][k];
 		}
@@ -343,7 +343,7 @@ bool MultiVariateDiagonalGaussianDistribution::loadFile(File& file)
 {
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("MultiVariateDiagonalGaussianDistribution::load - failed to read <ID> field!\n");
 		return false;
@@ -375,7 +375,7 @@ bool MultiVariateDiagonalGaussianDistribution::saveFile(File& file) const
 {
 	// Write the machine ID
 	const int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("MultiVariateDiagonalGaussianDistribution::save - failed to write <ID> field!\n");
 		return false;

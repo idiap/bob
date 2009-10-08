@@ -23,7 +23,7 @@ bool MultiVariateMeansDistribution::EMaccPosteriors(const DoubleTensor *input, c
 	acc_posteriors_weights[best_mean]++;
 	acc_posteriors_sum_weights++;
 
-	for(int k = 0 ; k < n_inputs ; k++) 
+	for(int k = 0 ; k < n_inputs ; k++)
 	{
 		double z = src[k];
 
@@ -58,7 +58,7 @@ bool MultiVariateMeansDistribution::EMupdate()
 
 	return true;
 }
-	
+
 double MultiVariateMeansDistribution::sampleProbability(double *sample_)
 {
 	double min_ = DBL_MAX;
@@ -73,9 +73,9 @@ double MultiVariateMeansDistribution::sampleProbability(double *sample_)
 			double z = sample_[k] - means[j][k];
 			d += z*z;
 		}
-		
+
 		current_likelihood_one_mean[j] = -d;
-		
+
 		if(d < min_)
 		{
 			min_ = d;
@@ -96,7 +96,7 @@ double MultiVariateMeansDistribution::sampleProbabilityOneMean(double *sample_, 
 		double z = sample_[k] - means[m][k];
 		d += z*z;
 	}
-		
+
 	current_likelihood_one_mean[m] = -d;
 
 	return -d;
@@ -106,7 +106,7 @@ bool MultiVariateMeansDistribution::loadFile(File& file)
 {
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("MultiVariateMeansDistribution::load - failed to read <ID> field!\n");
 		return false;
@@ -138,7 +138,7 @@ bool MultiVariateMeansDistribution::saveFile(File& file) const
 {
 	// Write the machine ID
 	const int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("MultiVariateMeansDistribution::save - failed to write <ID> field!\n");
 		return false;

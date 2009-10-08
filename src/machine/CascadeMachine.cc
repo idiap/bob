@@ -217,7 +217,7 @@ bool CascadeMachine::loadFile(File& file)
 {
 	// Check the ID
 	int id;
-	if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedRead(&id, 1, "ID") != 1)
 	{
 		Torch::message("CascadeMachine::load - failed to read <ID> field!\n");
 		return false;
@@ -230,7 +230,7 @@ bool CascadeMachine::loadFile(File& file)
 
 	// Get the model size
 	TensorSize inputSize;
-	if (file.taggedRead(&inputSize, sizeof(TensorSize), 1, "INPUT_SIZE") != 1)
+	if (file.taggedRead(&inputSize, "INPUT_SIZE") != 1)
 	{
 		Torch::message("CascadeMachine::load - failed to read <INPUT_SIZE> field!\n");
 		return false;
@@ -238,7 +238,7 @@ bool CascadeMachine::loadFile(File& file)
 
 	// Create the machine stages
 	int n_stages;
-        if (file.taggedRead(&n_stages, sizeof(int), 1, "N_STAGES") != 1)
+        if (file.taggedRead(&n_stages, 1, "N_STAGES") != 1)
         {
         	Torch::message("CascadeMachine::load - failed to read <N_STAGES> field!\n");
         	return false;
@@ -253,7 +253,7 @@ bool CascadeMachine::loadFile(File& file)
 	{
 		// Threshold
 		double threshold;
-		if (file.taggedRead(&threshold, sizeof(double), 1, "THRESHOLD") != 1)
+		if (file.taggedRead(&threshold, 1, "THRESHOLD") != 1)
 		{
 			Torch::message("CascadeMachine::load - failed to read <THRESHOLD> field!\n");
 			return false;
@@ -265,7 +265,7 @@ bool CascadeMachine::loadFile(File& file)
 
 		// Number of machines per stage
 		int n_trainers;
-		if (file.taggedRead(&n_trainers, sizeof(int), 1, "N_TRAINERS") != 1)
+		if (file.taggedRead(&n_trainers, 1, "N_TRAINERS") != 1)
 		{
 			Torch::message("CascadeMachine::load - failed to read <N_TRAINERS> field!\n");
 		}
@@ -279,7 +279,7 @@ bool CascadeMachine::loadFile(File& file)
 		{
 		        // Get the Machine's ID
 			int id;
-			if (file.taggedRead(&id, sizeof(int), 1, "ID") != 1)
+			if (file.taggedRead(&id, 1, "ID") != 1)
 			{
 				Torch::message("CascadeMachine::load - failed to read the Machine's <ID> field!\n");
 				return false;
@@ -305,7 +305,7 @@ bool CascadeMachine::loadFile(File& file)
 
 			// Load the weight of this machine
 			double weight;
-			if (file.taggedRead(&weight, sizeof(double), 1, "WEIGHT") != 1)
+			if (file.taggedRead(&weight, 1, "WEIGHT") != 1)
 			{
 				Torch::message("CascadeMachine::load - failed to read <WEIGHT> field!\n");
 				return false;
@@ -326,21 +326,21 @@ bool CascadeMachine::saveFile(File& file) const
 {
 	// Write the ID
 	const int id = getID();
-	if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+	if (file.taggedWrite(&id, 1, "ID") != 1)
 	{
 		Torch::message("CascadeMachine::save - failed to write <ID> field!\n");
 		return false;
 	}
 
 	// Write the model size
-	if (file.taggedWrite(&m_size, sizeof(TensorSize), 1, "INPUT_SIZE") != 1)
+	if (file.taggedWrite(&m_size, "INPUT_SIZE") != 1)
 	{
 		Torch::message("CascadeMachine::save - failed to write <INPUT_SIZE> field!\n");
 		return false;
 	}
 
 	// Write the number of stages
-	if (file.taggedWrite(&m_n_stages, sizeof(int), 1, "N_STAGES") != 1)
+	if (file.taggedWrite(&m_n_stages, 1, "N_STAGES") != 1)
         {
         	Torch::message("CascadeMachine::save - failed to write <N_STAGES> field!\n");
         	return false;
@@ -352,14 +352,14 @@ bool CascadeMachine::saveFile(File& file) const
 		const Stage& stage = m_stages[s];
 
 		// Threshold
-		if (file.taggedWrite(&stage.m_threshold, sizeof(double), 1, "THRESHOLD") != 1)
+		if (file.taggedWrite(&stage.m_threshold, 1, "THRESHOLD") != 1)
 		{
 			Torch::message("CascadeMachine::save - failed to write <THRESHOLD> field!\n");
 			return false;
 		}
 
 		// Number of machines per stage
-		if (file.taggedWrite(&stage.m_n_machines, sizeof(int), 1, "N_TRAINERS") != 1)
+		if (file.taggedWrite(&stage.m_n_machines, 1, "N_TRAINERS") != 1)
 		{
 			Torch::message("CascadeMachine::save - failed to write <N_TRAINERS> field!\n");
 		}
@@ -371,7 +371,7 @@ bool CascadeMachine::saveFile(File& file) const
 
 			// Write the Machine's ID
 			int id = machine->getID();
-			if (file.taggedWrite(&id, sizeof(int), 1, "ID") != 1)
+			if (file.taggedWrite(&id, 1, "ID") != 1)
 			{
 				Torch::message("CascadeMachine::save - failed to write the Machine's <ID> field!\n");
 				return false;
@@ -386,7 +386,7 @@ bool CascadeMachine::saveFile(File& file) const
 			}
 
 			// Save the weight of this machine
-			if (file.taggedWrite(&stage.m_weights[n], sizeof(double), 1, "WEIGHT") != 1)
+			if (file.taggedWrite(&stage.m_weights[n], 1, "WEIGHT") != 1)
 			{
 				Torch::message("CascadeMachine::save - failed to write <WEIGHT> field!\n");
 				return false;

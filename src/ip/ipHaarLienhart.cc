@@ -400,14 +400,14 @@ namespace Torch
     {
 
 
-        if (file.taggedRead(&m_width, sizeof(int), 1, "Width") != 1)
+        if (file.taggedRead(&m_width, 1, "Width") != 1)
         {
             Torch::message("ipHaarLienhart::load - failed to read <Width> field!\n");
             return false;
         }
 
 
-        if (file.taggedRead(&m_height, sizeof(int), 1, "Height") != 1)
+        if (file.taggedRead(&m_height, 1, "Height") != 1)
         {
             Torch::message("ipHaarLienhart::load - failed to read <Height> field!\n");
             return false;
@@ -416,7 +416,7 @@ namespace Torch
         m_modelSize.size[0] = m_height;
         m_modelSize.size[1]= m_width;
 
-        if (file.taggedRead(&m_noRecs, sizeof(int), 1, "NoRecs") != 1)
+        if (file.taggedRead(&m_noRecs, 1, "NoRecs") != 1)
         {
             Torch::message("ipHaarLienhart::load - failed to read <NoRecs> field!\n");
             return false;
@@ -426,7 +426,7 @@ namespace Torch
         delete [] m_parameters;
         m_parameters = new int[nsize];
 
-        if (file.taggedRead(m_parameters, sizeof(int),nsize , "parameters") != nsize)
+        if (file.taggedRead(m_parameters, nsize , "parameters") != nsize)
         {
             Torch::message("ipHaarLienhart::load - failed to read <parameters> field!\n");
             return false;
@@ -434,7 +434,7 @@ namespace Torch
 
 
         m_weight = new double[m_noRecs];
-        if (file.taggedRead(m_weight, sizeof(double),m_noRecs , "weight") != m_noRecs)
+        if (file.taggedRead(m_weight, m_noRecs , "weight") != m_noRecs)
         {
             Torch::message("ipHaarLienhart::load - failed to read <weight> field!\n");
             return false;
@@ -466,7 +466,7 @@ namespace Torch
     bool ipHaarLienhart::saveFile(File& file) const
     {
         int idCore = getID();
-        if (file.taggedWrite(&idCore, sizeof(int), 1, "CoreID") != 1)
+        if (file.taggedWrite(&idCore, 1, "CoreID") != 1)
         {
             Torch::message("ipHaarLienhart::save - failed to write <CoreID> field!\n");
             return false;
@@ -474,32 +474,32 @@ namespace Torch
 
 
         //  m_modelSize[0]
-        if (file.taggedWrite(&m_width, sizeof(int), 1, "Width") != 1)
+        if (file.taggedWrite(&m_width, 1, "Width") != 1)
         {
             Torch::message("ipHaarLienhart::save - failed to write <Width> field!\n");
             return false;
         }
 
-        if (file.taggedWrite(&m_height, sizeof(int), 1, "Height") != 1)
+        if (file.taggedWrite(&m_height, 1, "Height") != 1)
         {
             Torch::message("ipHaarLienhart::save - failed to write <height> field!\n");
             return false;
         }
 
-        if (file.taggedWrite(&m_noRecs, sizeof(int), 1, "NoRecs") != 1)
+        if (file.taggedWrite(&m_noRecs, 1, "NoRecs") != 1)
         {
             Torch::message("ipHaarLienhart::save - failed to write <NoRecs> field!\n");
             return false;
         }
 
         int nsize = m_noRecs*m_nparams;
-        if (file.taggedWrite(m_parameters, sizeof(int), nsize, "parameters") != nsize)
+        if (file.taggedWrite(m_parameters, nsize, "parameters") != nsize)
         {
             Torch::message("ipHaarLienhart::save - failed to write <parameters> field!\n");
             return false;
         }
 
-        if (file.taggedWrite(m_weight, sizeof(double), m_noRecs, "weight") != m_noRecs)
+        if (file.taggedWrite(m_weight, m_noRecs, "weight") != m_noRecs)
         {
             Torch::message("ipHaarLienhart::save - failed to write <weight> field!\n");
             return false;

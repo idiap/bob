@@ -470,7 +470,7 @@ bool CmdLine::saveFile(File& file) const
 
 	writeLog(file, true);
 
-	file.taggedWrite(&master_switch, sizeof(int), 1, "MASTER_SWITCH");
+	file.taggedWrite(&master_switch, 1, "MASTER_SWITCH");
 	CmdOption **cmd_options_ = cmd_options[master_switch];
 	int n_cmd_options_ = n_cmd_options[master_switch];
 	for (int i = 0; i < n_cmd_options_; i++)
@@ -617,7 +617,7 @@ bool CmdLine::loadFile(File& file)
 	//////////////////
 
 	int old_master_switch;
-	file.taggedRead(&old_master_switch, sizeof(int), 1, "MASTER_SWITCH");
+	file.taggedRead(&old_master_switch, 1, "MASTER_SWITCH");
 	CmdOption **cmd_options_ = cmd_options[old_master_switch];
 	int n_cmd_options_ = n_cmd_options[old_master_switch];
 	for (int i = 0; i < n_cmd_options_; i++)

@@ -21,7 +21,7 @@ namespace Torch {
 			size[2] = 0;
 			size[3] = 0;
 		}
-		TensorSize(long dim0)
+		TensorSize(int dim0)
 		{
 			n_dimensions = 1;
 			size[0] = dim0;
@@ -30,7 +30,7 @@ namespace Torch {
 			size[3] = 0;
 		}
 
-		TensorSize(long dim0, long dim1)
+		TensorSize(int dim0, int dim1)
 		{
 			n_dimensions = 2;
 			size[0] = dim0;
@@ -39,7 +39,7 @@ namespace Torch {
 			size[3] = 0;
 		}
 
-		TensorSize(long dim0, long dim1, long dim2)
+		TensorSize(int dim0, int dim1, int dim2)
 		{
 			n_dimensions = 3;
 			size[0] = dim0;
@@ -48,7 +48,7 @@ namespace Torch {
 			size[3] = 0;
 		}
 
-		TensorSize(long dim0, long dim1, long dim2, long dim3)
+		TensorSize(int dim0, int dim1, int dim2, int dim3)
 		{
 			n_dimensions = 4;
 			size[0] = dim0;
@@ -58,7 +58,7 @@ namespace Torch {
 		}
 
 		int n_dimensions;
-		long size[4];
+		int size[4];
 	};
 
 	/////////////////////////////////////////////////////////////////

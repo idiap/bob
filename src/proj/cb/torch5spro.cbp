@@ -404,6 +404,10 @@
 		<Unit filename="../../machine/distributions/CMakeLists.txt" />
 		<Unit filename="../../machine/distributions/MultiVariateDiagonalGaussianDistribution.cc" />
 		<Unit filename="../../machine/distributions/MultiVariateDiagonalGaussianDistribution.h" />
+		<Unit filename="../../machine/distributions/MultiVariateMAPDiagonalGaussianDistribution.cc" />
+		<Unit filename="../../machine/distributions/MultiVariateMAPDiagonalGaussianDistribution.h" />
+		<Unit filename="../../machine/distributions/MultiVariateMeansDistribution.cc" />
+		<Unit filename="../../machine/distributions/MultiVariateMeansDistribution.h" />
 		<Unit filename="../../machine/distributions/MultiVariateNormalDistribution.cc" />
 		<Unit filename="../../machine/distributions/MultiVariateNormalDistribution.h" />
 		<Unit filename="../../machine/gradients/CMakeLists.txt" />
