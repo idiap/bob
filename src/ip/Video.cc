@@ -4,9 +4,14 @@
 #ifdef HAVE_FFMPEG
 extern "C"
 {
-	#include "ffmpeg/avformat.h"
+	#include "avutil.h"
+	#include "avformat.h"
 	// WARNING: if you use libswscale below the code becomes GPL !!!
-	#include "ffmpeg/swscale.h"
+	#include "swscale.h"
+
+	#ifndef INT64_C
+		#define INT64_C(c)	(c ## LL)
+	#endif
 
 	// Example input program: http://web.me.com/dhoerl/Home/Tech_Blog/Entries/2009/1/22_Revised_avcodec_sample.c.html
 	// Example output program: http://cekirdek.pardus.org.tr/~ismail/ffmpeg-docs/output-example_8c-source.html
@@ -207,7 +212,7 @@ namespace Torch {
 				// close the output file
 				if (fmt != 0 && !(fmt->flags & AVFMT_NOFILE))
 				{
-					url_fclose(&oc->pb);
+					url_fclose(oc->pb);
 				}
 
 				// free the stream
@@ -654,7 +659,7 @@ namespace Torch {
 					if(verbose) print("Video::open - opening video file %s in write mode.\n", filename);
 
 					// allocate the output media context
-					m_fwrite.oc = av_alloc_format_context();
+					m_fwrite.oc = avformat_alloc_context();
 					if (!m_fwrite.oc)
 					{
 						warning("Video::open - impossible to alloc an output format context");
