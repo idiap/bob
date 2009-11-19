@@ -7,9 +7,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # Set the compiler flags and build type(release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer ")
-#SET(CMAKE_CXX_FLAGS_DEBUG "-g")
-SET(CMAKE_BUILD_TYPE RELEASE)
-#SET(CMAKE_BUILD_TYPE DEBUG)
+SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+#SET(CMAKE_BUILD_TYPE RELEASE)
+SET(CMAKE_BUILD_TYPE DEBUG)
 
 # Set the source files and includes to be added to the library
 SET(TORCH5SPRO_SRC "" CACHE INTERNAL "sources")
@@ -34,6 +34,10 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/lbfgs")
 
 # TIFF
 #ADD_DEFINITIONS(-DHAVE_TIFF)
+
+# FFMPEG
+ADD_DEFINITIONS(-DHAVE_FFMPEG)
+#TODO
 
 ########################################################
 # Sub-directories with source code

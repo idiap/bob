@@ -214,7 +214,7 @@ bool gifImageFile::readPixmap(Image& image)
 	}
 
 	// OK, update the image pixels to the pixmap
-	ImageFile::fillImage(pixmap, 3, image);
+	Image::fillImage(pixmap, 3, image);
 	delete[] pixmap;
 	return true;
 }

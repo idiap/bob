@@ -103,7 +103,7 @@ bool ppmImageFile::readPixmap(Image& image)
 	}
 
 	// OK, update the image pixels to the pixmap
-	ImageFile::fillImage(pixmap, 3, image);
+	Image::fillImage(pixmap, 3, image);
 	delete[] pixmap;
 	return true;
 }
@@ -136,7 +136,7 @@ bool ppmImageFile::writePixmap(const Image& image)
 
 	// Fill the pixmap with the image pixels
 	unsigned char* pixmap = new unsigned char[n_bytes];
-	ImageFile::fillPixmap(pixmap, 3, image);
+	Image::fillPixmap(pixmap, 3, image);
 
 	// Write the pixmap
 	if (m_file.write(pixmap, sizeof(unsigned char), n_bytes) != n_bytes)

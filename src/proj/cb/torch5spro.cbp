@@ -334,6 +334,8 @@
 		<Unit filename="../../ip/Image.h" />
 		<Unit filename="../../ip/ImageFile.cc" />
 		<Unit filename="../../ip/ImageFile.h" />
+		<Unit filename="../../ip/Video.cc" />
+		<Unit filename="../../ip/Video.h" />
 		<Unit filename="../../ip/imagefiles/CMakeLists.txt" />
 		<Unit filename="../../ip/imagefiles/gifImageFile.cc" />
 		<Unit filename="../../ip/imagefiles/gifImageFile.h" />

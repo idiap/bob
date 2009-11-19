@@ -46,6 +46,14 @@ namespace Torch {
 		///	- all planes are copied
 		bool			copyFrom(const Image& image);
 
+		/// Fills a pixmap from an image object
+		static  void		fillPixmap(	unsigned char* pixmap, int n_planes_pixmap,
+							const Image& image);
+
+		/// Fills an image object from a pixmap (the pixmap is RGB, the image may be gray)
+		static void		fillImage(	const unsigned char* pixmap, int n_planes_pixmap,
+							Image& image);
+
 		/**@name drawing methods */
 		//@{
 		/** draw a pixel in the image.

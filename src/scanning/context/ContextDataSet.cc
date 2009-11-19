@@ -296,7 +296,7 @@ bool ContextDataSet::save(const char* basename, unsigned char mask) const
 				const double* values = (const double*)m_contexts[i]->m_features[f].dataR();
 				for (int k = 0; k < fsize; k ++)
 				{
-					file.printf("%f\t", values[k]);
+					file.printf("%lf\t", values[k]);
 				}
 				file.printf("\n");
 			}

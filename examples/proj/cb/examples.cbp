@@ -137,6 +137,9 @@
 		</Unit>
 		<Unit filename="../../tensors/bigtest.cc" />
 		<Unit filename="../../tensors/make.csh" />
+		<Unit filename="../../video/CMakeLists.txt" />
+		<Unit filename="../../video/make.csh" />
+		<Unit filename="../../video/testio.cc" />
 		<Extensions>
 			<envvars />
 			<code_completion />

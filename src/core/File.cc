@@ -119,7 +119,13 @@ namespace Torch
 
 	bool File::readValue(unsigned char* value)
 	{
-		return scanf("%uc", value) > 0;
+		unsigned int temp;
+		if (scanf("%u", &temp) < 1)
+		{
+			return false;
+		}
+		*value = (unsigned char)temp;
+		return true;
 	}
 	bool File::readValue(bool* value)
 	{
@@ -158,7 +164,8 @@ namespace Torch
 
 	bool File::writeValue(const unsigned char* value)
 	{
-		return printf("%uc ", *value) > 0;
+		const unsigned int temp = *value;
+		return printf("%u ", temp) > 0;
 	}
 	bool File::writeValue(const bool* value)
 	{

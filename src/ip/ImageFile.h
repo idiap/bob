@@ -49,16 +49,6 @@ namespace Torch
 		//@}
 
 		///////////////////////////////////////////////////////////////////
-
-		// Fills a pixmap from an image object
-		static  void		fillPixmap(	unsigned char* pixmap, int n_planes_pixmap,
-							const Image& image);
-
-		// Fills an image object from a pixmap (the pixmap is RGB, the image may be gray)
-		static void		fillImage(	const unsigned char* pixmap, int n_planes_pixmap,
-							Image& image);
-
-		///////////////////////////////////////////////////////////////////
 		// Attributes
 
 		File			m_file;

@@ -122,7 +122,7 @@ bool tiffImageFile::readPixmap(Image& image)
     	unpack_tiff_raster(raster, pixmap);
 
 	// OK, update the image pixels to the pixmap
-	ImageFile::fillImage(pixmap, 3, image);
+	Image::fillImage(pixmap, 3, image);
 	delete[] pixmap;
 	_TIFFfree(raster);
 	return true;
@@ -177,7 +177,7 @@ bool tiffImageFile::writePixmap(const Image& image)
 
     	// Fill the pixmap with the image pixels
 	unsigned char* pixmap = new unsigned char[3 * width * height];
-	ImageFile::fillPixmap(pixmap, 3, image);
+	Image::fillPixmap(pixmap, 3, image);
 
 	// Write the pixmap
    	char* scanline = (char *) pixmap;
