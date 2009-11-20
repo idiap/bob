@@ -45,6 +45,10 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	print("Memory allocation done.\n");
+	
+	print("Reading memory ...\n");
+	
 	// Retrieve examples and targets
 	for (long i = 0; i < n_examples; i ++)
 	{

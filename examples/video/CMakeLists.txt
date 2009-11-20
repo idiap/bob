@@ -7,16 +7,29 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # Set the include directories and linking libraries
 SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
-SET(FFMPEG_DIR "/usr/")
+#SET(FFMPEG_DIR "/usr/")
+SET(FFMPEG_DIR "${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}")
 
 INCLUDE_DIRECTORIES("${TORCH5SPRO_DIR}")
 
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
 		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a"
-		"${FFMPEG_DIR}/lib/libavutil.so"
-		"${FFMPEG_DIR}/lib/libavformat.so"
-		"${FFMPEG_DIR}/lib/libavcodec.so"
-		"${FFMPEG_DIR}/lib/libswscale.so")
+		#"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavformat.so"
+		#"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavcodec.so"
+		#"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavutil.so"
+		#"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libswscale.so")
+		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavformat.a"
+		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavcodec.a"
+		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavutil.a"
+		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libswscale.a")
+		#"${FFMPEG_DIR}/lib/libavformat.a"
+		#"${FFMPEG_DIR}/lib/libavcodec.a"
+		#"${FFMPEG_DIR}/lib/libavutil.a"
+		#"${FFMPEG_DIR}/lib/libswscale.a")
+		#"${FFMPEG_DIR}/lib/libavformat.so"
+		#"${FFMPEG_DIR}/lib/libavcodec.so"
+		#"${FFMPEG_DIR}/lib/libavutil.so"
+		#"${FFMPEG_DIR}/lib/libswscale.so")
 
 # Set the compiler flags and build type (release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")

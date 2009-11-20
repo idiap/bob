@@ -36,11 +36,12 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/lbfgs")
 #ADD_DEFINITIONS(-DHAVE_TIFF)
 
 # FFMPEG
-#INCLUDE_DIRECTORIES("/usr/include/libavutil/")
-#INCLUDE_DIRECTORIES("/usr/include/libavformat/")
-#INCLUDE_DIRECTORIES("/usr/include/libavcodec/")
-#INCLUDE_DIRECTORIES("/usr/include/libswscale/")
-#ADD_DEFINITIONS(-DHAVE_FFMPEG)
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavutil")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavformat")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavcodec")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libswscale")
+ADD_DEFINITIONS(-DHAVE_FFMPEG)
 
 ########################################################
 # Sub-directories with source code
