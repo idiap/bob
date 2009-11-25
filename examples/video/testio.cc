@@ -83,6 +83,8 @@ int main(int argc, char* argv[])
 		if(cnt_frames == n_images) break; 
 	}
 
+	print("Real number of frames: %d\n", cnt_frames);
+	
 	//CHECK_FATAL(cnt_frames == in_video.getNFrames());
 
 	// Close the videos
