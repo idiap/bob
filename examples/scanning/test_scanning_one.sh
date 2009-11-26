@@ -1,6 +1,6 @@
 #!/bin/sh
 
-image="/idiap/common_vision/visidiap/databases/cmu-test/images_gray/addams-family.pgm"
+image="../data/images/1001_f_g1_s01_1001_en_1.jpeg"
 
 face_model="../data/models/facedetection/frontal/mct5-2-5-10-50-200.cascade"
 context_model="/idiap/catana/experiments/cmu_cmu/dx_0.1_dy_0.1_ds_1.1/axis/mct4.wsmxxx-0.049904xxx/context_models/face.context"
@@ -19,7 +19,7 @@ context_model="/idiap/catana/experiments/cmu_cmu/dx_0.1_dy_0.1_ds_1.1/axis/mct4.
 #	HLBP: multiscale (-prep_hlbp -prep_ii) vs. pyramid (-prep_hlbp -prep_ii)
 #	-----------
 #	explorer_type: 0 - Pyramid, 1 - MultiScale, 2 - Greedy
-#	scale_explorer_type: 0 - Exhaustive, 1 - Spiral, 2 - Random, 3 - Mixed
+#	scale_explorer_type: 0 - Exhaustive, 1 - Spiral, 2 - Random
 #	select_type: 0 - Overlap, 1 - AMS
 #	select_merge_type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence
 #	-stop_at_first_detection, -start_with_large_scale
@@ -30,12 +30,12 @@ params_context="-context_model $context_model -context_type 1"
 
 # Multiscale
 params_select="-select_type 0 -select_merge_type 1 -select_min_surf_overlap 60" #-select_overlap_iterative
-params=$params_prune" "$params_select" "$params_general" "$params_context" -verbose -prep_ii"
+params=$params_prune" "$params_select" "$params_general" "$params_context" -prep_ii" #-verbose"
 time ./`uname -s`_`uname -m`/scanning $image $face_model -explorer_type 1 -scale_explorer_type 0 $params
 
 # Pyramid
 params_select="-select_type 0 -select_merge_type 1 -select_min_surf_overlap 60" #-select_overlap_iterative
-params=$params_prune" "$params_select" "$params_general" "$params_context" -verbose"
+params=$params_prune" "$params_select" "$params_general" "$params_context" " # -verbose"
 time ./`uname -s`_`uname -m`/scanning $image $face_model -explorer_type 0 -scale_explorer_type 0 $params
 
 ## Context

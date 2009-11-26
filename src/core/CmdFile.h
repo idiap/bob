@@ -49,13 +49,17 @@ namespace Torch {
 		CmdFile();
 
 		///
-		void read(char *, bool = true);
+		void read(const char *, bool = true);
+
+		/// Write the current option values to some file (in the required format for ::read)
+		bool write(File& file) const;
+		bool write(const char* filename) const;
 
 		///
 		void readHref();
 
 		///
-		void help();
+		void help() const;
 
 		//-----
 
@@ -130,7 +134,7 @@ namespace Torch {
 		void setHrefCmdOption(int argc, char **argv, int *current, CmdFileOption *ptro);
 
 		///
-		void printCmdOption(CmdFileOption *ptro);
+		void printCmdOption(CmdFileOption *ptro) const;
 
 		///
 		virtual ~CmdFile();

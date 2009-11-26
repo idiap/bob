@@ -1,0 +1,74 @@
+### 
+
+### face classifier model
+model ../data/models/facedetection/frontal/mct4.cascade
+### threshold of the face classifier model
+-model_thres 0
+### use the given threshold
+-model_use_thres false
+### 
+
+### explorer type: 0 - Pyramid, 1 - Multiscale, 2 - Context
+-explorer_type 1
+### scale explorer type: 0 - Exhaustive, 1 - Spiral, 2 - Random
+-scale_explorer_type 0
+### minimum pattern width
+-min_patt_w 0
+### maximum pattern width
+-max_patt_w 10000
+### minimum pattern height
+-min_patt_h 0
+### maximum pattern height
+-max_patt_h 10000
+### Sub-window Oy position variation
+-dx 0.1
+### Sub-window Ox position variation
+-dy 0.1
+### Sub-window scale variation
+-ds 1.1
+### stop at first detection
+-stop_at_first_detection false
+### start with large scales
+-start_with_large_scale false
+### random scale explorer: number of samples
+-random_nsamples 1024
+### 
+
+### Compute integral image
+-prep_ii true
+### HLBP: compute LBP4R bitmaps
+-prep_hlbp false
+### 
+
+### prune using the mean
+-prune_use_mean false
+### prune using the stdev
+-prune_use_stdev false
+### prune using the mean: min value
+-prune_min_mean 25
+### prune using the mean: max value
+-prune_max_mean 225
+### prune using the stdev: min value
+-prune_min_stdev 10
+### prune using the stdev: max value
+-prune_max_stdev 125
+### 
+
+### selector type: 0 - Overlap, 1 - MeanShift, 2 - No merge
+-select_type 0
+### selector's merging type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence
+-select_overlap_type 1
+### Overlap: Iterative/One step
+-select_overlap_iterative false
+### Overlap: minimum surface overlap to merge
+-select_overlap_min_surf 60
+### 
+
+### Face context-based model
+-context_model ../data/models/facedetection/frontal/mct4.banca.dx01dy01ds11.defthres.full.context
+### Context type (0 - Full, 1 - Axis)
+-context_type 0
+### 
+
+### verbose
+-verbose false

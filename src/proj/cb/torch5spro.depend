@@ -1,0 +1,294 @@
+# depslib dependency file v1.0
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcapimin.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jinclude.h
+	"jconfig.h"
+	<stddef.h>
+	<stdlib.h>
+	<sys/types.h>
+	<stdio.h>
+	<strings.h>
+	<string.h>
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jconfig.h
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jpeglib.h
+	"jconfig.h"
+	"jmorecfg.h"
+	"jpegint.h"
+	"jerror.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jmorecfg.h
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jpegint.h
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jerror.h
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcapistd.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jccoefct.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jccolor.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcdctmgr.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdct.h
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jchuff.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jchuff.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jchuff.h
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcinit.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcmainct.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcmarker.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcmaster.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcomapi.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcparam.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcphuff.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jchuff.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcprepct.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jcsample.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jctrans.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdapimin.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdapistd.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdatadst.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jerror.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdatasrc.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jerror.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdcoefct.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdcolor.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jddctmgr.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdhuff.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdhuff.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdhuff.h
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdinput.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdmainct.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdmarker.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdmaster.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdmerge.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdphuff.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdhuff.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdpostct.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdsample.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jdtrans.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jerror.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jversion.h"
+	"jerror.h"
+	<windows.h>
+	"jerror.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jversion.h
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jfdctflt.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jfdctfst.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jfdctint.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jidctflt.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jidctfst.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jidctint.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jidctred.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jdct.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jmemmgr.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jmemsys.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jmemsys.h
+	<Files.h>
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jmemnobs.c
+	"jinclude.h"
+	"jpeglib.h"
+	"jmemsys.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jquant1.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jquant2.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/jpeg/jutils.c
+	"jinclude.h"
+	"jpeglib.h"
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/lbfgs/lbfgs.c
+	<config.h>
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"lbfgs.h"
+	"arithmetic_sse_double.h"
+	"arithmetic_sse_float.h"
+	"arithmetic_ansi.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/lbfgs/lbfgs.h
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/lbfgs/arithmetic_sse_double.h
+	<stdlib.h>
+	<malloc.h>
+	<memory.h>
+	<intrin.h>
+	<emmintrin.h>
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/lbfgs/arithmetic_sse_float.h
+	<stdlib.h>
+	<malloc.h>
+	<memory.h>
+	<intrin.h>
+	<xmmintrin.h>
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/lbfgs/arithmetic_ansi.h
+	<stdlib.h>
+	<memory.h>
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/oourafft/alloc.c
+	"alloc.h"
+
+1258638981 /home/cosmin/idiap/coding/torch5spro/torch5spro/extras/oourafft/alloc.h
+	<stdlib.h>
+	<stdio.h>
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/oourafft/fftsg.c
+	<math.h>
+	<pthread.h>
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	<stdio.h>
+	<stdlib.h>
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/oourafft/fftsg2d.c
+	<stdio.h>
+	<stdlib.h>
+	<pthread.h>
+	<windows.h>
+
+1258638981 source:/home/cosmin/idiap/coding/torch5spro/torch5spro/extras/oourafft/shrtdct.c
+

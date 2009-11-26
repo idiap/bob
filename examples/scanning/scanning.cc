@@ -10,7 +10,7 @@ struct Params
 {
         // General scanning
         int explorer_type;		// 0 - Pyramid, 1 - Multiscale, 2 - Context
-	int scale_explorer_type;        // 0 - Exhaustive, 1 - Spiral, 2 - Random, 3 - Mixed
+	int scale_explorer_type;        // 0 - Exhaustive, 1 - Spiral, 2 - Random
         int min_patt_w, max_patt_w;     // Min/max pattern width/height
         int min_patt_h, max_patt_h;
         float dx, dy, ds;               // Scanning precision factors
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
 
 	cmd.addText("\nScanning options:");
 	cmd.addICmdOption("-explorer_type", &params.explorer_type, 0, "explorer type: 0 - Pyramid, 1 - Multiscale, 2 - Context");
-	cmd.addICmdOption("-scale_explorer_type", &params.scale_explorer_type, 0, "scale explorer type: 0 - Exhaustive, 1 - Spiral, 2 - Random, 3 - Mixed");
+	cmd.addICmdOption("-scale_explorer_type", &params.scale_explorer_type, 0, "scale explorer type: 0 - Exhaustive, 1 - Spiral, 2 - Random");
 	cmd.addICmdOption("-min_patt_w", &params.min_patt_w, 19, "minimum pattern width");
 	cmd.addICmdOption("-max_patt_w", &params.max_patt_w, 190, "maximum pattern width");
 	cmd.addICmdOption("-min_patt_h", &params.min_patt_h, 19, "minimum pattern height");
@@ -449,11 +449,6 @@ int main(int argc, char* argv[])
 
 		case 2:	// Random
 			index = 2;
-			break;
-
-		case 3:	// Mixed
-		default:
-			index = rand() % n_scale_explorers;
 			break;
         	}
                 CHECK_FATAL(explorer->setScaleExplorer(j, scale_explorers[index]) == true);

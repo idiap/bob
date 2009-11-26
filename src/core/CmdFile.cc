@@ -110,7 +110,7 @@ void CmdFile::addText(const char *text)
   	addCmdOption(text, NULL, 0, "", CMD_FILE_TEXT);
 }
 
-void CmdFile::printCmdOption(CmdFileOption *ptro)
+void CmdFile::printCmdOption(CmdFileOption *ptro) const
 {
   	char **ptr_s;
 
@@ -238,7 +238,49 @@ void CmdFile::setHrefCmdOption(int argc, char **argv, int *current, CmdFileOptio
   	*current = current_;
 }
 
-void CmdFile::help()
+bool CmdFile::write(File& file) const
+{
+	if(text_info)
+    		file.printf("\n#### %s ####\n", text_info);
+
+	for(int i = 0; i < n_cmd_options; i++)
+  	{
+  		file.printf("### %s\n", cmd_options[i].help);
+  		switch(cmd_options[i].status)
+    		{
+      		case CMD_FILE_OPTION:
+      		case CMD_FILE_PARAMS:
+			switch(cmd_options[i].type)
+			{
+			case CMD_FILE_INT:
+				file.printf("%s %d", cmd_options[i].name, *((int *)cmd_options[i].ptr));
+				break;
+			case CMD_FILE_SWITCH:
+				file.printf("%s %s", cmd_options[i].name, *((bool *)cmd_options[i].ptr) ? "true" : "false");
+				break;
+			case CMD_FILE_DOUBLE:
+				file.printf("%s %g", cmd_options[i].name, *((double *)cmd_options[i].ptr));
+				break;
+			case CMD_FILE_STRING:
+				file.printf("%s %s", cmd_options[i].name, *((char**)cmd_options[i].ptr));
+				break;
+			}
+       			break;
+    		}
+    		file.printf("\n");
+  	}
+
+	file.close();
+	return true;
+}
+
+bool CmdFile::write(const char* filename) const
+{
+	File file;
+	return file.open(filename, "w") && write(file);
+}
+
+void CmdFile::help() const
 {
   	if(text_info)
     		print("\n#### %s ####\n", text_info);
@@ -378,16 +420,15 @@ CmdFile::~CmdFile()
   	free(str);
 }
 
-void CmdFile::read(char *filename, bool check_everything)
+void CmdFile::read(const char *filename, bool check_everything)
 {
   	int ld;
   	int the_opt, current;
-  	char dummy[500];
 
   	File ParamFile;
   	if (ParamFile.open(filename, "r") == false)
   	{
-  		// ?!
+		return;
   	}
 
   	//if(!ParamFile) error("CmdFile: Impossible to open file %s", filename);
@@ -395,63 +436,42 @@ void CmdFile::read(char *filename, bool check_everything)
   	strc = 0;
   	str = NULL;
 
-  	ParamFile.scanf("%s", dummy);
-	//print("[%s]\n", dummy);
+	// Parse the file (NB: line by line)
+  	while (!ParamFile.eof())
+  	{
+  		static const int dummy_size = 1024;
+  		char dummy[dummy_size];
 
-  	if(dummy[0] != '#')
-	{
-		ld = strlen(dummy);
-		str = (char **) malloc(sizeof(char*));
+		// Get the current line and remove its trailing \n
+		ParamFile.gets(dummy, dummy_size - 1);
+		for (int i = 0; i < dummy_size; i ++)
+			if (dummy[i] == '\n')
+			{
+				dummy[i] = '\0';
+				break;
+			}
+		if (strlen(dummy) < 1 || dummy[0] == '#')
+		{
+			continue;
+		}
+
+		// Break the line in strings
+		char str1[512], str2[512];
+		if (sscanf(dummy, "%s %s", str1, str2) != 2)
+			continue;
+
+		// Copy the strings (name + value)
+  		ld = strlen(str1);
+  		str = (char**) ((str == 0) ? malloc(sizeof(char*)) : realloc((void *)str, (strc + 1) * sizeof(char*)));
 		str[strc] = (char *) malloc(ld + 1);
-		strcpy(str[strc], dummy);
+		strcpy(str[strc], str1);
 		strc++;
 
-		ParamFile.scanf("%s", dummy);
-		//print("[%s]\n", dummy);
-		ld = strlen(dummy) ;
-		str = (char **) realloc((void *)str, (strc + 1) * sizeof(char*));
+		ld = strlen(str2);
+		str = (char**) ((str == 0) ? malloc(sizeof(char*)) : realloc((void *)str, (strc + 1) * sizeof(char*)));
 		str[strc] = (char *) malloc(ld + 1);
-		strcpy(str[strc], dummy);
+		strcpy(str[strc], str2);
 		strc++;
-	}
-  	else
-	{
-		ParamFile.scanf("%s", dummy);
-		//print("[%s]\n", dummy);
-	}
-
-  	while(!ParamFile.eof())
-	{
-		ParamFile.scanf("%s", dummy);
-		//print("[%s]\n", dummy);
-		if(ParamFile.eof()) break;
-		if(dummy[0] != '#')
-		{
-			 ld = strlen(dummy);
-			 if(strc == 0)
-			 	str = (char **) malloc(sizeof(char*));
-			 else
-			 	str = (char **) realloc((void *)str, (strc + 1) * sizeof(char*));
-
-			 str[strc] = (char *) malloc(ld + 1);
-			 strcpy(str[strc], dummy);
-			 strc++;
-
-			 ParamFile.scanf("%s", dummy);
-			 //print("[%s]\n", dummy);
-			 if(ParamFile.eof()) break;
-			 ld = strlen(dummy);
-			 str = (char **) realloc((void *)str, (strc + 1) * sizeof(char*));
-			 str[strc] = (char *) malloc(ld + 1);
-			 strcpy(str[strc], dummy);
-
-			 strc++;
-		}
-		else
-		{
-			 ParamFile.scanf("%s", dummy);
-			 //print("[%s]\n", dummy);
-		}
 	}
 
 	ParamFile.close();

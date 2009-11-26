@@ -138,7 +138,12 @@
 		<Unit filename="../../tensors/bigtest.cc" />
 		<Unit filename="../../tensors/make.csh" />
 		<Unit filename="../../video/CMakeLists.txt" />
+		<Unit filename="../../video/checkvideo.cc" />
+		<Unit filename="../../video/checkvideos.cc" />
+		<Unit filename="../../video/fdvideo.cc" />
 		<Unit filename="../../video/make.csh" />
+		<Unit filename="../../video/makeFaceFinder.cc" />
+		<Unit filename="../../video/makeFaceFinders.sh" />
 		<Unit filename="../../video/testio.cc" />
 		<Extensions>
 			<envvars />

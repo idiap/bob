@@ -9,6 +9,7 @@ SET(	scanning_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/Explorer.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Scanner.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Selector.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/FaceFinder.cc"
 	CACHE INTERNAL "sources")
 
 SET(	scanning_INCLUDE

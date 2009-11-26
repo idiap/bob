@@ -434,6 +434,8 @@
 		<Unit filename="../../scanning/CMakeLists.txt" />
 		<Unit filename="../../scanning/Explorer.cc" />
 		<Unit filename="../../scanning/Explorer.h" />
+		<Unit filename="../../scanning/FaceFinder.cc" />
+		<Unit filename="../../scanning/FaceFinder.h" />
 		<Unit filename="../../scanning/Pattern.cc" />
 		<Unit filename="../../scanning/Pattern.h" />
 		<Unit filename="../../scanning/ScaleExplorer.cc" />

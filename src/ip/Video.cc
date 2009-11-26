@@ -202,7 +202,7 @@ namespace Torch {
 				// free the streams
 				if (oc != 0)
 				{
-					for(i = 0; i < oc->nb_streams; i++)
+					for(i = 0; i < (int)oc->nb_streams; i++)
 					{
 						av_freep(&oc->streams[i]->codec);
 						av_freep(&oc->streams[i]);
@@ -428,7 +428,7 @@ namespace Torch {
 						AVPacket pkt;
 						av_init_packet(&pkt);
 
-						if (c->coded_frame->pts != AV_NOPTS_VALUE)
+						if ((int)c->coded_frame->pts != AV_NOPTS_VALUE)
 							pkt.pts= av_rescale_q(c->coded_frame->pts, c->time_base, video_st->time_base);
 						if(c->coded_frame->key_frame)
 							pkt.flags |= PKT_FLAG_KEY;
@@ -491,8 +491,8 @@ namespace Torch {
 			VideoImpl(bool verbose, const char* filename = 0, const char *open_flags = "r")
 				:	m_state(Video::Idle),
 					m_nframes(0),
-					m_width(0), m_height(0),
-					m_bitrate(1500000.0f), m_framerate(25.0f), m_gop(100)
+					m_width(0), m_height(0), m_gop(100),
+					m_bitrate(1500000.0f), m_framerate(25.0f)
 			{
 			#ifndef HAVE_FFMPEG
 				error("HAVE_FFMPEG not defined in Video::Video");
@@ -550,7 +550,7 @@ namespace Torch {
 
 					// Find the first video stream
 					m_fread.videoStream = -1;
-					for (m_fread.i = 0; m_fread.i < m_fread.pFormatCtx->nb_streams; m_fread.i ++)
+					for (m_fread.i = 0; m_fread.i < (int)m_fread.pFormatCtx->nb_streams; m_fread.i ++)
 						if (m_fread.pFormatCtx->streams[m_fread.i]->codec->codec_type
 							== CODEC_TYPE_VIDEO)
 						{
@@ -765,8 +765,8 @@ namespace Torch {
 					if (m_fread.packet.stream_index == m_fread.videoStream)
 					{
 						// Decode video frame
-						avcodec_decode_video(m_fread.pCodecCtx, m_fread.pFrame, &m_fread.frameFinished,
-								m_fread.packet.data, m_fread.packet.size);
+						avcodec_decode_video2(m_fread.pCodecCtx, m_fread.pFrame, &m_fread.frameFinished,
+								&m_fread.packet);
 
 						// Did we get a video frame?
 						if (m_fread.frameFinished)
@@ -790,10 +790,10 @@ namespace Torch {
 									return false;
 								}
 							}
-							int ret = sws_scale(	img_convert_ctx,
-										m_fread.pFrame->data, m_fread.pFrame->linesize,
-										0, m_fread.pCodecCtx->height,
-										m_fread.pFrameRGB->data, m_fread.pFrameRGB->linesize);
+							sws_scale(	img_convert_ctx,
+									m_fread.pFrame->data, m_fread.pFrame->linesize,
+									0, m_fread.pCodecCtx->height,
+									m_fread.pFrameRGB->data, m_fread.pFrameRGB->linesize);
 
 							// Got the image - exit
 							m_fread.i ++;

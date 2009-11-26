@@ -10,7 +10,7 @@ context_model="/idiap/catana/experiments/cmu_cmu/dx_0.1_dy_0.1_ds_1.1/axis/mct4.
 #	HLBP: multiscale (-prep_hlbp -prep_ii) vs. pyramid (-prep_hlbp -prep_ii)
 #	-----------
 #	explorer_type: 0 - Pyramid, 1 - MultiScale, 2 - Greedy
-#	scale_explorer_type: 0 - Exhaustive, 1 - Spiral, 2 - Random, 3 - Mixed
+#	scale_explorer_type: 0 - Exhaustive, 1 - Spiral, 2 - Random
 #	select_type: 0 - Overlap, 1 - AMS
 #	select_merge_type: 0 - Average, 1 - Confidence Weighted, 2 - Maximum Confidence
 #	-stop_at_first_detection, -start_with_large_scale
