@@ -12,7 +12,6 @@ int main(int argc, char* argv[])
 	char* in_paramname = 0;
 	char* out_videoname = 0;
 	char* out_resname;
-	bool draw = false;
 	bool verbose = false;
 
 	// Read the command line
@@ -24,10 +23,14 @@ int main(int argc, char* argv[])
 
 	cmd.addText("Options:");
 	cmd.addSCmdOption("-out_video", &out_videoname, "", "output video with face detections drawn for each frame");
-	cmd.addBCmdOption("-draw", &draw, false, "draw face detections for each frame");
 	cmd.addBCmdOption("-verbose", &verbose, false, "verbose");
 
-	cmd.read(argc, argv);
+	if (cmd.read(argc, argv) < 0)
+	{
+		return 0;
+	}
+
+	const bool draw = out_videoname != 0 && strlen(out_videoname) > 0;
 
 	// Load the face finder
 	FaceFinder ffinder;
@@ -94,8 +97,10 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	print("Real number of frames: %d\n", cnt_frames);
-
+	if (verbose == true)
+	{
+		print("Real number of frames: %d\n", cnt_frames);
+	}
 	//CHECK_FATAL(cnt_frames == in_video.getNFrames());
 
 	// Close the videos and the result file

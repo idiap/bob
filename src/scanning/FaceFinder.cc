@@ -496,8 +496,20 @@ bool FaceFinder::process(const Image& image)
 
 const PatternList& FaceFinder::getPatterns() const
 {
-	CHECK_FATAL(m_scanner != 0);
+	if (m_scanner == 0)
+	{
+		error("FaceFinder::getPatterns - invalid scanner!\n");
+	}
 	return m_scanner->getPatterns();
+}
+
+const Scanner& FaceFinder::getScanner() const
+{
+	if (m_scanner == 0)
+	{
+		error("FaceFinder::getScanner - invalid scanner!\n");
+	}
+	return *m_scanner;
 }
 
 /////////////////////////////////////////////////////////////////////////

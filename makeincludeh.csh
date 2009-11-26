@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 subdirs=$1
 hdir=$2
