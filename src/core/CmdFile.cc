@@ -407,7 +407,7 @@ CmdFile::~CmdFile()
 			}
 		}
 
-    		if(cmd_options[i].status != CMD_FILE_TEXT)
+    		//if(cmd_options[i].status != CMD_FILE_TEXT) -> THIS IS WRONG, the texts have an help of 1byte (strlen + 1)!
 			free(cmd_options[i].help);
   	}
 
@@ -443,6 +443,7 @@ void CmdFile::read(const char *filename, bool check_everything)
   		char dummy[dummy_size];
 
 		// Get the current line and remove its trailing \n
+		memset(dummy, '\0', dummy_size);
 		ParamFile.gets(dummy, dummy_size - 1);
 		for (int i = 0; i < dummy_size; i ++)
 			if (dummy[i] == '\n')

@@ -73,8 +73,10 @@ void getBaseFileName(const char* filename, char* basename)
         char* separator = (char*) rindex(basename, '/');
         if (separator != 0)
         {
-                separator++;
-                strcpy(basename, separator);
+        	separator++;
+        	memmove(basename, separator, strlen(separator));
+        	basename[strlen(separator)] = '\0';
+                //strcpy(basename, separator);
         }
 }
 

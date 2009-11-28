@@ -61,14 +61,14 @@
 	<File name="../../../extras/oourafft/CMakeLists.txt" open="0" top="0" tabpos="4">
 		<Cursor position="309" topLine="0" />
 	</File>
-	<File name="../../../makeall.csh" open="0" top="0" tabpos="2">
+	<File name="../../../makeall.csh" open="1" top="0" tabpos="3">
 		<Cursor position="13" topLine="0" />
 	</File>
-	<File name="../../../makeincludeh.csh" open="0" top="0" tabpos="3">
+	<File name="../../../makeincludeh.csh" open="1" top="0" tabpos="4">
 		<Cursor position="9" topLine="0" />
 	</File>
-	<File name="../../CMakeLists.txt" open="0" top="0" tabpos="1">
-		<Cursor position="1206" topLine="29" />
+	<File name="../../CMakeLists.txt" open="1" top="0" tabpos="5">
+		<Cursor position="278" topLine="1" />
 	</File>
 	<File name="../../boosting/BoostingRoundLBPTrainer.cc" open="0" top="0" tabpos="27">
 		<Cursor position="8871" topLine="273" />
@@ -142,11 +142,11 @@
 	<File name="../../core/CMakeLists.txt" open="0" top="0" tabpos="42">
 		<Cursor position="1242" topLine="0" />
 	</File>
-	<File name="../../core/CmdFile.cc" open="0" top="0" tabpos="66">
-		<Cursor position="6778" topLine="246" />
+	<File name="../../core/CmdFile.cc" open="1" top="1" tabpos="7">
+		<Cursor position="10180" topLine="375" />
 	</File>
-	<File name="../../core/CmdFile.h" open="0" top="0" tabpos="67">
-		<Cursor position="2604" topLine="99" />
+	<File name="../../core/CmdFile.h" open="1" top="0" tabpos="6">
+		<Cursor position="1265" topLine="48" />
 	</File>
 	<File name="../../core/CmdLine.cc" open="0" top="0" tabpos="104">
 		<Cursor position="15198" topLine="597" />
@@ -560,10 +560,10 @@
 		<Cursor position="3920" topLine="99" />
 	</File>
 	<File name="../../scanning/FaceFinder.cc" open="1" top="0" tabpos="2">
-		<Cursor position="14720" topLine="473" />
+		<Cursor position="15165" topLine="485" />
 	</File>
 	<File name="../../scanning/FaceFinder.h" open="1" top="0" tabpos="1">
-		<Cursor position="463" topLine="0" />
+		<Cursor position="1192" topLine="28" />
 	</File>
 	<File name="../../scanning/Pattern.cc" open="0" top="0" tabpos="76">
 		<Cursor position="2019" topLine="130" />

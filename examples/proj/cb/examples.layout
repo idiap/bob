@@ -190,23 +190,23 @@
 	<File name="../../options/parameters.cc" open="0" top="0" tabpos="54">
 		<Cursor position="23" topLine="0" />
 	</File>
-	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="9">
-		<Cursor position="520" topLine="0" />
+	<File name="../../scanning/CMakeLists.txt" open="1" top="0" tabpos="11">
+		<Cursor position="587" topLine="0" />
 	</File>
 	<File name="../../scanning/make.csh" open="0" top="0" tabpos="15">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../scanning/scanning.cc" open="1" top="0" tabpos="1">
-		<Cursor position="17564" topLine="388" />
+	<File name="../../scanning/scanning.cc" open="1" top="1" tabpos="1">
+		<Cursor position="3031" topLine="41" />
 	</File>
 	<File name="../../scanning/testPatternList.cc" open="0" top="0" tabpos="38">
 		<Cursor position="1297" topLine="18" />
 	</File>
-	<File name="../../scanning/test_scanning_all.sh" open="0" top="0" tabpos="8">
-		<Cursor position="851" topLine="0" />
+	<File name="../../scanning/test_scanning_all.sh" open="1" top="0" tabpos="5">
+		<Cursor position="84" topLine="0" />
 	</File>
-	<File name="../../scanning/test_scanning_one.sh" open="0" top="0" tabpos="1">
-		<Cursor position="2601" topLine="12" />
+	<File name="../../scanning/test_scanning_one.sh" open="1" top="0" tabpos="4">
+		<Cursor position="64" topLine="0" />
 	</File>
 	<File name="../../sp/dct1d.cc" open="0" top="0" tabpos="55">
 		<Cursor position="23" topLine="0" />
@@ -236,12 +236,12 @@
 		<Cursor position="556" topLine="3" />
 	</File>
 	<File name="../../video/fdvideo.cc" open="1" top="0" tabpos="2">
-		<Cursor position="3111" topLine="69" />
+		<Cursor position="948" topLine="19" />
 	</File>
 	<File name="../../video/make.csh" open="0" top="0" tabpos="9">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="../../video/makeFaceFinders.sh" open="1" top="1" tabpos="3">
+	<File name="../../video/makeFaceFinders.sh" open="1" top="0" tabpos="3">
 		<Cursor position="1021" topLine="3" />
 	</File>
 	<File name="../../video/testio.cc" open="0" top="0" tabpos="10">
