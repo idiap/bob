@@ -8,6 +8,7 @@ echo "Building FFmpeg library ..."
 
 cd ffmpeg
 ./configure --prefix=`pwd`/../build_`uname -s`_`uname -m` --disable-zlib --disable-bzlib --disable-ffmpeg --disable-ffserver --disable-ffplay --enable-gpl --enable-shared
+# May need to add "--disable-vdpau" switch if using NVidia card
 make
 make install
 cd ..
