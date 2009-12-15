@@ -102,7 +102,7 @@ bool ipHisto::processInput(const Tensor& input)
 			const short* src_row = &src_plane[y * in_stride_h];
 			for (int x = 0; x < width; x ++, src_row += in_stride_w)
 			{
-				histo_plane[*(src_row) * out_stride_b + p * out_stride_p] ++;
+				histo_plane[*(src_row) * out_stride_b] ++;
 			}
 		}
 	}

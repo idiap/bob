@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	cmd.read(argc, argv);
 
 	// Load or generate the image
-	Image image(1, 1, 1);
+	Image image(1, 1, 3);
 	switch (test_type)
 	{
 	case 0:	// Image
