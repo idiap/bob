@@ -669,10 +669,10 @@ namespace Torch {
 					m_fwrite.oc->oformat = m_fwrite.fmt;
 					snprintf(m_fwrite.oc->filename, sizeof(m_fwrite.oc->filename), "%s", filename);
 					snprintf(m_fwrite.oc->title, sizeof(m_fwrite.oc->title), "%s", filename);
-					snprintf(m_fwrite.oc->author, sizeof(m_fwrite.oc->author), "%s", "Sébastien Marcel (marcel@idiap.ch) -- Idiap Research Institute (www.idiap.ch)");
-					snprintf(m_fwrite.oc->copyright, sizeof(m_fwrite.oc->copyright), "%s", "(c) Torch5spro 2010");
-					snprintf(m_fwrite.oc->comment, sizeof(m_fwrite.oc->comment), "%s", "Created by Torch5spro using FFmpeg");
-					snprintf(m_fwrite.oc->album, sizeof(m_fwrite.oc->album), "%s", "Torch5spro");
+					snprintf(m_fwrite.oc->author, sizeof(m_fwrite.oc->author), "%s", "Sebastien Marcel (marcel@idiap.ch) -- Idiap Research Institute (www.idiap.ch)");
+					snprintf(m_fwrite.oc->copyright, sizeof(m_fwrite.oc->copyright), "%s", "(c) torch5spro 2010");
+					snprintf(m_fwrite.oc->comment, sizeof(m_fwrite.oc->comment), "%s", "Created by torch5spro using FFmpeg");
+					snprintf(m_fwrite.oc->album, sizeof(m_fwrite.oc->album), "%s", "torch5spro");
 					snprintf(m_fwrite.oc->genre, sizeof(m_fwrite.oc->genre), "%s", "Research");
 					m_fwrite.oc->year = 2010;
 					m_fwrite.oc->track = 0;

@@ -115,9 +115,9 @@ bool ppmImageFile::writeHeader(const Image& image)
 {
 	m_file.printf("P6\n");
 	m_file.printf("#\n");
-	m_file.printf("# Image generated using Torch vision\n");
-	m_file.printf("# (c) 2004-2008 Sebastien Marcel marcel@idiap.ch\n");
-	m_file.printf("# IDIAP Research Institute\n");
+	m_file.printf("# Image generated using torch5spro\n");
+	m_file.printf("# (c) torch5spro 2010\n");
+	m_file.printf("# Sebastien Marcel (marcel@idiap.ch) -- Idiap Research Institute (www.idiap.ch)\n");
 	m_file.printf("#\n");
 	m_file.printf("%d %d\n", image.getWidth(), image.getHeight());
 	m_file.printf("255\n");

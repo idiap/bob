@@ -21,7 +21,7 @@ int main()
 	for(int i = 0 ; i < H ; i++)
 		for(int j = 0 ; j < W ; j++)
 		{
-			double random_ = THRandom_uniform(0, 255);
+			double random_ = (int) THRandom_uniform(0, 255);
 	        	image(i,j) = random_;
 		}
 
@@ -41,6 +41,7 @@ int main()
 	assert(idct2d.getNOutputs() == 1);
 	idct2d.getOutput(0).print("inverse F[x]");
 
+	return 0;
 
 	//
 	const int n_tests = 11;

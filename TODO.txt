@@ -10,6 +10,8 @@ ASSIGNED
 ---
 
 Seb: 
+	PCA/LDA face recognition components linked with CBLAS for
+	matrix (2D tensor) routines (inversion, eigen decomposition) ?
 	MVSECriterion
 	KSOM
 	HMM (1D, 2D)
@@ -24,8 +26,6 @@ Ani:
 	Boosting of HLBP features
 
 Nik: ?
-	PCA/LDA face recognition components linked with CBLAS for
-	matrix (2D tensor) routines (inversion, eigen decomposition) ?
 	
 Cosmin:
 

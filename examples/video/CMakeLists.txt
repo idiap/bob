@@ -12,6 +12,7 @@ SET(FFMPEG_DIR "${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}"
 INCLUDE_DIRECTORIES("${TORCH5SPRO_DIR}")
 
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
+#		"/usr/lib/libcblas.so"
 		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a"
 		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavformat.a"
 		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavcodec.a"
@@ -36,8 +37,10 @@ MESSAGE("---------------------------------------------" "")
 
 SET(EXAMPLE_SRC
 	testio.cc
+	mobioVideoScan.cc
 	checkvideo.cc
 	checkvideos.cc
+	video2tensor.cc
 	makeFaceFinder.cc
 	fdvideo.cc)
 

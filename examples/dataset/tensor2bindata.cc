@@ -55,7 +55,6 @@ int main(int argc, char* argv[])
 
 		return 1;
 	}
-
 	if(header.m_n_dimensions != 2)
 	{
 		warning("Unsupported dimensions (2 only).");
@@ -78,6 +77,7 @@ int main(int argc, char* argv[])
 	int i = 0;
 
 	tensor = (ShortTensor *)tf.load();
+
 	if(verbose) tensor->sprint("%d", i);
 	for(int m=0;m<header.m_size[0];m++)
         	for(int n=0;n<header.m_size[1];n++)
