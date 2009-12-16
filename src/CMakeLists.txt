@@ -19,6 +19,10 @@ SET(TORCH5SPRO_INCLUDE "" CACHE INTERNAL "included")
 # Additional libraries
 ########################################################
 
+# CBLAS
+#ADD_DEFINITIONS(-DUSE_CBLAS)
+#INCLUDE_DIRECTORIES("/usr/include")
+
 # JPEG
 ADD_DEFINITIONS(-DHAVE_JPEG)
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/jpeg")
