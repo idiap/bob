@@ -32,7 +32,7 @@
 // Ensemble machines 6XXX ?
 #define BAGGING_MACHINE_ID 1
 #define CASCADE_MACHINE_ID 2
-#define BTREE_MACHINE_ID 3
+#define TREE_MACHINE_ID 3
 
 // Stumps XXXX ?
 #define STUMP_MACHINE_ID 20

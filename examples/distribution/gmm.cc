@@ -238,7 +238,11 @@ int main(int argc, char **argv)
 			else
 			{
    				if(verbose) print("\nInitializing the Kmeans from data ...\n");
-				kmean->setMeans(&mdataset_train);
+				if(kmean->setMeans(&mdataset_train) == false)
+				{
+   					if(verbose) print("\nInitializing the Kmeans randomly instead ...\n");
+					kmean->shuffle();
+				}
 				kmean->setFOption("min weights", prior_weights);
 			}
 			kmean->prepare();

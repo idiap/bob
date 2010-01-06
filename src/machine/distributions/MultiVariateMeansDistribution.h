@@ -23,13 +23,13 @@ public:
 	~MultiVariateMeansDistribution();
 
 	///
-	virtual bool 		EMaccPosteriors(const DoubleTensor *input, const double input_posterior);
-
-	///
 	virtual bool 		EMupdate();
 	
 	//---
 	
+	///
+	virtual bool 		sampleEMaccPosteriors(double *sample_, const double input_posterior);
+
 	///
 	virtual double 		sampleProbabilityOneMean(double *sample_, int m);
 

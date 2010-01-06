@@ -14,18 +14,16 @@ MultiVariateMeansDistribution::~MultiVariateMeansDistribution()
 {
 }
 
-bool MultiVariateMeansDistribution::EMaccPosteriors(const DoubleTensor *input, const double input_posterior)
+bool MultiVariateMeansDistribution::sampleEMaccPosteriors(double *sample_, const double input_posterior)
 {
-	double *src = (double *) input->dataR();
-
-	sampleProbability(src);
+	sampleProbability(sample_);
 
 	acc_posteriors_weights[best_mean]++;
 	acc_posteriors_sum_weights++;
 
 	for(int k = 0 ; k < n_inputs ; k++)
 	{
-		double z = src[k];
+		double z = sample_[k];
 
 		acc_posteriors_means[best_mean][k] += z;
 		acc_posteriors_variances[best_mean][k] += z * z;

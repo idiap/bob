@@ -23,7 +23,7 @@ public:
 	virtual bool 		prepare();
 
 	///
-	virtual bool 		EMaccPosteriors(const DoubleTensor *input, const double input_posterior);
+	virtual bool 		sampleEMaccPosteriors(double *sample_, const double input_posterior);
 
 	///
 	virtual bool 		EMupdate();

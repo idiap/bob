@@ -26,6 +26,9 @@ public:
 	virtual bool 		EMinit();
 
 	///
+	virtual bool 		EMaccPosteriors(const DoubleTensor *input, const double input_posterior);
+
+	///
 	virtual bool 		forward(const DoubleTensor *input);
 
 	///
@@ -38,6 +41,9 @@ public:
 
 	///
 	virtual bool 		cleanup();
+
+	///
+	virtual bool 		sampleEMaccPosteriors(double *sample_, const double input_posterior) = 0;
 
 	///
 	virtual double 		sampleProbability(double *sample_) = 0;

@@ -21,7 +21,8 @@ ${prerun_}/gmmdev lists/train_faces.list lists/test_nonfaces.list
 set norm = "-norm"
 #set norm = ""
 
-set n_gaussians = "-n_gaussians 150"
+#set n_gaussians = "-n_gaussians 150"
+set n_gaussians = "-n_gaussians 500"
 
 \rm -r models
 mkdir -p models

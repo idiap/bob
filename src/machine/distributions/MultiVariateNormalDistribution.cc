@@ -184,7 +184,7 @@ bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 		{
 			if (	input->size(0) != n_inputs)
 			{
-				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 1 (%d != %d).", input->size(0), n_inputs);
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 0 (%d != %d).", input->size(0), n_inputs);
 				
 				return false;
 			}
@@ -210,7 +210,7 @@ bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 		{
 			if (	input->size(0) != n_inputs)
 			{
-				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 2 (%d != %d).", input->size(0), n_inputs);
+				warning("MultiVariateNormalDistribution::forward() : incorrect input size along dimension 0 (%d != %d).", input->size(0), n_inputs);
 				
 				return false;
 			}
@@ -267,36 +267,133 @@ bool MultiVariateNormalDistribution::setMeans(double **means_)
 bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 {
 	// init only means from assigning a random sample per partitions
-	
+
+	/* !! Warning !!
+ 
+	   To fix to deal with 2D and 3D tensors
+
+	*/
+
 	if(dataset_ == NULL) return false;
 
-	int n_data = dataset_->getNoExamples();
+	// checking tensors in dataset
+	int n_data = 0;
+	int tensor_dim = 0;
+	Tensor *example = NULL;
+
+	Torch::print("Number of examples in the dataset %d\n", dataset_->getNoExamples());
+	for(int i = 0 ; i < dataset_->getNoExamples() ; i++) 
+	{
+		example = dataset_->getExample(i);
+
+		if (	example->getDatatype() != Tensor::Double)
+		{
+			warning("MultiVariateNormalDistribution::setMeans() : incorrect tensor type.");
+			return false;
+		}
+		if (	example->size(0) != n_inputs)
+		{
+			warning("MultiVariateNormalDistribution::setMeans() : incorrect input size along dimension 0 (%d != %d).", example->size(0), n_inputs);
+			return false;
+		}
+
+		if(i == 0) tensor_dim = example->nDimension();
+		else
+		{
+			if(example->nDimension() != tensor_dim)
+			{
+				warning("MultiVariateNormalDistribution::setMeans() : all tensors should have the same number of dimensions (%d).", tensor_dim);
+				return false;
+			}
+		}
+
+		if (	example->nDimension() == 1) n_data++;
+		else if (example->nDimension() == 2) n_data += example->size(1);
+		else if (example->nDimension() == 3) n_data += example->size(1) * example->size(2);
+		else 
+		{
+			warning("MultiVariateNormalDistribution::setMeans() : incorrect number of dimensions (only 1, 2 or 3).");
+			return false;
+		}
+	}
+
+	Torch::print("Total number of data samples %d\n", n_data);
+
 	if(n_means > n_data) warning("MultiVariateNormalDistribution::setMeans() There are more means than samples. This could creates some troubles.");
 
 	int n_partitions = (int)(n_data / (double) n_means);
+
+	double *src = NULL;
+	DoubleTensor *t_input = NULL;
+	int n_ = 0;
+
+	DoubleTensor *frame_ = new DoubleTensor;
+	DoubleTensor *sequence_ = new DoubleTensor;
 
 	for(int j = 0 ; j < n_means ; j++) 
 	{
 		int offset = j*n_partitions;
 		int index = offset + (int)(THRandom_uniform(0, 1)*(double) n_partitions);
 
+		//Torch::print("Index to match %d\n", index);
+		
 		if(index < 0) warning("under limit");
 		if(index >= n_data) warning("over limit");
 
-		Tensor *example = dataset_->getExample(index);
-		if (	example->nDimension() != 1 || example->getDatatype() != Tensor::Double)
+		switch(tensor_dim)
 		{
-			warning("MultiVariateNormalDistribution::setMeans() : incorrect number of dimensions or type.");
+		case 1: 
+		   	// An example of dimension 1 is necessary 1 vector of size n_inputs
+		   	example = dataset_->getExample(index);
+			t_input = (DoubleTensor *) example;
+			src = (double *) t_input->dataR();
 			break;
-		}
-		if (	example->size(0) != n_inputs)
-		{
-			warning("MultiVariateNormalDistribution::setMeans() : incorrect input size along dimension 0 (%d != %d).", example->size(0), n_inputs);
+		case 2:
+		   	// An example of dimension 2 is necessary a sequence of vectors of size n_inputs
+			n_ = 0;
+			for(int i = 0 ; i < dataset_->getNoExamples() ; i++) 
+			{
+				example = dataset_->getExample(i);
+				if(n_ + example->size(1) > index)
+				{
+				   	int offset_ = index - n_; 
+				   	//Torch::print("Offset %d\n", offset_);
+					t_input = (DoubleTensor *) example;
+					frame_->select(t_input, 1, offset_);
+					src = (double *) frame_->dataR();
+					break;
+				}
+				n_ += example->size(1);
+				//Torch::print("+%d (%d) ", example->size(1), n_);
+			}
 			break;
-		}
+		case 3:
+		   	// An example of dimension 3 is necessary a sequence of sequence of vectors of size n_inputs
+			n_ = 0;
+			for(int i = 0 ; i < dataset_->getNoExamples() ; i++) 
+			{
+				example = dataset_->getExample(i);
+				t_input = (DoubleTensor *) example;
 
-		DoubleTensor *t_input = (DoubleTensor *) example;
-		double *src = (double *) t_input->dataR();
+				//Torch::print("sequence of %d sequence of %d vectors\n", example->size(2), example->size(1));
+				
+				if(n_ + example->size(1)*example->size(2) > index)
+				{
+				   	int offset_seq = index - n_;
+					   			
+					int offset_seq_seq = offset_seq / example->size(1);
+					int offset_frame_seq = offset_seq % example->size(1);
+
+					sequence_->select(t_input, 2, offset_seq_seq);
+					frame_->select(sequence_, 1, offset_frame_seq);
+					src = (double *) frame_->dataR();
+					break;
+				}
+				n_ += example->size(1) * example->size(2);
+				//Torch::print("+%dx%d (%d) ", example->size(2), example->size(1), n_);
+			}
+			break;
+		}
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
@@ -305,10 +402,12 @@ bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 		}
 		weights[j] = 1.0 / (double) n_means;
 	}
+	
+	delete sequence_;
+	delete frame_;
 
 	return true;
 }
-
 
 bool MultiVariateNormalDistribution::shuffle()
 {
@@ -404,6 +503,88 @@ bool MultiVariateNormalDistribution::setVarianceFlooring(double *stdv_, double f
 		//Torch::print("vflooring [%d] = %g (stdv = %g)\n", k, threshold_variances[k], stdv_[k]);
 	}
 
+	return true;
+}
+
+bool MultiVariateNormalDistribution::EMaccPosteriors(const DoubleTensor *input, const double input_posterior)
+{
+	//
+	// If the tensor is 1D then considers it as a vector
+	if (	input->nDimension() == 1)
+	{
+		if (	input->size(0) != n_inputs)
+		{
+			warning("MultiVariateNormalDistribution::EMaccPosteriors() : incorrect input size along dimension 0 (%d != %d).", input->size(0), n_inputs);
+			
+			return false;
+		}
+
+		double *src = (double *) input->dataR();
+
+		sampleEMaccPosteriors(src, input_posterior);
+	}
+	else
+	{
+		//
+		// If the tensor is 2D/3D then considers it as a sequence along the first dimension
+
+   		if(input->nDimension() == 2)
+		{
+			if (	input->size(0) != n_inputs)
+			{
+				warning("MultiVariateNormalDistribution::EMaccPosteriors() : incorrect input size along dimension 0 (%d != %d).", input->size(0), n_inputs);
+				
+				return false;
+			}
+		
+			int n_frames_per_sequence = input->size(1);
+
+			//Torch::print("MultiVariateNormalDistribution::EMaccPosteriors() processing a sequence of %d frames of size %d\n", n_frames_per_sequence, n_inputs);
+
+			for(int f = 0 ; f < n_frames_per_sequence ; f++)
+			{
+				frame_->select(input, 1, f);
+
+				double *src = (double *) frame_->dataR();
+
+				sampleEMaccPosteriors(src, input_posterior);
+			}
+		}
+		else if(input->nDimension() == 3)
+		{
+			if (	input->size(0) != n_inputs)
+			{
+				warning("MultiVariateNormalDistribution::EMaccPosteriors() : incorrect input size along dimension 0 (%d != %d).", input->size(0), n_inputs);
+				
+				return false;
+			}
+			int n_sequences_per_sequence = input->size(2);
+			int n_frames_per_sequence = input->size(1);
+
+			//Torch::print("MultiVariateNormalDistribution::EMaccPosteriors() processing a sequence of %d sequences of %d frames of size %d\n", n_sequences_per_sequence, n_frames_per_sequence, n_inputs);
+
+			for(int s = 0 ; s < n_sequences_per_sequence ; s++)
+			{
+				sequence_->select(input, 2, s);
+				
+				for(int f = 0 ; f < n_frames_per_sequence ; f++)
+				{
+					frame_->select(sequence_, 1, f);
+
+					double *src = (double *) frame_->dataR();
+
+					sampleEMaccPosteriors(src, input_posterior);
+				}
+			}
+		}
+		else 
+		{
+			warning("MultiVariateNormalDistribution::EMaccPosteriors() : don't know how to deal with %d dimensions sorry :-(", input->nDimension());
+			
+			return false;
+		}
+	}
+	
 	return true;
 }
 

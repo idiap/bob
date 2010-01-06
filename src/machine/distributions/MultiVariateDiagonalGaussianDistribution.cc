@@ -112,10 +112,8 @@ bool MultiVariateDiagonalGaussianDistribution::EMinit()
 	return true;
 }
 
-bool MultiVariateDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTensor *input, const double input_posterior)
+bool MultiVariateDiagonalGaussianDistribution::sampleEMaccPosteriors(double *sample_, const double input_posterior)
 {
-	double *src = (double *) input->dataR();
-
    	/** Computes the posterior for each gaussian
 
 		\begin{equation}
@@ -128,7 +126,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTenso
    	double posterior_denominator;
 	if(use_log)
 	{
-		posterior_denominator = sampleProbability(src);
+		posterior_denominator = sampleProbability(sample_);
 		for(int j = 0 ; j < n_means ; j++) posterior_numerator[j] = log(weights[j]) + current_likelihood_one_mean[j];
 	}
 	else
@@ -137,7 +135,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTenso
 
 		for(int j = 0 ; j < n_means ; j++)
 		{
-			posterior_numerator[j] = weights[j] * sampleProbabilityOneGaussian(src, j);
+			posterior_numerator[j] = weights[j] * sampleProbabilityOneGaussian(sample_, j);
 			posterior_denominator += posterior_numerator[j];
 		}
 	}
@@ -178,7 +176,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMaccPosteriors(const DoubleTenso
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-			double z = src[k];
+			double z = sample_[k];
 
 			acc_posteriors_means[j][k] += posterior_j * z;
 
