@@ -27,7 +27,7 @@ MESSAGE("---------------------------------------------" "")
 ########################################################
 
 SET(EXAMPLE_SRC
-	options.cc parameters.cc)
+	options.cc parameters.cc cmdfileTest.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

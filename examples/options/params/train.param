@@ -1,0 +1,16 @@
+#Regression            false
+#Generative            true
+#ConstrainedGenerative true
+LearningRate         0.0001
+LearningRateDecay    0.0
+WeightMse            1.0
+WeightMvse           0.0
+WeightDecay          0.0
+MinimumCriterion     1e-6
+EarlyStoppingTrain   200
+#EarlyStoppingValid   400
+EpochMax             800
+EpochPlotLimit       100
+EpochPlotStep        100
+#EndAccuracy          1e-6
+#ManualSeed           1995
