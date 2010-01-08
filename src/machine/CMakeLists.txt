@@ -4,7 +4,7 @@
 SET(	machine_SRC
                 "${CMAKE_CURRENT_SOURCE_DIR}/Classifier.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/CascadeMachine.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/TreeMachine.cc"
+		"${CMAKE_CURRENT_SOURCE_DIR}/TreeClassifier.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/GradientMachine.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/Criterion.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ProbabilityDistribution.cc"

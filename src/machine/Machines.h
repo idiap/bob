@@ -31,8 +31,13 @@
 
 // Ensemble machines 6XXX ?
 #define BAGGING_MACHINE_ID 1
+
+// Classifier Machines
+// Note from Seb to Cosmin: the Cascade is not directly a machine but a
+// classifier. This should be both reflected by the name of the class
+// (CascadeClassifier) and the ID CASCADE_CLASSIFIER_ID as for TreeClassifier
 #define CASCADE_MACHINE_ID 2
-#define TREE_MACHINE_ID 3
+#define TREE_CLASSIFIER_ID 3
 
 // Stumps XXXX ?
 #define STUMP_MACHINE_ID 20
