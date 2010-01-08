@@ -1,0 +1,133 @@
+#ifndef _TORCH5SPRO_TREE_CLASSIFIER_H_
+#define _TORCH5SPRO_TREE_CLASSIFIER_H_
+
+#include "Classifier.h"	// <TreeClassifier> is a <Classifier>
+#include "Machines.h"
+
+namespace Torch
+{
+	//////////////////////////////////////////////////////////////////////////////////////
+	// Torch::TreeClassifier:
+	//	Implementes a tree of nodes. Each node has N Classifiers and N+1 childs.
+	//
+	//
+	// TODO: doxygen header!
+	//////////////////////////////////////////////////////////////////////////////////////
+
+	class TreeClassifier : public Classifier
+	{
+	public:
+
+		// Constructor
+		TreeClassifier();
+
+		// Destructor
+		virtual ~TreeClassifier();
+
+		///////////////////////////////////////////////////////////
+		// Classifier manipulation (add/remove/set Classifiers or Nodes)
+		// NB: The Tree will take care of deallocating the SET Classifiers!
+
+		bool			resize(int n_nodes);
+		bool			resize(int i_node, int n_classifiers);
+		bool			setClassifier(int i_node, int i_classifier, Classifier* classifier);
+		bool			setThreshold(int i_node, int i_classifier, double threshold);
+
+		// Set the model size to use (need to set the model size to each <Classifier>) - overriden
+		virtual void		setSize(const TensorSize& size);
+
+		///////////////////////////////////////////////////////////
+
+		/// Process the input tensor
+		virtual bool 		forward(const Tensor& input);
+
+		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		virtual bool		loadFile(File& file);
+		virtual bool		saveFile(File& file) const;
+
+		/// Constructs an empty Classifier of this kind - overriden
+		/// (used by <MachineManager>, this object is automatically deallocated)
+		virtual Machine*	getAnInstance() const { return manage(new TreeClassifier()); }
+
+		// Get the ID specific to each Machine - overriden
+		virtual int		getID() const { return TREE_CLASSIFIER_ID; }
+
+		///////////////////////////////////////////////////////////
+		// Access functions
+
+		int			getNoNodes() const { return m_n_nodes; }
+		int			getNoClassifiers(int i_node) const;
+		Classifier*		getClassifier(int i_node, int i_classifier);
+		const Classifier*	getClassifier(int i_node, int i_classifier) const;
+		double			getThreshold(int i_node, int i_classifier) const;
+
+		///////////////////////////////////////////////////////////
+
+	protected:
+
+		// Deallocate the memory
+		void			deallocate();
+
+		///////////////////////////////////////////////////////////////
+		// One Node in the tree (a sequence of <Classifier>s)
+
+		struct Node
+		{
+			// Constructor
+			Node()	:	m_classifiers(0),
+					m_n_classifiers(0),
+					m_thresholds(0)
+			{
+			}
+
+			// Destructor
+			~Node()
+			{
+				deallocate();
+			}
+
+			// Reset the number of classifiers
+			bool		resize(int n_classifiers);
+
+			// Deallocate memory
+			void		deallocate();
+
+			// Set a new classifier
+			bool		setClassifier(int i_classifier, Classifier* classifier);
+
+			// Set a new threshold for some classifier
+			bool		setThreshold(int i_classifier, double threshold);
+			
+			// Access functions
+			Classifier*		getClassifier(int i_classifier);
+			const Classifier*	getClassifier(int i_classifier) const;
+			double			getThreshold(int i_classifier) const;
+
+			//////////////////////////////////////////////////////////
+			// Attributes
+
+			Classifier**	m_classifiers;	// The classifiers in this node
+			int		m_n_classifiers;// Number of classifiers in this node
+			double*		m_thresholds;	// Threshold of each classifier
+		};
+
+		///////////////////////////////////////////////////////////////
+		/// Attributes
+
+		// The <Node>s that compose the tree
+		Node*			m_nodes;
+		int			m_n_nodes;
+
+		// Fast access to the output
+		double*			m_fast_output;	// Pointer to the DoubleTensor
+	};
+
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // REGISTER this machine to the <MachineManager>
+        const bool tree_machine_registered = MachineManager::getInstance().add(
+                new TreeClassifier(), "TreeClassifier");
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+}
+
+#endif
