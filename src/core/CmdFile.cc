@@ -200,7 +200,7 @@ void CmdFile::setHrefCmdOption(int argc, char **argv, int *current, CmdFileOptio
   	{
     		if( (current_ >= argc) && (ptro->type != CMD_FILE_SWITCH) )
       			error("CmdFile: cannot correctly argument <%s>", ptro->name);
-  	}
+  	} 	  	
 
   	switch(ptro->type)
   	{
@@ -224,7 +224,7 @@ void CmdFile::setHrefCmdOption(int argc, char **argv, int *current, CmdFileOptio
       		ptr_r  = (double *)ptro->ptr;
       		*ptr_r = (double)atof(argv[current_++]);
       		break;
-    	case CMD_FILE_STRING:
+      	case CMD_FILE_STRING: 
       		ptr_s  = (char **)ptro->ptr;
       		if(*ptr_s != NULL)
 			free(*ptr_s);
@@ -323,7 +323,7 @@ void CmdFile::help() const
 
     		if(z >= 0)
     		{
-      			for(int i = 0; i < long_max+1-z; i++)
+      			for(int j = 0; j < long_max+1-z; j++)
         		print(" ");
     		}
 
@@ -572,12 +572,12 @@ void CmdFile::read(const char *filename, bool check_everything)
 void CmdFile::addHrefCmdOption(const char *name, void **ptr, int type, const char *help, int status, int max_)
 {
   	char s[200];
-
+  	
   	for(int i = 0 ; i < max_ ; i++)
 	{
 		cmd_options = (CmdFileOption *)realloc((void *)cmd_options, (n_cmd_options+1)*sizeof(CmdFileOption));
 
-		CmdFileOption *optr = cmd_options+n_cmd_options;
+		CmdFileOption *optr = &cmd_options[n_cmd_options];
 
 		sprintf(s, name, i);
 
@@ -585,7 +585,22 @@ void CmdFile::addHrefCmdOption(const char *name, void **ptr, int type, const cha
 		optr->help = (char *)malloc(strlen(help)+1);
 		strcpy(optr->name, s);
 		strcpy(optr->help, help);
-		optr->ptr = &ptr[i];
+		switch (type)
+		{
+		case CMD_FILE_INT:
+			optr->ptr = &((int*)ptr)[i];
+			break;
+			
+		case CMD_FILE_SWITCH:
+			optr->ptr = &((bool*)ptr)[i];
+			break;		
+			
+		case CMD_FILE_DOUBLE:
+			optr->ptr = &((double*)ptr)[i];
+			break;
+		default:
+			optr->ptr = &ptr[i]; // This is pure evil!
+		}
 		optr->type = type;
 		optr->status = status;
 		if(i == 0) optr->first_ptr = true;
@@ -720,10 +735,10 @@ void CmdFile::readHref()
 
   	if(strc == 0) error("CmdFile: Parameters not loaded");
 
-//  	print("\n%d :\n", strc);
-//  	for(int i = 0 ; i < strc ; i++)
-//  		print(" [%s]\n", str[i]);
-
+ // 	print("\n%d :\n", strc);
+  //	for(int i = 0 ; i < strc ; i++)
+  //		print(" [%s]\n", str[i]);  		
+  
 //  	message("Check all params there");
 
   	// Check all Params
@@ -800,7 +815,7 @@ void CmdFile::readHref()
 		if(the_opt != -1) // This is an option or a parameter because everything was check
 		{
 			current++;
-
+			
 			setHrefCmdOption(strc, str, &current, &cmd_options[the_opt]);
 		}
 		else
