@@ -1,5 +1,4 @@
 #include "torch5spro.h"
-
 using namespace Torch;
 
 
@@ -73,7 +72,7 @@ int main(int argc, char* argv[])
 	Tensor *tensor = NULL;
 	int i = 0;
 	char image_filename[250];
-
+	
 	tensor = tf.load();
 	if(verbose) tensor->sprint("%d", i);
 	Image imagegray(tensor->size(1), tensor->size(0), 1);
@@ -81,21 +80,21 @@ int main(int argc, char* argv[])
 	t_->select(&imagegray, 2, 0);
 	t_->copy(tensor);
 	xtprobeImageFile xtprobe;
-	sprintf(image_filename, "%s_%05d.%s", image_basename, i, image_extension);
+	sprintf(image_filename, "%s%05d.%s", image_basename, i, image_extension);
 	xtprobe.save(imagegray, image_filename);
 	delete t_;
 	delete tensor;
 	i++;
 	while ((tensor = tf.load()) != 0)
 	{
-	   	if(i == n_images) break;
+	   	if(i == n_images) break; 
 		if(verbose) tensor->sprint("%d", i);
 		Image imagegray(tensor->size(1), tensor->size(0), 1);
 		ShortTensor *t_ = new ShortTensor();
 		t_->select(&imagegray, 2, 0);
 		t_->copy(tensor);
 		xtprobeImageFile xtprobe;
-		sprintf(image_filename, "%s_%05d.%s", image_basename, i, image_extension);
+		sprintf(image_filename, "%s%05d.%s", image_basename, i, image_extension);
 		xtprobe.save(imagegray, image_filename);
 		delete t_;
 		delete tensor;
