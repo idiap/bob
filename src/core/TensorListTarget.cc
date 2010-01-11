@@ -1,9 +1,9 @@
-#include "TensorList.h"
+#include "TensorListTarget.h"
 
 namespace Torch
 {
 
-    TensorList::TensorList()
+    TensorListTarget::TensorListTarget()
     {
         n_files = 0;
         n_examples=0;
@@ -16,7 +16,7 @@ namespace Torch
 
     }
 
-    bool TensorList::process(FileListCmdOption *tensorList_files, ShortTensor *target,Tensor::Type mtype)
+    bool TensorListTarget::process(FileListCmdOption *tensorList_files, ShortTensor *target,Tensor::Type mtype, char *targetfile)
     {
 
 
@@ -66,7 +66,7 @@ namespace Torch
                 tensor = new CharTensor(d1,d2,d3,d4);
                 break;
             default:
-            print("TensorList::process() problem\n");
+            print("TensorListTarget::process() problem\n");
 
             }
             break;
@@ -87,7 +87,7 @@ namespace Torch
                 tensor = new ShortTensor(d1,d2,d3,d4);
                 break;
                 default:
-                print("TensorList::process() problem\n");
+                print("TensorListTarget::process() problem\n");
             }
             break;
 
@@ -108,7 +108,7 @@ namespace Torch
                 tensor = new IntTensor(d1,d2,d3,d4);
                 break;
                 default:
-                print("TensorList::process() problem\n");
+                print("TensorListTarget::process() problem\n");
             }
             break;
 
@@ -129,7 +129,7 @@ namespace Torch
                 tensor = new LongTensor(d1,d2,d3,d4);
                 break;
                 default:
-                print("TensorList::process() problem\n");
+                print("TensorListTarget::process() problem\n");
             }
             break;
 
@@ -149,7 +149,7 @@ namespace Torch
                 tensor = new FloatTensor(d1,d2,d3,d4);
                 break;
                 default:
-                print("TensorList::process() problem\n");
+                print("TensorListTarget::process() problem\n");
             }
             break;
 
@@ -170,11 +170,11 @@ namespace Torch
                 tensor = new DoubleTensor(d1,d2,d3,d4);
                 break;
                 default:
-                print("TensorList::process() problem\n");
+                print("TensorListTarget::process() problem\n");
             }
             break;
         default:
-            print("TensorList::process() problem\n");
+            print("TensorListTarget::process() problem\n");
 
 
 
@@ -188,12 +188,21 @@ namespace Torch
 
         int nexmp;
         int nc=0; //keeping track of count
+        File tarfile;
+        tarfile.open(targetfile,"r");
         for (int i=0;i<n_files;i++)
         {
+        	int tarval;
+        	tarfile.scanf("%d",&tarval);
+        	//(*target)(0) = tarval;
+        	ShortTensor *ta1 = new ShortTensor(1);
+        	ta1->fill(tarval);
+        	//target->fill(tarval);
+        	print("Target Value %d\n",tarval);
 
             if (tf1.openRead(tensorList_files->file_names[i])==false)
             {
-                print("TensorList::process() Error while reading torch file %s\n",tensorList_files->file_names[i]);
+                print("TensorListTarget::process() Error while reading torch file %s\n",tensorList_files->file_names[i]);
                 return false;
             }
             const TensorFile::Header& header1 = tf1.getHeader();
@@ -202,7 +211,7 @@ namespace Torch
                   //  d1 != header1.m_size[0] ||    d2 != header1.m_size[1] ||  d3 != header1.m_size[2] ||
                  //   d4 != header1.m_size[3])
             {
-                print("TensorList::process() Inconsistency in torch file %s\n",tensorList_files->file_names[i]);
+                print("TensorListTarget::process() Inconsistency in torch file %s\n",tensorList_files->file_names[i]);
                 return false;
             }
             for (int j=0;j<nexmp;j++)
@@ -234,8 +243,10 @@ namespace Torch
                 tf1.load(*tensor);
                 m_data->getExample(nc)->copy(tensor);
 
-                m_data->setTarget(nc, target);
-
+                m_data->setTarget(nc, ta1);
+               // ShortTensor *ts = (ShortTensor*)m_data->getTarget(nc);
+		//print("Target Value %d\n",(*ts)(0));
+		//m_data->
 
 
 
@@ -244,18 +255,24 @@ namespace Torch
             tf1.close();
 
         }
+        tarfile.close();
         return true;
 
 
 
     }
 
-    DataSet *TensorList::getOutput()
+    DataSet *TensorListTarget::getOutput()
     {
+//    	for(int i=0;i<m_data->getNoExamples();i++)
+//    	{
+//    		ShortTensor*ts = (ShortTensor*)m_data->getTarget(i);
+//    		print("Target Value GOT %d\n",(*ts)(0));
+//    	}
         return m_data;
     }
 
-    TensorList::~TensorList()
+    TensorListTarget::~TensorListTarget()
     {
 //n_files = 0;
         delete m_data;
