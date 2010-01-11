@@ -38,6 +38,7 @@ SET(EXAMPLE_SRC
 	diskdataset.cc
 	makeWnds.cc
 	readWnds.cc
+	tensorCheckShort.cc
 	imagescandataset.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
