@@ -24,10 +24,18 @@ bool TreeClassifier::Node::resize(int n_classifiers)
 		m_n_classifiers = n_classifiers;
 		m_classifiers = new Classifier*[m_n_classifiers];
 		m_thresholds = new double[m_n_classifiers];
+		m_mu = new double[m_n_classifiers];
+		m_stdv = new double[m_n_classifiers];
+		m_sigma = new double[m_n_classifiers];
+		m_childs = new int[m_n_classifiers+1];
 		for (int i = 0; i < m_n_classifiers; i ++)
 		{
 			m_classifiers[i] = 0;
 			m_thresholds[i] = 0.0;
+			m_mu[i] = 0.0;
+			m_stdv[i] = 0.0;
+			m_sigma[i] = 0.0;
+			m_childs[i] = -1;
 		}
 	}
 	return true;
@@ -39,24 +47,35 @@ bool TreeClassifier::Node::resize(int n_classifiers)
 void TreeClassifier::Node::deallocate()
 {
 	delete[] m_classifiers;
+	delete[] m_sigma;
+	delete[] m_stdv;
+	delete[] m_mu;
 	delete[] m_thresholds;
+	delete[] m_childs;
 	m_classifiers = 0;
+	m_mu = 0;
+	m_stdv = 0;
+	m_sigma = 0;
 	m_thresholds = 0;
+	m_childs = 0;
 	m_n_classifiers = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Set a new classifier
 
-bool TreeClassifier::Node::setClassifier(int i_classifier, Classifier* classifier)
+bool TreeClassifier::Node::setClassifier(int i_classifier, Classifier* classifier, double mu, double stdv)
 {
 	if (i_classifier < 0 || i_classifier >= m_n_classifiers || classifier == 0)
 	{
 		return false;
 	}
 
-	// OK
 	m_classifiers[i_classifier] = classifier;
+	m_mu[i_classifier] = mu;
+	m_stdv[i_classifier] = stdv;
+	m_sigma[i_classifier] = sqrt(stdv);
+
 	return true;
 }
 
@@ -75,6 +94,20 @@ bool TreeClassifier::Node::setThreshold(int i_classifier, double threshold)
 	m_thresholds[i_classifier] = threshold;
 	return true;
 }
+			
+bool TreeClassifier::Node::setChild(int i_classifier, int child_node)
+{
+	if (i_classifier < 0 || i_classifier >= m_n_classifiers+1)
+	{
+		Torch::error("TreeClassifier::Node::setChild - invalid parameters!\n");
+		return false;
+	}
+
+	// OK
+	m_childs[i_classifier] = child_node;
+	return true;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Set the model size to use (need to set the model size to each <Classifier>) - overriden
@@ -131,12 +164,22 @@ const Classifier* TreeClassifier::Node::getClassifier(int i_classifier) const
 	return m_classifiers[i_classifier];
 }
 
+int TreeClassifier::Node::getChild(int i_classifier) const
+{
+	if (i_classifier < 0 || i_classifier >= m_n_classifiers+1)
+	{
+		Torch::error("TreeClassifier::Node::getChild - invalid parameters!\n");
+	}
+
+	return m_childs[i_classifier];
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Constructor
 
 TreeClassifier::TreeClassifier()
 	:	Classifier(),
-		m_nodes(0), m_n_nodes(0),
+		m_nodes(0), m_n_nodes(0), m_n_classes(0),
                 m_fast_output(0)
 {
         // Allocate the output
@@ -163,23 +206,119 @@ void TreeClassifier::deallocate()
 	m_n_nodes = 0;
 }
 
+double TreeClassifier::normal(double x, double mu, double sigma, double stdv)
+{
+   	if(mu == 0.0 && stdv == 1.0) return x;
+
+	double z = x - mu;
+
+	return sqrt(1.0/(sigma*2.0*M_PI)) * exp(-0.5 * z * z / stdv);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Process the input tensor
 
-/*
-     !!! TODO !!!
- */
-
 bool TreeClassifier::forward(const Tensor& input)
 {
-	m_isPattern = true;
+	m_isPattern = false;
 	m_patternClass = 0;
+	double output = 0.0;
 
+	int i_node = 0; // start on the root node (alwas the first one)
+	bool leaf_node_reached = false;
+
+	while(leaf_node_reached == false)
+	{
+		// if the node is a leaf node
+		if(i_node >= m_n_nodes)
+		{
+			leaf_node_reached = true;
+
+			int leaf_node_class = i_node - m_n_nodes;
+			if(leaf_node_class == 0)
+			{
+				// the first leaf node is always assumed to be the non-pattern one
+
+				m_isPattern = false;
+				m_patternClass = 0;
+				*m_fast_output = 0.0;
+				m_confidence = 0.0;
+			}
+			else
+			{
+				m_isPattern = true;
+				m_patternClass = leaf_node_class;
+				*m_fast_output = output;
+				m_confidence = output;
+			}
+		}
+		else
+		{
+			const Node& node = m_nodes[i_node];
+
+			//
+			int argmax_output = -1;
+			double max_output = -1000;
+
+			for (int n = 0; n < node.m_n_classifiers; n ++)
+			{
+				Classifier* classifier = node.m_classifiers[n];
+				if (classifier == 0)
+				{
+					Torch::message("TreeClassifier::forward - invalid classifier!\n");
+					return false;
+				}
+				classifier->setRegion(m_region);
+				if (classifier->forward(input) == false)
+				{
+					Torch::message("TreeClassifier::forward - error running the classifier!\n");
+					return false;
+				}
+
+				if(classifier->isPattern())
+				{
+					double z = classifier->getOutput().get(0);
+					
+					if(z >= node.m_thresholds[n]) 
+					{
+						// The score should be normalized here
+						double znorm = normal(z, node.m_mu[n], node.m_sigma[n], node.m_stdv[n]);
+
+						//print("(%d %d): norm(%g, %g, %g, %g) -> %g\n", i_node, n, z, node.m_mu[n], node.m_sigma[n], node.m_stdv[n], znorm);
+
+						if(znorm > max_output) 
+						{
+							max_output = znorm;
+							argmax_output = n;
+						}
+					}
+				}
+			}
+
+			if(argmax_output == -1)
+			{
+				// if the input is rejected by all the classifiers
+				i_node = node.getChild(node.m_n_classifiers);
+			}
+			else
+			{
+				i_node = node.getChild(argmax_output);
+
+				output = max_output;
+			}
+		}
+	}
+
+	// OK
+	m_confidence = *m_fast_output;
+
+	return true;
+
+	/*
 	for (int s = 0; s < m_n_nodes; s ++)
 	{
 		const Node& node = m_nodes[s];
 
-		double output = 0.0;
 		for (int n = 0; n < node.m_n_classifiers; n ++)
 		{
 			Classifier* classifier = node.m_classifiers[n];
@@ -195,22 +334,25 @@ bool TreeClassifier::forward(const Tensor& input)
 				return false;
 			}
 
-			// if(classifier->getOutput().get(0) > node.m_thresholds[n]) output += classifier->getOutput().get(0);
+			if(classifier->getOutput().get(0) > node.m_thresholds[n]) 
+			{
+				output += classifier->getOutput().get(0);
+				m_isPattern = true;
+			}
+
+			//
+			//if(classifier->isPattern() == true) m_isPattern = true;
 		}
 
-		// Check if rejected
-		*m_fast_output = output;
-
-		//if (output < stage.m_threshold)
-		//{
-		//        m_isPattern = false;
-		//	break;
-		//}
 	}
+
+	// Check if rejected
+	*m_fast_output = output;
 
 	// OK
 	m_confidence = *m_fast_output;
 	return true;
+	*/
 }
 
 ///////////////////////////////////////////////////////////
@@ -238,6 +380,15 @@ bool TreeClassifier::loadFile(File& file)
 		Torch::message("TreeClassifier::load - failed to read <INPUT_SIZE> field!\n");
 		return false;
 	}
+
+	int n_classes;
+        if (file.taggedRead(&n_classes, 1, "N_CLASSES") != 1)
+        {
+        	Torch::message("TreeClassifier::load - failed to read <N_CLASSES> field!\n");
+        	return false;
+        }
+
+	setClasses(n_classes);
 
 	// Create the classifier nodes
 	int n_nodes;
@@ -289,7 +440,22 @@ bool TreeClassifier::loadFile(File& file)
                                         s + 1, n_nodes, n + 1, n_trainers);
 			        return false;
 			}
-			if (setClassifier(s, n, classifier) == false)
+
+			// Load normalization
+			double mu;
+			double stdv;
+			if (file.taggedRead(&mu, 1, "MU") != 1)
+			{
+				Torch::message("TreeClassifier::load - failed to read <MU> field!\n");
+				return false;
+			}
+			if (file.taggedRead(&stdv, 1, "STDV") != 1)
+			{
+				Torch::message("TreeClassifier::load - failed to read <STDV> field!\n");
+				return false;
+			}
+
+			if (setClassifier(s, n, classifier, mu, stdv) == false)
 			{
 				return false;
 			}
@@ -302,6 +468,23 @@ bool TreeClassifier::loadFile(File& file)
 				return false;
 			}
 			if (setThreshold(s, n, threshold) == false)
+			{
+				return false;
+			}
+
+		}
+
+		// Load each classifier
+		for (int n = 0; n < n_trainers+1; n ++)
+		{
+			// Load the child associated to this classifier
+			int child;
+			if (file.taggedRead(&child, 1, "CHILD") != 1)
+			{
+				Torch::message("TreeClassifier::load - failed to read <CHILD> field!\n");
+				return false;
+			}
+			if (setChild(s, n, child) == false)
 			{
 				return false;
 			}
@@ -329,6 +512,13 @@ bool TreeClassifier::saveFile(File& file) const
 		Torch::message("TreeClassifier::save - failed to write <INPUT_SIZE> field!\n");
 		return false;
 	}
+
+	// Write the number of classes
+	if (file.taggedWrite(&m_n_classes, 1, "N_CLASSES") != 1)
+        {
+        	Torch::message("TreeClassifier::save - failed to write <N_CLASSES> field!\n");
+        	return false;
+        }
 
 	// Write the number of nodes
 	if (file.taggedWrite(&m_n_nodes, 1, "N_NODES") != 1)
@@ -364,8 +554,20 @@ bool TreeClassifier::saveFile(File& file) const
 			// Save the classifier's parameters
 			if (classifier->saveFile(file) == false)
 			{
-			        Torch::message("TreeClassifier::load - the [%d/%d]-[%d/%d] classifier could not be saved!\n",
+			        Torch::message("TreeClassifier::save - the [%d/%d]-[%d/%d] classifier could not be saved!\n",
                                         s + 1, m_n_nodes, n + 1, node.m_n_classifiers);
+				return false;
+			}
+
+			// Save the normalisation for this classifier
+			if (file.taggedWrite(&node.m_mu[n], 1, "MU") != 1)
+			{
+				Torch::message("TreeClassifier::save - failed to write <MU> field!\n");
+				return false;
+			}
+			if (file.taggedWrite(&node.m_stdv[n], 1, "STDV") != 1)
+			{
+				Torch::message("TreeClassifier::save - failed to write <STDV> field!\n");
 				return false;
 			}
 
@@ -373,6 +575,16 @@ bool TreeClassifier::saveFile(File& file) const
 			if (file.taggedWrite(&node.m_thresholds[n], 1, "THRESHOLD") != 1)
 			{
 				Torch::message("TreeClassifier::save - failed to write <THRESHOLD> field!\n");
+				return false;
+			}
+
+		}
+		for (int n = 0; n < node.m_n_classifiers+1; n ++)
+		{
+			// Save the child of this classifier
+			if (file.taggedWrite(&node.m_childs[n], 1, "CHILD") != 1)
+			{
+				Torch::message("TreeClassifier::save - failed to write <CHILD> field!\n");
 				return false;
 			}
 		}
@@ -415,7 +627,7 @@ bool TreeClassifier::resize(int i_node, int n_classifiers)
 	return node.resize(n_classifiers);
 }
 
-bool TreeClassifier::setClassifier(int i_node, int i_classifier, Classifier* classifier)
+int TreeClassifier::getChild(int i_node, int i_classifier) const
 {
 	if (i_node < 0 || i_node >= m_n_nodes)
 	{
@@ -425,7 +637,20 @@ bool TreeClassifier::setClassifier(int i_node, int i_classifier, Classifier* cla
 
 	// OK
 	Node& node = m_nodes[i_node];
-	if (node.setClassifier(i_classifier, classifier))
+	return node.getChild(i_classifier);
+}
+
+bool TreeClassifier::setClassifier(int i_node, int i_classifier, Classifier* classifier, double mu, double stdv)
+{
+	if (i_node < 0 || i_node >= m_n_nodes)
+	{
+		Torch::message("TreeClassifier::setClassifier - invalid parameters!\n");
+		return false;
+	}
+
+	// OK
+	Node& node = m_nodes[i_node];
+	if (node.setClassifier(i_classifier, classifier, mu, stdv))
 	{
 		// Don't forget to set the model size to this classifier too
 		classifier->setSize(m_size);
@@ -445,6 +670,31 @@ bool TreeClassifier::setThreshold(int i_node, int i_classifier, double threshold
 	// OK
 	Node& node = m_nodes[i_node];
 	return node.setThreshold(i_classifier, threshold);
+}
+		
+bool TreeClassifier::setChild(int i_node, int i_classifier, int child_node)
+{
+	if (i_node < 0 || i_node >= m_n_nodes)
+	{
+		Torch::message("TreeClassifier::setChild - invalid parameters!\n");
+		return false;
+	}
+
+	// OK
+	Node& node = m_nodes[i_node];
+	return node.setChild(i_classifier, child_node);
+}
+
+bool TreeClassifier::setClasses(int n_classes)
+{
+	m_n_classes = n_classes;
+
+	return true; 
+}
+
+int TreeClassifier::getClasses() const 
+{
+	return m_n_classes;
 }
 
 //////////////////////////////////////////////////////////////////////////

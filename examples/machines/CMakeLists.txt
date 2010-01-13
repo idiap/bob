@@ -29,6 +29,7 @@ MESSAGE("---------------------------------------------" "")
 
 SET(EXAMPLE_SRC
 	test19x19models.cc
+	treetest19x19models.cc
 	convert3to5models.cc
 	convert3pyramidto5tree.cc
 	trainLR.cc)
