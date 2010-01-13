@@ -475,6 +475,11 @@ bool CascadeMachine::setThreshold(int i_stage, double threshold)
 	m_stages[i_stage].m_threshold = threshold;
 	return true;
 }
+		
+bool CascadeMachine::setThreshold(double threshold)
+{
+	return setThreshold(m_n_stages-1, threshold);
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Access functions

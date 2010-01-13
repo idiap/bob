@@ -189,6 +189,10 @@ namespace Private
 		// Change the model threshold if required
 		if (params->use_f_thres)
 		{
+		   	Classifier *classifier_ = &evaluator->getClassifier();
+			classifier_->setThreshold(params->f_thres);
+
+			/*
 			CascadeMachine* cascade = dynamic_cast<CascadeMachine*>(&evaluator->getClassifier());
 			if (cascade == 0 || cascade->getNoStages() < 1)
 			{
@@ -196,6 +200,7 @@ namespace Private
 				return 0;
 			}
 			cascade->setThreshold(cascade->getNoStages() - 1, params->f_thres);
+			*/
 		}
 
 		// OK

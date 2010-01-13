@@ -34,6 +34,8 @@ namespace Torch
 		bool			setThreshold(int i_node, int i_classifier, double threshold);
 		bool			setChild(int i_node, int i_classifier, int child_node);
 
+		virtual bool            setThreshold(double threshold);
+
 		bool			setClasses(int n_classes);
 		int			getClasses() const;
 

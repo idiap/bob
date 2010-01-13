@@ -672,6 +672,13 @@ bool TreeClassifier::setThreshold(int i_node, int i_classifier, double threshold
 	return node.setThreshold(i_classifier, threshold);
 }
 		
+bool TreeClassifier::setThreshold(double threshold)
+{
+   	Torch::warning("TreeMachine::setThreshold(double) not implement yet !!");
+	
+	return true;
+}
+
 bool TreeClassifier::setChild(int i_node, int i_classifier, int child_node)
 {
 	if (i_node < 0 || i_node >= m_n_nodes)

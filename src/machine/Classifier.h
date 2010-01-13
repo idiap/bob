@@ -30,8 +30,9 @@ namespace Torch
                 bool                    isPattern() const { return m_isPattern; }
                 int                     getPatternClass() const { return m_patternClass; }
                 double                  getConfidence() const { return m_confidence; }
-
 		///////////////////////////////////////////////////////////
+
+		virtual bool            setThreshold(double threshold) { return true; }
 
 	protected:
 
