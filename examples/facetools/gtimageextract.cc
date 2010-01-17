@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 	cmd.addText("\nOptions:");
 	cmd.addSCmdOption("-image_ext", &image_ext, "pgm", "image file extension");
 	cmd.addSCmdOption("-gt_ext", &gt_ext, "pos", "gt file extension");
-	cmd.addICmdOption("-gt_format", &gt_format, 1, "gt format (1=eyes center, 2=banca format, 3=eyes corners, 4=eye corners + nose tip + chin, 5=left eye corners + right eye center + nose tip + chin, 6=left eye center + nose tip + chin, 7=Tim Cootes's markup 68 pts)");
+	cmd.addICmdOption("-gt_format", &gt_format, 1, "gt format (1=eyes center, 2=banca format, 3=eyes corners, 4=eye corners + nose tip + chin, 5=left eye corners + right eye center + nose tip + chin, 6=left eye center + nose tip + chin, 7=Tim Cootes's markup 68 pts, 8=eye center + nose tip + mouth center)");
 	cmd.addBCmdOption("-one_gt_object", &one_gt_object, false, "if true then considers that the gt file contains one object, otherwise assumes that the first line of the file contains the number of objects");
 	cmd.addBCmdOption("-verbose", &verbose, false, "verbose");
 	cmd.addBCmdOption("-oimage", &oimage, false, "output intermediate images");
@@ -72,6 +72,9 @@ int main(int argc, char* argv[])
 		break;
 	case 7:
 		gt_loader = new cootesGTFile();
+		break;
+	case 8:
+		gt_loader = new eyecenterNoseMouthGTFile();
 		break;
 	default:
 	   	warning("GT format not implemented.");
@@ -142,7 +145,8 @@ int main(int argc, char* argv[])
 		// Geometric normalize the image and save the result
 
 		CHECK_FATAL(gnormalizer.setGTFile(gt_loader) == true);
-		CHECK_FATAL(gnormalizer.process(image) == true);
+		if(gnormalizer.process(image) == true)
+		{
 
 		const ShortTensor& norm_timage = (const ShortTensor&)gnormalizer.getOutput(0);
 
@@ -221,6 +225,7 @@ int main(int argc, char* argv[])
 			sprintf(output_image_filename, "%s.geomnorm.jpeg", file_list->file_names[i]);
 			saveImageGTPts(norm_timage, 0, 0, output_image_filename);
 			delete [] output_image_filename;
+		}
 		}
 
 		//
