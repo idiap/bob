@@ -51,6 +51,7 @@ namespace Torch
 		int			getLBP() const { return *m_lbp; }
 		int			getX() const { return m_x; }
 		int			getY() const { return m_y; }
+		TensorRegion	getTensorRegion() const {return m_region;}
 
 		/////////////////////////////////////////////////////////////////
 
