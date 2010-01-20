@@ -39,7 +39,7 @@ SET(EXAMPLE_SRC
 	makeWnds.cc
 	readWnds.cc
 	tensorCheckShort.cc
-	tensor2image.cc
+		tensorSplitTrainingValidTest.cc
 	imagescandataset.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
