@@ -3,7 +3,7 @@
 ### face classifier model
 model ../data/models/facedetection/mv/pyramid-cascade-inplane-outplane-0-22-45.tree
 ### threshold of the face classifier model
--model_thres 0
+-model_thres 0.1
 ### use the given threshold
 -model_use_thres false
 ### 
@@ -13,23 +13,23 @@ model ../data/models/facedetection/mv/pyramid-cascade-inplane-outplane-0-22-45.t
 ### scale explorer type: 0 - Exhaustive, 1 - Spiral, 2 - Random
 -scale_explorer_type 0
 ### minimum pattern width
--min_patt_w 0
+-min_patt_w 95
 ### maximum pattern width
--max_patt_w 10000
+-max_patt_w 266
 ### minimum pattern height
--min_patt_h 0
+-min_patt_h 95
 ### maximum pattern height
--max_patt_h 10000
+-max_patt_h 266
 ### Sub-window Oy position variation
 -dx 0.1
 ### Sub-window Ox position variation
 -dy 0.1
 ### Sub-window scale variation
--ds 1.1
+-ds 1.05
 ### stop at first detection
 -stop_at_first_detection false
 ### start with large scales
--start_with_large_scale false
+-start_with_large_scale true
 ### random scale explorer: number of samples
 -random_nsamples 1024
 ### 
@@ -41,9 +41,9 @@ model ../data/models/facedetection/mv/pyramid-cascade-inplane-outplane-0-22-45.t
 ### 
 
 ### prune using the mean
--prune_use_mean false
+-prune_use_mean true
 ### prune using the stdev
--prune_use_stdev false
+-prune_use_stdev true
 ### prune using the mean: min value
 -prune_min_mean 25
 ### prune using the mean: max value

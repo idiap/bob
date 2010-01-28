@@ -43,6 +43,8 @@ bool Scanner::addROI(int x, int y, int w, int h)
 		Torch::message("Scanner::addROI - invalid parameters!\n");
 		return false;
 	}
+		   	
+	Torch::print("adding ROI (%d %d %d %d) to %d ROIs\n", x, y, w, h, m_n_rois);
 
 	// OK
 	sRect2D* temp = new sRect2D[m_n_rois + 1];
@@ -298,6 +300,9 @@ bool Scanner::checkParameters(const Image& image) const
 		if (!	(roi.x >= 0 && roi.w > 0 && roi.y >= 0 && roi.h > 0 &&
 			 roi.x + roi.w <= image_w && roi.y + roi.h <= image_h))
 		{
+		   	if(! (roi.x + roi.w <= image_w)) Torch::print("roi_x+w (%d+%d=%d) > image_w (%d)\n", roi.x, roi.w, roi.x + roi.w, image_w);
+		   	if(! (roi.y + roi.h <= image_h)) Torch::print("roi_y+h (%d+%d=%d) > image_h (%d)\n", roi.y, roi.h, roi.y + roi.h, image_h);
+			
 			Torch::message("Scanner::checkParameters - invalid ROI!\n");
 			return false;
 		}
