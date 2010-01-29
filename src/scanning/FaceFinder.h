@@ -46,6 +46,7 @@ namespace Torch
 
 		const PatternList&		getPatterns() const;
 		const Scanner&			getScanner() const;
+		Scanner&			getScanner();
 
 		/////////////////////////////////////////////////////////////////////////
 		// Gathers all the parameters needed to scan for faces

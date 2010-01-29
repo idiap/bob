@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 	while (in_video.read(image) == true)
 	{
 		cnt_frames ++;
-		print(">>> reading [%d/%d] ...\r", cnt_frames, in_video.getNFrames());
+		print(">>> reading [%d/%d] ...\n", cnt_frames, in_video.getNFrames());
 
 		// Process the frame
 		CHECK_FATAL(ffinder.process(image) == true);
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 			{
 				firstface = true;
 
-				Scanner scanner = ffinder.getScanner();
+				Scanner& scanner = ffinder.getScanner();
 				const Pattern& roi = detections.get(0);
 				      
 				// Get the face region (but enlarge it a little bit)

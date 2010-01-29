@@ -517,6 +517,15 @@ const Scanner& FaceFinder::getScanner() const
 	return *m_scanner;
 }
 
+Scanner& FaceFinder::getScanner()
+{
+	if (m_scanner == 0)
+	{
+		error("FaceFinder::getScanner - invalid scanner!\n");
+	}
+	return *m_scanner;
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 }
