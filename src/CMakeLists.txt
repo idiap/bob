@@ -20,8 +20,8 @@ SET(TORCH5SPRO_INCLUDE "" CACHE INTERNAL "included")
 ########################################################
 
 # CBLAS
-#ADD_DEFINITIONS(-DUSE_CBLAS)
-#INCLUDE_DIRECTORIES("/usr/include")
+ADD_DEFINITIONS(-DUSE_CBLAS)
+INCLUDE_DIRECTORIES("/usr/include")
 
 # JPEG
 ADD_DEFINITIONS(-DHAVE_JPEG)
@@ -40,12 +40,14 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/lbfgs")
 #ADD_DEFINITIONS(-DHAVE_TIFF)
 
 # FFMPEG
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavutil")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavformat")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavcodec")
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libswscale")
-ADD_DEFINITIONS(-DHAVE_FFMPEG)
+# EDIT LES: Remove ffmpeg due to compilation error
+# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include")
+# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavutil")
+# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavformat")
+# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavcodec")
+# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libswscale")
+# ADD_DEFINITIONS(-DHAVE_FFMPEG)
+# End EDIT
 
 ########################################################
 # Sub-directories with source code

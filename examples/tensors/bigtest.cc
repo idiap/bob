@@ -159,7 +159,7 @@ int main()
   it2->print("it2");
 
   IntTensor *it3 = new IntTensor();
-  it3->narrow(it1, 0, 2, 1);
+  it3->narrow(it1, 0, 2, 2);
   it3->print("it3");
 
   IntTensor *it4 = new IntTensor();
