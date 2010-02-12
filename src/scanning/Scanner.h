@@ -106,7 +106,13 @@ namespace Torch
 		const PatternList&		getPatterns() const;
 		const Explorer&			getExplorer() const;
 		Explorer&			getExplorer();
-
+	
+	private:
+	
+		// Disable copying
+		Scanner(const Scanner& other);
+		Scanner& operator=(const Scanner& other);
+	
 	protected:
 
 		/////////////////////////////////////////////////////////////////

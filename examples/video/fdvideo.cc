@@ -6,6 +6,10 @@ using namespace Torch;
 // Main
 ///////////////////////////////////////////////////////////////////////////
 
+char *strFilename(char *filename, char dirsep = '/');
+char *strBasename(char *filename, char extsep = '.');
+   
+
 int main(int argc, char* argv[])
 {
 	char* in_videoname = 0;
@@ -55,20 +59,77 @@ int main(int argc, char* argv[])
 
 		CHECK_FATAL(out_video.open(out_videoname, "w") == true);
 	}
+			
+	char *temp = strFilename(in_videoname);
+	char *basename = strBasename(temp);
+	
+	int image_width = in_video.getIOption("width");
+	int image_height = in_video.getIOption("height");
+
+	print("Input video (%s): width=%d, height=%d, framerate=%f, n_images=%d, codec=[%s].\n",
+	      		basename,
+			image_width,
+			image_height,
+			in_video.getFOption("framerate"),
+			in_video.getNFrames(),
+			in_video.codec());
 
 	// Load and process each frame from the input video
 	Image image(1, 1, 1);
 
 	int cnt_frames = 0;
+	int n_faces = 0;
+	int n_framesmultifaces = 0;
+
+	bool firstface = false;
+
 	while (in_video.read(image) == true)
 	{
 		cnt_frames ++;
-		print(">>> reading [%d/%d] ...\r", cnt_frames, in_video.getNFrames());
+		print(">>> reading [%d/%d] ...\n", cnt_frames, in_video.getNFrames());
 
 		// Process the frame
 		CHECK_FATAL(ffinder.process(image) == true);
 		const PatternList& detections = ffinder.getPatterns();
 		const int n_detections = detections.size();
+		n_faces += n_detections;
+		if(n_detections > 1) n_framesmultifaces++;
+		if(firstface == false)
+		{
+			if(n_detections == 1) 
+			{
+				firstface = true;
+
+				Scanner& scanner = ffinder.getScanner();
+				const Pattern& roi = detections.get(0);
+				      
+				// Get the face region (but enlarge it a little bit)
+				const int face_dw = (int)(roi.m_w * 0.15);	// 15% each side
+				const int face_dh = (int)(roi.m_h * 0.15);	// 15% each side
+
+				const int face_x = max(0, roi.m_x - face_dw);
+				const int face_y = max(0, roi.m_y - face_dh);			
+				int face_w = roi.m_w + 2 * face_dw;
+				if(face_x + face_w > image_width) 
+				{
+					print("cropping face_w (%d) > image_w (%d)\n", face_x + face_w, image_width);
+					face_w = image_width - face_x - 1;
+				}
+
+				int face_h = roi.m_h + 2 * face_dh;	
+				if(face_y + face_h > image_height)
+				{
+					print("cropping face_h (%d) > image_h (%d)\n", face_y + face_h, image_height);
+					face_h = image_height - face_y - 1;
+				}
+
+				scanner.deleteAllROIs();
+
+				print("Setting ROI (%d %d %d %d).\n", face_x, face_y, face_w, face_h);
+
+				scanner.addROI(face_x, face_y, face_w, face_h);
+			}
+		}
 
 		// Save the detections to the result file
 		out_file.printf("%d %d\n", cnt_frames, n_detections);
@@ -110,7 +171,43 @@ int main(int argc, char* argv[])
 		out_video.close();
 	}
 	out_file.close();
+	
+	print("\nOK\n");
+	print("Output video (%s): nframes=%d nfaces=%d nframesmultifaces=%d \n", basename, cnt_frames, n_faces, n_framesmultifaces);
+	print("\n");
+
+	delete [] basename;
 
 	return 0;
 }
+
+
+
+char *strFilename(char *filename, char dirsep) 
+{
+	char *p = strrchr(filename, dirsep);
+	return p ? (p+1) : filename;
+}
+
+char *strBasename(char *filename, char extsep)
+{
+	char *copy = NULL;
+	int len = strlen(filename);
+	char *p = filename + len - 1;
+	int i=len-1;
+	while (*p != extsep && i-- >0) p--;
+	if (i>0) 
+	{
+		copy = new char [i+1];
+		strncpy(copy,filename,i);
+		copy[i] = '\0';
+	} 
+	else 
+	{
+		copy = new char [len+1];
+		strcpy(copy,filename);
+	}
+	return copy;
+}
+
 

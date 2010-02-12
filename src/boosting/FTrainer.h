@@ -17,6 +17,7 @@ namespace Torch
 
 		/// Train the given machine on the given dataset
 		virtual double forward(const Tensor *example_) = 0; //get the output score for a single stage
+		virtual float forwardScan(const Tensor &example_,TensorRegion &tregion);
 	};
 }
 

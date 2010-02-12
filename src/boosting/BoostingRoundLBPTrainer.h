@@ -23,6 +23,7 @@ namespace Torch
         virtual double forward(const Tensor *example_);
         virtual ~BoostingRoundLBPTrainer();
         virtual bool setWeakLearners(int n_classifiers_, WeakLearner **weak_learners_);
+        virtual float forwardScan(const Tensor &example_,TensorRegion &trregion);
         //    virtual void updateWeights();
     private:
         int m_nrounds;          //number of weakclassifiers are set in BoostingTrainer

@@ -276,6 +276,7 @@ namespace Torch
             return false;
         }
         m_weak_classifier->setCore(m_features[bestFeature]);
+       // delete m_lbp_machine->
 
         m_lbp_machine->setParams(m_b_lutsize, m_bestlut_);
 

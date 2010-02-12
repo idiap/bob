@@ -1,4 +1,5 @@
 #include "BoostingRoundLBPTrainer.h"
+#include "ipLBP.h"
 
 namespace Torch
 {
@@ -40,19 +41,56 @@ namespace Torch
         return s;
     }
 
+    float BoostingRoundLBPTrainer::forwardScan(const Tensor &example,TensorRegion &trregion)
+    {
+
+
+	//store the actual tensor region.
+	//int tposy,tposx,tsizey,tsizex;
+	spCore *tempcore;
+
+	Machine *m_ = m_weak_learners[0]->getMachine();
+	tempcore = m_->getCore();
+	TensorRegion tr =       ((ipLBP*)tempcore)->getTensorRegion();
+	trregion.size[0] = tr.size[0];
+	trregion.size[1] = tr.size[1];
+    	//print("BoostingRoundLBPTrainer::forwardscan.....\n");
+        float s = 0.0;
+        for (int j = 0 ; j < m_n_classifiers ; j++)
+        {
+            Machine *m_ = m_weak_learners[j]->getMachine();
+            m_->setRegion(trregion);
+            m_->forward(example);
+            DoubleTensor *t_output = (DoubleTensor *) &m_->getOutput();
+
+            s +=  1.0*(*t_output)(0);
+
+        }
+         for (int j = 0 ; j < m_n_classifiers ; j++)
+        {
+            Machine *m_ = m_weak_learners[j]->getMachine();
+            m_->setRegion(tr);
+        }
+
+
+
+        // print("Score %f\n",s);
+        return s;
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     bool BoostingRoundLBPTrainer::train()
     {
         verbose = getBOption("verbose");
         if (verbose)
-        print("BoostingRoundLBPTrainer::train() ...\n");
+            print("BoostingRoundLBPTrainer::train() ...\n");
 
         //
         bool useSampling = getBOption("boosting_by_sampling");
         m_nrounds = getIOption("number_of_rounds");
 
         if (verbose)
-        print("Number of Classifiers %d, nRounds %d\n",m_n_classifiers,m_nrounds);
+            print("Number of Classifiers %d, nRounds %d\n",m_n_classifiers,m_nrounds);
 
         //Check if the number of rounds are greater than number of weakClassifiers
         if (m_n_classifiers> m_nrounds)
