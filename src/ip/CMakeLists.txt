@@ -36,8 +36,8 @@ SET(	ip_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipRelaxation.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipTanTriggs.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/ipRescaleGray.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipHOG.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipGabor.cc"
+#		"${CMAKE_CURRENT_SOURCE_DIR}/ipHOG.cc"
+#		"${CMAKE_CURRENT_SOURCE_DIR}/ipGabor.cc"
 	CACHE INTERNAL "sources")
 
 SET(	ip_INCLUDE
