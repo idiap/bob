@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 		else
 		{
 			// Remove the third dimension and save the result to a file
-			ShortTensor* out_2d=new ShortTensor();
+			out_2d=new ShortTensor();
 			out_2d->select( &((const ShortTensor&)relaxation.getOutput(0)), 2, 0 );
 		}
 
