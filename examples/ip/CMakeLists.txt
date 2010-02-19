@@ -59,8 +59,7 @@ SET(EXAMPLE_SRC
 	selfQuotientImageTensor.cc
 	relaxationTensor.cc
 	diffusionVcycleTensor.cc
-	tanTriggsTensor.cc
-	aGabortest.cc)
+	tanTriggsTensor.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
