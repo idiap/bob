@@ -100,11 +100,11 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	const int wxh = width * height;
 
 	// Temporary output destination tensor
-	DoubleTensor t_output_double( t_output->size(0), t_output->size(1), t_output->size(2) );
-	double* dst_double = (double*)t_output_double.dataW();
+	DoubleTensor t_output_double1( t_output->size(0), t_output->size(1), t_output->size(2) );
+	double* dst_double1 = (double*)t_output_double1.dataW();
 
-        const int dst_stride_h = t_output_double.t->stride[0];     // height
-        const int dst_stride_w = t_output_double.t->stride[1];     // width
+        const int dst_stride_h = t_output_double1.t->stride[0];     // height
+        const int dst_stride_w = t_output_double1.t->stride[1];     // width
 
 
         //////// PERFORM GAMMA COMPRESSION /////////
@@ -112,7 +112,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	for (int y=0; y<height; y++) 
 	{
 		const short* src_row=&src[y*src_stride_h];
-		double* dst_row=&dst_double[y*dst_stride_h];
+		double* dst_row=&dst_double1[y*dst_stride_h];
 		for (int x=0; x<width; x++, src_row+=src_stride_w, dst_row+=dst_stride_w )
 		{	
 			if ( fabs(gamma) > std::numeric_limits<double>::epsilon( ) )
@@ -127,12 +127,16 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	//////// PERFORM DoG FILTERING /////////
 	// Compute DoG kernel
 	DoubleTensor* DoG=computeDoG(sigma0, sigma1, real_size);
+
+	// Temporary output destination tensor
+	DoubleTensor t_output_double2( t_output->size(0), t_output->size(1), t_output->size(2) );
+	double* dst_double2 = (double*)t_output_double2.dataW();
 	
 	// Perform convolution using mirror interpolation
 	const int r=real_size/2;
 	for (int y = 0; y < height; y ++)
 	{
-		double* dst_row = &dst_double[y * dst_stride_h];
+		double* dst_row = &dst_double2[y * dst_stride_h];
 		for (int x = 0; x < width; x ++)
 		{
 			// Apply the kernel for the <y, x> pixel
@@ -146,7 +150,8 @@ bool ipTanTriggs::processInput(const Tensor& input)
 					yyy=abs(yyy)-1;
 				if (yyy>=height)
 					yyy=2*height-yyy-1;
-				const short* src_row = &src[ yyy * src_stride_h ];	
+//				const short* src_row = &src[ yyy * src_stride_h ];	
+				const double* src_row = &dst_double1[yyy * dst_stride_h];
 				for (int xx = -r; xx <= r; xx ++)
 				{
 					// mirror interpolation
@@ -172,7 +177,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	double sum=0.;
 	for (int y = 0; y < height; y ++)
 	{
-		double* dst_row= &dst_double[y * dst_stride_h];
+		double* dst_row= &dst_double2[y * dst_stride_h];
 		for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
 		{
 			sum += pow( fabs(*dst_row), alpha);
@@ -182,7 +187,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 		
 	for (int y = 0; y < height; y ++)
 	{
-		double* dst_row= &dst_double[y * dst_stride_h];
+		double* dst_row= &dst_double2[y * dst_stride_h];
 		for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
 		{
 			*dst_row /= sum;
@@ -195,7 +200,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	sum=0.;
 	for (int y = 0; y < height; y ++)
 	{
-		double* dst_row = &dst_double[y * dst_stride_h];
+		double* dst_row = &dst_double2[y * dst_stride_h];
 		for (int x = 0; x < width; x++, dst_row+=dst_stride_w )
 		{
 			double var;
@@ -212,7 +217,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	
 	for (int y = 0; y < height; y ++)
 	{
-		double* dst_row = &dst_double[y * dst_stride_h];
+		double* dst_row = &dst_double2[y * dst_stride_h];
 		for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
 		{
 			*dst_row /= sum;
@@ -222,7 +227,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	// Last step: I:= threshold * tanh( I / threshold )	
 	for (int y = 0; y < height; y ++)
 	{
-		double* dst_row = &dst_double[y * dst_stride_h];
+		double* dst_row = &dst_double2[y * dst_stride_h];
 		for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
 		{
 			*dst_row = threshold * tanh( *dst_row / threshold );
@@ -233,7 +238,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 	///////// RESCALE /////////////////	
 	// Rescale the values in [0,255] and copy it into the output Tensor
 	ipCore *rescale = new ipRescaleGray();
-	CHECK_FATAL(rescale->process(t_output_double) == true);
+	CHECK_FATAL(rescale->process(t_output_double2) == true);
 	t_output->copy( &(rescale->getOutput(0)) );
 	delete rescale;
 	

@@ -73,9 +73,9 @@ int main(int argc, char* argv[])
 	case 7:
 		gt_loader = new cootesGTFile();
 		break;
-	case 8:
-		gt_loader = new eyecenterNoseMouthGTFile();
-		break;
+//	case 8:
+//		gt_loader = new eyecenterNoseMouthGTFile();
+//		break;
 	default:
 	   	warning("GT format not implemented.");
 	   	return 1;

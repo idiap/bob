@@ -7,13 +7,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # Set the include directories and linking libraries
 SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
-SET(ATLAS_DIR "/usr/lib/atlas")
 INCLUDE_DIRECTORIES("${TORCH5SPRO_DIR}")
 LINK_LIBRARIES("${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
-		"${ATLAS_DIR}/libblas.a"
-		"${ATLAS_DIR}/libblas.so"
-		"${ATLAS_DIR}/liblapack.a"
-		"${ATLAS_DIR}/liblapack.so"
+		"/usr/lib/libcblas.so"
 		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a")
 
 # Set the compiler flags and build type (release or debug)
