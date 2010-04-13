@@ -1,5 +1,4 @@
 #include "ipHistoEqual.h"
-#include <limits>
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -91,9 +90,6 @@ bool ipHistoEqual::processInput(const Tensor& input)
 	double histogram[256];
 	double cumulHistogram[256];
 
-	// Double values below epsilon are considered as null
-	const double EPSILON = std::numeric_limits<double>::epsilon( ) * 1000;
-
 	// Performs Histogram Equalization... (only one channel)
 
 	// init histograms
@@ -123,19 +119,9 @@ bool ipHistoEqual::processInput(const Tensor& input)
 		cumulHistogram[ i ] = sum;
 	}
 
-	// normalize the histogram
-	if( cumulHistogram[255] < EPSILON )
-	{	
-		// if all values are zeros, set the cumulative histogram to zero to avoid division by zero
-		for(int i = 0; i < 256; i++)
-			cumulHistogram[i] = 0.;
-	}
-	else
-	{
-		// normalize the histogram in the regular way
-		for(int i = 0; i < 256; i++)
-			cumulHistogram[i] = 255.0 * (cumulHistogram[i] - cumulHistogram[0]) / cumulHistogram[255];
-	}
+	// normalize the histogram in the regular way
+	for(int i = 0; i < 256; i++)
+		cumulHistogram[i] = 255.0 * (cumulHistogram[i] - cumulHistogram[0]) / cumulHistogram[255];
 
 	// fill in the output 
 	for (int y = 0; y < height; y++ )

@@ -1,5 +1,5 @@
 #include "ipRescaleGray.h"
-#include <limits>
+//STL #include <limits>
 
 #define COMPUTE_SCALE_GRAY(tensorType, dataType)                                                                     \
 {                                                                                                                    \
@@ -16,8 +16,8 @@
         const int n_planes = input.size(2);                                                                          \
                                                                                                                      \
         /* Start to "normalize" current values in range [0,255] */                                                   \
-	double max_val = std::numeric_limits<double>::min( );                                                        \
-	double min_val = std::numeric_limits<double>::max( );                                                        \
+	double max_val = src[0]; /*STL std::numeric_limits<double>::min( ); */                                       \
+	double min_val = src[0]; /*STL std::numeric_limits<double>::max( ); */                                       \
 	double range;                                                                                                \
                                                                                                                      \
 	/* find min and max values in the image */                                                                   \
@@ -40,7 +40,7 @@
                                                                                                                      \
 	/* Compute the range */                                                                                      \
 	range = max_val - min_val;                                                                                   \
-	const double EPSILON = std::numeric_limits<double>::epsilon() * 1000;                                        \
+	const double EPSILON = 1e-12; /*STL std::numeric_limits<double>::epsilon() * 1000; */                        \
 	bool range_zero = range < EPSILON;                                                                           \
                                                                                                                      \
 	/* Change the scale */                                                                                       \

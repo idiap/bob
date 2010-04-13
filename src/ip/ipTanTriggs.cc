@@ -1,7 +1,7 @@
 #include "ipTanTriggs.h"
 #include "ipRescaleGray.h"
 #include <cmath>
-#include <limits>
+//STL #include <limits>
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ bool ipTanTriggs::processInput(const Tensor& input)
 		double* dst_row=&dst_double1[y*dst_stride_h];
 		for (int x=0; x<width; x++, src_row+=src_stride_w, dst_row+=dst_stride_w )
 		{	
-			if ( fabs(gamma) > std::numeric_limits<double>::epsilon( ) )
+			if ( fabs(gamma) > 1e-12 ) //STL std::numeric_limits<double>::epsilon( ) )
 				*dst_row = pow( *src_row, gamma );
 			// TODO which value to add in the log?
 			else
