@@ -42,7 +42,8 @@ SET(EXAMPLE_SRC
 	checkvideos.cc
 	video2tensor.cc
 	makeFaceFinder.cc
-	fdvideo.cc)
+	fdvideo.cc
+	fdtvideo.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )

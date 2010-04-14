@@ -142,8 +142,8 @@
 	<File name="../../core/CMakeLists.txt" open="0" top="0" tabpos="42">
 		<Cursor position="1242" topLine="0" />
 	</File>
-	<File name="../../core/CmdFile.cc" open="1" top="1" tabpos="7">
-		<Cursor position="10180" topLine="375" />
+	<File name="../../core/CmdFile.cc" open="1" top="0" tabpos="7">
+		<Cursor position="10180" topLine="0" />
 	</File>
 	<File name="../../core/CmdFile.h" open="1" top="0" tabpos="6">
 		<Cursor position="1265" topLine="48" />
@@ -553,11 +553,11 @@
 	<File name="../../scanning/CMakeLists.txt" open="0" top="0" tabpos="18">
 		<Cursor position="587" topLine="0" />
 	</File>
-	<File name="../../scanning/Explorer.cc" open="0" top="0" tabpos="16">
-		<Cursor position="5129" topLine="174" />
+	<File name="../../scanning/Explorer.cc" open="1" top="0" tabpos="11">
+		<Cursor position="970" topLine="314" />
 	</File>
-	<File name="../../scanning/Explorer.h" open="0" top="0" tabpos="12">
-		<Cursor position="3920" topLine="99" />
+	<File name="../../scanning/Explorer.h" open="1" top="0" tabpos="17">
+		<Cursor position="6701" topLine="176" />
 	</File>
 	<File name="../../scanning/FaceFinder.cc" open="1" top="0" tabpos="2">
 		<Cursor position="15165" topLine="485" />
@@ -571,17 +571,17 @@
 	<File name="../../scanning/Pattern.h" open="0" top="0" tabpos="20">
 		<Cursor position="1359" topLine="11" />
 	</File>
-	<File name="../../scanning/ScaleExplorer.cc" open="0" top="0" tabpos="14">
-		<Cursor position="1113" topLine="20" />
+	<File name="../../scanning/ScaleExplorer.cc" open="1" top="0" tabpos="13">
+		<Cursor position="1740" topLine="55" />
 	</File>
-	<File name="../../scanning/ScaleExplorer.h" open="0" top="0" tabpos="13">
-		<Cursor position="886" topLine="18" />
+	<File name="../../scanning/ScaleExplorer.h" open="1" top="0" tabpos="15">
+		<Cursor position="986" topLine="23" />
 	</File>
-	<File name="../../scanning/Scanner.cc" open="0" top="0" tabpos="24">
-		<Cursor position="3429" topLine="145" />
+	<File name="../../scanning/Scanner.cc" open="1" top="0" tabpos="9">
+		<Cursor position="5062" topLine="218" />
 	</File>
-	<File name="../../scanning/Scanner.h" open="0" top="0" tabpos="23">
-		<Cursor position="2347" topLine="63" />
+	<File name="../../scanning/Scanner.h" open="1" top="0" tabpos="16">
+		<Cursor position="2931" topLine="87" />
 	</File>
 	<File name="../../scanning/Selector.h" open="0" top="0" tabpos="74">
 		<Cursor position="353" topLine="0" />
@@ -628,20 +628,20 @@
 	<File name="../../scanning/explorers/CMakeLists.txt" open="0" top="0" tabpos="19">
 		<Cursor position="437" topLine="0" />
 	</File>
-	<File name="../../scanning/explorers/ContextExplorer.cc" open="0" top="0" tabpos="10">
-		<Cursor position="5616" topLine="210" />
+	<File name="../../scanning/explorers/ContextExplorer.cc" open="1" top="0" tabpos="14">
+		<Cursor position="10543" topLine="375" />
 	</File>
 	<File name="../../scanning/explorers/ContextExplorer.h" open="0" top="0" tabpos="9">
 		<Cursor position="1522" topLine="39" />
 	</File>
-	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.cc" open="0" top="0" tabpos="33">
-		<Cursor position="1833" topLine="37" />
+	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.cc" open="1" top="0" tabpos="12">
+		<Cursor position="1822" topLine="35" />
 	</File>
 	<File name="../../scanning/explorers/ExhaustiveScaleExplorer.h" open="0" top="0" tabpos="67">
 		<Cursor position="919" topLine="0" />
 	</File>
-	<File name="../../scanning/explorers/MSExplorer.cc" open="0" top="0" tabpos="18">
-		<Cursor position="3746" topLine="111" />
+	<File name="../../scanning/explorers/MSExplorer.cc" open="1" top="0" tabpos="10">
+		<Cursor position="6868" topLine="222" />
 	</File>
 	<File name="../../scanning/explorers/MSExplorer.h" open="0" top="0" tabpos="17">
 		<Cursor position="1794" topLine="46" />
@@ -705,6 +705,12 @@
 	</File>
 	<File name="../../scanning/selectors/OverlapSelector.h" open="0" top="0" tabpos="77">
 		<Cursor position="3150" topLine="66" />
+	</File>
+	<File name="../../scanning/trackers/MeanShiftTracker.cc" open="1" top="1" tabpos="8">
+		<Cursor position="5391" topLine="168" />
+	</File>
+	<File name="../../scanning/trackers/MeanShiftTracker.h" open="1" top="0" tabpos="18">
+		<Cursor position="763" topLine="19" />
 	</File>
 	<File name="../../sp/CMakeLists.txt" open="0" top="0" tabpos="32">
 		<Cursor position="170" topLine="0" />

@@ -11,13 +11,13 @@ model ../data/models/facedetection/frontal/mct4.cascade
 ### explorer type: 0 - Pyramid, 1 - Multiscale, 2 - Context
 -explorer_type 1
 ### scale explorer type: 0 - Exhaustive, 1 - Spiral, 2 - Random
--scale_explorer_type 1
+-scale_explorer_type 0
 ### minimum pattern width
--min_patt_w 190
+-min_patt_w 79
 ### maximum pattern width
 -max_patt_w 266
 ### minimum pattern height
--min_patt_h 190
+-min_patt_h 79
 ### maximum pattern height
 -max_patt_h 266
 ### Sub-window Oy position variation
@@ -25,7 +25,7 @@ model ../data/models/facedetection/frontal/mct4.cascade
 ### Sub-window Ox position variation
 -dy 0.130
 ### Sub-window scale variation
--ds 1.1
+-ds 1.05
 ### stop at first detection
 -stop_at_first_detection false
 ### start with large scales
@@ -41,9 +41,9 @@ model ../data/models/facedetection/frontal/mct4.cascade
 ### 
 
 ### prune using the mean
--prune_use_mean true
+-prune_use_mean false
 ### prune using the stdev
--prune_use_stdev true
+-prune_use_stdev false
 ### prune using the mean: min value
 -prune_min_mean 25
 ### prune using the mean: max value

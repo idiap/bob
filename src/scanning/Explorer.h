@@ -168,6 +168,8 @@ namespace Torch
 		int			getNoScales() const { return m_n_scales; }
 		const sSize&		getScale(int index_scale) const;
 
+		const ExplorerData*	getExplorerData() const { return m_data; }
+
 		/////////////////////////////////////////////////////////////////
 
 	protected:

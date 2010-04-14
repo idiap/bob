@@ -12,6 +12,9 @@
 #include <time.h>
 #include <float.h>
 
+//#include <algorithm>
+//using namespace std;
+
 // Old systems need that to define FLT_MAX and DBL_MAX
 #ifndef DBL_MAX
 #include <values.h>
