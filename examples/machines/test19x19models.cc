@@ -8,13 +8,14 @@ using namespace Torch;
 int main(int argc, char* argv[])
 {
         // Check arguments
-        if (argc != 3)
+        if (argc != 4)
         {
-                print("\nUsage: <test19x19models> <model filename> <tensor file to test>\n\n");
+                print("\nUsage: <test19x19models> <model filename> <tensor file to test> <threshold>\n\n");
                 return 1;
         }
         const char* model_filename = argv[1];
         const char* data_filename = argv[2];
+	const char* threshold = argv[3];
 
         // Load the cascade machine
 	CascadeMachine* cascade = dynamic_cast<CascadeMachine*>(Torch::loadMachineFromFile(model_filename));
@@ -34,6 +35,10 @@ int main(int argc, char* argv[])
 			i + 1, cascade->getNoStages(), cascade->getNoMachines(i), cascade->getThreshold(i));
 	}
 
+	double theta = atof(threshold);
+
+	print("threshold = %g\n", theta);
+	
 	// Load the tensors to test
 	TensorFile tf;
 	if (tf.openRead(data_filename) == true)
@@ -50,8 +55,15 @@ int main(int argc, char* argv[])
 				return 1;
 			}
 
-			//print("CONFIDENCE = %f\n", cascade->getConfidence());
-			n_patterns += cascade->isPattern() ? 1 : 0;
+			print("CONFIDENCE %f\n", cascade->getConfidence());
+			
+			//n_patterns += cascade->isPattern() ? 1 : 0;
+
+			if(cascade->isPattern())
+			{
+				n_patterns += (cascade->getConfidence() >= theta) ? 1 : 0;
+			}
+
 			n_samples ++;
 		}
 
@@ -59,7 +71,7 @@ int main(int argc, char* argv[])
 
 		// Print the results
 		print("---------------------------------------------------\n");
-		print(">>> detection rate: [%d/%d] = %f%% <<<\n",
+		print(">>> classification rate: [%d/%d] = %f%% <<<\n",
 			n_patterns, n_samples, 100.0f * (n_patterns + 0.0f) / (n_samples + 0.0f));
 		print("---------------------------------------------------\n");
 	}

@@ -14,13 +14,13 @@ void retainDC(const FloatTensor *dct2d_in, int n_dc, FloatTensor *dc_out, zigzag
 
 int main(int argc, char* argv[])
 {
-        ///////////////////////////////////////////////////////////////////
-        // Parse the command line
-        ///////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////
+	// Parse the command line
+	///////////////////////////////////////////////////////////////////
 
 	// Set options
-        char* tensor_filename;
-        char* output_basename;
+	char* tensor_filename;
+	char* output_basename;
 	bool verbose;
 	int block_size_h;
 	int block_size_w;
@@ -30,6 +30,7 @@ int main(int argc, char* argv[])
 	bool blocks_to_tensor2d;
 	bool rowblocks_to_tensor3d;
 	bool colblocks_to_tensor3d;
+	bool xy_mode;
 
 	// Build the command line object
 	CmdLine cmd;
@@ -55,7 +56,8 @@ int main(int argc, char* argv[])
 	cmd.addBCmdOption("-blocks_to_tensor2d", &blocks_to_tensor2d, false, "all blocks of an image are stored as one 2d tensor (dim X n_blocks)");
 	cmd.addBCmdOption("-rowblocks_to_tensor3d", &rowblocks_to_tensor3d, false, "all blocks of an image are stored as one 3d tensor (dim X n_cols X n_rows)");
 	cmd.addBCmdOption("-colblocks_to_tensor3d", &colblocks_to_tensor3d, false, "all blocks of an image are stored as one 3d tensor (dim X n_rows X n_cols)");
-	
+	cmd.addBCmdOption("-xy", &xy_mode, false, "concat the x and y of the blocks");
+
 	// Parse the command line
 	if (cmd.read(argc, argv) < 0)
 	{
@@ -101,7 +103,6 @@ int main(int argc, char* argv[])
 	}
 
 	//
-	spDCT dct;
 
 	zigzagDCT *dc_zigzag_index = new zigzagDCT [block_size_h * block_size_w];
 
@@ -122,6 +123,12 @@ int main(int argc, char* argv[])
 	else if(colblocks_to_tensor3d) print("all blocks of an image are stored as one 3d tensor (dim X n_rows X n_cols)\n");
 	else print("each block of an image is stored as one 1d tensor (dim)\n");
 
+	//
+	if (xy_mode) {
+		n_dc += 2;
+	}
+
+	//
 	int n_blocks = 0;
 
 	//
@@ -150,7 +157,7 @@ int main(int argc, char* argv[])
 
 		if(t == 0)
 		{
-		   	n_blocks = n_rows * n_cols;
+			n_blocks = n_rows * n_cols;
 
 			if(blocks_to_tensor2d)
 			{
@@ -202,7 +209,7 @@ int main(int argc, char* argv[])
 			t_dc = new FloatTensor();
 			t_rcblock = new FloatTensor();
 		}
-		else 
+		else
 		{
 			t_dc = new FloatTensor(n_dc);
 			t_dc->fill(0);
@@ -213,34 +220,44 @@ int main(int argc, char* argv[])
 		{
 			t_rcoutput_narrow_rows->select(&t_rcoutput, 0, r);
 
-		   	for(int c = 0; c < n_cols; c++)
+			for(int c = 0; c < n_cols; c++)
 			{
 				t_rcoutput_narrow_cols->select(t_rcoutput_narrow_rows, 0, c);
 
 				t_block->copy(t_rcoutput_narrow_cols);
 
+				// dct
+				spDCT dct;
 				dct.process(*t_block);
 
 				const FloatTensor& out = (const FloatTensor&) dct.getOutput(0);
 
-				//print("> %g %g %g\n", out.get(0,0), out.get(0,1), out.get(1,0));
-
 				if(blocks_to_tensor2d)
 				{
-					t_dc->select(t_seq, 1, i_block);	
+					t_dc->select(t_seq, 1, i_block);
 				}
 				else if(rowblocks_to_tensor3d)
 				{
-					t_rcblock->select(t_seq, 2, r);	
-					t_dc->select(t_rcblock, 1, c);	
+					t_rcblock->select(t_seq, 2, r);
+					t_dc->select(t_rcblock, 1, c);
 				}
 				else if(colblocks_to_tensor3d)
 				{
-					t_rcblock->select(t_seq, 2, c);	
-					t_dc->select(t_rcblock, 1, r);	
+					t_rcblock->select(t_seq, 2, c);
+					t_dc->select(t_rcblock, 1, r);
 				}
 
+				// if xy_mode, we will retain two too many,
+				// however, these will be overriden soon.
 				retainDC(&out, n_dc, t_dc, dc_zigzag_index);
+
+				// Concatenate the xy coordinates (row and col coord)
+				if(xy_mode) {
+					// override,
+					t_dc->set(n_dc-2, r);
+					t_dc->set(n_dc-1, c);
+				}
+
 
 				if(!blocks_to_tensor2d && !rowblocks_to_tensor3d && !colblocks_to_tensor3d)
 				{
@@ -248,6 +265,7 @@ int main(int argc, char* argv[])
 				}
 
 				i_block++;
+
 			}
 		}
 
@@ -273,7 +291,7 @@ int main(int argc, char* argv[])
 			delete t_seq;
 			delete t_rcblock;
 		}
-		
+
 		delete t_dc;
 
 		delete t_block;
@@ -291,27 +309,23 @@ int main(int argc, char* argv[])
 	delete [] dc_zigzag_index;
 
 
-        // OK
+	// OK
 	return 0;
 }
 
 void retainDC(const FloatTensor *dct2d_in, int n_dc, FloatTensor *dc_out, zigzagDCT *index)
 {
-	//dct2d_in->print("DCT 2D");
-
 	for(int i = 0 ; i < n_dc ; i++)
 	{
 		float z = dct2d_in->get(index[i].y, index[i].x);
 		dc_out->set(i, z);
 	}
-
-	//dc_out->print("DC retained");
 }
 
 
 void compute_zigzag(int block_size_h, int block_size_w, zigzagDCT *index)
 {
-   	print("Computing zig-zag pattern for DCT ...\n");
+	print("Computing zig-zag pattern for DCT ...\n");
 
 	int x = 0, y = 0;
 	int id = 0;

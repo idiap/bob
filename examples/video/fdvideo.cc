@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 	while (in_video.read(image) == true)
 	{
 		cnt_frames ++;
-		print(">>> reading [%d/%d] ...\n", cnt_frames, in_video.getNFrames());
+		print(">>> reading [%d/%d] ...\r", cnt_frames, in_video.getNFrames());
 
 		// Process the frame
 		CHECK_FATAL(ffinder.process(image) == true);
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 
 				scanner.deleteAllROIs();
 
-				print("Setting ROI (%d %d %d %d).\n", face_x, face_y, face_w, face_h);
+				//print("Setting ROI (%d %d %d %d).\n", face_x, face_y, face_w, face_h);
 
 				scanner.addROI(face_x, face_y, face_w, face_h);
 			}

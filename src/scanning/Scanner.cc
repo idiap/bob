@@ -44,7 +44,7 @@ bool Scanner::addROI(int x, int y, int w, int h)
 		return false;
 	}
 		   	
-	Torch::print("adding ROI (%d %d %d %d) to %d ROIs\n", x, y, w, h, m_n_rois);
+	//Torch::print("adding ROI (%d %d %d %d) to %d ROIs\n", x, y, w, h, m_n_rois);
 
 	// OK
 	sRect2D* temp = new sRect2D[m_n_rois + 1];
