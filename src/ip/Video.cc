@@ -4,14 +4,12 @@
 #ifdef HAVE_FFMPEG
 extern "C"
 {
+	#define __STDC_CONSTANT_MACROS
+
 	#include "avutil.h"
 	#include "avformat.h"
 	// WARNING: if you use libswscale below the code becomes GPL !!!
 	#include "swscale.h"
-
-	#ifndef INT64_C
-		#define INT64_C(c)	(c ## LL)
-	#endif
 
 	// Example input program: http://web.me.com/dhoerl/Home/Tech_Blog/Entries/2009/1/22_Revised_avcodec_sample.c.html
 	// Example output program: http://cekirdek.pardus.org.tr/~ismail/ffmpeg-docs/output-example_8c-source.html
@@ -643,11 +641,11 @@ namespace Torch {
 					}
 
 					// auto detect the output format from the name. default is mpeg.
-					m_fwrite.fmt = guess_format(NULL, filename, NULL);
+					m_fwrite.fmt = av_guess_format(NULL, filename, NULL);
 					if (!m_fwrite.fmt)
 					{
 						warning("Video::open - could not deduce output format from file extension: using MPEG.");
-						m_fwrite.fmt = guess_format("mpeg", NULL, NULL);
+						m_fwrite.fmt = av_guess_format("mpeg", NULL, NULL);
 					}
 					if (!m_fwrite.fmt)
 					{
