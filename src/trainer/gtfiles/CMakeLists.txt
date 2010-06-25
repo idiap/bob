@@ -9,7 +9,7 @@ SET(	gtfiles_SRC
 		"${CMAKE_CURRENT_SOURCE_DIR}/frontalEyeNoseChinGTFile.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/halfprofileEyeNoseChinGTFile.cc"
 		"${CMAKE_CURRENT_SOURCE_DIR}/profileEyeNoseChinGTFile.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/bbx2eye19x19deye10GTFile.cc"
+#		"${CMAKE_CURRENT_SOURCE_DIR}/bbx2eye19x19deye10GTFile.cc"
 	CACHE INTERNAL "sources")
 
 # Include this directory

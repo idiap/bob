@@ -41,12 +41,12 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/lbfgs")
 
 # FFMPEG
 # EDIT LES: Remove ffmpeg due to compilation error
-# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include")
-# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavutil")
-# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavformat")
-# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavcodec")
-# INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libswscale")
-# ADD_DEFINITIONS(-DHAVE_FFMPEG)
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavutil")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavformat")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libavcodec")
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../extras/ffmpeg/include/libswscale")
+ADD_DEFINITIONS(-DHAVE_FFMPEG)
 # End EDIT
 
 ########################################################

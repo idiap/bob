@@ -12,7 +12,7 @@ SET(FFMPEG_DIR "${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}"
 INCLUDE_DIRECTORIES("${TORCH5SPRO_DIR}")
 
 LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
-#		"/usr/lib/libcblas.so"
+		"/usr/lib/libcblas.so"
 		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a"
 		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavformat.a"
 		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavcodec.a"
@@ -20,8 +20,8 @@ LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro
 		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libswscale.a")
 
 # Set the compiler flags and build type (release or debug)
-SET(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+SET(CMAKE_CXX_FLAGS_RELEASE "-pthread -O2 -DNDEBUG")
+SET(CMAKE_CXX_FLAGS_DEBUG "-pthread -g")
 SET(CMAKE_BUILD_TYPE RELEASE)
 #SET(CMAKE_BUILD_TYPE DEBUG)
 
@@ -37,13 +37,13 @@ MESSAGE("---------------------------------------------" "")
 
 SET(EXAMPLE_SRC
 	testio.cc
-	mobioVideoScan.cc
+  #	mobioVideoScan.cc
 	checkvideo.cc
 	checkvideos.cc
-	video2tensor.cc
+  #	video2tensor.cc
 	makeFaceFinder.cc
-	fdvideo.cc
-	fdtvideo.cc)
+	fdvideo.cc)
+#	fdtvideo.cc)
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
