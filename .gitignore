@@ -1,0 +1,6 @@
+*~
+build_*
+torch5spro.h
+include
+extras/ffmpeg/ffmpeg
+examples/*/build_*
