@@ -2,5 +2,12 @@
 build_*
 torch5spro.h
 include
-extras/ffmpeg/ffmpeg
+*.swp
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
 examples/*/build_*
+extras/build_*
+extras/Makefile
+extras/*/Makefile
+extras/ffmpeg/ffmpeg*
