@@ -27,9 +27,15 @@ prefix=`pwd`
 build_dir=${prefix}/build/${platform}
 install_dir=${prefix}/install/${platform}
 include_dir=${prefix}/install/include
+if [ -r /proc/cpuinfo ]; then
+  cpu_count=`cat /proc/cpuinfo | egrep -c '^processor'`
+else
+  cpu_count=2 #a good default for current number of procs in a machine
+fi
 
 # Print out some stuff so the user knows what we are doing
 echo "Build type: ${build_type}"
+echo "CPU count: ${cpu_count}"
 echo "Platform: ${platform}"
 echo "Prefix: ${prefix}"
 echo "Build directory: ${build_dir}"
@@ -40,5 +46,6 @@ echo "Includes directory: ${include_dir}"
 # all and install.
 [ ! -d ${build_dir} ] && mkdir -p ${build_dir}
 cd ${build_dir}
-cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} ${prefix}
-make all install
+cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} -DCPU_COUNT=${cpu_count} ${prefix}
+make all
+make -j${cpu_count} install
