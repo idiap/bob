@@ -13,5 +13,5 @@ SET(${THIS}_SRC
 		"PyramidExplorer.cc"
 	CACHE INTERNAL "sources")
 
-include(../../SetupPackage.cmake)
 include(../../InstallParts.cmake)
+include(../../SetupPackage.cmake)

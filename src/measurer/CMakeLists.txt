@@ -7,5 +7,5 @@ set(THIS measurer)
 SET(${THIS}_SRC "measurer.cc"
   CACHE INTERNAL "sources")
 
-include(../SetupPackage.cmake)
 include(../InstallParts.cmake)
+include(../SetupPackage.cmake)

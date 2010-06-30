@@ -44,5 +44,5 @@ SET(${THIS}_SRC
 	CACHE INTERNAL "sources")
 
 SET(${THIS}_SUBDIRS imagefiles)
-include(../SetupPackage.cmake)
 include(../InstallParts.cmake)
+include(../SetupPackage.cmake)

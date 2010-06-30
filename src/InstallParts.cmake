@@ -12,6 +12,7 @@
 # INSTALL(TARGETS ${libname} LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 # INSTALL(TARGETS ${libname}-static ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
 
-# This handles the installation of the header files
-INSTALL(DIRECTORY . DESTINATION ${TORCH5SPRO_INCLUDE_DIR}
+# This handles the installation of the header files, the regular expression
+# avoids subdirectories to be installed.
+INSTALL(DIRECTORY ./ DESTINATION ${TORCH5SPRO_INCLUDE_DIR}
         FILES_MATCHING PATTERN "*.h")

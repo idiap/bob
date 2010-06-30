@@ -7,5 +7,5 @@ set(THIS sp)
 SET(${THIS}_SRC "spFFT.cc" "spDCT.cc" "spDeltaOne.cc" "ooura.cc"
 	CACHE INTERNAL "sources")
 
-include(../SetupPackage.cmake)
 include(../InstallParts.cmake)
+include(../SetupPackage.cmake)

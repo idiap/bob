@@ -10,5 +10,5 @@ SET(${THIS}_SRC
 		"MVSECriterion.cc"
 	CACHE INTERNAL "sources")
 
-include(../../SetupPackage.cmake)
 include(../../InstallParts.cmake)
+include(../../SetupPackage.cmake)
