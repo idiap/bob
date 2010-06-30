@@ -40,8 +40,6 @@ macro(build_ffmpeg version branch)
     SVN_REPOSITORY svn://svn.mplayerhq.hu/ffmpeg/${branch}
     UPDATE_COMMAND svn update .
     CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --incdir=${INCLUDE_DIR} --disable-zlib --disable-bzlib --disable-ffmpeg --disable-ffserver --disable-ffplay --enable-gpl --enable-shared ${FFMPEG_DEBUG}
-    BUILD_COMMAND make -j${CPU_COUNT}
-    INSTALL_COMMAND make install
     INSTALL_DIR ${INSTALL_DIR}
   )
 endmacro(build_ffmpeg)

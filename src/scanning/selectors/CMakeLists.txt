@@ -1,12 +1,11 @@
 #
 # Add the source files to the list of files to be added to the library
 #
-SET(	selectors_SRC
-		"${CMAKE_CURRENT_SOURCE_DIR}/DummySelector.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/OverlapSelector.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/MeanShiftSelector.cc"
+PROJECT(selectors)
+set(THIS selectors)
+
+SET(${THIS}_SRC "DummySelector.cc" "OverlapSelector.cc" "MeanShiftSelector.cc"
 	CACHE INTERNAL "sources")
 
-SET(	selectors_INCLUDE
-		${CMAKE_CURRENT_SOURCE_DIR}
-	CACHE INTERNAL "includes")
+include(../../SetupPackage.cmake)
+include(../../InstallParts.cmake)

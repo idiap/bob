@@ -1,17 +1,18 @@
 #
 # Add the source files to the list of files to be added to the library
 #
-SET(	th_SRC
-		"${CMAKE_CURRENT_SOURCE_DIR}/THBlas.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/THGeneral.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/THLogAdd.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/THRandom.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/THStorage.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/THTensor.c"
-		"${CMAKE_CURRENT_SOURCE_DIR}/THTensorMath.c"
+PROJECT(th)
+set(THIS th)
+
+SET(${THIS}_SRC
+		"THBlas.c"
+		"THGeneral.c"
+		"THLogAdd.c"
+		"THRandom.c"
+		"THStorage.c"
+		"THTensor.c"
+		"THTensorMath.c"
 	CACHE INTERNAL "sources")
 
-SET(	th_INCLUDE
-		${CMAKE_CURRENT_SOURCE_DIR}
-	CACHE INTERNAL "includes")
-
+include(../SetupPackage.cmake)
+include(../InstallParts.cmake)

@@ -1,20 +1,21 @@
 #
 # Add the source files to the list of files to be added to the library
 #
-SET(	boosting_SRC
-	"${CMAKE_CURRENT_SOURCE_DIR}/BoostingTrainer.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/BoostingRoundLBPTrainer.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/WeakLearner.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/StumpMachine.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/StumpTrainer.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/LBPRoundTrainer.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/IntLutMachine.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/RealLutMachine.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/FTrainer.cc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/CascadeTrainer.cc"
+PROJECT(boosting)
+set(THIS boosting)
+
+SET(${THIS}_SRC
+	"BoostingTrainer.cc"
+	"BoostingRoundLBPTrainer.cc"
+	"WeakLearner.cc"
+	"StumpMachine.cc"
+	"StumpTrainer.cc"
+	"LBPRoundTrainer.cc"
+	"IntLutMachine.cc"
+	"RealLutMachine.cc"
+	"FTrainer.cc"
+	"CascadeTrainer.cc"
 	CACHE INTERNAL "sources")
 
-SET(	boosting_INCLUDE
-		${CMAKE_CURRENT_SOURCE_DIR}
-	CACHE INTERNAL "includes")
-
+include(../SetupPackage.cmake)
+include(../InstallParts.cmake)

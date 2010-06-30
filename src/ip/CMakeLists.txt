@@ -1,59 +1,48 @@
 #
 # Add the source files to the list of files to be added to the library
 #
-SET(	ip_SRC
-		"${CMAKE_CURRENT_SOURCE_DIR}/vision.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Color.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Complex.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Convert.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Image.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ImageFile.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipIntegral.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/xtprobeImageFile.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipScaleYX.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipCrop.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipBlock.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipHaarLienhart.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipHLBPLienhart.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipLBP.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipLBP4R.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipLBP8R.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipLBPBitmap.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipHisto.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipSmoothGaussian.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipSobel.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipFlip.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipRotate.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipShift.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipGeomNorm.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Video.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipHistoEqual.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipMSRSQIGaussian.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipMultiscaleRetinex.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipSelfQuotientImage.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/multigrid.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipVcycle.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipRelaxation.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipTanTriggs.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/ipRescaleGray.cc"
-#		"${CMAKE_CURRENT_SOURCE_DIR}/ipHOG.cc"
-#		"${CMAKE_CURRENT_SOURCE_DIR}/ipGabor.cc"
+PROJECT(ip)
+set(THIS ip)
+
+SET(${THIS}_SRC
+		"vision.cc"
+		"Color.cc"
+		"Complex.cc"
+		"Convert.cc"
+		"Image.cc"
+		"ImageFile.cc"
+		"ipIntegral.cc"
+		"xtprobeImageFile.cc"
+		"ipScaleYX.cc"
+		"ipCrop.cc"
+		"ipBlock.cc"
+		"ipHaarLienhart.cc"
+		"ipHLBPLienhart.cc"
+		"ipLBP.cc"
+		"ipLBP4R.cc"
+		"ipLBP8R.cc"
+		"ipLBPBitmap.cc"
+		"ipHisto.cc"
+		"ipSmoothGaussian.cc"
+		"ipSobel.cc"
+		"ipFlip.cc"
+		"ipRotate.cc"
+		"ipShift.cc"
+		"ipGeomNorm.cc"
+		"Video.cc"
+		"ipHistoEqual.cc"
+		"ipMSRSQIGaussian.cc"
+		"ipMultiscaleRetinex.cc"
+		"ipSelfQuotientImage.cc"
+		"multigrid.cc"
+		"ipVcycle.cc"
+		"ipRelaxation.cc"
+		"ipTanTriggs.cc"
+		"ipRescaleGray.cc"
+#		"ipHOG.cc"
+#		"ipGabor.cc"
 	CACHE INTERNAL "sources")
 
-SET(	ip_INCLUDE
-		${CMAKE_CURRENT_SOURCE_DIR}
-	CACHE INTERNAL "includes")
-
-# Add some sub-directories
-SET(ip_SUBDIRS
-	imagefiles)
-
-FOREACH(subdir ${ip_SUBDIRS})
-	ADD_SUBDIRECTORY(${subdir})
-
-	# Add the sources from the subdirectories
-	SET(ip_SRC "${ip_SRC};${${subdir}_SRC}" CACHE INTERNAL "sources")
-
-	# Add the includes from the subdirectoris too
-	SET(ip_INCLUDE	"${ip_INCLUDE};${${subdir}_INCLUDE}" CACHE INTERNAL "includes")
-ENDFOREACH(subdir)
+SET(${THIS}_SUBDIRS imagefiles)
+include(../SetupPackage.cmake)
+include(../InstallParts.cmake)

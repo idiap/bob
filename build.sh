@@ -46,5 +46,6 @@ echo "Includes directory: ${include_dir}"
 # all and install.
 [ ! -d ${build_dir} ] && mkdir -p ${build_dir}
 cd ${build_dir}
-cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} ${prefix}
-make -j${cpu_count} all install
+cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} -DCPU_COUNT=${cpu_count} ${prefix}
+make -j${cpu_count} all
+make -j${cpu_count} install

@@ -2,5 +2,5 @@
 # Andre Anjos - 25.june.2010
 
 include(FindPkgConfig)
-pkg_check_modules(ffmpeg REQUIRED libavformat libswscale libavutil)
+pkg_check_modules(ffmpeg REQUIRED libavformat libavcodec libswscale libavutil)
 

@@ -1,16 +1,17 @@
 #
 # Add the source files to the list of files to be added to the library
 #
-SET(	gradients_SRC
-		"${CMAKE_CURRENT_SOURCE_DIR}/Exp.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Log.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Sigmoid.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Linear.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/Tanh.cc"
-		"${CMAKE_CURRENT_SOURCE_DIR}/MLP.cc"
+PROJECT(gradients)
+set(THIS gradients)
+
+SET(${THIS}_SRC
+		"Exp.cc"
+		"Log.cc"
+		"Sigmoid.cc"
+		"Linear.cc"
+		"Tanh.cc"
+		"MLP.cc"
 	CACHE INTERNAL "sources")
 
-SET(	gradients_INCLUDE
-		${CMAKE_CURRENT_SOURCE_DIR}
-	CACHE INTERNAL "includes")
-
+include(../../SetupPackage.cmake)
+include(../../InstallParts.cmake)
