@@ -101,10 +101,6 @@ INSTALL(DIRECTORY ./ DESTINATION ${TORCH5SPRO_INCLUDE_DIR}
 ADD_DEPENDENCIES(torch5spro ffmpeg jpeg lbfgs oourafft) 
 ADD_DEPENDENCIES(torch5spro-static ffmpeg jpeg lbfgs oourafft) 
 
-# Prepare the main header
-EXECUTE_PROCESS(COMMAND "../makeinclude.sh" ${INCLUDE_DIR}/torch5spro
-			"TensorGen.h THTensorGen.h THStorageGen.h")
-
 ########################################################
 # Make it verbose
 

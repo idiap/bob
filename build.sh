@@ -45,7 +45,15 @@ echo "Includes directory: ${include_dir}"
 # Here we create a directory for the build and call cmake followed by a make
 # all and install.
 [ ! -d ${build_dir} ] && mkdir -p ${build_dir}
+root_dir=`pwd`
 cd ${build_dir}
 cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} -DCPU_COUNT=${cpu_count} ${prefix}
 make -j${cpu_count} all
 make -j${cpu_count} install
+
+# After the installation, we update the torch5spro.h file, with what is there.
+cd ${root_dir}
+exclude="TensorGen.h THTensorGen.h THStorageGen.h"
+echo -n "Generating global include file..."
+./makeinclude.py ${include_dir}/torch5spro/torch5spro.h ${exclude}
+echo "ok!"
