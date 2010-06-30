@@ -14,5 +14,4 @@ SET(${THIS}_SRC
 		"THTensorMath.c"
 	CACHE INTERNAL "sources")
 
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)

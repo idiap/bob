@@ -12,5 +12,4 @@ SET(${THIS}_SRC
 		"MultiVariateMeansDistribution.cc"
 	CACHE INTERNAL "sources")
 
-include(../../InstallParts.cmake)
 include(../../SetupPackage.cmake)

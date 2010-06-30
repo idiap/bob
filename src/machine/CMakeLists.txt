@@ -14,5 +14,4 @@ SET(${THIS}_SRC
 	CACHE INTERNAL "sources")
 
 set(${THIS}_SUBDIRS gradients criterions normalisations distributions)
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)

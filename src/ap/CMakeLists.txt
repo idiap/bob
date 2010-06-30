@@ -5,5 +5,4 @@ PROJECT(ap)
 set(THIS ap)
 
 SET(${THIS}_SRC "apMFCC.cc" "apLFCC.cc")
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)

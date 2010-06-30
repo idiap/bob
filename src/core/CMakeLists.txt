@@ -32,5 +32,4 @@ SET(${THIS}_SRC
 		"CmdFile.cc"
 	CACHE INTERNAL "sources")
 
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)

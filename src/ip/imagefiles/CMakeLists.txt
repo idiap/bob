@@ -12,5 +12,4 @@ SET(${THIS}_SRC
 		"tiffImageFile.cc"
 	CACHE INTERNAL "sources")
 
-include(../../InstallParts.cmake)
 include(../../SetupPackage.cmake)

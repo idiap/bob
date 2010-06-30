@@ -6,5 +6,4 @@ set(THIS normalisations)
 
 SET(${THIS}_SRC "MeanVarNorm.cc" CACHE INTERNAL "sources")
 
-include(../../InstallParts.cmake)
 include(../../SetupPackage.cmake)

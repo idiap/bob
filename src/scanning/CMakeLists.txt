@@ -22,5 +22,4 @@ set(${THIS}_SUBDIRS
 	selectors
 #	trackers
 	context)
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)

@@ -24,5 +24,4 @@ SET(${THIS}_SRC
 		"trigonometry.cc"
 	CACHE INTERNAL "sources")
 
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)

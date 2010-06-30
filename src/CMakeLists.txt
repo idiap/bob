@@ -92,6 +92,8 @@ SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES OUTPUT_NAME "torch5spro")
 SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES PREFIX "lib")
 INSTALL(TARGETS torch5spro LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 INSTALL(TARGETS torch5spro-static ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
+INSTALL(DIRECTORY ./ DESTINATION ${TORCH5SPRO_INCLUDE_DIR}
+        FILES_MATCHING PATTERN "*.h")
 
 # There is a dependence between Torch5 and all the extras
 # for ffmpeg, specifically, we need to make sure to download it before we

@@ -17,5 +17,4 @@ SET(${THIS}_SRC
 	"CascadeTrainer.cc"
 	CACHE INTERNAL "sources")
 
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)

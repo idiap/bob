@@ -13,5 +13,4 @@ SET(${THIS}_SRC
 		"LRTrainer.cc"
 	CACHE INTERNAL "sources")
 
-include(../../InstallParts.cmake)
 include(../../SetupPackage.cmake)

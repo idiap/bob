@@ -15,5 +15,4 @@ SET(${THIS}_SRC
 #		"bbx2eye19x19deye10GTFile.cc"
 	CACHE INTERNAL "sources")
 
-include(../../InstallParts.cmake)
 include(../../SetupPackage.cmake)

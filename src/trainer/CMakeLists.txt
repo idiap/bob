@@ -12,5 +12,4 @@ SET(${THIS}_SRC
 	CACHE INTERNAL "sources")
 
 SET(${THIS}_SUBDIRS gtfiles)
-include(../InstallParts.cmake)
 include(../SetupPackage.cmake)
