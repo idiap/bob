@@ -57,3 +57,7 @@ exclude="TensorGen.h THTensorGen.h THStorageGen.h"
 echo -n "Generating global include file..."
 ./makeinclude.py ${include_dir}/torch5spro/torch5spro.h ${exclude}
 echo "ok!"
+
+# Now we can build the examples:
+cd ${build_dir}
+make -j${cpu_count} build-examples install-examples 

@@ -5,36 +5,6 @@ PROJECT(EXAMPLE)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
-# Set the include directories and linking libraries
-SET(TORCH5SPRO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
-SET(FFMPEG_DIR "${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}")
-
-INCLUDE_DIRECTORIES("${TORCH5SPRO_DIR}")
-
-LINK_LIBRARIES(	"${TORCH5SPRO_DIR}/build_${TORCH_OS}_${TORCH_ARCH}/libtorch5spro.a"
-		"/usr/lib/libcblas.so"
-		"${TORCH5SPRO_DIR}/extras/jpeg/build_${TORCH_OS}_${TORCH_ARCH}/libjpeg.a"
-		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavformat.a"
-		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavcodec.a"
-		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libavutil.a"
-		"${TORCH5SPRO_DIR}/extras/ffmpeg/build_${TORCH_OS}_${TORCH_ARCH}/lib/libswscale.a")
-
-# Set the compiler flags and build type (release or debug)
-SET(CMAKE_CXX_FLAGS_RELEASE "-pthread -O2 -DNDEBUG")
-SET(CMAKE_CXX_FLAGS_DEBUG "-pthread -g")
-SET(CMAKE_BUILD_TYPE RELEASE)
-#SET(CMAKE_BUILD_TYPE DEBUG)
-
-MESSAGE("---------------------------------------------" "")
-MESSAGE("CXX RELEASE FLAGS: " "${CMAKE_CXX_FLAGS_RELEASE}")
-MESSAGE("CXX DEBUG FLAGS:   " "${CMAKE_CXX_FLAGS_DEBUG}")
-MESSAGE("BUILD TYPE:        " "${CMAKE_BUILD_TYPE}")
-MESSAGE("---------------------------------------------" "")
-
-########################################################
-# For each source file build an executable
-########################################################
-
 SET(EXAMPLE_SRC
 	testio.cc
   #	mobioVideoScan.cc
@@ -45,9 +15,23 @@ SET(EXAMPLE_SRC
 	fdvideo.cc)
 #	fdtvideo.cc)
 
+LINK_DIRECTORIES(${INSTALL_DIR}/lib;/usr/lib/atlas)
+INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
+
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
 	ADD_EXECUTABLE(${file_exe} ${file})
-ENDFOREACH(file)
+  ADD_DEPENDENCIES(${file_exe} jpeg) #has to compile before
+  ADD_DEPENDENCIES(${file_exe} ffmpeg) #has to compile before
+  TARGET_LINK_LIBRARIES(${file_exe} torch5spro)
+  TARGET_LINK_LIBRARIES(${file_exe} libjpeg.so)
+  TARGET_LINK_LIBRARIES(${file_exe} libcblas.so)
+  TARGET_LINK_LIBRARIES(${file_exe} libavformat.so)
+  TARGET_LINK_LIBRARIES(${file_exe} libavcodec.so)
+  TARGET_LINK_LIBRARIES(${file_exe} libavutil.so)
+  TARGET_LINK_LIBRARIES(${file_exe} libswscale.so)
+  ADD_CUSTOM_TARGET(install-${file_exe} COMMAND cp -f ${CMAKE_CURRENT_BINARY_DIR}/${file_exe} ${INSTALL_DIR}/bin)
 
-########################################################
+  ADD_DEPENDENCIES(build-examples ${file_exe})
+  ADD_DEPENDENCIES(install-examples install-${file_exe})
+ENDFOREACH(file)

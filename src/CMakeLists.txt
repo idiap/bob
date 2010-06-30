@@ -5,12 +5,6 @@ PROJECT(TORCH5SPRO)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
-# Set the compiler flags and build type(release or debug)
-SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer ")
-SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-SET(CMAKE_CXX_FLAGS_DEBUG "-Wall -g")
-SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-
 # Set the source files and includes to be added to the library
 SET(TORCH5SPRO_SRC "" CACHE INTERNAL "sources")
 SET(TORCH5SPRO_INCLUDE "" CACHE INTERNAL "included")
@@ -66,19 +60,17 @@ SET(TORCH5SPRO_SUBDIRS
 	measurer
 	geometry)
 
-SET(TORCH5SPRO_INCLUDE_DIR "${INCLUDE_DIR}/torch5spro")
-
 FOREACH(subdir ${TORCH5SPRO_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})
 
 	# Add the includes from the subdirectoris too
-	SET(TORCH5SPRO_INCLUDE "${TORCH5SPRO_INCLUDE};${${subdir}_INCLUDE}")
+	SET(TORCH5SPRO_INCLUDE "${TORCH5SPRO_INCLUDE};${${subdir}_INCLUDE}" CACHE
+    INTERNAL "included")
 
 	# Add the includes from the subdirectoris too
 	SET(TORCH5SPRO_SRC "${TORCH5SPRO_SRC};${${subdir}_SRC}")
 
 ENDFOREACH(subdir)
-
 
 ########################################################
 # Build the library
@@ -86,13 +78,14 @@ ENDFOREACH(subdir)
 # This is the library with the source files gathered
 #	from the sub-directories specified above
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
+LINK_DIRECTORIES(${INSTALL_DIR}/lib;/usr/lib/atlas)
 ADD_LIBRARY(torch5spro SHARED ${TORCH5SPRO_SRC})
 ADD_LIBRARY(torch5spro-static STATIC ${TORCH5SPRO_SRC})
 SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES OUTPUT_NAME "torch5spro")
 SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES PREFIX "lib")
 INSTALL(TARGETS torch5spro LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 INSTALL(TARGETS torch5spro-static ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
-INSTALL(DIRECTORY ./ DESTINATION ${TORCH5SPRO_INCLUDE_DIR}
+INSTALL(DIRECTORY ./ DESTINATION ${INCLUDE_DIR}/torch5spro
         FILES_MATCHING PATTERN "*.h")
 
 # There is a dependence between Torch5 and all the extras
@@ -100,6 +93,17 @@ INSTALL(DIRECTORY ./ DESTINATION ${TORCH5SPRO_INCLUDE_DIR}
 # compile Torch5.
 ADD_DEPENDENCIES(torch5spro ffmpeg jpeg lbfgs oourafft) 
 ADD_DEPENDENCIES(torch5spro-static ffmpeg jpeg lbfgs oourafft) 
+
+# The linkage which is required for torch5spro
+TARGET_LINK_LIBRARIES(torch5spro libjpeg.so)
+TARGET_LINK_LIBRARIES(torch5spro liblbfgs.so)
+TARGET_LINK_LIBRARIES(torch5spro liboourafft.so)
+TARGET_LINK_LIBRARIES(torch5spro libavutil.so)
+TARGET_LINK_LIBRARIES(torch5spro libavcodec.so)
+TARGET_LINK_LIBRARIES(torch5spro libavformat.so)
+TARGET_LINK_LIBRARIES(torch5spro libswscale.so)
+TARGET_LINK_LIBRARIES(torch5spro libcblas.so)
+TARGET_LINK_LIBRARIES(torch5spro liblapack.so)
 
 ########################################################
 # Make it verbose
