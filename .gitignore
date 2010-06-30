@@ -1,12 +1,5 @@
 *~
 *.swp
-build_*
-*-release
-*-debug
-torch5spro.h
-CMakeCache.txt
-CMakeFiles
-cmake_install.cmake
+build
+install
 examples/*/build_*
-extras/build
-extras/install

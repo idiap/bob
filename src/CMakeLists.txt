@@ -8,7 +8,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 # Set the compiler flags and build type(release or debug)
 SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -ffast-math -fomit-frame-pointer ")
 SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+SET(CMAKE_CXX_FLAGS_DEBUG "-Wall -g")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
 # Set the source files and includes to be added to the library
@@ -93,6 +93,12 @@ SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES PREFIX "lib")
 INSTALL(TARGETS torch5spro LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 INSTALL(TARGETS torch5spro-static ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
 
+# There is a dependence between Torch5 and all the extras
+# for ffmpeg, specifically, we need to make sure to download it before we
+# compile Torch5.
+ADD_DEPENDENCIES(torch5spro ffmpeg jpeg lbfgs oourafft) 
+ADD_DEPENDENCIES(torch5spro-static ffmpeg jpeg lbfgs oourafft) 
+
 # Prepare the main header
 EXECUTE_PROCESS(COMMAND "../makeinclude.sh" ${INCLUDE_DIR}/torch5spro
 			"TensorGen.h THTensorGen.h THStorageGen.h")
@@ -100,10 +106,10 @@ EXECUTE_PROCESS(COMMAND "../makeinclude.sh" ${INCLUDE_DIR}/torch5spro
 ########################################################
 # Make it verbose
 
-MESSAGE("---------------------------------------------" "")
-MESSAGE("\"Torch5\" configuration
-MESSAGE("C flags:   " "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
-MESSAGE("C++ flags:   " "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
-MESSAGE("---------------------------------------------" "")
+MESSAGE("---------------------------------------------")
+MESSAGE("\"Torch5\" configuration")
+MESSAGE("C flags: ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
+MESSAGE("C++ flags: ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+MESSAGE("---------------------------------------------")
 
 ########################################################
