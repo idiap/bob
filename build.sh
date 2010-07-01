@@ -60,4 +60,5 @@ echo "ok!"
 
 # Now we can build the examples:
 cd ${build_dir}
-make -j${cpu_count} build-examples install-examples 
+make -j${cpu_count} build-examples
+make -j${cpu_count} install-examples 
