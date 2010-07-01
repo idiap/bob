@@ -17,6 +17,17 @@ if [ "${bname}" = "build" ]; then
   exit 1
 fi
 
+case $1 in
+  (-h|-?|--help)
+    echo "usage: `basename $0` [<example>|all-examples]"
+    echo "  By calling me with no arguments, I will build a full release of"
+    echo "Torch. If you give either the name of an example (all lowercase!)"
+    echo "or the special keyword 'all-examples', I'll also build those."
+    echo "Please note that by executing this symlink you will be building a"
+    echo "version of the system in '${bname}' mode."
+    exit 2;;
+esac
+
 # Here we compute all the relevant directories needed for our build and the
 # variables that need to be taken under consideration while building and
 # installing the projects.
@@ -33,8 +44,20 @@ else
   cpu_count=2 #a good default for current number of procs in a machine
 fi
 
+# Here you can choose if you want to have dynamic or static linking for
+# examples. All torch and auxiliary libraries will be compiled in both flavors
+# though. Static linkage is beneficial if you need to export the programs to
+# run in arbitrary environment where you don't expect requirements (libraries)
+# to be properly installed and compatible. Dynamic linkage is prefered if you
+# are running in Idiap or on know platforms that have all required libraries
+# installed. In this case, program loading may become faster.
+
+linkage=dynamic
+#linkage=static
+
 # Print out some stuff so the user knows what we are doing
 echo "Build type: ${build_type}"
+echo "Executable linkage: ${linkage}"
 echo "CPU count: ${cpu_count}"
 echo "Platform: ${platform}"
 echo "Prefix: ${prefix}"
@@ -47,18 +70,17 @@ echo "Includes directory: ${include_dir}"
 [ ! -d ${build_dir} ] && mkdir -p ${build_dir}
 root_dir=`pwd`
 cd ${build_dir}
-cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} -DCPU_COUNT=${cpu_count} ${prefix}
+cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} -DDIST_ROOT=${prefix} -DCPU_COUNT=${cpu_count} -DTORCH_LINKAGE=${linkage} ${prefix}
 make -j${cpu_count} all
-make -j${cpu_count} install
+make -j${cpu_count} install 
 
-# After the installation, we update the torch5spro.h file, with what is there.
-cd ${root_dir}
-exclude="TensorGen.h THTensorGen.h THStorageGen.h"
-echo -n "Generating global include file..."
-./makeinclude.py ${include_dir}/torch5spro/torch5spro.h ${exclude}
-echo "ok!"
+# Observation on "make -jX": Please note that the subproject ffmpeg does not
+# compile on the first try, in parallel. A second call to "make -j" sorts the
+# problem out. As an option, you can disable the parallel compilation of ffmpeg
+# by removing the cmake option "-DCPU_COUNT=${cpu_count}". 
 
-# Now we can build the examples:
-cd ${build_dir}
-make -j${cpu_count} build-examples
-make -j${cpu_count} install-examples 
+# If the user has given a clue on what to build (examples), we do it
+if [ $# -ge 1 ]; then
+  make -j${cpu_count} install-$1
+fi
+

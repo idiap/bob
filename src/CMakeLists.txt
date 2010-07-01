@@ -105,6 +105,12 @@ TARGET_LINK_LIBRARIES(torch5spro libswscale.so)
 TARGET_LINK_LIBRARIES(torch5spro libcblas.so)
 TARGET_LINK_LIBRARIES(torch5spro liblapack.so)
 
+# This will build the unified header file
+ADD_CUSTOM_TARGET(torch-uniheader ALL COMMAND ${DIST_ROOT}/makeinclude.py 
+                  ${CMAKE_CURRENT_SOURCE_DIR} 
+                  ${INCLUDE_DIR}/torch5spro/torch5spro.h 
+                  TensorGen.h THTensorGen.h THStorageGen.h)
+
 ########################################################
 # Make it verbose
 

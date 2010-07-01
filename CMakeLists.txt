@@ -1,4 +1,4 @@
-# Configures all extras in one shot. 
+# Configures all (extras, torch and examples) in one shot.
 # Andre Anjos - 28.june.2010
 
 # Sets up all extras in one go. 
@@ -19,9 +19,14 @@ set(tmp)
 foreach(dir ${TORCH5SPRO_INCLUDE})
   set(tmp ${tmp};${CMAKE_CURRENT_SOURCE_DIR}/src/${dir})
 endforeach(dir ${TORCH5SPRO_INCLUDE})
-# I also need to include to top level include directory into this
-set(tmp ${tmp};${INCLUDE_DIR}/torch5spro)
+# I also need to include to top level include directory into this and the
+# top-level torch "src" directory, since the header files will not be in the
+# install area yet, just after "make install". To get the examples compiling we
+# need the "src" directory to be there then.
+set(tmp ${tmp};${INCLUDE_DIR}/torch5spro;${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(TORCH5SPRO_INCLUDE ${tmp} CACHE INTERNAL "included")
 
-# If you cannot compile the examples
+# If you call our build scripts (release.sh or debug.sh), the examples are
+# built at the end, after extras and torch5 as the examples need a header file
+# to be computed
 add_subdirectory(examples EXCLUDE_FROM_ALL)

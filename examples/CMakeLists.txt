@@ -4,8 +4,9 @@
 project(examples)
 cmake_minimum_required(VERSION 2.6)
 
-add_custom_target(build-examples)
-add_custom_target(install-examples)
+# A few handles to build all examples in one shot.
+add_custom_target(all-examples)
+add_custom_target(install-all-examples)
 
 add_subdirectory(boosting)
 add_subdirectory(dataset)

@@ -8,15 +8,18 @@
 import os,sys,fnmatch,time
 
 def main():
-  if len(sys.argv) < 2:
-    print 'usage: %s <output-header-file> <excludes>' % sys.argv[0]
+  if len(sys.argv) < 3:
+    print 'usage: %s <scanned-directory> <output-header-file> <excludes>' % sys.argv[0]
     sys.exit(1)
 
-  dirname = os.path.dirname(sys.argv[1])
-  output = os.path.basename(sys.argv[1])
+  srcdir = sys.argv[1]
 
-  headers = get_headers(dirname, [output] + sys.argv[2:])
-  write_header(sys.argv[1], headers)
+  # makes sure the directory is there.
+  dirname = os.path.dirname(sys.argv[2])
+  if not os.path.exists(dirname): os.makedirs(dirname)
+
+  headers = get_headers(srcdir, [os.path.basename(sys.argv[2])] + sys.argv[3:])
+  write_header(sys.argv[2], headers)
 
 def get_headers(dir, excludes):
   """Gets all files ending in '.h' from the directory, recursively, except for
