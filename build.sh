@@ -81,6 +81,7 @@ make -j${cpu_count} install
 
 # If the user has given a clue on what to build (examples), we do it
 if [ $# -ge 1 ]; then
+  #make VERBOSE=1 install-$1 #use this to debug the examples building
   make -j${cpu_count} install-$1
 fi
 

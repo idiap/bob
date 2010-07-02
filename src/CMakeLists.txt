@@ -15,7 +15,7 @@ SET(TORCH5SPRO_INCLUDE "" CACHE INTERNAL "included")
 
 # CBLAS
 ADD_DEFINITIONS(-DUSE_CBLAS)
-INCLUDE_DIRECTORIES("/usr/include")
+INCLUDE_DIRECTORIES(${cblas_INCLUDE};${lapack_INCLUDE})
 
 # JPEG
 ADD_DEFINITIONS(-DHAVE_JPEG)
@@ -35,12 +35,12 @@ INCLUDE_DIRECTORIES("${INCLUDE_DIR}/lbfgs")
 
 # FFMPEG
 # EDIT LES: Remove ffmpeg due to compilation error
+ADD_DEFINITIONS(-DHAVE_FFMPEG)
 INCLUDE_DIRECTORIES("${INCLUDE_DIR}")
 INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libavutil")
 INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libavformat")
 INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libavcodec")
 INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libswscale")
-ADD_DEFINITIONS(-DHAVE_FFMPEG)
 # End EDIT
 
 ########################################################
@@ -78,7 +78,7 @@ ENDFOREACH(subdir)
 # This is the library with the source files gathered
 #	from the sub-directories specified above
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
-LINK_DIRECTORIES(${INSTALL_DIR}/lib;/usr/lib/atlas)
+LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 ADD_LIBRARY(torch5spro SHARED ${TORCH5SPRO_SRC})
 ADD_LIBRARY(torch5spro-static STATIC ${TORCH5SPRO_SRC})
 SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES OUTPUT_NAME "torch5spro")
@@ -95,15 +95,22 @@ ADD_DEPENDENCIES(torch5spro ffmpeg jpeg lbfgs oourafft)
 ADD_DEPENDENCIES(torch5spro-static ffmpeg jpeg lbfgs oourafft) 
 
 # The linkage which is required for torch5spro
+TARGET_LINK_LIBRARIES(torch5spro-static libjpeg.a)
+TARGET_LINK_LIBRARIES(torch5spro-static liblbfgs.a)
+TARGET_LINK_LIBRARIES(torch5spro-static liboourafft.a)
+TARGET_LINK_LIBRARIES(torch5spro-static libavformat.a)
+TARGET_LINK_LIBRARIES(torch5spro-static libavcodec.a)
+TARGET_LINK_LIBRARIES(torch5spro-static libavutil.a)
+TARGET_LINK_LIBRARIES(torch5spro-static libswscale.a)
+TARGET_LINK_LIBRARIES(torch5spro-static ${cblas_ARCHIVES})
 TARGET_LINK_LIBRARIES(torch5spro libjpeg.so)
 TARGET_LINK_LIBRARIES(torch5spro liblbfgs.so)
 TARGET_LINK_LIBRARIES(torch5spro liboourafft.so)
-TARGET_LINK_LIBRARIES(torch5spro libavutil.so)
-TARGET_LINK_LIBRARIES(torch5spro libavcodec.so)
 TARGET_LINK_LIBRARIES(torch5spro libavformat.so)
+TARGET_LINK_LIBRARIES(torch5spro libavcodec.so)
+TARGET_LINK_LIBRARIES(torch5spro libavutil.so)
 TARGET_LINK_LIBRARIES(torch5spro libswscale.so)
-TARGET_LINK_LIBRARIES(torch5spro libcblas.so)
-TARGET_LINK_LIBRARIES(torch5spro liblapack.so)
+TARGET_LINK_LIBRARIES(torch5spro ${cblas_LIBRARIES})
 
 # This will build the unified header file
 ADD_CUSTOM_TARGET(torch-uniheader ALL COMMAND ${DIST_ROOT}/makeinclude.py 

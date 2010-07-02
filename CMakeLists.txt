@@ -6,10 +6,15 @@ project(torch5spro)
 cmake_minimum_required(VERSION 2.8)
 
 # Set the compiler flags and build type(release or debug)
-SET(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -ffast-math -fomit-frame-pointer")
-SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-SET(CMAKE_CXX_FLAGS_DEBUG "-pthread -g")
-SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -ffast-math -fomit-frame-pointer")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_DEBUG "-pthread -g")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+
+# This will autoconfigure certain system libraries we need for both torch and
+# the examples
+set(cblas_DIR extras)
+find_package(cblas) # configures lapack, cblas and atlas
 
 add_subdirectory(extras)
 add_subdirectory(src)

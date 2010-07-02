@@ -8,7 +8,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 SET(EXAMPLE_SRC
 	gradientmachines.cc mlpforward1.cc mlpforward2.cc xor.cc mlpclassification.cc)
 
-LINK_DIRECTORIES(${INSTALL_DIR}/lib;/usr/lib/atlas)
+LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
 
 FOREACH(file ${EXAMPLE_SRC})
@@ -19,8 +19,6 @@ FOREACH(file ${EXAMPLE_SRC})
     TARGET_LINK_LIBRARIES(${file_exe} torch5spro)
   else (${TORCH_LINKAGE} STREQUAL dynamic)
     TARGET_LINK_LIBRARIES(${file_exe} torch5spro-static)
-    TARGET_LINK_LIBRARIES(${file_exe} libcblas.a)
-    TARGET_LINK_LIBRARIES(${file_exe} libatlas.a)
   endif (${TORCH_LINKAGE} STREQUAL dynamic)
   
   ADD_CUSTOM_TARGET(install-${file_exe} COMMAND cp -f ${CMAKE_CURRENT_BINARY_DIR}/${file_exe} ${INSTALL_DIR}/bin DEPENDS ${file_exe})

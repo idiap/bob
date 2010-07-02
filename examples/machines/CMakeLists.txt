@@ -12,23 +12,17 @@ SET(EXAMPLE_SRC
 	convert3pyramidto5tree.cc
 	trainLR.cc)
 
-LINK_DIRECTORIES(${INSTALL_DIR}/lib;/usr/lib/atlas)
+LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
 
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
 	ADD_EXECUTABLE(${file_exe} ${file})
-  ADD_DEPENDENCIES(${file_exe} lbfgs) #has to compile before
   ADD_DEPENDENCIES(${file_exe} torch5spro-uniheader) #has to be ready
   if (${TORCH_LINKAGE} STREQUAL dynamic)
     TARGET_LINK_LIBRARIES(${file_exe} torch5spro)
-    TARGET_LINK_LIBRARIES(${file_exe} liblbfgs.so)
-    TARGET_LINK_LIBRARIES(${file_exe} libcblas.so)
   else (${TORCH_LINKAGE} STREQUAL dynamic)
     TARGET_LINK_LIBRARIES(${file_exe} torch5spro-static)
-    TARGET_LINK_LIBRARIES(${file_exe} liblbfgs.a)
-    TARGET_LINK_LIBRARIES(${file_exe} libcblas.a)
-    TARGET_LINK_LIBRARIES(${file_exe} libatlas.a)
   endif (${TORCH_LINKAGE} STREQUAL dynamic)
   
   ADD_CUSTOM_TARGET(install-${file_exe} COMMAND cp -f ${CMAKE_CURRENT_BINARY_DIR}/${file_exe} ${INSTALL_DIR}/bin DEPENDS ${file_exe})
