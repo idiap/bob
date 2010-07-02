@@ -75,6 +75,12 @@ ENDFOREACH(subdir)
 ########################################################
 # Build the library
 
+# Avoids warning during linkage configuration see: cmake --help-policy CMP0003
+# for details.
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
 # This is the library with the source files gathered
 #	from the sub-directories specified above
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
