@@ -16,8 +16,8 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(cblas_DIR extras)
 find_package(cblas) # configures lapack, cblas and atlas
 
-set(boost_DIR extras)
-find_package(boost) # configures boost
+set(SystemBoost_DIR extras)
+find_package(SystemBoost) # configures boost found on the current system
 
 add_subdirectory(extras)
 add_subdirectory(src)
