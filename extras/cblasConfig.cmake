@@ -10,7 +10,12 @@ find_library(atlas_LIBRARY NAMES atlas)
 set(cblas_LIBRARIES ${lapack_LIBRARY};${cblas_LIBRARY};${atlas_LIBRARY} CACHE
     INTERNAL "libraries")
 set(cblas_ARCHIVES "" CACHE INTERNAL "archives")
+
+set(flags "")
 foreach(a ${cblas_LIBRARIES})
 	STRING(REGEX REPLACE "(.+)\\.(so|dylib)$" "\\1.a" tmp "${a}")
   set(cblas_ARCHIVES ${cblas_ARCHIVES};${tmp} CACHE INTERNAL "archives")
+	STRING(REGEX REPLACE ".+lib(.+)\\.(so|dylib)$" "-l\\1" tmp "${a}")
+  set(flags ${flags};${tmp})
 endforeach(a ${cblas_LIBRARIES})
+set(cblas_LIBRARIES ${flags} CACHE INTERNAL "libraries")

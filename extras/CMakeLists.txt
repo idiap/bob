@@ -9,9 +9,9 @@ include(ExternalProject)
 
 # This will handle the build of ffmpeg as a external project
 macro(build_ffmpeg version branch)
-  if (${CMAKE_BUILD_TYPE} EQUAL "DEBUG")
+  if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
     set(FFMPEG_DEBUG "--disable-optimizations")
-  endif (${CMAKE_BUILD_TYPE} EQUAL "DEBUG")
+  endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
   ExternalProject_Add(
     ffmpeg
     PREFIX "ffmpeg-${version}"
