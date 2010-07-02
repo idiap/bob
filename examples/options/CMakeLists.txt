@@ -11,6 +11,12 @@ SET(EXAMPLE_SRC
 LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
 
+# Avoids warning during linkage configuration see: cmake --help-policy CMP0003
+# for details.
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
 FOREACH(file ${EXAMPLE_SRC})
 	STRING(REGEX REPLACE "([a-z;A-Z;0-9]+).*" "\\1" file_exe "${file}" )
 	ADD_EXECUTABLE(${file_exe} ${file})
