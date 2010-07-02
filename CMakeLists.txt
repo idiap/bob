@@ -5,6 +5,9 @@
 project(torch5spro)
 cmake_minimum_required(VERSION 2.8)
 
+# To avoid some warning that happens with cmake-2.8 on OSX
+cmake_policy(SET CMP0003 NEW)
+
 # Set the compiler flags and build type(release or debug)
 set(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -ffast-math -fomit-frame-pointer")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")

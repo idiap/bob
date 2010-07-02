@@ -5,7 +5,8 @@
 # To setup in debug mode, just do
 # source ./setup.sh -d
 
-source ~aanjos/sw/setup.sh #this will get you cmake-2.8
+# this will get you cmake-2.8
+[ -r ~aanjos/sw/setup.sh ] && source ~aanjos/sw/setup.sh
 
 build_type=release
 if [ $# -ge 1 ]; then
@@ -28,5 +29,8 @@ build_dir=${prefix}/build/${platform}
 install_dir=${prefix}/install/${platform}
 include_dir=${prefix}/install/include
 
+if [ `uname -s` = Darwin ]; then
+  export DYLD_LIBRARY_PATH=${install_dir}/lib:${DYLD_LIBRARY_PATH}
+fi
 export LD_LIBRARY_PATH=${install_dir}/lib:${LD_LIBRARY_PATH}
 export PATH=${install_dir}/bin:${PATH}

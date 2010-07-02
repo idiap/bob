@@ -3,6 +3,7 @@
 #include "ipRescaleGray.h"
 
 #ifdef USE_CBLAS
+#include "cblas.h"
 #include "clapack.h"
 #endif
 
@@ -17,9 +18,13 @@
 //*******************************************************************
 
 #ifdef USE_CBLAS
-extern "C" int clapack_dgesv(const enum CBLAS_ORDER Order, const int N, const int NRHS,
-		double *A, const int lda, int *ipiv,
-		double *B, const int ldb);
+#ifdef __APPLE__ && __MACH__
+extern "C" int dgesv_(const enum CBLAS_ORDER Order, const int N, const int NRHS, double *A, const int lda, int *ipiv, double *B, const int ldb);
+#define LAPACK_DGESV dgesv_
+#else
+extern "C" int clapack_dgesv(const enum CBLAS_ORDER Order, const int N, const int NRHS, double *A, const int lda, int *ipiv, double *B, const int ldb);
+#define LAPACK_DGESV clapack_dgesv
+#endif
 #endif
 
 namespace Torch {
@@ -224,7 +229,7 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 		IntTensor ipiv(width_*height_);
 		int info = 0;
 #ifdef USE_CBLAS
-		info = clapack_dgesv(CblasRowMajor, width_*height_, 1, d_diffOperator, width_*height_, (int*)ipiv.dataW(), d_result, width_*height_);
+		info = LAPACK_DGESV(CblasRowMajor, width_*height_, 1, d_diffOperator, width_*height_, (int*)ipiv.dataW(), d_result, width_*height_);
 #endif
 		if (info != 0) error("ipVCycle: failure with error %d when solving sparse system\n", info);
 
