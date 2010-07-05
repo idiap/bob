@@ -35,7 +35,7 @@ SET(${THIS}_SRC
 		"ipMultiscaleRetinex.cc"
 		"ipSelfQuotientImage.cc"
 		"multigrid.cc"
-    #		"ipVcycle.cc"
+    "ipVcycle.cc"
 		"ipRelaxation.cc"
 		"ipTanTriggs.cc"
 		"ipRescaleGray.cc"

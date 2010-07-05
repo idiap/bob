@@ -24,13 +24,13 @@ SET(EXAMPLE_SRC
 	multiscaleRetinex.cc
 	selfQuotientImage.cc
 	relaxation.cc
-  #diffusionVcycle.cc
+  diffusionVcycle.cc
 	tanTriggs.cc
 	histoEqualTensor.cc
 	multiscaleRetinexTensor.cc
 	selfQuotientImageTensor.cc
 	relaxationTensor.cc
-  #diffusionVcycleTensor.cc
+  diffusionVcycleTensor.cc
 	tanTriggsTensor.cc)
 
 LINK_DIRECTORIES(${INSTALL_DIR}/lib)
