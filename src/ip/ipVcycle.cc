@@ -2,10 +2,7 @@
 #include "multigrid.h"
 #include "ipRescaleGray.h"
 
-#ifdef USE_CBLAS
-#include "cblas.h"
-#include "clapack.h"
-#endif
+//#include "clapack.h"
 
 //*******************************************************************
 //
@@ -17,15 +14,18 @@
 //
 //*******************************************************************
 
+/* former declaration for clapack
+extern "C" int clapack_dgesv(const enum CBLAS_ORDER Order, const int N, const int NRHS,
+		double *A, const int lda, int *ipiv,
+		double *B, const int ldb);
+*/
+
+// Declaration of the external Fortran library. This function performs an eigenvalue decomposition.
 #ifdef USE_CBLAS
-#ifdef __APPLE__ && __MACH__
-extern "C" int dgesv_(const enum CBLAS_ORDER Order, const int N, const int NRHS, double *A, const int lda, int *ipiv, double *B, const int ldb);
-#define LAPACK_DGESV dgesv_
-#else
-extern "C" int clapack_dgesv(const enum CBLAS_ORDER Order, const int N, const int NRHS, double *A, const int lda, int *ipiv, double *B, const int ldb);
-#define LAPACK_DGESV clapack_dgesv
+extern "C" void dgesv_( int *N, int *NRHS, double *A, int *lda, int *ipiv, 
+						double *B, int *ldb, int *info);
 #endif
-#endif
+
 
 namespace Torch {
 
@@ -227,11 +227,18 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 		
 		// Prepare to use LAPACK function
 		IntTensor ipiv(width_*height_);
+		int N =  width_*height_;
+		int lda = N;
+		int ldb = N;
+		int NRHS = 1;
 		int info = 0;
+		// Note: In principle, data should be transposed (column-major order instead of row-major order).
+		//       Anyway, it is not necessary here with the dgesv_function.
 #ifdef USE_CBLAS
-		info = LAPACK_DGESV(CblasRowMajor, width_*height_, 1, d_diffOperator, width_*height_, (int*)ipiv.dataW(), d_result, width_*height_);
+		dgesv_( &N, &NRHS, d_diffOperator, &lda, (int*)ipiv.dataW(), d_result, &ldb, &info );
 #endif
-		if (info != 0) error("ipVCycle: failure with error %d when solving sparse system\n", info);
+		//int info=clapack_dgesv(CblasRowMajor, width_*height_, 1, d_diffOperator, width_*height_, (int*)ipiv.dataW(), d_result, width_*height_);
+		if (info != 0) error("ipVCycle: error %d in LAPACK function dgesv_ (Solving a linear system).\n", info);
 
 		// set boundary pixels to zero
 		for (int y=0; y<height; y++)
