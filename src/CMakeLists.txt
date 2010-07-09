@@ -90,8 +90,6 @@ SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES OUTPUT_NAME "torch5spro")
 SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES PREFIX "lib")
 INSTALL(TARGETS torch5spro LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 INSTALL(TARGETS torch5spro-static ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
-INSTALL(DIRECTORY ./ DESTINATION ${INCLUDE_DIR}/torch5spro
-        FILES_MATCHING PATTERN "*.h")
 
 # There is a dependence between Torch5 and all the extras
 # for ffmpeg, specifically, we need to make sure to download it before we
@@ -117,11 +115,18 @@ TARGET_LINK_LIBRARIES(torch5spro -lavutil)
 TARGET_LINK_LIBRARIES(torch5spro -lswscale)
 TARGET_LINK_LIBRARIES(torch5spro ${cblas_LIBRARIES})
 
-# This will build the unified header file
-ADD_CUSTOM_TARGET(torch-uniheader ALL COMMAND ${DIST_ROOT}/makeinclude.py 
-                  ${CMAKE_CURRENT_SOURCE_DIR} 
+# This will trigger cmake to immediately copy Torch headers into the install
+# location
+FILE(COPY ./ DESTINATION ${INCLUDE_DIR}/torch5spro
+     FILES_MATCHING PATTERN "*.h")
+# This will build the unified header file, in the end, after the shared library
+# has been built
+ADD_CUSTOM_TARGET(torch5spro-uniheader ALL COMMAND ${DIST_ROOT}/makeinclude.py 
+                  ${CMAKE_CURRENT_SOURCE_DIR}
                   ${INCLUDE_DIR}/torch5spro/torch5spro.h 
-                  TensorGen.h THTensorGen.h THStorageGen.h)
+                  TensorGen.h THTensorGen.h THStorageGen.h
+                  DEPENDS torch5spro
+                  COMMENT "Building Torch unified header")
 
 ########################################################
 # Make it verbose
