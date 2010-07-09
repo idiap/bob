@@ -9,15 +9,12 @@ include(ExternalProject)
 
 # This will handle the build of ffmpeg as a external project
 macro(build_ffmpeg version branch)
-  if (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
-    set(FFMPEG_DEBUG "--disable-optimizations")
-  endif (${CMAKE_BUILD_TYPE} STREQUAL DEBUG)
   ExternalProject_Add(
     ffmpeg
     PREFIX "ffmpeg-${version}"
     SVN_REPOSITORY svn://svn.mplayerhq.hu/ffmpeg/${branch}
     UPDATE_COMMAND svn update .
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --incdir=${INCLUDE_DIR} --disable-zlib --disable-bzlib --disable-ffmpeg --disable-ffserver --disable-ffplay --enable-gpl --enable-shared ${FFMPEG_DEBUG}
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --incdir=${INCLUDE_DIR} --disable-zlib --disable-bzlib --disable-ffmpeg --disable-ffserver --disable-ffplay --enable-gpl --enable-shared
     INSTALL_DIR ${INSTALL_DIR}
     BUILD_COMMAND $(MAKE) -j${CPU_COUNT}
     INSTALL_COMMAND $(MAKE) -j${CPU_COUNT} install
