@@ -61,14 +61,6 @@ SET(TORCH5SPRO_SUBDIRS
 
 FOREACH(subdir ${TORCH5SPRO_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})
-
-	# Add the includes from the subdirectoris too
-	SET(TORCH5SPRO_INCLUDE "${TORCH5SPRO_INCLUDE};${${subdir}_INCLUDE}" CACHE
-    INTERNAL "included")
-
-	# Add the includes from the subdirectoris too
-	SET(TORCH5SPRO_SRC "${TORCH5SPRO_SRC};${${subdir}_SRC}")
-
 ENDFOREACH(subdir)
 
 ########################################################

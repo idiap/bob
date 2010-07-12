@@ -19,8 +19,18 @@ find_package(cblas) # configures lapack, cblas and atlas
 set(SystemBoost_DIR extras)
 find_package(SystemBoost) # configures boost found on the current system
 
+set(python_DIR extras)
+find_package(python) # configures pytohn found on the current system
+
 add_subdirectory(extras)
 add_subdirectory(src)
+
+# This will bring in the Python bindings, if python was found
+if ((DEFINED PYTHONLIBS_FOUND) AND (DEFINED Boost_FOUND))
+  add_subdirectory(python)
+else ((DEFINED PYTHONLIBS_FOUND) AND (DEFINED Boost_FOUND))
+  message("Boost::Python bindings are DISABLED")
+endif ((DEFINED PYTHONLIBS_FOUND) AND (DEFINED Boost_FOUND))
 
 # To compile the examples, we need to make the include directories absolute
 set(tmp)
