@@ -510,7 +510,7 @@ namespace Torch {
 				// Open the video (if any given)
 				if (filename != 0)
 				{
-					open(filename, open_flags);
+					open(verbose, filename, open_flags);
 				}
 			#endif
 			}
