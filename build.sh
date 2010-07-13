@@ -19,10 +19,10 @@ fi
 
 case $1 in
   (-h|-?|--help)
-    echo "usage: `basename $0` [<example>|all-examples]"
+    echo "usage: `basename $0` [<example>|all-examples|test]"
     echo "  By calling me with no arguments, I will build a full release of"
-    echo "Torch. If you give either the name of an example (all lowercase!)"
-    echo "or the special keyword 'all-examples', I'll also build those."
+    echo "Torch. If you give either the name of an example or one of the"
+    echo "special keywords 'all-examples' or 'test', I'll also build those."
     echo "Please note that by executing this symlink you will be building a"
     echo "version of the system in '${bname}' mode."
     exit 2;;
@@ -81,7 +81,10 @@ make -j${cpu_count} install
 
 # If the user has given a clue on what to build (examples), we do it
 if [ $# -ge 1 ]; then
-  #make VERBOSE=1 install-$1 #use this to debug the examples building
-  make -j${cpu_count} install-$1
+  if [ "$1" = "test" ]; then
+    make test;
+  else
+    #make VERBOSE=1 install-$1 #use this to debug the examples building
+    make -j${cpu_count} install-$1
+  fi
 fi
-

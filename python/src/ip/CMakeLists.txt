@@ -8,7 +8,6 @@ set(THIS pytorch_ip)
 
 # Creates and installs the binary component for the python library
 include_directories(${TORCH5SPRO_INCLUDE})
-include_directories(${INCLUDE_DIR}/torch5spro)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PYTHON_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})

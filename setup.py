@@ -86,7 +86,8 @@ def main(dir, debug, csh):
   pythonpath = os.environ.get('PYTHONPATH', '')
   libdir = os.path.join(install_dir, 'lib')
   pythonpath = path_remove_if_startswith(pythonpath, base_dir) 
-  pythonpath = path_add(pythonpath, os.path.join(dir, 'install', 'python'))
+  python_version = 'python%d.%d' % (sys.version_info[0], sys.version_info[1])
+  pythonpath = path_add(pythonpath, os.path.join(libdir, python_version))
   pythonpath = path_add(pythonpath, libdir)
   all.append(('PYTHONPATH', pythonpath))
 

@@ -5,6 +5,9 @@
 project(torch5spro)
 cmake_minimum_required(VERSION 2.8)
 
+# Enables the testing framework
+enable_testing()
+
 # Set the compiler flags and build type(release or debug)
 set(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -ffast-math -fomit-frame-pointer")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
@@ -16,33 +19,26 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(cblas_DIR extras)
 find_package(cblas) # configures lapack, cblas and atlas
 
+add_subdirectory(extras)
+add_subdirectory(src)
+
+# To compile the examples and, possibly, the pythonic bindings, we need
+# to include the place for the unified header
+set(TORCH5SPRO_INCLUDE ${TORCH5SPRO_INCLUDE};${INCLUDE_DIR}/torch5spro CACHE INTERNAL "included")
+
+# This will bring in the Python bindings, if python was found
+
 set(SystemBoost_DIR extras)
 find_package(SystemBoost) # configures boost found on the current system
 
 set(python_DIR extras)
 find_package(python) # configures pytohn found on the current system
 
-add_subdirectory(extras)
-add_subdirectory(src)
-
-# This will bring in the Python bindings, if python was found
-if ((DEFINED PYTHONLIBS_FOUND) AND (DEFINED Boost_FOUND))
+if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_subdirectory(python)
-else ((DEFINED PYTHONLIBS_FOUND) AND (DEFINED Boost_FOUND))
+else (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   message("Boost::Python bindings are DISABLED")
-endif ((DEFINED PYTHONLIBS_FOUND) AND (DEFINED Boost_FOUND))
-
-# To compile the examples, we need to make the include directories absolute
-set(tmp)
-foreach(dir ${TORCH5SPRO_INCLUDE})
-  set(tmp ${tmp};${CMAKE_CURRENT_SOURCE_DIR}/src/${dir})
-endforeach(dir ${TORCH5SPRO_INCLUDE})
-# I also need to include to top level include directory into this and the
-# top-level torch "src" directory, since the header files will not be in the
-# install area yet, just after "make install". To get the examples compiling we
-# need the "src" directory to be there then.
-set(tmp ${tmp};${INCLUDE_DIR}/torch5spro;${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(TORCH5SPRO_INCLUDE ${tmp} CACHE INTERNAL "included")
+endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
 # If you call our build scripts (release.sh or debug.sh), the examples are
 # built at the end, after extras and torch5 as the examples need a header file

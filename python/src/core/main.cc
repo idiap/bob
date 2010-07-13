@@ -8,9 +8,9 @@
 #include <boost/python.hpp>
 
 void bind_core_object();
-void bind_tensor_object();
+void bind_core_tensor();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_object();
-  bind_tensor_object();
+  bind_core_tensor();
 }

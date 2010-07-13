@@ -9,6 +9,7 @@
 
 #include "core/Object.h"
 #include "ip/Image.h"
+#include "scanning/Scanner.h"
 #include "scanning/FaceFinder.h"
 
 using namespace boost::python;
@@ -20,5 +21,6 @@ void bind_scanning_facefinder()
     .def("reset", (bool (Torch::FaceFinder::*)(const char*))&Torch::FaceFinder::reset)
     .def("process", &Torch::FaceFinder::process)
     .def("getPatterns", &Torch::FaceFinder::getPatterns, return_internal_reference<>())
+    .def("getScanner", (Torch::Scanner& (Torch::FaceFinder::*)())&Torch::FaceFinder::getScanner, return_internal_reference<>())
     ;
 }
