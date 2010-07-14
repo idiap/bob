@@ -58,6 +58,7 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(ov.getState(), torch.ip.State.Write)
 
 if __name__ == '__main__':
-  import sys
+  import os, sys
   sys.argv.append('-v')
+  os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
