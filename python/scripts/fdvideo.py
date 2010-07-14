@@ -9,10 +9,14 @@
 import os, sys
 import torch
 
-def draw_rectangle(i, pat, line_width, color):
+def draw_rectangle(i, positions, line_width, color):
   """Draws a rectangle on an image in a certain position."""
-  for k in range(line_width):
-    i.drawRect(pat.x-k, pat.y-k, pat.width+(2*k), pat.height+(2*k), color) 
+  cimage = torch.ip.Image(i.getWidth(), i.getHeight(), 3)
+  cimage.copyFromImage(i)
+  for i in positions:
+    for k in range(line_width):
+      cimage.drawRect(i.x-k, i.y-k, i.width+(2*k), i.height+(2*k), color) 
+  return cimage
 
 def main():
   if len(sys.argv) == 1:
@@ -42,10 +46,7 @@ def main():
       raise RuntimeError, 'Scanner could not set ROIs'
 
     if output:
-      color_buffer = torch.ip.Image(buffer.getWidth(), buffer.getHeight(), 3)
-      color_buffer.copyFromImage(buffer)
-      for k in detections: draw_rectangle(color_buffer, k, 3, torch.ip.red)
-      output.write(color_buffer)
+      output.write(draw_rectangle(buffer, detections, 3, torch.ip.red))
 
   input.close()
   if output: output.close()
