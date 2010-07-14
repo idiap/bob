@@ -7,8 +7,8 @@
 """
 
 # These are some global parameters for the test.
-INPUT_VIDEO = '/idiap/group/vision/visidiap/databases/banca/english/videos/1001_f_g1_04_1001_en.avi'
-OUTPUT_VIDEO = '/tmp/video_test.avi'
+INPUT_VIDEO = 'test.mov'
+OUTPUT_VIDEO = '/tmp/video_test.mov'
 
 import unittest
 import torch

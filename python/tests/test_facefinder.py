@@ -6,7 +6,7 @@
 """Runs some face finder tests
 """
 
-INPUT_VIDEO = '/idiap/group/vision/visidiap/databases/banca/english/videos/1001_f_g1_04_1001_en.avi'
+INPUT_VIDEO = 'test.mov'
 PARAMETERS = 'facefinder.multiscale.params'
 
 import unittest
