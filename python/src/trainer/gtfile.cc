@@ -32,7 +32,7 @@ static list gtfile_getpoints(const Torch::GTFile& gtf) {
 
 void bind_trainer_gtfile()
 {
-  class_<Torch::GTFile, bases<Torch::File>, boost::noncopyable>("GTFile", no_init)
+  class_<Torch::GTFile, bases<Torch::File>, boost::noncopyable>("GTFile", "Base Geometry Tip file type", no_init)
     .def("load", &Torch::GTFile::load)
     .def("getName", &Torch::GTFile::getName)
     .def("hasLabel", &Torch::GTFile::hasLabel)
@@ -54,6 +54,5 @@ void bind_trainer_gtfile()
   class_<Torch::eyecornerGTFile, bases<Torch::GTFile> >("eyecornerGTFile", init<>());
   class_<Torch::frontalEyeNoseChinGTFile, bases<Torch::GTFile> >("frontalEyeNoseChinGTFile", init<>());
   class_<Torch::halfprofileEyeNoseChinGTFile, bases<Torch::GTFile> >("halfprofileEyeNoseChinGTFile", init<>());
-  class_<Torch::profileEyeNoseChinGTFile, bases<Torch::GTFile> >("profileEyeNoseChinGTFile", init<>());
   class_<Torch::profileEyeNoseChinGTFile, bases<Torch::GTFile> >("profileEyeNoseChinGTFile", init<>());
 }
