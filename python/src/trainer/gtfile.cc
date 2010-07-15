@@ -30,9 +30,14 @@ static list gtfile_getpoints(const Torch::GTFile& gtf) {
   return retval;
 }
 
+// some very long constant strings
+static const char GTFile_docstring[] = "\
+Base Ground Truth file type. Files of this type are used by Normalizers to\n\
+crop faces from images and videos.";
+
 void bind_trainer_gtfile()
 {
-  class_<Torch::GTFile, bases<Torch::File>, boost::noncopyable>("GTFile", "Base Geometry Tip file type", no_init)
+  class_<Torch::GTFile, bases<Torch::File>, boost::noncopyable>("GTFile", GTFile_docstring, no_init)
     .def("load", &Torch::GTFile::load)
     .def("getName", &Torch::GTFile::getName)
     .def("hasLabel", &Torch::GTFile::hasLabel)
