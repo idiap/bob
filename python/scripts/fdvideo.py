@@ -41,10 +41,15 @@ def main():
     print 'frame: %d, detections: %d' % (frame, len(detections))
     for k in detections: print k
 
+    # This bit adds regions of interest in the next search, so we go a bit
+    # faster in the next scan. You can also, optionally, remove this so you
+    # re-scan the image at every attempt.
     finder.getScanner().deleteAllROIs()
     if not finder.getScanner().addROIs(buffer, 0.3):
       raise RuntimeError, 'Scanner could not set ROIs'
 
+    # If the user has given an output file, we write another movie showing our
+    # results there. Good if you are a beginner.
     if output:
       output.write(draw_rectangle(buffer, detections, 3, torch.ip.red))
 
