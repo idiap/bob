@@ -9,7 +9,8 @@ SET(EXAMPLE_SRC
 	tensor2blocks.cc
 	tensor2dct.cc
 	filelist.cc
-	gtimageextract.cc)
+	gtimageextract.cc
+	gtvideoextract.cc)
 
 LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})

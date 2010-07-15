@@ -16,12 +16,13 @@ link_directories(${INSTALL_DIR}/lib)
 
 add_library(${THIS} SHARED 
   object.cc
+  file.cc
   tensor.cc
+  spcore.cc
+  ipcore.cc
   main.cc
   )
-set_target_properties(${THIS} PROPERTIES SUFFIX ".so")
 target_link_libraries(${THIS} torch5spro)
 target_link_libraries(${THIS} ${Boost_PYTHON_LIBRARY})
-target_link_libraries(${THIS} ${PYTHON_LIBRARIES})
 
 install(TARGETS ${THIS} LIBRARY DESTINATION ${INSTALL_DIR}/lib)

@@ -52,6 +52,7 @@ namespace Torch
 
 		// Change the ground truth points to use for normalization
 		bool			setGTFile(const GTFile* gt_file);
+		const GTFile*	getGTFile() const { return m_gt_file; }
 
 		// Access the normalized points
 		const sPoint2D*		getNMPoints() const { return m_nm_pts; }

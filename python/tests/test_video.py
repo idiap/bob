@@ -7,8 +7,8 @@
 """
 
 # These are some global parameters for the test.
-INPUT_VIDEO = 'test.mov'
-OUTPUT_VIDEO = '/tmp/video_test.mov'
+INPUT_VIDEO = '/idiap/group/vision/visidiap/databases/banca/english/videos/1001_f_g1_04_1001_en.avi'
+OUTPUT_VIDEO = '/tmp/video_test.avi'
 
 import unittest
 import torch
@@ -58,7 +58,6 @@ class VideoTest(unittest.TestCase):
     self.assertEqual(ov.getState(), torch.ip.State.Write)
 
 if __name__ == '__main__':
-  import os, sys
+  import sys
   sys.argv.append('-v')
-  os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()

@@ -73,8 +73,57 @@ static void set_lll_d (Torch::Tensor& o, long x, long y, long z,  double v)
 static void set_llll_d (Torch::Tensor& o, long x, long y, long z, long w, double v) 
 { o.set(x, y, z, w, v); }
 
+static int ts_get_size(const Torch::TensorSize& t, unsigned int i) {
+  if (i < t.n_dimensions) return t.size[i];
+  return 0;
+}
+
+static void ts_set_size(Torch::TensorSize& t, unsigned int i, int v) {
+  if (i < t.n_dimensions) t.size[i] = v;
+}
+
+static int tr_get_size(const Torch::TensorRegion& t, unsigned int i) {
+  if (i < t.n_dimensions) return t.size[i];
+  return 0;
+}
+
+static int tr_set_size(Torch::TensorRegion& t, unsigned int i, long v) {
+  if (i < t.n_dimensions) t.size[i] = v;
+}
+
+static int tr_get_pos(const Torch::TensorRegion& t, unsigned int i) {
+  if (i < t.n_dimensions) return t.pos[i];
+  return 0;
+}
+
+static int tr_set_pos(Torch::TensorRegion& t, unsigned int i, long v) {
+  if (i < t.n_dimensions) t.pos[i] = v;
+}
+
 void bind_core_tensor()
 {
+  class_<Torch::TensorSize>("TensorSize", init<>())
+    .def(init<int>())
+    .def(init<int, int>())
+    .def(init<int, int, int>())
+    .def(init<int, int, int, int>())
+    .def_readwrite("n_dimensions", &Torch::TensorSize::n_dimensions)
+    .def("size", &ts_get_size)
+    .def("set_size", &ts_set_size)
+    ;
+
+  class_<Torch::TensorRegion>("TensorRegion", init<>())
+    .def(init<long, long>())
+    .def(init<long, long, long, long>())
+    .def(init<long, long, long, long, long, long>())
+    .def(init<long, long, long, long, long, long, long, long>())
+    .def_readwrite("n_dimensions", &Torch::TensorRegion::n_dimensions)
+    .def("size", &tr_get_size)
+    .def("set_size", &tr_set_size)
+    .def("pos", &tr_get_pos)
+    .def("set_pos", &tr_set_size)
+    ;
+
   enum_<Torch::Tensor::Type>("Type")
     .value("Char", Torch::Tensor::Char)
     .value("Short", Torch::Tensor::Short)

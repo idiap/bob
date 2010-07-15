@@ -12,7 +12,7 @@ SET(${THIS}_SRC
 		"frontalEyeNoseChinGTFile.cc"
 		"halfprofileEyeNoseChinGTFile.cc"
 		"profileEyeNoseChinGTFile.cc"
-#		"bbx2eye19x19deye10GTFile.cc"
+		"bbx2eye19x19deye10GTFile.cc"
 	CACHE INTERNAL "sources")
 
 include(../../SetupPackage.cmake)
