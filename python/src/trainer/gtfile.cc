@@ -50,7 +50,7 @@ void bind_trainer_gtfile()
     ;
 
   class_<Torch::bbx2eye19x19deye10_GTFile, bases<Torch::GTFile> >("BoundingBoxGTFile", init<>())
-    .def("load", (bool (Torch::bbx2eye19x19deye10_GTFile::*)(short, short, short, short))&Torch::bbx2eye19x19deye10_GTFile::load)
+    .def("load", (bool (Torch::bbx2eye19x19deye10_GTFile::*)(const Torch::Pattern&))&Torch::bbx2eye19x19deye10_GTFile::load)
     ;
 
   class_<Torch::bancaGTFile, bases<Torch::GTFile> >("bancaGTFile", init<>());
