@@ -31,7 +31,32 @@ class CroppingTest(unittest.TestCase):
       gt_file.load(k)
       self.assertEqual(geom_norm.process(i), True)
       oi = geom_norm.getOutputImage(index)
-      print oi
+      self.assertEqual(oi.getWidth(), 64)
+      self.assertEqual(oi.getHeight(), 80)
+      self.assertEqual(oi.getNPlanes(), 1)
+
+  def test02_CanCropMany(self):
+    finder = torch.scanning.FaceFinder(FACE_FINDER_PARAMETERS)
+    v = torch.ip.Video(INPUT_VIDEO)
+    i = torch.ip.Image(1, 1, 1) #converts all to grayscale automagically!
+    for frame in range(50):
+      self.assertEqual(v.read(i), True)
+      self.assertEqual(finder.process(i), True)
+      patterns = finder.getPatterns()
+      if len(patterns) == 0:
+        print 'Skipping frame %d' % frame
+        continue
+      self.assertEqual(patterns.size(), 1)
+      geom_norm = torch.ip.ipGeomNorm(GEOMNORM_PARAMETERS)
+      gt_file = torch.trainer.BoundingBoxGTFile() #all in memory!
+      self.assertEqual(geom_norm.setGTFile(gt_file), True)
+      for index, k in enumerate(patterns): 
+        gt_file.load(k)
+        self.assertEqual(geom_norm.process(i), True)
+        oi = geom_norm.getOutputImage(index)
+        self.assertEqual(oi.getWidth(), 64)
+        self.assertEqual(oi.getHeight(), 80)
+        self.assertEqual(oi.getNPlanes(), 1)
 
 if __name__ == '__main__':
   import os, sys

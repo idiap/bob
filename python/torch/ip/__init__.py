@@ -47,3 +47,4 @@ def image_str(i):
   return 'Image(width=%d, height=%d, planes=%d)' % (i.getWidth(),
       i.getHeight(), i.getNPlanes())
 Image.__str__ = image_str
+
