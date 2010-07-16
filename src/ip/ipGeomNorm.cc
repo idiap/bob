@@ -355,7 +355,6 @@ bool ipGeomNorm::processInput(const Tensor& input)
 
 	int nCx = (int)( px1+0.5);
 	int nCy = (int) (py1+0.5);
-	print("The centers %d %d\n",nCx,nCy);
 	ip_rot_angle = finalRotAngle-ip_rot_angle;
 
 	// Rotate the image
