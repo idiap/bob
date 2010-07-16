@@ -6,6 +6,7 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "core/Object.h"
 #include "core/Tensor.h"
@@ -15,9 +16,28 @@
 
 using namespace boost::python;
 
+/**
+ * Converts an image from any format into grayscale.
+ */
+static boost::shared_ptr<Torch::Image> image_make_gray(const Torch::Image& i)
+{
+  boost::shared_ptr<Torch::Image> retval(new Torch::Image(i.getWidth(),
+        i.getHeight(), 1));
+  retval->copyFrom(i);
+  return retval;
+}
+
+static boost::shared_ptr<Torch::Image> image_make_rgb(const Torch::Image& i)
+{
+  boost::shared_ptr<Torch::Image> retval(new Torch::Image(i.getWidth(),
+        i.getHeight(), 3));
+  retval->copyFrom(i);
+  return retval;
+}
+
 void bind_ip_image()
 {
-  class_<Torch::Image, bases<Torch::Object, Torch::ShortTensor> >("Image", no_init)
+  class_<Torch::Image, boost::shared_ptr<Torch::Image>, bases<Torch::Object, Torch::ShortTensor> >("Image", no_init)
     .def(init<optional<int, int, int> >())
     .def("getWidth", &Torch::Image::getWidth)
     .def("getHeight", &Torch::Image::getHeight)
@@ -30,6 +50,8 @@ void bind_ip_image()
     .def("drawCross", &Torch::Image::drawLine)
     .def("drawRect", (void (Torch::Image::*)(int, int, int, int, const Torch::Color&))&Torch::Image::drawRect)
     .def("drawRect", (void (Torch::Image::*)(const Torch::sRect2D&, const Torch::Color&))&Torch::Image::drawRect)
+    .def("_toGray", &image_make_gray)
+    .def("_toRGB", &image_make_rgb)
     ;
 }
 
