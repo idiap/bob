@@ -33,3 +33,17 @@ def scomplex_str(v):
   return 'Complex(r=%.3e, i=%.3e)' % (v.r, v.i)
 sComplex.__str__ = scomplex_str
 
+def image_as_gray(i):
+  if i.getNPlanes() == 1: return i
+  return i._toGray()
+Image.as_gray = image_as_gray
+
+def image_as_rgb(i):
+  if i.getNPlanes() == 3: return i
+  return i._toRGB()
+Image.as_rgb = image_as_rgb
+
+def image_str(i):
+  return 'Image(width=%d, height=%d, planes=%d)' % (i.getWidth(),
+      i.getHeight(), i.getNPlanes())
+Image.__str__ = image_str
