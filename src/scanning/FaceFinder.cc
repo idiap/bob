@@ -5,6 +5,7 @@
 #include "PyramidExplorer.h"
 #include "MSExplorer.h"
 #include "ContextExplorer.h"
+#include "TrackContextExplorer.h"
 #include "ScaleExplorer.h"
 #include "ExhaustiveScaleExplorer.h"
 #include "SpiralScaleExplorer.h"
@@ -243,7 +244,6 @@ namespace Private
 			break;
 
 		case 2: // Context
-		default:
 			explorer = manage(new ContextExplorer);
 			if (	((ContextExplorer*)explorer)->setContextModel(params->context_model) == false ||
 				((ContextExplorer*)explorer)->setIOption("ctx_type", params->context_type) == false)
@@ -251,6 +251,17 @@ namespace Private
 				return 0;
 			}
 			((ContextExplorer*)explorer)->setMode(ContextExplorer::Scanning);
+			break;
+		
+		case 3: // Track context
+		default:
+			explorer = manage(new TrackContextExplorer);
+			if (	((TrackContextExplorer*)explorer)->setContextModel(params->context_model) == false ||
+				((TrackContextExplorer*)explorer)->setIOption("ctx_type", params->context_type) == false)
+			{
+				return 0;
+			}
+			((TrackContextExplorer*)explorer)->setMode(ContextExplorer::Scanning);
 			break;
 		}
 		if (	explorer->setIOption("min_patt_w", params->min_patt_w) == false ||
@@ -404,7 +415,7 @@ bool FaceFinder::reset(FaceFinder::Params* params)
 	}
 
 	// Check parameters
-	params->explorer_type = getInRange(params->explorer_type, 0, 2);
+	params->explorer_type = getInRange(params->explorer_type, 0, 3);
 	params->scale_explorer_type = getInRange(params->scale_explorer_type, 0, 2);
 
 	params->select_type = getInRange(params->select_type, 0, 2);

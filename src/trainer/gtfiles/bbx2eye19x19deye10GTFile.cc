@@ -41,9 +41,9 @@ bbx2eye19x19deye10_GTFile::bbx2eye19x19deye10_GTFile() : GTFile(2)
 	CHECK_FATAL(setLabel(1, "reye_center") == true);
 }
 
-bool bbx2eye19x19deye10_GTFile::load(short x, short y, short w, short)
+bool bbx2eye19x19deye10_GTFile::load(const Torch::Pattern& p)
 {
-  bbx2eyepos(x, y, w, m_points[0], m_points[1]);
+  bbx2eyepos(p.m_x, p.m_y, p.m_w, m_points[0], m_points[1]);
   return true;
 }
 

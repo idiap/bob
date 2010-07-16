@@ -11,6 +11,7 @@ SET(${THIS}_SRC
 		"MSExplorer.cc"
 		"ContextExplorer.cc"
 		"PyramidExplorer.cc"
+    "TrackContextExplorer.cc"
 	CACHE INTERNAL "sources")
 
 include(../../SetupPackage.cmake)

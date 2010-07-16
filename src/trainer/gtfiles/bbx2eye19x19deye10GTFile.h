@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_BBX2EYE19X19DEYE10_GT_FILE_H_
 
 #include "GTFile.h"
+#include "Pattern.h"
 
 namespace Torch
 {
@@ -23,14 +24,11 @@ namespace Torch
 
     /**
      * Load points already in memory
-     * @param x The top left ordinate of the bounding box
-     * @param y The top left abcissa of the bounding box
-     * @param w The width of the bounding box
-     * @param w The height of the bounding box
+     * @param p The pattern containing the bounding box you want to use
      *
      * @return Always true...
      */
-    virtual bool    load(short x, short y, short w, short h);
+    virtual bool    load(const Torch::Pattern& p);
 
 		// Get the name of the GT file format
 		virtual const char*	getName();

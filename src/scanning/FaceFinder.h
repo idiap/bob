@@ -72,7 +72,7 @@ namespace Torch
 			double			f_thres;		// Face model threshold
 			bool			use_f_thres;		// USe the face model threshold
 
-			int			explorer_type;		// Explorer: 0 - Pyramid, 1 - Multiscale, 2 - Context
+			int			explorer_type;		// Explorer: 0 - Pyramid, 1 - Multiscale, 2 - Context, 3 - Track Context
 			int			scale_explorer_type;    // ScaleExplorer: 0 - Exhaustive, 1 - Spiral, 2 - Random
 			int			min_patt_w, max_patt_w; // Min/max pattern width/height
 			int			min_patt_h, max_patt_h;

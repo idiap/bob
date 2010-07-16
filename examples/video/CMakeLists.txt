@@ -12,7 +12,8 @@ SET(EXAMPLE_SRC
 	checkvideos.cc
   #	video2tensor.cc
 	makeFaceFinder.cc
-	fdvideo.cc)
+	fdvideo.cc
+  fctxtrackingVideo.cc)
 #	fdtvideo.cc)
 
 LINK_DIRECTORIES(${INSTALL_DIR}/lib)
