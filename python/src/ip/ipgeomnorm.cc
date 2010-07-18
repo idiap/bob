@@ -37,11 +37,11 @@ static boost::shared_ptr<Torch::Image> ipgn_get_image(const Torch::ipGeomNorm& g
 
 void bind_ip_ipgeomnorm()
 {
-  class_<Torch::ipGeomNorm, boost::shared_ptr<Torch::ipGeomNorm>, bases<Torch::ipCore> >("ipGeomNorm", no_init)
+  class_<Torch::ipGeomNorm, boost::shared_ptr<Torch::ipGeomNorm>, bases<Torch::ipCore> >("ipGeomNorm", "This class is designed to geometrically normalize a 2D/3D tensor,	using some ground truth points.	The normalized tensor has the same storage type and is of required size.", no_init)
     .def("__init__", make_constructor(&make_geomnorm))
-    .def("setGTFile", &Torch::ipGeomNorm::setGTFile)
-    .def("getGTFile", &Torch::ipGeomNorm::getGTFile, return_internal_reference<>())
-    .def("getNMPoints", &ipgn_get_points)
-    .def("getOutputImage", &ipgn_get_image, with_custodian_and_ward_postcall<0, 1>())
+    .def("setGTFile", &Torch::ipGeomNorm::setGTFile, (arg("self"), arg("gtfile")), "Sets the ground-truth file to be used for the normalization of the next image.")
+    .def("getGTFile", &Torch::ipGeomNorm::getGTFile, return_internal_reference<>(), (arg("self")), "Returns the current ground-truth file being used")
+    .def("getNMPoints", &ipgn_get_points, (arg("self")), "Returns all the normalized points")
+    .def("getOutputImage", &ipgn_get_image, with_custodian_and_ward_postcall<0, 1>(), (arg("self")), "Pythonic extension to this class that allows the retrieval of the just processed image as a Torch.ip.Image object")
     ;
 }
