@@ -36,8 +36,9 @@ platform=`uname -s`-`uname -m`-${build_type}
 platform=`echo ${platform} | tr 'A-Z' 'a-z'` #lowercase transformation
 prefix=`pwd`
 build_dir=${prefix}/build/${platform}
-install_dir=${prefix}/install/${platform}
-include_dir=${prefix}/install/include
+install_root=${prefix}/install
+install_dir=${install_root}/${platform}
+include_dir=${install_root}/include
 if [ -r /proc/cpuinfo ]; then
   cpu_count=`cat /proc/cpuinfo | egrep -c '^processor'`
 else

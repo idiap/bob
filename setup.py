@@ -80,6 +80,7 @@ def main(dir, debug, csh):
   path = os.environ.get('PATH', '')
   path = path_remove(path, '.') #security concern
   path = path_remove_if_startswith(path, base_dir)
+  path = path_add(path, os.path.join(base_dir, 'bin'))
   path = path_add(path, os.path.join(install_dir, 'bin'))
   all.append(('PATH', path))
 
