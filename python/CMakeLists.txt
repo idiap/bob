@@ -5,6 +5,7 @@ project(pytorch)
 cmake_minimum_required(VERSION 2.6)
 
 add_subdirectory(src)
+add_subdirectory(scripts)
 
 # Installs all python complements to use torch in a nice way
 file(COPY torch DESTINATION ${INSTALL_DIR}/lib/python${PYTHON_VERSION} FILES_MATCHING PATTERN "*.py")
