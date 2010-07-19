@@ -30,6 +30,7 @@ SET(${THIS}_SRC
 		"ipShift.cc"
 		"ipGeomNorm.cc"
 		"Video.cc"
+    "VideoTensor.cc"
 		"ipHistoEqual.cc"
 		"ipMSRSQIGaussian.cc"
 		"ipMultiscaleRetinex.cc"
