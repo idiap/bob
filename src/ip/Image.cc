@@ -283,8 +283,8 @@ void Image::setPixel3DChar(ShortTensor* data, int x, int y, const Color& color)
 
 void Image::drawCross(int x, int y, int r, const Color& color)
 {
-	drawLine(x - r, y, x + r, y, green);
-	drawLine(x, y - r, x, y + r, green);
+	drawLine(x - r, y, x + r, y, color);
+	drawLine(x, y - r, x, y + r, color);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
