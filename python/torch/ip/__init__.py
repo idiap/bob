@@ -33,6 +33,10 @@ def scomplex_str(v):
   return 'Complex(r=%.3e, i=%.3e)' % (v.r, v.i)
 sComplex.__str__ = scomplex_str
 
+def color_str(c):
+  return '%s(%d, %d, %d)' % (c.coding, c.data0, c.data1, c.data2)
+Color.__str__ = color_str
+
 def image_as_gray(i):
   if i.getNPlanes() == 1: return i
   return i._toGray()
