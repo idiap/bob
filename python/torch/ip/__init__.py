@@ -34,8 +34,14 @@ def scomplex_str(v):
 sComplex.__str__ = scomplex_str
 
 def color_str(c):
-  return '%s(%d, %d, %d)' % (c.coding, c.data0, c.data1, c.data2)
+  return 'Color(%s, %d, %d, %d)' % (c.coding, c.data0, c.data1, c.data2)
 Color.__str__ = color_str
+Color.__repr__ = color_str
+
+def color_eq(c1, c2):
+  return ((c1.coding == c2.coding) and (c1.data0 == c2.data0) and \
+      (c1.data1 == c2.data1) and (c1.data2 == c2.data2))
+Color.__eq__ = color_eq
 
 def image_as_gray(i):
   if i.getNPlanes() == 1: return i
