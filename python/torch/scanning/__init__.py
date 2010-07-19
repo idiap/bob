@@ -34,3 +34,5 @@ PatternList.__iter__ = patternlist_iter
 def patternlist_str(p):
   return '[' + ','.join([str(k) for k in p]) + ']'
 PatternList.__str__ = patternlist_str
+
+__all__ = dir()

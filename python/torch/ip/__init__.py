@@ -58,3 +58,4 @@ def image_str(i):
       i.getHeight(), i.getNPlanes())
 Image.__str__ = image_str
 
+__all__ = dir()
