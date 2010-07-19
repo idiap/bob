@@ -11,7 +11,7 @@ Image::Image(int width, int height, int n_planes)
 	:	ShortTensor(height, width, n_planes),
 		m_setPixelCallback(setPixel1DChar)
 {
-	resize(width, height, n_planes);
+  this->resize(width, height, n_planes);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -28,22 +28,25 @@ Image::~Image()
 bool Image::resize(int width, int height, int n_planes)
 {
 	// Check parameters
-	if (	width < 1 || height < 1 ||
-		(n_planes != 1 && n_planes != 3))// Suport only images with one (gray) or 3 (RGB like) components
-	{
+	if (	width < 1 || height < 1 || (n_planes != 1 && n_planes != 3)) {
+    // Suport only images with one (gray) or 3 (RGB like) components
 		Torch::message("Torch::Image::resize - invalid parameters!\n");
 		return false;
 	}
 
 	// Resize only if needed
-	if (getWidth() != width || getHeight() != height)
-	{
+	if (getWidth() != width || getHeight() != height) {
 		cleanup();
 
-		// Allocate the tensor, fill it black and set the callback to change the pixels
+		// Allocate the tensor, fill it black
 		ShortTensor::t = THShortTensor_newWithSize3d(height, width, n_planes);
-		m_setPixelCallback = n_planes == 1 ? setPixel1DChar : setPixel3DChar;
-	}
+  }
+
+  // Sets the callback to change the pixels - AA: please note this has to be
+  // done irrespective of the image changing size. The only change that needs
+  // to be considered is if the number of planes changes. 
+  if (n_planes == 1) m_setPixelCallback = setPixel1DChar;
+  else m_setPixelCallback = setPixel3DChar;
 
 	// OK
 	return true;
