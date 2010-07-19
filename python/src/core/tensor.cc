@@ -12,66 +12,7 @@
 using namespace boost::python;
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(resize_overloads, resize, 1, 4);
-
-static void resize_1d (Torch::Tensor& o, long x) { o.resize(x); }
-static void resize_2d (Torch::Tensor& o, long x, long y) { o.resize(x, y); }
-static void resize_3d (Torch::Tensor& o, long x, long y, long z) { o.resize(x, y, z); }
-static void resize_4d (Torch::Tensor& o, long x, long y, long z, long w) 
-{ o.resize(x, y, z, w); }
-
-static void set_l_c (Torch::Tensor& o, long x, char v) 
-{ o.set(x, v); }
-static void set_ll_c (Torch::Tensor& o, long x, long y, char v) 
-{ o.set(x, y, v); }
-static void set_lll_c (Torch::Tensor& o, long x, long y, long z,  char v) 
-{ o.set(x, y, z, v); }
-static void set_llll_c (Torch::Tensor& o, long x, long y, long z, long w, char v) 
-{ o.set(x, y, z, w, v); }
-
-static void set_l_s (Torch::Tensor& o, long x, short v) 
-{ o.set(x, v); }
-static void set_ll_s (Torch::Tensor& o, long x, long y, short v) 
-{ o.set(x, y, v); }
-static void set_lll_s (Torch::Tensor& o, long x, long y, long z,  short v) 
-{ o.set(x, y, z, v); }
-static void set_llll_s (Torch::Tensor& o, long x, long y, long z, long w, short v) 
-{ o.set(x, y, z, w, v); }
-
-static void set_l_i (Torch::Tensor& o, long x, int v) 
-{ o.set(x, v); }
-static void set_ll_i (Torch::Tensor& o, long x, long y, int v) 
-{ o.set(x, y, v); }
-static void set_lll_i (Torch::Tensor& o, long x, long y, long z,  int v) 
-{ o.set(x, y, z, v); }
-static void set_llll_i (Torch::Tensor& o, long x, long y, long z, long w, int v) 
-{ o.set(x, y, z, w, v); }
-
-static void set_l_l (Torch::Tensor& o, long x, long v) 
-{ o.set(x, v); }
-static void set_ll_l (Torch::Tensor& o, long x, long y, long v) 
-{ o.set(x, y, v); }
-static void set_lll_l (Torch::Tensor& o, long x, long y, long z,  long v) 
-{ o.set(x, y, z, v); }
-static void set_llll_l (Torch::Tensor& o, long x, long y, long z, long w, long v) 
-{ o.set(x, y, z, w, v); }
-
-static void set_l_f (Torch::Tensor& o, long x, float v) 
-{ o.set(x, v); }
-static void set_ll_f (Torch::Tensor& o, long x, long y, float v) 
-{ o.set(x, y, v); }
-static void set_lll_f (Torch::Tensor& o, long x, long y, long z,  float v) 
-{ o.set(x, y, z, v); }
-static void set_llll_f (Torch::Tensor& o, long x, long y, long z, long w, float v) 
-{ o.set(x, y, z, w, v); }
-
-static void set_l_d (Torch::Tensor& o, long x, double v) 
-{ o.set(x, v); }
-static void set_ll_d (Torch::Tensor& o, long x, long y, double v) 
-{ o.set(x, y, v); }
-static void set_lll_d (Torch::Tensor& o, long x, long y, long z,  double v) 
-{ o.set(x, y, z, v); }
-static void set_llll_d (Torch::Tensor& o, long x, long y, long z, long w, double v) 
-{ o.set(x, y, z, w, v); }
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(get_overloads, get, 1, 4);
 
 static int ts_get_size(const Torch::TensorSize& t, unsigned int i) {
   if (i < t.n_dimensions) return t.size[i];
@@ -142,47 +83,67 @@ void bind_core_tensor()
     .def("select", (Torch::Tensor* (Torch::Tensor::*)(int, long) const)&Torch::Tensor::select, with_custodian_and_ward_postcall<0, 1, return_value_policy<manage_new_object> >(), (arg("self"), arg("dimension"), arg("slice_index")), "Returns a new tensor that is selected from mysel according to the dimension and slice_index settings")
     .def("typeSize", &Torch::Tensor::typeSize, arg("self"), "Returns the size of one of my elements")
     .def("isReference", &Torch::Tensor::isReference, arg("self"), "Tells if this tensor contains data or is just a reference to another tensor")
-    .def("resize", &resize_1d, (arg("self"), arg("dimension0")), "Resizes the tensor along the first dimension")
-    .def("resize", &resize_2d, (arg("self"), arg("dimension0"), arg("dimension1")), "Resizes the tensor along the first two dimensions")
-    .def("resize", &resize_3d, (arg("self"), arg("dimension0"), arg("dimension1"), arg("dimension2")), "Resizes the tensor along the first three dimensions")
-    .def("resize", &resize_4d, (arg("self"), arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Resizes the tensor along all the four dimensions")
-    .def("set", &set_l_c, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional char tensor")
-    .def("set", &set_ll_c, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional char tensor")
-    .def("set", &set_lll_c, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional char tensor")
-    .def("set", &set_llll_c, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional char tensor")
-    .def("set", &set_l_s, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional short tensor")
-    .def("set", &set_ll_s, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional short tensor")
-    .def("set", &set_lll_s, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional short tensor")
-    .def("set", &set_llll_s, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional short tensor")
-    .def("set", &set_l_i, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional integer tensor")
-    .def("set", &set_ll_i, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional integer tensor")
-    .def("set", &set_lll_i, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional integer tensor")
-    .def("set", &set_llll_i, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional integer tensor")
-    .def("set", &set_l_l, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional long tensor")
-    .def("set", &set_ll_l, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional long tensor")
-    .def("set", &set_lll_l, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional long tensor")
-    .def("set", &set_llll_l, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional long tensor")
-    .def("set", &set_l_f, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional float tensor")
-    .def("set", &set_ll_f, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional float tensor")
-    .def("set", &set_lll_f, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional float tensor")
-    .def("set", &set_llll_f, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional float tensor")
-    .def("set", &set_l_d, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional double tensor")
-    .def("set", &set_ll_d, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional double tensor")
-    .def("set", &set_lll_d, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional double tensor")
-    .def("set", &set_llll_d, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional double tensor")
+    .def("resize", (void (Torch::Tensor::*)(long, long, long, long) const)&Torch::Tensor::resize, resize_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Resizes the tensor"))
     ;
 
-    //the several specialization for the Tensor class
-    class_<Torch::CharTensor, bases<Torch::Tensor> >("CharTensor", 
-        init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with char values"));
-    class_<Torch::ShortTensor, bases<Torch::Tensor> >("ShortTensor", 
-        init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with short integer values"));
-    class_<Torch::IntTensor, bases<Torch::Tensor> >("IntTensor", 
-        init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with integer values"));
-    class_<Torch::LongTensor, bases<Torch::Tensor> >("LongTensor", 
-        init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with long integer values"));
-    class_<Torch::FloatTensor, bases<Torch::Tensor> >("FloatTensor", 
-        init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with float-point values"));
-    class_<Torch::DoubleTensor, bases<Torch::Tensor> >("DoubleTensor", 
-        init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with double-precision values values"));
+  //the several specialization for the Tensor class
+  class_<Torch::CharTensor, bases<Torch::Tensor> >("CharTensor", 
+      init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with char values"))
+    .def("get", (char (Torch::CharTensor::*)(long, long, long, long) const)&Torch::CharTensor::get, get_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Returns a specific value from the tensor"))
+    .def("set", (void (Torch::CharTensor::*)(long, char))&Torch::CharTensor::set, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional char tensor")
+    .def("set", (void (Torch::CharTensor::*)(long, long, char))&Torch::CharTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional char tensor")
+    .def("set", (void (Torch::CharTensor::*)(long, long, long, char))&Torch::CharTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional char tensor")
+    .def("set", (void (Torch::CharTensor::*)(long, long, long, long, char))&Torch::CharTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional char tensor")
+    .def("sum", &Torch::CharTensor::sum, (arg("self")), "Returns the sume of all elements")
+    ;
+
+  class_<Torch::ShortTensor, bases<Torch::Tensor> >("ShortTensor", 
+      init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with short integer values"))
+    .def("get", (short (Torch::ShortTensor::*)(long, long, long, long) const)&Torch::ShortTensor::get, get_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Returns a specific value from the tensor"))
+    .def("set", (void (Torch::ShortTensor::*)(long, short))&Torch::ShortTensor::set, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional short tensor")
+    .def("set", (void (Torch::ShortTensor::*)(long, long, short))&Torch::ShortTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional short tensor")
+    .def("set", (void (Torch::ShortTensor::*)(long, long, long, short))&Torch::ShortTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional short tensor")
+    .def("set", (void (Torch::ShortTensor::*)(long, long, long, long, short))&Torch::ShortTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional short tensor")
+    .def("sum", &Torch::ShortTensor::sum, (arg("self")), "Returns the sume of all elements")
+    ;
+
+  class_<Torch::IntTensor, bases<Torch::Tensor> >("IntTensor", 
+      init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with integer values"))
+    .def("get", (int (Torch::IntTensor::*)(long, long, long, long) const)&Torch::IntTensor::get, get_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Returns a specific value from the tensor"))
+    .def("set", (void (Torch::IntTensor::*)(long, int))&Torch::IntTensor::set, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional int tensor")
+    .def("set", (void (Torch::IntTensor::*)(long, long, int))&Torch::IntTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional int tensor")
+    .def("set", (void (Torch::IntTensor::*)(long, long, long, int))&Torch::IntTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional int tensor")
+    .def("set", (void (Torch::IntTensor::*)(long, long, long, long, int))&Torch::IntTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional int tensor")
+    .def("sum", &Torch::IntTensor::sum, (arg("self")), "Returns the sume of all elements")
+    ;
+
+  class_<Torch::LongTensor, bases<Torch::Tensor> >("LongTensor", 
+      init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with long integer values"))
+    .def("get", (long (Torch::LongTensor::*)(long, long, long, long) const)&Torch::LongTensor::get, get_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Returns a specific value from the tensor"))
+    .def("set", (void (Torch::LongTensor::*)(long, long))&Torch::LongTensor::set, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional long tensor")
+    .def("set", (void (Torch::LongTensor::*)(long, long, long))&Torch::LongTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional long tensor")
+    .def("set", (void (Torch::LongTensor::*)(long, long, long, long))&Torch::LongTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional long tensor")
+    .def("set", (void (Torch::LongTensor::*)(long, long, long, long, long))&Torch::LongTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional long tensor")
+    .def("sum", &Torch::LongTensor::sum, (arg("self")), "Returns the sume of all elements")
+    ;
+
+  class_<Torch::FloatTensor, bases<Torch::Tensor> >("FloatTensor", 
+      init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with float-point values"))
+    .def("get", (float (Torch::FloatTensor::*)(long, long, long, long) const)&Torch::FloatTensor::get, get_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Returns a specific value from the tensor"))
+    .def("set", (void (Torch::FloatTensor::*)(long, float))&Torch::FloatTensor::set, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional float tensor")
+    .def("set", (void (Torch::FloatTensor::*)(long, long, float))&Torch::FloatTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional float tensor")
+    .def("set", (void (Torch::FloatTensor::*)(long, long, long, float))&Torch::FloatTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional float tensor")
+    .def("set", (void (Torch::FloatTensor::*)(long, long, long, long, float))&Torch::FloatTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional float tensor")
+    .def("sum", &Torch::FloatTensor::sum, (arg("self")), "Returns the sume of all elements")
+    ;
+
+  class_<Torch::DoubleTensor, bases<Torch::Tensor> >("DoubleTensor", 
+      init<optional<long, long, long, long> >((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "A tensor with double-precision values values"))
+    .def("get", (double (Torch::DoubleTensor::*)(long, long, long, long) const)&Torch::DoubleTensor::get, get_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Returns a specific value from the tensor"))
+    .def("set", (void (Torch::DoubleTensor::*)(long, double))&Torch::DoubleTensor::set, (arg("self"), arg("index0"), arg("value")), "Sets a value in a one-dimensional double tensor")
+    .def("set", (void (Torch::DoubleTensor::*)(long, long, double))&Torch::DoubleTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("value")), "Sets a value in a two-dimensional double tensor")
+    .def("set", (void (Torch::DoubleTensor::*)(long, long, long, double))&Torch::DoubleTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("value")), "Sets a value in a three-dimensional double tensor")
+    .def("set", (void (Torch::DoubleTensor::*)(long, long, long, long, double))&Torch::DoubleTensor::set, (arg("self"), arg("index0"), arg("index1"), arg("index2"), arg("index3"), arg("value")), "Sets a value in a four-dimensional double tensor")
+    .def("sum", &Torch::DoubleTensor::sum, (arg("self")), "Returns the sume of all elements")
+    ;
 }
