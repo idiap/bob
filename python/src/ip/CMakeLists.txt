@@ -19,6 +19,7 @@ add_library(${THIS} SHARED
   color.cc
   image.cc
   video.cc
+  videotensor.cc
   ipgeomnorm.cc
   main.cc
   )

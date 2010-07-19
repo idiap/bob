@@ -31,9 +31,9 @@ class CroppingTest(unittest.TestCase):
       gt_file.load(k)
       self.assertEqual(geom_norm.process(i), True)
       oi = geom_norm.getOutputImage(index)
-      self.assertEqual(oi.getWidth(), 64)
-      self.assertEqual(oi.getHeight(), 80)
-      self.assertEqual(oi.getNPlanes(), 1)
+      self.assertEqual(oi.width, 64)
+      self.assertEqual(oi.height, 80)
+      self.assertEqual(oi.nplanes, 1)
 
   def test02_CanCropMany(self):
     finder = torch.scanning.FaceFinder(FACE_FINDER_PARAMETERS)
@@ -54,9 +54,9 @@ class CroppingTest(unittest.TestCase):
         gt_file.load(k)
         self.assertEqual(geom_norm.process(i), True)
         oi = geom_norm.getOutputImage(index)
-        self.assertEqual(oi.getWidth(), 64)
-        self.assertEqual(oi.getHeight(), 80)
-        self.assertEqual(oi.getNPlanes(), 1)
+        self.assertEqual(oi.width, 64)
+        self.assertEqual(oi.height, 80)
+        self.assertEqual(oi.nplanes, 1)
 
 if __name__ == '__main__':
   import os, sys

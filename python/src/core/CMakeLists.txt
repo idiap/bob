@@ -18,6 +18,7 @@ add_library(${THIS} SHARED
   object.cc
   file.cc
   tensor.cc
+  tensorfile.cc
   spcore.cc
   ipcore.cc
   main.cc

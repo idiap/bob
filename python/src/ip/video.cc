@@ -82,20 +82,38 @@ static boost::shared_ptr<Torch::Video> make_readable_video_quietly(const char* n
 static int get_video_width(Torch::Video& v) 
 { return v.getIOption("width"); }
 
+static void set_video_width(Torch::Video& v, int val)
+{ v.setIOption("width", val); }
+
 static int get_video_height(Torch::Video& v) 
 { return v.getIOption("height"); }
+
+static void set_video_height(Torch::Video& v, int val)
+{ v.setIOption("height", val); }
 
 static float get_video_bitrate(Torch::Video& v) 
 { return v.getFOption("bitrate"); }
 
+static void set_video_bitrate(Torch::Video& v, float val)
+{ v.setFOption("bitrate", val); }
+
 static float get_video_framerate(Torch::Video& v) 
 { return v.getFOption("framerate"); }
+
+static void set_video_framerate(Torch::Video& v, float val)
+{ v.setFOption("framerate", val); }
 
 static int get_video_gop(Torch::Video& v) 
 { return v.getIOption("gop"); }
 
-static bool get_video_verbosity(Torch::Video& v) 
+static void set_video_gop(Torch::Video& v, int val)
+{ v.setIOption("gop", val); }
+
+static bool get_video_verbose(Torch::Video& v) 
 { return v.getBOption("verbose"); }
+
+static bool set_video_verbose(Torch::Video& v, bool val) 
+{ v.setBOption("verbose", val); }
 
 /**
  * A helper to make videos like another existing one, minus the name and
@@ -133,13 +151,14 @@ void bind_ip_video()
     .def("close", &Torch::Video::close, arg("self"), "Closes the video file, if it was opened")
     .def("read", &Torch::Video::read, (arg("self"), arg("image")), "Reads a single image from the video file.\n\nThis method will copy the video frame pixmap into the image object given as input parameter.")
     .def("write", &Torch::Video::write, (arg("self"), arg("image")), "Write an image file into the video stream (single frame)")
-    .def("codec", &Torch::Video::codec, (arg("self")), "Returns the name of the codec being used")
-    .def("getNFrames", &Torch::Video::getNFrames, (arg("self")), "Returns the total number of frames the current video has")
-    .def("getState", &Torch::Video::getState, (arg("self")), "Returns the current state (reading, writing or idle)")
-    .def("width", &get_video_width, arg("self"), "Returns the video width")
-    .def("height", &get_video_height, arg("self"), "Returns the video height")
-    .def("bitrate", &get_video_bitrate, arg("self"), "Returns the video bit rate")
-    .def("framerate", &get_video_framerate, arg("self"), "Returns the video frame rate")
-    .def("gop", &get_video_gop, arg("self"), "Returns the value of the \"group-of-pictures\" property in this video")
+    .add_property("codec", &Torch::Video::codec)
+    .add_property("nframes", &Torch::Video::getNFrames)
+    .add_property("state", &Torch::Video::getState)
+    .add_property("width", &get_video_width, &set_video_width)
+    .add_property("height", &get_video_height, &set_video_height) 
+    .add_property("bitrate", &get_video_bitrate, &set_video_bitrate)
+    .add_property("framerate", &get_video_framerate, &set_video_framerate)
+    .add_property("gop", &get_video_gop, &set_video_gop)
+    .add_property("verbose", &get_video_verbose, &set_video_verbose)
     ;
 }

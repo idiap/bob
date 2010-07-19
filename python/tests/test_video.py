@@ -18,35 +18,35 @@ class VideoTest(unittest.TestCase):
   
   def test01_CanOpen(self):
     v = torch.ip.Video(INPUT_VIDEO) 
-    self.assertEqual(v.getState(), torch.ip.State.Read)
+    self.assertEqual(v.state, torch.ip.State.Read)
 
   def test02_CanReadGrayImage(self):
     v = torch.ip.Video(INPUT_VIDEO) 
-    self.assertEqual(v.getState(), torch.ip.State.Read)
+    self.assertEqual(v.state, torch.ip.State.Read)
     i = torch.ip.Image(1, 1, 1)
     self.assertEqual(v.read(i), True)
-    self.assertEqual(i.getWidth(), v.width())
-    self.assertEqual(i.getHeight(), v.height())
-    self.assertEqual(i.getNPlanes(), 1)
+    self.assertEqual(i.width, v.width)
+    self.assertEqual(i.height, v.height)
+    self.assertEqual(i.nplanes, 1)
 
   def test03_CanReadMultiColorImage(self):
     v = torch.ip.Video(INPUT_VIDEO) 
     i = torch.ip.Image(1, 1, 3)
     self.assertEqual(v.read(i), True)
-    self.assertEqual(i.getWidth(), v.width())
-    self.assertEqual(i.getHeight(), v.height())
-    self.assertEqual(i.getNPlanes(), 3)
-    self.assertEqual(v.getState(), torch.ip.State.Read)
+    self.assertEqual(i.width, v.width)
+    self.assertEqual(i.height, v.height)
+    self.assertEqual(i.nplanes, 3)
+    self.assertEqual(v.state, torch.ip.State.Read)
 
   def test04_CanReadManyImages(self):
     v = torch.ip.Video(INPUT_VIDEO) 
     i = torch.ip.Image(1, 1, 1)
     for k in range(10):
       self.assertEqual(v.read(i), True)
-      self.assertEqual(i.getWidth(), v.width())
-      self.assertEqual(i.getHeight(), v.height())
-      self.assertEqual(i.getNPlanes(), 1)
-    self.assertEqual(v.getState(), torch.ip.State.Read)
+      self.assertEqual(i.width, v.width)
+      self.assertEqual(i.height, v.height)
+      self.assertEqual(i.nplanes, 1)
+    self.assertEqual(v.state, torch.ip.State.Read)
 
   def test05_CanWriteVideo(self):
     iv = torch.ip.Video(INPUT_VIDEO)
@@ -54,8 +54,8 @@ class VideoTest(unittest.TestCase):
     i = torch.ip.Image(1, 1, 1)
     self.assertEqual(iv.read(i), True)
     for k in range(50): self.assertEqual(ov.write(i), True)
-    self.assertEqual(iv.getState(), torch.ip.State.Read)
-    self.assertEqual(ov.getState(), torch.ip.State.Write)
+    self.assertEqual(iv.state, torch.ip.State.Read)
+    self.assertEqual(ov.state, torch.ip.State.Write)
 
 if __name__ == '__main__':
   import sys

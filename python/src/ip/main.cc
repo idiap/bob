@@ -13,6 +13,7 @@ void bind_ip_color();
 void bind_ip_vision();
 void bind_ip_image();
 void bind_ip_video();
+void bind_ip_videotensor();
 void bind_ip_ipgeomnorm();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
@@ -21,5 +22,6 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_vision();
   bind_ip_image();
   bind_ip_video();
+  bind_ip_videotensor();
   bind_ip_ipgeomnorm();
 }

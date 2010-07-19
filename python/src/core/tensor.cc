@@ -102,26 +102,23 @@ static int tr_set_pos(Torch::TensorRegion& t, unsigned int i, long v) {
 
 void bind_core_tensor()
 {
-  class_<Torch::TensorSize>("TensorSize", init<>("Structures of this type represent multi-dimensional tensor sizes."))
+  class_<Torch::TensorSize>("TensorSize", "Structures of this type represent multi-dimensional tensor sizes.", init<>("Default constructor"))
     .def(init<int>(arg("dim0"), "Initializes structure with a single dimension"))
     .def(init<int, int>((arg("dim0"), arg("dim1")), "Initializes structure with 2 dimensions"))
     .def(init<int, int, int>((arg("dim0"), arg("dim1"), arg("dim2")), "Initializes structure with 3 dimensions"))
     .def(init<int, int, int, int>((arg("dim0"), arg("dim1"), arg("dim2"), arg("dim3")), "Initializes structure with 4 dimensions"))
     .def_readwrite("n_dimensions", &Torch::TensorSize::n_dimensions)
-    .def("size", &ts_get_size, (arg("self"), arg("dimension")), "Returns one of the dimension values")
-    .def("set_size", &ts_set_size, (arg("self"), arg("dimension")), "Sets one of the dimension values")
+    .add_property("size", &ts_get_size, &ts_set_size)
     ;
 
-  class_<Torch::TensorRegion>("TensorRegion", init<>("A tensor region represents a slice of the tensor data"))
+  class_<Torch::TensorRegion>("TensorRegion", "A tensor region represents a slice of the tensor data", init<>("Default constructor"))
     .def(init<long, long>((arg("d0_start"), arg("d0_size")), "One-dimesion initialization"))
     .def(init<long, long, long, long>((arg("d0_start"), arg("d0_size"), arg("d1_start"), arg("d1_size")), "Two-dimesion initialization"))
     .def(init<long, long, long, long, long, long>((arg("d0_start"), arg("d0_size"), arg("d1_start"), arg("d1_size"), arg("d2_start"), arg("d2_size")), "Three-dimesion initialization"))
     .def(init<long, long, long, long, long, long, long, long>((arg("d0_start"), arg("d0_size"), arg("d1_start"), arg("d1_size"), arg("d2_start"), arg("d2_size"), arg("d3_start"), arg("d3_size")), "Four-dimesion initialization"))
     .def_readwrite("n_dimensions", &Torch::TensorRegion::n_dimensions)
-    .def("size", &tr_get_size, (arg("self"), arg("dimension")), "Returns the size in one of the dimensions")
-    .def("set_size", &tr_set_size, (arg("self"), arg("dimension")), "Sets the size of the slice in one of the dimensions")
-    .def("pos", &tr_get_pos, (arg("self"), arg("dimension")), "Returns the start position of the slice in one of the dimensions")
-    .def("set_pos", &tr_set_size, (arg("self"), arg("dimension")), "Sets the start position of the slice in one of the dimensions")
+    .add_property("size", &tr_get_size, &tr_set_size) 
+    .add_property("pos", &tr_get_pos, &tr_set_pos)
     ;
 
   enum_<Torch::Tensor::Type>("Type")
