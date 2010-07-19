@@ -26,8 +26,8 @@ class VideoTensorTest(unittest.TestCase):
     colors = (
               torch.ip.white, 
               torch.ip.blue, 
-              #torch.ip.red, 
-              #torch.ip.yellow, 
+              torch.ip.red, 
+              torch.ip.yellow, 
               #torch.ip.green,
               #torch.ip.cyan, 
               #torch.ip.black, 
@@ -36,8 +36,7 @@ class VideoTensorTest(unittest.TestCase):
     bar_width = width/len(colors)
     for i, c in enumerate(colors):
       for k in range(bar_width):
-        print 'drawLine(%d, %d, %d, %d, %s)' % (k+(i*bar_width), 0, k+(i*bar_width), 399, c)
-        pattern.drawLine(k+(i*bar_width), 0, k+(i*bar_width), 399, c)
+        pattern.drawLine(k+(i*bar_width), 0, k+(i*bar_width), height-1, c)
     pattern.save("test.jpg")
     import sys; exit(1)
     for i in range(100): vt.setFrame(pattern, i)
