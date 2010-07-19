@@ -25,7 +25,7 @@ class SmoothLocation:
     """
     self.p = None
     self.move = 1
-    self.every = 10 #frames
+    self.every = 20 #frames
     self.now = 0
 
   def learn(self, p):
@@ -52,6 +52,7 @@ def main():
   input = torch.ip.Video(sys.argv[1])
   output = None #created after we know the output image size...
   finder = torch.scanning.FaceFinder(sys.argv[2])
+  ctx_explorer = finder.getScanner().tryGetTrackContextExplorer()
   geom_norm = torch.ip.ipGeomNorm(sys.argv[3])
   gt_file = torch.trainer.BoundingBoxGTFile()
   if not geom_norm.setGTFile(gt_file):
@@ -80,9 +81,14 @@ def main():
       raise RuntimeError, 'ipGeomNorm could not process image'
     oi = geom_norm.getOutputImage(0)
 
-    finder.getScanner().deleteAllROIs()
-    if not finder.getScanner().addROIs(buffer, 0.3):
-      raise RuntimeError, 'Scanner could not set ROIs'
+    if ctx_explorer is None:
+      #we do the classical RoI restrictions
+      finder.getScanner().deleteAllROIs()
+      if not finder.getScanner().addROIs(buffer, 0.3):
+        raise RuntimeError, 'Scanner could not set ROIs'
+    else:
+      #does this always succeeds?
+      ctx_explorer.setSeedPatterns(detections)
 
     if len(sys.argv) >= 5: 
       if not output:

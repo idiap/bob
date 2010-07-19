@@ -8,6 +8,7 @@
 
 INPUT_VIDEO = 'test.mov'
 PARAMETERS = 'facefinder.multiscale.params'
+CONTEXT_PARAMETERS = 'facefinder.track.context.params'
 
 import unittest
 import torch
@@ -31,11 +32,13 @@ class FaceFinderTest(unittest.TestCase):
     finder = torch.scanning.FaceFinder(PARAMETERS)
     v = torch.ip.Video(INPUT_VIDEO) 
     i = torch.ip.Image(1, 1, 1) #converts all to grayscale automagically!
-    for k in range(10):
+    n = 0
+    for k in range(20):
       self.assertEqual(v.read(i), True)
       self.assertEqual(finder.process(i), True)
       patterns = finder.getPatterns()
-      self.assertEqual(patterns.size(), 1)
+      n += len(patterns)
+    self.assertEqual(n > 15, True)
 
   def test04_CanFindOnROI(self):
     finder = torch.scanning.FaceFinder(PARAMETERS)
@@ -48,6 +51,21 @@ class FaceFinderTest(unittest.TestCase):
     finder.getScanner().deleteAllROIs()
     self.assertEqual(finder.getScanner().addROIs(i, 0.3), True)
     self.assertEqual(finder.getScanner().getNoROIs(), 1)
+    self.assertEqual(v.read(i), True)
+    self.assertEqual(finder.process(i), True)
+    patterns = finder.getPatterns()
+    self.assertEqual(patterns.size(), 1)
+
+  def test05_CanFindWithContextTracker(self):
+    finder = torch.scanning.FaceFinder(CONTEXT_PARAMETERS)
+    v = torch.ip.Video(INPUT_VIDEO) 
+    i = torch.ip.Image(1, 1, 1) #converts all to grayscale automagically!
+    self.assertEqual(v.read(i), True)
+    self.assertEqual(finder.process(i), True)
+    patterns = finder.getPatterns()
+    self.assertEqual(patterns.size(), 1)
+    self.assertNotEqual(finder.getScanner().tryGetTrackContextExplorer(), None)
+    finder.getScanner().tryGetTrackContextExplorer().setSeedPatterns(patterns)
     self.assertEqual(v.read(i), True)
     self.assertEqual(finder.process(i), True)
     patterns = finder.getPatterns()

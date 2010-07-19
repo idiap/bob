@@ -18,6 +18,7 @@ add_library(${THIS} SHARED
   pattern.cc
   scanner.cc
   facefinder.cc
+  explorer.cc
   main.cc
   )
 set_target_properties(${THIS} PROPERTIES SUFFIX ".so")

@@ -27,6 +27,7 @@ def main():
 
   input = torch.ip.Video(sys.argv[1])
   finder = torch.scanning.FaceFinder(sys.argv[2])
+  ctx_explorer = finder.getScanner().tryGetTrackContextExplorer()
   buffer = torch.ip.Image(1, 1, 1) #forces gray-scale conversion
   output = None
   if len(sys.argv) >= 4: output = torch.ip.Video(sys.argv[3], input)
@@ -41,9 +42,14 @@ def main():
     print 'frame: %d, detections: %d' % (frame, len(detections))
     for k in detections: print k
 
-    finder.getScanner().deleteAllROIs()
-    if not finder.getScanner().addROIs(buffer, 0.3):
-      raise RuntimeError, 'Scanner could not set ROIs'
+    if ctx_explorer is None:
+      #we do the classical RoI restrictions
+      finder.getScanner().deleteAllROIs()
+      if not finder.getScanner().addROIs(buffer, 0.3):
+        raise RuntimeError, 'Scanner could not set ROIs'
+    else:
+      #does this always succeeds?
+      ctx_explorer.setSeedPatterns(detections)
 
     if output:
       output.write(draw_rectangle(buffer, detections, 3, torch.ip.red))

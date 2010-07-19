@@ -10,6 +10,7 @@
 #include "core/Object.h"
 #include "ip/Image.h"
 #include "scanning/Scanner.h"
+#include "scanning/explorers/TrackContextExplorer.h"
 
 using namespace boost::python;
 
@@ -75,6 +76,11 @@ static bool set_rois_from_last(Torch::Scanner& scanner, Torch::Image& ref_image,
   return success;
 }
 
+static Torch::TrackContextExplorer* scanner_get_trackctx_explorer(Torch::Scanner& scanner)
+{
+  return dynamic_cast<Torch::TrackContextExplorer*>(&scanner.getExplorer());
+}
+
 void bind_scanning_scanner()
 {
   class_<Torch::Scanner, bases<Torch::Object>, boost::noncopyable>("Scanner", "Objects of this type scan an image for rectangular patterns in 4D (position + scale + model confidence) scanning space. They use a Explorer object to investigate the 4D pattern space and a Selector object to select the best patterns from the candidates.", no_init)
@@ -93,5 +99,7 @@ void bind_scanning_scanner()
     .def("getNoPrunnedSWs", &Torch::Scanner::getNoPrunnedSWs, arg("self"), "Returns the number of prunned selection-windows")
     .def("getNoAcceptedSWs", &Torch::Scanner::getNoAcceptedSWs, arg("self"), "Returns the number of accepted selection-windows")
     .def("getPatterns", &Torch::Scanner::getPatterns, return_internal_reference<>(), arg("self"), "Returns all patterns found on the previous scan")
+    .def("getExplorer", (Torch::Explorer& (Torch::Scanner::*)(void))&Torch::Scanner::getExplorer, return_internal_reference<>(), arg("self"), "Returns the current explorer configured")
+    .def("tryGetTrackContextExplorer", &scanner_get_trackctx_explorer, return_internal_reference<>(), arg("self"), "This method will return the currently configured TrackContextExplorer if that is the case, otherwise None")
     ;
 }
