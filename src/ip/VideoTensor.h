@@ -75,6 +75,11 @@ namespace Torch {
     VideoTensor& operator=(const Torch::VideoTensor& other);
 
     /**
+     * Destructor
+     */
+    virtual ~VideoTensor() {}
+
+    /**
      * Sets the image object to the i-th image on the sequence (this will set
      * by reference, so it is fast!). 
      *
