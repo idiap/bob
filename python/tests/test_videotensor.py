@@ -6,40 +6,79 @@
 """Tests the Torch::VideoTensor class
 """
 
+import torch
+
 # These are some global parameters for the test.
-INPUT_VIDEO = '/idiap/group/vision/visidiap/databases/banca/english/videos/1001_f_g1_04_1001_en.avi'
 OUTPUT_VIDEO = '/tmp/out.avi'
+OUTPUT_FILE = '/tmp/out.tensor'
+WIDTH = 600
+HEIGHT = 400
+FRAMES = 100
+COLORS = (
+          torch.ip.white, 
+          torch.ip.blue, 
+          torch.ip.red, 
+          torch.ip.yellow, 
+          torch.ip.green,
+          torch.ip.cyan, 
+          torch.ip.black, 
+          torch.ip.pink
+         )
+FRAMERATE = 10
+GROUP_OF_PICT = FRAMES/FRAMERATE
+
+PATTERN = torch.ip.Image(WIDTH, HEIGHT, 3)
+bar_WIDTH = WIDTH/len(COLORS)
+for i, c in enumerate(COLORS):
+  for k in range(bar_WIDTH):
+    PATTERN.drawLine(k+(i*bar_WIDTH), 0, k+(i*bar_WIDTH), HEIGHT-1, c)
 
 import unittest
-import torch
 
 class VideoTensorTest(unittest.TestCase):
   """Performs various combined read/write tests on the Torch::VideoTensor object"""
   
   def test01_CanConstructFromScratch(self):
-    width = 600
-    height = 400
-    frames = 100
-    vt = torch.ip.VideoTensor(width, height, 3, frames)
-    pattern = torch.ip.Image(width, height, 3)
-    colors = (
-              torch.ip.white, 
-              torch.ip.blue, 
-              torch.ip.red, 
-              torch.ip.yellow, 
-              torch.ip.green,
-              torch.ip.cyan, 
-              torch.ip.black, 
-              torch.ip.pink
-             )
-    bar_width = width/len(colors)
-    for i, c in enumerate(colors):
-      for k in range(bar_width):
-        pattern.drawLine(k+(i*bar_width), 0, k+(i*bar_width), height-1, c)
-    for i in range(100): vt.setFrame(pattern, i)
-    out_video = torch.ip.Video(OUTPUT_VIDEO, width, height, 150000, 20, 5)
+    vt = torch.ip.VideoTensor(WIDTH, HEIGHT, 3, FRAMES)
+    for i in range(FRAMES): vt.setFrame(PATTERN, i)
+    out_video = torch.ip.Video(OUTPUT_VIDEO, WIDTH, HEIGHT, 150000, FRAMERATE,
+        GROUP_OF_PICT)
     self.assertEqual(vt.save(out_video), True)
     out_video.close()
+
+  def test02_CanReadFromStandardVideoFile(self):
+    video = torch.ip.Video(OUTPUT_VIDEO)
+    #self.assertEqual(video.gop, GROUP_OF_PICT) #does not currently work!
+    vt = torch.ip.VideoTensor(video, 1)
+    self.assertEqual(vt.width, WIDTH)
+    self.assertEqual(vt.height, HEIGHT)
+    self.assertEqual(vt.planes, 1)
+    self.assertEqual(vt.frames, FRAMES)
+    #retrieves an image and compares it to the stock pattern
+    image = torch.ip.Image(WIDTH, HEIGHT, 3)
+    self.assertEqual(vt.getFrame(image, FRAMES/2), True)
+    self.assertEqual(image.nplanes, 3) #image is black and white
+
+  def test03_CanRecordOnTensorFile(self):
+    vt = torch.ip.VideoTensor(WIDTH, HEIGHT, 3, FRAMES)
+    for i in range(FRAMES): vt.setFrame(PATTERN, i)
+    out_tensor = torch.core.TensorFile()
+    out_tensor.openWrite(OUTPUT_FILE, vt)
+    self.assertEqual(vt.save(out_tensor), True)
+    out_tensor.close()
+
+  def test04_CanReadFromTensorFile(self):
+    video = torch.core.TensorFile()
+    video.openRead(OUTPUT_FILE)
+    vt = torch.ip.VideoTensor(video)
+    self.assertEqual(vt.width, WIDTH)
+    self.assertEqual(vt.height, HEIGHT)
+    self.assertEqual(vt.planes, 3)
+    self.assertEqual(vt.frames, FRAMES)
+    #retrieves an image and compares it to the stock pattern
+    image = torch.ip.Image(WIDTH, HEIGHT, 3)
+    self.assertEqual(vt.getFrame(image, FRAMES/2), True)
+    self.assertEqual(image.nplanes, 3) #image is color
 
 if __name__ == '__main__':
   import sys

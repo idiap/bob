@@ -8,15 +8,17 @@
 #include "VideoTensor.h"
 #include "Convert.h"
 
-Torch::VideoTensor::VideoTensor (Torch::Video& video)
+Torch::VideoTensor::VideoTensor (Torch::Video& video, int color_planes)
   :ShortTensor(video.getIOption("height"), 
                video.getIOption("width"),
-               3,
+               color_planes,
                video.getNFrames())
 {
-  Torch::Image image(1, 1, 3);
+  Torch::Image image(1, 1, color_planes);
   int frame = 0;
-	while (video.read(image) == true) this->setFrame(image, frame);
+	while (video.read(image) == true) {
+    this->setFrame(image, frame++);
+  }
 }
 
 Torch::VideoTensor::VideoTensor (Torch::TensorFile& tensor_file)

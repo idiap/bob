@@ -23,6 +23,33 @@ static void tfh_set_size(Torch::TensorFile::Header& tfh, unsigned int i, int val
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openwrite_overloads, openWrite, 4, 7);
 
+//opens a new file for writing and set the header properties to be like the
+//tensor given as model
+static bool tf_open_write(Torch::TensorFile& f, const char* name, 
+    const Torch::Tensor& model) {
+  switch (model.nDimension()) {
+    case 1:
+      return f.openWrite(name, model.getDatatype(), model.nDimension(), 
+          model.size(0)); 
+      break;
+    case 2:
+      return f.openWrite(name, model.getDatatype(), model.nDimension(), 
+          model.size(0), model.size(1)); 
+      break;
+    case 3:
+      return f.openWrite(name, model.getDatatype(), model.nDimension(), 
+          model.size(0), model.size(1), model.size(2)); 
+      break;
+    case 4:
+      return f.openWrite(name, model.getDatatype(), model.nDimension(), 
+          model.size(0), model.size(1), model.size(2), model.size(3)); 
+      break;
+    default:
+      return false;
+  }
+  return false;
+}
+
 void bind_core_tensorfile()
 {
   class_<Torch::TensorFile::Header>("TensorFileHeader", "Header information in TensorFiles", no_init)
@@ -37,6 +64,7 @@ void bind_core_tensorfile()
 
   class_<Torch::TensorFile>("TensorFile", "TensorFiles help users in loading and saving tensor data into files", init<>())
     .def("openRead", &Torch::TensorFile::openRead, (arg("self"), arg("filename")), "Opens an existing tensor file to read")
+    .def("openWrite", &tf_open_write, (arg("self"), arg("filename"), arg("tensor_model")), "Opens a new tensor file for writing. If the file exists, truncates it. The new tensor file will be set to have the dimensions of the model tensor passed as the second parameter.")
     .def("openWrite", &Torch::TensorFile::openWrite, openwrite_overloads((arg("filename"), arg("tensor_type"), arg("number_of_dimensions"), arg("size_dim0"), arg("size_dim1")=0, arg("size_dim2")=0, arg("size_dim3")=0), "Opens a new tensor file for writing. If the file exists, truncates it."))
     .def("openAppend", &Torch::TensorFile::openAppend, (arg("self"), arg("filename")), "Opens an existing file to append")
     .def("close", &Torch::TensorFile::close, (arg("self")), "Closes an opened file")

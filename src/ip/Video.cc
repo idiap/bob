@@ -921,6 +921,7 @@ Video::~Video()
 
 bool Video::open(const char* filename, const char *open_flags)
 {
+  this->optionChanged(""); //just triggers update of internal settings
 	if (m_impl->open(getBOption("verbose"), filename, open_flags) == true)
 	{
 		// Make sure the read statistics are set to the main Video class

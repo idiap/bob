@@ -32,8 +32,11 @@ namespace Torch {
      *
      * @param video The video object that will be read and from which we are
      * loading the image sequence.
+     * @param color_planes The number of color planes we need for the tensor.
+     * The default is 3 (RGB video), but you can cause color squashing if you
+     * specify 1. Please note that any other value will not work.
      */
-    VideoTensor (Torch::Video& video);
+    VideoTensor (Torch::Video& video, int color_planes=3);
 
     /**
      * Copies the data from another VideoTensor
