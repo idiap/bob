@@ -22,6 +22,7 @@ add_library(${THIS} SHARED
   videotensor.cc
   ipgeomnorm.cc
   main.cc
+  lbp.cc
   )
 set_target_properties(${THIS} PROPERTIES SUFFIX ".so")
 target_link_libraries(${THIS} torch5spro)

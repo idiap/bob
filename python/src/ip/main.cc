@@ -15,6 +15,7 @@ void bind_ip_image();
 void bind_ip_video();
 void bind_ip_videotensor();
 void bind_ip_ipgeomnorm();
+void bind_ip_lbp();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
   scope().attr("__doc__") = "Torch trainer classes and sub-classes";
@@ -24,4 +25,5 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_video();
   bind_ip_videotensor();
   bind_ip_ipgeomnorm();
+  bind_ip_lbp();
 }
