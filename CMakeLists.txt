@@ -44,3 +44,8 @@ endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 # built at the end, after extras and torch5 as the examples need a header file
 # to be computed
 add_subdirectory(examples EXCLUDE_FROM_ALL)
+
+# This adds a target to produce both vim and emacs tag files for the whole
+# project. To learn how to use tag files with your editor do "man ctags" on
+# your prompt
+execute_process(COMMAND ${DIST_ROOT}/gentags.sh)
