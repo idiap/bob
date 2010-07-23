@@ -40,6 +40,7 @@ SET(${THIS}_SRC
 		"ipRelaxation.cc"
 		"ipTanTriggs.cc"
 		"ipRescaleGray.cc"
+    "ipLBPTopOperator.cc"
 #		"ipHOG.cc"
 #		"ipGabor.cc"
 	CACHE INTERNAL "sources")
