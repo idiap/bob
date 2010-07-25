@@ -92,7 +92,7 @@ def main(dir, debug, csh):
   pythonpath = path_add(pythonpath, libdir)
   all.append(('PYTHONPATH', pythonpath))
 
-  if uname[0].lower == 'darwin': # we are under OSX
+  if uname[0].lower() == 'darwin': # we are under OSX
     dyld_library_path = os.environ.get('DYLD_LIBRARY_PATH', '')
     dyld_library_path = path_remove_if_startswith(dyld_library_path, base_dir)
     dyld_library_path = path_add(dyld_library_path, libdir)
