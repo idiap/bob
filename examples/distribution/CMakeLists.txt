@@ -11,6 +11,7 @@ SET(EXAMPLE_SRC
 	gmm.cc)
 
 LINK_DIRECTORIES(${INSTALL_DIR}/lib)
+LINK_DIRECTORIES(${ffmpeg_LIBRARY_DIRS})
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
@@ -30,6 +31,7 @@ FOREACH(file ${EXAMPLE_SRC})
   endif (${TORCH_LINKAGE} STREQUAL dynamic)
   
   ADD_CUSTOM_TARGET(install-${file_exe} COMMAND cp -f ${CMAKE_CURRENT_BINARY_DIR}/${file_exe} ${INSTALL_DIR}/bin DEPENDS ${file_exe})
+  ADD_DEPENDENCIES(install-${file_exe} create-install-dir)
   ADD_DEPENDENCIES(all-examples ${file_exe})
   ADD_DEPENDENCIES(install-all-examples install-${file_exe})
 ENDFOREACH(file)

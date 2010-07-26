@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # A few handles to build all examples in one shot.
 add_custom_target(all-examples)
+add_custom_target(create-install-dir COMMAND mkdir -p ${INSTALL_DIR}/bin)
 add_custom_target(install-all-examples)
 
 add_subdirectory(boosting)

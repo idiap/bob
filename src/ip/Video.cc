@@ -6,10 +6,9 @@ extern "C"
 {
 	#define __STDC_CONSTANT_MACROS
 
-	#include "avutil.h"
-	#include "avformat.h"
-	// WARNING: if you use libswscale below the code becomes GPL !!!
-	#include "swscale.h"
+	#include "libavutil/avutil.h"
+	#include "libavformat/avformat.h"
+	#include "libswscale/swscale.h"
 
 	// Example input program: http://web.me.com/dhoerl/Home/Tech_Blog/Entries/2009/1/22_Revised_avcodec_sample.c.html
 	// Example output program: http://cekirdek.pardus.org.tr/~ismail/ffmpeg-docs/output-example_8c-source.html

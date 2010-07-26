@@ -20,6 +20,13 @@ set(cblas_DIR extras)
 find_package(cblas) # configures lapack, cblas and atlas
 
 add_subdirectory(extras)
+
+# This will bring in the ffmpeg dependency. Please note that if you comment out
+# the ffmpeg building in extras/CMakeLists.txt, we will use that instead of the
+# system's version.
+set(ffmpeg_DIR extras)
+find_package(ffmpeg)
+
 add_subdirectory(src)
 
 # To compile the examples and, possibly, the pythonic bindings, we need

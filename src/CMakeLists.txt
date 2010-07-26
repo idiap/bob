@@ -16,6 +16,7 @@ SET(TORCH5SPRO_INCLUDE "" CACHE INTERNAL "included")
 # CBLAS
 ADD_DEFINITIONS(-DUSE_CBLAS)
 INCLUDE_DIRECTORIES(${cblas_INCLUDE};${lapack_INCLUDE})
+LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 
 # JPEG
 ADD_DEFINITIONS(-DHAVE_JPEG)
@@ -34,13 +35,11 @@ INCLUDE_DIRECTORIES("${INCLUDE_DIR}/lbfgs")
 #ADD_DEFINITIONS(-DHAVE_TIFF)
 
 # FFMPEG
-ADD_DEFINITIONS(-DHAVE_FFMPEG)
-INCLUDE_DIRECTORIES("${INCLUDE_DIR}")
-INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libavutil")
-INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libavformat")
-INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libavcodec")
-INCLUDE_DIRECTORIES("${INCLUDE_DIR}/libswscale")
-# End EDIT
+IF(ffmpeg_FOUND)
+  ADD_DEFINITIONS(-DHAVE_FFMPEG)
+  INCLUDE_DIRECTORIES(${ffmpeg_INCLUDE_DIRS})
+  LINK_DIRECTORIES(${ffmpeg_LIBRARY_DIRS})
+ENDIF(ffmpeg_FOUND)
 
 ########################################################
 # Sub-directories with source code
@@ -75,7 +74,6 @@ endif(COMMAND cmake_policy)
 # This is the library with the source files gathered
 #	from the sub-directories specified above
 INCLUDE_DIRECTORIES(${TORCH5SPRO_INCLUDE})
-LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 ADD_LIBRARY(torch5spro SHARED ${TORCH5SPRO_SRC})
 ADD_LIBRARY(torch5spro-static STATIC ${TORCH5SPRO_SRC})
 SET_TARGET_PROPERTIES(torch5spro-static PROPERTIES OUTPUT_NAME "torch5spro")
@@ -84,28 +82,26 @@ INSTALL(TARGETS torch5spro LIBRARY DESTINATION ${INSTALL_DIR}/lib)
 INSTALL(TARGETS torch5spro-static ARCHIVE DESTINATION ${INSTALL_DIR}/lib)
 
 # There is a dependence between Torch5 and all the extras
-# for ffmpeg, specifically, we need to make sure to download it before we
-# compile Torch5.
-ADD_DEPENDENCIES(torch5spro ffmpeg jpeg lbfgs oourafft) 
-ADD_DEPENDENCIES(torch5spro-static ffmpeg jpeg lbfgs oourafft) 
+ADD_DEPENDENCIES(torch5spro jpeg lbfgs oourafft) 
+ADD_DEPENDENCIES(torch5spro-static jpeg lbfgs oourafft) 
 
 # The linkage which is required for torch5spro
 TARGET_LINK_LIBRARIES(torch5spro-static libjpeg.a)
 TARGET_LINK_LIBRARIES(torch5spro-static liblbfgs.a)
 TARGET_LINK_LIBRARIES(torch5spro-static liboourafft.a)
-TARGET_LINK_LIBRARIES(torch5spro-static libavformat.a)
-TARGET_LINK_LIBRARIES(torch5spro-static libavcodec.a)
-TARGET_LINK_LIBRARIES(torch5spro-static libavutil.a)
-TARGET_LINK_LIBRARIES(torch5spro-static libswscale.a)
 TARGET_LINK_LIBRARIES(torch5spro-static ${cblas_ARCHIVES})
 TARGET_LINK_LIBRARIES(torch5spro -ljpeg)
 TARGET_LINK_LIBRARIES(torch5spro -llbfgs)
 TARGET_LINK_LIBRARIES(torch5spro -loourafft)
-TARGET_LINK_LIBRARIES(torch5spro -lavformat)
-TARGET_LINK_LIBRARIES(torch5spro -lavcodec)
-TARGET_LINK_LIBRARIES(torch5spro -lavutil)
-TARGET_LINK_LIBRARIES(torch5spro -lswscale)
 TARGET_LINK_LIBRARIES(torch5spro ${cblas_LIBRARIES})
+
+# The ffmpeg addons
+IF(ffmpeg_FOUND)
+  TARGET_LINK_LIBRARIES(torch5spro ${ffmpeg_LIBRARIES}) 
+  FOREACH(ffmod ${ffmpeg_STATIC_LIBRARIES})
+    TARGET_LINK_LIBRARIES(torch5spro-static lib${ffmod}.a)
+  ENDFOREACH(ffmod ${ffmpeg_STATIC_LIBRARIES})
+ENDIF(ffmpeg_FOUND)
 
 # This will trigger cmake to immediately copy Torch headers into the install
 # location
