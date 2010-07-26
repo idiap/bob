@@ -97,7 +97,7 @@ TARGET_LINK_LIBRARIES(torch5spro ${cblas_LIBRARIES})
 
 # The ffmpeg addons
 IF(ffmpeg_FOUND)
-  TARGET_LINK_LIBRARIES(torch5spro ${ffmpeg_LIBRARIES}) 
+  TARGET_LINK_LIBRARIES(torch5spro ${ffmpeg_LIBRARIES})
   FOREACH(ffmod ${ffmpeg_STATIC_LIBRARIES})
     TARGET_LINK_LIBRARIES(torch5spro-static lib${ffmod}.a)
   ENDFOREACH(ffmod ${ffmpeg_STATIC_LIBRARIES})
