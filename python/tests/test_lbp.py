@@ -35,10 +35,27 @@ def generate_3x3_image(image, values):
   image.set(1, 0, 0, int(values[8]))
   #image.save('img_%s.pgm' % values)
 
+def rotate(v, size=8):
+  """Rotates the LSB bit in v, making it a HSB"""
+  lsb = v & 1
+  v >>= 1
+  return (lsb << (size-1)) | v
+
 def calculate_lbp8r_rotinvariant_value(v):
   """Calculates the rotation invariant LBP code for a certain 8-bit value"""
-   
+  smallest = 0xff
+  tmp = v
+  for k in range(8):
+    tmp = rotate(tmp)
+    if tmp < smallest: smallest = tmp
+  return smallest
 
+def calculate_lbp8r_rotinvariant_table():
+  retval = []
+  for k in range(256):
+    retval.append(calculate_lbp8r_rotinvariant_value(k))
+  return retval
+   
 class Processor:
 
   def __init__(self, operator, generator, center):
