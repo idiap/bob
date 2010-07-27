@@ -61,9 +61,11 @@ static bool fft2d_image(Torch::spCore& op, const Torch::Image& input,
   if (!op.process(finput)) return false;
   const Torch::Tensor& ot = op.getOutput(0);
   if (ot.size(1) != output.getWidth() || ot.size(0) != output.getHeight()) {
-    output.resize(ot.size(1), ot.size(0), 2);
+    output.resize(ot.size(1), ot.size(0), 3);
   }
-  output.copy(&ot);
+  Torch::ShortTensor narrowed;
+  narrowed.narrow(&output, 2, 0, 2); 
+  narrowed.copy(&ot); //only copy the first two planes
   return true;
 }
 
