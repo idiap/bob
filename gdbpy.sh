@@ -7,4 +7,4 @@ if [ $# = 0 ]; then
   exit 1
 fi
 
-gdb -silent --args `which python` $1
+gdb -silent --args `which python` $*
