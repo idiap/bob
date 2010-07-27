@@ -46,6 +46,13 @@ static boost::shared_ptr<Torch::Image> load_image(const char* filename)
   return boost::shared_ptr<Torch::Image>();
 }
 
+static boost::shared_ptr<Torch::Image> from_tensor(const Torch::Tensor& t)
+{
+  Torch::Image* retval = new Torch::Image(t.size(1), t.size(0), t.size(2));
+  if (retval->copyFrom(t)) return boost::shared_ptr<Torch::Image>(retval);
+  return boost::shared_ptr<Torch::Image>();
+}
+
 static bool save_image(const Torch::Image& i, const char* filename)
 {
   Torch::xtprobeImageFile loader;
@@ -56,6 +63,7 @@ void bind_ip_image()
 {
   class_<Torch::Image, boost::shared_ptr<Torch::Image>, bases<Torch::Object, Torch::ShortTensor> >("Image", init<optional<int, int, int> >((arg("width"), arg("height"), arg("planes"))))
     .def("__init__", make_constructor(load_image))
+    .def("__init__", make_constructor(from_tensor))
     .def("save", &save_image, (arg("self"), arg("filename")), "Saves the image using a standard format, guessed by the filename (e.g. jpg, ppm, pgm, tif or gif)")
     .def("resize", &Torch::Image::resize, (arg("self"), arg("width"), arg("height"), arg("planes")), "Resizes the current image")
     .def("copyFromImage", (bool (Torch::Image::*)(const Torch::Image&))&Torch::Image::copyFrom, (arg("self"), arg("image")), "Copy the data from the other image converting it appropriately taking into consideration the number of planes")

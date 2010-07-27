@@ -133,6 +133,21 @@ static boost::shared_ptr<Torch::Video> make_writeable_video_like_quietly
       get_video_bitrate(v), get_video_framerate(v), get_video_gop(v), false);
 }
 
+static bool video_write(Torch::Video& v, const Torch::Image& i) {
+  if (i.getNPlanes() == 3) return v.write(i);
+
+  //we are dealing with grayscale images, needs expansion to RGB
+  Torch::Image color_i(i.getWidth(), i.getHeight(), 3);
+  Torch::ShortTensor grays;
+  grays.select(&i, 2, 0); //get the gray levels
+  for (unsigned i=0; i<3; ++i) {
+    Torch::ShortTensor s;
+    s.select(&color_i, 2, i);
+    s.copy(&grays); //copy the gray levels over the 3 dimensions
+  }
+  return v.write(color_i);
+}
+
 void bind_ip_video()
 {
   enum_<Torch::Video::State>("State")
@@ -150,7 +165,7 @@ void bind_ip_video()
     .def("__init__", make_constructor(&make_writeable_video_like_quietly))
     .def("close", &Torch::Video::close, arg("self"), "Closes the video file, if it was opened")
     .def("read", &Torch::Video::read, (arg("self"), arg("image")), "Reads a single image from the video file.\n\nThis method will copy the video frame pixmap into the image object given as input parameter.")
-    .def("write", &Torch::Video::write, (arg("self"), arg("image")), "Write an image file into the video stream (single frame)")
+    .def("write", &video_write, (arg("self"), arg("image")), "Write an image file into the video stream (single frame)")
     .add_property("codec", &Torch::Video::codec)
     .add_property("nframes", &Torch::Video::getNFrames)
     .add_property("state", &Torch::Video::getState)
