@@ -46,7 +46,7 @@ bool spFFT::checkInput(const Tensor& input) const
 
 	if (input.nDimension() == 1)
 	{
-		print("spFFT::checkInput() assuming FFT 1D ...\n");
+		//print("spFFT::checkInput() assuming FFT 1D ...\n");
 
 	   	if(inverse)
 		{
@@ -69,7 +69,7 @@ bool spFFT::checkInput(const Tensor& input) const
 	{
 	   	if(inverse)
 		{
-			print("spFFT::checkInput() assuming inverse FFT 1D ...\n");
+			//print("spFFT::checkInput() assuming inverse FFT 1D ...\n");
 
 			int N_ = input.size(0);
 			unsigned int nn = nexthigher(N_); 
@@ -81,7 +81,7 @@ bool spFFT::checkInput(const Tensor& input) const
 		}
 		else
 		{
-			print("spFFT::checkInput() assuming FFT 2D ...\n");
+			//print("spFFT::checkInput() assuming FFT 2D ...\n");
 
 			int N_ = input.size(0);
 			unsigned int nn = nexthigher(N_); 
@@ -102,7 +102,7 @@ bool spFFT::checkInput(const Tensor& input) const
 	
 	if (input.nDimension() == 3)
 	{
-		print("spFFT::checkInput() assuming inverse FFT 2D ...\n");
+		//print("spFFT::checkInput() assuming inverse FFT 2D ...\n");
 
 	   	if(inverse == false)
 		{
@@ -147,7 +147,7 @@ bool spFFT::allocateOutput(const Tensor& input)
 	
 		if (input.nDimension() == 1)
 		{
-			print("spFFT::allocateOutput() assuming FFT 1D ...\n");
+			//print("spFFT::allocateOutput() assuming FFT 1D ...\n");
 
 			N = input.size(0);
 
@@ -159,7 +159,7 @@ bool spFFT::allocateOutput(const Tensor& input)
 		{
 		   	if(inverse)
 			{
-				print("spFFT::allocateOutput() assuming inverse FFT 1D ...\n");
+				//print("spFFT::allocateOutput() assuming inverse FFT 1D ...\n");
 
 				N = input.size(0);
 
@@ -169,7 +169,7 @@ bool spFFT::allocateOutput(const Tensor& input)
 			}
 			else
 			{
-				print("spFFT::allocateOutput() assuming FFT 2D ...\n");
+				//print("spFFT::allocateOutput() assuming FFT 2D ...\n");
 
 				H = input.size(0);
 				W = input.size(1);
@@ -181,7 +181,7 @@ bool spFFT::allocateOutput(const Tensor& input)
 		}
 		else if (input.nDimension() == 3)
 		{
-			print("spFFT::allocateOutput() assuming inverse FFT 2D ...\n");
+			//print("spFFT::allocateOutput() assuming inverse FFT 2D ...\n");
 
 			H = input.size(0);
 			W = input.size(1);
