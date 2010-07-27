@@ -9,6 +9,7 @@ LBP codes.
 
 import unittest
 import torch
+import math
 
 def generate_3x3_image(image, values):
   """Generates a 3x3 image from a 9-position value vector using the following
@@ -52,10 +53,57 @@ def calculate_lbp8r_rotinvariant_value(v):
 
 def calculate_lbp8r_rotinvariant_table():
   retval = []
+  map = {} #map into torch values
+  last = 1
   for k in range(256):
+    v = calculate_lbp8r_rotinvariant_value(k)
+    if not v in map.keys():
+      map[v] = last
+      last += 1
+    retval.append(map[v])
+  return retval
+
+def uniformity(v):
+  "Says the degree of uniformity of a certain pattern"
+  retval = 0
+  notation = ('%8s' % bin(v)).replace(' ', '0')
+  tmp = list(notation)
+  current = None
+  for k in tmp:
+    if current is None: #initialize
+      if tmp[0] != tmp[-1]: retval += 1
+    else:
+      if current != k: retval += 1
+    current = k
+  return retval
+
+def calculate_lbp8r_u2_table():
+  retval = []
+  map = {} #map into torch values
+  last = 1
+  for k in range(256):
+    if uniformity(k) <= 2: 
+      retval.append(k)
+    else: retval.append(0)
+  return retval
+
+def calculate_lbp8r_riu2_table():
+  retval = []
+  for k in calculate_lbp8r_u2_table():
     retval.append(calculate_lbp8r_rotinvariant_value(k))
   return retval
-   
+
+def bilinear_interpolation(image, x, y):
+  """Calculates the bilinear interpolation value for a certain point in the
+  given image."""
+  xl = int(math.floor(x))
+  xh = int(math.ceil(x))
+  yl = int(math.floor(y))
+  yh = int(math.floor(y))
+  y1 = ((xh - x) * image.get(yl, xl)) + ((x - xl) * image.get(yl, xh))
+  y2 = ((xh - x) * image.get(yh, xl)) + ((x - xl) * image.get(yh, xh))
+  retval = ((yh - y) * y1) + ((y - yl) * y2)
+
 class Processor:
 
   def __init__(self, operator, generator, center):
@@ -68,6 +116,10 @@ class Processor:
     image = self.generator(self.image, value)
     self.operator.process(self.image)
     return self.operator.value
+
+def bin(s, m=1):
+  """Converts the number s into its binary representation (as a string)"""
+  return str(m*s) if s<=1 else bin(s>>1, m) + str(m*(s&1))
 
 class LBPTest(unittest.TestCase):
   """Performs various tests for the Torch::ipLBP and friends types."""
@@ -190,6 +242,53 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc('102000200'), 0xa) #average is 1.0
     self.assertEqual(proc('102020202'), 0xf) #average is 1.8
     #self.assertEqual(op.max_label, 0xf) this is set to 16!
+
+  def test06_vanilla_8p1r(self):
+    op = torch.ip.ipLBP8R(1)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      self.assertEqual(proc(v), i)
+
+  def test07_rotinvariant_8p1r(self):
+    op = torch.ip.ipLBP8R(1)
+    op.setBOption("RotInvariant", True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    table = calculate_lbp8r_rotinvariant_table()
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      self.assertEqual(proc(v), table[i])
+
+  def test08_u2_8p1r(self):
+    op = torch.ip.ipLBP8R(1)
+    op.setBOption("Uniform", True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    table = calculate_lbp8r_u2_table()
+    values = []
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      values.append(proc(v))
+      # just check that the zeros are good
+      if not table[i] and i: self.assertEqual(values[-1], 0)
+      if values[-1] and i: 
+        self.assertEqual(bool(table[i]), True)
+    self.assertEqual(len(set(values)), len(set(table))+1)
+
+  def test09_riu2_8p1r(self):
+    op = torch.ip.ipLBP8R(1)
+    op.setBOption("RotInvariant", True)
+    op.setBOption("Uniform", True)
+    proc = Processor(op, generate_3x3_image, (1,1))
+    table = calculate_lbp8r_riu2_table()
+    values = []
+    for i in range(256):
+      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+      values.append(proc(v)) 
+      # just check that the zeros are good
+      if not table[i] and i: self.assertEqual(values[-1], 0)
+      if values[-1] and i: 
+        self.assertEqual(bool(table[i]), True)
+    self.assertEqual(len(set(values)), len(set(table))+1)
 
 if __name__ == '__main__':
   import os, sys
