@@ -95,7 +95,6 @@ def main(dir, debug, csh):
   if uname[0].lower() == 'darwin': # we are under OSX
     dyld_library_path = os.environ.get('DYLD_LIBRARY_PATH', '')
     dyld_library_path = path_remove_if_startswith(dyld_library_path, base_dir)
-    dyld_library_path = path_add(dyld_library_path, '/opt/local/lib')
     dyld_library_path = path_add(dyld_library_path, libdir)
     # this is for taking into consideration our python mac ports installation
     all.append(('DYLD_LIBRARY_PATH', dyld_library_path))

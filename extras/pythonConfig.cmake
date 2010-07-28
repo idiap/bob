@@ -1,6 +1,10 @@
 # Tries to find a local version of Python installed
 # Andre Anjos - 09.july.2010
 
+# This includes in OSX, the MacPorts installation path, comment if you want to
+# use the stock python distribution.
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
+
 include(FindPythonLibs)
 include(FindPythonInterp)
 
