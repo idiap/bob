@@ -7,9 +7,10 @@
 """
 
 # These are some global parameters for the test.
-INPUT_VIDEO = '/idiap/group/vision/visidiap/databases/banca/english/videos/1001_f_g1_04_1001_en.avi'
+INPUT_VIDEO = 'test.mov'
 OUTPUT_VIDEO = '/tmp/video_test.avi'
 
+import os, sys
 import unittest
 import torch
 
@@ -60,4 +61,5 @@ class VideoTest(unittest.TestCase):
 if __name__ == '__main__':
   import sys
   sys.argv.append('-v')
+  os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
