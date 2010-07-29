@@ -11,4 +11,4 @@ endif (${TORCH_LINKAGE} STREQUAL static)
 set(Boost_USE_MULTITHREADED ON)
 
 # Determine here the components you need so the system can verify
-find_package(Boost COMPONENTS python)
+find_package(Boost COMPONENTS python unit_test_framework)
