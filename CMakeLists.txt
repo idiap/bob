@@ -34,6 +34,7 @@ add_subdirectory(src)
 set(TORCH5SPRO_INCLUDE ${TORCH5SPRO_INCLUDE};${INCLUDE_DIR}/torch5spro CACHE INTERNAL "included")
 
 add_subdirectory(test)
+add_subdirectory(benchmark)
 
 # This will bring in the Python bindings, if python was found
 
