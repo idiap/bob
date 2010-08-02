@@ -241,11 +241,26 @@ int main(int argc, char** argv) {
   benchmark_narrow(10000000, dt1);
   std::cout << std::endl;
 
-  //Operation tests
-  boost::format fsize("Add (%d,%d,%d,%d)");
-  std::string size = str(fsize % dt4.size(0) % dt4.size(1) % dt4.size(2) 
+  //Operation tests: add
+  boost::format fsize4("Add (%d,%d,%d,%d)");
+  std::string size = str(fsize4 % dt4.size(0) % dt4.size(1) % dt4.size(2) 
       % dt4.size(3));
   std::cout << H % size;
   benchmark_add(10, dt4, dt4);
+  std::cout << std::endl;
+  boost::format fsize3("Add (%d,%d,%d)");
+  size = str(fsize3 % dt3.size(0) % dt3.size(1) % dt3.size(2));
+  std::cout << H % size;
+  benchmark_add(5000, dt3, dt3);
+  std::cout << std::endl;
+  boost::format fsize2("Add (%d,%d)");
+  size = str(fsize2 % dt2.size(0) % dt2.size(1));
+  std::cout << H % size;
+  benchmark_add(50000, dt2, dt2);
+  std::cout << std::endl;
+  boost::format fsize1("Add (%d)");
+  size = str(fsize1 % dt1.size(0));
+  std::cout << H % size;
+  benchmark_add(2500000, dt1, dt1);
   std::cout << std::endl;
 }
