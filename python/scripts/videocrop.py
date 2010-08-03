@@ -74,9 +74,9 @@ def main():
       skipped += 1
       continue
 
-    smooth.learn(detections[0])
-    gt_file.load(smooth.p)
-    #gt_file.load(detections[0])
+    #smooth.learn(detections[0])
+    #gt_file.load(smooth.p)
+    gt_file.load(detections[0])
     if not geom_norm.process(buffer):
       raise RuntimeError, 'ipGeomNorm could not process image'
     oi = geom_norm.getOutputImage(0)
@@ -92,8 +92,8 @@ def main():
 
     if len(sys.argv) >= 5: 
       if not output:
-        output = torch.ip.Video(sys.argv[4], oi.getWidth(), oi.getHeight(),
-            input.bitrate(), input.framerate(), input.gop())
+        output = torch.ip.Video(sys.argv[4], oi.width, oi.height,
+            input.bitrate, input.framerate, input.gop)
       if not output.write(oi):
         raise RuntimeError, 'Video backend cannot write frame %d' % frame
 
