@@ -19,7 +19,7 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(cblas_DIR extras)
 find_package(cblas) # configures lapack, cblas and atlas
 
-# add_subdirectory(extras)
+add_subdirectory(extras)
 
 # This will bring in the ffmpeg dependency. Please note that if you comment out
 # the ffmpeg building in extras/CMakeLists.txt, we will use that instead of the

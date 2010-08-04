@@ -1,7 +1,7 @@
 #ifndef TENSOR_INC
 #define TENSOR_INC
 
-#include "general.h"
+#include "core/general.h"
 
 #define METHOD_NOT_IMPLEMENTED { warning("Not implemented !\n"); }
 
@@ -252,13 +252,13 @@ extern const char *str_TensorTypeName[];
 
 extern "C"
 {
-#include "TH.h"
+#include "th/TH.h"
 }
 
 #define TYPE char
 #define CAP_TYPE Char
 #define TYPE_FORMAT "%d"
-#include "TensorGen.h"
+#include "core/TensorGen.h"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -266,7 +266,7 @@ extern "C"
 #define TYPE short
 #define CAP_TYPE Short
 #define TYPE_FORMAT "%d"
-#include "TensorGen.h"
+#include "core/TensorGen.h"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -274,7 +274,7 @@ extern "C"
 #define TYPE int
 #define CAP_TYPE Int
 #define TYPE_FORMAT "%d"
-#include "TensorGen.h"
+#include "core/TensorGen.h"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -282,7 +282,7 @@ extern "C"
 #define TYPE long
 #define CAP_TYPE Long
 #define TYPE_FORMAT "%ld"
-#include "TensorGen.h"
+#include "core/TensorGen.h"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -290,7 +290,7 @@ extern "C"
 #define TYPE float
 #define CAP_TYPE Float
 #define TYPE_FORMAT "%f"
-#include "TensorGen.h"
+#include "core/TensorGen.h"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -299,7 +299,7 @@ extern "C"
 #define CAP_TYPE Double
 #define TYPE_FORMAT "%g"
 #define DEFAULT_TENSOR
-#include "TensorGen.h"
+#include "core/TensorGen.h"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE

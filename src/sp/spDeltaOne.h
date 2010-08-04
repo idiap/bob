@@ -2,7 +2,7 @@
 #define _TORCHSPRO_SP_DELTA_ONE_H_
 
 #include "core/Tensor.h"
-#include "sp/spCore.h"
+#include "core/spCore.h"
 
 namespace Torch
 {

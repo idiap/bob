@@ -36,6 +36,7 @@ endif(COMMAND cmake_policy)
 
 # This makes sure we have all headers within reach before starting to compile
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+link_directories(${INSTALL_DIR}/lib)
 
 # to-do:
 #	ip
