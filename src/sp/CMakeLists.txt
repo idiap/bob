@@ -1,10 +1,16 @@
-#
-# Add the source files to the list of files to be added to the library
-#
-PROJECT(sp)
-set(THIS sp)
+project(sp)
+cmake_minimum_required(VERSION 2.4)
 
-SET(${THIS}_SRC "spFFT.cc" "spDCT.cc" "spDeltaOne.cc" "ooura.cc"
-	CACHE INTERNAL "sources")
+# This defines the dependencies of this package
+set(deps core) #other torch subprojects
 
-include(../SetupPackage.cmake)
+add_definitions(-DHAVE_OOURAFFT)
+include_directories("${INCLUDE_DIR}/oourafft")
+set(shared "oourafft")
+set(archive "liboourafft.a")
+
+# This defines the list of source files inside this package.
+set(src "spFFT.cc" "spDCT.cc" "spDeltaOne.cc" "ooura.cc")
+
+include(../macros.cmake)
+torch_package(sp "${src}" "${deps}" "${shared}" "${archive}")

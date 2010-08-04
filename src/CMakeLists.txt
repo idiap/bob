@@ -13,10 +13,6 @@ cmake_minimum_required(VERSION 2.4)
 ADD_DEFINITIONS(-DHAVE_JPEG)
 INCLUDE_DIRECTORIES("${INCLUDE_DIR}/jpeg")
 
-# OOURA FFT
-ADD_DEFINITIONS(-DHAVE_OOURAFFT)
-INCLUDE_DIRECTORIES("${INCLUDE_DIR}/oourafft")
-
 # LBFGS
 ADD_DEFINITIONS(-DHAVE_LBFGS)
 ADD_DEFINITIONS(-DUSE_SSE)
@@ -51,6 +47,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 #	boosting
 #	measurer
 #	geometry
-foreach(subdir th core)
+foreach(subdir th core sp)
 	add_subdirectory(${subdir})
 endforeach(subdir)
