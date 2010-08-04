@@ -46,17 +46,17 @@ ENDIF(ffmpeg_FOUND)
 ########################################################
 
 SET(TORCH5SPRO_SUBDIRS
-	th
-	core
-  ip
-	sp
-	ap
-	scanning
-	machine
-	trainer
-	boosting
-	measurer
-	geometry)
+	th)
+#	core
+#	ip
+#	sp
+#	ap
+#	scanning
+#	machine
+#	trainer
+#	boosting
+#	measurer
+#	geometry)
 
 FOREACH(subdir ${TORCH5SPRO_SUBDIRS})
 	ADD_SUBDIRECTORY(${subdir})
