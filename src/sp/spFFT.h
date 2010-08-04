@@ -1,8 +1,8 @@
 #ifndef _TORCHSPRO_SP_FFT_H_
 #define _TORCHSPRO_SP_FFT_H_
 
-#include "Tensor.h"
-#include "spCore.h"		// <ipCrop> is a <Torch::ipCore>
+#include "core/Tensor.h"
+#include "sp/spCore.h"		// <ipCrop> is a <Torch::ipCore>
 
 namespace Torch
 {

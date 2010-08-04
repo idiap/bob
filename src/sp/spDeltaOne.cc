@@ -1,4 +1,4 @@
-#include "spDeltaOne.h"
+#include "sp/spDeltaOne.h"
 
 namespace Torch {
 

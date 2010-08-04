@@ -1,8 +1,8 @@
 #ifndef _TORCHSPRO_SP_DCT_H_
 #define _TORCHSPRO_SP_DCT_H_
 
-#include "Tensor.h"
-#include "spCore.h"
+#include "core/Tensor.h"
+#include "sp/spCore.h"
 
 namespace Torch
 {
