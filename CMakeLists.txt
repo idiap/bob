@@ -19,7 +19,7 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(cblas_DIR extras)
 find_package(cblas) # configures lapack, cblas and atlas
 
-add_subdirectory(extras)
+# add_subdirectory(extras)
 
 # This will bring in the ffmpeg dependency. Please note that if you comment out
 # the ffmpeg building in extras/CMakeLists.txt, we will use that instead of the
@@ -36,18 +36,18 @@ set(TORCH5SPRO_INCLUDE ${TORCH5SPRO_INCLUDE};${INCLUDE_DIR}/torch5spro CACHE INT
 set(SystemBoost_DIR extras)
 find_package(SystemBoost) # configures boost found on the current system
 
-add_subdirectory(test)
-add_subdirectory(benchmark)
+#add_subdirectory(test)
+#add_subdirectory(benchmark)
 
 # This will bring in the Python bindings, if python was found
 set(python_DIR extras)
 find_package(python) # configures pytohn found on the current system
 
-if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
-  add_subdirectory(python)
-else (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
-  message("Boost::Python bindings are DISABLED")
-endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+#if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+#  add_subdirectory(python)
+#else (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+#  message("Boost::Python bindings are DISABLED")
+#endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
 # If you call our build scripts (release.sh or debug.sh), the examples are
 # built at the end, after extras and torch5 as the examples need a header file
