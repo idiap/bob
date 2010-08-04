@@ -33,14 +33,13 @@ add_subdirectory(src)
 # to include the place for the unified header
 set(TORCH5SPRO_INCLUDE ${TORCH5SPRO_INCLUDE};${INCLUDE_DIR}/torch5spro CACHE INTERNAL "included")
 
+set(SystemBoost_DIR extras)
+find_package(SystemBoost) # configures boost found on the current system
+
 add_subdirectory(test)
 add_subdirectory(benchmark)
 
 # This will bring in the Python bindings, if python was found
-
-set(SystemBoost_DIR extras)
-find_package(SystemBoost) # configures boost found on the current system
-
 set(python_DIR extras)
 find_package(python) # configures pytohn found on the current system
 
