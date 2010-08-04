@@ -1,7 +1,7 @@
 #ifndef _TORCHSPRO_IP_BLOCK_H_
 #define _TORCHSPRO_IP_BLOCK_H_
 
-#include "ipCore.h"		
+#include "core/ipCore.h"		
 
 namespace Torch
 {

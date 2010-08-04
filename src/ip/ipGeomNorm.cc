@@ -1,5 +1,5 @@
 #include "ipGeomNorm.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 #include "trigonometry.h"
 #include "RotationMatrix2D.h"
 #include "Point2D.h"

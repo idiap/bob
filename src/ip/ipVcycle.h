@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_IP_VCYCLE_H_
 #define _TORCH5SPRO_IP_VCYCLE_H_
 
-#include "ipCore.h"
+#include "core/ipCore.h"
 
 #define IS_NEAR(var, value, delta) ((var >= (value - delta)) && (var <= (value + delta)))
 

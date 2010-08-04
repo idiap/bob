@@ -1,5 +1,4 @@
 #include "ipRotate.h"
-#include "Tensor.h"
 
 namespace Torch {
 

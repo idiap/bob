@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_MULTIGRID_H_
 #define _TORCH5SPRO_MULTIGRID_H_
 
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 // used for the coefficients
 #define CENTER 0

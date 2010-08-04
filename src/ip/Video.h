@@ -1,7 +1,7 @@
 #ifndef VIDEO_INC
 #define VIDEO_INC
 
-#include "Object.h"
+#include "core/Object.h"
 
 namespace Torch
 {

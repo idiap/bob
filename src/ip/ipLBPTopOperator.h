@@ -11,8 +11,8 @@
 #ifndef TORCH_IPLBPTOP_OPERATOR_H 
 #define TORCH_IPLBPTOP_OPERATOR_H
 
-#include "Object.h"
-#include "Tensor.h"
+#include "core/Object.h"
+#include "core/Tensor.h"
 #include "Image.h"
 #include "ipLBP.h"
 

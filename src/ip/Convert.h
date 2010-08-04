@@ -1,7 +1,7 @@
 #ifndef CONVERT_INC
 #define CONVERT_INC
 
-#include "general.h"
+#include "core/general.h"
 
 namespace Torch {
 

@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_IP_MULTISCALE_RETINEX_H_
 #define _TORCH5SPRO_IP_MULTISCALE_RETINEX_H_
 
-#include "ipCore.h"
+#include "core/ipCore.h"
 
 namespace Torch {
 

@@ -1,7 +1,7 @@
 #ifndef IMAGE_INC
 #define IMAGE_INC
 
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 namespace Torch {
 

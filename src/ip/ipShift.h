@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_IP_SHIFT_H_
 #define _TORCHVISION_IP_SHIFT_H_
 
-#include "ipCore.h"		// <ipShift> is a <Torch::ipCore>
+#include "core/ipCore.h"		// <ipShift> is a <Torch::ipCore>
 
 namespace Torch
 {

@@ -46,6 +46,6 @@ link_directories(${INSTALL_DIR}/lib)
 #	boosting
 #	measurer
 #	geometry
-foreach(subdir th core sp ap)
+foreach(subdir th core sp ap ip)
 	add_subdirectory(${subdir})
 endforeach(subdir)

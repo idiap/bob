@@ -1,7 +1,7 @@
 #ifndef _IMAGE_SCAN_DATA_SET_INC
 #define _IMAGE_SCAN_DATA_SET_INC
 
-#include "DataSet.h"
+#include "core/DataSet.h"
 
 namespace Torch
 {

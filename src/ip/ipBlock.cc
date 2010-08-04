@@ -1,5 +1,5 @@
 #include "ipBlock.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 namespace Torch {
 

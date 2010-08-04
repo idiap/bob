@@ -1,7 +1,8 @@
 #ifndef _TORCHVISION_IP_SCALE_YX_H_
 #define _TORCHVISION_IP_SCALE_YX_H_
 
-#include "ipCore.h"		// <ipScaleYX> is a <Torch::ipCore>
+#include "core/ipCore.h"		// <ipScaleYX> is a <Torch::ipCore>
+#include "vision.h"
 
 namespace Torch
 {

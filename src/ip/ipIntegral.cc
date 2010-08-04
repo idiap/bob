@@ -1,5 +1,5 @@
 #include "ipIntegral.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 /////////////////////////////////////////////////////////////////////////
 // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]

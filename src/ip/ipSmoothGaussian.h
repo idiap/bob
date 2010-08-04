@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_IP_SMOOTH_GAUSSIAN_H_
 #define _TORCHVISION_IP_SMOOTH_GAUSSIAN_H_
 
-#include "ipCore.h"		// <ipSmoothGaussian> is a <Torch::ipCore>
+#include "core/ipCore.h"		// <ipSmoothGaussian> is a <Torch::ipCore>
 
 namespace Torch {
 

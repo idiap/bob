@@ -1,6 +1,6 @@
 #include "ipLBPBitmap.h"
 #include "ipLBP.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 namespace Torch {
 

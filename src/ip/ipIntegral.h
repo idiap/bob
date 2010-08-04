@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_IP_INTEGRAL_H_
 #define _TORCHVISION_IP_INTEGRAL_H_
 
-#include "ipCore.h"		// <ipIntegral> is a <Torch::ipCore>
+#include "core/ipCore.h"		// <ipIntegral> is a <Torch::ipCore>
 
 namespace Torch
 {

@@ -9,8 +9,8 @@
 #ifndef TORCH_VIDEOTENSOR_H 
 #define TORCH_VIDEOTENSOR_H
 
-#include "Tensor.h"
-#include "TensorFile.h"
+#include "core/Tensor.h"
+#include "core/TensorFile.h"
 #include "Image.h"
 #include "Video.h"
 

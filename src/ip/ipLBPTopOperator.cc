@@ -9,7 +9,7 @@
 #include "ipLBP.h"
 #include "ipLBP4R.h"
 #include "ipLBP8R.h"
-#include "general.h"
+#include "core/general.h"
 
 Torch::ipLBPTopOperator::ipLBPTopOperator(int radius_xy, 
                                           int points_xy, 

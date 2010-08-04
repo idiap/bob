@@ -1,10 +1,10 @@
 #ifndef _TORCHVISION_IP_ROTATE_H_
 #define _TORCHVISION_IP_ROTATE_H_
 
-#include "ipCore.h"		// <ipRotate> is a <Torch::ipCore>
+#include "core/ipCore.h"		// <ipRotate> is a <Torch::ipCore>
 #include "RotationMatrix2D.h"
 #include "ipShift.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

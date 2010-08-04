@@ -1,5 +1,5 @@
 #include "ipFlip.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 #include <iostream>
 
 namespace Torch {

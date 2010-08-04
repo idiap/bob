@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_IMAGE_FILE_H_
 #define _TORCH5SPRO_IMAGE_FILE_H_
 
-#include "File.h"
+#include "core/File.h"
 
 namespace Torch
 {

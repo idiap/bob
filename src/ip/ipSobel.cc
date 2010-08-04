@@ -1,5 +1,4 @@
 #include "ipSobel.h"
-#include "Tensor.h"
 
 namespace Torch
 {

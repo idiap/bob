@@ -1,7 +1,7 @@
 #ifndef VISION_INC
 #define VISION_INC
 
-#include "general.h"
+#include "core/general.h"
 
 namespace Torch {
 

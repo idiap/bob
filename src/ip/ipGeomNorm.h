@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_IP_GEOM_NORM_H_
 #define _TORCHVISION_IP_GEOM_NORM_H_
 
-#include "ipCore.h"		// <ipGeomNorm> is a <Torch::ipCore>
+#include "core/ipCore.h"		// <ipGeomNorm> is a <Torch::ipCore>
 #include "vision.h"		// <sPoint2D> definition
 #include "ipRotate.h"
 #include "ipScaleYX.h"
