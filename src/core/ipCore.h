@@ -2,7 +2,6 @@
 #define IPCORE_INC
 
 #include "spCore.h"
-#include "vision.h"		// <sSize> definition
 
 namespace Torch
 {
