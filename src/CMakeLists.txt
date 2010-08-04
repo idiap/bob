@@ -46,8 +46,8 @@ ENDIF(ffmpeg_FOUND)
 ########################################################
 
 SET(TORCH5SPRO_SUBDIRS
-	th)
-#	core
+	th
+	core)
 #	ip
 #	sp
 #	ap
