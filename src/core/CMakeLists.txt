@@ -1,10 +1,9 @@
-#
-# Add the source files to the list of files to be added to the library
-#
-PROJECT(core)
-set(THIS core)
+project(core)
+cmake_minimum_required(VERSION 2.4)
 
-SET(${THIS}_SRC
+include(../macros.cmake)
+
+SET(src
 		"general.cc"
 		"VariableCollector.cc"
 		"Object.cc"
@@ -28,7 +27,11 @@ SET(${THIS}_SRC
 		"FileListCmdOption.cc"
 		"FileList.cc"
 		"CmdLine.cc"
-		"CmdFile.cc"
-	CACHE INTERNAL "sources")
+		"CmdFile.cc")
 
-include(../SetupPackage.cmake)
+set(this core)
+set(deps torch_th)
+torch_shlib(torch_${this} ${src} ${deps} "" ${INSTALL_DIR}/lib)
+torch_archive(torch_${this} ${src} ${deps} "" ${INSTALL_DIR}/lib)
+
+file(COPY ./ DESTINATION ${INCLUDE_DIR}/torch/${this} FILES_MATCHING PATTERN "*.h")

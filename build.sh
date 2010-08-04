@@ -72,9 +72,10 @@ echo "Includes directory: ${include_dir}"
 root_dir=`pwd`
 cd ${build_dir}
 cmake -DCMAKE_BUILD_TYPE=${build_type} -DPLATFORM=${platform} -DINSTALL_DIR=${install_dir} -DINCLUDE_DIR=${include_dir} -DDIST_ROOT=${prefix} -DCPU_COUNT=${cpu_count} -DTORCH_LINKAGE=${linkage} ${prefix}
-make -j${cpu_count} all
-make -j${cpu_count} install 
-#make VERBOSE=1 all
+#make -j${cpu_count} all
+#make -j${cpu_count} install 
+make VERBOSE=1 all
+exit 0
 
 # Observation on "make -jX": Please note that the subproject ffmpeg does not
 # compile on the first try, in parallel. A second call to "make -j" sorts the

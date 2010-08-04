@@ -1,18 +1,13 @@
 #
 # Top level project
 #
-PROJECT(TORCH5SPRO)
+project(torch)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+cmake_minimum_required(VERSION 2.4)
 
 ########################################################
 # Additional libraries
 ########################################################
-
-# CBLAS
-ADD_DEFINITIONS(-DUSE_CBLAS)
-INCLUDE_DIRECTORIES(${cblas_INCLUDE};${lapack_INCLUDE})
-LINK_DIRECTORIES(${INSTALL_DIR}/lib)
 
 # JPEG
 ADD_DEFINITIONS(-DHAVE_JPEG)
@@ -37,13 +32,16 @@ IF(ffmpeg_FOUND)
   LINK_DIRECTORIES(${ffmpeg_LIBRARY_DIRS})
 ENDIF(ffmpeg_FOUND)
 
-########################################################
-# Sub-directories with source code
-########################################################
+# Avoids warning during linkage configuration see: cmake --help-policy CMP0003
+# for details.
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
-SET(TORCH5SPRO_SUBDIRS
-	th)
-  #	core)
+# This makes sure we have all headers within reach before starting to compile
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+# to-do:
 #	ip
 #	sp
 #	ap
@@ -52,14 +50,7 @@ SET(TORCH5SPRO_SUBDIRS
 #	trainer
 #	boosting
 #	measurer
-#	geometry)
-
-FOREACH(subdir ${TORCH5SPRO_SUBDIRS})
-	ADD_SUBDIRECTORY(${subdir})
-ENDFOREACH(subdir)
-
-# Avoids warning during linkage configuration see: cmake --help-policy CMP0003
-# for details.
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+#	geometry
+foreach(subdir th core)
+	add_subdirectory(${subdir})
+endforeach(subdir)
