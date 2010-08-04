@@ -1,9 +1,13 @@
 project(core)
 cmake_minimum_required(VERSION 2.4)
 
-include(../macros.cmake)
+# This defines the dependencies of this package
+set(deps th) #other torch subprojects
+set(shared "") #shared externals to link against (link)
+set(archive "") #external archives to link against (merge)
 
-SET(src
+# This defines the list of source files inside this package.
+set(src
 		"general.cc"
 		"VariableCollector.cc"
 		"Object.cc"
@@ -29,9 +33,5 @@ SET(src
 		"CmdLine.cc"
 		"CmdFile.cc")
 
-set(this core)
-set(deps torch_th)
-torch_shlib(torch_${this} ${src} ${deps} "" ${INSTALL_DIR}/lib)
-torch_archive(torch_${this} ${src} ${deps} "" ${INSTALL_DIR}/lib)
-
-file(COPY ./ DESTINATION ${INCLUDE_DIR}/torch/${this} FILES_MATCHING PATTERN "*.h")
+include(../macros.cmake)
+torch_package(core "${src}" "${deps}" "${shared}" "${archive}")
