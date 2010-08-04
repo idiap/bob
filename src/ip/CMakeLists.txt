@@ -41,6 +41,7 @@ SET(${THIS}_SRC
 		"ipTanTriggs.cc"
 		"ipRescaleGray.cc"
     "ipLBPTopOperator.cc"
+		"ImageScanDataSet.cc"
 #		"ipHOG.cc"
 #		"ipGabor.cc"
 	CACHE INTERNAL "sources")

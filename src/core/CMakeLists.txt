@@ -17,7 +17,6 @@ SET(${THIS}_SRC
 		"DataSet.cc"
 		"MemoryDataSet.cc"
 		"DiskDataSet.cc"
-		"ImageScanDataSet.cc"
 		"Trainer.cc"
 		"Machine.cc"
 		"Tensor.cc"
