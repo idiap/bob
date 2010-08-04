@@ -1,8 +1,11 @@
-#
-# Add the source files to the list of files to be added to the library
-#
 PROJECT(ap)
-set(THIS ap)
+cmake_minimum_required(VERSION 2.4)
 
-SET(${THIS}_SRC "apMFCC.cc" "apLFCC.cc")
-include(../SetupPackage.cmake)
+# This defines the dependencies of this package
+set(deps core) #other torch subprojects
+
+# This defines the list of source files inside this package.
+SET(src "apMFCC.cc" "apLFCC.cc")
+
+include(../macros.cmake)
+torch_package(ap "${src}" "${deps}" "${shared}" "${archive}")

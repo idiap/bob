@@ -1,8 +1,8 @@
 #ifndef _TORCHSPRO_AP_LFCC_H_
 #define _TORCHSPRO_AP_LFCC_H_
 
-#include "Tensor.h"
-#include "apCore.h"
+#include "core/Tensor.h"
+#include "core/apCore.h"
 
 namespace Torch
 {

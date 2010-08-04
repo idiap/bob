@@ -40,14 +40,12 @@ link_directories(${INSTALL_DIR}/lib)
 
 # to-do:
 #	ip
-#	sp
-#	ap
 #	scanning
 #	machine
 #	trainer
 #	boosting
 #	measurer
 #	geometry
-foreach(subdir th core sp)
+foreach(subdir th core sp ap)
 	add_subdirectory(${subdir})
 endforeach(subdir)
