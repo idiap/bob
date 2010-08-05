@@ -2,7 +2,7 @@
 #define POINT3D_INC
 
 #include "geomObject.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 namespace Torch {
 

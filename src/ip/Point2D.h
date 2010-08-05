@@ -3,7 +3,7 @@
 
 #include "geomObject.h"
 #include "trigonometry.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 namespace Torch {
 

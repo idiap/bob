@@ -1,7 +1,7 @@
 #ifndef TRIGONOMETRY_INC
 #define TRIGONOMETRY_INC
 
-#include "general.h"
+#include "core/general.h"
 
 namespace Torch
 {

@@ -37,7 +37,7 @@ set(src_ip
 		"ipSmoothGaussian.cc"
 		"ipSobel.cc"
 		"ipFlip.cc"
-#		"ipRotate.cc"
+		"ipRotate.cc"
 		"ipShift.cc"
 #		"ipGeomNorm.cc"
 		"Video.cc"
@@ -65,9 +65,29 @@ set(src_imagefiles
 		"jpegImageFile.cc"
 		"tiffImageFile.cc")
 
+set(src_geometry
+		"Affine2D.cc"
+		"Circle2D.cc"
+		"Line2D.cc"
+		"Matrix2D.cc"
+		"Octon2D.cc"
+		"Plane.cc"
+		"Point2D.cc"
+		"Point3D.cc"
+		"Polygon2D.cc"
+		"Ray2D.cc"
+		"Rectangle2D.cc"
+		"RotationMatrix2D.cc"
+		"Segment2D.cc"
+		"Triangle2D.cc"
+		"Vector2D.cc"
+		"Vector3D.cc"
+		"trigonometry.cc")
+
 set(src 
 		"${src_ip}" 
-		"${src_imagefiles}")
+		"${src_imagefiles}"
+		"${src_geometry}")
 
 
 include(../macros.cmake)

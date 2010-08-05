@@ -1,8 +1,8 @@
 #ifndef MATRIX2D_INC
 #define MATRIX2D_INC
 
-#include "general.h"
-#include "Tensor.h"
+#include "core/general.h"
+#include "core/Tensor.h"
 
 namespace Torch {
 
