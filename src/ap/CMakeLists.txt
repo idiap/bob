@@ -8,4 +8,4 @@ set(deps core) #other torch subprojects
 SET(src "apMFCC.cc" "apLFCC.cc")
 
 include(../macros.cmake)
-torch_package(ap "${src}" "${deps}" "${shared}" "${archive}")
+torch_package(ap "${src}" "${deps}" "${shared}")

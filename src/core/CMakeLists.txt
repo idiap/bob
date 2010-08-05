@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 2.4)
 # This defines the dependencies of this package
 set(deps th) #other torch subprojects
 set(shared "") #shared externals to link against (link)
-set(archive "") #external archives to link against (merge)
 
 # This defines the list of source files inside this package.
 set(src
@@ -34,4 +33,4 @@ set(src
 		"CmdFile.cc")
 
 include(../macros.cmake)
-torch_package(core "${src}" "${deps}" "${shared}" "${archive}")
+torch_package(core "${src}" "${deps}" "${shared}")
