@@ -15,7 +15,7 @@ include_directories("${INCLUDE_DIR}/oourafft")
 set(shared "-loourafft")
 
 # This defines the list of source files inside this package.
-set(src
+set(src_ip
 		"vision.cc"
 		"Color.cc"
 		"Complex.cc"
@@ -23,7 +23,7 @@ set(src
 		"Image.cc"
 		"ImageFile.cc"
 		"ipIntegral.cc"
-#		"xtprobeImageFile.cc"
+		"xtprobeImageFile.cc"
 		"ipScaleYX.cc"
 		"ipCrop.cc"
 		"ipBlock.cc"
@@ -56,6 +56,19 @@ set(src
 )
 #		"ipHOG.cc"
 #		"ipGabor.cc"
+
+
+set(src_imagefiles
+		"pgmImageFile.cc"
+		"ppmImageFile.cc"
+		"gifImageFile.cc"
+		"jpegImageFile.cc"
+		"tiffImageFile.cc")
+
+set(src 
+		"${src_ip}" 
+		"${src_imagefiles}")
+
 
 include(../macros.cmake)
 torch_package(ip "${src}" "${deps}" "${shared}")
