@@ -33,13 +33,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 link_directories(${INSTALL_DIR}/lib)
 
 # to-do:
-#	ip
 #	scanning
 #	machine
 #	trainer
 #	boosting
-#	measurer
 #	geometry
-foreach(subdir th core sp ap ip)
+foreach(subdir th core sp ap ip measurer)
 	add_subdirectory(${subdir})
 endforeach(subdir)

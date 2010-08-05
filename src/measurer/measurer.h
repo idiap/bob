@@ -1,7 +1,7 @@
 #ifndef MEASURER_INC
 #define MEASURER_INC
 
-#include "general.h"
+#include "core/general.h"
 
 namespace Torch {
 

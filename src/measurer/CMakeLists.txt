@@ -1,10 +1,10 @@
-#
-# Add the source files to the list of files to be added to the library
-#
-PROJECT(measurer)
-set(THIS measurer)
+project(measurer)
+cmake_minimum_required(VERSION 2.4)
 
-SET(${THIS}_SRC "measurer.cc"
-  CACHE INTERNAL "sources")
+# This defines the dependencies of this package
+set(deps core) #other torch subprojects
 
-include(../SetupPackage.cmake)
+set(src "measurer.cc")
+
+include(../macros.cmake)
+torch_package(measurer "${src}" "${deps}" "${shared}")
