@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_CLASSIFIER_H_
 #define _TORCH5SPRO_CLASSIFIER_H_
 
-#include "Machine.h"	// <Classifier> is a <Machine>
+#include "core/Machine.h"	// <Classifier> is a <Machine>
 
 namespace Torch
 {

@@ -2,7 +2,7 @@
 #define _TORCH5SPRO_MULTIVARIATE_NORMAL_DISTRIBUTION_MACHINE_H_
 
 #include "ProbabilityDistribution.h"
-#include "DataSet.h"
+#include "core/DataSet.h"
 
 namespace Torch {
 

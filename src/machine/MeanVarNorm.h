@@ -2,8 +2,8 @@
 #define _TORCH5SPRO_MEANVAR_NORM_H_
 
 #include "Machines.h"
-#include "Machine.h"
-#include "DataSet.h"
+#include "core/Machine.h"
+#include "core/DataSet.h"
 
 namespace Torch
 {

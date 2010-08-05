@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_CRITERION_H_
 #define _TORCH5SPRO_CRITERION_H_
 
-#include "Object.h"
-#include "Tensor.h"
+#include "core/Object.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {
