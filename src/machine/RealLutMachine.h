@@ -1,14 +1,14 @@
-#ifndef _TORCH5SPRO_STUMP_MACHINE_H_
-#define _TORCH5SPRO_STUMP_MACHINE_H_
+#ifndef _TORCH5SPRO_REALLUT_MACHINE_H_
+#define _TORCH5SPRO_REALLUT_MACHINE_H_
 
-#include "Machine.h"
+#include "core/Machine.h"
 #include "Machines.h"
 
 namespace Torch {
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Torch::StumpMachine:
+	// Torch::LUTMachine:
 	//      Process some input using a model (loaded from some file).
 	//      The output is a DoubleTensor!
 	//
@@ -21,16 +21,16 @@ namespace Torch {
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class StumpMachine : public Machine
+	class RealLutMachine : public Machine
 	{
 
 	public:
 
 		/// Constructor
-		StumpMachine();
+		RealLutMachine();
 
 		/// Destructor
-		virtual ~StumpMachine();
+		virtual ~RealLutMachine();
 
 		/// Process the input tensor
 		virtual bool 		forward(const Tensor& input);
@@ -41,15 +41,15 @@ namespace Torch {
 
 		/// Constructs an empty Machine of this kind
 		/// (used by <MachineManager>, this object is automatically deallocated)
-		virtual Machine*	getAnInstance() const { return manage(new StumpMachine()); }
+		virtual Machine*	getAnInstance() const { return manage(new RealLutMachine()); }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const { return STUMP_MACHINE_ID; }
+		virtual int		getID() const { return REAL_LUT_MACHINE_ID; }
 
 		///////////////////////////////////////////////////////////
 		// Access functions
 
-		void 			setParams(int direction_, float threshold_);
+		void 			setParams(double min_, double max_, int n_bins_, double *lut_);
 
 		///////////////////////////////////////////////////////////
 
@@ -58,19 +58,17 @@ namespace Torch {
 		///////////////////////////////////////////////////////////////
 		// Attributes
 
-		// feature
-		//int feature_id;
-
 		// parameters of the machine
-		float threshold;
-		int direction;
+		double min, max;
+		int n_bins;
+		double *lut;
 		bool verbose;
 	};
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // REGISTER this machine to the <MachineManager>
-        const bool stump_machine_registered = MachineManager::getInstance().add(
-                new StumpMachine(), "StumpMachine");
+        const bool real_lut_machine_registered = MachineManager::getInstance().add(
+		new RealLutMachine(), "RealLutMachine");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 

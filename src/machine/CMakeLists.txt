@@ -31,12 +31,18 @@ set(src_gradients
 set(src_normalisations
 	"MeanVarNorm.cc")
 
+set(src_boosting
+	"IntLutMachine.cc"
+	"RealLutMachine.cc"
+	"StumpMachine.cc")
+
 set(src
 	"${src_machine}"
 	"${src_criterions}"
 	"${src_distributions}"
 	"${src_gradients}"
-	"${src_normalisations}")
+	"${src_normalisations}"
+	"${src_boosting}")
 
 include(../macros.cmake)
 torch_package(machine "${src}" "${deps}" "${shared}")
