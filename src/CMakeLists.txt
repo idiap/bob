@@ -38,6 +38,6 @@ link_directories(${INSTALL_DIR}/lib)
 #	trainer
 #	boosting
 #	geometry
-foreach(subdir th core sp ap ip measurer)
+foreach(subdir th core sp ap ip measurer machine)
 	add_subdirectory(${subdir})
 endforeach(subdir)

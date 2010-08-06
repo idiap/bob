@@ -1,7 +1,7 @@
-#ifndef _TORCH5SPRO_REALLUT_MACHINE_H_
-#define _TORCH5SPRO_REALLUT_MACHINE_H_
+#ifndef _TORCH5SPRO_INTLUT_MACHINE_H_
+#define _TORCH5SPRO_INTLUT_MACHINE_H_
 
-#include "Machine.h"
+#include "core/Machine.h"
 #include "Machines.h"
 
 namespace Torch {
@@ -21,16 +21,16 @@ namespace Torch {
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class RealLutMachine : public Machine
+	class IntLutMachine : public Machine
 	{
 
 	public:
 
 		/// Constructor
-		RealLutMachine();
+		IntLutMachine();
 
 		/// Destructor
-		virtual ~RealLutMachine();
+		virtual ~IntLutMachine();
 
 		/// Process the input tensor
 		virtual bool 		forward(const Tensor& input);
@@ -41,15 +41,18 @@ namespace Torch {
 
 		/// Constructs an empty Machine of this kind
 		/// (used by <MachineManager>, this object is automatically deallocated)
-		virtual Machine*	getAnInstance() const { return manage(new RealLutMachine()); }
+		virtual Machine*	getAnInstance() const { return manage(new IntLutMachine()); }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const { return REAL_LUT_MACHINE_ID; }
+		virtual int		getID() const { return INT_LUT_MACHINE_ID; }
+
+		void 			setParams(int n_bins_, double *lut_);
 
 		///////////////////////////////////////////////////////////
 		// Access functions
 
-		void 			setParams(double min_, double max_, int n_bins_, double *lut_);
+		int			getLUTSize() const { return n_bins; }
+		double*			getLUT()  { return lut; }
 
 		///////////////////////////////////////////////////////////
 
@@ -59,16 +62,16 @@ namespace Torch {
 		// Attributes
 
 		// parameters of the machine
-		double min, max;
+		//double min, max;
 		int n_bins;
 		double *lut;
-		bool verbose;
 	};
+
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // REGISTER this machine to the <MachineManager>
-        const bool real_lut_machine_registered = MachineManager::getInstance().add(
-		new RealLutMachine(), "RealLutMachine");
+        const bool intlut_machine_registered = MachineManager::getInstance().add(
+		new IntLutMachine(), "IntLutMachine");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 

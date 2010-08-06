@@ -1,14 +1,14 @@
-#ifndef _TORCH5SPRO_INTLUT_MACHINE_H_
-#define _TORCH5SPRO_INTLUT_MACHINE_H_
+#ifndef _TORCH5SPRO_STUMP_MACHINE_H_
+#define _TORCH5SPRO_STUMP_MACHINE_H_
 
-#include "Machine.h"
+#include "core/Machine.h"
 #include "Machines.h"
 
 namespace Torch {
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
-	// Torch::LUTMachine:
+	// Torch::StumpMachine:
 	//      Process some input using a model (loaded from some file).
 	//      The output is a DoubleTensor!
 	//
@@ -21,16 +21,16 @@ namespace Torch {
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
 
-	class IntLutMachine : public Machine
+	class StumpMachine : public Machine
 	{
 
 	public:
 
 		/// Constructor
-		IntLutMachine();
+		StumpMachine();
 
 		/// Destructor
-		virtual ~IntLutMachine();
+		virtual ~StumpMachine();
 
 		/// Process the input tensor
 		virtual bool 		forward(const Tensor& input);
@@ -41,18 +41,15 @@ namespace Torch {
 
 		/// Constructs an empty Machine of this kind
 		/// (used by <MachineManager>, this object is automatically deallocated)
-		virtual Machine*	getAnInstance() const { return manage(new IntLutMachine()); }
+		virtual Machine*	getAnInstance() const { return manage(new StumpMachine()); }
 
 		// Get the ID specific to each Machine
-		virtual int		getID() const { return INT_LUT_MACHINE_ID; }
-
-		void 			setParams(int n_bins_, double *lut_);
+		virtual int		getID() const { return STUMP_MACHINE_ID; }
 
 		///////////////////////////////////////////////////////////
 		// Access functions
 
-		int			getLUTSize() const { return n_bins; }
-		double*			getLUT()  { return lut; }
+		void 			setParams(int direction_, float threshold_);
 
 		///////////////////////////////////////////////////////////
 
@@ -61,17 +58,19 @@ namespace Torch {
 		///////////////////////////////////////////////////////////////
 		// Attributes
 
-		// parameters of the machine
-		//double min, max;
-		int n_bins;
-		double *lut;
-	};
+		// feature
+		//int feature_id;
 
+		// parameters of the machine
+		float threshold;
+		int direction;
+		bool verbose;
+	};
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // REGISTER this machine to the <MachineManager>
-        const bool intlut_machine_registered = MachineManager::getInstance().add(
-		new IntLutMachine(), "IntLutMachine");
+        const bool stump_machine_registered = MachineManager::getInstance().add(
+                new StumpMachine(), "StumpMachine");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 

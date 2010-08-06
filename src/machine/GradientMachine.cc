@@ -1,6 +1,6 @@
 #include "GradientMachine.h"
-#include "Tensor.h"
-#include "File.h"
+#include "core/Tensor.h"
+#include "core/File.h"
 
 namespace Torch {
 

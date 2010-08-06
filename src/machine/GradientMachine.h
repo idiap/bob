@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_GRADIENT_MACHINE_H_
 #define _TORCH5SPRO_GRADIENT_MACHINE_H_
 
-#include "Machine.h"	// GradientMachine is a <Machine>
+#include "core/Machine.h"	// GradientMachine is a <Machine>
 
 namespace Torch
 {
