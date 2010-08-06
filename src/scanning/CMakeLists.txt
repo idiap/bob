@@ -52,11 +52,11 @@ set(src_selectors
 	"MeanShiftSelector.cc")
 
 set(src
-	"${src_scanning}"
-	"${src_context}"
-	"${src_explorers}"
-	"${src_pruners}"
-	"${src_selectors}")
+	"${src_scanning}")
+#	"${src_context}"
+#	"${src_explorers}"
+#	"${src_pruners}"
+#	"${src_selectors}")
 #set(${THIS}_SUBDIRS
 #	explorers
 #	pruners
