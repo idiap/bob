@@ -1,10 +1,10 @@
 #include "PyramidExplorer.h"
 #include "ScaleExplorer.h"
 #include "ipSWEvaluator.h"
-#include "Image.h"
-#include "xtprobeImageFile.h"
-#include "ipScaleYX.h"
-#include "Image.h"
+#include "ip/Image.h"
+#include "ip/xtprobeImageFile.h"
+#include "ip/ipScaleYX.h"
+#include "ip/Image.h"
 
 namespace Torch {
 

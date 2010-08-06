@@ -1,9 +1,9 @@
 #ifndef _TORCHVISION_SCANNING_SCANNER_H_
 #define _TORCHVISION_SCANNING_SCANNER_H_
 
-#include "Object.h"			// <Scanner> is a <Torch::Object>
+#include "core/Object.h"			// <Scanner> is a <Torch::Object>
 #include "Pattern.h"			// detected patterns
-#include "vision.h"			// <sRect2D> definition
+#include "ip/vision.h"			// <sRect2D> definition
 
 namespace Torch
 {

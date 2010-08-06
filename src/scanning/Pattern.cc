@@ -1,5 +1,5 @@
 #include "Pattern.h"
-#include "general.h"
+#include "core/general.h"
 
 namespace Torch
 {

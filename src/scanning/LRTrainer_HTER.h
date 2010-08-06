@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_LR_TRAINER_H_
 #define _TORCHVISION_LR_TRAINER_H_
 
-#include "Trainer.h"		// <LRTrainer> is a <Trainer>
+#include "core/Trainer.h"		// <LRTrainer> is a <Trainer>
 
 namespace Torch
 {
@@ -16,9 +16,8 @@ namespace Torch
 	//	- uses a validation dataset (<setValidationData>) to set the optimum L1 and L2 norm priors
 	//
         //      - PARAMETERS (name, type, default value, description):
-        //		"FARvsFRRRatio"		double		1.0	"FAR vs FRR ratio: between 0.0 and 1.0"
-        //		"useL1"			bool		false	"Use L1 norm regularization term"
-        //
+        //		//
+	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
@@ -40,14 +39,13 @@ namespace Torch
 
 		// Test the LR machine
 		static void		test(	LRMachine* machine, DataSet* samples,
-						double& TAR, double& FAR, double& HTER,
-						double FARvsFRRRatio);
+						double& TAR, double& FAR, double& HTER);
 
 		// Compute the gradient for the Grafting method (negative loglikelihoods + regularization terms)
 		static void		getGradient(	DataSet* dataset,
 							double* gradients, double* buf_gradients,
 							const double* weights, int size,
-							double L1_prior, double L2_prior, double FARvsFRRRatio);
+							double L1_prior, double L2_prior);
 
 		// Computes the inverse of the number of positive and negative samples in a dataset
 		static void		getInvPosNeg(	DataSet* dataset,
@@ -58,13 +56,15 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 
 		// Train the LR machine using the given L1 and L2 priors
-		bool			train(	double L1_prior, double L2_prior, double FARvsFRRRatio,
-						double* weights, double* gradients, double* buf_gradients,
+		bool			train(	double L1_prior, double L2_prior,
+						double* weights,
+						double* gradients, double* buf_gradients,
 						bool* fselected, int size,
 						bool verbose);
 
-		// Optimize the LR machine - the optimum threshold is set to the machine!
-		static void		optimize(LRMachine* machine, DataSet* samples, double FARvsFRRRatio);
+		// Optimize (minimum HTER) and test the LR machine
+		// NB: the optimum threshold is set to the machine!
+		static void		optimize(LRMachine* machine, DataSet* samples);
 
                 /////////////////////////////////////////////////////////////////
       		// Attributes

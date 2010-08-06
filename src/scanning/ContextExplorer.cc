@@ -1,7 +1,7 @@
 #include "ContextExplorer.h"
 #include "ipSWEvaluator.h"
 #include "ScaleExplorer.h"
-#include "File.h"
+#include "core/File.h"
 
 // Context constants
 static const int	NoVarX = 6;	// No. of steps on Ox

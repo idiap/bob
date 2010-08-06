@@ -1,6 +1,6 @@
 #include "ipLBP8R.h"
 #include "core/Tensor.h"
-#include "Scanner.h"
+//#include "Scanner.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute the 8R LBP code for a generic tensor
@@ -262,10 +262,11 @@ int ipLBP8R::getMaxLabel()
 bool ipLBP8R::processInput(const Tensor& input)
 {
 	// Force interpolation for the multiscale even at the model size
-	if (CurrentScanType::getInstance().get() == ScanTypeMultiscale)
+/*	if (CurrentScanType::getInstance().get() == ScanTypeMultiscale)
 	{
 		m_need_interp = true;
-	}
+	}*/
+	m_need_interp = getBOption("need_interp");
 
 	// No interpolation needed, the model size is the same as the region size to process!
 	if (m_need_interp == false)

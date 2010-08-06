@@ -1,5 +1,5 @@
 #include "Scanner.h"
-#include "Image.h"
+#include "ip/Image.h"
 #include "Explorer.h"
 #include "Selector.h"
 #include "MSExplorer.h"

@@ -1,6 +1,6 @@
 #include "FaceFinder.h"
 #include "Scanner.h"
-#include "Image.h"
+#include "core/Image.h"
 #include "Explorer.h"
 #include "PyramidExplorer.h"
 #include "MSExplorer.h"
@@ -13,12 +13,12 @@
 #include "OverlapSelector.h"
 #include "MeanShiftSelector.h"
 #include "DummySelector.h"
-#include "spCoreChain.h"
+#include "core/spCoreChain.h"
 #include "CascadeMachine.h"
 #include "ipSWEvaluator.h"
 #include "ipSWVariancePruner.h"
-#include "ipLBPBitmap.h"
-#include "ipLBP4R.h"
+#include "ip/ipLBPBitmap.h"
+#include "ip/ipLBP4R.h"
 
 namespace Torch
 {

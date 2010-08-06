@@ -35,5 +35,5 @@ endmacro(build_cmakeable proj)
 
 #build_ffmpeg("0.6" "branches/0.6")
 #build_cmakeable(jpeg)
-#build_cmakeable(lbfgs)
+build_cmakeable(lbfgs)
 build_cmakeable(oourafft)

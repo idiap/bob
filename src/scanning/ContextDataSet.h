@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_CONTEXT_DATA_SET_H_
 #define _TORCHVISION_SCANNING_CONTEXT_DATA_SET_H_
 
-#include "DataSet.h"		// <ContextDataSet> is a <DataSet>
+#include "core/DataSet.h"		// <ContextDataSet> is a <DataSet>
 #include "Context.h"
 
 namespace Torch

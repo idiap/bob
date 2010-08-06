@@ -1,7 +1,7 @@
 #include "ipSWEvaluator.h"
-#include "Classifier.h"
-#include "Machines.h"
-#include "Tensor.h"
+#include "machine/Classifier.h"
+#include "machine/Machines.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

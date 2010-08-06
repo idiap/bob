@@ -2,7 +2,7 @@
 #define _TORCHVISION_SCANNING_IP_SW_VARIANCE_PRUNER_H_
 
 #include "ipSWPruner.h"		// <ipSWVariancePruner> is a <ipSWPruner>
-#include "ipIntegral.h"
+#include "ip/ipIntegral.h"
 
 namespace Torch
 {

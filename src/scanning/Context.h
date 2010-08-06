@@ -2,7 +2,7 @@
 #define _TORCHVISION_SCANNING_CONTEXT_SAMPLE_H_
 
 #include "Pattern.h"
-#include "Tensor.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

@@ -1,8 +1,8 @@
 #ifndef _TORCHVISION_SCANNING_SCALE_EXPLORER_H_
 #define _TORCHVISION_SCANNING_SCALE_EXPLORER_H_
 
-#include "Object.h"		// <ScaleExplorer> is a <Torch::Object>
-#include "vision.h"		// <sSize> and <sRect2D> definitions
+#include "core/Object.h"		// <ScaleExplorer> is a <Torch::Object>
+#include "ip/vision.h"		// <sSize> and <sRect2D> definitions
 #include "Explorer.h"
 
 namespace Torch

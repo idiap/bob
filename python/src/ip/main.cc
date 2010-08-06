@@ -26,6 +26,6 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_video();
   bind_ip_videotensor();
 #endif
-  bind_ip_ipgeomnorm();
+//  bind_ip_ipgeomnorm();
   bind_ip_lbp();
 }

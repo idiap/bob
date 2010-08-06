@@ -1,9 +1,9 @@
 #include "LRTrainer.h"
 #include "LRMachine.h"
-#include "measurer.h"
+#include "measurer/measurer.h"
 
 #ifdef HAVE_LBFGS
-	#include "lbfgs.h"
+	#include <lbfgs/lbfgs.h>
 #endif
 
 static double getSign(double value)

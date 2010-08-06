@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_IP_SW_EVALUATOR_H_
 #define _TORCHVISION_SCANNING_IP_SW_EVALUATOR_H_
 
-#include "ipCore.h"		// <ipSWEvaluator> is an <ipCore>
+#include "core/ipCore.h"		// <ipSWEvaluator> is an <ipCore>
 
 namespace Torch
 {

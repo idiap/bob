@@ -1,9 +1,9 @@
 #ifndef _TORCHVISION_FACE_FINDER_H_
 #define _TORCHVISION_FACE_FINDER_H_
 
-#include "Object.h"			// <FaceFinder> is a <Torch::Object>
+#include "core/Object.h"			// <FaceFinder> is a <Torch::Object>
 #include "Pattern.h"			// detected patterns
-#include "CmdFile.h"
+#include "core/CmdFile.h"
 
 namespace Torch
 {

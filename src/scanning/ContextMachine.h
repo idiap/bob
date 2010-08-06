@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_CONTEXT_MACHINE_H_
 #define _TORCHVISION_SCANNING_CONTEXT_MACHINE_H_
 
-#include "Classifier.h"			// <ContextMachine> is a <Classifier>
+#include "machine/Classifier.h"			// <ContextMachine> is a <Classifier>
 #include "LRMachine.h"
 #include "Context.h"
 
