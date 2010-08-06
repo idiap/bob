@@ -18,5 +18,5 @@ if ( ${#args} >= 4 ) then
   endsw
 endif
 
-#echo `${dir}/setup.py --csh${build_type}`
-eval `${dir}/setup.py --csh${build_type}`
+#echo `${dir}/bin/setup.py --csh${build_type}`
+eval `${dir}/bin/setup.py --csh${build_type}`

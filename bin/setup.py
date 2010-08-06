@@ -80,6 +80,7 @@ def main(dir, debug, csh):
   path = os.environ.get('PATH', '')
   path = path_remove(path, '.') #security concern
   path = path_remove_if_startswith(path, base_dir)
+  path = path_add(path, os.path.join(dir, 'bin'))
   path = path_add(path, os.path.join(base_dir, 'bin'))
   path = path_add(path, os.path.join(install_dir, 'bin'))
   all.append(('PATH', path))
@@ -107,7 +108,7 @@ def main(dir, debug, csh):
   for k, v in all: print shell_str(k, v, csh)
 
 if __name__ == '__main__':
-  dir = os.path.realpath(os.path.dirname(sys.argv[0]))
+  dir = os.path.realpath(os.path.dirname(os.path.dirname(sys.argv[0])))
   debug = False
   csh = False
 

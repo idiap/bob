@@ -15,5 +15,5 @@ if [ $# -ge 1 ]; then
 fi
 
 dir=`dirname ${BASH_SOURCE[0]}`
-#echo "eval \`${dir}/setup.py${build_type} --sh\`"
-eval `${dir}/setup.py${build_type} --sh`
+#echo "eval \`${dir}/bin/setup.py${build_type} --sh\`"
+eval `${dir}/bin/setup.py${build_type} --sh`
