@@ -10,7 +10,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 link_directories(${INSTALL_DIR}/lib)
 
 # to-do:
+# scanning
 #	trainer
-foreach(subdir oourafft lbfgs th core sp ap ip measurer machine scanning)
+foreach(subdir oourafft lbfgs th core sp ap ip measurer machine)
 	add_subdirectory(${subdir})
 endforeach(subdir)
