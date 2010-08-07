@@ -2,12 +2,7 @@ PROJECT(trainer)
 cmake_minimum_required(VERSION 2.4)
 
 # This defines the dependencies of this package
-set(deps core ip machine scanning) #other torch subprojects
-
-# lbfgs
-add_definitions(-DHAVE_LBFGS)
-include_directories("${INCLUDE_DIR}")
-set(shared "-llbfgs")
+set(deps core ip machine scanning lbfgs) #other torch subprojects
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
 # for details.
