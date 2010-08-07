@@ -8,12 +8,20 @@ checkout=`dirname ${bindir}`;
 prefix=`pwd`;
 nightly=`date +%d.%m.%Y`;
 
+echo "[${nightly}] Setting up externals...";
+source /idiap/home/aanjos/sw/setup.sh;
+
 echo "[${nightly}] Cleaning up old nightlies..."
-find . -maxdepth 1 -type d -not -ctime 7 -print0 | xargs -0 rm -rf;
+find . -mindepth 1 -maxdepth 1 -type d -not -ctime 7 -print0 | xargs -0 rm -rf;
+
+if [ -d ${nightly} ]; then
+  echo "[${nightly}] Replacing available build...";
+  rm -rf ${nightly};
+fi
 
 cd ${checkout}
 echo "[${nightly}] Synchronizing repository..."
-echo git pull /idiap/home/lelshafey/work/development/torchDep
+git pull /idiap/home/lelshafey/work/development/torchDep
 
 cd ${prefix}
 echo "[${nightly}] Building torch (debug)..."
@@ -39,7 +47,6 @@ for d in `ls -d ${nightly}/install`; do
   ln -s ${checkout}/setup.sh $d;
   ln -s ${checkout}/setup.csh $d;
 done
-
 
 echo "[${nightly}] Replacing nightly link: last -> ${nightly}"
 rm -f last;
