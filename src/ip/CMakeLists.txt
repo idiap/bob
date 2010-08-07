@@ -2,7 +2,7 @@ PROJECT(ip)
 cmake_minimum_required(VERSION 2.4)
 
 # This defines the dependencies of this package
-set(deps core) #other torch subprojects
+set(deps core sp) #other torch subprojects
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
 # for details.
@@ -10,9 +10,21 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-add_definitions(-DHAVE_OOURAFFT)
-include_directories("${INCLUDE_DIR}/oourafft")
-set(shared "-loourafft")
+# jpeg (to be removed)
+add_definitions(-DHAVE_JPEG)
+include_directories("${INCLUDE_DIR}/jpeg")
+set(shared "-ljpeg")
+
+# tiff
+#add_definitions(-DHAVE_TIFF)
+
+# ffmpeg
+if(ffmpeg_FOUND)
+  add_definitions(-DHAVE_FFMPEG)
+  include_directories(${ffmpeg_INCLUDE_DIRS})
+  link_directories(${ffmpeg_LIBRARY_DIRS})
+  set(shared "${shared};${ffmpeg_LIBRARIES}")
+endif(ffmpeg_FOUND)
 
 # This defines the list of source files inside this package.
 set(src_ip
@@ -88,7 +100,6 @@ set(src
 		"${src_ip}" 
 		"${src_imagefiles}"
 		"${src_geometry}")
-
 
 include(../macros.cmake)
 torch_package(ip "${src}" "${deps}" "${shared}")

@@ -57,12 +57,6 @@ set(src
 #	"${src_explorers}"
 #	"${src_pruners}"
 #	"${src_selectors}")
-#set(${THIS}_SUBDIRS
-#	explorers
-#	pruners
-#	selectors
-####	trackers
-#	context)
-#include(../SetupPackage.cmake)
+
 include(../macros.cmake)
 torch_package(scanning "${src}" "${deps}" "${shared}")

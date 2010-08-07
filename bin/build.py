@@ -70,7 +70,7 @@ def parse_args():
                     dest="source_dir",
                     default=sources,
                     metavar="DIR",
-                    help="builds from this source tree",
+                    help="builds from this source tree (defaults to %default)",
                    )
   parser.add_option("--build-type", 
                     type="string",
