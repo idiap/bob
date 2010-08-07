@@ -43,12 +43,15 @@ else
 fi
 
 echo "[${nightly}] Installing setup files..."
-for d in `ls -d ${nightly}/install`; do
-  ln -s ${checkout}/setup.sh $d;
-  ln -s ${checkout}/setup.csh $d;
-done
+cd ${nightly}
+ln -s ${checkout}/setup.sh .;
+ln -s ${checkout}/setup.csh .;
+mkdir bin;
+cd bin;
+ln -s ${checkout}/bin/setup.py .;
 
 echo "[${nightly}] Replacing nightly link: last -> ${nightly}"
+cd ${prefix};
 rm -f last;
 ln -s ${nightly} last;
 
