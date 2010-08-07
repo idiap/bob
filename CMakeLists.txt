@@ -3,39 +3,41 @@
 
 # Sets up all extras in one go. 
 project(torch5spro)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
 
 # Enables the testing framework
 enable_testing()
 
 # Set the compiler flags and build type(release or debug)
-set(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -ffast-math -fomit-frame-pointer")
+set(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -ffast-math -fomit-frame-pointer -msse2")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG "-pthread -g")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
-# This will autoconfigure certain system libraries we need for both torch and
-# the examples
+# This will bring in the cblas/lapack/atlas dependence. 
 set(cblas_DIR extras)
-find_package(cblas) # configures lapack, cblas and atlas
+find_package(cblas REQUIRED)
 
-add_subdirectory(extras)
+# This will bring in the jpeg dependence. 
+set(jpeg_DIR extras)
+find_package(jpeg REQUIRED)
 
-# This will bring in the ffmpeg dependency. 
+# This will bring in the ffmpeg dependence. 
 set(ffmpeg_DIR extras)
-find_package(ffmpeg)
+find_package(ffmpeg REQUIRED)
 
 add_subdirectory(src)
 
+# configures boost found on the current system
 set(SystemBoost_DIR extras)
-find_package(SystemBoost) # configures boost found on the current system
+find_package(SystemBoost REQUIRED)
 
 #add_subdirectory(test)
 #add_subdirectory(benchmark)
 
 # This will bring in the Python bindings, if python was found
 set(python_DIR extras)
-find_package(python) # configures pytohn found on the current system
+find_package(python REQUIRED)
 
 #if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 #  add_subdirectory(python)

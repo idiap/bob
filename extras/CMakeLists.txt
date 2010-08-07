@@ -21,19 +21,4 @@ macro(build_ffmpeg version branch)
   )
 endmacro(build_ffmpeg)
 
-# This will handle the build of jpeg as a external project
-macro(build_cmakeable proj)
-  ExternalProject_Add(
-    ${proj}
-    PREFIX "current"
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/${proj} 
-    CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DINSTALL_DIR=${INSTALL_DIR} -DINCLUDE_DIR=${INCLUDE_DIR}
-    BUILD_COMMAND $(MAKE) -j${CPU_COUNT}
-    INSTALL_COMMAND $(MAKE) -j${CPU_COUNT} install
-    )
-endmacro(build_cmakeable proj)
-
 #build_ffmpeg("0.6" "branches/0.6")
-#build_cmakeable(jpeg)
-build_cmakeable(lbfgs)
-build_cmakeable(oourafft)

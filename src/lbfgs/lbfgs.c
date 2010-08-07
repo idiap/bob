@@ -69,7 +69,7 @@ licence.
 #include <stdlib.h>
 #include <math.h>
 
-#include "lbfgs.h"
+#include "lbfgs/lbfgs.h"
 
 #ifdef  _MSC_VER
 #define inline  __inline
@@ -78,15 +78,15 @@ typedef unsigned int uint32_t;
 
 #if     defined(USE_SSE) && defined(__SSE2__) && LBFGS_FLOAT == 64
 /* Use SSE2 optimization for 64bit double precision. */
-#include "arithmetic_sse_double.h"
+#include "lbfgs/arithmetic_sse_double.h"
 
 #elif   defined(USE_SSE) && defined(__SSE__) && LBFGS_FLOAT == 32
 /* Use SSE optimization for 32bit float precision. */
-#include "arithmetic_sse_float.h"
+#include "lbfgs/arithmetic_sse_float.h"
 
 #else
 /* No CPU specific optimization. */
-#include "arithmetic_ansi.h"
+#include "lbfgs/arithmetic_ansi.h"
 
 #endif
 

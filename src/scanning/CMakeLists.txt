@@ -2,7 +2,7 @@ PROJECT(scanning)
 cmake_minimum_required(VERSION 2.4)
 
 # This defines the dependencies of this package
-set(deps core ip machine) #other torch subprojects
+set(deps lbfgs core ip machine) #other torch subprojects
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
 # for details.
@@ -11,8 +11,12 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 add_definitions(-DHAVE_LBFGS)
-include_directories("${INCLUDE_DIR}/lbfgs")
-set(shared "-llbfgs")
+add_definitions(-DUSE_SSE)
+
+# ffmpeg, somehow, cannot be found by scanning
+if(ffmpeg_FOUND)
+  link_directories(${ffmpeg_LIBRARY_DIRS})
+endif(ffmpeg_FOUND)
 
 # This defines the list of source files inside this package.
 set(src_scanning
@@ -53,10 +57,10 @@ set(src_selectors
 
 set(src
 	"${src_scanning}")
-#	"${src_context}"
-#	"${src_explorers}"
-#	"${src_pruners}"
-#	"${src_selectors}")
+  #"${src_context}"
+  #"${src_explorers}"
+  #	"${src_pruners}"
+  #	"${src_selectors}")
 
 include(../macros.cmake)
 torch_package(scanning "${src}" "${deps}" "${shared}")

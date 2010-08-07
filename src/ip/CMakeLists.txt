@@ -1,22 +1,19 @@
 PROJECT(ip)
 cmake_minimum_required(VERSION 2.4)
 
-# This defines the dependencies of this package
-set(deps core sp) #other torch subprojects
-
-# Avoids warning during linkage configuration see: cmake --help-policy CMP0003
-# for details.
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-# jpeg (to be removed)
-add_definitions(-DHAVE_JPEG)
-include_directories("${INCLUDE_DIR}/jpeg")
-set(shared "-ljpeg")
+# This defines the dependencies of this package
+set(deps core sp) #other torch subprojects
 
-# tiff
-#add_definitions(-DHAVE_TIFF)
+# jpeg
+if(JPEG_FOUND)
+  add_definitions(-DHAVE_JPEG)
+  include_directories(${JPEG_INCLUDE_DIR})
+  set(shared "${JPEG_LIBRARIES}")
+endif(JPEG_FOUND)
 
 # ffmpeg
 if(ffmpeg_FOUND)
