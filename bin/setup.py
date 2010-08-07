@@ -3,16 +3,9 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Thu 08 Jul 2010 09:18:28 CEST 
 
-"""A generic setup system for Torch5
+"""A generic setup system for Torch"""
 
-usage: setup.py [options]
-  options:
-  -h|-?|--help Prints this help message
-  -d|--debug   Outputs settings to run against the debug build
-  -c|--csh     Outputs settings for csh shells (csh|tcsh)
-  -s|--sh      Outputs settings for sh shells (sh|bash|zsh|... etc)
-
-examples:
+epilog = """examples:
 
   If you are unsure of what to do, just print the help message:
   $ ./setup.py --help
@@ -31,6 +24,37 @@ examples:
 """
 
 import os, sys
+
+def parse_args():
+  """Parses the command line input."""
+  import optparse
+
+  dir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
+  
+  parser = optparse.OptionParser(description=__doc__, epilog=epilog)
+  parser.add_option("-b", "--base-dir", 
+                    action="store",
+                    dest="dir", 
+                    default=dir,
+                    help="Sets the base directory to a different value (defaults to %default)",
+                   )
+  parser.add_option("-c", "--csh", 
+                    action="store_true",
+                    dest="csh", 
+                    default=False,
+                    help="Outputs settings for csh shells (csh|tcsh)",
+                   )
+  parser.add_option("-d", "--debug", 
+                    action="store_true",
+                    dest="debug", 
+                    default=False,
+                    help="Outputs settings to run against the debug build",
+                   )
+  options, arguments = parser.parse_args()
+
+  options.dir = os.path.realpath(options.dir)
+
+  return (options, arguments)
 
 def path_remove(env, what):
   """Removes the 'what' components from the path environment 'env', if it
@@ -108,23 +132,7 @@ def main(dir, debug, csh):
   for k, v in all: print shell_str(k, v, csh)
 
 if __name__ == '__main__':
-  dir = os.path.realpath(os.path.dirname(os.path.dirname(sys.argv[0])))
-  debug = False
-  csh = False
 
-  if len(sys.argv) == 1:
-    print __doc__
-    sys.exit(1)
-  if len(sys.argv) > 1:
-    if sys.argv[1] in ('-h', '-?', '--help'):
-      print __doc__
-      sys.exit(1)
-    for arg in sys.argv[1:]:
-      if arg in ('-d', '--debug'): debug = True
-      elif arg in ('-c', '--csh'): csh = True
-      elif arg in ('-s', '--sh'): csh = False
-      else:
-        print __doc__
-        sys.exit(1)
+  options, arguments = parse_args()
 
-  main(dir, debug, csh)
+  main(options.dir, options.debug, options.csh)
