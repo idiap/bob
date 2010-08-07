@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_GT_FILE_H_
 #define _TORCH5SPRO_GT_FILE_H_
 
-#include "File.h"
-#include "vision.h"
+#include "core/File.h"
+#include "ip/vision.h"
 
 namespace Torch
 {

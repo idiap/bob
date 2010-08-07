@@ -1,13 +1,13 @@
 #ifndef _TORCH5SPRO_BOOSTING_ROUND_LBP_TRAINER_H_
 #define _TORCH5SPRO_BOOSTING_ROUND_LBP_TRAINER_H_
 
-#include "DataSet.h"
+#include "core/DataSet.h"
 #include "WeakLearner.h"
-#include "measurer.h"
+#include "measurer/measurer.h"
 #include "BoostingTrainer.h"
 #include "LBPRoundTrainer.h"
-#include "IntLutMachine.h"
-#include "Machine.h"
+#include "machine/IntLutMachine.h"
+#include "core/Machine.h"
 
 namespace Torch
 {

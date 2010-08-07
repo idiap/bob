@@ -2,8 +2,8 @@
 #define _TORCH5SPRO_STUMP_TRAINER_H_
 
 #include "WeakLearner.h"
-#include "StumpMachine.h"
-#include "measurer.h"
+#include "machine/StumpMachine.h"
+#include "measurer/measurer.h"
 
 namespace Torch
 {

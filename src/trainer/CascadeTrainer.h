@@ -1,12 +1,12 @@
 #ifndef _TORCH5SPRO_CASCADE_TRAINER_H_
 #define _TORCH5SPRO_CASCADE_TRAINER_H_
 
-#include "DataSet.h"
-#include "ImageScanDataSet.h"
-#include "measurer.h"
-#include "MemoryDataSet.h"
+#include "core/DataSet.h"
+#include "ip/ImageScanDataSet.h"
+#include "measurer/measurer.h"
+#include "core/MemoryDataSet.h"
 #include "FTrainer.h"
-#include "general.h"
+#include "core/general.h"
 namespace Torch
 {
 

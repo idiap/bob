@@ -1,5 +1,5 @@
 #include "BoostingRoundLBPTrainer.h"
-#include "ipLBP.h"
+#include "ip/ipLBP.h"
 
 namespace Torch
 {

@@ -12,6 +12,6 @@ link_directories(${INSTALL_DIR}/lib)
 # to-do:
 # scanning
 #	trainer
-foreach(subdir oourafft lbfgs th core sp ap ip measurer machine)
+foreach(subdir oourafft lbfgs th core sp ap ip measurer machine scanning)
 	add_subdirectory(${subdir})
 endforeach(subdir)

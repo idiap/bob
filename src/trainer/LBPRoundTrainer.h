@@ -2,7 +2,7 @@
 #define _TORCH5SPRO_LBP_ROUND_TRAINER_H_
 
 #include "WeakLearner.h"
-#include "IntLutMachine.h"
+#include "machine/IntLutMachine.h"
 
 namespace Torch
 {

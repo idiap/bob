@@ -1,5 +1,5 @@
 #include "CascadeTrainer.h"
-#include "spCore.h"
+#include "core/spCore.h"
 
 namespace Torch
 {

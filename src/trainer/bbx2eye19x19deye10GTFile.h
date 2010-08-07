@@ -2,7 +2,7 @@
 #define _TORCH5SPRO_BBX2EYE19X19DEYE10_GT_FILE_H_
 
 #include "GTFile.h"
-#include "Pattern.h"
+#include "scanning/Pattern.h"
 
 namespace Torch
 {

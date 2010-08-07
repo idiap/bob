@@ -26,17 +26,17 @@ set(src_scanning
 	"ScaleExplorer.cc"
 	"Explorer.cc"
 	"Scanner.cc"
-	"Selector.cc")
+	"Selector.cc"
 ##		"PatternTracker.cc"
-#	"FaceFinder.cc")
+	"FaceFinder.cc")
 
 set(src_context
 	"Context.cc"
 	"ContextDataSet.cc"
-	"ContextMachine.cc")
-#	"ContextTrainer.cc")
-#	"LRMachine.cc"
-#	"LRTrainer.cc")
+	"ContextMachine.cc"
+	"ContextTrainer.cc"
+	"LRMachine.cc"
+	"LRTrainer.cc")
 
 set(src_explorers
 	"ExhaustiveScaleExplorer.cc"
@@ -56,11 +56,11 @@ set(src_selectors
 	"MeanShiftSelector.cc")
 
 set(src
-	"${src_scanning}")
-  #"${src_context}"
-  #"${src_explorers}"
-  #	"${src_pruners}"
-  #	"${src_selectors}")
+	"${src_scanning}"
+	"${src_context}"
+	"${src_explorers}"
+	"${src_pruners}"
+	"${src_selectors}")
 
 include(../macros.cmake)
 torch_package(scanning "${src}" "${deps}" "${shared}")

@@ -1,5 +1,5 @@
 #include "GradientTrainer.h"
-#include "GradientMachine.h"
+#include "machine/GradientMachine.h"
 
 namespace Torch
 {

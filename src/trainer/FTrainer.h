@@ -1,7 +1,7 @@
 #ifndef F_TRAINER_INC
 #define F_TRAINER_INC
 
-#include "Trainer.h"
+#include "core/Trainer.h"
 
 namespace Torch
 {

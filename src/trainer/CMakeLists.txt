@@ -1,15 +1,50 @@
-#
-# Add the source files to the list of files to be added to the library
-#
 PROJECT(trainer)
-set(THIS trainer)
+cmake_minimum_required(VERSION 2.4)
 
-SET(${THIS}_SRC
-		"GTFile.cc"
-		"GradientTrainer.cc"
-		"StochasticGradientTrainer.cc"
-		"EMTrainer.cc"
-	CACHE INTERNAL "sources")
+# This defines the dependencies of this package
+set(deps core ip machine scanning) #other torch subprojects
 
-SET(${THIS}_SUBDIRS gtfiles)
-include(../SetupPackage.cmake)
+# lbfgs
+add_definitions(-DHAVE_LBFGS)
+include_directories("${INCLUDE_DIR}")
+set(shared "-llbfgs")
+
+# Avoids warning during linkage configuration see: cmake --help-policy CMP0003
+# for details.
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
+SET(src_trainer
+	"GTFile.cc"
+	"GradientTrainer.cc"
+	"StochasticGradientTrainer.cc"
+	"EMTrainer.cc")
+
+SET(src_gtfiles
+	"bancaGTFile.cc"
+	"bbx2eye19x19deye10GTFile.cc"
+	"cootesGTFile.cc"
+	"eyecenterGTFile.cc"
+	"eyecornerGTFile.cc"
+	"frontalEyeNoseChinGTFile.cc"
+	"halfprofileEyeNoseChinGTFile.cc"
+	"profileEyeNoseChinGTFile.cc")
+
+SET(src_boosting
+	"BoostingRoundLBPTrainer.cc"
+	"BoostingRoundTrainer.cc"
+	"BoostingTrainer.cc"
+	"CascadeTrainer.cc"
+	"FTrainer.cc"
+	"LBPRoundTrainer.cc"
+	"StumpTrainer.cc"
+	"WeakLearner.cc")
+
+set(src 
+	"${src_trainer}"
+	"${src_gtfiles}"
+	"${src_boosting}")
+
+include(../macros.cmake)
+torch_package(trainer "${src}" "${deps}" "${shared}")

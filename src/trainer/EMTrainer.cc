@@ -1,5 +1,5 @@
 #include "EMTrainer.h"
-#include "ProbabilityDistribution.h"
+#include "machine/ProbabilityDistribution.h"
 
 namespace Torch
 {
