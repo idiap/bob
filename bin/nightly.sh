@@ -44,11 +44,12 @@ fi
 
 echo "[${nightly}] Installing setup files..."
 cd ${nightly}
-ln -s ${checkout}/setup.sh .;
-ln -s ${checkout}/setup.csh .;
+cp -f ${checkout}/setup.sh .;
+cp -f ${checkout}/setup.csh .;
 mkdir bin;
 cd bin;
-ln -s ${checkout}/bin/setup.py .;
+cp -f ${checkout}/bin/setup.py .;
+chmod 755 setup.py;
 
 echo "[${nightly}] Replacing nightly link: last -> ${nightly}"
 cd ${prefix};
