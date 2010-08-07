@@ -9,7 +9,7 @@ prefix=`pwd`;
 nightly=`date +%d.%m.%Y`;
 
 echo "[${nightly}] Cleaning up old nightlies..."
-find . -depth 1 -type d -not -ctime -7 -print0 | xargs -0 rm -rf;
+find . -maxdepth 1 -type d -not -ctime 7 -print0 | xargs -0 rm -rf;
 
 cd ${checkout}
 echo "[${nightly}] Synchronizing repository..."
