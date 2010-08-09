@@ -45,7 +45,7 @@ def parse_args():
   import optparse
   
   #some defaults
-  actions = ('all', 'build', 'documentation', 'test')
+  actions = ('all', 'build', 'documentation', 'test', 'depfigure')
   build_types = ('release', 'debug') #default is #0
   pwd = os.path.realpath(os.curdir)
   default_prefix = os.path.join(pwd, 'install')
@@ -228,6 +228,7 @@ def cmake(option, build_dir, install_dir):
   os.chdir(build_dir)
 
   cmake_options = {}
+  cmake_options['--graphviz'] = "dependencies.dot"
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
   cmake_options['-DINSTALL_DIR'] = install_dir
   cmake_options['-DINCLUDE_DIR'] = os.path.join(install_dir, 'include')
@@ -334,6 +335,18 @@ def status_log(option, build_dir, install_dir, platform, timing, problems):
   logging.debug('Finished writing status file.')
   return cfname
 
+def dot(option, build_dir):
+  """Runs dot on the output of cmake/graphviz."""
+  logging.debug('Running dot...')
+
+  os.chdir(build_dir)
+
+  cmdline = ['dot', '-Tpng', 'dependencies.dot', '-odependencies.png']
+  status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  if status != 0:
+    raise RuntimeError, '** ERROR: "dot" did not work as expected.'
+  logging.debug('Finished running dot.')
+
 if __name__ == '__main__':
   time_track = {'start': time.time()}
   problem_track = {}
@@ -378,7 +391,7 @@ if __name__ == '__main__':
   #build
   proceed = True
 
-  if option.action in ('all', 'build', 'test'):
+  if option.action in ('all', 'build', 'test', 'depfigure'):
     start = time.time()
     try:
       cmake(option, build_dir, install_dir)
@@ -388,6 +401,7 @@ if __name__ == '__main__':
       proceed = False
     time_track['cmake'] = time.time() - start 
 
+  if option.action in ('all', 'build', 'test'):
     start = time.time()
     try:
       if proceed: 
@@ -411,7 +425,17 @@ if __name__ == '__main__':
       problem_track['make_all'] = ('failed', '%s' % e)
       proceed = False
     time_track['make_install'] = time.time() - start 
-  
+
+  #dependency figure
+  if option.action in ('all', 'depfigure'):
+    start = time.time()
+    try:
+      dot(option, build_dir)
+      problem_track['depfigure'] = ('success', )
+    except Exception, e:
+      problem_track['depfigure'] = ('failed', '%s' % e)
+    time_track['depfigure'] = time.time() - start
+
   #documentation
   if option.action in ('all', 'documentation'):
     start = time.time()
