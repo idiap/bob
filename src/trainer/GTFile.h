@@ -8,7 +8,7 @@ namespace Torch
 {
 	class sPoint2D;
 
-	/**
+	/*
 		NB: Labels are case insensitive!
 		NB: By default all the labels are <undefined>,
 			so in the specialized classes just put labels for the interest points!

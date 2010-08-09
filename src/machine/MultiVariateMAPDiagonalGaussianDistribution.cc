@@ -53,14 +53,14 @@ bool MultiVariateMAPDiagonalGaussianDistribution::prepare()
 
 bool MultiVariateMAPDiagonalGaussianDistribution::sampleEMaccPosteriors(double *sample_, const double input_posterior)
 {
-   	/** Computes the posterior for each gaussian
+   	/* Computes the posterior for each gaussian
 
 		\begin{equation}
 			P(q_j | x_i) = \frac{P(q_j) \times p(x_i | q_j)}{\sum_{k=1}^K P(q_k) \times p(x_i | q_k)}
 		\end{equation}
 	*/
 
-   	/** Computes and keeps the numerator and cumulates the denominator
+   	/* Computes and keeps the numerator and cumulates the denominator
 	*/
    	double posterior_denominator;
 	if(use_log)
@@ -79,7 +79,7 @@ bool MultiVariateMAPDiagonalGaussianDistribution::sampleEMaccPosteriors(double *
 		}
 	}
 
-	/** Accumulates weights, means and variances weighted by the posterior
+	/* Accumulates weights, means and variances weighted by the posterior
 
 		\begin{equation}
 			posterior_j = P(q_j | x_i)

@@ -45,13 +45,13 @@ namespace Torch
 		virtual bool 		backward(const DoubleTensor *input, const DoubleTensor *alpha);
 
 		/// Constructs an empty Machine of this kind - overriden
-		/// (used by <MachineManager>, this object should be deallocated by the user)
+		// (used by <MachineManager>, this object should be deallocated by the user)
 		virtual Machine*	getAnInstance() const { return new MLP(); }
 
 		// Get the ID specific to each Machine - overriden
 		virtual int		getID() const { return MLP_GRADIENT_MACHINE_ID; }
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		// Loading/Saving the content from files (\emph{not the options}) - overriden
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 

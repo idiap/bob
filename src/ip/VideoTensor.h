@@ -43,7 +43,7 @@ namespace Torch {
      *
      * @param video_tensor The input video tensor to copy the data from.
      */
-    VideoTensor (const Torch::VideoTensor& other);
+    VideoTensor (const Torch::VideoTensor& video_tensor);
 
     /**
      * Builds a new VideoTensor from data existing in a TensorFile. This method
