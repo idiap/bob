@@ -49,7 +49,7 @@ namespace Torch
 
 		double			normal(double x, double mu, double sigma, double stdv);
 			   
-		// Loading/Saving the content from files (\em{not the options}) - overriden
+		// Loading/Saving the content from files (<em>not the options</em>) - overriden
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 

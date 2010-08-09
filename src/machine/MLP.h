@@ -51,7 +51,7 @@ namespace Torch
 		// Get the ID specific to each Machine - overriden
 		virtual int		getID() const { return MLP_GRADIENT_MACHINE_ID; }
 
-		// Loading/Saving the content from files (\em{not the options}) - overriden
+		// Loading/Saving the content from files (<em>not the options</em>) - overriden
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 

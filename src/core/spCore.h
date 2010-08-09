@@ -25,7 +25,7 @@ namespace Torch
 		/// Destructor
 		virtual ~spCore();
 
-		/// Loading/Saving the content from files (\em{not the options})
+		/// Loading/Saving the content from files (<em>not the options</em>)
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 

@@ -36,7 +36,7 @@ namespace Torch
 		///
 		virtual bool 	forward(const Tensor& input);
 
-		// Loading/Saving the content from files (\em{not the options}) - overriden
+		// Loading/Saving the content from files (<em>not the options</em>) - overriden
 		virtual bool	loadFile(File& file);
 		virtual bool	saveFile(File& file) const;
 

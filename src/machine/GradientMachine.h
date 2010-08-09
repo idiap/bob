@@ -47,7 +47,7 @@ namespace Torch
 		virtual bool 		backward(const Tensor& input, const DoubleTensor *alpha);
 		virtual bool 		backward(const DoubleTensor *input, const DoubleTensor *alpha) = 0;
 
-		// Loading/Saving the content from files (\em{not the options}) - overriden
+		// Loading/Saving the content from files (<em>not the options</em>) - overriden
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 

@@ -124,7 +124,7 @@ namespace Torch
                     This path will be deleted by CmdLine. */
                 char *getPath(const char *filename);
 
-                /// Loading/Saving the content from files (\em{not the options}) - overriden
+                /// Loading/Saving the content from files (<em>not the options</em>) - overriden
                 virtual bool loadFile(File& file);
                 virtual bool saveFile(File& file) const;
 
