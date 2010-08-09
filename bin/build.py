@@ -240,7 +240,7 @@ def make(option, build_dir, target="all"):
 
   os.chdir(build_dir)
 
-  cmdline = ['make']
+  cmdline = ['make', '--keep-going']
   if option.debug_build:
     cmdline.append('VERBOSE=1')
   else:
