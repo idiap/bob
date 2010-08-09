@@ -3327,7 +3327,7 @@ void dstsub(int n, double *a, int nc, double *c)
 
 @section intro Introduction
 
-oourafft is a C++ for Fast Fourier Transform computation
+Oourafft is a C++ library for Fast Fourier Transform computation.
 
 @section api Documentation
 - @ref liboourafft_api "libOOURAFFT API"
