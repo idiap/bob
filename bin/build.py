@@ -270,7 +270,6 @@ def doxygen(option):
   overwrite_options['INPUT'] = os.path.join(option.source_dir, 'src')
   overwrite_options['STRIP_FROM_PATH'] = option.source_dir
   overwrite_options['OUTPUT_DIRECTORY'] = option.doc_prefix
-  if option.debug_build: overwrite_options['QUIET'] = 'NO'
   extras = []
   for k,v in overwrite_options.iteritems(): extras.append('%s = %s\n' % (k, v))
 
