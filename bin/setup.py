@@ -5,33 +5,39 @@
 
 """A generic setup system for Torch"""
 
-epilog = """examples:
+import sys, os
+
+epilog = """
+Examples:
 
   If you are unsure of what to do, just print the help message:
-  $ ./setup.py --help
+  $ %(prog)s --help
 
   If you want to setup your shell and you have either csh or tcsh:
-  $ eval `./setup.py --csh`
+  $ eval `%(prog)s --csh`
 
   If you want to setup your shell and you have one of the sh variants:
-  $ eval `./setup.py --sh`
+  $ eval `%(prog)s --sh`
 
   If you want to setup in debug mode:
-  $ eval `./setup.py --debug --sh`
+  $ eval `%(prog)s --debug --sh`
 
   If you don't know which shell type you have:
   $ echo $SHELL
-"""
-
-import os, sys
+""" % {'prog': os.path.basename(sys.argv[0])}
 
 def parse_args():
   """Parses the command line input."""
   import optparse
 
+  class MyParser(optparse.OptionParser):
+    """Overwites the format_epilog() so we keep newlines..."""
+    def format_epilog(self, formatter):
+      return self.epilog
+
   dir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
   
-  parser = optparse.OptionParser(description=__doc__, epilog=epilog)
+  parser = MyParser(description=__doc__, epilog=epilog)
   parser.add_option("-b", "--base-dir", 
                     action="store",
                     dest="dir", 
