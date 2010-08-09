@@ -31,7 +31,7 @@ namespace Torch
 		virtual bool 		backward(const DoubleTensor *input, const DoubleTensor *alpha);
 
 		/// Constructs an empty Machine of this kind - overriden
-		/// (used by <MachineManager>, this object should be deallocated by the user)
+		// (used by <MachineManager>, this object should be deallocated by the user)
 		virtual Machine*	getAnInstance() const { return new Log(); }
 
 		// Get the ID specific to each Machine - overriden

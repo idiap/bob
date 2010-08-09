@@ -49,12 +49,12 @@ namespace Torch
 
 		double			normal(double x, double mu, double sigma, double stdv);
 			   
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		// Loading/Saving the content from files (\emph{not the options}) - overriden
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 
 		/// Constructs an empty Classifier of this kind - overriden
-		/// (used by <MachineManager>, this object is automatically deallocated)
+		// (used by <MachineManager>, this object is automatically deallocated)
 		virtual Machine*	getAnInstance() const { return manage(new TreeClassifier()); }
 
 		// Get the ID specific to each Machine - overriden

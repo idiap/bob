@@ -35,12 +35,12 @@ namespace Torch {
 		/// Process the input tensor
 		virtual bool 		forward(const Tensor& input);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		// Loading/Saving the content from files (\emph{not the options}) - overriden
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 
 		/// Constructs an empty Machine of this kind
-		/// (used by <MachineManager>, this object is automatically deallocated)
+		// (used by <MachineManager>, this object is automatically deallocated)
 		virtual Machine*	getAnInstance() const { return manage(new IntLutMachine()); }
 
 		// Get the ID specific to each Machine

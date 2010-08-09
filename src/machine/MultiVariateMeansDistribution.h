@@ -43,7 +43,7 @@ public:
 	virtual bool		saveFile(File& file) const;
 
 	/// Constructs an empty Machine of this kind - overriden
-	/// (used by <MachineManager>, this object should be deallocated by the user)
+	// (used by <MachineManager>, this object should be deallocated by the user)
 	virtual Machine*	getAnInstance() const { return new MultiVariateMeansDistribution(); }
 
 	// Get the ID specific to each Machine - overriden

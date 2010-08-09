@@ -114,7 +114,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMinit()
 
 bool MultiVariateDiagonalGaussianDistribution::sampleEMaccPosteriors(double *sample_, const double input_posterior)
 {
-   	/** Computes the posterior for each gaussian
+   	/* Computes the posterior for each gaussian
 
 		\begin{equation}
 			P(q_j | x_i) = \frac{P(q_j) \times p(x_i | q_j)}{\sum_{k=1}^K P(q_k) \times p(x_i | q_k)}
@@ -140,7 +140,7 @@ bool MultiVariateDiagonalGaussianDistribution::sampleEMaccPosteriors(double *sam
 		}
 	}
 
-	/** Accumulates weights, means and variances weighted by the posterior
+	/* Accumulates weights, means and variances weighted by the posterior
 
 		\begin{equation}
 			posterior_j = P(q_j | x_i)
@@ -196,7 +196,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 
 	for(int j = 0 ; j < n_means ; j++)
 	{
-	   	/** Update rule for weights:
+	   	/* Update rule for weights:
 			\begin{equation}
 			\lambda_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i)}{\sum_{k=1}^{n_gaussians} \sum_{i=1}^{n_samples} P(q_k | x_i)}
 			\end{equation}
@@ -205,7 +205,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-	   		/** Update rule for means:
+	   		/* Update rule for means:
 				\begin{equation}
 				\mu_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i) \times x_i}{\sum_{i=1}^{n_samples} P(q_j | x_i)}
 				\end{equation}
@@ -214,14 +214,14 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 
 			if(variance_update)
 			{
-	   			/** Update rule (1) for variances:
+	   			/* Update rule (1) for variances:
 					\begin{equation}
 					\sigma_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i) \times (x_i - \mu_j)}{\sum_{i=1}^{n_samples} P(q_j | x_i)}
 					\end{equation}
 				*/
 				//double v = acc_posteriors_variances[j][k] / acc_posteriors_weights[j];
 
-				/** Update rule (2) for variances:
+				/* Update rule (2) for variances:
 					\begin{equation}
 					\sigma_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i) \times x_i^2}{\sum_{i=1}^{n_samples} P(q_j | x_i)} - \mu_j^2
 					\end{equation}

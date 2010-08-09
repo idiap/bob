@@ -40,7 +40,7 @@ bool MultiVariateMeansDistribution::EMupdate()
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-	   		/** Update rule for means:
+	   		/* Update rule for means:
 				\begin{equation}
 				\mu_j = \frac{\sum_{i=1}^{n_samples} P(q_j | x_i) \times x_i}{\sum_{i=1}^{n_samples} P(q_j | x_i)}
 				\end{equation}

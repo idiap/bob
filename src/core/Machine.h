@@ -47,7 +47,7 @@ namespace Torch {
 		virtual bool 		forward(const Tensor& input) = 0;
 
 		/// Constructs an empty Machine of this kind
-		/// (used by <MachineManager>, this object is automatically deallocated)
+		// (used by <MachineManager>, this object is automatically deallocated)
 		virtual Machine*	getAnInstance() const = 0;
 
 		// Set the model size to use
@@ -62,7 +62,7 @@ namespace Torch {
 		// Get the ID specific to each Machine
 		virtual int		getID() const = 0;
 
-		/// Loading/Saving the content from files (\emph{not the options})
+		// Loading/Saving the content from files (\emph{not the options})
 		virtual bool		loadFile(File& file) = 0;
 		virtual bool		saveFile(File& file) const = 0;
 
