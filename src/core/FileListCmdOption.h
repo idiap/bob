@@ -37,7 +37,7 @@ namespace Torch {
 		/// Read the option on the command line. - overriden
 		virtual void read(int *argc_, char ***argv_);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		/// Loading/Saving the content from files (\em{not the options}) - overriden
 		virtual bool loadFile(File& file);
 		virtual bool saveFile(File& file) const;
 

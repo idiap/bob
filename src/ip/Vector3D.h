@@ -12,7 +12,7 @@ namespace Torch {
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	class Vector3D : public Point3D
@@ -113,7 +113,7 @@ namespace Torch {
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -140,7 +140,7 @@ namespace Torch {
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{

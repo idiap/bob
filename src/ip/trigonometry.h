@@ -22,7 +22,7 @@ namespace Torch
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 //@{

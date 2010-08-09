@@ -20,7 +20,7 @@ namespace Torch {
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Laurent El Shafey (laurent.el-shafey@idiap.ch)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 2.0
 	*/
 

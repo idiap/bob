@@ -31,7 +31,7 @@ namespace Torch {
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	class Point2D : public DoubleTensor
@@ -172,7 +172,7 @@ namespace Torch {
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -206,7 +206,7 @@ namespace Torch {
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -220,7 +220,7 @@ namespace Torch {
 
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -236,7 +236,7 @@ namespace Torch {
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -253,7 +253,7 @@ namespace Torch {
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -276,7 +276,7 @@ namespace Torch {
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -301,7 +301,7 @@ namespace Torch {
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	int isLeft(const Point2D& P0, const Point2D& P1, const Point2D& P2);
@@ -319,7 +319,7 @@ namespace Torch {
 
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	int ccw(const Point2D& V0, const Point2D& V1, const Point2D& V2);

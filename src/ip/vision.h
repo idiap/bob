@@ -15,7 +15,7 @@ namespace Torch {
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 struct sPixRGB
@@ -33,7 +33,7 @@ struct sPixRGB
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 struct sPixYUV
@@ -50,7 +50,7 @@ struct sPixYUV
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 struct sPoint2D
@@ -70,7 +70,7 @@ struct sPoint2D
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.1
-    \Date
+    \date
     @since 2.1
 */
 struct sPoint2Dpolar
@@ -89,7 +89,7 @@ struct sPoint2Dpolar
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 struct sRect2D
@@ -113,7 +113,7 @@ struct sRect2D
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 struct sSize
@@ -141,7 +141,7 @@ struct sSize
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.1
-    \Date
+    \date
     @since 2.1
 */
 struct sRect2Dpolar
@@ -158,7 +158,7 @@ struct sRect2Dpolar
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 struct sPoly2D
@@ -191,7 +191,7 @@ struct sPoly2D
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 struct sOcton
@@ -214,7 +214,7 @@ struct sOcton
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 struct sComplex

@@ -19,7 +19,7 @@ namespace Torch {
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 #define CLIP(t) (((t)>255)?255:(((t)<0)?0:(t)))
@@ -27,7 +27,7 @@ namespace Torch {
 /** Getting R value from Y U V
 
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 #define GET_R_FROM_YUV(y, u, v) UNFIX((FIX(1.0, FIXNUM)*(y) + FIX(1.402, FIXNUM)*(v)), FIXNUM)
@@ -35,7 +35,7 @@ namespace Torch {
 /** Getting G value from Y U V
 
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 #define GET_G_FROM_YUV(y, u, v) UNFIX((FIX(1.0, FIXNUM)*(y) + FIX(-0.344, FIXNUM)*(u) + FIX(-0.714, FIXNUM)*(v)), FIXNUM)
@@ -43,7 +43,7 @@ namespace Torch {
 /** Getting B value from Y U V
 
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 #define GET_B_FROM_YUV(y, u, v) UNFIX((FIX(1.0, FIXNUM)*(y) + FIX(1.772, FIXNUM)*(u)), FIXNUM)
@@ -51,7 +51,7 @@ namespace Torch {
 /** Getting Y value from R G B
 
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 #define GET_Y_FROM_RGB(r, g, b) UNFIX((FIX(0.299, FIXNUM)*(r) + FIX(0.587, FIXNUM)*(g) + FIX(0.114, FIXNUM)*(b)), FIXNUM)
@@ -59,7 +59,7 @@ namespace Torch {
 /** Getting U value from R G B
 
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 #define GET_U_FROM_RGB(r, g, b) UNFIX((FIX(-0.169, FIXNUM)*(r) + FIX(-0.331, FIXNUM)*(g) + FIX(0.500, FIXNUM)*(b)), FIXNUM)
@@ -67,7 +67,7 @@ namespace Torch {
 /** Getting V value from R G B
 
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 #define GET_V_FROM_RGB(r, g, b) UNFIX((FIX(0.500, FIXNUM)*(r) + FIX(-0.419, FIXNUM)*(g) + FIX(-0.081, FIXNUM)*(b)), FIXNUM)
@@ -76,7 +76,7 @@ namespace Torch {
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 //@{
@@ -90,7 +90,7 @@ namespace Torch {
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 unsigned char rgb_to_gray(unsigned char r_, unsigned char g_, unsigned char b_);
@@ -140,7 +140,7 @@ bool RGB32_to_YUV(int width_, int height_, unsigned char *s_, int bytesperline_s
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 //@{
@@ -156,7 +156,7 @@ void ycbcr2rgb(int y, int cb, int cr, unsigned char *rgb);
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 //@{
@@ -183,7 +183,7 @@ extern int times29[256];
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 //@{
@@ -212,7 +212,7 @@ extern int LUT_ICCIRUV_128[256];
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 1.0
 */
 //@{

@@ -27,7 +27,7 @@ namespace Torch {
 
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	class Rectangle2D : public geomObject
@@ -127,7 +127,7 @@ namespace Torch {
 
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{

@@ -9,7 +9,7 @@ namespace Torch {
 
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @version 2.0
-	    \Date
+	    \date
 	    @since 2.0
 	*/
 	class Octon2D : public geomObject

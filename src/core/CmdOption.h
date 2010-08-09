@@ -39,7 +39,7 @@ namespace Torch
 		*/
 		virtual void read(int *argc_, char ***argv_) {};
 
-		/// Loading/Saving the content from files (\emph{not the options})
+		/// Loading/Saving the content from files (\em{not the options})
 		virtual bool loadFile(File& file) { return true; }
 		virtual bool saveFile(File& file) const { return true; }
 
@@ -134,7 +134,7 @@ namespace Torch
 		/// Read the option on the command line. - overriden
 		virtual void read(int *argc_, char ***argv_);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		/// Loading/Saving the content from files (\em{not the options}) - overriden
 		virtual bool loadFile(File& file);
 		virtual bool saveFile(File& file) const;
 
@@ -174,7 +174,7 @@ namespace Torch
 		/// Read the option on the command line. - overriden
 		virtual void read(int *argc_, char ***argv_);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		/// Loading/Saving the content from files (\em{not the options}) - overriden
 		virtual bool loadFile(File& file);
 		virtual bool saveFile(File& file) const;
 
@@ -214,7 +214,7 @@ namespace Torch
 		/// Read the option on the command line. - overriden
 		virtual void read(int *argc_, char ***argv_);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		/// Loading/Saving the content from files (\em{not the options}) - overriden
 		virtual bool loadFile(File& file);
 		virtual bool saveFile(File& file) const;
 
@@ -256,7 +256,7 @@ namespace Torch
 		/// Read the option on the command line. - overriden
 		virtual void read(int *argc_, char ***argv_);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		/// Loading/Saving the content from files (\em{not the options}) - overriden
 		virtual bool loadFile(File& file);
 		virtual bool saveFile(File& file) const;
 
@@ -299,7 +299,7 @@ namespace Torch
 		/// Read the option on the command line. - overriden
 		virtual void read(int *argc_, char ***argv_);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		/// Loading/Saving the content from files (\em{not the options}) - overriden
 		virtual bool loadFile(File& file);
 		virtual bool saveFile(File& file) const;
 
@@ -341,7 +341,7 @@ namespace Torch
 		/// Read the option on the command line. - overriden
 		virtual void read(int *argc_, char ***argv_);
 
-		/// Loading/Saving the content from files (\emph{not the options}) - overriden
+		/// Loading/Saving the content from files (\em{not the options}) - overriden
 		virtual bool loadFile(File& file);
 		virtual bool saveFile(File& file) const;
 

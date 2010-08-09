@@ -17,7 +17,7 @@ namespace Torch {
 
     @author Guillaume Heusch (heusch@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 

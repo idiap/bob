@@ -39,7 +39,7 @@ namespace Torch
 		// Get the ID specific to each Machine
 		virtual int		getID() const { return LR_MACHINE_ID; }
 
-		// Loading/Saving the content from files (\emph{not the options})
+		// Loading/Saving the content from files (\em{not the options})
 		virtual bool		loadFile(File& file);
 		virtual bool		saveFile(File& file) const;
 

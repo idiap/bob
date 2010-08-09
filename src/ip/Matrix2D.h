@@ -11,7 +11,7 @@ namespace Torch {
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	class Matrix2D : public DoubleTensor
@@ -81,7 +81,7 @@ namespace Torch {
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{
@@ -105,7 +105,7 @@ namespace Torch {
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1
-	    \Date
+	    \date
 	    @since 1.0
 	*/
 	//@{

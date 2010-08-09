@@ -21,7 +21,7 @@ namespace Torch {
     @author Guillaume Heusch (heusch@idiap.ch)
     @author Laurent El Shafey (laurent.el-shafey@idiap.ch)
     @version 2.0
-    \Date
+    \date
     @since 2.0
 */
 class ipVcycle : public ipCore
