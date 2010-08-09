@@ -282,6 +282,12 @@ Appendix :
 */
 
 
+/**
+ * \addtogroup liboourafft_api libOOURAFFT API
+ * @{
+ *
+ *  The libOOURAFFT API.
+ */
 void cdft(int n, int isgn, double *a, int *ip, double *w)
 {
     void makewt(int nw, int *ip, double *w);
@@ -3311,4 +3317,20 @@ void dstsub(int n, double *a, int nc, double *c)
     }
     a[m] *= c[0];
 }
+/**
+ * @}
+ */
+
+
+/**
+@page libOOURAFFT: a C++ library for Fast Fourier Transform computation (Oourafft)
+
+@section intro Introduction
+
+oourafft is a C++ for Fast Fourier Transform computation
+
+@section api Documentation
+- @ref liboourafft_api "libOOURAFFT API"
+
+*/
 

@@ -27,6 +27,17 @@
 
 Torch5spro is a signal-processing and machine learning toolbox for vision and speech processing developed
  at  Idiap, in Switzerland. The toolbox is written in C++ and is designed to be efficient.
+
+
+@section api Documentation
+- @ref libth_api "libTH API"
+- @ref liblbfgs_api "libLBFGS API"
+- @ref liboourafft_api "libOOURAFFT API"
+
+@section ack Acknowledgements
+
+@section reference Reference
+
 */
 
 #endif
