@@ -2,7 +2,7 @@ PROJECT(scanning)
 cmake_minimum_required(VERSION 2.4)
 
 # This defines the dependencies of this package
-set(deps lbfgs core ip machine) #other torch subprojects
+set(deps lbfgs core ip measurer machine) #other torch subprojects
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
 # for details.

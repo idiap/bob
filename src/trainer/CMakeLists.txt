@@ -10,6 +10,11 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+# ffmpeg, somehow, cannot be found by scanning
+if(ffmpeg_FOUND)
+  link_directories(${ffmpeg_LIBRARY_DIRS})
+endif(ffmpeg_FOUND)
+
 SET(src_trainer
 	"GTFile.cc"
 	"GradientTrainer.cc"
