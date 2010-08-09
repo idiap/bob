@@ -25,7 +25,7 @@ git pull /idiap/home/lelshafey/work/development/torchDep
 
 cd ${prefix}
 echo "[${nightly}] Building torch (debug)..."
-${bindir}/build.py --log-output --build-type=debug --install-prefix=${nightly}/install --build-prefix=${nightly}/build
+${bindir}/build.py --log-output --build-type=debug --install-prefix=${nightly}/install --build-prefix=${nightly}/build --version="nightly-${nightly}"
 debug_status=$?
 if [ ${debug_status} = 0 ]; then
   echo "[${nightly}] Debug build successful."
@@ -34,7 +34,7 @@ else
 fi
 
 echo "[${nightly}] Building torch (release)..."
-${bindir}/build.py --log-output --build-type=release --install-prefix=${nightly}/install --build-prefix=${nightly}/build
+${bindir}/build.py --log-output --build-type=release --install-prefix=${nightly}/install --build-prefix=${nightly}/build --version="nightly-${nightly}"
 release_status=$?
 if [ ${release_status} = 0 ]; then
   echo "[${nightly}] Release build successful."

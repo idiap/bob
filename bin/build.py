@@ -155,6 +155,13 @@ def parse_args():
                     callback=increase_verbosity,
                     help="increases the current verbosity level",
                    )
+  parser.add_option("-V", "--version",
+                    action="store",
+                    dest="version",
+                    default="Version ?.?",
+                    metavar="VERSION",
+                    help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned"
+                   )
   
   options, args = parser.parse_args()
 
@@ -258,6 +265,7 @@ def doxygen(option):
   if not os.path.exists(option.doc_prefix): os.makedirs(option.doc_prefix)
 
   overwrite_options = {}
+  overwrite_options['PROJECT_NUMBER'] = option.version
   overwrite_options['INPUT'] = os.path.join(option.source_dir, 'src')
   overwrite_options['STRIP_FROM_PATH'] = option.source_dir
   overwrite_options['OUTPUT_DIRECTORY'] = option.doc_prefix
