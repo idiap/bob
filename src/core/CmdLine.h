@@ -12,8 +12,8 @@ namespace Torch
 
             Note that here, we make a difference between:
             \begin{itemize}
-              \item {\bf options} which are not required.
-              \item {\bf arguments} which are required.
+              \item {\b options} which are not required.
+              \item {\b arguments} which are required.
             \end{itemize}
 
             Options:
@@ -40,13 +40,13 @@ namespace Torch
                 virtual ~CmdLine();
 
                 /** Read the command-line.
-                    Call this function {\bf after} adding options/arguments
+                    Call this function {\b after} adding options/arguments
                     that you need, with the help of the following functions.
                 */
                 int read(int argc_, char **argv_);
 
                 /** Print the help.
-                    Call this function {\bf after} adding options/arguments
+                    Call this function {\b after} adding options/arguments
                     that you need, with the help of the following functions.
                 */
                 void help();
@@ -83,7 +83,7 @@ namespace Torch
 
                 /** Functions for adding an argument.
                     The argument will be setted to #value# in the command-line
-                    by writting "#value#" {\bf after} all the options.
+                    by writting "#value#" {\b after} all the options.
                     If there are N arguments, you have to write
                     "#value1# #value2# #value3# ... #valueN#" to set them in the
                     command-line.
