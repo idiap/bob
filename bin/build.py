@@ -430,8 +430,11 @@ if __name__ == '__main__':
   if option.action in ('all', 'depfigure'):
     start = time.time()
     try:
-      dot(option, build_dir)
-      problem_track['depfigure'] = ('success', )
+      if problem_track['cmake'][0] == 'success':
+        dot(option, build_dir)
+        problem_track['depfigure'] = ('success',)
+      else:
+        problem_track['depfigure'] = ('blocked',)
     except Exception, e:
       problem_track['depfigure'] = ('failed', '%s' % e)
     time_track['depfigure'] = time.time() - start
