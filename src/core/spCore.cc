@@ -94,7 +94,7 @@ void spCore::setModelSize(const TensorSize& modelSize)
 }
 
 ////////////////////////////////////////////////////////////////////
-/// Loading/Saving the content from files (\emph{not the options})
+/// Loading/Saving the content from files (<em>not the options</em>)
 
 bool spCore::loadFile(File& file)
 {

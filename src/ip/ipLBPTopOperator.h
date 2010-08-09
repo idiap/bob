@@ -96,10 +96,10 @@ namespace Torch {
      * this method.
      * @param xy The result of the LBP operator in the XY plane (frame), for
      * the central frame of the input tensor. This is an image.
-     * @parma xt The result of the LBP operator in the XT plane for the whole
+     * @param xt The result of the LBP operator in the XT plane for the whole
      * image, taking into consideration the size of the width of the input
      * tensor along the time direction. 
-     * @parma yt The result of the LBP operator in the YT plane for the whole
+     * @param yt The result of the LBP operator in the YT plane for the whole
      * image, taking into consideration the size of the width of the input
      * tensor along the time direction. 
      *
