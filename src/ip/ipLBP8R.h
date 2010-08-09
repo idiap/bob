@@ -38,7 +38,7 @@ namespace Torch
 		virtual int		getID() const { return IP_LBP_8R_ID; }
 
 		/// Constructs an empty spCore of this kind - overriden
-		/// (used by <spCoreManager>, this object is automatically deallocated)
+		/// (used by \c spCoreManager, this object is automatically deallocated)
 		virtual spCore*		getAnInstance() const { return manage(new ipLBP8R()); }
 
 		/////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ namespace Torch
 	};
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // REGISTER this spCore to the <spCoreManager>
+        // REGISTER this spCore to the \c spCoreManager
         const bool ip_lbp_8r_registered = spCoreManager::getInstance().add(
                 manage(new ipLBP8R()), "LBP 8R");
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

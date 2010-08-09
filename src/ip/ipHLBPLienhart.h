@@ -37,7 +37,7 @@ namespace Torch
 		}
 
 		/// Constructs an empty spCore of this kind - overriden
-		/// (used by <spCoreManager>, this object is automatically deallocated)
+		/// (used by \c spCoreManager, this object is automatically deallocated)
 		virtual spCore*		getAnInstance() const {
 			return manage(new ipHLBPLienhart());
 		}
@@ -96,7 +96,7 @@ namespace Torch
 	};
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// REGISTER this spCore to the <spCoreManager>
+	// REGISTER this spCore to the \c spCoreManager
 	const bool ip_hlbp_lienhart_registered = spCoreManager::getInstance().add(
 				manage(new ipHLBPLienhart()), "Lienhart HLBP");
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

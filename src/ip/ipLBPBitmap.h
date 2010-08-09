@@ -47,7 +47,7 @@ namespace Torch
 		virtual int		getID() const { return IP_LBP_BITMAP_ID; }
 
 		/// Constructs an empty spCore of this kind - overriden
-		/// (used by <spCoreManager>, this object is automatically deallocated)
+		/// (used by \c spCoreManager, this object is automatically deallocated)
 		virtual spCore*		getAnInstance() const { return manage(new ipLBPBitmap()); }
 
 		// Change the ipLBP to use

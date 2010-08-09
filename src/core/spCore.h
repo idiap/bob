@@ -42,7 +42,7 @@ namespace Torch
 		virtual int		getID() const { return 0; }
 
 		/// Constructs an empty spCore of this kind
-		/// (used by <spCoreManager>, this object is automatically deallocated)
+		/// (used by \c spCoreManager, this object is automatically deallocated)
 		virtual spCore*		getAnInstance() const { return NULL; }
 
 		/// Access the results
