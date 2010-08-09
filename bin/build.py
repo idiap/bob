@@ -321,6 +321,7 @@ def status_log(option, build_dir, install_dir, platform, timing, problems):
   lines.append('# this is the status of the run.')
   lines.append('status = %s' % pp.pformat(problems))
   cfile.write('\n'.join(lines))
+  cfile.write('\n')
   cfile.close()
   logging.debug('Finished writing status file.')
   return cfname
