@@ -524,7 +524,7 @@ void lbfgs_free(lbfgsfloatval_t *x);
 
 
 /**
-@mainpage libLBFGS: a library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS)
+@page libLBFGS: a library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS)
 
 @section intro Introduction
 
