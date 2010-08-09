@@ -10,7 +10,7 @@ namespace Torch
 	//	This class is designed to compute the histogram of some Image (3D ShortTensor).
 	//	The result is 2D IntTensor with the dimensions (bin counts, planes)
 	//
-	//	\begin{verbatim}
+	//	\verbatim
 	//
 	//	 +---+          +--------------+         +
 	//	 |XXX|	        |              |         |   *    *
@@ -20,7 +20,7 @@ namespace Torch
 	//
 	//	 image                                         histogram
 	//
-	//	\end{verbatim}
+	//	\endverbatim
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////

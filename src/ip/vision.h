@@ -7,11 +7,11 @@ namespace Torch {
 
 /** RGB pixel
 
-    \begin{verbatim}
+    \verbatim
     r is the red component
     g is the green component
     b is the blue component
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -25,11 +25,11 @@ struct sPixRGB
 
 /** YUV pixel
 
-    \begin{verbatim}
+    \verbatim
     y is the Y component
     u is the U component
     v is the V component
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -43,10 +43,10 @@ struct sPixYUV
 
 /** Point2D (in double)
 
-    \begin{verbatim}
+    \verbatim
     x is the x coordinate
     y is the y coordinate
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -64,9 +64,9 @@ struct sPoint2D
 
 /** Point2D (in polar coordinates)
 
-    \begin{verbatim}
+    \verbatim
     rho and theta determine the polar coordinates of a 2D point
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.1
@@ -80,12 +80,12 @@ struct sPoint2Dpolar
 
 /** Rect2D
 
-    \begin{verbatim}
+    \verbatim
     x is the upper-left x coordinate
     y is the upper-left y coordinate
     w is the width
     h is the height
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -106,10 +106,10 @@ struct sRect2D
 
 /** sSize
 
-    \begin{verbatim}
+    \verbatim
     w is the width
     h is the height
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -132,12 +132,12 @@ struct sSize
 
 /** Rect2D (in polar coordinates)
 
-    \begin{verbatim}
+    \verbatim
     tl is the top-left polar coordinate
     tr is the top-right polar coordinate
     bl is the bottom-left polar coordinate
     br is the bottom-right polar coordinate
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.1
@@ -151,10 +151,10 @@ struct sRect2Dpolar
 
 /** Poly2D
 
-    \begin{verbatim}
+    \verbatim
     n is the number of points
     p is the array of points
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -171,7 +171,7 @@ struct sPoly2D
 
     An octon is a particular octogon with horizontal top/bottom and vertical left/right.
 
-    \begin{verbatim}
+    \verbatim
               __________
              /          \
             /            |
@@ -187,7 +187,7 @@ struct sPoly2D
 	height is the height
 	cg is the center of gravity
 
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -207,10 +207,10 @@ struct sOcton
 
 /** Complex (in double)
 
-    \begin{verbatim}
+    \verbatim
     r is the real part
     i is the imaginary part
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0

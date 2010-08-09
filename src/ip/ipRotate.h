@@ -15,7 +15,7 @@ namespace Torch
 	//
 	//	It implements the rotation by shear also called Paeth rotation.
 	//
-	//	\begin{verbatim}
+	//	\verbatim
 	//		@inproceedings{paeth:86,
 	//		author = {A W Paeth},
 	//		title = {A fast algorithm for general raster rotation},
@@ -25,7 +25,7 @@ namespace Torch
 	//		location = {Vancouver, British Columbia, Canada},
 	//		publisher = {Canadian Information Processing Society},
 	//		}
-	//	\end{verbatim}
+	//	\endverbatim
 	//
 	//	The original source code can be found \URL[here]{http://www.codeproject.com/bitmap/rotatebyshear.asp}
 	//

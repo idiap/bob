@@ -7,7 +7,7 @@ namespace Torch {
 
 	/** This class is designed to perform the Multiscale Retinex algorithm on an image
 
-	    \begin{verbatim}
+	    \verbatim
 
 	         +---+          +---------------------+         +---+
 	         |xxx|	        |                     |         |XXX|
@@ -15,7 +15,7 @@ namespace Torch {
 	         |xxx|          |                     |         |XXX|
 	         +---+          +---------------------+         +---+
 	
-	    \end{verbatim}
+	    \endverbatim
 
 	    @author Guillaume Heusch (heusch@idiap.ch)	    
 	    @author Laurent El Shafey (laurent.el-shafey@idiap.ch)

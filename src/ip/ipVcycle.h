@@ -14,9 +14,9 @@ namespace Torch {
     Multiple grids of different resolution are used in order to speed up the resolution. 
     Note that the number of grids is dependent on the initial size of the 2D data.
    
-    \begin{verbatim}
+    \verbatim
     "A Multigrid Tutorial", W. L. Briggs. SIAM Books, Philadelphia, 1987.
-    \end{verbatim}
+    \endverbatim
 
     @author Guillaume Heusch (heusch@idiap.ch)
     @author Laurent El Shafey (laurent.el-shafey@idiap.ch)

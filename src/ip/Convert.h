@@ -149,10 +149,10 @@ void ycbcr2rgb(int y, int cb, int cr, unsigned char *rgb);
 
 /** Look-up tables for fast RGB -> luminance calculation
 
-    \begin{verbatim}
+    \verbatim
 	Example:
 		gray = ((times77[r] + times150[g] + times29[b]) >> 8);
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -174,12 +174,12 @@ extern int times29[256];
 
 /** Look-up tables for fast YUV to ICCIRYUV convertion
 
-    \begin{verbatim}
+    \verbatim
 	Example:
 		Y = LUT_ICCIRY[yy];
 		U = LUT_ICCIRUV_128[uu];
 		V = LUT_ICCIRUV_128[vv];
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0
@@ -201,14 +201,14 @@ extern int LUT_ICCIRUV_128[256];
 
     These tables should be initialized first by calling #initLUT_ICCIRYUV_RGB()#.
 
-    \begin{verbatim}
+    \verbatim
 	Example:
 		initLUT_ICCIRYUV_RGB();
 		
 		r = LUT_ICCIRYUV_R[yy][uu][vv];
 		g = LUT_ICCIRYUV_G[yy][uu][vv];
 		b = LUT_ICCIRYUV_B[yy][uu][vv];
-    \end{verbatim}
+    \endverbatim
 
     @author Sebastien Marcel (marcel@idiap.ch)
     @version 2.0

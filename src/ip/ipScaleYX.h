@@ -11,7 +11,7 @@ namespace Torch
 	//	This class is designed to scale an image.
 	//	The result is a tensor of the same storage type.
 	//
-	//	\begin{verbatim}
+	//	\verbatim
 	//
 	//	+----+          +--------------+
 	//	|XXXX|          |              |         +--+
@@ -21,7 +21,7 @@ namespace Torch
 	//
         //	image                                 scaled image
 	//
-	//	\end{verbatim}
+	//	\endverbatim
 	//
 	//	- PARAMETERS (name, type, default value, description):
 	//		"width"		int	0	"width of the scaled tensor"

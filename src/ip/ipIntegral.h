@@ -30,14 +30,14 @@ namespace Torch
 	//		II(x,y) = \sum_{i=1}^{x-1} \sum_{j=1}^{y-1} I(i,j)
 	//	\end{equation}
 	//
-    	//	\begin{verbatim}
+    	//	\verbatim
         //		+---+          +--------------+         +---+
 	//		|XXX|	       |              |         |XXX|
 	//		|XXX|   ---->  |  ipIntegral  | ---->   |XXX|
 	//		|XXX|          |              |         |XXX|
 	//		+---+          +--------------+         +---+
 	//		image                                integral image
-	//	\end{verbatim}
+	//	\endverbatim
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////

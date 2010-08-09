@@ -7,7 +7,7 @@ namespace Torch {
 
 	/** This class is designed to enhance an image using histogram equalisation
 
-	    \begin{verbatim}
+	    \verbatim
 
 	         +---+          +--------------+         +---+
 	         |xxx|	        |              |         |XXX|
@@ -15,7 +15,7 @@ namespace Torch {
 	         |xxx|          |              |         |XXX|
 	         +---+          +--------------+         +---+
 	
-	    \end{verbatim}
+	    \endverbatim
 	    
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @author Laurent El Shafey (laurent.el-shafey@idiap.ch)

@@ -26,10 +26,10 @@ namespace Torch {
 		/** creates a 2D matrix from coefficients.
 
 		    the 2D matrix will be:
-		    \begin{verbatim}
+		    \verbatim
 			[ a b
 			  c d ]
-		    \end{verbatim}
+		    \endverbatim
 		*/
 		Matrix2D(double a, double b, double c, double d);
 

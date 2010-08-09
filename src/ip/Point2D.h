@@ -159,7 +159,7 @@ namespace Torch {
 
 	/** @name Point2D scalar multiplication and divisions
 
-	    \begin{verbatim}
+	    \verbatim
 	    Point2D Scalar Operations (convenient but often illegal)
 	    using any type of scalar (int, float, or double)
 	    are not valid for points in general,
@@ -168,7 +168,7 @@ namespace Torch {
 	    such as: the sum (a*P + b*Q) with (a+b == 1).
 
 	    The programmer must enforce this (if they want to).
-	    \end{verbatim}
+	    \endverbatim
 
 	    @author Dan Sunday (http://www.softsurfer.com/)
 	    @version 2.1

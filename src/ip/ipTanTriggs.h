@@ -22,7 +22,7 @@ namespace Torch {
 	 *  }
 	 *
 
-	    \begin{verbatim}
+	    \verbatim
 
 	         +---+          +---------------------+         +---+
 	         |xxx|	        |                     |         |XXX|
@@ -30,7 +30,7 @@ namespace Torch {
 	         |xxx|          |                     |         |XXX|
 	         +---+          +---------------------+         +---+
 	
-	    \end{verbatim}
+	    \endverbatim
 
 	    @author Laurent El Shafey (laurent.el-shafey@idiap.ch)
 	    

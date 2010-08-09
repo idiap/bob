@@ -11,10 +11,10 @@ namespace Torch {
 	//	        to an image (3D ShortTensor)
 	//		by convolving a NxM Gaussian or Weighed Gaussianfilter.
 	//      The implementation is descrined in:
-	//        \begin{verbatim}
+	//        \verbatim
 	//            "Face Recognition under Varying Lighting conditions using Self Quotient Image"
 	//                Wang, Li and Wang, 2004
-	//        \end{verbatim}
+	//        \endverbatim
 	//        for the SelfQuotientImage.
 	//
 	//

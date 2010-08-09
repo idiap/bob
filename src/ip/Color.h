@@ -36,7 +36,7 @@ namespace Torch {
 		//@{
 		/** Makes a black RGB color object.
 
-		    \begin{verbatim}
+		    \verbatim
 			Some colors are already instanciated, so you can do:
 
 				Color c;
@@ -50,7 +50,7 @@ namespace Torch {
 				c = cyan;
 				c = pink;
 				c = orange;
-		    \end{verbatim}
+		    \endverbatim
 		*/
 		Color();
 
@@ -61,11 +61,11 @@ namespace Torch {
 		    @param data2_ is the BLUE component (if #coding_# is set to "rgb") or the V component (if #coding_# is set to "yuv")
 		    @param coding_ is the coding (RGB by default)
 
-		    \begin{verbatim}
+		    \verbatim
 			Example:
 				Color w(255, 255, 255);
 				Color r(255, 0, 0);
-		    \end{verbatim}
+		    \endverbatim
 		*/
 		Color(unsigned char data0_, unsigned char data1_, unsigned char data2_, const char *coding_ = "rgb");
 
@@ -73,14 +73,14 @@ namespace Torch {
 
 		    @param color_name is the X11 color name (see file rgb.txt for the list of color names)
 
-		    \begin{verbatim}
+		    \verbatim
 			Example:
 				Color w("white");
 				Color r("red");
 				Color p("peach puff");
 
 			@see rgb.txt for the list of color names.
-		    \end{verbatim}
+		    \endverbatim
 		*/
 		Color(const char *color_name_);
 

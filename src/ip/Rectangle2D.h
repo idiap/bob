@@ -10,7 +10,7 @@ namespace Torch {
 
 	/** This class is designed to handle a rectangle in 2D
 
-	    \begin{verbatim}
+	    \verbatim
 
 		      P0            P1
 			+----------+
@@ -23,7 +23,7 @@ namespace Torch {
 			+----------+
 		      P3            P2
 
-	    \end{verbatim}
+	    \endverbatim
 
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @version 2.1
