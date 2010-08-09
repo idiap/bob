@@ -55,7 +55,7 @@ void print(const char *fmt, ...)
   va_end(args);
 }
 
-/// Functions used for sorting arrays with <qsort>
+/// Functions used for sorting arrays with \c qsort
 int compare_floats(const void* a, const void* b)
 {
 	const float* da = (const float*) a;
