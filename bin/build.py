@@ -365,7 +365,7 @@ if __name__ == '__main__':
   if option.action in ('all', 'test'):
     logging.info("Run tests after build: YES")
   
-  problem_track = {'configuration': 'success'}
+  problem_track = {'configuration': ('success',)}
 
   #build
   proceed = True
@@ -420,13 +420,13 @@ if __name__ == '__main__':
     try:
       if proceed:
         make(option, build_dir, 'test')
-        problem_track['make_test'] = ('success', )
+        problem_track['make_test'] = ('success',)
       else:
         problem_track['make_test'] = ('blocked',)
     except Exception, e:
       problem_track['make_test'] = ('failed', '%s' % e)
       proceed = False
-    time_track['doxygen'] = time.time() - start 
+    time_track['make_test'] = time.time() - start 
 
   time_track['end'] = time.time()
 
