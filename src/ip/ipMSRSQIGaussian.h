@@ -30,12 +30,12 @@ namespace Torch {
 	//	\end{eqnarray}
 	//
 	//	\begin{itemize}
-	//		\item $I(x,y)$ is the input image,
-	//		\item $O(x,y)$ is the output image,
-	//		\item $I,O \in {{\rm I \kern -0.2em R}}^w \times {{\rm I \kern -0.2em R}}^h$,
-	//		\item $w$ is the width of the image and $h$ is the height of the image,
-	//		\item $\sigma$ is the variance of the kernel,
-	//		\item * is the convolution operator.
+	//		\li $I(x,y)$ is the input image,
+	//		\li $O(x,y)$ is the output image,
+	//		\li $I,O \in {{\rm I \kern -0.2em R}}^w \times {{\rm I \kern -0.2em R}}^h$,
+	//		\li $w$ is the width of the image and $h$ is the height of the image,
+	//		\li $\sigma$ is the variance of the kernel,
+	//		\li * is the convolution operator.
 	//	\end{itemize}
 	//
 	//	- PARAMETERS (name, type, default value, description):

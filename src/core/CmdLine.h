@@ -12,8 +12,8 @@ namespace Torch
 
             Note that here, we make a difference between:
             \begin{itemize}
-              \item {\b options} which are not required.
-              \item {\b arguments} which are required.
+              \li {\b options} which are not required.
+              \li {\b arguments} which are required.
             \end{itemize}
 
             Options:
@@ -59,10 +59,10 @@ namespace Torch
 
                     Add an option (Int, Bool, Float, String).
                     \begin{itemize}
-                      \item #name# the name of the option (must be unique).
-                      \item #ptr# is the pointer on the optional variable.
-                      \item #init_value# is the initialization value.
-                      \item #help# is the help text for this option.
+                      \li #name# the name of the option (must be unique).
+                      \li #ptr# is the pointer on the optional variable.
+                      \li #init_value# is the initialization value.
+                      \li #help# is the help text for this option.
                     \end{itemize}
 
                     The option will be setted to #value# in the command-line
