@@ -3323,7 +3323,7 @@ void dstsub(int n, double *a, int nc, double *c)
 
 
 /**
-@page libOOURAFFT: a C++ library for Fast Fourier Transform computation (Oourafft)
+@page libOOURAFFT Oourafft: a C++ library for Fast Fourier Transform computation
 
 @section intro Introduction
 
