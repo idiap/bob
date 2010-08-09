@@ -57,4 +57,4 @@ rm -f last;
 ln -s ${nightly} last;
 
 echo "[${nightly}] Running build analysis..."
-#${bindir}/analyze.py 
+${bindir}/nightly_analysis.py 
