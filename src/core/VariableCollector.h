@@ -78,7 +78,7 @@ namespace Torch
 		// Search an variable given its name and returns its index (or <0 if not found)
 		int		search(const char* name) const;
 
-		// Sets an <ok> flag to the given value
+		// Sets an \c ok flag to the given value
 		void		setOK(bool* ok, bool value) const;
 
 	private:

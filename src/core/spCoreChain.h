@@ -27,7 +27,7 @@ namespace Torch
 		/// Change the model size (if used with some machine)
 		virtual void		setModelSize(const TensorSize& modelSize);
 
-		/// Manage the chain of <spCore> to use
+		/// Manage the chain of \c spCore to use
 		void			clear();
 		bool			add(spCore* core);
 

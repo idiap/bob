@@ -21,7 +21,7 @@ namespace Torch
 		///////////////////////////////////////////////////////////
 		/// Option management functions - adding new ones
 
-		/// returns <false> if the name is already taken
+		/// returns \c false if the name is already taken
 		bool			addBOption(const char* name, bool init_value, const char* help = "");
 		bool			addIOption(const char* name, int init_value, const char* help = "");
 		bool			addFOption(const char* name, float init_value, const char* help = "");
@@ -31,7 +31,7 @@ namespace Torch
 		///////////////////////////////////////////////////////////
 		/// Option management functions - changing their values
 
-		/// returns <false> if the name is wrong or the option has a different type
+		/// returns \c false if the name is wrong or the option has a different type
 		bool			setBOption(const char* name, bool new_value);
 		bool			setIOption(const char* name, int new_value);
 		bool			setFOption(const char* name, float new_value);
@@ -42,7 +42,7 @@ namespace Torch
 		/// Option management functions - retrieving alues
 
 		/// it the name is wrong of the option has a different type, the return value is invalid
-		///	check the <ok> value
+		///	check the \c ok value
 		bool			getBOption(const char* name, bool* ok = 0);
 		int			getIOption(const char* name, bool* ok = 0);
 		float			getFOption(const char* name, bool* ok = 0);

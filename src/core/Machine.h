@@ -86,7 +86,7 @@ namespace Torch {
 		// Model size
 		TensorSize		m_size;
 
-		// <spCore> to extract some features (if needed)
+		// \c spCore to extract some features (if needed)
 		spCore*			m_core;
 		TensorRegion		m_region;	// Region where to process
 

@@ -89,7 +89,7 @@ namespace Torch
 	//	Given some ID (e.g. found in a model file), it's possible to retrieve a
 	//		spCore associated with this ID.
 	//
-	//	NB: the <spCore>s are deallocated from the spCoreManager.
+	//	NB: the \c spCores are deallocated from the spCoreManager.
 	//
 	// TODO: doxygen header!
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -108,10 +108,10 @@ namespace Torch
 			return manager;
 		}
 
-		// Register a new <spCore> with a given ID (supposed to be unique)
+		// Register a new \c spCore with a given ID (supposed to be unique)
 		bool			add(spCore* core, const char* name);
 
-		// Get a copy of the <spCore> (empty, no parameters set) for the given ID
+		// Get a copy of the \c spCore (empty, no parameters set) for the given ID
 		// (returns NULL/0 if the <id> is invalid)
 		// The new spCore is automatically deallocated!
 		spCore*			get(int id) const;

@@ -23,7 +23,7 @@ namespace Torch
 		///////////////////////////////////////////////////////////
 		/// Parameters management functions - adding new ones
 
-		/// returns <false> if the name is already taken
+		/// returns \c false if the name is already taken
 		bool			addI(const char* name, const int init_value = 0, const char* help = "");
 		bool			addF(const char* name, const float init_value = 0, const char* help = "");
 		bool			addD(const char* name, const double init_value = 0, const char* help = "");
@@ -34,7 +34,7 @@ namespace Torch
 		///////////////////////////////////////////////////////////
 		/// Parameters management functions - changing their values
 
-		/// returns <false> if the name is wrong or the option has a different type
+		/// returns \c false if the name is wrong or the option has a different type
 		bool			setI(const char* name, const int new_value);
 		bool			setF(const char* name, const float new_value);
 		bool			setD(const char* name, const double new_value);
@@ -46,7 +46,7 @@ namespace Torch
 		/// Parameters management functions - retrieving values
 
 		/// it the name is wrong of the option has a different type, the return value is invalid
-		///	check the <ok> value
+		///	check the \c ok value
 		int	getI(const char* name, bool* ok = 0);
 		float	getF(const char* name, bool* ok = 0);
 		double	getD(const char* name, bool* ok = 0);
