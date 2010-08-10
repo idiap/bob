@@ -1,4 +1,4 @@
-#include "THGeneral.h"
+#include "th/THGeneral.h"
 
 /* Torch Error Handling */
 static void defaultTorchErrorHandlerFunction(const char *msg)

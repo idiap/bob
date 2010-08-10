@@ -1,5 +1,5 @@
-#include "THBlas.h"
-#include "THCBlas.h"
+#include "th/THBlas.h"
+#include "th/THCBlas.h"
 
 #define USE_DOUBLE
 #define real double

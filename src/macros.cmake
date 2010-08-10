@@ -16,7 +16,7 @@ macro(torch_shlib libname sources dependencies externals installdir)
       target_link_libraries(${libname} ${ext})
     endforeach(ext ${externals})
   endif(NOT ("${externals}" STREQUAL ""))
-  install(TARGETS ${libname} LIBRARY DESTINATION ${installdir})
+  install(TARGETS ${libname} EXPORT ${libname} LIBRARY DESTINATION ${installdir})
 endmacro(torch_shlib libname sources dependencies)
 
 # Builds and installs a shared library with dependencies
@@ -29,15 +29,37 @@ macro(torch_archive libname sources dependencies installdir)
   endif(NOT ("${dependencies}" STREQUAL ""))
   set_target_properties(${libname}-static PROPERTIES OUTPUT_NAME ${libname})
   set_target_properties(${libname}-static PROPERTIES PREFIX "lib")
-  install(TARGETS ${libname}-static ARCHIVE DESTINATION ${installdir})
+  install(TARGETS ${libname}-static EXPORT ${libname} ARCHIVE DESTINATION ${installdir})
 endmacro(torch_archive sources dependencies)
 
-# Builds libraries for a subproject and installs headers
-macro(torch_package package src deps shared)
+# Builds libraries for a subproject and installs headers. Wraps every of those
+# items in an exported CMake module to be used by other libraries in or outside
+# the project.
+# 
+# The parameters:
+# torch_library -- This macro's name
+# package -- The base name of this package, so everything besides "torch_",
+# which will get automatically prefixed
+# src -- The sources for the libraries generated
+# deps -- This is a list of other subprojects that this project depends on.
+# shared -- This is a list of shared libraries to which shared libraries
+# generated on this project must link against.
+macro(torch_library package src deps shared)
+  # We set this so we don't need to become repetitive.
   set(libname torch_${package})
-  set(libdir ${INSTALL_DIR}/lib)
-  set(incdir ${INCLUDE_DIR}/torch/${package})
+  set(libdir lib)
+  set(incdir include/torch)
+  set(cmakedir ${libdir}/cmake/torch)
+
+  # This adds target (library) torch_<package>, exports into torch_<package>
   torch_shlib(${libname} "${src}" "${deps}" "${shared}" ${libdir})
+
+  # This adds target (library) torch_<package>-static, exports into
+  # torch_<package>
   torch_archive(${libname} "${src}" "${deps}" ${libdir})
-  file(COPY ./ DESTINATION ${incdir} FILES_MATCHING PATTERN "*.h")
-endmacro(torch_package)
+
+  # This installs all headers to the destination directory
+  install(DIRECTORY ${package}/ DESTINATION ${incdir}/${package} FILES_MATCHING PATTERN "*.h")
+ 
+  install(EXPORT ${libname} DESTINATION ${cmakedir})
+endmacro(torch_library)

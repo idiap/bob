@@ -9,9 +9,7 @@ cmake_minimum_required(VERSION 2.4)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 link_directories(${INSTALL_DIR}/lib)
 
-# to-do:
-# scanning
-#	trainer
-foreach(subdir oourafft lbfgs th core sp ap ip measurer machine scanning trainer)
+#foreach(subdir oourafft lbfgs th core sp ap ip measurer machine scanning trainer)
+foreach(subdir th)
 	add_subdirectory(${subdir})
 endforeach(subdir)

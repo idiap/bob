@@ -1,4 +1,4 @@
-#include "THLogAdd.h"
+#include "th/THLogAdd.h"
 
 #ifdef USE_DOUBLE
 #define MINUS_LOG_THRESHOLD -39.14

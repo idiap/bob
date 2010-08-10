@@ -1,6 +1,6 @@
-#include "THTensorMath.h"
-#include "THTensorApply.h"
-#include "THBlas.h"
+#include "th/THTensorMath.h"
+#include "th/THTensorApply.h"
+#include "th/THBlas.h"
 
 #define TENSOR_IMPLEMENT_BASIC_FUNCTION(NAME, CFUNC) \
 void THTensor_##NAME(THTensor *tensor) \

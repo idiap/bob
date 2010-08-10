@@ -1,5 +1,5 @@
-#include "THGeneral.h"
-#include "THRandom.h"
+#include "th/THGeneral.h"
+#include "th/THRandom.h"
 
 /* The initial seed. */
 static unsigned long the_initial_seed;

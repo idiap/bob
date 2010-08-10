@@ -230,7 +230,7 @@ def cmake(option, build_dir, install_dir):
   cmake_options = {}
   cmake_options['--graphviz'] = "dependencies.dot"
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
-  cmake_options['-DINSTALL_DIR'] = install_dir
+  cmake_options['-DCMAKE_INSTALL_PREFIX'] = install_dir
   cmake_options['-DINCLUDE_DIR'] = os.path.join(install_dir, 'include')
   cmake_options['-DTORCH_LINKAGE'] = 'dynamic'
   if option.static_linkage: cmake_options['-DTORCH_LINKAGE'] = 'static'
