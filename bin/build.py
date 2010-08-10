@@ -340,8 +340,12 @@ def dot(option, build_dir):
   logging.debug('Running dot...')
 
   os.chdir(build_dir)
+  dotfile = 'dependencies.dot'
+  if option.save_output: 
+    os.chdir(option.log_prefix)
+    dotfile = os.path.join('..', dotfile)
 
-  cmdline = ['dot', '-Tpng', 'dependencies.dot', '-odependencies.png']
+  cmdline = ['dot', '-Tpng', dotfile, '-odependencies.png']
   status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
   if status != 0:
     raise RuntimeError, '** ERROR: "dot" did not work as expected.'

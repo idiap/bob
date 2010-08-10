@@ -108,14 +108,17 @@ def build_html_table(entries):
   for k in sorted(entries.keys(), reverse=True):
     v = entries[k]
     start = time.localtime(k)
+    tarball = time.strftime('../chrome/site/nightly/torch-nightly-%d.%m.%Y.tar.gz', start)
     retval.append('<tr style="border: 1px black solid;">')
-    retval.append('<td rowspan="%d" style="border: 1px black solid; padding: 5px;">%s<br/><font style="%s">started: %s</font></td>' % (len(v), time.strftime("%d/%b/%Y", start), subscript_style, time.strftime("%H:%M:%S", start)))
+    retval.append('<td rowspan="%d" style="border: 1px black solid; padding: 5px;">%s<br/><font style="%s"><a href="%s">(download)</a><br/>started: %s</font></td>' % (len(v), time.strftime("%d/%b/%Y", start), subscript_style, tarball, time.strftime("%H:%M:%S", start)))
     first = True
     for build in sorted(v.keys()):
       if not first: 
         retval.append('<tr>')
         first = False
-      retval.append('<td style="border: 1px black solid; padding: 5px;">%s<br/><font style="%s">%s</font></td>' % (build, subscript_style, '%s-%s (%s)' % (v[build]['uname'][0], v[build]['uname'][2], v[build]['uname'][4])))
+      depfig = '/'.join([v[build]['options']['log_prefix'], 'dependencies']) + '.png'
+      depfig = '../chrome/site/' + '/'.join(depfig.split('/')[-6:])
+      retval.append('<td style="border: 1px black solid; padding: 5px;">%s<br/><font style="%s"><a title="Click to find out inter-dependencies within this build" href="%s">(dependencies)</a><br/>%s</font></td>' % (build, subscript_style, depfig, '%s-%s (%s)' % (v[build]['uname'][0], v[build]['uname'][2], v[build]['uname'][4])))
       for phase in ('cmake','make_all','make_install','doxygen','make_test'):
         status = v[build]['status'][phase][0]
         timing = v[build]['timing'][phase]

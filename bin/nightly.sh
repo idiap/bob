@@ -57,5 +57,11 @@ cd ${prefix};
 rm -f last;
 ln -s ${nightly} last;
 
+echo "[${nightly}] Creating tarball..."
+cd ${prefix};
+cd ${nightly};
+tar cfz ../torch-nightly-${nightly}.tar.gz setup.sh setup.csh bin install;
+
 echo "[${nightly}] Running build analysis..."
+cd ${prefix};
 ${bindir}/nightly_analysis.py > table.html;
