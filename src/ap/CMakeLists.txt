@@ -11,7 +11,10 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # This defines the list of source files inside this package.
-SET(src "apMFCC.cc" "apLFCC.cc")
+SET(src 
+        "apCore.cc"
+        "apMFCC.cc"
+        "apLFCC.cc")
 
 include(../macros.cmake)
 torch_package(ap "${src}" "${deps}" "${shared}")

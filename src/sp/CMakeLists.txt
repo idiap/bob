@@ -7,7 +7,13 @@ set(deps oourafft core) #other torch subprojects
 add_definitions(-DHAVE_OOURAFFT)
 
 # This defines the list of source files inside this package.
-set(src "spFFT.cc" "spDCT.cc" "spDeltaOne.cc" "ooura.cc")
+set(src 
+#        "spCore.cc"
+#        "spCoreChain.cc"
+        "spFFT.cc"
+        "spDCT.cc"
+        "spDeltaOne.cc"
+        "ooura.cc")
 
 include(../macros.cmake)
 torch_package(sp "${src}" "${deps}" "${shared}")

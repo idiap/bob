@@ -14,7 +14,7 @@ set(src
 		"File.cc"
 		"spCore.cc"
 		"spCoreChain.cc"
-		"apCore.cc"
+#		"apCore.cc"
 		"DataSet.cc"
 		"MemoryDataSet.cc"
 		"DiskDataSet.cc"
