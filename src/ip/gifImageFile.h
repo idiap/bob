@@ -1,7 +1,7 @@
 #ifndef GIF_IMAGE_FILE_INC
 #define GIF_IMAGE_FILE_INC
 
-#include "ImageFile.h"
+#include "ip/ImageFile.h"
 
 namespace Torch {
 

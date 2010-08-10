@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_IP_HISTO_EQUAL_H_
 #define _TORCH5SPRO_IP_HISTO_EQUAL_H_
 
-#include "core/ipCore.h"
+#include "ip/ipCore.h"
 
 namespace Torch {
 

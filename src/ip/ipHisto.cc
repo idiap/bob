@@ -1,4 +1,4 @@
-#include "ipHisto.h"
+#include "ip/ipHisto.h"
 #include "core/Tensor.h"
 
 namespace Torch {

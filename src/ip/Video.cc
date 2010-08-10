@@ -1,5 +1,5 @@
-#include "Video.h"
-#include "Image.h"
+#include "ip/Video.h"
+#include "ip/Image.h"
 
 #ifdef HAVE_FFMPEG
 extern "C"

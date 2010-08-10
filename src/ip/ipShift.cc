@@ -1,4 +1,4 @@
-#include "ipShift.h"
+#include "ip/ipShift.h"
 #include "core/Tensor.h"
 
 namespace Torch {

@@ -1,7 +1,7 @@
 #ifndef _IP_TAN_TRIGGS_H_
 #define _IP_TAN_TRIGGS_H_
 
-#include "core/ipCore.h"
+#include "ip/ipCore.h"
 
 namespace Torch {
 

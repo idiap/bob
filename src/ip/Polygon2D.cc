@@ -1,5 +1,5 @@
-#include "Polygon2D.h"
-#include "Color.h"
+#include "ip/Polygon2D.h"
+#include "ip/Color.h"
 
 namespace Torch {
 

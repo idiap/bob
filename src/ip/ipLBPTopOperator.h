@@ -13,8 +13,8 @@
 
 #include "core/Object.h"
 #include "core/Tensor.h"
-#include "Image.h"
-#include "ipLBP.h"
+#include "ip/Image.h"
+#include "ip/ipLBP.h"
 
 namespace Torch {
 

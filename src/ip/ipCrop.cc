@@ -1,4 +1,4 @@
-#include "ipCrop.h"
+#include "ip/ipCrop.h"
 #include "core/Tensor.h"
 
 namespace Torch {

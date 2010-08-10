@@ -1,8 +1,8 @@
 #ifndef _TORCHVISION_IP_SOBEL_H_
 #define _TORCHVISION_IP_SOBEL_H_
 
-#include "core/ipCore.h"		// <ipSobel> is a <Torch::ipCore>
-#include "vision.h"		// <sRect2D> definition
+#include "ip/ipCore.h"		// <ipSobel> is a <Torch::ipCore>
+#include "ip/vision.h"		// <sRect2D> definition
 #include "core/Tensor.h"
 
 namespace Torch

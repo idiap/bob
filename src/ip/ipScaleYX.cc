@@ -1,4 +1,4 @@
-#include "ipScaleYX.h"
+#include "ip/ipScaleYX.h"
 #include "core/Tensor.h"
 
 namespace Torch {

@@ -1,4 +1,4 @@
-#include "Convert.h"
+#include "ip/Convert.h"
 
 namespace Torch {
 

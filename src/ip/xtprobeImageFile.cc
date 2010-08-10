@@ -1,10 +1,10 @@
-#include "xtprobeImageFile.h"
+#include "ip/xtprobeImageFile.h"
 
-#include "pgmImageFile.h"
-#include "ppmImageFile.h"
-#include "jpegImageFile.h"
-#include "gifImageFile.h"
-#include "tiffImageFile.h"
+#include "ip/pgmImageFile.h"
+#include "ip/ppmImageFile.h"
+#include "ip/jpegImageFile.h"
+#include "ip/gifImageFile.h"
+#include "ip/tiffImageFile.h"
 
 namespace Torch {
 

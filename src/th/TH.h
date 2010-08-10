@@ -31,6 +31,7 @@ Torch5spro is a signal-processing and machine learning toolbox for vision and sp
 
 @section api Documentation
 - @ref libth_api "libTH API"
+- @ref libip_api "libIP API"
 - @ref liblbfgs_api "libLBFGS API"
 - @ref liboourafft_api "libOOURAFFT API"
 

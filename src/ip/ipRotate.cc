@@ -1,4 +1,4 @@
-#include "ipRotate.h"
+#include "ip/ipRotate.h"
 
 namespace Torch {
 

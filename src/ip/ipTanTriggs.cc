@@ -1,5 +1,5 @@
-#include "ipTanTriggs.h"
-#include "ipRescaleGray.h"
+#include "ip/ipTanTriggs.h"
+#include "ip/ipRescaleGray.h"
 #include <cmath>
 //STL #include <limits>
 

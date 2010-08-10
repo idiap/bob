@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_IP_MSR_SQI_GAUSSIAN_H_
 #define _TORCH5SPRO_IP_MSR_SQI_GAUSSIAN_H_
 
-#include "core/ipCore.h"		// <ipMSRSQIGaussian> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipMSRSQIGaussian> is a <Torch::ipCore>
 
 namespace Torch {
 

@@ -1,4 +1,4 @@
-#include "ipRescaleGray.h"
+#include "ip/ipRescaleGray.h"
 //STL #include <limits>
 
 #define COMPUTE_SCALE_GRAY(tensorType, dataType)                                                                     \

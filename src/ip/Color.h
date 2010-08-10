@@ -1,7 +1,7 @@
 #ifndef COLOR_INC
 #define COLOR_INC
 
-#include "Convert.h"
+#include "ip/Convert.h"
 
 namespace Torch {
 

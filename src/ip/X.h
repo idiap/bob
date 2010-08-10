@@ -1,7 +1,7 @@
 #ifndef X_INC
 #define X_INC
 
-#include "general.h"
+#include "core/general.h"
 
 #ifdef HAVE_X11
 // Xm stuff

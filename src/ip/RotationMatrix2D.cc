@@ -1,4 +1,4 @@
-#include "RotationMatrix2D.h"
+#include "ip/RotationMatrix2D.h"
 
 namespace Torch {
 

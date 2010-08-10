@@ -1,4 +1,4 @@
-#include "ipSmoothGaussian.h"
+#include "ip/ipSmoothGaussian.h"
 #include "core/Tensor.h"
 
 namespace Torch {

@@ -1,8 +1,8 @@
-#include "ImageScanDataSet.h"
-#include "Image.h"
-#include "ipScaleYX.h"
-#include "ipCrop.h"
-#include "xtprobeImageFile.h"
+#include "ip/ImageScanDataSet.h"
+#include "ip/Image.h"
+#include "ip/ipScaleYX.h"
+#include "ip/ipCrop.h"
+#include "ip/xtprobeImageFile.h"
 
 namespace Torch {
 

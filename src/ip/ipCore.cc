@@ -1,4 +1,4 @@
-#include "ipCore.h"
+#include "ip/ipCore.h"
 
 namespace Torch {
 

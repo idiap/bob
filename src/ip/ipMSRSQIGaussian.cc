@@ -1,4 +1,4 @@
-#include "ipMSRSQIGaussian.h"
+#include "ip/ipMSRSQIGaussian.h"
 
 namespace Torch {
 

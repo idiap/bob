@@ -1,5 +1,5 @@
-#include "ipLBPBitmap.h"
-#include "ipLBP.h"
+#include "ip/ipLBPBitmap.h"
+#include "ip/ipLBP.h"
 #include "core/Tensor.h"
 
 namespace Torch {

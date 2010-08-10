@@ -1,4 +1,4 @@
-#include "ipLBP.h"
+#include "ip/ipLBP.h"
 #include "core/Tensor.h"
 
 namespace Torch {

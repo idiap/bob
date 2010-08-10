@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_IP_LBP_4R_H_
 #define _TORCHVISION_IP_LBP_4R_H_
 
-#include "ipLBP.h"		// <ipLBP4R> is an <ipLBP>
+#include "ip/ipLBP.h"		// <ipLBP4R> is an <ipLBP>
 #include "core/spCores.h"
 
 namespace Torch

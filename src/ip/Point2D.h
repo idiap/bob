@@ -1,8 +1,8 @@
 #ifndef POINT2D_INC
 #define POINT2D_INC
 
-#include "geomObject.h"
-#include "trigonometry.h"
+#include "ip/geomObject.h"
+#include "ip/trigonometry.h"
 #include "core/Tensor.h"
 
 namespace Torch {

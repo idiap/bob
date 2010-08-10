@@ -1,4 +1,4 @@
-#include "ipLBP8R.h"
+#include "ip/ipLBP8R.h"
 #include "core/Tensor.h"
 //#include "Scanner.h"
 

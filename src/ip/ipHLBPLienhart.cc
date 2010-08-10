@@ -1,4 +1,4 @@
-#include "ipHLBPLienhart.h"
+#include "ip/ipHLBPLienhart.h"
 
 namespace Torch
 {

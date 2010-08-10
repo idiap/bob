@@ -1,8 +1,8 @@
 #ifndef _TORCHVISION_IP_FLIP_H_
 #define _TORCHVISION_IP_FLIP_H_
 
-#include "core/ipCore.h"		// <ipFlip> is a <Torch::ipCore>
-#include "vision.h"		// <sRect2D> definition
+#include "ip/ipCore.h"		// <ipFlip> is a <Torch::ipCore>
+#include "ip/vision.h"		// <sRect2D> definition
 
 namespace Torch
 {

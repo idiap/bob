@@ -1,6 +1,6 @@
-#include "ipMultiscaleRetinex.h"
-#include "ipMSRSQIGaussian.h"
-#include "ipRescaleGray.h"
+#include "ip/ipMultiscaleRetinex.h"
+#include "ip/ipMSRSQIGaussian.h"
+#include "ip/ipRescaleGray.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////

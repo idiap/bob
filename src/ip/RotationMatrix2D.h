@@ -1,7 +1,7 @@
 #ifndef ROTATION_MATRIX2D_INC
 #define ROTATION_MATRIX2D_INC
 
-#include "Matrix2D.h"
+#include "ip/Matrix2D.h"
 
 namespace Torch {
 

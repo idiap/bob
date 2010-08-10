@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_IP_SW_PRUNER_H_
 #define _TORCHVISION_SCANNING_IP_SW_PRUNER_H_
 
-#include "core/ipCore.h"		// <ipSWPruner> is an <ipCore>
+#include "ip/ipCore.h"		// <ipSWPruner> is an <ipCore>
 
 namespace Torch
 {

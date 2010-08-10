@@ -1,4 +1,4 @@
-#include "vision.h"
+#include "ip/vision.h"
 
 namespace Torch {
 
