@@ -1,9 +1,9 @@
 #ifndef SPCORE_INC
 #define SPCORE_INC
 
-#include "Object.h"
-#include "Tensor.h"
-#include "File.h"
+#include "core/Object.h"
+#include "core/Tensor.h"
+#include "core/File.h"
 
 namespace Torch
 {

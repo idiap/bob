@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_MSE_CRITERION_H_
 #define _TORCH5SPRO_MSE_CRITERION_H_
 
-#include "Criterion.h"
+#include "machine/Criterion.h"
 
 namespace Torch
 {

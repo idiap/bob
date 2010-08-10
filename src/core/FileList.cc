@@ -1,5 +1,5 @@
-#include "FileList.h"
-#include "File.h"
+#include "core/FileList.h"
+#include "core/File.h"
 
 namespace Torch {
 

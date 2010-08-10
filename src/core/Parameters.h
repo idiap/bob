@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_PARAMETERS_H_
 #define _TORCH5SPRO_PARAMETERS_H_
 
-#include "Object.h"
-#include "File.h"
+#include "core/Object.h"
+#include "core/File.h"
 
 namespace Torch
 {

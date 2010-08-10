@@ -1,7 +1,7 @@
 #ifndef TENSOR_INC
 #define TENSOR_INC
 
-#include "general.h"
+#include "core/general.h"
 
 #define METHOD_NOT_IMPLEMENTED { warning("Not implemented !\n"); }
 

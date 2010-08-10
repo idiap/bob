@@ -1,4 +1,4 @@
-#include "StochasticGradientTrainer.h"
+#include "trainer/StochasticGradientTrainer.h"
 #include "machine/GradientMachine.h"
 
 namespace Torch

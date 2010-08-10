@@ -1,4 +1,4 @@
-#include "Tanh.h"
+#include "machine/Tanh.h"
 
 namespace Torch {
 

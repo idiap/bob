@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_LOG_MACHINE_H_
 #define _TORCH5SPRO_LOG_MACHINE_H_
 
-#include "GradientMachine.h"	// Log is a <GradientMachine>
-#include "Machines.h"
+#include "machine/GradientMachine.h"	// Log is a <GradientMachine>
+#include "machine/Machines.h"
 
 namespace Torch
 {

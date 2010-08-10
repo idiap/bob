@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_VARIABLE_COLLECTOR_H_
 #define _TORCH5SPRO_VARIABLE_COLLECTOR_H_
 
-#include "general.h"
+#include "core/general.h"
 
 namespace Torch
 {

@@ -1,4 +1,4 @@
-#include "StumpTrainer.h"
+#include "trainer/StumpTrainer.h"
 
 namespace Torch
 {

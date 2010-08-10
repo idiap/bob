@@ -1,4 +1,4 @@
-#include "FTrainer.h"
+#include "trainer/FTrainer.h"
 
 namespace Torch {
 

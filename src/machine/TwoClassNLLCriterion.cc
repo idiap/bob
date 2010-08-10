@@ -1,4 +1,4 @@
-#include "TwoClassNLLCriterion.h"
+#include "machine/TwoClassNLLCriterion.h"
 
 namespace Torch {
 

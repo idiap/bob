@@ -1,4 +1,4 @@
-#include "Object.h"
+#include "core/Object.h"
 
 namespace Torch
 {

@@ -1,6 +1,6 @@
-#include "spCore.h"
-#include "general.h"
-#include "Tensor.h"
+#include "core/spCore.h"
+#include "core/general.h"
+#include "core/Tensor.h"
 
 namespace Torch {
 

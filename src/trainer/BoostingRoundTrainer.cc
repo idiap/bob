@@ -1,4 +1,4 @@
-#include "BoostingRoundTrainer.h"
+#include "trainer/BoostingRoundTrainer.h"
 
 namespace Torch
 {

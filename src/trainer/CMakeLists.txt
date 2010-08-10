@@ -16,6 +16,7 @@ if(ffmpeg_FOUND)
 endif(ffmpeg_FOUND)
 
 SET(src_trainer
+    "Trainer.cc"
 	"GTFile.cc"
 	"GradientTrainer.cc"
 	"StochasticGradientTrainer.cc"

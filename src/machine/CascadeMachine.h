@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_CASCADE_MACHINE_H_
 #define _TORCH5SPRO_CASCADE_MACHINE_H_
 
-#include "Classifier.h"	// <CascadeMachine> is a <Classifier>
-#include "Machines.h"
+#include "machine/Classifier.h"	// <CascadeMachine> is a <Classifier>
+#include "machine/Machines.h"
 
 namespace Torch
 {

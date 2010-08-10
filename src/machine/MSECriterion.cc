@@ -1,4 +1,4 @@
-#include "MSECriterion.h"
+#include "machine/MSECriterion.h"
 
 namespace Torch {
 

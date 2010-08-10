@@ -1,4 +1,4 @@
-#include "EMTrainer.h"
+#include "trainer/EMTrainer.h"
 #include "machine/ProbabilityDistribution.h"
 
 namespace Torch

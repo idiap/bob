@@ -2,9 +2,9 @@
 #define _TORCH5SPRO_BOOSTING_ROUND_TRAINER_H_
 
 #include "core/DataSet.h"
-#include "WeakLearner.h"
+#include "trainer/WeakLearner.h"
 #include "measurer/measurer.h"
-#include "BoostingTrainer.h"
+#include "trainer/BoostingTrainer.h"
 
 namespace Torch
 {

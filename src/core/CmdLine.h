@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_CMD_LINE_H_
 #define _TORCH5SPRO_CMD_LINE_H_
 
-#include "Object.h"
-#include "CmdOption.h"
+#include "core/Object.h"
+#include "core/CmdOption.h"
 
 namespace Torch
 {

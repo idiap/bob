@@ -1,4 +1,4 @@
-#include "GradientTrainer.h"
+#include "trainer/GradientTrainer.h"
 #include "machine/GradientMachine.h"
 
 namespace Torch

@@ -1,4 +1,4 @@
-#include "Sigmoid.h"
+#include "machine/Sigmoid.h"
 
 namespace Torch {
 

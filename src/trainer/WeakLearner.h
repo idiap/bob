@@ -1,9 +1,9 @@
 #ifndef _TORCH5SPRO_WEAK_LEARNER_H_
 #define _TORCH5SPRO_WEAK_LEARNER_H_
 
-#include "FTrainer.h"
+#include "trainer/FTrainer.h"
 #include "core/spCore.h"
-#include "core/Machine.h"
+#include "machine/Machine.h"
 
 namespace Torch {
 

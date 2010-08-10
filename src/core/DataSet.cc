@@ -1,4 +1,4 @@
-#include "DataSet.h"
+#include "core/DataSet.h"
 
 namespace Torch {
 

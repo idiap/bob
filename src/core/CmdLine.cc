@@ -1,5 +1,5 @@
-#include "CmdLine.h"
-#include "File.h"
+#include "core/CmdLine.h"
+#include "core/File.h"
 #include <time.h>
 
 namespace Torch {

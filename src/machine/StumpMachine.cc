@@ -1,4 +1,4 @@
-#include "StumpMachine.h"
+#include "machine/StumpMachine.h"
 #include "core/spCore.h"
 
 namespace Torch

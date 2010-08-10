@@ -1,4 +1,4 @@
-#include "ProbabilityDistribution.h"
+#include "machine/ProbabilityDistribution.h"
 #include "core/Tensor.h"
 #include "core/File.h"
 

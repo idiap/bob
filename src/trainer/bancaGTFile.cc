@@ -1,4 +1,4 @@
-#include "bancaGTFile.h"
+#include "trainer/bancaGTFile.h"
 
 namespace Torch {
 

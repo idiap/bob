@@ -1,4 +1,4 @@
-#include "RealLutMachine.h"
+#include "machine/RealLutMachine.h"
 #include "core/spCore.h"
 
 namespace Torch

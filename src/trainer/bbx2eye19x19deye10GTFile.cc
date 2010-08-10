@@ -1,4 +1,4 @@
-#include "bbx2eye19x19deye10GTFile.h"
+#include "trainer/bbx2eye19x19deye10GTFile.h"
 
 /**
  * Converts a bounding box into eye positions

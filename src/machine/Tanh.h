@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_TANH_MACHINE_H_
 #define _TORCH5SPRO_TANH_MACHINE_H_
 
-#include "GradientMachine.h"	// Tanh is a <GradientMachine>
-#include "Machines.h"
+#include "machine/GradientMachine.h"	// Tanh is a <GradientMachine>
+#include "machine/Machines.h"
 
 namespace Torch
 {

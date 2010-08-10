@@ -1,4 +1,4 @@
-#include "spCoreChain.h"
+#include "core/spCoreChain.h"
 
 namespace Torch {
 

@@ -1,4 +1,4 @@
-#include "MeanVarNorm.h"
+#include "machine/MeanVarNorm.h"
 #include "core/File.h"
 
 namespace Torch {

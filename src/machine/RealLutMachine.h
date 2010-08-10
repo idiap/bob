@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_REALLUT_MACHINE_H_
 #define _TORCH5SPRO_REALLUT_MACHINE_H_
 
-#include "core/Machine.h"
-#include "Machines.h"
+#include "machine/Machine.h"
+#include "machine/Machines.h"
 
 namespace Torch {
 

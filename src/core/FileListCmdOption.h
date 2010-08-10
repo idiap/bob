@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_FILE_LIST_CMD_OPTION_H_
 #define _TORCH5SPRO_FILE_LIST_CMD_OPTION_H_
 
-#include "CmdOption.h"
+#include "core/CmdOption.h"
 
 namespace Torch {
 

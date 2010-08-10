@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_STUMP_TRAINER_H_
 #define _TORCH5SPRO_STUMP_TRAINER_H_
 
-#include "WeakLearner.h"
+#include "trainer/WeakLearner.h"
 #include "machine/StumpMachine.h"
 #include "measurer/measurer.h"
 

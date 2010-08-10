@@ -1,4 +1,4 @@
-#include "Classifier.h"
+#include "machine/Classifier.h"
 
 namespace Torch {
 

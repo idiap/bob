@@ -1,4 +1,4 @@
-#include "MultiVariateDiagonalGaussianDistribution.h"
+#include "machine/MultiVariateDiagonalGaussianDistribution.h"
 
 namespace Torch {
 

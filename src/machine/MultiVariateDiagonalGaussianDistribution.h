@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_MULTIVARIATE_DIAGONAL_GAUSSIAN_DISTRIBUTION_MACHINE_H_
 #define _TORCH5SPRO_MULTIVARIATE_DIAGONAL_GAUSSIAN_DISTRIBUTION_MACHINE_H_
 
-#include "MultiVariateNormalDistribution.h"
-#include "Machines.h"
+#include "machine/MultiVariateNormalDistribution.h"
+#include "machine/Machines.h"
 
 namespace Torch {
 

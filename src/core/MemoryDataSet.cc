@@ -1,5 +1,5 @@
-#include "Tensor.h"
-#include "MemoryDataSet.h"
+#include "core/Tensor.h"
+#include "core/MemoryDataSet.h"
 
 namespace Torch {
 

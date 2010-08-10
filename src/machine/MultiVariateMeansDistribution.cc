@@ -1,4 +1,4 @@
-#include "MultiVariateMeansDistribution.h"
+#include "machine/MultiVariateMeansDistribution.h"
 
 namespace Torch {
 

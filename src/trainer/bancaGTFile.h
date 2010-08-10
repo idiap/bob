@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_BANCA_GT_FILE_H_
 #define _TORCH5SPRO_BANCA_GT_FILE_H_
 
-#include "GTFile.h"
+#include "trainer/GTFile.h"
 
 namespace Torch
 {
