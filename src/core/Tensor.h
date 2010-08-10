@@ -5,6 +5,12 @@
 
 #define METHOD_NOT_IMPLEMENTED { warning("Not implemented !\n"); }
 
+/**
+ * \addtogroup libcore_api libCore API
+ * @{
+ *
+ *  The libCore API.
+ */
 namespace Torch {
 
 	/////////////////////////////////////////////////////////////////
@@ -306,5 +312,22 @@ extern "C"
 #undef DEFAULT_TENSOR
 
 }
+
+/**
+ * @}
+ */
+
+
+/**
+@page libCore Core: The Core module of Torch
+
+@section intro Introduction
+
+Core contains the core entities of the Torch library.
+
+@section api Documentation
+- @ref libcore_api "libCore API"
+
+*/
 
 #endif
