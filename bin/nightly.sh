@@ -58,4 +58,4 @@ rm -f last;
 ln -s ${nightly} last;
 
 echo "[${nightly}] Running build analysis..."
-${bindir}/nightly_analysis.py 
+${bindir}/nightly_analysis.py > table.html;
