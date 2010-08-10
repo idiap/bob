@@ -3,7 +3,7 @@
 
 #include "ip/ipCore.h"
 #include "core/Tensor.h"
-#include "core/spCores.h"
+#include "sp/spCores.h"
 
 namespace Torch
 {

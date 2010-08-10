@@ -5,6 +5,12 @@
 #include "core/Tensor.h"
 #include "core/File.h"
 
+/**
+ * \addtogroup libsp_api libSP API
+ * @{
+ *
+ *  The libSP API.
+ */
 namespace Torch
 {
 	class Tensor;
@@ -147,5 +153,22 @@ namespace Torch
 		int			m_capacity;	// Number of IDs allocated
 	};
 }
+
+/**
+ * @}
+ */
+
+
+/**
+@page libSP SP: a Signal Processing module
+
+@section intro Introduction
+
+SP is the Signal Processing module of Torch.
+
+@section api Documentation
+- @ref libsp_api "libSP API"
+
+*/
 
 #endif

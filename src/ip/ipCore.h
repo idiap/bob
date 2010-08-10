@@ -1,7 +1,7 @@
 #ifndef IPCORE_INC
 #define IPCORE_INC
 
-#include "core/spCore.h"
+#include "sp/spCore.h"
 
 /**
  * \addtogroup libip_api libIP API

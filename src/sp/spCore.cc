@@ -1,4 +1,4 @@
-#include "core/spCore.h"
+#include "sp/spCore.h"
 #include "core/general.h"
 #include "core/Tensor.h"
 

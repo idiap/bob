@@ -1,7 +1,7 @@
 #ifndef SPCORE_CHAIN_INC
 #define SPCORE_CHAIN_INC
 
-#include "core/spCore.h"
+#include "sp/spCore.h"
 
 namespace Torch
 {

@@ -2,7 +2,7 @@
 #define _TORCH5SPRO_IP_LBPBITMAP_H_
 
 #include "ip/ipCore.h"		// <ipLBPBitmap> is an <ipCore>
-#include "core/spCores.h"
+#include "sp/spCores.h"
 
 namespace Torch
 {

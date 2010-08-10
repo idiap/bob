@@ -1,7 +1,7 @@
 #ifndef APCORE_INC
 #define APCORE_INC
 
-#include "core/spCore.h"
+#include "sp/spCore.h"
 
 /**
  * \addtogroup libap_api libAP API

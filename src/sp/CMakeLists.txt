@@ -8,8 +8,8 @@ add_definitions(-DHAVE_OOURAFFT)
 
 # This defines the list of source files inside this package.
 set(src 
-#        "spCore.cc"
-#        "spCoreChain.cc"
+        "spCore.cc"
+        "spCoreChain.cc"
         "spFFT.cc"
         "spDCT.cc"
         "spDeltaOne.cc"
