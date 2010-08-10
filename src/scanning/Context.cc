@@ -1,5 +1,5 @@
-#include "Context.h"
-#include "ContextExplorer.h"
+#include "scanning/Context.h"
+#include "scanning/ContextExplorer.h"
 
 namespace Torch
 {

@@ -1,5 +1,5 @@
-#include "SpiralScaleExplorer.h"
-#include "ipSWEvaluator.h"
+#include "scanning/SpiralScaleExplorer.h"
+#include "scanning/ipSWEvaluator.h"
 
 namespace Torch
 {

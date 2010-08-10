@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_RANDOM_SCALE_EXPLORER_H_
 #define _TORCHVISION_SCANNING_RANDOM_SCALE_EXPLORER_H_
 
-#include "ScaleExplorer.h"	// <RandomScaleExplorer> is a <ScaleExplorer>
+#include "scanning/ScaleExplorer.h"	// <RandomScaleExplorer> is a <ScaleExplorer>
 
 namespace Torch
 {

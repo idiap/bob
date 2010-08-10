@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_PYRAMID_EXPLORER_H_
 #define _TORCHVISION_SCANNING_PYRAMID_EXPLORER_H_
 
-#include "Explorer.h"		// <PyramidExplorer> is an <Explorer>
+#include "scanning/Explorer.h"		// <PyramidExplorer> is an <Explorer>
 
 namespace Torch
 {

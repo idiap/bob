@@ -3,7 +3,7 @@
 
 #include "core/Object.h"		// <ScaleExplorer> is a <Torch::Object>
 #include "ip/vision.h"		// <sSize> and <sRect2D> definitions
-#include "Explorer.h"
+#include "scanning/Explorer.h"
 
 namespace Torch
 {

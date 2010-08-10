@@ -1,7 +1,7 @@
-#include "ContextTrainer.h"
-#include "ContextMachine.h"
-#include "ContextDataSet.h"
-#include "LRTrainer.h"
+#include "scanning/ContextTrainer.h"
+#include "scanning/ContextMachine.h"
+#include "scanning/ContextDataSet.h"
+#include "scanning/LRTrainer.h"
 #include "core/MemoryDataSet.h"
 
 static double getFARvsFRRRatio()

@@ -1,4 +1,4 @@
-#include "ContextDataSet.h"
+#include "scanning/ContextDataSet.h"
 #include "core/File.h"
 
 namespace Torch

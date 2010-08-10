@@ -2,8 +2,8 @@
 #define _TORCHVISION_SCANNING_CONTEXT_MACHINE_H_
 
 #include "machine/Classifier.h"			// <ContextMachine> is a <Classifier>
-#include "LRMachine.h"
-#include "Context.h"
+#include "scanning/LRMachine.h"
+#include "scanning/Context.h"
 
 namespace Torch
 {

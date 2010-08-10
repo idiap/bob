@@ -1,6 +1,6 @@
-#include "MSExplorer.h"
-#include "ScaleExplorer.h"
-#include "ipSWEvaluator.h"
+#include "scanning/MSExplorer.h"
+#include "scanning/ScaleExplorer.h"
+#include "scanning/ipSWEvaluator.h"
 #include "ip/Image.h"
 
 namespace Torch {

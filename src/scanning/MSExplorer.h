@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_MS_EXPLORER_H_
 #define _TORCHVISION_SCANNING_MS_EXPLORER_H_
 
-#include "Explorer.h"		// <MSExplorer> is an <Explorer>
+#include "scanning/Explorer.h"		// <MSExplorer> is an <Explorer>
 
 namespace Torch
 {

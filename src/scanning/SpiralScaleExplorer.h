@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_SPIRAL_SCALE_EXPLORER_H_
 #define _TORCHVISION_SCANNING_SPIRAL_SCALE_EXPLORER_H_
 
-#include "ScaleExplorer.h"	// <SpiralScaleExplorer> is a <ScaleExplorer>
+#include "scanning/ScaleExplorer.h"	// <SpiralScaleExplorer> is a <ScaleExplorer>
 
 namespace Torch
 {

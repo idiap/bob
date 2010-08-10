@@ -1,4 +1,4 @@
-#include "ipSWPruner.h"
+#include "scanning/ipSWPruner.h"
 
 namespace Torch
 {

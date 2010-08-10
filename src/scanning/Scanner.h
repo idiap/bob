@@ -5,6 +5,12 @@
 #include "Pattern.h"			// detected patterns
 #include "ip/vision.h"			// <sRect2D> definition
 
+/**
+ * \addtogroup libscanning_api libScanning API
+ * @{
+ *
+ *  The libScanning API.
+ */
 namespace Torch
 {
 	class Image;
@@ -142,5 +148,22 @@ namespace Torch
 
 	};
 }
+
+/**
+ * @}
+ */
+
+
+/**
+@page libScanning Scanning: a Scanning module
+
+@section intro Introduction
+
+Scanning is the module of Torch which processes parts of an image.
+
+@section api Documentation
+- @ref libscanning_api "libScanning API"
+
+*/
 
 #endif

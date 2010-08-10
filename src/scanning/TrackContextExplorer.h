@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_TRACK_CONTEXT_EXPLORER_H_
 #define _TORCHVISION_SCANNING_TRACK_CONTEXT_EXPLORER_H_
 
-#include "ContextExplorer.h"		// <TrackContextExplorer> is a <ContextExplorer>
+#include "scanning/ContextExplorer.h"		// <TrackContextExplorer> is a <ContextExplorer>
 
 namespace Torch
 {

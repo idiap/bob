@@ -1,4 +1,4 @@
-#include "LRMachine.h"
+#include "scanning/LRMachine.h"
 #include "core/File.h"
 
 namespace Torch

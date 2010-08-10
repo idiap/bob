@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_MEAN_SHIFT_SELECTOR_H_
 #define _TORCHVISION_SCANNING_MEAN_SHIFT_SELECTOR_H_
 
-#include "Selector.h"		// <MeanShiftSelector> is a <Selector>
+#include "scanning/Selector.h"		// <MeanShiftSelector> is a <Selector>
 
 namespace Torch
 {

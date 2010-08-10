@@ -1,4 +1,4 @@
-#include "DummySelector.h"
+#include "scanning/DummySelector.h"
 
 namespace Torch
 {

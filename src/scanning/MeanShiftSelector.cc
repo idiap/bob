@@ -1,4 +1,4 @@
-#include "MeanShiftSelector.h"
+#include "scanning/MeanShiftSelector.h"
 
 namespace Torch
 {

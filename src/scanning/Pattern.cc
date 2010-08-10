@@ -1,4 +1,4 @@
-#include "Pattern.h"
+#include "scanning/Pattern.h"
 #include "core/general.h"
 
 namespace Torch
