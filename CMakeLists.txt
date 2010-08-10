@@ -32,7 +32,7 @@ add_subdirectory(src)
 set(SystemBoost_DIR extras)
 find_package(SystemBoost REQUIRED)
 
-#add_subdirectory(test)
+add_subdirectory(test)
 #add_subdirectory(benchmark)
 
 # This will bring in the Python bindings, if python was found
