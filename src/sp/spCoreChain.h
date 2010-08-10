@@ -3,6 +3,12 @@
 
 #include "sp/spCore.h"
 
+/**
+ * \addtogroup libsp_api libSP API
+ * @{
+ *
+ *  The libSP API.
+ */
 namespace Torch
 {
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -55,5 +61,9 @@ namespace Torch
 		int			m_n_cores;
 	};
 }
+
+/**
+ * @}
+ */
 
 #endif
