@@ -1,4 +1,4 @@
-#include "trainer/eyecornerGTFile.h"
+#include "scanning/eyecornerGTFile.h"
 
 namespace Torch {
 

@@ -1,24 +1,25 @@
-#ifndef _TORCH5SPRO_EYECORNER_GT_FILE_H_
-#define _TORCH5SPRO_EYECORNER_GT_FILE_H_
+#ifndef _TORCH5SPRO_FRONTAL_ENC_GT_FILE_H_
+#define _TORCH5SPRO_FRONTAL_ENC_GT_FILE_H_
 
-#include "trainer/GTFile.h"
+#include "scanning/GTFile.h"
 
 namespace Torch
 {
 	/**
 		Labels: leye_ocorner, leye_icorner
 			reye_ocorner, reye_icorner
+			nose_tip, chin
 			leye_center, reye_center
 
 	*/
-	class eyecornerGTFile : public GTFile
+	class frontalEyeNoseChinGTFile : public GTFile
 	{
 	public:
 		// Constructor
-		eyecornerGTFile();
+		frontalEyeNoseChinGTFile();
 
 		// Destructor
-		virtual ~eyecornerGTFile();
+		virtual ~frontalEyeNoseChinGTFile();
 
 		// Load points from some file
 		virtual bool		load(File* file);
