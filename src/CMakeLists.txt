@@ -3,7 +3,7 @@
 #
 project(torch)
 
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.6)
 
 # This makes sure we have all headers within reach before starting to compile
 include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)

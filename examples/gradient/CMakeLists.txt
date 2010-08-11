@@ -3,7 +3,7 @@
 #
 PROJECT(EXAMPLE)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET(EXAMPLE_SRC
 	gradientmachines.cc mlpforward1.cc mlpforward2.cc xor.cc mlpclassification.cc)

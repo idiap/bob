@@ -1,5 +1,5 @@
 PROJECT(scanning)
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps lbfgs core ip measurer machine trainer) #other torch subprojects
