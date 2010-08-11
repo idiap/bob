@@ -48,4 +48,4 @@ set(src
 	"${src_boosting}")
 
 include(../macros.cmake)
-torch_package(trainer "${src}" "${deps}" "${shared}")
+torch_library(trainer "${src}" "${deps}" "${shared}")
