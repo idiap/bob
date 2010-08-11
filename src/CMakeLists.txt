@@ -13,7 +13,7 @@ endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
 # Compiles all installed python files
 add_custom_target(python-compilation ALL ${PYTHON_EXECUTABLE} -m compileall .
-  WORKING_DIRECTORY ${INSTALL_DIR}/lib/python${PYTHON_VERSION} 
+  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION} 
   COMMENT "Compiling python files")
 
 foreach(proj oourafft lbfgs th core sp ap ip measurer machine scanning trainer)
