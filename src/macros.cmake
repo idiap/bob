@@ -49,7 +49,11 @@ macro(torch_library package src deps shared)
   set(libname torch_${package})
   set(libdir lib)
   set(incdir include/torch)
-  set(cmakedir share/cmake)
+
+  # Makes sure we can have access to the other package includes
+  foreach(d ${deps})
+    include_directories(../${d})
+  endforeach(d ${deps})
 
   # This adds target (library) torch_<package>, exports into torch_<package>
   torch_shlib(${libname} "${src}" "${deps}" "${shared}" ${libdir})
@@ -59,7 +63,5 @@ macro(torch_library package src deps shared)
   torch_archive(${libname} "${src}" "${deps}" ${libdir})
 
   # This installs all headers to the destination directory
-  install(DIRECTORY ${package}/ DESTINATION ${incdir}/${package} FILES_MATCHING PATTERN "*.h")
- 
-  install(EXPORT ${libname} DESTINATION ${cmakedir})
+  file(COPY ${package}/ DESTINATION ${incdir}/${package} FILES_MATCHING PATTERN "*.h")
 endmacro(torch_library)

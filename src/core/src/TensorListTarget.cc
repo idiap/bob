@@ -1,4 +1,4 @@
-#include "TensorListTarget.h"
+#include "core/TensorListTarget.h"
 
 namespace Torch
 {

@@ -7,26 +7,27 @@ set(shared "") #shared externals to link against (link)
 
 # This defines the list of source files inside this package.
 set(src
-		"general.cc"
-		"VariableCollector.cc"
-		"Object.cc"
-		"Parameters.cc"
-		"File.cc"
-#		"spCore.cc"
-#		"spCoreChain.cc"
-		"DataSet.cc"
-		"MemoryDataSet.cc"
-		"DiskDataSet.cc"
-		"Tensor.cc"
-		"TensorFile.cc"
-		"TensorList.cc"
-		"TensorListTarget.cc"
-		"MTimer.cc"
-		"CmdOption.cc"
-		"FileListCmdOption.cc"
-		"FileList.cc"
-		"CmdLine.cc"
-		"CmdFile.cc")
+   "src/general.cc"
+    "src/VariableCollector.cc"
+    "src/Object.cc"
+    "src/Parameters.cc"
+    "src/File.cc"
+#    "src/spCore.cc"
+#    "src/spCoreChain.cc"
+    "src/DataSet.cc"
+    "src/MemoryDataSet.cc"
+    "src/DiskDataSet.cc"
+    "src/Tensor.cc"
+    "src/TensorFile.cc"
+    "src/TensorList.cc"
+    "src/TensorListTarget.cc"
+    "src/MTimer.cc"
+    "src/CmdOption.cc"
+    "src/FileListCmdOption.cc"
+    "src/FileList.cc"
+    "src/CmdLine.cc"
+    "src/CmdFile.cc")
 
 include(../macros.cmake)
-torch_package(core "${src}" "${deps}" "${shared}")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+torch_library(core "${src}" "${deps}" "${shared}")

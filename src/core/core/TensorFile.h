@@ -1,8 +1,8 @@
 #ifndef	_TORCH5SPRO_TENSOR_FILE_H_
 #define _TORCH5SPRO_TENSOR_FILE_H_
 
-#include "File.h"
-#include "Tensor.h"
+#include "core/File.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

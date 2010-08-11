@@ -1,5 +1,5 @@
-#include "CmdFile.h"
-#include "File.h"
+#include "core/CmdFile.h"
+#include "core/File.h"
 
 //#include <iostream.h>
 //#include <fstream.h>

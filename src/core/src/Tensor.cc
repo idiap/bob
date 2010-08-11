@@ -17,7 +17,7 @@ long Tensor::sizeAll() const
 #define TYPE char
 #define CAP_TYPE Char
 #define TYPE_FORMAT "%d"
-#include "core/TensorGen.cc"
+#include "TensorGen.cc"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -27,7 +27,7 @@ long Tensor::sizeAll() const
 #define TYPE short
 #define CAP_TYPE Short
 #define TYPE_FORMAT "%d"
-#include "core/TensorGen.cc"
+#include "TensorGen.cc"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -37,7 +37,7 @@ long Tensor::sizeAll() const
 #define TYPE int
 #define CAP_TYPE Int
 #define TYPE_FORMAT "%d"
-#include "core/TensorGen.cc"
+#include "TensorGen.cc"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -47,7 +47,7 @@ long Tensor::sizeAll() const
 #define TYPE long
 #define CAP_TYPE Long
 #define TYPE_FORMAT "%ld"
-#include "core/TensorGen.cc"
+#include "TensorGen.cc"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -57,7 +57,7 @@ long Tensor::sizeAll() const
 #define TYPE float
 #define CAP_TYPE Float
 #define TYPE_FORMAT "%f"
-#include "core/TensorGen.cc"
+#include "TensorGen.cc"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
@@ -68,7 +68,7 @@ long Tensor::sizeAll() const
 #define CAP_TYPE Double
 #define TYPE_FORMAT "%g"
 #define DEFAULT_TENSOR
-#include "core/TensorGen.cc"
+#include "TensorGen.cc"
 #undef TYPE_FORMAT
 #undef TYPE
 #undef CAP_TYPE
