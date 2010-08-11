@@ -2,7 +2,7 @@ PROJECT(scanning)
 cmake_minimum_required(VERSION 2.4)
 
 # This defines the dependencies of this package
-set(deps lbfgs core ip measurer machine) #other torch subprojects
+set(deps lbfgs core ip measurer machine trainer) #other torch subprojects
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
 # for details.
@@ -29,6 +29,17 @@ set(src_scanning
    "src/Selector.cc"
 ##   "src/PatternTracker.cc"
    "src/FaceFinder.cc")
+
+SET(src_gtfiles
+   "src/GTFile.cc"
+   "src/bancaGTFile.cc"
+   "src/bbx2eye19x19deye10GTFile.cc"
+   "src/cootesGTFile.cc"
+   "src/eyecenterGTFile.cc"
+   "src/eyecornerGTFile.cc"
+   "src/frontalEyeNoseChinGTFile.cc"
+   "src/halfprofileEyeNoseChinGTFile.cc"
+   "src/profileEyeNoseChinGTFile.cc")
 
 set(src_context
    "src/Context.cc"
@@ -57,6 +68,7 @@ set(src_selectors
 
 set(src
 	"${src_scanning}"
+	"${src_gtfiles}"
 	"${src_context}"
 	"${src_explorers}"
 	"${src_pruners}"

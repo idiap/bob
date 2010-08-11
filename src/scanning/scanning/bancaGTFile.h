@@ -1,7 +1,7 @@
-#ifndef _TORCH5SPRO_COOTES_GT_FILE_H_
-#define _TORCH5SPRO_COOTES_GT_FILE_H_
+#ifndef _TORCH5SPRO_BANCA_GT_FILE_H_
+#define _TORCH5SPRO_BANCA_GT_FILE_H_
 
-#include "trainer/GTFile.h"
+#include "scanning/GTFile.h"
 
 namespace Torch
 {
@@ -9,14 +9,14 @@ namespace Torch
 		Labels: leye_center, reye_center
 
 	*/
-	class cootesGTFile : public GTFile
+	class bancaGTFile : public GTFile
 	{
 	public:
 		// Constructor
-		cootesGTFile();
+		bancaGTFile();
 
 		// Destructor
-		virtual ~cootesGTFile();
+		virtual ~bancaGTFile();
 
 		// Load points from some file
 		virtual bool		load(File* file);
@@ -24,7 +24,6 @@ namespace Torch
 		// Get the name of the GT file format
 		virtual const char*	getName();
 	};
-
 }
 
 #endif

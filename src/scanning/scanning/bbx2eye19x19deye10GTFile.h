@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_BBX2EYE19X19DEYE10_GT_FILE_H_
 #define _TORCH5SPRO_BBX2EYE19X19DEYE10_GT_FILE_H_
 
-#include "trainer/GTFile.h"
+#include "scanning/GTFile.h"
 #include "scanning/Pattern.h"
 
 namespace Torch

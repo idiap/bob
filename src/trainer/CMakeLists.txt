@@ -2,7 +2,7 @@ PROJECT(trainer)
 cmake_minimum_required(VERSION 2.4)
 
 # This defines the dependencies of this package
-set(deps core ip machine scanning lbfgs) #other torch subprojects
+set(deps core ip machine lbfgs) #other torch subprojects
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
 # for details.
@@ -17,20 +17,9 @@ endif(ffmpeg_FOUND)
 
 SET(src_trainer
    "src/Trainer.cc"
-   "src/GTFile.cc"
    "src/GradientTrainer.cc"
    "src/StochasticGradientTrainer.cc"
    "src/EMTrainer.cc")
-
-SET(src_gtfiles
-   "src/bancaGTFile.cc"
-   "src/bbx2eye19x19deye10GTFile.cc"
-   "src/cootesGTFile.cc"
-   "src/eyecenterGTFile.cc"
-   "src/eyecornerGTFile.cc"
-   "src/frontalEyeNoseChinGTFile.cc"
-   "src/halfprofileEyeNoseChinGTFile.cc"
-   "src/profileEyeNoseChinGTFile.cc")
 
 SET(src_boosting
    "src/BoostingRoundLBPTrainer.cc"
@@ -44,7 +33,6 @@ SET(src_boosting
 
 set(src 
 	"${src_trainer}"
-	"${src_gtfiles}"
 	"${src_boosting}")
 
 include(../macros.cmake)
