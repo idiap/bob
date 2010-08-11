@@ -1,5 +1,5 @@
 PROJECT(ap)
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps core) #other torch subprojects
@@ -12,9 +12,9 @@ endif(COMMAND cmake_policy)
 
 # This defines the list of source files inside this package.
 SET(src 
-        "apCore.cc"
-        "apMFCC.cc"
-        "apLFCC.cc")
+   "src/apCore.cc"
+   "src/apMFCC.cc"
+   "src/apLFCC.cc")
 
 include(../macros.cmake)
-torch_package(ap "${src}" "${deps}" "${shared}")
+torch_library(ap "${src}" "${deps}" "${shared}")

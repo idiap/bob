@@ -11,40 +11,40 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 set(src_machine
-    "Machine.cc"	
-	"Classifier.cc"
-	"CascadeMachine.cc"
-	"TreeClassifier.cc"
-	"GradientMachine.cc"
-	"Criterion.cc"
-	"ProbabilityDistribution.cc")
+   "src/Machine.cc"	
+   "src/Classifier.cc"
+   "src/CascadeMachine.cc"
+   "src/TreeClassifier.cc"
+   "src/GradientMachine.cc"
+   "src/Criterion.cc"
+   "src/ProbabilityDistribution.cc")
 
 set(src_criterions
-	"MSECriterion.cc"
-	"TwoClassNLLCriterion.cc"
-	"MVSECriterion.cc")
+   "src/MSECriterion.cc"
+   "src/TwoClassNLLCriterion.cc"
+   "src/MVSECriterion.cc")
 
 set(src_distributions
-	"MultiVariateNormalDistribution.cc"
-	"MultiVariateDiagonalGaussianDistribution.cc"
-	"MultiVariateMAPDiagonalGaussianDistribution.cc"
-	"MultiVariateMeansDistribution.cc")
+   "src/MultiVariateNormalDistribution.cc"
+   "src/MultiVariateDiagonalGaussianDistribution.cc"
+   "src/MultiVariateMAPDiagonalGaussianDistribution.cc"
+   "src/MultiVariateMeansDistribution.cc")
 
 set(src_gradients
-	"Exp.cc"
-	"Log.cc"
-	"Sigmoid.cc"
-	"Linear.cc"
-	"Tanh.cc"
-	"MLP.cc")
+   "src/Exp.cc"
+   "src/Log.cc"
+   "src/Sigmoid.cc"
+   "src/Linear.cc"
+   "src/Tanh.cc"
+   "src/MLP.cc")
 
 set(src_normalisations
-	"MeanVarNorm.cc")
+   "src/MeanVarNorm.cc")
 
 set(src_boosting
-	"IntLutMachine.cc"
-	"RealLutMachine.cc"
-	"StumpMachine.cc")
+   "src/IntLutMachine.cc"
+   "src/RealLutMachine.cc"
+   "src/StumpMachine.cc")
 
 set(src
 	"${src_machine}"
@@ -55,4 +55,4 @@ set(src
 	"${src_boosting}")
 
 include(../macros.cmake)
-torch_package(machine "${src}" "${deps}" "${shared}")
+torch_library(machine "${src}" "${deps}" "${shared}")
