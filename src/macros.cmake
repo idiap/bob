@@ -64,7 +64,7 @@ endmacro(torch_library)
 
 # Creates a standard Torch test.
 macro(torch_test package name src)
-  set(testname ${package}_${name})
+  set(testname torchtest_${package}_${name})
 
   # Include the Boost Unit Test Framework
   include_directories(${Boost_INCLUDE_DIRS})
@@ -73,5 +73,18 @@ macro(torch_test package name src)
   # Please note we don't install test executables
   add_executable(${testname} ${src})
   target_link_libraries(${testname} torch_${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-  add_test(cxx-${testname} ${testname})
+  add_test(cxx-${package}-${name} ${testname})
+endmacro(torch_test package src)
+
+# Creates a standard Torch benchmark.
+macro(torch_benchmark package name src)
+  set(bindir bin)
+  set(progname torchbench_${package}_${name})
+
+  # Include the Boost Unit Test Framework
+  include_directories(${Boost_INCLUDE_DIRS})
+
+  add_executable(${progname} ${src})
+  target_link_libraries(${progname} torch_${package})
+  install(TARGETS ${progname} ARCHIVE DESTINATION ${bindir})
 endmacro(torch_test package src)
