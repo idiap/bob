@@ -103,8 +103,9 @@ macro(torch_python_bindings package src)
   link_directories(${PYTHON_LIBRARY_DIRS})
 
   # Building the library itself
-  add_library(${libname} SHARED "${src}")
+  add_library(${libname} SHARED ${src})
   set_target_properties(${libname} PROPERTIES SUFFIX ".so")
+  target_link_libraries(${libname} torch_${package})
   target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY})
   target_link_libraries(${libname} ${PYTHON_LIBRARIES})
 

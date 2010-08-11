@@ -12,8 +12,6 @@ set(src
     "src/Object.cc"
     "src/Parameters.cc"
     "src/File.cc"
-#    "src/spCore.cc"
-#    "src/spCoreChain.cc"
     "src/DataSet.cc"
     "src/MemoryDataSet.cc"
     "src/DiskDataSet.cc"
@@ -26,7 +24,8 @@ set(src
     "src/FileListCmdOption.cc"
     "src/FileList.cc"
     "src/CmdLine.cc"
-    "src/CmdFile.cc")
+    "src/CmdFile.cc"
+    )
 
 include(../macros.cmake)
 torch_library(core "${src}" "${deps}" "${shared}")
@@ -43,8 +42,6 @@ set(pysrc
    "python/src/file.cc"
    "python/src/tensor.cc"
    "python/src/tensorfile.cc"
-   "python/src/spcore.cc"
-   "python/src/ipcore.cc"
    "python/src/main.cc"
    )
  
