@@ -116,6 +116,6 @@ endmacro(torch_python_bindings package name src)
 # Installs python files and compile them
 macro(torch_python_install package)
   set(pydir ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/torch)
-  file(COPY python/${package} DESTINATION ${pydir}/${package} 
+  file(COPY python/${package} DESTINATION ${pydir}
     FILES_MATCHING PATTERN "*.py")
 endmacro(torch_python_install package)
