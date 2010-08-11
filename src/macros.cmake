@@ -16,7 +16,7 @@ macro(torch_shlib libname sources dependencies externals installdir)
       target_link_libraries(${libname} ${ext})
     endforeach(ext ${externals})
   endif(NOT ("${externals}" STREQUAL ""))
-  install(TARGETS ${libname} EXPORT ${libname} LIBRARY DESTINATION ${installdir})
+  install(TARGETS ${libname} EXPORT torch LIBRARY DESTINATION ${installdir})
 endmacro(torch_shlib libname sources dependencies)
 
 # Builds and installs a shared library with dependencies
@@ -29,7 +29,7 @@ macro(torch_archive libname sources dependencies installdir)
   endif(NOT ("${dependencies}" STREQUAL ""))
   set_target_properties(${libname}-static PROPERTIES OUTPUT_NAME ${libname})
   set_target_properties(${libname}-static PROPERTIES PREFIX "lib")
-  install(TARGETS ${libname}-static EXPORT ${libname} ARCHIVE DESTINATION ${installdir})
+  install(TARGETS ${libname}-static EXPORT torch ARCHIVE DESTINATION ${installdir})
 endmacro(torch_archive sources dependencies)
 
 # Builds libraries for a subproject and installs headers. Wraps every of those
@@ -49,7 +49,7 @@ macro(torch_library package src deps shared)
   set(libname torch_${package})
   set(libdir lib)
   set(incdir include/torch)
-  set(cmakedir ${libdir}/cmake/torch)
+  set(cmakedir share/cmake)
 
   # This adds target (library) torch_<package>, exports into torch_<package>
   torch_shlib(${libname} "${src}" "${deps}" "${shared}" ${libdir})
