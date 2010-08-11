@@ -2,7 +2,7 @@ PROJECT(trainer)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core ip machine lbfgs) #other torch subprojects
+set(deps core ip machine lbfgs measurer) #other torch subprojects
 
 # Avoids warning during linkage configuration see: cmake --help-policy CMP0003
 # for details.

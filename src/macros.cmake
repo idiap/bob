@@ -55,8 +55,10 @@ macro(torch_library package src deps shared)
   # This adds target (library) torch_<package>, exports into "torch"
   torch_shlib(${libname} "${src}" "${deps}" "${shared}" ${libdir})
 
-  # This adds target (library) torch_<package>-static, exports into "torch"
-  torch_archive(${libname} "${src}" "${deps}" ${libdir})
+  if ("${TORCH_BUILD_STATIC_LIBS}")
+    # This adds target (library) torch_<package>-static, exports into "torch"
+    torch_archive(${libname} "${src}" "${deps}" ${libdir})
+  endif ("${TORCH_BUILD_STATIC_LIBS}")
 
   # This installs all headers to the destination directory
   add_custom_command(TARGET ${libname} POST_BUILD COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/${package} ${CMAKE_INSTALL_PREFIX}/${incdir} COMMENT "Installing ${package} headers...")
@@ -120,7 +122,9 @@ endmacro(torch_python_bindings package name src)
 macro(torch_python_install package)
   if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     set(pydir ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/torch)
-    file(COPY python/${package} DESTINATION ${pydir}
-      FILES_MATCHING PATTERN "*.py")
+    add_custom_target(${package}-python-install cp -r ${CMAKE_CURRENT_SOURCE_DIR}/python/${package} ${pydir} COMMENT "Installing ${package} python files...")
+    add_dependencies(${package}-python-install pytorch_${package})
+    add_dependencies(${package}-python-install torch-python-install)
+    add_dependencies(python-compilation ${package}-python-install)
   endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 endmacro(torch_python_install package)

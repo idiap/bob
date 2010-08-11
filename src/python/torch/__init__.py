@@ -2,8 +2,7 @@
 """
 import core
 import sp
-import scanning
 import ip
-import trainer
+import scanning
 
-__all__ = ['core', 'sp', 'scanning', 'ip', 'trainer'] 
+__all__ = ['core', 'sp', 'ip', 'scanning']
