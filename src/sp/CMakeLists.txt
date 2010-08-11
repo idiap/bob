@@ -4,16 +4,15 @@ cmake_minimum_required(VERSION 2.4)
 # This defines the dependencies of this package
 set(deps oourafft core) #other torch subprojects
 
-add_definitions(-DHAVE_OOURAFFT)
-
 # This defines the list of source files inside this package.
 set(src 
-        "spCore.cc"
-        "spCoreChain.cc"
-        "spFFT.cc"
-        "spDCT.cc"
-        "spDeltaOne.cc"
-        "ooura.cc")
+    "src/spCore.cc"
+    "src/spCoreChain.cc"
+    "src/spFFT.cc"
+    "src/spDCT.cc"
+    "src/spDeltaOne.cc")
+
+add_definitions(-DHAVE_OOURAFFT)
 
 include(../macros.cmake)
-torch_package(sp "${src}" "${deps}" "${shared}")
+torch_library(sp "${src}" "${deps}" "")

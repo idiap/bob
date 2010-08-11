@@ -22,5 +22,4 @@ set(src
 		"src/THTensorMath.c")
 
 include(../macros.cmake)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 torch_library(th "${src}" "${deps}" "${shared}")

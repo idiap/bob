@@ -1,5 +1,5 @@
 #include "sp/spFFT.h"
-#include "sp/ooura.h"
+#include "oourafft/ooura.h"
 
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 

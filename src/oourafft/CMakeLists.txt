@@ -2,7 +2,7 @@ project(oourafft)
 
 cmake_minimum_required(VERSION 2.4)
 
-set(src alloc.c fftsg.c fftsg2d.c shrtdct.c)
+set(src src/alloc.c src/fftsg.c src/fftsg2d.c src/shrtdct.c src/ooura.cc)
 
 include(../macros.cmake)
-torch_package(oourafft "${src}" "" "")
+torch_library(oourafft "${src}" "" "")

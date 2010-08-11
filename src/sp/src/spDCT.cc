@@ -1,5 +1,5 @@
 #include "sp/spDCT.h"
-#include "sp/ooura.h"
+#include "oourafft/ooura.h"
 
 /**
  * \addtogroup libsp_api libSP API

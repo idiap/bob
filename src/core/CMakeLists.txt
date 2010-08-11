@@ -29,5 +29,4 @@ set(src
     "src/CmdFile.cc")
 
 include(../macros.cmake)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 torch_library(core "${src}" "${deps}" "${shared}")
