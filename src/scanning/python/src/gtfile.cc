@@ -1,5 +1,5 @@
 /**
- * @file src/trainer/gtfile.cc
+ * @file src/scanning/gtfile.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the Scanner to python
@@ -10,15 +10,15 @@
 #include "core/Object.h"
 #include "core/File.h"
 #include "ip/vision.h"
-#include "trainer/GTFile.h"
-#include "trainer/gtfiles/bbx2eye19x19deye10GTFile.h"
-#include "trainer/gtfiles/bancaGTFile.h"
-#include "trainer/gtfiles/cootesGTFile.h"
-#include "trainer/gtfiles/eyecenterGTFile.h"
-#include "trainer/gtfiles/eyecornerGTFile.h"
-#include "trainer/gtfiles/frontalEyeNoseChinGTFile.h"
-#include "trainer/gtfiles/halfprofileEyeNoseChinGTFile.h"
-#include "trainer/gtfiles/profileEyeNoseChinGTFile.h"
+#include "scanning/GTFile.h"
+#include "scanning/bbx2eye19x19deye10GTFile.h"
+#include "scanning/bancaGTFile.h"
+#include "scanning/cootesGTFile.h"
+#include "scanning/eyecenterGTFile.h"
+#include "scanning/eyecornerGTFile.h"
+#include "scanning/frontalEyeNoseChinGTFile.h"
+#include "scanning/halfprofileEyeNoseChinGTFile.h"
+#include "scanning/profileEyeNoseChinGTFile.h"
 
 using namespace boost::python;
 
@@ -30,7 +30,7 @@ static list gtfile_getpoints(const Torch::GTFile& gtf) {
   return retval;
 }
 
-void bind_trainer_gtfile()
+void bind_scanning_gtfile()
 {
   class_<Torch::GTFile, bases<Torch::File>, boost::noncopyable>("GTFile", "Base Ground Truth file type. Files of this type are used by Normalizers to crop faces from images and videos", no_init)
     .def("load", &Torch::GTFile::load, (arg("self"), arg("file")), "Loads positions for a single face from the input file\n\nReturns \"True\" if we could load the next set of values without problems")

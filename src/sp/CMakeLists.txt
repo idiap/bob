@@ -16,3 +16,13 @@ add_definitions(-DHAVE_OOURAFFT)
 
 include(../macros.cmake)
 torch_library(sp "${src}" "${deps}" "")
+
+# Python bindings
+set(pysrc
+   "python/src/spcore.cc"
+   "python/src/transforms.cc"
+   "python/src/main.cc"
+   )
+ 
+torch_python_bindings(sp "${pysrc}")
+torch_python_install(sp)

@@ -10,11 +10,11 @@
 #include "core/Object.h"
 #include "core/Tensor.h"
 #include "core/File.h"
-#include "core/spCore.h"
+#include "sp/spCore.h"
 
 using namespace boost::python;
 
-void bind_core_spcore()
+void bind_sp_spcore()
 {
   class_<Torch::spCore, bases<Torch::Object>, boost::noncopyable>("spCore", "A base type for all signal processing operators", no_init)
     .def("loadFile", &Torch::spCore::loadFile, (arg("self"), arg("file")), "Loads the content from files (not options)")

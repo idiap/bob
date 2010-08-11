@@ -9,9 +9,11 @@
 
 using namespace boost::python;
 
-void bind_trainer_gtfile();
+void bind_sp_spcore();
+void bind_sp_transforms();
 
-BOOST_PYTHON_MODULE(libpytorch_trainer) {
-  scope().attr("__doc__") = "Torch trainer classes and sub-classes";
-  bind_trainer_gtfile();
+BOOST_PYTHON_MODULE(libpytorch_sp) {
+  scope().attr("__doc__") = "Torch signal processing classes and sub-classes";
+  bind_sp_spcore();
+  bind_sp_transforms();
 }

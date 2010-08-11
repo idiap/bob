@@ -1,4 +1,4 @@
-#include "ip/ipGeomNorm.h"
+#include "scanning/ipGeomNorm.h"
 #include "core/Tensor.h"
 #include "ip/trigonometry.h"
 #include "ip/RotationMatrix2D.h"

@@ -8,9 +8,9 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "ip/ipGeomNorm.h"
-#include "trainer/GTFile.h"
 #include "ip/Image.h"
+#include "scanning/ipGeomNorm.h"
+#include "scanning/GTFile.h"
 
 using namespace boost::python;
 
@@ -35,7 +35,7 @@ static boost::shared_ptr<Torch::Image> ipgn_get_image(const Torch::ipGeomNorm& g
   return retval;
 }
 
-void bind_ip_ipgeomnorm()
+void bind_scanning_ipgeomnorm()
 {
   class_<Torch::ipGeomNorm, boost::shared_ptr<Torch::ipGeomNorm>, bases<Torch::ipCore> >("ipGeomNorm", "This class is designed to geometrically normalize a 2D/3D tensor,	using some ground truth points.	The normalized tensor has the same storage type and is of required size.", no_init)
     .def("__init__", make_constructor(&make_geomnorm))

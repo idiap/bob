@@ -45,7 +45,6 @@ set(pysrc
    "python/src/main.cc"
    )
  
-include(../macros.cmake)
 torch_python_bindings(core "${pysrc}")
 torch_python_install(core)
 

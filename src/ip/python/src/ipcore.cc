@@ -7,12 +7,12 @@
 
 #include <boost/python.hpp>
 
-#include "core/spCore.h"
-#include "core/ipCore.h"
+#include "sp/spCore.h"
+#include "ip/ipCore.h"
 
 using namespace boost::python;
 
-void bind_core_ipcore()
+void bind_ip_ipcore()
 {
   class_<Torch::ipCore, bases<Torch::spCore>, boost::noncopyable>("ipCore", "The base type for all image processing operators", no_init);
 }

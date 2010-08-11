@@ -21,6 +21,7 @@ endif(ffmpeg_FOUND)
 # This defines the list of source files inside this package.
 set(src_scanning
    "src/Pattern.cc"
+   "src/ipGeomNorm.cc"
    "src/ipSWEvaluator.cc"
    "src/ipSWPruner.cc"
    "src/ScaleExplorer.cc"
@@ -76,3 +77,17 @@ set(src
 
 include(../macros.cmake)
 torch_library(scanning "${src}" "${deps}" "${shared}")
+
+# Python bindings
+set(pysrc
+   "python/src/explorer.cc"
+   "python/src/facefinder.cc"
+   "python/src/pattern.cc"
+   "python/src/scanner.cc"
+   "python/src/ipgeomnorm.cc"
+   "python/src/gtfile.cc"
+   "python/src/main.cc"
+   )
+ 
+torch_python_bindings(scanning "${pysrc}")
+torch_python_install(scanning)

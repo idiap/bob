@@ -10,7 +10,7 @@
 #include "core/Object.h"
 #include "ip/Image.h"
 #include "scanning/Scanner.h"
-#include "scanning/explorers/TrackContextExplorer.h"
+#include "scanning/TrackContextExplorer.h"
 
 using namespace boost::python;
 

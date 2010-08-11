@@ -12,9 +12,9 @@
 #include "ip/Image.h"
 #include "scanning/Pattern.h"
 #include "scanning/Explorer.h"
-#include "scanning/explorers/MSExplorer.h"
-#include "scanning/explorers/ContextExplorer.h"
-#include "scanning/explorers/TrackContextExplorer.h"
+#include "scanning/MSExplorer.h"
+#include "scanning/ContextExplorer.h"
+#include "scanning/TrackContextExplorer.h"
 
 using namespace boost::python;
 
