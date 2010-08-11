@@ -52,11 +52,10 @@ macro(torch_library package src deps shared)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-  # This adds target (library) torch_<package>, exports into torch_<package>
+  # This adds target (library) torch_<package>, exports into "torch"
   torch_shlib(${libname} "${src}" "${deps}" "${shared}" ${libdir})
 
-  # This adds target (library) torch_<package>-static, exports into
-  # torch_<package>
+  # This adds target (library) torch_<package>-static, exports into "torch"
   torch_archive(${libname} "${src}" "${deps}" ${libdir})
 
   # This installs all headers to the destination directory
