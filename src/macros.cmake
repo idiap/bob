@@ -72,7 +72,8 @@ macro(torch_test package name src)
 
   # Please note we don't install test executables
   add_executable(${testname} ${src})
-  target_link_libraries(${testname} torch_${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+  target_link_libraries(${testname} torch_${package})
+  target_link_libraries(${testname} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
   add_test(cxx-${package}-${name} ${testname})
 endmacro(torch_test package src)
 
@@ -86,5 +87,5 @@ macro(torch_benchmark package name src)
 
   add_executable(${progname} ${src})
   target_link_libraries(${progname} torch_${package})
-  install(TARGETS ${progname} ARCHIVE DESTINATION ${bindir})
+  install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
 endmacro(torch_test package src)

@@ -10,11 +10,6 @@ set(THIS benchmark_core)
 include_directories(${TORCH5SPRO_INCLUDE})
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${INSTALL_DIR}/lib)
-if(ffmpeg_FOUND)
-  add_definitions(-DHAVE_FFMPEG)
-  include_directories(${ffmpeg_INCLUDE_DIRS})
-  link_directories(${ffmpeg_LIBRARY_DIRS})
-endif(ffmpeg_FOUND)
 
 # Please note we don't install benchmark executables
 add_executable(${THIS}_tensor tensor.cc)

@@ -26,20 +26,19 @@ find_package(jpeg REQUIRED)
 set(ffmpeg_DIR extras)
 find_package(ffmpeg REQUIRED)
 
-add_subdirectory(src)
-
 # configures boost found on the current system
 set(SystemBoost_DIR extras)
 find_package(SystemBoost REQUIRED)
 
-#add_subdirectory(benchmark)
-
 # This will bring in the Python bindings, if python was found
 set(python_DIR extras)
 find_package(python REQUIRED)
+
+add_subdirectory(src)
 
 #if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 #  add_subdirectory(python)
 #else (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 #  message("Boost::Python bindings are DISABLED")
 #endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+
