@@ -23,6 +23,7 @@ fi
 cd ${checkout}
 echo "[${nightly}] Synchronizing repository..."
 git pull /idiap/home/lelshafey/work/development/torchDep
+git reset --hard HEAD
 
 cd ${prefix}
 echo "[${nightly}] Building torch (debug)..."
