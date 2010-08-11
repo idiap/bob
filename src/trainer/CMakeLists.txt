@@ -16,31 +16,31 @@ if(ffmpeg_FOUND)
 endif(ffmpeg_FOUND)
 
 SET(src_trainer
-    "Trainer.cc"
-	"GTFile.cc"
-	"GradientTrainer.cc"
-	"StochasticGradientTrainer.cc"
-	"EMTrainer.cc")
+   "src/Trainer.cc"
+   "src/GTFile.cc"
+   "src/GradientTrainer.cc"
+   "src/StochasticGradientTrainer.cc"
+   "src/EMTrainer.cc")
 
 SET(src_gtfiles
-	"bancaGTFile.cc"
-	"bbx2eye19x19deye10GTFile.cc"
-	"cootesGTFile.cc"
-	"eyecenterGTFile.cc"
-	"eyecornerGTFile.cc"
-	"frontalEyeNoseChinGTFile.cc"
-	"halfprofileEyeNoseChinGTFile.cc"
-	"profileEyeNoseChinGTFile.cc")
+   "src/bancaGTFile.cc"
+   "src/bbx2eye19x19deye10GTFile.cc"
+   "src/cootesGTFile.cc"
+   "src/eyecenterGTFile.cc"
+   "src/eyecornerGTFile.cc"
+   "src/frontalEyeNoseChinGTFile.cc"
+   "src/halfprofileEyeNoseChinGTFile.cc"
+   "src/profileEyeNoseChinGTFile.cc")
 
 SET(src_boosting
-	"BoostingRoundLBPTrainer.cc"
-	"BoostingRoundTrainer.cc"
-	"BoostingTrainer.cc"
-	"CascadeTrainer.cc"
-	"FTrainer.cc"
-	"LBPRoundTrainer.cc"
-	"StumpTrainer.cc"
-	"WeakLearner.cc")
+   "src/BoostingRoundLBPTrainer.cc"
+   "src/BoostingRoundTrainer.cc"
+   "src/BoostingTrainer.cc"
+   "src/CascadeTrainer.cc"
+   "src/FTrainer.cc"
+   "src/LBPRoundTrainer.cc"
+   "src/StumpTrainer.cc"
+   "src/WeakLearner.cc")
 
 set(src 
 	"${src_trainer}"

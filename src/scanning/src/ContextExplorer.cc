@@ -1,6 +1,6 @@
-#include "ContextExplorer.h"
-#include "ipSWEvaluator.h"
-#include "ScaleExplorer.h"
+#include "scanning/ContextExplorer.h"
+#include "scanning/ipSWEvaluator.h"
+#include "scanning/ScaleExplorer.h"
 #include "core/File.h"
 
 // Context constants

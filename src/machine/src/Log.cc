@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "machine/Log.h"
 
 namespace Torch {
 

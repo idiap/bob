@@ -1,9 +1,9 @@
-#include "Scanner.h"
+#include "scanning/Scanner.h"
 #include "ip/Image.h"
-#include "Explorer.h"
-#include "Selector.h"
-#include "MSExplorer.h"
-#include "PyramidExplorer.h"
+#include "scanning/Explorer.h"
+#include "scanning/Selector.h"
+#include "scanning/MSExplorer.h"
+#include "scanning/PyramidExplorer.h"
 
 namespace Torch
 {
