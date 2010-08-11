@@ -89,3 +89,32 @@ macro(torch_benchmark package name src)
   target_link_libraries(${progname} torch_${package})
   install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
 endmacro(torch_benchmark package name src)
+
+# Creates Torch pythonic bindings to C/C++ code using Boost::Python
+macro(torch_python_bindings package src)
+  # Some preparatory work
+  set(libname pytorch_${package})
+  set(libdir lib)
+
+  # Some necessary compilation and linkage includes
+  include_directories(${Boost_INCLUDE_DIRS})
+  include_directories(${PYTHON_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+  link_directories(${PYTHON_LIBRARY_DIRS})
+
+  # Building the library itself
+  add_library(${libname} SHARED "${src}")
+  set_target_properties(${libname} PROPERTIES SUFFIX ".so")
+  target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY})
+  target_link_libraries(${libname} ${PYTHON_LIBRARIES})
+
+  # And its installation
+  install(TARGETS ${libname} LIBRARY DESTINATION ${libdir})
+endmacro(torch_python_bindings package name src)
+
+# Installs python files and compile them
+macro(torch_python_install package)
+  set(pydir ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/torch)
+  file(COPY python/${package} DESTINATION ${pydir}/${package} 
+    FILES_MATCHING PATTERN "*.py")
+endmacro(torch_python_install package)

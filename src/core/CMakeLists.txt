@@ -36,3 +36,19 @@ torch_test(core tensor test/tensor.cc)
 
 # Defines benchmarks we make available
 torch_benchmark(core tensor benchmark/tensor.cc)
+
+# Python bindings
+set(pysrc
+   "python/src/object.cc"
+   "python/src/file.cc"
+   "python/src/tensor.cc"
+   "python/src/tensorfile.cc"
+   "python/src/spcore.cc"
+   "python/src/ipcore.cc"
+   "python/src/main.cc"
+   )
+ 
+include(../macros.cmake)
+torch_python_bindings(core "${pysrc}")
+torch_python_install(core)
+
