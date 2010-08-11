@@ -1,7 +1,7 @@
 #ifndef COMPLEX_INC
 #define COMPLEX_INC
 
-#include "vision.h"
+#include "ip/vision.h"
 
 namespace Torch {
 

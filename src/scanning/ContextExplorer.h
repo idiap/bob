@@ -1,8 +1,8 @@
 #ifndef _TORCHVISION_SCANNING_CONTEXT_EXPLORER_H_
 #define _TORCHVISION_SCANNING_CONTEXT_EXPLORER_H_
 
-#include "MSExplorer.h"		// <ContextExplorer> is a <MSExplorer>
-#include "ContextMachine.h"
+#include "scanning/MSExplorer.h"		// <ContextExplorer> is a <MSExplorer>
+#include "scanning/ContextMachine.h"
 
 namespace Torch
 {

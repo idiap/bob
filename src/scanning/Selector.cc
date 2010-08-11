@@ -1,4 +1,4 @@
-#include "Selector.h"
+#include "scanning/Selector.h"
 
 namespace Torch
 {

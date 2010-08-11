@@ -1,9 +1,9 @@
 #ifndef _TORCH5SPRO_IP_HAAR_LIENHART_H_
 #define _TORCH5SPRO_IP_HAAR_LIENHART_H_
 
-#include "core/ipCore.h"
+#include "ip/ipCore.h"
 #include "core/Tensor.h"
-#include "core/spCores.h"
+#include "sp/spCores.h"
 
 namespace Torch
 {

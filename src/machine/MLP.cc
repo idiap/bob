@@ -1,6 +1,6 @@
-#include "MLP.h"
-#include "Linear.h"
-#include "Tanh.h"
+#include "machine/MLP.h"
+#include "machine/Linear.h"
+#include "machine/Tanh.h"
 
 namespace Torch {
 

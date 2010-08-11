@@ -1,8 +1,14 @@
 #ifndef IPCORE_INC
 #define IPCORE_INC
 
-#include "spCore.h"
+#include "sp/spCore.h"
 
+/**
+ * \addtogroup libip_api libIP API
+ * @{
+ *
+ *  The libIP API.
+ */
 namespace Torch
 {
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -30,5 +36,23 @@ namespace Torch
 	};
 
 }
+
+
+/**
+ * @}
+ */
+
+
+/**
+@page libIP IP: an Image Processing module
+
+@section intro Introduction
+
+IP is the Image Processing module of Torch.
+
+@section api Documentation
+- @ref libip_api "libIP API"
+
+*/
 
 #endif

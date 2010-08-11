@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_DUMMY_SELECTOR_H_
 #define _TORCHVISION_SCANNING_DUMMY_SELECTOR_H_
 
-#include "Selector.h"		// <DummySelector> is a <Selector>
+#include "scanning/Selector.h"		// <DummySelector> is a <Selector>
 
 namespace Torch
 {

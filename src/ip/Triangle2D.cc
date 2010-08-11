@@ -1,5 +1,5 @@
-#include "Triangle2D.h"
-#include "Color.h"
+#include "ip/Triangle2D.h"
+#include "ip/Color.h"
 
 namespace Torch {
 

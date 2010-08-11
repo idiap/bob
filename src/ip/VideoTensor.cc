@@ -5,8 +5,8 @@
  * @brief Implements the VideoTensor methods
  */
 
-#include "VideoTensor.h"
-#include "Convert.h"
+#include "ip/VideoTensor.h"
+#include "ip/Convert.h"
 
 Torch::VideoTensor::VideoTensor (Torch::Video& video, int color_planes)
   :ShortTensor(video.getIOption("height"), 

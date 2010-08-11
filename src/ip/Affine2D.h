@@ -1,9 +1,9 @@
 #ifndef AFFINE2D_INC
 #define AFFINE2D_INC
 
-#include "Matrix2D.h"
-#include "Vector2D.h"
-#include "Rectangle2D.h"
+#include "ip/Matrix2D.h"
+#include "ip/Vector2D.h"
+#include "ip/Rectangle2D.h"
 
 namespace Torch {
 

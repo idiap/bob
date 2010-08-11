@@ -1,4 +1,4 @@
-#include "Linear.h"
+#include "machine/Linear.h"
 
 namespace Torch {
 

@@ -1,4 +1,4 @@
-#include "ipSWVariancePruner.h"
+#include "scanning/ipSWVariancePruner.h"
 #include "core/Tensor.h"
 
 namespace Torch

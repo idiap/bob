@@ -1,8 +1,8 @@
 #ifndef RECTANGLE2D_INC
 #define RECTANGLE2D_INC
 
-#include "Point2D.h"
-#include "Vector2D.h"
+#include "ip/Point2D.h"
+#include "ip/Vector2D.h"
 
 namespace Torch {
 

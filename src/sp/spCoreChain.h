@@ -1,8 +1,14 @@
 #ifndef SPCORE_CHAIN_INC
 #define SPCORE_CHAIN_INC
 
-#include "spCore.h"
+#include "sp/spCore.h"
 
+/**
+ * \addtogroup libsp_api libSP API
+ * @{
+ *
+ *  The libSP API.
+ */
 namespace Torch
 {
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -55,5 +61,9 @@ namespace Torch
 		int			m_n_cores;
 	};
 }
+
+/**
+ * @}
+ */
 
 #endif

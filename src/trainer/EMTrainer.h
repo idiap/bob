@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_EM_TRAINER_H_
 #define _TORCH5SPRO_EM_TRAINER_H_
 
-#include "core/Trainer.h"
+#include "trainer/Trainer.h"
 
 namespace Torch
 {

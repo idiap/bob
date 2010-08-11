@@ -1,7 +1,7 @@
 #ifndef VECTOR3D_INC
 #define VECTOR3D_INC
 
-#include "Point3D.h"
+#include "ip/Point3D.h"
 
 namespace Torch {
 

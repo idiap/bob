@@ -1,5 +1,5 @@
-#include "CmdOption.h"
-#include "File.h"
+#include "core/CmdOption.h"
+#include "core/File.h"
 
 namespace Torch {
 

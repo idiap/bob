@@ -1,8 +1,14 @@
 #ifndef APCORE_INC
 #define APCORE_INC
 
-#include "spCore.h"
+#include "sp/spCore.h"
 
+/**
+ * \addtogroup libap_api libAP API
+ * @{
+ *
+ *  The libAP API.
+ */
 namespace Torch {
 
 	class apCore : public spCore
@@ -29,5 +35,22 @@ namespace Torch {
 	};
 
 }
+
+/**
+ * @}
+ */
+
+
+/**
+@page libAP AP: an Audio Processing module
+
+@section intro Introduction
+
+AP is the Audio Processing module of Torch.
+
+@section api Documentation
+- @ref libap_api "libAP API"
+
+*/
 
 #endif

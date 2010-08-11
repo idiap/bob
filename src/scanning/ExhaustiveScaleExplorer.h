@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_EXHAUSTIVE_SCALE_EXPLORER_H_
 #define _TORCHVISION_SCANNING_EXHAUSTIVE_SCALE_EXPLORER_H_
 
-#include "ScaleExplorer.h"	// <ExhaustiveScaleExplorer> is a <ScaleExplorer>
+#include "scanning/ScaleExplorer.h"	// <ExhaustiveScaleExplorer> is a <ScaleExplorer>
 
 namespace Torch
 {

@@ -11,8 +11,8 @@
 
 #include "core/Tensor.h"
 #include "core/TensorFile.h"
-#include "Image.h"
-#include "Video.h"
+#include "ip/Image.h"
+#include "ip/Video.h"
 
 namespace Torch {
 

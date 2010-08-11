@@ -1,5 +1,5 @@
-#include "tiffImageFile.h"
-#include "Image.h"
+#include "ip/tiffImageFile.h"
+#include "ip/Image.h"
 
 namespace Torch {
 

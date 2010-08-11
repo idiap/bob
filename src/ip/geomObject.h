@@ -1,8 +1,8 @@
 #ifndef GEOM_OBJECT_INC
 #define GEOM_OBJECT_INC
 
-#include "Image.h"
-#include "vision.h"
+#include "ip/Image.h"
+#include "ip/vision.h"
 
 #ifdef HAVE_X11
 #include "X.h"

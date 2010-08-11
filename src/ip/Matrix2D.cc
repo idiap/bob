@@ -1,4 +1,4 @@
-#include "Matrix2D.h"
+#include "ip/Matrix2D.h"
 
 namespace Torch {
 

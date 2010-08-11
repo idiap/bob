@@ -1,5 +1,5 @@
-#include "RandomScaleExplorer.h"
-#include "ipSWEvaluator.h"
+#include "scanning/RandomScaleExplorer.h"
+#include "scanning/ipSWEvaluator.h"
 
 #include <stdlib.h>
 

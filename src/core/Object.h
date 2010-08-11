@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_OBJECT_H_
 #define _TORCH5SPRO_OBJECT_H_
 
-#include "general.h"
-#include "VariableCollector.h"
+#include "core/general.h"
+#include "core/VariableCollector.h"
 
 namespace Torch
 {

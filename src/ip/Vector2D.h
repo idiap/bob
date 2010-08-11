@@ -1,7 +1,7 @@
 #ifndef VECTOR2D_INC
 #define VECTOR2D_INC
 
-#include "Point2D.h"
+#include "ip/Point2D.h"
 
 namespace Torch {
 

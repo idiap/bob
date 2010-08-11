@@ -1,6 +1,6 @@
-#include "ipVcycle.h"
-#include "multigrid.h"
-#include "ipRescaleGray.h"
+#include "ip/ipVcycle.h"
+#include "ip/multigrid.h"
+#include "ip/ipRescaleGray.h"
 
 //#include "clapack.h"
 

@@ -1,4 +1,4 @@
-#include "ipSWEvaluator.h"
+#include "scanning/ipSWEvaluator.h"
 #include "machine/Classifier.h"
 #include "machine/Machines.h"
 #include "core/Tensor.h"

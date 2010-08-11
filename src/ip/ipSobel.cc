@@ -1,4 +1,4 @@
-#include "ipSobel.h"
+#include "ip/ipSobel.h"
 
 namespace Torch
 {

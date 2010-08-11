@@ -10,7 +10,8 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-set(src_machine	
+set(src_machine
+    "Machine.cc"	
 	"Classifier.cc"
 	"CascadeMachine.cc"
 	"TreeClassifier.cc"

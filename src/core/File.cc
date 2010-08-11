@@ -1,5 +1,5 @@
-#include "File.h"
-#include "Tensor.h"
+#include "core/File.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

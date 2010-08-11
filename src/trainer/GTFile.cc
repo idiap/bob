@@ -1,4 +1,4 @@
-#include "GTFile.h"
+#include "trainer/GTFile.h"
 
 namespace Torch {
 

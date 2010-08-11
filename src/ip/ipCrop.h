@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_IP_CROP_H_
 #define _TORCHVISION_IP_CROP_H_
 
-#include "core/ipCore.h"		// <ipCrop> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipCrop> is a <Torch::ipCore>
 
 namespace Torch
 {

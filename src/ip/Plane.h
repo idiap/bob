@@ -1,8 +1,8 @@
 #ifndef PLANE_INC
 #define PLANE_INC
 
-#include "Point3D.h"
-#include "Vector3D.h"
+#include "ip/Point3D.h"
+#include "ip/Vector3D.h"
 
 namespace Torch {
 

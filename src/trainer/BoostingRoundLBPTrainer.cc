@@ -1,4 +1,4 @@
-#include "BoostingRoundLBPTrainer.h"
+#include "trainer/BoostingRoundLBPTrainer.h"
 #include "ip/ipLBP.h"
 
 namespace Torch

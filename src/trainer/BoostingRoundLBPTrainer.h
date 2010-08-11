@@ -2,12 +2,12 @@
 #define _TORCH5SPRO_BOOSTING_ROUND_LBP_TRAINER_H_
 
 #include "core/DataSet.h"
-#include "WeakLearner.h"
+#include "trainer/WeakLearner.h"
 #include "measurer/measurer.h"
-#include "BoostingTrainer.h"
-#include "LBPRoundTrainer.h"
+#include "trainer/BoostingTrainer.h"
+#include "trainer/LBPRoundTrainer.h"
 #include "machine/IntLutMachine.h"
-#include "core/Machine.h"
+#include "machine/Machine.h"
 
 namespace Torch
 {

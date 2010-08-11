@@ -1,7 +1,7 @@
 #ifndef MY_TIMER_INC
 #define MY_TIMER_INC
 
-#include "Object.h"
+#include "core/Object.h"
 
 namespace Torch {
 

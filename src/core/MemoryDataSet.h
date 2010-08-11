@@ -1,8 +1,8 @@
 #ifndef MEMORY_DATA_SET_INC
 #define MEMORY_DATA_SET_INC
 
-#include "DataSet.h"
-#include "Tensor.h"
+#include "core/DataSet.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

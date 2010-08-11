@@ -1,6 +1,6 @@
-#include "ImageFile.h"
-#include "Image.h"
-#include "Convert.h"
+#include "ip/ImageFile.h"
+#include "ip/Image.h"
+#include "ip/Convert.h"
 
 namespace Torch {
 

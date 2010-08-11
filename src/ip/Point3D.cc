@@ -1,6 +1,6 @@
-#include "Point3D.h"
-#include "Vector3D.h"
-#include "Color.h"
+#include "ip/Point3D.h"
+#include "ip/Vector3D.h"
+#include "ip/Color.h"
 
 namespace Torch {
 

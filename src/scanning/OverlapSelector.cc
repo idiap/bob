@@ -1,4 +1,4 @@
-#include "OverlapSelector.h"
+#include "scanning/OverlapSelector.h"
 
 namespace Torch
 {

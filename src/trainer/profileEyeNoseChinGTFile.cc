@@ -1,4 +1,4 @@
-#include "profileEyeNoseChinGTFile.h"
+#include "trainer/profileEyeNoseChinGTFile.h"
 
 namespace Torch {
 

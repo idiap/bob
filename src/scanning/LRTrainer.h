@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_LR_TRAINER_H_
 #define _TORCHVISION_LR_TRAINER_H_
 
-#include "core/Trainer.h"		// <LRTrainer> is a <Trainer>
+#include "trainer/Trainer.h"		// <LRTrainer> is a <Trainer>
 
 namespace Torch
 {

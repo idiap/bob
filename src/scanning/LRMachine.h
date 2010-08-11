@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_LR_MACHINE_H_
 #define _TORCHVISION_LR_MACHINE_H_
 
-#include "core/Machine.h"			// <LRMachine> is a <Machine>
+#include "machine/Machine.h"			// <LRMachine> is a <Machine>
 
 namespace Torch
 {

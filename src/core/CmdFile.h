@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_CMD_FILE_H_
 #define _TORCH5SPRO_CMD_FILE_H_
 
-#include "Object.h"
+#include "core/Object.h"
 
 namespace Torch {
 

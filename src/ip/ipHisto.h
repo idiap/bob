@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_IP_HISTO_H_
 #define _TORCHVISION_IP_HISTO_H_
 
-#include "core/ipCore.h"		// <ipHisto> is a <Torch::ipCore>
+#include "ip/ipCore.h"		// <ipHisto> is a <Torch::ipCore>
 
 namespace Torch
 {

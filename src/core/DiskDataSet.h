@@ -1,8 +1,8 @@
 #ifndef DISK_DATA_SET_INC
 #define DISK_DATA_SET_INC
 
-#include "DataSet.h"
-#include "TensorFile.h"
+#include "core/DataSet.h"
+#include "core/TensorFile.h"
 
 namespace Torch
 {

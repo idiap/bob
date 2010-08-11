@@ -5,7 +5,7 @@
 #include "ip/ImageScanDataSet.h"
 #include "measurer/measurer.h"
 #include "core/MemoryDataSet.h"
-#include "FTrainer.h"
+#include "trainer/FTrainer.h"
 #include "core/general.h"
 namespace Torch
 {

@@ -1,4 +1,4 @@
-#include "GradientMachine.h"
+#include "machine/GradientMachine.h"
 #include "core/Tensor.h"
 #include "core/File.h"
 

@@ -1,6 +1,6 @@
-#include "ipRelaxation.h"
-#include "multigrid.h"
-#include "ipRescaleGray.h"
+#include "ip/ipRelaxation.h"
+#include "ip/multigrid.h"
+#include "ip/ipRescaleGray.h"
 
 namespace Torch {
 

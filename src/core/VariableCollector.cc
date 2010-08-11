@@ -1,5 +1,5 @@
-#include "VariableCollector.h"
-#include "File.h"
+#include "core/VariableCollector.h"
+#include "core/File.h"
 
 namespace Torch
 {

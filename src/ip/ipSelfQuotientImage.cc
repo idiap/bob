@@ -1,6 +1,6 @@
-#include "ipSelfQuotientImage.h"
-#include "ipMSRSQIGaussian.h"
-#include "ipRescaleGray.h"
+#include "ip/ipSelfQuotientImage.h"
+#include "ip/ipMSRSQIGaussian.h"
+#include "ip/ipRescaleGray.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////

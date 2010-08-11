@@ -1,6 +1,6 @@
-#include "Image.h"
-#include "Color.h"
-#include "vision.h"
+#include "ip/Image.h"
+#include "ip/Color.h"
+#include "ip/vision.h"
 
 namespace Torch {
 

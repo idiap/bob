@@ -1,4 +1,4 @@
-#include "ContextMachine.h"
+#include "scanning/ContextMachine.h"
 #include "core/File.h"
 
 namespace Torch

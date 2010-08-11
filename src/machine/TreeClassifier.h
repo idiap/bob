@@ -1,8 +1,8 @@
 #ifndef _TORCH5SPRO_TREE_CLASSIFIER_H_
 #define _TORCH5SPRO_TREE_CLASSIFIER_H_
 
-#include "Classifier.h"	// <TreeClassifier> is a <Classifier>
-#include "Machines.h"
+#include "machine/Classifier.h"	// <TreeClassifier> is a <Classifier>
+#include "machine/Machines.h"
 
 namespace Torch
 {

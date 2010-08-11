@@ -2,7 +2,7 @@
 #define _TORCHVISION_SCANNING_EXPLORER_H_
 
 #include "core/Object.h"		// <Explorer> is a <Torch::Object>
-#include "Pattern.h"		// works on <Pattern>s
+#include "scanning/Pattern.h"		// works on <Pattern>s
 #include "ip/vision.h"		// <sSize> and <sRect2D> definitions
 
 namespace Torch

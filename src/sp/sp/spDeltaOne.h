@@ -2,8 +2,14 @@
 #define _TORCHSPRO_SP_DELTA_ONE_H_
 
 #include "core/Tensor.h"
-#include "core/spCore.h"
+#include "sp/spCore.h"
 
+/**
+ * \addtogroup libsp_api libSP API
+ * @{
+ *
+ *  The libSP API.
+ */
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
@@ -47,5 +53,9 @@ namespace Torch
 		int n;
 	};
 }
+
+/**
+ * @}
+ */
 
 #endif

@@ -1,10 +1,16 @@
 #ifndef TRAINER_INC
 #define TRAINER_INC
 
-#include "Object.h"
-#include "DataSet.h"
-#include "Machine.h"
+#include "core/Object.h"
+#include "core/DataSet.h"
+#include "machine/Machine.h"
 
+/**
+ * \addtogroup libtrainer_api libTrainer API
+ * @{
+ *
+ *  The libTrainer API.
+ */
 namespace Torch {
 
 	class Trainer : public Object
@@ -38,5 +44,22 @@ namespace Torch {
 	};
 
 }
+
+/**
+ * @}
+ */
+
+
+/**
+@page libTrainer Trainer: a Trainer module
+
+@section intro Introduction
+
+Trainer is module of Torch used to train a Machine.
+
+@section api Documentation
+- @ref libtrainer_api "libTrainer API"
+
+*/
 
 #endif

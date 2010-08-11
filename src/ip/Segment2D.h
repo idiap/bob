@@ -1,7 +1,7 @@
 #ifndef SEGMENT2D_INC
 #define SEGMENT2D_INC
 
-#include "Point2D.h"
+#include "ip/Point2D.h"
 
 namespace Torch {
 

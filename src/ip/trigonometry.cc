@@ -1,4 +1,4 @@
-#include "trigonometry.h"
+#include "ip/trigonometry.h"
 
 namespace Torch
 {

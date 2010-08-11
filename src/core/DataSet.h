@@ -1,8 +1,8 @@
 #ifndef DATA_SET_INC
 #define DATA_SET_INC
 
-#include "Object.h"
-#include "Tensor.h"
+#include "core/Object.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

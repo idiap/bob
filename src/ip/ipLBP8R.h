@@ -1,8 +1,8 @@
 #ifndef _TORCHVISION_IP_LBP_8R_H_
 #define _TORCHVISION_IP_LBP_8R_H_
 
-#include "ipLBP.h"		// <ipLBP8R> is an <ipLBP>
-#include "core/spCores.h"
+#include "ip/ipLBP.h"		// <ipLBP8R> is an <ipLBP>
+#include "sp/spCores.h"
 
 namespace Torch
 {

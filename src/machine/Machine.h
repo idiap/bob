@@ -1,10 +1,16 @@
 #ifndef _TORCH5SPRO_MACHINE_H_
 #define _TORCH5SPRO_MACHINE_H_
 
-#include "Object.h"
-#include "Parameters.h"
-#include "Tensor.h"
+#include "core/Object.h"
+#include "core/Parameters.h"
+#include "core/Tensor.h"
 
+/**
+ * \addtogroup libmachine_api libMachine API
+ * @{
+ *
+ *  The libMachine API.
+ */
 namespace Torch {
 
 	class Machine;
@@ -158,5 +164,22 @@ namespace Torch {
 		int			m_capacity;	// Number of IDs allocated
 	};
 }
+
+/**
+ * @}
+ */
+
+
+/**
+@page libMachine Machine: a Machine module
+
+@section intro Introduction
+
+Machine is the Torch module used to process some data. A Machine may or may not be trained by a Trainer.
+
+@section api Documentation
+- @ref libmachine_api "libMachine API"
+
+*/
 
 #endif

@@ -1,4 +1,4 @@
-#include "cootesGTFile.h"
+#include "trainer/cootesGTFile.h"
 
 namespace Torch {
 

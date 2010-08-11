@@ -25,6 +25,7 @@ endif(ffmpeg_FOUND)
 
 # This defines the list of source files inside this package.
 set(src_ip
+        "ipCore.cc"
 		"vision.cc"
 		"Color.cc"
 		"Complex.cc"

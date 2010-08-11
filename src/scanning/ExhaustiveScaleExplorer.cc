@@ -1,5 +1,5 @@
-#include "ExhaustiveScaleExplorer.h"
-#include "ipSWEvaluator.h"
+#include "scanning/ExhaustiveScaleExplorer.h"
+#include "scanning/ipSWEvaluator.h"
 
 namespace Torch
 {

@@ -1,5 +1,5 @@
-#include "StumpMachine.h"
-#include "core/spCore.h"
+#include "machine/StumpMachine.h"
+#include "sp/spCore.h"
 
 namespace Torch
 {

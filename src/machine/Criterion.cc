@@ -1,4 +1,4 @@
-#include "Criterion.h"
+#include "machine/Criterion.h"
 
 namespace Torch {
 

@@ -2,8 +2,14 @@
 #define _TORCHSPRO_SP_DCT_H_
 
 #include "core/Tensor.h"
-#include "core/spCore.h"
+#include "sp/spCore.h"
 
+/**
+ * \addtogroup libsp_api libSP API
+ * @{
+ *
+ *  The libSP API.
+ */
 namespace Torch
 {
 	/////////////////////////////////////////////////////////////////////////
@@ -53,5 +59,9 @@ namespace Torch
 		FloatTensor *R;
 	};
 }
+
+/**
+ * @}
+ */
 
 #endif

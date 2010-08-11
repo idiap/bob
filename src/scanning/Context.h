@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_CONTEXT_SAMPLE_H_
 #define _TORCHVISION_SCANNING_CONTEXT_SAMPLE_H_
 
-#include "Pattern.h"
+#include "scanning/Pattern.h"
 #include "core/Tensor.h"
 
 namespace Torch

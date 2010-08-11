@@ -1,5 +1,5 @@
-#include "Plane.h"
-#include "Color.h"
+#include "ip/Plane.h"
+#include "ip/Color.h"
 
 namespace Torch {
 

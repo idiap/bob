@@ -1,7 +1,7 @@
 #ifndef _TORCHVISION_SCANNING_CONTEXT_TRAINER_H_
 #define _TORCHVISION_SCANNING_CONTEXT_TRAINER_H_
 
-#include "core/Trainer.h"		// <ContextTrainer> is a <Trainer>
+#include "trainer/Trainer.h"		// <ContextTrainer> is a <Trainer>
 
 namespace Torch
 {

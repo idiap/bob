@@ -1,4 +1,4 @@
-#include "WeakLearner.h"
+#include "trainer/WeakLearner.h"
 
 namespace Torch
 {

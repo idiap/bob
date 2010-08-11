@@ -2,7 +2,7 @@
 #define _TORCHVISION_SCANNING_SELECTOR_H_
 
 #include "core/Object.h"		// <Selector> is a <Torch::Object>
-#include "Pattern.h"		// works on <Pattern>s
+#include "scanning/Pattern.h"		// works on <Pattern>s
 
 namespace Torch
 {

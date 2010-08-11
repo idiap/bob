@@ -1,7 +1,7 @@
 #ifndef _TORCH5SPRO_LBP_ROUND_TRAINER_H_
 #define _TORCH5SPRO_LBP_ROUND_TRAINER_H_
 
-#include "WeakLearner.h"
+#include "trainer/WeakLearner.h"
 #include "machine/IntLutMachine.h"
 
 namespace Torch

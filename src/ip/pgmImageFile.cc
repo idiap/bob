@@ -1,5 +1,5 @@
-#include "pgmImageFile.h"
-#include "Image.h"
+#include "ip/pgmImageFile.h"
+#include "ip/Image.h"
 
 namespace Torch {
 

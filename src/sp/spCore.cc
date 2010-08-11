@@ -1,8 +1,15 @@
-#include "spCore.h"
-#include "general.h"
-#include "Tensor.h"
+#include "sp/spCore.h"
+#include "core/general.h"
+#include "core/Tensor.h"
 
+/**
+ * \addtogroup libsp_api libSP API
+ * @{
+ *
+ *  The libSP API.
+ */
 namespace Torch {
+
 
 ////////////////////////////////////////////////////////////////////
 // Constructor
@@ -241,4 +248,8 @@ int spCoreManager::find(int id) const
 
 }
 
+
+/**
+ * @}
+ */
 

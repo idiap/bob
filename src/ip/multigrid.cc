@@ -1,4 +1,4 @@
-#include "multigrid.h"
+#include "ip/multigrid.h"
 #include "string.h"
 
 //*************************************************************************************

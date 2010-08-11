@@ -1,12 +1,12 @@
-#include "ipGeomNorm.h"
+#include "ip/ipGeomNorm.h"
 #include "core/Tensor.h"
-#include "trigonometry.h"
-#include "RotationMatrix2D.h"
-#include "Point2D.h"
-#include "Image.h"
-#include "Color.h"
-#include "xtprobeImageFile.h"
-#include "GTFile.h"
+#include "ip/trigonometry.h"
+#include "ip/RotationMatrix2D.h"
+#include "ip/Point2D.h"
+#include "ip/Image.h"
+#include "ip/Color.h"
+#include "ip/xtprobeImageFile.h"
+#include "scanning/GTFile.h"
 
 
 namespace Torch {

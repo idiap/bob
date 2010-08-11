@@ -1,11 +1,11 @@
 #ifndef _TENSOR_LIST_TARGET_INC
 #define _TENSOR_LIST_TARGET_INC
 
-#include "DataSet.h"
-#include "MemoryDataSet.h"
-#include "TensorFile.h"
-#include "FileListCmdOption.h"
-#include "Tensor.h"
+#include "core/DataSet.h"
+#include "core/MemoryDataSet.h"
+#include "core/TensorFile.h"
+#include "core/FileListCmdOption.h"
+#include "core/Tensor.h"
 
 namespace Torch
 {

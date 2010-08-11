@@ -5,10 +5,10 @@
  * @brief  
  */
 
-#include "ipLBPTopOperator.h"
-#include "ipLBP.h"
-#include "ipLBP4R.h"
-#include "ipLBP8R.h"
+#include "ip/ipLBPTopOperator.h"
+#include "ip/ipLBP.h"
+#include "ip/ipLBP4R.h"
+#include "ip/ipLBP8R.h"
 #include "core/general.h"
 
 Torch::ipLBPTopOperator::ipLBPTopOperator(int radius_xy, 

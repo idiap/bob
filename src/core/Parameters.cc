@@ -1,4 +1,4 @@
-#include "Parameters.h"
+#include "core/Parameters.h"
 
 namespace Torch
 {
