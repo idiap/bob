@@ -61,3 +61,17 @@ macro(torch_library package src deps shared)
   # This installs all headers to the destination directory
   add_custom_command(TARGET ${libname} POST_BUILD COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/${package} ${CMAKE_INSTALL_PREFIX}/${incdir} COMMENT "Installing ${package} headers...")
 endmacro(torch_library)
+
+# Creates a standard Torch test.
+macro(torch_test package name src)
+  set(testname ${package}_${name})
+
+  # Include the Boost Unit Test Framework
+  include_directories(${Boost_INCLUDE_DIRS})
+  link_directories(${Boost_LIBRARY_DIRS})
+
+  # Please note we don't install test executables
+  add_executable(${testname} ${src})
+  target_link_libraries(${testname} torch_${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+  add_test(cxx-${testname} ${testname})
+endmacro(torch_test package src)

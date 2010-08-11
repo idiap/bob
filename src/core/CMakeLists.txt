@@ -30,3 +30,6 @@ set(src
 
 include(../macros.cmake)
 torch_library(core "${src}" "${deps}" "${shared}")
+
+# This defines the tests we need to perform for this package.
+torch_test(core tensor test/tensor.cc)
