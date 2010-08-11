@@ -35,4 +35,4 @@ torch_library(core "${src}" "${deps}" "${shared}")
 torch_test(core tensor test/tensor.cc)
 
 # Defines benchmarks we make available
-torch_test(core tensor benchmark/tensor.cc)
+torch_benchmark(core tensor benchmark/tensor.cc)
