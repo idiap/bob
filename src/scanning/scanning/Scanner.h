@@ -5,14 +5,15 @@
 #include "Pattern.h"			// detected patterns
 #include "ip/vision.h"			// <sRect2D> definition
 
+namespace Torch
+{
 /**
- * \addtogroup libscanning_api libScanning API
+ * \defgroup libscanning_api libScanning API
  * @{
  *
  *  The libScanning API.
  */
-namespace Torch
-{
+
 	class Image;
 	class Explorer;
 	class Selector;
@@ -147,12 +148,12 @@ namespace Torch
 			// m_stat_scanned >= m_stat_accepted
 
 	};
-}
 
 /**
  * @}
  */
 
+}
 
 /**
 @page libScanning Scanning: a Scanning module

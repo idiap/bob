@@ -3,14 +3,15 @@
 
 #include "sp/spCore.h"
 
+namespace Torch
+{
 /**
- * \addtogroup libip_api libIP API
+ * \defgroup libip_api libIP API
  * @{
  *
  *  The libIP API.
  */
-namespace Torch
-{
+
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::ipCore:
 	//	- image processing interface
@@ -35,12 +36,11 @@ namespace Torch
 		//
 	};
 
-}
-
-
 /**
  * @}
  */
+
+}
 
 
 /**

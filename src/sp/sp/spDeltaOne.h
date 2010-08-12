@@ -4,14 +4,14 @@
 #include "core/Tensor.h"
 #include "sp/spCore.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 namespace Torch
 {
+/**
+ * \ingroup libsp_api
+ * @{
+ *
+ */
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::spDeltaOne
 	//	This class applies the delta function (identity) and return a single value.
@@ -52,10 +52,11 @@ namespace Torch
 
 		int n;
 	};
-}
 
 /**
  * @}
  */
+
+}
 
 #endif

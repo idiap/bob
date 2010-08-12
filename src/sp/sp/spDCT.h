@@ -4,14 +4,14 @@
 #include "core/Tensor.h"
 #include "sp/spCore.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 namespace Torch
 {
+/**
+ * \ingroup libsp_api
+ * @{
+ *
+ */
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::spDCT
 	//	This class is designed to perform DCT.
@@ -58,10 +58,11 @@ namespace Torch
 
 		FloatTensor *R;
 	};
-}
 
 /**
  * @}
  */
+
+}
 
 #endif

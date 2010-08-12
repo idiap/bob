@@ -1,11 +1,5 @@
 #include "sp/spDeltaOne.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 namespace Torch {
 
 /////////////////////////////////////////////////////////////////////////
@@ -90,8 +84,4 @@ bool spDeltaOne::processInput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 
 }
-
-/**
- * @}
- */
 

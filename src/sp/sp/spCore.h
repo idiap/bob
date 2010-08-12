@@ -5,14 +5,14 @@
 #include "core/Tensor.h"
 #include "core/File.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 namespace Torch
 {
+/**
+ * \defgroup libsp_api libSP API
+ * @{
+ *
+ *  @brief The libSP API.
+ */
 	class Tensor;
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,9 @@ namespace Torch
 	class spCore : public Object
 	{
 	public:
-		/// Constructor
+		/**
+          * Constructor
+          */
 		spCore();
 
 		/// Destructor
@@ -152,11 +154,11 @@ namespace Torch
 		int			m_size;		// Number of IDs actually used
 		int			m_capacity;	// Number of IDs allocated
 	};
-}
-
 /**
  * @}
  */
+
+}
 
 
 /**

@@ -1,12 +1,6 @@
 #include "sp/spDCT.h"
 #include "oourafft/ooura.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 
 namespace Torch {
@@ -336,8 +330,4 @@ bool spDCT::processInput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 
 }
-
-/**
- * @}
- */
 

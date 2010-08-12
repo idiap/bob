@@ -6,6 +6,12 @@
 
 namespace Torch
 {
+/**
+ * \ingroup libap_api libAP API
+ * @{
+ *
+ */
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::apMFCC
 	//	This class is designed to compute Mel Frequency Cepstral Coefficients (MFCC).
@@ -48,6 +54,11 @@ namespace Torch
 		// Attributes
 
 	};
+
+/**
+ * @}
+ */
+
 }
 
 #endif

@@ -1,11 +1,5 @@
 #include "sp/spCoreChain.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 namespace Torch {
 
 ////////////////////////////////////////////////////////////////////
@@ -156,8 +150,4 @@ void spCoreChain::setModelSize(const TensorSize& modelSize)
 ////////////////////////////////////////////////////////////////////
 
 }
-
-/**
- * @}
- */
 

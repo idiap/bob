@@ -5,13 +5,15 @@
 #include "core/Parameters.h"
 #include "core/Tensor.h"
 
+namespace Torch
+{
+
 /**
- * \addtogroup libmachine_api libMachine API
+ * \defgroup libmachine_api libMachine API
  * @{
  *
  *  The libMachine API.
  */
-namespace Torch {
 
 	class Machine;
 	class File;
@@ -163,11 +165,12 @@ namespace Torch {
 		int			m_size;		// Number of IDs actually used
 		int			m_capacity;	// Number of IDs allocated
 	};
-}
 
 /**
  * @}
  */
+
+}
 
 
 /**

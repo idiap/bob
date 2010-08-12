@@ -3,13 +3,15 @@
 
 #include "sp/spCore.h"
 
+namespace Torch
+{
+
 /**
- * \addtogroup libap_api libAP API
+ * \defgroup libap_api libAP API
  * @{
  *
  *  The libAP API.
  */
-namespace Torch {
 
 	class apCore : public spCore
 	{
@@ -34,11 +36,11 @@ namespace Torch {
 		int			m_audioSize;	// Will process only inputs of this size!
 	};
 
-}
-
 /**
  * @}
  */
+
+}
 
 
 /**

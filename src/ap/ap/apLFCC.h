@@ -6,6 +6,12 @@
 
 namespace Torch
 {
+/**
+ * \ingroup libap_api libAP API
+ * @{
+ *
+ */
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::apLFCC
 	//	This class is designed to compute Linear Frequency Cepstral Coefficients (LFCC).
@@ -45,6 +51,11 @@ namespace Torch
 		// Attributes
 
 	};
+
+/**
+ * @}
+ */
+
 }
 
 #endif

@@ -3,7 +3,15 @@
 
 #include "core/general.h"
 
-namespace Torch {
+namespace Torch 
+{
+
+/**
+ * \defgroup libmeasurer_api libMeasurer API
+ * @{
+ *
+ *  The libMeasurer API.
+ */
 
 struct LabelledMeasure {
   short label;
@@ -23,5 +31,10 @@ double computeHTER(LabelledMeasure* measures, int n, double* frr, double* far, i
 
 //void computeFaFr(real thrd, Int_real* to_sort, int n, real* frr, real* far, int number_of_clients_ = -1,bool sort = true);
 
+/**
+ * @}
+ */
+
 }
+
 #endif

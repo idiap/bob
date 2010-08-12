@@ -2,10 +2,16 @@
 #define _TORCHSPRO_SP_FFT_H_
 
 #include "core/Tensor.h"
-#include "sp/spCore.h"		// <ipCrop> is a <Torch::ipCore>
+#include "sp/spCore.h"
 
 namespace Torch
 {
+/**
+ * \ingroup libsp_api
+ * @{
+ *
+ */
+
 	/////////////////////////////////////////////////////////////////////////
 	// Torch::spFFT
 	//	This class is designed to perform FFT.
@@ -52,6 +58,11 @@ namespace Torch
 		FloatTensor *R;
 		FloatTensor *I;
 	};
+
+/**
+ * @}
+ */
+
 }
 
 #endif

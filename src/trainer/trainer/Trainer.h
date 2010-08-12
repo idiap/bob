@@ -5,13 +5,15 @@
 #include "core/DataSet.h"
 #include "machine/Machine.h"
 
+namespace Torch
+{
+
 /**
- * \addtogroup libtrainer_api libTrainer API
+ * \defgroup libtrainer_api libTrainer API
  * @{
  *
  *  The libTrainer API.
  */
-namespace Torch {
 
 	class Trainer : public Object
 	{
@@ -43,11 +45,11 @@ namespace Torch {
 		DataSet		*m_dataset;	// The dataset used to train the machine
 	};
 
-}
-
 /**
  * @}
  */
+
+}
 
 
 /**
