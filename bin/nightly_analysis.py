@@ -78,6 +78,19 @@ def count_problems(fname):
   f.close()
   return (ecount, wcount)
 
+def count_tests(fname):
+  """Counts tests and problems"""
+  total = re.compile('Test #')
+  fail = re.compile('\*Failed')
+  f = open(fname, 'rt')
+  tcount = 0
+  fcount = 0
+  for line in f:
+    if total.search(line): tcount += 1 
+    if fail.search(line): fcount += 1 
+  f.close()
+  return (tcount, fcount)
+
 def build_html_table(entries):
   """Builds an HTML table based on the found builds."""
   # Loads and resets information for the builds
@@ -92,7 +105,7 @@ def build_html_table(entries):
   # Now we build the table
   retval = ['<table style="margin-left: auto; margin-right: auto; font-family: sans-serif; text-align: center;">']
   retval.append('<tr>')
-  retval.extend(['<th style="border: 1px black solid; padding: 5px; color: white; background-color: black;">%s</th>' % k for k in ('Date', 'Platform', 'Cmake', 'Build', 'Install', 'Documentation', 'Tests')])
+  retval.extend(['<th style="border: 1px black solid; padding: 5px; color: white; background-color: black;">%s</th>' % k for k in ('Date', 'Platform', 'Cmake', 'Compilation', 'Install', 'Documentation', 'Tests')])
   retval.append('</tr>')
 
   colors = {
@@ -119,10 +132,15 @@ def build_html_table(entries):
       depfig = '/'.join([v[build]['options']['log_prefix'], 'dependencies']) + '.png'
       depfig = '../chrome/site/' + '/'.join(depfig.split('/')[-6:])
       retval.append('<td style="border: 1px black solid; padding: 5px;">%s<br/><font style="%s"><a title="Click to find out inter-dependencies within this build" href="%s">(dependencies)</a><br/>%s</font></td>' % (build, subscript_style, depfig, '%s-%s (%s)' % (v[build]['uname'][0], v[build]['uname'][2], v[build]['uname'][4])))
-      for phase in ('cmake','make_all','make_install','doxygen','make_test'):
+      log_prefix = {'cmake': 'cmake', 
+                    'compile': 'make_all', 
+                    'install': 'make_install',
+                    'documentation': 'doxygen',
+                   }
+      for phase in ('cmake','compile','install','documentation'):
         status = v[build]['status'][phase][0]
         timing = v[build]['timing'][phase]
-        log = '/'.join([v[build]['options']['log_prefix'], phase]) + '.txt'
+        log = '/'.join([v[build]['options']['log_prefix'], log_prefix[phase]]) + '.txt'
         html_log = '../chrome/site/' + '/'.join(log.split('/')[-6:])
         extra_style = ok_style
         message = "No issues"
@@ -136,6 +154,22 @@ def build_html_table(entries):
           extra_style = warning_style
           message = 'warnings: %d' % (warnings)
         retval.append('<td style="background-color: %s; border: 1px black solid; padding: 5px;"><a href="%s">%s</a><br/><font style="%s">%s</font><br/><font style="%s">time: %.1f s</font></td>' % (colors[status], html_log, status.upper(), extra_style, message, subscript_style, timing))
+
+      # for the test
+      status = v[build]['status']['test'][0]
+      timing = v[build]['timing']['test']
+      log = '/'.join([v[build]['options']['log_prefix'], 'make_test']) + '.txt'
+      html_log = '../chrome/site/' + '/'.join(log.split('/')[-6:])
+      extra_style = ok_style
+      message = "No issues"
+      total, failures = count_tests(log)
+      if failures: 
+        status = 'failed'
+        extra_style = error_style
+        message = "failures: %d/%d" % (failures, total)
+      else: message = "tests: %d" % (total)
+      retval.append('<td style="background-color: %s; border: 1px black solid; padding: 5px;"><a href="%s">%s</a><br/><font style="%s">%s</font><br/><font style="%s">time: %.1f s</font></td>' % (colors[status], html_log, status.upper(), extra_style, message, subscript_style, timing))
+
       retval.append('</tr>')
     retval.append('</tr>')
   retval.append('<caption style="text-align: right; font-style: italic; font-size: 70%%; color: gray;">Last updated on %s</caption>' % time.asctime())
