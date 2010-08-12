@@ -10,12 +10,11 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG "-pthread -g -Wall")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
-# Sets up externals
-find_package(cblas REQUIRED PATHS external) #cblas, lapack and atlas
-find_package(jpeg REQUIRED PATHS external)
-find_package(ffmpeg REQUIRED PATHS external)
-find_package(SystemBoost REQUIRED PATHS external)
-find_package(python REQUIRED PATHS external)
+# Sets up externals and install
+foreach(ext cblas jpeg ffmpeg boost python)
+  find_package(${ext} REQUIRED PATHS external)
+  install(FILES external/${ext}Config.cmake DESTINATION share/cmake)
+endforeach(ext cblas jpeg ffmpeg boost python)
 
 # Enables the testing framework
 enable_testing()

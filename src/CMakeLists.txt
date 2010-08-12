@@ -11,4 +11,6 @@ foreach(proj oourafft lbfgs th core sp ap ip measurer machine scanning trainer)
 	add_subdirectory(${proj})
 endforeach(proj)
 
-install(EXPORT torch DESTINATION share/cmake)
+set(cmakedir share/cmake)
+install(EXPORT torch DESTINATION ${cmakedir})
+install(FILES torchConfig.cmake DESTINATION ${cmakedir})

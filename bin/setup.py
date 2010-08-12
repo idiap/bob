@@ -136,11 +136,11 @@ def main(dir, debug, csh):
   all.append(('LD_LIBRARY_PATH', ld_library_path))
 
   # this is for cmake
-  cmake_module_path = os.environ.get('CMAKE_MODULE_PATH', '')
+  cmake_prefix_path = os.environ.get('CMAKE_PREFIX_PATH', '')
   cmakedir = os.path.join(install_dir, 'share', 'cmake')
-  cmake_module_path = path_remove_if_startswith(cmake_module_path, base_dir)
-  cmake_module_path = path_add(cmake_module_path, cmakedir)
-  all.append(('CMAKE_MODULE_PATH', cmake_module_path))
+  cmake_prefix_path = path_remove_if_startswith(cmake_prefix_path, base_dir)
+  cmake_prefix_path = path_add(cmake_prefix_path, cmakedir)
+  all.append(('CMAKE_PREFIX_PATH', cmake_prefix_path))
 
   for k, v in all: print shell_str(k, v, csh)
 
