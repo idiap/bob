@@ -3,14 +3,14 @@
 
 #include "sp/spCore.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 namespace Torch
 {
+/**
+ * \ingroup libsp_api
+ * @{
+ *
+ */
+
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Torch::spCoreChain:
 	//      - process some tensor given a list of spCores
@@ -60,10 +60,11 @@ namespace Torch
 		spCore**		m_cores;
 		int			m_n_cores;
 	};
-}
 
 /**
  * @}
  */
+
+}
 
 #endif

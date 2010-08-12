@@ -2,12 +2,6 @@
 #include "core/general.h"
 #include "core/Tensor.h"
 
-/**
- * \addtogroup libsp_api libSP API
- * @{
- *
- *  The libSP API.
- */
 namespace Torch {
 
 
@@ -101,7 +95,7 @@ void spCore::setModelSize(const TensorSize& modelSize)
 }
 
 ////////////////////////////////////////////////////////////////////
-/// Loading/Saving the content from files (<em>not the options</em>)
+// Loading/Saving the content from files (<em>not the options</em>)
 
 bool spCore::loadFile(File& file)
 {
@@ -247,9 +241,4 @@ int spCoreManager::find(int id) const
 ////////////////////////////////////////////////////////////////////
 
 }
-
-
-/**
- * @}
- */
 

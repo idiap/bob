@@ -2,11 +2,11 @@
 #define _TORCH5SPRO_SP_CORES_H_
 
 //////////////////////////////////////////////////////////////////////////////////
+
 /**
- * \addtogroup libsp_api libSP API
+ * \ingroup libsp_api libSP API
  * @{
  *
- *  The libSP API.
  */
 
 #define IP_HAAR_LIENHART_ID 2
@@ -18,6 +18,7 @@
 /**
  * @}
  */
+
 //////////////////////////////////////////////////////////////////////////////////
 
 #endif
