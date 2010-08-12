@@ -5,13 +5,14 @@
 
 #define METHOD_NOT_IMPLEMENTED { warning("Not implemented !\n"); }
 
+namespace Torch 
+{
 /**
- * \addtogroup libcore_api libCore API
+ * \defgroup libcore_api libCore API
  * @{
  *
  *  The libCore API.
  */
-namespace Torch {
 
 	/////////////////////////////////////////////////////////////////
 	// Specify the size of some tensor
@@ -311,11 +312,11 @@ extern "C"
 #undef CAP_TYPE
 #undef DEFAULT_TENSOR
 
-}
-
 /**
  * @}
  */
+
+}
 
 
 /**
