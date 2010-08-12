@@ -67,7 +67,7 @@ def path_remove(env, what):
   exists."""
   p = env.split(':')
   if what in p: del p[p.index(what)]
-  return ':'.join(p)
+  return ':'.join([k for k in p if k.strip()])
 
 def path_remove_if_startswith(env, what):
   """Removes in path that starts with 'what' from the path environment 'env',
@@ -77,7 +77,7 @@ def path_remove_if_startswith(env, what):
   for k in p:
     if k.find(what) == 0: to_delete.append(k)
   for k in to_delete: del p[p.index(k)]
-  return ':'.join(p)
+  return ':'.join([k for k in p if k.strip()])
 
 def path_add(env, what, preffix=True):
   """Affixes 'what' into path, verifying if there are no other copies of it
@@ -86,7 +86,7 @@ def path_add(env, what, preffix=True):
   p = path_remove(env, what).split(':')
   if preffix: p.insert(0, what)
   else: p.append(what)
-  return ':'.join(p)
+  return ':'.join([k for k in p if k.strip()])
 
 def shell_str(env, value, csh=False):
   """Outputs the correct environment set string."""
