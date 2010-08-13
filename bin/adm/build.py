@@ -26,13 +26,13 @@ CURRENT_LOGGING_LEVEL = 2
 logging.basicConfig(level=LOGGING_LEVELS[CURRENT_LOGGING_LEVEL], 
                     format="%(asctime)s | %(levelname)s | %(message)s")
 
-def get_headers(dir, exclude):
+def get_headers(dir, excludes):
   """Gets all files ending in '.h' from the directory, recursively, except for
-  what is defined in the input argument "exclude"."""
+  what is defined in the input argument "excludes"."""
   retval = []
   for (path, dirs, files) in os.walk(dir):
     for f in fnmatch.filter(files, '*.h'):
-      if f == exclude: continue
+      if f in excludes: continue
       sub = path.replace(dir+os.sep, '')
       retval.append(os.path.join(sub, f))
   return retval
@@ -41,7 +41,13 @@ def write_header(option):
   """Writes a new header file that incorporates all existing ones."""
   scandir = os.path.join(option.install_prefix, 'include', 'torch')
   output = os.path.join(scandir, 'torch5spro.h')
-  headers = get_headers(scandir, os.path.basename(output))
+  excludes = [
+              os.path.basename(output),
+              'THTensorGen.h', 
+              'THStorageGen.h', 
+              'TensorGen.h',
+             ]
+  headers = get_headers(scandir, excludes)
   f = open(output, 'wt')
   f.write('/* This file was automatically generated -- DO NOT CHANGE IT */\n')
   f.write('/* Date: %s */\n\n' % time.asctime())
