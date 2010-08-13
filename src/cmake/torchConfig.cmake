@@ -37,5 +37,3 @@ macro(torch_add_executable name sources dependencies)
     target_link_libraries(${name} torch_${dep})
   endforeach(dep ${dependencies})
 endmacro(torch_add_executable name sources dependencies)
-
-message("-- Found Torch: ${torch_PREFIX}")
