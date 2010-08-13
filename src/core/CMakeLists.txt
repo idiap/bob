@@ -27,7 +27,7 @@ set(src
     "src/CmdFile.cc"
     )
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(core "${src}" "${deps}" "${shared}")
 
 # Defines tests for this package

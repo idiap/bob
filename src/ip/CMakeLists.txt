@@ -11,7 +11,7 @@ set(deps core sp) #other torch subprojects
 # jpeg
 if(JPEG_FOUND)
   add_definitions(-DHAVE_JPEG)
-  include_directories(${JPEG_INCLUDE_DIR})
+  include_directories(${jpeg_INCLUDE_DIRS})
   set(shared "${JPEG_LIBRARIES}")
 endif(JPEG_FOUND)
 
@@ -98,7 +98,7 @@ set(src
    "${src_imagefiles}"
    "${src_geometry}")
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(ip "${src}" "${deps}" "${shared}")
 
 set(pysrc

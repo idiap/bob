@@ -14,7 +14,7 @@ set(src
 
 add_definitions(-DHAVE_OOURAFFT)
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(sp "${src}" "${deps}" "")
 
 # Python bindings

@@ -7,8 +7,8 @@ set(shared "") #shared externals to link against (link)
 if(cblas_FOUND)
   set(shared "${cblas_LIBRARIES}")
   add_definitions(-DUSE_CBLAS)
-  include_directories(${cblas_INCLUDE};${lapack_INCLUDE})
-  link_directories(${cblas_LIBDIR})
+  include_directories(${cblas_INCLUDE_DIRS})
+  link_directories(${cblas_LIBRARY_DIRS})
 endif(cblas_FOUND)
 
 # This defines the list of source files inside this package.
@@ -21,5 +21,5 @@ set(src
 		"src/THTensor.c"
 		"src/THTensorMath.c")
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(th "${src}" "${deps}" "${shared}")

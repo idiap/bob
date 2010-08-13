@@ -16,5 +16,5 @@ SET(src
    "src/apMFCC.cc"
    "src/apLFCC.cc")
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(ap "${src}" "${deps}" "${shared}")

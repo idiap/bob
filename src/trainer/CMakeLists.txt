@@ -35,5 +35,5 @@ set(src
 	"${src_trainer}"
 	"${src_boosting}")
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(trainer "${src}" "${deps}" "${shared}")

@@ -31,6 +31,7 @@ def parse_args():
   default_build_prefix = os.path.join(pwd, 'build')
   default_log_prefix = os.path.join('logs')
   sources=os.path.realpath(os.path.dirname(os.path.dirname(sys.argv[0])))
+  sources=os.path.join(sources, 'src')
   default_doxyfile = os.path.join(sources, 'doc', 'Doxyfile')
 
   #our gigantic list of options...

@@ -54,5 +54,5 @@ set(src
 	"${src_normalisations}"
 	"${src_boosting}")
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(machine "${src}" "${deps}" "${shared}")

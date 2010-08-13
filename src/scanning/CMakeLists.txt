@@ -75,7 +75,7 @@ set(src
 	"${src_pruners}"
 	"${src_selectors}")
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(scanning "${src}" "${deps}" "${shared}")
 
 # Python bindings

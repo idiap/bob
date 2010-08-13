@@ -1,10 +1,11 @@
 # Finds and configures cblas if it exists on the system. 
 # Andre Anjos - 02.july.2010
-set(cblas_LIBDIRS /usr/lib;/usr/lib/atlas CACHE INTERNAL "libdirs")
+set(cblas_LIBRARY_DIRS /usr/lib;/usr/lib/atlas CACHE INTERNAL "libdirs")
 find_path(cblas_INCLUDE NAMES cblas.h)
 find_path(lapack_INCLUDE NAMES clapack.h)
+set(cblas_INCLUDE_DIRS ${cblas_INCLUDE};${lapack_INCLUDE} CACHE INTERNAL "incdirs")
 
-find_library(lapack_LIBRARY NAMES lapack lapack PATHS ${cblas_LIBDIRS})
+find_library(lapack_LIBRARY NAMES lapack lapack PATHS ${cblas_LIBRARY_DIRS})
 find_library(cblas_LIBRARY NAMES cblas)
 find_library(atlas_LIBRARY NAMES atlas)
 set(cblas_LIBRARIES ${lapack_LIBRARY};${cblas_LIBRARY};${atlas_LIBRARY} CACHE

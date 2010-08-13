@@ -6,5 +6,5 @@ set(deps core) #other torch subprojects
 
 set(src "src/measurer.cc")
 
-include(../macros.cmake)
+include(../cmake/macros.cmake)
 torch_library(measurer "${src}" "${deps}" "${shared}")
