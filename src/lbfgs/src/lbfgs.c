@@ -78,15 +78,15 @@ typedef unsigned int uint32_t;
 
 #if     defined(USE_SSE) && defined(__SSE2__) && LBFGS_FLOAT == 64
 /* Use SSE2 optimization for 64bit double precision. */
-#include "lbfgs/arithmetic_sse_double.h"
+#include "arithmetic_sse_double.h"
 
 #elif   defined(USE_SSE) && defined(__SSE__) && LBFGS_FLOAT == 32
 /* Use SSE optimization for 32bit float precision. */
-#include "lbfgs/arithmetic_sse_float.h"
+#include "arithmetic_sse_float.h"
 
 #else
 /* No CPU specific optimization. */
-#include "lbfgs/arithmetic_ansi.h"
+#include "arithmetic_ansi.h"
 
 #endif
 
