@@ -144,7 +144,7 @@ def doxygen(option):
 
   overwrite_options = {}
   overwrite_options['PROJECT_NUMBER'] = option.version
-  overwrite_options['INPUT'] = os.path.join(option.source_dir, 'src')
+  overwrite_options['INPUT'] = option.source_dir
   overwrite_options['STRIP_FROM_PATH'] = option.source_dir
   overwrite_options['OUTPUT_DIRECTORY'] = option.doc_prefix
   if option.debug_build: overwrite_options['QUIET'] = 'NO'
