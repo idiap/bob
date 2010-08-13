@@ -67,7 +67,6 @@ ipLBP::ipLBP(int P, int R)
 	addBOption("AddAvgBit", false, "add to the LBP code the center (considering the average)");
 	addBOption("Uniform", false, "uniform patterns (at most two bitwise 0-1 or 1-0 transitions)");
 	addBOption("RotInvariant", false, "rotation invariant patterns");
-	addBOption("need_interp", false, "Tell if we need interpolation (no interpolation means that the model size is the same as the region size to process)");
 
 }
 

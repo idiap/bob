@@ -187,11 +187,10 @@ int ipLBP4R::getMaxLabel()
 bool ipLBP4R::processInput(const Tensor& input)
 {
 	// Force interpolation for the multiscale even at the model size
-/*	if (CurrentScanType::getInstance().get() == ScanTypeMultiscale)
+	if (CurrentScanType::getInstance().get() == ScanTypeMultiscale)
 	{
 			m_need_interp = true;
-	}*/
-	m_need_interp = getBOption("need_interp");
+	}
 
 	// No interpolation needed, the model size is the same as the region size to process!
 	if (m_need_interp == false)

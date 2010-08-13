@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_IP_LBP_H_
 
 #include "ip/ipCore.h"		// <ipLBP> is an <ipCore>
+#include "ip/vision.h"
 #include "core/Tensor.h"
 namespace Torch
 {

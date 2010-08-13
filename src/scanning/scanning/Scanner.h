@@ -18,38 +18,6 @@ namespace Torch
 	class Explorer;
 	class Selector;
 
-	// Global object to "inform" ipXXX classes that they are used for multiscale, pyramid
-	//	or some other scanning procedure
-	enum ScanType
-	{
-		ScanTypeMultiscale,
-		ScanTypePyramid,
-		ScanTypeOther
-	};
-	class CurrentScanType
-	{
-	public:
-
-		static CurrentScanType& getInstance()
-		{
-			static CurrentScanType instance;
-			return instance;
-		}
-
-		~CurrentScanType() {}
-
-		ScanType	get() const { return m_value; }
-		void		set(ScanType value) { m_value = value; }
-
-	private:
-
-		CurrentScanType() : m_value(ScanTypePyramid) {}
-		CurrentScanType(const CurrentScanType& other);
-		CurrentScanType& operator=(const CurrentScanType& other);
-
-		ScanType	m_value;
-	};
-
 	// HOW TO USE:
 	// --------------------------------
 	// init(image)

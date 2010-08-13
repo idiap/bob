@@ -222,6 +222,40 @@ struct sComplex
 	double r, i;
 };
 
+// Global object to "inform" ipXXX classes that they are used for multiscale,
+// pyramid	or some other scanning procedure.
+// WARNING: This code was moved from "scanning" to avoid the circular
+// dependence between "ip" and "scanning". REVISE THIS AS SOON AS POSSIBLE.
+enum ScanType
+{
+  ScanTypeMultiscale,
+  ScanTypePyramid,
+  ScanTypeOther
+};
+class CurrentScanType
+{
+public:
+
+  static CurrentScanType& getInstance()
+  {
+    static CurrentScanType instance;
+    return instance;
+  }
+
+  ~CurrentScanType() {}
+
+  ScanType	get() const { return m_value; }
+  void		set(ScanType value) { m_value = value; }
+
+private:
+
+  CurrentScanType() : m_value(ScanTypePyramid) {}
+  CurrentScanType(const CurrentScanType& other);
+  CurrentScanType& operator=(const CurrentScanType& other);
+
+  ScanType	m_value;
+};
+
 }
 
 #endif
