@@ -182,6 +182,15 @@ if __name__ == '__main__':
       problem_track[phase] = ('blocked',)
 
   if options.action in ('all', 'build', 'test'):
+    phase = 'header'
+    if problem_track['compile'][0] == 'success':
+      time_track[phase], problem_track[phase] = \
+          adm.build.action(adm.build.write_header, options)
+    else:
+      time_track[phase] = 0
+      problem_track[phase] = ('blocked',)
+
+  if options.action in ('all', 'build', 'test'):
     phase = 'install'
     if problem_track['compile'][0] == 'success':
       time_track[phase], problem_track[phase] = \

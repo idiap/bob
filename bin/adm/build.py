@@ -13,6 +13,7 @@ import logging
 import tempfile
 import time
 import pprint
+import fnmatch
 
 LOGGING_LEVELS = [
                   logging.DEBUG,
@@ -24,6 +25,31 @@ LOGGING_LEVELS = [
 CURRENT_LOGGING_LEVEL = 2
 logging.basicConfig(level=LOGGING_LEVELS[CURRENT_LOGGING_LEVEL], 
                     format="%(asctime)s | %(levelname)s | %(message)s")
+
+def get_headers(dir, exclude):
+  """Gets all files ending in '.h' from the directory, recursively, except for
+  what is defined in the input argument "exclude"."""
+  retval = []
+  for (path, dirs, files) in os.walk(dir):
+    for f in fnmatch.filter(files, '*.h'):
+      if f == exclude: continue
+      sub = path.replace(dir+os.sep, '')
+      retval.append(os.path.join(sub, f))
+  return retval
+
+def write_header(option):
+  """Writes a new header file that incorporates all existing ones."""
+  scandir = os.path.join(option.install_prefix, 'include', 'torch')
+  output = os.path.join(scandir, 'torch5spro.h')
+  headers = get_headers(scandir, os.path.basename(output))
+  f = open(output, 'wt')
+  f.write('/* This file was automatically generated -- DO NOT CHANGE IT */\n')
+  f.write('/* Date: %s */\n\n' % time.asctime())
+  f.write('#ifndef __TORCH5SPROC_H__\n')
+  f.write('#define __TORCH5SPROC_H__\n\n')
+  f.writelines(['#include "%s"\n' % k for k in headers])
+  f.write('\n#endif /* __TORCH5SPROC_H__ */\n')
+  f.close()
 
 def increase_verbosity(option, opt, value, parser):
   """Increases the current verbosity level for the logging module. 
