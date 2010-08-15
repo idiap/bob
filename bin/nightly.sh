@@ -12,8 +12,8 @@ echo "[${nightly}] Setting up externals...";
 source /idiap/home/aanjos/sw/setup.sh;
 
 echo "[${nightly}] Cleaning up old nightlies..."
-find . -mindepth 1 -maxdepth 1 -type d -not -ctime -7 -print0 | xargs -0 rm -rf;
-find . -mindepth 1 -maxdepth 1 -type f -not -ctime -7 -name '*.tar.gz' -print0 | xargs -0 rm -rf;
+find . -mindepth 1 -maxdepth 1 -type d -not -ctime -6 -print0 | xargs -0 rm -rf;
+find . -mindepth 1 -maxdepth 1 -type f -not -ctime -6 -name '*.tar.gz' -print0 | xargs -0 rm -rf;
 
 if [ -d ${nightly} ]; then
   echo "[${nightly}] Replacing available build...";
