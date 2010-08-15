@@ -93,7 +93,11 @@ def shell_str(env, value, csh=False):
   if csh: return 'setenv %s "%s";' % (env, value)
   else: return 'export %s="%s";' % (env, value)
 
-def main(dir, debug, csh):
+def setup_python(all):
+  """Sets up a python application"""
+  for k, v in all: os.environ[k] = v
+
+def main(dir, debug):
   """Searches for the parent shell type and outputs the correct environment
   settings for that."""
 
@@ -142,10 +146,12 @@ def main(dir, debug, csh):
   cmake_prefix_path = path_add(cmake_prefix_path, cmakedir)
   all.append(('CMAKE_PREFIX_PATH', cmake_prefix_path))
 
-  for k, v in all: print shell_str(k, v, csh)
+  return all
 
 if __name__ == '__main__':
 
   options, arguments = parse_args()
 
-  main(options.dir, options.debug, options.csh)
+  all = main(options.dir, options.debug)
+  
+  for k, v in all: print shell_str(k, v, options.csh)
