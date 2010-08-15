@@ -95,7 +95,10 @@ def shell_str(env, value, csh=False):
 
 def setup_python(all):
   """Sets up a python application"""
-  for k, v in all: os.environ[k] = v
+  for k, v in all: 
+    if k == 'PYTHONPATH':
+      for i in v.split(':'): sys.path.append(i)
+    os.environ[k] = v
 
 def main(dir, debug):
   """Searches for the parent shell type and outputs the correct environment
