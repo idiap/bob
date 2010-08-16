@@ -172,7 +172,7 @@ if __name__ == '__main__':
     time_track[phase], problem_track[phase] = \
         adm.build.action(adm.build.cmake, options)
 
-  if options.action in ('all', 'build', 'test'):
+  if options.action in ('all', 'build'):
     phase = 'compile'
     if problem_track['cmake'][0] == 'success':
       time_track[phase], problem_track[phase] = \
@@ -181,7 +181,7 @@ if __name__ == '__main__':
       time_track[phase] = 0
       problem_track[phase] = ('blocked',)
 
-  if options.action in ('all', 'build', 'test'):
+  if options.action in ('all', 'build'):
     phase = 'header'
     if problem_track['compile'][0] == 'success':
       time_track[phase], problem_track[phase] = \
@@ -190,7 +190,7 @@ if __name__ == '__main__':
       time_track[phase] = 0
       problem_track[phase] = ('blocked',)
 
-  if options.action in ('all', 'build', 'test'):
+  if options.action in ('all', 'build'):
     phase = 'install'
     if problem_track['compile'][0] == 'success':
       time_track[phase], problem_track[phase] = \
