@@ -69,7 +69,7 @@ def count_problems(fname):
   """Counts warnings and errors in files."""
   error   = re.compile('error\s*:', re.I)
   warning = re.compile('warning\s*:', re.I)
-  if not os.path.exists(fname): raise RuntimeError, 'Cannot find log %s' % fname
+  if not os.path.exists(fname): return (0, 0) 
   f = open(fname, 'rt')
   wcount = 0
   ecount = 0
@@ -83,6 +83,7 @@ def count_tests(fname):
   """Counts tests and problems"""
   total = re.compile('Test #')
   fail = re.compile('\*Failed')
+  if not os.path.exists(fname): return (0, 0) 
   f = open(fname, 'rt')
   tcount = 0
   fcount = 0
