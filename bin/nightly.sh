@@ -45,7 +45,7 @@ else
 fi
 
 echo "[${nightly}] Installing setup files..."
-cd ${prefix}
+cd ${nightly}
 cp -f ${checkout}/setup.sh .;
 cp -f ${checkout}/setup.csh .;
 mkdir bin;
