@@ -3,7 +3,7 @@
 # Fri 06 Aug 2010 08:35:41 CEST
 
 # Runs the full torch nightly build.
-bindir=`dirname $0`;
+bindir=$(python -c "import os; print os.path.realpath('`dirname $0`')");
 checkout=`dirname ${bindir}`;
 prefix=`pwd`;
 nightly=`date +%d.%m.%Y`;
