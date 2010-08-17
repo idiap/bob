@@ -5,9 +5,9 @@ project(torch5spro)
 cmake_minimum_required(VERSION 2.6)
 
 # Set the compiler flags and build type(release or debug)
-set(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -g -Wall -pedantic -ffast-math -fomit-frame-pointer -msse2")
+set(CMAKE_CXX_FLAGS_RELEASE "-pthread -O3 -g -Wall -ffast-math -fomit-frame-pointer -msse2")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_CXX_FLAGS_DEBUG "-pthread -g -Wall -pedantic")
+set(CMAKE_CXX_FLAGS_DEBUG "-pthread -g -Wall")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
 # This is where we install cmake files for external projects
