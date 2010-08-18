@@ -1,9 +1,0 @@
-
-#
-tensor2blocks onetensor.tensor -verbose -sizeW 8 -sizeH 8 -overlapW 0 -overlapH 0
-readtensor block.tensor
-tensor2image  block.tensor -xt jpg -base block
-
-tensor2dct onetensor.tensor -verbose -sizeW 8 -sizeH 8 -overlapW 0 -overlapH 0 -dc 15
-readtensor dct.tensor -verbose
-

@@ -1,6 +1,0 @@
-NbInputs        1200
-NbHiddenLayers  1
-NbHidden[0]     90
-NbOutputs       1
-SigmoidOrTanh   false
-InputsToOutputs false
