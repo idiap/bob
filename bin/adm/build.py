@@ -14,6 +14,7 @@ import tempfile
 import time
 import pprint
 import fnmatch
+import shutil
 
 LOGGING_LEVELS = [
                   logging.DEBUG,
@@ -122,8 +123,15 @@ def cmake(option):
   
   If there is a problem, throw a RuntimeError.
   """
-
   logging.debug('Running cmake...')
+  
+  if os.path.exists(option.build_prefix) and option.cleanup:
+    logging.debug('Removing build directory %s before build on user request' % option.build_prefix)
+    shutil.rmtree(option.build_prefix)
+
+  if os.path.exists(option.install_prefix) and option.cleanup:
+    logging.debug('Removing install directory %s before build on user request' % option.install_prefix)
+    shutil.rmtree(option.install_prefix)
 
   if not os.path.exists(option.build_prefix): os.makedirs(option.build_prefix)
 
@@ -171,6 +179,11 @@ def doxygen(option):
   throws a RuntimeError."""
 
   logging.debug('Running doxygen...')
+
+  if os.path.exists(option.doc_prefix) and option.cleanup:
+    logging.debug('Removing directory %s before doxygen on user request' % \
+        option.doc_prefix)
+    shutil.rmtree(option.doc_prefix)
 
   if not os.path.exists(option.doc_prefix): os.makedirs(option.doc_prefix)
 

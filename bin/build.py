@@ -65,6 +65,9 @@ def parse_args():
       default=default_doxyfile, metavar="FILE",
       help="path of a doxygen file to be used as configuration basis (defaults to %default)",
       )
+  parser.add_option("-c", "--cleanup-before", action="store_true",
+      dest="cleanup", default=False, help="remove output directories before respective actions",
+      )
   parser.add_option("-l", "--log-output", action="store_true",
       dest="save_output", default=False, help="store output into files",
       )
