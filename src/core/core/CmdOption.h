@@ -315,7 +315,7 @@ namespace Torch
 	};
 
 	////////////////////////////////////////////////////////////////////////////////////
-	/** This class defines a long long integer command-line option.
+	/** This class defines a int64_t integer command-line option.
 
 	    @author Sebastien Marcel (marcel@idiap.ch)
 	    @see CmdLine
@@ -325,7 +325,7 @@ namespace Torch
 	{
 	public:
 		/// Constructor
-		LongLongCmdOption(const char *name_, long long *ptr_, long long init_value_, const char *help_="", bool save_=false);
+		LongLongCmdOption(const char *name_, int64_t *ptr_, int64_t init_value_, const char *help_="", bool save_=false);
 
 		/// Destructor
 		~LongLongCmdOption();
@@ -352,8 +352,8 @@ namespace Torch
 		////////////////////////////////////////////////////////////////////////////////////
 		// Attributes
 
-		long long *ptr;
-		long long init_value;
+		int64_t *ptr;
+		int64_t init_value;
 	};
 }
 

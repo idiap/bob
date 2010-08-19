@@ -14,7 +14,7 @@ namespace Torch {
 */
 class MTimer
 {
-	long long start_time;
+	int64_t start_time;
 
 public:
 	/// hours
@@ -48,13 +48,13 @@ public:
 	void reset();
 
 	/// stop the timer and return the total accumulated time
-	long long stop();
+	int64_t stop();
 
 	/// return the total accumulated time
-	long long getRunTime();
+	int64_t getRunTime();
 
 	/// compute the time difference
-	long long computeDelta(long long current_time_, long long previous_time_);
+	int64_t computeDelta(int64_t current_time_, int64_t previous_time_);
 };
 
 }

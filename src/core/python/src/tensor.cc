@@ -11,8 +11,8 @@
 
 using namespace boost::python;
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(resize_overloads, resize, 1, 4);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(get_overloads, get, 1, 4);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(resize_overloads, resize, 1, 4)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(get_overloads, get, 1, 4)
 
 static int ts_get_size(const Torch::TensorSize& t, unsigned int i) {
   if (i < t.n_dimensions) return t.size[i];

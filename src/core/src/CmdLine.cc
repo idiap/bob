@@ -165,7 +165,7 @@ void CmdLine::addDCmdOption(const char *name, double *ptr, double init_value, co
 	addCmdOption(new DoubleCmdOption(name, ptr, init_value, help, save_it));
 }
 
-void CmdLine::addLLCmdOption(const char *name, long long *ptr, long long init_value, const char *help, bool save_it)
+void CmdLine::addLLCmdOption(const char *name, int64_t *ptr, int64_t init_value, const char *help, bool save_it)
 {
 	addCmdOption(new LongLongCmdOption(name, ptr, init_value, help, save_it));
 }
@@ -205,7 +205,7 @@ void CmdLine::addDCmdArg(const char *name, double *ptr, const char *help, bool s
 	addCmdOption(option);
 }
 
-void CmdLine::addLLCmdArg(const char *name, long long *ptr, const char *help, bool save_it)
+void CmdLine::addLLCmdArg(const char *name, int64_t *ptr, const char *help, bool save_it)
 {
 	LongLongCmdOption *option = new LongLongCmdOption(name, ptr, 0, help, save_it);
 	option->isArgument(true);

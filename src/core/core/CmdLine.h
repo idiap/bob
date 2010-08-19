@@ -1,6 +1,7 @@
 #ifndef _TORCH5SPRO_CMD_LINE_H_
 #define _TORCH5SPRO_CMD_LINE_H_
 
+#include <stdint.h>
 #include "core/Object.h"
 #include "core/CmdOption.h"
 
@@ -79,7 +80,7 @@ namespace Torch
                 ///
                 void addDCmdOption(const char *name, double *ptr, double init_value, const char *help="", bool save_it=false);
                 ///
-                void addLLCmdOption(const char *name, long long *ptr, long long init_value, const char *help="", bool save_it=false);
+                void addLLCmdOption(const char *name, int64_t *ptr, int64_t init_value, const char *help="", bool save_it=false);
 
                 /** Functions for adding an argument.
                     The argument will be setted to #value# in the command-line
@@ -99,7 +100,7 @@ namespace Torch
                 ///
                 void addDCmdArg(const char *name, double *ptr, const char *help="", bool save_it=false);
                 ///
-                void addLLCmdArg(const char *name, long long *ptr, const char *help="", bool save_it=false);
+                void addLLCmdArg(const char *name, int64_t *ptr, const char *help="", bool save_it=false);
 
                 /// Add a text line in the help message.
                 void addText(const char *text);

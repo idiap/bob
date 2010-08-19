@@ -11,17 +11,17 @@
 
 using namespace boost::python;
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addBOption_overloads, addBOption, 2, 3);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addIOption_overloads, addIOption, 2, 3);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addFOption_overloads, addFOption, 2, 3);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addDOption_overloads, addDOption, 2, 3);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addSOption_overloads, addSOption, 2, 3);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addBOption_overloads, addBOption, 2, 3)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addIOption_overloads, addIOption, 2, 3)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addFOption_overloads, addFOption, 2, 3)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addDOption_overloads, addDOption, 2, 3)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addSOption_overloads, addSOption, 2, 3)
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getBOption_overloads, getBOption, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getIOption_overloads, getIOption, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFOption_overloads, getFOption, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getDOption_overloads, getDOption, 1, 2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSOption_overloads, getSOption, 1, 2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getBOption_overloads, getBOption, 1, 2)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getIOption_overloads, getIOption, 1, 2)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFOption_overloads, getFOption, 1, 2)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getDOption_overloads, getDOption, 1, 2)
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSOption_overloads, getSOption, 1, 2)
 
 void bind_core_object()
 {

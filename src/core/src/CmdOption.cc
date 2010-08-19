@@ -371,9 +371,9 @@ DoubleCmdOption::~DoubleCmdOption()
 }
 
 
-//-------------------------- long long
+//-------------------------- int64_t
 
-LongLongCmdOption::LongLongCmdOption(const char *name_, long long *ptr_, long long init_value_, const char *help_, bool save_)
+LongLongCmdOption::LongLongCmdOption(const char *name_, int64_t *ptr_, int64_t init_value_, const char *help_, bool save_)
 		: CmdOption(name_, "<longlong>", help_, save_)
 {
 	ptr = ptr_;

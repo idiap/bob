@@ -21,7 +21,7 @@ static void tfh_set_size(Torch::TensorFile::Header& tfh, unsigned int i, int val
   if (i < tfh.m_n_dimensions) tfh.m_size[i] = value;
 }
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openwrite_overloads, openWrite, 4, 7);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openwrite_overloads, openWrite, 4, 7)
 
 //opens a new file for writing and set the header properties to be like the
 //tensor given as model

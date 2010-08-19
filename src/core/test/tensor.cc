@@ -41,28 +41,28 @@ struct T {
 template<typename TTensor, typename TVal> void check_fill_1d(const TTensor& t,
     const TVal& v) {
   BOOST_REQUIRE_EQUAL(t.nDimension(), 1);
-  for (unsigned i=0; i<t.size(0); ++i) BOOST_CHECK_EQUAL(t.get(i), v);
+  for (int i=0; i<t.size(0); ++i) BOOST_CHECK_EQUAL(t.get(i), v);
 }
 template<typename TTensor, typename TVal> void check_fill_2d(const TTensor& t,
     const TVal& v) {
   BOOST_REQUIRE_EQUAL(t.nDimension(), 2);
-  for (unsigned i=0; i<t.size(0); ++i) 
-    for (unsigned j=0; j<t.size(1); ++j) BOOST_CHECK_EQUAL(t.get(i, j), v);
+  for (int i=0; i<t.size(0); ++i) 
+    for (int j=0; j<t.size(1); ++j) BOOST_CHECK_EQUAL(t.get(i, j), v);
 }
 template<typename TTensor, typename TVal> void check_fill_3d(const TTensor& t,
     const TVal& v) {
   BOOST_REQUIRE_EQUAL(t.nDimension(), 3);
-  for (unsigned i=0; i<t.size(0); ++i) 
-    for (unsigned j=0; j<t.size(1); ++j)
-      for (unsigned k=0; k<t.size(2); ++k) BOOST_CHECK_EQUAL(t.get(i, j, k), v);
+  for (int i=0; i<t.size(0); ++i) 
+    for (int j=0; j<t.size(1); ++j)
+      for (int k=0; k<t.size(2); ++k) BOOST_CHECK_EQUAL(t.get(i, j, k), v);
 }
 template<typename TTensor, typename TVal> void check_fill_4d(const TTensor& t,
     const TVal& v) {
   BOOST_REQUIRE_EQUAL(t.nDimension(), 4);
-  for (unsigned i=0; i<t.size(0); ++i) 
-    for (unsigned j=0; j<t.size(1); ++j)
-      for (unsigned k=0; k<t.size(2); ++k)
-        for (unsigned l=0; l<t.size(3); ++l) 
+  for (int i=0; i<t.size(0); ++i) 
+    for (int j=0; j<t.size(1); ++j)
+      for (int k=0; k<t.size(2); ++k)
+        for (int l=0; l<t.size(3); ++l) 
           BOOST_CHECK_EQUAL(t.get(i, j, k, l), v);
 }
 void check_dimensions(Torch::Tensor& t, unsigned s1, unsigned s2=0, 
@@ -167,87 +167,87 @@ BOOST_AUTO_TEST_CASE( test_set )
 BOOST_AUTO_TEST_CASE( test_transpose )
 {
   unsigned int counter = 0;
-  for (unsigned int i=0; i<st.size(0); ++i)
-    for (unsigned int j=0; j<st.size(1); ++j)
-      for (unsigned int k=0; k<st.size(2); ++k)
-        for (unsigned int l=0; l<st.size(3); ++l)
+  for (int i=0; i<st.size(0); ++i)
+    for (int j=0; j<st.size(1); ++j)
+      for (int k=0; k<st.size(2); ++k)
+        for (int l=0; l<st.size(3); ++l)
           st(i, j, k, l) = counter++;
   Torch::ShortTensor t2;
   t2.transpose(&st, 0, 1);
   BOOST_CHECK(t2.isReference());
   check_dimensions(t2, 9, 10, 8, 7);
-  for (unsigned int i=0; i<t2.size(1); ++i)
-    for (unsigned int j=0; j<t2.size(0); ++j)
-      for (unsigned int k=0; k<t2.size(2); ++k)
-        for (unsigned int l=0; l<t2.size(3); ++l)
+  for (int i=0; i<t2.size(1); ++i)
+    for (int j=0; j<t2.size(0); ++j)
+      for (int k=0; k<t2.size(2); ++k)
+        for (int l=0; l<t2.size(3); ++l)
           BOOST_CHECK_EQUAL(t2.get(j, i, k, l), st.get(i, j, k, l));
   Torch::ShortTensor t3;
   t3.transpose(&t2, 0, 1); //back to normal
   BOOST_CHECK(t3.isReference());
   check_dimensions(t3, 10, 9, 8, 7);
-  for (unsigned int i=0; i<t3.size(0); ++i)
-    for (unsigned int j=0; j<t3.size(1); ++j)
-      for (unsigned int k=0; k<t3.size(2); ++k)
-        for (unsigned int l=0; l<t3.size(3); ++l)
+  for (int i=0; i<t3.size(0); ++i)
+    for (int j=0; j<t3.size(1); ++j)
+      for (int k=0; k<t3.size(2); ++k)
+        for (int l=0; l<t3.size(3); ++l)
           BOOST_CHECK_EQUAL(t3.get(i, j, k, l), st.get(i, j, k, l));
 }
 
 BOOST_AUTO_TEST_CASE( test_select )
 {
   unsigned int counter = 0;
-  for (unsigned int i=0; i<st.size(0); ++i)
-    for (unsigned int j=0; j<st.size(1); ++j)
-      for (unsigned int k=0; k<st.size(2); ++k)
-        for (unsigned int l=0; l<st.size(3); ++l)
+  for (int i=0; i<st.size(0); ++i)
+    for (int j=0; j<st.size(1); ++j)
+      for (int k=0; k<st.size(2); ++k)
+        for (int l=0; l<st.size(3); ++l)
           st(i, j, k, l) = counter++;
   Torch::ShortTensor t2;
   t2.select(&st, 0, 2); 
   BOOST_CHECK(t2.isReference());
   check_dimensions(t2, 9, 8, 7);
-  for (unsigned int j=0; j<t2.size(0); ++j)
-    for (unsigned int k=0; k<t2.size(1); ++k)
-      for (unsigned int l=0; l<t2.size(2); ++l)
+  for (int j=0; j<t2.size(0); ++j)
+    for (int k=0; k<t2.size(1); ++k)
+      for (int l=0; l<t2.size(2); ++l)
         BOOST_CHECK_EQUAL(t2.get(j, k, l), st.get(2, j, k, l));
   Torch::ShortTensor t3;
   t3.select(&t2, 0, 4);
   BOOST_CHECK(t3.isReference());
   check_dimensions(t3, 8, 7);
-  for (unsigned int k=0; k<t3.size(0); ++k)
-    for (unsigned int l=0; l<t3.size(1); ++l)
+  for (int k=0; k<t3.size(0); ++k)
+    for (int l=0; l<t3.size(1); ++l)
       BOOST_CHECK_EQUAL(t3.get(k, l), st.get(2, 4, k, l));
   Torch::ShortTensor t4;
   t4.select(&t3, 0, 6);
   BOOST_CHECK(t4.isReference());
   check_dimensions(t4, 7);
-  for (unsigned int l=0; l<t4.size(0); ++l)
+  for (int l=0; l<t4.size(0); ++l)
     BOOST_CHECK_EQUAL(t4.get(l), st.get(2, 4, 6, l));
 }
 
 BOOST_AUTO_TEST_CASE( test_narrow )
 {
   unsigned int counter = 0;
-  for (unsigned int i=0; i<st.size(0); ++i)
-    for (unsigned int j=0; j<st.size(1); ++j)
-      for (unsigned int k=0; k<st.size(2); ++k)
-        for (unsigned int l=0; l<st.size(3); ++l)
+  for (int i=0; i<st.size(0); ++i)
+    for (int j=0; j<st.size(1); ++j)
+      for (int k=0; k<st.size(2); ++k)
+        for (int l=0; l<st.size(3); ++l)
           st(i, j, k, l) = counter++;
   Torch::ShortTensor t2;
   t2.narrow(&st, 0, 0, 5);
   BOOST_CHECK(t2.isReference());
   check_dimensions(t2, 5, 9, 8, 7);
-  for (unsigned int i=0; i<t2.size(0); ++i)
-    for (unsigned int j=0; j<t2.size(1); ++j)
-      for (unsigned int k=0; k<t2.size(2); ++k)
-        for (unsigned int l=0; l<t2.size(3); ++l)
+  for (int i=0; i<t2.size(0); ++i)
+    for (int j=0; j<t2.size(1); ++j)
+      for (int k=0; k<t2.size(2); ++k)
+        for (int l=0; l<t2.size(3); ++l)
           BOOST_CHECK_EQUAL(t2.get(i, j, k, l), st.get(i, j, k, l));
   Torch::ShortTensor t3;
   t3.narrow(&t2, 2, 0, 4);
   BOOST_CHECK(t3.isReference());
   check_dimensions(t3, 5, 9, 4, 7);
-  for (unsigned int i=0; i<t3.size(0); ++i)
-    for (unsigned int j=0; j<t3.size(1); ++j)
-      for (unsigned int k=0; k<t3.size(2); ++k)
-        for (unsigned int l=0; l<t3.size(3); ++l)
+  for (int i=0; i<t3.size(0); ++i)
+    for (int j=0; j<t3.size(1); ++j)
+      for (int k=0; k<t3.size(2); ++k)
+        for (int l=0; l<t3.size(3); ++l)
           BOOST_CHECK_EQUAL(t3.get(i, j, k, l), st.get(i, j, k, l));
 }
 

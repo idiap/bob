@@ -40,7 +40,7 @@ namespace Torch
 		int			taggedRead(char* ptr, int n, const char* tag);
 		int			taggedRead(short* ptr, int n, const char* tag);
 		int			taggedRead(int* ptr, int n, const char* tag);
-		int			taggedRead(long long* ptr, int n, const char* tag);
+		int			taggedRead(int64_t* ptr, int n, const char* tag);
 		int			taggedRead(float* ptr, int n, const char* tag);
 		int			taggedRead(double* ptr, int n, const char* tag);
 
@@ -51,7 +51,7 @@ namespace Torch
 		int			taggedWrite(const char* ptr, int n, const char* tag);
 		int			taggedWrite(const short* ptr, int n, const char* tag);
 		int			taggedWrite(const int* ptr, int n, const char* tag);
-		int			taggedWrite(const long long* ptr, int n, const char* tag);
+		int			taggedWrite(const int64_t* ptr, int n, const char* tag);
 		int			taggedWrite(const float* ptr, int n, const char* tag);
 		int			taggedWrite(const double* ptr, int n, const char* tag);
 
@@ -101,7 +101,7 @@ namespace Torch
 		bool			readValue(char* value);
 		bool			readValue(short* value);
 		bool			readValue(int* value);
-		bool			readValue(long long* value);
+		bool			readValue(int64_t* value);
 		bool			readValue(float* value);
 		bool			readValue(double* value);
 
@@ -110,7 +110,7 @@ namespace Torch
 		bool			writeValue(const char* value);
 		bool			writeValue(const short* value);
 		bool			writeValue(const int* value);
-		bool			writeValue(const long long* value);
+		bool			writeValue(const int64_t* value);
 		bool			writeValue(const float* value);
 		bool			writeValue(const double* value);
 

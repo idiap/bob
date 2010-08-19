@@ -19,22 +19,22 @@ void MTimer::reset()
 	start_time = getRunTime();
 }
 
-long long MTimer::stop()
+int64_t MTimer::stop()
 {
-  	long long current_time;
+  	int64_t current_time;
 
   	current_time = getRunTime();
 
 	return computeDelta(current_time, start_time);
 }
 
-long long MTimer::computeDelta(long long current_time_, long long previous_time_)
+int64_t MTimer::computeDelta(int64_t current_time_, int64_t previous_time_)
 {
-   	long long delta;
+   	int64_t delta;
 
   	delta = current_time_ - previous_time_;
  
-	long long hours_, minutes_, seconds_, mseconds_, useconds_;
+	int64_t hours_, minutes_, seconds_, mseconds_, useconds_;
 
 	useconds_ = delta;
 	mseconds_ = useconds_ / 1000;
@@ -57,10 +57,10 @@ long long MTimer::computeDelta(long long current_time_, long long previous_time_
 }
 
 /// returns timestamp in microseconds
-long long MTimer::getRunTime()
+int64_t MTimer::getRunTime()
 {
-   	timeval tv;
-	long long ts;
+  timeval tv;
+	int64_t ts;
 	
     	gettimeofday(&tv, NULL);
 	

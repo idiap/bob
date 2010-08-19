@@ -149,7 +149,7 @@ namespace Torch
 	{
 		return scanf("%d", value) > 0;
 	}
-	bool File::readValue(long long* value)
+	bool File::readValue(int64_t* value)
 	{
 		return scanf("%ld", value) > 0;
 	}
@@ -184,7 +184,7 @@ namespace Torch
 	{
 		return printf("%d ", *value) > 0;
 	}
-	bool File::writeValue(const long long* value)
+	bool File::writeValue(const int64_t* value)
 	{
 		return printf("%ld ", *value) > 0;
 	}
@@ -295,7 +295,7 @@ namespace Torch
 			;
 		return i;
 	}
-	int File::taggedRead(long long* ptr, int n, const char* tag)
+	int File::taggedRead(int64_t* ptr, int n, const char* tag)
 	{
 		if (readTag(tag) == false || readNElements(n) == false)
 		{
@@ -414,7 +414,7 @@ namespace Torch
 		printf("\n");
 		return i;
 	}
-	int File::taggedWrite(const long long* ptr, int n, const char* tag)
+	int File::taggedWrite(const int64_t* ptr, int n, const char* tag)
 	{
 		if (writeTag(tag) == false || writeValue(&n) == false)
 		{
