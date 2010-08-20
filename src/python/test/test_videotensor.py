@@ -6,6 +6,7 @@
 """Tests the Torch::VideoTensor class
 """
 
+import os, sys
 import torch
 
 # These are some global parameters for the test.
