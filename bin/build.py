@@ -23,7 +23,7 @@ def parse_args():
   import optparse
   
   #some defaults
-  actions = ('all', 'build', 'documentation', 'test', 'depfigure', 'differences')
+  actions = ('all', 'build', 'documentation', 'test', 'depfigure')
   build_types = ('release', 'debug') #default is #0
   pwd = os.path.realpath(os.curdir)
   default_install_prefix = os.path.join(pwd, 'install')
@@ -33,8 +33,6 @@ def parse_args():
   sources=os.path.realpath(os.path.dirname(os.path.dirname(sys.argv[0])))
   sources=os.path.join(sources, 'src')
   default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'Doxyfile')
-  diffs_since = 'yesterday'
-  repository = os.path.join(os.path.realpath(os.curdir), '.git')
 
   #our gigantic list of options...
   parser = optparse.OptionParser(description=__doc__)
@@ -97,14 +95,6 @@ def parse_args():
       callback=adm.build.increase_verbosity,
       help="increases the current verbosity level",
       )
-  parser.add_option("-R", "--repository", type="string",
-      action="store", dest="repository", default=repository,
-      metavar="DIR", help="The original repository for the code for repository operations (defaults to %default)",
-      )
-  parser.add_option("-D", "--compute-diffs-since", type="string", 
-      action="store", dest="diffs_since", default=diffs_since,
-      metavar="TIME", help="if set, will compute the differences between this and the last build indicated by the date given in seconds since the UNIX epoch or one of git's relative time frames (defaults to %default)",
-      )
   parser.add_option("-V", "--version", action="store", dest="version",
       default="Version ?.?", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned"
@@ -152,9 +142,6 @@ def parse_args():
   logging.info('== build.py setup ==')
   logging.info("Action: %s" % options.action.upper())
   logging.info("Job count: %d" % options.jobs)
-  logging.info("Repository: %s" % options.repository)
-  if options.action in ('all', 'differences'):
-    logging.info("Repository differences since: %s" % options.diffs_since)
   if options.save_output:
     logging.info("Log output: YES, on %s" % options.log_prefix)
   else: logging.info("Log output: NO")
@@ -182,12 +169,6 @@ if __name__ == '__main__':
   (options, args) = parse_args()
 
   problem_track = {'configuration': ('success',)}
-
-  #differences, depends on nothing else
-  if options.action in ('all', 'differences'): 
-    phase = 'differences'
-    time_track[phase], problem_track[phase] = \
-        adm.build.action(adm.build.differences, options)
 
   if options.action in ('all', 'build', 'test', 'depfigure'):
     phase = 'cmake'
