@@ -11,7 +11,6 @@ import tempfile
 
 def get_tempfilename(prefix='torchtest_', suffix='.avi'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
-  fd.close()
   os.unlink(name)
   return name
 
@@ -65,8 +64,9 @@ class VideoTest(unittest.TestCase):
     for k in range(50): self.assertEqual(ov.write(i), True)
     self.assertEqual(iv.state, torch.ip.State.Read)
     self.assertEqual(ov.state, torch.ip.State.Write)
-    del ov
-    os.unlink(OUTPUT_VIDEO) #cleanup
+
+  def test99_CleanUp(self):
+    os.unlink(OUTPUT_VIDEO)
 
 if __name__ == '__main__':
   import sys
