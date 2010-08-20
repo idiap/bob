@@ -14,3 +14,13 @@ set(PYTHON_VERSION ${PYTHON_VERSION} CACHE INTERNAL "python")
 
 set(python_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} CACHE INTERNAL "incdirs")
 get_filename_component(python_LIBRARY_DIRS ${PYTHON_LIBRARY} PATH CACHE)
+  
+set(PYTHON_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}
+  CACHE INTERNAL "python")
+
+# This macro helps users to build torch-based executables
+function(torch_python_add_test)
+  add_test(${ARGV})
+  set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT
+    "DYLD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib;LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib;PYTHONPATH=${CMAKE_INSTALL_PREFIX}/lib:${PYTHON_INSTALL_DIRECTORY}")
+endfunction(torch_python_add_test)
