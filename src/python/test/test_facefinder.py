@@ -75,5 +75,4 @@ if __name__ == '__main__':
   import os, sys
   sys.argv.append('-v')
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
-  os.umask(0) # makes sure all files created are removeable by others
   unittest.main()

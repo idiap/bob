@@ -6,11 +6,19 @@
 """Runs some video tests
 """
 
+import os, sys
+import tempfile
+
+def get_tempfilename(prefix='torchtest_', suffix='.avi'):
+  (fd, name) = tempfile.mkstemp(suffix, prefix)
+  fd.close()
+  os.unlink(name)
+  return name
+
 # These are some global parameters for the test.
 INPUT_VIDEO = 'test.mov'
-OUTPUT_VIDEO = '/tmp/video_test.avi'
+OUTPUT_VIDEO = get_tempfilename()
 
-import os, sys
 import unittest
 import torch
 
@@ -57,10 +65,11 @@ class VideoTest(unittest.TestCase):
     for k in range(50): self.assertEqual(ov.write(i), True)
     self.assertEqual(iv.state, torch.ip.State.Read)
     self.assertEqual(ov.state, torch.ip.State.Write)
+    del ov
+    os.unlink(OUTPUT_VIDEO) #cleanup
 
 if __name__ == '__main__':
   import sys
   sys.argv.append('-v')
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
-  os.umask(0) # makes sure all files created are removeable by others
   unittest.main()

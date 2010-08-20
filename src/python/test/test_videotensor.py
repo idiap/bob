@@ -7,11 +7,17 @@
 """
 
 import os, sys
-import torch
+import tempfile
+
+def get_tempfilename(prefix='torchtest_', suffix='.avi'):
+  (fd, name) = tempfile.mkstemp(suffix, prefix)
+  fd.close()
+  os.unlink(name)
+  return name
 
 # These are some global parameters for the test.
-OUTPUT_VIDEO = '/tmp/out.avi'
-OUTPUT_FILE = '/tmp/out.tensor'
+OUTPUT_VIDEO = get_tempfilename()
+OUTPUT_FILE = get_tempfilename(suffix='.tensor')
 WIDTH = 600
 HEIGHT = 400
 FRAMES = 100
@@ -35,6 +41,7 @@ for i, c in enumerate(COLORS):
     PATTERN.drawLine(k+(i*bar_WIDTH), 0, k+(i*bar_WIDTH), HEIGHT-1, c)
 
 import unittest
+import torch
 
 class VideoTensorTest(unittest.TestCase):
   """Performs various combined read/write tests on the Torch::VideoTensor object"""
@@ -46,6 +53,8 @@ class VideoTensorTest(unittest.TestCase):
         GROUP_OF_PICT)
     self.assertEqual(vt.save(out_video), True)
     out_video.close()
+    del out_video
+    os.unlink(OUTPUT_VIDEO)
 
   def test02_CanReadFromStandardVideoFile(self):
     video = torch.ip.Video(OUTPUT_VIDEO)
@@ -59,6 +68,8 @@ class VideoTensorTest(unittest.TestCase):
     image = torch.ip.Image(WIDTH, HEIGHT, 3)
     self.assertEqual(vt.getFrame(image, FRAMES/2), True)
     self.assertEqual(image.nplanes, 3) #image is black and white
+    del video
+    os.unlink(OUTPUT_VIDEO)
 
   def test03_CanRecordOnTensorFile(self):
     vt = torch.ip.VideoTensor(WIDTH, HEIGHT, 3, FRAMES)
@@ -67,6 +78,8 @@ class VideoTensorTest(unittest.TestCase):
     out_tensor.openWrite(OUTPUT_FILE, vt)
     self.assertEqual(vt.save(out_tensor), True)
     out_tensor.close()
+    del out_tensor
+    os.unlink(OUTPUT_FILE)
 
   def test04_CanReadFromTensorFile(self):
     video = torch.core.TensorFile()
@@ -80,11 +93,12 @@ class VideoTensorTest(unittest.TestCase):
     image = torch.ip.Image(WIDTH, HEIGHT, 3)
     self.assertEqual(vt.getFrame(image, FRAMES/2), True)
     self.assertEqual(image.nplanes, 3) #image is color
+    del video
+    os.unlink(OUTPUT_FILE)
 
 if __name__ == '__main__':
   import sys
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
-  os.umask(0)
   sys.argv.append('-v')
   unittest.main()
 
