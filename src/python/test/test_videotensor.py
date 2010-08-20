@@ -82,6 +82,8 @@ class VideoTensorTest(unittest.TestCase):
 
 if __name__ == '__main__':
   import sys
+  os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
+  os.umask(0)
   sys.argv.append('-v')
   unittest.main()
 
