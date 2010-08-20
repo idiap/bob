@@ -99,6 +99,10 @@ def parse_args():
       default="Version ?.?", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned"
       )
+  parser.add_option("-D", "--compute-diffs-since", type="string", 
+      action="store", dest="diffs_since", default=False,
+      metavar="TIME", help="if set, will compute the differences between this and the last build indicated by the date given in seconds since the UNIX epoch (defaults to %default)",
+      )
   
   options, args = parser.parse_args()
 
@@ -217,6 +221,12 @@ if __name__ == '__main__':
     phase = 'documentation'
     time_track[phase], problem_track[phase] = \
         adm.build.action(adm.build.doxygen, options)
+
+  #differences, depends on nothing else
+  if options.diffs_since: 
+    phase = 'differences'
+    time_track[phase], problem_track[phase] = \
+        adm.build.action(adm.build.differences, options)
 
   #test, depends on install
   if options.action in ('all', 'test'):
