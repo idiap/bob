@@ -218,7 +218,29 @@ def doxygen(option):
     os.symlink('index.html', 'main.html')
 
   logging.debug('Finished running doxygen.')
+
+def differences(option):
+  """Calculates the repository differences since the time specified."""
   
+  logging.debug('Running git diff...')
+
+  try:
+    start = time.localtime(int(option.diffs_since))
+    start = time.strftime('%d.%m.%Y %H:%M:%S', start)
+  except ValueError:
+    start = option.diffs_since
+
+  cmd=['git']
+  cmd.append('--git-dir=%s' % option.repository)
+  cmd.append('log')
+  cmd.append('--since="%s"' % start)
+
+  status = run(cmd, option.save_output, option.log_prefix, 'differences')
+  if status != 0:
+    raise RuntimeError, '** ERROR: "git-log" did not work as expected.'
+
+  logging.debug('Finished running git diff.')
+
 def status_log(option, timing, problems):
   """Writes a pythonic status file in the root of the log directory. 
   
@@ -285,6 +307,8 @@ def action(what, option, *args):
   try:
     what(option, *args)
   except Exception, e:
+    logging.error('Executing action "%s": %s' % (what.__name__, e))
     problems = ('failed', '%s' % e)
   total_time = time.time() - start 
+  logging.info('Action "%s" took %.1f s' % (what.__name__, total_time))
   return (total_time, problems)
