@@ -14,7 +14,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
   # Finally, adds all python tests
   torch_python_add_test(python-video-tests
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py bla)
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py)
   torch_python_add_test(python-facefinder-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_facefinder.py)
   torch_python_add_test(python-cropping-tests 
