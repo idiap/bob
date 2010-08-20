@@ -221,7 +221,9 @@ if __name__ == '__main__':
   #test, depends on install
   if options.action in ('all', 'test'):
     phase = 'test'
-    if problem_track['install'][0] == 'success':
+    if (problem_track.has_key('install') and \
+        problem_track['install'][0] == 'success') or \
+        not problem_track.has_key('install'):
       time_track[phase], problem_track[phase] = \
           adm.build.action(adm.build.make, options, 'test')
     else:
