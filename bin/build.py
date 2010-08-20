@@ -33,7 +33,7 @@ def parse_args():
   sources=os.path.realpath(os.path.dirname(os.path.dirname(sys.argv[0])))
   sources=os.path.join(sources, 'src')
   default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'Doxyfile')
-  diffs_since = time.time() - (60*60*24)
+  diffs_since = 'yesterday'
   repository = os.path.join(os.path.realpath(os.curdir), '.git')
 
   #our gigantic list of options...
