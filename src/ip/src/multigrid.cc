@@ -41,11 +41,8 @@ namespace Torch {
 
 	        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	        // TODO: check correctness of dimension between input and ouput (factor 2)
-		const int height = data.size(0);
-		const int width = data.size(1);
-		const int n_planes = data.size(2);
 
-  		const int height_out = restricted.size(0);
+  	const int height_out = restricted.size(0);
 		const int width_out = restricted.size(1);
 		const int n_planes_out = restricted.size(2);
 
@@ -94,9 +91,6 @@ namespace Torch {
 
 	        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	        // TODO: check correctness of dimension between input and ouput (factor 2)
-		const int height = data.size(0);
-		const int width = data.size(1);
-		const int n_planes = data.size(2);
 
   		const int height_out = projected.size(0);
 		const int width_out = projected.size(1);
@@ -146,7 +140,6 @@ namespace Torch {
 	        const int stride_w = t_matrix->t->stride[1];     // width
 
 		// TODO: check that the dimensions are correct (square matrix)
-		const int height_matrix = matrix.size(0);
 		const int width_matrix = matrix.size(1);
 
 		const int height = image.size(0);
@@ -221,19 +214,12 @@ namespace Torch {
   
 	void computeCoeff(DoubleTensor& rho, const DoubleTensor& image, const int x_coord, const int y_coord, const int type )
 	{
-	        DoubleTensor* t_image = (DoubleTensor*)&image;
 		DoubleTensor* t_rho = (DoubleTensor*)&rho;
 
-	        double* img = t_image->t->storage->data + t_image->t->storageOffset;
 	        double* rho_p = t_rho->t->storage->data + t_rho->t->storageOffset;
-
-	        const int stride_h = t_image->t->stride[0];     // height
-	        const int stride_w = t_image->t->stride[1];     // width
-	        const int stride_p = t_image->t->stride[2];     // no planes
 
 		const int height = image.size(0);
 		const int width = image.size(1);
-		const int n_planes = image.size(2);
 
 		bool up = true;
 		bool down = true;
@@ -320,14 +306,9 @@ namespace Torch {
 
 	        const int src_stride_h = t_source->t->stride[0];     // height
 	        const int src_stride_w = t_source->t->stride[1];     // width
-	        const int src_stride_p = t_source->t->stride[2];     // no planes
-
 	        const int res_stride_h = t_result->t->stride[0];     // height
 	        const int res_stride_w = t_result->t->stride[1];     // width
-	        const int res_stride_p = t_result->t->stride[2];     // no planes
 	
-		const int rho_stride = t_rho->t->stride[0];
-
 		const int height = source.size(0);
 		const int width = source.size(1);
 
@@ -340,7 +321,6 @@ namespace Torch {
 			error("gaussSeidel(): Result and source do not have the same dimensions.");
 		}
 
-    		int dim = width*height;
 		double up, down, left, right, center;
 
 		// RED-BLACK GAUSS-SEIDEL
@@ -473,7 +453,6 @@ namespace Torch {
 					*res_row = 0.;//result.set(y, x, 0, 0.);
 				else 
 				{
-					int i=x+y*width;
 					computeCoeff(rho, data, x, y, type);
 
 					if (up)
@@ -522,9 +501,7 @@ namespace Torch {
 		// TODO: check that the dimensions are correct (cmp src and res)
 		const int height = source.size(0);
 		const int width = source.size(1);
-		const int n_planes = source.size(2);
 
-		int dim = width*height;
 		double up, down, left, right, center;
 
 		DoubleTensor* old=new DoubleTensor( result.size(0), result.size(1), result.size(2) );
@@ -549,7 +526,6 @@ namespace Torch {
 					*res_row = 0.;
 				else 
 				{
-					int idx= x+y*width;
 					computeCoeff(rho, source, x, y, type);
 
 					up = -lambda*rho_p[UP]*old_p[ (y-1) * old_stride_h + x * old_stride_w ];
@@ -576,12 +552,7 @@ namespace Torch {
 
 	        const int stride_h = t_image->t->stride[0];     // height
 	        const int stride_w = t_image->t->stride[1];     // width
-	        const int stride_p = t_image->t->stride[2];     // no planes
 
-		const int height = image.size(0);
-		const int width = image.size(1);
-		const int n_planes = image.size(2);
-		
 		if (strcmp(position, "up") == 0) 
 		{
 			double center = img[ y_coord * stride_h + x_coord * stride_w ]; 

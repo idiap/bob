@@ -112,7 +112,7 @@ static void set_video_gop(Torch::Video& v, int val)
 static bool get_video_verbose(Torch::Video& v) 
 { return v.getBOption("verbose"); }
 
-static bool set_video_verbose(Torch::Video& v, bool val) 
+static void set_video_verbose(Torch::Video& v, bool val) 
 { v.setBOption("verbose", val); }
 
 /**
