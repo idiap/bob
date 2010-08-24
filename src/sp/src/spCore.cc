@@ -4,7 +4,6 @@
 
 namespace Torch {
 
-
 ////////////////////////////////////////////////////////////////////
 // Constructor
 
@@ -105,6 +104,12 @@ bool spCore::loadFile(File& file)
 bool spCore::saveFile(File& file) const
 {
 	return true;
+}
+
+spCoreManager& spCoreManager::getInstance() {
+  static spCoreManager* manager = 0;
+  if (!manager) manager = new spCoreManager;
+  return *manager;
 }
 
 ///////////////////////////////////////////////////////////////////////////

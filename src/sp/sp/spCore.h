@@ -107,14 +107,10 @@ namespace Torch
 	public:
 
 		// Destructor
-		~spCoreManager();
+		virtual ~spCoreManager();
 
 		// Access to the single instance of this object
-		static spCoreManager&	getInstance()
-		{
-			static spCoreManager manager;
-			return manager;
-		}
+		static spCoreManager&	getInstance();
 
 		// Register a new \c spCore with a given ID (supposed to be unique)
 		bool			add(spCore* core, const char* name);
