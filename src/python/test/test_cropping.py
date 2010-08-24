@@ -24,8 +24,8 @@ class CroppingTest(unittest.TestCase):
     self.assertEqual(finder.process(i), True)
     patterns = finder.getPatterns()
     self.assertEqual(patterns.size(), 1)
-    geom_norm = torch.ip.ipGeomNorm(GEOMNORM_PARAMETERS)
-    gt_file = torch.trainer.BoundingBoxGTFile() #all in memory!
+    geom_norm = torch.scanning.ipGeomNorm(GEOMNORM_PARAMETERS)
+    gt_file = torch.scanning.BoundingBoxGTFile() #all in memory!
     self.assertEqual(geom_norm.setGTFile(gt_file), True)
     for index, k in enumerate(patterns): 
       gt_file.load(k)
@@ -44,11 +44,11 @@ class CroppingTest(unittest.TestCase):
       self.assertEqual(finder.process(i), True)
       patterns = finder.getPatterns()
       if len(patterns) == 0:
-        print 'Skipping frame %d' % frame
+        #print 'Skipping frame %d' % frame
         continue
       self.assertEqual(patterns.size(), 1)
-      geom_norm = torch.ip.ipGeomNorm(GEOMNORM_PARAMETERS)
-      gt_file = torch.trainer.BoundingBoxGTFile() #all in memory!
+      geom_norm = torch.scanning.ipGeomNorm(GEOMNORM_PARAMETERS)
+      gt_file = torch.scanning.BoundingBoxGTFile() #all in memory!
       self.assertEqual(geom_norm.setGTFile(gt_file), True)
       for index, k in enumerate(patterns): 
         gt_file.load(k)
