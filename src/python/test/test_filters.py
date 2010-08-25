@@ -9,7 +9,7 @@
 import os, sys
 
 # These are some global parameters for the test.
-INPUT_IMAGE = 'image.ppm'
+INPUT_IMAGE = 'image.ppm' #this a 100x100 pixel image of a face
 
 import unittest
 import torch
@@ -21,10 +21,10 @@ class FilterTest(unittest.TestCase):
     v = torch.ip.Image(1, 1, 3) 
     v.load(INPUT_IMAGE)
     f = torch.ip.ipCrop()
-    self.assertEqual(f.setIOption('x', 300), True)
-    self.assertEqual(f.setIOption('y', 300), True)
-    self.assertEqual(f.setIOption('w', 200), True)
-    self.assertEqual(f.setIOption('h', 200), True)
+    self.assertEqual(f.setIOption('x', 50), True)
+    self.assertEqual(f.setIOption('y', 50), True)
+    self.assertEqual(f.setIOption('w', 20), True)
+    self.assertEqual(f.setIOption('h', 20), True)
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
     processed = torch.ip.Image(f.getOutput(0))
@@ -66,6 +66,7 @@ class FilterTest(unittest.TestCase):
     #save_ref.openWrite('histo.tensorfile', processed)
     #save_ref.save(processed)
     #save_ref.close()
+    # compare to our model
     reference = torch.core.IntTensor()
     ref_file = torch.core.TensorFile()
     ref_file.openRead('histo.tensorfile')
@@ -103,6 +104,7 @@ class FilterTest(unittest.TestCase):
     #save_ref.openWrite('integralimage.tensorfile', processed)
     #save_ref.save(processed)
     #save_ref.close()
+    # compare to our model
     reference = torch.core.IntTensor()
     ref_file = torch.core.TensorFile()
     ref_file.openRead('integralimage.tensorfile')
@@ -112,6 +114,9 @@ class FilterTest(unittest.TestCase):
         for k in range(reference.size(2)):
           self.assertEqual(reference.get(i, j, k), reference.get(i, j, k))
     ref_file.close()
+
+  def test06_MSRSQIGaussian(self):
+    pass
 
 if __name__ == '__main__':
   import sys
