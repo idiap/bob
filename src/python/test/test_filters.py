@@ -152,6 +152,41 @@ class FilterTest(unittest.TestCase):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
+  def test08_relaxation(self):
+    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipRelaxation()
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('relaxation.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('relaxation.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+
+  def test09_rescaleGray(self):
+    v_file = torch.core.TensorFile()
+    v_file.openRead('integralimage.tensorfile')
+    v = v_file.load()
+    v_file.close()
+    f = torch.ip.ipRescaleGray()
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('rescalegray.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('rescalegray.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
 if __name__ == '__main__':
   import sys
