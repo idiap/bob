@@ -329,6 +329,26 @@ class FilterTest(unittest.TestCase):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
+  def test17_vcycle(self):
+    v = torch.ip.Image(1, 1, 1) #Tan/Triggs only work with grayscaled images
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipVcycle()
+    self.assertEqual(f.setIOption('n_grids', 2), True)
+    self.assertEqual(f.setIOption('type', 1), True)
+    self.assertEqual(f.setDOption('lambda', 0.1), True)
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('vcycle.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('vcycle.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+
 if __name__ == '__main__':
   import sys
   sys.argv.append('-v')
