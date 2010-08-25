@@ -92,12 +92,12 @@ def main():
       width, height = getTerminalSize()
       largest = max([len(k.__name__) for k in FILTERS])
       largest = max(largest, len('Filter'))
-      header = ' %-' + ('%d' % largest) + 's | Description'
-      prefix = '%s| ' % ((largest+2)*' ',)
+      header = ' %-' + ('%d' % largest) + 's| Description'
+      prefix = '%s| ' % ((largest+1)*' ',)
       print header % 'Filter'
-      print '%s+%s' % ((largest+2)*'-', (width-largest-3)*'-')
-      entry = '%-' + ('%d' % (largest+1)) + 's | %s'
-      for k in FILTERS:
+      print '%s+%s' % ((largest+1)*'-', (width-largest-2)*'-')
+      entry = '%-' + ('%d' % (largest)) + 's | %s'
+      for k in sorted(FILTERS):
         print entry % (k.__name__.lower(), format_doc(k.doc, width, prefix))
       sys.exit(1)
     elif sys.argv[1].lower() in [k.__name__.lower() for k in FILTERS]:
