@@ -24,7 +24,7 @@ def handle_filter(f, args):
   parser = optparse.OptionParser(prog="%s %s" % \
       (os.path.basename(sys.argv[0]), f.__name__.lower()),
       usage='%prog [options] ' + ' '.join(f.arguments),
-      description=f.__doc__)
+      description=f.doc)
   for k in f.options: parser.add_option(*k[0], **k[1])
   options, args = parser.parse_args()
 
@@ -35,7 +35,7 @@ def handle_filter(f, args):
   #finally, we call the filter with the given parametrization
   f()(options, args[1:])
 
-def format_doc(d, width=80, prefix='           | '):
+def format_doc(d, width, prefix):
   """Formats the documentation given to fit in the number of columns
   defined."""
   cols = width - len(prefix)
@@ -55,6 +55,29 @@ def format_doc(d, width=80, prefix='           | '):
   lines.append(prefix + curline)
   return '\n'.join(lines)
 
+def getTerminalSize():
+  def ioctl_GWINSZ(fd):
+    try:
+      import fcntl, termios, struct, os
+      cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ, '1234'))
+    except:
+      return None
+    return cr
+  cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+  if not cr:
+    try:
+      fd = os.open(os.ctermid(), os.O_RDONLY)
+      cr = ioctl_GWINSZ(fd)
+      os.close(fd)
+    except:
+      pass
+  if not cr:
+    try:
+      cr = (env['LINES'], env['COLUMNS'])
+    except:
+      cr = (25, 80)
+  return int(cr[1]), int(cr[0])
+
 def main():
 
   if len(sys.argv) == 1:
@@ -66,11 +89,16 @@ def main():
       print __doc__
       sys.exit(1)
     elif sys.argv[1].lower() in ('list', '-l'):
-      width = 80 #number of terminal columns
+      width, height = getTerminalSize()
+      largest = max([len(k.__name__) for k in FILTERS])
+      largest = max(largest, len('Filter'))
+      header = ' %-' + ('%d' % largest) + 's | Description'
+      prefix = '%s| ' % ((largest+2)*' ',)
+      print header % 'Filter'
+      print '%s+%s' % ((largest+2)*'-', (width-largest-3)*'-')
+      entry = '%-' + ('%d' % (largest+1)) + 's | %s'
       for k in FILTERS:
-        print ' %-9s | Descrition' % 'Filter'
-        print '-----------+%s' % ((width-12)*'-',)
-        print '%-10s | %s' % (k.__name__.lower(), format_doc(k.doc, width))
+        print entry % (k.__name__.lower(), format_doc(k.doc, width, prefix))
       sys.exit(1)
     elif sys.argv[1].lower() in [k.__name__.lower() for k in FILTERS]:
       filter = [k for k in FILTERS if k.__name__.lower() ==
