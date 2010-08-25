@@ -27,15 +27,15 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.setIOption('h', 200), True)
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
-    cropped = torch.ip.Image(f.getOutput(0))
-    #cropped.save('cropped.ppm') #use this to save another reference image
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('cropped.ppm') #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
     reference.load('cropped.ppm')
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
-          self.assertEqual(cropped.get(j, i, k), reference.get(j, i, k))
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
   def test02_flip(self):
     v = torch.ip.Image(1, 1, 3) 
@@ -44,15 +44,15 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.setBOption('vertical', True), True)
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
-    flipped = torch.ip.Image(f.getOutput(0))
-    #flipped.save('flipped.ppm') #use this to save another reference image
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('flipped.ppm') #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
     reference.load('flipped.ppm')
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
-          self.assertEqual(flipped.get(j, i, k), reference.get(j, i, k))
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
   
   def test03_histo(self):
     v = torch.ip.Image(1, 1, 3) 
@@ -60,11 +60,11 @@ class FilterTest(unittest.TestCase):
     f = torch.ip.ipHisto()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
-    histo = f.getOutput(0)
-    self.assertEqual(histo.getDatatype(), torch.core.Type.Int)
+    processed = f.getOutput(0)
+    self.assertEqual(processed.getDatatype(), torch.core.Type.Int)
     #save_ref = torch.core.TensorFile() #use this to save a new reference
-    #save_ref.openWrite('histo.tensorfile', histo)
-    #save_ref.save(histo)
+    #save_ref.openWrite('histo.tensorfile', processed)
+    #save_ref.save(processed)
     #save_ref.close()
     reference = torch.core.IntTensor()
     ref_file = torch.core.TensorFile()
@@ -73,6 +73,25 @@ class FilterTest(unittest.TestCase):
     for i in range(reference.size(0)):
        self.assertEqual(reference.get(i), reference.get(i))
     ref_file.close()
+
+  def test04_histoequal(self):
+    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipHistoEqual()
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('histoequal.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('histoequal.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+  
+
 
 if __name__ == '__main__':
   import sys
