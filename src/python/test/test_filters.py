@@ -28,6 +28,7 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
     cropped = torch.ip.Image(f.getOutput(0))
+    #cropped.save('cropped.ppm') #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
     reference.load('cropped.ppm')
@@ -35,6 +36,24 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(cropped.get(j, i, k), reference.get(j, i, k))
+
+  def test02_flip(self):
+    v = torch.ip.Image(1, 1, 3) 
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipFlip()
+    self.assertEqual(f.setBOption('vertical', True), True)
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    flipped = torch.ip.Image(f.getOutput(0))
+    #flipped.save('flipped.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 3)
+    reference.load('flipped.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(flipped.get(j, i, k), reference.get(j, i, k))
+    
 
 if __name__ == '__main__':
   import sys
