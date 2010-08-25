@@ -287,6 +287,31 @@ class FilterTest(unittest.TestCase):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
+  def test15_sobel(self):
+    v = torch.ip.Image(1, 1, 1)
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipSobel()
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 3)
+    outputs = []
+    for z in range(3): outputs.append(f.getOutput(z))
+    for t in outputs: self.assertEqual(t.getDatatype(), torch.core.Type.Int)
+    #save_ref = torch.core.TensorFile() #use this to save a new reference
+    #save_ref.openWrite('sobel.tensorfile', outputs[0])
+    #for t in outputs: save_ref.save(t)
+    #save_ref.close()
+    # compare to our model
+    reference = torch.core.IntTensor()
+    ref_file = torch.core.TensorFile()
+    ref_file.openRead('sobel.tensorfile')
+    for t in outputs:
+      ref_file.load(reference)
+      for i in range(reference.size(0)):
+        for j in range(reference.size(1)):
+          for k in range(reference.size(2)):
+            self.assertEqual(t.get(i, j, k), reference.get(i, j, k))
+    ref_file.close()
+
 if __name__ == '__main__':
   import sys
   sys.argv.append('-v')
