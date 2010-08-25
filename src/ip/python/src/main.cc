@@ -16,9 +16,10 @@ void bind_ip_image();
 void bind_ip_video();
 void bind_ip_videotensor();
 void bind_ip_lbp();
+void bind_ip_filters();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
-  scope().attr("__doc__") = "Torch trainer classes and sub-classes";
+  scope().attr("__doc__") = "Torch image processing classes and sub-classes";
   bind_ip_ipcore();
   bind_ip_color();
   bind_ip_vision();
@@ -28,4 +29,5 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_videotensor();
 #endif
   bind_ip_lbp();
+  bind_ip_filters();
 }

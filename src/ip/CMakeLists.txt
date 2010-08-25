@@ -106,6 +106,7 @@ set(pysrc
    "python/src/color.cc"
    "python/src/image.cc"
    "python/src/lbp.cc"
+   "python/src/filters.cc"
    "python/src/video.cc"
    "python/src/videotensor.cc"
    "python/src/vision.cc"
