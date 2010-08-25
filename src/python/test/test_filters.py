@@ -136,7 +136,7 @@ class FilterTest(unittest.TestCase):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
   def test07_MultiscaleRetinex(self):
-    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v = torch.ip.Image(1, 1, 1)
     v.load(INPUT_IMAGE)
     f = torch.ip.ipMultiscaleRetinex()
     self.assertEqual(f.process(v), True)
@@ -153,7 +153,7 @@ class FilterTest(unittest.TestCase):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
   def test08_relaxation(self):
-    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v = torch.ip.Image(1, 1, 1)
     v.load(INPUT_IMAGE)
     f = torch.ip.ipRelaxation()
     self.assertEqual(f.process(v), True)
@@ -189,7 +189,7 @@ class FilterTest(unittest.TestCase):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
   def test10_rotate(self):
-    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v = torch.ip.Image(1, 1, 1)
     v.load(INPUT_IMAGE)
     f = torch.ip.ipRotate()
     self.assertEqual(f.setIOption('centerx', 50), True)
@@ -203,6 +203,25 @@ class FilterTest(unittest.TestCase):
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
     reference.load('rotated.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+
+  def test11_scaleYX(self):
+    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipScaleYX()
+    self.assertEqual(f.setIOption('width', 50), True)
+    self.assertEqual(f.setIOption('height', 50), True)
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    processed.save('scaled.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('scaled.ppm')
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
