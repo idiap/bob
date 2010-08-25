@@ -24,7 +24,7 @@ using namespace boost::python;
 
 static list gtfile_getpoints(const Torch::GTFile& gtf) {
   list retval;
-  for (unsigned int i=0; i<gtf.getNPoints(); ++i) {
+  for (int i=0; i<gtf.getNPoints(); ++i) {
     retval.append(gtf.getPoint(i));
   }
   return retval;

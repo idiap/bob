@@ -14,30 +14,30 @@ using namespace boost::python;
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(resize_overloads, resize, 1, 4)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(get_overloads, get, 1, 4)
 
-static int ts_get_size(const Torch::TensorSize& t, unsigned int i) {
+static int ts_get_size(const Torch::TensorSize& t, int i) {
   if (i < t.n_dimensions) return t.size[i];
   return 0;
 }
 
-static void ts_set_size(Torch::TensorSize& t, unsigned int i, int v) {
+static void ts_set_size(Torch::TensorSize& t, int i, int v) {
   if (i < t.n_dimensions) t.size[i] = v;
 }
 
-static int tr_get_size(const Torch::TensorRegion& t, unsigned int i) {
+static int tr_get_size(const Torch::TensorRegion& t, int i) {
   if (i < t.n_dimensions) return t.size[i];
   return 0;
 }
 
-static int tr_set_size(Torch::TensorRegion& t, unsigned int i, long v) {
+static void tr_set_size(Torch::TensorRegion& t, int i, long v) {
   if (i < t.n_dimensions) t.size[i] = v;
 }
 
-static int tr_get_pos(const Torch::TensorRegion& t, unsigned int i) {
+static int tr_get_pos(const Torch::TensorRegion& t, int i) {
   if (i < t.n_dimensions) return t.pos[i];
   return 0;
 }
 
-static int tr_set_pos(Torch::TensorRegion& t, unsigned int i, long v) {
+static void tr_set_pos(Torch::TensorRegion& t, int i, long v) {
   if (i < t.n_dimensions) t.pos[i] = v;
 }
 

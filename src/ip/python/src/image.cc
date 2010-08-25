@@ -60,9 +60,9 @@ static bool save_image(const Torch::Image& i, const char* filename)
 }
 
 static void inplace_add(Torch::Image& self, const Torch::Image& other) {
-  for (unsigned i=0; i<self.getHeight(); ++i) {
-    for (unsigned j=0; j<self.getWidth(); ++j) {
-      for (unsigned k=0; k<self.getNPlanes(); ++k) {
+  for (int i=0; i<self.getHeight(); ++i) {
+    for (int j=0; j<self.getWidth(); ++j) {
+      for (int k=0; k<self.getNPlanes(); ++k) {
         self(i, j, k) += other.get(i, j, k);
       }
     }
@@ -70,9 +70,9 @@ static void inplace_add(Torch::Image& self, const Torch::Image& other) {
 }
 
 static void inplace_subtract(Torch::Image& self, const Torch::Image& other) {
-  for (unsigned i=0; i<self.getHeight(); ++i) {
-    for (unsigned j=0; j<self.getWidth(); ++j) {
-      for (unsigned k=0; k<self.getNPlanes(); ++k) {
+  for (int i=0; i<self.getHeight(); ++i) {
+    for (int j=0; j<self.getWidth(); ++j) {
+      for (int k=0; k<self.getNPlanes(); ++k) {
         self(i, j, k) -= other.get(i, j, k);
       }
     }
@@ -80,9 +80,9 @@ static void inplace_subtract(Torch::Image& self, const Torch::Image& other) {
 }
 
 static void inplace_reset(Torch::Image& self, short threshold, short value) {
-  for (unsigned i=0; i<self.getHeight(); ++i) {
-    for (unsigned j=0; j<self.getWidth(); ++j) {
-      for (unsigned k=0; k<self.getNPlanes(); ++k) {
+  for (int i=0; i<self.getHeight(); ++i) {
+    for (int j=0; j<self.getWidth(); ++j) {
+      for (int k=0; k<self.getNPlanes(); ++k) {
         if (self(i, j, k) < threshold) self(i, j, k) = value;
       }
     }
@@ -91,9 +91,9 @@ static void inplace_reset(Torch::Image& self, short threshold, short value) {
 
 static double sum(Torch::Image& self) {
   double retval = 0;
-  for (unsigned i=0; i<self.getHeight(); ++i) {
-    for (unsigned j=0; j<self.getWidth(); ++j) {
-      for (unsigned k=0; k<self.getNPlanes(); ++k) {
+  for (int i=0; i<self.getHeight(); ++i) {
+    for (int j=0; j<self.getWidth(); ++j) {
+      for (int k=0; k<self.getNPlanes(); ++k) {
         retval += self(i, j, k);
       }
     }

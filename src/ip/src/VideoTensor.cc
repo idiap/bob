@@ -86,7 +86,7 @@ bool Torch::VideoTensor::save(Torch::TensorFile& tensor_file) const
 bool Torch::VideoTensor::save(Torch::Video& video) const
 {
   Torch::Image tmp(this->size(1), this->size(0), 3); //always color for video
-  for(unsigned i=0; i<this->size(3); ++i) {
+  for(int i=0; i<this->size(3); ++i) {
     if (!const_cast<Torch::VideoTensor*>(this)->getFrame(tmp, i)) return false;
     if (!video.write(tmp)) return false;
   }

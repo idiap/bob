@@ -12,12 +12,12 @@
 
 using namespace boost::python;
 
-static int tfh_get_size(const Torch::TensorFile::Header& tfh, unsigned int i) {
+static int tfh_get_size(const Torch::TensorFile::Header& tfh, int i) {
   if (i < tfh.m_n_dimensions) return tfh.m_size[i];
   return 0;
 }
 
-static void tfh_set_size(Torch::TensorFile::Header& tfh, unsigned int i, int value) {
+static void tfh_set_size(Torch::TensorFile::Header& tfh, int i, int value) {
   if (i < tfh.m_n_dimensions) tfh.m_size[i] = value;
 }
 

@@ -59,7 +59,7 @@ static bool set_rois(Torch::Scanner& scanner, Torch::Image& ref_image,
     Torch::PatternList& plist, float increase_ratio)
 {
   bool success = true;
-  for(unsigned int i=0; i<plist.size(); ++i) {
+  for(int i=0; i<plist.size(); ++i) {
     success &= set_roi(scanner, ref_image, plist.get(i), increase_ratio);
   }
   return success;
@@ -70,7 +70,7 @@ static bool set_rois_from_last(Torch::Scanner& scanner, Torch::Image& ref_image,
 {
   bool success = true;
   const Torch::PatternList& plist = scanner.getPatterns();
-  for(unsigned int i=0; i<plist.size(); ++i) {
+  for(int i=0; i<plist.size(); ++i) {
     success &= set_roi(scanner, ref_image, plist.get(i), increase_ratio);
   }
   return success;

@@ -44,7 +44,6 @@ const char* type2string(const Torch::Tensor& t) {
 
 template<typename T> void benchmark_allocation
 (const unsigned times, const unsigned s) {
-  short v = 0;
   boost::timer timer;
   for (unsigned n=0; n<times; ++n) {
     Torch::Tensor* t = new T(s, s, s, s);
@@ -72,7 +71,7 @@ template<typename T> void benchmark_allocation
             << " us";
 }
 
-void benchmark_set(const int times, Torch::Tensor& t) {
+void benchmark_set(const unsigned int times, Torch::Tensor& t) {
   short v = 0;
   const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   boost::timer timer;
@@ -89,7 +88,7 @@ void benchmark_set(const int times, Torch::Tensor& t) {
             << ((1000000.0)*(elapsed/total)) << " us";
 }
 
-template<typename T> double benchmark_get(const int times, const T& t) {
+template<typename T> double benchmark_get(const unsigned int times, const T& t) {
   double v = 0;
   const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   boost::timer timer;
@@ -107,7 +106,7 @@ template<typename T> double benchmark_get(const int times, const T& t) {
   return v;
 }
 
-template<typename T> void benchmark_narrow(const int times, const T& t) {
+template<typename T> void benchmark_narrow(const unsigned int times, const T& t) {
   const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   T narrowed;
   boost::timer timer;
@@ -118,7 +117,7 @@ template<typename T> void benchmark_narrow(const int times, const T& t) {
 }
 
 template<typename T> void 
-benchmark_add(const int times, const T& t1, const T& t2) {
+benchmark_add(const unsigned int times, const T& t1, const T& t2) {
   const unsigned S[] = {t1.size(0), t1.size(1), t1.size(2), t1.size(3)};
   T result(S[0], S[1], S[2], S[3]);
   boost::timer timer;

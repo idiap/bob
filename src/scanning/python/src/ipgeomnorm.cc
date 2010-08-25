@@ -17,7 +17,7 @@ using namespace boost::python;
 static list ipgn_get_points(const Torch::ipGeomNorm& n) {
   list retval;
   const Torch::sPoint2D* points = n.getNMPoints();
-  for (unsigned int i=0; i<n.getGTFile()->getNPoints(); ++i) retval.append(points[i]);
+  for (int i=0; i<n.getGTFile()->getNPoints(); ++i) retval.append(points[i]);
   return retval;
 }
 

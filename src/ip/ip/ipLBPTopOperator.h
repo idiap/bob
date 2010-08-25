@@ -120,10 +120,10 @@ namespace Torch {
     private:
 
     int m_radius_xy; ///< The LBPu2,i radius in XY
-    int m_radius_xt; ///< The LBPu2,i radius in XT
-    int m_radius_yt; ///< The LBPu2,i radius in YT
     int m_points_xy; ///< The number of points in the XY LBPu2,i
+    int m_radius_xt; ///< The LBPu2,i radius in XT
     int m_points_xt; ///< The number of points in the XT LBPu2,i
+    int m_radius_yt; ///< The LBPu2,i radius in YT
     int m_points_yt; ///< The number of points in the YT LBPu2,i
     Torch::ipLBP* m_lbp_xy; ///< The operator for the XY calculation
     Torch::ipLBP* m_lbp_xt; ///< The operator for the XT calculation
