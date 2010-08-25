@@ -116,7 +116,42 @@ class FilterTest(unittest.TestCase):
     ref_file.close()
 
   def test06_MSRSQIGaussian(self):
-    pass
+    v = torch.ip.Image(1, 1, 1) 
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipMSRSQIGaussian()
+    self.assertEqual(f.setIOption('RadiusX', 6), True)
+    self.assertEqual(f.setIOption('RadiusY', 6), True)
+    self.assertEqual(f.setDOption('Sigma', 3), True)
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('msrsqigauss.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('msrsqigauss.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+
+  def test07_MultiscaleRetinex(self):
+    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipMultiscaleRetinex()
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('multiscaleretinex.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('multiscaleretinex.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+
 
 if __name__ == '__main__':
   import sys
