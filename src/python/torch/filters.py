@@ -15,8 +15,6 @@ class Filter(object):
   pass
 
 class Crop(Filter):
-  """Crops an image according to an offset in (x,y), width and height."""
-
   tmp = torch.ip.ipCrop()
 
   doc = tmp.__doc__
@@ -48,6 +46,81 @@ class Crop(Filter):
     self.filter.setIOption('y', options.y)
     self.filter.setIOption('w', options.w)
     self.filter.setIOption('h', options.h)
+    input = torch.ip.Image(1, 1, 3)
+    input.load(args[0])
+    if not self.filter.process(input):
+      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
+    torch.ip.Image(self.filter.getOutput(0)).save(args[1])
+
+class Flip(Filter):
+  tmp = torch.ip.ipFlip()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-v', '--vertical'), 
+        {'action':"store_true", 'dest':"vertical",
+        'default': tmp.getIOption("vertical"), 
+        'help':"Direction of the flipping (defaults to horizontal)"}),
+      ]
+
+  del tmp
+
+  arguments = ['input', 'output']
+      
+  def __call__(self, options, args):
+    self.filter = torch.ip.ipCrop()
+    self.filter.setBOption('vertical', options.x)
+    input = torch.ip.Image(1, 1, 3)
+    input.load(args[0])
+    if not self.filter.process(input):
+      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
+    torch.ip.Image(self.filter.getOutput(0)).save(args[1])
+
+class Histo(Filter):
+  tmp = torch.ip.ipHisto()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-a', '--append'), 
+        {'action':"store_true", 'dest':"append",
+        'default': False,
+        'help':"If set, I'll try to append to the output file instead of overwriting it."}),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-tensor']
+      
+  def __call__(self, options, args):
+    self.filter = torch.ip.ipCrop()
+    self.filter.setBOption('vertical', options.x)
+    input = torch.ip.Image(1, 1, 3)
+    input.load(args[0])
+    if not self.filter.process(input):
+      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
+    output = torch.core.TensorFile()
+    otensor = self.filter.getOutput(0)
+    if options.append: output.openAppend(args[1])
+    else: output.openWrite(args[1], otensor)
+    output.save(otensor)
+    output.close()
+
+class HistoEqual(Filter):
+  tmp = torch.ip.ipHistoEqual()
+
+  doc = tmp.__doc__
+
+  options = []
+
+  del tmp
+
+  arguments = ['input', 'output']
+      
+  def __call__(self, options, args):
+    self.filter = torch.ip.ipCrop()
+    self.filter.setBOption('vertical', options.x)
     input = torch.ip.Image(1, 1, 3)
     input.load(args[0])
     if not self.filter.process(input):
