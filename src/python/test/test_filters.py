@@ -218,7 +218,7 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    processed.save('scaled.ppm') #use this to save another reference image
+    #processed.save('scaled.ppm') #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
     reference.load('scaled.ppm')
@@ -226,6 +226,28 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+
+  def test12_selfQuotientImage(self):
+    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipSelfQuotientImage()
+    self.assertEqual(f.setIOption('s_nb', 3), True)
+    self.assertEqual(f.setIOption('s_min', 2), True)
+    self.assertEqual(f.setIOption('s_step', 5), True)
+    self.assertEqual(f.setDOption('Sigma', 0.5), True)
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('selfquotient.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('selfquotient.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+    
 
 if __name__ == '__main__':
   import sys
