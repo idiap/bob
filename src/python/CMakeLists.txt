@@ -21,5 +21,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cropping.py)
   torch_python_add_test(python-videotensor-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_videotensor.py)
+  torch_python_add_test(python-filter-tests 
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters.py)
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
