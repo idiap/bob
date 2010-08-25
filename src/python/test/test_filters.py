@@ -312,6 +312,23 @@ class FilterTest(unittest.TestCase):
             self.assertEqual(t.get(i, j, k), reference.get(i, j, k))
     ref_file.close()
 
+  def test16_TanTriggs(self):
+    v = torch.ip.Image(1, 1, 1) #Tan/Triggs only work with grayscaled images
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipTanTriggs()
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('tantriggs.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('tantriggs.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+
 if __name__ == '__main__':
   import sys
   sys.argv.append('-v')
