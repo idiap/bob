@@ -17,6 +17,9 @@ import sys, os
 from torch.filters import FILTERS
 
 def handle_filter(f, args):
+  """Handles the processing of a certain filter. If you are curious about which
+  filters are available, please look inside the torch.filters module"""
+
   import optparse
   parser = optparse.OptionParser(prog="%s %s" % \
       (os.path.basename(sys.argv[0]), f.__name__.lower()),
@@ -32,6 +35,26 @@ def handle_filter(f, args):
   #finally, we call the filter with the given parametrization
   f()(options, args[1:])
 
+def format_doc(d, width=80, prefix='           | '):
+  """Formats the documentation given to fit in the number of columns
+  defined."""
+  cols = width - len(prefix)
+  curline = ''
+  lines = []
+  for k in d.split():
+    if len(curline) <= cols:
+      if not curline: 
+        curline += k
+        continue
+      if len(' '.join([curline, k])) <= cols: 
+        curline += ' ' + k
+      else:
+        if not lines: lines.append(curline)
+        else: lines.append(prefix + curline)
+        curline = k 
+  lines.append(prefix + curline)
+  return '\n'.join(lines)
+
 def main():
 
   if len(sys.argv) == 1:
@@ -43,8 +66,11 @@ def main():
       print __doc__
       sys.exit(1)
     elif sys.argv[1].lower() in ('list', '-l'):
+      width = 80 #number of terminal columns
       for k in FILTERS:
-        print '%-10s %s' % (k.__name__.lower(), k.__doc__)
+        print ' %-9s | Descrition' % 'Filter'
+        print '-----------+%s' % ((width-12)*'-',)
+        print '%-10s | %s' % (k.__name__.lower(), format_doc(k.doc, width))
       sys.exit(1)
     elif sys.argv[1].lower() in [k.__name__.lower() for k in FILTERS]:
       filter = [k for k in FILTERS if k.__name__.lower() ==

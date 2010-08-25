@@ -19,6 +19,8 @@ class Crop(Filter):
 
   tmp = torch.ip.ipCrop()
 
+  doc = tmp.__doc__
+
   options = [ 
       (('-x',), {'type':"int", 'action':"store", 'dest':"x", 'metavar':"INT",
         'default': tmp.getIOption("x"), 
