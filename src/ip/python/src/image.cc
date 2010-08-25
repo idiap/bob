@@ -59,6 +59,12 @@ static bool save_image(const Torch::Image& i, const char* filename)
   return loader.save(i, filename);
 }
 
+static bool reload_image(Torch::Image& i, const char* filename)
+{
+  Torch::xtprobeImageFile loader;
+  return loader.load(i, filename);
+}
+
 static void inplace_add(Torch::Image& self, const Torch::Image& other) {
   for (int i=0; i<self.getHeight(); ++i) {
     for (int j=0; j<self.getWidth(); ++j) {
@@ -107,6 +113,7 @@ void bind_ip_image()
     .def("__init__", make_constructor(load_image))
     .def("__init__", make_constructor(from_tensor))
     .def("save", &save_image, (arg("self"), arg("filename")), "Saves the image using a standard format, guessed by the filename (e.g. jpg, ppm, pgm, tif or gif)")
+    .def("load", &reload_image, (arg("self"), arg("filename")), "Loads the image from a given file. Supports jpg, ppm, pgm, tif or gif.")
     .def("resize", &Torch::Image::resize, (arg("self"), arg("width"), arg("height"), arg("planes")), "Resizes the current image")
     .def("copyFromImage", (bool (Torch::Image::*)(const Torch::Image&))&Torch::Image::copyFrom, (arg("self"), arg("image")), "Copy the data from the other image converting it appropriately taking into consideration the number of planes")
     .def("copyFromTensor", (bool (Torch::Image::*)(const Torch::Tensor&))&Torch::Image::copyFrom, (arg("self"), arg("tensor")), "Copy data from a tensor (with the exact same dimensions)")
