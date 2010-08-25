@@ -91,7 +91,27 @@ class FilterTest(unittest.TestCase):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
   
-
+  def test05_ii(self):
+    v = torch.ip.Image(1, 1, 1) #only works on grayscaled
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipIntegral()
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    processed = f.getOutput(0)
+    self.assertEqual(processed.getDatatype(), torch.core.Type.Int)
+    #save_ref = torch.core.TensorFile() #use this to save a new reference
+    #save_ref.openWrite('integralimage.tensorfile', processed)
+    #save_ref.save(processed)
+    #save_ref.close()
+    reference = torch.core.IntTensor()
+    ref_file = torch.core.TensorFile()
+    ref_file.openRead('integralimage.tensorfile')
+    ref_file.load(reference)
+    for i in range(reference.size(0)):
+      for j in range(reference.size(1)):
+        for k in range(reference.size(2)):
+          self.assertEqual(reference.get(i, j, k), reference.get(i, j, k))
+    ref_file.close()
 
 if __name__ == '__main__':
   import sys
