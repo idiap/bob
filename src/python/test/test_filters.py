@@ -247,7 +247,25 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
-    
+
+  def test13_shift(self):
+    v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
+    v.load(INPUT_IMAGE)
+    f = torch.ip.ipShift()
+    self.assertEqual(f.setIOption('shiftx', 10), True)
+    self.assertEqual(f.setIOption('shifty', 10), True)
+    self.assertEqual(f.process(v), True)
+    self.assertEqual(f.getNOutputs(), 1)
+    self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
+    processed = torch.ip.Image(f.getOutput(0))
+    #processed.save('shift.ppm') #use this to save another reference image
+    # compare to our model
+    reference = torch.ip.Image(1, 1, 1)
+    reference.load('shift.ppm')
+    for i in range(reference.width):
+      for j in range(reference.height):
+        for k in range(reference.nplanes):
+          self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
 if __name__ == '__main__':
   import sys
