@@ -23,9 +23,37 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getFOption_overloads, getFOption, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getDOption_overloads, getDOption, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSOption_overloads, getSOption, 1, 2)
 
+//a pythonic implementation of Torch::Object::getVariables()
+static list get_variables(Torch::Object& o) {
+  list retval;
+  const Torch::Variable* var = o.getVariables();
+  int nvar = o.getNvariables();
+  for (int i=0; i<nvar; ++i) retval.append(var[i]);
+  return retval;
+}
+
 void bind_core_object()
 {
-  class_<Torch::Object>("Object", init<>("This is the base class of almost all Torch types. It allows setting and getting options."))
+  enum_<Torch::Variable::Type>("VariableType") 
+      .value("Nothing", Torch::Variable::TypeNothing)
+      .value("Bool", Torch::Variable::TypeBool)
+      .value("Int", Torch::Variable::TypeInt)
+      .value("Float", Torch::Variable::TypeFloat)
+      .value("Double", Torch::Variable::TypeDouble)
+      .value("String", Torch::Variable::TypeString)
+      .value("IntArray", Torch::Variable::TypeIntArray)
+      .value("FloatArray", Torch::Variable::TypeFloatArray)
+      .value("DoubleArray", Torch::Variable::TypeDoubleArray)
+      ;
+
+  class_<Torch::Variable>("Variable", "Options are synthetized as Variables, internally.", init<const Torch::Variable&>())
+    .def_readonly("type", &Torch::Variable::m_type)
+    .def_readonly("name", &Torch::Variable::m_name)
+    .def_readonly("help", &Torch::Variable::m_help)
+    .def_readonly("n", &Torch::Variable::m_n_values)
+    ;
+
+  class_<Torch::Object>("Object", "This is the base class of almost all Torch types. It allows setting and getting options.", init<>())
     .def("addBOption", &Torch::Object::addBOption, addBOption_overloads((arg("name"), arg("init_value"), arg("help")), "Adds the named boolean option to the object, with an initial value.\n\nThe exit status may be check to certify that the operation was successful."))
     .def("addIOption", &Torch::Object::addIOption, addIOption_overloads((arg("name"), arg("init_value"), arg("help")), "Adds the named integer option to the object, with an initial value.\n\nThe exit status may be check to certify that the operation was successful."))
     .def("addFOption", &Torch::Object::addFOption, addFOption_overloads((arg("name"), arg("init_value"), arg("help")), "Adds the named float-point option to the object, with an initial value.\n\nThe exit status may be check to certify that the operation was successful."))
@@ -43,5 +71,6 @@ void bind_core_object()
     .def("getFOption", &Torch::Object::getFOption, getFOption_overloads((arg("name"), arg("ok")), "This method allows the retrieval of named float-point values.\n\nIf you pass a boolean object as second parameter, you can use it to check if the operation was successful."))
     .def("getDOption", &Torch::Object::getDOption, getDOption_overloads((arg("name"), arg("ok")), "This method allows the retrieval of named double-precision values.\n\nIf you pass a boolean object as second parameter, you can use it to check if the operation was successful."))
     .def("getSOption", &Torch::Object::getSOption, getSOption_overloads((arg("name"), arg("ok")), "This method allows the retrieval of named string values.\n\nIf you pass a boolean object as second parameter, you can use it to check if the operation was successful."))
+    .def("variables", &get_variables)
     ;
 }

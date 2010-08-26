@@ -6,7 +6,48 @@
 namespace Torch
 {
 	class File;
-	struct Variable;
+
+	struct Variable
+	{
+		enum Type
+		{
+			TypeNothing,
+			TypeBool,
+			TypeInt,
+			TypeFloat,
+			TypeDouble,
+			TypeString,
+			TypeIntArray,
+			TypeFloatArray,
+			TypeDoubleArray
+		};
+
+		// Constructor - default
+		Variable();
+
+		// Destructor
+		virtual ~Variable();
+
+		// Initializes the object
+		void init(const char* name, const char* help, bool init_value);
+		void init(const char* name, const char* help, int init_value);
+		void init(const char* name, const char* help, float init_value);
+		void init(const char* name, const char* help, double init_value);
+		void init(const char* name, const char* help, const char* init_value);
+		void init(const char* name, const char* help, int n_values, int init_value);
+		void init(const char* name, const char* help, int n_values, float init_value);
+		void init(const char* name, const char* help, int n_values, double init_value);
+		void init(const Variable& other);
+
+		// Delete the allocated memory
+		void cleanup();
+
+		Type  m_type;
+		char* m_name;
+		char* m_help;
+		void* m_value;
+		int   m_n_values;
+	};
 
 	class VariableCollector
 	{
