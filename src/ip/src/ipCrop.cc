@@ -11,8 +11,8 @@ ipCrop::ipCrop()
 {
 	addIOption("x", 0, "Ox coordinate of the top left corner of the cropping area");
 	addIOption("y", 0, "Oy coordinate of the top left corner of the cropping area");
-	addIOption("w", 0, "desired width of the cropped image");
-	addIOption("h", 0, "desired height of the cropped image");
+	addIOption("w", 1, "desired width of the cropped image");
+	addIOption("h", 1, "desired height of the cropped image");
 }
 
 /////////////////////////////////////////////////////////////////////////
