@@ -50,7 +50,7 @@ macro(torch_library package src deps shared)
   set(libdir lib)
   set(incdir include/torch)
 
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+  include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
   # This adds target (library) torch_<package>, exports into "torch"
   torch_shlib(${libname} "${src}" "${deps}" "${shared}" ${libdir})
