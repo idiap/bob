@@ -77,21 +77,21 @@ bool ipScaleYX::processInput(const Tensor& input)
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
 	// Prepare the arrays to work with
-	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-	short* dst = t_output->t->storage->data + t_output->t->storageOffset;
+	const short* src = (const short*)t_input->dataR();
+	short* dst = (short*)t_output->dataW();
 
 	// Prepare the input/output dimensions
 	const int in_height = input.size(0);
 	const int in_width = input.size(1);
 	const int n_planes = input.size(2);
 
-	const int in_stride_h = t_input->t->stride[0];	// height
-	const int in_stride_w = t_input->t->stride[1];	// width
-	const int in_stride_p = t_input->t->stride[2];	// no planes
+	const int in_stride_h = t_input->stride(0);	// height
+	const int in_stride_w = t_input->stride(1);	// width
+	const int in_stride_p = t_input->stride(2);	// no planes
 
-	const int out_stride_h = t_output->t->stride[0];	// height
-	const int out_stride_w = t_output->t->stride[1];	// width
-	const int out_stride_p = t_output->t->stride[2];	// no planes
+	const int out_stride_h = t_output->stride(0);	// height
+	const int out_stride_w = t_output->stride(1);	// width
+	const int out_stride_p = t_output->stride(2);	// no planes
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
@@ -309,6 +309,7 @@ bool ipScaleYX::processInput(const Tensor& input)
 	}
 
 	// OK
+  t_output->resetFromData();
 	return true;
 }
 

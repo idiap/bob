@@ -116,6 +116,9 @@ public:
 	TYPE &operator()(long, long, long);
 	TYPE &operator()(long, long, long, long);
 
+  //
+  inline int stride(size_t d) const { return t->stride[d]; }
+
 	//
 	virtual ~TENSOR_CLASS(Tensor)();
 

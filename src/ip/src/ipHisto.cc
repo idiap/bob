@@ -68,12 +68,12 @@ bool ipHisto::processInput(const Tensor& input)
 	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
 	int* dst = t_output->t->storage->data + t_output->t->storageOffset;
 
-	const int in_stride_h = t_input->t->stride[0];	// height
-	const int in_stride_w = t_input->t->stride[1];	// width
-	const int in_stride_p = t_input->t->stride[2];	// no planes
+	const int in_stride_h = t_input->stride(0);	// height
+	const int in_stride_w = t_input->stride(1);	// width
+	const int in_stride_p = t_input->stride(2);	// no planes
 
-	const int out_stride_b = t_output->t->stride[0];// bin index
-	const int out_stride_p = t_output->t->stride[1];// no planes
+	const int out_stride_b = t_output->stride(0);// bin index
+	const int out_stride_p = t_output->stride(1);// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
@@ -108,6 +108,7 @@ bool ipHisto::processInput(const Tensor& input)
 	}
 
 	// OK
+  t_output->resetFromData();
 	return true;
 }
 

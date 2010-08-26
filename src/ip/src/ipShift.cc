@@ -81,9 +81,9 @@ bool ipShift::processInput(const Tensor& input)
 	const short* src = (const short*)t_input->dataR();
 	short* dst = (short*)t_output->dataW();
 
-	const int stride_h = t_input->t->stride[0];	// height
-	const int stride_w = t_input->t->stride[1];	// width
-	const int stride_p = t_input->t->stride[2];	// no planes
+	const int stride_h = t_input->stride(0);	// height
+	const int stride_w = t_input->stride(1);	// width
+	const int stride_p = t_input->stride(2);	// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	const int width = input.size(1);
@@ -123,6 +123,7 @@ bool ipShift::processInput(const Tensor& input)
 	}
 
 	// OK
+  t_output->resetFromData();
 	return true;
 }
 

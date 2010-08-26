@@ -6,9 +6,9 @@
 	const tensorType* t_input = (tensorType*)&input;                                                             \
 	const dataType* src = (const dataType*)input.dataR();                                                        \
                                                                                                                      \
-        const int src_stride_h = t_input->t->stride[0];     /* height */                                             \
-        const int src_stride_w = t_input->t->stride[1];     /* width */                                              \
-        const int src_stride_p = t_input->t->stride[2];     /* nb planes */                                          \
+        const int src_stride_h = t_input->stride(0);     /* height */                                             \
+        const int src_stride_w = t_input->stride(1);     /* width */                                              \
+        const int src_stride_p = t_input->stride(2);     /* nb planes */                                          \
                                                                                                                      \
         /* An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p] */                            \
         const int height = input.size(0);                                                                            \
@@ -126,9 +126,9 @@ bool ipRescaleGray::processInput(const Tensor& input)
 	ShortTensor* t_output = (ShortTensor*)m_output[0];	
 	short* dst = (short*)t_output->dataW();                                                                   
                                               
-        const int dst_stride_h = t_output->t->stride[0];     /* height */                                                 
-        const int dst_stride_w = t_output->t->stride[1];     /* width */
-        const int dst_stride_p = t_output->t->stride[2];     /* nb_planes */
+        const int dst_stride_h = t_output->stride(0);     /* height */                                                 
+        const int dst_stride_w = t_output->stride(1);     /* width */
+        const int dst_stride_p = t_output->stride(2);     /* nb_planes */
 
 	switch (input.getDatatype())
 	{
@@ -158,6 +158,7 @@ bool ipRescaleGray::processInput(const Tensor& input)
 	}
 
 	// OK
+  t_output->resetFromData();
 	return true;
 }
 

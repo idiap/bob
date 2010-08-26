@@ -83,15 +83,13 @@ bool ipMultiscaleRetinex::processInput(const Tensor& input)
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
 	const short* src = (const short*)t_input->dataR();
-	short* dst = (short*)t_output->dataW();
 
-        const int stride_h = t_input->t->stride[0];     // height
-        const int stride_w = t_input->t->stride[1];     // width
+        const int stride_h = t_input->stride(0);     // height
+        const int stride_w = t_input->stride(1);     // width
 
         // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
         const int width = input.size(1);
         const int height = input.size(0);
-	const int wxh = width * height;
 
 
 	// Compute Multi-scale Gaussian Filtering
@@ -166,7 +164,6 @@ bool ipMultiscaleRetinex::processInput(const Tensor& input)
 		delete filtered_array[s];
 
 	delete[] filtered_array;
-
 	return true;
 }
 

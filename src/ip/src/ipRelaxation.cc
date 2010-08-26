@@ -79,14 +79,10 @@ bool ipRelaxation::processInput(const Tensor& input)
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-	short* dst = t_output->t->storage->data + t_output->t->storageOffset;
+	const short* src = (const short*)t_input->dataR();
 
-	const int src_stride_h = t_input->t->stride[0];	// height
-	const int src_stride_w = t_input->t->stride[1];	// width
-
-	const int dst_stride_h = t_output->t->stride[0];	// height
-	const int dst_stride_w = t_output->t->stride[1];	// width
+	const int src_stride_h = t_input->stride(0);	// height
+	const int src_stride_w = t_input->stride(1);	// width
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
@@ -98,11 +94,11 @@ bool ipRelaxation::processInput(const Tensor& input)
 	DoubleTensor* light = new DoubleTensor(height,width,1);
 
 	// Initializes variables for efficient access
-	double* img = image->t->storage->data + image->t->storageOffset;	
-	double* lig = light->t->storage->data + light->t->storageOffset;	
+	double* img = (double*)image->dataW();
+	double* lig = (double*)light->dataW();
 
-	const int d_stride_h = image->t->stride[0];	// height
-	const int d_stride_w = image->t->stride[1];	// width
+	const int d_stride_h = image->stride(0);	// height
+	const int d_stride_w = image->stride(1);	// width
 
 	// initialization: "source" term: image | solution: light
 	for (int y=0; y<height; y++)
@@ -117,6 +113,8 @@ bool ipRelaxation::processInput(const Tensor& input)
 			*light_row = *src_row;	
 		}
 	}
+  image->resetFromData();
+  light->resetFromData();
 
 	// apply relaxation steps (gaussSeidel -> see multigrid.cc)
 	for (int i=0; i<=steps; i++)
@@ -152,7 +150,7 @@ bool ipRelaxation::processInput(const Tensor& input)
 			}
 		}
 	}
-
+  light->resetFromData();
        	cutExtremum(*light, 4); 
        
  
@@ -175,10 +173,10 @@ bool ipRelaxation::processInput(const Tensor& input)
 bool ipRelaxation::cutExtremum(DoubleTensor& data, int distribution_width) 
 {
 	DoubleTensor* t_data = (DoubleTensor*)&data;	
-	double* dat = t_data->t->storage->data + t_data->t->storageOffset;
+	double* dat = (double*)t_data->dataW();
  
-	const int stride_h = t_data->t->stride[0];	// height
-	const int stride_w = t_data->t->stride[1];	// width
+	const int stride_h = t_data->stride(0);	// height
+	const int stride_w = t_data->stride(1);	// width
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	const int height = data.size(0);
@@ -229,7 +227,7 @@ bool ipRelaxation::cutExtremum(DoubleTensor& data, int distribution_width)
 				*t_data_row = mean_minus_dxstd;
 		}
 	}
-
+  data.resetFromData();
 	return true;
 }
 

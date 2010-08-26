@@ -120,13 +120,13 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 	const short* src = (const short*)t_input->dataR();
 	short* dst = (short*)t_output->dataW();
 
-	const int src_stride_h = t_input->t->stride[0];	// height
-	const int src_stride_w = t_input->t->stride[1];	// width
-	const int src_stride_p = t_input->t->stride[2];	// no planes
+	const int src_stride_h = t_input->stride(0);	// height
+	const int src_stride_w = t_input->stride(1);	// width
+	const int src_stride_p = t_input->stride(2);	// no planes
 
-	const int dst_stride_h = t_output->t->stride[0];	// height
-	const int dst_stride_w = t_output->t->stride[1];	// width
-	const int dst_stride_p = t_output->t->stride[2];	// no planes
+	const int dst_stride_h = t_output->stride(0);	// height
+	const int dst_stride_w = t_output->stride(1);	// width
+	const int dst_stride_p = t_output->stride(2);	// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
@@ -169,8 +169,8 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 
 					// prepare variables for an efficient access to the kernel values
 					double* kernw = m_kernel_weighed->t->storage->data + m_kernel_weighed->t->storageOffset;
-					const int kernw_stride_h = m_kernel_weighed->t->stride[0];	// height
-					const int kernw_stride_w = m_kernel_weighed->t->stride[1];	// width
+					const int kernw_stride_h = m_kernel_weighed->stride(0);	// height
+					const int kernw_stride_w = m_kernel_weighed->stride(1);	// width
 
 
 					// Init kernel weighed
@@ -322,8 +322,8 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 				{	
 					// prepare variables for an efficient access to the kernel values
 					const double* kern = m_kernel->t->storage->data + m_kernel->t->storageOffset;
-					const int kern_stride_h = m_kernel->t->stride[0];	// height
-					const int kern_stride_w = m_kernel->t->stride[1];	// width
+					const int kern_stride_h = m_kernel->stride(0);	// height
+					const int kern_stride_w = m_kernel->stride(1);	// width
 
 					// Apply the kernel for the <y, x> pixel
 					double sum = 0.0;
@@ -361,6 +361,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 	}
 
 	// OK
+  t_output->resetFromData();
 	return true;
 }
 

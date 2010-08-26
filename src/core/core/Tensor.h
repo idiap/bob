@@ -196,6 +196,7 @@ namespace Torch
 		// Access to the raw data
 		virtual void* dataW() = 0;
 		virtual const void* dataR() const = 0;
+    inline virtual void resetFromData() {}
 
 		// Get the size of an element
 		virtual int typeSize() const = 0;

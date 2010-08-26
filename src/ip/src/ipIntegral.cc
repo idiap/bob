@@ -26,8 +26,8 @@
 	const inType* src = t_input->t->storage->data + t_input->t->storageOffset;      \
 	outType* dst = t_output->t->storage->data + t_output->t->storageOffset;         \
                                                                                         \
-	const int stride_h = t_input->t->stride[0];	                                \
-	const int stride_w = t_input->t->stride[1];	                                \
+	const int stride_h = t_input->stride(0);	                                \
+	const int stride_w = t_input->stride(1);	                                \
                                                                                         \
 	const int width = input.size(1);                                                \
 	const int height = input.size(0);						\
@@ -81,6 +81,7 @@
                         }                                                               \
                 }                                                                       \
 	}                                                                               \
+  t_output->resetFromData(); \
 }
 
 // II_3D_FOR_TYPE - compute the integral (image) for any 3D tensor type!
@@ -92,9 +93,9 @@
 	const inType* src = t_input->t->storage->data + t_input->t->storageOffset;      \
 	outType* dst = t_output->t->storage->data + t_output->t->storageOffset;         \
                                                                                         \
-	const int stride_h = t_input->t->stride[0];	                                \
-	const int stride_w = t_input->t->stride[1];	                                \
-	const int stride_p = t_input->t->stride[2];	                                \
+	const int stride_h = t_input->stride(0);	                                \
+	const int stride_w = t_input->stride(1);	                                \
+	const int stride_p = t_input->stride(2);	                                \
                                                                                         \
 	const int width = input.size(1);                                                \
 	const int height = input.size(0);                                               \
@@ -159,6 +160,7 @@
                         }                                                                       \
                 }                                                                       \
         }                                                                               \
+  t_output->resetFromData(); \
 }
 
 /////////////////////////////////////////////////////////////////////////

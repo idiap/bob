@@ -273,12 +273,12 @@ void ipRotate::HorizSkew(const ShortTensor& src, ShortTensor& dst, int uRow, int
 	const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
-	const int src_stride_h = src.t->stride[0];
-	const int src_stride_w = src.t->stride[1];
-	const int src_stride_p = src.t->stride[2];
-	const int dst_stride_h = dst.t->stride[0];
-	const int dst_stride_w = dst.t->stride[1];
-	const int dst_stride_p = dst.t->stride[2];
+	const int src_stride_h = src.stride(0);
+	const int src_stride_w = src.stride(1);
+	const int src_stride_p = src.stride(2);
+	const int dst_stride_h = dst.stride(0);
+	const int dst_stride_w = dst.stride(1);
+	const int dst_stride_p = dst.stride(2);
 
 	const short* src_data = (const short*)src.dataR();
 	short* dst_data = (short*)dst.dataW();
@@ -337,6 +337,7 @@ void ipRotate::HorizSkew(const ShortTensor& src, ShortTensor& dst, int uRow, int
 			dst_row += dst_stride_w;
 		}
 	}
+  dst.resetFromData();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -361,13 +362,13 @@ void ipRotate::VertSkew(const ShortTensor& src, ShortTensor& dst, int uCol, int 
 	//const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
-	const int src_stride_h = src.t->stride[0];
-	const int src_stride_w = src.t->stride[1];
-	const int src_stride_p = src.t->stride[2];
+	const int src_stride_h = src.stride(0);
+	const int src_stride_w = src.stride(1);
+	const int src_stride_p = src.stride(2);
 
-	const int dst_stride_h = dst.t->stride[0];
-	const int dst_stride_w = dst.t->stride[1];
-	const int dst_stride_p = dst.t->stride[2];
+	const int dst_stride_h = dst.stride(0);
+	const int dst_stride_w = dst.stride(1);
+	const int dst_stride_p = dst.stride(2);
 
 	const short* src_data = (const short*)src.dataR();
 	short* dst_data = (short*)dst.dataW();
@@ -426,6 +427,7 @@ void ipRotate::VertSkew(const ShortTensor& src, ShortTensor& dst, int uCol, int 
 			dst_col += dst_stride_h;
 		}
 	}
+  dst.resetFromData();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -448,13 +450,13 @@ bool ipRotate::rotateimage90(const ShortTensor& src, ShortTensor& dst)
 	//const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
-	const int src_stride_h = src.t->stride[0];
-	const int src_stride_w = src.t->stride[1];
-	const int src_stride_p = src.t->stride[2];
+	const int src_stride_h = src.stride(0);
+	const int src_stride_w = src.stride(1);
+	const int src_stride_p = src.stride(2);
 
-	const int dst_stride_h = dst.t->stride[0];
-	const int dst_stride_w = dst.t->stride[1];
-	const int dst_stride_p = dst.t->stride[2];
+	const int dst_stride_h = dst.stride(0);
+	const int dst_stride_w = dst.stride(1);
+	const int dst_stride_p = dst.stride(2);
 
 	const short* src_data = (const short*)src.dataR();
 	short* dst_data = (short*)dst.dataW();
@@ -476,7 +478,7 @@ bool ipRotate::rotateimage90(const ShortTensor& src, ShortTensor& dst)
 			}
 		}
 	}
-
+  dst.resetFromData();
 	return true;
 }
 
@@ -491,13 +493,13 @@ bool ipRotate::rotateimage180(const ShortTensor& src, ShortTensor& dst)
 	const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
-	const int src_stride_h = src.t->stride[0];
-	const int src_stride_w = src.t->stride[1];
-	const int src_stride_p = src.t->stride[2];
+	const int src_stride_h = src.stride(0);
+	const int src_stride_w = src.stride(1);
+	const int src_stride_p = src.stride(2);
 
-	const int dst_stride_h = dst.t->stride[0];
-	const int dst_stride_w = dst.t->stride[1];
-	const int dst_stride_p = dst.t->stride[2];
+	const int dst_stride_h = dst.stride(0);
+	const int dst_stride_w = dst.stride(1);
+	const int dst_stride_p = dst.stride(2);
 
 	const short* src_data = (const short*)src.dataR();
 	short* dst_data = (short*)dst.dataW();
@@ -519,7 +521,7 @@ bool ipRotate::rotateimage180(const ShortTensor& src, ShortTensor& dst)
 			}
 		}
 	}
-
+  dst.resetFromData();
 	return true;
 }
 
@@ -534,13 +536,13 @@ bool ipRotate::rotateimage270(const ShortTensor& src, ShortTensor& dst)
 	//const int dst_width = dst.size(1);
 	const int n_planes = src.size(2);
 
-	const int src_stride_h = src.t->stride[0];
-	const int src_stride_w = src.t->stride[1];
-	const int src_stride_p = src.t->stride[2];
+	const int src_stride_h = src.stride(0);
+	const int src_stride_w = src.stride(1);
+	const int src_stride_p = src.stride(2);
 
-	const int dst_stride_h = dst.t->stride[0];
-	const int dst_stride_w = dst.t->stride[1];
-	const int dst_stride_p = dst.t->stride[2];
+	const int dst_stride_h = dst.stride(0);
+	const int dst_stride_w = dst.stride(1);
+	const int dst_stride_p = dst.stride(2);
 
 	const short* src_data = (const short*)src.dataR();
 	short* dst_data = (short*)dst.dataW();
@@ -565,7 +567,7 @@ bool ipRotate::rotateimage270(const ShortTensor& src, ShortTensor& dst)
 			}
 		}
 	}
-
+  dst.resetFromData();
 	return true;
 }
 

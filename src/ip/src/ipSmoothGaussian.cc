@@ -116,12 +116,11 @@ bool ipSmoothGaussian::processInput(const Tensor& input)
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-	short* dst = t_output->t->storage->data + t_output->t->storageOffset;
+	const short* src = (const short*)t_input->dataR();
 
-	const int stride_h = t_input->t->stride[0];	// height
-	const int stride_w = t_input->t->stride[1];	// width
-	const int stride_p = t_input->t->stride[2];	// no planes
+	const int stride_h = t_input->stride(0);	// height
+	const int stride_w = t_input->stride(1);	// width
+	const int stride_p = t_input->stride(2);	// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
@@ -136,6 +135,7 @@ bool ipSmoothGaussian::processInput(const Tensor& input)
 
 	// Fill with 0 the output image (to clear boundaries)
 	t_output->fill(0);
+	short* dst = (short*)t_output->dataW();
 
 	// Apply the kernel to the image for each color plane
 	for (int p = 0; p < n_planes; p ++)
@@ -163,6 +163,7 @@ bool ipSmoothGaussian::processInput(const Tensor& input)
 	}
 
 	// OK
+  t_output->resetFromData();
 	return true;
 }
 
