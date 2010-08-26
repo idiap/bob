@@ -24,12 +24,20 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getDOption_overloads, getDOption, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSOption_overloads, getSOption, 1, 2)
 
 //a pythonic implementation of Torch::Object::getVariables()
-static list get_variables(Torch::Object& o) {
-  list retval;
+
+static const Torch::Variable* get_variable(Torch::Object& o, size_t i) {
   const Torch::Variable* var = o.getVariables();
-  int nvar = o.getNvariables();
-  for (int i=0; i<nvar; ++i) retval.append(var[i]);
-  return retval;
+  size_t nvar = o.getNvariables();
+  if (i < nvar) return &var[i];
+  return 0;
+}
+
+static const char* get_name(Torch::Variable& v) {
+  return v.m_name;
+}
+
+static const char* get_help(Torch::Variable& v) {
+  return v.m_help;
 }
 
 void bind_core_object()
@@ -48,8 +56,8 @@ void bind_core_object()
 
   class_<Torch::Variable>("Variable", "Options are synthetized as Variables, internally.", init<const Torch::Variable&>())
     .def_readonly("type", &Torch::Variable::m_type)
-    .def_readonly("name", &Torch::Variable::m_name)
-    .def_readonly("help", &Torch::Variable::m_help)
+    .add_property("name", &get_name)
+    .add_property("help", &get_help)
     .def_readonly("n", &Torch::Variable::m_n_values)
     ;
 
@@ -71,6 +79,7 @@ void bind_core_object()
     .def("getFOption", &Torch::Object::getFOption, getFOption_overloads((arg("name"), arg("ok")), "This method allows the retrieval of named float-point values.\n\nIf you pass a boolean object as second parameter, you can use it to check if the operation was successful."))
     .def("getDOption", &Torch::Object::getDOption, getDOption_overloads((arg("name"), arg("ok")), "This method allows the retrieval of named double-precision values.\n\nIf you pass a boolean object as second parameter, you can use it to check if the operation was successful."))
     .def("getSOption", &Torch::Object::getSOption, getSOption_overloads((arg("name"), arg("ok")), "This method allows the retrieval of named string values.\n\nIf you pass a boolean object as second parameter, you can use it to check if the operation was successful."))
-    .def("variables", &get_variables)
+    .def("nVariables", &Torch::Object::getNvariables)
+    .def("variable", &get_variable, return_internal_reference<>())
     ;
 }
