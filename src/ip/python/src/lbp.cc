@@ -6,14 +6,31 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "ip/ipLBP.h"
 #include "ip/ipLBP8R.h"
 #include "ip/ipLBP4R.h"
 #include "ip/ipLBPTopOperator.h"
 
-
 using namespace boost::python;
+
+static boost::shared_ptr<Torch::Image> lbp_batch(Torch::ipLBP& op, const Torch::Image& i) {
+  const int w = i.getWidth();
+  const int h = i.getHeight();
+  const int max_lbp = op.getMaxLabel();
+  const float inv_max_lbp = 255.0f / (max_lbp + 0.0f);
+  boost::shared_ptr<Torch::Image> retval(new Torch::Image(w, h, 1));
+  bool success = true;
+  for (int x = 1; x < w - 1; x ++)
+    for (int y = 1; y < h - 1; y ++) {
+      success &= op.setXY(x, y);
+      success &= op.process(i);
+      (*retval)(y, x, 0) = (short)(inv_max_lbp * op.getLBP() + 0.5f);
+    }
+  if (success) return retval;
+  return boost::shared_ptr<Torch::Image>();
+}
 
 void bind_ip_lbp()
 {
@@ -26,6 +43,7 @@ void bind_ip_lbp()
     .add_property("y", &Torch::ipLBP::getY)
     .add_property("value", &Torch::ipLBP::getLBP)
     .add_property("max_label", &Torch::ipLBP::getMaxLabel)
+    .def("batch", &lbp_batch, (arg("self"), arg("image")), "Processes the whole image given as input and return a gray-scaled image with the same size. This handle avoids the normal usage loop for the simplest use-case.")
     ;
 
   class_<Torch::ipLBP4R, bases<Torch::ipLBP> >("ipLBP4R",
