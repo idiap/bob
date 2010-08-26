@@ -211,8 +211,8 @@ bool ipLBP::allocateOutput(const Tensor& input)
 	        m_n_outputs = 1;
                 m_output = new Tensor*[m_n_outputs];
                 m_output[0] = new IntTensor(1);
-                const IntTensor* t_output = (IntTensor*)m_output[0];
-                m_lbp = t_output->t->storage->data + t_output->t->storageOffset;
+                IntTensor* t_output = (IntTensor*)m_output[0];
+                m_lbp = &(*t_output)(0);
 	}
 
 	// If the input tensor size was modified, update the scalling factors

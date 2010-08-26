@@ -65,8 +65,8 @@ bool ipHisto::processInput(const Tensor& input)
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	IntTensor* t_output = (IntTensor*)m_output[0];
 
-	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-	int* dst = t_output->t->storage->data + t_output->t->storageOffset;
+	const short* src = (const short*)t_input->dataR();
+	int* dst = (int*)t_output->dataW();
 
 	const int in_stride_h = t_input->stride(0);	// height
 	const int in_stride_w = t_input->stride(1);	// width

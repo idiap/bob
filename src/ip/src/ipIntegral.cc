@@ -23,8 +23,8 @@
         const tensorInType* t_input = (tensorInType*)&input;                            \
 	tensorOutType* t_output = (tensorOutType*)m_output[0];                          \
                                                                                         \
-	const inType* src = t_input->t->storage->data + t_input->t->storageOffset;      \
-	outType* dst = t_output->t->storage->data + t_output->t->storageOffset;         \
+	const inType* src = (const inType*)t_input->dataR(); \
+	outType* dst = (outType*)t_output->dataW(); \
                                                                                         \
 	const int stride_h = t_input->stride(0);	                                \
 	const int stride_w = t_input->stride(1);	                                \
@@ -90,8 +90,8 @@
         const tensorInType* t_input = (tensorInType*)&input;                            \
 	tensorOutType* t_output = (tensorOutType*)m_output[0];                          \
                                                                                         \
-	const inType* src = t_input->t->storage->data + t_input->t->storageOffset;      \
-	outType* dst = t_output->t->storage->data + t_output->t->storageOffset;         \
+	const inType* src = (inType*)t_input->dataR(); \
+	outType* dst = (outType*)t_output->dataW(); \
                                                                                         \
 	const int stride_h = t_input->stride(0);	                                \
 	const int stride_w = t_input->stride(1);	                                \

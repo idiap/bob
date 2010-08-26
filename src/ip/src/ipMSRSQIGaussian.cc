@@ -134,11 +134,6 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 	const int width = input.size(1);
 	const int n_planes = input.size(2);
 
-	const int start_x = radius_x;
-	const int start_y = radius_y;
-	const int stop_x = width - radius_x;
-	const int stop_y = height - radius_y;
-
 	// Fill with 0 the output image (to clear boundaries)
 	t_output->fill(0);
 
@@ -168,10 +163,9 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 					m_kernel_weighed = new DoubleTensor(2 * radius_y + 1, 2 * radius_x + 1);
 
 					// prepare variables for an efficient access to the kernel values
-					double* kernw = m_kernel_weighed->t->storage->data + m_kernel_weighed->t->storageOffset;
+					double* kernw = (double*)m_kernel_weighed->dataW();
 					const int kernw_stride_h = m_kernel_weighed->stride(0);	// height
 					const int kernw_stride_w = m_kernel_weighed->stride(1);	// width
-
 
 					// Init kernel weighed
 					m_kernel_weighed->copy( m_kernel );
@@ -321,7 +315,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 				else
 				{	
 					// prepare variables for an efficient access to the kernel values
-					const double* kern = m_kernel->t->storage->data + m_kernel->t->storageOffset;
+					const double* kern = (const double*)m_kernel->dataR();
 					const int kern_stride_h = m_kernel->stride(0);	// height
 					const int kern_stride_w = m_kernel->stride(1);	// width
 

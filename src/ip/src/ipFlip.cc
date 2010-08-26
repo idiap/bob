@@ -80,8 +80,8 @@ bool ipFlip::processInput(const Tensor& input)
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
 	// source and destination in memory
-	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-	short* dst = t_output->t->storage->data + t_output->t->storageOffset;
+	const short* src = (const short*)t_input->dataR();
+	short* dst = (short*)t_output->dataW();
 
 	// the indexing of the data
 	const int stride_h = t_input->t->stride[0];        // height
@@ -143,6 +143,7 @@ bool ipFlip::processInput(const Tensor& input)
 	}
 
 	// OK
+  t_output->resetFromData();
 	return true;
 }
 
