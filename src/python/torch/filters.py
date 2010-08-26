@@ -156,7 +156,7 @@ class Integral(Filter):
     output.save(otensor)
     output.close()
 
-class MSRSQIGaussian(Filter)
+class MSRSQIGaussian(Filter):
   tmp = torch.ip.ipMSRSQIGaussian()
 
   doc = tmp.__doc__
@@ -196,7 +196,7 @@ class MSRSQIGaussian(Filter)
       raise RuntimeError, 'Processing of "%s" has failed' % args[0]
     torch.ip.Image(self.filter.getOutput(0)).save(args[1])
 
-class MultiscaleRetinex(Filter)
+class MultiscaleRetinex(Filter):
   tmp = torch.ip.ipMultiscaleRetinex()
 
   doc = tmp.__doc__
