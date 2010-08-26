@@ -239,7 +239,7 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('selfquotient.ppm') #use this to save another reference image
+    # processed.save('selfquotient.ppm') #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
     reference.load('selfquotient.ppm')
