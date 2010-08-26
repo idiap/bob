@@ -8,7 +8,98 @@ filter.py. If you want to include a filter here, follow one of the models
 bellow.
 """
 
-import torch.ip
+import os
+import torch
+
+def map_variable_types(v):
+  """Returns the standard python types for variables defined"""
+  if v.type == torch.core.VariableType.Int: return 'int'
+  elif v.type in (torch.core.VariableType.Float, torch.core.VariableType.Double): return 'float'
+  elif v.type == torch.core.VariableType.Bool: return 'bool'
+  elif v.type == torch.core.VariableType.String: return 'str'
+  raise RuntimeError, 'Unsupported mapping from type %s' % v.type
+
+def generate_option_dict(o, var):
+  """Generates the dictionary required for option parsing, from a specific
+  variable in an object"""
+  v = [k for k in o.variables() if k.name == var]
+  if len(v) != 1: 
+    raise RuntimeError, 'Object does not contain Variable %s' % var
+  v = v[0]
+  t = map_variable_types(v)
+  action = 'store'
+  metavar = t.upper()
+  if t == 'bool':
+    if o.getBOption(var):
+      action = 'store_false'
+      default = True
+    else:
+      action = 'store_true'
+      default = False
+    metavar = None
+  elif t == 'str':
+    default = o.getSOption(var)
+  elif t == 'int':
+    default = o.getIOption(var)
+  if v.type == torch.core.VariableType.Float:
+    default = o.getFOption(var)
+  if v.type == torch.core.VariableType.Double:
+    default = o.getDOption(var)
+
+  if metavar:
+    return {'type': t, 'action': action, 'dest': var, 'metavar': metavar,
+            'default': default, 'help': v.help + ' (defaults to %default)'}
+  return {'action': action, 'dest': var,
+          'default': default, 'help': v.help + ' (defaults to %default)'}
+
+def customize_filter(filter, options):
+  for k, v in filter.variable_dict().iteritems():
+    if hasattr(options, k):
+      if v.type == torch.core.VariableType.Bool:
+        filter.setBOption(k, getattr(options, k))
+      elif v.type == torch.core.VariableType.Int:
+        filter.setIOption(k, getattr(options, k))
+      elif v.type == torch.core.VariableType.Float:
+        filter.setFOption(k, getattr(options, k))
+      elif v.type == torch.core.VariableType.Double:
+        filter.setDOption(k, getattr(options, k))
+      elif v.type == torch.core.VariableType.String:
+        filter.setSOption(k, getattr(options, k))
+      else:
+        raise RuntimeError, 'I cannot customize option of type %s' % v.type
+
+def apply_image_filter(cls, options, input, output, planes=3):
+  filter = cls()
+  customize_filter(filter, options)
+  if not os.path.exists(input):
+    raise RuntimeError, 'I cannot read input file "%s"' % input
+  i = torch.ip.Image(1, 1, planes)
+  i.load(input)
+  if not filter.process(i):
+    raise RuntimeError, 'Processing of "%s" has failed' % input
+  if not filter.getNOutputs() == 1:
+    raise RuntimeError, 'Filter "%s" returned more than 1 output?' % filter
+  torch.ip.Image(filter.getOutput(0)).save(output)
+
+def apply_image_processor(cls, options, input, output, planes=3):
+  filter = cls()
+  customize_filter(filter, options)
+  if not os.path.exists(input):
+    raise RuntimeError, 'I cannot read input file "%s"' % input
+  i = torch.ip.Image(1, 1, planes)
+  i.load(input)
+  if not filter.process(i):
+    raise RuntimeError, 'Processing of "%s" has failed' % input
+  o = torch.core.TensorFile()
+  otensor = filter.getOutput(0)
+  if options.append: o.openAppend(output)
+  else: o.openWrite(output, otensor)
+  for n in range(filter.getNOutputs()): o.save(filter.getOutput(n))
+  o.close()
+
+APPEND_OPTION = (('-a', '--append'), 
+    {'action': "store_true", 'dest': "append", 'default': False,
+     'help': "If set, I'll try to append to the output file instead of overwriting it."})
 
 class Filter(object):
   """Top-level class for all implemented filters"""
@@ -20,37 +111,20 @@ class Crop(Filter):
   doc = tmp.__doc__
 
   options = [ 
-      (('-x',), {'type':"int", 'action':"store", 'dest':"x", 'metavar':"INT",
-        'default': tmp.getIOption("x"), 
-        'help':"Offset in x (defaults to %default)"}),
-      (('-y',), {'type':"int", 'action':"store", 'dest':"y", 'metavar':"INT",
-        'default': tmp.getIOption("y"), 
-        'help':"Offset in y (defaults to %default)"}),
-      (('-w','--width'), {'type': "int", 
-        'action': "store", 'dest': "w", 'metavar': "INT",
-        'default':tmp.getIOption("w"), 
-        'help':"Width of the cropped image (defaults to %default)"}),
-      (('-z','--height'), {'type': "int",
-        'action': "store", 'dest': "h", 'metavar': "INT",
-        'default':tmp.getIOption("h"), 
-        'help':"Height of the cropped image (defaults to %default)"}),
+      (('-x',), generate_option_dict(tmp, 'x')),
+      (('-y',), generate_option_dict(tmp, 'y')),
+      (('-w', '--width'), generate_option_dict(tmp, 'w')),
+      (('-z', '--height'), generate_option_dict(tmp, 'h')),
       ]
 
   del tmp
 
-  arguments = ['input', 'output']
+  arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    self.filter = torch.ip.ipCrop()
-    self.filter.setIOption('x', options.x)
-    self.filter.setIOption('y', options.y)
-    self.filter.setIOption('w', options.w)
-    self.filter.setIOption('h', options.h)
-    input = torch.ip.Image(1, 1, 3)
-    input.load(args[0])
-    if not self.filter.process(input):
-      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
-    torch.ip.Image(self.filter.getOutput(0)).save(args[1])
+    if options.w == 0 or options.h == 0:
+      raise RuntimeError, 'I cannot crop an image to have zero dimensions, please revise your options!'
+    apply_image_filter(torch.ip.ipCrop, options, args[0], args[1], planes=3)
 
 class Flip(Filter):
   tmp = torch.ip.ipFlip()
@@ -58,54 +132,30 @@ class Flip(Filter):
   doc = tmp.__doc__
 
   options = [ 
-      (('-v', '--vertical'), 
-        {'action':"store_true", 'dest':"vertical",
-        'default': tmp.getBOption("vertical"), 
-        'help':"Direction of the flipping (defaults to horizontal)"}),
+      (('-v', '--vertical'), generate_option_dict(tmp, 'vertical')),
       ]
 
   del tmp
 
-  arguments = ['input', 'output']
+  arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    self.filter = torch.ip.ipFlip()
-    self.filter.setBOption('vertical', options.x)
-    input = torch.ip.Image(1, 1, 3)
-    input.load(args[0])
-    if not self.filter.process(input):
-      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
-    torch.ip.Image(self.filter.getOutput(0)).save(args[1])
+    apply_image_filter(torch.ip.ipFlip, options, args[0], args[1], planes=3)
 
 class Histo(Filter):
   tmp = torch.ip.ipHisto()
 
   doc = tmp.__doc__
 
-  options = [ 
-      (('-a', '--append'), 
-        {'action':"store_true", 'dest':"append",
-        'default': False,
-        'help':"If set, I'll try to append to the output file instead of overwriting it."}),
-      ]
+  options = [APPEND_OPTION] 
 
   del tmp
 
   arguments = ['input-image', 'output-tensor']
       
   def __call__(self, options, args):
-    self.filter = torch.ip.ipHisto()
-    self.filter.setBOption('vertical', options.x)
-    input = torch.ip.Image(1, 1, 3)
-    input.load(args[0])
-    if not self.filter.process(input):
-      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
-    output = torch.core.TensorFile()
-    otensor = self.filter.getOutput(0)
-    if options.append: output.openAppend(args[1])
-    else: output.openWrite(args[1], otensor)
-    output.save(otensor)
-    output.close()
+    apply_image_processor(torch.ip.ipHisto, options, 
+        args[0], args[1], planes=3)
 
 class HistoEqual(Filter):
   tmp = torch.ip.ipHistoEqual()
@@ -116,45 +166,26 @@ class HistoEqual(Filter):
 
   del tmp
 
-  arguments = ['input', 'output']
+  arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    self.filter = torch.ip.ipHistoEqual()
-    self.filter.setBOption('vertical', options.x)
-    input = torch.ip.Image(1, 1, 3)
-    input.load(args[0])
-    if not self.filter.process(input):
-      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
-    torch.ip.Image(self.filter.getOutput(0)).save(args[1])
+    apply_image_filter(torch.ip.ipHistoEqual, options, 
+        args[0], args[1], planes=1)
 
 class Integral(Filter):
   tmp = torch.ip.ipIntegral()
 
   doc = tmp.__doc__
 
-  options = [ 
-      (('-a', '--append'), 
-        {'action':"store_true", 'dest':"append",
-        'default': False,
-        'help':"If set, I'll try to append to the output file instead of overwriting it."}),
-      ]
+  options = [APPEND_OPTION]
 
   del tmp
 
   arguments = ['input-image', 'output-tensor']
       
   def __call__(self, options, args):
-    self.filter = torch.ip.ipIntegral()
-    input = torch.ip.Image(1, 1, 3)
-    input.load(args[0])
-    if not self.filter.process(input):
-      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
-    output = torch.core.TensorFile()
-    otensor = self.filter.getOutput(0)
-    if options.append: output.openAppend(args[1])
-    else: output.openWrite(args[1], otensor)
-    output.save(otensor)
-    output.close()
+    apply_image_processor(torch.ip.ipIntegral, options, 
+        args[0], args[1], planes=3)
 
 class MSRSQIGaussian(Filter):
   tmp = torch.ip.ipMSRSQIGaussian()
@@ -162,39 +193,19 @@ class MSRSQIGaussian(Filter):
   doc = tmp.__doc__
 
   options = [ 
-      (('-a', '--append'), 
-        {'action':"store_true", 'dest':"append",
-        'default': False,
-        'help':"If set, I'll try to append to the output file instead of overwriting it."}),
-      (('-x', '--radius-x'), {'type':"int", 'action':"store", 'dest':"radius_x", 
-        'metavar':"INT", 'default': tmp.getIOption("RadiusX"), 
-        'help':"Kernel radius on Ox (defaults to %default)"}),
-      (('-y', '--radius-y'), {'type':"int", 'action':"store", 'dest':"radius_y", 
-        'metavar':"INT", 'default': tmp.getIOption("RadiusY"), 
-        'help':"Kernel radius on Oy (defaults to %default)"}),
-      (('-s', '--sigma'), {'type':"float", 'action':"store", 'dest':"sigma", 
-        'metavar':"INT", 'default': tmp.getIOption("Sigma"), 
-        'help':"Variance of the kernel (defaults to %default)"}),
-      (('-w', '--weighted'), {'action':"store_true", 'dest':"weighted", 
-        'default': False,
-        'help':"If true, SQI is performed (Weighted Gaussian kernel), otherwise MSR is done (Regular Gaussian kernel) (defaults to %default)"}),
+      (('-x','--radius-x'), generate_option_dict(tmp, 'RadiusX')),
+      (('-y','--radius-y'), generate_option_dict(tmp, 'RadiusY')),
+      (('-s','--sigma'), generate_option_dict(tmp, 'Sigma')),
+      (('-w', '--weighted'), generate_option_dict(tmp, 'Weighed')),
       ]
 
   del tmp
 
-  arguments = ['input', 'output']
+  arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    self.filter = torch.ip.ipMSRSQIGaussian()
-    self.filter.setIOption('RadiusX', options.radius_x)
-    self.filter.setIOption('RadiusY', options.radius_y)
-    self.filter.setDOption('Sigma', options.sigma)
-    self.filter.setBOption('Weighed', options.weighted)
-    input = torch.ip.Image(1, 1, 3)
-    input.load(args[0])
-    if not self.filter.process(input):
-      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
-    torch.ip.Image(self.filter.getOutput(0)).save(args[1])
+    apply_image_filter(torch.ip.ipMSRSQIGaussian, options, args[0], args[1], 
+        planes=3) 
 
 class MultiscaleRetinex(Filter):
   tmp = torch.ip.ipMultiscaleRetinex()
@@ -202,39 +213,138 @@ class MultiscaleRetinex(Filter):
   doc = tmp.__doc__
 
   options = [ 
-      (('-a', '--append'), 
-        {'action':"store_true", 'dest':"append",
-        'default': False,
-        'help':"If set, I'll try to append to the output file instead of overwriting it."}),
-      (('-n', '--scales'), {'type':"int", 'action':"store", 'dest':"nb", 
-        'metavar':"INT", 'default': tmp.getIOption("s_nb"), 
-        'help':"Number of different scales (Singlescale Retinex <-> 1) (defaults to %default)"}),
-      (('-m', '--min'), {'type':"int", 'action':"store", 'dest':"min", 
-        'metavar':"INT", 'default': tmp.getIOption("s_min"), 
-        'help':"Minimum scale: (2*min+1) (defaults to %default)"}),
-      (('-t', '--step'), {'type':"int", 'action':"store", 'dest':"step", 
-        'metavar':"INT", 'default': tmp.getIOption("s_step"), 
-        'help':"Scale step: (2*step) (defaults to %default)"}),
-      (('-s', '--sigma'), {'type':"float", 'action':"store", 'dest':"sigma", 
-        'metavar':"FLOAT", 'default': tmp.getIOption("sigma"), 
-        'help':"Variance of the kernel for the minimum scale (defaults to %default)"}),
+      (('-n','--scales'), generate_option_dict(tmp, 's_nb')),
+      (('-m','--min'), generate_option_dict(tmp, 's_min')),
+      (('-t','--step'), generate_option_dict(tmp, 's_step')),
+      (('-s', '--sigma'), generate_option_dict(tmp, 'sigma')),
       ]
 
   del tmp
 
-  arguments = ['input', 'output']
+  arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    self.filter = torch.ip.ipMultiscaleRetinex()
-    self.filter.setIOption('s_nb', options.nb)
-    self.filter.setIOption('s_min', options.min)
-    self.filter.setIOption('s_step', options.step)
-    self.filter.setDOption('sigma', options.sigma)
-    input = torch.ip.Image(1, 1, 3)
-    input.load(args[0])
-    if not self.filter.process(input):
-      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
-    torch.ip.Image(self.filter.getOutput(0)).save(args[1])
+    apply_image_filter(torch.ip.ipMultiscaleRetinex, options, args[0], args[1], planes=1)
+
+class Relaxation(Filter):
+  tmp = torch.ip.ipRelaxation()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-t','--type'), generate_option_dict(tmp, 'type')),
+      (('-s','--steps'), generate_option_dict(tmp, 'steps')),
+      (('-l','--lambda'), generate_option_dict(tmp, 'lambda')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipRelaxation, options, args[0], args[1], planes=1)
+
+class Rotate(Filter):
+  tmp = torch.ip.ipRotate()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-x','--center-x'), generate_option_dict(tmp, 'centerx')),
+      (('-y','--center-y'), generate_option_dict(tmp, 'centery')),
+      (('-a','--angle'), generate_option_dict(tmp, 'angle')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipRotate, options, args[0], args[1], planes=3)
+
+class Rotate(Filter):
+  tmp = torch.ip.ipScaleYX()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-w','--width'), generate_option_dict(tmp, 'width')),
+      (('-t','--height'), generate_option_dict(tmp, 'height')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipScaleYX, options, args[0], args[1], planes=3)
+
+class SelfQuotient(Filter):
+  tmp = torch.ip.ipSelfQuotientImage()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-s','--scales'), generate_option_dict(tmp, 's_nb')),
+      (('-m','--min'), generate_option_dict(tmp, 's_min')),
+      (('-t','--step'), generate_option_dict(tmp, 's_step')),
+      (('-g','--sigma'), generate_option_dict(tmp, 'Sigma')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipSelfQuotientImage, options, args[0], args[1], planes=3)
+
+class Shift(Filter):
+  tmp = torch.ip.ipShift()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-x','--shift-x'), generate_option_dict(tmp, 'shiftx')),
+      (('-y','--shift-y'), generate_option_dict(tmp, 'shifty')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipShift, options, args[0], args[1], planes=3)
+
+class SmoothGaussian(Filter):
+  tmp = torch.ip.ipSmoothGaussian()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-x','--radius-x'), generate_option_dict(tmp, 'RadiusX')),
+      (('-y','--radius-y'), generate_option_dict(tmp, 'RadiusY')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipSmoothGaussian, options, args[0], args[1], planes=3)
+
+class Sobel(Filter):
+  tmp = torch.ip.ipSobel()
+
+  doc = tmp.__doc__
+
+  options = []
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipSobel, options, args[0], args[1], planes=3)
 
 # This is some black-instrospection-magic to get all filters declared in this
 # submodule automatically. Don't touch it. If you want to include a new filter

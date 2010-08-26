@@ -54,8 +54,7 @@ def image_as_rgb(i):
 Image.as_rgb = image_as_rgb
 
 def image_str(i):
-  return 'Image(width=%d, height=%d, planes=%d)' % (i.getWidth(),
-      i.getHeight(), i.getNPlanes())
+  return 'Image(width=%d, height=%d, planes=%d)' % (i.width, i.height, i.nplanes)
 Image.__str__ = image_str
 
 __all__ = dir()
