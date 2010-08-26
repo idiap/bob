@@ -363,7 +363,7 @@ class SelfQuotient(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipSelfQuotientImage, options, args[0], args[1], planes=3)
+    apply_image_filter(torch.ip.ipSelfQuotientImage, options, args[0], args[1], planes=1)
 
 class Shift(Filter):
   tmp = torch.ip.ipShift()
