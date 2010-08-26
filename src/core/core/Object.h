@@ -49,6 +49,13 @@ namespace Torch
 		double			getDOption(const char* name, bool* ok = 0);
 		const char*		getSOption(const char* name, bool* ok = 0);
 
+    /**
+     * Returns a handle to all variables registered.
+     */
+		inline int getNvariables() { return m_optionImpl->getNvariables(); }
+		inline const Variable* getVariables() 
+    { return m_optionImpl->getVariables(); }
+
 	protected:
 
 		/// called when some option was changed
