@@ -68,9 +68,7 @@ def customize_filter(filter, options):
       else:
         raise RuntimeError, 'I cannot customize option of type %s' % v.type
 
-def apply_image_filter(cls, options, input, output, planes=3):
-  filter = cls()
-  customize_filter(filter, options)
+def apply_filter_from_instance(filter, input, output, planes):
   if not os.path.exists(input):
     raise RuntimeError, 'I cannot read input file "%s"' % input
   i = torch.ip.Image(1, 1, planes)
@@ -80,6 +78,11 @@ def apply_image_filter(cls, options, input, output, planes=3):
   if not filter.getNOutputs() == 1:
     raise RuntimeError, 'Filter "%s" returned more than 1 output?' % filter
   torch.ip.Image(filter.getOutput(0)).save(output)
+
+def apply_image_filter(cls, options, input, output, planes=3):
+  filter = cls()
+  customize_filter(filter, options)
+  apply_filter_from_instance(filter, input, output, planes)
 
 def apply_image_processor(cls, options, input, output, planes=3):
   filter = cls()
@@ -186,6 +189,70 @@ class Integral(Filter):
   def __call__(self, options, args):
     apply_image_processor(torch.ip.ipIntegral, options, 
         args[0], args[1], planes=3)
+
+class lbp8R(Filter):
+  tmp = torch.ip.ipLBP8R()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-a','--to-average'), generate_option_dict(tmp, 'ToAverage')),
+      (('-b','--average-bit'), generate_option_dict(tmp, 'AddAvgBit')),
+      (('-u','--uniform'), generate_option_dict(tmp, 'Uniform')),
+      (('-i','--rotation-invariant'), generate_option_dict(tmp, 'RotInvariant')),
+      (('-r', '--radius'),  {'action': "store", 'dest': "radius", 
+        'default': 1, 
+        'help': "Sets the radius, in pixels, of the LBP operator (defaults to %default)"}),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    #the LBP implementation in torch requires special handling.
+    filter = torch.ip.ipLBP8R(options.radius)
+    customize_filter(filter, options)
+    if not os.path.exists(args[0]):
+      raise RuntimeError, 'I cannot read input file "%s"' % args[0]
+    i = torch.ip.Image(1, 1, 3)
+    i.load(args[0])
+    o = filter.batch(i)
+    if not o:
+      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
+    o.save(args[1])
+
+class lbp4R(Filter):
+  tmp = torch.ip.ipLBP4R()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-a','--to-average'), generate_option_dict(tmp, 'ToAverage')),
+      (('-b','--average-bit'), generate_option_dict(tmp, 'AddAvgBit')),
+      (('-u','--uniform'), generate_option_dict(tmp, 'Uniform')),
+      (('-i','--rotation-invariant'), generate_option_dict(tmp, 'RotInvariant')),
+      (('-r', '--radius'),  {'action': "store", 'dest': "radius", 
+        'default': 1, 
+        'help': "Sets the radius, in pixels, of the LBP operator (defaults to %default)"}),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    #the LBP implementation in torch requires special handling.
+    filter = torch.ip.ipLBP4R(options.radius)
+    customize_filter(filter, options)
+    if not os.path.exists(args[0]):
+      raise RuntimeError, 'I cannot read input file "%s"' % args[0]
+    i = torch.ip.Image(1, 1, 3)
+    i.load(args[0])
+    o = filter.batch(i)
+    if not o:
+      raise RuntimeError, 'Processing of "%s" has failed' % args[0]
+    o.save(args[1])
 
 class MSRSQIGaussian(Filter):
   tmp = torch.ip.ipMSRSQIGaussian()
@@ -345,6 +412,46 @@ class Sobel(Filter):
       
   def __call__(self, options, args):
     apply_image_filter(torch.ip.ipSobel, options, args[0], args[1], planes=3)
+
+class TanTriggs(Filter):
+  tmp = torch.ip.ipTanTriggs()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-s','--step'), generate_option_dict(tmp, 's_step')),
+      (('-g','--gamma'), generate_option_dict(tmp, 'gamma')),
+      (('-z','--sigma0'), generate_option_dict(tmp, 'sigma0')),
+      (('-y','--sigma1'), generate_option_dict(tmp, 'sigma1')),
+      (('-t','--size'), generate_option_dict(tmp, 'size')),
+      (('-q','--threshold'), generate_option_dict(tmp, 'threshold')),
+      (('-a','--alpha'), generate_option_dict(tmp, 'alpha')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipTanTriggs, options, args[0], args[1], planes=3)
+
+class Vcycle(Filter):
+  tmp = torch.ip.ipVcycle()
+
+  doc = tmp.__doc__
+
+  options = [ 
+      (('-l','--lambda'), generate_option_dict(tmp, 'lambda')),
+      (('-g','--grids'), generate_option_dict(tmp, 'n_grids')),
+      (('-t','--type'), generate_option_dict(tmp, 'type')),
+      ]
+
+  del tmp
+
+  arguments = ['input-image', 'output-image']
+      
+  def __call__(self, options, args):
+    apply_image_filter(torch.ip.ipVcycle, options, args[0], args[1], planes=3)
 
 # This is some black-instrospection-magic to get all filters declared in this
 # submodule automatically. Don't touch it. If you want to include a new filter
