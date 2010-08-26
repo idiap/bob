@@ -110,11 +110,11 @@ bool ipVcycle::processInput(const Tensor& input)
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-	short* dst = t_output->t->storage->data + t_output->t->storageOffset;
+	const short* src = (const short*)t_input->dataR();
+	short* dst = (short*)t_output->dataW();
 
-	const int src_stride_h = t_input->t->stride[0];	// height
-	const int src_stride_w = t_input->t->stride[1];	// width
+	const int src_stride_h = t_input->stride(0);	// height
+	const int src_stride_w = t_input->stride(1);	// width
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
@@ -129,10 +129,10 @@ bool ipVcycle::processInput(const Tensor& input)
 
 	// Tensor to store the non-rescaled double output
 	DoubleTensor* t_output_double = new DoubleTensor( height, width, 1 );
-	double* dst_double = t_output_double->t->storage->data + t_output_double->t->storageOffset;
+	double* dst_double = (double*)t_output_double->dataW();
 
-	const int dst_stride_h = t_output_double->t->stride[0];	// height
-	const int dst_stride_w = t_output_double->t->stride[1];	// width
+	const int dst_stride_h = t_output_double->stride(0);	// height
+	const int dst_stride_w = t_output_double->stride(1);	// width
 
         // Fill with 0 the output image (to clear boundaries)
         t_output->fill(0);
@@ -151,8 +151,8 @@ bool ipVcycle::processInput(const Tensor& input)
 	// call to Multigrid V-cycle
 	DoubleTensor* light = mgv(*guess, *image_grid, lambda, 0, type );
 	
-	double* img = image_grid->t->storage->data + image_grid->t->storageOffset;	
-	double* lig = light->t->storage->data + light->t->storageOffset;	
+	double* img = (double*)image_grid->dataW();	
+	double* lig = (double*)light->dataW();	
 
 	// build final result (R = I/L)
 	for (int y=0; y<height; y++)
@@ -196,10 +196,10 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 {
 	// Prepare the input and output 3D image tensors
 	DoubleTensor* t_b = (DoubleTensor*)&b_v;
-	const double* b_vec = t_b->t->storage->data + t_b->t->storageOffset;
+	const double* b_vec = (const double*)t_b->dataR();
 
-	const int stride_h = t_b->t->stride[0];	// height
-	const int stride_w = t_b->t->stride[1];	// width
+	const int stride_h = t_b->stride(0);	// height
+	const int stride_w = t_b->stride(1);	// width
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	const int height = b_v.size(0);
@@ -207,10 +207,10 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 
 	// TODO: Check dimensions
 	DoubleTensor* result = new DoubleTensor( height_, width_, 1 );
-	double* res = result->t->storage->data + result->t->storageOffset;
+	double* res = (double*)result->dataW();
 
-	const int res_stride_h = result->t->stride[0];	// height
-	const int res_stride_w = result->t->stride[1];	// width
+	const int res_stride_h = result->stride(0);	// height
+	const int res_stride_w = result->stride(1);	// width
 
 	DoubleTensor* rho = new DoubleTensor(5);
 
@@ -262,13 +262,13 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
       
 		// Prepare tensor and compute residual
 		DoubleTensor temp( height_, width_, 1);
-		double* temp_p = temp.t->storage->data + temp.t->storageOffset;
-		const int temp_stride_h = temp.t->stride[0];	// height
-		const int temp_stride_w = temp.t->stride[1];	// width
+		double* temp_p = (double*)temp.dataW();
+		const int temp_stride_h = temp.stride(0);	// height
+		const int temp_stride_w = temp.stride(1);	// width
 
-		double* b_v_p = b_v.t->storage->data + b_v.t->storageOffset;
-		const int b_v_stride_h = b_v.t->stride[0];	// height
-		const int b_v_stride_w = b_v.t->stride[1];	// width
+		double* b_v_p = (double*)b_v.dataW();
+		const int b_v_stride_h = b_v.stride(0);	// height
+		const int b_v_stride_w = b_v.stride(1);	// width
 
 		myMultiply(x_v, temp, *rho, lambda, type);
 
@@ -303,13 +303,13 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 		delete xhat;
 
 		// Prepare tensor for efficient access
-		double* x_v_p = x_v.t->storage->data + x_v.t->storageOffset;
-		const int x_v_stride_h = x_v.t->stride[0];	// height
-		const int x_v_stride_w = x_v.t->stride[1];	// width
+		double* x_v_p = (double*)x_v.dataW();
+		const int x_v_stride_h = x_v.stride(0);	// height
+		const int x_v_stride_w = x_v.stride(1);	// width
 
-		double* xcorr_p = xcorr.t->storage->data + xcorr.t->storageOffset;
-		const int xcorr_stride_h = xcorr.t->stride[0];	// height
-		const int xcorr_stride_w = xcorr.t->stride[1];	// width
+		double* xcorr_p = (double*)xcorr.dataW();
+		const int xcorr_stride_h = xcorr.stride(0);	// height
+		const int xcorr_stride_w = xcorr.stride(1);	// width
 
 		// update solution
 		for (int y=0; y<height_; y++)
@@ -334,11 +334,11 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 bool ipVcycle::cutExtremum(DoubleTensor& data, int distribution_width, int p) 
 {
 	DoubleTensor* t_data = (DoubleTensor*)&data;	
-	double* dat = t_data->t->storage->data + t_data->t->storageOffset;
+	double* dat = (double*)t_data->dataW();
  
-	const int stride_h = t_data->t->stride[0];	// height
-	const int stride_w = t_data->t->stride[1];	// width
-	const int stride_p = t_data->t->stride[2];	// no planes
+	const int stride_h = t_data->stride(0);	// height
+	const int stride_w = t_data->stride(1);	// width
+	const int stride_p = t_data->stride(2);	// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	const int height = data.size(0);
