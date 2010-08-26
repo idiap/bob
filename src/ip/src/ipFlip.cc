@@ -84,8 +84,8 @@ bool ipFlip::processInput(const Tensor& input)
 	short* dst = (short*)t_output->dataW();
 
 	// the indexing of the data
-	const int stride_h = t_input->t->stride[0];        // height
-	const int stride_w = t_input->t->stride[1];        // width
+	const int stride_h = t_input->stride(0);        // height
+	const int stride_w = t_input->stride(1);        // width
 	const int in_x_max = input.size(0);
 	const int in_y_max = input.size(1);
 
@@ -94,7 +94,7 @@ bool ipFlip::processInput(const Tensor& input)
 	int n_planes;
 	if (3 == t_input->nDimension())
 	{
-		stride_p = t_input->t->stride[2];
+		stride_p = t_input->stride(2);
 		n_planes = input.size(2);
 	}
 	else
