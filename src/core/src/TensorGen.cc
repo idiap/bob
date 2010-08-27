@@ -339,6 +339,26 @@ TYPE &TENSOR_CLASS(Tensor)::operator()(long x0, long x1, long x2, long x3)
   return (t->storage->data+t->storageOffset)[x0*t->stride[0]+x1*t->stride[1]+x2*t->stride[2]+x3*t->stride[3]];
 }
 
+const TYPE &TENSOR_CLASS(Tensor)::operator()(long x0) const
+{
+  return (t->storage->data+t->storageOffset)[x0*t->stride[0]];
+}
+
+const TYPE &TENSOR_CLASS(Tensor)::operator()(long x0, long x1) const
+{
+  return (t->storage->data+t->storageOffset)[x0*t->stride[0]+x1*t->stride[1]];
+}
+
+const TYPE &TENSOR_CLASS(Tensor)::operator()(long x0, long x1, long x2) const
+{
+  return (t->storage->data+t->storageOffset)[x0*t->stride[0]+x1*t->stride[1]+x2*t->stride[2]];
+}
+
+const TYPE &TENSOR_CLASS(Tensor)::operator()(long x0, long x1, long x2, long x3) const
+{
+  return (t->storage->data+t->storageOffset)[x0*t->stride[0]+x1*t->stride[1]+x2*t->stride[2]+x3*t->stride[3]];
+}
+
 TENSOR_CLASS(Tensor)::~TENSOR_CLASS(Tensor)()
 {
   TENSOR_FUNC(free)(t);

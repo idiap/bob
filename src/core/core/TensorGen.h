@@ -115,6 +115,10 @@ public:
 	TYPE &operator()(long, long);
 	TYPE &operator()(long, long, long);
 	TYPE &operator()(long, long, long, long);
+	const TYPE &operator()(long) const;
+	const TYPE &operator()(long, long) const;
+	const TYPE &operator()(long, long, long) const;
+	const TYPE &operator()(long, long, long, long) const;
 
   //
   inline int stride(size_t d) const { return t->stride[d]; }
