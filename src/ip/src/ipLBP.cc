@@ -254,6 +254,9 @@ bool ipLBP::allocateOutput(const Tensor& input)
 			m_input_stride_h = ((const DoubleTensor*)&input)->stride(0);
 			m_input_stride_w = ((const DoubleTensor*)&input)->stride(1);
 			break;
+
+    default:
+      break;
 		}
 
 		m_ii_factors.resizeSW(m_region.size[1], m_region.size[0], m_input_stride_w, m_input_stride_h, m_x, m_y, m_R);

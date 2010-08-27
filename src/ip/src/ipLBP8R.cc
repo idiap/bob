@@ -295,6 +295,9 @@ bool ipLBP8R::processInput(const Tensor& input)
 		case Tensor::Double:
 			COMPUTE_LBP8R(DoubleTensor, double);
 			break;
+
+    default:
+      break;
 		}
 	}
 
@@ -326,6 +329,9 @@ bool ipLBP8R::processInput(const Tensor& input)
 		case Tensor::Double:
 			COMPUTE_LBP8R_INTEGRAL(DoubleTensor, double);
 			break;
+
+    default:
+      break;
 		}
 	}
 

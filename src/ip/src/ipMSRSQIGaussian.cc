@@ -79,23 +79,20 @@ void ipMSRSQIGaussian::prepareKernel(int radius_x, int radius_y, double sigma)
 	// Compute the kernel
 	const double inv_sigma = 1.0  / sigma;
 	double sum = 0.0;
-  	for (int i = -radius_x; i <= radius_x; i ++)
-    		for (int j = -radius_y; j <= radius_y; j ++)
-    		{
-      			const double weight = exp(- inv_sigma * (i * i + j * j));
-
-			m_kernel->set(j + radius_y, i + radius_x, weight);
+ 	for (int i = -radius_x; i <= radius_x; i ++)
+ 		for (int j = -radius_y; j <= radius_y; j ++)
+ 		{
+ 			const double weight = exp(- inv_sigma * (i * i + j * j));
+      (*m_kernel)(j + radius_y, i + radius_x) = weight;
 			sum += weight;
-    		}
+    }
 
 	// Normalize the kernel such that the sum over the area is equal to 1
-  	const double inv_sum = 1.0 / sum ;
-  	for (int i = -radius_x; i <= radius_x; i ++)
-    		for (int j = -radius_y; j <= radius_y; j ++)
-    		{
-			m_kernel->set(	j + radius_y,
-					i + radius_x,
-					inv_sum * m_kernel->get(j + radius_y, i + radius_x));
+ 	const double inv_sum = 1.0 / sum ;
+ 	for (int i = -radius_x; i <= radius_x; i ++)
+ 		for (int j = -radius_y; j <= radius_y; j ++)
+ 		{
+			(*m_kernel)(	j + radius_y,	i + radius_x) *= inv_sum;
 		}
 }
 
@@ -116,8 +113,6 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 	// Prepare the input and output 3D image tensors
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
-
-	const short* src = (const short*)t_input->dataR();
 
 	const int src_stride_h = t_input->stride(0);	// height
 	const int src_stride_w = t_input->stride(1);	// width
@@ -176,7 +171,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 					
-							region_mean += src[yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ];
+							region_mean += (*t_input)(yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p );
 						}
 					}
 					region_mean /= ((2*radius_x+1)*(2*radius_y+1));
@@ -203,7 +198,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							if(src[ yyy* src_stride_h + xxx * src_stride_w + p * src_stride_p]>region_mean)
+							if((*t_input)( yyy* src_stride_h + xxx * src_stride_w + p * src_stride_p)>region_mean)
 								over++;
 							else
 								under++;
@@ -233,8 +228,8 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							if ( ((src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ] > region_mean) && !above)
-							   || ((src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ] < region_mean) && above) )
+							if ( (( (*t_input)( yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ) > region_mean) && !above)
+							   || (((*t_input)( yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ) < region_mean) && above) )
 							{	
                 (*m_kernel_weighed)(yy+radius_y, xx+radius_x) = 0.;
 							}
@@ -247,7 +242,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 					{
 						for (int xx = -radius_x; xx <= radius_x; xx++)
 						{
-							weighed_sum+= m_kernel_weighed->get(yy+radius_y, xx+radius_x);
+							weighed_sum+= (*m_kernel_weighed)(yy+radius_y, xx+radius_x);
 						}
 					}
 			
@@ -279,8 +274,8 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							sum +=  m_kernel_weighed->get( yy+radius_y, xx+radius_x) * 
-								src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p];
+							sum +=  (*m_kernel_weighed)( yy+radius_y, xx+radius_x) * 
+								(*t_input)( yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p);
 						}
 					}
 					delete m_kernel_weighed;
@@ -313,7 +308,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							sum +=  m_kernel->get(yy + radius_y, xx + radius_x ) * src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ];
+							sum +=  (*m_kernel)(yy + radius_y, xx + radius_x ) * (*t_input)( yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p );
 						}
 					}
 					// Update output using the FixI macro (round double value)

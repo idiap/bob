@@ -12,10 +12,10 @@ namespace Torch {
 ipMultiscaleRetinex::ipMultiscaleRetinex() 
 	    : 	ipCore()
 {
-        addIOption("s_nb", 1, "Number of different scales (Singlescale Retinex <-> 1)");
-        addIOption("s_min", 1, "Minimum scale: (2*s_min+1)");
-        addIOption("s_step", 1, "Scale step: (2*s_step)");
-        addDOption("sigma", 0.6, "Variance of the kernel for the minimum scale");
+  addIOption("s_nb", 1, "Number of different scales (Singlescale Retinex <-> 1)");
+  addIOption("s_min", 1, "Minimum scale: (2*s_min+1)");
+  addIOption("s_step", 1, "Scale step: (2*s_step)");
+  addDOption("sigma", 0.6, "Variance of the kernel for the minimum scale");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -73,23 +73,18 @@ bool ipMultiscaleRetinex::allocateOutput(const Tensor& input)
 bool ipMultiscaleRetinex::processInput(const Tensor& input)
 {
 	// Get parameters
-        const int s_nb = getIOption("s_nb");
-        const int s_min = getIOption("s_min");
-        const int s_step = getIOption("s_step");
+  const int s_nb = getIOption("s_nb");
+  const int s_min = getIOption("s_min");
+  const int s_step = getIOption("s_step");
 	const double sigma =  getDOption("sigma");
 
 	// Prepare pointers to access pixels
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = (const short*)t_input->dataR();
-
-        const int stride_h = t_input->stride(0);     // height
-        const int stride_w = t_input->stride(1);     // width
-
-        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-        const int width = input.size(1);
-        const int height = input.size(0);
+  // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
+  const int width = input.size(1);
+  const int height = input.size(0);
 
 
 	// Compute Multi-scale Gaussian Filtering
@@ -118,13 +113,13 @@ bool ipMultiscaleRetinex::processInput(const Tensor& input)
 
    		// Copy the output of ipGaussian to the array of filters 
 		filtered_array[s] = new ShortTensor(input.size(0), input.size(1), input.size(2));
-		filtered_array[s]->copy( &(gaussian->getOutput(0)) ); 
+    const ShortTensor *out_g = (const ShortTensor*)&gaussian->getOutput(0);
+		filtered_array[s]->copy( out_g ); 
 		delete gaussian;
 	}
 
 	// Allocate a tensor which contains double (because of the use of the non linear function)
 	DoubleTensor* dst_double=new DoubleTensor(input.size(0), input.size(1), 1);
-	double* dst_double_data = (double*)dst_double->dataW();
 
 	// Initialize the tensor to zero
 	dst_double->fill(0.);
@@ -132,21 +127,15 @@ bool ipMultiscaleRetinex::processInput(const Tensor& input)
 	// Filter the image several times and update the tensor values
 	for (int s = 0; s < s_nb ; s++)
 	{
-		const short* s_filter = (const short*)filtered_array[s]->dataR();
-               	for (int y = 0; y < height; y++ )
+    const ShortTensor *s_filter = (const ShortTensor*)filtered_array[s];
+   	for (int y = 0; y < height; y++ )
 		{
-			int ind_h=y*stride_h;
-			const short* src_row=&src[ind_h];
-			const short* s_filter_row=&s_filter[ind_h];
-			double* dst_double_data_row=&dst_double_data[ind_h];
-                       	for (int x = 0; x < width; x++ )
-                       	{
+     	for (int x = 0; x < width; x++ )
+     	{
 				// +1 inside the log to avoid log(0). Could choose a smaller value
 				// TODO: make alternative nonlinear transformation such as
 				// arctan, sigmoid possible instead of logarithm
-				int ind_w = x*stride_w;
-				dst_double_data_row[ ind_w ] += 
-					(log( (src_row[ ind_w ]+1.) ) - log( (s_filter_row[ ind_w ]+1.) ) );
+        (*dst_double)(y,x,0) += log( (*t_input)(y,x,0) + 1. ) - log( (*s_filter)(y,x,0) + 1.);
 			}
 		}
 	}
@@ -154,7 +143,8 @@ bool ipMultiscaleRetinex::processInput(const Tensor& input)
 	// Rescale the values in [0,255] and copy it into the output Tensor
 	ipCore *rescale = new ipRescaleGray();
 	CHECK_FATAL(rescale->process(*dst_double) == true);
-	t_output->copy( &(rescale->getOutput(0)) );
+  const ShortTensor* out = ((const ShortTensor*)&rescale->getOutput(0));
+	t_output->copy( out );
 
 	// clean up
 	delete dst_double;

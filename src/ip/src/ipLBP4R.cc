@@ -209,6 +209,9 @@ bool ipLBP4R::processInput(const Tensor& input)
 		case Tensor::Double:
 			COMPUTE_LBP4R(DoubleTensor, double);
 			break;
+
+    default:
+      break;
 		}
 	}
 
@@ -240,6 +243,9 @@ bool ipLBP4R::processInput(const Tensor& input)
 		case Tensor::Double:
 			COMPUTE_LBP4R_INTEGRAL(DoubleTensor, double);
 			break;
+
+    default:
+      break;
 		}
 	}
 
