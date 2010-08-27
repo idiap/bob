@@ -110,12 +110,6 @@ bool ipVcycle::processInput(const Tensor& input)
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = (const short*)t_input->dataR();
-	short* dst = (short*)t_output->dataW();
-
-	const int src_stride_h = t_input->stride(0);	// height
-	const int src_stride_w = t_input->stride(1);	// width
-
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
 	const int height = input.size(0);
@@ -129,53 +123,44 @@ bool ipVcycle::processInput(const Tensor& input)
 
 	// Tensor to store the non-rescaled double output
 	DoubleTensor* t_output_double = new DoubleTensor( height, width, 1 );
-	double* dst_double = (double*)t_output_double->dataW();
 
-	const int dst_stride_h = t_output_double->stride(0);	// height
-	const int dst_stride_w = t_output_double->stride(1);	// width
-
-        // Fill with 0 the output image (to clear boundaries)
-        t_output->fill(0);
+  // Fill with 0 the output image (to clear boundaries)
+  t_output->fill(0);
         
 	// the original image
 	DoubleTensor* image_grid = new DoubleTensor(height,  width, 1);
+	//copy the data into the finest image grid
+	image_grid->copy( t_input );
 
 	// take zero as an initial guess
 	DoubleTensor *guess = new DoubleTensor( height, width, 1);
 	guess->fill(0.);
 
-
-	//copy the data into the finest image grid
-	image_grid->copy( t_input );
-
 	// call to Multigrid V-cycle
-	DoubleTensor* light = mgv(*guess, *image_grid, lambda, 0, type );
-	
-	double* img = (double*)image_grid->dataW();	
-	double* lig = (double*)light->dataW();	
+	DoubleTensor* light = mgv(*guess, *image_grid, lambda, 0, type );	
+
 
 	// build final result (R = I/L)
 	for (int y=0; y<height; y++)
 	{
-		const double* lig_row = &lig[ y * src_stride_h ];
-		const double* img_row = &img[ y * src_stride_h ];
-		double* dst_double_row = &dst_double[ y * dst_stride_h ];
-		for (int x=0; x<width; x++, lig_row+=dst_stride_w, dst_double_row+=dst_stride_w, img_row+=dst_stride_w )
+		for (int x=0; x<width; x++ )
 		{
 			if ( (y==0) || (y == (height - 1)) ||  (x == 0) || (x == width-1) ) 
-				*dst_double_row = 1.;
+				(*t_output_double)(y, x, 0) = 1.;
 			else 
 			{
-				if ( IS_NEAR( *lig_row , 0.0 , 0.01 ) ) 
-					*dst_double_row = 1.;
+				if ( IS_NEAR( light->get(y,x,0) , 0.0 , 0.01 ) ) 
+					(*t_output_double)(y, x, 0) = 1.;
 				else
-					*dst_double_row = *img_row / *lig_row;
+					(*t_output_double)(y, x, 0) = image_grid->get(y,x,0) / light->get(y,x,0);
 			}
 		}
 	}
 
 	// display purpose
 	bool b1=cutExtremum( *t_output_double, 4, 0 );
+  if( !b1)
+    warning("ipVcycle::processInput::cutExtremum() failed");
 
 	// Rescale the values in [0,255] and copy it into the output Tensor
 	ipCore *rescale = new ipRescaleGray();
