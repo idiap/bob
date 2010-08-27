@@ -240,14 +240,14 @@ bool TreeClassifier::forward(const Tensor& input)
 
 				m_isPattern = false;
 				m_patternClass = 0;
-        m_output.set(0, 0.0);
+        m_output(0) = 0.0;
 				m_confidence = 0.0;
 			}
 			else
 			{
 				m_isPattern = true;
 				m_patternClass = leaf_node_class;
-        m_output.set(0, output);
+        m_output(0) = output;
 				m_confidence = output;
 			}
 		}

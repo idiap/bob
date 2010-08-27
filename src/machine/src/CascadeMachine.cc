@@ -195,7 +195,7 @@ bool CascadeMachine::forward(const Tensor& input)
 		}
 
 		// Check if rejected
-    m_output.set(0, output);
+    m_output(0) = output;
 
 		if (output < stage.m_threshold)
 		{

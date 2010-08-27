@@ -44,7 +44,7 @@ bool ContextMachine::forward(const Tensor& input)
 			return false;
 		}
 
-		const double score = ((const DoubleTensor&)m_fmodels[f].getOutput()).get(0);
+		const double score = ((const DoubleTensor&)m_fmodels[f].getOutput())(0);
 		m_foutputs.set(f, score - m_fmodels[f].getThreshold());
 	}
 
@@ -57,12 +57,12 @@ bool ContextMachine::forward(const Tensor& input)
 		return false;
 	}
 
-	const double score = ((const DoubleTensor&)m_cmodel.getOutput()).get(0);
+	const double score = ((const DoubleTensor&)m_cmodel.getOutput())(0);
   m_output(0) = score;
 	m_isPattern = score >= m_cmodel.getThreshold();
 
 	// OK
-	m_confidence = m_output.get(0);
+	m_confidence = m_output(0);
 	return true;
 }
 

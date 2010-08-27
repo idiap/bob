@@ -50,9 +50,9 @@ bool TwoClassNLLCriterion::forward(const DoubleTensor *machine_output, const Ten
 
 	m_target->copy(target);
 
-	double error = THLogAdd(0, m_cst - m_target->get(0) * machine_output->get(0));
+	double error = THLogAdd(0, m_cst - (*m_target)(0) * (*machine_output)(0));
 	(*m_error)(0) = error;
-	(*m_beta)(0) = - m_target->get(0) * (1. - exp(-error));
+	(*m_beta)(0) = - (*m_target)(0) * (1. - exp(-error));
 
 	return true;
 }
