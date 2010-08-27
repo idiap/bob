@@ -161,14 +161,14 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 					bool above;
 
 					m_kernel_weighed = new DoubleTensor(2 * radius_y + 1, 2 * radius_x + 1);
+					// Init kernel weighed
+					m_kernel_weighed->copy( m_kernel );
 
 					// prepare variables for an efficient access to the kernel values
 					double* kernw = (double*)m_kernel_weighed->dataW();
 					const int kernw_stride_h = m_kernel_weighed->stride(0);	// height
 					const int kernw_stride_w = m_kernel_weighed->stride(1);	// width
 
-					// Init kernel weighed
-					m_kernel_weighed->copy( m_kernel );
 	
 					// Compute region mean
 					region_mean = 0.;
@@ -308,21 +308,16 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 					delete m_kernel_weighed;
 				
 					// Update output using the FixI macro (round double value)
-					*dst_row = FixI(sum);
+					(*t_output)(y,x,p) = FixI(sum);
 				
 				}
 				// Regular Gaussian kernel for MSR
 				else
 				{	
-					// prepare variables for an efficient access to the kernel values
-					const double* kern = (const double*)m_kernel->dataR();
-					const int kern_stride_h = m_kernel->stride(0);	// height
-					const int kern_stride_w = m_kernel->stride(1);	// width
-
 					// Apply the kernel for the <y, x> pixel
 					double sum = 0.0;
 					int yyy, xxx;
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++ )
 					{
 						// mirror interpolation
 						yyy=yy+y;
@@ -331,9 +326,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 						if (yyy>=height)
 							yyy=2*height-yyy-1;
 				
-						const short* src_row=&src_plane[ yyy * src_stride_h ];	
-						const double *kern_row=&kern[ (yy + radius_y) * kern_stride_h ];
-						for (int xx = -radius_x; xx <= radius_x; xx ++, kern_row+=kern_stride_w )
+						for (int xx = -radius_x; xx <= radius_x; xx++ )
 						{
 							// mirror interpolation
 							xxx=xx+x;
@@ -342,20 +335,17 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							sum +=  *kern_row * src_row[ xxx * src_stride_w];
+							sum +=  m_kernel->get(yy + radius_y, xx + radius_x ) * src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ];
 						}
 					}
 					// Update output using the FixI macro (round double value)
-					*dst_row = FixI(sum);
-		
+					(*t_output)(y,x,p) = FixI(sum);	
 				}
-
 			}
 		}
 	}
 
 	// OK
-  t_output->resetFromData();
 	return true;
 }
 
