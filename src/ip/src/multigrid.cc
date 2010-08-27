@@ -28,16 +28,16 @@ namespace Torch {
 	        const DoubleTensor* t_data = (DoubleTensor*)&data;
         	DoubleTensor* t_restricted = (DoubleTensor*)&restricted;
 
-	        const double* src = t_data->t->storage->data + t_data->t->storageOffset;
-	        double* dst = t_restricted->t->storage->data + t_restricted->t->storageOffset;
+	        const double* src = (const double*)t_data->dataR();
+	        double* dst = (double*)t_restricted->dataW();
 
-	        const int stride_h = t_data->t->stride[0];     // height
-	        const int stride_w = t_data->t->stride[1];     // width
-	        const int stride_p = t_data->t->stride[2];     // no planes
+	        const int stride_h = t_data->stride(0);     // height
+	        const int stride_w = t_data->stride(1);     // width
+	        const int stride_p = t_data->stride(2);     // no planes
 		
-	        const int stride_h_out = t_restricted->t->stride[0];     // height
-	        const int stride_w_out = t_restricted->t->stride[1];     // width
-	        const int stride_p_out = t_restricted->t->stride[2];     // no planes
+	        const int stride_h_out = t_restricted->stride(0);     // height
+	        const int stride_w_out = t_restricted->stride(1);     // width
+	        const int stride_p_out = t_restricted->stride(2);     // no planes
 
 	        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	        // TODO: check correctness of dimension between input and ouput (factor 2)
@@ -78,16 +78,16 @@ namespace Torch {
 	        const DoubleTensor* t_data = (DoubleTensor*)&data;
         	DoubleTensor* t_projected = (DoubleTensor*)&projected;
 
-	        const double* src = t_data->t->storage->data + t_data->t->storageOffset;
-	        double* dst = t_projected->t->storage->data + t_projected->t->storageOffset;
+	        const double* src = (const double*)t_data->dataR();
+	        double* dst = (double*)t_projected->dataW();
 
-	        const int stride_h = t_data->t->stride[0];     // height
-	        const int stride_w = t_data->t->stride[1];     // width
-	        const int stride_p = t_data->t->stride[2];     // no planes
+	        const int stride_h = t_data->stride(0);     // height
+	        const int stride_w = t_data->stride(1);     // width
+	        const int stride_p = t_data->stride(2);     // no planes
 		
-	        const int stride_h_out = t_projected->t->stride[0];     // height
-	        const int stride_w_out = t_projected->t->stride[1];     // width
-	        const int stride_p_out = t_projected->t->stride[2];     // no planes
+	        const int stride_h_out = t_projected->stride(0);     // height
+	        const int stride_w_out = t_projected->stride(1);     // width
+	        const int stride_p_out = t_projected->stride(2);     // no planes
 
 	        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	        // TODO: check correctness of dimension between input and ouput (factor 2)
@@ -133,11 +133,11 @@ namespace Torch {
 	        DoubleTensor* t_matrix = (DoubleTensor*)&matrix;
 		//DoubleTensor* t_projected = (DoubleTensor*)&projected;
 
-	        double* mat = t_matrix->t->storage->data + t_matrix->t->storageOffset;
+	        double* mat = (double*)t_matrix->dataW();
 	        //double* dst = t_projected->t->storage->data + t_projected->t->storageOffset;
 
-	        const int stride_h = t_matrix->t->stride[0];     // height
-	        const int stride_w = t_matrix->t->stride[1];     // width
+	        const int stride_h = t_matrix->stride(0);     // height
+	        const int stride_w = t_matrix->stride(1);     // width
 
 		// TODO: check that the dimensions are correct (square matrix)
 		const int width_matrix = matrix.size(1);
@@ -148,7 +148,7 @@ namespace Torch {
 		t_matrix->fill(0.);
 
 		// Prepare pointer to efficient access to rho
-		double* rho_p =  rho.t->storage->data + rho.t->storageOffset;
+		double* rho_p = (double*)rho.dataW();
 
 		for (int i=0; i<width_matrix; i++)
 		{
@@ -216,7 +216,7 @@ namespace Torch {
 	{
 		DoubleTensor* t_rho = (DoubleTensor*)&rho;
 
-	        double* rho_p = t_rho->t->storage->data + t_rho->t->storageOffset;
+	        double* rho_p = (double*)t_rho->dataW();
 
 		const int height = image.size(0);
 		const int width = image.size(1);
@@ -300,14 +300,14 @@ namespace Torch {
 		DoubleTensor* t_source = (DoubleTensor*)&source;
 		DoubleTensor* t_rho = (DoubleTensor*)&rho;
 
-	        double* res = t_result->t->storage->data + t_result->t->storageOffset;
-	        double* src = t_source->t->storage->data + t_source->t->storageOffset;
-		double* rho_p = t_rho->t->storage->data + t_rho->t->storageOffset;
+	        double* res = (double*)t_result->dataW();
+	        double* src = (double*)t_source->dataW();
+		double* rho_p = (double*)t_rho->dataW();
 
-	        const int src_stride_h = t_source->t->stride[0];     // height
-	        const int src_stride_w = t_source->t->stride[1];     // width
-	        const int res_stride_h = t_result->t->stride[0];     // height
-	        const int res_stride_w = t_result->t->stride[1];     // width
+	        const int src_stride_h = t_source->stride(0);     // height
+	        const int src_stride_w = t_source->stride(1);     // width
+	        const int res_stride_h = t_result->stride(0);     // height
+	        const int res_stride_w = t_result->stride(1);     // width
 	
 		const int height = source.size(0);
 		const int width = source.size(1);
@@ -397,20 +397,20 @@ namespace Torch {
 	        DoubleTensor* t_result = (DoubleTensor*)&result;
 		const DoubleTensor* t_data = (DoubleTensor*)&data;
 
-	        double* res = t_result->t->storage->data + t_result->t->storageOffset;
-	        const double* src = t_data->t->storage->data + t_data->t->storageOffset;
+	        double* res = (double*)t_result->dataW();
+	        const double* src = (const double*)t_data->dataR();
 
-	        const int src_stride_h = t_data->t->stride[0];     // height
-	        const int src_stride_w = t_data->t->stride[1];     // width
+	        const int src_stride_h = t_data->stride(0);     // height
+	        const int src_stride_w = t_data->stride(1);     // width
 
-	        const int res_stride_h = t_result->t->stride[0];     // height
-	        const int res_stride_w = t_result->t->stride[1];     // width
+	        const int res_stride_h = t_result->stride(0);     // height
+	        const int res_stride_w = t_result->stride(1);     // width
 
 		// TODO: check that the dimensions are correct (cmp src and res)
 		const int height = data.size(0);
 		const int width = data.size(1);
 
-	        double* rho_p = rho.t->storage->data + rho.t->storageOffset;
+	        double* rho_p = (double*)rho.dataW();
 
                 for (int y = 0; y < height; y ++)
        	        {
@@ -489,14 +489,14 @@ namespace Torch {
 	        DoubleTensor* t_result = (DoubleTensor*)&result;
 		DoubleTensor* t_source = (DoubleTensor*)&source;
 
-	        double* res = t_result->t->storage->data + t_result->t->storageOffset;
-	        double* src = t_source->t->storage->data + t_source->t->storageOffset;
+	        double* res = (double*)t_result->dataW();
+	        double* src = (double*)t_source->dataW();
 
-	        const int src_stride_h = t_source->t->stride[0];     // height
-	        const int src_stride_w = t_source->t->stride[1];     // width
+	        const int src_stride_h = t_source->stride(0);     // height
+	        const int src_stride_w = t_source->stride(1);     // width
 
-	        const int res_stride_h = t_result->t->stride[0];     // height
-	        const int res_stride_w = t_result->t->stride[1];     // width
+	        const int res_stride_h = t_result->stride(0);     // height
+	        const int res_stride_w = t_result->stride(1);     // width
 
 		// TODO: check that the dimensions are correct (cmp src and res)
 		const int height = source.size(0);
@@ -506,13 +506,13 @@ namespace Torch {
 
 		DoubleTensor* old=new DoubleTensor( result.size(0), result.size(1), result.size(2) );
 		old->copy( &result );
-	        double* old_p = old->t->storage->data + old->t->storageOffset;
-	        const int old_stride_h = old->t->stride[0];     // height
-	        const int old_stride_w = old->t->stride[1];     // width
+	        double* old_p = (double*)old->dataW();
+	        const int old_stride_h = old->stride(0);     // height
+	        const int old_stride_w = old->stride(1);     // width
  
 		double weight = 1; // weight used in damped Jacobi (set to 1 = pure Jacobi)
 
-	        double* rho_p = rho.t->storage->data + rho.t->storageOffset;
+	        double* rho_p = (double*)rho.dataW();
 
                 for (int y = 0; y < height; y ++)
        	        {
@@ -547,11 +547,11 @@ namespace Torch {
 	        DoubleTensor* t_image = (DoubleTensor*)&image;
 		DoubleTensor* t_rho = (DoubleTensor*)&rho;
 
-	        double* img = t_image->t->storage->data + t_image->t->storageOffset;
-	        double* rho_p = t_rho->t->storage->data + t_rho->t->storageOffset;
+	        double* img = (double*)t_image->dataW();
+	        double* rho_p = (double*)t_rho->dataW();
 
-	        const int stride_h = t_image->t->stride[0];     // height
-	        const int stride_w = t_image->t->stride[1];     // width
+	        const int stride_h = t_image->stride(0);     // height
+	        const int stride_w = t_image->stride(1);     // width
 
 		if (strcmp(position, "up") == 0) 
 		{

@@ -118,15 +118,11 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
 	const short* src = (const short*)t_input->dataR();
-	short* dst = (short*)t_output->dataW();
 
 	const int src_stride_h = t_input->stride(0);	// height
 	const int src_stride_w = t_input->stride(1);	// width
 	const int src_stride_p = t_input->stride(2);	// no planes
 
-	const int dst_stride_h = t_output->stride(0);	// height
-	const int dst_stride_w = t_output->stride(1);	// width
-	const int dst_stride_p = t_output->stride(2);	// no planes
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 
@@ -142,15 +138,11 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 
 	
 	// Apply the kernel to the image for each color plane
-	for (int p = 0; p < n_planes; p ++)
+	for (int p = 0; p < n_planes; p++)
 	{
-		const short* src_plane = &src[p * src_stride_p];
-		short* dst_plane = &dst[p * dst_stride_p];
-
-		for (int y = 0; y < height; y ++)
+		for (int y = 0; y < height; y++)
 		{
-			short* dst_row = &dst_plane[ y * dst_stride_h ];
-			for (int x = 0; x < width; x ++, dst_row += dst_stride_w)
+			for (int x = 0; x < width; x++)
 			{
 				// Weighed kernel for SQI
 				if( sqi )
@@ -161,18 +153,12 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 					bool above;
 
 					m_kernel_weighed = new DoubleTensor(2 * radius_y + 1, 2 * radius_x + 1);
-
-					// prepare variables for an efficient access to the kernel values
-					double* kernw = (double*)m_kernel_weighed->dataW();
-					const int kernw_stride_h = m_kernel_weighed->stride(0);	// height
-					const int kernw_stride_w = m_kernel_weighed->stride(1);	// width
-
 					// Init kernel weighed
 					m_kernel_weighed->copy( m_kernel );
-	
+
 					// Compute region mean
 					region_mean = 0.;
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++)
 					{
 						// Mirror interpolation
 						int yyy=yy+y;
@@ -181,8 +167,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 						if (yyy>=height)
 							yyy=2*height-yyy-1;
 
-						const short* src_row=&src[ yyy * src_stride_h ];	
-						for (int xx = -radius_x; xx <= radius_x; xx ++)
+						for (int xx = -radius_x; xx <= radius_x; xx++)
 						{
 							// mirror interpolation
 							int xxx=xx+x;
@@ -191,7 +176,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 					
-							region_mean += src_row[ xxx * src_stride_w];
+							region_mean += src[yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ];
 						}
 					}
 					region_mean /= ((2*radius_x+1)*(2*radius_y+1));
@@ -200,7 +185,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 					// count number of pixels bigger/smaller than the mean
 					under = 0;
 					over = 0;	
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++)
 					{
 						// Mirror interpolation
 						int yyy=yy+y;
@@ -209,8 +194,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 						if (yyy>=height)
 							yyy=2*height-yyy-1;
 
-						const short* src_row=&src[ yyy * src_stride_h ];	
-						for (int xx = -radius_x; xx <= radius_x; xx ++)
+						for (int xx = -radius_x; xx <= radius_x; xx++)
 						{	
 							// mirror interpolation
 							int xxx=xx+x;
@@ -219,7 +203,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							if(src_row[ xxx * src_stride_w]>region_mean)
+							if(src[ yyy* src_stride_h + xxx * src_stride_w + p * src_stride_p]>region_mean)
 								over++;
 							else
 								under++;
@@ -232,7 +216,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 
 				
 					// Update filter weights 
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++)
 					{
 						// Mirror interpolation
 						int yyy=yy+y;
@@ -241,9 +225,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 						if (yyy>=height)
 							yyy=2*height-yyy-1;
 
-						const short* src_row=&src[ yyy * src_stride_h ];	
-						double *kernw_row=&kernw[ (yy + radius_y) * kernw_stride_h ];
-						for (int xx = -radius_x; xx <= radius_x; xx ++)
+						for (int xx = -radius_x; xx <= radius_x; xx++)
 						{
 							int xxx=xx+x;
 							if (xxx<0)
@@ -251,37 +233,35 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							if ( ((src_row[ xxx * src_stride_w] > region_mean) && !above)
-							   || ((src_row[ xxx * src_stride_w] < region_mean) && above) )
+							if ( ((src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ] > region_mean) && !above)
+							   || ((src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ] < region_mean) && above) )
 							{	
-								kernw_row[ (xx+radius_x) * kernw_stride_w ] = 0.;
+                (*m_kernel_weighed)(yy+radius_y, xx+radius_x) = 0.;
 							}
 						}
 					}
 
 					// Normalize kernel
 					double weighed_sum=0.;
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++)
 					{
-						double *kernw_row=&kernw[ (yy + radius_y) * kernw_stride_h ];
-						for (int xx = -radius_x; xx <= radius_x; xx ++)
+						for (int xx = -radius_x; xx <= radius_x; xx++)
 						{
-							weighed_sum+=kernw_row[ (xx + radius_x) * kernw_stride_w ];
+							weighed_sum+= m_kernel_weighed->get(yy+radius_y, xx+radius_x);
 						}
 					}
 			
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++)
 					{
-						double *kernw_row=&kernw[ (yy + radius_y) * kernw_stride_h ];
-						for (int xx = -radius_x; xx <= radius_x; xx ++)
+						for (int xx = -radius_x; xx <= radius_x; xx++)
 						{
-							kernw_row[ (xx + radius_x) * kernw_stride_w ] /= weighed_sum ;
+              (*m_kernel_weighed)(yy+radius_y, xx+radius_x) /= weighed_sum;
 						}
 					}
 
 					// Apply the kernel for the <y, x> pixel
 					double sum = 0.0;
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++)
 					{
 						// mirror interpolation
 						int yyy=yy+y;
@@ -290,9 +270,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 						if (yyy>=height)
 							yyy=2*height-yyy-1;
 					
-						const short* src_row=&src[ yyy * src_stride_h ];	
-						double *kernw_row=&kernw[ (yy + radius_y) * kernw_stride_h ];
-						for (int xx = -radius_x; xx <= radius_x; xx ++)
+						for (int xx = -radius_x; xx <= radius_x; xx++)
 						{
 							// mirror interpolation
 							int xxx=xx+x;
@@ -301,28 +279,23 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							sum +=  kernw_row[ (xx + radius_x) * kernw_stride_w ] * 
-								src_row[ xxx * src_stride_w];
+							sum +=  m_kernel_weighed->get( yy+radius_y, xx+radius_x) * 
+								src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p];
 						}
 					}
 					delete m_kernel_weighed;
 				
 					// Update output using the FixI macro (round double value)
-					*dst_row = FixI(sum);
+					(*t_output)(y,x,p) = FixI(sum);
 				
 				}
 				// Regular Gaussian kernel for MSR
 				else
 				{	
-					// prepare variables for an efficient access to the kernel values
-					const double* kern = (const double*)m_kernel->dataR();
-					const int kern_stride_h = m_kernel->stride(0);	// height
-					const int kern_stride_w = m_kernel->stride(1);	// width
-
 					// Apply the kernel for the <y, x> pixel
 					double sum = 0.0;
 					int yyy, xxx;
-					for (int yy = -radius_y; yy <= radius_y; yy ++)
+					for (int yy = -radius_y; yy <= radius_y; yy++ )
 					{
 						// mirror interpolation
 						yyy=yy+y;
@@ -331,9 +304,7 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 						if (yyy>=height)
 							yyy=2*height-yyy-1;
 				
-						const short* src_row=&src_plane[ yyy * src_stride_h ];	
-						const double *kern_row=&kern[ (yy + radius_y) * kern_stride_h ];
-						for (int xx = -radius_x; xx <= radius_x; xx ++, kern_row+=kern_stride_w )
+						for (int xx = -radius_x; xx <= radius_x; xx++ )
 						{
 							// mirror interpolation
 							xxx=xx+x;
@@ -342,20 +313,17 @@ bool ipMSRSQIGaussian::processInput(const Tensor& input)
 							if (xxx>=width)
 								xxx=2*width-xxx-1;
 
-							sum +=  *kern_row * src_row[ xxx * src_stride_w];
+							sum +=  m_kernel->get(yy + radius_y, xx + radius_x ) * src[ yyy * src_stride_h + xxx * src_stride_w + p * src_stride_p ];
 						}
 					}
 					// Update output using the FixI macro (round double value)
-					*dst_row = FixI(sum);
-		
+					(*t_output)(y,x,p) = FixI(sum);	
 				}
-
 			}
 		}
 	}
 
 	// OK
-  t_output->resetFromData();
 	return true;
 }
 
