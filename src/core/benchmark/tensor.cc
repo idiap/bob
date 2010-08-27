@@ -38,6 +38,8 @@ const char* type2string(const Torch::Tensor& t) {
     case Torch::Tensor::Char:
       return c;
       break;
+    default:
+      break;
   }
   return u;
 }
