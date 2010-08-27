@@ -329,7 +329,7 @@ class Rotate(Filter):
   def __call__(self, options, args):
     apply_image_filter(torch.ip.ipRotate, options, args[0], args[1], planes=3)
 
-class Rotate(Filter):
+class ScaleYX(Filter):
   tmp = torch.ip.ipScaleYX()
 
   doc = tmp.__doc__
