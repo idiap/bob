@@ -77,53 +77,21 @@ bool ipShift::processInput(const Tensor& input)
 	// Prepare pointers to access pixels
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
-
-	const short* src = (const short*)t_input->dataR();
-	short* dst = (short*)t_output->dataW();
-
-	const int stride_h = t_input->stride(0);	// height
-	const int stride_w = t_input->stride(1);	// width
-	const int stride_p = t_input->stride(2);	// no planes
+  t_output->fill(0);
 
 	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
 	const int width = input.size(1);
 	const int height = input.size(0);
 	const int n_planes = input.size(2);
+	const int start_x = getInRange(dx, 0, width);
+	const int start_y = getInRange(dy, 0, height);
+	const int stop_x = getInRange(width + dx, 0, width);
+	const int stop_y = getInRange(height + dy, 0, height);
+  for (int x=start_x; x<stop_x; ++x)
+    for (int y=start_y; y<stop_y; ++y)
+      for (int p=0; p<n_planes; ++p)
+        (*t_output)(y, x, p) = (*t_input)(y-start_y, x-start_x, p);
 
-	// Fill the result image with black
-	t_output->fill(0);
-
-	// Compute the range of valid pixel positions in the shifted image
-	const int start_x = getInRange(dx, 0, width - 1);
-	const int start_y = getInRange(dy, 0, height - 1);
-	const int stop_x = getInRange(width + dx, 0, width - 1);
-	const int stop_y = getInRange(height + dy, 0, height - 1);
-	const int dindex = dy * stride_h + dx * stride_w;
-
-	// Shift each plane ...
-	for (int p = 0; p < n_planes; p ++)
-	{
-		//	input: 	[y * stride_h + x * stride_w + p * stride_p]
-		//		->>>
-		//	output: [(y + dy) * stride_h + (x + dx) * stride_w + p * stride_p])
-		const short* src_plane = &src[p * stride_p];
-		short* dst_plane = &dst[p * stride_p];
-
-		for (int y = start_y; y < stop_y; y ++)
-		{
-			const int index_row = y * stride_h + start_x * stride_w;
-			const short* src_row = &src_plane[index_row - dindex];
-			short* dst_row = &dst_plane[index_row];
-
-			for (int x = start_x; x < stop_x; x ++, src_row += stride_w, dst_row += stride_w)
-			{
-				*dst_row = *src_row;
-			}
-		}
-	}
-
-	// OK
-  t_output->resetFromData();
 	return true;
 }
 

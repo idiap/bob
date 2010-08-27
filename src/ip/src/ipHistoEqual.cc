@@ -66,79 +66,44 @@ bool ipHistoEqual::allocateOutput(const Tensor& input)
 // Process some input tensor (the input is checked, the outputs are allocated)
 bool ipHistoEqual::processInput(const Tensor& input)
 {
-	// Process single channel images
+	//Process single channel images
 
-	// Prepare pointers to access pixels
+	//Prepare pointers to access pixels
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = (const short*)t_input->dataR();
-	short* dst = (short*)t_output->dataW();
+	DoubleTensor histo(256);
+  histo.fill(0);
+  DoubleTensor chisto(256);
 
-        const int src_stride_h = t_input->stride(0);     // height
-        const int src_stride_w = t_input->stride(1);     // width
+  //Computes histogram and cumulative histogram: remember, only gray-scale
+  //accepted!
+  const int height = input.size(0);
+  const int width = input.size(1);
+  //First we calculate a simple histogram, just the bin count
+	for (int x=0; x<width; ++x)
+		for (int y = 0; y<height; ++y) ++histo((*t_input)(y, x, 0));
 
-        const int dst_stride_h = t_output->stride(0);     // height
-        const int dst_stride_w = t_output->stride(1);     // width
+  //Now we normalize the histogram w.r.t to the image dimensions and calculate
+  //the cumulative histograms. For that, a little iteration trick
+  histo(0) /= (height * width);
+  chisto(0) = histo(0);
+  for (int k=1; k<256; ++k) {
+    histo(k) /= (height * width);
+    chisto(k) = histo(k) + chisto(k-1);
+  }
 
-        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-        const int height = input.size(0);
-        const int width = input.size(1);
-	const int wxh = width * height;
+  //Now we normalize the cumulative histogram in the regular way
+  for (int k=0; k<256; ++k)
+    chisto(k) = 255 * (chisto(k)-chisto(0)) / chisto(255);
 
-	// allocate temporary variables for histogram and cumulative histogram (1 plane)
-	double histogram[256];
-	double cumulHistogram[256];
+	//Fills in the output, normalizing the image
+	for (int x=0; x<width; ++x)
+		for (int y = 0; y<height; ++y) 
+      (*t_output)(y, x, 0) = FixI(chisto((*t_input)(y, x, 0)));
 
-	// Performs Histogram Equalization... (only one channel)
-
-	// init histograms
-	for(int i = 0; i < 256; i++)
-	{
-		histogram[i] = 0.0;
-		cumulHistogram[i] = 0.0;
-	}
-
-	// compute histograms
-	for ( int y = 0; y < height; y++ )
-	{
-		const short* src_row=&src[ y*src_stride_h ];
-		for (int x = 0; x < width; x++, src_row+=src_stride_w )
-		{
-			short k = *src_row;
-			if(k<0 || k>255) warning("ipHistoEqual::process() out-of-range value.");
-			histogram[ k ]+=1.0 / wxh;
-		}
-	}
-		
-	// compute cumulative histogram
-	double sum = 0.0;
-        for (int i = 0; i < 256; i++ )
-	{
-		sum += histogram[ i ];
-		cumulHistogram[ i ] = sum;
-	}
-
-	// normalize the histogram in the regular way
-	for(int i = 0; i < 256; i++)
-		cumulHistogram[i] = 255.0 * (cumulHistogram[i] - cumulHistogram[0]) / cumulHistogram[255];
-
-	// fill in the output 
-	for (int y = 0; y < height; y++ )
-	{
-		const short* src_row=&src[ y*src_stride_h ];
-		short* dst_row=&dst[ y*dst_stride_h ];
-		for (int x = 0; x < width; x++, src_row+=src_stride_w, dst_row+=dst_stride_w )
-		{
-			short k = *src_row; 
-			// Convert the value into integer using the FixI macro
-			*dst_row = FixI(cumulHistogram[k]);
-		}
-	}
-
-  t_output->resetFromData();
 	return true;
 }
 
-}
+} 
 

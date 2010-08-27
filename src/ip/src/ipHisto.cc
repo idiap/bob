@@ -64,51 +64,11 @@ bool ipHisto::processInput(const Tensor& input)
 	// Prepare the input and output (histogram) tensors
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	IntTensor* t_output = (IntTensor*)m_output[0];
-
-	const short* src = (const short*)t_input->dataR();
-	int* dst = (int*)t_output->dataW();
-
-	const int in_stride_h = t_input->stride(0);	// height
-	const int in_stride_w = t_input->stride(1);	// width
-	const int in_stride_p = t_input->stride(2);	// no planes
-
-	const int out_stride_b = t_output->stride(0);// bin index
-	const int out_stride_p = t_output->stride(1);// no planes
-
-	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-
-	const int height = input.size(0);
-	const int width = input.size(1);
-	const int n_planes = input.size(2);
-
-	// Clear the histogram
-	for (int p = 0; p < n_planes; p ++)
-	{
-		int* histo_plane = &dst[p * out_stride_p];
-		for (int b = 0; b < 256; b ++, histo_plane += out_stride_b)
-		{
-			*histo_plane = 0;
-		}
-	}
-
-	// Compute the histogram
-	for (int p = 0; p < n_planes; p ++)
-	{
-		const short* src_plane = &src[p* in_stride_p];
-		int* histo_plane = &dst[p * out_stride_p];
-
-		for (int y = 0; y < height; y ++)
-		{
-			const short* src_row = &src_plane[y * in_stride_h];
-			for (int x = 0; x < width; x ++, src_row += in_stride_w)
-			{
-				histo_plane[*(src_row) * out_stride_b] ++;
-			}
-		}
-	}
-
-	// OK
-  t_output->resetFromData();
+  t_output->fill(0);
+	for (int x=0; x<input.size(1); ++x)
+		for (int y = 0; y<input.size(0); ++y)
+      for (int p = 0; p<input.size(2); ++p)
+        ++(*t_output)((*t_input)(y, x, p), p);
 	return true;
 }
 

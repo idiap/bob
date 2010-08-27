@@ -28,9 +28,7 @@ ipCrop::~ipCrop()
 bool ipCrop::checkInput(const Tensor& input) const
 {
 	// Accept only 3D tensors of Torch::Image type
-	if (	input.nDimension() != 3 ||
-		input.getDatatype() != Tensor::Short)
-	{
+	if (	input.nDimension() != 3 || input.getDatatype() != Tensor::Short) {
 		return false;
 	}
 
@@ -85,47 +83,16 @@ bool ipCrop::processInput(const Tensor& input)
 	const int crop_y = getIOption("y");
 	const int crop_w = getIOption("w");
 	const int crop_h = getIOption("h");
-
-	// Prepare direct access to data
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = (const short*)t_input->dataR();
-	short* dst = (short*)t_output->dataW();
+  for (int cx=0; cx<crop_w; ++cx) {
+    for (int cy=0; cy<crop_h; ++cy) {
+      for (int cp=0; cp<t_input->size(2); ++cp)
+        (*t_output)(cy, cx, cp) = (*t_input)(cy+crop_y, cx+crop_x, cp);
+    }
+  }
 
-	const int src_stride_h = t_input->stride(0);	// height
-	const int src_stride_w = t_input->stride(1);	// width
-	const int src_stride_p = t_input->stride(2);	// no planes
-
-	const int dst_stride_h = t_output->stride(0);// height
-	const int dst_stride_w = t_output->stride(1);// width
-	const int dst_stride_p = t_output->stride(2);// no planes
-
-	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-	//const int src_height = t_input->size(0);
-	//const int src_width = t_input->size(1);
-	const int n_planes = input.size(2);
-
-	// Cropping - just copy pixels in the given range
-	for (int p = 0; p < n_planes; p ++)
-	{
-		const short* src_plane = &src[p * src_stride_p];
-		short* dst_plane = &dst[p * dst_stride_p];
-
-		for (int y = 0; y < crop_h; y ++)
-		{
-			const short* src_row = &src_plane[(crop_y + y) * src_stride_h + crop_x * src_stride_w];
-			short* dst_row = &dst_plane[y * dst_stride_h];
-
-			for (int x = 0; x < crop_w; x ++, src_row += src_stride_w, dst_row += dst_stride_w)
-			{
-				*dst_row = *src_row;
-			}
-		}
-	}
-
-	// OK
-  t_output->resetFromData();
 	return true;
 }
 

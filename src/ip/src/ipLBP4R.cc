@@ -5,115 +5,104 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute the 4R LBP code for a generic tensor
 
-#define COMPUTE_LBP4R(tensorType, dataType)							\
-{												\
-	const dataType* src = (const dataType*)input.dataR();					\
-	const int offset_center = 	(m_region.pos[0] + m_y) * m_input_stride_h +		\
-					(m_region.pos[1] + m_x) * m_input_stride_w;		\
-												\
-	dataType tab[4];									\
-	tab[0] = src[offset_center - m_R * m_input_stride_h];					\
-	tab[1] = src[offset_center + m_R * m_input_stride_w];					\
-	tab[2] = src[offset_center + m_R * m_input_stride_h];					\
-	tab[3] = src[offset_center - m_R * m_input_stride_w];					\
-												\
-	const dataType center = src[offset_center];						\
-												\
-	const dataType cmp_point = m_toAverage ?						\
-		(dataType)									\
-                        ( 0.2 * (tab[0] + tab[1] + tab[2] + tab[3] + center + 0.0))	\
-		:										\
-		center;										\
-												\
-	unsigned char lbp = 0;									\
-												\
-	lbp = lbp << 1;										\
-	if (tab[0] > cmp_point) lbp ++;								\
-	lbp = lbp << 1;										\
-	if (tab[1] > cmp_point) lbp ++;								\
-	lbp = lbp << 1;										\
-	if (tab[2] > cmp_point) lbp ++;								\
-	lbp = lbp << 1;										\
-	if (tab[3] > cmp_point) lbp ++;								\
-	if (m_addAvgBit == true && m_rot_invariant == false && m_uniform == false)              \
-	{                                                                                       \
-		lbp = lbp << 1;                                                                 \
-		if (center > cmp_point) lbp ++;                                                 \
-	}                                                                                       \
-                                                                                                \
-	*m_lbp = m_crt_lut[lbp];								\
+#define COMPUTE_LBP4R(tensorType, dataType)\
+{\
+	const int offset_center = 	(m_region.pos[0] + m_y) * m_input_stride_h +\
+					(m_region.pos[1] + m_x) * m_input_stride_w;\
+  const tensorType* t_input = static_cast<const tensorType*>(&input);\
+\
+	dataType tab[4];\
+	tab[0] = (*t_input)(offset_center - m_R * m_input_stride_h);\
+	tab[1] = (*t_input)(offset_center + m_R * m_input_stride_w);\
+	tab[2] = (*t_input)(offset_center + m_R * m_input_stride_h);\
+	tab[3] = (*t_input)(offset_center - m_R * m_input_stride_w);\
+\
+	const dataType center = (*t_input)(offset_center);\
+	const dataType cmp_point = m_toAverage ?\
+		(dataType)\
+                        ( 0.2 * (tab[0] + tab[1] + tab[2] + tab[3] + center + 0.0))\
+		:\
+		center;\
+\
+	unsigned char lbp = 0;\
+\
+	lbp = lbp << 1;\
+	if (tab[0] > cmp_point) lbp ++;\
+	lbp = lbp << 1;\
+	if (tab[1] > cmp_point) lbp ++;\
+	lbp = lbp << 1;\
+	if (tab[2] > cmp_point) lbp ++;\
+	lbp = lbp << 1;\
+	if (tab[3] > cmp_point) lbp ++;\
+	if (m_addAvgBit == true && m_rot_invariant == false && m_uniform == false)\
+	{\
+		lbp = lbp << 1;\
+		if (center > cmp_point) lbp ++;\
+	}\
+\
+	*m_lbp = m_crt_lut[lbp];\
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Compute the 4R LBP code for a generic tensor (by interpolating using an integral image)
 
-#define COMPUTE_LBP4R_INTEGRAL(tensorType, dataType)						\
-{												\
-	const int& ii_dx = m_ii_factors.getDx();						\
-	const int& ii_dy = m_ii_factors.getDy();						\
-	const int& ii_w = m_ii_factors.getCellW();						\
-	const int& ii_w1 = m_ii_factors.getCellW1();						\
-	const int& ii_w12 = m_ii_factors.getCellW12();						\
-	const int& ii_h = m_ii_factors.getCellH();						\
-	const int& ii_h1 = m_ii_factors.getCellH1();						\
-	const int& ii_h12 = m_ii_factors.getCellH12();						\
-												\
-	const int offset_sw 	= 	m_region.pos[0] * m_input_stride_h +			\
-					m_region.pos[1] * m_input_stride_w;			\
-												\
-	const dataType* src = (const dataType*)input.dataR();					\
-												\
-	const int offset1 = offset_sw + ii_dx + ii_dy;						\
-	const dataType P2 = src[offset1 + ii_w1];						\
-	const dataType P3 = src[offset1 + ii_w12];						\
-												\
-	const int offset2 = offset1 + ii_h1;							\
-	const dataType P5 = src[offset2];							\
-	const dataType P6 = src[offset2 + ii_w1];						\
-	const dataType P7 = src[offset2 + ii_w12];						\
-	const dataType P8 = src[offset2 + ii_w];						\
-												\
-	const int offset3 = offset1 + ii_h12;							\
-	const dataType P9 = src[offset3];							\
-	const dataType P10 = src[offset3 + ii_w1];						\
-	const dataType P11 = src[offset3 + ii_w12];						\
-	const dataType P12 = src[offset3 + ii_w];						\
-												\
-	const int offset4 = offset1 + ii_h;							\
-	const dataType P14 = src[offset4 + ii_w1];						\
-	const dataType P15 = src[offset4 + ii_w12];						\
-												\
-	dataType tab[4];									\
-	tab[0] = P7 + P2 - P3 - P6;								\
-	tab[1] = P12 + P7 - P8 - P11;								\
-	tab[2] = P15 + P10 - P11 - P14;								\
-	tab[3] = P10 + P5 - P6 - P9;								\
-												\
-	const dataType center = P11 + P6 - P7 - P10;						\
-												\
-	const dataType cmp_point = m_toAverage ?						\
-		(dataType)									\
-                        (0.2 * (tab[0] + tab[1] + tab[2] + tab[3] + center + 0.0))		\
-		:										\
-		center;										\
-												\
-	unsigned char lbp = 0;									\
-												\
-	lbp = lbp << 1;										\
-	if (tab[0] > cmp_point) lbp ++;								\
-	lbp = lbp << 1;										\
-	if (tab[1] > cmp_point) lbp ++;								\
-	lbp = lbp << 1;										\
-	if (tab[2] > cmp_point) lbp ++;								\
-	lbp = lbp << 1;										\
-	if (tab[3] > cmp_point) lbp ++;								\
-	if (m_addAvgBit == true && m_rot_invariant == false && m_uniform == false)              \
-	{                                                                                       \
-		lbp = lbp << 1;                                                                 \
-		if (center > cmp_point) lbp ++;                                                 \
-	}                                                                                       \
-                                                                                                \
-	*m_lbp = m_crt_lut[lbp];								\
+#define COMPUTE_LBP4R_INTEGRAL(tensorType, dataType)\
+{\
+  const tensorType* t_input = static_cast<const tensorType*>(&input);\
+	const int& ii_dx = m_ii_factors.getDx();\
+	const int& ii_dy = m_ii_factors.getDy();\
+	const int& ii_w = m_ii_factors.getCellW();\
+	const int& ii_w1 = m_ii_factors.getCellW1();\
+	const int& ii_w12 = m_ii_factors.getCellW12();\
+	const int& ii_h = m_ii_factors.getCellH();\
+	const int& ii_h1 = m_ii_factors.getCellH1();\
+	const int& ii_h12 = m_ii_factors.getCellH12();\
+	const int offset_sw 	= 	m_region.pos[0] * m_input_stride_h +\
+					m_region.pos[1] * m_input_stride_w;\
+	const int offset1 = offset_sw + ii_dx + ii_dy;\
+	const dataType P2 = (*t_input)(offset1 + ii_w1);\
+	const dataType P3 = (*t_input)(offset1 + ii_w12);\
+	const int offset2 = offset1 + ii_h1;\
+	const dataType P5 = (*t_input)(offset2);\
+	const dataType P6 = (*t_input)(offset2 + ii_w1);\
+	const dataType P7 = (*t_input)(offset2 + ii_w12);\
+	const dataType P8 = (*t_input)(offset2 + ii_w);\
+	const int offset3 = offset1 + ii_h12;\
+	const dataType P9 = (*t_input)(offset3);\
+	const dataType P10 = (*t_input)(offset3 + ii_w1);\
+	const dataType P11 = (*t_input)(offset3 + ii_w12);\
+	const dataType P12 = (*t_input)(offset3 + ii_w);\
+	const int offset4 = offset1 + ii_h;\
+	const dataType P14 = (*t_input)(offset4 + ii_w1);\
+	const dataType P15 = (*t_input)(offset4 + ii_w12);\
+	dataType tab[4];\
+	tab[0] = P7 + P2 - P3 - P6;\
+	tab[1] = P12 + P7 - P8 - P11;\
+	tab[2] = P15 + P10 - P11 - P14;\
+	tab[3] = P10 + P5 - P6 - P9;\
+	const dataType center = P11 + P6 - P7 - P10;\
+	const dataType cmp_point = m_toAverage ?\
+		(dataType)\
+                        (0.2 * (tab[0] + tab[1] + tab[2] + tab[3] + center + 0.0))\
+		:\
+		center;\
+\
+	unsigned char lbp = 0;\
+\
+	lbp = lbp << 1;\
+	if (tab[0] > cmp_point) lbp ++;\
+	lbp = lbp << 1;\
+	if (tab[1] > cmp_point) lbp ++;\
+	lbp = lbp << 1;\
+	if (tab[2] > cmp_point) lbp ++;\
+	lbp = lbp << 1;\
+	if (tab[3] > cmp_point) lbp ++;\
+	if (m_addAvgBit == true && m_rot_invariant == false && m_uniform == false)\
+	{\
+		lbp = lbp << 1;\
+		if (center > cmp_point) lbp ++;\
+	}\
+	*m_lbp = m_crt_lut[lbp];\
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

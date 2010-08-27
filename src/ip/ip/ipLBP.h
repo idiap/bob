@@ -69,26 +69,6 @@ namespace Torch
 		/// called when some option was changed - overriden
 		virtual void		optionChanged(const char* name);
 
-		// Bilinear interpolation (for different tensor types)
-		char			bilinear_interpolation(	const char* src,
-								int stride_w, int stride_h,
-								float x, float y);
-		short			bilinear_interpolation(	const short* src,
-								int stride_w, int stride_h,
-								float x, float y);
-                int			bilinear_interpolation(	const int* src,
-								int stride_w, int stride_h,
-								float x, float y);
-		long			bilinear_interpolation(	const long* src,
-								int stride_w, int stride_h,
-								float x, float y);
-		float			bilinear_interpolation(	const float* src,
-								int stride_w, int stride_h,
-								float x, float y);
-		double			bilinear_interpolation(	const double* src,
-								int stride_w, int stride_h,
-								float x, float y);
-
 		/////////////////////////////////////////////////////////////////////////
 		// IntegralFactors:
 		//	- Singleton that stores the scalling factors for some
@@ -200,6 +180,29 @@ namespace Torch
 		// Integral image scalling factors
 		IntegralFactors		m_ii_factors;
 	};
+
+  /**
+   * A generic templated method for bilinear interpolation.
+   *
+   * @param src The input tensor
+   * @param stride_w
+   */
+  template<typename TTensor> float bilinear_interpolation(const TTensor& src, float x, float y) {
+    int stride_h = src.stride(0);
+    int stride_w = src.stride(1);
+    int xl = (int) floor(x);
+    int yl = (int) floor(y);
+    int xh = (int) ceil(x);
+    int yh = (int) ceil(y);
+
+    const float Il = src(xl * stride_w + yl * stride_h) + (x - xl) *
+      (src(xh * stride_w + yl * stride_h) - src(xl * stride_w + yl * stride_h));
+    const float Ih = src(xl * stride_w + yh * stride_h) + (x - xl) *
+      (src(xh * stride_w + yh * stride_h) - src(xl * stride_w + yh * stride_h));
+
+    return Il + (y - yl) * (Ih - Il) + 0.5f;
+  }
+
 }
 
 #endif
