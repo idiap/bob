@@ -18,15 +18,16 @@ struct T {
   Torch::FloatTensor ft;
   Torch::LongTensor lt;
   Torch::IntTensor it;
-  Torch::ShortTensor st;
+  Torch::ShortTensor st, st2;
   Torch::CharTensor ct;
 
-  T(): dt(3,5), ft(5), lt(3,5), it(5, 5, 5), st(10, 9, 8, 7), ct(5) {
+  T(): dt(3,5), ft(5), lt(3,5), it(5, 5, 5), st(10, 9, 8, 7), st2(2, 2, 2, 2), ct(5) {
     dt.fill(1);
     ft.fill(2);
     lt.fill(3);
     it.fill(4);
     st.fill(5);
+    st2.fill(0);
     ct.set(0, 'T');
     ct.set(1, 'O');
     ct.set(2, 'R');
@@ -163,6 +164,28 @@ BOOST_AUTO_TEST_CASE( test_set )
   lt.set(2, 4, 0xffffL);
   BOOST_CHECK_EQUAL(lt.get(2, 4), 0xffffL);
 }
+
+BOOST_AUTO_TEST_CASE( test_bracket_stride )
+{
+  unsigned int counter = 0;
+  for (int i=0; i<st2.size(0); ++i)
+    for (int j=0; j<st2.size(1); ++j)
+      for (int k=0; k<st2.size(2); ++k)
+        for (int l=0; l<st2.size(3); ++l)
+          st2(i, j, k, l) = counter++;
+
+  int stride_i = st2.stride(0);
+  int stride_j = st2.stride(1);
+  int stride_k = st2.stride(2);
+  int stride_l = st2.stride(3);
+  
+  for (int i=0; i<st2.size(0); ++i)
+    for (int j=0; j<st2.size(1); ++j)
+      for (int k=0; k<st2.size(2); ++k)
+        for (int l=0; l<st2.size(3); ++l)
+          BOOST_CHECK_EQUAL( st2(i, j, k, l), st2(i*stride_i + j*stride_j + k*stride_k + l*stride_l));
+}
+
 
 BOOST_AUTO_TEST_CASE( test_transpose )
 {
