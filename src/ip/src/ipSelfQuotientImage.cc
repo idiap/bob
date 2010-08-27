@@ -79,17 +79,17 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 	const double sigma =  getDOption("Sigma");
 
 	// Prepare pointers to access pixels
-	const ShortTensor* t_input = (ShortTensor*)&input;
+	const ShortTensor* t_input = (const ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
 	const short* src = (const short*)t_input->dataR();
 
-        const int stride_h = t_input->stride(0);     // height
-        const int stride_w = t_input->stride(1);     // width
+  const int src_stride_h = t_input->stride(0);     // height
+  const int src_stride_w = t_input->stride(1);     // width
 
-        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-        const int width = input.size(1);
-        const int height = input.size(0);
+  // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
+  const int width = input.size(1);
+  const int height = input.size(0);
 
 
 	// Compute Multi-scale Gaussian Filtering
@@ -122,41 +122,26 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 
 	// Allocate a tensor for one hyperplane
 	DoubleTensor* dst_double=new DoubleTensor(input.size(0), input.size(1), 1);
-	double* dst_double_data = (double*)dst_double->dataW();
-
-	for (int y =0; y < height; y++ )
-	{
-		double* dst_double_data_row=&dst_double_data[ y*stride_h ];
-		for (int x=0; x < width; x++ )
-		{
-			dst_double_data_row[ x*stride_w ] = 0.;
-		}
-	}
-		
+	dst_double->fill(0.);
 
 	for (int s = 0; s < s_nb ; s++)
 	{
 		const short* s_filter = (const short*)filtered_array[s]->dataR();
-		//const short* s_filter_plane= &s_filter[p * stride_p];
 
-                for (int y = 0; y < height; y++ )
+    const int s_filter_stride_h = ((ShortTensor*)filtered_array[s])->stride(0);     // height
+    const int s_filter_stride_w = ((ShortTensor*)filtered_array[s])->stride(1);     // width
+
+    for (int y = 0; y < height; y++ )
 		{
-			int ind_h= y*stride_h;
-			const short* s_filter_row=&s_filter[ ind_h ];
-			const short* src_row=&src[ ind_h ];
-			double* dst_double_data_row=&dst_double_data[ ind_h ];
-			
-                       	for (int x = 0; x < width; x++ )
-                       	{
+     	for (int x = 0; x < width; x++ )
+     	{
 				// +1 inside the log to avoid log(0). Could choose a smaller value
 				// TODO: make alternative nonlinear transformation such as
 				// arctan, sigmoid possible instead of logarithm
-				int ind_w = x*stride_w;
-				dst_double_data_row[ ind_w ] += (log( (src_row[ ind_w ]+1.) ) - log( (s_filter_row[ ind_w ]+1.) ) );
+        (*dst_double)(y,x,0) += log( (src[ y*src_stride_h + x*src_stride_w ]+1.) ) - log( (s_filter[ y*s_filter_stride_h + x*s_filter_stride_w ]+1.) );
 			}
 		}
 	}
-  dst_double->resetFromData();
 
 	// Rescale the values in [0,255] and copy it into the output Tensor
 	ipCore *rescale = new ipRescaleGray();
