@@ -140,8 +140,6 @@ namespace Torch
 		int			m_n_nodes;
 		int			m_n_classes;
 
-		// Fast access to the output
-		double*			m_fast_output;	// Pointer to the DoubleTensor
 	};
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

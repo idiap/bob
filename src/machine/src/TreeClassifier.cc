@@ -179,13 +179,12 @@ int TreeClassifier::Node::getChild(int i_classifier) const
 
 TreeClassifier::TreeClassifier()
 	:	Classifier(),
-		m_nodes(0), m_n_nodes(0), m_n_classes(0),
-                m_fast_output(0)
+		m_nodes(0), 
+    m_n_nodes(0), 
+    m_n_classes(0)
 {
         // Allocate the output
 	m_output.resize(1);
-	const DoubleTensor* t_output = (DoubleTensor*)&m_output;
-	m_fast_output = t_output->t->storage->data + t_output->t->storageOffset;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -241,14 +240,14 @@ bool TreeClassifier::forward(const Tensor& input)
 
 				m_isPattern = false;
 				m_patternClass = 0;
-				*m_fast_output = 0.0;
+        m_output.set(0, 0.0);
 				m_confidence = 0.0;
 			}
 			else
 			{
 				m_isPattern = true;
 				m_patternClass = leaf_node_class;
-				*m_fast_output = output;
+        m_output.set(0, output);
 				m_confidence = output;
 			}
 		}
@@ -310,7 +309,7 @@ bool TreeClassifier::forward(const Tensor& input)
 	}
 
 	// OK
-	m_confidence = *m_fast_output;
+	m_confidence = m_output(0);
 
 	return true;
 
