@@ -12,7 +12,6 @@ ContextMachine::ContextMachine()
 		m_fmodels(new LRMachine[NoFeatures])
 {
 	m_output.resize(1);
-	m_poutput = (double*)m_output.dataW();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -59,11 +58,11 @@ bool ContextMachine::forward(const Tensor& input)
 	}
 
 	const double score = ((const DoubleTensor&)m_cmodel.getOutput()).get(0);
-	*m_poutput = score;
+  m_output(0) = score;
 	m_isPattern = score >= m_cmodel.getThreshold();
 
 	// OK
-	m_confidence = *m_poutput;
+	m_confidence = m_output.get(0);
 	return true;
 }
 

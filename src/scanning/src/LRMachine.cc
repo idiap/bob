@@ -14,8 +14,6 @@ LRMachine::LRMachine(int size)
 		m_threshold(0.5)
 {
 	m_output.resize(1);
-	m_poutput = (double*)m_output.dataW();
-
 	resize(size);
 }
 
@@ -82,31 +80,30 @@ bool LRMachine::forward(const Tensor& input)
 	}
 
 	// OK
-	const double* data = (const double*)input.dataR();
-	*m_poutput = sigmoid(data, m_weights, m_size);
+  m_output(0) = sigmoid(dynamic_cast<const DoubleTensor&>(input), m_weights, m_size);
 	return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
 // Apply the sigmoid function on some data
 
-double LRMachine::sigmoid(const double* data, const double* weights, int size)
+double LRMachine::sigmoid(const DoubleTensor& data, const double* weights, int size)
 {
 	double sum = weights[size];
 	for (int i = 0; i < size; i ++)
 	{
-		sum += data[i] * weights[i];
+		sum += data(i) * weights[i];
 	}
 
 	return 1.0 / (1.0 + exp(-sum));
 }
 
-double LRMachine::sigmoidEps(const double* data, const double* weights, int size, double eps)
+double LRMachine::sigmoidEps(const DoubleTensor& data, const double* weights, int size, double eps)
 {
 	double sum = weights[size];
 	for (int i = 0; i < size; i ++)
 	{
-		sum += data[i] * weights[i];
+		sum += data(i) * weights[i];
 	}
 
 	return getInRange(1.0 / (1.0 + exp(-sum)), eps, 1.0 - eps);

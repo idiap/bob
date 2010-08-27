@@ -51,7 +51,7 @@ bool MultiVariateMAPDiagonalGaussianDistribution::prepare()
 	return true;
 }
 
-bool MultiVariateMAPDiagonalGaussianDistribution::sampleEMaccPosteriors(double *sample_, const double input_posterior)
+bool MultiVariateMAPDiagonalGaussianDistribution::sampleEMaccPosteriors(const DoubleTensor& sample_, const double input_posterior)
 {
    	/* Computes the posterior for each gaussian
 
@@ -115,7 +115,7 @@ bool MultiVariateMAPDiagonalGaussianDistribution::sampleEMaccPosteriors(double *
 
 		for(int k = 0 ; k < n_inputs ; k++) 
 		{
-			double z = sample_[k];
+			double z = sample_(k);
 
 			acc_posteriors_means[j][k] += posterior_j * z;
 

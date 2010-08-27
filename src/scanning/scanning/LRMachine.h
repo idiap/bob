@@ -55,8 +55,8 @@ namespace Torch
 		const double*		getWeights() const { return m_weights; }
 
 		// Apply the sigmoid function on some data
-		static double		sigmoid(const double* data, const double* weights, int size);
-		static double		sigmoidEps(const double* data, const double* weights, int size, double eps = 0.1);
+		static double		sigmoid(const DoubleTensor& data, const double* weights, int size);
+		static double		sigmoidEps(const DoubleTensor& data, const double* weights, int size, double eps = 0.1);
 
 		/////////////////////////////////////////////////////////////////
 
@@ -64,8 +64,6 @@ namespace Torch
 
 		/////////////////////////////////////////////////////////////////
                 // Attributes
-
-                double*			m_poutput;	// Direct access to the machine's output
 
                 int			m_size;		// Number of dimensions
 		double*			m_weights;	// [N+1]-dimensional weights

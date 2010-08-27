@@ -30,7 +30,7 @@ namespace Torch
 		virtual bool 		EMinit() { return true; };
 
 		///
-		virtual bool 		EMaccPosteriors(const DoubleTensor *input, const double input_posterior) { return true; };
+		virtual bool 		EMaccPosteriors(const DoubleTensor& input, const double input_posterior) { return true; };
 
 		///
 		virtual bool 		EMupdate() { return true; };

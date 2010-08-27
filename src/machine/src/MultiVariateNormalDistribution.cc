@@ -170,10 +170,7 @@ bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 			return false;
 		}
 
-		double *src = (double *) input->dataR();
-		double *dst = (double *) m_output.dataW();
-
-		dst[0] = sampleProbability(src);
+		m_output(0) = sampleProbability(*input);
 	}
 	else
 	{
@@ -197,14 +194,10 @@ bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 			for(int f = 0 ; f < n_frames_per_sequence ; f++)
 			{
 				frame_->select(input, 1, f);
-
-				double *src = (double *) frame_->dataR();
-
-				ll += sampleProbability(src);
+				ll += sampleProbability(*frame_);
 			}
 
-			double *dst = (double *) m_output.dataW();
-			dst[0] = ll / (double) n_frames_per_sequence;
+			m_output(0) = ll / (double) n_frames_per_sequence;
 		}
 		else if(input->nDimension() == 3)
 		{
@@ -227,15 +220,11 @@ bool MultiVariateNormalDistribution::forward(const DoubleTensor *input)
 				for(int f = 0 ; f < n_frames_per_sequence ; f++)
 				{
 					frame_->select(sequence_, 1, f);
-
-					double *src = (double *) frame_->dataR();
-
-					ll += sampleProbability(src);
+					ll += sampleProbability(*frame_);
 				}
 			}
 
-			double *dst = (double *) m_output.dataW();
-			dst[0] = ll / (double) (n_frames_per_sequence * n_sequences_per_sequence);
+			m_output(0) = ll / (double) (n_frames_per_sequence * n_sequences_per_sequence);
 		}
 		else 
 		{
@@ -323,7 +312,7 @@ bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 
 	int n_partitions = (int)(n_data / (double) n_means);
 
-	double *src = NULL;
+	DoubleTensor *src = NULL;
 	DoubleTensor *t_input = NULL;
 	int n_ = 0;
 
@@ -346,7 +335,7 @@ bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 		   	// An example of dimension 1 is necessary 1 vector of size n_inputs
 		   	example = dataset_->getExample(index);
 			t_input = (DoubleTensor *) example;
-			src = (double *) t_input->dataR();
+      src = t_input;
 			break;
 		case 2:
 		   	// An example of dimension 2 is necessary a sequence of vectors of size n_inputs
@@ -360,7 +349,7 @@ bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 				   	//Torch::print("Offset %d\n", offset_);
 					t_input = (DoubleTensor *) example;
 					frame_->select(t_input, 1, offset_);
-					src = (double *) frame_->dataR();
+          src = frame_;
 					break;
 				}
 				n_ += example->size(1);
@@ -386,7 +375,7 @@ bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 
 					sequence_->select(t_input, 2, offset_seq_seq);
 					frame_->select(sequence_, 1, offset_frame_seq);
-					src = (double *) frame_->dataR();
+          src = frame_;
 					break;
 				}
 				n_ += example->size(1) * example->size(2);
@@ -397,7 +386,7 @@ bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-		   	means[j][k] = src[k];
+		   	means[j][k] = (*src)(k);
 			variances[j][k] = threshold_variances[k];
 		}
 		weights[j] = 1.0 / (double) n_means;
@@ -519,9 +508,7 @@ bool MultiVariateNormalDistribution::EMaccPosteriors(const DoubleTensor *input, 
 			return false;
 		}
 
-		double *src = (double *) input->dataR();
-
-		sampleEMaccPosteriors(src, input_posterior);
+		sampleEMaccPosteriors(*input, input_posterior);
 	}
 	else
 	{
@@ -544,10 +531,7 @@ bool MultiVariateNormalDistribution::EMaccPosteriors(const DoubleTensor *input, 
 			for(int f = 0 ; f < n_frames_per_sequence ; f++)
 			{
 				frame_->select(input, 1, f);
-
-				double *src = (double *) frame_->dataR();
-
-				sampleEMaccPosteriors(src, input_posterior);
+				sampleEMaccPosteriors(*frame_, input_posterior);
 			}
 		}
 		else if(input->nDimension() == 3)
@@ -571,9 +555,7 @@ bool MultiVariateNormalDistribution::EMaccPosteriors(const DoubleTensor *input, 
 				{
 					frame_->select(sequence_, 1, f);
 
-					double *src = (double *) frame_->dataR();
-
-					sampleEMaccPosteriors(src, input_posterior);
+					sampleEMaccPosteriors(*frame_, input_posterior);
 				}
 			}
 		}

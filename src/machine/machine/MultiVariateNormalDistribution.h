@@ -43,10 +43,10 @@ public:
 	virtual bool 		cleanup();
 
 	///
-	virtual bool 		sampleEMaccPosteriors(double *sample_, const double input_posterior) = 0;
+	virtual bool 		sampleEMaccPosteriors(const DoubleTensor& sample_, const double input_posterior) = 0;
 
 	///
-	virtual double 		sampleProbability(double *sample_) = 0;
+	virtual double 		sampleProbability(const DoubleTensor& sample_) = 0;
 
 	///
 	int			getNmeans() { return n_means; };

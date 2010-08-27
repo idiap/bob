@@ -139,22 +139,15 @@ bool Linear::Gupdate(double learning_rate)
 		
 bool Linear::forward(const DoubleTensor *input)
 {
-	//int n_inputs = m_parameters->getI("n_inputs");
-	//int n_outputs = m_parameters->getI("n_outputs");
-
-	double *src = (double *) input->dataR();
-	double *dst = (double *) m_output.dataW();
 	double *weights_ = weights;
-
 	for(int i = 0; i < n_outputs; i++)
 	{
 		double z = bias[i];
 		for(int j = 0; j < n_inputs; j++)
-			z += weights_[j] * src[j];
+			z += weights_[j] * (*input)(j);
 		weights_ += n_inputs;
-		dst[i] = z;
+		m_output(i) = z;
 	}
-
 	return true;
 }
 
@@ -163,21 +156,17 @@ bool Linear::backward(const DoubleTensor *input, const DoubleTensor *alpha)
 	//int n_inputs = m_parameters->getI("n_inputs");
 	//int n_outputs = m_parameters->getI("n_outputs");
 
-	double *beta_ = (double *) m_beta->dataW();
-	double *input_ = (double *) input->dataR();
-	double *alpha_ = (double *) alpha->dataR();
-
-	for(int i = 0; i < n_inputs; i++) beta_[i] = 0.0;
+	for(int i = 0; i < n_inputs; i++) (*m_beta)(i) = 0.0;
 
 	double *weights_ = weights;
 	double *der_weights_ = der_weights;
 	for(int i = 0; i < n_outputs; i++)
 	{
-		double z = alpha_[i];
+		double z = (*alpha)(i);
 		for(int j = 0; j < n_inputs; j++)
 		{
-			beta_[j] += z * weights_[j];
-			der_weights_[j] += z * input_[j];
+			(*m_beta)(j) += z * weights_[j];
+			der_weights_[j] += z * (*input)(j);
 		}
 		weights_ += n_inputs;
 		der_weights_ += n_inputs;
@@ -194,6 +183,7 @@ bool Linear::backward(const DoubleTensor *input, const DoubleTensor *alpha)
 		for(int i = 0; i < n_inputs*n_outputs;i++)
 			dst_[i] += weight_decay * src_[i];
 	}
+  m_beta->resetFromData();
 	return true;
 }
 

@@ -53,13 +53,12 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 		if (example->nDimension() == 1)
 		{
 			DoubleTensor *t_input = (DoubleTensor *) example;
-			double *src = (double *) t_input->dataR();
 
 			//Torch::print("MeanVarNorm() processing a frames of size %d\n", n_inputs);
 
 			for(int i = 0 ; i < n_inputs ; i++)
 			{
-			   	double z = src[i];
+			   	double z = (*t_input)(i);
 				m_mean[i] += z;
 				m_stdv[i] += z*z;
 			}
@@ -77,11 +76,9 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 			{
 				frame_in_->select(example, 1, f);
 
-				double *src = (double *) frame_in_->dataR();
-
 				for(int i = 0 ; i < n_inputs ; i++)
 				{
-			   		double z = src[i];
+			   		double z = (*frame_in_)(i);
 					m_mean[i] += z;
 					m_stdv[i] += z*z;
 				}
@@ -106,11 +103,9 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 				{
 					frame_in_->select(sequence_in_, 1, f);
 
-					double *src = (double *) frame_in_->dataR();
-
 					for(int i = 0 ; i < n_inputs ; i++)
 					{
-			   			double z = src[i];
+			   			double z = (*frame_in_)(i);
 						m_mean[i] += z;
 						m_stdv[i] += z*z;
 					}
@@ -234,11 +229,8 @@ bool MeanVarNorm::forward(const Tensor& input)
 		//Torch::print("MeanVarNorm::forward() processing a frame of size %d\n", n_inputs);
 	   	resize(n_inputs);
 
-		double *src = (double *) t_input->dataR();
-		double *dst = (double *) m_output.dataW();
-
 		for(int i = 0 ; i < n_inputs ; i++)
-			dst[i] = (src[i] - m_mean[i]) / m_stdv[i];
+			m_output(i) = ((*t_input)(i) - m_mean[i]) / m_stdv[i];
 	}
 	// If the tensor is 2D then considers it as a sequence along the first dimension
 	else if (input.nDimension() == 2)
@@ -253,13 +245,11 @@ bool MeanVarNorm::forward(const Tensor& input)
 		for(int f = 0 ; f < n_frames_per_sequence ; f++)
 		{
 			frame_in_->select(t_input, 1, f);
-			double *src = (double *) frame_in_->dataR();
 
 			frame_out_->select(t_output, 1, f);
-			double *dst = (double *) frame_out_->dataW();
 
 			for(int i = 0 ; i < n_inputs ; i++)
-				dst[i] = (src[i] - m_mean[i]) / m_stdv[i];
+				(*frame_out_)(i) = ((*frame_in_)(i) - m_mean[i]) / m_stdv[i];
 		}
 	}
 	// If the tensor is 3D then considers it as a sequence of sequence along the first dimension
@@ -281,13 +271,11 @@ bool MeanVarNorm::forward(const Tensor& input)
 			for(int f = 0 ; f < n_frames_per_sequence ; f++)
 			{
 				frame_in_->select(sequence_in_, 1, f);
-				double *src = (double *) frame_in_->dataR();
 
 				frame_out_->select(sequence_out_, 1, f);
-				double *dst = (double *) frame_out_->dataW();
 
 				for(int i = 0 ; i < n_inputs ; i++)
-					dst[i] = (src[i] - m_mean[i]) / m_stdv[i];
+					(*frame_out_)(i) = ((*frame_in_)(i) - m_mean[i]) / m_stdv[i];
 			}
 		}
 	}

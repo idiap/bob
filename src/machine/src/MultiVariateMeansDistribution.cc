@@ -14,7 +14,7 @@ MultiVariateMeansDistribution::~MultiVariateMeansDistribution()
 {
 }
 
-bool MultiVariateMeansDistribution::sampleEMaccPosteriors(double *sample_, const double input_posterior)
+bool MultiVariateMeansDistribution::sampleEMaccPosteriors(const DoubleTensor& sample_, const double input_posterior)
 {
 	sampleProbability(sample_);
 
@@ -23,7 +23,7 @@ bool MultiVariateMeansDistribution::sampleEMaccPosteriors(double *sample_, const
 
 	for(int k = 0 ; k < n_inputs ; k++)
 	{
-		double z = sample_[k];
+		double z = sample_(k);
 
 		acc_posteriors_means[best_mean][k] += z;
 		acc_posteriors_variances[best_mean][k] += z * z;
@@ -57,7 +57,7 @@ bool MultiVariateMeansDistribution::EMupdate()
 	return true;
 }
 
-double MultiVariateMeansDistribution::sampleProbability(double *sample_)
+double MultiVariateMeansDistribution::sampleProbability(const DoubleTensor& sample_)
 {
 	double min_ = DBL_MAX;
 	best_mean = -1;
@@ -68,7 +68,7 @@ double MultiVariateMeansDistribution::sampleProbability(double *sample_)
 		double d = 0.0;
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-			double z = sample_[k] - means[j][k];
+			double z = sample_(k) - means[j][k];
 			d += z*z;
 		}
 
@@ -86,12 +86,12 @@ double MultiVariateMeansDistribution::sampleProbability(double *sample_)
 	return current_likelihood;
 }
 
-double MultiVariateMeansDistribution::sampleProbabilityOneMean(double *sample_, int m)
+double MultiVariateMeansDistribution::sampleProbabilityOneMean(const DoubleTensor& sample_, int m)
 {
 	double d = 0.0;
 	for(int k = 0 ; k < n_inputs ; k++)
 	{
-		double z = sample_[k] - means[m][k];
+		double z = sample_(k) - means[m][k];
 		d += z*z;
 	}
 

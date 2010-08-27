@@ -251,8 +251,7 @@ bool ContextDataSet::save(const char* dir_data, const char* name) const
 		}
 
 		// Write each context
-		for (long s = 0; s < m_n_examples; s ++)
-		{
+		for (long s = 0; s < m_n_examples; s ++) {
 			const Context* context = m_contexts[s];
 
 			file.printf("%d %d %d %d %lf %d ",
@@ -260,13 +259,10 @@ bool ContextDataSet::save(const char* dir_data, const char* name) const
 				context->m_pattern.m_w, context->m_pattern.m_h,
 				context->m_pattern.m_confidence, context->m_pattern.m_activation);
 
-			for (int f = 0; f < NoFeatures; f ++)
-			{
+			for (int f = 0; f < NoFeatures; f ++) {
 				const int size = FeatureSizes[f];
-				const double* data = (const double*)context->m_features[f].dataR();
-				for (int k = 0; k < size; k ++)
-				{
-					file.printf("%lf ", data[k]);
+				for (int k = 0; k < size; k ++) {
+					file.printf("%lf ", context->m_features[f](k));
 				}
 			}
 		}
@@ -293,10 +289,9 @@ bool ContextDataSet::save(const char* basename, unsigned char mask) const
 		for (int i = 0; i < m_n_examples; i ++)
 			if (m_masks[i] == mask)
 			{
-				const double* values = (const double*)m_contexts[i]->m_features[f].dataR();
 				for (int k = 0; k < fsize; k ++)
 				{
-					file.printf("%lf\t", values[k]);
+					file.printf("%lf\t", m_contexts[i]->m_features[f](k));
 				}
 				file.printf("\n");
 			}
@@ -365,10 +360,9 @@ bool ContextDataSet::load(const char* dir_data, const char* name)
 		for (int f = 0; f < NoFeatures; f ++)
 		{
 			const int size = FeatureSizes[f];
-			double* data = (double*)context->m_features[f].dataW();
 			for (int k = 0; k < size; k ++)
 			{
-				if (file.scanf("%lf", &data[k]) != 1)
+				if (file.scanf("%lf", &(context->m_features[f](k))) != 1)
 				{
 					print("ContextDataSet::load - failed to read context [%d/%d]!\n", s + 1, m_n_examples);
 					return false;

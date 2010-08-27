@@ -56,7 +56,6 @@ namespace Torch
                 /////////////////////////////////////////////////////////////////
                 // Attributes
 
-		double*			m_poutput;		// Direct access to the machine's output
 		DoubleTensor		m_foutputs;		// Store outputs from context feature models
 
 		LRMachine*		m_fmodels;		// Models for each feature

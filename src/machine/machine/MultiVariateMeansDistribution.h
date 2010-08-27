@@ -28,13 +28,13 @@ public:
 	//---
 	
 	///
-	virtual bool 		sampleEMaccPosteriors(double *sample_, const double input_posterior);
+	virtual bool 		sampleEMaccPosteriors(const DoubleTensor& sample_, const double input_posterior);
 
 	///
-	virtual double 		sampleProbabilityOneMean(double *sample_, int m);
+	virtual double 		sampleProbabilityOneMean(const DoubleTensor& sample_, int m);
 
 	///
-	virtual double 		sampleProbability(double *sample_);
+	virtual double 		sampleProbability(const DoubleTensor& sample_);
 
 	///
 	virtual bool		loadFile(File& file);

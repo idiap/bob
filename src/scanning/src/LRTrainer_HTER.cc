@@ -294,11 +294,9 @@ static lbfgsfloatval_t evaluate(	void* instance,
 	for (long s = 0; s < dataset->getNoExamples(); s ++)
 	{
 		const DoubleTensor* example = (const DoubleTensor*)dataset->getExample(s);
-
-		const double score = LRMachine::sigmoidEps((const double*)example->dataR(), x, size);
+		const double score = LRMachine::sigmoidEps(*example, x, size);
 		const double label = ((const DoubleTensor*)dataset->getTarget(s))->get(0);
 		double* dst = label > 0.5 ? &fx : &fx_neg;
-
 		*dst -= label * log(score) + (1.0 - label) * log(1.0 - score);
 	}
 
@@ -449,7 +447,6 @@ bool LRTrainer::train(	double L1_prior, double L2_prior,
 
 void LRTrainer::test(LRMachine* machine, DataSet* samples, double& TAR, double& FAR, double& HTER)
 {
-	const double* machine_output = (const double*)(machine->getOutput().dataR());
 	const double threshold = machine->getThreshold();
 
 	long passed_pos = 0, passed_neg = 0;
@@ -458,7 +455,7 @@ void LRTrainer::test(LRMachine* machine, DataSet* samples, double& TAR, double& 
 		const DoubleTensor* example = (const DoubleTensor*)samples->getExample(s);
 		CHECK_FATAL(machine->forward(*example) == true);
 
-		if (*machine_output >= threshold)
+		if (machine->getOutput()(0) >= threshold)
 		{
 			const double label = ((const DoubleTensor*)samples->getTarget(s))->get(0);
 			long* dst = label >= threshold ? &passed_pos : &passed_neg;
@@ -488,7 +485,6 @@ void LRTrainer::optimize(LRMachine* machine, DataSet* samples)
 //	}
 
 	const long n_samples = samples->getNoExamples();
-	const double* machine_output = (const double*)(machine->getOutput().dataR());
 
 	// Compute the scores and sort them
 	LabelledMeasure* scores = new LabelledMeasure[n_samples];
@@ -498,7 +494,7 @@ void LRTrainer::optimize(LRMachine* machine, DataSet* samples)
 		const double label = ((const DoubleTensor*)samples->getTarget(s))->get(0);
 
 		CHECK_FATAL(machine->forward(*example) == true);
-		scores[s].measure = *machine_output;
+		scores[s].measure = machine->getOutput()(0);
 		scores[s].label = label > 0.5 ? 1 : 0;
 
 //		print("[%ld/%ld]: score = %lf, label = %d\n", s + 1, n_samples, scores[s].measure, scores[s].label);
@@ -589,8 +585,7 @@ void LRTrainer::getGradient(DataSet* dataset, double* gradients, double* buf_gra
 	for (long s = 0; s < dataset->getNoExamples(); s ++)
 	{
 		const DoubleTensor* example = (const DoubleTensor*)dataset->getExample(s);
-		const double* data = (const double*)example->dataR();
-		const double score = LRMachine::sigmoidEps(data, weights, size);
+		const double score = LRMachine::sigmoidEps(*example, weights, size);
 
 		const double label = ((const DoubleTensor*)dataset->getTarget(s))->get(0);
 		double* dst = label > 0.5 ? gradients : buf_gradients;
@@ -598,7 +593,7 @@ void LRTrainer::getGradient(DataSet* dataset, double* gradients, double* buf_gra
 		const double factor = - (label - score);
 		for (int i = 0; i < size; i ++)
 		{
-			dst[i] += factor * data[i];
+			dst[i] += factor * (*example)(i);
 		}
 		dst[size] += factor * 1.0;
 	}

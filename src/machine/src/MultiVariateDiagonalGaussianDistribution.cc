@@ -112,7 +112,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMinit()
 	return true;
 }
 
-bool MultiVariateDiagonalGaussianDistribution::sampleEMaccPosteriors(double *sample_, const double input_posterior)
+bool MultiVariateDiagonalGaussianDistribution::sampleEMaccPosteriors(const DoubleTensor& sample_, const double input_posterior)
 {
    	/* Computes the posterior for each gaussian
 
@@ -176,7 +176,7 @@ bool MultiVariateDiagonalGaussianDistribution::sampleEMaccPosteriors(double *sam
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-			double z = sample_[k];
+			double z = sample_(k);
 
 			acc_posteriors_means[j][k] += posterior_j * z;
 
@@ -249,10 +249,10 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 	return true;
 }
 
-double MultiVariateDiagonalGaussianDistribution::sampleProbability(double *sample_)
+double MultiVariateDiagonalGaussianDistribution::sampleProbability(const DoubleTensor& sample_)
 {
 	//Torch::print("MultiVariateDiagonalGaussianDistribution::sampleProbability()\n");
-	//for(int k = 0 ; k < n_inputs ; k++) Torch::print(" %g ", sample_[k]);
+	//for(int k = 0 ; k < n_inputs ; k++) Torch::print(" %g ", sample_(k));
 	//Torch::print("\n");
 
 	if(use_log)
@@ -297,7 +297,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbability(double *sampl
 	return current_likelihood;
 }
 
-double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(double *sample_, int g)
+double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(const DoubleTensor& sample_, int g)
 {
 	double l;
 	double z;
@@ -308,7 +308,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(do
 		z = 0.0;
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-			double zz = sample_[k] - means[g][k];
+			double zz = sample_(k) - means[g][k];
 
 			z += zz*zz / variances[g][k];
 		}
@@ -321,7 +321,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(do
 		z = 0.0;
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-			double zz = sample_[k] - means[g][k];
+			double zz = sample_(k) - means[g][k];
 
 			z += zz*zz / variances[g][k];
 			det *= variances[g][k];

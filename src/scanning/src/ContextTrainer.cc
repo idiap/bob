@@ -59,7 +59,6 @@ static bool buildCDataSet(MemoryDataSet& c_dataset, ContextDataSet* dataset, Con
 		dataset->reset(f);
 
 		LRMachine& fmodel = ctx_machine->getFModel(f);
-		const double* score = (const double*)fmodel.getOutput().dataR();
 
 		for (long s = 0; s < dataset->getNoExamples(); s ++)
 		{
@@ -69,7 +68,7 @@ static bool buildCDataSet(MemoryDataSet& c_dataset, ContextDataSet* dataset, Con
 				return false;
 			}
 
-			c_dataset.getExample(s)->set(f, *score - fmodel.getThreshold());
+			c_dataset.getExample(s)->set(f, fmodel.getOutput()(0) - fmodel.getThreshold());
 		}
 	}
 

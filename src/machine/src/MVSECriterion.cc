@@ -49,20 +49,14 @@ bool MVSECriterion::forward(const DoubleTensor *machine_output, const Tensor *ta
 
 	m_target->copy(target);
 
-	double *o_ = (double *) machine_output->dataR();
-	double *t_ = (double *) m_target->dataR();
-	double *beta_ = (double *) m_beta->dataW();
-
 	double error_ = 0.0;
 	for(int i = 0; i < m_target_size; i++)
 	{
-		double z = o_[i] - t_[i];
-		beta_[i] = 2. * z;
+		double z = machine_output->get(i) - m_target->get(i);
+    (*m_beta)(i) = 2. * z;
 		error_ += z*z;
 	}
-
-	double *e_ = (double *) m_error->dataW();
-	*e_ = error_;
+  (*m_error)(0) = error_;
 
 	return true;
 }

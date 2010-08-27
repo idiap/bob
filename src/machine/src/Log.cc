@@ -26,11 +26,8 @@ Log::~Log()
 
 bool Log::forward(const DoubleTensor *input)
 {
-	THTensor *src = input->t;
-	THTensor *dst = m_output.t;
-	
-	TH_TENSOR_APPLY2(double, dst, double, src, *dst_p = log(*src_p););
-
+  const int K=input->sizeAll();
+  for (int k=0; k<K; ++k) m_output(k) = log((*input)(k));
 	return true;
 }
 

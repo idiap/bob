@@ -87,12 +87,11 @@ namespace Torch
 		pd_machine->EMinit();
 
 		// E-step : computes and accumulates posterior probabilities
-        	for (long i=0 ; i<m_n_examples ; i++)
-        	{
-  			DoubleTensor *example = (DoubleTensor *) m_dataset->getExample(i);
-
-			pd_machine->EMaccPosteriors(example, THLogOne);
-		}
+    for (long i=0 ; i<m_n_examples ; i++)
+    {
+      const DoubleTensor* example = static_cast<const DoubleTensor*>(m_dataset->getExample(i));
+      pd_machine->EMaccPosteriors(*example, THLogOne);
+    }
 
 		
 		// M-step : Updates weights, means and variances 

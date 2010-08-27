@@ -40,13 +40,13 @@ public:
 	virtual bool 		cleanup();
 
 	///
-	virtual bool 		sampleEMaccPosteriors(double *sample_, const double input_posterior);
+	virtual bool 		sampleEMaccPosteriors(const DoubleTensor& sample_, const double input_posterior);
 
 	///
-	virtual double 		sampleProbabilityOneGaussian(double *sample_, int g);
+	virtual double 		sampleProbabilityOneGaussian(const DoubleTensor& sample_, int g);
 
 	///
-	virtual double 		sampleProbability(double *sample_);
+	virtual double 		sampleProbability(const DoubleTensor& sample_);
 
 	///
 	virtual bool		loadFile(File& file);
