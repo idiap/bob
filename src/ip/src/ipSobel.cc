@@ -106,8 +106,8 @@ namespace Torch
         double rescale = 255*4;
 
 
-        //const short* src = t_input->t->storage->data + t_input->t->storageOffset;
-        //short* dst = t_output->t->storage->data + t_output->t->storageOffset;
+        //const short* src = (const short*)t_input->dataR();
+        //short* dst = (short*)t_output->dataW();
 
         //const int in_stride_h = t_input->stride(0);	// height
         //const int in_stride_w = t_input->stride(1);	// width
