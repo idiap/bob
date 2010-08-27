@@ -134,8 +134,6 @@ namespace Torch
 		Stage*			m_stages;
 		int			m_n_stages;
 
-		// Fast access to the output
-		double*			m_fast_output;	// Pointer to the DoubleTensor
 	};
 
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

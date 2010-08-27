@@ -136,13 +136,11 @@ const Machine* CascadeMachine::Stage::getMachine(int i_machine) const
 
 CascadeMachine::CascadeMachine()
 	:	Classifier(),
-		m_stages(0), m_n_stages(0),
-                m_fast_output(0)
+		m_stages(0), 
+    m_n_stages(0)
 {
         // Allocate the output
 	m_output.resize(1);
-	const DoubleTensor* t_output = (DoubleTensor*)&m_output;
-	m_fast_output = t_output->t->storage->data + t_output->t->storageOffset;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -197,7 +195,8 @@ bool CascadeMachine::forward(const Tensor& input)
 		}
 
 		// Check if rejected
-		*m_fast_output = output;
+    m_output.set(0, output);
+
 		if (output < stage.m_threshold)
 		{
 		        m_isPattern = false;
@@ -206,7 +205,7 @@ bool CascadeMachine::forward(const Tensor& input)
 	}
 
 	// OK
-	m_confidence = *m_fast_output;
+	m_confidence = m_output(0);
 	return true;
 }
 
