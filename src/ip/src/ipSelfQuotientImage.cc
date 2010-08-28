@@ -110,7 +110,8 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 
     
 		filtered_array[s] = new ShortTensor(input.size(0), input.size(1), input.size(2));
-		filtered_array[s]->copy( &(weighedGaussian->getOutput(0)) ); 
+    const ShortTensor *out = (const ShortTensor*)&weighedGaussian->getOutput(0);
+		filtered_array[s]->copy( out ); 
 		delete weighedGaussian;
 	}
 

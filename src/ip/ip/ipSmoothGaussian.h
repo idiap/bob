@@ -34,8 +34,6 @@ namespace Torch {
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class DoubleTensor;
-
 	class ipSmoothGaussian : public ipCore
 	{
 	public:
