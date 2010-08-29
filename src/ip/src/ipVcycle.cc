@@ -183,16 +183,16 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 
 		result->copy(t_b);
 		
+		int info = 0;
+#ifdef USE_CBLAS
 		// Prepare to use LAPACK function
 		IntTensor ipiv(width_*height_);
 		int N =  width_*height_;
 		int lda = N;
 		int ldb = N;
 		int NRHS = 1;
-		int info = 0;
 		// Note: In principle, data should be transposed (column-major order instead of row-major order).
 		//       Anyway, it is not necessary here with the dgesv_function.
-#ifdef USE_CBLAS
 		dgesv_( &N, &NRHS, d_diffOperator, &lda, (int*)ipiv.dataW(), d_result, &ldb, &info );
 #endif
 		if (info != 0) error("ipVCycle: error %d in LAPACK function dgesv_ (Solving a linear system).\n", info);
