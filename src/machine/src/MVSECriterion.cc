@@ -52,7 +52,7 @@ bool MVSECriterion::forward(const DoubleTensor *machine_output, const Tensor *ta
 	double error_ = 0.0;
 	for(int i = 0; i < m_target_size; i++)
 	{
-		double z = (*machine_output)(i) - (*m_target)(i);
+		const double z = (*machine_output)(i) - (*m_target)(i);
     (*m_beta)(i) = 2. * z;
 		error_ += z*z;
 	}
