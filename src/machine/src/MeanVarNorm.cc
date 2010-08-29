@@ -8,7 +8,7 @@ namespace Torch {
 
 MeanVarNorm::MeanVarNorm()
 {
-   	n_inputs = 0;
+ 	n_inputs = 0;
 	m_mean = NULL;
 	m_stdv = NULL;
 
@@ -35,7 +35,7 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 	int T = 0;
 	for(long t = 0 ; t < dataset->getNoExamples() ; t++)
 	{
-		Tensor *example = dataset->getExample(t);
+		const DoubleTensor *example = (const DoubleTensor*)dataset->getExample(t);
 
 		if (	example->getDatatype() != Tensor::Double)
 		{
@@ -52,13 +52,11 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 		// If the tensor is 1D then considers it as a vector
 		if (example->nDimension() == 1)
 		{
-			DoubleTensor *t_input = (DoubleTensor *) example;
-
 			//Torch::print("MeanVarNorm() processing a frames of size %d\n", n_inputs);
 
 			for(int i = 0 ; i < n_inputs ; i++)
 			{
-			   	double z = (*t_input)(i);
+		   	const double z = (*example)(i);
 				m_mean[i] += z;
 				m_stdv[i] += z*z;
 			}
@@ -78,7 +76,7 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 
 				for(int i = 0 ; i < n_inputs ; i++)
 				{
-			   		double z = (*frame_in_)(i);
+			   	const	double z = (*frame_in_)(i);
 					m_mean[i] += z;
 					m_stdv[i] += z*z;
 				}
@@ -105,7 +103,7 @@ MeanVarNorm::MeanVarNorm(const int n_inputs_, DataSet *dataset)
 
 					for(int i = 0 ; i < n_inputs ; i++)
 					{
-			   			double z = (*frame_in_)(i);
+			   		const	double z = (*frame_in_)(i);
 						m_mean[i] += z;
 						m_stdv[i] += z*z;
 					}
@@ -221,13 +219,13 @@ bool MeanVarNorm::forward(const Tensor& input)
 		return false;
 	}
 
+  const DoubleTensor *t_input = (const DoubleTensor*)&input;
+
 	// If the tensor is 1D then considers it as a vector
 	if (input.nDimension() == 1)
 	{
-		DoubleTensor *t_input = (DoubleTensor *) &input;
-
 		//Torch::print("MeanVarNorm::forward() processing a frame of size %d\n", n_inputs);
-	   	resize(n_inputs);
+	  resize(n_inputs);
 
 		for(int i = 0 ; i < n_inputs ; i++)
 			m_output(i) = ((*t_input)(i) - m_mean[i]) / m_stdv[i];
@@ -235,12 +233,11 @@ bool MeanVarNorm::forward(const Tensor& input)
 	// If the tensor is 2D then considers it as a sequence along the first dimension
 	else if (input.nDimension() == 2)
 	{
-		DoubleTensor *t_input = (DoubleTensor *) &input;
 		DoubleTensor *t_output = (DoubleTensor *) &m_output;
 		int n_frames_per_sequence = t_input->size(1);
 
 		//Torch::print("MeanVarNorm::forward() processing a sequence of %d frames of size %d\n", n_frames_per_sequence, n_inputs);
-	   	resize(n_inputs, n_frames_per_sequence);
+	  resize(n_inputs, n_frames_per_sequence);
 
 		for(int f = 0 ; f < n_frames_per_sequence ; f++)
 		{
@@ -255,13 +252,12 @@ bool MeanVarNorm::forward(const Tensor& input)
 	// If the tensor is 3D then considers it as a sequence of sequence along the first dimension
 	else if (input.nDimension() == 3)
 	{
-		DoubleTensor *t_input = (DoubleTensor *) &input;
 		DoubleTensor *t_output = (DoubleTensor *) &m_output;
 		int n_sequences_per_sequence = t_input->size(2);
 		int n_frames_per_sequence = t_input->size(1);
 
 		//Torch::print("MeanVarNorm::forward() processing a sequence of %d sequences of %d frames of size %d\n", n_sequences_per_sequence, n_frames_per_sequence, n_inputs);
-	   	resize(n_inputs, n_frames_per_sequence, n_sequences_per_sequence);
+	  resize(n_inputs, n_frames_per_sequence, n_sequences_per_sequence);
 
 		for(int s = 0 ; s < n_sequences_per_sequence ; s++)
 		{
