@@ -47,7 +47,7 @@ bool MSECriterion::forward(const DoubleTensor *machine_output, const Tensor *tar
 		return false;
 	}
 
-	m_target->copy(target);
+	((Tensor*)m_target)->copy(target);
 
 	double error_ = 0.0;
 	for(int i = 0; i < m_target_size; i++)
