@@ -1,3 +1,4 @@
+
 /* Storage type */
 #define STORAGE_T_(TYPE) TH##TYPE##Storage
 #define STORAGE_T(TYPE) STORAGE_T_(TYPE)
@@ -140,6 +141,7 @@ STORAGE* STORAGE_FUNC(newWithMapping)(const char *fileName, int isShared)
 STORAGE* STORAGE_FUNC(newWithMapping)(const char *fileName, int isShared)
 {
   THError("Mapped file Storages are not supported on your system");
+  return NULL;
 }
 
 #endif
