@@ -45,7 +45,7 @@ bool SpiralScaleExplorer::process(	ExplorerData& explorerData,
 	const int sw_center_x = m_roi.x + m_roi.w / 2;
 	const int sw_center_y = m_roi.y + m_roi.h / 2;
 
-	const int n_spirales = min(     (m_roi.w - sw_w) / dx,
+	const int n_spirales = std::min(     (m_roi.w - sw_w) / dx,
                                         (m_roi.h - sw_h) / dy);
 
 	// Vary the radius to the center of ROI ...

@@ -125,11 +125,11 @@ namespace Torch
 		}
 		void 			update_max(int f, int index, double value)
 		{
-			m_features[f].set(index, max(m_features[f].get(index), value));
+			m_features[f].set(index, std::max(m_features[f].get(index), value));
 		}
 		void 			update_min(int f, int index, double value)
 		{
-			m_features[f].set(index, min(m_features[f].get(index), value));
+			m_features[f].set(index, std::min(m_features[f].get(index), value));
 		}
 		void 			update_dif(int f, int index, int f2, int index21, int index22)
 		{

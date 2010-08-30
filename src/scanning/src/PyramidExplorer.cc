@@ -98,8 +98,8 @@ bool PyramidExplorer::init(int image_w, int image_h)
 	const int max_patt_h = getInRange(param_max_patt_h, model_h, image_h);
 
         // Compute the min/max and scale variance (relative to the image size)
-	const float min_scale = max((model_w + 0.0f) / (max_patt_w + 0.0f), (model_h + 0.0f) / (max_patt_h + 0.0f));
-	const float max_scale = min((model_w + 0.0f) / (min_patt_w + 0.0f), (model_h + 0.0f) / (min_patt_h + 0.0f));
+	const float min_scale = std::max((model_w + 0.0f) / (max_patt_w + 0.0f), (model_h + 0.0f) / (max_patt_h + 0.0f));
+	const float max_scale = std::min((model_w + 0.0f) / (min_patt_w + 0.0f), (model_h + 0.0f) / (min_patt_h + 0.0f));
 	const float ds = getInRange(    getFOption("ds"),
                                         1.0f + 1.0f / (image_w + 0.0f),
                                         (max_patt_w + 0.0f) / (min_patt_w + 0.0f) + 2.0f / (image_w + 0.0f));

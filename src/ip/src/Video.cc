@@ -4,8 +4,6 @@
 #ifdef HAVE_FFMPEG
 extern "C"
 {
-	#define __STDC_CONSTANT_MACROS
-
 	#include <libavutil/avutil.h>
 	#include <libavformat/avformat.h>
 	#include <libswscale/swscale.h>

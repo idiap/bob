@@ -171,8 +171,8 @@ void Context::reset(const Pattern& pattern, const ContextExplorer& explorer)
 			if (ctx_flags[i] != 0x00 && axis_check_a(explorer, i) == true)
 			{
 				const double score = ctx_scores[i];
-				min_score = min(min_score, score);
-				max_score = max(max_score, score);
+				min_score = std::min(min_score, score);
+				max_score = std::max(max_score, score);
 				sum_score += score;
 				cnt ++;
 			}
@@ -216,8 +216,8 @@ void Context::reset(const Pattern& pattern, const ContextExplorer& explorer)
 				for (int j = 0; j < axis_no_a; j ++)
 				{
 					const int axis = (explorer.*axis_indexes_a[j])(i);
-					min_hits[j] = min(min_hits[j], axis);
-					max_hits[j] = max(max_hits[j], axis);
+					min_hits[j] = std::min(min_hits[j], axis);
+					max_hits[j] = std::max(max_hits[j], axis);
 					sum_hits[j] += axis;
 				}
 

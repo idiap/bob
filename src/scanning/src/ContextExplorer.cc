@@ -223,8 +223,8 @@ bool ContextExplorer::process()
 					const double dcx = abs(sw.getCenterX() - sw_ctx.getCenterX());
 					const double dcy = abs(sw.getCenterY() - sw_ctx.getCenterY());
 
-					max_diff_size = max(max_diff_size, (dw + dh) / (sw.m_w + sw.m_h));
-					max_diff_center = max(max_diff_center, (dcx + dcy) / (sw.m_w + sw.m_h));
+					max_diff_size = std::max(max_diff_size, (dw + dh) / (sw.m_w + sw.m_h));
+					max_diff_center = std::max(max_diff_center, (dcx + dcy) / (sw.m_w + sw.m_h));
 				}
 
 				if (verbose == true)
@@ -295,7 +295,7 @@ bool ContextExplorer::buildSWContext(int sw_x, int sw_y, int sw_w, int sw_h)
 			}
 
 			// Vary the Ox coordinate
-			const int dx = max(FixI(0.01 * VarX * sw_w), 1);
+			const int dx = std::max(FixI(0.01 * VarX * sw_w), 1);
 			for (int ix = -NoVarX; ix <= NoVarX; ix ++, index ++)
 			{
 				const int new_sw_x = sw_x + ix * dx;
@@ -308,7 +308,7 @@ bool ContextExplorer::buildSWContext(int sw_x, int sw_y, int sw_w, int sw_h)
 			}
 
 			// Vary the Oy coordinate
-			const int dy = max(FixI(0.01 * VarY * sw_h), 1);
+			const int dy = std::max(FixI(0.01 * VarY * sw_h), 1);
 			for (int iy = -NoVarY; iy <= NoVarY; iy ++, index ++)
 			{
 				const int new_sw_y = sw_y + iy * dy;
@@ -332,8 +332,8 @@ bool ContextExplorer::buildSWContext(int sw_x, int sw_y, int sw_w, int sw_h)
 				const int new_sw_w = FixI(ds * sw_w);
 				const int new_sw_h = FixI(ds * sw_h);
 
-				const int dx = max(FixI(0.01 * VarX * new_sw_w), 1);
-				const int dy = max(FixI(0.01 * VarY * new_sw_h), 1);
+				const int dx = std::max(FixI(0.01 * VarX * new_sw_w), 1);
+				const int dy = std::max(FixI(0.01 * VarY * new_sw_h), 1);
 
 				// Vary the Ox position
 				for (int ix = -NoVarX; ix <= NoVarX; ix ++)

@@ -82,12 +82,12 @@ Torch::ipLBPTopOperator::~ipLBPTopOperator() {
 bool Torch::ipLBPTopOperator::process(const Torch::ShortTensor& tensor,
     Torch::Image& xy, Torch::Image& xt, Torch::Image& yt) const
 {
-  // we need an odd number, at (2N+1), where N = max(radius_xt, radius_yt)
+  // we need an odd number, at (2N+1), where N = std::max(radius_xt, radius_yt)
   if (tensor.size(4)%2 == 0) {
     Torch::warning("Cannot process a even-numbered set of frames");
     return false;
   }
-  const int N = max(m_radius_xt, m_radius_yt);
+  const int N = std::max(m_radius_xt, m_radius_yt);
   if (tensor.size(4) != (2*N+1) ) {
     Torch::warning("The number of input frames should be %d", 2*N+1);
     return false;

@@ -11,9 +11,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <float.h>
-
-//#include <algorithm>
-//using namespace std;
+#include <algorithm>
 
 // Old systems need that to define FLT_MAX and DBL_MAX
 #ifndef DBL_MAX
@@ -44,16 +42,6 @@ int compare_floats(const void* a, const void* b);
 int compare_doubles(const void* a, const void* b);
 
 //-----------------------------------
-
-#ifndef min
-/// The min function
-#define	min(a,b) ((a) > (b) ? (b) : (a))
-#endif
-
-#ifndef max
-/// The max function
-#define	max(a,b) ((a) > (b) ? (a) : (b))
-#endif
 
 #ifndef getInRange
 /// The getInRange function (force some value to be in the [m, M] range)

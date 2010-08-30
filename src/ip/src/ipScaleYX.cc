@@ -98,9 +98,9 @@ bool ipScaleYX::processInput(const Tensor& input)
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	// Allocate buffer (if needed)
-	if (m_buffer_size != n_planes * (3 * in_width + max(in_width, out_width)))
+	if (m_buffer_size != n_planes * (3 * in_width + std::max(in_width, out_width)))
 	{
-		m_buffer_size = n_planes * (3 * in_width + max(in_width, out_width));
+		m_buffer_size = n_planes * (3 * in_width + std::max(in_width, out_width));
 		delete[] m_buffer;
 		m_buffer = new float[m_buffer_size];
 	}
@@ -204,11 +204,11 @@ bool ipScaleYX::processInput(const Tensor& input)
 				scanline, // destination
 				n_planes * in_width); // size
 
-			// <scanline> = min(<scanline>, max pixel value)
+			// <scanline> = std::min(<scanline>, max pixel value)
 			const int size = n_planes * in_width;
 			for (int k = 0; k < size; k ++)
 			{
-				scanline[k] = min(scanline[k], max_pixel);
+				scanline[k] = std::min(scanline[k], max_pixel);
 			}
 
 			// <y_vector> = 0
@@ -265,7 +265,7 @@ bool ipScaleYX::processInput(const Tensor& input)
 						}
 
 						pixel += x_span * (*s);
-						*t = min(pixel, max_pixel);
+						*t = std::min(pixel, max_pixel);
 						x_scale -= x_span;
 						x_span = 1.0f;
 						next_column = 1;
@@ -294,7 +294,7 @@ bool ipScaleYX::processInput(const Tensor& input)
 
 				if (!next_column && ((t - scale_scanline) < n_planes * out_width))
 				{
-					*t = min(pixel, max_pixel);
+					*t = std::min(pixel, max_pixel);
 				}
         		}
 

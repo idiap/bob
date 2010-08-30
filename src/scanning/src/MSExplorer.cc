@@ -79,8 +79,8 @@ bool MSExplorer::init(int image_w, int image_h)
 	const int max_patt_h = getInRange(param_max_patt_h, model_h, image_h);
 
 	// Compute the min/max and scale variance (relative the model size)
-	const double min_scale = max((min_patt_w + 0.0) / (model_w + 0.0), (min_patt_h + 0.0) / (model_h + 0.0));
-	const double max_scale = min((max_patt_w + 0.0) / (model_w + 0.0), (max_patt_h + 0.0) / (model_h + 0.0));
+	const double min_scale = std::max((min_patt_w + 0.0) / (model_w + 0.0), (min_patt_h + 0.0) / (model_h + 0.0));
+	const double max_scale = std::min((max_patt_w + 0.0) / (model_w + 0.0), (max_patt_h + 0.0) / (model_h + 0.0));
 	const double ds = getInRange(   getFOption("ds"),
                                         1.0 + 1.0 / (image_w + 0.0),
                                         (max_patt_w + 0.0) / (min_patt_w + 0.0) + 2.0 / (image_w + 0.0));
