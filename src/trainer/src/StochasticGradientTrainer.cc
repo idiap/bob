@@ -18,7 +18,7 @@ namespace Torch
 
     void shuffle(void *array, int size_element, long n_elements)
     {
-    	void *swap_ = THAlloc(size_element);
+    	char swap_[size_element];
     	char *array_ = (char *) array;
     
     	for(long i = 0; i < n_elements; i++)
@@ -28,7 +28,6 @@ namespace Torch
     	   memcpy(array_ + i*size_element, array_ + (z + i)*size_element, size_element);
     	   memcpy(array_ + (z + i)*size_element, swap_, size_element);
     	}
-    	THFree(swap_);
     }
 
     bool StochasticGradientTrainer::train()

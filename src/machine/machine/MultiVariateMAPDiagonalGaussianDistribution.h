@@ -3,6 +3,7 @@
 
 #include "machine/MultiVariateDiagonalGaussianDistribution.h"
 #include "machine/Machines.h"
+#include <boost/scoped_array.hpp>
 
 namespace Torch {
 
@@ -30,7 +31,7 @@ public:
 		
 protected:
 	MultiVariateDiagonalGaussianDistribution *prior;
-	double **prior_means;
+	boost::scoped_array<double*> prior_means;
 
 	float map_factor;
 };
