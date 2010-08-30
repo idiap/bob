@@ -121,7 +121,7 @@ bool GradientMachine::forward(const Tensor& input)
 		return false;
 	}
 
-	DoubleTensor *t_input = (DoubleTensor *) &input;
+	const DoubleTensor *t_input = (const DoubleTensor *) &input;
 
 	return forward(t_input);
 }

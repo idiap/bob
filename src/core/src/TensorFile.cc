@@ -44,6 +44,9 @@ void TensorFile::Header::update()
 	case Tensor::Double:
 		base_size = sizeof(double);
 		break;
+
+  default:
+    break;
 	}
 
 	int tsize = 1;

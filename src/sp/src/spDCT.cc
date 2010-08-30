@@ -131,7 +131,7 @@ bool spDCT::processInput(const Tensor& input)
 	if (input.nDimension() == 1)
 	{
 		//R->copy(t_input);
-		R->copy(&input);
+		((Tensor*)R)->copy(&input);
 
 #ifdef HAVE_OOURAFFT
 		if(inverse)
@@ -199,7 +199,7 @@ bool spDCT::processInput(const Tensor& input)
 	else if (input.nDimension() == 2)
 	{
 		//R->copy(t_input);
-		R->copy(&input);
+		((Tensor*)R)->copy(&input);
 
 #ifdef HAVE_OOURAFFT
 		if(inverse)

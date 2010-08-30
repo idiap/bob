@@ -79,23 +79,20 @@ void ipSmoothGaussian::prepareKernel(int radius_x, int radius_y, double sigma)
 	// Compute the kernel
 	const double inv_sigma = 1.0  / sigma;
 	double sum = 0.0;
-  	for (int i = -radius_x; i <= radius_x; i ++)
-    		for (int j = -radius_y; j <= radius_y; j ++)
-    		{
-      			const double weight = exp(- inv_sigma * (i * i + j * j));
-
-			m_kernel->set(j + radius_y, i + radius_x, weight);
-			sum += weight;
-    		}
+ 	for (int i = -radius_x; i <= radius_x; i ++)
+ 		for (int j = -radius_y; j <= radius_y; j ++)
+ 		{
+ 			const double weight = exp(- inv_sigma * (i * i + j * j));
+ 			(*m_kernel)(j + radius_y, i + radius_x) = weight;
+    	sum += weight;
+ 		}
 
 	// Normalize the kernel
-  	const double inv_sum = 1.0 / sum;
-  	for (int i = -radius_x; i <= radius_x; i ++)
-    		for (int j = -radius_y; j <= radius_y; j ++)
-    		{
-			m_kernel->set(	j + radius_y,
-					i + radius_x,
-					inv_sum * m_kernel->get(j + radius_y, i + radius_x));
+ 	const double inv_sum = 1.0 / sum;
+ 	for (int i = -radius_x; i <= radius_x; i ++)
+ 		for (int j = -radius_y; j <= radius_y; j ++)
+ 		{
+			(*m_kernel)(j + radius_y,	i + radius_x) *= inv_sum;
 		}
 }
 
@@ -116,14 +113,6 @@ bool ipSmoothGaussian::processInput(const Tensor& input)
 	const ShortTensor* t_input = (ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = (const short*)t_input->dataR();
-
-	const int stride_h = t_input->stride(0);	// height
-	const int stride_w = t_input->stride(1);	// width
-	const int stride_p = t_input->stride(2);	// no planes
-
-	// An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-
 	const int height = input.size(0);
 	const int width = input.size(1);
 	const int n_planes = input.size(2);
@@ -135,35 +124,24 @@ bool ipSmoothGaussian::processInput(const Tensor& input)
 
 	// Fill with 0 the output image (to clear boundaries)
 	t_output->fill(0);
-	short* dst = (short*)t_output->dataW();
 
 	// Apply the kernel to the image for each color plane
 	for (int p = 0; p < n_planes; p ++)
-	{
-		const short* src_plane = &src[p * stride_p];
-		short* dst_plane = &dst[p * stride_p];
-
 		for (int y = start_y; y < stop_y; y ++)
-		{
-			short* dst_row = &dst_plane[y * stride_h + start_x * stride_w];
-			for (int x = start_x; x < stop_x; x ++, dst_row += stride_w)
+			for (int x = start_x; x < stop_x; x ++)
 			{
 				// Apply the kernel for the <y, x> pixel
 				double sum = 0.0;
 				for (int yy = -radius_y; yy <= radius_y; yy ++)
 					for (int xx = -radius_x; xx <= radius_x; xx ++)
 					{
-						sum += 	m_kernel->get(yy + radius_y, xx + radius_x) *
-							src_plane[(y + yy) * stride_h + (x + xx) * stride_w];
+						sum += 	(*m_kernel)(yy + radius_y, xx + radius_x) *	(*t_input)(y + yy, x + xx, p);
 					}
 
-				*dst_row = FixI(sum);
+				(*t_output)(y,x,p) = FixI(sum);
 			}
-		}
-	}
 
 	// OK
-  t_output->resetFromData();
 	return true;
 }
 

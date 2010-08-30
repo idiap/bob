@@ -25,132 +25,75 @@ namespace Torch {
 
 	void restriction(const DoubleTensor& data, DoubleTensor& restricted )
 	{
-	        const DoubleTensor* t_data = (DoubleTensor*)&data;
-        	DoubleTensor* t_restricted = (DoubleTensor*)&restricted;
-
-	        const double* src = (const double*)t_data->dataR();
-	        double* dst = (double*)t_restricted->dataW();
-
-	        const int stride_h = t_data->stride(0);     // height
-	        const int stride_w = t_data->stride(1);     // width
-	        const int stride_p = t_data->stride(2);     // no planes
-		
-	        const int stride_h_out = t_restricted->stride(0);     // height
-	        const int stride_w_out = t_restricted->stride(1);     // width
-	        const int stride_p_out = t_restricted->stride(2);     // no planes
-
-	        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-	        // TODO: check correctness of dimension between input and ouput (factor 2)
-
+    // TODO: check correctness of dimension between input and ouput (factor 2)
   	const int height_out = restricted.size(0);
 		const int width_out = restricted.size(1);
 		const int n_planes_out = restricted.size(2);
 
-	        for (int p = 0; p < n_planes_out; p ++) 
-        	{
-                	const double* src_plane = &src[p * stride_p];
-	                double* dst_plane = &dst[p * stride_p_out];
-
-	                for (int y = 0; y < height_out; y ++)
-        	        {
-                        	for (int x = 0; x < width_out; x ++)
-	                        {
-					// on the boundary: copy the corresponding pixel (injection)
+    for (int p = 0; p < n_planes_out; p ++) 
+      for (int y = 0; y < height_out; y ++)
+        for (int x = 0; x < width_out; x ++)
+        {
+				  // on the boundary: copy the corresponding pixel (injection)
 					if( (x==0) || (x==width_out-1) || (y==0) || (y==width_out-1))
-						dst_plane[x*stride_w_out + y*stride_h_out]=src_plane[2*x*stride_w + 2*y*stride_h];		
+						restricted(y,x,p) = data(2*y,2*x,p);	
 					// full weighting scheme (interior points)
 					else
 					{
-						int ind=2*x*stride_w + 2*y*stride_h;
-						dst_plane[x*stride_w_out + y*stride_h_out]= 0.25*src_plane[ind]
-						+ 0.125*(src_plane[ind-stride_w]+src_plane[ind-stride_h]+src_plane[ind+stride_w]+src_plane[ind+stride_h])
-						+ 0.0625*(src_plane[ind-stride_w-stride_h]+src_plane[ind-stride_w+stride_h]
-								+src_plane[ind+stride_w-stride_h]+src_plane[ind+stride_w+stride_h]);
+            restricted(y,x,p) = 0.25*data(2*y,2*x,p) + 
+              0.125  * ( data(2*y,2*x-1,p)+data(2*y-1,2*x,p)+data(2*y,2*x+1,p)+data(2*y+1,2*x,p) ) +
+              0.0625 * ( data(2*y-1,2*x-1,p)+data(2*y+1,2*x-1,p)+data(2*y-1,2*x+1,p)+data(2*y+1,2*x+1,p) );
 					}
 				}
-			}
-		}		
+
 	}
     
 
 	void project(const DoubleTensor& data, DoubleTensor& projected )
 	{
-	        const DoubleTensor* t_data = (DoubleTensor*)&data;
-        	DoubleTensor* t_projected = (DoubleTensor*)&projected;
-
-	        const double* src = (const double*)t_data->dataR();
-	        double* dst = (double*)t_projected->dataW();
-
-	        const int stride_h = t_data->stride(0);     // height
-	        const int stride_w = t_data->stride(1);     // width
-	        const int stride_p = t_data->stride(2);     // no planes
-		
-	        const int stride_h_out = t_projected->stride(0);     // height
-	        const int stride_w_out = t_projected->stride(1);     // width
-	        const int stride_p_out = t_projected->stride(2);     // no planes
-
-	        // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
-	        // TODO: check correctness of dimension between input and ouput (factor 2)
-
-  		const int height_out = projected.size(0);
+    // TODO: check correctness of dimension between input and ouput (factor 2)
+ 		const int height_out = projected.size(0);
 		const int width_out = projected.size(1);
 		const int n_planes_out = projected.size(2);
 
-	        for (int p = 0; p < n_planes_out; p ++) 
-        	{
-                	const double* src_plane = &src[p * stride_p];
-	                double* dst_plane = &dst[p * stride_p_out];
-
+    for (int p = 0; p < n_planes_out; p ++) 
+    {
 			// fill in even column and even row
-	                for (int y = 0; y < height_out; y+=2)
-                        	for (int x = 0; x < width_out; x+=2)
-					dst_plane[x*stride_w_out + y*stride_h_out] = src_plane[x/2*stride_w + y/2*stride_h];
+      for (int y = 0; y < height_out; y+=2)
+        for (int x = 0; x < width_out; x+=2)
+  				projected(y,x,p) = data(y/2, x/2, p);
 
 			// fill in even column/odd row (except boundary)
-	                for (int y = 1; y < height_out-1; y+=2)
-                        	for (int x = 0; x < width_out; x+=2)
-					dst_plane[x*stride_w_out + y*stride_h_out] = 0.5*(dst_plane[x*stride_w_out + (y+1)*stride_h_out]
-						+dst_plane[x*stride_w_out + (y-1)*stride_h_out]);
+      for (int y = 1; y < height_out-1; y+=2)
+        for (int x = 0; x < width_out; x+=2)
+          projected(y,x,p) = 0.5 * ( projected(y+1,x,p) + projected(y-1,x,p) );
 				
 			// fill in odd column
-	                for (int y = 0; y < height_out; y++)
-                        	for (int x = 1; x < width_out-1; x+=2)
-					dst_plane[x*stride_w_out + y*stride_h_out] = 0.5*(dst_plane[(x+1)*stride_w_out + y*stride_h_out]
-						+dst_plane[(x-1)*stride_w_out + y*stride_h_out]);
+      for (int y = 0; y < height_out; y++)
+        for (int x = 1; x < width_out-1; x+=2)
+          projected(y,x,p) = 0.5 * ( projected(y,x+1,p) + projected(y,x-1,p) );
 
 			// Fill in boundaries
 			for(int x = 0; x < width_out; x++)
-				dst_plane[x*stride_w_out+(height_out-1)*stride_h_out]=dst_plane[x*stride_w_out+(height_out-2)*stride_h_out];
+        projected(height_out-1, x, p) = projected(height_out-2, x, p);
 
 			for(int y = 0; y < height_out; y++)
-				dst_plane[(width_out-1)*stride_w_out+y*stride_h_out]=dst_plane[(width_out-2)*stride_w_out+y*stride_h_out];
-		}	
+        projected(y, width_out-1, p) = projected(y, width_out-2, p);
+		}
 	}
 
 
 	void buildOperator( DoubleTensor& matrix, DoubleTensor& rho, const double lambda, const int type, const DoubleTensor& image) 
 	{
-	        DoubleTensor* t_matrix = (DoubleTensor*)&matrix;
-		//DoubleTensor* t_projected = (DoubleTensor*)&projected;
-
-	        double* mat = (double*)t_matrix->dataW();
-	        //double* dst = t_projected->t->storage->data + t_projected->t->storageOffset;
-
-	        const int stride_h = t_matrix->stride(0);     // height
-	        const int stride_w = t_matrix->stride(1);     // width
-
 		// TODO: check that the dimensions are correct (square matrix)
 		const int width_matrix = matrix.size(1);
 
 		const int height = image.size(0);
 		const int width = image.size(1);	
 	
-		t_matrix->fill(0.);
+		matrix.fill(0.);
 
-		// Prepare pointer to efficient access to rho
-		double* rho_p = (double*)rho.dataW();
-
-		for (int i=0; i<width_matrix; i++)
+		for(int i=0; i<width_matrix; i++)
 		{
 			// CHECK WHERE WE ARE
 			bool up = true;
@@ -174,7 +117,7 @@ namespace Torch {
 			if ( (i % width) == (width - 1) )
 				right = false;
 
-			mat[ i*stride_w + i*stride_h] = 1.;
+			matrix(i, i) = 1.;
 			
 			// compute the diffusion coefficients associated to the current pixel (i)
 			int x_coord = i % width;
@@ -184,29 +127,29 @@ namespace Torch {
 			// upper diagonal
 			if (right)
 			{
-				mat[ i*stride_w + (i+1)*stride_h] = -lambda*rho_p[RIGHT];
-				mat[ i*stride_w + i*stride_h] += lambda*rho_p[RIGHT];
+				matrix(i+1,i) = -lambda*rho(RIGHT);
+				matrix(i,i) += lambda*rho(RIGHT);
 			}
 
 			// lower diagonal
 			if (left)
 			{
-				mat[ i*stride_w + (i-1)*stride_h] = -lambda*rho_p[LEFT];
-				mat[ i*stride_w + i*stride_h] += lambda*rho_p[LEFT];
+				matrix((i-1),i) = -lambda*rho(LEFT);
+				matrix(i,i) += lambda*rho(LEFT);
 			}
 
 			// upper fringe
 			if (down)
 			{
-				mat[ i*stride_w + (i+width)*stride_h] = -lambda*rho_p[DOWN];
-				mat[ i*stride_w + i*stride_h] += lambda*rho_p[DOWN];
+				matrix(i+width,i) = -lambda*rho(DOWN);
+				matrix(i,i) += lambda*rho(DOWN);
 			}
 
 			// lower fringe
 			if (up)
 			{
-				mat[ i*stride_w + (i-width)*stride_h] = -lambda*rho_p[UP];
-				mat[ i*stride_w + i*stride_h] += lambda*rho_p[UP];
+				matrix(i-width,i) = -lambda*rho(UP);
+				matrix(i,i) += lambda*rho(UP);
 			}
 		}
 	} 
@@ -214,10 +157,6 @@ namespace Torch {
   
 	void computeCoeff(DoubleTensor& rho, const DoubleTensor& image, const int x_coord, const int y_coord, const int type )
 	{
-		DoubleTensor* t_rho = (DoubleTensor*)&rho;
-
-	        double* rho_p = (double*)t_rho->dataW();
-
 		const int height = image.size(0);
 		const int width = image.size(1);
 
@@ -243,25 +182,25 @@ namespace Torch {
 			right = false;
     
 		// initial contrast values set to zero, updated if we can compute it ...
-		t_rho->fill(0.);
+		rho.fill(0.);
 
 		// compute the five points stencil coefficients
-		if (up) 
+		if(up) 
 			switch(type) 
 			{
 				case 0:
-					rho_p[UP] = 1.;
+					rho(UP) = 1.;
 					break;
 				case 1:
 					weber(rho, image, x_coord, y_coord, "up");
 				break;
 			} 
 
-		if (down) 
+		if(down)
 			switch(type) 
 			{
 				case 0:
-					rho_p[DOWN] = 1.;
+					rho(DOWN) = 1.;
 					break;
 				case 1:
 					weber(rho, image, x_coord, y_coord, "down");
@@ -272,7 +211,7 @@ namespace Torch {
 			switch(type) 
 			{
 				case 0:
-					rho_p[LEFT] = 1.;
+					rho(LEFT) = 1.;
 					break;
 				case 1:
 					weber(rho, image, x_coord, y_coord, "left");
@@ -283,32 +222,19 @@ namespace Torch {
 			switch(type) 
 			{
 				case 0:
-					rho_p[RIGHT] = 1.;
+					rho(RIGHT) = 1.;
 					break;
 				case 1:
 					weber(rho, image, x_coord, y_coord, "right");
 				break;
 			} 
 
-		rho_p[CENTER] =  rho_p[UP] + rho_p[DOWN] + rho_p[LEFT] + rho_p[RIGHT];
+		rho(CENTER) =  rho(UP) + rho(DOWN) + rho(LEFT) + rho(RIGHT);
 	}
 
 
 	void gaussSeidel(DoubleTensor& result, const DoubleTensor& source, DoubleTensor &rho, const double lambda, const int type) 
 	{
-	        DoubleTensor* t_result = (DoubleTensor*)&result;
-		DoubleTensor* t_source = (DoubleTensor*)&source;
-		DoubleTensor* t_rho = (DoubleTensor*)&rho;
-
-	        double* res = (double*)t_result->dataW();
-	        double* src = (double*)t_source->dataW();
-		double* rho_p = (double*)t_rho->dataW();
-
-	        const int src_stride_h = t_source->stride(0);     // height
-	        const int src_stride_w = t_source->stride(1);     // width
-	        const int res_stride_h = t_result->stride(0);     // height
-	        const int res_stride_w = t_result->stride(1);     // width
-	
 		const int height = source.size(0);
 		const int width = source.size(1);
 
@@ -324,19 +250,17 @@ namespace Torch {
 		double up, down, left, right, center;
 
 		// RED-BLACK GAUSS-SEIDEL
-                for (int y = 0; y < height; y ++)
-       	        {
-			double* src_row = &src[ y * src_stride_h ];
-			double* res_row = &res[ y * src_stride_h ];
-                       	for (int x = 0; x < width; x ++, src_row+=src_stride_w, res_row+=res_stride_w ) 
-                        {
+    for (int y = 0; y < height; y ++)
+    {
+     	for (int x = 0; x < width; x ++) 
+      {
 				// if we are  on the boundary
 				if ( (y == 0) || (y == height-1) ||  (x == 0) || (x == width-1) )
 				{ 
 					// set the boundary values to zero
-					*res_row = 0.;
+					result(y,x,0) = 0.;
 				} 
-				else 
+				else
 				{
 					// if we are on an "even" pixel
 					int idx = x + y*width;
@@ -344,29 +268,27 @@ namespace Torch {
 					{
 						computeCoeff(rho, source, x, y, type);
 
-						up = -lambda*rho_p[UP]* res[ (y-1)*res_stride_h + x*res_stride_w ];
-						down = -lambda*rho_p[DOWN]* res[ (y+1)*res_stride_h + x*res_stride_w ];
-						left = -lambda*rho_p[LEFT]* res[ y*res_stride_h + (x-1)*res_stride_w ];
-						right = -lambda*rho_p[RIGHT]* res[ y*res_stride_h + (x+1)*res_stride_w ];
-						center = 1 + lambda*rho_p[UP] + lambda*rho_p[DOWN] + lambda*rho_p[LEFT] + lambda*rho_p[RIGHT];
+						up = -lambda*rho(UP)* result( y-1, x, 0);
+						down = -lambda*rho(DOWN)* result( y+1, x, 0);
+						left = -lambda*rho(LEFT)* result( y, x-1, 0);
+						right = -lambda*rho(RIGHT)* result( y, x+1, 0);
+						center = 1 + lambda*rho(UP) + lambda*rho(DOWN) + lambda*rho(LEFT) + lambda*rho(RIGHT);
 
-						*res_row = *src_row / center - (up + down + left + right)/center;
+						result(y,x,0) = source(y,x,0) / center - (up + down + left + right)/center;
 					}
 				}
 			}
 		}
 
-                for (int y = 0; y < height; y ++)
-       	        {
-			double* src_row = &src[ y * src_stride_h ];
-			double* res_row = &res[ y * src_stride_h ];
-                       	for (int x = (y==0?1:0); x < width; x ++, src_row+=src_stride_w, res_row+=res_stride_w )
-                        {
+    for (int y = 0; y < height; y ++)
+    {
+    	for (int x = (y==0?1:0); x < width; x ++ )
+      {
 				// if we are on the boundary
 				if ( (y == 0) || (y == height-1) ||  (x == 0) || (x == width-1) )
 				{  
 					// set the boundary values to zero
-					*res_row = 0.;
+					result(y,x,0) = 0.;
 				} 
 				else 
 				{
@@ -376,13 +298,13 @@ namespace Torch {
 					{
 						computeCoeff(rho, source, x, y, type);
 
-						up = -lambda*rho_p[UP]* res[ (y-1)*res_stride_h + x*res_stride_w ];
-						down = -lambda*rho_p[DOWN]* res[ (y+1)*res_stride_h + x*res_stride_w ];
-						left = -lambda*rho_p[LEFT]* res[ y*res_stride_h + (x-1)*res_stride_w ];
-						right = -lambda*rho_p[RIGHT]* res[ y*res_stride_h + (x+1)*res_stride_w ];
-						center = 1 + lambda*rho_p[UP] + lambda*rho_p[DOWN] + lambda*rho_p[LEFT] + lambda*rho_p[RIGHT];
+						up = -lambda*rho(UP)* result( y-1, x, 0);
+						down = -lambda*rho(DOWN)* result( y+1, x, 0);
+						left = -lambda*rho(LEFT)* result( y, x-1, 0);
+						right = -lambda*rho(RIGHT)* result( y, x+1, 0);
+						center = 1 + lambda*rho(UP) + lambda*rho(DOWN) + lambda*rho(LEFT) + lambda*rho(RIGHT);
 
-						*res_row = *src_row / center - (up + down + left + right)/center;
+						result(y,x,0) = source(y,x,0) / center - (up + down + left + right)/center;
 					}
 				}
 			}
@@ -393,33 +315,14 @@ namespace Torch {
 
 	void myMultiply(const DoubleTensor& data, DoubleTensor& result, DoubleTensor& rho, const double lambda, const int type ) 
 	{
-
-	        DoubleTensor* t_result = (DoubleTensor*)&result;
-		const DoubleTensor* t_data = (DoubleTensor*)&data;
-
-	        double* res = (double*)t_result->dataW();
-	        const double* src = (const double*)t_data->dataR();
-
-	        const int src_stride_h = t_data->stride(0);     // height
-	        const int src_stride_w = t_data->stride(1);     // width
-
-	        const int res_stride_h = t_result->stride(0);     // height
-	        const int res_stride_w = t_result->stride(1);     // width
-
 		// TODO: check that the dimensions are correct (cmp src and res)
 		const int height = data.size(0);
 		const int width = data.size(1);
 
-	        double* rho_p = (double*)rho.dataW();
-
-                for (int y = 0; y < height; y ++)
-       	        {
-			double* res_row=&res[ y * res_stride_h ];
-			const double* src_row=&src[ y * src_stride_h ];
-                       	for (int x = 0; x < width; x++, src_row+=src_stride_w, res_row+=res_stride_w )
-                        {
-
-				// BEWARE --- first check were we are
+    for (int y = 0; y < height; y++)
+      for (int x = 0; x < width; x++)
+      {
+				// BEWARE --- first check where we are
 				bool up = true;
 				bool down = true;
 				bool left = true;
@@ -450,113 +353,82 @@ namespace Torch {
 				bool is_on_boundary = (!up || !down || !left || !right);
 	
 				if (is_on_boundary)
-					*res_row = 0.;//result.set(y, x, 0, 0.);
+					result(y,x,0) = 0.;
 				else 
 				{
 					computeCoeff(rho, data, x, y, type);
 
-					if (up)
+					if(up)
 					{
-						coeff_up = -lambda*rho_p[UP]* src[ (y-1)*src_stride_h + x*src_stride_w];
-						coeff_center += lambda*rho_p[UP];
+						coeff_up = -lambda*rho(UP) * data( y-1, x, 0);
+						coeff_center += lambda*rho(UP);
 					}
-					if (down) 
+					if(down) 
 					{
-						coeff_down = -lambda*rho_p[DOWN]* src[ (y+1)*src_stride_h + x*src_stride_w];//data.get(y+1,x,0);
-						coeff_center += lambda*rho_p[DOWN];
+						coeff_down = -lambda*rho(DOWN) * data( y+1, x, 0);
+						coeff_center += lambda*rho(DOWN);
 					}
-					if (left) 
+					if(left) 
 					{
-						coeff_left = -lambda*rho_p[LEFT]*src[ y*src_stride_h + (x-1)*src_stride_w];//data.get(y,x-1,0);
-						coeff_center += lambda*rho_p[LEFT];
+						coeff_left = -lambda*rho(LEFT) * data( y, x-1, 0);
+						coeff_center += lambda*rho(LEFT);
 					}
-					if (right) 
+					if(right) 
 					{
-						coeff_right = -lambda*rho_p[RIGHT]*src[ y*src_stride_h + (x+1)*src_stride_w];//data.get(y,x+1,0);
-						coeff_center += lambda*rho_p[RIGHT];
+						coeff_right = -lambda*rho(RIGHT) * data( y, x+1, 0);
+						coeff_center += lambda*rho(RIGHT);
 					}
 	
-					*res_row= coeff_center* *src_row + coeff_up + coeff_down + coeff_left + coeff_right; 
+					result(y,x,0) = coeff_center * data(y,x,0) + coeff_up + coeff_down + coeff_left + coeff_right; 
 				}
 			}
-		}
+
 	}
 
 
 	void jacobi(DoubleTensor& result, const DoubleTensor& source, DoubleTensor& rho, const double lambda, const int type )
 	{ 
-    
-	        DoubleTensor* t_result = (DoubleTensor*)&result;
-		DoubleTensor* t_source = (DoubleTensor*)&source;
-
-	        double* res = (double*)t_result->dataW();
-	        double* src = (double*)t_source->dataW();
-
-	        const int src_stride_h = t_source->stride(0);     // height
-	        const int src_stride_w = t_source->stride(1);     // width
-
-	        const int res_stride_h = t_result->stride(0);     // height
-	        const int res_stride_w = t_result->stride(1);     // width
-
 		// TODO: check that the dimensions are correct (cmp src and res)
 		const int height = source.size(0);
 		const int width = source.size(1);
 
 		double up, down, left, right, center;
 
-		DoubleTensor* old=new DoubleTensor( result.size(0), result.size(1), result.size(2) );
-		old->copy( &result );
-	        double* old_p = (double*)old->dataW();
-	        const int old_stride_h = old->stride(0);     // height
-	        const int old_stride_w = old->stride(1);     // width
- 
+		DoubleTensor old( result.size(0), result.size(1), result.size(2) );
+		old.copy( &result );
+
 		double weight = 1; // weight used in damped Jacobi (set to 1 = pure Jacobi)
 
-	        double* rho_p = (double*)rho.dataW();
-
-                for (int y = 0; y < height; y ++)
-       	        {
-			double* res_row=&res[ y * res_stride_h ];
-			double* src_row=&src[ y * src_stride_h ];
-                       	for (int x = 0; x < width; x ++, res_row+=res_stride_w, src_row+=src_stride_w )
-                        {
+    for (int y = 0; y < height; y++)
+      for (int x = 0; x < width; x++ )
+      {
 				// if we are  on the boundary
 				if ((y == 0) || (y == height-1) ||  (x == 0) || (x == width-1)) 
 					// set the boundary values to zero
-					*res_row = 0.;
+					result(y,x,0) = 0.;
 				else 
 				{
 					computeCoeff(rho, source, x, y, type);
 
-					up = -lambda*rho_p[UP]*old_p[ (y-1) * old_stride_h + x * old_stride_w ];
-					down = -lambda*rho_p[DOWN]*old_p[ (y+1) * old_stride_h + x * old_stride_w ];
-					left = -lambda*rho_p[LEFT]*old_p[ y * old_stride_h + (x-1) * old_stride_w ];
-					right = -lambda*rho_p[RIGHT]*old_p[ y * old_stride_h + (x+1) * old_stride_w ];
-					center = 1 + lambda*rho_p[UP] + lambda*rho_p[DOWN] + lambda*rho_p[LEFT] + lambda*rho_p[RIGHT];
+					up = -lambda*rho(UP) * old( y-1, x, 0);
+					down = -lambda*rho(DOWN) * old( y+1, x, 0);
+					left = -lambda*rho(LEFT) * old( y, x-1, 0);
+					right = -lambda*rho(RIGHT) * old( y, x+1, 0);
+					center = 1 + lambda*rho(UP) + lambda*rho(DOWN) + lambda*rho(LEFT) + lambda*rho(RIGHT);
 	
-					*res_row = (1-weight) * old_p[ y * old_stride_h + x * old_stride_w ] + weight*( *src_row /center - (up + down + left + right)/center);
+					result(y,x,0) = (1-weight) * old( y, x, 0) + weight * ( source(y,x,0) /center - (up + down + left + right)/center);
 				}
 			} 
-		}
-		delete old;
+
 	}
 
 
 	void weber(DoubleTensor& rho, const DoubleTensor &image, const int x_coord, const  int y_coord, const char *position) 
 	{
-	        DoubleTensor* t_image = (DoubleTensor*)&image;
-		DoubleTensor* t_rho = (DoubleTensor*)&rho;
-
-	        double* img = (double*)t_image->dataW();
-	        double* rho_p = (double*)t_rho->dataW();
-
-	        const int stride_h = t_image->stride(0);     // height
-	        const int stride_w = t_image->stride(1);     // width
-
 		if (strcmp(position, "up") == 0) 
 		{
-			double center = img[ y_coord * stride_h + x_coord * stride_w ]; 
-			double up = img[ (y_coord-1) * stride_h + x_coord * stride_w ];
+			double center = image( y_coord, x_coord, 0); 
+			double up = image( y_coord-1, x_coord, 0);
 			double diff = fabs(center - up);
 			double min = 0.0;
 
@@ -566,15 +438,15 @@ namespace Torch {
 				min = up;
 
 			if (IS_NEAR(diff, 0, 1))
-				rho_p[UP] = min;
+				rho(UP) = min;
 			else 
-				rho_p[UP] = min/diff;
+				rho(UP) = min/diff;
 		}
 
 		if (strcmp(position, "down") == 0) 
 		{
-			double center = img[ y_coord * stride_h + x_coord * stride_w ]; 
-			double down = img[ (y_coord+1) * stride_h + x_coord * stride_w ];
+			double center = image( y_coord, x_coord, 0); 
+			double down = image( y_coord+1, x_coord, 0);
 			double diff = fabs(center - down);
 			double min = 0.0;
 
@@ -584,15 +456,15 @@ namespace Torch {
 				min = down;
 
 			if (IS_NEAR(diff, 0, 1))
-				rho_p[DOWN] = min;
+				rho(DOWN) = min;
 			else 
-				rho_p[DOWN] = min/diff;
+				rho(DOWN) = min/diff;
 		}
 
 		if (strcmp(position, "left") == 0) 
 		{
-			double center = img[ y_coord * stride_h + x_coord * stride_w ]; 
-			double left = img[ y_coord * stride_h + (x_coord-1) * stride_w ];
+			double center = image( y_coord, x_coord, 0); 
+			double left = image( y_coord, x_coord-1, 0);
 			double diff = fabs(center - left);
 			double min = 0.0;
 
@@ -602,15 +474,15 @@ namespace Torch {
 				min = left;
 
 			if (IS_NEAR(diff, 0, 1))
-				rho_p[LEFT] = min;
+				rho(LEFT) = min;
 			else 
-				rho_p[LEFT] = min/diff;
+				rho(LEFT) = min/diff;
 		}
 
 		if (strcmp(position, "right") == 0) 
 		{
-			double center = img[ y_coord * stride_h + x_coord * stride_w ]; 
-			double right = img[ y_coord * stride_h + (x_coord+1) * stride_w ];
+			double center = image( y_coord, x_coord, 0); 
+			double right = image( y_coord, x_coord+1, 0);
 			double diff = fabs(center - right);
 			double min = 0.0;
 
@@ -620,9 +492,9 @@ namespace Torch {
 				min = right;
 
 			if (IS_NEAR(diff, 0, 1))
-				rho_p[RIGHT] = min;
+				rho(RIGHT) = min;
 			else 
-				rho_p[RIGHT] = min/diff;
+				rho(RIGHT) = min/diff;
 		}
 	}
 

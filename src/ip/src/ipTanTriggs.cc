@@ -88,11 +88,6 @@ namespace Torch {
     const ShortTensor* t_input = (ShortTensor*)&input;
     ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-    const short* src = (const short*)t_input->dataR();
-
-    const int src_stride_h = t_input->stride(0);     // height
-    const int src_stride_w = t_input->stride(1);     // width
-
     // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
     const int width = input.size(1);
     const int height = input.size(0);
@@ -100,28 +95,20 @@ namespace Torch {
 
     // Temporary output destination tensor
     DoubleTensor t_output_double1( t_output->size(0), t_output->size(1), t_output->size(2) );
-    double* dst_double1 = (double*)t_output_double1.dataW();
-
-    const int dst_stride_h = t_output_double1.stride(0);     // height
-    const int dst_stride_w = t_output_double1.stride(1);     // width
-
 
     //////// PERFORM GAMMA COMPRESSION /////////
     // Initialize indices
     for (int y=0; y<height; y++) 
     {
-      const short* src_row=&src[y*src_stride_h];
-      double* dst_row=&dst_double1[y*dst_stride_h];
-      for (int x=0; x<width; x++, src_row+=src_stride_w, dst_row+=dst_stride_w )
+      for (int x=0; x<width; x++ )
       {	
         if ( fabs(gamma) > 1e-12 ) //STL std::numeric_limits<double>::epsilon( ) )
-          *dst_row = pow( *src_row, gamma );
+          (t_output_double1)(y,x,0) = pow( (*t_input)(y,x,0), gamma );
         // TODO which value to add in the log?
         else
-          *dst_row = log( 1. + *src_row );
+          (t_output_double1)(y,x,0) = log( 1. + (*t_input)(y,x,0) );
       }
     }
-    t_output_double1.resetFromData();
 
     //////// PERFORM DoG FILTERING /////////
     // Compute DoG kernel
@@ -129,13 +116,11 @@ namespace Torch {
 
     // Temporary output destination tensor
     DoubleTensor t_output_double2( t_output->size(0), t_output->size(1), t_output->size(2) );
-    double* dst_double2 = (double*)t_output_double2.dataW();
 
     // Perform convolution using mirror interpolation
     const int r=real_size/2;
     for (int y = 0; y < height; y ++)
     {
-      double* dst_row = &dst_double2[y * dst_stride_h];
       for (int x = 0; x < width; x ++)
       {
         // Apply the kernel for the <y, x> pixel
@@ -149,8 +134,6 @@ namespace Torch {
             yyy=abs(yyy)-1;
           if (yyy>=height)
             yyy=2*height-yyy-1;
-          //				const short* src_row = &src[ yyy * src_stride_h ];	
-          const double* src_row = &dst_double1[yyy * dst_stride_h];
           for (int xx = -r; xx <= r; xx ++)
           {
             // mirror interpolation
@@ -159,15 +142,14 @@ namespace Torch {
               xxx=abs(xxx)-1;
             if (xxx>=width)
               xxx=2*width-xxx-1;
-            sum += 	DoG->get(yy + r, xx + r) * src_row[ xxx * src_stride_w ];
+            sum += 	DoG->get(yy + r, xx + r) * (t_output_double1)(yyy,xxx,0);
           }
         }
 
         // Save the double value
-        dst_row[ x * dst_stride_w] = sum;
+        (t_output_double2)(y,x,0) = sum;
       }
     }
-    t_output_double2.resetFromData();
 
 
     //////// PERFORM CONTRAST EQUALIZATION ////////
@@ -177,20 +159,18 @@ namespace Torch {
     double sum=0.;
     for (int y = 0; y < height; y ++)
     {
-      double* dst_row= &dst_double2[y * dst_stride_h];
-      for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
+      for (int x = 0; x < width; x ++ )
       {
-        sum += pow( fabs(*dst_row), alpha);
+        sum += pow( fabs((t_output_double2)(y,x,0)), alpha);
       }
     }
     sum = pow( sum/wxh , inv_alpha);
 
     for (int y = 0; y < height; y ++)
     {
-      double* dst_row= &dst_double2[y * dst_stride_h];
-      for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
+      for (int x = 0; x < width; x ++ )
       {
-        *dst_row /= sum;
+        (t_output_double2)(y,x,0) /= sum;
       }
     }
 
@@ -200,13 +180,12 @@ namespace Torch {
     sum=0.;
     for (int y = 0; y < height; y ++)
     {
-      double* dst_row = &dst_double2[y * dst_stride_h];
-      for (int x = 0; x < width; x++, dst_row+=dst_stride_w )
+      for (int x = 0; x < width; x++)
       {
         double var;
-        if (  fabs(*dst_row)<threshold )
+        if (  fabs((t_output_double2)(y,x,0))<threshold )
         {
-          var =  pow( fabs( *dst_row ), alpha );
+          var =  pow( fabs( (t_output_double2)(y,x,0) ), alpha );
         }
         else
           var = threshold_alpha;
@@ -217,20 +196,18 @@ namespace Torch {
 
     for (int y = 0; y < height; y ++)
     {
-      double* dst_row = &dst_double2[y * dst_stride_h];
-      for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
+      for (int x = 0; x < width; x ++ )
       {
-        *dst_row /= sum;
+        (t_output_double2)(y,x,0) /= sum;
       }
     }
 
     // Last step: I:= threshold * tanh( I / threshold )	
     for (int y = 0; y < height; y ++)
     {
-      double* dst_row = &dst_double2[y * dst_stride_h];
-      for (int x = 0; x < width; x ++, dst_row+=dst_stride_w )
+      for (int x = 0; x < width; x ++ )
       {
-        *dst_row = threshold * tanh( *dst_row / threshold );
+        (t_output_double2)(y,x,0) = threshold * tanh( (t_output_double2)(y,x,0) / threshold );
       }
     }
 
@@ -239,7 +216,8 @@ namespace Torch {
     // Rescale the values in [0,255] and copy it into the output Tensor
     ipCore *rescale = new ipRescaleGray();
     CHECK_FATAL(rescale->process(t_output_double2) == true);
-    t_output->copy( &(rescale->getOutput(0)) );
+    const ShortTensor* out = (const ShortTensor*)&rescale->getOutput(0);
+    t_output->copy( out );
     delete rescale;
 
     delete DoG;
@@ -251,10 +229,6 @@ namespace Torch {
   {
     // TODO: Check that size is an odd number
     DoubleTensor* res=new DoubleTensor(size, size);
-    double* res_p = (double*)res->dataW();
-
-    const int res_stride_h = res->stride(0);     // height
-    const int res_stride_w = res->stride(1);     // width
 
     const double inv_sigma0_2 = 0.5  / (sigma0*sigma0);
     const double inv_sigma1_2 = 0.5  / (sigma1*sigma1);
@@ -291,15 +265,12 @@ namespace Torch {
 
     for (int y = 0 ; y < size ; y++)
     {
-      double* res_row=&res_p[ y * res_stride_h ];
-      for (int x = 0 ; x < size ; x++, res_row+=res_stride_w )
+      for (int x = 0 ; x < size ; x++ )
       {
-
         int ind =  y * size + x;
-        *res_row = inv_sum0 * g0[ ind ] - inv_sum1 * g1[ ind ];
+        (*res)(y,x) = inv_sum0 * g0[ ind ] - inv_sum1 * g1[ ind ];
       }
     }
-    res->resetFromData();
 
     delete[] g0;
     delete[] g1;

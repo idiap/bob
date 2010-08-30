@@ -82,11 +82,6 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 	const ShortTensor* t_input = (const ShortTensor*)&input;
 	ShortTensor* t_output = (ShortTensor*)m_output[0];
 
-	const short* src = (const short*)t_input->dataR();
-
-  const int src_stride_h = t_input->stride(0);     // height
-  const int src_stride_w = t_input->stride(1);     // width
-
   // An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p]
   const int width = input.size(1);
   const int height = input.size(0);
@@ -115,7 +110,8 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 
     
 		filtered_array[s] = new ShortTensor(input.size(0), input.size(1), input.size(2));
-		filtered_array[s]->copy( &(weighedGaussian->getOutput(0)) ); 
+    const ShortTensor *out = (const ShortTensor*)&weighedGaussian->getOutput(0);
+		filtered_array[s]->copy( out ); 
 		delete weighedGaussian;
 	}
 
@@ -126,10 +122,7 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 
 	for (int s = 0; s < s_nb ; s++)
 	{
-		const short* s_filter = (const short*)filtered_array[s]->dataR();
-
-    const int s_filter_stride_h = ((ShortTensor*)filtered_array[s])->stride(0);     // height
-    const int s_filter_stride_w = ((ShortTensor*)filtered_array[s])->stride(1);     // width
+		const ShortTensor* s_filter = (const ShortTensor*)filtered_array[s];
 
     for (int y = 0; y < height; y++ )
 		{
@@ -138,7 +131,7 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 				// +1 inside the log to avoid log(0). Could choose a smaller value
 				// TODO: make alternative nonlinear transformation such as
 				// arctan, sigmoid possible instead of logarithm
-        (*dst_double)(y,x,0) += log( (src[ y*src_stride_h + x*src_stride_w ]+1.) ) - log( (s_filter[ y*s_filter_stride_h + x*s_filter_stride_w ]+1.) );
+        (*dst_double)(y,x,0) += log( (*t_input)(y,x,0)+1.)  - log( (*s_filter)(y,x,0)+1.);
 			}
 		}
 	}
@@ -146,7 +139,8 @@ bool ipSelfQuotientImage::processInput(const Tensor& input)
 	// Rescale the values in [0,255] and copy it into the output Tensor
 	ipCore *rescale = new ipRescaleGray();
 	CHECK_FATAL(rescale->process(*dst_double) == true);
-	t_output->copy( &(rescale->getOutput(0)) );
+	const ShortTensor *out_d = (const ShortTensor*)(&rescale->getOutput(0));
+	t_output->copy( out_d );
 
 	// clean up
 	delete dst_double;

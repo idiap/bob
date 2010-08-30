@@ -2,38 +2,29 @@
 //STL #include <limits>
 
 #define COMPUTE_SCALE_GRAY(tensorType, dataType)                                                                     \
-{                                                                                                                    \
-	const tensorType* t_input = (tensorType*)&input;                                                             \
-	const dataType* src = (const dataType*)input.dataR();                                                        \
-                                                                                                                     \
-        const int src_stride_h = t_input->stride(0);     /* height */                                             \
-        const int src_stride_w = t_input->stride(1);     /* width */                                              \
-        const int src_stride_p = t_input->stride(2);     /* nb planes */                                          \
-                                                                                                                     \
-        /* An index for the 3D tensor is: [y * stride_h + x * stride_w + p * stride_p] */                            \
-        const int height = input.size(0);                                                                            \
-        const int width = input.size(1);                                                                             \
-        const int n_planes = input.size(2);                                                                          \
-                                                                                                                     \
-        /* Start to "normalize" current values in range [0,255] */                                                   \
-	double max_val = src[0]; /*STL std::numeric_limits<double>::min( ); */                                       \
-	double min_val = src[0]; /*STL std::numeric_limits<double>::max( ); */                                       \
+{   \
+  const tensorType* t_input = (const tensorType*)&input; \
+  const int height = t_input->size(0);                                                                          \
+  const int width = t_input->size(1);                                                                          \
+  const int n_planes = t_input->size(2);                                                                          \
+                                                                                                                \
+  /* Start to "normalize" current values in range [0,255] */                                                   \
+	double max_val = (*t_input)(0,0,0); /*STL std::numeric_limits<double>::min( ); */                                       \
+	double min_val = (*t_input)(0,0,0); /*STL std::numeric_limits<double>::max( ); */                                       \
 	double range;                                                                                                \
                                                                                                                      \
 	/* find min and max values in the image */                                                                   \
 	for( int p=0; p<n_planes; p++ )                                                                              \
 	{                                                                                                            \
-		const dataType* src_plane = &src[ p * src_stride_p ];                                                \
 		for( int y=0; y<height; y++ )                                                                        \
 		{                                                                                                    \
-			const dataType* src_row = &src_plane[ y * src_stride_h ];                                    \
-			for( int x=0; x<width; x++, src_row += src_stride_w )                                        \
+			for( int x=0; x<width; x++ )                                        \
 			{                                                                                            \
-				if (*src_row > max_val)                                                              \
-					max_val = *src_row;                                                          \
+				if ((*t_input)(y,x,p) > max_val)                                                              \
+					max_val = (*t_input)(y,x,p);                                                          \
                                                                                                                      \
-				if (*src_row < min_val)                                                              \
-					min_val = *src_row;                                                          \
+				if ((*t_input)(y,x,p) < min_val)                                                              \
+					min_val = (*t_input)(y,x,p);                                                          \
 			}                                                                                            \
 		}                                                                                                    \
 	}                                                                                                            \
@@ -46,15 +37,11 @@
 	/* Change the scale */                                                                                       \
 	for( int p=0; p<n_planes; p++ )                                                                              \
 	{                                                                                                            \
-		const dataType* src_plane = &src[ p * src_stride_p ];                                                \
-		short* dst_plane = &dst[ p * dst_stride_p ];                                                         \
 		for( int y=0; y<height; y++ )                                                                        \
 		{                                                                                                    \
-			const dataType* src_row = &src_plane[ y * src_stride_h ];                                    \
-			short* dst_row = &dst_plane[ y * dst_stride_h ];                                             \
-			for( int x=0; x<width; x++, src_row += dst_stride_w, dst_row+= dst_stride_w )                \
+			for( int x=0; x<width; x++ )                \
 			{                                                                                            \
-				*dst_row = ( range_zero ? 0 : FixI(255. * (*src_row - min_val) / range) );           \
+				(*t_output)(y,x,p) = ( range_zero ? 0 : FixI(255. * ((*t_input)(y,x,p) - min_val) / range) );           \
 			}                                                                                            \
 		}                                                                                                    \
 	}                                                                                                            \
@@ -124,11 +111,6 @@ bool ipRescaleGray::processInput(const Tensor& input)
 {
 	// Prepare direct access to output data
 	ShortTensor* t_output = (ShortTensor*)m_output[0];	
-	short* dst = (short*)t_output->dataW();                                                                   
-                                              
-        const int dst_stride_h = t_output->stride(0);     /* height */                                                 
-        const int dst_stride_w = t_output->stride(1);     /* width */
-        const int dst_stride_p = t_output->stride(2);     /* nb_planes */
 
 	switch (input.getDatatype())
 	{
@@ -155,10 +137,12 @@ bool ipRescaleGray::processInput(const Tensor& input)
 		case Tensor::Double:
 			COMPUTE_SCALE_GRAY(DoubleTensor, double);
 			break;
+
+    default:
+      break;
 	}
 
 	// OK
-  t_output->resetFromData();
 	return true;
 }
 

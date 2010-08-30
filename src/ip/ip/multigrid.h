@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_MULTIGRID_H_
 
 #include "core/Tensor.h"
+#include "core/general.h"
 
 // used for the coefficients
 #define CENTER 0
