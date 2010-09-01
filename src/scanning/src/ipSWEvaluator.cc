@@ -52,7 +52,7 @@ bool ipSWEvaluator::setClassifier(const char* filename)
 /////////////////////////////////////////////////////////////////////////
 // Access functions
 
-inline bool ipSWEvaluator::isPattern() const
+bool ipSWEvaluator::isPattern() const
 {
         if (m_classifier == 0)
         {
