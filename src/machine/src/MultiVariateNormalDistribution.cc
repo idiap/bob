@@ -11,15 +11,15 @@ MultiVariateNormalDistribution::MultiVariateNormalDistribution()
 	means = NULL;
 	weights = NULL;
 	variances = NULL;
-	threshold_variances = NULL;
+//	threshold_variances = NULL;
 
 	//
-	acc_posteriors_weights = NULL;
-	buffer_acc_posteriors_means = NULL;
-	acc_posteriors_means = NULL;
-	buffer_acc_posteriors_variances = NULL;
-	acc_posteriors_variances = NULL;
-	current_likelihood_one_mean = NULL;
+//	acc_posteriors_weights = NULL;
+//	buffer_acc_posteriors_means = NULL;
+//	acc_posteriors_means = NULL;
+//	buffer_acc_posteriors_variances = NULL;
+//	acc_posteriors_variances = NULL;
+//	current_likelihood_one_mean = NULL;
 
 	frame_ = new DoubleTensor();
 	sequence_ = new DoubleTensor();
@@ -41,14 +41,14 @@ MultiVariateNormalDistribution::MultiVariateNormalDistribution(int n_inputs_, in
 	means = NULL;
 	weights = NULL;
 	variances = NULL;
-	threshold_variances = NULL;
+//	threshold_variances = NULL;
 
-	acc_posteriors_weights = NULL;
-	buffer_acc_posteriors_means = NULL;
-	acc_posteriors_means = NULL;
-	buffer_acc_posteriors_variances = NULL;
-	acc_posteriors_variances = NULL;
-	current_likelihood_one_mean = NULL;
+//	acc_posteriors_weights = NULL;
+//	buffer_acc_posteriors_means = NULL;
+//	acc_posteriors_means = NULL;
+//	buffer_acc_posteriors_variances = NULL;
+//	acc_posteriors_variances = NULL;
+//	current_likelihood_one_mean = NULL;
 
 	frame_ = new DoubleTensor();
 	sequence_ = new DoubleTensor();
@@ -71,7 +71,7 @@ bool MultiVariateNormalDistribution::resize(int n_inputs_, int n_means_)
 	//
 	weights = m_parameters->getDarray("weigths");
 	double *means_ = m_parameters->getDarray("means");
-	means = (double **) THAlloc(n_means_ * sizeof(double *));
+	means = new double*[n_means_];
 	double *p = means_;
 	for(int j = 0 ; j < n_means_ ; j++)
 	{
@@ -80,13 +80,13 @@ bool MultiVariateNormalDistribution::resize(int n_inputs_, int n_means_)
 	}
 
 	//
-	current_likelihood_one_mean = (double *) THAlloc(n_means_ * sizeof(double));
+	current_likelihood_one_mean.reset(new double[n_means]);
 	for(int j = 0 ; j < n_means_ ; j++) current_likelihood_one_mean[j] = 0.0;
 
 	//
-	acc_posteriors_weights = (double *) THAlloc(n_means_ * sizeof(double));
-	buffer_acc_posteriors_means = (double *) THAlloc(n_means_ * n_inputs_ * sizeof(double));
-	acc_posteriors_means = (double **) THAlloc(n_means_ * sizeof(double *));
+	acc_posteriors_weights.reset(new double[n_means]);
+	buffer_acc_posteriors_means.reset(new double[n_means_*n_inputs_]);
+	acc_posteriors_means.reset(new double*[n_means_]);
 
 	for(int j = 0 ; j < n_means_ ; j++)
 		acc_posteriors_means[j] = &buffer_acc_posteriors_means[j*n_inputs_];
@@ -94,7 +94,7 @@ bool MultiVariateNormalDistribution::resize(int n_inputs_, int n_means_)
 	//
 	double *variances_ = m_parameters->getDarray("variances");
 
-	variances = (double **) THAlloc(n_means_ * sizeof(double *));
+	variances = new double*[n_means_];
 	p = variances_;
 	for(int j = 0 ; j < n_means_ ; j++)
 	{
@@ -103,11 +103,11 @@ bool MultiVariateNormalDistribution::resize(int n_inputs_, int n_means_)
 	}
 	
 	//
-	threshold_variances = (double *) THAlloc(n_inputs_ * sizeof(double));
+	threshold_variances.reset(new double[n_inputs_]);
 	for(int i = 0 ; i < n_inputs_ ; i++) threshold_variances[i] = 1e-10;
 
-	buffer_acc_posteriors_variances = (double *) THAlloc(n_means_ * n_inputs_ * sizeof(double));
-	acc_posteriors_variances = (double **) THAlloc(n_means_ * sizeof(double *));
+	buffer_acc_posteriors_variances.reset(new double[n_means_ * n_inputs_]);
+	acc_posteriors_variances.reset(new double*[n_means_]);
 
 	for(int j = 0 ; j < n_means_ ; j++)
 		acc_posteriors_variances[j] = &buffer_acc_posteriors_variances[j*n_inputs_];
@@ -119,15 +119,8 @@ bool MultiVariateNormalDistribution::cleanup()
 {
 	//Torch::print("MultiVariateNormalDistribution::cleanup()\n");
 
-	if(acc_posteriors_means != NULL) THFree(acc_posteriors_means);
-	if(buffer_acc_posteriors_means != NULL) THFree(buffer_acc_posteriors_means);
-	if(acc_posteriors_weights != NULL) THFree(acc_posteriors_weights);
-	if(current_likelihood_one_mean != NULL) THFree(current_likelihood_one_mean);
-	if(means != NULL) THFree(means);
-	if(acc_posteriors_variances != NULL) THFree(acc_posteriors_variances);
-	if(buffer_acc_posteriors_variances != NULL) THFree(buffer_acc_posteriors_variances);
-	if(threshold_variances != NULL) THFree(threshold_variances);
-	if(variances != NULL) THFree(variances);
+	delete [] means;
+	delete [] variances;
 
 	return true;
 }

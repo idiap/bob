@@ -16,7 +16,7 @@ MultiVariateMAPDiagonalGaussianDistribution::MultiVariateMAPDiagonalGaussianDist
 	n_means = prior->m_parameters->getI("n_means");
 
 	double *means_ = prior->m_parameters->getDarray("means");
-	prior_means = (double **) THAlloc(n_means * sizeof(double *));
+	prior_means.reset(new double*[n_means]);
 	double *p = means_;
 	for(int j = 0 ; j < n_means ; j++)
 	{
@@ -32,7 +32,6 @@ MultiVariateMAPDiagonalGaussianDistribution::MultiVariateMAPDiagonalGaussianDist
 
 MultiVariateMAPDiagonalGaussianDistribution::~MultiVariateMAPDiagonalGaussianDistribution()
 {
-	THFree(prior_means);
 }
 
 bool MultiVariateMAPDiagonalGaussianDistribution::prepare()

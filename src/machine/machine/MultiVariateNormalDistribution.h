@@ -3,6 +3,7 @@
 
 #include "machine/ProbabilityDistribution.h"
 #include "core/DataSet.h"
+#include <boost/scoped_array.hpp>
 
 namespace Torch {
 
@@ -79,14 +80,14 @@ protected:
 	double **variances;
 
 	//
-	double *threshold_variances;
+	boost::scoped_array<double>   threshold_variances;
 
 	//
 	int best_mean;
 
 	//
 	double current_likelihood;
-	double *current_likelihood_one_mean;
+	boost::scoped_array<double>   current_likelihood_one_mean;
 
 	//
 	double global_likelihood;
@@ -94,11 +95,11 @@ protected:
 	//---
 	
 	double acc_posteriors_sum_weights;
-	double *acc_posteriors_weights;
-	double *buffer_acc_posteriors_means;
-	double **acc_posteriors_means;
-	double *buffer_acc_posteriors_variances;
-	double **acc_posteriors_variances;
+	boost::scoped_array<double>   acc_posteriors_weights;
+	boost::scoped_array<double>   buffer_acc_posteriors_means;
+	boost::scoped_array<double*>  acc_posteriors_means;
+	boost::scoped_array<double>   buffer_acc_posteriors_variances;
+  boost::scoped_array<double*>  acc_posteriors_variances;
 
 	DoubleTensor *frame_;
 	DoubleTensor *sequence_;

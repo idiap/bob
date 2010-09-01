@@ -3,45 +3,39 @@
 
 namespace Torch
 {
-    StochasticGradientTrainer::StochasticGradientTrainer() : Trainer()
-    {
-	addIOption("max iter", 10, "maximum number of iterations");
-	addFOption("end accuracy", 0.0001, "end accuracy");
-	addIOption("early stopping", 0, "maximum number of iterations for early stopping");
-	addFOption("learning rate", 0.01, "learning rate");
-	addFOption("learning rate decay", 0.0, "learning rate decay");
-	addFOption("weight decay", 0.0, "weight decay");
-	addFOption("momentum", 0.0, "Inertia momentum");
+  StochasticGradientTrainer::StochasticGradientTrainer() : Trainer()
+  {
+  	addIOption("max iter", 10, "maximum number of iterations");
+  	addFOption("end accuracy", 0.0001, "end accuracy");
+	  addIOption("early stopping", 0, "maximum number of iterations for early stopping");
+  	addFOption("learning rate", 0.01, "learning rate");
+	  addFOption("learning rate decay", 0.0, "learning rate decay");
+  	addFOption("weight decay", 0.0, "weight decay");
+	  addFOption("momentum", 0.0, "Inertia momentum");
 
-        m_shuffledindex = NULL;
+    m_shuffledindex = NULL;
+  }
+
+  void shuffle(long *array, long n_elements)
+  {
+  	for(long i = 0; i < n_elements; i++)
+   	{
+   	   int z = (int) THRandom_uniform(0, (double)(n_elements - i - 1));
+       std::swap(array[i], array[z+i]);
+   	}
+  }
+
+  bool StochasticGradientTrainer::train()
+  {
+    print("StochasticGradientTrainer::train() ...\n");
+
+	  //
+    if (m_machine == NULL)
+    {
+      warning("StochasticGradientTrainer::train() no machine.");
+
+      return false;
     }
-
-    void shuffle(void *array, int size_element, long n_elements)
-    {
-    	void *swap_ = THAlloc(size_element);
-    	char *array_ = (char *) array;
-    
-    	for(long i = 0; i < n_elements; i++)
-    	{
-    	   int z = (int) THRandom_uniform(0, (double)(n_elements - i - 1));
-    	   memcpy(swap_, array_ + i*size_element, size_element);
-    	   memcpy(array_ + i*size_element, array_ + (z + i)*size_element, size_element);
-    	   memcpy(array_ + (z + i)*size_element, swap_, size_element);
-    	}
-    	THFree(swap_);
-    }
-
-    bool StochasticGradientTrainer::train()
-    {
-        print("StochasticGradientTrainer::train() ...\n");
-
-	//
-        if (m_machine == NULL)
-        {
-            warning("StochasticGradientTrainer::train() no machine.");
-
-            return false;
-        }
 
 	/*
 	int m_id_ = 1000 * (int) (m_machine->getID() / 1000); 
@@ -54,144 +48,144 @@ namespace Torch
 	*/
 
 	//
-        if (m_criterion == NULL)
-        {
-            warning("StochasticGradientTrainer::train() no criterion.");
+    if (m_criterion == NULL)
+    {
+      warning("StochasticGradientTrainer::train() no criterion.");
 
-            return false;
-        }
+      return false;
+    }
 
 	//
-        if (m_dataset == NULL)
-        {
-            warning("StochasticGradientTrainer::train() no dataset.");
+    if (m_dataset == NULL)
+    {
+      warning("StochasticGradientTrainer::train() no dataset.");
 
-            return false;
-        }
+      return false;
+    }
 
-        //
-        long m_n_examples = m_dataset->getNoExamples();
-        if (m_n_examples < 2)
-        {
-            warning("StochasticGradientTrainer::train() not enough examples in the  dataset.");
+    //
+    long m_n_examples = m_dataset->getNoExamples();
+    if (m_n_examples < 2)
+    {
+      warning("StochasticGradientTrainer::train() not enough examples in the  dataset.");
 
-            return false;
-        }
+      return false;
+    }
 
-        // testing at least if the dataset has targets
-        if (m_dataset->hasTargets() != true)
-        {
-            warning("StochasticGradientTrainer::train() no targets in the dataset.");
+    // testing at least if the dataset has targets
+    if (m_dataset->hasTargets() != true)
+    {
+      warning("StochasticGradientTrainer::train() no targets in the dataset.");
 
-            return false;
-        }
+      return false;
+    }
 
-        //
-    	if (m_shuffledindex == NULL) delete []m_shuffledindex;
-        m_shuffledindex = new long [m_n_examples];
-        for (int i=0 ; i<m_n_examples ; i++) m_shuffledindex[i] = i;
-	shuffle(m_shuffledindex, sizeof(long), m_n_examples);
+    //
+   	if (m_shuffledindex == NULL) delete []m_shuffledindex;
+      m_shuffledindex = new long [m_n_examples];
+    for (int i=0 ; i<m_n_examples ; i++) m_shuffledindex[i] = i;
+  	shuffle(m_shuffledindex, m_n_examples);
 	
-	//
-	int max_iter = getIOption("max iter");
-	float end_accuracy = getFOption("end accuracy");
-	//int early_stopping = getIOption("early stopping");
-	float learning_rate = getFOption("learning rate");
-	float learning_rate_decay = getFOption("learning rate decay");
-	float weight_decay = getFOption("weight decay");
-	float momentum = getFOption("momentum");
+	  //
+  	int max_iter = getIOption("max iter");
+	  float end_accuracy = getFOption("end accuracy");
+  	//int early_stopping = getIOption("early stopping");
+	  float learning_rate = getFOption("learning rate");
+  	float learning_rate_decay = getFOption("learning rate decay");
+	  float weight_decay = getFOption("weight decay");
+  	float momentum = getFOption("momentum");
 
-	//
-	GradientMachine *g_machine = (GradientMachine *) m_machine;
+	  //
+  	GradientMachine *g_machine = (GradientMachine *) m_machine;
 
-	g_machine->setFOption("weight decay", weight_decay);
-	g_machine->setFOption("momentum", momentum);
+	  g_machine->setFOption("weight decay", weight_decay);
+  	g_machine->setFOption("momentum", momentum);
 
-	g_machine->prepare();
+	  g_machine->prepare();
 
-	g_machine->shuffle();
+  	g_machine->shuffle();
 
-	//int n_parameters_ = g_machine->m_parameters->getI("n_parameters");
-	//double *parameters_ = g_machine->m_parameters->getDarray("parameters");
-	//double *der_parameters_ = g_machine->m_parameters->getDarray("der_parameters");
+	  //int n_parameters_ = g_machine->m_parameters->getI("n_parameters");
+  	//double *parameters_ = g_machine->m_parameters->getDarray("parameters");
+	  //double *der_parameters_ = g_machine->m_parameters->getDarray("der_parameters");
 																		                
-	//
-	double current_learning_rate = learning_rate;
-	double previous_error = 100000.0;
-	int iter = 0;
+  	//
+	  double current_learning_rate = learning_rate;
+  	double previous_error = 100000.0;
+	  int iter = 0;
 
-	while(1)
-	{
-		double error = 0.0;
+  	while(1)
+	  {
+		  double error = 0.0;
 
-        	for (long i=0 ; i<m_n_examples ; i++)
-        	{
+      for (long i=0 ; i<m_n_examples ; i++)
+      {
 		   	//
-			g_machine->Ginit();
+			  g_machine->Ginit();
 
    			Tensor *example = m_dataset->getExample(m_shuffledindex[i]);
   			Tensor *target = m_dataset->getTarget(m_shuffledindex[i]);
         	        
-			// forward
-			g_machine->forward(*example);
+  			// forward
+	  		g_machine->forward(*example);
 
-			// criterion
-			m_criterion->forward(&g_machine->getOutput(), target);
+		  	// criterion
+			  m_criterion->forward(&g_machine->getOutput(), target);
 			
-			// backward
-			g_machine->backward(*example, m_criterion->m_beta);
+  			// backward
+	  		g_machine->backward(*example, m_criterion->m_beta);
 
-			error += m_criterion->m_error->get(0);
+		  	error += m_criterion->m_error->get(0);
 		
-			//
-			g_machine->Gupdate(current_learning_rate);
-        	}
+			  //
+  			g_machine->Gupdate(current_learning_rate);
+      }
 
-		// !!!! consider saving the model at each iteration !!!!
-		// ..
+  		// !!!! consider saving the model at each iteration !!!!
+	  	// ..
 
-		print(".");
+		  print(".");
 
    		//
-		error /= (double) m_n_examples;
-		print("error @ %d = %g (%g)\n", iter, error, current_learning_rate);
+  		error /= (double) m_n_examples;
+	  	print("error @ %d = %g (%g)\n", iter, error, current_learning_rate);
 
-		//
-		if(fabs(previous_error - error) < end_accuracy)
- 		{
-			print("End of accuracy\n");
-			break;
-		}
-		previous_error = error;
+		  //
+  		if(fabs(previous_error - error) < end_accuracy)
+ 	  	{
+		  	print("End of accuracy\n");
+			  break;
+  		}
+	  	previous_error = error;
 
-		// !!!! implements early stopping (validation set required) !!!!
-		// ..
+		  // !!!! implements early stopping (validation set required) !!!!
+  		// ..
 
-		//
-		iter++;
-		if( (iter >= max_iter) && (max_iter > 0) )
-		{
-			print("\nMaximum number of iterations reached\n");
-			break;
-		}
+	  	//
+		  iter++;
+  		if( (iter >= max_iter) && (max_iter > 0) )
+	  	{
+		  	print("\nMaximum number of iterations reached\n");
+			  break;
+  		}
 
-		//
-		current_learning_rate = learning_rate/(1.+((float)(iter))*learning_rate_decay);
-	}
+	  	//
+		  current_learning_rate = learning_rate/(1.+((float)(iter))*learning_rate_decay);
+  	}
 
-        return true;
-    }
+    return true;
+  }
 
-    bool StochasticGradientTrainer::setCriterion(Criterion *m_criterion_)
-    {
+  bool StochasticGradientTrainer::setCriterion(Criterion *m_criterion_)
+  {
    	if(m_criterion_ == NULL) return false;
-	m_criterion = m_criterion_;
-	return true;
-    }
+	  m_criterion = m_criterion_;
+    return true;
+  }
 
-    StochasticGradientTrainer::~StochasticGradientTrainer()
-    {
-    	if (m_shuffledindex != NULL) delete []m_shuffledindex;
-    }
+  StochasticGradientTrainer::~StochasticGradientTrainer()
+  {
+  	if (m_shuffledindex != NULL) delete []m_shuffledindex;
+  }
 
 }
