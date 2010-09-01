@@ -191,9 +191,13 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 		int lda = N;
 		int ldb = N;
 		int NRHS = 1;
+		double* d_diffOperator=(double*)diffOperator->dataW();
+		double* d_result=(double*)result->dataW();
 		// Note: In principle, data should be transposed (column-major order instead of row-major order).
 		//       Anyway, it is not necessary here with the dgesv_function.
 		dgesv_( &N, &NRHS, d_diffOperator, &lda, (int*)ipiv.dataW(), d_result, &ldb, &info );
+    diffOperator->resetFromData();
+    result->resetFromData();
 #endif
 		if (info != 0) error("ipVCycle: error %d in LAPACK function dgesv_ (Solving a linear system).\n", info);
 
