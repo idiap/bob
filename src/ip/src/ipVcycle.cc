@@ -178,7 +178,7 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 	// if we are on the coarsest level -> solve
 	if (level == n_grids_-1) 
 	{
-		DoubleTensor* diffOperator = new DoubleTensor(width_*height_, width_*height_, 1);
+		DoubleTensor* diffOperator = new DoubleTensor(width_*height_, width_*height_);
 		buildOperator(*diffOperator, *rho, lambda, type, b_v );
 
 		result->copy(t_b);
