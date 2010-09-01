@@ -15,7 +15,6 @@ endif(cblas_FOUND)
 set(src
 		"src/THBlas.c"
 		"src/THGeneral.c"
-		"src/THLogAdd.c"
 		"src/THRandom.c"
 		"src/THStorage.c"
 		"src/THTensor.c"

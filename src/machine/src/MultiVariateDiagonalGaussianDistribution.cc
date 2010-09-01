@@ -269,7 +269,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbability(const DoubleT
 		{
 			sampleProbabilityOneGaussian(sample_, j);
 
-		   	current_likelihood = THLogAdd(current_likelihood, log(weights[j]) + current_likelihood_one_mean[j]);
+		   	current_likelihood = Torch::log_add(current_likelihood, log(weights[j]) + current_likelihood_one_mean[j]);
 
 			if(current_likelihood_one_mean[j] > max_)
 			{
