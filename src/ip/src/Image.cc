@@ -56,7 +56,7 @@ namespace Torch {
       }
 
     // OK, copy it
-    ShortTensor::copy(&data);
+    copy(&data);
     return true;
   }
 
@@ -64,7 +64,7 @@ namespace Torch {
   bool Image::copyFrom(const Image& image)
   {
     // Check parameters
-    if (image.t == 0 || getWidth() != image.getWidth() ||
+    if ( getWidth() != image.getWidth() ||
         getHeight() != image.getHeight()) {
       Torch::message("Torch::Image::copyFrom - invalid image!\n");
       return false;
