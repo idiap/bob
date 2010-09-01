@@ -13,8 +13,6 @@
 #include <float.h>
 #include <algorithm>
 
-#include "core/Random.hpp"
-
 // Old systems need that to define FLT_MAX and DBL_MAX
 #ifndef DBL_MAX
 #include <values.h>

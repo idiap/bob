@@ -1,6 +1,6 @@
 #include "trainer/CascadeTrainer.h"
 #include "sp/spCore.h"
-#include "core/general.h"
+#include "core/Random.hpp"
 
 namespace Torch
 {
