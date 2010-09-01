@@ -175,7 +175,7 @@ void CmdFile::setCmdOption(int argc, char **argv, int *current, CmdFileOption *p
   		free(*ptr_s);
 	  	*ptr_s = (char *)malloc(strlen(argv[current_])+1);
 		  strcpy(*ptr_s, argv[current_++]);
-      break:
+      break;
    	default:
    		error("CmdFile: wrong format");
  	}
