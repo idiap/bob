@@ -225,7 +225,7 @@ if __name__ == '__main__':
         problem_track['install'][0] == 'success') or \
         not problem_track.has_key('install'):
       time_track[phase], problem_track[phase] = \
-          adm.build.action(adm.build.make, options, 'test')
+          adm.build.action(adm.build.ctest, options)
     else:
       time_track[phase] = 0
       problem_track[phase] = ('blocked',)

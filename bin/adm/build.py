@@ -174,6 +174,23 @@ def make(option, target="all"):
     raise RuntimeError, '** ERROR: "make %s" did not work as expected.' % target
   logging.debug('Finished running make %s.' % target)
 
+def ctest(option):
+  """Runs ctest on the 'option.build_prefix'. If there is a problem, 
+  throws RuntimeError.
+  """
+
+  logging.debug('Running ctest...')
+
+  os.chdir(option.build_prefix)
+
+  cmdline = ['ctest']
+  if option.debug_build:
+    cmdline.append('--verbose')
+  status = run(cmdline, option.save_output, option.log_prefix, 'make_test')
+  if status != 0:
+    raise RuntimeError, '** ERROR: "ctest" did not work as expected.'
+  logging.debug('Finished running ctest.')
+
 def doxygen(option):
   """Builds the project documentation using doxygen. If there is a problem,
   throws a RuntimeError."""
