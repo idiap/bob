@@ -1,4 +1,5 @@
 #include "machine/MultiVariateNormalDistribution.h"
+#include "core/general.h"
 
 namespace Torch {
 
@@ -311,11 +312,13 @@ bool MultiVariateNormalDistribution::setMeans(DataSet *dataset_)
 
 	DoubleTensor *frame_ = new DoubleTensor;
 	DoubleTensor *sequence_ = new DoubleTensor;
+ 
+  core::random::uniform_uint<unsigned int> rng;
 
 	for(int j = 0 ; j < n_means ; j++) 
 	{
 		int offset = j*n_partitions;
-		int index = offset + (int)(THRandom_uniform(0, 1)*(double) n_partitions);
+		int index = offset + rng( n_partitions );
 
 		//Torch::print("Index to match %d\n", index);
 		
@@ -395,17 +398,18 @@ bool MultiVariateNormalDistribution::shuffle()
 {
 	//Torch::print("MultiVariateNormalDistribution::shuffle()\n");
 	
-   	double z = 0.0;
+  double z = 0.0;
+  core::random::uniform_real<double> rng;
 
 	for(int j = 0 ; j < n_means ; j++)
 	{
-		weights[j] = THRandom_uniform(0, 1);
+		weights[j] = rng(0.,1.);
 		z += weights[j];
 
 		for(int k = 0 ; k < n_inputs ; k++)
 		{
-			means[j][k] = THRandom_uniform(0, 1);
-			variances[j][k] = THRandom_uniform(0, 1);
+			means[j][k] = rng(0.,1.);
+			variances[j][k] = rng(0.,1.);
 		}
 	}
 

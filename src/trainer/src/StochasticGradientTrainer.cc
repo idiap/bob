@@ -16,14 +16,6 @@ namespace Torch
     m_shuffledindex = NULL;
   }
 
-  void shuffle(long *array, long n_elements)
-  {
-  	for(long i = 0; i < n_elements; i++)
-   	{
-   	   int z = (int) THRandom_uniform(0, (double)(n_elements - i - 1));
-       std::swap(array[i], array[z+i]);
-   	}
-  }
 
   bool StochasticGradientTrainer::train()
   {
@@ -84,7 +76,8 @@ namespace Torch
    	if (m_shuffledindex == NULL) delete []m_shuffledindex;
       m_shuffledindex = new long [m_n_examples];
     for (int i=0 ; i<m_n_examples ; i++) m_shuffledindex[i] = i;
-  	shuffle(m_shuffledindex, m_n_examples);
+    core::random::uniform_uint<unsigned int> rng;
+    std::random_shuffle(m_shuffledindex, m_shuffledindex+m_n_examples, rng);
 	
 	  //
   	int max_iter = getIOption("max iter");
