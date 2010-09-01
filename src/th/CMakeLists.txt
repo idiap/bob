@@ -8,7 +8,6 @@ if(cblas_FOUND)
   set(shared "${cblas_LIBRARIES}")
   add_definitions(-DUSE_CBLAS)
   include_directories(${cblas_INCLUDE_DIRS})
-  link_directories(${cblas_LIBRARY_DIRS})
 endif(cblas_FOUND)
 
 # This defines the list of source files inside this package.
