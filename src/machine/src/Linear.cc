@@ -1,4 +1,5 @@
 #include "machine/Linear.h"
+#include "core/Random.hpp"
 
 namespace Torch {
 
@@ -78,16 +79,19 @@ bool Linear::shuffle()
 	double *weights_ = weights;
 	double *der_weights_ = der_weights;
 	double bound = 1./sqrt((double)n_inputs);
+
+  core::random::uniform_real<double> rng;
+
 	for(int i = 0; i < n_outputs; i++)
 	{
 		for(int j = 0; j < n_inputs; j++)
 		{
-			weights_[j] = THRandom_uniform(-bound, bound);
+			weights_[j] = rng(-bound,bound);
 			der_weights_[j] = 0.0;
 		}
 		weights_ += n_inputs;
 		der_weights_ += n_inputs;
-		bias[i] = THRandom_uniform(-bound, bound);
+		bias[i] = rng(-bound,bound);
 		der_bias[i] = 0.0;
 	}
 
@@ -183,7 +187,6 @@ bool Linear::backward(const DoubleTensor *input, const DoubleTensor *alpha)
 		for(int i = 0; i < n_inputs*n_outputs;i++)
 			dst_[i] += weight_decay * src_[i];
 	}
-  m_beta->resetFromData();
 	return true;
 }
 

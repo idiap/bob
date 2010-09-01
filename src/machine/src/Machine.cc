@@ -1,5 +1,8 @@
 #include "machine/Machine.h"
 #include "sp/spCore.h"
+#include <cmath>
+#include <boost/math/special_functions/log1p.hpp>
+#include <stdexcept>
 
 namespace Torch {
 
@@ -228,6 +231,26 @@ int MachineManager::find(int id) const
 }
 
 ///////////////////////////////////////////////////////////////////////////
+
+//If difference between the log_*() operands is less than this limit, returns
+//the first operand and disconsider the second.
+double log_add(double log_a, double log_b)
+{
+  static const double MINUS_LOG_THRESHOLD = std::log(1e-17);
+
+  if (log_a < log_b) std::swap(log_a, log_b);
+  double minusdif = log_b - log_a;
+
+  if (std::isnan(minusdif)) {
+    //why: minusdif, log_b, and/or log_a are nan
+    throw std::underflow_error("minusdif, log_a and/or log_b are NaN");
+  }
+
+  if (minusdif < MINUS_LOG_THRESHOLD)
+    return log_a;
+  else
+    return log_a + boost::math::log1p(exp(minusdif));
+}
 
 }
 

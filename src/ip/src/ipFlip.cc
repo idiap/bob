@@ -139,7 +139,6 @@ bool ipFlip::processInput(const Tensor& input)
 	}
 
 	// OK
-  t_output->resetFromData();
 	return true;
 }
 

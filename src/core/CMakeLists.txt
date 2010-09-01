@@ -25,6 +25,7 @@ set(src
     "src/FileList.cc"
     "src/CmdLine.cc"
     "src/CmdFile.cc"
+    "src/Random.cc"
     )
 
 include(../cmake/macros.cmake)

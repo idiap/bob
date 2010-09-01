@@ -1,4 +1,7 @@
 #include "machine/MultiVariateMAPDiagonalGaussianDistribution.h"
+#include <cmath>
+
+static const double M_LOG2PI=std::log(M_2_PI);
 
 namespace Torch {
 
@@ -211,7 +214,7 @@ bool MultiVariateMAPDiagonalGaussianDistribution::EMupdate()
 	if(use_log)
 	{
 		// pre-compute constants
-		double cst_ = n_inputs * THLog2Pi;
+		double cst_ = n_inputs * M_LOG2PI;
 		for(int j = 0 ; j < n_means ; j++) 
 		{
 			double log_det = 0.0;

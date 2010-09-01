@@ -1,4 +1,8 @@
 #include "machine/MultiVariateDiagonalGaussianDistribution.h"
+#include <climits>
+#include <cmath>
+
+static const double M_LOG2PI=std::log(M_2_PI);
 
 namespace Torch {
 
@@ -67,7 +71,7 @@ bool MultiVariateDiagonalGaussianDistribution::prepare()
 	if(use_log)
 	{
 		// pre-compute constants
-		double cst_ = n_inputs * THLog2Pi;
+		double cst_ = n_inputs * M_LOG2PI;
 		for(int j = 0 ; j < n_means ; j++)
 		{
 			double log_det = 0.0;
@@ -85,7 +89,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMinit()
 	if(use_log)
 	{
 		// pre-compute constants
-		double cst_ = n_inputs * THLog2Pi;
+		double cst_ = n_inputs * M_LOG2PI;
 		for(int j = 0 ; j < n_means ; j++)
 		{
 			double log_det = 0.0;
@@ -237,7 +241,7 @@ bool MultiVariateDiagonalGaussianDistribution::EMupdate()
 	if(use_log)
 	{
 		// pre-compute constants
-		double cst_ = n_inputs * THLog2Pi;
+		double cst_ = n_inputs * M_LOG2PI;
 		for(int j = 0 ; j < n_means ; j++)
 		{
 			double log_det = 0.0;
@@ -259,13 +263,13 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbability(const DoubleT
 	{
 		double max_ = -DBL_MAX;
 		best_mean = -1;
-		current_likelihood = THLogZero;
+		current_likelihood = -DBL_MAX;
 
 		for(int j = 0 ; j < n_means ; j++)
 		{
 			sampleProbabilityOneGaussian(sample_, j);
 
-		   	current_likelihood = THLogAdd(current_likelihood, log(weights[j]) + current_likelihood_one_mean[j]);
+		   	current_likelihood = Torch::log_add(current_likelihood, log(weights[j]) + current_likelihood_one_mean[j]);
 
 			if(current_likelihood_one_mean[j] > max_)
 			{

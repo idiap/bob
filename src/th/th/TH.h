@@ -9,7 +9,6 @@
  */
 #include "THBlas.h"
 #include "THGeneral.h"
-#include "THLogAdd.h"
 #include "THRandom.h"
 #include "THStorage.h"
 #include "THTensor.h"

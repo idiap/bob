@@ -76,7 +76,7 @@ macro(torch_test package name src)
   add_executable(${testname} ${src})
   target_link_libraries(${testname} torch_${package})
   target_link_libraries(${testname} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-  add_test(cxx-${package}-${name} ${testname})
+  add_test(cxx-${package}-${name} ${testname} --log_level=test_suite)
 endmacro(torch_test package src)
 
 # Creates a standard Torch benchmark.

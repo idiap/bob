@@ -90,7 +90,7 @@ namespace Torch
     for (long i=0 ; i<m_n_examples ; i++)
     {
       const DoubleTensor* example = static_cast<const DoubleTensor*>(m_dataset->getExample(i));
-      pd_machine->EMaccPosteriors(*example, THLogOne);
+      pd_machine->EMaccPosteriors(*example, 0 /* log(1) */);
     }
 
 		
