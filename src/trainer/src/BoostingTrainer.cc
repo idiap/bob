@@ -1,5 +1,5 @@
 #include "trainer/BoostingTrainer.h"
-#include "core/general.h"
+#include "core/Random.hpp"
 
 namespace Torch
 {

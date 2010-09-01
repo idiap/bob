@@ -1,5 +1,5 @@
 #include "machine/MultiVariateNormalDistribution.h"
-#include "core/general.h"
+#include "core/Random.hpp"
 
 namespace Torch {
 
