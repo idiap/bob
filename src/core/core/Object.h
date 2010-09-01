@@ -53,8 +53,7 @@ namespace Torch
      * Returns a handle to all variables registered.
      */
 		inline int getNvariables() { return m_optionImpl->getNvariables(); }
-		inline const Variable* getVariables() 
-    { return m_optionImpl->getVariables(); }
+		inline const Variable* getVariables() { return m_optionImpl->getVariables(); }
 
 	protected:
 

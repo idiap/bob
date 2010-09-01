@@ -126,12 +126,9 @@ bool spDCT::allocateOutput(const Tensor& input)
 
 bool spDCT::processInput(const Tensor& input)
 {
-	//const FloatTensor* t_input = (FloatTensor*)&input;
-
 	if (input.nDimension() == 1)
 	{
-		//R->copy(t_input);
-		((Tensor*)R)->copy(&input);
+		R->copy(&input);
 
 #ifdef HAVE_OOURAFFT
 		if(inverse)
@@ -198,8 +195,7 @@ bool spDCT::processInput(const Tensor& input)
 	}
 	else if (input.nDimension() == 2)
 	{
-		//R->copy(t_input);
-		((Tensor*)R)->copy(&input);
+		R->copy(&input);
 
 #ifdef HAVE_OOURAFFT
 		if(inverse)

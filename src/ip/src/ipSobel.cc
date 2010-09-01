@@ -146,7 +146,6 @@ namespace Torch
 
 
         // OK
-        // t_output->resetFromData();
         return true;
     }
 

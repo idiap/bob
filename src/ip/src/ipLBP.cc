@@ -262,8 +262,8 @@ bool ipLBP::allocateOutput(const Tensor& input)
 		m_ii_factors.resizeSW(m_region.size[1], m_region.size[0], m_input_stride_w, m_input_stride_h, m_x, m_y, m_R);
 		m_need_interp = (m_modelSize.size[0] != m_region.size[0]) || (m_modelSize.size[1] != m_region.size[1]);
 	}
-  IntTensor* t_output = (IntTensor*)m_output[0];
-  t_output->resetFromData();
+//  IntTensor* t_output = (IntTensor*)m_output[0];
+//  t_output->resetFromData();
 	return true;
 }
 

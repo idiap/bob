@@ -187,7 +187,6 @@ bool Linear::backward(const DoubleTensor *input, const DoubleTensor *alpha)
 		for(int i = 0; i < n_inputs*n_outputs;i++)
 			dst_[i] += weight_decay * src_[i];
 	}
-  m_beta->resetFromData();
 	return true;
 }
 

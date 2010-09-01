@@ -69,7 +69,6 @@
                   }\
           }\
 	}\
-  t_output->resetFromData();\
 }
 
 // II_3D_FOR_TYPE - compute the integral (image) for any 3D tensor type!
@@ -133,7 +132,6 @@
                   }\
           }\
   }\
-  t_output->resetFromData();\
 }
 
 /////////////////////////////////////////////////////////////////////////
