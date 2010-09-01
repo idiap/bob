@@ -108,14 +108,14 @@ double THTensor_dot(THTensor *tensor, THTensor *src)
 /* basic statistics */
 double THTensor_min(THTensor *tensor)
 {
-  double theMin = THInf;
+  double theMin = DBL_MAX;
   TH_TENSOR_APPLY(double, tensor, if(*tensor_p < theMin) theMin = *tensor_p;);
   return theMin; 
 }
 
 double THTensor_max(THTensor *tensor)
 {
-  double theMax = -THInf;
+  double theMax = -DBL_MAX;
   TH_TENSOR_APPLY(double, tensor, if(*tensor_p > theMax) theMax = *tensor_p;);
   return theMax; 
 }

@@ -170,6 +170,10 @@ namespace Torch
  * @}
  */
 
+  /**
+   */
+  double log_add(double log_a, double log_b);
+
 }
 
 

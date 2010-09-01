@@ -9,35 +9,10 @@
 #include <float.h>
 #include <time.h>
 
-
 #ifdef __cplusplus
-# define TH_EXTERNC extern "C"
+# define TH_API extern "C"
 #else
-# define TH_EXTERNC extern
-#endif
-
-#ifdef WIN32
-# ifdef TH_EXPORTS
-#  define TH_API TH_EXTERNC __declspec(dllexport)
-# else
-#  define TH_API TH_EXTERNC __declspec(dllimport)
-# endif
-#else
-# define TH_API TH_EXTERNC
-#endif
-
-#define THInf DBL_MAX
-
-#if !defined(inline)
-# define inline
-#endif
-
-#ifndef M_PI
-# define M_PI 3.14159265358979323846
-#endif
-
-#ifdef _MSC_VER
-TH_API double log1p(const double x);
+# define TH_API extern
 #endif
 
 TH_API void THError(const char *fmt, ...);

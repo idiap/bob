@@ -1,4 +1,5 @@
 #include "machine/TwoClassNLLCriterion.h"
+#include "machine/Machine.h"
 
 namespace Torch {
 
@@ -50,7 +51,7 @@ bool TwoClassNLLCriterion::forward(const DoubleTensor *machine_output, const Ten
 
 	((Tensor*)m_target)->copy(target);
 
-	double error = THLogAdd(0, m_cst - (*m_target)(0) * (*machine_output)(0));
+	double error = Torch::log_add(0, m_cst - (*m_target)(0) * (*machine_output)(0));
 	(*m_error)(0) = error;
 	(*m_beta)(0) = - (*m_target)(0) * (1. - exp(-error));
 
