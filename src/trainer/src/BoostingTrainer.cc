@@ -1,4 +1,5 @@
 #include "trainer/BoostingTrainer.h"
+#include "core/general.h"
 
 namespace Torch
 {
@@ -69,15 +70,16 @@ namespace Torch
             return false;
         }
 
-        THRandom_manualSeed(THRandom_seed());
+        core::random::generator::instance().seed(std::time(0));
 
         m_repartition[0] = 0.0;
         for (int i=0;i<m_n_examples;i++)
             m_repartition[i+1] = m_repartition[i] + m_weights_samples[i];
 
+        core::random::uniform_real<double> rng;
         for (int i=0;i<m_n_examples;i++)
         {
-            double z = THRandom_uniform(0, 1);
+            double z = rng(0., 1.);
             int left = 0;
             int right = m_n_examples;
             while (left+1 != right)

@@ -1,5 +1,6 @@
 #include "trainer/CascadeTrainer.h"
 #include "sp/spCore.h"
+#include "core/general.h"
 
 namespace Torch
 {
@@ -127,6 +128,8 @@ void CascadeTrainer::setPreprocessor(spCore* core)
         }
 
 
+        core::random::uniform_real<double> rng;
+
         for (int mt = 0;mt< m_n_cascade;mt++)
         {
 
@@ -207,9 +210,10 @@ void CascadeTrainer::setPreprocessor(spCore* core)
             short *randTrack = new short[pnCount];
             for (int i=0;i<pnCount;i++)
                 randTrack[i]=0;
+
             for (int i=0;i<pnCount;i++)
             {
-                double z = THRandom_uniform(0, n_count);
+                double z = rng(0., n_count);
                 randSelect[i]=int(z);
 
             }
@@ -438,14 +442,14 @@ void CascadeTrainer::setPreprocessor(spCore* core)
 
         reject_target.fill(-1.0);
         verbose = getBOption("verbose");
+
+        core::random::uniform_real<double> rng;
         for (long i=0;i<n_scanexamples;i++)
         {
             //have to check if the target is +1 and fill withit
             if (((DoubleTensor*)m_imagescandataset->getTarget(i))->get(0)>0.0)
             {
-
-
-                double z = THRandom_uniform(0, 1);
+                double z = rng(0., 1.);
 
                 if (z>0.5)
                     // set the pattern to reject
