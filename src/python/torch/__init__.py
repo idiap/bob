@@ -14,6 +14,6 @@ import ip
 import scanning
 
 sys.setdlopenflags(default_flags)
-del default_flags, sys, dl
+del default_flags
 
 __all__ = ['core', 'sp', 'ip', 'scanning']
