@@ -6,10 +6,6 @@
 #define MINUS_LOG_THRESHOLD -18.42
 #endif
 
-const double THLog2Pi=1.83787706640934548355;
-const double THLogZero=-THInf;
-const double THLogOne=0;
-
 double THLogAdd(double log_a, double log_b)
 {
   double minusdif;
@@ -45,7 +41,7 @@ double THLogSub(double log_a, double log_b)
     THError("LogSub: minusdif (%f) log_b (%f) or log_a (%f) is nan", minusdif, log_b, log_a);
 #endif
   if (log_a == log_b)
-    return THLogZero;
+    return -DBL_MAX;
   else if (minusdif < MINUS_LOG_THRESHOLD)
     return log_a;
   else
