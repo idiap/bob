@@ -48,11 +48,6 @@ int compare_doubles(const void* a, const void* b);
 #define	getInRange(v,m,M) ((v) < (m) ? (m) : ((v) > (M) ? (M) : (v)))
 #endif
 
-#ifndef isInRange
-/// The isInRange function (checks if some value is in the [m, M] range)
-#define	isInRange(v,m,M) ((v) >= (m) && (v) <= (M))
-#endif
-
 #ifndef isIndex
 /// The isIndex function checks if some value is an index
 #define	isIndex(v,N) ((v) >= 0 && (v) < (N))
