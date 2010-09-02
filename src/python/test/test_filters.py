@@ -67,12 +67,12 @@ class FilterTest(unittest.TestCase):
     #save_ref.save(processed)
     #save_ref.close()
     # compare to our model
-    reference = torch.core.IntTensor()
     ref_file = torch.core.TensorFile()
     ref_file.openRead('histo.tensorfile')
-    ref_file.load(reference)
+    reference = ref_file.load()
     for i in range(reference.size(0)):
-       self.assertEqual(reference.get(i), reference.get(i))
+      for j in range(reference.size(1)):
+        self.assertEqual(processed.get(i,j), reference.get(i,j))
     ref_file.close()
 
   def test04_histoequal(self):
@@ -105,14 +105,13 @@ class FilterTest(unittest.TestCase):
     #save_ref.save(processed)
     #save_ref.close()
     # compare to our model
-    reference = torch.core.IntTensor()
     ref_file = torch.core.TensorFile()
     ref_file.openRead('integralimage.tensorfile')
-    ref_file.load(reference)
+    reference = ref_file.load()
     for i in range(reference.size(0)):
       for j in range(reference.size(1)):
         for k in range(reference.size(2)):
-          self.assertEqual(reference.get(i, j, k), reference.get(i, j, k))
+          self.assertEqual(processed.get(i, j, k), reference.get(i, j, k))
     ref_file.close()
 
   def test06_MSRSQIGaussian(self):
@@ -179,7 +178,6 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('rescalegray.ppm') #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
     reference.load('rescalegray.ppm')
@@ -301,11 +299,10 @@ class FilterTest(unittest.TestCase):
     #for t in outputs: save_ref.save(t)
     #save_ref.close()
     # compare to our model
-    reference = torch.core.IntTensor()
     ref_file = torch.core.TensorFile()
     ref_file.openRead('sobel.tensorfile')
     for t in outputs:
-      ref_file.load(reference)
+      reference = ref_file.load()
       for i in range(reference.size(0)):
         for j in range(reference.size(1)):
           for k in range(reference.size(2)):

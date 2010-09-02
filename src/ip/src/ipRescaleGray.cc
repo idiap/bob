@@ -1,57 +1,57 @@
 #include "ip/ipRescaleGray.h"
-//STL #include <limits>
-
-#define COMPUTE_SCALE_GRAY(tensorType, dataType)                                                                     \
-{   \
-  const tensorType* t_input = (const tensorType*)&input; \
-  const int height = t_input->size(0);                                                                          \
-  const int width = t_input->size(1);                                                                          \
-  const int n_planes = t_input->size(2);                                                                          \
-                                                                                                                \
-  /* Start to "normalize" current values in range [0,255] */                                                   \
-	double max_val = (*t_input)(0,0,0); /*STL std::numeric_limits<double>::min( ); */                                       \
-	double min_val = (*t_input)(0,0,0); /*STL std::numeric_limits<double>::max( ); */                                       \
-	double range;                                                                                                \
-                                                                                                                     \
-	/* find min and max values in the image */                                                                   \
-	for( int p=0; p<n_planes; p++ )                                                                              \
-	{                                                                                                            \
-		for( int y=0; y<height; y++ )                                                                        \
-		{                                                                                                    \
-			for( int x=0; x<width; x++ )                                        \
-			{                                                                                            \
-				if ((*t_input)(y,x,p) > max_val)                                                              \
-					max_val = (*t_input)(y,x,p);                                                          \
-                                                                                                                     \
-				if ((*t_input)(y,x,p) < min_val)                                                              \
-					min_val = (*t_input)(y,x,p);                                                          \
-			}                                                                                            \
-		}                                                                                                    \
-	}                                                                                                            \
-                                                                                                                     \
-	/* Compute the range */                                                                                      \
-	range = max_val - min_val;                                                                                   \
-	const double EPSILON = 1e-12; /*STL std::numeric_limits<double>::epsilon() * 1000; */                        \
-	bool range_zero = range < EPSILON;                                                                           \
-                                                                                                                     \
-	/* Change the scale */                                                                                       \
-	for( int p=0; p<n_planes; p++ )                                                                              \
-	{                                                                                                            \
-		for( int y=0; y<height; y++ )                                                                        \
-		{                                                                                                    \
-			for( int x=0; x<width; x++ )                \
-			{                                                                                            \
-				(*t_output)(y,x,p) = ( range_zero ? 0 : FixI(255. * ((*t_input)(y,x,p) - min_val) / range) );           \
-			}                                                                                            \
-		}                                                                                                    \
-	}                                                                                                            \
-}                                                                                                                    
 
 namespace Torch {
 
+template <typename T> void computeRescaleGray(const Tensor& input, ShortTensor& t_output)
+{
+  const T& t_input = dynamic_cast<const T&>(input);
+  const int height = t_input.size(0);
+  const int width = t_input.size(1);
+  const int n_planes = t_input.size(2);
+
+  /* Start to "normalize" current values in range [0,255] */
+	double max_val = t_input(0,0,0); /*STL std::numeric_limits<double>::min( ); */
+	double min_val = t_input(0,0,0); /*STL std::numeric_limits<double>::max( ); */
+	double range;
+
+	/* find min and max values in the image */
+	for( int p=0; p<n_planes; ++p )
+	{
+		for( int y=0; y<height; ++y )
+		{
+			for( int x=0; x<width; ++x )
+			{
+				if (t_input(y,x,p) > max_val)
+					max_val = t_input(y,x,p);
+
+				if (t_input(y,x,p) < min_val)
+					min_val = t_input(y,x,p);
+			}
+		}
+	}
+
+	/* Compute the range */
+	range = max_val - min_val;
+	const double EPSILON = 1e-12; /*STL std::numeric_limits<double>::epsilon() * 1000; */
+	bool range_zero = range < EPSILON;
+
+	/* Change the scale */
+	for( int p=0; p<n_planes; ++p )
+	{
+		for( int y=0; y<height; ++y )
+		{
+			for( int x=0; x<width; ++x )
+			{
+				t_output(y,x,p) = ( range_zero ? 0 : FixI(255. * (t_input(y,x,p) - min_val) / range) );
+			}
+		}
+	}
+
+}
+
+
 /////////////////////////////////////////////////////////////////////////
 // Constructor
-
 ipRescaleGray::ipRescaleGray()
 	:	ipCore()
 {
@@ -59,7 +59,6 @@ ipRescaleGray::ipRescaleGray()
 
 /////////////////////////////////////////////////////////////////////////
 // Destructor
-
 ipRescaleGray::~ipRescaleGray()
 {
 }
@@ -71,7 +70,6 @@ bool ipRescaleGray::checkInput(const Tensor& input) const
 {
 	// Accept only 3D tensors 
 	if (	input.nDimension() != 3 )
-// || input.getDatatype() != Tensor::Short)
 	{
 		return false;
 	}
@@ -82,7 +80,6 @@ bool ipRescaleGray::checkInput(const Tensor& input) const
 
 /////////////////////////////////////////////////////////////////////////
 // Allocate (if needed) the output tensors given the input tensor dimensions
-
 bool ipRescaleGray::allocateOutput(const Tensor& input)
 {
 	// Allocate output if required
@@ -106,46 +103,44 @@ bool ipRescaleGray::allocateOutput(const Tensor& input)
 
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated)
-
 bool ipRescaleGray::processInput(const Tensor& input)
 {
 	// Prepare direct access to output data
-	ShortTensor* t_output = (ShortTensor*)m_output[0];	
+	ShortTensor* t_output = dynamic_cast<ShortTensor*>(m_output[0]);
 
 	switch (input.getDatatype())
 	{
 		case Tensor::Char:
-			COMPUTE_SCALE_GRAY(CharTensor, char);
+      computeRescaleGray<CharTensor>( input, *t_output);
 			break;
 
 		case Tensor::Short:
-			COMPUTE_SCALE_GRAY(ShortTensor, short);
+      computeRescaleGray<ShortTensor>( input, *t_output);
 			break;
 
 		case Tensor::Int:
-			COMPUTE_SCALE_GRAY(IntTensor, int);
+      computeRescaleGray<IntTensor>( input, *t_output);
 			break;
 
 		case Tensor::Long:
-			COMPUTE_SCALE_GRAY(LongTensor, long);
+      computeRescaleGray<LongTensor>( input, *t_output);
 			break;
 
 		case Tensor::Float:
-			COMPUTE_SCALE_GRAY(FloatTensor, float);
+      computeRescaleGray<FloatTensor>( input, *t_output);
 			break;
 
 		case Tensor::Double:
-			COMPUTE_SCALE_GRAY(DoubleTensor, double);
+      computeRescaleGray<DoubleTensor>( input, *t_output);
 			break;
 
     default:
-      break;
+      return false;
 	}
 
 	// OK
 	return true;
 }
-
 /////////////////////////////////////////////////////////////////////////
 
 }

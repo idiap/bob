@@ -366,6 +366,7 @@ bool TensorFile::load(Tensor& tensor)
 	{
 		return false;
 	}
+  tensor.resetFromData();
 
 	// OK
 	return true;
