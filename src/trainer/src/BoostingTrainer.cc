@@ -70,7 +70,7 @@ namespace Torch
             return false;
         }
 
-        core::random::generator::instance().seed(std::time(0));
+        core::random::generator::instance().seed(time(0));
 
         m_repartition[0] = 0.0;
         for (int i=0;i<m_n_examples;i++)
