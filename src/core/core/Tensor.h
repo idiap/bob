@@ -207,16 +207,16 @@ namespace Torch
 		//---
 
 		//
-		virtual void resize(long dim0_) const = 0;
+		virtual void resize(long dim0_) = 0;
 
 		//
-		virtual void resize(long dim0_, long dim1_) const = 0;
+		virtual void resize(long dim0_, long dim1_) = 0;
 
 		//
-		virtual void resize(long dim0_, long dim1_, long dim2_) const = 0;
+		virtual void resize(long dim0_, long dim1_, long dim2_) = 0;
 
 		//
-		virtual void resize(long dim0_, long dim1_, long dim2_, long dim3_) const = 0;
+		virtual void resize(long dim0_, long dim1_, long dim2_, long dim3_) = 0;
 
 		/////////////////////////////////////////////////////////////////////
 		// SET functions for each possible type

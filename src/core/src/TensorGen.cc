@@ -247,25 +247,25 @@ void TENSOR_CLASS(Tensor)::fill(TYPE value)
   TENSOR_FUNC(fill)(t, value);
 }
 
-void TENSOR_CLASS(Tensor)::resize(long dim0) const
+void TENSOR_CLASS(Tensor)::resize(long dim0)
 {
   TENSOR_FUNC(resize4d)(t, dim0, -1, -1, -1);
   m_isReference = false;
 }
 
-void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1) const
+void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1)
 {
   TENSOR_FUNC(resize4d)(t, dim0, dim1, -1, -1);
   m_isReference = false;
 }
 
-void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2) const
+void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2)
 {
   TENSOR_FUNC(resize4d)(t, dim0, dim1, dim2, -1);
   m_isReference = false;
 }
 
-void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2, long dim3) const
+void TENSOR_CLASS(Tensor)::resize(long dim0, long dim1, long dim2, long dim3)
 {
   TENSOR_FUNC(resize4d)(t, dim0, dim1, dim2, dim3);
   m_isReference = false;

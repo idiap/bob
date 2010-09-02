@@ -98,10 +98,10 @@ public:
 	void fill(TYPE value);
 
 	//
-	virtual void resize(long) const;
-	virtual void resize(long, long) const;
-	virtual void resize(long, long, long) const;
-	virtual void resize(long, long, long, long) const;
+	virtual void resize(long);
+	virtual void resize(long, long);
+	virtual void resize(long, long, long);
+	virtual void resize(long, long, long, long);
 
 	///
 	TYPE sum() const;
