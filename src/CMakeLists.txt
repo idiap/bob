@@ -39,10 +39,8 @@ enable_testing()
 
 # This makes sure we can reach all external headers
 if(NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL ""))
-  foreach(dir $ENV{CMAKE_PREFIX_PATH})
-    include_directories(SYSTEM "${dir}/include")
-    link_directories("${dir}/lib")
-  endforeach(dir $ENV{CMAKE_PREFIX_PATH})
+  include_directories(SYSTEM "$ENV{CMAKE_PREFIX_PATH}/include")
+  link_directories("$ENV{CMAKE_PREFIX_PATH}/lib")
 endif(NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL ""))
 
 # This makes sure we have all headers within reach before starting to compile
