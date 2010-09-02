@@ -1,25 +1,23 @@
 PROJECT(ip)
 cmake_minimum_required(VERSION 2.6)
 
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
-
 # This defines the dependencies of this package
 set(deps core sp) #other torch subprojects
+
+# cblas/lapack
+if(cblas_FOUND)
+  add_definitions(-DUSE_CBLAS)
+endif(cblas_FOUND)
 
 # jpeg
 if(JPEG_FOUND)
   add_definitions(-DHAVE_JPEG)
-  include_directories(${jpeg_INCLUDE_DIRS})
   set(shared "${JPEG_LIBRARIES}")
 endif(JPEG_FOUND)
 
 # ffmpeg
 if(ffmpeg_FOUND)
   add_definitions(-DHAVE_FFMPEG)
-  include_directories(${ffmpeg_INCLUDE_DIRS})
-  link_directories(${ffmpeg_LIBRARY_DIRS})
   set(shared "${shared};${ffmpeg_LIBRARIES}")
 endif(ffmpeg_FOUND)
 

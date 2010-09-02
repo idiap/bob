@@ -68,10 +68,6 @@ endmacro(torch_library)
 macro(torch_test package name src)
   set(testname torchtest_${package}_${name})
 
-  # Include the Boost Unit Test Framework
-  include_directories(${boost_INCLUDE_DIRS})
-  link_directories(${boost_LIBRARY_DIRS})
-
   # Please note we don't install test executables
   add_executable(${testname} ${src})
   target_link_libraries(${testname} torch_${package})
@@ -84,9 +80,6 @@ macro(torch_benchmark package name src)
   set(bindir bin)
   set(progname torchbench_${package}_${name})
 
-  # Include the Boost Unit Test Framework
-  include_directories(${boost_INCLUDE_DIRS})
-
   add_executable(${progname} ${src})
   target_link_libraries(${progname} torch_${package})
   install(TARGETS ${progname} RUNTIME DESTINATION ${bindir})
@@ -97,12 +90,7 @@ macro(torch_python_bindings package src)
     # Some preparatory work
     set(libname pytorch_${package})
     set(libdir lib)
-
-    # Some necessary compilation and linkage includes
-    include_directories(${boost_INCLUDE_DIRS})
     include_directories(${PYTHON_INCLUDE_DIRS})
-    link_directories(${boost_LIBRARY_DIRS})
-    link_directories(${PYTHON_LIBRARY_DIRS})
 
     # Building the library itself
     add_library(${libname} SHARED ${src})

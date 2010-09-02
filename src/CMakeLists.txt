@@ -5,7 +5,7 @@ project(torch5spro)
 cmake_minimum_required(VERSION 2.6)
 
 # Set the compiler flags and build type(release or debug)
-set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall")
+set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall -pedantic")
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -O3 -ffast-math -fomit-frame-pointer -msse2")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS}")
@@ -36,6 +36,14 @@ install(FILES cmake/torch-external.cmake DESTINATION ${cmakedir})
 
 # Enables the testing framework
 enable_testing()
+
+# This makes sure we can reach all external headers
+if(NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL ""))
+  foreach(dir $ENV{CMAKE_PREFIX_PATH})
+    include_directories(SYSTEM "${dir}/include")
+    link_directories("${dir}/lib")
+  endforeach(dir $ENV{CMAKE_PREFIX_PATH})
+endif(NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL ""))
 
 # This makes sure we have all headers within reach before starting to compile
 include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)

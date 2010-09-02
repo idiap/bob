@@ -143,7 +143,7 @@ enum {
     /** A logic error (negative line-search step) occurred. */
     LBFGSERR_INVALIDPARAMETERS,
     /** The current search direction increases the objective function value. */
-    LBFGSERR_INCREASEGRADIENT,
+    LBFGSERR_INCREASEGRADIENT
 };
 
 /**
@@ -187,7 +187,7 @@ enum {
      *  where x is the current point, d is the current search direction, and
      *  a is the step length.
      */
-    LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE = 3,
+    LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE = 3
 };
 
 /**

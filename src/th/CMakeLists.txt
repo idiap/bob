@@ -7,7 +7,6 @@ set(shared "") #shared externals to link against (link)
 if(cblas_FOUND)
   set(shared "${cblas_LIBRARIES}")
   add_definitions(-DUSE_CBLAS)
-  include_directories(${cblas_INCLUDE_DIRS})
 endif(cblas_FOUND)
 
 # This defines the list of source files inside this package.
