@@ -83,7 +83,7 @@ void bind_core_tensor()
     .def("select", (Torch::Tensor* (Torch::Tensor::*)(int, long) const)&Torch::Tensor::select, with_custodian_and_ward_postcall<0, 1, return_value_policy<manage_new_object> >(), (arg("self"), arg("dimension"), arg("slice_index")), "Returns a new tensor that is selected from mysel according to the dimension and slice_index settings")
     .def("typeSize", &Torch::Tensor::typeSize, arg("self"), "Returns the size of one of my elements")
     .def("isReference", &Torch::Tensor::isReference, arg("self"), "Tells if this tensor contains data or is just a reference to another tensor")
-    .def("resize", (void (Torch::Tensor::*)(long, long, long, long) const)&Torch::Tensor::resize, resize_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Resizes the tensor"))
+    .def("resize", (void (Torch::Tensor::*)(long, long, long, long))&Torch::Tensor::resize, resize_overloads((arg("dimension0"), arg("dimension1"), arg("dimension2"), arg("dimension3")), "Resizes the tensor"))
     ;
 
   //the several specialization for the Tensor class
