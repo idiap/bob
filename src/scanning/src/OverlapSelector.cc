@@ -375,7 +375,7 @@ bool OverlapSelector::process(const PatternList& candidates)
 				}
 
 				// Keep it, if yes!
-				if (its_max = true)
+				if (true == its_max)
 				{
 					m_patternTags[i] = true;
 					for (int j = 0; j < info.m_n_overlaps; j ++)
