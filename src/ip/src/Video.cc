@@ -423,7 +423,7 @@ namespace Torch {
 						AVPacket pkt;
 						av_init_packet(&pkt);
 
-						if ((int)c->coded_frame->pts != AV_NOPTS_VALUE)
+						if (static_cast<unsigned int>(c->coded_frame->pts) != AV_NOPTS_VALUE)
 							pkt.pts= av_rescale_q(c->coded_frame->pts, c->time_base, video_st->time_base);
 						if(c->coded_frame->key_frame)
 							pkt.flags |= PKT_FLAG_KEY;
