@@ -4,11 +4,6 @@ cmake_minimum_required(VERSION 2.6)
 # This defines the dependencies of this package
 set(deps core sp) #other torch subprojects
 
-# cblas/lapack
-if(cblas_FOUND)
-  add_definitions(-DUSE_CBLAS)
-endif(cblas_FOUND)
-
 # jpeg
 if(JPEG_FOUND)
   add_definitions(-DHAVE_JPEG)
