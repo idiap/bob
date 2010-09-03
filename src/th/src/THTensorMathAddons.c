@@ -1,5 +1,5 @@
 
-// Addons
+/* Addons */
 int THIntTensor_sum(THIntTensor *tensor)
 {
   int sum = 0;
@@ -39,5 +39,5 @@ void THFloatTensor_mul(THFloatTensor *tensor, float value)
 {
   TH_TENSOR_APPLY(float, tensor, *tensor_p *= value;);
 }
-// End of addons
+/* End of addons */
 
