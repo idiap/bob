@@ -77,13 +77,37 @@ void benchmark_set(const unsigned int times, Torch::Tensor& t) {
   short v = 0;
   const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   boost::timer timer;
-  for (unsigned n=0; n<times; ++n) 
-    for(unsigned int i=0; i<S[0]; ++i)  
-      for(unsigned int j=0; j<S[1]; ++j)  
-        for(unsigned int k=0; k<S[2]; ++k)  
-          for(unsigned int l=0; l<S[3]; ++l) {
-            t.set(i, j, k, l, v++);
-          }
+  switch(t.nDimension())
+  {
+    case 1:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          t.set(i, ++v);
+      break;
+    case 2:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            t.set(i, j, ++v);
+      break;
+    case 3:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            for(unsigned int k=0; k<S[2]; ++k)  
+              t.set(i, j, k, ++v);
+      break;
+    case 4:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            for(unsigned int k=0; k<S[2]; ++k)  
+              for(unsigned int l=0; l<S[3]; ++l) 
+                t.set(i, j, k, l, ++v);
+      break;
+    default:
+      break;
+  }
   double elapsed = timer.elapsed();
   uint64_t total = times * t.sizeAll();
   std::cout << "total: " << elapsed << " s; per element: "
