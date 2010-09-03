@@ -94,13 +94,37 @@ template<typename T> double benchmark_get(const unsigned int times, const T& t) 
   double v = 0;
   const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   boost::timer timer;
-  for (unsigned n=0; n<times; ++n) 
-    for(unsigned int i=0; i<S[0]; ++i)  
-      for(unsigned int j=0; j<S[1]; ++j)  
-        for(unsigned int k=0; k<S[2]; ++k)  
-          for(unsigned int l=0; l<S[3]; ++l) {
-            v += t.get(i, j, k, l);
-          }
+  switch(t.nDimension())
+  {
+    case 1:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          v += t.get(i);
+      break;
+    case 2:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            v += t.get(i, j);
+      break;
+    case 3:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            for(unsigned int k=0; k<S[2]; ++k)  
+              v += t.get(i, j, k);
+      break;
+    case 4:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            for(unsigned int k=0; k<S[2]; ++k)  
+              for(unsigned int l=0; l<S[3]; ++l) 
+                v += t.get(i, j, k, l);
+      break;
+    default:
+      break;
+  }
   double elapsed = timer.elapsed();
   uint64_t total = times * t.sizeAll();
   std::cout << "total: " << elapsed << " s; per element: "
@@ -121,15 +145,42 @@ template<typename T> void benchmark_narrow(const unsigned int times, const T& t)
 template<typename T> void 
 benchmark_add(const unsigned int times, const T& t1, const T& t2) {
   const unsigned S[] = {t1.size(0), t1.size(1), t1.size(2), t1.size(3)};
-  T result(S[0], S[1], S[2], S[3]);
+  T result1(S[0]);
+  T result2(S[0], S[1]);
+  T result3(S[0], S[1], S[2]);
+  T result4(S[0], S[1], S[2], S[3]);
   boost::timer timer;
-  for (unsigned n=0; n<times; ++n) 
-    for(unsigned int i=0; i<S[0]; ++i)  
-      for(unsigned int j=0; j<S[1]; ++j)  
-        for(unsigned int k=0; k<S[2]; ++k)  
-          for(unsigned int l=0; l<S[3]; ++l) {
-            result(i, j, k, l) = t1.get(i, j, k, l) + t2.get(i, j, k, l);
-          }
+  switch(t1.nDimension())
+  {
+    case 1:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          result1(i) = t1.get(i) + t2.get(i);
+      break;
+    case 2:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            result2(i, j) = t1.get(i, j) + t2.get(i, j);
+      break;
+    case 3:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            for(unsigned int k=0; k<S[2]; ++k)  
+              result3(i, j, k) = t1.get(i, j, k) + t2.get(i, j, k);
+      break;
+    case 4:
+      for (unsigned n=0; n<times; ++n) 
+        for(unsigned int i=0; i<S[0]; ++i)  
+          for(unsigned int j=0; j<S[1]; ++j)  
+            for(unsigned int k=0; k<S[2]; ++k)  
+              for(unsigned int l=0; l<S[3]; ++l)
+                result4(i, j, k, l) = t1.get(i, j, k, l) + t2.get(i, j, k, l);
+      break;
+    default:
+      break;
+  }
   double elapsed = timer.elapsed();
   std::cout << "total: " << elapsed << " s; per time: "
             << ((1000.0)*(elapsed/times)) << " ms";
