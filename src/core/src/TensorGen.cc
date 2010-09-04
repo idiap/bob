@@ -1,3 +1,5 @@
+#if TORCH5SPRO_TENSOR_TYPE == 1
+
 /* Tensor type */
 #define TENSOR_T_(TYPE) TH##TYPE##Tensor
 #define TENSOR_T(TYPE) TENSOR_T_(TYPE)
@@ -421,3 +423,5 @@ void Tprint(const TENSOR_CLASS(Tensor) *T)
 #undef TENSOR_CLASS_TN_
 #undef TENSOR_CLASS_TN
 #undef TENSOR_CLASS
+
+#endif
