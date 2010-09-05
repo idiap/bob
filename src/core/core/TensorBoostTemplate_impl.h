@@ -1165,8 +1165,9 @@ namespace Torch
     TensorTemplate<T>* self = const_cast<TensorTemplate<T>*>(this);
 
     size_t array_length = sizeAll();
-    if( !self->m_data_RW)
-      self->m_data_RW = new T[array_length];
+    if( self->m_data_RW)
+      delete [] self->m_data_RW;
+    self->m_data_RW = new T[array_length];
 
     self->computeStride();
     self->computeDataRW();
@@ -1177,8 +1178,9 @@ namespace Torch
   TensorTemplate<T>::dataW()
   {
     size_t array_length = sizeAll();
-    if( !m_data_RW)
-      m_data_RW = new T[array_length];
+    if( m_data_RW)
+      delete [] m_data_RW;
+    m_data_RW = new T[array_length];
 
     computeStride();
     computeDataRW();
