@@ -3,3 +3,4 @@
 
 include(FindPkgConfig)
 pkg_check_modules(ffmpeg REQUIRED libavformat>=52 libavcodec>=52 libavutil>=49 libswscale>=0.10)
+link_directories(${ffmpeg_LIBRARY_DIRS})

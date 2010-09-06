@@ -15,4 +15,5 @@ find_package(Boost COMPONENTS python unit_test_framework)
 
 # Renaming so all works automagically
 set(boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} CACHE INTERNAL "incdirs")
+include_directories(SYSTEM ${boost_INCLUDE_DIRS})
 set(boost_LIBRARY_DIRS ${Boost_LIBRARY_DIRS} CACHE INTERNAL "libdirs")

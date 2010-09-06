@@ -5,7 +5,16 @@ project(torch5spro)
 cmake_minimum_required(VERSION 2.6)
 
 # Set the compiler flags and build type(release or debug)
-set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall -pedantic")
+set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall")
+
+# Cmake does not support include_directories(SYSTEM) correctly on OSX, so the
+# compiler issues warnings/errors on Python and ffmpeg includes that do not 
+# respect a strict standard. To make it compile, we do not use "-pedantic" on
+# OSX.
+if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+  string(COMMON_FLAGS "${COMMON_FLAGS} -pedantic") 
+endif(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS}")
@@ -13,15 +22,15 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
 # This is our RPATH policy
 # use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+set(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # when building, don't use the install RPATH already
 # (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 # the RPATH to be used when installing
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # This is where we install cmake files for external projects
 set(cmakedir share/cmake)
