@@ -12,7 +12,7 @@ set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall")
 # respect a strict standard. To make it compile, we do not use "-pedantic" on
 # OSX.
 if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-  string(COMMON_FLAGS "${COMMON_FLAGS} -pedantic") 
+  set(COMMON_FLAGS "${COMMON_FLAGS} -pedantic")
 endif(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -O3 -march=native")
