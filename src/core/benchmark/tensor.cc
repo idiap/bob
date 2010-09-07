@@ -258,6 +258,9 @@ int main(int argc, char** argv) {
     std::cout << H % "Alloc (Char/4d)";
     benchmark_allocation<Torch::CharTensor>(AR[k], TS[k]);
     std::cout << std::endl;
+#ifdef HAS_GOOGLE_PERFTOOLS
+    if (profile_output) ProfilerFlush();
+#endif
   }
 
   //Set tests //would narrowing be slower?
@@ -299,6 +302,9 @@ int main(int argc, char** argv) {
   dt1_narrow.narrow(&dt1, 0, 0, 50);
   benchmark_set(250000*N, dt1_narrow);
   std::cout << std::endl;
+#ifdef HAS_GOOGLE_PERFTOOLS
+  if (profile_output) ProfilerFlush();
+#endif
 
   //Retrieval tests
   std::cout << H % "Get (4d)";
@@ -325,6 +331,9 @@ int main(int argc, char** argv) {
   std::cout << H % "Get (1d/narrowed)";
   benchmark_get(250000*N, dt1_narrow);
   std::cout << std::endl;
+#ifdef HAS_GOOGLE_PERFTOOLS
+  if (profile_output) ProfilerFlush();
+#endif
 
   //Narrow tests
   std::cout << H % "Narrow (4d)";
@@ -339,6 +348,9 @@ int main(int argc, char** argv) {
   std::cout << H % "Narrow (1d)";
   benchmark_narrow(10000000, dt1);
   std::cout << std::endl;
+#ifdef HAS_GOOGLE_PERFTOOLS
+  if (profile_output) ProfilerFlush();
+#endif
 
   //Operation tests: add
   boost::format fsize4("Add (%d,%d,%d,%d)");
