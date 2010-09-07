@@ -231,7 +231,7 @@ int main(int argc, char** argv) {
     ProfilerStart(profile_output);
 #else
     std::cout << "Google perftools were not found. Make sure they are available on your system and recompile." << std::endl;
-#endif HAS_GOOGLE_PERFTOOLS
+#endif
   }
 
   boost::format H("%19s | ");
