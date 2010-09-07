@@ -225,7 +225,7 @@ benchmark_add(const unsigned int times, const T& t1, const T& t2) {
 
 int main(int argc, char** argv) {
   const char* profile_output = std::getenv("TORCH_PROFILE");
-  if (profile_output) {
+  if (profile_output && std::strlen(profile_output)) {
 #ifdef HAS_GOOGLE_PERFTOOLS
     std::cout << "Google perftools profile output set to " << profile_output << std::endl;
     ProfilerStart(profile_output);
@@ -376,7 +376,7 @@ int main(int argc, char** argv) {
   std::cout << std::endl;
   
 #ifdef HAS_GOOGLE_PERFTOOLS
-  if (profile_output) ProfilerStop();
+  if (profile_output && std::strlen(profile_output)) ProfilerStop();
 #endif
 
   return 0;
