@@ -13,6 +13,7 @@ void bind_core_object();
 void bind_core_file();
 void bind_core_tensor();
 void bind_core_tensorfile();
+void bind_core_profiler();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
   scope().attr("__doc__") = "Torch core classes and sub-classes";
@@ -20,4 +21,5 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_file();
   bind_core_tensor();
   bind_core_tensorfile();
+  bind_core_profiler();
 }

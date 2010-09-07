@@ -5,6 +5,13 @@ cmake_minimum_required(VERSION 2.6)
 set(deps th) #other torch subprojects
 set(shared "") #shared externals to link against (link)
 
+# If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
+# so profiling extensions can be compiled in.
+if(googlePerfTools_FOUND)
+  set(shared "${googlePerfTools_LIBRARIES}")
+  add_definitions(-DHAS_GOOGLE_PERFTOOLS)
+endif(googlePerfTools_FOUND)
+
 # This defines the list of source files inside this package.
 set(src
    "src/general.cc"
@@ -43,6 +50,7 @@ set(pysrc
    "python/src/file.cc"
    "python/src/tensor.cc"
    "python/src/tensorfile.cc"
+   "python/src/profile.cc"
    "python/src/main.cc"
    )
  

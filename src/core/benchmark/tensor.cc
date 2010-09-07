@@ -7,9 +7,14 @@
 
 #include <iostream>
 #include <stdint.h>
+#include <cstdlib>
 #include <boost/timer.hpp>
 #include <boost/format.hpp>
 #include "core/Tensor.h"
+
+#ifdef HAS_GOOGLE_PERFTOOLS
+#include <google/profiler.h>
+#endif
 
 const char* type2string(const Torch::Tensor& t) {
   static const char* d = "Double";
@@ -73,37 +78,45 @@ template<typename T> void benchmark_allocation
             << " us";
 }
 
-void benchmark_set(const unsigned int times, Torch::Tensor& t) {
-  short v = 0;
+template<typename T> void benchmark_set(const unsigned int times, T& t) {
+  double v = 0;
   const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   boost::timer timer;
   switch(t.nDimension())
   {
     case 1:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          t.set(i, ++v);
+        for(unsigned int i=0; i<S[0]; ++i) {
+          v += 1;
+          t(i) = v;
+        }
       break;
     case 2:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
-            t.set(i, j, ++v);
+          for(unsigned int j=0; j<S[1]; ++j) {
+            v += 1;
+            t(i, j) = v;
+          }
       break;
     case 3:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
           for(unsigned int j=0; j<S[1]; ++j)  
-            for(unsigned int k=0; k<S[2]; ++k)  
-              t.set(i, j, k, ++v);
+            for(unsigned int k=0; k<S[2]; ++k) {
+              v += 1;
+              t(i, j, k) = v;
+            }
       break;
     case 4:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
           for(unsigned int j=0; j<S[1]; ++j)  
             for(unsigned int k=0; k<S[2]; ++k)  
-              for(unsigned int l=0; l<S[3]; ++l) 
-                t.set(i, j, k, l, ++v);
+              for(unsigned int l=0; l<S[3]; ++l) {
+                v += 1;
+                t(i, j, k, l) = v;
+              }
       break;
     default:
       break;
@@ -123,20 +136,20 @@ template<typename T> double benchmark_get(const unsigned int times, const T& t) 
     case 1:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
-          v += t.get(i);
+          v += t(i);
       break;
     case 2:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
           for(unsigned int j=0; j<S[1]; ++j)  
-            v += t.get(i, j);
+            v += t(i, j);
       break;
     case 3:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
           for(unsigned int j=0; j<S[1]; ++j)  
             for(unsigned int k=0; k<S[2]; ++k)  
-              v += t.get(i, j, k);
+              v += t(i, j, k);
       break;
     case 4:
       for (unsigned n=0; n<times; ++n) 
@@ -144,7 +157,7 @@ template<typename T> double benchmark_get(const unsigned int times, const T& t) 
           for(unsigned int j=0; j<S[1]; ++j)  
             for(unsigned int k=0; k<S[2]; ++k)  
               for(unsigned int l=0; l<S[3]; ++l) 
-                v += t.get(i, j, k, l);
+                v += t(i, j, k, l);
       break;
     default:
       break;
@@ -179,20 +192,20 @@ benchmark_add(const unsigned int times, const T& t1, const T& t2) {
     case 1:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
-          result1(i) = t1.get(i) + t2.get(i);
+          result1(i) = t1(i) + t2(i);
       break;
     case 2:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
           for(unsigned int j=0; j<S[1]; ++j)  
-            result2(i, j) = t1.get(i, j) + t2.get(i, j);
+            result2(i, j) = t1(i, j) + t2(i, j);
       break;
     case 3:
       for (unsigned n=0; n<times; ++n) 
         for(unsigned int i=0; i<S[0]; ++i)  
           for(unsigned int j=0; j<S[1]; ++j)  
             for(unsigned int k=0; k<S[2]; ++k)  
-              result3(i, j, k) = t1.get(i, j, k) + t2.get(i, j, k);
+              result3(i, j, k) = t1(i, j, k) + t2(i, j, k);
       break;
     case 4:
       for (unsigned n=0; n<times; ++n) 
@@ -200,7 +213,7 @@ benchmark_add(const unsigned int times, const T& t1, const T& t2) {
           for(unsigned int j=0; j<S[1]; ++j)  
             for(unsigned int k=0; k<S[2]; ++k)  
               for(unsigned int l=0; l<S[3]; ++l)
-                result4(i, j, k, l) = t1.get(i, j, k, l) + t2.get(i, j, k, l);
+                result4(i, j, k, l) = t1(i, j, k, l) + t2(i, j, k, l);
       break;
     default:
       break;
@@ -211,6 +224,12 @@ benchmark_add(const unsigned int times, const T& t1, const T& t2) {
 }
 
 int main(int argc, char** argv) {
+  const char* profile_output = std::getenv("TORCH_PROFILE");
+  if (profile_output) {
+    std::cout << "Google perftools profile output set to " << profile_output << std::endl;
+    ProfilerStart(profile_output);
+  }
+
   boost::format H("%19s | ");
   
   //Allocation tests
@@ -339,4 +358,8 @@ int main(int argc, char** argv) {
   std::cout << H % size;
   benchmark_add(2500000, dt1, dt1);
   std::cout << std::endl;
+  
+  if (profile_output) ProfilerStop();
+
+  return 0;
 }
