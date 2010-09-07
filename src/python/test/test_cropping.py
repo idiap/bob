@@ -10,6 +10,7 @@ INPUT_VIDEO = 'test.mov'
 FACE_FINDER_PARAMETERS = 'facefinder.multiscale.params'
 GEOMNORM_PARAMETERS = 'geom.norm-64x80.cfg'
 
+import os, sys
 import unittest
 import torch
 
@@ -59,8 +60,15 @@ class CroppingTest(unittest.TestCase):
         self.assertEqual(oi.nplanes, 1)
 
 if __name__ == '__main__':
-  import os, sys
   sys.argv.append('-v')
+  if os.environ.has_key('TORCH_PROFILE') and \
+      os.environ['TORCH_PROFILE'] and \
+      hasattr(torch.core, 'ProfilerStart'):
+    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
+  if os.environ.has_key('TORCH_PROFILE') and \
+      os.environ['TORCH_PROFILE'] and \
+      hasattr(torch.core, 'ProfilerStop'):
+    torch.core.ProfilerStop()
 
