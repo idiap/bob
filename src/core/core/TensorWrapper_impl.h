@@ -3,25 +3,16 @@
 
 namespace Torch 
 {
-
-///////////////////////////////// TENSOR Methods Definitions ///////////////////////////////////
-  inline void
-  Tensor::raiseError(std::string msg) const
-  {
+  void Tensor::raiseError(std::string msg) const {
     std::cerr << "Error: " << msg << std::endl;
   }
   
-  inline void
-  Tensor::raiseFatalError(std::string msg) const
-  {
+  void Tensor::raiseFatalError(std::string msg) const {
     std::cerr << "Fatal Error: " << msg << std::endl;
     exit(-1);
   }
   
-
-  inline void
-  Tensor::setTensor( const Tensor *src)
-  {
+  void Tensor::setTensor( const Tensor *src) {
     Tensor::Type type = m_datatype;
     Tensor::Type src_type = src->getDatatype();
     // This seems to be reasonable (force the type to be specified before calling the function)
@@ -84,10 +75,7 @@ namespace Torch
     }
   }
 
-
-  inline void
-  Tensor::copy(const Tensor *src)
-  {
+  void Tensor::copy(const Tensor *src) {
     Tensor::Type type = m_datatype;
     Tensor::Type src_type = src->getDatatype();
     // This seems to be reasonable (force the type to be specified before calling the function)
@@ -341,10 +329,7 @@ namespace Torch
     }
   }
 
-
-  inline void
-  Tensor::transpose( const Tensor *src, int dimension1, int dimension2)
-  {
+  void Tensor::transpose( const Tensor *src, int dimension1, int dimension2) {
     Tensor::Type type = m_datatype;
     Tensor::Type src_type = src->getDatatype();
     // This seems to be reasonable (force the type to be specified before calling the function)
@@ -405,10 +390,8 @@ namespace Torch
     }
   }
 
-
-  inline void
-  Tensor::narrow( const Tensor *src, int dimension, long firstIndex, long size)
-  {
+  void Tensor::narrow (const Tensor *src, int dimension, long firstIndex,
+      long size) {
     Tensor::Type type = m_datatype;
     Tensor::Type src_type = src->getDatatype();
     // This seems to be reasonable (force the type to be specified before calling the function)
@@ -469,10 +452,7 @@ namespace Torch
     }
   }
 
-
-  inline void
-  Tensor::select( const Tensor* src, int dimension, long sliceIndex)
-  {
+  void Tensor::select( const Tensor* src, int dimension, long sliceIndex) {
     Tensor::Type type = m_datatype;
     Tensor::Type src_type = src->getDatatype();
     // This seems to be reasonable (force the type to be specified before calling the function)
@@ -533,10 +513,7 @@ namespace Torch
     }
   }
 
-
-  inline Tensor*
-  Tensor::select( int dimension, long sliceIndex) const
-  {
+  Tensor* Tensor::select( int dimension, long sliceIndex) const {
     Tensor* res = 0;
     Tensor::Type type = m_datatype;
 
@@ -580,721 +557,7 @@ namespace Torch
     return res;
   }
 
-/*
-  template <typename T> void
-  Tensor::set(long x0, T value)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        this_char->set( x0, value);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        this_short->set( x0, value);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        this_int->set( x0, value);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        this_long->set( x0, value);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        this_float->set( x0, value);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        this_double->set( x0, value);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::set() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> void
-  Tensor::set(long x0, long x1, T value)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        this_char->set( x0, x1, value);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        this_short->set( x0, x1, value);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        this_int->set( x0, x1, value);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        this_long->set( x0, x1, value);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        this_float->set( x0, x1, value);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        this_double->set( x0, x1, value);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::set() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> void
-  Tensor::set(long x0, long x1, long x2, T value)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        this_char->set( x0, x1, x2, value);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        this_short->set( x0, x1, x2, value);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        this_int->set( x0, x1, x2, value);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        this_long->set( x0, x1, x2, value);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        this_float->set( x0, x1, x2, value);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        this_double->set( x0, x1, x2, value);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::set() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> void
-  Tensor::set(long x0, long x1, long x2, long x3, T value)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        this_char->set( x0, x1, x2, x3, value);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        this_short->set( x0, x1, x2, x3, value);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        this_int->set( x0, x1, x2, x3, value);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        this_long->set( x0, x1, x2, x3, value);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        this_float->set( x0, x1, x2, x3, value);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        this_double->set( x0, x1, x2, x3, value);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::set() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-
-
-  template <typename T> T
-  Tensor::get(long x0) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return this_char->get( x0);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return this_short->get( x0);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return this_int->get( x0);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return this_long->get( x0);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return this_float->get( x0);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return this_double->get( x0);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::get() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> T
-  Tensor::get(long x0, long x1) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return this_char->get( x0, x1);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return this_short->get( x0, x1);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return this_int->get( x0, x1);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return this_long->get( x0, x1);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return this_float->get( x0, x1);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return this_double->get( x0, x1);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::get() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> T
-  Tensor::get(long x0, long x1, long x2) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return this_char->get( x0, x1, x2);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return this_short->get( x0, x1, x2);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return this_int->get( x0, x1, x2);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return this_long->get( x0, x1, x2);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return this_float->get( x0, x1, x2);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return this_double->get( x0, x1, x2);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::get() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> T
-  Tensor::get(long x0, long x1, long x2, long x3) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return this_char->get( x0, x1, x2, x3);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return this_short->get( x0, x1, x2, x3);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return this_int->get( x0, x1, x2, x3);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return this_long->get( x0, x1, x2, x3);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return this_float->get( x0, x1, x2, x3);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return this_double->get( x0, x1, x2, x3);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::get() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-
-
-  template <typename T> T&
-  Tensor::operator()(long x0)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        return (*this_char)( x0);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        return (*this_short)( x0);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        return (*this_int)( x0);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        return (*this_long)( x0);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        return (*this_float)( x0);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        return (*this_double)( x0);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> T&
-  Tensor::operator()(long x0, long x1)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        return (*this_char)( x0, x1);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        return (*this_short)( x0, x1);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        return (*this_int)( x0, x1);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        return (*this_long)( x0, x1);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        return (*this_float)( x0, x1);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        return (*this_double)( x0, x1);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> T&
-  Tensor::operator()(long x0, long x1, long x2)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        return (*this_char)( x0, x1, x2);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        return (*this_short)( x0, x1, x2);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        return (*this_int)( x0, x1, x2);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        return (*this_long)( x0, x1, x2);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        return (*this_float)( x0, x1, x2);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        return (*this_double)( x0, x1, x2);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> T&
-  Tensor::operator()(long x0, long x1, long x2, long x3)
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        CharTensor* this_char;
-        this_char = dynamic_cast<CharTensor*>(this);
-        return (*this_char)( x0, x1, x2, x3);
-        break;
-      case Tensor::Short:
-        ShortTensor* this_short;
-        this_short = dynamic_cast<ShortTensor*>(this);
-        return (*this_short)( x0, x1, x2, x3);
-        break;
-      case Tensor::Int:
-        IntTensor* this_int;
-        this_int = dynamic_cast<IntTensor*>(this);
-        return (*this_int)( x0, x1, x2, x3);
-        break;
-      case Tensor::Long:
-        LongTensor* this_long;
-        this_long = dynamic_cast<LongTensor*>(this);
-        return (*this_long)( x0, x1, x2, x3);
-        break;
-      case Tensor::Float:
-        FloatTensor* this_float;
-        this_float = dynamic_cast<FloatTensor*>(this);
-        return (*this_float)( x0, x1, x2, x3);
-        break;
-      case Tensor::Double:
-        DoubleTensor* this_double;
-        this_double = dynamic_cast<DoubleTensor*>(this);
-        return (*this_double)( x0, x1, x2, x3);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-
-  template <typename T> const T&
-  Tensor::operator()(long x0) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return (*this_char)( x0);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return (*this_short)( x0);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return (*this_int)( x0);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return (*this_long)( x0);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return (*this_float)( x0);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return (*this_double)( x0);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> const T&
-  Tensor::operator()(long x0, long x1) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return (*this_char)( x0, x1);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return (*this_short)( x0, x1);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return (*this_int)( x0, x1);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return (*this_long)( x0, x1);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return (*this_float)( x0, x1);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return (*this_double)( x0, x1);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> const T&
-  Tensor::operator()(long x0, long x1, long x2) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return (*this_char)( x0, x1, x2);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return (*this_short)( x0, x1, x2);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return (*this_int)( x0, x1, x2);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return (*this_long)( x0, x1, x2);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return (*this_float)( x0, x1, x2);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return (*this_double)( x0, x1, x2);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-
-  template <typename T> const T&
-  Tensor::operator()(long x0, long x1, long x2, long x3) const
-  {
-    Tensor::Type type = m_datatype;
-
-    switch(type)
-    {
-      case Tensor::Char:
-        const CharTensor* this_char;
-        this_char = dynamic_cast<const CharTensor*>(this);
-        return (*this_char)( x0, x1, x2, x3);
-        break;
-      case Tensor::Short:
-        const ShortTensor* this_short;
-        this_short = dynamic_cast<const ShortTensor*>(this);
-        return (*this_short)( x0, x1, x2, x3);
-        break;
-      case Tensor::Int:
-        const IntTensor* this_int;
-        this_int = dynamic_cast<const IntTensor*>(this);
-        return (*this_int)( x0, x1, x2, x3);
-        break;
-      case Tensor::Long:
-        const LongTensor* this_long;
-        this_long = dynamic_cast<const LongTensor*>(this);
-        return (*this_long)( x0, x1, x2, x3);
-        break;
-      case Tensor::Float:
-        const FloatTensor* this_float;
-        this_float = dynamic_cast<const FloatTensor*>(this);
-        return (*this_float)( x0, x1, x2, x3);
-        break;
-      case Tensor::Double:
-        const DoubleTensor* this_double;
-        this_double = dynamic_cast<const DoubleTensor*>(this);
-        return (*this_double)( x0, x1, x2, x3);
-        break;
-      case Tensor::Undefined:
-        std::cerr << "Error: Tensor::operator()() don't know how to set a Tensor from Undefined type." << std::endl;
-      default:
-        break;
-    }
-  }
-*/
-
-
-  inline int
-  Tensor::typeSize() const
-  {
+  int Tensor::typeSize() const {
     int res = 0;
     Tensor::Type type = m_datatype;
 
@@ -1325,10 +588,7 @@ namespace Torch
     return res;
   }
 
-
-  inline const void* 
-  Tensor::dataR() const
-  {
+  const void* Tensor::dataR() const {
     const void* res = 0;
     Tensor::Type type = m_datatype;
 
@@ -1371,10 +631,7 @@ namespace Torch
     return res;
   }
 
-
-  inline void* 
-  Tensor::dataW()
-  {
+  void* Tensor::dataW() {
     void* res = 0;
     Tensor::Type type = m_datatype;
 
@@ -1417,10 +674,7 @@ namespace Torch
     return res;
   }
 
-
-  inline void
-  Tensor::resetFromData()
-  {
+  void Tensor::resetFromData() {
     Tensor::Type type = m_datatype;
 
     switch(type)
@@ -1461,10 +715,7 @@ namespace Torch
     }
   }
 
-
-  inline long
-  Tensor::stride(int dim) const
-  {
+  long Tensor::stride(int dim) const {
     long res = 0;
     Tensor::Type type = m_datatype;
 
@@ -1506,8 +757,6 @@ namespace Torch
     }
     return res;
   }
-
-
 
 }
 

@@ -1,7 +1,7 @@
 #ifndef TORCH5SPRO_TENSOR_H
 #define TORCH5SPRO_TENSOR_H
 
-#define TORCH5SPRO_TENSOR_TYPE 1
+#define TORCH5SPRO_TENSOR_TYPE 2
 
 /**
  * \defgroup libcore_api libCore API
@@ -124,21 +124,20 @@ namespace Torch
 
 #if TORCH5SPRO_TENSOR_TYPE == 1
 #include "core/TensorTorch5.h"
-#endif
-
-#if TORCH5SPRO_TENSOR_TYPE == 2 
+#elif TORCH5SPRO_TENSOR_TYPE == 2 
 #include <boost/multi_array.hpp>
 #include "core/TensorWrapper.h"
-#endif
-
-#if TORCH5SPRO_TENSOR_TYPE == 3 
+#elif TORCH5SPRO_TENSOR_TYPE == 3 
+#include <blitz/array.h>
+#include "core/TensorWrapper.h"
+#elif TORCH5SPRO_TENSOR_TYPE == 4 
 #include <blitz/array.h>
 #include "core/TensorWrapper.h"
 #endif
+
 /**
  * @}
  */
-
 
 /**
 @page libCore Core: The Core module of Torch

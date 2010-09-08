@@ -1,6 +1,5 @@
 #include "core/Tensor.h"
 
-
 namespace Torch {
 
 const char *str_TensorTypeName[] = {"char", "short", "int", "long", "float", "double"};
@@ -80,3 +79,7 @@ long Tensor::sizeAll() const
 #endif
 
 }
+
+#if TORCH5SPRO_TENSOR_TYPE > 1 
+#include "TensorWrapper.cc"
+#endif
