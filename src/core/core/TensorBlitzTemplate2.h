@@ -1,5 +1,5 @@
 /**
-  * @file TensorBlitzTemplateAA.h
+  * @file TensorBlitzTemplate2.h
   * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
   * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
   *
