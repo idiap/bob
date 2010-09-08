@@ -8,6 +8,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <cstdlib>
+#include <cstring>
 #include <boost/timer.hpp>
 #include <boost/format.hpp>
 #include "core/Tensor.h"
