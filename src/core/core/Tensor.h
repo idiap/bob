@@ -1,7 +1,7 @@
 #ifndef TORCH5SPRO_TENSOR_H
 #define TORCH5SPRO_TENSOR_H
 
-#define TORCH5SPRO_TENSOR_TYPE 2
+#define TORCH5SPRO_TENSOR_TYPE 1
 
 /**
  * \defgroup libcore_api libCore API
