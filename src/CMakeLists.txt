@@ -35,12 +35,16 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # This is where we install cmake files for external projects
 set(cmakedir share/cmake)
 
-# Sets up externals and install
+# Sets up externals and install the central dependency file
 include(cmake/torch-external.cmake)
 foreach(ext ${torch_DEPENDENCIES}) 
   find_package(${ext} REQUIRED PATHS external)
   install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
 endforeach(ext ${torch_DEPENDENCIES}) 
+foreach(ext ${torch_OPTIONALS}) 
+  find_package(${ext} PATHS external)
+  install(FILES external/${ext}Config.cmake DESTINATION ${cmakedir})
+endforeach(ext ${torch_OPTIONALS}) 
 install(FILES cmake/torch-external.cmake DESTINATION ${cmakedir})
 
 # Enables the testing framework

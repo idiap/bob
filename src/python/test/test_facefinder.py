@@ -10,6 +10,7 @@ INPUT_VIDEO = 'test.mov'
 PARAMETERS = 'facefinder.multiscale.params'
 CONTEXT_PARAMETERS = 'facefinder.track.context.params'
 
+import os, sys
 import unittest
 import torch
 
@@ -72,7 +73,14 @@ class FaceFinderTest(unittest.TestCase):
     self.assertEqual(patterns.size(), 1)
 
 if __name__ == '__main__':
-  import os, sys
   sys.argv.append('-v')
+  if os.environ.has_key('TORCH_PROFILE') and \
+      os.environ['TORCH_PROFILE'] and \
+      hasattr(torch.core, 'ProfilerStart'):
+    torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
+  if os.environ.has_key('TORCH_PROFILE') and \
+      os.environ['TORCH_PROFILE'] and \
+      hasattr(torch.core, 'ProfilerStop'):
+    torch.core.ProfilerStop()
