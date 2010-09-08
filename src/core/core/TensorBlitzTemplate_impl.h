@@ -1,6 +1,8 @@
 #ifndef TORCH5SPRO_TENSOR_BLITZ_TEMPLATE_IMPL_H
 #define TORCH5SPRO_TENSOR_BLITZ_TEMPLATE_IMPL_H
 
+#include <cstdarg>
+
 namespace Torch 
 {
 /*
