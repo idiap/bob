@@ -331,7 +331,7 @@ double MultiVariateDiagonalGaussianDistribution::sampleProbabilityOneGaussian(co
 			sq_det *= sqrt(variances[g][k]);
 		}
 
-		l = exp(-0.5*z) / pow(sqrt(2.0*M_PI), n_inputs) * sq_det;
+		l = exp(-0.5*z) / (pow(sqrt(2.0*M_PI), n_inputs) * sq_det);
 		// Warning !! the following formula is incorrect and produces a likelihood decrease during EM (this is a typical error !!
 		//l = exp(-0.5*z) / sqrt(pow(2.0*M_PI, dim)) * det;
 	}
