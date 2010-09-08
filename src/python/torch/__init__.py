@@ -12,8 +12,9 @@ import core
 import sp
 import ip
 import scanning
+import machine
 
 sys.setdlopenflags(default_flags)
 del default_flags
 
-__all__ = ['core', 'sp', 'ip', 'scanning']
+__all__ = ['core', 'sp', 'ip', 'scanning', 'machine']

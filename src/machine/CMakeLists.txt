@@ -50,3 +50,15 @@ set(src
 
 include(../cmake/macros.cmake)
 torch_library(machine "${src}" "${deps}" "${shared}")
+
+# Python bindings
+set(pysrc
+   "python/src/main.cc"
+   "python/src/machine.cc"
+   "python/src/ProbabilityDistribution.cc"
+   "python/src/MultiVariateNormalDistribution.cc"
+   "python/src/MultiVariateDiagonalGaussianDistribution.cc"
+   )
+ 
+torch_python_bindings(machine "${pysrc}")
+torch_python_install(machine)
