@@ -188,7 +188,7 @@ namespace Torch {
 #include "core/TensorBlitzTemplate.h"
 #include "core/TensorBlitzTemplate_impl.h"
 #elif TORCH5SPRO_TENSOR_TYPE == 4
-#include "core/TensorBlitzTemplateAA.h"
+#include "core/TensorBlitzTemplate2.h"
 #endif
 
 namespace Torch {
