@@ -2,6 +2,7 @@
 #define _TORCH5SPRO_MACHINE_H_
 
 #include "core/Object.h"
+#include "core/File.h"
 #include "core/Parameters.h"
 #include "core/Tensor.h"
 

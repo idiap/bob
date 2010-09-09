@@ -16,7 +16,6 @@ using namespace boost::python;
 
 void bind_machine_ProbabilityDistribution()
 {
-	class_<Torch::ProbabilityDistribution, bases<Torch::Machine>, boost::noncopyable>("ProbabilityDistribution", "", , no_init)
-		.def("loadFile", &Torch::ProbabilityDistribution::loadFile, (arg("self"), arg("file")), "loads a file")
+	class_<Torch::ProbabilityDistribution, bases<Torch::Machine>, boost::noncopyable>("ProbabilityDistribution", "", no_init)
 	;
 }
