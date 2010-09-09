@@ -13,8 +13,19 @@
 
 using namespace boost::python;
 
+static double score(Torch::Machine &self, const Torch::Tensor &tensor)
+{
+	self.forward(tensor);
+	const Torch::DoubleTensor &res = self.getOutput();
+	double score = *((double *) res.dataR());
+
+	return score;
+}
+
+
 void bind_machine_MultiVariateNormalDistribution()
 {
 	class_<Torch::MultiVariateNormalDistribution, bases<Torch::ProbabilityDistribution>, boost::noncopyable>("MultiVariateNormalDistribution", "", no_init)
+		.def("score", &score, (arg("self"), arg("tensor")), "score a tensor against the mixture")
 	;
 }

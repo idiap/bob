@@ -7,8 +7,7 @@
  */
 
 #include <boost/python.hpp>
-
-#include <cstdio>
+#include <boost/shared_ptr.hpp>
 
 #include "core/Object.h"
 #include "core/File.h"
@@ -42,8 +41,11 @@ static bool loadFileWithString(Torch::Machine &self, const char *filename)
 
 void bind_machine_machine()
 {
-	class_<Torch::Machine, bases<Torch::Object>, boost::noncopyable>("Machine", "", no_init)
+	class_<Torch::Machine, boost::shared_ptr<Torch::Machine>, bases<Torch::Object>, boost::noncopyable>("Machine", "", no_init)
 		.def("forward", &Torch::Machine::forward, (arg("self"), arg("tensor input")), "Process the input tensor")
 		.def("loadFile", &loadFileWithString, (arg("self"), arg("file")), "loads a file")
+		// .def("getSize", &Torch::Machine::getSize, (arg("self")), "Get the tensor size")
+		// .add_property("size", &Torch::Machine::getSize)
+		// .add_property("output", &Torch::Machine::getOutput)
 		;
 }
