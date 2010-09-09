@@ -553,12 +553,12 @@ Torch::TensorTemplate<T>::resizeAs(const Torch::TensorTemplate<U> &src) {
       m_array_2D = new blitz::Array<T,2>((int)src.size(0), (int)src.size(1));
       break;
     case 3:
-      m_array_3D = new blitz::Array<T,3>((int)src.size(0), (int)src.size(1),
-          (int)src.size(2));
+      m_array_3D = new blitz::Array<T,3>((int)src.size(0),
+          (int)src.size(1), (int)src.size(2));
       break;
     case 4:
-      m_array_4D = new blitz::Array<T,4>((int)src.size(0), (int)src.size(1),
-          (int)src.size(2), (int)src.size(3));
+      m_array_4D = new blitz::Array<T,4>((int)src.size(0),
+          (int)src.size(1), (int)src.size(2), (int)src.size(3));
       break;
   }
 }
@@ -613,15 +613,15 @@ template <typename T> T& Torch::TensorTemplate<T>::operator()(long dim0) {
       return (*m_array_1D)((int)dim0);
     case 2:
       {
-        const int s0 = size(0);
+        const int s0 = m_array_2D->extent(0);
         long ndim0=dim0 % s0;
         long ndim1=dim0 / s0;
         return (*this)(ndim0, ndim1);
       }
     case 3:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
+        const int s0 = m_array_3D->extent(0);
+        const int s1 = m_array_3D->extent(1);
         long ndim2=dim0 / (s0*s1);
         dim0 -= (s0*s1)*ndim2;
         long ndim1=dim0 / s0;
@@ -630,9 +630,9 @@ template <typename T> T& Torch::TensorTemplate<T>::operator()(long dim0) {
       }
     case 4:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
-        const int s2 = size(2);
+        const int s0 = m_array_4D->extent(0);
+        const int s1 = m_array_4D->extent(1);
+        const int s2 = m_array_4D->extent(2);
         long ndim3=dim0 / (s0*s1*s2);
         dim0 -= (s0*s1*s2)*ndim3;
         long ndim2=dim0 / (s0*s1);
@@ -653,15 +653,15 @@ template <typename T> const T& Torch::TensorTemplate<T>::operator()(long dim0) c
       return (*m_array_1D)((int)dim0);
     case 2:
       {
-        const int s0 = size(0);
+        const int s0 = m_array_2D->extent(0);
         long ndim0=dim0 % s0;
         long ndim1=dim0 / s0;
         return (*this)(ndim0, ndim1);
       }
     case 3:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
+        const int s0 = m_array_3D->extent(0);
+        const int s1 = m_array_3D->extent(1);
         long ndim2=dim0 / (s0*s1);
         dim0 -= (s0*s1)*ndim2;
         long ndim1=dim0 / s0;
@@ -670,9 +670,9 @@ template <typename T> const T& Torch::TensorTemplate<T>::operator()(long dim0) c
       }
     case 4:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
-        const int s2 = size(2);
+        const int s0 = m_array_4D->extent(0);
+        const int s1 = m_array_4D->extent(1);
+        const int s2 = m_array_4D->extent(2);
         long ndim3=dim0 / (s0*s1*s2);
         dim0 -= (s0*s1*s2)*ndim3;
         long ndim2=dim0 / (s0*s1);
@@ -692,14 +692,14 @@ template <typename T> void Torch::TensorTemplate<T>::computeDataRW() {
   {
     case 1:
       {
-        const int s0 = size(0);
+        const int s0 = m_array_1D->extent(0);
         for(int i = 0; i<s0; i++) m_data_RW[i] = (*m_array_1D)(i);
       }
       break;
     case 2:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
+        const int s0 = m_array_2D->extent(0);
+        const int s1 = m_array_2D->extent(1);
         for(int j = 0; j<s1; j++)
           for(int i = 0; i<s0; i++)
             m_data_RW[i+j*m_stride[1]] = (*m_array_2D)(i, j);
@@ -707,9 +707,9 @@ template <typename T> void Torch::TensorTemplate<T>::computeDataRW() {
       break;
     case 3:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
-        const int s2 = size(2);
+        const int s0 = m_array_3D->extent(0);
+        const int s1 = m_array_3D->extent(1);
+        const int s2 = m_array_3D->extent(2);
         for(int k = 0; k<s2; k++)
           for(int j = 0; j<s1; j++)
             for(int i = 0; i<s0; i++)
@@ -718,10 +718,10 @@ template <typename T> void Torch::TensorTemplate<T>::computeDataRW() {
       break;
     case 4:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
-        const int s2 = size(2);
-        const int s3 = size(3);
+        const int s0 = m_array_4D->extent(0);
+        const int s1 = m_array_4D->extent(1);
+        const int s2 = m_array_4D->extent(2);
+        const int s3 = m_array_4D->extent(3);
         for(int l = 0; l<s3; l++)
           for(int k = 0; k<s2; k++)
             for(int j = 0; j<s1; j++)
@@ -761,20 +761,20 @@ template <typename T> void Torch::TensorTemplate<T>::computeStride() const {
       break;
     case 2:
       self->m_stride[0] = 1;
-      self->m_stride[1] = size(0);
+      self->m_stride[1] = m_array_2D->extent(0);
       self->m_stride[2] = self->m_stride[3] = 0;
       break;
     case 3:
       self->m_stride[0] = 1;
-      self->m_stride[1] = size(0);
-      self->m_stride[2] = self->m_stride[1]*size(1);
+      self->m_stride[1] = m_array_3D->extent(0);
+      self->m_stride[2] = self->m_stride[1]*m_array_3D->extent(1);
       self->m_stride[3] = 0;
       break;
     case 4:
       self->m_stride[0] = 1;
-      self->m_stride[1] = size(0);
-      self->m_stride[2] = self->m_stride[1]*size(1);
-      self->m_stride[3] = self->m_stride[2]*size(2);
+      self->m_stride[1] = m_array_4D->extent(0);
+      self->m_stride[2] = self->m_stride[1]*m_array_4D->extent(1);
+      self->m_stride[3] = self->m_stride[2]*m_array_4D->extent(2);
     default:
       break;
   }
@@ -789,14 +789,14 @@ template <typename T> void Torch::TensorTemplate<T>::resetFromData() {
   switch(m_n_dimensions) {
     case 1:
       {
-        const int s0 = size(0);
+        const int s0 = m_array_1D->extent(0);
         for(int i = 0; i<s0; ++i) (*m_array_1D)(i) = m_data_RW[i];
       }
       break;
     case 2:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
+        const int s0 = m_array_2D->extent(0);
+        const int s1 = m_array_2D->extent(1);
         for(int j = 0; j<s1; ++j)
           for(int i = 0; i<s0; ++i)
             (*m_array_2D)(i, j) = m_data_RW[i+j*m_stride[1]];
@@ -804,9 +804,9 @@ template <typename T> void Torch::TensorTemplate<T>::resetFromData() {
       break;
     case 3:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
-        const int s2 = size(2);
+        const int s0 = m_array_3D->extent(0);
+        const int s1 = m_array_3D->extent(1);
+        const int s2 = m_array_3D->extent(2);
         for(int k = 0; k<s2; ++k)
           for(int j = 0; j<s1; ++j)
             for(int i = 0; i<s0; ++i)
@@ -815,10 +815,10 @@ template <typename T> void Torch::TensorTemplate<T>::resetFromData() {
       break;
     case 4:
       {
-        const int s0 = size(0);
-        const int s1 = size(1);
-        const int s2 = size(2);
-        const int s3 = size(3);
+        const int s0 = m_array_4D->extent(0);
+        const int s1 = m_array_4D->extent(1);
+        const int s2 = m_array_4D->extent(2);
+        const int s3 = m_array_4D->extent(3);
         for(int l = 0; l<s3; ++l)
           for(int k = 0; k<s2; ++k)
             for(int j = 0; j<s1; ++j)
