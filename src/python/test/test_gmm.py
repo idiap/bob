@@ -74,6 +74,20 @@ class GmmTest(unittest.TestCase):
     score = gmm.score(zero_tensor)
     self.assertTrue(compare(score, -14.6556824302, 1e-6))
 
+  def test_score_04(self):
+    lds = torch.core.ListDataSet()
+    status = lds.load("data_machine/1001_f_g1_s01_1001_en_4.chris.dct")
+
+    # make sure we read everything
+    self.assertEqual(status, 2337)
+
+    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution("data_machine/1001.gmm")
+    score = gmm.score(lds)
+    
+    # make sure that the score is correct
+    self.assertTrue(compare(score, -98.8320520107, 1e-6))
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))

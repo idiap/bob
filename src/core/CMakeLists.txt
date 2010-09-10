@@ -33,6 +33,7 @@ set(src
     "src/CmdLine.cc"
     "src/CmdFile.cc"
     "src/Random.cc"
+    "src/ListDataSet.cc"
     )
 
 include(../cmake/macros.cmake)
@@ -51,6 +52,8 @@ set(pysrc
    "python/src/tensor.cc"
    "python/src/tensorfile.cc"
    "python/src/profile.cc"
+   "python/src/DataSet.cc"
+   "python/src/ListDataSet.cc"
    "python/src/main.cc"
    )
  

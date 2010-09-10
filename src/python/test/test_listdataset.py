@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+# vim: set fileencoding=utf-8 :
+# Andre Anjos <andre.dos.anjos@gmail.com>
+# Fri 16 Jul 2010 09:30:53 CEST
+
+"""Tests cropping features
+"""
+
+import os, sys
+import unittest
+import torch
+
+class ListDataSetTest(unittest.TestCase):
+  """Performs various tests for the Torch::ipGeomNorm object."""
+
+  ###############################################################
+  #
+
+  def test_load(self):
+    lds = torch.core.ListDataSet()
+    status = lds.load("data_machine/1001_f_g1_s01_1001_en_4.chris.dct")
+
+    # make sure we read everything
+    self.assertEqual(status, 2337)
+
+if __name__ == '__main__':
+  sys.argv.append('-v')
+  os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
+  unittest.main()
+

@@ -25,7 +25,10 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp.py)
   torch_python_add_test(python-filter-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters.py)
+  torch_python_add_test(python-listdataset-tests 
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_listdataset.py)
   torch_python_add_test(python-gmm-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gmm.py)
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+
 
