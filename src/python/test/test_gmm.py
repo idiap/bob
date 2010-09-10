@@ -33,6 +33,15 @@ class GmmTest(unittest.TestCase):
     gmm = torch.machine.MultiVariateDiagonalGaussianDistribution("data_machine/1001.gmm")
     self.assertTrue(True) # bad need to find a good test here
 
+  def test_load_and_construct_04(self):
+
+    try:
+      gmm = torch.machine.MultiVariateDiagonalGaussianDistribution("does.not.exist.gmm")
+    except:
+      self.assertTrue(True) # an exception was raised - good
+      return                # leave test
+ 
+    self.assertTrue(False)  # no exception was raised - wrong
 
   ###############################################################
   #

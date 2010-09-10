@@ -10,6 +10,8 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <exception>
+
 #include "machine/MultiVariateDiagonalGaussianDistribution.h"
 
 using namespace boost::python;
@@ -33,6 +35,8 @@ static boost::shared_ptr<TGMM> createWithString(const char *filename)
 	} else {
 		// TODO error message
 		status = false;
+		throw std::exception();
+		
 	}
 
 	if (status)
