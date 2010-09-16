@@ -114,7 +114,7 @@ void ListDataSet::turn_to_floats()
 }
 
 /**
- * Turn the whole data set to floats
+ * Turn the whole data set to doubles
  *
  */
 void ListDataSet::turn_to_doubles()
@@ -146,7 +146,7 @@ void ListDataSet::turn_to_doubles()
 }
 
 /**
- * Get memory data set with 10 uniformly samples
+ * Get memory data set with <n> samples (uniformly sampling)
  *
  */
 MemoryDataSet *ListDataSet::get_subset(const int size)
@@ -175,6 +175,11 @@ MemoryDataSet *ListDataSet::get_subset(const int size)
 	return subset;
 }
 
+
+/**
+ * Get the whole dataset but as a MemoryDataSet
+ *
+ */
 MemoryDataSet *ListDataSet::get_subset_all()
 {
 	MemoryDataSet *subset = new MemoryDataSet(getSize(),
@@ -195,7 +200,7 @@ MemoryDataSet *ListDataSet::get_subset_all()
 
 
 /**
- * Save the listdataset into a tensor file
+ * Save the listdataset as a  tensor file (on disk)
  *
  */
 int ListDataSet::save(const char *fname)
