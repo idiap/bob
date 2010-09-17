@@ -31,8 +31,13 @@ namespace Torch {
 
   /**
    * @brief Search for the EER and returns the threshold, the FRR and FAR
-   * @param
-   * @return 
+   * @param measures the array of measures to consider
+   * @param n the number of measures
+   * @param frr a pointer to the FRR (updated by this function)
+   * @param far a pointer to the FAR (updated by this function)
+   * @param number_of_positives_ the number of positive samples
+   * @param sort_ indicates if a sort should be performed
+   * @return Returns the EER
    */
   double computeEER(LabelledMeasure* measures, int n, double* frr, 
       double* far, int number_of_positives_ = -1, bool sort_ = true);
@@ -40,8 +45,14 @@ namespace Torch {
   /**
    * @brief Search for the min HTER and returns the threshold, 
    * the FRR and FAR
-   * @param
-   * @return 
+   * @param measures the array of measures to consider
+   * @param n the number of measures
+   * @param frr a pointer to the FRR (updated by this function)
+   * @param far a pointer to the FAR (updated by this function)
+   * @param number_of_positives_ the number of positive samples
+   * @param sort_ indicates if a sort should be performed
+   * @param ratio_far the FAR ratio for the cost computation
+   * @return Returns the HTER
    */
   double computeHTER(LabelledMeasure* measures, int n, double* frr, 
       double* far, int number_of_positives_ = -1, bool sort = true, 
