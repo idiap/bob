@@ -12,35 +12,41 @@ namespace Torch
  *
  */
 
-	/////////////////////////////////////////////////////////////////////////
-	// Torch::spDCT
-	//	This class is designed to perform DCT.
-	//	The result is a tensor of the same storage type.
-	//
-	// TODO: doxygen header!
-	/////////////////////////////////////////////////////////////////////////
-
+  /**
+   * This class is designed to perform DCT.
+   * The result is a tensor of the same storage type.
+   */
 	class spDCT : public spCore
 	{
 	public:
 
-		// Constructor
+		/**
+     *  Constructor
+     */
 		spDCT(bool inverse_ = false);
 
-		// Destructor
+		/**
+     *  Destructor
+     */
 		virtual ~spDCT();
 
 	protected:
 
 		//////////////////////////////////////////////////////////
 
-		/// Check if the input tensor has the right dimensions and type - overriden
+		/**
+     *  Check if the input tensor has the right dimensions and type - overriden
+     */
 		virtual bool		checkInput(const Tensor& input) const;
 
-		/// Allocate (if needed) the output tensors given the input tensor dimensions - overriden
+		/**
+     *  Allocate (if needed) the output tensors given the input tensor dimensions - overriden
+     */
 		virtual bool		allocateOutput(const Tensor& input);
 
-		/// Process some input tensor (the input is checked, the outputs are allocated) - overriden
+		/**
+     *  Process some input tensor (the input is checked, the outputs are allocated) - overriden
+     */
 		virtual bool		processInput(const Tensor& input);
 
 		//////////////////////////////////////////////////////////
@@ -50,7 +56,11 @@ namespace Torch
 		/////////////////////////////////////////////////////////////////
 		// Attributes
 
+    /**
+     * Indicates if we want to compute the inverse DCT
+     */
 		bool inverse;
+
 
 		int N;
 		int H;
