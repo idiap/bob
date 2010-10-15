@@ -2,9 +2,7 @@
 #include "scanning/LRMachine.h"
 #include "measurer/measurer.h"
 
-#ifdef HAVE_LBFGS
-	#include "lbfgs/lbfgs.h"
-#endif
+#include "lbfgs/lbfgs.h"
 
 static double getSign(double value)
 {
@@ -258,7 +256,6 @@ bool LRTrainer::train()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Callback functions for the L-BFGS optimization library
 
-#ifdef HAVE_LBFGS
 
 struct LBFGS_Data
 {
@@ -333,7 +330,6 @@ static lbfgsfloatval_t evaluate(	void* instance,
 //	return 0;
 //}
 
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Train the LR machine using the given L1 and L2 priors
@@ -382,7 +378,7 @@ bool LRTrainer::train(	double L1_prior, double L2_prior,
 		///////////////////////////////////////////////////////////////////////
 		// Optimize the criterion using the selected features/weights
 
-#ifdef HAVE_LBFGS		// L-BFGS optimization
+		// L-BFGS optimization
 
 		// Initialize the parameters for the L-BFGS optimization
 		lbfgs_parameter_t param;
@@ -396,6 +392,7 @@ bool LRTrainer::train(	double L1_prior, double L2_prior,
 		LBFGS_Data data(m_dataset, buf_gradients, fselected, L1_prior, L2_prior);
 		lbfgs(size + 1, weights, &fx, evaluate, NULL, (void*)&data, &param);
 
+/* LBFGS is now an external requirement of Torch5spro
 #else				// Batch gradient descent
 
 		const double eps = 0.00001;
@@ -435,7 +432,7 @@ bool LRTrainer::train(	double L1_prior, double L2_prior,
 //			}
 		}
 #endif
-
+*/
 		///////////////////////////////////////////////////////////////////////
 	}
 

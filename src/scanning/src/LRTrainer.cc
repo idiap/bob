@@ -2,9 +2,7 @@
 #include "scanning/LRMachine.h"
 #include "measurer/measurer.h"
 
-#ifdef HAVE_LBFGS
-	#include "lbfgs/lbfgs.h"
-#endif
+#include "lbfgs/lbfgs.h"
 
 static double getSign(double value)
 {
@@ -247,8 +245,6 @@ bool LRTrainer::train()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Callback functions for the L-BFGS optimization library
 
-#ifdef HAVE_LBFGS
-
 struct LBFGS_Data
 {
 	LBFGS_Data(	DataSet* dataset, double* buf_gradients, bool* fselected, double l1_prior, double l2_prior,
@@ -321,7 +317,6 @@ static lbfgsfloatval_t evaluate(	void* instance,
 //	return 0;
 //}
 
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Train the LR machine using the given L1 and L2 priors
@@ -341,8 +336,6 @@ bool LRTrainer::train(	double L1_prior, double L2_prior, double FARvsFRRRatio,
 			fselected[i] = true;
 		}
 
-	#ifdef HAVE_LBFGS
-
 		// Initialize the parameters for the L-BFGS optimization
 		lbfgs_parameter_t param;
 		lbfgs_parameter_init(&param);
@@ -354,12 +347,6 @@ bool LRTrainer::train(	double L1_prior, double L2_prior, double FARvsFRRRatio,
 		lbfgsfloatval_t fx;
 		LBFGS_Data data(m_dataset, buf_gradients, fselected, L1_prior, L2_prior, FARvsFRRRatio);
 		lbfgs(size + 1, weights, &fx, evaluate, NULL, (void*)&data, &param);
-
-	#else
-
-		CHECK_FATAL(false);
-
-	#endif
 
 		return true;
 	}
@@ -402,8 +389,6 @@ bool LRTrainer::train(	double L1_prior, double L2_prior, double FARvsFRRRatio,
 			fselected[i_max_gradient] = true;
 			n_fselected ++;
 
-		#ifdef HAVE_LBFGS
-
 			// Initialize the parameters for the L-BFGS optimization
 			lbfgs_parameter_t param;
 			lbfgs_parameter_init(&param);
@@ -415,12 +400,6 @@ bool LRTrainer::train(	double L1_prior, double L2_prior, double FARvsFRRRatio,
 			lbfgsfloatval_t fx;
 			LBFGS_Data data(m_dataset, buf_gradients, fselected, L1_prior, L2_prior, FARvsFRRRatio);
 			lbfgs(size + 1, weights, &fx, evaluate, NULL, (void*)&data, &param);
-
-		#else
-
-			CHECK_FATAL(false);
-
-		#endif
 		}
 
 		return n_fselected > 0;
