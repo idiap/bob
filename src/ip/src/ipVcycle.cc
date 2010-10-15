@@ -13,10 +13,8 @@
 //*******************************************************************
 
 // Declaration of the external Fortran library. This function performs an eigenvalue decomposition.
-#ifdef USE_CBLAS
 extern "C" void dgesv_( int *N, int *NRHS, double *A, int *lda, int *ipiv, 
 						double *B, int *ldb, int *info);
-#endif
 
 
 namespace Torch {
@@ -184,7 +182,6 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 		result->copy(t_b);
 		
 		int info = 0;
-#ifdef USE_CBLAS
 		// Prepare to use LAPACK function
 		IntTensor ipiv(width_*height_);
 		int N =  width_*height_;
@@ -198,7 +195,7 @@ DoubleTensor* ipVcycle::mgv(DoubleTensor& x_v, DoubleTensor& b_v, double lambda,
 		dgesv_( &N, &NRHS, d_diffOperator, &lda, (int*)ipiv.dataW(), d_result, &ldb, &info );
     diffOperator->resetFromData();
     result->resetFromData();
-#endif
+
 		if (info != 0) error("ipVCycle: error %d in LAPACK function dgesv_ (Solving a linear system).\n", info);
 
 		// set boundary pixels to zero
