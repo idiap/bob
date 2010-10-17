@@ -14,8 +14,8 @@ namespace Torch
  */
 
   /**
-   * This class defines Eigenmachine.
-   * An Eigenmachine performs dimensionality reduction by projecting data on a basis on Eigenvectors.
+   * This class defines an Eigenmachine.
+   * An Eigenmachine performs dimensionality reduction by projecting data on a basis of Eigenvectors.
    * Both PCAMachine and LDAMachine are Eigenmachines.
    */
 	class EigenMachine : public Machine
