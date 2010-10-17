@@ -11,7 +11,9 @@ set(src_machine
    "src/TreeClassifier.cc"
    "src/GradientMachine.cc"
    "src/Criterion.cc"
-   "src/ProbabilityDistribution.cc")
+   "src/ProbabilityDistribution.cc"
+   "src/EigenMachine.cc"
+   "src/PCAMachine.cc")
 
 set(src_criterions
    "src/MSECriterion.cc"

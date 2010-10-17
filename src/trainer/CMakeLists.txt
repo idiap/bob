@@ -8,7 +8,9 @@ SET(src_trainer
    "src/Trainer.cc"
    "src/GradientTrainer.cc"
    "src/StochasticGradientTrainer.cc"
-   "src/EMTrainer.cc")
+   "src/EMTrainer.cc"
+   "src/EigenTrainer.cc"
+   "src/SVDPCATrainer.cc")
 
 SET(src_boosting
    "src/BoostingRoundLBPTrainer.cc"

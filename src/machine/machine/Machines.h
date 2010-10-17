@@ -44,6 +44,10 @@
 #define INT_LUT_MACHINE_ID 21
 #define REAL_LUT_MACHINE_ID 22
 
+// PCA/LDA like machines 7XXX
+#define EIGEN_MACHINE_ID 7000
+#define PCA_MACHINE_ID 7001
+
 //////////////////////////////////////////////////////////////////////////////////
 
 #endif
