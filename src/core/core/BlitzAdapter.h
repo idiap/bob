@@ -23,7 +23,7 @@ namespace Torch {
         /**
          * Constructor
          */
-        BlitzAdapter(T& blitz_array): m_v(blitz_array) {}
+        BlitzAdapter(T& blitz_array): m_array(blitz_array) {}
 
         /**
          * Write a Blitz++ array into an output stream
@@ -35,8 +35,8 @@ namespace Torch {
           // allow to easily reconstruct a blitz array of unknown type just  by reading 
           // the stored data.
           os << typeid(T).name() << std::endl;
-          os << ad.m_v.dimensions() << std::endl;
-          os << ad.m_v << std::endl;
+          os << ad.m_array.dimensions() << std::endl;
+          os << ad.m_array << std::endl;
           return os;
         }
 
@@ -50,7 +50,7 @@ namespace Torch {
           is >> str_type;
           is >> dimensions;
           // Check consistency between the stored data and the given blitz++ array
-          if( str_type.compare(typeid(T).name()) || dimensions != ad.m_v.dimensions() )
+          if( str_type.compare(typeid(T).name()) || dimensions != ad.m_array.dimensions() )
           {
             std::cerr << "BlitzAdapter::operator>>: Incompatible blitz++ multiarray \
               (type or number of dimensions)." <<std::endl;
@@ -58,13 +58,13 @@ namespace Torch {
             throw(e);
           }
           else
-            is >> ad.m_v;
+            is >> ad.m_array;
 
           return is;
         }
   
       private:
-        T& m_v;
+        T& m_array;
     };
 
   }
