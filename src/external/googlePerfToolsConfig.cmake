@@ -1,26 +1,29 @@
 # Finds and configures google-perftools if it exists on the system. 
 # Andre Anjos - 07.september.2010
 
-# We start by defining googlePerfTools_FOUND to false
-set(googlePerfTools_FOUND "NO" CACHE INTERNAL "package")
+# We start by defining GOOGLE_PERFTOOLS_FOUND to false
+set(GOOGLE_PERFTOOLS_FOUND "NO" CACHE INTERNAL "package")
 
 # Here we do some variable cleanup and adjustments
-find_path(googlePerfTools_INCLUDE NAMES google/profiler.h)
-set(googlePerfTools_INCLUDE_DIRS ${googlePerfTools_INCLUDE})
-include_directories(SYSTEM ${googlePerfTools_INCLUDE_DIRS})
+find_path(GOOGLE_PERFTOOLS_INCLUDE NAMES google/profiler.h)
+set(GOOGLE_PERFTOOLS_INCLUDE_DIRS ${GOOGLE_PERFTOOLS_INCLUDE})
 
-find_library(googlePerfTools_LIBRARY NAMES profiler)
-set(googlePerfTools_LIBRARIES ${googlePerfTools_LIBRARY} CACHE INTERNAL "libraries")
+find_library(GOOGLE_PERFTOOLS_LIBRARY NAMES profiler)
+set(GOOGLE_PERFTOOLS_LIBRARIES ${GOOGLE_PERFTOOLS_LIBRARY} CACHE INTERNAL "libraries")
 
-if(googlePerfTools_INCLUDE AND googlePerfTools_LIBRARY)
-  set(googlePerfTools_FOUND "YES" CACHE INTERNAL "package")
-else(googlePerfTools_INCLUDE AND googlePerfTools_LIBRARY)
+if(GOOGLE_PERFTOOLS_INCLUDE AND GOOGLE_PERFTOOLS_LIBRARY)
+  message( STATUS "Google Perftools FOUND: Enabling compilation flags...")
+  set(GOOGLE_PERFTOOLS_FOUND "YES" CACHE INTERNAL "package")
+  include_directories(SYSTEM ${GOOGLE_PERFTOOLS_INCLUDE_DIRS})
+  add_definitions(-DHAS_GOOGLE_PERFTOOLS)
+else(GOOGLE_PERFTOOLS_INCLUDE AND GOOGLE_PERFTOOLS_LIBRARY)
   # This will say why we have got to that conclusion
-  set(googlePerfTools_FOUND "NO")
-  if (NOT googlePerfTools_INCLUDE)
-    message("--   google-perftools <google/profiler.h> not found!")
-  endif (NOT googlePerfTools_INCLUDE)
-  if (NOT googlePerfTools_LIBRARY)
-    message("--   google-perftools libprofiler.so not found!")
-  endif (NOT googlePerfTools_LIBRARY)
-endif(googlePerfTools_INCLUDE AND googlePerfTools_LIBRARY)
+  set(GOOGLE_PERFTOOLS_FOUND "NO")
+  message( STATUS "Google Perftools NOT FOUND: Disabling...")
+  if (NOT GOOGLE_PERFTOOLS_INCLUDE)
+    message( STATUS "Google Perftools <google/profiler.h> not found!")
+  endif (NOT GOOGLE_PERFTOOLS_INCLUDE)
+  if (NOT GOOGLE_PERFTOOLS_LIBRARY)
+    message( STATUS "Google Perftools libprofiler.so not found!")
+  endif (NOT GOOGLE_PERFTOOLS_LIBRARY)
+endif(GOOGLE_PERFTOOLS_INCLUDE AND GOOGLE_PERFTOOLS_LIBRARY)

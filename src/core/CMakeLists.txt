@@ -7,10 +7,9 @@ set(shared "") #shared externals to link against (link)
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
-if(googlePerfTools_FOUND)
-  set(shared "${googlePerfTools_LIBRARIES}")
-  add_definitions(-DHAS_GOOGLE_PERFTOOLS)
-endif(googlePerfTools_FOUND)
+if(GOOGLE_PERFTOOLS_FOUND)
+  set(shared "${GOOGLE_PERFTOOLS_LIBRARIES}")
+endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
 set(src
