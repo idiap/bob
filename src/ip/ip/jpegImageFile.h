@@ -3,8 +3,6 @@
 
 #include "ip/ImageFile.h"
 
-namespace Torch {
-
 #ifdef HAVE_JPEG
 extern "C"
 {
@@ -12,6 +10,8 @@ extern "C"
 	#include <setjmp.h>
 }
 #endif
+
+namespace Torch {
 
 	/** This class is designed to handle a JPEG image on the disk
 
