@@ -40,6 +40,7 @@ torch_library(core "${src}" "${deps}" "${shared}")
 
 # Defines tests for this package
 torch_test(core tensor test/tensor.cc)
+torch_test(core adapter test/blitzAdapter.cc)
 
 # Defines benchmarks we make available
 torch_benchmark(core tensor benchmark/tensor.cc)
