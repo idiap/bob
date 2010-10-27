@@ -100,14 +100,19 @@ def setup_python(all):
       for i in v.split(':'): sys.path.append(i)
     os.environ[k] = v
 
-def main(dir, debug):
-  """Searches for the parent shell type and outputs the correct environment
-  settings for that."""
-
+def current_platform(debug):
+  """Calculates the current platform"""
   uname = os.uname()
   platform = '%s-%s' % (uname[0].lower(), uname[4].lower())
   if debug: platform += '-debug'
   else: platform += '-release'
+  return platform
+
+def main(dir, debug):
+  """Searches for the parent shell type and outputs the correct environment
+  settings for that."""
+
+  platform = current_platform(debug)
 
   base_dir = os.path.join(dir, 'install')
   install_dir = os.path.join(base_dir, platform)
@@ -130,6 +135,7 @@ def main(dir, debug):
   pythonpath = path_add(pythonpath, libdir)
   all.append(('PYTHONPATH', pythonpath))
 
+  uname = os.uname()
   if uname[0].lower() == 'darwin': # we are under OSX
     dyld_library_path = os.environ.get('DYLD_LIBRARY_PATH', '')
     dyld_library_path = path_remove_if_startswith(dyld_library_path, base_dir)
@@ -157,4 +163,9 @@ if __name__ == '__main__':
 
   all = main(options.dir, options.debug)
   
+  #echo what has been setup
+  print 'echo "Setting up torch5spro from \'%s\' for platform \'%s\'...";' % \
+      (options.dir, current_platform(options.debug))
+
   for k, v in all: print shell_str(k, v, options.csh)
+
