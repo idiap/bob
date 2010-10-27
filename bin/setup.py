@@ -13,18 +13,12 @@ Examples:
   If you are unsure of what to do, just print the help message:
   $ %(prog)s --help
 
-  If you want to setup your shell and you have either csh or tcsh:
-  $ eval `%(prog)s --csh`
-
-  If you want to setup your shell and you have one of the sh variants:
-  $ eval `%(prog)s --sh`
-
   If you want to setup in debug mode:
-  $ eval `%(prog)s --debug --sh`
-
-  If you don't know which shell type you have:
-  $ echo $SHELL
-""" % {'prog': os.path.basename(sys.argv[0])}
+  $ %(prog)s --debug
+  
+  If you want to show what would be done:
+  $ %(prog)s --simulate
+"""
 
 def parse_args():
   """Parses the command line input."""
@@ -36,8 +30,13 @@ def parse_args():
       return self.epilog
 
   dir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
-  
-  parser = MyParser(description=__doc__, epilog=epilog)
+ 
+  prog =  os.path.basename(sys.argv[0])
+  if len(sys.argv) > 1 and sys.argv[1][0] != '-': 
+    prog = os.path.basename(sys.argv[1])
+
+  parser = MyParser(prog=prog, description=__doc__, 
+      epilog=epilog % {'prog': prog})
   parser.add_option("-b", "--base-dir", 
                     action="store",
                     dest="dir", 
@@ -48,7 +47,7 @@ def parse_args():
                     action="store_true",
                     dest="csh", 
                     default=False,
-                    help="Outputs settings for csh shells (csh|tcsh)",
+                    help=optparse.SUPPRESS_HELP,
                    )
   parser.add_option("-d", "--debug", 
                     action="store_true",
@@ -56,7 +55,31 @@ def parse_args():
                     default=False,
                     help="Outputs settings to run against the debug build",
                    )
+  parser.add_option("-n", "--check-options",
+                    action="store_true",
+                    dest="checker",
+                    default=False,
+                    help="If this option is active, I'll check if everything is alright and exit with a status of 0 if so.",
+                    )
+  parser.remove_option("--help")
+  parser.add_option("-h", "--help",
+                    action="store_true",
+                    dest="help",
+                    default=False,
+                    help="If this option is active, I'll print the help message and exit with status 3.",
+                    )
+  parser.add_option("-s", "--simulate",
+                    action="store_true",
+                    dest="simulate",
+                    default=False,
+                    help="If this option is active, I'll show what the shell would do to setup and exit with status 4.",
+                    )
+
   options, arguments = parser.parse_args()
+
+  if options.help: 
+    parser.print_help()
+    parser.exit(status=3)
 
   options.dir = os.path.realpath(options.dir)
 
@@ -93,8 +116,12 @@ def shell_str(env, value, csh=False):
   if csh: return 'setenv %s "%s";' % (env, value)
   else: return 'export %s="%s";' % (env, value)
 
-def setup_python(all):
-  """Sets up a python application"""
+def shell_echo(value):
+  """Outputs and echo message"""
+  return 'echo "%s";' % value
+
+def setup_this(all):
+  """Sets up the current python application"""
   for k, v in all: 
     if k == 'PYTHONPATH':
       for i in v.split(':'): sys.path.append(i)
@@ -161,11 +188,17 @@ if __name__ == '__main__':
 
   options, arguments = parse_args()
 
+  # do not execute anything else, just exit
+  if options.checker and not options.simulate: sys.exit(0)
+
   all = main(options.dir, options.debug)
   
   #echo what has been setup
-  print 'echo "Setting up torch5spro from \'%s\' for platform \'%s\'...";' % \
-      (options.dir, current_platform(options.debug))
+  print shell_echo("Setting up torch5spro from '%s' for platform '%s'..." % \
+      (options.dir, current_platform(options.debug)))
 
   for k, v in all: print shell_str(k, v, options.csh)
 
+  if options.simulate: sys.exit(4)
+
+  sys.exit(0)
