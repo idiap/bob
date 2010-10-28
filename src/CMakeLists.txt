@@ -43,10 +43,10 @@ endif ("${TORCH_LINKAGE}" STREQUAL static)
 # Sets up externals and install the central dependency file
 include(cmake/torch-external.cmake)
 foreach(ext ${torch_DEPENDENCIES}) 
-  find_package(${ext} REQUIRED PATHS external)
+  find_package(${ext} REQUIRED)
 endforeach(ext ${torch_DEPENDENCIES}) 
 foreach(ext ${torch_OPTIONALS}) 
-  find_package(${ext} PATHS external)
+  find_package(${ext})
 endforeach(ext ${torch_OPTIONALS}) 
 install(FILES cmake/torch-external.cmake DESTINATION ${cmakedir})
 
