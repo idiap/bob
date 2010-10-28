@@ -84,7 +84,21 @@ def parse_args():
 
   options.dir = os.path.realpath(options.dir)
 
+  #also, sets up the version
+  options.version = version(options.dir)
+
   return (options, arguments)
+
+def version(dir):
+  """Finds out my own version"""
+  version_file = os.path.join(dir, '.version')
+  retval = 'unknown'
+  if os.path.exists(version_file):
+    f = open(version_file, 'rt')
+    lines = f.readlines()
+    if lines: retval = lines[0].strip()
+    f.close()
+  return retval
 
 def self_root():
   """Finds out where I am installed."""
@@ -195,11 +209,11 @@ if __name__ == '__main__':
   # do not execute anything else, just exit
   if options.checker and not options.simulate: sys.exit(0)
 
-  #echo what will be setup 
-  print shell_echo("Setting up torch5spro from '%s' for platform '%s'..." % \
-      (options.dir, current_platform(options.debug)))
+  #echo what will be setup
+  print shell_echo("Setting up torch5spro '%s' for platform '%s'..." % \
+      (options.version, current_platform(options.debug)))
 
-  for k, v in generate_environment(options.debug, self_root()): 
+  for k, v in generate_environment(options.debug, self_root()):
     print shell_str(k, v, options.csh)
 
   if options.simulate: sys.exit(4)
