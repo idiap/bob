@@ -35,6 +35,11 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # This is where we install cmake files for external projects
 set(cmakedir share/cmake)
 
+# Setup BOOST pre-conditions
+if ("${TORCH_LINKAGE}" STREQUAL static)
+  set(Boost_USE_STATIC_LIBS ON)
+endif ("${TORCH_LINKAGE}" STREQUAL static)
+
 # Sets up externals and install the central dependency file
 include(cmake/torch-external.cmake)
 foreach(ext ${torch_DEPENDENCIES}) 
