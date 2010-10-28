@@ -29,8 +29,6 @@ def parse_args():
     def format_epilog(self, formatter):
       return self.epilog
 
-  dir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
- 
   prog =  os.path.basename(sys.argv[0])
   if len(sys.argv) > 1 and sys.argv[1][0] != '-': 
     prog = os.path.basename(sys.argv[1])
@@ -40,13 +38,15 @@ def parse_args():
   parser.add_option("-b", "--base-dir", 
                     action="store",
                     dest="dir", 
-                    default=dir,
-                    help="Sets the base directory to a different value (defaults to %default)",
+                    default=self_root(),
+                    #help="Changes the default root directory of the setup",
+                    help=optparse.SUPPRESS_HELP,
                    )
   parser.add_option("-c", "--csh", 
                     action="store_true",
                     dest="csh", 
                     default=False,
+                    #help="Generates output for csh compatible shells",
                     help=optparse.SUPPRESS_HELP,
                    )
   parser.add_option("-d", "--debug", 
@@ -59,7 +59,8 @@ def parse_args():
                     action="store_true",
                     dest="checker",
                     default=False,
-                    help="If this option is active, I'll check if everything is alright and exit with a status of 0 if so.",
+                    #help="If this option is active, I'll check if everything is alright and exit with a status of 0 if so.",
+                    help=optparse.SUPPRESS_HELP,
                     )
   parser.remove_option("--help")
   parser.add_option("-h", "--help",
@@ -84,6 +85,10 @@ def parse_args():
   options.dir = os.path.realpath(options.dir)
 
   return (options, arguments)
+
+def self_root():
+  """Finds out where I am installed."""
+  return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 def path_remove(env, what):
   """Removes the 'what' components from the path environment 'env', if it
@@ -120,9 +125,9 @@ def shell_echo(value):
   """Outputs and echo message"""
   return 'echo "%s";' % value
 
-def setup_this(all):
+def setup_this(debug, dir=self_root()):
   """Sets up the current python application"""
-  for k, v in all: 
+  for k, v in generate_environment(debug, dir): 
     if k == 'PYTHONPATH':
       for i in v.split(':'): sys.path.append(i)
     os.environ[k] = v
@@ -135,9 +140,8 @@ def current_platform(debug):
   else: platform += '-release'
   return platform
 
-def main(dir, debug):
-  """Searches for the parent shell type and outputs the correct environment
-  settings for that."""
+def generate_environment(debug, dir):
+  """Returns a list of environment variables that need setting."""
 
   platform = current_platform(debug)
 
@@ -191,13 +195,12 @@ if __name__ == '__main__':
   # do not execute anything else, just exit
   if options.checker and not options.simulate: sys.exit(0)
 
-  all = main(options.dir, options.debug)
-  
-  #echo what has been setup
+  #echo what will be setup 
   print shell_echo("Setting up torch5spro from '%s' for platform '%s'..." % \
       (options.dir, current_platform(options.debug)))
 
-  for k, v in all: print shell_str(k, v, options.csh)
+  for k, v in generate_environment(options.debug, self_root()): 
+    print shell_str(k, v, options.csh)
 
   if options.simulate: sys.exit(4)
 
