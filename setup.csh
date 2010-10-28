@@ -9,7 +9,7 @@ set externals_version=last
 set args=($_)
 set prog=${args[2]}
 set dir=`dirname ${prog}`
-${dir}/bin/setup.py ${prog} --base-dir=${dir} $* --check-options
+${dir}/bin/setup.py ${prog} $* --check-options
 if ( "$?" == "0" ) then
   if ( -e ${externals}/tools/setup.py ) then
     eval `${externals}/tools/setup.py --csh --version=${externals_version}`

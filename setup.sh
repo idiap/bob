@@ -8,8 +8,8 @@ externals_version=last
 # From this point onwards, I'll do the work
 prog=${BASH_SOURCE[0]}
 dir=$(dirname ${prog})
-${dir}/bin/setup.py ${prog} --base-dir=${dir} $* --check-options
+${dir}/bin/setup.py ${prog} $* --check-options
 if [ "$?" = "0" ]; then
   [ -e ${externals}/tools/setup.py ] && eval `${externals}/tools/setup.py --version=${externals_version}`
-  eval `${dir}/bin/setup.py --base-dir=${dir} $*`
+  eval `${dir}/bin/setup.py $*`
 fi
