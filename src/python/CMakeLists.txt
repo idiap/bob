@@ -12,22 +12,24 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_custom_target(python-compilation ALL ${PYTHON_EXECUTABLE} -m compileall . 
     WORKING_DIRECTORY ${PYTHON_INSTALL_DIRECTORY} COMMENT "Compiling python files")
 
+  include(../cmake/macros.cmake)
+
   # Finally, adds all python tests
-  python_add_test(python-video-tests
+  torch_python_add_test(python-video-tests
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py)
-  python_add_test(python-facefinder-tests 
+  torch_python_add_test(python-facefinder-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_facefinder.py)
-  python_add_test(python-cropping-tests 
+  torch_python_add_test(python-cropping-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_cropping.py)
-  python_add_test(python-videotensor-tests 
+  torch_python_add_test(python-videotensor-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_videotensor.py)
-  python_add_test(python-lbp-tests 
+  torch_python_add_test(python-lbp-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp.py)
-  python_add_test(python-filter-tests 
+  torch_python_add_test(python-filter-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters.py)
-  python_add_test(python-listdataset-tests 
+  torch_python_add_test(python-listdataset-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_listdataset.py)
-  python_add_test(python-gmm-tests 
+  torch_python_add_test(python-gmm-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gmm.py)
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 

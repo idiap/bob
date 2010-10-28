@@ -116,3 +116,10 @@ macro(torch_python_install package)
     add_dependencies(python-compilation ${package}-python-install)
   endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 endmacro(torch_python_install package)
+
+# This macro helps users to add python tests to cmake
+function(torch_python_add_test)
+  add_test(${ARGV})
+  set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT
+    "DYLD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$ENV{DYLD_LIBRARY_PATH};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/lib:${PYTHON_INSTALL_DIRECTORY}:$ENV{PYTHONPATH}")
+endfunction(torch_python_add_test)
