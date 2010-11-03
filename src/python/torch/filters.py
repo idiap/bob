@@ -433,7 +433,7 @@ class TanTriggs(Filter):
   arguments = ['input-image', 'output-image']
       
   def __call__(self, options, args):
-    apply_image_filter(torch.ip.ipTanTriggs, options, args[0], args[1], planes=3)
+    apply_image_filter(torch.ip.ipTanTriggs, options, args[0], args[1], planes=1)
 
 class Vcycle(Filter):
   tmp = torch.ip.ipVcycle()
