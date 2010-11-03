@@ -9,6 +9,7 @@
 
 using namespace boost::python;
 
+void bind_core_exception();
 void bind_core_object();
 void bind_core_file();
 void bind_core_tensor();
@@ -19,6 +20,7 @@ void bind_core_ListDataSet();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
   scope().attr("__doc__") = "Torch core classes and sub-classes";
+  bind_core_exception();
   bind_core_object();
   bind_core_file();
   bind_core_tensor();

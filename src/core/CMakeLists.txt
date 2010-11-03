@@ -33,6 +33,7 @@ set(src
     "src/CmdFile.cc"
     "src/Random.cc"
     "src/ListDataSet.cc"
+    "src/Exception.cc"
     )
 
 include(../cmake/macros.cmake)
@@ -47,6 +48,7 @@ torch_benchmark(core tensor benchmark/tensor.cc)
 
 # Python bindings
 set(pysrc
+   "python/src/exception.cc"
    "python/src/object.cc"
    "python/src/file.cc"
    "python/src/tensor.cc"
