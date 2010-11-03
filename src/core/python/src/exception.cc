@@ -35,6 +35,7 @@ static void throw_exception(void) {
 
 void bind_core_exception() {
   class_<Torch::core::Exception> torchCoreException("Exception", "The core Exception class should be used as a basis for all Torch-Python exceptions.", init<>("Creates a new exception"));
+  torchCoreException.def("__str__", &Torch::core::Exception::what);
   pyTorchExceptionType = torchCoreException.ptr();
   register_exception_translator<Torch::core::Exception>(&translateException);
   def("throw_exception", &throw_exception);

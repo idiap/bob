@@ -10,6 +10,10 @@ import os, sys
 import unittest
 import torch
 
+def test_file(name):
+  """Returns the path to the filename for this test."""
+  return os.path.join("data", "machine", name)
+
 class ListDataSetTest(unittest.TestCase):
   """Performs various tests for the Torch::ipGeomNorm object."""
 
@@ -18,7 +22,7 @@ class ListDataSetTest(unittest.TestCase):
 
   def test_load(self):
     lds = torch.core.ListDataSet()
-    status = lds.load("data_machine/1001_f_g1_s01_1001_en_4.chris.dct")
+    status = lds.load(test_file("1001_f_g1_s01_1001_en_4.chris.dct"))
 
     # make sure we read everything
     self.assertEqual(status, 2337)

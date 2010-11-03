@@ -8,8 +8,12 @@
 
 import os, sys
 
+def test_file(name):
+  """Returns the path to the filename for this test."""
+  return os.path.join("data", "filter", name)
+
 # These are some global parameters for the test.
-INPUT_IMAGE = 'image.ppm' #this a 100x100 pixel image of a face
+INPUT_IMAGE = test_file('image.ppm') #this a 100x100 pixel image of a face
 
 import unittest
 import torch
@@ -28,10 +32,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('cropped.ppm') #use this to save another reference image
+    #processed.save(test_file('cropped.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
-    reference.load('cropped.ppm')
+    reference.load(test_file('cropped.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -45,10 +49,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('flipped.ppm') #use this to save another reference image
+    #processed.save(test_file('flipped.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
-    reference.load('flipped.ppm')
+    reference.load(test_file('flipped.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -63,12 +67,12 @@ class FilterTest(unittest.TestCase):
     processed = f.getOutput(0)
     self.assertEqual(processed.getDatatype(), torch.core.Type.Int)
     #save_ref = torch.core.TensorFile() #use this to save a new reference
-    #save_ref.openWrite('histo.tensorfile', processed)
+    #save_ref.openWrite(test_file('histo.tensorfile'), processed)
     #save_ref.save(processed)
     #save_ref.close()
     # compare to our model
     ref_file = torch.core.TensorFile()
-    ref_file.openRead('histo.tensorfile')
+    ref_file.openRead(test_file('histo.tensorfile'))
     reference = ref_file.load()
     for i in range(reference.size(0)):
       for j in range(reference.size(1)):
@@ -83,10 +87,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('histoequal.ppm') #use this to save another reference image
+    #processed.save(test_file('histoequal.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('histoequal.ppm')
+    reference.load(test_file('histoequal.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -101,12 +105,12 @@ class FilterTest(unittest.TestCase):
     processed = f.getOutput(0)
     self.assertEqual(processed.getDatatype(), torch.core.Type.Int)
     #save_ref = torch.core.TensorFile() #use this to save a new reference
-    #save_ref.openWrite('integralimage.tensorfile', processed)
+    #save_ref.openWrite(test_file('integralimage.tensorfile'), processed)
     #save_ref.save(processed)
     #save_ref.close()
     # compare to our model
     ref_file = torch.core.TensorFile()
-    ref_file.openRead('integralimage.tensorfile')
+    ref_file.openRead(test_file('integralimage.tensorfile'))
     reference = ref_file.load()
     for i in range(reference.size(0)):
       for j in range(reference.size(1)):
@@ -125,10 +129,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('msrsqigauss.ppm') #use this to save another reference image
+    #processed.save(test_file('msrsqigauss.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('msrsqigauss.ppm')
+    reference.load(test_file('msrsqigauss.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -142,10 +146,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('multiscaleretinex.ppm') #use this to save another reference image
+    #processed.save(test_file('multiscaleretinex.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('multiscaleretinex.ppm')
+    reference.load(test_file('multiscaleretinex.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -159,10 +163,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('relaxation.ppm') #use this to save another reference image
+    #processed.save(test_file('relaxation.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('relaxation.ppm')
+    reference.load(test_file('relaxation.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -170,7 +174,7 @@ class FilterTest(unittest.TestCase):
 
   def test09_rescaleGray(self):
     v_file = torch.core.TensorFile()
-    v_file.openRead('integralimage.tensorfile')
+    v_file.openRead(test_file('integralimage.tensorfile'))
     v = v_file.load()
     v_file.close()
     f = torch.ip.ipRescaleGray()
@@ -180,7 +184,7 @@ class FilterTest(unittest.TestCase):
     processed = torch.ip.Image(f.getOutput(0))
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('rescalegray.ppm')
+    reference.load(test_file('rescalegray.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -197,10 +201,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('rotated.ppm') #use this to save another reference image
+    #processed.save(test_file('rotated.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('rotated.ppm')
+    reference.load(test_file('rotated.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -216,10 +220,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('scaled.ppm') #use this to save another reference image
+    #processed.save(test_file('scaled.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('scaled.ppm')
+    reference.load(test_file('scaled.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -237,10 +241,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    # processed.save('selfquotient.ppm') #use this to save another reference image
+    # processed.save(test_file('selfquotient.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('selfquotient.ppm')
+    reference.load(test_file('selfquotient.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -256,10 +260,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('shift.ppm') #use this to save another reference image
+    #processed.save(test_file('shift.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('shift.ppm')
+    reference.load(test_file('shift.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -276,10 +280,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('smoothgauss.ppm') #use this to save another reference image
+    #processed.save(test_file('smoothgauss.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
-    reference.load('smoothgauss.ppm')
+    reference.load(test_file('smoothgauss.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -295,12 +299,12 @@ class FilterTest(unittest.TestCase):
     for z in range(3): outputs.append(f.getOutput(z))
     for t in outputs: self.assertEqual(t.getDatatype(), torch.core.Type.Int)
     #save_ref = torch.core.TensorFile() #use this to save a new reference
-    #save_ref.openWrite('sobel.tensorfile', outputs[0])
+    #save_ref.openWrite(test_file('sobel.tensorfile'), outputs[0])
     #for t in outputs: save_ref.save(t)
     #save_ref.close()
     # compare to our model
     ref_file = torch.core.TensorFile()
-    ref_file.openRead('sobel.tensorfile')
+    ref_file.openRead(test_file('sobel.tensorfile'))
     for t in outputs:
       reference = ref_file.load()
       for i in range(reference.size(0)):
@@ -317,10 +321,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('tantriggs.ppm') #use this to save another reference image
+    #processed.save(test_file('tantriggs.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('tantriggs.ppm')
+    reference.load(test_file('tantriggs.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -337,10 +341,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    #processed.save('vcycle.ppm') #use this to save another reference image
+    #processed.save(test_file('vcycle.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load('vcycle.ppm')
+    reference.load(test_file('vcycle.ppm'))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):

@@ -6,13 +6,13 @@
 """Tests cropping features
 """
 
-INPUT_VIDEO = 'test.mov'
-FACE_FINDER_PARAMETERS = 'facefinder.multiscale.params'
-GEOMNORM_PARAMETERS = 'geom.norm-64x80.cfg'
-
 import os, sys
 import unittest
 import torch
+
+INPUT_VIDEO = 'test.mov'
+FACE_FINDER_PARAMETERS = 'facefinder.multiscale.params'
+GEOMNORM_PARAMETERS = 'geom.norm-64x80.cfg'
 
 class CroppingTest(unittest.TestCase):
   """Performs various tests for the Torch::ipGeomNorm object."""
@@ -66,9 +66,9 @@ if __name__ == '__main__':
       hasattr(torch.core, 'ProfilerStart'):
     torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
+  os.chdir(os.path.join('data', 'video'))
   unittest.main()
   if os.environ.has_key('TORCH_PROFILE') and \
       os.environ['TORCH_PROFILE'] and \
       hasattr(torch.core, 'ProfilerStop'):
     torch.core.ProfilerStop()
-

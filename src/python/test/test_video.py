@@ -9,13 +9,17 @@
 import os, sys
 import tempfile
 
+def test_file(name):
+  """Returns the path to the filename for this test."""
+  return os.path.join("data", "video", name)
+
 def get_tempfilename(prefix='torchtest_', suffix='.avi'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
   os.unlink(name)
   return name
 
 # These are some global parameters for the test.
-INPUT_VIDEO = 'test.mov'
+INPUT_VIDEO = test_file('test.mov')
 OUTPUT_VIDEO = get_tempfilename()
 
 import unittest

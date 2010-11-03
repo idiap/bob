@@ -13,6 +13,10 @@ import torch
 def compare(v1, v2, width):
   return abs(v1-v2) <= width
 
+def test_file(name):
+  """Returns the path to the filename for this test."""
+  return os.path.join("data", "machine", name)
+
 class GmmTest(unittest.TestCase):
   """Performs various tests for the Torch::ipGeomNorm object."""
 
@@ -26,11 +30,11 @@ class GmmTest(unittest.TestCase):
 
   def test_load_and_construct_02(self):
     gmm = torch.machine.MultiVariateDiagonalGaussianDistribution()
-    status = gmm.loadFile("data_machine/1001.gmm")
+    status = gmm.loadFile(test_file("1001.gmm"))
     self.assertTrue(status)
 
   def test_load_and_construct_03(self):
-    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution("data_machine/1001.gmm")
+    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution(test_file("1001.gmm"))
     self.assertTrue(True) # bad need to find a good test here
 
   def test_load_and_construct_04(self):
@@ -49,7 +53,7 @@ class GmmTest(unittest.TestCase):
   def test_score_01(self):
     zero_tensor = torch.core.DoubleTensor(91)
     zero_tensor.fill(0)
-    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution("data_machine/1001.gmm")
+    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution(test_file("1001.gmm"))
 
     score = gmm.score(zero_tensor)
     self.assertTrue(compare(score, -15.3702381398, 1e-6))
@@ -60,7 +64,7 @@ class GmmTest(unittest.TestCase):
     zero_tensor.fill(0)
 
     gmm = torch.machine.MultiVariateDiagonalGaussianDistribution()
-    gmm.loadFile("data_machine/1001.gmm")
+    gmm.loadFile(test_file("1001.gmm"))
 
     score = gmm.score(zero_tensor)
     self.assertTrue(compare(score, -15.3702381398, 1e-6))
@@ -69,19 +73,19 @@ class GmmTest(unittest.TestCase):
     zero_tensor = torch.core.DoubleTensor(91)
     zero_tensor.fill(0)
 
-    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution("data_machine/1046.gmm")
+    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution(test_file("1046.gmm"))
 
     score = gmm.score(zero_tensor)
     self.assertTrue(compare(score, -14.6556824302, 1e-6))
 
   def test_score_04(self):
     lds = torch.core.ListDataSet()
-    status = lds.load("data_machine/1001_f_g1_s01_1001_en_4.chris.dct")
+    status = lds.load(test_file("1001_f_g1_s01_1001_en_4.chris.dct"))
 
     # make sure we read everything
     self.assertEqual(status, 2337)
 
-    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution("data_machine/1001.gmm")
+    gmm = torch.machine.MultiVariateDiagonalGaussianDistribution(test_file("1001.gmm"))
     score = gmm.score(lds)
     
     # make sure that the score is correct
@@ -92,4 +96,3 @@ if __name__ == '__main__':
   sys.argv.append('-v')
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   unittest.main()
-
