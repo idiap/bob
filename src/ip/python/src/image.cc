@@ -8,6 +8,7 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "core/Exception.h"
 #include "core/Object.h"
 #include "core/Tensor.h"
 #include "ip/vision.h"
@@ -107,6 +108,13 @@ static double sum(Torch::Image& self) {
   return retval;
 }
 
+/**
+ * This method is only useful to test exception throwing in Python code.
+ */
+static void throw_exception(void) {
+  throw Torch::core::Exception();
+}
+
 void bind_ip_image()
 {
   class_<Torch::Image, boost::shared_ptr<Torch::Image>, bases<Torch::Object, Torch::ShortTensor> >("Image", init<optional<int, int, int> >((arg("width"), arg("height"), arg("planes"))))
@@ -132,5 +140,6 @@ void bind_ip_image()
     .def("reset", &inplace_reset, return_self<>(), (arg("self"), arg("threshold"), arg("value")), "Sets values in the image that are smaller than 'threshold' to the given value")
     .def("sum", &sum, (arg("self")), "Returns the sum of all pixels in the image as a double value")
     ;
+  def("throw_exception", &throw_exception);
 }
 
