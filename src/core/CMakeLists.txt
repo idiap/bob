@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps th) #other torch subprojects
-set(shared "") #shared externals to link against (link)
+set(shared "${Boost_THREAD_LIBRARY};${Boost_FILESYSTEM_LIBRARY};${Boost_IOSTREAMS_LIBRARY}") #shared externals to link against
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
 if(GOOGLE_PERFTOOLS_FOUND)
-  set(shared "${GOOGLE_PERFTOOLS_LIBRARIES}")
+  set(shared "${shared};${GOOGLE_PERFTOOLS_LIBRARIES}")
 endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
@@ -34,6 +34,7 @@ set(src
     "src/Random.cc"
     "src/ListDataSet.cc"
     "src/Exception.cc"
+    "src/logging.cc"
     )
 
 include(../cmake/macros.cmake)
@@ -42,6 +43,7 @@ torch_library(core "${src}" "${deps}" "${shared}")
 # Defines tests for this package
 torch_test(core tensor test/tensor.cc)
 torch_test(core adapter test/blitzAdapter.cc)
+torch_test(core logging test/logging.cc)
 
 # Defines benchmarks we make available
 torch_benchmark(core tensor benchmark/tensor.cc)
