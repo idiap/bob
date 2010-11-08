@@ -107,10 +107,6 @@ Torch::core::Sink::Sink(const boost::shared_ptr<Torch::core::Device>& device)
 : m_device(device)
 {}
 
-Torch::core::Sink::Sink(Torch::core::Device* device)
-: m_device(device)
-{}
-
 Torch::core::Sink::Sink(const std::string& configuration) 
 : m_device()
 {
@@ -128,10 +124,6 @@ void Torch::core::Sink::reset(const std::string& configuration) {
 
 void Torch::core::Sink::reset(const boost::shared_ptr<Torch::core::Device>& device) {
   m_device = device;
-}
-
-void Torch::core::Sink::reset(Torch::core::Device* device) {
-  m_device.reset(device);
 }
 
 std::streamsize Torch::core::Sink::write(const char* s, std::streamsize n) {

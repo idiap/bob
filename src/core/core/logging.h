@@ -82,12 +82,6 @@ namespace Torch {
         Sink(const boost::shared_ptr<Device>& device);
 
         /**
-         * Initializes with an allocated device. Please note that this method
-         * will take the ownership of the device and delete it when done.
-         */
-        Sink(Device* device);
-
-        /**
          * D'tor
          */
         virtual ~Sink();
@@ -98,12 +92,6 @@ namespace Torch {
          */
         void reset(const std::string& configuration);
         void reset(const boost::shared_ptr<Device>& device);
-
-        /**
-         * This method will reset the current device by taking the ownership of
-         * the input pointer and will delete the currently pointed device.
-         */
-        void reset(Device* device);
 
         /**
          * Discards all data input
@@ -127,6 +115,18 @@ namespace Torch {
      * Torch::core::error->reset("null");
      */
     struct Stream: public boost::iostreams::stream<Sink> {
+
+      /**
+       * Constructs an empty version of the stream, uses NullDevice.
+       */
+      Stream()
+        : boost::iostreams::stream<Sink>() {}
+
+      /**
+       * Copy construct the current stream.
+       */
+      Stream(const Stream& other)
+        : boost::iostreams::stream<Sink>(*const_cast<Stream&>(other)) {}
 
       /**
        * Constructs the current stream 

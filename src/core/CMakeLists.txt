@@ -51,6 +51,7 @@ torch_benchmark(core tensor benchmark/tensor.cc)
 # Python bindings
 set(pysrc
    "python/src/exception.cc"
+   "python/src/logging.cc"
    "python/src/object.cc"
    "python/src/file.cc"
    "python/src/tensor.cc"
