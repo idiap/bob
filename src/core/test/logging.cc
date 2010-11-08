@@ -53,16 +53,25 @@ std::string get_contents(const std::string& fname) {
   return result;
 }
 
+/**
+ * Generates a unique temporary filename
+ */
+std::string temp_file() {
+  char tmp_name[12] = "test_XXXXXX";
+  mkstemp(tmp_name);
+  return tmp_name;
+}
+
 //tests if I can easily switch streams 
 BOOST_AUTO_TEST_CASE( test_switch )
 {
-  std::string testfile = "/tmp/testfile";
-  std::string gztestfile = "/tmp/testfile.gz";
+  std::string testfile = temp_file();
+  std::string gztestfile = testfile + ".gz";
   std::string teststring = "** info test **";
 
-  info->reset(testfile);
+  info.reset(testfile);
   info << teststring << std::endl;
-  info->reset(gztestfile);
+  info.reset(gztestfile);
 
   //at this point checks if "testfile" is filled
   BOOST_CHECK(boost::filesystem::exists(testfile));
@@ -70,7 +79,7 @@ BOOST_AUTO_TEST_CASE( test_switch )
   boost::filesystem::remove(testfile);
 
   info << teststring << std::endl;
-  info->reset("null");
+  info.reset("null");
   
   //at this point checks if "testfile.gz" is filled
   BOOST_CHECK(boost::filesystem::exists(gztestfile));

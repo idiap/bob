@@ -16,6 +16,8 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/concepts.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 
 namespace Torch {
 
@@ -124,7 +126,25 @@ namespace Torch {
      *
      * Torch::core::error->reset("null");
      */
-    typedef boost::iostreams::stream<Sink> Stream;
+    struct Stream: public boost::iostreams::stream<Sink> {
+
+      /**
+       * Constructs the current stream 
+       */
+      template <typename T> Stream(const T& value)
+        : boost::iostreams::stream<Sink>(value) {}
+
+      virtual ~Stream();
+
+      /**
+       * Resets the current sink and use a new strategy according to the
+       * possible settings in `Sink()`.
+       */
+      template <typename T> void reset(const T& value) {
+        (*this)->reset(value);
+      }
+
+    };
 
     extern Stream debug; ///< default debug stream
     extern Stream info; ///< default info stream
@@ -146,10 +166,25 @@ namespace Torch {
 
 }
 
+//returns the current location where the message is being printed
+#ifndef TLOCATION
+#define TLOCATION __FILE__ << "+" << __LINE__
+#endif
+
+//returns the current date and time
+#ifndef TNOW
+#define TNOW boost::posix_time::second_clock::local_time()
+#endif
+
+//an unified marker for the location, date and time
+#ifndef TMARKER
+#define TMARKER TLOCATION << ", " << TNOW << ": "
+#endif
+
 #ifdef TORCH_DEBUG
-#define TDEBUG1(v) if (Torch::core::debug_level(1)) { Torch::core::debug << v << std::endl; }
-#define TDEBUG2(v) if (Torch::core::debug_level(2)) { Torch::core::debug << v << std::endl; }
-#define TDEBUG3(v) if (Torch::core::debug_level(3)) { Torch::core::debug << v << std::endl; }
+#define TDEBUG1(v) if (Torch::core::debug_level(1)) { Torch::core::debug << "DEBUG1@" << TMARKER << v << std::endl; }
+#define TDEBUG2(v) if (Torch::core::debug_level(2)) { Torch::core::debug << "DEBUG2@" << TMARKER << v << std::endl; }
+#define TDEBUG3(v) if (Torch::core::debug_level(3)) { Torch::core::debug << "DEBUG3@" << TMARKER << v << std::endl; }
 #else
 #define TDEBUG1(v)
 #define TDEBUG2(v)

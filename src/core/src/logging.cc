@@ -142,7 +142,9 @@ void Torch::core::Sink::close() {
   m_device->close();
 }
 
-Torch::core::Stream Torch::core::debug(new StdoutDevice);
-Torch::core::Stream Torch::core::info(new StdoutDevice);
-Torch::core::Stream Torch::core::warn(new StderrDevice);
-Torch::core::Stream Torch::core::error(new StderrDevice);
+Torch::core::Stream::~Stream() {}
+
+Torch::core::Stream Torch::core::debug("stdout");
+Torch::core::Stream Torch::core::info("stdout");
+Torch::core::Stream Torch::core::warn("stderr");
+Torch::core::Stream Torch::core::error("stderr");

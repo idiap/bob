@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps th) #other torch subprojects
-set(shared "${Boost_THREAD_LIBRARY};${Boost_FILESYSTEM_LIBRARY};${Boost_IOSTREAMS_LIBRARY}") #shared externals to link against
+set(shared "${Boost_THREAD_LIBRARY};${Boost_FILESYSTEM_LIBRARY};${Boost_IOSTREAMS_LIBRARY};${Boost_DATE_TIME_LIBRARY}") #shared externals to link against
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
