@@ -66,11 +66,22 @@ static bool reload_image(Torch::Image& i, const char* filename)
   return loader.load(i, filename);
 }
 
+static void inplace_abs(Torch::Image& self) {
+  for (int i=0; i<self.getHeight(); ++i) {
+    for (int j=0; j<self.getWidth(); ++j) {
+      for (int k=0; k<self.getNPlanes(); ++k) {
+        short& s = self(i, j, k);
+        s = ((s<0)?-s:s);
+      }
+    }
+  }
+}
+
 static void inplace_add(Torch::Image& self, const Torch::Image& other) {
   for (int i=0; i<self.getHeight(); ++i) {
     for (int j=0; j<self.getWidth(); ++j) {
       for (int k=0; k<self.getNPlanes(); ++k) {
-        self(i, j, k) += other.get(i, j, k);
+        self(i, j, k) += other(i, j, k);
       }
     }
   }
@@ -80,7 +91,7 @@ static void inplace_subtract(Torch::Image& self, const Torch::Image& other) {
   for (int i=0; i<self.getHeight(); ++i) {
     for (int j=0; j<self.getWidth(); ++j) {
       for (int k=0; k<self.getNPlanes(); ++k) {
-        self(i, j, k) -= other.get(i, j, k);
+        self(i, j, k) -= other(i, j, k);
       }
     }
   }
@@ -138,6 +149,7 @@ void bind_ip_image()
     .def("__iadd__", &inplace_add, return_self<>(), (arg("self"), arg("other")), "Inplace addition of images")
     .def("__isub__", &inplace_subtract, return_self<>(), (arg("self"), arg("other")), "Inplace subtraction of images")
     .def("reset", &inplace_reset, return_self<>(), (arg("self"), arg("threshold"), arg("value")), "Sets values in the image that are smaller than 'threshold' to the given value")
+    .def("abs", &inplace_abs, (arg("self")), "Applies pixel = abs(pixel) for each pixel in the image. Modifes the image inplace.")
     .def("sum", &sum, (arg("self")), "Returns the sum of all pixels in the image as a double value")
     ;
   def("throw_exception", &throw_exception);
