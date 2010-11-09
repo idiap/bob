@@ -222,11 +222,13 @@ bool spFFT::processInput(const Tensor& input)
 		// Init workspace
 		ip[0] = 0; // Possible speed up here as ip[0] == 0 is used to init the rest of ip and the workspace !!
 		
-		for(int i=0; i < N; i++) a[i] = (*RI)(i);
-		for(int i=N; i < 2*N; i++) a[i] = 0.0;
+		for(int i=0; i < N; i++) {
+      a[2*i] = (*RI)(i);
+      a[2*i+1] = 0.0;
+    }
 
 		// Complex Discrete Fourier Transform routine
-		cdft(N, -1, a, ip, w);
+		cdft(2*N, -1, a, ip, w);
 
 		//
 		FloatTensor *F = (FloatTensor *) m_output[0];
