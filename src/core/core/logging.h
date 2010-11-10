@@ -25,13 +25,13 @@ namespace Torch {
 
     /**
      * The device is what tells the sink where to actually send the messages
-     * to. If the Sink does not have a device, the messages are discarded.
+     * to. If the AutoOutputDevice does not have a device, the messages are discarded.
      */
-    struct Device {
+    struct OutputDevice {
       /**
        * Virtual destructor.
        */
-      virtual ~Device();
+      virtual ~OutputDevice();
 
       /**
        * Writes n bytes of data into this device
@@ -45,17 +45,39 @@ namespace Torch {
     };
 
     /**
+     * The device is what tells the source where to actually read the messages
+     * from. If the AutoInputDevice does not have a device, the messages are 
+     * discarded.
+     */
+    struct InputDevice {
+      /**
+       * Virtual destructor.
+       */
+      virtual ~InputDevice();
+
+      /**
+       * Reads n bytes of data from this device
+       */
+      virtual std::streamsize read(char* s, std::streamsize n) =0;
+
+      /**
+       * Closes this device
+       */
+      virtual void close() {}
+    };
+
+    /**
      * Use this sink always in Torch C++ programs. You can configure it to send
      * messages to stdout, stderr, to a file or discard them. 
      */
-    class Sink: public boost::iostreams::sink { 
+    class AutoOutputDevice: public boost::iostreams::sink { 
 
       public:
 
         /**
-         * C'tor, empty, make it "Nullified" sink. All messages are discarded.
+         * C'tor, empty, discards all input.
          */
-        Sink();
+        AutoOutputDevice();
 
         /**
          * Creates a new sink using one of the built-in strategies.
@@ -69,32 +91,33 @@ namespace Torch {
          * @param configuration The configuration string to use for this sink
          * as declared above
          */
-        Sink(const std::string& configuration);
+        AutoOutputDevice(const std::string& configuration);
 
         /**
-         * Copies the configuration from the other Sink
+         * Copies the configuration from the other AutoOutputDevice
          */
-        Sink(const Sink& other);
+        AutoOutputDevice(const AutoOutputDevice& other);
 
         /**
          * Intializes with a device.
          */
-        Sink(const boost::shared_ptr<Device>& device);
+        AutoOutputDevice(const boost::shared_ptr<OutputDevice>& device);
 
         /**
          * D'tor
          */
-        virtual ~Sink();
+        virtual ~AutoOutputDevice();
 
         /**
          * Resets the current sink and use a new strategy according to the
-         * possible settings in `Sink(const std::string& configuration)`.
+         * possible settings in 
+         * `AutoOutputDevice(const std::string& configuration)`.
          */
         void reset(const std::string& configuration);
-        void reset(const boost::shared_ptr<Device>& device);
+        void reset(const boost::shared_ptr<OutputDevice>& device);
 
         /**
-         * Discards all data input
+         * Forwards call to underlying OutputDevice
          */
         virtual std::streamsize write(const char* s, std::streamsize n);
 
@@ -105,7 +128,71 @@ namespace Torch {
 
       private:
 
-        boost::shared_ptr<Device> m_device; ///< Who does the real job.
+        boost::shared_ptr<OutputDevice> m_device; ///< Who does the real job.
+
+    };
+
+    /**
+     * Use this source always in Torch C++ programs. You can configure it to
+     * read messages from stdin or a file.
+     */
+    class AutoInputDevice: public boost::iostreams::source { 
+
+      public:
+
+        /**
+         * C'tor, empty, reads from stdin.
+         */
+        AutoInputDevice();
+
+        /**
+         * Creates a new source using one of the built-in strategies.
+         * - stdin: reads from the standard input
+         * - filename: read all messages from the file named "filename"
+         * - filename.gz: read all messagses from the file named "filename.gz",
+         *   in compressed format.
+         *
+         * @param configuration The configuration string to use for this source
+         * as declared above
+         */
+        AutoInputDevice(const std::string& configuration);
+
+        /**
+         * Copies the configuration from the other AutoInputDevice
+         */
+        AutoInputDevice(const AutoInputDevice& other);
+
+        /**
+         * Intializes with a device.
+         */
+        AutoInputDevice(const boost::shared_ptr<InputDevice>& device);
+
+        /**
+         * D'tor
+         */
+        virtual ~AutoInputDevice();
+
+        /**
+         * Resets the current source and use a new strategy according to the
+         * possible settings in 
+         * `AutoInputDevice(const std::string& configuration)`.
+         */
+        void reset(const std::string& configuration);
+        void reset(const boost::shared_ptr<InputDevice>& device);
+
+        /**
+         * Forwards call to underlying InputDevice
+         */
+        virtual std::streamsize read(char* s, std::streamsize n);
+
+        /**
+         * Closes this base source
+         */
+        virtual void close();
+
+      private:
+
+        boost::shared_ptr<InputDevice> m_device; ///< Who does the real job.
 
     };
 
@@ -114,31 +201,31 @@ namespace Torch {
      *
      * Torch::core::error->reset("null");
      */
-    struct Stream: public boost::iostreams::stream<Sink> {
+    struct OutputStream: public boost::iostreams::stream<AutoOutputDevice> {
 
       /**
-       * Constructs an empty version of the stream, uses NullDevice.
+       * Constructs an empty version of the stream, uses NullOutputDevice.
        */
-      Stream()
-        : boost::iostreams::stream<Sink>() {}
+      OutputStream()
+        : boost::iostreams::stream<AutoOutputDevice>() {}
 
       /**
        * Copy construct the current stream.
        */
-      Stream(const Stream& other)
-        : boost::iostreams::stream<Sink>(*const_cast<Stream&>(other)) {}
+      OutputStream(const OutputStream& other)
+        : boost::iostreams::stream<AutoOutputDevice>(*const_cast<OutputStream&>(other)) {}
 
       /**
        * Constructs the current stream 
        */
-      template <typename T> Stream(const T& value)
-        : boost::iostreams::stream<Sink>(value) {}
+      template <typename T> OutputStream(const T& value)
+        : boost::iostreams::stream<AutoOutputDevice>(value) {}
 
-      virtual ~Stream();
+      virtual ~OutputStream();
 
       /**
        * Resets the current sink and use a new strategy according to the
-       * possible settings in `Sink()`.
+       * possible settings in `AutoOutputDevice()`.
        */
       template <typename T> void reset(const T& value) {
         (*this)->reset(value);
@@ -146,10 +233,45 @@ namespace Torch {
 
     };
 
-    extern Stream debug; ///< default debug stream
-    extern Stream info; ///< default info stream
-    extern Stream warn; ///< default warning stream
-    extern Stream error; ///< default error stream
+    /**
+     * Create streams of this type to input data into Torch5spro
+     */
+    struct InputStream: public boost::iostreams::stream<AutoInputDevice> {
+
+      /**
+       * Constructs an empty version of the stream, uses NullInputDevice.
+       */
+      InputStream()
+        : boost::iostreams::stream<AutoInputDevice>() {}
+
+      /**
+       * Copy construct the current stream.
+       */
+      InputStream(const InputStream& other)
+        : boost::iostreams::stream<AutoInputDevice>(*const_cast<InputStream&>(other)) {}
+
+      /**
+       * Constructs the current stream 
+       */
+      template <typename T> InputStream(const T& value)
+        : boost::iostreams::stream<AutoInputDevice>(value) {}
+
+      virtual ~InputStream();
+
+      /**
+       * Resets the current sink and use a new strategy according to the
+       * possible settings in `AutoInputDevice()`.
+       */
+      template <typename T> void reset(const T& value) {
+        (*this)->reset(value);
+      }
+
+    };
+
+    extern OutputStream debug; ///< default debug stream
+    extern OutputStream info; ///< default info stream
+    extern OutputStream warn; ///< default warning stream
+    extern OutputStream error; ///< default error stream
 
     /**
      * This method is used by our TDEBUGX macros to define if the current debug
@@ -161,6 +283,15 @@ namespace Torch {
      * the value collected from the environment. Otherwise, returns false.
      */
     bool debug_level(unsigned int i);
+
+    /**
+     * Chooses the correct temporary directory to use, like this:
+     *
+     * - The environment variable TMPDIR, if it is defined. For security reasons
+     *   this only happens if the program is not SUID or SGID enabled.
+     * - The directory /tmp.
+     */
+    std::string tmpdir();
 
   }
 

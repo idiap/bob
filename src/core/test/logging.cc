@@ -19,6 +19,20 @@
 
 using namespace Torch::core;
 
+/**
+ * Generates a unique temporary filename
+ */
+std::string temp_file() {
+  std::string tpl = Torch::core::tmpdir();
+  tpl += "/torchtest_core_loggingXXXXXX";
+  boost::shared_ptr<char> char_tpl(new char[tpl.size()+1]);
+  strcpy(char_tpl.get(), tpl.c_str());
+  int fd = mkstemp(char_tpl.get());
+  close(fd);
+  boost::filesystem::remove(char_tpl.get());
+  return char_tpl.get();
+}
+
 //tests if the streams are correctly initialized and will work correctly
 BOOST_AUTO_TEST_CASE( test_basic )
 {
@@ -53,15 +67,6 @@ std::string get_contents(const std::string& fname) {
   return result;
 }
 
-/**
- * Generates a unique temporary filename
- */
-std::string temp_file() {
-  char tmp_name[12] = "test_XXXXXX";
-  mkstemp(tmp_name);
-  return tmp_name;
-}
-
 //tests if I can easily switch streams 
 BOOST_AUTO_TEST_CASE( test_switch )
 {
@@ -87,4 +92,36 @@ BOOST_AUTO_TEST_CASE( test_switch )
   boost::filesystem::remove(gztestfile);
 
   info << "NOT SUPPOSED TO BE PRINTED!" << std::endl;
+}
+
+//tests if I can read from files
+BOOST_AUTO_TEST_CASE( test_input )
+{
+  std::string testfilename = temp_file();
+  Torch::core::OutputStream ofile(testfilename);
+  std::string testdata = "12345678,a_single_sentence";
+  ofile << testdata;
+  ofile.close();
+  Torch::core::InputStream ifile(testfilename);
+  std::string back;
+  ifile >> back;
+  BOOST_CHECK_EQUAL(testdata.compare(back), 0);
+  //error << "File saved at: " << testfilename << std::endl;
+  boost::filesystem::remove(testfilename);
+}
+
+//tests if I can read from compressed files
+BOOST_AUTO_TEST_CASE( test_compressed_input )
+{
+  std::string testfilename = temp_file() + ".gz";
+  Torch::core::OutputStream ofile(testfilename);
+  std::string testdata = "12345678,a_single_sentence";
+  ofile << testdata;
+  ofile.close();
+  Torch::core::InputStream ifile(testfilename);
+  std::string back;
+  ifile >> back;
+  BOOST_CHECK_EQUAL(testdata.compare(back), 0);
+  //error << "File saved at: " << testfilename << std::endl;
+  boost::filesystem::remove(testfilename);
 }

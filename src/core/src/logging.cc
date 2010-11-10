@@ -9,23 +9,25 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/detail/lock.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
-Torch::core::Device::~Device() {}
+Torch::core::OutputDevice::~OutputDevice() {}
+Torch::core::InputDevice::~InputDevice() {}
     
-struct NullDevice: public Torch::core::Device {
-  virtual ~NullDevice() {}
+struct NullOutputDevice: public Torch::core::OutputDevice {
+  virtual ~NullOutputDevice() {}
   virtual std::streamsize write(const char*, std::streamsize n) {
     return n;
   }
 };
 
-struct StdoutDevice: public Torch::core::Device {
-  virtual ~StdoutDevice() {}
+struct StdoutOutputDevice: public Torch::core::OutputDevice {
+  virtual ~StdoutOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
     boost::detail::thread::scoped_lock<boost::mutex> lock(mutex);
@@ -34,12 +36,22 @@ struct StdoutDevice: public Torch::core::Device {
   }
 };
 
-struct StderrDevice: public Torch::core::Device {
-  virtual ~StderrDevice() {}
+struct StderrOutputDevice: public Torch::core::OutputDevice {
+  virtual ~StderrOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
     boost::detail::thread::scoped_lock<boost::mutex> lock(mutex);
     std::cerr.write(s, n);
+    return n;
+  }
+};
+
+struct StdinInputDevice: public Torch::core::InputDevice {
+  virtual ~StdinInputDevice() {}
+  virtual std::streamsize read(char* s, std::streamsize n) {
+    static boost::mutex mutex;
+    boost::detail::thread::scoped_lock<boost::mutex> lock(mutex);
+    std::cin.read(s, n);
     return n;
   }
 };
@@ -53,8 +65,8 @@ inline static bool is_dot_gz(const std::string& filename) {
   return boost::filesystem::extension(filename) == ".gz";
 }
 
-struct FileDevice: public Torch::core::Device {
-  FileDevice(const std::string& filename)
+struct FileOutputDevice: public Torch::core::OutputDevice {
+  FileOutputDevice(const std::string& filename)
     : m_filename(filename),
       m_file(),
       m_ostream(),
@@ -70,7 +82,7 @@ struct FileDevice: public Torch::core::Device {
       m_ostream.push(boost::iostreams::basic_gzip_compressor<>());
     m_ostream.push(m_file);
   }
-  virtual ~FileDevice() {}
+  virtual ~FileOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     boost::detail::thread::scoped_lock<boost::mutex> lock(m_mutex);
     m_ostream.write(s, n);
@@ -86,57 +98,139 @@ struct FileDevice: public Torch::core::Device {
 
 };
 
+struct FileInputDevice: public Torch::core::InputDevice {
+  FileInputDevice(const std::string& filename)
+    : m_filename(filename),
+      m_file(),
+      m_istream(),
+      m_mutex()
+  {
+    //this first bit creates the input file handle
+    std::ios_base::openmode mode = std::ios_base::in;
+    if (is_dot_gz(filename)) mode |= std::ios_base::binary;
+    m_file.open(filename.c_str(), mode);
+    //this second part configures gzip'ing if necessary and associates the
+    //input file with the filtering stream.
+    if (is_dot_gz(filename)) 
+      m_istream.push(boost::iostreams::basic_gzip_decompressor<>());
+    m_istream.push(m_file);
+  }
+  virtual ~FileInputDevice() {}
+  virtual std::streamsize read(char* s, std::streamsize n) {
+    boost::detail::thread::scoped_lock<boost::mutex> lock(m_mutex);
+    m_istream.read(s, n);
+    return n;
+  }
+
+  //internal representation
+  private:
+    std::string m_filename; ///< the name of the file I'm reading from
+    std::ifstream m_file; ///< the file input stream
+    boost::iostreams::filtering_istream m_istream; ///< the input stream
+    boost::mutex m_mutex; ///< multi-threading guardian
+
+};
+
 bool Torch::core::debug_level(unsigned int i) {
   const char* value = getenv("TORCH_DEBUG");
   if (!value) return false;
   unsigned long v = strtoul(value, 0, 0);
-  if (v < 1 | v > 3) v = 0;
+  if (v < 1 || v > 3) v = 0;
   return (i <= v);
 }
 
 
-Torch::core::Sink::Sink()
-: m_device(new NullDevice)
+Torch::core::AutoOutputDevice::AutoOutputDevice()
+: m_device(new NullOutputDevice)
 {}
 
-Torch::core::Sink::Sink(const Torch::core::Sink& other)
+Torch::core::AutoOutputDevice::AutoOutputDevice(const Torch::core::AutoOutputDevice& other)
 : m_device(other.m_device)
 {}
 
-Torch::core::Sink::Sink(const boost::shared_ptr<Torch::core::Device>& device)
+Torch::core::AutoOutputDevice::AutoOutputDevice(const boost::shared_ptr<Torch::core::OutputDevice>& device)
 : m_device(device)
 {}
 
-Torch::core::Sink::Sink(const std::string& configuration) 
+Torch::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration) 
 : m_device()
 {
   reset(configuration);
 }
 
-Torch::core::Sink::~Sink() {}
+Torch::core::AutoOutputDevice::~AutoOutputDevice() {}
 
-void Torch::core::Sink::reset(const std::string& configuration) {
-  if (configuration == "null") m_device.reset(new NullDevice);
-  else if (configuration == "stdout") m_device.reset(new StdoutDevice);
-  else if (configuration == "stderr") m_device.reset(new StderrDevice);
-  else m_device.reset(new FileDevice(configuration));
+void Torch::core::AutoOutputDevice::reset(const std::string& configuration) {
+  std::string str(configuration);
+  str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
+  if (str == "null" || str.size()==0) m_device.reset(new NullOutputDevice);
+  else if (str == "stdout") m_device.reset(new StdoutOutputDevice);
+  else if (str == "stderr") m_device.reset(new StderrOutputDevice);
+  else m_device.reset(new FileOutputDevice(configuration));
 }
 
-void Torch::core::Sink::reset(const boost::shared_ptr<Torch::core::Device>& device) {
+void Torch::core::AutoOutputDevice::reset(const boost::shared_ptr<Torch::core::OutputDevice>& device) {
   m_device = device;
 }
 
-std::streamsize Torch::core::Sink::write(const char* s, std::streamsize n) {
+std::streamsize Torch::core::AutoOutputDevice::write(const char* s, std::streamsize n) {
   return m_device->write(s, n);
 }
 
-void Torch::core::Sink::close() {
+void Torch::core::AutoOutputDevice::close() {
   m_device->close();
 }
 
-Torch::core::Stream::~Stream() {}
+Torch::core::OutputStream::~OutputStream() {}
 
-Torch::core::Stream Torch::core::debug("stdout");
-Torch::core::Stream Torch::core::info("stdout");
-Torch::core::Stream Torch::core::warn("stderr");
-Torch::core::Stream Torch::core::error("stderr");
+Torch::core::AutoInputDevice::AutoInputDevice()
+: m_device(new StdinInputDevice)
+{}
+
+Torch::core::AutoInputDevice::AutoInputDevice(const Torch::core::AutoInputDevice& other)
+: m_device(other.m_device)
+{}
+
+Torch::core::AutoInputDevice::AutoInputDevice(const boost::shared_ptr<Torch::core::InputDevice>& device)
+: m_device(device)
+{}
+
+Torch::core::AutoInputDevice::AutoInputDevice(const std::string& configuration) 
+: m_device()
+{
+  reset(configuration);
+}
+
+Torch::core::AutoInputDevice::~AutoInputDevice() {}
+
+void Torch::core::AutoInputDevice::reset(const std::string& configuration) {
+  std::string str(configuration);
+  str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
+  if (str == "stdin" || str.size() == 0) m_device.reset(new StdinInputDevice);
+  else m_device.reset(new FileInputDevice(configuration));
+}
+
+void Torch::core::AutoInputDevice::reset(const boost::shared_ptr<Torch::core::InputDevice>& device) {
+  m_device = device;
+}
+
+std::streamsize Torch::core::AutoInputDevice::read(char* s, std::streamsize n) {
+  return m_device->read(s, n);
+}
+
+void Torch::core::AutoInputDevice::close() {
+  m_device->close();
+}
+
+Torch::core::InputStream::~InputStream() {}
+
+Torch::core::OutputStream Torch::core::debug("stdout");
+Torch::core::OutputStream Torch::core::info("stdout");
+Torch::core::OutputStream Torch::core::warn("stderr");
+Torch::core::OutputStream Torch::core::error("stderr");
+
+std::string Torch::core::tmpdir() {
+  const char* value = getenv("TMPDIR");
+  if (value) return value;
+  else return "/tmp";
+}
