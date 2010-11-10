@@ -12,9 +12,16 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/detail/lock.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+
+//By-passes the fact that boost 1.34.1 does not have a lock class
+struct Lock {
+  Lock(boost::mutex& m) : m_mutex(m) { m_mutex.lock(); }
+  ~Lock() { m_mutex.unlock(); }
+  private:
+    boost::mutex& m_mutex;
+};
 
 Torch::core::OutputDevice::~OutputDevice() {}
 Torch::core::InputDevice::~InputDevice() {}
@@ -30,7 +37,7 @@ struct StdoutOutputDevice: public Torch::core::OutputDevice {
   virtual ~StdoutOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
-    boost::detail::thread::scoped_lock<boost::mutex> lock(mutex);
+    Lock lock(mutex);
     std::cout.write(s, n);
     return n;
   }
@@ -40,7 +47,7 @@ struct StderrOutputDevice: public Torch::core::OutputDevice {
   virtual ~StderrOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
-    boost::detail::thread::scoped_lock<boost::mutex> lock(mutex);
+    Lock lock(mutex);
     std::cerr.write(s, n);
     return n;
   }
@@ -50,7 +57,7 @@ struct StdinInputDevice: public Torch::core::InputDevice {
   virtual ~StdinInputDevice() {}
   virtual std::streamsize read(char* s, std::streamsize n) {
     static boost::mutex mutex;
-    boost::detail::thread::scoped_lock<boost::mutex> lock(mutex);
+    Lock lock(mutex);
     std::cin.read(s, n);
     return n;
   }
@@ -84,7 +91,7 @@ struct FileOutputDevice: public Torch::core::OutputDevice {
   }
   virtual ~FileOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
-    boost::detail::thread::scoped_lock<boost::mutex> lock(m_mutex);
+    Lock lock(m_mutex);
     m_ostream.write(s, n);
     return n;
   }
@@ -117,7 +124,7 @@ struct FileInputDevice: public Torch::core::InputDevice {
   }
   virtual ~FileInputDevice() {}
   virtual std::streamsize read(char* s, std::streamsize n) {
-    boost::detail::thread::scoped_lock<boost::mutex> lock(m_mutex);
+    Lock lock(m_mutex);
     m_istream.read(s, n);
     return n;
   }
