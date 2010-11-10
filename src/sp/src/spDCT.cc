@@ -133,60 +133,74 @@ bool spDCT::processInput(const Tensor& input)
 #ifdef HAVE_OOURAFFT
 		if(inverse)
 		{
-		   	//
+	   	// Declare variables
 			int *ip;
 			double *w;
 			double *a;
+      double a0;
 
-			//
+			// Allocate C arrays according to the oourafft requirements 
+			//    (slightly larger)
 			a = alloc_1d_double(N);
 			ip = alloc_1d_int(2 + (int) sqrt(N + 0.5));
 			w = alloc_1d_double(N * 3 / 2);
 
-			//
+			// Set ip[0] such that the cos/sine coefficients are computed and
+			// stored in w correctly.
 			ip[0] = 0;
-
-			//
+			// Copy the float tensor in the C array
 			for(int i=0; i < N; i++) a[i] = (*R)(i);
 
-			a[0] *= 0.5;
+			a0 = a[0];
 
+      // Compute the inverse DCT (second argument set to 1)
 			ddct(N, 1, a, ip, w);
 
-			//
-			double scale = 2.0 / N;
+			// The output of the oourafft implementation does not use the 
+			// scale1/scale2 coefficients. This has to be done manually.
+			// This is a bit tricky for the inverse, as the sum needs to be 
+			// processed manually by removing the first initial value a0.
+			double scale1 = sqrt(1.0 / N);
+			double scale2 = sqrt(2.0 / N);
 			FloatTensor *F = (FloatTensor *) m_output[0];
-			for(int i=0; i < N; i++) (*F)(i) = scale * a[i];
+			for(int i=0; i < N; i++) (*F)(i) = scale1 * a0 + scale2 * (a[i]-a0);
 
-			//
+			// Deallocate memory
 			free_1d_int(ip);
 			free_1d_double(w);
 			free_1d_double(a);
 		}
 		else
 		{
-		   	//
+	   	// Declare variables
 			int *ip;
 			double *w;
 			double *a;
 
-			//
+			// Allocate C arrays according to the oourafft requirements 
+			//    (slightly larger)
 			a = alloc_1d_double(N);
 			ip = alloc_1d_int(2 + (int) sqrt(N + 0.5));
 			w = alloc_1d_double(N * 3 / 2);
 
-			//
+			// Set ip[0] such that the cos/sine coefficients are computed and
+			// stored in w correctly.
 			ip[0] = 0;
+			// Copy the float tensor in the C array
 			for(int i=0; i < N; i++) a[i] = (*R)(i);
 
-			//
+      // Compute the DCT (second argument set to -1)
 			ddct(N, -1, a, ip, w);
 
-			//
+			// The output of the oourafft implementation does not use the 
+			// scale1/scale2 coefficients. This has to be done manually.
+			// This is done separately for the first coefficients
 			FloatTensor *F = (FloatTensor *) m_output[0];
-			for(int i=0; i < N; i++) (*F)(i) = a[i];
+      (*F)(0) = sqrt(1./N) * a[0];
+      double scale = sqrt(2./N);
+			for(int i=1; i < N; i++) (*F)(i) = scale * a[i];
 
-			//
+			// Deallocate memory
 			free_1d_double(a);
 			free_1d_int(ip);
 			free_1d_double(w);
@@ -207,7 +221,7 @@ bool spDCT::processInput(const Tensor& input)
 			for(int i=0; i < H; i++)
 				for(int j=0; j < W; j++) a[i][j] = (*R)(i,j);
 
-		   	if(W == 8 && H == 8)
+	   	if(W == 8 && H == 8)
 			{
     				ddct8x8s(1, a);
 
@@ -268,7 +282,7 @@ bool spDCT::processInput(const Tensor& input)
 			for(int i=0; i < H; i++)
 				for(int j=0; j < W; j++) a[i][j] = (*R)(i,j);
 
-		   	if(W == 8 && H == 8)
+	   	if(W == 8 && H == 8)
 			{
     				ddct8x8s(-1, a);
 
