@@ -100,12 +100,12 @@ BOOST_AUTO_TEST_CASE( test_input )
   std::string testfilename = temp_file();
   Torch::core::OutputStream ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
-  ofile << testdata;
+  ofile << testdata << std::endl;
   ofile.close();
   Torch::core::InputStream ifile(testfilename);
   std::string back;
   ifile >> back;
-  BOOST_CHECK_EQUAL(testdata.compare(back), 0);
+  BOOST_CHECK_EQUAL(testdata, back);
   //error << "File saved at: " << testfilename << std::endl;
   boost::filesystem::remove(testfilename);
 }
@@ -116,12 +116,12 @@ BOOST_AUTO_TEST_CASE( test_compressed_input )
   std::string testfilename = temp_file() + ".gz";
   Torch::core::OutputStream ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
-  ofile << testdata;
+  ofile << testdata << std::endl;
   ofile.close();
   Torch::core::InputStream ifile(testfilename);
   std::string back;
   ifile >> back;
-  BOOST_CHECK_EQUAL(testdata.compare(back), 0);
+  BOOST_CHECK_EQUAL(testdata, back);
   //error << "File saved at: " << testfilename << std::endl;
   boost::filesystem::remove(testfilename);
 }
