@@ -99,6 +99,10 @@ def parse_args():
       default="Version ?.?", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned"
       )
+  parser.add_option("-3", "--force-32bits", action="store_true",
+      dest="force_32bits", default=False,
+      help="forces a 32-bit build instead of what would be the default for the platform.",
+      )
   
   options, args = parser.parse_args()
 
@@ -126,7 +130,7 @@ def parse_args():
   options.log_prefix = options.log_prefix.strip()
 
   options.platform = adm.build.platform(options)
- 
+
   #we suffix the platform on the build and installation directories
   options.build_prefix = os.path.join(options.build_prefix, options.platform)
   options.install_prefix = os.path.join(options.install_prefix, options.platform)

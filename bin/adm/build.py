@@ -139,6 +139,7 @@ def cmake(option):
 
   cmake_options = {}
   cmake_options['--graphviz'] = "dependencies.dot"
+  if option.force_32bits: cmake_options['-DTORCH_FORCE_32BITS'] = 'yes'
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
   cmake_options['-DCMAKE_INSTALL_PREFIX'] = option.install_prefix
   cmake_options['-DINCLUDE_DIR'] = \
@@ -316,7 +317,11 @@ def dot(option):
 def platform(option):
   """Calculates the platform string."""
   uname = os.uname()
-  return '%s-%s-%s' % (uname[0].lower(), uname[4].lower(), option.build_type)
+  arch = uname[4].lower()
+  if option.force_32bits: 
+    logging.warn("Forcing 32-bits compilation")
+    arch = 'i686'
+  return '%s-%s-%s' % (uname[0].lower(), arch, option.build_type)
 
 def action(what, option, *args):
   start = time.time()
