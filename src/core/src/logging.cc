@@ -11,17 +11,21 @@
 #include <fstream>
 #include <algorithm>
 #include <boost/filesystem.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
-//By-passes the fact that boost 1.34.1 does not have a lock class
-struct Lock {
-  Lock(boost::mutex& m) : m_mutex(m) { m_mutex.lock(); }
-  ~Lock() { m_mutex.unlock(); }
-  private:
-    boost::mutex& m_mutex;
-};
+/**
+ * MT "lock" support was only introduced in Boost 1.35. Before copying this
+ * very ugly hack, make sure we are still using Boost 1.34. This will no longer
+ * be the case starting January 2011.
+ */
+#include <boost/version.hpp>
+#include <boost/thread/mutex.hpp>
+#if ((BOOST_VERSION / 100) % 1000) > 34
+#include <boost/thread/locks.hpp>
+#else
+#warning Disabling MT locks because Boost < 1.35!
+#endif
 
 Torch::core::OutputDevice::~OutputDevice() {}
 Torch::core::InputDevice::~InputDevice() {}
@@ -37,7 +41,9 @@ struct StdoutOutputDevice: public Torch::core::OutputDevice {
   virtual ~StdoutOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
-    Lock lock(mutex);
+#if ((BOOST_VERSION / 100) % 1000) > 35
+    boost::lock_guard<boost::mutex> lock(mutex);
+#endif
     std::cout.write(s, n);
     return n;
   }
@@ -47,7 +53,9 @@ struct StderrOutputDevice: public Torch::core::OutputDevice {
   virtual ~StderrOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
     static boost::mutex mutex;
-    Lock lock(mutex);
+#if ((BOOST_VERSION / 100) % 1000) > 35
+    boost::lock_guard<boost::mutex> lock(mutex);
+#endif
     std::cerr.write(s, n);
     return n;
   }
@@ -57,7 +65,9 @@ struct StdinInputDevice: public Torch::core::InputDevice {
   virtual ~StdinInputDevice() {}
   virtual std::streamsize read(char* s, std::streamsize n) {
     static boost::mutex mutex;
-    Lock lock(mutex);
+#if ((BOOST_VERSION / 100) % 1000) > 35
+    boost::lock_guard<boost::mutex> lock(mutex);
+#endif
     std::cin.read(s, n);
     return n;
   }
@@ -91,7 +101,9 @@ struct FileOutputDevice: public Torch::core::OutputDevice {
   }
   virtual ~FileOutputDevice() {}
   virtual std::streamsize write(const char* s, std::streamsize n) {
-    Lock lock(m_mutex);
+#if ((BOOST_VERSION / 100) % 1000) > 35
+    boost::lock_guard<boost::mutex> lock(m_mutex);
+#endif
     m_ostream.write(s, n);
     return n;
   }
@@ -124,7 +136,9 @@ struct FileInputDevice: public Torch::core::InputDevice {
   }
   virtual ~FileInputDevice() {}
   virtual std::streamsize read(char* s, std::streamsize n) {
-    Lock lock(m_mutex);
+#if ((BOOST_VERSION / 100) % 1000) > 35
+    boost::lock_guard<boost::mutex> lock(m_mutex);
+#endif
     m_istream.read(s, n);
     return n;
   }
