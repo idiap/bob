@@ -6,6 +6,7 @@
 """A generic setup system for Torch"""
 
 import sys, os
+import optparse
 
 epilog = """
 Examples:
@@ -13,16 +14,26 @@ Examples:
   If you are unsure of what to do, just print the help message:
   $ %(prog)s --help
 
-  If you want to setup in debug mode:
+  If you want to setup in debug mode for the current architecture:
   $ %(prog)s --debug
+  
+  If you want to setup for an arbitrary architecture:
+  $ %(prog)s --arch=linux-i686-release
   
   If you want to show what would be done:
   $ %(prog)s --simulate
 """
 
+def current_arch(debug):
+  """Calculates the current arch"""
+  uname = os.uname()
+  arch = '%s-%s' % (uname[0].lower(), uname[4].lower())
+  if debug: arch += '-debug'
+  else: arch += '-release'
+  return arch
+
 def parse_args():
   """Parses the command line input."""
-  import optparse
 
   class MyParser(optparse.OptionParser):
     """Overwites the format_epilog() so we keep newlines..."""
@@ -35,12 +46,11 @@ def parse_args():
 
   parser = MyParser(prog=prog, description=__doc__, 
       epilog=epilog % {'prog': prog})
-  parser.add_option("-b", "--base-dir", 
+  parser.add_option("-a", "--arch",
                     action="store",
-                    dest="dir", 
-                    default=self_root(),
-                    #help="Changes the default root directory of the setup",
-                    help=optparse.SUPPRESS_HELP,
+                    dest="arch",
+                    default=current_arch(debug=False),
+                    help="Changes the default architecture for the setup.",
                    )
   parser.add_option("-c", "--csh", 
                     action="store_true",
@@ -50,9 +60,9 @@ def parse_args():
                     help=optparse.SUPPRESS_HELP,
                    )
   parser.add_option("-d", "--debug", 
-                    action="store_true",
-                    dest="debug", 
-                    default=False,
+                    action="store_const",
+                    const=current_arch(debug=True),
+                    dest="arch", 
                     help="Outputs settings to run against the debug build",
                    )
   parser.add_option("-n", "--check-options",
@@ -75,6 +85,18 @@ def parse_args():
                     default=False,
                     help="If this option is active, I'll show what the shell would do to setup and exit with status 4.",
                     )
+  parser.add_option("-e", "--externals-setup",
+                    action="store",
+                    dest="externals_setup",
+                    default="/idiap/group/torch5spro/nightlies/externals/tools/setup.py",
+                    help="Set this to a different path if your externals are installed somewhere else (defaults to %default)."
+                    )
+  parser.add_option("-v", "--externals-version",
+                    action="store",
+                    dest="externals_version",
+                    default="last",
+                    help="Set this to a different value if you want a different externals version (defaults to %default)."
+                   )
 
   options, arguments = parser.parse_args()
 
@@ -82,10 +104,8 @@ def parse_args():
     parser.print_help()
     parser.exit(status=3)
 
-  options.dir = os.path.realpath(options.dir)
-
-  #also, sets up the version
-  options.version = version(options.dir)
+  #sets up the version
+  options.version = version(self_root())
 
   return (options, arguments)
 
@@ -139,38 +159,35 @@ def shell_echo(value):
   """Outputs and echo message"""
   return 'echo "%s";' % value
 
-def setup_this(debug, dir=self_root()):
-  """Sets up the current python application"""
-  for k, v in generate_environment(debug, dir): 
-    if k == 'PYTHONPATH':
-      for i in v.split(':'): sys.path.append(i)
-    os.environ[k] = v
+def load_externals(options):
+  """Loads environment from the externals of choice."""
+  class Opt(object): pass
+  opt = Opt()
+  opt.arch = externals_arch(options)
+  opt.version = options.externals_version
+  
+  # this magic will load the "externals" setup module
+  import imp; extsetup = imp.load_source('extsetup', options.externals_setup)
 
-def current_platform(debug):
-  """Calculates the current platform"""
-  uname = os.uname()
-  platform = '%s-%s' % (uname[0].lower(), uname[4].lower())
-  if debug: platform += '-debug'
-  else: platform += '-release'
-  return platform
+  # this bit will execute the setup for the externals
+  return extsetup.setup_this(opt)
 
-def generate_environment(debug, dir):
+def generate_environment(options):
   """Returns a list of environment variables that need setting."""
 
-  platform = current_platform(debug)
+  external_env = load_externals(options)
 
-  base_dir = os.path.join(dir, 'install')
-  install_dir = os.path.join(base_dir, platform)
+  base_dir = os.path.join(self_root(), 'install')
+  install_dir = os.path.join(base_dir, options.arch)
 
-  all = []
+  all = {}
 
   path = os.environ.get('PATH', '')
   path = path_remove(path, '.') #security concern
   path = path_remove_if_startswith(path, base_dir)
-  path = path_add(path, os.path.join(dir, 'bin'))
-  path = path_add(path, os.path.join(base_dir, 'bin'))
+  path = path_add(path, os.path.join(self_root(), 'bin'))
   path = path_add(path, os.path.join(install_dir, 'bin'))
-  all.append(('PATH', path))
+  all['PATH'] = path
 
   pythonpath = os.environ.get('PYTHONPATH', '')
   libdir = os.path.join(install_dir, 'lib')
@@ -178,29 +195,45 @@ def generate_environment(debug, dir):
   python_version = 'python%d.%d' % (sys.version_info[0], sys.version_info[1])
   pythonpath = path_add(pythonpath, os.path.join(libdir, python_version))
   pythonpath = path_add(pythonpath, libdir)
-  all.append(('PYTHONPATH', pythonpath))
+  all['PYTHONPATH'] = pythonpath
 
   uname = os.uname()
-  if uname[0].lower() == 'darwin': # we are under OSX
+  if options.arch.split('-')[0] == 'darwin': # we are under OSX
     dyld_library_path = os.environ.get('DYLD_LIBRARY_PATH', '')
     dyld_library_path = path_remove_if_startswith(dyld_library_path, base_dir)
     dyld_library_path = path_add(dyld_library_path, libdir)
     # this is for taking into consideration our python mac ports installation
-    all.append(('DYLD_LIBRARY_PATH', dyld_library_path))
+    all['DYLD_LIBRARY_PATH'] = dyld_library_path
 
   ld_library_path = os.environ.get('LD_LIBRARY_PATH', '')
   ld_library_path = path_remove_if_startswith(ld_library_path, base_dir)
   ld_library_path = path_add(ld_library_path, libdir)
-  all.append(('LD_LIBRARY_PATH', ld_library_path))
+  all['LD_LIBRARY_PATH'] = ld_library_path
 
   # this is for cmake
   cmake_prefix_path = os.environ.get('CMAKE_PREFIX_PATH', '')
   cmakedir = os.path.join(install_dir, 'share', 'cmake')
   cmake_prefix_path = path_remove_if_startswith(cmake_prefix_path, base_dir)
   cmake_prefix_path = path_add(cmake_prefix_path, cmakedir)
-  all.append(('CMAKE_PREFIX_PATH', cmake_prefix_path))
+  all['CMAKE_PREFIX_PATH'] = cmake_prefix_path
+
+  # updates with keys found in the externals, but not touched by our procedure
+  for k in external_env.keys():
+    if not all.has_key(k): all[k] = external_env[k]
 
   return all
+
+def setup_this(options):
+  """Sets up the current python application"""
+  env = generate_environment(options)
+  for k, v in env.iteritems():
+    if k == 'PYTHONPATH':
+      for i in v.split(':'): sys.path.append(i)
+    os.environ[k] = v
+  return env
+
+def externals_arch(options):
+  return '-'.join(options.arch.split('-')[0:2]) + '-release'
 
 if __name__ == '__main__':
 
@@ -210,10 +243,12 @@ if __name__ == '__main__':
   if options.checker and not options.simulate: sys.exit(0)
 
   #echo what will be setup
-  print shell_echo("Setting up torch5spro '%s' for platform '%s'..." % \
-      (options.version, current_platform(options.debug)))
+  print shell_echo("Setting up externals '%s' for architecture '%s'..." % \
+      (options.externals_version, externals_arch(options)))
+  print shell_echo("Setting up torch5spro '%s' for architecture '%s'..." % \
+      (options.version, options.arch))
 
-  for k, v in generate_environment(options.debug, self_root()):
+  for k, v in generate_environment(options).iteritems():
     print shell_str(k, v, options.csh)
 
   if options.simulate: sys.exit(4)
