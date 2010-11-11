@@ -49,7 +49,6 @@ set(src
   "src/rfftf1.f"
   "src/rffti1.f"
   "src/sint1.f"
-  "src/test.f"
   "src/zfftb.f"
   "src/zfftf.f"
   "src/zffti.f")
