@@ -3,7 +3,7 @@
 
 # These are some variables you may want to configure
 externals=/idiap/group/torch5spro/nightlies/externals
-externals_version=v2
+externals_version=last
 
 # From this point onwards, I'll do the work
 prog=${BASH_SOURCE[0]}
