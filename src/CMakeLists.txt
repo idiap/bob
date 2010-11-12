@@ -10,7 +10,7 @@ set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall")
 # We allow you to force the compilation to be done using a base 32-bit
 # architecture if you call cmake with "-DTORCH_FORCE_32BITS=yes"
 if(TORCH_FORCE_32BITS)
-  set(COMMON_FLAGS "${COMMON_FLAGS} -m32")
+  set(COMMON_FLAGS "-m32 ${COMMON_FLAGS}")
 endif(TORCH_FORCE_32BITS)
 
 # Cmake does not support include_directories(SYSTEM) correctly on OSX, so the
