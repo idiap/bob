@@ -63,6 +63,27 @@ set(pysrc
    "python/src/main.cc"
    )
  
+set(pysrc_array
+   "python/src/array.cc"
+   "python/src/array_bool.cc"
+   "python/src/array_int8.cc"
+   "python/src/array_int16.cc"
+   "python/src/array_int32.cc"
+   "python/src/array_int64.cc"
+   "python/src/array_uint8.cc"
+   "python/src/array_uint16.cc"
+   "python/src/array_uint32.cc"
+   "python/src/array_uint64.cc"
+   "python/src/array_float32.cc"
+   "python/src/array_float64.cc"
+   "python/src/array_float128.cc"
+   "python/src/array_complex64.cc"
+   "python/src/array_complex128.cc"
+   "python/src/array_complex256.cc"
+   "python/src/main_array.cc"
+   )
+
 torch_python_bindings(core "${pysrc}")
+torch_python_submodule(core array "${pysrc_array}")
 torch_python_install(core)
 

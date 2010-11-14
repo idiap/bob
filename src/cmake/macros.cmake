@@ -90,7 +90,7 @@ macro(torch_python_bindings package src)
     # Some preparatory work
     set(libname pytorch_${package})
     set(libdir lib)
-    include_directories(${PYTHON_INCLUDE_DIRS})
+    include_directories(${python_INCLUDE_DIRS};${CMAKE_CURRENT_SOURCE_DIR}/python/src)
 
     # Building the library itself
     add_library(${libname} SHARED ${src})
@@ -105,6 +105,27 @@ macro(torch_python_bindings package src)
     message("Boost::Python bindings for ${package} are DISABLED: externals NOT FOUND!")
   endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 endmacro(torch_python_bindings package name src)
+
+macro(torch_python_submodule package subpackage src)
+  if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+    # Some preparatory work
+    set(libname pytorch_${package}_${subpackage})
+    set(libdir lib)
+    include_directories(${python_INCLUDE_DIRS};${CMAKE_CURRENT_SOURCE_DIR}/python/src)
+
+    # Building the library itself
+    add_library(${libname} SHARED ${src})
+    set_target_properties(${libname} PROPERTIES SUFFIX ".so")
+    target_link_libraries(${libname} torch_${package})
+    target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY})
+    target_link_libraries(${libname} ${PYTHON_LIBRARIES})
+
+    # And its installation
+    install(TARGETS ${libname} LIBRARY DESTINATION ${libdir})
+  else (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+    message("Boost::Python bindings for ${package}_${subpackage} are DISABLED: externals NOT FOUND!")
+  endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+endmacro(torch_python_submodule package name src)
 
 # Installs python files and compile them
 macro(torch_python_install package)

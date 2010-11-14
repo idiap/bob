@@ -1,4 +1,5 @@
 from libpytorch_core import *
+from . import array
 __all__ = dir()
 
 def variables(self):
