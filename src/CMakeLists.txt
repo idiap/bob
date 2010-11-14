@@ -10,7 +10,7 @@ set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall")
 # We allow you to force the compilation to be done using a base 32-bit
 # architecture if you call cmake with "-DTORCH_FORCE_32BITS=yes"
 if(TORCH_FORCE_32BITS)
-  set(COMMON_FLAGS "${COMMON_FLAGS} -m32")
+  set(COMMON_FLAGS "-m32 ${COMMON_FLAGS}")
 endif(TORCH_FORCE_32BITS)
 
 # Cmake does not support include_directories(SYSTEM) correctly on OSX, so the
@@ -23,8 +23,10 @@ endif(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+set(CMAKE_Fortran_FLAGS_RELEASE "-O2 -funroll-loops -fexpensive-optimizations")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -DTORCH_DEBUG")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_Fortran_FLAGS_DEBUG "${COMMON_FLAGS}")
 
 # This is our RPATH policy
 # use, i.e. don't skip the full RPATH for the build tree
@@ -75,6 +77,7 @@ endif(NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL ""))
 include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)
 
 add_subdirectory(python)
+add_subdirectory(dfftpack)
 add_subdirectory(oourafft)
 add_subdirectory(lbfgs)
 add_subdirectory(core)
