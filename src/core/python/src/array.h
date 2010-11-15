@@ -229,7 +229,7 @@ namespace Torch { namespace python {
         boost::python::throw_error_already_set();
       }
 
-      int dimensions[N];
+      npy_intp dimensions[N];
       for (size_t i=0; i<N; ++i) { dimensions[i] = b.extent(i); }
       NPY_TYPES tp = TYPEMAP.type_to_enum<T>();
       PyObject* pyobj = PyArray_SimpleNew(N, dimensions, tp);
