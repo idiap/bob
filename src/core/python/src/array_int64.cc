@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(int64_t, int64);
+declare_arrays(int64_t, int64)

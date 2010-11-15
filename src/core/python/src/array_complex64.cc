@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(std::complex<float>, complex64);
+declare_arrays(std::complex<float>, complex64)

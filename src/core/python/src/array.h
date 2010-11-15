@@ -12,7 +12,6 @@
 #include <string>
 #include <map>
 #include <boost/format.hpp>
-#include <numpy/ndarraytypes.h>
 #include <numpy/ndarrayobject.h>
 #include <stdexcept>
 #include <stdint.h>
@@ -230,7 +229,7 @@ namespace Torch { namespace python {
       int dimensions[N];
       for (size_t i=0; i<N; ++i) { dimensions[i] = b.extent(i); }
       NPY_TYPES tp = TYPEMAP.type_to_enum<T>();
-      PyArrayObject* a = (PyArrayObject*)PyArray_FromDims(N, dimensions, tp);
+      PyArrayObject* a = (PyArrayObject*)(PyArray_FromDims(N, dimensions, tp));
       T* array_data = (T*)PyArray_DATA(a);
       size_t i = 0;
       for (typename blitz::Array<T,N>::const_iterator it=b.begin(); it!=b.end(); ++it, ++i) {
@@ -339,11 +338,12 @@ namespace Torch { namespace python {
       retval.def("numpy_enum", &to_enum<T, N>, (boost::python::arg("self")), "Describes the equivalent numpy C enumeration of this blitz::Array");
 
       return retval;
-    };
+    }
 
 } } //namespace Torch::python 
 
 #define declare_arrays(T,NAME) void BOOST_JOIN(bind_core_array_,NAME)() { \
+  import_array(); \
   Torch::python::array_class<T,1>(BOOST_STRINGIZE(NAME)); \
   Torch::python::array_class<T,2>(BOOST_STRINGIZE(NAME)); \
   Torch::python::array_class<T,3>(BOOST_STRINGIZE(NAME)); \

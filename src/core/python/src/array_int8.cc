@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(int8_t, int8);
+declare_arrays(int8_t, int8)

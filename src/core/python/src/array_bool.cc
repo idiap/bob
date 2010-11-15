@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(bool, bool);
+declare_arrays(bool, bool)

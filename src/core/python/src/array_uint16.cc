@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(uint16_t, uint16);
+declare_arrays(uint16_t, uint16)
