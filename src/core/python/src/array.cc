@@ -230,11 +230,6 @@ boost::python::numeric::array Torch::python::astype(boost::python::numeric::arra
 
 void bind_core_array() {
   /**
-   * Need to call the PyArrayObject API to set up itself at least once.
-   */
-  import_array();
-
-  /**
    * Resets the module and type used by boost::python to numpy
    */
   boost::python::numeric::array::set_module_and_type("numpy", "ndarray");
