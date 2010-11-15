@@ -84,6 +84,12 @@ set(pysrc_array
    )
 
 torch_python_bindings(core "${pysrc}")
+
 torch_python_submodule(core array "${pysrc_array}")
+# the core array python binding should not be compiled with -Wall because the
+# PyArray includes are full of dynamically loaded objects that need casting.
+# Also, it uses the type "long long" that is not allowed in the standard.
+set_target_properties(${libname} PROPERTIES COMPILE_FLAGS "-Wno-long-long -Wno-unused-function")
+
 torch_python_install(core)
 

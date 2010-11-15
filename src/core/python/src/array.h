@@ -12,10 +12,10 @@
 #include <string>
 #include <map>
 #include <boost/format.hpp>
-#include <numpy/ndarrayobject.h>
 #include <stdexcept>
 #include <stdint.h>
 #include <sstream>
+#include <numpy/arrayobject.h>
 
 #include "core/logging.h"
 
@@ -229,14 +229,14 @@ namespace Torch { namespace python {
       int dimensions[N];
       for (size_t i=0; i<N; ++i) { dimensions[i] = b.extent(i); }
       NPY_TYPES tp = TYPEMAP.type_to_enum<T>();
-      PyArrayObject* a = (PyArrayObject*)(PyArray_FromDims(N, dimensions, tp));
-      T* array_data = (T*)PyArray_DATA(a);
+      PyObject* pyobj = PyArray_SimpleNew(N, dimensions, tp);
+      T* array_data = (T*)PyArray_DATA(pyobj);
       size_t i = 0;
       for (typename blitz::Array<T,N>::const_iterator it=b.begin(); it!=b.end(); ++it, ++i) {
         array_data[i] = *it;
       }
 
-      boost::python::object obj(boost::python::handle<>((PyObject*)a));
+      boost::python::object obj(boost::python::handle<>((PyObject*)pyobj));
       return boost::python::extract<boost::python::numeric::array>(obj);
     }
 
@@ -343,7 +343,6 @@ namespace Torch { namespace python {
 } } //namespace Torch::python 
 
 #define declare_arrays(T,NAME) void BOOST_JOIN(bind_core_array_,NAME)() { \
-  import_array(); \
   Torch::python::array_class<T,1>(BOOST_STRINGIZE(NAME)); \
   Torch::python::array_class<T,2>(BOOST_STRINGIZE(NAME)); \
   Torch::python::array_class<T,3>(BOOST_STRINGIZE(NAME)); \
