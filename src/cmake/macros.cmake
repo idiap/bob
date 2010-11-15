@@ -90,7 +90,7 @@ macro(torch_python_bindings package src)
     # Some preparatory work
     set(libname pytorch_${package})
     set(libdir lib)
-    include_directories(${python_INCLUDE_DIRS};${CMAKE_CURRENT_SOURCE_DIR}/python/src)
+    include_directories(SYSTEM ${python_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/python/src)
 
     # Building the library itself
     add_library(${libname} SHARED ${src})
@@ -111,7 +111,7 @@ macro(torch_python_submodule package subpackage src)
     # Some preparatory work
     set(libname pytorch_${package}_${subpackage})
     set(libdir lib)
-    include_directories(${python_INCLUDE_DIRS};${CMAKE_CURRENT_SOURCE_DIR}/python/src)
+    include_directories(SYSTEM ${python_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/python/src)
 
     # Building the library itself
     add_library(${libname} SHARED ${src})

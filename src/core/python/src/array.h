@@ -15,7 +15,10 @@
 #include <stdexcept>
 #include <stdint.h>
 #include <sstream>
-#include <numpy/arrayobject.h>
+
+extern "C" {
+  #include <numpy/arrayobject.h>
+}
 
 #include "core/logging.h"
 
