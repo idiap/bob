@@ -10,15 +10,6 @@ import torch
 def compare(v1, v2, width):
   return abs(v1-v2) <= width
 
-def my_assert_true(real, aim):
-
-  if compare(real, aim, 1e-3):
-    return True
-  else:
-    print ""
-    print " Real: ", real, " Aim: ", aim
-    return False
-
 class TransformTest(unittest.TestCase):
   """Performs for dct, dct2, fft, fft2 and their inverses"""
   
