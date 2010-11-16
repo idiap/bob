@@ -161,6 +161,8 @@ def shell_echo(value):
 
 def load_externals(options):
   """Loads environment from the externals of choice."""
+  if not os.path.exists(options.externals_setup) or \
+      not options.externals_setup: return {}
   class Opt(object): pass
   opt = Opt()
   opt.arch = externals_arch(options)
@@ -168,6 +170,9 @@ def load_externals(options):
   
   # this magic will load the "externals" setup module
   import imp; extsetup = imp.load_source('extsetup', options.externals_setup)
+
+  print shell_echo("Setting up externals '%s' for architecture '%s'..." % \
+      (options.externals_version, externals_arch(options)))
 
   # this bit will execute the setup for the externals
   return extsetup.setup_this(opt)
@@ -243,8 +248,6 @@ if __name__ == '__main__':
   if options.checker and not options.simulate: sys.exit(0)
 
   #echo what will be setup
-  print shell_echo("Setting up externals '%s' for architecture '%s'..." % \
-      (options.externals_version, externals_arch(options)))
   print shell_echo("Setting up torch5spro '%s' for architecture '%s'..." % \
       (options.version, options.arch))
 
