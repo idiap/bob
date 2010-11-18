@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(double, float64)
+declare_float_arrays(double, float64)

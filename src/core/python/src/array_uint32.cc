@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(uint32_t, uint32)
+declare_unsigned_arrays(uint32_t, uint32)

@@ -228,6 +228,35 @@ boost::python::numeric::array Torch::python::astype(boost::python::numeric::arra
   return (boost::python::numeric::array) a.astype(t);
 }
 
+template <int N> 
+boost::python::class_<blitz::GeneralArrayStorage<N>,
+  boost::shared_ptr<blitz::GeneralArrayStorage<N> > > bind_c_storage() {
+
+  typedef typename blitz::GeneralArrayStorage<N> storage_type;
+  boost::format class_name("c_storage_%d");
+  class_name % N;
+  boost::format class_doc("Storages of this type can be used to force a certain storage style in an array. Use objects of this type to force a C-storage type for a %d-D array.");
+  class_doc % N;
+  boost::python::class_<storage_type, boost::shared_ptr<storage_type> > 
+    retval(class_name.str().c_str(), class_doc.str().c_str(), boost::python::init<>());
+  return retval;
+}
+
+template <int N>
+boost::python::class_<blitz::FortranArray<N>,
+  boost::shared_ptr<blitz::FortranArray<N> > > bind_fortran_storage() {
+  typedef typename blitz::FortranArray<N> storage_type;
+  boost::format class_name("fortran_storage_%d");
+  class_name % N;
+  boost::format class_doc("Storages of this type can be used to force a certain storage style in an array. Use objects of this type to force a Fortran-storage type for a %d-D array.");
+  class_doc % N;
+  boost::python::class_<storage_type, boost::shared_ptr<storage_type> > 
+    retval(class_name.str().c_str(), class_doc.str().c_str(), boost::python::init<>());
+  return retval;
+}
+
+#define bind_storages(N) bind_c_storage<N>(); bind_fortran_storage<N>();
+
 void bind_core_array() {
   /**
    * Resets the module and type used by boost::python to numpy
@@ -276,4 +305,18 @@ void bind_core_array() {
   boost::python::scope().attr("ninthDim") = blitz::ninthDim;
   boost::python::scope().attr("tenthDim") = blitz::tenthDim;
   boost::python::scope().attr("eleventhDim") = blitz::tenthDim;
+
+  //this maps the blitz ordering schemes
+  bind_storages(1);
+  bind_storages(2);
+  bind_storages(3);
+  bind_storages(4);
+  bind_storages(5);
+  bind_storages(6);
+  bind_storages(7);
+  bind_storages(8);
+  bind_storages(9);
+  bind_storages(10);
+  bind_storages(11);
+
 }

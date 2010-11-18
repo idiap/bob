@@ -6,4 +6,4 @@
  */
 
 #include <array.h>
-declare_arrays(int32_t, int32)
+declare_integer_arrays(int32_t, int32)

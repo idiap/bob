@@ -64,6 +64,7 @@ set(pysrc
    )
  
 set(pysrc_array
+   "python/src/tinyvector.cc"
    "python/src/array.cc"
    "python/src/array_bool.cc"
    "python/src/array_int8.cc"
@@ -85,11 +86,10 @@ set(pysrc_array
 
 torch_python_bindings(core "${pysrc}")
 
+#some pre-compiled header black magic: read macros.cmake for details. if you
+#don't know what pre-compiled headers are good for, google for it.
+torch_add_python_pch("python/src/array.h" pysrc_array)
 torch_python_submodule(core array "${pysrc_array}")
-# the core array python binding should not be compiled with -Wall because the
-# PyArray includes are full of dynamically loaded objects that need casting.
-# Also, it uses the type "long long" that is not allowed in the standard.
-set_target_properties(${libname} PROPERTIES COMPILE_FLAGS "-Wno-long-long -Wno-unused-function")
 
 torch_python_install(core)
 

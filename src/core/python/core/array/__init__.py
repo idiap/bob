@@ -8,3 +8,7 @@ def as_torch(a):
   array scalar type."""
   exec('obj = %s(a)' % equivalent_scalar(a))
   return obj
+
+def array_repr(self):
+  """Returns the current array representation."""
+  pass
