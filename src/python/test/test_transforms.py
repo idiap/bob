@@ -117,7 +117,7 @@ class TransformTest(unittest.TestCase):
 
     for i in range(N):
       for j in range(N):
-        self.assertTrue(compare(tt.get(i,j), mat(i,j), 1e-3))
+        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
 
 
   def test_dct2D_8(self):
@@ -209,6 +209,32 @@ class TransformTest(unittest.TestCase):
 
     for i in range(N):
       for j in range(N):
+        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+
+
+  def test_fft1D_8(self):
+    # size of the data
+    N = 8
+
+    # set up simple 1D tensor
+    t = torch.core.FloatTensor(N)
+    for i in range(N):
+      t.set(i, 1.0+i)
+    
+    # process using DCT
+    d = torch.sp.spFFT()
+    d.process(t)
+    self.assertEqual(d.getNOutputs(), 1)
+
+    # get answer and compare to matlabs dct
+    tt = d.getOutput(0)
+
+    # array containing matlab values
+    mat = ((36.0000, 0.), (-4., 9.6569), (-4., 4.), (-4., 1.6569),
+           (-4., 0.), (-4.,-1.6569), (-4., -4.), (-4.,-9.6569))
+
+    for i in range(N):
+      for j in range(2):
         self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
 
 
