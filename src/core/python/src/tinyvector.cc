@@ -156,7 +156,12 @@ struct tinyvec_to_tuple {
 
 template <typename T, int N>
 void register_tinyvec_to_tuple() {
-  bp::to_python_converter<typename blitz::TinyVector<T,N>, tinyvec_to_tuple<T,N>, true>();
+  bp::to_python_converter<typename blitz::TinyVector<T,N>, 
+                          tinyvec_to_tuple<T,N>
+#if defined BOOST_PYTHON_SUPPORTS_PY_SIGNATURES
+                          ,true
+#endif
+              >();
 }
 
 void bind_core_array_tinyvector () {

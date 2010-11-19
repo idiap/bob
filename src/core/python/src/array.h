@@ -591,8 +591,8 @@ namespace Torch { namespace python {
             m_class->def(boost::python::init<int,storage_type>((boost::python::arg("dim0"), boost::python::arg("storage")), "Builds array with the given size and a storage type."));
             break;
           case 2: 
-            m_class->def(boost::python::init<int, int>((boost::python::arg("dim0"), boost::python::arg("dim1")), "Builds array with the given size"));
-            m_class->def(boost::python::init<int,int,storage_type>((boost::python::arg("self"), boost::python::arg("dim0"), boost::python::arg("dim1"), boost::python::arg("storage")), "Builds array with the given size and a storage type."));
+            m_class->def(boost::python::init<int,int>((boost::python::arg("dim0"), boost::python::arg("dim1")), "Builds array with the given size"));
+            m_class->def(boost::python::init<int,int,storage_type>((boost::python::arg("dim0"), boost::python::arg("dim1"), boost::python::arg("storage")), "Builds array with the given size and a storage type."));
             break;
           case 3: 
             m_class->def(boost::python::init<int, int, int>((boost::python::arg("dim0"), boost::python::arg("dim1"), boost::python::arg("dim2")), "Builds array with the given size"));
@@ -600,13 +600,13 @@ namespace Torch { namespace python {
             break;
           case 4: 
             m_class->def(boost::python::init<int, int, int, int>((boost::python::arg("dim0"), boost::python::arg("dim1"), boost::python::arg("dim2"), boost::python::arg("dim3")), "Builds array with the given size"));
-            m_class->def(boost::python::init<int,int,int,int,storage_type>((boost::python::arg("self"), boost::python::arg("dim0"), boost::python::arg("dim1"), boost::python::arg("dim2"), boost::python::arg("dim3"), boost::python::arg("storage")), "Builds array with the given size and a storage type."));
+            m_class->def(boost::python::init<int,int,int,int,storage_type>((boost::python::arg("dim0"), boost::python::arg("dim1"), boost::python::arg("dim2"), boost::python::arg("dim3"), boost::python::arg("storage")), "Builds array with the given size and a storage type."));
             break;
         }
 
         //initialization using a TinyVector<int,T> (bound to tuple)
         m_class->def(boost::python::init<const shape_type&>((boost::python::arg("extent")), "Initalizes the array with extents described in a tuple"));
-        m_class->def(boost::python::init<const shape_type&>((boost::python::arg("extent"), boost::python::arg("storage")), "Initalizes the array with extents described in a tuple and a storage type."));
+        m_class->def(boost::python::init<const shape_type&,storage_type>((boost::python::arg("extent"), boost::python::arg("storage")), "Initalizes the array with extents described in a tuple and a storage type."));
 
         //initialization from a numpy array or iterable
         m_class->def("__init__", make_constructor(iterable_to_blitz<T,N>, boost::python::default_call_policies(), (boost::python::arg("iterable"), boost::python::arg("shape"), boost::python::arg("storage"))), "Builds an array from a python sequence. Please note that the length of the sequence or iterable must be exactly the same as defined by the array shape parameter. You should also specify a storage order (GeneralArrayStorage or FortranArray).");
