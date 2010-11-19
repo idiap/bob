@@ -64,6 +64,7 @@ namespace blitz {
       }
   };
 
+#ifndef __LP64__
   // abs(int64_t)
   template<> struct Fn_abs< int64_t > {
     typedef int64_t T_numtype1;
@@ -81,10 +82,11 @@ namespace blitz {
         str += ")";
       }
   };
-
   // missing scalar ops
   BZ_DECLARE_ARRAY_ET_SCALAR_OPS(int64_t)
   BZ_DECLARE_ARRAY_ET_SCALAR_OPS(uint64_t)
+#endif
+
 }
 
 namespace Torch { namespace python {
