@@ -88,4 +88,3 @@ torch_python_bindings(core "${pysrc}")
 torch_python_submodule(core array "${pysrc_array}" "python/src/array.h")
 
 torch_python_install(core)
-
