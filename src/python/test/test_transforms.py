@@ -11,6 +11,7 @@ import torch
 def compare(v1, v2, width):
   return abs(v1-v2) <= width
 
+
 class TransformTest(unittest.TestCase):
   """Performs for dct, dct2, fft, fft2 and their inverses"""
 
@@ -25,18 +26,28 @@ class TransformTest(unittest.TestCase):
       t.set(i, 1.0+i)
     
     # process using DCT
-    d = torch.sp.spDCT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    dct = torch.sp.spDCT()
+    dct.process(t)
+    self.assertEqual(dct.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct
-    tt = d.getOutput(0)
+    dt = dct.getOutput(0)
 
     # array containing matlab values
     mat = (12.7279,-6.4423,0.,-0.6735,0.,-0.2009,0.,-0.0507)
 
     for i in range(N):
-      self.assertTrue(compare(tt.get(i), mat[i], 1e-3))
+      self.assertTrue(compare(dt.get(i), mat[i], 1e-3))
+
+    # process using inverse DCT
+    idct = torch.sp.spDCT(True)
+    idct.process(dt)
+    self.assertEqual(idct.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = idct.getOutput(0)
+    for i in range(N):
+      self.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
 
 
   def test_dct2D_2a(self):
@@ -51,19 +62,30 @@ class TransformTest(unittest.TestCase):
     t.set(1, 1, 0.0)
 
     # process using DCT
-    d = torch.sp.spDCT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    dct = torch.sp.spDCT()
+    dct.process(t)
+    self.assertEqual(dct.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct2 (warning do not use dct)
-    tt = d.getOutput(0)
+    dt = dct.getOutput(0)
 
     # array containing matlab values
     mat = ((0.5, 0.5), (0.5, 0.5))
 
     for i in range(N):
       for j in range(N):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse DCT
+    idct = torch.sp.spDCT(True)
+    idct.process(dt)
+    self.assertEqual(idct.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = idct.getOutput(0)
+    for i in range(N):
+      for j in range(N):
+        self.assertTrue(compare(idt.get(i,j), t.get(i,j), 1e-3))
 
 
   def test_dct2D_2b(self):
@@ -78,21 +100,32 @@ class TransformTest(unittest.TestCase):
     t.set(1, 1, 0.2)
 
     # process using DCT
-    d = torch.sp.spDCT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    dct = torch.sp.spDCT()
+    dct.process(t)
+    self.assertEqual(dct.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct2 (warning do not use dct)
-    tt = d.getOutput(0)
+    dt = dct.getOutput(0)
 
     # array containing matlab values
     mat = ((6.75, 1.85), (1.15,-3.35))
 
     for i in range(N):
       for j in range(N):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
    
+    # process using inverse DCT
+    idct = torch.sp.spDCT(True)
+    idct.process(dt)
+    self.assertEqual(idct.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = idct.getOutput(0)
+    for i in range(N):
+      for j in range(N):
+        self.assertTrue(compare(idt.get(i,j), t.get(i,j), 1e-3))
  
+
   def test_dct2D_4(self):
     # size of the data
     N = 4 
@@ -105,21 +138,31 @@ class TransformTest(unittest.TestCase):
         t.set(i, j, 1.0+i+j)
 
     # process using DCT
-    d = torch.sp.spDCT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    dct = torch.sp.spDCT()
+    dct.process(t)
+    self.assertEqual(dct.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct2 (warning do not use dct)
-    tt = d.getOutput(0)
+    dt = dct.getOutput(0)
 
     # array containing matlab values
-    #mat = (0.5,0.5,0.5,0.5)
     mat = ((16.0000, -4.4609, 0., -0.3170), (-4.4609, 0., 0., 0.),
            (0., 0., 0., 0.), (-0.3170, 0., 0., 0.))
 
     for i in range(N):
       for j in range(N):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse DCT
+    idct = torch.sp.spDCT(True)
+    idct.process(dt)
+    self.assertEqual(idct.getNOutputs(), 1)
+
+    # get answer and compare to matlabs original
+    idt = idct.getOutput(0)
+    for i in range(N):
+      for j in range(N):
+        self.assertTrue(compare(idt.get(i,j), t.get(i,j), 1e-3))
 
 
   def test_dct2D_8(self):
@@ -134,12 +177,12 @@ class TransformTest(unittest.TestCase):
         t.set(i, j, 1.0+i+j)
 
     # process using DCT
-    d = torch.sp.spDCT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    dct = torch.sp.spDCT()
+    dct.process(t)
+    self.assertEqual(dct.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct2 (warning do not use dct)
-    tt = d.getOutput(0)
+    dt = dct.getOutput(0)
 
     # array containing matlab values
     mat = ((64.0000, -18.2216, 0., -1.9048, 0., -0.5682, 0., -0.1434),
@@ -153,7 +196,18 @@ class TransformTest(unittest.TestCase):
 
     for i in range(N):
       for j in range(N):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse DCT
+    idct = torch.sp.spDCT(True)
+    idct.process(dt)
+    self.assertEqual(idct.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = idct.getOutput(0)
+    for i in range(N):
+      for j in range(N):
+        self.assertTrue(compare(idt.get(i,j), t.get(i,j), 1e-3))
 
 
   def test_dct2D_16(self):
@@ -168,12 +222,12 @@ class TransformTest(unittest.TestCase):
         t.set(i, j, 1.0+i+j)
 
     # process using DCT
-    d = torch.sp.spDCT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    dct = torch.sp.spDCT()
+    dct.process(t)
+    self.assertEqual(dct.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct2 (warning do not use dct)
-    tt = d.getOutput(0)
+    dt = dct.getOutput(0)
 
     # array containing matlab values
     mat = ((256.0000, -73.2461, 0., -8.0301, 0., -2.8063, 0., -1.3582, 
@@ -211,8 +265,18 @@ class TransformTest(unittest.TestCase):
 
     for i in range(N):
       for j in range(N):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
 
+    # process using inverse DCT
+    idct = torch.sp.spDCT(True)
+    idct.process(dt)
+    self.assertEqual(idct.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = idct.getOutput(0)
+    for i in range(N):
+      for j in range(N):
+        self.assertTrue(compare(idt.get(i,j), t.get(i,j), 1e-3))
 
 
 ##################### FFT Tests ##################  
@@ -225,20 +289,30 @@ class TransformTest(unittest.TestCase):
     for i in range(N):
       t.set(i, 1.0+i)
     
-    # process using DCT
-    d = torch.sp.spFFT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    # process using FFT
+    fft = torch.sp.spFFT()
+    fft.process(t)
+    self.assertEqual(fft.getNOutputs(), 1)
 
-    # get answer and compare to matlabs dct
-    tt = d.getOutput(0)
+    # get answer and compare to matlabs fft
+    dt = fft.getOutput(0)
 
     # array containing matlab values
     mat = ((3., 0.), (-1., 0.))
 
     for i in range(N):
       for j in range(2):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse FFT
+    ifft = torch.sp.spFFT(True)
+    ifft.process(dt)
+    self.assertEqual(ifft.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = ifft.getOutput(0)
+    for i in range(N):
+      self.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
 
 
   def test_fft1D_4(self):
@@ -251,19 +325,29 @@ class TransformTest(unittest.TestCase):
       t.set(i, 1.0+i)
     
     # process using DCT
-    d = torch.sp.spFFT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    fft = torch.sp.spFFT()
+    fft.process(t)
+    self.assertEqual(fft.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct
-    tt = d.getOutput(0)
+    dt = fft.getOutput(0)
 
     # array containing matlab values
     mat = ((10., 0.), (-2., 2.), (-2., 0.), (-2., -2.))
 
     for i in range(N):
       for j in range(2):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse FFT
+    ifft = torch.sp.spFFT(True)
+    ifft.process(dt)
+    self.assertEqual(ifft.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = ifft.getOutput(0)
+    for i in range(N):
+      self.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
 
 
   def test_fft1D_8(self):
@@ -276,12 +360,12 @@ class TransformTest(unittest.TestCase):
       t.set(i, 1.0+i)
     
     # process using DCT
-    d = torch.sp.spFFT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    fft = torch.sp.spFFT()
+    fft.process(t)
+    self.assertEqual(fft.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct
-    tt = d.getOutput(0)
+    dt = fft.getOutput(0)
 
     # array containing matlab values
     mat = ((36.0000, 0.), (-4., 9.6569), (-4., 4.), (-4., 1.6569),
@@ -289,7 +373,17 @@ class TransformTest(unittest.TestCase):
 
     for i in range(N):
       for j in range(2):
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse FFT
+    ifft = torch.sp.spFFT(True)
+    ifft.process(dt)
+    self.assertEqual(ifft.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = ifft.getOutput(0)
+    for i in range(N):
+      self.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
 
 
   def test_fft1D_16(self):
@@ -302,12 +396,12 @@ class TransformTest(unittest.TestCase):
       t.set(i, 1.0+i)
     
     # process using DCT
-    d = torch.sp.spFFT()
-    d.process(t)
-    self.assertEqual(d.getNOutputs(), 1)
+    fft = torch.sp.spFFT()
+    fft.process(t)
+    self.assertEqual(fft.getNOutputs(), 1)
 
     # get answer and compare to matlabs dct
-    tt = d.getOutput(0)
+    dt = fft.getOutput(0)
 
     # array containing matlab values
     mat = ((136.00, 0.), (-8., 40.2187), (-8., 19.3137), (-8., 11.9728), 
@@ -317,8 +411,18 @@ class TransformTest(unittest.TestCase):
 
     for i in range(N):
       for j in range(2):
-        print str(tt.get(i,j)) + " " + str(mat[i][j])
-        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+        #print str(tt.get(i,j)) + " " + str(mat[i][j])
+        self.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse FFT
+    ifft = torch.sp.spFFT(True)
+    ifft.process(dt)
+    self.assertEqual(ifft.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = ifft.getOutput(0)
+    for i in range(N):
+      self.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
 
 
 if __name__ == '__main__':

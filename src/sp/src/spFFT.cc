@@ -273,11 +273,12 @@ bool spFFT::processInput(const Tensor& input)
 			}
 
 			// Complex Discrete Fourier Transform routine (in inverse mode)
-			cdft(N, 1, a, ip, w);
+			cdft(2*N, 1, a, ip, w);
 
+      // Return real part of the FFT only!
 			FloatTensor *F = (FloatTensor *) m_output[0];
 			for(int i=0; i < N; i++)
-				(*F)(i) = 2.0 * a[i] / N;
+				(*F)(i) = a[2*i] / N;
 
 			// Free workspace
 			free_1d_int(ip);
