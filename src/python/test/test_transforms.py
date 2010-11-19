@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
+# Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 # Wed 25 Aug 2010 12:33:13 CEST 
 
 import os, sys
@@ -12,7 +13,8 @@ def compare(v1, v2, width):
 
 class TransformTest(unittest.TestCase):
   """Performs for dct, dct2, fft, fft2 and their inverses"""
-  
+
+##################### DCT Tests ##################  
   def test_dct1D_8(self):
     # size of the data
     N = 8
@@ -212,6 +214,58 @@ class TransformTest(unittest.TestCase):
         self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
 
 
+
+##################### FFT Tests ##################  
+  def test_fft1D_2(self):
+    # size of the data
+    N = 2
+
+    # set up simple 1D tensor
+    t = torch.core.FloatTensor(N)
+    for i in range(N):
+      t.set(i, 1.0+i)
+    
+    # process using DCT
+    d = torch.sp.spFFT()
+    d.process(t)
+    self.assertEqual(d.getNOutputs(), 1)
+
+    # get answer and compare to matlabs dct
+    tt = d.getOutput(0)
+
+    # array containing matlab values
+    mat = ((3., 0.), (-1., 0.))
+
+    for i in range(N):
+      for j in range(2):
+        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+
+
+  def test_fft1D_4(self):
+    # size of the data
+    N = 4
+
+    # set up simple 1D tensor
+    t = torch.core.FloatTensor(N)
+    for i in range(N):
+      t.set(i, 1.0+i)
+    
+    # process using DCT
+    d = torch.sp.spFFT()
+    d.process(t)
+    self.assertEqual(d.getNOutputs(), 1)
+
+    # get answer and compare to matlabs dct
+    tt = d.getOutput(0)
+
+    # array containing matlab values
+    mat = ((10., 0.), (-2., 2.), (-2., 0.), (-2., -2.))
+
+    for i in range(N):
+      for j in range(2):
+        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+
+
   def test_fft1D_8(self):
     # size of the data
     N = 8
@@ -235,6 +289,35 @@ class TransformTest(unittest.TestCase):
 
     for i in range(N):
       for j in range(2):
+        self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
+
+
+  def test_fft1D_16(self):
+    # size of the data
+    N = 16
+
+    # set up simple 1D tensor
+    t = torch.core.FloatTensor(N)
+    for i in range(N):
+      t.set(i, 1.0+i)
+    
+    # process using DCT
+    d = torch.sp.spFFT()
+    d.process(t)
+    self.assertEqual(d.getNOutputs(), 1)
+
+    # get answer and compare to matlabs dct
+    tt = d.getOutput(0)
+
+    # array containing matlab values
+    mat = ((136.00, 0.), (-8., 40.2187), (-8., 19.3137), (-8., 11.9728), 
+           (-8., 8.), (-8., 5.3454), (-8., 3.3137), (-8., 1.5913),
+           (-8., 0.), (-8., -1.5913), (-8., -3.3137), (-8., -5.3454),
+           (-8., -8.), (-8., -11.9728), (-8., -19.3137), (-8., -40.2187))
+
+    for i in range(N):
+      for j in range(2):
+        print str(tt.get(i,j)) + " " + str(mat[i][j])
         self.assertTrue(compare(tt.get(i,j), mat[i][j], 1e-3))
 
 
