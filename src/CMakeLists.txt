@@ -63,16 +63,6 @@ install(FILES cmake/torch-external.cmake DESTINATION ${cmakedir})
 # Enables the testing framework
 enable_testing()
 
-# This makes sure we can reach all external headers
-if(NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL ""))
-  string(REGEX MATCHALL "[^:]+" prefix_path $ENV{CMAKE_PREFIX_PATH})
-  list(REMOVE_DUPLICATES prefix_path)
-  foreach(prefix ${prefix_path})
-    include_directories(SYSTEM "${prefix}/include")
-    link_directories("${prefix}/lib")
-  endforeach(prefix ${prefix_path})
-endif(NOT ("$ENV{CMAKE_PREFIX_PATH}" STREQUAL ""))
-
 # This makes sure we have all headers within reach before starting to compile
 include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)
 
