@@ -346,6 +346,43 @@ class TransformTest(unittest.TestCase):
     test_fft2D(N, t, mat, 1e-3, self)
 
 
+  def test_fft2D_2b(self):
+    # size of the data
+    N = 2
+
+    # set up simple 2D tensor
+    t = torch.core.FloatTensor(N, N)
+    t.set(0, 0, 3.2)
+    t.set(0, 1, 4.7)
+    t.set(1, 0, 5.4)
+    t.set(1, 1, 0.2)
+
+    # array containing matlab values
+    mat = ( ((13.5, 0.), (3.7, 0.)), ((2.3, 0.), (-6.7, 0.)) )
+  
+    # call the test function
+    test_fft2D(N, t, mat, 1e-3, self)
+
+
+  def test_fft2D_4(self):
+    # size of the data
+    N = 4
+
+    # set up simple 2D tensor
+    t = torch.core.FloatTensor(N, N)
+    for i in range(N):
+      for j in range(N):
+        t.set(i, j, 1.0+i+j)
+
+    # array containing matlab values
+    mat = ( ((64., 0.), (-8., 8.), (-8.,0.), (-8., -8.)), 
+            ((-8., 8.), (0., 0.), (0., 0.), (0., 0.)), 
+            ((-8., 0.), (0., 0.), (0., 0.), (0., 0.)), 
+            ((-8., -8.), (0., 0.), (0., 0.), (0., 0.)))
+  
+    # call the test function
+    test_fft2D(N, t, mat, 1e-3, self)
+
 
 if __name__ == '__main__':
   sys.argv.append('-v')
