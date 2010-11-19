@@ -85,11 +85,7 @@ set(pysrc_array
    )
 
 torch_python_bindings(core "${pysrc}")
-
-#some pre-compiled header black magic: read macros.cmake for details. if you
-#don't know what pre-compiled headers are good for, google for it.
-torch_add_python_pch("python/src/array.h" pysrc_array)
-torch_python_submodule(core array "${pysrc_array}")
+torch_python_submodule(core array "${pysrc_array}" "python/src/array.h")
 
 torch_python_install(core)
 

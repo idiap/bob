@@ -33,11 +33,11 @@ namespace blitz {
     typedef int8_t T_numtype1;
     typedef int8_t T_numtype;
 
-    static inline T_numtype
+    static T_numtype
       apply(T_numtype1 a) { return BZ_MATHFN_SCOPE(abs)(a); }
 
     template<typename T1>
-      static inline void prettyPrint(BZ_STD_SCOPE(string) &str,
+      static void prettyPrint(BZ_STD_SCOPE(string) &str,
           prettyPrintFormat& format, const T1& t1) {
         str += "abs";
         str += "(";
@@ -51,11 +51,11 @@ namespace blitz {
     typedef int16_t T_numtype1;
     typedef int16_t T_numtype;
 
-    static inline T_numtype
+    static T_numtype
       apply(T_numtype1 a) { return BZ_MATHFN_SCOPE(abs)(a); }
 
     template<typename T1>
-      static inline void prettyPrint(BZ_STD_SCOPE(string) &str,
+      static void prettyPrint(BZ_STD_SCOPE(string) &str,
           prettyPrintFormat& format, const T1& t1) {
         str += "abs";
         str += "(";
@@ -69,11 +69,11 @@ namespace blitz {
     typedef int64_t T_numtype1;
     typedef int64_t T_numtype;
 
-    static inline T_numtype
+    static T_numtype
       apply(T_numtype1 a) { return BZ_MATHFN_SCOPE(abs)(a); }
 
     template<typename T1>
-      static inline void prettyPrint(BZ_STD_SCOPE(string) &str,
+      static void prettyPrint(BZ_STD_SCOPE(string) &str,
           prettyPrintFormat& format, const T1& t1) {
         str += "abs";
         str += "(";
@@ -397,118 +397,117 @@ namespace Torch { namespace python {
   /**
    * Casts to a certain type
    */
-  template <typename T, int N, typename T2> inline blitz::Array<T2,N> cast(blitz::Array<T,N>& i) { return blitz::Array<T2,N>(blitz::cast<T2>(i)); }
+  template <typename T, int N, typename T2> blitz::Array<T2,N> cast(blitz::Array<T,N>& i) { return blitz::Array<T2,N>(blitz::cast<T2>(i)); }
 
   /**
    * Some arithmetical operators
    */
-  template <typename T, int N> inline blitz::Array<T,N> __add__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 + i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __add_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 + i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __sub__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 - i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __sub_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 - i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __mul__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 * i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __mul_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 * i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __div__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 / i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __div_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 / i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __mod__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 % i2); }
-  template <typename T, int N> inline blitz::Array<T,N> __mod_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 % i2); }
+  template <typename T, int N> blitz::Array<T,N> __add__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 + i2); }
+  template <typename T, int N> blitz::Array<T,N> __add_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 + i2); }
+  template <typename T, int N> blitz::Array<T,N> __sub__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 - i2); }
+  template <typename T, int N> blitz::Array<T,N> __sub_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 - i2); }
+  template <typename T, int N> blitz::Array<T,N> __mul__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 * i2); }
+  template <typename T, int N> blitz::Array<T,N> __mul_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 * i2); }
+  template <typename T, int N> blitz::Array<T,N> __div__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 / i2); }
+  template <typename T, int N> blitz::Array<T,N> __div_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 / i2); }
+  template <typename T, int N> blitz::Array<T,N> __mod__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(i1 % i2); }
+  template <typename T, int N> blitz::Array<T,N> __mod_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<T,N>(i1 % i2); }
  
-  template <typename T, int N> inline blitz::Array<bool,N> __lt__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 < i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __lt_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 < i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __le__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 <= i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __le_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 <= i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __gt__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 > i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __gt_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 > i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __ge__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 >= i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __ge_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 >= i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __ne__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 != i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __ne_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 != i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __eq__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 == i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __eq_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 == i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __and__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 & i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __and_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 & i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __or__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 | i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __or_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 | i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __xor__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 ^ i2); }
-  template <typename T, int N> inline blitz::Array<bool,N> __xor_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 ^ i2); }
+  template <typename T, int N> blitz::Array<bool,N> __lt__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 < i2); }
+  template <typename T, int N> blitz::Array<bool,N> __lt_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 < i2); }
+  template <typename T, int N> blitz::Array<bool,N> __le__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 <= i2); }
+  template <typename T, int N> blitz::Array<bool,N> __le_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 <= i2); }
+  template <typename T, int N> blitz::Array<bool,N> __gt__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 > i2); }
+  template <typename T, int N> blitz::Array<bool,N> __gt_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 > i2); }
+  template <typename T, int N> blitz::Array<bool,N> __ge__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 >= i2); }
+  template <typename T, int N> blitz::Array<bool,N> __ge_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 >= i2); }
+  template <typename T, int N> blitz::Array<bool,N> __ne__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 != i2); }
+  template <typename T, int N> blitz::Array<bool,N> __ne_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 != i2); }
+  template <typename T, int N> blitz::Array<bool,N> __eq__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 == i2); }
+  template <typename T, int N> blitz::Array<bool,N> __eq_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 == i2); }
+  template <typename T, int N> blitz::Array<bool,N> __and__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 & i2); }
+  template <typename T, int N> blitz::Array<bool,N> __and_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 & i2); }
+  template <typename T, int N> blitz::Array<bool,N> __or__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 | i2); }
+  template <typename T, int N> blitz::Array<bool,N> __or_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 | i2); }
+  template <typename T, int N> blitz::Array<bool,N> __xor__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<bool,N>(i1 ^ i2); }
+  template <typename T, int N> blitz::Array<bool,N> __xor_c__(blitz::Array<T,N>& i1, const T& i2) { return blitz::Array<bool,N>(i1 ^ i2); }
 
-  template <typename T, int N> inline blitz::Array<T,N> __invert__(blitz::Array<T,N>& i) { return blitz::Array<T,N>(~i); }
-  template <typename T, int N> inline blitz::Array<T,N> __neg__(blitz::Array<T,N>& i) { return blitz::Array<T,N>(-i); }
-  template <typename T, int N> inline blitz::Array<T,N> __abs__(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::abs(i)); }
+  template <typename T, int N> blitz::Array<T,N> __invert__(blitz::Array<T,N>& i) { return blitz::Array<T,N>(~i); }
+  template <typename T, int N> blitz::Array<T,N> __neg__(blitz::Array<T,N>& i) { return blitz::Array<T,N>(-i); }
+  template <typename T, int N> blitz::Array<T,N> __abs__(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::abs(i)); }
   
-  //multi-T operands
-  template <typename T, int N> inline blitz::Array<T,N> acos(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::acos(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> asin(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::asin(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> atan(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::atan(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> cos(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::cos(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> cosh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::cosh(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> acosh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::acosh(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> log(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::log(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> log10(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::log10(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> sin(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sin(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> sinh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sinh(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> sqr(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sqr(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> sqrt(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sqrt(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> tan(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::tan(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> tanh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::tanh(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> atanh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::atanh(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> cbrt(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::cbrt(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> exp(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> expm1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::expm1(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> erf(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::erf(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> erfc(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::erfc(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> ilogb(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ilogb(i)); }
-  //TODO: template <typename T, int N> inline blitz::Array<int,N> isnan(blitz::Array<T,N& i) { return blitz::Array<int,N>(blitz::blitz_isnan(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> j0(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::j0(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> j1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::j1(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> lgamma(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::lgamma(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> log1p(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::log1p(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> rint(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::rint(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> y0(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::y0(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> y1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::y1(i)); }
+  template <typename T, int N> blitz::Array<T,N> acos(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::acos(i)); }
+  template <typename T, int N> blitz::Array<T,N> asin(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::asin(i)); }
+  template <typename T, int N> blitz::Array<T,N> atan(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::atan(i)); }
+  template <typename T, int N> blitz::Array<T,N> cos(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::cos(i)); }
+  template <typename T, int N> blitz::Array<T,N> cosh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::cosh(i)); }
+  template <typename T, int N> blitz::Array<T,N> acosh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::acosh(i)); }
+  template <typename T, int N> blitz::Array<T,N> log(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::log(i)); }
+  template <typename T, int N> blitz::Array<T,N> log10(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::log10(i)); }
+  template <typename T, int N> blitz::Array<T,N> sin(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sin(i)); }
+  template <typename T, int N> blitz::Array<T,N> sinh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sinh(i)); }
+  template <typename T, int N> blitz::Array<T,N> sqr(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sqr(i)); }
+  template <typename T, int N> blitz::Array<T,N> sqrt(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::sqrt(i)); }
+  template <typename T, int N> blitz::Array<T,N> tan(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::tan(i)); }
+  template <typename T, int N> blitz::Array<T,N> tanh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::tanh(i)); }
+  template <typename T, int N> blitz::Array<T,N> atanh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::atanh(i)); }
+  template <typename T, int N> blitz::Array<T,N> cbrt(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::cbrt(i)); }
+  template <typename T, int N> blitz::Array<T,N> exp(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
+  template <typename T, int N> blitz::Array<T,N> expm1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::expm1(i)); }
+  template <typename T, int N> blitz::Array<T,N> erf(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::erf(i)); }
+  template <typename T, int N> blitz::Array<T,N> erfc(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::erfc(i)); }
+  template <typename T, int N> blitz::Array<T,N> ilogb(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ilogb(i)); }
+  //TODO: template <typename T, int N> blitz::Array<int,N> isnan(blitz::Array<T,N& i) { return blitz::Array<int,N>(blitz::blitz_isnan(i)); }
+  template <typename T, int N> blitz::Array<T,N> j0(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::j0(i)); }
+  template <typename T, int N> blitz::Array<T,N> j1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::j1(i)); }
+  template <typename T, int N> blitz::Array<T,N> lgamma(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::lgamma(i)); }
+  template <typename T, int N> blitz::Array<T,N> log1p(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::log1p(i)); }
+  template <typename T, int N> blitz::Array<T,N> rint(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::rint(i)); }
+  template <typename T, int N> blitz::Array<T,N> y0(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::y0(i)); }
+  template <typename T, int N> blitz::Array<T,N> y1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::y1(i)); }
 
 
   //operate on floats
-  template <typename T, int N> inline blitz::Array<T,N> ceil(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> floor(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
+  template <typename T, int N> blitz::Array<T,N> ceil(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
+  template <typename T, int N> blitz::Array<T,N> floor(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
 
   //operate on complex T
-  template <typename T, int N> inline blitz::Array<T,N> arg(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::arg(i)); }
-  template <typename T, int N> inline blitz::Array<T,N> conj(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::conj(i)); }
+  template <typename T, int N> blitz::Array<T,N> arg(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::arg(i)); }
+  template <typename T, int N> blitz::Array<T,N> conj(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::conj(i)); }
 
   //some reductions
   //TODO: Missing reductions that take a dimension parameter (please note this
   //is not an "int". Blitz provides its own scheme with indexes which are fully
   //fledged types. See the manual.
-  template <typename T, int N> inline T sum(blitz::Array<T,N>& i) { return blitz::sum(i); }
-  //template <typename T, int N> inline blitz::Array<T,1> sum_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::sum(i, dim)); }
-  template <typename T, int N> inline T product(blitz::Array<T,N>& i) { return blitz::product(i); }
-  //template <typename T, int N> inline blitz::Array<T,1> product_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::product(i, dim)); }
-  template <typename T, int N> inline T mean(blitz::Array<T,N>& i) { return blitz::mean(i); }
-  //template <typename T, int N> inline blitz::Array<T,1> mean_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::mean(i, dim)); }
-  template <typename T, int N> inline T min(blitz::Array<T,N>& i) { return blitz::min(i); }
-  //template <typename T, int N> inline blitz::Array<T,1> min_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::min(i, dim)); }
-  template <typename T, int N> inline T max(blitz::Array<T,N>& i) { return blitz::max(i); }
-  //template <typename T, int N> inline blitz::Array<T,1> max_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::max(i, dim)); }
-  template <typename T, int N> inline blitz::TinyVector<int,N> minIndex(blitz::Array<T,N>& i) { return blitz::minIndex(i); }
-  //template <typename T, int N> inline blitz::TinyVector<int,N> minIndex_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::minIndex(i, dim)); }
-  template <typename T, int N> inline blitz::TinyVector<int,N> maxIndex(blitz::Array<T,N>& i) { return blitz::maxIndex(i); }
-  //template <typename T, int N> inline blitz::TinyVector<int,N> maxIndex_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::maxIndex(i, dim)); }
-  template <typename T, int N> inline int count(blitz::Array<T,N>& i) { return blitz::count(i); }
-  //template <typename T, int N> inline blitz::Array<int,1> count_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::count(i, dim)); }
-  template <typename T, int N> inline bool any(blitz::Array<T,N>& i) { return blitz::any(i); }
-  //template <typename T, int N> inline blitz::Array<bool,1> any_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::any(i, dim)); }
-  template <typename T, int N> inline bool all(blitz::Array<T,N>& i) { return blitz::all(i); }
-  //template <typename T, int N> inline blitz::Array<bool,1> all_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::all(i, dim)); }
+  template <typename T, int N> T sum(blitz::Array<T,N>& i) { return blitz::sum(i); }
+  //template <typename T, int N> blitz::Array<T,1> sum_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::sum(i, dim)); }
+  template <typename T, int N> T product(blitz::Array<T,N>& i) { return blitz::product(i); }
+  //template <typename T, int N> blitz::Array<T,1> product_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::product(i, dim)); }
+  template <typename T, int N> T mean(blitz::Array<T,N>& i) { return blitz::mean(i); }
+  //template <typename T, int N> blitz::Array<T,1> mean_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::mean(i, dim)); }
+  template <typename T, int N> T min(blitz::Array<T,N>& i) { return blitz::min(i); }
+  //template <typename T, int N> blitz::Array<T,1> min_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::min(i, dim)); }
+  template <typename T, int N> T max(blitz::Array<T,N>& i) { return blitz::max(i); }
+  //template <typename T, int N> blitz::Array<T,1> max_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::max(i, dim)); }
+  template <typename T, int N> blitz::TinyVector<int,N> minIndex(blitz::Array<T,N>& i) { return blitz::minIndex(i); }
+  //template <typename T, int N> blitz::TinyVector<int,N> minIndex_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::minIndex(i, dim)); }
+  template <typename T, int N> blitz::TinyVector<int,N> maxIndex(blitz::Array<T,N>& i) { return blitz::maxIndex(i); }
+  //template <typename T, int N> blitz::TinyVector<int,N> maxIndex_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::maxIndex(i, dim)); }
+  template <typename T, int N> int count(blitz::Array<T,N>& i) { return blitz::count(i); }
+  //template <typename T, int N> blitz::Array<int,1> count_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::count(i, dim)); }
+  template <typename T, int N> bool any(blitz::Array<T,N>& i) { return blitz::any(i); }
+  //template <typename T, int N> blitz::Array<bool,1> any_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::any(i, dim)); }
+  template <typename T, int N> bool all(blitz::Array<T,N>& i) { return blitz::all(i); }
+  //template <typename T, int N> blitz::Array<bool,1> all_dim(blitz::Array<T,N>& i, int dim) { return blitz::Array<T,1>(blitz::all(i, dim)); }
   
   //Some special functions with 2 arguments
-  template <typename T, int N> inline blitz::Array<T,N> __pow__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(blitz::pow(i1, i2)); }
+  template <typename T, int N> blitz::Array<T,N> __pow__(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) { return blitz::Array<T,N>(blitz::pow(i1, i2)); }
   template <typename T, int N> blitz::Array<T,N> __pow_c__(blitz::Array<T,N>& i1, const T& i2) { blitz::Array<T,N> tmp(i1.shape()); tmp = i2; return blitz::Array<T,N>(blitz::pow(i1, tmp)); }
 
   //Functions to help filling
-  template <typename T, int N> inline void fill(blitz::Array<T,N>& i, const T& v) { i = v; }
-  template <typename T, int N> inline void zeroes(blitz::Array<T,N>& i) { i = 0; }
-  template <typename T, int N> inline void ones(blitz::Array<T,N>& i) { i = 1; }
+  template <typename T, int N> void fill(blitz::Array<T,N>& i, const T& v) { i = v; }
+  template <typename T, int N> void zeroes(blitz::Array<T,N>& i) { i = 0; }
+  template <typename T, int N> void ones(blitz::Array<T,N>& i) { i = 1; }
 
   //Some help with indexing
   template <typename T, int N> T __getitem__(const blitz::Array<T,N>& a,

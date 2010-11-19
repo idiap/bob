@@ -109,77 +109,111 @@ endmacro(target_include_system_directories)
 # Support for precompiled headers (template compilation speed up). Please have
 # a look at this discussion: http://www.cmake.org/Bug/view.php?id=1260
 # If you don't know what are precompiled headers, please google for it. [AA]
-macro(torch_add_python_pch _header_filename _src_list)
+macro(torch_add_python_pch _header_filename _target _extra_flags)
   get_filename_component(_header_basename ${_header_filename} NAME)
 	set(_gch_filename "${CMAKE_CURRENT_BINARY_DIR}/${_header_basename}.gch")
   set(_gch_original "${CMAKE_CURRENT_SOURCE_DIR}/${_header_filename}")
-	list(APPEND ${_src_list} ${_gch_filename})
 	set(_args ${CMAKE_CXX_FLAGS})
 	list(APPEND _args -c ${_gch_original} -o ${_gch_filename})
 	get_directory_property(DIRINC INCLUDE_DIRECTORIES)
 	foreach (_inc ${DIRINC})
 		list(APPEND _args "-I" ${_inc})
 	endforeach(_inc ${DIRINC})
+	foreach (_extra ${_extra_flags})
+		list(APPEND _args "${_extra}")
+	endforeach (_extra ${_extra_flags})
 	foreach (_inc ${python_INCLUDE_DIRS})
 		list(APPEND _args "-isystem" ${_inc})
 	endforeach (_inc ${python_INCLUDE_DIRS})
   list(APPEND _args "-I" ${CMAKE_CURRENT_SOURCE_DIR}/python/src)
-	separate_arguments(_args)
   execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "print '${CMAKE_BUILD_TYPE}'.upper()" OUTPUT_VARIABLE uppercase_build_type OUTPUT_STRIP_TRAILING_WHITESPACE)
   set(_flags "${CMAKE_CXX_FLAGS_${uppercase_build_type}}")
+	separate_arguments(_args)
   separate_arguments(_flags)
-	add_custom_command(OUTPUT ${_gch_filename} COMMAND rm -f ${_gch_filename} COMMAND ${CMAKE_CXX_COMPILER} ${_flags} ${_args} DEPENDS ${_gch_original})
-endmacro(torch_add_python_pch _header_filename _src_list)
+	add_custom_target(pch-${_header_basename} ALL ${CMAKE_CXX_COMPILER} ${_flags} ${_args} DEPENDS ${_gch_original} COMMENT "Building PCH for ${_header_filename}...")
+  add_dependencies(pch-${_header_basename} ${_gch_original})
+  add_dependencies(${_target} pch-${_header_filename})
+endmacro(torch_add_python_pch _header_filename _target _extra_flags)
 
-macro(torch_python_bindings package src)
+# Builds a top-level python module. Arguments are:
+# package -- the package name
+# src -- a list of sources to compile into the package
+# pch (optional) -- a list of C++ header files to precompile
+function(torch_python_bindings package src)
   if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     # Some preparatory work
     set(libname pytorch_${package})
     set(libdir lib)
 
+    # Our compilation flags
+    set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
+
     # Building the library itself
     add_library(${libname} SHARED ${src})
     set_target_properties(${libname} PROPERTIES SUFFIX ".so")
-    set_target_properties(${libname} PROPERTIES COMPILE_FLAGS "-Wno-long-long -Wno-unused-function -Winvalid-pch")
+    set_target_properties(${libname} PROPERTIES COMPILE_FLAGS ${pycxx_flags})
     target_include_system_directories(${libname} "${python_INCLUDE_DIRS}")
-    # For precompiled headers
     target_include_directories(${libname} ${CMAKE_CURRENT_BINARY_DIR})
     target_include_directories(${libname} ${CMAKE_CURRENT_SOURCE_DIR}/python/src)
     target_link_libraries(${libname} torch_${package})
     target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY})
     target_link_libraries(${libname} ${PYTHON_LIBRARIES})
+
+    # Building associated PCHs
+    if(ARGN)
+      #message(STATUS "Adding PCH to target ${libname}: ${ARGN}")
+      foreach(pch ${ARGN})
+        torch_add_python_pch(${pch} ${libname} "${pycxx_flags}")
+      endforeach(pch ${ARGN})
+    endif(ARGN)
 
     # And its installation
     install(TARGETS ${libname} LIBRARY DESTINATION ${libdir})
   else (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     message("Boost::Python bindings for ${package} are DISABLED: externals NOT FOUND!")
   endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
-endmacro(torch_python_bindings package name src)
+endfunction(torch_python_bindings package name src)
 
-macro(torch_python_submodule package subpackage src)
+# Builds a python module that will be nested in a package, as a submodule. 
+# Arguments are:
+# package -- the package name
+# subpackage -- the name of the subpackage
+# src -- a list of sources to compile into the package
+# pch (optional) -- a list of C++ header files to precompile
+function(torch_python_submodule package subpackage src)
   if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     # Some preparatory work
     set(libname pytorch_${package}_${subpackage})
     set(libdir lib)
 
+    # Our compilation flags
+    set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
+
     # Building the library itself
     add_library(${libname} SHARED ${src})
     set_target_properties(${libname} PROPERTIES SUFFIX ".so")
-    set_target_properties(${libname} PROPERTIES COMPILE_FLAGS "-Wno-long-long -Wno-unused-function -Winvalid-pch")
+    set_target_properties(${libname} PROPERTIES COMPILE_FLAGS ${pycxx_flags})
     target_include_system_directories(${libname} "${python_INCLUDE_DIRS}")
-    # For precompiled headers
     target_include_directories(${libname} ${CMAKE_CURRENT_BINARY_DIR})
     target_include_directories(${libname} ${CMAKE_CURRENT_SOURCE_DIR}/python/src)
     target_link_libraries(${libname} torch_${package})
     target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY})
     target_link_libraries(${libname} ${PYTHON_LIBRARIES})
 
+    # Building associated PCHs
+    if(ARGN)
+      foreach(pch ${ARGN})
+        #message(STATUS "Adding PCH to target ${libname}: ${ARGN}")
+        torch_add_python_pch(${pch} ${libname} "${pycxx_flags}")
+      endforeach(pch ${ARGN})
+    endif(ARGN)
+
     # And its installation
     install(TARGETS ${libname} LIBRARY DESTINATION ${libdir})
   else (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     message("Boost::Python bindings for ${package}_${subpackage} are DISABLED: externals NOT FOUND!")
   endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
-endmacro(torch_python_submodule package name src)
+endfunction(torch_python_submodule package name src)
 
 # Installs python files and compile them
 macro(torch_python_install package)
