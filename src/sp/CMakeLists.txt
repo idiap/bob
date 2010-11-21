@@ -2,7 +2,7 @@ project(sp)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps dfftpack oourafft core) #other torch subprojects
+set(deps dfftpack41 oourafft core) #other torch subprojects
 
 # This defines the list of source files inside this package.
 set(src 
@@ -10,6 +10,7 @@ set(src
     "src/spCoreChain.cc"
     "src/spFFT.cc"
     "src/spDCT.cc"
+    "src/spDCT_pack41.cc"
     "src/spDeltaOne.cc")
 
 add_definitions(-DHAVE_OOURAFFT)
