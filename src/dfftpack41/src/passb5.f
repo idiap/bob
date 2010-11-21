@@ -1,4 +1,5 @@
       SUBROUTINE PASSB5 (IDO,L1,CC,CH,WA1,WA2,WA3,WA4)
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DIMENSION       CC(IDO,5,L1)           ,CH(IDO,L1,5)           ,
      1                WA1(*)     ,WA2(*)     ,WA3(*)     ,WA4(*)
 C     ** TR11=COS(2*PI/5), TI11=SIN(2*PI/5) **
