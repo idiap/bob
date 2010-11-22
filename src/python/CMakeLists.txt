@@ -34,7 +34,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   torch_python_add_test(python-gmm-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gmm.py)
   torch_python_add_test(python-transforms-tests 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_transforms.py)
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sptransforms.py)
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
 
