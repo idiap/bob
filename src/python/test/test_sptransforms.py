@@ -156,6 +156,32 @@ def test_fft1D_pack41(N, t, mat, eps, obj):
       obj.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
 
 
+def test_fft2D_pack41(N, t, mat, eps, obj):
+    # process using FFT
+    fft = torch.sp.spFFT_pack41()
+    fft.process(t)
+    obj.assertEqual(fft.getNOutputs(), 1)
+
+    # get answer and compare to matlabs fft
+    dt = fft.getOutput(0)
+
+    for i in range(N):
+      for j in range(N):
+        for k in range(2):
+          obj.assertTrue(compare(dt.get(i,j,k), mat[i][j][k], 1e-3))
+
+    # process using inverse FFT
+    ifft = torch.sp.spFFT(True)
+    ifft.process(dt)
+    obj.assertEqual(ifft.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = ifft.getOutput(0)
+    for i in range(N):
+      for j in range(N):
+        obj.assertTrue(compare(idt.get(i,j), t.get(i,j), 1e-3))
+
+
 
 class TransformTest(unittest.TestCase):
   """Performs for dct, dct2, fft, fft2 and their inverses"""
@@ -248,6 +274,7 @@ class TransformTest(unittest.TestCase):
 
     # call the test function
     test_dct2D(N, t, mat, 1e-3, self)
+    test_dct2D_pack41(N, t, mat, 1e-3, self)
 
 
   def test_dct2D_8(self):
@@ -432,6 +459,7 @@ class TransformTest(unittest.TestCase):
   
     # call the test function
     test_fft2D(N, t, mat, 1e-3, self)
+    test_fft2D_pack41(N, t, mat, 1e-3, self)
 
 
   def test_fft2D_2b(self):
@@ -450,6 +478,7 @@ class TransformTest(unittest.TestCase):
   
     # call the test function
     test_fft2D(N, t, mat, 1e-3, self)
+    test_fft2D_pack41(N, t, mat, 1e-3, self)
 
 
   def test_fft2D_4(self):
@@ -470,6 +499,7 @@ class TransformTest(unittest.TestCase):
   
     # call the test function
     test_fft2D(N, t, mat, 1e-3, self)
+    test_fft2D_pack41(N, t, mat, 1e-3, self)
 
 
 if __name__ == '__main__':
