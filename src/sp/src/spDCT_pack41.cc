@@ -73,7 +73,7 @@ namespace Torch {
 
         m_n_outputs = 1;
         m_output = new Tensor*[m_n_outputs];
-        m_output[0] = new DoubleTensor(N);
+        m_output[0] = new FloatTensor(N);
 
         R = new DoubleTensor(N);
       }
@@ -123,8 +123,8 @@ namespace Torch {
         cosqf_( &N, x, wsave);
 
         // Update the tensor from the C/Fortran array
-        DoubleTensor *F = (DoubleTensor *) m_output[0];
-        for(int i=0; i < N; ++i) (*F)(i) = x[i];
+        FloatTensor *F = (FloatTensor *) m_output[0];
+        for(int i=0; i < N; ++i) (*F)(i) = static_cast<float>(x[i]);
 
         // Deallocate memory
         delete [] wsave;
@@ -148,9 +148,9 @@ namespace Torch {
 
         // Update the tensor from the C/Fortran array and
         // scale it with correct coefficients
-        DoubleTensor *F = (DoubleTensor *) m_output[0];
+        FloatTensor *F = (FloatTensor *) m_output[0];
         double sqrt2N = sqrt(2./N);
-        for(int i=0; i < N; ++i) (*F)(i) = x[i]/4.*(i==0?sqrt(1./N):sqrt2N);
+        for(int i=0; i < N; ++i) (*F)(i) = static_cast<float>(x[i]/4.*(i==0?sqrt(1./N):sqrt2N));
 
         // Deallocate memory
         delete [] wsave;

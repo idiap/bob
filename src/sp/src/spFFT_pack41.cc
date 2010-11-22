@@ -20,17 +20,12 @@ namespace Torch {
     :	spCore()
   {
     inverse = inverse_;
-
-    R = new DoubleTensor;
-    I = new DoubleTensor;
   }
 
   /////////////////////////////////////////////////////////////////////////
   // Destructor
   spFFT_pack41::~spFFT_pack41()
   {
-    delete I;
-    delete R;
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -113,7 +108,7 @@ namespace Torch {
 
         m_n_outputs = 1;
         m_output = new Tensor*[m_n_outputs];
-        m_output[0] = new DoubleTensor(N, 2);
+        m_output[0] = new FloatTensor(N, 2);
       }
       else if (input.nDimension() == 2)
       {
@@ -125,7 +120,7 @@ namespace Torch {
 
           m_n_outputs = 1;
           m_output = new Tensor*[m_n_outputs];
-          m_output[0] = new DoubleTensor(N);
+          m_output[0] = new FloatTensor(N);
         }
         else
         {
@@ -188,11 +183,11 @@ namespace Torch {
       cfftf_( &N, x, wsave);
 
       //
-      DoubleTensor *F = (DoubleTensor *) m_output[0];
+      FloatTensor *F = (FloatTensor *) m_output[0];
       for(int i=0; i < N; ++i)
       {
-        (*F)(i,0) = x[i].real;
-        (*F)(i,1) = x[i].imag;
+        (*F)(i,0) = static_cast<float>(x[i].real);
+        (*F)(i,1) = static_cast<float>(x[i].imag);
       }
 
       // Deallocate memory
@@ -226,9 +221,9 @@ namespace Torch {
         cfftb_( &N, x, wsave);
 
         //
-        DoubleTensor *F = (DoubleTensor *) m_output[0];
+        FloatTensor *F = (FloatTensor *) m_output[0];
         for(int i=0; i < N; ++i)
-          (*F)(i) = x[i].real/N;
+          (*F)(i) = static_cast<float>(x[i].real/N);
 
         // Deallocate memory
         delete RI;

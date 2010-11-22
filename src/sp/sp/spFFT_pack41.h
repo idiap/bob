@@ -54,9 +54,6 @@ namespace Torch
 
 		int N;
 		int H,W;
-
-		DoubleTensor *R;
-		DoubleTensor *I;
 	};
 
 /**
