@@ -109,6 +109,52 @@ def test_fft2D(N, t, mat, eps, obj):
         obj.assertTrue(compare(idt.get(i,j), t.get(i,j), 1e-3))
 
 
+def test_dct1D_pack41(N, t, mat, eps, obj):
+  # process using DCT
+  dct = torch.sp.spDCT_pack41()
+  dct.process(t)
+  obj.assertEqual(dct.getNOutputs(), 1)
+
+  # get answer and compare to matlabs dct
+  dt = dct.getOutput(0)
+
+  for i in range(N):
+    obj.assertTrue(compare(dt.get(i), mat[i], 1e-3))
+
+  # process using inverse DCT
+  idct = torch.sp.spDCT_pack41(True)
+  idct.process(dt)
+  obj.assertEqual(idct.getNOutputs(), 1)
+
+  # get answer and compare to original
+  idt = idct.getOutput(0)
+  for i in range(N):
+    obj.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
+
+
+def test_fft1D_pack41(N, t, mat, eps, obj):
+    # process using FFT
+    fft = torch.sp.spFFT_pack41()
+    fft.process(t)
+    obj.assertEqual(fft.getNOutputs(), 1)
+
+    # get answer and compare to matlabs fft
+    dt = fft.getOutput(0)
+
+    for i in range(N):
+      for j in range(2):
+        obj.assertTrue(compare(dt.get(i,j), mat[i][j], 1e-3))
+
+    # process using inverse FFT
+    ifft = torch.sp.spFFT_pack41(True)
+    ifft.process(dt)
+    obj.assertEqual(ifft.getNOutputs(), 1)
+
+    # get answer and compare to original
+    idt = ifft.getOutput(0)
+    for i in range(N):
+      obj.assertTrue(compare(idt.get(i), t.get(i), 1e-3))
+
 
 
 class TransformTest(unittest.TestCase):
@@ -129,6 +175,24 @@ class TransformTest(unittest.TestCase):
 
     # call the test function
     test_dct1D(N, t, mat, 1e-3, self)
+    test_dct1D_pack41(N, t, mat, 1e-3, self)
+  
+  
+  def test_dct1D_17_pack41(self):
+    # size of the data
+    N = 17
+
+    # set up simple 1D tensor
+    t = torch.core.FloatTensor(N)
+    for i in range(N):
+      t.set(i, 1.0+i)
+
+    # array containing matlab values
+    mat = (37.1080,-20.0585,0.,-2.2025,0.,-0.7727,0.,-0.3768,
+             0.,-0.2116,0.,-0.1249,0.,-0.0713,0.,-0.0326,0.)
+
+    # call the test function
+    test_dct1D_pack41(N, t, mat, 1e-3, self)
     
 
   def test_dct2D_2a(self):
@@ -275,6 +339,7 @@ class TransformTest(unittest.TestCase):
 
     # call the test function
     test_fft1D(N, t, mat, 1e-3, self)
+    test_fft1D_pack41(N, t, mat, 1e-3, self)
 
 
   def test_fft1D_4(self):
@@ -291,6 +356,7 @@ class TransformTest(unittest.TestCase):
 
     # call the test function
     test_fft1D(N, t, mat, 1e-3, self)
+    test_fft1D_pack41(N, t, mat, 1e-3, self)
 
 
   def test_fft1D_8(self):
@@ -308,6 +374,7 @@ class TransformTest(unittest.TestCase):
 
     # call the test function
     test_fft1D(N, t, mat, 1e-3, self)
+    test_fft1D_pack41(N, t, mat, 1e-3, self)
 
 
   def test_fft1D_16(self):
@@ -327,7 +394,28 @@ class TransformTest(unittest.TestCase):
 
     # call the test function
     test_fft1D(N, t, mat, 1e-3, self)
+    test_fft1D_pack41(N, t, mat, 1e-3, self)
 
+
+  def test_fft1D_17_pack41(self):
+    # size of the data
+    N = 17
+
+    # set up simple 1D tensor
+    t = torch.core.FloatTensor(N)
+    for i in range(N):
+      t.set(i, 1.0+i)
+
+    # array containing matlab values
+    mat = ((153.,0.), (-8.5,45.4710), (-8.5,21.9410), (-8.5,13.7280),
+           (-8.5,9.3241), (-8.5,6.4189), (-8.5,4.2325), (-8.5,2.4185),
+           (-8.5,0.7876), (-8.5,-0.7876), (-8.5,-2.4185), (-8.5,-4.2325),
+           (-8.5,-6.4189), (-8.5,-9.3241), (-8.5,-13.7280), (-8.5,-21.9410),
+           (-8.5,-45.4710))
+
+    # call the test function
+    test_fft1D_pack41(N, t, mat, 1e-3, self)
+    
 
   def test_fft2D_2a(self):
     # size of the data
