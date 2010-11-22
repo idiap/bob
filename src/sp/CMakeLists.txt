@@ -9,6 +9,7 @@ set(src
     "src/spCore.cc"
     "src/spCoreChain.cc"
     "src/spFFT.cc"
+    "src/spFFT_pack41.cc"
     "src/spDCT.cc"
     "src/spDCT_pack41.cc"
     "src/spDeltaOne.cc")
