@@ -144,7 +144,7 @@ namespace Torch {
         // scale it with correct coefficients
         FloatTensor *F = (FloatTensor *) m_output[0];
         double sqrt2N = sqrt(2./N);
-        for(int i=0; i < N; ++i) (*F)(i) = static_cast<float>(x[i]/4.*(i==0?sqrt(1./N):sqrt2N));
+        for(int i=0; i < N; ++i) (*F)(i) = static_cast<float>(x[i]/4*(i==0?sqrt(1./N):sqrt2N));
 
         // Deallocate memory
         delete [] wsave;
@@ -181,7 +181,7 @@ namespace Torch {
           // Initialize C/Fortran array for FFTPACK
           // Copy the double tensor into the C/Fortran array
           for(int i=0; i < W; ++i) {
-            x[i] = (*R)(j,i)*16./(i==0?sqrt1W:sqrt2W)/(j==0?sqrt1H:sqrt2H);
+            x[i] = (*R)(j,i)*16/(i==0?sqrt1W:sqrt2W)/(j==0?sqrt1H:sqrt2H);
           }
 
           // Compute the DCT of one row
@@ -201,10 +201,11 @@ namespace Torch {
 
         // Update the output tensor with the computed values
         FloatTensor *F = (FloatTensor *) m_output[0];
+        double norm_factor = 16*W*H;
         for(int i=0; i < W; ++i) {
           int iH = i*H;
           for(int j=0; j < H; ++j)
-            (*F)(j,i) = static_cast<float>(full_x[j+iH]/(16.*W*H));
+            (*F)(j,i) = static_cast<float>(full_x[j+iH]/normfactor);
         }
 
         // Deallocate memory
@@ -247,7 +248,6 @@ namespace Torch {
 
           // Copy resulting values into the large C/Fortran array
           for(int i=0; i < W; ++i)
-            //full_x[j+i*H] = x[i]/4.*(i==0?sqrt1W:sqrt2W);
             full_x[j+i*H] = x[i];
         }
 
@@ -263,7 +263,6 @@ namespace Torch {
         for(int i=0; i < W; ++i) {
           int iH = i*H;
           for(int j=0; j < H; ++j)
-            //(*F)(j,i) = static_cast<float>(full_x[j+iH]/4.*(j==0?sqrt1H:sqrt2H));
             (*F)(j,i) = static_cast<float>(full_x[j+iH]/16.*(j==0?sqrt1H:sqrt2H)*(i==0?sqrt1W:sqrt2W));
         }
 
