@@ -1,4 +1,4 @@
-#include "sp/spFFT_pack41.h"
+#include "sp/spFFT.h"
 
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 
@@ -16,7 +16,7 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Constructor
-  spFFT_pack41::spFFT_pack41(bool inverse_)
+  spFFT::spFFT(bool inverse_)
     :	spCore()
   {
     inverse = inverse_;
@@ -24,13 +24,13 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Destructor
-  spFFT_pack41::~spFFT_pack41()
+  spFFT::~spFFT()
   {
   }
 
   //////////////////////////////////////////////////////////////////////////
   // Check if the input tensor has the right dimensions and type
-  bool spFFT_pack41::checkInput(const Tensor& input) const
+  bool spFFT::checkInput(const Tensor& input) const
   {
     // Accept only tensors of Torch::Float
     //if (input.getDatatype() != Tensor::Double) return false;
@@ -45,11 +45,11 @@ namespace Torch {
 
     if (input.nDimension() == 1)
     {
-      //print("spFFT_pack41::checkInput() assuming FFT 1D ...\n");
+      //print("spFFT::checkInput() assuming FFT 1D ...\n");
 
       if(inverse)
       {
-        warning("spFFT_pack41(): impossible to handle inverse mode with 1D input tensor.");
+        warning("spFFT(): impossible to handle inverse mode with 1D input tensor.");
         return false;
       }
     }
@@ -58,29 +58,29 @@ namespace Torch {
     {
       if(inverse)
       {
-        //print("spFFT_pack41::checkInput() assuming inverse FFT 1D ...\n");
+        //print("spFFT::checkInput() assuming inverse FFT 1D ...\n");
         return true;
       }
       else
       {
-        //print("spFFT_pack41::checkInput() assuming FFT 2D ...\n");
+        //print("spFFT::checkInput() assuming FFT 2D ...\n");
         return true;
       }
     }
 
     if (input.nDimension() == 3)
     {
-      //print("spFFT_pack41::checkInput() assuming inverse FFT 2D ...\n");
+      //print("spFFT::checkInput() assuming inverse FFT 2D ...\n");
 
       if(inverse == false)
       {
-        warning("spFFT_pack41(): impossible to handle forward mode with 3D input tensor.");
+        warning("spFFT(): impossible to handle forward mode with 3D input tensor.");
         return false;
       }
 
       if(input.size(2) != 2)
       {
-        warning("spFFT_pack41(): The third dimension should of the 3D input tensor should be equal to 2.");
+        warning("spFFT(): The third dimension should of the 3D input tensor should be equal to 2.");
         return false;
       }
 
@@ -93,7 +93,7 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Allocate (if needed) the output tensors given the input tensor dimensions
-  bool spFFT_pack41::allocateOutput(const Tensor& input)
+  bool spFFT::allocateOutput(const Tensor& input)
   {
     if (	m_output == 0 )
     {
@@ -101,7 +101,7 @@ namespace Torch {
 
       if (input.nDimension() == 1)
       {
-        //print("spFFT_pack41::allocateOutput() assuming FFT 1D ...\n");
+        //print("spFFT::allocateOutput() assuming FFT 1D ...\n");
 
         N = input.size(0);
 
@@ -113,7 +113,7 @@ namespace Torch {
       {
         if(inverse)
         {
-          //print("spFFT_pack41::allocateOutput() assuming inverse FFT 1D ...\n");
+          //print("spFFT::allocateOutput() assuming inverse FFT 1D ...\n");
 
           N = input.size(0);
 
@@ -124,7 +124,7 @@ namespace Torch {
         else
         {
           //if(verbose) print("spDCT_pack41::allocateOutput() DCT 2D ...\n");
-          //print("spFFT_pack41::allocateOutput() assuming FFT 2D ...\n");
+          //print("spFFT::allocateOutput() assuming FFT 2D ...\n");
 
           H = input.size(0);
           W = input.size(1);
@@ -136,7 +136,7 @@ namespace Torch {
       }
       else if (input.nDimension() == 3)
       {
-        //print("spFFT_pack41::allocateOutput() assuming inverse FFT 2D ...\n");
+        //print("spFFT::allocateOutput() assuming inverse FFT 2D ...\n");
 
         H = input.size(0);
         W = input.size(1);
@@ -152,7 +152,7 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Process some input tensor (the input is checked, the outputs are allocated)
-  bool spFFT_pack41::processInput(const Tensor& input)
+  bool spFFT::processInput(const Tensor& input)
   {
     if (input.nDimension() == 1)
     {

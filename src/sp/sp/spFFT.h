@@ -1,5 +1,5 @@
-#ifndef _TORCHSPRO_SP_FFT_PACK41_H_
-#define _TORCHSPRO_SP_FFT_PACK41_H_
+#ifndef _TORCHSPRO_SP_FFT_H_
+#define _TORCHSPRO_SP_FFT_H_
 
 #include "core/Tensor.h"
 #include "sp/spCore.h"
@@ -13,22 +13,22 @@ namespace Torch
  */
 
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::spFFT_PACK41
+	// Torch::spFFT
 	//	This class is designed to perform FFT.
 	//	The result is a tensor of the same storage type.
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class spFFT_pack41 : public spCore
+	class spFFT : public spCore
 	{
 	public:
 
 		// Constructor
-		spFFT_pack41(bool inverse_ = false);
+		spFFT(bool inverse_ = false);
 
 		// Destructor
-		virtual ~spFFT_pack41();
+		virtual ~spFFT();
 
 	protected:
 

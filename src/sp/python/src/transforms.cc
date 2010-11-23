@@ -1,6 +1,7 @@
 /**
  * @file src/python/ip/color.cc 
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief Binds Color to python 
  */
@@ -9,12 +10,12 @@
 
 #include "core/Tensor.h"
 #include "sp/spCore.h"
-#include "sp/spFCT.h"
 #include "sp/spDCT_naive.h"
+#include "sp/spFCT.h"
 #include "sp/spFCT_oourafft.h"
-#include "sp/spFFT_oourafft.h"
-#include "sp/spFFT_pack41.h"
 #include "sp/spDFT.h"
+#include "sp/spFFT.h"
+#include "sp/spFFT_oourafft.h"
 
 using namespace boost::python;
 
@@ -28,7 +29,7 @@ void bind_sp_transforms()
     ;
   class_<Torch::spFFT_oourafft, bases<Torch::spCore> >("spFFT_oourafft", "This class is designed to perform an FFT (or inverse FFT) over an input tensor. The result is a tensor of the same storage type.", init<optional<bool> >(arg("inverse"), "Creates an new FFT operator."))
     ;
-  class_<Torch::spFFT_pack41, bases<Torch::spCore> >("spFFT_pack41", "This class is designed to perform an FFT (or inverse FFT) over an input tensor. The result is a tensor of the same storage type.", init<optional<bool> >(arg("inverse"), "Creates an new FFT operator."))
+  class_<Torch::spFFT, bases<Torch::spCore> >("spFFT", "This class is designed to perform an FFT (or inverse FFT) over an input tensor. The result is a tensor of the same storage type.", init<optional<bool> >(arg("inverse"), "Creates an new FFT operator."))
     ;
   class_<Torch::spDFT, bases<Torch::spCore> >("spDFT", "This class is designed to perform a DFT (or inverse DFT) over an input tensor. The result is a tensor of the same storage type.", init<optional<bool> >(arg("inverse"), "Creates a new DFT operator."))
     ;
