@@ -290,6 +290,7 @@ namespace Torch {
         delete [] wsave_W;
         delete [] wsave_H;
         delete [] x;
+        delete [] full_x;
       }
     }
     else if (input.nDimension() == 3)
@@ -355,6 +356,7 @@ namespace Torch {
         delete [] wsave_W;
         delete [] wsave_H;
         delete [] x;
+        delete [] full_x;
       }
     }
 
