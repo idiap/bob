@@ -26,11 +26,19 @@ Examples:
 
 def current_arch(debug):
   """Calculates the current arch"""
-  uname = os.uname()
-  arch = '%s-%s' % (uname[0].lower(), uname[4].lower())
-  if debug: arch += '-debug'
-  else: arch += '-release'
-  return arch
+  import platform
+  
+  base = platform.system().lower()
+  if base == 'darwin': 
+    base = 'macosx' #change name to something nicer and easy to identify
+
+  arch = platform.architecture()[0]
+  if arch == '32bit': arch = 'i686'
+  elif arch == '64bit': arch = 'x86_64'
+
+  btype = 'release'
+  if debug: btype = 'debug'
+  return '%s-%s-%s' % (base, arch, btype) 
 
 def parse_args():
   """Parses the command line input."""

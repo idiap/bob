@@ -5,7 +5,7 @@
  * @brief blitz::Array<> to and from python converters for arrays
  */
 
-#include <array.h>
+#include "core/python/array.h"
 
 Torch::python::TypeMapper Torch::python::TYPEMAP;
 
@@ -253,6 +253,11 @@ boost::python::class_<blitz::FortranArray<N>,
   boost::python::class_<storage_type, boost::shared_ptr<storage_type> > 
     retval(class_name.str().c_str(), class_doc.str().c_str(), boost::python::init<>());
   return retval;
+}
+
+PyObject* Torch::python::create_numpy_array(int N, npy_intp* dimensions,
+    NPY_TYPES tp) {
+  return PyArray_SimpleNew(N, dimensions, tp);
 }
 
 #define bind_storages(N) bind_c_storage<N>(); bind_fortran_storage<N>();
