@@ -1,5 +1,5 @@
-#ifndef _TORCHSPRO_SP_DCT_NAIVE_H_
-#define _TORCHSPRO_SP_DCT_NAIVE_H_
+#ifndef _TORCHSPRO_SP_DCT_H_
+#define _TORCHSPRO_SP_DCT_H_
 
 #include "core/Tensor.h"
 #include "sp/spCore.h"
@@ -16,18 +16,18 @@ namespace Torch
    * @brief This class is designed to perform DCT.
    * The output is a FloatTensor.
    */
-	class spDCT_naive : public spCore
+	class spDCT : public spCore
 	{
   public:
 		/**
      *  Constructor
      */
-		spDCT_naive(bool inverse_ = false);
+		spDCT(bool inverse_ = false);
 
 		/**
      *  Destructor
      */
-		virtual ~spDCT_naive();
+		virtual ~spDCT();
 
 
 	protected:

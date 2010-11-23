@@ -11,7 +11,7 @@ set(src
     "src/spDFT.cc"
     "src/spFFT.cc"
     "src/spFFT_oourafft.cc"
-    "src/spDCT_naive.cc"
+    "src/spDCT.cc"
     "src/spFCT.cc"
     "src/spFCT_oourafft.cc"
     "src/spDeltaOne.cc")

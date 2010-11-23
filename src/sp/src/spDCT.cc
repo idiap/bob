@@ -1,28 +1,28 @@
-#include "sp/spDCT_naive.h"
+#include "sp/spDCT.h"
 
 namespace Torch {
 
-  spDCT_naive::spDCT_naive(bool inverse_)
+  spDCT::spDCT(bool inverse_)
     :	spCore(), inverse(inverse_), sig(0), cos_coef1(0), cos_coef2(0)
   {
     addBOption("verbose", false, "verbose");
   }
 
 
-  spDCT_naive::~spDCT_naive()
+  spDCT::~spDCT()
   {
     if(sig != 0) delete sig;
     if(cos_coef1 != 0) delete cos_coef1;
     if(cos_coef2 != 0) delete cos_coef2;
   }
 
-  bool spDCT_naive::checkInput(const Tensor& input) const
+  bool spDCT::checkInput(const Tensor& input) const
   {
     if (input.nDimension() == 1 || input.nDimension() == 2) {
       return true;
     }
     else {
-      warning("spDCT_naive(): incorrect number of dimensions for the input \
+      warning("spDCT(): incorrect number of dimensions for the input \
         tensor.");
       return false;
     }
@@ -32,7 +32,7 @@ namespace Torch {
   }
 
 
-  bool spDCT_naive::allocateOutput(const Tensor& input)
+  bool spDCT::allocateOutput(const Tensor& input)
   {
     bool verbose = getBOption("verbose");
 
@@ -49,7 +49,7 @@ namespace Torch {
 
       if (input.nDimension() == 1)
       {
-        if(verbose) print("spDCT_naive::allocateOutput() DCT 1D ...\n");
+        if(verbose) print("spDCT::allocateOutput() DCT 1D ...\n");
 
         N = input.size(0);
 
@@ -62,7 +62,7 @@ namespace Torch {
       }
       else if (input.nDimension() == 2)
       {
-        if(verbose) print("spDCT_naive::allocateOutput() DCT 2D ...\n");
+        if(verbose) print("spDCT::allocateOutput() DCT 2D ...\n");
 
         H = input.size(0);
         W = input.size(1);
@@ -82,11 +82,11 @@ namespace Torch {
   }
 
 
-  bool spDCT_naive::initCosArray(const int N)
+  bool spDCT::initCosArray(const int N)
   {
     int twoN = 2*N;
     if( cos_coef1 == 0 || cos_coef1->size(0) != twoN) {
-      warning("spDCT_naive::initCosArray(): Array for cosine coefficients \
+      warning("spDCT::initCosArray(): Array for cosine coefficients \
         was not allocated correctly.");
       return false;
     }
@@ -98,14 +98,14 @@ namespace Torch {
   }
 
 
-  bool spDCT_naive::initCosArray(const int H, const int W)
+  bool spDCT::initCosArray(const int H, const int W)
   {
     int twoH = 2*H;
     int twoW = 2*W;
     if( cos_coef1 == 0 || cos_coef1->size(0) != twoH ||
         cos_coef2 == 0 || cos_coef2->size(0) != twoW ) 
     {
-      warning("spDCT_naive::initCosArray(): Arrays for cosine coefficients \
+      warning("spDCT::initCosArray(): Arrays for cosine coefficients \
         were not allocated correctly.");
       return false;
     }
@@ -120,7 +120,7 @@ namespace Torch {
   }
 
 
-  bool spDCT_naive::processInput(const Tensor& input)
+  bool spDCT::processInput(const Tensor& input)
   {
     if (input.nDimension() == 1)
     {
