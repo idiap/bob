@@ -1,5 +1,5 @@
-#ifndef _TORCHSPRO_SP_DCT_H_
-#define _TORCHSPRO_SP_DCT_H_
+#ifndef _TORCHSPRO_SP_FCT_oourafft_H_
+#define _TORCHSPRO_SP_FCT_oourafft_H_
 
 #include "core/Tensor.h"
 #include "sp/spCore.h"
@@ -13,22 +13,22 @@ namespace Torch
  */
 
   /**
-   * This class is designed to perform DCT.
+   * This class is designed to perform FCT_oourafft.
    * The result is a tensor of the same storage type.
    */
-	class spDCT : public spCore
+	class spFCT_oourafft : public spCore
 	{
 	public:
 
 		/**
      *  Constructor
      */
-		spDCT(bool inverse_ = false);
+		spFCT_oourafft(bool inverse_ = false);
 
 		/**
      *  Destructor
      */
-		virtual ~spDCT();
+		virtual ~spFCT_oourafft();
 
 	protected:
 
@@ -57,7 +57,7 @@ namespace Torch
 		// Attributes
 
     /**
-     * Indicates if we want to compute the inverse DCT
+     * Indicates if we want to compute the inverse FCT_oourafft
      */
 		bool inverse;
 

@@ -1,4 +1,4 @@
-#include "sp/spDCT.h"
+#include "sp/spFCT_oourafft.h"
 #include "oourafft/ooura.h"
 
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
@@ -8,7 +8,7 @@ namespace Torch {
 /////////////////////////////////////////////////////////////////////////
 // Constructor
 
-spDCT::spDCT(bool inverse_)
+spFCT_oourafft::spFCT_oourafft(bool inverse_)
 	:	spCore()
 {
 	inverse = inverse_;
@@ -20,7 +20,7 @@ spDCT::spDCT(bool inverse_)
 /////////////////////////////////////////////////////////////////////////
 // Destructor
 
-spDCT::~spDCT()
+spFCT_oourafft::~spFCT_oourafft()
 {
 	if(R != NULL) delete R;
 }
@@ -28,15 +28,15 @@ spDCT::~spDCT()
 //////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type
 
-bool spDCT::checkInput(const Tensor& input) const
+bool spFCT_oourafft::checkInput(const Tensor& input) const
 {
 	// Accept only tensors of Torch::Float
 	//if (input.getDatatype() != Tensor::Float) return false;
 
 	if (input.nDimension() == 1)
 	{
-	   	//if(inverse) print("spDCT::checkInput() inverse DCT 1D ...\n");
-		//else print("spDCT::checkInput() DCT 1D ...\n");
+	   	//if(inverse) print("spFCT_oourafft::checkInput() inverse FCT_oourafft 1D ...\n");
+		//else print("spFCT_oourafft::checkInput() FCT_oourafft 1D ...\n");
 
 		int N_ = input.size(0);
 
@@ -44,33 +44,33 @@ bool spDCT::checkInput(const Tensor& input) const
 
 		if(N_ != (int) nn)
 		{
-			warning("spDCT(): size(0) is not a power of 2.");
+			warning("spFCT_oourafft(): size(0) is not a power of 2.");
 			return false;
 		}
 	}
 	else if (input.nDimension() == 2)
 	{
-	   	//if(inverse) print("spDCT::checkInput() inverse DCT 2D ...\n");
-		//else print("spDCT::checkInput() DCT 2D ...\n");
+	   	//if(inverse) print("spFCT_oourafft::checkInput() inverse FCT_oourafft 2D ...\n");
+		//else print("spFCT_oourafft::checkInput() FCT_oourafft 2D ...\n");
 
 		int N_ = input.size(0);
 		unsigned int nn = nexthigher(N_);
 		if(N_ != (int) nn)
 		{
-			warning("spDCT(): size(0) is not a power of 2.");
+			warning("spFCT_oourafft(): size(0) is not a power of 2.");
 			return false;
 		}
 		N_ = input.size(1);
 		nn = nexthigher(N_);
 		if(N_ != (int) nn)
 		{
-			warning("spDCT(): size(1) is not a power of 2.");
+			warning("spFCT_oourafft(): size(1) is not a power of 2.");
 			return false;
 		}
 	}
 	else
 	{
-		warning("spDCT(): incorrect number of dimensions for the input tensor.");
+		warning("spFCT_oourafft(): incorrect number of dimensions for the input tensor.");
 		return false;
 	}
 
@@ -81,7 +81,7 @@ bool spDCT::checkInput(const Tensor& input) const
 /////////////////////////////////////////////////////////////////////////
 // Allocate (if needed) the output tensors given the input tensor dimensions
 
-bool spDCT::allocateOutput(const Tensor& input)
+bool spFCT_oourafft::allocateOutput(const Tensor& input)
 {
 	bool verbose = getBOption("verbose");
 
@@ -93,7 +93,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 
 		if (input.nDimension() == 1)
 		{
-			if(verbose) print("spDCT::allocateOutput() DCT 1D ...\n");
+			if(verbose) print("spFCT_oourafft::allocateOutput() FCT_oourafft 1D ...\n");
 
 			N = input.size(0);
 
@@ -105,7 +105,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 		}
 		else if (input.nDimension() == 2)
 		{
-			if(verbose) print("spDCT::allocateOutput() DCT 2D ...\n");
+			if(verbose) print("spFCT_oourafft::allocateOutput() FCT_oourafft 2D ...\n");
 
 			H = input.size(0);
 			W = input.size(1);
@@ -124,7 +124,7 @@ bool spDCT::allocateOutput(const Tensor& input)
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated)
 
-bool spDCT::processInput(const Tensor& input)
+bool spFCT_oourafft::processInput(const Tensor& input)
 {
 	if (input.nDimension() == 1)
 	{
@@ -153,7 +153,7 @@ bool spDCT::processInput(const Tensor& input)
 
 			a0 = a[0];
 
-      // Compute the inverse DCT (second argument set to 1)
+      // Compute the inverse FCT_oourafft (second argument set to 1)
 			ddct(N, 1, a, ip, w);
 
 			// The output of the oourafft implementation does not use the 
@@ -189,7 +189,7 @@ bool spDCT::processInput(const Tensor& input)
 			// Copy the float tensor in the C array
 			for(int i=0; i < N; i++) a[i] = (*R)(i);
 
-      // Compute the DCT (second argument set to -1)
+      // Compute the FCT_oourafft (second argument set to -1)
 			ddct(N, -1, a, ip, w);
 
 			// The output of the oourafft implementation does not use the 

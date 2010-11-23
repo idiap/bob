@@ -1,6 +1,4 @@
-#include "sp/spDCT_pack41.h"
-
-#define MAX(x,y) ((x) > (y) ? (x) : (y))
+#include "sp/spFCT.h"
 
 
 // Declaration of FORTRAN functions from FFTPACK4.1
@@ -12,7 +10,7 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Constructor
-  spDCT_pack41::spDCT_pack41(bool inverse_)
+  spFCT::spFCT(bool inverse_)
     :	spCore()
   {
     inverse = inverse_;
@@ -23,14 +21,14 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Destructor
-  spDCT_pack41::~spDCT_pack41()
+  spFCT::~spFCT()
   {
     if(R != NULL) delete R;
   }
 
   //////////////////////////////////////////////////////////////////////////
   // Check if the input tensor has the right dimensions and type
-  bool spDCT_pack41::checkInput(const Tensor& input) const
+  bool spFCT::checkInput(const Tensor& input) const
   {
 
     if (input.nDimension() == 1 || input.nDimension() == 2)
@@ -40,7 +38,7 @@ namespace Torch {
     }
     else
     {
-      warning("spDCT_pack41(): incorrect number of dimensions for the input tensor.");
+      warning("spFCT(): incorrect number of dimensions for the input tensor.");
       return false;
     }
 
@@ -50,7 +48,7 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Allocate (if needed) the output tensors given the input tensor dimensions
-  bool spDCT_pack41::allocateOutput(const Tensor& input)
+  bool spFCT::allocateOutput(const Tensor& input)
   {
     bool verbose = getBOption("verbose");
 
@@ -62,7 +60,7 @@ namespace Torch {
 
       if (input.nDimension() == 1)
       {
-        if(verbose) print("spDCT_pack41::allocateOutput() DCT 1D ...\n");
+        if(verbose) print("spFCT::allocateOutput() DCT 1D ...\n");
 
         N = input.size(0);
 
@@ -74,7 +72,7 @@ namespace Torch {
       }
       else if (input.nDimension() == 2)
       {
-        if(verbose) print("spDCT_pack41::allocateOutput() DCT 2D ...\n");
+        if(verbose) print("spFCT::allocateOutput() DCT 2D ...\n");
 
         H = input.size(0);
         W = input.size(1);
@@ -92,7 +90,7 @@ namespace Torch {
 
   /////////////////////////////////////////////////////////////////////////
   // Process some input tensor (the input is checked, the outputs are allocated)
-  bool spDCT_pack41::processInput(const Tensor& input)
+  bool spFCT::processInput(const Tensor& input)
   {
     if (input.nDimension() == 1)
     {

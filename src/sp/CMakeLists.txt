@@ -8,10 +8,12 @@ set(deps dfftpack41 oourafft core) #other torch subprojects
 set(src 
     "src/spCore.cc"
     "src/spCoreChain.cc"
-    "src/spFFT.cc"
+    "src/spFFT_oourafft.cc"
     "src/spFFT_pack41.cc"
-    "src/spDCT.cc"
-    "src/spDCT_pack41.cc"
+    "src/spDFT.cc"
+    "src/spFCT_oourafft.cc"
+    "src/spDCT_naive.cc"
+    "src/spFCT.cc"
     "src/spDeltaOne.cc")
 
 add_definitions(-DHAVE_OOURAFFT)

@@ -1,5 +1,5 @@
-#ifndef _TORCHSPRO_SP_FFT_H_
-#define _TORCHSPRO_SP_FFT_H_
+#ifndef _TORCHSPRO_SP_FFT_oourafft_H_
+#define _TORCHSPRO_SP_FFT_oourafft_H_
 
 #include "core/Tensor.h"
 #include "sp/spCore.h"
@@ -13,22 +13,22 @@ namespace Torch
  */
 
 	/////////////////////////////////////////////////////////////////////////
-	// Torch::spFFT
+	// Torch::spFFT_oourafft
 	//	This class is designed to perform FFT.
 	//	The result is a tensor of the same storage type.
 	//
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
-	class spFFT : public spCore
+	class spFFT_oourafft : public spCore
 	{
 	public:
 
 		// Constructor
-		spFFT(bool inverse_ = false);
+		spFFT_oourafft(bool inverse_ = false);
 
 		// Destructor
-		virtual ~spFFT();
+		virtual ~spFFT_oourafft();
 
 	protected:
 
