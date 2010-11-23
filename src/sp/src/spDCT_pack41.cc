@@ -205,7 +205,7 @@ namespace Torch {
         for(int i=0; i < W; ++i) {
           int iH = i*H;
           for(int j=0; j < H; ++j)
-            (*F)(j,i) = static_cast<float>(full_x[j+iH]/normfactor);
+            (*F)(j,i) = static_cast<float>(full_x[j+iH]/norm_factor);
         }
 
         // Deallocate memory
