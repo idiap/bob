@@ -33,15 +33,10 @@ namespace Torch {
   bool spDCT_pack41::checkInput(const Tensor& input) const
   {
 
-    if (input.nDimension() == 1)
+    if (input.nDimension() == 1 || input.nDimension() == 2)
     {
-      //OK
+      // OK
       return true;
-    }
-    else if (input.nDimension() == 2)
-    {
-      warning("spDCT_pack41(): DCT2D not yet ready");
-      return false;
     }
     else
     {
@@ -79,17 +74,16 @@ namespace Torch {
       }
       else if (input.nDimension() == 2)
       {
-        /* Not yet implemented 
-           if(verbose) print("spDCT_pack41::allocateOutput() DCT 2D ...\n");
+        if(verbose) print("spDCT_pack41::allocateOutput() DCT 2D ...\n");
 
-           H = input.size(0);
-           W = input.size(1);
+        H = input.size(0);
+        W = input.size(1);
 
-           m_n_outputs = 1;
-           m_output = new Tensor*[m_n_outputs];
-           m_output[0] = new DoubleTensor(H,W);
+        m_n_outputs = 1;
+        m_output = new Tensor*[m_n_outputs];
+        m_output[0] = new FloatTensor(H,W);
 
-           R = new DoubleTensor(H,W);*/
+        R = new DoubleTensor(H,W);
       }
     }
 
@@ -150,7 +144,7 @@ namespace Torch {
         // scale it with correct coefficients
         FloatTensor *F = (FloatTensor *) m_output[0];
         double sqrt2N = sqrt(2./N);
-        for(int i=0; i < N; ++i) (*F)(i) = static_cast<float>(x[i]/4.*(i==0?sqrt(1./N):sqrt2N));
+        for(int i=0; i < N; ++i) (*F)(i) = static_cast<float>(x[i]/4*(i==0?sqrt(1./N):sqrt2N));
 
         // Deallocate memory
         delete [] wsave;
@@ -159,8 +153,125 @@ namespace Torch {
     }
     else if (input.nDimension() == 2)
     {
-      /* Not yet implemented */
-      ;
+      R->copy(&input);
+
+      if( inverse)
+      {
+        // Precompute multiplicative factors
+        double sqrt1H=sqrt(1./H);
+        double sqrt2H=sqrt(2./H);
+        double sqrt1W=sqrt(1./W);
+        double sqrt2W=sqrt(2./W);
+
+        // Declare variables
+        int n_wsave_W=3*W+15;
+        double *wsave_W = new double[n_wsave_W];
+        cosqi_( &W, wsave_W);
+        int n_wsave_H=3*H+15;
+        double *wsave_H = new double[n_wsave_H];
+        cosqi_( &H, wsave_H);
+
+        // Allocate memory for C/Fortran arrays
+        double *full_x = new double[H*W];
+        double *x = new double[W];
+
+        // Apply 1D DCT to each row of the tensor (tensor_x(id_row,id_column))
+        for(int j=0; j<H; ++j)
+        {
+          // Initialize C/Fortran array for FFTPACK
+          // Copy the double tensor into the C/Fortran array
+          for(int i=0; i < W; ++i) {
+            x[i] = (*R)(j,i)*16/(i==0?sqrt1W:sqrt2W)/(j==0?sqrt1H:sqrt2H);
+          }
+
+          // Compute the DCT of one row
+          cosqf_( &W, x, wsave_W);
+
+          // Copy resulting values into the large C/Fortran array
+          for(int i=0; i < W; ++i)
+            full_x[j+i*H] = x[i];
+        }
+
+        // Apply 1D DCT to each column of the resulting matrix
+        for(int i=0; i < W; ++i)
+        {
+          // Compute the DCT of one column
+          cosqf_( &H, full_x+i*H, wsave_H);
+        }
+
+        // Update the output tensor with the computed values
+        FloatTensor *F = (FloatTensor *) m_output[0];
+        double norm_factor = 16*W*H;
+        for(int i=0; i < W; ++i) {
+          int iH = i*H;
+          for(int j=0; j < H; ++j)
+            (*F)(j,i) = static_cast<float>(full_x[j+iH]/norm_factor);
+        }
+
+        // Deallocate memory
+        delete [] wsave_W;
+        delete [] wsave_H;
+        delete [] full_x;
+        delete [] x;
+      }
+      else
+      {
+        // Precompute multiplicative factors
+        double sqrt1H=sqrt(1./H);
+        double sqrt2H=sqrt(2./H);
+        double sqrt1W=sqrt(1./W);
+        double sqrt2W=sqrt(2./W);
+
+        // Declare variables
+        int n_wsave_W=3*W+15;
+        double *wsave_W = new double[n_wsave_W];
+        cosqi_( &W, wsave_W);
+        int n_wsave_H=3*H+15;
+        double *wsave_H = new double[n_wsave_H];
+        cosqi_( &H, wsave_H);
+
+        // Allocate memory for C/Fortran arrays
+        double *full_x = new double[H*W];
+        double *x = new double[W];
+
+        // Apply 1D DCT to each row of the tensor (tensor_x(id_row,id_column))
+        for(int j=0; j<H; ++j)
+        {
+          // Initialize C/Fortran array for FFTPACK
+          // Copy the double tensor into the C/Fortran array
+          for(int i=0; i < W; ++i) {
+            x[i] = (*R)(j,i);
+          }
+
+          // Compute the DCT of one row
+          cosqb_( &W, x, wsave_W);
+
+          // Copy resulting values into the large C/Fortran array
+          for(int i=0; i < W; ++i)
+            full_x[j+i*H] = x[i];
+        }
+
+        // Apply 1D DCT to each column of the resulting matrix
+        for(int i=0; i < W; ++i)
+        {
+          // Compute the DCT of one column
+          cosqb_( &H, full_x+i*H, wsave_H);
+        }
+
+        // Update the output tensor with the computed values
+        FloatTensor *F = (FloatTensor *) m_output[0];
+        for(int i=0; i < W; ++i) {
+          int iH = i*H;
+          for(int j=0; j < H; ++j)
+            (*F)(j,i) = static_cast<float>(full_x[j+iH]/16.*(j==0?sqrt1H:sqrt2H)*(i==0?sqrt1W:sqrt2W));
+        }
+
+        // Deallocate memory
+        delete [] wsave_W;
+        delete [] wsave_H;
+        delete [] full_x;
+        delete [] x;
+      }
     }
 
     // OK
