@@ -1,6 +1,7 @@
 *~
 *.swp
 *.pyc
+*.gch
 build
 install
 examples/*/build_*

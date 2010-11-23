@@ -316,12 +316,21 @@ def dot(option):
 
 def platform(option):
   """Calculates the platform string."""
-  uname = os.uname()
-  arch = uname[4].lower()
+  import platform
+  
+  base = platform.system().lower()
+  if base == 'darwin': 
+    base = 'macosx' #change name to something nicer and easy to identify
+
+  arch = platform.architecture()[0]
+  if arch == '32bit': arch = 'i686'
+  elif arch == '64bit': arch = 'x86_64'
+
   if option.force_32bits: 
     logging.warn("Forcing 32-bits compilation")
     arch = 'i686'
-  return '%s-%s-%s' % (uname[0].lower(), arch, option.build_type)
+
+  return '%s-%s-%s' % (base, arch, option.build_type)
 
 def action(what, option, *args):
   start = time.time()

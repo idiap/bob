@@ -4,22 +4,22 @@
 project(torch5spro)
 cmake_minimum_required(VERSION 2.6)
 
-# Set the compiler flags and build type(release or debug)
-set(COMMON_FLAGS "-D__STDC_CONSTANT_MACROS -pthread -g -Wall")
+# Force __LP64__ scheme on OSX
+if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+  set(COMMON_FLAGS "-m64")
+  # Bogus on OSX?
+  set(CMAKE_INCLUDE_SYSTEM_FLAG_C "-isystem ")
+  set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 # We allow you to force the compilation to be done using a base 32-bit
 # architecture if you call cmake with "-DTORCH_FORCE_32BITS=yes"
 if(TORCH_FORCE_32BITS)
-  set(COMMON_FLAGS "-m32 ${COMMON_FLAGS}")
+  set(COMMON_FLAGS "-m32")
 endif(TORCH_FORCE_32BITS)
 
-# Cmake does not support include_directories(SYSTEM) correctly on OSX, so the
-# compiler issues warnings/errors on Python and ffmpeg includes that do not 
-# respect a strict standard. To make it compile, we do not use "-pedantic" on
-# OSX.
-if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-  set(COMMON_FLAGS "${COMMON_FLAGS} -pedantic")
-endif(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+# Set the compiler flags and build type(release or debug)
+set(COMMON_FLAGS "${COMMON_FLAGS} -D__STDC_CONSTANT_MACROS -pthread -g -Wall -pedantic")
 
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
