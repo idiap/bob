@@ -1,5 +1,5 @@
 /**
- * @file src/core/spcore.cc
+ * @file src/sp/python/src/spcore.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the spCore object type into python 

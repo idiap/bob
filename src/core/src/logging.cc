@@ -1,5 +1,5 @@
 /**
- * @file src/logging.cc
+ * @file src/core/src/logging.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Implements all logging infrastructure.
