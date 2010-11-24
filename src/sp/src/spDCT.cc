@@ -58,7 +58,7 @@ namespace Torch {
         m_output[0] = new FloatTensor(N);
 
         sig = new DoubleTensor(N);
-        cos_coef1 = new DoubleTensor(2*N);
+        cos_coef1 = new DoubleTensor(2*N+1);
       }
       else if (input.nDimension() == 2)
       {
@@ -73,8 +73,8 @@ namespace Torch {
         m_output[0] = new FloatTensor(H,W);
 
         sig = new DoubleTensor(H,W);
-        cos_coef1 = new DoubleTensor(2*H);
-        cos_coef2 = new DoubleTensor(2*W);
+        cos_coef1 = new DoubleTensor(2*H+1);
+        cos_coef2 = new DoubleTensor(2*W+1);
       }
     }
 
@@ -85,13 +85,13 @@ namespace Torch {
   bool spDCT::initCosArray(const int N)
   {
     int twoN = 2*N;
-    if( cos_coef1 == 0 || cos_coef1->size(0) != twoN) {
+    if( cos_coef1 == 0 || cos_coef1->size(0) != twoN+1) {
       warning("spDCT::initCosArray(): Array for cosine coefficients \
         was not allocated correctly.");
       return false;
     }
 
-    for(int i=0; i < twoN; ++i)
+    for(int i=0; i <= twoN; ++i)
       (*cos_coef1)(i) = cos( M_PI * i / twoN);
 
     return true;
@@ -102,18 +102,18 @@ namespace Torch {
   {
     int twoH = 2*H;
     int twoW = 2*W;
-    if( cos_coef1 == 0 || cos_coef1->size(0) != twoH ||
-        cos_coef2 == 0 || cos_coef2->size(0) != twoW ) 
+    if( cos_coef1 == 0 || cos_coef1->size(0) != twoH+1 ||
+        cos_coef2 == 0 || cos_coef2->size(0) != twoW+1 ) 
     {
       warning("spDCT::initCosArray(): Arrays for cosine coefficients \
         were not allocated correctly.");
       return false;
     }
 
-    for(int i=0; i < twoH; ++i)
+    for(int i=0; i <= twoH; ++i)
       (*cos_coef1)(i) = cos( M_PI * i / twoH);
 
-    for(int i=0; i < twoW; ++i)
+    for(int i=0; i <= twoW; ++i)
       (*cos_coef2)(i) = cos( M_PI * i / twoW);
 
     return true;
@@ -151,7 +151,7 @@ namespace Torch {
             int idx = ( ((2*k+1)*n % (4*N)) + 4*N ) % (4*N);
 
             // Use the symmetry of the cosine function over half a period
-            if( idx >= 2*N) idx = 4*N - idx;
+            if( idx > 2*N) idx = 4*N - idx;
 
             // Update the coefficient: 
             // cos(PI*idx/(2*N)) <-> cos(PI*(2*k+1)*n/(2*N))
@@ -181,7 +181,7 @@ namespace Torch {
             int idx = ( ((2*n+1)*k % (4*N)) + 4*N ) % (4*N);
 
             // Use the symmetry of the cosine function over half a period
-            if( idx >= 2*N) idx = 4*N - idx;
+            if( idx > 2*N) idx = 4*N - idx;
 
             // Update the coefficient: 
             // cos(PI*idx/(2*N)) <-> cos(PI*(2*n+1)*k/(2*N))
@@ -231,14 +231,14 @@ namespace Torch {
                 int idh = ( ((2*k_h+1)*n_h % (4*H)) + 4*H ) % (4*H);
 
                 // Use the symmetry of the cosine function over half a period
-                if( idh >= 2*H) idh = 4*H - idh;
+                if( idh > 2*H) idh = 4*H - idh;
 
                 // Force the modulus values to be in [0,4*W[ 
                 //   (values returned by operator % might be negative)
                 int idw = ( ((2*k_w+1)*n_w % (4*W)) + 4*W ) % (4*W);
 
                 // Use the symmetry of the cosine function over half a period
-                if( idw >= 2*W) idw = 4*W - idw;
+                if( idw > 2*W) idw = 4*W - idw;
 
                 // Update the coefficient: 
                 // cos(PI*idx/(2*X)) <-> cos(PI*(2*n_x+1)*k_x/(2*N))
@@ -273,14 +273,14 @@ namespace Torch {
                 int idh = ( ((2*n_h+1)*k_h % (4*H)) + 4*H ) % (4*H);
 
                 // Use the symmetry of the cosine function over half a period
-                if( idh >= 2*H) idh = 4*H - idh;
+                if( idh > 2*H) idh = 4*H - idh;
 
                 // Force the modulus values to be in [0,4*W[ 
                 //   (values returned by operator % might be negative)
                 int idw = ( ((2*n_w+1)*k_w % (4*W)) + 4*W ) % (4*W);
 
                 // Use the symmetry of the cosine function over half a period
-                if( idw >= 2*W) idw = 4*W - idw;
+                if( idw > 2*W) idw = 4*W - idw;
 
                 // Update the coefficient: 
                 // cos(PI*idx/(2*X)) <-> cos(PI*(2*n_x+1)*k_x/(2*N))
