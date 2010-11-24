@@ -7,7 +7,6 @@ namespace Torch {
 
 /////////////////////////////////////////////////////////////////////////
 // Constructor
-
 spFCT_oourafft::spFCT_oourafft(bool inverse_)
 	:	spCore()
 {
@@ -17,60 +16,56 @@ spFCT_oourafft::spFCT_oourafft(bool inverse_)
 	addBOption("verbose", false, "verbose");
 }
 
+
 /////////////////////////////////////////////////////////////////////////
 // Destructor
-
 spFCT_oourafft::~spFCT_oourafft()
 {
 	if(R != NULL) delete R;
 }
 
+
 //////////////////////////////////////////////////////////////////////////
 // Check if the input tensor has the right dimensions and type
-
 bool spFCT_oourafft::checkInput(const Tensor& input) const
 {
-	// Accept only tensors of Torch::Float
-	//if (input.getDatatype() != Tensor::Float) return false;
-
 	if (input.nDimension() == 1)
 	{
-	   	//if(inverse) print("spFCT_oourafft::checkInput() inverse FCT_oourafft 1D ...\n");
+	 	//if(inverse) print("spFCT_oourafft::checkInput() inverse FCT_oourafft 
+	 	//  1D ...\n");
 		//else print("spFCT_oourafft::checkInput() FCT_oourafft 1D ...\n");
 
 		int N_ = input.size(0);
-
 		unsigned int nn = nexthigher(N_);
-
-		if(N_ != (int) nn)
-		{
+		if(N_ != (int) nn) {
 			warning("spFCT_oourafft(): size(0) is not a power of 2.");
 			return false;
 		}
 	}
 	else if (input.nDimension() == 2)
 	{
-	   	//if(inverse) print("spFCT_oourafft::checkInput() inverse FCT_oourafft 2D ...\n");
+	 	//if(inverse) print("spFCT_oourafft::checkInput() inverse FCT_oourafft
+	 	//  2D ...\n");
 		//else print("spFCT_oourafft::checkInput() FCT_oourafft 2D ...\n");
 
 		int N_ = input.size(0);
 		unsigned int nn = nexthigher(N_);
-		if(N_ != (int) nn)
-		{
+		if(N_ != (int) nn) {
 			warning("spFCT_oourafft(): size(0) is not a power of 2.");
 			return false;
 		}
+
 		N_ = input.size(1);
 		nn = nexthigher(N_);
-		if(N_ != (int) nn)
-		{
+		if(N_ != (int) nn) {
 			warning("spFCT_oourafft(): size(1) is not a power of 2.");
 			return false;
 		}
 	}
 	else
 	{
-		warning("spFCT_oourafft(): incorrect number of dimensions for the input tensor.");
+		warning("spFCT_oourafft(): incorrect number of dimensions for the input \
+      tensor.");
 		return false;
 	}
 
@@ -78,9 +73,9 @@ bool spFCT_oourafft::checkInput(const Tensor& input) const
 	return true;
 }
 
+
 /////////////////////////////////////////////////////////////////////////
 // Allocate (if needed) the output tensors given the input tensor dimensions
-
 bool spFCT_oourafft::allocateOutput(const Tensor& input)
 {
 	bool verbose = getBOption("verbose");
@@ -93,7 +88,8 @@ bool spFCT_oourafft::allocateOutput(const Tensor& input)
 
 		if (input.nDimension() == 1)
 		{
-			if(verbose) print("spFCT_oourafft::allocateOutput() FCT_oourafft 1D ...\n");
+			if(verbose) print("spFCT_oourafft::allocateOutput() FCT_oourafft \
+        1D ...\n");
 
 			N = input.size(0);
 
@@ -105,7 +101,8 @@ bool spFCT_oourafft::allocateOutput(const Tensor& input)
 		}
 		else if (input.nDimension() == 2)
 		{
-			if(verbose) print("spFCT_oourafft::allocateOutput() FCT_oourafft 2D ...\n");
+			if(verbose) print("spFCT_oourafft::allocateOutput() FCT_oourafft \
+        2D ...\n");
 
 			H = input.size(0);
 			W = input.size(1);
@@ -121,16 +118,15 @@ bool spFCT_oourafft::allocateOutput(const Tensor& input)
 	return true;
 }
 
+
 /////////////////////////////////////////////////////////////////////////
 // Process some input tensor (the input is checked, the outputs are allocated)
-
 bool spFCT_oourafft::processInput(const Tensor& input)
 {
 	if (input.nDimension() == 1)
 	{
 		R->copy(&input);
 
-#ifdef HAVE_OOURAFFT
 		if(inverse)
 		{
 	   	// Declare variables
@@ -148,9 +144,8 @@ bool spFCT_oourafft::processInput(const Tensor& input)
 			// Set ip[0] such that the cos/sine coefficients are computed and
 			// stored in w correctly.
 			ip[0] = 0;
-			// Copy the float tensor in the C array
+			// Copy the float tensor in the C array and save first value
 			for(int i=0; i < N; i++) a[i] = (*R)(i);
-
 			a0 = a[0];
 
       // Compute the inverse FCT_oourafft (second argument set to 1)
@@ -205,25 +200,23 @@ bool spFCT_oourafft::processInput(const Tensor& input)
 			free_1d_int(ip);
 			free_1d_double(w);
 		}
-#endif
 	}
 	else if (input.nDimension() == 2)
 	{
 		R->copy(&input);
 
-#ifdef HAVE_OOURAFFT
 		if(inverse)
 		{
-		   	//
+		  // Allocate C array
 			double **a = alloc_2d_double(H, W);
 
-			//
+			// Copy the FloatTensor in the C array
 			for(int i=0; i < H; i++)
 				for(int j=0; j < W; j++) a[i][j] = (*R)(i,j);
 
 	   	if(W == 8 && H == 8)
 			{
-    				ddct8x8s(1, a);
+ 				ddct8x8s(1, a);
 
 				FloatTensor *F = (FloatTensor *) m_output[0];
 				for(int i=0; i < H; i++)
@@ -231,7 +224,7 @@ bool spFCT_oourafft::processInput(const Tensor& input)
 			}
 			else if(W == 16 && H == 16)
 			{
-    				ddct16x16s(1, a);
+ 				ddct16x16s(1, a);
 
 				FloatTensor *F = (FloatTensor *) m_output[0];
 				for(int i=0; i < H; i++)
@@ -239,43 +232,49 @@ bool spFCT_oourafft::processInput(const Tensor& input)
 			}
 			else
 			{
-			   	//
+		   	// Declare variables 
 				int *ip, n;
 				double *w;
 
-				//
+				// Allocate arrays
 				n = MAX(H, W / 2);
 				ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
 				n = MAX(H, W) * 3 / 2;
 				w = alloc_1d_double(n);
 
-				//
+				// Initialize first value of the working array to zero. Thus,
+				// exponential coefficients will be initialized correctly by oourafft
 				ip[0] = 0;
 
-				for (int i = 0; i <= H - 1; i++) a[i][0] *= 0.5;
-				for (int i = 0; i <= W - 1; i++) a[0][i] *= 0.5;
+				// Rescale C array
+        double sqrt1H = sqrt(1./H); 
+        double sqrt2H = sqrt(2./H); 
+        double sqrt1W = sqrt(1./W);
+        double sqrt2W = sqrt(2./W); 
+				for(int i=0; i < H; ++i)
+					for(int j=0; j < W; ++j) 
+            a[i][j] = a[i][j]*(i==0?sqrt1H:sqrt2H)*(j==0?sqrt1W:sqrt2W);
 
-				//
+        // Compute the 2D inverse DCT
 				ddct2d(H, W, 1, a, NULL, ip, w);
 
-				//
-				double scale = 4.0 / (H * W);
+				// Update the output tensor
 				FloatTensor *F = (FloatTensor *) m_output[0];
 				for(int i=0; i < H; i++)
-					for(int j=0; j < W; j++) (*F)(i,j) = scale * a[i][j];
+					for(int j=0; j < W; j++) (*F)(i,j) = a[i][j];
 
-				//
+				// Free dynamically allocated memory
 				free_1d_int(ip);
 				free_1d_double(w);
 
 			}
 
-			//
+			// Free dynamically allocated memory
 			free_2d_double(a);
 		}
 		else
 		{
-		   	//
+	   	// Allocate C array
 			double **a = alloc_2d_double(H, W);
 
 			//
@@ -284,7 +283,7 @@ bool spFCT_oourafft::processInput(const Tensor& input)
 
 	   	if(W == 8 && H == 8)
 			{
-    				ddct8x8s(-1, a);
+ 				ddct8x8s(-1, a);
 
 				FloatTensor *F = (FloatTensor *) m_output[0];
 				for(int i=0; i < H; i++)
@@ -292,7 +291,7 @@ bool spFCT_oourafft::processInput(const Tensor& input)
 			}
 			else if(W == 16 && H == 16)
 			{
-    				ddct16x16s(-1, a);
+ 				ddct16x16s(-1, a);
 
 				FloatTensor *F = (FloatTensor *) m_output[0];
 				for(int i=0; i < H; i++)
@@ -300,44 +299,47 @@ bool spFCT_oourafft::processInput(const Tensor& input)
 			}
 			else
 			{
-			   	//
+		   	// Declare variables
 				int *ip, n;
 				double *w;
 
-				//
+				// Allocate arrays
 				n = MAX(H, W / 2);
 				ip = alloc_1d_int(2 + (int) sqrt(n + 0.5));
 				n = MAX(H, W) * 3 / 2;
 				w = alloc_1d_double(n);
 
-				//
+				// Initialize first value of the working array to zero. Thus,
+				// exponential coefficients will be initialized correctly by oourafft
 				ip[0] = 0;
 
-				//
+				// Compute the 2D DCT
 				ddct2d(H, W, -1, a, NULL, ip, w);
 
-				//
+				// Update the output tensor
 				FloatTensor *F = (FloatTensor *) m_output[0];
-				for(int i=0; i < H; i++)
-					for(int j=0; j < W; j++) (*F)(i,j) = a[i][j];
+        double sqrt1H = sqrt(1./H); 
+        double sqrt2H = sqrt(2./H); 
+        double sqrt1W = sqrt(1./W);
+        double sqrt2W = sqrt(2./W); 
+				for(int i=0; i < H; ++i)
+					for(int j=0; j < W; ++j) 
+            (*F)(i,j) = a[i][j]*(i==0?sqrt1H:sqrt2H)*(j==0?sqrt1W:sqrt2W);
 
-				//
+				// Free dynamically allocated memory
 				free_1d_int(ip);
 				free_1d_double(w);
-
 			}
 
-			//
+			// Free dynamically allocated memory
 			free_2d_double(a);
 		}
-#endif
 	}
 
 	// OK
 	return true;
 }
 
-/////////////////////////////////////////////////////////////////////////
 
 }
 
