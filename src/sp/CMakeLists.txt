@@ -2,7 +2,7 @@ project(sp)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps dfftpack41 oourafft core) #other torch subprojects
+set(deps dfftpack41 core) #other torch subprojects
 
 # This defines the list of source files inside this package.
 set(src 
@@ -10,13 +10,9 @@ set(src
     "src/spCoreChain.cc"
     "src/spDFT.cc"
     "src/spFFT.cc"
-    "src/spFFT_oourafft.cc"
     "src/spDCT.cc"
     "src/spFCT.cc"
-    "src/spFCT_oourafft.cc"
     "src/spDeltaOne.cc")
-
-add_definitions(-DHAVE_OOURAFFT)
 
 include(../cmake/macros.cmake)
 torch_library(sp "${src}" "${deps}" "")

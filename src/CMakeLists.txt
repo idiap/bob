@@ -68,7 +68,6 @@ include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)
 
 add_subdirectory(python)
 add_subdirectory(dfftpack41)
-add_subdirectory(oourafft)
 add_subdirectory(lbfgs)
 add_subdirectory(core)
 add_subdirectory(sp)
