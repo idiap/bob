@@ -11,6 +11,7 @@
 #include "core/Dataset.h"
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <blitz/array.h>
 
 
 namespace Torch {   
@@ -24,14 +25,21 @@ namespace Torch {
     /**
      * @brief The array XML class for an XML dataset
      */
-    class ArrayXML: public Array { //pure virtual
-      ArrayXML();
+    template <typename T, int dim> class ArrayXML: public Array { //pure virtual
+      public:
+        ArrayXML();
+        ArrayXML(const char* filename);
+        blitz::Array<T,dim>* getData() { return m_data; }
       //
       //load and save blitz::Array dumps, if data contained
       //call loader that knows how to read from file.
       //NULL pointer if no target!
       //Target == contained Array
       //template <typename T> load(const T&);
+      
+      private:
+        blitz::Array<T,dim> *m_data;
+        char *filename;
     };
 
 

@@ -5,7 +5,7 @@
  * @brief A torch abstract representation of a Dataset
  */
 
-#ifndef TORCH5SPRO_CORE_DATASET_H 
+#ifndef TORCH5SPRO_CORE_DATASET_H
 #define TORCH5SPRO_CORE_DATASET_H
 
 
@@ -63,10 +63,14 @@ namespace Torch {
      */
     class Dataset { //pure virtual
       //query/iterate over:
-      //1. "Array"
-      //2. "ArraySet"
-      //3. "TargetSet"
-      virtual bool loadDataset(char *filename) = 0;
+      //1. "Patternset"
+      //2. "Cluster"
+      //3. "Mapping"
+      public:
+        virtual bool loadDataset(char *filename) = 0;
+
+      private:
+        
     };
 
 

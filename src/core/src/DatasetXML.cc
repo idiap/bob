@@ -7,7 +7,8 @@
 
 #include "core/DatasetXML.h"
 
-Torch::core::ArrayXML::ArrayXML() {
+template<typename T, int dim> Torch::core::ArrayXML<T,dim>::ArrayXML():
+  m_data(0) {
 
 }
 
