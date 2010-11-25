@@ -181,15 +181,7 @@ namespace Torch {
 
 }
 
-#if TORCH5SPRO_TENSOR_TYPE == 2
-#include "core/TensorBoostTemplate.h"
-#include "core/TensorBoostTemplate_impl.h"
-#elif TORCH5SPRO_TENSOR_TYPE == 3
-#include "core/TensorBlitzTemplate.h"
-#include "core/TensorBlitzTemplate_impl.h"
-#elif TORCH5SPRO_TENSOR_TYPE == 4
 #include "core/TensorBlitzTemplate2.h"
-#endif
 
 namespace Torch {
   typedef Torch::TensorTemplate<char>    CharTensor;
