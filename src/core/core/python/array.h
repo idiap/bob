@@ -321,6 +321,77 @@ namespace Torch { namespace python {
     }
 
   /**
+   * This methods implement the __getitem__ functionality expected by every
+   * python random access container. Here is their behavior:
+   * 1. Checks if the received index is a valid entry w.r.t. N and the size of
+   * the input array. Here are the possibilities
+   *    a) If index is a single integer, N has to be 1, the index has to be
+   *    smaller than the first array extent. The same is applicable if index is
+   *    a single slice element.
+   *    b) If index is a tuple composed of integers, N == len(index) and every
+   *    index has to be smaller than the extent they refer to. The same is
+   *    applicable if the tuple is composed of a mix of integers and slices.
+   * 2. If the input index refers to a single element of the array, we return
+   * this value as a python object. If the input index refers to a slice, we
+   * return a new array referencing the array in the positions selected.
+   *
+   * Negative indexing is supported, mimmicking normal python random access
+   * containers.
+   */
+
+  /**
+   * We specialize to avoid computing N at run time.
+   *
+   * With N == 1 the input index can be either a single number, an iterable
+   * with a single number, a range or an iterable with a single range
+   */
+
+  //gets from tuple (remember TinyVector == tuple!)
+  template <typename T, int N> T __getitem__(const blitz::Array<T,N>& a,
+      const blitz::TinyVector<int,N>& index) {
+    blitz::TinyVector<int,N> use;
+    for (int i=0; i<N; ++i) {
+      use[i] = (index[i]<0)? index[i] + a.extent(i) : index[i];
+      if (use[i] >= a.extent(i)) {
+        PyErr_SetString(PyExc_IndexError, "array index out of range");
+        boost::python::throw_error_already_set();
+      }
+    }
+    return a(use);
+  }
+  template <typename T, int N> void __setitem__(blitz::Array<T,N>& a,
+      const blitz::TinyVector<int,N>& index, const T& v) {
+    blitz::TinyVector<int,N> use;
+    for (int i=0; i<N; ++i) {
+      use[i] = (index[i]<0)? index[i] + a.extent(i) : index[i];
+      if (use[i] >= a.extent(i)) {
+        PyErr_SetString(PyExc_IndexError, "array index out of range");
+        boost::python::throw_error_already_set();
+      }
+    }
+    a(use) = v;
+  }
+
+  //gets from a integer (1-D special case)
+  template<typename T> T __getitem_1__ (blitz::Array<T,1>& a, int index) 
+  {
+    int use = (index<0)? index + a.extent(0) : index;
+    if (use >= a.extent(0)) {
+      PyErr_SetString(PyExc_IndexError, "array index out of range");
+      boost::python::throw_error_already_set();
+    }
+    return a(use);
+  }
+  template <typename T> void __setitem_1__ (blitz::Array<T,1>& a, int index, const T& v) {
+    int use = (index<0)? index + a.extent(0) : index;
+    if (use >= a.extent(0)) {
+      PyErr_SetString(PyExc_IndexError, "array index out of range");
+      boost::python::throw_error_already_set();
+    }
+    a(use) = v;
+  }
+
+  /**
    * Constructs a new Torch/Blitz array starting from a python sequence. The
    * data from the python object is copied.
    */
@@ -521,16 +592,6 @@ namespace Torch { namespace python {
   template <typename T, int N> void zeroes(blitz::Array<T,N>& i) { i = 0; }
   template <typename T, int N> void ones(blitz::Array<T,N>& i) { i = 1; }
 
-  //Some help with indexing
-  template <typename T, int N> T __getitem__(const blitz::Array<T,N>& a,
-      const blitz::TinyVector<int,N>& index) {
-    return a(index);
-  }
-  template <typename T, int N> void __setitem__(blitz::Array<T,N>& a,
-      const blitz::TinyVector<int,N>& index, const T& v) {
-    a(index) = v;
-  }
-
   /**
    * This struct will declare the several bits that are part of the Torch
    * blitz::Array<T,N> python bindings.
@@ -634,6 +695,10 @@ namespace Torch { namespace python {
       void load_indexers() {
         m_class->def("__getitem__", &__getitem__<T,N>, (boost::python::arg("self"), boost::python::arg("tuple")), "Accesses one element of the array."); 
         m_class->def("__setitem__", &__setitem__<T,N>, (boost::python::arg("self"), boost::python::arg("tuple"), boost::python::arg("value")), "Sets one element of the array."); 
+        if (N == 1) { //loads special case for 1-D arrays
+          m_class->def("__getitem__", &__getitem_1__<T>, (boost::python::arg("self"), boost::python::arg("index")), "Accesses one element of the array."); 
+          m_class->def("__setitem__", &__setitem_1__<T>, (boost::python::arg("self"), boost::python::arg("index"), boost::python::arg("value")), "Sets one element of the array."); 
+        }
       }
 
       /**
