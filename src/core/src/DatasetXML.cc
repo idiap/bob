@@ -2,7 +2,7 @@
  * @file src/core/src/DatasetXML.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
- * @brief Implements the DatasetXML calss.
+ * @brief Implements the DatasetXML class.
  */
 
 #include "core/DatasetXML.h"

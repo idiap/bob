@@ -1,6 +1,6 @@
 
 /**
- * @file src/machine/machine.cc
+ * @file src/machine/python/src/MultiVariateDiagonalGaussianDistribution.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  * @author <a href="mailto:niklas.johansson@idiap.ch">Niklas Johansson</a>
  *

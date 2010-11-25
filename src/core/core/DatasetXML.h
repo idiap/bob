@@ -14,8 +14,16 @@
 
 
 namespace Torch {   
+  /**
+   * \ingroup libcore_api
+   * @{
+   *
+   */
   namespace core {
 
+    /**
+     * @brief The array XML class for an XML dataset
+     */
     class ArrayXML: public Array { //pure virtual
       ArrayXML();
       //
@@ -27,6 +35,9 @@ namespace Torch {
     };
 
 
+    /**
+     * @brief The patternset XML class for an XML dataset
+     */
     class PatternsetXML: public Patternset { //pure virtual
       //
       //query/iterate over:
@@ -34,6 +45,9 @@ namespace Torch {
     };
 
 
+    /**
+     * @brief The cluster XML class for an XML dataset
+     */
     class ClusterXML: public Cluster { //pure virtual
       //
       //query/iterate over:
@@ -41,11 +55,17 @@ namespace Torch {
     };
 
 
+    /**
+     * @brief The mapping XML class for an XML dataset
+     */
     class MappingXML: public Mapping {
 
     };
 
 
+    /**
+     * @brief The main XML dataset class
+     */
     class DatasetXML: public Dataset { //pure virtual
       public:
         DatasetXML();
@@ -62,9 +82,10 @@ namespace Torch {
     };
 
 
-
-
   }
+  /**
+   * @}
+   */
 }
 
 #endif /* TORCH5SPRO_CORE_DATASET_H */

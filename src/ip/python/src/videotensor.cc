@@ -1,8 +1,8 @@
 /**
- * @file src/ip/video.cc
+ * @file src/ip/python/src/videotensor.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
- * @brief Binds the Video framework to python
+ * @brief Binds the VideoTensor Framework to python
  */
 
 #include <boost/python.hpp>

@@ -10,8 +10,16 @@
 
 
 namespace Torch {   
+  /**
+   * \ingroup libcore_api
+   * @{
+   *
+   */
   namespace core {
 
+    /**
+     * @brief The array class for a dataset
+     */
     class Array { //pure virtual
       //
       //load and save blitz::Array dumps, if data contained
@@ -22,6 +30,9 @@ namespace Torch {
     };
 
 
+    /**
+     * @brief The patternset class for a dataset
+     */
     class Patternset { //pure virtual
       //
       //query/iterate over:
@@ -29,18 +40,27 @@ namespace Torch {
     };
 
 
+    /**
+     * @brief The cluster class for a dataset
+     */
     class Cluster { //pure virtual
       //
       //query/iterate over:
       //1. "Array"
     };
 
-
+  
+    /**
+     * @brief The mapping class for a dataset
+     */
     class Mapping {
 
     };
 
 
+    /**
+     * @brief The main dataset class
+     */
     class Dataset { //pure virtual
       //query/iterate over:
       //1. "Array"
@@ -50,9 +70,10 @@ namespace Torch {
     };
 
 
-
-
   }
+  /**
+   * @}
+   */
 }
 
 #endif /* TORCH5SPRO_CORE_DATASET_H */
