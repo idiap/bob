@@ -14,8 +14,6 @@ const char *str_TensorTypeName[] = {"char", "short", "int", "long", "float", "do
 
 }
 
-//#include "TensorWrapper.cc"
-
 void Torch::Tensor::raiseError(std::string msg) const {
   std::cerr << "Error: " << msg << std::endl;
 }
