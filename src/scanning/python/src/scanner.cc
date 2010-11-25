@@ -1,5 +1,5 @@
 /**
- * @file src/scanning/scanner.cc
+ * @file src/scanning/python/src/scanner.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the Scanner to python

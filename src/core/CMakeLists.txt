@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps "") #other torch subprojects
-set(shared "${Boost_SYSTEM_LIBRARY};${Boost_THREAD_LIBRARY};${Boost_FILESYSTEM_LIBRARY};${Boost_IOSTREAMS_LIBRARY};${Boost_DATE_TIME_LIBRARY};${cblas_LIBRARIES}")
+set(shared "${Boost_SYSTEM_LIBRARY};${Boost_THREAD_LIBRARY};${Boost_FILESYSTEM_LIBRARY};${Boost_IOSTREAMS_LIBRARY};${Boost_DATE_TIME_LIBRARY};${cblas_LIBRARIES};${LIBXML2_LIBRARIES}")
 add_definitions(-DUSE_CBLAS)
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
@@ -36,6 +36,7 @@ set(src
     "src/ListDataSet.cc"
     "src/Exception.cc"
     "src/logging.cc"
+    "src/DatasetXML.cc"
     )
 
 include(../cmake/macros.cmake)
