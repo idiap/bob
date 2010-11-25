@@ -309,7 +309,7 @@ void bind_core_array() {
   boost::python::scope().attr("eighthDim") = blitz::eighthDim;
   boost::python::scope().attr("ninthDim") = blitz::ninthDim;
   boost::python::scope().attr("tenthDim") = blitz::tenthDim;
-  boost::python::scope().attr("eleventhDim") = blitz::tenthDim;
+  boost::python::scope().attr("eleventhDim") = blitz::eleventhDim;
 
   //this maps the blitz ordering schemes
   bind_storages(1);
