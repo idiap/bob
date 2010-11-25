@@ -5,6 +5,9 @@
   * @brief Wrapper from Boost::Multi_Array to former Tensor class
   */
 
+#ifndef TORCH5SPRO_CORE_TENSOR_WRAPPER_H
+#define TORCH5SPRO_CORE_TENSOR_WRAPPER_H
+
 #include <cstdlib> //exit function
 #include <string>
 #include <iostream>
@@ -181,7 +184,7 @@ namespace Torch {
 
 }
 
-#include "core/TensorBlitzTemplate2.h"
+#include "core/TensorBlitzTemplate.h"
 
 namespace Torch {
   typedef Torch::TensorTemplate<char>    CharTensor;
@@ -195,3 +198,5 @@ namespace Torch {
 /**
  * @}
  */
+
+#endif /* TORCH5SPRO_CORE_TENSOR_WRAPPER_H */
