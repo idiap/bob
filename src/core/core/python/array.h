@@ -1,5 +1,5 @@
 /**
- * @file python/src/array.hpp
+ * @file src/core/core/python/array.h
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *
  * @brief blitz::Array<> to and from python converters for arrays

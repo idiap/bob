@@ -33,8 +33,12 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_listdataset.py)
   torch_python_add_test(python-gmm-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gmm.py)
-  torch_python_add_test(python-transforms-tests 
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sptransforms.py)
+  torch_python_add_test(python-sp_naive-tests 
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sp_naive.py)
+  torch_python_add_test(python-sp_fftpack-tests 
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sp_fftpack.py)
+  torch_python_add_test(python-sp_oourafft-tests 
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_sp_oourafft.py)
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
 

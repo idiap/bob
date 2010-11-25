@@ -1,5 +1,5 @@
 /**
- * @file src/Exception.cxx
+ * @file src/core/src/Exception.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Implements the Exception class. Makes sure we have at least one

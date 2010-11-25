@@ -1,5 +1,5 @@
 /**
- * @file tensor.cc
+ * @file src/core/test/tensor.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Extensive Tensor tests 
