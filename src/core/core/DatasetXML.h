@@ -8,7 +8,7 @@
 #ifndef TORCH5SPRO_CORE_DATASET_XML_H 
 #define TORCH5SPRO_CORE_DATASET_XML_H
 
-#include "core/Dataset.h"
+#include "core/Dataset2.h"
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <blitz/array.h>
