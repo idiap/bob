@@ -17,6 +17,9 @@ set(src
 include(../cmake/macros.cmake)
 torch_library(sp "${src}" "${deps}" "")
 
+# Defines tests for this package
+torch_test(sp dftdct_naive test/dftdctnaive.cc)
+
 # Python bindings
 set(pysrc
    "python/src/spcore.cc"

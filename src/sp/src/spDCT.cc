@@ -161,6 +161,9 @@ namespace Torch {
         // Update the output tensor
         FloatTensor *F = (FloatTensor *) m_output[0];
         for(int k=0; k < N; ++k) (*F)(k) = static_cast<float>(w[k]);
+
+        // Free dynamically allocated memory
+        delete [] w;
       }
       else
       {
@@ -194,6 +197,9 @@ namespace Torch {
         FloatTensor *F = (FloatTensor *) m_output[0];
         for(int k=0; k < N; ++k) 
           (*F)(k) = static_cast<float>(w[k]*(k==0?sqrt1N:sqrt2N));
+
+        // Free dynamically allocated memory
+        delete [] w;
       }
     }
     else if (input.nDimension() == 2)
@@ -251,6 +257,9 @@ namespace Torch {
         for(int k_h=0; k_h < H; ++k_h)
           for(int k_w=0; k_w < W; ++k_w)
             (*F)(k_h,k_w) = static_cast<float>(w[k_h*W+k_w]);
+
+        // Free dynamically allocated memory
+        delete [] w;
       }
       else
       {
@@ -298,6 +307,9 @@ namespace Torch {
           for(int k_w=0; k_w < W; ++k_w)
             (*F)(k_h,k_w) = static_cast<float>(w[k_h*W+k_w]*
               (k_h==0?sqrt1H:sqrt2H)*(k_w==0?sqrt1W:sqrt2W));
+
+        // Free dynamically allocated memory
+        delete [] w;
       }
     }
 
