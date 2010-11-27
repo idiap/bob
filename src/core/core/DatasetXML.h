@@ -2,7 +2,7 @@
  * @file src/core/core/DatasetXML.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
- * @brief A torch abstract representation of a DatasetXML
+ * @brief A torch representation of a DatasetXML
  */
 
 #ifndef TORCH5SPRO_CORE_DATASET_XML_H 
@@ -25,7 +25,7 @@ namespace Torch {
     /**
      * @brief The array XML class for an XML dataset
      */
-    template <typename T, int dim> class ArrayXML: public Array { //pure virtual
+    template <typename T, int dim> class ArrayXML: public Array {
       public:
         ArrayXML();
         ArrayXML(const char* filename);
@@ -42,11 +42,10 @@ namespace Torch {
         char *filename;
     };
 
-
     /**
-     * @brief The patternset XML class for an XML dataset
+     * @brief The arrayset XML class for an XML dataset
      */
-    class PatternsetXML: public Patternset { //pure virtual
+    class ArraysetXML: public Arrayset {
       //
       //query/iterate over:
       //1. "Array"
@@ -54,27 +53,28 @@ namespace Torch {
 
 
     /**
-     * @brief The cluster XML class for an XML dataset
+     * @brief The relation XML class for an XML dataset
      */
-    class ClusterXML: public Cluster { //pure virtual
-      //
-      //query/iterate over:
-      //1. "Array"
+    class RelationXML: public Relation {
     };
 
+    /**
+     * @brief The rule XML class for an XML dataset
+     */
+    class RuleXML: public Rule {
+    };
 
     /**
-     * @brief The mapping XML class for an XML dataset
+     * @brief The relationset XML class for an XML dataset
      */
-    class MappingXML: public Mapping {
-
+    class RelationsetXML: public Relationset {
     };
 
 
     /**
      * @brief The main XML dataset class
      */
-    class DatasetXML: public Dataset { //pure virtual
+    class DatasetXML: public Dataset {
       public:
         DatasetXML();
         DatasetXML(char *filename);
