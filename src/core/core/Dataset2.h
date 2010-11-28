@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/Dataset.h
+ * @file src/core/core/Dataset2.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief A torch abstract representation of a Dataset
@@ -29,11 +29,10 @@ namespace Torch {
       //template <typename T> load(const T&);
     };
 
-
     /**
-     * @brief The patternset class for a dataset
+     * @brief The arrayset class for a dataset
      */
-    class Patternset { //pure virtual
+    class Arrayset { //pure virtual
       //
       //query/iterate over:
       //1. "Array"
@@ -41,23 +40,24 @@ namespace Torch {
 
 
     /**
-     * @brief The cluster class for a dataset
+     * @brief The relation class for a dataset
      */
-    class Cluster { //pure virtual
-      //
-      //query/iterate over:
-      //1. "Array"
+    class Relation { //pure virtual
+    };
+
+    /**
+     * @brief The rule class for a dataset
+     */
+    class Rule { //pure virtual
+    };
+
+    /**
+     * @brief The relationset class for a dataset
+     */
+    class Relationset { //pure virtual
     };
 
   
-    /**
-     * @brief The mapping class for a dataset
-     */
-    class Mapping {
-
-    };
-
-
     /**
      * @brief The main dataset class
      */
