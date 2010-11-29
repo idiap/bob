@@ -271,6 +271,9 @@ namespace Torch { namespace python {
       }
 
       if (copy) {
+        //TODO: Allow any numpy type to be cast into T. You will have to
+        //iterate and cast each value individually in this case. Problem: how
+        //to iterate on a numeric::array from boost::python?
         return boost::shared_ptr<blitz::Array<T,N> >(new blitz::Array<T,N>((T*)PyArray_DATA(a.ptr()), shape, strides, blitz::duplicateData));
       }
 
@@ -346,50 +349,41 @@ namespace Torch { namespace python {
    * with a single number, a range or an iterable with a single range
    */
 
+  /**
+   * This method will check the array limits in one dimension and will raise an
+   * error if appropriate. It returns the C++ index expected for the
+   * blitz::Array<> operation in case of no problems. Fortran-style arrays are
+   * also taken into account.
+   */
+  int check_array_limits(int index, int base, int extent);
+
   //gets from tuple (remember TinyVector == tuple!)
   template <typename T, int N> T __getitem__(const blitz::Array<T,N>& a,
       const blitz::TinyVector<int,N>& index) {
     blitz::TinyVector<int,N> use;
-    for (int i=0; i<N; ++i) {
-      use[i] = (index[i]<0)? index[i] + a.extent(i) : index[i];
-      if (use[i] >= a.extent(i)) {
-        PyErr_SetString(PyExc_IndexError, "array index out of range");
-        boost::python::throw_error_already_set();
-      }
-    }
+    for (int i=0; i<N; ++i)
+      use[i] = check_array_limits(index[i], a.base(i), a.extent(i)); 
     return a(use);
   }
   template <typename T, int N> void __setitem__(blitz::Array<T,N>& a,
       const blitz::TinyVector<int,N>& index, const T& v) {
     blitz::TinyVector<int,N> use;
-    for (int i=0; i<N; ++i) {
-      use[i] = (index[i]<0)? index[i] + a.extent(i) : index[i];
-      if (use[i] >= a.extent(i)) {
-        PyErr_SetString(PyExc_IndexError, "array index out of range");
-        boost::python::throw_error_already_set();
-      }
-    }
+    for (int i=0; i<N; ++i) 
+      use[i] = check_array_limits(index[i], a.base(i), a.extent(i)); 
     a(use) = v;
   }
 
   //gets from a integer (1-D special case)
-  template<typename T> T __getitem_1__ (blitz::Array<T,1>& a, int index) 
-  {
-    int use = (index<0)? index + a.extent(0) : index;
-    if (use >= a.extent(0)) {
-      PyErr_SetString(PyExc_IndexError, "array index out of range");
-      boost::python::throw_error_already_set();
-    }
-    return a(use);
+  template<typename T> inline T __getitem_1__ (blitz::Array<T,1>& a,
+      int index) { 
+    return a(check_array_limits(index, a.base(0), a.extent(0))); 
   }
-  template <typename T> void __setitem_1__ (blitz::Array<T,1>& a, int index, const T& v) {
-    int use = (index<0)? index + a.extent(0) : index;
-    if (use >= a.extent(0)) {
-      PyErr_SetString(PyExc_IndexError, "array index out of range");
-      boost::python::throw_error_already_set();
-    }
-    a(use) = v;
+  template <typename T> inline void __setitem_1__ (blitz::Array<T,1>& a,
+      int index, const T& v) {
+    a(check_array_limits(index, a.base(0), a.extent(0))) = v; 
   }
+
+  //gets a slice from
 
   /**
    * Constructs a new Torch/Blitz array starting from a python sequence. The
@@ -548,7 +542,6 @@ namespace Torch { namespace python {
   template <typename T, int N> blitz::Array<T,N> rint(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::rint(i)); }
   template <typename T, int N> blitz::Array<T,N> y0(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::y0(i)); }
   template <typename T, int N> blitz::Array<T,N> y1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::y1(i)); }
-
 
   //operate on floats
   template <typename T, int N> blitz::Array<T,N> ceil(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
@@ -766,7 +759,7 @@ namespace Torch { namespace python {
         m_class->def("size", &array_type::size, "Total number of elements in this array");
         m_class->def("base", (const shape_type& (array_type::*)() const)(&array_type::base), boost::python::return_value_policy<boost::python::return_by_value>(), "The base of a dimension is the first valid index value. A typical C-style array will have base of zero; a Fortran-style array will have base of one. The base can be different for each dimension, but only if you deliberately use a Range-argument constructor or design a custom storage ordering.");
         m_class->def("base", (int (array_type::*)(int) const)(&array_type::base), "The base of a dimension is the first valid index value. A typical C-style array will have base of zero; a Fortran-style array will have base of one. The base can be different for each dimension, but only if you deliberately use a Range-argument constructor or design a custom storage ordering.");
-        m_class->def("isMajorRank", &array_type::isMajorRank, boost::python::arg("dimension"), "Returns true if the dimension has the largest stride. For C-style arrays (the default), the first dimension always has the largest stride. For Fortran-style arrays, the last dimension has the largest stride.");
+        m_class->def("isMajorRank", &array_type::isMajorRank, boost::python::arg("dimension"), "Returns true if the dimension has the largest stride. For C-style arrays, the first dimension always has the largest stride. For Fortran-style arrays, the last dimension has the largest stride.");
         m_class->def("isMinorRank", &array_type::isMinorRank, boost::python::arg("dimension"), "Returns true if the dimension does not have the largest stride. See also isMajorRank().");
         m_class->def("isStorageContiguous", &array_type::isStorageContiguous, "Returns true if the array data is stored contiguously in memory. If you slice the array or work on subarrays, there can be skips -- the array data is interspersed with other data not part of the array. See also the various data..() functions. If you need to ensure that the storage is contiguous, try reference(copy()).");
         m_class->def("numElements", &array_type::numElements, "The same as size()");
