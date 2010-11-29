@@ -2,7 +2,7 @@
  * @file src/core/python/src/profile.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
- * @brief Binds the Tensor object type into python 
+ * @brief Binds the Google profiler into python 
  */
 
 #include <boost/python.hpp>

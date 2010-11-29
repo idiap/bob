@@ -31,7 +31,8 @@ void test_dct1D(const int N, const Torch::FloatTensor& t, const float mat[],
   BOOST_REQUIRE_EQUAL(dct->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  Torch::FloatTensor &dt = ((Torch::FloatTensor&)dct->getOutput(0));
+  const Torch::FloatTensor &dt = 
+    ((const Torch::FloatTensor&)dct->getOutput(0));
 
   for(int i=0; i < N; ++i)
     BOOST_CHECK_SMALL(dt.get(i)-mat[i], eps);
@@ -42,7 +43,8 @@ void test_dct1D(const int N, const Torch::FloatTensor& t, const float mat[],
   BOOST_REQUIRE_EQUAL(idct->getNOutputs(), 1);
 
   // get answer and compare to original
-  Torch::FloatTensor &idt = ((Torch::FloatTensor&)idct->getOutput(0));
+  const Torch::FloatTensor &idt = 
+    ((const Torch::FloatTensor&)idct->getOutput(0));
   for(int i=0; i < N; ++i)
     BOOST_CHECK_SMALL(idt.get(i)-t.get(i), eps);
 
@@ -60,7 +62,8 @@ void test_dct2D(const int M, const int N, const Torch::FloatTensor& t,
   BOOST_REQUIRE_EQUAL(dct->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  Torch::FloatTensor &dt = ((Torch::FloatTensor&)dct->getOutput(0));
+  const Torch::FloatTensor &dt = 
+    ((const Torch::FloatTensor&)dct->getOutput(0));
 
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
@@ -72,7 +75,8 @@ void test_dct2D(const int M, const int N, const Torch::FloatTensor& t,
   BOOST_REQUIRE_EQUAL(idct->getNOutputs(), 1);
 
   // get answer and compare to original
-  Torch::FloatTensor &idt = ((Torch::FloatTensor&)idct->getOutput(0));
+  const Torch::FloatTensor &idt = 
+    ((const Torch::FloatTensor&)idct->getOutput(0));
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
       BOOST_CHECK_SMALL(idt.get(i,j)-t.get(i,j), eps);
@@ -90,7 +94,8 @@ void test_dft1D(const int N, const Torch::FloatTensor& t, const float mat[],
   BOOST_REQUIRE_EQUAL(dft->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  Torch::FloatTensor &dt = ((Torch::FloatTensor&)dft->getOutput(0));
+  const Torch::FloatTensor &dt = 
+    ((const Torch::FloatTensor&)dft->getOutput(0));
 
   for(int i=0; i < N; ++i)
     for(int j=0; j < 2; ++j)
@@ -102,7 +107,8 @@ void test_dft1D(const int N, const Torch::FloatTensor& t, const float mat[],
   BOOST_REQUIRE_EQUAL(idft->getNOutputs(), 1);
 
   // get answer and compare to original
-  Torch::FloatTensor &idt = ((Torch::FloatTensor&)idft->getOutput(0));
+  const Torch::FloatTensor &idt = 
+    ((const Torch::FloatTensor&)idft->getOutput(0));
   for(int i=0; i < N; ++i)
     BOOST_CHECK_SMALL(idt.get(i)-t.get(i), eps);
 
@@ -119,7 +125,8 @@ void test_dft2D(const int M, const int N, const Torch::FloatTensor& t,
   BOOST_REQUIRE_EQUAL(dft->getNOutputs(), 1);
 
   // get answer and compare to matlabs dct
-  Torch::FloatTensor &dt = ((Torch::FloatTensor&)dft->getOutput(0));
+  const Torch::FloatTensor &dt = 
+    ((const Torch::FloatTensor&)dft->getOutput(0));
 
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
@@ -132,7 +139,8 @@ void test_dft2D(const int M, const int N, const Torch::FloatTensor& t,
   BOOST_REQUIRE_EQUAL(idft->getNOutputs(), 1);
 
   // get answer and compare to original
-  Torch::FloatTensor &idt = ((Torch::FloatTensor&)idft->getOutput(0));
+  const Torch::FloatTensor &idt = 
+    ((const Torch::FloatTensor&)idft->getOutput(0));
   for(int i=0; i < M; ++i)
     for(int j=0; j < N; ++j)
       BOOST_CHECK_SMALL(idt.get(i,j)-t.get(i,j), eps);
