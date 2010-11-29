@@ -1,5 +1,5 @@
 /**
- * @file src/exception.cc
+ * @file src/core/python/src/exception.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the core extension into Python. Please note that, for each
