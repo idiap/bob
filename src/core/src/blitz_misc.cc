@@ -70,7 +70,7 @@ ostream& operator<<(ostream& os, const Array<uint8_t,2>& x)
 /**
  * @brief specialization of operator << for uint8_t in 3D
  */
-template<>
+template <>
 ostream& operator<<(ostream& os, const Array<uint8_t,3>& x)
 {
   return out3D_template<uint8_t,uint16_t>(os,x);

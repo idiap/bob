@@ -16,7 +16,7 @@
 BZ_NAMESPACE(blitz)
 
 /**
- * @brief local function for outputting a 1D int8/uint8 Blitz++ array,
+ * @brief Local function for outputting a 1D int8/uint8 Blitz++ array,
  * by converting it to a printable type (int16/uint16)
  */
 template <typename Tsrc, typename Tdst>
@@ -35,7 +35,7 @@ ostream& out1D_template(ostream& os, const Array<Tsrc,1>& x)
 }
 
 /**
- * @brief local function for outputting a 2D int8/uint8 Blitz++ array,
+ * @brief Local function for outputting a 2D int8/uint8 Blitz++ array,
  * by converting it to a printable type (int16/uint16)
  */
 template <typename Tsrc, typename Tdst>
@@ -62,7 +62,7 @@ ostream& out2D_template(ostream& os, const Array<Tsrc,2>& x)
 }
 
 /**
- * @brief local function for outputting a 3D int8/uint8 Blitz++ array,
+ * @brief Local function for outputting a 3D int8/uint8 Blitz++ array,
  * by converting it to a printable type (int16/uint16)
  */
 template <typename Tsrc, typename Tdst>
@@ -95,7 +95,7 @@ ostream& out3D_template(ostream& os, const Array<Tsrc,3>& x)
 }
 
 /**
- * @brief local function for outputting a 4D int8/uint8 Blitz++ array,
+ * @brief Local function for outputting a 4D int8/uint8 Blitz++ array,
  * by converting it to a printable type (int16/uint16)
  */
 template <typename Tsrc, typename Tdst>
@@ -133,121 +133,69 @@ ostream& out4D_template(ostream& os, const Array<Tsrc,4>& x)
 
 
 /**
- * @brief specialization of operator << for the 3D case
+ * @brief Specialization of operator << for the 3D case
  */
 template<typename T_numtype>
 ostream& operator<<(ostream& os, const Array<T_numtype,3>& x)
 {
   return out3D_template<T_numtype,T_numtype>(os,x);
-/*  int N_rank = 3;
-  for (int i=0; i < N_rank; ++i) {
-    os << x.extent(i);
-    if (i != N_rank - 1)
-      os << " x ";
-  }
-
-  os << endl << "[ ";
-  for (int i=x.lbound(firstRank); i <= x.ubound(firstRank); ++i) {
-    for (int j=x.lbound(secondRank); j <= x.ubound(secondRank); ++j) {
-      for (int k=x.lbound(thirdRank); k <= x.ubound(thirdRank); ++k) {
-        os << setw(9) << x(i,j,k) << " ";
-        if (!((k+1-x.lbound(thirdRank)) % 7))
-          os << endl << "  ";
-      }
-      if (j != x.ubound(secondRank))
-        os << endl << "  ";
-    }
-    if (i != x.ubound(firstRank))
-      os << endl << "  ";
-  }
-  os << endl << "]" << endl;
-
-  return os;*/
 }
 
 /**
- * @brief specialization of operator << for the 4D case
+ * @brief Specialization of operator << for the 4D case
  */
 template<typename T_numtype>
 ostream& operator<<(ostream& os, const Array<T_numtype,4>& x)
 {
   return out4D_template<T_numtype,T_numtype>(os,x);
-/*  int N_rank = 4;
-  for (int i=0; i < N_rank; ++i) {
-    os << x.extent(i);
-    if (i != N_rank - 1)
-      os << " x ";
-  }
-
-  os << endl << "[ ";
-  for (int i=x.lbound(firstRank); i <= x.ubound(firstRank); ++i) {
-    for (int j=x.lbound(secondRank); j <= x.ubound(secondRank); ++j) {
-      for (int k=x.lbound(thirdRank); k <= x.ubound(thirdRank); ++k) {
-        for (int l=x.lbound(fourthRank); l <= x.ubound(fourthRank); ++l) {
-          os << setw(9) << x(i,j,k,l) << " ";
-          if (!((l+1-x.lbound(fourthRank)) % 7))
-            os << endl << "  ";
-        }
-        if (k != x.ubound(thirdRank))
-          os << endl << "  ";
-      }
-      if (j != x.ubound(secondRank))
-        os << endl << "  ";
-    }
-    if (i != x.ubound(firstRank))
-      os << endl << "  ";
-  }
-  os << endl << "]" << endl;
-
-  return os;*/
 }
 
 
 
 /** 
- * @brief specialization of operator << for int8_t in 1D
+ * @brief Specialization of operator << for int8_t in 1D
  */
 template <>
 ostream& operator<<(ostream& os, const Array<int8_t,1>& x);
 
 /** 
- * @brief specialization of operator << for int8_t in 2D
+ * @brief Specialization of operator << for int8_t in 2D
  */
 template <>
 ostream& operator<<(ostream& os, const Array<int8_t,2>& x);
 
 /**
- * @brief specialization of operator << for int8_t in 3D
+ * @brief Specialization of operator << for int8_t in 3D
  */
 template <>
 ostream& operator<<(ostream& os, const Array<int8_t,3>& x);
 
 /**
- * @brief specialization of operator << for int8_t in 4D
+ * @brief Specialization of operator << for int8_t in 4D
  */
 template <>
 ostream& operator<<(ostream& os, const Array<int8_t,4>& x);
 
 /** 
- * @brief specialization of operator << for uint8_t in 1D
+ * @brief Specialization of operator << for uint8_t in 1D
  */
 template <>
 ostream& operator<<(ostream& os, const Array<uint8_t,1>& x);
 
 /** 
- * @brief specialization of operator << for uint8_t in 2D
+ * @brief Specialization of operator << for uint8_t in 2D
  */
 template <>
 ostream& operator<<(ostream& os, const Array<uint8_t,2>& x);
 
 /**
- * @brief specialization of operator << for uint8_t in 3D
+ * @brief Specialization of operator << for uint8_t in 3D
  */
 template<>
 ostream& operator<<(ostream& os, const Array<uint8_t,3>& x);
 
 /**
- * @brief specialization of operator << for uint8_t in 4D
+ * @brief Specialization of operator << for uint8_t in 4D
  */
 template <>
 ostream& operator<<(ostream& os, const Array<uint8_t,4>& x);
@@ -256,7 +204,7 @@ ostream& operator<<(ostream& os, const Array<uint8_t,4>& x);
 
 
 /**
- * @brief local function for reading a 4D int8/uint8 Blitz++ array,
+ * @brief Local function for reading a int8/uint8 Blitz++ array,
  * by converting the saved printable type (int16/uint16)
  */
 template<typename Tsrc, typename Tdst, int N_rank>
@@ -309,7 +257,7 @@ istream& in_template(istream& is, Array<Tdst,N_rank>& x)
 
 
 /**
- * @brief specialization of operator >> for the int8_t case
+ * @brief Specialization of operator >> for the int8_t case
  */
 template<int N_rank>
 istream& operator>>(istream& is, Array<int8_t,N_rank>& x)
@@ -318,7 +266,7 @@ istream& operator>>(istream& is, Array<int8_t,N_rank>& x)
 }
   
 /**
- * @brief specialization of operator >> for the uint8_t case
+ * @brief Specialization of operator >> for the uint8_t case
  */
 template<int N_rank>
 istream& operator>>(istream& is, Array<uint8_t,N_rank>& x)
