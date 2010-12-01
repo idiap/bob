@@ -260,6 +260,21 @@ PyObject* Torch::python::create_numpy_array(int N, npy_intp* dimensions,
   return PyArray_SimpleNew(N, dimensions, tp);
 }
 
+int Torch::python::check_array_limits(int index, int base, int extent) {
+  const int limit = base + extent;
+  index = (index<0)? index + limit : index;
+  //checks final range
+  if (index < base) {
+    PyErr_SetString(PyExc_IndexError, "(fortran) array index out of range");
+    boost::python::throw_error_already_set();
+  }
+  if (index >= limit) {
+    PyErr_SetString(PyExc_IndexError, "array index out of range");
+    boost::python::throw_error_already_set();
+  }
+  return index;
+}
+
 #define bind_storages(N) bind_c_storage<N>(); bind_fortran_storage<N>();
 
 void bind_core_array() {

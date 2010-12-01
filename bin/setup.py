@@ -211,7 +211,7 @@ def generate_environment(options):
   all['PYTHONPATH'] = pythonpath
 
   uname = os.uname()
-  if options.arch.split('-')[0] == 'darwin': # we are under OSX
+  if options.arch.split('-')[0] == 'macosx': # we are under OSX
     dyld_library_path = os.environ.get('DYLD_LIBRARY_PATH', '')
     dyld_library_path = path_remove_if_startswith(dyld_library_path, base_dir)
     dyld_library_path = path_add(dyld_library_path, libdir)
