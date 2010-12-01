@@ -2,7 +2,7 @@
  * @file blitzAdapter.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief Test the blitz adapter 
+ * @brief Test the blitz adapter and blitz additions 
  */
 
 #define BOOST_TEST_DYN_LINK
@@ -10,27 +10,37 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
+#include "core/logging.h" // for "core/blitz_misc.h"
 #include "core/Tensor.h"
 #include "core/BlitzAdapter.h"
 #include <iostream>
-#include <fstream>
+#include <sstream>
 
 
 struct T {
   typedef blitz::Array<double,2> BAd2;
   typedef blitz::Array<int,3> BAi3;
   typedef blitz::Array<double,3> BAd3;
+  typedef blitz::Array<int8_t,2> BAi8_2;
+  typedef blitz::Array<uint8_t,2> BAui8_2;
   BAd2 bl1, bl2;
   BAi3 bl3, bl4;
   BAd3 bl5;
+  BAi8_2 bl6, bl7;
+  BAui8_2 bl8, bl9;
+  
 
-  T(): bl1(3,5), bl3(2,2,2) {
+  T(): bl1(3,5), bl3(2,2,2), bl6(2,3), bl8(3,2) {
     bl1 = 1.1, 0, 0, 1, 5,  
           1.3, 2, 3, 4, 5,  
           6.5, 7, 8, 9, 10;
     
     bl3 = 5, 4,   6, 7,
           11, -6, 37, 54;
+
+    bl6 = 0, 1, 2, 3, 4, 5;
+
+    bl8 = -2, -1, 0, 0, 1, 2;
   }
 
   ~T() {}
@@ -65,32 +75,53 @@ BOOST_AUTO_TEST_CASE( test_write_read )
 {
   // 1/ 2D double array
   // Save
-  std::ofstream out_d("test_adapter_BAd2.blitz");
+  std::stringstream stream_d;
   Torch::core::BlitzAdapter<BAd2> X(bl1);
-  out_d << X;
-  out_d.close();
+  stream_d << X;
   // Load
-  std::ifstream in_d("test_adapter_BAd2.blitz");
   Torch::core::BlitzAdapter<BAd2> Y(bl2);
-  in_d >> Y;
-  in_d.close();
+  stream_d >> Y;
   // Compare
   check_equal2d( bl1, bl2);
 
   // 2/ 3D int array
   // Save
-  std::ofstream out_i("test_adapter_BAi3.blitz");
+  std::stringstream stream_i;
   Torch::core::BlitzAdapter<BAi3> Z(bl3);
-  out_i << Z;
-  out_i.close();
+  stream_i << Z;
   // Load
-  std::ifstream in_i("test_adapter_BAi3.blitz");
   Torch::core::BlitzAdapter<BAi3> T(bl4);
-  in_i >> T;
-  in_i.close();
+  stream_i >> T;
   // Compare
   check_equal3d( bl3, bl4);
+}
 
+
+//this will save, load and compare two blitz arrays
+//of type int8_t and uint8_t
+BOOST_AUTO_TEST_CASE( test_write_read_int8_uint8 )
+{
+  // 2D/ int8_t array
+  // Save
+  std::stringstream stream_i;
+  Torch::core::BlitzAdapter<BAi8_2> A(bl6);
+  stream_i << A;
+  // Load
+  Torch::core::BlitzAdapter<BAi8_2> B(bl7);
+  stream_i >> B;
+  // Compare
+  check_equal2d( bl6, bl7);
+
+  // 2D/ uint8_t array
+  // Save
+  std::stringstream stream_u;
+  Torch::core::BlitzAdapter<BAui8_2> C(bl8);
+  stream_u << C;
+  // Load
+  Torch::core::BlitzAdapter<BAui8_2> D(bl9);
+  stream_u >> D;
+  // Compare
+  check_equal2d( bl8, bl9);
 }
 
 //this will save, read a converted blitz array and compare it to the original
@@ -98,15 +129,12 @@ BOOST_AUTO_TEST_CASE( test_write_convertread )
 {
   // 1/ 3D array: Load an int array into a double array
   // Save
-  std::ofstream out_i("test_adapter_BAi3.blitz");
+  std::stringstream stream_i;
   Torch::core::BlitzAdapter<BAi3> X(bl3);
-  out_i << X;
-  out_i.close();
+  stream_i << X;
   // Load
-  std::ifstream in_d("test_adapter_BAi3.blitz");
   Torch::core::BlitzAdapter<BAd3> Y(bl5, false);
-  in_d >> Y;
-  in_d.close();
+  stream_i >> Y;
   // Compare
   check_equal3d( bl3, bl5);
 }
