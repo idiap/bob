@@ -37,6 +37,7 @@ set(src
     "src/Exception.cc"
     "src/logging.cc"
     "src/DatasetXML.cc"
+    "src/blitz_misc.cc"
     )
 
 include(../cmake/macros.cmake)
