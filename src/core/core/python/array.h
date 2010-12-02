@@ -1,5 +1,4 @@
 /**
- * @file src/core/core/python/array.h
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *
  * @brief blitz::Array<> to and from python converters for arrays
@@ -9,21 +8,16 @@
 #define TORCH_CORE_PYTHON_ARRAY
 
 #include <boost/python.hpp>
-#include <boost/python/numeric.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 #include <blitz/array.h>
 #include <string>
-#include <map>
-#include <stdexcept>
 #include <stdint.h>
 #include <sstream>
 
-extern "C" {
-  #include <numpy/arrayobject.h>
-}
-
 #include "core/logging.h"
+#include "core/python/ndarray.h"
+#include "core/python/TypeMapper.h"
 
 //some blitz extras for signed and unsigned 8 and 16-bit integers
 namespace blitz {
@@ -91,237 +85,16 @@ namespace blitz {
 
 namespace Torch { namespace python {
 
-  /**
-   * This map allows me to convert from the C type code (enum) into the python 
-   * type code (single char) or type name (string) and vice-versa. We
-   * instantiate a static variable of this type and use it throughout the code.
-   */
-  struct TypeMapper { 
-
-    public:
-      /**
-       * Constructor
-       */
-      TypeMapper();
-
-      /** 
-       * Conversion from Numpy C enum to Numpy single character typecode
-       */
-      const std::string& enum_to_code(NPY_TYPES t) const;
-
-      /**
-       * Conversion from Numpy C enum to string description
-       */
-      const std::string& enum_to_name(NPY_TYPES t) const; 
-
-      /**
-       * Conversion from Numpy C enum to blitz::Array<T,N>::T typename
-       */
-      const std::string& enum_to_blitzT(NPY_TYPES t) const; 
-
-      /**
-       * Converts from Numpy C enum to the size of the scalar
-       */
-      size_t enum_to_scalar_size(NPY_TYPES t) const;
-
-      /**
-       * Converts from Numpy C enum to the base type of the scalar
-       */
-      char enum_to_scalar_base(NPY_TYPES t) const;
-
-      /**
-       * Conversion from C++ type to Numpy C enum
-       */
-      template <typename T> NPY_TYPES type_to_enum(void) const 
-      { return NPY_NOTYPE; }
-
-      /**
-       * Conversion from C++ type to Numpy typecode
-       */
-      template <typename T> const std::string& type_to_typecode(void) const 
-      { return enum_to_code(type_to_enum<T>()); }
-
-      /**
-       * Conversion from C++ type to Numpy typename
-       */
-      template <typename T> const std::string& type_to_typename(void) const 
-      { return enum_to_name(type_to_enum<T>()); }
-
-      /**
-       * Tells if two types are equivalent in size for the current platform
-       */
-      bool are_equivalent(NPY_TYPES i1, NPY_TYPES i2) const;
-
-    private:
-      std::string bind(const char* base, int size) const;
-      std::string bind_typename(const char* base, const char* type, int size) const;
-      const std::string& get(const std::map<NPY_TYPES, std::string>& dict,
-          NPY_TYPES t) const;
-
-      template <typename T> const typename T::mapped_type& get_raise
-        (const T& dict, NPY_TYPES t) const {
-          typename T::const_iterator it = dict.find(t); 
-          if (it == dict.end()) {
-            boost::format f("value not listed in internal mapper (%s - %s)");
-            f % this->get(this->m_c_to_typecode, t);
-            f % this->get(this->m_c_to_typename, t);
-            PyErr_SetString(PyExc_ValueError, f.str().c_str()); 
-            throw boost::python::error_already_set(); 
-          }
-          return it->second;
-        }
-
-    private:
-      std::map<NPY_TYPES, std::string> m_c_to_typecode;
-      std::map<NPY_TYPES, std::string> m_c_to_typename;
-      std::map<NPY_TYPES, std::string> m_c_to_blitz;
-      std::map<NPY_TYPES, size_t> m_scalar_size;
-      std::map<NPY_TYPES, char> m_scalar_base;
-  }; 
-
-  template <> NPY_TYPES TypeMapper::type_to_enum<bool>(void) const; 
-  template <> NPY_TYPES TypeMapper::type_to_enum<signed char>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<unsigned char>(void) const; 
-  template <> NPY_TYPES TypeMapper::type_to_enum<short>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<unsigned short>(void) const; 
-  template <> NPY_TYPES TypeMapper::type_to_enum<int>(void) const; 
-  template <> NPY_TYPES TypeMapper::type_to_enum<unsigned int>(void) const; 
-  template <> NPY_TYPES TypeMapper::type_to_enum<long>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<unsigned long>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<long long>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<unsigned long long>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<float>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<double>(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<long double>(void) const; 
-  template <> NPY_TYPES TypeMapper::type_to_enum<std::complex<float> >(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<std::complex<double> >(void) const;
-  template <> NPY_TYPES TypeMapper::type_to_enum<std::complex<long double> >(void) const; 
-
-  extern struct TypeMapper TYPEMAP;
-
-  /**
-   * Returns the C Numpy enum type of the given array
-   */
-  NPY_TYPES type(boost::python::numeric::array a);
-
-  /**
-   * Returns the expected python blitz::Array<T,N> typename for a given numeric
-   * array. Please note this is mostly trivial, except for integers where these
-   * may be confused:
-   * int => normally size 4 (32-bits) across architectures (32 or 64 bits)
-   * long => size 4 in 32-bit archs, size 8 in 64-bit archs
-   * long long => size 8 across architectures (32 or 64 bits)
-   */
-  std::string equivalent_scalar(boost::python::numeric::array a);
-
-  /**
-   * Checks the array type and raises a TypeError if that does not conform.
-   * Please read the comments for "equivalent_scalar()" above concerning
-   * exceptional cases we need to treat in this method.
-   */
-  template <typename T> void check_type (boost::python::numeric::array a) {
-    if (!TYPEMAP.are_equivalent(type(a), TYPEMAP.type_to_enum<T>())) {
-      boost::format err("expected array of type \"%s\", but got \"%s\"");
-      err % TYPEMAP.type_to_typename<T>() % TYPEMAP.enum_to_name(type(a));
-      PyErr_SetString(PyExc_TypeError, err.str().c_str());
-      boost::python::throw_error_already_set();
-    }
+  template <typename T, int N>
+  boost::python::ndarray make_ndarray(const blitz::Array<T,N>& bzarray) {
+    boost::python::ndarray npy(bzarray);
+    return npy;
   }
 
-  /**
-   * Returns the number of dimensions for the given array
-   */
-  size_t rank(boost::python::numeric::array a);
-  
-  /**
-   * Checks if the input array has an expected rank.
-   */
-  void check_rank(boost::python::numeric::array a, size_t expected_rank);
-
-  /**
-   * Checks if the given object is an array.
-   */
-  void check_is_array(boost::python::object o);
-
-  /**
-   * Returns a clone of this array, enforcing a new type.
-   */
-  boost::python::numeric::array astype(boost::python::numeric::array a, const::std::string& t);
-
-  /**
-   * Converts a Numpy array to a blitz one, using a reference to the original 
-   * numpy array data. The last flag "copy" will make this function perform a
-   * copy instead of just pointing to the numpy array data from the blitz array.
-   */
-  template<typename T, int N> boost::shared_ptr<blitz::Array<T,N> >
-    numpy_to_blitz (boost::python::numeric::array a, bool copy) {
-
-      //checks rank (i.e., number of dimensions)
-      check_rank(a, N);
-
-      //checks type
-      check_type<T>(a);
-
-      const int T_size = sizeof(T);
-      blitz::TinyVector<int,N> shape(0);
-      blitz::TinyVector<int,N> strides(0);
-      for (int i=0;i<N;++i) {
-        shape[i] = PyArray_DIM(a.ptr(), i);
-        strides[i] = PyArray_STRIDE(a.ptr(), i) / T_size;
-      }
-
-      if (copy) {
-        //TODO: Allow any numpy type to be cast into T. You will have to
-        //iterate and cast each value individually in this case. Problem: how
-        //to iterate on a numeric::array from boost::python?
-        return boost::shared_ptr<blitz::Array<T,N> >(new blitz::Array<T,N>((T*)PyArray_DATA(a.ptr()), shape, strides, blitz::duplicateData));
-      }
-
-      //please note this will not copy the data, just transfer the memory
-      //ownership to the returned value.
-      return boost::shared_ptr<blitz::Array<T,N> >(new blitz::Array<T,N>((T*)PyArray_DATA(a.ptr()), shape, strides, blitz::neverDeleteData));
-    }
-
-  /**
-   * A shortcut to make the overloading easier to solve for Boost::Python.
-   */
-  template<typename T, int N> boost::shared_ptr<blitz::Array<T,N> >
-    numpy_to_blitz_copy (boost::python::numeric::array a)
-    { return numpy_to_blitz<T,N>(a, true); }
-
-  /**
-   * This shortcut will build a new numpy array with a number of dimensions.
-   *
-   * @param ndim The number of dimensions the new array will have
-   * @param dimensions This is a npy_intp array with as many positions as
-   * dimensions, indicating the extent of the array.
-   * @param tp This is the NumPy type for every element in the array.
-   */
-  PyObject* create_numpy_array(int ndim, npy_intp* dimensions, NPY_TYPES tp);
-
-  /**
-   * Converts a blitz array to a Numpy one, in a single copy. 
-   */
-  template<typename T, int N>
-    boost::python::numeric::array blitz_to_numpy_copy(const blitz::Array<T,N>& b) {
-      if (b.base(0) != 0) {
-        PyErr_SetString(PyExc_RuntimeError, "expected array in row-major format (C-style)");
-        boost::python::throw_error_already_set();
-      }
-
-      npy_intp dimensions[N];
-      for (size_t i=0; i<N; ++i) { dimensions[i] = b.extent(i); }
-      NPY_TYPES tp = TYPEMAP.type_to_enum<T>();
-      PyObject* pyobj = create_numpy_array(N, dimensions, tp); 
-      T* array_data = (T*)PyArray_DATA(pyobj);
-      size_t i = 0;
-      for (typename blitz::Array<T,N>::const_iterator it=b.begin(); it!=b.end(); ++it, ++i) {
-        array_data[i] = *it;
-      }
-
-      boost::python::object obj(boost::python::handle<>((PyObject*)pyobj));
-      return boost::python::extract<boost::python::numeric::array>(obj);
-    }
+  template <typename T, int N>
+  boost::shared_ptr<blitz::Array<T,N> > make_blitz(const boost::python::ndarray& array) {
+    return array.to_blitz<T,N>();
+  }
 
   /**
    * This methods implement the __getitem__ functionality expected by every
@@ -448,17 +221,17 @@ namespace Torch { namespace python {
    */
   template<typename T, int N> const char* to_typecode
     (const blitz::Array<T,N>& a) {
-    return TYPEMAP.type_to_typecode<T>().c_str();
+    return Torch::python::TYPEMAP.type_to_typecode<T>().c_str();
   }
 
   template<typename T, int N> const char* to_typename
     (const blitz::Array<T,N>& a) {
-    return TYPEMAP.type_to_typename<T>().c_str();
+    return Torch::python::TYPEMAP.type_to_typename<T>().c_str();
   }
 
   template<typename T, int N> NPY_TYPES to_enum
     (const blitz::Array<T,N>& a) {
-    return TYPEMAP.type_to_enum<T>();
+    return Torch::python::TYPEMAP.type_to_enum<T>();
   }
 
   /**
@@ -529,7 +302,7 @@ namespace Torch { namespace python {
   template <typename T, int N> blitz::Array<T,N> tanh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::tanh(i)); }
   template <typename T, int N> blitz::Array<T,N> atanh(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::atanh(i)); }
   template <typename T, int N> blitz::Array<T,N> cbrt(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::cbrt(i)); }
-  template <typename T, int N> blitz::Array<T,N> exp(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
+  template <typename T, int N> blitz::Array<T,N> exp(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::exp(i)); }
   template <typename T, int N> blitz::Array<T,N> expm1(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::expm1(i)); }
   template <typename T, int N> blitz::Array<T,N> erf(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::erf(i)); }
   template <typename T, int N> blitz::Array<T,N> erfc(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::erfc(i)); }
@@ -545,7 +318,7 @@ namespace Torch { namespace python {
 
   //operate on floats
   template <typename T, int N> blitz::Array<T,N> ceil(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
-  template <typename T, int N> blitz::Array<T,N> floor(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::ceil(i)); }
+  template <typename T, int N> blitz::Array<T,N> floor(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::floor(i)); }
 
   //operate on complex T
   template <typename T, int N> blitz::Array<T,N> arg(blitz::Array<T,N>& i) { return blitz::Array<T,N>(blitz::arg(i)); }
@@ -677,8 +450,7 @@ namespace Torch { namespace python {
         //initialization from a numpy array or iterable
         m_class->def("__init__", make_constructor(iterable_to_blitz<T,N>, boost::python::default_call_policies(), (boost::python::arg("iterable"), boost::python::arg("shape"), boost::python::arg("storage"))), "Builds an array from a python sequence. Please note that the length of the sequence or iterable must be exactly the same as defined by the array shape parameter. You should also specify a storage order (GeneralArrayStorage or FortranArray).");
         m_class->def("__init__", make_constructor(iterable_to_blitz_c<T,N>, boost::python::default_call_policies(), (boost::python::arg("iterable"), boost::python::arg("shape"))), "Builds an array from a python sequence. Please note that the length of the sequence or iterable must be exactly the same as defined by the array shape parameter. This version will build a C-storage.");
-        m_class->def("__init__", make_constructor(numpy_to_blitz<T,N>, boost::python::default_call_policies(), (boost::python::arg("array"), boost::python::arg("copy"))), "Builds an array copying or referring to data data from a numpy array. If `copy' is set to True, the behavior of this constructor is just like calling it only with `array'.");
-        m_class->def("__init__", make_constructor(numpy_to_blitz_copy<T,N>, boost::python::default_call_policies(), (boost::python::arg("array"))), "Builds an array copying data from a numpy array");
+        m_class->def("__init__", make_constructor(&make_blitz<T,N>, boost::python::default_call_policies(), (boost::python::arg("array"))), "Builds an array copying data from a numpy array");
 
       }
 
@@ -707,7 +479,7 @@ namespace Torch { namespace python {
        */
       void load_copiers() {
         //get a copy as numpy array
-        m_class->def("as_ndarray", &blitz_to_numpy_copy<T, N>, (boost::python::arg("self")), "Creates a copy of this array as a NumPy Array with the same dimensions and storage type");
+        m_class->def("as_ndarray", &make_ndarray<T,N>, (boost::python::arg("self")), "Creates a copy of this array as a NumPy Array with the same dimensions and storage type");
         m_class->def("copy", &array_type::copy, "This method creates a copy of the array's data, using the same storage ordering as the current array. The returned array is guaranteed to be stored contiguously in memory, and to be the only object referring to its memory block (i.e. the data isn't shared with any other array object).");
         m_class->def("makeUnique", &array_type::makeUnique, "If the array's data is being shared with another Blitz++ array object, this member function creates a copy so the array object has a unique view of the data.");
       }
@@ -910,6 +682,7 @@ namespace Torch { namespace python {
         m_class->def("acosh", &acosh<T,N>, "Inverse hyperbolic cosine, element-wise");
         m_class->def("acos", &acos<T,N>, "Arc cosine, element-wise");
         m_class->def("asin", &asin<T,N>, "Arc sine, element-wise");
+        m_class->def("atan", &atan<T,N>, "Arc tangent, element-wise");
         m_class->def("atanh", &atanh<T,N>, "Inverse hyperbolic tangent, element-wise");
         m_class->def("cbrt", &cbrt<T,N>, "self ** (1/3) (cubic root), element-wise");
         m_class->def("exp", &exp<T,N>, "exponential element-wise");

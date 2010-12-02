@@ -15,6 +15,8 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   include(../cmake/macros.cmake)
 
   # Finally, adds all python tests
+  torch_python_add_test(python-array-tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
   torch_python_add_test(python-exception-tests 
     ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
   torch_python_add_test(python-video-tests
