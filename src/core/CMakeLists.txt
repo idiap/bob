@@ -65,6 +65,8 @@ set(pysrc
    )
  
 set(pysrc_array
+   "python/src/TypeMapper.cc"
+   "python/src/ndarray.cc"
    "python/src/tinyvector.cc"
    "python/src/array.cc"
    "python/src/array_bool_1.cc"
@@ -131,6 +133,6 @@ set(pysrc_array
    )
 
 torch_python_bindings(core "${pysrc}")
-torch_python_submodule(core array "${pysrc_array}" "core/python/array.h")
+torch_python_submodule(core array "${pysrc_array}")
 
 torch_python_install(core)

@@ -9,6 +9,7 @@
 
 using namespace boost::python;
 
+void bind_ndarray();
 void bind_core_array_tinyvector();
 void bind_core_array();
 
@@ -76,6 +77,8 @@ void bind_core_array_complex256_4();
 // END: generate.py
 
 BOOST_PYTHON_MODULE(libpytorch_core_array) {
+  bind_ndarray();
+
   scope().attr("__doc__") = "Torch core classes and sub-classes for array manipulation";
   bind_core_array_tinyvector();
   bind_core_array();
