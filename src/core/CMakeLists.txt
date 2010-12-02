@@ -15,6 +15,7 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 # This defines the list of source files inside this package.
 set(src
    "src/general.cc"
+    "src/blitz_misc.cc"
     "src/VariableCollector.cc"
     "src/Object.cc"
     "src/Parameters.cc"
@@ -37,7 +38,6 @@ set(src
     "src/Exception.cc"
     "src/logging.cc"
     "src/DatasetXML.cc"
-    "src/blitz_misc.cc"
     )
 
 include(../cmake/macros.cmake)
@@ -62,6 +62,7 @@ set(pysrc
    "python/src/profile.cc"
    "python/src/DataSet.cc"
    "python/src/ListDataSet.cc"
+   "python/src/DatasetXML.cc"
    "python/src/main.cc"
    )
  
