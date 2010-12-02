@@ -47,10 +47,13 @@ namespace Torch {
         //   virtual void at(size_t id, blitz::Array<bool,1>& output) const
         // For this purpose, the C++ code might eventually be generated.
 
-        virtual template<typename T, int D> void at(size_t id, blitz::Array<T,D>& output) const {
-        //1. check if data is cached. if not load on-the-fly, with the expected arrayset type
-        //1.1 verify what is the actual data type inside the arrayset (e.g., a complex with 2 dimensions)
-        //    and use *that* type to load the data
+        virtual template<typename T, int D> 
+        void at(size_t id, blitz::Array<T,D>& output) const {
+        //1. check if data is cached. if not load on-the-fly, with the 
+        //   expected arrayset type
+        //1.1 verify what is the actual data type inside the arrayset 
+        //    (e.g., a complex with 2 dimensions) and use *that* type 
+        //    to load the data
         //2. With that data loaded, cast over the output.
         //2.1 output type == expected data type: hand over memory
         //2.2 output type != expected data type: use blitz::cast()
@@ -72,7 +75,7 @@ namespace Torch {
       }
 */
     private:
-      
+      void setArraydata(const xmlNodePtr& node);
 /*
       dictionary<id, blitz::Array<bool, 1> > m_bool_1;
       dictionary<id, blitz::Array<bool, 2> > m_bool_2;
@@ -108,6 +111,11 @@ namespace Torch {
       std::string m_elementtype;
 
       /**
+       * @brief The number of dimensions of the arrayset
+       */
+      size_t m_nb_dim;
+
+      /**
        * @brief The shape of the arrayset. There are at most 4 dimensions.
        */
       size_t m_shape[4];
@@ -116,6 +124,159 @@ namespace Torch {
        * @brief The eventual file containing the data of the arrayset.
        */
       std::string m_filename;
+
+      /**
+       * @brief Value indicating the type of the data from this arrayset.
+       *          0:  unknown/not yet set
+       *          1:  bool  1D
+       *          2:  bool  2D
+       *          3:  bool  3D
+       *          4:  bool  4D
+       *          5:  int8  1D
+       *          6:  int8  2D
+       *          7:  int8  3D
+       *          8:  int8  4D
+       *          9:  int16 1D
+       *          10: int16 2D
+       *          11: int16 3D
+       *          12: int16 4D
+       *          13: int32 1D
+       *          14: int32 2D
+       *          15: int32 3D
+       *          16: int32 4D
+       *          17: int64 1D
+       *          18: int64 2D
+       *          19: int64 3D
+       *          20: int64 4D
+       *          21: uint8  1D
+       *          22: uint8  2D
+       *          23: uint8  3D
+       *          24: uint8  4D
+       *          25: uint16 1D
+       *          26: uint16 2D
+       *          27: uint16 3D
+       *          28: uint16 4D
+       *          29: uint32 1D
+       *          30: uint32 2D
+       *          31: uint32 3D
+       *          32: uint32 4D
+       *          33: uint64 1D
+       *          34: uint64 2D
+       *          35: uint64 3D
+       *          36: uint64 4D
+       *          37: float32 1D
+       *          38: float32 2D
+       *          39: float32 3D
+       *          40: float32 4D
+       *          41: float64 1D
+       *          42: float64 2D
+       *          43: float64 3D
+       *          44: float64 4D
+       *          45: float128 1D
+       *          46: float128 2D
+       *          47: float128 3D
+       *          48: float128 4D
+       *          49: complex64 1D
+       *          50: complex64 2D
+       *          51: complex64 3D
+       *          52: complex64 4D
+       *          53: complex128 1D
+       *          54: complex128 2D
+       *          55: complex128 3D
+       *          56: complex128 4D
+       *          57: complex256 1D
+       *          58: complex256 2D
+       *          59: complex256 3D
+       *          60: complex256 4D
+       */
+      size_t m_blitz_type;
+
+      /**
+       * @brief The maps containing the Blitz++ arrays
+       */
+      std::map<size_t, blitz::Array<bool,1>* > m_data_bool_1;
+      std::map<size_t, blitz::Array<bool,2>* > m_data_bool_2;
+      std::map<size_t, blitz::Array<bool,3>* > m_data_bool_3;
+      std::map<size_t, blitz::Array<bool,4>* > m_data_bool_4;
+      std::map<size_t, blitz::Array<int8_t,1>* > m_data_int8_1;
+      std::map<size_t, blitz::Array<int8_t,2>* > m_data_int8_2;
+      std::map<size_t, blitz::Array<int8_t,3>* > m_data_int8_3;
+      std::map<size_t, blitz::Array<int8_t,4>* > m_data_int8_4;
+      std::map<size_t, blitz::Array<int16_t,1>* > m_data_int16_1;
+      std::map<size_t, blitz::Array<int16_t,2>* > m_data_int16_2;
+      std::map<size_t, blitz::Array<int16_t,3>* > m_data_int16_3;
+      std::map<size_t, blitz::Array<int16_t,4>* > m_data_int16_4;
+      std::map<size_t, blitz::Array<int32_t,1>* > m_data_int32_1;
+      std::map<size_t, blitz::Array<int32_t,2>* > m_data_int32_2;
+      std::map<size_t, blitz::Array<int32_t,3>* > m_data_int32_3;
+      std::map<size_t, blitz::Array<int32_t,4>* > m_data_int32_4;
+      std::map<size_t, blitz::Array<int64_t,1>* > m_data_int64_1;
+      std::map<size_t, blitz::Array<int64_t,2>* > m_data_int64_2;
+      std::map<size_t, blitz::Array<int64_t,3>* > m_data_int64_3;
+      std::map<size_t, blitz::Array<int64_t,4>* > m_data_int64_4;
+      std::map<size_t, blitz::Array<uint8_t,1>* > m_data_uint8_1;
+      std::map<size_t, blitz::Array<uint8_t,2>* > m_data_uint8_2;
+      std::map<size_t, blitz::Array<uint8_t,3>* > m_data_uint8_3;
+      std::map<size_t, blitz::Array<uint8_t,4>* > m_data_uint8_4;
+      std::map<size_t, blitz::Array<uint16_t,1>* > m_data_uint16_1;
+      std::map<size_t, blitz::Array<uint16_t,2>* > m_data_uint16_2;
+      std::map<size_t, blitz::Array<uint16_t,3>* > m_data_uint16_3;
+      std::map<size_t, blitz::Array<uint16_t,4>* > m_data_uint16_4;
+      std::map<size_t, blitz::Array<uint32_t,1>* > m_data_uint32_1;
+      std::map<size_t, blitz::Array<uint32_t,2>* > m_data_uint32_2;
+      std::map<size_t, blitz::Array<uint32_t,3>* > m_data_uint32_3;
+      std::map<size_t, blitz::Array<uint32_t,4>* > m_data_uint32_4;
+      std::map<size_t, blitz::Array<uint64_t,1>* > m_data_uint64_1;
+      std::map<size_t, blitz::Array<uint64_t,2>* > m_data_uint64_2;
+      std::map<size_t, blitz::Array<uint64_t,3>* > m_data_uint64_3;
+      std::map<size_t, blitz::Array<uint64_t,4>* > m_data_uint64_4;
+      std::map<size_t, blitz::Array<float,1>* > m_data_float32_1;
+      std::map<size_t, blitz::Array<float,2>* > m_data_float32_2;
+      std::map<size_t, blitz::Array<float,3>* > m_data_float32_3;
+      std::map<size_t, blitz::Array<float,4>* > m_data_float32_4;
+      std::map<size_t, blitz::Array<double,1>* > m_data_float64_1;
+      std::map<size_t, blitz::Array<double,2>* > m_data_float64_2;
+      std::map<size_t, blitz::Array<double,3>* > m_data_float64_3;
+      std::map<size_t, blitz::Array<double,4>* > m_data_float64_4;
+      std::map<size_t, blitz::Array<long double,1>* > m_data_float128_1;
+      std::map<size_t, blitz::Array<long double,2>* > m_data_float128_2;
+      std::map<size_t, blitz::Array<long double,3>* > m_data_float128_3;
+      std::map<size_t, blitz::Array<long double,4>* > m_data_float128_4;
+      std::map<size_t, blitz::Array<std::complex<float>,1>* > 
+        m_data_complex64_1;
+      std::map<size_t, blitz::Array<std::complex<float>,2>* > 
+        m_data_complex64_2;
+      std::map<size_t, blitz::Array<std::complex<float>,3>* > 
+        m_data_complex64_3;
+      std::map<size_t, blitz::Array<std::complex<float>,4>* > 
+        m_data_complex64_4;
+      std::map<size_t, blitz::Array<std::complex<double>,1>* > 
+        m_data_complex128_1;
+      std::map<size_t, blitz::Array<std::complex<double>,2>* > 
+        m_data_complex128_2;
+      std::map<size_t, blitz::Array<std::complex<double>,3>* > 
+        m_data_complex128_3;
+      std::map<size_t, blitz::Array<std::complex<double>,4>* > 
+        m_data_complex128_4;
+      std::map<size_t, blitz::Array<std::complex<long double>,1>* > 
+        m_data_complex256_1;
+      std::map<size_t, blitz::Array<std::complex<long double>,2>* > 
+        m_data_complex256_2;
+      std::map<size_t, blitz::Array<std::complex<long double>,3>* > 
+        m_data_complex256_3;
+      std::map<size_t, blitz::Array<std::complex<long double>,4>* > 
+        m_data_complex256_4;
+
+
+      typedef struct s_file_loader_ {
+        std::string s_filename;
+        //loader
+      } s_file_loader;
+      /**
+       * @brief The maps associating id with filenames/loader
+       */
+      std::map<size_t,s_file_loader> m_data_filenames;
+
     };
 
 
@@ -225,7 +386,7 @@ namespace Torch {
         /**
          * @brief A container mapping ids to arraysets
          */
-        std::map<size_t, const ArraysetXML* > m_arrayset;
+        std::map<size_t, ArraysetXML* > m_arrayset;
     };
 
 
