@@ -57,10 +57,14 @@ class ArrayTest(unittest.TestCase):
     # IndexError:
     self.assertRaises(IndexError, t5_array.__getitem__, (0,10))
 
-    # TODO: You cannot use slices just yet. The primary reason is that
-    # implementing a mixed range/integer indexing support is difficult and
-    # would incur in all indexing becoming slower. We will continue to
-    # investigate if that could not be done in a simpler way. Keep posted!
+    # You can also use slicing to retrieve portions of the array.
+    t5_sliced = t5_array[1:,1:]
+    self.assertEqual(t5_sliced.rank(), 2)
+    self.assertEqual(t5_sliced.extent(torch.core.array.firstDim), 1)
+    self.assertEqual(t5_sliced.extent(torch.core.array.secondDim), 2)
+    for i in range(t5_sliced.extent(torch.core.array.firstDim)):
+      for j in range(t5_sliced.extent(torch.core.array.secondDim)):
+        self.assertEqual(t5_sliced[i,j], t5_array[i+1,j+1])
 
     # TODO: For very special purposes, you can create fortran arrays from
     # python. Most array constructors support an extra parameter to specify
@@ -627,8 +631,12 @@ class ArrayTest(unittest.TestCase):
     # torch array bound to python. In this example, converting back should just
     # give us the exact same array as before.
     np_array_2 = t5_array.as_ndarray()
+    for i in range(t5_array.extent(torch.core.array.firstDim)):
+      for j in range(t5_array.extent(torch.core.array.secondDim)):
+        self.assertEqual(np_array[i,j], np_array_2[i,j]) #despite the cast!
 
-    # Some basic checks
+    # You can also cast to a different numpy array subtype
+    np_array_complex = t5_array.as_ndarray(torch.core.array.NPY_TYPES.NPY_CDOUBLE)
 
 if __name__ == '__main__':
   sys.argv.append('-v')

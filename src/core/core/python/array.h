@@ -8,6 +8,7 @@
 #define TORCH_CORE_PYTHON_ARRAY
 
 #include <boost/python.hpp>
+#include <boost/python/slice.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
 #include <blitz/array.h>
@@ -85,10 +86,14 @@ namespace blitz {
 
 namespace Torch { namespace python {
 
-  template <typename T, int N>
+  template <typename T, int N> inline
   boost::python::ndarray make_ndarray(const blitz::Array<T,N>& bzarray) {
-    boost::python::ndarray npy(bzarray);
-    return npy;
+    return boost::python::ndarray(bzarray);
+  }
+
+  template <typename T, int N> inline
+  boost::python::ndarray cast_ndarray(const blitz::Array<T,N>& bzarray, NPY_TYPES cast_to) {
+    return boost::python::ndarray(bzarray, cast_to);
   }
 
   template <typename T, int N>
@@ -156,7 +161,61 @@ namespace Torch { namespace python {
     a(check_array_limits(index, a.base(0), a.extent(0))) = v; 
   }
 
-  //gets a slice from
+  /**
+   * Check number of ranges and convert from python slice to blitz::Range
+   */
+  void check_are_slices(int size, boost::python::tuple ranges);
+  blitz::Range slice2range(boost::python::slice s, int base, int extent);
+
+  //get/set slice for 1D arrays
+  template<typename T> inline blitz::Array<T,1> __getslice_1__ (blitz::Array<T,1>& a, boost::python::slice range) {
+    return a(slice2range(range, a.base(0), a.extent(0)));
+  }
+  template<typename T> inline void __setslice_1__ (blitz::Array<T,1>& a, boost::python::slice range, const T& v) {
+    a(slice2range(range, a.base(0), a.extent(0))) = v;
+  }
+
+  //get/set slice for 2D arrays
+  template <typename T> inline blitz::Array<T,2> __getslice_2__(const blitz::Array<T,2>& a, boost::python::tuple ranges) {
+    check_are_slices(2, ranges);
+    return a(slice2range(boost::python::extract<boost::python::slice>(ranges[0])(), a.base(0), a.extent(0)),
+             slice2range(boost::python::extract<boost::python::slice>(ranges[1])(), a.base(1), a.extent(1)));
+  }
+  template <typename T> inline void __setslice_2__(const blitz::Array<T,2>& a, boost::python::tuple ranges, const T& v) {
+    check_are_slices(2, ranges);
+    a(slice2range(boost::python::extract<boost::python::slice>(ranges[0])(), a.base(0), a.extent(0)),
+      slice2range(boost::python::extract<boost::python::slice>(ranges[1])(), a.base(1), a.extent(1))) = v;
+  }
+
+  //get/set slice for 3D arrays
+  template <typename T> inline blitz::Array<T,3> __getslice_3__(const blitz::Array<T,3>& a, boost::python::tuple ranges) {
+    check_are_slices(3, ranges);
+    return a(slice2range(boost::python::extract<boost::python::slice>(ranges[0])(), a.base(0), a.extent(0)),
+             slice2range(boost::python::extract<boost::python::slice>(ranges[1])(), a.base(1), a.extent(1)),
+             slice2range(boost::python::extract<boost::python::slice>(ranges[2])(), a.base(2), a.extent(2)));
+  }
+  template <typename T> inline void __setslice_3__(const blitz::Array<T,3>& a, boost::python::tuple ranges, const T& v) {
+    check_are_slices(3, ranges);
+    a(slice2range(boost::python::extract<boost::python::slice>(ranges[0])(), a.base(0), a.extent(0)),
+      slice2range(boost::python::extract<boost::python::slice>(ranges[1])(), a.base(1), a.extent(1)),
+      slice2range(boost::python::extract<boost::python::slice>(ranges[2])(), a.base(2), a.extent(2))) = v;
+  }
+
+  //get/set slice for 4D arrays
+  template <typename T> inline blitz::Array<T,4> __getslice_4__(const blitz::Array<T,4>& a, boost::python::tuple ranges) {
+    check_are_slices(4, ranges);
+    return a(slice2range(boost::python::extract<boost::python::slice>(ranges[0])(), a.base(0), a.extent(0)),
+             slice2range(boost::python::extract<boost::python::slice>(ranges[1])(), a.base(1), a.extent(1)),
+             slice2range(boost::python::extract<boost::python::slice>(ranges[2])(), a.base(2), a.extent(2)),
+             slice2range(boost::python::extract<boost::python::slice>(ranges[3])(), a.base(3), a.extent(3)));
+  }
+  template <typename T> inline void __setslice_4__(const blitz::Array<T,3>& a, boost::python::tuple ranges, const T& v) {
+    check_are_slices(4, ranges);
+    a(slice2range(boost::python::extract<boost::python::slice>(ranges[0])(), a.base(0), a.extent(0)),
+      slice2range(boost::python::extract<boost::python::slice>(ranges[1])(), a.base(1), a.extent(1)),
+      slice2range(boost::python::extract<boost::python::slice>(ranges[2])(), a.base(2), a.extent(2)),
+      slice2range(boost::python::extract<boost::python::slice>(ranges[3])(), a.base(3), a.extent(3))) = v;
+  }
 
   /**
    * Constructs a new Torch/Blitz array starting from a python sequence. The
@@ -455,14 +514,28 @@ namespace Torch { namespace python {
       }
 
       /**
-       * TODO: Loads indexers and slicers
+       * Loads indexers and slicers
        */
       void load_indexers() {
-        m_class->def("__getitem__", &__getitem__<T,N>, (boost::python::arg("self"), boost::python::arg("tuple")), "Accesses one element of the array."); 
-        m_class->def("__setitem__", &__setitem__<T,N>, (boost::python::arg("self"), boost::python::arg("tuple"), boost::python::arg("value")), "Sets one element of the array."); 
+        m_class->def("__getitem_internal__", &__getitem__<T,N>, (boost::python::arg("self"), boost::python::arg("tuple")), "Accesses one element of the array."); 
+        m_class->def("__setitem_internal__", &__setitem__<T,N>, (boost::python::arg("self"), boost::python::arg("tuple"), boost::python::arg("value")), "Sets one element of the array."); 
         if (N == 1) { //loads special case for 1-D arrays
-          m_class->def("__getitem__", &__getitem_1__<T>, (boost::python::arg("self"), boost::python::arg("index")), "Accesses one element of the array."); 
-          m_class->def("__setitem__", &__setitem_1__<T>, (boost::python::arg("self"), boost::python::arg("index"), boost::python::arg("value")), "Sets one element of the array."); 
+          m_class->def("__getitem_internal__", &__getitem_1__<T>, (boost::python::arg("self"), boost::python::arg("index")), "Accesses one element of the array."); 
+          m_class->def("__setitem_internal__", &__setitem_1__<T>, (boost::python::arg("self"), boost::python::arg("index"), boost::python::arg("value")), "Sets one element of the array."); 
+          m_class->def("__getslice_internal__", &__getslice_1__<T>, (boost::python::arg("self"), boost::python::arg("slice")), "Accesses multiple elements of the array."); 
+          m_class->def("__setslice_internal__", &__setslice_1__<T>, (boost::python::arg("self"), boost::python::arg("slice"), boost::python::arg("value")), "Sets multiple elements of the array."); 
+        }
+        if (N == 2) { //loads special case for 2-D arrays
+          m_class->def("__getslice_internal__", &__getslice_2__<T>, (boost::python::arg("self"), boost::python::arg("slice_tuple")), "Accesses multiple elements of the array."); 
+          m_class->def("__setslice_internal__", &__setslice_2__<T>, (boost::python::arg("self"), boost::python::arg("slice_tuple"), boost::python::arg("value")), "Sets multiple elements of the array."); 
+        }
+        if (N == 3) { //loads special case for 3-D arrays
+          m_class->def("__getslice_internal__", &__getslice_3__<T>, (boost::python::arg("self"), boost::python::arg("slice_tuple")), "Accesses multiple elements of the array."); 
+          m_class->def("__setslice_internal__", &__setslice_3__<T>, (boost::python::arg("self"), boost::python::arg("slice_tuple"), boost::python::arg("value")), "Sets multiple elements of the array."); 
+        }
+        if (N == 4) { //loads special case for 4-D arrays
+          m_class->def("__getslice_internal__", &__getslice_4__<T>, (boost::python::arg("self"), boost::python::arg("slice_tuple")), "Accesses multiple elements of the array."); 
+          m_class->def("__setslice_internal__", &__setslice_4__<T>, (boost::python::arg("self"), boost::python::arg("slice_tuple"), boost::python::arg("value")), "Sets multiple elements of the array."); 
         }
       }
 
@@ -480,6 +553,7 @@ namespace Torch { namespace python {
       void load_copiers() {
         //get a copy as numpy array
         m_class->def("as_ndarray", &make_ndarray<T,N>, (boost::python::arg("self")), "Creates a copy of this array as a NumPy Array with the same dimensions and storage type");
+        m_class->def("as_ndarray", &cast_ndarray<T,N>, (boost::python::arg("self"), boost::python::arg("cast_to")), "Creates a copy of this array as a NumPy Array with the same dimensions, but casts the storage type to the type defined");
         m_class->def("copy", &array_type::copy, "This method creates a copy of the array's data, using the same storage ordering as the current array. The returned array is guaranteed to be stored contiguously in memory, and to be the only object referring to its memory block (i.e. the data isn't shared with any other array object).");
         m_class->def("makeUnique", &array_type::makeUnique, "If the array's data is being shared with another Blitz++ array object, this member function creates a copy so the array object has a unique view of the data.");
       }
