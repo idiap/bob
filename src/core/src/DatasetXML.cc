@@ -333,7 +333,7 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_bool_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<bool>(*it);
                     std::cout << m_data_bool_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
@@ -389,10 +389,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_int8_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int8_t>(*it);
                     std::cout << m_data_int8_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 9: m_data_int16_1.insert(
                           std::pair<size_t,blitz::Array<int16_t,1> >
                           ( cur_id, blitz::Array<int16_t,1>(m_shape[0]) ) 
@@ -444,10 +445,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_int16_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int16_t>(*it);
                     std::cout << m_data_int16_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 13: m_data_int32_1.insert(
                           std::pair<size_t,blitz::Array<int32_t,1> >
                           ( cur_id, blitz::Array<int32_t,1>(m_shape[0]) ) 
@@ -499,10 +501,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_int32_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int32_t>(*it);
                     std::cout << m_data_int32_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 17: m_data_int64_1.insert(
                           std::pair<size_t,blitz::Array<int64_t,1> >
                           ( cur_id, blitz::Array<int64_t,1>(m_shape[0]) ) 
@@ -554,10 +557,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_int64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int64_t>(*it);
                     std::cout << m_data_int64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 21: m_data_uint8_1.insert(
                           std::pair<size_t,blitz::Array<uint8_t,1> >
                           ( cur_id, blitz::Array<uint8_t,1>(m_shape[0]) ) 
@@ -609,10 +613,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_uint8_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint8_t>(*it);
                     std::cout << m_data_uint8_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 25: m_data_uint16_1.insert(
                           std::pair<size_t,blitz::Array<uint16_t,1> >
                           ( cur_id, blitz::Array<uint16_t,1>(m_shape[0]) ) 
@@ -664,10 +669,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_uint16_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint16_t>(*it);
                     std::cout << m_data_uint16_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 29: m_data_uint32_1.insert(
                           std::pair<size_t,blitz::Array<uint32_t,1> >
                           ( cur_id, blitz::Array<uint32_t,1>(m_shape[0]) ) 
@@ -719,10 +725,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_uint32_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint32_t>(*it);
                     std::cout << m_data_uint32_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 33: m_data_uint64_1.insert(
                           std::pair<size_t,blitz::Array<uint64_t,1> >
                           ( cur_id, blitz::Array<uint64_t,1>(m_shape[0]) ) 
@@ -774,10 +781,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_uint64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint64_t>(*it);
                     std::cout << m_data_uint64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 37: m_data_float32_1.insert(
                           std::pair<size_t,blitz::Array<float,1> >
                           ( cur_id, blitz::Array<float,1>(m_shape[0]) ) 
@@ -829,10 +837,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_float32_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<float>(*it);
                     std::cout << m_data_float32_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 41: m_data_float64_1.insert(
                           std::pair<size_t,blitz::Array<double,1> >
                           ( cur_id, blitz::Array<double,1>(m_shape[0]) ) 
@@ -884,10 +893,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_float64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<double>(*it);
                     std::cout << m_data_float64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 45: m_data_float128_1.insert(
                           std::pair<size_t,blitz::Array<long double,1> >
                           ( cur_id, blitz::Array<long double,1>(m_shape[0]) ) 
@@ -939,10 +949,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_float128_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<long double>(*it);
                     std::cout << m_data_float128_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 49: m_data_complex64_1.insert(
                           std::pair<size_t,blitz::Array<std::complex<float> ,1> >
                           ( cur_id, blitz::Array<std::complex<float> ,1>(m_shape[0]) ) 
@@ -994,10 +1005,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_complex64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<std::complex<float> >(*it);
                     std::cout << m_data_complex64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 53: m_data_complex128_1.insert(
                           std::pair<size_t,blitz::Array<std::complex<double> ,1> >
                           ( cur_id, blitz::Array<std::complex<double> ,1>(m_shape[0]) ) 
@@ -1049,10 +1061,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_complex128_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<std::complex<double> >(*it);
                     std::cout << m_data_complex128_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 case 57: m_data_complex256_1.insert(
                           std::pair<size_t,blitz::Array<std::complex<long double> ,1> >
                           ( cur_id, blitz::Array<std::complex<long double> ,1>(m_shape[0]) ) 
@@ -1104,10 +1117,11 @@ namespace Torch {
                     i1=tmp1 / (m_shape[2]*m_shape[3]);
                     tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
                     i2=tmp2 / m_shape[3];
-                    i2=tmp2 % m_shape[3];
+                    i3=tmp2 % m_shape[3];
                     m_data_complex256_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<std::complex<long double> >(*it);
                     std::cout << m_data_complex256_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
                   }
+                  break;
                 default:
                   break;
               }
