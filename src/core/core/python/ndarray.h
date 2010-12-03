@@ -53,6 +53,14 @@ namespace boost { namespace python {
       }
 
       /**
+       * builds from a particular blitz::Array<> type and forces a cast
+       */
+      template <typename T,int N> ndarray(const blitz::Array<T,N>&, NPY_TYPES) {
+        PyErr_SetString(PyExc_TypeError, "unsupported blitz::Array<T,N>");
+        boost::python::throw_error_already_set();
+      }
+
+      /**
        * virtual d'tor
        */
       virtual ~ndarray();
@@ -133,6 +141,10 @@ namespace boost { namespace python {
   template<> ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz); \
   template<> ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz); \
   template<> ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz); \
+  template<> ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz, NPY_TYPES cast_to); \
+  template<> ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz, NPY_TYPES cast_to); \
+  template<> ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz, NPY_TYPES cast_to); \
+  template<> ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz, NPY_TYPES cast_to); \
   template<> boost::shared_ptr<blitz::Array<BZ_ELEMENT_TYPE,1> > ndarray::to_blitz<BZ_ELEMENT_TYPE,1>() const; \
   template<> boost::shared_ptr<blitz::Array<BZ_ELEMENT_TYPE,2> > ndarray::to_blitz<BZ_ELEMENT_TYPE,2>() const; \
   template<> boost::shared_ptr<blitz::Array<BZ_ELEMENT_TYPE,3> > ndarray::to_blitz<BZ_ELEMENT_TYPE,3>() const; \
