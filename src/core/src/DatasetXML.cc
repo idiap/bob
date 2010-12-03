@@ -227,10 +227,11 @@ namespace Torch {
 
       // Parse loader
       str = xmlGetProp(arrayset, xmlCharStrdup(db::loader));
-      std::cout << "Loader: " << (str!=0?str:xmlCharStrdup("")) << std::endl;
+      m_loader.assign( (str!=0?(const char*)str:"") );
+      std::cout << "Loader: " << m_loader << std::endl;
       xmlFree(str);
      
-     // Parse file
+      // Parse file
       str = xmlGetProp(arrayset, xmlCharStrdup(db::file));
       m_filename.assign( (str!=0?(const char*)str:"") );
       std::cout << "File: " << m_filename << std::endl;
@@ -266,7 +267,7 @@ namespace Torch {
 
             if(!s_filename.compare(""))
             {
-              // Process the content of the array
+              // Preliminary for the processing of the content of the array
               xmlChar* content = xmlNodeGetContent(cur);
               std::string data( (const char *)content);
               boost::char_separator<char> sep(" ;|");
@@ -276,11 +277,841 @@ namespace Torch {
                 total *= m_shape[i];
         
               count = 0;
-              for( boost::tokenizer<boost::char_separator<char> >::iterator
-                it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+              // Insert a new blitz array in the map of the arrayset type
+              // and fillt it in
+              int i0,i1,i2,i3,tmp1,tmp2;
+              switch(m_blitz_type)
               {
-                std::cout << *it << " ";
+                case 1: m_data_bool_1.insert(
+                          std::pair<size_t,blitz::Array<bool,1> >
+                          ( cur_id, blitz::Array<bool,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_bool_1.find(cur_id)->second(count) = boost::lexical_cast<bool>(*it);
+                    std::cout << m_data_bool_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 2: m_data_bool_2.insert(
+                          std::pair<size_t,blitz::Array<bool,2> >
+                          ( cur_id, blitz::Array<bool,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_bool_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<bool>(*it);
+                    std::cout << m_data_bool_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 3: m_data_bool_3.insert(
+                          std::pair<size_t,blitz::Array<bool,3> >
+                          ( cur_id, blitz::Array<bool,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_bool_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<bool>(*it);
+                    std::cout << m_data_bool_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 4: m_data_bool_4.insert(
+                          std::pair<size_t,blitz::Array<bool,4> >
+                          ( cur_id, blitz::Array<bool,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_bool_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<bool>(*it);
+                    std::cout << m_data_bool_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                  break;
+                case 5: m_data_int8_1.insert(
+                          std::pair<size_t,blitz::Array<int8_t,1> >
+                          ( cur_id, blitz::Array<int8_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_int8_1.find(cur_id)->second(count) = boost::lexical_cast<int8_t>(*it);
+                    std::cout << m_data_int8_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 6: m_data_int8_2.insert(
+                          std::pair<size_t,blitz::Array<int8_t,2> >
+                          ( cur_id, blitz::Array<int8_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_int8_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<int8_t>(*it);
+                    std::cout << m_data_int8_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 7: m_data_int8_3.insert(
+                          std::pair<size_t,blitz::Array<int8_t,3> >
+                          ( cur_id, blitz::Array<int8_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_int8_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<int8_t>(*it);
+                    std::cout << m_data_int8_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 8: m_data_int8_4.insert(
+                          std::pair<size_t,blitz::Array<int8_t,4> >
+                          ( cur_id, blitz::Array<int8_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_int8_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int8_t>(*it);
+                    std::cout << m_data_int8_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 9: m_data_int16_1.insert(
+                          std::pair<size_t,blitz::Array<int16_t,1> >
+                          ( cur_id, blitz::Array<int16_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_int16_1.find(cur_id)->second(count) = boost::lexical_cast<int16_t>(*it);
+                    std::cout << m_data_int16_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 10: m_data_int16_2.insert(
+                          std::pair<size_t,blitz::Array<int16_t,2> >
+                          ( cur_id, blitz::Array<int16_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_int16_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<int16_t>(*it);
+                    std::cout << m_data_int16_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 11: m_data_int16_3.insert(
+                          std::pair<size_t,blitz::Array<int16_t,3> >
+                          ( cur_id, blitz::Array<int16_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_int16_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<int16_t>(*it);
+                    std::cout << m_data_int16_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 12: m_data_int16_4.insert(
+                          std::pair<size_t,blitz::Array<int16_t,4> >
+                          ( cur_id, blitz::Array<int16_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_int16_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int16_t>(*it);
+                    std::cout << m_data_int16_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 13: m_data_int32_1.insert(
+                          std::pair<size_t,blitz::Array<int32_t,1> >
+                          ( cur_id, blitz::Array<int32_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_int32_1.find(cur_id)->second(count) = boost::lexical_cast<int32_t>(*it);
+                    std::cout << m_data_int32_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 14: m_data_int32_2.insert(
+                          std::pair<size_t,blitz::Array<int32_t,2> >
+                          ( cur_id, blitz::Array<int32_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_int32_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<int32_t>(*it);
+                    std::cout << m_data_int32_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 15: m_data_int32_3.insert(
+                          std::pair<size_t,blitz::Array<int32_t,3> >
+                          ( cur_id, blitz::Array<int32_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_int32_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<int32_t>(*it);
+                    std::cout << m_data_int32_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 16: m_data_int32_4.insert(
+                          std::pair<size_t,blitz::Array<int32_t,4> >
+                          ( cur_id, blitz::Array<int32_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_int32_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int32_t>(*it);
+                    std::cout << m_data_int32_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 17: m_data_int64_1.insert(
+                          std::pair<size_t,blitz::Array<int64_t,1> >
+                          ( cur_id, blitz::Array<int64_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_int64_1.find(cur_id)->second(count) = boost::lexical_cast<int64_t>(*it);
+                    std::cout << m_data_int64_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 18: m_data_int64_2.insert(
+                          std::pair<size_t,blitz::Array<int64_t,2> >
+                          ( cur_id, blitz::Array<int64_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_int64_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<int64_t>(*it);
+                    std::cout << m_data_int64_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 19: m_data_int64_3.insert(
+                          std::pair<size_t,blitz::Array<int64_t,3> >
+                          ( cur_id, blitz::Array<int64_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_int64_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<int64_t>(*it);
+                    std::cout << m_data_int64_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 20: m_data_int64_4.insert(
+                          std::pair<size_t,blitz::Array<int64_t,4> >
+                          ( cur_id, blitz::Array<int64_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_int64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<int64_t>(*it);
+                    std::cout << m_data_int64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 21: m_data_uint8_1.insert(
+                          std::pair<size_t,blitz::Array<uint8_t,1> >
+                          ( cur_id, blitz::Array<uint8_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_uint8_1.find(cur_id)->second(count) = boost::lexical_cast<uint8_t>(*it);
+                    std::cout << m_data_uint8_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 22: m_data_uint8_2.insert(
+                          std::pair<size_t,blitz::Array<uint8_t,2> >
+                          ( cur_id, blitz::Array<uint8_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_uint8_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<uint8_t>(*it);
+                    std::cout << m_data_uint8_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 23: m_data_uint8_3.insert(
+                          std::pair<size_t,blitz::Array<uint8_t,3> >
+                          ( cur_id, blitz::Array<uint8_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_uint8_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<uint8_t>(*it);
+                    std::cout << m_data_uint8_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 24: m_data_uint8_4.insert(
+                          std::pair<size_t,blitz::Array<uint8_t,4> >
+                          ( cur_id, blitz::Array<uint8_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_uint8_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint8_t>(*it);
+                    std::cout << m_data_uint8_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 25: m_data_uint16_1.insert(
+                          std::pair<size_t,blitz::Array<uint16_t,1> >
+                          ( cur_id, blitz::Array<uint16_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_uint16_1.find(cur_id)->second(count) = boost::lexical_cast<uint16_t>(*it);
+                    std::cout << m_data_uint16_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 26: m_data_uint16_2.insert(
+                          std::pair<size_t,blitz::Array<uint16_t,2> >
+                          ( cur_id, blitz::Array<uint16_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_uint16_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<uint16_t>(*it);
+                    std::cout << m_data_uint16_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 27: m_data_uint16_3.insert(
+                          std::pair<size_t,blitz::Array<uint16_t,3> >
+                          ( cur_id, blitz::Array<uint16_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_uint16_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<uint16_t>(*it);
+                    std::cout << m_data_uint16_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 28: m_data_uint16_4.insert(
+                          std::pair<size_t,blitz::Array<uint16_t,4> >
+                          ( cur_id, blitz::Array<uint16_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_uint16_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint16_t>(*it);
+                    std::cout << m_data_uint16_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 29: m_data_uint32_1.insert(
+                          std::pair<size_t,blitz::Array<uint32_t,1> >
+                          ( cur_id, blitz::Array<uint32_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_uint32_1.find(cur_id)->second(count) = boost::lexical_cast<uint32_t>(*it);
+                    std::cout << m_data_uint32_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 30: m_data_uint32_2.insert(
+                          std::pair<size_t,blitz::Array<uint32_t,2> >
+                          ( cur_id, blitz::Array<uint32_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_uint32_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<uint32_t>(*it);
+                    std::cout << m_data_uint32_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 31: m_data_uint32_3.insert(
+                          std::pair<size_t,blitz::Array<uint32_t,3> >
+                          ( cur_id, blitz::Array<uint32_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_uint32_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<uint32_t>(*it);
+                    std::cout << m_data_uint32_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 32: m_data_uint32_4.insert(
+                          std::pair<size_t,blitz::Array<uint32_t,4> >
+                          ( cur_id, blitz::Array<uint32_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_uint32_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint32_t>(*it);
+                    std::cout << m_data_uint32_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 33: m_data_uint64_1.insert(
+                          std::pair<size_t,blitz::Array<uint64_t,1> >
+                          ( cur_id, blitz::Array<uint64_t,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_uint64_1.find(cur_id)->second(count) = boost::lexical_cast<uint64_t>(*it);
+                    std::cout << m_data_uint64_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 34: m_data_uint64_2.insert(
+                          std::pair<size_t,blitz::Array<uint64_t,2> >
+                          ( cur_id, blitz::Array<uint64_t,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_uint64_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<uint64_t>(*it);
+                    std::cout << m_data_uint64_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 35: m_data_uint64_3.insert(
+                          std::pair<size_t,blitz::Array<uint64_t,3> >
+                          ( cur_id, blitz::Array<uint64_t,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_uint64_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<uint64_t>(*it);
+                    std::cout << m_data_uint64_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 36: m_data_uint64_4.insert(
+                          std::pair<size_t,blitz::Array<uint64_t,4> >
+                          ( cur_id, blitz::Array<uint64_t,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_uint64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<uint64_t>(*it);
+                    std::cout << m_data_uint64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 37: m_data_float32_1.insert(
+                          std::pair<size_t,blitz::Array<float,1> >
+                          ( cur_id, blitz::Array<float,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_float32_1.find(cur_id)->second(count) = boost::lexical_cast<float>(*it);
+                    std::cout << m_data_float32_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 38: m_data_float32_2.insert(
+                          std::pair<size_t,blitz::Array<float,2> >
+                          ( cur_id, blitz::Array<float,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_float32_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<float>(*it);
+                    std::cout << m_data_float32_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 39: m_data_float32_3.insert(
+                          std::pair<size_t,blitz::Array<float,3> >
+                          ( cur_id, blitz::Array<float,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_float32_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<float>(*it);
+                    std::cout << m_data_float32_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 40: m_data_float32_4.insert(
+                          std::pair<size_t,blitz::Array<float,4> >
+                          ( cur_id, blitz::Array<float,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_float32_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<float>(*it);
+                    std::cout << m_data_float32_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 41: m_data_float64_1.insert(
+                          std::pair<size_t,blitz::Array<double,1> >
+                          ( cur_id, blitz::Array<double,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_float64_1.find(cur_id)->second(count) = boost::lexical_cast<double>(*it);
+                    std::cout << m_data_float64_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 42: m_data_float64_2.insert(
+                          std::pair<size_t,blitz::Array<double,2> >
+                          ( cur_id, blitz::Array<double,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_float64_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<double>(*it);
+                    std::cout << m_data_float64_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 43: m_data_float64_3.insert(
+                          std::pair<size_t,blitz::Array<double,3> >
+                          ( cur_id, blitz::Array<double,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_float64_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<double>(*it);
+                    std::cout << m_data_float64_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 44: m_data_float64_4.insert(
+                          std::pair<size_t,blitz::Array<double,4> >
+                          ( cur_id, blitz::Array<double,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_float64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<double>(*it);
+                    std::cout << m_data_float64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 45: m_data_float128_1.insert(
+                          std::pair<size_t,blitz::Array<long double,1> >
+                          ( cur_id, blitz::Array<long double,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_float128_1.find(cur_id)->second(count) = boost::lexical_cast<long double>(*it);
+                    std::cout << m_data_float128_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 46: m_data_float128_2.insert(
+                          std::pair<size_t,blitz::Array<long double,2> >
+                          ( cur_id, blitz::Array<long double,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_float128_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<long double>(*it);
+                    std::cout << m_data_float128_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 47: m_data_float128_3.insert(
+                          std::pair<size_t,blitz::Array<long double,3> >
+                          ( cur_id, blitz::Array<long double,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_float128_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<long double>(*it);
+                    std::cout << m_data_float128_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 48: m_data_float128_4.insert(
+                          std::pair<size_t,blitz::Array<long double,4> >
+                          ( cur_id, blitz::Array<long double,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_float128_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<long double>(*it);
+                    std::cout << m_data_float128_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 49: m_data_complex64_1.insert(
+                          std::pair<size_t,blitz::Array<std::complex<float> ,1> >
+                          ( cur_id, blitz::Array<std::complex<float> ,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_complex64_1.find(cur_id)->second(count) = boost::lexical_cast<std::complex<float> >(*it);
+                    std::cout << m_data_complex64_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 50: m_data_complex64_2.insert(
+                          std::pair<size_t,blitz::Array<std::complex<float> ,2> >
+                          ( cur_id, blitz::Array<std::complex<float> ,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_complex64_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<std::complex<float> >(*it);
+                    std::cout << m_data_complex64_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 51: m_data_complex64_3.insert(
+                          std::pair<size_t,blitz::Array<std::complex<float> ,3> >
+                          ( cur_id, blitz::Array<std::complex<float> ,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_complex64_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<std::complex<float> >(*it);
+                    std::cout << m_data_complex64_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 52: m_data_complex64_4.insert(
+                          std::pair<size_t,blitz::Array<std::complex<float> ,4> >
+                          ( cur_id, blitz::Array<std::complex<float> ,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_complex64_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<std::complex<float> >(*it);
+                    std::cout << m_data_complex64_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 53: m_data_complex128_1.insert(
+                          std::pair<size_t,blitz::Array<std::complex<double> ,1> >
+                          ( cur_id, blitz::Array<std::complex<double> ,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_complex128_1.find(cur_id)->second(count) = boost::lexical_cast<std::complex<double> >(*it);
+                    std::cout << m_data_complex128_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 54: m_data_complex128_2.insert(
+                          std::pair<size_t,blitz::Array<std::complex<double> ,2> >
+                          ( cur_id, blitz::Array<std::complex<double> ,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_complex128_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<std::complex<double> >(*it);
+                    std::cout << m_data_complex128_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 55: m_data_complex128_3.insert(
+                          std::pair<size_t,blitz::Array<std::complex<double> ,3> >
+                          ( cur_id, blitz::Array<std::complex<double> ,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_complex128_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<std::complex<double> >(*it);
+                    std::cout << m_data_complex128_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 56: m_data_complex128_4.insert(
+                          std::pair<size_t,blitz::Array<std::complex<double> ,4> >
+                          ( cur_id, blitz::Array<std::complex<double> ,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_complex128_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<std::complex<double> >(*it);
+                    std::cout << m_data_complex128_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                case 57: m_data_complex256_1.insert(
+                          std::pair<size_t,blitz::Array<std::complex<long double> ,1> >
+                          ( cur_id, blitz::Array<std::complex<long double> ,1>(m_shape[0]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    m_data_complex256_1.find(cur_id)->second(count) = boost::lexical_cast<std::complex<long double> >(*it);
+                    std::cout << m_data_complex256_1.find(cur_id)->second(count) << " ";
+                  }
+                  break;
+                case 58: m_data_complex256_2.insert(
+                          std::pair<size_t,blitz::Array<std::complex<long double> ,2> >
+                          ( cur_id, blitz::Array<std::complex<long double> ,2>(m_shape[0], m_shape[1]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / m_shape[1];
+                    i1=count % m_shape[1];
+                    m_data_complex256_2.find(cur_id)->second(i0,i1) = boost::lexical_cast<std::complex<long double> >(*it);
+                    std::cout << m_data_complex256_2.find(cur_id)->second(i0,i1) << " ";
+                  }
+                  break;
+                case 59: m_data_complex256_3.insert(
+                          std::pair<size_t,blitz::Array<std::complex<long double> ,3> >
+                          ( cur_id, blitz::Array<std::complex<long double> ,3>(m_shape[0], m_shape[1], m_shape[2]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]);
+                    i1=tmp1 / m_shape[2];
+                    i2=tmp1 % m_shape[2];
+                    m_data_complex256_3.find(cur_id)->second(i0,i1,i2) = boost::lexical_cast<std::complex<long double> >(*it);
+                    std::cout << m_data_complex256_3.find(cur_id)->second(i0,i1,i2) << " ";
+                  }
+                  break;
+                case 60: m_data_complex256_4.insert(
+                          std::pair<size_t,blitz::Array<std::complex<long double> ,4> >
+                          ( cur_id, blitz::Array<std::complex<long double> ,4>(m_shape[0], m_shape[1], m_shape[2], m_shape[3]) ) 
+                          );
+                  for( boost::tokenizer<boost::char_separator<char> >::iterator
+                    it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+                  {
+                    i0=count / (m_shape[1]*m_shape[2]*m_shape[3]);
+                    tmp1=count - i0*(m_shape[1]*m_shape[2]*m_shape[3]);
+                    i1=tmp1 / (m_shape[2]*m_shape[3]);
+                    tmp2=tmp1 - i1*(m_shape[2]*m_shape[3]);
+                    i2=tmp2 / m_shape[3];
+                    i2=tmp2 % m_shape[3];
+                    m_data_complex256_4.find(cur_id)->second(i0,i1,i2,i3) = boost::lexical_cast<std::complex<long double> >(*it);
+                    std::cout << m_data_complex256_4.find(cur_id)->second(i0,i1,i2,i3) << " ";
+                  }
+                default:
+                  break;
               }
+
               if(count < total) {
                 error << "Only " <<  count << " elements have been found " <<
                   "instead of " << total << " expected." << std::endl;
@@ -292,6 +1123,11 @@ namespace Torch {
               //ar = new ArrayXML(cur);
               //m_arrayset.insert ( std::pair<size_t,const ArraysetXML*>(ar->getId(), ar) );
             }
+            else {
+              //m_data_filenames.insert( std::pair<size_t,s_file_loader(s_filename, s_loader)>);
+            }
+
+
           }
           cur = cur->next;
         }

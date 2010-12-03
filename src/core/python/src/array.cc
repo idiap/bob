@@ -50,6 +50,31 @@ int Torch::python::check_array_limits(int index, int base, int extent) {
   return index;
 }
 
+void Torch::python::check_are_slices(int size, boost::python::tuple ranges) {
+  if (size != boost::python::len(ranges)) {
+    boost::format s("wrong number of slices - expected %d, got %d");
+    s % size % boost::python::len(ranges);
+    PyErr_SetString(PyExc_TypeError, s.str().c_str());
+    boost::python::throw_error_already_set();
+  }
+}
+
+blitz::Range Torch::python::slice2range(boost::python::slice s, int base,
+    int extent) {
+  int step = 1;
+  if (s.step().ptr() != Py_None) step = boost::python::extract<int>(s.step())();
+  int start = 0;
+  if (s.start().ptr() != Py_None) 
+    start = Torch::python::check_array_limits(boost::python::extract<int>(s.start())(), base, extent); 
+  int stop = extent - 1;
+  if (s.stop().ptr() != Py_None) { 
+    stop = Torch::python::check_array_limits(boost::python::extract<int>(s.stop())(), base, extent);
+    if (step < 0) stop += 1;
+    else if (stop > 0) stop -= 1;
+  }
+  return blitz::Range(start, stop, step); 
+}
+
 #define bind_storages(N) bind_c_storage<N>(); bind_fortran_storage<N>();
 
 void bind_core_array() {

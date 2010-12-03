@@ -50,6 +50,43 @@ NDARRAY_CTOR(std::complex<double>)
 NDARRAY_CTOR(std::complex<long double>)
 #undef NDARRAY_CTOR
 
+template<typename T, int N> 
+static bp::ndarray from_blitz(const blitz::Array<T,N>& b, NPY_TYPES cast_to) {
+  //if we get called, it is because we have one of the allowed types and the
+  //number of dimensions was already checked.
+  npy_intp dims[N];
+  for (size_t i=0; i<N; ++i) dims[i] = b.extent(i);
+  bp::ndarray npy = bp::new_ndarray(N, dims, tp::TYPEMAP.type_to_enum<T>());
+  T* data = (T*)npy.data();
+  size_t i = 0;
+  for (typename blitz::Array<T,N>::const_iterator it=b.begin(); it!=b.end(); ++it, ++i) {
+    data[i] = *it;
+  }
+  return npy.astype(cast_to);
+}
+
+#define NDARRAY_CTOR(BZ_ELEMENT_TYPE) \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } 
+NDARRAY_CTOR(bool)
+NDARRAY_CTOR(int8_t)
+NDARRAY_CTOR(uint8_t)
+NDARRAY_CTOR(int16_t)
+NDARRAY_CTOR(uint16_t)
+NDARRAY_CTOR(int32_t)
+NDARRAY_CTOR(uint32_t)
+NDARRAY_CTOR(int64_t)
+NDARRAY_CTOR(uint64_t)
+NDARRAY_CTOR(float)
+NDARRAY_CTOR(double)
+NDARRAY_CTOR(long double)
+NDARRAY_CTOR(std::complex<float>)
+NDARRAY_CTOR(std::complex<double>)
+NDARRAY_CTOR(std::complex<long double>)
+#undef NDARRAY_CTOR
+
 bp::ndarray::ndarray(const bp::object& obj)
   : m_obj(obj)
 {
