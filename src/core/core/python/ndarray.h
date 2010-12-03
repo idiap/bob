@@ -12,7 +12,7 @@
 #include <boost/shared_ptr.hpp>
 #include <numpy/arrayobject.h>
 #include <stdint.h>
-#include <blitz/Array.h>
+#include <blitz/array.h>
 
 namespace boost { namespace python {
 
