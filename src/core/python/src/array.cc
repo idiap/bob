@@ -61,16 +61,17 @@ void Torch::python::check_are_slices(int size, boost::python::tuple ranges) {
 
 blitz::Range Torch::python::slice2range(boost::python::slice s, int base,
     int extent) {
+  int step = 1;
+  if (s.step().ptr() != Py_None) step = boost::python::extract<int>(s.step())();
   int start = 0;
   if (s.start().ptr() != Py_None) 
     start = Torch::python::check_array_limits(boost::python::extract<int>(s.start())(), base, extent); 
   int stop = extent - 1;
   if (s.stop().ptr() != Py_None) { 
     stop = Torch::python::check_array_limits(boost::python::extract<int>(s.stop())(), base, extent);
-    if (stop > 0) stop -= 1;
+    if (step < 0) stop += 1;
+    else if (stop > 0) stop -= 1;
   }
-  int step = 1;
-  if (s.step().ptr() != Py_None) step = boost::python::extract<int>(s.step())();
   return blitz::Range(start, stop, step); 
 }
 

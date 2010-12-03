@@ -66,6 +66,27 @@ class ArrayTest(unittest.TestCase):
       for j in range(t5_sliced.extent(torch.core.array.secondDim)):
         self.assertEqual(t5_sliced[i,j], t5_array[i+1,j+1])
 
+    # The slice operations can also use negative indexes. Here are some
+    # examples of addressing you can use
+    arr = torch.core.array.float32_1(range(10),(10,))
+
+    # Please note that slicing will get you are reference to the elements of
+    # the original array. If you change those, the original array will also get
+    # changed.
+    self.assertTrue( (arr == arr[:]).all() )
+    self.assertTrue( (arr == arr[0:]).all() )
+
+    self.assertTrue( (arr[2:5] == torch.core.array.float32_1([2,3,4],(3,))).all())
+    self.assertTrue( (arr[7:-1] == torch.core.array.float32_1([7,8],(2,))).all())
+
+    # For very fancy stuff, you can also do some fancy indexing ;-)
+
+    # I can get every other column like this:
+    self.assertTrue( (arr[::2] == torch.core.array.float32_1([0,2,4,6,8],(5,))).all())
+    
+    # I can invert parts of the array through indexing
+    self.assertTrue( (arr[9:0:-3] == torch.core.array.float32_1([9,6,3],(3,))).all())
+
     # TODO: For very special purposes, you can create fortran arrays from
     # python. Most array constructors support an extra parameter to specify
     # this. Here is how to do it: ...
@@ -629,14 +650,23 @@ class ArrayTest(unittest.TestCase):
 
     # And we can convert back using the "as_ndarray()" call available in every
     # torch array bound to python. In this example, converting back should just
-    # give us the exact same array as before.
+    # give us the exact same array as before (minus the element types inside).
+    #
+    # WARNING: Please note that casting to/from numpy is a constly operation
+    # that incurs in data copying. This is done to achieve some level of
+    # independence between torch and numpy.
     np_array_2 = t5_array.as_ndarray()
     for i in range(t5_array.extent(torch.core.array.firstDim)):
       for j in range(t5_array.extent(torch.core.array.secondDim)):
         self.assertEqual(np_array[i,j], np_array_2[i,j]) #despite the cast!
 
-    # You can also cast to a different numpy array subtype
+    # You can also cast to a different numpy array subtype. The next example
+    # demonstrates how you can cast types around.
     np_array_complex = t5_array.as_ndarray(torch.core.array.NPY_TYPES.NPY_CDOUBLE)
+    t5_complex = torch.core.array.complex128_2(np_array_complex)
+
+    self.assertTrue(isinstance(t5_complex[0,0], complex))
+    self.assertEqual(t5_complex[1,1], complex(5,0))
 
 if __name__ == '__main__':
   sys.argv.append('-v')
