@@ -142,6 +142,8 @@ class ArrayTest(unittest.TestCase):
 
   def test03_checkTyping(self):
 
+    import platform
+
     # This test demonstrates we support all expected types and these types are
     # correctly expressed as python objects.
     for t in ('bool', 'int8', 'int16', 'int32', 'int64', 'uint8', 'uint16',
@@ -157,11 +159,17 @@ class ArrayTest(unittest.TestCase):
     self.assertEqual(type(torch.core.array.int8_1((1,),(1,))[0]), int)
     self.assertEqual(type(torch.core.array.int16_1((1,),(1,))[0]), int)
     self.assertEqual(type(torch.core.array.int32_1((1,),(1,))[0]), int)
-    self.assertEqual(type(torch.core.array.int64_1((1,),(1,))[0]), long)
+    if platform.architecture()[0] == '32bit':
+      self.assertEqual(type(torch.core.array.int64_1((1,),(1,))[0]), long)
+    else: 
+      self.assertEqual(type(torch.core.array.int64_1((1,),(1,))[0]), int)
     self.assertEqual(type(torch.core.array.uint8_1((1,),(1,))[0]), int)
     self.assertEqual(type(torch.core.array.uint16_1((1,),(1,))[0]), int)
     self.assertEqual(type(torch.core.array.uint32_1((1,),(1,))[0]), int)
-    self.assertEqual(type(torch.core.array.uint64_1((1,),(1,))[0]), long)
+    if platform.architecture()[0] == '32bit':
+      self.assertEqual(type(torch.core.array.uint64_1((1,),(1,))[0]), long)
+    else:
+      self.assertEqual(type(torch.core.array.uint64_1((1,),(1,))[0]), int)
     self.assertEqual(type(torch.core.array.float32_1((1,),(1,))[0]), float)
     self.assertEqual(type(torch.core.array.float64_1((1,),(1,))[0]), float)
     self.assertEqual(type(torch.core.array.float128_1((1,),(1,))[0]), float)
