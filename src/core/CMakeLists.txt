@@ -37,7 +37,8 @@ set(src
     "src/ListDataSet.cc"
     "src/Exception.cc"
     "src/logging.cc"
-    "src/DatasetXML.cc"
+    "src/Dataset2.cc"
+    "src/XMLParser.cc"
     )
 
 include(../cmake/macros.cmake)
@@ -62,7 +63,8 @@ set(pysrc
    "python/src/profile.cc"
    "python/src/DataSet.cc"
    "python/src/ListDataSet.cc"
-   "python/src/DatasetXML.cc"
+   "python/src/Dataset2.cc"
+   "python/src/XMLParser.cc"
    "python/src/main.cc"
    )
  
