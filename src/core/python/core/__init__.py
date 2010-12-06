@@ -4,7 +4,6 @@ __all__ = dir()
 
 #this will setup divergence from C++ into python.logging correctly
 import logging
-from . import colorlog
 
 #this configures our core logger
 logger = logging.getLogger("torch")
