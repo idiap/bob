@@ -62,7 +62,18 @@ namespace Torch {
          * @brief Parse an array given an XML node and return the 
          * corresponding object.
          */
-        boost::shared_ptr<Array> parseArray(xmlNodePtr node);
+        boost::shared_ptr<Array> parseArray(xmlNodePtr node, 
+          Array_Type a_type, size_t nb_values);
+
+        /**
+         * @brief Parse the data of an array given a tokenized string, and
+         * check that the number of tokens matches the number of expected 
+         * values.
+         */
+        template <typename T> T* parseArrayData( 
+          boost::tokenizer<boost::char_separator<char> > tok, 
+          size_t nb_values );
+
 
         // Attributes
         /** 

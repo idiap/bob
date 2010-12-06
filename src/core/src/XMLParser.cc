@@ -8,6 +8,8 @@
 #include "core/XMLParser.h"
 #include "core/Exception.h"
 
+#include <sys/stat.h> 
+
 namespace Torch {
   namespace core {
 
@@ -44,6 +46,8 @@ namespace Torch {
 
       // loader
       static const char l_blitz[]       = "blitz";
+      static const char l_tensor[]      = "tensor";
+      static const char l_bindata[]     = "bindata";
     }
 
 
@@ -187,39 +191,179 @@ namespace Torch {
         arrayset->getShape()[3] << ")" << std::endl;
       xmlFree(str);
 
-      // TODO: 1/ parse filename and loader
-      //       2/ stat the filename
-      //       3/ check that there is no data (if a filename is given)
-      //       4/ if not filename do the following
+      // Parse loader
+      str = xmlGetProp(cur, xmlCharStrdup(db::loader));
+      std::string str_loader( str!=0 ? (const char*)str: "" );
+      if( !str_loader.compare( db::l_blitz ) )
+        arrayset->setLoader( l_blitz );
+      else if( !str_loader.compare( db::l_tensor ) )
+        arrayset->setLoader( l_tensor );
+      else if( !str_loader.compare( db::l_bindata ) )
+        arrayset->setLoader( l_bindata );
+      else 
+        arrayset->setLoader( l_unknown );
+      std::cout << "Loader: " << arrayset->getLoader() << std::endl;
+      xmlFree(str);
 
-      // Parse the data
-      xmlNodePtr cur_data = cur->xmlChildrenNode;
-      while (cur_data != 0) { 
-        // Process an array
-        if ((!xmlStrcmp(cur_data->name, xmlCharStrdup(db::array)))) {
-          arrayset->add_array( parseArray(cur_data) );
+      // Parse filename
+      str = xmlGetProp(cur, xmlCharStrdup(db::file));
+      arrayset->setFilename( (str!=0?(const char*)str:"") );
+      struct stat stFileInfo;
+      if( arrayset->getFilename().compare("") && 
+          stat( arrayset->getFilename().c_str(), &stFileInfo) ) 
+        Torch::core::warn << "The file" << arrayset->getFilename() << 
+          " was not found." << std::endl;
+      std::cout << "File: " << arrayset->getFilename() << std::endl;
+      xmlFree(str);
+
+      if( !arrayset->getFilename().compare("") )
+      {
+        // Parse the data
+        xmlNodePtr cur_data = cur->xmlChildrenNode;
+
+        Array_Type a_type = arrayset->getArray_Type();
+        size_t nb_values = arrayset->getShape()[0];
+        for( size_t i=1; i < arrayset->getN_dim(); ++i)
+          nb_values *= arrayset->getShape()[i];
+        while (cur_data != 0) { 
+          // Process an array
+          if ((!xmlStrcmp(cur_data->name, xmlCharStrdup(db::array)))) {
+            arrayset->add_array( parseArray( cur_data, a_type, nb_values ) );
+          }
+          cur_data = cur_data->next;
         }
-        cur_data = cur_data->next;
       }
 
       return arrayset;
     }
 
 
-    boost::shared_ptr<Array> XMLParser::parseArray(const xmlNodePtr cur) {
+    boost::shared_ptr<Array> XMLParser::parseArray(const xmlNodePtr cur, 
+      Array_Type a_type, size_t nb_values) 
+    {
       boost::shared_ptr<Array> array(new Array());
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, xmlCharStrdup(db::id));
       array->setId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
-      std::cout << "Id: " << array->getId() << std::endl;
+      std::cout << "  Array Id: " << array->getId() << std::endl;
       xmlFree(str);
 
-      //TODO: parse other attributes inclusive data
+      // Parse loader
+      str = xmlGetProp(cur, xmlCharStrdup(db::loader));
+      std::string str_loader( str!=0 ? (const char*)str: "" );
+      if( !str_loader.compare( db::l_blitz ) )
+        array->setLoader( l_blitz );
+      else if( !str_loader.compare( db::l_tensor ) )
+        array->setLoader( l_tensor );
+      else if( !str_loader.compare( db::l_bindata ) )
+        array->setLoader( l_bindata );
+      else 
+        array->setLoader( l_unknown );
+      std::cout << "  Array Loader: " << array->getLoader() << std::endl;
+      xmlFree(str);
+
+      // Parse filename
+      str = xmlGetProp(cur, xmlCharStrdup(db::file));
+      array->setFilename( (str!=0?(const char*)str:"") );
+      struct stat stFileInfo;
+      if( array->getFilename().compare("") && 
+          stat( array->getFilename().c_str(), &stFileInfo) ) 
+        Torch::core::warn << "The file" << array->getFilename() << 
+          " was not found." << std::endl;
+      std::cout << "  Array File: " << array->getFilename() << std::endl;
+      xmlFree(str);
+
+      // Parse the data contained in the XML file
+      if( !array->getFilename().compare("") )
+      {
+        // Preliminary for the processing of the content of the array
+        xmlChar* content = xmlNodeGetContent(cur);
+        std::string data( (const char *)content);
+        boost::char_separator<char> sep(" ;|");
+        boost::tokenizer<boost::char_separator<char> > tok(data, sep);
+
+        // Switch over the possible type
+        switch( a_type) {
+          case t_bool:
+            array->setStorage( parseArrayData<bool>( tok, nb_values ) );
+            break;
+          case t_int8:
+            array->setStorage( parseArrayData<int8_t>( tok, nb_values ) );
+            break;
+          case t_int16:
+            array->setStorage( parseArrayData<int16_t>( tok, nb_values ) );
+            break;
+          case t_int32:
+            array->setStorage( parseArrayData<int32_t>( tok, nb_values ) );
+            break;
+          case t_int64:
+            array->setStorage( parseArrayData<int64_t>( tok, nb_values ) );
+            break;
+          case t_uint8:
+            array->setStorage( parseArrayData<uint8_t>( tok, nb_values ) );
+            break;
+          case t_uint16:
+            array->setStorage( parseArrayData<uint16_t>( tok, nb_values ) );
+            break;
+          case t_uint32:
+            array->setStorage( parseArrayData<uint32_t>( tok, nb_values ) );
+            break;
+          case t_uint64:
+            array->setStorage( parseArrayData<uint64_t>( tok, nb_values ) );
+            break;
+          case t_float32:
+            array->setStorage( parseArrayData<float>( tok, nb_values ) );
+            break;
+          case t_float64:
+            array->setStorage( parseArrayData<double>( tok, nb_values ) );
+            break;
+          case t_float128:
+            array->setStorage( parseArrayData<long double>( tok, nb_values ) );
+            break;
+          case t_complex64:
+            array->setStorage( parseArrayData<std::complex<float> >( tok, 
+              nb_values ) );
+            break;
+          case t_complex128:
+            array->setStorage( parseArrayData<std::complex<double> >( tok, 
+              nb_values ) );
+            break;
+          case t_complex256:
+            array->setStorage( parseArrayData<std::complex<long double> >( 
+              tok, nb_values ) );
+            break;
+          default:
+            break;
+        }     
+      }
       
       return array;
     }
 
+
+    template <typename T> T* XMLParser::parseArrayData( 
+      boost::tokenizer<boost::char_separator<char> > tok, size_t nb_values )
+    {
+      T* data_array = new T[nb_values];
+      size_t count = 0;
+      for( boost::tokenizer<boost::char_separator<char> >::iterator
+          it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+      {
+        data_array[count] = boost::lexical_cast<T>(*it);
+        std::cout << data_array[count] << " ";
+      }
+      std::cout << std::endl;
+
+      if(count != nb_values) {
+        Torch::core::error << "The number of values read (" << count <<
+          ") in the array does not match with the expected number (" << 
+          nb_values << ")" << std::endl;
+        throw Exception();
+      }
+
+      return data_array;
+    }
 
 
   }
