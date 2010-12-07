@@ -81,7 +81,7 @@ template<typename T> void benchmark_allocation
 
 template<typename T> void benchmark_set(const unsigned int times, T& t) {
   double v = 0;
-  const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
+  const long S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   boost::timer timer;
   switch(t.nDimension())
   {
@@ -130,7 +130,7 @@ template<typename T> void benchmark_set(const unsigned int times, T& t) {
 
 template<typename T> double benchmark_get(const unsigned int times, const T& t) {
   double v = 0;
-  const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
+  const long S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   boost::timer timer;
   switch(t.nDimension())
   {
@@ -171,7 +171,7 @@ template<typename T> double benchmark_get(const unsigned int times, const T& t) 
 }
 
 template<typename T> void benchmark_narrow(const unsigned int times, const T& t) {
-  const unsigned S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
+  const long S[] = {t.size(0), t.size(1), t.size(2), t.size(3)};
   T narrowed;
   boost::timer timer;
   for (unsigned n=0; n<times; ++n) narrowed.narrow(&t, 0, 0, S[0]/2);
@@ -182,7 +182,7 @@ template<typename T> void benchmark_narrow(const unsigned int times, const T& t)
 
 template<typename T> void 
 benchmark_add(const unsigned int times, const T& t1, const T& t2) {
-  const unsigned S[] = {t1.size(0), t1.size(1), t1.size(2), t1.size(3)};
+  const long S[] = {t1.size(0), t1.size(1), t1.size(2), t1.size(3)};
   T result1(S[0]);
   T result2(S[0], S[1]);
   T result3(S[0], S[1], S[2]);
