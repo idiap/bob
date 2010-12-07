@@ -11,13 +11,13 @@
 namespace Torch {
   namespace core {
 
-    Array::Array(const boost::shared_ptr<Arrayset> parent): 
+    Array::Array(const boost::shared_ptr<Arrayset>& parent): 
       m_parent_arrayset(parent), m_id(0), m_is_loaded(false), m_filename(""),
-      m_loader(l_unknown), m_storage(0) { }
+      m_loader(l_unknown), m_storage(0), 
+      m_element_type(parent->getArray_Type()) { }
 
     Array::~Array() {
-      Array_Type t = m_parent_arrayset->getArray_Type();
-      switch(t) {
+      switch(m_element_type) {
         case t_bool:
           delete [] static_cast<bool*>(m_storage); break;
         case t_int8:
@@ -62,7 +62,7 @@ namespace Torch {
       m_shape[0]=m_shape[1]=m_shape[2]=m_shape[3]=0; 
     }
 
-    Arrayset::~Arrayset() { } 
+    Arrayset::~Arrayset() { }
 
     void Arrayset::add_array( boost::shared_ptr<Array> array) {
       m_array.insert( std::pair<size_t,boost::shared_ptr<Array> >(

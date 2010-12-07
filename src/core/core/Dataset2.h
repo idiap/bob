@@ -47,7 +47,7 @@ namespace Torch {
         /**
          * @brief Constructor
          */
-        Array(const boost::shared_ptr<Arrayset> parent);
+        Array(const boost::shared_ptr<Arrayset>& parent);
         /**
          * @brief Destructor
          */
@@ -102,12 +102,17 @@ namespace Torch {
         //TODO: method to get the data???
 
       private:
-        const boost::shared_ptr<Arrayset> m_parent_arrayset;
+        const boost::shared_ptr<Arrayset>& m_parent_arrayset;
         size_t m_id;
         bool m_is_loaded;
         std::string m_filename;
         Loader_Type m_loader;
         void* m_storage;
+        // The following member is duplicated from the parent arrayset. This
+        // is necessary, as the parent arrayset is deleted before the 
+        // underlying arrays, and type is required to cast the void pointer 
+        // containing the data
+        Array_Type m_element_type;
     };
 
     /**
