@@ -60,21 +60,21 @@ namespace Torch {
 
     void XMLParser::load(const char* filename, Dataset& dataset) {
       // Parse the XML file with libxml2
-      xmlDocPtr m_doc = xmlParseFile(filename);
+      xmlDocPtr doc = xmlParseFile(filename);
       xmlNodePtr cur; 
 
       // Check validity of the XML file
-      if(m_doc == 0 ) {
+      if(doc == 0 ) {
         error << "Document " << filename << " was not parsed successfully." <<
           std::endl;
         throw Exception();
       }
 
       // Check that the XML file is not empty
-      cur = xmlDocGetRootElement(m_doc);
+      cur = xmlDocGetRootElement(doc);
       if(cur == 0) { 
         error << "Document " << filename << " is empty." << std::endl;
-        xmlFreeDoc(m_doc);
+        xmlFreeDoc(doc);
         throw Exception();
       }
 
@@ -82,7 +82,7 @@ namespace Torch {
       if( strcmp((const char*)cur->name, db::dataset) ) {
         error << "Document " << filename << 
           " is of the wrong type (!= dataset)." << std::endl;
-        xmlFreeDoc(m_doc);
+        xmlFreeDoc(doc);
         throw Exception();
       }    
 
@@ -95,6 +95,7 @@ namespace Torch {
         cur = cur->next;
       }
 
+      xmlFreeDoc(doc);
     }
 
 
@@ -223,12 +224,11 @@ namespace Torch {
         // Parse the data
         xmlNodePtr cur_data = cur->xmlChildrenNode;
 
-        Array_Type a_type = arrayset->getArray_Type();
         while (cur_data != 0) { 
           // Process an array
           if ( !strcmp( (const char*)cur_data->name, db::array)) {
-            arrayset->add_array( parseArray( arrayset, cur_data, a_type, 
-              arrayset->getN_elem() ) );
+            arrayset->add_array( parseArray( arrayset, cur_data, 
+              arrayset->getArray_Type(), arrayset->getN_elem() ) );
           }
           cur_data = cur_data->next;
         }
@@ -283,6 +283,7 @@ namespace Torch {
         std::string data( (const char *)content);
         boost::char_separator<char> sep(" ;|");
         boost::tokenizer<boost::char_separator<char> > tok(data, sep);
+        xmlFree(content);
 
         // Switch over the possible type
         switch( a_type) {
@@ -336,7 +337,7 @@ namespace Torch {
             break;
           default:
             break;
-        }     
+        }
       }
       
       return array;

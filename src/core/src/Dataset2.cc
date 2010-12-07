@@ -56,7 +56,7 @@ namespace Torch {
 
 
     Arrayset::Arrayset(): 
-      m_id(0), m_n_dim(0), m_element_type(t_unknown), m_role(""), 
+      m_id(0), m_n_dim(0), m_n_elem(0), m_element_type(t_unknown), m_role(""),
       m_is_loaded(false), m_filename(""), m_loader(l_unknown) 
     {
       m_shape[0]=m_shape[1]=m_shape[2]=m_shape[3]=0; 
