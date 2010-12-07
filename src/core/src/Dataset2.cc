@@ -11,11 +11,13 @@
 namespace Torch {
   namespace core {
 
-    Array::Array(): 
-      m_id(0), m_is_loaded(false), m_filename(""), m_loader(l_unknown), 
-      m_storage(0) { }
+    Array::Array(const boost::shared_ptr<Arrayset> parent): 
+      m_parent_arrayset(parent), m_id(0), m_is_loaded(false), m_filename(""),
+      m_loader(l_unknown), m_storage(0) { }
 
-    Array::~Array() { } 
+    Array::~Array() {
+      delete [] m_storage;
+    } 
 
 
     Arrayset::Arrayset(): 

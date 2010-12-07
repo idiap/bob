@@ -42,16 +42,13 @@ namespace Torch {
         ~XMLParser();
 
 
-        // TODO: Should we make this method static?
         /**
-         * @brief Parse an XML file an return a Dataset. The returned dataset
-         * should be deallocated by the caller using delete.
+         * @brief Parse an XML file and update the dataset object accordingly.
          */
-        Dataset* load(const char *filename);
+        void load(const char *filename, Dataset& dataset);
 
 
       private:
-        // TODO: Should we make the following methods static?
         /**
          * @brief Parse an arrayset given an XML node and return the 
          * corresponding object.
@@ -62,7 +59,8 @@ namespace Torch {
          * @brief Parse an array given an XML node and return the 
          * corresponding object.
          */
-        boost::shared_ptr<Array> parseArray(xmlNodePtr node, 
+        boost::shared_ptr<Array> parseArray( 
+          const boost::shared_ptr<Arrayset> parent, xmlNodePtr node, 
           Array_Type a_type, size_t nb_values);
 
         /**
@@ -74,12 +72,6 @@ namespace Torch {
           boost::tokenizer<boost::char_separator<char> > tok, 
           size_t nb_values );
 
-
-        // Attributes
-        /** 
-         * @brief Structure describing an XML document
-         */
-        xmlDocPtr m_doc; // TODO: Necessary?
     };
 
   }

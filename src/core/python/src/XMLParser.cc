@@ -15,7 +15,8 @@ using namespace boost::python;
 void bind_core_XMLParser()
 {
 	class_<Torch::core::XMLParser, boost::shared_ptr<Torch::core::XMLParser> >("XMLParser","This class is used to parse an XML file", init<>())
-		.def("load",(Torch::core::Dataset* (Torch::core::XMLParser::*)(const char*))&Torch::core::XMLParser::load, return_value_policy<manage_new_object>(), (arg("self"), arg("filename")), "Load function")
+		.def("load",(void (Torch::core::XMLParser::*)(const char*, Torch::core::Dataset&))&Torch::core::XMLParser::load, (arg("self"), arg("filename"), arg("dataset")), "Load function")
 		;
 }
 
+//static void load(const char *filename, Dataset& dataset);

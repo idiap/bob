@@ -34,6 +34,11 @@ namespace Torch {
     typedef enum Loader_Type { l_unknown, l_blitz, l_tensor, l_bindata } 
       Loader_Type;
 
+    
+    // Declare the Arrayset for the reference to the parent Arrayset in the
+    // Array class.
+    class Arrayset;
+
     /**
      * @brief The array class for a dataset
      */
@@ -42,7 +47,7 @@ namespace Torch {
         /**
          * @brief Constructor
          */
-        Array();
+        Array(const boost::shared_ptr<Arrayset> parent);
         /**
          * @brief Destructor
          */
@@ -97,6 +102,7 @@ namespace Torch {
         //TODO: method to get the data???
 
       private:
+        const boost::shared_ptr<Arrayset> m_parent_arrayset;
         size_t m_id;
         bool m_is_loaded;
         std::string m_filename;

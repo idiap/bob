@@ -58,9 +58,9 @@ namespace Torch {
     XMLParser::~XMLParser() { }
 
 
-    Dataset* XMLParser::load(const char* filename) {
+    void XMLParser::load(const char* filename, Dataset& dataset) {
       // Parse the XML file with libxml2
-      m_doc = xmlParseFile(filename);
+      xmlDocPtr m_doc = xmlParseFile(filename);
       xmlNodePtr cur; 
 
       // Check validity of the XML file
@@ -86,18 +86,15 @@ namespace Torch {
         throw Exception();
       }    
 
-      Dataset* dataset=new Dataset();
-
       // Parse Arraysets
       cur = cur->xmlChildrenNode;
       while (cur != 0) { 
         // Parse an arrayset and add it to the dataset
         if ((!xmlStrcmp(cur->name, xmlCharStrdup(db::arrayset)))) 
-          dataset->add_arrayset( parseArrayset(cur) );
+          dataset.add_arrayset( parseArrayset(cur) );
         cur = cur->next;
       }
 
-      return dataset;
     }
 
 
@@ -228,7 +225,8 @@ namespace Torch {
         while (cur_data != 0) { 
           // Process an array
           if ((!xmlStrcmp(cur_data->name, xmlCharStrdup(db::array)))) {
-            arrayset->add_array( parseArray( cur_data, a_type, nb_values ) );
+            arrayset->add_array( parseArray( arrayset, cur_data, a_type, 
+              nb_values ) );
           }
           cur_data = cur_data->next;
         }
@@ -238,10 +236,11 @@ namespace Torch {
     }
 
 
-    boost::shared_ptr<Array> XMLParser::parseArray(const xmlNodePtr cur, 
-      Array_Type a_type, size_t nb_values) 
+    boost::shared_ptr<Array> XMLParser::parseArray(
+      const boost::shared_ptr<Arrayset> parent, 
+      const xmlNodePtr cur, Array_Type a_type, size_t nb_values) 
     {
-      boost::shared_ptr<Array> array(new Array());
+      boost::shared_ptr<Array> array(new Array(parent));
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, xmlCharStrdup(db::id));
