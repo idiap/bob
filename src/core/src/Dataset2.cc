@@ -66,7 +66,7 @@ namespace Torch {
 
     void Arrayset::add_array( boost::shared_ptr<Array> array) {
       m_array.insert( std::pair<size_t,boost::shared_ptr<Array> >(
-        array->getId(), boost::shared_ptr<Array>(array)) );
+        array->getId(), array) );
     }
 
     template<typename T, int D> void 
@@ -81,7 +81,7 @@ namespace Torch {
 
     void Dataset::add_arrayset( boost::shared_ptr<Arrayset> arrayset) {
       m_arrayset.insert( std::pair<size_t,boost::shared_ptr<Arrayset> >(
-        arrayset->getId(), boost::shared_ptr<Arrayset>(arrayset)) );
+        arrayset->getId(), arrayset) );
     }
 
     const boost::shared_ptr<Arrayset> Dataset::at( const size_t id ) const {
