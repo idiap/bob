@@ -16,7 +16,42 @@ namespace Torch {
       m_loader(l_unknown), m_storage(0) { }
 
     Array::~Array() {
-      delete [] m_storage;
+      Array_Type t = m_parent_arrayset->getArray_Type();
+      switch(t) {
+        case t_bool:
+          delete [] static_cast<bool*>(m_storage); break;
+        case t_int8:
+          delete [] static_cast<int8_t*>(m_storage); break;
+        case t_int16:
+          delete [] static_cast<int16_t*>(m_storage); break;
+        case t_int32:
+          delete [] static_cast<int32_t*>(m_storage); break;
+        case t_int64:
+          delete [] static_cast<int64_t*>(m_storage); break;
+        case t_uint8:
+          delete [] static_cast<uint8_t*>(m_storage); break;
+        case t_uint16:
+          delete [] static_cast<uint16_t*>(m_storage); break;
+        case t_uint32:
+          delete [] static_cast<uint32_t*>(m_storage); break;
+        case t_uint64:
+          delete [] static_cast<uint64_t*>(m_storage); break;
+        case t_float32:
+          delete [] static_cast<float*>(m_storage); break;
+        case t_float64:
+          delete [] static_cast<double*>(m_storage); break;
+        case t_float128:
+          delete [] static_cast<long double*>(m_storage); break;
+        case t_complex64:
+          delete [] static_cast<std::complex<float>* >(m_storage); break;
+        case t_complex128:
+          delete [] static_cast<std::complex<double>* >(m_storage); break;
+        case t_complex256:
+          delete [] static_cast<std::complex<long double>* >(m_storage); 
+          break;
+        default:
+          break;
+      }
     } 
 
 

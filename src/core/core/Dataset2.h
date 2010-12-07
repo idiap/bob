@@ -107,9 +107,7 @@ namespace Torch {
         bool m_is_loaded;
         std::string m_filename;
         Loader_Type m_loader;
-        // TODO: Check how we are going to deal with the storage area.
         void* m_storage;
-        // TODO: Type and dimension attributes copied from the arrayset?
     };
 
     /**
@@ -152,6 +150,11 @@ namespace Torch {
             m_shape[i] = shape[i];
         }
         /**
+         * @brief Set the number of elements in each array of this 
+         * Arrayset
+         */
+        void setN_elem(const size_t n_elem) {  m_n_elem = n_elem; } 
+        /**
          * @brief Set the type of the elements contained in the the arrays of 
          * this Arrayset
          */
@@ -191,6 +194,11 @@ namespace Torch {
          * Arrayset
          */
         const size_t* getShape() const { return m_shape; }
+        /**
+         * @brief Get the number of elements in each array of this 
+         * Arrayset
+         */
+        const size_t getN_elem() const { return m_n_elem; } 
         /**
          * @brief Get the type of the elements contained in the the arrays of 
          * this Arrayset
@@ -263,6 +271,7 @@ namespace Torch {
 
         size_t m_n_dim;
         size_t m_shape[4];
+        size_t m_n_elem;
         Array_Type m_element_type;
         
         std::string m_role;

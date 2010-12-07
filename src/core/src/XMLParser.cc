@@ -187,6 +187,11 @@ namespace Torch {
         arrayset->getShape()[1] << ","<< arrayset->getShape()[2] << "," << 
         arrayset->getShape()[3] << ")" << std::endl;
       xmlFree(str);
+      // Set the number of elements
+      size_t n_elem = arrayset->getShape()[0];
+      for( size_t i=1; i < arrayset->getN_dim(); ++i)
+        n_elem *= arrayset->getShape()[i];
+      arrayset->setN_elem(n_elem);
 
       // Parse loader
       str = xmlGetProp(cur, xmlCharStrdup(db::loader));
@@ -219,14 +224,11 @@ namespace Torch {
         xmlNodePtr cur_data = cur->xmlChildrenNode;
 
         Array_Type a_type = arrayset->getArray_Type();
-        size_t nb_values = arrayset->getShape()[0];
-        for( size_t i=1; i < arrayset->getN_dim(); ++i)
-          nb_values *= arrayset->getShape()[i];
         while (cur_data != 0) { 
           // Process an array
           if ((!xmlStrcmp(cur_data->name, xmlCharStrdup(db::array)))) {
             arrayset->add_array( parseArray( arrayset, cur_data, a_type, 
-              nb_values ) );
+              arrayset->getN_elem() ) );
           }
           cur_data = cur_data->next;
         }
