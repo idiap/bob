@@ -72,14 +72,14 @@ namespace Torch {
 
       // Check that the XML file is not empty
       cur = xmlDocGetRootElement(m_doc);
-      if (cur == 0) { 
+      if(cur == 0) { 
         error << "Document " << filename << " is empty." << std::endl;
         xmlFreeDoc(m_doc);
         throw Exception();
       }
 
       // Check that the XML file contains a dataset
-      if (xmlStrcmp(cur->name, xmlCharStrdup(db::dataset))) {
+      if( strcmp((const char*)cur->name, db::dataset) ) {
         error << "Document " << filename << 
           " is of the wrong type (!= dataset)." << std::endl;
         xmlFreeDoc(m_doc);
@@ -88,9 +88,9 @@ namespace Torch {
 
       // Parse Arraysets
       cur = cur->xmlChildrenNode;
-      while (cur != 0) { 
+      while(cur != 0) { 
         // Parse an arrayset and add it to the dataset
-        if ((!xmlStrcmp(cur->name, xmlCharStrdup(db::arrayset)))) 
+        if( !strcmp((const char*)cur->name, db::arrayset) )
           dataset.add_arrayset( parseArrayset(cur) );
         cur = cur->next;
       }
@@ -102,19 +102,19 @@ namespace Torch {
       boost::shared_ptr<Arrayset> arrayset(new Arrayset());
       // Parse id
       xmlChar *str;
-      str = xmlGetProp(cur, xmlCharStrdup(db::id));
+      str = xmlGetProp(cur, (const xmlChar*)db::id);
       arrayset->setId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
       std::cout << "Id: " << arrayset->getId() << std::endl;
       xmlFree(str);
 
       // Parse role
-      str = xmlGetProp(cur, xmlCharStrdup(db::role));
+      str = xmlGetProp(cur, (const xmlChar*)db::role);
       arrayset->setRole( ( (str!=0?(const char *)str:"") ) );
       std::cout << "Role: " << arrayset->getRole() << std::endl;
       xmlFree(str);
 
       // Parse elementtype
-      str = xmlGetProp(cur, xmlCharStrdup(db::elementtype));
+      str = xmlGetProp(cur, (const xmlChar*)db::elementtype);
       if( str==0 ) {
         error << "Elementtype is not specified in arrayset (id: " << 
           arrayset->getId() << ")." << std::endl;
@@ -159,7 +159,7 @@ namespace Torch {
       // Parse shape
       size_t shape[4];
       shape[0]=shape[1]=shape[2]=shape[3]=0;
-      str = xmlGetProp(cur, xmlCharStrdup(db::shape));
+      str = xmlGetProp(cur, (const xmlChar*)db::shape);
       if( str==0 ) {
         error << "Elementtype is not specified in arrayset (id: " << 
           arrayset->getId() << ")." << std::endl;
@@ -194,7 +194,7 @@ namespace Torch {
       arrayset->setN_elem(n_elem);
 
       // Parse loader
-      str = xmlGetProp(cur, xmlCharStrdup(db::loader));
+      str = xmlGetProp(cur, (const xmlChar*)db::loader);
       std::string str_loader( str!=0 ? (const char*)str: "" );
       if( !str_loader.compare( db::l_blitz ) )
         arrayset->setLoader( l_blitz );
@@ -208,7 +208,7 @@ namespace Torch {
       xmlFree(str);
 
       // Parse filename
-      str = xmlGetProp(cur, xmlCharStrdup(db::file));
+      str = xmlGetProp(cur, (const xmlChar*)db::file);
       arrayset->setFilename( (str!=0?(const char*)str:"") );
       struct stat stFileInfo;
       if( arrayset->getFilename().compare("") && 
@@ -226,7 +226,7 @@ namespace Torch {
         Array_Type a_type = arrayset->getArray_Type();
         while (cur_data != 0) { 
           // Process an array
-          if ((!xmlStrcmp(cur_data->name, xmlCharStrdup(db::array)))) {
+          if ( !strcmp( (const char*)cur_data->name, db::array)) {
             arrayset->add_array( parseArray( arrayset, cur_data, a_type, 
               arrayset->getN_elem() ) );
           }
@@ -245,13 +245,13 @@ namespace Torch {
       boost::shared_ptr<Array> array(new Array(parent));
       // Parse id
       xmlChar *str;
-      str = xmlGetProp(cur, xmlCharStrdup(db::id));
+      str = xmlGetProp(cur, (const xmlChar*)db::id);
       array->setId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
       std::cout << "  Array Id: " << array->getId() << std::endl;
       xmlFree(str);
 
       // Parse loader
-      str = xmlGetProp(cur, xmlCharStrdup(db::loader));
+      str = xmlGetProp(cur, (const xmlChar*)db::loader);
       std::string str_loader( str!=0 ? (const char*)str: "" );
       if( !str_loader.compare( db::l_blitz ) )
         array->setLoader( l_blitz );
@@ -265,7 +265,7 @@ namespace Torch {
       xmlFree(str);
 
       // Parse filename
-      str = xmlGetProp(cur, xmlCharStrdup(db::file));
+      str = xmlGetProp(cur, (const xmlChar*)db::file);
       array->setFilename( (str!=0?(const char*)str:"") );
       struct stat stFileInfo;
       if( array->getFilename().compare("") && 

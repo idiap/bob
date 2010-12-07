@@ -19,4 +19,3 @@ void bind_core_XMLParser()
 		;
 }
 
-//static void load(const char *filename, Dataset& dataset);
