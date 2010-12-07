@@ -18,7 +18,8 @@ void bind_core_tensorfile();
 void bind_core_profiler();
 void bind_core_DataSet();
 void bind_core_ListDataSet();
-void bind_core_DatasetXML();
+void bind_core_Dataset();
+void bind_core_XMLParser();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
   scope().attr("__doc__") = "Torch core classes and sub-classes";
@@ -31,5 +32,6 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_profiler();
   bind_core_DataSet();
   bind_core_ListDataSet();
-  bind_core_DatasetXML();
+  bind_core_Dataset();
+  bind_core_XMLParser();
 }
