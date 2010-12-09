@@ -6,18 +6,17 @@
  */
 
 #include "core/Dataset2.h"
-#include "core/Exception.h"
 
 namespace Torch {
   namespace core {
 
-    Array::Array(const boost::shared_ptr<Arrayset>& parent): 
+    Array::Array(const Arrayset& parent): 
       m_parent_arrayset(parent), m_id(0), m_is_loaded(false), m_filename(""),
-      m_loader(l_unknown), m_storage(0), 
-      m_element_type(parent->getArray_Type()) { }
+      m_loader(l_unknown), m_storage(0) { }
 
     Array::~Array() {
-      switch(m_element_type) {
+      std::cout << "Array destructor (id: " << getId() << ")" << std::endl;
+      switch(m_parent_arrayset.getArrayType()/* m_element_type*/) {
         case t_bool:
           delete [] static_cast<bool*>(m_storage); break;
         case t_int8:
@@ -62,24 +61,27 @@ namespace Torch {
       m_shape[0]=m_shape[1]=m_shape[2]=m_shape[3]=0; 
     }
 
-    Arrayset::~Arrayset() { }
-
-    void Arrayset::add_array( boost::shared_ptr<Array> array) {
-      m_array.insert( std::pair<size_t,boost::shared_ptr<Array> >(
-        array->getId(), array) );
+    Arrayset::~Arrayset() {
+      std::cout << "Arrayset destructor (id: " << getId() << ")" << std::endl;
+      for(iterator it=begin(); it!=end(); ++it)
+        it->second.reset();
     }
 
-    template<typename T, int D> void 
-      Arrayset::at(size_t id, blitz::Array<T,D>& output) {
-      // TODO: to implement
+    void Arrayset::addArray( boost::shared_ptr<Array> array) {
+      m_array.insert( std::pair<size_t,boost::shared_ptr<Array> >(
+        array->getId(), array) );
     }
 
 
     Dataset::Dataset() { }
 
-    Dataset::~Dataset() { }
+    Dataset::~Dataset() {
+      std::cout << "Dataset destructor" << std::endl;
+      for(iterator it=begin(); it!=end(); ++it)
+        it->second.reset();
+    }
 
-    void Dataset::add_arrayset( boost::shared_ptr<Arrayset> arrayset) {
+    void Dataset::addArrayset( boost::shared_ptr<Arrayset> arrayset) {
       m_arrayset.insert( std::pair<size_t,boost::shared_ptr<Arrayset> >(
         arrayset->getId(), arrayset) );
     }

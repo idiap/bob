@@ -60,8 +60,8 @@ namespace Torch {
          * corresponding object.
          */
         boost::shared_ptr<Array> parseArray( 
-          const boost::shared_ptr<Arrayset> parent, xmlNodePtr node, 
-          Array_Type a_type, size_t nb_values);
+          const Arrayset& parent, xmlNodePtr node, 
+          ArrayType a_type, size_t nb_values);
 
         /**
          * @brief Parse the data of an array given a tokenized string, and
@@ -73,6 +73,33 @@ namespace Torch {
           size_t nb_values );
 
     };
+
+
+    /********************** TEMPLATE FUNCTION DEFINITIONS ***************/
+    template <typename T> T* XMLParser::parseArrayData( 
+      boost::tokenizer<boost::char_separator<char> > tok, size_t nb_values )
+    {
+      T* data_array = new T[nb_values];
+      size_t count = 0;
+      for( boost::tokenizer<boost::char_separator<char> >::iterator
+          it=tok.begin(); it!=tok.end(); ++it, ++count ) 
+      {
+        data_array[count] = boost::lexical_cast<T>(*it);
+        std::cout << data_array[count] << " ";
+      }
+      std::cout << std::endl;
+
+      if(count != nb_values) {
+        Torch::core::error << "The number of values read (" << count <<
+          ") in the array does not match with the expected number (" << 
+          nb_values << ")" << std::endl;
+        throw Exception();
+      }
+
+      return data_array;
+    }
+
+    
 
   }
 

@@ -91,7 +91,7 @@ namespace Torch {
       while(cur != 0) { 
         // Parse an arrayset and add it to the dataset
         if( !strcmp((const char*)cur->name, db::arrayset) )
-          dataset.add_arrayset( parseArrayset(cur) );
+          dataset.addArrayset( parseArrayset(cur) );
         cur = cur->next;
       }
 
@@ -123,38 +123,38 @@ namespace Torch {
       }
       std::string str_element_type( (const char*)str );
       if( !str_element_type.compare( db::t_bool ) )
-        arrayset->setArray_Type( t_bool );
+        arrayset->setArrayType( t_bool );
       else if( !str_element_type.compare( db::t_uint8 ) )
-        arrayset->setArray_Type( t_uint8 );
+        arrayset->setArrayType( t_uint8 );
       else if( !str_element_type.compare( db::t_uint16 ) )
-        arrayset->setArray_Type( t_uint16 );
+        arrayset->setArrayType( t_uint16 );
       else if( !str_element_type.compare( db::t_uint32 ) )
-        arrayset->setArray_Type( t_uint32 );
+        arrayset->setArrayType( t_uint32 );
       else if( !str_element_type.compare( db::t_uint64 ) )
-        arrayset->setArray_Type( t_uint64 );
+        arrayset->setArrayType( t_uint64 );
       else if( !str_element_type.compare( db::t_int8 ) )
-        arrayset->setArray_Type( t_int8 );
+        arrayset->setArrayType( t_int8 );
       else if( !str_element_type.compare( db::t_int16 ) )
-        arrayset->setArray_Type( t_int16 );
+        arrayset->setArrayType( t_int16 );
       else if( !str_element_type.compare( db::t_int32 ) )
-        arrayset->setArray_Type( t_int32 );
+        arrayset->setArrayType( t_int32 );
       else if( !str_element_type.compare( db::t_int64 ) )
-        arrayset->setArray_Type( t_int64 );
+        arrayset->setArrayType( t_int64 );
       else if( !str_element_type.compare( db::t_float32 ) )
-        arrayset->setArray_Type( t_float32 );
+        arrayset->setArrayType( t_float32 );
       else if( !str_element_type.compare( db::t_float64 ) )
-        arrayset->setArray_Type( t_float64 );
+        arrayset->setArrayType( t_float64 );
       else if( !str_element_type.compare( db::t_float128 ) )
-        arrayset->setArray_Type( t_float128 );
+        arrayset->setArrayType( t_float128 );
       else if( !str_element_type.compare( db::t_complex64 ) )
-        arrayset->setArray_Type( t_complex64 );
+        arrayset->setArrayType( t_complex64 );
       else if( !str_element_type.compare( db::t_complex128 ) )
-        arrayset->setArray_Type( t_complex128 );
+        arrayset->setArrayType( t_complex128 );
       else if( !str_element_type.compare( db::t_complex256 ) )
-        arrayset->setArray_Type( t_complex256 );
+        arrayset->setArrayType( t_complex256 );
       else
-        arrayset->setArray_Type( t_unknown );
-      std::cout << "Elementtype: " << arrayset->getArray_Type() << std::endl;
+        arrayset->setArrayType( t_unknown );
+      std::cout << "Elementtype: " << arrayset->getArrayType() << std::endl;
       xmlFree(str);
 
       // Parse shape
@@ -181,18 +181,18 @@ namespace Torch {
         }
         shape[count] = atoi((*it).c_str());
       }
-      arrayset->setN_dim(count);
+      arrayset->setNDim(count);
       arrayset->setShape(shape);
-      std::cout << "Nb dimensions: " << arrayset->getN_dim() << std::endl;
+      std::cout << "Nb dimensions: " << arrayset->getNDim() << std::endl;
       std::cout << "Shape: (" << arrayset->getShape()[0] << "," << 
         arrayset->getShape()[1] << ","<< arrayset->getShape()[2] << "," << 
         arrayset->getShape()[3] << ")" << std::endl;
       xmlFree(str);
       // Set the number of elements
       size_t n_elem = arrayset->getShape()[0];
-      for( size_t i=1; i < arrayset->getN_dim(); ++i)
+      for( size_t i=1; i < arrayset->getNDim(); ++i)
         n_elem *= arrayset->getShape()[i];
-      arrayset->setN_elem(n_elem);
+      arrayset->setNElem(n_elem);
 
       // Parse loader
       str = xmlGetProp(cur, (const xmlChar*)db::loader);
@@ -227,8 +227,8 @@ namespace Torch {
         while (cur_data != 0) { 
           // Process an array
           if ( !strcmp( (const char*)cur_data->name, db::array)) {
-            arrayset->add_array( parseArray( arrayset, cur_data, 
-              arrayset->getArray_Type(), arrayset->getN_elem() ) );
+            arrayset->addArray( parseArray( *arrayset, cur_data, 
+              arrayset->getArrayType(), arrayset->getNElem() ) );
           }
           cur_data = cur_data->next;
         }
@@ -239,8 +239,8 @@ namespace Torch {
 
 
     boost::shared_ptr<Array> XMLParser::parseArray(
-      const boost::shared_ptr<Arrayset> parent, 
-      const xmlNodePtr cur, Array_Type a_type, size_t nb_values) 
+      const Arrayset& parent, 
+      const xmlNodePtr cur, ArrayType a_type, size_t nb_values) 
     {
       boost::shared_ptr<Array> array(new Array(parent));
       // Parse id
@@ -341,30 +341,6 @@ namespace Torch {
       }
       
       return array;
-    }
-
-
-    template <typename T> T* XMLParser::parseArrayData( 
-      boost::tokenizer<boost::char_separator<char> > tok, size_t nb_values )
-    {
-      T* data_array = new T[nb_values];
-      size_t count = 0;
-      for( boost::tokenizer<boost::char_separator<char> >::iterator
-          it=tok.begin(); it!=tok.end(); ++it, ++count ) 
-      {
-        data_array[count] = boost::lexical_cast<T>(*it);
-        std::cout << data_array[count] << " ";
-      }
-      std::cout << std::endl;
-
-      if(count != nb_values) {
-        Torch::core::error << "The number of values read (" << count <<
-          ") in the array does not match with the expected number (" << 
-          nb_values << ")" << std::endl;
-        throw Exception();
-      }
-
-      return data_array;
     }
 
 
