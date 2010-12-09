@@ -72,7 +72,13 @@ namespace Torch {
         array->getId(), array) );
     }
 
-    const boost::shared_ptr<Array> Arrayset::operator[]( const size_t id ) const {
+    const boost::shared_ptr<Array> 
+    Arrayset::operator[]( const size_t id ) const {
+      return (m_array.find(id))->second;
+    }
+
+    const boost::shared_ptr<Array> 
+    Arrayset::getArray( const size_t id ) const {
       return (m_array.find(id))->second;
     }
 
@@ -90,7 +96,13 @@ namespace Torch {
         arrayset->getId(), arrayset) );
     }
 
-    const boost::shared_ptr<Arrayset> Dataset::operator[]( const size_t id ) const {
+    const boost::shared_ptr<Arrayset> 
+    Dataset::operator[]( const size_t id ) const {
+      return (m_arrayset.find(id))->second;
+    }
+
+    const boost::shared_ptr<Arrayset> 
+    Dataset::getArrayset( const size_t id ) const {
       return (m_arrayset.find(id))->second;
     }
 

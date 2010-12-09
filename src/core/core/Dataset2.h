@@ -14,9 +14,12 @@
 #include <blitz/array.h>
 #include "core/logging.h"
 #include "core/Exception.h"
+#include "core/StaticComplexCast.h"
+
 #include <string>
 #include <map>
 #include <cstdlib> // required when using size_t type
+
 
 
 namespace Torch {   
@@ -132,7 +135,7 @@ namespace Torch {
         void refer( blitz::Array<std::complex<long double>,D>& output);
 
       private:
-        template <typename T, typename U> void copyCast( T* out);
+        template <typename T, typename U> void copyCast( U* out);
         template <typename T, int D> 
         void referCheck( blitz::Array<T,D>& output);
 
@@ -166,7 +169,6 @@ namespace Torch {
         /**
          * @brief Add an Array to the Arrayset
          */
-        // TODO: const argument or not?
         void addArray( boost::shared_ptr<Array> array);
 
         /**
@@ -297,6 +299,7 @@ namespace Torch {
          * @brief Return the array of the given id
          */
         const boost::shared_ptr<Array> operator[](size_t id) const;
+        const boost::shared_ptr<Array> getArray(size_t id) const;
 
         /**
          * @brief Update the blitz array with the content of the array 
@@ -367,7 +370,6 @@ namespace Torch {
         /**
          * @brief Add an Arrayset to the Dataset
          */
-        // TODO: const argument or not?
         void addArrayset( boost::shared_ptr<Arrayset> arrayset);
 
         /**
@@ -405,6 +407,7 @@ namespace Torch {
          * @brief Return the Arrayset of the given id 
          */
         const boost::shared_ptr<Arrayset> operator[]( const size_t id ) const;
+        const boost::shared_ptr<Arrayset> getArrayset( const size_t id ) const;
 
       private:    
         std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
@@ -414,11 +417,11 @@ namespace Torch {
 
     /********************** TEMPLATE FUNCTION DEFINITIONS ***************/
     template <typename T, typename U> 
-    void Array::copyCast( T* out) {
+    void Array::copyCast( U* out) {
       size_t n_elem = m_parent_arrayset.getNElem();
       for( size_t i=0; i<n_elem; ++i) {
-        U* u_storage = reinterpret_cast<U*>(m_storage);
-        out[i] = *reinterpret_cast<T*>(&u_storage[i]);
+        T* t_storage = static_cast<T*>(m_storage);
+        static_complex_cast( t_storage[i], out[i] );
       }
     }
 
@@ -438,61 +441,38 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-
-      if( output.numElements() != m_parent_arrayset.getNElem() ) {
-        error << "Cannot copy the data in a blitz array with a different " <<
-          "number of elements." << std::endl;
-        throw Exception();
-      }
-
-      // TODO: check number of elements in each dimensions?
       T* out_data = output.data();
       switch(m_parent_arrayset.getArrayType()) {
         case t_bool:
-//          output = blitz::Array<T,D>(reinterpret_cast<bool*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,bool>(out_data); break;
+          copyCast<bool,T>(out_data); break;
         case t_int8:
-//          output = blitz::Array<T,D>(reinterpret_cast<int8_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,int8_t>(out_data); break;
+          copyCast<int8_t,T>(out_data); break;
         case t_int16:
-//          output = blitz::Array<T,D>(reinterpret_cast<int16_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,int16_t>(out_data); break;
+          copyCast<int16_t,T>(out_data); break;
         case t_int32:
-//          output = blitz::Array<T,D>(reinterpret_cast<int32_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,int32_t>(out_data); break;
+          copyCast<int32_t,T>(out_data); break;
         case t_int64:
-//          output = blitz::Array<T,D>(reinterpret_cast<int64_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,int64_t>(out_data); break;
+          copyCast<int64_t,T>(out_data); break;
         case t_uint8:
-//          output = blitz::Array<T,D>(reinterpret_cast<uint8_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,uint8_t>(out_data); break;
+          copyCast<uint8_t,T>(out_data); break;
         case t_uint16:
-//          output = blitz::Array<T,D>(reinterpret_cast<uint16_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,uint16_t>(out_data); break;
+          copyCast<uint16_t,T>(out_data); break;
         case t_uint32:
-//          output = blitz::Array<T,D>(reinterpret_cast<uint32_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,uint32_t>(out_data); break;
+          copyCast<uint32_t,T>(out_data); break;
         case t_uint64:
-//          output = blitz::Array<T,D>(reinterpret_cast<uint64_t*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,uint64_t>(out_data); break;
+          copyCast<uint64_t,T>(out_data); break;
         case t_float32:
-//          output = blitz::Array<T,D>(reinterpret_cast<float*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,float>(out_data); break;
+          copyCast<float,T>(out_data); break;
         case t_float64:
-//          output = blitz::Array<T,D>(reinterpret_cast<double*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,double>(out_data); break;
+          copyCast<double,T>(out_data); break;
         case t_float128:
-//          output = blitz::Array<T,D>(reinterpret_cast<long double*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,long double>(out_data); break;
+          copyCast<long double,T>(out_data); break;
         case t_complex64:
-//          output = blitz::Array<T,D>(reinterpret_cast<std::complex<float>*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,std::complex<float> >(out_data); break;
+          copyCast<std::complex<float>,T>(out_data); break;
         case t_complex128:
-//          output = blitz::Array<T,D>(reinterpret_cast<std::complex<double>*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,std::complex<double> >(out_data); break;
+          copyCast<std::complex<double>,T>(out_data); break;
         case t_complex256:
-//          output = blitz::Array<T,D>(reinterpret_cast<std::complex<long double>*>(m_storage), shape, blitz::duplicateData); break;
-          copyCast<T,std::complex<long double> >(out_data); break;
+          copyCast<std::complex<long double>,T>(out_data); break;
         default:
           break;
       }
@@ -529,7 +509,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_bool:
-          output = blitz::Array<bool,D>(reinterpret_cast<bool*>(m_storage), 
+          output = blitz::Array<bool,D>(static_cast<bool*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -552,7 +532,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_int8:
-          output = blitz::Array<int8_t,D>(reinterpret_cast<int8_t*>(m_storage), 
+          output = blitz::Array<int8_t,D>(static_cast<int8_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -575,7 +555,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_int16:
-          output = blitz::Array<int16_t,D>(reinterpret_cast<int16_t*>(m_storage), 
+          output = blitz::Array<int16_t,D>(static_cast<int16_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -598,7 +578,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_int32:
-          output = blitz::Array<int32_t,D>(reinterpret_cast<int32_t*>(m_storage), 
+          output = blitz::Array<int32_t,D>(static_cast<int32_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -621,7 +601,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_int64:
-          output = blitz::Array<int64_t,D>(reinterpret_cast<int64_t*>(m_storage), 
+          output = blitz::Array<int64_t,D>(static_cast<int64_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -644,7 +624,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_uint8:
-          output = blitz::Array<uint8_t,D>(reinterpret_cast<uint8_t*>(m_storage), 
+          output = blitz::Array<uint8_t,D>(static_cast<uint8_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -667,7 +647,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_uint16:
-          output = blitz::Array<uint16_t,D>(reinterpret_cast<uint16_t*>(m_storage), 
+          output = blitz::Array<uint16_t,D>(static_cast<uint16_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -690,7 +670,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_uint32:
-          output = blitz::Array<uint32_t,D>(reinterpret_cast<uint32_t*>(m_storage), 
+          output = blitz::Array<uint32_t,D>(static_cast<uint32_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -713,7 +693,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_uint64:
-          output = blitz::Array<uint64_t,D>(reinterpret_cast<uint64_t*>(m_storage), 
+          output = blitz::Array<uint64_t,D>(static_cast<uint64_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -736,7 +716,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_float32:
-          output = blitz::Array<float,D>(reinterpret_cast<float*>(m_storage),
+          output = blitz::Array<float,D>(static_cast<float*>(m_storage),
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -759,7 +739,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_float64:
-          output = blitz::Array<double,D>(reinterpret_cast<double*>
+          output = blitz::Array<double,D>(static_cast<double*>
             (m_storage), shape, blitz::neverDeleteData); 
           break;
         default:
@@ -782,7 +762,7 @@ namespace Torch {
 
       switch(m_parent_arrayset.getArrayType()) {
         case t_float128:
-          output = blitz::Array<long double,D>(reinterpret_cast<long double*>
+          output = blitz::Array<long double,D>(static_cast<long double*>
             (m_storage), shape, blitz::neverDeleteData); 
           break;
         default:
@@ -806,7 +786,7 @@ namespace Torch {
       switch(m_parent_arrayset.getArrayType()) {
         case t_complex64:
           output = blitz::Array<std::complex<float>,D>(
-            reinterpret_cast<std::complex<float>*>(m_storage), 
+            static_cast<std::complex<float>*>(m_storage), 
             shape, blitz::neverDeleteData);
           break;
         default:
@@ -830,7 +810,7 @@ namespace Torch {
       switch(m_parent_arrayset.getArrayType()) {
         case t_complex128:
           output = blitz::Array<std::complex<double>,D>(
-            reinterpret_cast<std::complex<double>*>(m_storage), 
+            static_cast<std::complex<double>*>(m_storage), 
             shape, blitz::neverDeleteData);
           break;
         default:
@@ -854,7 +834,7 @@ namespace Torch {
       switch(m_parent_arrayset.getArrayType()) {
         case t_complex256:
           output = blitz::Array<std::complex<long double>,D>(
-            reinterpret_cast<std::complex<long double>*>(m_storage), 
+            static_cast<std::complex<long double>*>(m_storage), 
             shape, blitz::neverDeleteData); 
           break;
         default:
@@ -878,7 +858,6 @@ namespace Torch {
       boost::shared_ptr<Array> x = (m_array.find(id))->second;
       x->copy(output);
     }
-
 
 
   }
