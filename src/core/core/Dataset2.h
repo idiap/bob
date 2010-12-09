@@ -101,11 +101,40 @@ namespace Torch {
          */
         const LoaderType getLoader() const {return m_loader; }
 
-        //TODO: method to get the data???
+        /**
+         * @brief Adapt the size of each dimension of the passed blitz array
+         * to the ones of the underlying array and copy the data in it.
+         */
         template<typename T, int D> void copy( blitz::Array<T,D>& output);
+        /**
+         * @brief Adapt the size of each dimension of the passed blitz array
+         * to the ones of the underlying array and refer to the data in it.
+         */
+        template<typename T, int D> void refer( blitz::Array<T,D>& output);
+        /************** Partial specialization declaration *************/
+        template<int D> void refer( blitz::Array<bool,D>& output); 
+        template<int D> void refer( blitz::Array<int8_t,D>& output); 
+        template<int D> void refer( blitz::Array<int16_t,D>& output); 
+        template<int D> void refer( blitz::Array<int32_t,D>& output); 
+        template<int D> void refer( blitz::Array<int64_t,D>& output); 
+        template<int D> void refer( blitz::Array<uint8_t,D>& output); 
+        template<int D> void refer( blitz::Array<uint16_t,D>& output); 
+        template<int D> void refer( blitz::Array<uint32_t,D>& output); 
+        template<int D> void refer( blitz::Array<uint64_t,D>& output); 
+        template<int D> void refer( blitz::Array<float,D>& output); 
+        template<int D> void refer( blitz::Array<double,D>& output); 
+        template<int D> void refer( blitz::Array<long double,D>& output); 
+        template<int D> 
+        void refer( blitz::Array<std::complex<float>,D>& output); 
+        template<int D> 
+        void refer( blitz::Array<std::complex<double>,D>& output); 
+        template<int D> 
+        void refer( blitz::Array<std::complex<long double>,D>& output);
 
       private:
         template <typename T, typename U> void copyCast( T* out);
+        template <typename T, int D> 
+        void referCheck( blitz::Array<T,D>& output);
 
         const Arrayset& m_parent_arrayset;
         size_t m_id;
@@ -265,14 +294,23 @@ namespace Torch {
         iterator end() { return m_array.end(); }
 
         /**
+         * @brief Return the array of the given id
+         */
+        const boost::shared_ptr<Array> operator[](size_t id) const;
+
+        /**
          * @brief Update the blitz array with the content of the array 
          * of the provided id.
          */
         template<typename T, int D> 
         void at(size_t id, blitz::Array<T,D>& output);
-        // blitz::Array<float, 2> myarray;
-        // arrayset->at(3, myarray);
-        //
+
+        /**
+         * @brief Update the given blitz array with the content of the array
+         * of the provided id.
+         */
+        template<int D> void getShape( blitz::TinyVector<int,D>& res ) const;
+
       private:
         size_t m_id;
 
@@ -366,7 +404,7 @@ namespace Torch {
         /**
          * @brief Return the Arrayset of the given id 
          */
-        const boost::shared_ptr<Arrayset> at( const size_t id ) const;
+        const boost::shared_ptr<Arrayset> operator[]( const size_t id ) const;
 
       private:    
         std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
@@ -395,6 +433,12 @@ namespace Torch {
         throw Exception();
       }
 
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+
       if( output.numElements() != m_parent_arrayset.getNElem() ) {
         error << "Cannot copy the data in a blitz array with a different " <<
           "number of elements." << std::endl;
@@ -405,41 +449,429 @@ namespace Torch {
       T* out_data = output.data();
       switch(m_parent_arrayset.getArrayType()) {
         case t_bool:
-          //output = blitz::Array<T,D>(reinterpret_cast<T>(m_storage), (shape), blitz::duplicateData);
+//          output = blitz::Array<T,D>(reinterpret_cast<bool*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,bool>(out_data); break;
         case t_int8:
+//          output = blitz::Array<T,D>(reinterpret_cast<int8_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,int8_t>(out_data); break;
         case t_int16:
+//          output = blitz::Array<T,D>(reinterpret_cast<int16_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,int16_t>(out_data); break;
         case t_int32:
+//          output = blitz::Array<T,D>(reinterpret_cast<int32_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,int32_t>(out_data); break;
         case t_int64:
+//          output = blitz::Array<T,D>(reinterpret_cast<int64_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,int64_t>(out_data); break;
         case t_uint8:
+//          output = blitz::Array<T,D>(reinterpret_cast<uint8_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,uint8_t>(out_data); break;
         case t_uint16:
+//          output = blitz::Array<T,D>(reinterpret_cast<uint16_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,uint16_t>(out_data); break;
         case t_uint32:
+//          output = blitz::Array<T,D>(reinterpret_cast<uint32_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,uint32_t>(out_data); break;
         case t_uint64:
+//          output = blitz::Array<T,D>(reinterpret_cast<uint64_t*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,uint64_t>(out_data); break;
         case t_float32:
+//          output = blitz::Array<T,D>(reinterpret_cast<float*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,float>(out_data); break;
         case t_float64:
+//          output = blitz::Array<T,D>(reinterpret_cast<double*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,double>(out_data); break;
         case t_float128:
+//          output = blitz::Array<T,D>(reinterpret_cast<long double*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,long double>(out_data); break;
         case t_complex64:
+//          output = blitz::Array<T,D>(reinterpret_cast<std::complex<float>*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,std::complex<float> >(out_data); break;
         case t_complex128:
+//          output = blitz::Array<T,D>(reinterpret_cast<std::complex<double>*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,std::complex<double> >(out_data); break;
         case t_complex256:
+//          output = blitz::Array<T,D>(reinterpret_cast<std::complex<long double>*>(m_storage), shape, blitz::duplicateData); break;
           copyCast<T,std::complex<long double> >(out_data); break;
         default:
           break;
       }
     }
 
+    template <typename T, int D> 
+    void Array::referCheck( blitz::Array<T,D>& output)
+    {
+      if( D != m_parent_arrayset.getNDim() ) {
+        std::cout << "D=" << D << " -- ParseXML: D=" <<
+           m_parent_arrayset.getNDim() << std::endl;
+        error << "Cannot refer to the data in a blitz array with a " <<
+          "different number of dimensions." << std::endl;
+        throw Exception();
+      }
+    }
+
+    template <typename T, int D> 
+    void Array::refer( blitz::Array<T,D>& output) 
+    {
+      error << "Unsupported blitz array type " << std::endl;
+      throw Exception();
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<bool,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_bool:
+          output = blitz::Array<bool,D>(reinterpret_cast<bool*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type bool with a non-bool " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<int8_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_int8:
+          output = blitz::Array<int8_t,D>(reinterpret_cast<int8_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type int8_t with a non-int8_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<int16_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_int16:
+          output = blitz::Array<int16_t,D>(reinterpret_cast<int16_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type int16_t with a non-int16_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<int32_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_int32:
+          output = blitz::Array<int32_t,D>(reinterpret_cast<int32_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type int32_t with a non-int32_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<int64_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_int64:
+          output = blitz::Array<int64_t,D>(reinterpret_cast<int64_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type int64_t with a non-int64_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<uint8_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_uint8:
+          output = blitz::Array<uint8_t,D>(reinterpret_cast<uint8_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type uint8_t with a non-uint8_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<uint16_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_uint16:
+          output = blitz::Array<uint16_t,D>(reinterpret_cast<uint16_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type uint16_t with a non-uint16_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<uint32_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_uint32:
+          output = blitz::Array<uint32_t,D>(reinterpret_cast<uint32_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type uint32_t with a non-uint32_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<uint64_t,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_uint64:
+          output = blitz::Array<uint64_t,D>(reinterpret_cast<uint64_t*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type uint64_t with a non-uint64_t " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<float,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_float32:
+          output = blitz::Array<float,D>(reinterpret_cast<float*>(m_storage),
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type float with a non-float " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<double,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_float64:
+          output = blitz::Array<double,D>(reinterpret_cast<double*>
+            (m_storage), shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type double with a non-double " <<
+            "blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<long double,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_float128:
+          output = blitz::Array<long double,D>(reinterpret_cast<long double*>
+            (m_storage), shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type long double with a " <<
+            "non-long double blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<std::complex<float>,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_complex64:
+          output = blitz::Array<std::complex<float>,D>(
+            reinterpret_cast<std::complex<float>*>(m_storage), 
+            shape, blitz::neverDeleteData);
+          break;
+        default:
+          error << "Cannot refer to data of type complex(float) with a " <<
+            "non-complex(float) blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<std::complex<double>,D>& output) 
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_complex128:
+          output = blitz::Array<std::complex<double>,D>(
+            reinterpret_cast<std::complex<double>*>(m_storage), 
+            shape, blitz::neverDeleteData);
+          break;
+        default:
+          error << "Cannot refer to data of type complex(double) with a " <<
+            "non-complex(double) blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+    template<int D> 
+    void Array::refer( blitz::Array<std::complex<long double>,D>& output)
+    {
+      referCheck(output);
+
+      // Reshape each dimensions with the correct size
+      blitz::TinyVector<int,D> shape;
+      m_parent_arrayset.getShape(shape);
+      output.resize(shape);
+
+      switch(m_parent_arrayset.getArrayType()) {
+        case t_complex256:
+          output = blitz::Array<std::complex<long double>,D>(
+            reinterpret_cast<std::complex<long double>*>(m_storage), 
+            shape, blitz::neverDeleteData); 
+          break;
+        default:
+          error << "Cannot refer to data of type complex(long double) with" <<
+            "a non-complex(long double) blitz array." << std::endl;
+          throw Exception();
+          break;
+      }
+    }
+
+
+    template<int D> 
+    void Arrayset::getShape( blitz::TinyVector<int,D>& res ) const {
+      const size_t *shape = getShape();
+      for( int i=0; i<D; ++i)
+        res[i] = shape[i];
+    }
 
     template<typename T, int D> void 
     Arrayset::at(size_t id, blitz::Array<T,D>& output) {

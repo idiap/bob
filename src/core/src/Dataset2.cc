@@ -16,7 +16,7 @@ namespace Torch {
 
     Array::~Array() {
       std::cout << "Array destructor (id: " << getId() << ")" << std::endl;
-      switch(m_parent_arrayset.getArrayType()/* m_element_type*/) {
+      switch(m_parent_arrayset.getArrayType()) {
         case t_bool:
           delete [] static_cast<bool*>(m_storage); break;
         case t_int8:
@@ -72,6 +72,10 @@ namespace Torch {
         array->getId(), array) );
     }
 
+    const boost::shared_ptr<Array> Arrayset::operator[]( const size_t id ) const {
+      return (m_array.find(id))->second;
+    }
+
 
     Dataset::Dataset() { }
 
@@ -86,7 +90,7 @@ namespace Torch {
         arrayset->getId(), arrayset) );
     }
 
-    const boost::shared_ptr<Arrayset> Dataset::at( const size_t id ) const {
+    const boost::shared_ptr<Arrayset> Dataset::operator[]( const size_t id ) const {
       return (m_arrayset.find(id))->second;
     }
 
