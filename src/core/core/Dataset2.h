@@ -115,6 +115,8 @@ namespace Torch {
         /**
          * @brief Adapt the size of each dimension of the passed blitz array
          * to the ones of the underlying array and refer to the data in it.
+         * @warning Updating the content of the blitz array will update the
+         * of the corresponding array in the dataset.
          */
         template<typename T, int D> 
         void refer( blitz::Array<T,D>& output) const;
