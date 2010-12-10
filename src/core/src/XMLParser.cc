@@ -8,6 +8,8 @@
 #include "core/XMLParser.h"
 #include "core/Exception.h"
 
+#include <libxml/xmlschemas.h>
+
 namespace Torch {
   namespace core {
 
@@ -56,6 +58,63 @@ namespace Torch {
     XMLParser::~XMLParser() { }
 
 
+    void XMLParser::validateXMLSchema(xmlDocPtr doc) {
+      // Get path to the XML Schema definition
+      char *schema_path = getenv("TORCH_SCHEMA_PATH");
+      if( !strcmp( schema_path, "") )
+        warn << "Environment variable $TORCH_SCHEMA_PATH is not set." <<
+          std::endl;
+      char schema_full_path[1024];
+      strcpy( schema_full_path, schema_path);
+      strcat( schema_full_path, "/dataset.xsd" );
+
+      // Load the XML schema from the file
+      xmlDocPtr xsd_doc = xmlReadFile(schema_full_path, 0, 0);
+      if(xsd_doc == 0) {
+        error << "Unable to load the XML schema" << std::endl;
+        throw Exception();        
+      }
+      // Create an XML schema parse context
+      xmlSchemaParserCtxtPtr xsd_parser = xmlSchemaNewDocParserCtxt(xsd_doc);
+      if(xsd_parser == 0) {
+        xmlFreeDoc(xsd_doc);
+        error << "Unable to create the XML schema parse context." << std::endl;
+        throw Exception();        
+      }
+      // Parse the XML schema definition and check its correctness
+      xmlSchemaPtr xsd_schema = xmlSchemaParse(xsd_parser);
+      if(xsd_schema == 0) {
+        xmlSchemaFreeParserCtxt(xsd_parser);
+        xmlFreeDoc(xsd_doc); 
+        error << "Invalid XML Schema definition." << std::endl;
+        throw Exception();        
+      }
+      // Create an XML schema validation context for the schema
+      xmlSchemaValidCtxtPtr xsd_valid = xmlSchemaNewValidCtxt(xsd_schema);
+      if(xsd_valid == 0) {
+        xmlSchemaFree(xsd_schema);
+        xmlSchemaFreeParserCtxt(xsd_parser);
+        xmlFreeDoc(xsd_doc);
+        error << "Unable to create an XML Schema validation context." <<
+          std::endl;
+        throw Exception();
+      }
+
+      // Check that the document is valid wrt. to the schema, and throw an 
+      // exception otherwise.
+      if(xmlSchemaValidateDoc(xsd_valid, doc)) {
+        error << "The XML file is NOT valid with respect to the XML schema." <<
+          std::endl;
+        throw Exception();
+      }
+
+      xmlSchemaFreeValidCtxt(xsd_valid);
+      xmlSchemaFree(xsd_schema);
+      xmlSchemaFreeParserCtxt(xsd_parser);
+      xmlFreeDoc(xsd_doc);
+    }
+
+
     void XMLParser::load(const char* filename, Dataset& dataset) {
       // Parse the XML file with libxml2
       xmlDocPtr doc = xmlParseFile(filename);
@@ -82,7 +141,13 @@ namespace Torch {
           " is of the wrong type (!= dataset)." << std::endl;
         xmlFreeDoc(doc);
         throw Exception();
-      }    
+      } 
+
+      // Validate the XML document against the XML Schema
+      // Throw an exception in case of failure
+      validateXMLSchema( doc);
+
+
 
       // Parse Arraysets
       cur = cur->xmlChildrenNode;

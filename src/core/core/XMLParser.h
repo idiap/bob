@@ -50,6 +50,11 @@ namespace Torch {
 
       private:
         /**
+         * @brief Validation of the XML file against the XML Schema
+         */
+        void validateXMLSchema(xmlDocPtr doc);
+
+        /**
          * @brief Parse an arrayset given an XML node and return the 
          * corresponding object.
          */
