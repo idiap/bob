@@ -36,7 +36,7 @@
       <xsd:field xpath="@name"/>
     </xsd:key>
 
-    <xsd:keyref name="ArraysetRoleRef" refer="ArraysetRoleRef">
+    <xsd:keyref name="ArraysetRoleRef" refer="ArraysetKey">
       <xsd:selector xpath="./arrayset"/>
       <xsd:field xpath="@id"/>
     </xsd:keyref>
@@ -102,7 +102,11 @@
   </xsd:complexType>
 
   <xsd:complexType name="ArrayInlineType">
-    <xsd:attribute name="id" type="xsd:positiveInteger" use="required" />
+   <xsd:simpleContent>
+     <xsd:extension base="xsd:string">
+        <xsd:attribute name="id" type="xsd:positiveInteger" use="required" />
+     </xsd:extension>
+   </xsd:simpleContent>
   </xsd:complexType>
 
   <xsd:complexType name="ArrayFileType">
@@ -153,7 +157,6 @@
   <xsd:complexType name="MemberArraysetType">
     <xsd:attribute name="arrayset-id" type="xsd:positiveInteger" use="required" />
   </xsd:complexType>
-
 
 </xsd:schema>
 
