@@ -230,6 +230,13 @@ def generate_environment(options):
   cmake_prefix_path = path_add(cmake_prefix_path, cmakedir)
   all['CMAKE_PREFIX_PATH'] = cmake_prefix_path
 
+  # this is for the XML schema
+  torch_schema_path = os.environ.get('TORCH_SCHEMA_PATH', '')
+  schemadir = os.path.join(install_dir, 'share', 'torch', 'schema')
+  torch_schema_path = path_remove_if_startswith(torch_schema_path, base_dir)
+  torch_schema_path = path_add(torch_schema_path, schemadir)
+  all['TORCH_SCHEMA_PATH'] = torch_schema_path
+
   # updates with keys found in the externals, but not touched by our procedure
   for k in external_env.keys():
     if not all.has_key(k): all[k] = external_env[k]

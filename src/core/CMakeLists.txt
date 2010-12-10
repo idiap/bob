@@ -140,3 +140,8 @@ torch_python_bindings(core "${pysrc}")
 torch_python_submodule(core array "${pysrc_array}")
 
 torch_python_install(core)
+
+# This is where we install the XML schema definition
+set(schemadir share/torch/schema)
+install(FILES schema/dataset.xsd DESTINATION ${schemadir})
+
