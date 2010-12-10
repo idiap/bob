@@ -2,12 +2,8 @@
 <xsd:schema version="1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <xsd:element name="dataset">
     <xsd:complexType>
-      <xsd:attribute name="name" type="xsd:string" use="optional" />
-      <xsd:attribute name="version" type="xsd:positiveInteger" use="optional" />
-      <xsd:attribute name="author" type="xsd:string" use="optional" />
-      <xsd:attribute name="date" type="xsd:date" use="optional" />
-      <xsd:element name="comment" minOccurs="0" maxOccurs="1" type="xsd:string" />
       <xsd:sequence>
+        <xsd:element name="comment" minOccurs="0" maxOccurs="1" type="xsd:string" />
         <xsd:element name="arrayset" minOccurs="0" maxOccurs="unbounded" type="ArraysetInlineType" >
           <xsd:key name="ArrayKey">
             <!-- array elements must be unique across the arrayset and referenceable -->
@@ -18,6 +14,10 @@
         <xsd:element name="external-arrayset" minOccurs="0" maxOccurs="unbounded" type="ArraysetFileType" />
         <xsd:element name="relationset" minOccurs="0" maxOccurs="unbounded" type="RelationsetType" />
       </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" use="optional" />
+      <xsd:attribute name="version" type="xsd:positiveInteger" use="optional" />
+      <xsd:attribute name="author" type="xsd:string" use="optional" />
+      <xsd:attribute name="date" type="xsd:date" use="optional" />
     </xsd:complexType>
 
     <xsd:key name="ArraysetKey">
@@ -82,14 +82,14 @@
   </xsd:simpleType>
 
   <xsd:complexType name="ArraysetInlineType">
-    <xsd:attribute name="id" type="xsd:positiveInteger" use="required" />
-    <xsd:attribute name="elementtype" type="ElementType" use="required" />
-    <xsd:attribute name="role" type="xsd:string" use="required" />
-    <xsd:attribute name="shape" type="ShapeType" use="required" />
     <xsd:sequence>
       <xsd:element minOccurs="0" maxOccurs="unbounded" name="array" type="ArrayInlineType" />
       <xsd:element minOccurs="0" maxOccurs="unbounded" name="external-array" type="ArrayFileType" />
     </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:positiveInteger" use="required" />
+    <xsd:attribute name="elementtype" type="ElementType" use="required" />
+    <xsd:attribute name="role" type="xsd:string" use="required" />
+    <xsd:attribute name="shape" type="ShapeType" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="ArraysetFileType">
@@ -112,7 +112,6 @@
   </xsd:complexType>
 
   <xsd:complexType name="RelationsetType">
-    <xsd:attribute name="name" type="xsd:string" use="required" />
     <xsd:sequence>
       <xsd:element minOccurs="2" maxOccurs="unbounded" name="rule" type="RuleType" />
       <xsd:element minOccurs="1" maxOccurs="unbounded" name="relation" type="RelationType" >
@@ -123,6 +122,7 @@
         </xsd:unique>
       </xsd:element>
     </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:simpleType name="MaxMultiplicityType">
@@ -138,11 +138,11 @@
   </xsd:complexType>
 
   <xsd:complexType name="RelationType">
-    <xsd:attribute name="id" type="xsd:positiveInteger" use="required" />
     <xsd:sequence>
       <xsd:element name="member" minOccurs="0" maxOccurs="unbounded" type="MemberType" />
       <xsd:element name="arrayset-member" minOccurs="0" maxOccurs="unbounded" type="MemberArraysetType" />
     </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:positiveInteger" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="MemberType">
