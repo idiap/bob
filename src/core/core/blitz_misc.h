@@ -11,6 +11,7 @@
 #define TORCH_CORE_BLITZ_MISC_H
 
 #include <blitz/array.h>
+#include "core/logging.h"
 
 
 BZ_NAMESPACE(blitz)
