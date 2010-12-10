@@ -39,6 +39,8 @@ namespace Torch {
     typedef enum LoaderType { l_unknown, l_blitz, l_tensor, l_bindata } 
       LoaderType;
 
+    class IndexError: public Exception { };
+
     
     // Declare the Arrayset for the reference to the parent Arrayset in the
     // Array class.
@@ -108,36 +110,39 @@ namespace Torch {
          * @brief Adapt the size of each dimension of the passed blitz array
          * to the ones of the underlying array and copy the data in it.
          */
-        template<typename T, int D> void copy( blitz::Array<T,D>& output);
+        template<typename T, int D> 
+        void copy( blitz::Array<T,D>& output) const;
         /**
          * @brief Adapt the size of each dimension of the passed blitz array
          * to the ones of the underlying array and refer to the data in it.
          */
-        template<typename T, int D> void refer( blitz::Array<T,D>& output);
+        template<typename T, int D> 
+        void refer( blitz::Array<T,D>& output) const;
         /************** Partial specialization declaration *************/
-        template<int D> void refer( blitz::Array<bool,D>& output); 
-        template<int D> void refer( blitz::Array<int8_t,D>& output); 
-        template<int D> void refer( blitz::Array<int16_t,D>& output); 
-        template<int D> void refer( blitz::Array<int32_t,D>& output); 
-        template<int D> void refer( blitz::Array<int64_t,D>& output); 
-        template<int D> void refer( blitz::Array<uint8_t,D>& output); 
-        template<int D> void refer( blitz::Array<uint16_t,D>& output); 
-        template<int D> void refer( blitz::Array<uint32_t,D>& output); 
-        template<int D> void refer( blitz::Array<uint64_t,D>& output); 
-        template<int D> void refer( blitz::Array<float,D>& output); 
-        template<int D> void refer( blitz::Array<double,D>& output); 
-        template<int D> void refer( blitz::Array<long double,D>& output); 
+        template<int D> void refer( blitz::Array<bool,D>& output) const;
+        template<int D> void refer( blitz::Array<int8_t,D>& output) const;
+        template<int D> void refer( blitz::Array<int16_t,D>& output) const;
+        template<int D> void refer( blitz::Array<int32_t,D>& output) const;
+        template<int D> void refer( blitz::Array<int64_t,D>& output) const;
+        template<int D> void refer( blitz::Array<uint8_t,D>& output) const;
+        template<int D> void refer( blitz::Array<uint16_t,D>& output) const;
+        template<int D> void refer( blitz::Array<uint32_t,D>& output) const;
+        template<int D> void refer( blitz::Array<uint64_t,D>& output) const;
+        template<int D> void refer( blitz::Array<float,D>& output) const;
+        template<int D> void refer( blitz::Array<double,D>& output) const;
         template<int D> 
-        void refer( blitz::Array<std::complex<float>,D>& output); 
+        void refer( blitz::Array<long double,D>& output) const;
         template<int D> 
-        void refer( blitz::Array<std::complex<double>,D>& output); 
+        void refer( blitz::Array<std::complex<float>,D>& output) const;
         template<int D> 
-        void refer( blitz::Array<std::complex<long double>,D>& output);
+        void refer( blitz::Array<std::complex<double>,D>& output) const;
+        template<int D> 
+        void refer( blitz::Array<std::complex<long double>,D>& output) const;
 
       private:
-        template <typename T, typename U> void copyCast( U* out);
+        template <typename T, typename U> void copyCast( U* out) const;
         template <typename T, int D> 
-        void referCheck( blitz::Array<T,D>& output);
+        void referCheck( blitz::Array<T,D>& output) const;
 
         const Arrayset& m_parent_arrayset;
         size_t m_id;
@@ -152,10 +157,7 @@ namespace Torch {
     /**
      * @brief The arrayset class for a dataset
      */
-    class Arrayset { //pure virtual
-      //
-      //query/iterate over:
-      //1. "Array"
+    class Arrayset {
       public:
         /**
          * @brief Constructor
@@ -236,7 +238,7 @@ namespace Torch {
          * @brief Get the number of elements in each array of this 
          * Arrayset
          */
-        const size_t getNElem() const { return m_n_elem; } 
+        size_t getNElem() const { return m_n_elem; } 
         /**
          * @brief Get the type of the elements contained in the the arrays of 
          * this Arrayset
@@ -297,16 +299,21 @@ namespace Torch {
 
         /**
          * @brief Return the array of the given id
+         * @warning Please note that if you use that method, scope matters,
+         * because the dataset owns the arrays.
          */
-        const boost::shared_ptr<Array> operator[](size_t id) const;
-        const boost::shared_ptr<Array> getArray(size_t id) const;
+        const Array& operator[](size_t id) const;
+        /**
+         * @brief Return a smart pointer to the array of the given id
+         */
+        boost::shared_ptr<const Array> getArray(size_t id) const;
 
         /**
          * @brief Update the blitz array with the content of the array 
          * of the provided id.
          */
         template<typename T, int D> 
-        void at(size_t id, blitz::Array<T,D>& output);
+        void at(size_t id, blitz::Array<T,D>& output) const;
 
         /**
          * @brief Update the given blitz array with the content of the array
@@ -334,21 +341,21 @@ namespace Torch {
     /**
      * @brief The relation class for a dataset
      */
-    class Relation { //pure virtual
+    class Relation {
       // TODO
     };
 
     /**
      * @brief The rule class for a dataset
      */
-    class Rule { //pure virtual
+    class Rule {
       // TODO
     };
 
     /**
      * @brief The relationset class for a dataset
      */
-    class Relationset { //pure virtual
+    class Relationset {
       // TODO
     };
 
@@ -356,7 +363,7 @@ namespace Torch {
     /**
      * @brief The main dataset class
     */
-    class Dataset { //pure virtual
+    class Dataset {
       public:
         /**
          * @brief Constructor
@@ -406,8 +413,13 @@ namespace Torch {
         /**
          * @brief Return the Arrayset of the given id 
          */
-        const boost::shared_ptr<Arrayset> operator[]( const size_t id ) const;
-        const boost::shared_ptr<Arrayset> getArrayset( const size_t id ) const;
+        const Arrayset& operator[]( const size_t id ) const;
+        /**
+         * @brief Return the arrayset of the given id
+         * @warning Please note that if you use that method, scope matters,
+         * because the dataset owns the arraysets.
+         */
+        boost::shared_ptr<const Arrayset> getArrayset( const size_t id ) const;
 
       private:    
         std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
@@ -417,7 +429,7 @@ namespace Torch {
 
     /********************** TEMPLATE FUNCTION DEFINITIONS ***************/
     template <typename T, typename U> 
-    void Array::copyCast( U* out) {
+    void Array::copyCast( U* out ) const {
       size_t n_elem = m_parent_arrayset.getNElem();
       for( size_t i=0; i<n_elem; ++i) {
         T* t_storage = static_cast<T*>(m_storage);
@@ -426,7 +438,7 @@ namespace Torch {
     }
 
     template <typename T, int D> 
-    void Array::copy( blitz::Array<T,D>& output) 
+    void Array::copy( blitz::Array<T,D>& output) const 
     {
       if( D != m_parent_arrayset.getNDim() ) {
         std::cout << "D=" << D << " -- ParseXML: D=" <<
@@ -479,7 +491,7 @@ namespace Torch {
     }
 
     template <typename T, int D> 
-    void Array::referCheck( blitz::Array<T,D>& output)
+    void Array::referCheck( blitz::Array<T,D>& output) const
     {
       if( D != m_parent_arrayset.getNDim() ) {
         std::cout << "D=" << D << " -- ParseXML: D=" <<
@@ -491,14 +503,14 @@ namespace Torch {
     }
 
     template <typename T, int D> 
-    void Array::refer( blitz::Array<T,D>& output) 
+    void Array::refer( blitz::Array<T,D>& output) const
     {
       error << "Unsupported blitz array type " << std::endl;
       throw Exception();
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<bool,D>& output) 
+    void Array::refer( blitz::Array<bool,D>& output) const
     {
       referCheck(output);
 
@@ -521,7 +533,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int8_t,D>& output) 
+    void Array::refer( blitz::Array<int8_t,D>& output) const
     {
       referCheck(output);
 
@@ -544,7 +556,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int16_t,D>& output) 
+    void Array::refer( blitz::Array<int16_t,D>& output) const
     {
       referCheck(output);
 
@@ -567,7 +579,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int32_t,D>& output) 
+    void Array::refer( blitz::Array<int32_t,D>& output) const
     {
       referCheck(output);
 
@@ -590,7 +602,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int64_t,D>& output) 
+    void Array::refer( blitz::Array<int64_t,D>& output) const
     {
       referCheck(output);
 
@@ -613,7 +625,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint8_t,D>& output) 
+    void Array::refer( blitz::Array<uint8_t,D>& output) const
     {
       referCheck(output);
 
@@ -636,7 +648,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint16_t,D>& output) 
+    void Array::refer( blitz::Array<uint16_t,D>& output) const
     {
       referCheck(output);
 
@@ -659,7 +671,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint32_t,D>& output) 
+    void Array::refer( blitz::Array<uint32_t,D>& output) const
     {
       referCheck(output);
 
@@ -682,7 +694,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint64_t,D>& output) 
+    void Array::refer( blitz::Array<uint64_t,D>& output) const
     {
       referCheck(output);
 
@@ -705,7 +717,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<float,D>& output) 
+    void Array::refer( blitz::Array<float,D>& output) const
     {
       referCheck(output);
 
@@ -728,7 +740,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<double,D>& output) 
+    void Array::refer( blitz::Array<double,D>& output) const
     {
       referCheck(output);
 
@@ -751,7 +763,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<long double,D>& output) 
+    void Array::refer( blitz::Array<long double,D>& output) const
     {
       referCheck(output);
 
@@ -774,7 +786,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<std::complex<float>,D>& output) 
+    void Array::refer( blitz::Array<std::complex<float>,D>& output) const
     {
       referCheck(output);
 
@@ -798,7 +810,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<std::complex<double>,D>& output) 
+    void Array::refer( blitz::Array<std::complex<double>,D>& output) const
     {
       referCheck(output);
 
@@ -822,7 +834,8 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<std::complex<long double>,D>& output)
+    void 
+    Array::refer( blitz::Array<std::complex<long double>,D>& output) const
     {
       referCheck(output);
 
@@ -854,7 +867,7 @@ namespace Torch {
     }
 
     template<typename T, int D> void 
-    Arrayset::at(size_t id, blitz::Array<T,D>& output) {
+    Arrayset::at(size_t id, blitz::Array<T,D>& output) const {
       boost::shared_ptr<Array> x = (m_array.find(id))->second;
       x->copy(output);
     }

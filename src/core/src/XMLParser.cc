@@ -8,8 +8,6 @@
 #include "core/XMLParser.h"
 #include "core/Exception.h"
 
-#include <sys/stat.h> 
-
 namespace Torch {
   namespace core {
 
@@ -211,11 +209,6 @@ namespace Torch {
       // Parse filename
       str = xmlGetProp(cur, (const xmlChar*)db::file);
       arrayset->setFilename( (str!=0?(const char*)str:"") );
-      struct stat stFileInfo;
-      if( arrayset->getFilename().compare("") && 
-          stat( arrayset->getFilename().c_str(), &stFileInfo) ) 
-        Torch::core::warn << "The file" << arrayset->getFilename() << 
-          " was not found." << std::endl;
       std::cout << "File: " << arrayset->getFilename() << std::endl;
       xmlFree(str);
 
@@ -267,11 +260,6 @@ namespace Torch {
       // Parse filename
       str = xmlGetProp(cur, (const xmlChar*)db::file);
       array->setFilename( (str!=0?(const char*)str:"") );
-      struct stat stFileInfo;
-      if( array->getFilename().compare("") && 
-          stat( array->getFilename().c_str(), &stFileInfo) ) 
-        Torch::core::warn << "The file" << array->getFilename() << 
-          " was not found." << std::endl;
       std::cout << "  Array File: " << array->getFilename() << std::endl;
       xmlFree(str);
 

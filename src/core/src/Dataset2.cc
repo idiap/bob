@@ -6,6 +6,7 @@
  */
 
 #include "core/Dataset2.h"
+#include <stdexcept>
 
 namespace Torch {
   namespace core {
@@ -72,14 +73,21 @@ namespace Torch {
         array->getId(), array) );
     }
 
-    const boost::shared_ptr<Array> 
-    Arrayset::operator[]( const size_t id ) const {
-      return (m_array.find(id))->second;
+    const Array& Arrayset::operator[]( const size_t id ) const {
+      std::map<size_t, boost::shared_ptr<Array> >::const_iterator it = 
+        (m_array.find(id));
+      if( it == m_array.end() )
+        throw IndexError();
+      return *(it->second);
     }
 
-    const boost::shared_ptr<Array> 
+    boost::shared_ptr<const Array> 
     Arrayset::getArray( const size_t id ) const {
-      return (m_array.find(id))->second;
+      std::map<size_t, boost::shared_ptr<Array> >::const_iterator it = 
+        (m_array.find(id));
+      if( it == m_array.end() )
+        throw IndexError();
+      return it->second;
     }
 
 
@@ -96,14 +104,21 @@ namespace Torch {
         arrayset->getId(), arrayset) );
     }
 
-    const boost::shared_ptr<Arrayset> 
-    Dataset::operator[]( const size_t id ) const {
-      return (m_arrayset.find(id))->second;
+    const Arrayset& Dataset::operator[]( const size_t id ) const {
+      std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator it = 
+        (m_arrayset.find(id));
+      if( it == m_arrayset.end() )
+        throw IndexError();
+      return *(it->second);
     }
 
-    const boost::shared_ptr<Arrayset> 
+    boost::shared_ptr<const Arrayset> 
     Dataset::getArrayset( const size_t id ) const {
-      return (m_arrayset.find(id))->second;
+      std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator it = 
+        (m_arrayset.find(id));
+      if( it == m_arrayset.end() )
+        throw IndexError();
+      return it->second;
     }
 
 
