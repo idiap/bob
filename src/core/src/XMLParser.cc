@@ -20,6 +20,7 @@ namespace Torch {
       static const char dataset[]           = "dataset";
       static const char arrayset[]          = "arrayset";
       static const char external_arrayset[] = "external-arrayset";
+      static const char relationset[]       = "relationset";
       static const char id[]                = "id";
       static const char role[]              = "role";
       static const char elementtype[]       = "elementtype";
@@ -28,6 +29,9 @@ namespace Torch {
       static const char file[]              = "file";
       static const char array[]             = "array";
       static const char external_array[]    = "external-array";
+      static const char name[]              = "name";
+      static const char rule[]              = "role";
+      static const char relation[]          = "relation";
 
       // elementtype
       static const char t_bool[]        = "bool";
@@ -50,6 +54,7 @@ namespace Torch {
       static const char l_blitz[]       = "blitz";
       static const char l_tensor[]      = "tensor";
       static const char l_bindata[]     = "bindata";
+      static const char l_byextension[] = "byextension";
     }
 
 
@@ -157,10 +162,51 @@ namespace Torch {
         if( !strcmp((const char*)cur->name, db::arrayset) || 
             !strcmp((const char*)cur->name, db::external_arrayset) )
           dataset.addArrayset( parseArrayset(cur) );
+        else if( !strcmp((const char*)cur->name, db::relationset) )
+          dataset.addRelationset( parseRelationset(cur) );
         cur = cur->next;
       }
 
       xmlFreeDoc(doc);
+    }
+
+
+    boost::shared_ptr<Relationset> XMLParser::parseRelationset(const xmlNodePtr cur) {
+      boost::shared_ptr<Relationset> relationset(new Relationset());
+      // Parse name
+      xmlChar *str;
+      str = xmlGetProp(cur, (const xmlChar*)db::name);
+      relationset->setName( ( (str!=0?(const char *)str:"") ) );
+      std::cout << "Name: " << relationset->getName() << std::endl;
+      xmlFree(str);
+      
+      // Parse the relations and rules
+      xmlNodePtr cur_relation = cur->xmlChildrenNode;
+      while(cur_relation != 0) { 
+        // Parse a rule and add it to the relationset
+        if( !strcmp((const char*)cur_relation->name, db::rule) ) 
+          relationset->addRule( parseRule(cur_relation) );
+        // Parse a relation and add it to the relationset
+        else if( !strcmp((const char*)cur_relation->name, db::relation) ) 
+          relationset->addRelation( parseRelation(cur_relation) );
+        cur_relation = cur_relation->next;
+      }
+
+      return relationset;
+    }
+
+
+    boost::shared_ptr<Rule> XMLParser::parseRule(const xmlNodePtr cur) {
+      boost::shared_ptr<Rule> rule(new Rule());
+      //TODO: implementation
+      return rule;
+    }
+
+
+    boost::shared_ptr<Relation> XMLParser::parseRelation(const xmlNodePtr cur) {
+      boost::shared_ptr<Relation> relation(new Relation());
+      //TODO: implementation
+      return relation;
     }
 
 

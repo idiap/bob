@@ -61,11 +61,29 @@ namespace Torch {
         boost::shared_ptr<Arrayset> parseArrayset(xmlNodePtr node);
 
         /**
+         * @brief Parse a relationset given an XML node and return the 
+         * corresponding object.
+         */
+        boost::shared_ptr<Relationset> parseRelationset(xmlNodePtr node);
+
+        /**
          * @brief Parse an array given an XML node and return the 
          * corresponding object.
          */
         boost::shared_ptr<Array> parseArray( 
           const Arrayset& parent, xmlNodePtr node);
+
+        /**
+         * @brief Parse a rule given an XML node and return the 
+         * corresponding object.
+         */
+        boost::shared_ptr<Rule> parseRule(xmlNodePtr node);
+
+        /**
+         * @brief Parse a relation given an XML node and return the 
+         * corresponding object.
+         */
+        boost::shared_ptr<Relation> parseRelation(xmlNodePtr node);
 
         /**
          * @brief Parse the data of an array given a tokenized string, and

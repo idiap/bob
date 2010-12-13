@@ -208,7 +208,7 @@ namespace Torch {
         /**
          * @brief Set the role of the Arrayset
          */
-        void setRole(const std::string& role) {m_role.assign(role); } 
+        void setRole(const std::string& role) { m_role.assign(role); } 
         /**
          * @brief Set the flag indicating if this arrayset is loaded from an 
          * external file.
@@ -267,7 +267,7 @@ namespace Torch {
          * @brief Get the loader used to read the data from the external file 
          * if any.
          */
-        LoaderType getLoader() const {return m_loader; }
+        LoaderType getLoader() const { return m_loader; }
 
 
         /**
@@ -348,20 +348,117 @@ namespace Torch {
      */
     class Relation {
       // TODO
+      public:
+        /**
+         * @brief Constructor
+         */
+        Relation();
+
+        /**
+         * @brief Destructor
+         */
+        ~Relation();
+
+        /**
+         * @brief Set the maximum number of occurences for this rule
+         */
+        void setId(const size_t id) { m_id = id; }
+        /**
+         * @brief Get the maximum number of occurences for this rule
+         */
+        size_t getId() const { return m_id; }
+
+      private:
+        size_t m_id;
     };
 
     /**
      * @brief The rule class for a dataset
      */
     class Rule {
-      // TODO
+      public:
+        /**
+         * @brief Constructor
+         */
+        Rule();
+
+        /**
+         * @brief Destructor
+         */
+        ~Rule();
+
+        /**
+         * @brief Set the arraysetrole for this rule
+         */
+        void setArraysetRole(const std::string& arraysetrole) { 
+          m_arraysetrole.assign(arraysetrole); }
+        /**
+         * @brief Set the minimum number of occurences for this rule
+         */
+        void setMin(const size_t min) { m_min = min; }
+        /**
+         * @brief Set the maximum number of occurences for this rule
+         */
+        void setMax(const size_t max) { m_max = max; }
+        /**
+         * @brief Get the arrayset role for this rule
+         */
+        const std::string& getArraysetRole() const { return m_arraysetrole; }
+        /**
+         * @brief Get the minimum number of occurences for this rule
+         */
+        size_t getMin() const { return m_min; }
+        /**
+         * @brief Get the maximum number of occurences for this rule
+         */
+        size_t getMax() const { return m_max; }
+
+      private:
+        std::string m_arraysetrole;
+        size_t m_min;
+        size_t m_max;
     };
+
 
     /**
      * @brief The relationset class for a dataset
      */
     class Relationset {
-      // TODO
+      public:
+        /**
+         * @brief Constructor
+         */
+        Relationset();
+
+        /**
+         * @brief Destructor
+         */
+        ~Relationset();
+
+        /**
+         * @brief Add a Relation to the Relationset
+         */
+        void addRelation( boost::shared_ptr<Relation> relation);
+
+        /**
+         * @brief Add a Rule to the Relationset
+         */
+        void addRule( boost::shared_ptr<Rule> rule);
+
+        /**
+         * @brief Get the name of this Relationset
+         */
+        const std::string& getName() const { return m_name; }
+        /**
+         * @brief Set the name of this Relationset
+         */
+        void setName(const std::string& name) { m_name.assign(name); }
+
+      private:
+        std::string m_name;
+
+        std::map<std::string, boost::shared_ptr<Rule> > m_rule;        
+        std::map<size_t, boost::shared_ptr<Relation> > m_relation;
     };
 
 
@@ -387,33 +484,34 @@ namespace Torch {
         /**
          * @brief const_iterator over the Arraysets of the Dataset
          */
-        typedef std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator 
-          const_iterator;
+        typedef std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator
+          arrayset_const_iterator;
         /**
          * @brief Return a const_iterator pointing at the first Arrayset of 
          * the Arrayset
          */
-        const_iterator begin() const { return m_arrayset.begin(); }
+        arrayset_const_iterator begin() const { return m_arrayset.begin(); }
         /**
          * @brief Return a const_iterator pointing at the last Arrayset of 
          * the Arrayset
          */
-        const_iterator end() const { return m_arrayset.end(); }
+        arrayset_const_iterator end() const { return m_arrayset.end(); }
 
         /**
          * @brief iterator over the Arraysets of the Dataset
          */
-        typedef std::map<size_t, boost::shared_ptr<Arrayset> >::iterator iterator;
+        typedef std::map<size_t, boost::shared_ptr<Arrayset> >::iterator 
+          arrayset_iterator;
         /**
          * @brief Return an iterator pointing at the first Arrayset of 
          * the Arrayset
          */
-        iterator begin() { return m_arrayset.begin(); }
+        arrayset_iterator begin() { return m_arrayset.begin(); }
         /**
          * @brief Return an iterator pointing at the first Arrayset of 
          * the Arrayset
          */
-        iterator end() { return m_arrayset.end(); }
+        arrayset_iterator end() { return m_arrayset.end(); }
    
         /**
          * @brief Return the Arrayset of the given id 
@@ -426,9 +524,14 @@ namespace Torch {
          */
         boost::shared_ptr<const Arrayset> getArrayset( const size_t id ) const;
 
+        /**
+         * @brief Add a Relationset to the Dataset
+         */
+        void addRelationset( boost::shared_ptr<Relationset> relationset);
+
       private:    
         std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
-        std::map<size_t, boost::shared_ptr<Relationset> > m_relationset;
+        std::map<std::string, boost::shared_ptr<Relationset> > m_relationset;
     };
 
 

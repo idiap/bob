@@ -91,17 +91,53 @@ namespace Torch {
     }
 
 
+    Relationset::Relationset(): 
+      m_name("") { }
+
+    Relationset::~Relationset() {
+      std::cout << "Relationset destructor (name: " << getName() << ")" << std::endl;
+    }
+
+    void Relationset::addRule( boost::shared_ptr<Rule> rule) {
+      m_rule.insert( std::pair<std::string,boost::shared_ptr<Rule> >(
+        rule->getArraysetRole(), rule) );
+    }
+
+    void Relationset::addRelation( boost::shared_ptr<Relation> relation) {
+      m_relation.insert( std::pair<size_t,boost::shared_ptr<Relation> >(
+        relation->getId(), relation) );
+    }
+
+
+    Rule::Rule(): 
+      m_arraysetrole(""), m_min(1), m_max(1) { }
+
+    Rule::~Rule() {
+      std::cout << "Rule destructor (Arrayset-role: " << getArraysetRole() << ")" << std::endl;
+    }
+
+    Relation::Relation(): 
+      m_id(0) { }
+
+    Relation::~Relation() {
+      std::cout << "Relation destructor (id: " << getId() << ")" << std::endl;
+    }
+
+
     Dataset::Dataset() { }
 
     Dataset::~Dataset() {
       std::cout << "Dataset destructor" << std::endl;
-      for(iterator it=begin(); it!=end(); ++it)
-        it->second.reset();
     }
 
     void Dataset::addArrayset( boost::shared_ptr<Arrayset> arrayset) {
       m_arrayset.insert( std::pair<size_t,boost::shared_ptr<Arrayset> >(
         arrayset->getId(), arrayset) );
+    }
+
+    void Dataset::addRelationset( boost::shared_ptr<Relationset> relationset) {
+      m_relationset.insert( std::pair<std::string,boost::shared_ptr<Relationset> >(
+        relationset->getName(), relationset) );
     }
 
     const Arrayset& Dataset::operator[]( const size_t id ) const {
