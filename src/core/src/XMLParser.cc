@@ -396,6 +396,8 @@ namespace Torch {
           }
           cur_data = cur_data->next;
         }
+
+        arrayset->setIsLoaded(true);
       }
 
       return arrayset;
@@ -497,6 +499,8 @@ namespace Torch {
           default:
             break;
         }
+
+        array->setIsLoaded(true);
       }
       
       return array;
