@@ -288,8 +288,7 @@ namespace Torch {
           // Process an array
           if ( !strcmp( (const char*)cur_data->name, db::array) || 
                !strcmp( (const char*)cur_data->name, db::external_array) ) {
-            arrayset->addArray( parseArray( *arrayset, cur_data, 
-              arrayset->getArrayType(), arrayset->getNElem() ) );
+            arrayset->addArray( parseArray( *arrayset, cur_data) );
           }
           cur_data = cur_data->next;
         }
@@ -300,8 +299,7 @@ namespace Torch {
 
 
     boost::shared_ptr<Array> XMLParser::parseArray(
-      const Arrayset& parent, 
-      const xmlNodePtr cur, ArrayType a_type, size_t nb_values) 
+      const Arrayset& parent, const xmlNodePtr cur) 
     {
       boost::shared_ptr<Array> array(new Array(parent));
       // Parse id
@@ -342,7 +340,8 @@ namespace Torch {
         xmlFree(content);
 
         // Switch over the possible type
-        switch( a_type) {
+        size_t nb_values = parent.getNElem();
+        switch( parent.getArrayType()) {
           case t_bool:
             array->setStorage( parseArrayData<bool>( tok, nb_values ) );
             break;

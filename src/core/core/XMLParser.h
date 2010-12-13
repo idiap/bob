@@ -65,8 +65,7 @@ namespace Torch {
          * corresponding object.
          */
         boost::shared_ptr<Array> parseArray( 
-          const Arrayset& parent, xmlNodePtr node, 
-          ArrayType a_type, size_t nb_values);
+          const Arrayset& parent, xmlNodePtr node);
 
         /**
          * @brief Parse the data of an array given a tokenized string, and
