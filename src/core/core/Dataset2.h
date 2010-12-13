@@ -40,6 +40,8 @@ namespace Torch {
       LoaderType;
 
     class IndexError: public Exception { };
+    class NDimensionError: public Exception { };
+    class TypeError: public Exception { };
 
     
     // Declare the Arrayset for the reference to the parent Arrayset in the
@@ -116,8 +118,9 @@ namespace Torch {
          * @brief Adapt the size of each dimension of the passed blitz array
          * to the ones of the underlying array and refer to the data in it.
          * @warning Updating the content of the blitz array will update the
-         * of the corresponding array in the dataset.
+         * content of the corresponding array in the dataset.
          */
+        // TODO: remove const keyword?
         template<typename T, int D> 
         void refer( blitz::Array<T,D>& output) const;
         /************** Partial specialization declaration *************/
@@ -447,7 +450,7 @@ namespace Torch {
            m_parent_arrayset.getNDim() << std::endl;
         error << "Cannot copy the data in a blitz array with a different " <<
           "number of dimensions." << std::endl;
-        throw Exception();
+        throw NDimensionError();
       }
 
       // Reshape each dimensions with the correct size
@@ -500,7 +503,7 @@ namespace Torch {
            m_parent_arrayset.getNDim() << std::endl;
         error << "Cannot refer to the data in a blitz array with a " <<
           "different number of dimensions." << std::endl;
-        throw Exception();
+        throw NDimensionError();
       }
     }
 
@@ -508,7 +511,7 @@ namespace Torch {
     void Array::refer( blitz::Array<T,D>& output) const
     {
       error << "Unsupported blitz array type " << std::endl;
-      throw Exception();
+      throw TypeError();
     }
 
     template<int D> 
@@ -529,7 +532,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type bool with a non-bool " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -552,7 +555,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type int8_t with a non-int8_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -575,7 +578,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type int16_t with a non-int16_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -598,7 +601,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type int32_t with a non-int32_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -621,7 +624,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type int64_t with a non-int64_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -644,7 +647,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type uint8_t with a non-uint8_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -667,7 +670,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type uint16_t with a non-uint16_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -690,7 +693,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type uint32_t with a non-uint32_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -713,7 +716,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type uint64_t with a non-uint64_t " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -736,7 +739,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type float with a non-float " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -759,7 +762,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type double with a non-double " <<
             "blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -782,7 +785,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type long double with a " <<
             "non-long double blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -806,7 +809,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type complex(float) with a " <<
             "non-complex(float) blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -830,7 +833,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type complex(double) with a " <<
             "non-complex(double) blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }
@@ -855,7 +858,7 @@ namespace Torch {
         default:
           error << "Cannot refer to data of type complex(long double) with" <<
             "a non-complex(long double) blitz array." << std::endl;
-          throw Exception();
+          throw TypeError();
           break;
       }
     }

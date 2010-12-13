@@ -17,15 +17,17 @@ namespace Torch {
      * string for the XML attributes
      */
     namespace db {
-      static const char dataset[]     = "dataset";
-      static const char arrayset[]    = "arrayset";
-      static const char id[]          = "id";
-      static const char role[]        = "role";
-      static const char elementtype[] = "elementtype";
-      static const char shape[]       = "shape";
-      static const char loader[]      = "loader";
-      static const char file[]        = "file";
-      static const char array[]       = "array";
+      static const char dataset[]           = "dataset";
+      static const char arrayset[]          = "arrayset";
+      static const char external_arrayset[] = "external-arrayset";
+      static const char id[]                = "id";
+      static const char role[]              = "role";
+      static const char elementtype[]       = "elementtype";
+      static const char shape[]             = "shape";
+      static const char loader[]            = "loader";
+      static const char file[]              = "file";
+      static const char array[]             = "array";
+      static const char external_array[]    = "external-array";
 
       // elementtype
       static const char t_bool[]        = "bool";
@@ -148,12 +150,12 @@ namespace Torch {
       validateXMLSchema( doc);
 
 
-
       // Parse Arraysets
       cur = cur->xmlChildrenNode;
       while(cur != 0) { 
         // Parse an arrayset and add it to the dataset
-        if( !strcmp((const char*)cur->name, db::arrayset) )
+        if( !strcmp((const char*)cur->name, db::arrayset) || 
+            !strcmp((const char*)cur->name, db::external_arrayset) )
           dataset.addArrayset( parseArrayset(cur) );
         cur = cur->next;
       }
@@ -284,7 +286,8 @@ namespace Torch {
 
         while (cur_data != 0) { 
           // Process an array
-          if ( !strcmp( (const char*)cur_data->name, db::array)) {
+          if ( !strcmp( (const char*)cur_data->name, db::array) || 
+               !strcmp( (const char*)cur_data->name, db::external_array) ) {
             arrayset->addArray( parseArray( *arrayset, cur_data, 
               arrayset->getArrayType(), arrayset->getNElem() ) );
           }
