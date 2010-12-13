@@ -344,10 +344,49 @@ namespace Torch {
 
 
     /**
+     * @brief The member class for a dataset
+     */
+    class Member {
+      public:
+        /**
+         * @brief Constructor
+         */
+        Member();
+
+        /**
+         * @brief Destructor
+         */
+        ~Member();
+
+        /**
+         * @brief Set the array-id for this member
+         */
+        void setArrayId(const size_t array_id) { m_array_id = array_id; }
+        /**
+         * @brief Get the array-id for this member
+         */
+        size_t getArrayId() const { return m_array_id; }
+
+        /**
+         * @brief Set the array-id for this member
+         */
+        void setArraysetId(const size_t arrayset_id) { 
+          m_arrayset_id = arrayset_id; }
+        /**
+         * @brief Get the array-id for this member
+         */
+        size_t getArraysetId() const { return m_arrayset_id; }
+
+      private:
+        size_t m_array_id;
+        size_t m_arrayset_id;
+    };
+
+
+    /**
      * @brief The relation class for a dataset
      */
     class Relation {
-      // TODO
       public:
         /**
          * @brief Constructor
@@ -360,6 +399,11 @@ namespace Torch {
         ~Relation();
 
         /**
+         * @brief Add a member to the Relation
+         */
+        void addMember( boost::shared_ptr<Member> member);
+
+        /**
          * @brief Set the maximum number of occurences for this rule
          */
         void setId(const size_t id) { m_id = id; }
@@ -369,8 +413,11 @@ namespace Torch {
         size_t getId() const { return m_id; }
 
       private:
+        typedef std::pair<size_t, size_t> size_t_pair;
+        std::map<size_t_pair, boost::shared_ptr<Member> > m_member;
         size_t m_id;
     };
+
 
     /**
      * @brief The rule class for a dataset

@@ -116,11 +116,26 @@ namespace Torch {
       std::cout << "Rule destructor (Arrayset-role: " << getArraysetRole() << ")" << std::endl;
     }
 
+
     Relation::Relation(): 
       m_id(0) { }
 
     Relation::~Relation() {
       std::cout << "Relation destructor (id: " << getId() << ")" << std::endl;
+    }
+
+    void Relation::addMember( boost::shared_ptr<Member> member) {
+      size_t_pair ids( member->getArrayId(), member->getArraysetId());
+      m_member.insert( std::pair<size_t_pair,boost::shared_ptr<Member> >(
+        ids, member) );
+    }
+
+
+    Member::Member(): 
+      m_array_id(0), m_arrayset_id(0) { }
+
+    Member::~Member() {
+      std::cout << "Member destructor (id: " << getArrayId() << "-" << getArraysetId() << ")" << std::endl;
     }
 
 

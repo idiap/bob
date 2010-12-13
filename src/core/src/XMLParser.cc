@@ -30,8 +30,14 @@ namespace Torch {
       static const char array[]             = "array";
       static const char external_array[]    = "external-array";
       static const char name[]              = "name";
-      static const char rule[]              = "role";
+      static const char rule[]              = "rule";
       static const char relation[]          = "relation";
+      static const char member[]            = "member";
+      static const char arrayset_role[]     = "arrayset-role";
+      static const char min[]               = "min";
+      static const char max[]               = "max";
+      static const char array_id[]          = "array-id";
+      static const char arrayset_id[]       = "arrayset-id";
 
       // elementtype
       static const char t_bool[]        = "bool";
@@ -198,15 +204,67 @@ namespace Torch {
 
     boost::shared_ptr<Rule> XMLParser::parseRule(const xmlNodePtr cur) {
       boost::shared_ptr<Rule> rule(new Rule());
-      //TODO: implementation
+      // Parse arrayset-role
+      xmlChar *str;
+      str = xmlGetProp(cur, (const xmlChar*)db::arrayset_role);
+      rule->setArraysetRole( ( (str!=0?(const char *)str:"") ) );
+      std::cout << "  Arrayset-role: " << rule->getArraysetRole() << std::endl;
+      xmlFree(str);
+      
+      // Parse min
+      str = xmlGetProp(cur, (const xmlChar*)db::min);
+      rule->setMin(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      std::cout << "  Min: " << rule->getMin() << std::endl;
+      xmlFree(str);
+
+      // Parse max
+      str = xmlGetProp(cur, (const xmlChar*)db::max);
+      rule->setMax(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      std::cout << "  Max: " << rule->getMax() << std::endl;
+      xmlFree(str);
+
       return rule;
     }
 
 
     boost::shared_ptr<Relation> XMLParser::parseRelation(const xmlNodePtr cur) {
       boost::shared_ptr<Relation> relation(new Relation());
-      //TODO: implementation
+      // Parse id
+      xmlChar *str;
+      str = xmlGetProp(cur, (const xmlChar*)db::id);
+      relation->setId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      std::cout << "  Id: " << relation->getId() << std::endl;
+      xmlFree(str);
+
+      // Parse the members
+      xmlNodePtr cur_member = cur->xmlChildrenNode;
+      while(cur_member != 0) { 
+        // Parse a member and add it to the relation
+        if( !strcmp((const char*)cur_member->name, db::member) ) 
+          relation->addMember( parseMember(cur_member) );
+        cur_member = cur_member->next;
+      }
+
       return relation;
+    }
+
+
+    boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
+      boost::shared_ptr<Member> member(new Member());
+      // Parse array-id
+      xmlChar *str;
+      str = xmlGetProp(cur, (const xmlChar*)db::array_id);
+      member->setArrayId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      std::cout << "    Array-id: " << member->getArrayId() << std::endl;
+      xmlFree(str);
+
+      // Parse arrayset-id
+      str = xmlGetProp(cur, (const xmlChar*)db::arrayset_id);
+      member->setArraysetId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      std::cout << "    Arrayset-id: " << member->getArraysetId() << std::endl;
+      xmlFree(str);
+
+      return member;
     }
 
 

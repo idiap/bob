@@ -94,6 +94,11 @@ namespace Torch {
           boost::tokenizer<boost::char_separator<char> > tok, 
           size_t nb_values );
 
+        /**
+         * @brief Parse a member given an XML node and return the 
+         * corresponding object.
+         */
+        boost::shared_ptr<Member> parseMember(xmlNodePtr node);
     };
 
 
