@@ -532,33 +532,33 @@ namespace Torch {
          * @brief const_iterator over the Arraysets of the Dataset
          */
         typedef std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator
-          arrayset_const_iterator;
+          const_iterator;
         /**
          * @brief Return a const_iterator pointing at the first Arrayset of 
-         * the Arrayset
+         * the Dataset
          */
-        arrayset_const_iterator begin() const { return m_arrayset.begin(); }
+        const_iterator begin() const { return m_arrayset.begin(); }
         /**
          * @brief Return a const_iterator pointing at the last Arrayset of 
-         * the Arrayset
+         * the Dataset
          */
-        arrayset_const_iterator end() const { return m_arrayset.end(); }
+        const_iterator end() const { return m_arrayset.end(); }
 
         /**
          * @brief iterator over the Arraysets of the Dataset
          */
         typedef std::map<size_t, boost::shared_ptr<Arrayset> >::iterator 
-          arrayset_iterator;
+          iterator;
         /**
          * @brief Return an iterator pointing at the first Arrayset of 
-         * the Arrayset
+         * the Dataset
          */
-        arrayset_iterator begin() { return m_arrayset.begin(); }
+        iterator begin() { return m_arrayset.begin(); }
         /**
          * @brief Return an iterator pointing at the first Arrayset of 
-         * the Arrayset
+         * the Dataset
          */
-        arrayset_iterator end() { return m_arrayset.end(); }
+        iterator end() { return m_arrayset.end(); }
    
         /**
          * @brief Return the Arrayset of the given id 
@@ -575,6 +575,52 @@ namespace Torch {
          * @brief Add a Relationset to the Dataset
          */
         void addRelationset( boost::shared_ptr<Relationset> relationset);
+
+        /**
+         * @brief const_iterator over the Relationsets of the Dataset
+         */
+        typedef std::map<std::string, boost::shared_ptr<Relationset> >::
+          const_iterator relationset_const_iterator;
+        /**
+         * @brief Return a const_iterator pointing at the first Relationset of
+         * the Dataset
+         */
+        relationset_const_iterator relationset_begin() const { 
+          return m_relationset.begin(); }
+        /**
+         * @brief Return a const_iterator pointing at the last Relationset of 
+         * the Dataset
+         */
+        relationset_const_iterator relationset_end() const { 
+          return m_relationset.end(); }
+
+        /**
+         * @brief iterator over the Relationsets of the Dataset
+         */
+        typedef std::map<std::string, boost::shared_ptr<Relationset> >::iterator
+          relationset_iterator;
+        /**
+         * @brief Return an iterator pointing at the first Relationset of 
+         * the Dataset
+         */
+        relationset_iterator relationset_begin() { return m_relationset.begin(); }
+        /**
+         * @brief Return an iterator pointing at the first Relationset of 
+         * the Dataset
+         */
+        relationset_iterator relationset_end() { return m_relationset.end(); }
+   
+        /**
+         * @brief Return the Relationset of the given name
+         */
+        const Relationset& operator[]( const std::string& name ) const;
+        /**
+         * @brief Return the arrayset of the given id
+         * @warning Please note that if you use that method, scope matters,
+         * because the dataset owns the arraysets.
+         */
+        boost::shared_ptr<const Relationset> 
+        getRelationset( const std::string& name ) const;
 
       private:    
         std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;

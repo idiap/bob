@@ -172,6 +172,23 @@ namespace Torch {
       return it->second;
     }
 
+    const Relationset& Dataset::operator[]( const std::string& name ) const {
+      std::map<std::string, boost::shared_ptr<Relationset> >::const_iterator 
+        it = (m_relationset.find(name));
+      if( it == m_relationset.end() )
+        throw IndexError();
+      return *(it->second);
+    }
+
+    boost::shared_ptr<const Relationset> 
+    Dataset::getRelationset( const std::string& name ) const {
+      std::map<std::string, boost::shared_ptr<Relationset> >::const_iterator it = 
+        (m_relationset.find(name));
+      if( it == m_relationset.end() )
+        throw IndexError();
+      return it->second;
+    }
+
 
   }
 }
