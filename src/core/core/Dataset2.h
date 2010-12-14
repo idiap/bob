@@ -502,6 +502,38 @@ namespace Torch {
         void setName(const std::string& name) { m_name.assign(name); }
 
         /**
+         * @brief const_iterator over the Relations of the Relationset
+         */
+        typedef std::map<size_t, boost::shared_ptr<Relation> >::const_iterator
+          const_iterator;
+        /**
+         * @brief Return a const_iterator pointing at the first Relation of 
+         * the Relationset
+         */
+        const_iterator begin() const { return m_relation.begin(); }
+        /**
+         * @brief Return a const_iterator pointing at the last Relation of 
+         * the Relationet
+         */
+        const_iterator end() const { return m_relation.end(); }
+
+        /**
+         * @brief iterator over the Relations of the Relationset
+         */
+        typedef std::map<size_t, boost::shared_ptr<Relation> >::iterator 
+          iterator;
+        /**
+         * @brief Return an iterator pointing at the first Relation of the
+         * Relationset
+         */
+        iterator begin() { return m_relation.begin(); }
+        /**
+         * @brief Return an iterator pointing at the last Relation of the 
+         * Relationset
+         */
+        iterator end() { return m_relation.end(); }
+
+        /**
          * @brief Return the relation of the given id
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the relations.
