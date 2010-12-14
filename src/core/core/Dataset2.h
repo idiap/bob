@@ -501,6 +501,17 @@ namespace Torch {
          */
         void setName(const std::string& name) { m_name.assign(name); }
 
+        /**
+         * @brief Return the relation of the given id
+         * @warning Please note that if you use that method, scope matters,
+         * because the dataset owns the relations.
+         */
+        const Relation& operator[](size_t id) const;
+        /**
+         * @brief Return a smart pointer to the relation of the given id
+         */
+        boost::shared_ptr<const Relation> getRelation(size_t id) const;
+
       private:
         std::string m_name;
 
@@ -562,12 +573,12 @@ namespace Torch {
    
         /**
          * @brief Return the Arrayset of the given id 
+         * @warning Please note that if you use that method, scope matters,
+         * because the dataset owns the arraysets.
          */
         const Arrayset& operator[]( const size_t id ) const;
         /**
          * @brief Return the arrayset of the given id
-         * @warning Please note that if you use that method, scope matters,
-         * because the dataset owns the arraysets.
          */
         boost::shared_ptr<const Arrayset> getArrayset( const size_t id ) const;
 
@@ -612,12 +623,12 @@ namespace Torch {
    
         /**
          * @brief Return the Relationset of the given name
+         * @warning Please note that if you use that method, scope matters,
+         * because the dataset owns the relationsets.
          */
         const Relationset& operator[]( const std::string& name ) const;
         /**
          * @brief Return the arrayset of the given id
-         * @warning Please note that if you use that method, scope matters,
-         * because the dataset owns the arraysets.
          */
         boost::shared_ptr<const Relationset> 
         getRelationset( const std::string& name ) const;

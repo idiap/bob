@@ -108,6 +108,23 @@ namespace Torch {
         relation->getId(), relation) );
     }
 
+    const Relation& Relationset::operator[]( const size_t id ) const {
+      std::map<size_t, boost::shared_ptr<Relation> >::const_iterator it = 
+        (m_relation.find(id));
+      if( it == m_relation.end() )
+        throw IndexError();
+      return *(it->second);
+    }
+
+    boost::shared_ptr<const Relation> 
+    Relationset::getRelation( const size_t id ) const {
+      std::map<size_t, boost::shared_ptr<Relation> >::const_iterator it = 
+        (m_relation.find(id));
+      if( it == m_relation.end() )
+        throw IndexError();
+      return it->second;
+    }
+
 
     Rule::Rule(): 
       m_arraysetrole(""), m_min(1), m_max(1) { }
