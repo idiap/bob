@@ -18,35 +18,35 @@ namespace Torch {
     Array::~Array() {
       std::cout << "Array destructor (id: " << getId() << ")" << std::endl;
       switch(m_parent_arrayset.getArrayType()) {
-        case t_bool:
+        case array::t_bool:
           delete [] static_cast<bool*>(m_storage); break;
-        case t_int8:
+        case array::t_int8:
           delete [] static_cast<int8_t*>(m_storage); break;
-        case t_int16:
+        case array::t_int16:
           delete [] static_cast<int16_t*>(m_storage); break;
-        case t_int32:
+        case array::t_int32:
           delete [] static_cast<int32_t*>(m_storage); break;
-        case t_int64:
+        case array::t_int64:
           delete [] static_cast<int64_t*>(m_storage); break;
-        case t_uint8:
+        case array::t_uint8:
           delete [] static_cast<uint8_t*>(m_storage); break;
-        case t_uint16:
+        case array::t_uint16:
           delete [] static_cast<uint16_t*>(m_storage); break;
-        case t_uint32:
+        case array::t_uint32:
           delete [] static_cast<uint32_t*>(m_storage); break;
-        case t_uint64:
+        case array::t_uint64:
           delete [] static_cast<uint64_t*>(m_storage); break;
-        case t_float32:
+        case array::t_float32:
           delete [] static_cast<float*>(m_storage); break;
-        case t_float64:
+        case array::t_float64:
           delete [] static_cast<double*>(m_storage); break;
-        case t_float128:
+        case array::t_float128:
           delete [] static_cast<long double*>(m_storage); break;
-        case t_complex64:
+        case array::t_complex64:
           delete [] static_cast<std::complex<float>* >(m_storage); break;
-        case t_complex128:
+        case array::t_complex128:
           delete [] static_cast<std::complex<double>* >(m_storage); break;
-        case t_complex256:
+        case array::t_complex256:
           delete [] static_cast<std::complex<long double>* >(m_storage); 
           break;
         default:
@@ -56,8 +56,8 @@ namespace Torch {
 
 
     Arrayset::Arrayset(): 
-      m_id(0), m_n_dim(0), m_n_elem(0), m_element_type(t_unknown), m_role(""),
-      m_is_loaded(false), m_filename(""), m_loader(l_unknown) 
+      m_id(0), m_n_dim(0), m_n_elem(0), m_element_type(array::t_unknown), 
+      m_role(""), m_is_loaded(false), m_filename(""), m_loader(l_unknown) 
     {
       m_shape[0]=m_shape[1]=m_shape[2]=m_shape[3]=0; 
     }

@@ -13,6 +13,42 @@
 #include <blitz/array.h>
 #include "core/logging.h"
 
+// TODO: Is it a reasonable choice to keep the following together?
+
+namespace Torch {
+/**
+ * \ingroup libcore_api
+ * @{
+ *
+ */
+  namespace core {
+
+    namespace array {
+
+      /**
+       * @brief Enumeration of the supported type for multidimensional arrays
+       */
+      typedef enum ArrayType { t_unknown, t_bool,
+        t_int8, t_int16, t_int32, t_int64,
+        t_uint8, t_uint16, t_uint32, t_uint64,
+        t_float32, t_float64, t_float128,
+        t_complex64, t_complex128, t_complex256 } ArrayType;
+
+      /**
+       * @brief Maximum number of supported dimensions for multidimensional 
+       * arrays.
+       */
+      const size_t N_MAX_DIMENSIONS_ARRAY = 4;
+
+    }
+
+  }
+/**
+ * @}
+ */
+}
+
+
 
 BZ_NAMESPACE(blitz)
 

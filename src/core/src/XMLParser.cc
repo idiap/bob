@@ -292,43 +292,44 @@ namespace Torch {
       }
       std::string str_element_type( (const char*)str );
       if( !str_element_type.compare( db::t_bool ) )
-        arrayset->setArrayType( t_bool );
+        arrayset->setArrayType( array::t_bool );
       else if( !str_element_type.compare( db::t_uint8 ) )
-        arrayset->setArrayType( t_uint8 );
+        arrayset->setArrayType( array::t_uint8 );
       else if( !str_element_type.compare( db::t_uint16 ) )
-        arrayset->setArrayType( t_uint16 );
+        arrayset->setArrayType( array::t_uint16 );
       else if( !str_element_type.compare( db::t_uint32 ) )
-        arrayset->setArrayType( t_uint32 );
+        arrayset->setArrayType( array::t_uint32 );
       else if( !str_element_type.compare( db::t_uint64 ) )
-        arrayset->setArrayType( t_uint64 );
+        arrayset->setArrayType( array::t_uint64 );
       else if( !str_element_type.compare( db::t_int8 ) )
-        arrayset->setArrayType( t_int8 );
+        arrayset->setArrayType( array::t_int8 );
       else if( !str_element_type.compare( db::t_int16 ) )
-        arrayset->setArrayType( t_int16 );
+        arrayset->setArrayType( array::t_int16 );
       else if( !str_element_type.compare( db::t_int32 ) )
-        arrayset->setArrayType( t_int32 );
+        arrayset->setArrayType( array::t_int32 );
       else if( !str_element_type.compare( db::t_int64 ) )
-        arrayset->setArrayType( t_int64 );
+        arrayset->setArrayType( array::t_int64 );
       else if( !str_element_type.compare( db::t_float32 ) )
-        arrayset->setArrayType( t_float32 );
+        arrayset->setArrayType( array::t_float32 );
       else if( !str_element_type.compare( db::t_float64 ) )
-        arrayset->setArrayType( t_float64 );
+        arrayset->setArrayType( array::t_float64 );
       else if( !str_element_type.compare( db::t_float128 ) )
-        arrayset->setArrayType( t_float128 );
+        arrayset->setArrayType( array::t_float128 );
       else if( !str_element_type.compare( db::t_complex64 ) )
-        arrayset->setArrayType( t_complex64 );
+        arrayset->setArrayType( array::t_complex64 );
       else if( !str_element_type.compare( db::t_complex128 ) )
-        arrayset->setArrayType( t_complex128 );
+        arrayset->setArrayType( array::t_complex128 );
       else if( !str_element_type.compare( db::t_complex256 ) )
-        arrayset->setArrayType( t_complex256 );
+        arrayset->setArrayType( array::t_complex256 );
       else
-        arrayset->setArrayType( t_unknown );
+        arrayset->setArrayType( array::t_unknown );
       std::cout << "Elementtype: " << arrayset->getArrayType() << std::endl;
       xmlFree(str);
 
       // Parse shape
-      size_t shape[4];
-      shape[0]=shape[1]=shape[2]=shape[3]=0;
+      size_t shape[array::N_MAX_DIMENSIONS_ARRAY];
+      for(size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
+        shape[i]=0;
       str = xmlGetProp(cur, (const xmlChar*)db::shape);
       if( str==0 ) {
         error << "Elementtype is not specified in arrayset (id: " << 
@@ -342,10 +343,10 @@ namespace Torch {
       for( boost::tokenizer<>::iterator it=tok.begin(); it!=tok.end(); 
         ++it, ++count ) 
       {
-        if(count>3) {
+        if(count>=array::N_MAX_DIMENSIONS_ARRAY) {
           error << "Shape is not valid in arrayset (id: " << 
-            arrayset->getId() << "). Maximum number of dimensions is 4." << 
-            std::endl;
+            arrayset->getId() << "). Maximum number of dimensions is " <<
+            array::N_MAX_DIMENSIONS_ARRAY << "." << std::endl;
           throw Exception();        
         }
         shape[count] = atoi((*it).c_str());
@@ -448,51 +449,51 @@ namespace Torch {
         // Switch over the possible type
         size_t nb_values = parent.getNElem();
         switch( parent.getArrayType()) {
-          case t_bool:
+          case array::t_bool:
             array->setStorage( parseArrayData<bool>( tok, nb_values ) );
             break;
-          case t_int8:
+          case array::t_int8:
             array->setStorage( parseArrayData<int8_t>( tok, nb_values ) );
             break;
-          case t_int16:
+          case array::t_int16:
             array->setStorage( parseArrayData<int16_t>( tok, nb_values ) );
             break;
-          case t_int32:
+          case array::t_int32:
             array->setStorage( parseArrayData<int32_t>( tok, nb_values ) );
             break;
-          case t_int64:
+          case array::t_int64:
             array->setStorage( parseArrayData<int64_t>( tok, nb_values ) );
             break;
-          case t_uint8:
+          case array::t_uint8:
             array->setStorage( parseArrayData<uint8_t>( tok, nb_values ) );
             break;
-          case t_uint16:
+          case array::t_uint16:
             array->setStorage( parseArrayData<uint16_t>( tok, nb_values ) );
             break;
-          case t_uint32:
+          case array::t_uint32:
             array->setStorage( parseArrayData<uint32_t>( tok, nb_values ) );
             break;
-          case t_uint64:
+          case array::t_uint64:
             array->setStorage( parseArrayData<uint64_t>( tok, nb_values ) );
             break;
-          case t_float32:
+          case array::t_float32:
             array->setStorage( parseArrayData<float>( tok, nb_values ) );
             break;
-          case t_float64:
+          case array::t_float64:
             array->setStorage( parseArrayData<double>( tok, nb_values ) );
             break;
-          case t_float128:
+          case array::t_float128:
             array->setStorage( parseArrayData<long double>( tok, nb_values ) );
             break;
-          case t_complex64:
+          case array::t_complex64:
             array->setStorage( parseArrayData<std::complex<float> >( tok, 
               nb_values ) );
             break;
-          case t_complex128:
+          case array::t_complex128:
             array->setStorage( parseArrayData<std::complex<double> >( tok, 
               nb_values ) );
             break;
-          case t_complex256:
+          case array::t_complex256:
             array->setStorage( parseArrayData<std::complex<long double> >( 
               tok, nb_values ) );
             break;
