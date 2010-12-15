@@ -39,6 +39,8 @@ set(src
     "src/logging.cc"
     "src/Dataset2.cc"
     "src/XMLParser.cc"
+    "src/BinFileHeader.cc"
+    "src/BinOutputFile.cc"
     )
 
 include(../cmake/macros.cmake)
