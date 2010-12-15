@@ -66,8 +66,8 @@ template<typename TTensor, typename TVal> void check_fill_4d(const TTensor& t,
         for (int l=0; l<t.size(3); ++l) 
           BOOST_CHECK_EQUAL(t.get(i, j, k, l), v);
 }
-void check_dimensions(Torch::Tensor& t, unsigned s1, unsigned s2=0, 
-                      unsigned s3=0, unsigned s4=0) {
+void check_dimensions(Torch::Tensor& t, int s1, int s2=0, 
+                      int s3=0, int s4=0) {
   if (!s2) { //1-D
     BOOST_CHECK_EQUAL(t.nDimension(), 1);
   }
