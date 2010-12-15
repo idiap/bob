@@ -101,7 +101,15 @@ namespace Torch {
          * @brief Get the loader used to read the data from the external file 
          * if any.
          */
-        const LoaderType getLoader() const {return m_loader; }
+        const LoaderType getLoader() const { return m_loader; }
+        /**
+         * @brief Get a pointer to the storage area containing the data
+         */
+        const void* getStorage() const { return m_storage; }
+        /**
+         * @brief Get the parent arrayset of this array
+         */
+        const Arrayset& getParentArrayset() const { return m_parent_arrayset; }
 
         /**
          * @brief Adapt the size of each dimension of the passed blitz array
