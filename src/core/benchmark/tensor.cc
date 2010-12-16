@@ -87,34 +87,34 @@ template<typename T> void benchmark_set(const unsigned int times, T& t) {
   {
     case 1:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i) {
+        for(int i=0; i<S[0]; ++i) {
           v += 1;
           t(i) = v;
         }
       break;
     case 2:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j) {
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j) {
             v += 1;
             t(i, j) = v;
           }
       break;
     case 3:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
-            for(unsigned int k=0; k<S[2]; ++k) {
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
+            for(int k=0; k<S[2]; ++k) {
               v += 1;
               t(i, j, k) = v;
             }
       break;
     case 4:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
-            for(unsigned int k=0; k<S[2]; ++k)  
-              for(unsigned int l=0; l<S[3]; ++l) {
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
+            for(int k=0; k<S[2]; ++k)  
+              for(int l=0; l<S[3]; ++l) {
                 v += 1;
                 t(i, j, k, l) = v;
               }
@@ -136,28 +136,28 @@ template<typename T> double benchmark_get(const unsigned int times, const T& t) 
   {
     case 1:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
+        for(int i=0; i<S[0]; ++i)  
           v += t(i);
       break;
     case 2:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
             v += t(i, j);
       break;
     case 3:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
-            for(unsigned int k=0; k<S[2]; ++k)  
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
+            for(int k=0; k<S[2]; ++k)  
               v += t(i, j, k);
       break;
     case 4:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
-            for(unsigned int k=0; k<S[2]; ++k)  
-              for(unsigned int l=0; l<S[3]; ++l) 
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
+            for(int k=0; k<S[2]; ++k)  
+              for(int l=0; l<S[3]; ++l) 
                 v += t(i, j, k, l);
       break;
     default:
@@ -192,28 +192,28 @@ benchmark_add(const unsigned int times, const T& t1, const T& t2) {
   {
     case 1:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
+        for(int i=0; i<S[0]; ++i)  
           result1(i) = t1(i) + t2(i);
       break;
     case 2:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
             result2(i, j) = t1(i, j) + t2(i, j);
       break;
     case 3:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
-            for(unsigned int k=0; k<S[2]; ++k)  
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
+            for(int k=0; k<S[2]; ++k)  
               result3(i, j, k) = t1(i, j, k) + t2(i, j, k);
       break;
     case 4:
       for (unsigned n=0; n<times; ++n) 
-        for(unsigned int i=0; i<S[0]; ++i)  
-          for(unsigned int j=0; j<S[1]; ++j)  
-            for(unsigned int k=0; k<S[2]; ++k)  
-              for(unsigned int l=0; l<S[3]; ++l)
+        for(int i=0; i<S[0]; ++i)  
+          for(int j=0; j<S[1]; ++j)  
+            for(int k=0; k<S[2]; ++k)  
+              for(int l=0; l<S[3]; ++l)
                 result4(i, j, k, l) = t1(i, j, k, l) + t2(i, j, k, l);
       break;
     default:
