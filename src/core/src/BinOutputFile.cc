@@ -12,12 +12,13 @@ namespace Torch {
   namespace core {
 
     BinOutputFile::BinOutputFile(const std::string& filename, bool append):
-      m_write_init(append), 
+      m_header_init(append), 
       m_out_stream( filename.c_str(), std::ios::out | std::ios::binary ),
       m_n_arrays_written(0)
     {
       if(append) {
         m_header.read(m_out_stream);
+        m_header_init = true;
         m_n_arrays_written = m_header.getNSamples();
         m_out_stream.seekp(0, std::ios::end);
       }
@@ -32,22 +33,38 @@ namespace Torch {
     void BinOutputFile::initHeader(const array::ArrayType type, 
         const size_t shape[array::N_MAX_DIMENSIONS_ARRAY]) 
     {
+      // Check that data have not already been written
+      if( m_n_arrays_written > 0 ) {
+        error << "Cannot init the header of an output stream in which data" <<
+          " have already been written." << std::endl;
+        throw Exception();
+      }
+      
+      // Initialize header
       m_header.setArrayType( type);
       m_header.setShape( shape);
       m_header.write(m_out_stream);
-      m_write_init = true;
+      m_header_init = true;
     }
 
-    void BinOutputFile::close()
-    {
+    void BinOutputFile::close() {
       m_header.setNSamples(m_n_arrays_written);
       m_out_stream.close();
     }
 
 
+    void BinOutputFile::checkHeaderInit() {
+      if(!m_header_init) {
+        error << "The header have not yet been initialized with the type " <<
+          "and dimensions." << std::endl;
+        throw Exception();
+      }
+    }
+
+
     void BinOutputFile::save(const Arrayset& arrayset) {
       // Check that the header has been initialized
-      checkWriteInit();
+      checkHeaderInit();
 
       if(!arrayset.getIsLoaded()) {
         error << "The arrayset is not loaded." << std::endl;
@@ -65,26 +82,97 @@ namespace Torch {
 
     void BinOutputFile::save(const Array& array) {
       // Check that the header has been initialized
-      checkWriteInit();
+      checkHeaderInit();
       
       bool shapeCompatibility = true;
       size_t i=0;
+      const size_t* p_shape = array.getParentArrayset().getShape();
+      const size_t* h_shape = m_header.getShape();
       while( i<array::N_MAX_DIMENSIONS_ARRAY && shapeCompatibility) {
-        shapeCompatibility = ( array.getParentArrayset().getShape()[i] ==
-          getHeader().getShape()[i]);
+        shapeCompatibility = ( p_shape[i] == h_shape[i]);
         ++i;
       }
         
-      if( shapeCompatibility && (array.getParentArrayset().getArrayType() != 
-        getHeader().getArrayType() ) )
+      if(!shapeCompatibility)
       {
+        error << "The dimensions of this array does not match the " <<
+          "contained in the header file. The array cannot be saved." <<
+          std::endl;
+        throw Exception();
+      }
+
+      if(array.getParentArrayset().getArrayType() == m_header.getArrayType())
         operator<<(array.getStorage()); 
+      else // cast is required
+      {
+        // copy the data into the output stream
+        switch(array.getParentArrayset().getArrayType())
+        {
+          case array::t_bool:
+            operator<<( reinterpret_cast<const bool*>(array.getStorage()) );
+            break;
+          case array::t_int8:
+            operator<<( reinterpret_cast<const int8_t*>(array.getStorage()) );
+            break;
+          case array::t_int16:
+            operator<<( reinterpret_cast<const int16_t*>(array.getStorage()) );
+            break;
+          case array::t_int32:
+            operator<<( reinterpret_cast<const int32_t*>(array.getStorage()) );
+            break;
+          case array::t_int64:
+            operator<<( reinterpret_cast<const int64_t*>(
+              array.getStorage()) );
+            break;
+          case array::t_uint8:
+            operator<<( reinterpret_cast<const uint8_t*>(
+              array.getStorage()) );
+            break;
+          case array::t_uint16:
+            operator<<( reinterpret_cast<const uint16_t*>(
+              array.getStorage()) );
+            break;
+          case array::t_uint32:
+            operator<<( reinterpret_cast<const uint32_t*>(
+              array.getStorage()) );
+            break;
+          case array::t_uint64:
+            operator<<( reinterpret_cast<const uint64_t*>(
+              array.getStorage()) );
+            break;
+          case array::t_float32:
+            operator<<( reinterpret_cast<const float*>(
+              array.getStorage()) );
+            break;
+          case array::t_float64:
+            operator<<( reinterpret_cast<const double*>(
+              array.getStorage()) );
+            break;
+          case array::t_float128:
+            operator<<( reinterpret_cast<const long double*>(
+              array.getStorage()) );
+            break;
+          case array::t_complex64:
+            operator<<( reinterpret_cast<const std::complex<float>* >(
+              array.getStorage()) );
+            break;
+          case array::t_complex128:
+            operator<<( reinterpret_cast<const std::complex<double>*>(
+              array.getStorage()) );
+            break;
+          case array::t_complex256:
+            operator<<( reinterpret_cast<const std::complex<long double>* >(
+              array.getStorage()) );
+            break;
+          default:
+            break;
+        }
       }
     }
 
     BinOutputFile& BinOutputFile::operator<<(const void* multi_array) {
       // Check that the header has been initialized
-      checkWriteInit();
+      checkHeaderInit();
 
       // copy the data into the output stream
       switch(m_header.getArrayType())
@@ -159,14 +247,6 @@ namespace Torch {
       return *this;
     }
 
-
-    void BinOutputFile::checkWriteInit() {
-      if(!m_write_init) {
-        error << "The header have not yet been initialized with the type " <<
-          "and dimensions" << std::endl;
-        throw Exception();
-      }
-    }
 
   }
 }
