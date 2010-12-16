@@ -700,7 +700,11 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      T* out_data = output.data();
+      T* out_data;
+      if( output.isStorageContiguous() )
+        out_data = output.data();
+      else
+        out_data = output.copy().data();
       switch(m_parent_arrayset.getArrayType()) {
         case array::t_bool:
           copyCast<bool,T>(out_data); break;

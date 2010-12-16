@@ -50,16 +50,26 @@ namespace Torch {
         void close();
 
 
+        // TODO: Make API more consistent?
         /**
-         * @brief Put a C-style multiarray into the output stream/file
+         * @brief Put a void C-style multiarray into the output stream/file
          * @warning This is the responsability of the user to check
          * the correctness of the type and size of the memory block 
          * pointed by the void pointer
          */
         BinOutputFile& operator<<(const void* multi_array);
 
+        /** 
+         * @brief Put a C-style multiarray of a given type into the output
+         * stream/file by casting it to the correct type.
+         */
         template <typename T> BinOutputFile& operator<<(const T* multi_array);
 
+        /** 
+         * @brief Put a Blitz++ multiarray of a given type into the output
+         * stream/file by casting it to the correct type.
+         */
+        template <typename T, int D> void save(const blitz::Array<T,D>& bl);
 
         /**
          * @brief Save an Arrayset into a binary file
@@ -201,7 +211,38 @@ namespace Torch {
       ++m_n_arrays_written;
 
       return *this;
+    }
 
+
+    template <typename T, int D> 
+    void BinOutputFile::save(const blitz::Array<T,D>& bl) {
+      // Check that the header has been initialized
+      checkHeaderInit();
+
+      // Check the shape compatibility
+      bool shapeCompatibility = true;
+      size_t i=0;
+      const size_t* h_shape = m_header.getShape();
+      while( i<array::N_MAX_DIMENSIONS_ARRAY && shapeCompatibility) {
+        shapeCompatibility = (bl.extent(i) == h_shape[i]);
+        ++i;
+      }
+
+      if(!shapeCompatibility)
+      {
+        error << "The dimensions of this array does not match the " <<
+          "contained in the header file. The array cannot be saved." <<
+          std::endl;
+        throw Exception();
+      }
+
+      // Copy the data into the output stream
+      const T* data;
+      if( bl.isStorageContiguous() )
+        data = bl.data();
+      else
+        data = bl.copy().data();
+      operator<<(data);
     }
 
   }
