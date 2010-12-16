@@ -27,12 +27,11 @@ namespace Torch {
 
     void BinFileHeader::sizeUpdated() {
       m_n_elements = m_shape[0];
-      size_t i = 1;
-      while( i < array::N_MAX_DIMENSIONS_ARRAY && m_shape[i] != 0) {
+      size_t i;
+      for(i=1; i<array::N_MAX_DIMENSIONS_ARRAY && m_shape[i]!=0; ++i) {
         m_n_elements *= m_shape[i];
-        ++i;
       }
-      m_n_dimensions = (m_shape[0]!=0 ? i : 0);
+      m_n_dimensions = i;
     }
 
     void BinFileHeader::typeUpdated() {

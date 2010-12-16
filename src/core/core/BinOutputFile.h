@@ -224,7 +224,10 @@ namespace Torch {
       size_t i=0;
       const size_t* h_shape = m_header.getShape();
       while( i<array::N_MAX_DIMENSIONS_ARRAY && shapeCompatibility) {
-        shapeCompatibility = (bl.extent(i) == h_shape[i]);
+        if( i<D)
+          shapeCompatibility = (static_cast<size_t>(bl.extent(i))==h_shape[i]);
+        else
+          shapeCompatibility = (h_shape[i] == 0);
         ++i;
       }
 
