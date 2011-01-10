@@ -15,6 +15,8 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include <string>
+
 #include "core/Dataset2.h"
 
 
@@ -99,6 +101,12 @@ namespace Torch {
          * corresponding object.
          */
         boost::shared_ptr<Member> parseMember(xmlNodePtr node);
+
+
+        /**
+         * @brief Mapping from arrayset-id to role
+         */
+        std::map<size_t, std::string > m_id_role;
     };
 
 
