@@ -46,8 +46,13 @@ namespace Torch {
 
         /**
          * @brief Parse an XML file and update the dataset object accordingly.
+         * There are three check levels:
+         *   + 0: libxml2 schema validation only
+         *   + 1: same as 0 and high-level check
+         *   + 2: same as 1 and high-level check while loading everything
          */
-        void load(const char *filename, Dataset& dataset);
+        void load(const char *filename, Dataset& dataset, 
+          size_t check_level=1);
 
 
       private:
