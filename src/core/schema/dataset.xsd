@@ -143,7 +143,7 @@
 
   <xsd:complexType name="RuleType">
     <xsd:attribute name="arrayset-role" type="xsd:string" use="required" />
-    <xsd:attribute name="min" type="xsd:positiveInteger" use="required" />
+    <xsd:attribute name="min" type="xsd:nonNegativeInteger" use="required" />
     <xsd:attribute name="max" type="MaxMultiplicityType" use="required" />
   </xsd:complexType>
 
