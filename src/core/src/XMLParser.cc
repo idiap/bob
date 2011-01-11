@@ -168,10 +168,20 @@ namespace Torch {
         if( !strcmp((const char*)cur->name, db::arrayset) || 
             !strcmp((const char*)cur->name, db::external_arrayset) )
           dataset.addArrayset( parseArrayset(cur) );
-        else if( !strcmp((const char*)cur->name, db::relationset) )
+        cur = cur->next;
+      }
+
+      // Parse Relationsets
+      cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
+      while(cur != 0) { 
+        // Parse a relationset and add it to the dataset
+        if( !strcmp((const char*)cur->name, db::relationset) )
           dataset.addRelationset( parseRelationset(cur) );
         cur = cur->next;
       }
+
+      // High-level checks
+      // TODO
 
       xmlFreeDoc(doc);
     }
@@ -282,6 +292,11 @@ namespace Torch {
       arrayset->setRole( ( (str!=0?(const char *)str:"") ) );
       std::cout << "Role: " << arrayset->getRole() << std::endl;
       xmlFree(str);
+
+      // Add id-role to the mapping of the XMLParser. This will be used for
+      // checking the members of a relation.
+      m_id_role.insert( std::pair<size_t,std::string>( 
+        arrayset->getId(), arrayset->getRole()) );
 
       // Parse elementtype
       str = xmlGetProp(cur, (const xmlChar*)db::elementtype);

@@ -74,6 +74,11 @@ namespace Torch {
     }
 
     const Array& Arrayset::operator[]( const size_t id ) const {
+      if(!getIsLoaded()) {
+        ;//TODO:load
+        Arrayset* a=const_cast<Arrayset*>(this);
+        a->setIsLoaded(true);
+      }
       std::map<size_t, boost::shared_ptr<Array> >::const_iterator it = 
         (m_array.find(id));
       if( it == m_array.end() )
@@ -83,6 +88,11 @@ namespace Torch {
 
     boost::shared_ptr<const Array> 
     Arrayset::getArray( const size_t id ) const {
+      if(!getIsLoaded()) {
+        ;//TODO:load
+        Arrayset* a=const_cast<Arrayset*>(this);
+        a->setIsLoaded(true);
+      }
       std::map<size_t, boost::shared_ptr<Array> >::const_iterator it = 
         (m_array.find(id));
       if( it == m_array.end() )

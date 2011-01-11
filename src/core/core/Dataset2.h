@@ -105,7 +105,14 @@ namespace Torch {
         /**
          * @brief Get a pointer to the storage area containing the data
          */
-        const void* getStorage() const { return m_storage; }
+        const void* getStorage() const { 
+          if(!getIsLoaded()) {
+            ;//TODO:load
+            Array* a=const_cast<Array*>(this);
+            a->setIsLoaded(true);
+          }          
+          return m_storage; 
+        }
         /**
          * @brief Get the parent arrayset of this array
          */
@@ -282,12 +289,26 @@ namespace Torch {
          * @brief Return a const_iterator pointing at the first Array of the 
          * Arrayset
          */
-        const_iterator begin() const { return m_array.begin(); }
+        const_iterator begin() const { 
+          if(!getIsLoaded()) {
+            ;//TODO:load
+            Arrayset* a=const_cast<Arrayset*>(this);
+            a->setIsLoaded(true);
+          }          
+          return m_array.begin(); 
+        }
         /**
          * @brief Return a const_iterator pointing at the last Array of the 
          * Arrayset
          */
-        const_iterator end() const { return m_array.end(); }
+        const_iterator end() const { 
+          if(!getIsLoaded()) {
+            ;//TODO:load
+            Arrayset* a=const_cast<Arrayset*>(this);
+            a->setIsLoaded(true);
+          }          
+          return m_array.end(); 
+        }
 
         /**
          * @brief iterator over the Arrays of the Arrayset
@@ -298,12 +319,24 @@ namespace Torch {
          * @brief Return an iterator pointing at the first Array of the 
          * Arrayset
          */
-        iterator begin() { return m_array.begin(); }
+        iterator begin() { 
+          if(!getIsLoaded()) {
+            ;//TODO:load
+            setIsLoaded(true);
+          }          
+          return m_array.begin(); 
+        }
         /**
          * @brief Return an iterator pointing at the last Array of the 
          * Arrayset
          */
-        iterator end() { return m_array.end(); }
+        iterator end() { 
+          if(!getIsLoaded()) {
+            ;//TODO:load
+            setIsLoaded(true);
+          }          
+          return m_array.end(); 
+        }
 
         /**
          * @brief Return the array of the given id
@@ -700,6 +733,13 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
+      // Load the data if required
+      if(!getIsLoaded()) {
+        ;//TODO:load 
+        Array* a=const_cast<Array*>(this);
+        a->setIsLoaded(true);
+      }
+
       T* out_data;
       if( output.isStorageContiguous() )
         out_data = output.data();
@@ -744,6 +784,13 @@ namespace Torch {
     template <typename T, int D> 
     void Array::referCheck( blitz::Array<T,D>& output) const
     {
+      // Load the data if required
+      if(!getIsLoaded()) {
+        ;//TODO:load 
+        Array* a=const_cast<Array*>(this);
+        a->setIsLoaded(true);
+      }
+
       if( D != m_parent_arrayset.getNDim() ) {
         std::cout << "D=" << D << " -- ParseXML: D=" <<
            m_parent_arrayset.getNDim() << std::endl;
