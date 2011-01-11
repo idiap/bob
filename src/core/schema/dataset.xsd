@@ -13,8 +13,8 @@
             </xsd:key>
           </xsd:element>
           <xsd:element name="external-arrayset" minOccurs="0" maxOccurs="unbounded" type="ArraysetFileType" />
-          <xsd:element name="relationset" minOccurs="0" maxOccurs="unbounded" type="RelationsetType" />
         </xsd:choice>
+        <xsd:element name="relationset" minOccurs="0" maxOccurs="unbounded" type="RelationsetType" />
       </xsd:sequence>
       <xsd:attribute name="name" type="xsd:string" use="optional" />
       <xsd:attribute name="version" type="xsd:positiveInteger" use="optional" />

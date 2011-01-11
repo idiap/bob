@@ -161,21 +161,15 @@ namespace Torch {
       validateXMLSchema( doc);
 
 
-      // Parse Arraysets
+      // Parse Arraysets and Relationsets
       cur = cur->xmlChildrenNode;
       while(cur != 0) { 
         // Parse an arrayset and add it to the dataset
         if( !strcmp((const char*)cur->name, db::arrayset) || 
             !strcmp((const char*)cur->name, db::external_arrayset) )
           dataset.addArrayset( parseArrayset(cur) );
-        cur = cur->next;
-      }
-
-      // Parse Relationsets
-      cur = xmlDocGetRootElement(doc)->xmlChildrenNode;
-      while(cur != 0) { 
         // Parse a relationset and add it to the dataset
-        if( !strcmp((const char*)cur->name, db::relationset) )
+        else if( !strcmp((const char*)cur->name, db::relationset) )
           dataset.addRelationset( parseRelationset(cur) );
         cur = cur->next;
       }
