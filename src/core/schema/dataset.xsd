@@ -135,16 +135,10 @@
     <xsd:attribute name="name" type="xsd:string" use="required" />
   </xsd:complexType>
 
-  <xsd:simpleType name="MaxMultiplicityType">
-     <xsd:restriction base="xsd:int">
-       <xsd:minInclusive value="-1"/>
-     </xsd:restriction>
-  </xsd:simpleType>
-
   <xsd:complexType name="RuleType">
     <xsd:attribute name="arrayset-role" type="xsd:string" use="required" />
     <xsd:attribute name="min" type="xsd:nonNegativeInteger" use="required" />
-    <xsd:attribute name="max" type="MaxMultiplicityType" use="required" />
+    <xsd:attribute name="max" type="xsd:nonNegativeInteger" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="RelationType">
