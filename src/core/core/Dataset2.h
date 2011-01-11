@@ -278,6 +278,10 @@ namespace Torch {
          * if any.
          */
         LoaderType getLoader() const { return m_loader; }
+        /**
+         * @brief Get the number of arrays in this Arrayset
+         */
+        size_t getNArrays() const { return m_array.size(); }
 
 
         /**
@@ -427,7 +431,7 @@ namespace Torch {
         /**
          * @brief Constructor
          */
-        Relation();
+        Relation(boost::shared_ptr<std::map<size_t,std::string> > id_role);
 
         /**
          * @brief Destructor
@@ -484,6 +488,10 @@ namespace Torch {
       private:
         std::map<size_t_pair, boost::shared_ptr<Member> > m_member;
         size_t m_id;
+        /**
+         * @brief Mapping from arrayset-id to role
+         */
+        boost::shared_ptr<std::map<size_t,std::string> > m_id_role;
     };
 
 

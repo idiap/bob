@@ -106,7 +106,7 @@ namespace Torch {
         /**
          * @brief Mapping from arrayset-id to role
          */
-        std::map<size_t, std::string > m_id_role;
+        boost::shared_ptr<std::map<size_t, std::string > > m_id_role;
     };
 
 

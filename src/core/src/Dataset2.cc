@@ -144,8 +144,10 @@ namespace Torch {
     }
 
 
-    Relation::Relation(): 
-      m_id(0) { }
+    Relation::Relation( boost::shared_ptr<std::map<size_t,std::string> > 
+      id_role): m_id(0), m_id_role(id_role)
+    { 
+    }
 
     Relation::~Relation() {
       std::cout << "Relation destructor (id: " << getId() << ")" << std::endl;

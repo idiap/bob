@@ -33,6 +33,7 @@ namespace Torch {
       static const char rule[]              = "rule";
       static const char relation[]          = "relation";
       static const char member[]            = "member";
+      static const char arrayset_member[]   = "arrayset-member";
       static const char arrayset_role[]     = "arrayset-role";
       static const char min[]               = "min";
       static const char max[]               = "max";
@@ -65,7 +66,9 @@ namespace Torch {
 
 
 
-    XMLParser::XMLParser() { }
+    XMLParser::XMLParser(): m_id_role( new std::map<size_t,std::string>() )
+    {
+    }
 
 
     XMLParser::~XMLParser() { }
@@ -174,6 +177,7 @@ namespace Torch {
         cur = cur->next;
       }
 
+      
       // High-level checks (which can not be done by libxml2)
       std::cout << std::endl << "HIGH-LEVEL CHECKS" << std::endl;
       // Iterate over the relationsets
@@ -217,27 +221,44 @@ namespace Torch {
           {
             std::cout << "Rule id: " << rule->second->getArraysetRole() << std::endl;
             size_t counter = 0;
+            bool check_ok = true;
             for( Relation::const_iterator member = relation->second->begin();
               member != relation->second->end(); ++member )
             {
               std::cout << "  Member ids: " << member->second->getArrayId() <<
                 "," << member->second->getArraysetId() << std::endl;
-              std::cout << "  " << m_id_role[member->second->getArraysetId()] << std::endl;
+              std::cout << "  " << (*m_id_role)[member->second->getArraysetId()] << std::endl;
               std::cout << "  " << rule->second->getArraysetRole() << std::endl;
-              if( !m_id_role[member->second->getArraysetId()].compare( 
+              if( !(*m_id_role)[member->second->getArraysetId()].compare( 
                 rule->second->getArraysetRole() ) )
               {
-                ++counter;
+                std::cout << "  Array id: " << member->second->getArrayId() << std::endl;
+                if( member->second->getArrayId()!=0 )
+                  ++counter;
+                else // Arrayset-member
+                {
+                  const Arrayset &ar=dataset[member->second->getArraysetId()];
+                  if( ar.getIsLoaded() )
+                  {
+                    counter+=ar.getNArrays();
+                  }
+                  else
+                    check_ok = false;
+                }
               }
             }
             std::cout << "  Counter: " << counter << std::endl;
-            if( counter<rule->second->getMin() || 
-              counter>rule->second->getMax() ) 
+            if( check_ok && (counter<rule->second->getMin() || 
+              (rule->second->getMax()!=0 && counter>rule->second->getMax()) ) )
             {
               error << "Relation (id=" << relation->second->getId() << 
                 ") is not valid." << std::endl;
               throw Exception();
             }
+            else if( !check_ok)
+              warn << "Relation (id=" << relation->second->getId() <<
+                ") has not been fully checked, because of external data." << 
+                std::endl;
           }
 
           // Check that there is no member referring to a non-existing rule.
@@ -252,7 +273,7 @@ namespace Torch {
             {
               std::cout << "Rule id: " << rule->second->getArraysetRole() << 
                 std::endl;
-              if( !m_id_role[member->second->getArraysetId()].compare(
+              if( !(*m_id_role)[member->second->getArraysetId()].compare(
                 rule->second->getArraysetRole() ) )
               {
                 found = true;
@@ -324,7 +345,7 @@ namespace Torch {
 
 
     boost::shared_ptr<Relation> XMLParser::parseRelation(const xmlNodePtr cur) {
-      boost::shared_ptr<Relation> relation(new Relation());
+      boost::shared_ptr<Relation> relation(new Relation(m_id_role));
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
@@ -336,7 +357,8 @@ namespace Torch {
       xmlNodePtr cur_member = cur->xmlChildrenNode;
       while(cur_member != 0) { 
         // Parse a member and add it to the relation
-        if( !strcmp((const char*)cur_member->name, db::member) ) 
+        if( !strcmp((const char*)cur_member->name, db::member) ||
+          !strcmp((const char*)cur_member->name, db::arrayset_member) ) 
           relation->addMember( parseMember(cur_member) );
         cur_member = cur_member->next;
       }
@@ -381,7 +403,7 @@ namespace Torch {
 
       // Add id-role to the mapping of the XMLParser. This will be used for
       // checking the members of a relation.
-      m_id_role.insert( std::pair<size_t,std::string>( 
+      m_id_role->insert( std::pair<size_t,std::string>( 
         arrayset->getId(), arrayset->getRole()) );
 
       // Parse elementtype
