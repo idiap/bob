@@ -440,16 +440,48 @@ namespace Torch {
         void addMember( boost::shared_ptr<Member> member);
 
         /**
-         * @brief Set the maximum number of occurences for this rule
+         * @brief Set the id for this relation
          */
         void setId(const size_t id) { m_id = id; }
         /**
-         * @brief Get the maximum number of occurences for this rule
+         * @brief Get the id for this relation
          */
         size_t getId() const { return m_id; }
 
-      private:
         typedef std::pair<size_t, size_t> size_t_pair;
+        /**
+         * @brief const_iterator over the Members of the Relation
+         */
+        typedef std::map<size_t_pair, boost::shared_ptr<Member> >::const_iterator
+          const_iterator;
+        /**
+         * @brief Return a const_iterator pointing at the first Member of 
+         * the Relation
+         */
+        const_iterator begin() const { return m_member.begin(); }
+        /**
+         * @brief Return a const_iterator pointing at the last Member of 
+         * the Relation
+         */
+        const_iterator end() const { return m_member.end(); }
+
+        /**
+         * @brief iterator over the Members of the Relation
+         */
+        typedef std::map<size_t_pair, boost::shared_ptr<Member> >::iterator 
+          iterator;
+        /**
+         * @brief Return an iterator pointing at the first Member of the
+         * Relation
+         */
+        iterator begin() { return m_member.begin(); }
+        /**
+         * @brief Return an iterator pointing at the last Member of the 
+         * Relation
+         */
+        iterator end() { return m_member.end(); }
+
+      private:
         std::map<size_t_pair, boost::shared_ptr<Member> > m_member;
         size_t m_id;
     };
@@ -549,7 +581,7 @@ namespace Torch {
         const_iterator begin() const { return m_relation.begin(); }
         /**
          * @brief Return a const_iterator pointing at the last Relation of 
-         * the Relationet
+         * the Relationset
          */
         const_iterator end() const { return m_relation.end(); }
 
