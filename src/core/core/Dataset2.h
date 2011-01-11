@@ -570,6 +570,38 @@ namespace Torch {
         iterator end() { return m_relation.end(); }
 
         /**
+         * @brief const_iterator over the Rules of the Relationset
+         */
+        typedef std::map<std::string, boost::shared_ptr<Rule> >::const_iterator
+          rule_const_iterator;
+        /**
+         * @brief Return a rule_const_iterator pointing at the first Rule of 
+         * the Relationset
+         */
+        rule_const_iterator rule_begin() const { return m_rule.begin(); }
+        /**
+         * @brief Return a rule_const_iterator pointing at the last Rule of
+         * the Relationet
+         */
+        rule_const_iterator rule_end() const { return m_rule.end(); }
+
+        /**
+         * @brief iterator over the Rules of the Relationset
+         */
+        typedef std::map<std::string, boost::shared_ptr<Rule> >::iterator 
+          rule_iterator;
+        /**
+         * @brief Return an iterator pointing at the first Rule of the
+         * Relationset
+         */
+        rule_iterator rule_begin() { return m_rule.begin(); }
+        /**
+         * @brief Return an iterator pointing at the last Rule of the 
+         * Relationset
+         */
+        rule_iterator rule_end() { return m_rule.end(); }
+
+        /**
          * @brief Return the relation of the given id
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the relations.
