@@ -216,6 +216,8 @@ namespace Torch {
           relation != relationset->second->end(); ++relation )
         {
           std::cout << "Relation id: " << relation->second->getId() << std::endl;
+          // Check that for each rule in the relationset, the multiplicity of
+          // the members is correct.
           for( Relationset::rule_const_iterator rule = relationset->second->rule_begin();
             rule != relationset->second->rule_end(); ++rule )
           {
@@ -228,8 +230,11 @@ namespace Torch {
                 "," << member->second->getArraysetId() << std::endl;
               std::cout << "  " << m_id_role[member->second->getArraysetId()] << std::endl;
               std::cout << "  " << rule->second->getArraysetRole() << std::endl;
-              if( !m_id_role[member->second->getArraysetId()].compare( rule->second->getArraysetRole() ) )
+              if( !m_id_role[member->second->getArraysetId()].compare( 
+                rule->second->getArraysetRole() ) )
+              {
                 ++counter;
+              }
             }
             std::cout << "  Counter: " << counter << std::endl;
             if( counter<rule->second->getMin() || 
@@ -237,6 +242,33 @@ namespace Torch {
             {
               error << "Relation (id=" << relation->second->getId() << 
                 ") is not valid." << std::endl;
+              throw Exception();
+            }
+          }
+
+          // Check that there is no member referring to a non-existing rule.
+          for( Relation::const_iterator member = relation->second->begin();
+            member != relation->second->end(); ++member )
+          {
+            std::cout << "  Member ids: " << member->second->getArrayId() <<
+              "," << member->second->getArraysetId() << std::endl;
+            bool found = false;
+            for( Relationset::rule_const_iterator rule = relationset->second->rule_begin();
+              rule != relationset->second->rule_end(); ++rule )
+            {
+              std::cout << "Rule id: " << rule->second->getArraysetRole() << 
+                std::endl;
+              if( !m_id_role[member->second->getArraysetId()].compare(
+                rule->second->getArraysetRole() ) )
+              {
+                found = true;
+                break;
+              }
+            }
+            if( !found ) {
+              error << "Member (id:" << member->second->getArrayId() << "," <<
+                member->second->getArraysetId() << 
+                ") refers to a non-existing rule." << std::endl;
               throw Exception();
             }
           }
