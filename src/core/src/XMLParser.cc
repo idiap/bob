@@ -180,8 +180,68 @@ namespace Torch {
         cur = cur->next;
       }
 
-      // High-level checks
-      // TODO
+      // High-level checks (which can not be done by libxml2)
+      std::cout << std::endl << "HIGH-LEVEL CHECKS" << std::endl;
+      // Iterate over the relationsets
+      for( Dataset::relationset_const_iterator relationset = dataset.relationset_begin();
+        relationset != dataset.relationset_end(); ++relationset )
+      {
+        std::cout << "Relationset name: " << relationset->second->getName() << std::endl;
+        // Check that the rules are correct.
+        //   (arrayset-role refers to an existing string role)
+        for( Relationset::rule_const_iterator rule = relationset->second->rule_begin();
+          rule != relationset->second->rule_end(); ++rule )
+        {
+          std::cout << "Rule role: " << rule->second->getArraysetRole() << std::endl;
+          bool found = false;
+          for( Dataset::const_iterator arrayset = dataset.begin(); 
+            arrayset != dataset.end(); ++arrayset )
+          {
+            if( !rule->second->getArraysetRole().compare( 
+              arrayset->second->getRole() ) )
+            {
+              found = true;
+              break;
+            }
+          }
+          if( !found ) {
+            error << "Rule refers to a non-existing arrayset-role (" << 
+              rule->second->getArraysetRole() << ")." << std::endl;
+            throw Exception();
+          }
+        }
+
+        // Check that the relations are correct
+        for( Relationset::const_iterator relation = relationset->second->begin();
+          relation != relationset->second->end(); ++relation )
+        {
+          std::cout << "Relation id: " << relation->second->getId() << std::endl;
+          for( Relationset::rule_const_iterator rule = relationset->second->rule_begin();
+            rule != relationset->second->rule_end(); ++rule )
+          {
+            std::cout << "Rule id: " << rule->second->getArraysetRole() << std::endl;
+            size_t counter = 0;
+            for( Relation::const_iterator member = relation->second->begin();
+              member != relation->second->end(); ++member )
+            {
+              std::cout << "  Member ids: " << member->second->getArrayId() <<
+                "," << member->second->getArraysetId() << std::endl;
+              std::cout << "  " << m_id_role[member->second->getArraysetId()] << std::endl;
+              std::cout << "  " << rule->second->getArraysetRole() << std::endl;
+              if( !m_id_role[member->second->getArraysetId()].compare( rule->second->getArraysetRole() ) )
+                ++counter;
+            }
+            std::cout << "  Counter: " << counter << std::endl;
+            if( counter<rule->second->getMin() || 
+              counter>rule->second->getMax() ) 
+            {
+              error << "Relation (id=" << relation->second->getId() << 
+                ") is not valid." << std::endl;
+              throw Exception();
+            }
+          }
+        }
+      }
 
       xmlFreeDoc(doc);
     }
