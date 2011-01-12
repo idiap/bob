@@ -38,6 +38,52 @@ namespace Torch {
         virtual ~BinOutputFile();
 
         /**
+         * @brief Close the BlitzOutputFile and update the header
+         */
+        void close();
+
+
+        // TODO: Make the API more consistent
+        /** 
+         * @brief Put a Blitz++ multiarray of a given type into the output
+         * stream/file by casting it to the correct type.
+         */
+        template <typename T, int D> void write(const blitz::Array<T,D>& bl);
+
+        /**
+         * @brief Save an Arrayset into a binary file
+         */
+        void write(const Arrayset& arrayset);
+
+        /**
+         * @brief Save an Array into a binary file
+         */
+        void write(const Array& array);
+
+        // TODO: define and map functions from the header that we want
+        // to make public.
+        /**
+         * @brief Return the header
+         */
+        //BinFileHeader& getHeader() const { return m_header; }
+
+      private:
+        /**
+         * @brief Put a void C-style multiarray into the output stream/file
+         * @warning This is the responsability of the user to check
+         * the correctness of the type and size of the memory block 
+         * pointed by the void pointer
+         */
+        BinOutputFile& write(const void* multi_array);
+
+        /** 
+         * @brief Put a C-style multiarray of a given type into the output
+         * stream/file by casting it to the correct type.
+         */
+        template <typename T> 
+        BinOutputFile& writeWithCast(const T* multi_array);
+
+        /**
          * @brief Initialize the header of the output stream with the given
          * type and shape
          */
@@ -45,65 +91,84 @@ namespace Torch {
             const size_t shape[array::N_MAX_DIMENSIONS_ARRAY]);
 
         /**
-         * @brief Close the BlitzOutputFile and update the header
+         * @brief Initialize the header with a blitz array
          */
-        void close();
-
-
-        // TODO: Make the API more consistent
-        /**
-         * @brief Put a void C-style multiarray into the output stream/file
-         * @warning This is the responsability of the user to check
-         * the correctness of the type and size of the memory block 
-         * pointed by the void pointer
-         */
-        BinOutputFile& operator<<(const void* multi_array);
-
-        /** 
-         * @brief Put a C-style multiarray of a given type into the output
-         * stream/file by casting it to the correct type.
-         */
-        template <typename T> BinOutputFile& operator<<(const T* multi_array);
-
-        /** 
-         * @brief Put a Blitz++ multiarray of a given type into the output
-         * stream/file by casting it to the correct type.
-         */
-        template <typename T, int D> void save(const blitz::Array<T,D>& bl);
+        template <typename T, int D> 
+        void initHeader(const blitz::Array<T,D>& bl);
 
         /**
-         * @brief Save an Arrayset into a binary file
+         * @brief Initialize the part of the header which requires 
+         * specialization with a blitz array
          */
-        void save(const Arrayset& arrayset);
+        template <typename T, int D> 
+        void initTypeHeader(const blitz::Array<T,D>& bl);
+        /************** Partial specialization declaration *************/
+        template<int D> void initTypeHeader(const blitz::Array<bool,D>& bl);
+        template<int D> void initTypeHeader(const blitz::Array<int8_t,D>& bl);
+        template<int D> void initTypeHeader(const blitz::Array<int16_t,D>& bl);
+        template<int D> void initTypeHeader(const blitz::Array<int32_t,D>& bl);
+        template<int D> void initTypeHeader(const blitz::Array<int64_t,D>& bl);
+        template<int D> void initTypeHeader(const blitz::Array<uint8_t,D>& bl);
+        template<int D> 
+        void initTypeHeader(const blitz::Array<uint16_t,D>& bl);
+        template<int D> 
+        void initTypeHeader(const blitz::Array<uint32_t,D>& bl);
+        template<int D> 
+        void initTypeHeader(const blitz::Array<uint64_t,D>& bl);
+        template<int D> void initTypeHeader(const blitz::Array<float,D>& bl);
+        template<int D> void initTypeHeader(const blitz::Array<double,D>& bl);
+        template<int D> 
+        void initTypeHeader(const blitz::Array<long double,D>& bl);
+        template<int D> 
+        void initTypeHeader(const blitz::Array<std::complex<float>,D>& bl);
+        template<int D>
+        void initTypeHeader(const blitz::Array<std::complex<double>,D>& bl);
+        template<int D> 
+        void 
+        initTypeHeader(const blitz::Array<std::complex<long double>,D>& bl);
 
         /**
-         * @brief Save an Array into a binary file
+         * @brief Check if there is a need to cast the data of a blitz array
          */
-        void save(const Array& array);
+        template <typename T, int D> 
+        bool needCast(const blitz::Array<T,D>& bl) const;
+        /************** Partial specialization declaration *************/
+        template<int D> bool needCast(const blitz::Array<bool,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int8_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int16_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int32_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int64_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<uint8_t,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<uint16_t,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<uint32_t,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<uint64_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<float,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<double,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<long double,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<std::complex<float>,D>& bl) const;
+        template<int D>
+        bool needCast(const blitz::Array<std::complex<double>,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<std::complex<long double>,D>& bl) const;
+
 
         /**
-         * @brief Return the header
+         * Attributes
          */
-        BinFileHeader& getHeader() { return m_header; }
-
-      private:
-        /**
-         * @brief Check that the header is initialized (before writing data)
-         */
-        void checkHeaderInit();
-
         bool m_header_init;
         std::fstream m_out_stream;
         BinFileHeader m_header;
         size_t m_n_arrays_written;
     };
 
-    template <typename T> BinOutputFile& BinOutputFile::operator<<(
+    template <typename T> BinOutputFile& BinOutputFile::writeWithCast(
       const T* multi_array) 
     {
-      // Check that the header has been initialized
-      checkHeaderInit();
-
       // copy the data into the output stream
       bool b;
       int8_t i8; int16_t i16; int32_t i32; int64_t i64;
@@ -116,91 +181,106 @@ namespace Torch {
         case array::t_bool:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],b);
-            m_out_stream << b;
+            m_out_stream.write( reinterpret_cast<const char*>(&b), 
+              sizeof(bool));
           }
           break;
         case array::t_int8:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],i8);
-            m_out_stream << i8;
+            m_out_stream.write( reinterpret_cast<const char*>(&i8), 
+              sizeof(int8_t));
           }
           break;
         case array::t_int16:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],i16);
-            m_out_stream << i16;
+            m_out_stream.write( reinterpret_cast<const char*>(&i16), 
+              sizeof(int16_t));
           }
           break;
         case array::t_int32:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],i32);
-            m_out_stream << i32;
+            m_out_stream.write( reinterpret_cast<const char*>(&i32), 
+              sizeof(int32_t));
           }
           break;
         case array::t_int64:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],i64);
-            m_out_stream << i64;
+            m_out_stream.write( reinterpret_cast<const char*>(&i64), 
+              sizeof(int64_t));
           }
           break;
         case array::t_uint8:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],ui8);
-            m_out_stream << ui8;
+            m_out_stream.write( reinterpret_cast<const char*>(&ui8), 
+              sizeof(uint8_t));
           }
           break;
         case array::t_uint16:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],ui16);
-            m_out_stream << ui16;
+            m_out_stream.write( reinterpret_cast<const char*>(&ui16), 
+              sizeof(uint16_t));
           }
           break;
         case array::t_uint32:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],ui32);
-            m_out_stream << ui32;
+            m_out_stream.write( reinterpret_cast<const char*>(&ui32), 
+              sizeof(uint32_t));
           }
           break;
         case array::t_uint64:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],ui64);
-            m_out_stream << ui64;
+            m_out_stream.write( reinterpret_cast<const char*>(&ui64), 
+              sizeof(uint64_t));
           }
           break;
         case array::t_float32:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],f);
-            m_out_stream << f;
+            m_out_stream.write( reinterpret_cast<const char*>(&f), 
+              sizeof(float));
           }
           break;
         case array::t_float64:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],d);
-            m_out_stream << d;
+            m_out_stream.write( reinterpret_cast<const char*>(&d), 
+              sizeof(double));
           }
           break;
         case array::t_float128:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],ld);
-            m_out_stream << ld;
+            m_out_stream.write( reinterpret_cast<const char*>(&ld), 
+              sizeof(long double));
           }
           break;
         case array::t_complex64:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],cf);
-            m_out_stream << cf;
+            m_out_stream.write( reinterpret_cast<const char*>(&cf), 
+              sizeof(std::complex<float>));
           }
           break;
         case array::t_complex128:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],cd);
-            m_out_stream << cd;
+            m_out_stream.write( reinterpret_cast<const char*>(&cd), 
+              sizeof(std::complex<double>));
           }
           break;
         case array::t_complex256:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
             static_complex_cast(multi_array[i],cld);
-            m_out_stream << cld;
+            m_out_stream.write( reinterpret_cast<const char*>(&cld), 
+              sizeof(std::complex<long double>));
           }
           break;
         default:
@@ -215,9 +295,10 @@ namespace Torch {
 
 
     template <typename T, int D> 
-    void BinOutputFile::save(const blitz::Array<T,D>& bl) {
-      // Check that the header has been initialized
-      checkHeaderInit();
+    void BinOutputFile::write(const blitz::Array<T,D>& bl) {
+      // Initialize the header if required
+      if(!m_header_init)
+        initHeader(bl);
 
       // Check the shape compatibility
       bool shapeCompatibility = true;
@@ -245,8 +326,267 @@ namespace Torch {
         data = bl.data();
       else
         data = bl.copy().data();
-      operator<<(data);
+
+      if(needCast(bl))
+        writeWithCast(data);
+      else
+        write(data);
     }
+
+
+    template <typename T, int d>
+    void BinOutputFile::initHeader(const blitz::Array<T,d>& bl)
+    {
+      // Check that data have not already been written
+      if( m_n_arrays_written > 0 ) { 
+        error << "Cannot init the header of an output stream in which data" <<
+          " have already been written." << std::endl;
+        throw Exception();
+      }   
+    
+      // Initialize header
+      initTypeHeader(bl);
+      size_t shape[array::N_MAX_DIMENSIONS_ARRAY];
+      for(size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i) {
+        shape[i] = ( i<d ? bl.extent(i) : 0);
+      }
+      m_header.setShape(shape);
+      m_header.write(m_out_stream);
+      m_header_init = true;
+    }
+
+    template <typename T, int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<T,d>& bl)
+    {
+      error << "Unsupported blitz array type " << std::endl;
+      throw TypeError();
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<bool,d>& bl)
+    {
+      m_header.setArrayType(array::t_bool);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<int8_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_int8);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<int16_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_int16);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<int32_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_int32);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<int64_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_int64);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<uint8_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_uint8);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<uint16_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_uint16);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<uint32_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_uint32);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<uint64_t,d>& bl)
+    {
+      m_header.setArrayType(array::t_uint64);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<float,d>& bl)
+    {
+      m_header.setArrayType(array::t_float32);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<double,d>& bl)
+    {
+      m_header.setArrayType(array::t_float64);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(const blitz::Array<long double,d>& bl)
+    {
+      m_header.setArrayType(array::t_float128);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(
+      const blitz::Array<std::complex<float>,d>& bl)
+    {
+      m_header.setArrayType(array::t_complex64);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(
+      const blitz::Array<std::complex<double>,d>& bl)
+    {
+      m_header.setArrayType(array::t_complex128);
+    }
+
+    template <int d>
+    void BinOutputFile::initTypeHeader(
+      const blitz::Array<std::complex<long double>,d>& bl)
+    {
+      m_header.setArrayType(array::t_complex256);
+    }
+
+
+    template <typename T, int d>
+    bool BinOutputFile::needCast(const blitz::Array<T,d>& bl) const
+    {
+      error << "Unsupported blitz array type " << std::endl;
+      throw TypeError();
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<bool,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_bool )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<int8_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_int8 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<int16_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_int16 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<int32_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_int32 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<int64_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_int64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<uint8_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_uint8 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<uint16_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_uint16 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<uint32_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_uint32 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<uint64_t,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_uint64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<float,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_float32 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<double,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_float64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(const blitz::Array<long double,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_float128 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(
+      const blitz::Array<std::complex<float>,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_complex64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(
+      const blitz::Array<std::complex<double>,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_complex128 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinOutputFile::needCast(
+      const blitz::Array<std::complex<long double>,d>& bl) const
+    {
+      if(m_header.getArrayType() == array::t_complex256 )
+        return false;
+      return true;
+    }
+
 
   }
 }

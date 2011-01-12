@@ -53,37 +53,29 @@ namespace Torch {
     }
 
 
-    void BinOutputFile::checkHeaderInit() {
-      if(!m_header_init) {
-        error << "The header have not yet been initialized with the type " <<
-          "and dimensions." << std::endl;
-        throw Exception();
-      }
-    }
-
-
-    void BinOutputFile::save(const Arrayset& arrayset) {
-      // Check that the header has been initialized
-      checkHeaderInit();
+    void BinOutputFile::write(const Arrayset& arrayset) {
+      // Initialize the header if required
+      if(!m_header_init)
+        initHeader( arrayset.getArrayType(), arrayset.getShape() );
 
       if(!arrayset.getIsLoaded()) {
         error << "The arrayset is not loaded." << std::endl;
         throw Exception();
       }
-
-      initHeader( arrayset.getArrayType(), arrayset.getShape() );
       
       for(Arrayset::const_iterator it=arrayset.begin(); it!=arrayset.end(); 
         ++it)
       {
-        save(*(it->second));
+        write(*(it->second));
       }
     }
 
-    void BinOutputFile::save(const Array& array) {
-      // Check that the header has been initialized
-      checkHeaderInit();
-      
+    void BinOutputFile::write(const Array& array) {
+      // Initialize the header if required
+      if(!m_header_init)
+        initHeader( array.getParentArrayset().getArrayType(), 
+          array.getParentArrayset().getShape() );
+
       bool shapeCompatibility = true;
       size_t i=0;
       const size_t* p_shape = array.getParentArrayset().getShape();
@@ -102,66 +94,69 @@ namespace Torch {
       }
 
       if(array.getParentArrayset().getArrayType() == m_header.getArrayType())
-        operator<<(array.getStorage()); 
+        write(array.getStorage()); 
       else // cast is required
       {
         // copy the data into the output stream
         switch(array.getParentArrayset().getArrayType())
         {
           case array::t_bool:
-            operator<<( reinterpret_cast<const bool*>(array.getStorage()) );
+            writeWithCast( reinterpret_cast<const bool*>(array.getStorage()) );
             break;
           case array::t_int8:
-            operator<<( reinterpret_cast<const int8_t*>(array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const int8_t*>(array.getStorage()) );
             break;
           case array::t_int16:
-            operator<<( reinterpret_cast<const int16_t*>(array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const int16_t*>(array.getStorage()) );
             break;
           case array::t_int32:
-            operator<<( reinterpret_cast<const int32_t*>(array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const int32_t*>(array.getStorage()) );
             break;
           case array::t_int64:
-            operator<<( reinterpret_cast<const int64_t*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const int64_t*>(array.getStorage()) );
             break;
           case array::t_uint8:
-            operator<<( reinterpret_cast<const uint8_t*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const uint8_t*>(array.getStorage()) );
             break;
           case array::t_uint16:
-            operator<<( reinterpret_cast<const uint16_t*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const uint16_t*>(array.getStorage()) );
             break;
           case array::t_uint32:
-            operator<<( reinterpret_cast<const uint32_t*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const uint32_t*>(array.getStorage()) );
             break;
           case array::t_uint64:
-            operator<<( reinterpret_cast<const uint64_t*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const uint64_t*>(array.getStorage()) );
             break;
           case array::t_float32:
-            operator<<( reinterpret_cast<const float*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const float*>(array.getStorage()) );
             break;
           case array::t_float64:
-            operator<<( reinterpret_cast<const double*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const double*>(array.getStorage()) );
             break;
           case array::t_float128:
-            operator<<( reinterpret_cast<const long double*>(
-              array.getStorage()) );
+            writeWithCast( 
+              reinterpret_cast<const long double*>(array.getStorage()) );
             break;
           case array::t_complex64:
-            operator<<( reinterpret_cast<const std::complex<float>* >(
+            writeWithCast( reinterpret_cast<const std::complex<float>* >(
               array.getStorage()) );
             break;
           case array::t_complex128:
-            operator<<( reinterpret_cast<const std::complex<double>*>(
+            writeWithCast( reinterpret_cast<const std::complex<double>*>(
               array.getStorage()) );
             break;
           case array::t_complex256:
-            operator<<( reinterpret_cast<const std::complex<long double>* >(
+            writeWithCast( reinterpret_cast<const std::complex<long double>* >(
               array.getStorage()) );
             break;
           default:
@@ -170,10 +165,7 @@ namespace Torch {
       }
     }
 
-    BinOutputFile& BinOutputFile::operator<<(const void* multi_array) {
-      // Check that the header has been initialized
-      checkHeaderInit();
-
+    BinOutputFile& BinOutputFile::write(const void* multi_array) {
       // copy the data into the output stream
       switch(m_header.getArrayType())
       {
