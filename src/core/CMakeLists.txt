@@ -41,6 +41,7 @@ set(src
     "src/XMLParser.cc"
     "src/BinFileHeader.cc"
     "src/BinOutputFile.cc"
+    "src/BinInputFile.cc"
     )
 
 include(../cmake/macros.cmake)

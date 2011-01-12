@@ -50,7 +50,7 @@ namespace Torch {
         void close();
 
 
-        // TODO: Make API more consistent?
+        // TODO: Make the API more consistent
         /**
          * @brief Put a void C-style multiarray into the output stream/file
          * @warning This is the responsability of the user to check
@@ -234,7 +234,7 @@ namespace Torch {
       if(!shapeCompatibility)
       {
         error << "The dimensions of this array does not match the " <<
-          "contained in the header file. The array cannot be saved." <<
+          "ones contained in the header file. The array cannot be saved." <<
           std::endl;
         throw Exception();
       }

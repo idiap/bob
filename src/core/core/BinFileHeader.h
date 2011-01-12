@@ -55,6 +55,16 @@ namespace Torch {
          */
         const size_t* getShape() const { return m_shape; }
         /**
+         * @brief Get the shape of each array in a blitz format
+         */
+        template<int d>
+        void getShape( blitz::TinyVector<int,d>& res ) const {
+          const size_t *shape = getShape();
+          for( int i=0; i<d; ++i)
+            res[i] = shape[i];
+        }
+
+        /**
          * @brief Get the number of samples/arrays
          */
         size_t getNSamples() const { return m_n_samples; }
