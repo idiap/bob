@@ -217,7 +217,8 @@ namespace Torch {
         default:
           break;
       }
-      return this;
+
+      return *this;
     }
 
   }
