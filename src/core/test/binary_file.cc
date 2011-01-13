@@ -20,11 +20,20 @@ struct T {
   blitz::Array<double,1> a;
   blitz::Array<double,1> b;
   blitz::Array<uint32_t,1> c;
+
+  blitz::Array<float,2> d;
+  blitz::Array<float,2> e;
+  blitz::Array<float,2> f;
   T() {
     a.resize(4);
     a = 1, 2, 3, 4;
     c.resize(4);
     c = 1, 2, 3, 4;
+
+    d.resize(2,2);
+    d = 1, 2, 3, 4;
+    e.resize(2,2);
+    e = 5, 6, 7, 8;
   }
 
   ~T() { }
@@ -47,14 +56,28 @@ std::string temp_file() {
   return char_tpl.get();
 }
 
-template<typename T, typename U, int d> void check_equal_1d(const blitz::Array<T,d>& a,
-  const blitz::Array<U,d>& b) 
+template<typename T, typename U> 
+void check_equal_1d(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   T val;
   for (int i=0; i<a.extent(0); ++i) {
     Torch::core::static_complex_cast(b(i), val);
     BOOST_CHECK_EQUAL(a(i), val);
+  }
+}
+
+template<typename T, typename U> 
+void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
+{
+  BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
+  BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
+  T val;
+  for (int i=0; i<a.extent(0); ++i) {
+    for (int j=0; j<a.extent(1); ++j) {
+      Torch::core::static_complex_cast(b(i,j), val);
+      BOOST_CHECK_EQUAL(a(i,j), val);
+    }
   }
 }
 
@@ -88,6 +111,23 @@ BOOST_AUTO_TEST_CASE( blitz1d_withcast )
   
   in.read( b);
   check_equal_1d( c, b);
+  in.close();
+}
+
+BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
+{
+  std::string tmp_file = temp_file();
+  Torch::core::BinOutputFile out(tmp_file);
+
+  out.write( d);
+  out.write( e);
+  out.write( d);
+  out.close();
+
+  Torch::core::BinInputFile in(tmp_file);
+  
+  in.read(1, f);
+  check_equal_2d( e, f);
   in.close();
 }
 
