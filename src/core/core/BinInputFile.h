@@ -161,9 +161,6 @@ namespace Torch {
         readWithCast(data);
       else
         read(data);
-
-      // Update current array
-      ++m_current_array;
     }
 
     template <typename T, int d> 
