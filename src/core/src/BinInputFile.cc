@@ -29,8 +29,22 @@ namespace Torch {
 
 
     void BinInputFile::read( Arrayset& arrayset) {
-      //TODO: implementation:
-      // There is a need to create/allocate arrays inside the arrayset
+      // Create/allocate arrays inside the arrayset
+      size_t n_arrays = m_header.getNSamples() - m_current_array;
+      for( size_t i=0; i<n_arrays; ++i) {
+        // Create a new array 
+        boost::shared_ptr<Array> ar(new Array(arrayset));
+
+        // Update some array members (m_id and m_is_loaded)
+        ar->setId(i+1);
+        ar->setIsLoaded(true);
+
+        // Update the array with the content from the binary file
+        read(*ar);
+        
+        // Add the array to the arrayset
+        arrayset.addArray(ar);
+      }
     }
 
     void BinInputFile::read( Array& array) {
