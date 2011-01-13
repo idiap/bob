@@ -51,6 +51,7 @@ torch_library(core "${src}" "${deps}" "${shared}")
 torch_test(core tensor test/tensor.cc)
 torch_test(core adapter test/blitzAdapter.cc)
 torch_test(core logging test/logging.cc)
+torch_test(core binary_file test/binary_file.cc)
 
 # Defines benchmarks we make available
 torch_benchmark(core tensor benchmark/tensor.cc)
