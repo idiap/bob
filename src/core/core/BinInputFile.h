@@ -54,16 +54,6 @@ namespace Torch {
          */
         void read( Array& array);
 
-        /**
-         * @brief Check if the end of the binary file is reached
-         */
-        void endOfFile() {
-          if(m_current_array >= m_header.getNSamples() ) {
-            error << "The end of the binary file has been reached." << 
-              std::endl;
-            throw Exception();
-          }
-        }
 
 
         /**
@@ -119,6 +109,17 @@ namespace Torch {
          * dimensions
          */
         template <typename T> BinInputFile& readWithCast(T* multiarray);
+
+        /**
+         * @brief Check if the end of the binary file is reached
+         */
+        void endOfFile() {
+          if(m_current_array >= m_header.getNSamples() ) {
+            error << "The end of the binary file has been reached." << 
+              std::endl;
+            throw Exception();
+          }
+        }
 
         /**
          * Attributes
