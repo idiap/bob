@@ -99,14 +99,15 @@ namespace Torch {
       // data is read from explicit types and converted back
       uint32_t val32;
       uint64_t val64;
-      str >> val32;
+      str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
       m_version = static_cast<size_t>(val32);
-      str >> val32;
+      TDEBUG3("Version: " << m_version);
+      str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
       m_type = static_cast<array::ArrayType>(val32);
-      str >> val32;
+      TDEBUG3("Array-type: " << m_type);
+      str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
       // call function to update other type-related member (m_data_size_of)
       typeUpdated();
-
       m_n_dimensions = static_cast<size_t>(val32);
       if( m_n_dimensions > array::N_MAX_DIMENSIONS_ARRAY) {
         error << "The number of dimensions is larger the maximal number " <<
@@ -114,30 +115,73 @@ namespace Torch {
           std::endl;
         throw Exception();
       }
+      TDEBUG3("Number of dimensions: " << m_n_dimensions);
       for( size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i) {
         if( i<m_n_dimensions) {
-          str >> val64;
+          str.read( reinterpret_cast<char*>(&val64), sizeof(uint64_t));
           m_shape[i] = static_cast<size_t>(val64);
         }
         else
           m_shape[i] = 0;
+        TDEBUG3("  Dimension " << i << ": " << m_shape[i]);
       }
       // call function to update other size-related members
       sizeUpdated();
 
-      str >> val64;
+      str.read( reinterpret_cast<char*>(&val64), sizeof(uint64_t));
       m_n_samples = static_cast<size_t>(val64);
-      str >> val32;
+      TDEBUG3("Number of samples: " << m_n_samples);
+      str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
       m_endianness = static_cast<size_t>(val32);
+      TDEBUG3("Endianness: " << m_endianness);
 
       // Read the sizeof value stored in the header and check that it matches
       // the run-time value
-      str >> val32;
-      if( static_cast<size_t>(val32) != m_data_sizeof )
+      str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
+      size_t runtime_sizeof;
+      switch(m_type)
+      {
+        case array::t_bool:
+          runtime_sizeof = sizeof(bool); break;
+        case array::t_int8:
+          runtime_sizeof = sizeof(int8_t); break;
+        case array::t_int16:
+          runtime_sizeof = sizeof(int16_t); break;
+        case array::t_int32:
+          runtime_sizeof = sizeof(int32_t); break;
+        case array::t_int64:
+          runtime_sizeof = sizeof(int64_t); break;
+        case array::t_uint8:
+          runtime_sizeof = sizeof(uint8_t); break;
+        case array::t_uint16:
+          runtime_sizeof = sizeof(uint16_t); break;
+        case array::t_uint32:
+          runtime_sizeof = sizeof(uint32_t); break;
+        case array::t_uint64:
+          runtime_sizeof = sizeof(uint64_t); break;
+        case array::t_float32:
+          runtime_sizeof = sizeof(float); break;
+        case array::t_float64:
+          runtime_sizeof = sizeof(double); break;
+        case array::t_float128:
+          runtime_sizeof = sizeof(long double); break;
+        case array::t_complex64:
+          runtime_sizeof = sizeof(std::complex<float>); break;
+        case array::t_complex128:
+          runtime_sizeof = sizeof(std::complex<double>); break;
+        case array::t_complex256:
+          runtime_sizeof = sizeof(std::complex<long double>); break;
+        default:
+          error << "Unknown type." << std::endl;
+          throw Exception();
+          break;
+      }
+      if( runtime_sizeof != m_data_sizeof )
         warn << "The size of the element type stored in the header does" <<
           " not match the runtime size. This might be the case with long " <<
           " double and std::complex<long double> when transmitting data " <<
           " between 32 bits and 64 bits Linux machines!" << std::endl;
+      TDEBUG3("Sizeof: " << m_data_sizeof);
     }
 
 
@@ -148,14 +192,31 @@ namespace Torch {
 
       // data is converted to more explicit types before being written 
       // in order to improve portability
-      str << static_cast<uint32_t>(m_version);
-      str << static_cast<uint32_t>(m_type);
-      str << static_cast<uint32_t>(m_n_dimensions);
-      for( size_t i=0; i<m_n_dimensions; ++i)
-        str << static_cast<uint64_t>(m_shape[i]);
-      str << static_cast<uint64_t>(m_n_samples);
-      str << static_cast<uint32_t>(m_endianness);
-      str << static_cast<uint32_t>(m_data_sizeof);
+      uint32_t uint32;
+      uint64_t uint64;
+      uint32 = static_cast<uint32_t>(m_version);
+      str.write( reinterpret_cast<char*>(&uint32), sizeof(uint32_t) );
+      TDEBUG3("Version: " << m_version);
+      uint32 = static_cast<uint32_t>(m_type);
+      str.write( reinterpret_cast<char*>(&uint32), sizeof(uint32_t) );
+      TDEBUG3("Array-type: " << m_type);
+      uint32 = static_cast<uint32_t>(m_n_dimensions);
+      str.write( reinterpret_cast<char*>(&uint32), sizeof(uint32_t) );
+      TDEBUG3("Number of dimensions: " << m_n_dimensions);
+      for( size_t i=0; i<m_n_dimensions; ++i) {
+        uint64 = static_cast<uint64_t>(m_shape[i]);
+        str.write( reinterpret_cast<char*>(&uint64), sizeof(uint64_t) );
+        TDEBUG3("  Dimension " << i << ": " << m_shape[i]);
+      }
+      uint64 = static_cast<uint64_t>(m_n_samples);
+      str.write( reinterpret_cast<char*>(&uint64), sizeof(uint64_t) );
+      TDEBUG3("Number of samples: " << m_n_samples);
+      uint32 = static_cast<uint32_t>(m_endianness);
+      str.write( reinterpret_cast<char*>(&uint32), sizeof(uint32_t) );
+      TDEBUG3("Endianness: " << m_endianness);
+      uint32 = static_cast<uint32_t>(m_data_sizeof);
+      str.write( reinterpret_cast<char*>(&uint32), sizeof(uint32_t) );
+      TDEBUG3("Sizeof: " << m_data_sizeof);
     }
 
 

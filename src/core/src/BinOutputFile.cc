@@ -47,7 +47,10 @@ namespace Torch {
     }
 
     void BinOutputFile::close() {
+      // Rewrite the header and update the number of samples
       m_header.setNSamples(m_n_arrays_written);
+      m_header.write(m_out_stream);
+
       m_out_stream.close();
     }
 
