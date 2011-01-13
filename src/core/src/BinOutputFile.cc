@@ -24,7 +24,6 @@ namespace Torch {
       }
     }
 
-
     BinOutputFile::~BinOutputFile() {
       close();
     }

@@ -22,9 +22,11 @@ namespace Torch {
       close();
     }
 
+
     void BinInputFile::close() {
       m_in_stream.close();
     } 
+
 
     void BinInputFile::read( Arrayset& arrayset) {
       //TODO: implementation:

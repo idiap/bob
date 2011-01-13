@@ -22,7 +22,7 @@ namespace Torch {
   namespace core {
 
     /**
-     *  @brief the OutputFile class for storing multiarrays into files
+     *  @brief The OutputFile class for storing multiarrays into files
      */
     class BinOutputFile
     {
@@ -38,10 +38,9 @@ namespace Torch {
         virtual ~BinOutputFile();
 
         /**
-         * @brief Close the BlitzOutputFile and update the header
+         * @brief Close the BinOutputFile and update the header
          */
         void close();
-
 
         /** 
          * @brief Put a Blitz++ multiarray of a given type into the output
@@ -59,19 +58,72 @@ namespace Torch {
          */
         void write(const Array& array);
 
-        // TODO: define and map functions from the header that we want
-        // to make public.
+
         /**
-         * @brief Return the header
+         * @brief Get the Array type
+         * @warning An exception is thrown if nothing was written so far
          */
-        //BinFileHeader& getHeader() const { return m_header; }
+        array::ArrayType getArrayType() const { 
+          headerInitialized(); 
+          return m_header.getArrayType(); 
+        }
+        /**
+         * @brief Get the number of dimensions
+         * @warning An exception is thrown if nothing was written so far
+         */
+        size_t getNDimensions() const {  
+          headerInitialized(); 
+          return m_header.getNDimensions(); 
+        }
+        /**
+         * @brief Get the shape of each array
+         * @warning An exception is thrown if nothing was written so far
+         */
+        const size_t* getShape() const { 
+          headerInitialized(); 
+          return m_header.getShape(); 
+        }
+        /**
+         * @brief Get the shape of each array in a blitz format
+         * @warning An exception is thrown if nothing was written so far
+         */
+        template<int d>
+        void getShape( blitz::TinyVector<int,d>& res ) const {
+          headerInitialized(); 
+          m_header.getShape(res);
+        }
+        /**
+         * @brief Get the number of samples/arrays written so far
+         * @warning An exception is thrown if nothing was written so far
+         */
+        size_t getNSamples() const { 
+          headerInitialized(); 
+          return m_n_arrays_written; 
+        }
+        /**
+         * @brief Get the number of elements per array
+         * @warning An exception is thrown if nothing was written so far
+         */
+        size_t getNElements() const { 
+          headerInitialized(); 
+          return m_header.getNElements(); 
+        }
+        /**
+         * @brief Get the size along a particular dimension
+         * @warning An exception is thrown if nothing was written so far
+         */
+        size_t getSize(size_t dim_index) const { 
+          headerInitialized(); 
+          return m_header.getSize(dim_index); 
+        }
+
 
       private:
         /**
          * @brief Put a void C-style multiarray into the output stream/file
          * @warning This is the responsability of the user to check
          * the correctness of the type and size of the memory block 
-         * pointed by the void pointer
+         * pointed by the void pointer.
          */
         BinOutputFile& write(const void* multi_array);
 
@@ -83,6 +135,17 @@ namespace Torch {
          */
         template <typename T> 
         BinOutputFile& writeWithCast(const T* multi_array);
+
+        /**
+         * @brief Check that the header has been initialized, and raise an
+         * exception if not
+         */
+        void headerInitialized() const { 
+          if(!m_header_init) {
+            error << "The error has not yet been initialized." << std::endl;
+            throw Exception();
+          }
+        }
 
         /**
          * @brief Initialize the header of the output stream with the given
@@ -136,6 +199,7 @@ namespace Torch {
         BinFileHeader m_header;
         size_t m_n_arrays_written;
     };
+
 
     template <typename T> BinOutputFile& BinOutputFile::writeWithCast(
       const T* multi_array) 

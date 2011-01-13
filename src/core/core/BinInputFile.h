@@ -16,7 +16,7 @@ namespace Torch {
   namespace core {
 
     /**
-     *  @brief the InputFile class for loading multiarrays from binary files
+     *  @brief The InputFile class for loading multiarrays from binary files
      */
     class BinInputFile
     {
@@ -32,7 +32,7 @@ namespace Torch {
         ~BinInputFile();
 
         /**
-         * Close the BlitzInputFile
+         * Close the BinInputFile
          */
         void close();
 
@@ -65,6 +65,44 @@ namespace Torch {
           }
         }
 
+
+        /**
+         * @brief Get the Array type
+         */
+        array::ArrayType getArrayType() const { 
+          return m_header.getArrayType(); 
+        }
+        /**
+         * @brief Get the number of dimensions
+         */
+        size_t getNDimensions() const { return m_header.getNDimensions(); }
+        /**
+         * @brief Get the shape of each array
+         */
+        const size_t* getShape() const { return m_header.getShape(); }
+        /**
+         * @brief Get the shape of each array in a blitz format
+         */
+        template<int d>
+        void getShape( blitz::TinyVector<int,d>& res ) const {
+          m_header.getShape(res);
+        }
+        /**
+         * @brief Get the number of samples/arrays written so far
+         */
+        size_t getNSamples() const { return m_header.getNSamples(); }
+        /**
+         * @brief Get the number of elements per array
+         */
+        size_t getNElements() const { return m_header.getNElements(); }
+        /**
+         * @brief Get the size along a particular dimension
+         */
+        size_t getSize(size_t dim_index) const { 
+          return m_header.getSize(dim_index); 
+        }
+
+
       private:
         /**
          * @brief Put a void C-style multiarray into the output stream/file
@@ -82,6 +120,9 @@ namespace Torch {
          */
         template <typename T> BinInputFile& readWithCast(T* multiarray);
 
+        /**
+         * Attributes
+         */
         size_t m_current_array;
         std::fstream m_in_stream;
         BinFileHeader m_header;
