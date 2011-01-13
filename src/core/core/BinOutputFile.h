@@ -43,7 +43,6 @@ namespace Torch {
         void close();
 
 
-        // TODO: Make the API more consistent
         /** 
          * @brief Put a Blitz++ multiarray of a given type into the output
          * stream/file by casting it to the correct type.
@@ -79,6 +78,8 @@ namespace Torch {
         /** 
          * @brief Put a C-style multiarray of a given type into the output
          * stream/file by casting it to the correct type.
+         * @warning The C-style array has to be allocated with the proper 
+         * dimensions.
          */
         template <typename T> 
         BinOutputFile& writeWithCast(const T* multi_array);
@@ -126,36 +127,6 @@ namespace Torch {
         template<int D> 
         void 
         initTypeHeader(const blitz::Array<std::complex<long double>,D>& bl);
-
-        /**
-         * @brief Check if there is a need to cast the data of a blitz array
-         */
-        template <typename T, int D> 
-        bool needCast(const blitz::Array<T,D>& bl) const;
-        /************** Partial specialization declaration *************/
-        template<int D> bool needCast(const blitz::Array<bool,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int8_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int16_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int32_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int64_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<uint8_t,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<uint16_t,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<uint32_t,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<uint64_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<float,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<double,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<long double,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<std::complex<float>,D>& bl) const;
-        template<int D>
-        bool needCast(const blitz::Array<std::complex<double>,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<std::complex<long double>,D>& bl) const;
-
 
         /**
          * Attributes
@@ -327,7 +298,7 @@ namespace Torch {
       else
         data = bl.copy().data();
 
-      if(needCast(bl))
+      if(m_header.needCast(bl))
         writeWithCast(data);
       else
         write(data);
@@ -454,139 +425,6 @@ namespace Torch {
     {
       m_header.setArrayType(array::t_complex256);
     }
-
-
-    template <typename T, int d>
-    bool BinOutputFile::needCast(const blitz::Array<T,d>& bl) const
-    {
-      error << "Unsupported blitz array type " << std::endl;
-      throw TypeError();
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<bool,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_bool )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<int8_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_int8 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<int16_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_int16 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<int32_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_int32 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<int64_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_int64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<uint8_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_uint8 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<uint16_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_uint16 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<uint32_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_uint32 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<uint64_t,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_uint64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<float,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_float32 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<double,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_float64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(const blitz::Array<long double,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_float128 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(
-      const blitz::Array<std::complex<float>,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_complex64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(
-      const blitz::Array<std::complex<double>,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_complex128 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinOutputFile::needCast(
-      const blitz::Array<std::complex<long double>,d>& bl) const
-    {
-      if(m_header.getArrayType() == array::t_complex256 )
-        return false;
-      return true;
-    }
-
 
   }
 }

@@ -134,6 +134,35 @@ namespace Torch {
          */
         void read(std::istream& str);
 
+        /**
+         * @brief Check if there is a need to cast the data of a blitz array
+         */
+        template <typename T, int D> 
+        bool needCast(const blitz::Array<T,D>& bl) const;
+        /************** Partial specialization declaration *************/
+        template<int D> bool needCast(const blitz::Array<bool,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int8_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int16_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int32_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<int64_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<uint8_t,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<uint16_t,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<uint32_t,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<uint64_t,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<float,D>& bl) const;
+        template<int D> bool needCast(const blitz::Array<double,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<long double,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<std::complex<float>,D>& bl) const;
+        template<int D>
+        bool needCast(const blitz::Array<std::complex<double>,D>& bl) const;
+        template<int D> 
+        bool needCast(const blitz::Array<std::complex<long double>,D>& bl) const;
+
 
       private:
         /**
@@ -159,6 +188,137 @@ namespace Torch {
         size_t m_n_elements;
         size_t m_data_sizeof;
     };
+
+    template <typename T, int d>
+    bool BinFileHeader::needCast(const blitz::Array<T,d>& bl) const
+    {
+      error << "Unsupported blitz array type " << std::endl;
+      throw Exception();
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<bool,d>& bl) const
+    {
+      if(getArrayType() == array::t_bool )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<int8_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_int8 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<int16_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_int16 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<int32_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_int32 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<int64_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_int64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<uint8_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_uint8 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<uint16_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_uint16 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<uint32_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_uint32 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<uint64_t,d>& bl) const
+    {
+      if(getArrayType() == array::t_uint64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<float,d>& bl) const
+    {
+      if(getArrayType() == array::t_float32 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<double,d>& bl) const
+    {
+      if(getArrayType() == array::t_float64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(const blitz::Array<long double,d>& bl) const
+    {
+      if(getArrayType() == array::t_float128 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(
+      const blitz::Array<std::complex<float>,d>& bl) const
+    {
+      if(getArrayType() == array::t_complex64 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(
+      const blitz::Array<std::complex<double>,d>& bl) const
+    {
+      if(getArrayType() == array::t_complex128 )
+        return false;
+      return true;
+    }
+
+    template <int d>
+    bool BinFileHeader::needCast(
+      const blitz::Array<std::complex<long double>,d>& bl) const
+    {
+      if(getArrayType() == array::t_complex256 )
+        return false;
+      return true;
+    }
 
   }
 }
