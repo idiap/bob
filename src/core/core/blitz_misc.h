@@ -51,7 +51,8 @@ namespace Torch {
 
 
 BZ_NAMESPACE(blitz)
-
+//TODO
+#ifdef TORCH_NEEDS_REVISION
 /**
  * @brief Local function for outputting a 1D int8/uint8 Blitz++ array,
  * by converting it to a printable type (int16/uint16)
@@ -310,7 +311,7 @@ istream& operator>>(istream& is, Array<uint8_t,N_rank>& x)
 {
   return in_template<uint16_t,uint8_t,N_rank>(is, x);
 }
-
+#endif
 BZ_NAMESPACE_END
 
 #endif /* TORCH_CORE_BLITZ_MISC_H */

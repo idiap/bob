@@ -10,7 +10,8 @@
 #include "core/blitz_misc.h"
 
 BZ_NAMESPACE(blitz)
-
+// TODO
+#ifdef TORCH_NEEDS_REVISION
 
 /** 
  * @brief specialization of operator << for int8_t in 1D
@@ -85,6 +86,6 @@ ostream& operator<<(ostream& os, const Array<uint8_t,4>& x)
   return out4D_template<uint8_t,uint16_t>(os,x);
 }
 
-
+#endif
 BZ_NAMESPACE_END
 
