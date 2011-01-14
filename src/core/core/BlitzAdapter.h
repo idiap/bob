@@ -11,6 +11,7 @@
 #define TORCH5SPRO_CORE_BLITZ_ADAPTER_H
 
 #include <iostream>
+#include <typeinfo>
 
 namespace Torch {
 /**
