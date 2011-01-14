@@ -60,7 +60,9 @@ BZ_NAMESPACE(blitz)
 template <typename Tsrc, typename Tdst>
 ostream& out1D_template(ostream& os, const Array<Tsrc,1>& x)
 {
-  os << x.extent(firstRank) << endl;
+  os << "(" << x.lbound(firstRank) << "," << x.ubound(firstRank) << ")" << 
+    endl;
+
   os << " [ ";
   for (int i=x.lbound(firstRank); i <= x.ubound(firstRank); ++i)
   {
@@ -79,7 +81,10 @@ ostream& out1D_template(ostream& os, const Array<Tsrc,1>& x)
 template <typename Tsrc, typename Tdst>
 ostream& out2D_template(ostream& os, const Array<Tsrc,2>& x)
 {
-  os << x.rows() << " x " << x.columns() << endl;
+  os << "(" << x.lbound(firstRank) << "," << x.ubound(firstRank) << ")" << 
+    " x (" << x.lbound(secondRank) << "," << x.ubound(secondRank) << ")" << 
+    endl;
+
   os << "[ ";
   for (int i=x.lbound(firstRank); i <= x.ubound(firstRank); ++i)
   {
@@ -106,12 +111,10 @@ ostream& out2D_template(ostream& os, const Array<Tsrc,2>& x)
 template <typename Tsrc, typename Tdst>
 ostream& out3D_template(ostream& os, const Array<Tsrc,3>& x)
 {
-  int N_rank = 3;
-  for (int i=0; i < N_rank; ++i) {
-    os << x.extent(i);
-    if (i != N_rank - 1)
-      os << " x ";
-  }
+  os << "(" << x.lbound(firstRank) << "," << x.ubound(firstRank) << ")" << 
+    " x (" << x.lbound(secondRank) << "," << x.ubound(secondRank) << ")" << 
+    " x (" << x.lbound(thirdRank) << "," << x.ubound(thirdRank) << ")" << 
+    std::endl;
 
   os << endl << "[ ";
   for (int i=x.lbound(firstRank); i <= x.ubound(firstRank); ++i) {
@@ -139,12 +142,11 @@ ostream& out3D_template(ostream& os, const Array<Tsrc,3>& x)
 template <typename Tsrc, typename Tdst>
 ostream& out4D_template(ostream& os, const Array<Tsrc,4>& x)
 {
-  int N_rank = 4;
-  for (int i=0; i < N_rank; ++i) {
-    os << x.extent(i);
-    if (i != N_rank - 1)
-      os << " x ";
-  }
+  os << "(" << x.lbound(firstRank) << "," << x.ubound(firstRank) << ")" << 
+    " x (" << x.lbound(secondRank) << "," << x.ubound(secondRank) << ")" << 
+    " x (" << x.lbound(thirdRank) << "," << x.ubound(thirdRank) << ")" << 
+    " x (" << x.lbound(fourthRank) << "," << x.ubound(fourthRank) << ")" << 
+    std::endl;
 
   os << endl << "[ ";
   for (int i=x.lbound(firstRank); i <= x.ubound(firstRank); ++i) {
@@ -248,49 +250,61 @@ ostream& operator<<(ostream& os, const Array<uint8_t,4>& x);
 template<typename Tsrc, typename Tdst, int N_rank>
 istream& in_template(istream& is, Array<Tdst,N_rank>& x)
 {
-    TinyVector<int,N_rank> extent;
-    char sep;
- 
-    // Read the extent vector: this is separated by 'x's, e.g.
-    // 3 x 4 x 5
+  TinyVector<int,N_rank> lower_bounds, upper_bounds, extent;
+  char sep;
 
-    for (int i=0; i < N_rank; ++i)
-    {
-        is >> extent(i);
+  // Read the range-extent vector: this is separated by 'x's, e.g.
+  // (0,2) x (0,4) x (0,5)
 
-        BZPRECHECK(!is.bad(), "Premature end of input while scanning array");
-
-        if (i != N_rank - 1)
-        {
-            is >> sep;
-            BZPRECHECK(sep == 'x', "Format error while scanning input array"
-                << endl << " (expected 'x' between array extents)");
-        }
-    }
-
+  for (int i=0; i < N_rank; ++i) {
     is >> sep;
-    BZPRECHECK(sep == '[', "Format error while scanning input array"
-        << endl << " (expected '[' before beginning of array data)");
+    BZPRECHECK(!is.bad(), "Premature end of input while scanning Array");
+    BZPRECHECK(sep == '(', "Format error while scanning input \
+        Array \n -- expected '(' opening Array extents");
 
-    x.resize(extent);
+    is >> lower_bounds(i); 
+    is >> sep; 
+    BZPRECHECK(sep == ',', "Format error while scanning input \
+        Array \n -- expected ',' between Array extents");
+    is >> upper_bounds(i);
 
-    _bz_typename Array<Tdst,N_rank>::iterator iter = x.begin();
-    _bz_typename Array<Tdst,N_rank>::iterator end = x.end();
+    is >> sep; 
+    BZPRECHECK(sep == ')', "Format error while scanning input \
+        Array \n -- expected ',' closing Array extents");
 
-    Tsrc temp_val;
-    while (iter != end) {
-        BZPRECHECK(!is.bad(), "Premature end of input while scanning array");
+    if (i != N_rank-1) {
+      is >> sep;
+      BZPRECHECK(sep == 'x', "Format error while scanning input \
+          Array \n (expected 'x' between Array extents)");
+    }   
+  }
 
-        is >> temp_val;
-        (*iter) = static_cast<Tdst>(temp_val);
-        ++iter;
-    }
+  is >> sep;
+  BZPRECHECK(sep == '[', "Format error while scanning input \
+      Array \n (expected '[' before beginning of Array data)");
 
-    is >> sep;
-    BZPRECHECK(sep == ']', "Format error while scanning input array"
-       << endl << " (expected ']' after end of array data)");
+  for (int i=0; i < N_rank; ++i)
+    extent(i) = upper_bounds(i) - lower_bounds(i) + 1;
+  x.resize(extent);
+  x.reindexSelf(lower_bounds);
 
-    return is;
+  _bz_typename Array<Tdst,N_rank>::iterator iter = x.begin();
+  _bz_typename Array<Tdst,N_rank>::iterator end = x.end();
+
+  Tsrc temp_val;
+  while (iter != end) {
+    BZPRECHECK(!is.bad(), "Premature end of input while scanning array");
+
+    is >> temp_val;
+    (*iter) = static_cast<Tdst>(temp_val);
+    ++iter;
+  }
+
+  is >> sep;
+  BZPRECHECK(sep == ']', "Format error while scanning input array"
+      << endl << " (expected ']' after end of array data)");
+
+  return is;
 }
 
 
@@ -302,7 +316,7 @@ istream& operator>>(istream& is, Array<int8_t,N_rank>& x)
 {
   return in_template<int16_t,int8_t,N_rank>(is, x);
 }
-  
+
 /**
  * @brief Specialization of operator >> for the uint8_t case
  */
