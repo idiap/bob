@@ -26,9 +26,7 @@ void bind_core_array_uint16_1();
 void bind_core_array_float64_1();
 void bind_core_array_int32_1();
 void bind_core_array_uint32_1();
-void bind_core_array_float128_1();
 void bind_core_array_complex128_1();
-void bind_core_array_complex256_1();
 void bind_core_array_bool_2();
 void bind_core_array_int8_2();
 void bind_core_array_uint8_2();
@@ -41,9 +39,7 @@ void bind_core_array_uint16_2();
 void bind_core_array_float64_2();
 void bind_core_array_int32_2();
 void bind_core_array_uint32_2();
-void bind_core_array_float128_2();
 void bind_core_array_complex128_2();
-void bind_core_array_complex256_2();
 void bind_core_array_bool_3();
 void bind_core_array_int8_3();
 void bind_core_array_uint8_3();
@@ -56,9 +52,7 @@ void bind_core_array_uint16_3();
 void bind_core_array_float64_3();
 void bind_core_array_int32_3();
 void bind_core_array_uint32_3();
-void bind_core_array_float128_3();
 void bind_core_array_complex128_3();
-void bind_core_array_complex256_3();
 void bind_core_array_bool_4();
 void bind_core_array_int8_4();
 void bind_core_array_uint8_4();
@@ -71,9 +65,7 @@ void bind_core_array_uint16_4();
 void bind_core_array_float64_4();
 void bind_core_array_int32_4();
 void bind_core_array_uint32_4();
-void bind_core_array_float128_4();
 void bind_core_array_complex128_4();
-void bind_core_array_complex256_4();
 // END: generate.py
 
 BOOST_PYTHON_MODULE(libpytorch_core_array) {
@@ -96,9 +88,7 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_core_array_float64_1();
   bind_core_array_int32_1();
   bind_core_array_uint32_1();
-  bind_core_array_float128_1();
   bind_core_array_complex128_1();
-  bind_core_array_complex256_1();
   bind_core_array_bool_2();
   bind_core_array_int8_2();
   bind_core_array_uint8_2();
@@ -111,9 +101,7 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_core_array_float64_2();
   bind_core_array_int32_2();
   bind_core_array_uint32_2();
-  bind_core_array_float128_2();
   bind_core_array_complex128_2();
-  bind_core_array_complex256_2();
   bind_core_array_bool_3();
   bind_core_array_int8_3();
   bind_core_array_uint8_3();
@@ -126,9 +114,7 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_core_array_float64_3();
   bind_core_array_int32_3();
   bind_core_array_uint32_3();
-  bind_core_array_float128_3();
   bind_core_array_complex128_3();
-  bind_core_array_complex256_3();
   bind_core_array_bool_4();
   bind_core_array_int8_4();
   bind_core_array_uint8_4();
@@ -141,9 +127,7 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_core_array_float64_4();
   bind_core_array_int32_4();
   bind_core_array_uint32_4();
-  bind_core_array_float128_4();
   bind_core_array_complex128_4();
-  bind_core_array_complex256_4();
   // END: generate.py
 
 }

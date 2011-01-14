@@ -172,8 +172,7 @@ class ArrayTest(unittest.TestCase):
     # This test demonstrates we support all expected types and these types are
     # correctly expressed as python objects.
     for t in ('bool', 'int8', 'int16', 'int32', 'int64', 'uint8', 'uint16',
-        'uint32', 'uint64', 'float32', 'float64', 'float128', 'complex64', 
-        'complex128', 'complex256'):
+        'uint32', 'uint64', 'float32', 'float64', 'complex64', 'complex128'):
       for d in (1, 2, 3, 4):
         classname = '%s_%d' % (t, d)
         self.assertTrue(hasattr(torch.core.array, classname))
@@ -197,10 +196,8 @@ class ArrayTest(unittest.TestCase):
       self.assertEqual(type(torch.core.array.uint64_1((1,),(1,))[0]), int)
     self.assertEqual(type(torch.core.array.float32_1((1,),(1,))[0]), float)
     self.assertEqual(type(torch.core.array.float64_1((1,),(1,))[0]), float)
-    self.assertEqual(type(torch.core.array.float128_1((1,),(1,))[0]), float)
     self.assertEqual(type(torch.core.array.complex64_1((1,),(1,))[0]), complex)
     self.assertEqual(type(torch.core.array.complex128_1((1,),(1,))[0]), complex)
-    self.assertEqual(type(torch.core.array.complex256_1((1,),(1,))[0]), complex)
 
     # And we check we can set the elements using the specified types
     t = torch.core.array.bool_1((True,),(1,))

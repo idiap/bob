@@ -196,6 +196,17 @@ void bind_core_array_tinyvector () {
   tinyvec_from_sequence<int,9>();
   tinyvec_from_sequence<int,10>();
   tinyvec_from_sequence<int,11>();
+  tinyvec_from_sequence<blitz::diffType,1>();
+  tinyvec_from_sequence<blitz::diffType,2>();
+  tinyvec_from_sequence<blitz::diffType,3>();
+  tinyvec_from_sequence<blitz::diffType,4>();
+  tinyvec_from_sequence<blitz::diffType,5>();
+  tinyvec_from_sequence<blitz::diffType,6>();
+  tinyvec_from_sequence<blitz::diffType,7>();
+  tinyvec_from_sequence<blitz::diffType,8>();
+  tinyvec_from_sequence<blitz::diffType,9>();
+  tinyvec_from_sequence<blitz::diffType,10>();
+  tinyvec_from_sequence<blitz::diffType,11>();
 
   /**
    * The following struct constructors will make C++ return values of type
@@ -212,5 +223,16 @@ void bind_core_array_tinyvector () {
   register_tinyvec_to_tuple<int,9>();
   register_tinyvec_to_tuple<int,10>();
   register_tinyvec_to_tuple<int,11>();
+  register_tinyvec_to_tuple<blitz::diffType,1>();
+  register_tinyvec_to_tuple<blitz::diffType,2>();
+  register_tinyvec_to_tuple<blitz::diffType,3>();
+  register_tinyvec_to_tuple<blitz::diffType,4>();
+  register_tinyvec_to_tuple<blitz::diffType,5>();
+  register_tinyvec_to_tuple<blitz::diffType,6>();
+  register_tinyvec_to_tuple<blitz::diffType,7>();
+  register_tinyvec_to_tuple<blitz::diffType,8>();
+  register_tinyvec_to_tuple<blitz::diffType,9>();
+  register_tinyvec_to_tuple<blitz::diffType,10>();
+  register_tinyvec_to_tuple<blitz::diffType,11>();
 
 }
