@@ -55,7 +55,6 @@ namespace Torch {
         void read( Array& array);
 
 
-
         /**
          * @brief Get the Array type
          */

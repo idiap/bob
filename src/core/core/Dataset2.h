@@ -62,8 +62,7 @@ namespace Torch {
          */
         void setId(const size_t id) { m_id = id; }
         /**
-         * @brief Set the flag indicating if this array is loaded from an 
-         * external file.
+         * @brief Set the flag indicating if this array is loaded.
          */
         void setIsLoaded(const bool is_loaded) { m_is_loaded = is_loaded; }
         /**
@@ -485,6 +484,86 @@ namespace Torch {
          */
         iterator end() { return m_member.end(); }
 
+
+        /**
+         * @brief iterator over the Members of the Relation with a given 
+         * arrayset-role
+         */
+        template <typename T, typename U, typename V> 
+        class iterator_template {
+          public:
+            /**
+             * @brief Constructor
+             */
+            iterator_template(): m_str(""), m_it(0), m_parent(0) { }
+            iterator_template(const std::string& str, V it, U* parent):
+              m_str(str), m_it(it), m_parent(parent) { }
+
+            T* operator*() const;
+            T& operator->() const;
+            iterator_template<T,U,V>& operator++(); // prefix, const?
+            iterator_template<T,U,V> operator++(int); // postfix, const?
+            bool operator==(const iterator_template<T,U,V>& i) const;
+            bool operator!=(const iterator_template<T,U,V>& i) const;
+
+          private:
+            std::string m_str;
+            V m_it;
+            const U* m_parent;
+        };
+       
+        typedef iterator_template<Member, Relation, 
+          Relation::iterator> iterator_b;
+        typedef iterator_template<const Member, const Relation, 
+          Relation::const_iterator> const_iterator_b;
+
+        /**
+         * @brief Return an iterator pointing at the first Member of the 
+         * Relation with a given arrayset-role
+         */
+        iterator_b begin(const std::string& str) {
+          iterator it=begin();
+          while( it!=end() &&
+            m_id_role->operator[]( it->second->getArraysetId()).compare(str) )
+            ++it;
+          return iterator_b( str, it, this);
+        }
+
+        /**
+         * @brief Return an iterator pointing at the last Member of the 
+         * Relation with a given arrayset-role
+         */
+        iterator_b end(const std::string& str) {
+          return iterator_b( str, end(), this);
+        }
+
+        /**
+         * @brief Return an iterator pointing at the first Member of the 
+         * Relation with a given arrayset-role
+         */
+        const_iterator_b begin(const std::string& str) const {
+          // How to 'create' iterator_b?
+          const_iterator it=begin();
+          while( it!=end() &&
+            m_id_role->operator[]( it->second->getArraysetId()).compare(str) )
+            ++it;
+          return const_iterator_b( str, it, this);
+        }
+
+        /**
+         * @brief Return an iterator pointing at the last Member of the 
+         * Relation with a given arrayset-role
+         */
+        const_iterator_b end(const std::string& str) const {
+          // How to 'create' iterator_b?
+          return const_iterator_b( str, end(), this);
+        }
+
+
+        boost::shared_ptr<std::map<size_t,std::string> > getIdRole() const {
+          return m_id_role;
+        }
+
       private:
         std::map<size_t_pair, boost::shared_ptr<Member> > m_member;
         size_t m_id;
@@ -493,6 +572,44 @@ namespace Torch {
          */
         boost::shared_ptr<std::map<size_t,std::string> > m_id_role;
     };
+
+    template <typename T, typename U, typename V> 
+    T* Relation::iterator_template<T,U,V>::operator*() const {
+      return &(*(m_it->second));
+    }
+
+    template <typename T, typename U, typename V> 
+    T& Relation::iterator_template<T,U,V>::operator->() const {
+      return *(m_it->second);
+    }
+
+    template <typename T, typename U, typename V> 
+    Relation::iterator_template<T,U,V>& Relation::iterator_template<T,U,V>::operator++() {
+      ++m_it;
+      while( m_it!=m_parent->end() && 
+          m_parent->getIdRole()->operator[]( m_it->second->getArraysetId()).compare(m_str) )
+        ++m_it;
+      return *this;
+    }
+
+    template <typename T, typename U, typename V> 
+    Relation::iterator_template<T,U,V> Relation::iterator_template<T,U,V>::operator++(int) {
+      m_it++;
+      while( m_it!=m_parent->end() && 
+          m_parent->getIdRole()->operator[]( m_it->second->getArraysetId()).compare(m_str) )
+        ++m_it;
+      return *this;
+    }
+
+    template <typename T, typename U, typename V> 
+    bool Relation::iterator_template<T,U,V>::operator==(const iterator_template<T,U,V>& it) const {
+      return m_it == it.m_it;
+    }
+
+    template <typename T, typename U, typename V> 
+    bool Relation::iterator_template<T,U,V>::operator!=(const iterator_template<T,U,V>& it) const {
+      return m_it != it.m_it;
+    }
 
 
     /**

@@ -203,15 +203,15 @@ namespace Torch {
             m_header.getNElements()*sizeof(bool));
           break;
         case array::t_int8:
-          m_in_stream.read( reinterpret_cast< char*>(multi_array),
+          m_in_stream.read( reinterpret_cast<char*>(multi_array),
             m_header.getNElements()*sizeof(int8_t));
           break;
         case array::t_int16:
-          m_in_stream.read( reinterpret_cast< char*>(multi_array),
+          m_in_stream.read( reinterpret_cast<char*>(multi_array),
             m_header.getNElements()*sizeof(int16_t));
           break;
         case array::t_int32:
-          m_in_stream.read( reinterpret_cast< char*>(multi_array),
+          m_in_stream.read( reinterpret_cast<char*>(multi_array),
             m_header.getNElements()*sizeof(int32_t));
           break;
         case array::t_int64:
