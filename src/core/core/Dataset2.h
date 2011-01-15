@@ -499,10 +499,10 @@ namespace Torch {
             iterator_template(const std::string& str, V it, U* parent):
               m_str(str), m_it(it), m_parent(parent) { }
 
-            T* operator*() const;
-            T& operator->() const;
-            iterator_template<T,U,V>& operator++(); // prefix, const?
-            iterator_template<T,U,V> operator++(int); // postfix, const?
+            T& operator*() const;
+            T* operator->() const;
+            iterator_template<T,U,V>& operator++(); // prefix
+            iterator_template<T,U,V> operator++(int); // postfix
             bool operator==(const iterator_template<T,U,V>& i) const;
             bool operator!=(const iterator_template<T,U,V>& i) const;
 
@@ -512,9 +512,10 @@ namespace Torch {
             const U* m_parent;
         };
        
-        typedef iterator_template<Member, Relation, 
+        // TODO: check const size_t_pair
+        typedef iterator_template<std::pair<const size_t_pair, boost::shared_ptr<Member> >, Relation, 
           Relation::iterator> iterator_b;
-        typedef iterator_template<const Member, const Relation, 
+        typedef iterator_template<const std::pair<const size_t_pair, boost::shared_ptr<Member> >, const Relation, 
           Relation::const_iterator> const_iterator_b;
 
         /**
@@ -542,7 +543,6 @@ namespace Torch {
          * Relation with a given arrayset-role
          */
         const_iterator_b begin(const std::string& str) const {
-          // How to 'create' iterator_b?
           const_iterator it=begin();
           while( it!=end() &&
             m_id_role->operator[]( it->second->getArraysetId()).compare(str) )
@@ -555,7 +555,6 @@ namespace Torch {
          * Relation with a given arrayset-role
          */
         const_iterator_b end(const std::string& str) const {
-          // How to 'create' iterator_b?
           return const_iterator_b( str, end(), this);
         }
 
@@ -574,13 +573,13 @@ namespace Torch {
     };
 
     template <typename T, typename U, typename V> 
-    T* Relation::iterator_template<T,U,V>::operator*() const {
-      return &(*(m_it->second));
+    T& Relation::iterator_template<T,U,V>::operator*() const {
+      return *m_it;
     }
 
     template <typename T, typename U, typename V> 
-    T& Relation::iterator_template<T,U,V>::operator->() const {
-      return *(m_it->second);
+    T* Relation::iterator_template<T,U,V>::operator->() const {
+      return m_it.operator->();
     }
 
     template <typename T, typename U, typename V> 
