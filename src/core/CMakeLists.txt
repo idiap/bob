@@ -39,6 +39,7 @@ set(src
     "src/logging.cc"
     "src/Dataset2.cc"
     "src/XMLParser.cc"
+    "src/XMLWriter.cc"
     "src/BinFileHeader.cc"
     "src/BinOutputFile.cc"
     "src/BinInputFile.cc"

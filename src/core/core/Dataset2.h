@@ -39,7 +39,7 @@ namespace Torch {
     class TypeError: public Exception { };
 
     
-    // Declare the Arrayset for the reference to the parent Arrayset in the
+    // Declare Arrayset for the reference to the parent Arrayset in the
     // Array class.
     class Arrayset;
 
@@ -165,7 +165,6 @@ namespace Torch {
         LoaderType m_loader;
         void* m_storage;
     };
-
 
 
     /**
@@ -512,10 +511,20 @@ namespace Torch {
             const U* m_parent;
         };
        
-        // TODO: check const size_t_pair
-        typedef iterator_template<std::pair<const size_t_pair, boost::shared_ptr<Member> >, Relation, 
-          Relation::iterator> iterator_b;
-        typedef iterator_template<const std::pair<const size_t_pair, boost::shared_ptr<Member> >, const Relation, 
+        /**
+         * @warning Looking at the STL implementation of a map, the keys are 
+         * const:
+         * "template <typename _Key, typename _Tp, 
+         *    typename _Compare = std::less<_Key>,
+         *    typename _Alloc = std::allocator<std::pair<const _Key, _Tp> > >"
+         * The following iterator typedefs take this fact into consideration,
+         * and use a const size_t_pair as Keys type.
+         */
+        typedef iterator_template<std::pair<const size_t_pair, 
+          boost::shared_ptr<Member> >, Relation, Relation::iterator> 
+          iterator_b;
+        typedef iterator_template<const std::pair<const size_t_pair,
+          boost::shared_ptr<Member> >, const Relation, 
           Relation::const_iterator> const_iterator_b;
 
         /**
@@ -583,30 +592,38 @@ namespace Torch {
     }
 
     template <typename T, typename U, typename V> 
-    Relation::iterator_template<T,U,V>& Relation::iterator_template<T,U,V>::operator++() {
+    Relation::iterator_template<T,U,V>& 
+    Relation::iterator_template<T,U,V>::operator++() {
       ++m_it;
       while( m_it!=m_parent->end() && 
-          m_parent->getIdRole()->operator[]( m_it->second->getArraysetId()).compare(m_str) )
+        m_parent->getIdRole()->operator[]( 
+          m_it->second->getArraysetId()).compare(m_str) )
         ++m_it;
       return *this;
     }
 
     template <typename T, typename U, typename V> 
-    Relation::iterator_template<T,U,V> Relation::iterator_template<T,U,V>::operator++(int) {
+    Relation::iterator_template<T,U,V> 
+    Relation::iterator_template<T,U,V>::operator++(int) {
       m_it++;
       while( m_it!=m_parent->end() && 
-          m_parent->getIdRole()->operator[]( m_it->second->getArraysetId()).compare(m_str) )
+        m_parent->getIdRole()->operator[]( 
+          m_it->second->getArraysetId()).compare(m_str) )
         ++m_it;
       return *this;
     }
 
     template <typename T, typename U, typename V> 
-    bool Relation::iterator_template<T,U,V>::operator==(const iterator_template<T,U,V>& it) const {
+    bool Relation::iterator_template<T,U,V>::operator==(
+      const iterator_template<T,U,V>& it) const 
+    {
       return m_it == it.m_it;
     }
 
     template <typename T, typename U, typename V> 
-    bool Relation::iterator_template<T,U,V>::operator!=(const iterator_template<T,U,V>& it) const {
+    bool Relation::iterator_template<T,U,V>::operator!=(
+    const iterator_template<T,U,V>& it) const 
+    {
       return m_it != it.m_it;
     }
 
