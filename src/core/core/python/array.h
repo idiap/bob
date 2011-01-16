@@ -427,7 +427,7 @@ namespace Torch { namespace python {
       //declares a few typedefs to make it easier to write code
       typedef typename blitz::Array<T,N> array_type;
       typedef typename blitz::TinyVector<int,N> shape_type;
-      typedef typename blitz::TinyVector<blitz::diffType,N> stride_type;
+      typedef typename blitz::TinyVector<ptrdiff_t,N> stride_type;
       typedef typename blitz::GeneralArrayStorage<N> storage_type;
       typedef array_type& (array_type::*inplace_const_op)(const T&); 
       typedef array_type& (array_type::*inplace_array_op)(const array_type&);
@@ -612,7 +612,7 @@ namespace Torch { namespace python {
         m_class->def("numElements", &array_type::numElements, "The same as size()");
         m_class->def("shape", &array_type::shape, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the vector of extents (lengths) of the array");
         m_class->def("stride", (const stride_type& (array_type::*)() const)&array_type::stride, boost::python::return_value_policy<boost::python::return_by_value>(), "A stride is the distance between pointers to two array elements which are adjacent in a dimension. For example, A.stride(firstDim) is equal to &A(1,0,0) - &A(0,0,0). The stride for the second dimension, A.stride(secondDim), is equal to &A(0,1,0) - &A(0,0,0), and so on. For more information about strides, see the description of custom storage formats in Section 2.9 of the Blitz manual. See also the description of parameters like firstDim and secondDim in the previous section of the same manual.");
-        m_class->def("stride", (blitz::diffType (array_type::*)(int) const)&array_type::stride, "A stride is the distance between pointers to two array elements which are adjacent in a dimension. For example, A.stride(firstDim) is equal to &A(1,0,0) - &A(0,0,0). The stride for the second dimension, A.stride(secondDim), is equal to &A(0,1,0) - &A(0,0,0), and so on. For more information about strides, see the description of custom storage formats in Section 2.9 of the Blitz manual. See also the description of parameters like firstDim and secondDim in the previous section of the same manual.");
+        m_class->def("stride", (ptrdiff_t (array_type::*)(int) const)&array_type::stride, "A stride is the distance between pointers to two array elements which are adjacent in a dimension. For example, A.stride(firstDim) is equal to &A(1,0,0) - &A(0,0,0). The stride for the second dimension, A.stride(secondDim), is equal to &A(0,1,0) - &A(0,0,0), and so on. For more information about strides, see the description of custom storage formats in Section 2.9 of the Blitz manual. See also the description of parameters like firstDim and secondDim in the previous section of the same manual.");
       
         //some type information that correlates the C++ type to the Numpy C-API
         //types.
