@@ -59,6 +59,18 @@ namespace Torch {
          */
         xmlNodePtr writeRelationset( xmlDocPtr doc, const Relationset& r,
           bool content_inline);
+        /**
+         * @brief Return an XML node containing a Rule
+         */
+        xmlNodePtr writeRule( xmlDocPtr doc, const Rule& r);
+        /**
+         * @brief Return an XML node containing a Relation
+         */
+        xmlNodePtr writeRelation( xmlDocPtr doc, const Relation& r);
+        /**
+         * @brief Return an XML node containing a Member
+         */
+        xmlNodePtr writeMember( xmlDocPtr doc, const Member& m);
     };
 
   }

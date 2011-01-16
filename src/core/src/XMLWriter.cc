@@ -20,6 +20,7 @@ namespace Torch {
       static const char arrayset[]          = "arrayset";
       static const char external_arrayset[] = "external-arrayset";
       static const char relationset[]       = "relationset";
+      static const char version[]           = "version"; 
       static const char id[]                = "id";
       static const char role[]              = "role";
       static const char elementtype[]       = "elementtype";
@@ -79,6 +80,16 @@ namespace Torch {
       rootnode = xmlNewDocNode(doc, 0, (const xmlChar*)db::dataset, 0);
       xmlDocSetRootElement(doc, rootnode);
 
+      // Write name attribute if any
+      if(dataset.getName().compare("") )
+        xmlNewProp( rootnode, (const xmlChar*)db::name, 
+          (const xmlChar*)dataset.getName().c_str() );
+
+      // Write version attribute if any
+      if(dataset.getVersion() != 0)
+        xmlNewProp( rootnode, (const xmlChar*)db::version, (const xmlChar*)
+          (boost::lexical_cast<std::string>(dataset.getVersion())).c_str() );
+
       // Create Arrayset nodes
       for(Dataset::const_iterator it=dataset.begin(); it!=dataset.end(); 
         ++it)
@@ -108,8 +119,83 @@ namespace Torch {
     xmlNodePtr XMLWriter::writeRelationset( xmlDocPtr doc, const Relationset& r,
       bool content_inline) 
     {
-      // TODO: implementation
-      return xmlNewDocNode(doc, 0, (const xmlChar*)db::relationset, 0);
+      // Create the Relationset node
+      xmlNodePtr relationsetnode = 
+        xmlNewDocNode(doc, 0, (const xmlChar*)db::relationset, 0);
+
+      // Write name attribute
+      xmlNewProp( relationsetnode, (const xmlChar*)db::name, 
+          (const xmlChar*)r.getName().c_str() );
+
+      // Add the Rule nodes to the relationset node
+      for(Relationset::rule_const_iterator it=r.rule_begin(); 
+        it!=r.rule_end(); ++it)
+      {
+        xmlAddChild( relationsetnode, writeRule( doc, *it->second) );
+      }
+
+      // Add the Relation nodes to the relationset node
+      for(Relationset::const_iterator it=r.begin(); it!=r.end(); ++it)
+      {
+        xmlAddChild( relationsetnode, writeRelation( doc, *it->second) );
+      }
+
+      return relationsetnode;
+    }
+    
+    xmlNodePtr XMLWriter::writeRule( xmlDocPtr doc, const Rule& r) {
+      // Create the Rule node
+      xmlNodePtr rulenode = xmlNewDocNode(doc,0, (const xmlChar*)db::rule, 0);
+
+      // Write arrayset-role attribute
+      xmlNewProp( rulenode, (const xmlChar*)db::arrayset_role, 
+          (const xmlChar*)r.getArraysetRole().c_str() );
+      // Write min attribute
+      xmlNewProp( rulenode, (const xmlChar*)db::min, (const xmlChar*)
+        (boost::lexical_cast<std::string>(r.getMin())).c_str() );
+      // Write max attribute
+      xmlNewProp( rulenode, (const xmlChar*)db::max, (const xmlChar*)
+        (boost::lexical_cast<std::string>(r.getMax())).c_str() );
+
+      return rulenode;
+    }
+    
+    xmlNodePtr XMLWriter::writeRelation( xmlDocPtr doc, const Relation& r) {
+      // Create the Relation node
+      xmlNodePtr relationnode = 
+        xmlNewDocNode(doc, 0, (const xmlChar*)db::relation, 0);
+
+      // Write id attribute
+      xmlNewProp( relationnode, (const xmlChar*)db::id, (const xmlChar*)
+        (boost::lexical_cast<std::string>(r.getId())).c_str() );
+
+      // Add the Member nodes to the relation node
+      for(Relation::const_iterator it=r.begin(); it!=r.end(); ++it)
+      {
+        xmlAddChild( relationnode, writeMember( doc, *it->second) );
+      }
+      return relationnode;
+    }
+
+    xmlNodePtr XMLWriter::writeMember( xmlDocPtr doc, const Member& m) {
+      // Create the Member node
+      xmlNodePtr membernode; 
+      if( m.getArrayId() != 0)
+        membernode = xmlNewDocNode(doc, 0, (const xmlChar*)db::member, 0);
+      else
+        membernode = 
+          xmlNewDocNode(doc, 0, (const xmlChar*)db::arrayset_member, 0);
+
+      // Write arrayset-id attribute
+      xmlNewProp( membernode, (const xmlChar*)db::arrayset_id, (const xmlChar*)
+        (boost::lexical_cast<std::string>(m.getArraysetId())).c_str() );
+
+      // Write array-id attribute if any
+      if( m.getArrayId() != 0)
+        xmlNewProp( membernode, (const xmlChar*)db::array_id, (const xmlChar*)
+          (boost::lexical_cast<std::string>(m.getArrayId())).c_str() );
+
+      return membernode;
     }
 
   }

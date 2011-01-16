@@ -178,7 +178,7 @@ namespace Torch {
       // 2/ Parse version 
       str = xmlGetProp(cur, (const xmlChar*)db::version);
       dataset.setVersion( str!=0 ? 
-        static_cast<size_t>(atoi((const char *)str)) : 0 );
+        boost::lexical_cast<size_t>((const char *)str) : 0 );
       if( dataset.getVersion() != 0 )
         std::cout << "Version: " << dataset.getVersion() << std::endl;
       xmlFree(str);
@@ -379,13 +379,13 @@ namespace Torch {
       
       // Parse min
       str = xmlGetProp(cur, (const xmlChar*)db::min);
-      rule->setMin(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      rule->setMin(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
       std::cout << "  Min: " << rule->getMin() << std::endl;
       xmlFree(str);
 
       // Parse max
       str = xmlGetProp(cur, (const xmlChar*)db::max);
-      rule->setMax(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      rule->setMax(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
       std::cout << "  Max: " << rule->getMax() << std::endl;
       xmlFree(str);
 
@@ -398,7 +398,7 @@ namespace Torch {
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
-      relation->setId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      relation->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
       std::cout << "  Id: " << relation->getId() << std::endl;
       xmlFree(str);
 
@@ -421,13 +421,13 @@ namespace Torch {
       // Parse array-id
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::array_id);
-      member->setArrayId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      member->setArrayId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
       std::cout << "    Array-id: " << member->getArrayId() << std::endl;
       xmlFree(str);
 
       // Parse arrayset-id
       str = xmlGetProp(cur, (const xmlChar*)db::arrayset_id);
-      member->setArraysetId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      member->setArraysetId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
       std::cout << "    Arrayset-id: " << member->getArraysetId() << std::endl;
       xmlFree(str);
 
@@ -440,7 +440,7 @@ namespace Torch {
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
-      arrayset->setId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      arrayset->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
       std::cout << "Id: " << arrayset->getId() << std::endl;
       xmlFree(str);
 
@@ -521,7 +521,7 @@ namespace Torch {
             array::N_MAX_DIMENSIONS_ARRAY << "." << std::endl;
           throw Exception();        
         }
-        shape[count] = atoi((*it).c_str());
+        shape[count] = boost::lexical_cast<size_t>((*it).c_str());
       }
       arrayset->setNDim(count);
       arrayset->setShape(shape);
@@ -584,7 +584,7 @@ namespace Torch {
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
-      array->setId(str!=0? static_cast<size_t>(atoi((const char*)str)): 0);
+      array->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
       std::cout << "  Array Id: " << array->getId() << std::endl;
       xmlFree(str);
 

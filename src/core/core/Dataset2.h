@@ -815,7 +815,7 @@ namespace Torch {
         /**
          * @brief Get the name of the Dataset
          */
-        std::string& getName() { return m_name; }
+        const std::string& getName() const { return m_name; }
 
         /**
          * @brief Set the name of the Dataset
@@ -825,7 +825,7 @@ namespace Torch {
         /**
          * @brief Get the version of the Dataset
          */
-        size_t getVersion() { return m_version; }
+        const size_t getVersion() const { return m_version; }
 
         /**
          * @brief Set the version of the Dataset
