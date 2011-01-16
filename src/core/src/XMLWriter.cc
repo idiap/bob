@@ -111,8 +111,150 @@ namespace Torch {
     xmlNodePtr XMLWriter::writeArrayset( xmlDocPtr doc, const Arrayset& a, 
       bool content_inline) 
     {
-      // TODO: implementation 
-      return xmlNewDocNode(doc, 0, (const xmlChar*)db::arrayset, 0);
+      // Create the Arrayset node
+      xmlNodePtr arraysetnode; 
+      if( a.getFilename().compare("") && !content_inline)
+        arraysetnode = 
+          xmlNewDocNode(doc, 0, (const xmlChar*)db::external_arrayset, 0);
+      else
+        arraysetnode = xmlNewDocNode(doc, 0, (const xmlChar*)db::arrayset, 0);
+
+      // Write id attribute
+      xmlNewProp( arraysetnode, (const xmlChar*)db::id, (const xmlChar*)
+        (boost::lexical_cast<std::string>(a.getId())).c_str() );
+
+      // Write elementtype attribute
+      std::string str;
+      switch(a.getArrayType()) {
+        case array::t_bool:
+          str = db::t_bool; break;
+        case array::t_int8:
+          str = db::t_int8; break;
+        case array::t_int16:
+          str = db::t_int16; break;
+        case array::t_int32:
+          str = db::t_int32; break;
+        case array::t_int64:
+          str = db::t_int64; break;
+        case array::t_uint8:
+          str = db::t_uint8; break;
+        case array::t_uint16:
+          str = db::t_uint16; break;
+        case array::t_uint32:
+          str = db::t_uint32; break;
+        case array::t_uint64:
+          str = db::t_uint64; break;
+        case array::t_float32:
+          str = db::t_float32; break;
+        case array::t_float64:
+          str = db::t_float64; break;
+        case array::t_float128:
+          str = db::t_float128; break;
+        case array::t_complex64:
+          str = db::t_complex64; break;
+        case array::t_complex128:
+          str = db::t_complex128; break;
+        case array::t_complex256:
+          str = db::t_complex256; break;
+        default:
+          throw Exception();
+          break;
+      }    
+      xmlNewProp( arraysetnode, (const xmlChar*)db::elementtype, (const xmlChar*)
+        str.c_str() );
+
+      // Write shape attribute
+      const size_t* shape = a.getShape();
+      str = boost::lexical_cast<std::string>(shape[0]);
+      for(size_t i=1; i<a.getNDim(); ++i)
+        str += " " + boost::lexical_cast<std::string>(shape[i]);
+      xmlNewProp( arraysetnode, (const xmlChar*)db::shape, (const xmlChar*)
+        str.c_str() );
+
+      // Write role attribute
+      xmlNewProp( arraysetnode, (const xmlChar*)db::role, (const xmlChar*)
+        a.getRole().c_str() );
+
+      // Write file and loader attributes if any
+      if( a.getFilename().compare("") && !content_inline)
+      {
+        // Write file attribute
+        xmlNewProp( arraysetnode, (const xmlChar*)db::file, (const xmlChar*)
+          a.getFilename().c_str() );
+
+        // Write loader attribute
+        str = "";
+        switch( a.getLoader() )
+        {
+          case l_blitz:
+            str = db::l_blitz; break;
+          case l_tensor:
+            str = db::l_tensor; break;
+          case l_bindata:
+            str = db::l_bindata; break;
+          default:
+            throw Exception();
+            break;
+        }
+        xmlNewProp( arraysetnode, (const xmlChar*)db::loader, (const xmlChar*)
+          str.c_str() );
+      }
+
+      // Create Array nodes
+      for(Arrayset::const_iterator it=a.begin(); it!=a.end(); 
+        ++it)
+      {
+        xmlAddChild( arraysetnode, 
+          writeArray( doc, *it->second, content_inline) );
+      }
+
+      return arraysetnode;
+    }
+
+    xmlNodePtr XMLWriter::writeArray( xmlDocPtr doc, const Array& a, 
+      bool content_inline) 
+    {
+      // Create the Arrayset node
+      xmlNodePtr arraynode; 
+      if( a.getFilename().compare("") && !content_inline)
+        arraynode = 
+          xmlNewDocNode(doc, 0, (const xmlChar*)db::external_array, 0);
+      else {
+        std::string content;
+        // TODO: Write the array data into the content string
+        arraynode = xmlNewDocNode(doc, 0, (const xmlChar*)db::array, 
+          (const xmlChar*)content.c_str());
+      }
+
+      // Write id attribute
+      xmlNewProp( arraynode, (const xmlChar*)db::id, (const xmlChar*)
+        (boost::lexical_cast<std::string>(a.getId())).c_str() );
+
+      if( a.getFilename().compare("") && !content_inline)
+      {
+        // Write file attribute
+        xmlNewProp( arraynode, (const xmlChar*)db::file, (const xmlChar*)
+          a.getFilename().c_str() );
+
+        // Write loader attribute
+        std::string str;
+        switch( a.getLoader() )
+        {
+          case l_blitz:
+            str = db::l_blitz; break;
+          case l_tensor:
+            str = db::l_tensor; break;
+          case l_bindata:
+            str = db::l_bindata; break;
+          default:
+            throw Exception();
+            break;
+        }
+        xmlNewProp( arraynode, (const xmlChar*)db::loader, (const xmlChar*)
+          str.c_str() );
+      }
+
+      return arraynode;
     }
 
 

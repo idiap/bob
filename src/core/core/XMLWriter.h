@@ -55,6 +55,11 @@ namespace Torch {
         xmlNodePtr writeArrayset( xmlDocPtr doc, const Arrayset& a, 
           bool content_inline);
         /**
+         * @brief Return an XML node containing an Array
+         */
+        xmlNodePtr writeArray( xmlDocPtr doc, const Array& a, 
+          bool content_inline);
+        /**
          * @brief Return an XML node containing a Relationset
          */
         xmlNodePtr writeRelationset( xmlDocPtr doc, const Relationset& r,
