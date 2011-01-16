@@ -18,7 +18,13 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+
+/*************************************************************************/
+//TODO: might be better to create a "core/torch.h" header containing the 
+// following header and to force people to include it when using torch
 #include "core/blitz_misc.h"
+#include "core/array_common.h"
+/*************************************************************************/
 
 namespace Torch {
 

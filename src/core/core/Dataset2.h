@@ -15,7 +15,7 @@
 #include "core/logging.h"
 #include "core/Exception.h"
 #include "core/StaticComplexCast.h"
-#include "core/blitz_misc.h"
+#include "core/dataset_common.h"
 
 #include <string>
 #include <map>
@@ -30,14 +30,6 @@ namespace Torch {
    *
    */
   namespace core {
-  
-    typedef enum LoaderType { l_unknown, l_blitz, l_tensor, l_bindata } 
-      LoaderType;
-
-    class IndexError: public Exception { };
-    class NDimensionError: public Exception { };
-    class TypeError: public Exception { };
-
     
     // Declare Arrayset for the reference to the parent Arrayset in the
     // Array class.

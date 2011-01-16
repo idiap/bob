@@ -16,6 +16,7 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 set(src
    "src/general.cc"
     "src/blitz_misc.cc"
+    "src/dataset_common.cc"
     "src/VariableCollector.cc"
     "src/Object.cc"
     "src/Parameters.cc"
