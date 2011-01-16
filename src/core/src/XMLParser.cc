@@ -21,6 +21,7 @@ namespace Torch {
       static const char arrayset[]          = "arrayset";
       static const char external_arrayset[] = "external-arrayset";
       static const char relationset[]       = "relationset";
+      static const char version[]           = "version";
       static const char id[]                = "id";
       static const char role[]              = "role";
       static const char elementtype[]       = "elementtype";
@@ -165,6 +166,26 @@ namespace Torch {
       // Throw an exception in case of failure
       validateXMLSchema( doc);
 
+      // Parse Dataset Attributes
+      // 1/ Parse name
+      xmlChar *str;
+      str = xmlGetProp(cur, (const xmlChar*)db::name);
+      dataset.setName( ( (str!=0?(const char *)str:"") ) );
+      if( dataset.getName().compare(""))
+        std::cout << "Name: " << dataset.getName() << std::endl;
+      xmlFree(str);
+
+      // 2/ Parse version 
+      str = xmlGetProp(cur, (const xmlChar*)db::version);
+      dataset.setVersion( str!=0 ? 
+        static_cast<size_t>(atoi((const char *)str)) : 0 );
+      if( dataset.getVersion() != 0 )
+        std::cout << "Version: " << dataset.getVersion() << std::endl;
+      xmlFree(str);
+
+      // 3/ Parse date
+      // TODO: implementation
+      
 
       // Parse Arraysets and Relationsets
       cur = cur->xmlChildrenNode;

@@ -813,6 +813,26 @@ namespace Torch {
         void addArrayset( boost::shared_ptr<Arrayset> arrayset);
 
         /**
+         * @brief Get the name of the Dataset
+         */
+        std::string& getName() { return m_name; }
+
+        /**
+         * @brief Set the name of the Dataset
+         */
+        void setName( const std::string& name) { m_name = name; }
+
+        /**
+         * @brief Get the version of the Dataset
+         */
+        size_t getVersion() { return m_version; }
+
+        /**
+         * @brief Set the version of the Dataset
+         */
+        void setVersion( const size_t version) { m_version = version; }
+
+        /**
          * @brief const_iterator over the Arraysets of the Dataset
          */
         typedef std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator
@@ -906,7 +926,10 @@ namespace Torch {
         boost::shared_ptr<const Relationset> 
         getRelationset( const std::string& name ) const;
 
-      private:    
+      private:
+        std::string m_name;
+        size_t m_version;
+
         std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
         std::map<std::string, boost::shared_ptr<Relationset> > m_relationset;
     };
