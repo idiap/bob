@@ -36,15 +36,15 @@ void checkBlitzAllocation( const int n_megabytes ) {
   // Check X.extent(blitz::secondDim) equals n_elems_second
   BOOST_CHECK_EQUAL(n_elems_second, X.extent(blitz::secondDim));
 
-  // Make sure no exceptions are thrown
-  for(int64_t i=0; i<n_elems_first; ++i) {
-    BOOST_CHECK_NO_THROW(X(i) = (i % 37 % 37));
-  }
-
-  // Check the validity of the value stored in the array
-  for(int64_t i=0; i<n_elems_first; ++i) {
-    BOOST_CHECK_EQUAL(X(i), (i % 37 % 37));
-  }
+  int8_t tmp = 37;
+  for(int i=0; i<n_elems_first; ++i)
+    for(int j=0; j<n_elems_second; ++j) {
+//      tmp = j % 37 % 37;
+      // Make sure no exceptions are thrown
+      BOOST_CHECK_NO_THROW(X(i,j) = tmp);
+      // Check the validity of the value stored in the array
+      BOOST_CHECK_EQUAL(X(i,j), tmp);
+    }
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_512MB )
 {
   checkBlitzAllocation( 512 );
 }
-
+/*
 BOOST_AUTO_TEST_CASE( test_blitz_array_1024MB )
 {
   checkBlitzAllocation( 1024 );
@@ -70,12 +70,19 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_2048MB )
   if(sizeof(size_t) > 4)
     checkBlitzAllocation( 2048 );
 }
-
+*/
+BOOST_AUTO_TEST_CASE( test_blitz_array_2560MB )
+{
+  // Check that the OS is 64 bits, otherwise ignore the test
+  if(sizeof(size_t) > 4)
+    checkBlitzAllocation( 2560 );
+}
+/*
 BOOST_AUTO_TEST_CASE( test_blitz_array_3072MB )
 {
   // Check that the OS is 64 bits, otherwise ignore the test
   if(sizeof(size_t) > 4)
     checkBlitzAllocation( 3072 );
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()
