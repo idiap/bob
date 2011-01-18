@@ -1,4 +1,4 @@
-project(dfftpack41)
+project(dfftpack41-cxx)
 
 cmake_minimum_required(VERSION 2.6)
 enable_language(Fortran)
@@ -54,5 +54,6 @@ set(src
   "src/sint.f"
   "src/sinti.f")
 
-include(../cmake/macros.cmake)
+include(../../cmake/macros.cmake)
 torch_library(dfftpack41 "${src}" "" "")
+torch_header_install(dfftpack41 "torch::dfftpack41")

@@ -32,9 +32,20 @@ macro(torch_archive libname sources dependencies installdir)
   install(TARGETS ${libname}-static EXPORT torch ARCHIVE DESTINATION ${installdir})
 endmacro(torch_archive sources dependencies)
 
-# Builds libraries for a subproject and installs headers. Wraps every of those
-# items in an exported CMake module to be used by other libraries in or outside
-# the project.
+# Installs header files to the default include directory
+#
+# The parameters:
+# package -- The base name of this package, so everything besides "torch_"
+# comment -- This will be used to print a nice comment when installing the
+#            header. Something like "torch::core" will look nice
+macro(torch_header_install package comment)
+  set(libname torch_${package})
+  set(incdir include/torch)
+  add_custom_command(TARGET ${libname} PRE_BUILD COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND cp -a ${CMAKE_CURRENT_SOURCE_DIR}/${package} ${CMAKE_INSTALL_PREFIX}/${incdir} COMMENT "Installing ${comment} headers...")
+endmacro(torch_header_install package comment)
+
+# Builds libraries for a subproject. Wraps every of those items in an exported
+# CMake module to be used by other libraries in or outside the project.
 # 
 # The parameters:
 # torch_library -- This macro's name
@@ -48,7 +59,6 @@ macro(torch_library package src deps shared)
   # We set this so we don't need to become repetitive.
   set(libname torch_${package})
   set(libdir lib)
-  set(incdir include/torch)
 
   include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -59,9 +69,6 @@ macro(torch_library package src deps shared)
     # This adds target (library) torch_<package>-static, exports into "torch"
     torch_archive(${libname} "${src}" "${deps}" ${libdir})
   endif ("${TORCH_BUILD_STATIC_LIBS}")
-
-  # This installs all headers to the destination directory
-  add_custom_command(TARGET ${libname} POST_BUILD COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/${package} ${CMAKE_INSTALL_PREFIX}/${incdir} COMMENT "Installing ${package} headers...")
 endmacro(torch_library)
 
 # Creates a standard Torch test.
@@ -151,6 +158,8 @@ function(torch_python_bindings package src)
     # Our compilation flags
     set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
 
+    include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
+
     # Building the library itself
     add_library(${libname} SHARED ${src})
     set_target_properties(${libname} PROPERTIES SUFFIX ".so")
@@ -193,6 +202,8 @@ function(torch_python_submodule package subpackage src)
     # Our compilation flags
     set(pycxx_flags "-Wno-long-long -Wno-unused-function -Winvalid-pch")
 
+    include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR})
+
     # Building the library itself
     add_library(${libname} SHARED ${src})
     set_target_properties(${libname} PROPERTIES SUFFIX ".so")
@@ -224,7 +235,7 @@ endfunction(torch_python_submodule package name src)
 macro(torch_python_install package)
   if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     set(pydir ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/torch)
-    add_custom_target(${package}-python-install cp -r ${CMAKE_CURRENT_SOURCE_DIR}/python/${package} ${pydir} COMMENT "Installing ${package} python files...")
+    add_custom_target(${package}-python-install cp -a ${CMAKE_CURRENT_SOURCE_DIR}/${package} ${pydir} COMMENT "Installing ${package} python files...")
     add_dependencies(${package}-python-install pytorch_${package})
     add_dependencies(${package}-python-install torch-python-install)
     add_dependencies(python-compilation ${package}-python-install)

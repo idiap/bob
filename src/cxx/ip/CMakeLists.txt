@@ -1,4 +1,4 @@
-PROJECT(ip)
+PROJECT(ip-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
@@ -91,20 +91,6 @@ set(src
    "${src_imagefiles}"
    "${src_geometry}")
 
-include(../cmake/macros.cmake)
+include(../../cmake/macros.cmake)
 torch_library(ip "${src}" "${deps}" "${shared}")
-
-set(pysrc
-   "python/src/ipcore.cc"
-   "python/src/color.cc"
-   "python/src/image.cc"
-   "python/src/lbp.cc"
-   "python/src/filters.cc"
-   "python/src/video.cc"
-   "python/src/videotensor.cc"
-   "python/src/vision.cc"
-   "python/src/main.cc"
-   )
-
-torch_python_bindings(ip "${pysrc}")
-torch_python_install(ip)
+torch_header_install(ip "torch::ip")

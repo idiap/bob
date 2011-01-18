@@ -25,6 +25,7 @@ def parse_args():
   #some defaults
   actions = ('all', 'build', 'documentation', 'test', 'depfigure')
   build_types = ('release', 'debug') #default is #0
+  build_blocks = ('all', 'cxx', 'python') #default is #0
   pwd = os.path.realpath(os.curdir)
   default_install_prefix = os.path.join(pwd, 'install')
   default_doc_prefix = os.path.join('share', 'doc')
@@ -48,6 +49,11 @@ def parse_args():
       dest="build_type", default=build_types[0],
       metavar="(%s)" % '|'.join(build_types),
       help="defines the build type (defaults to %default)",
+      )
+  parser.add_option("-B", "--build-block", type="string", action="store",
+      dest="build_block", default=build_blocks[0],
+      metavar="(%s)" % '|'.join(build_blocks),
+      help="defines which libraries to build (defaults to %default)",
       )
   parser.add_option("--build-prefix", type="string", action="store",
       dest="build_prefix", default=default_build_prefix, metavar="DIR",
@@ -111,6 +117,8 @@ def parse_args():
     parser.error("option --action has to be one of %s" % ", ".join(actions))
   if options.build_type not in build_types:
     parser.error("option --build-type has to be one of %s" % ", ".join(build_types))
+  if options.build_block not in build_blocks:
+    parser.error("option --build-block has to be one of %s" % ", ".join(build_blocks))
   if options.jobs < 1:
     parser.error("option --jobs has to be equal or greater than 1")
   if options.debug_build and options.jobs > 1:

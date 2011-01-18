@@ -1,4 +1,4 @@
-PROJECT(trainer)
+PROJECT(trainer-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
@@ -26,5 +26,6 @@ set(src
 	"${src_trainer}"
 	"${src_boosting}")
 
-include(../cmake/macros.cmake)
+include(../../cmake/macros.cmake)
 torch_library(trainer "${src}" "${deps}" "${shared}")
+torch_header_install(trainer "torch::trainer")
