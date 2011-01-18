@@ -66,6 +66,9 @@ enable_testing()
 # This makes sure we have all headers within reach before starting to compile
 include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)
 
+# Some common definitions
+add_definitions("-DHAVE_LBFGS=1")
+
 if (TORCH_CXX)
   add_subdirectory(cxx)
 endif (TORCH_CXX)

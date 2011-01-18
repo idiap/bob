@@ -3,18 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps core sp) #other torch subprojects
-
-# jpeg
-if(JPEG_FOUND)
-  add_definitions(-DHAVE_JPEG)
-  set(shared "${JPEG_LIBRARIES}")
-endif(JPEG_FOUND)
-
-# ffmpeg
-if(ffmpeg_FOUND)
-  add_definitions(-DHAVE_FFMPEG)
-  set(shared "${shared};${ffmpeg_LIBRARIES}")
-endif(ffmpeg_FOUND)
+set(shared "${JPEG_LIBRARIES};${ffmpeg_LIBRARIES}")
 
 # This defines the list of source files inside this package.
 set(src_ip

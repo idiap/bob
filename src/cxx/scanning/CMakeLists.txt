@@ -4,9 +4,6 @@ cmake_minimum_required(VERSION 2.6)
 # This defines the dependencies of this package
 set(deps lbfgs core ip measurer machine trainer) #other torch subprojects
 
-add_definitions(-DHAVE_LBFGS)
-add_definitions(-DUSE_SSE)
-
 # This defines the list of source files inside this package.
 set(src_scanning
    "src/Pattern.cc"
