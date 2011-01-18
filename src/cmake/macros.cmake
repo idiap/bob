@@ -71,7 +71,7 @@ macro(torch_test package name src)
   # Please note we don't install test executables
   add_executable(${testname} ${src})
   target_link_libraries(${testname} torch_${package})
-  target_link_libraries(${testname} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+  target_link_libraries(${testname} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
   add_test(cxx-${package}-${name} ${testname} --log_level=test_suite)
 endmacro(torch_test package src)
 
@@ -160,7 +160,7 @@ function(torch_python_bindings package src)
       target_include_directories(${libname} ${CMAKE_CURRENT_BINARY_DIR}) 
     endif(ARGN)
     target_link_libraries(${libname} torch_${package})
-    target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY})
+    target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY_RELEASE})
     target_link_libraries(${libname} ${PYTHON_LIBRARIES})
 
     # Building associated PCHs
@@ -202,7 +202,7 @@ function(torch_python_submodule package subpackage src)
       target_include_directories(${libname} ${CMAKE_CURRENT_BINARY_DIR}) 
     endif(ARGN)
     target_link_libraries(${libname} torch_${package})
-    target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY})
+    target_link_libraries(${libname} ${Boost_PYTHON_LIBRARY_RELEASE})
     target_link_libraries(${libname} ${PYTHON_LIBRARIES})
 
     # Building associated PCHs
