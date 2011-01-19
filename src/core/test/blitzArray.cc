@@ -31,7 +31,7 @@ void checkBlitzAllocation( const int n_megabytes ) {
   // careful: use a 64 bit type to store the result)
   int64_t n_e = (int64_t)n_elems_first*(int64_t)n_elems_second;
 #if !(defined(__LP64__) || defined(__APPLE__))
-  BOOST_CHECK_(n_e != (int64_t)X.numElements() );
+  BOOST_CHECK(n_e != (int64_t)X.numElements() );
 #else
   BOOST_CHECK_EQUAL(n_e, (int64_t)X.numElements() );
 #endif
