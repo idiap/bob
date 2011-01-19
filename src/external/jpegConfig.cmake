@@ -8,3 +8,4 @@ include(FindJPEG)
 
 set(jpeg_INCLUDE_DIRS ${JPEG_INCLUDE_DIR} CACHE INTERNAL "incdirs")
 get_filename_component(jpeg_LIBRARY_DIRS ${JPEG_LIBRARY} PATH CACHE)
+add_definitions("-DHAVE_JPEG=1")

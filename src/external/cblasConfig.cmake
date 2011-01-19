@@ -22,6 +22,7 @@ set(cblas_LIBRARIES ${cblas_LIBRARIES} CACHE INTERNAL "libraries")
 
 if(cblas_INCLUDE AND lapack_INCLUDE AND cblas_LIBRARY AND lapack_LIBRARY)
   set(cblas_FOUND "YES" CACHE INTERNAL "package")
+  add_definitions("-DUSE_CBLAS=1")
 else(cblas_INCLUDE AND lapack_INCLUDE AND cblas_LIBRARY AND lapack_LIBRARY)
   # This will say why we have got to the conclusion to not have found "cblas"
   set(cblas_FOUND "NO")

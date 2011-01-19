@@ -146,6 +146,11 @@ def cmake(option):
       os.path.join(option.install_prefix, 'include')
   cmake_options['-DTORCH_LINKAGE'] = 'dynamic'
   if option.static_linkage: cmake_options['-DTORCH_LINKAGE'] = 'static'
+  if option.build_block == 'all':
+    cmake_options['-DTORCH_CXX'] = 'ON'
+    cmake_options['-DTORCH_PYTHON'] = 'ON'
+  else: 
+    cmake_options['-DTORCH_%s' % option.build_block.upper()] = 'ON'
   cmdline = ['cmake']
   if option.debug_build: cmdline.append('--debug-output')
   for k,v in cmake_options.iteritems(): cmdline.append('%s=%s' % (k, v))

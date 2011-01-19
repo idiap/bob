@@ -1,4 +1,4 @@
-project(sp)
+project(sp-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
@@ -14,19 +14,10 @@ set(src
     "src/spFCT.cc"
     "src/spDeltaOne.cc")
 
-include(../cmake/macros.cmake)
+include(../../cmake/macros.cmake)
 torch_library(sp "${src}" "${deps}" "")
+torch_header_install(sp "torch::sp")
 
 # Defines tests for this package
 torch_test(sp dftdct_naive test/dftdctnaive.cc)
 torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
-
-# Python bindings
-set(pysrc
-   "python/src/spcore.cc"
-   "python/src/transforms.cc"
-   "python/src/main.cc"
-   )
- 
-torch_python_bindings(sp "${pysrc}")
-torch_python_install(sp)

@@ -1,4 +1,4 @@
-PROJECT(ap)
+PROJECT(ap-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
@@ -10,5 +10,6 @@ SET(src
    "src/apMFCC.cc"
    "src/apLFCC.cc")
 
-include(../cmake/macros.cmake)
+include(../../cmake/macros.cmake)
 torch_library(ap "${src}" "${deps}" "${shared}")
+torch_header_install(ap "torch::ap")

@@ -1,4 +1,4 @@
-PROJECT(machine)
+PROJECT(machine-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
@@ -50,17 +50,6 @@ set(src
 	"${src_normalisations}"
 	"${src_boosting}")
 
-include(../cmake/macros.cmake)
+include(../../cmake/macros.cmake)
 torch_library(machine "${src}" "${deps}" "${shared}")
-
-# Python bindings
-set(pysrc
-   "python/src/main.cc"
-   "python/src/machine.cc"
-   "python/src/ProbabilityDistribution.cc"
-   "python/src/MultiVariateNormalDistribution.cc"
-   "python/src/MultiVariateDiagonalGaussianDistribution.cc"
-   )
- 
-torch_python_bindings(machine "${pysrc}")
-torch_python_install(machine)
+torch_header_install(machine "torch::machine")

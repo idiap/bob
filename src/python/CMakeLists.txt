@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 2.6)
 
 # Installs python top-level wrapper
 if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
+ 
+  # We need first to create the basic python targets before including the
+  # directories containing the python modules
   add_custom_target(torch-python-install ALL mkdir -p ${PYTHON_INSTALL_DIRECTORY} COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/torch ${PYTHON_INSTALL_DIRECTORY} COMMENT "Installing torch python files...")
   # Installs all python scripts
   file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
@@ -11,6 +14,12 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   # Compiles all installed python files
   add_custom_target(python-compilation ALL ${PYTHON_EXECUTABLE} -m compileall . 
     WORKING_DIRECTORY ${PYTHON_INSTALL_DIRECTORY} COMMENT "Compiling python files")
+
+  add_subdirectory(core)
+  add_subdirectory(ip)
+  add_subdirectory(machine)
+  add_subdirectory(scanning)
+  add_subdirectory(sp)
 
   include(../cmake/macros.cmake)
 

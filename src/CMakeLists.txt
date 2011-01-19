@@ -66,17 +66,15 @@ enable_testing()
 # This makes sure we have all headers within reach before starting to compile
 include_directories(${CMAKE_INSTALL_PREFIX}/include/torch)
 
-add_subdirectory(python)
-add_subdirectory(dfftpack41)
-add_subdirectory(lbfgs)
-add_subdirectory(core)
-add_subdirectory(sp)
-add_subdirectory(ap)
-add_subdirectory(ip)
-add_subdirectory(measurer)
-add_subdirectory(machine)
-add_subdirectory(scanning)
-add_subdirectory(trainer)
+# Some common definitions
+add_definitions("-DHAVE_LBFGS=1")
+
+if (TORCH_CXX)
+  add_subdirectory(cxx)
+endif (TORCH_CXX)
+if (TORCH_PYTHON)
+  add_subdirectory(python)
+endif (TORCH_PYTHON)
 
 install(EXPORT torch DESTINATION ${cmakedir})
 install(FILES cmake/torchConfig.cmake DESTINATION ${cmakedir})

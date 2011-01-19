@@ -1,11 +1,8 @@
-PROJECT(scanning)
+PROJECT(scanning-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps lbfgs core ip measurer machine trainer) #other torch subprojects
-
-add_definitions(-DHAVE_LBFGS)
-add_definitions(-DUSE_SSE)
 
 # This defines the list of source files inside this package.
 set(src_scanning
@@ -64,19 +61,6 @@ set(src
 	"${src_pruners}"
 	"${src_selectors}")
 
-include(../cmake/macros.cmake)
+include(../../cmake/macros.cmake)
 torch_library(scanning "${src}" "${deps}" "${shared}")
-
-# Python bindings
-set(pysrc
-   "python/src/explorer.cc"
-   "python/src/facefinder.cc"
-   "python/src/pattern.cc"
-   "python/src/scanner.cc"
-   "python/src/ipgeomnorm.cc"
-   "python/src/gtfile.cc"
-   "python/src/main.cc"
-   )
- 
-torch_python_bindings(scanning "${pysrc}")
-torch_python_install(scanning)
+torch_header_install(scanning "torch::scanning")
