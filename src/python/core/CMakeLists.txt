@@ -34,9 +34,7 @@ set(pysrc_array
    "src/array_float64_1.cc"
    "src/array_int32_1.cc"
    "src/array_uint32_1.cc"
-   #"src/array_float128_1.cc"
    "src/array_complex128_1.cc"
-   #"src/array_complex256_1.cc"
    "src/array_bool_2.cc"
    "src/array_int8_2.cc"
    "src/array_uint8_2.cc"
@@ -49,9 +47,7 @@ set(pysrc_array
    "src/array_float64_2.cc"
    "src/array_int32_2.cc"
    "src/array_uint32_2.cc"
-   #"src/array_float128_2.cc"
    "src/array_complex128_2.cc"
-   #"src/array_complex256_2.cc"
    "src/array_bool_3.cc"
    "src/array_int8_3.cc"
    "src/array_uint8_3.cc"
@@ -64,9 +60,7 @@ set(pysrc_array
    "src/array_float64_3.cc"
    "src/array_int32_3.cc"
    "src/array_uint32_3.cc"
-   #"src/array_float128_3.cc"
    "src/array_complex128_3.cc"
-   #"src/array_complex256_3.cc"
    "src/array_bool_4.cc"
    "src/array_int8_4.cc"
    "src/array_uint8_4.cc"
@@ -79,15 +73,13 @@ set(pysrc_array
    "src/array_float64_4.cc"
    "src/array_int32_4.cc"
    "src/array_uint32_4.cc"
-   #"src/array_float128_4.cc"
    "src/array_complex128_4.cc"
-   #"src/array_complex256_4.cc"
    "src/main_array.cc"
    )
 
 include(../../cmake/macros.cmake)
 
 torch_header_install(core "torch::python::core")
-torch_python_bindings(core "${pysrc}")
-torch_python_submodule(core array "${pysrc_array}")
+torch_python_package_bindings(core "${pysrc}")
+torch_python_submodule_bindings(core array "${pysrc_array}")
 torch_python_install(core)
