@@ -195,6 +195,16 @@ namespace Torch {
             m_shape[i] = shape[i];
         }
         /**
+         * @brief Update the shape of the Array with the one given in the
+         * blitz TinyVector.
+         */
+        template<int D> 
+        void setShape( const blitz::TinyVector<int,D>& shape ) {
+          m_n_dim = D;
+          for( int i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
+            m_shape[i] = ( i<D ? shape(i) : 0);
+        }
+        /**
          * @brief Set the number of elements in each array of this 
          * Arrayset
          */
@@ -239,6 +249,16 @@ namespace Torch {
          * Arrayset
          */
         const size_t* getShape() const { return m_shape; }
+        /**
+         * @brief Update the given blitz array with the content of the array
+         * of the provided id.
+         */
+        template<int D> void getShape( blitz::TinyVector<int,D>& res ) const {
+          if( D!=m_n_dim )
+            throw NDimensionError();
+          for( int i=0; i<D; ++i)
+            res[i] = m_shape[i];
+        }
         /**
          * @brief Get the number of elements in each array of this 
          * Arrayset
@@ -350,11 +370,6 @@ namespace Torch {
         template<typename T, int D> 
         void at(size_t id, blitz::Array<T,D>& output) const;
 
-        /**
-         * @brief Update the given blitz array with the content of the array
-         * of the provided id.
-         */
-        template<int D> void getShape( blitz::TinyVector<int,D>& res ) const;
 
       private:
         size_t m_id;
@@ -1376,13 +1391,6 @@ namespace Torch {
       }
     }
 
-
-    template<int D> 
-    void Arrayset::getShape( blitz::TinyVector<int,D>& res ) const {
-      const size_t *shape = getShape();
-      for( int i=0; i<D; ++i)
-        res[i] = shape[i];
-    }
 
     template<typename T, int D> void 
     Arrayset::at(size_t id, blitz::Array<T,D>& output) const {
