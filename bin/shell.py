@@ -24,6 +24,9 @@ if __name__ == '__main__':
       elif not os.environ.has_key(key):
         print "Key:", key
         print "=", new_environ[key]
+  if not os.path.exists(options.executable):
+    print "Aborting: '%s' cannot be executed" % options.executable
+    sys.exit(1)
   if options.verbose: print "Executing '%s'" % ' '.join(options.full_executable)
   retval = os.spawnvpe(os.P_WAIT, options.executable, options.full_executable, 
       new_environ)
