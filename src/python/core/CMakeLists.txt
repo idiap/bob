@@ -12,8 +12,6 @@ set(pysrc
    "src/profile.cc"
    "src/DataSet.cc"
    "src/ListDataSet.cc"
-   "src/Dataset2.cc"
-   "src/XMLParser.cc"
    "src/main.cc"
    )
  

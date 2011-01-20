@@ -6,6 +6,7 @@ set(pysrc
    "src/array.cc"
    "src/arrayset.cc"
    "src/dataset.cc"
+   "src/xmlparser.cc"
    "src/main.cc"
    )
  
