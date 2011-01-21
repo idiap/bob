@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/XMLParser.h
+ * @file cxx/src/core/core/XMLParser.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *
