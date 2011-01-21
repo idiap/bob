@@ -36,8 +36,8 @@ def parse_args():
   default_doc_prefix = os.path.join('share', 'doc')
   default_build_prefix = os.path.join(pwd, 'build')
   sources = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
-  default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'Doxyfile')
   sources = os.path.join(sources, 'src')
+  default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'Doxyfile')
 
   #our gigantic list of options...
   parser = optparse.OptionParser(description=__doc__)
