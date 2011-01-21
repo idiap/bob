@@ -116,16 +116,14 @@ namespace Torch {
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::name);
       dataset.setName( ( (str!=0?(const char *)str:"") ) );
-      if( dataset.getName().compare(""))
-        std::cout << "Name: " << dataset.getName() << std::endl;
+      TDEBUG3("Name: " << dataset.getName());
       xmlFree(str);
 
       // 2/ Parse version 
       str = xmlGetProp(cur, (const xmlChar*)db::version);
       dataset.setVersion( str!=0 ? 
         boost::lexical_cast<size_t>((const char *)str) : 0 );
-      if( dataset.getVersion() != 0 )
-        std::cout << "Version: " << dataset.getVersion() << std::endl;
+      TDEBUG3("Version: " << dataset.getVersion());
       xmlFree(str);
 
       // 3/ Parse date
@@ -149,14 +147,13 @@ namespace Torch {
       // High-level checks (which can not be done by libxml2)
       if( check_level>= 1)
       {
-        std::cout << std::endl << "HIGH-LEVEL CHECKS" << std::endl;
+        TDEBUG3(std::endl << "HIGH-LEVEL CHECKS");
         // Iterate over the relationsets
         for( Dataset::relationset_const_iterator 
           relationset = dataset.relationset_begin();
           relationset != dataset.relationset_end(); ++relationset )
         {
-          std::cout << "Relationset name: " << 
-            relationset->second->getName() << std::endl;
+          TDEBUG3("Relationset name: " << relationset->second->getName()); 
 
           // Check that the rules are correct.
           //   (arrayset-role refers to an existing string role)
@@ -164,8 +161,7 @@ namespace Torch {
             rule = relationset->second->rule_begin();
             rule != relationset->second->rule_end(); ++rule )
           {
-            std::cout << "Rule role: " << 
-              rule->second->getArraysetRole() << std::endl;
+            TDEBUG3("Rule role: " << rule->second->getArraysetRole()); 
             bool found = false;
             for( Dataset::const_iterator arrayset = dataset.begin(); 
               arrayset != dataset.end(); ++arrayset )
@@ -190,8 +186,7 @@ namespace Torch {
             relation = relationset->second->begin();
             relation != relationset->second->end(); ++relation )
           {
-            std::cout << "Relation id: " << relation->second->getId() << 
-              std::endl;
+            TDEBUG3("Relation id: " << relation->second->getId()); 
 
             // Check that for each rule in the relationset, the multiplicity
             // of the members is correct.
@@ -199,26 +194,22 @@ namespace Torch {
               rule = relationset->second->rule_begin();
               rule != relationset->second->rule_end(); ++rule )
             {
-              std::cout << "Rule id: " << rule->second->getArraysetRole() << 
-                std::endl;
+              TDEBUG3("Rule id: " << rule->second->getArraysetRole());
 
               size_t counter = 0;
               bool check_ok = true;
               for( Relation::const_iterator member = relation->second->begin();
                 member != relation->second->end(); ++member )
               {
-                std::cout << "  Member ids: " << member->second->getArrayId()
-                  << "," << member->second->getArraysetId() << std::endl;
-                std::cout << "  " << 
-                  (*m_id_role)[member->second->getArraysetId()] << std::endl;
-                std::cout << "  " << rule->second->getArraysetRole() << 
-                  std::endl;
+                TDEBUG3("  Member ids: " << member->second->getArrayId()
+                  << "," << member->second->getArraysetId());
+                TDEBUG3("  " << (*m_id_role)[member->second->getArraysetId()]);
+                TDEBUG3("  " << rule->second->getArraysetRole() << std::endl);
 
                 if( !(*m_id_role)[member->second->getArraysetId()].compare( 
                   rule->second->getArraysetRole() ) )
                 {
-                  std::cout << "  Array id: " << member->second->getArrayId()
-                    << std::endl;
+                  TDEBUG3("  Array id: " << member->second->getArrayId());
                   if( member->second->getArrayId()!=0 )
                     ++counter;
                   else // Arrayset-member
@@ -237,7 +228,7 @@ namespace Torch {
                 }
               }
 
-              std::cout << "  Counter: " << counter << std::endl;
+              TDEBUG3("  Counter: " << counter);
               if( check_ok && ( counter<rule->second->getMin() || 
                 (rule->second->getMax()!=0 && counter>rule->second->getMax()) ) )
               {
@@ -255,16 +246,15 @@ namespace Torch {
             for( Relation::const_iterator member = relation->second->begin();
               member != relation->second->end(); ++member )
             {
-              std::cout << "  Member ids: " << member->second->getArrayId() <<
-                "," << member->second->getArraysetId() << std::endl;
+              TDEBUG3("  Member ids: " << member->second->getArrayId() <<
+                "," << member->second->getArraysetId());
 
               bool found = false;
               for( Relationset::rule_const_iterator 
                 rule = relationset->second->rule_begin();
                 rule != relationset->second->rule_end(); ++rule )
               {
-                std::cout << "Rule id: " << rule->second->getArraysetRole() << 
-                  std::endl;
+                TDEBUG3("Rule id: " << rule->second->getArraysetRole()); 
                 if( !(*m_id_role)[member->second->getArraysetId()].compare(
                   rule->second->getArraysetRole() ) )
                 {
@@ -288,13 +278,15 @@ namespace Torch {
     }
 
 
-    boost::shared_ptr<Relationset> XMLParser::parseRelationset(const xmlNodePtr cur) {
+    boost::shared_ptr<Relationset> 
+    XMLParser::parseRelationset(const xmlNodePtr cur) 
+    {
       boost::shared_ptr<Relationset> relationset(new Relationset());
       // Parse name
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::name);
       relationset->setName( ( (str!=0?(const char *)str:"") ) );
-      std::cout << "Name: " << relationset->getName() << std::endl;
+      TDEBUG3("Name: " << relationset->getName());
       xmlFree(str);
       
       // Parse the relations and rules
@@ -319,19 +311,19 @@ namespace Torch {
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::arrayset_role);
       rule->setArraysetRole( ( (str!=0?(const char *)str:"") ) );
-      std::cout << "  Arrayset-role: " << rule->getArraysetRole() << std::endl;
+      TDEBUG3("  Arrayset-role: " << rule->getArraysetRole());
       xmlFree(str);
       
       // Parse min
       str = xmlGetProp(cur, (const xmlChar*)db::min);
       rule->setMin(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      std::cout << "  Min: " << rule->getMin() << std::endl;
+      TDEBUG3("  Min: " << rule->getMin());
       xmlFree(str);
 
       // Parse max
       str = xmlGetProp(cur, (const xmlChar*)db::max);
       rule->setMax(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      std::cout << "  Max: " << rule->getMax() << std::endl;
+      TDEBUG3("  Max: " << rule->getMax());
       xmlFree(str);
 
       return rule;
@@ -344,7 +336,7 @@ namespace Torch {
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
       relation->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      std::cout << "  Id: " << relation->getId() << std::endl;
+      TDEBUG3("  Id: " << relation->getId());
       xmlFree(str);
 
       // Parse the members
@@ -367,13 +359,13 @@ namespace Torch {
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::array_id);
       member->setArrayId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      std::cout << "    Array-id: " << member->getArrayId() << std::endl;
+      TDEBUG3("    Array-id: " << member->getArrayId());
       xmlFree(str);
 
       // Parse arrayset-id
       str = xmlGetProp(cur, (const xmlChar*)db::arrayset_id);
       member->setArraysetId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      std::cout << "    Arrayset-id: " << member->getArraysetId() << std::endl;
+      TDEBUG3("    Arrayset-id: " << member->getArraysetId());
       xmlFree(str);
 
       return member;
@@ -386,13 +378,13 @@ namespace Torch {
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
       arrayset->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      std::cout << "Id: " << arrayset->getId() << std::endl;
+      TDEBUG3("Id: " << arrayset->getId());
       xmlFree(str);
 
       // Parse role
       str = xmlGetProp(cur, (const xmlChar*)db::role);
       arrayset->setRole( ( (str!=0?(const char *)str:"") ) );
-      std::cout << "Role: " << arrayset->getRole() << std::endl;
+      TDEBUG3("Role: " << arrayset->getRole());
       xmlFree(str);
 
       // Add id-role to the mapping of the XMLParser. This will be used for
@@ -440,7 +432,7 @@ namespace Torch {
         arrayset->setArrayType( array::t_complex256 );
       else
         arrayset->setArrayType( array::t_unknown );
-      std::cout << "Elementtype: " << arrayset->getArrayType() << std::endl;
+      TDEBUG3("Elementtype: " << arrayset->getArrayType());
       xmlFree(str);
 
       // Parse shape
@@ -470,10 +462,10 @@ namespace Torch {
       }
       arrayset->setNDim(count);
       arrayset->setShape(shape);
-      std::cout << "Nb dimensions: " << arrayset->getNDim() << std::endl;
-      std::cout << "Shape: (" << arrayset->getShape()[0] << "," << 
+      TDEBUG3("Nb dimensions: " << arrayset->getNDim());
+      TDEBUG3("Shape: (" << arrayset->getShape()[0] << "," << 
         arrayset->getShape()[1] << ","<< arrayset->getShape()[2] << "," << 
-        arrayset->getShape()[3] << ")" << std::endl;
+        arrayset->getShape()[3] << ")");
       xmlFree(str);
       // Set the number of elements
       size_t n_elem = arrayset->getShape()[0];
@@ -492,13 +484,13 @@ namespace Torch {
         arrayset->setLoader( l_bindata );
       else 
         arrayset->setLoader( l_unknown );
-      std::cout << "Loader: " << arrayset->getLoader() << std::endl;
+      TDEBUG3("Loader: " << arrayset->getLoader());
       xmlFree(str);
 
       // Parse filename
       str = xmlGetProp(cur, (const xmlChar*)db::file);
       arrayset->setFilename( (str!=0?(const char*)str:"") );
-      std::cout << "File: " << arrayset->getFilename() << std::endl;
+      TDEBUG3("File: " << arrayset->getFilename());
       xmlFree(str);
 
       if( !arrayset->getFilename().compare("") )
@@ -530,7 +522,7 @@ namespace Torch {
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
       array->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      std::cout << "  Array Id: " << array->getId() << std::endl;
+      TDEBUG3("  Array Id: " << array->getId());
       xmlFree(str);
 
       // Parse loader
@@ -544,13 +536,13 @@ namespace Torch {
         array->setLoader( l_bindata );
       else 
         array->setLoader( l_unknown );
-      std::cout << "  Array Loader: " << array->getLoader() << std::endl;
+      TDEBUG3("  Array Loader: " << array->getLoader());
       xmlFree(str);
 
       // Parse filename
       str = xmlGetProp(cur, (const xmlChar*)db::file);
       array->setFilename( (str!=0?(const char*)str:"") );
-      std::cout << "  Array File: " << array->getFilename() << std::endl;
+      TDEBUG3("  Array File: " << array->getFilename());
       xmlFree(str);
 
       // Parse the data contained in the XML file

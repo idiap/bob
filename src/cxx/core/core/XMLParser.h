@@ -125,9 +125,8 @@ namespace Torch {
           it=tok.begin(); it!=tok.end(); ++it, ++count ) 
       {
         data_array[count] = boost::lexical_cast<T>(*it);
-        std::cout << data_array[count] << " ";
+        TDEBUG3(data_array[count]);
       }
-      std::cout << std::endl;
 
       if(count != nb_values) {
         Torch::core::error << "The number of values read (" << count <<

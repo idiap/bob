@@ -1,5 +1,5 @@
 /**
- * @file src/core/src/Dataset2.cc
+ * @file cxx/src/core/src/Dataset2.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implements the Dataset class.
@@ -16,7 +16,7 @@ namespace Torch {
       m_loader(l_unknown), m_storage(0) { }
 
     Array::~Array() {
-      std::cout << "Array destructor (id: " << getId() << ")" << std::endl;
+      TDEBUG3("Array destructor (id: " << getId() << ")");
       switch(m_parent_arrayset.getArrayType()) {
         case array::t_bool:
           delete [] static_cast<bool*>(m_storage); break;
@@ -63,7 +63,7 @@ namespace Torch {
     }
 
     Arrayset::~Arrayset() {
-      std::cout << "Arrayset destructor (id: " << getId() << ")" << std::endl;
+      TDEBUG3("Arrayset destructor (id: " << getId() << ")");
       for(iterator it=begin(); it!=end(); ++it)
         it->second.reset();
     }
@@ -105,7 +105,7 @@ namespace Torch {
       m_name("") { }
 
     Relationset::~Relationset() {
-      std::cout << "Relationset destructor (name: " << getName() << ")" << std::endl;
+      TDEBUG3("Relationset destructor (name: " << getName() << ")");
     }
 
     void Relationset::addRule( boost::shared_ptr<Rule> rule) {
@@ -140,7 +140,7 @@ namespace Torch {
       m_arraysetrole(""), m_min(1), m_max(1) { }
 
     Rule::~Rule() {
-      std::cout << "Rule destructor (Arrayset-role: " << getArraysetRole() << ")" << std::endl;
+      TDEBUG3("Rule destructor (Arrayset-role: " << getArraysetRole() << ")");
     }
 
 
@@ -150,7 +150,7 @@ namespace Torch {
     }
 
     Relation::~Relation() {
-      std::cout << "Relation destructor (id: " << getId() << ")" << std::endl;
+      TDEBUG3("Relation destructor (id: " << getId() << ")");
     }
 
     void Relation::addMember( boost::shared_ptr<Member> member) {
@@ -164,14 +164,15 @@ namespace Torch {
       m_array_id(0), m_arrayset_id(0) { }
 
     Member::~Member() {
-      std::cout << "Member destructor (id: " << getArrayId() << "-" << getArraysetId() << ")" << std::endl;
+      TDEBUG3("Member destructor (id: " << getArrayId() << "-" << 
+        getArraysetId() << ")");
     }
 
 
     Dataset::Dataset() { }
 
     Dataset::~Dataset() {
-      std::cout << "Dataset destructor" << std::endl;
+      TDEBUG3("Dataset destructor");
     }
 
     void Dataset::addArrayset( boost::shared_ptr<Arrayset> arrayset) {

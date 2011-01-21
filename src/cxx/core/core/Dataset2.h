@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/Dataset2.h
+ * @file cxx/src/core/core/Dataset2.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *
@@ -956,8 +956,8 @@ namespace Torch {
     void Array::copy( blitz::Array<T,D>& output) const 
     {
       if( D != m_parent_arrayset.getNDim() ) {
-        std::cout << "D=" << D << " -- ParseXML: D=" <<
-           m_parent_arrayset.getNDim() << std::endl;
+        TDEBUG3("D=" << D << " -- ParseXML: D=" << 
+          m_parent_arrayset.getNDim());
         error << "Cannot copy the data in a blitz array with a different " <<
           "number of dimensions." << std::endl;
         throw NDimensionError();
@@ -1027,8 +1027,8 @@ namespace Torch {
       }
 
       if( D != m_parent_arrayset.getNDim() ) {
-        std::cout << "D=" << D << " -- ParseXML: D=" <<
-           m_parent_arrayset.getNDim() << std::endl;
+        TDEBUG3("D=" << D << " -- ParseXML: D=" <<
+           m_parent_arrayset.getNDim());
         error << "Cannot refer to the data in a blitz array with a " <<
           "different number of dimensions." << std::endl;
         throw NDimensionError();
