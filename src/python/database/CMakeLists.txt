@@ -7,7 +7,11 @@ set(pysrc
    "src/arrayset.cc"
    "src/dataset.cc"
    "src/xmlparser.cc"
+   "src/member.cc"
+   "src/rule.cc"
    "src/main.cc"
+   "src/relation.cc"
+   "src/relationset.cc"
    )
  
 include(../../cmake/macros.cmake)
