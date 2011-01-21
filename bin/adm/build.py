@@ -82,7 +82,7 @@ def decrease_verbosity(option, opt, value, parser):
   logger.setLevel(LOGGING_LEVELS[next])
   CURRENT_LOGGING_LEVEL = next
 
-def run(cmd, log, dir, prefix):
+def run(cmd, log=False, dir=None, prefix=None):
   """Executes command 'cmd' on the shell. If 'log' is set, save the output on
   'dir/prefix.txt'.
 
@@ -125,11 +125,13 @@ def cmake(option):
   """
   logging.debug('Running cmake...')
   
-  if os.path.exists(option.build_prefix) and option.cleanup:
+  if os.path.exists(option.build_prefix) and hasattr(option, "cleanup") and \
+      option.cleanup:
     logging.debug('Removing build directory %s before build on user request' % option.build_prefix)
     shutil.rmtree(option.build_prefix)
 
-  if os.path.exists(option.install_prefix) and option.cleanup:
+  if os.path.exists(option.install_prefix) and hasattr(option, "cleanup") and \
+      option.cleanup:
     logging.debug('Removing install directory %s before build on user request' % option.install_prefix)
     shutil.rmtree(option.install_prefix)
 
@@ -139,7 +141,8 @@ def cmake(option):
 
   cmake_options = {}
   cmake_options['--graphviz'] = "dependencies.dot"
-  if option.force_32bits: cmake_options['-DTORCH_FORCE_32BITS'] = 'yes'
+  if hasattr(option, "force_32bits") and option.force_32bits: 
+    cmake_options['-DTORCH_FORCE_32BITS'] = 'yes'
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
   cmake_options['-DCMAKE_INSTALL_PREFIX'] = option.install_prefix
   cmake_options['-DINCLUDE_DIR'] = \
@@ -155,7 +158,10 @@ def cmake(option):
   if option.debug_build: cmdline.append('--debug-output')
   for k,v in cmake_options.iteritems(): cmdline.append('%s=%s' % (k, v))
   cmdline.append(option.source_dir)
-  status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  else:
+    status = run(cmdline)
   if status != 0:
     raise RuntimeError, '** ERROR: "cmake" did not work as expected.'
   logging.debug('Finished running cmake.')
@@ -175,7 +181,10 @@ def make(option, target="all"):
   else:
     cmdline.append('-j%d' % option.jobs)
   cmdline.append(target)
-  status = run(cmdline, option.save_output, option.log_prefix, cmdline[0]+'_'+target)
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0]+'_'+target)
+  else:
+    status = run(cmdline)
   if status != 0:
     raise RuntimeError, '** ERROR: "make %s" did not work as expected.' % target
   logging.debug('Finished running make %s.' % target)
@@ -192,7 +201,10 @@ def ctest(option):
   cmdline = ['ctest']
   if option.debug_build:
     cmdline.append('--verbose')
-  status = run(cmdline, option.save_output, option.log_prefix, 'make_test')
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, 'make_test')
+  else:
+    status = run(cmdline)
   if status != 0:
     raise RuntimeError, '** ERROR: "ctest" did not work as expected.'
   logging.debug('Finished running ctest.')
@@ -203,7 +215,8 @@ def doxygen(option):
 
   logging.debug('Running doxygen...')
 
-  if os.path.exists(option.doc_prefix) and option.cleanup:
+  if os.path.exists(option.doc_prefix) and hasattr(option, "cleanup") and \
+      option.cleanup:
     logging.debug('Removing directory %s before doxygen on user request' % \
         option.doc_prefix)
     shutil.rmtree(option.doc_prefix)
@@ -228,7 +241,10 @@ def doxygen(option):
   tmpfile.seek(0)
  
   cmdline = ['doxygen', tmpname]
-  status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  else:
+    status = run(cmdline)
   if status != 0:
     raise RuntimeError, '** ERROR: "doxygen" did not work as expected.'
   tmpfile.close()
@@ -258,7 +274,10 @@ def differences(option):
   cmd.append('log')
   cmd.append('--since="%s"' % start)
 
-  status = run(cmd, option.save_output, option.log_prefix, 'differences')
+  if hasattr(option, "log_prefix"):
+    status = run(cmd, option.save_output, option.log_prefix, 'differences')
+  else:
+    status = run(cmd)
   if status != 0:
     raise RuntimeError, '** ERROR: "git-log" did not work as expected.'
 
@@ -309,12 +328,15 @@ def dot(option):
 
   os.chdir(option.build_prefix)
   dotfile = 'dependencies.dot'
-  if option.save_output: 
+  if hasattr(option, "save_output") and option.save_output: 
     os.chdir(option.log_prefix)
     dotfile = os.path.join('..', dotfile)
 
   cmdline = ['dot', '-Tpng', dotfile, '-odependencies.png']
-  status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  else:
+    status = run(cmdline)
   if status != 0:
     raise RuntimeError, '** ERROR: "dot" did not work as expected.'
   logging.debug('Finished running dot.')
@@ -331,7 +353,7 @@ def platform(option):
   if arch == '32bit': arch = 'i686'
   elif arch == '64bit': arch = 'x86_64'
 
-  if option.force_32bits: 
+  if hasattr(option, "force_32bits") and option.force_32bits: 
     logging.warn("Forcing 32-bits compilation")
     arch = 'i686'
 

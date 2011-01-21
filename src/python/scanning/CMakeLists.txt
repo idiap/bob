@@ -13,5 +13,5 @@ set(pysrc
  
 include(../../cmake/macros.cmake)
 
-torch_python_bindings(scanning "${pysrc}")
+torch_python_package_bindings(scanning "${pysrc}")
 torch_python_install(scanning)
