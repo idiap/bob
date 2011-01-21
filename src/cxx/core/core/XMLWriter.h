@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/XMLWriter.h
+ * @file cxx/src/core/core/XMLWriter.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief An XML Writer for a Dataset
@@ -15,6 +15,7 @@
 #include <libxml/xmlwriter.h>
 
 #include <string>
+#include <sstream>
 
 #include "core/Dataset2.h"
 
@@ -53,12 +54,22 @@ namespace Torch {
          * @brief Return an XML node containing an Arrayset
          */
         xmlNodePtr writeArrayset( xmlDocPtr doc, const Arrayset& a, 
-          bool content_inline);
+          bool content_inline, int precision=10, bool scientific=false);
         /**
          * @brief Return an XML node containing an Array
          */
         xmlNodePtr writeArray( xmlDocPtr doc, const Array& a, 
-          bool content_inline);
+          bool content_inline, int precision=10, bool scientific=false);
+        /**
+         * @brief Write the (casted) data in the given stringstrean
+         */
+        template <typename T> void writeData( std::stringstream& content,
+          const T* data, size_t len) {
+          content << data[0];
+          for(size_t i=1; i<len; ++i)
+            content << " " << data[i];
+        }
+
         /**
          * @brief Return an XML node containing a Relationset
          */

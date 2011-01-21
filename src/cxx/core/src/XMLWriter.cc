@@ -1,5 +1,5 @@
 /**
- * @file src/core/src/XMLWriter.cc
+ * @file cxx/src/core/src/XMLWriter.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implements the XML writer for a dataset.
@@ -56,7 +56,7 @@ namespace Torch {
 
 
     xmlNodePtr XMLWriter::writeArrayset( xmlDocPtr doc, const Arrayset& a, 
-      bool content_inline) 
+      bool content_inline, int precision, bool scientific) 
     {
       // Create the Arrayset node
       xmlNodePtr arraysetnode; 
@@ -151,8 +151,8 @@ namespace Torch {
       for(Arrayset::const_iterator it=a.begin(); it!=a.end(); 
         ++it)
       {
-        xmlAddChild( arraysetnode, 
-          writeArray( doc, *it->second, content_inline) );
+        xmlAddChild( arraysetnode, writeArray( doc, *it->second, 
+          content_inline, precision, scientific) );
       }
 
       return arraysetnode;
@@ -160,7 +160,7 @@ namespace Torch {
 
 
     xmlNodePtr XMLWriter::writeArray( xmlDocPtr doc, const Array& a, 
-      bool content_inline) 
+      bool content_inline, int precision, bool scientific) 
     {
       // Create the Arrayset node
       xmlNodePtr arraynode; 
@@ -168,10 +168,82 @@ namespace Torch {
         arraynode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::external_array, 0);
       else {
-        std::string content;
-        // TODO: Write the array data into the content string
+        // Prepare the string stream
+        std::stringstream content;
+        content << std::setprecision(precision);
+        if( scientific)
+          content << std::scientific;
+
+        // Cast the data and call the writing function
+        switch(a.getParentArrayset().getArrayType()) {
+          case array::t_bool:
+            writeData( content, 
+              reinterpret_cast<const bool*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_int8:
+            writeData( content, 
+              reinterpret_cast<const int8_t*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_int16:
+            writeData( content, 
+              reinterpret_cast<const int16_t*>(a.getStorage()),
+              a.getParentArrayset().getNElem()); break;
+          case array::t_int32:
+            writeData( content, 
+              reinterpret_cast<const int32_t*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_int64:
+            writeData( content, 
+              reinterpret_cast<const int64_t*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_uint8:
+            writeData( content, 
+              reinterpret_cast<const uint8_t*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_uint16:
+            writeData( content, 
+              reinterpret_cast<const uint16_t*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_uint32:
+            writeData( content, 
+              reinterpret_cast<const uint32_t*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_uint64:
+            writeData( content, 
+              reinterpret_cast<const uint64_t*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_float32:
+            writeData( content, 
+              reinterpret_cast<const float*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_float64:
+            writeData( content, 
+              reinterpret_cast<const double*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_float128:
+            writeData( content, 
+              reinterpret_cast<const long double*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_complex64:
+            writeData( content, 
+              reinterpret_cast<const std::complex<float>*>(a.getStorage()), 
+              a.getParentArrayset().getNElem()); break;
+          case array::t_complex128:
+            writeData( content, 
+              reinterpret_cast<const std::complex<double>*>(a.getStorage()),
+              a.getParentArrayset().getNElem()); break;
+          case array::t_complex256:
+            writeData( content, 
+              reinterpret_cast<const std::complex<long double>*>(
+              a.getStorage()), a.getParentArrayset().getNElem()); break;
+          default:
+            throw Exception();
+            break;
+        }
+ 
+        TDEBUG3("Inline content: " << content.str());
         arraynode = xmlNewDocNode(doc, 0, (const xmlChar*)db::array, 
-          (const xmlChar*)content.c_str());
+          (const xmlChar*)(content.str().c_str()));
       }
 
       // Write id attribute
