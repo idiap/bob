@@ -1,5 +1,5 @@
 /**
- * @file src/scanning/python/src/pattern.cc
+ * @file src/python/scanning/src/pattern.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the Pattern objects to python

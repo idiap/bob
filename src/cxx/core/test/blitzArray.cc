@@ -1,5 +1,5 @@
 /**
- * @file src/core/test/blitzArray.cc
+ * @file src/cxx/core/test/blitzArray.cc
  * @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *

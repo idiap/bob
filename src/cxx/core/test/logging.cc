@@ -1,5 +1,5 @@
 /**
- * @file src/core/test/logging.cc
+ * @file src/cxx/core/test/logging.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Multiple C++ tests for the logging infrastructure.

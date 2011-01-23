@@ -1,5 +1,5 @@
 /**
- * @file src/ip/src/VideoTensor.cc
+ * @file src/cxx/ip/src/VideoTensor.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Implements the VideoTensor methods

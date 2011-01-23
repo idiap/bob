@@ -1,5 +1,5 @@
 /**
- * @file src/core/src/Tensor.cc 
+ * @file src/cxx/core/src/Tensor.cc 
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El-Shafey</a> 
  *

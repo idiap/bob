@@ -1,5 +1,5 @@
 /**
- * @file src/sp/python/src/transforms.cc 
+ * @file src/python/sp/src/transforms.cc 
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *

@@ -1,5 +1,5 @@
 /**
- * @file src/core/python/src/object.cc
+ * @file src/python/core/src/object.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the Core object type into python 

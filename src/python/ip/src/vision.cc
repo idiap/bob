@@ -1,5 +1,5 @@
 /**
- * @file src/ip/python/src/vision.cc
+ * @file src/python/ip/src/vision.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Geometric constructions from vision.h 

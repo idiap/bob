@@ -1,5 +1,5 @@
 /**
- * @file cxx/src/core/core/XMLWriter.h
+ * @file src/cxx/core/core/XMLWriter.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief An XML Writer for a Dataset

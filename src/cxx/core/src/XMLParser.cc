@@ -1,5 +1,5 @@
 /**
- * @file cxx/src/core/src/XMLParser.cc
+ * @file src/cxx/core/src/XMLParser.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implements the XML parser for a dataset.

@@ -1,5 +1,5 @@
 /**
- * @file src/scanning/python/src/facefinder.cc
+ * @file src/python/scanning/src/facefinder.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the FaceFinder to python

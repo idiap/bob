@@ -1,5 +1,5 @@
 /**
- * @file src/core/src/blitz_misc.cc
+ * @file src/cxx/core/src/blitz_misc.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file contains miscellaneous additions for blitz++ arrays

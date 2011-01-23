@@ -1,5 +1,5 @@
 /**
- * @file src/ip/python/src/color.cc 
+ * @file src/python/ip/src/color.cc 
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds Color to python 

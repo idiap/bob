@@ -1,5 +1,5 @@
 /**
- * @file src/core/python/src/DataSet.cc
+ * @file src/python/core/src/DataSet.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  * @author <a href="mailto:niklas.johansson@idiap.ch">Niklas Johansson</a>
  *

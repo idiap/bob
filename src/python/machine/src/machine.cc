@@ -1,5 +1,5 @@
 /**
- * @file src/machine/python/src/machine.cc
+ * @file src/python/machine/src/machine.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  * @author <a href="mailto:niklas.johansson@idiap.ch">Niklas Johansson</a> 
  *

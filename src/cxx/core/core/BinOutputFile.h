@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/BinOutputFile.h
+ * @file src/cxx/core/core/BinOutputFile.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class can be used to store multiarrays into files.

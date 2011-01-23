@@ -1,5 +1,5 @@
 /**
- * @file src/ip/python/src/image.cc
+ * @file src/python/ip/src/image.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the Video framework to python

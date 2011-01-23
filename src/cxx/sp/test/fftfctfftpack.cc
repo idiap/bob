@@ -1,5 +1,5 @@
 /**
- * @file src/sp/test/fftfctfftpack.cc
+ * @file src/cxx/sp/test/fftfctfftpack.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Compare FFT and FCT based on FFTPACK with naive DFT DCT 

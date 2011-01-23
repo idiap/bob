@@ -1,5 +1,5 @@
 /**
- * @file src/ip/ip/ipLBPTopOperator.h
+ * @file src/cxx/ip/ip/ipLBPTopOperator.h
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief This class can be used to calculate the LBP-Top  of a set of image

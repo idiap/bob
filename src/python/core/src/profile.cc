@@ -1,5 +1,5 @@
 /**
- * @file src/core/python/src/profile.cc
+ * @file src/python/core/src/profile.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the Google profiler into python 

@@ -1,5 +1,5 @@
 /**
- * @file src/ip/ip/VideoTensor.h
+ * @file src/cxx/ip/ip/VideoTensor.h
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief As an Image, VideoTensor represents a Video object as a Tensor and

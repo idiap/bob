@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/BinFileHeader.h
+ * @file src/cxx/core/core/BinFileHeader.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class defines an header for storing multiarrays into

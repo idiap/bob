@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/array_common.h
+ * @file src/cxx/core/core/array_common.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file contains information about the supported arrays

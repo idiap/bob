@@ -1,5 +1,5 @@
 /**
- * @file src/core/python/src/tensorfile.cc
+ * @file src/python/core/src/tensorfile.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds the TensorFile object type into python 

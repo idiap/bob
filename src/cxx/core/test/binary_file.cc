@@ -1,5 +1,5 @@
 /**
- * @file src/core/test/binary_file.cc
+ * @file src/cxx/core/test/binary_file.cc
  * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief BinOutputFile tests

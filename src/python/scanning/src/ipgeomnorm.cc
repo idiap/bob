@@ -1,5 +1,5 @@
 /**
- * @file src/scanning/python/src/ipgeomnorm.cc 
+ * @file src/python/scanning/src/ipgeomnorm.cc 
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds ipGeomNorm to python 

@@ -1,5 +1,5 @@
 /**
- * @file src/core/python/src/main.cc 
+ * @file src/python/core/src/main.cc 
  * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
  *
  * @brief Combines all modules to make up the complete bindings

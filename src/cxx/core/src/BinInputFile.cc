@@ -1,5 +1,5 @@
 /**
- * @file src/core/src/BinInputFile.cc
+ * @file src/cxx/core/src/BinInputFile.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class can be used to load multiarrays from files.

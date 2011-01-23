@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/dataset_common.h
+ * @file src/cxx/core/core/dataset_common.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file contains standard definitions for the Dataset 

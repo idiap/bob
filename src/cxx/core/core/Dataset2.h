@@ -1,5 +1,5 @@
 /**
- * @file cxx/src/core/core/Dataset2.h
+ * @file src/cxx/core/core/Dataset2.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *

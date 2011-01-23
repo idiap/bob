@@ -1,5 +1,5 @@
 /**
- * @file src/core/python/src/logging.cc
+ * @file src/python/core/src/logging.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Bindings to re-inject C++ messages into the Python logging module

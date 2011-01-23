@@ -1,5 +1,5 @@
 /**
- * @file src/core/python/src/tinyvector.cc
+ * @file src/python/core/src/tinyvector.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Automatic converters to-from python for blitz::TinyVectors

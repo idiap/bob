@@ -1,5 +1,5 @@
 /**
- * @file src/core/src/BinOutputFile.cc
+ * @file src/cxx/core/src/BinOutputFile.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class can be used to store multiarrays into files.

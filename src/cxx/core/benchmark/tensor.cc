@@ -1,5 +1,5 @@
 /**
- * @file src/core/benchmark/tensor.cc
+ * @file src/cxx/core/benchmark/tensor.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Extensive Tensor benchmark tests 

@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/StaticComplexCast.h
+ * @file src/cxx/core/core/StaticComplexCast.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines functions which add std::complex support to the 

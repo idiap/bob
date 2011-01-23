@@ -1,5 +1,5 @@
 /**
- * @file cxx/src/core/src/Dataset2.cc
+ * @file src/cxx/core/src/Dataset2.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implements the Dataset class.

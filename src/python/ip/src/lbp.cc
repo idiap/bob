@@ -1,5 +1,5 @@
 /**
- * @file src/ip/python/src/lbp.cc
+ * @file src/python/ip/src/lbp.cc
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Binds all LBP constructions into python

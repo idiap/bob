@@ -1,5 +1,5 @@
 /**
- * @file src/core/src/dataset_common.cc
+ * @file src/cxx/core/src/dataset_common.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines const string for the Dataset implementation

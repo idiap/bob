@@ -1,5 +1,5 @@
 /**
- * @file src/core/core/BinInputFile.h
+ * @file src/cxx/core/core/BinInputFile.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class can be used to load multiarrays from binary files.

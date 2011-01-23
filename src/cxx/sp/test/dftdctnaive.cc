@@ -1,5 +1,5 @@
 /**
- * @file src/sp/test/dftdctnaive.cc
+ * @file src/cxx/sp/test/dftdctnaive.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Compare naive DFT and DCT with some values returned by Matlab
