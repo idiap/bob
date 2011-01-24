@@ -13,10 +13,10 @@ using namespace boost::python;
 namespace db = Torch::core;
 
 static const char* ARRAY_COPY_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the underlying array and copies the data in it.";
-#define ARRAY_COPY_DEF(T,D) .def("copy", &db::Array::copy<T,D>, (arg("self"), arg("array")), ARRAY_COPY_DOC)
+#define ARRAY_COPY_DEF(T,D) .def("bzcopy", &db::Array::copy<T,D>, (arg("self"), arg("array")), ARRAY_COPY_DOC)
 
 static const char* ARRAY_REFER_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the underlying array and refers to the data in it. WARNING: Updating the content of the blitz array will update the content of the corresponding array in the dataset. Use this method with care!";
-#define ARRAY_REFER_DEF(T,D) .def("refer", (void (db::Array::*)(blitz::Array<T,D>&) const)&db::Array::refer<D>, (arg("self"), arg("array")), ARRAY_REFER_DOC)
+#define ARRAY_REFER_DEF(T,D) .def("bzrefer", (void (db::Array::*)(blitz::Array<T,D>&) const)&db::Array::refer<D>, (arg("self"), arg("array")), ARRAY_REFER_DOC)
 
 static const char* get_filename(db::Array& a) {
   return a.getFilename().c_str();
