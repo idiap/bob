@@ -103,9 +103,7 @@ void bind_database_arrayset() {
     .add_property("filename", &get_filename, &set_filename)
     .add_property("arrayType", &db::Arrayset::getArrayType, &db::Arrayset::setArrayType, "This property indicates the type of element used for each array in the current set.")
     .add_property("arrays", &get_arrays, "Iterable over all arrays in this set")
-    .add_property("arrayIds", &get_array_ids)
     .def("__len__", &db::Arrayset::getNArrays, "The number of arrays stored in this set.")
     //TODO: Missing __delitem__, __setitem__
-    .def("__getitem__", &db::Arrayset::getArray)
     ;
 }

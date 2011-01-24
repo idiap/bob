@@ -20,10 +20,9 @@ static tuple get_members(const db::Relation& r) {
   }
   return tuple(l);
 }
-
-static tuple get_members_with_role(const db::Relation& r, const char* role=0) {
+static tuple get_members_with_role(db::Relation& r, const char* role) {
   list l;
-  for (db::Relation::const_iterator_b it=r.begin(role); it!=r.end(role); ++it) {
+  for (db::Relation::iterator_b it=r.begin(role); it!=r.end(role); ++it) {
     l.append(it->second);
   }
   return tuple(l);
@@ -34,6 +33,6 @@ void bind_database_relation() {
     .def("addMember", &db::Relation::addMember, (arg("self"), arg("member")), "Adds a new member to this relation")
     .add_property("id", &db::Relation::getId, &db::Relation::setId)
     .add_property("members", &get_members, "All members of this Relation")
-    .def("getMembersWithRole", &get_members_with_role, (arg("self"), arg("role")), "Returns all members with a certain role in this relation")
+    .def("membersWithRole", &get_members_with_role, (arg("self"), arg("role")), "Returns all members with a certain role in this relation")
     ;
 }

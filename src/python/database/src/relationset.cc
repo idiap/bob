@@ -59,10 +59,8 @@ void bind_database_relationset() {
     .def("addRelation", &db::Relationset::addRelation)
     .def("addRule", &db::Relationset::addRule)
     .add_property("name", &get_name, &set_name)
-    .def("relationIds", &get_relation_ids, "All Relation id's in this Relationset")    
-    .def("relations", &get_relations, "All Relation's in this Relationset")    
-    .def("roles", &get_roles, "All roles described in this Relationset")
-    .def("rules", &get_rules, "All rules described in this Relationset")
-    .def("__getitem__", &db::Relationset::getRelation)
+    .add_property("relations", &get_relations, "All Relation's in this Relationset")    
+    .add_property("roles", &get_roles, "All roles described in this Relationset")
+    .add_property("rules", &get_rules, "All rules described in this Relationset")
     ;
 }

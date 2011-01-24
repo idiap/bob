@@ -11,7 +11,6 @@ using namespace boost::python;
 void bind_database_array();
 void bind_database_arrayset();
 void bind_database_dataset();
-void bind_database_xmlparser();
 void bind_database_member();
 void bind_database_rule();
 void bind_database_relation();
@@ -22,7 +21,6 @@ BOOST_PYTHON_MODULE(libpytorch_database) {
   bind_database_array();
   bind_database_arrayset();
   bind_database_dataset();
-  bind_database_xmlparser();
   bind_database_member();
   bind_database_rule();
   bind_database_relation();

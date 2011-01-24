@@ -35,7 +35,7 @@ static tuple get_arrayset_ids(const db::Dataset& ds) {
   for(db::Dataset::const_iterator it=ds.begin(); it!=ds.end(); ++it) {
     l.append(it->first);
   }
-  return make_tuple(l);
+  return tuple(l);
 }
 
 static tuple get_arraysets(const db::Dataset& ds) {
@@ -43,7 +43,7 @@ static tuple get_arraysets(const db::Dataset& ds) {
   for(db::Dataset::const_iterator it=ds.begin(); it!=ds.end(); ++it) {
     l.append(it->second);
   }
-  return make_tuple(l);
+  return tuple(l);
 }
 
 static tuple get_relationset_names(const db::Dataset& ds) {
@@ -51,7 +51,7 @@ static tuple get_relationset_names(const db::Dataset& ds) {
   for(db::Dataset::relationset_const_iterator it=ds.relationset_begin(); it!=ds.relationset_end(); ++it) {
     l.append(it->first);
   }
-  return make_tuple(l);
+  return tuple(l);
 }
 
 static tuple get_relationsets(const db::Dataset& ds) {
@@ -59,7 +59,7 @@ static tuple get_relationsets(const db::Dataset& ds) {
   for(db::Dataset::relationset_const_iterator it=ds.relationset_begin(); it!=ds.relationset_end(); ++it) {
     l.append(it->second);
   }
-  return make_tuple(l);
+  return tuple(l);
 }
 
 void bind_database_dataset() {
@@ -68,12 +68,8 @@ void bind_database_dataset() {
     .add_property("name", &get_name, &set_name, "The name of this Dataset")
     .add_property("version", &db::Dataset::getVersion, &db::Dataset::setVersion, "The version of this Dataset")
     .add_property("arraysets", &get_arraysets, "All Arraysets of this Dataset")
-    .add_property("arraysetIds", &get_arrayset_ids, "The ids of all Arrayset's in this Dataset")
-    .def("arrayset", &db::Dataset::getArrayset, (arg("id")), "Returns a single Arrayset given its identifier")
     .add_property("relationsets", &get_relationsets, "All Relationsets of this Dataset")
-    .add_property("relationsetNames", &get_relationset_names, "The names of all Relationset's in this Dataset")
-    .def("relationset", &db::Dataset::getRelationset, (arg("name")), "Returns a single Relationset given its name")
     ;
 
-  def("loadxml", &loadxml, (arg("path")), "Loads a local Dataset stored in an XML file");
+  def("__load_local_xml__", &loadxml, (arg("path")), "Loads a local Dataset stored in an XML file");
 }
