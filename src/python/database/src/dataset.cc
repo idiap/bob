@@ -71,8 +71,8 @@ static tuple get_relationsets(const db::Dataset& ds) {
 void bind_database_dataset() {
   class_<db::Dataset, boost::shared_ptr<db::Dataset> >("Dataset", "Datasets represent lists of Arraysets and Relationsets that are bound together to form a homegeneous database description.", init<>("Initializes a new, empty dataset"))
     .def("__init__", make_constructor(dataset_from_xml))
-    .def("append", &db::Dataset::addArrayset, (arg("self"), arg("arrayset")), "Adds an arrayset to this dataset")
-    .def("append", &db::Dataset::addRelationset, (arg("self"), arg("relationset")), "Adds a relationset to this dataset")
+    .def("append", (void (db::Dataset::*)(boost::shared_ptr<db::Arrayset>))&db::Dataset::append, (arg("self"), arg("arrayset")), "Adds an arrayset to this dataset")
+    .def("append", (void (db::Dataset::*)(boost::shared_ptr<db::Relationset>))&db::Dataset::append, (arg("self"), arg("relationset")), "Adds a relationset to this dataset")
     .def("__getitem__", (boost::shared_ptr<db::Arrayset> (db::Dataset::*)(const size_t))&db::Dataset::getArrayset, (arg("self"), arg("arrayset_id")), "Returns the Arrayset given its arrayset-id")
     .def("__getitem__", (boost::shared_ptr<db::Relationset> (db::Dataset::*)(const std::string&))&db::Dataset::getRelationset, (arg("self"), arg("relationset_name")), "Returns the Relationset given its relationset-name")
     .add_property("name", &get_name, &set_name, "The name of this Dataset")

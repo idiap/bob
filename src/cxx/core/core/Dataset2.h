@@ -175,7 +175,7 @@ namespace Torch {
         /**
          * @brief Add an Array to the Arrayset
          */
-        void addArray( boost::shared_ptr<Array> array);
+        void append( boost::shared_ptr<Array> array);
 
         /**
          * @brief Set the id of the Arrayset
@@ -446,7 +446,7 @@ namespace Torch {
         /**
          * @brief Add a member to the Relation
          */
-        void addMember( boost::shared_ptr<Member> member);
+        void append( boost::shared_ptr<Member> member);
 
         /**
          * @brief Set the id for this relation
@@ -701,12 +701,12 @@ namespace Torch {
         /**
          * @brief Add a Relation to the Relationset
          */
-        void addRelation( boost::shared_ptr<Relation> relation);
+        void append( boost::shared_ptr<Relation> relation);
 
         /**
          * @brief Add a Rule to the Relationset
          */
-        void addRule( boost::shared_ptr<Rule> rule);
+        void append( boost::shared_ptr<Rule> rule);
 
         /**
          * @brief Get the name of this Relationset
@@ -830,7 +830,7 @@ namespace Torch {
         /**
          * @brief Add an Arrayset to the Dataset
          */
-        void addArrayset( boost::shared_ptr<Arrayset> arrayset);
+        void append( boost::shared_ptr<Arrayset> arrayset);
 
         /**
          * @brief Get the name of the Dataset
@@ -899,7 +899,7 @@ namespace Torch {
         /**
          * @brief Add a Relationset to the Dataset
          */
-        void addRelationset( boost::shared_ptr<Relationset> relationset);
+        void append( boost::shared_ptr<Relationset> relationset);
 
         /**
          * @brief const_iterator over the Relationsets of the Dataset

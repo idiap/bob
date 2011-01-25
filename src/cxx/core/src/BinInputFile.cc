@@ -43,7 +43,7 @@ namespace Torch {
         read(*ar);
         
         // Add the array to the arrayset
-        arrayset.addArray(ar);
+        arrayset.append(ar);
       }
     }
 

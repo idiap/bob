@@ -138,10 +138,10 @@ namespace Torch {
         // Parse an arrayset and add it to the dataset
         if( !strcmp((const char*)cur->name, db::arrayset) || 
             !strcmp((const char*)cur->name, db::external_arrayset) )
-          dataset.addArrayset( parseArrayset(cur) );
+          dataset.append( parseArrayset(cur) );
         // Parse a relationset and add it to the dataset
         else if( !strcmp((const char*)cur->name, db::relationset) )
-          dataset.addRelationset( parseRelationset(cur) );
+          dataset.append( parseRelationset(cur) );
         cur = cur->next;
       }
 
@@ -296,10 +296,10 @@ namespace Torch {
       while(cur_relation != 0) { 
         // Parse a rule and add it to the relationset
         if( !strcmp((const char*)cur_relation->name, db::rule) ) 
-          relationset->addRule( parseRule(cur_relation) );
+          relationset->append( parseRule(cur_relation) );
         // Parse a relation and add it to the relationset
         else if( !strcmp((const char*)cur_relation->name, db::relation) ) 
-          relationset->addRelation( parseRelation(cur_relation) );
+          relationset->append( parseRelation(cur_relation) );
         cur_relation = cur_relation->next;
       }
 
@@ -347,7 +347,7 @@ namespace Torch {
         // Parse a member and add it to the relation
         if( !strcmp((const char*)cur_member->name, db::member) ||
           !strcmp((const char*)cur_member->name, db::arrayset_member) ) 
-          relation->addMember( parseMember(cur_member) );
+          relation->append( parseMember(cur_member) );
         cur_member = cur_member->next;
       }
 
@@ -504,7 +504,7 @@ namespace Torch {
           // Process an array
           if ( !strcmp( (const char*)cur_data->name, db::array) || 
                !strcmp( (const char*)cur_data->name, db::external_array) ) {
-            arrayset->addArray( parseArray( *arrayset, cur_data) );
+            arrayset->append( parseArray( *arrayset, cur_data) );
           }
           cur_data = cur_data->next;
         }

@@ -56,8 +56,8 @@ static void set_name(db::Relationset& rs, const char* name) {
 
 void bind_database_relationset() {
   class_<db::Relationset, boost::shared_ptr<db::Relationset> >("Relationset", "A Relationset describes groupings of Array/Arraysets in a Dataset.", init<>("Builds a new Relationset."))
-    .def("append", &db::Relationset::addRelation, (arg("self"), arg("relation")))
-    .def("append", &db::Relationset::addRule, (arg("self"), arg("rule")))
+    .def("append", (void (db::Relationset::*)(boost::shared_ptr<db::Relation>))&db::Relationset::append, (arg("self"), arg("relation")))
+    .def("append", (void (db::Relationset::*)(boost::shared_ptr<db::Rule>))&db::Relationset::append, (arg("self"), arg("rule")))
     .def("__getitem__", (boost::shared_ptr<db::Relation> (db::Relationset::*)(const size_t))&db::Relationset::getRelation, (arg("self"), arg("relation_id")))
     .def("__getitem__", (boost::shared_ptr<db::Rule> (db::Relationset::*)(const std::string&))&db::Relationset::getRule, (arg("self"), arg("rule_role")))
     .add_property("name", &get_name, &set_name, "This relationset's name")
