@@ -27,6 +27,7 @@ namespace Torch {
    *
    */
   namespace core {
+    class XMLException: public Exception { };
 
     /**
      * @brief The main class for the XML parser

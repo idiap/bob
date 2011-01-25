@@ -23,9 +23,11 @@ namespace Torch {
     void XMLParser::validateXMLSchema(xmlDocPtr doc) {
       // Get path to the XML Schema definition
       char *schema_path = getenv("TORCH_SCHEMA_PATH");
-      if( !strcmp( schema_path, "") )
-        warn << "Environment variable $TORCH_SCHEMA_PATH is not set." <<
-          std::endl;
+      if( !schema_path || !strcmp( schema_path, "") ) {
+         error << "Environment variable $TORCH_SCHEMA_PATH is not set. " << 
+          "Have you setup your working environment correctly?" << std::endl;
+         throw XMLException();
+      }
       char schema_full_path[1024];
       strcpy( schema_full_path, schema_path);
       strcat( schema_full_path, "/dataset.xsd" );
