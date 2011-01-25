@@ -103,7 +103,7 @@ namespace Torch {
       m_version = static_cast<size_t>(val32);
       TDEBUG3("Version: " << m_version);
       str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
-      m_type = static_cast<array::ArrayType>(val32);
+      m_type = static_cast<array::ElementType>(val32);
       TDEBUG3("Array-type: " << m_type);
       str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
       // call function to update other type-related member (m_data_size_of)

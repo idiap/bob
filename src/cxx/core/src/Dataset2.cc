@@ -17,7 +17,7 @@ namespace Torch {
 
     Array::~Array() {
       TDEBUG3("Array destructor (id: " << getId() << ")");
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_bool:
           delete [] static_cast<bool*>(m_storage); break;
         case array::t_int8:

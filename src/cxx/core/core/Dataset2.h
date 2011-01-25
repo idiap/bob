@@ -212,7 +212,7 @@ namespace Torch {
          * @brief Set the type of the elements contained in the the arrays of 
          * this Arrayset
          */
-        void setArrayType(const array::ArrayType element_type) 
+        void setElementType(const array::ElementType element_type) 
           { m_element_type = element_type; }
         /**
          * @brief Set the role of the Arrayset
@@ -267,7 +267,7 @@ namespace Torch {
          * @brief Get the type of the elements contained in the the arrays of 
          * this Arrayset
          */
-        array::ArrayType getArrayType() const { return m_element_type; }
+        array::ElementType getElementType() const { return m_element_type; }
         /**
          * @brief Get the role of this Arrayset
          */
@@ -377,7 +377,7 @@ namespace Torch {
         size_t m_n_dim;
         size_t m_shape[array::N_MAX_DIMENSIONS_ARRAY];
         size_t m_n_elem;
-        array::ArrayType m_element_type;
+        array::ElementType m_element_type;
         
         std::string m_role;
         bool m_is_loaded;
@@ -997,7 +997,7 @@ namespace Torch {
         out_data = output.data();
       else
         out_data = output.copy().data();
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_bool:
           copyCast<bool,T>(out_data); break;
         case array::t_int8:
@@ -1069,7 +1069,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_bool:
           output = blitz::Array<bool,D>(static_cast<bool*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1092,7 +1092,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_int8:
           output = blitz::Array<int8_t,D>(static_cast<int8_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1115,7 +1115,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_int16:
           output = blitz::Array<int16_t,D>(static_cast<int16_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1138,7 +1138,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_int32:
           output = blitz::Array<int32_t,D>(static_cast<int32_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1161,7 +1161,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_int64:
           output = blitz::Array<int64_t,D>(static_cast<int64_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1184,7 +1184,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_uint8:
           output = blitz::Array<uint8_t,D>(static_cast<uint8_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1207,7 +1207,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_uint16:
           output = blitz::Array<uint16_t,D>(static_cast<uint16_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1230,7 +1230,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_uint32:
           output = blitz::Array<uint32_t,D>(static_cast<uint32_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1253,7 +1253,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_uint64:
           output = blitz::Array<uint64_t,D>(static_cast<uint64_t*>(m_storage), 
             shape, blitz::neverDeleteData); 
@@ -1276,7 +1276,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_float32:
           output = blitz::Array<float,D>(static_cast<float*>(m_storage),
             shape, blitz::neverDeleteData); 
@@ -1299,7 +1299,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_float64:
           output = blitz::Array<double,D>(static_cast<double*>
             (m_storage), shape, blitz::neverDeleteData); 
@@ -1322,7 +1322,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_float128:
           output = blitz::Array<long double,D>(static_cast<long double*>
             (m_storage), shape, blitz::neverDeleteData); 
@@ -1345,7 +1345,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_complex64:
           output = blitz::Array<std::complex<float>,D>(
             static_cast<std::complex<float>*>(m_storage), 
@@ -1369,7 +1369,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_complex128:
           output = blitz::Array<std::complex<double>,D>(
             static_cast<std::complex<double>*>(m_storage), 
@@ -1394,7 +1394,7 @@ namespace Torch {
       m_parent_arrayset.getShape(shape);
       output.resize(shape);
 
-      switch(m_parent_arrayset.getArrayType()) {
+      switch(m_parent_arrayset.getElementType()) {
         case array::t_complex256:
           output = blitz::Array<std::complex<long double>,D>(
             static_cast<std::complex<long double>*>(m_storage), 

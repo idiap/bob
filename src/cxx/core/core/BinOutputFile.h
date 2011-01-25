@@ -60,12 +60,12 @@ namespace Torch {
 
 
         /**
-         * @brief Get the Array type
+         * @brief Get the Element type
          * @warning An exception is thrown if nothing was written so far
          */
-        array::ArrayType getArrayType() const { 
+        array::ElementType getElementType() const { 
           headerInitialized(); 
-          return m_header.getArrayType(); 
+          return m_header.getElementType(); 
         }
         /**
          * @brief Get the number of dimensions
@@ -151,7 +151,7 @@ namespace Torch {
          * @brief Initialize the header of the output stream with the given
          * type and shape
          */
-        void initHeader(const array::ArrayType type, 
+        void initHeader(const array::ElementType type, 
             const size_t shape[array::N_MAX_DIMENSIONS_ARRAY]);
 
         /**
@@ -211,7 +211,7 @@ namespace Torch {
       float f; double d; long double ld;
       std::complex<float> cf; std::complex<double> cd; 
       std::complex<long double> cld;
-      switch(m_header.getArrayType())
+      switch(m_header.getElementType())
       {
         case array::t_bool:
           for( size_t i=0; i<m_header.getNElements(); ++i) {
@@ -400,94 +400,94 @@ namespace Torch {
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<bool,d>& bl)
     {
-      m_header.setArrayType(array::t_bool);
+      m_header.setElementType(array::t_bool);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int8_t,d>& bl)
     {
-      m_header.setArrayType(array::t_int8);
+      m_header.setElementType(array::t_int8);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int16_t,d>& bl)
     {
-      m_header.setArrayType(array::t_int16);
+      m_header.setElementType(array::t_int16);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int32_t,d>& bl)
     {
-      m_header.setArrayType(array::t_int32);
+      m_header.setElementType(array::t_int32);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int64_t,d>& bl)
     {
-      m_header.setArrayType(array::t_int64);
+      m_header.setElementType(array::t_int64);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint8_t,d>& bl)
     {
-      m_header.setArrayType(array::t_uint8);
+      m_header.setElementType(array::t_uint8);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint16_t,d>& bl)
     {
-      m_header.setArrayType(array::t_uint16);
+      m_header.setElementType(array::t_uint16);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint32_t,d>& bl)
     {
-      m_header.setArrayType(array::t_uint32);
+      m_header.setElementType(array::t_uint32);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint64_t,d>& bl)
     {
-      m_header.setArrayType(array::t_uint64);
+      m_header.setElementType(array::t_uint64);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<float,d>& bl)
     {
-      m_header.setArrayType(array::t_float32);
+      m_header.setElementType(array::t_float32);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<double,d>& bl)
     {
-      m_header.setArrayType(array::t_float64);
+      m_header.setElementType(array::t_float64);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<long double,d>& bl)
     {
-      m_header.setArrayType(array::t_float128);
+      m_header.setElementType(array::t_float128);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<float>,d>& bl)
     {
-      m_header.setArrayType(array::t_complex64);
+      m_header.setElementType(array::t_complex64);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<double>,d>& bl)
     {
-      m_header.setArrayType(array::t_complex128);
+      m_header.setElementType(array::t_complex128);
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<long double>,d>& bl)
     {
-      m_header.setArrayType(array::t_complex256);
+      m_header.setElementType(array::t_complex256);
     }
 
   }

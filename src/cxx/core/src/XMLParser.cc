@@ -403,38 +403,38 @@ namespace Torch {
       }
       std::string str_element_type( (const char*)str );
       if( !str_element_type.compare( db::t_bool ) )
-        arrayset->setArrayType( array::t_bool );
+        arrayset->setElementType( array::t_bool );
       else if( !str_element_type.compare( db::t_uint8 ) )
-        arrayset->setArrayType( array::t_uint8 );
+        arrayset->setElementType( array::t_uint8 );
       else if( !str_element_type.compare( db::t_uint16 ) )
-        arrayset->setArrayType( array::t_uint16 );
+        arrayset->setElementType( array::t_uint16 );
       else if( !str_element_type.compare( db::t_uint32 ) )
-        arrayset->setArrayType( array::t_uint32 );
+        arrayset->setElementType( array::t_uint32 );
       else if( !str_element_type.compare( db::t_uint64 ) )
-        arrayset->setArrayType( array::t_uint64 );
+        arrayset->setElementType( array::t_uint64 );
       else if( !str_element_type.compare( db::t_int8 ) )
-        arrayset->setArrayType( array::t_int8 );
+        arrayset->setElementType( array::t_int8 );
       else if( !str_element_type.compare( db::t_int16 ) )
-        arrayset->setArrayType( array::t_int16 );
+        arrayset->setElementType( array::t_int16 );
       else if( !str_element_type.compare( db::t_int32 ) )
-        arrayset->setArrayType( array::t_int32 );
+        arrayset->setElementType( array::t_int32 );
       else if( !str_element_type.compare( db::t_int64 ) )
-        arrayset->setArrayType( array::t_int64 );
+        arrayset->setElementType( array::t_int64 );
       else if( !str_element_type.compare( db::t_float32 ) )
-        arrayset->setArrayType( array::t_float32 );
+        arrayset->setElementType( array::t_float32 );
       else if( !str_element_type.compare( db::t_float64 ) )
-        arrayset->setArrayType( array::t_float64 );
+        arrayset->setElementType( array::t_float64 );
       else if( !str_element_type.compare( db::t_float128 ) )
-        arrayset->setArrayType( array::t_float128 );
+        arrayset->setElementType( array::t_float128 );
       else if( !str_element_type.compare( db::t_complex64 ) )
-        arrayset->setArrayType( array::t_complex64 );
+        arrayset->setElementType( array::t_complex64 );
       else if( !str_element_type.compare( db::t_complex128 ) )
-        arrayset->setArrayType( array::t_complex128 );
+        arrayset->setElementType( array::t_complex128 );
       else if( !str_element_type.compare( db::t_complex256 ) )
-        arrayset->setArrayType( array::t_complex256 );
+        arrayset->setElementType( array::t_complex256 );
       else
-        arrayset->setArrayType( array::t_unknown );
-      TDEBUG3("Elementtype: " << arrayset->getArrayType());
+        arrayset->setElementType( array::t_unknown );
+      TDEBUG3("Elementtype: " << arrayset->getElementType());
       xmlFree(str);
 
       // Parse shape
@@ -559,7 +559,7 @@ namespace Torch {
 
         // Switch over the possible type
         size_t nb_values = parent.getNElem();
-        switch( parent.getArrayType()) {
+        switch( parent.getElementType()) {
           case array::t_bool:
             array->setStorage( parseArrayData<bool>( tok, nb_values ) );
             break;

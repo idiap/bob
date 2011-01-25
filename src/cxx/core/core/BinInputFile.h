@@ -56,10 +56,10 @@ namespace Torch {
 
 
         /**
-         * @brief Get the Array type
+         * @brief Get the Element type
          */
-        array::ArrayType getArrayType() const { 
-          return m_header.getArrayType(); 
+        array::ElementType getElementType() const { 
+          return m_header.getElementType(); 
         }
         /**
          * @brief Get the number of dimensions
@@ -188,7 +188,7 @@ namespace Torch {
       float f; double dou; long double ld;
       std::complex<float> cf; std::complex<double> cd; 
       std::complex<long double> cld;
-      switch(m_header.getArrayType())
+      switch(m_header.getElementType())
       {
         case array::t_bool:
           for( size_t i=0; i<m_header.getNElements(); ++i) {

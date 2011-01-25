@@ -77,7 +77,7 @@ static tuple get_arrays(const db::Arrayset& as) {
 }
 
 void bind_database_arrayset() {
-  enum_<dba::ArrayType>("ArrayType")
+  enum_<dba::ElementType>("ElementType")
     .value("unknown", dba::t_unknown)
     .value("bool", dba::t_bool)
     .value("int8", dba::t_int8)
@@ -102,7 +102,7 @@ void bind_database_arrayset() {
     .add_property("role", &get_role, &set_role, "This variable determines the role of this arrayset inside this dataset.")
     .add_property("loaded", &db::Arrayset::getIsLoaded, &db::Arrayset::setIsLoaded, "This variable determines if the arrayset is loaded in memory. This may be false in the case the arrayset is completely stored in an external file.")
     .add_property("filename", &get_filename, &set_filename)
-    .add_property("arrayType", &db::Arrayset::getArrayType, &db::Arrayset::setArrayType, "This property indicates the type of element used for each array in the current set.")
+    .add_property("arrayType", &db::Arrayset::getElementType, &db::Arrayset::setElementType, "This property indicates the type of element used for each array in the current set.")
     .add_property("arrays", &get_arrays, "Iterable over all arrays in this set")
     .def("__len__", &db::Arrayset::getNArrays, "The number of arrays stored in this set.")
     //TODO: Missing __delitem__, __setitem__

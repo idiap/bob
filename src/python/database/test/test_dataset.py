@@ -28,16 +28,16 @@ class DatasetTest(unittest.TestCase):
     db = torch.database.Dataset(INPUT_DATABASE)
     self.assertEqual(len(db.arraysets), 10)
     arrset_props = (
-        {'role': 'pattern1', 'elemtype':torch.database.ArrayType.uint16, 'shape':(3,), 'id':1},
-        {'role': 'pattern2', 'elemtype':torch.database.ArrayType.uint16, 'shape':(3,), 'id':2},
-        {'role': 'pattern3', 'elemtype':torch.database.ArrayType.int16, 'shape':(3,), 'id':3},
-        {'role': 'pattern4', 'elemtype':torch.database.ArrayType.float32, 'shape':(3,), 'id':4},
-        {'role': 'pattern5', 'elemtype':torch.database.ArrayType.uint16, 'shape':(2,2), 'id':5},
-        {'role': 'pattern6', 'elemtype':torch.database.ArrayType.uint16, 'shape':(2,2,2), 'id':6},
-        {'role': 'pattern7', 'elemtype':torch.database.ArrayType.uint16, 'shape':(2,2,2,2), 'id':7},
-        {'role': 'pattern8', 'elemtype':torch.database.ArrayType.uint32, 'shape':(3,2,2,2), 'id':8},
-        {'role': 'pattern9', 'elemtype':torch.database.ArrayType.uint32, 'shape':(3,2,2,20), 'id':9},
-        {'role': 'pattern11', 'elemtype':torch.database.ArrayType.complex64, 'shape':(2,), 'id':11},
+        {'role': 'pattern1', 'elemtype':torch.database.ElementType.uint16, 'shape':(3,), 'id':1},
+        {'role': 'pattern2', 'elemtype':torch.database.ElementType.uint16, 'shape':(3,), 'id':2},
+        {'role': 'pattern3', 'elemtype':torch.database.ElementType.int16, 'shape':(3,), 'id':3},
+        {'role': 'pattern4', 'elemtype':torch.database.ElementType.float32, 'shape':(3,), 'id':4},
+        {'role': 'pattern5', 'elemtype':torch.database.ElementType.uint16, 'shape':(2,2), 'id':5},
+        {'role': 'pattern6', 'elemtype':torch.database.ElementType.uint16, 'shape':(2,2,2), 'id':6},
+        {'role': 'pattern7', 'elemtype':torch.database.ElementType.uint16, 'shape':(2,2,2,2), 'id':7},
+        {'role': 'pattern8', 'elemtype':torch.database.ElementType.uint32, 'shape':(3,2,2,2), 'id':8},
+        {'role': 'pattern9', 'elemtype':torch.database.ElementType.uint32, 'shape':(3,2,2,20), 'id':9},
+        {'role': 'pattern11', 'elemtype':torch.database.ElementType.complex64, 'shape':(2,), 'id':11},
         )
     for i, arrset in enumerate(db.arraysets):
       # These are a few properties of the Arrayset in question (pointed by

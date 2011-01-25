@@ -72,7 +72,7 @@ namespace Torch {
 
       // Write elementtype attribute
       std::string str;
-      switch(a.getArrayType()) {
+      switch(a.getElementType()) {
         case array::t_bool:
           str = db::t_bool; break;
         case array::t_int8:
@@ -175,7 +175,7 @@ namespace Torch {
           content << std::scientific;
 
         // Cast the data and call the writing function
-        switch(a.getParentArrayset().getArrayType()) {
+        switch(a.getParentArrayset().getElementType()) {
           case array::t_bool:
             writeData( content, 
               reinterpret_cast<const bool*>(a.getStorage()), 

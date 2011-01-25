@@ -29,7 +29,7 @@ namespace Torch {
     }
 
 
-    void BinOutputFile::initHeader(const array::ArrayType type, 
+    void BinOutputFile::initHeader(const array::ElementType type, 
         const size_t shape[array::N_MAX_DIMENSIONS_ARRAY]) 
     {
       // Check that data have not already been written
@@ -40,7 +40,7 @@ namespace Torch {
       }
       
       // Initialize header
-      m_header.setArrayType( type);
+      m_header.setElementType( type);
       m_header.setShape( shape);
       m_header.write(m_out_stream);
       m_header_init = true;
@@ -58,7 +58,7 @@ namespace Torch {
     void BinOutputFile::write(const Arrayset& arrayset) {
       // Initialize the header if required
       if(!m_header_init)
-        initHeader( arrayset.getArrayType(), arrayset.getShape() );
+        initHeader( arrayset.getElementType(), arrayset.getShape() );
 
       if(!arrayset.getIsLoaded()) {
         error << "The arrayset is not loaded." << std::endl;
@@ -75,7 +75,7 @@ namespace Torch {
     void BinOutputFile::write(const Array& array) {
       // Initialize the header if required
       if(!m_header_init)
-        initHeader( array.getParentArrayset().getArrayType(), 
+        initHeader( array.getParentArrayset().getElementType(), 
           array.getParentArrayset().getShape() );
 
       bool shapeCompatibility = true;
@@ -95,12 +95,12 @@ namespace Torch {
         throw Exception();
       }
 
-      if(array.getParentArrayset().getArrayType() == m_header.getArrayType())
+      if(array.getParentArrayset().getElementType() == m_header.getElementType())
         write(array.getStorage()); 
       else // cast is required
       {
         // copy the data into the output stream
-        switch(array.getParentArrayset().getArrayType())
+        switch(array.getParentArrayset().getElementType())
         {
           case array::t_bool:
             writeWithCast( reinterpret_cast<const bool*>(array.getStorage()) );
@@ -169,7 +169,7 @@ namespace Torch {
 
     BinOutputFile& BinOutputFile::write(const void* multi_array) {
       // copy the data into the output stream
-      switch(m_header.getArrayType())
+      switch(m_header.getElementType())
       {
         case array::t_bool:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
