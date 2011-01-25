@@ -362,6 +362,7 @@ namespace Torch {
          * @brief Return a smart pointer to the array of the given id
          */
         boost::shared_ptr<const Array> getArray(size_t id) const;
+        boost::shared_ptr<Array> getArray(size_t id);
 
         /**
          * @brief Update the blitz array with the content of the array 
@@ -791,6 +792,19 @@ namespace Torch {
          * @brief Return a smart pointer to the relation of the given id
          */
         boost::shared_ptr<const Relation> getRelation(size_t id) const;
+        boost::shared_ptr<Relation> getRelation(size_t id);
+
+        /**
+         * @brief Return the rule object referred by the given role 
+         * @warning Please note that if you use that method, scope matters,
+         * because the dataset owns the rules.
+         */
+        const Rule& operator[](const std::string& name) const;
+        /**
+         * @brief Return a smart pointer to the rule given the role
+         */
+        boost::shared_ptr<const Rule> getRule(const std::string& name) const;
+        boost::shared_ptr<Rule> getRule(const std::string& name);
 
       private:
         std::string m_name;
@@ -880,7 +894,8 @@ namespace Torch {
         /**
          * @brief Return the arrayset of the given id
          */
-        boost::shared_ptr<const Arrayset> getArrayset( const size_t id ) const;
+        boost::shared_ptr<const Arrayset> getArrayset(const size_t id) const;
+        boost::shared_ptr<Arrayset> getArrayset(const size_t id);
 
         /**
          * @brief Add a Relationset to the Dataset
@@ -927,11 +942,14 @@ namespace Torch {
          * because the dataset owns the relationsets.
          */
         const Relationset& operator[]( const std::string& name ) const;
+
         /**
          * @brief Return the arrayset of the given id
          */
         boost::shared_ptr<const Relationset> 
         getRelationset( const std::string& name ) const;
+        boost::shared_ptr<Relationset> 
+        getRelationset( const std::string& name );
 
       private:
         std::string m_name;

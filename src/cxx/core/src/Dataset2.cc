@@ -100,6 +100,19 @@ namespace Torch {
       return it->second;
     }
 
+    boost::shared_ptr<Array> 
+    Arrayset::getArray( const size_t id ) {
+      if(!getIsLoaded()) {
+        ;//TODO:load
+        Arrayset* a=const_cast<Arrayset*>(this);
+        a->setIsLoaded(true);
+      }
+      std::map<size_t, boost::shared_ptr<Array> >::iterator it = 
+        (m_array.find(id));
+      if( it == m_array.end() )
+        throw IndexError();
+      return it->second;
+    }
 
     Relationset::Relationset(): 
       m_name("") { }
@@ -135,6 +148,34 @@ namespace Torch {
       return it->second;
     }
 
+    boost::shared_ptr<Relation> 
+    Relationset::getRelation( const size_t id ) {
+      std::map<size_t, boost::shared_ptr<Relation> >::iterator it = 
+        (m_relation.find(id));
+      if( it == m_relation.end() )
+        throw IndexError();
+      return it->second;
+    }
+
+    const Rule& Relationset::operator[]( const std::string& role ) const {
+      std::map<std::string, boost::shared_ptr<Rule> >::const_iterator it = 
+        (m_rule.find(role));
+      if( it == m_rule.end() )
+        throw IndexError();
+      return *(it->second);
+    }
+
+    boost::shared_ptr<const Rule> Relationset::getRule( const std::string& role ) const {
+      std::map<std::string, boost::shared_ptr<Rule> >::const_iterator it = (m_rule.find(role));
+      if( it == m_rule.end() ) throw IndexError();
+      return it->second;
+    }
+
+    boost::shared_ptr<Rule> Relationset::getRule( const std::string& role ) {
+      std::map<std::string, boost::shared_ptr<Rule> >::iterator it = (m_rule.find(role));
+      if( it == m_rule.end() ) throw IndexError();
+      return it->second;
+    }
 
     Rule::Rule(): 
       m_arraysetrole(""), m_min(1), m_max(1) { }
@@ -202,6 +243,15 @@ namespace Torch {
       return it->second;
     }
 
+    boost::shared_ptr<Arrayset>
+    Dataset::getArrayset( const size_t id ) {
+      std::map<size_t, boost::shared_ptr<Arrayset> >::iterator it = 
+        (m_arrayset.find(id));
+      if( it == m_arrayset.end() )
+        throw IndexError();
+      return it->second;
+    }
+
     const Relationset& Dataset::operator[]( const std::string& name ) const {
       std::map<std::string, boost::shared_ptr<Relationset> >::const_iterator 
         it = (m_relationset.find(name));
@@ -219,7 +269,14 @@ namespace Torch {
       return it->second;
     }
 
+    boost::shared_ptr<Relationset> 
+    Dataset::getRelationset( const std::string& name ) {
+      std::map<std::string, boost::shared_ptr<Relationset> >::iterator it = 
+        (m_relationset.find(name));
+      if( it == m_relationset.end() )
+        throw IndexError();
+      return it->second;
+    }
 
   }
 }
-
