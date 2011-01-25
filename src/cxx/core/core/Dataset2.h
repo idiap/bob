@@ -30,6 +30,7 @@ namespace Torch {
    *
    */
   namespace core {
+    class NonExistingElement: public Exception { };
     
     // Declare Arrayset for the reference to the parent Arrayset in the
     // Array class.
@@ -176,6 +177,17 @@ namespace Torch {
          * @brief Add an Array to the Arrayset
          */
         void append( boost::shared_ptr<Array> array);
+        /**
+         * @brief Remove an Array with a given id from the Arrayset
+         */
+        void remove( const size_t id) {
+          std::map<size_t, boost::shared_ptr<Array> >::iterator it =
+            m_array.find(id);
+          if(it!=m_array.end())
+            m_array.erase(it);
+          else
+            throw NonExistingElement();
+        }
 
         /**
          * @brief Set the id of the Arrayset
@@ -831,6 +843,17 @@ namespace Torch {
          * @brief Add an Arrayset to the Dataset
          */
         void append( boost::shared_ptr<Arrayset> arrayset);
+        /**
+         * @brief Remove a Relationset with a given name from the Dataset
+         */
+        void remove( const size_t id) {
+          std::map<size_t, boost::shared_ptr<Arrayset> >::iterator it =
+            m_arrayset.find(id);
+          if(it!=m_arrayset.end())
+            m_arrayset.erase(it);
+          else
+            throw NonExistingElement();
+        }
 
         /**
          * @brief Get the name of the Dataset
@@ -900,6 +923,17 @@ namespace Torch {
          * @brief Add a Relationset to the Dataset
          */
         void append( boost::shared_ptr<Relationset> relationset);
+        /**
+         * @brief Remove a Relationset with a given name from the Dataset
+         */
+        void remove( const std::string& name) {
+          std::map<std::string, boost::shared_ptr<Relationset> >::iterator it=
+            m_relationset.find(name);
+          if(it!=m_relationset.end())
+            m_relationset.erase(it);
+          else
+            throw NonExistingElement();
+        }
 
         /**
          * @brief const_iterator over the Relationsets of the Dataset
