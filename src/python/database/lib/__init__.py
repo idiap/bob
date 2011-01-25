@@ -1,20 +1,35 @@
 from libpytorch_database import *
-
-# We attach some high-level functionality to this module:
-def load(path):
-  """Loads the dataset from an arbitrary file."""
-  from libpytorch_database import __load_local_xml__
-  return __load_local_xml__(path)
+import os
 
 def loadString(data):
-  """Loads the dataset from a string"""
-  from libpytorch_database import __load_local_xml__
+  """Loads the dataset from a string by temporarily saving the set to a XML
+  file and then loading from that file."""
   from tempfile import mkstemp
   (fd, name) = mkstemp(prefix='torch_dataset_', suffix='.xml')
-  f = fdopen(fd, 'wt')
+  f = os.fdopen(fd, 'wt')
   f.write(data)
   f.close()
-  return __load_local_xml__(data)
+  retval = Dataset(name)
+  os.unlink(name)
+  return retval
+
+def dataset_xml(self):
+  """Converts a dataset to an in-memory string representation by saving the set
+  into a local temporary XML file and then loading it into a string from that
+  file."""
+  from tempfile import mkstemp
+  import os
+  (fd, name) = mkstemp(prefix='torch_dataset_', suffix='.xml')
+  os.close(fd)
+  os.unlink(name)
+  self.save(name)
+  f = open(name, 'rt')
+  retval = f.read()
+  f.close()
+  os.unlink(name)
+  return retval
+
+Dataset.xml = property(dataset_xml)
 
 def dataset_arrayset_index(self):
   """Returns a dictionary containing the arrayset-id (key) and the arrayset
@@ -41,6 +56,15 @@ def arrayset_array_index(self):
   return retval
 
 Arrayset.arrayIndex = property(arrayset_array_index)
+
+def arrayset_append(self, o):
+  import numpy
+  from .. import core
+  if isinstance(o, Array):
+    self.__append_array__(o)
+  elif core.array.is_blitz_array(o):
+    self.__append_array__(o) #TODO: Please note this will not work as of today
+  raise RuntimeError, "Can only append database::Array or blitz::Array to Arrayset"
 
 def array_copy(self):
   """Returns a blitz::Array object with the expected type and dimension"""
@@ -99,7 +123,7 @@ def member_arrays(self, arraysets):
   """
   tmp = [k for k in arraysets if k.id == self.arraysetId]
   if not tmp:
-    raise RuntimeException, "Cannot find Arrayset with id=%d pointed by Member in Relationset" % self.arraysetId
+    raise IndexError, "Cannot find Arrayset with id=%d pointed by Member in Relationset" % self.arraysetId
   
   #if you find it , because of the schema restrictions, there has to be only 1
   tmp = tmp[0]
@@ -109,7 +133,7 @@ def member_arrays(self, arraysets):
   #if you get to this point, we are talking about a specific array
   tmp = [k for k in tmp.arrays if k.id == self.arrayId]
   if not tmp:
-    raise RuntimeException, "Cannot find Array with id=%d in Arrayset with id=%d, pointed by Member in Relationset" % (self.arrayId, self.arraysetId)
+    raise IndexError, "Cannot find Array with id=%d in Arrayset with id=%d, pointed by Member in Relationset" % (self.arrayId, self.arraysetId)
 
   #if you find it , because of the schema restrictions, there has to be only 1
   return tuple(tmp)

@@ -95,7 +95,8 @@ void bind_database_arrayset() {
     ;
 
   class_<db::Arrayset, boost::shared_ptr<db::Arrayset> >("Arrayset", "Dataset Arraysets represent lists of Arrays that share the same element type and dimension properties and are grouped together by the DB designer.", init<>("Initializes a new arrayset"))
-    .def("addArray", &db::Arrayset::addArray, (arg("self"), arg("array")), "Adds an array to this set")
+    .def("__append_array__", &db::Arrayset::addArray, (arg("self"), arg("array")), "Adds an array to this set")
+    .def("__getitem__", (boost::shared_ptr<db::Array> (db::Arrayset::*)(const size_t))&db::Arrayset::getArray, (arg("self"), arg("array_id")), "Gets an array from this set given its id")
     .add_property("id", &db::Arrayset::getId, &db::Arrayset::setId)
     .add_property("shape", &get_shape, &set_shape, "The shape of each array in this set is determined by this variable.")
     .add_property("role", &get_role, &set_role, "This variable determines the role of this arrayset inside this dataset.")

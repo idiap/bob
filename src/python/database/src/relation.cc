@@ -30,7 +30,7 @@ static tuple get_members_with_role(db::Relation& r, const char* role) {
 
 void bind_database_relation() {
   class_<db::Relation, boost::shared_ptr<db::Relation> >("Relation", "A Relation describes a single grouping of Array/Arraysets in a RelationSet.", no_init)
-    .def("addMember", &db::Relation::addMember, (arg("self"), arg("member")), "Adds a new member to this relation")
+    .def("append", &db::Relation::addMember, (arg("self"), arg("member")), "Adds a new member to this relation")
     .add_property("id", &db::Relation::getId, &db::Relation::setId)
     .add_property("members", &get_members, "All members of this Relation")
     .def("membersWithRole", &get_members_with_role, (arg("self"), arg("role")), "Returns all members with a certain role in this relation")

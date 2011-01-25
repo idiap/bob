@@ -19,13 +19,13 @@ class DatasetTest(unittest.TestCase):
   def test01_CanLoad(self):
     # This method demonstrates how to load an XML from scratch. The only thing
     # you have to do is to pass the relative (or absolute) location of the
-    # input file containing the dataset to torch.database.load().
-    db = torch.database.load(INPUT_DATABASE)
+    # input file containing the dataset to torch.database.Dataset().
+    db = torch.database.Dataset(INPUT_DATABASE)
 
   def test02_CanBrowseArraysets(self):
     # This example shows how to access the arraysets from a dataset and how to
     # access several of its properties.
-    db = torch.database.load(INPUT_DATABASE)
+    db = torch.database.Dataset(INPUT_DATABASE)
     self.assertEqual(len(db.arraysets), 10)
     arrset_props = (
         {'role': 'pattern1', 'elemtype':torch.database.ArrayType.uint16, 'shape':(3,), 'id':1},
@@ -69,18 +69,27 @@ class DatasetTest(unittest.TestCase):
     # use will trigger loading. This is the case of the second arrayset in the
     # dataset. In these examples we will show how to manipulate both in a 
     # transparent way.
-    db = torch.database.load(INPUT_DATABASE)
+    db = torch.database.Dataset(INPUT_DATABASE)
 
-    # browsing arrayset #9 (10th position) which is complex64, inlined
-    self.assertEqual(db.arraysets[9].loaded, True) #should be loaded!
+    # browsing arrayset #11 (10th position) which is complex64, inlined
+    # Please note the use of the __getitem__ ([]) operator on datasets. It is
+    # possible to either put an integer (for retrieving the arrayset with the
+    # given arrayset-id) or a string (for retrieving the relationset with the
+    # given relationset-name).
+    # IMPORTANT: Please note that while the [] functionality is provided
+    # throughout the whole dataset bindings, it is more inefficient than
+    # loading all elements at once (for example using one of the *Index
+    # properties of every element) and using that. The reason is that the []
+    # operator will trigger a map search every time it is used. Your call!
+    self.assertEqual(db[11].loaded, True) #should be loaded!
     
     # you can use the len() function to find how many arrays are available
     # inside a given arrayset.
-    self.assertEqual(len(db.arraysets[9]), 2) #contains 2 arrays
+    self.assertEqual(len(db[11]), 2) #contains 2 arrays
 
     # lets get the arrays and iterate over them
     array_ids = (1, 2)
-    for i, k in enumerate(db.arraysets[9].arrays):
+    for i, k in enumerate(db[11].arrays):
       self.assertEqual(array_ids[i], k.id)
 
     # Needless to say, you can incarnate torch Array objects (python equivalent
@@ -90,24 +99,27 @@ class DatasetTest(unittest.TestCase):
     # array point to the dataset allocated data. Changing it *will* have an
     # impact on future dataset queries.
 
-    # Here is a copy example:
-    bzarray = db.arraysets[9].arrays[1].copy() #copy the second array
+    # Here is a copy example. Note that we can address a particular array using
+    # a concatencation of __getitem__() ([]) operators. The first instance
+    # works for addressing the Arrayset #9 while the second addresses the Array
+    # with array-id = 2.
+    bzarray = db[11][2].copy() #copy the second array
     self.assertEqual(bzarray[0], complex(9.,3.))
     self.assertEqual(bzarray[1], complex(5.,7.))
 
     # Please note that if I modify the array, the database continues unmodified
     bzarray[0] = complex(13.,2.5)
     self.assertEqual(bzarray[0], complex(13.,2.5))
-    dbvalue = db.arraysets[9].arrays[1].copy() #re-copy the second array
+    dbvalue = db[11][2].copy() #re-copy the second array
     self.assertNotEqual(dbvalue[0], complex(13.,2.5))
 
     # This is not at all what would happen if you decide to refer() instead:
-    bzarray = db.arraysets[9].arrays[1].refer() #refers to the second array
+    bzarray = db[11][2].refer() #refers to the second array
     self.assertEqual(bzarray[0], complex(9.,3.))
     self.assertEqual(bzarray[1], complex(5.,7.))
     bzarray[0] = complex(13.,2.5)
     self.assertEqual(bzarray[0], complex(13.,2.5))
-    dbvalue = db.arraysets[9].arrays[1].refer() #another pointer / same location
+    dbvalue = db[11][2].refer() #another pointer / same location
     self.assertEqual(dbvalue[0], complex(13.,2.5)) #!
 
     # The advantages and disadvantages on using one or the other technique are
@@ -124,9 +136,9 @@ class DatasetTest(unittest.TestCase):
   def test05_CanBrowseRelationsets(self):
     # This example shows how to access the relationsets from a dataset and how
     # to access several of its properties.
-    db = torch.database.load(INPUT_DATABASE)
+    db = torch.database.Dataset(INPUT_DATABASE)
     self.assertEqual(len(db.relationsets), 1)
-    rs = db.relationsets[0]
+    rs = db['pattern-pattern']
     self.assertEqual(rs.name, 'pattern-pattern')
     self.assertEqual(len(rs.relations), 3)
     self.assertEqual(len(rs.rules), 2)
@@ -138,6 +150,11 @@ class DatasetTest(unittest.TestCase):
     self.assertEqual(type(db.relationsetIndex), dict)
     self.assertEqual(len(db.relationsetIndex), len(db.relationsets))
 
+    # You can also use the [] operator to access rules (give role as parameter)
+    # or relations (give relation-id as parameter). The same rule as for
+    # Datasets apply to the efficiency of the [] operator compared to
+    # retrieving indexes directly using one of the *Index() methods.
+
   def test06_CanBrowseRelations(self):
     # Relations store clustering information of arraysets and arrays in a 
     # dataset. In this test we examplify how to iterate over relations in a 
@@ -147,12 +164,24 @@ class DatasetTest(unittest.TestCase):
     # relationship between objects from the arraysets with role "pattern1" and
     # arraysets with role "pattern9". You can get information about the rules
     # of the relationset using the `rule` property. Here is an example:
-    db = torch.database.load(INPUT_DATABASE)
+    db = torch.database.Dataset(INPUT_DATABASE)
+    
+    #equivalent to db['pattern-pattern']['pattern1'].role!
     self.assertEqual(db.relationsets[0].rules[0].role, "pattern1")
+    
+    #equivalent to db['pattern-pattern']['pattern9'].role!
     self.assertEqual(db.relationsets[0].rules[1].role, "pattern9")
+
+    #equivalent to db['pattern-pattern']['pattern1'].min!
     self.assertEqual(db.relationsets[0].rules[0].min, 1)
+
+    #equivalent to db['pattern-pattern']['pattern9'].min!
     self.assertEqual(db.relationsets[0].rules[1].min, 1)
+    
+    #equivalent to db['pattern-pattern']['pattern1'].max!
     self.assertEqual(db.relationsets[0].rules[0].max, 1)
+    
+    #equivalent to db['pattern-pattern']['pattern9'].max!
     self.assertEqual(db.relationsets[0].rules[1].max, 1)
 
     # You can browse the relationset rules and relations and then cross-relate
@@ -170,13 +199,19 @@ class DatasetTest(unittest.TestCase):
     # there.
     self.assertEqual(sorted(index.keys()), sorted([k.role for k in db.relationsets[0].rules] + ['__id__']))
 
-    # In our test case we only have 2 roles being grouped
+    # In our test case we only have 2 roles being grouped. As a plus, we also
+    # append the relation-id of every relation we have into the special
+    # dictionary key '__id__', so we must have 3 keys into our index
+    # dictionary.
     self.assertEqual(len(index), 3)
 
-    # The next assertion should be always true. The number of member lists for
-    # each role should be the same, across the relationset.
+    # The next assertion should be always true. The number of member tuples for
+    # each role should be the same, across the relationset. Within each tuple,
+    # the number of members may vary, depending on the role. We don't test for
+    # that here.
     self.assertEqual(len(index['pattern1']), len(db.relationsets[0].relations))
     self.assertEqual(len(index['pattern1']), len(index['pattern9']))
+    self.assertEqual(len(index['pattern1']), len(index['__id__']))
 
     # This is how to access the arrays using the index. You should keep your
     # dataset object close for that operation, as you are going to need the
