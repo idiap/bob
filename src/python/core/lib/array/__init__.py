@@ -38,3 +38,10 @@ for tname, atype in get_array_types():
   atype.__getitem__ = array_getitem
   atype.__setitem__ = array_setitem
   atype.__repr__ = atype.__str__
+
+class is_blitz_array(object):
+  """A tester for blitz::Array<> types."""
+  types = tuple([k[1] for k in get_array_types()])
+
+  def __call__(self, item):
+    return isinstance(item, self.types)
