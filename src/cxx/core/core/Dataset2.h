@@ -121,29 +121,28 @@ namespace Torch {
          * @warning Updating the content of the blitz array will update the
          * content of the corresponding array in the dataset.
          */
-        // TODO: remove const keyword?
         template<typename T, int D> 
-        void refer( blitz::Array<T,D>& output) const;
+        void refer( blitz::Array<T,D>& output);
         /************** Partial specialization declaration *************/
-        template<int D> void refer( blitz::Array<bool,D>& output) const;
-        template<int D> void refer( blitz::Array<int8_t,D>& output) const;
-        template<int D> void refer( blitz::Array<int16_t,D>& output) const;
-        template<int D> void refer( blitz::Array<int32_t,D>& output) const;
-        template<int D> void refer( blitz::Array<int64_t,D>& output) const;
-        template<int D> void refer( blitz::Array<uint8_t,D>& output) const;
-        template<int D> void refer( blitz::Array<uint16_t,D>& output) const;
-        template<int D> void refer( blitz::Array<uint32_t,D>& output) const;
-        template<int D> void refer( blitz::Array<uint64_t,D>& output) const;
-        template<int D> void refer( blitz::Array<float,D>& output) const;
-        template<int D> void refer( blitz::Array<double,D>& output) const;
+        template<int D> void refer( blitz::Array<bool,D>& output);
+        template<int D> void refer( blitz::Array<int8_t,D>& output);
+        template<int D> void refer( blitz::Array<int16_t,D>& output);
+        template<int D> void refer( blitz::Array<int32_t,D>& output);
+        template<int D> void refer( blitz::Array<int64_t,D>& output);
+        template<int D> void refer( blitz::Array<uint8_t,D>& output);
+        template<int D> void refer( blitz::Array<uint16_t,D>& output);
+        template<int D> void refer( blitz::Array<uint32_t,D>& output);
+        template<int D> void refer( blitz::Array<uint64_t,D>& output);
+        template<int D> void refer( blitz::Array<float,D>& output);
+        template<int D> void refer( blitz::Array<double,D>& output);
         template<int D> 
-        void refer( blitz::Array<long double,D>& output) const;
+        void refer( blitz::Array<long double,D>& output);
         template<int D> 
-        void refer( blitz::Array<std::complex<float>,D>& output) const;
+        void refer( blitz::Array<std::complex<float>,D>& output);
         template<int D> 
-        void refer( blitz::Array<std::complex<double>,D>& output) const;
+        void refer( blitz::Array<std::complex<double>,D>& output);
         template<int D> 
-        void refer( blitz::Array<std::complex<long double>,D>& output) const;
+        void refer( blitz::Array<std::complex<long double>,D>& output);
 
       private:
         template <typename T, typename U> void copyCast( U* out) const;
@@ -1054,14 +1053,14 @@ namespace Torch {
     }
 
     template <typename T, int D> 
-    void Array::refer( blitz::Array<T,D>& output) const
+    void Array::refer( blitz::Array<T,D>& output)
     {
       error << "Unsupported blitz array type " << std::endl;
       throw TypeError();
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<bool,D>& output) const
+    void Array::refer( blitz::Array<bool,D>& output)
     {
       referCheck(output);
 
@@ -1084,7 +1083,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int8_t,D>& output) const
+    void Array::refer( blitz::Array<int8_t,D>& output)
     {
       referCheck(output);
 
@@ -1107,7 +1106,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int16_t,D>& output) const
+    void Array::refer( blitz::Array<int16_t,D>& output)
     {
       referCheck(output);
 
@@ -1130,7 +1129,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int32_t,D>& output) const
+    void Array::refer( blitz::Array<int32_t,D>& output)
     {
       referCheck(output);
 
@@ -1153,7 +1152,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int64_t,D>& output) const
+    void Array::refer( blitz::Array<int64_t,D>& output)
     {
       referCheck(output);
 
@@ -1176,7 +1175,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint8_t,D>& output) const
+    void Array::refer( blitz::Array<uint8_t,D>& output)
     {
       referCheck(output);
 
@@ -1199,7 +1198,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint16_t,D>& output) const
+    void Array::refer( blitz::Array<uint16_t,D>& output)
     {
       referCheck(output);
 
@@ -1222,7 +1221,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint32_t,D>& output) const
+    void Array::refer( blitz::Array<uint32_t,D>& output)
     {
       referCheck(output);
 
@@ -1245,7 +1244,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint64_t,D>& output) const
+    void Array::refer( blitz::Array<uint64_t,D>& output)
     {
       referCheck(output);
 
@@ -1268,7 +1267,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<float,D>& output) const
+    void Array::refer( blitz::Array<float,D>& output)
     {
       referCheck(output);
 
@@ -1291,7 +1290,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<double,D>& output) const
+    void Array::refer( blitz::Array<double,D>& output)
     {
       referCheck(output);
 
@@ -1314,7 +1313,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<long double,D>& output) const
+    void Array::refer( blitz::Array<long double,D>& output)
     {
       referCheck(output);
 
@@ -1337,7 +1336,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<std::complex<float>,D>& output) const
+    void Array::refer( blitz::Array<std::complex<float>,D>& output)
     {
       referCheck(output);
 
@@ -1361,7 +1360,7 @@ namespace Torch {
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<std::complex<double>,D>& output) const
+    void Array::refer( blitz::Array<std::complex<double>,D>& output)
     {
       referCheck(output);
 
@@ -1386,7 +1385,7 @@ namespace Torch {
 
     template<int D> 
     void 
-    Array::refer( blitz::Array<std::complex<long double>,D>& output) const
+    Array::refer( blitz::Array<std::complex<long double>,D>& output)
     {
       referCheck(output);
 
