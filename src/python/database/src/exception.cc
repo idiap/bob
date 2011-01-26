@@ -1,15 +1,13 @@
 /**
- * @file src/python/core/src/exception.cc
- * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
+ * @date Wed 26 Jan 14:29:39 2011 
  *
- * @brief Binds the core extension into Python. Please note that, for each
- * exception type you only need to declare once the translator. All other
- * modules will benefit from it automatically.
+ * @brief Database exceptions 
  */
 
 #include <boost/python.hpp>
 
-#include "core/Exception.h"
+#include "core/Dataset2.h"
 
 using namespace boost::python;
 
@@ -56,14 +54,9 @@ template <typename T> PyObject* CxxToPythonTranslator<T>::pyExceptionType = 0;
 
 #define BIND_EXCEPTION(TYPE,NAME,DOC) CxxToPythonTranslator<TYPE>(NAME, DOC)
 
-/**
- * This method is only useful to test exception throwing in Python code.
- */
-static void throw_exception(void) {
-  throw Torch::core::Exception();
-}
-
-void bind_core_exception() {
-  BIND_EXCEPTION(Torch::core::Exception, "Exception", "The core Exception class should be used as a basis for all Torch-Python exceptions.");
-  def("throw_exception", &throw_exception);
+void bind_database_exception() {
+  BIND_EXCEPTION(Torch::core::NonExistingElement, "NonExistingElement", "Raised when database elements queried-for do not exist");
+  BIND_EXCEPTION(Torch::core::IndexError, "IndexError", "Raised when database elements queried-for do not exist");
+  BIND_EXCEPTION(Torch::core::NDimensionError, "NDimensionError", "Raised when user asks for arrays with unsupported dimensionality");
+  BIND_EXCEPTION(Torch::core::TypeError, "TypeError", "Raised when user asks for arrays with unsupported element type");
 }
