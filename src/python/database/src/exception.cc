@@ -58,5 +58,5 @@ void bind_database_exception() {
   BIND_EXCEPTION(Torch::core::NonExistingElement, "NonExistingElement", "Raised when database elements that were queried for do not exist");
   BIND_EXCEPTION(Torch::core::IndexError, "IndexError", "Raised when database elements queried-for do not exist");
   BIND_EXCEPTION(Torch::core::NDimensionError, "NDimensionError", "Raised when user asks for arrays with unsupported dimensionality");
-  BIND_EXCEPTION(Torch::core::TypeError, "TypeError", "Raised when user asks for arrays with unsupported element type");
+  BIND_EXCEPTION(Torch::core::TypeError, "TypeError", "Raised when the user asks for arrays with unsupported element type");
 }
