@@ -70,7 +70,7 @@ def array_copy(self):
   """Returns a blitz::Array object with the expected type and dimension"""
   from .. import core
   retval = getattr(core.array, '%s_%d' % \
-      (self.getParentArrayset().arrayType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
+      (self.getParentArrayset().elementType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
   self.bzcopy(retval)
   return retval
 
@@ -141,7 +141,7 @@ def bininputfile_getitem(self, i):
   """Returns a blitz::Array object with the expected type and dimension"""
   from .. import core
   retval = getattr(core.array, '%s_%d' % \
-      (self.getParentArrayset().arrayType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
+      (self.getParentArrayset().elementType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
   self.bzrelad(i, retval)
   return retval
 
