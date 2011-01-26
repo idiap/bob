@@ -11,6 +11,7 @@ set(pysrc
    "src/main.cc"
    "src/relation.cc"
    "src/relationset.cc"
+   "src/binfile.cc"
    )
  
 include(../../cmake/macros.cmake)

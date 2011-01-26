@@ -139,3 +139,13 @@ def member_arrays(self, arraysets):
   return tuple(tmp)
 
 Member.arrays = member_arrays
+
+def bininputfile_getitem(self, i):
+  """Returns a blitz::Array object with the expected type and dimension"""
+  from .. import core
+  retval = getattr(core.array, '%s_%d' % \
+      (self.getParentArrayset().arrayType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
+  self.bzrelad(i, retval)
+  return retval
+
+BinInputFile.__getitem__ = bininputfile_getitem

@@ -15,6 +15,7 @@ void bind_database_member();
 void bind_database_rule();
 void bind_database_relation();
 void bind_database_relationset();
+void bind_database_binfile();
 
 BOOST_PYTHON_MODULE(libpytorch_database) {
   scope().attr("__doc__") = "Torch classes and sub-classes for database access";
@@ -25,4 +26,5 @@ BOOST_PYTHON_MODULE(libpytorch_database) {
   bind_database_rule();
   bind_database_relation();
   bind_database_relationset();
+  bind_database_binfile();
 }
