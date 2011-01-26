@@ -77,11 +77,8 @@ def array_copy(self):
 def array_refer(self):
   """Returns a blitz::Array object with the expected type and dimension, which
   points to the internally allocated data."""
-  from .. import core
-  retval = getattr(core.array, '%s_%d' % \
-      (self.getParentArrayset().arrayType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
-  self.bzrefer(retval)
-  return retval
+  return getattr(self, 'refer_%s_%d' % \
+      (self.getParentArrayset().elementType.name, len(self.getParentArrayset().shape)))()
 
 Array.copy = array_copy
 Array.refer = array_refer

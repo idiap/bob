@@ -116,39 +116,167 @@ namespace Torch {
          */
         template<typename T, int D> 
         void copy( blitz::Array<T,D>& output) const;
+
+
+        template<typename T, int D> struct do_refer
+        {
+          blitz::Array<T,D> static apply(Array&) {
+            error << "Unsupported blitz array type " << std::endl;
+            throw TypeError();
+          }
+        };
+
+        template<int D> struct do_refer<bool,D> {
+          blitz::Array<bool,D> static apply(Array& arr);
+        };
+        friend struct do_refer<bool,1>;
+        friend struct do_refer<bool,2>;
+        friend struct do_refer<bool,3>;
+        friend struct do_refer<bool,4>;
+
+        template<int D> struct do_refer<int8_t,D> {
+          blitz::Array<int8_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<int8_t,1>;
+        friend struct do_refer<int8_t,2>;
+        friend struct do_refer<int8_t,3>;
+        friend struct do_refer<int8_t,4>;
+
+        template<int D> struct do_refer<int16_t,D> {
+          blitz::Array<int16_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<int16_t,1>;
+        friend struct do_refer<int16_t,2>;
+        friend struct do_refer<int16_t,3>;
+        friend struct do_refer<int16_t,4>;
+
+        template<int D> struct do_refer<int32_t,D> {
+          blitz::Array<int32_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<int32_t,1>;
+        friend struct do_refer<int32_t,2>;
+        friend struct do_refer<int32_t,3>;
+        friend struct do_refer<int32_t,4>;
+
+        template<int D> struct do_refer<int64_t,D> {
+          blitz::Array<int64_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<int64_t,1>;
+        friend struct do_refer<int64_t,2>;
+        friend struct do_refer<int64_t,3>;
+        friend struct do_refer<int64_t,4>;
+
+        template<int D> struct do_refer<uint8_t,D> {
+          blitz::Array<uint8_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<uint8_t,1>;
+        friend struct do_refer<uint8_t,2>;
+        friend struct do_refer<uint8_t,3>;
+        friend struct do_refer<uint8_t,4>;
+
+        template<int D> struct do_refer<uint16_t,D> {
+          blitz::Array<uint16_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<uint16_t,1>;
+        friend struct do_refer<uint16_t,2>;
+        friend struct do_refer<uint16_t,3>;
+        friend struct do_refer<uint16_t,4>;
+
+        template<int D> struct do_refer<uint32_t,D> {
+          blitz::Array<uint32_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<uint32_t,1>;
+        friend struct do_refer<uint32_t,2>;
+        friend struct do_refer<uint32_t,3>;
+        friend struct do_refer<uint32_t,4>;
+
+        template<int D> struct do_refer<uint64_t,D> {
+          blitz::Array<uint64_t,D> static apply(Array& arr);
+        };
+        friend struct do_refer<uint64_t,1>;
+        friend struct do_refer<uint64_t,2>;
+        friend struct do_refer<uint64_t,3>;
+        friend struct do_refer<uint64_t,4>;
+
+        template<int D> struct do_refer<float,D> {
+          blitz::Array<float,D> static apply(Array& arr);
+        };
+        friend struct do_refer<float,1>;
+        friend struct do_refer<float,2>;
+        friend struct do_refer<float,3>;
+        friend struct do_refer<float,4>;
+
+        template<int D> struct do_refer<double,D> {
+          blitz::Array<double,D> static apply(Array& arr);
+        };
+        friend struct do_refer<double,1>;
+        friend struct do_refer<double,2>;
+        friend struct do_refer<double,3>;
+        friend struct do_refer<double,4>;
+
+        template<int D> struct do_refer<long double,D> {
+          blitz::Array<long double,D> static apply(Array& arr);
+        };
+        friend struct do_refer<long double,1>;
+        friend struct do_refer<long double,2>;
+        friend struct do_refer<long double,3>;
+        friend struct do_refer<long double,4>;
+
+        template<int D> struct do_refer<std::complex<float>,D> {
+          blitz::Array<std::complex<float>,D> static apply(Array& arr);
+        };
+        friend struct do_refer<std::complex<float>,1>;
+        friend struct do_refer<std::complex<float>,2>;
+        friend struct do_refer<std::complex<float>,3>;
+        friend struct do_refer<std::complex<float>,4>;
+
+        template<int D> struct do_refer<std::complex<double>,D> {
+          blitz::Array<std::complex<double>,D> static apply(Array& arr);
+        };
+        friend struct do_refer<std::complex<double>,1>;
+        friend struct do_refer<std::complex<double>,2>;
+        friend struct do_refer<std::complex<double>,3>;
+        friend struct do_refer<std::complex<double>,4>;
+
+        template<int D> struct do_refer<std::complex<long double>,D> {
+          blitz::Array<std::complex<long double>,D> static apply(Array& arr);
+        };
+        friend struct do_refer<std::complex<long double>,1>;
+        friend struct do_refer<std::complex<long double>,2>;
+        friend struct do_refer<std::complex<long double>,3>;
+        friend struct do_refer<std::complex<long double>,4>;
+
         /**
          * @brief Adapt the size of each dimension of the passed blitz array
          * to the ones of the underlying array and refer to the data in it.
          * @warning Updating the content of the blitz array will update the
          * content of the corresponding array in the dataset.
          */
-        template<typename T, int D> 
-        void refer( blitz::Array<T,D>& output);
-        /************** Partial specialization declaration *************/
-        template<int D> void refer( blitz::Array<bool,D>& output);
-        template<int D> void refer( blitz::Array<int8_t,D>& output);
-        template<int D> void refer( blitz::Array<int16_t,D>& output);
-        template<int D> void refer( blitz::Array<int32_t,D>& output);
-        template<int D> void refer( blitz::Array<int64_t,D>& output);
-        template<int D> void refer( blitz::Array<uint8_t,D>& output);
-        template<int D> void refer( blitz::Array<uint16_t,D>& output);
-        template<int D> void refer( blitz::Array<uint32_t,D>& output);
-        template<int D> void refer( blitz::Array<uint64_t,D>& output);
-        template<int D> void refer( blitz::Array<float,D>& output);
-        template<int D> void refer( blitz::Array<double,D>& output);
-        template<int D> 
-        void refer( blitz::Array<long double,D>& output);
-        template<int D> 
-        void refer( blitz::Array<std::complex<float>,D>& output);
-        template<int D> 
-        void refer( blitz::Array<std::complex<double>,D>& output);
-        template<int D> 
-        void refer( blitz::Array<std::complex<long double>,D>& output);
+        template<typename T, int D> blitz::Array<T,D> refer() {
+          return do_refer<T,D>::apply(*this);
+        }
 
+
+        /************** Partial specialization declaration *************/
+/*        template<int D> blitz::Array<bool,D> refer( );
+        template<int D> blitz::Array<int8_t,D> refer( );
+        template<int D> blitz::Array<int16_t,D> refer( );
+        template<int D> blitz::Array<int32_t,D> refer( );
+        template<int D> blitz::Array<int64_t,D> refer( );
+        template<int D> blitz::Array<uint8_t,D> refer( );
+        template<int D> blitz::Array<uint16_t,D> refer( );
+        template<int D> blitz::Array<uint32_t,D> refer( );
+        template<int D> blitz::Array<uint64_t,D> refer( );
+        template<int D> blitz::Array<float,D> refer( );
+        template<int D> blitz::Array<double,D> refer( );
+        template<int D> blitz::Array<long double,D> refer( );
+        template<int D> blitz::Array<std::complex<float>,D> refer( );
+        template<int D> blitz::Array<std::complex<double>,D> refer( );
+        template<int D> blitz::Array<std::complex<long double>,D> refer( );
+*/
       private:
         template <typename T, typename U> void copyCast( U* out) const;
-        template <typename T, int D> 
-        void referCheck( blitz::Array<T,D>& output) const;
+        template <int D> void referCheck( ) const;
 
         const Arrayset& m_parent_arrayset;
         size_t m_id;
@@ -1067,8 +1195,7 @@ namespace Torch {
       }
     }
 
-    template <typename T, int D> 
-    void Array::referCheck( blitz::Array<T,D>& output) const
+    template <int D> void Array::referCheck( ) const
     {
       // Load the data if required
       if(!getIsLoaded()) {
@@ -1086,27 +1213,18 @@ namespace Torch {
       }
     }
 
-    template <typename T, int D> 
-    void Array::refer( blitz::Array<T,D>& output)
-    {
-      error << "Unsupported blitz array type " << std::endl;
-      throw TypeError();
-    }
 
     template<int D> 
-    void Array::refer( blitz::Array<bool,D>& output)
+    blitz::Array<bool,D> Array::do_refer<bool,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_bool:
-          output = blitz::Array<bool,D>(static_cast<bool*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type bool with a non-bool " <<
@@ -1114,45 +1232,43 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<bool,D>(static_cast<bool*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int8_t,D>& output)
+    blitz::Array<int8_t,D> Array::do_refer<int8_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_int8:
-          output = blitz::Array<int8_t,D>(static_cast<int8_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
-          error << "Cannot refer to data of type int8_t with a non-int8_t " <<
+          error << "Cannot refer to data of type bool with a non-bool " <<
             "blitz array." << std::endl;
           throw TypeError();
           break;
       }
+      return blitz::Array<int8_t,D>(static_cast<int8_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int16_t,D>& output)
+    blitz::Array<int16_t,D> Array::do_refer<int16_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_int16:
-          output = blitz::Array<int16_t,D>(static_cast<int16_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type int16_t with a non-int16_t " <<
@@ -1160,22 +1276,21 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<int16_t,D>(static_cast<int16_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int32_t,D>& output)
+    blitz::Array<int32_t,D> Array::do_refer<int32_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_int32:
-          output = blitz::Array<int32_t,D>(static_cast<int32_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type int32_t with a non-int32_t " <<
@@ -1183,22 +1298,21 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<int32_t,D>(static_cast<int32_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<int64_t,D>& output)
+    blitz::Array<int64_t,D> Array::do_refer<int64_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_int64:
-          output = blitz::Array<int64_t,D>(static_cast<int64_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type int64_t with a non-int64_t " <<
@@ -1206,45 +1320,43 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<int64_t,D>(static_cast<int64_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint8_t,D>& output)
+    blitz::Array<uint8_t,D> Array::do_refer<uint8_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_uint8:
-          output = blitz::Array<uint8_t,D>(static_cast<uint8_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
-          error << "Cannot refer to data of type uint8_t with a non-uint8_t " <<
+          error << "Cannot refer to data of type bool with a non-bool " <<
             "blitz array." << std::endl;
           throw TypeError();
           break;
       }
+      return blitz::Array<uint8_t,D>(static_cast<uint8_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint16_t,D>& output)
+    blitz::Array<uint16_t,D> Array::do_refer<uint16_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_uint16:
-          output = blitz::Array<uint16_t,D>(static_cast<uint16_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type uint16_t with a non-uint16_t " <<
@@ -1252,22 +1364,21 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<uint16_t,D>(static_cast<uint16_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint32_t,D>& output)
+    blitz::Array<uint32_t,D> Array::do_refer<uint32_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_uint32:
-          output = blitz::Array<uint32_t,D>(static_cast<uint32_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type uint32_t with a non-uint32_t " <<
@@ -1275,22 +1386,21 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<uint32_t,D>(static_cast<uint32_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<uint64_t,D>& output)
+    blitz::Array<uint64_t,D> Array::do_refer<uint64_t,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_uint64:
-          output = blitz::Array<uint64_t,D>(static_cast<uint64_t*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type uint64_t with a non-uint64_t " <<
@@ -1298,22 +1408,21 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<uint64_t,D>(static_cast<uint64_t*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<float,D>& output)
+    blitz::Array<float,D> Array::do_refer<float,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_float32:
-          output = blitz::Array<float,D>(static_cast<float*>(m_storage),
-            shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type float with a non-float " <<
@@ -1321,22 +1430,21 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<float,D>(static_cast<float*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<double,D>& output)
+    blitz::Array<double,D> Array::do_refer<double,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_float64:
-          output = blitz::Array<double,D>(static_cast<double*>
-            (m_storage), shape, blitz::neverDeleteData); 
           break;
         default:
           error << "Cannot refer to data of type double with a non-double " <<
@@ -1344,104 +1452,97 @@ namespace Torch {
           throw TypeError();
           break;
       }
+      return blitz::Array<double,D>(static_cast<double*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<long double,D>& output)
+    blitz::Array<long double,D> Array::do_refer<long double,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_float128:
-          output = blitz::Array<long double,D>(static_cast<long double*>
-            (m_storage), shape, blitz::neverDeleteData); 
           break;
         default:
-          error << "Cannot refer to data of type long double with a " <<
-            "non-long double blitz array." << std::endl;
+          error << "Cannot refer to data of type long double with a non-long double " <<
+            "blitz array." << std::endl;
           throw TypeError();
           break;
       }
+      return blitz::Array<long double,D>(static_cast<long double*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<std::complex<float>,D>& output)
+    blitz::Array<std::complex<float>,D> Array::do_refer<std::complex<float>,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_complex64:
-          output = blitz::Array<std::complex<float>,D>(
-            static_cast<std::complex<float>*>(m_storage), 
-            shape, blitz::neverDeleteData);
           break;
         default:
-          error << "Cannot refer to data of type complex(float) with a " <<
-            "non-complex(float) blitz array." << std::endl;
+          error << "Cannot refer to data of type std::complex<float> with a non-std::complex<float> " <<
+            "blitz array." << std::endl;
           throw TypeError();
           break;
       }
+      return blitz::Array<std::complex<float>,D>(static_cast<std::complex<float>*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void Array::refer( blitz::Array<std::complex<double>,D>& output)
+    blitz::Array<std::complex<double>,D> Array::do_refer<std::complex<double>,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_complex128:
-          output = blitz::Array<std::complex<double>,D>(
-            static_cast<std::complex<double>*>(m_storage), 
-            shape, blitz::neverDeleteData);
           break;
         default:
-          error << "Cannot refer to data of type complex(double) with a " <<
-            "non-complex(double) blitz array." << std::endl;
+          error << "Cannot refer to data of type std::complex<double> with a non-std::complex<double> " <<
+            "blitz array." << std::endl;
           throw TypeError();
           break;
       }
+      return blitz::Array<std::complex<double>,D>(static_cast<std::complex<double>*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
 
     template<int D> 
-    void 
-    Array::refer( blitz::Array<std::complex<long double>,D>& output)
+    blitz::Array<std::complex<long double>,D> Array::do_refer<std::complex<long double>,D>::apply(Array& arr)
     {
-      referCheck(output);
+      arr.referCheck<D>();
 
-      // Reshape each dimensions with the correct size
+      // Get the shape with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      arr.m_parent_arrayset.getShape(shape);
 
-      switch(m_parent_arrayset.getElementType()) {
+      switch(arr.m_parent_arrayset.getElementType()) {
         case array::t_complex256:
-          output = blitz::Array<std::complex<long double>,D>(
-            static_cast<std::complex<long double>*>(m_storage), 
-            shape, blitz::neverDeleteData); 
           break;
         default:
-          error << "Cannot refer to data of type complex(long double) with" <<
-            "a non-complex(long double) blitz array." << std::endl;
+          error << "Cannot refer to data of type std::complex<long double> with a non-std::complex<long double> " <<
+            "blitz array." << std::endl;
           throw TypeError();
           break;
       }
+      return blitz::Array<std::complex<long double>,D>(static_cast<std::complex<long double>*>(arr.m_storage), 
+        shape, blitz::neverDeleteData); 
     }
-
 
     template<typename T, int D> void 
     Arrayset::at(size_t id, blitz::Array<T,D>& output) const {

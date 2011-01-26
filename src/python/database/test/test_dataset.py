@@ -46,7 +46,7 @@ class DatasetTest(unittest.TestCase):
       # call operator ()!). You can find more about methods and properties of
       # arraysets by looking its manual using help(torch.dataset.Arrayset).
       self.assertEqual(arrset.role, arrset_props[i]['role'])
-      self.assertEqual(arrset.arrayType, arrset_props[i]['elemtype'])
+      self.assertEqual(arrset.elementType, arrset_props[i]['elemtype'])
       self.assertEqual(arrset.shape, arrset_props[i]['shape'])
       self.assertEqual(arrset.id, arrset_props[i]['id'])
 
