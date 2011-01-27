@@ -11,10 +11,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "core/Tensor.h"
-#include "sp/spDCT.h"
-#include "sp/spDFT.h"
-
 #include "sp/convolution.h"
 #include <blitz/array.h>
 

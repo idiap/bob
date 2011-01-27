@@ -32,16 +32,14 @@ void checkBlitzAllocation( const int n_megabytes ) {
 // If we can't allocate more than 2GB adresses, throw an exception
 #if !((defined(__LP64__) || defined(__APPLE__)) \
   && defined(HAVE_BLITZ_DIFFTYPE))
-  std::cout << "Can't " << std::endl;
   static const int64_t TWO_GB = ((int64_t)2*1024)*((int64_t)1024*1024);
   if( n_e >= TWO_GB ) {
-    std::cout << "  More than 2GB " << std::endl;
+    BOOST_REQUIRE_THROW( throw );
     BOOST_REQUIRE_THROW(X.resize(n_elems_first,n_elems_second), 
       std::bad_alloc);
   }
 #endif
 
-  std::cout << "Can " << std::endl;
   // Resize the blitz::Array and check that no exception is thrown
   BOOST_REQUIRE_NO_THROW( X.resize(n_elems_first,n_elems_second) );
 
