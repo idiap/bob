@@ -138,7 +138,7 @@ def member_arrays(self, arraysets):
 Member.arrays = member_arrays
 
 def bininputfile_getitem(self, i):
-  """Returns a blitz::Array object with the expected type and dimension"""
+  """Returns a blitz::Array<> object with the expected element type and shape"""
   from .. import core
   retval = getattr(core.array, '%s_%d' % \
       (self.elementType.name, len(self.shape)))() #empty blitz::Array
