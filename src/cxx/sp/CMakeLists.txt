@@ -21,3 +21,4 @@ torch_header_install(sp "torch::sp")
 # Defines tests for this package
 torch_test(sp dftdct_naive test/dftdctnaive.cc)
 torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
+torch_test(sp convolution_zeropadding test/convolution.cc)
