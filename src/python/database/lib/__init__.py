@@ -3,7 +3,7 @@ import os
 
 def loadString(data):
   """Loads the dataset from a string by temporarily saving the set to an XML
-  file and then loading from that file."""
+  file and then loading from that file.""" 
   from tempfile import mkstemp
   (fd, name) = mkstemp(prefix='torch_dataset_', suffix='.xml')
   f = os.fdopen(fd, 'wt')
