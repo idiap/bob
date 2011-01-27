@@ -13,3 +13,7 @@ include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(machine "${pysrc}")
 torch_python_install(machine)
+
+# Our test units
+torch_python_add_test(python-machine-gmm-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gmm.py)

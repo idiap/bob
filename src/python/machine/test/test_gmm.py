@@ -15,7 +15,7 @@ def compare(v1, v2, width):
 
 def test_file(name):
   """Returns the path to the filename for this test."""
-  return os.path.join("data", "machine", name)
+  return os.path.join("data", "gmm", name)
 
 class GmmTest(unittest.TestCase):
   """Performs various tests for the Torch::ipGeomNorm object."""

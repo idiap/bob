@@ -20,6 +20,8 @@ include(../../cmake/macros.cmake)
 torch_python_bindings(database "${pysrc}" "core" "")
 torch_python_install(database)
 
-#our tests
-torch_python_add_test(python-dataset-tests
+# Our test units
+torch_python_add_test(python-database-dataset-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dataset.py)
+torch_python_add_test(python-database-binfile-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_binfile.py)

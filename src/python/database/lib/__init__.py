@@ -2,7 +2,7 @@ from libpytorch_database import *
 import os
 
 def loadString(data):
-  """Loads the dataset from a string by temporarily saving the set to a XML
+  """Loads the dataset from a string by temporarily saving the set to an XML
   file and then loading from that file."""
   from tempfile import mkstemp
   (fd, name) = mkstemp(prefix='torch_dataset_', suffix='.xml')
@@ -67,7 +67,7 @@ def arrayset_append(self, o):
   raise RuntimeError, "Can only append database::Array or blitz::Array to Arrayset"
 
 def array_copy(self):
-  """Returns a blitz::Array object with the expected type and dimension"""
+  """Returns a blitz::Array object with the expected element type and shape"""
   from .. import core
   retval = getattr(core.array, '%s_%d' % \
       (self.getParentArrayset().elementType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
@@ -116,7 +116,7 @@ def member_arrays(self, arraysets):
   described in this relation member. Please note that by using this property
   you may trigger loading of data.
 
-  N.B.: If the array-id == 0, the member points to an Arrayset.
+  N.B.: If the array-id == 0, the member points to an Arrayset!
   """
   tmp = [k for k in arraysets if k.id == self.arraysetId]
   if not tmp:
@@ -138,11 +138,11 @@ def member_arrays(self, arraysets):
 Member.arrays = member_arrays
 
 def bininputfile_getitem(self, i):
-  """Returns a blitz::Array object with the expected type and dimension"""
+  """Returns a blitz::Array<> object with the expected element type and shape"""
   from .. import core
   retval = getattr(core.array, '%s_%d' % \
-      (self.getParentArrayset().elementType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
-  self.bzrelad(i, retval)
+      (self.elementType.name, len(self.shape)))() #empty blitz::Array
+  self.bzread(i, retval)
   return retval
 
 BinInputFile.__getitem__ = bininputfile_getitem

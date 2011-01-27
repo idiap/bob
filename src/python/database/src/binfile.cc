@@ -37,12 +37,13 @@ static const char* ARRAY_READ_DOC = "Adapts the size of each dimension of the pa
 #define ARRAY_READ_DEF(T,D) .def("bzread", (void (db::BinInputFile::*)(size_t, blitz::Array<T,D>&))&db::BinInputFile::read<T,D>, (arg("self"), arg("index"), arg("array")), ARRAY_READ_DOC)
 
 static const char* ARRAY_WRITE_DOC = "Writes a single blitz::Array<> into the binary file. Please note that this array should conform to the shape and element type of the arrays already inserted. If no array was inserted, the element type and shape will be defined when you first write an array to this binary file.";
-#define ARRAY_WRITE_DEF(T,D) .def("bzwrite", (void (db::BinOutputFile::*)(const blitz::Array<T,D>&))&db::BinOutputFile::write<T,D>, (arg("self"), arg("array")), ARRAY_WRITE_DOC)
+#define ARRAY_WRITE_DEF(T,D) .def("append", (void (db::BinOutputFile::*)(const blitz::Array<T,D>&))&db::BinOutputFile::write<T,D>, (arg("self"), arg("array")), ARRAY_WRITE_DOC)
 
 void bind_database_binfile() {
   class_<db::BinInputFile, boost::shared_ptr<db::BinInputFile>, boost::noncopyable>("BinInputFile", "An BinInputFile allows users to read data from files containing standard Torch binary coded data", init<const std::string&>((arg("filename")), "Initializes an binary file reader. Please note that this constructor will not load the data."))
     .add_property("shape", &get_shape<db::BinInputFile>, "The shape of arrays in this binary file. Please note all arrays in the file have necessarily the same shape.")
-    .add_property("__len__", &db::BinInputFile::getNSamples, "The number of arrays in this binary file.")
+    .add_property("elementType", &db::BinInputFile::getElementType, "The type of array elements contained in this binary file. This would be equivalent to the 'T' bit in blitz::Array<T,D>.")
+    .def("__len__", &db::BinInputFile::getNSamples, "The number of arrays in this binary file.")
     ARRAY_READ_DEF(bool, 1)
     ARRAY_READ_DEF(int8_t, 1)
     ARRAY_READ_DEF(int16_t, 1)
@@ -99,7 +100,8 @@ void bind_database_binfile() {
   
   class_<db::BinOutputFile, boost::shared_ptr<db::BinOutputFile>, boost::noncopyable>("BinOutputFile", "An BinOutputFile allows users to write data to files containing standard Torch binary coded data", init<const std::string&, optional<bool> >((arg("filename"), arg("append")=false), "Initializes an binary file writer. If the file exists, it is truncated unless the append attribute is set to True."))
     .add_property("shape", &get_shape<db::BinOutputFile>, "The shape of arrays in this binary file. Please note all arrays in the file have necessarily the same shape.")
-    .add_property("__len__", &db::BinOutputFile::getNSamples, "The number of arrays in this binary file.")
+    .add_property("elementType", &db::BinOutputFile::getElementType, "The type of array elements contained in this binary file. This would be equivalent to the 'T' bit in blitz::Array<T,D>.")
+    .def("__len__", &db::BinOutputFile::getNSamples, "The number of arrays in this binary file.")
     ARRAY_WRITE_DEF(bool, 1)
     ARRAY_WRITE_DEF(int8_t, 1)
     ARRAY_WRITE_DEF(int16_t, 1)

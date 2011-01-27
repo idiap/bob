@@ -66,7 +66,7 @@ if __name__ == '__main__':
       hasattr(torch.core, 'ProfilerStart'):
     torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
-  os.chdir(os.path.join('data', 'video'))
+  os.chdir('data')
   unittest.main()
   if os.environ.has_key('TORCH_PROFILE') and \
       os.environ['TORCH_PROFILE'] and \
