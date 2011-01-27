@@ -116,7 +116,7 @@ def member_arrays(self, arraysets):
   described in this relation member. Please note that by using this property
   you may trigger loading of data.
 
-  N.B.: If the array-id == 0, the member points to an Arrayset.
+  N.B.: If the array-id == 0, the member points to an Arrayset!
   """
   tmp = [k for k in arraysets if k.id == self.arraysetId]
   if not tmp:
