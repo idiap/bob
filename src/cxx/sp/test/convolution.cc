@@ -36,6 +36,20 @@ struct T {
   blitz::Array<double,1> res_A1_10_b1_5_same;
   blitz::Array<double,1> res_A1_10_b1_5_valid;
 
+ 
+  blitz::Array<double,2> A2_5;
+  blitz::Array<double,2> b2_2;
+  blitz::Array<double,2> b2_3;
+
+  blitz::Array<double,2> res_A2_5_b2_2_full;
+  blitz::Array<double,2> res_A2_5_b2_2_same;
+  blitz::Array<double,2> res_A2_5_b2_2_valid;
+
+  blitz::Array<double,2> res_A2_5_b2_3_full;
+  blitz::Array<double,2> res_A2_5_b2_3_same;
+  blitz::Array<double,2> res_A2_5_b2_3_valid;
+
+
   double eps_d;
   T(): eps_d(1e-3) {
     // The following arrays have been generated randomly.
@@ -49,6 +63,22 @@ struct T {
     b1_4 = 0.2551, 0.5060, 0.6991, 0.8909;
     b1_5.resize(5);
     b1_5 = 0.9593, 0.5472, 0.1386, 0.1493, 0.2575;
+
+    A2_5.resize(5,5);
+    A2_5 = 0.8407, 0.3500, 0.3517, 0.2858, 0.0759,
+      0.2543, 0.1966, 0.8308, 0.7572, 0.0540,
+      0.8143, 0.2511, 0.5853, 0.7537, 0.5308,
+      0.2435, 0.6160, 0.5497, 0.3804, 0.7792,
+      0.9293, 0.4733, 0.9172, 0.5678, 0.9340;
+
+    b2_2.resize(2,2);
+    b2_2 = 0.1299, 0.4694,
+      0.5688, 0.0119;
+
+    b2_3.resize(3,3);
+    b2_3 = 0.3371, 0.3112, 0.6020,
+      0.1622, 0.5285, 0.2630,
+      0.7943, 0.1656, 0.6541;
 
     // Reference results have been produced using matlab conv and conv2 
     // functions.
@@ -86,6 +116,49 @@ struct T {
 
     res_A1_10_b1_5_valid.resize(6);
     res_A1_10_b1_5_valid = 1.3340, 0.8442, 0.4665, 0.8386, 1.4028, 0.9804;
+
+    res_A2_5_b2_2_full.resize(6,6);
+    res_A2_5_b2_2_full = 0.1092, 0.4401, 0.2100, 0.2022, 0.1440, 0.0356,
+      0.5113, 0.3540, 0.4044, 0.6551, 0.4090, 0.0262,
+      0.2504, 0.5297, 0.6688, 0.8132, 0.4624, 0.2498,
+      0.4948, 0.3469, 0.6965, 0.7432, 0.5907, 0.3721,
+      0.2592, 0.8510, 0.6613, 0.7272, 0.8356, 0.4477,
+      0.5286, 0.2803, 0.5274, 0.3339, 0.5380, 0.0111;
+
+    res_A2_5_b2_2_same.resize(5,5);
+    res_A2_5_b2_2_same = 0.3540, 0.4044, 0.6551, 0.4090, 0.0262,
+      0.5297, 0.6688, 0.8132, 0.4624, 0.2498,
+      0.3469, 0.6965, 0.7432, 0.5907, 0.3721,
+      0.8510, 0.6613, 0.7272, 0.8356, 0.4477,
+      0.2803, 0.5274, 0.3339, 0.5380, 0.0111;
+
+    res_A2_5_b2_2_valid.resize(4,4);
+    res_A2_5_b2_2_valid = 0.3540, 0.4044, 0.6551, 0.4090,
+      0.5297, 0.6688, 0.8132, 0.4624,
+      0.3469, 0.6965, 0.7432, 0.5907,
+      0.8510, 0.6613, 0.7272, 0.8356;
+
+    res_A2_5_b2_3_full.resize(7,7);
+    res_A2_5_b2_3_full = 
+      0.2834, 0.3796, 0.7336, 0.4165, 0.3262, 0.1957, 0.0457,
+      0.2221, 0.6465, 0.9574, 0.9564, 1.0098, 0.5879, 0.0524,
+      0.9835, 0.9216, 1.9583, 1.7152, 1.7309, 1.0461, 0.3833,
+      0.4161, 0.9528, 1.8242, 2.0354, 2.0621, 1.4545, 0.6439,
+      0.9995, 1.0117, 2.5338, 2.1359, 2.4450, 1.7253, 1.1143,
+      0.3441, 1.0976, 1.3412, 1.4975, 1.7343, 1.0209, 0.7553,
+      0.7381, 0.5299, 1.4147, 0.9125, 1.4358, 0.5261, 0.6109;
+
+    res_A2_5_b2_3_same.resize(5,5);
+    res_A2_5_b2_3_same = 0.6465, 0.9574, 0.9564, 1.0098, 0.5879,
+      0.9216, 1.9583, 1.7152, 1.7309, 1.0461,
+      0.9528, 1.8242, 2.0354, 2.0621, 1.4545,
+      1.0117, 2.5338, 2.1359, 2.4450, 1.7253,
+      1.0976, 1.3412, 1.4975, 1.7343, 1.0209;
+
+    res_A2_5_b2_3_valid.resize(3,3);
+    res_A2_5_b2_3_valid = 1.9583, 1.7152, 1.7309,
+      1.8242, 2.0354, 2.0621,
+      2.5338, 2.1359, 2.4450;
   }
   ~T() {}
 };
@@ -98,6 +171,16 @@ void test_convolve_1D( T eps, const blitz::Array<T,1>& a1,
   blitz::Array<T,1> res = Torch::sp::convolve( a1, a2, option);
   for(int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
+}
+
+template <typename T> 
+void test_convolve_2D( T eps, const blitz::Array<T,2>& a1, 
+  const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat, size_t option = 0)
+{
+  blitz::Array<T,2> res = Torch::sp::convolve( a1, a2, option);
+  for(int i=0; i<res.extent(0); ++i)
+    for(int j=0; j<res.extent(1); ++j)
+      BOOST_CHECK_SMALL(res(i,j) - mat(i,j), eps);
 }
 
 
@@ -156,6 +239,42 @@ BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_same )
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_valid )
 {
   test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_valid, 2);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 2x2 (full)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_full )
+{
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 2x2 (same)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_same )
+{
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_same, 1);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 2x2 (valid)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_valid )
+{
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_valid, 2);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 3x3 (full)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_full )
+{
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 3x3 (same)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_same )
+{
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_same, 1);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 3x3 (valid)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_valid )
+{
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_valid, 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
