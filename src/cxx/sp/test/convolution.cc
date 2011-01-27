@@ -15,7 +15,7 @@
 #include "sp/spDCT.h"
 #include "sp/spDFT.h"
 
-#include "sp/convolve.h"
+#include "sp/convolution.h"
 #include <blitz/array.h>
 
 struct T {
