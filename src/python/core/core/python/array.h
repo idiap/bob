@@ -655,6 +655,11 @@ namespace Torch { namespace python {
         m_class->def("__imul__", (inplace_array_op)&array_type::operator*=, boost::python::return_self<>(), "Inplace multiplication by array, elementwise.");
         m_class->def("__idiv__", (inplace_const_op)&array_type::operator/=, boost::python::return_self<>(), "Inplace division by constant");
         m_class->def("__idiv__", (inplace_array_op)&array_type::operator/=, boost::python::return_self<>(), "Inplace division by array, elementwise.");
+        m_class->def("__eq__", &__eq__<T,N>, "Compares two arrays element-wise"); 
+        m_class->def("__eq__", &__eq_c__<T,N>, "Compares an array to a constant element-wise"); 
+        m_class->def("__ne__", &__ne__<T,N>, "Compares two arrays element-wise"); 
+        m_class->def("__ne__", &__ne_c__<T,N>, "Compares an array to a constant element-wise"); 
+        m_class->def("__neg__", &__neg__<T,N>, "The negated values of the array element-wise"); 
       }
 
       void load_transformers() {
@@ -755,15 +760,10 @@ namespace Torch { namespace python {
         m_class->def("__lt__", &__lt_c__<T,N>, "Compares an array to a constant element-wise"); 
         m_class->def("__le__", &__le__<T,N>, "Compares two arrays element-wise"); 
         m_class->def("__le__", &__le_c__<T,N>, "Compares an array to a constant element-wise"); 
-        m_class->def("__eq__", &__eq__<T,N>, "Compares two arrays element-wise"); 
-        m_class->def("__eq__", &__eq_c__<T,N>, "Compares an array to a constant element-wise"); 
-        m_class->def("__ne__", &__ne__<T,N>, "Compares two arrays element-wise"); 
-        m_class->def("__ne__", &__ne_c__<T,N>, "Compares an array to a constant element-wise"); 
         m_class->def("__gt__", &__gt__<T,N>, "Compares two arrays element-wise"); 
         m_class->def("__gt__", &__gt_c__<T,N>, "Compares an array to a constant element-wise"); 
         m_class->def("__ge__", &__ge__<T,N>, "Compares two arrays element-wise"); 
         m_class->def("__ge__", &__ge_c__<T,N>, "Compares an array to a constant element-wise"); 
-        m_class->def("__neg__", &__neg__<T,N>, "The negated values of the array element-wise"); 
 
         m_class->def("acosh", &acosh<T,N>, "Inverse hyperbolic cosine, element-wise");
         m_class->def("acos", &acos<T,N>, "Arc cosine, element-wise");
