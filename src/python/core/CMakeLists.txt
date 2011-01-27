@@ -81,3 +81,11 @@ torch_header_install(core "torch::python::core")
 torch_python_package_bindings(core "${pysrc}")
 torch_python_submodule_bindings(core array "${pysrc_array}")
 torch_python_install(core)
+
+# Our test units
+torch_python_add_test(python-core-array-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
+torch_python_add_test(python-core-exception-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
+torch_python_add_test(python-core-listdataset-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_listdataset.py)

@@ -11,3 +11,9 @@ include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(sp "${pysrc}")
 torch_python_install(sp)
+
+# Our test units
+torch_python_add_test(python-sp-naive-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_naive.py)
+torch_python_add_test(python-sp-fftpack-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_fftpack.py)

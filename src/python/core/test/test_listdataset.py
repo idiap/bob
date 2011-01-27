@@ -12,13 +12,10 @@ import torch
 
 def test_file(name):
   """Returns the path to the filename for this test."""
-  return os.path.join("data", "machine", name)
+  return os.path.join("data", name)
 
 class ListDataSetTest(unittest.TestCase):
-  """Performs various tests for the Torch::ipGeomNorm object."""
-
-  ###############################################################
-  #
+  """Performs a few tests tests for the ListDataSet type."""
 
   def test_load(self):
     lds = torch.core.ListDataSet()
