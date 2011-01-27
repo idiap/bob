@@ -1,16 +1,12 @@
 /**
- * @file src/cxx/sp/sp/convolve.cc
+ * @file src/cxx/sp/src/convolve.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
- * @brief Implement a convolution product with zero padding
+ * @brief Implement a blitz-based convolution product with zero padding
  */
 
-#ifndef TORCH5SPRO_SP_CONVOLVE_H
-#define TORCH5SPRO_SP_CONVOLVE_H
-
-#include "core/logging.h"
-#include "core/Exception.h"
-#include <blitz/array.h>
+#ifndef TORCH5SPRO_SP_CONVOLVE_CC
+#define TORCH5SPRO_SP_CONVOLVE_CC
 
 namespace Torch {
   /**
@@ -20,13 +16,6 @@ namespace Torch {
    */
   namespace sp {
 
-    /**
-     * @brief 1D convolution of blitz arrays using zero padding
-     * @param option:  * 0: full size (default)
-     *                 * 1: same size as B
-     *                 * 2: valid (part without zero padding)
-     * @warning Assume size(A) > size(B)
-     */
     template<typename T>
       blitz::Array<T,1> convolve(const blitz::Array<T,1>& B, 
         const blitz::Array<T,1>& C, size_t option = 0)
@@ -94,13 +83,6 @@ namespace Torch {
       }
 
 
-    /**
-     * @brief 2D convolution of blitz arrays using zero padding
-     * @param option:  * 0: full size
-     *                 * 1: same size as B
-     *                 * 2: valid (part without zero padding)
-     * @warning Assume size(A) > size(B)
-     */
     template<typename T>
       blitz::Array<T,2> convolve(const blitz::Array<T,2>& B, 
         const blitz::Array<T,2>& C, size_t option = 0)
@@ -212,5 +194,5 @@ namespace Torch {
 }
 
 
-#endif /* TORCH5SPRO_SP_CONVOLVE_H */
+#endif /* TORCH5SPRO_SP_CONVOLVE_CC */
 
