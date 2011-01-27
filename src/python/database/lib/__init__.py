@@ -67,7 +67,7 @@ def arrayset_append(self, o):
   raise RuntimeError, "Can only append database::Array or blitz::Array to Arrayset"
 
 def array_copy(self):
-  """Returns a blitz::Array object with the expected type and dimension"""
+  """Returns a blitz::Array object with the expected element type and shape"""
   from .. import core
   retval = getattr(core.array, '%s_%d' % \
       (self.getParentArrayset().elementType.name, len(self.getParentArrayset().shape)))() #empty blitz::Array
