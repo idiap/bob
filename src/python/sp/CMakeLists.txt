@@ -18,3 +18,5 @@ torch_python_add_test(python-sp-naive-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_naive.py)
 torch_python_add_test(python-sp-fftpack-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_fftpack.py)
+torch_python_add_test(python-sp-convolution-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_convolution.py)

@@ -42,7 +42,6 @@ namespace Torch {
       blitz::Array<T,2> convolve(const blitz::Array<T,2>& B, 
         const blitz::Array<T,2>& C, size_t option = 0);
 
-
   }
 /**
  * @}
