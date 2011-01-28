@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/sp/sp/convolve.h
+ * @file src/cxx/sp/sp/convolution.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implement a blitz-based convolution product with zero padding
@@ -43,9 +43,12 @@ namespace Torch {
         const blitz::Array<T,2>& C, size_t option = 0);
 
   }
+/**
+ * @}
+ */
 }
 
-#include "../src/convolution.cc"
+#include "sp/convolution.cc"
 
 #endif /* TORCH5SPRO_SP_CONVOLVE_H */
 

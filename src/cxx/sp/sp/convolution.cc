@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/sp/src/convolve.cc
+ * @file src/cxx/sp/sp/convolution.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implement a blitz-based convolution product with zero padding

@@ -2,6 +2,7 @@ project(sp-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/convolution.cc"
    "src/spcore.cc"
    "src/transforms.cc"
    "src/main.cc"
