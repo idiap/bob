@@ -274,8 +274,9 @@ namespace Torch {
         template<int D> blitz::Array<std::complex<double>,D> refer( );
         template<int D> blitz::Array<std::complex<long double>,D> refer( );
 */
-      private:
         template <typename T, typename U> void copyCast( U* out) const;
+
+      private:
         template <int D> void referCheck( ) const;
 
         const Arrayset& m_parent_arrayset;
@@ -305,6 +306,11 @@ namespace Torch {
          * @brief Add an Array to the Arrayset
          */
         void append( boost::shared_ptr<Array> array);
+        /**
+         * @brief Add a blitz array to the Arrayset
+         */
+        template <typename T, int D>
+        void append( const blitz::Array<T,D>& bl);
         /**
          * @brief Remove an Array with a given id from the Arrayset
          */
@@ -512,6 +518,12 @@ namespace Torch {
 
 
       private:
+        /**
+         * @brief Check that the blitz array has a compatible number of 
+         * dimensions with this Arrayset
+         */
+        template <int D> void appendCheck() const;
+
         size_t m_id;
 
         size_t m_n_dim;
@@ -1126,7 +1138,7 @@ namespace Torch {
     void Array::copyCast( U* out ) const {
       size_t n_elem = m_parent_arrayset.getNElem();
       for( size_t i=0; i<n_elem; ++i) {
-        T* t_storage = static_cast<T*>(m_storage);
+        T* t_storage = reinterpret_cast<T*>(m_storage);
         static_complex_cast( t_storage[i], out[i] );
       }
     }
@@ -1543,6 +1555,100 @@ namespace Torch {
       return blitz::Array<std::complex<long double>,D>(static_cast<std::complex<long double>*>(arr.m_storage), 
         shape, blitz::neverDeleteData); 
     }
+
+
+    template<int D> void Arrayset::appendCheck() const
+    {
+      if( D != m_n_dim ) {
+        TDEBUG3("D=" << D << " -- Blitz array of size D=" << m_n_dim);
+        error << "Cannot appened to the Arrayset a blitz array with a " <<
+          "different number of dimensions." << std::endl;
+        throw NDimensionError();
+      }
+    }
+
+
+    template <typename T, int D>
+    void Arrayset::append( const blitz::Array<T,D>& bl)
+    {
+      appendCheck<D>();
+
+      boost::shared_ptr<Array> array(new Array(*this));
+      // Find an available id and assign it to the Array
+      // TODO: set id properly
+      static size_t id = 157;//1;
+      bool available_id = false;
+      while( !available_id )
+      {
+        if(true /*array->m_array.find(id) != m_array.end()*/ )
+          available_id = true;
+        ++id;
+      }
+      array->setId(id);
+
+      void* storage;
+      array->setIsLoaded(true);
+
+      // Check that the memory is contiguous in the blitz array
+      // as this is required by the copy
+      blitz::Array<T,D> ref;
+      if( !bl.isStorageContiguous() )
+        ref.reference(bl.copy());
+      else
+        ref.reference(bl);
+      // Allocate storage area and copy the data from the blitz 
+      // array to the storage area
+      switch(m_element_type) {
+        case array::t_bool:
+          storage=new bool[m_n_elem];
+          array->copyCast<bool,T>(ref.data()); break;
+        case array::t_int8:
+          storage=new int8_t[m_n_elem];
+          array->copyCast<int8_t,T>(ref.data()); break;
+        case array::t_int16:
+          storage=new int16_t[m_n_elem];
+          array->copyCast<int16_t,T>(ref.data()); break;
+        case array::t_int32:
+          storage=new int32_t[m_n_elem];
+          array->copyCast<int32_t,T>(ref.data()); break;
+        case array::t_int64:
+          storage=new int64_t[m_n_elem];
+          array->copyCast<int64_t,T>(ref.data()); break;
+        case array::t_uint8:
+          storage=new uint8_t[m_n_elem];
+          array->copyCast<uint8_t,T>(ref.data()); break;
+        case array::t_uint16:
+          storage=new uint16_t[m_n_elem];
+          array->copyCast<uint16_t,T>(ref.data()); break;
+        case array::t_uint32:
+          storage=new uint32_t[m_n_elem];
+          array->copyCast<uint32_t,T>(ref.data()); break;
+        case array::t_uint64:
+          storage=new uint64_t[m_n_elem];
+          array->copyCast<uint64_t,T>(ref.data()); break;
+        case array::t_float32:
+          storage=new float[m_n_elem];
+          array->copyCast<float,T>(ref.data()); break;
+        case array::t_float64:
+          storage=new double[m_n_elem];
+          array->copyCast<double,T>(ref.data()); break;
+        case array::t_float128:
+          storage=new long double[m_n_elem];
+          array->copyCast<long double,T>(ref.data()); break;
+        case array::t_complex64:
+          storage=new std::complex<float>[m_n_elem];
+          array->copyCast<std::complex<float>,T>(ref.data()); break;
+        case array::t_complex128:
+          storage=new std::complex<double>[m_n_elem];
+          array->copyCast<std::complex<double>,T>(ref.data()); break;
+        case array::t_complex256:
+          storage=new std::complex<long double>[m_n_elem];
+          array->copyCast<std::complex<long double>,T>(ref.data()); break;
+        default:
+          break;
+      }
+    }
+
 
     template<typename T, int D> void 
     Arrayset::at(size_t id, blitz::Array<T,D>& output) const {
