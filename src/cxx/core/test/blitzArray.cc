@@ -34,7 +34,6 @@ void checkBlitzAllocation( const int n_megabytes ) {
   && defined(HAVE_BLITZ_DIFFTYPE))
   static const int64_t TWO_GB = ((int64_t)2*1024)*((int64_t)1024*1024);
   if( n_e >= TWO_GB ) {
-    BOOST_REQUIRE_THROW( throw );
     BOOST_REQUIRE_THROW(X.resize(n_elems_first,n_elems_second), 
       std::bad_alloc);
   }
