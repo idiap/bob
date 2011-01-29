@@ -15,6 +15,7 @@ namespace Torch
   /**
    * @brief This class is designed to perform a DCT.
    * The output is a FloatTensor.
+   * @deprecated Please use the fct function designed for blitz::array
    */
 	class spFCT : public spCore
 	{
