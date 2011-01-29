@@ -13,7 +13,8 @@ set(src
     "src/spDCT.cc"
     "src/spFCT.cc"
     "src/spDeltaOne.cc"
-    "src/FFT.cc")
+    "src/FFT.cc"
+    "src/FCT.cc")
 
 include(../../cmake/macros.cmake)
 torch_library(sp "${src}" "${deps}" "")
