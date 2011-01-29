@@ -33,18 +33,22 @@ void checkBlitzAllocation( const int n_megabytes ) {
 #if !((defined(__LP64__) || defined(__APPLE__)) \
   && defined(HAVE_BLITZ_DIFFTYPE))
   static const int64_t TWO_GB = ((int64_t)2*1024)*((int64_t)1024*1024);
-  if( n_e >= TWO_GB ) {
-    BOOST_REQUIRE_THROW(X.resize(n_elems_first,n_elems_second), 
-      std::bad_alloc);
-  }
-#endif
+  if( n_e < TWO_GB ) {
+    // Resize the blitz::Array and check that no exception is thrown
+    BOOST_REQUIRE_NO_THROW( X.resize(n_elems_first,n_elems_second) );
 
+    // Check X.numElements equals n_elems_first * n_elems_second 
+    // careful: use a 64 bit type to store the result)
+    BOOST_CHECK_EQUAL(n_e, (int64_t)X.numElements() );
+  }
+#else
   // Resize the blitz::Array and check that no exception is thrown
   BOOST_REQUIRE_NO_THROW( X.resize(n_elems_first,n_elems_second) );
 
   // Check X.numElements equals n_elems_first * n_elems_second 
   // careful: use a 64 bit type to store the result)
   BOOST_CHECK_EQUAL(n_e, (int64_t)X.numElements() );
+#endif
 
 #ifdef blitzArrayFullTest
   // Check X.extent(blitz::firstDim) equals n_elems_first
