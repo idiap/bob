@@ -50,7 +50,7 @@ def test_fct2D(M, N, t, eps, obj):
   # TODO
 
   # process using inverse FCT
-  dt_ifct = torch.sp.ifft(dt_fct)
+  dt_ifct = torch.sp.ifct(dt_fct)
   obj.assertEqual(dt_ifct.dimensions(), 2)
 
   # get answer and compare to original
@@ -130,7 +130,7 @@ class TransformTest(unittest.TestCase):
         t[i] = random.uniform(1, 10)
 
       # call the test function
-      test_fft1D(N, t, 1e-3, self)
+      test_fct1D(N, t, 1e-3, self)
 
 
   def test_fct2D_1x1to8x8_set(self):
