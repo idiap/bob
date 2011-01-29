@@ -18,7 +18,7 @@ namespace Torch {
 
     template<typename T>
       blitz::Array<T,1> convolve(const blitz::Array<T,1>& B, 
-        const blitz::Array<T,1>& C, size_t option = 0)
+        const blitz::Array<T,1>& C, const ConvolutionOption option)
       {
         int Bl = B.lbound(0), Bh = B.ubound(0);
         int Cl = C.lbound(0), Ch = C.ubound(0);
@@ -29,13 +29,13 @@ namespace Torch {
         int ubound;
 
         // Size of "B + C - 1"
-        if( option == 0 )
+        if( option == FULL )
           ubound = Bsize + Csize - 2;
         // Same size as B
-        else if( option == 1 )
+        else if( option == SAME )
           ubound = Bsize - 1;
         // Size when not allowing any padding
-        else if( option == 2 )
+        else if( option == VALID )
         {
           ubound = Bsize - Csize;
           // Check that B is larger than C, otherwise, throw an exception
@@ -52,19 +52,19 @@ namespace Torch {
           int jh;
           int i_shifted = i;
 
-          if( option == 0 )
+          if( option == FULL )
           {
             jl = ( i - (Csize-1) > 0 ? i - (Csize-1) : 0 );
             jh = ( i < Bsize ? i : Bsize-1 ); 
           }
-          else if( option == 1 )
+          else if( option == SAME )
           {
             i_shifted += Csize / 2;
 
             jl = ( i_shifted - (Csize-1) > 0 ? i_shifted - (Csize-1) : 0 );
             jh = ( i_shifted < Bsize ? i_shifted : Bsize-1 ); 
           }
-          else if( option == 2 )
+          else if( option == VALID )
           {
             i_shifted += Csize - 1;
 
@@ -85,7 +85,7 @@ namespace Torch {
 
     template<typename T>
       blitz::Array<T,2> convolve(const blitz::Array<T,2>& B, 
-        const blitz::Array<T,2>& C, size_t option = 0)
+        const blitz::Array<T,2>& C, ConvolutionOption option)
       {
         int Bl1 = B.lbound(0), Bh1 = B.ubound(0);
         int Bl2 = B.lbound(1), Bh2 = B.ubound(1);
@@ -101,17 +101,17 @@ namespace Torch {
         int ubound1;
         int ubound2;
 
-        if( option == 0 )
+        if( option == FULL )
         {
           ubound1 = Bsize1 + Csize1 - 2;
           ubound2 = Bsize2 + Csize2 - 2;
         }
-        else if( option == 1 )
+        else if( option == SAME )
         {
           ubound1 = Bsize1 - 1;
           ubound2 = Bsize2 - 1;
         }
-        else if( option == 2 )
+        else if( option == VALID )
         {
           ubound1 = Bsize1 - Csize1;
           ubound2 = Bsize2 - Csize2;
@@ -131,19 +131,19 @@ namespace Torch {
 
           int i1_shifted = i1;
 
-          if( option == 0 )
+          if( option == FULL )
           {
             jl1 = ( i1 - (Csize1-1) > 0 ? i1 - (Csize1-1) : 0 );
             jh1 = ( i1 < Bsize1 ? i1 : Bsize1-1 ); 
           }
-          else if( option == 1 )
+          else if( option == SAME )
           {
             i1_shifted += Csize1 / 2;
 
             jl1 = ( i1_shifted-(Csize1-1) > 0 ? i1_shifted-(Csize1-1) : 0);
             jh1 = ( i1_shifted < Bsize1 ? i1_shifted : Bsize1-1 );
           }
-          else if( option == 2 )
+          else if( option == VALID )
           {
             i1_shifted += Csize1 - 1;
 
@@ -157,19 +157,19 @@ namespace Torch {
             int jh2;
             int i2_shifted = i2;
 
-            if( option == 0 )
+            if( option == FULL )
             {
               jl2 = ( i2 - (Csize2-1) > 0 ? i2 - (Csize2-1) : 0 );
               jh2 = ( i2 < Bsize2 ? i2 : Bsize2-1 );
             }
-            else if( option == 1 )
+            else if( option == SAME )
             {
               i2_shifted += Csize2 / 2;
 
               jl2 = ( i2_shifted-(Csize2-1) > 0 ? i2_shifted-(Csize2-1) : 0);
               jh2 = ( i2_shifted < Bsize2 ? i2_shifted : Bsize2-1 );
             }
-            else if( option == 2 )
+            else if( option == VALID )
             {
               i2_shifted += Csize2 - 1;
 
