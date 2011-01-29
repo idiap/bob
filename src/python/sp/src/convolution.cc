@@ -12,12 +12,13 @@
 
 using namespace boost::python;
 
-static const char* CONVOLVE_DOC = "Compute the convolution product of two blitz arrays and return the results as a blitz array.";
+static const char* CONVOLVE_DOC = "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array.";
+static const char* CONVOLVE_OPT_DOC = "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array. The option field allows to give information about the size of the output (FULL, SAME, VALID)";
 
 #define CONVOLVE_DECL(T,N,D) static inline blitz::Array<T, D> convolve_ ## N ## _ ## D(const blitz::Array<T, D>& a, const blitz::Array<T, D>& b, const Torch::sp::ConvolutionOption option) { return Torch::sp::convolve<T>(a, b, option); } \
 static inline blitz::Array<T, D> convolve_ ## N ## _ ## D ## _nopt(const blitz::Array<T, D>& a, const blitz::Array<T, D>& b) { return Torch::sp::convolve<T>(a, b); }
 
-#define CONVOLVE_DEF(T,N,D) def("convolve", convolve_ ## N ## _ ## D, (arg("arrayA"), arg("arrayB"), arg("option")), CONVOLVE_DOC); \
+#define CONVOLVE_DEF(T,N,D) def("convolve", convolve_ ## N ## _ ## D, (arg("arrayA"), arg("arrayB"), arg("option")), CONVOLVE_OPT_DOC); \
 def("convolve", convolve_ ## N ## _ ## D ## _nopt, (arg("arrayA"), arg("arrayB")), CONVOLVE_DOC);
 
 CONVOLVE_DECL(bool, bool, 1)

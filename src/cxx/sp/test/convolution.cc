@@ -12,7 +12,6 @@
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "sp/convolution.h"
-#include <blitz/array.h>
 
 struct T {
   blitz::Array<double,1> A1_10;

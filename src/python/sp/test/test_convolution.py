@@ -2,14 +2,15 @@
 #
 # vim: set fileencoding=utf-8 :
 # Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-# 24 Nov 2010
+# 28 Jan 2011
 
 import os, sys
 import unittest
 import torch
 
 #############################################################################
-# Compare naive DCT/DFT implementation with values returned by Matlab
+# Compare blitz-based convolution product implementation with values returned 
+# by Matlab
 #############################################################################
 
 ########################## Values used for the computation ##################
