@@ -11,6 +11,7 @@
 #define TORCH_CORE_BLITZ_MISC_H
 
 #include <blitz/array.h>
+#include "core/StaticComplexCast.h"
 
 BZ_NAMESPACE(blitz)
 
@@ -90,6 +91,52 @@ Array<T,4> copySafedata( const Array<T,4>& src)
             l+src.lbound(3));
   return dst;
 }
+
+
+/**
+ * @brief Casts a blitz array allowing std::complex types.
+ */
+template<typename T, typename U, int D> 
+void complex_cast(const Array<U,D> in, Array<T,D> out) {
+  out = cast<T>(in);
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,1> in, Array<T,1> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    Torch::core::static_complex_cast<T>( in(i+in.lbound(0)), out(i));
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,2> in, Array<T,2> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    for( int j=0; j<in.extent(1); ++j)
+      Torch::core::static_complex_cast<T>( in(i+in.lbound(0),j+in.lbound(1)), out(i,j));
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,3> in, Array<T,3> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    for( int j=0; j<in.extent(1); ++j)
+      for( int k=0; k<in.extent(2); ++k)
+        Torch::core::static_complex_cast<T>( in(i+in.lbound(0),j+in.lbound(1),k+in.lbound(2)), out(i,j,k));
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,4> in, Array<T,4> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    for( int j=0; j<in.extent(1); ++j)
+      for( int k=0; k<in.extent(2); ++k)
+        for( int l=0; l<in.extent(3); ++l)
+          Torch::core::static_complex_cast<T>( in(i+in.lbound(0),j+in.lbound(1),k+in.lbound(2),l+in.lbound(3)), out(i,j,k,l));
+}
+
+
+template<typename T, typename U, int D> 
+void complex_cast(const Array<std::complex<U>,D> in, Array<std::complex<T>,D> out) {
+  out = cast<std::complex<T> >(in);
+}
+
 
 
 //TODO
