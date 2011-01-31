@@ -54,7 +54,8 @@ torch_header_install(core "torch::core")
 torch_test(core tensor test/tensor.cc)
 torch_test(core adapter test/blitzAdapter.cc)
 torch_test(core logging test/logging.cc)
-torch_test(core binary_file test/binary_file_old.cc)
+torch_test(core binary_file test/binary_file.cc)
+torch_test(core binary_file_old test/binary_file_old.cc)
 torch_test(core blitzarray test/blitzArray.cc)
 
 # Defines benchmarks we make available
