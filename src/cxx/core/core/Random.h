@@ -1,3 +1,11 @@
+/**
+ * @file src/cxx/core/core/Random.h
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
+ * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
+ *
+ * @brief Random integer generators based on Boost
+ */
+
 #ifndef TORCH5SPRO_CORE_RANDOM_H
 #define TORCH5SPRO_CORE_RANDOM_H 1
 
@@ -12,7 +20,7 @@ namespace Torch {
 
       class generator {
         public:
-          virtual ~generator();
+          virtual ~generator() {}
           static boost::mt19937& instance();
 
         private:

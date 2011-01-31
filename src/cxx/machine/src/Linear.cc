@@ -1,5 +1,5 @@
 #include "machine/Linear.h"
-#include "core/Random.hpp"
+#include "core/Random.h"
 
 namespace Torch {
 
