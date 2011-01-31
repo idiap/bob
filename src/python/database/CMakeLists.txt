@@ -23,5 +23,7 @@ torch_python_install(database)
 # Our test units
 torch_python_add_test(python-database-dataset-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dataset.py)
+torch_python_add_test(python-database-binfile_old-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_binfile_old.py)
 torch_python_add_test(python-database-binfile-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_binfile.py)
