@@ -15,6 +15,10 @@
 namespace Torch {
   namespace core {
 
+    /**
+     * @brief Defines the flags that might be used when loading/storing
+     * a file containing blitz arrays.
+     */
     enum _BinFileFlag {
       _append  = 1L << 0,
       _in      = 1L << 3,

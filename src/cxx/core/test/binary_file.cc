@@ -132,4 +132,20 @@ BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
   in.close();
 }
 
+BOOST_AUTO_TEST_CASE( blitz1d_inout )
+{
+  std::string tmp_file = temp_file();
+  Torch::core::BinFile out(tmp_file, Torch::core::BinFile::out);
+
+  out.write( a);
+  out.close();
+
+  Torch::core::BinFile in(tmp_file, Torch::core::BinFile::in | 
+    Torch::core::BinFile::out);
+  
+  in.read( b);
+  check_equal_1d( a, b);
+  in.close();
+}
+
 BOOST_AUTO_TEST_SUITE_END()

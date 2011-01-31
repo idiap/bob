@@ -48,13 +48,13 @@ namespace Torch {
         m_n_arrays_written = m_header.m_n_samples;
         
         if( flag & BinFile::append) {
-          error << "Cannot append data in read only mode" << std::endl;
+          error << "Cannot append data in read only mode." << std::endl;
           throw Exception();
         }
       }
       else
       {
-        error << "File should be opened in read or write mode." << std::endl;
+        error << "Invalid combination of flags." << std::endl;
         throw Exception();
       }
     }

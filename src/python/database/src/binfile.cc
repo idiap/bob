@@ -12,6 +12,8 @@
 #include "core/BinOutputFile.h"
 #include "core/BinFile.h"
 
+#include <iostream>
+
 using namespace boost::python;
 namespace db = Torch::core;
 
@@ -34,6 +36,18 @@ static tuple get_shape(const T& f) {
   return make_tuple();
 }
 
+/**
+ * Converts an image from any format into grayscale.
+ */
+static boost::shared_ptr<Torch::core::BinFile> 
+binfile_make_fromint(const std::string& filename, int i)
+{
+  boost::shared_ptr<Torch::core::BinFile> retval(new Torch::core::BinFile(
+    filename, static_cast<Torch::core::BinFile::openmode>(i) ) );
+  return retval;
+}
+
+
 static const char* ARRAY_READ_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the binary file and copies the data for a certain array in the file to the passed blitz::Array.";
 #define ARRAY_READ_DEF(T,D) .def("bzread", (void (db::BinInputFile::*)(size_t, blitz::Array<T,D>&))&db::BinInputFile::read<T,D>, (arg("self"), arg("index"), arg("array")), ARRAY_READ_DOC)
 
@@ -54,10 +68,8 @@ void bind_database_binfile() {
         .value("append", Torch::core::BinFile::append)
         ;
 
-// TODO: Overload operator over enum type to allow the combination of several flags
-//  def(enum_<Torch::core::BinFile::openmode> & enum_<Torch::core::BinFile::openmode>, (Torch::core::BinFile::openmode (*)(Torch::core::BinFile::openmode a, Torch::core::BinFile::openmode b))&(Torch::core::operator&), (arg("mode1"),arg("mode2")) );
-  
   class_<db::BinFile, boost::shared_ptr<db::BinFile>, boost::noncopyable>("BinFile", "A BinFile allows users to read and write data from and to files containing standard Torch binary coded data", init<const std::string&, Torch::core::BinFile::openmode>((arg("filename"),arg("openmode")), "Initializes an binary file reader. Please note that this constructor will not load the data."))
+    .def("__init__", make_constructor(binfile_make_fromint))
     .add_property("shape", &get_shape<db::BinFile>, "The shape of arrays in this binary file. Please note all arrays in the file have necessarily the same shape.")
     .add_property("elementType", &db::BinFile::getElementType, "The type of array elements contained in this binary file. This would be equivalent to the 'T' bit in blitz::Array<T,D>.")
     .def("__len__", &db::BinFile::getNSamples, "The number of arrays in this binary file.")
