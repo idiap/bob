@@ -30,7 +30,7 @@ namespace Torch {
 
     void BinInputFile::read( Arrayset& arrayset) {
       // Create/allocate arrays inside the arrayset
-      size_t n_arrays = m_header.getNSamples() - m_current_array;
+      size_t n_arrays = m_header.m_n_samples - m_current_array;
       for( size_t i=0; i<n_arrays; ++i) {
         // Create a new array 
         boost::shared_ptr<Array> ar(new Array(arrayset));
@@ -55,7 +55,7 @@ namespace Torch {
       bool shapeCompatibility = true;
       size_t i=0;
       const size_t* p_shape = array.getParentArrayset().getShape();
-      const size_t* h_shape = m_header.getShape();
+      const size_t* h_shape = m_header.m_shape;
       while( i<array::N_MAX_DIMENSIONS_ARRAY && shapeCompatibility) {
         shapeCompatibility = ( p_shape[i] == h_shape[i]);
         ++i;
@@ -76,84 +76,84 @@ namespace Torch {
       {
         case array::t_bool:
           storage = new bool[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<bool*>(storage) );
           else
             readWithCast( reinterpret_cast<bool*>(storage) );
           break;
         case array::t_int8:
           storage = new int8_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<int8_t*>(storage) );
           else
             readWithCast( reinterpret_cast<int8_t*>(storage) );
           break;
         case array::t_int16:
           storage = new int16_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<int16_t*>(storage) );
           else
             readWithCast( reinterpret_cast<int16_t*>(storage) );
           break;
         case array::t_int32:
           storage = new int32_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<int32_t*>(storage) );
           else
             readWithCast( reinterpret_cast<int32_t*>(storage) );
           break;
         case array::t_int64:
           storage = new int64_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<int64_t*>(storage) );
           else
             readWithCast( reinterpret_cast<int64_t*>(storage) );
           break;
         case array::t_uint8:
           storage = new uint8_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<uint8_t*>(storage) );
           else
             readWithCast( reinterpret_cast<uint8_t*>(storage) );
           break;
         case array::t_uint16:
           storage = new uint16_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<uint16_t*>(storage) );
           else
             readWithCast( reinterpret_cast<uint16_t*>(storage) );
           break;
         case array::t_uint32:
           storage = new uint32_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<uint32_t*>(storage) );
           else
             readWithCast( reinterpret_cast<uint32_t*>(storage) );
           break;
         case array::t_uint64:
           storage = new uint64_t[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<uint64_t*>(storage) );
           else
             readWithCast( reinterpret_cast<uint64_t*>(storage) );
           break;
         case array::t_float32:
           storage = new float[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<float*>(storage) );
           else
             readWithCast( reinterpret_cast<float*>(storage) );
           break;
         case array::t_float64:
           storage = new double[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<double*>(storage) );
           else
             readWithCast( reinterpret_cast<double*>(storage) );
           break;
         case array::t_float128:
           storage = new long double[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<long double*>(storage) );
           else
             readWithCast( reinterpret_cast<long double*>(storage) );
@@ -161,7 +161,7 @@ namespace Torch {
         case array::t_complex64:
           storage = new 
             std::complex<float>[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<std::complex<float>* >(storage) );
           else
             readWithCast( 
@@ -170,7 +170,7 @@ namespace Torch {
         case array::t_complex128:
           storage = new 
             std::complex<double>[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<std::complex<double>* >(storage) );
           else
             readWithCast( 
@@ -179,7 +179,7 @@ namespace Torch {
         case array::t_complex256:
           storage = new 
             std::complex<long double>[array.getParentArrayset().getNElem()];
-          if(array.getParentArrayset().getElementType()==m_header.getElementType())
+          if(array.getParentArrayset().getElementType()==m_header.m_type)
             read( reinterpret_cast<std::complex<long double>* >(storage) );
           else
             readWithCast( 
@@ -196,67 +196,67 @@ namespace Torch {
 
     BinInputFile& BinInputFile::read(void* multi_array) {
       // copy the multiarray from the input stream to the C-style array
-      switch(m_header.getElementType())
+      switch(m_header.m_type)
       {
         case array::t_bool:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(bool));
+            m_header.m_n_elements*sizeof(bool));
           break;
         case array::t_int8:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(int8_t));
+            m_header.m_n_elements*sizeof(int8_t));
           break;
         case array::t_int16:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(int16_t));
+            m_header.m_n_elements*sizeof(int16_t));
           break;
         case array::t_int32:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(int32_t));
+            m_header.m_n_elements*sizeof(int32_t));
           break;
         case array::t_int64:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(int64_t));
+            m_header.m_n_elements*sizeof(int64_t));
           break;
         case array::t_uint8:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(uint8_t));
+            m_header.m_n_elements*sizeof(uint8_t));
           break;
         case array::t_uint16:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(uint16_t));
+            m_header.m_n_elements*sizeof(uint16_t));
           break;
         case array::t_uint32:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(uint32_t));
+            m_header.m_n_elements*sizeof(uint32_t));
           break;
         case array::t_uint64:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(uint64_t));
+            m_header.m_n_elements*sizeof(uint64_t));
           break;
         case array::t_float32:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(float));
+            m_header.m_n_elements*sizeof(float));
           break;
         case array::t_float64:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(double));
+            m_header.m_n_elements*sizeof(double));
           break;
         case array::t_float128:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(long double));
+            m_header.m_n_elements*sizeof(long double));
           break;
         case array::t_complex64:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(std::complex<float>));
+            m_header.m_n_elements*sizeof(std::complex<float>));
           break;
         case array::t_complex128:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(std::complex<double>));
+            m_header.m_n_elements*sizeof(std::complex<double>));
           break;
         case array::t_complex256:
           m_in_stream.read( reinterpret_cast<char*>(multi_array),
-            m_header.getNElements()*sizeof(std::complex<long double>));
+            m_header.m_n_elements*sizeof(std::complex<long double>));
           break;
         default:
           break;

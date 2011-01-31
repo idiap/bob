@@ -13,7 +13,7 @@ namespace Torch {
 
     BinFileHeader::BinFileHeader():
       m_version(0), m_type(array::t_unknown), m_n_dimensions(0), 
-      m_n_samples(0), m_endianness(0), m_n_elements(0), m_data_sizeof(0)
+      m_n_samples(0), m_endianness(0), m_data_sizeof(0), m_n_elements(0)
     {
       for( size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
         m_shape[i] = 0;

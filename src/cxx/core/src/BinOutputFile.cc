@@ -19,7 +19,7 @@ namespace Torch {
       if(append) {
         m_header.read(m_out_stream);
         m_header_init = true;
-        m_n_arrays_written = m_header.getNSamples();
+        m_n_arrays_written = m_header.m_n_samples;
         m_out_stream.seekp(0, std::ios::end);
       }
     }
@@ -40,7 +40,7 @@ namespace Torch {
       }
       
       // Initialize header
-      m_header.setElementType( type);
+      m_header.m_type = type;
       m_header.setShape( shape);
       m_header.write(m_out_stream);
       m_header_init = true;
@@ -48,7 +48,7 @@ namespace Torch {
 
     void BinOutputFile::close() {
       // Rewrite the header and update the number of samples
-      m_header.setNSamples(m_n_arrays_written);
+      m_header.m_n_samples = m_n_arrays_written;
       m_header.write(m_out_stream);
 
       m_out_stream.close();
@@ -81,7 +81,7 @@ namespace Torch {
       bool shapeCompatibility = true;
       size_t i=0;
       const size_t* p_shape = array.getParentArrayset().getShape();
-      const size_t* h_shape = m_header.getShape();
+      const size_t* h_shape = m_header.m_shape;
       while( i<array::N_MAX_DIMENSIONS_ARRAY && shapeCompatibility) {
         shapeCompatibility = ( p_shape[i] == h_shape[i]);
         ++i;
@@ -95,7 +95,7 @@ namespace Torch {
         throw Exception();
       }
 
-      if(array.getParentArrayset().getElementType() == m_header.getElementType())
+      if(array.getParentArrayset().getElementType() == m_header.m_type)
         write(array.getStorage()); 
       else // cast is required
       {
@@ -169,67 +169,67 @@ namespace Torch {
 
     BinOutputFile& BinOutputFile::write(const void* multi_array) {
       // copy the data into the output stream
-      switch(m_header.getElementType())
+      switch(m_header.m_type)
       {
         case array::t_bool:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(bool));
+            m_header.m_n_elements*sizeof(bool));
           break;
         case array::t_int8:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(int8_t));
+            m_header.m_n_elements*sizeof(int8_t));
           break;
         case array::t_int16:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(int16_t));
+            m_header.m_n_elements*sizeof(int16_t));
           break;
         case array::t_int32:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(int32_t));
+            m_header.m_n_elements*sizeof(int32_t));
           break;
         case array::t_int64:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(int64_t));
+            m_header.m_n_elements*sizeof(int64_t));
           break;
         case array::t_uint8:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(uint8_t));
+            m_header.m_n_elements*sizeof(uint8_t));
           break;
         case array::t_uint16:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(uint16_t));
+            m_header.m_n_elements*sizeof(uint16_t));
           break;
         case array::t_uint32:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(uint32_t));
+            m_header.m_n_elements*sizeof(uint32_t));
           break;
         case array::t_uint64:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(uint64_t));
+            m_header.m_n_elements*sizeof(uint64_t));
           break;
         case array::t_float32:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(float));
+            m_header.m_n_elements*sizeof(float));
           break;
         case array::t_float64:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(double));
+            m_header.m_n_elements*sizeof(double));
           break;
         case array::t_float128:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(long double));
+            m_header.m_n_elements*sizeof(long double));
           break;
         case array::t_complex64:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(std::complex<float>));
+            m_header.m_n_elements*sizeof(std::complex<float>));
           break;
         case array::t_complex128:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(std::complex<double>));
+            m_header.m_n_elements*sizeof(std::complex<double>));
           break;
         case array::t_complex256:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.getNElements()*sizeof(std::complex<long double>));
+            m_header.m_n_elements*sizeof(std::complex<long double>));
           break;
         default:
           break;

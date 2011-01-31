@@ -65,7 +65,7 @@ namespace Torch {
          */
         array::ElementType getElementType() const { 
           headerInitialized(); 
-          return m_header.getElementType(); 
+          return m_header.m_type; 
         }
         /**
          * @brief Get the number of dimensions
@@ -73,7 +73,7 @@ namespace Torch {
          */
         size_t getNDimensions() const {  
           headerInitialized(); 
-          return m_header.getNDimensions(); 
+          return m_header.m_n_dimensions; 
         }
         /**
          * @brief Get the shape of each array
@@ -81,7 +81,7 @@ namespace Torch {
          */
         const size_t* getShape() const { 
           headerInitialized(); 
-          return m_header.getShape(); 
+          return m_header.m_shape; 
         }
         /**
          * @brief Get the shape of each array in a blitz format
@@ -106,7 +106,7 @@ namespace Torch {
          */
         size_t getNElements() const { 
           headerInitialized(); 
-          return m_header.getNElements(); 
+          return m_header.m_n_elements; 
         }
         /**
          * @brief Get the size along a particular dimension
@@ -211,108 +211,108 @@ namespace Torch {
       float f; double d; long double ld;
       std::complex<float> cf; std::complex<double> cd; 
       std::complex<long double> cld;
-      switch(m_header.getElementType())
+      switch(m_header.m_type)
       {
         case array::t_bool:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],b);
             m_out_stream.write( reinterpret_cast<const char*>(&b), 
               sizeof(bool));
           }
           break;
         case array::t_int8:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],i8);
             m_out_stream.write( reinterpret_cast<const char*>(&i8), 
               sizeof(int8_t));
           }
           break;
         case array::t_int16:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],i16);
             m_out_stream.write( reinterpret_cast<const char*>(&i16), 
               sizeof(int16_t));
           }
           break;
         case array::t_int32:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],i32);
             m_out_stream.write( reinterpret_cast<const char*>(&i32), 
               sizeof(int32_t));
           }
           break;
         case array::t_int64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],i64);
             m_out_stream.write( reinterpret_cast<const char*>(&i64), 
               sizeof(int64_t));
           }
           break;
         case array::t_uint8:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],ui8);
             m_out_stream.write( reinterpret_cast<const char*>(&ui8), 
               sizeof(uint8_t));
           }
           break;
         case array::t_uint16:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],ui16);
             m_out_stream.write( reinterpret_cast<const char*>(&ui16), 
               sizeof(uint16_t));
           }
           break;
         case array::t_uint32:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],ui32);
             m_out_stream.write( reinterpret_cast<const char*>(&ui32), 
               sizeof(uint32_t));
           }
           break;
         case array::t_uint64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],ui64);
             m_out_stream.write( reinterpret_cast<const char*>(&ui64), 
               sizeof(uint64_t));
           }
           break;
         case array::t_float32:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],f);
             m_out_stream.write( reinterpret_cast<const char*>(&f), 
               sizeof(float));
           }
           break;
         case array::t_float64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],d);
             m_out_stream.write( reinterpret_cast<const char*>(&d), 
               sizeof(double));
           }
           break;
         case array::t_float128:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],ld);
             m_out_stream.write( reinterpret_cast<const char*>(&ld), 
               sizeof(long double));
           }
           break;
         case array::t_complex64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],cf);
             m_out_stream.write( reinterpret_cast<const char*>(&cf), 
               sizeof(std::complex<float>));
           }
           break;
         case array::t_complex128:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],cd);
             m_out_stream.write( reinterpret_cast<const char*>(&cd), 
               sizeof(std::complex<double>));
           }
           break;
         case array::t_complex256:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],cld);
             m_out_stream.write( reinterpret_cast<const char*>(&cld), 
               sizeof(std::complex<long double>));
@@ -338,7 +338,7 @@ namespace Torch {
       // Check the shape compatibility
       bool shapeCompatibility = true;
       size_t i=0;
-      const size_t* h_shape = m_header.getShape();
+      const size_t* h_shape = m_header.m_shape;
       while( i<array::N_MAX_DIMENSIONS_ARRAY && shapeCompatibility) {
         if( i<D)
           shapeCompatibility = (static_cast<size_t>(bl.extent(i))==h_shape[i]);
@@ -400,94 +400,94 @@ namespace Torch {
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<bool,d>& bl)
     {
-      m_header.setElementType(array::t_bool);
+      m_header.m_type = array::t_bool;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int8_t,d>& bl)
     {
-      m_header.setElementType(array::t_int8);
+      m_header.m_type = array::t_int8;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int16_t,d>& bl)
     {
-      m_header.setElementType(array::t_int16);
+      m_header.m_type = array::t_int16;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int32_t,d>& bl)
     {
-      m_header.setElementType(array::t_int32);
+      m_header.m_type = array::t_int32;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int64_t,d>& bl)
     {
-      m_header.setElementType(array::t_int64);
+      m_header.m_type = array::t_int64;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint8_t,d>& bl)
     {
-      m_header.setElementType(array::t_uint8);
+      m_header.m_type = array::t_uint8;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint16_t,d>& bl)
     {
-      m_header.setElementType(array::t_uint16);
+      m_header.m_type = array::t_uint16;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint32_t,d>& bl)
     {
-      m_header.setElementType(array::t_uint32);
+      m_header.m_type = array::t_uint32;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint64_t,d>& bl)
     {
-      m_header.setElementType(array::t_uint64);
+      m_header.m_type = array::t_uint64;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<float,d>& bl)
     {
-      m_header.setElementType(array::t_float32);
+      m_header.m_type = array::t_float32;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<double,d>& bl)
     {
-      m_header.setElementType(array::t_float64);
+      m_header.m_type = array::t_float64;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<long double,d>& bl)
     {
-      m_header.setElementType(array::t_float128);
+      m_header.m_type = array::t_float128;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<float>,d>& bl)
     {
-      m_header.setElementType(array::t_complex64);
+      m_header.m_type = array::t_complex64;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<double>,d>& bl)
     {
-      m_header.setElementType(array::t_complex128);
+      m_header.m_type = array::t_complex128;
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<long double>,d>& bl)
     {
-      m_header.setElementType(array::t_complex256);
+      m_header.m_type = array::t_complex256;
     }
 
   }

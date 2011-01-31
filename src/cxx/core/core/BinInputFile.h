@@ -59,16 +59,16 @@ namespace Torch {
          * @brief Get the Element type
          */
         array::ElementType getElementType() const { 
-          return m_header.getElementType(); 
+          return m_header.m_type; 
         }
         /**
          * @brief Get the number of dimensions
          */
-        size_t getNDimensions() const { return m_header.getNDimensions(); }
+        size_t getNDimensions() const { return m_header.m_n_dimensions; }
         /**
          * @brief Get the shape of each array
          */
-        const size_t* getShape() const { return m_header.getShape(); }
+        const size_t* getShape() const { return m_header.m_shape; }
         /**
          * @brief Get the shape of each array in a blitz format
          */
@@ -79,11 +79,11 @@ namespace Torch {
         /**
          * @brief Get the number of samples/arrays written so far
          */
-        size_t getNSamples() const { return m_header.getNSamples(); }
+        size_t getNSamples() const { return m_header.m_n_samples; }
         /**
          * @brief Get the number of elements per array
          */
-        size_t getNElements() const { return m_header.getNElements(); }
+        size_t getNElements() const { return m_header.m_n_elements; }
         /**
          * @brief Get the size along a particular dimension
          */
@@ -113,7 +113,7 @@ namespace Torch {
          * @brief Check if the end of the binary file is reached
          */
         void endOfFile() {
-          if(m_current_array >= m_header.getNSamples() ) {
+          if(m_current_array >= m_header.m_n_samples ) {
             error << "The end of the binary file has been reached." << 
               std::endl;
             throw Exception();
@@ -135,7 +135,7 @@ namespace Torch {
       endOfFile(); 
 
       // Check the shape compatibility (number of dimensions)
-      if( d != m_header.getNDimensions() ) {
+      if( d != m_header.m_n_dimensions ) {
         error << "The dimensions of this array does not match the " <<
           "ones contained in the header file. The array cannot be loaded." <<
           std::endl;
@@ -166,7 +166,7 @@ namespace Torch {
     template <typename T, int d> 
     void BinInputFile::read( size_t index, blitz::Array<T,d>& bl) {
       // Check that we are reaching an existing array
-      if( index > m_header.getNSamples() ) {
+      if( index > m_header.m_n_samples ) {
         error << "Trying to reach a non-existing array." << std::endl;
         throw Exception();
       }
@@ -188,100 +188,100 @@ namespace Torch {
       float f; double dou; long double ld;
       std::complex<float> cf; std::complex<double> cd; 
       std::complex<long double> cld;
-      switch(m_header.getElementType())
+      switch(m_header.m_type)
       {
         case array::t_bool:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&b), sizeof(bool));
             static_complex_cast(b,multiarray[i]);
           }
           break;
         case array::t_int8:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&i8), sizeof(int8_t));
             static_complex_cast(i8,multiarray[i]);
           }
           break;
         case array::t_int16:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&i16), sizeof(int16_t));
             static_complex_cast(i16,multiarray[i]);
           }
           break;
         case array::t_int32:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&i32), sizeof(int32_t));
             static_complex_cast(i32,multiarray[i]);
           }
           break;
         case array::t_int64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&i64), sizeof(int64_t));
             static_complex_cast(i64,multiarray[i]);
           }
           break;
         case array::t_uint8:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&ui8), sizeof(uint8_t));
             static_complex_cast(ui8,multiarray[i]);
           }
           break;
         case array::t_uint16:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&ui16), 
               sizeof(uint16_t));
             static_complex_cast(ui16,multiarray[i]);
           }
           break;
         case array::t_uint32:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&ui32), 
               sizeof(uint32_t));
             static_complex_cast(ui32,multiarray[i]);
           }
           break;
         case array::t_uint64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&ui64), 
               sizeof(uint64_t));
             static_complex_cast(ui64,multiarray[i]);
           }
           break;
         case array::t_float32:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&f), sizeof(float));
             static_complex_cast(f,multiarray[i]);
           }
           break;
         case array::t_float64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&dou), sizeof(double));
             static_complex_cast(dou,multiarray[i]);
           }
           break;
         case array::t_float128:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&ld), 
               sizeof(long double));
             static_complex_cast(ld,multiarray[i]);
           }
           break;
         case array::t_complex64:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&cf), 
               sizeof(std::complex<float>));
             static_complex_cast(cf,multiarray[i]);
           }
           break;
         case array::t_complex128:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&cd), 
               sizeof(std::complex<double>));
             static_complex_cast(cd,multiarray[i]);
           }
           break;
         case array::t_complex256:
-          for( size_t i=0; i<m_header.getNElements(); ++i) {
+          for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&cld), 
               sizeof(std::complex<long double>));
             static_complex_cast(cld,multiarray[i]);
