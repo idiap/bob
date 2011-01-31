@@ -42,9 +42,8 @@ namespace Torch {
          */
         template<int d>
         void getShape( blitz::TinyVector<int,d>& res ) const {
-          const size_t *shape = m_shape;
           for( int i=0; i<d; ++i)
-            res[i] = shape[i];
+            res[i] = m_shape[i];
         }
 
         /**
@@ -99,13 +98,9 @@ namespace Torch {
         template<int D> bool needCast(const blitz::Array<float,D>& bl) const;
         template<int D> bool needCast(const blitz::Array<double,D>& bl) const;
         template<int D> 
-        bool needCast(const blitz::Array<long double,D>& bl) const;
-        template<int D> 
         bool needCast(const blitz::Array<std::complex<float>,D>& bl) const;
         template<int D>
         bool needCast(const blitz::Array<std::complex<double>,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<std::complex<long double>,D>& bl) const;
 
         /**
          * @brief Update the number of elements and number of dimensions 
@@ -123,15 +118,15 @@ namespace Torch {
         /**
          *  Attributes
          */
-        size_t m_version;
-        array::ElementType m_type;
-        size_t m_n_dimensions;
-        size_t m_shape[array::N_MAX_DIMENSIONS_ARRAY];
-        size_t m_n_samples;
-        size_t m_endianness;
-        size_t m_data_sizeof;
+        uint8_t m_version;
+        array::ElementType m_elem_type;
+        uint8_t m_elem_sizeof;
+        uint8_t m_n_dimensions;
+        uint32_t m_endianness;
+        uint64_t m_shape[array::N_MAX_DIMENSIONS_ARRAY];
+        uint64_t m_n_samples;
 
-        size_t m_n_elements;
+        uint64_t m_n_elements;
     };
 
     template <typename T, int d>
@@ -145,7 +140,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<bool,d>& bl) const
     {
-      if(m_type == array::t_bool )
+      if(m_elem_type == array::t_bool )
         return false;
       return true;
     }
@@ -153,7 +148,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<int8_t,d>& bl) const
     {
-      if(m_type == array::t_int8 )
+      if(m_elem_type == array::t_int8 )
         return false;
       return true;
     }
@@ -161,7 +156,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<int16_t,d>& bl) const
     {
-      if(m_type == array::t_int16 )
+      if(m_elem_type == array::t_int16 )
         return false;
       return true;
     }
@@ -169,7 +164,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<int32_t,d>& bl) const
     {
-      if(m_type == array::t_int32 )
+      if(m_elem_type == array::t_int32 )
         return false;
       return true;
     }
@@ -177,7 +172,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<int64_t,d>& bl) const
     {
-      if(m_type == array::t_int64 )
+      if(m_elem_type == array::t_int64 )
         return false;
       return true;
     }
@@ -185,7 +180,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<uint8_t,d>& bl) const
     {
-      if(m_type == array::t_uint8 )
+      if(m_elem_type == array::t_uint8 )
         return false;
       return true;
     }
@@ -193,7 +188,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<uint16_t,d>& bl) const
     {
-      if(m_type == array::t_uint16 )
+      if(m_elem_type == array::t_uint16 )
         return false;
       return true;
     }
@@ -201,7 +196,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<uint32_t,d>& bl) const
     {
-      if(m_type == array::t_uint32 )
+      if(m_elem_type == array::t_uint32 )
         return false;
       return true;
     }
@@ -209,7 +204,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<uint64_t,d>& bl) const
     {
-      if(m_type == array::t_uint64 )
+      if(m_elem_type == array::t_uint64 )
         return false;
       return true;
     }
@@ -217,7 +212,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<float,d>& bl) const
     {
-      if(m_type == array::t_float32 )
+      if(m_elem_type == array::t_float32 )
         return false;
       return true;
     }
@@ -225,15 +220,7 @@ namespace Torch {
     template <int d>
     bool BinFileHeader::needCast(const blitz::Array<double,d>& bl) const
     {
-      if(m_type == array::t_float64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<long double,d>& bl) const
-    {
-      if(m_type == array::t_float128 )
+      if(m_elem_type == array::t_float64 )
         return false;
       return true;
     }
@@ -242,7 +229,7 @@ namespace Torch {
     bool BinFileHeader::needCast(
       const blitz::Array<std::complex<float>,d>& bl) const
     {
-      if(m_type == array::t_complex64 )
+      if(m_elem_type == array::t_complex64 )
         return false;
       return true;
     }
@@ -251,16 +238,7 @@ namespace Torch {
     bool BinFileHeader::needCast(
       const blitz::Array<std::complex<double>,d>& bl) const
     {
-      if(m_type == array::t_complex128 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(
-      const blitz::Array<std::complex<long double>,d>& bl) const
-    {
-      if(m_type == array::t_complex256 )
+      if(m_elem_type == array::t_complex128 )
         return false;
       return true;
     }

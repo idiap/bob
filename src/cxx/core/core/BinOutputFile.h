@@ -66,7 +66,7 @@ namespace Torch {
          */
         array::ElementType getElementType() const { 
           headerInitialized(); 
-          return m_header.m_type; 
+          return m_header.m_elem_type; 
         }
         /**
          * @brief Get the number of dimensions
@@ -183,14 +183,9 @@ namespace Torch {
         template<int D> void initTypeHeader(const blitz::Array<float,D>& bl);
         template<int D> void initTypeHeader(const blitz::Array<double,D>& bl);
         template<int D> 
-        void initTypeHeader(const blitz::Array<long double,D>& bl);
-        template<int D> 
         void initTypeHeader(const blitz::Array<std::complex<float>,D>& bl);
         template<int D>
         void initTypeHeader(const blitz::Array<std::complex<double>,D>& bl);
-        template<int D> 
-        void 
-        initTypeHeader(const blitz::Array<std::complex<long double>,D>& bl);
 
         /**
          * Attributes
@@ -209,10 +204,9 @@ namespace Torch {
       bool b;
       int8_t i8; int16_t i16; int32_t i32; int64_t i64;
       uint8_t ui8; uint16_t ui16; uint32_t ui32; uint64_t ui64;
-      float f; double d; long double ld;
+      float f; double d; 
       std::complex<float> cf; std::complex<double> cd; 
-      std::complex<long double> cld;
-      switch(m_header.m_type)
+      switch(m_header.m_elem_type)
       {
         case array::t_bool:
           for( size_t i=0; i<m_header.m_n_elements; ++i) {
@@ -291,13 +285,6 @@ namespace Torch {
               sizeof(double));
           }
           break;
-        case array::t_float128:
-          for( size_t i=0; i<m_header.m_n_elements; ++i) {
-            static_complex_cast(multi_array[i],ld);
-            m_out_stream.write( reinterpret_cast<const char*>(&ld), 
-              sizeof(long double));
-          }
-          break;
         case array::t_complex64:
           for( size_t i=0; i<m_header.m_n_elements; ++i) {
             static_complex_cast(multi_array[i],cf);
@@ -310,13 +297,6 @@ namespace Torch {
             static_complex_cast(multi_array[i],cd);
             m_out_stream.write( reinterpret_cast<const char*>(&cd), 
               sizeof(std::complex<double>));
-          }
-          break;
-        case array::t_complex256:
-          for( size_t i=0; i<m_header.m_n_elements; ++i) {
-            static_complex_cast(multi_array[i],cld);
-            m_out_stream.write( reinterpret_cast<const char*>(&cld), 
-              sizeof(std::complex<long double>));
           }
           break;
         default:
@@ -401,94 +381,94 @@ namespace Torch {
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<bool,d>& bl)
     {
-      m_header.m_type = array::t_bool;
+      m_header.m_elem_type = array::t_bool;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int8_t,d>& bl)
     {
-      m_header.m_type = array::t_int8;
+      m_header.m_elem_type = array::t_int8;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int16_t,d>& bl)
     {
-      m_header.m_type = array::t_int16;
+      m_header.m_elem_type = array::t_int16;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int32_t,d>& bl)
     {
-      m_header.m_type = array::t_int32;
+      m_header.m_elem_type = array::t_int32;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<int64_t,d>& bl)
     {
-      m_header.m_type = array::t_int64;
+      m_header.m_elem_type = array::t_int64;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint8_t,d>& bl)
     {
-      m_header.m_type = array::t_uint8;
+      m_header.m_elem_type = array::t_uint8;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint16_t,d>& bl)
     {
-      m_header.m_type = array::t_uint16;
+      m_header.m_elem_type = array::t_uint16;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint32_t,d>& bl)
     {
-      m_header.m_type = array::t_uint32;
+      m_header.m_elem_type = array::t_uint32;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<uint64_t,d>& bl)
     {
-      m_header.m_type = array::t_uint64;
+      m_header.m_elem_type = array::t_uint64;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<float,d>& bl)
     {
-      m_header.m_type = array::t_float32;
+      m_header.m_elem_type = array::t_float32;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(const blitz::Array<double,d>& bl)
     {
-      m_header.m_type = array::t_float64;
-    }
-
-    template <int d>
-    void BinOutputFile::initTypeHeader(const blitz::Array<long double,d>& bl)
-    {
-      m_header.m_type = array::t_float128;
+      m_header.m_elem_type = array::t_float64;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<float>,d>& bl)
     {
-      m_header.m_type = array::t_complex64;
+      m_header.m_elem_type = array::t_complex64;
+      m_header.typeUpdated();
     }
 
     template <int d>
     void BinOutputFile::initTypeHeader(
       const blitz::Array<std::complex<double>,d>& bl)
     {
-      m_header.m_type = array::t_complex128;
-    }
-
-    template <int d>
-    void BinOutputFile::initTypeHeader(
-      const blitz::Array<std::complex<long double>,d>& bl)
-    {
-      m_header.m_type = array::t_complex256;
+      m_header.m_elem_type = array::t_complex128;
+      m_header.typeUpdated();
     }
 
   }

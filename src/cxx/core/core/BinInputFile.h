@@ -60,7 +60,7 @@ namespace Torch {
          * @brief Get the Element type
          */
         array::ElementType getElementType() const { 
-          return m_header.m_type; 
+          return m_header.m_elem_type; 
         }
         /**
          * @brief Get the number of dimensions
@@ -186,10 +186,9 @@ namespace Torch {
       bool b;
       int8_t i8; int16_t i16; int32_t i32; int64_t i64;
       uint8_t ui8; uint16_t ui16; uint32_t ui32; uint64_t ui64;
-      float f; double dou; long double ld;
+      float f; double dou;
       std::complex<float> cf; std::complex<double> cd; 
-      std::complex<long double> cld;
-      switch(m_header.m_type)
+      switch(m_header.m_elem_type)
       {
         case array::t_bool:
           for( size_t i=0; i<m_header.m_n_elements; ++i) {
@@ -260,13 +259,6 @@ namespace Torch {
             static_complex_cast(dou,multiarray[i]);
           }
           break;
-        case array::t_float128:
-          for( size_t i=0; i<m_header.m_n_elements; ++i) {
-            m_in_stream.read( reinterpret_cast<char*>(&ld), 
-              sizeof(long double));
-            static_complex_cast(ld,multiarray[i]);
-          }
-          break;
         case array::t_complex64:
           for( size_t i=0; i<m_header.m_n_elements; ++i) {
             m_in_stream.read( reinterpret_cast<char*>(&cf), 
@@ -279,13 +271,6 @@ namespace Torch {
             m_in_stream.read( reinterpret_cast<char*>(&cd), 
               sizeof(std::complex<double>));
             static_complex_cast(cd,multiarray[i]);
-          }
-          break;
-        case array::t_complex256:
-          for( size_t i=0; i<m_header.m_n_elements; ++i) {
-            m_in_stream.read( reinterpret_cast<char*>(&cld), 
-              sizeof(std::complex<long double>));
-            static_complex_cast(cld,multiarray[i]);
           }
           break;
         default:

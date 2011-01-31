@@ -40,7 +40,8 @@ namespace Torch {
       }
       
       // Initialize header
-      m_header.m_type = type;
+      m_header.m_elem_type = type;
+      m_header.typeUpdated();
       m_header.setShape( shape);
       m_header.write(m_out_stream);
       m_header_init = true;
@@ -95,7 +96,7 @@ namespace Torch {
         throw Exception();
       }
 
-      if(array.getParentArrayset().getElementType() == m_header.m_type)
+      if(array.getParentArrayset().getElementType() == m_header.m_elem_type)
         write(array.getStorage()); 
       else // cast is required
       {
@@ -145,20 +146,12 @@ namespace Torch {
             writeWithCast( 
               reinterpret_cast<const double*>(array.getStorage()) );
             break;
-          case array::t_float128:
-            writeWithCast( 
-              reinterpret_cast<const long double*>(array.getStorage()) );
-            break;
           case array::t_complex64:
             writeWithCast( reinterpret_cast<const std::complex<float>* >(
               array.getStorage()) );
             break;
           case array::t_complex128:
             writeWithCast( reinterpret_cast<const std::complex<double>*>(
-              array.getStorage()) );
-            break;
-          case array::t_complex256:
-            writeWithCast( reinterpret_cast<const std::complex<long double>* >(
               array.getStorage()) );
             break;
           default:
@@ -169,7 +162,7 @@ namespace Torch {
 
     BinOutputFile& BinOutputFile::write(const void* multi_array) {
       // copy the data into the output stream
-      switch(m_header.m_type)
+      switch(m_header.m_elem_type)
       {
         case array::t_bool:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
@@ -215,10 +208,6 @@ namespace Torch {
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
             m_header.m_n_elements*sizeof(double));
           break;
-        case array::t_float128:
-          m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.m_n_elements*sizeof(long double));
-          break;
         case array::t_complex64:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
             m_header.m_n_elements*sizeof(std::complex<float>));
@@ -226,10 +215,6 @@ namespace Torch {
         case array::t_complex128:
           m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
             m_header.m_n_elements*sizeof(std::complex<double>));
-          break;
-        case array::t_complex256:
-          m_out_stream.write( reinterpret_cast<const char*>(multi_array), 
-            m_header.m_n_elements*sizeof(std::complex<long double>));
           break;
         default:
           break;
