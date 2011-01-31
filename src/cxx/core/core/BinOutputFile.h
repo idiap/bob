@@ -23,6 +23,7 @@ namespace Torch {
 
     /**
      *  @brief The OutputFile class for storing multiarrays into files
+     *  @deprecated Please use the BinFile class instead.
      */
     class BinOutputFile
     {

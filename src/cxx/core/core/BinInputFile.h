@@ -17,6 +17,7 @@ namespace Torch {
 
     /**
      *  @brief The InputFile class for loading multiarrays from binary files
+     *  @deprecated Please use the BinFile class instead.
      */
     class BinInputFile
     {
