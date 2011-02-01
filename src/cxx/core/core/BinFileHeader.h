@@ -123,7 +123,7 @@ namespace Torch {
         uint8_t m_elem_sizeof;
         uint8_t m_n_dimensions;
         uint32_t m_endianness;
-        uint64_t m_shape[array::N_MAX_DIMENSIONS_ARRAY];
+        size_t m_shape[array::N_MAX_DIMENSIONS_ARRAY];
         uint64_t m_n_samples;
 
         uint64_t m_n_elements;
