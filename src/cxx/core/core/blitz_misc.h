@@ -26,7 +26,8 @@ BZ_NAMESPACE(blitz)
 template <typename T>
 inline bool checkSafedata( const Array<T,1>& src) 
 {
-  if( src.isStorageContiguous() && src.isRankStoredAscending(0) )
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    (src.stride(0) == 1) )
     return true;
   return false;
 }
@@ -43,7 +44,8 @@ inline bool checkSafedata( const Array<T,2>& src)
 {
   if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
     src.isRankStoredAscending(1) && (src.ordering(0)==1) && 
-    (src.ordering(1)==0) )
+    (src.ordering(1)==0) && (src.stride(0) == src.extent(1)) && 
+    (src.stride(1) == 1))
     return true;
   return false;
 }
@@ -60,7 +62,9 @@ inline bool checkSafedata( const Array<T,3>& src)
 {
   if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
     src.isRankStoredAscending(1) && src.isRankStoredAscending(2) && 
-    (src.ordering(0)==2) && (src.ordering(1)==1) && (src.ordering(2)==0) )
+    (src.ordering(0)==2) && (src.ordering(1)==1) && (src.ordering(2)==0) &&
+    (src.stride(0) == src.extent(1)*src.extent(2)) && 
+    (src.stride(1) == src.extent(2)) && (src.stride(2) == 1))
     return true;
   return false;
 }
@@ -78,7 +82,10 @@ inline bool checkSafedata( const Array<T,4>& src)
   if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
     src.isRankStoredAscending(1) && src.isRankStoredAscending(2) && 
     src.isRankStoredAscending(3) && (src.ordering(0)==3) && 
-    (src.ordering(1)==2) && (src.ordering(2)==1) && (src.ordering(3)==0) )
+    (src.ordering(1)==2) && (src.ordering(2)==1) && (src.ordering(3)==0) &&
+    (src.stride(0) == src.extent(1)*src.extent(2)*src.extent(3)) && 
+    (src.stride(1) == src.extent(2)*src.extent(3)) && 
+    (src.stride(2) == src.extent(3)) && (src.stride(3) == 1))
     return true;
   return false;
 }
