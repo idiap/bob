@@ -11,8 +11,6 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 
-#include "core/BinOutputFile.h"
-#include "core/BinInputFile.h"
 #include "core/BinFile.h"
 #include "core/StaticComplexCast.h"
 
