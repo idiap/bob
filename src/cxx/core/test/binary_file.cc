@@ -23,6 +23,10 @@ struct T {
   blitz::Array<float,2> d;
   blitz::Array<float,2> e;
   blitz::Array<float,2> f;
+
+  blitz::Array<double,4> g;
+  blitz::Array<double,4> h;
+
   T() {
     a.resize(4);
     a = 1, 2, 3, 4;
@@ -33,7 +37,10 @@ struct T {
     d = 1, 2, 3, 4;
     e.resize(2,2);
     e = 5, 6, 7, 8;
+
+    g.resize(2,3,4,5);
   }
+
 
   ~T() { }
 
@@ -76,6 +83,26 @@ void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
     for (int j=0; j<a.extent(1); ++j) {
       Torch::core::static_complex_cast(b(i,j), val);
       BOOST_CHECK_EQUAL(a(i,j), val);
+    }
+  }
+}
+
+template<typename T, typename U> 
+void check_equal_4d(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b) 
+{
+  BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
+  BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
+  BOOST_REQUIRE_EQUAL(a.extent(2), b.extent(2));
+  BOOST_REQUIRE_EQUAL(a.extent(3), b.extent(3));
+  T val;
+  for (int i=0; i<a.extent(0); ++i) {
+    for (int j=0; j<a.extent(1); ++j) {
+      for (int k=0; k<a.extent(2); ++k) {
+        for (int l=0; l<a.extent(3); ++l) {
+          Torch::core::static_complex_cast(b(i,j,k,l), val);
+          BOOST_CHECK_EQUAL(a(i,j,k,l), val);
+        }
+      }
     }
   }
 }
@@ -144,6 +171,44 @@ BOOST_AUTO_TEST_CASE( blitz1d_inout )
   in.read( b);
   check_equal_1d( a, b);
   in.close();
+}
+
+BOOST_AUTO_TEST_CASE( blitz4d_slice )
+{
+  std::string tmp_file1 = temp_file();
+  Torch::core::BinFile out1(tmp_file1, Torch::core::BinFile::out);
+  std::string tmp_file2 = temp_file();
+  Torch::core::BinFile out2(tmp_file2, Torch::core::BinFile::out);
+
+  for(int i=0; i<2;++i)
+    for(int j=0; j<3;++j)
+      for(int k=0; k<4;++k)
+        for(int l=0; l<5;++l)
+          g(i,j,k,l) = i*3*4*5+j*4*5+k*5+l;
+
+  blitz::Array<double,4> g_sliced1 = g(blitz::Range::all(), blitz::Range(0,0),
+    blitz::Range::all(), blitz::Range::all());
+
+  out1.write( g_sliced1);
+  out1.close();
+
+  Torch::core::BinFile in1(tmp_file1, Torch::core::BinFile::in);
+  
+  in1.read( h);
+  check_equal_4d( g_sliced1, h);
+  in1.close();
+
+  blitz::Array<double,4> g_sliced2 = g(blitz::Range(0,0), blitz::Range::all(),
+    blitz::Range::all(), blitz::Range::all());
+
+  out2.write( g_sliced2);
+  out2.close();
+
+  Torch::core::BinFile in2(tmp_file2, Torch::core::BinFile::in);
+  
+  in2.read( h);
+  check_equal_4d( g_sliced2, h);
+  in1.close();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

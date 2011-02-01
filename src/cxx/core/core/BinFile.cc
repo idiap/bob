@@ -181,10 +181,14 @@ namespace Torch {
 
       // Copy the data into the output stream
       const T* data;
-      if( bl.isStorageContiguous() )
+      blitz::Array<T,D> ref;
+      if( checkSafedata(bl) )
         data = bl.data();
       else
-        data = bl.copy().data();
+      {
+        ref.reference( copySafedata(bl) );
+        data = ref.data();
+      }
 
       if(m_header.needCast(bl))
         writeWithCast(data);
