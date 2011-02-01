@@ -15,6 +15,75 @@
 
 BZ_NAMESPACE(blitz)
 
+
+/**
+ * @brief This function check that the data() function of a 1D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,1>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) )
+    return true;
+  return false;
+}
+
+/**
+ * @brief This function check that the data() function of a 2D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,2>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    src.isRankStoredAscending(1) && (src.ordering(0)==1) && 
+    (src.ordering(1)==0) )
+    return true;
+  return false;
+}
+
+/**
+ * @brief This function check that the data() function of a 3D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,3>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    src.isRankStoredAscending(1) && src.isRankStoredAscending(2) && 
+    (src.ordering(0)==2) && (src.ordering(1)==1) && (src.ordering(2)==0) )
+    return true;
+  return false;
+}
+
+/**
+ * @brief This function check that the data() function of a 4D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,4>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    src.isRankStoredAscending(1) && src.isRankStoredAscending(2) && 
+    src.isRankStoredAscending(3) && (src.ordering(0)==3) && 
+    (src.ordering(1)==2) && (src.ordering(2)==1) && (src.ordering(3)==0) )
+    return true;
+  return false;
+}
+
+
 /**
  * @brief This copies a 1D blitz array and guaranties that:
  *   * the memory is stored contiguously
