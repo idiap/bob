@@ -151,6 +151,8 @@ void bind_ip_image()
     .def("reset", &inplace_reset, return_self<>(), (arg("self"), arg("threshold"), arg("value")), "Sets values in the image that are smaller than 'threshold' to the given value")
     .def("abs", &inplace_abs, (arg("self")), "Applies pixel = abs(pixel) for each pixel in the image. Modifes the image inplace.")
     .def("sum", &sum, (arg("self")), "Returns the sum of all pixels in the image as a double value")
+    .def("__call__", (short (Torch::Image::*)(long, long, long) const)&Torch::Image::get, (arg("self"), arg("y"), arg("x"), arg("plane")), "Returns a particular pixel from the image")
+    .def("get", (short (Torch::Image::*)(long, long, long) const)&Torch::Image::get, (arg("self"), arg("y"), arg("x"), arg("plane")), "Returns a particular pixel from the image")
     ;
   def("throw_exception", &throw_exception);
 }
