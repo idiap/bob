@@ -61,9 +61,9 @@ def main():
     save = torch.ip.Image(buffer)
     buffer -= previous
     previous = save
-    buffer.reset(0, 0)
+    buffer.abs()
     values.append(buffer.sum()/buffer.sizeAll())
-    if scores: scores.write('%.3e\n' % values[-1])
+    if scores: scores.write('%d %.5e\n' % (frame, values[-1]))
     frame += 1
 
   # calculates the ratio between FFT magnitudes at 0 and the sum of the rest.
@@ -71,7 +71,7 @@ def main():
 
   if os.path.basename(sys.argv[1]).find('attack') == 0: print "attack",
   else: print "real",
-  print '%.3e %.3e %.3e %.3e %.3e %s' % (mean(values), stdvar(values), min(values), max(values), fa, os.path.basename(os.path.realpath(sys.argv[1])))
+  print '%.5e %.5e %.5e %.5e %.5e %s' % (mean(values), stdvar(values), min(values), max(values), fa, os.path.basename(os.path.realpath(sys.argv[1])))
   
   input.close()
   if scores: scores.close()
