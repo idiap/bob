@@ -161,7 +161,11 @@ void ycbcr2rgb(int y, int cb, int cr, unsigned char *rgb);
 */
 //@{
 
-#define CONVERT_FAST_RGB2GRAY_
+//The following define was removed until further investigation on the "fast"
+//grayscale converter is pursued. Results are not always consistent with the
+//normal (function-based) converter, giving results which can be 1 level of
+//gray higher. Consult with AA, LES or SM on this before enabling it.
+/* #define CONVERT_FAST_RGB2GRAY_ */
 
 /// Look-up table for R
 extern int times77[256];
