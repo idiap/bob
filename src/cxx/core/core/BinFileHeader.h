@@ -14,6 +14,8 @@
 #include <fstream>
 #include <blitz/array.h>
 
+#include <typeinfo>
+
 namespace Torch {
   /**
    * \ingroup libcore_api
@@ -86,26 +88,10 @@ namespace Torch {
          * @brief Check if there is a need to cast the data of a blitz array
          */
         template <typename T, int D> 
-        bool needCast(const blitz::Array<T,D>& bl) const;
-        /************** Partial specialization declaration *************/
-        template<int D> bool needCast(const blitz::Array<bool,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int8_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int16_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int32_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<int64_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<uint8_t,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<uint16_t,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<uint32_t,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<uint64_t,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<float,D>& bl) const;
-        template<int D> bool needCast(const blitz::Array<double,D>& bl) const;
-        template<int D> 
-        bool needCast(const blitz::Array<std::complex<float>,D>& bl) const;
-        template<int D>
-        bool needCast(const blitz::Array<std::complex<double>,D>& bl) const;
+        bool needCast(const blitz::Array<T,D>& bl) const {
+          std::cout << "Generic: " << typeid(T).name() << std::endl;
+          return true;
+        }
 
         /**
          * @brief Update the number of elements and number of dimensions 
@@ -117,7 +103,6 @@ namespace Torch {
          * (is called when the type is set)
          */
         void typeUpdated();
-
 
 
         /**
@@ -134,117 +119,63 @@ namespace Torch {
         uint64_t m_n_elements;
     };
 
-    template <typename T, int d>
-    bool BinFileHeader::needCast(const blitz::Array<T,d>& bl) const
-    {
-      return true;
-    }
 
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<bool,d>& bl) const
-    {
-      if(m_elem_type == array::t_bool )
-        return false;
-      return true;
-    }
+/************** Full specialization declarations *************/
+#define NEED_CAST_DECL(T,D) template<> bool \
+  BinFileHeader::needCast(const blitz::Array<T,D>& bl) const;\
 
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<int8_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_int8 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<int16_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_int16 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<int32_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_int32 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<int64_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_int64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<uint8_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_uint8 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<uint16_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_uint16 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<uint32_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_uint32 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<uint64_t,d>& bl) const
-    {
-      if(m_elem_type == array::t_uint64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<float,d>& bl) const
-    {
-      if(m_elem_type == array::t_float32 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(const blitz::Array<double,d>& bl) const
-    {
-      if(m_elem_type == array::t_float64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(
-      const blitz::Array<std::complex<float>,d>& bl) const
-    {
-      if(m_elem_type == array::t_complex64 )
-        return false;
-      return true;
-    }
-
-    template <int d>
-    bool BinFileHeader::needCast(
-      const blitz::Array<std::complex<double>,d>& bl) const
-    {
-      if(m_elem_type == array::t_complex128 )
-        return false;
-      return true;
-    }
+    NEED_CAST_DECL(bool,1)
+    NEED_CAST_DECL(bool,2)
+    NEED_CAST_DECL(bool,3)
+    NEED_CAST_DECL(bool,4)
+    NEED_CAST_DECL(int8_t,1)
+    NEED_CAST_DECL(int8_t,2)
+    NEED_CAST_DECL(int8_t,3)
+    NEED_CAST_DECL(int8_t,4)
+    NEED_CAST_DECL(int16_t,1)
+    NEED_CAST_DECL(int16_t,2)
+    NEED_CAST_DECL(int16_t,3)
+    NEED_CAST_DECL(int16_t,4)
+    NEED_CAST_DECL(int32_t,1)
+    NEED_CAST_DECL(int32_t,2)
+    NEED_CAST_DECL(int32_t,3)
+    NEED_CAST_DECL(int32_t,4)
+    NEED_CAST_DECL(int64_t,1)
+    NEED_CAST_DECL(int64_t,2)
+    NEED_CAST_DECL(int64_t,3)
+    NEED_CAST_DECL(int64_t,4)
+    NEED_CAST_DECL(uint8_t,1)
+    NEED_CAST_DECL(uint8_t,2)
+    NEED_CAST_DECL(uint8_t,3)
+    NEED_CAST_DECL(uint8_t,4)
+    NEED_CAST_DECL(uint16_t,1)
+    NEED_CAST_DECL(uint16_t,2)
+    NEED_CAST_DECL(uint16_t,3)
+    NEED_CAST_DECL(uint16_t,4)
+    NEED_CAST_DECL(uint32_t,1)
+    NEED_CAST_DECL(uint32_t,2)
+    NEED_CAST_DECL(uint32_t,3)
+    NEED_CAST_DECL(uint32_t,4)
+    NEED_CAST_DECL(uint64_t,1)
+    NEED_CAST_DECL(uint64_t,2)
+    NEED_CAST_DECL(uint64_t,3)
+    NEED_CAST_DECL(uint64_t,4)
+    NEED_CAST_DECL(float,1)
+    NEED_CAST_DECL(float,2)
+    NEED_CAST_DECL(float,3)
+    NEED_CAST_DECL(float,4)
+    NEED_CAST_DECL(double,1)
+    NEED_CAST_DECL(double,2)
+    NEED_CAST_DECL(double,3)
+    NEED_CAST_DECL(double,4)
+    NEED_CAST_DECL(std::complex<float>,1)
+    NEED_CAST_DECL(std::complex<float>,2)
+    NEED_CAST_DECL(std::complex<float>,3)
+    NEED_CAST_DECL(std::complex<float>,4)
+    NEED_CAST_DECL(std::complex<double>,1)
+    NEED_CAST_DECL(std::complex<double>,2)
+    NEED_CAST_DECL(std::complex<double>,3)
+    NEED_CAST_DECL(std::complex<double>,4)
 
   }
 }
