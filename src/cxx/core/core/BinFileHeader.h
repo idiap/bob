@@ -14,8 +14,6 @@
 #include <fstream>
 #include <blitz/array.h>
 
-#include <typeinfo>
-
 namespace Torch {
   /**
    * \ingroup libcore_api
@@ -89,7 +87,6 @@ namespace Torch {
          */
         template <typename T, int D> 
         bool needCast(const blitz::Array<T,D>& bl) const {
-          std::cout << "Generic: " << typeid(T).name() << std::endl;
           return true;
         }
 

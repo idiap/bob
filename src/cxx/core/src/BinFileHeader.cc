@@ -252,7 +252,6 @@ namespace Torch {
 #define NEED_CAST_DEF(T,name,D) template<> \
     bool BinFileHeader::needCast(const blitz::Array<T,D>& bl) const \
     {\
-      std::cout << "Not Generic " << name << std::endl;\
       if(m_elem_type == name )\
         return false;\
       return true;\
