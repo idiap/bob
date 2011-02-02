@@ -35,15 +35,9 @@ namespace Torch {
     }
 
     template<typename T, typename U> 
-    void static_complex_cast(const U& in, std::complex<T>& out) {
-      out = std::complex<T>(static_cast<T>(in), 0);
-    }
-
-    template<typename T, typename U> 
     void static_complex_cast(const std::complex<U>& in, std::complex<T>& out)
     {
-      out = std::complex<T>(
-        static_cast<T>(in.real()), static_cast<T>(in.imag()) );
+      out = static_cast<std::complex<T> >(in);
     }
 
   }

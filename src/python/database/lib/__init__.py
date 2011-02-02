@@ -137,7 +137,7 @@ def member_arrays(self, arraysets):
 
 Member.arrays = member_arrays
 
-def bininputfile_getitem(self, i):
+def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""
   from .. import core
   retval = getattr(core.array, '%s_%d' % \
@@ -145,4 +145,4 @@ def bininputfile_getitem(self, i):
   self.bzread(i, retval)
   return retval
 
-BinInputFile.__getitem__ = bininputfile_getitem
+BinFile.__getitem__ = binfile_getitem

@@ -12,7 +12,6 @@
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "sp/convolution.h"
-#include <blitz/array.h>
 
 struct T {
   blitz::Array<double,1> A1_10;
@@ -161,8 +160,28 @@ struct T {
 
 
 template <typename T> 
+void test_convolve_1D_nopt( T eps, const blitz::Array<T,1>& a1, 
+  const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat)
+{
+  blitz::Array<T,1> res = Torch::sp::convolve( a1, a2);
+  for(int i=0; i<res.extent(0); ++i)
+    BOOST_CHECK_SMALL(res(i) - mat(i), eps);
+}
+
+template <typename T> 
+void test_convolve_2D_nopt( T eps, const blitz::Array<T,2>& a1, 
+  const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat)
+{
+  blitz::Array<T,2> res = Torch::sp::convolve( a1, a2);
+  for(int i=0; i<res.extent(0); ++i)
+    for(int j=0; j<res.extent(1); ++j)
+      BOOST_CHECK_SMALL(res(i,j) - mat(i,j), eps);
+}
+
+template <typename T> 
 void test_convolve_1D( T eps, const blitz::Array<T,1>& a1, 
-  const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat, size_t option = 0)
+  const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat, 
+  const Torch::sp::ConvolutionOption option = Torch::sp::FULL)
 {
   blitz::Array<T,1> res = Torch::sp::convolve( a1, a2, option);
   for(int i=0; i<res.extent(0); ++i)
@@ -171,7 +190,8 @@ void test_convolve_1D( T eps, const blitz::Array<T,1>& a1,
 
 template <typename T> 
 void test_convolve_2D( T eps, const blitz::Array<T,2>& a1, 
-  const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat, size_t option = 0)
+  const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat,
+  const Torch::sp::ConvolutionOption option = Torch::sp::FULL)
 {
   blitz::Array<T,2> res = Torch::sp::convolve( a1, a2, option);
   for(int i=0; i<res.extent(0); ++i)
@@ -183,94 +203,127 @@ void test_convolve_2D( T eps, const blitz::Array<T,2>& a1,
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 // The following tests compare results from Torch and Matlab.
 
+// 1D convolution between a 1D vector of length 10 and 3 (no option)
+BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_nopt )
+{
+  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full);
+}
+
 // 1D convolution between a 1D vector of length 10 and 3 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full);
+  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full, Torch::sp::FULL);
 }
 
 // 1D convolution between a 1D vector of length 10 and 3 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_same, 1);
+  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_same, Torch::sp::SAME);
 }
 
 // 1D convolution between a 1D vector of length 10 and 3 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_valid, 2);
+  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_valid, 
+    Torch::sp::VALID);
+}
+
+// 1D convolution between a 1D vector of length 10 and 4 (no option)
+BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_nopt )
+{
+  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full);
+  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full, Torch::sp::FULL);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_same, 1);
+  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_same, Torch::sp::SAME);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_valid, 2);
+  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_valid, 
+    Torch::sp::VALID);
+}
+
+// 1D convolution between a 1D vector of length 10 and 5 (no option)
+BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_nopt )
+{
+  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full);
+  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full, Torch::sp::FULL);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_same, 1);
+  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_same, Torch::sp::SAME);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_valid, 2);
+  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_valid, 
+    Torch::sp::VALID);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 2x2 (no option)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_nopt )
+{
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_full )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full);
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full, Torch::sp::FULL);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_same )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_same, 1);
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_same, Torch::sp::SAME);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_valid )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_valid, 2);
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_valid, Torch::sp::VALID);
+}
+
+// 2D convolution between a 2D vector of length 5x5 and 3x3 (no option)
+BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_nopt )
+{
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_full )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full);
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full, Torch::sp::FULL);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_same )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_same, 1);
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_same, Torch::sp::SAME);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_valid )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_valid, 2);
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_valid, Torch::sp::VALID);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

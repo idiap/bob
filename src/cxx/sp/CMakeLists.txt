@@ -12,7 +12,9 @@ set(src
     "src/spFFT.cc"
     "src/spDCT.cc"
     "src/spFCT.cc"
-    "src/spDeltaOne.cc")
+    "src/spDeltaOne.cc"
+    "src/FFT.cc"
+    "src/FCT.cc")
 
 include(../../cmake/macros.cmake)
 torch_library(sp "${src}" "${deps}" "")
@@ -22,3 +24,4 @@ torch_header_install(sp "torch::sp")
 torch_test(sp dftdct_naive test/dftdctnaive.cc)
 torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
 torch_test(sp convolution_zeropadding test/convolution.cc)
+torch_test(sp fftfct_fftpack_blitz test/fftfctfftpack_blitz.cc)

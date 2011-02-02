@@ -39,7 +39,7 @@ class BinaryFileTest(unittest.TestCase):
     # Now we create a new binary output file in a temporary location and save
     # the data there.
     tmpname = get_tempfilename()
-    outfile = torch.database.BinOutputFile(tmpname)
+    outfile = torch.database.BinFile(tmpname, torch.database.openmode.out )
     for k in arrays: outfile.append(k)
 
     # We can verify some of the output file's properties
@@ -50,13 +50,27 @@ class BinaryFileTest(unittest.TestCase):
 
     # Now we open the binary file for reading and the data should be all there.
     # Loading the data should prove us it is as we expect it
-    infile = torch.database.BinInputFile(tmpname)
+    infile = torch.database.BinFile(tmpname, torch.database.openmode.inp)
     self.assertEqual(len(infile), N)
     self.assertEqual(infile.shape, SHAPE)
     self.assertEqual(infile.elementType, torch.database.ElementType.complex128)
     for k in range(N): 
       self.assertEqual(infile[k], arrays[k])
     del infile
+
+    # Now we open the binary file for reading and the data should be all there.
+    # We try to combine the read and write flags.
+    inoutfile = torch.database.BinFile(tmpname, torch.database.openmode.inp | 
+      torch.database.openmode.out)
+    self.assertEqual(len(inoutfile), N)
+    self.assertEqual(inoutfile.shape, SHAPE)
+    self.assertEqual(inoutfile.elementType, torch.database.ElementType.complex128)
+    for k in range(N): 
+      self.assertEqual(inoutfile[k], arrays[k])
+    del inoutfile
+
+
+
 
     os.unlink(tmpname)
 

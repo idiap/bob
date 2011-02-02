@@ -2,14 +2,15 @@
 #
 # vim: set fileencoding=utf-8 :
 # Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-# 24 Nov 2010
+# 28 Jan 2011
 
 import os, sys
 import unittest
 import torch
 
 #############################################################################
-# Compare naive DCT/DFT implementation with values returned by Matlab
+# Compare blitz-based convolution product implementation with values returned 
+# by Matlab
 #############################################################################
 
 ########################## Values used for the computation ##################
@@ -158,61 +159,76 @@ class ConvolutionTest(unittest.TestCase):
     test_convolve_1D_nopt( A10, b1_3, RES_A1_10_b1_3_full, self)
 
   def test_convolution_1D_10_3_F(self):
-    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_full, self, 0)
+    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_full, self, 
+      torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_1D_10_3_S(self):
-    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_same, self, 1)
+    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_same, self, 
+      torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_1D_10_3_V(self):
-    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_valid, self, 2)
+    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_valid, self, 
+      torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_1D_10_4_n(self):
     test_convolve_1D_nopt( A10, b1_4, RES_A1_10_b1_4_full, self)
 
   def test_convolution_1D_10_4_F(self):
-    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_full, self, 0)
+    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_full, self, 
+      torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_1D_10_4_S(self):
-    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_same, self, 1)
+    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_same, self, 
+      torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_1D_10_4_V(self):
-    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_valid, self, 2)
+    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_valid, self, 
+      torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_1D_10_5_n(self):
     test_convolve_1D_nopt( A10, b1_5, RES_A1_10_b1_5_full, self)
 
   def test_convolution_1D_10_5_F(self):
-    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_full, self, 0)
+    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_full, self, 
+      torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_1D_10_5_S(self):
-    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_same, self, 1)
+    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_same, self, 
+      torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_1D_10_5_V(self):
-    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_valid, self, 2)
+    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_valid, self, 
+      torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_2D_5_2_n(self):
     test_convolve_2D_nopt( A2_5, b2_2, RES_A2_5_b2_2_full, self)
 
   def test_convolution_2D_5_2_F(self):
-    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_full, self, 0)
+    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_full, self, 
+      torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_2D_5_2_S(self):
-    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_same, self, 1)
+    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_same, self, 
+      torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_2D_5_2_V(self):
-    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_valid, self, 2)
+    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_valid, self, 
+      torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_2D_5_3_n(self):
     test_convolve_2D_nopt( A2_5, b2_3, RES_A2_5_b2_3_full, self)
 
   def test_convolution_2D_5_3_F(self):
-    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_full, self, 0)
+    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_full, self, 
+      torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_2D_5_3_S(self):
-    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_same, self, 1)
+    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_same, self, 
+      torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_2D_5_3_V(self):
-    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_valid, self, 2)
+    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_valid, self, 
+      torch.sp.ConvolutionOption.VALID)
 
 
 ##################### Main ##################  

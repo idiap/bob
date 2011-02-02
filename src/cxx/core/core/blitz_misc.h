@@ -11,8 +11,210 @@
 #define TORCH_CORE_BLITZ_MISC_H
 
 #include <blitz/array.h>
+#include "core/StaticComplexCast.h"
 
 BZ_NAMESPACE(blitz)
+
+
+/**
+ * @brief This function check that the data() function of a 1D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,1>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    (src.stride(0) == 1) )
+    return true;
+  return false;
+}
+
+/**
+ * @brief This function check that the data() function of a 2D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,2>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    src.isRankStoredAscending(1) && (src.ordering(0)==1) && 
+    (src.ordering(1)==0) && (src.stride(0) == src.extent(1)) && 
+    (src.stride(1) == 1))
+    return true;
+  return false;
+}
+
+/**
+ * @brief This function check that the data() function of a 3D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,3>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    src.isRankStoredAscending(1) && src.isRankStoredAscending(2) && 
+    (src.ordering(0)==2) && (src.ordering(1)==1) && (src.ordering(2)==0) &&
+    (src.stride(0) == src.extent(1)*src.extent(2)) && 
+    (src.stride(1) == src.extent(2)) && (src.stride(2) == 1))
+    return true;
+  return false;
+}
+
+/**
+ * @brief This function check that the data() function of a 4D blitz array
+ * can be used safely, i.e.:
+ *   * the memory is stored contiguously
+ *   * data is not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T>
+inline bool checkSafedata( const Array<T,4>& src) 
+{
+  if( src.isStorageContiguous() && src.isRankStoredAscending(0) && 
+    src.isRankStoredAscending(1) && src.isRankStoredAscending(2) && 
+    src.isRankStoredAscending(3) && (src.ordering(0)==3) && 
+    (src.ordering(1)==2) && (src.ordering(2)==1) && (src.ordering(3)==0) &&
+    (src.stride(0) == src.extent(1)*src.extent(2)*src.extent(3)) && 
+    (src.stride(1) == src.extent(2)*src.extent(3)) && 
+    (src.stride(2) == src.extent(3)) && (src.stride(3) == 1))
+    return true;
+  return false;
+}
+
+
+/**
+ * @brief This copies a 1D blitz array and guaranties that:
+ *   * the memory is stored contiguously
+ *   * indices start at 0 and data are not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T> 
+Array<T,1> copySafedata( const Array<T,1>& src)
+{
+  int n_0 = src.extent(0);
+  Array<T,1> dst( n_0 );
+  for( int i=0; i<n_0; ++i )
+    dst(i) = src(i+src.lbound(0));
+  return dst;
+}
+
+/**
+ * @brief This copies a 2D blitz array and guaranties that:
+ *   * the memory is stored contiguously
+ *   * indices start at 0 and data are not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T> 
+Array<T,2> copySafedata( const Array<T,2>& src)
+{
+  int n_0 = src.extent(0);
+  int n_1 = src.extent(1);
+  Array<T,2> dst( n_0, n_1 );
+  for( int i=0; i<n_0; ++i )
+    for( int j=0; j<n_1; ++j )
+      dst(i,j) = src(i+src.lbound(0),j+src.lbound(1));
+  return dst;
+}
+
+/**
+ * @brief This copies a 3D blitz array and guaranties that:
+ *   * the memory is stored contiguously
+ *   * indices start at 0 and data are not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T> 
+Array<T,3> copySafedata( const Array<T,3>& src)
+{
+  int n_0 = src.extent(0);
+  int n_1 = src.extent(1);
+  int n_2 = src.extent(2);
+  Array<T,3> dst( n_0, n_1, n_2 );
+  for( int i=0; i<n_0; ++i )
+    for( int j=0; j<n_1; ++j )
+      for( int k=0; k<n_2; ++k )
+        dst(i,j,k) = src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2));
+  return dst;
+}
+
+/**
+ * @brief This copies a 4D blitz array and guaranties that:
+ *   * the memory is stored contiguously
+ *   * indices start at 0 and data are not reversed in each dimension
+ *   * Row major storage order is used
+ */
+template <typename T> 
+Array<T,4> copySafedata( const Array<T,4>& src)
+{
+  int n_0 = src.extent(0);
+  int n_1 = src.extent(1);
+  int n_2 = src.extent(2);
+  int n_3 = src.extent(3);
+  Array<T,4> dst( n_0, n_1, n_2, n_3 );
+  for( int i=0; i<n_0; ++i )
+    for( int j=0; j<n_1; ++j )
+      for( int k=0; k<n_2; ++k )
+        for( int l=0; l<n_3; ++l )
+          dst(i,j,k,l) = src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),
+            l+src.lbound(3));
+  return dst;
+}
+
+
+/**
+ * @brief Casts a blitz array allowing std::complex types.
+ */
+template<typename T, typename U, int D> 
+void complex_cast(const Array<U,D> in, Array<T,D> out) {
+  out = cast<T>(in);
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,1> in, Array<T,1> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    Torch::core::static_complex_cast<T>( in(i+in.lbound(0)), out(i));
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,2> in, Array<T,2> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    for( int j=0; j<in.extent(1); ++j)
+      Torch::core::static_complex_cast<T>( in(i+in.lbound(0),j+in.lbound(1)), out(i,j));
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,3> in, Array<T,3> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    for( int j=0; j<in.extent(1); ++j)
+      for( int k=0; k<in.extent(2); ++k)
+        Torch::core::static_complex_cast<T>( in(i+in.lbound(0),j+in.lbound(1),k+in.lbound(2)), out(i,j,k));
+}
+
+template<typename T, typename U> 
+void complex_cast(const Array<std::complex<U>,4> in, Array<T,4> out) {
+  for( int i=0; i<in.extent(0); ++i)
+    for( int j=0; j<in.extent(1); ++j)
+      for( int k=0; k<in.extent(2); ++k)
+        for( int l=0; l<in.extent(3); ++l)
+          Torch::core::static_complex_cast<T>( in(i+in.lbound(0),j+in.lbound(1),k+in.lbound(2),l+in.lbound(3)), out(i,j,k,l));
+}
+
+
+template<typename T, typename U, int D> 
+void complex_cast(const Array<std::complex<U>,D> in, Array<std::complex<T>,D> out) {
+  out = cast<std::complex<T> >(in);
+}
+
+
+
 //TODO
 #ifdef TORCH_NEEDS_REVISION
 /**

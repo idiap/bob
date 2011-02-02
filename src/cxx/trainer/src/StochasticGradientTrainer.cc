@@ -1,6 +1,6 @@
 #include "trainer/StochasticGradientTrainer.h"
 #include "machine/GradientMachine.h"
-#include "core/Random.hpp"
+#include "core/Random.h"
 
 namespace Torch
 {

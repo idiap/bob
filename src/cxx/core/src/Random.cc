@@ -1,8 +1,12 @@
-#include "core/Random.hpp"
+/**
+ * @file src/cxx/core/src/Random.cc
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
+ * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
+ *
+ * @brief Random integer generators based on Boost
+ */
 
-Torch::core::random::generator::~generator()
-{
-}
+#include "core/Random.h"
 
 boost::mt19937& 
 Torch::core::random::generator::instance()
@@ -13,4 +17,4 @@ Torch::core::random::generator::instance()
 }
 
 boost::scoped_ptr<boost::mt19937> Torch::core::random::generator::s_generator;
-   
+

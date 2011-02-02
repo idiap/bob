@@ -20,6 +20,10 @@ namespace Torch
 	// TODO: doxygen header!
 	/////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @brief
+   * @deprecated Please use the fft function designed for blitz::arrays
+   */
 	class spFFT : public spCore
 	{
 	public:

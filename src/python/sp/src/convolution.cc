@@ -12,12 +12,13 @@
 
 using namespace boost::python;
 
-static const char* CONVOLVE_DOC = "Compute the convolution product of two blitz arrays and return the results as a blitz array.";
+static const char* CONVOLVE_DOC = "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array.";
+static const char* CONVOLVE_OPT_DOC = "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array. The option field allows to give information about the size of the output (FULL, SAME, VALID)";
 
-#define CONVOLVE_DECL(T,N,D) static inline blitz::Array<T, D> convolve_ ## N ## _ ## D(const blitz::Array<T, D>& a, const blitz::Array<T, D>& b, size_t option) { return Torch::sp::convolve<T>(a, b, option); } \
+#define CONVOLVE_DECL(T,N,D) static inline blitz::Array<T, D> convolve_ ## N ## _ ## D(const blitz::Array<T, D>& a, const blitz::Array<T, D>& b, const Torch::sp::ConvolutionOption option) { return Torch::sp::convolve<T>(a, b, option); } \
 static inline blitz::Array<T, D> convolve_ ## N ## _ ## D ## _nopt(const blitz::Array<T, D>& a, const blitz::Array<T, D>& b) { return Torch::sp::convolve<T>(a, b); }
 
-#define CONVOLVE_DEF(T,N,D) def("convolve", convolve_ ## N ## _ ## D, (arg("arrayA"), arg("arrayB"), arg("option")), CONVOLVE_DOC); \
+#define CONVOLVE_DEF(T,N,D) def("convolve", convolve_ ## N ## _ ## D, (arg("arrayA"), arg("arrayB"), arg("option")), CONVOLVE_OPT_DOC); \
 def("convolve", convolve_ ## N ## _ ## D ## _nopt, (arg("arrayA"), arg("arrayB")), CONVOLVE_DOC);
 
 CONVOLVE_DECL(bool, bool, 1)
@@ -49,31 +50,37 @@ CONVOLVE_DECL(std::complex<double>, complex128, 2)
 
 void bind_sp_convolution()
 {
-    CONVOLVE_DEF(bool, bool, 1)
-    CONVOLVE_DEF(int8_t, int8, 1)
-    CONVOLVE_DEF(int16_t, int16, 1)
-    CONVOLVE_DEF(int32_t, int32, 1)
-    CONVOLVE_DEF(int64_t, int64, 1)
-    CONVOLVE_DEF(uint8_t, uint8, 1)
-    CONVOLVE_DEF(uint16_t, uint16, 1)
-    CONVOLVE_DEF(uint32_t, uint32, 1)
-    CONVOLVE_DEF(uint64_t, uint64, 1)
-    CONVOLVE_DEF(float, float32, 1)
-    CONVOLVE_DEF(double, float64, 1)
-    CONVOLVE_DEF(std::complex<float>, complex64, 1)
-    CONVOLVE_DEF(std::complex<double>, complex128, 1)
-    CONVOLVE_DEF(bool, bool, 2)
-    CONVOLVE_DEF(int8_t, int8, 2)
-    CONVOLVE_DEF(int16_t, int16, 2)
-    CONVOLVE_DEF(int32_t, int32, 2)
-    CONVOLVE_DEF(int64_t, int64, 2)
-    CONVOLVE_DEF(uint8_t, uint8, 2)
-    CONVOLVE_DEF(uint16_t, uint16, 2)
-    CONVOLVE_DEF(uint32_t, uint32, 2)
-    CONVOLVE_DEF(uint64_t, uint64, 2)
-    CONVOLVE_DEF(float, float32, 2)
-    CONVOLVE_DEF(double, float64, 2)
-    CONVOLVE_DEF(std::complex<float>, complex64, 2)
-    CONVOLVE_DEF(std::complex<double>, complex128, 2)
+  enum_<Torch::sp::ConvolutionOption>("ConvolutionOption")
+    .value("FULL", Torch::sp::FULL)
+    .value("SAME", Torch::sp::SAME)
+    .value("VALID", Torch::sp::VALID)
+    ;
+ 
+  CONVOLVE_DEF(bool, bool, 1)
+  CONVOLVE_DEF(int8_t, int8, 1)
+  CONVOLVE_DEF(int16_t, int16, 1)
+  CONVOLVE_DEF(int32_t, int32, 1)
+  CONVOLVE_DEF(int64_t, int64, 1)
+  CONVOLVE_DEF(uint8_t, uint8, 1)
+  CONVOLVE_DEF(uint16_t, uint16, 1)
+  CONVOLVE_DEF(uint32_t, uint32, 1)
+  CONVOLVE_DEF(uint64_t, uint64, 1)
+  CONVOLVE_DEF(float, float32, 1)
+  CONVOLVE_DEF(double, float64, 1)
+  CONVOLVE_DEF(std::complex<float>, complex64, 1)
+  CONVOLVE_DEF(std::complex<double>, complex128, 1)
+  CONVOLVE_DEF(bool, bool, 2)
+  CONVOLVE_DEF(int8_t, int8, 2)
+  CONVOLVE_DEF(int16_t, int16, 2)
+  CONVOLVE_DEF(int32_t, int32, 2)
+  CONVOLVE_DEF(int64_t, int64, 2)
+  CONVOLVE_DEF(uint8_t, uint8, 2)
+  CONVOLVE_DEF(uint16_t, uint16, 2)
+  CONVOLVE_DEF(uint32_t, uint32, 2)
+  CONVOLVE_DEF(uint64_t, uint64, 2)
+  CONVOLVE_DEF(float, float32, 2)
+  CONVOLVE_DEF(double, float64, 2)
+  CONVOLVE_DEF(std::complex<float>, complex64, 2)
+  CONVOLVE_DEF(std::complex<double>, complex128, 2)
 }
 

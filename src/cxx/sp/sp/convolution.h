@@ -21,6 +21,15 @@ namespace Torch {
   namespace sp {
 
     /**
+     * @brief Enumeration of the possible options
+     */
+    enum ConvolutionOption {
+      FULL,
+      SAME,
+      VALID
+    };
+
+    /**
      * @brief 1D convolution of blitz arrays using zero padding
      * @param option:  * 0: full size (default)
      *                 * 1: same size as B
@@ -29,7 +38,7 @@ namespace Torch {
      */
     template<typename T>
       blitz::Array<T,1> convolve(const blitz::Array<T,1>& B, 
-        const blitz::Array<T,1>& C, size_t option = 0);
+        const blitz::Array<T,1>& C, const ConvolutionOption option = FULL);
 
     /**
      * @brief 2D convolution of blitz arrays using zero padding
@@ -40,7 +49,7 @@ namespace Torch {
      */
     template<typename T>
       blitz::Array<T,2> convolve(const blitz::Array<T,2>& B, 
-        const blitz::Array<T,2>& C, size_t option = 0);
+        const blitz::Array<T,2>& C, const ConvolutionOption option = FULL);
 
   }
 /**
