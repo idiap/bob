@@ -22,6 +22,11 @@ namespace Torch {
    */
   namespace core {
 
+    namespace BinaryFile {
+      extern const uint32_t MAGIC_ENDIAN_DW;
+      extern const uint8_t FORMAT_VERSION;
+    }
+
     /**
      *  @brief The Header for storing multiarrays into binary files
      */
@@ -132,8 +137,6 @@ namespace Torch {
     template <typename T, int d>
     bool BinFileHeader::needCast(const blitz::Array<T,d>& bl) const
     {
-      error << "Unsupported blitz array type " << std::endl;
-      throw Exception();
       return true;
     }
 

@@ -9,11 +9,14 @@
 #include "core/BinFileHeader.h"
 
 namespace Torch {
-  namespace core {
+  namespace core {    
+
+    const uint32_t BinaryFile::MAGIC_ENDIAN_DW = 0x01020304;
 
     BinFileHeader::BinFileHeader():
       m_version(0), m_elem_type(array::t_unknown), m_elem_sizeof(0), 
-      m_n_dimensions(0), m_endianness(0), m_n_samples(0), m_n_elements(0)
+      m_n_dimensions(0), m_endianness(BinaryFile::MAGIC_ENDIAN_DW), 
+      m_n_samples(0), m_n_elements(0)
     {
       for( size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
         m_shape[i] = 0;
@@ -164,6 +167,12 @@ namespace Torch {
 
       // Endianness
       str.read( reinterpret_cast<char*>(&val32), sizeof(uint32_t));
+      if(val32 != BinaryFile::MAGIC_ENDIAN_DW)
+      {
+        error << "The data has been saved on a machine with a different " <<
+          " endianness." << std::endl;
+        throw Exception();
+      }
       m_endianness = static_cast<uint32_t>(val32);
       TDEBUG3("Endianness: " << m_endianness);
 
