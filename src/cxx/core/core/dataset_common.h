@@ -78,6 +78,7 @@ namespace Torch {
     class IndexError: public Exception { };
     class NDimensionError: public Exception { };
     class TypeError: public Exception { };
+    class NonExistingElement: public Exception { };
 
   }
 /**

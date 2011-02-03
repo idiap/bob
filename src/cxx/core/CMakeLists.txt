@@ -38,6 +38,7 @@ set(src
     "src/Exception.cc"
     "src/logging.cc"
     "src/Dataset2.cc"
+    "src/Arrayset.cc"
     "src/XMLParser.cc"
     "src/XMLWriter.cc"
     "src/BinFileHeader.cc"
