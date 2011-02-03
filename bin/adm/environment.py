@@ -14,6 +14,12 @@ import subprocess
 epilog = """
 Examples:
 
+  To create a new (sub) shell with torch configured just type:
+  $ %(prog)s
+
+  Leaving that shell will bring you to the place you are now, clearing all of
+  your environment.
+
   If you are unsure of what to do, just print the help message:
   $ %(prog)s --help
 
@@ -23,8 +29,12 @@ Examples:
   If you want to setup for an arbitrary architecture:
   $ %(prog)s --arch=linux-i686-release
   
-  If you want to execute a program under a setup using this installation
-  $ %(prog)s --execute="<path-to-executable> <executable-options>"
+  If you want to execute a program under a setup using this installation.
+  Please note that the two dashes without options halt option processing and
+  enable you to give options to the executable you want to run:
+  $ %(prog)s --debug -- <path-to-executable> <executable-options>
+
+  No need for quotes or the such
 """
 
 def current_arch(debug):
@@ -65,10 +75,8 @@ def parse_args():
   if os.path.exists(idiap_externals):
     default_externals.append(idiap_externals)
 
-  default_executable = os.environ['SHELL']
-
   parser = MyParser(prog=prog, description=__doc__, 
-      epilog=epilog % {'prog': prog})
+      epilog=epilog % {'prog': prog,})
   parser.add_option("-a", "--arch",
                     action="store",
                     dest="arch",
@@ -100,12 +108,6 @@ def parse_args():
                     default=False,
                     help="Prints messages during execution."
                     )
-  parser.add_option("-x", "--execute",
-                    action="store",
-                    dest="executable",
-                    default=default_executable,
-                    help="Sets the name of the program to execute under the new environment (defaults to %default)."
-                    )
   parser.add_option("-c", "--csh",
                     action="store_true",
                     dest="csh",
@@ -125,14 +127,6 @@ def parse_args():
   #reverses the externals input list so the appended user preferences come
   #first
   options.externals.reverse()
-
-  #separates executable and exec_options
-  if options.executable.find(' ') != -1:
-    x = options.executable.split(' ', 1)
-    options.executable = x[0]
-    options.full_executable = [k for k in ' '.join(x).split(' ') if k]
-  else:
-    options.full_executable = [options.executable]
 
   return (options, arguments)
 

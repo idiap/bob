@@ -3,4 +3,9 @@
 set args=($_)
 set prog=${args[2]}
 set dir=`dirname ${prog}`
+echo "Warning: This script will be deprecated in favor of bin/shell.py";
+echo "Warning: Please use it to create an environment like this:";
+echo "         $ bin/shell.py #release build";
+echo "         $ bin/shell.py -d # (or --debug) for a debug build setup";
+echo "         $ bin/shell.py --help #will give you more usage options";
 eval `${dir}/bin/setup.py ${args[3-]} --csh`

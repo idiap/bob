@@ -41,6 +41,7 @@ def get_headers(dir, excludes):
 def write_header(option):
   """Writes a new header file that incorporates all existing ones."""
   scandir = os.path.join(option.install_prefix, 'include', 'torch')
+  if not os.path.exists(scandir): os.makedirs(scandir)
   output = os.path.join(scandir, 'torch5spro.h')
   excludes = [
               os.path.basename(output),
@@ -391,6 +392,7 @@ def untemplatize_path(path, option):
       'name': 'torch5spro',
       'version': 'alpha',
       'date': time.strftime("%d.%m.%Y"),
+      'weekday': time.strftime("%A").lower(),
       'platform': option.platform,
       'install-prefix': option.install_prefix,
       'build-prefix': option.build_prefix,
