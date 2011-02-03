@@ -370,3 +370,14 @@ def action(what, option, *args):
   total_time = time.time() - start 
   logging.info('Action "%s" took %.1f s' % (what.__name__, total_time))
   return (total_time, problems)
+
+def mrproper(option):
+  """Completely sanitizes the build and installation areas"""
+  import shutil
+  shutil.rmtree(option.install_prefix)
+  shutil.rmtree(option.build_prefix)
+  p = subprocess.Popen(['find', '.', '-name', '*~'], stdout=subprocess.PIPE,
+      stderr=subprocess.STDOUT)
+  (out, err) = p.communicate()
+  for f in [k.strip() for k in out.split('\n') if k.strip()]:
+    os.unlink(os.path.realpath(f))
