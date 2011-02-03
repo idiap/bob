@@ -11,7 +11,10 @@ unsigned char rgb_to_gray(unsigned char r, unsigned char g, unsigned char b)
 #else
    	float gray = 0.299f * (float) r + 0.587f * (float) g + 0.114f * (float) b;
 
-	return (unsigned char) gray;
+  //Please note we have to round the "gray" result to avoid cases like
+  //gray = 109.99999997 to be converted into 109 by this cast. We add 0.5 and
+  //only then we cast.
+	return (unsigned char) (gray+0.5f);
 #endif	
 }
 
