@@ -23,7 +23,7 @@ class FilterTest(unittest.TestCase):
   
   def test01_crop(self):
     v = torch.ip.Image(1, 1, 3) 
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipCrop()
     self.assertEqual(f.setIOption('x', 50), True)
     self.assertEqual(f.setIOption('y', 50), True)
@@ -35,7 +35,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('cropped.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
-    reference.load(test_file('cropped.ppm'))
+    self.assertTrue(reference.load(test_file('cropped.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -43,7 +43,7 @@ class FilterTest(unittest.TestCase):
 
   def test02_flip(self):
     v = torch.ip.Image(1, 1, 3) 
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipFlip()
     self.assertEqual(f.setBOption('vertical', True), True)
     self.assertEqual(f.process(v), True)
@@ -52,7 +52,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('flipped.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
-    reference.load(test_file('flipped.ppm'))
+    self.assertTrue(reference.load(test_file('flipped.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -60,7 +60,7 @@ class FilterTest(unittest.TestCase):
   
   def test03_histo(self):
     v = torch.ip.Image(1, 1, 3) 
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipHisto()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
@@ -81,7 +81,7 @@ class FilterTest(unittest.TestCase):
 
   def test04_histoequal(self):
     v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipHistoEqual()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
@@ -90,7 +90,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('histoequal.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('histoequal.ppm'))
+    self.assertTrue(reference.load(test_file('histoequal.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -98,7 +98,7 @@ class FilterTest(unittest.TestCase):
   
   def test05_ii(self):
     v = torch.ip.Image(1, 1, 1) #only works on grayscaled
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipIntegral()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
@@ -120,7 +120,7 @@ class FilterTest(unittest.TestCase):
 
   def test06_MSRSQIGaussian(self):
     v = torch.ip.Image(1, 1, 1) 
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipMSRSQIGaussian()
     self.assertEqual(f.setIOption('RadiusX', 6), True)
     self.assertEqual(f.setIOption('RadiusY', 6), True)
@@ -132,7 +132,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('msrsqigauss.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('msrsqigauss.ppm'))
+    self.assertTrue(reference.load(test_file('msrsqigauss.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -140,7 +140,7 @@ class FilterTest(unittest.TestCase):
 
   def test07_MultiscaleRetinex(self):
     v = torch.ip.Image(1, 1, 1)
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipMultiscaleRetinex()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
@@ -149,7 +149,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('multiscaleretinex.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('multiscaleretinex.ppm'))
+    self.assertTrue(reference.load(test_file('multiscaleretinex.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -157,7 +157,7 @@ class FilterTest(unittest.TestCase):
 
   def test08_relaxation(self):
     v = torch.ip.Image(1, 1, 1)
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipRelaxation()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
@@ -166,7 +166,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('relaxation.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('relaxation.ppm'))
+    self.assertTrue(reference.load(test_file('relaxation.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -182,9 +182,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
+    #processed.save(test_file('rescalegray.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('rescalegray.ppm'))
+    self.assertTrue(reference.load(test_file('rescalegray.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -192,7 +193,7 @@ class FilterTest(unittest.TestCase):
 
   def test10_rotate(self):
     v = torch.ip.Image(1, 1, 1)
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipRotate()
     self.assertEqual(f.setIOption('centerx', 50), True)
     self.assertEqual(f.setIOption('centery', 50), True)
@@ -204,7 +205,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('rotated.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('rotated.ppm'))
+    self.assertTrue(reference.load(test_file('rotated.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -212,7 +213,7 @@ class FilterTest(unittest.TestCase):
 
   def test11_scaleYX(self):
     v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipScaleYX()
     self.assertEqual(f.setIOption('width', 50), True)
     self.assertEqual(f.setIOption('height', 50), True)
@@ -223,7 +224,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('scaled.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('scaled.ppm'))
+    self.assertTrue(reference.load(test_file('scaled.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -231,7 +232,7 @@ class FilterTest(unittest.TestCase):
 
   def test12_selfQuotientImage(self):
     v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipSelfQuotientImage()
     self.assertEqual(f.setIOption('s_nb', 3), True)
     self.assertEqual(f.setIOption('s_min', 2), True)
@@ -241,10 +242,10 @@ class FilterTest(unittest.TestCase):
     self.assertEqual(f.getNOutputs(), 1)
     self.assertEqual(f.getOutput(0).getDatatype(), torch.core.Type.Short)
     processed = torch.ip.Image(f.getOutput(0))
-    # processed.save(test_file('selfquotient.ppm')) #use this to save another reference image
+    #processed.save(test_file('selfquotient.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('selfquotient.ppm'))
+    self.assertTrue(reference.load(test_file('selfquotient.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -252,7 +253,7 @@ class FilterTest(unittest.TestCase):
 
   def test13_shift(self):
     v = torch.ip.Image(1, 1, 1)
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipShift()
     self.assertEqual(f.setIOption('shiftx', 10), True)
     self.assertEqual(f.setIOption('shifty', 10), True)
@@ -263,7 +264,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('shift.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('shift.ppm'))
+    self.assertTrue(reference.load(test_file('shift.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -271,7 +272,7 @@ class FilterTest(unittest.TestCase):
 
   def test14_smoothGaussian(self):
     v = torch.ip.Image(1, 1, 3)
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipSmoothGaussian()
     self.assertEqual(f.setIOption('RadiusX', 5), True)
     self.assertEqual(f.setIOption('RadiusY', 5), True)
@@ -283,7 +284,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('smoothgauss.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 3)
-    reference.load(test_file('smoothgauss.ppm'))
+    self.assertTrue(reference.load(test_file('smoothgauss.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -291,7 +292,7 @@ class FilterTest(unittest.TestCase):
 
   def test15_sobel(self):
     v = torch.ip.Image(1, 1, 1)
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipSobel()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 3)
@@ -315,7 +316,7 @@ class FilterTest(unittest.TestCase):
 
   def test16_TanTriggs(self):
     v = torch.ip.Image(1, 1, 1) #Tan/Triggs only work with grayscaled images
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipTanTriggs()
     self.assertEqual(f.process(v), True)
     self.assertEqual(f.getNOutputs(), 1)
@@ -324,7 +325,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('tantriggs.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('tantriggs.ppm'))
+    self.assertTrue(reference.load(test_file('tantriggs.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
@@ -332,7 +333,7 @@ class FilterTest(unittest.TestCase):
 
   def test17_vcycle(self):
     v = torch.ip.Image(1, 1, 1) #Tan/Triggs only work with grayscaled images
-    v.load(INPUT_IMAGE)
+    self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipVcycle()
     self.assertEqual(f.setIOption('n_grids', 2), True)
     self.assertEqual(f.setIOption('type', 1), True)
@@ -344,7 +345,7 @@ class FilterTest(unittest.TestCase):
     #processed.save(test_file('vcycle.ppm')) #use this to save another reference image
     # compare to our model
     reference = torch.ip.Image(1, 1, 1)
-    reference.load(test_file('vcycle.ppm'))
+    self.assertTrue(reference.load(test_file('vcycle.ppm')))
     for i in range(reference.width):
       for j in range(reference.height):
         for k in range(reference.nplanes):
