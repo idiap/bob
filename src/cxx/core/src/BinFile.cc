@@ -544,6 +544,85 @@ namespace Torch {
     INIT_HEADER_DEF(std::complex<double>,array::t_complex128,3)
     INIT_HEADER_DEF(std::complex<double>,array::t_complex128,4)
 
+
+/**
+ * @brief Specializations of the writeBlitz() function, which write
+ * the data from a blitz array into a binary file.
+ * @warning It assumes that the shape and the type of the blitz array
+ * match the ones of the binary file.
+ */
+#define WRITE_BLITZ(T) \
+  template<> void BinFile::writeBlitz(const blitz::Array<T,1>& bl) { \
+    T val; \
+    for(int i=0; i<bl.extent(0); ++i) { \
+      val = bl(i); \
+      m_stream.write( reinterpret_cast<const char*>(&val), sizeof(T)); \
+    } \
+    ++m_current_array; \
+    if(m_current_array>m_n_arrays_written) \
+      ++m_n_arrays_written; \
+  } \
+\
+  template<> void BinFile::writeBlitz(const blitz::Array<T,2>& bl) { \
+    T val; \
+    for(int i=0; i<bl.extent(0); ++i) { \
+      for(int j=0; j<bl.extent(1); ++j) { \
+        val = bl(i,j); \
+        m_stream.write( reinterpret_cast<const char*>(&val), sizeof(T)); \
+      } \
+    } \
+    ++m_current_array; \
+    if(m_current_array>m_n_arrays_written) \
+      ++m_n_arrays_written; \
+  } \
+\
+  template<> void BinFile::writeBlitz(const blitz::Array<T,3>& bl) { \
+    T val; \
+    for(int i=0; i<bl.extent(0); ++i) { \
+      for(int j=0; j<bl.extent(1); ++j) { \
+        for(int k=0; k<bl.extent(2); ++k) { \
+          val = bl(i,j,k); \
+          m_stream.write( reinterpret_cast<const char*>(&val), sizeof(T)); \
+        } \
+      } \
+    } \
+    ++m_current_array; \
+    if(m_current_array>m_n_arrays_written) \
+      ++m_n_arrays_written; \
+  } \
+\
+  template<> void BinFile::writeBlitz(const blitz::Array<T,4>& bl) { \
+    T val; \
+    for(int i=0; i<bl.extent(0); ++i) { \
+      for(int j=0; j<bl.extent(1); ++j) { \
+        for(int k=0; k<bl.extent(2); ++k) { \
+          for(int l=0; l<bl.extent(3); ++l) { \
+            val = bl(i,j,k,l); \
+            m_stream.write( reinterpret_cast<const char*>(&val), sizeof(T)); \
+          } \
+        } \
+      } \
+    } \
+    ++m_current_array; \
+    if(m_current_array>m_n_arrays_written) \
+      ++m_n_arrays_written; \
+  } \
+\
+
+    WRITE_BLITZ(bool)
+    WRITE_BLITZ(int8_t)
+    WRITE_BLITZ(int16_t)
+    WRITE_BLITZ(int32_t)
+    WRITE_BLITZ(int64_t)
+    WRITE_BLITZ(uint8_t)
+    WRITE_BLITZ(uint16_t)
+    WRITE_BLITZ(uint32_t)
+    WRITE_BLITZ(uint64_t)
+    WRITE_BLITZ(float)
+    WRITE_BLITZ(double)
+    WRITE_BLITZ(std::complex<float>)
+    WRITE_BLITZ(std::complex<double>)
+
   }
 }
 

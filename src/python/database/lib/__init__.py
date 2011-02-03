@@ -137,12 +137,21 @@ def member_arrays(self, arraysets):
 
 Member.arrays = member_arrays
 
+def bzread(self, index):
+  """Returns a blitz::Array object with the expected type and dimension, which
+  contains a copy of the data in the binary file."""
+  return getattr(self, 'read_%s_%d' % \
+      (self.elementType.name, len(self.shape)))(index)
+
+BinFile.bzread = bzread
+
 def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""
   from .. import core
-  retval = getattr(core.array, '%s_%d' % \
-      (self.elementType.name, len(self.shape)))() #empty blitz::Array
-  self.bzread(i, retval)
+  #retval = getattr(core.array, '%s_%d' % \
+  #    (self.elementType.name, len(self.shape)))() #empty blitz::Array
+  retval = self.bzread(i)
   return retval
 
 BinFile.__getitem__ = binfile_getitem
+

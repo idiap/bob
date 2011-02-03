@@ -64,7 +64,9 @@ namespace Torch {
 
         /** 
          * @brief Put a Blitz++ multiarray of a given type into the output
-         * stream/file by casting it to the correct type.
+         * stream/file. If the type/shape have not yet been set, it is set 
+         * according to the type and shape given in the blitz array, otherwise
+         * the type/shape should match or an exception is thrown.
          */
         template <typename T, int D> void write(const blitz::Array<T,D>& bl);
 
@@ -82,9 +84,9 @@ namespace Torch {
          * @brief Load one blitz++ multiarray from the input stream/file
          * All the multiarrays saved have the same dimensions.
          */
-        template <typename T, int d> void read( blitz::Array<T,d>& bl);
+        template <typename T, int d> blitz::Array<T,d> read();
         template <typename T, int d> 
-        void read(size_t index, blitz::Array<T,d>& bl);
+        blitz::Array<T,d> read(size_t index);
 
         /** 
          * @brief Load an Arrayset from a binary file
@@ -155,6 +157,15 @@ namespace Torch {
           return m_header.getSize(dim_index); 
         }
 
+        /**
+         * @brief Initialize the binary file with the given type
+         * and shape.
+         */
+        void initBinaryFile(const array::ElementType type,
+          const size_t shape[array::N_MAX_DIMENSIONS_ARRAY]) {
+            initHeader(type, shape);
+        }
+
 
       private:
         /**
@@ -174,6 +185,16 @@ namespace Torch {
         template <typename T> 
         BinFile& writeWithCast(const T* multi_array);
 
+        /**
+         * @brief Write the data from a blitz array into a binary file
+         * @warning It assumes that the shape and type match.
+         */ 
+        template <typename T, int D> 
+        void writeBlitz(const blitz::Array<T,D>& bl) {
+          error << "Unsupported type or number of dimensions" << std::endl;
+          throw Exception();
+        }
+        
         /**
          * @brief Put a void C-style multiarray into the output stream/file
          * @warning This is the responsability of the user to check
@@ -207,7 +228,7 @@ namespace Torch {
          */
         void headerInitialized() const { 
           if(!m_header_init) {
-            error << "The error has not yet been initialized." << std::endl;
+            error << "The binary file has not yet been initialized." << std::endl;
             throw Exception();
           }
         }
@@ -243,6 +264,63 @@ namespace Torch {
         BinFileHeader m_header;
         openmode m_openmode;
     };
+
+
+#define WRITE_BLITZ_DECL(T,D) template <> \
+  void BinFile::writeBlitz(const blitz::Array<T,D>& bl); \
+
+        WRITE_BLITZ_DECL(bool,1)
+        WRITE_BLITZ_DECL(bool,2)
+        WRITE_BLITZ_DECL(bool,3)
+        WRITE_BLITZ_DECL(bool,4)
+        WRITE_BLITZ_DECL(int8_t,1)
+        WRITE_BLITZ_DECL(int8_t,2)
+        WRITE_BLITZ_DECL(int8_t,3)
+        WRITE_BLITZ_DECL(int8_t,4)
+        WRITE_BLITZ_DECL(int16_t,1)
+        WRITE_BLITZ_DECL(int16_t,2)
+        WRITE_BLITZ_DECL(int16_t,3)
+        WRITE_BLITZ_DECL(int16_t,4)
+        WRITE_BLITZ_DECL(int32_t,1)
+        WRITE_BLITZ_DECL(int32_t,2)
+        WRITE_BLITZ_DECL(int32_t,3)
+        WRITE_BLITZ_DECL(int32_t,4)
+        WRITE_BLITZ_DECL(int64_t,1)
+        WRITE_BLITZ_DECL(int64_t,2)
+        WRITE_BLITZ_DECL(int64_t,3)
+        WRITE_BLITZ_DECL(int64_t,4)
+        WRITE_BLITZ_DECL(uint8_t,1)
+        WRITE_BLITZ_DECL(uint8_t,2)
+        WRITE_BLITZ_DECL(uint8_t,3)
+        WRITE_BLITZ_DECL(uint8_t,4)
+        WRITE_BLITZ_DECL(uint16_t,1)
+        WRITE_BLITZ_DECL(uint16_t,2)
+        WRITE_BLITZ_DECL(uint16_t,3)
+        WRITE_BLITZ_DECL(uint16_t,4)
+        WRITE_BLITZ_DECL(uint32_t,1)
+        WRITE_BLITZ_DECL(uint32_t,2)
+        WRITE_BLITZ_DECL(uint32_t,3)
+        WRITE_BLITZ_DECL(uint32_t,4)
+        WRITE_BLITZ_DECL(uint64_t,1)
+        WRITE_BLITZ_DECL(uint64_t,2)
+        WRITE_BLITZ_DECL(uint64_t,3)
+        WRITE_BLITZ_DECL(uint64_t,4)
+        WRITE_BLITZ_DECL(float,1)
+        WRITE_BLITZ_DECL(float,2)
+        WRITE_BLITZ_DECL(float,3)
+        WRITE_BLITZ_DECL(float,4)
+        WRITE_BLITZ_DECL(double,1)
+        WRITE_BLITZ_DECL(double,2)
+        WRITE_BLITZ_DECL(double,3)
+        WRITE_BLITZ_DECL(double,4)
+        WRITE_BLITZ_DECL(std::complex<float>,1)
+        WRITE_BLITZ_DECL(std::complex<float>,2)
+        WRITE_BLITZ_DECL(std::complex<float>,3)
+        WRITE_BLITZ_DECL(std::complex<float>,4)
+        WRITE_BLITZ_DECL(std::complex<double>,1)
+        WRITE_BLITZ_DECL(std::complex<double>,2)
+        WRITE_BLITZ_DECL(std::complex<double>,3)
+        WRITE_BLITZ_DECL(std::complex<double>,4)
 
 #define INIT_HEADER_DECL(T,D) template<> \
   void BinFile::initTypeHeader(const blitz::Array<T,D>& bl); \

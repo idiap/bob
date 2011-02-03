@@ -179,25 +179,19 @@ namespace Torch {
         throw Exception();
       }
 
-      // Copy the data into the output stream
-      const T* data;
-      blitz::Array<T,D> ref;
-      if( checkSafedata(bl) )
-        data = bl.data();
-      else
-      {
-        ref.reference( copySafedata(bl) );
-        data = ref.data();
+      // Copy the data into the output stream if the type is correct
+      if(m_header.needCast(bl)) {
+        error << "Cannot write a blitz array of a type which does not " <<
+          "the type of the binary file" << std::endl;
+        throw Exception();
       }
-
-      if(m_header.needCast(bl))
-        writeWithCast(data);
       else
-        write(data);
+        writeBlitz(bl);
     }
 
+
     template <typename T, int d> 
-    void BinFile::read( blitz::Array<T,d>& bl) {
+    blitz::Array<T,d> BinFile::read() {
       // Check that the last array was not reached in the binary file
       endOfFile(); 
 
@@ -212,11 +206,11 @@ namespace Torch {
       // Reshape each dimension with the correct size
       blitz::TinyVector<int,d> shape;
       m_header.getShape(shape);
-      bl.resize(shape);
+      blitz::Array<T,d> bl(shape);
      
-      // Check that the memory of the blitz array is contiguous (maybe useless)
-      // TODO: access the data in an other way and do not raise an exception
-      if( !bl.isStorageContiguous() ) {
+      // Check that the memory of the blitz array is row-major order with
+      // base index at zero, etc. (in principle useless)
+      if( !checkSafedata(bl) ) {
         error << "The memory of the blitz array is not contiguous." <<
           "The array cannot be loaded." << std::endl;
         throw Exception();
@@ -228,10 +222,13 @@ namespace Torch {
         readWithCast(data);
       else
         read(data);
+
+      return bl;
     }
 
+
     template <typename T, int d> 
-    void BinFile::read( size_t index, blitz::Array<T,d>& bl) {
+    blitz::Array<T,d> BinFile::read( size_t index) {
       // Check that we are reaching an existing array
       if( index > m_header.m_n_samples ) {
         error << "Trying to reach a non-existing array." << std::endl;
@@ -243,7 +240,7 @@ namespace Torch {
       m_current_array = index;
 
       // Put the content of the stream in the blitz array.
-      read(bl);
+      return read<T,d>();
     }
 
     template <typename T> 

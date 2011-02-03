@@ -120,8 +120,9 @@ BOOST_AUTO_TEST_CASE( blitz1d )
 
   Torch::core::BinFile in(tmp_file, Torch::core::BinFile::in);
   
-  in.read( b);
-  check_equal_1d( a, b);
+  blitz::Array<double,1> a_read = in.read<double,1>();
+
+  check_equal_1d( a, a_read);
   in.close();
 }
 
@@ -135,8 +136,8 @@ BOOST_AUTO_TEST_CASE( blitz1d_withcast )
 
   Torch::core::BinFile in(tmp_file, Torch::core::BinFile::in);
   
-  in.read( b);
-  check_equal_1d( c, b);
+  blitz::Array<double,1> c_read = in.read<double,1>();
+  check_equal_1d( c, c_read);
   in.close();
 }
 
@@ -152,8 +153,8 @@ BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
 
   Torch::core::BinFile in(tmp_file, Torch::core::BinFile::in);
   
-  in.read(1, f);
-  check_equal_2d( e, f);
+  blitz::Array<float,2> e_read = in.read<float,2>(1);
+  check_equal_2d( e, e_read);
   in.close();
 }
 
@@ -168,8 +169,8 @@ BOOST_AUTO_TEST_CASE( blitz1d_inout )
   Torch::core::BinFile in(tmp_file, Torch::core::BinFile::in | 
     Torch::core::BinFile::out);
   
-  in.read( b);
-  check_equal_1d( a, b);
+  blitz::Array<double,1> a_read = in.read<double,1>();
+  check_equal_1d( a, a_read);
   in.close();
 }
 
@@ -194,8 +195,8 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
 
   Torch::core::BinFile in1(tmp_file1, Torch::core::BinFile::in);
   
-  in1.read( h);
-  check_equal_4d( g_sliced1, h);
+  blitz::Array<double,4> g_sliced1_read = in1.read<double,4>();
+  check_equal_4d( g_sliced1, g_sliced1_read);
   in1.close();
 
   blitz::Array<double,4> g_sliced2 = g(blitz::Range(0,0), blitz::Range::all(),
@@ -206,8 +207,8 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
 
   Torch::core::BinFile in2(tmp_file2, Torch::core::BinFile::in);
   
-  in2.read( h);
-  check_equal_4d( g_sliced2, h);
+  blitz::Array<double,4> g_sliced2_read = in2.read<double,4>();
+  check_equal_4d( g_sliced2, g_sliced2_read);
   in1.close();
 }
 
