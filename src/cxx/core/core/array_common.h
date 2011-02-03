@@ -21,12 +21,14 @@ namespace Torch {
 
       /**
        * @brief Enumeration of the supported type for multidimensional arrays
+       * @warning float128 and complex256 are defined but currently not 
+       * supported
        */
-      typedef enum ElementType { t_unknown, t_bool,
-        t_int8, t_int16, t_int32, t_int64,
-        t_uint8, t_uint16, t_uint32, t_uint64,
-        t_float32, t_float64, t_float128,
-        t_complex64, t_complex128, t_complex256 } ArrayType;
+      typedef enum ElementType { t_unknown=0, t_bool=1,
+        t_int8=2, t_int16=3, t_int32=4, t_int64=5,
+        t_uint8=6, t_uint16=7, t_uint32=8, t_uint64=9,
+        t_float32=10, t_float64=11, t_float128=12,
+        t_complex64=13, t_complex128=14, t_complex256=15 } ArrayType;
 
       /**
        * @brief Maximum number of supported dimensions for multidimensional 

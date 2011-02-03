@@ -231,25 +231,6 @@ namespace Torch {
          */
         template <typename T, int D> 
         void initTypeHeader(const blitz::Array<T,D>& bl);
-        /************** Partial specialization declaration *************/
-        template<int D> void initTypeHeader(const blitz::Array<bool,D>& bl);
-        template<int D> void initTypeHeader(const blitz::Array<int8_t,D>& bl);
-        template<int D> void initTypeHeader(const blitz::Array<int16_t,D>& bl);
-        template<int D> void initTypeHeader(const blitz::Array<int32_t,D>& bl);
-        template<int D> void initTypeHeader(const blitz::Array<int64_t,D>& bl);
-        template<int D> void initTypeHeader(const blitz::Array<uint8_t,D>& bl);
-        template<int D> 
-        void initTypeHeader(const blitz::Array<uint16_t,D>& bl);
-        template<int D> 
-        void initTypeHeader(const blitz::Array<uint32_t,D>& bl);
-        template<int D> 
-        void initTypeHeader(const blitz::Array<uint64_t,D>& bl);
-        template<int D> void initTypeHeader(const blitz::Array<float,D>& bl);
-        template<int D> void initTypeHeader(const blitz::Array<double,D>& bl);
-        template<int D> 
-        void initTypeHeader(const blitz::Array<std::complex<float>,D>& bl);
-        template<int D>
-        void initTypeHeader(const blitz::Array<std::complex<double>,D>& bl);
 
 
        /**
@@ -262,6 +243,63 @@ namespace Torch {
         BinFileHeader m_header;
         openmode m_openmode;
     };
+
+#define INIT_HEADER_DECL(T,D) template<> \
+  void BinFile::initTypeHeader(const blitz::Array<T,D>& bl); \
+
+        INIT_HEADER_DECL(bool,1)
+        INIT_HEADER_DECL(bool,2)
+        INIT_HEADER_DECL(bool,3)
+        INIT_HEADER_DECL(bool,4)
+        INIT_HEADER_DECL(int8_t,1)
+        INIT_HEADER_DECL(int8_t,2)
+        INIT_HEADER_DECL(int8_t,3)
+        INIT_HEADER_DECL(int8_t,4)
+        INIT_HEADER_DECL(int16_t,1)
+        INIT_HEADER_DECL(int16_t,2)
+        INIT_HEADER_DECL(int16_t,3)
+        INIT_HEADER_DECL(int16_t,4)
+        INIT_HEADER_DECL(int32_t,1)
+        INIT_HEADER_DECL(int32_t,2)
+        INIT_HEADER_DECL(int32_t,3)
+        INIT_HEADER_DECL(int32_t,4)
+        INIT_HEADER_DECL(int64_t,1)
+        INIT_HEADER_DECL(int64_t,2)
+        INIT_HEADER_DECL(int64_t,3)
+        INIT_HEADER_DECL(int64_t,4)
+        INIT_HEADER_DECL(uint8_t,1)
+        INIT_HEADER_DECL(uint8_t,2)
+        INIT_HEADER_DECL(uint8_t,3)
+        INIT_HEADER_DECL(uint8_t,4)
+        INIT_HEADER_DECL(uint16_t,1)
+        INIT_HEADER_DECL(uint16_t,2)
+        INIT_HEADER_DECL(uint16_t,3)
+        INIT_HEADER_DECL(uint16_t,4)
+        INIT_HEADER_DECL(uint32_t,1)
+        INIT_HEADER_DECL(uint32_t,2)
+        INIT_HEADER_DECL(uint32_t,3)
+        INIT_HEADER_DECL(uint32_t,4)
+        INIT_HEADER_DECL(uint64_t,1)
+        INIT_HEADER_DECL(uint64_t,2)
+        INIT_HEADER_DECL(uint64_t,3)
+        INIT_HEADER_DECL(uint64_t,4)
+        INIT_HEADER_DECL(float,1)
+        INIT_HEADER_DECL(float,2)
+        INIT_HEADER_DECL(float,3)
+        INIT_HEADER_DECL(float,4)
+        INIT_HEADER_DECL(double,1)
+        INIT_HEADER_DECL(double,2)
+        INIT_HEADER_DECL(double,3)
+        INIT_HEADER_DECL(double,4)
+        INIT_HEADER_DECL(std::complex<float>,1)
+        INIT_HEADER_DECL(std::complex<float>,2)
+        INIT_HEADER_DECL(std::complex<float>,3)
+        INIT_HEADER_DECL(std::complex<float>,4)
+        INIT_HEADER_DECL(std::complex<double>,1)
+        INIT_HEADER_DECL(std::complex<double>,2)
+        INIT_HEADER_DECL(std::complex<double>,3)
+        INIT_HEADER_DECL(std::complex<double>,4)
+
 
   }
   /**

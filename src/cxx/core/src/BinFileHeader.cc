@@ -12,11 +12,13 @@ namespace Torch {
   namespace core {    
 
     const uint32_t BinaryFile::MAGIC_ENDIAN_DW = 0x01020304;
+    const uint8_t BinaryFile::FORMAT_VERSION = 0;
 
     BinFileHeader::BinFileHeader():
-      m_version(0), m_elem_type(array::t_unknown), m_elem_sizeof(0), 
-      m_n_dimensions(0), m_endianness(BinaryFile::MAGIC_ENDIAN_DW), 
-      m_n_samples(0), m_n_elements(0)
+      m_version(BinaryFile::FORMAT_VERSION), m_elem_type(array::t_unknown), 
+      m_elem_sizeof(0), m_n_dimensions(0), 
+      m_endianness(BinaryFile::MAGIC_ENDIAN_DW), m_n_samples(0), 
+      m_n_elements(0)
     {
       for( size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
         m_shape[i] = 0;
@@ -245,6 +247,68 @@ namespace Torch {
       TDEBUG3("Number of samples: " << m_n_samples);
     }
 
+
+/************** Full specialization definitions *************/
+#define NEED_CAST_DEF(T,name,D) template<> \
+    bool BinFileHeader::needCast(const blitz::Array<T,D>& bl) const \
+    {\
+      if(m_elem_type == name )\
+        return false;\
+      return true;\
+    }\
+
+    NEED_CAST_DEF(bool,array::t_bool,1)
+    NEED_CAST_DEF(bool,array::t_bool,2)
+    NEED_CAST_DEF(bool,array::t_bool,3)
+    NEED_CAST_DEF(bool,array::t_bool,4)
+    NEED_CAST_DEF(int8_t,array::t_int8,1)
+    NEED_CAST_DEF(int8_t,array::t_int8,2)
+    NEED_CAST_DEF(int8_t,array::t_int8,3)
+    NEED_CAST_DEF(int8_t,array::t_int8,4)
+    NEED_CAST_DEF(int16_t,array::t_int16,1)
+    NEED_CAST_DEF(int16_t,array::t_int16,2)
+    NEED_CAST_DEF(int16_t,array::t_int16,3)
+    NEED_CAST_DEF(int16_t,array::t_int16,4)
+    NEED_CAST_DEF(int32_t,array::t_int32,1)
+    NEED_CAST_DEF(int32_t,array::t_int32,2)
+    NEED_CAST_DEF(int32_t,array::t_int32,3)
+    NEED_CAST_DEF(int32_t,array::t_int32,4)
+    NEED_CAST_DEF(int64_t,array::t_int64,1)
+    NEED_CAST_DEF(int64_t,array::t_int64,2)
+    NEED_CAST_DEF(int64_t,array::t_int64,3)
+    NEED_CAST_DEF(int64_t,array::t_int64,4)
+    NEED_CAST_DEF(uint8_t,array::t_uint8,1)
+    NEED_CAST_DEF(uint8_t,array::t_uint8,2)
+    NEED_CAST_DEF(uint8_t,array::t_uint8,3)
+    NEED_CAST_DEF(uint8_t,array::t_uint8,4)
+    NEED_CAST_DEF(uint16_t,array::t_uint16,1)
+    NEED_CAST_DEF(uint16_t,array::t_uint16,2)
+    NEED_CAST_DEF(uint16_t,array::t_uint16,3)
+    NEED_CAST_DEF(uint16_t,array::t_uint16,4)
+    NEED_CAST_DEF(uint32_t,array::t_uint32,1)
+    NEED_CAST_DEF(uint32_t,array::t_uint32,2)
+    NEED_CAST_DEF(uint32_t,array::t_uint32,3)
+    NEED_CAST_DEF(uint32_t,array::t_uint32,4)
+    NEED_CAST_DEF(uint64_t,array::t_uint64,1)
+    NEED_CAST_DEF(uint64_t,array::t_uint64,2)
+    NEED_CAST_DEF(uint64_t,array::t_uint64,3)
+    NEED_CAST_DEF(uint64_t,array::t_uint64,4)
+    NEED_CAST_DEF(float,array::t_float32,1)
+    NEED_CAST_DEF(float,array::t_float32,2)
+    NEED_CAST_DEF(float,array::t_float32,3)
+    NEED_CAST_DEF(float,array::t_float32,4)
+    NEED_CAST_DEF(double,array::t_float64,1)
+    NEED_CAST_DEF(double,array::t_float64,2)
+    NEED_CAST_DEF(double,array::t_float64,3)
+    NEED_CAST_DEF(double,array::t_float64,4)
+    NEED_CAST_DEF(std::complex<float>,array::t_complex64,1)
+    NEED_CAST_DEF(std::complex<float>,array::t_complex64,2)
+    NEED_CAST_DEF(std::complex<float>,array::t_complex64,3)
+    NEED_CAST_DEF(std::complex<float>,array::t_complex64,4)
+    NEED_CAST_DEF(std::complex<double>,array::t_complex128,1)
+    NEED_CAST_DEF(std::complex<double>,array::t_complex128,2)
+    NEED_CAST_DEF(std::complex<double>,array::t_complex128,3)
+    NEED_CAST_DEF(std::complex<double>,array::t_complex128,4)
 
   }
 }

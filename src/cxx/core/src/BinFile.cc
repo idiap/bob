@@ -480,6 +480,70 @@ namespace Torch {
       return *this;
     }
 
+/**
+ * @brief Specialization of the initTypeHeader(), which sets the
+ * element type in the header
+ */
+#define INIT_HEADER_DEF(T,name,D) template<> \
+    void BinFile::initTypeHeader(const blitz::Array<T,D>& bl) \
+    { \
+      m_header.m_elem_type = name; \
+      m_header.typeUpdated(); \
+    } \
+ 
+    INIT_HEADER_DEF(bool,array::t_bool,1)
+    INIT_HEADER_DEF(bool,array::t_bool,2)
+    INIT_HEADER_DEF(bool,array::t_bool,3)
+    INIT_HEADER_DEF(bool,array::t_bool,4)
+    INIT_HEADER_DEF(int8_t,array::t_int8,1)
+    INIT_HEADER_DEF(int8_t,array::t_int8,2)
+    INIT_HEADER_DEF(int8_t,array::t_int8,3)
+    INIT_HEADER_DEF(int8_t,array::t_int8,4)
+    INIT_HEADER_DEF(int16_t,array::t_int16,1)
+    INIT_HEADER_DEF(int16_t,array::t_int16,2)
+    INIT_HEADER_DEF(int16_t,array::t_int16,3)
+    INIT_HEADER_DEF(int16_t,array::t_int16,4)
+    INIT_HEADER_DEF(int32_t,array::t_int32,1)
+    INIT_HEADER_DEF(int32_t,array::t_int32,2)
+    INIT_HEADER_DEF(int32_t,array::t_int32,3)
+    INIT_HEADER_DEF(int32_t,array::t_int32,4)
+    INIT_HEADER_DEF(int64_t,array::t_int64,1)
+    INIT_HEADER_DEF(int64_t,array::t_int64,2)
+    INIT_HEADER_DEF(int64_t,array::t_int64,3)
+    INIT_HEADER_DEF(int64_t,array::t_int64,4)
+    INIT_HEADER_DEF(uint8_t,array::t_uint8,1)
+    INIT_HEADER_DEF(uint8_t,array::t_uint8,2)
+    INIT_HEADER_DEF(uint8_t,array::t_uint8,3)
+    INIT_HEADER_DEF(uint8_t,array::t_uint8,4)
+    INIT_HEADER_DEF(uint16_t,array::t_uint16,1)
+    INIT_HEADER_DEF(uint16_t,array::t_uint16,2)
+    INIT_HEADER_DEF(uint16_t,array::t_uint16,3)
+    INIT_HEADER_DEF(uint16_t,array::t_uint16,4)
+    INIT_HEADER_DEF(uint32_t,array::t_uint32,1)
+    INIT_HEADER_DEF(uint32_t,array::t_uint32,2)
+    INIT_HEADER_DEF(uint32_t,array::t_uint32,3)
+    INIT_HEADER_DEF(uint32_t,array::t_uint32,4)
+    INIT_HEADER_DEF(uint64_t,array::t_uint64,1)
+    INIT_HEADER_DEF(uint64_t,array::t_uint64,2)
+    INIT_HEADER_DEF(uint64_t,array::t_uint64,3)
+    INIT_HEADER_DEF(uint64_t,array::t_uint64,4)
+    INIT_HEADER_DEF(float,array::t_float32,1)
+    INIT_HEADER_DEF(float,array::t_float32,2)
+    INIT_HEADER_DEF(float,array::t_float32,3)
+    INIT_HEADER_DEF(float,array::t_float32,4)
+    INIT_HEADER_DEF(double,array::t_float64,1)
+    INIT_HEADER_DEF(double,array::t_float64,2)
+    INIT_HEADER_DEF(double,array::t_float64,3)
+    INIT_HEADER_DEF(double,array::t_float64,4)
+    INIT_HEADER_DEF(std::complex<float>,array::t_complex64,1)
+    INIT_HEADER_DEF(std::complex<float>,array::t_complex64,2)
+    INIT_HEADER_DEF(std::complex<float>,array::t_complex64,3)
+    INIT_HEADER_DEF(std::complex<float>,array::t_complex64,4)
+    INIT_HEADER_DEF(std::complex<double>,array::t_complex128,1)
+    INIT_HEADER_DEF(std::complex<double>,array::t_complex128,2)
+    INIT_HEADER_DEF(std::complex<double>,array::t_complex128,3)
+    INIT_HEADER_DEF(std::complex<double>,array::t_complex128,4)
+
   }
 }
 
