@@ -374,10 +374,29 @@ def action(what, option, *args):
 def mrproper(option):
   """Completely sanitizes the build and installation areas"""
   import shutil
-  shutil.rmtree(option.install_prefix)
-  shutil.rmtree(option.build_prefix)
-  p = subprocess.Popen(['find', '.', '-name', '*~'], stdout=subprocess.PIPE,
+  shutil.rmtree(option.install_prefix, ignore_errors=True)
+  shutil.rmtree(option.build_prefix, ignore_errors=True)
+  shutil.rmtree(option.doc_prefix, ignore_errors=True)
+  p = subprocess.Popen(['find', '.', '-name', '*~', '-or', '-iname', '*.pyc'], stdout=subprocess.PIPE,
       stderr=subprocess.STDOUT)
   (out, err) = p.communicate()
   for f in [k.strip() for k in out.split('\n') if k.strip()]:
     os.unlink(os.path.realpath(f))
+
+def untemplatize_path(path, option):
+  """Removes string templates that may have been inserted into the path
+  descriptor and returns a fully resolved string.
+  """
+  replacements = {
+      'name': 'torch5spro',
+      'version': 'alpha',
+      'date': time.strftime("%d.%m.%Y"),
+      'platform': option.platform,
+      'install-prefix': option.install_prefix,
+      'build-prefix': option.build_prefix,
+      'doc-prefix': option.doc_prefix,
+      }
+  retval = path % replacements
+  if retval.find('%(') != -1:
+    raise RuntimeError, "Cannot fully expand path `%s'" % retval
+  return retval

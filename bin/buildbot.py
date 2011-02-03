@@ -32,9 +32,9 @@ def parse_args():
   build_types = ('release', 'debug') #default is #0
   build_blocks = ('all', 'cxx', 'python') #default is #0
   pwd = os.path.realpath(os.curdir)
-  default_install_prefix = os.path.join(pwd, 'install')
-  default_doc_prefix = os.path.join('share', 'doc')
-  default_build_prefix = os.path.join(pwd, 'build')
+  default_install_prefix = os.path.join(pwd, 'install', '%(platform)s')
+  default_doc_prefix = os.path.join('%(install-prefix)s', 'share', 'doc')
+  default_build_prefix = os.path.join(pwd, 'build', '%(platform)s')
   sources = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
   sources = os.path.join(sources, 'src')
   default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'Doxyfile')
@@ -113,16 +113,19 @@ def parse_args():
   if options.build_prefix and options.build_prefix[0] != os.path.sep:
     options.build_prefix = os.path.join(pwd, options.build_prefix) 
   options.doc_prefix = options.doc_prefix.strip()
+  if options.doc_prefix and options.doc_prefix[0] != os.path.sep:
+    options.doc_prefix = os.path.join(pwd, options.doc_prefix)
 
   options.platform = adm.build.platform(options)
   options.source_dir = sources
 
-  #we suffix the platform on the build and installation directories
-  options.build_prefix = os.path.join(options.build_prefix, options.platform)
-  options.install_prefix = os.path.join(options.install_prefix, options.platform)
-
-  if options.doc_prefix and options.doc_prefix[0] != os.path.sep:
-    options.doc_prefix = os.path.join(options.install_prefix, options.doc_prefix)
+  #we also replace potential %(bla)s substitutions we may have
+  options.build_prefix = adm.build.untemplatize_path(options.build_prefix,
+      options)
+  options.install_prefix = adm.build.untemplatize_path(options.install_prefix,
+      options)
+  options.doc_prefix = adm.build.untemplatize_path(options.doc_prefix,
+      options)
 
   return options, args
 
