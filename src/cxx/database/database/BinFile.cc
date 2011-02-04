@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/core/core/BinFile.cc
+ * @file src/cxx/database/database/BinFile.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class can be used to load and store multiarrays from binary files.
@@ -7,7 +7,7 @@
 
 
 namespace Torch {
-  namespace core {
+  namespace database {
 
     inline _BinFileFlag operator&(_BinFileFlag a, _BinFileFlag b) { 
       return _BinFileFlag(static_cast<int>(a) & static_cast<int>(b)); 

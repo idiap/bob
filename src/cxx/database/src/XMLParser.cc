@@ -1,17 +1,22 @@
 /**
- * @file src/cxx/core/src/XMLParser.cc
+ * @file src/cxx/database/src/XMLParser.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implements the XML parser for a dataset.
  */
 
-#include "core/XMLParser.h"
-#include "core/Exception.h"
-
+#include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 #include <libxml/xmlschemas.h>
 
+#include "database/XMLParser.h"
+#include "database/XMLWriter.h"
+#include "database/Dataset.h"
+#include "database/Arrayset.h"
+#include "database/Relationset.h"
+
 namespace Torch {
-  namespace core {
+  namespace database {
 
     XMLParser::XMLParser(): m_id_role( new std::map<size_t,std::string>() )
     {

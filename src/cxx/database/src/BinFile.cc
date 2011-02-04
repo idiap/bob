@@ -1,15 +1,15 @@
 /**
- * @file src/cxx/core/src/BinFile.cc
+ * @file src/cxx/database/src/BinFile.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class can be used to store and load multiarrays into/from files.
  */
 
 
-#include "core/BinFile.h"
+#include "database/BinFile.h"
 
 namespace Torch {
-  namespace core {
+  namespace database {
 
     BinFile::BinFile(const std::string& filename, openmode flag):
       m_header_init(false),

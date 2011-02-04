@@ -1,15 +1,22 @@
 /**
- * @file src/cxx/core/src/XMLWriter.cc
+ * @file src/cxx/database/src/XMLWriter.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Implements the XML writer for a dataset.
  */
 
-#include "core/XMLWriter.h"
-#include "core/Exception.h"
+#include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include "database/XMLWriter.h"
+#include "database/XMLParser.h"
+#include "database/Dataset.h"
+#include "database/Arrayset.h"
+#include "database/Array.h"
+#include "database/Relationset.h"
 
 namespace Torch {
-  namespace core {
+  namespace database {
 
     XMLWriter::XMLWriter() { }
 

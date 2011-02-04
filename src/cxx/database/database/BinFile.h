@@ -1,24 +1,24 @@
 /**
- * @file src/cxx/core/core/BinFile.h
+ * @file src/cxx/database/database/BinFile.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class can be used to load and store multiarrays from binary files.
  */
 
-#ifndef TORCH5SPRO_CORE_BIN_FILE_H
-#define TORCH5SPRO_CORE_BIN_FILE_H 1
+#ifndef TORCH5SPRO_DATABASE_BIN_FILE_H
+#define TORCH5SPRO_DATABASE_BIN_FILE_H 1
 
-#include "core/BinFileHeader.h"
-#include "core/Dataset2.h"
+#include "database/BinFileHeader.h"
+#include "database/Dataset.h"
 #include "core/StaticComplexCast.h"
 
 namespace Torch {
   /**
-   * \ingroup libcore_api
+   * \ingroup libdatabase_api
    * @{
    *
    */
-  namespace core {
+  namespace database {
 
     /**
      * @brief Defines the flags that might be used when loading/storing
@@ -385,7 +385,7 @@ namespace Torch {
    */
 }
 
-#include "core/BinFile.cc"
+#include "database/BinFile.cc"
 
-#endif /* TORCH5SPRO_CORE_BIN_FILE_H */
+#endif /* TORCH5SPRO_DATABASE_BIN_FILE_H */
 

@@ -1,223 +1,170 @@
 /**
- * @file src/cxx/core/core/Dataset2.h
+ * @file src/cxx/database/database/Dataset.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *
  * @brief A torch representation of a Dataset
  */
 
-#ifndef TORCH5SPRO_CORE_DATASET_H
-#define TORCH5SPRO_CORE_DATASET_H
-
-#include <boost/shared_ptr.hpp>
-#include <boost/shared_array.hpp>
-#include <blitz/array.h>
-#include "core/logging.h"
-#include "core/Exception.h"
-#include "core/StaticComplexCast.h"
-#include "core/dataset_common.h"
-
-#include "core/Arrayset.h"
-#include "core/Relationset.h"
+#ifndef TORCH_DATABASE_DATASET_H
+#define TORCH_DATABASE_DATASET_H
 
 #include <string>
 #include <map>
-#include <cstdlib> // required when using size_t type
-
-
+#include <cstdlib>
+#include <boost/shared_ptr.hpp>
 
 namespace Torch {   
   /**
-   * \ingroup libcore_api
+   * \ingroup libdatabase_api
    * @{
    *
    */
-  namespace core {
+  namespace database {
+
+    /// Some promises ;-)
+    class Arrayset;
+    class Relationset;
 
     /**
-     * @brief The main dataset class
-    */
+     * The main dataset class.
+     */
     class Dataset {
+
       public:
-        /**
-         * @brief Constructor
-         */
-        Dataset();
-        /**
-         * @brief Destructor
-         */
-        ~Dataset();
 
         /**
-         * @brief Add an Arrayset to the Dataset
+         * Default constructor, builds an otherwise empty Dataset
          */
-        void append( boost::shared_ptr<Arrayset> arrayset);
-        /**
-         * @brief Remove an Arrayset with a given index from the Dataset
-         */
-        void remove( const size_t index) {
-          // Get the array using the given index
-          boost::shared_ptr<Arrayset> ar = m_arrayset[index];
-          // Remove the tuple (id,index) from the map if it exists
-          m_arrayset_index.erase( ar->getId() );
-          // Remove the Arrayset from the vector
-          if( index<m_arrayset.size() )
-            m_arrayset.erase(m_arrayset.begin()+index);
-          else
-            throw NonExistingElement();
-          // Decrease all the index from the map that were above the given
-          // on
-          std::map<size_t, size_t >::iterator it; 
-          for(it = m_arrayset_index.begin(); it != m_arrayset_index.end(); ++it)
-            if( (*it).second > index )
-              --((*it).second);
+        Dataset(const std::string& name, size_t version);
 
-          // TODO: remove all the relations/members that might be using this 
-          // object
-        }
+        /**
+         * Reads the contents of this database from a given file
+         */
+        Dataset(const std::string& path);
+
+        /**
+         * Copy construct a Dataset by copying all members of the other Dataset
+         */
+        Dataset(const Dataset& other);
+
+        /**
+         * Destructor virtualization
+         */
+        virtual ~Dataset();
+
+        /**
+         * Assignment operator, copy all members of the other Dataset
+         */
+        Dataset& operator= (const Dataset& other);
 
         /**
          * @brief Get the name of the Dataset
          */
-        const std::string& getName() const { return m_name; }
+        inline const std::string& getName() const { return m_name; }
 
         /**
          * @brief Set the name of the Dataset
          */
-        void setName( const std::string& name) { m_name = name; }
+        inline void setName(const std::string& name) { m_name = name; }
 
         /**
          * @brief Get the version of the Dataset
          */
-        const size_t getVersion() const { return m_version; }
+        inline size_t getVersion() const { return m_version; }
 
         /**
          * @brief Set the version of the Dataset
          */
-        void setVersion( const size_t version) { m_version = version; }
-
-/***************************************************************************/
-        /**
-         * @brief const_iterator over the Arraysets of the Dataset
-         */
-        typedef std::vector<boost::shared_ptr<Arrayset> >::const_iterator
-          const_iterator;
-        /**
-         * @brief Return a const_iterator pointing at the first Arrayset of 
-         * the Dataset
-         */
-        const_iterator begin() const { return m_arrayset.begin(); }
-        /**
-         * @brief Return a const_iterator pointing at the last Arrayset of 
-         * the Dataset
-         */
-        const_iterator end() const { return m_arrayset.end(); }
+        inline void setVersion(const size_t version) { m_version = version; }
 
         /**
-         * @brief iterator over the Arraysets of the Dataset
+         * Appends a new Arrayset into this Dataset. If you specify the
+         * id of an Arrayset that already exists, it is reset to accomodate
+         * this one. Information about existing Arraysets using one of the
+         * indexing methods.
          */
-        typedef std::vector<boost::shared_ptr<Arrayset> >::iterator 
-          iterator;
+        void add(boost::shared_ptr<Arrayset> arrayset);
+
         /**
-         * @brief Return an iterator pointing at the first Arrayset of 
-         * the Dataset
+         * This method creates an internal copy of the given arrayset and store
+         * internally. If the arrayset contains an id of an object that already
+         * exists in this database, it is overwritten.
          */
-        iterator begin() { return m_arrayset.begin(); }
+        void add(const Arrayset& arrayset);
+
         /**
-         * @brief Return an iterator pointing at the first Arrayset of 
-         * the Dataset
+         * Removes an Arrayset with a given index from the Dataset. Please note
+         * that this may also remove all relations that do depend on this
+         * Arrayset.
          */
-        iterator end() { return m_arrayset.end(); }
-/**************************************************************************/
+        void remove(size_t index);
+
         /**
-         * @brief Return the Arrayset of the given index 
+         * Returns my internal arrayset index
+         */
+        inline const std::map<size_t, boost::shared_ptr<Arrayset> >& arraysetIndex() const { return m_id2arrayset; }
+
+        /**
+         * Returns the Arrayset given a certain, valid, arrayset-id
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the arraysets.
          */
-        const Arrayset& operator[]( const size_t index ) const;
-        Arrayset& operator[]( const size_t index );
-        /**
-         * @brief Return the arrayset of the given id
-         */
-        boost::shared_ptr<const Arrayset> getArrayset(const size_t index) const;
-        boost::shared_ptr<Arrayset> getArrayset(const size_t index);
+        const Arrayset& operator[] (size_t id) const;
+        Arrayset& operator[] (size_t id);
 
         /**
-         * @brief Add a Relationset to the Dataset
+         * Returns the arrayset of the given id
          */
-        void append( boost::shared_ptr<Relationset> relationset);
+        boost::shared_ptr<const Arrayset> getArrayset(const size_t id) const;
+        boost::shared_ptr<Arrayset> getArrayset(const size_t id);
+
+        /**
+         * @brief Add a Relationset to the Dataset. Please note that the
+         * attribute "name" of the Relationset is used as acess key. If you
+         * provide the name of an existing Relationset, it is replaced by this
+         * one.
+         */
+        void add(boost::shared_ptr<Relationset> relationset);
+
+        /**
+         * This method creates an internal copy of the given relationset and
+         * store internally. If the relationset contains the name of an object
+         * that already exists in this database, it is overwritten.
+         */
+        void add(const Relationset& arrayset);
+
         /**
          * @brief Remove a Relationset with a given name from the Dataset
          */
-        void remove( const std::string& name) {
-          std::map<std::string, boost::shared_ptr<Relationset> >::iterator it=
-            m_relationset.find(name);
-          if(it!=m_relationset.end())
-            m_relationset.erase(it);
-          else
-            throw NonExistingElement();
-        }
+        void remove (const std::string& name);
 
-        /**
-         * @brief const_iterator over the Relationsets of the Dataset
-         */
-        typedef std::map<std::string, boost::shared_ptr<Relationset> >::
-          const_iterator relationset_const_iterator;
-        /**
-         * @brief Return a const_iterator pointing at the first Relationset of
-         * the Dataset
-         */
-        relationset_const_iterator relationset_begin() const { 
-          return m_relationset.begin(); }
-        /**
-         * @brief Return a const_iterator pointing at the last Relationset of 
-         * the Dataset
-         */
-        relationset_const_iterator relationset_end() const { 
-          return m_relationset.end(); }
-
-        /**
-         * @brief iterator over the Relationsets of the Dataset
-         */
-        typedef std::map<std::string, boost::shared_ptr<Relationset> >::iterator
-          relationset_iterator;
-        /**
-         * @brief Return an iterator pointing at the first Relationset of 
-         * the Dataset
-         */
-        relationset_iterator relationset_begin() { return m_relationset.begin(); }
-        /**
-         * @brief Return an iterator pointing at the first Relationset of 
-         * the Dataset
-         */
-        relationset_iterator relationset_end() { return m_relationset.end(); }
-   
         /**
          * @brief Return the Relationset of the given name
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the relationsets.
          */
-        const Relationset& operator[]( const std::string& name ) const;
+        const Relationset& operator[](const std::string& name) const;
+        Relationset& operator[](const std::string& name);
 
         /**
-         * @brief Return the arrayset of the given id
+         * @brief Return the relationset of the given name
          */
-        boost::shared_ptr<const Relationset> 
-        getRelationset( const std::string& name ) const;
-        boost::shared_ptr<Relationset> 
-        getRelationset( const std::string& name );
+        boost::shared_ptr<const Relationset> getRelationset(const std::string& name) const;
+        boost::shared_ptr<Relationset> getRelationset(const std::string& name);
+
+        /**
+         * Returns my internal relationset index
+         */
+        inline const std::map<std::string, boost::shared_ptr<Relationset> >& relationIndex() const { return m_name2relationset; }
 
       private:
         std::string m_name;
         size_t m_version;
 
-        std::vector<boost::shared_ptr<Arrayset> > m_arrayset;
-        std::map<size_t,size_t> m_arrayset_index;
-        //std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
-        std::map<std::string, boost::shared_ptr<Relationset> > m_relationset;
+        std::map<size_t, boost::shared_ptr<Arrayset> > m_id2arrayset;
+        std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;
     };
-
-
 
   }
   /**
@@ -225,5 +172,4 @@ namespace Torch {
    */
 }
 
-#endif /* TORCH5SPRO_CORE_DATASET_H */
-
+#endif /* TORCH_DATABASE_DATASET_H */

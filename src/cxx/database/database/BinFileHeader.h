@@ -1,13 +1,13 @@
 /**
- * @file src/cxx/core/core/BinFileHeader.h
+ * @file src/cxx/database/database/BinFileHeader.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class defines an header for storing multiarrays into
  * binary files.
  */
 
-#ifndef TORCH5SPRO_CORE_BIN_FILE_HEADER_H
-#define TORCH5SPRO_CORE_BIN_FILE_HEADER_H
+#ifndef TORCH5SPRO_DATABASE_BIN_FILE_HEADER_H
+#define TORCH5SPRO_DATABASE_BIN_FILE_HEADER_H
 
 #include "core/logging.h"
 #include "core/Exception.h"
@@ -16,11 +16,11 @@
 
 namespace Torch {
   /**
-   * \ingroup libcore_api
+   * \ingroup libdatabase_api
    * @{
    *
    */
-  namespace core {
+  namespace database {
 
     namespace BinaryFile {
       extern const uint32_t MAGIC_ENDIAN_DW;
@@ -178,5 +178,5 @@ namespace Torch {
 }
 
 
-#endif /* TORCH5SPRO_CORE_BIN_FILE_HEADER_H */
+#endif /* TORCH5SPRO_DATABASE_BIN_FILE_HEADER_H */
 

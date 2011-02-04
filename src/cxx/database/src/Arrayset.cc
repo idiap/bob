@@ -1,65 +1,14 @@
 /**
- * @file src/cxx/core/src/Arrayset.cc
+ * @file src/cxx/database/src/Arrayset.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief A torch representation of an Array for a Dataset.
  */
 
-#include "core/Arrayset.h"
+#include "database/Arrayset.h"
 
 namespace Torch {
-  namespace core {
-
-    Array::Array(boost::shared_ptr<const Arrayset> parent, const size_t id,
-      const std::string& filename, const std::string& codec):
-      m_parent_arrayset(parent), m_id(id), m_is_loaded(false), 
-      m_filename(filename), m_codecname(codec), m_storage(0) {
-      // TODO: check that the id is not already used
-      // TODO: check that the codec name is valid in the registry 
-      //TODO: if codecname is an empty string, look in the registry
-      // for the appropriate codec using the filename extension.
-    }
-
-    Array::~Array() {
-      TDEBUG3("Array destructor (id: " << m_id << ")");
-      boost::shared_ptr<const Arrayset> parent(m_parent_arrayset);
-      switch(parent->getElementType()) {
-        case array::t_bool:
-          delete [] static_cast<bool*>(m_storage); break;
-        case array::t_int8:
-          delete [] static_cast<int8_t*>(m_storage); break;
-        case array::t_int16:
-          delete [] static_cast<int16_t*>(m_storage); break;
-        case array::t_int32:
-          delete [] static_cast<int32_t*>(m_storage); break;
-        case array::t_int64:
-          delete [] static_cast<int64_t*>(m_storage); break;
-        case array::t_uint8:
-          delete [] static_cast<uint8_t*>(m_storage); break;
-        case array::t_uint16:
-          delete [] static_cast<uint16_t*>(m_storage); break;
-        case array::t_uint32:
-          delete [] static_cast<uint32_t*>(m_storage); break;
-        case array::t_uint64:
-          delete [] static_cast<uint64_t*>(m_storage); break;
-        case array::t_float32:
-          delete [] static_cast<float*>(m_storage); break;
-        case array::t_float64:
-          delete [] static_cast<double*>(m_storage); break;
-        case array::t_float128:
-          delete [] static_cast<long double*>(m_storage); break;
-        case array::t_complex64:
-          delete [] static_cast<std::complex<float>* >(m_storage); break;
-        case array::t_complex128:
-          delete [] static_cast<std::complex<double>* >(m_storage); break;
-        case array::t_complex256:
-          delete [] static_cast<std::complex<long double>* >(m_storage); 
-          break;
-        default:
-          break;
-      }
-    } 
-
+  namespace database {
 
     Arrayset::Arrayset(boost::shared_ptr<const Dataset> parent, 
       const size_t id, const std::string& filename, const std::string& codec):

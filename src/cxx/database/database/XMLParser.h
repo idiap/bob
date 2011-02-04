@@ -1,33 +1,41 @@
 /**
- * @file src/cxx/core/core/XMLParser.h
+ * @file src/cxx/database/database/XMLParser.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *
  * @brief An XML Parser for a Dataset
  */
 
-#ifndef TORCH5SPRO_XML_PARSER_H 
-#define TORCH5SPRO_XML_PARSER_H
-
-#include <blitz/array.h>
-#include "core/logging.h"
-
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+#ifndef TORCH_DATABASE_XML_PARSER_H 
+#define TORCH_DATABASE_XML_PARSER_H
 
 #include <string>
+#include <map>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <boost/tokenizer.hpp>
 
-#include "core/Dataset2.h"
-
+#include "core/Exception.h"
+#include "core/logging.h"
 
 namespace Torch {   
   /**
-   * \ingroup libcore_api
+   * \ingroup libdatabase_api
    * @{
    *
    */
-  namespace core {
-    class XMLException: public Exception { };
+  namespace database {
+
+    //Some promises
+    class Dataset;
+    class Arrayset;
+    class Array;
+    class Relationset;
+    class Rule;
+    class Member;
+    class Relation;
+
+    class XMLException: public Torch::core::Exception { };
 
     /**
      * @brief The main class for the XML parser
@@ -134,7 +142,7 @@ namespace Torch {
         Torch::core::error << "The number of values read (" << count <<
           ") in the array does not match with the expected number (" << 
           nb_values << ")" << std::endl;
-        throw Exception();
+        throw Torch::core::Exception();
       }
 
       return data_array;
@@ -148,5 +156,5 @@ namespace Torch {
    */
 }
 
-#endif /* TORCH5SPRO_XML_PARSER_H */
+#endif /* TORCH_DATABASE_XML_PARSER_H */
 

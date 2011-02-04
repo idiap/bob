@@ -1,184 +1,115 @@
 /**
- * @file src/cxx/core/src/Dataset2.cc
+ * @file src/cxx/database/src/Dataset.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
+ * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
  *
  * @brief Implements the Dataset class.
  */
 
-#include "core/Dataset2.h"
-#include <stdexcept>
+#include "database/Dataset.h"
+#include "database/XMLParser.h"
+#include "database/dataset_common.h"
+#include "database/Arrayset.h"
+#include "database/Relationset.h"
 
-namespace Torch {
-  namespace core {
+namespace db = Torch::database;
 
-    Relationset::Relationset(): 
-      m_name("") { }
+db::Dataset::Dataset(const std::string& name, size_t version)
+  : m_name(name),
+    m_version(version),
+    m_id2arrayset(),
+    m_name2relationset()
+{
+}
 
-    Relationset::~Relationset() {
-      TDEBUG3("Relationset destructor (name: " << getName() << ")");
-    }
+db::Dataset::Dataset(const std::string& path)
+  : m_name(),
+    m_version(0),
+    m_id2arrayset(),
+    m_name2relationset()
+{
+  //fill up using the parser
+  db::XMLParser parser;
+  parser.load(path.c_str(), *this, 2); 
+}
 
-    void Relationset::append( boost::shared_ptr<Rule> rule) {
-      m_rule.insert( std::pair<std::string,boost::shared_ptr<Rule> >(
-        rule->getArraysetRole(), rule) );
-    }
+db::Dataset::~Dataset() { }
 
-    void Relationset::append( boost::shared_ptr<Relation> relation) {
-      m_relation.insert( std::pair<size_t,boost::shared_ptr<Relation> >(
-        relation->getId(), relation) );
-    }
+/** Operations for accessing the Dataset information **/
+const db::Arrayset& db::Dataset::operator[] (size_t id) const {
+  std::map<size_t, boost::shared_ptr<db::Arrayset> >::const_iterator it = m_id2arrayset.find(id);
+  if (it == m_id2arrayset.end()) throw IndexError();
+  return *(it->second.get());
+}
 
-    const Relation& Relationset::operator[]( const size_t id ) const {
-      std::map<size_t, boost::shared_ptr<Relation> >::const_iterator it = 
-        (m_relation.find(id));
-      if( it == m_relation.end() )
-        throw IndexError();
-      return *(it->second);
-    }
+db::Arrayset& db::Dataset::operator[] (size_t id) {
+  std::map<size_t, boost::shared_ptr<db::Arrayset> >::iterator it = m_id2arrayset.find(id);
+  if (it == m_id2arrayset.end()) throw IndexError();
+  return *(it->second.get());
+}
 
-    boost::shared_ptr<const Relation> 
-    Relationset::getRelation( const size_t id ) const {
-      std::map<size_t, boost::shared_ptr<Relation> >::const_iterator it = 
-        (m_relation.find(id));
-      if( it == m_relation.end() )
-        throw IndexError();
-      return it->second;
-    }
+boost::shared_ptr<const db::Arrayset> 
+db::Dataset::getArrayset(const size_t id) const {
+  std::map<size_t, boost::shared_ptr<db::Arrayset> >::const_iterator it = m_id2arrayset.find(id);
+  if (it == m_id2arrayset.end()) throw IndexError();
+  return it->second;
+}
 
-    boost::shared_ptr<Relation> 
-    Relationset::getRelation( const size_t id ) {
-      std::map<size_t, boost::shared_ptr<Relation> >::iterator it = 
-        (m_relation.find(id));
-      if( it == m_relation.end() )
-        throw IndexError();
-      return it->second;
-    }
+boost::shared_ptr<db::Arrayset> db::Dataset::getArrayset(const size_t id) {
+  std::map<size_t, boost::shared_ptr<db::Arrayset> >::iterator it = m_id2arrayset.find(id);
+  if (it == m_id2arrayset.end()) throw IndexError();
+  return it->second;
+}
 
-    const Rule& Relationset::operator[]( const std::string& role ) const {
-      std::map<std::string, boost::shared_ptr<Rule> >::const_iterator it = 
-        (m_rule.find(role));
-      if( it == m_rule.end() )
-        throw IndexError();
-      return *(it->second);
-    }
+const db::Relationset& db::Dataset::operator[](const std::string& name) const {
+  std::map<std::string, boost::shared_ptr<db::Relationset> >::const_iterator it = m_name2relationset.find(name);
+  if (it == m_name2relationset.end()) throw IndexError();
+  return *(it->second.get());
+}
 
-    boost::shared_ptr<const Rule> Relationset::getRule( const std::string& role ) const {
-      std::map<std::string, boost::shared_ptr<Rule> >::const_iterator it = (m_rule.find(role));
-      if( it == m_rule.end() ) throw IndexError();
-      return it->second;
-    }
+db::Relationset& db::Dataset::operator[](const std::string& name) {
+  std::map<std::string, boost::shared_ptr<db::Relationset> >::iterator it = m_name2relationset.find(name);
+  if (it == m_name2relationset.end()) throw IndexError();
+  return *(it->second.get());
+}
 
-    boost::shared_ptr<Rule> Relationset::getRule( const std::string& role ) {
-      std::map<std::string, boost::shared_ptr<Rule> >::iterator it = (m_rule.find(role));
-      if( it == m_rule.end() ) throw IndexError();
-      return it->second;
-    }
+boost::shared_ptr<const db::Relationset> 
+db::Dataset::getRelationset(const std::string& name) const {
+  std::map<std::string, boost::shared_ptr<db::Relationset> >::const_iterator it = m_name2relationset.find(name);
+  if (it == m_name2relationset.end()) throw IndexError();
+  return it->second;
+}
 
-    Rule::Rule(): 
-      m_arraysetrole(""), m_min(1), m_max(1) { }
+boost::shared_ptr<db::Relationset> 
+db::Dataset::getRelationset(const std::string& name) {
+  std::map<std::string, boost::shared_ptr<db::Relationset> >::iterator it = m_name2relationset.find(name);
+  if (it == m_name2relationset.end()) throw IndexError();
+  return it->second;
+}
 
-    Rule::~Rule() {
-      TDEBUG3("Rule destructor (Arrayset-role: " << getArraysetRole() << ")");
-    }
+/** Operations dealing with modification of the Dataset **/
+void db::Dataset::add(boost::shared_ptr<db::Arrayset> arrayset) {
+  m_id2arrayset[arrayset->getId()] = arrayset;
+}
 
+void db::Dataset::add(const db::Arrayset& arrayset) {
+  m_id2arrayset[arrayset.getId()] = 
+    boost::shared_ptr<db::Arrayset>(new db::Arrayset(arrayset));
+}
 
-    Relation::Relation( boost::shared_ptr<std::map<size_t,std::string> > 
-      id_role): m_id(0), m_id_role(id_role)
-    { 
-    }
+void db::Dataset::remove(size_t index) {
+  m_id2arrayset.erase(index);
+}
 
-    Relation::~Relation() {
-      TDEBUG3("Relation destructor (id: " << getId() << ")");
-    }
+void db::Dataset::add (boost::shared_ptr<db::Relationset> relationset) {
+  m_name2relationset[relationset->getName()] = relationset;
+}
 
-    void Relation::append( boost::shared_ptr<Member> member) {
-      size_t_pair ids( member->getArrayId(), member->getArraysetId());
-      m_member.insert( std::pair<size_t_pair,boost::shared_ptr<Member> >(
-        ids, member) );
-    }
+void db::Dataset::add (const db::Relationset& arrayset) {
+  m_name2relationset[relationset.getName()] = 
+    boost::shared_ptr<db::Arrayset>(new db::Relationset(relationset));
+}
 
-
-    Member::Member(): 
-      m_array_id(0), m_arrayset_id(0) { }
-
-    Member::~Member() {
-      TDEBUG3("Member destructor (id: " << getArrayId() << "-" << 
-        getArraysetId() << ")");
-    }
-
-
-    Dataset::Dataset() { }
-
-    Dataset::~Dataset() {
-      TDEBUG3("Dataset destructor");
-    }
-
-    void Dataset::append( boost::shared_ptr<Arrayset> arrayset) {
-      m_arrayset.push_back( arrayset);
-      m_arrayset_index.insert( std::pair<size_t,size_t>(m_arrayset.size()-1,
-        arrayset->getId() ) );
-    }
-
-    void Dataset::append( boost::shared_ptr<Relationset> relationset) {
-      m_relationset.insert( std::pair<std::string,boost::shared_ptr<Relationset> >(
-        relationset->getName(), relationset) );
-    }
-
-    const Arrayset& Dataset::operator[]( const size_t index ) const {
-      if( index >= m_arrayset.size() )
-        throw IndexError();
-      else
-        return *(m_arrayset[index]);
-    }
-
-    Arrayset& Dataset::operator[]( const size_t index ) {
-      if( index >= m_arrayset.size() )
-        throw IndexError();
-      else
-        return *(m_arrayset[index]);
-    }
-
-    boost::shared_ptr<const Arrayset> 
-    Dataset::getArrayset( const size_t index ) const {
-      if( index >= m_arrayset.size() )
-        throw IndexError();
-      else
-        return m_arrayset[index];
-    }
-
-    boost::shared_ptr<Arrayset>
-    Dataset::getArrayset( const size_t index ) {
-      if( index >= m_arrayset.size() )
-        throw IndexError();
-      else
-        return m_arrayset[index];
-    }
-
-    const Relationset& Dataset::operator[]( const std::string& name ) const {
-      std::map<std::string, boost::shared_ptr<Relationset> >::const_iterator 
-        it = (m_relationset.find(name));
-      if( it == m_relationset.end() )
-        throw IndexError();
-      return *(it->second);
-    }
-
-    boost::shared_ptr<const Relationset> 
-    Dataset::getRelationset( const std::string& name ) const {
-      std::map<std::string, boost::shared_ptr<Relationset> >::const_iterator it = 
-        (m_relationset.find(name));
-      if( it == m_relationset.end() )
-        throw IndexError();
-      return it->second;
-    }
-
-    boost::shared_ptr<Relationset> 
-    Dataset::getRelationset( const std::string& name ) {
-      std::map<std::string, boost::shared_ptr<Relationset> >::iterator it = 
-        (m_relationset.find(name));
-      if( it == m_relationset.end() )
-        throw IndexError();
-      return it->second;
-    }
-
-  }
+void db::Dataset::remove (const std::string& name) {
+  m_name2relationset.erase(name);
 }

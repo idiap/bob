@@ -1,15 +1,15 @@
 /**
- * @file src/cxx/core/core/BinFileHeader.cc
+ * @file src/cxx/database/database/BinFileHeader.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This class defines an header for storing multiarrays into
  * binary files.
  */
 
-#include "core/BinFileHeader.h"
+#include "database/BinFileHeader.h"
 
 namespace Torch {
-  namespace core {    
+  namespace database {    
 
     const uint32_t BinaryFile::MAGIC_ENDIAN_DW = 0x01020304;
     const uint8_t BinaryFile::FORMAT_VERSION = 0;

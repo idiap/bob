@@ -1,171 +1,33 @@
 /**
- * @file src/cxx/core/core/Arrayset.h
+ * @file src/cxx/database/database/Arrayset.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief A torch representation of an Array for a Dataset.
  */
 
-#ifndef TORCH5SPRO_CORE_ARRAYSET_H
-#define TORCH5SPRO_CORE_ARRAYSET_H 1
-
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-
-#include <blitz/array.h>
-#include "core/logging.h"
-#include "core/Exception.h"
-#include "core/StaticComplexCast.h"
-#include "core/dataset_common.h"
+#ifndef TORCH5SPRO_DATABASE_ARRAYSET_H
+#define TORCH5SPRO_DATABASE_ARRAYSET_H 1
 
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+#include <blitz/array.h>
 
-
+#include "core/logging.h"
+#include "core/Exception.h"
+#include "core/StaticComplexCast.h"
+#include "database/dataset_common.h"
 
 namespace Torch {   
   /**
-   * \ingroup libcore_api
+   * \ingroup libdatabase_api
    * @{
    *
    */
-  namespace core {
+  namespace database {
     
-    // Declare Arrayset for the reference to the parent Arrayset in the
-    // Array class.
-    class Arrayset;
-
-    /**
-     * @brief The array class for a dataset
-     */
-    class Array { //pure virtual
-      friend class Arrayset;
-      friend class XMLParser;
-      friend class XMLWriter;
-      friend class BinFile;
-
-      public:
-        /**
-         * @brief Destructor
-         */
-        ~Array();
-        
-        /**
-         * @brief Set the filename containing the data if any. An empty string
-         * indicates that the data are stored in the XML file directly.
-         */
-        void setFilename(const std::string& filename, 
-          const std::string& codecname="")
-        { 
-          m_filename.assign(filename);
-          if( codecname.compare(""))
-            m_codecname.assign(codecname);
-          else
-            ;//TODO find codec name using the extension in the registry
-        }
-
-        /**
-         * @brief Get the filename containing the data if any. An empty string
-         * indicates that the data is stored in the XML file directly.
-         */
-        const std::string& getFilename() const { return m_filename; }
-        /**
-         * @brief Get the loader used to read the data from the external file 
-         * if any.
-         */
-        const std::string& getCodecname() const { return m_codecname; }
-
-        /**
-         * @brief Get the id of the Array
-         */
-        const size_t getId() const { return m_id; }
-        /**
-         * @brief Get the flag indicating if the array is loaded from an 
-         * external file.
-         */
-        const bool getIsLoaded() const { return m_is_loaded; }
-        /**
-         * @brief Get the parent arrayset of this array
-         */
-        boost::shared_ptr<const Arrayset> getParentArrayset() const { 
-          return m_parent_arrayset.lock(); 
-        }
-
-        /**
-         * @brief Adapt the size of each dimension of the passed blitz array
-         * to the ones of the underlying array and copy the data in it.
-         */
-        template<typename T, int D> blitz::Array<T,D> data() const;
-
-        /**
-         * @brief Adapt the size of each dimension of the passed blitz array
-         * to the ones of the underlying array and refer to the data in it.
-         * @warning Updating the content of the blitz array will update the
-         * content of the corresponding array in the dataset.
-         */
-        template<typename T, int D> blitz::Array<T,D> data() {
-          error << "Unsupported blitz array type " << std::endl;
-          throw TypeError();
-        }
-
-
-      private:
-        /**
-         * @brief Constructor
-         */
-        Array(boost::shared_ptr<const Arrayset> parent, const size_t id=0,
-          const std::string& filename="", const std::string& codec="");
-        
-        /**
-          * @brief Copy the data from the Array object into the given C-style
-          * array, and cast if required.
-          */
-        template <typename T, typename U> void copyCast( U* out) const;
-
-        /**
-          * @brief check that the number of dimensions match in order to be
-          * able to refer to the data.
-          */
-        template <int D> void referCheck( ) const;
-
-        /**
-         * @brief Set the id of the Array
-         */
-//        void setId(const size_t id) { m_id = id; }
-        /**
-         * @brief Set the flag indicating if this array is loaded.
-         */
-        void setIsLoaded(const bool is_loaded) { m_is_loaded = is_loaded; }
-        /**
-         * @brief Set the data of the Array.
-         */
-        void setStorage(void* storage) { m_storage = storage; }
-
-
-        /**
-         * @brief Get a pointer to the storage area containing the data
-         */
-        const void* getStorage() const { 
-          if(!m_is_loaded) {
-            ;//TODO:load
-            Array* a=const_cast<Array*>(this);
-            a->m_is_loaded = true;
-          }          
-          return m_storage; 
-        }
-
-        /**
-          * @brief Attributes
-          */
-        boost::weak_ptr<const Arrayset> m_parent_arrayset;
-        size_t m_id;
-        bool m_is_loaded;
-        std::string m_filename;
-        std::string m_codecname;
-        void* m_storage;
-    };
-
-
     class Dataset;
     /**
      * @brief The arrayset class for a dataset
@@ -703,5 +565,5 @@ namespace Torch {
    */
 }
 
-#endif /* TORCH5SPRO_CORE_ARRAYSET_H */
+#endif /* TORCH5SPRO_DATABASE_ARRAYSET_H */
 

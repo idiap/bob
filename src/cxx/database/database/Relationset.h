@@ -1,22 +1,22 @@
 /**
- * @file src/cxx/core/core/Relationset.h
+ * @file src/cxx/database/database/Relationset.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief A torch representation of a Relationset for a Dataset.
  */
 
-#ifndef TORCH5SPRO_CORE_RELATIONSET_H
-#define TORCH5SPRO_CORE_RELATIONSET_H 1
+#ifndef TORCH5SPRO_DATABASE_RELATIONSET_H
+#define TORCH5SPRO_DATABASE_RELATIONSET_H 1
 
-#include "core/Arrayset.h"
+#include "database/Arrayset.h"
 
 namespace Torch {   
   /**
-   * \ingroup libcore_api
+   * \ingroup libdatabase_api
    * @{
    *
    */
-  namespace core {
+  namespace database {
     
     /**
      * @brief The member class for a dataset
@@ -452,5 +452,5 @@ namespace Torch {
    */
 }
 
-#endif /* TORCH5SPRO_CORE_RELATIONSET_H */
+#endif /* TORCH5SPRO_DATABASE_RELATIONSET_H */
 

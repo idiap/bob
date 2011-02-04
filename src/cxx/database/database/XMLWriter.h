@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/core/core/XMLWriter.h
+ * @file src/cxx/database/database/XMLWriter.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief An XML Writer for a Dataset
@@ -8,25 +8,20 @@
 #ifndef TORCH5SPRO_XML_WRITER_H 
 #define TORCH5SPRO_XML_WRITER_H
 
-#include <blitz/array.h>
-#include "core/logging.h"
-
+#include <string>
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
 
-#include <string>
-#include <sstream>
-
-#include "core/Dataset2.h"
-
-
 namespace Torch {   
   /**
-   * \ingroup libcore_api
+   * \ingroup libdatabase_api
    * @{
    *
    */
-  namespace core {
+  namespace database {
+
+    //Some promises
+    class Dataset;
 
     /**
      * @brief The main class for the XML parser
