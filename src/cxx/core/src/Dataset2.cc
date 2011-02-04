@@ -11,109 +11,6 @@
 namespace Torch {
   namespace core {
 
-    Array::Array(const Arrayset& parent): 
-      m_parent_arrayset(parent), m_id(0), m_is_loaded(false), m_filename(""),
-      m_loader(l_unknown), m_storage(0) { }
-
-    Array::~Array() {
-      TDEBUG3("Array destructor (id: " << getId() << ")");
-      switch(m_parent_arrayset.getElementType()) {
-        case array::t_bool:
-          delete [] static_cast<bool*>(m_storage); break;
-        case array::t_int8:
-          delete [] static_cast<int8_t*>(m_storage); break;
-        case array::t_int16:
-          delete [] static_cast<int16_t*>(m_storage); break;
-        case array::t_int32:
-          delete [] static_cast<int32_t*>(m_storage); break;
-        case array::t_int64:
-          delete [] static_cast<int64_t*>(m_storage); break;
-        case array::t_uint8:
-          delete [] static_cast<uint8_t*>(m_storage); break;
-        case array::t_uint16:
-          delete [] static_cast<uint16_t*>(m_storage); break;
-        case array::t_uint32:
-          delete [] static_cast<uint32_t*>(m_storage); break;
-        case array::t_uint64:
-          delete [] static_cast<uint64_t*>(m_storage); break;
-        case array::t_float32:
-          delete [] static_cast<float*>(m_storage); break;
-        case array::t_float64:
-          delete [] static_cast<double*>(m_storage); break;
-        case array::t_float128:
-          delete [] static_cast<long double*>(m_storage); break;
-        case array::t_complex64:
-          delete [] static_cast<std::complex<float>* >(m_storage); break;
-        case array::t_complex128:
-          delete [] static_cast<std::complex<double>* >(m_storage); break;
-        case array::t_complex256:
-          delete [] static_cast<std::complex<long double>* >(m_storage); 
-          break;
-        default:
-          break;
-      }
-    } 
-
-
-    Arrayset::Arrayset(): 
-      m_id(0), m_n_dim(0), m_n_elem(0), m_element_type(array::t_unknown), 
-      m_role(""), m_is_loaded(false), m_filename(""), m_loader(l_unknown) 
-    {
-      m_shape[0]=m_shape[1]=m_shape[2]=m_shape[3]=0; 
-    }
-
-    Arrayset::~Arrayset() {
-      TDEBUG3("Arrayset destructor (id: " << getId() << ")");
-      for(iterator it=begin(); it!=end(); ++it)
-        it->second.reset();
-    }
-
-    void Arrayset::append( boost::shared_ptr<Array> array) {
-      m_array.insert( std::pair<size_t,boost::shared_ptr<Array> >(
-        array->getId(), array) );
-    }
-
-    const Array& Arrayset::operator[]( const size_t id ) const {
-      if(!getIsLoaded()) {
-        ;//TODO:load
-        Arrayset* a=const_cast<Arrayset*>(this);
-        a->setIsLoaded(true);
-      }
-      std::map<size_t, boost::shared_ptr<Array> >::const_iterator it = 
-        (m_array.find(id));
-      if( it == m_array.end() )
-        throw IndexError();
-      return *(it->second);
-    }
-
-    boost::shared_ptr<const Array> 
-    Arrayset::getArray( const size_t id ) const {
-      if(!getIsLoaded()) {
-        ;//TODO:load
-        Arrayset* a=const_cast<Arrayset*>(this);
-        a->setIsLoaded(true);
-      }
-      std::map<size_t, boost::shared_ptr<Array> >::const_iterator it = 
-        (m_array.find(id));
-      if( it == m_array.end() )
-        throw IndexError();
-      return it->second;
-    }
-
-    boost::shared_ptr<Array> 
-    Arrayset::getArray( const size_t id ) {
-      if(!getIsLoaded()) {
-        ;//TODO:load
-        Arrayset* a=const_cast<Arrayset*>(this);
-        a->setIsLoaded(true);
-      }
-      std::map<size_t, boost::shared_ptr<Array> >::iterator it = 
-        (m_array.find(id));
-      if( it == m_array.end() )
-        throw IndexError();
-      return it->second;
-    }
-
     Relationset::Relationset(): 
       m_name("") { }
 
@@ -217,8 +114,9 @@ namespace Torch {
     }
 
     void Dataset::append( boost::shared_ptr<Arrayset> arrayset) {
-      m_arrayset.insert( std::pair<size_t,boost::shared_ptr<Arrayset> >(
-        arrayset->getId(), arrayset) );
+      m_arrayset.push_back( arrayset);
+      m_arrayset_index.insert( std::pair<size_t,size_t>(m_arrayset.size()-1,
+        arrayset->getId() ) );
     }
 
     void Dataset::append( boost::shared_ptr<Relationset> relationset) {
@@ -226,30 +124,34 @@ namespace Torch {
         relationset->getName(), relationset) );
     }
 
-    const Arrayset& Dataset::operator[]( const size_t id ) const {
-      std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator it = 
-        (m_arrayset.find(id));
-      if( it == m_arrayset.end() )
+    const Arrayset& Dataset::operator[]( const size_t index ) const {
+      if( index >= m_arrayset.size() )
         throw IndexError();
-      return *(it->second);
+      else
+        return *(m_arrayset[index]);
+    }
+
+    Arrayset& Dataset::operator[]( const size_t index ) {
+      if( index >= m_arrayset.size() )
+        throw IndexError();
+      else
+        return *(m_arrayset[index]);
     }
 
     boost::shared_ptr<const Arrayset> 
-    Dataset::getArrayset( const size_t id ) const {
-      std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator it = 
-        (m_arrayset.find(id));
-      if( it == m_arrayset.end() )
+    Dataset::getArrayset( const size_t index ) const {
+      if( index >= m_arrayset.size() )
         throw IndexError();
-      return it->second;
+      else
+        return m_arrayset[index];
     }
 
     boost::shared_ptr<Arrayset>
-    Dataset::getArrayset( const size_t id ) {
-      std::map<size_t, boost::shared_ptr<Arrayset> >::iterator it = 
-        (m_arrayset.find(id));
-      if( it == m_arrayset.end() )
+    Dataset::getArrayset( const size_t index ) {
+      if( index >= m_arrayset.size() )
         throw IndexError();
-      return it->second;
+      else
+        return m_arrayset[index];
     }
 
     const Relationset& Dataset::operator[]( const std::string& name ) const {

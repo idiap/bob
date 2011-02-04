@@ -53,15 +53,27 @@ namespace Torch {
          */
         void append( boost::shared_ptr<Arrayset> arrayset);
         /**
-         * @brief Remove a Relationset with a given name from the Dataset
+         * @brief Remove an Arrayset with a given index from the Dataset
          */
-        void remove( const size_t id) {
-          std::map<size_t, boost::shared_ptr<Arrayset> >::iterator it =
-            m_arrayset.find(id);
-          if(it!=m_arrayset.end())
-            m_arrayset.erase(it);
+        void remove( const size_t index) {
+          // Get the array using the given index
+          boost::shared_ptr<Arrayset> ar = m_arrayset[index];
+          // Remove the tuple (id,index) from the map if it exists
+          m_arrayset_index.erase( ar->getId() );
+          // Remove the Arrayset from the vector
+          if( index<m_arrayset.size() )
+            m_arrayset.erase(m_arrayset.begin()+index);
           else
             throw NonExistingElement();
+          // Decrease all the index from the map that were above the given
+          // on
+          std::map<size_t, size_t >::iterator it; 
+          for(it = m_arrayset_index.begin(); it != m_arrayset_index.end(); ++it)
+            if( (*it).second > index )
+              --((*it).second);
+
+          // TODO: remove all the relations/members that might be using this 
+          // object
         }
 
         /**
@@ -84,10 +96,11 @@ namespace Torch {
          */
         void setVersion( const size_t version) { m_version = version; }
 
+/***************************************************************************/
         /**
          * @brief const_iterator over the Arraysets of the Dataset
          */
-        typedef std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator
+        typedef std::vector<boost::shared_ptr<Arrayset> >::const_iterator
           const_iterator;
         /**
          * @brief Return a const_iterator pointing at the first Arrayset of 
@@ -103,7 +116,7 @@ namespace Torch {
         /**
          * @brief iterator over the Arraysets of the Dataset
          */
-        typedef std::map<size_t, boost::shared_ptr<Arrayset> >::iterator 
+        typedef std::vector<boost::shared_ptr<Arrayset> >::iterator 
           iterator;
         /**
          * @brief Return an iterator pointing at the first Arrayset of 
@@ -115,18 +128,19 @@ namespace Torch {
          * the Dataset
          */
         iterator end() { return m_arrayset.end(); }
-   
+/**************************************************************************/
         /**
-         * @brief Return the Arrayset of the given id 
+         * @brief Return the Arrayset of the given index 
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the arraysets.
          */
-        const Arrayset& operator[]( const size_t id ) const;
+        const Arrayset& operator[]( const size_t index ) const;
+        Arrayset& operator[]( const size_t index );
         /**
          * @brief Return the arrayset of the given id
          */
-        boost::shared_ptr<const Arrayset> getArrayset(const size_t id) const;
-        boost::shared_ptr<Arrayset> getArrayset(const size_t id);
+        boost::shared_ptr<const Arrayset> getArrayset(const size_t index) const;
+        boost::shared_ptr<Arrayset> getArrayset(const size_t index);
 
         /**
          * @brief Add a Relationset to the Dataset
@@ -197,7 +211,9 @@ namespace Torch {
         std::string m_name;
         size_t m_version;
 
-        std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
+        std::vector<boost::shared_ptr<Arrayset> > m_arrayset;
+        std::map<size_t,size_t> m_arrayset_index;
+        //std::map<size_t, boost::shared_ptr<Arrayset> > m_arrayset;
         std::map<std::string, boost::shared_ptr<Relationset> > m_relationset;
     };
 

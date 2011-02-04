@@ -66,7 +66,8 @@ namespace Torch {
          * @brief Parse an arrayset given an XML node and return the 
          * corresponding object.
          */
-        boost::shared_ptr<Arrayset> parseArrayset(xmlNodePtr node);
+        boost::shared_ptr<Arrayset> parseArrayset(
+          boost::shared_ptr<const Dataset> parent, xmlNodePtr node);
 
         /**
          * @brief Parse a relationset given an XML node and return the 
@@ -79,7 +80,7 @@ namespace Torch {
          * corresponding object.
          */
         boost::shared_ptr<Array> parseArray( 
-          const Arrayset& parent, xmlNodePtr node);
+          boost::shared_ptr<const Arrayset> parent, xmlNodePtr node);
 
         /**
          * @brief Parse a rule given an XML node and return the 

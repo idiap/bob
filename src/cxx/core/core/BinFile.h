@@ -73,12 +73,12 @@ namespace Torch {
         /**
          * @brief Save an Arrayset into a binary file
          */
-        void write(const Arrayset& arrayset);
+        void write( boost::shared_ptr<const Arrayset> arrayset);
 
         /**
          * @brief Save an Array into a binary file
          */
-        void write(const Array& array);
+        void write( boost::shared_ptr<const Array> array);
 
         /**
          * @brief Load one blitz++ multiarray from the input stream/file
@@ -91,12 +91,12 @@ namespace Torch {
         /** 
          * @brief Load an Arrayset from a binary file
          */
-        void read( Arrayset& arrayset);
+        void read( boost::shared_ptr<Arrayset> arrayset);
 
         /** 
          * @brief Load an Array from a binary file
          */
-        void read( Array& array);
+        void read( boost::shared_ptr<Array> array);
 
 
         /**

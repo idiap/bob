@@ -9,7 +9,8 @@
 #define TORCH5SPRO_CORE_ARRAYSET_H 1
 
 #include <boost/shared_ptr.hpp>
-#include <boost/shared_array.hpp>
+#include <boost/weak_ptr.hpp>
+
 #include <blitz/array.h>
 #include "core/logging.h"
 #include "core/Exception.h"
@@ -18,7 +19,7 @@
 
 #include <string>
 #include <map>
-#include <cstdlib> // required when using size_t type
+#include <vector>
 
 
 
@@ -38,40 +39,41 @@ namespace Torch {
      * @brief The array class for a dataset
      */
     class Array { //pure virtual
+      friend class Arrayset;
+      friend class XMLParser;
+      friend class XMLWriter;
+      friend class BinFile;
+
       public:
-        /**
-         * @brief Constructor
-         */
-        Array(const Arrayset& parent);
         /**
          * @brief Destructor
          */
         ~Array();
         
         /**
-         * @brief Set the id of the Array
-         */
-        void setId(const size_t id) { m_id = id; }
-        /**
-         * @brief Set the flag indicating if this array is loaded.
-         */
-        void setIsLoaded(const bool is_loaded) { m_is_loaded = is_loaded; }
-        /**
          * @brief Set the filename containing the data if any. An empty string
          * indicates that the data are stored in the XML file directly.
          */
-        void setFilename(const std::string& filename)
-          { m_filename.assign(filename); }
+        void setFilename(const std::string& filename, 
+          const std::string& codecname="")
+        { 
+          m_filename.assign(filename);
+          if( codecname.compare(""))
+            m_codecname.assign(codecname);
+          else
+            ;//TODO find codec name using the extension in the registry
+        }
+
         /**
-         * @brief Set the loader used to read the data from the external file 
+         * @brief Get the filename containing the data if any. An empty string
+         * indicates that the data is stored in the XML file directly.
+         */
+        const std::string& getFilename() const { return m_filename; }
+        /**
+         * @brief Get the loader used to read the data from the external file 
          * if any.
          */
-        void setLoader(const LoaderType loader) { m_loader = loader; }
-        /**
-         * @brief Set the data of the Array. Storage should have been allocated
-         * with malloc, to make the deallocation easy? 
-         */
-        void setStorage(void* storage) { m_storage = storage; }
+        const std::string& getCodecname() const { return m_codecname; }
 
         /**
          * @brief Get the id of the Array
@@ -83,262 +85,124 @@ namespace Torch {
          */
         const bool getIsLoaded() const { return m_is_loaded; }
         /**
-         * @brief Get the filename containing the data if any. An empty string
-         * indicates that the data is stored in the XML file directly.
-         */
-        const std::string& getFilename() const { return m_filename; }
-        /**
-         * @brief Get the loader used to read the data from the external file 
-         * if any.
-         */
-        const LoaderType getLoader() const { return m_loader; }
-        /**
-         * @brief Get a pointer to the storage area containing the data
-         */
-        const void* getStorage() const { 
-          if(!getIsLoaded()) {
-            ;//TODO:load
-            Array* a=const_cast<Array*>(this);
-            a->setIsLoaded(true);
-          }          
-          return m_storage; 
-        }
-        /**
          * @brief Get the parent arrayset of this array
          */
-        const Arrayset& getParentArrayset() const { return m_parent_arrayset; }
+        boost::shared_ptr<const Arrayset> getParentArrayset() const { 
+          return m_parent_arrayset.lock(); 
+        }
 
         /**
          * @brief Adapt the size of each dimension of the passed blitz array
          * to the ones of the underlying array and copy the data in it.
          */
-        template<typename T, int D> 
-        void copy( blitz::Array<T,D>& output) const;
+        template<typename T, int D> blitz::Array<T,D> data() const;
 
-/*
-        template<typename T, int D> struct do_refer
-        {
-          blitz::Array<T,D> static apply(Array&) {
-            error << "Unsupported blitz array type " << std::endl;
-            throw TypeError();
-          }
-        };
-
-        template<int D> struct do_refer<bool,D> {
-          blitz::Array<bool,D> static apply(Array& arr);
-        };
-        friend struct do_refer<bool,1>;
-        friend struct do_refer<bool,2>;
-        friend struct do_refer<bool,3>;
-        friend struct do_refer<bool,4>;
-
-        template<int D> struct do_refer<int8_t,D> {
-          blitz::Array<int8_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<int8_t,1>;
-        friend struct do_refer<int8_t,2>;
-        friend struct do_refer<int8_t,3>;
-        friend struct do_refer<int8_t,4>;
-
-        template<int D> struct do_refer<int16_t,D> {
-          blitz::Array<int16_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<int16_t,1>;
-        friend struct do_refer<int16_t,2>;
-        friend struct do_refer<int16_t,3>;
-        friend struct do_refer<int16_t,4>;
-
-        template<int D> struct do_refer<int32_t,D> {
-          blitz::Array<int32_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<int32_t,1>;
-        friend struct do_refer<int32_t,2>;
-        friend struct do_refer<int32_t,3>;
-        friend struct do_refer<int32_t,4>;
-
-        template<int D> struct do_refer<int64_t,D> {
-          blitz::Array<int64_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<int64_t,1>;
-        friend struct do_refer<int64_t,2>;
-        friend struct do_refer<int64_t,3>;
-        friend struct do_refer<int64_t,4>;
-
-        template<int D> struct do_refer<uint8_t,D> {
-          blitz::Array<uint8_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<uint8_t,1>;
-        friend struct do_refer<uint8_t,2>;
-        friend struct do_refer<uint8_t,3>;
-        friend struct do_refer<uint8_t,4>;
-
-        template<int D> struct do_refer<uint16_t,D> {
-          blitz::Array<uint16_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<uint16_t,1>;
-        friend struct do_refer<uint16_t,2>;
-        friend struct do_refer<uint16_t,3>;
-        friend struct do_refer<uint16_t,4>;
-
-        template<int D> struct do_refer<uint32_t,D> {
-          blitz::Array<uint32_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<uint32_t,1>;
-        friend struct do_refer<uint32_t,2>;
-        friend struct do_refer<uint32_t,3>;
-        friend struct do_refer<uint32_t,4>;
-
-        template<int D> struct do_refer<uint64_t,D> {
-          blitz::Array<uint64_t,D> static apply(Array& arr);
-        };
-        friend struct do_refer<uint64_t,1>;
-        friend struct do_refer<uint64_t,2>;
-        friend struct do_refer<uint64_t,3>;
-        friend struct do_refer<uint64_t,4>;
-
-        template<int D> struct do_refer<float,D> {
-          blitz::Array<float,D> static apply(Array& arr);
-        };
-        friend struct do_refer<float,1>;
-        friend struct do_refer<float,2>;
-        friend struct do_refer<float,3>;
-        friend struct do_refer<float,4>;
-
-        template<int D> struct do_refer<double,D> {
-          blitz::Array<double,D> static apply(Array& arr);
-        };
-        friend struct do_refer<double,1>;
-        friend struct do_refer<double,2>;
-        friend struct do_refer<double,3>;
-        friend struct do_refer<double,4>;
-
-        template<int D> struct do_refer<long double,D> {
-          blitz::Array<long double,D> static apply(Array& arr);
-        };
-        friend struct do_refer<long double,1>;
-        friend struct do_refer<long double,2>;
-        friend struct do_refer<long double,3>;
-        friend struct do_refer<long double,4>;
-
-        template<int D> struct do_refer<std::complex<float>,D> {
-          blitz::Array<std::complex<float>,D> static apply(Array& arr);
-        };
-        friend struct do_refer<std::complex<float>,1>;
-        friend struct do_refer<std::complex<float>,2>;
-        friend struct do_refer<std::complex<float>,3>;
-        friend struct do_refer<std::complex<float>,4>;
-
-        template<int D> struct do_refer<std::complex<double>,D> {
-          blitz::Array<std::complex<double>,D> static apply(Array& arr);
-        };
-        friend struct do_refer<std::complex<double>,1>;
-        friend struct do_refer<std::complex<double>,2>;
-        friend struct do_refer<std::complex<double>,3>;
-        friend struct do_refer<std::complex<double>,4>;
-
-        template<int D> struct do_refer<std::complex<long double>,D> {
-          blitz::Array<std::complex<long double>,D> static apply(Array& arr);
-        };
-        friend struct do_refer<std::complex<long double>,1>;
-        friend struct do_refer<std::complex<long double>,2>;
-        friend struct do_refer<std::complex<long double>,3>;
-        friend struct do_refer<std::complex<long double>,4>;
-*/
         /**
          * @brief Adapt the size of each dimension of the passed blitz array
          * to the ones of the underlying array and refer to the data in it.
          * @warning Updating the content of the blitz array will update the
          * content of the corresponding array in the dataset.
          */
-        template<typename T, int D> blitz::Array<T,D> refer() {
+        template<typename T, int D> blitz::Array<T,D> data() {
           error << "Unsupported blitz array type " << std::endl;
           throw TypeError();
-          //return do_refer<T,D>::apply(*this);
         }
 
 
-        /************** Partial specialization declaration *************/
-/*        template<int D> blitz::Array<bool,D> refer( );
-        template<int D> blitz::Array<int8_t,D> refer( );
-        template<int D> blitz::Array<int16_t,D> refer( );
-        template<int D> blitz::Array<int32_t,D> refer( );
-        template<int D> blitz::Array<int64_t,D> refer( );
-        template<int D> blitz::Array<uint8_t,D> refer( );
-        template<int D> blitz::Array<uint16_t,D> refer( );
-        template<int D> blitz::Array<uint32_t,D> refer( );
-        template<int D> blitz::Array<uint64_t,D> refer( );
-        template<int D> blitz::Array<float,D> refer( );
-        template<int D> blitz::Array<double,D> refer( );
-        template<int D> blitz::Array<long double,D> refer( );
-        template<int D> blitz::Array<std::complex<float>,D> refer( );
-        template<int D> blitz::Array<std::complex<double>,D> refer( );
-        template<int D> blitz::Array<std::complex<long double>,D> refer( );
-*/
+      private:
+        /**
+         * @brief Constructor
+         */
+        Array(boost::shared_ptr<const Arrayset> parent, const size_t id=0,
+          const std::string& filename="", const std::string& codec="");
+        
+        /**
+          * @brief Copy the data from the Array object into the given C-style
+          * array, and cast if required.
+          */
         template <typename T, typename U> void copyCast( U* out) const;
 
-      private:
+        /**
+          * @brief check that the number of dimensions match in order to be
+          * able to refer to the data.
+          */
         template <int D> void referCheck( ) const;
 
-        const Arrayset& m_parent_arrayset;
+        /**
+         * @brief Set the id of the Array
+         */
+//        void setId(const size_t id) { m_id = id; }
+        /**
+         * @brief Set the flag indicating if this array is loaded.
+         */
+        void setIsLoaded(const bool is_loaded) { m_is_loaded = is_loaded; }
+        /**
+         * @brief Set the data of the Array.
+         */
+        void setStorage(void* storage) { m_storage = storage; }
+
+
+        /**
+         * @brief Get a pointer to the storage area containing the data
+         */
+        const void* getStorage() const { 
+          if(!m_is_loaded) {
+            ;//TODO:load
+            Array* a=const_cast<Array*>(this);
+            a->m_is_loaded = true;
+          }          
+          return m_storage; 
+        }
+
+        /**
+          * @brief Attributes
+          */
+        boost::weak_ptr<const Arrayset> m_parent_arrayset;
         size_t m_id;
         bool m_is_loaded;
         std::string m_filename;
-        LoaderType m_loader;
+        std::string m_codecname;
         void* m_storage;
     };
 
 
+    class Dataset;
     /**
      * @brief The arrayset class for a dataset
      */
     class Arrayset {
+      friend class XMLParser;
+      friend class XMLWriter;
+      friend class BinFile;
+
       public:
-        /**
-         * @brief Constructor
-         */
-        Arrayset();
         /**
          * @brief Destructor
          */
         ~Arrayset();
 
-        /**
-         * @brief Add an Array to the Arrayset
+        /*y*
+         * @brief Add a copy of the given Array to the Arrayset
          */
-        void append( boost::shared_ptr<Array> array);
+        void append( boost::shared_ptr<const Array> array);
+        /*y*
+         * @brief Add a copy of the given Array to the Arrayset
+         */
+        void append( const Array& array);
         /**
          * @brief Add a blitz array to the Arrayset
          */
         template <typename T, int D>
         void append( const blitz::Array<T,D>& bl);
         /**
+         * @brief Add a new array to the Arrayset
+         */
+        void append( const std::string& filename, const std::string& codec);
+        /**
          * @brief Remove an Array with a given id from the Arrayset
          */
-        void remove( const size_t id) {
-          std::map<size_t, boost::shared_ptr<Array> >::iterator it =
-            m_array.find(id);
-          if(it!=m_array.end())
-            m_array.erase(it);
-          else
-            throw NonExistingElement();
-        }
+        void remove( const size_t id);
 
-        /**
-         * @brief Set the id of the Arrayset
-         */
-        void setId(const size_t id) { m_id = id; }
-        /**
-         * @brief Set the number of dimensions of the arrays of this Arrayset
-         */
-        void setNDim(const size_t n_dim) { m_n_dim = n_dim; }
-        /**
-         * @brief Set the size of each dimension of the arrays of this 
-         * Arrayset
-         */
-        void setShape(const size_t shape[]) { 
-          for(size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
-            m_shape[i] = shape[i];
-        }
         /**
          * @brief Update the shape of the Array with the one given in the
          * blitz TinyVector.
@@ -346,14 +210,18 @@ namespace Torch {
         template<int D> 
         void setShape( const blitz::TinyVector<int,D>& shape ) {
           m_n_dim = D;
-          for( int i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
-            m_shape[i] = ( i<D ? shape(i) : 0);
+          size_t n_elem = 1;
+          for( int i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i) {
+            if( i< D) {
+              m_shape[i] = shape(i);
+              n_elem *= shape(i);
+            } 
+            else
+              m_shape[i] = 0;
+          }
+          m_n_elem = n_elem;
         }
-        /**
-         * @brief Set the number of elements in each array of this 
-         * Arrayset
-         */
-        void setNElem(const size_t n_elem) {  m_n_elem = n_elem; } 
+
         /**
          * @brief Set the type of the elements contained in the the arrays of 
          * this Arrayset
@@ -368,18 +236,18 @@ namespace Torch {
          * @brief Set the flag indicating if this arrayset is loaded from an 
          * external file.
          */
-        void setIsLoaded(const bool is_loaded) { m_is_loaded = is_loaded; }
+//        void setIsLoaded(const bool is_loaded) { m_is_loaded = is_loaded; }
         /**
          * @brief Set the filename containing the data if any. An empty string
          * indicates that the data are stored in the XML file directly.
          */
-        void setFilename(const std::string& filename)
+        void setFilename(const std::string& filename, const std::string& codec="")
           { m_filename.assign(filename); }
         /**
          * @brief Set the loader used to read the data from the external file 
          * if any.
          */
-        void setLoader(const LoaderType loader) { m_loader = loader; }
+//        void setLoader(const LoaderType loader) { m_loader = loader; }
         
         /**
          * @brief Get the id of the Arrayset
@@ -389,11 +257,6 @@ namespace Torch {
          * @brief Get the number of dimensions of the arrays of this Arrayset
          */
         size_t getNDim() const { return m_n_dim; }
-        /**
-         * @brief Get the size of each dimension of the arrays of this 
-         * Arrayset
-         */
-        const size_t* getShape() const { return m_shape; }
         /**
          * @brief Update the given blitz array with the content of the array
          * of the provided id.
@@ -432,98 +295,134 @@ namespace Torch {
          * @brief Get the loader used to read the data from the external file 
          * if any.
          */
-        LoaderType getLoader() const { return m_loader; }
+        const std::string& getCodecname() const { return m_codecname; }
         /**
          * @brief Get the number of arrays in this Arrayset
          */
         size_t getNArrays() const { return m_array.size(); }
 
-
         /**
-         * @brief const_iterator over the Arrays of the Arrayset
-         */
-        typedef std::map<size_t, boost::shared_ptr<Array> >::const_iterator 
-          const_iterator;
+          * @brief Update the given vector with the 
+          */
+        void index( std::vector<size_t>& x );
         /**
-         * @brief Return a const_iterator pointing at the first Array of the 
-         * Arrayset
-         */
-        const_iterator begin() const { 
-          if(!getIsLoaded()) {
-            ;//TODO:load
-            Arrayset* a=const_cast<Arrayset*>(this);
-            a->setIsLoaded(true);
-          }          
-          return m_array.begin(); 
-        }
-        /**
-         * @brief Return a const_iterator pointing at the last Array of the 
-         * Arrayset
-         */
-        const_iterator end() const { 
-          if(!getIsLoaded()) {
-            ;//TODO:load
-            Arrayset* a=const_cast<Arrayset*>(this);
-            a->setIsLoaded(true);
-          }          
-          return m_array.end(); 
-        }
-
-        /**
-         * @brief iterator over the Arrays of the Arrayset
-         */
-        typedef std::map<size_t, boost::shared_ptr<Array> >::iterator 
-          iterator;
-        /**
-         * @brief Return an iterator pointing at the first Array of the 
-         * Arrayset
-         */
-        iterator begin() { 
-          if(!getIsLoaded()) {
-            ;//TODO:load
-            setIsLoaded(true);
-          }          
-          return m_array.begin(); 
-        }
-        /**
-         * @brief Return an iterator pointing at the last Array of the 
-         * Arrayset
-         */
-        iterator end() { 
-          if(!getIsLoaded()) {
-            ;//TODO:load
-            setIsLoaded(true);
-          }          
-          return m_array.end(); 
-        }
-
-        /**
-         * @brief Return the array of the given id
+         * @brief Return the array of the given index
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the arrays.
          */
-        const Array& operator[](size_t id) const;
+        const Array& operator[](size_t ind) const;
+        Array& operator[](size_t ind);
         /**
-         * @brief Return a smart pointer to the array of the given id
+         * @brief Return a smart pointer to the array of the given index
          */
-        boost::shared_ptr<const Array> getArray(size_t id) const;
-        boost::shared_ptr<Array> getArray(size_t id);
+        boost::shared_ptr<const Array> getArray(size_t ind) const;
+        boost::shared_ptr<Array> getArray(size_t ind);
 
         /**
-         * @brief Update the blitz array with the content of the array 
+         * @brief Return a blitz array with the content of the array 
          * of the provided id.
          */
         template<typename T, int D> 
-        void at(size_t id, blitz::Array<T,D>& output) const;
+        blitz::Array<T,D> at(size_t id) const;
+
+
+        boost::shared_ptr<const Dataset> getParentDataset() const;
+
+        /** 
+         * @brief const_iterator over the Arrays of the Dataset
+         */
+        typedef std::vector<boost::shared_ptr<Array> >::const_iterator
+          const_iterator;
+        /** 
+         * @brief Return a const_iterator pointing at the first Array of 
+         * the Dataset
+         */
+        const_iterator begin() const { return m_array.begin(); }
+        /** 
+         * @brief Return a const_iterator pointing at the last Array of 
+         * the Dataset
+         */
+        const_iterator end() const { return m_array.end(); }
+
+        /** 
+         * @brief iterator over the Arrays of the Dataset
+         */
+        typedef std::vector<boost::shared_ptr<Array> >::iterator 
+          iterator;
+        /** 
+         * @brief Return an iterator pointing at the first Array of 
+         * the Dataset
+         */
+        iterator begin() { return m_array.begin(); }
+        /** 
+         * @brief Return an iterator pointing at the first Array of 
+         * the Dataset
+         */
+        iterator end() { return m_array.end(); }
+
 
 
       private:
+        /**
+         * @brief Constructor
+         */
+        Arrayset( boost::shared_ptr<const Dataset> parent, const size_t id=0,
+          const std::string& filename="", const std::string& codec="");
+
+        /**
+         * @brief Set the id of the Arrayset
+         */
+//        const size_t getId() { return m_id; }
+        /**
+         * @brief Set the number of dimensions of the arrays of this Arrayset
+         */
+//        int getNDim() { return m_n_dim; }
+//      void setNDim(const size_t n_dim) { m_n_dim = n_dim; }
+        /**
+         * @brief Set the size of each dimension of the arrays of this 
+         * Arrayset
+         */
+/*      void setShape(const size_t shape[]) { 
+          for(size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
+            m_shape[i] = shape[i];
+        }*/
+
         /**
          * @brief Check that the blitz array has a compatible number of 
          * dimensions with this Arrayset
          */
         template <int D> void appendCheck() const;
 
+        /**
+          * @brief Return the shape in the C-style format
+          */
+        const size_t* getShape() const { return m_shape; }
+        /**
+         * @brief Update the shape of the Array with the one given.
+         */
+        void setShape( const size_t shape[array::N_MAX_DIMENSIONS_ARRAY] ) {
+          m_n_dim = 0;
+          size_t n_elem = 1;
+          bool over = false;
+          for( size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i) {
+            if( !over && shape[i] > 0 ) {
+              m_shape[i] = shape[i];
+              n_elem *= shape[i];
+              ++m_n_dim;
+            } 
+            else {
+              over = true;
+              m_shape[i] = 0;
+            }
+          }
+          m_n_elem = n_elem;
+        }
+
+
+        /**
+          * Attributes
+          */
+        boost::weak_ptr<const Dataset> m_parent_dataset;
         size_t m_id;
 
         size_t m_n_dim;
@@ -534,16 +433,19 @@ namespace Torch {
         std::string m_role;
         bool m_is_loaded;
         std::string m_filename;
-        LoaderType m_loader;
+        std::string m_codecname;
 
-        std::map<size_t, boost::shared_ptr<Array> > m_array;
+
+        std::vector<boost::shared_ptr<Array> > m_array;
+        std::map<size_t,size_t> m_index; //Key:id, value:index
     };
+
 
 
     /********************** TEMPLATE FUNCTION DEFINITIONS ***************/
     template <typename T, typename U> 
     void Array::copyCast( U* out ) const {
-      size_t n_elem = m_parent_arrayset.getNElem();
+      size_t n_elem = (m_parent_arrayset.lock())->getNElem();
       for( size_t i=0; i<n_elem; ++i) {
         T* t_storage = reinterpret_cast<T*>(m_storage);
         static_complex_cast( t_storage[i], out[i] );
@@ -551,11 +453,12 @@ namespace Torch {
     }
 
     template <typename T, int D> 
-    void Array::copy( blitz::Array<T,D>& output) const 
+    blitz::Array<T,D> Array::data( ) const 
     {
-      if( D != m_parent_arrayset.getNDim() ) {
+      boost::shared_ptr<const Arrayset> parent = m_parent_arrayset.lock();
+      if( D != parent->getNDim() ) {
         TDEBUG3("D=" << D << " -- ParseXML: D=" << 
-          m_parent_arrayset.getNDim());
+          parent->getNDim());
         error << "Cannot copy the data in a blitz array with a different " <<
           "number of dimensions." << std::endl;
         throw NDimensionError();
@@ -563,22 +466,19 @@ namespace Torch {
 
       // Reshape each dimensions with the correct size
       blitz::TinyVector<int,D> shape;
-      m_parent_arrayset.getShape(shape);
-      output.resize(shape);
+      parent->getShape(shape);
+
+      blitz::Array<T,D> bl(shape);
 
       // Load the data if required
-      if(!getIsLoaded()) {
+      if(!m_is_loaded) {
         ;//TODO:load 
         Array* a=const_cast<Array*>(this);
-        a->setIsLoaded(true);
+        a->m_is_loaded = true;
       }
 
-      T* out_data;
-      if( output.isStorageContiguous() )
-        out_data = output.data();
-      else
-        out_data = output.copy().data();
-      switch(m_parent_arrayset.getElementType()) {
+      T* out_data = bl.data();
+      switch(parent->getElementType()) {
         case array::t_bool:
           copyCast<bool,T>(out_data); break;
         case array::t_int8:
@@ -612,20 +512,23 @@ namespace Torch {
         default:
           break;
       }
+
+      return bl;
     }
 
     template <int D> void Array::referCheck( ) const
     {
       // Load the data if required
-      if(!getIsLoaded()) {
+      if(!m_is_loaded) {
         ;//TODO:load 
         Array* a=const_cast<Array*>(this);
-        a->setIsLoaded(true);
+        a->m_is_loaded = true;
       }
 
-      if( D != m_parent_arrayset.getNDim() ) {
+      boost::shared_ptr<const Arrayset> parent = m_parent_arrayset.lock();
+      if( D != parent->getNDim() ) {
         TDEBUG3("D=" << D << " -- ParseXML: D=" <<
-           m_parent_arrayset.getNDim());
+           parent->getNDim());
         error << "Cannot refer to the data in a blitz array with a " <<
           "different number of dimensions." << std::endl;
         throw NDimensionError();
@@ -634,7 +537,7 @@ namespace Torch {
 
 
 #define REFER_DECL(T,D) template<> \
-   blitz::Array<T,D> Array::refer(); \
+   blitz::Array<T,D> Array::data(); \
 
         REFER_DECL(bool,1)
         REFER_DECL(bool,2)
@@ -706,26 +609,25 @@ namespace Torch {
     {
       appendCheck<D>();
 
-      boost::shared_ptr<Array> array(new Array(*this));
       // Find an available id and assign it to the Array
-      // TODO: set id properly
-      static size_t id = 157;//1;
+      // TODO: check that this works
+      static size_t id = 1;
       bool available_id = false;
       while( !available_id )
       {
-        if(m_array.find(id) != m_array.end() )
+        if(m_index.find(id) == m_index.end() )
           available_id = true;
         ++id;
       }
-      array->setId(id);
+      boost::shared_ptr<Array> array(
+        new Array(boost::shared_ptr<const Arrayset>(this), id));
 
       void* storage;
-      array->setIsLoaded(true);
 
       // Check that the memory is contiguous in the blitz array
       // as this is required by the copy
       blitz::Array<T,D> ref;
-      if( !bl.isStorageContiguous() )
+      if( !checkSafedata(bl) )
         ref.reference(bl.copy());
       else
         ref.reference(bl);
@@ -780,13 +682,16 @@ namespace Torch {
         default:
           break;
       }
+
+      // Update the m_is_loaded member of the array
+      array->m_is_loaded = true;
     }
 
 
-    template<typename T, int D> void 
-    Arrayset::at(size_t id, blitz::Array<T,D>& output) const {
-      boost::shared_ptr<Array> x = (m_array.find(id))->second;
-      x->copy(output);
+    template<typename T, int D> blitz::Array<T,D>
+    Arrayset::at(size_t ind) const {
+      boost::shared_ptr<const Array> x = m_array[ind];
+      return x->data<T,D>();
     }
 
 

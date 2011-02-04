@@ -64,15 +64,6 @@
     </xsd:restriction>
   </xsd:simpleType>
 
-  <xsd:simpleType name="LoaderType">
-    <xsd:restriction base="xsd:string">
-      <xsd:enumeration value="blitz"/>
-      <xsd:enumeration value="tensor"/>
-      <xsd:enumeration value="bindata"/>
-      <xsd:enumeration value="byextension"/>
-    </xsd:restriction>
-  </xsd:simpleType>
-
   <xsd:simpleType name="ShapeExtentType">
      <xsd:restriction base="xsd:positiveInteger">
        <xsd:minInclusive value="1"/>
@@ -102,7 +93,7 @@
     <xsd:attribute name="shape" type="ShapeType" use="required" />
     <xsd:attribute name="role" type="xsd:string" use="required" />
     <xsd:attribute name="file" type="xsd:anyURI" use="required" />
-    <xsd:attribute name="loader" type="LoaderType" use="required" />
+    <xsd:attribute name="codec" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="ArrayInlineType">
@@ -116,7 +107,7 @@
   <xsd:complexType name="ArrayFileType">
     <xsd:attribute name="id" type="xsd:positiveInteger" use="required" />
     <xsd:attribute name="file" type="xsd:anyURI" use="required" />
-    <xsd:attribute name="loader" type="LoaderType" use="required" />
+    <xsd:attribute name="codec" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="RelationsetType">

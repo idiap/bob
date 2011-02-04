@@ -41,7 +41,7 @@ namespace Torch {
       for(Dataset::const_iterator it=dataset.begin(); it!=dataset.end(); 
         ++it)
       {
-        xmlAddChild( rootnode, writeArrayset( doc, *it->second, b) );
+        xmlAddChild( rootnode, writeArrayset( doc, *it, b) );
       }
       // Create Relationset nodes
       for(Dataset::relationset_const_iterator it=dataset.relationset_begin(); 
@@ -55,12 +55,13 @@ namespace Torch {
     }
 
 
-    xmlNodePtr XMLWriter::writeArrayset( xmlDocPtr doc, const Arrayset& a, 
+    xmlNodePtr XMLWriter::writeArrayset( xmlDocPtr doc, 
+      boost::shared_ptr<const Arrayset> a, 
       bool content_inline, int precision, bool scientific) 
     {
       // Create the Arrayset node
       xmlNodePtr arraysetnode; 
-      if( a.getFilename().compare("") && !content_inline)
+      if( a->getFilename().compare("") && !content_inline)
         arraysetnode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::external_arrayset, 0);
       else
@@ -68,11 +69,11 @@ namespace Torch {
 
       // Write id attribute
       xmlNewProp( arraysetnode, (const xmlChar*)db::id, (const xmlChar*)
-        (boost::lexical_cast<std::string>(a.getId())).c_str() );
+        (boost::lexical_cast<std::string>(a->getId())).c_str() );
 
       // Write elementtype attribute
       std::string str;
-      switch(a.getElementType()) {
+      switch(a->getElementType()) {
         case array::t_bool:
           str = db::t_bool; break;
         case array::t_int8:
@@ -111,47 +112,36 @@ namespace Torch {
         str.c_str() );
 
       // Write shape attribute
-      const size_t* shape = a.getShape();
+      const size_t* shape = a->getShape();
       str = boost::lexical_cast<std::string>(shape[0]);
-      for(size_t i=1; i<a.getNDim(); ++i)
+      for(size_t i=1; i<a->getNDim(); ++i)
         str += " " + boost::lexical_cast<std::string>(shape[i]);
       xmlNewProp( arraysetnode, (const xmlChar*)db::shape, (const xmlChar*)
         str.c_str() );
 
       // Write role attribute
       xmlNewProp( arraysetnode, (const xmlChar*)db::role, (const xmlChar*)
-        a.getRole().c_str() );
+        a->getRole().c_str() );
 
       // Write file and loader attributes if any
-      if( a.getFilename().compare("") && !content_inline)
+      if( a->getFilename().compare("") && !content_inline)
       {
         // Write file attribute
         xmlNewProp( arraysetnode, (const xmlChar*)db::file, (const xmlChar*)
-          a.getFilename().c_str() );
+          a->getFilename().c_str() );
 
-        // Write loader attribute
-        str = "";
-        switch( a.getLoader() )
-        {
-          case l_blitz:
-            str = db::l_blitz; break;
-          case l_tensor:
-            str = db::l_tensor; break;
-          case l_bindata:
-            str = db::l_bindata; break;
-          default:
-            throw Exception();
-            break;
-        }
-        xmlNewProp( arraysetnode, (const xmlChar*)db::loader, (const xmlChar*)
+        // Write codec attribute
+        str = a->getCodecname();
+        // TODO: check that the codec exists in the registry
+        xmlNewProp( arraysetnode, (const xmlChar*)db::codec, (const xmlChar*)
           str.c_str() );
       }
 
       // Create Array nodes
-      for(Arrayset::const_iterator it=a.begin(); it!=a.end(); 
+      for(Arrayset::const_iterator it=a->begin(); it!=a->end(); 
         ++it)
       {
-        xmlAddChild( arraysetnode, writeArray( doc, *it->second, 
+        xmlAddChild( arraysetnode, writeArray( doc, *it, 
           content_inline, precision, scientific) );
       }
 
@@ -159,12 +149,13 @@ namespace Torch {
     }
 
 
-    xmlNodePtr XMLWriter::writeArray( xmlDocPtr doc, const Array& a, 
-      bool content_inline, int precision, bool scientific) 
+    xmlNodePtr XMLWriter::writeArray( xmlDocPtr doc, 
+      boost::shared_ptr<const Array> a, bool content_inline, int precision, 
+      bool scientific) 
     {
       // Create the Arrayset node
       xmlNodePtr arraynode; 
-      if( a.getFilename().compare("") && !content_inline)
+      if( a->getFilename().compare("") && !content_inline)
         arraynode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::external_array, 0);
       else {
@@ -175,67 +166,60 @@ namespace Torch {
           content << std::scientific;
 
         // Cast the data and call the writing function
-        switch(a.getParentArrayset().getElementType()) {
+        boost::shared_ptr<const Arrayset> parent = a->getParentArrayset();
+        switch(parent->getElementType()) {
           case array::t_bool:
             writeData( content, 
-              reinterpret_cast<const bool*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const bool*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_int8:
             writeData( content, 
-              reinterpret_cast<const int8_t*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const int8_t*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_int16:
             writeData( content, 
-              reinterpret_cast<const int16_t*>(a.getStorage()),
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const int16_t*>(a->getStorage()),
+              parent->getNElem()); break;
           case array::t_int32:
             writeData( content, 
-              reinterpret_cast<const int32_t*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const int32_t*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_int64:
             writeData( content, 
-              reinterpret_cast<const int64_t*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const int64_t*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_uint8:
             writeData( content, 
-              reinterpret_cast<const uint8_t*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const uint8_t*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_uint16:
             writeData( content, 
-              reinterpret_cast<const uint16_t*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const uint16_t*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_uint32:
             writeData( content, 
-              reinterpret_cast<const uint32_t*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const uint32_t*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_uint64:
             writeData( content, 
-              reinterpret_cast<const uint64_t*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const uint64_t*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_float32:
             writeData( content, 
-              reinterpret_cast<const float*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const float*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_float64:
             writeData( content, 
-              reinterpret_cast<const double*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
-          case array::t_float128:
-            writeData( content, 
-              reinterpret_cast<const long double*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const double*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_complex64:
             writeData( content, 
-              reinterpret_cast<const std::complex<float>*>(a.getStorage()), 
-              a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const std::complex<float>*>(a->getStorage()), 
+              parent->getNElem()); break;
           case array::t_complex128:
             writeData( content, 
-              reinterpret_cast<const std::complex<double>*>(a.getStorage()),
-              a.getParentArrayset().getNElem()); break;
-          case array::t_complex256:
-            writeData( content, 
-              reinterpret_cast<const std::complex<long double>*>(
-              a.getStorage()), a.getParentArrayset().getNElem()); break;
+              reinterpret_cast<const std::complex<double>*>(a->getStorage()),
+              parent->getNElem()); break;
           default:
             throw Exception();
             break;
@@ -248,29 +232,23 @@ namespace Torch {
 
       // Write id attribute
       xmlNewProp( arraynode, (const xmlChar*)db::id, (const xmlChar*)
-        (boost::lexical_cast<std::string>(a.getId())).c_str() );
+        (boost::lexical_cast<std::string>(a->getId())).c_str() );
 
-      if( a.getFilename().compare("") && !content_inline)
+      if( a->getFilename().compare("") && !content_inline)
       {
         // Write file attribute
         xmlNewProp( arraynode, (const xmlChar*)db::file, (const xmlChar*)
-          a.getFilename().c_str() );
+          a->getFilename().c_str() );
 
-        // Write loader attribute
-        std::string str;
-        switch( a.getLoader() )
+        // Write codec attribute
+        std::string str( a->getCodecname() );
+        if( !str.compare( db::c_blitz ) && !str.compare( db::c_tensor ) && 
+          !str.compare( db::c_bindata ) )
         {
-          case l_blitz:
-            str = db::l_blitz; break;
-          case l_tensor:
-            str = db::l_tensor; break;
-          case l_bindata:
-            str = db::l_bindata; break;
-          default:
-            throw Exception();
-            break;
+          error << "Unknown codec attribute " << std::endl;
+          throw Exception();
         }
-        xmlNewProp( arraynode, (const xmlChar*)db::loader, (const xmlChar*)
+        xmlNewProp( arraynode, (const xmlChar*)db::codec, (const xmlChar*)
           str.c_str() );
       }
 

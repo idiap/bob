@@ -91,6 +91,17 @@ inline bool checkSafedata( const Array<T,4>& src)
 }
 
 
+template <typename T>
+void makeSafedata( Array<T,1>& src)
+{ 
+  int n_0 = src.extent(0);
+  Array<T,1> dst( n_0 );
+  for( int i=0; i<n_0; ++i )
+    dst(i) = src(i+src.lbound(0));
+  return dst;
+}
+
+
 /**
  * @brief This copies a 1D blitz array and guaranties that:
  *   * the memory is stored contiguously

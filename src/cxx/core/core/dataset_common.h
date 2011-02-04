@@ -33,7 +33,7 @@ namespace Torch {
       extern const char *role;
       extern const char *elementtype;
       extern const char *shape;
-      extern const char *loader;
+      extern const char *codec;
       extern const char *file;
       extern const char *array;
       extern const char *external_array;
@@ -65,15 +65,15 @@ namespace Torch {
       extern const char *t_complex128;
       extern const char *t_complex256;
 
-      // loader
-      extern const char *l_blitz;
-      extern const char *l_tensor;
-      extern const char *l_bindata;
-      extern const char *l_byextension;
+      // Codec
+      extern const char *c_blitz;
+      extern const char *c_tensor;
+      extern const char *c_bindata;
+      extern const char *c_byextension;
     }
 
-    typedef enum LoaderType { l_unknown, l_blitz, l_tensor, l_bindata }
-      LoaderType;
+    typedef enum CodecType { c_unknown, c_blitz, c_tensor, c_bindata }
+      CodecType;
 
     class IndexError: public Exception { };
     class NDimensionError: public Exception { };

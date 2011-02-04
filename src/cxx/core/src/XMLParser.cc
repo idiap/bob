@@ -138,7 +138,8 @@ namespace Torch {
         // Parse an arrayset and add it to the dataset
         if( !strcmp((const char*)cur->name, db::arrayset) || 
             !strcmp((const char*)cur->name, db::external_arrayset) )
-          dataset.append( parseArrayset(cur) );
+          dataset.append( parseArrayset( 
+            boost::shared_ptr<const Dataset>(&dataset),cur) );
         // Parse a relationset and add it to the dataset
         else if( !strcmp((const char*)cur->name, db::relationset) )
           dataset.append( parseRelationset(cur) );
@@ -169,7 +170,7 @@ namespace Torch {
               arrayset != dataset.end(); ++arrayset )
             {
               if( !rule->second->getArraysetRole().compare( 
-                arrayset->second->getRole() ) )
+                (*arrayset)->getRole() ) )
               {
                 found = true;
                 break;
@@ -374,67 +375,64 @@ namespace Torch {
     }
 
 
-    boost::shared_ptr<Arrayset> XMLParser::parseArrayset(const xmlNodePtr cur) {
-      boost::shared_ptr<Arrayset> arrayset(new Arrayset());
+    boost::shared_ptr<Arrayset> XMLParser::parseArrayset(
+      boost::shared_ptr<const Dataset> parent, const xmlNodePtr cur) 
+    {
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
-      arrayset->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      TDEBUG3("Id: " << arrayset->getId());
+      size_t id = (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+      TDEBUG3("Id: " << id);
       xmlFree(str);
 
       // Parse role
       str = xmlGetProp(cur, (const xmlChar*)db::role);
-      arrayset->setRole( ( (str!=0?(const char *)str:"") ) );
-      TDEBUG3("Role: " << arrayset->getRole());
+      std::string str_role(str!=0?(const char *)str:"");
+      TDEBUG3("Role: " << str_role);
       xmlFree(str);
 
       // Add id-role to the mapping of the XMLParser. This will be used for
       // checking the members of a relation.
-      m_id_role->insert( std::pair<size_t,std::string>( 
-        arrayset->getId(), arrayset->getRole()) );
+      m_id_role->insert( std::pair<size_t,std::string>( id, str_role) );
 
       // Parse elementtype
       str = xmlGetProp(cur, (const xmlChar*)db::elementtype);
       if( str==0 ) {
         error << "Elementtype is not specified in arrayset (id: " << 
-          arrayset->getId() << ")." << std::endl;
+          id << ")." << std::endl;
         throw Exception();
       }
+      array::ElementType elem_type;
       std::string str_element_type( (const char*)str );
       if( !str_element_type.compare( db::t_bool ) )
-        arrayset->setElementType( array::t_bool );
+        elem_type = array::t_bool;
       else if( !str_element_type.compare( db::t_uint8 ) )
-        arrayset->setElementType( array::t_uint8 );
+        elem_type = array::t_uint8;
       else if( !str_element_type.compare( db::t_uint16 ) )
-        arrayset->setElementType( array::t_uint16 );
+        elem_type = array::t_uint16;
       else if( !str_element_type.compare( db::t_uint32 ) )
-        arrayset->setElementType( array::t_uint32 );
+        elem_type = array::t_uint32;
       else if( !str_element_type.compare( db::t_uint64 ) )
-        arrayset->setElementType( array::t_uint64 );
+        elem_type = array::t_uint64;
       else if( !str_element_type.compare( db::t_int8 ) )
-        arrayset->setElementType( array::t_int8 );
+        elem_type = array::t_int8;
       else if( !str_element_type.compare( db::t_int16 ) )
-        arrayset->setElementType( array::t_int16 );
+        elem_type = array::t_int16;
       else if( !str_element_type.compare( db::t_int32 ) )
-        arrayset->setElementType( array::t_int32 );
+        elem_type = array::t_int32;
       else if( !str_element_type.compare( db::t_int64 ) )
-        arrayset->setElementType( array::t_int64 );
+        elem_type = array::t_int64;
       else if( !str_element_type.compare( db::t_float32 ) )
-        arrayset->setElementType( array::t_float32 );
+        elem_type = array::t_float32;
       else if( !str_element_type.compare( db::t_float64 ) )
-        arrayset->setElementType( array::t_float64 );
-      else if( !str_element_type.compare( db::t_float128 ) )
-        arrayset->setElementType( array::t_float128 );
+        elem_type = array::t_float64;
       else if( !str_element_type.compare( db::t_complex64 ) )
-        arrayset->setElementType( array::t_complex64 );
+        elem_type = array::t_complex64;
       else if( !str_element_type.compare( db::t_complex128 ) )
-        arrayset->setElementType( array::t_complex128 );
-      else if( !str_element_type.compare( db::t_complex256 ) )
-        arrayset->setElementType( array::t_complex256 );
+        elem_type = array::t_complex128;
       else
-        arrayset->setElementType( array::t_unknown );
-      TDEBUG3("Elementtype: " << arrayset->getElementType());
+        elem_type = array::t_unknown;
+      TDEBUG3("Elementtype: " << elem_type);
       xmlFree(str);
 
       // Parse shape
@@ -444,7 +442,7 @@ namespace Torch {
       str = xmlGetProp(cur, (const xmlChar*)db::shape);
       if( str==0 ) {
         error << "Elementtype is not specified in arrayset (id: " << 
-          arrayset->getId() << ")." << std::endl;
+          id << ")." << std::endl;
         throw Exception();
       }
       // Tokenize the shape string to extract the dimensions
@@ -456,46 +454,37 @@ namespace Torch {
       {
         if(count>=array::N_MAX_DIMENSIONS_ARRAY) {
           error << "Shape is not valid in arrayset (id: " << 
-            arrayset->getId() << "). Maximum number of dimensions is " <<
+            id << "). Maximum number of dimensions is " <<
             array::N_MAX_DIMENSIONS_ARRAY << "." << std::endl;
           throw Exception();        
         }
         shape[count] = boost::lexical_cast<size_t>((*it).c_str());
       }
-      arrayset->setNDim(count);
-      arrayset->setShape(shape);
-      TDEBUG3("Nb dimensions: " << arrayset->getNDim());
-      TDEBUG3("Shape: (" << arrayset->getShape()[0] << "," << 
-        arrayset->getShape()[1] << ","<< arrayset->getShape()[2] << "," << 
-        arrayset->getShape()[3] << ")");
+      TDEBUG3("Nb dimensions: " << count);
+      TDEBUG3("Shape: (" << shape[0] << "," << shape[1] << ","<< 
+        shape[2] << "," << shape[3] << ")");
       xmlFree(str);
-      // Set the number of elements
-      size_t n_elem = arrayset->getShape()[0];
-      for( size_t i=1; i < arrayset->getNDim(); ++i)
-        n_elem *= arrayset->getShape()[i];
-      arrayset->setNElem(n_elem);
 
-      // Parse loader
-      str = xmlGetProp(cur, (const xmlChar*)db::loader);
-      std::string str_loader( str!=0 ? (const char*)str: "" );
-      if( !str_loader.compare( db::l_blitz ) )
-        arrayset->setLoader( l_blitz );
-      else if( !str_loader.compare( db::l_tensor ) )
-        arrayset->setLoader( l_tensor );
-      else if( !str_loader.compare( db::l_bindata ) )
-        arrayset->setLoader( l_bindata );
-      else 
-        arrayset->setLoader( l_unknown );
-      TDEBUG3("Loader: " << arrayset->getLoader());
+      // Parse codec
+      str = xmlGetProp(cur, (const xmlChar*)db::codec);
+      std::string str_codecname( str!=0 ? (const char*)str: "" );
+      TDEBUG3("Codec: " << str_codecname);
       xmlFree(str);
 
       // Parse filename
       str = xmlGetProp(cur, (const xmlChar*)db::file);
-      arrayset->setFilename( (str!=0?(const char*)str:"") );
-      TDEBUG3("File: " << arrayset->getFilename());
+      std::string str_filename( (str!=0?(const char*)str:"") );
+      TDEBUG3("File: " << str_filename);
       xmlFree(str);
 
-      if( !arrayset->getFilename().compare("") )
+      // Create the Arrayset
+      boost::shared_ptr<Arrayset> arrayset(new Arrayset(parent, id, 
+        str_filename, str_codecname));
+
+      // Set the shape
+      arrayset->setShape(shape);
+
+      if( !str_filename.compare("") )
       {
         // Parse the data
         xmlNodePtr cur_data = cur->xmlChildrenNode;
@@ -504,12 +493,12 @@ namespace Torch {
           // Process an array
           if ( !strcmp( (const char*)cur_data->name, db::array) || 
                !strcmp( (const char*)cur_data->name, db::external_array) ) {
-            arrayset->append( parseArray( *arrayset, cur_data) );
+            arrayset->append( parseArray( arrayset, cur_data) );
           }
           cur_data = cur_data->next;
         }
 
-        arrayset->setIsLoaded(true);
+        arrayset->m_is_loaded = true;
       }
 
       return arrayset;
@@ -517,35 +506,29 @@ namespace Torch {
 
 
     boost::shared_ptr<Array> XMLParser::parseArray(
-      const Arrayset& parent, const xmlNodePtr cur) 
+      boost::shared_ptr<const Arrayset> parent, const xmlNodePtr cur) 
     {
-      boost::shared_ptr<Array> array(new Array(parent));
       // Parse id
       xmlChar *str;
       str = xmlGetProp(cur, (const xmlChar*)db::id);
-      array->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-      TDEBUG3("  Array Id: " << array->getId());
+      size_t id = (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+      TDEBUG3("  Array Id: " << id);
       xmlFree(str);
 
-      // Parse loader
-      str = xmlGetProp(cur, (const xmlChar*)db::loader);
-      std::string str_loader( str!=0 ? (const char*)str: "" );
-      if( !str_loader.compare( db::l_blitz ) )
-        array->setLoader( l_blitz );
-      else if( !str_loader.compare( db::l_tensor ) )
-        array->setLoader( l_tensor );
-      else if( !str_loader.compare( db::l_bindata ) )
-        array->setLoader( l_bindata );
-      else 
-        array->setLoader( l_unknown );
-      TDEBUG3("  Array Loader: " << array->getLoader());
+      // Parse codec
+      str = xmlGetProp(cur, (const xmlChar*)db::codec);
+      std::string str_codec( str!=0 ? (const char*)str: "" );
+      TDEBUG3("  Array Codec: " << str_codec);
       xmlFree(str);
 
       // Parse filename
       str = xmlGetProp(cur, (const xmlChar*)db::file);
-      array->setFilename( (str!=0?(const char*)str:"") );
-      TDEBUG3("  Array File: " << array->getFilename());
+      std::string filename(str!=0?(const char*)str:"");
+      TDEBUG3("  Array File: " << filename);
       xmlFree(str);
+
+      // Create the array
+      boost::shared_ptr<Array> array(new Array(parent, id, filename, str_codec));
 
       // Parse the data contained in the XML file
       if( !array->getFilename().compare("") )
@@ -558,8 +541,8 @@ namespace Torch {
         xmlFree(content);
 
         // Switch over the possible type
-        size_t nb_values = parent.getNElem();
-        switch( parent.getElementType()) {
+        size_t nb_values = parent->getNElem();
+        switch( parent->getElementType()) {
           case array::t_bool:
             array->setStorage( parseArrayData<bool>( tok, nb_values ) );
             break;
@@ -593,9 +576,6 @@ namespace Torch {
           case array::t_float64:
             array->setStorage( parseArrayData<double>( tok, nb_values ) );
             break;
-          case array::t_float128:
-            array->setStorage( parseArrayData<long double>( tok, nb_values ) );
-            break;
           case array::t_complex64:
             array->setStorage( parseArrayData<std::complex<float> >( tok, 
               nb_values ) );
@@ -604,15 +584,12 @@ namespace Torch {
             array->setStorage( parseArrayData<std::complex<double> >( tok, 
               nb_values ) );
             break;
-          case array::t_complex256:
-            array->setStorage( parseArrayData<std::complex<long double> >( 
-              tok, nb_values ) );
             break;
           default:
             break;
         }
 
-        array->setIsLoaded(true);
+        array->setIsLoaded( true );
       }
       
       return array;

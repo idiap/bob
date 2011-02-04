@@ -53,12 +53,13 @@ namespace Torch {
         /**
          * @brief Return an XML node containing an Arrayset
          */
-        xmlNodePtr writeArrayset( xmlDocPtr doc, const Arrayset& a, 
+        xmlNodePtr writeArrayset( xmlDocPtr doc, 
+          boost::shared_ptr<const Arrayset> a, 
           bool content_inline, int precision=10, bool scientific=false);
         /**
          * @brief Return an XML node containing an Array
          */
-        xmlNodePtr writeArray( xmlDocPtr doc, const Array& a, 
+        xmlNodePtr writeArray( xmlDocPtr doc, boost::shared_ptr<const Array> a,
           bool content_inline, int precision=10, bool scientific=false);
         /**
          * @brief Write the (casted) data in the given stringstrean

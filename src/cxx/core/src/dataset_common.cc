@@ -24,7 +24,7 @@ namespace Torch {
       const char *role              = "role";
       const char *elementtype       = "elementtype";
       const char *shape             = "shape";
-      const char *loader            = "loader";
+      const char *codec             = "codec";
       const char *file              = "file";
       const char *array             = "array";
       const char *external_array    = "external-array";
@@ -56,11 +56,11 @@ namespace Torch {
       const char *t_complex128  = "complex128";
       const char *t_complex256  = "complex256";
 
-      // loader
-      const char *l_blitz       = "blitz";
-      const char *l_tensor      = "tensor";
-      const char *l_bindata     = "bindata";
-      const char *l_byextension = "byextension";
+      // codec
+      const char *c_blitz       = "blitz";
+      const char *c_tensor      = "tensor";
+      const char *c_bindata     = "bindata";
+      const char *c_byextension = "byextension";
     }
 
   }
