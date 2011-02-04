@@ -21,6 +21,7 @@ if __name__ == '__main__':
   
   new_environ = adm.environment.generate_environment(options)
   if options.verbose >= 2: #print changed items
+    print "Here are the environment *modifications*:"
     for key, value in new_environ.iteritems():
       if os.environ.has_key(key) and os.environ[key] != value:
         print "Key:", key
