@@ -103,16 +103,21 @@ def parse_args():
                     help="Prepends external paths containing library installations to the list of searched paths. Please note that this list is taken backwards. (defaults to %default)."
                     )
   parser.add_option("-v", "--verbose",
-                    action="store_true",
+                    action="count",
                     dest="verbose",
-                    default=False,
-                    help="Prints messages during execution."
+                    help="Prints messages during execution. Using this option multiple times increases the verbosity level"
                     )
   parser.add_option("-c", "--csh",
                     action="store_true",
                     dest="csh",
                     default=False,
                     help=optparse.SUPPRESS_HELP,
+                   )
+  parser.add_option("-m", "--environment-manipulation",
+                    action="store_true",
+                    dest="env_manipulation",
+                    default=False,
+                    help="Makes this program change your executable behavior to be more torch friendly, if it can"
                    )
 
   options, arguments = parser.parse_args()
@@ -140,7 +145,7 @@ def version(dir, verbose):
     if lines: retval = lines[0].strip()
     f.close()
   else:
-    if verbose: print "Version file '%s' does not exist" % version_file
+    if verbose >= 3: print "Version file '%s' does not exist" % version_file
   return retval
 
 def self_root():
@@ -170,6 +175,9 @@ class PathManipulator(object):
   def __init__(self, d):
     self.dictionary = d
 
+  def set(self, key, value):
+    self.dictionary[key] = value
+
   def prepend_one(self, key, value):
     if value in self.dictionary[key]:
       del self.dictionary[key][self.dictionary[key].index(value)]
@@ -184,7 +192,7 @@ class PathManipulator(object):
     if not self.dictionary.has_key(key): self.dictionary[key] = []
     elif not isinstance(self.dictionary[key], list): 
       #break-up and remove empty
-      self.dictionary[key] = [v for v in self.dictionary[key].split(':') if v]
+      self.dictionary[key] = [v for v in self.dictionary[key].split(os.pathsep) if v]
     for value in args: self.prepend_one(key, value)
 
   def after(self, key, *args):
@@ -195,7 +203,7 @@ class PathManipulator(object):
     """Returns a copy of the environment dict where all entries are strings."""
     retval = dict(self.dictionary)
     for key, value in retval.iteritems():
-      if isinstance(value, list): retval[key] = ':'.join(value)
+      if isinstance(value, list): retval[key] = os.pathsep.join(value)
     return retval
 
 def setup_external_dir(environment, directory, arch, verbose):
@@ -203,7 +211,7 @@ def setup_external_dir(environment, directory, arch, verbose):
   "directory"."""
 
   if not os.path.exists(directory):
-    if verbose: print "External '%s' ignored -- not accessible!"
+    if verbose >= 3: print "External '%s' ignored -- not accessible!"
     return
 
   J = PathJoiner(directory)
@@ -251,15 +259,17 @@ def generate_environment(options):
   for k in options.externals:
     setup_external_dir(envdict, k, options.arch, options.verbose)
 
-  J = PathJoiner(self_root()) #root_dir
+  root = self_root()
+
+  J = PathJoiner(root) #root_dir
   JIA = PathJoiner(J('install', options.arch)) #install_dir
   P = PathManipulator(envdict)
 
   pyver = python_version(P.consolidate())
   if pyver:
-    if options.verbose: print "Python version detected: %s" % pyver
+    if options.verbose >= 3: print "Python version detected: %s" % pyver
   else:
-    if options.verbose: print "No python interpreter detected - using current"
+    if options.verbose >= 3: print "No python interpreter detected - using current"
     pyver = 'python%d.%d' % sys.version_info[0:2]
 
   P.before('PATH', J('bin'), JIA('bin'))
@@ -270,4 +280,25 @@ def generate_environment(options):
   P.before('CMAKE_PREFIX_PATH', JIA('share', 'cmake'))
   P.before('TORCH_SCHEMA_PATH', JIA('share', 'torch', 'schema'))
 
+  #this will place a few TORCH_ variables into the game, so the user can make
+  #adjust its shell behavior accordinly, if he/she ever wants it.
+
+  P.set('TORCH_INSTALL_DIR', root)
+  P.set('TORCH_VERSION', version(root, False))
+  P.set('TORCH_PLATFORM', options.arch)
+
   return P.consolidate()
+
+def set_prompt(arguments, environ):
+  """Adjusts the user prompt depending on the executable of choice. This will
+  also depend on if we can make a better setting of the user environment or
+  not."""
+  executable = os.path.basename(arguments[0])
+  J = PathJoiner(environ['TORCH_INSTALL_DIR'])
+  JIA = PathJoiner(J('install', environ['TORCH_PLATFORM'])) #install_dir
+
+  #this should be a gigantic switch covering all cases we know about:
+  if executable in ('bash',):
+    rcfile = J('bin', 'rcfiles', 'bash')
+    arguments.extend(('--rcfile', rcfile))
+    return
