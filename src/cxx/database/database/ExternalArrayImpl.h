@@ -54,6 +54,13 @@ namespace Torch { namespace database { namespace detail {
       /**
        * Saves data in the file
        */
+      inline void save(const InlinedArrayImpl& data) {
+        m_codec->save(m_filename, data);
+      }
+
+      /**
+       * Saves data in the file
+       */
       template<typename T, int D> void save(const blitz::Array<T,D>& data) {
         m_codec->save(m_filename, InlinedArrayImpl(data));
       }
@@ -62,6 +69,9 @@ namespace Torch { namespace database { namespace detail {
        * Returns the specifications of the array contained in the file. This
        * operation is delegated to the codec that may open the file and read
        * values from the file to return you sensible data.
+       *
+       * TODO: We could easily optimize this call by caching the element type
+       * and number of dimensions after first reading them.
        */
       void getSpecification(Torch::core::array::ElementType& eltype,
           size_t& ndim) const;

@@ -14,6 +14,7 @@
 #include <boost/weak_ptr.hpp>
 #include <blitz/array.h>
 
+#include "database/ArrayCodec.h"
 #include "database/InlinedArrayImpl.h"
 #include "database/ExternalArrayImpl.h"
 
@@ -26,34 +27,35 @@ namespace Torch {
   namespace database {
 
     //I promise this exists:
-    class Arrayset;
+    //class Arrayset;
 
     /**
-     * The array class for a dataset
+     * The array class for a dataset. The Array class acts like a manager for
+     * the underlying data (blitz::Array<> in memory or serialized in file). It
+     * keeps tight its relationship with its parent Arrayset object, if one was
+     * assigned.
      */
     class Array {
 
       public:
 
         /**
-         * This initializes a new Array with a default id that serves as a
-         * placeholder. As soon as this array is adopted by some Arrayset, the
-         * id will be correctly set to the next available id in that set
+         * Starts a new array with in-memory content. We don't ever copy the
+         * data, just refer to it. If you want me to have a private copy, just
+         * copy the data before-hand.
          */
-        Array();
+        template<typename T, int D> Array(blitz::Array<T,D>& data);
 
         /**
          * Builds an Array that contains data from a file. You can optionally
-         * specify the name of a codec and the array id.
+         * specify the name of a codec.
          */
-        Array(const std::string& filename="", const std::string& codec="");
+        Array(const std::string& filename, const std::string& codec="");
 
         /**
-         * Copies the Array data from another array. If any blitz::Array<>
-         * is allocated internally, its data will be <b>copied</b> by this new 
-         * array as well. If a parent was already set, the id property of this
-         * copy will be reset according to the availability of ids in the
-         * parent.
+         * Refers to the Array data from another array. If a parent was already
+         * set, the id property of this copy will be reset according to the
+         * availability of ids in the parent.
          */
         Array(const Array& other);
 
@@ -65,36 +67,60 @@ namespace Torch {
         virtual ~Array();
 
         /**
-         * Copies the data from another array. If any blitz::Array<> is
-         * allocated internally, its data will be <b>copied</b> by this array as
-         * well. If a parent was already set, the id property of this copy will
-         * be reset according to the availability of ids in the parent.
+         * Copies the data from another array. If a parent was already set, the
+         * id property of this copy will be reset according to the availability
+         * of ids in the parent.
          */
         Array& operator= (const Array& other);
 
         /**
-         * Set the filename containing the data. An empty string
-         * indicates that the data are stored inlined at the database. If codec
-         * is empty it means "figure it out by using the filename extension".
-         *
-         * The codec will be looked up and the file poked for the element type
-         * and the number of dimensions that it can provide.
+         * Saves this array in the given path using the codec indicated (or by
+         * looking at the file extension if that is empty). If the array was
+         * already in a file it is moved/re-encoded as need to fulfill this
+         * request. If the array was in memory, it is serialized, from the data
+         * I have in memory and subsequently erased. If the filename specifies
+         * an existing file, this file is overwritten.
          */
-        void setFilename(const std::string& filename, 
-            const std::string& codecname="");
+        void save(const std::string& filename, const std::string& codecname="");
+
+        /**
+         * Loads the blitz::Array<> data into memory and gets you a
+         * <b>reference</b> to it. If you specify a type that is different than
+         * the currently set element type, the array will be cast. If you
+         * specify the wrong number of dimensions, it will raise an exception.
+         *
+         * If the array is already in memory, we return a reference to it. If
+         * it is in a file, we load it and return a reference to the loaded
+         * data.
+         */
+        template <typename T, int D> blitz::Array<T,D> load();
+
+        /**
+         * Sets the current data to the given array
+         */
+        template<typename T, int D> void set(blitz::Array<T,D>& data);
+
+        /**
+         * Returns the current number of dimensions set by this array.
+         */
+        size_t getNDim() const;
+
+        /**
+         * Returns the type of element of this array.
+         */
+        Torch::core::array::ElementType getElementType() const; 
 
         /**
          * Get the filename containing the data if any. An empty string
          * indicates that the data is stored inlined.
          */
-        inline const std::string& getFilename() const { return m_filename; }
+        const std::string& getFilename() const;
 
         /**
-         * TODO:
          * Get the codec used to read the data from the external file 
-         * if any. This will be non-empty if the filename is non-empty.
+         * if any. This will be non-empty only if the filename is non-empty.
          */
-        //inline boost::shared_ptr<Codec> getCodec() const { return m_codec; }
+        boost::shared_ptr<const ArrayCodec> getCodec() const; 
 
         /**
          * Gets the id of the Array
@@ -102,10 +128,17 @@ namespace Torch {
         inline size_t getId() const { return m_id; }
 
         /**
-         * Get the flag indicating if the array is loaded from an 
-         * external file.
+         * Sets the id for this Array. If this array has a parent Arrayset, we
+         * do check the identity is not taken already. If so, an exception is
+         * raised. You can get automatic id's that are guaranteed to be free by
+         * setting the special value '0' (zero).
          */
-        inline bool isLoaded() const { return m_is_loaded; }
+        void setId(size_t id);
+
+        /**
+         * Get the flag indicating if the array is loaded in memory
+         */
+        inline bool isLoaded() const { return m_inlined; }
 
         /**
          * Sets the parent arrayset of this array. If my parent is already set,
@@ -118,32 +151,50 @@ namespace Torch {
          * case, I'll raise an exception. If you don't set the id property in
          * this call, I'll ask the parent to assign me a proper available id.
          */
+        /**
         void setParent (boost::shared_ptr<Arrayset> parent, size_t id=0);
+        */
 
         /**
          * Gets the parent arrayset of this array
          */
+        /**
         inline boost::shared_ptr<const Arrayset> getParent() const 
         { return m_parent_arrayset.lock(); }
+        */
         
-        inline boost::shared_ptr<Arrayset> getParent()
-        { return m_parent_arrayset.lock(); }
-
-        /**
-         * Returns some information about this array
-         */
-        inline size_t getNDim() const { return m_ndim; }
-        inline Torch::core::array::ElementType getElementType() const 
-        { return m_elementtype; }
-
       private: //representation
-        boost::weak_ptr<Arrayset> m_parent_arrayset; ///< My current parent
+        //boost::weak_ptr<Arrayset> m_parent_arrayset; ///< My current parent
+        boost::shared_ptr<detail::InlinedArrayImpl> m_inlined;
+        boost::shared_ptr<detail::ExternalArrayImpl> m_external;
         size_t m_id; ///< This is my id
     };
+
+    template<typename T, int D> Array::Array(blitz::Array<T,D>& data) 
+      : m_inlined(new detail::InlinedArrayImpl(data)),
+        m_id(0)
+    {
+    }
+
+    template <typename T, int D> blitz::Array<T,D> Array::load() {
+      if (D != getNDim()) throw DimensionError();
+      if (!m_inlined) return m_external->load<T,D>();
+      return m_inlined->castCopy<T,D>(); 
+    }
+
+    template<typename T, int D> void Array::set(blitz::Array<T,D>& data) {
+      /**
+      if (m_parent_arrayset) {
+        if (D != m_parent_arrayset->getNDim()) throw DimensionError();
+        if (Torch::core::array::getElementType<T>() != m_parent_arrayset->getElementType()) throw TypeError();
+      }
+      **/
+      if (m_external) m_external.reset();
+      m_inlined.reset(new detail::InlinedArrayImpl(data));
+    }
 
   } //closes namespace database
 
 } //closes namespace Torch
 
 #endif /* TORCH_DATABASE_ARRAY_H */
-

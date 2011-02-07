@@ -18,17 +18,17 @@ set(src
     "src/ArrayCodec.cc"
     "src/ArrayCodecRegistry.cc"
     "src/ExternalArrayImpl.cc"
-    #"src/Array.cc"
+    "src/Array.cc"
+    #"src/Arrayset.cc"
     #"src/Dataset.cc"
-    #"src/XMLParser.cc"
-    #"src/XMLWriter.cc"
     #"src/Relationset.cc"
     #"src/Rule.cc"
     #"src/Member.cc"
     #"src/Relation.cc"
-    #"src/Arrayset.cc"
     #"src/BinFileHeader.cc"
     #"src/BinFile.cc"
+    #"src/XMLParser.cc"
+    #"src/XMLWriter.cc"
     )
 
 include(../../cmake/macros.cmake)

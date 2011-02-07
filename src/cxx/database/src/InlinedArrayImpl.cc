@@ -52,7 +52,7 @@ template<typename T, int D> static inline void* getBzArray(void* bzarray) {
   return reinterpret_cast<void*>(new blitz::Array<T,D>(*castBzArray<T,D>(bzarray)));
 }
 
-tdd::InlinedArrayImpl::InlinedArrayImpl (tdd::InlinedArrayImpl& other) {
+tdd::InlinedArrayImpl::InlinedArrayImpl (const tdd::InlinedArrayImpl& other) {
   *this = other; 
 }
 
@@ -63,7 +63,7 @@ tdd::InlinedArrayImpl::InlinedArrayImpl (tdd::InlinedArrayImpl& other) {
   case 3: m_bzarray = getBzArray<T,3>(other.m_bzarray); \
   case 4: m_bzarray = getBzArray<T,4>(other.m_bzarray); }
 
-tdd::InlinedArrayImpl& tdd::InlinedArrayImpl::operator= (tdd::InlinedArrayImpl& other) {
+tdd::InlinedArrayImpl& tdd::InlinedArrayImpl::operator= (const tdd::InlinedArrayImpl& other) {
   m_elementtype = other.m_elementtype;
   m_ndim = other.m_ndim;
   switch(m_elementtype) {

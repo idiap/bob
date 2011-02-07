@@ -29,7 +29,7 @@ namespace Torch { namespace database { namespace detail {
       /**
        * Copy construct by getting an extra reference to somebodies' array.
        */
-      InlinedArrayImpl(InlinedArrayImpl& other);
+      InlinedArrayImpl(const InlinedArrayImpl& other);
 
       /**
        * Destroyes me
@@ -40,7 +40,7 @@ namespace Torch { namespace database { namespace detail {
        * Copies the content of the other array and gets a reference to the
        * other array's data.
        */
-      InlinedArrayImpl& operator= (InlinedArrayImpl& other);
+      InlinedArrayImpl& operator= (const InlinedArrayImpl& other);
 
       /**
        * This method will set my internal data to the value you specify. We
