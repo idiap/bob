@@ -73,18 +73,6 @@ namespace Torch {
         Array& operator= (const Array& other);
 
         /**
-         * Is the current array empty?
-         */
-        inline bool isEmpty() const { return m_bzarray; }
-
-        /**
-         * Make the current array empty, not pointing or containing any data.
-         * Please note that the parent and id settings remain unchanged, if
-         * they were already set.
-         */
-        void clear();
-
-        /**
          * Set the filename containing the data. An empty string
          * indicates that the data are stored inlined at the database. If codec
          * is empty it means "figure it out by using the filename extension".
