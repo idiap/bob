@@ -36,6 +36,32 @@ namespace Torch {
        */
       const size_t N_MAX_DIMENSIONS_ARRAY = 4;
 
+      /**
+       * These are some type to element type conversions
+       */
+      template<typename T> getElementType() {
+        return t_unknown;
+      }
+
+      /**
+       * Some specializations we can manage
+       */
+      inline template<> getElementType<bool>() { return t_bool; }
+      inline template<> getElementType<int8_t>() { return t_int8; }
+      inline template<> getElementType<int16_t>() { return t_int16; }
+      inline template<> getElementType<int32_t>() { return t_int32; }
+      inline template<> getElementType<int64_t>() { return t_int64; }
+      inline template<> getElementType<uint8_t>() { return t_uint8; }
+      inline template<> getElementType<uint16_t>() { return t_uint16; }
+      inline template<> getElementType<uint32_t>() { return t_uint32; }
+      inline template<> getElementType<uint64_t>() { return t_uint64; }
+      inline template<> getElementType<float>() { return t_float32; }
+      inline template<> getElementType<double>() { return t_float64; }
+      inline template<> getElementType<long double>() { return t_float128; }
+      inline template<> getElementType<std::complex<float> >() { return t_complex64; }
+      inline template<> getElementType<std::complex<double> >() { return t_complex128; }
+      inline template<> getElementType<std::complex<long double> >() { return t_complex256; }
+
     }
 
   }
@@ -45,4 +71,3 @@ namespace Torch {
 }
 
 #endif /* TORCH_CORE_COMMON_ARRAY_H */
-

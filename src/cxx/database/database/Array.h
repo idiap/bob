@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 #include "core/array_common.h"
+#include "core/dataset_common.h"
 
 namespace Torch {   
   /**
@@ -39,34 +40,37 @@ namespace Torch {
         /**
          * This initializes a new and a default id that serves as a
          * placeholder. As soon as this array is adopted by some Arrayset, the
-         * id will be correctly set to the next available id in that set. You
-         * can also specify the id in this constructor.
+         * id will be correctly set to the next available id in that set
          */
-        Array(size_t id=0);
+        Array();
 
         /**
          * Builds an Array that contains data from a file. You can optionally
          * specify the name of a codec and the array id.
          */
-        Array(const std::string& filename="", const std::string& codec="",
-            size_it id=0);
+        Array(const std::string& filename="", const std::string& codec="");
 
         /**
          * Copies the Array data from another array. If any blitz::Array<>
-         * is allocated internally, its data will not be copied, but just
-         * referred by the blitz::Array in this new Array object. 
+         * is allocated internally, its data will be <b>copied</b> by this new 
+         * array as well. If a parent was already set, the id property of this
+         * copy will be reset according to the availability of ids in the
+         * parent.
          */
         Array(const Array& other);
 
         /**
-         * Destructor virtualization
+         * Destroys this array. If this array had a parent, this array is
+         * firstly unregistered from the parent and then destroyed together
+         * with its data.
          */
         virtual ~Array();
 
         /**
          * Copies the data from another array. If any blitz::Array<> is
-         * allocated internally, its data will not be copied, but just referred
-         * by the blitz::Array in this new Array object.
+         * allocated internally, its data will be <b>copied</b> by this array as
+         * well. If a parent was already set, the id property of this copy will
+         * be reset according to the availability of ids in the parent.
          */
         Array& operator= (const Array& other);
 
@@ -77,16 +81,20 @@ namespace Torch {
 
         /**
          * Make the current array empty, not pointing or containing any data.
-         * Please note that the parent and id settings remain unchanged.
+         * Please note that the parent and id settings remain unchanged, if
+         * they were already set.
          */
         void clear();
 
         /**
-         * Set the filename containing the data if any. An empty string
+         * Set the filename containing the data. An empty string
          * indicates that the data are stored inlined at the database. If codec
-         * is empty it means "figure it out by using the filename extension"
+         * is empty it means "figure it out by using the filename extension".
+         *
+         * The codec will be looked up and the file poked for the element type
+         * and the number of dimensions that it can provide.
          */
-        void setFilename(const std::string& filename,
+        void setFilename(const std::string& filename, 
             const std::string& codecname="");
 
         /**
@@ -96,15 +104,11 @@ namespace Torch {
         inline const std::string& getFilename() const { return m_filename; }
 
         /**
+         * TODO:
          * Get the codec used to read the data from the external file 
          * if any. This will be non-empty if the filename is non-empty.
          */
         //inline boost::shared_ptr<Codec> getCodec() const { return m_codec; }
-
-        /**
-         * Sets the id of the Array
-         */
-        inline void setId(size_t id) const { m_id = id; }
 
         /**
          * Gets the id of the Array
@@ -118,10 +122,17 @@ namespace Torch {
         inline bool isLoaded() const { return m_is_loaded; }
 
         /**
-         * Sets the parent arrayset of this array
+         * Sets the parent arrayset of this array. If my parent is already set,
+         * I'll detach myself from my old parent and insert myself onto the new
+         * parent, checking initialized type information if any was already
+         * set. Incompatibilities will be flagged by exceptions.
+         *
+         * The optional parameter 'id' will set my id property, but first I'll
+         * check if that id is unblocked in the parent. If that is not the
+         * case, I'll raise an exception. If you don't set the id property in
+         * this call, I'll ask the parent to assign me a proper available id.
          */
-        inline void setParent (boost::shared_ptr<Arrayset> parent)
-        { m_parent(parent); }
+        void setParent (boost::shared_ptr<Arrayset> parent, size_t id=0);
 
         /**
          * Gets the parent arrayset of this array
@@ -140,60 +151,64 @@ namespace Torch {
         { return m_elementtype; }
 
         /**
-         * Adapts the size of each dimension of the passed blitz array
-         * to the ones of the underlying array and copy the data in it.
+         * This method returns a constant reference to my internal blitz array.
+         * It is the fastest way to get access to my data because it involves
+         * no data copying. The only downside is that you need to know the
+         * correct type and number of dimensions or I'll throw an exception.
          */
-        template<typename T, int D> blitz::Array<T,D> data() const;
+        template<typename T, int D> const blitz::Array<T,D>& getData() const;
 
         /**
-         * Adapts the size of each dimension of the passed blitz array
-         * to the ones of the underlying array and refer to the data in it.
-         * @warning Updating the content of the blitz array will update the
-         * content of the corresponding array in the dataset.
+         * This method returns a constant reference to my internal data (not a
+         * copy) in the type you wish. It is the easiest method to use because
+         * I'll never throw, no matter which type you want to receive data at.
+         * Only get the number of dimensions right!
          */
-        template<typename T, int D> blitz::Array<T,D> data();
+        template<typename T, int D> const blitz::Array<T,D> castData() const;
+
+        /**
+         * This method will set my internal data to the value you specify.
+         * Please note you can only set to a type and number of dimensions that
+         * is coherent with my current settings or my parent's settings. If you
+         * wish to create a new type with different number of dimensions or
+         * element type, you have to create a new array and possibly associated
+         * with a new parent.
+         *
+         * If you are setting me for the first time, you can choose the type
+         * and number of dimensions that pleases you. 
+         */
+        template<typename T, int D> void setData(blitz::Array<T,D>& data);
 
       private: //some utilities to deal with transparency with the bz arrays.
 
         /**
-         * Returns a reference to the currently pointed blitz::Array<>, 
-         * transparently. This method should only be used by myself.
+         * Loads the array data from a file into memory.
          */
-        void* getBlitzArray() const;
+        void loadBlitzArray();
 
         /**
-         * Clones the blitz::Array in bzarray transparently. This method should
-         * only be used by myself.
+         * Returns a new reference to the currently pointed blitz::Array<>, 
+         * transparently. The caller becomes responsible for the returned
+         * pointer. This method should only be used by myself and is
+         * implemented *just* for my own internal management.
+         */
+        void* getBlitzArray();
+
+        /**
+         * Clones the blitz::Array in bzarray transparently. The caller becomes
+         * responsible fo the returned pointer. This method should only be used
+         * by myself and is implemented *just* for my own internal managament.
          */
         void* cloneBlitzArray() const;
 
         /**
-         * Delete the underlying blitz::Array.
+         * Delete the underlying blitz::Array. This method should only be used
+         * by myself and is implemented *just* for my own internal management.
          */
-        void deleteBlitzArray() const;
-
-        /**
-         * Returns a version of the underlying array cast into the type desired
-         * by the user. Please note that the number of dimensions (i.e. the
-         * array rank) must match or an exception will be thrown.
-         */
-        blitz::Array<T,D> getBlitzArrayWithCast() const;
-
-      private:
-        /**
-         * Copies the data from the Array object into the given C-style
-         * array, and cast if required.
-         */
-        template <typename T, typename U> void copyCast( U* out) const;
-
-        /**
-         * Checks that the number of dimensions match in order to be
-         * able to refer to the data.
-         */
-        template <int D> void referCheck() const;
+        void deleteBlitzArray();
 
       private: //representation
-        boost::weak_ptr<Arrayset> m_parent_arrayset; ///< My current
+        boost::weak_ptr<Arrayset> m_parent_arrayset; ///< My current parent
         size_t m_id; ///< This is my id
         bool m_is_loaded; ///< Am I already loaded?
         std::string m_filename; ///< If I'm stored in a file, put it here
@@ -202,6 +217,60 @@ namespace Torch {
         size_t m_ndim; ///< The number of dimensions the blitz::Array has
         void* m_bzarray; ///< A void* to a blitz::Array instantiated here.
     };
+
+    template<typename T, int D>
+    const blitz::Array<T,D>& Array::getData() const {
+      if (!m_bzarray) throw NotInitialized();
+      if (D != m_ndim) throw DimensionError();
+      if (Torch::core::array::getElementType<T>() != m_elementtype)
+        throw TypeError();
+      //at this point we know both T and D are correct and that we have an
+      //internal blitz::Array<> set.
+      return *static_cast<const blitz::Array<T,D> >(m_bzarray);
+    }
+
+    template<typename T, int D> const blitz::Array<T,D> Array::castData() const {
+      if (!m_bzarray) throw NotInitialized();
+      if (D != getNDim()) throw DimensionError();
+      //at this point we know D is correct and that we have an
+      //internal blitz::Array<> set.
+      //TODO: Ask LES how to use blitz::complex_cast<>() in this situation...
+      switch (m_elementtype) {
+        case Torch::core::array::t_bool: 
+          return blitz::cast<T>(*static_cast<blitz::Array<bool,D>(m_bzarray));
+        case Torch::core::array::t_int8: 
+          return blitz::cast<T>(*static_cast<blitz::Array<int8_t,D>(m_bzarray));
+        case Torch::core::array::t_int16: 
+          return blitz::cast<T>(*static_cast<blitz::Array<int16_t,D>(m_bzarray));
+        case Torch::core::array::t_int32: 
+          return blitz::cast<T>(*static_cast<blitz::Array<int32_t,D>(m_bzarray));
+        case Torch::core::array::t_int64: 
+          return blitz::cast<T>(*static_cast<blitz::Array<int64_t,D>(m_bzarray));
+        case Torch::core::array::t_uint8: 
+          return blitz::cast<T>(*static_cast<blitz::Array<uint8_t,D>(m_bzarray));
+        case Torch::core::array::t_uint16: 
+          return blitz::cast<T>(*static_cast<blitz::Array<uint16_t,D>(m_bzarray));
+        case Torch::core::array::t_uint32: 
+          return blitz::cast<T>(*static_cast<blitz::Array<uint32_t,D>(m_bzarray));
+        case Torch::core::array::t_uint64: 
+          return blitz::cast<T>(*static_cast<blitz::Array<uint64_t,D>(m_bzarray));
+        case Torch::core::array::t_float32: 
+          return blitz::cast<T>(*static_cast<blitz::Array<float,D>(m_bzarray));
+        case Torch::core::array::t_float64: 
+          return blitz::cast<T>(*static_cast<blitz::Array<double,D>(m_bzarray));
+        case Torch::core::array::t_float128: 
+          return blitz::cast<T>(*static_cast<blitz::Array<long double,D>(m_bzarray));
+        case Torch::core::array::t_complex64: 
+          return blitz::cast<T>(*static_cast<blitz::Array<std::complex<float>,D>(m_bzarray));
+        case Torch::core::array::t_complex128: 
+          return blitz::cast<T>(*static_cast<blitz::Array<std::complex<double>,D>(m_bzarray));
+        case Torch::core::array::t_complex256: 
+          return blitz::cast<T>(*static_cast<blitz::Array<std::complex<long double>,D>(m_bzarray));
+      }
+
+      //if we get to this point, there is nothing much we can do...
+      throw TypeError();
+    }
 
   } //closes namespace database
 

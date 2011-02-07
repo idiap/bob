@@ -65,9 +65,10 @@ namespace Torch {
     extern const char *t_complex256;
 
     class IndexError: public Torch::core::Exception { };
-    class NDimensionError: public Torch::core::Exception { };
+    class DimensionError: public Torch::core::Exception { };
     class TypeError: public Torch::core::Exception { };
     class NonExistingElement: public Torch::core::Exception { };
+    class NotInitialized: public Torch::core::Exception { };
 
   }
 /**
