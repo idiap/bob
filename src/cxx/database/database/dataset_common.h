@@ -68,7 +68,6 @@ namespace Torch {
     class DimensionError: public Torch::core::Exception { };
     class TypeError: public Torch::core::Exception { };
     class NonExistingElement: public Torch::core::Exception { };
-    class NotInitialized: public Torch::core::Exception { };
 
   }
 /**
@@ -77,4 +76,3 @@ namespace Torch {
 }
 
 #endif /* TORCH_DATABASE_DATASET_COMMON_H */
-

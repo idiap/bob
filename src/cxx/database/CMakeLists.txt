@@ -14,7 +14,11 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 # This defines the list of source files inside this package.
 set(src
     "src/dataset_common.cc"
-    "src/Array.cc"
+    "src/InlinedArrayImpl.cc"
+    "src/ArrayCodec.cc"
+    "src/ArrayCodecRegistry.cc"
+    "src/ExternalArrayImpl.cc"
+    #"src/Array.cc"
     #"src/Dataset.cc"
     #"src/XMLParser.cc"
     #"src/XMLWriter.cc"
@@ -32,7 +36,7 @@ torch_library(database "${src}" "${deps}" "${shared}")
 torch_header_install(database "torch::database")
 
 # Defines tests for this package
-torch_test(database binary_file test/binary_file.cc)
+#torch_test(database binary_file test/binary_file.cc)
 
 # This is where we install the XML schema definition
 set(schemadir share/torch/schema)
