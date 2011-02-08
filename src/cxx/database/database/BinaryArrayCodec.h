@@ -17,7 +17,7 @@ namespace Torch { namespace database {
    * BinaryArrayCodecs can read and write single arrays into a Torch-compatible
    * binary file.
    */
-  class BinaryArrayCodec {
+  class BinaryArrayCodec : public ArrayCodec {
 
     public:
 
@@ -30,7 +30,8 @@ namespace Torch { namespace database {
        * array.
        */
       virtual void peek(const std::string& filename, 
-          Torch::core::array::ElementType& eltype, size_t& ndim) const;
+          Torch::core::array::ElementType& eltype, size_t& ndim,
+          size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const;
 
       /**
        * Returns the stored array in a InlinedArrayImpl
@@ -46,7 +47,7 @@ namespace Torch { namespace database {
       /**
        * Returns the name of this codec
        */
-      virtual const std::string& name () const;
+      virtual inline const std::string& name () const { return m_name; }
 
       /**
        * Returns a list of known extensions this codec can handle. The
@@ -55,7 +56,7 @@ namespace Torch { namespace database {
        * matters, so ".jpeg" and ".JPEG" are different extensions. If are the
        * responsible to cover all possible variations an extension can have.
        */
-      virtual const std::vector<std::string>& extensions () const;
+      virtual inline const std::vector<std::string>& extensions () const { return m_extensions; }
 
     private: //representation
 

@@ -68,6 +68,7 @@ namespace Torch {
     class DimensionError: public Torch::core::Exception { };
     class TypeError: public Torch::core::Exception { };
     class NonExistingElement: public Torch::core::Exception { };
+    class Uninitialized: public Torch::core::Exception { };
 
   }
 /**

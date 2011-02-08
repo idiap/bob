@@ -84,16 +84,21 @@ namespace Torch {
         void save(const std::string& filename, const std::string& codecname="");
 
         /**
-         * Loads the blitz::Array<> data into memory and gets you a
-         * <b>reference</b> to it. If you specify a type that is different than
-         * the currently set element type, the array will be cast. If you
-         * specify the wrong number of dimensions, it will raise an exception.
-         *
+         * If the array is in-memory, returns a reference to it. If it is in a
+         * file, the file data is read and I become an inlined array. The
+         * underlying file containing the data is <b>not</b> erased, we just
+         * unlink it from this Array. If you want to read the array data from
+         * the file without switching the internal representation of this array
+         * (from external to inlined), use the get() method.
+         */
+        template <typename T, int D> blitz::Array<T,D> load();
+
+        /**
          * If the array is already in memory, we return a reference to it. If
          * it is in a file, we load it and return a reference to the loaded
          * data.
          */
-        template <typename T, int D> blitz::Array<T,D> load();
+        template <typename T, int D> blitz::Array<T,D> get();
 
         /**
          * Sets the current data to the given array
@@ -109,6 +114,11 @@ namespace Torch {
          * Returns the type of element of this array.
          */
         Torch::core::array::ElementType getElementType() const; 
+
+        /**
+         * Returns the shape of the current array.
+         */
+        const size_t* getShape() const; 
 
         /**
          * Get the filename containing the data if any. An empty string
@@ -168,6 +178,7 @@ namespace Torch {
         boost::shared_ptr<detail::InlinedArrayImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArrayImpl> m_external;
         size_t m_id; ///< This is my id
+        size_t m_tmp_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< temporary variable used to return the shape of external arrays.
     };
 
     template<typename T, int D> Array::Array(blitz::Array<T,D>& data) 
@@ -177,6 +188,15 @@ namespace Torch {
     }
 
     template <typename T, int D> blitz::Array<T,D> Array::load() {
+      if (D != getNDim()) throw DimensionError();
+      if (!m_inlined) {
+        m_inlined.reset(new detail::InlinedArrayImpl(m_external->load()));
+        m_external.reset();
+      }
+      return m_inlined->castCopy<T,D>(); 
+    }
+
+    template <typename T, int D> blitz::Array<T,D> Array::get() {
       if (D != getNDim()) throw DimensionError();
       if (!m_inlined) return m_external->load<T,D>();
       return m_inlined->castCopy<T,D>(); 

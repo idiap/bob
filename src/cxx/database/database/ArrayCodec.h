@@ -34,7 +34,8 @@ namespace Torch { namespace database {
        * array.
        */
       virtual void peek(const std::string& filename, 
-          Torch::core::array::ElementType& eltype, size_t& ndim) const =0;
+          Torch::core::array::ElementType& eltype, size_t& ndim,
+          size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const =0;
 
       /**
        * Returns the stored array in a InlinedArrayImpl

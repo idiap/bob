@@ -36,6 +36,7 @@ set(src
     "src/ListDataSet.cc"
     "src/Exception.cc"
     "src/logging.cc"
+    "src/array_common.cc"
     )
 
 include(../../cmake/macros.cmake)

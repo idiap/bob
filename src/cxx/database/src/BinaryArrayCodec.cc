@@ -7,8 +7,16 @@
 
 #include "database/BinaryArrayCodec.h"
 #include "database/BinFile.h"
+#include "database/ArrayCodecRegistry.h"
 
 namespace db = Torch::database;
+
+//Takes care of the codec registration.
+static bool register_codec() {
+  db::ArrayCodecRegistry::addCodec(new db::BinaryArrayCodec()); 
+}
+
+static bool codec_registered = register_codec(); 
 
 db::BinaryArrayCodec::BinaryArrayCodec()
   : m_name("torch.array.binary"),
@@ -20,10 +28,12 @@ db::BinaryArrayCodec::BinaryArrayCodec()
 db::BinaryArrayCodec::~BinaryArrayCodec() { }
 
 void db::BinaryArrayCodec::peek(const std::string& filename, 
-    Torch::core::array::ElementType& eltype, size_t& ndim) const {
+    Torch::core::array::ElementType& eltype, size_t& ndim
+    size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const {
   db::BinFile f(filename, db::BinFile::in);
   eltype = f.getElementType();
   ndim = f.getNDimensions();
+  for (size_t i=0; i<ndim; ++i) shape[i] = f.getShape()[i]; 
 }
 
 db::detail::InlinedArrayImpl 
@@ -35,15 +45,6 @@ db::BinaryArrayCodec::load(const std::string& filename) const {
 
 void db::BinaryArrayCodec::save (const std::string& filename, 
     const db::detail::InlinedArrayImpl& data) const {
+  db::BinFile f(filename, db::BinFile::out);
+  f.write(data);
 }
-
-const std::string& dbname () const;
-
-/**
- * Returns a list of known extensions this codec can handle. The
- * extensions include the initial ".". So, to cover for jpeg images, you
- * may return a vector containing ".jpeg" and ".jpg" for example. Case
- * matters, so ".jpeg" and ".JPEG" are different extensions. If are the
- * responsible to cover all possible variations an extension can have.
- */
-const std::vector<std::string>& extensions () const;

@@ -48,21 +48,22 @@ namespace Torch { namespace database { namespace detail {
        * Returns a new array from the data in the file.
        */
       template<typename T, int D> inline blitz::Array<T,D> load() const {
-        return m_codec->load(m_filename).cast<T,D>();
+        return load().cast<T,D>();
       }
 
       /**
-       * Saves data in the file
+       * Loads the data from the file
+       */
+      inline void InlinedArrayImpl load() const {
+        return m_codec->load(m_filename);
+      }
+
+      /**
+       * Saves data in the file. Please note that blitz::Array<>'s will be
+       * implicetly converted to InlinedArrayImpl as required.
        */
       inline void save(const InlinedArrayImpl& data) {
         m_codec->save(m_filename, data);
-      }
-
-      /**
-       * Saves data in the file
-       */
-      template<typename T, int D> void save(const blitz::Array<T,D>& data) {
-        m_codec->save(m_filename, InlinedArrayImpl(data));
       }
 
       /**
@@ -70,11 +71,14 @@ namespace Torch { namespace database { namespace detail {
        * operation is delegated to the codec that may open the file and read
        * values from the file to return you sensible data.
        *
-       * TODO: We could easily optimize this call by caching the element type
-       * and number of dimensions after first reading them.
+       * TODO: We could try to optimize this call by caching the element type
+       * and number of dimensions after first reading them. Please note you
+       * have to solve the "empty file" or "non-existant file" problem for this
+       * to work reliably.
        */
       void getSpecification(Torch::core::array::ElementType& eltype,
-          size_t& ndim) const;
+          size_t& ndim, 
+          size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const;
 
       /**
        * Sets the filename of where the data is contained, re-writing the data

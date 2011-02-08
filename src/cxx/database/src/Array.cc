@@ -54,6 +54,14 @@ Torch::core::array::ElementType db::Array::getElementType() const {
   return eltype;
 }
 
+const size_t* db::Array::getShape() const {
+  if (m_inlined) return m_inlined->getShape(); 
+  Torch::core::array::ElementType eltype;
+  size_t ndim;
+  m_external->getSpecification(eltype, ndim, m_tmp_shape);
+  return m_tmp_shape;
+}
+
 void db::Array::save(const std::string& filename, const std::string& codecname) 
 {
   if (m_inlined) {

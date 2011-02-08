@@ -66,6 +66,7 @@ tdd::InlinedArrayImpl::InlinedArrayImpl (const tdd::InlinedArrayImpl& other) {
 tdd::InlinedArrayImpl& tdd::InlinedArrayImpl::operator= (const tdd::InlinedArrayImpl& other) {
   m_elementtype = other.m_elementtype;
   m_ndim = other.m_ndim;
+  for (size_t i=0; i<m_ndim; ++i) m_shape[i] = other.m_shape[i];
   switch(m_elementtype) {
     GETSWITCH(bool, core::array::t_bool, m_ndim)
     GETSWITCH(int8_t, core::array::t_int8, m_ndim)

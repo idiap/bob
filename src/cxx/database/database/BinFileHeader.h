@@ -6,177 +6,93 @@
  * binary files.
  */
 
-#ifndef TORCH5SPRO_DATABASE_BIN_FILE_HEADER_H
-#define TORCH5SPRO_DATABASE_BIN_FILE_HEADER_H
+#ifndef TORCH_DATABASE_BINFILEHEADER_H
+#define TORCH_DATABASE_BINFILEHEADER_H
 
-#include "core/logging.h"
-#include "core/Exception.h"
 #include <fstream>
 #include <blitz/array.h>
 
-namespace Torch {
-  /**
-   * \ingroup libdatabase_api
-   * @{
-   *
-   */
-  namespace database {
+namespace Torch { namespace database { namespace detail {
 
-    namespace BinaryFile {
-      extern const uint32_t MAGIC_ENDIAN_DW;
-      extern const uint8_t FORMAT_VERSION;
-    }
+    extern const uint32_t MAGIC_ENDIAN_DW;
+    extern const uint8_t FORMAT_VERSION;
 
     /**
-     *  @brief The Header for storing multiarrays into binary files
+     * The Header for storing arrays into binary files. Please note that this
+     * class is for private use of the BinFile type.
      */
-    struct BinFileHeader
-    {
-        /**
-         * @brief Constructor
-         */
-        BinFileHeader();
+    struct BinFileHeader {
 
-        /**
-         * @brief Destructor
-         */
-        virtual ~BinFileHeader() {}
+      /**
+       * Constructor
+       */
+      BinFileHeader();
 
-        /**
-         * @brief Get the shape of each array in a blitz format
-         */
-        template<int d>
-        void getShape( blitz::TinyVector<int,d>& res ) const {
-          for( int i=0; i<d; ++i)
-            res[i] = m_shape[i];
-        }
+      /**
+       * Destructor
+       */
+      virtual ~BinFileHeader();
 
-        /**
-         * @brief Set the shape of each array
-         */
-        void setShape(const size_t shape[array::N_MAX_DIMENSIONS_ARRAY]) {
-          for(size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
-            m_shape[i] = shape[i];
-          sizeUpdated();
-        }
+      /**
+       * Gets the shape of each array in a blitz format
+       */
+      template<int D> void getShape (blitz::TinyVector<int,D>& res) const {
+        for (int i=0; i<D; ++i) res[i] = m_shape[i];
+      }
 
-        /**
-         * @brief Get the size along a particular dimension
-         */
-        size_t getSize(size_t dim_index) const;
-        /**
-         * @brief Set the size along a particular dimension
-         */
-        void setSize(const size_t dim_index, size_t val);
-        /** 
-         * @brief Get the offset of some array in the file
-         */
-        size_t getArrayIndex(size_t index) const;
+      /**
+       * Sets the shape of each array
+       */
+      void setShape(size_t ndim, const size_t* shape) {
+        m_n_dimensions = ndim;
+        for(size_t i=0; i<ndim; ++i) m_shape[i] = shape[i];
+      }
 
-        /**
-         * @brief Write the header into an output stream
-         */
-        void write(std::ostream& str) const;
-        /**
-         * @brief Read the header from an input stream
-         */
-        void read(std::istream& str);
+      /**
+       * Gets the size along a particular dimension
+       */
+      size_t getSize(size_t dim_index) const;
 
-        /**
-         * @brief Check if there is a need to cast the data of a blitz array
-         */
-        template <typename T, int D> 
-        bool needCast(const blitz::Array<T,D>& bl) const {
-          return true;
-        }
+      /**
+       * Sets the size along a particular dimension
+       */
+      void setSize(const size_t dim_index, size_t val);
 
-        /**
-         * @brief Update the number of elements and number of dimensions 
-         * members (is called in case of resizing)
-         */
-        void sizeUpdated();
-        /**
-         * @brief Update the size of the array elements' type
-         * (is called when the type is set)
-         */
-        void typeUpdated();
+      /** 
+       * Gets the offset of some array in the file
+       */
+      size_t getArrayIndex(size_t index) const;
 
+      /**
+       * Writes the header into an output stream
+       */
+      void write(std::ostream& str) const;
 
-        /**
-         *  Attributes
-         */
-        uint8_t m_version;
-        array::ElementType m_elem_type;
-        uint8_t m_elem_sizeof;
-        uint8_t m_n_dimensions;
-        uint32_t m_endianness;
-        size_t m_shape[array::N_MAX_DIMENSIONS_ARRAY];
-        uint64_t m_n_samples;
+      /**
+       * Reads the header from an input stream
+       */
+      void read(std::istream& str);
 
-        uint64_t m_n_elements;
+      /**
+       * Gets number of elements in binary file
+       */
+      inline size_t getNElements() { 
+        size_t tmp = 1;
+        for(size_t i=0; i<m_n_dimensions; ++i) tmp *= m_shape[i];
+      }
+
+      //representation
+      uint8_t m_version; ///< current version being read
+      Torch::core::array::ElementType m_elem_type; ///< array element type 
+      uint8_t m_elem_sizeof; ///< the syze in bytes of the element
+      uint32_t m_endianness; ///< the endianness of data recorded in the file
+      uint8_t m_n_dimensions; ///< the number of dimensions in each array
+      size_t m_shape[array::N_MAX_DIMENSIONS_ARRAY]; ///< shape of data
+      uint64_t m_n_samples; ///< total number of arrays in the file
+      uint64_t m_n_elements; ///< number of elements per array == PROD(shape)
     };
 
+} } }
 
-/************** Full specialization declarations *************/
-#define NEED_CAST_DECL(T,D) template<> bool \
-  BinFileHeader::needCast(const blitz::Array<T,D>& bl) const;\
-
-    NEED_CAST_DECL(bool,1)
-    NEED_CAST_DECL(bool,2)
-    NEED_CAST_DECL(bool,3)
-    NEED_CAST_DECL(bool,4)
-    NEED_CAST_DECL(int8_t,1)
-    NEED_CAST_DECL(int8_t,2)
-    NEED_CAST_DECL(int8_t,3)
-    NEED_CAST_DECL(int8_t,4)
-    NEED_CAST_DECL(int16_t,1)
-    NEED_CAST_DECL(int16_t,2)
-    NEED_CAST_DECL(int16_t,3)
-    NEED_CAST_DECL(int16_t,4)
-    NEED_CAST_DECL(int32_t,1)
-    NEED_CAST_DECL(int32_t,2)
-    NEED_CAST_DECL(int32_t,3)
-    NEED_CAST_DECL(int32_t,4)
-    NEED_CAST_DECL(int64_t,1)
-    NEED_CAST_DECL(int64_t,2)
-    NEED_CAST_DECL(int64_t,3)
-    NEED_CAST_DECL(int64_t,4)
-    NEED_CAST_DECL(uint8_t,1)
-    NEED_CAST_DECL(uint8_t,2)
-    NEED_CAST_DECL(uint8_t,3)
-    NEED_CAST_DECL(uint8_t,4)
-    NEED_CAST_DECL(uint16_t,1)
-    NEED_CAST_DECL(uint16_t,2)
-    NEED_CAST_DECL(uint16_t,3)
-    NEED_CAST_DECL(uint16_t,4)
-    NEED_CAST_DECL(uint32_t,1)
-    NEED_CAST_DECL(uint32_t,2)
-    NEED_CAST_DECL(uint32_t,3)
-    NEED_CAST_DECL(uint32_t,4)
-    NEED_CAST_DECL(uint64_t,1)
-    NEED_CAST_DECL(uint64_t,2)
-    NEED_CAST_DECL(uint64_t,3)
-    NEED_CAST_DECL(uint64_t,4)
-    NEED_CAST_DECL(float,1)
-    NEED_CAST_DECL(float,2)
-    NEED_CAST_DECL(float,3)
-    NEED_CAST_DECL(float,4)
-    NEED_CAST_DECL(double,1)
-    NEED_CAST_DECL(double,2)
-    NEED_CAST_DECL(double,3)
-    NEED_CAST_DECL(double,4)
-    NEED_CAST_DECL(std::complex<float>,1)
-    NEED_CAST_DECL(std::complex<float>,2)
-    NEED_CAST_DECL(std::complex<float>,3)
-    NEED_CAST_DECL(std::complex<float>,4)
-    NEED_CAST_DECL(std::complex<double>,1)
-    NEED_CAST_DECL(std::complex<double>,2)
-    NEED_CAST_DECL(std::complex<double>,3)
-    NEED_CAST_DECL(std::complex<double>,4)
-
-  }
-}
-
-
-#endif /* TORCH5SPRO_DATABASE_BIN_FILE_HEADER_H */
+#endif /* TORCH_DATABASE_BINFILEHEADER_H */
 

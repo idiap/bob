@@ -92,6 +92,51 @@ namespace Torch {
       template<> inline ElementType getElementType<std::complex<long double> >()
       { return t_complex256; }
 
+      /**
+       * These are some type to element size conversions
+       */
+      template<typename T> size_t getElementSize() {
+        return 0;
+      }
+
+      /**
+       * Some specializations tat convert the types we handle properly
+       */
+      template<> inline size_t getElementSize<bool>() { return sizeof(bool); }
+      template<> inline size_t getElementSize<int8_t>() 
+      { return sizeof(int8_t); }
+      template<> inline size_t getElementSize<int16_t>() 
+      { return sizeof(int16_t); }
+      template<> inline size_t getElementSize<int32_t>() 
+      { return sizeof(int32_t); }
+      template<> inline size_t getElementSize<int64_t>() 
+      { return sizeof(int64_t); }
+      template<> inline size_t getElementSize<uint8_t>() 
+      { return sizeof(uint8_t); }
+      template<> inline size_t getElementSize<uint16_t>() 
+      { return sizeof(uint16_t); }
+      template<> inline size_t getElementSize<uint32_t>() 
+      { return sizeof(uint32_t); }
+      template<> inline size_t getElementSize<uint64_t>() 
+      { return sizeof(uint64_t); }
+      template<> inline size_t getElementSize<float>() 
+      { return sizeof(float); }
+      template<> inline size_t getElementSize<double>() 
+      { return sizeof(double); }
+      template<> inline size_t getElementSize<long double>() 
+      { return sizeof(long double); }
+      template<> inline size_t getElementSize<std::complex<float> >() 
+      { return sizeof(std::complex<float>); }
+      template<> inline size_t getElementSize<std::complex<double> >() 
+      { return sizeof(std::complex<double>); }
+      template<> inline size_t getElementSize<std::complex<long double> >() 
+      { return sizeof(std::complex<long double>); }
+
+      /**
+       * Returns the type size given the enumeration
+       */
+      size_t getElementSize(ElementType t);
+
     }
 
   }
