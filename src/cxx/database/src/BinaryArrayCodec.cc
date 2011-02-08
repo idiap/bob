@@ -13,7 +13,8 @@ namespace db = Torch::database;
 
 //Takes care of the codec registration.
 static bool register_codec() {
-  db::ArrayCodecRegistry::addCodec(new db::BinaryArrayCodec()); 
+  db::ArrayCodecRegistry::addCodec(boost::shared_ptr<db::ArrayCodec>(new db::BinaryArrayCodec())); 
+  return true;
 }
 
 static bool codec_registered = register_codec(); 
@@ -28,8 +29,8 @@ db::BinaryArrayCodec::BinaryArrayCodec()
 db::BinaryArrayCodec::~BinaryArrayCodec() { }
 
 void db::BinaryArrayCodec::peek(const std::string& filename, 
-    Torch::core::array::ElementType& eltype, size_t& ndim
-    size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const {
+    Torch::core::array::ElementType& eltype, size_t& ndim,
+    size_t* shape) const {
   db::BinFile f(filename, db::BinFile::in);
   eltype = f.getElementType();
   ndim = f.getNDimensions();
@@ -39,8 +40,7 @@ void db::BinaryArrayCodec::peek(const std::string& filename,
 db::detail::InlinedArrayImpl 
 db::BinaryArrayCodec::load(const std::string& filename) const {
   db::BinFile f(filename, db::BinFile::in);
-  eltype = f.getElementType();
-  ndim = f.getNDimensions();
+  return f.read();
 }
 
 void db::BinaryArrayCodec::save (const std::string& filename, 

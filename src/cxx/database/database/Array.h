@@ -178,7 +178,7 @@ namespace Torch {
         boost::shared_ptr<detail::InlinedArrayImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArrayImpl> m_external;
         size_t m_id; ///< This is my id
-        size_t m_tmp_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< temporary variable used to return the shape of external arrays.
+        mutable size_t m_tmp_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< temporary variable used to return the shape of external arrays.
     };
 
     template<typename T, int D> Array::Array(blitz::Array<T,D>& data) 

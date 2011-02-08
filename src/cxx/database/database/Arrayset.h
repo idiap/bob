@@ -70,7 +70,7 @@ namespace Torch {
          * blitz TinyVector.
          */
         template<int D> 
-        void setShape( const blitz::TinyVector<int,D>& shape ) {
+        void setShape (const blitz::TinyVector<int,D>& shape) {
           m_n_dim = D;
           size_t n_elem = 1;
           for( int i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i) {

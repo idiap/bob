@@ -12,7 +12,6 @@
 #include <vector>
 #include <string>
 
-#include "core/array_common.h"
 #include "database/InlinedArrayImpl.h"
 
 namespace Torch { namespace database {
@@ -35,7 +34,7 @@ namespace Torch { namespace database {
        */
       virtual void peek(const std::string& filename, 
           Torch::core::array::ElementType& eltype, size_t& ndim,
-          size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const =0;
+          size_t* shape) const =0;
 
       /**
        * Returns the stored array in a InlinedArrayImpl

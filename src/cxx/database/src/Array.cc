@@ -42,7 +42,7 @@ size_t db::Array::getNDim() const {
   if (m_inlined) return m_inlined->getNDim(); 
   Torch::core::array::ElementType eltype;
   size_t ndim;
-  m_external->getSpecification(eltype, ndim);
+  m_external->getSpecification(eltype, ndim, m_tmp_shape);
   return ndim;
 }
 
@@ -50,7 +50,7 @@ Torch::core::array::ElementType db::Array::getElementType() const {
   if (m_inlined) return m_inlined->getElementType(); 
   Torch::core::array::ElementType eltype;
   size_t ndim;
-  m_external->getSpecification(eltype, ndim);
+  m_external->getSpecification(eltype, ndim, m_tmp_shape);
   return eltype;
 }
 

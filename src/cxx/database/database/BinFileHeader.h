@@ -11,6 +11,7 @@
 
 #include <fstream>
 #include <blitz/array.h>
+#include "core/array_common.h"
 
 namespace Torch { namespace database { namespace detail {
 
@@ -76,10 +77,21 @@ namespace Torch { namespace database { namespace detail {
       /**
        * Gets number of elements in binary file
        */
-      inline size_t getNElements() { 
+      inline size_t getNElements() const {
         size_t tmp = 1;
         for(size_t i=0; i<m_n_dimensions; ++i) tmp *= m_shape[i];
+        return tmp;
       }
+
+      /**
+       * Returns the number of dimensions in this binary file
+       */
+      inline size_t getNDim() const { return m_n_dimensions; }
+
+      /**
+       * Returns the shape in a N-element C-style array
+       */
+      inline const size_t* getShape() const { return m_shape; }
 
       //representation
       uint8_t m_version; ///< current version being read
@@ -87,7 +99,7 @@ namespace Torch { namespace database { namespace detail {
       uint8_t m_elem_sizeof; ///< the syze in bytes of the element
       uint32_t m_endianness; ///< the endianness of data recorded in the file
       uint8_t m_n_dimensions; ///< the number of dimensions in each array
-      size_t m_shape[array::N_MAX_DIMENSIONS_ARRAY]; ///< shape of data
+      size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< shape of data
       uint64_t m_n_samples; ///< total number of arrays in the file
       uint64_t m_n_elements; ///< number of elements per array == PROD(shape)
     };

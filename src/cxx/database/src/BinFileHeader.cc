@@ -5,7 +5,6 @@
  * This class defines an header for storing multiarrays into binary files.
  */
 
-#include "core/array_common.h"
 #include "core/logging.h"
 
 #include "database/BinFileHeader.h"
@@ -20,14 +19,16 @@ const uint8_t dbd::FORMAT_VERSION = 0;
 
 dbd::BinFileHeader::BinFileHeader()
   : m_version(dbd::FORMAT_VERSION),
-    m_elem_type(core::Torch::core::array::t_unknown), 
-    m_elem_sizeof(Torch::core::array::getElementSize(m_elem_type)),
+    m_elem_type(core::array::t_unknown), 
+    m_elem_sizeof(core::array::getElementSize(m_elem_type)),
     m_endianness(dbd::MAGIC_ENDIAN_DW),
     m_n_dimensions(0), 
     m_n_samples(0)
 {
-  for (size_t i=0; i<Torch::core::array::N_MAX_DIMENSIONS_ARRAY; ++i) m_shape[i] = 0;
+  for (size_t i=0; i<core::array::N_MAX_DIMENSIONS_ARRAY; ++i) m_shape[i] = 0;
 }
+
+dbd::BinFileHeader::~BinFileHeader() { }
 
 size_t dbd::BinFileHeader::getArrayIndex (size_t index) const {
   size_t header_size = 4*sizeof(uint8_t) + sizeof(uint32_t)
@@ -56,7 +57,7 @@ void dbd::BinFileHeader::read (std::istream& str) {
 
   // Element type
   str.read( reinterpret_cast<char*>(&val8), sizeof(uint8_t));
-  m_elem_type = static_cast<Torch::core::array::ElementType>(val8);
+  m_elem_type = static_cast<core::array::ElementType>(val8);
   TDEBUG3("Array-type: " << m_elem_type);
   // call function to update other type-related member (m_data_size_of)
 
@@ -64,35 +65,35 @@ void dbd::BinFileHeader::read (std::istream& str) {
   // Check that the value stored in the header matches the run-time value
   str.read( reinterpret_cast<char*>(&val8), sizeof(uint8_t));
   m_elem_sizeof = static_cast<uint8_t>(val8);
-  size_t runtime_sizeof = Torch::core::array::getElementSize(m_elem_type);
+  size_t runtime_sizeof = core::array::getElementSize(m_elem_type);
   if( runtime_sizeof != m_elem_sizeof )
-    warn << "The size of the element type stored in the header does" <<
+    core::warn << "The size of the element type stored in the header does" <<
       " not match the runtime size." << std::endl;
   TDEBUG3("Sizeof: " << m_elem_sizeof);
 
   // Number of dimensions
   str.read (reinterpret_cast<char*>(&val8), sizeof(uint8_t));
   m_n_dimensions = static_cast<uint8_t>(val8);
-  if( m_n_dimensions > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) {
-    error << "The number of dimensions is larger the maximal number " <<
+  if( m_n_dimensions > core::array::N_MAX_DIMENSIONS_ARRAY) {
+    core::error << "The number of dimensions is larger the maximal number " <<
       "of dimensions supported by this version of Torch5spro." << 
       std::endl;
-    throw Exception();
+    throw core::Exception();
   }
   TDEBUG3("Number of dimensions: " << m_n_dimensions);
 
   // Endianness
   str.read (reinterpret_cast<char*>(&val32), sizeof(uint32_t));
-  if(val32 != BinaryFile::MAGIC_ENDIAN_DW) {
-    error << "The data has been saved on a machine with a different " <<
+  if(val32 != dbd::MAGIC_ENDIAN_DW) {
+    core::error << "The data has been saved on a machine with a different " <<
       " endianness." << std::endl;
-    throw Exception();
+    throw core::Exception();
   }
   m_endianness = static_cast<uint32_t>(val32);
   TDEBUG3("Endianness: " << m_endianness);
 
   // Size of each dimension
-  for( size_t i=0; i<Torch::core::array::N_MAX_DIMENSIONS_ARRAY; ++i) {
+  for( size_t i=0; i<core::array::N_MAX_DIMENSIONS_ARRAY; ++i) {
     if( i<m_n_dimensions) {
       str.read( reinterpret_cast<char*>(&val64), sizeof(uint64_t));
       m_shape[i] = static_cast<uint64_t>(val64);

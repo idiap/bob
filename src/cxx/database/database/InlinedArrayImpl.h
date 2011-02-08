@@ -94,7 +94,7 @@ namespace Torch { namespace database { namespace detail {
     private: //representation
       Torch::core::array::ElementType m_elementtype; ///< Elements' type
       size_t m_ndim; ///< The number of dimensions
-      size_t m_shape[N_MAX_DIMENSIONS_ARRAY]; ///< The array shape
+      size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< The array shape
       void* m_bzarray; ///< Pointer to the real data
 
   };
@@ -105,7 +105,7 @@ namespace Torch { namespace database { namespace detail {
   }
 
   template<typename T, int D> void InlinedArrayImpl::set(blitz::Array<T,D>& data) {
-    if (D > N_MAX_DIMENSIONS_ARRAY) throw DimensionError();
+    if (D > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) throw DimensionError();
     m_elementtype = Torch::core::array::getElementType<T>();
     m_ndim = D;
     for (int i=0; i<D; ++i) m_shape[i] = data.extent(i);

@@ -54,7 +54,7 @@ namespace Torch { namespace database { namespace detail {
       /**
        * Loads the data from the file
        */
-      inline void InlinedArrayImpl load() const {
+      inline InlinedArrayImpl load() const {
         return m_codec->load(m_filename);
       }
 
@@ -77,8 +77,7 @@ namespace Torch { namespace database { namespace detail {
        * to work reliably.
        */
       void getSpecification(Torch::core::array::ElementType& eltype,
-          size_t& ndim, 
-          size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const;
+          size_t& ndim, size_t* shape) const;
 
       /**
        * Sets the filename of where the data is contained, re-writing the data

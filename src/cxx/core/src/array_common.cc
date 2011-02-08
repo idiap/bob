@@ -6,40 +6,41 @@
  */
 
 #include "core/array_common.h"
+#include "core/Exception.h"
 
 size_t Torch::core::array::getElementSize(ElementType t) {
   switch(t) {
     case Torch::core::array::t_bool:
-      data_size = sizeof(bool); break;
+      return sizeof(bool);
     case Torch::core::array::t_int8:
-      data_size = sizeof(int8_t); break;
+      return sizeof(int8_t);
     case Torch::core::array::t_int16:
-      data_size = sizeof(int16_t); break;
+      return sizeof(int16_t);
     case Torch::core::array::t_int32:
-      data_size = sizeof(int32_t); break;
+      return sizeof(int32_t);
     case Torch::core::array::t_int64:
-      data_size = sizeof(int64_t); break;
+      return sizeof(int64_t);
     case Torch::core::array::t_uint8:
-      data_size = sizeof(uint8_t); break;
+      return sizeof(uint8_t);
     case Torch::core::array::t_uint16:
-      data_size = sizeof(uint16_t); break;
+      return sizeof(uint16_t);
     case Torch::core::array::t_uint32:
-      data_size = sizeof(uint32_t); break;
+      return sizeof(uint32_t);
     case Torch::core::array::t_uint64:
-      data_size = sizeof(uint64_t); break;
+      return sizeof(uint64_t);
     case Torch::core::array::t_float32:
-      data_size = sizeof(float); break;
+      return sizeof(float);
     case Torch::core::array::t_float64:
-      data_size = sizeof(double); break;
+      return sizeof(double);
     case Torch::core::array::t_float128:
-      data_size = sizeof(long double); break;
+      return sizeof(long double);
     case Torch::core::array::t_complex64:
-      data_size = sizeof(std::complex<float>); break;
+      return sizeof(std::complex<float>);
     case Torch::core::array::t_complex128:
-      data_size = sizeof(std::complex<double>); break;
+      return sizeof(std::complex<double>);
     case Torch::core::array::t_complex256:
-      data_size = sizeof(std::complex<long double>); break;
+      return sizeof(std::complex<long double>);
+    default:
       throw Exception();
-      break;
   }
 }

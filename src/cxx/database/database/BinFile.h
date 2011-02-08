@@ -161,8 +161,8 @@ namespace Torch {
          * Initializes the binary file with the given type and shape.
          */
         inline void initBinaryFile(Torch::core::array::ElementType type,
-            size_t ndim, const size_t& shape[array::N_MAX_DIMENSIONS_ARRAY]) {
-            initHeader(type, ndim, shape);
+            size_t ndim, const size_t* shape) {
+          initHeader(type, ndim, shape);
         }
 
       private: //Some stuff I need privately
@@ -195,7 +195,7 @@ namespace Torch {
         size_t m_current_array;
         size_t m_n_arrays_written;
         std::fstream m_stream;
-        BinFileHeader m_header;
+        detail::BinFileHeader m_header;
         openmode m_openmode;
     };
 

@@ -29,8 +29,7 @@ tdd::ExternalArrayImpl::ExternalArrayImpl(const std::string& filename,
 tdd::ExternalArrayImpl::~ExternalArrayImpl() {}
 
 void tdd::ExternalArrayImpl::getSpecification
-(Torch::core::array::ElementType& eltype, size_t& ndim,
- size_t& shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]) const {
+(Torch::core::array::ElementType& eltype, size_t& ndim, size_t* shape) const {
   m_codec->peek(m_filename, eltype, ndim, shape);
 }
 
