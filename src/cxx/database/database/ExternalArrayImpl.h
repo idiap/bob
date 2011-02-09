@@ -15,6 +15,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "core/array_common.h"
+
+#include "database/InlinedArrayImpl.h"
 #include "database/ArrayCodec.h"
 
 namespace Torch { namespace database { namespace detail {

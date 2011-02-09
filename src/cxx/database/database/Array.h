@@ -42,9 +42,11 @@ namespace Torch {
         /**
          * Starts a new array with in-memory content. We don't ever copy the
          * data, just refer to it. If you want me to have a private copy, just
-         * copy the data before-hand.
+         * copy the data before-hand. Please note this constructor is able to
+         * receive blitz::Array<> elements by implicit construction into
+         * InlinedArrayImpl.
          */
-        template<typename T, int D> Array(blitz::Array<T,D>& data);
+        Array(const detail::InlinedArrayImpl& data);
 
         /**
          * Builds an Array that contains data from a file. You can optionally
@@ -98,12 +100,20 @@ namespace Torch {
          * it is in a file, we load it and return a reference to the loaded
          * data.
          */
-        template <typename T, int D> blitz::Array<T,D> get();
+        template <typename T, int D> blitz::Array<T,D> get() const;
+
+        /**
+         * This is a non-templated version of the get() method that returns a
+         * generic array, used for typeless manipulations. 
+         *
+         * @warning You do NOT want to use this!
+         */
+        detail::InlinedArrayImpl get() const;
 
         /**
          * Sets the current data to the given array
          */
-        template<typename T, int D> void set(blitz::Array<T,D>& data);
+        void set(const detail::InlinedArrayImpl& data);
 
         /**
          * Returns the current number of dimensions set by this array.
@@ -181,12 +191,6 @@ namespace Torch {
         mutable size_t m_tmp_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< temporary variable used to return the shape of external arrays.
     };
 
-    template<typename T, int D> Array::Array(blitz::Array<T,D>& data) 
-      : m_inlined(new detail::InlinedArrayImpl(data)),
-        m_id(0)
-    {
-    }
-
     template <typename T, int D> blitz::Array<T,D> Array::load() {
       if (D != getNDim()) throw DimensionError();
       if (!m_inlined) {
@@ -196,21 +200,10 @@ namespace Torch {
       return m_inlined->castCopy<T,D>(); 
     }
 
-    template <typename T, int D> blitz::Array<T,D> Array::get() {
+    template <typename T, int D> blitz::Array<T,D> Array::get() const {
       if (D != getNDim()) throw DimensionError();
       if (!m_inlined) return m_external->load<T,D>();
       return m_inlined->castCopy<T,D>(); 
-    }
-
-    template<typename T, int D> void Array::set(blitz::Array<T,D>& data) {
-      /**
-      if (m_parent_arrayset) {
-        if (D != m_parent_arrayset->getNDim()) throw DimensionError();
-        if (Torch::core::array::getElementType<T>() != m_parent_arrayset->getElementType()) throw TypeError();
-      }
-      **/
-      if (m_external) m_external.reset();
-      m_inlined.reset(new detail::InlinedArrayImpl(data));
     }
 
   } //closes namespace database

@@ -6,9 +6,14 @@
  */
 
 #include "database/Array.h"
-//#include "database/Arrayset.h"
 
 namespace db = Torch::database;
+
+db::Array::Array(const db::detail::InlinedArrayImpl& data)
+  : m_inlined(new db::detail::InlinedArrayImpl(data)),
+    m_id(0) 
+{
+}
 
 db::Array::Array(const std::string& filename, const std::string& codec)
   : m_external(new db::detail::ExternalArrayImpl(filename, codec)),
@@ -95,4 +100,20 @@ const std::string& db::Array::getFilename() const {
 boost::shared_ptr<const db::ArrayCodec> db::Array::getCodec() const {
   if (m_external) return m_external->getCodec();
   return boost::shared_ptr<ArrayCodec>(); 
+}
+    
+void db::Array::set(const db::detail::InlinedArrayImpl& data) {
+  /**
+    if (m_parent_arrayset) {
+    if (D != m_parent_arrayset->getNDim()) throw DimensionError();
+    if (Torch::core::array::getElementType<T>() != m_parent_arrayset->getElementType()) throw TypeError();
+    }
+   **/
+  if (m_external) m_external.reset();
+  m_inlined.reset(new detail::InlinedArrayImpl(data));
+}
+
+db::detail::InlinedArrayImpl db::Array::get() const {
+  if (!m_inlined) return m_external->load();
+  return *m_inlined.get();
 }

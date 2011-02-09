@@ -9,6 +9,7 @@
 
 #include "database/ExternalArrayImpl.h"
 #include "database/InlinedArrayImpl.h"
+#include "database/ArrayCodec.h"
 #include "database/ArrayCodecRegistry.h"
 
 namespace tdd = Torch::database::detail;
@@ -49,5 +50,6 @@ void tdd::ExternalArrayImpl::move(const std::string& filename,
   else { //the user wants to re-write it in a different format.
     newcodec->save(filename, m_codec->load(m_filename));
     boost::filesystem::remove(boost::filesystem::path(m_filename));
+    m_codec = newcodec;
   }
 }
