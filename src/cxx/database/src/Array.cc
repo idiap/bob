@@ -90,6 +90,15 @@ void db::Array::setParent (boost::shared_ptr<Arrayset> parent, size_t id) {
   m_parent_arrayset->addArray(*this);
 }
 **/
+
+void db::Array::setId (size_t id) {
+  /**if (m_parent) {
+    m_parent->removeArray(*this);
+    m_id = id;
+    m_parent->addArray(*this);
+  }
+  else **/ m_id = id;
+}
         
 const std::string& db::Array::getFilename() const {
   if (m_external) return m_external->getFilename();
