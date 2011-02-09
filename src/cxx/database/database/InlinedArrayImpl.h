@@ -176,7 +176,7 @@ namespace Torch { namespace database { namespace detail {
 
   template<typename T, int D> blitz::Array<T,D> InlinedArrayImpl::castCopy() const 
   {
-    return cast<T,D>()->copy();
+    return cast<T,D>().copy();
   }
 
 }}}
