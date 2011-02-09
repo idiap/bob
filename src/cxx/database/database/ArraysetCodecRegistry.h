@@ -37,9 +37,15 @@ namespace Torch { namespace database {
         getCodecByExtension(const std::string& filename);
 
     private:
+      ArraysetCodecRegistry(): s_name2codec(), s_extension2codec() {}
+      // Not implemented
+      ArraysetCodecRegistry( const ArraysetCodecRegistry&);
 
-      static std::map<std::string, boost::shared_ptr<Torch::database::ArraysetCodec> > s_name2codec;
-      static std::map<std::string, boost::shared_ptr<Torch::database::ArraysetCodec> > s_extension2codec;
+      static boost::shared_ptr<ArraysetCodecRegistry> instance();
+      static boost::shared_ptr<ArraysetCodecRegistry> s_instance;
+
+      std::map<std::string, boost::shared_ptr<Torch::database::ArraysetCodec> > s_name2codec;
+      std::map<std::string, boost::shared_ptr<Torch::database::ArraysetCodec> > s_extension2codec;
     
   };
 

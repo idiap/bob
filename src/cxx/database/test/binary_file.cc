@@ -142,8 +142,8 @@ BOOST_AUTO_TEST_CASE( blitz2d )
   out.close();
 
   Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in);
-  blitz::Array<float,2> d_read = in.read<float,2>();
-/*
+/*  blitz::Array<float,2> d_read = in.read<float,2>();
+
   check_equal_2d( d, d_read);
   in.close();*/
 }

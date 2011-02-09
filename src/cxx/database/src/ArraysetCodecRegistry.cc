@@ -12,23 +12,28 @@
 
 namespace db = Torch::database;
 
-std::map<std::string, boost::shared_ptr<db::ArraysetCodec> > db::ArraysetCodecRegistry::s_name2codec;
-std::map<std::string, boost::shared_ptr<db::ArraysetCodec> > db::ArraysetCodecRegistry::s_extension2codec;
+boost::shared_ptr<db::ArraysetCodecRegistry> db::ArraysetCodecRegistry::s_instance;
+
+boost::shared_ptr<db::ArraysetCodecRegistry> db::ArraysetCodecRegistry::instance() {
+  if( s_instance == 0)
+    s_instance.reset(new ArraysetCodecRegistry());
+  return s_instance; 
+}    
     
-void db::ArraysetCodecRegistry::addCodec
-(boost::shared_ptr<db::ArraysetCodec> codec) {
-  std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = s_name2codec.find(codec->name());
-  if (it == s_name2codec.end()) {
-    s_name2codec[codec->name()] = codec;
+void db::ArraysetCodecRegistry::addCodec(boost::shared_ptr<db::ArraysetCodec> codec) {
+  boost::shared_ptr<ArraysetCodecRegistry> instance = db::ArraysetCodecRegistry::instance();
+  std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = instance->s_name2codec.find(codec->name());
+  if (it == instance->s_name2codec.end()) {
+    instance->s_name2codec[codec->name()] = codec;
   }
   else {
     throw db::IndexError();
   }
 
   for (std::vector<std::string>::const_iterator jt = codec->extensions().begin(); jt != codec->extensions().end(); ++jt) {
-    it = s_extension2codec.find(*jt);
-    if (it == s_extension2codec.end()) {
-      s_extension2codec[*jt] = codec;
+    it = instance->s_extension2codec.find(*jt);
+    if (it == instance->s_extension2codec.end()) {
+      instance->s_extension2codec[*jt] = codec;
     }
     else {
       throw db::IndexError();
@@ -38,8 +43,9 @@ void db::ArraysetCodecRegistry::addCodec
 
 boost::shared_ptr<const db::ArraysetCodec>
 db::ArraysetCodecRegistry::getCodecByName(const std::string& name) {
-  std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = s_name2codec.find(name);
-  if (it == s_name2codec.end()) {
+  boost::shared_ptr<ArraysetCodecRegistry> instance = db::ArraysetCodecRegistry::instance();
+  std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = instance->s_name2codec.find(name);
+  if (it == instance->s_name2codec.end()) {
     throw db::IndexError();
   }
   return it->second;
@@ -48,9 +54,10 @@ db::ArraysetCodecRegistry::getCodecByName(const std::string& name) {
 boost::shared_ptr<const db::ArraysetCodec>
 db::ArraysetCodecRegistry::getCodecByExtension(const std::string& filename)
 {
+  boost::shared_ptr<ArraysetCodecRegistry> instance = db::ArraysetCodecRegistry::instance();
   boost::filesystem::path path(filename);
-  std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = s_extension2codec.find(path.extension());
-  if (it == s_extension2codec.end()) {
+  std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = instance->s_extension2codec.find(path.extension());
+  if (it == instance->s_extension2codec.end()) {
     throw db::IndexError();
   }
   return it->second;
