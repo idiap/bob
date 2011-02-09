@@ -53,10 +53,10 @@ struct T {
  */
 std::string temp_file() {
   std::string tpl = Torch::core::tmpdir();
-  tpl += "/torchtest_core_binformatXXXXXX";
+  tpl += "/torchtest_core_binformatXXXXXX.bin";
   boost::shared_ptr<char> char_tpl(new char[tpl.size()+1]);
   strcpy(char_tpl.get(), tpl.c_str());
-  int fd = mkstemp(char_tpl.get());
+  int fd = mkstemps(char_tpl.get(),4);
   close(fd);
   boost::filesystem::remove(char_tpl.get());
   return char_tpl.get();
