@@ -142,27 +142,9 @@ BOOST_AUTO_TEST_CASE( blitz2d )
   out.close();
 
   Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in);
-/*  blitz::Array<float,2> d_read = in.read<float,2>();
+  blitz::Array<float,2> d_read = in.read<float,2>();
 
   check_equal_2d( d, d_read);
-  in.close();*/
-}
-
-/*
-BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
-{
-  std::string tmp_file = temp_file();
-  Torch::database::BinFile out(tmp_file, Torch::database::BinFile::out);
-
-  out.write( d);
-  out.write( e);
-  out.write( d);
-  out.close();
-
-  Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in);
-  
-  blitz::Array<float,2> e_read = in.read<float,2>(1);
-  check_equal_2d( e, e_read);
   in.close();
 }
 
@@ -174,11 +156,47 @@ BOOST_AUTO_TEST_CASE( blitz1d_inout )
   out.write( a);
   out.close();
 
-  Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in | 
-    Torch::database::BinFile::out);
+  Torch::database::BinFile inoutap(tmp_file, Torch::database::BinFile::in | 
+    Torch::database::BinFile::out | Torch::database::BinFile::append);
   
-  blitz::Array<double,1> a_read = in.read<double,1>();
+  inoutap.write( a);
+  inoutap.write( a);
+  inoutap.write( a);
+
+  blitz::Array<double,1> a_read = inoutap.read<double,1>(0);
   check_equal_1d( a, a_read);
+  inoutap.close();
+}
+
+BOOST_AUTO_TEST_CASE( blitz2d_withcast )
+{
+  std::string tmp_file = temp_file();
+  Torch::database::BinFile out(tmp_file, Torch::database::BinFile::out);
+
+  out.write( d);
+  out.close();
+
+  Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in);
+  blitz::Array<uint32_t,2> d_read = in.read<uint32_t,2>();
+
+  check_equal_2d( d, d_read);
+  in.close();
+}
+
+BOOST_AUTO_TEST_CASE( blitz2d_directaccess )
+{
+  std::string tmp_file = temp_file();
+  Torch::database::BinFile out(tmp_file, Torch::database::BinFile::out);
+
+  out.write( d);
+  out.write( e);
+  out.write( d);
+  out.close();
+
+  Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in);
+  blitz::Array<float,2> e_read = in.read<float,2>(1);
+  
+  check_equal_2d( e, e_read);
   in.close();
 }
 
@@ -220,22 +238,4 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
   in1.close();
 }
 
-BOOST_AUTO_TEST_CASE( dbArray )
-{
-  std::string tmp_file = temp_file();
-  Torch::database::BinFile out(tmp_file, Torch::database::BinFile::out);
-
-  Torch::database::Array db_a(a);
-
-  out.write( db_a);
-  out.close();
-
-  Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in);
-  
-  Torch::database::Array db_a_read = in.read<double,1>();
-
-  check_equal_1d( a, a_read);
-  in.close();
-}
-*/
 BOOST_AUTO_TEST_SUITE_END()
