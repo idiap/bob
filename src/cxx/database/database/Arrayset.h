@@ -17,7 +17,7 @@
 
 #include "core/logging.h"
 #include "core/Exception.h"
-#include "core/StaticComplexCast.h"
+#include "core/cast.h"
 #include "database/dataset_common.h"
 
 namespace Torch {   

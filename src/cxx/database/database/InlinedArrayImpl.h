@@ -12,6 +12,7 @@
 #include <blitz/array.h>
 #include <core/array_common.h>
 #include <database/dataset_common.h>
+#include "core/cast.h"
 
 namespace Torch { namespace database { namespace detail {
 
@@ -136,35 +137,35 @@ namespace Torch { namespace database { namespace detail {
     //TODO: Ask LES how to use blitz::complex_cast<>() in this situation...
     switch (m_elementtype) {
       case Torch::core::array::t_bool: 
-        return blitz::cast<T>(*static_cast<blitz::Array<bool,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<bool,D>* >(m_bzarray));
       case Torch::core::array::t_int8: 
-        return blitz::cast<T>(*static_cast<blitz::Array<int8_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<int8_t,D>* >(m_bzarray));
       case Torch::core::array::t_int16: 
-        return blitz::cast<T>(*static_cast<blitz::Array<int16_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<int16_t,D>* >(m_bzarray));
       case Torch::core::array::t_int32: 
-        return blitz::cast<T>(*static_cast<blitz::Array<int32_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<int32_t,D>* >(m_bzarray));
       case Torch::core::array::t_int64: 
-        return blitz::cast<T>(*static_cast<blitz::Array<int64_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<int64_t,D>* >(m_bzarray));
       case Torch::core::array::t_uint8: 
-        return blitz::cast<T>(*static_cast<blitz::Array<uint8_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<uint8_t,D>* >(m_bzarray));
       case Torch::core::array::t_uint16: 
-        return blitz::cast<T>(*static_cast<blitz::Array<uint16_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<uint16_t,D>* >(m_bzarray));
       case Torch::core::array::t_uint32: 
-        return blitz::cast<T>(*static_cast<blitz::Array<uint32_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<uint32_t,D>* >(m_bzarray));
       case Torch::core::array::t_uint64: 
-        return blitz::cast<T>(*static_cast<blitz::Array<uint64_t,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<uint64_t,D>* >(m_bzarray));
       case Torch::core::array::t_float32: 
-        return blitz::cast<T>(*static_cast<blitz::Array<float,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<float,D>* >(m_bzarray));
       case Torch::core::array::t_float64: 
-        return blitz::cast<T>(*static_cast<blitz::Array<double,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<double,D>* >(m_bzarray));
       case Torch::core::array::t_float128: 
-        return blitz::cast<T>(*static_cast<blitz::Array<long double,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<long double,D>* >(m_bzarray));
       case Torch::core::array::t_complex64: 
-        return blitz::cast<T>(*static_cast<blitz::Array<std::complex<float>,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<std::complex<float>,D>* >(m_bzarray));
       case Torch::core::array::t_complex128: 
-        return blitz::cast<T>(*static_cast<blitz::Array<std::complex<double>,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<std::complex<double>,D>* >(m_bzarray));
       case Torch::core::array::t_complex256: 
-        return blitz::cast<T>(*static_cast<blitz::Array<std::complex<long double>,D> >(m_bzarray));
+        return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<std::complex<long double>,D>* >(m_bzarray));
     }
 
     //if we get to this point, there is nothing much we can do...

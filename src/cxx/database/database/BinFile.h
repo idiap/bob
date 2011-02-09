@@ -8,7 +8,7 @@
 #ifndef TORCH_DATABASE_BINFILE_H
 #define TORCH_DATABASE_BINFILE_H 1
 
-#include "core/StaticComplexCast.h"
+#include "core/cast.h"
 #include "database/BinFileHeader.h"
 #include "database/InlinedArrayImpl.h"
 

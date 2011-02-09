@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_simple_1D )
     X(i) = i+1;
 
   blitz::Array<double,1> Y(4), ref(4); 
-  blitz::complex_cast<double>(X, Y);
+  Y = Torch::core::cast<double>(X);
 
   for(int i=0; i<4; ++i)
     ref(i) = static_cast<double>(i+1);
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_1D )
     X(i) = i+1;
 
   blitz::Array<std::complex<double>,1> Y(4), ref(4); 
-  blitz::complex_cast<std::complex<double> >(X, Y);
+  Y = Torch::core::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
     ref(i) = std::complex<double>(i+1,0);
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_2D )
       X(i,j) = i+j+1;
 
   blitz::Array<std::complex<double>,2> Y(4,4), ref(4,4); 
-  blitz::complex_cast<std::complex<double> >(X, Y);
+  Y = Torch::core::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
     for(int j=0; j<4; ++j)
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_3D )
         X(i,j,k) = i+j+k+1;
 
   blitz::Array<std::complex<double>,3> Y(4,4,4), ref(4,4,4); 
-  blitz::complex_cast<std::complex<double> >(X, Y);
+  Y = Torch::core::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
     for(int j=0; j<4; ++j)
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_4D )
           X(i,j,k,l) = i+j+k+l+1;
 
   blitz::Array<std::complex<double>,4> Y(4,4,4,4), ref(4,4,4,4); 
-  blitz::complex_cast<std::complex<double> >(X, Y);
+  Y = Torch::core::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
     for(int j=0; j<4; ++j)
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_1D )
     X(i) = std::complex<double>(i+1,i);
 
   blitz::Array<int32_t,1> Y(4), ref(4); 
-  blitz::complex_cast<int32_t >(X, Y);
+  Y = Torch::core::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)
     ref(i) = i+1;
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_2D )
       X(i,j) = std::complex<double>(i+j+1,i*j);
 
   blitz::Array<int32_t,2> Y(4,4), ref(4,4); 
-  blitz::complex_cast<int32_t >(X, Y);
+  Y = Torch::core::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)
     for(int j=0; j<4; ++j)
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_3D )
         X(i,j,k) = std::complex<double>(i+j+k+1,i*j*k);
 
   blitz::Array<int32_t,3> Y(4,4,4), ref(4,4,4); 
-  blitz::complex_cast<int32_t >(X, Y);
+  Y = Torch::core::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)
     for(int j=0; j<4; ++j)
@@ -300,7 +300,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_4D )
           X(i,j,k,l) = std::complex<double>(i+j+k+l+1,i*j*k*l);
 
   blitz::Array<int32_t,4> Y(4,4,4,4), ref(4,4,4,4); 
-  blitz::complex_cast<int32_t >(X, Y);
+  Y = Torch::core::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)
     for(int j=0; j<4; ++j)

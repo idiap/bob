@@ -37,6 +37,7 @@ set(src
     "src/Exception.cc"
     "src/logging.cc"
     "src/array_common.cc"
+    "src/cast.cc"
     )
 
 include(../../cmake/macros.cmake)

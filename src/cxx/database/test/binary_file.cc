@@ -12,7 +12,7 @@
 #include <boost/filesystem.hpp>
 
 #include "core/BinFile.h"
-#include "core/StaticComplexCast.h"
+#include "core/cast.h"
 
 struct T {
 
