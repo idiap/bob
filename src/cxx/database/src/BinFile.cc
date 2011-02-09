@@ -102,6 +102,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
           T val = bz(i);
           s.write((const char*)&val, core::array::getElementSize<T>());
         }
+        break;
       }
     case 2:
       {
@@ -111,6 +112,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
             T val = bz(i,j);
             s.write((const char*)&val, core::array::getElementSize<T>());
           }
+        break;
       }
     case 3:
       {
@@ -121,6 +123,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
               T val = bz(i,j,k);
               s.write((const char*)&val, core::array::getElementSize<T>());
             }
+        break;
       }
     case 4:
       {
@@ -132,6 +135,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
                 T val = bz(i,j,k,l);
                 s.write((const char*)&val, core::array::getElementSize<T>());
               }
+        break;
       }
     default:
       throw db::DimensionError();

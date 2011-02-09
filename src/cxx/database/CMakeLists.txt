@@ -42,7 +42,7 @@ torch_library(database "${src}" "${deps}" "${shared}")
 torch_header_install(database "torch::database")
 
 # Defines tests for this package
-#torch_test(database binary_file test/binary_file.cc)
+torch_test(database binary_file test/binary_file.cc)
 
 # This is where we install the XML schema definition
 set(schemadir share/torch/schema)
