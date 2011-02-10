@@ -60,7 +60,7 @@ db::Array db::BinaryArraysetCodec::load
 
 void db::BinaryArraysetCodec::append
 (const std::string& filename, const Array& array) const {
-  db::BinFile f(filename, db::BinFile::append);
+  db::BinFile f(filename, db::BinFile::out | db::BinFile::append);
   f.write(array.get());
 }
 

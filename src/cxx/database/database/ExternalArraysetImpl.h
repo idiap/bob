@@ -108,6 +108,11 @@ namespace Torch { namespace database { namespace detail {
 
     private: //some helpers
 
+      /**
+       * Checks that the current Arrayset is compatible with the given Array.
+       */ 
+      void checkCompatibility (const Torch::database::Array& a) const;
+
       void reloadSpecification();
      
     private: //representation

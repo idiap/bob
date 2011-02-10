@@ -58,12 +58,23 @@ Torch::database::Array tdd::ExternalArraysetImpl::operator[] (size_t id) const {
   return m_codec->load(m_filename, id);
 }
 
+void tdd::ExternalArraysetImpl::checkCompatibility(const Torch::database::Array& array) const {
+  if (m_elementtype != Torch::core::array::t_unknown) {
+    if (array.getElementType() != m_elementtype) throw Torch::database::TypeError();
+    if (array.getNDim() != m_ndim) throw Torch::database::DimensionError();
+    for (size_t i=0; i<m_ndim; ++i)
+      if (array.getShape()[i] != m_shape[i]) throw Torch::database::DimensionError();
+  }
+}
+
 size_t tdd::ExternalArraysetImpl::add
 (boost::shared_ptr<const Torch::database::Array> array) {
   return add(*array.get()); 
 }
 
 size_t tdd::ExternalArraysetImpl::add(const Torch::database::Array& array) {
+  checkCompatibility(array);
+
   m_codec->append(m_filename, array);
   reloadSpecification();
   return m_samples;

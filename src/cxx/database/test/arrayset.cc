@@ -192,6 +192,9 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);
+  // Check that adding a blitz arrays with different dimensions will raise
+  // an exception
+  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::DimensionError );
   
   // Create an Arrayset from a file and check its properties
   Torch::database::Arrayset db_Ar_read(tmp_file);
@@ -203,9 +206,11 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_CHECK_EQUAL(db_Ar.getNSamples(), db_Ar_read.getNSamples());
   for( size_t i=0; i<db_Ar.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_Ar.getShape()[i], db_Ar_read.getShape()[i]);
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);
-  
+  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(db_Ar_read.getFilename()), 0);
+  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare(db_Ar_read.getCodec()->name()), 0); 
+  // Check that adding a blitz arrays with different dimensions will raise
+  // an exception
+  BOOST_CHECK_THROW( db_Ar_read.add(g), Torch::database::DimensionError );
 }
 
 /*
