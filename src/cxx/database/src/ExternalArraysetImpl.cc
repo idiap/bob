@@ -78,7 +78,7 @@ void tdd::ExternalArraysetImpl::extend(const tdd::InlinedArraysetImpl& set) {
 void tdd::ExternalArraysetImpl::remove(size_t id) {
   Torch::core::array::ElementType eltype;
   size_t ndim;
-  size_t* shape;
+  size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
   size_t samples;
   m_codec->peek(m_filename, eltype, ndim, shape, samples);
   if (id > samples) throw Torch::database::IndexError();
