@@ -18,10 +18,10 @@ namespace Torch { namespace database { namespace detail {
   /**
    * A small predicate class to help with Id comparison for the m_array
    */
-  struct equal_id {
+  struct equal_array_id {
     size_t id;
 
-    equal_id(size_t id) : id(id) { }
+    equal_array_id(size_t id) : id(id) { }
 
     inline bool operator() (const boost::shared_ptr<db::Array>& v)
     { return v->getId() == id; }
@@ -31,7 +31,7 @@ namespace Torch { namespace database { namespace detail {
   /**
    * Another predicate to help list sorting
    */
-  bool is_smaller (const boost::shared_ptr<db::Array>& v1,
+  static bool array_is_smaller (const boost::shared_ptr<db::Array>& v1,
                    const boost::shared_ptr<db::Array>& v2) {
     return v1->getId() < v2->getId();
   }
@@ -148,7 +148,7 @@ size_t tdd::InlinedArraysetImpl::adopt (boost::shared_ptr<db::Array> array) {
 
 void tdd::InlinedArraysetImpl::remove(size_t id) {
   m_index.erase(id);
-  m_array.remove_if(tdd::equal_id(id));
+  m_array.remove_if(tdd::equal_array_id(id));
   if (m_array.size() == 0) { //uninitialize
     m_elementtype = Torch::core::array::t_unknown;
     m_ndim = 0;
@@ -165,11 +165,11 @@ void tdd::InlinedArraysetImpl::remove(const db::Array& array) {
 
 size_t tdd::InlinedArraysetImpl::getNextFreeId() const {
   if (!m_array.size()) return 1;
-  return (*std::max_element(m_array.begin(), m_array.end(), tdd::is_smaller))->getId() + 1;
+  return (*std::max_element(m_array.begin(), m_array.end(), tdd::array_is_smaller))->getId() + 1;
 }
 
 void tdd::InlinedArraysetImpl::consolidateIds() {
-  m_array.sort(tdd::is_smaller);
+  m_array.sort(tdd::array_is_smaller);
   m_index.clear();
   size_t id=1;
   for (std::list<boost::shared_ptr<db::Array> >::iterator it = m_array.begin();

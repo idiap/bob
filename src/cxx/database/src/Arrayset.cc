@@ -10,6 +10,7 @@
 namespace db = Torch::database;
 
 db::Arrayset::Arrayset (const db::detail::InlinedArraysetImpl& inlined):
+  m_parent(),
   m_inlined(new db::detail::InlinedArraysetImpl(inlined)),
   m_external(),
   m_id(0),
@@ -18,6 +19,7 @@ db::Arrayset::Arrayset (const db::detail::InlinedArraysetImpl& inlined):
 }
 
 db::Arrayset::Arrayset(const std::string& filename, const std::string& codec):
+  m_parent(),
   m_inlined(),
   m_external(new db::detail::ExternalArraysetImpl(filename, codec)),
   m_id(0),
@@ -26,26 +28,23 @@ db::Arrayset::Arrayset(const std::string& filename, const std::string& codec):
 }
 
 db::Arrayset::Arrayset(const db::Arrayset::Arrayset& other):
-  //m_parent_dataset(other.m_parent_dataset),
+  m_parent(other.m_parent),
   m_inlined(other.m_inlined),
   m_external(other.m_external),
   m_id(0),
   m_role(other.m_role)
 {
-  //if (m_parent_dataset) m_parent_dataset->add(*this);
 }
 
 db::Arrayset::~Arrayset() {
-  //if (m_parent_dataset) m_parent_dataset->add(*this);
 }
 
 db::Arrayset& db::Arrayset::operator= (const db::Arrayset& other) {
-  //m_parent_dataset = other.m_parent_dataset;
+  m_parent = other.m_parent;
   m_inlined = other.m_inlined;
   m_external = other.m_external;
   m_id = 0;
   m_role = other.m_role;
-  //if (m_parent_dataset) m_parent_dataset->add(*this);
   return *this;
 }
 

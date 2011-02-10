@@ -25,7 +25,7 @@ namespace Torch {
   namespace database {
     
     //I promise this exists:
-    //class Dataset;
+    class Dataset;
 
     /**
      * The arrayset class for a dataset. It is responsible for holding and
@@ -149,19 +149,9 @@ namespace Torch {
         /**
          * Returns a pointer to the parent Dataset
          */
-        /**
-        boost::shared_ptr<const Dataset> getParent() const;
-        **/
-
-        /**
-         * Set my parent and adds me to the given Dataset. If my id was set to
-         * 0, this will get reset by choosing a free id from the parent
-         * Dataset. Otherwise, this will insert me into the Arrayset
-         * overwriting, possibly, any other exising Arrayset.
-         */
-        /**
-        void setParent(boost::shared_ptr<Dataset>& parent);
-        **/
+        inline boost::shared_ptr<const Dataset> getParent() const {
+          return m_parent.lock(); 
+        }
 
         /**
          * This set of methods allow you to access the data contained in this
@@ -177,8 +167,30 @@ namespace Torch {
         template<typename T, int D> const blitz::Array<T,D> get (size_t index) const;
         template<typename T, int D> blitz::Array<T,D> cast (size_t index) const;
 
+        //The next methods are sort of semi-private: Only to be used by the
+        //Database loading system. You can adventure yourself, but really not
+        //recommended to set the id or the parent of an array. Be sure to
+        //understand the consequences.
+        
+        /**
+         * Sets the id. No further checks are performed. This method is not
+         * intended for normal programs, just for parsers that need to read
+         * data from a file and fill it up.
+         */
+        inline void setId (size_t id) { m_id = id; }
+
+        /**
+         * Set my parent and adds me to the given Dataset. If my id was set to
+         * 0, this will get reset by choosing a free id from the parent
+         * Dataset. Otherwise, this will insert me into the Arrayset
+         * overwriting, possibly, any other exising Arrayset.
+         */
+        inline void setParent(boost::shared_ptr<Dataset>& parent) {
+          m_parent = parent;
+        }
+
       private:
-        //boost::weak_ptr<Dataset> m_parent_dataset; ///< My current parent
+        boost::weak_ptr<Dataset> m_parent; ///< My current parent
         boost::shared_ptr<detail::InlinedArraysetImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArraysetImpl> m_external;
         size_t m_id; ///< This is my id
