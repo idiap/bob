@@ -35,10 +35,10 @@ namespace Torch { namespace database { namespace detail {
       /**
        * Starts a new Arrayset with begin and end iterators to
        * boost::shared_ptr<Torch::database::Array>'s or anything else that
-       * overwrite() can accept.
+       * add() can accept.
        */
       template <typename T> InlinedArraysetImpl(T begin, T end) {
-        for (T it = begin; it != end; ++it) overwrite(*it);
+        for (T it = begin; it != end; ++it) add(*it);
       }
 
       /**
@@ -47,10 +47,10 @@ namespace Torch { namespace database { namespace detail {
        * wish.
        *
        * boost::shared_ptr<Torch::database::Array>'s or anything else that
-       * overwrite() can accept.
+       * add() can accept.
        */
       template <typename T> InlinedArraysetImpl(const T& iterable) {
-        for (typename T::const_iterator it = iterable.begin(); it != iterable.end(); ++it) overwrite(*it);
+        for (typename T::const_iterator it = iterable.begin(); it != iterable.end(); ++it) add(*it);
       }
 
       /**
@@ -107,7 +107,7 @@ namespace Torch { namespace database { namespace detail {
       size_t add(const Torch::database::Array& array);
 
       /**
-       * This is a special version of the overwriteArray() method that will
+       * This is a special version of the add() method that will
        * take a reference to the array you are manipulating instead of the
        * copying. This implies that I'll set up its parent and id myself.
        *
