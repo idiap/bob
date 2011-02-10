@@ -157,6 +157,8 @@ namespace Torch { namespace database { namespace detail {
         return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<std::complex<double>,D>* >(m_bzarray));
       case Torch::core::array::t_complex256: 
         return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<std::complex<long double>,D>* >(m_bzarray));
+      case Torch::core::array::t_unknown: 
+        break;
     }
 
     //if we get to this point, there is nothing much we can do...

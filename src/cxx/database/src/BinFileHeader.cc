@@ -20,7 +20,7 @@ const uint8_t dbd::FORMAT_VERSION = 0;
 dbd::BinFileHeader::BinFileHeader()
   : m_version(dbd::FORMAT_VERSION),
     m_elem_type(core::array::t_unknown), 
-    m_elem_sizeof(core::array::getElementSize(m_elem_type)),
+    m_elem_sizeof(0),//core::array::getElementSize(m_elem_type)),
     m_endianness(dbd::MAGIC_ENDIAN_DW),
     m_n_dimensions(0), 
     m_n_samples(0)

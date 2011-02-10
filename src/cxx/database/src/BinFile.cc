@@ -102,6 +102,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
           T val = bz(i);
           s.write((const char*)&val, core::array::getElementSize<T>());
         }
+        break;
       }
     case 2:
       {
@@ -111,6 +112,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
             T val = bz(i,j);
             s.write((const char*)&val, core::array::getElementSize<T>());
           }
+        break;
       }
     case 3:
       {
@@ -121,6 +123,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
               T val = bz(i,j,k);
               s.write((const char*)&val, core::array::getElementSize<T>());
             }
+        break;
       }
     case 4:
       {
@@ -132,6 +135,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
                 T val = bz(i,j,k,l);
                 s.write((const char*)&val, core::array::getElementSize<T>());
               }
+        break;
       }
     default:
       throw db::DimensionError();
@@ -190,21 +194,21 @@ db::detail::InlinedArrayImpl read_inlined(size_t ndim, const size_t* shape,
     case 2:
       {
         //arrays are always stored in C-style ordering
-        blitz::Array<T,1> bz(shape[0], shape[1]);
+        blitz::Array<T,2> bz(shape[0], shape[1]);
         s.read(reinterpret_cast<char*>(bz.data()), shape[0]*shape[1]*sizeof(T));
         return bz;
       }
     case 3:
       {
         //arrays are always stored in C-style ordering
-        blitz::Array<T,1> bz(shape[0], shape[1], shape[2]);
+        blitz::Array<T,3> bz(shape[0], shape[1], shape[2]);
         s.read(reinterpret_cast<char*>(bz.data()), shape[0]*shape[1]*shape[2]*sizeof(T));
         return bz;
       }
     case 4:
       {
         //arrays are always stored in C-style ordering
-        blitz::Array<T,1> bz(shape[0], shape[1], shape[2], shape[3]);
+        blitz::Array<T,4> bz(shape[0], shape[1], shape[2], shape[3]);
         s.read(reinterpret_cast<char*>(bz.data()), shape[0]*shape[1]*shape[2]*shape[3]*sizeof(T));
         return bz;
       }

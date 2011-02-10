@@ -21,10 +21,13 @@ template<typename T, int D> static inline void deleteBzArray(void* bzarray) {
 
 #define DELSWITCH(T,N,D) case N: \
   switch(D) { \
-  case 1: deleteBzArray<T,1>(m_bzarray); \
-  case 2: deleteBzArray<T,2>(m_bzarray); \
-  case 3: deleteBzArray<T,3>(m_bzarray); \
-  case 4: deleteBzArray<T,4>(m_bzarray); }
+    case 1: deleteBzArray<T,1>(m_bzarray); break;\
+    case 2: deleteBzArray<T,2>(m_bzarray); break;\
+    case 3: deleteBzArray<T,3>(m_bzarray); break;\
+    case 4: deleteBzArray<T,4>(m_bzarray); break;\
+    default: throw Torch::database::DimensionError();\
+  } \
+  break;
 
 tdd::InlinedArrayImpl::~InlinedArrayImpl() {
   switch(m_elementtype) {
@@ -58,10 +61,13 @@ tdd::InlinedArrayImpl::InlinedArrayImpl (const tdd::InlinedArrayImpl& other) {
 
 #define GETSWITCH(T,N,D) case N: \
   switch(D) { \
-  case 1: m_bzarray = getBzArray<T,1>(other.m_bzarray); \
-  case 2: m_bzarray = getBzArray<T,2>(other.m_bzarray); \
-  case 3: m_bzarray = getBzArray<T,3>(other.m_bzarray); \
-  case 4: m_bzarray = getBzArray<T,4>(other.m_bzarray); }
+    case 1: m_bzarray = getBzArray<T,1>(other.m_bzarray); break;\
+    case 2: m_bzarray = getBzArray<T,2>(other.m_bzarray); break;\
+    case 3: m_bzarray = getBzArray<T,3>(other.m_bzarray); break;\
+    case 4: m_bzarray = getBzArray<T,4>(other.m_bzarray); break;\
+    default: throw Torch::database::DimensionError();\
+  }\
+  break;
 
 tdd::InlinedArrayImpl& tdd::InlinedArrayImpl::operator= (const tdd::InlinedArrayImpl& other) {
   m_elementtype = other.m_elementtype;
