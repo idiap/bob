@@ -27,7 +27,7 @@ db::Array::Array(const Array& other)
     m_external(other.m_external),
     m_id(0)
 {
-  //if (m_parent_arrayset) m_parent_arrayset->addArray(*this);
+  //if (m_parent_arrayset) m_parent_arrayset->add(*this);
 }
 
 db::Array::~Array() {
@@ -45,33 +45,24 @@ db::Array& db::Array::operator= (const db::Array& other) {
 
 size_t db::Array::getNDim() const {
   if (m_inlined) return m_inlined->getNDim(); 
-  Torch::core::array::ElementType eltype;
-  size_t ndim;
-  m_external->getSpecification(eltype, ndim, m_tmp_shape);
-  return ndim;
+  return m_external->getNDim();
 }
 
 Torch::core::array::ElementType db::Array::getElementType() const {
   if (m_inlined) return m_inlined->getElementType(); 
-  Torch::core::array::ElementType eltype;
-  size_t ndim;
-  m_external->getSpecification(eltype, ndim, m_tmp_shape);
-  return eltype;
+  return m_external->getElementType();
 }
 
 const size_t* db::Array::getShape() const {
   if (m_inlined) return m_inlined->getShape(); 
-  Torch::core::array::ElementType eltype;
-  size_t ndim;
-  m_external->getSpecification(eltype, ndim, m_tmp_shape);
-  return m_tmp_shape;
+  return m_external->getShape();
 }
 
 void db::Array::save(const std::string& filename, const std::string& codecname) 
 {
   if (m_inlined) {
     m_external.reset(new db::detail::ExternalArrayImpl(filename, codecname));
-    m_external->save(*m_inlined);
+    m_external->set(*m_inlined);
     m_inlined.reset();
     return;
   }
@@ -123,6 +114,14 @@ void db::Array::set(const db::detail::InlinedArrayImpl& data) {
 }
 
 db::detail::InlinedArrayImpl db::Array::get() const {
-  if (!m_inlined) return m_external->load();
+  if (!m_inlined) return m_external->get();
   return *m_inlined.get();
 }
+
+void db::Array::load() {
+  if (!m_inlined) {
+    m_inlined.reset(new detail::InlinedArrayImpl(m_external->get()));
+    m_external.reset();
+  }
+}
+

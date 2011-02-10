@@ -69,20 +69,12 @@ namespace Torch { namespace database { namespace detail {
       template<typename T, int D> blitz::Array<T,D> getCopy() const;
 
       /**
-       * This method returns a reference to my internal data (not a
-       * copy) in the type you wish. It is the easiest method to use because
-       * I'll never throw, no matter which type you want to receive data at.
-       * Only get the number of dimensions right!
+       * This method returns a copy to my internal data (not a
+       * reference) in the type you wish. It is the easiest method to use
+       * because I'll never throw, no matter which type you want to receive
+       * data at. Only get the number of dimensions right!
        */
-      template<typename T, int D> const blitz::Array<T,D> cast() const;
-
-      /**
-       * This method returns a copy of my internal data (not a
-       * copy) in the type you wish. It is the easiest method to use because
-       * I'll never throw, no matter which type you want to receive data at.
-       * Only get the number of dimensions right!
-       */
-      template<typename T, int D> blitz::Array<T,D> castCopy() const;
+      template<typename T, int D> blitz::Array<T,D> cast() const;
 
       /**
        * Some informative methods
@@ -132,9 +124,8 @@ namespace Torch { namespace database { namespace detail {
     return get<T,D>()->copy();
   }
 
-  template<typename T, int D> const blitz::Array<T,D> InlinedArrayImpl::cast() const {
+  template<typename T, int D> blitz::Array<T,D> InlinedArrayImpl::cast() const {
     if (D != m_ndim) throw DimensionError();
-    //TODO: Ask LES how to use blitz::complex_cast<>() in this situation...
     switch (m_elementtype) {
       case Torch::core::array::t_bool: 
         return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<bool,D>* >(m_bzarray));
@@ -170,11 +161,6 @@ namespace Torch { namespace database { namespace detail {
 
     //if we get to this point, there is nothing much we can do...
     throw TypeError();
-  }
-
-  template<typename T, int D> blitz::Array<T,D> InlinedArrayImpl::castCopy() const 
-  {
-    return cast<T,D>()->copy();
   }
 
 }}}

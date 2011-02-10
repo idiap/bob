@@ -25,13 +25,13 @@ tdd::ExternalArrayImpl::ExternalArrayImpl(const std::string& filename,
   else {
     m_codec = Torch::database::ArrayCodecRegistry::getCodecByExtension(filename);
   }
+  reloadSpecification();
 }
 
 tdd::ExternalArrayImpl::~ExternalArrayImpl() {}
 
-void tdd::ExternalArrayImpl::getSpecification
-(Torch::core::array::ElementType& eltype, size_t& ndim, size_t* shape) const {
-  m_codec->peek(m_filename, eltype, ndim, shape);
+void tdd::ExternalArrayImpl::reloadSpecification () {
+  m_codec->peek(m_filename, m_elementtype, m_ndim, m_shape);
 }
 
 void tdd::ExternalArrayImpl::move(const std::string& filename,
@@ -52,4 +52,10 @@ void tdd::ExternalArrayImpl::move(const std::string& filename,
     boost::filesystem::remove(boost::filesystem::path(m_filename));
     m_codec = newcodec;
   }
+  reloadSpecification();
+}
+
+void tdd::ExternalArrayImpl::set(const tdd::InlinedArrayImpl& data) {
+  m_codec->save(m_filename, data);
+  reloadSpecification();
 }

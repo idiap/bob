@@ -1,563 +1,214 @@
 /**
- * @file src/cxx/database/database/Arrayset.h
+ * @file database/Arrayset.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
- * @brief A torch representation of an Array for a Dataset.
+ * @brief A torch representation of an Arrayset for a Dataset.
  */
 
-#ifndef TORCH5SPRO_DATABASE_ARRAYSET_H
-#define TORCH5SPRO_DATABASE_ARRAYSET_H 1
+#ifndef TORCH_DATABASE_ARRAYSET_H
+#define TORCH_DATABASE_ARRAYSET_H 1
 
 #include <string>
-#include <map>
-#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include <blitz/array.h>
 
-#include "core/logging.h"
-#include "core/Exception.h"
-#include "core/cast.h"
-#include "database/dataset_common.h"
+#include "database/Array.h"
+#include "database/InlinedArraysetImpl.h"
+#include "database/ExternalArraysetImpl.h"
 
 namespace Torch {   
   /**
    * \ingroup libdatabase_api
    * @{
-   *
    */
   namespace database {
     
-    class Dataset;
+    //I promise this exists:
+    //class Dataset;
+
     /**
-     * @brief The arrayset class for a dataset
+     * The arrayset class for a dataset. It is responsible for holding and
+     * allowing access to sets of arrays that share the same element type,
+     * number of dimensions and shape.
      */
     class Arrayset {
-      friend class XMLParser;
-      friend class XMLWriter;
-      friend class BinFile;
 
       public:
-        /**
-         * @brief Destructor
-         */
-        ~Arrayset();
-
-        /*y*
-         * @brief Add a copy of the given Array to the Arrayset
-         */
-        void append( boost::shared_ptr<const Array> array);
-        /*y*
-         * @brief Add a copy of the given Array to the Arrayset
-         */
-        void append( const Array& array);
-        /**
-         * @brief Add a blitz array to the Arrayset
-         */
-        template <typename T, int D>
-        void append( const blitz::Array<T,D>& bl);
-        /**
-         * @brief Add a new array to the Arrayset
-         */
-        void append( const std::string& filename, const std::string& codec);
-        /**
-         * @brief Remove an Array with a given id from the Arrayset
-         */
-        void remove( const size_t id);
 
         /**
-         * @brief Update the shape of the Array with the one given in the
-         * blitz TinyVector.
+         * Constructor. Start a new Arrayset with whatever suits the
+         * InlinedArraysetImpl class
          */
-        template<int D> 
-        void setShape (const blitz::TinyVector<int,D>& shape) {
-          m_n_dim = D;
-          size_t n_elem = 1;
-          for( int i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i) {
-            if( i< D) {
-              m_shape[i] = shape(i);
-              n_elem *= shape(i);
-            } 
-            else
-              m_shape[i] = 0;
-          }
-          m_n_elem = n_elem;
-        }
+        Arrayset (const detail::InlinedArraysetImpl& inlined);
 
         /**
-         * @brief Set the type of the elements contained in the the arrays of 
-         * this Arrayset
+         * Builds an Arrayset that contains data from a file.
+         * You can optionally specify the name of a codec.
          */
-        void setElementType(const array::ElementType element_type) 
-          { m_element_type = element_type; }
+        Arrayset(const std::string& filename, const std::string& codec="");
+
         /**
-         * @brief Set the role of the Arrayset
+         * Copy construct an Arrayset
          */
-        void setRole(const std::string& role) { m_role.assign(role); } 
+        Arrayset(const Arrayset& other);
+
         /**
-         * @brief Set the flag indicating if this arrayset is loaded from an 
-         * external file.
+         * Destructor
          */
-//        void setIsLoaded(const bool is_loaded) { m_is_loaded = is_loaded; }
+        virtual ~Arrayset();
+
         /**
-         * @brief Set the filename containing the data if any. An empty string
-         * indicates that the data are stored in the XML file directly.
+         * Assign an arrayset
          */
-        void setFilename(const std::string& filename, const std::string& codec="")
-          { m_filename.assign(filename); }
+        Arrayset& operator= (const Arrayset& other);
+
         /**
-         * @brief Set the loader used to read the data from the external file 
-         * if any.
+         * Adds a copy of the given Array to the Arrayset. If the array id is
+         * zero, I'll assign a proper id to this array. Else, if the arrayset
+         * is loaded in memory and if an array with existing id is already
+         * inside, this will throw an exception. If the arrayset is serialized
+         * in a file, the array.id property will be ignore and the array will
+         * be appended to that file. 
+         *
+         * To force adding, possibly overwriting an existing array position,
+         * just use overwrite()
          */
-//        void setLoader(const LoaderType loader) { m_loader = loader; }
+        void add (boost::shared_ptr<const Array> array);
+        void overwrite (boost::shared_ptr<const Array> array);
+        void add (const Array& array);
+        void overwrite (const Array& array);
+
+        /**
+         * Adds a blitz array to the Arrayset, optionally specifying the id.
+         * Please note that if this id is repeated, this may raise an
+         * exception. If the arrayset is file-based, the id will be ignored.
+         */
+        void add (const detail::InlinedArrayImpl& array, size_t id=0);
+        void overwrite (const detail::InlinedArrayImpl& array, size_t id=0);
         
         /**
-         * @brief Get the id of the Arrayset
+         * Adds a new external array to the Arrayset
          */
-        size_t getId() const { return m_id; }
-        /**
-         * @brief Get the number of dimensions of the arrays of this Arrayset
-         */
-        size_t getNDim() const { return m_n_dim; }
-        /**
-         * @brief Update the given blitz array with the content of the array
-         * of the provided id.
-         */
-        template<int D> void getShape( blitz::TinyVector<int,D>& res ) const {
-          if( D!=m_n_dim )
-            throw NDimensionError();
-          for( int i=0; i<D; ++i)
-            res[i] = m_shape[i];
-        }
-        /**
-         * @brief Get the number of elements in each array of this 
-         * Arrayset
-         */
-        size_t getNElem() const { return m_n_elem; } 
-        /**
-         * @brief Get the type of the elements contained in the the arrays of 
-         * this Arrayset
-         */
-        array::ElementType getElementType() const { return m_element_type; }
-        /**
-         * @brief Get the role of this Arrayset
-         */
-        const std::string& getRole() const { return m_role; }
-        /**
-         * @brief Get the flag indicating if the arrayset is loaded from an 
-         * external file.
-         */
-        bool getIsLoaded() const { return m_is_loaded; }
-        /**
-         * @brief Get the filename containing the data if any. An empty string
-         * indicates that the data is stored in the XML file directly.
-         */
-        const std::string& getFilename() const { return m_filename; }
-        /**
-         * @brief Get the loader used to read the data from the external file 
-         * if any.
-         */
-        const std::string& getCodecname() const { return m_codecname; }
-        /**
-         * @brief Get the number of arrays in this Arrayset
-         */
-        size_t getNArrays() const { return m_array.size(); }
+        void add (const std::string& filename, const std::string& codec, size_t id=0);
+        void overwrite (const std::string& filename, const std::string& codec, size_t id=0);
 
         /**
-          * @brief Update the given vector with the 
+         * Removes an Array with a given id from the Arrayset. Please note that
+         * if this arrayset is encoded in an external file, this will trigger
+         * loading the whole arrayset into memory, deleting the required array
+         * and re-saving the file, which can be time-consuming.
+         */
+        void remove (const size_t id);
+
+        /**
+         * Removes a given Array from the set.
+         */
+        void remove (const Array& array);
+        void remove (boost::shared_ptr<const Array> array);
+
+        /**
+         * Returns some information from the current Arrayset
+         */
+        inline size_t getId () const { return m_id; }
+        inline const std::string& getRole() const { return m_role; }
+        inline bool isLoaded() const { return m_inlined; }
+        
+        Torch::core::array::ElementType getElementType() const;
+        size_t getNDim() const;
+        const size_t* getShape() const;
+        size_t getNSamples() const;
+
+        /**
+         * Sets the role of the Arrayset
+         */
+        inline void setRole (const std::string& role) { m_role = role; } 
+
+        /**
+         * Saves this arrayset in the given path using the codec indicated (or
+         * by looking at the file extension if that is empty). If the arrayset
+         * was already in a file it is moved/re-encoded as need to fulfill this
+         * request. If the arrayset was in memory, it is serialized, from the
+         * data I have in memory and subsequently erased. If the filename
+         * specifies an existing file, this file is overwritten.
+         */
+        void save(const std::string& filename, const std::string&
+            codecname="");
+
+        /**
+         * If the arrayset is in memory already, this is a noop. If it is in an
+         * external file, the file data is read and I become an inlined
+         * arrayset. The underlying file containing the data is <b>not</b>
+         * erased, we just unlink it from this Arrayset. If you want to read
+         * the arrayset data from the file without switching the internal
+         * representation of this arrayset (from external to inlined), use the
+         * operator[].
+         */
+        void load();
+
+        /**
+         * Inserts, in the given STL-conforming container (has to accept
+         * push_back(size_t)), the identities of the Arrays I have in this
+         * Arrayset.
           */
-        void index( std::vector<size_t>& x );
-        /**
-         * @brief Return the array of the given index
-         * @warning Please note that if you use that method, scope matters,
-         * because the dataset owns the arrays.
-         */
-        const Array& operator[](size_t ind) const;
-        Array& operator[](size_t ind);
-        /**
-         * @brief Return a smart pointer to the array of the given index
-         */
-        boost::shared_ptr<const Array> getArray(size_t ind) const;
-        boost::shared_ptr<Array> getArray(size_t ind);
+        template <typename T> void index(T& container) const;
 
         /**
-         * @brief Return a blitz array with the content of the array 
-         * of the provided id.
+         * Returns a pointer to the parent Dataset
          */
-        template<typename T, int D> 
-        blitz::Array<T,D> at(size_t id) const;
+        /**
+        boost::shared_ptr<const Dataset> getParent() const;
+        **/
 
+        /**
+         * Set my parent and adds me to the given Dataset. If my id was set to
+         * 0, this will get reset by choosing a free id from the parent
+         * Dataset. Otherwise, this will insert me into the Arrayset
+         * overwriting, possibly, any other exising Arrayset.
+         */
+        /**
+        void setParent(boost::shared_ptr<Dataset>& parent);
+        **/
 
-        boost::shared_ptr<const Dataset> getParentDataset() const;
+        /**
+         * This set of methods allow you to access the data contained in this
+         * Arrayset. Please note that, if this Arrayset is inlined, you will
+         * get a reference to the pointed data. Changing it, will be reflected
+         * in my internals (would you ever save me again!). If this Arrayset is
+         * serialized in a file, you will get a copy of the data. In this last
+         * case, changing this array will not affect my internals.
+         */
+        const Array operator[] (size_t index) const;
+        Array operator[] (size_t index);
 
-        /** 
-         * @brief const_iterator over the Arrays of the Dataset
-         */
-        typedef std::vector<boost::shared_ptr<Array> >::const_iterator
-          const_iterator;
-        /** 
-         * @brief Return a const_iterator pointing at the first Array of 
-         * the Dataset
-         */
-        const_iterator begin() const { return m_array.begin(); }
-        /** 
-         * @brief Return a const_iterator pointing at the last Array of 
-         * the Dataset
-         */
-        const_iterator end() const { return m_array.end(); }
-
-        /** 
-         * @brief iterator over the Arrays of the Dataset
-         */
-        typedef std::vector<boost::shared_ptr<Array> >::iterator 
-          iterator;
-        /** 
-         * @brief Return an iterator pointing at the first Array of 
-         * the Dataset
-         */
-        iterator begin() { return m_array.begin(); }
-        /** 
-         * @brief Return an iterator pointing at the first Array of 
-         * the Dataset
-         */
-        iterator end() { return m_array.end(); }
-
-
+        template<typename T, int D> const blitz::Array<T,D> get (size_t index) const;
+        template<typename T, int D> blitz::Array<T,D> cast (size_t index) const;
 
       private:
-        /**
-         * @brief Constructor
-         */
-        Arrayset( boost::shared_ptr<const Dataset> parent, const size_t id=0,
-          const std::string& filename="", const std::string& codec="");
+        //boost::weak_ptr<Dataset> m_parent_dataset; ///< My current parent
+        boost::shared_ptr<detail::InlinedArraysetImpl> m_inlined;
+        boost::shared_ptr<detail::ExternalArraysetImpl> m_external;
+        size_t m_id; ///< This is my id
+        std::string m_role; ///< This is my role
 
-        /**
-         * @brief Set the id of the Arrayset
-         */
-//        const size_t getId() { return m_id; }
-        /**
-         * @brief Set the number of dimensions of the arrays of this Arrayset
-         */
-//        int getNDim() { return m_n_dim; }
-//      void setNDim(const size_t n_dim) { m_n_dim = n_dim; }
-        /**
-         * @brief Set the size of each dimension of the arrays of this 
-         * Arrayset
-         */
-/*      void setShape(const size_t shape[]) { 
-          for(size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i)
-            m_shape[i] = shape[i];
-        }*/
-
-        /**
-         * @brief Check that the blitz array has a compatible number of 
-         * dimensions with this Arrayset
-         */
-        template <int D> void appendCheck() const;
-
-        /**
-          * @brief Return the shape in the C-style format
-          */
-        const size_t* getShape() const { return m_shape; }
-        /**
-         * @brief Update the shape of the Array with the one given.
-         */
-        void setShape( const size_t shape[array::N_MAX_DIMENSIONS_ARRAY] ) {
-          m_n_dim = 0;
-          size_t n_elem = 1;
-          bool over = false;
-          for( size_t i=0; i<array::N_MAX_DIMENSIONS_ARRAY; ++i) {
-            if( !over && shape[i] > 0 ) {
-              m_shape[i] = shape[i];
-              n_elem *= shape[i];
-              ++m_n_dim;
-            } 
-            else {
-              over = true;
-              m_shape[i] = 0;
-            }
-          }
-          m_n_elem = n_elem;
-        }
-
-
-        /**
-          * Attributes
-          */
-        boost::weak_ptr<const Dataset> m_parent_dataset;
-        size_t m_id;
-
-        size_t m_n_dim;
-        size_t m_shape[array::N_MAX_DIMENSIONS_ARRAY];
-        size_t m_n_elem;
-        array::ElementType m_element_type;
-        
-        std::string m_role;
-        bool m_is_loaded;
-        std::string m_filename;
-        std::string m_codecname;
-
-
-        std::vector<boost::shared_ptr<Array> > m_array;
-        std::map<size_t,size_t> m_index; //Key:id, value:index
     };
 
-
-
-    /********************** TEMPLATE FUNCTION DEFINITIONS ***************/
-    template <typename T, typename U> 
-    void Array::copyCast( U* out ) const {
-      size_t n_elem = (m_parent_arrayset.lock())->getNElem();
-      for( size_t i=0; i<n_elem; ++i) {
-        T* t_storage = reinterpret_cast<T*>(m_storage);
-        static_complex_cast( t_storage[i], out[i] );
+    template <typename T> void Arrayset::index(T& container) const {
+      if (m_inlined) {
+        for (std::list<boost::shared_ptr<Array> >::const_iterator it=m_inlined->arrays().begin(); it!=m_inlined->arrays().end(); ++it) container.push_back((*it)->getId());
+      }
+      else {
+        for (size_t i=0; i<m_external->getNSamples(); ++i) container.push_back(i+1);
       }
     }
-
-    template <typename T, int D> 
-    blitz::Array<T,D> Array::data( ) const 
-    {
-      boost::shared_ptr<const Arrayset> parent = m_parent_arrayset.lock();
-      if( D != parent->getNDim() ) {
-        TDEBUG3("D=" << D << " -- ParseXML: D=" << 
-          parent->getNDim());
-        error << "Cannot copy the data in a blitz array with a different " <<
-          "number of dimensions." << std::endl;
-        throw NDimensionError();
-      }
-
-      // Reshape each dimensions with the correct size
-      blitz::TinyVector<int,D> shape;
-      parent->getShape(shape);
-
-      blitz::Array<T,D> bl(shape);
-
-      // Load the data if required
-      if(!m_is_loaded) {
-        ;//TODO:load 
-        Array* a=const_cast<Array*>(this);
-        a->m_is_loaded = true;
-      }
-
-      T* out_data = bl.data();
-      switch(parent->getElementType()) {
-        case array::t_bool:
-          copyCast<bool,T>(out_data); break;
-        case array::t_int8:
-          copyCast<int8_t,T>(out_data); break;
-        case array::t_int16:
-          copyCast<int16_t,T>(out_data); break;
-        case array::t_int32:
-          copyCast<int32_t,T>(out_data); break;
-        case array::t_int64:
-          copyCast<int64_t,T>(out_data); break;
-        case array::t_uint8:
-          copyCast<uint8_t,T>(out_data); break;
-        case array::t_uint16:
-          copyCast<uint16_t,T>(out_data); break;
-        case array::t_uint32:
-          copyCast<uint32_t,T>(out_data); break;
-        case array::t_uint64:
-          copyCast<uint64_t,T>(out_data); break;
-        case array::t_float32:
-          copyCast<float,T>(out_data); break;
-        case array::t_float64:
-          copyCast<double,T>(out_data); break;
-        case array::t_float128:
-          copyCast<long double,T>(out_data); break;
-        case array::t_complex64:
-          copyCast<std::complex<float>,T>(out_data); break;
-        case array::t_complex128:
-          copyCast<std::complex<double>,T>(out_data); break;
-        case array::t_complex256:
-          copyCast<std::complex<long double>,T>(out_data); break;
-        default:
-          break;
-      }
-
-      return bl;
+        
+    template<typename T, int D> const blitz::Array<T,D> Arrayset::get (size_t index) const {
+      return (*this)[index].get<T,D>();
     }
 
-    template <int D> void Array::referCheck( ) const
-    {
-      // Load the data if required
-      if(!m_is_loaded) {
-        ;//TODO:load 
-        Array* a=const_cast<Array*>(this);
-        a->m_is_loaded = true;
-      }
-
-      boost::shared_ptr<const Arrayset> parent = m_parent_arrayset.lock();
-      if( D != parent->getNDim() ) {
-        TDEBUG3("D=" << D << " -- ParseXML: D=" <<
-           parent->getNDim());
-        error << "Cannot refer to the data in a blitz array with a " <<
-          "different number of dimensions." << std::endl;
-        throw NDimensionError();
-      }
+    template<typename T, int D> blitz::Array<T,D> Arrayset::cast (size_t index) const {
+      return (*this)[index].cast<T,D>();
     }
-
-
-#define REFER_DECL(T,D) template<> \
-   blitz::Array<T,D> Array::data(); \
-
-        REFER_DECL(bool,1)
-        REFER_DECL(bool,2)
-        REFER_DECL(bool,3)
-        REFER_DECL(bool,4)
-        REFER_DECL(int8_t,1)
-        REFER_DECL(int8_t,2)
-        REFER_DECL(int8_t,3)
-        REFER_DECL(int8_t,4)
-        REFER_DECL(int16_t,1)
-        REFER_DECL(int16_t,2)
-        REFER_DECL(int16_t,3)
-        REFER_DECL(int16_t,4)
-        REFER_DECL(int32_t,1)
-        REFER_DECL(int32_t,2)
-        REFER_DECL(int32_t,3)
-        REFER_DECL(int32_t,4)
-        REFER_DECL(int64_t,1)
-        REFER_DECL(int64_t,2)
-        REFER_DECL(int64_t,3)
-        REFER_DECL(int64_t,4)
-        REFER_DECL(uint8_t,1)
-        REFER_DECL(uint8_t,2)
-        REFER_DECL(uint8_t,3)
-        REFER_DECL(uint8_t,4)
-        REFER_DECL(uint16_t,1)
-        REFER_DECL(uint16_t,2)
-        REFER_DECL(uint16_t,3)
-        REFER_DECL(uint16_t,4)
-        REFER_DECL(uint32_t,1)
-        REFER_DECL(uint32_t,2)
-        REFER_DECL(uint32_t,3)
-        REFER_DECL(uint32_t,4)
-        REFER_DECL(uint64_t,1)
-        REFER_DECL(uint64_t,2)
-        REFER_DECL(uint64_t,3)
-        REFER_DECL(uint64_t,4)
-        REFER_DECL(float,1)
-        REFER_DECL(float,2)
-        REFER_DECL(float,3)
-        REFER_DECL(float,4)
-        REFER_DECL(double,1)
-        REFER_DECL(double,2)
-        REFER_DECL(double,3)
-        REFER_DECL(double,4)
-        REFER_DECL(std::complex<float>,1)
-        REFER_DECL(std::complex<float>,2)
-        REFER_DECL(std::complex<float>,3)
-        REFER_DECL(std::complex<float>,4)
-        REFER_DECL(std::complex<double>,1)
-        REFER_DECL(std::complex<double>,2)
-        REFER_DECL(std::complex<double>,3)
-        REFER_DECL(std::complex<double>,4)
-
-
-    template<int D> void Arrayset::appendCheck() const
-    {
-      if( D != m_n_dim ) {
-        TDEBUG3("D=" << D << " -- Blitz array of size D=" << m_n_dim);
-        error << "Cannot appened to the Arrayset a blitz array with a " <<
-          "different number of dimensions." << std::endl;
-        throw NDimensionError();
-      }
-    }
-
-
-    template <typename T, int D>
-    void Arrayset::append( const blitz::Array<T,D>& bl)
-    {
-      appendCheck<D>();
-
-      // Find an available id and assign it to the Array
-      // TODO: check that this works
-      static size_t id = 1;
-      bool available_id = false;
-      while( !available_id )
-      {
-        if(m_index.find(id) == m_index.end() )
-          available_id = true;
-        ++id;
-      }
-      boost::shared_ptr<Array> array(
-        new Array(boost::shared_ptr<const Arrayset>(this), id));
-
-      void* storage;
-
-      // Check that the memory is contiguous in the blitz array
-      // as this is required by the copy
-      blitz::Array<T,D> ref;
-      if( !checkSafedata(bl) )
-        ref.reference(bl.copy());
-      else
-        ref.reference(bl);
-      // Allocate storage area and copy the data from the blitz 
-      // array to the storage area
-      switch(m_element_type) {
-        case array::t_bool:
-          storage=new bool[m_n_elem];
-          array->copyCast<bool,T>(ref.data()); break;
-        case array::t_int8:
-          storage=new int8_t[m_n_elem];
-          array->copyCast<int8_t,T>(ref.data()); break;
-        case array::t_int16:
-          storage=new int16_t[m_n_elem];
-          array->copyCast<int16_t,T>(ref.data()); break;
-        case array::t_int32:
-          storage=new int32_t[m_n_elem];
-          array->copyCast<int32_t,T>(ref.data()); break;
-        case array::t_int64:
-          storage=new int64_t[m_n_elem];
-          array->copyCast<int64_t,T>(ref.data()); break;
-        case array::t_uint8:
-          storage=new uint8_t[m_n_elem];
-          array->copyCast<uint8_t,T>(ref.data()); break;
-        case array::t_uint16:
-          storage=new uint16_t[m_n_elem];
-          array->copyCast<uint16_t,T>(ref.data()); break;
-        case array::t_uint32:
-          storage=new uint32_t[m_n_elem];
-          array->copyCast<uint32_t,T>(ref.data()); break;
-        case array::t_uint64:
-          storage=new uint64_t[m_n_elem];
-          array->copyCast<uint64_t,T>(ref.data()); break;
-        case array::t_float32:
-          storage=new float[m_n_elem];
-          array->copyCast<float,T>(ref.data()); break;
-        case array::t_float64:
-          storage=new double[m_n_elem];
-          array->copyCast<double,T>(ref.data()); break;
-        case array::t_float128:
-          storage=new long double[m_n_elem];
-          array->copyCast<long double,T>(ref.data()); break;
-        case array::t_complex64:
-          storage=new std::complex<float>[m_n_elem];
-          array->copyCast<std::complex<float>,T>(ref.data()); break;
-        case array::t_complex128:
-          storage=new std::complex<double>[m_n_elem];
-          array->copyCast<std::complex<double>,T>(ref.data()); break;
-        case array::t_complex256:
-          storage=new std::complex<long double>[m_n_elem];
-          array->copyCast<std::complex<long double>,T>(ref.data()); break;
-        default:
-          break;
-      }
-
-      // Update the m_is_loaded member of the array
-      array->m_is_loaded = true;
-    }
-
-
-    template<typename T, int D> blitz::Array<T,D>
-    Arrayset::at(size_t ind) const {
-      boost::shared_ptr<const Array> x = m_array[ind];
-      return x->data<T,D>();
-    }
-
-
-
 
   }
   /**
@@ -565,5 +216,4 @@ namespace Torch {
    */
 }
 
-#endif /* TORCH5SPRO_DATABASE_ARRAYSET_H */
-
+#endif /* TORCH_DATABASE_ARRAYSET_H */

@@ -27,7 +27,7 @@ set(src
     "src/ArraysetCodecRegistry.cc"
     "src/BinaryArraysetCodec.cc"
     "src/ExternalArraysetImpl.cc"
-    #"src/Arrayset.cc"
+    "src/Arrayset.cc"
     #"src/Dataset.cc"
     #"src/Relationset.cc"
     #"src/Rule.cc"

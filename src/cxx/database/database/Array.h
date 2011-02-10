@@ -86,21 +86,26 @@ namespace Torch {
         void save(const std::string& filename, const std::string& codecname="");
 
         /**
-         * If the array is in-memory, returns a reference to it. If it is in a
+         * If the array is in-memory nothing happens. If the array is in a
          * file, the file data is read and I become an inlined array. The
          * underlying file containing the data is <b>not</b> erased, we just
-         * unlink it from this Array. If you want to read the array data from
-         * the file without switching the internal representation of this array
-         * (from external to inlined), use the get() method.
+         * unlink it from this Array. 
          */
-        template <typename T, int D> blitz::Array<T,D> load();
+        void load();
+
+        /**
+         * If the array is already in memory, we return a copy of it in the
+         * type you wish (just have to get the number of dimensions right!). If
+         * it is in a file, we load it and return a copy of the loaded data.
+         */
+        template <typename T, int D> blitz::Array<T,D> cast() const;
 
         /**
          * If the array is already in memory, we return a reference to it. If
          * it is in a file, we load it and return a reference to the loaded
          * data.
          */
-        template <typename T, int D> blitz::Array<T,D> get() const;
+        template <typename T, int D> const blitz::Array<T,D> get() const;
 
         /**
          * This is a non-templated version of the get() method that returns a
@@ -112,6 +117,9 @@ namespace Torch {
 
         /**
          * Sets the current data to the given array
+         *
+         * @warning The data is not copied, but referred so modifications to it
+         * will affect this array.
          */
         void set(const detail::InlinedArrayImpl& data);
 
@@ -191,19 +199,16 @@ namespace Torch {
         mutable size_t m_tmp_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< temporary variable used to return the shape of external arrays.
     };
 
-    template <typename T, int D> blitz::Array<T,D> Array::load() {
+    template <typename T, int D> const blitz::Array<T,D> Array::get() const {
       if (D != getNDim()) throw DimensionError();
-      if (!m_inlined) {
-        m_inlined.reset(new detail::InlinedArrayImpl(m_external->load()));
-        m_external.reset();
-      }
-      return m_inlined->castCopy<T,D>(); 
+      if (!m_inlined) return m_external->get().get<T,D>();
+      return m_inlined->get<T,D>(); 
     }
 
-    template <typename T, int D> blitz::Array<T,D> Array::get() const {
+    template <typename T, int D> blitz::Array<T,D> Array::cast() const {
       if (D != getNDim()) throw DimensionError();
-      if (!m_inlined) return m_external->load<T,D>();
-      return m_inlined->castCopy<T,D>(); 
+      if (!m_inlined) return m_external->get().cast<T,D>();
+      return m_inlined->cast<T,D>(); 
     }
 
   } //closes namespace database

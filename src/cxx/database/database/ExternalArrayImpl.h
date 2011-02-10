@@ -47,39 +47,15 @@ namespace Torch { namespace database { namespace detail {
       virtual ~ExternalArrayImpl();
 
       /**
-       * Returns a new array from the data in the file.
-       */
-      template<typename T, int D> inline blitz::Array<T,D> load() const {
-        return load().cast<T,D>();
-      }
-
-      /**
        * Loads the data from the file
        */
-      inline InlinedArrayImpl load() const {
-        return m_codec->load(m_filename);
-      }
+      inline InlinedArrayImpl get() const { return m_codec->load(m_filename); }
 
       /**
        * Saves data in the file. Please note that blitz::Array<>'s will be
        * implicetly converted to InlinedArrayImpl as required.
        */
-      inline void save(const InlinedArrayImpl& data) {
-        m_codec->save(m_filename, data);
-      }
-
-      /**
-       * Returns the specifications of the array contained in the file. This
-       * operation is delegated to the codec that may open the file and read
-       * values from the file to return you sensible data.
-       *
-       * TODO: We could try to optimize this call by caching the element type
-       * and number of dimensions after first reading them. Please note you
-       * have to solve the "empty file" or "non-existant file" problem for this
-       * to work reliably.
-       */
-      void getSpecification(Torch::core::array::ElementType& eltype,
-          size_t& ndim, size_t* shape) const;
+      void set(const InlinedArrayImpl& data);
 
       /**
        * Sets the filename of where the data is contained, re-writing the data
@@ -98,9 +74,23 @@ namespace Torch { namespace database { namespace detail {
       inline boost::shared_ptr<const Torch::database::ArrayCodec> getCodec() const 
       { return m_codec; }
 
+      /**
+       * Some informative methods
+       */
+      inline Torch::core::array::ElementType getElementType() const { return m_elementtype; }
+      inline size_t getNDim() const { return m_ndim; }
+      inline const size_t* getShape() const { return m_shape; }
+
+    private: //some helpers
+
+      void reloadSpecification();
+
     private: //representation
       std::string m_filename; ///< The file where this array is stored
       boost::shared_ptr<const Torch::database::ArrayCodec> m_codec; ///< How to load and save the data
+      Torch::core::array::ElementType m_elementtype;
+      size_t m_ndim;
+      size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
   };
 
 }}}

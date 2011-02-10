@@ -45,19 +45,6 @@ namespace Torch { namespace database { namespace detail {
       virtual ~ExternalArraysetImpl();
 
       /**
-       * Returns the specifications of the arrays contained in the file. This
-       * operation is delegated to the codec that may open the file and read
-       * values from the file to return you sensible data.
-       *
-       * TODO: We could try to optimize this call by caching the element type
-       * and number of dimensions after first reading them. Please note you
-       * have to solve the "empty file" or "non-existant file" problem for this
-       * to work reliably.
-       */
-      void getSpecification(Torch::core::array::ElementType& eltype,
-          size_t& ndim, size_t* shape, size_t& samples) const;
-
-      /**
        * Sets the filename of where the data is contained, re-writing the data
        * if the codec changes. Otherwise, just move.
        */
@@ -87,23 +74,49 @@ namespace Torch { namespace database { namespace detail {
        */
       void add(boost::shared_ptr<const Torch::database::Array> array);
       void add(const Torch::database::Array& array);
-      void add(const InlinedArraysetImpl& set);
+      void extend(const InlinedArraysetImpl& set);
+
+      /**
+       * Removes a certain Array from this set. Please note this will trigger
+       * loading and re-writing the underlying file. If the id index is out of
+       * bounds, this is a noop. The numbering scheme for the ids is
+       * "fortran-based", so we start counting at 1.
+       */
+      void remove(size_t id);
+      void remove(boost::shared_ptr<const Torch::database::Array> array);
+      void remove(const Torch::database::Array& array);
 
       /**
        * Loads the arrayset in memory in one shot.
        */
-      InlinedArraysetImpl load() const;
+      InlinedArraysetImpl get() const;
 
       /**
        * Saves the inlined array set in memory in one shot. This procedure will
        * erase any contents that previously existed on the file. If you want to
        * append use add() instead.
        */
-      void save(const InlinedArraysetImpl& set);
+      void set(const InlinedArraysetImpl& set);
+
+      /**
+       * Some informative methods
+       */
+      inline Torch::core::array::ElementType getElementType() const { return m_elementtype; }
+      inline size_t getNDim() const { return m_ndim; }
+      inline const size_t* getShape() const { return m_shape; }
+      inline size_t getNSamples() const { return m_samples; }
+
+    private: //some helpers
+
+      void reloadSpecification();
      
     private: //representation
       std::string m_filename; ///< The file where this array is stored
       boost::shared_ptr<const Torch::database::ArraysetCodec> m_codec; ///< How to load and save the data
+      Torch::core::array::ElementType m_elementtype;
+      size_t m_ndim;
+      size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
+      size_t m_samples;
   };
 
 }}}

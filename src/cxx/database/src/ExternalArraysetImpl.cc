@@ -24,13 +24,13 @@ tdd::ExternalArraysetImpl::ExternalArraysetImpl(const std::string& filename,
   else {
     m_codec = Torch::database::ArraysetCodecRegistry::getCodecByExtension(filename);
   }
+  reloadSpecification();
 }
 
 tdd::ExternalArraysetImpl::~ExternalArraysetImpl() {}
 
-void tdd::ExternalArraysetImpl::getSpecification
-(Torch::core::array::ElementType& eltype, size_t& ndim, size_t* shape, size_t& samples) const {
-  m_codec->peek(m_filename, eltype, ndim, shape, samples);
+void tdd::ExternalArraysetImpl::reloadSpecification() {
+  m_codec->peek(m_filename, m_elementtype, m_ndim, m_shape, m_samples);
 }
 
 void tdd::ExternalArraysetImpl::move(const std::string& filename,
@@ -51,6 +51,7 @@ void tdd::ExternalArraysetImpl::move(const std::string& filename,
     boost::filesystem::remove(boost::filesystem::path(m_filename));
     m_codec = newcodec;
   }
+  reloadSpecification();
 }
 
 Torch::database::Array tdd::ExternalArraysetImpl::operator[] (size_t id) const {
@@ -64,18 +65,43 @@ void tdd::ExternalArraysetImpl::add
 
 void tdd::ExternalArraysetImpl::add(const Torch::database::Array& array) {
   m_codec->append(m_filename, array);
+  reloadSpecification();
 }
 
-void tdd::ExternalArraysetImpl::add(const tdd::InlinedArraysetImpl& set) {
+void tdd::ExternalArraysetImpl::extend(const tdd::InlinedArraysetImpl& set) {
   for(std::list<boost::shared_ptr<Torch::database::Array> >::const_iterator it= set.arrays().begin(); it != set.arrays().end(); ++it) {
     add(*it);
   }
+  reloadSpecification();
 }
 
-tdd::InlinedArraysetImpl tdd::ExternalArraysetImpl::load() const {
+void tdd::ExternalArraysetImpl::remove(size_t id) {
+  Torch::core::array::ElementType eltype;
+  size_t ndim;
+  size_t* shape;
+  size_t samples;
+  m_codec->peek(m_filename, eltype, ndim, shape, samples);
+  if (id > samples) throw Torch::database::IndexError();
+  
+  //loads the file and rewrite it.
+  tdd::InlinedArraysetImpl data = get();
+  data.remove(id);
+  set(data);
+}
+
+void tdd::ExternalArraysetImpl::remove(boost::shared_ptr<const Torch::database::Array> array) {
+  remove(array->getId());
+}
+
+void tdd::ExternalArraysetImpl::remove(const Torch::database::Array& array) {
+  remove(array.getId());
+}
+
+tdd::InlinedArraysetImpl tdd::ExternalArraysetImpl::get() const {
   return m_codec->load(m_filename);
 }
 
-void tdd::ExternalArraysetImpl::save(const InlinedArraysetImpl& set) {
+void tdd::ExternalArraysetImpl::set(const InlinedArraysetImpl& set) {
   m_codec->save(m_filename, set);
+  reloadSpecification();
 }

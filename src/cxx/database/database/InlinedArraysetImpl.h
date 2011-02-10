@@ -34,9 +34,24 @@ namespace Torch { namespace database { namespace detail {
 
       /**
        * Starts a new Arrayset with begin and end iterators to
-       * boost::shared_ptr<Torch::database::Array>'s.
+       * boost::shared_ptr<Torch::database::Array>'s or anything else that
+       * overwrite() can accept.
        */
-      template <typename T> InlinedArraysetImpl(T begin, T end); 
+      template <typename T> InlinedArraysetImpl(T begin, T end) {
+        for (T it = begin; it != end; ++it) overwrite(*it);
+      }
+
+      /**
+       * Starts a new Arrayset with an STL conformant iterable container. This
+       * can be for example std::vector<Array> or std::list<Array>, as you
+       * wish.
+       *
+       * boost::shared_ptr<Torch::database::Array>'s or anything else that
+       * overwrite() can accept.
+       */
+      template <typename T> InlinedArraysetImpl(const T& iterable) {
+        for (typename T::const_iterator it = iterable.begin(); it != iterable.end(); ++it) overwrite(*it);
+      }
 
       /**
        * Copy construct by getting an extra reference to somebodies' arrays.
