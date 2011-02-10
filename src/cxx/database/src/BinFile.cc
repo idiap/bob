@@ -23,36 +23,40 @@ db::BinFile::BinFile(const std::string& filename, db::BinFile::openmode flag):
   if((flag & db::BinFile::out) && (flag & db::BinFile::in)) {
     m_stream.open(filename.c_str(), std::ios::in | std::ios::out | 
         std::ios::binary);
-    m_header.read(m_stream);
-    m_header_init = true;
-    m_n_arrays_written = m_header.m_n_samples;
+    if(m_stream)
+    {
+      m_header.read(m_stream);
+      m_header_init = true;
+      m_n_arrays_written = m_header.m_n_samples;
 
-    if (flag & db::BinFile::append) {
-      m_stream.seekp(0, std::ios::end);
-      m_current_array = m_header.m_n_samples;
+      if (flag & db::BinFile::append) {
+        m_stream.seekp(0, std::ios::end);
+        m_current_array = m_header.m_n_samples;
+      }
     }
   }
   else if(flag & db::BinFile::out) {
     m_stream.open(filename.c_str(), std::ios::out | std::ios::binary);
-
-    if (flag & db::BinFile::append) {
+    
+    if(m_stream && (flag & db::BinFile::append)) {
       m_header.read(m_stream);
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
       m_stream.seekp(0, std::ios::end);
       m_current_array = m_header.m_n_samples;
-
     }
   }
   else if(flag & db::BinFile::in) {
     m_stream.open(filename.c_str(), std::ios::in | std::ios::binary);
-    m_header.read(m_stream);
-    m_header_init = true;
-    m_n_arrays_written = m_header.m_n_samples;
+    if(m_stream) {
+      m_header.read(m_stream);
+      m_header_init = true;
+      m_n_arrays_written = m_header.m_n_samples;
 
-    if (flag & db::BinFile::append) {
-      core::error << "Cannot append data in read only mode." << std::endl;
-      throw core::Exception();
+      if (flag & db::BinFile::append) {
+        core::error << "Cannot append data in read only mode." << std::endl;
+        throw core::Exception();
+      }
     }
   }
   else
