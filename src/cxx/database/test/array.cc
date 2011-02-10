@@ -301,6 +301,46 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_external )
   check_equal_4d( g_get_uint8, g_get_float);
 }
 
+BOOST_AUTO_TEST_CASE( dbArray_set )
+{
+  // Create a database Array from a blitz::array
+  Torch::database::Array db_a(a);
+  check_equal_1d( a, db_a.get<double,1>() );
+
+  // Initialize a new blitz array
+  b.resize(4);
+  b = 5;
+  b(0) = 37;
+  // Call the set function and check that database Array and the blitz
+  // Array have the same content
+  db_a.set(b);
+  check_equal_1d( b, db_a.get<double,1>() );
+
+  // Update b and check that the content of the database Array is identical,
+  // as they are sharing the same storage.
+  b(1) = 73;
+  check_equal_1d( b, db_a.get<double,1>() );
+
+
+  // Create a database Array from a blitz::array
+  Torch::database::Array db_g(g);
+  check_equal_4d( g, db_g.get<double,4>() );
+
+  // Initialize a new blitz array
+  h.resize(2,3,4,5);
+  h = 5.;
+  h(0,0,1,3) = 37.;
+  // Call the set function and check that database Array and the blitz
+  // Array have the same content
+  db_g.set(h);
+  check_equal_4d( h, db_g.get<double,4>() );
+
+  // Update b and check that the content of the database Array is identical,
+  // as they are sharing the same storage.
+  h(1,1,2,3) = 73.;
+  check_equal_4d( h, db_g.get<double,4>() );
+}
+
 BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
 {
   // Create a database Array from a blitz::array
