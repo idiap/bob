@@ -50,22 +50,12 @@ db::Arrayset& db::Arrayset::operator= (const db::Arrayset& other) {
 }
 
 void db::Arrayset::add (boost::shared_ptr<const db::Array> array) {
-  if (m_inlined) m_inlined->add(array); //TODO: Ask about relations to yourself
-  else m_external->add(array);
-}
-
-void db::Arrayset::overwrite (boost::shared_ptr<const db::Array> array) {
-  if (m_inlined) m_inlined->overwrite(array); //TODO: Ask about relations to yourself
+  if (m_inlined) m_inlined->add(array);
   else m_external->add(array);
 }
 
 void db::Arrayset::add (const db::Array& array) {
-  if (m_inlined) m_inlined->add(array); //TODO: Ask about relations to yourself
-  else m_external->add(array);
-}
-
-void db::Arrayset::overwrite (const db::Array& array) {
-  if (m_inlined) m_inlined->overwrite(array); //TODO: Ask about relations to yourself
+  if (m_inlined) m_inlined->add(array);
   else m_external->add(array);
 }
 
@@ -78,25 +68,9 @@ void db::Arrayset::add (const db::detail::InlinedArrayImpl& array, size_t id) {
   else m_external->add(array);
 }
 
-void db::Arrayset::overwrite (const db::detail::InlinedArrayImpl& array, size_t id) {
-  if (m_inlined) {
-    db::Array tmp(array);
-    tmp.setId(id);
-    m_inlined->overwrite(tmp);
-  }
-  else m_external->add(array);
-}
-
 void db::Arrayset::add (const std::string& filename, const std::string& codec, size_t id) {
   db::Array tmp(filename, codec);
   if (m_inlined) m_inlined->add(tmp);
-  else m_external->add(tmp);
-}
-
-void db::Arrayset::overwrite (const std::string& filename, const std::string& codec, size_t id) {
-  db::Array tmp(filename, codec);
-  tmp.setId(id);
-  if (m_inlined) m_inlined->overwrite(tmp);
   else m_external->add(tmp);
 }
 

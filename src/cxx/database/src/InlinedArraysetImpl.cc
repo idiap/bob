@@ -114,66 +114,12 @@ void tdd::InlinedArraysetImpl::updateTyping (const db::Array& array) {
   }
 }
 
-void tdd::InlinedArraysetImpl::add (boost::shared_ptr<const db::Array> array) {
-  add(*array.get());
+size_t tdd::InlinedArraysetImpl::add (boost::shared_ptr<const db::Array> array)
+{ 
+  return add(*array.get()); 
 }
 
-void tdd::InlinedArraysetImpl::add (boost::shared_ptr<db::Array> array) {
-  checkCompatibility(*array.get());
-
-  size_t use_id = array->getId();
-  if (use_id != 0) {
-    std::map<size_t, boost::shared_ptr<db::Array> >::iterator it = 
-      m_index.find(use_id);
-    if (it != m_index.end()) throw db::IndexError();
-  }
-  else use_id = getNextFreeId();
-
-  //at this point the array has a valid id and can be inserted
-  array->setId(use_id);
-  m_index[use_id] = array;
-  m_array.push_back(array);
-
-  updateTyping(*array.get());
-}
-
-void tdd::InlinedArraysetImpl::add (const db::Array& array) {
-  checkCompatibility(array);
-
-  size_t use_id = array.getId();
-  if (use_id != 0) {
-    std::map<size_t, boost::shared_ptr<db::Array> >::iterator it = 
-      m_index.find(use_id);
-    if (it != m_index.end()) throw db::IndexError();
-  }
-  else use_id = getNextFreeId();
-
-  //at this point the array has a valid id and can be inserted
-  boost::shared_ptr<db::Array> acopy(new db::Array(array));
-  acopy->setId(use_id);
-  m_index[use_id] = acopy;
-  m_array.push_back(acopy);
-  
-  updateTyping(array);
-}
-
-void tdd::InlinedArraysetImpl::overwrite 
-(boost::shared_ptr<const db::Array> array) { overwrite(*array.get()); }
-
-void tdd::InlinedArraysetImpl::overwrite
-(boost::shared_ptr<db::Array> array) {
-  checkCompatibility(*array.get());
-  
-  size_t use_id = array->getId();
-  if (!use_id) use_id = getNextFreeId();
-  array->setId(use_id);
-  m_index[use_id] = array;
-  m_array.push_back(array);
-  
-  updateTyping(*array.get());
-}
-
-void tdd::InlinedArraysetImpl::overwrite(const db::Array& array) {
+size_t tdd::InlinedArraysetImpl::add(const db::Array& array) {
   checkCompatibility(array);
 
   size_t use_id = array.getId();
@@ -184,6 +130,20 @@ void tdd::InlinedArraysetImpl::overwrite(const db::Array& array) {
   m_array.push_back(acopy);
 
   updateTyping(array);
+  return use_id;
+}
+
+size_t tdd::InlinedArraysetImpl::adopt (boost::shared_ptr<db::Array> array) {
+  checkCompatibility(*array.get());
+  
+  size_t use_id = array->getId();
+  if (!use_id) use_id = getNextFreeId();
+  array->setId(use_id);
+  m_index[use_id] = array;
+  m_array.push_back(array);
+  
+  updateTyping(*array.get());
+  return use_id;
 }
 
 void tdd::InlinedArraysetImpl::remove(size_t id) {

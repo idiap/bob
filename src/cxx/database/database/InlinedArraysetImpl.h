@@ -95,36 +95,25 @@ namespace Torch { namespace database { namespace detail {
       boost::shared_ptr<Torch::database::Array> ptr (size_t id);
 
       /**
-       * Adds a new array to the list I have. The id will be automatically
-       * assigned if the Array has a temporary id of 0 (zero). Otherwise we
-       * will check for the availability of ids and throw an exception in case
-       * an id is already taken. Please note that by using the following
-       * methods a new Array will be copy constructed from the array you give
-       * me as input.
+       * Adds a copy of an array to the list I have. We not check for the
+       * id. Except that its value has to be greater than 0. If there is an
+       * existing element already associated with that id, it is erased and
+       * replaced by a copy of this one. If you don't want to erase, please
+       * make sure to always call getNextFreeId() first.
+       *
+       * @return The id assigned to the array.
        */
-      void add(boost::shared_ptr<const Torch::database::Array> array);
-      void add(const Torch::database::Array& array);
-     
-      /**
-       * This is a special version of the addArray() method that will take a
-       * reference to the array you are manipulating instead of the copying.
-       */
-      void add(boost::shared_ptr<Torch::database::Array> array);
-
-      /**
-       * Adds a new array to the list I have, but does not check for the id. If
-       * the id is set to 0 (zero), assign an available one, otherwise just
-       * overwrite.
-       */
-      void overwrite(boost::shared_ptr<const Torch::database::Array> array);
-      void overwrite(const Torch::database::Array& array);
+      size_t add(boost::shared_ptr<const Torch::database::Array> array);
+      size_t add(const Torch::database::Array& array);
 
       /**
        * This is a special version of the overwriteArray() method that will
        * take a reference to the array you are manipulating instead of the
-       * copying.
+       * copying. This implies that I'll set up its parent and id myself.
+       *
+       * @return The id assigned to the array.
        */
-      void overwrite(boost::shared_ptr<Torch::database::Array> array);
+      size_t adopt(boost::shared_ptr<Torch::database::Array> array);
 
       /**
        * Removes the array with a certain id. If the array does not exist, no

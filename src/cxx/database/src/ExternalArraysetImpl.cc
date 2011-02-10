@@ -58,14 +58,15 @@ Torch::database::Array tdd::ExternalArraysetImpl::operator[] (size_t id) const {
   return m_codec->load(m_filename, id);
 }
 
-void tdd::ExternalArraysetImpl::add
+size_t tdd::ExternalArraysetImpl::add
 (boost::shared_ptr<const Torch::database::Array> array) {
-  add(*array.get()); 
+  return add(*array.get()); 
 }
 
-void tdd::ExternalArraysetImpl::add(const Torch::database::Array& array) {
+size_t tdd::ExternalArraysetImpl::add(const Torch::database::Array& array) {
   m_codec->append(m_filename, array);
   reloadSpecification();
+  return m_samples;
 }
 
 void tdd::ExternalArraysetImpl::extend(const tdd::InlinedArraysetImpl& set) {

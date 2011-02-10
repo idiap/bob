@@ -32,6 +32,11 @@ void db::BinaryArrayCodec::peek(const std::string& filename,
     Torch::core::array::ElementType& eltype, size_t& ndim,
     size_t* shape) const {
   db::BinFile f(filename, db::BinFile::in);
+  if (!f) {
+    eltype = Torch::core::array::t_unknown;
+    ndim = 0;
+    return;
+  }
   eltype = f.getElementType();
   ndim = f.getNDimensions();
   for (size_t i=0; i<ndim; ++i) shape[i] = f.getShape()[i]; 

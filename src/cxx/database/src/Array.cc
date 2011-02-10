@@ -9,37 +9,33 @@
 
 namespace db = Torch::database;
 
-db::Array::Array(const db::detail::InlinedArrayImpl& data)
-  : m_inlined(new db::detail::InlinedArrayImpl(data)),
-    m_id(0) 
+db::Array::Array(const db::detail::InlinedArrayImpl& data) :
+  m_inlined(new db::detail::InlinedArrayImpl(data)),
+  m_id(0) 
 {
 }
 
-db::Array::Array(const std::string& filename, const std::string& codec)
-  : m_external(new db::detail::ExternalArrayImpl(filename, codec)),
-    m_id(0)
+db::Array::Array(const std::string& filename, const std::string& codec) :
+  m_external(new db::detail::ExternalArrayImpl(filename, codec)),
+  m_id(0)
 {
 }
 
-db::Array::Array(const Array& other)
-  : //m_parent_arrayset(other.m_parent_arrayset),
-    m_inlined(other.m_inlined),
-    m_external(other.m_external),
-    m_id(0)
+db::Array::Array(const Array& other) : 
+  m_parent(),
+  m_inlined(other.m_inlined),
+  m_external(other.m_external),
+  m_id(0)
 {
-  //if (m_parent_arrayset) m_parent_arrayset->add(*this);
 }
 
 db::Array::~Array() {
-  //m_parent_arrayset->removeArray(*this);
 }
 
 db::Array& db::Array::operator= (const db::Array& other) {
-  //m_parent_arrayset = other.m_parent_arrayset;
   m_inlined = other.m_inlined;
   m_external = other.m_external;
   m_id = 0;
-  //if (m_parent_arrayset) m_parent_arrayset->addArray(*this);
   return *this;
 }
 
@@ -69,28 +65,6 @@ void db::Array::save(const std::string& filename, const std::string& codecname)
   m_external->move(filename, codecname); 
 }
 
-/**
-void db::Array::setParent (boost::shared_ptr<Arrayset> parent, size_t id) {
-  //first we double check that the parent has equivalent typing information
-  if (parent->getNDim() != getNDim()) throw DimensionError();
-  if (parent->getElementType() != getElementType()) throw TypeError();
-  //if so, we exchange, first de-registering the array from the parent
-  m_parent_arrayset->removeArray(*this);
-  m_parent_arrayset = parent;
-  m_id = id;
-  m_parent_arrayset->addArray(*this);
-}
-**/
-
-void db::Array::setId (size_t id) {
-  /**if (m_parent) {
-    m_parent->removeArray(*this);
-    m_id = id;
-    m_parent->addArray(*this);
-  }
-  else **/ m_id = id;
-}
-        
 const std::string& db::Array::getFilename() const {
   if (m_external) return m_external->getFilename();
   static std::string empty_string;
@@ -103,12 +77,6 @@ boost::shared_ptr<const db::ArrayCodec> db::Array::getCodec() const {
 }
     
 void db::Array::set(const db::detail::InlinedArrayImpl& data) {
-  /**
-    if (m_parent_arrayset) {
-    if (D != m_parent_arrayset->getNDim()) throw DimensionError();
-    if (Torch::core::array::getElementType<T>() != m_parent_arrayset->getElementType()) throw TypeError();
-    }
-   **/
   if (m_external) m_external.reset();
   m_inlined.reset(new detail::InlinedArrayImpl(data));
 }
@@ -124,4 +92,3 @@ void db::Array::load() {
     m_external.reset();
   }
 }
-

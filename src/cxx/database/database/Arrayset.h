@@ -67,17 +67,12 @@ namespace Torch {
          * Adds a copy of the given Array to the Arrayset. If the array id is
          * zero, I'll assign a proper id to this array. Else, if the arrayset
          * is loaded in memory and if an array with existing id is already
-         * inside, this will throw an exception. If the arrayset is serialized
-         * in a file, the array.id property will be ignore and the array will
-         * be appended to that file. 
-         *
-         * To force adding, possibly overwriting an existing array position,
-         * just use overwrite()
+         * inside, I'll overwrite it. If the arrayset is serialized in a file,
+         * the array.id property will be ignored and the array will be appended
+         * to that file. 
          */
         void add (boost::shared_ptr<const Array> array);
-        void overwrite (boost::shared_ptr<const Array> array);
         void add (const Array& array);
-        void overwrite (const Array& array);
 
         /**
          * Adds a blitz array to the Arrayset, optionally specifying the id.
@@ -85,13 +80,11 @@ namespace Torch {
          * exception. If the arrayset is file-based, the id will be ignored.
          */
         void add (const detail::InlinedArrayImpl& array, size_t id=0);
-        void overwrite (const detail::InlinedArrayImpl& array, size_t id=0);
         
         /**
          * Adds a new external array to the Arrayset
          */
         void add (const std::string& filename, const std::string& codec, size_t id=0);
-        void overwrite (const std::string& filename, const std::string& codec, size_t id=0);
 
         /**
          * Removes an Array with a given id from the Arrayset. Please note that

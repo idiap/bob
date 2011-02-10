@@ -72,8 +72,8 @@ namespace Torch { namespace database { namespace detail {
        * a file-based arrayset. Ids for arrays are given depending on their
        * position (1st array => id "1", 2nd array => id "2", and so on).
        */
-      void add(boost::shared_ptr<const Torch::database::Array> array);
-      void add(const Torch::database::Array& array);
+      size_t add(boost::shared_ptr<const Torch::database::Array> array);
+      size_t add(const Torch::database::Array& array);
       void extend(const InlinedArraysetImpl& set);
 
       /**

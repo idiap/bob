@@ -57,6 +57,11 @@ namespace Torch {
         ~BinFile();
 
         /**
+         * Tests if next operation will succeed.
+         */
+        inline bool operator!() const { return !m_stream; }
+
+        /**
          * Closes the BinFile
          */
         void close();

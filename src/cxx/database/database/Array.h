@@ -27,7 +27,7 @@ namespace Torch {
   namespace database {
 
     //I promise this exists:
-    //class Arrayset;
+    class Arrayset;
 
     /**
      * The array class for a dataset. The Array class acts like a manager for
@@ -156,43 +156,45 @@ namespace Torch {
         inline size_t getId() const { return m_id; }
 
         /**
-         * Sets the id for this Array. If this array has a parent Arrayset, we
-         * do check the identity is not taken already. If so, an exception is
-         * raised. You can get automatic id's that are guaranteed to be free by
-         * setting the special value '0' (zero).
-         */
-        void setId(size_t id);
-
-        /**
          * Get the flag indicating if the array is loaded in memory
          */
         inline bool isLoaded() const { return m_inlined; }
 
         /**
-         * Sets the parent arrayset of this array. If my parent is already set,
-         * I'll detach myself from my old parent and insert myself onto the new
-         * parent, checking initialized type information if any was already
-         * set. Incompatibilities will be flagged by exceptions.
-         *
-         * The optional parameter 'id' will set my id property, but first I'll
-         * check if that id is unblocked in the parent. If that is not the
-         * case, I'll raise an exception. If you don't set the id property in
-         * this call, I'll ask the parent to assign me a proper available id.
-         */
-        /**
-        void setParent (boost::shared_ptr<Arrayset> parent, size_t id=0);
-        */
-
-        /**
          * Gets the parent arrayset of this array
          */
-        /**
-        inline boost::shared_ptr<const Arrayset> getParent() const 
-        { return m_parent_arrayset.lock(); }
-        */
+        inline boost::shared_ptr<const Arrayset> getParent() const { 
+          return m_parent.lock(); 
+        }
+
+        //The next methods are sort of semi-private: Only to be used by the
+        //Database loading system. You can adventure yourself, but really not
+        //recommended to set the id or the parent of an array. Be sure to
+        //understand the consequences.
         
+        /**
+         * Sets the id for this Array. You can get automatic id's that are
+         * guaranteed to be free by setting the special value '0' (zero). That
+         * is the default for the Array construction, so if you don't use this
+         * method, everything should work smoothly.
+         */
+        inline void setId (size_t id) { m_id = id; }
+
+        /**
+         * Sets the parent arrayset of this array. Please note this is a simple
+         * assignment that has to be done by the Dataset parent of the Arrayset
+         * as it is the only entity in the system that holds a
+         * boost::shared_ptr<> to an Arrayset.
+         *
+         * It is meant to be used in the context of the database creation. So,
+         * not for us, mortal users ;-)
+         */
+        inline void setParent (boost::shared_ptr<Arrayset> parent) {
+          m_parent = parent;
+        }
+
       private: //representation
-        //boost::weak_ptr<Arrayset> m_parent_arrayset; ///< My current parent
+        boost::weak_ptr<Arrayset> m_parent; ///< My current parent
         boost::shared_ptr<detail::InlinedArrayImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArrayImpl> m_external;
         size_t m_id; ///< This is my id
