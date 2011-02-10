@@ -42,7 +42,6 @@ namespace Torch { namespace database {
       ArraysetCodecRegistry( const ArraysetCodecRegistry&);
 
       static boost::shared_ptr<ArraysetCodecRegistry> instance();
-      static boost::shared_ptr<ArraysetCodecRegistry> s_instance;
 
       std::map<std::string, boost::shared_ptr<Torch::database::ArraysetCodec> > s_name2codec;
       std::map<std::string, boost::shared_ptr<Torch::database::ArraysetCodec> > s_extension2codec;

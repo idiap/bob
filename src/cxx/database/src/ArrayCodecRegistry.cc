@@ -14,11 +14,8 @@
 
 namespace db = Torch::database;
 
-boost::shared_ptr<db::ArrayCodecRegistry> db::ArrayCodecRegistry::s_instance;
-
 boost::shared_ptr<db::ArrayCodecRegistry> db::ArrayCodecRegistry::instance() {
-  if( s_instance == 0)
-    s_instance.reset(new ArrayCodecRegistry());
+  static boost::shared_ptr<db::ArrayCodecRegistry> s_instance(new ArrayCodecRegistry());
   return s_instance; 
 }
     

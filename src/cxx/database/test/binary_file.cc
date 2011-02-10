@@ -10,11 +10,14 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/shared_array.hpp>
 
 #include <blitz/array.h>
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Array.h"
+
+#include<iostream>
 
 struct T {
   blitz::Array<double,1> a;
@@ -52,14 +55,16 @@ struct T {
  * descriptor
  */
 std::string temp_file() {
-  std::string tpl = Torch::core::tmpdir();
-  tpl += "/torchtest_core_binformatXXXXXX.bin";
-  boost::shared_ptr<char> char_tpl(new char[tpl.size()+1]);
-  strcpy(char_tpl.get(), tpl.c_str());
+  boost::filesystem::path tpl = Torch::core::tmpdir();
+  tpl /= "torchtest_core_binformatXXXXXX.bin";
+  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
+  strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),4);
   close(fd);
   boost::filesystem::remove(char_tpl.get());
-  return char_tpl.get();
+  std::string res = char_tpl.get();
+  return res;
+//  return char_tpl.get();
 }
 
 template<typename T, typename U> 
@@ -236,6 +241,18 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
   blitz::Array<double,4> g_sliced2_read = in2.read<double,4>();
   check_equal_4d( g_sliced2, g_sliced2_read);
   in1.close();
+}
+
+BOOST_AUTO_TEST_CASE( dbArray )
+{
+  Torch::database::Array db_a(a);
+  std::string tmp_file = temp_file();
+  db_a.save( tmp_file);
+
+  Torch::database::Array db_a_read(tmp_file);
+  blitz::Array<double,1> bl_read = db_a_read.load<double,1>();
+  
+  check_equal_1d( a, bl_read);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

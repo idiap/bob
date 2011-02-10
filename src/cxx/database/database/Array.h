@@ -197,7 +197,7 @@ namespace Torch {
         m_inlined.reset(new detail::InlinedArrayImpl(m_external->load()));
         m_external.reset();
       }
-      return m_inlined->castCopy<T,D>(); 
+      return m_inlined->cast<T,D>(); 
     }
 
     template <typename T, int D> blitz::Array<T,D> Array::get() const {
