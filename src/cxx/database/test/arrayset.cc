@@ -108,7 +108,7 @@ void check_equal_4d(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b)
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( dbArrayset_construction )
+BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
 {
   // Initialize some blitz arrays
   b.resize(4);
@@ -155,32 +155,60 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction )
   BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::DimensionError );
 }
 
-/*
-BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
+BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
 {
-  // Create a database Array from a blitz::array and save it to a binary file
-  Torch::database::Array db_a(a);
+  // Initialize some blitz arrays
+  b.resize(4);
+  b = 33.;
+  b(0) = 2.;
+  c.resize(4);
+  c = 23.;
+  c(0) = 3.;
+
+  // Create database Arrays from blitz::arrays
+  boost::shared_ptr<Torch::database::Array> db_a(new Torch::database::Array(a));
+  boost::shared_ptr<Torch::database::Array> db_b(new Torch::database::Array(b));
+  boost::shared_ptr<Torch::database::Array> db_c(new Torch::database::Array(c));
+
+  // Put these database Arrays in a STL vector
+  std::vector<boost::shared_ptr<Torch::database::Array> > vec;
+  vec.push_back(db_a);
+  vec.push_back(db_b);
+  vec.push_back(db_c);
+
+  // Create an Arrayset from the STL vector
+  Torch::database::Arrayset db_Ar(vec);
+  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), true);
+  BOOST_CHECK_EQUAL(db_Ar.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_Ar.getNDim(), 1);
+  BOOST_CHECK_EQUAL(db_Ar.getNSamples(), 3);
+  BOOST_CHECK_EQUAL(db_Ar.getShape()[0], 4);
+  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(""), 0);
+  BOOST_CHECK_EQUAL(db_Ar.getCodec().use_count(), 0);
+
+  // Save the Arrayset to a file
   std::string tmp_file = temp_file();
-  db_a.save( tmp_file);
-
-  // Create a database Array from a binary file and check its properties
-  Torch::database::Array db_a_read(tmp_file);
-  BOOST_CHECK_EQUAL(db_a_read.getNDim(), a.dimensions());
-  BOOST_CHECK_EQUAL(db_a_read.getElementType(), Torch::core::array::t_float64);
-  BOOST_CHECK_EQUAL(db_a_read.isLoaded(), false);
-  BOOST_CHECK_EQUAL(db_a_read.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(
-    db_a_read.getCodec()->name().compare("torch.array.binary"), 0);
-  for(size_t i=0; i<db_a_read.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_a_read.getShape()[i], a.extent(i));
-
-  // Get a blitz array from the database Array and check that the values 
-  // remain unchanged
-  blitz::Array<double,1> bl_read = db_a_read.get<double,1>();
-  BOOST_CHECK_EQUAL(db_a_read.isLoaded(), false);
-  check_equal_1d( a, bl_read);
+  db_Ar.save( tmp_file );
+  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
+  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
+  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);
+  
+  // Create an Arrayset from a file and check its properties
+  Torch::database::Arrayset db_Ar_read(tmp_file);
+  BOOST_CHECK_EQUAL(db_Ar.getId(), db_Ar_read.getId());
+  BOOST_CHECK_EQUAL(db_Ar.getRole().compare( db_Ar_read.getRole()), 0);
+  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), db_Ar_read.isLoaded());
+  BOOST_CHECK_EQUAL(db_Ar.getElementType(), db_Ar_read.getElementType());
+  BOOST_CHECK_EQUAL(db_Ar.getNDim(), db_Ar_read.getNDim());
+  BOOST_CHECK_EQUAL(db_Ar.getNSamples(), db_Ar_read.getNSamples());
+  for( size_t i=0; i<db_Ar.getNDim(); ++i)
+    BOOST_CHECK_EQUAL(db_Ar.getShape()[i], db_Ar_read.getShape()[i]);
+  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
+  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);
+  
 }
 
+/*
 BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
 {
   // Create a database Array from a blitz::array
