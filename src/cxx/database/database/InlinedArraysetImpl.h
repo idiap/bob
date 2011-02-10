@@ -37,7 +37,12 @@ namespace Torch { namespace database { namespace detail {
        * boost::shared_ptr<Torch::database::Array>'s or anything else that
        * add() can accept.
        */
-      template <typename T> InlinedArraysetImpl(T begin, T end) {
+      template <typename T> InlinedArraysetImpl(T begin, T end): 
+        m_elementtype(Torch::core::array::t_unknown),
+        m_ndim(0),
+        m_array(),
+        m_index()
+      {
         for (T it = begin; it != end; ++it) add(*it);
       }
 
@@ -49,7 +54,12 @@ namespace Torch { namespace database { namespace detail {
        * boost::shared_ptr<Torch::database::Array>'s or anything else that
        * add() can accept.
        */
-      template <typename T> InlinedArraysetImpl(const T& iterable) {
+      template <typename T> InlinedArraysetImpl(const T& iterable):
+        m_elementtype(Torch::core::array::t_unknown),
+        m_ndim(0),
+        m_array(),
+        m_index()
+      {
         for (typename T::const_iterator it = iterable.begin(); it != iterable.end(); ++it) add(*it);
       }
 
