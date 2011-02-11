@@ -6,20 +6,49 @@
  */
 
 #include "database/Relation.h"
+#include "database/dataset_common.h"
 
 namespace db = Torch::database;
 
-db::Relation::Relation (boost::shared_ptr<std::map<size_t,std::string> > id_role): 
-  m_id(0), 
-  m_id_role(id_role)
-{ 
+db::Relation::Relation() :
+  //m_parent(),
+  m_id(0),
+  m_member()
+{
 }
 
-db::Relation::~Relation() {
+db::Relation::Relation(const Relation& other) :
+  //m_parent(),
+  m_id(0),
+  m_member(other.m_member)
+{
 }
 
-void db::Relation::append( boost::shared_ptr<db::Member> member) {
-  size_t_pair ids( member->getArrayId(), member->getArraysetId());
-  m_member.insert( std::pair<size_t_pair,boost::shared_ptr<Member> >(
-        ids, member) );
+db::Relation::~Relation() { }
+
+db::Relation& db::Relation::operator= (const Relation& other) {
+  //m_parent.reset();
+  m_id = 0;
+  m_member = other.m_member;
+  return *this;
+}
+
+void db::Relation::add (const std::string& role, size_t arraysetid) {
+  if (!arraysetid) throw db::IndexError();
+  m_member[role] = std::make_pair(arraysetid, 0);
+}
+
+void db::Relation::add (const std::string& role, size_t arraysetid, size_t arrayid) {
+  if (!arraysetid) throw db::IndexError();
+  m_member[role] = std::make_pair(arraysetid, arrayid);
+}
+
+void db::Relation::remove (const std::string& role) {
+  m_member.erase(role);
+}
+
+const std::pair<size_t, size_t>& db::Relation::operator[] (const std::string& role) {
+  std::map<std::string, std::pair<size_t, size_t> >::const_iterator it = m_member.find(role);
+  if (it == m_member.end()) throw IndexError();
+  return it->second;
 }
