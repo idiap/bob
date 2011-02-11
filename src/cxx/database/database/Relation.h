@@ -8,6 +8,10 @@
 #ifndef TORCH_DATABASE_RELATION_H 
 #define TORCH_DATABASE_RELATION_H
 
+#include <map>
+#include <string>
+#include <cstdlib>
+
 namespace Torch { namespace database {
 
   /**
@@ -16,213 +20,114 @@ namespace Torch { namespace database {
    */
   class Relation {
 
+    //I promise this exists
+    //class Relationset;
+
     public:
       /**
-       * Constructor.
+       * Constructor, builds an empty Relation. 
        */
-      Relation(boost::shared_ptr<std::map<size_t,std::string> > id_role);
+      Relation();
+
+      /**
+       * Copy constructor
+       */
+      Relation (const Relation& other);
 
       /**
        * Destructor
        */
-      ~Relation();
+      virtual ~Relation();
 
       /**
-       * Add a member to the Relation
+       * Assignment operation
        */
-      void append( boost::shared_ptr<Member> member);
+      Relation& operator= (const Relation& other);
 
       /**
-       * Set the id for this relation
+       * Adds a member to the Relation. If a member with a given role already
+       * exists, it is overwritten.
        */
-      void setId(const size_t id) { m_id = id; }
+      void add (const std::string& role, size_t arraysetid);
+      void add (const std::string& role, size_t arraysetid, size_t arrayid);
 
       /**
-       * Get the id for this relation
+       * Removes a member, given the role. If the member does not exist, this
+       * is a noop.
        */
-      size_t getId() const { return m_id; }
-
-      typedef std::pair<size_t, size_t> size_t_pair;
+      void remove (const std::string& role);
 
       /**
-       * const_iterator over the Members of the Relation
+       * Gets the id for this relation
        */
-      typedef std::map<size_t_pair, boost::shared_ptr<Member> >::const_iterator
-        const_iterator;
+      inline size_t getId() const { return m_id; }
 
       /**
-       * Return a const_iterator pointing at the first Member of 
-       * the Relation
+       * Given the role, returns a std::pair<size_t, size_t> where 'first' is
+       * the arrayset id and 'second' is the array id. If the array id is set
+       * to zero, it means this member points to an arrayset instead of a
+       * single array. This will throw an exception if the role was not
+       * registered in this Relation.
        */
-      const_iterator begin() const { return m_member.begin(); }
+      const std::pair<size_t, size_t>& operator[] (const std::string& role);
 
       /**
-       * Return a const_iterator pointing at the last Member of 
-       * the Relation
+       * How to get a handle to all my roles. You must provide a container that
+       * accepts push_back() and has std::string elements (e.g.
+       * std::vector<std::string> or std::list<std::string>)
        */
-      const_iterator end() const { return m_member.end(); }
-
-      /**
-       * @brief iterator over the Members of the Relation
-       */
-      typedef std::map<size_t_pair, boost::shared_ptr<Member> >::iterator 
-        iterator;
-
-      /**
-       * @brief Return an iterator pointing at the first Member of the
-       * Relation
-       */
-
-      iterator begin() { return m_member.begin(); }
-
-      /**
-       * @brief Return an iterator pointing at the last Member of the 
-       * Relation
-       */
-      iterator end() { return m_member.end(); }
-
-      /**
-       * @brief iterator over the Members of the Relation with a given 
-       * arrayset-role
-       */
-      template <typename T, typename U, typename V> 
-        class iterator_template {
-          public:
-            /**
-             * @brief Constructor
-             */
-            iterator_template(): m_str(""), m_it(0), m_parent(0) { }
-            iterator_template(const std::string& str, V it, U* parent):
-              m_str(str), m_it(it), m_parent(parent) { }
-
-            T& operator*() const;
-            T* operator->() const;
-            iterator_template<T,U,V>& operator++(); // prefix
-            iterator_template<T,U,V> operator++(int); // postfix
-            bool operator==(const iterator_template<T,U,V>& i) const;
-            bool operator!=(const iterator_template<T,U,V>& i) const;
-
-          private:
-            std::string m_str;
-            V m_it;
-            const U* m_parent;
-        };
-
-      /**
-       * @warning Looking at the STL implementation of a map, the keys are 
-       * const:
-       * "template <typename _Key, typename _Tp, 
-       *    typename _Compare = std::less<_Key>,
-       *    typename _Alloc = std::allocator<std::pair<const _Key, _Tp> > >"
-       * The following iterator typedefs take this fact into consideration,
-       * and use a const size_t_pair as Keys type.
-       */
-      typedef iterator_template<std::pair<const size_t_pair, 
-              boost::shared_ptr<Member> >, Relation, Relation::iterator> 
-                iterator_b;
-      typedef iterator_template<const std::pair<const size_t_pair,
-              boost::shared_ptr<Member> >, const Relation, 
-              Relation::const_iterator> const_iterator_b;
-
-      /**
-       * @brief Return an iterator pointing at the first Member of the 
-       * Relation with a given arrayset-role
-       */
-      iterator_b begin(const std::string& str) {
-        iterator it=begin();
-        while( it!=end() &&
-            m_id_role->operator[]( it->second->getArraysetId()).compare(str) )
-          ++it;
-        return iterator_b( str, it, this);
+      template <typename T> void index(T& container) const {
+        for (std::map<std::string, std::pair<size_t,size_t> >::const_iterator it=m_member.begin(); it!=m_member.end(); ++it) container.push_back(it->first);
       }
 
       /**
-       * @brief Return an iterator pointing at the last Member of the 
-       * Relation with a given arrayset-role
+       * A handle to all my members
        */
-      iterator_b end(const std::string& str) {
-        return iterator_b( str, end(), this);
+      const std::map<std::string, std::pair<size_t,size_t> >& members() const {
+        return m_member;
       }
 
       /**
-       * @brief Return an iterator pointing at the first Member of the 
-       * Relation with a given arrayset-role
+       * Gets the parent arrayset of this array
        */
-      const_iterator_b begin(const std::string& str) const {
-        const_iterator it=begin();
-        while( it!=end() &&
-            m_id_role->operator[]( it->second->getArraysetId()).compare(str) )
-          ++it;
-        return const_iterator_b( str, it, this);
+      /**
+      inline boost::shared_ptr<const Relationset> getParent() const { 
+        return m_parent.lock(); 
       }
+      **/
+
+      //The next methods are sort of semi-private: Only to be used by the
+      //Database loading system. You can adventure yourself, but really not
+      //recommended to set the id or the parent of an array. Be sure to
+      //understand the consequences.
+ 
+      /**
+       * Sets the parent arrayset of this array. Please note this is a simple
+       * assignment that has to be done by the Dataset parent of the Arrayset
+       * as it is the only entity in the system that holds a
+       * boost::shared_ptr<> to an Arrayset.
+       *
+       * It is meant to be used in the context of the database creation. So,
+       * not for us, mortal users ;-)
+       */
+      /**
+      inline void setParent (boost::shared_ptr<Relationset> parent) { 
+        m_parent = parent;
+      }
+      **/
 
       /**
-       * @brief Return an iterator pointing at the last Member of the 
-       * Relation with a given arrayset-role
+       * Sets the id for this relation. This is some sort of semi-private
+       * method and is intended only for database parsers. Use it with care.
        */
-      const_iterator_b end(const std::string& str) const {
-        return const_iterator_b( str, end(), this);
-      }
-
-
-      boost::shared_ptr<std::map<size_t,std::string> > getIdRole() const {
-        return m_id_role;
-      }
+      inline void setId(const size_t id) { m_id = id; }
 
     private:
-      std::map<size_t_pair, boost::shared_ptr<Member> > m_member;
-      size_t m_id;
-      /**
-       * @brief Mapping from arrayset-id to role
-       */
-      boost::shared_ptr<std::map<size_t,std::string> > m_id_role;
+      //boost::weak_ptr<Relationset> m_parent; ///< my parent relation set
+      size_t m_id; ///< my identifier
+      std::map<std::string, std::pair<size_t, size_t> > m_member; ///< my members
+
   };
-
-  template <typename T, typename U, typename V> 
-    T& Relation::iterator_template<T,U,V>::operator*() const {
-      return *m_it;
-    }
-
-  template <typename T, typename U, typename V> 
-    T* Relation::iterator_template<T,U,V>::operator->() const {
-      return m_it.operator->();
-    }
-
-  template <typename T, typename U, typename V> 
-    Relation::iterator_template<T,U,V>& 
-    Relation::iterator_template<T,U,V>::operator++() {
-      ++m_it;
-      while( m_it!=m_parent->end() && 
-          m_parent->getIdRole()->operator[]( 
-            m_it->second->getArraysetId()).compare(m_str) )
-        ++m_it;
-      return *this;
-    }
-
-  template <typename T, typename U, typename V> 
-    Relation::iterator_template<T,U,V> 
-    Relation::iterator_template<T,U,V>::operator++(int) {
-      m_it++;
-      while( m_it!=m_parent->end() && 
-          m_parent->getIdRole()->operator[]( 
-            m_it->second->getArraysetId()).compare(m_str) )
-        ++m_it;
-      return *this;
-    }
-
-  template <typename T, typename U, typename V> 
-    bool Relation::iterator_template<T,U,V>::operator==(
-        const iterator_template<T,U,V>& it) const 
-    {
-      return m_it == it.m_it;
-    }
-
-  template <typename T, typename U, typename V> 
-    bool Relation::iterator_template<T,U,V>::operator!=(
-        const iterator_template<T,U,V>& it) const 
-    {
-      return m_it != it.m_it;
-    }
 
 } }
 
