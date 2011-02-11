@@ -331,31 +331,29 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 3); 
-  // TODO: deal with id properly and not with index
-  check_equal_1d( a, db_Ar[0].get<double,1>() );
-  check_equal_1d( b, db_Ar[1].get<double,1>() );
-  check_equal_1d( c, db_Ar[2].get<double,1>() );
+  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal_1d( b, db_Ar[ids[1]].get<double,1>() );
+  check_equal_1d( c, db_Ar[ids[2]].get<double,1>() );
 
   // Check the content when using the cast function
-  check_equal_1d( a, db_Ar[0].cast<uint32_t,1>() );
+  check_equal_1d( a, db_Ar[ids[0]].cast<uint32_t,1>() );
 
   // Remove the second array and check
-/*  db_Ar.remove( 2);
+  db_Ar.remove( 2);
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 2); 
-  check_equal_1d( a, db_Ar[0].get<double,1>() );
-  check_equal_1d( c, db_Ar[1].get<double,1>() );
+  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
 
   // Add array and check
   db_Ar.add( db_b );
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 3); 
-  check_equal_1d( a, db_Ar[0].get<double,1>() );
-  check_equal_1d( c, db_Ar[1].get<double,1>() );
-  check_equal_1d( b, db_Ar[2].get<double,1>() );
-*/
+  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal_1d( b, db_Ar[ids[2]].get<double,1>() );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

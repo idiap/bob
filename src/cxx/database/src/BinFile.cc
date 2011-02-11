@@ -35,16 +35,17 @@ db::BinFile::BinFile(const std::string& filename, db::BinFile::openmode flag):
       }
     }
   }
-  else if(flag & db::BinFile::out) {
-    m_stream.open(filename.c_str(), std::ios::out | std::ios::binary);
-    
+  else if(flag & db::BinFile::out) {  
     if(m_stream && (flag & db::BinFile::append)) {
+      m_stream.open(filename.c_str(), std::ios::out | std::ios::in);
       m_header.read(m_stream);
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
       m_stream.seekp(0, std::ios::end);
       m_current_array = m_header.m_n_samples;
     }
+    else
+      m_stream.open(filename.c_str(), std::ios::out | std::ios::binary);
   }
   else if(flag & db::BinFile::in) {
     m_stream.open(filename.c_str(), std::ios::in | std::ios::binary);
