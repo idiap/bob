@@ -113,6 +113,18 @@ namespace Torch {
         size_t getNSamples() const;
 
         /**
+         * Get the filename containing the data if any. An empty string
+         * indicates that the data is stored inlined.
+         */
+        const std::string& getFilename() const;
+
+        /**
+         * Get the codec used to read the data from the external file 
+         * if any. This will be non-empty only if the filename is non-empty.
+         */
+        boost::shared_ptr<const ArraysetCodec> getCodec() const; 
+
+        /**
          * Sets the role of the Arrayset
          */
         inline void setRole (const std::string& role) { m_role = role; } 

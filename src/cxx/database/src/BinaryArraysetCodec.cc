@@ -32,6 +32,12 @@ void db::BinaryArraysetCodec::peek(const std::string& filename,
     Torch::core::array::ElementType& eltype, size_t& ndim,
     size_t* shape, size_t& samples) const {
   db::BinFile f(filename, db::BinFile::in);
+  if (!f) {
+    eltype = Torch::core::array::t_unknown;
+    ndim = 0;
+    samples = 0;
+    return;
+  }
   eltype = f.getElementType();
   ndim = f.getNDimensions();
   samples = f.getNSamples();
@@ -54,7 +60,7 @@ db::Array db::BinaryArraysetCodec::load
 
 void db::BinaryArraysetCodec::append
 (const std::string& filename, const Array& array) const {
-  db::BinFile f(filename, db::BinFile::append);
+  db::BinFile f(filename, db::BinFile::out | db::BinFile::append);
   f.write(array.get());
 }
 

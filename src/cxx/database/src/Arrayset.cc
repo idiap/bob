@@ -118,6 +118,17 @@ void db::Arrayset::save(const std::string& filename, const std::string& codecnam
   m_external->move(filename, codecname); 
 }
 
+const std::string& db::Arrayset::getFilename() const {
+  if (m_external) return m_external->getFilename();
+  static std::string empty_string;
+  return empty_string;
+}
+
+boost::shared_ptr<const db::ArraysetCodec> db::Arrayset::getCodec() const {
+  if (m_external) return m_external->getCodec();
+  return boost::shared_ptr<ArraysetCodec>(); 
+}
+    
 void db::Arrayset::load() {
   if (!m_inlined) {
     m_inlined.reset(new detail::InlinedArraysetImpl(m_external->get()));
