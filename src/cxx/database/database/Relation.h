@@ -8,9 +8,10 @@
 #ifndef TORCH_DATABASE_RELATION_H 
 #define TORCH_DATABASE_RELATION_H
 
-#include <map>
+#include <list>
 #include <string>
 #include <cstdlib>
+#include <boost/shared_ptr.hpp>
 
 namespace Torch { namespace database {
 
@@ -21,7 +22,7 @@ namespace Torch { namespace database {
   class Relation {
 
     //I promise this exists
-    //class Relationset;
+    class Rule;
 
     public:
       /**
@@ -46,16 +47,22 @@ namespace Torch { namespace database {
 
       /**
        * Adds a member to the Relation. If a member with a given role already
-       * exists, it is overwritten.
+       * exists, it we add to it.
        */
-      void add (const std::string& role, size_t arraysetid);
-      void add (const std::string& role, size_t arraysetid, size_t arrayid);
+      inline void add (size_t arraysetid) {
+        m_member.push_back(std::make_pair(arraysetid, 0));
+      }
+
+      inline void add (size_t arraysetid, size_t arrayid) {
+        m_member.push_back(std::make_pair(arraysetid, arrayid));
+      }
 
       /**
        * Removes a member, given the role. If the member does not exist, this
-       * is a noop.
+       * is a noop. Please note we will remove all members associated with a
+       * given role.
        */
-      void remove (const std::string& role);
+      void remove (size_t index);
 
       /**
        * Gets the id for this relation
@@ -63,38 +70,29 @@ namespace Torch { namespace database {
       inline size_t getId() const { return m_id; }
 
       /**
-       * Given the role, returns a std::pair<size_t, size_t> where 'first' is
+       * Given the index, returns a std::pair<size_t, size_t> where 'first' is
        * the arrayset id and 'second' is the array id. If the array id is set
        * to zero, it means this member points to an arrayset instead of a
-       * single array. This will throw an exception if the role was not
+       * single array. This will throw an exception if the id was not
        * registered in this Relation.
        */
-      const std::pair<size_t, size_t>& operator[] (const std::string& role);
+      const std::pair<size_t, size_t>& operator[] (size_t index) const;
 
       /**
        * How to get a handle to all my roles. You must provide a container that
        * accepts push_back() and has std::string elements (e.g.
        * std::vector<std::string> or std::list<std::string>)
        */
-      template <typename T> void index(T& container) const {
-        for (std::map<std::string, std::pair<size_t,size_t> >::const_iterator it=m_member.begin(); it!=m_member.end(); ++it) container.push_back(it->first);
+      template <typename T> inline void index(T& container) const {
+        for (std::list<std::pair<size_t,size_t> >::const_iterator it=m_member.begin(); it!=m_member.end(); ++it) container.push_back(it->first);
       }
 
       /**
        * A handle to all my members
        */
-      const std::map<std::string, std::pair<size_t,size_t> >& members() const {
+      inline const std::list<std::pair<size_t,size_t> >& members() const {
         return m_member;
       }
-
-      /**
-       * Gets the parent arrayset of this array
-       */
-      /**
-      inline boost::shared_ptr<const Relationset> getParent() const { 
-        return m_parent.lock(); 
-      }
-      **/
 
       //The next methods are sort of semi-private: Only to be used by the
       //Database loading system. You can adventure yourself, but really not
@@ -102,34 +100,17 @@ namespace Torch { namespace database {
       //understand the consequences.
  
       /**
-       * Sets the parent arrayset of this array. Please note this is a simple
-       * assignment that has to be done by the Dataset parent of the Arrayset
-       * as it is the only entity in the system that holds a
-       * boost::shared_ptr<> to an Arrayset.
-       *
-       * It is meant to be used in the context of the database creation. So,
-       * not for us, mortal users ;-)
-       */
-      /**
-      inline void setParent (boost::shared_ptr<Relationset> parent) { 
-        m_parent = parent;
-      }
-      **/
-
-      /**
        * Sets the id for this relation. This is some sort of semi-private
        * method and is intended only for database parsers. Use it with care.
        */
       inline void setId(const size_t id) { m_id = id; }
 
     private:
-      //boost::weak_ptr<Relationset> m_parent; ///< my parent relation set
       size_t m_id; ///< my identifier
-      std::map<std::string, std::pair<size_t, size_t> > m_member; ///< my members
+      std::list<std::pair<size_t, size_t> > m_member; ///< my members
 
   };
 
 } }
 
 #endif /* TORCH_DATABASE_RELATION_H */
-

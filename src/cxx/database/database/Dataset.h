@@ -15,6 +15,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "database/Arrayset.h"
+#include "database/Relationset.h"
 
 namespace Torch {   
   /**
@@ -102,6 +103,16 @@ namespace Torch {
         void remove(size_t index);
 
         /**
+         * Adds and removes Relationsets. If you add() a relationset with the
+         * same name as of an existing relationset (within this dataset), that
+         * relationset is overwritten. To remove a unexisting relationset is
+         * not an error.
+         */
+        size_t add(boost::shared_ptr<const Relationset> relationset);
+        size_t add(const Relationset& relationset);
+        void remove(const std::string& name);
+
+        /**
          * Returns my internal arrayset index
          */
         inline const std::map<size_t, boost::shared_ptr<Arrayset> >& arraysetIndex() const { return m_id2arrayset; }
@@ -112,7 +123,13 @@ namespace Torch {
         inline const std::list<boost::shared_ptr<Arrayset> >& arraysets () const { return m_arrayset; }
 
         /**
+         * Returns my internal relationset index
+         */
+        inline const std::map<std::string, boost::shared_ptr<Relationset> >& relationsetIndex() const { return m_name2relationset; }
+
+        /**
          * Returns the Arrayset given a certain, valid, arrayset-id
+         *
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the arraysets.
          */
@@ -126,43 +143,19 @@ namespace Torch {
         boost::shared_ptr<Arrayset> ptr(const size_t id);
 
         /**
-         * @brief Add a Relationset to the Dataset. Please note that the
-         * attribute "name" of the Relationset is used as acess key. If you
-         * provide the name of an existing Relationset, it is replaced by this
-         * one.
-         */
-        //void add(boost::shared_ptr<Relationset> relationset);
-
-        /**
-         * This method creates an internal copy of the given relationset and
-         * store internally. If the relationset contains the name of an object
-         * that already exists in this database, it is overwritten.
-         */
-        //void add(const Relationset& arrayset);
-
-        /**
-         * @brief Remove a Relationset with a given name from the Dataset
-         */
-        //void remove (const std::string& name);
-
-        /**
          * @brief Return the Relationset of the given name
+         *
          * @warning Please note that if you use that method, scope matters,
          * because the dataset owns the relationsets.
          */
-        //const Relationset& operator[](const std::string& name) const;
-        //Relationset& operator[](const std::string& name);
+        const Relationset& operator[](const std::string& name) const;
+        Relationset& operator[](const std::string& name);
 
         /**
-         * @brief Return the relationset of the given name
+         * Returns the relationset of the given name
          */
-        //boost::shared_ptr<const Relationset> getRelationset(const std::string& name) const;
-        //boost::shared_ptr<Relationset> getRelationset(const std::string& name);
-
-        /**
-         * Returns my internal relationset index
-         */
-        //inline const std::map<std::string, boost::shared_ptr<Relationset> >& relationIndex() const { return m_name2relationset; }
+        boost::shared_ptr<const Relationset> ptr(const std::string& name) const;
+        boost::shared_ptr<Relationset> ptr(const std::string& name);
 
         /**
          * Gets the next free id
@@ -180,7 +173,7 @@ namespace Torch {
         size_t m_version;
         std::list<boost::shared_ptr<Torch::database::Arrayset> > m_arrayset; ///< My arrayset list
         std::map<size_t, boost::shared_ptr<Arrayset> > m_id2arrayset;
-        //std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;
+        std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;
     };
 
   }

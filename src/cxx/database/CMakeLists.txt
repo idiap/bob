@@ -29,10 +29,9 @@ set(src
     "src/ExternalArraysetImpl.cc"
     "src/Arrayset.cc"
     "src/Dataset.cc"
-    "src/Member.cc"
     "src/Relation.cc"
-    #"src/Relationset.cc"
-    #"src/Rule.cc"
+    "src/Relationset.cc"
+    "src/Rule.cc"
     #"src/XMLParser.cc"
     #"src/XMLWriter.cc"
     )

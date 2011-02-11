@@ -22,7 +22,6 @@ db::Array::Array(const std::string& filename, const std::string& codec) :
 }
 
 db::Array::Array(const Array& other) : 
-  m_parent(),
   m_inlined(other.m_inlined),
   m_external(other.m_external),
   m_id(0)

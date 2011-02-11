@@ -174,6 +174,7 @@ void tdd::InlinedArraysetImpl::consolidateIds() {
   size_t id=1;
   for (std::list<boost::shared_ptr<db::Array> >::iterator it = m_array.begin();
        it != m_array.end(); ++it, ++id) {
+    (*it)->setId(id);
     m_index[id] = *it;
   }
 }

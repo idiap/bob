@@ -5,11 +5,16 @@
  * @brief Declares the Dataset Rules
  */
 
-#include "Database/Rule.h"
+#include "database/Rule.h"
+#include "database/Relation.h"
 
-Rule::Rule(): 
-  m_arraysetrole(""), m_min(1), m_max(1) { }
+namespace db = Torch::database;
 
-Rule::~Rule() {
-  TDEBUG3("Rule destructor (Arrayset-role: " << getArraysetRole() << ")");
+db::Rule::Rule (const std::string& role, size_t min, size_t max) :
+  m_role(role),
+  m_min(min),
+  m_max(max)
+{
 }
+
+db::Rule::~Rule() { }

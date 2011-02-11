@@ -8,8 +8,6 @@
 
 #include "database/Dataset.h"
 #include "database/XMLParser.h"
-#include "database/Arrayset.h"
-//#include "database/Relationset.h"
 #include "database/dataset_common.h"
 
 namespace db = Torch::database;
@@ -106,35 +104,26 @@ boost::shared_ptr<db::Arrayset> db::Dataset::ptr(const size_t id) {
   return it->second;
 }
 
-/**
 const db::Relationset& db::Dataset::operator[](const std::string& name) const {
-  std::map<std::string, boost::shared_ptr<db::Relationset> >::const_iterator it = m_name2relationset.find(name);
-  if (it == m_name2relationset.end()) throw IndexError();
-  return *(it->second.get());
+  return *ptr(name).get();
 }
 
 db::Relationset& db::Dataset::operator[](const std::string& name) {
-  std::map<std::string, boost::shared_ptr<db::Relationset> >::iterator it = m_name2relationset.find(name);
-  if (it == m_name2relationset.end()) throw IndexError();
-  return *(it->second.get());
+  return *ptr(name).get();
 }
 
-boost::shared_ptr<const db::Relationset> 
-db::Dataset::getRelationset(const std::string& name) const {
+boost::shared_ptr<const db::Relationset> db::Dataset::ptr(const std::string& name) const {
   std::map<std::string, boost::shared_ptr<db::Relationset> >::const_iterator it = m_name2relationset.find(name);
   if (it == m_name2relationset.end()) throw IndexError();
   return it->second;
 }
 
-boost::shared_ptr<db::Relationset> 
-db::Dataset::getRelationset(const std::string& name) {
+boost::shared_ptr<db::Relationset> db::Dataset::ptr(const std::string& name) {
   std::map<std::string, boost::shared_ptr<db::Relationset> >::iterator it = m_name2relationset.find(name);
   if (it == m_name2relationset.end()) throw IndexError();
   return it->second;
 }
-**/
 
-/** Operations dealing with modification of the Dataset **/
 size_t db::Dataset::add(boost::shared_ptr<const db::Arrayset> arrayset) {
   return add(*arrayset.get());
 }
@@ -154,20 +143,19 @@ void db::Dataset::remove(size_t index) {
   m_arrayset.remove_if(tdd::equal_arrayset_id(index));
 }
 
-/**
-void db::Dataset::add (boost::shared_ptr<db::Relationset> relationset) {
-  m_name2relationset[relationset->getName()] = relationset;
+size_t db::Dataset::add (const db::Relationset& relationset) {
+  m_name2relationset[relationset.getName()] = 
+    boost::shared_ptr<db::Relationset>(new db::Relationset(relationset));
+  return m_name2relationset.size();
 }
 
-void db::Dataset::add (const db::Relationset& arrayset) {
-  m_name2relationset[relationset.getName()] = 
-    boost::shared_ptr<db::Arrayset>(new db::Relationset(relationset));
+size_t db::Dataset::add (boost::shared_ptr<const db::Relationset> relationset) {
+  return add(*relationset.get());  
 }
 
 void db::Dataset::remove (const std::string& name) {
   m_name2relationset.erase(name);
 }
-**/
 
 size_t db::Dataset::getNextFreeId() const {
   if (!m_arrayset.size()) return 1;

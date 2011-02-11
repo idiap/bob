@@ -24,9 +24,6 @@ namespace Torch {
    */
   namespace database {
     
-    //I promise this exists:
-    class Dataset;
-
     /**
      * The arrayset class for a dataset. It is responsible for holding and
      * allowing access to sets of arrays that share the same element type,
@@ -159,13 +156,6 @@ namespace Torch {
         template <typename T> void index(T& container) const;
 
         /**
-         * Returns a pointer to the parent Dataset
-         */
-        inline boost::shared_ptr<const Dataset> getParent() const {
-          return m_parent.lock(); 
-        }
-
-        /**
          * This set of methods allow you to access the data contained in this
          * Arrayset. Please note that, if this Arrayset is inlined, you will
          * get a reference to the pointed data. Changing it, will be reflected
@@ -191,18 +181,7 @@ namespace Torch {
          */
         inline void setId (size_t id) { m_id = id; }
 
-        /**
-         * Set my parent and adds me to the given Dataset. If my id was set to
-         * 0, this will get reset by choosing a free id from the parent
-         * Dataset. Otherwise, this will insert me into the Arrayset
-         * overwriting, possibly, any other exising Arrayset.
-         */
-        inline void setParent(boost::shared_ptr<Dataset>& parent) {
-          m_parent = parent;
-        }
-
       private:
-        boost::weak_ptr<Dataset> m_parent; ///< My current parent
         boost::shared_ptr<detail::InlinedArraysetImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArraysetImpl> m_external;
         size_t m_id; ///< This is my id

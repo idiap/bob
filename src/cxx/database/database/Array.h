@@ -26,14 +26,9 @@ namespace Torch {
    */
   namespace database {
 
-    //I promise this exists:
-    class Arrayset;
-
     /**
      * The array class for a dataset. The Array class acts like a manager for
-     * the underlying data (blitz::Array<> in memory or serialized in file). It
-     * keeps tight its relationship with its parent Arrayset object, if one was
-     * assigned.
+     * the underlying data (blitz::Array<> in memory or serialized in file).
      */
     class Array {
 
@@ -55,23 +50,17 @@ namespace Torch {
         Array(const std::string& filename, const std::string& codec="");
 
         /**
-         * Refers to the Array data from another array. If a parent was already
-         * set, the id property of this copy will be reset according to the
-         * availability of ids in the parent.
+         * Refers to the Array data from another array. 
          */
         Array(const Array& other);
 
         /**
-         * Destroys this array. If this array had a parent, this array is
-         * firstly unregistered from the parent and then destroyed together
-         * with its data.
+         * Destroys this array. 
          */
         virtual ~Array();
 
         /**
-         * Copies the data from another array. If a parent was already set, the
-         * id property of this copy will be reset according to the availability
-         * of ids in the parent.
+         * Copies the data from another array. 
          */
         Array& operator= (const Array& other);
 
@@ -161,18 +150,6 @@ namespace Torch {
         inline bool isLoaded() const { return m_inlined; }
 
         /**
-         * Gets the parent arrayset of this array
-         */
-        inline boost::shared_ptr<const Arrayset> getParent() const { 
-          return m_parent.lock(); 
-        }
-
-        //The next methods are sort of semi-private: Only to be used by the
-        //Database loading system. You can adventure yourself, but really not
-        //recommended to set the id or the parent of an array. Be sure to
-        //understand the consequences.
-        
-        /**
          * Sets the id for this Array. You can get automatic id's that are
          * guaranteed to be free by setting the special value '0' (zero). That
          * is the default for the Array construction, so if you don't use this
@@ -180,21 +157,7 @@ namespace Torch {
          */
         inline void setId (size_t id) { m_id = id; }
 
-        /**
-         * Sets the parent arrayset of this array. Please note this is a simple
-         * assignment that has to be done by the Dataset parent of the Arrayset
-         * as it is the only entity in the system that holds a
-         * boost::shared_ptr<> to an Arrayset.
-         *
-         * It is meant to be used in the context of the database creation. So,
-         * not for us, mortal users ;-)
-         */
-        inline void setParent (boost::shared_ptr<Arrayset> parent) {
-          m_parent = parent;
-        }
-
       private: //representation
-        boost::weak_ptr<Arrayset> m_parent; ///< My current parent
         boost::shared_ptr<detail::InlinedArrayImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArrayImpl> m_external;
         size_t m_id; ///< This is my id
