@@ -58,6 +58,10 @@ void db::Arrayset::add (const db::Array& array) {
   else m_external->add(array);
 }
 
+void db::Arrayset::add (const db::detail::InlinedArrayImpl& array) {
+  add( array, 0);
+}
+
 void db::Arrayset::add (const db::detail::InlinedArrayImpl& array, size_t id) {
   if (m_inlined) {
     db::Array tmp(array);

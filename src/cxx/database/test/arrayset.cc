@@ -18,6 +18,8 @@
 #include "database/BinFile.h"
 #include "database/Arrayset.h"
 
+#include <iostream>
+
 struct T {
   blitz::Array<double,1> a;
   blitz::Array<double,1> b;
@@ -272,8 +274,8 @@ BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
   check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
   check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
 
-  // Add array and check
-  db_Ar.add( db_b );
+  // Add blitz array and check
+  db_Ar.add( b );
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 3); 
@@ -317,6 +319,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   std::vector<size_t> ids;
   db_Ar.index( ids);
   // Check the content
+  BOOST_CHECK_EQUAL( ids.size(), 3); 
   check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
   check_equal_1d( b, db_Ar[ids[1]].get<double,1>() );
   check_equal_1d( c, db_Ar[ids[2]].get<double,1>() );
@@ -346,8 +349,8 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
   check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
 
-  // Add array and check
-  db_Ar.add( db_b );
+  // Add blitz array and check
+  db_Ar.add( b );
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 3); 
