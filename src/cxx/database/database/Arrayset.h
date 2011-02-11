@@ -72,11 +72,16 @@ namespace Torch {
         void add (const Array& array);
 
         /**
-         * Adds a blitz array to the Arrayset, optionally specifying the id.
+         * Adds a blitz array to the Arrayset.
+         */
+        void add (const detail::InlinedArrayImpl& array);
+
+        /**
+         * Adds a blitz array to the Arrayset, specifying the id.
          * Please note that if this id is repeated, this may raise an
          * exception. If the arrayset is file-based, the id will be ignored.
          */
-        void add (const detail::InlinedArrayImpl& array, size_t id=0);
+        void add (const detail::InlinedArrayImpl& array, size_t id);
         
         /**
          * Adds a new external array to the Arrayset

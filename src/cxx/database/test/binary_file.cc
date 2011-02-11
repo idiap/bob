@@ -172,6 +172,28 @@ BOOST_AUTO_TEST_CASE( blitz1d_inout )
   inoutap.close();
 }
 
+BOOST_AUTO_TEST_CASE( blitz1d_append )
+{
+  std::string tmp_file = temp_file();
+  Torch::database::BinFile out(tmp_file, Torch::database::BinFile::out);
+
+  out.write( a);
+  out.close();
+
+  Torch::database::BinFile outap(tmp_file, Torch::database::BinFile::out | 
+    Torch::database::BinFile::append);
+  
+  outap.write( a);
+  outap.close();
+
+  Torch::database::BinFile in(tmp_file, Torch::database::BinFile::in);
+  blitz::Array<double,1> a_read1 = in.read<double,1>(0);
+  check_equal_1d( a, a_read1);
+  blitz::Array<double,1> a_read2 = in.read<double,1>(1);
+  check_equal_1d( a, a_read2);
+  in.close();
+}
+
 BOOST_AUTO_TEST_CASE( blitz2d_withcast )
 {
   std::string tmp_file = temp_file();
