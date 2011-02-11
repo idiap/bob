@@ -136,12 +136,12 @@ void db::Arrayset::load() {
   }
 }
 
-const db::Array db::Arrayset::operator[] (size_t index) const {
-  if (m_inlined) return (*m_inlined)[index];
-  return (*m_external)[index];
+const db::Array db::Arrayset::operator[] (size_t id) const {
+  if (m_inlined) return (*m_inlined)[id];
+  return (*m_external)[id];
 }
 
-db::Array db::Arrayset::operator[] (size_t index) {
-  if (m_inlined) return (*m_inlined)[index];
-  return (*m_external)[index];
+db::Array db::Arrayset::operator[] (size_t id) {
+  if (m_inlined) return (*m_inlined)[id];
+  return (*m_external)[id];
 }

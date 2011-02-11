@@ -53,9 +53,9 @@ db::detail::InlinedArraysetImpl db::BinaryArraysetCodec::load
 }
 
 db::Array db::BinaryArraysetCodec::load
-(const std::string& filename, size_t index) const {
+(const std::string& filename, size_t id) const {
   db::BinFile f(filename, db::BinFile::in);
-  return f.read(index);
+  return f.read(id-1);
 }
 
 void db::BinaryArraysetCodec::append
