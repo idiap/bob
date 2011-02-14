@@ -32,7 +32,7 @@ set(src
     "src/Relation.cc"
     "src/Relationset.cc"
     "src/Rule.cc"
-    #"src/XMLParser.cc"
+    "src/XMLParser.cc"
     #"src/XMLWriter.cc"
     )
 
