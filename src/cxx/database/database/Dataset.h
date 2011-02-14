@@ -168,6 +168,25 @@ namespace Torch {
          */
         void consolidateIds();
 
+        /**
+         * For a certain relationset, retrives 
+         */
+
+        /**
+         * Saves the contents of this database at a given file. If the file
+         * already exists, it is backed-up (filename + '~') and re-written. If
+         * a backup already exists, it is erased before the process begins.
+         */
+        //void save(const std::string& path);
+
+      private: //some methods for internal usage.
+
+        /**
+         * Runs a full check on the rule consistency and the existance of
+         * the respective arrays.
+         */
+        void checkRelationConsistency() const;
+
       private:
         std::string m_name;
         size_t m_version;

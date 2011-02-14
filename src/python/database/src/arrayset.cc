@@ -77,23 +77,6 @@ static tuple get_arrays(const db::Arrayset& as) {
 }
 
 void bind_database_arrayset() {
-  enum_<dba::ElementType>("ElementType")
-    .value("unknown", dba::t_unknown)
-    .value("bool", dba::t_bool)
-    .value("int8", dba::t_int8)
-    .value("int16", dba::t_int16)
-    .value("int32", dba::t_int32)
-    .value("int64", dba::t_int64)
-    .value("uint8", dba::t_uint8)
-    .value("uint16", dba::t_uint16)
-    .value("uint32", dba::t_uint32)
-    .value("uint64", dba::t_uint64)
-    .value("float32", dba::t_float32)
-    .value("float64", dba::t_float64)
-    .value("complex64", dba::t_complex64)
-    .value("complex128", dba::t_complex128)
-    ;
-
 #define APPEND_DEF(T,D) .def("append", (void (db::Arrayset::*)(const blitz::Array<T,D>&))&db::Arrayset::append, (arg("self"),arg("array")), "Adds an array to this set")
 
   class_<db::Arrayset, boost::shared_ptr<db::Arrayset> >("Arrayset", "Dataset Arraysets represent lists of Arrays that share the same element type and dimension properties and are grouped together by the DB designer.", init<>("Initializes a new arrayset"))
