@@ -638,11 +638,20 @@ namespace Torch {
 					}
 
 					// auto detect the output format from the name. default is mpeg.
+					// ffmpeg 0.6 and above [libavformat 52.64.2 = 0x344002]
+#if LIBAVFORMAT_VERSION_INT >= 0x344002
 					m_fwrite.fmt = av_guess_format(NULL, filename, NULL);
+#else
+					m_fwrite.fmt = guess_format(NULL, filename, NULL);
+#endif
 					if (!m_fwrite.fmt)
 					{
 						warning("Video::open - could not deduce output format from file extension: using MPEG.");
+#if LIBAVFORMAT_VERSION_INT >= 0x344002
 						m_fwrite.fmt = av_guess_format("mpeg", NULL, NULL);
+#else
+						m_fwrite.fmt = guess_format("mpeg", NULL, NULL);
+#endif
 					}
 					if (!m_fwrite.fmt)
 					{
@@ -759,9 +768,15 @@ namespace Torch {
 					// Is this a packet from the video stream?
 					if (m_fread.packet.stream_index == m_fread.videoStream)
 					{
-						// Decode video frame
-						avcodec_decode_video2(m_fread.pCodecCtx, m_fread.pFrame, &m_fread.frameFinished,
-								&m_fread.packet);
+						// Decode video frame -- ffmpeg 0.6 and above [libavcodec 52.72.2 =
+            // 0x344802
+#if LIBAVCODEC_VERSION_INT >= 0x344802
+						avcodec_decode_video2(m_fread.pCodecCtx, m_fread.pFrame, &m_fread.frameFinished, &m_fread.packet);
+#else
+            // ffmpeg 0.5.3 and bellow [libavcodec 52.20.1 or 52.20.0 =
+            // 0x341401 or 0x341400
+            avcodec_decode_video(m_fread.pCodecCtx, m_fread.pFrame, &m_fread.frameFinished, m_fread.packet.data, m_fread.packet.size);
+#endif
 
 						// Did we get a video frame?
 						if (m_fread.frameFinished)
