@@ -57,6 +57,8 @@ db::Dataset::Dataset(const std::string& path) :
   //LES: Please fill up using the parser
   //db::XMLParser parser;
   //parser.load(path.c_str(), *this, 2); 
+  tdd::XMLParser parser;
+  parser.load(path.c_str(), *this, 2);
 }
 
 db::Dataset::Dataset(const db::Dataset& other) :

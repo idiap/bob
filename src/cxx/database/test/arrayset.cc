@@ -18,8 +18,6 @@
 #include "database/BinFile.h"
 #include "database/Arrayset.h"
 
-#include <iostream>
-
 struct T {
   blitz::Array<double,1> a;
   blitz::Array<double,1> b;
