@@ -6,13 +6,22 @@
 
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/format.hpp>
 
-#include "core/Dataset2.h"
+#include "database/Arrayset.h"
 
 using namespace boost::python;
-namespace db = Torch::core;
-namespace dba = Torch::core::array;
+namespace db = Torch::database;
+namespace core = Torch::core;
+namespace array = Torch::core::array;
+
+/**
+ * Creates an empty Arrayset (inlined representation)
+ */
+boost::shared_ptr<db::Arrayset> make_inlined() {
+  return boost::make_shared<db::Arrayset>(db::detail::InlinedArraysetImpl());
+}
 
 tuple get_shape(const db::Arrayset& as) {
   size_t ndim = as.getNDim();
@@ -32,16 +41,6 @@ tuple get_shape(const db::Arrayset& as) {
   return make_tuple();
 }
 
-static void set_shape(db::Arrayset& as, tuple& t) {
-  size_t ndim = len(t);
-  if (ndim == 0 || ndim > 4) {
-    boost::format s("input object must contain from 1 to 4 elements, not %d");
-    s % ndim;
-    PyErr_SetString(PyExc_RuntimeError, s.str().c_str());
-    boost::python::throw_error_already_set();
-  }
-}
-
 static const char* get_role(db::Arrayset& as) {
   return as.getRole().c_str();
 }
@@ -55,93 +54,129 @@ static const char* get_filename(db::Arrayset& as) {
   return as.getFilename().c_str();
 }
 
-static void set_filename(db::Arrayset& as, const char* filename) {
-  std::string f(filename);
-  as.setFilename(f);
-}
-
 static tuple get_array_ids(const db::Arrayset& as) {
+  std::vector<size_t> t;
   list l;
-  for(db::Arrayset::const_iterator it=as.begin(); it!=as.end(); ++it) {
-    l.append(it->first);
+  for(std::vector<size_t>::iterator it=t.begin(); it!=t.end(); ++it) {
+    l.append(*it);
   }
   return tuple(l);
 }
 
-static tuple get_arrays(const db::Arrayset& as) {
-  list l;
-  for(db::Arrayset::const_iterator it=as.begin(); it!=as.end(); ++it) {
-    l.append(it->second);
-  }
-  return tuple(l);
+template<typename T, int D> static void append_bzarray(db::Arrayset& as, blitz::Array<T,D>& bz) {
+  as.add(db::detail::InlinedArrayImpl(bz));
 }
+
+template<typename T, int D> static void append_bzarray_id(db::Arrayset& as, size_t id, blitz::Array<T,D>& bz) {
+  as.add(db::detail::InlinedArrayImpl(bz), id);
+}
+
+static void append_file(db::Arrayset& as, const std::string& filename) {
+  as.add(filename);
+}
+
+static void append_file_codec(db::Arrayset& as, const std::string& filename, const std::string& codec) {
+  as.add(filename, codec);
+}
+
+static void append_file_codec_id(db::Arrayset& as, const std::string& filename, const std::string& codec, size_t id) {
+  as.add(filename, codec, id);
+}
+
+static void remove_id(db::Arrayset& as, size_t id) {
+  as.remove(id);
+}
+
+static void remove_array(db::Arrayset& as, boost::shared_ptr<const db::Array> array) {
+  as.remove(array);
+}
+
+static const char* ARRAYSET_APPEND = "Adds a blitz array to this set";
+#define ARRAYSET_ALL_DEFS(T,N,D) .def("append", &append_bzarray<T,D>, (arg("self"),arg("array")), ARRAYSET_APPEND) \
+  .def("__setitem__", &append_bzarray_id<T,D>) 
+
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(arrayset_save_overloads, save, 1, 2) 
 
 void bind_database_arrayset() {
-#define APPEND_DEF(T,D) .def("append", (void (db::Arrayset::*)(const blitz::Array<T,D>&))&db::Arrayset::append, (arg("self"),arg("array")), "Adds an array to this set")
-
-  class_<db::Arrayset, boost::shared_ptr<db::Arrayset> >("Arrayset", "Dataset Arraysets represent lists of Arrays that share the same element type and dimension properties and are grouped together by the DB designer.", init<>("Initializes a new arrayset"))
-    .def("__append_array__", (void (db::Arrayset::*)(boost::shared_ptr<db::Array>))&db::Arrayset::append, (arg("self"), arg("array")), "Adds an array to this set")
-    .def("__getitem__", (boost::shared_ptr<db::Array> (db::Arrayset::*)(const size_t))&db::Arrayset::getArray, (arg("self"), arg("array_id")), "Gets an array from this set given its id")
+  class_<db::Arrayset, boost::shared_ptr<db::Arrayset> >("Arrayset", "Dataset Arraysets represent lists of Arrays that share the same element type and dimension properties and are grouped together by the DB designer.", init<const std::string&, optional<const std::string&> >((arg("filename"),arg("codecname")=""), "Initializes a new arrayset from an external file. An optional codec may be passed."))
+    .def("__init__", make_constructor(&make_inlined), "Creates a new empty arraset with an inlined representation.")
     .add_property("id", &db::Arrayset::getId, &db::Arrayset::setId)
-    .add_property("shape", &get_shape, &set_shape, "The shape of each array in this set is determined by this variable.")
+    .add_property("shape", &get_shape, "The shape of each array in this set is determined by this variable.")
     .add_property("role", &get_role, &set_role, "This variable determines the role of this arrayset inside this dataset.")
-    .add_property("loaded", &db::Arrayset::getIsLoaded, &db::Arrayset::setIsLoaded, "This variable determines if the arrayset is loaded in memory. This may be false in the case the arrayset is completely stored in an external file.")
-    .add_property("filename", &get_filename, &set_filename)
-    .add_property("elementType", &db::Arrayset::getElementType, &db::Arrayset::setElementType, "This property indicates the type of element used for each array in the current set.")
-    .add_property("arrays", &get_arrays, "Iterable over all arrays in this set")
-    .def("__len__", &db::Arrayset::getNArrays, "The number of arrays stored in this set.")
-    //TODO: Missing __delitem__, __setitem__
-    APPEND_DEF(bool, 1)
-    APPEND_DEF(int8_t, 1)
-    APPEND_DEF(int16_t, 1)
-    APPEND_DEF(int32_t, 1)
-    APPEND_DEF(int64_t, 1)
-    APPEND_DEF(uint8_t, 1)
-    APPEND_DEF(uint16_t, 1)
-    APPEND_DEF(uint32_t, 1)
-    APPEND_DEF(uint64_t, 1)
-    APPEND_DEF(float, 1)
-    APPEND_DEF(double, 1)
-    APPEND_DEF(std::complex<float>, 1)
-    APPEND_DEF(std::complex<double>, 1)
-    APPEND_DEF(bool, 2)
-    APPEND_DEF(int8_t, 2)
-    APPEND_DEF(int16_t, 2)
-    APPEND_DEF(int32_t, 2)
-    APPEND_DEF(int64_t, 2)
-    APPEND_DEF(uint8_t, 2)
-    APPEND_DEF(uint16_t, 2)
-    APPEND_DEF(uint32_t, 2)
-    APPEND_DEF(uint64_t, 2)
-    APPEND_DEF(float, 2)
-    APPEND_DEF(double, 2)
-    APPEND_DEF(std::complex<float>, 2)
-    APPEND_DEF(std::complex<double>, 2)
-    APPEND_DEF(bool, 3)
-    APPEND_DEF(int8_t, 3)
-    APPEND_DEF(int16_t, 3)
-    APPEND_DEF(int32_t, 3)
-    APPEND_DEF(int64_t, 3)
-    APPEND_DEF(uint8_t, 3)
-    APPEND_DEF(uint16_t, 3)
-    APPEND_DEF(uint32_t, 3)
-    APPEND_DEF(uint64_t, 3)
-    APPEND_DEF(float, 3)
-    APPEND_DEF(double, 3)
-    APPEND_DEF(std::complex<float>, 3)
-    APPEND_DEF(std::complex<double>, 3)
-    APPEND_DEF(bool, 4)
-    APPEND_DEF(int8_t, 4)
-    APPEND_DEF(int16_t, 4)
-    APPEND_DEF(int32_t, 4)
-    APPEND_DEF(int64_t, 4)
-    APPEND_DEF(uint8_t, 4)
-    APPEND_DEF(uint16_t, 4)
-    APPEND_DEF(uint32_t, 4)
-    APPEND_DEF(uint64_t, 4)
-    APPEND_DEF(float, 4)
-    APPEND_DEF(double, 4)
-    APPEND_DEF(std::complex<float>, 4)
-    APPEND_DEF(std::complex<double>, 4)
+    .add_property("loaded", &db::Arrayset::isLoaded, "This variable determines if the arrayset is loaded in memory. This may be false in the case the arrayset is completely stored in an external file.")
+    .add_property("filename", &get_filename)
+    .add_property("elementType", &db::Arrayset::getElementType, "This property indicates the type of element used for each array in the current set.")
+    .def("save", &db::Arrayset::save, arrayset_save_overloads((arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the arrayset into a file. It will save if the arrayset is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."))
+    .def("load", &db::Arrayset::load)
+    .def("__len__", &db::Arrayset::getNSamples, "The number of arrays stored in this set.")
+    .def("ids", &get_array_ids, "The ids of every array in this set, in a tuple")
+    //some manipulations
+    .def("__getitem__", (db::Array (db::Arrayset::*)(size_t))&db::Arrayset::operator[], (arg("self"), arg("array_id")), "Gets an array from this set given its id")
+    .def("__delitem__", remove_id, (arg("self"), arg("id")), "Removes the array given its id. Never raises an exception.")
+    .def("__delitem__", remove_array, (arg("self"), arg("array")), "Removes the array given itself (internally we just take its id). Never raises an exception.")
+    .def("__setitem__", append_file_codec_id, (arg("self"), arg("filename"), arg("codecname"), arg("id")), "Adds an array to this set, indicating a codecname to be used, and the id this array should occupy. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")
+    .def("append", append_file, (arg("self"), arg("filename")), "Adds an array to this set")
+    .def("append", append_file_codec, (arg("self"), arg("filename"), arg("codecname")), "Adds an array to this set, indicating a codecname to be used.")
+    .def("append", (void (db::Arrayset::*)(boost::shared_ptr<const db::Array>))&db::Arrayset::add, (arg("self"), arg("array")), "Adds an array to this set")
+    ARRAYSET_ALL_DEFS(bool, bool, 1)
+    ARRAYSET_ALL_DEFS(int8_t, int8, 1)
+    ARRAYSET_ALL_DEFS(int16_t, int16, 1)
+    ARRAYSET_ALL_DEFS(int32_t, int32, 1)
+    ARRAYSET_ALL_DEFS(int64_t, int64, 1)
+    ARRAYSET_ALL_DEFS(uint8_t, uint8, 1)
+    ARRAYSET_ALL_DEFS(uint16_t, uint16, 1)
+    ARRAYSET_ALL_DEFS(uint32_t, uint32, 1)
+    ARRAYSET_ALL_DEFS(uint64_t, uint64, 1)
+    ARRAYSET_ALL_DEFS(float, float32, 1)
+    ARRAYSET_ALL_DEFS(double, float64, 1)
+    ARRAYSET_ALL_DEFS(double, float128, 1)
+    ARRAYSET_ALL_DEFS(std::complex<float>, complex64, 1)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex128, 1)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex256, 1)
+    ARRAYSET_ALL_DEFS(bool, bool, 2)
+    ARRAYSET_ALL_DEFS(int8_t, int8, 2)
+    ARRAYSET_ALL_DEFS(int16_t, int16, 2)
+    ARRAYSET_ALL_DEFS(int32_t, int32, 2)
+    ARRAYSET_ALL_DEFS(int64_t, int64, 2)
+    ARRAYSET_ALL_DEFS(uint8_t, uint8, 2)
+    ARRAYSET_ALL_DEFS(uint16_t, uint16, 2)
+    ARRAYSET_ALL_DEFS(uint32_t, uint32, 2)
+    ARRAYSET_ALL_DEFS(uint64_t, uint64, 2)
+    ARRAYSET_ALL_DEFS(float, float32, 2)
+    ARRAYSET_ALL_DEFS(double, float64, 2)
+    ARRAYSET_ALL_DEFS(double, float128, 2)
+    ARRAYSET_ALL_DEFS(std::complex<float>, complex64, 2)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex128, 2)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex256, 2)
+    ARRAYSET_ALL_DEFS(bool, bool, 3)
+    ARRAYSET_ALL_DEFS(int8_t, int8, 3)
+    ARRAYSET_ALL_DEFS(int16_t, int16, 3)
+    ARRAYSET_ALL_DEFS(int32_t, int32, 3)
+    ARRAYSET_ALL_DEFS(int64_t, int64, 3)
+    ARRAYSET_ALL_DEFS(uint8_t, uint8, 3)
+    ARRAYSET_ALL_DEFS(uint16_t, uint16, 3)
+    ARRAYSET_ALL_DEFS(uint32_t, uint32, 3)
+    ARRAYSET_ALL_DEFS(uint64_t, uint64, 3)
+    ARRAYSET_ALL_DEFS(float, float32, 3)
+    ARRAYSET_ALL_DEFS(double, float64, 3)
+    ARRAYSET_ALL_DEFS(double, float128, 3)
+    ARRAYSET_ALL_DEFS(std::complex<float>, complex64, 3)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex128, 3)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex256, 3)
+    ARRAYSET_ALL_DEFS(bool, bool, 4)
+    ARRAYSET_ALL_DEFS(int8_t, int8, 4)
+    ARRAYSET_ALL_DEFS(int16_t, int16, 4)
+    ARRAYSET_ALL_DEFS(int32_t, int32, 4)
+    ARRAYSET_ALL_DEFS(int64_t, int64, 4)
+    ARRAYSET_ALL_DEFS(uint8_t, uint8, 4)
+    ARRAYSET_ALL_DEFS(uint16_t, uint16, 4)
+    ARRAYSET_ALL_DEFS(uint32_t, uint32, 4)
+    ARRAYSET_ALL_DEFS(uint64_t, uint64, 4)
+    ARRAYSET_ALL_DEFS(float, float32, 4)
+    ARRAYSET_ALL_DEFS(double, float64, 4)
+    ARRAYSET_ALL_DEFS(double, float128, 4)
+    ARRAYSET_ALL_DEFS(std::complex<float>, complex64, 4)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex128, 4)
+    ARRAYSET_ALL_DEFS(std::complex<double>, complex256, 4)
     ;
 }
