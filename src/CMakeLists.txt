@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # Force __LP64__ scheme on OSX
 if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
-  set(COMMON_FLAGS "-m64")
+  set(COMMON_FLAGS "-m64 -framework CoreServices")
   # Bogus on OSX?
   set(CMAKE_INCLUDE_SYSTEM_FLAG_C "-isystem ")
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")

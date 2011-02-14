@@ -12,6 +12,14 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
+#include <iostream>
+
+#ifdef __APPLE__
+# include <CoreServices/CoreServices.h>
+# include <stdint.h>
+#else
+# include <unistd.h>
+#endif
 
 #include "core/logging.h"
 
@@ -22,7 +30,25 @@ struct T {
   ~T() {}
 };
 
-void checkBlitzAllocation( const int n_megabytes ) {
+/**
+ * This method will work in UN*X based platforms
+ */
+size_t maxRAMInMegabytes () {
+#ifdef __APPLE__
+  int32_t memsize;
+  Gestalt(gestaltPhysicalRAMSizeInMegabytes, &mem_size);
+  return memsize;
+#else
+  return sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) / (1024 * 1024);
+#endif
+}
+
+void checkBlitzAllocation( const unsigned int n_megabytes ) {
+  if (n_megabytes > maxRAMInMegabytes()) {
+    std::cout << "Warning: Skipping allocation test for " << n_megabytes << " MB because this machine only has " << maxRAMInMegabytes() << " MB of RAM" << std::endl;
+    return;
+  }
+
   // Dimensions of the blitz::Array
   int n_elems_first = n_megabytes*1024;
   int n_elems_second = 1024;
@@ -113,8 +139,6 @@ void checkBlitzEqual( const blitz::Array<T,4> a, const blitz::Array<T,4> b ) {
             a(i+a.lbound(0),j+a.lbound(1),k+a.lbound(2),l+a.lbound(3)), 
             b(i+b.lbound(0),j+b.lbound(1),k+b.lbound(2),l+b.lbound(3)) );
 }
-
-
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
