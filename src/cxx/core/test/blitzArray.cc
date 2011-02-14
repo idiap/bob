@@ -13,6 +13,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <iostream>
+#include "core/logging.h"
 
 #ifdef __APPLE__
 # include <CoreServices/CoreServices.h>
@@ -20,9 +21,6 @@
 #else
 # include <unistd.h>
 #endif
-
-#include "core/logging.h"
-
 
 struct T {
   double eps;
@@ -36,7 +34,7 @@ struct T {
 size_t maxRAMInMegabytes () {
 #ifdef __APPLE__
   int32_t memsize;
-  Gestalt(gestaltPhysicalRAMSizeInMegabytes, &mem_size);
+  Gestalt(gestaltPhysicalRAMSizeInMegabytes, &memsize);
   return memsize;
 #else
   return sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) / (1024 * 1024);
