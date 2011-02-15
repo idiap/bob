@@ -137,7 +137,7 @@ namespace Torch {
       {
         blitz::Array<T,D> array(shape);
         T* data_array = array.data();
-        size_t count = 0;
+        blitz::sizeType count = 0;
         for( boost::tokenizer<boost::char_separator<char> >::iterator
             it=tok.begin(); it!=tok.end(); ++it, ++count ) 
         {
