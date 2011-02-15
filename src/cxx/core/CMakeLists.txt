@@ -55,6 +55,9 @@ torch_test(core adapter test/blitzAdapter.cc)
 torch_test(core logging test/logging.cc)
 torch_test(core binary_file test/binary_file.cc)
 torch_test(core blitzarray test/blitzArray.cc)
+if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+  target_link_libraries(torchtest_core_blitzarray "-framework CoreServices")
+endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 # Defines benchmarks we make available
 torch_benchmark(core tensor benchmark/tensor.cc)
