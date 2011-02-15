@@ -8,7 +8,7 @@
 
 #include "database/Dataset.h"
 #include "database/XMLParser.h"
-//#include "database/XMLWriter.h"
+#include "database/XMLWriter.h"
 #include "database/dataset_common.h"
 
 namespace db = Torch::database;
@@ -172,6 +172,6 @@ void db::Dataset::consolidateIds() {
 }
 
 void db::Dataset::save(const std::string& path) const {
-  //db::XMLWriter writer();
-  //writer.write(path, ds);
+  tdd::XMLWriter writer;
+  writer.write(path.c_str(), *this);
 }

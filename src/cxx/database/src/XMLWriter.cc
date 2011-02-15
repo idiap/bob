@@ -9,22 +9,26 @@
 #include <boost/shared_ptr.hpp>
 
 #include "database/XMLWriter.h"
-#include "database/XMLParser.h"
 #include "database/Dataset.h"
 #include "database/Arrayset.h"
 #include "database/Array.h"
 #include "database/Relationset.h"
 
+#include "core/logging.h"
+
+namespace db = Torch::database;
+namespace tc = Torch::core;
+namespace tca = Torch::core::array;
+
 namespace Torch {
-  namespace database {
+  namespace database { namespace detail {
 
     XMLWriter::XMLWriter() { }
 
     XMLWriter::~XMLWriter() { }
 
 
-    void XMLWriter::write(const char *filename, const Dataset& dataset,
-      bool b) 
+    void XMLWriter::write(const char *filename, const db::Dataset& dataset)
     {
       xmlDocPtr doc;
       xmlNodePtr rootnode;
@@ -45,18 +49,20 @@ namespace Torch {
           (boost::lexical_cast<std::string>(dataset.getVersion())).c_str() );
 
       // Create Arrayset nodes
-      for(Dataset::const_iterator it=dataset.begin(); it!=dataset.end(); 
-        ++it)
+      const std::list<boost::shared_ptr<Arrayset> > arraysets = 
+        dataset.arraysets();
+      for(std::list<boost::shared_ptr<Arrayset> >::const_iterator 
+        it=arraysets.begin(); it!=arraysets.end(); ++it)
       {
-        xmlAddChild( rootnode, writeArrayset( doc, *it, b) );
+        xmlAddChild( rootnode, writeArrayset( doc, *it) );
       }
       // Create Relationset nodes
-      for(Dataset::relationset_const_iterator it=dataset.relationset_begin(); 
+/*      for(Dataset::relationset_const_iterator it=dataset.relationset_begin(); 
         it!=dataset.relationset_end(); ++it)
       {
         xmlAddChild( rootnode, writeRelationset( doc, *it->second, b) );
       }
-
+*/
       // Save the document to the specified XML file in UTF-8 format
       xmlSaveFormatFileEnc(filename, doc, "UTF-8", 1);
     }
@@ -64,11 +70,11 @@ namespace Torch {
 
     xmlNodePtr XMLWriter::writeArrayset( xmlDocPtr doc, 
       boost::shared_ptr<const Arrayset> a, 
-      bool content_inline, int precision, bool scientific) 
+      int precision, bool scientific) 
     {
       // Create the Arrayset node
       xmlNodePtr arraysetnode; 
-      if( a->getFilename().compare("") && !content_inline)
+      if( a->getFilename().compare("") )
         arraysetnode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::external_arrayset, 0);
       else
@@ -81,38 +87,38 @@ namespace Torch {
       // Write elementtype attribute
       std::string str;
       switch(a->getElementType()) {
-        case array::t_bool:
+        case tca::t_bool:
           str = db::t_bool; break;
-        case array::t_int8:
+        case tca::t_int8:
           str = db::t_int8; break;
-        case array::t_int16:
+        case tca::t_int16:
           str = db::t_int16; break;
-        case array::t_int32:
+        case tca::t_int32:
           str = db::t_int32; break;
-        case array::t_int64:
+        case tca::t_int64:
           str = db::t_int64; break;
-        case array::t_uint8:
+        case tca::t_uint8:
           str = db::t_uint8; break;
-        case array::t_uint16:
+        case tca::t_uint16:
           str = db::t_uint16; break;
-        case array::t_uint32:
+        case tca::t_uint32:
           str = db::t_uint32; break;
-        case array::t_uint64:
+        case tca::t_uint64:
           str = db::t_uint64; break;
-        case array::t_float32:
+        case tca::t_float32:
           str = db::t_float32; break;
-        case array::t_float64:
+        case tca::t_float64:
           str = db::t_float64; break;
-        case array::t_float128:
+        case tca::t_float128:
           str = db::t_float128; break;
-        case array::t_complex64:
+        case tca::t_complex64:
           str = db::t_complex64; break;
-        case array::t_complex128:
+        case tca::t_complex128:
           str = db::t_complex128; break;
-        case array::t_complex256:
+        case tca::t_complex256:
           str = db::t_complex256; break;
         default:
-          throw Exception();
+          throw tc::Exception();
           break;
       }    
       xmlNewProp( arraysetnode, (const xmlChar*)db::elementtype, (const xmlChar*)
@@ -131,25 +137,28 @@ namespace Torch {
         a->getRole().c_str() );
 
       // Write file and loader attributes if any
-      if( a->getFilename().compare("") && !content_inline)
+      if( a->getFilename().compare("") )
       {
         // Write file attribute
         xmlNewProp( arraysetnode, (const xmlChar*)db::file, (const xmlChar*)
           a->getFilename().c_str() );
 
         // Write codec attribute
-        str = a->getCodecname();
-        // TODO: check that the codec exists in the registry
+        str = a->getCodec()->name();
+        // TODO: check that the codec exists in the registry?
         xmlNewProp( arraysetnode, (const xmlChar*)db::codec, (const xmlChar*)
           str.c_str() );
       }
-
-      // Create Array nodes
-      for(Arrayset::const_iterator it=a->begin(); it!=a->end(); 
-        ++it)
-      {
-        xmlAddChild( arraysetnode, writeArray( doc, *it, 
-          content_inline, precision, scientific) );
+      else {
+        std::vector<size_t> ids;
+        a->index( ids );
+        // Create Array nodes
+        for( std::vector<size_t>::const_iterator a_id=ids.begin(); 
+          a_id!=ids.end(); ++a_id)
+        {
+          xmlAddChild( arraysetnode, writeArray( doc, a->operator[](*a_id),
+            precision, scientific) );
+        }
       }
 
       return arraysetnode;
@@ -157,81 +166,91 @@ namespace Torch {
 
 
     xmlNodePtr XMLWriter::writeArray( xmlDocPtr doc, 
-      boost::shared_ptr<const Array> a, bool content_inline, int precision, 
-      bool scientific) 
+      const Array a, int precision, bool scientific)
     {
       // Create the Arrayset node
-      xmlNodePtr arraynode; 
-      if( a->getFilename().compare("") && !content_inline)
+      xmlNodePtr arraynode;
+ 
+      // External Array
+      if( a.getFilename().compare("") ) {
         arraynode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::external_array, 0);
-      else {
+
+        // Write file attribute
+        xmlNewProp( arraynode, (const xmlChar*)db::file, (const xmlChar*)
+          a.getFilename().c_str() );
+
+        // Write codec attribute
+        std::string str( a.getCodec()->name() );
+        xmlNewProp( arraynode, (const xmlChar*)db::codec, (const xmlChar*)
+          str.c_str() );
+      }
+      // Inline Array
+      else { 
         // Prepare the string stream
         std::stringstream content;
         content << std::setprecision(precision);
         if( scientific)
           content << std::scientific;
 
-        // Cast the data and call the writing function
-        boost::shared_ptr<const Arrayset> parent = a->getParentArrayset();
-        switch(parent->getElementType()) {
-          case array::t_bool:
-            writeData( content, 
-              reinterpret_cast<const bool*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_int8:
-            writeData( content, 
-              reinterpret_cast<const int8_t*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_int16:
-            writeData( content, 
-              reinterpret_cast<const int16_t*>(a->getStorage()),
-              parent->getNElem()); break;
-          case array::t_int32:
-            writeData( content, 
-              reinterpret_cast<const int32_t*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_int64:
-            writeData( content, 
-              reinterpret_cast<const int64_t*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_uint8:
-            writeData( content, 
-              reinterpret_cast<const uint8_t*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_uint16:
-            writeData( content, 
-              reinterpret_cast<const uint16_t*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_uint32:
-            writeData( content, 
-              reinterpret_cast<const uint32_t*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_uint64:
-            writeData( content, 
-              reinterpret_cast<const uint64_t*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_float32:
-            writeData( content, 
-              reinterpret_cast<const float*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_float64:
-            writeData( content, 
-              reinterpret_cast<const double*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_complex64:
-            writeData( content, 
-              reinterpret_cast<const std::complex<float>*>(a->getStorage()), 
-              parent->getNElem()); break;
-          case array::t_complex128:
-            writeData( content, 
-              reinterpret_cast<const std::complex<double>*>(a->getStorage()),
-              parent->getNElem()); break;
+#define WRITE_ARRAY_DATA(T) switch(a.getNDim()) { \
+  case 1: writeData<T,1>( content, a.get<T,1>() ); break; \
+  case 2: writeData<T,2>( content, a.get<T,2>() ); break; \
+  case 3: writeData<T,3>( content, a.get<T,3>() ); break; \
+  case 4: writeData<T,4>( content, a.get<T,4>() ); break; \
+  default: throw tc::Exception(); }
+
+        switch( a.getElementType()) {
+          case tca::t_bool:
+            WRITE_ARRAY_DATA(bool);
+            break;
+          case tca::t_int8:
+            WRITE_ARRAY_DATA(int8_t);
+            break;
+          case tca::t_int16:
+            WRITE_ARRAY_DATA(int16_t);
+            break;
+          case tca::t_int32:
+            WRITE_ARRAY_DATA(int32_t);
+            break;
+          case tca::t_int64:
+            WRITE_ARRAY_DATA(int64_t);
+            break;
+          case tca::t_uint8:
+            WRITE_ARRAY_DATA(uint8_t);
+            break;
+          case tca::t_uint16:
+            WRITE_ARRAY_DATA(uint16_t);
+            break;
+          case tca::t_uint32:
+            WRITE_ARRAY_DATA(uint32_t);
+            break;
+          case tca::t_uint64:
+            WRITE_ARRAY_DATA(uint64_t);
+            break;
+          case tca::t_float32:
+            WRITE_ARRAY_DATA(float);
+            break;
+          case tca::t_float64:
+            WRITE_ARRAY_DATA(double);
+            break;
+          case tca::t_float128:
+            WRITE_ARRAY_DATA(long double);
+            break;
+          case tca::t_complex64:
+            WRITE_ARRAY_DATA(std::complex<float>);
+            break;
+          case tca::t_complex128:
+            WRITE_ARRAY_DATA(std::complex<double>);
+            break;
+          case tca::t_complex256:
+            WRITE_ARRAY_DATA(std::complex<long double>);
+            break;
           default:
-            throw Exception();
+            throw tc::Exception();
             break;
         }
- 
+
         TDEBUG3("Inline content: " << content.str());
         arraynode = xmlNewDocNode(doc, 0, (const xmlChar*)db::array, 
           (const xmlChar*)(content.str().c_str()));
@@ -239,30 +258,12 @@ namespace Torch {
 
       // Write id attribute
       xmlNewProp( arraynode, (const xmlChar*)db::id, (const xmlChar*)
-        (boost::lexical_cast<std::string>(a->getId())).c_str() );
-
-      if( a->getFilename().compare("") && !content_inline)
-      {
-        // Write file attribute
-        xmlNewProp( arraynode, (const xmlChar*)db::file, (const xmlChar*)
-          a->getFilename().c_str() );
-
-        // Write codec attribute
-        std::string str( a->getCodecname() );
-        if( !str.compare( db::c_blitz ) && !str.compare( db::c_tensor ) && 
-          !str.compare( db::c_bindata ) )
-        {
-          error << "Unknown codec attribute " << std::endl;
-          throw Exception();
-        }
-        xmlNewProp( arraynode, (const xmlChar*)db::codec, (const xmlChar*)
-          str.c_str() );
-      }
+        (boost::lexical_cast<std::string>(a.getId())).c_str() );
 
       return arraynode;
     }
 
-
+/*
     xmlNodePtr XMLWriter::writeRelationset( xmlDocPtr doc, const Relationset& r,
       bool content_inline) 
     {
@@ -345,7 +346,8 @@ namespace Torch {
 
       return membernode;
     }
+*/
 
-  }
+  }}
 }
 

@@ -10,7 +10,6 @@
 #include <libxml/xmlschemas.h>
 
 #include "database/XMLParser.h"
-//#include "database/XMLWriter.h"
 #include "database/Dataset.h"
 #include "database/Arrayset.h"
 //#include "database/Relationset.h"
@@ -589,7 +588,7 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
         case tca::t_bool:
           PARSE_ARRAY_DATA(bool);
           break;
-      case tca::t_int8:
+        case tca::t_int8:
           PARSE_ARRAY_DATA(int8_t);
           break;
         case tca::t_int16:
