@@ -33,7 +33,7 @@ set(src
     "src/Relationset.cc"
     "src/Rule.cc"
     "src/XMLParser.cc"
-    #"src/XMLWriter.cc"
+    "src/XMLWriter.cc"
     )
 
 include(../../cmake/macros.cmake)
