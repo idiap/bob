@@ -175,3 +175,12 @@ void db::Dataset::save(const std::string& path) const {
   tdd::XMLWriter writer;
   writer.write(path.c_str(), *this);
 }
+
+bool db::Dataset::exists(size_t arrayset_id) const {
+  return (m_id2arrayset.find(arrayset_id) != m_id2arrayset.end());
+}
+
+bool db::Dataset::exists(const std::string& relationset_name) const {
+  return (m_name2relationset.find(relationset_name) != m_name2relationset.end());
+}
+

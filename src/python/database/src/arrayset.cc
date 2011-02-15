@@ -87,10 +87,6 @@ static void remove_id(db::Arrayset& as, size_t id) {
   as.remove(id);
 }
 
-static void remove_array(db::Arrayset& as, boost::shared_ptr<const db::Array> array) {
-  as.remove(array);
-}
-
 static const char* ARRAYSET_APPEND = "Adds a blitz array to this set";
 #define ARRAYSET_ALL_DEFS(T,N,D) .def("append", &append_bzarray<T,D>, (arg("self"),arg("array")), ARRAYSET_APPEND) \
   .def("__setitem__", &append_bzarray_id<T,D>) 
@@ -110,10 +106,11 @@ void bind_database_arrayset() {
     .def("load", &db::Arrayset::load)
     .def("__len__", &db::Arrayset::getNSamples, "The number of arrays stored in this set.")
     .def("ids", &get_array_ids, "The ids of every array in this set, in a tuple")
+    .def("exists", &db::Arrayset::exists, (arg("self"), arg("array_id")), "Returns True if I have an Array with the given array-id") 
+
     //some manipulations
     .def("__getitem__", (db::Array (db::Arrayset::*)(size_t))&db::Arrayset::operator[], (arg("self"), arg("array_id")), "Gets an array from this set given its id")
     .def("__delitem__", remove_id, (arg("self"), arg("id")), "Removes the array given its id. Never raises an exception.")
-    .def("__delitem__", remove_array, (arg("self"), arg("array")), "Removes the array given itself (internally we just take its id). Never raises an exception.")
     .def("__setitem__", append_file_codec_id, (arg("self"), arg("filename"), arg("codecname"), arg("id")), "Adds an array to this set, indicating a codecname to be used, and the id this array should occupy. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")
     .def("append", append_file, (arg("self"), arg("filename")), "Adds an array to this set")
     .def("append", append_file_codec, (arg("self"), arg("filename"), arg("codecname")), "Adds an array to this set, indicating a codecname to be used.")

@@ -145,3 +145,8 @@ db::Array db::Arrayset::operator[] (size_t id) {
   if (m_inlined) return (*m_inlined)[id];
   return (*m_external)[id];
 }
+
+bool db::Arrayset::exists (size_t id) const {
+  if (m_inlined) return m_inlined->exists(id);
+  return m_external->exists(id);
+}

@@ -76,6 +76,8 @@ void bind_database_dataset() {
     .def("save", &db::Dataset::save, (arg("self"), arg("path")), "Saves the current dataset into a file representation")
     .def("getNextFreeId", &db::Dataset::getNextFreeId, "Returns the next free arrayset-id")
     .def("consolidateIds", &db::Dataset::consolidateIds, "Re-writes the ids of every arrayset so they are numbered sequentially and by the order of insertion.")
+    .def("exists", (bool (db::Dataset::*)(size_t) const)&db::Dataset::exists, (arg("self"), arg("arrayset_id")), "Returns True if I have an Arrayset with the given arrayset-id") 
+    .def("exists", (bool (db::Dataset::*)(const std::string&) const)&db::Dataset::exists, (arg("self"), arg("relationset_name")), "Returns True if I have a Relationset with the given relationset-id")
 
     //appending...
     .def("append", (size_t (db::Dataset::*)(boost::shared_ptr<const db::Arrayset>))&db::Dataset::add, (arg("self"), arg("arrayset")), "Adds an arrayset to this dataset")

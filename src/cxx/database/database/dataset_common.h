@@ -69,6 +69,10 @@ namespace Torch {
     class TypeError: public Torch::core::Exception { };
     class NonExistingElement: public Torch::core::Exception { };
     class Uninitialized: public Torch::core::Exception { };
+    class AlreadyHasRelations: public Torch::core::Exception { };
+    class InvalidRelation: public Torch::core::Exception { };
+    class UnknownArrayset: public Torch::core::Exception { };
+    class UnknownArray: public Torch::core::Exception { };
 
   }
 /**

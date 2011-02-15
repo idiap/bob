@@ -165,8 +165,15 @@ namespace Torch {
          * Inserts, in the given STL-conforming container (has to accept
          * push_back(size_t)), the identities of the Arrays I have in this
          * Arrayset.
-          */
+         */
         template <typename T> void index(T& container) const;
+
+        /**
+         * This method tells if I have a certain array-id registered inside. It
+         * avoids me loading files to verify that arrays with that id are
+         * available.
+         */
+        bool exists (size_t id) const;
 
         /**
          * This set of methods allow you to access the data contained in this

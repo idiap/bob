@@ -157,6 +157,12 @@ namespace Torch {
         boost::shared_ptr<const Relationset> ptr(const std::string& name) const;
         boost::shared_ptr<Relationset> ptr(const std::string& name);
 
+        /** 
+         * Probes information about existing arraysets or relationsets
+         */
+        bool exists(size_t arrayset_id) const;
+        bool exists(const std::string& relationset_name) const;
+
         /**
          * Gets the next free id
          */

@@ -19,6 +19,8 @@
 
 namespace Torch { namespace database {
 
+  class Dataset;
+
   /**
    * The Relationset class describes relations between Arraysets and Arrays in
    * a database, binding them to compose groups of identities or pattern-target
@@ -34,7 +36,11 @@ namespace Torch { namespace database {
       Relationset ();
 
       /**
-       * Copy constructor
+       * Copy constructor. If a Dataset parent was set, this will also be
+       * copied, but I'll not trigger a add() of myself on that Dataset. It
+       * will only be used for checking purposes. You can attach this
+       * Relationset to another dataset if you like using the Dataset::add()
+       * method.
        */
       Relationset (const Relationset& other);
 
@@ -44,7 +50,11 @@ namespace Torch { namespace database {
       virtual ~Relationset();
 
       /**
-       * Assignment operator
+       * Assignment operator. If a Dataset parent was set, this will also be
+       * copied, but I'll not trigger a add() of myself on that Dataset. It
+       * will only be used for checking purposes. You can attach this
+       * Relationset to another dataset if you like using the Dataset::add()
+       * method.
        */
       Relationset& operator= (const Relationset& other);
 
@@ -151,7 +161,22 @@ namespace Torch { namespace database {
        */
       void consolidateIds();
 
+      /**
+       * Use the next two methods with care as they influence on how you can
+       * add/remove relations.
+       */
+      void setParent (const Dataset* parent) { m_parent = parent; }
+      const Dataset* getParent () const { return m_parent; }
+
+    private: //a few helpers for the work
+
+      /**
+       * Checks if a given relation respects all my rules
+       */
+      void checkRelation(const Relation& relation) const;
+
     private: //representation
+      const Dataset* m_parent; ///< My parent dataset
       std::string m_name; ///< My name
       std::map<size_t, boost::shared_ptr<Relation> > m_relation; ///< My declared relations
       std::map<std::string, boost::shared_ptr<Rule> > m_rule; ///< My currently set rules

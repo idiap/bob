@@ -6,18 +6,23 @@
  */
 
 #include <list>
+#include <algorithm>
+
 #include "database/Relationset.h"
 #include "database/dataset_common.h"
+#include "database/Dataset.h"
 
 namespace db = Torch::database;
 
 db::Relationset::Relationset () :
+  m_parent(0),
   m_name(),
   m_relation()
 {
 }
 
 db::Relationset::Relationset (const Relationset& other) :
+  m_parent(other.m_parent),
   m_name(other.m_name),
   m_relation(other.m_relation)
 {
@@ -26,6 +31,7 @@ db::Relationset::Relationset (const Relationset& other) :
 db::Relationset::~Relationset() { }
 
 db::Relationset& db::Relationset::operator= (const db::Relationset& other) {
+  m_parent = other.m_parent;
   m_name = other.m_name;
   m_relation = other.m_relation;
   return *this;
@@ -53,7 +59,49 @@ void db::Relationset::consolidateIds() {
   }
 }
 
+void db::Relationset::checkRelation(const db::Relation& r) const {
+  if (!m_parent) throw db::Uninitialized();
+  if (!m_rule.size()) throw db::Uninitialized();
+
+  //stage 1: fill the role count map, check if the mentioned arrays do exist
+  std::map<std::string, size_t> role_count;
+  
+  for (std::list<std::pair<size_t,size_t> >::const_iterator it = r.members().begin(); it != r.members().end(); ++it) {
+    //it->first == arrayset-id, it->second == array-id
+    if (!m_parent->exists(it->first)) throw db::UnknownArrayset();
+    const db::Arrayset& arrayset = (*m_parent)[it->first];
+    if (it->second) //specific array required, try get
+      if (!arrayset.exists(it->second)) throw db::UnknownArray();
+
+    //if you get to this point, the array exists, get roles and count
+    if (role_count.find(arrayset.getRole()) == role_count.end())
+      role_count[arrayset.getRole()] = 0;
+
+    //if it is a single array:
+    if (it->second) role_count[arrayset.getRole()] += 1;
+    else role_count[arrayset.getRole()] += arrayset.getNSamples();
+  }
+   
+  //stage 2: compare the role count with the rules - in this stage we consume
+  //the role counts until all rules have been scanned.
+  for (std::map<std::string, boost::shared_ptr<Rule> >::const_iterator it = m_rule.begin(); it != m_rule.end(); ++it) {
+    if (role_count.find(it->first) == role_count.end()) 
+      throw db::InvalidRelation(); //cannot find such role!
+    if (role_count[it->first] < it->second->getMin())
+      throw db::InvalidRelation(); //does not satisfy the minimum
+    if (it->second->getMax() && (role_count[it->first]>it->second->getMax()))
+      throw db::InvalidRelation(); //does not statisfy the maximum
+    //if you got here the rule exists and it satisfies both min and maximum
+    role_count.erase(it->first);
+  }
+
+  //well, after consuming the role count I cannot have anything left, or it
+  //means I have uncovered members, what is an error:
+  if (role_count.size()) throw db::InvalidRelation(); //something is missing!
+}
+
 size_t db::Relationset::add (const db::Relation& relation) {
+  checkRelation(relation);
   size_t use_id = relation.getId();
   if (!use_id) use_id = getNextFreeId();
   boost::shared_ptr<db::Relation> rcopy(new db::Relation(relation));
@@ -63,6 +111,7 @@ size_t db::Relationset::add (const db::Relation& relation) {
 }
 
 size_t db::Relationset::add (boost::shared_ptr<const db::Relation> relation) {
+  checkRelation(*relation.get());
   return add(*relation.get());
 }
 
@@ -81,11 +130,17 @@ boost::shared_ptr<const db::Relation> db::Relationset::ptr (size_t id) const {
 }
       
 size_t db::Relationset::add (const db::Rule& rule) {
+  //if you want to remove a rule, you must first remove all relations that
+  //follow that rule - otherwise, consistency cannot be guaranteed
+  if (m_relation.size()) throw db::AlreadyHasRelations();
   m_rule[rule.getRole()] = boost::shared_ptr<db::Rule>(new db::Rule(rule));
   return m_rule.size();
 }
 
 size_t db::Relationset::add (boost::shared_ptr<const db::Rule> rule) {
+  //if you want to remove a rule, you must first remove all relations that
+  //follow that rule - otherwise, consistency cannot be guaranteed
+  if (m_relation.size()) throw db::AlreadyHasRelations();
   return add(*rule.get()); 
 }
 
