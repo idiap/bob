@@ -511,7 +511,7 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
       }
     
       // Create an inline arrayset from the vector
-      arrayset.reset(new db::Arrayset(db::detail::InlinedArraysetImpl()));
+      arrayset.reset(new db::Arrayset());
       for (size_t i=0; i<arrays.size(); ++i) 
         arrayset->add(array_ids[i], arrays[i]);
       

@@ -9,6 +9,13 @@
 
 namespace db = Torch::database;
 
+db::Arrayset::Arrayset ():
+  m_inlined(new db::detail::InlinedArraysetImpl()),
+  m_external(),
+  m_role("")
+{
+}
+
 db::Arrayset::Arrayset (const db::detail::InlinedArraysetImpl& inlined):
   m_inlined(new db::detail::InlinedArraysetImpl(inlined)),
   m_external(),

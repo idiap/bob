@@ -34,6 +34,12 @@ namespace Torch {
       public:
 
         /**
+         * Emtpy constructor. Start a new Arrayset with an empty inlined
+         * arrayset
+         */
+        Arrayset ();
+
+        /**
          * Constructor. Start a new Arrayset with whatever suits the
          * InlinedArraysetImpl class
          */

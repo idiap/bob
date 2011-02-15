@@ -113,6 +113,13 @@ namespace Torch {
         void set(const detail::InlinedArrayImpl& data);
 
         /**
+         * A handle to simplify your life with blitz::Array<>'s
+         */
+        template <typename T, int D> inline void set(blitz::Array<T,D>& bzarray) {
+          set(detail::InlinedArrayImpl(bzarray));
+        }
+
+        /**
          * Returns the current number of dimensions set by this array.
          */
         size_t getNDim() const;
