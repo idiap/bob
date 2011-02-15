@@ -56,12 +56,13 @@ namespace Torch {
            * @brief Return an XML node containing an Arrayset
            */
           xmlNodePtr writeArrayset( xmlDocPtr doc, 
-            boost::shared_ptr<const db::Arrayset> a, 
+            size_t id, boost::shared_ptr<const db::Arrayset> a, 
             int precision=10, bool scientific=false);
           /**
            * @brief Return an XML node containing an Array
            */
-          xmlNodePtr writeArray( xmlDocPtr doc, const db::Array a,
+          xmlNodePtr writeArray( xmlDocPtr doc, 
+              size_t id, const db::Array a,
             int precision=10, bool scientific=false);
           /**
            * @brief Write the (casted) data in the given stringstrean
@@ -70,7 +71,7 @@ namespace Torch {
               std::stringstream& content, const blitz::Array<T,D> b) 
           {
             const T* data = b.data();
-            for(size_t i=0; i<b.numElements(); ++i)
+            for(blitz::sizeType i=0; i<b.numElements(); ++i)
               content << " " << data[i];
           }
 

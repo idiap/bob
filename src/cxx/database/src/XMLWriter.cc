@@ -49,12 +49,12 @@ namespace Torch {
           (boost::lexical_cast<std::string>(dataset.getVersion())).c_str() );
 
       // Create Arrayset nodes
-      const std::list<boost::shared_ptr<Arrayset> > arraysets = 
-        dataset.arraysets();
-      for(std::list<boost::shared_ptr<Arrayset> >::const_iterator 
-        it=arraysets.begin(); it!=arraysets.end(); ++it)
+      const std::map<size_t, boost::shared_ptr<Arrayset> >&
+        arraysets = dataset.arraysetIndex(); 
+      for(std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator 
+          it=arraysets.begin(); it!=arraysets.end(); ++it)
       {
-        xmlAddChild( rootnode, writeArrayset( doc, *it) );
+        xmlAddChild( rootnode, writeArrayset( doc, it->first, it->second) );
       }
       // Create Relationset nodes
 /*      for(Dataset::relationset_const_iterator it=dataset.relationset_begin(); 
@@ -69,8 +69,8 @@ namespace Torch {
 
 
     xmlNodePtr XMLWriter::writeArrayset( xmlDocPtr doc, 
-      boost::shared_ptr<const Arrayset> a, 
-      int precision, bool scientific) 
+        size_t id, boost::shared_ptr<const Arrayset> a, 
+        int precision, bool scientific) 
     {
       // Create the Arrayset node
       xmlNodePtr arraysetnode; 
@@ -82,7 +82,7 @@ namespace Torch {
 
       // Write id attribute
       xmlNewProp( arraysetnode, (const xmlChar*)db::id, (const xmlChar*)
-        (boost::lexical_cast<std::string>(a->getId())).c_str() );
+        (boost::lexical_cast<std::string>(id)).c_str() );
 
       // Write elementtype attribute
       std::string str;
@@ -156,7 +156,7 @@ namespace Torch {
         for( std::vector<size_t>::const_iterator a_id=ids.begin(); 
           a_id!=ids.end(); ++a_id)
         {
-          xmlAddChild( arraysetnode, writeArray( doc, a->operator[](*a_id),
+          xmlAddChild( arraysetnode, writeArray( doc, *a_id, a->operator[](*a_id),
             precision, scientific) );
         }
       }
@@ -166,7 +166,7 @@ namespace Torch {
 
 
     xmlNodePtr XMLWriter::writeArray( xmlDocPtr doc, 
-      const Array a, int precision, bool scientific)
+      size_t id, const Array a, int precision, bool scientific)
     {
       // Create the Arrayset node
       xmlNodePtr arraynode;
@@ -258,7 +258,7 @@ namespace Torch {
 
       // Write id attribute
       xmlNewProp( arraynode, (const xmlChar*)db::id, (const xmlChar*)
-        (boost::lexical_cast<std::string>(a.getId())).c_str() );
+        (boost::lexical_cast<std::string>(id)).c_str() );
 
       return arraynode;
     }
