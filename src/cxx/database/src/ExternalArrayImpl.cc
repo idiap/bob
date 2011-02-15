@@ -47,9 +47,8 @@ void tdd::ExternalArrayImpl::move(const std::string& filename,
         boost::filesystem::path(filename));
     m_filename = filename;
   }
-  else { //the user wants to re-write it in a different format.
+  else { //the user wants to re-write it in a different format. DON'T erase!
     newcodec->save(filename, m_codec->load(m_filename));
-    boost::filesystem::remove(boost::filesystem::path(m_filename));
     m_codec = newcodec;
   }
   reloadSpecification();

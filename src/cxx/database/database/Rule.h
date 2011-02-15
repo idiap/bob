@@ -25,7 +25,7 @@ namespace Torch { namespace database {
        * Constructor, establishes a Rule for a certain arrayset role with a
        * minimum set of occurences an a maximum one.
        */
-      Rule (const std::string& role, size_t min=1, size_t max=1);
+      Rule (size_t min=1, size_t max=1);
 
       /**
        * Destructor virtualization
@@ -35,13 +35,11 @@ namespace Torch { namespace database {
       /**
        * Accessors
        */
-      inline const std::string& getRole() const { return m_role; }
       inline size_t getMin() const { return m_min; }
       inline size_t getMax() const { return m_max; }
 
     private:
 
-      std::string m_role; ///< the arrayset role we must cover
       size_t m_min; ///< the minimum amount of members of this kind
       size_t m_max; ///< the maximum amount of members of this kind
 

@@ -10,8 +10,7 @@
 
 namespace db = Torch::database;
 
-db::Rule::Rule (const std::string& role, size_t min, size_t max) :
-  m_role(role),
+db::Rule::Rule (size_t min, size_t max) :
   m_min(min),
   m_max(max)
 {

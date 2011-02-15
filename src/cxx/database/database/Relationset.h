@@ -59,19 +59,24 @@ namespace Torch { namespace database {
       Relationset& operator= (const Relationset& other);
 
       /**
-       * Adds rules. Please note that if you add a rule with a role that
-       * already exists internally, that rule is overwritten. Returns the
-       * amount of rules so far.
+       * Adds rules. Will work if no other rule for the given role has been set
+       * yet.
        */
-      size_t add (const Rule& rule);
-      size_t add (boost::shared_ptr<const Rule> rule);
+      void add (const std::string& role, const Rule& rule);
+      void add (const std::string& role, boost::shared_ptr<const Rule> rule);
 
       /**
-       * Removes rules. Please note that if you remove rules that are obeyed by
-       * Relations in this Relationset, their refered members will be also
-       * removed.
+       * Overwrites rules. Will work if the rule has already been set.
        */
-      void remove(const std::string& rulerole);
+      void set (const std::string& role, const Rule& rule);
+      void set (const std::string& role, boost::shared_ptr<const Rule> rule);
+
+      /**
+       * Removes rules that exist, it is an error to remove an unexisting rule.
+       * To get existing rule either use exists() or get the rule index with
+       * rules().
+       */
+      void remove(const std::string& role);
 
       /**
        * Adds a Relation, returns its allocated id, if it passes the rule check.
@@ -83,6 +88,28 @@ namespace Torch { namespace database {
        */
       size_t add (const Relation& relation);
       size_t add (boost::shared_ptr<const Relation> relation);
+
+      /**
+       * Adds a Relation, will work if id has not been set yet
+       *
+       * Please note you cannot add relations while you have not established any
+       * rules using add(rule) (and remove(rule)).
+       *
+       * Returns the assign id.
+       */
+      void add (size_t id, const Relation& relation);
+      void add (size_t id, boost::shared_ptr<const Relation> relation);
+
+      /**
+       * Overwrites a Relation, will work if id has already been set
+       *
+       * Please note you cannot add relations while you have not established any
+       * rules using add(rule) (and remove(rule)).
+       *
+       * Returns the assign id.
+       */
+      void set (size_t id, const Relation& relation);
+      void set (size_t id, boost::shared_ptr<const Relation> relation);
 
       /**
        * Removes a relation with a certain id. If the Relation with the given id
@@ -98,27 +125,31 @@ namespace Torch { namespace database {
       /**
        * Returns a pointer to my internal map of rules
        */
-      inline const std::map<std::string, boost::shared_ptr<Rule> >& rules () { return m_rule; } 
+      inline const std::map<std::string, boost::shared_ptr<Rule> >& rules () const { return m_rule; } 
 
       /**
        * Returns a reference to an existing relation. Raises an exception if the
        * given relation is not there.
        */
+      Relation& operator[] (size_t id);
       const Relation& operator[] (size_t id) const;
 
       /**
        * Returns a reference to an existing rule.
        */
+      Rule& operator[] (const std::string& role);
       const Rule& operator[] (const std::string& role) const;
 
       /**
        * Returns a boost shared_ptr to the relation instead
        */
+      boost::shared_ptr<Relation> ptr (size_t id);
       boost::shared_ptr<const Relation> ptr (size_t id) const;
 
       /**
        * Returns a boost shared_ptr to the rule insted
        */
+      boost::shared_ptr<Rule> ptr(const std::string& role);
       boost::shared_ptr<const Rule> ptr(const std::string& role) const;
 
       /**
@@ -150,6 +181,22 @@ namespace Torch { namespace database {
        */
       void setParent (const Dataset* parent) { m_parent = parent; }
       const Dataset* getParent () const { return m_parent; }
+
+      /**
+       * Clear relations
+       */
+      inline void clearRelations () { m_relation.clear(); }
+
+      /**
+       * Clear rules in a safe way
+       */
+      void clearRules ();
+
+      /**
+       * Checks existence of Relation or Rule
+       */
+      bool exists(size_t relation_id) const;
+      bool exists(const std::string& rule_role) const;
 
     private: //a few helpers for the work
 

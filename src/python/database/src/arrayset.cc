@@ -16,13 +16,6 @@ namespace db = Torch::database;
 namespace core = Torch::core;
 namespace array = Torch::core::array;
 
-/**
- * Creates an empty Arrayset (inlined representation)
- */
-boost::shared_ptr<db::Arrayset> make_inlined() {
-  return boost::make_shared<db::Arrayset>(db::detail::InlinedArraysetImpl());
-}
-
 tuple get_shape(const db::Arrayset& as) {
   size_t ndim = as.getNDim();
   const size_t* shape = as.getShape();
@@ -56,6 +49,7 @@ static const char* get_filename(db::Arrayset& as) {
 
 static tuple get_array_ids(const db::Arrayset& as) {
   std::vector<size_t> t;
+  as.index(t);
   list l;
   for(std::vector<size_t>::iterator it=t.begin(); it!=t.end(); ++it) {
     l.append(*it);
@@ -63,40 +57,44 @@ static tuple get_array_ids(const db::Arrayset& as) {
   return tuple(l);
 }
 
-template<typename T, int D> static void append_bzarray(db::Arrayset& as, blitz::Array<T,D>& bz) {
-  as.add(db::detail::InlinedArrayImpl(bz));
+template <typename T>
+static void pythonic_set (db::Arrayset& as, size_t id, T obj) {
+  if (as.exists(id)) as.set(id, obj);
+  else as.add(id, obj);
 }
 
-template<typename T, int D> static void append_bzarray_id(db::Arrayset& as, size_t id, blitz::Array<T,D>& bz) {
-  as.add(db::detail::InlinedArrayImpl(bz), id);
+template <typename T, int D>
+static void pythonic_set_bz (db::Arrayset& as, size_t id, blitz::Array<T,D>& obj) {
+  if (as.exists(id)) as.set(id, obj);
+  else as.add(id, obj);
 }
 
-static void append_file(db::Arrayset& as, const std::string& filename) {
-  as.add(filename);
-}
-
-static void append_file_codec(db::Arrayset& as, const std::string& filename, const std::string& codec) {
-  as.add(filename, codec);
-}
-
-static void append_file_codec_id(db::Arrayset& as, const std::string& filename, const std::string& codec, size_t id) {
-  as.add(filename, codec, id);
-}
-
-static void remove_id(db::Arrayset& as, size_t id) {
-  as.remove(id);
+static void pythonic_set_file_codec (db::Arrayset& as, size_t id,
+    const std::string& filename, const std::string& codecname) {
+  if (as.exists(id)) as.set(id, filename, codecname);
+  else as.add(id, filename, codecname);
 }
 
 static const char* ARRAYSET_APPEND = "Adds a blitz array to this set";
-#define ARRAYSET_ALL_DEFS(T,N,D) .def("append", &append_bzarray<T,D>, (arg("self"),arg("array")), ARRAYSET_APPEND) \
-  .def("__setitem__", &append_bzarray_id<T,D>) 
+#define ARRAYSET_ALL_DEFS(T,N,D) \
+  .def("append", (size_t (db::Arrayset::*)(blitz::Array<T,D>&))&db::Arrayset::add<T,D>, (arg("self"),arg("array")), ARRAYSET_APPEND) \
+  .def("__setitem__", (void (*)(db::Arrayset&, size_t, blitz::Array<T,D>&))&pythonic_set_bz) \
+  .def(BOOST_PP_STRINGIZE(__getitem_ ## N ## _ ## D ## __), (const blitz::Array<T,D> (db::Arrayset::*)(size_t) const)&db::Arrayset::get<T,D>) \
+  .def(BOOST_PP_STRINGIZE(__castitem_ ## N ## _ ## D ## __), (blitz::Array<T,D> (db::Arrayset::*)(size_t) const)&db::Arrayset::cast<T,D>)
+
+static void add_file (db::Arrayset& as, const std::string& filename) {
+  as.add(filename);
+}
+
+static void add_file_codec (db::Arrayset& as, const std::string& filename, const std::string& codecname) {
+  as.add(filename, codecname);
+}
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(arrayset_save_overloads, save, 1, 2) 
 
 void bind_database_arrayset() {
   class_<db::Arrayset, boost::shared_ptr<db::Arrayset> >("Arrayset", "Dataset Arraysets represent lists of Arrays that share the same element type and dimension properties and are grouped together by the DB designer.", init<const std::string&, optional<const std::string&> >((arg("filename"),arg("codecname")=""), "Initializes a new arrayset from an external file. An optional codec may be passed."))
-    .def("__init__", make_constructor(&make_inlined), "Creates a new empty arraset with an inlined representation.")
-    .add_property("id", &db::Arrayset::getId, &db::Arrayset::setId)
+    .def(init<>("Creates a new empty arraset with an inlined representation."))
     .add_property("shape", &get_shape, "The shape of each array in this set is determined by this variable.")
     .add_property("role", &get_role, &set_role, "This variable determines the role of this arrayset inside this dataset.")
     .add_property("loaded", &db::Arrayset::isLoaded, "This variable determines if the arrayset is loaded in memory. This may be false in the case the arrayset is completely stored in an external file.")
@@ -104,17 +102,25 @@ void bind_database_arrayset() {
     .add_property("elementType", &db::Arrayset::getElementType, "This property indicates the type of element used for each array in the current set.")
     .def("save", &db::Arrayset::save, arrayset_save_overloads((arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the arrayset into a file. It will save if the arrayset is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."))
     .def("load", &db::Arrayset::load)
+    .def("consolidateIds", &db::Arrayset::consolidateIds, "Re-numbers all ids so they are sequential and starting at 1")
+
+    //some list-like entries
     .def("__len__", &db::Arrayset::getNSamples, "The number of arrays stored in this set.")
+    .def("append", add_file, (arg("self"), arg("filename")), "Adds an array to this set")
+    .def("append", add_file_codec, (arg("self"), arg("filename"), arg("codecname")), "Adds an array to this set, indicating a codecname to be used.")
+    .def("append", (size_t (db::Arrayset::*)(boost::shared_ptr<const db::Array>))&db::Arrayset::add, (arg("self"), arg("array")), "Adds an array to this set")
+
+    //some dict-like entries
     .def("ids", &get_array_ids, "The ids of every array in this set, in a tuple")
     .def("exists", &db::Arrayset::exists, (arg("self"), arg("array_id")), "Returns True if I have an Array with the given array-id") 
 
-    //some manipulations
     .def("__getitem__", (db::Array (db::Arrayset::*)(size_t))&db::Arrayset::operator[], (arg("self"), arg("array_id")), "Gets an array from this set given its id")
-    .def("__delitem__", remove_id, (arg("self"), arg("id")), "Removes the array given its id. Never raises an exception.")
-    .def("__setitem__", append_file_codec_id, (arg("self"), arg("filename"), arg("codecname"), arg("id")), "Adds an array to this set, indicating a codecname to be used, and the id this array should occupy. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")
-    .def("append", append_file, (arg("self"), arg("filename")), "Adds an array to this set")
-    .def("append", append_file_codec, (arg("self"), arg("filename"), arg("codecname")), "Adds an array to this set, indicating a codecname to be used.")
-    .def("append", (void (db::Arrayset::*)(boost::shared_ptr<const db::Array>))&db::Arrayset::add, (arg("self"), arg("array")), "Adds an array to this set")
+    
+    .def("__delitem__", &db::Arrayset::remove, (arg("self"), arg("id")), "Removes the array given its id. May raise an exception if there is no such array inside.")
+    
+    .def("__setitem__", pythonic_set_file_codec, (arg("self"), arg("id"), arg("filename"), arg("codecname")), "Adds an array to this set, indicating a codecname to be used, and the id this array should occupy. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")
+    .def("__setitem__", &pythonic_set<const std::string&>, (arg("self"), arg("id"), arg("filename")), "Adds an array to this set, without indicating a codecname to be used (we guess it from the file extension). If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")
+
     ARRAYSET_ALL_DEFS(bool, bool, 1)
     ARRAYSET_ALL_DEFS(int8_t, int8, 1)
     ARRAYSET_ALL_DEFS(int16_t, int16, 1)

@@ -211,6 +211,12 @@ namespace Torch {
          */
         void save(const std::string& path) const;
 
+        /**
+         * Removes all relationsets or arraysets
+         */
+        inline void clearArraysets () { m_id2arrayset.clear(); }
+        inline void clearRelationsets () { m_name2relationset.clear(); }
+
       private: //some methods for internal usage.
 
         /**

@@ -7,11 +7,11 @@ set(pysrc
    "src/arrayset.cc"
    "src/dataset.cc"
    "src/exception.cc"
-   "src/relation.cc"
-   "src/binfile.cc"
    "src/rule.cc"
-   #"src/relationset.cc"
-   #"src/main.cc"
+   "src/relation.cc"
+   "src/relationset.cc"
+   "src/binfile.cc"
+   "src/main.cc"
    )
  
 include(../../cmake/macros.cmake)

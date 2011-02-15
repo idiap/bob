@@ -24,10 +24,10 @@ static const char* MAKE_ARRAY_DOC = "Creates a new database.Array from the given
 #define MAKE_ARRAY_DEF(T,N,D) .def("__init__", make_constructor(&make_array<T,D>, default_call_policies(), arg("array")), MAKE_ARRAY_DOC)
 
 static const char* ARRAY_CAST_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the underlying array and *copies* the data in it.";
-#define ARRAY_CAST_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(cast_ ## N ## _ ## D), (blitz::Array<T,D> (db::Array::*)(void) const)&db::Array::cast<T,D>, (arg("self")), ARRAY_CAST_DOC)
+#define ARRAY_CAST_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(__cast_ ## N ## _ ## D ## __), (blitz::Array<T,D> (db::Array::*)(void) const)&db::Array::cast<T,D>, (arg("self")), ARRAY_CAST_DOC)
 
 static const char* ARRAY_GET_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the underlying array and *refers* to the data in it. WARNING: Updating the content of the blitz array will update the content of the corresponding array in the dataset. Use this method with care!";
-#define ARRAY_GET_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(get_ ## N ## _ ## D), (const blitz::Array<T,D> (db::Array::*)(void) const)&db::Array::get<T,D>, (arg("self")), ARRAY_GET_DOC)
+#define ARRAY_GET_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(__get_ ## N ## _ ## D ## __), (const blitz::Array<T,D> (db::Array::*)(void) const)&db::Array::get<T,D>, (arg("self")), ARRAY_GET_DOC)
 
 #define ARRAY_ALL_DEFS(T,N,D)\
   MAKE_ARRAY_DEF(T,N,D) \

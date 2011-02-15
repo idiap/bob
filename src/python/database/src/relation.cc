@@ -89,7 +89,6 @@ static size_t length(const db::Relation& r) {
 
 void bind_database_relation() {
   class_<db::Relation, boost::shared_ptr<db::Relation> >("Relation", "A Relation describes a single grouping of Array/Arraysets in a RelationSet. The pythonic bindings for this class represent a Relation as a list of tuples (arrayset-id, array-id).", init<>("Constructs a relation that is uninitialized"))
-    .add_property("id", &db::Relation::getId, &db::Relation::setId)
     .def("members", &get_members, "All members of this Relation")
     .def("add", (void (db::Relation::*)(size_t))&db::Relation::add, (arg("self"), arg("arrayset_id")), "Adds a new member to this relation that is an arrayset")
     .def("add", (void (db::Relation::*)(size_t, size_t))&db::Relation::add, (arg("self"), arg("arrayset_id"), arg("array_id")), "Adds a new member to this relation that is a specific array in an arrayset")

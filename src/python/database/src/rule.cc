@@ -13,13 +13,8 @@
 using namespace boost::python;
 namespace db = Torch::database;
 
-static const char* get_role(const db::Rule& r) {
-  return r.getRole().c_str();
-}
-
 void bind_database_rule() {
-  class_<db::Rule, boost::shared_ptr<db::Rule> >("Rule", "A Rule describes restrictions on Array/Arrayset associations in a Dataset", init<const std::string&, optional<size_t, size_t> >((arg("role"), arg("min"), arg("max")), "Initializes a new rule"))
-    .add_property("role", &get_role)
+  class_<db::Rule, boost::shared_ptr<db::Rule> >("Rule", "A Rule describes restrictions on Array/Arrayset associations in a Dataset", init<optional<size_t, size_t> >((arg("min"), arg("max")), "Initializes a new rule"))
     .add_property("min", &db::Rule::getMin)
     .add_property("max", &db::Rule::getMax)
     ;
