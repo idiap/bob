@@ -75,8 +75,6 @@ namespace Torch { namespace database {
 
       /**
        * Adds a Relation, returns its allocated id, if it passes the rule check.
-       * If the Relation id is set, I'll overwrite any currently occupied
-       * position inside my map.
        *
        * Please note you cannot add relations while you have not established any
        * rules using add(rule) (and remove(rule)).
@@ -101,16 +99,6 @@ namespace Torch { namespace database {
        * Returns a pointer to my internal map of rules
        */
       inline const std::map<std::string, boost::shared_ptr<Rule> >& rules () { return m_rule; } 
-
-      /**
-       * Sets my name
-       */
-      inline void setName (const std::string& name) { m_name = name; }
-
-      /**
-       * Gets my name
-       */
-      inline const std::string& getName () const { return m_name; }
 
       /**
        * Returns a reference to an existing relation. Raises an exception if the
@@ -151,11 +139,6 @@ namespace Torch { namespace database {
       }
 
       /**
-       * Gets the next free id for a Relation
-       */
-      size_t getNextFreeId() const;
-
-      /**
        * Consolidates the relation ids by resetting the first array to have id =
        * 1, the second id = 2 and so on.
        */
@@ -171,13 +154,17 @@ namespace Torch { namespace database {
     private: //a few helpers for the work
 
       /**
+       * Gets the next free id for a Relation
+       */
+      size_t getNextFreeId() const;
+
+      /**
        * Checks if a given relation respects all my rules
        */
       void checkRelation(const Relation& relation) const;
 
     private: //representation
       const Dataset* m_parent; ///< My parent dataset
-      std::string m_name; ///< My name
       std::map<size_t, boost::shared_ptr<Relation> > m_relation; ///< My declared relations
       std::map<std::string, boost::shared_ptr<Rule> > m_rule; ///< My currently set rules
 

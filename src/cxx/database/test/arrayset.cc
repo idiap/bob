@@ -198,7 +198,6 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   
   // Create an Arrayset from a file and check its properties
   Torch::database::Arrayset db_Ar_read(tmp_file);
-  BOOST_CHECK_EQUAL(db_Ar.getId(), db_Ar_read.getId());
   BOOST_CHECK_EQUAL(db_Ar.getRole().compare( db_Ar_read.getRole()), 0);
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), db_Ar_read.isLoaded());
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), db_Ar_read.getElementType());

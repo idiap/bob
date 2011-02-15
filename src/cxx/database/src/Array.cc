@@ -10,21 +10,18 @@
 namespace db = Torch::database;
 
 db::Array::Array(const db::detail::InlinedArrayImpl& data) :
-  m_inlined(new db::detail::InlinedArrayImpl(data)),
-  m_id(0) 
+  m_inlined(new db::detail::InlinedArrayImpl(data))
 {
 }
 
 db::Array::Array(const std::string& filename, const std::string& codec) :
-  m_external(new db::detail::ExternalArrayImpl(filename, codec)),
-  m_id(0)
+  m_external(new db::detail::ExternalArrayImpl(filename, codec))
 {
 }
 
 db::Array::Array(const Array& other) : 
   m_inlined(other.m_inlined),
-  m_external(other.m_external),
-  m_id(0)
+  m_external(other.m_external)
 {
 }
 
@@ -34,7 +31,6 @@ db::Array::~Array() {
 db::Array& db::Array::operator= (const db::Array& other) {
   m_inlined = other.m_inlined;
   m_external = other.m_external;
-  m_id = 0;
   return *this;
 }
 

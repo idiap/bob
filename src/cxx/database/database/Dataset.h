@@ -78,22 +78,50 @@ namespace Torch {
         inline void setVersion(const size_t version) { m_version = version; }
 
         /**
-         * Appends a copy of an Arrayset into this Dataset. If you specify the
-         * id of an Arrayset that already exists, we overwrite the existing
-         * one and replace it with this one. 
+         * Appends a copy of an Arrayset into this Dataset. 
          *
          * @return The id assigned to the arrayset.
          */
         size_t add(boost::shared_ptr<const Arrayset> arrayset);
 
         /**
-         * Appends a copy of an Arrayset into this Dataset. If you specify the
-         * id of an Arrayset that already exists, we overwrite the existing
-         * one and replace it with this one. 
+         * Appends a copy of an Arrayset into this Dataset.
          *
          * @return The id assigned to the arrayset.
          */
         size_t add(const Arrayset& arrayset);
+
+        /**
+         * Sets a certain Arrayset into this Dataset. Please note this will
+         * raise an IndexError if you specify a key that already exists. You
+         * can check existing ids with exists() and arraysetIndex(). 
+         */
+        void add(size_t id, boost::shared_ptr<const Arrayset> arrayset);
+
+        /**
+         * Sets a certain Arrayset into this Dataset. Please note this will
+         * raise an IndexError if you specify a key that already exists. You
+         * can check existing ids with exists() and arraysetIndex(). 
+         *
+         * @return The id assigned to the arrayset.
+         */
+        void add(size_t id, const Arrayset& arrayset);
+
+        /**
+         * Sets a certain Arrayset into this Dataset. Please note this will
+         * raise an IndexError if you specify a key that does not exist. You
+         * can check existing ids with exists() and arraysetIndex(). 
+         */
+        void set(size_t id, boost::shared_ptr<const Arrayset> arrayset);
+
+        /**
+         * Sets a certain Arrayset into this Dataset. Please note this will
+         * raise an IndexError if you specify a key that does not exist. You
+         * can check existing ids with exists() and arraysetIndex(). 
+         *
+         * @return The id assigned to the arrayset.
+         */
+        void set(size_t id, const Arrayset& arrayset);
 
         /**
          * Removes an Arrayset with a given index from the Dataset. Please note
@@ -104,23 +132,21 @@ namespace Torch {
 
         /**
          * Adds and removes Relationsets. If you add() a relationset with the
-         * same name as of an existing relationset (within this dataset), that
-         * relationset is overwritten. To remove a unexisting relationset is
-         * not an error.
+         * same name as of an existing relationset (within this dataset), I'll
+         * raise an exception. Setting requires the name to exist otherwise an
+         * IndexError() is raised. You can check relationset name existance by
+         * using exists() or relationsetIndex().
          */
-        size_t add(boost::shared_ptr<const Relationset> relationset);
-        size_t add(const Relationset& relationset);
+        size_t add(const std::string& name, boost::shared_ptr<const Relationset> relationset);
+        size_t add(const std::string& name, const Relationset& relationset);
+        void set(const std::string& name, boost::shared_ptr<const Relationset> relationset);
+        void set(const std::string& name, const Relationset& relationset);
         void remove(const std::string& name);
 
         /**
          * Returns my internal arrayset index
          */
         inline const std::map<size_t, boost::shared_ptr<Arrayset> >& arraysetIndex() const { return m_id2arrayset; }
-
-        /**
-         * Returns my internal list of arraysets, by insertion order.
-         */
-        inline const std::list<boost::shared_ptr<Arrayset> >& arraysets () const { return m_arrayset; }
 
         /**
          * Returns my internal relationset index
@@ -196,7 +222,6 @@ namespace Torch {
       private:
         std::string m_name;
         size_t m_version;
-        std::list<boost::shared_ptr<Torch::database::Arrayset> > m_arrayset; ///< My arrayset list
         std::map<size_t, boost::shared_ptr<Arrayset> > m_id2arrayset;
         std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;
     };

@@ -85,11 +85,6 @@ namespace Torch { namespace database {
       void remove (size_t arrayset_id, size_t array_id);
 
       /**
-       * Gets the id for this relation
-       */
-      inline size_t getId() const { return m_id; }
-
-      /**
        * Given the index, returns a std::pair<size_t, size_t> where 'first' is
        * the arrayset id and 'second' is the array id. If the array id is set
        * to zero, it means this member points to an arrayset instead of a
@@ -114,19 +109,7 @@ namespace Torch { namespace database {
         return m_member;
       }
 
-      //The next methods are sort of semi-private: Only to be used by the
-      //Database loading system. You can adventure yourself, but really not
-      //recommended to set the id or the parent of an array. Be sure to
-      //understand the consequences.
- 
-      /**
-       * Sets the id for this relation. This is some sort of semi-private
-       * method and is intended only for database parsers. Use it with care.
-       */
-      inline void setId(const size_t id) { m_id = id; }
-
     private:
-      size_t m_id; ///< my identifier
       std::list<std::pair<size_t, size_t> > m_member; ///< my members
 
   };

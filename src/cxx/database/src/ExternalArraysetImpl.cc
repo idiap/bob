@@ -74,39 +74,54 @@ size_t tdd::ExternalArraysetImpl::add
 
 size_t tdd::ExternalArraysetImpl::add(const Torch::database::Array& array) {
   checkCompatibility(array);
-
   m_codec->append(m_filename, array);
   reloadSpecification();
   return m_samples;
 }
 
 void tdd::ExternalArraysetImpl::extend(const tdd::InlinedArraysetImpl& set) {
-  for(std::list<boost::shared_ptr<Torch::database::Array> >::const_iterator it= set.arrays().begin(); it != set.arrays().end(); ++it) {
-    add(*it);
+  for(std::map<size_t, boost::shared_ptr<Torch::database::Array> >::const_iterator it= set.index().begin(); it != set.index().end(); ++it) {
+    add(it->second);
   }
   reloadSpecification();
 }
 
 void tdd::ExternalArraysetImpl::remove(size_t id) {
-  Torch::core::array::ElementType eltype;
-  size_t ndim;
-  size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
-  size_t samples;
-  m_codec->peek(m_filename, eltype, ndim, shape, samples);
-  if (id > samples) throw Torch::database::IndexError();
-  
+  if (id > m_samples) throw Torch::database::IndexError();
   //loads the file and rewrite it.
+  //TODO: Optimize to avoid loading the whole file in memory
   tdd::InlinedArraysetImpl data = get();
   data.remove(id);
   set(data);
+  reloadSpecification();
 }
 
-void tdd::ExternalArraysetImpl::remove(boost::shared_ptr<const Torch::database::Array> array) {
-  remove(array->getId());
+void tdd::ExternalArraysetImpl::add(size_t id, 
+    boost::shared_ptr<const Torch::database::Array> array) {
+  add(id, *array.get());
 }
 
-void tdd::ExternalArraysetImpl::remove(const Torch::database::Array& array) {
-  remove(array.getId());
+void tdd::ExternalArraysetImpl::add(size_t id,
+    const Torch::database::Array& array) {
+  if (id != (m_samples+1)) throw Torch::database::IndexError();
+  add(array);
+  reloadSpecification();
+}
+
+void tdd::ExternalArraysetImpl::set(size_t id, 
+    boost::shared_ptr<const Torch::database::Array> array) {
+  set(id, *array.get());
+}
+
+void tdd::ExternalArraysetImpl::set(size_t id,
+    const Torch::database::Array& array) {
+  if (id > m_samples) throw Torch::database::IndexError();
+  //loads the file and rewrite it.
+  //TODO: Optimize to avoid loading the whole file in memory
+  tdd::InlinedArraysetImpl data = get();
+  data[id] = array;
+  set(data);
+  reloadSpecification();
 }
 
 tdd::InlinedArraysetImpl tdd::ExternalArraysetImpl::get() const {

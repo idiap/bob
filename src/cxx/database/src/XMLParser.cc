@@ -149,8 +149,11 @@ namespace Torch { namespace database { namespace detail {
     while(cur != 0) { 
       // Parse an arrayset and add it to the dataset
       if( !strcmp((const char*)cur->name, db::arrayset) || 
-          !strcmp((const char*)cur->name, db::external_arrayset) )
-        dataset.add( parseArrayset( cur) );
+          !strcmp((const char*)cur->name, db::external_arrayset) ) {
+        std::pair<size_t, boost::shared_ptr<db::Arrayset> >
+          pcur = parseArrayset(cur);
+        dataset.add(pcur.first, pcur.second);
+      }
       // Parse a relationset and add it to the dataset
       //      else if( !strcmp((const char*)cur->name, db::relationset) )
       //        dataset.append( parseRelationset(cur) );
@@ -387,7 +390,7 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
 }
 */
 
-  boost::shared_ptr<db::Arrayset> 
+  std::pair<size_t, boost::shared_ptr<db::Arrayset> >
   XMLParser::parseArrayset( const xmlNodePtr cur)
   {
     // Parse filename
@@ -487,7 +490,9 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
           shape[2] << "," << shape[3] << ")");
       xmlFree(str);
 
-      // Create a vector which will contain the database arrays
+      // Create a vector which will contain the database arrays (keep insertion
+      // order)
+      std::vector<size_t> array_ids;
       std::vector<boost::shared_ptr<db::Array> > arrays;
 
       // Parse the data
@@ -497,13 +502,18 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
         // Process an array
         if ( !strcmp( (const char*)cur_data->name, db::array) || 
             !strcmp( (const char*)cur_data->name, db::external_array) ) {
-          arrays.push_back( parseArray( cur_data, elem_type, shape, count) );
+          std::pair<size_t, boost::shared_ptr<db::Array> > 
+            pcur = parseArray( cur_data, elem_type, shape, count);
+          array_ids.push_back(pcur.first);
+          arrays.push_back(pcur.second);
         }
         cur_data = cur_data->next;
       }
     
       // Create an inline arrayset from the vector
-      arrayset.reset( new db::Arrayset( arrays ) );
+      arrayset.reset(new db::Arrayset(db::detail::InlinedArraysetImpl()));
+      for (size_t i=0; i<arrays.size(); ++i) 
+        arrayset->add(array_ids[i], arrays[i]);
       
       //arrayset->m_is_loaded = true;
     }
@@ -515,7 +525,6 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
     size_t id = (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
     TDEBUG3("Id: " << id);
     xmlFree(str);
-    arrayset->setId( id );
 
     // Parse role
     str = xmlGetProp(cur, (const xmlChar*)db::role);
@@ -525,11 +534,12 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
     arrayset->setRole( str_role );
 
     // Return the arrayset
-    return arrayset;
+    return std::make_pair(id, arrayset);
   }
 
 
-  boost::shared_ptr<db::Array> XMLParser::parseArray( const xmlNodePtr cur, 
+  std::pair<size_t, boost::shared_ptr<db::Array> > 
+  XMLParser::parseArray( const xmlNodePtr cur, 
     tca::ElementType elem, size_t shape[tca::N_MAX_DIMENSIONS_ARRAY], 
     size_t nb_dim)
   {
@@ -646,9 +656,7 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
     TDEBUG3("  Array Id: " << id);
     xmlFree(str);
 
-    array->setId( id );
-
-    return array;
+    return std::make_pair(id, array);
   }
 
 }}}

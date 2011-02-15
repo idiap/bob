@@ -81,17 +81,34 @@ namespace Torch { namespace database { namespace detail {
        */
       size_t add(boost::shared_ptr<const Torch::database::Array> array);
       size_t add(const Torch::database::Array& array);
+
       void extend(const InlinedArraysetImpl& set);
 
       /**
        * Removes a certain Array from this set. Please note this will trigger
        * loading and re-writing the underlying file. If the id index is out of
-       * bounds, this is a noop. The numbering scheme for the ids is
+       * bounds, I'll raise an exception. The numbering scheme for the ids is
        * "fortran-based", so we start counting at 1.
        */
       void remove(size_t id);
-      void remove(boost::shared_ptr<const Torch::database::Array> array);
-      void remove(const Torch::database::Array& array);
+
+      /**
+       * Adds a certain Array at this set. I'll throw if you you are not out of
+       * bounds. If I don't throw (good for you!), I'll load, reset and
+       * re-write this file to contain the array you just gave me in the
+       * position you assigned.
+       */
+      void add(size_t id, boost::shared_ptr<const Torch::database::Array> array);
+      void add(size_t id, const Torch::database::Array& array);
+
+      /**
+       * Sets a certain Array at this set. I'll throw if you you are out of
+       * bounds. If I don't throw (good for you!), I'll load, reset and
+       * re-write this file to contain the array you just gave me in the
+       * position you assigned.
+       */
+      void set(size_t id, boost::shared_ptr<const Torch::database::Array> array);
+      void set(size_t id, const Torch::database::Array& array);
 
       /**
        * Loads the arrayset in memory in one shot.
@@ -101,7 +118,7 @@ namespace Torch { namespace database { namespace detail {
       /**
        * Saves the inlined array set in memory in one shot. This procedure will
        * erase any contents that previously existed on the file. If you want to
-       * append use add() instead.
+       * append use extend() instead.
        */
       void set(const InlinedArraysetImpl& set);
 

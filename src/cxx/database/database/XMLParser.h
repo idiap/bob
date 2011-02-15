@@ -78,7 +78,8 @@ namespace Torch {
            * @brief Parse an arrayset given an XML node and return the 
            * corresponding object.
            */
-          boost::shared_ptr<Arrayset> parseArrayset( xmlNodePtr node);
+          std::pair<size_t, boost::shared_ptr<Arrayset> >
+            parseArrayset( xmlNodePtr node);
 
           /**
            * @brief Parse a relationset given an XML node and return the 
@@ -90,8 +91,8 @@ namespace Torch {
            * @brief Parse an array given an XML node and return the 
            * corresponding object.
            */
-          boost::shared_ptr<Array> parseArray( xmlNodePtr node, 
-            Torch::core::array::ElementType elem,
+          std::pair<size_t, boost::shared_ptr<Array> >
+            parseArray( xmlNodePtr node, Torch::core::array::ElementType elem,
             size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY], 
             size_t nb_dim );
 

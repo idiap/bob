@@ -11,13 +11,11 @@
 namespace db = Torch::database;
 
 db::Relation::Relation() :
-  m_id(0),
   m_member()
 {
 }
 
 db::Relation::Relation(const Relation& other) :
-  m_id(0),
   m_member(other.m_member)
 {
 }
@@ -25,7 +23,6 @@ db::Relation::Relation(const Relation& other) :
 db::Relation::~Relation() { }
 
 db::Relation& db::Relation::operator= (const Relation& other) {
-  m_id = 0;
   m_member = other.m_member;
   return *this;
 }

@@ -12,7 +12,6 @@ namespace db = Torch::database;
 db::Arrayset::Arrayset (const db::detail::InlinedArraysetImpl& inlined):
   m_inlined(new db::detail::InlinedArraysetImpl(inlined)),
   m_external(),
-  m_id(0),
   m_role("")
 {
 }
@@ -20,7 +19,6 @@ db::Arrayset::Arrayset (const db::detail::InlinedArraysetImpl& inlined):
 db::Arrayset::Arrayset(const std::string& filename, const std::string& codec):
   m_inlined(),
   m_external(new db::detail::ExternalArraysetImpl(filename, codec)),
-  m_id(0),
   m_role("")
 {
 }
@@ -28,7 +26,6 @@ db::Arrayset::Arrayset(const std::string& filename, const std::string& codec):
 db::Arrayset::Arrayset(const db::Arrayset::Arrayset& other):
   m_inlined(other.m_inlined),
   m_external(other.m_external),
-  m_id(0),
   m_role(other.m_role)
 {
 }
@@ -39,53 +36,70 @@ db::Arrayset::~Arrayset() {
 db::Arrayset& db::Arrayset::operator= (const db::Arrayset& other) {
   m_inlined = other.m_inlined;
   m_external = other.m_external;
-  m_id = 0;
   m_role = other.m_role;
   return *this;
 }
 
-void db::Arrayset::add (boost::shared_ptr<const db::Array> array) {
-  if (m_inlined) m_inlined->add(array);
-  else m_external->add(array);
+size_t db::Arrayset::add (boost::shared_ptr<const db::Array> array) {
+  return add(*array.get());
 }
 
-void db::Arrayset::add (const db::Array& array) {
-  if (m_inlined) m_inlined->add(array);
-  else m_external->add(array);
+size_t db::Arrayset::add (const db::Array& array) {
+  if (m_inlined) return m_inlined->add(array);
+  else return m_external->add(array);
 }
 
-void db::Arrayset::add (const db::detail::InlinedArrayImpl& array) {
-  add( array, 0);
+size_t db::Arrayset::add (const db::detail::InlinedArrayImpl& array) {
+  if (m_inlined) return m_inlined->add(array);
+  else return m_external->add(array);
 }
 
-void db::Arrayset::add (const db::detail::InlinedArrayImpl& array, size_t id) {
-  if (m_inlined) {
-    db::Array tmp(array);
-    tmp.setId(id);
-    m_inlined->add(tmp);
-  }
-  else m_external->add(array);
+size_t db::Arrayset::add (const std::string& filename, const std::string& codec) {
+  if (m_inlined) return m_inlined->add(db::Array(filename, codec));
+  else return m_external->add(db::Array(filename, codec));
 }
 
-void db::Arrayset::add (const std::string& filename, const std::string& codec, size_t id) {
-  db::Array tmp(filename, codec);
-  if (m_inlined) m_inlined->add(tmp);
-  else m_external->add(tmp);
+void db::Arrayset::add (size_t id, boost::shared_ptr<const db::Array> array) {
+  add(id, *array.get());
+}
+
+void db::Arrayset::add (size_t id, const db::Array& array) {
+  if (m_inlined) (*m_inlined)[id] = array;
+  else m_external->add(id, array);
+}
+
+void db::Arrayset::add (size_t id, const db::detail::InlinedArrayImpl& array) {
+  if (m_inlined) (*m_inlined)[id] = array;
+  else m_external->add(id, array);
+}
+
+void db::Arrayset::add (size_t id, const std::string& filename, const std::string& codec) {
+  if (m_inlined) (*m_inlined)[id] = db::Array(filename, codec);
+  else m_external->add(id, db::Array(filename, codec));
+}
+
+void db::Arrayset::set (size_t id, boost::shared_ptr<const db::Array> array) {
+  set(id, *array.get());
+}
+
+void db::Arrayset::set (size_t id, const db::Array& array) {
+  if (m_inlined) (*m_inlined)[id] = array;
+  else m_external->set(id, array);
+}
+
+void db::Arrayset::set (size_t id, const db::detail::InlinedArrayImpl& array) {
+  if (m_inlined) (*m_inlined)[id] = array;
+  else m_external->set(id, array);
+}
+
+void db::Arrayset::set (size_t id, const std::string& filename, const std::string& codec) {
+  if (m_inlined) (*m_inlined)[id] = db::Array(filename, codec);
+  else m_external->set(id, db::Array(filename, codec));
 }
 
 void db::Arrayset::remove (const size_t id) {
   if (m_inlined) m_inlined->remove(id);
   else m_external->remove(id);
-}
-
-void db::Arrayset::remove (const db::Array& array) {
-  if (m_inlined) m_inlined->remove(array);
-  else m_external->remove(array);
-}
-
-void db::Arrayset::remove (boost::shared_ptr<const db::Array> array) {
-  if (m_inlined) m_inlined->remove(array);
-  else m_external->remove(array);
 }
 
 Torch::core::array::ElementType db::Arrayset::getElementType() const {
@@ -149,4 +163,8 @@ db::Array db::Arrayset::operator[] (size_t id) {
 bool db::Arrayset::exists (size_t id) const {
   if (m_inlined) return m_inlined->exists(id);
   return m_external->exists(id);
+}
+
+void db::Arrayset::consolidateIds () {
+  if (m_inlined) m_inlined->consolidateIds();
 }

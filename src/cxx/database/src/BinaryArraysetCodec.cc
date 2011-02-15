@@ -67,5 +67,5 @@ void db::BinaryArraysetCodec::append
 void db::BinaryArraysetCodec::save (const std::string& filename, 
     const detail::InlinedArraysetImpl& data) const {
   db::BinFile f(filename, db::BinFile::out);
-  for (std::list<boost::shared_ptr<db::Array> >::const_iterator it = data.arrays().begin(); it != data.arrays().end(); ++it) f.write(it->get()->get());
+  for (std::map<size_t, boost::shared_ptr<db::Array> >::const_iterator it = data.index().begin(); it != data.index().end(); ++it) f.write(it->second.get()->get());
 }

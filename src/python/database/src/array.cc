@@ -86,7 +86,6 @@ void bind_database_array() {
     .add_property("codec", &db::Array::getCodec, "Accesses the codec that decodes and encodes this Array from/to files.")
     .add_property("shape", &get_shape, "Accesses the shape of this array")
     .add_property("elementType", &db::Array::getElementType, "Accesses the element type of this array")
-    .add_property("id", &db::Array::getId, &db::Array::setId, "Accesses and sets the id of this array, if any (if id == 0, it means unassigned, let for my parent to decide - that is normally a good strategy!)")
     ARRAY_ALL_DEFS(bool, bool, 1)
     ARRAY_ALL_DEFS(int8_t, int8, 1)
     ARRAY_ALL_DEFS(int16_t, int16, 1)

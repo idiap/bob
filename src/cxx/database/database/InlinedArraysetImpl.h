@@ -40,7 +40,6 @@ namespace Torch { namespace database { namespace detail {
       template <typename T> InlinedArraysetImpl(T begin, T end): 
         m_elementtype(Torch::core::array::t_unknown),
         m_ndim(0),
-        m_array(),
         m_index()
       {
         for (T it = begin; it != end; ++it) add(*it);
@@ -57,7 +56,6 @@ namespace Torch { namespace database { namespace detail {
       template <typename T> InlinedArraysetImpl(const T& iterable):
         m_elementtype(Torch::core::array::t_unknown),
         m_ndim(0),
-        m_array(),
         m_index()
       {
         for (typename T::const_iterator it = iterable.begin(); it != iterable.end(); ++it) add(*it);
@@ -87,11 +85,6 @@ namespace Torch { namespace database { namespace detail {
       inline const std::map<size_t, boost::shared_ptr<Torch::database::Array> >& index() const { return m_index; }
 
       /**
-       * Returns a list of arrays in the order they were inserted.
-       */
-      inline const std::list<boost::shared_ptr<Torch::database::Array> >& arrays() const { return m_array; }
-
-      /**
        * Accesses a single array by their id
        */
       const Torch::database::Array& operator[] (size_t id) const;
@@ -112,16 +105,19 @@ namespace Torch { namespace database { namespace detail {
       bool exists (size_t id) const;
 
       /**
-       * Adds a copy of an array to the list I have. We not check for the
-       * id. Except that its value has to be greater than 0. If there is an
-       * existing element already associated with that id, it is erased and
-       * replaced by a copy of this one. If you don't want to erase, please
-       * make sure to always call getNextFreeId() first.
+       * Adds a copy of an array to the list I have. 
        *
        * @return The id assigned to the array.
        */
       size_t add(boost::shared_ptr<const Torch::database::Array> array);
       size_t add(const Torch::database::Array& array);
+
+      /**
+       * Adds a copy of an array to the list I have, with id setting. It will
+       * work ok if the id is not already set.
+       */
+      void add(size_t id, boost::shared_ptr<const Torch::database::Array> array);
+      void add(size_t id, const Torch::database::Array& array);
 
       /**
        * This is a special version of the add() method that will
@@ -133,12 +129,11 @@ namespace Torch { namespace database { namespace detail {
       size_t adopt(boost::shared_ptr<Torch::database::Array> array);
 
       /**
-       * Removes the array with a certain id. If the array does not exist, no
-       * exception is thrown -- this operation is a noop.
+       * Removes the array with a certain id. If the array does not exist, I'll
+       * raise an exception. You can check that with exists() if you are not
+       * sure before you try.
        */
       void remove(size_t id);
-      void remove(boost::shared_ptr<const Torch::database::Array> array);
-      void remove(const Torch::database::Array& array);
 
       /**
        * Some informative methods
@@ -147,12 +142,7 @@ namespace Torch { namespace database { namespace detail {
       { return m_elementtype; }
       inline size_t getNDim() const { return m_ndim; }
       inline const size_t* getShape() const { return m_shape; }
-      inline size_t getNSamples() const { return m_array.size(); }
-
-      /**
-       * Gets the next free id
-       */
-      size_t getNextFreeId() const;
+      inline size_t getNSamples() const { return m_index.size(); }
 
       /**
        * Consolidates the array ids by resetting the first array to have id =
@@ -161,6 +151,11 @@ namespace Torch { namespace database { namespace detail {
       void consolidateIds();
 
     private: //checking and typing updating
+
+      /**
+       * Gets the next free id
+       */
+      size_t getNextFreeId() const;
 
       /**
        * Checks that the current Arrayset is compatible with the given Array.
@@ -177,7 +172,6 @@ namespace Torch { namespace database { namespace detail {
       Torch::core::array::ElementType m_elementtype; ///< Elements' type
       size_t m_ndim; ///< The number of dimensions
       size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< The array shape
-      std::list<boost::shared_ptr<Torch::database::Array> > m_array; ///< My array list
       std::map<size_t, boost::shared_ptr<Torch::database::Array> > m_index; ///< My index
 
   };

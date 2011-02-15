@@ -61,59 +61,74 @@ namespace Torch {
         Arrayset& operator= (const Arrayset& other);
 
         /**
-         * Adds a copy of the given Array to the Arrayset. If the array id is
-         * zero, I'll assign a proper id to this array. Else, if the arrayset
-         * is loaded in memory and if an array with existing id is already
-         * inside, I'll overwrite it. If the arrayset is serialized in a file,
-         * the array.id property will be ignored and the array will be appended
-         * to that file. 
+         * Adds a copy of the given Array to the Arrayset. This will
+         * potentially trigger file re-writing in case the arrayset is
+         * serialized in an external file.
+         *
+         * @return The assigned id for this array.
          */
-        void add (boost::shared_ptr<const Array> array);
-        void add (const Array& array);
-
-        /**
-         * Adds a blitz array to the Arrayset.
-         */
-        void add (const detail::InlinedArrayImpl& array);
+        size_t add (boost::shared_ptr<const Array> array);
+        size_t add (const Array& array);
+        size_t add (const detail::InlinedArrayImpl& array);
+        size_t add (const std::string& filename, const std::string& codec="");
         
         /**
          * A shortcut to add a blitz::Array<T,D>
          */
         template <typename T, int D> 
-          inline void add(blitz::Array<T,D>& bz) {
-          add(detail::InlinedArrayImpl(bz));
+          inline size_t add(blitz::Array<T,D>& bz) {
+            return add(detail::InlinedArrayImpl(bz));
         }
 
         /**
-         * Adds a blitz array to the Arrayset, specifying the id.
-         * Please note that if this id is repeated, this may raise an
-         * exception. If the arrayset is file-based, the id will be ignored.
+         * Adds a specific array to a new value. Note that if the id already 
+         * exists, I'll raise an exception. You can check existing ids with
+         * exists().
          */
-        void add (const detail::InlinedArrayImpl& array, size_t id);
-        
+        void add (size_t id, boost::shared_ptr<const Array> array);
+        void add (size_t id, const Array& array);
+        void add (size_t id, const detail::InlinedArrayImpl& array);
+        void add (size_t id, const std::string& filename, const std::string& codec="");
+
         /**
-         * Adds a new external array to the Arrayset
+         * A shortcut to set a blitz::Array<T,D>
          */
-        void add (const std::string& filename, const std::string& codec="", size_t id=0);
+        template <typename T, int D> 
+          inline void add(size_t id, blitz::Array<T,D>& bz) {
+            add(id, detail::InlinedArrayImpl(bz));
+        }
+
+        /**
+         * Sets a specific array to a new value. Note that if the id does not
+         * exist, I'll raise an exception. You can check existing ids with
+         * exists().
+         */
+        void set (size_t id, boost::shared_ptr<const Array> array);
+        void set (size_t id, const Array& array);
+        void set (size_t id, const detail::InlinedArrayImpl& array);
+        void set (size_t id, const std::string& filename, const std::string& codec="");
+
+        /**
+         * A shortcut to set a blitz::Array<T,D>
+         */
+        template <typename T, int D> 
+          inline void set(size_t id, blitz::Array<T,D>& bz) {
+            set(id, detail::InlinedArrayImpl(bz));
+        }
 
         /**
          * Removes an Array with a given id from the Arrayset. Please note that
          * if this arrayset is encoded in an external file, this will trigger
          * loading the whole arrayset into memory, deleting the required array
          * and re-saving the file, which can be time-consuming.
+         *
+         * @return The current size of this arrayset in number of samples
          */
         void remove (const size_t id);
 
         /**
-         * Removes a given Array from the set.
-         */
-        void remove (const Array& array);
-        void remove (boost::shared_ptr<const Array> array);
-
-        /**
          * Returns some information from the current Arrayset
          */
-        inline size_t getId () const { return m_id; }
         inline const std::string& getRole() const { return m_role; }
         inline bool isLoaded() const { return m_inlined; }
         
@@ -189,29 +204,22 @@ namespace Torch {
         template<typename T, int D> const blitz::Array<T,D> get (size_t index) const;
         template<typename T, int D> blitz::Array<T,D> cast (size_t index) const;
 
-        //The next methods are sort of semi-private: Only to be used by the
-        //Database loading system. You can adventure yourself, but really not
-        //recommended to set the id or the parent of an array. Be sure to
-        //understand the consequences.
-        
         /**
-         * Sets the id. No further checks are performed. This method is not
-         * intended for normal programs, just for parsers that need to read
-         * data from a file and fill it up.
+         * Consolidates the ids of inner Arrays by re-numbering them
+         * sequentially, starting at 1.
          */
-        inline void setId (size_t id) { m_id = id; }
+        void consolidateIds();
 
       private:
         boost::shared_ptr<detail::InlinedArraysetImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArraysetImpl> m_external;
-        size_t m_id; ///< This is my id
         std::string m_role; ///< This is my role
 
     };
 
     template <typename T> void Arrayset::index(T& container) const {
       if (m_inlined) {
-        for (std::list<boost::shared_ptr<Array> >::const_iterator it=m_inlined->arrays().begin(); it!=m_inlined->arrays().end(); ++it) container.push_back((*it)->getId());
+        for (std::map<size_t, boost::shared_ptr<Array> >::const_iterator it=m_inlined->index().begin(); it!=m_inlined->index().end(); ++it) container.push_back(it->first);
       }
       else {
         for (size_t i=0; i<m_external->getNSamples(); ++i) container.push_back(i+1);

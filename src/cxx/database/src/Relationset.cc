@@ -7,6 +7,7 @@
 
 #include <list>
 #include <algorithm>
+#include <boost/make_shared.hpp>
 
 #include "database/Relationset.h"
 #include "database/dataset_common.h"
@@ -16,15 +17,15 @@ namespace db = Torch::database;
 
 db::Relationset::Relationset () :
   m_parent(0),
-  m_name(),
-  m_relation()
+  m_relation(),
+  m_rule()
 {
 }
 
 db::Relationset::Relationset (const Relationset& other) :
   m_parent(other.m_parent),
-  m_name(other.m_name),
-  m_relation(other.m_relation)
+  m_relation(other.m_relation),
+  m_rule(other.m_rule)
 {
 }
 
@@ -32,30 +33,23 @@ db::Relationset::~Relationset() { }
 
 db::Relationset& db::Relationset::operator= (const db::Relationset& other) {
   m_parent = other.m_parent;
-  m_name = other.m_name;
   m_relation = other.m_relation;
+  m_rule = other.m_rule;
   return *this;
 }
 
 size_t db::Relationset::getNextFreeId() const {
   if (!m_relation.size()) return 1;
-  size_t max = 0;
-  for (std::map<size_t, boost::shared_ptr<db::Relation> >::const_iterator it = m_relation.begin();
-      it != m_relation.end(); ++it) {
-    if (it->first > max) max = it->first;
-  }
-  return max + 1;
+  return m_relation.rbegin()->first + 1; //remember: std::map is sorted by key!
 }
 
 void db::Relationset::consolidateIds() {
-  std::list<boost::shared_ptr<db::Relation> > l;
-  for (std::map<size_t, boost::shared_ptr<db::Relation> >::iterator it = m_relation.begin(); it != m_relation.end(); ++it) l.push_back(it->second);
-  m_relation.clear();
   size_t id=1;
-  for (std::list<boost::shared_ptr<db::Relation> >::iterator it = l.begin();
-       it != l.end(); ++it, ++id) {
-    (*it)->setId(id);
-    m_relation[id] = *it;
+  for (std::map<size_t, boost::shared_ptr<db::Relation> >::iterator it = m_relation.begin(); it != m_relation.end(); ++it, ++id) {
+    if (id != it->first) { //displaced value, reset
+      m_relation[id] = it->second;
+      m_relation.erase(it->first);
+    }
   }
 }
 
@@ -102,16 +96,11 @@ void db::Relationset::checkRelation(const db::Relation& r) const {
 
 size_t db::Relationset::add (const db::Relation& relation) {
   checkRelation(relation);
-  size_t use_id = relation.getId();
-  if (!use_id) use_id = getNextFreeId();
-  boost::shared_ptr<db::Relation> rcopy(new db::Relation(relation));
-  rcopy->setId(use_id);
-  m_relation[use_id] = rcopy;
-  return use_id;
+  m_relation[getNextFreeId()] = boost::make_shared<db::Relation>(relation);
+  return m_relation.rbegin()->first;
 }
 
 size_t db::Relationset::add (boost::shared_ptr<const db::Relation> relation) {
-  checkRelation(*relation.get());
   return add(*relation.get());
 }
 

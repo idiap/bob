@@ -140,27 +140,13 @@ namespace Torch {
         boost::shared_ptr<const ArrayCodec> getCodec() const; 
 
         /**
-         * Gets the id of the Array
-         */
-        inline size_t getId() const { return m_id; }
-
-        /**
          * Get the flag indicating if the array is loaded in memory
          */
         inline bool isLoaded() const { return m_inlined; }
 
-        /**
-         * Sets the id for this Array. You can get automatic id's that are
-         * guaranteed to be free by setting the special value '0' (zero). That
-         * is the default for the Array construction, so if you don't use this
-         * method, everything should work smoothly.
-         */
-        inline void setId (size_t id) { m_id = id; }
-
       private: //representation
         boost::shared_ptr<detail::InlinedArrayImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArrayImpl> m_external;
-        size_t m_id; ///< This is my id
         mutable size_t m_tmp_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< temporary variable used to return the shape of external arrays.
     };
 
