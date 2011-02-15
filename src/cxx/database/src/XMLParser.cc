@@ -550,7 +550,7 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
     boost::shared_ptr<db::Array> array;
 
     // Parse the data contained in the XML file
-    if( !array->getFilename().compare("") )
+    if( !str_filename.compare("") )
     {
       // Preliminary for the processing of the content of the array
       xmlChar* content = xmlNodeGetContent(cur);
@@ -635,9 +635,6 @@ boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
           throw XMLException();
           break;
       }
-
-
-
 //      array->setIsLoaded( true );
     }
     else // External Array
