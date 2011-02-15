@@ -178,3 +178,7 @@ void tdd::InlinedArraysetImpl::consolidateIds() {
     m_index[id] = *it;
   }
 }
+
+bool tdd::InlinedArraysetImpl::exists(size_t id) const {
+  return (m_index.find(id) != m_index.end());
+}

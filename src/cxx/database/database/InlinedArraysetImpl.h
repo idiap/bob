@@ -105,6 +105,13 @@ namespace Torch { namespace database { namespace detail {
       boost::shared_ptr<Torch::database::Array> ptr (size_t id);
 
       /**
+       * This method tells if I have a certain array-id registered inside. It
+       * avoids me loading files to verify that arrays with that id are
+       * available.
+       */
+      bool exists (size_t id) const;
+
+      /**
        * Adds a copy of an array to the list I have. We not check for the
        * id. Except that its value has to be greater than 0. If there is an
        * existing element already associated with that id, it is erased and

@@ -67,6 +67,13 @@ namespace Torch { namespace database { namespace detail {
       Torch::database::Array operator[] (size_t id) const;
 
       /**
+       * This method tells if I have a certain array-id registered inside. It
+       * avoids me loading files to verify that arrays with that id are
+       * available.
+       */
+      bool exists (size_t id) const;
+
+      /**
        * Appends a new array to the file I have. The 'id' field of such array
        * is ignored (even if it is non-zero). You cannot set the array 'id' in 
        * a file-based arrayset. Ids for arrays are given depending on their

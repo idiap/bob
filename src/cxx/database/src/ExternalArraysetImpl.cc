@@ -117,3 +117,7 @@ void tdd::ExternalArraysetImpl::set(const InlinedArraysetImpl& set) {
   m_codec->save(m_filename, set);
   reloadSpecification();
 }
+
+bool tdd::ExternalArraysetImpl::exists(size_t id) const {
+  return (id <= getNSamples());
+}

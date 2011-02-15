@@ -60,4 +60,8 @@ void bind_database_exception() {
   BIND_EXCEPTION(Torch::database::DimensionError, "NDimensionError", "Raised when user asks for arrays with unsupported dimensionality");
   BIND_EXCEPTION(Torch::database::TypeError, "TypeError", "Raised when the user asks for arrays with unsupported element type");
   BIND_EXCEPTION(Torch::database::Uninitialized, "Uninitialized", "Raised when the user asks for arrays with unsupported element type");
+  BIND_EXCEPTION(Torch::database::AlreadyHasRelations, "AlreadyHasRelations", "Raised when the user inserts a new rule to a Relationset with existing relations");
+  BIND_EXCEPTION(Torch::database::InvalidRelation, "InvalidRelation", "Raised when the user inserts a new Relation to a Relationset that does not conform to its rules");
+  BIND_EXCEPTION(Torch::database::UnknownArrayset, "UnknownArrayset", "Raised when the user inserts a new Relation to a Relationset that points to unexisting Arraysets");
+  BIND_EXCEPTION(Torch::database::UnknownArray, "UnknownArray", "Raised when the user inserts a new Relation to a Relationset that points to unexisting Arrays");
 }

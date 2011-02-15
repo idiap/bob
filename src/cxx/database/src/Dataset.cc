@@ -172,6 +172,16 @@ void db::Dataset::consolidateIds() {
 }
 
 void db::Dataset::save(const std::string& path) const {
+  //TODO: LES, please uncomment when XMLWriter becomes available!
   //db::XMLWriter writer();
   //writer.write(path, ds);
 }
+
+bool db::Dataset::exists(size_t arrayset_id) const {
+  return (m_id2arrayset.find(arrayset_id) != m_id2arrayset.end());
+}
+
+bool db::Dataset::exists(const std::string& relationset_name) const {
+  return (m_name2relationset.find(relationset_name) != m_name2relationset.end());
+}
+
