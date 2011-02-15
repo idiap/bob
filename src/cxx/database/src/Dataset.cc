@@ -177,4 +177,3 @@ bool db::Dataset::exists(size_t arrayset_id) const {
 bool db::Dataset::exists(const std::string& relationset_name) const {
   return (m_name2relationset.find(relationset_name) != m_name2relationset.end());
 }
-
