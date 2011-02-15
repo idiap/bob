@@ -33,7 +33,7 @@ set(src
     "src/Relationset.cc"
     "src/Rule.cc"
     "src/XMLParser.cc"
-    #"src/XMLWriter.cc"
+    "src/XMLWriter.cc"
     )
 
 include(../../cmake/macros.cmake)
@@ -44,6 +44,9 @@ torch_header_install(database "torch::database")
 torch_test(database binary_file test/binary_file.cc)
 torch_test(database array test/array.cc)
 torch_test(database arrayset test/arrayset.cc)
+torch_test(database dataset test/dataset.cc)
+set_property(TEST cxx-database-dataset APPEND PROPERTY ENVIRONMENT
+  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test")
 
 # This is where we install the XML schema definition
 set(schemadir share/torch/schema)

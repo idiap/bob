@@ -9,7 +9,7 @@
 #include <boost/make_shared.hpp>
 #include "database/Dataset.h"
 #include "database/XMLParser.h"
-//#include "database/XMLWriter.h"
+#include "database/XMLWriter.h"
 #include "database/dataset_common.h"
 
 namespace db = Torch::database;
@@ -166,9 +166,8 @@ void db::Dataset::consolidateIds() {
 }
 
 void db::Dataset::save(const std::string& path) const {
-  //TODO: LES, please uncomment when XMLWriter becomes available!
-  //db::XMLWriter writer();
-  //writer.write(path, ds);
+  tdd::XMLWriter writer;
+  writer.write(path.c_str(), *this);
 }
 
 bool db::Dataset::exists(size_t arrayset_id) const {
