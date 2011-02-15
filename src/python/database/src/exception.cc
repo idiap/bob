@@ -7,7 +7,7 @@
 
 #include <boost/python.hpp>
 
-#include "core/Dataset2.h"
+#include "database/dataset_common.h"
 
 using namespace boost::python;
 
@@ -55,8 +55,9 @@ template <typename T> PyObject* CxxToPythonTranslator<T>::pyExceptionType = 0;
 #define BIND_EXCEPTION(TYPE,NAME,DOC) CxxToPythonTranslator<TYPE>(NAME, DOC)
 
 void bind_database_exception() {
-  BIND_EXCEPTION(Torch::core::NonExistingElement, "NonExistingElement", "Raised when database elements that were queried for do not exist");
-  BIND_EXCEPTION(Torch::core::IndexError, "IndexError", "Raised when database elements queried-for do not exist");
-  BIND_EXCEPTION(Torch::core::NDimensionError, "NDimensionError", "Raised when user asks for arrays with unsupported dimensionality");
-  BIND_EXCEPTION(Torch::core::TypeError, "TypeError", "Raised when the user asks for arrays with unsupported element type");
+  BIND_EXCEPTION(Torch::database::NonExistingElement, "NonExistingElement", "Raised when database elements that were queried for do not exist");
+  BIND_EXCEPTION(Torch::database::IndexError, "IndexError", "Raised when database elements queried-for do not exist");
+  BIND_EXCEPTION(Torch::database::DimensionError, "NDimensionError", "Raised when user asks for arrays with unsupported dimensionality");
+  BIND_EXCEPTION(Torch::database::TypeError, "TypeError", "Raised when the user asks for arrays with unsupported element type");
+  BIND_EXCEPTION(Torch::database::Uninitialized, "Uninitialized", "Raised when the user asks for arrays with unsupported element type");
 }
