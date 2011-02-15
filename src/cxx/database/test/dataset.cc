@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( dbDataset_load_xml )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
+  char *testdata_cpath = getenv("TORCH_TESTDATA_PATH");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
     Torch::core::error << "Environment variable $TORCH_TESTDATA_PATH " <<
       "is not set. " << "Have you setup your working environment " <<
