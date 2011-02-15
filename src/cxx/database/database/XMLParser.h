@@ -14,6 +14,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <boost/tokenizer.hpp>
+#include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 
 #include "core/Exception.h"
@@ -154,7 +155,6 @@ namespace Torch {
 
         return array;
       }
-
 
     }
   }
