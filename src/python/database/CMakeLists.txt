@@ -9,10 +9,9 @@ set(pysrc
    "src/exception.cc"
    "src/relation.cc"
    "src/binfile.cc"
-   #"src/member.cc"
    #"src/rule.cc"
-   #"src/main.cc"
    #"src/relationset.cc"
+   #"src/main.cc"
    )
  
 include(../../cmake/macros.cmake)
