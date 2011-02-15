@@ -79,7 +79,7 @@ namespace Torch {
 
         /**
          * Appends a copy of an Arrayset into this Dataset. If you specify the
-         * id of an Arrayset that already exists, we overwrites the existing
+         * id of an Arrayset that already exists, we overwrite the existing
          * one and replace it with this one. 
          *
          * @return The id assigned to the arrayset.
@@ -88,7 +88,7 @@ namespace Torch {
 
         /**
          * Appends a copy of an Arrayset into this Dataset. If you specify the
-         * id of an Arrayset that already exists, we overwrites the existing
+         * id of an Arrayset that already exists, we overwrite the existing
          * one and replace it with this one. 
          *
          * @return The id assigned to the arrayset.
@@ -177,7 +177,7 @@ namespace Torch {
          * already exists, it is backed-up (filename + '~') and re-written. If
          * a backup already exists, it is erased before the process begins.
          */
-        //void save(const std::string& path);
+        void save(const std::string& path) const;
 
       private: //some methods for internal usage.
 

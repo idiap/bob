@@ -46,8 +46,7 @@ namespace Torch { namespace database {
       Relation& operator= (const Relation& other);
 
       /**
-       * Adds a member to the Relation. If a member with a given role already
-       * exists, it we add to it.
+       * Appends a member to the Relation. No further checks are performed.
        */
       inline void add (size_t arraysetid) {
         m_member.push_back(std::make_pair(arraysetid, 0));
@@ -58,11 +57,32 @@ namespace Torch { namespace database {
       }
 
       /**
-       * Removes a member, given the role. If the member does not exist, this
-       * is a noop. Please note we will remove all members associated with a
-       * given role.
+       * Adds by index or resets a position in this Relation. If the position
+       * indicated exists, I replace this position by the value given. If not,
+       * I raise an exception.
        */
-      void remove (size_t index);
+      void set (size_t index, size_t arrayset_id);
+      void set (size_t index, size_t arrayset_id, size_t array_id);
+
+      /**
+       * Removes a member, given its index. If the member does not exist, I
+       * raise an exception.
+       * 
+       */
+      void erase (size_t index);
+
+      /**
+       * Removes a member, given its arrayset id. It is not an error to
+       * specify arraysets that don't exist in the relation. Please note this
+       * method will only remove full arrayset entries from the relation.
+       */
+      void remove (size_t arrayset_id);
+
+      /**
+       * Removes a member, given its arrayset id and array id. It is not an
+       * error to specify arrays that don't exist in the relation. 
+       */
+      void remove (size_t arrayset_id, size_t array_id);
 
       /**
        * Gets the id for this relation

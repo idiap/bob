@@ -78,6 +78,14 @@ namespace Torch {
         void write(const detail::InlinedArrayImpl& data);
 
         /**
+         * A shortcut to write a blitz::Array<T,D>
+         */
+        template <typename T, int D> 
+          inline void write(blitz::Array<T,D>& bz) {
+          write(detail::InlinedArrayImpl(bz));
+        }
+
+        /**
          * Load one blitz++ multiarray from the input stream/file All the
          * multiarrays saved have the same dimensions.
          */

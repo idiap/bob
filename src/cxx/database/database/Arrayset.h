@@ -75,6 +75,14 @@ namespace Torch {
          * Adds a blitz array to the Arrayset.
          */
         void add (const detail::InlinedArrayImpl& array);
+        
+        /**
+         * A shortcut to add a blitz::Array<T,D>
+         */
+        template <typename T, int D> 
+          inline void add(blitz::Array<T,D>& bz) {
+          add(detail::InlinedArrayImpl(bz));
+        }
 
         /**
          * Adds a blitz array to the Arrayset, specifying the id.

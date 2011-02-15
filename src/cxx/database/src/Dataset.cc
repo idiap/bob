@@ -8,6 +8,7 @@
 
 #include "database/Dataset.h"
 #include "database/XMLParser.h"
+//#include "database/XMLWriter.h"
 #include "database/dataset_common.h"
 
 namespace db = Torch::database;
@@ -42,8 +43,8 @@ db::Dataset::Dataset(const std::string& name, size_t version) :
   m_name(name),
   m_version(version),
   m_arrayset(),
-  m_id2arrayset()
-  //m_name2relationset()
+  m_id2arrayset(),
+  m_name2relationset()
 {
 }
 
@@ -51,22 +52,19 @@ db::Dataset::Dataset(const std::string& path) :
   m_name(),
   m_version(0),
   m_arrayset(),
-  m_id2arrayset()
-  //m_name2relationset()
+  m_id2arrayset(),
+  m_name2relationset()
 {
-  //LES: Please fill up using the parser
-  //db::XMLParser parser;
-  //parser.load(path.c_str(), *this, 2); 
-  tdd::XMLParser parser;
-  parser.load(path.c_str(), *this, 2);
+  db::detail::XMLParser parser;
+  parser.load(path.c_str(), *this, 2); 
 }
 
 db::Dataset::Dataset(const db::Dataset& other) :
   m_name(other.m_name),
   m_version(other.m_version),
   m_arrayset(other.m_arrayset),
-  m_id2arrayset(other.m_id2arrayset)
-  //m_name2relationset(other.m_name2relationset)
+  m_id2arrayset(other.m_id2arrayset),
+  m_name2relationset(other.m_name2relationset)
 {
 }
 
@@ -77,7 +75,7 @@ db::Dataset& db::Dataset::operator= (const db::Dataset& other) {
   m_version = other.m_version;
   m_arrayset = other.m_arrayset;
   m_id2arrayset = other.m_id2arrayset;
-  //m_name2relationset = other.m_name2relationset;
+  m_name2relationset = other.m_name2relationset;
   return *this;
 }
 
@@ -171,4 +169,9 @@ void db::Dataset::consolidateIds() {
   for (std::list<boost::shared_ptr<db::Arrayset> >::iterator it = m_arrayset.begin(); it != m_arrayset.end(); ++it, ++id) {
     m_id2arrayset[id] = *it;
   }
+}
+
+void db::Dataset::save(const std::string& path) const {
+  //db::XMLWriter writer();
+  //writer.write(path, ds);
 }
