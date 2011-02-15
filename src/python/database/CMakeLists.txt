@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 # Python bindings
 set(pysrc
    "src/array.cc"
-   #"src/arrayset.cc"
+   "src/arrayset.cc"
    #"src/dataset.cc"
    #"src/member.cc"
    #"src/rule.cc"

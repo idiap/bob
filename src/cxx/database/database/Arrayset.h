@@ -86,7 +86,7 @@ namespace Torch {
         /**
          * Adds a new external array to the Arrayset
          */
-        void add (const std::string& filename, const std::string& codec, size_t id=0);
+        void add (const std::string& filename, const std::string& codec="", size_t id=0);
 
         /**
          * Removes an Array with a given id from the Arrayset. Please note that
