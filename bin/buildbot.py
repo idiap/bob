@@ -105,27 +105,27 @@ def parse_args():
   if args:
     parser.error("this program does not accept positional arguments: %s" % args)
 
-  #some fixing
-  options.install_prefix = options.install_prefix.strip()
-  if options.install_prefix and options.install_prefix[0] != os.path.sep:
-    options.install_prefix = os.path.join(pwd, options.install_prefix) 
-  options.build_prefix = options.build_prefix.strip()
-  if options.build_prefix and options.build_prefix[0] != os.path.sep:
-    options.build_prefix = os.path.join(pwd, options.build_prefix) 
-  options.doc_prefix = options.doc_prefix.strip()
-  if options.doc_prefix and options.doc_prefix[0] != os.path.sep:
-    options.doc_prefix = os.path.join(pwd, options.doc_prefix)
-
   options.platform = adm.build.platform(options)
   options.source_dir = sources
 
   #we also replace potential %(bla)s substitutions we may have
+  options.build_prefix = options.build_prefix.strip()
   options.build_prefix = adm.build.untemplatize_path(options.build_prefix,
       options)
+  options.install_prefix = options.install_prefix.strip()
   options.install_prefix = adm.build.untemplatize_path(options.install_prefix,
       options)
+  options.doc_prefix = options.doc_prefix.strip()
   options.doc_prefix = adm.build.untemplatize_path(options.doc_prefix,
       options)
+
+  #some fixing
+  if options.install_prefix and options.install_prefix[0] != os.path.sep:
+    options.install_prefix = os.path.join(pwd, options.install_prefix) 
+  if options.build_prefix and options.build_prefix[0] != os.path.sep:
+    options.build_prefix = os.path.join(pwd, options.build_prefix) 
+  if options.doc_prefix and options.doc_prefix[0] != os.path.sep:
+    options.doc_prefix = os.path.join(pwd, options.doc_prefix)
 
   return options, args
 
