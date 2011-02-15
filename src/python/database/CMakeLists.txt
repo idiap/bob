@@ -9,7 +9,7 @@ set(pysrc
    "src/exception.cc"
    "src/relation.cc"
    "src/binfile.cc"
-   #"src/rule.cc"
+   "src/rule.cc"
    #"src/relationset.cc"
    #"src/main.cc"
    )
