@@ -67,6 +67,9 @@ namespace Torch {
 */
       // Save the document to the specified XML file in UTF-8 format
       xmlSaveFormatFileEnc(filename, doc, "UTF-8", 1);
+
+      // Free the memory
+      xmlFreeDoc(doc);
     }
 
 
