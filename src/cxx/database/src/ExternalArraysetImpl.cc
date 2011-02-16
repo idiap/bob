@@ -59,10 +59,10 @@ Torch::database::Array tdd::ExternalArraysetImpl::operator[] (size_t id) const {
 
 void tdd::ExternalArraysetImpl::checkCompatibility(const Torch::database::Array& array) const {
   if (m_elementtype != Torch::core::array::t_unknown) {
-    if (array.getElementType() != m_elementtype) throw Torch::database::TypeError();
-    if (array.getNDim() != m_ndim) throw Torch::database::DimensionError();
+    if (array.getElementType() != m_elementtype) throw Torch::database::TypeError(array.getElementType(), m_elementtype);
+    if (array.getNDim() != m_ndim) throw Torch::database::DimensionError(array.getNDim(), m_ndim);
     for (size_t i=0; i<m_ndim; ++i)
-      if (array.getShape()[i] != m_shape[i]) throw Torch::database::DimensionError();
+      if (array.getShape()[i] != m_shape[i]) throw Torch::database::DimensionError(array.getShape()[i], m_shape[i]);
   }
 }
 
@@ -86,7 +86,7 @@ void tdd::ExternalArraysetImpl::extend(const tdd::InlinedArraysetImpl& set) {
 }
 
 void tdd::ExternalArraysetImpl::remove(size_t id) {
-  if (id > m_samples) throw Torch::database::IndexError();
+  if (id > m_samples) throw Torch::database::IndexError(id);
   //loads the file and rewrite it.
   //TODO: Optimize to avoid loading the whole file in memory
   tdd::InlinedArraysetImpl data = get();
@@ -102,7 +102,7 @@ void tdd::ExternalArraysetImpl::add(size_t id,
 
 void tdd::ExternalArraysetImpl::add(size_t id,
     const Torch::database::Array& array) {
-  if (id != (m_samples+1)) throw Torch::database::IndexError();
+  if (id != (m_samples+1)) throw Torch::database::IndexError(id);
   add(array);
   reloadSpecification();
 }
@@ -114,7 +114,7 @@ void tdd::ExternalArraysetImpl::set(size_t id,
 
 void tdd::ExternalArraysetImpl::set(size_t id,
     const Torch::database::Array& array) {
-  if (id > m_samples) throw Torch::database::IndexError();
+  if (id > m_samples) throw Torch::database::IndexError(id);
   //loads the file and rewrite it.
   //TODO: Optimize to avoid loading the whole file in memory
   tdd::InlinedArraysetImpl data = get();

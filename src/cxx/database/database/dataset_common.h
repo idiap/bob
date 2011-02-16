@@ -64,16 +64,6 @@ namespace Torch {
     extern const char *t_complex128;
     extern const char *t_complex256;
 
-    class IndexError: public Torch::core::Exception { };
-    class DimensionError: public Torch::core::Exception { };
-    class TypeError: public Torch::core::Exception { };
-    class NonExistingElement: public Torch::core::Exception { };
-    class Uninitialized: public Torch::core::Exception { };
-    class AlreadyHasRelations: public Torch::core::Exception { };
-    class InvalidRelation: public Torch::core::Exception { };
-    class UnknownArrayset: public Torch::core::Exception { };
-    class UnknownArray: public Torch::core::Exception { };
-
   }
 /**
  * @}

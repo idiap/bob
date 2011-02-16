@@ -44,14 +44,14 @@ tdd::InlinedArraysetImpl& tdd::InlinedArraysetImpl::operator=
 const db::Array& tdd::InlinedArraysetImpl::operator[] (size_t id) const {
   std::map<size_t, boost::shared_ptr<db::Array> >::const_iterator it = 
     m_index.find(id);
-  if (it == m_index.end()) throw db::IndexError();
+  if (it == m_index.end()) throw db::IndexError(id);
   return *(it->second.get());
 }
 
 db::Array& tdd::InlinedArraysetImpl::operator[] (size_t id) {
   std::map<size_t, boost::shared_ptr<db::Array> >::iterator it = 
     m_index.find(id);
-  if (it == m_index.end()) throw db::IndexError();
+  if (it == m_index.end()) throw db::IndexError(id);
   return *(it->second.get());
 }
 
@@ -59,23 +59,23 @@ boost::shared_ptr<const db::Array> tdd::InlinedArraysetImpl::ptr
 (size_t id) const {
   std::map<size_t, boost::shared_ptr<db::Array> >::const_iterator it = 
     m_index.find(id);
-  if (it == m_index.end()) throw db::IndexError();
+  if (it == m_index.end()) throw db::IndexError(id);
   return it->second;
 }
 
 boost::shared_ptr<db::Array> tdd::InlinedArraysetImpl::ptr (size_t id) {
   std::map<size_t, boost::shared_ptr<db::Array> >::iterator it = 
     m_index.find(id);
-  if (it == m_index.end()) throw db::IndexError();
+  if (it == m_index.end()) throw db::IndexError(id);
   return it->second;
 }
 
 void tdd::InlinedArraysetImpl::checkCompatibility (const db::Array& array) const {
   if (m_elementtype != Torch::core::array::t_unknown) {
-    if (array.getElementType() != m_elementtype) throw db::TypeError();
-    if (array.getNDim() != m_ndim) throw db::DimensionError();
+    if (array.getElementType() != m_elementtype) throw db::TypeError(array.getElementType(), m_elementtype);
+    if (array.getNDim() != m_ndim) throw db::DimensionError(array.getNDim(), m_ndim);
     for (size_t i=0; i<m_ndim; ++i)
-      if (array.getShape()[i] != m_shape[i]) throw db::DimensionError();
+      if (array.getShape()[i] != m_shape[i]) throw db::DimensionError(array.getShape()[i], m_shape[i]);
   }
 }
 
@@ -104,7 +104,7 @@ void tdd::InlinedArraysetImpl::add(size_t id, boost::shared_ptr<const Torch::dat
 }
 
 void tdd::InlinedArraysetImpl::add(size_t id, const Torch::database::Array& array) {
-  if (m_index.find(id) != m_index.end()) throw db::IndexError();
+  if (m_index.find(id) != m_index.end()) throw db::IndexError(id);
   checkCompatibility(array);
   updateTyping(array);
   m_index[id] = boost::make_shared<db::Array>(array); 
@@ -118,7 +118,7 @@ size_t tdd::InlinedArraysetImpl::adopt (boost::shared_ptr<db::Array> array) {
 }
 
 void tdd::InlinedArraysetImpl::remove(size_t id) {
-  if (m_index.find(id) == m_index.end()) throw db::IndexError();
+  if (m_index.find(id) == m_index.end()) throw db::IndexError(id);
   m_index.erase(id);
   if (m_index.size() == 0) { //uninitialize
     m_elementtype = Torch::core::array::t_unknown;

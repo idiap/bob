@@ -12,6 +12,8 @@
 #include "database/XMLParser.h"
 #include "database/Dataset.h"
 #include "database/Arrayset.h"
+#include "database/Exception.h"
+#include "database/dataset_common.h"
 //#include "database/Relationset.h"
 
 namespace db = Torch::database;

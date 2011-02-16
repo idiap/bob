@@ -8,7 +8,7 @@
 #include <boost/filesystem.hpp>
 
 #include "database/ArraysetCodecRegistry.h"
-#include "database/dataset_common.h"
+#include "database/Exception.h"
 
 namespace db = Torch::database;
 
@@ -24,7 +24,7 @@ void db::ArraysetCodecRegistry::addCodec(boost::shared_ptr<db::ArraysetCodec> co
     instance->s_name2codec[codec->name()] = codec;
   }
   else {
-    throw db::IndexError();
+    throw db::NameError(codec->name());
   }
 
   for (std::vector<std::string>::const_iterator jt = codec->extensions().begin(); jt != codec->extensions().end(); ++jt) {
@@ -33,7 +33,7 @@ void db::ArraysetCodecRegistry::addCodec(boost::shared_ptr<db::ArraysetCodec> co
       instance->s_extension2codec[*jt] = codec;
     }
     else {
-      throw db::IndexError();
+      throw db::NameError(codec->name());
     }
   }
 }
@@ -43,7 +43,7 @@ db::ArraysetCodecRegistry::getCodecByName(const std::string& name) {
   boost::shared_ptr<ArraysetCodecRegistry> instance = db::ArraysetCodecRegistry::instance();
   std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = instance->s_name2codec.find(name);
   if (it == instance->s_name2codec.end()) {
-    throw db::IndexError();
+    throw db::CodecNotFound(name);
   }
   return it->second;
 }
@@ -55,7 +55,7 @@ db::ArraysetCodecRegistry::getCodecByExtension(const std::string& filename)
   boost::filesystem::path path(filename);
   std::map<std::string, boost::shared_ptr<db::ArraysetCodec> >::iterator it = instance->s_extension2codec.find(path.extension());
   if (it == instance->s_extension2codec.end()) {
-    throw db::IndexError();
+    throw db::ExtensionNotRegistered(path.extension());
   }
   return it->second;
 }

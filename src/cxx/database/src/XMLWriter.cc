@@ -13,6 +13,8 @@
 #include "database/Arrayset.h"
 #include "database/Array.h"
 #include "database/Relationset.h"
+#include "database/dataset_common.h"
+#include "database/Exception.h"
 
 #include "core/logging.h"
 

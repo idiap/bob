@@ -143,7 +143,7 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
         break;
       }
     default:
-      throw db::DimensionError();
+      throw db::DimensionError(data.getNDim(), Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
   }
 }
 
@@ -154,11 +154,11 @@ void db::BinFile::write(const db::detail::InlinedArrayImpl& data) {
   }
   else {
       //checks compatibility with previously written stuff
-      if (data.getNDim() != m_header.getNDim()) throw DimensionError();
+      if (data.getNDim() != m_header.getNDim()) throw DimensionError(data.getNDim(), m_header.getNDim());
       const size_t* p_shape = data.getShape();
       const size_t* h_shape = m_header.getShape();
       for (size_t i=0; i<data.getNDim(); ++i)
-        if(p_shape[i] != h_shape[i]) throw DimensionError();
+        if(p_shape[i] != h_shape[i]) throw DimensionError(p_shape[i], h_shape[i]);
   }
 
   // copy the data into the output stream
@@ -178,7 +178,7 @@ void db::BinFile::write(const db::detail::InlinedArrayImpl& data) {
     case Torch::core::array::t_complex64: write_inlined<std::complex<float> >(data, m_stream); break;
     case Torch::core::array::t_complex128: write_inlined<std::complex<double> >(data, m_stream); break;
     case Torch::core::array::t_complex256: write_inlined<std::complex<long double> >(data, m_stream); break;
-    default: throw TypeError();
+    default: throw TypeError(data.getElementType(), Torch::core::array::t_unknown);
   }
 
   // increment m_n_arrays_written and m_current_array
@@ -218,7 +218,7 @@ db::detail::InlinedArrayImpl read_inlined(size_t ndim, const size_t* shape,
         return bz;
       }
     default:
-      throw db::DimensionError();
+      throw db::DimensionError(ndim, Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
   }
 }
 
@@ -240,7 +240,7 @@ db::detail::InlinedArrayImpl db::BinFile::read() {
     case Torch::core::array::t_complex64: return read_inlined<std::complex<float> >(m_header.getNDim(), m_header.getShape(), m_stream);
     case Torch::core::array::t_complex128: return read_inlined<std::complex<double> >(m_header.getNDim(), m_header.getShape(), m_stream);
     case Torch::core::array::t_complex256: return read_inlined<std::complex<long double> >(m_header.getNDim(), m_header.getShape(), m_stream);
-    default: throw TypeError();
+    default: throw Torch::database::TypeError(getElementType(), Torch::core::array::t_unknown);
   }
   ++m_current_array;
 }
@@ -249,7 +249,7 @@ db::detail::InlinedArrayImpl db::BinFile::read (size_t index) {
   // Check that we are reaching an existing array
   if( index > m_header.m_n_samples ) {
     core::error << "Trying to reach a non-existing array." << std::endl;
-    throw IndexError();
+    throw IndexError(index);
   }
 
   // Set the stream pointer at the correct position

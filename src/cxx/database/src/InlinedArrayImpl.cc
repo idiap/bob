@@ -7,6 +7,7 @@
 
 #include "database/InlinedArrayImpl.h"
 #include "database/dataset_common.h"
+#include "database/Exception.h"
 
 namespace tdd = Torch::database::detail;
 
@@ -25,7 +26,7 @@ template<typename T, int D> static inline void deleteBzArray(void* bzarray) {
     case 2: deleteBzArray<T,2>(m_bzarray); break;\
     case 3: deleteBzArray<T,3>(m_bzarray); break;\
     case 4: deleteBzArray<T,4>(m_bzarray); break;\
-    default: throw Torch::database::DimensionError();\
+    default: throw Torch::database::DimensionError(D,4);\
   } \
   break;
 
@@ -47,7 +48,7 @@ tdd::InlinedArrayImpl::~InlinedArrayImpl() {
     DELSWITCH(std::complex<double>, core::array::t_complex128, m_ndim)
     DELSWITCH(std::complex<long double>, core::array::t_complex256, m_ndim)
     default:
-      throw Torch::database::TypeError();
+      throw Torch::database::TypeError(m_elementtype, Torch::core::array::t_unknown);
   }
 }
 
@@ -65,7 +66,7 @@ tdd::InlinedArrayImpl::InlinedArrayImpl (const tdd::InlinedArrayImpl& other) {
     case 2: m_bzarray = getBzArray<T,2>(other.m_bzarray); break;\
     case 3: m_bzarray = getBzArray<T,3>(other.m_bzarray); break;\
     case 4: m_bzarray = getBzArray<T,4>(other.m_bzarray); break;\
-    default: throw Torch::database::DimensionError();\
+    default: throw Torch::database::DimensionError(D,4);\
   }\
   break;
 
@@ -90,7 +91,7 @@ tdd::InlinedArrayImpl& tdd::InlinedArrayImpl::operator= (const tdd::InlinedArray
     GETSWITCH(std::complex<double>, core::array::t_complex128, m_ndim)
     GETSWITCH(std::complex<long double>, core::array::t_complex256, m_ndim)
     default:
-      throw Torch::database::TypeError();
+      throw Torch::database::TypeError(m_elementtype, Torch::core::array::t_unknown);
   }
   return *this;
 }

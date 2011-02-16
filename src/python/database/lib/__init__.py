@@ -77,6 +77,11 @@ def array_cast(self, eltype):
   return getattr(self, '__cast_%s_%d__' % (eltype.name, len(self.shape)))()
 Array.cast = array_cast
 
+def array_copy(self):
+  """Returns a blitz::Array object which is a copy of the internal data"""
+  return getattr(self, '__cast_%s_%d__' % (self.elementType.name, len(self.shape)))()
+Array.copy = array_copy
+
 def relationset_index(self):
   """Returns a standard python dictionary that contains as keys, the roles and
   as values, python tuples containing the members (tuples) associated with each 
@@ -95,7 +100,7 @@ def relationset_index(self):
   """
 
   retval = {}
-  retval['id'] = self.ids()
+  retval['__id__'] = self.ids()
   roles = self.roles()
   for role in roles: retval[role] = [] #initialization
   for k in self.ids():
@@ -116,7 +121,7 @@ def dataset_relationset_index(self, name):
     else: return dataset[member[0]]
 
   retval = self[name].index()
-  for role in [k for k in retval.keys() if k != 'id']:
+  for role in [k for k in retval.keys() if k != '__id__']:
     replace_role = []
     for member_tuple in retval[role]: 
       replace_role.append(tuple([map_one(self, m) for m in member_tuple]))
@@ -126,7 +131,7 @@ Dataset.relationsetIndex = dataset_relationset_index
 
 def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""
-  return getattr(self, 'read_%s_%d' % \
+  return getattr(self, '__getitem_%s_%d__' % \
       (self.elementType.name, len(self.shape)))(i)
 
 BinFile.__getitem__ = binfile_getitem

@@ -8,7 +8,7 @@
 #include <boost/filesystem.hpp>
 
 #include "database/ArrayCodecRegistry.h"
-#include "database/dataset_common.h"
+#include "database/Exception.h"
 
 #include<iostream>
 
@@ -27,7 +27,7 @@ void db::ArrayCodecRegistry::addCodec(boost::shared_ptr<db::ArrayCodec> codec) {
     instance->s_name2codec[codec->name()] = codec;
   }
   else {
-    throw db::IndexError();
+    throw db::NameError(codec->name());
   }
 
   for (std::vector<std::string>::const_iterator jt = codec->extensions().begin(); jt != codec->extensions().end(); ++jt) {
@@ -36,7 +36,7 @@ void db::ArrayCodecRegistry::addCodec(boost::shared_ptr<db::ArrayCodec> codec) {
       instance->s_extension2codec[*jt] = codec;
     }
     else {
-      throw db::IndexError();
+      throw db::NameError(*jt);
     }
   }
 }
@@ -46,7 +46,7 @@ db::ArrayCodecRegistry::getCodecByName(const std::string& name) {
   boost::shared_ptr<ArrayCodecRegistry> instance = db::ArrayCodecRegistry::instance();
   std::map<std::string, boost::shared_ptr<db::ArrayCodec> >::iterator it = instance->s_name2codec.find(name);
   if (it == instance->s_name2codec.end()) {
-    throw db::IndexError();
+    throw db::CodecNotFound(name);
   }
   return it->second;
 }
@@ -58,7 +58,7 @@ db::ArrayCodecRegistry::getCodecByExtension(const std::string& filename)
   boost::filesystem::path path(filename);
   std::map<std::string, boost::shared_ptr<db::ArrayCodec> >::iterator it = instance->s_extension2codec.find(path.extension());
   if (it == instance->s_extension2codec.end()) {
-    throw db::IndexError();
+    throw db::ExtensionNotRegistered(path.extension());
   }
   return it->second;
 }

@@ -11,6 +11,7 @@
 #include "core/cast.h"
 #include "database/BinFileHeader.h"
 #include "database/InlinedArrayImpl.h"
+#include "database/Exception.h"
 
 namespace Torch {
   /**
@@ -185,7 +186,7 @@ namespace Torch {
          * Checks if the end of the binary file is reached
          */
         inline void endOfFile() {
-          if(m_current_array >= m_header.m_n_samples ) throw IndexError();
+          if(m_current_array >= m_header.m_n_samples ) throw IndexError(m_current_array);
         }
 
         /** 

@@ -34,6 +34,7 @@ set(src
     "src/Rule.cc"
     "src/XMLParser.cc"
     "src/XMLWriter.cc"
+    "src/Exception.cc"
     )
 
 include(../../cmake/macros.cmake)

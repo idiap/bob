@@ -8,7 +8,7 @@
 #include "core/logging.h"
 
 #include "database/BinFileHeader.h"
-#include "database/dataset_common.h"
+#include "database/Exception.h"
 
 namespace db = Torch::database;
 namespace dbd = db::detail;
@@ -37,7 +37,7 @@ size_t dbd::BinFileHeader::getArrayIndex (size_t index) const {
 }
 
 size_t dbd::BinFileHeader::getSize (size_t dim_index) const {
-  if(dim_index >= m_n_dimensions) throw DimensionError();
+  if(dim_index >= m_n_dimensions) throw db::DimensionError(dim_index, m_n_dimensions);
   return m_shape[dim_index]; 
 }
 
@@ -75,10 +75,7 @@ void dbd::BinFileHeader::read (std::istream& str) {
   str.read (reinterpret_cast<char*>(&val8), sizeof(uint8_t));
   m_n_dimensions = static_cast<uint8_t>(val8);
   if( m_n_dimensions > core::array::N_MAX_DIMENSIONS_ARRAY) {
-    core::error << "The number of dimensions is larger the maximal number " <<
-      "of dimensions supported by this version of Torch5spro." << 
-      std::endl;
-    throw core::Exception();
+    throw db::DimensionError(m_n_dimensions, core::array::N_MAX_DIMENSIONS_ARRAY);
   }
   TDEBUG3("Number of dimensions: " << m_n_dimensions);
 

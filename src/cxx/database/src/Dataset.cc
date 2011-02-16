@@ -54,25 +54,25 @@ db::Dataset& db::Dataset::operator= (const db::Dataset& other) {
 /** Operations for accessing the Dataset information **/
 const db::Arrayset& db::Dataset::operator[] (size_t id) const {
   std::map<size_t, boost::shared_ptr<db::Arrayset> >::const_iterator it = m_id2arrayset.find(id);
-  if (it == m_id2arrayset.end()) throw db::IndexError();
+  if (it == m_id2arrayset.end()) throw db::IndexError(id);
   return *(it->second.get());
 }
 
 db::Arrayset& db::Dataset::operator[] (size_t id) {
   std::map<size_t, boost::shared_ptr<db::Arrayset> >::iterator it = m_id2arrayset.find(id);
-  if (it == m_id2arrayset.end()) throw db::IndexError();
+  if (it == m_id2arrayset.end()) throw db::IndexError(id);
   return *(it->second.get());
 }
 
 boost::shared_ptr<const db::Arrayset> db::Dataset::ptr(const size_t id) const {
   std::map<size_t, boost::shared_ptr<db::Arrayset> >::const_iterator it = m_id2arrayset.find(id);
-  if (it == m_id2arrayset.end()) throw db::IndexError();
+  if (it == m_id2arrayset.end()) throw db::IndexError(id);
   return it->second;
 }
 
 boost::shared_ptr<db::Arrayset> db::Dataset::ptr(const size_t id) {
   std::map<size_t, boost::shared_ptr<db::Arrayset> >::iterator it = m_id2arrayset.find(id);
-  if (it == m_id2arrayset.end()) throw db::IndexError();
+  if (it == m_id2arrayset.end()) throw db::IndexError(id);
   return it->second;
 }
 
@@ -86,13 +86,13 @@ db::Relationset& db::Dataset::operator[](const std::string& name) {
 
 boost::shared_ptr<const db::Relationset> db::Dataset::ptr(const std::string& name) const {
   std::map<std::string, boost::shared_ptr<db::Relationset> >::const_iterator it = m_name2relationset.find(name);
-  if (it == m_name2relationset.end()) throw db::IndexError();
+  if (it == m_name2relationset.end()) throw db::NameError(name);
   return it->second;
 }
 
 boost::shared_ptr<db::Relationset> db::Dataset::ptr(const std::string& name) {
   std::map<std::string, boost::shared_ptr<db::Relationset> >::iterator it = m_name2relationset.find(name);
-  if (it == m_name2relationset.end()) throw db::IndexError();
+  if (it == m_name2relationset.end()) throw db::NameError(name);
   return it->second;
 }
 
@@ -110,7 +110,7 @@ void db::Dataset::add(size_t id, boost::shared_ptr<const db::Arrayset> arrayset)
 }
 
 void db::Dataset::add(size_t id, const db::Arrayset& arrayset) {
-  if (m_id2arrayset.find(id) != m_id2arrayset.end()) throw db::IndexError();
+  if (m_id2arrayset.find(id) != m_id2arrayset.end()) throw db::IndexError(id);
   m_id2arrayset[id] = boost::make_shared<db::Arrayset>(arrayset);
 }
 
@@ -119,7 +119,7 @@ void db::Dataset::set(size_t id, boost::shared_ptr<const db::Arrayset> arrayset)
 }
 
 void db::Dataset::set(size_t id, const db::Arrayset& arrayset) {
-  if (m_id2arrayset.find(id) == m_id2arrayset.end()) throw db::IndexError();
+  if (m_id2arrayset.find(id) == m_id2arrayset.end()) throw db::IndexError(id);
   m_id2arrayset[id] = boost::make_shared<db::Arrayset>(arrayset);
 }
 
@@ -128,7 +128,7 @@ void db::Dataset::remove(size_t index) {
 }
 
 size_t db::Dataset::add (const std::string& name, const db::Relationset& relationset) {
-  if (m_name2relationset.find(name) != m_name2relationset.end()) throw db::IndexError();
+  if (m_name2relationset.find(name) != m_name2relationset.end()) throw db::NameError(name);
   m_name2relationset[name] = boost::make_shared<db::Relationset>(relationset);
   return m_name2relationset.size();
 }
@@ -138,7 +138,7 @@ size_t db::Dataset::add (const std::string& name, boost::shared_ptr<const db::Re
 }
 
 void db::Dataset::set (const std::string& name, const db::Relationset& relationset) {
-  if (m_name2relationset.find(name) == m_name2relationset.end()) throw db::IndexError();
+  if (m_name2relationset.find(name) == m_name2relationset.end()) throw db::NameError(name);
   m_name2relationset[name] = boost::make_shared<db::Relationset>(relationset);
 }
 

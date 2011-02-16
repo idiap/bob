@@ -10,7 +10,7 @@
 #include <boost/make_shared.hpp>
 
 #include "database/Relationset.h"
-#include "database/dataset_common.h"
+#include "database/Exception.h"
 #include "database/Dataset.h"
 
 namespace db = Torch::database;
@@ -54,7 +54,7 @@ void db::Relationset::consolidateIds() {
 }
 
 void db::Relationset::fillMemberMap(size_t id, std::map<std::string, std::vector<std::pair<size_t, size_t> > >& dictionary) const {
-  if (!exists(id)) throw db::IndexError();
+  if (!exists(id)) throw db::IndexError(id);
   const db::Relation& r = (*this)[id];
 
   checkRelation(r); //D.R.Y.
@@ -75,10 +75,10 @@ void db::Relationset::checkRelation(const db::Relation& r) const {
   
   for (std::list<std::pair<size_t,size_t> >::const_iterator it = r.members().begin(); it != r.members().end(); ++it) {
     //it->first == arrayset-id, it->second == array-id
-    if (!m_parent->exists(it->first)) throw db::UnknownArrayset();
+    if (!m_parent->exists(it->first)) throw db::IndexError(it->first);
     const db::Arrayset& arrayset = (*m_parent)[it->first];
     if (it->second) //specific array required, try get
-      if (!arrayset.exists(it->second)) throw db::UnknownArray();
+      if (!arrayset.exists(it->second)) throw db::IndexError(it->second);
 
     //if you get to this point, the array exists, get roles and count
     if (role_count.find(arrayset.getRole()) == role_count.end())
@@ -118,7 +118,7 @@ size_t db::Relationset::add (boost::shared_ptr<const db::Relation> relation) {
 }
 
 void db::Relationset::add (size_t id, const db::Relation& relation) {
-  if (m_relation.find(id) != m_relation.end()) throw db::IndexError();
+  if (m_relation.find(id) != m_relation.end()) throw db::IndexError(id);
   checkRelation(relation);
   m_relation[id] = boost::make_shared<db::Relation>(relation);
 }
@@ -128,7 +128,7 @@ void db::Relationset::add (size_t id, boost::shared_ptr<const db::Relation> rela
 }
 
 void db::Relationset::set (size_t id, const db::Relation& relation) {
-  if (m_relation.find(id) == m_relation.end()) throw db::IndexError();
+  if (m_relation.find(id) == m_relation.end()) throw db::IndexError(id);
   checkRelation(relation);
   m_relation[id] = boost::make_shared<db::Relation>(relation);
 }
@@ -151,21 +151,21 @@ const db::Relation& db::Relationset::operator[] (size_t id) const {
 
 boost::shared_ptr<db::Relation> db::Relationset::ptr (size_t id) {
   std::map<size_t, boost::shared_ptr<db::Relation> >::iterator it = m_relation.find(id);
-  if (it == m_relation.end()) throw db::IndexError();
+  if (it == m_relation.end()) throw db::IndexError(id);
   return it->second;
 }
 
 boost::shared_ptr<const db::Relation> db::Relationset::ptr (size_t id) const {
   std::map<size_t, boost::shared_ptr<db::Relation> >::const_iterator it = m_relation.find(id);
-  if (it == m_relation.end()) throw db::IndexError();
+  if (it == m_relation.end()) throw db::IndexError(id);
   return it->second;
 }
 
 void db::Relationset::add (const std::string& role, const db::Rule& rule) {
   //if you want to remove a rule, you must first remove all relations that
   //follow that rule - otherwise, consistency cannot be guaranteed
-  if (m_relation.size()) throw db::AlreadyHasRelations();
-  if (m_rule.find(role) != m_rule.end()) throw db::IndexError();
+  if (m_relation.size()) throw db::AlreadyHasRelations(m_relation.size());
+  if (m_rule.find(role) != m_rule.end()) throw db::NameError(role);
   m_rule[role] = boost::make_shared<db::Rule>(rule);
 }
 
@@ -177,7 +177,7 @@ void db::Relationset::add (const std::string& role,
 void db::Relationset::set (const std::string& role, const db::Rule& rule) {
   //please note that when you reset a rule, we have to recompute all relations
   //consistency - we throw if a relation does not obey
-  if (m_rule.find(role) == m_rule.end()) throw db::IndexError();
+  if (m_rule.find(role) == m_rule.end()) throw db::NameError(role);
   m_rule[role] = boost::make_shared<db::Rule>(rule);
   for (std::map<size_t, boost::shared_ptr<db::Relation> >::const_iterator
       it = m_relation.begin(); it != m_relation.end(); ++it) {
@@ -191,19 +191,19 @@ void db::Relationset::set (const std::string& role,
 }
 
 void db::Relationset::remove(const std::string& role) {
-  if (m_rule.find(role) == m_rule.end()) throw db::IndexError();
+  if (m_rule.find(role) == m_rule.end()) throw db::NameError(role);
   m_rule.erase(role);
 }
 
 boost::shared_ptr<db::Rule> db::Relationset::ptr (const std::string& role) {
   std::map<std::string, boost::shared_ptr<db::Rule> >::iterator it = m_rule.find(role);
-  if (it == m_rule.end()) throw db::IndexError();
+  if (it == m_rule.end()) throw db::NameError(role);
   return it->second;
 }
       
 boost::shared_ptr<const db::Rule> db::Relationset::ptr (const std::string& role) const {
   std::map<std::string, boost::shared_ptr<db::Rule> >::const_iterator it = m_rule.find(role);
-  if (it == m_rule.end()) throw db::IndexError();
+  if (it == m_rule.end()) throw db::NameError(role);
   return it->second;
 }
 
@@ -216,7 +216,7 @@ const db::Rule& db::Relationset::operator[] (const std::string& role) const {
 }
 
 void db::Relationset::clearRules () {
-  if (m_relation.size()) throw db::AlreadyHasRelations();
+  if (m_relation.size()) throw db::AlreadyHasRelations(m_relation.size());
 }
 
 bool db::Relationset::exists(size_t relation_id) const {

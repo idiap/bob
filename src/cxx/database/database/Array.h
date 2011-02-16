@@ -158,13 +158,13 @@ namespace Torch {
     };
 
     template <typename T, int D> const blitz::Array<T,D> Array::get() const {
-      if (D != getNDim()) throw DimensionError();
+      if (D != getNDim()) throw DimensionError(D, getNDim());
       if (!m_inlined) return m_external->get().get<T,D>();
       return m_inlined->get<T,D>(); 
     }
 
     template <typename T, int D> blitz::Array<T,D> Array::cast() const {
-      if (D != getNDim()) throw DimensionError();
+      if (D != getNDim()) throw DimensionError(D, getNDim());
       if (!m_inlined) return m_external->get().cast<T,D>();
       return m_inlined->cast<T,D>(); 
     }

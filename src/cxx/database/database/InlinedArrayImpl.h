@@ -11,7 +11,7 @@
 
 #include <blitz/array.h>
 #include <core/array_common.h>
-#include <database/dataset_common.h>
+#include <database/Exception.h>
 #include "core/cast.h"
 
 namespace Torch { namespace database { namespace detail {
@@ -98,7 +98,7 @@ namespace Torch { namespace database { namespace detail {
   }
 
   template<typename T, int D> void InlinedArrayImpl::set(blitz::Array<T,D>& data) {
-    if (D > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) throw DimensionError();
+    if (D > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) throw DimensionError(D, Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
     m_elementtype = Torch::core::array::getElementType<T>();
     m_ndim = D;
     for (int i=0; i<D; ++i) m_shape[i] = data.extent(i);
@@ -112,10 +112,10 @@ namespace Torch { namespace database { namespace detail {
 
   template<typename T, int D> const blitz::Array<T,D>& InlinedArrayImpl::get() const {
     if (m_elementtype != Torch::core::array::getElementType<T>()) {
-      throw Torch::database::TypeError();
+      throw Torch::database::TypeError(Torch::core::array::getElementType<T>(), m_elementtype);
     }
     if (m_ndim != D) {
-      throw Torch::database::DimensionError();
+      throw Torch::database::DimensionError(D, m_ndim);
     }
     return *reinterpret_cast<blitz::Array<T,D>*>(m_bzarray);
   }
@@ -125,7 +125,7 @@ namespace Torch { namespace database { namespace detail {
   }
 
   template<typename T, int D> blitz::Array<T,D> InlinedArrayImpl::cast() const {
-    if (D != m_ndim) throw DimensionError();
+    if (D != m_ndim) throw DimensionError(D, m_ndim);
     switch (m_elementtype) {
       case Torch::core::array::t_bool: 
         return Torch::core::cast<T>(*reinterpret_cast<blitz::Array<bool,D>* >(m_bzarray));
@@ -162,7 +162,7 @@ namespace Torch { namespace database { namespace detail {
     }
 
     //if we get to this point, there is nothing much we can do...
-    throw TypeError();
+    throw TypeError(m_elementtype, Torch::core::array::t_unknown);
   }
 
 }}}

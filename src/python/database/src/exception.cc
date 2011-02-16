@@ -7,7 +7,7 @@
 
 #include <boost/python.hpp>
 
-#include "database/dataset_common.h"
+#include "database/Exception.h"
 
 using namespace boost::python;
 
@@ -50,18 +50,92 @@ template <typename T> struct CxxToPythonTranslator {
 
 };
 
-template <typename T> PyObject* CxxToPythonTranslator<T>::pyExceptionType = 0;
+template <typename T, typename TPar> struct CxxToPythonTranslatorPar {
+  /**
+   * This static class variable will hold a pointer to the exception type as
+   * defined by the boost::python
+   */
+  static PyObject* pyExceptionType;
 
-#define BIND_EXCEPTION(TYPE,NAME,DOC) CxxToPythonTranslator<TYPE>(NAME, DOC)
+  /**
+   * Do the exception translation for the specific exception we are trying to
+   * tackle.
+   */
+  static void translateException(const T& ex) {
+    assert(pyExceptionType != NULL);
+    boost::python::object pythonExceptionInstance(ex);
+    PyErr_SetObject(pyExceptionType, pythonExceptionInstance.ptr());
+  }
+
+  /**
+   * Constructor will instantiate all required parameters for this standard
+   * exception handler and create the pythonic bindings in one method call
+   */
+  CxxToPythonTranslatorPar(const char* python_name, const char* python_doc) {
+    class_<T> pythonEquivalentException(python_name, python_doc, init<TPar>("Creates a new exception of this type"));
+    pythonEquivalentException.def("__str__", &T::what);
+    pyExceptionType = pythonEquivalentException.ptr();
+    register_exception_translator<T>(&translateException);
+  }
+
+};
+
+template <typename T, typename TPar1, typename TPar2> struct CxxToPythonTranslatorPar2 {
+  /**
+   * This static class variable will hold a pointer to the exception type as
+   * defined by the boost::python
+   */
+  static PyObject* pyExceptionType;
+
+  /**
+   * Do the exception translation for the specific exception we are trying to
+   * tackle.
+   */
+  static void translateException(const T& ex) {
+    assert(pyExceptionType != NULL);
+    boost::python::object pythonExceptionInstance(ex);
+    PyErr_SetObject(pyExceptionType, pythonExceptionInstance.ptr());
+  }
+
+  /**
+   * Constructor will instantiate all required parameters for this standard
+   * exception handler and create the pythonic bindings in one method call
+   */
+  CxxToPythonTranslatorPar2(const char* python_name, const char* python_doc) {
+    class_<T> pythonEquivalentException(python_name, python_doc, init<TPar1, TPar2>("Creates a new exception of this type"));
+    pythonEquivalentException.def("__str__", &T::what);
+    pyExceptionType = pythonEquivalentException.ptr();
+    register_exception_translator<T>(&translateException);
+  }
+
+};
+
+template <typename T> PyObject* CxxToPythonTranslator<T>::pyExceptionType = 0;
+template <typename T, typename TPar> PyObject* CxxToPythonTranslatorPar<T,TPar>::pyExceptionType = 0;
+template <typename T, typename TPar1, typename TPar2> PyObject* CxxToPythonTranslatorPar2<T,TPar1,TPar2>::pyExceptionType = 0;
 
 void bind_database_exception() {
-  BIND_EXCEPTION(Torch::database::NonExistingElement, "NonExistingElement", "Raised when database elements that were queried for do not exist");
-  BIND_EXCEPTION(Torch::database::IndexError, "IndexError", "Raised when database elements queried-for do not exist");
-  BIND_EXCEPTION(Torch::database::DimensionError, "NDimensionError", "Raised when user asks for arrays with unsupported dimensionality");
-  BIND_EXCEPTION(Torch::database::TypeError, "TypeError", "Raised when the user asks for arrays with unsupported element type");
-  BIND_EXCEPTION(Torch::database::Uninitialized, "Uninitialized", "Raised when the user asks for arrays with unsupported element type");
-  BIND_EXCEPTION(Torch::database::AlreadyHasRelations, "AlreadyHasRelations", "Raised when the user inserts a new rule to a Relationset with existing relations");
-  BIND_EXCEPTION(Torch::database::InvalidRelation, "InvalidRelation", "Raised when the user inserts a new Relation to a Relationset that does not conform to its rules");
-  BIND_EXCEPTION(Torch::database::UnknownArrayset, "UnknownArrayset", "Raised when the user inserts a new Relation to a Relationset that points to unexisting Arraysets");
-  BIND_EXCEPTION(Torch::database::UnknownArray, "UnknownArray", "Raised when the user inserts a new Relation to a Relationset that points to unexisting Arrays");
+  CxxToPythonTranslator<Torch::database::Exception>("Exception", "Raised when no other exception type is better to describe the problem. You should never use this!");
+
+  CxxToPythonTranslator<Torch::database::NonExistingElement>("NonExistingElement", "Raised when database elements types are not implemented");
+
+  CxxToPythonTranslatorPar<Torch::database::IndexError, size_t>("IndexError", "Raised when database elements queried-for (addressable by id) do not exist");
+
+  CxxToPythonTranslatorPar<Torch::database::NameError, const std::string&>("NameError", "Raised when database elements queried-for (addressable by name) do not exist");
+
+  CxxToPythonTranslatorPar2<Torch::database::DimensionError, size_t, size_t>("DimensionError", "Raised when user asks for arrays with unsupported dimensionality");
+
+  CxxToPythonTranslatorPar2<Torch::database::TypeError, Torch::core::array::ElementType, Torch::core::array::ElementType>("TypeError", "Raised when the user asks for arrays with unsupported element type");
+
+  CxxToPythonTranslator<Torch::database::Uninitialized>("Uninitialized", "Raised when the user asks for arrays with unsupported element type");
+
+  CxxToPythonTranslatorPar<Torch::database::AlreadyHasRelations, size_t>("AlreadyHasRelations", "Raised when the user inserts a new rule to a Relationset with existing relations");
+
+  CxxToPythonTranslator<Torch::database::InvalidRelation>("InvalidRelation", "Raised when the user inserts a new Relation to a Relationset that does not conform to its rules");
+  
+  CxxToPythonTranslatorPar<Torch::database::FileNotReadable, const std::string&>("FileNotReadable", "Raised when a file is not found or readable");
+
+  CxxToPythonTranslatorPar<Torch::database::ExtensionNotRegistered, const std::string&>("ExtensionNotRegistered", "Raised when Codec Registry lookups by extension do not find a codec match for the given string");
+
+  CxxToPythonTranslatorPar<Torch::database::CodecNotFound, const std::string&>("CodecNotFound", "Raised when the codec is looked-up by name and is not found");
 }

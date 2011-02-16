@@ -2,10 +2,10 @@
 <dataset name="Coco" version="1">
   <arrayset role="pattern1" elementtype="uint16" shape="3" id="1">
     <array id="1" >43 21 58</array>
-    <external-array id="3" file="bla" loader="blitz" />
+    <external-array id="3" file="test1.bin" codec="torch.array.binary" />
     <array id="2" >43 21 58</array>
   </arrayset>
-  <external-arrayset role="pattern2" elementtype="uint16" shape="3" id="2" file="/idiap/home/lelshafey/Desktop/db.xml" loader="blitz"/>
+  <external-arrayset role="pattern2" elementtype="uint16" shape="3" id="2" file="test1.bin" codec="torch.arrayset.binary"/>
   <arrayset role="pattern3" elementtype="int16" shape="3" id="3">
     <array id="1" >43 -21 -58</array>
   </arrayset>

@@ -36,7 +36,7 @@ void db::BinaryArraysetCodec::peek(const std::string& filename,
     eltype = Torch::core::array::t_unknown;
     ndim = 0;
     samples = 0;
-    return;
+    throw db::FileNotReadable(filename);
   }
   eltype = f.getElementType();
   ndim = f.getNDimensions();
@@ -55,6 +55,7 @@ db::detail::InlinedArraysetImpl db::BinaryArraysetCodec::load
 db::Array db::BinaryArraysetCodec::load
 (const std::string& filename, size_t id) const {
   db::BinFile f(filename, db::BinFile::in);
+  if (!f) throw db::FileNotReadable(filename);
   return f.read(id-1);
 }
 

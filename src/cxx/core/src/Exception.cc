@@ -19,6 +19,6 @@ Torch::core::Exception::~Exception() throw() {
 }
 
 const char* Torch::core::Exception::what() const throw() {
- static const char* what_string = "Torch::core::Exception";
+ static const char* what_string = "Generic core::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
  return what_string;
 }
