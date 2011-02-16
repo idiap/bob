@@ -72,7 +72,7 @@ namespace Torch {
          * and shape given in the blitz array, otherwise the type/shape should
          * match or an exception is thrown.
          *
-         * Please note that blitz::Array<> will be implicetly constructed as
+         * Please note that blitz::Array<> will be implicitly constructed as
          * required and respecting those norms.
          */
         void write(const detail::InlinedArrayImpl& data);

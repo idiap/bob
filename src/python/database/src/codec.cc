@@ -12,22 +12,47 @@
 
 using namespace boost::python;
 namespace db = Torch::database;
+namespace array = Torch::core::array;
 
 //boost::python scaffoldings for virtualization
 
+/**
+ * The ArrayCodecWrapper is a python reflection that allows users to implement
+ * ArrayCodec's in pure python
+ */
 class ArrayCodecWrapper: public db::ArrayCodec, public wrapper<db::ArrayCodec> {
 
   public:
 
-    void peek(const std::string& filename, Torch::core::array::ElementType& eltype, size_t& ndim, size_t* shape) const {
-      list lshape;
-      this->get_override("peek")(filename, eltype, lshape); 
-      ndim = len(lshape);
-      for (size_t i=0; i<ndim; ++i) shape[i] = extract<size_t>(lshape[i])();
+    /**
+     * The peek() method that is overrideable in python will require your
+     * method to receive a filename and return a tuple containing the element
+     * type and a shape tuple.
+     *
+     * python prototype:
+     *
+     * def peek (filename):
+     *   ...
+     *   return (elementType, shape)
+     *
+     * shape = (extent0, extent1, ...)
+     */
+    void peek(const std::string& filename, array::ElementType& eltype,
+        size_t& ndim, size_t* shape) const {
+      tuple retval = this->get_override("peek")(filename);
+      eltype = extract<array::ElementType>(retval[0])();
+      ndim = len(retval[1]);
+      for (size_t i=0; i<ndim; ++i) 
+        shape[i] = extract<size_t>(retval[1][i])();
     }
 
+    /**
+     * The load() method takes a filename and returns a single db::Array (with
+     * inlined representation)
+     */
     db::detail::InlinedArrayImpl load(const std::string& filename) const {
-      return this->get_override("load")(filename);
+      object retval = this->get_override("load")(filename);
+      return extract<db::Array>(retval)().get();
     }
 
     void save (const std::string& filename, const db::detail::InlinedArrayImpl& data) const {
@@ -41,7 +66,7 @@ class ArrayCodecWrapper: public db::ArrayCodec, public wrapper<db::ArrayCodec> {
     const std::vector<std::string>& extensions () const {
       tuple exts = this->get_override("extensions")();
       m_extensions.clear();
-      for (Py_ssize_t i=0; i<len(exts); ++i) 
+      for (Py_ssize_t i=0; i<len(exts); ++i)
         m_extensions.push_back(extract<std::string>(exts[i])()); 
       return m_extensions;
     }

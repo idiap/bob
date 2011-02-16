@@ -53,6 +53,19 @@ void db::Relationset::consolidateIds() {
   }
 }
 
+void db::Relationset::fillMemberMap(size_t id, std::map<std::string, std::vector<std::pair<size_t, size_t> > >& dictionary) const {
+  if (!exists(id)) throw db::IndexError();
+  const db::Relation& r = (*this)[id];
+
+  checkRelation(r); //D.R.Y.
+
+  for (std::list<std::pair<size_t,size_t> >::const_iterator it = r.members().begin(); it != r.members().end(); ++it) {
+    //it->first == arrayset-id, it->second == array-id
+    const db::Arrayset& arrayset = (*m_parent)[it->first];
+    dictionary[arrayset.getRole()].push_back(std::make_pair(it->first, it->second));
+  }
+}
+
 void db::Relationset::checkRelation(const db::Relation& r) const {
   if (!m_parent) throw db::Uninitialized();
   if (!m_rule.size()) throw db::Uninitialized();

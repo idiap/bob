@@ -12,6 +12,7 @@
 #include <string>
 #include <cstdlib>
 #include <map>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 #include "database/Relation.h"
@@ -197,6 +198,15 @@ namespace Torch { namespace database {
        */
       bool exists(size_t relation_id) const;
       bool exists(const std::string& rule_role) const;
+
+      /**
+       * Given a certain internal relation checks, I can fill a map for you
+       * that maps roles to pairs (arrayset-id, array-id), so you get a
+       * segmented representation of a Relation. You must pass a std::map in
+       * which the keys are the roles and the values are vectors of pairs
+       * (arrayset-id, array-id).
+       */
+      void fillMemberMap(size_t relation_id, std::map<std::string, std::vector<std::pair<size_t, size_t> > >& dictionary) const;
 
     private: //a few helpers for the work
 

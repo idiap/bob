@@ -55,6 +55,20 @@ static void pythonic_set_rule (db::Relationset& rs, const std::string& role, boo
   else rs.add(role, obj);
 }
 
+static dict fill_member_map (const db::Relationset& rs, size_t id) {
+  dict retval;
+  std::map<std::string, std::vector<std::pair<size_t, size_t> > > tmp;
+  rs.fillMemberMap(id, tmp);
+  for (std::map<std::string, std::vector<std::pair<size_t, size_t> > >::const_iterator it = tmp.begin(); it != tmp.end(); ++it) {
+    list l;
+    for (std::vector<std::pair<size_t, size_t> >::const_iterator vit = it->second.begin(); vit != it->second.end(); ++vit) {
+      l.append(make_tuple(vit->first, vit->second)); 
+    }
+    retval[it->first] = tuple(l);
+  }
+  return retval;
+}
+
 void bind_database_relationset() {
   class_<db::Relationset, boost::shared_ptr<db::Relationset> >("Relationset", "A Relationset describes groupings of Array/Arraysets in a Dataset.", init<>("Builds a new Relationset."))
     .def("consolidateIds", &db::Relationset::consolidateIds, "Re-writes the ids of every relation so they are numbered sequentially and by the order of insertion.")
@@ -65,6 +79,7 @@ void bind_database_relationset() {
     .def("relations", &get_relations, "All Relation's in this Relationset")    
     .def("roles", &get_roles, "All roles described in this Relationset")
     .def("rules", &get_rules, "All rules described in this Relationset")
+    .def("memberDict", &fill_member_map, "Returns a python dictionary binding roles to members in a specific relation")
     
     //some manipulations
     .def("append", (size_t (db::Relationset::*)(boost::shared_ptr<const db::Relation>))&db::Relationset::add, (arg("self"), arg("relation")))
