@@ -71,17 +71,17 @@ void db::Arrayset::add (size_t id, boost::shared_ptr<const db::Array> array) {
 }
 
 void db::Arrayset::add (size_t id, const db::Array& array) {
-  if (m_inlined) (*m_inlined)[id] = array;
+  if (m_inlined) m_inlined->add(id, array);
   else m_external->add(id, array);
 }
 
 void db::Arrayset::add (size_t id, const db::detail::InlinedArrayImpl& array) {
-  if (m_inlined) (*m_inlined)[id] = array;
+  if (m_inlined) m_inlined->add(id, array);
   else m_external->add(id, array);
 }
 
 void db::Arrayset::add (size_t id, const std::string& filename, const std::string& codec) {
-  if (m_inlined) (*m_inlined)[id] = db::Array(filename, codec);
+  if (m_inlined) m_inlined->add(id, db::Array(filename, codec));
   else m_external->add(id, db::Array(filename, codec));
 }
 

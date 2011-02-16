@@ -59,7 +59,7 @@ struct T {
  */
 std::string temp_file() {
   boost::filesystem::path tpl = Torch::core::tmpdir();
-  tpl /= "torchtest_core_binformatXXXXXX.bin";
+  tpl /= "torchtest_database_datasetXXXXXX.xml";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),4);
@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( dbDataset_load_xml )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
+  char *testdata_cpath = getenv("TORCH_TESTDATA_PATH");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
     Torch::core::error << "Environment variable $TORCH_TESTDATA_PATH " <<
       "is not set. " << "Have you setup your working environment " <<
@@ -126,6 +126,9 @@ BOOST_AUTO_TEST_CASE( dbDataset_load_xml )
   testdata_path /= "db_inline.xml";
 
   Torch::database::Dataset d(testdata_path.string());
+
+  boost::filesystem::path tpl = temp_file();
+  d.save(tpl.string());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -94,8 +94,8 @@ size_t tdd::InlinedArraysetImpl::add (boost::shared_ptr<const db::Array> array)
 
 size_t tdd::InlinedArraysetImpl::add(const db::Array& array) {
   checkCompatibility(array);
-  m_index[getNextFreeId()] = boost::make_shared<db::Array>(array); 
   updateTyping(array);
+  m_index[getNextFreeId()] = boost::make_shared<db::Array>(array); 
   return m_index.rbegin()->first;
 }
 
@@ -106,14 +106,14 @@ void tdd::InlinedArraysetImpl::add(size_t id, boost::shared_ptr<const Torch::dat
 void tdd::InlinedArraysetImpl::add(size_t id, const Torch::database::Array& array) {
   if (m_index.find(id) != m_index.end()) throw db::IndexError();
   checkCompatibility(array);
-  m_index[id] = boost::make_shared<db::Array>(array); 
   updateTyping(array);
+  m_index[id] = boost::make_shared<db::Array>(array); 
 }
 
 size_t tdd::InlinedArraysetImpl::adopt (boost::shared_ptr<db::Array> array) {
   checkCompatibility(*array.get());
-  m_index[getNextFreeId()] = array;
   updateTyping(*array.get());
+  m_index[getNextFreeId()] = array;
   return m_index.rbegin()->first;
 }
 
