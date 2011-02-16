@@ -203,10 +203,6 @@ class DatasetTest(unittest.TestCase):
     self.assertEqual(len(index['pattern1']), len(index['pattern9']))
     self.assertEqual(len(index['pattern1']), len(index['__id__']))
 
-  def test07_canWrite(self):
-    # TODO:
-    pass
-
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \

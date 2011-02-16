@@ -6,9 +6,12 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/make_shared.hpp>
 
 #include "database/ArrayCodec.h"
 #include "database/ArraysetCodec.h"
+#include "database/ArrayCodecRegistry.h"
+#include "database/ArraysetCodecRegistry.h"
 
 using namespace boost::python;
 namespace db = Torch::database;
@@ -56,11 +59,13 @@ class ArrayCodecWrapper: public db::ArrayCodec, public wrapper<db::ArrayCodec> {
     }
 
     void save (const std::string& filename, const db::detail::InlinedArrayImpl& data) const {
-      this->get_override("save")(filename, data);
+      this->get_override("save")(filename, db::Array(data));
     }
 
     const std::string& name () const {
-      return this->get_override("name")();
+      object o = this->get_override("name")();
+      m_name = extract<std::string>(o)();
+      return m_name;
     }
 
     const std::vector<std::string>& extensions () const {
@@ -73,13 +78,62 @@ class ArrayCodecWrapper: public db::ArrayCodec, public wrapper<db::ArrayCodec> {
 
   private:
 
+    mutable std::string m_name;
     mutable std::vector<std::string> m_extensions;
 
 };
 
-void bind_database_codec() {
+static tuple get_array_codec_names() {
+  list retval;
+  std::vector<std::string> names;
+  db::ArrayCodecRegistry::getCodecNames(names);
+  for (std::vector<std::string>::const_iterator it=names.begin(); it != names.end(); ++it) retval.append(*it);
+  return tuple(retval);
+}
 
-  class_<ArrayCodecWrapper, boost::noncopyable>("ArrayCodec")
+static tuple get_array_extensions() {
+  list retval;
+  std::vector<std::string> names;
+  db::ArrayCodecRegistry::getExtensions(names);
+  for (std::vector<std::string>::const_iterator it=names.begin(); it != names.end(); ++it) retval.append(*it);
+  return tuple(retval);
+}
+
+/**
+ * Need to override the save method of the Cxx ArrayCodec as it normally does
+ * not receive an Array as parameter, but an InlinedArrayImpl.
+ */
+static void cxx_array_codec_save (boost::shared_ptr<const db::ArrayCodec> codec, const std::string& filename, boost::shared_ptr<db::Array> array) {
+  codec->save(filename, array->get());
+}
+
+static boost::shared_ptr<db::Array> cxx_array_codec_load (boost::shared_ptr<const db::ArrayCodec> codec, const std::string& filename) {
+  return boost::make_shared<db::Array>(codec->load(filename));
+}
+
+void bind_database_codec() {
+  class_<boost::shared_ptr<const db::ArrayCodec> >("CxxArrayCodec", no_init)
+    .def("peek", &db::ArrayCodec::peek)
+    .def("load", &cxx_array_codec_load)
+    .def("save", &cxx_array_codec_save)
+    .def("name", &db::ArrayCodec::name, return_internal_reference<>())
+    .def("extensions", &db::ArrayCodec::extensions, return_internal_reference<>())
+    ;
+
+  class_<db::ArrayCodecRegistry, boost::shared_ptr<db::ArrayCodecRegistry>, boost::noncopyable>("ArrayCodecRegistry", "A Registry for Array Codecs available at runtime", no_init)
+    .def("addCodec", &db::ArrayCodecRegistry::addCodec)
+    .staticmethod("addCodec")
+    .def("getCodecByName", &db::ArrayCodecRegistry::getCodecByName)
+    .staticmethod("getCodecByName")
+    .def("getCodecByExtension", &db::ArrayCodecRegistry::getCodecByExtension)
+    .staticmethod("getCodecByExtension")
+    .def("getCodecNames", &get_array_codec_names)
+    .staticmethod("getCodecNames")
+    .def("getExtensions", &get_array_extensions)
+    .staticmethod("getExtensions")
+    ;
+
+  class_<ArrayCodecWrapper, boost::shared_ptr<ArrayCodecWrapper>, boost::noncopyable>("ArrayCodec")
     .def("peek", pure_virtual(&db::ArrayCodec::peek))
     .def("load", pure_virtual(&db::ArrayCodec::load))
     .def("save", pure_virtual(&db::ArrayCodec::save))

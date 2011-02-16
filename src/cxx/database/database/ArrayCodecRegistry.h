@@ -36,6 +36,18 @@ namespace Torch { namespace database {
       static boost::shared_ptr<const Torch::database::ArrayCodec>
         getCodecByExtension(const std::string& filename);
 
+      template <typename T>
+      static void getCodecNames(T& t) {
+        boost::shared_ptr<ArrayCodecRegistry> ptr = instance();
+        for (std::map<std::string, boost::shared_ptr<Torch::database::ArrayCodec> >::const_iterator it = ptr->s_name2codec.begin(); it != ptr->s_name2codec.end(); ++it) t.push_back(it->first);
+      }
+
+      template <typename T>
+      static void getExtensions(T& t) {
+        boost::shared_ptr<ArrayCodecRegistry> ptr = instance();
+        for (std::map<std::string, boost::shared_ptr<Torch::database::ArrayCodec> >::const_iterator it = ptr->s_extension2codec.begin(); it != ptr->s_extension2codec.end(); ++it) t.push_back(it->first);
+      }
+
     private:
       ArrayCodecRegistry(): s_name2codec(), s_extension2codec() {}
       // Not implemented
