@@ -44,9 +44,9 @@
   }
 
 #define COMPLEX_TO_COMPLEX_FULL(COMP) \
-  COMPLEX_TO_REGULAR(COMP, std::complex<float>) \
-  COMPLEX_TO_REGULAR(COMP, std::complex<double>) \
-  COMPLEX_TO_REGULAR(COMP, std::complex<long double>) 
+  COMPLEX_TO_COMPLEX(COMP, std::complex<float>) \
+  COMPLEX_TO_COMPLEX(COMP, std::complex<double>) \
+  COMPLEX_TO_COMPLEX(COMP, std::complex<long double>) 
 
   COMPLEX_TO_COMPLEX_FULL(std::complex<float>)
   COMPLEX_TO_COMPLEX_FULL(std::complex<double>)
