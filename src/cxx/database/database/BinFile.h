@@ -25,6 +25,7 @@ namespace Torch {
      * containing blitz arrays.
      */
     enum _BinFileFlag {
+      _unset   = 0,
       _append  = 1L << 0,
       _in      = 1L << 3,
       _out     = 1L << 4

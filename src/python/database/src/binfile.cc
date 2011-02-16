@@ -43,18 +43,17 @@ static tuple get_shape(const T& f) {
  */
 static boost::shared_ptr<db::BinFile>
 binfile_make_fromstr(const std::string& filename, const std::string& opmode) {
-  if (opmode[0] == 'r') {
-    return boost::make_shared<db::BinFile>(filename, db::_in);
+  db::BinFile::openmode mode = db::_unset;
+  for (size_t i=0; i<opmode.size(); ++i) {
+    if (opmode[i] == 'r') mode |= db::BinFile::in;
+    else if (opmode[i] == 'w') mode |= db::BinFile::out;
+    else if (opmode[i] == 'a' || opmode[i] == '+') mode |= db::BinFile::append; 
+    else { //anything else is just unsupported for the time being
+      PyErr_SetString(PyExc_RuntimeError, "Supported flags are 'r' (read), 'w' (write) or 'a'/'+' (append) or combination of those");
+      boost::python::throw_error_already_set();
+    }
   }
-  else if (opmode[0] == 'w') {
-    return boost::make_shared<db::BinFile>(filename, db::_out);
-  }
-  else if (opmode[0] == 'a') {
-    return boost::make_shared<db::BinFile>(filename, db::_append);
-  }
-  PyErr_SetString(PyExc_RuntimeError, "Pass a single-character string like 'r' (read), 'w' (write) or 'a' (append) as second parameter");
-  throw_error_already_set();
-  return boost::shared_ptr<db::BinFile>(); //shuts-up gcc -Wall
+  return boost::make_shared<db::BinFile>(filename, mode);
 }
 
 /**

@@ -127,6 +127,6 @@ Dataset.relationsetIndex = dataset_relationset_index
 def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""
   return getattr(self, 'read_%s_%d' % \
-      (self.elementType.name, len(self.shape)))(index)
+      (self.elementType.name, len(self.shape)))(i)
 
 BinFile.__getitem__ = binfile_getitem
