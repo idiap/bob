@@ -19,7 +19,6 @@
 #include "database/Dataset.h"
 
 #include <unistd.h>
-#include <iostream>
 
 struct T {
   blitz::Array<double,1> a;
@@ -218,10 +217,9 @@ BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_inline )
   // TODO: check consistency after loading the saved XML database
 
   //d.consolidateIds();
-  const std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> > m=d.arraysetIndex();
+/*  const std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> > m=d.arraysetIndex();
   for( std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> >::const_iterator 
-    it=m.begin(); it!=m.end(); ++it)
-    std::cout << it->first << std::endl;
+    it=m.begin(); it!=m.end(); ++it)*/
 }
 
 BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_withexternal )
@@ -247,8 +245,6 @@ BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_withexternal )
   // external array
   d[3][1].save( temp_bin_file());
   
-  std::cout << "Isloaded: " << d[3][1].isLoaded() << std::endl;
-
   // Save to XML
   boost::filesystem::path tpx = temp_xml_file();
   d.save(tpx.string());

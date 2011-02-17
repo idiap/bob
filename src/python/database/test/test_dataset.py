@@ -137,10 +137,9 @@ class DatasetTest(unittest.TestCase):
     db = torch.database.Dataset(INPUT_DATABASE)
     self.assertEqual(len(db.relationsets()), 1)
     rs = db['pattern-pattern']
-    self.assertEqual(rs.name, 'pattern-pattern')
     self.assertEqual(len(rs.relations()), 3)
-    self.assertEqual(len(rs.rules), 2)
-    self.assertEqual(len(rs.roles), len(rs.rules)) #because of the set design
+    self.assertEqual(len(rs.rules()), 2)
+    self.assertEqual(len(rs.roles()), len(rs.rules())) #because of the set design
 
     # You can also access the relationset index like it follows. This is similar
     # to accessing db.relationsets, but it puts the relationset names's as key 
@@ -168,13 +167,13 @@ class DatasetTest(unittest.TestCase):
     
     self.assertEqual(db.relationsets()[0].roles()[1], "pattern9")
 
-    self.assertEqual(db.relationsets[0].rules[0].min, 1)
+    self.assertEqual(db.relationsets()[0].rules()[0].min, 1)
 
-    self.assertEqual(db.relationsets[0].rules[1].min, 1)
+    self.assertEqual(db.relationsets()[0].rules()[1].min, 1)
     
-    self.assertEqual(db.relationsets[0].rules[0].max, 1)
+    self.assertEqual(db.relationsets()[0].rules()[0].max, 1)
     
-    self.assertEqual(db.relationsets[0].rules[1].max, 1)
+    self.assertEqual(db.relationsets()[0].rules()[1].max, 1)
 
     # You can browse the relationset rules and relations and then cross-relate
     # member array/arrayset identifiers with those in the dataset to get direct
