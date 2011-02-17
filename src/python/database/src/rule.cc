@@ -8,25 +8,14 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "core/Dataset2.h"
+#include "database/Rule.h"
 
 using namespace boost::python;
-namespace db = Torch::core;
-
-static const char* get_role(const db::Rule& r) {
-  return r.getArraysetRole().c_str();
-}
-
-static void set_role(db::Rule& r, const char* name) {
-  std::string n(name);
-  r.setArraysetRole(n);
-}
-
+namespace db = Torch::database;
 
 void bind_database_rule() {
-  class_<db::Rule, boost::shared_ptr<db::Rule> >("Rule", "A Rule describes restrictions on Array/Arrayset associations in a Dataset", init<>("Initializes a new rule"))
-    .add_property("role", &get_role, &set_role)
-    .add_property("min", &db::Rule::getMin, &db::Rule::setMin)
-    .add_property("max", &db::Rule::getMax, &db::Rule::setMax)
+  class_<db::Rule, boost::shared_ptr<db::Rule> >("Rule", "A Rule describes restrictions on Array/Arrayset associations in a Dataset", init<optional<size_t, size_t> >((arg("min"), arg("max")), "Initializes a new rule"))
+    .add_property("min", &db::Rule::getMin)
+    .add_property("max", &db::Rule::getMax)
     ;
 }

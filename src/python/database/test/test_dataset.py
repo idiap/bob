@@ -26,7 +26,7 @@ class DatasetTest(unittest.TestCase):
     # This example shows how to access the arraysets from a dataset and how to
     # access several of its properties.
     db = torch.database.Dataset(INPUT_DATABASE)
-    self.assertEqual(len(db.arraysets), 10)
+    self.assertEqual(len(db.arraysets()), 10)
     arrset_props = (
         {'role': 'pattern1', 'elemtype':torch.database.ElementType.uint16, 'shape':(3,), 'id':1},
         {'role': 'pattern2', 'elemtype':torch.database.ElementType.uint16, 'shape':(3,), 'id':2},
@@ -39,7 +39,7 @@ class DatasetTest(unittest.TestCase):
         {'role': 'pattern9', 'elemtype':torch.database.ElementType.uint32, 'shape':(3,2,2,20), 'id':9},
         {'role': 'pattern11', 'elemtype':torch.database.ElementType.complex64, 'shape':(2,), 'id':11},
         )
-    for i, arrset in enumerate(db.arraysets):
+    for i, arrset in enumerate(db.arraysets()):
       # These are a few properties of the Arrayset in question (pointed by
       # 'arrset'. As you can see, most of the C++ methods are bound in python
       # to look like simple object variables (note you don't need the function
@@ -48,13 +48,9 @@ class DatasetTest(unittest.TestCase):
       self.assertEqual(arrset.role, arrset_props[i]['role'])
       self.assertEqual(arrset.elementType, arrset_props[i]['elemtype'])
       self.assertEqual(arrset.shape, arrset_props[i]['shape'])
-      self.assertEqual(arrset.id, arrset_props[i]['id'])
 
-    # You can also access the arrayset index like it follows. This is similar
-    # to accessing db.arraysets, but it puts the arrayset id's as key of a 
-    # dictionary so you can access the dataset contents by them.
-    self.assertEqual(type(db.arraysetIndex), dict)
-    self.assertEqual(len(db.arraysetIndex), len(db.arraysets))
+    # You can also access the arrayset index like it follows. 
+    self.assertEqual(type(db.ids()), tuple)
   
   def test03_CanBrowseArraysTransparently(self):
     # There are 2 sub-classes of arraysets in the database: An inlined version
@@ -87,10 +83,10 @@ class DatasetTest(unittest.TestCase):
     # inside a given arrayset.
     self.assertEqual(len(db[11]), 2) #contains 2 arrays
 
-    # lets get the arrays and iterate over them
-    array_ids = (1, 2)
-    for i, k in enumerate(db[11].arrays):
-      self.assertEqual(array_ids[i], k.id)
+    # lets get the arrays ids and iterate over them
+    expects = (1, 2)
+    for k, id in enumerate(db[11].ids()):
+      self.assertEqual(expects[k], id)
 
     # Needless to say, you can incarnate torch Array objects (python equivalent
     # of the C++ side blitz::Array<>) as simply. You have two options here. You
@@ -103,7 +99,7 @@ class DatasetTest(unittest.TestCase):
     # a concatencation of __getitem__() ([]) operators. The first instance
     # works for addressing the Arrayset #9 while the second addresses the Array
     # with array-id = 2.
-    bzarray = db[11][2].copy() #copy the second array
+    bzarray = db[11][2].copy() #bzarray copy
     self.assertEqual(bzarray[0], complex(9.,3.))
     self.assertEqual(bzarray[1], complex(5.,7.))
 
@@ -114,12 +110,12 @@ class DatasetTest(unittest.TestCase):
     self.assertNotEqual(dbvalue[0], complex(13.,2.5))
 
     # This is not at all what would happen if you decide to refer() instead:
-    bzarray = db[11][2].refer() #refers to the second array
+    bzarray = db[11][2].get() #refers to the second array
     self.assertEqual(bzarray[0], complex(9.,3.))
     self.assertEqual(bzarray[1], complex(5.,7.))
     bzarray[0] = complex(13.,2.5)
     self.assertEqual(bzarray[0], complex(13.,2.5))
-    dbvalue = db[11][2].refer() #another pointer / same location
+    dbvalue = db[11][2].get() #another pointer / same location
     self.assertEqual(dbvalue[0], complex(13.,2.5)) #!
 
     # The advantages and disadvantages on using one or the other technique are
@@ -130,25 +126,26 @@ class DatasetTest(unittest.TestCase):
     # in the array documentation, in case you need it. You can also look at
     # test_array.py for more information and code examples.
 
-    # TODO: External arrayset loading is not yet implemented as of today.
-    # TODO: External array loading is also not yet implemented.
+    # Note on external arrays and arraysets: It should be transparent to you if
+    # arrays are served from memory or disk. You can check using
+    # Arrayset.loaded or Array.loaded properties to see if the arrays are in
+    # memory or not.
 
   def test05_CanBrowseRelationsets(self):
     # This example shows how to access the relationsets from a dataset and how
     # to access several of its properties.
     db = torch.database.Dataset(INPUT_DATABASE)
-    self.assertEqual(len(db.relationsets), 1)
+    self.assertEqual(len(db.relationsets()), 1)
     rs = db['pattern-pattern']
-    self.assertEqual(rs.name, 'pattern-pattern')
-    self.assertEqual(len(rs.relations), 3)
-    self.assertEqual(len(rs.rules), 2)
-    self.assertEqual(len(rs.roles), len(rs.rules)) #because of the set design
+    self.assertEqual(len(rs.relations()), 3)
+    self.assertEqual(len(rs.rules()), 2)
+    self.assertEqual(len(rs.roles()), len(rs.rules())) #because of the set design
 
     # You can also access the relationset index like it follows. This is similar
     # to accessing db.relationsets, but it puts the relationset names's as key 
     # of a dictionary so you can access the dataset contents by them.
-    self.assertEqual(type(db.relationsetIndex), dict)
-    self.assertEqual(len(db.relationsetIndex), len(db.relationsets))
+    self.assertEqual(type(db.relationsetIndex()), dict)
+    self.assertEqual(len(db.relationsetIndex()), len(db.relationsets()))
 
     # You can also use the [] operator to access rules (give role as parameter)
     # or relations (give relation-id as parameter). The same rule as for
@@ -163,45 +160,37 @@ class DatasetTest(unittest.TestCase):
     # In our example database there is a relationset that establishes a simple 
     # relationship between objects from the arraysets with role "pattern1" and
     # arraysets with role "pattern9". You can get information about the rules
-    # of the relationset using the `rule` property. Here is an example:
+    # of the relationset using the `rules` method. Here is an example:
     db = torch.database.Dataset(INPUT_DATABASE)
     
-    #equivalent to db['pattern-pattern']['pattern1'].role!
-    self.assertEqual(db.relationsets[0].rules[0].role, "pattern1")
+    self.assertEqual(db.relationsets()[0].roles()[0], "pattern1")
     
-    #equivalent to db['pattern-pattern']['pattern9'].role!
-    self.assertEqual(db.relationsets[0].rules[1].role, "pattern9")
+    self.assertEqual(db.relationsets()[0].roles()[1], "pattern9")
 
-    #equivalent to db['pattern-pattern']['pattern1'].min!
-    self.assertEqual(db.relationsets[0].rules[0].min, 1)
+    self.assertEqual(db.relationsets()[0].rules()[0].min, 1)
 
-    #equivalent to db['pattern-pattern']['pattern9'].min!
-    self.assertEqual(db.relationsets[0].rules[1].min, 1)
+    self.assertEqual(db.relationsets()[0].rules()[1].min, 1)
     
-    #equivalent to db['pattern-pattern']['pattern1'].max!
-    self.assertEqual(db.relationsets[0].rules[0].max, 1)
+    self.assertEqual(db.relationsets()[0].rules()[0].max, 1)
     
-    #equivalent to db['pattern-pattern']['pattern9'].max!
-    self.assertEqual(db.relationsets[0].rules[1].max, 1)
+    self.assertEqual(db.relationsets()[0].rules()[1].max, 1)
 
     # You can browse the relationset rules and relations and then cross-relate
     # member array/arrayset identifiers with those in the dataset to get direct
     # access to the data. Of course, this would be the painful way. We provide
-    # a method in every member to allow easier access to the arrays they are 
-    # pointing to. You only have to give me the list of arraysets in the
-    # dataset and we will do the rest. Here is how to use it. To get into it
-    # we first access another python facility that indexes the whole of the 
-    # relationset into an easily readable python dictionary. Please read the
-    # help message of torch.database.Relationset.index for details.
-    index = db.relationsets[0].index
+    # a method in Datasets to allow easier access to the arrays their
+    # Relationsets are pointing to. You only need to give me the Relationset
+    # name and I'll fetch all information for you. Please read the
+    # help message of torch.database.Dataset.relationsetIndex for details.
+    index = db.relationsetIndexByName('pattern-pattern')
     
     # The keys of 'index' are simply the roles. All (rule) roles should be 
     # there.
-    self.assertEqual(sorted(index.keys()), sorted([k.role for k in db.relationsets[0].rules] + ['__id__']))
+    self.assertEqual(sorted(index.keys()), sorted([k for k in db.relationsets()[0].roles()] + ['__id__']))
 
     # In our test case we only have 2 roles being grouped. As a plus, we also
     # append the relation-id of every relation we have into the special
-    # dictionary key '__id__', so we must have 3 keys into our index
+    # dictionary key '__id__', so we must have 3 keys at our index
     # dictionary.
     self.assertEqual(len(index), 3)
 
@@ -209,22 +198,9 @@ class DatasetTest(unittest.TestCase):
     # each role should be the same, across the relationset. Within each tuple,
     # the number of members may vary, depending on the role. We don't test for
     # that here.
-    self.assertEqual(len(index['pattern1']), len(db.relationsets[0].relations))
+    self.assertEqual(len(index['pattern1']), len(db.relationsets()[0].relations()))
     self.assertEqual(len(index['pattern1']), len(index['pattern9']))
     self.assertEqual(len(index['pattern1']), len(index['__id__']))
-
-    # This is how to access the arrays using the index. You should keep your
-    # dataset object close for that operation, as you are going to need the
-    # list of arraysets available:
-    bzarrays = [k.copy() for k in index['pattern1'][0][0].arrays(db.arraysets)]
-    self.assertEqual(len(bzarrays), 1) #a priori knowledge of the dataset
-    self.assertEqual(bzarrays[0], torch.core.array.uint16_1([43, 21, 58], (3,)))
-
-    # Another example: access the 3rd relation, 'pattern9'
-    bzarrays = [k.copy() for k in index['pattern9'][2][0].arrays(db.arraysets)]
-    self.assertEqual(len(bzarrays), 1) #a priori knowledge of the dataset
-    self.assertEqual(bzarrays[0].shape(), (3,2,2,20))
-    # ... other checks?
 
 if __name__ == '__main__':
   sys.argv.append('-v')

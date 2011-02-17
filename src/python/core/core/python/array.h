@@ -17,6 +17,7 @@
 #include <sstream>
 
 #include "core/logging.h"
+#include "core/array_common.h"
 #include "core/python/ndarray.h"
 #include "core/python/TypeMapper.h"
 
@@ -83,17 +84,6 @@ namespace blitz {
 #endif
 
 }
-
-/**
- * Defines the diffType and sizeType in case blitz (old) don't have it defined
- * already.
- */
-#ifndef HAVE_BLITZ_SIZETYPE
-namespace blitz { typedef int sizeType; }
-#endif
-#ifndef HAVE_BLITZ_DIFFTYPE
-namespace blitz { typedef int diffType; }
-#endif
 
 namespace Torch { namespace python {
 

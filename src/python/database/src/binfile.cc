@@ -3,19 +3,21 @@
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  * @date Wed 26 Jan 2011 07:46:17
  *
- * @brief Python bindings to Torch::core::BinFile
+ * @brief Python bindings to db::BinFile
  */
 
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/preprocessor/stringize.hpp>
+#include <blitz/array.h>
 
-#include "core/BinFile.h"
+#include "database/BinFile.h"
 
 #include <iostream>
 
 using namespace boost::python;
-namespace db = Torch::core;
+namespace db = Torch::database;
 
 template <typename T>
 static tuple get_shape(const T& f) {
@@ -37,32 +39,49 @@ static tuple get_shape(const T& f) {
 }
 
 /**
- * Converts an image from any format into grayscale.
+ * Allows us to write BinFile("filename.bin", "rb")
  */
-static boost::shared_ptr<Torch::core::BinFile> 
-binfile_make_fromint(const std::string& filename, int i)
-{
-  boost::shared_ptr<Torch::core::BinFile> retval(new Torch::core::BinFile(
-    filename, static_cast<Torch::core::BinFile::openmode>(i) ) );
-  return retval;
+static boost::shared_ptr<db::BinFile>
+binfile_make_fromstr(const std::string& filename, const std::string& opmode) {
+  db::BinFile::openmode mode = db::_unset;
+  for (size_t i=0; i<opmode.size(); ++i) {
+    if (opmode[i] == 'r') mode |= db::BinFile::in;
+    else if (opmode[i] == 'w') mode |= db::BinFile::out;
+    else if (opmode[i] == 'a' || opmode[i] == '+') mode |= db::BinFile::append; 
+    else { //anything else is just unsupported for the time being
+      PyErr_SetString(PyExc_RuntimeError, "Supported flags are 'r' (read), 'w' (write) or 'a'/'+' (append) or combination of those");
+      boost::python::throw_error_already_set();
+    }
+  }
+  return boost::make_shared<db::BinFile>(filename, mode);
+}
+
+/**
+ * Allows us to write BinFile("filename.bin") and open that file for reading
+ */
+static boost::shared_ptr<db::BinFile>
+binfile_make_readable(const std::string& filename) {
+  return boost::make_shared<db::BinFile>(filename, db::_in);
+}
+
+/**
+ * blitz::Array<> writing
+ */
+template <typename T, int D> 
+static void bzwrite(db::BinFile& f, blitz::Array<T,D>& bz) {
+  f.write(db::detail::InlinedArrayImpl(bz));
 }
 
 
 static const char* ARRAY_READ_DOC = "Reads data in the binary file and return a blitz::Array with a copy of this data.";
 static const char* ARRAY_WRITE_DOC = "Writes a single blitz::Array<> into the binary file. Please note that this array should conform to the shape and element type of the arrays already inserted. If no array was inserted, the element type and shape will be defined when you first write an array to this binary file.";
-#define ARRAY_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(read_ ## N ## _ ## D), (blitz::Array<T,D> (db::BinFile::*)(size_t))&db::BinFile::read<T,D>, (arg("self"), arg("index")), ARRAY_READ_DOC) \
-.def("append", (void (db::BinFile::*)(const blitz::Array<T,D>&))&db::BinFile::write<T,D>, (arg("self"), arg("array")), ARRAY_WRITE_DOC)
-
+#define ARRAY_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(__getitem_ ## N ## _ ## D ## __), (blitz::Array<T,D> (db::BinFile::*)(size_t))&db::BinFile::read<T,D>, (arg("self"), arg("index")), ARRAY_READ_DOC) \
+.def("write", &bzwrite<T,D>, (arg("self"), arg("array")), ARRAY_WRITE_DOC)
 
 void bind_database_binfile() {
-  enum_<Torch::core::BinFile::openmode>("openmode")
-        .value("inp", Torch::core::BinFile::in)
-        .value("out", Torch::core::BinFile::out)
-        .value("append", Torch::core::BinFile::append)
-        ;
-
-  class_<db::BinFile, boost::shared_ptr<db::BinFile>, boost::noncopyable>("BinFile", "A BinFile allows users to read and write data from and to files containing standard Torch binary coded data", init<const std::string&, Torch::core::BinFile::openmode>((arg("filename"),arg("openmode")), "Initializes an binary file reader. Please note that this constructor will not load the data."))
-    .def("__init__", make_constructor(binfile_make_fromint))
+  class_<db::BinFile, boost::shared_ptr<db::BinFile>, boost::noncopyable>("BinFile", "A BinFile allows users to read and write data from and to files containing standard Torch binary coded data", no_init)
+    .def("__init__", make_constructor(binfile_make_fromstr, default_call_policies(), (arg("filename"), arg("openmode_string"))), "Opens a new file for reading (pass 'r' as second parameter), writing (pass 'w') or appending (pass 'a') depending on the given flag.")
+    .def("__init__", make_constructor(binfile_make_readable, default_call_policies(), (arg("filename"))), "Opens a new file for reading")
     .add_property("shape", &get_shape<db::BinFile>, "The shape of arrays in this binary file. Please note all arrays in the file have necessarily the same shape.")
     .add_property("elementType", &db::BinFile::getElementType, "The type of array elements contained in this binary file. This would be equivalent to the 'T' bit in blitz::Array<T,D>.")
     .def("__len__", &db::BinFile::getNSamples, "The number of arrays in this binary file.")
@@ -77,8 +96,10 @@ void bind_database_binfile() {
     ARRAY_DEF(uint64_t, uint64, 1)
     ARRAY_DEF(float, float32, 1)
     ARRAY_DEF(double, float64, 1)
+    ARRAY_DEF(double, float128, 1)
     ARRAY_DEF(std::complex<float>, complex64, 1)
     ARRAY_DEF(std::complex<double>, complex128, 1)
+    ARRAY_DEF(std::complex<double>, complex256, 1)
     ARRAY_DEF(bool, bool, 2)
     ARRAY_DEF(int8_t, int8, 2)
     ARRAY_DEF(int16_t, int16, 2)
@@ -90,8 +111,10 @@ void bind_database_binfile() {
     ARRAY_DEF(uint64_t, uint64, 2)
     ARRAY_DEF(float, float32, 2)
     ARRAY_DEF(double, float64, 2)
+    ARRAY_DEF(double, float128, 2)
     ARRAY_DEF(std::complex<float>, complex64, 2)
     ARRAY_DEF(std::complex<double>, complex128, 2)
+    ARRAY_DEF(std::complex<double>, complex256, 2)
     ARRAY_DEF(bool, bool, 3)
     ARRAY_DEF(int8_t, int8, 3)
     ARRAY_DEF(int16_t, int16, 3)
@@ -103,8 +126,10 @@ void bind_database_binfile() {
     ARRAY_DEF(uint64_t, uint64, 3)
     ARRAY_DEF(float, float32, 3)
     ARRAY_DEF(double, float64, 3)
+    ARRAY_DEF(double, float128, 3)
     ARRAY_DEF(std::complex<float>, complex64, 3)
     ARRAY_DEF(std::complex<double>, complex128, 3)
+    ARRAY_DEF(std::complex<double>, complex256, 3)
     ARRAY_DEF(bool, bool, 4)
     ARRAY_DEF(int8_t, int8, 4)
     ARRAY_DEF(int16_t, int16, 4)
@@ -116,8 +141,10 @@ void bind_database_binfile() {
     ARRAY_DEF(uint64_t, uint64, 4)
     ARRAY_DEF(float, float32, 4)
     ARRAY_DEF(double, float64, 4)
+    ARRAY_DEF(double, float128, 4)
     ARRAY_DEF(std::complex<float>, complex64, 4)
     ARRAY_DEF(std::complex<double>, complex128, 4)
+    ARRAY_DEF(std::complex<double>, complex256, 4)
     ;
 
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset name="Coco" version="1">
+  <arrayset role="pattern1" elementtype="uint16" shape="3" id="1">
+    <external-array id="3" file="test_array_codec.txt" codec="example.array.text" />
+  </arrayset>
+  <!--<external-arrayset role="pattern2" elementtype="uint16" shape="3" id="2" file="test1.bin" codec="torch.arrayset.binary"/>-->
+</dataset>
