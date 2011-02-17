@@ -134,7 +134,7 @@ def relationset_index(self):
   roles = self.roles()
   for role in roles: retval[role] = [] #initialization
   for k in self.ids():
-    for memberRole, members in self.memberDict(k):
+    for memberRole, members in self.memberDict(k).iteritems():
       retval[memberRole].append(members) #only works if initialized!
   for role in roles: retval[role] = tuple(retval[role]) #make it read-only
   return retval

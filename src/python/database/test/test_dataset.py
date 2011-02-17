@@ -186,7 +186,7 @@ class DatasetTest(unittest.TestCase):
     
     # The keys of 'index' are simply the roles. All (rule) roles should be 
     # there.
-    self.assertEqual(sorted(index.keys()), sorted([k.role for k in db.relationsets[0].rules] + ['__id__']))
+    self.assertEqual(sorted(index.keys()), sorted([k for k in db.relationsets()[0].roles()] + ['__id__']))
 
     # In our test case we only have 2 roles being grouped. As a plus, we also
     # append the relation-id of every relation we have into the special
@@ -198,7 +198,7 @@ class DatasetTest(unittest.TestCase):
     # each role should be the same, across the relationset. Within each tuple,
     # the number of members may vary, depending on the role. We don't test for
     # that here.
-    self.assertEqual(len(index['pattern1']), len(db.relationsets[0].relations))
+    self.assertEqual(len(index['pattern1']), len(db.relationsets()[0].relations()))
     self.assertEqual(len(index['pattern1']), len(index['pattern9']))
     self.assertEqual(len(index['pattern1']), len(index['__id__']))
 

@@ -21,7 +21,11 @@ torch_python_bindings(database "${pysrc}" "database" "")
 torch_python_install(database)
 
 # Our test units
-torch_python_add_test(python-database-dataset-tests
+torch_python_add_test(python-database-dataset-read-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dataset.py)
 torch_python_add_test(python-database-binfile-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_binfile.py)
+torch_python_add_test(python-database-array-codec-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_codec.py)
+torch_python_add_test(python-database-arrayset-codec-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_codec_set.py)
