@@ -45,12 +45,22 @@ static tuple get_rules(const db::Relationset& rs) {
   return tuple(l);
 }
 
-static void pythonic_set_relation (db::Relationset& rs, size_t id, boost::shared_ptr<const db::Relation> obj) {
+static void pythonic_set_relation_bsp (db::Relationset& rs, size_t id, boost::shared_ptr<const db::Relation> obj) {
   if (rs.exists(id)) rs.set(id, obj);
   else rs.add(id, obj);
 }
 
-static void pythonic_set_rule (db::Relationset& rs, const std::string& role, boost::shared_ptr<const db::Rule> obj) {
+static void pythonic_set_relation (db::Relationset& rs, size_t id, const db::Relation& obj) {
+  if (rs.exists(id)) rs.set(id, obj);
+  else rs.add(id, obj);
+}
+
+static void pythonic_set_rule_bsp (db::Relationset& rs, const std::string& role, boost::shared_ptr<const db::Rule> obj) {
+  if (rs.exists(role)) rs.set(role, obj);
+  else rs.add(role, obj);
+}
+
+static void pythonic_set_rule (db::Relationset& rs, const std::string& role, const db::Rule& obj) {
   if (rs.exists(role)) rs.set(role, obj);
   else rs.add(role, obj);
 }
@@ -82,12 +92,15 @@ void bind_database_relationset() {
     .def("memberDict", &fill_member_map, "Returns a python dictionary binding roles to members in a specific relation")
     
     //some manipulations
+    .def("append", (size_t (db::Relationset::*)(const db::Relation&))&db::Relationset::add, (arg("self"), arg("relation")))
     .def("append", (size_t (db::Relationset::*)(boost::shared_ptr<const db::Relation>))&db::Relationset::add, (arg("self"), arg("relation")))
 
     //some dictionary-like manipulations
     .def("__getitem__", (boost::shared_ptr<db::Relation> (db::Relationset::*)(const size_t))&db::Relationset::ptr, (arg("self"), arg("relation_id")))
     .def("__getitem__", (boost::shared_ptr<db::Rule> (db::Relationset::*)(const std::string&))&db::Relationset::ptr, (arg("self"), arg("rule_role")))
     .def("__setitem__", &pythonic_set_relation)
+    .def("__setitem__", &pythonic_set_relation_bsp)
     .def("__setitem__", &pythonic_set_rule)
+    .def("__setitem__", &pythonic_set_rule_bsp)
     ;
 }

@@ -124,12 +124,17 @@ void db::Dataset::set(size_t id, const db::Arrayset& arrayset) {
 }
 
 void db::Dataset::remove(size_t index) {
-  m_id2arrayset.erase(index);
+  std::map<size_t, boost::shared_ptr<db::Arrayset> >::iterator it = m_id2arrayset.find(index);
+  if (it != m_id2arrayset.end()) {
+    m_id2arrayset.erase(index);
+  }
+  else throw db::IndexError(index);
 }
 
 size_t db::Dataset::add (const std::string& name, const db::Relationset& relationset) {
   if (m_name2relationset.find(name) != m_name2relationset.end()) throw db::NameError(name);
   m_name2relationset[name] = boost::make_shared<db::Relationset>(relationset);
+  m_name2relationset[name]->setParent(this);
   return m_name2relationset.size();
 }
 
@@ -147,7 +152,12 @@ void db::Dataset::set (const std::string& name, boost::shared_ptr<const db::Rela
 }
 
 void db::Dataset::remove (const std::string& name) {
-  m_name2relationset.erase(name);
+  std::map<std::string, boost::shared_ptr<db::Relationset> >::iterator it = m_name2relationset.find(name);
+  if (it != m_name2relationset.end()) {
+    it->second->setParent(0); //in case the user holds a copy of this...
+    m_name2relationset.erase(name);
+  }
+  else throw db::NameError(name);
 }
 
 size_t db::Dataset::getNextFreeId() const {

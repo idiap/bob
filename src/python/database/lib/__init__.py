@@ -17,6 +17,24 @@ def dataset_relationset_index(self):
   return retval
 Dataset.relationsetIndex = dataset_relationset_index
 
+def dataset_eq(self, other):
+  """Compares two datasets for equality, by comparing if their arraysets and
+  relationsets are numerically equal. Please note that this method will defer
+  the comparision of arraysets and relationsets to their respective __eq__()
+  operators. Things like name and version will be skipped."""
+  if sorted(self.ids()) != sorted(other.ids()): return False
+  if sorted(self.names()) != sorted(other.names()): return False
+  for id in self.ids(): 
+    if self[id] != other[id]: return False
+  for name in self.names():
+    if self[name] != other[name]: return False
+  return True
+Dataset.__eq__ = dataset_eq
+
+def dataset_ne(self, other):
+  return not (self == other)
+Dataset.__ne__ = dataset_ne
+
 def arrayset_array_index(self):
   """Returns a dictionary containing the array ids (keys) and the arrays
   themselves (values)."""
@@ -141,6 +159,21 @@ def relationset_index(self):
 
 Relationset.index = relationset_index
 
+def relationset_eq(self, other):
+  """Compares the contents of two relationsets to see if they match"""
+  if sorted(self.roles()) != sorted(other.roles()): return False
+  for k in self.roles():
+    if self[k] != other[k]: return False
+  if sorted(self.ids()) != sorted(other.ids()): return False
+  for k in self.ids():
+    if self[k] != other[k]: return False
+  return True
+Relationset.__eq__ = relationset_eq
+
+def relationset_ne(self, other):
+  return not (self == other)
+Relationset.__ne__ = relationset_ne
+
 def dataset_relationset_index_by_name(self, name):
   """Returns a dictionary like the one in Relationset.index(), but replaces the
   member tuples with real arrays or arraysets, as requested.
@@ -166,3 +199,19 @@ def binfile_getitem(self, i):
       (self.elementType.name, len(self.shape)))(i)
 
 BinFile.__getitem__ = binfile_getitem
+
+def relation_eq(self, other):
+  return sorted(self.members()) == sorted(other.members())
+Relation.__eq__ = relation_eq
+
+def relation_ne(self, other):
+  return not (self == other)
+Relation.__ne__ = relation_ne
+
+def rule_eq(self, other):
+  return (self.min == other.min) and (self.max == other.max)
+Rule.__eq__ = rule_eq
+
+def rule_ne(self, other):
+  return not (self == other)
+Rule.__ne__ = rule_ne

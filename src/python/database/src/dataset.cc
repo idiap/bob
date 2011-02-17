@@ -54,12 +54,22 @@ static tuple get_relationsets(db::Dataset& ds) {
   return tuple(l);
 }
 
-static void pythonic_set_arrayset (db::Dataset& ds, size_t id, boost::shared_ptr<const db::Arrayset> obj) {
+static void pythonic_set_arrayset_bsp (db::Dataset& ds, size_t id, boost::shared_ptr<const db::Arrayset> obj) {
   if (ds.exists(id)) ds.set(id, obj);
   else ds.add(id, obj);
 }
 
-static void pythonic_set_relationset (db::Dataset& ds, const std::string& name, boost::shared_ptr<const db::Relationset> obj) {
+static void pythonic_set_arrayset (db::Dataset& ds, size_t id, const db::Arrayset& obj) {
+  if (ds.exists(id)) ds.set(id, obj);
+  else ds.add(id, obj);
+}
+
+static void pythonic_set_relationset_bsp (db::Dataset& ds, const std::string& name, boost::shared_ptr<const db::Relationset> obj) {
+  if (ds.exists(name)) ds.set(name, obj);
+  else ds.add(name, obj);
+}
+
+static void pythonic_set_relationset (db::Dataset& ds, const std::string& name, const db::Relationset& obj) {
   if (ds.exists(name)) ds.set(name, obj);
   else ds.add(name, obj);
 }
@@ -85,13 +95,16 @@ void bind_database_dataset() {
     .def("clearRelationsets", &db::Dataset::clearRelationsets, "Removes all Relationsets from this Dataset")
 
     //appending...
+    .def("append", (size_t (db::Dataset::*)(const db::Arrayset&))&db::Dataset::add, (arg("self"), arg("arrayset")), "Adds an arrayset to this dataset")
     .def("append", (size_t (db::Dataset::*)(boost::shared_ptr<const db::Arrayset>))&db::Dataset::add, (arg("self"), arg("arrayset")), "Adds an arrayset to this dataset")
 
     //some dictionary-like manipulations
     .def("__getitem__", (boost::shared_ptr<db::Arrayset> (db::Dataset::*)(const size_t))&db::Dataset::ptr, (arg("self"), arg("arrayset_id")), "Returns the Arrayset given its arrayset-id")
+    .def("__setitem__", &pythonic_set_arrayset_bsp, (arg("self"), arg("id"), arg("arrayset")), "Sets a given arrayset-id to point to the given arrayset")
     .def("__setitem__", &pythonic_set_arrayset, (arg("self"), arg("id"), arg("arrayset")), "Sets a given arrayset-id to point to the given arrayset")
     .def("__delitem__", (void (db::Dataset::*)(size_t))&db::Dataset::remove, (arg("self"), arg("arrayset_id")), "Erases a certain arrayset from this dataset")
     .def("__getitem__", (boost::shared_ptr<db::Relationset> (db::Dataset::*)(const std::string&))&db::Dataset::ptr, (arg("self"), arg("relationset_name")), "Returns the Relationset given its relationset-name")
+    .def("__setitem__", &pythonic_set_relationset_bsp, (arg("self"), arg("name"), arg("relationset")), "Sets a given relationset-name to point to the given relationset")
     .def("__setitem__", &pythonic_set_relationset, (arg("self"), arg("name"), arg("relationset")), "Sets a given relationset-name to point to the given relationset")
     .def("__delitem__", (void (db::Dataset::*)(const std::string&))&db::Dataset::remove, (arg("self"), arg("relationset_name")), "Erases a certain relationset from this dataset")
     ;
