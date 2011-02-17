@@ -36,10 +36,12 @@ namespace Torch { namespace database { namespace detail {
       /**
        * Specify the filename and the code to read it. If you don't specify the
        * codec, I'll try to guess it from the registry. If the user gives a
-       * relative path, it is relative to the current working directory.
+       * relative path, it is relative to the current working directory. The
+       * last parameter should be used in the case this is supposed to create a
+       * new file, in which case the specifications will not be pre-loaded.
        */
       ExternalArrayImpl(const std::string& filename, const std::string&
-          codecname="");
+          codecname="", bool newfile=false);
 
       /**
        * Destroys an array.

@@ -131,7 +131,7 @@ size_t db::Arrayset::getNSamples() const {
 
 void db::Arrayset::save(const std::string& filename, const std::string& codecname) {
   if (m_inlined) {
-    m_external.reset(new db::detail::ExternalArraysetImpl(filename, codecname));
+    m_external.reset(new db::detail::ExternalArraysetImpl(filename, codecname, true));
     m_external->set(*m_inlined);
     m_inlined.reset();
     return;

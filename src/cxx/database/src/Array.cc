@@ -52,7 +52,7 @@ const size_t* db::Array::getShape() const {
 void db::Array::save(const std::string& filename, const std::string& codecname) 
 {
   if (m_inlined) {
-    m_external.reset(new db::detail::ExternalArrayImpl(filename, codecname));
+    m_external.reset(new db::detail::ExternalArrayImpl(filename, codecname, true));
     m_external->set(*m_inlined);
     m_inlined.reset();
     return;

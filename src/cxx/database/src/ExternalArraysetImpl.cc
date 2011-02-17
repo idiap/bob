@@ -14,7 +14,7 @@
 namespace tdd = Torch::database::detail;
 
 tdd::ExternalArraysetImpl::ExternalArraysetImpl(const std::string& filename, 
-    const std::string& codecname)
+    const std::string& codecname, bool newfile)
   : m_filename(filename)
 {
   //the next instructions will raise an exception if the code is not found.
@@ -24,7 +24,7 @@ tdd::ExternalArraysetImpl::ExternalArraysetImpl(const std::string& filename,
   else {
     m_codec = Torch::database::ArraysetCodecRegistry::getCodecByExtension(filename);
   }
-  reloadSpecification();
+  if (!newfile) reloadSpecification();
 }
 
 tdd::ExternalArraysetImpl::~ExternalArraysetImpl() {}
