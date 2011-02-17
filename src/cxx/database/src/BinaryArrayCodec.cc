@@ -36,7 +36,8 @@ void db::BinaryArrayCodec::peek(const std::string& filename,
   if (!f) {
     eltype = Torch::core::array::t_unknown;
     ndim = 0;
-    throw db::FileNotReadable(filename);
+    return;
+//    throw db::FileNotReadable(filename);
   }
   eltype = f.getElementType();
   ndim = f.getNDimensions();

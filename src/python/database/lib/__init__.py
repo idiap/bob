@@ -141,7 +141,7 @@ def relationset_index(self):
 
 Relationset.index = relationset_index
 
-def dataset_relationset_index(self, name):
+def dataset_relationset_index_by_name(self, name):
   """Returns a dictionary like the one in Relationset.index(), but replaces the
   member tuples with real arrays or arraysets, as requested.
   """
@@ -156,8 +156,9 @@ def dataset_relationset_index(self, name):
     for member_tuple in retval[role]: 
       replace_role.append(tuple([map_one(self, m) for m in member_tuple]))
     retval[role] = tuple(replace_role)
+  return retval
 
-Dataset.relationsetIndex = dataset_relationset_index
+Dataset.relationsetIndexByName = dataset_relationset_index_by_name
 
 def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""

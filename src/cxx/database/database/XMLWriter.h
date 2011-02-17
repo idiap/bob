@@ -78,20 +78,23 @@ namespace Torch {
           /**
            * @brief Return an XML node containing a Relationset
            */
-//        xmlNodePtr writeRelationset( xmlDocPtr doc, const Relationset& r,
-//            bool content_inline);
+          xmlNodePtr writeRelationset( xmlDocPtr doc, std::string name,
+            boost::shared_ptr<const db::Relationset> r);
           /**
            * @brief Return an XML node containing a Rule
            */
-//        xmlNodePtr writeRule( xmlDocPtr doc, const Rule& r);
+          xmlNodePtr writeRule( xmlDocPtr doc, std::string role, 
+            boost::shared_ptr<const db::Rule>r);
           /**
            * @brief Return an XML node containing a Relation
            */
-//        xmlNodePtr writeRelation( xmlDocPtr doc, const Relation& r);
+          xmlNodePtr writeRelation( xmlDocPtr doc, const size_t id, 
+            boost::shared_ptr<const Relation> r);
           /**
            * @brief Return an XML node containing a Member
            */
-//        xmlNodePtr writeMember( xmlDocPtr doc, const Member& m);
+          xmlNodePtr writeMember( xmlDocPtr doc, const size_t arrayset_id,
+            const size_t array_id);
       };
 
     }

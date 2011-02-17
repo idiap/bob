@@ -13,6 +13,7 @@
 #include <boost/shared_array.hpp>
 
 #include <blitz/array.h>
+#include <complex>
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Array.h"
@@ -29,6 +30,10 @@ struct T {
   blitz::Array<double,4> g;
   blitz::Array<double,4> h;
 
+  blitz::Array<std::complex<double>,1> cd1;
+  blitz::Array<std::complex<double>,1> cd2;
+  blitz::Array<std::complex<float>,1> cf1;
+
   T() {
     a.resize(4);
     a = 1, 2, 3, 4;
@@ -42,6 +47,9 @@ struct T {
 
     g.resize(2,3,4,5);
     g = 37.;
+  
+    cd1.resize(4);
+    cd1 = std::complex<double>(3.,9.);
   }
 
   ~T() { }
@@ -143,6 +151,24 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_blitz )
   for(size_t i=0; i<db_g.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_g.getShape()[i], g.extent(i));
   check_equal_4d( db_g.get<double,4>(), g );
+}
+
+BOOST_AUTO_TEST_CASE( dbArray_cast_blitz )
+{
+  // Create database Arrays from blitz::arrays and check properties
+
+  // "Cast" to std::complex<double>,1
+  Torch::database::Array db_cd1(cd1);
+  cd2.resize(cd1.shape());
+  cd2 = db_cd1.cast<std::complex<double>,1>();
+  // Compare to initial array
+  check_equal_1d( cd1, cd2 );
+
+  // Cast to std::complex<float>,1
+  cf1.resize(cd1.shape());
+  cf1 = db_cd1.cast<std::complex<float>,1>();
+  // Compare to initial array
+  check_equal_1d( cd1, cf1 );
 }
 
 BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )

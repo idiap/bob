@@ -254,6 +254,26 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_1D )
   checkBlitzEqual( Y, ref);
 }
 
+BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromtocomplex_1D )
+{
+  blitz::Array<std::complex<double>,1> X(4);
+  for(int i=0; i<4; ++i)
+    X(i) = std::complex<double>(i+1,i);
+
+  blitz::Array<std::complex<float>,1> Y(4), ref(4); 
+  Y = Torch::core::cast<std::complex<float>,std::complex<double> >(X);
+
+  for(int i=0; i<4; ++i)
+    ref(i) = std::complex<float>(i+1,i);
+
+  checkBlitzEqual( Y, ref);
+
+  blitz::Array<std::complex<double>,1> Z(4); 
+  Z = Torch::core::cast<std::complex<double>,std::complex<double> >(X);
+
+  checkBlitzEqual( Z, X);
+}
+
 BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_2D )
 {
   blitz::Array<std::complex<double>,2> X(4,4);

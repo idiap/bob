@@ -62,9 +62,9 @@ namespace Torch {
       TO cast<TO, FROM>( const FROM& in);
 
     #define COMPLEX_TO_COMPLEX_FULL_DECL(COMP) \
-      COMPLEX_TO_REGULAR_DECL(COMP, std::complex<float>) \
-      COMPLEX_TO_REGULAR_DECL(COMP, std::complex<double>) \
-      COMPLEX_TO_REGULAR_DECL(COMP, std::complex<long double>)
+      COMPLEX_TO_COMPLEX_DECL(COMP, std::complex<float>) \
+      COMPLEX_TO_COMPLEX_DECL(COMP, std::complex<double>) \
+      COMPLEX_TO_COMPLEX_DECL(COMP, std::complex<long double>)
 
     COMPLEX_TO_COMPLEX_FULL_DECL(std::complex<float>)
     COMPLEX_TO_COMPLEX_FULL_DECL(std::complex<double>)

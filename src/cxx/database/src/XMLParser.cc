@@ -156,8 +156,11 @@ namespace Torch { namespace database { namespace detail {
         dataset.add(pcur.first, pcur.second);
       }
       // Parse a relationset and add it to the dataset
-      //      else if( !strcmp((const char*)cur->name, db::relationset) )
-      //        dataset.append( parseRelationset(cur) );
+      else if( !strcmp((const char*)cur->name, db::relationset) ) {
+        std::pair<std::string, boost::shared_ptr<db::Relationset> >
+          pcur = parseRelationset(cur, dataset);
+        dataset.add(pcur.first, pcur.second);
+      }
       cur = cur->next;
     }
 
@@ -296,100 +299,135 @@ namespace Torch { namespace database { namespace detail {
     xmlFreeDoc(doc);
   }
 
-  /*
-     boost::shared_ptr<Relationset> 
-     XMLParser::parseRelationset(const xmlNodePtr cur) 
-     {
-     boost::shared_ptr<Relationset> relationset(new Relationset());
-  // Parse name
-  xmlChar *str;
-  str = xmlGetProp(cur, (const xmlChar*)db::name);
-  relationset->setName( ( (str!=0?(const char *)str:"") ) );
-  TDEBUG3("Name: " << relationset->getName());
-  xmlFree(str);
 
-  // Parse the relations and rules
-  xmlNodePtr cur_relation = cur->xmlChildrenNode;
-  while(cur_relation != 0) { 
-  // Parse a rule and add it to the relationset
-  if( !strcmp((const char*)cur_relation->name, db::rule) ) 
-  relationset->append( parseRule(cur_relation) );
-  // Parse a relation and add it to the relationset
-  else if( !strcmp((const char*)cur_relation->name, db::relation) ) 
-  relationset->append( parseRelation(cur_relation) );
-  cur_relation = cur_relation->next;
-  }
+  std::pair<std::string, boost::shared_ptr<db::Relationset> >
+  XMLParser::parseRelationset(const xmlNodePtr cur, const db::Dataset& d)
+  {
+    boost::shared_ptr<Relationset> relationset(new Relationset());
+    // Set parent dataset
+    relationset->setParent(&d);
 
-  return relationset;
-  }
+    // Parse name
+    xmlChar *str;
+    str = xmlGetProp(cur, (const xmlChar*)db::name);
+    std::string str_name(str!=0 ? (const char *)str : "");
+    TDEBUG3("Name: " << str_name);
+    xmlFree(str);
 
+    // Parse the relations and rules
+    xmlNodePtr cur_relationrule = cur->xmlChildrenNode;
+    while(cur_relationrule != 0) { 
+      // Parse a relation and add it to the relationset
+      if( !strcmp((const char*)cur_relationrule->name, db::relation) ) {
+        std::pair<size_t, boost::shared_ptr<db::Relation> > 
+          pcur = parseRelation( cur_relationrule);
+        relationset->add( pcur.first, pcur.second );
+      }
+      // Parse a rule and add it to the relationset
+      else if( !strcmp((const char*)cur_relationrule->name, db::rule) ) {
+        std::pair<std::string, boost::shared_ptr<db::Rule> > 
+          pcur = parseRule( cur_relationrule);
+        relationset->add( pcur.first, pcur.second );
+      }
+      cur_relationrule = cur_relationrule->next;
+    }
 
-  boost::shared_ptr<Rule> XMLParser::parseRule(const xmlNodePtr cur) {
-  boost::shared_ptr<Rule> rule(new Rule());
-  // Parse arrayset-role
-  xmlChar *str;
-  str = xmlGetProp(cur, (const xmlChar*)db::arrayset_role);
-  rule->setArraysetRole( ( (str!=0?(const char *)str:"") ) );
-  TDEBUG3("  Arrayset-role: " << rule->getArraysetRole());
-  xmlFree(str);
-
-  // Parse min
-  str = xmlGetProp(cur, (const xmlChar*)db::min);
-  rule->setMin(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-  TDEBUG3("  Min: " << rule->getMin());
-  xmlFree(str);
-
-  // Parse max
-  str = xmlGetProp(cur, (const xmlChar*)db::max);
-  rule->setMax(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-  TDEBUG3("  Max: " << rule->getMax());
-  xmlFree(str);
-
-  return rule;
+    // Return the arrayset
+    return std::make_pair(str_name, relationset);
   }
 
 
-  boost::shared_ptr<Relation> XMLParser::parseRelation(const xmlNodePtr cur) {
-  boost::shared_ptr<Relation> relation(new Relation(m_id_role));
-  // Parse id
-  xmlChar *str;
-  str = xmlGetProp(cur, (const xmlChar*)db::id);
-  relation->setId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-  TDEBUG3("  Id: " << relation->getId());
-  xmlFree(str);
+  std::pair<std::string, boost::shared_ptr<db::Rule> >
+  XMLParser::parseRule(const xmlNodePtr cur) 
+  {
+    // Parse arrayset-role
+    xmlChar *str;
+    str = xmlGetProp(cur, (const xmlChar*)db::arrayset_role);
+    std::string str_ArraysetRole( str!=0 ? (const char *)str : "");
+    TDEBUG3("  Arrayset-role: " << str_ArraysetRole);
+    xmlFree(str);
 
-  // Parse the members
-  xmlNodePtr cur_member = cur->xmlChildrenNode;
-  while(cur_member != 0) { 
-  // Parse a member and add it to the relation
-  if( !strcmp((const char*)cur_member->name, db::member) ||
-  !strcmp((const char*)cur_member->name, db::arrayset_member) ) 
-  relation->append( parseMember(cur_member) );
-  cur_member = cur_member->next;
+    // Parse min
+    str = xmlGetProp(cur, (const xmlChar*)db::min);
+    size_t r_min = (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+    TDEBUG3("  Min: " << r_min);
+    xmlFree(str);
+
+    // Parse max
+    str = xmlGetProp(cur, (const xmlChar*)db::max);
+    size_t r_max = (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+    TDEBUG3("  Max: " << r_max);
+    xmlFree(str);
+
+    // Create the Rule
+    boost::shared_ptr<Rule> rule(new Rule(r_min, r_max));
+
+    return std::make_pair(str_ArraysetRole, rule);
   }
 
-  return relation;
-}
+
+  std::pair<size_t, boost::shared_ptr<db::Relation> >
+  XMLParser::parseRelation(const xmlNodePtr cur) 
+  {
+    // Parse id
+    xmlChar *str;
+    str = xmlGetProp(cur, (const xmlChar*)db::id);
+    size_t r_id = (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+    TDEBUG3("  Id: " << r_id);
+    xmlFree(str);
+
+    // Create the relation
+    boost::shared_ptr<Relation> relation(new Relation());
+
+    // Parse the members and add them to the relation
+    xmlNodePtr cur_member = cur->xmlChildrenNode;
+    while(cur_member != 0) { 
+      // Parse a member and add it to the relation
+      if( !strcmp((const char*)cur_member->name, db::member) ) { 
+        std::pair<size_t,size_t> p_cur = parseMember(cur_member);
+        relation->add( p_cur.first, p_cur.second);
+      }
+      else if( !strcmp((const char*)cur_member->name, db::arrayset_member) )
+        relation->add( parseArraysetMember(cur_member) );
+      cur_member = cur_member->next;
+    }
+
+    return std::make_pair(r_id, relation);
+  }
 
 
-boost::shared_ptr<Member> XMLParser::parseMember(const xmlNodePtr cur) {
-  boost::shared_ptr<Member> member(new Member());
-  // Parse array-id
-  xmlChar *str;
-  str = xmlGetProp(cur, (const xmlChar*)db::array_id);
-  member->setArrayId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-  TDEBUG3("    Array-id: " << member->getArrayId());
-  xmlFree(str);
+  std::pair<size_t,size_t> XMLParser::parseMember(const xmlNodePtr cur) 
+  {
+    // Parse array-id
+    xmlChar *str;
+    str = xmlGetProp(cur, (const xmlChar*)db::array_id);
+    size_t array_id = 
+      (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+    TDEBUG3("    Array-id: " << array_id);
+    xmlFree(str);
 
-  // Parse arrayset-id
-  str = xmlGetProp(cur, (const xmlChar*)db::arrayset_id);
-  member->setArraysetId(str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
-  TDEBUG3("    Arrayset-id: " << member->getArraysetId());
-  xmlFree(str);
+    // Parse arrayset-id
+    str = xmlGetProp(cur, (const xmlChar*)db::arrayset_id);
+    size_t arrayset_id = 
+      (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+    TDEBUG3("    Arrayset-id: " << arrayset_id);
+    xmlFree(str);
 
-  return member;
-}
-*/
+    return std::make_pair(arrayset_id, array_id);
+  } 
+
+  size_t XMLParser::parseArraysetMember(const xmlNodePtr cur) 
+  {
+    // Parse arrayset-id
+    xmlChar *str;
+    str = xmlGetProp(cur, (const xmlChar*)db::arrayset_id);
+    size_t arrayset_id = 
+      (str!=0? boost::lexical_cast<size_t>((const char*)str): 0);
+    TDEBUG3("    Arrayset-id: " << arrayset_id);
+    xmlFree(str);
+
+    return arrayset_id;
+  } 
 
   std::pair<size_t, boost::shared_ptr<db::Arrayset> >
   XMLParser::parseArrayset( const xmlNodePtr cur)
