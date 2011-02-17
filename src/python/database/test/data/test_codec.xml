@@ -5,4 +5,3 @@
   </arrayset>
   <!--<external-arrayset role="pattern2" elementtype="uint16" shape="3" id="2" file="test1.bin" codec="torch.arrayset.binary"/>-->
 </dataset>
-

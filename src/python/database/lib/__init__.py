@@ -30,16 +30,16 @@ def arrayset_append(self, *args):
   from .. import core
   if len(args) == 1:
     if isinstance(args[0], Array):
-      self.__append_array__(args[0])
+      return self.__append_array__(args[0])
     elif core.array.is_blitz_array(args[0]):
-      self.__append_array__(Array(args[0]))
+      return self.__append_array__(Array(args[0]))
     elif isinstance(args[0], (str, unicode)):
-      self.__append_array__(Array(args[0]))
-    else: 
+      return self.__append_array__(Array(args[0]))
+    else:
       raise RuntimeError, "Can only append database::Array, blitz::Array or filename to Arrayset"
   elif len(args) == 2:
     if isinstance(args[0], (str, unicode)) and instance(args[1], str):
-      self.__append_array__(args[0], args[1])
+      return self.__append_array__(args[0], args[1])
     else: 
       raise RuntimeError, "Can only append (filename,codecname) to Arrayset"
   raise RuntimeError, "This cannot happen!"
@@ -52,20 +52,40 @@ def arrayset_setitem(self, id, *args):
   if len(args) == 1:
     if isinstance(args[0], Array):
       self.__setitem_array__(id, args[0])
+      return
     elif core.array.is_blitz_array(args[0]):
       self.__setitem_array__(id, Array(args[0]))
+      return
     elif isinstance(args[0], (str, unicode)):
       self.__setitem_array__(id, Array(args[0]))
+      return
     else:
       raise RuntimeError, "Can only set database::Array, blitz::Array or filename to Arrayset"
   elif len(args) == 2:
     if isinstance(args[0], (str, unicode)) and instance(args[1], str):
       self.__setitem_array__(id, Array(args[0], args[1]))
+      return
     else: 
       raise RuntimeError, "Can only set (filename,codecname) to Arrayset"
   raise RuntimeError, "This cannot happen!"
 
 Arrayset.append = arrayset_append
+
+def arrayset_eq(self, other):
+  """Compares two arraysets for content equality. We don't compare roles!"""
+  if self.shape != other.shape: return False 
+  #if self.role != other.role: return False
+  if len(self) != len(other): return False
+  for id in self.ids():
+    if not other.exists(id): return False
+    if self[id] != other[id]: return False
+  return True
+Arrayset.__eq__ = arrayset_eq
+
+def arrayset_ne(self, other):
+  """Compares two arraysets for content inequality. We don't compare roles!"""
+  return not (self == other)
+Arrayset.__ne__ = arrayset_ne
 
 def array_get(self):
   """Returns a blitz::Array object with the internal element type"""
@@ -81,6 +101,16 @@ def array_copy(self):
   """Returns a blitz::Array object which is a copy of the internal data"""
   return getattr(self, '__cast_%s_%d__' % (self.elementType.name, len(self.shape)))()
 Array.copy = array_copy
+
+def array_eq(self, other):
+  """Compares two arrays for numeric equality"""
+  return (self.get() == other.get()).all()
+Array.__eq__ = array_eq
+
+def array_ne(self, other):
+  """Compares two arrays for numeric equality"""
+  return not (self == other)
+Array.__ne__ = array_ne
 
 def relationset_index(self):
   """Returns a standard python dictionary that contains as keys, the roles and

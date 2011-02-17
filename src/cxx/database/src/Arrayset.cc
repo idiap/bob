@@ -175,3 +175,8 @@ bool db::Arrayset::exists (size_t id) const {
 void db::Arrayset::consolidateIds () {
   if (m_inlined) m_inlined->consolidateIds();
 }
+
+db::detail::InlinedArraysetImpl db::Arrayset::get() const {
+  if (!m_inlined) return m_external->get();
+  return *m_inlined.get();
+}

@@ -79,6 +79,7 @@ void bind_database_arrayset() {
 
     //some list-like entries
     .def("__len__", &db::Arrayset::getNSamples, "The number of arrays stored in this set.")
+    .def("__append_array__", (size_t (db::Arrayset::*)(const db::Array&))&db::Arrayset::add, (arg("self"), arg("array")), "Adds an array to this set")
     .def("__append_array__", (size_t (db::Arrayset::*)(boost::shared_ptr<const db::Array>))&db::Arrayset::add, (arg("self"), arg("array")), "Adds an array to this set")
 
     //some dict-like entries

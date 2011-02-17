@@ -18,8 +18,12 @@ def get_tempfilename(prefix='torchtest_', suffix='.txt'):
   os.unlink(name)
   return name
 
-# This new python-based codec is used in our tests. Please read the
-# documentation in the class CodecTest before going through it
+# This test demonstrates how you create and add a codec that knows how to read
+# data from arbitrary file types. It also tests some of the functionality the
+# system is supposed to have. For this example, we will create a simple codec
+# that can read and write data to a simple text file.  This (arbitrary) code
+# can only digest uni-dimensional 16-bit unsigned integers. The array size is
+# variable and is annotated on the file, as the first entry.
 
 # First things first: your Codec *has* to inherit from our base class
 class TextArrayCodec(torch.database.ArrayCodec):
@@ -101,15 +105,6 @@ class CodecTest(unittest.TestCase):
  
   def test01_CanRegisterArrayCodec(self):
 
-    # This test demonstrates how you create and add a codec that knows how to
-    # read data from arbitrary file types. It also tests some of the
-    # functionality the system is supposed to have. For this example, we will
-    # create a simple codec that can read and write data to a simple text file.
-    # This (arbitrary) code can only digest uni-dimensional 16-bit unsigned 
-    # integers. The array size is variable and is annotated on the file, as the
-    # first entry.
-    # ==> The codec is defined in the top of this file, you just passed by it.
-
     # After declaring your new codec, you need to inform Torch a new codec is
     # available, by registering it with the pertinent codec registry. Since
     # this codec can load/save arrays, it is an ArrayCodec and will be
@@ -148,9 +143,12 @@ class CodecTest(unittest.TestCase):
   def test03_Transcoding(self):
 
     # We can use the codecs for simple transcoding of files from one format to
-    # another format. Let's take for example our "test1.bin" file in the test
-    # directory. This file contains 3 arrays of type blitz::Array<uint16_t, 1>
-    # We can load using a codec and just write using the other one:
+    # another format. Let's take for example our "test_array_codec.txt" file in
+    # the test directory. This file contains 1 array of type
+    # blitz::Array<uint16_t, 1>. Let's play with it combining built-in (C++)
+    # codecs and our python-based codecs and see we can go back and forth w/o
+    # problems.
+
     text = torch.database.ArrayCodecRegistry.getCodecByName("example.array.text")
     binary = torch.database.ArrayCodecRegistry.getCodecByName("torch.array.binary")
     # Lets put the results on a temporary file we scratch later
@@ -174,6 +172,10 @@ class CodecTest(unittest.TestCase):
     # And we erase both files after this
     os.unlink(tmpname)
     os.unlink(tmpname2)
+
+    # Needless to say, you can use a similar technique to transcode a whole
+    # dataset in an homogene way, by registering the codecs you want to deploy
+    # and calling save() on arraysets or arrays as you see fit.
 
 if __name__ == '__main__':
   sys.argv.append('-v')

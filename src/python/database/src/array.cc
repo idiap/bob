@@ -78,7 +78,8 @@ void bind_database_array() {
     .value("complex256", array::t_complex256)
     ;
 
-  class_<db::Array, boost::shared_ptr<db::Array> >("Array", "Dataset Arrays represent pointers to concrete data serialized on a database. You can load or refer to real blitz::Arrays using this type.", init<const std::string&, optional<const std::string&> >((arg("filename"),arg("codecname")=""), "Initializes a new array from an external file. An optional codec may be passed."))
+  typedef const db::Array ConstArray;
+  class_<db::Array, boost::shared_ptr<db::Array>, boost::shared_ptr<ConstArray> >("Array", "Dataset Arrays represent pointers to concrete data serialized on a database. You can load or refer to real blitz::Arrays using this type.", init<const std::string&, optional<const std::string&> >((arg("filename"),arg("codecname")=""), "Initializes a new array from an external file. An optional codec may be passed."))
     .def("save", &db::Array::save, array_save_overloads((arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the array into a file. It will save if the array is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."))
     .def("load", &db::Array::load)
     .add_property("loaded", &db::Array::isLoaded)

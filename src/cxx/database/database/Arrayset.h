@@ -211,6 +211,14 @@ namespace Torch {
         template<typename T, int D> blitz::Array<T,D> cast (size_t index) const;
 
         /**
+         * This is a non-templated version of the get() method that returns a
+         * generic array, used for typeless manipulations. 
+         *
+         * @warning You do NOT want to use this!
+         */
+        detail::InlinedArraysetImpl get() const;
+
+        /**
          * Consolidates the ids of inner Arrays by re-numbering them
          * sequentially, starting at 1.
          */
