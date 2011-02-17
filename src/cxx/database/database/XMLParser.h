@@ -32,10 +32,10 @@ namespace Torch {
     class Dataset;
     class Arrayset;
     class Array;
-    //class Relationset;
-    //class Rule;
+    class Relationset;
+    class Rule;
     //class Member;
-    //class Relation;
+    class Relation;
 
     namespace detail {
 
@@ -85,7 +85,8 @@ namespace Torch {
            * @brief Parse a relationset given an XML node and return the 
            * corresponding object.
            */
-//        boost::shared_ptr<Relationset> parseRelationset(xmlNodePtr node);
+          std::pair<std::string, boost::shared_ptr<Relationset> >
+            parseRelationset(xmlNodePtr node);
 
           /**
            * @brief Parse an array given an XML node and return the 
@@ -100,13 +101,15 @@ namespace Torch {
            * @brief Parse a rule given an XML node and return the 
            * corresponding object.
            */
-//        boost::shared_ptr<Rule> parseRule(xmlNodePtr node);
+          std::pair<std::string, boost::shared_ptr<Rule> > 
+            parseRule(xmlNodePtr node);
 
           /**
            * @brief Parse a relation given an XML node and return the 
            * corresponding object.
            */
-//        boost::shared_ptr<Relation> parseRelation(xmlNodePtr node);
+          std::pair<size_t, boost::shared_ptr<Relation> > 
+            parseRelation(xmlNodePtr node);
 
           /**
            * @brief Parse the data of an array given a tokenized string, and
@@ -116,11 +119,16 @@ namespace Torch {
           template <typename T,int D> blitz::Array<T,D> parseArrayData(
             boost::tokenizer<boost::char_separator<char> > tok,
             const blitz::TinyVector<int,D> shape);
-            /**
+          /**
            * @brief Parse a member given an XML node and return the 
-           * corresponding object.
+           * corresponding ids.
            */
-//        boost::shared_ptr<Member> parseMember(xmlNodePtr node);
+          std::pair<size_t,size_t> parseMember(xmlNodePtr node);
+          /**
+           * @brief Parse an Arrayset-member given an XML node and return the
+           * corresponding arrayset id.
+           */
+          size_t parseArraysetMember(xmlNodePtr node);
 
 
           /**
@@ -134,8 +142,6 @@ namespace Torch {
       template <typename T,int D> blitz::Array<T,D> XMLParser::parseArrayData(
         boost::tokenizer<boost::char_separator<char> > tok,
         const blitz::TinyVector<int,D> shape)
-//        size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY], 
-//        size_t nb_dim)
       {
         blitz::Array<T,D> array(shape);
         T* data_array = array.data();
