@@ -86,7 +86,7 @@ namespace Torch {
            * corresponding object.
            */
           std::pair<std::string, boost::shared_ptr<Relationset> >
-            parseRelationset(xmlNodePtr node);
+            parseRelationset(xmlNodePtr node, const Dataset& d);
 
           /**
            * @brief Parse an array given an XML node and return the 

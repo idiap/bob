@@ -158,7 +158,7 @@ namespace Torch { namespace database { namespace detail {
       // Parse a relationset and add it to the dataset
       else if( !strcmp((const char*)cur->name, db::relationset) ) {
         std::pair<std::string, boost::shared_ptr<db::Relationset> >
-          pcur = parseRelationset(cur);
+          pcur = parseRelationset(cur, dataset);
         dataset.add(pcur.first, pcur.second);
       }
       cur = cur->next;
@@ -301,9 +301,12 @@ namespace Torch { namespace database { namespace detail {
 
 
   std::pair<std::string, boost::shared_ptr<db::Relationset> >
-  XMLParser::parseRelationset(const xmlNodePtr cur) 
+  XMLParser::parseRelationset(const xmlNodePtr cur, const db::Dataset& d)
   {
     boost::shared_ptr<Relationset> relationset(new Relationset());
+    // Set parent dataset
+    relationset->setParent(&d);
+
     // Parse name
     xmlChar *str;
     str = xmlGetProp(cur, (const xmlChar*)db::name);
