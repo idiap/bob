@@ -38,9 +38,6 @@ class DatasetWritingTest(unittest.TestCase):
     db2 = torch.database.Dataset(tmpname)
     os.unlink(tmpname)
 
-    # Now test loading from a string
-    db3 = torch.database.loadString(db2.xml)
-
     # TODO: check db == db2 == db3
 
   def todo_test02_CanCreateFromScratch(self):

@@ -29,6 +29,7 @@ namespace Torch { namespace database {
     public:
 
       static void addCodec(boost::shared_ptr<Torch::database::ArraysetCodec> codec);
+      static void removeCodecByName(const std::string& codecname);
 
       static boost::shared_ptr<const Torch::database::ArraysetCodec>
         getCodecByName(const std::string& name);

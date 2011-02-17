@@ -177,6 +177,17 @@ class CodecTest(unittest.TestCase):
     # dataset in an homogene way, by registering the codecs you want to deploy
     # and calling save() on arraysets or arrays as you see fit.
 
+  def test04_Deregistration(self):
+
+    # You can deregister one or many codecs using the removeCodecByName()
+    # static method.
+    torch.database.ArrayCodecRegistry.removeCodecByName("example.array.text")
+
+    self.assertEqual('example.array.text' not in
+        torch.database.ArrayCodecRegistry.getCodecNames(), True)
+    self.assertEqual('.Xtxt' not in
+        torch.database.ArrayCodecRegistry.getExtensions(), True)
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
