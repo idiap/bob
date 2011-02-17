@@ -144,8 +144,8 @@ class DatasetTest(unittest.TestCase):
     # You can also access the relationset index like it follows. This is similar
     # to accessing db.relationsets, but it puts the relationset names's as key 
     # of a dictionary so you can access the dataset contents by them.
-    self.assertEqual(type(db.relationsetIndex), dict)
-    self.assertEqual(len(db.relationsetIndex), len(db.relationsets))
+    self.assertEqual(type(db.relationsetIndex()), dict)
+    self.assertEqual(len(db.relationsetIndex()), len(db.relationsets()))
 
     # You can also use the [] operator to access rules (give role as parameter)
     # or relations (give relation-id as parameter). The same rule as for
@@ -182,7 +182,7 @@ class DatasetTest(unittest.TestCase):
     # Relationsets are pointing to. You only need to give me the Relationset
     # name and I'll fetch all information for you. Please read the
     # help message of torch.database.Dataset.relationsetIndex for details.
-    index = db.relationsetIndex('pattern-pattern')
+    index = db.relationsetIndexByName('pattern-pattern')
     
     # The keys of 'index' are simply the roles. All (rule) roles should be 
     # there.
