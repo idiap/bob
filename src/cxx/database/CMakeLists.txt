@@ -47,7 +47,7 @@ torch_test(database array test/array.cc)
 torch_test(database arrayset test/arrayset.cc)
 torch_test(database dataset test/dataset.cc)
 set_property(TEST cxx-database-dataset APPEND PROPERTY ENVIRONMENT
-  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test")
+  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 
 # This is where we install the XML schema definition
 set(schemadir share/torch/schema)
