@@ -177,6 +177,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   vec.push_back(db_c);
 
   // Create an Arrayset from the STL vector
+  BOOST_REQUIRE_NO_THROW(Torch::database::Arrayset db_Ar(vec));
   Torch::database::Arrayset db_Ar(vec);
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), Torch::core::array::t_float64);
@@ -188,7 +189,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
 
   // Save the Arrayset to a file
   std::string tmp_file = temp_file();
-  db_Ar.save( tmp_file );
+  BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);
@@ -303,6 +304,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   vec.push_back(db_c);
 
   // Create an Arrayset from the STL vector
+  BOOST_REQUIRE_NO_THROW(Torch::database::Arrayset db_Ar(vec));
   Torch::database::Arrayset db_Ar(vec);
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), Torch::core::array::t_float64);
@@ -323,7 +325,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
 
   // Save the Arrayset to a file
   std::string tmp_file = temp_file();
-  db_Ar.save( tmp_file );
+  BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);

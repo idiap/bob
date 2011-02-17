@@ -174,12 +174,16 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_blitz )
 BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
 {
   // Create a database Array from a blitz::array and save it to a binary file
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a(a));
   Torch::database::Array db_a(a);
+
   std::string tmp_file = temp_file();
-  db_a.save( tmp_file);
+  BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
 
   // Create a database Array from a binary file and check its properties
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a_read(tmp_file));
   Torch::database::Array db_a_read(tmp_file);
+
   BOOST_CHECK_EQUAL(db_a_read.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a_read.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a_read.isLoaded(), false);
@@ -199,7 +203,9 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
 BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
 {
   // Create a database Array from a blitz::array
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a(a));
   Torch::database::Array db_a(a);
+
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
@@ -210,7 +216,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   
   // Save it to a binary file
   std::string tmp_file = temp_file();
-  db_a.save( tmp_file);
+  BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
@@ -232,7 +238,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   check_equal_1d( a, a_get);
 
   // Call the load function and check that properties are updated
-  db_a.load();
+  BOOST_REQUIRE_NO_THROW(db_a.load());
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
@@ -248,7 +254,9 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
 BOOST_AUTO_TEST_CASE( dbArray_transform_move )
 {
   // Create a database Array from a blitz::array
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a(a));
   Torch::database::Array db_a(a);
+
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
@@ -259,7 +267,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   
   // Save it to a binary file
   std::string tmp_file = temp_file();
-  db_a.save( tmp_file);
+  BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
@@ -272,7 +280,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
 
   // Move it to another binary file
   std::string tmp_file2 = temp_file();
-  db_a.save( tmp_file2);
+  BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file2));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
@@ -286,6 +294,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
 BOOST_AUTO_TEST_CASE( dbArray_cast_inline )
 {
   // Create a database Array from a blitz::array
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a(a));
   Torch::database::Array db_a(a);
 
   // Call the cast function and check that properties remain unchanged
@@ -305,10 +314,11 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_inline )
 BOOST_AUTO_TEST_CASE( dbArray_cast_external )
 {
   // Create a database Array from a blitz::array
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a(a));
   Torch::database::Array db_a(a);
   // Save it to a binary file
   std::string tmp_file_a = temp_file();
-  db_a.save( tmp_file_a);
+  BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file_a));
 
   // Call the cast function and check that properties remain unchanged
   blitz::Array<uint8_t,1> a_get_uint8 = db_a.cast<uint8_t,1>();
@@ -316,10 +326,11 @@ BOOST_AUTO_TEST_CASE( dbArray_cast_external )
   check_equal_1d( a_get_uint8, a_get_float);
 
   // Create a database Array from a blitz::array
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_g(g));
   Torch::database::Array db_g(g);
   // Save it to a binary file
   std::string tmp_file_g = temp_file();
-  db_a.save( tmp_file_g);
+  BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file_g));
 
   // Call the get function and check that properties remain unchanged
   blitz::Array<uint8_t,4> g_get_uint8 = db_g.cast<uint8_t,4>();
@@ -370,7 +381,9 @@ BOOST_AUTO_TEST_CASE( dbArray_set )
 BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
 {
   // Create a database Array from a blitz::array
+  BOOST_CHECK_NO_THROW(Torch::database::Array db_a(a));
   Torch::database::Array db_a(a);
+
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), true);
@@ -380,7 +393,9 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 
   // Test copy constructor
+  BOOST_CHECK_NO_THROW(Torch::database::Array db_a_copy1(db_a));
   Torch::database::Array db_a_copy1(db_a);
+
   BOOST_CHECK_EQUAL(db_a.getNDim(), db_a_copy1.getNDim());
   BOOST_CHECK_EQUAL(db_a.getElementType(), db_a_copy1.getElementType());
   BOOST_CHECK_EQUAL(db_a.isLoaded(), db_a_copy1.isLoaded());
@@ -409,9 +424,10 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_inline )
 BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
 {
   // Create a database Array from a blitz::array
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a(a));
   Torch::database::Array db_a(a);
   std::string tmp_file = temp_file();
-  db_a.save( tmp_file);
+  BOOST_REQUIRE_NO_THROW(db_a.save( tmp_file));
   BOOST_CHECK_EQUAL(db_a.getNDim(), a.dimensions());
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
@@ -421,6 +437,7 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 
   // Test copy constructor
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a_copy1(db_a));
   Torch::database::Array db_a_copy1(db_a);
   BOOST_CHECK_EQUAL(db_a.getNDim(), db_a_copy1.getNDim());
   BOOST_CHECK_EQUAL(db_a.getElementType(), db_a_copy1.getElementType());
@@ -434,6 +451,7 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
   check_equal_1d( db_a.get<double,1>(), db_a_copy1.get<double,1>() );
 
   // Test copy constructor (assignment)
+  BOOST_REQUIRE_NO_THROW(Torch::database::Array db_a_copy2 = db_a);
   Torch::database::Array db_a_copy2 = db_a;
   BOOST_CHECK_EQUAL(db_a.getNDim(), db_a_copy2.getNDim());
   BOOST_CHECK_EQUAL(db_a.getElementType(), db_a_copy2.getElementType());
@@ -448,4 +466,3 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

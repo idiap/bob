@@ -183,8 +183,10 @@ BOOST_AUTO_TEST_CASE( dbDataset_nodata )
  
   // Save the Database to XML and load it
   std::string filename = temp_xml_file();
-  d3.save(filename);
+  BOOST_REQUIRE_NO_THROW(d3.save(filename));
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d4(filename));
   Torch::database::Dataset d4(filename);
+
   // Check that the name and the version are correctly set
   BOOST_CHECK_EQUAL( d3.getName().compare(d4.getName()), 0);
   BOOST_CHECK_EQUAL( d3.getVersion(), d4.getVersion());
@@ -196,23 +198,23 @@ BOOST_AUTO_TEST_CASE( dbDataset_nodata )
 BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_inline )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_TESTDATA_PATH");
+  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_TESTDATA_PATH " <<
+    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw Torch::core::Exception();
   }
   boost::filesystem::path testdata_path( testdata_cpath);
-  testdata_path /= "data";
   testdata_path /= "db_inline.xml";
 
   // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
   Torch::database::Dataset d(testdata_path.string());
   
   // Save to XML
   std::string tpx = temp_xml_file();
-  d.save(tpx);
+  BOOST_REQUIRE_NO_THROW(d.save(tpx));
 
   // TODO: check consistency after loading the saved XML database
 
@@ -225,29 +227,29 @@ BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_inline )
 BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_withexternal )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_TESTDATA_PATH");
+  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_TESTDATA_PATH " <<
+    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw Torch::core::Exception();
   }
   boost::filesystem::path testdata_path( testdata_cpath);
-  testdata_path /= "data";
   testdata_path /= "db_inline.xml";
 
   // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
   Torch::database::Dataset d(testdata_path.string());
 
   // Make the inline arrayset of id 1 an external arrayset
-  d[1].save( temp_bin_file());
+  BOOST_CHECK_NO_THROW(d[1].save( temp_bin_file()));
   // Make the inline array of id 1 of the inline arrayset of id 3 an 
   // external array
-  d[3][1].save( temp_bin_file());
+  BOOST_CHECK_NO_THROW(d[3][1].save( temp_bin_file()));
   
   // Save to XML
   boost::filesystem::path tpx = temp_xml_file();
-  d.save(tpx.string());
+  BOOST_REQUIRE_NO_THROW(d.save(tpx.string()));
 
   // TODO: check consistency after loading the saved XML database
 }
@@ -255,23 +257,23 @@ BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_withexternal )
 BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_inline_full )
 {
   // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_TESTDATA_PATH");
+  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_TESTDATA_PATH " <<
+    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
       "is not set. " << "Have you setup your working environment " <<
       "correctly?" << std::endl;
     throw Torch::core::Exception();
   }
   boost::filesystem::path testdata_path( testdata_cpath);
-  testdata_path /= "data";
   testdata_path /= "db_inline2.xml";
 
   // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
   Torch::database::Dataset d(testdata_path.string());
   
   // Save to XML
   std::string tpx = temp_xml_file();
-  d.save(tpx);
+  BOOST_REQUIRE_NO_THROW(d.save(tpx));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
