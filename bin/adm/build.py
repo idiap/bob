@@ -174,16 +174,28 @@ def install(option):
   import shutil
 
   logging.debug('Running make install...')
-  make(option, install)
+  make(option, 'install')
 
   logging.debug('Installing setup scripts...')
 
   # copies all relevant files setup, if they don't already exist
-  srcdir = os.path.join(option.source_dir, 'bin')
+  srcdir = os.path.realpath(os.path.join(option.source_dir, '..'))
   destdir = os.path.realpath(os.path.join(option.install_prefix, '..', '..'))
+
+  # we go through extra copying if installing
   if srcdir != destdir:
-    if os.path.exists(destdir): shutil.rmtree(destdir)
-    shutil.copytree(srcdir, destdir)
+    bindestdir = os.path.join(destdir, 'bin')
+    if os.path.exists(bindestdir): shutil.rmtree(bindestdir)
+    shutil.copytree(os.path.join(srcdir, 'bin'), destdir)
+
+    # finally, writes a ".version" file at the root of the directory
+    version = time.strftime("nightly@%d.%m.%Y")
+    if option.version[0] != '?': version = option.version
+    info = os.path.join(option.destdir, ".version")
+    if os.path.exists(info): os.unlink(info)
+    f = open(info, 'wt')
+    f.write(option.version)
+    f.close()
 
 def make(option, target="all"):
   """Runs "make 'target'" on the 'option.build_prefix'. If there is a problem, 
