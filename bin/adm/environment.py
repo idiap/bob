@@ -123,7 +123,7 @@ def parse_args():
                     action="store",
                     dest="root_dir",
                     default=self_root(),
-                    help="Switch to a different base installation",
+                    help="Switch to a different base installation (defaults to %default)",
                    )
                     
 
