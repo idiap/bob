@@ -17,6 +17,8 @@
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Dataset.h"
+#include "database/Arrayset.h"
+#include "database/Array.h"
 
 #include <unistd.h>
 
@@ -29,9 +31,6 @@ struct T {
   blitz::Array<float,2> e;
   blitz::Array<float,2> f;
 
-  blitz::Array<double,4> g;
-  blitz::Array<double,4> h;
-
   T() {
     a.resize(4);
     a = 1, 2, 3, 4;
@@ -42,9 +41,6 @@ struct T {
     d = 1, 2, 3, 4;
     e.resize(2,2);
     e = 5, 6, 7, 8;
-
-    g.resize(2,3,4,5);
-    g = 37.;
   }
 
   ~T() { }
@@ -105,27 +101,10 @@ void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   }
 }
 
-template<typename T, typename U> 
-void check_equal_4d(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b) 
-{
-  BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
-  BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
-  BOOST_REQUIRE_EQUAL(a.extent(2), b.extent(2));
-  BOOST_REQUIRE_EQUAL(a.extent(3), b.extent(3));
-  for (int i=0; i<a.extent(0); ++i) {
-    for (int j=0; j<a.extent(1); ++j) {
-      for (int k=0; k<a.extent(2); ++k) {
-        for (int l=0; l<a.extent(3); ++l) {
-          BOOST_CHECK_EQUAL(a(i,j,k,l), Torch::core::cast<T>(b(i,j,k,l)));
-        }
-      }
-    }
-  }
-}
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( dbDataset_nodata )
+BOOST_AUTO_TEST_CASE( dbDataset_construction )
 {
   // Create a dataset and save it in the given XML file
   std::string name = "Novel dataset example";
@@ -195,7 +174,137 @@ BOOST_AUTO_TEST_CASE( dbDataset_nodata )
   BOOST_CHECK_EQUAL(d4.relationsetIndex().empty(),true);
 }
 
-BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_inline )
+
+BOOST_AUTO_TEST_CASE( dbDataset_arrayset )
+{
+  // Create a dataset and save it in the given XML file
+  std::string name = "Novel dataset example";
+  size_t version = 1;
+  Torch::database::Dataset ds(name, version);
+
+  // Create database Arrays from blitz::arrays
+  boost::shared_ptr<Torch::database::Array> db_a1(
+    new Torch::database::Array(a));
+  boost::shared_ptr<Torch::database::Array> db_c1(
+    new Torch::database::Array(c));
+
+  // Put these database Arrays in a STL vector
+  std::vector<boost::shared_ptr<Torch::database::Array> > vec1;
+  vec1.push_back(db_a1);
+  vec1.push_back(db_c1);
+
+  // Create an Arrayset from the STL vector
+  Torch::database::Arrayset db_Ar1(vec1);
+
+  // Add the arrayset to the dataset and check the id
+  size_t id;
+  BOOST_REQUIRE_NO_THROW( id = ds.add(db_Ar1) );
+  BOOST_CHECK_EQUAL( id, 1 );
+
+  // Create database Arrays from blitz::arrays
+  boost::shared_ptr<Torch::database::Array> db_a2(
+    new Torch::database::Array(a));
+  boost::shared_ptr<Torch::database::Array> db_c2(
+    new Torch::database::Array(c));
+
+  // Put these database Arrays in a STL vector
+  std::vector<boost::shared_ptr<Torch::database::Array> > vec2;
+  vec2.push_back(db_c2);
+  vec2.push_back(db_a2);
+
+  // Create an Arrayset from the STL vector
+  Torch::database::Arrayset db_Ar2(vec2);
+
+  // Add the arrayset to the dataset
+  BOOST_REQUIRE_NO_THROW( ds.add(3, db_Ar2) );
+
+  // Access Arrayset 1 and 3 and check content
+  check_equal_1d( ds[1][1].get<double,1>(), a);
+  check_equal_1d( ds[1][2].get<double,1>(), c);
+  check_equal_1d( ds[3][1].get<double,1>(), c);
+  check_equal_1d( ds[3][2].get<double,1>(), a);
+  check_equal_1d( ds.ptr(3)->operator[](2).get<double,1>(), c);
+
+  // Add an Arrayset at an occupied position and check that an exception
+  // is thrown.
+  BOOST_CHECK_THROW( ds.add(3, db_Ar2), Torch::database::IndexError );
+
+  // Create database Arrays from blitz::arrays
+  boost::shared_ptr<Torch::database::Array> db_d3(
+    new Torch::database::Array(d));
+  boost::shared_ptr<Torch::database::Array> db_e3(
+    new Torch::database::Array(e));
+  boost::shared_ptr<Torch::database::Array> db_f3(
+    new Torch::database::Array(e));
+
+  // Put these database Arrays in a STL vector
+  std::vector<boost::shared_ptr<Torch::database::Array> > vec3;
+  vec3.push_back(db_d3);
+  vec3.push_back(db_e3);
+  vec3.push_back(db_f3);
+
+  // Create an Arrayset from the STL vector
+  Torch::database::Arrayset db_Ar3(vec3);
+
+  // Set the arrayset at a non occupied position and check that an exception
+  // is thrown.
+  BOOST_CHECK_THROW( ds.set(2, db_Ar3), Torch::database::IndexError );
+  // Set the arrayset at an occupied position and check that the dataset is
+  // updated.
+  BOOST_CHECK_NO_THROW( ds.set(1, db_Ar3) );
+  check_equal_2d( ds[1][1].get<float,2>(), d);
+  check_equal_2d( ds[1][2].get<float,2>(), e);
+  check_equal_2d( ds[1][3].get<float,2>(), e);
+  check_equal_2d( ds.ptr(1)->operator[](3).get<float,2>(), e);
+
+  // Check that the Arrayset of id 3 exists and that the next free id is 4
+  BOOST_CHECK_EQUAL( ds.exists(3), true);
+  BOOST_CHECK_EQUAL( ds.exists(2), false);
+  BOOST_CHECK_EQUAL( ds.getNextFreeId(), 4);
+  BOOST_CHECK_EQUAL( ds.arraysetIndex().size(), 2 );
+
+  // Consolidate the id: 3 is moved to 2
+  BOOST_CHECK_NO_THROW( ds.consolidateIds() );
+
+  // Remove Arrayset of id 2
+  BOOST_CHECK_NO_THROW( ds.remove(2) );
+  BOOST_CHECK_EQUAL( ds.exists(2), false);
+  BOOST_CHECK_EQUAL( ds.getNextFreeId(), 2);
+  BOOST_CHECK_EQUAL( ds.arraysetIndex().size(), 1 );
+
+  // Clear Arraysets
+  BOOST_CHECK_NO_THROW( ds.clearArraysets() );
+  BOOST_CHECK_EQUAL( ds.getNextFreeId(), 1);
+  BOOST_CHECK_EQUAL( ds.arraysetIndex().size(), 0 );
+}
+
+
+BOOST_AUTO_TEST_CASE( dbDataset_relationset )
+{
+  // Create a dataset and save it in the given XML file
+  std::string name = "Novel dataset example";
+  size_t version = 1;
+  Torch::database::Dataset ds(name, version);
+
+  // Create database Arrays from blitz::arrays
+  boost::shared_ptr<Torch::database::Array> db_a1(
+    new Torch::database::Array(a));
+  boost::shared_ptr<Torch::database::Array> db_c1(
+    new Torch::database::Array(c));
+
+  // Put these database Arrays in a STL vector
+  std::vector<boost::shared_ptr<Torch::database::Array> > vec1;
+  vec1.push_back(db_a1);
+  vec1.push_back(db_c1);
+
+  // Create an Arrayset from the STL vector
+  Torch::database::Arrayset db_Ar1(vec1);
+
+  //TODO: Add relationset
+}
+
+
+BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_inline )
 {
   // Get path to the XML Schema definition
   char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
@@ -224,7 +333,7 @@ BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_inline )
     it=m.begin(); it!=m.end(); ++it)*/
 }
 
-BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_withexternal )
+BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_withexternal )
 {
   // Get path to the XML Schema definition
   char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
@@ -254,7 +363,7 @@ BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_withexternal )
   // TODO: check consistency after loading the saved XML database
 }
 
-BOOST_AUTO_TEST_CASE( dbDataset_load_inline_save_inline_full )
+BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_inline2 )
 {
   // Get path to the XML Schema definition
   char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
