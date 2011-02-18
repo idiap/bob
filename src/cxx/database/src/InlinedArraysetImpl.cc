@@ -132,13 +132,16 @@ size_t tdd::InlinedArraysetImpl::getNextFreeId() const {
 }
 
 void tdd::InlinedArraysetImpl::consolidateIds() {
-  size_t id=1;
-  for (std::map<size_t, boost::shared_ptr<db::Array> >::iterator it = m_index.begin(); it != m_index.end(); ++it, ++id) {
-    if (id != it->first) { //displaced value, reset
-      m_index[id] = it->second;
-      m_index.erase(it->first);
+  std::vector<size_t> keys;
+  for (std::map<size_t, boost::shared_ptr<db::Array> >::iterator 
+      it = m_index.begin(); it != m_index.end(); ++it)
+    keys.push_back(it->first);
+
+  for (size_t id=1; id<=m_index.size(); ++id)
+    if (id != keys[id-1]) { //displaced value, reset
+      m_index[id] = m_index[keys[id-1]];
+      m_index.erase(keys[id-1]);
     }
-  }
 }
 
 bool tdd::InlinedArraysetImpl::exists(size_t id) const {
