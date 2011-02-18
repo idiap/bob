@@ -174,7 +174,7 @@ def install(option):
   import shutil
 
   logging.debug('Running make install...')
-  make(option, install)
+  make(option, 'install')
 
   logging.debug('Installing setup scripts...')
 
