@@ -115,7 +115,7 @@ void check_equal_4d(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b)
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( dbArray_creation_blitz )
+BOOST_AUTO_TEST_CASE( dbArray_construction_get )
 {
   // Create database Arrays from blitz::arrays and check properties
 
@@ -151,6 +151,29 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_blitz )
   for(size_t i=0; i<db_g.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_g.getShape()[i], g.extent(i));
   check_equal_4d( db_g.get<double,4>(), g );
+
+  // Copy constructor
+  Torch::database::Array db_g2(db_g);
+  BOOST_CHECK_EQUAL(db_g2.getNDim(), g.dimensions());
+  BOOST_CHECK_EQUAL(db_g2.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_g2.isLoaded(), true);
+  BOOST_CHECK_EQUAL(db_g2.getFilename().size(), 0);
+  BOOST_CHECK_EQUAL(db_g2.getCodec().use_count(), 0);
+  for(size_t i=0; i<db_g2.getNDim(); ++i)
+    BOOST_CHECK_EQUAL(db_g2.getShape()[i], g.extent(i));
+  check_equal_4d( db_g2.get<double,4>(), g );
+  
+  // Assignment
+  Torch::database::Array db_g3(db_g);
+  BOOST_CHECK_EQUAL(db_g3.getNDim(), g.dimensions());
+  BOOST_CHECK_EQUAL(db_g3.getElementType(), Torch::core::array::t_float64);
+  BOOST_CHECK_EQUAL(db_g3.isLoaded(), true);
+  BOOST_CHECK_EQUAL(db_g3.getFilename().size(), 0);
+  BOOST_CHECK_EQUAL(db_g3.getCodec().use_count(), 0);
+  for(size_t i=0; i<db_g3.getNDim(); ++i)
+    BOOST_CHECK_EQUAL(db_g3.getShape()[i], g.extent(i));
+  check_equal_4d( db_g3.get<double,4>(), g );
+  
 }
 
 BOOST_AUTO_TEST_CASE( dbArray_cast_blitz )
