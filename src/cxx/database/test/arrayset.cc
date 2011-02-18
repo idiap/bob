@@ -68,7 +68,7 @@ std::string temp_file() {
 }
 
 template<typename T, typename U> 
-void check_equal_1d(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
+void check_equal(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   for (int i=0; i<a.extent(0); ++i) {
@@ -77,7 +77,7 @@ void check_equal_1d(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b)
 }
 
 template<typename T, typename U> 
-void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
+void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -89,7 +89,7 @@ void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
 }
 
 template<typename T, typename U> 
-void check_equal_4d(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b) 
+void check_equal(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -137,6 +137,22 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
   db_Ar.index( ids);
   std::vector<size_t>::const_iterator it=ids.begin();
 
+  // Set and get attributes
+  std::string a_role("MyRole");
+  db_Ar.setRole(a_role);
+  BOOST_CHECK_EQUAL( db_Ar.getRole(), a_role);
+  BOOST_CHECK_EQUAL( db_Ar.isLoaded(), true );
+  BOOST_CHECK_EQUAL( db_Ar.getElementType(), Torch::core::array::t_float64 );
+  BOOST_CHECK_EQUAL( db_Ar.getNDim(), 1 );
+  const size_t* shape = db_Ar.getShape();
+  BOOST_CHECK_EQUAL( shape[0], 4 );
+  BOOST_CHECK_EQUAL( db_Ar.getNSamples(), 3 );
+  BOOST_CHECK_EQUAL( db_Ar.getFilename().compare(""), 0 );
+  BOOST_CHECK_EQUAL( db_Ar.exists(1), true);
+  BOOST_CHECK_EQUAL( db_Ar.exists(2), true);
+  BOOST_CHECK_EQUAL( db_Ar.exists(3), true);
+  BOOST_CHECK_EQUAL( db_Ar.exists(4), false);
+
   // Get the content of the database Arrays in blitz Arrays
   blitz::Array<double,1> a_get = db_Ar[*it].get<double,1>();
   ++it;
@@ -146,13 +162,86 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
   ++it;
  
   // Check that the content remains unchanged
-  check_equal_1d( a, a_get);
-  check_equal_1d( b, b_get);
-  check_equal_1d( c, c_get);
+  check_equal( a, a_get);
+  check_equal( b, b_get);
+  check_equal( c, c_get);
 
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
   BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::DimensionError );
+
+
+  // Copy constructor
+  Torch::database::Arrayset db_Ar2(db_Ar);
+  
+  // Reinit index
+  ids.clear();
+  db_Ar2.index( ids);
+  it=ids.begin();
+ 
+  // Check attributes 
+  BOOST_CHECK_EQUAL( db_Ar2.getRole(), a_role);
+  BOOST_CHECK_EQUAL( db_Ar2.isLoaded(), true );
+  BOOST_CHECK_EQUAL( db_Ar2.getElementType(), Torch::core::array::t_float64 );
+  BOOST_CHECK_EQUAL( db_Ar2.getNDim(), 1 );
+  shape = db_Ar2.getShape();
+  BOOST_CHECK_EQUAL( shape[0], 4 );
+  BOOST_CHECK_EQUAL( db_Ar2.getNSamples(), 3 );
+  BOOST_CHECK_EQUAL( db_Ar2.getFilename().compare(""), 0 );
+  BOOST_CHECK_EQUAL( db_Ar2.exists(1), true);
+  BOOST_CHECK_EQUAL( db_Ar2.exists(2), true);
+  BOOST_CHECK_EQUAL( db_Ar2.exists(3), true);
+  BOOST_CHECK_EQUAL( db_Ar2.exists(4), false);
+
+  // Get the content of the database Arrays in blitz Arrays
+  a_get = db_Ar2[*it].get<double,1>();
+  ++it;
+  b_get = db_Ar[*it].get<double,1>();
+  ++it;
+  c_get = db_Ar[*it].get<double,1>();
+  ++it;
+ 
+  // Check that the content remains unchanged
+  check_equal( a, a_get);
+  check_equal( b, b_get);
+  check_equal( c, c_get);
+ 
+ 
+  // Assignment
+  db_Ar2 = db_Ar;
+  
+  // Reinit index
+  ids.clear();
+  db_Ar2.index( ids);
+  it=ids.begin();
+ 
+  // Check attributes 
+  BOOST_CHECK_EQUAL( db_Ar2.getRole(), a_role);
+  BOOST_CHECK_EQUAL( db_Ar2.isLoaded(), true );
+  BOOST_CHECK_EQUAL( db_Ar2.getElementType(), Torch::core::array::t_float64 );
+  BOOST_CHECK_EQUAL( db_Ar2.getNDim(), 1 );
+  shape = db_Ar2.getShape();
+  BOOST_CHECK_EQUAL( shape[0], 4 );
+  BOOST_CHECK_EQUAL( db_Ar2.getNSamples(), 3 );
+  BOOST_CHECK_EQUAL( db_Ar2.getFilename().compare(""), 0 );
+  BOOST_CHECK_EQUAL( db_Ar2.getCodec(), db_Ar.getCodec());
+  BOOST_CHECK_EQUAL( db_Ar2.exists(1), true);
+  BOOST_CHECK_EQUAL( db_Ar2.exists(2), true);
+  BOOST_CHECK_EQUAL( db_Ar2.exists(3), true);
+  BOOST_CHECK_EQUAL( db_Ar2.exists(4), false);
+
+  // Get the content of the database Arrays in blitz Arrays
+  a_get = db_Ar2[*it].get<double,1>();
+  ++it;
+  b_get = db_Ar[*it].get<double,1>();
+  ++it;
+  c_get = db_Ar[*it].get<double,1>();
+  ++it;
+ 
+  // Check that the content remains unchanged
+  check_equal( a, a_get);
+  check_equal( b, b_get);
+  check_equal( c, c_get);
 }
 
 BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
@@ -254,32 +343,102 @@ BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
   std::vector<size_t> ids;
   db_Ar.index( ids);
   // Check the content
-  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
-  check_equal_1d( b, db_Ar[ids[1]].get<double,1>() );
-  check_equal_1d( c, db_Ar[ids[2]].get<double,1>() );
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( b, db_Ar[ids[1]].get<double,1>() );
+  check_equal( c, db_Ar[ids[2]].get<double,1>() );
 
   // Check that an exception is thrown when accessing a non-existent array
   BOOST_CHECK_THROW( db_Ar[137], Torch::database::IndexError );
 
   // Check the content when using the cast function
-  check_equal_1d( a, db_Ar[ids[0]].cast<uint32_t,1>() );
+  check_equal( a, db_Ar[ids[0]].cast<uint32_t,1>() );
 
   // Remove the second array and check
   db_Ar.remove( ids[1] );
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 2); 
-  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
-  check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
 
-  // Add blitz array and check
+  // Add a blitz array and check
   db_Ar.add( b );
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 3); 
-  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
-  check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
-  check_equal_1d( b, db_Ar[ids[2]].get<double,1>() );
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( b, db_Ar[ids[2]].get<double,1>() );
+
+  // Add a database array and check
+  boost::shared_ptr<Torch::database::Array> db_b2(
+    new Torch::database::Array(b));
+  db_Ar.add( db_b2 );
+  ids.clear();
+  db_Ar.index( ids);
+  BOOST_CHECK_EQUAL( ids.size(), 4); 
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( b, db_Ar[ids[2]].get<double,1>() );
+  check_equal( b, db_Ar[ids[3]].get<double,1>() );
+  BOOST_CHECK_EQUAL( ids[0], 1);
+  BOOST_CHECK_EQUAL( ids[1], 3);
+  BOOST_CHECK_EQUAL( ids[2], 4);
+  BOOST_CHECK_EQUAL( ids[3], 5);
+
+  // Add a blitz array and check
+  db_Ar.add( 7, b );
+  ids.clear();
+  db_Ar.index( ids);
+  BOOST_CHECK_EQUAL( ids.size(), 5); 
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( b, db_Ar[ids[2]].get<double,1>() );
+  check_equal( b, db_Ar[ids[3]].get<double,1>() );
+  check_equal( b, db_Ar[ids[4]].get<double,1>() );
+  BOOST_CHECK_EQUAL( ids[0], 1);
+  BOOST_CHECK_EQUAL( ids[1], 3);
+  BOOST_CHECK_EQUAL( ids[2], 4);
+  BOOST_CHECK_EQUAL( ids[3], 5);
+  BOOST_CHECK_EQUAL( ids[4], 7);
+
+  // Add a database array and check
+  boost::shared_ptr<Torch::database::Array> db_b3(
+    new Torch::database::Array(b));
+  db_Ar.add( 9, db_b2 );
+  ids.clear();
+  db_Ar.index( ids);
+  BOOST_CHECK_EQUAL( ids.size(), 6); 
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( b, db_Ar[ids[2]].get<double,1>() );
+  check_equal( b, db_Ar[ids[3]].get<double,1>() );
+  check_equal( b, db_Ar[ids[4]].get<double,1>() );
+  check_equal( b, db_Ar[ids[5]].get<double,1>() );
+  BOOST_CHECK_EQUAL( ids[0], 1);
+  BOOST_CHECK_EQUAL( ids[1], 3);
+  BOOST_CHECK_EQUAL( ids[2], 4);
+  BOOST_CHECK_EQUAL( ids[3], 5);
+  BOOST_CHECK_EQUAL( ids[4], 7);
+  BOOST_CHECK_EQUAL( ids[5], 9);
+
+  // Consolidate the ids
+  db_Ar.consolidateIds();
+  ids.clear();
+  db_Ar.index( ids);
+  BOOST_CHECK_EQUAL( ids.size(), 6); 
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( b, db_Ar[ids[2]].get<double,1>() );
+  check_equal( b, db_Ar[ids[3]].get<double,1>() );
+  check_equal( b, db_Ar[ids[4]].get<double,1>() );
+  check_equal( b, db_Ar[ids[5]].get<double,1>() );
+  BOOST_CHECK_EQUAL( ids[0], 1);
+  BOOST_CHECK_EQUAL( ids[1], 2);
+  BOOST_CHECK_EQUAL( ids[2], 3);
+  BOOST_CHECK_EQUAL( ids[3], 4);
+  BOOST_CHECK_EQUAL( ids[4], 5);
+  BOOST_CHECK_EQUAL( ids[5], 6);
 }
 
 BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
@@ -319,9 +478,9 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   db_Ar.index( ids);
   // Check the content
   BOOST_CHECK_EQUAL( ids.size(), 3); 
-  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
-  check_equal_1d( b, db_Ar[ids[1]].get<double,1>() );
-  check_equal_1d( c, db_Ar[ids[2]].get<double,1>() );
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( b, db_Ar[ids[1]].get<double,1>() );
+  check_equal( c, db_Ar[ids[2]].get<double,1>() );
 
   // Save the Arrayset to a file
   std::string tmp_file = temp_file();
@@ -333,30 +492,29 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 3); 
-  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
-  check_equal_1d( b, db_Ar[ids[1]].get<double,1>() );
-  check_equal_1d( c, db_Ar[ids[2]].get<double,1>() );
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( b, db_Ar[ids[1]].get<double,1>() );
+  check_equal( c, db_Ar[ids[2]].get<double,1>() );
 
   // Check the content when using the cast function
-  check_equal_1d( a, db_Ar[ids[0]].cast<uint32_t,1>() );
+  check_equal( a, db_Ar[ids[0]].cast<uint32_t,1>() );
 
   // Remove the second array and check
   db_Ar.remove( 2);
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 2); 
-  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
-  check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
 
   // Add blitz array and check
   db_Ar.add( b );
   ids.clear();
   db_Ar.index( ids);
   BOOST_CHECK_EQUAL( ids.size(), 3); 
-  check_equal_1d( a, db_Ar[ids[0]].get<double,1>() );
-  check_equal_1d( c, db_Ar[ids[1]].get<double,1>() );
-  check_equal_1d( b, db_Ar[ids[2]].get<double,1>() );
+  check_equal( a, db_Ar[ids[0]].get<double,1>() );
+  check_equal( c, db_Ar[ids[1]].get<double,1>() );
+  check_equal( b, db_Ar[ids[2]].get<double,1>() );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
