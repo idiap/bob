@@ -121,7 +121,7 @@ def parse_args():
 
   #some fixing
   if options.install_prefix and options.install_prefix[0] != os.path.sep:
-    options.install_prefix = os.path.join(pwd, options.install_prefix) 
+    options.install_prefix = os.path.join(pwd, options.install_prefix)
   if options.build_prefix and options.build_prefix[0] != os.path.sep:
     options.build_prefix = os.path.join(pwd, options.build_prefix) 
   if options.doc_prefix and options.doc_prefix[0] != os.path.sep:
@@ -139,7 +139,7 @@ if __name__ == '__main__':
   elif options.action == 'make_all':
     adm.build.make(options, 'all')
     adm.build.write_header(options)
-  elif options.action == 'make_install': adm.build.make(options, 'install')
+  elif options.action == 'make_install': adm.build.install(options)
   elif options.action == 'documentation': adm.build.doxygen(options)
   elif options.action == 'ctest': adm.build.ctest(options)
   elif options.action == 'make_clean': adm.build.make(options, 'clean')

@@ -167,6 +167,24 @@ def cmake(option):
     raise RuntimeError, '** ERROR: "cmake" did not work as expected.'
   logging.debug('Finished running cmake.')
 
+def install(option):
+  """Runs "make install" on the 'option.build_prefix'. If there is a problem, 
+  throws RuntimeError.
+  """
+  import shutil
+
+  logging.debug('Running make install...')
+  make(option, install)
+
+  logging.debug('Installing setup scripts...')
+
+  # copies all relevant files setup, if they don't already exist
+  srcdir = os.path.join(option.source_dir, 'bin')
+  destdir = os.path.realpath(os.path.join(option.install_prefix, '..', '..'))
+  if srcdir != destdir:
+    if os.path.exists(destdir): shutil.rmtree(destdir)
+    shutil.copytree(srcdir, destdir)
+
 def make(option, target="all"):
   """Runs "make 'target'" on the 'option.build_prefix'. If there is a problem, 
   throws RuntimeError.
