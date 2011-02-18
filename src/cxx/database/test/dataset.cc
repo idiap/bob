@@ -81,7 +81,7 @@ std::string temp_bin_file() {
 }
 
 template<typename T, typename U> 
-void check_equal_1d(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
+void check_equal(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   for (int i=0; i<a.extent(0); ++i) {
@@ -90,7 +90,7 @@ void check_equal_1d(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b)
 }
 
 template<typename T, typename U> 
-void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
+void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -101,6 +101,157 @@ void check_equal_2d(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   }
 }
 
+template<typename T, typename U> 
+void check_equal(const blitz::Array<T,3>& a, const blitz::Array<U,3>& b) 
+{
+  BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
+  BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
+  BOOST_REQUIRE_EQUAL(a.extent(2), b.extent(2));
+  for (int i=0; i<a.extent(0); ++i) {
+    for (int j=0; j<a.extent(1); ++j) {
+      for (int k=0; k<a.extent(2); ++k) {
+        BOOST_CHECK_EQUAL(a(i,j,k), Torch::core::cast<T>(b(i,j,k)));
+      }
+    }
+  }
+}
+
+template<typename T, typename U> 
+void check_equal(const blitz::Array<T,4>& a, const blitz::Array<U,4>& b) 
+{
+  BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
+  BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
+  BOOST_REQUIRE_EQUAL(a.extent(2), b.extent(2));
+  BOOST_REQUIRE_EQUAL(a.extent(3), b.extent(3));
+  for (int i=0; i<a.extent(0); ++i) {
+    for (int j=0; j<a.extent(1); ++j) {
+      for (int k=0; k<a.extent(2); ++k) {
+        for (int l=0; l<a.extent(3); ++l) {
+          BOOST_CHECK_EQUAL(a(i,j,k,l), Torch::core::cast<T>(b(i,j,k,l)));
+        }
+      }
+    }
+  }
+}
+
+void check_equal( const Torch::database::Dataset& ds1, 
+  const Torch::database::Dataset& ds2)
+{
+  // Check the Arraysets
+  const std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> > 
+    m1 = ds1.arraysetIndex();
+  const std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> > 
+    m2 = ds2.arraysetIndex();
+  BOOST_CHECK_EQUAL( m1.size(), m2.size() );
+  for( std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> >::const_iterator 
+    it1=m1.begin(), it2=m2.begin(); it1!=m1.end() && it2!=m2.end(); ++it1, ++it2)
+  {
+    BOOST_CHECK_EQUAL(it1->first, it2->first );
+    BOOST_CHECK_EQUAL(it1->second->getRole().compare(it2->second->getRole()), 0 );
+    BOOST_CHECK_EQUAL(it1->second->isLoaded(), it2->second->isLoaded() );
+    BOOST_CHECK_EQUAL(it1->second->getElementType(), it2->second->getElementType() );
+    BOOST_CHECK_EQUAL(it1->second->getNDim(), it2->second->getNDim() );
+    const size_t *shape1 = it1->second->getShape();
+    const size_t *shape2 = it2->second->getShape();
+    for (size_t i=0; i<it1->second->getNDim(); ++i)
+      BOOST_CHECK_EQUAL( shape1[i], shape2[i]);
+    BOOST_CHECK_EQUAL(it1->second->getNSamples(), it2->second->getNSamples() );
+    BOOST_CHECK_EQUAL(it1->second->getFilename().compare(it2->second->getFilename()), 0 );
+    BOOST_CHECK_EQUAL(it1->second->getCodec(), it2->second->getCodec() );
+
+    // Check the Arrays
+    std::vector<size_t> ids1, ids2;
+    it1->second->index(ids1);
+    it2->second->index(ids2);
+    BOOST_CHECK_EQUAL( ids1.size(), ids2.size() );
+    for( std::vector<size_t>::const_iterator
+      ita1=ids1.begin(), ita2=ids2.begin(); 
+      ita1!=ids1.end() && ita2!=ids2.end(); ++ita1, ++ita2)
+    {
+      Torch::database::Array a1 = it1->second->operator[](*ita1);
+      Torch::database::Array a2 = it2->second->operator[](*ita2);
+      BOOST_CHECK_EQUAL(a1.getNDim(), a2.getNDim() );
+      BOOST_CHECK_EQUAL(a1.getElementType(), a2.getElementType() );
+      const size_t *ashape1 = a1.getShape();
+      const size_t *ashape2 = a2.getShape();
+      for (size_t i=0; i<a1.getNDim(); ++i)
+        BOOST_CHECK_EQUAL( ashape1[i], ashape2[i]);
+      BOOST_CHECK_EQUAL(a1.getFilename().compare(a2.getFilename()), 0 );
+      BOOST_CHECK_EQUAL(a1.getCodec(), a2.getCodec() );
+      BOOST_CHECK_EQUAL(a1.isLoaded(), a2.isLoaded() );
+
+      // Check Array content 
+      switch(a1.getNDim())
+      {
+        case 1: check_equal( a1.cast<std::complex<double>,1>(), 
+          a2.cast<std::complex<double>,1>() ); break;
+        case 2: check_equal( a1.cast<std::complex<double>,2>(), 
+          a2.cast<std::complex<double>,2>() ); break;
+        case 3: check_equal( a1.cast<std::complex<double>,3>(), 
+          a2.cast<std::complex<double>,3>() ); break;
+        case 4: check_equal( a1.cast<std::complex<double>,4>(), 
+          a2.cast<std::complex<double>,4>() ); break;
+        default: ; break;
+      }
+    }
+  }
+
+  // Check the Relationsets
+  const std::map<std::string, boost::shared_ptr<Torch::database::Relationset> > 
+    r1 = ds1.relationsetIndex();
+  const std::map<std::string, boost::shared_ptr<Torch::database::Relationset> > 
+    r2 = ds2.relationsetIndex();
+  BOOST_CHECK_EQUAL( r1.size(), r2.size() );
+  for( std::map<std::string, boost::shared_ptr<Torch::database::Relationset> >::const_iterator 
+    it1=r1.begin(), it2=r2.begin(); it1!=r1.end() && it2!=r2.end(); ++it1, ++it2)
+  {
+    BOOST_CHECK_EQUAL(it1->first.compare(it2->first), 0 );
+    BOOST_CHECK_EQUAL(it1->second->getParent(), &ds1);
+    BOOST_CHECK_EQUAL(it2->second->getParent(), &ds2);
+
+    // Check the Rules
+    const std::map<std::string, boost::shared_ptr<Torch::database::Rule> > 
+      ru1 = it1->second->rules();
+    const std::map<std::string, boost::shared_ptr<Torch::database::Rule> > 
+      ru2 = it2->second->rules();
+    BOOST_CHECK_EQUAL( ru1.size(), ru2.size() );
+    for( std::map<std::string, boost::shared_ptr<Torch::database::Rule> >::const_iterator
+      itru1=ru1.begin(), itru2=ru2.begin(); 
+      itru1!=ru1.end() && itru2!=ru2.end(); ++itru1, ++itru2)
+    {
+      BOOST_CHECK_EQUAL( itru1->first.compare( itru2->first), 0 );
+      BOOST_CHECK_EQUAL( itru1->second->getMin(), itru2->second->getMin() );
+      BOOST_CHECK_EQUAL( itru1->second->getMax(), itru2->second->getMax() );
+    }
+
+    // Check the Relations
+    const std::map<size_t, boost::shared_ptr<Torch::database::Relation> > 
+      re1 = it1->second->relations();
+    const std::map<size_t, boost::shared_ptr<Torch::database::Relation> > 
+      re2 = it2->second->relations();
+    BOOST_CHECK_EQUAL( re1.size(), re2.size() );
+    for( std::map<size_t, boost::shared_ptr<Torch::database::Relation> >::const_iterator
+      itre1=re1.begin(), itre2=re2.begin(); 
+      itre1!=re1.end() && itre2!=re2.end(); ++itre1, ++itre2)
+    {
+      BOOST_CHECK_EQUAL( itre1->first, itre2->first );
+
+      // Check the Members
+      const std::list<std::pair<size_t,size_t> > 
+        me1 = itre1->second->members();
+      const std::list<std::pair<size_t,size_t> > 
+        me2 = itre2->second->members();
+      BOOST_CHECK_EQUAL( me1.size(), me2.size() );
+      for( std::list<std::pair<size_t,size_t> >::const_iterator
+        itme1=me1.begin(), itme2=me2.begin();
+        itme1!=me1.end() && itme2!=me2.end(); ++itme1, ++itme2)
+      {
+        BOOST_CHECK_EQUAL( itme1->first, itme2->first );
+        BOOST_CHECK_EQUAL( itme1->second, itme2->second );
+      }
+    }
+  }
+}
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
@@ -219,11 +370,11 @@ BOOST_AUTO_TEST_CASE( dbDataset_arrayset )
   BOOST_REQUIRE_NO_THROW( ds.add(3, db_Ar2) );
 
   // Access Arrayset 1 and 3 and check content
-  check_equal_1d( ds[1][1].get<double,1>(), a);
-  check_equal_1d( ds[1][2].get<double,1>(), c);
-  check_equal_1d( ds[3][1].get<double,1>(), c);
-  check_equal_1d( ds[3][2].get<double,1>(), a);
-  check_equal_1d( ds.ptr(3)->operator[](2).get<double,1>(), c);
+  check_equal( ds[1][1].get<double,1>(), a);
+  check_equal( ds[1][2].get<double,1>(), c);
+  check_equal( ds[3][1].get<double,1>(), c);
+  check_equal( ds[3][2].get<double,1>(), a);
+  check_equal( ds.ptr(3)->operator[](2).get<double,1>(), c);
 
   // Add an Arrayset at an occupied position and check that an exception
   // is thrown.
@@ -252,10 +403,10 @@ BOOST_AUTO_TEST_CASE( dbDataset_arrayset )
   // Set the arrayset at an occupied position and check that the dataset is
   // updated.
   BOOST_CHECK_NO_THROW( ds.set(1, db_Ar3) );
-  check_equal_2d( ds[1][1].get<float,2>(), d);
-  check_equal_2d( ds[1][2].get<float,2>(), e);
-  check_equal_2d( ds[1][3].get<float,2>(), e);
-  check_equal_2d( ds.ptr(1)->operator[](3).get<float,2>(), e);
+  check_equal( ds[1][1].get<float,2>(), d);
+  check_equal( ds[1][2].get<float,2>(), e);
+  check_equal( ds[1][3].get<float,2>(), e);
+  check_equal( ds.ptr(1)->operator[](3).get<float,2>(), e);
 
   // Check that the Arrayset of id 3 exists and that the next free id is 4
   BOOST_CHECK_EQUAL( ds.exists(3), true);
@@ -300,7 +451,57 @@ BOOST_AUTO_TEST_CASE( dbDataset_relationset )
   // Create an Arrayset from the STL vector
   Torch::database::Arrayset db_Ar1(vec1);
 
-  //TODO: Add relationset
+  // Create the relationsets
+  Torch::database::Relationset db_R1;
+  std::string role1("rule1");
+  BOOST_CHECK_NO_THROW( db_R1.add(role1, Torch::database::Rule(0,1)));
+  Torch::database::Relationset db_R2;
+  std::string role2("rule2");
+  BOOST_CHECK_NO_THROW( db_R2.add(role2, Torch::database::Rule(0,1)));
+  Torch::database::Relationset db_R3;
+  std::string role3("rule3");
+  BOOST_CHECK_NO_THROW( db_R3.add(role3, Torch::database::Rule(0,1)));
+  std::string r_name1("MyRelationset1");
+  std::string r_name2("MyRelationset2");
+  std::string r_name3("MyRelationset3");
+
+  // Add/Set/Remove them to/from the dataset and perform the check
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 0);
+  BOOST_CHECK_EQUAL( ds.exists(r_name1), false);
+  BOOST_CHECK_NO_THROW( ds.add(r_name1,db_R1) );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 1);
+  BOOST_CHECK_EQUAL( ds.exists(r_name1), true);
+  BOOST_CHECK_THROW( ds.add(r_name1,db_R2), Torch::database::NameError );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 1);
+  BOOST_CHECK_EQUAL( ds.exists(r_name1), true);
+  BOOST_CHECK_EQUAL( ds.exists(r_name2), false);
+  BOOST_CHECK_NO_THROW( ds.add(r_name2,db_R2) );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 2);
+  BOOST_CHECK_EQUAL( ds.exists(r_name2), true);
+  BOOST_CHECK_EQUAL( ds.exists(r_name3), false);
+  BOOST_CHECK_THROW( ds.set(r_name3,db_R3), Torch::database::NameError );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 2);
+  BOOST_CHECK_EQUAL( ds.exists(r_name3), false);
+  BOOST_CHECK_EQUAL( ds.exists(r_name2), true);
+  BOOST_CHECK_NO_THROW( ds.set(r_name2,db_R3) );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 2);
+  BOOST_CHECK_EQUAL( ds.exists(r_name2), true);
+  BOOST_CHECK_NO_THROW( ds.remove(r_name2) );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 1);
+  BOOST_CHECK_EQUAL( ds.exists(r_name2), false);
+
+  // Clear the relationsets
+  BOOST_CHECK_NO_THROW( ds.clearRelationsets() );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 0);
+  BOOST_CHECK_EQUAL( ds.exists(r_name1), false);
+  BOOST_CHECK_EQUAL( ds.exists(r_name2), false);
+  BOOST_CHECK_EQUAL( ds.exists(r_name3), false);
+
+  // Access the relationset
+  BOOST_CHECK_NO_THROW( ds.add(r_name1,db_R1) );
+  BOOST_CHECK_EQUAL( ds.relationsetIndex().size(), 1);
+  BOOST_CHECK_NO_THROW( ds[r_name1][role1] );
+  BOOST_CHECK_NO_THROW( ds.ptr(r_name1)->operator[](role1) );
 }
 
 
@@ -318,50 +519,20 @@ BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_inline )
   testdata_path /= "db_inline.xml";
 
   // Load from XML
-  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
-  Torch::database::Dataset d(testdata_path.string());
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset ds1(testdata_path.string()));
+  Torch::database::Dataset ds1(testdata_path.string());
   
   // Save to XML
   std::string tpx = temp_xml_file();
-  BOOST_REQUIRE_NO_THROW(d.save(tpx));
+  BOOST_REQUIRE_NO_THROW(ds1.save(tpx));
 
-  // TODO: check consistency after loading the saved XML database
+  // Load and parse the saved XML database
+  Torch::database::Dataset ds2(tpx);
 
-  //d.consolidateIds();
-/*  const std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> > m=d.arraysetIndex();
-  for( std::map<size_t, boost::shared_ptr<Torch::database::Arrayset> >::const_iterator 
-    it=m.begin(); it!=m.end(); ++it)*/
+  // Check that the Datasets are similar
+  check_equal( ds1, ds2);
 }
 
-BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_withexternal )
-{
-  // Get path to the XML Schema definition
-  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
-  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
-      "is not set. " << "Have you setup your working environment " <<
-      "correctly?" << std::endl;
-    throw Torch::core::Exception();
-  }
-  boost::filesystem::path testdata_path( testdata_cpath);
-  testdata_path /= "db_inline.xml";
-
-  // Load from XML
-  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
-  Torch::database::Dataset d(testdata_path.string());
-
-  // Make the inline arrayset of id 1 an external arrayset
-  BOOST_CHECK_NO_THROW(d[1].save( temp_bin_file()));
-  // Make the inline array of id 1 of the inline arrayset of id 3 an 
-  // external array
-  BOOST_CHECK_NO_THROW(d[3][1].save( temp_bin_file()));
-  
-  // Save to XML
-  boost::filesystem::path tpx = temp_xml_file();
-  BOOST_REQUIRE_NO_THROW(d.save(tpx.string()));
-
-  // TODO: check consistency after loading the saved XML database
-}
 
 BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_inline2 )
 {
@@ -378,12 +549,54 @@ BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_inline2 )
 
   // Load from XML
   BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
-  Torch::database::Dataset d(testdata_path.string());
+  Torch::database::Dataset ds1(testdata_path.string());
   
   // Save to XML
   std::string tpx = temp_xml_file();
-  BOOST_REQUIRE_NO_THROW(d.save(tpx));
+  BOOST_REQUIRE_NO_THROW(ds1.save(tpx));
+
+  // Load and parse the saved XML database
+  Torch::database::Dataset ds2(tpx);
+  
+  // Check that the Datasets are similar
+  check_equal( ds1, ds2);
 }
+
+
+BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_withexternal )
+{
+  // Get path to the XML Schema definition
+  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw Torch::core::Exception();
+  }
+  boost::filesystem::path testdata_path( testdata_cpath);
+  testdata_path /= "db_inline.xml";
+
+  // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
+  Torch::database::Dataset ds1(testdata_path.string());
+
+  // Make the inline arrayset of id 1 an external arrayset
+  BOOST_CHECK_NO_THROW(ds1[1].save( temp_bin_file()));
+  // Make the inline array of id 1 of the inline arrayset of id 3 an 
+  // external array
+  BOOST_CHECK_NO_THROW(ds1[3][1].save( temp_bin_file()));
+  
+  // Save to XML
+  std::string tpx = temp_xml_file();
+  BOOST_REQUIRE_NO_THROW(ds1.save(tpx));
+
+  // Load and parse the saved XML database
+  Torch::database::Dataset ds2(tpx);
+  
+  // Check that the Datasets are similar
+  check_equal( ds1, ds2);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 
