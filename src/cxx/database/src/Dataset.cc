@@ -166,13 +166,16 @@ size_t db::Dataset::getNextFreeId() const {
 }
 
 void db::Dataset::consolidateIds() {
-  size_t id=1;
-  for (std::map<size_t, boost::shared_ptr<db::Arrayset> >::iterator it = m_id2arrayset.begin(); it != m_id2arrayset.end(); ++it, ++id) {
-    if (id != it->first) { //displaced value, reset
-      m_id2arrayset[id] = it->second;
-      m_id2arrayset.erase(it->first);
+  std::vector<size_t> keys;
+  for (std::map<size_t, boost::shared_ptr<db::Arrayset> >::iterator 
+      it = m_id2arrayset.begin(); it != m_id2arrayset.end(); ++it)
+    keys.push_back(it->first);
+
+  for (size_t id=1; id<=m_id2arrayset.size(); ++id)
+    if (id != keys[id-1]) { //displaced value, reset
+      m_id2arrayset[id] = m_id2arrayset[keys[id-1]];
+      m_id2arrayset.erase(keys[id-1]);
     }
-  }
 }
 
 void db::Dataset::save(const std::string& path) const {
