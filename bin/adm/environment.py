@@ -119,6 +119,13 @@ def parse_args():
                     default=False,
                     help="Makes this program change your executable behavior to be more torch friendly, if it can"
                    )
+  parser.add_option("-r", "--root-dir",
+                    action="store",
+                    dest="root_dir",
+                    default=self_root(),
+                    help="Switch to a different base installation",
+                   )
+                    
 
   options, arguments = parser.parse_args()
 
@@ -127,7 +134,7 @@ def parse_args():
     parser.exit(status=3)
 
   #sets up the version
-  options.version = version(self_root(), options.verbose)
+  options.version = version(options.root_dir, options.verbose)
 
   #reverses the externals input list so the appended user preferences come
   #first
@@ -259,7 +266,7 @@ def generate_environment(options):
   for k in options.externals:
     setup_external_dir(envdict, k, options.arch, options.verbose)
 
-  root = self_root()
+  root = options.root_dir
 
   J = PathJoiner(root) #root_dir
   JIA = PathJoiner(J('install', options.arch)) #install_dir
