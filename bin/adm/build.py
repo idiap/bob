@@ -186,7 +186,7 @@ def install(option):
   if srcdir != destdir:
     bindestdir = os.path.join(destdir, 'bin')
     if os.path.exists(bindestdir): shutil.rmtree(bindestdir)
-    shutil.copytree(os.path.join(srcdir, 'bin'), destdir)
+    shutil.copytree(os.path.join(srcdir, 'bin'), bindestdir)
 
     # finally, writes a ".version" file at the root of the directory
     version = time.strftime("nightly@%d.%m.%Y")
