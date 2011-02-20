@@ -191,7 +191,7 @@ def install(option):
     # finally, writes a ".version" file at the root of the directory
     version = time.strftime("nightly@%d.%m.%Y")
     if option.version[0] != '?': version = option.version
-    info = os.path.join(option.destdir, ".version")
+    info = os.path.join(destdir, ".version")
     if os.path.exists(info): os.unlink(info)
     f = open(info, 'wt')
     f.write(option.version)
