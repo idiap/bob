@@ -50,10 +50,13 @@ unittest.TestCase.transcode = testcase_transcode
 def testcase_readwrite(self, codecname, bzdata):
   """Runs a read/write verify step using the given bz data"""
   testcodec = torch.database.ArrayCodecRegistry.getCodecByName(codecname)
-  tmpname = tempname('.bindata')
+  tmpname = tempname(testcodec.extensions()[0])
   testcodec.save(tmpname, torch.database.Array(bzdata))
   reloaded = testcodec.load(tmpname).get()
   self.assertEqual(bzdata, reloaded)
+  os.unlink(tmpname)
+
+# And we attach...
 unittest.TestCase.readwrite = testcase_readwrite
 
 class ArrayCodecTest(unittest.TestCase):
@@ -65,6 +68,19 @@ class ArrayCodecTest(unittest.TestCase):
     self.readwrite("torch3.array.binary",
         torch.core.array.float64_1(range(24), (24,)) / 3.33336)
     self.transcode("torch3.array.binary", "torch3.bindata")
+
+  def test02_matlab(self):
+    self.readwrite("matlab.array.binary",
+        torch.core.array.float32_1(range(24), (24,)) / 24.)
+    self.readwrite("matlab.array.binary",
+        torch.core.array.float64_1(range(24), (24,)) / 3.33336)
+    self.readwrite("matlab.array.binary",
+        torch.core.array.complex64_1(range(24), (24,)) / complex(29.5,37.2))
+    self.readwrite("matlab.array.binary",
+        torch.core.array.complex128_1(range(24), (24,)) / complex(12.7,-92))
+    self.readwrite("matlab.array.binary",
+        torch.core.array.complex128_2(range(24), (6,4)) / complex(3.1416,-3.1416))
+    self.transcode("matlab.array.binary", "test.mat")
 
 if __name__ == '__main__':
   sys.argv.append('-v')

@@ -56,6 +56,9 @@ def testcase_readwrite(self, codecname, bzdata_list):
   testcodec.save(tmpname, indata)
   reloaded = testcodec.load(tmpname).get()
   self.assertEqual(indata, reloaded)
+  os.unlink(tmpname)
+
+# And we attach...
 unittest.TestCase.readwrite = testcase_readwrite
 
 class ArraysetCodecTest(unittest.TestCase):

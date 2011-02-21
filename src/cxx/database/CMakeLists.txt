@@ -39,6 +39,12 @@ set(src
     "src/Exception.cc"
     )
 
+# If we have matio installed, enable the compilation of relevant modules
+if(MATIO_FOUND)
+  set(shared "${shared};${matio_LIBRARY}")
+  set(src "${src};src/MatUtils.cc;src/MatArrayCodec.cc;src/MatArraysetCodec.cc")
+endif(MATIO_FOUND)
+
 include(../../cmake/macros.cmake)
 torch_library(database "${src}" "${deps}" "${shared}")
 torch_header_install(database "torch::database")
