@@ -10,9 +10,11 @@
 
 #include <matio.h>
 #include <blitz/array.h>
+#include <boost/format.hpp>
 
 #include "core/array_common.h"
 #include "database/InlinedArrayImpl.h"
+#include "database/InlinedArraysetImpl.h"
 #include "database/Exception.h"
 
 namespace Torch { namespace database { namespace detail {
@@ -144,6 +146,47 @@ namespace Torch { namespace database { namespace detail {
       Mat_VarWrite(file, matvar, 0);
       Mat_VarFree(matvar);
     }
+
+  /**
+   * Reads all variables on the (already opened) mat_t file.
+   */
+  template <typename T, int D> InlinedArraysetImpl read_arrayset(mat_t* file) {
+    InlinedArraysetImpl retval;
+    while (!feof(file->fp)) retval.add(read_array<T,D>(file)); 
+    return retval;
+  }
+
+  /**
+   * Writes all arrays in the given arrayset
+   */
+  template <typename T, int D> void write_arrayset(mat_t* file,
+      boost::format& fmt_varname, const InlinedArraysetImpl& data) {
+    for (size_t i=0; i<data.getNSamples(); ++i) {
+      fmt_varname % (i+1);
+      write_array<T,D>(file, fmt_varname.str().c_str(), data[i].get());
+    }
+  }
+
+  /**
+   * Reads all complex variables on the (already opened) mat_t file.
+   */
+  template <typename T, typename F, int D> InlinedArraysetImpl 
+    read_complex_arrayset (mat_t* file) {
+    InlinedArraysetImpl retval;
+    while (!feof(file->fp)) retval.add(read_array<T,D>(file)); 
+    return retval;
+  }
+
+  /**
+   * Writes all complex arrays in the given arrayset
+   */
+  template <typename T, typename F, int D> void write_complex_arrayset
+    (mat_t* file, boost::format& fmt_varname, const InlinedArraysetImpl& data) {
+    for (size_t i=0; i<data.getNSamples(); ++i) {
+      fmt_varname % (i+1);
+      write_complex_array<T,F,D>(file, fmt_varname.str().c_str(), data[i].get());
+    }
+  }
 
 }}}
 

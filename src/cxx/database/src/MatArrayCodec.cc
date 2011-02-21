@@ -6,6 +6,7 @@
  */
 
 #include <boost/shared_array.hpp>
+#include <boost/filesystem.hpp>
 
 #include "database/MatArrayCodec.h"
 #include "database/MatUtils.h"
@@ -52,7 +53,6 @@ void db::MatArrayCodec::peek(const std::string& filename,
   if (eltype == Torch::core::array::t_unknown) {
     throw db::TypeError(eltype, Torch::core::array::t_float32);
   }
-
 }
 
 #define DIMSWITCH(T) switch(ndim) { \
@@ -152,6 +152,11 @@ db::MatArrayCodec::load(const std::string& filename) const {
 void db::MatArrayCodec::save (const std::string& filename,
     const db::detail::InlinedArrayImpl& data) const {
   const char* varname = "array";
+
+  //this file is supposed to hold a single array. delete it if it exists
+  boost::filesystem::path path (filename);
+  if (boost::filesystem::exists(path)) boost::filesystem::remove(path);
+
   mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDWR);
   if (!mat) throw db::FileNotReadable(filename.c_str());
   try {

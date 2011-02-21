@@ -50,11 +50,11 @@ unittest.TestCase.transcode = testcase_transcode
 def testcase_readwrite(self, codecname, bzdata_list):
   """Runs a read/write verify step using the given bz data"""
   testcodec = torch.database.ArraysetCodecRegistry.getCodecByName(codecname)
-  tmpname = tempname('.bindata')
+  tmpname = tempname('.test')
   indata = torch.database.Arrayset()
   for k in bzdata_list: indata.append(k)
   testcodec.save(tmpname, indata)
-  reloaded = testcodec.load(tmpname).get()
+  reloaded = testcodec.load(tmpname)
   self.assertEqual(indata, reloaded)
   os.unlink(tmpname)
 
@@ -71,13 +71,28 @@ class ArraysetCodecTest(unittest.TestCase):
         torch.core.array.float32_1(range(24), (24,)) / 48.,
         torch.core.array.float32_1(range(24), (24,)) / 0.25,
     ]
-    #self.readwrite("torch3.arrayset.binary", floatdata)
-    floatdata = [
+    self.readwrite("torch3.arrayset.binary", floatdata)
+    doubledata = [
         torch.core.array.float64_1(range(24), (24,)) / 24.3333334,
         torch.core.array.float64_1(range(24), (24,)) / -52.9,
         torch.core.array.float64_1(range(24), (24,)) / 37,
     ]
-    #self.readwrite("torch3.arrayset.binary", doubledata)
+    self.readwrite("torch3.arrayset.binary", doubledata)
+
+  def notest02_matlab(self):
+    #self.transcode("torch3.arrayset.binary", "torch3.bindata")
+    floatdata = [
+        torch.core.array.float32_1(range(24), (24,)) / 24.,
+        torch.core.array.float32_1(range(24), (24,)) / 48.,
+        torch.core.array.float32_1(range(24), (24,)) / 0.25,
+    ]
+    self.readwrite("matlab.arrayset.binary", floatdata)
+    doubledata = [
+        torch.core.array.float64_1(range(24), (24,)) / 24.3333334,
+        torch.core.array.float64_1(range(24), (24,)) / -52.9,
+        torch.core.array.float64_1(range(24), (24,)) / 37,
+    ]
+    self.readwrite("matlab.arrayset.binary", doubledata)
 
 if __name__ == '__main__':
   sys.argv.append('-v')

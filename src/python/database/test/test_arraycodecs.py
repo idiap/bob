@@ -50,7 +50,7 @@ unittest.TestCase.transcode = testcase_transcode
 def testcase_readwrite(self, codecname, bzdata):
   """Runs a read/write verify step using the given bz data"""
   testcodec = torch.database.ArrayCodecRegistry.getCodecByName(codecname)
-  tmpname = tempname(testcodec.extensions()[0])
+  tmpname = tempname('.test')
   testcodec.save(tmpname, torch.database.Array(bzdata))
   reloaded = testcodec.load(tmpname).get()
   self.assertEqual(bzdata, reloaded)
