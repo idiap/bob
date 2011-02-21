@@ -19,7 +19,7 @@ namespace Torch { namespace database {
 
     public:
 
-      T3BinaryArraysetCodec(bool save_in_float32=true);
+      T3BinaryArraysetCodec();
 
       virtual ~T3BinaryArraysetCodec();
 
@@ -73,7 +73,6 @@ namespace Torch { namespace database {
 
       std::string m_name; ///< my own name
       std::vector<std::string> m_extensions; ///< extensions I can handle
-      bool m_float; ///< should I save output as floats?
 
   };
 

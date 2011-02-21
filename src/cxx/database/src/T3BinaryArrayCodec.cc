@@ -44,10 +44,9 @@ static bool register_codec() {
 
 static bool codec_registered = register_codec();
 
-db::T3BinaryArrayCodec::T3BinaryArrayCodec(bool save_in_float32)
+db::T3BinaryArrayCodec::T3BinaryArrayCodec()
   : m_name("torch3.array.binary"),
-    m_extensions(),
-    m_float(save_in_float32)
+    m_extensions()
 { 
   m_extensions.push_back(".bindata");
 }
@@ -63,12 +62,12 @@ void db::T3BinaryArrayCodec::peek(const std::string& filename,
   std::ifstream ifile(filename.c_str(), std::ios::binary|std::ios::in);
   if (!ifile) throw db::FileNotReadable(filename);
   uint32_t nsamples, framesize;
-  ifile >> nsamples;
-  ifile >> framesize;
+  ifile.read((char*)nsamples, sizeof(uint32_t));
+  ifile.read((char*)framesize, sizeof(uint32_t));
   ifile.close();
   // are those floats or doubles?
-  if (fsize == (nsamples*framesize)) eltype = Torch::core::array::t_float32;
-  else if (fsize == (2*nsamples*framesize)) eltype = Torch::core::array::t_float64;
+  if (fsize == (nsamples*framesize*sizeof(float))) eltype = Torch::core::array::t_float32;
+  else if (fsize == (nsamples*framesize*sizeof(double))) eltype = Torch::core::array::t_float64;
   else throw db::TypeError(Torch::core::array::t_float32, Torch::core::array::t_unknown);
   ndim = 1;
   shape[0] = framesize;
@@ -82,21 +81,24 @@ db::T3BinaryArrayCodec::load(const std::string& filename) const {
   std::ifstream ifile(filename.c_str(), std::ios::binary|std::ios::in);
   if (!ifile) throw db::FileNotReadable(filename);
   uint32_t nsamples, framesize;
-  ifile >> nsamples;
-  ifile >> framesize;
+  ifile.read((char*)&nsamples, sizeof(uint32_t));
+  ifile.read((char*)&framesize, sizeof(uint32_t));
   // are those floats or doubles?
-  if (fsize == (nsamples*framesize)) {
+  if (fsize == (nsamples*framesize*sizeof(float))) {
     blitz::Array<float,1> data(framesize);
-    for (size_t i=0; i<framesize; ++i) ifile >> data(i);
+    ifile.read((char*)data.data(), sizeof(float)*framesize);
     return db::detail::InlinedArrayImpl(data);
   }
-  else if (fsize == (2*nsamples*framesize)) {
+  else if (fsize == (nsamples*framesize*sizeof(double))) {
     // this is the normal case: dealing with single-precision floats
     blitz::Array<double,1> data(framesize);
-    for (size_t i=0; i<framesize; ++i) ifile >> data(i);
+    ifile.read((char*)data.data(), sizeof(double)*framesize);
     return db::detail::InlinedArrayImpl(data);
   }
-  throw db::TypeError(Torch::core::array::t_float32, Torch::core::array::t_unknown);
+  else {
+    ifile.close();
+    throw db::TypeError(Torch::core::array::t_unknown, Torch::core::array::t_float32);
+  }
 }
 
 void db::T3BinaryArrayCodec::save (const std::string& filename,
@@ -104,18 +106,24 @@ void db::T3BinaryArrayCodec::save (const std::string& filename,
   //can only save uni-dimensional data, so throw if that is not the case
   if (data.getNDim() != 1) throw db::DimensionError(data.getNDim(), 1);
 
+  //can only save float32 or float64, otherwise, throw.
+  if ((data.getElementType() != Torch::core::array::t_float32) && 
+      (data.getElementType() != Torch::core::array::t_float64)) {
+    throw db::TypeError(data.getElementType(), Torch::core::array::t_float32); 
+  }
+
   std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::out);
   const uint32_t nsamples = 1;
-  ofile << nsamples;
-  const uint32_t length = data.getShape()[0];
-  ofile << length;
-  if (m_float) {
-    blitz::Array<float, 1> save = data.cast<float,1>();
-    for (blitz::sizeType i=0; i<save.extent(0); ++i) ofile << save(i); 
+  const uint32_t framesize = data.getShape()[0];
+  ofile.write((const char*)&nsamples, sizeof(uint32_t));
+  ofile.write((const char*)&framesize, sizeof(uint32_t));
+  if (data.getElementType() == Torch::core::array::t_float32) {
+    blitz::Array<float, 1> save = data.get<float,1>();
+    ofile.write((const char*)save.data(), save.extent(0)*sizeof(float));
   }
-  else {
-    blitz::Array<double, 1> save = data.cast<double,1>();
-    for (blitz::sizeType i=0; i<save.extent(0); ++i) ofile << save(i); 
+  else { //it is a t_float64
+    blitz::Array<double, 1> save = data.get<double,1>();
+    ofile.write((const char*)save.data(), save.extent(0)*sizeof(double));
   }
   ofile.close();
 }

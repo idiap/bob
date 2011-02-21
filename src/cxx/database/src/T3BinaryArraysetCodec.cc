@@ -43,10 +43,9 @@ static bool register_codec() {
 
 static bool codec_registered = register_codec(); 
 
-db::T3BinaryArraysetCodec::T3BinaryArraysetCodec(bool save_in_float32)
+db::T3BinaryArraysetCodec::T3BinaryArraysetCodec()
   : m_name("torch3.arrayset.binary"),
-    m_extensions(),
-    m_float(save_in_float32)
+    m_extensions()
 { 
   m_extensions.push_back(".bindata");
 }
@@ -62,12 +61,12 @@ void db::T3BinaryArraysetCodec::peek(const std::string& filename,
   std::ifstream ifile(filename.c_str(), std::ios::binary|std::ios::in);
   if (!ifile) throw db::FileNotReadable(filename);
   uint32_t nsamples, framesize;
-  ifile >> nsamples;
-  ifile >> framesize;
+  ifile.read((char*)&nsamples, sizeof(uint32_t));
+  ifile.read((char*)&framesize, sizeof(uint32_t));
   ifile.close();
   // are those floats or doubles?
-  if (fsize == (nsamples*framesize)) eltype = Torch::core::array::t_float32;
-  else if (fsize == (2*nsamples*framesize)) eltype = Torch::core::array::t_float64;
+  if (fsize == (nsamples*framesize*sizeof(float))) eltype = Torch::core::array::t_float32;
+  else if (fsize == (nsamples*framesize*sizeof(double))) eltype = Torch::core::array::t_float64;
   else throw db::TypeError(Torch::core::array::t_float32, Torch::core::array::t_unknown);
   ndim = 1;
   shape[0] = framesize;
@@ -82,27 +81,27 @@ db::detail::InlinedArraysetImpl db::T3BinaryArraysetCodec::load
   std::ifstream ifile(filename.c_str(), std::ios::binary|std::ios::in);
   if (!ifile) throw db::FileNotReadable(filename);
   uint32_t xsamples, framesize;
-  ifile >> xsamples;
-  ifile >> framesize;
+  ifile.read((char*)&xsamples, sizeof(uint32_t));
+  ifile.read((char*)&framesize, sizeof(uint32_t));
   // are those floats or doubles?
   db::detail::InlinedArraysetImpl retval;
-  if (fsize == (xsamples*framesize)) { //floats of 32-bits
+  if (fsize == (xsamples*framesize*sizeof(float))) { //floats of 32-bits
     for (size_t ex=0; ex<xsamples; ++ex) {
       blitz::Array<float, 1> data(framesize);
-      for (size_t i=0; i<framesize; ++i) ifile >> data(i);
+      ifile.read((char*)data.data(), sizeof(float)*framesize);
       retval.add(db::Array(data));
     }
   }
-  else if (fsize == (2*xsamples*framesize)) {
+  else if (fsize == (xsamples*framesize*sizeof(double))) {
     for (size_t ex=0; ex<xsamples; ++ex) {
       blitz::Array<double, 1> data(framesize);
-      for (size_t i=0; i<framesize; ++i) ifile >> data(i);
+      ifile.read((char*)data.data(), sizeof(double)*framesize);
       retval.add(db::Array(data));
     }
   }
   else {
     ifile.close();
-    throw db::TypeError(Torch::core::array::t_float32, Torch::core::array::t_unknown);
+    throw db::TypeError(Torch::core::array::t_unknown, Torch::core::array::t_float32);
   }
   ifile.close();
   return retval;
@@ -116,20 +115,19 @@ db::Array db::T3BinaryArraysetCodec::load
   std::ifstream ifile(filename.c_str(), std::ios::binary|std::ios::in);
   if (!ifile) throw db::FileNotReadable(filename);
   uint32_t xsamples, framesize;
-  ifile >> xsamples;
-  if (id > xsamples) throw db::IndexError(id);
-  ifile >> framesize;
+  ifile.read((char*)&xsamples, sizeof(uint32_t));
+  ifile.read((char*)&framesize, sizeof(uint32_t));
   // are those floats or doubles?
-  if (fsize == (xsamples*framesize)) { //floats of 32-bits
+  if (fsize == (xsamples*framesize*sizeof(float))) { //floats of 32-bits
     ifile.seekg(8 + (sizeof(float)*(id-1)*framesize)); //move into position
     blitz::Array<float, 1> data(framesize);
-    for (size_t i=0; i<framesize; ++i) ifile >> data(i);
+    ifile.read((char*)data.data(), sizeof(float)*framesize);
     return db::Array(data);
   }
-  else if (fsize == (2*xsamples*framesize)) {
+  else if (fsize == (xsamples*framesize*sizeof(double))) { //floats of 64-bits
     ifile.seekg(8 + (sizeof(double)*(id-1)*framesize)); //move into position
     blitz::Array<double, 1> data(framesize);
-    for (size_t i=0; i<framesize; ++i) ifile >> data(i);
+    ifile.read((char*)data.data(), sizeof(double)*framesize);
     return db::Array(data);
   }
   else {
@@ -140,7 +138,7 @@ db::Array db::T3BinaryArraysetCodec::load
 
 void db::T3BinaryArraysetCodec::append
 (const std::string& filename, const Array& array) const {
-  //peek the data to see we are ok
+  //peek the data to see we are ok by looking existing specifications on file
   Torch::core::array::ElementType eltype;
   size_t ndim;
   size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
@@ -153,33 +151,43 @@ void db::T3BinaryArraysetCodec::append
   if (array.getElementType() != eltype) throw db::TypeError(array.getElementType(), eltype);
 
   std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::app);
-  if (m_float) {
-    blitz::Array<float, 1> save = array.cast<float,1>();
-    for (blitz::sizeType i=0; i<save.extent(0); ++i) ofile << save(i); 
+  if (array.getElementType() == Torch::core::array::t_float32) {
+    blitz::Array<float, 1> save = array.get<float,1>();
+    ofile.write((const char*)save.data(), save.extent(0)*sizeof(float));
   }
-  else {
-    blitz::Array<double, 1> save = array.cast<double,1>();
-    for (blitz::sizeType i=0; i<save.extent(0); ++i) ofile << save(i); 
+  else { //must be double
+    blitz::Array<double, 1> save = array.get<double,1>();
+    ofile.write((const char*)save.data(), save.extent(0)*sizeof(double));
   }
   ofile.close();
 }
 
 void db::T3BinaryArraysetCodec::save (const std::string& filename, 
     const detail::InlinedArraysetImpl& data) const {
+  //can only save uni-dimensional data, so throw if that is not the case
+  if (data.getNDim() != 1) throw db::DimensionError(data.getNDim(), 1);
+
+  //can only save float32 or float64, otherwise, throw.
+  if ((data.getElementType() != Torch::core::array::t_float32) && 
+      (data.getElementType() != Torch::core::array::t_float64)) {
+    throw db::TypeError(data.getElementType(), Torch::core::array::t_float32); 
+  }
+
   std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::out);
-  uint32_t samples = data.getNSamples();
-  uint32_t dim0 = data.getShape()[0];
-  ofile << samples << dim0;
-  if (m_float) {
+  uint32_t nsamples = data.getNSamples();
+  uint32_t framesize = data.getShape()[0];
+  ofile.write((const char*)&nsamples, sizeof(uint32_t));
+  ofile.write((const char*)&framesize, sizeof(uint32_t));
+  if (data.getElementType() == Torch::core::array::t_float32) {
     for (size_t i=0; i<data.getNSamples(); ++i) {
-      blitz::Array<float, 1> save = data[i+1].cast<float,1>();
-      for (blitz::sizeType i=0; i<save.extent(0); ++i) ofile << save(i); 
+      blitz::Array<float, 1> save = data[i+1].get<float,1>();
+      ofile.write((const char*)save.data(), save.extent(0)*sizeof(float));
     }
   }
-  else {
+  else { //must be double
     for (size_t i=0; i<data.getNSamples(); ++i) {
-      blitz::Array<double, 1> save = data[i+1].cast<double,1>();
-      for (blitz::sizeType i=0; i<save.extent(0); ++i) ofile << save(i); 
+      blitz::Array<double, 1> save = data[i+1].get<double,1>();
+      ofile.write((const char*)save.data(), save.extent(0)*sizeof(double));
     }
   }
   ofile.close();
