@@ -7,7 +7,7 @@
 required Torch variables already set. It will respect your shell choices 
 and add to it."""
 
-import sys, os
+import sys, os, time
 import optparse
 import subprocess
 
@@ -266,7 +266,7 @@ def generate_environment(options):
   for k in options.externals:
     setup_external_dir(envdict, k, options.arch, options.verbose)
 
-  root = options.root_dir
+  root = untemplatize_path(options.root_dir, options)
 
   J = PathJoiner(root) #root_dir
   JIA = PathJoiner(J('install', options.arch)) #install_dir
@@ -309,3 +309,20 @@ def set_prompt(arguments, environ):
     rcfile = J('bin', 'rcfiles', 'bash')
     arguments.extend(('--rcfile', rcfile))
     return
+
+def untemplatize_path(path, options):
+  """Removes string templates that may have been inserted into the path
+  descriptor and returns a fully resolved string.
+  """
+  replacements = {
+      'name': 'torch5spro',
+      'version': 'alpha',
+      'date': time.strftime("%d.%m.%Y"),
+      'weekday': time.strftime("%A").lower(),
+      'platform': options.arch,
+      'root-dir': options.root_dir,
+      }
+  retval = path % replacements
+  if retval.find('%(') != -1:
+    raise RuntimeError, "Cannot fully expand path `%s'" % retval
+  return retval
