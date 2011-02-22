@@ -84,7 +84,7 @@ def parse_args():
       help="executes all stages with lots of verbose output",
       )
   parser.add_option("-V", "--version", action="store", dest="version",
-      default="%(name)-x.y.z", metavar="VERSION",
+      default="%(name)s-x.y.z", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
       )
   
