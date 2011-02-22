@@ -101,6 +101,12 @@ class ArrayCodecTest(unittest.TestCase):
       torch.core.array.uint8_3(range(24), (3,2,4)) * 7)
     self.transcode("torch.image.ppm_p6", "test.ppm")
 
+  def test06_imagejpg(self):
+    self.readwrite("torch.image.jpg",
+      torch.core.array.uint8_3(range(24), (3,2,4)) * 4)
+    self.readwrite("torch.image.jpg",
+      torch.core.array.uint8_3(range(24), (3,2,4)) * 7)
+    self.transcode("torch.image.jpg", "test.jpg")
 
 
 if __name__ == '__main__':
