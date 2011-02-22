@@ -84,8 +84,8 @@ def parse_args():
       help="executes all stages with lots of verbose output",
       )
   parser.add_option("-V", "--version", action="store", dest="version",
-      default="?.?", metavar="VERSION",
-      help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned"
+      default="%(name)s-x.y.z", metavar="VERSION",
+      help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
       )
   
   options, args = parser.parse_args()
@@ -109,6 +109,8 @@ def parse_args():
   options.source_dir = sources
 
   #we also replace potential %(bla)s substitutions we may have
+  options.version = options.version.strip()
+  options.version = adm.build.untemplatize_version(options.version, options)
   options.build_prefix = options.build_prefix.strip()
   options.build_prefix = adm.build.untemplatize_path(options.build_prefix,
       options)

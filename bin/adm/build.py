@@ -182,15 +182,18 @@ def install(option):
   srcdir = os.path.realpath(os.path.join(option.source_dir, '..'))
   destdir = os.path.realpath(os.path.join(option.install_prefix, '..', '..'))
 
-  # we go through extra copying if installing
+  # we go through extra copying if installing outside the source tree
   if srcdir != destdir:
     bindestdir = os.path.join(destdir, 'bin')
     if os.path.exists(bindestdir): shutil.rmtree(bindestdir)
     shutil.copytree(os.path.join(srcdir, 'bin'), bindestdir)
 
+    # copies a reference of the sources used for the build
+    srcdestdir = os.path.join(destdir, 'src')
+    if os.path.exists(srcdestdir): shutil.rmtree(srcdestdir)
+    shutil.copytree(os.path.join(srcdir, 'src'), srcdestdir)
+
     # finally, writes a ".version" file at the root of the directory
-    version = time.strftime("nightly@%d.%m.%Y")
-    if option.version[0] != '?': version = option.version
     info = os.path.join(destdir, ".version")
     if os.path.exists(info): os.unlink(info)
     f = open(info, 'wt')
@@ -284,8 +287,8 @@ def doxygen(option):
   #create a link from index.html to main.html 
   os.chdir(os.path.join(option.doc_prefix, 'html'))
   if not os.path.exists('main.html'):
-    logging.debug("Generating symlink main.html -> index.html")
-    os.symlink('index.html', 'main.html')
+    logging.debug("Copying index.html -> main.html")
+    shutil.copy('index.html', 'main.html')
 
   logging.debug('Finished running doxygen.')
 
@@ -420,7 +423,7 @@ def untemplatize_path(path, option):
   """
   replacements = {
       'name': 'torch5spro',
-      'version': 'alpha',
+      'version': option.version,
       'date': time.strftime("%d.%m.%Y"),
       'weekday': time.strftime("%A").lower(),
       'platform': option.platform,
@@ -431,4 +434,19 @@ def untemplatize_path(path, option):
   retval = path % replacements
   if retval.find('%(') != -1:
     raise RuntimeError, "Cannot fully expand path `%s'" % retval
+  return retval
+
+def untemplatize_version(version, option):
+  replacements = {
+      'name': 'torch5spro',
+      'date': time.strftime("%d.%m.%Y"),
+      'weekday': time.strftime("%A").lower(),
+      'platform': option.platform,
+      'install-prefix': option.install_prefix,
+      'build-prefix': option.build_prefix,
+      'doc-prefix': option.doc_prefix,
+      }
+  retval = version % replacements
+  if retval.find('%(') != -1:
+    raise RuntimeError, "Cannot fully expand version `%s'" % retval
   return retval
