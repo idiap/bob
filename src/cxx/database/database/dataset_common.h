@@ -10,7 +10,7 @@
 #ifndef TORCH_DATABASE_DATASET_COMMON_H
 #define TORCH_DATABASE_DATASET_COMMON_H
 
-#include "core/Exception.h"
+#include "core/array_common.h"
 
 namespace Torch {
 /**
@@ -64,10 +64,36 @@ namespace Torch {
     extern const char *t_complex128;
     extern const char *t_complex256;
 
-  }
+    /**
+     * This structure holds information about array typing in a single bound
+     * place.
+     */
+    class ArrayTypeInfo {
+
+      public:
+        //what defines an array in terms of its typing...
+        Torch::core::array::ElementType eltype;
+        size_t ndim;
+        size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
+
+        /**
+         * Compares two ArrayTypeInfo objects for equality
+         */
+        bool operator== (const ArrayTypeInfo& other) const;
+
+        /**
+         * Compares two ArrayTypeInfo objects for inequality
+         */
+        inline bool operator!= (const ArrayTypeInfo& other) const {
+          return ! (*this == other);
+        }
+
+    };
+
 /**
  * @}
  */
+  }
 }
 
 #endif /* TORCH_DATABASE_DATASET_COMMON_H */

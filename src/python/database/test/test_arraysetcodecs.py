@@ -79,7 +79,7 @@ class ArraysetCodecTest(unittest.TestCase):
     ]
     self.readwrite("torch3.arrayset.binary", doubledata)
 
-  def notest02_matlab(self):
+  def test02_matlab(self):
     #self.transcode("torch3.arrayset.binary", "torch3.bindata")
     floatdata = [
         torch.core.array.float32_1(range(24), (24,)) / 24.,

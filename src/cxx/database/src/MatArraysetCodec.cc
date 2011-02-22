@@ -14,8 +14,6 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "database/MatArraysetCodec.h"
 #include "database/MatUtils.h"
@@ -41,72 +39,14 @@ db::MatArraysetCodec::MatArraysetCodec()
 
 db::MatArraysetCodec::~MatArraysetCodec() { }
 
-/**
- * This is a local variant of the peek routine, that also returns the "highest"
- * named "array_%d" object in the file
- */
-static size_t max_peek(const std::string& filename, 
-    Torch::core::array::ElementType& eltype, size_t& ndim,
-    size_t* shape, size_t& samples) {
-
-  static const boost::regex allowed_varname("^array_(\\d*)$");
-  boost::cmatch what;
-
-  mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDONLY);
-  if (!mat) throw db::FileNotReadable(filename);
-  matvar_t* matvar = Mat_VarReadNext(mat); //gets the first variable
-
-  //we continue reading until we find a variable that matches our naming
-  //convention.
-  while (!boost::regex_match(matvar->name, what, allowed_varname) && !feof(mat->fp)) {
-    Mat_VarFree(matvar);
-    matvar = Mat_VarReadNext(mat); //gets the first variable
-  }
-
-  if (!what.size()) throw db::Uninitialized();
-
-  //max is set after this variable
-  size_t max = boost::lexical_cast<size_t>(what[0]);
- 
-  //now that we have found a variable under our name convention, fill the array
-  //properties taking that variable as basis
-  ndim = matvar->rank;
-  for (size_t i=0; i<ndim; ++i) shape[i] = matvar->dims[i];
-  eltype = db::detail::torch_element_type(matvar->data_type, matvar->isComplex);
-
-  //checks our support and see if we can load this...
-  Mat_VarFree(matvar);
-
-  if (ndim > 4) {
-    Mat_Close(mat);
-    throw db::DimensionError(ndim, Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
-  }
-  if (eltype == Torch::core::array::t_unknown) {
-    Mat_Close(mat);
-    throw db::TypeError(eltype, Torch::core::array::t_float32);
-  }
-
-  //if we got here, just continue counting the variables inside. we
-  //only read their info since that is faster
-
-  samples = 1; //already read 1
-  while (!feof(mat->fp)) {
-    matvar = Mat_VarReadNextInfo(mat);
-    if (boost::regex_match(matvar->name, what, allowed_varname)) {
-      size_t v = boost::lexical_cast<size_t>(what[0]);
-      if (v > max) max = v;
-      ++samples; //a valid variable name was found
-    }
-    Mat_VarFree(Mat_VarReadNextInfo(mat));
-  }
-  Mat_Close(mat);
-  return max;
-}
-
 void db::MatArraysetCodec::peek(const std::string& filename, 
     Torch::core::array::ElementType& eltype, size_t& ndim,
     size_t* shape, size_t& samples) const {
-  max_peek(filename, eltype, ndim, shape, samples);
+  db::ArrayTypeInfo info;
+  db::detail::get_info_first(filename, info);
+  eltype = info.eltype;
+  ndim = info.ndim;
+  for (size_t i=0; i<ndim; ++i) shape[i] = info.shape[i];
 }
 
 #define DIMSWITCH(T) switch(ndim) { \
@@ -175,7 +115,7 @@ db::detail::InlinedArraysetImpl db::MatArraysetCodec::load
         CDIMSWITCH(std::complex<double>, double) 
         break;
       default:
-        throw Torch::core::Exception(); //shut-up gcc
+        throw Torch::database::Exception(); //shut-up gcc
     }
   } catch (Torch::core::Exception& ex) {
     Mat_Close(mat);
@@ -189,41 +129,40 @@ db::detail::InlinedArraysetImpl db::MatArraysetCodec::load
 #undef CDIMSWITCH
 
 #define DIMSWITCH(T) switch(ndim) { \
-  case 1: return db::detail::read_array<T,1>(mat); break; \
-  case 2: return db::detail::read_array<T,2>(mat); break; \
-  case 3: return db::detail::read_array<T,3>(mat); break; \
-  case 4: return db::detail::read_array<T,4>(mat); break; \
+  case 1: return db::detail::read_array<T,1>(mat,varname); break; \
+  case 2: return db::detail::read_array<T,2>(mat,varname); break; \
+  case 3: return db::detail::read_array<T,3>(mat,varname); break; \
+  case 4: return db::detail::read_array<T,4>(mat,varname); break; \
   default: throw db::DimensionError(ndim, Torch::core::array::N_MAX_DIMENSIONS_ARRAY); \
 }
 
 #define CDIMSWITCH(T,F) switch(ndim) { \
-  case 1: return db::detail::read_complex_array<T,F,1>(mat); break; \
-  case 2: return db::detail::read_complex_array<T,F,2>(mat); break; \
-  case 3: return db::detail::read_complex_array<T,F,3>(mat); break; \
-  case 4: return db::detail::read_complex_array<T,F,4>(mat); break; \
+  case 1: return db::detail::read_complex_array<T,F,1>(mat,varname); break; \
+  case 2: return db::detail::read_complex_array<T,F,2>(mat,varname); break; \
+  case 3: return db::detail::read_complex_array<T,F,3>(mat,varname); break; \
+  case 4: return db::detail::read_complex_array<T,F,4>(mat,varname); break; \
   default: throw db::DimensionError(ndim, Torch::core::array::N_MAX_DIMENSIONS_ARRAY); \
 }
 
 db::Array db::MatArraysetCodec::load
 (const std::string& filename, size_t id) const {
-  Torch::core::array::ElementType eltype;
-  size_t ndim = 0;
-  size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
-  size_t samples;
-  peek(filename, eltype, ndim, shape, samples);
-  if (id > samples) throw db::IndexError(id);
+  
+  boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > > dict = db::detail::list_variables(filename);
+
+  if (id > dict->size()) throw db::IndexError(id);
+
+  //the name of interest
+  std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> >::iterator 
+    it = dict->begin();
+  std::advance(it, id-1); //it is now pointing to the correct name to look for.
 
   //we already did this at peek(), so we know it is not going to fail!
   mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDONLY);
+  const char* varname = it->second.first.c_str();
+  Torch::core::array::ElementType eltype = it->second.second.eltype;
+  size_t ndim = it->second.second.ndim;
 
-  //we skip to the point we want
-  size_t skip = id - 1;
-  while (skip--) {
-    Mat_VarFree(Mat_VarReadNextInfo(mat));
-    ++samples;
-  }
-
-  //then we do a normal array readout, as in an ArrayCodec
+  //then we do a normal array readout, as in an ArrayCodec.load()
   try {
     switch (eltype) {
       case Torch::core::array::t_int8: 
@@ -263,7 +202,7 @@ db::Array db::MatArraysetCodec::load
         CDIMSWITCH(std::complex<double>, double) 
         break;
       default:
-        throw Torch::core::Exception(); //shut-up gcc
+        throw Torch::database::Exception(); //shut-up gcc
     }
   } catch (Torch::core::Exception& ex) {
     Mat_Close(mat);
@@ -271,6 +210,7 @@ db::Array db::MatArraysetCodec::load
   }
 
   Mat_Close(mat);
+  throw Torch::database::Exception(); //shut-up gcc
 }
 
 #undef DIMSWITCH
@@ -294,26 +234,36 @@ db::Array db::MatArraysetCodec::load
 
 void db::MatArraysetCodec::append
 (const std::string& filename, const Array& array) const {
-  Torch::core::array::ElementType eltype;
-  size_t ndim = 0;
-  size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
-  size_t samples;
-  size_t maxnumber = max_peek(filename, eltype, ndim, shape, samples);
+  
+  size_t next_index = 1; //to be used for the array name "array_%d", bellow
 
-  //some checks before letting it append
-  if (eltype != array.getElementType()) 
-    throw db::TypeError(array.getElementType(), eltype);
-  if (ndim != array.getNDim())
-    throw db::DimensionError(array.getNDim(), ndim);
-  for (size_t i=0; i<ndim; ++i) {
-    if (shape[i] != array.getShape()[i])
-      throw db::DimensionError(array.getShape()[i], shape[i]);
+  if (boost::filesystem::exists(filename)) { //the new array must conform!
+
+    boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > > dict = db::detail::list_variables(filename);
+
+    //the first entry
+    std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> >::iterator 
+      it = dict->begin();
+    const db::ArrayTypeInfo& info = it->second.second;
+
+    //some checks before letting it append
+    if (info.eltype != array.getElementType()) 
+      throw db::TypeError(array.getElementType(), info.eltype);
+    if (info.ndim != array.getNDim())
+      throw db::DimensionError(array.getNDim(), info.ndim);
+    for (size_t i=0; i<info.ndim; ++i) {
+      if (info.shape[i] != array.getShape()[i])
+        throw db::DimensionError(array.getShape()[i], info.shape[i]);
+    }
+
+    //max number => last entry
+    next_index = dict->rbegin()->first + 1;
   }
 
   //if you get to this point, the array is compatible, let's give it a unique 
   //name based on our max_peek() findings.
   boost::format fmt_varname("array_%d");
-  fmt_varname % (maxnumber+1);
+  fmt_varname % next_index;
   const char* varname = fmt_varname.str().c_str();
 
   mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDWR);
@@ -358,7 +308,7 @@ void db::MatArraysetCodec::append
         break;
       default:
         Mat_Close(mat);
-        throw Torch::core::Exception(); //shut-up gcc
+        throw Torch::database::Exception(); //shut-up gcc
     }
   } catch (Torch::core::Exception& ex) {
     Mat_Close(mat);
@@ -439,7 +389,7 @@ void db::MatArraysetCodec::save (const std::string& filename,
         break;
       default:
         Mat_Close(mat);
-        throw Torch::core::Exception(); //shut-up gcc
+        throw Torch::database::Exception(); //shut-up gcc
     }
   } catch (Torch::core::Exception& ex) {
     Mat_Close(mat);
