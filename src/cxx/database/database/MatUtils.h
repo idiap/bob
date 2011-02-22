@@ -11,11 +11,15 @@
 #include <matio.h>
 #include <blitz/array.h>
 #include <boost/format.hpp>
+#include <boost/shared_ptr.hpp>
+#include <map>
+#include <string>
 
 #include "core/array_common.h"
 #include "database/InlinedArrayImpl.h"
 #include "database/InlinedArraysetImpl.h"
 #include "database/Exception.h"
+#include "database/dataset_common.h"
 
 namespace Torch { namespace database { namespace detail {
 
@@ -43,6 +47,15 @@ namespace Torch { namespace database { namespace detail {
   template <> blitz::TinyVector<int,2> make_shape<2> (const int* shape);
   template <> blitz::TinyVector<int,3> make_shape<3> (const int* shape);
   template <> blitz::TinyVector<int,4> make_shape<4> (const int* shape);
+
+  /**
+   * Assignes a single matvar variable to a blitz::Array
+   */
+  template <typename T, int D> InlinedArrayImpl assign_array(matvar_t* matvar) {
+    blitz::Array<T,D> data(static_cast<T*>(matvar->data), 
+        make_shape<D>(matvar->dims), blitz::duplicateData);
+    return InlinedArrayImpl(data); 
+  }
  
   /**
    * Reads a variable on the (already opened) mat_t file. If you don't
@@ -50,16 +63,13 @@ namespace Torch { namespace database { namespace detail {
    */
   template <typename T, int D> InlinedArrayImpl read_array(mat_t* file, 
       const char* varname=0) {
-
     matvar_t* matvar = 0;
     if (varname) matvar = Mat_VarRead(file, const_cast<char*>(varname));
     else matvar = Mat_VarReadNext(file);
-
-    blitz::Array<T,D> data(static_cast<T*>(matvar->data), 
-        make_shape<D>(matvar->dims), blitz::duplicateData);
+    if (!matvar) throw Torch::database::Uninitialized();
+    InlinedArrayImpl retval = assign_array<T,D>(matvar);
     Mat_VarFree(matvar);
-
-    return InlinedArrayImpl(data); 
+    return retval;
   }
 
   /**
@@ -84,30 +94,34 @@ namespace Torch { namespace database { namespace detail {
       Mat_VarFree(matvar);
     }
 
+  template <typename T, typename F, int D> InlinedArrayImpl assign_complex_array
+    (matvar_t* matvar) {
+      //copies the pointers of interest.
+      ComplexSplit mio_complex = *static_cast<ComplexSplit*>(matvar->data);
+      F* real = static_cast<F*>(mio_complex.Re);
+      F* imag = static_cast<F*>(mio_complex.Im);
+
+      blitz::Array<T,D> data(make_shape<D>(matvar->dims));
+      size_t n=0;
+      for (typename blitz::Array<T,D>::iterator it=data.begin(); it!=data.end(); ++it, ++n) {
+        (*it) = std::complex<F>(real[n], imag[n]);
+      }
+      return InlinedArrayImpl(data); 
+    }
+
   /**
    * Reads a complex variable on the (already opened) mat_t file. If you don't
    * specify the variable name, I'll just read the next one.
    */
   template <typename T, typename F, int D> InlinedArrayImpl read_complex_array
     (mat_t* file, const char* varname=0) {
-
     matvar_t* matvar = 0;
     if (varname) matvar = Mat_VarRead(file, const_cast<char*>(varname));
     else matvar = Mat_VarReadNext(file);
-
-    //copies the pointers of interest.
-    ComplexSplit mio_complex = *static_cast<ComplexSplit*>(matvar->data);
-    F* real = static_cast<F*>(mio_complex.Re);
-    F* imag = static_cast<F*>(mio_complex.Im);
-
-    blitz::Array<T,D> data(make_shape<D>(matvar->dims));
-    size_t n=0;
-    for (typename blitz::Array<T,D>::iterator it=data.begin(); it!=data.end(); ++it, ++n) {
-      (*it) = std::complex<F>(real[n], imag[n]);
-    }
+    if (!matvar) throw Torch::database::Uninitialized();
+    InlinedArrayImpl retval = assign_complex_array<T,F,D>(matvar);
     Mat_VarFree(matvar);
-
-    return InlinedArrayImpl(data); 
+    return retval;
   }
 
   /**
@@ -152,7 +166,11 @@ namespace Torch { namespace database { namespace detail {
    */
   template <typename T, int D> InlinedArraysetImpl read_arrayset(mat_t* file) {
     InlinedArraysetImpl retval;
-    while (!feof(file->fp)) retval.add(read_array<T,D>(file)); 
+    matvar_t* matvar = 0;
+    while ((matvar = Mat_VarReadNext(file))) {
+      retval.add(assign_array<T,D>(matvar));
+      Mat_VarFree(matvar);
+    }
     return retval;
   }
 
@@ -163,7 +181,7 @@ namespace Torch { namespace database { namespace detail {
       boost::format& fmt_varname, const InlinedArraysetImpl& data) {
     for (size_t i=0; i<data.getNSamples(); ++i) {
       fmt_varname % (i+1);
-      write_array<T,D>(file, fmt_varname.str().c_str(), data[i].get());
+      write_array<T,D>(file, fmt_varname.str().c_str(), data[i+1].get());
     }
   }
 
@@ -173,7 +191,11 @@ namespace Torch { namespace database { namespace detail {
   template <typename T, typename F, int D> InlinedArraysetImpl 
     read_complex_arrayset (mat_t* file) {
     InlinedArraysetImpl retval;
-    while (!feof(file->fp)) retval.add(read_array<T,D>(file)); 
+    matvar_t* matvar = 0;
+    while ((matvar = Mat_VarReadNext(file))) {
+      retval.add(assign_array<T,D>(matvar));
+      Mat_VarFree(matvar);
+    }
     return retval;
   }
 
@@ -184,9 +206,26 @@ namespace Torch { namespace database { namespace detail {
     (mat_t* file, boost::format& fmt_varname, const InlinedArraysetImpl& data) {
     for (size_t i=0; i<data.getNSamples(); ++i) {
       fmt_varname % (i+1);
-      write_complex_array<T,F,D>(file, fmt_varname.str().c_str(), data[i].get());
+      write_complex_array<T,F,D>(file, fmt_varname.str().c_str(), data[i+1].get());
     }
   }
+
+  /**
+   * Given a matvar_t object, returns our equivalent ArrayTypeInfo struct.
+   */
+  void get_info(const matvar_t* matvar, Torch::database::ArrayTypeInfo& info);
+
+  /**
+   * Retrieves information about the first variable with a certain name
+   * (array_%d) that exists in a .mat file (if it exists)
+   */
+  void get_info_first(const std::string& filename, Torch::database::ArrayTypeInfo& info);
+
+  /**
+   * Retrieves information about all variables with a certain name (array_%d)
+   * that exist in a .mat file
+   */
+  boost::shared_ptr<std::map<size_t, std::pair<std::string, Torch::database::ArrayTypeInfo> > > list_variables(const std::string& filename);
 
 }}}
 

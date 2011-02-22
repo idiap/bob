@@ -54,4 +54,13 @@ namespace Torch { namespace database {
     const char *t_complex128  = "complex128";
     const char *t_complex256  = "complex256";
 
+    bool ArrayTypeInfo::operator== (const ArrayTypeInfo& other) const {
+      if (eltype != other.eltype) return false;
+      if (ndim != other.ndim) return false;
+      for (size_t i=0; i<ndim; ++i)
+        if (shape[i] != other.shape[i]) return false;
+      //if you get here, all is equal
+      return true;
+    }
+
 } }
