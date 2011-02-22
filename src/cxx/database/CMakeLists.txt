@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps "core") #other torch subprojects
-set(shared "${LIBXML2_LIBRARIES};${Boost_REGEX_LIBRARY_RELEASE};${JPEG_LIBRARIES}")
+set(shared "${LIBXML2_LIBRARIES};${Boost_REGEX_LIBRARY_RELEASE};${JPEG_LIBRARIES};${ImageMagick_LIBRARIES}")
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
