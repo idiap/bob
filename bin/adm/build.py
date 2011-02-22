@@ -441,7 +441,7 @@ def untemplatize_version(version, option):
       'build-prefix': option.build_prefix,
       'doc-prefix': option.doc_prefix,
       }
-  retval = path % replacements
+  retval = version % replacements
   if retval.find('%(') != -1:
     raise RuntimeError, "Cannot fully expand version `%s'" % retval
   return retval
