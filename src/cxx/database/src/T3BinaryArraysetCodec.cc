@@ -21,6 +21,7 @@
 #include "database/T3BinaryArraysetCodec.h"
 #include "database/ArraysetCodecRegistry.h"
 #include <fstream>
+#include <boost/filesystem.hpp>
 
 //some infrastructure to check the file size
 #include <sys/types.h>
@@ -138,17 +139,20 @@ db::Array db::T3BinaryArraysetCodec::load
 
 void db::T3BinaryArraysetCodec::append
 (const std::string& filename, const Array& array) const {
-  //peek the data to see we are ok by looking existing specifications on file
-  Torch::core::array::ElementType eltype;
-  size_t ndim;
-  size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
-  size_t samples;
-  peek(filename, eltype, ndim, shape, samples);
 
-  //throw if typing is different (remember we only accept 1-D input!!)
-  if (array.getNDim() != ndim) throw db::DimensionError(array.getNDim(), ndim);
-  if (shape[0] != array.getShape()[0]) throw db::DimensionError(array.getShape()[0], shape[0]);
-  if (array.getElementType() != eltype) throw db::TypeError(array.getElementType(), eltype);
+  if (boost::filesystem::exists(filename)) { //the new array must conform!
+    //peek the data to see we are ok by looking existing specifications on file
+    Torch::core::array::ElementType eltype;
+    size_t ndim;
+    size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
+    size_t samples;
+    peek(filename, eltype, ndim, shape, samples);
+
+    //throw if typing is different (remember we only accept 1-D input!!)
+    if (array.getNDim() != ndim) throw db::DimensionError(array.getNDim(), ndim);
+    if (shape[0] != array.getShape()[0]) throw db::DimensionError(array.getShape()[0], shape[0]);
+    if (array.getElementType() != eltype) throw db::TypeError(array.getElementType(), eltype);
+  }
 
   std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::app);
   if (array.getElementType() == Torch::core::array::t_float32) {

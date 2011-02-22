@@ -188,6 +188,11 @@ def install(option):
     if os.path.exists(bindestdir): shutil.rmtree(bindestdir)
     shutil.copytree(os.path.join(srcdir, 'bin'), bindestdir)
 
+    # copies a reference of the sources used for the build
+    srcdestdir = os.path.join(destdir, 'src')
+    if os.path.exists(srcdestdir): shutil.rmtree(srcdestdir)
+    shutil.copytree(os.path.join(srcdir, 'src'), srcdestdir)
+
     # finally, writes a ".version" file at the root of the directory
     info = os.path.join(destdir, ".version")
     if os.path.exists(info): os.unlink(info)
