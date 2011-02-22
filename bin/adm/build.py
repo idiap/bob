@@ -282,8 +282,8 @@ def doxygen(option):
   #create a link from index.html to main.html 
   os.chdir(os.path.join(option.doc_prefix, 'html'))
   if not os.path.exists('main.html'):
-    logging.debug("Generating symlink main.html -> index.html")
-    os.symlink('index.html', 'main.html')
+    logging.debug("Copying index.html -> main.html")
+    shutil.copy('index.html', 'main.html')
 
   logging.debug('Finished running doxygen.')
 
