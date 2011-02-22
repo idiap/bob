@@ -119,10 +119,12 @@ void db::T3BinaryArrayCodec::save (const std::string& filename,
   ofile.write((const char*)&framesize, sizeof(uint32_t));
   if (data.getElementType() == Torch::core::array::t_float32) {
     blitz::Array<float, 1> save = data.get<float,1>();
+    if (!save.isStorageContiguous()) save.reference(save.copy());
     ofile.write((const char*)save.data(), save.extent(0)*sizeof(float));
   }
   else { //it is a t_float64
     blitz::Array<double, 1> save = data.get<double,1>();
+    if (!save.isStorageContiguous()) save.reference(save.copy());
     ofile.write((const char*)save.data(), save.extent(0)*sizeof(double));
   }
   ofile.close();

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps "core") #other torch subprojects
-set(shared "${LIBXML2_LIBRARIES}")
+set(shared "${LIBXML2_LIBRARIES};${Boost_REGEX_LIBRARY_RELEASE}")
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
@@ -22,6 +22,9 @@ set(src
     "src/BinFileHeader.cc"
     "src/BinFile.cc"
     "src/BinaryArrayCodec.cc"
+    "src/PBMImageArrayCodec.cc"
+    "src/PGMImageArrayCodec.cc"
+    "src/PPMImageArrayCodec.cc"
     "src/T3BinaryArrayCodec.cc"
     "src/InlinedArraysetImpl.cc"
     "src/ArraysetCodec.cc"
@@ -38,6 +41,12 @@ set(src
     "src/XMLWriter.cc"
     "src/Exception.cc"
     )
+
+# If we have matio installed, enable the compilation of relevant modules
+if(MATIO_FOUND)
+  set(shared "${shared};${matio_LIBRARY}")
+  set(src "${src};src/MatUtils.cc;src/MatArrayCodec.cc;src/MatArraysetCodec.cc")
+endif(MATIO_FOUND)
 
 include(../../cmake/macros.cmake)
 torch_library(database "${src}" "${deps}" "${shared}")
