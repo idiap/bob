@@ -42,11 +42,12 @@ db::MatArraysetCodec::~MatArraysetCodec() { }
 void db::MatArraysetCodec::peek(const std::string& filename, 
     Torch::core::array::ElementType& eltype, size_t& ndim,
     size_t* shape, size_t& samples) const {
-  db::ArrayTypeInfo info;
-  db::detail::get_info_first(filename, info);
+  boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > > dict = db::detail::list_variables(filename);
+  const db::ArrayTypeInfo& info = dict->begin()->second.second;
   eltype = info.eltype;
   ndim = info.ndim;
   for (size_t i=0; i<ndim; ++i) shape[i] = info.shape[i];
+  samples = dict->size();
 }
 
 #define DIMSWITCH(T) switch(ndim) { \
@@ -74,55 +75,49 @@ db::detail::InlinedArraysetImpl db::MatArraysetCodec::load
   peek(filename, eltype, ndim, shape, samples);
 
   //we already did this at peek(), so we know it is not going to fail!
-  mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDONLY);
+  boost::shared_ptr<mat_t> mat = db::detail::make_matfile(filename, MAT_ACC_RDONLY);
 
-  try {
-    switch (eltype) {
-      case Torch::core::array::t_int8: 
-        DIMSWITCH(int8_t) 
+  switch (eltype) {
+    case Torch::core::array::t_int8: 
+      DIMSWITCH(int8_t) 
         break;
-      case Torch::core::array::t_int16: 
-        DIMSWITCH(int16_t) 
+    case Torch::core::array::t_int16: 
+      DIMSWITCH(int16_t) 
         break;
-      case Torch::core::array::t_int32: 
-        DIMSWITCH(int32_t) 
+    case Torch::core::array::t_int32: 
+      DIMSWITCH(int32_t) 
         break;
-      case Torch::core::array::t_int64: 
-        DIMSWITCH(int64_t) 
+    case Torch::core::array::t_int64: 
+      DIMSWITCH(int64_t) 
         break;
-      case Torch::core::array::t_uint8: 
-        DIMSWITCH(uint8_t) 
+    case Torch::core::array::t_uint8: 
+      DIMSWITCH(uint8_t) 
         break;
-      case Torch::core::array::t_uint16: 
-        DIMSWITCH(uint16_t) 
+    case Torch::core::array::t_uint16: 
+      DIMSWITCH(uint16_t) 
         break;
-      case Torch::core::array::t_uint32: 
-        DIMSWITCH(uint32_t) 
+    case Torch::core::array::t_uint32: 
+      DIMSWITCH(uint32_t) 
         break;
-      case Torch::core::array::t_uint64: 
-        DIMSWITCH(uint64_t) 
+    case Torch::core::array::t_uint64: 
+      DIMSWITCH(uint64_t) 
         break;
-      case Torch::core::array::t_float32: 
-        DIMSWITCH(float) 
+    case Torch::core::array::t_float32: 
+      DIMSWITCH(float) 
         break;
-      case Torch::core::array::t_float64: 
-        DIMSWITCH(double) 
+    case Torch::core::array::t_float64: 
+      DIMSWITCH(double) 
         break;
-      case Torch::core::array::t_complex64: 
-        CDIMSWITCH(std::complex<float>, float) 
+    case Torch::core::array::t_complex64: 
+      CDIMSWITCH(std::complex<float>, float) 
         break;
-      case Torch::core::array::t_complex128: 
-        CDIMSWITCH(std::complex<double>, double) 
+    case Torch::core::array::t_complex128: 
+      CDIMSWITCH(std::complex<double>, double) 
         break;
-      default:
-        throw Torch::database::Exception(); //shut-up gcc
-    }
-  } catch (Torch::core::Exception& ex) {
-    Mat_Close(mat);
-    throw;
+    default:
+      break;
   }
-
-  Mat_Close(mat);
+  throw Torch::database::Exception(); //shut-up gcc
 }
 
 #undef DIMSWITCH
@@ -157,59 +152,52 @@ db::Array db::MatArraysetCodec::load
   std::advance(it, id-1); //it is now pointing to the correct name to look for.
 
   //we already did this at peek(), so we know it is not going to fail!
-  mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDONLY);
-  const char* varname = it->second.first.c_str();
+  boost::shared_ptr<mat_t> mat = db::detail::make_matfile(filename, MAT_ACC_RDONLY);
+  const std::string& varname = it->second.first;
   Torch::core::array::ElementType eltype = it->second.second.eltype;
   size_t ndim = it->second.second.ndim;
 
   //then we do a normal array readout, as in an ArrayCodec.load()
-  try {
-    switch (eltype) {
-      case Torch::core::array::t_int8: 
-        DIMSWITCH(int8_t) 
+  switch (eltype) {
+    case Torch::core::array::t_int8: 
+      DIMSWITCH(int8_t) 
         break;
-      case Torch::core::array::t_int16: 
-        DIMSWITCH(int16_t) 
+    case Torch::core::array::t_int16: 
+      DIMSWITCH(int16_t) 
         break;
-      case Torch::core::array::t_int32: 
-        DIMSWITCH(int32_t) 
+    case Torch::core::array::t_int32: 
+      DIMSWITCH(int32_t) 
         break;
-      case Torch::core::array::t_int64: 
-        DIMSWITCH(int64_t) 
+    case Torch::core::array::t_int64: 
+      DIMSWITCH(int64_t) 
         break;
-      case Torch::core::array::t_uint8: 
-        DIMSWITCH(uint8_t) 
+    case Torch::core::array::t_uint8: 
+      DIMSWITCH(uint8_t) 
         break;
-      case Torch::core::array::t_uint16: 
-        DIMSWITCH(uint16_t) 
+    case Torch::core::array::t_uint16: 
+      DIMSWITCH(uint16_t) 
         break;
-      case Torch::core::array::t_uint32: 
-        DIMSWITCH(uint32_t) 
+    case Torch::core::array::t_uint32: 
+      DIMSWITCH(uint32_t) 
         break;
-      case Torch::core::array::t_uint64: 
-        DIMSWITCH(uint64_t) 
+    case Torch::core::array::t_uint64: 
+      DIMSWITCH(uint64_t) 
         break;
-      case Torch::core::array::t_float32: 
-        DIMSWITCH(float) 
+    case Torch::core::array::t_float32: 
+      DIMSWITCH(float) 
         break;
-      case Torch::core::array::t_float64: 
-        DIMSWITCH(double) 
+    case Torch::core::array::t_float64: 
+      DIMSWITCH(double) 
         break;
-      case Torch::core::array::t_complex64: 
-        CDIMSWITCH(std::complex<float>, float) 
+    case Torch::core::array::t_complex64: 
+      CDIMSWITCH(std::complex<float>, float) 
         break;
-      case Torch::core::array::t_complex128: 
-        CDIMSWITCH(std::complex<double>, double) 
+    case Torch::core::array::t_complex128: 
+      CDIMSWITCH(std::complex<double>, double) 
         break;
-      default:
-        throw Torch::database::Exception(); //shut-up gcc
-    }
-  } catch (Torch::core::Exception& ex) {
-    Mat_Close(mat);
-    throw;
+    default:
+      break;
   }
-
-  Mat_Close(mat);
   throw Torch::database::Exception(); //shut-up gcc
 }
 
@@ -264,58 +252,51 @@ void db::MatArraysetCodec::append
   //name based on our max_peek() findings.
   boost::format fmt_varname("array_%d");
   fmt_varname % next_index;
-  const char* varname = fmt_varname.str().c_str();
+  const std::string& varname = fmt_varname.str();
 
-  mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDWR);
-  if (!mat) throw db::FileNotReadable(filename.c_str());
-  try {
-    switch(array.getElementType()) {
-      case Torch::core::array::t_int8: 
-        DIMSWITCH(int8_t) 
+  boost::shared_ptr<mat_t> mat = db::detail::make_matfile(filename, MAT_ACC_RDWR);
+  if (!mat) throw db::FileNotReadable(filename);
+
+  switch(array.getElementType()) {
+    case Torch::core::array::t_int8: 
+      DIMSWITCH(int8_t) 
         break;
-      case Torch::core::array::t_int16: 
-        DIMSWITCH(int16_t) 
+    case Torch::core::array::t_int16: 
+      DIMSWITCH(int16_t) 
         break;
-      case Torch::core::array::t_int32: 
-        DIMSWITCH(int32_t) 
+    case Torch::core::array::t_int32: 
+      DIMSWITCH(int32_t) 
         break;
-      case Torch::core::array::t_int64: 
-        DIMSWITCH(int64_t) 
+    case Torch::core::array::t_int64: 
+      DIMSWITCH(int64_t) 
         break;
-      case Torch::core::array::t_uint8: 
-        DIMSWITCH(uint8_t) 
+    case Torch::core::array::t_uint8: 
+      DIMSWITCH(uint8_t) 
         break;
-      case Torch::core::array::t_uint16: 
-        DIMSWITCH(uint16_t) 
+    case Torch::core::array::t_uint16: 
+      DIMSWITCH(uint16_t) 
         break;
-      case Torch::core::array::t_uint32: 
-        DIMSWITCH(uint32_t) 
+    case Torch::core::array::t_uint32: 
+      DIMSWITCH(uint32_t) 
         break;
-      case Torch::core::array::t_uint64: 
-        DIMSWITCH(uint64_t) 
+    case Torch::core::array::t_uint64: 
+      DIMSWITCH(uint64_t) 
         break;
-      case Torch::core::array::t_float32: 
-        DIMSWITCH(float) 
+    case Torch::core::array::t_float32: 
+      DIMSWITCH(float) 
         break;
-      case Torch::core::array::t_float64: 
-        DIMSWITCH(double) 
+    case Torch::core::array::t_float64: 
+      DIMSWITCH(double) 
         break;
-      case Torch::core::array::t_complex64: 
-        CDIMSWITCH(std::complex<float>, float) 
+    case Torch::core::array::t_complex64: 
+      CDIMSWITCH(std::complex<float>, float) 
         break;
-      case Torch::core::array::t_complex128: 
-        CDIMSWITCH(std::complex<double>, double) 
+    case Torch::core::array::t_complex128: 
+      CDIMSWITCH(std::complex<double>, double) 
         break;
-      default:
-        Mat_Close(mat);
-        throw Torch::database::Exception(); //shut-up gcc
-    }
-  } catch (Torch::core::Exception& ex) {
-    Mat_Close(mat);
-    throw; //re-throw
+    default:
+      throw Torch::database::Exception(); //shut-up gcc
   }
-
-  Mat_Close(mat);
 }
 
 #undef DIMSWITCH
@@ -346,55 +327,47 @@ void db::MatArraysetCodec::save (const std::string& filename,
 
   static boost::format fmt_varname("array_%d");
 
-  mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDWR);
-  if (!mat) throw db::FileNotReadable(filename.c_str());
+  boost::shared_ptr<mat_t> mat = db::detail::make_matfile(filename, MAT_ACC_RDWR);
+  if (!mat) throw db::FileNotReadable(filename);
 
-  try {
-    switch(data.getElementType()) {
-      case Torch::core::array::t_int8: 
-        DIMSWITCH(int8_t) 
+  switch(data.getElementType()) {
+    case Torch::core::array::t_int8: 
+      DIMSWITCH(int8_t) 
         break;
-      case Torch::core::array::t_int16: 
-        DIMSWITCH(int16_t) 
+    case Torch::core::array::t_int16: 
+      DIMSWITCH(int16_t) 
         break;
-      case Torch::core::array::t_int32: 
-        DIMSWITCH(int32_t) 
+    case Torch::core::array::t_int32: 
+      DIMSWITCH(int32_t) 
         break;
-      case Torch::core::array::t_int64: 
-        DIMSWITCH(int64_t) 
+    case Torch::core::array::t_int64: 
+      DIMSWITCH(int64_t) 
         break;
-      case Torch::core::array::t_uint8: 
-        DIMSWITCH(uint8_t) 
+    case Torch::core::array::t_uint8: 
+      DIMSWITCH(uint8_t) 
         break;
-      case Torch::core::array::t_uint16: 
-        DIMSWITCH(uint16_t) 
+    case Torch::core::array::t_uint16: 
+      DIMSWITCH(uint16_t) 
         break;
-      case Torch::core::array::t_uint32: 
-        DIMSWITCH(uint32_t) 
+    case Torch::core::array::t_uint32: 
+      DIMSWITCH(uint32_t) 
         break;
-      case Torch::core::array::t_uint64: 
-        DIMSWITCH(uint64_t) 
+    case Torch::core::array::t_uint64: 
+      DIMSWITCH(uint64_t) 
         break;
-      case Torch::core::array::t_float32: 
-        DIMSWITCH(float) 
+    case Torch::core::array::t_float32: 
+      DIMSWITCH(float) 
         break;
-      case Torch::core::array::t_float64: 
-        DIMSWITCH(double) 
+    case Torch::core::array::t_float64: 
+      DIMSWITCH(double) 
         break;
-      case Torch::core::array::t_complex64: 
-        CDIMSWITCH(std::complex<float>, float) 
+    case Torch::core::array::t_complex64: 
+      CDIMSWITCH(std::complex<float>, float) 
         break;
-      case Torch::core::array::t_complex128: 
-        CDIMSWITCH(std::complex<double>, double) 
+    case Torch::core::array::t_complex128: 
+      CDIMSWITCH(std::complex<double>, double) 
         break;
-      default:
-        Mat_Close(mat);
-        throw Torch::database::Exception(); //shut-up gcc
-    }
-  } catch (Torch::core::Exception& ex) {
-    Mat_Close(mat);
-    throw; //re-throw
+    default:
+      throw Torch::database::Exception(); //shut-up gcc
   }
-
-  Mat_Close(mat);
 }
