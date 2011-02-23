@@ -55,11 +55,11 @@ void db::ImageArrayCodec::peek(const std::string& filename,
     Torch::core::array::ElementType& eltype, size_t& ndim,
     size_t* shape) const 
 {
-  Magick::Image image;
   try {
     // Read a file into image object
     // TODO: Does ping() retrieve the colorspace and the depth?
-    image.read(filename.c_str());
+    //  Magick::Image image;
+    Magick::Image image(filename.c_str());
   
     if( image.colorSpace() == Magick::GRAYColorspace)
       shape[0] = 1;
@@ -85,13 +85,12 @@ void db::ImageArrayCodec::peek(const std::string& filename,
 
 db::detail::InlinedArrayImpl 
 db::ImageArrayCodec::load(const std::string& filename) const {
-  Magick::Image image;
   size_t shape[3];
   Torch::core::array::ElementType eltype;
   try {
     // Read a file into image object
     // TODO: Does ping() retrieve the colorspace and the depth?
-    image.read(filename.c_str());
+    Magick::Image image(filename.c_str());
   
     if( image.colorSpace() == Magick::GRAYColorspace)
       shape[0] = 1;
@@ -107,42 +106,42 @@ db::ImageArrayCodec::load(const std::string& filename) const {
       eltype = Torch::core::array::t_uint16;
     else 
       throw db::ImageException();
+
+    // Get the with and the height
+    int n_c = shape[0];
+    int height = shape[1];
+    int width = shape[2];
+
+    if( eltype == Torch::core::array::t_uint16) {
+      blitz::Array<uint16_t,3> data(n_c, height, width);
+      if(n_c == 1) {
+        uint16_t *pixels = new uint16_t[width*height];
+        image.write( 0, 0, width, height, "I", Magick::ShortPixel, pixels );
+        for (int h=0; h<height; ++h)
+          for (int w=0; w<width; ++w)
+            data(0,h,w) = pixels[h*width+w]; 
+        delete [] pixels;
+      }
+      else if(n_c == 3) {
+        const Magick::PixelPacket *pixels=image.getConstPixels(0,0,width,height);
+        for (int h=0; h<height; ++h)
+          for (int w=0; w<width; ++w) {
+            data(0,h,w) = pixels[h*width+w].red; 
+            data(1,h,w) = pixels[h*width+w].green; 
+            data(2,h,w) = pixels[h*width+w].blue; 
+          }
+      }
+      return db::detail::InlinedArrayImpl(data);
+    }
+    else
+    {
+      throw db::ImageException();
+    }
   }
   catch( Magick::Exception &error_ )
   {
     throw db::ImageException();
   } 
-
-  // Get the with and the height
-  int n_c = shape[0];
-  int height = shape[1];
-  int width = shape[2];
-
-  if( eltype == Torch::core::array::t_uint16) {
-    blitz::Array<uint16_t,3> data(n_c, height, width);
-    if(n_c == 1) {
-      uint16_t *pixels = new uint16_t[width*height];
-      image.write( 0, 0, width, height, "I", Magick::ShortPixel, pixels );
-      for (int h=0; h<height; ++h)
-        for (int w=0; w<width; ++w)
-          data(0,h,w) = pixels[h*width+w]; 
-      delete [] pixels;
-    }
-    else if(n_c == 3) {
-      const Magick::PixelPacket *pixels=image.getConstPixels(0,0,width,height);
-      for (int h=0; h<height; ++h)
-        for (int w=0; w<width; ++w) {
-          data(0,h,w) = pixels[h*width+w].red; 
-          data(1,h,w) = pixels[h*width+w].green; 
-          data(2,h,w) = pixels[h*width+w].blue; 
-        }
-    }
-    return db::detail::InlinedArrayImpl(data);
-  }
-  else
-  {
-    throw db::ImageException();
-  }
 }
 
 void db::ImageArrayCodec::save (const std::string& filename,
@@ -162,9 +161,11 @@ void db::ImageArrayCodec::save (const std::string& filename,
 
   // Write image
   Magick::Image image;
+  image.size( Magick::Geometry( width, height) );
   blitz::Array<uint16_t,3> img = data.get<uint16_t,3>();
   if( shape[0] == 1) // Grayscale
   {
+    image.colorSpace( Magick::GRAYColorspace);
     uint16_t *pixels = new uint16_t[width*height];
     for (int h=0; h<height; ++h)
       for (int w=0; w<width; ++w)
@@ -175,6 +176,7 @@ void db::ImageArrayCodec::save (const std::string& filename,
   }
   else if( shape[0] == 3) // RGB
   {
+    image.colorSpace( Magick::RGBColorspace);
     // Ensure that there is only one reference to underlying image
     // If this is not done, then image pixels will not be modified.
     image.modifyImage();
@@ -187,7 +189,8 @@ void db::ImageArrayCodec::save (const std::string& filename,
         pixels[h*width+w].green = img(1,h,w); 
         pixels[h*width+w].blue = img(2,h,w); 
       }
-     // Save changes to image.
-     view.sync();
+    // Save changes to image.
+    view.sync();
+    image.write( filename.c_str());
   }
 }
