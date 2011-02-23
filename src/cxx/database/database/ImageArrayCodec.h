@@ -64,4 +64,4 @@ namespace Torch { namespace database {
 
 }}
 
-#endif /* TORCH5SPRO_DATABASE_PBMIMAGE_ARRAYCODEC_H */
+#endif /* TORCH5SPRO_DATABASE_IMAGE_ARRAYCODEC_H */
