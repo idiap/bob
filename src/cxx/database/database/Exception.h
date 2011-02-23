@@ -70,6 +70,17 @@ namespace Torch { namespace database {
       mutable std::string m_message;
   };
 
+  class UnsupportedTypeError: public Exception {
+    public:
+      UnsupportedTypeError(Torch::core::array::ElementType eltype) throw();
+      virtual ~UnsupportedTypeError() throw();
+      virtual const char* what() const throw();
+
+    private:
+      Torch::core::array::ElementType m_eltype;
+      mutable std::string m_message;
+  };
+
   class NonExistingElement: public Exception {
     public:
       NonExistingElement();

@@ -49,7 +49,7 @@ void db::MatArrayCodec::peek(const std::string& filename,
     throw db::DimensionError(ndim, Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
   }
   if (eltype == Torch::core::array::t_unknown) {
-    throw db::TypeError(eltype, Torch::core::array::t_float32);
+    throw db::UnsupportedTypeError(eltype);
   }
 }
 
@@ -119,7 +119,7 @@ db::MatArrayCodec::load(const std::string& filename) const {
     default:
       break;
   }
-  throw Torch::core::Exception(); //shut-up gcc
+  throw Torch::database::UnsupportedTypeError(eltype);
 }
 
 #undef DIMSWITCH
@@ -190,9 +190,8 @@ void db::MatArrayCodec::save (const std::string& filename,
       CDIMSWITCH(std::complex<double>, double) 
         break;
     default:
-      break;
+      throw Torch::database::UnsupportedTypeError(data.getElementType());
   }
-  throw Torch::core::Exception(); //shut-up gcc
 }
 
 #undef DIMSWITCH

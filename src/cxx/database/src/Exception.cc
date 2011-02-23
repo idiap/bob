@@ -100,6 +100,25 @@ const char* db::TypeError::what() const throw() {
   }
 }
 
+db::UnsupportedTypeError::UnsupportedTypeError(Torch::core::array::ElementType eltype) throw() :
+  m_eltype(eltype)
+{
+}
+
+db::UnsupportedTypeError::~UnsupportedTypeError() throw() { }
+
+const char* db::UnsupportedTypeError::what() const throw() {
+  try {
+    boost::format message("The type '%s' is not supported for this operation");
+    message % array::stringize(m_eltype);
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::UnsupportedTypeError: cannot format, exception raised";
+    return emergency;
+  }
+}
+
 db::NonExistingElement::NonExistingElement() { }
 
 db::NonExistingElement::~NonExistingElement() throw() { }

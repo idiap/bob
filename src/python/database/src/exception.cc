@@ -127,6 +127,8 @@ void bind_database_exception() {
 
   CxxToPythonTranslatorPar2<Torch::database::TypeError, Torch::core::array::ElementType, Torch::core::array::ElementType>("TypeError", "Raised when the user asks for arrays with unsupported element type");
 
+  CxxToPythonTranslatorPar<Torch::database::UnsupportedTypeError, Torch::core::array::ElementType>("UnsupportedTypeError", "Raised when the user wants to performe an operation for which this particular type is not supported");
+
   CxxToPythonTranslator<Torch::database::Uninitialized>("Uninitialized", "Raised when the user asks for arrays with unsupported element type");
 
   CxxToPythonTranslatorPar<Torch::database::AlreadyHasRelations, size_t>("AlreadyHasRelations", "Raised when the user inserts a new rule to a Relationset with existing relations");

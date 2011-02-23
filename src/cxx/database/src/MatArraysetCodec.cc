@@ -117,7 +117,7 @@ db::detail::InlinedArraysetImpl db::MatArraysetCodec::load
     default:
       break;
   }
-  throw Torch::database::Exception(); //shut-up gcc
+  throw Torch::database::UnsupportedTypeError(eltype);
 }
 
 #undef DIMSWITCH
@@ -198,7 +198,7 @@ db::Array db::MatArraysetCodec::load
     default:
       break;
   }
-  throw Torch::database::Exception(); //shut-up gcc
+  throw Torch::database::UnsupportedTypeError(eltype);
 }
 
 #undef DIMSWITCH
@@ -295,7 +295,7 @@ void db::MatArraysetCodec::append
       CDIMSWITCH(std::complex<double>, double) 
         break;
     default:
-      throw Torch::database::Exception(); //shut-up gcc
+      throw Torch::database::UnsupportedTypeError(array.getElementType());
   }
 }
 
@@ -368,6 +368,6 @@ void db::MatArraysetCodec::save (const std::string& filename,
       CDIMSWITCH(std::complex<double>, double) 
         break;
     default:
-      throw Torch::database::Exception(); //shut-up gcc
+      throw Torch::database::UnsupportedTypeError(data.getElementType());
   }
 }

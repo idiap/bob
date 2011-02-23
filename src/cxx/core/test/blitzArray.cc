@@ -42,8 +42,8 @@ size_t maxRAMInMegabytes () {
 }
 
 void checkBlitzAllocation( const unsigned int n_megabytes ) {
-  if (n_megabytes > maxRAMInMegabytes()) {
-    std::cout << "Warning: Skipping allocation test for " << n_megabytes << " MB because this machine only has " << maxRAMInMegabytes() << " MB of RAM" << std::endl;
+  if (n_megabytes > 0.75*maxRAMInMegabytes()) {
+    std::cout << "Warning: Skipping allocation test for " << n_megabytes << " MB because this machine only has " << maxRAMInMegabytes() << " MB of RAM (and we use a max-75% rule)" << std::endl;
     return;
   }
 

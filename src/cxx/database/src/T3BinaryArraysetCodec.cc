@@ -194,7 +194,7 @@ void db::T3BinaryArraysetCodec::save (const std::string& filename,
   //can only save float32 or float64, otherwise, throw.
   if ((data.getElementType() != Torch::core::array::t_float32) && 
       (data.getElementType() != Torch::core::array::t_float64)) {
-    throw db::TypeError(data.getElementType(), Torch::core::array::t_float32); 
+    throw db::UnsupportedTypeError(data.getElementType());
   }
 
   std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::out);
