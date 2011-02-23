@@ -14,7 +14,7 @@
 #include <boost/lexical_cast.hpp>
 #include <unistd.h>
 
-#include <Magick++.h> 
+#include <ImageMagick/Magick++.h> 
 
 namespace db = Torch::database;
 
@@ -70,15 +70,9 @@ void db::ImageArrayCodec::peek(const std::string& filename,
     shape[1] = image.rows();
     shape[2] = image.columns();
 
-    // Set other attributes
-    if( image.depth() <= 8)
-      eltype = Torch::core::array::t_uint8;
-/*    else if( image.depth() <= 16)
+    // Set other attributes TODO: depth
+    if( image.depth() == 16)
       eltype = Torch::core::array::t_uint16;
-    else if( image.depth() <= 32)
-      eltype = Torch::core::array::t_uint32;
-    else if( image.depth() <= 64)
-      eltype = Torch::core::array::t_uint64;*/
     else 
       throw db::ImageException();
     ndim = 3; 
@@ -108,13 +102,9 @@ db::ImageArrayCodec::load(const std::string& filename) const {
     shape[1] = image.rows();
     shape[2] = image.columns();
 
-    // Set other attributes
-    if( image.depth() <= 8)
-      eltype = Torch::core::array::t_uint8;
-/*    else if( image.depth() <= 16)
+    // Set other attributes TODO: depth
+    if( image.depth() == 16)
       eltype = Torch::core::array::t_uint16;
-    else if( image.depth() <= 32)
-      eltype = Torch::core::array::t_uint32;*/
     else 
       throw db::ImageException();
   }
@@ -128,47 +118,31 @@ db::ImageArrayCodec::load(const std::string& filename) const {
   int height = shape[1];
   int width = shape[2];
 
-  if( eltype == Torch::core::array::t_uint8) {
-    blitz::Array<uint8_t,3> data(n_c, height, width);
+  if( eltype == Torch::core::array::t_uint16) {
+    blitz::Array<uint16_t,3> data(n_c, height, width);
     if(n_c == 1) {
-      uint8_t *pixels = new uint8_t[width*height];
-      image.write( 0, 0, width, height, "I", CharPixel, pixels );
+      uint16_t *pixels = new uint16_t[width*height];
+      image.write( 0, 0, width, height, "I", Magick::ShortPixel, pixels );
       for (int h=0; h<height; ++h)
         for (int w=0; w<width; ++w)
           data(0,h,w) = pixels[h*width+w]; 
       delete [] pixels;
     }
     else if(n_c == 3) {
-      uint8_t *pixels = new uint8_t[width*height];
-      const PixelPacket *pixels=image.getConstPixels(0,0,width,height);
+      const Magick::PixelPacket *pixels=image.getConstPixels(0,0,width,height);
       for (int h=0; h<height; ++h)
         for (int w=0; w<width; ++w) {
           data(0,h,w) = pixels[h*width+w].red; 
           data(1,h,w) = pixels[h*width+w].green; 
           data(2,h,w) = pixels[h*width+w].blue; 
         }
-      delete [] pixels;
     }
     return db::detail::InlinedArrayImpl(data);
   }
-/*  else if( eltype == Torch::core::array::t_uint16) {
-    blitz::Array<uint16_t,3> data(n_c, height, width);
-    for (int h=0; h<height; ++h)
-      for (int w=0; w<width; ++w)
-        for (int c=0; c<n_c; ++c)
-          ifile >> data(c,h,w);
-    return db::detail::InlinedArrayImpl(data);
-  }
-  else if( eltype == Torch::core::array::t_uint32) {
-    blitz::Array<uint32_t,3> data(n_c, height, width);
-    for (int h=0; h<height; ++h)
-      for (int w=0; w<width; ++w)
-        for (int c=0; c<n_c; ++c)
-          ifile >> data(c,h,w);
-    return db::detail::InlinedArrayImpl(data);
-  }*/
   else
+  {
     throw db::ImageException();
+  }
 }
 
 void db::ImageArrayCodec::save (const std::string& filename,
@@ -176,7 +150,7 @@ void db::ImageArrayCodec::save (const std::string& filename,
   //can only save tree-dimensional data, so throw if that is not the case
   if (data.getNDim() != 3) throw db::DimensionError(data.getNDim(), 3);
 
-  if(data.getElementType() != Torch::core::array::t_uint8)
+  if(data.getElementType() != Torch::core::array::t_uint16)
     throw db::ImageException();
 
   const size_t *shape = data.getShape();
@@ -188,18 +162,32 @@ void db::ImageArrayCodec::save (const std::string& filename,
 
   // Write image
   Magick::Image image;
+  blitz::Array<uint16_t,3> img = data.get<uint16_t,3>();
   if( shape[0] == 1) // Grayscale
   {
-    uint8_t *pixels = new uint8_t[width*height];
+    uint16_t *pixels = new uint16_t[width*height];
     for (int h=0; h<height; ++h)
       for (int w=0; w<width; ++w)
-        pixels[h*width+w] = data(0,h,w);
-    image.read( shape[2], shape[1], "I", CharPixel, pixels );
-    image.save( filename.c_str);
+        pixels[h*width+w] = img(0,h,w);
+    image.read( shape[2], shape[1], "I", Magick::ShortPixel, pixels );
+    image.write( filename.c_str());
     delete [] pixels;
   }
-/*  else if( shape[0] == 3) // RGB
+  else if( shape[0] == 3) // RGB
   {
-
-  }*/
+    // Ensure that there is only one reference to underlying image
+    // If this is not done, then image pixels will not be modified.
+    image.modifyImage();
+    // Allocate pixel view
+    Magick::Pixels view(image); 
+    Magick::PixelPacket *pixels = view.get(0,0,width,height);
+    for (int h=0; h<height; ++h )
+      for (int w=0; w<width; ++w ) {
+        pixels[h*width+w].red = img(0,h,w); 
+        pixels[h*width+w].green = img(1,h,w); 
+        pixels[h*width+w].blue = img(2,h,w); 
+      }
+     // Save changes to image.
+     view.sync();
+  }
 }
