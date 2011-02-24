@@ -12,6 +12,7 @@ set(pysrc
    "src/relationset.cc"
    "src/binfile.cc"
    "src/codec.cc"
+   "src/transcode.cc"
    "src/main.cc"
    )
  
