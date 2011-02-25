@@ -22,6 +22,18 @@ static void set_name(db::Dataset& ds, const char* name) {
   ds.setName(n);
 }
 
+static std::wstring get_author(const db::Dataset& ds) {
+  return ds.getAuthor();
+}
+
+static void set_author(db::Dataset& ds, const std::wstring& author) {
+  ds.setAuthor(author);
+}
+
+static boost::posix_time::ptime get_datetime(const db::Dataset& ds) {
+  return ds.getDateTime();
+}
+
 static tuple get_arrayset_ids(db::Dataset& ds) {
   list l;
   for(std::map<size_t, boost::shared_ptr<db::Arrayset> >::const_iterator it=ds.arraysetIndex().begin(); it!=ds.arraysetIndex().end(); ++it) {
@@ -79,6 +91,8 @@ void bind_database_dataset() {
     .def(init<const std::string&>((arg("url")), "Initializes a Dataset reading the contents from a file"))
 
     .add_property("name", &get_name, &set_name, "The name of this Dataset")
+    .add_property("author", &get_author, &set_author, "The author of this Dataset")
+    .add_property("datetime", &get_datetime, &db::Dataset::setDateTime, "The date in which this Dataset was last modified.")
     .add_property("version", &db::Dataset::getVersion, &db::Dataset::setVersion, "The version of this Dataset")
     
     .def("ids", &get_arrayset_ids, "All Arrayset ids of this Dataset")
