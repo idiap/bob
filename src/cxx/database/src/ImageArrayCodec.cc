@@ -82,7 +82,7 @@ void db::ImageArrayCodec::peek(const std::string& filename,
     // Set depth
     if( image.depth() <= 8)
       eltype = Torch::core::array::t_uint8;
-    if( image.depth() <= 16)
+    else if( image.depth() <= 16)
       eltype = Torch::core::array::t_uint16;
     else {
       throw db::ImageException();
