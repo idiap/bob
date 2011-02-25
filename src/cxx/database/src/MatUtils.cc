@@ -13,6 +13,25 @@ namespace db = Torch::database;
 namespace array = Torch::core::array;
 namespace det = db::detail;
 
+boost::shared_ptr<mat_t> det::make_matfile(const std::string& filename,
+    int flags) {
+  return boost::shared_ptr<mat_t>(Mat_Open(filename.c_str(), flags), std::ptr_fun(Mat_Close));
+}
+
+boost::shared_ptr<matvar_t> det::make_matvar(boost::shared_ptr<mat_t>& file) {
+  return boost::shared_ptr<matvar_t>(Mat_VarReadNext(file.get()), std::ptr_fun(Mat_VarFree));
+}
+
+boost::shared_ptr<matvar_t> det::make_matvar_info(boost::shared_ptr<mat_t>& file) {
+  return boost::shared_ptr<matvar_t>(Mat_VarReadNextInfo(file.get()), std::ptr_fun(Mat_VarFree));
+}
+
+boost::shared_ptr<matvar_t> det::make_matvar(boost::shared_ptr<mat_t>& file,
+   const std::string& varname) {
+  if (!varname.size()) throw db::Uninitialized();
+  return boost::shared_ptr<matvar_t>(Mat_VarRead(file.get(), const_cast<char*>(varname.c_str())), std::ptr_fun(Mat_VarFree));
+}
+
 enum matio_classes det::mio_class_type (array::ElementType i) {
   switch (i) {
     case array::t_int8: 
@@ -141,7 +160,7 @@ template <> blitz::TinyVector<int,4> det::make_shape<4> (const int* shape) {
   return blitz::shape(shape[0], shape[1], shape[2], shape[3]);
 }
 
-void det::get_info(const matvar_t* matvar,
+void det::get_info(boost::shared_ptr<const matvar_t> matvar,
     Torch::database::ArrayTypeInfo& info) {
   info.ndim = matvar->rank;
   for (size_t i=0; i<info.ndim; ++i) info.shape[i] = matvar->dims[i];
@@ -156,28 +175,19 @@ void det::get_info_first(const std::string& filename, db::ArrayTypeInfo& info) {
 
   boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > > retval(new std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> >());
 
-  mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDONLY);
-  
+  boost::shared_ptr<mat_t> mat = det::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw db::FileNotReadable(filename);
   
-  matvar_t* matvar = Mat_VarReadNext(mat); //gets the first variable
+  boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
 
   //we continue reading until we find a variable that matches our naming
   //convention.
   while (matvar && !boost::regex_match(matvar->name, what, allowed_varname)) {
-    Mat_VarFree(matvar);
-    matvar = Mat_VarReadNext(mat); //gets the first variable
+    matvar = make_matvar(mat); //gets the next variable
   }
 
-  if (!what.size()) {
-    Mat_Close(mat);
-    throw db::Uninitialized();
-  }
-
+  if (!what.size()) throw db::Uninitialized();
   get_info(matvar, info);
-
-  Mat_VarFree(matvar);
-  Mat_Close(mat);
 }
 
 boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > >
@@ -188,15 +198,14 @@ boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > >
 
   boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > > retval(new std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> >());
 
-  mat_t* mat = Mat_Open(filename.c_str(), MAT_ACC_RDONLY);
+  boost::shared_ptr<mat_t> mat = det::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw db::FileNotReadable(filename);
-  matvar_t* matvar = Mat_VarReadNext(mat); //gets the first variable
+  boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
 
   //we continue reading until we find a variable that matches our naming
   //convention.
   while (matvar && !boost::regex_match(matvar->name, what, allowed_varname)) {
-    Mat_VarFree(matvar);
-    matvar = Mat_VarReadNext(mat); //gets the first variable
+    matvar = make_matvar(mat); //gets the next variable
   }
 
   if (!what.size()) throw db::Uninitialized();
@@ -207,35 +216,29 @@ boost::shared_ptr<std::map<size_t, std::pair<std::string, db::ArrayTypeInfo> > >
   //properties taking that variable as basis
   (*retval)[id] = std::make_pair(matvar->name, db::ArrayTypeInfo());
   get_info(matvar, (*retval)[id].second);
-
-  //release this one and go for reading the next ones
-  Mat_VarFree(matvar);
+  const ArrayTypeInfo& type_cache = (*retval)[id].second;
 
   //checks our support and see if we can load this...
   if ((*retval)[id].second.ndim > 4) {
-    Mat_Close(mat);
     throw db::DimensionError((*retval)[id].second.ndim, 
         Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
   }
   if ((*retval)[id].second.eltype == Torch::core::array::t_unknown) {
-    Mat_Close(mat);
     throw db::TypeError((*retval)[id].second.eltype, 
         Torch::core::array::t_float32);
   }
 
   //if we got here, just continue counting the variables inside. we
-  //only read their info since that is faster
+  //only read their info since that is faster -- but attention! if we just read
+  //the varinfo, we don't get typing correct, so we copy that from the previous
+  //read variable and hope for the best.
 
-  while ((matvar = Mat_VarReadNextInfo(mat))) {
+  while ((matvar = make_matvar_info(mat))) {
     if (boost::regex_match(matvar->name, what, allowed_varname)) {
       id = boost::lexical_cast<size_t>(what[1]);
-      (*retval)[id] = std::make_pair(matvar->name, db::ArrayTypeInfo());
-      get_info(matvar, (*retval)[id].second);
+      (*retval)[id] = std::make_pair(matvar->name, type_cache);
     }
-    Mat_VarFree(matvar);
   }
-
-  Mat_Close(mat);
 
   return retval;
 }

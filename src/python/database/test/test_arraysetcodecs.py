@@ -14,8 +14,7 @@ import random
 
 # This test implements a generalized framework for testing Torch codecs. It
 # loads files in the codec native format, convert into torch native binary
-# format and back, comparing the outcomes at every stage. We believe in the
-# quality of the binary codec because that is covered in other tests.
+# format and back, comparing the outcomes at every stage. 
 
 def tempname(suffix, prefix='torchtest_'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)
@@ -47,52 +46,126 @@ def testcase_transcode(self, codecname, filename):
 # assertions
 unittest.TestCase.transcode = testcase_transcode
 
-def testcase_readwrite(self, codecname, bzdata_list):
+def testcase_readwrite(self, codecname, bzdata_list, save=None):
   """Runs a read/write verify step using the given bz data"""
   testcodec = torch.database.ArraysetCodecRegistry.getCodecByName(codecname)
   tmpname = tempname('.test')
   indata = torch.database.Arrayset()
   for k in bzdata_list: indata.append(k)
   testcodec.save(tmpname, indata)
+
+  # just peeking
+  (eltype, shape, samples) = testcodec.peek(tmpname)
+  self.assertEqual(eltype, indata.elementType)
+  self.assertEqual(shape, indata.shape)
+  self.assertEqual(samples, len(indata))
+
+  # full loading
   reloaded = testcodec.load(tmpname)
   self.assertEqual(indata, reloaded)
+  if save and isinstance(save, (str, unicode)):
+    import shutil
+    shutil.copy(tmpname, save)
   os.unlink(tmpname)
 
 # And we attach...
 unittest.TestCase.readwrite = testcase_readwrite
 
+def testcase_append_load(self, codecname, bzdata_list):
+  """Runs an arrayset append() on the codec, tests if it keeps the data."""
+  testcodec = torch.database.ArraysetCodecRegistry.getCodecByName(codecname)
+  tmpname = tempname('.test')
+  indata = torch.database.Arrayset()
+  for k in bzdata_list:
+    indata.append(k)
+    testcodec.append(tmpname, torch.database.Array(k))
+
+  #loads everything, see if are exactly the same
+  reloaded = testcodec.load(tmpname)
+  self.assertEqual(indata, reloaded)
+
+  #loads one by one and checks they are individually correct
+  for i, k in enumerate(bzdata_list):
+    self.assertEqual(testcodec.load(tmpname, i+1).get(), i)
+
+  os.unlink(tmpname)
+
+# And we attach...
+unittest.TestCase.append_load = testcase_append_load
+
+# This is the data we test with
+data_1 = [
+    torch.core.array.float32_1(range(24), (24,)) / 24.,
+    torch.core.array.float32_1(range(24), (24,)) / 48.,
+    torch.core.array.float32_1(range(24), (24,)) / 0.25,
+    ]
+data_2 = [
+    torch.core.array.float64_1(range(24), (24,)) / 24.3333334,
+    torch.core.array.float64_1(range(24), (24,)) / -52.9,
+    torch.core.array.float64_1(range(24), (24,)) / 37,
+    ]
+data_3 = [
+    torch.core.array.complex128_3(range(24), (2,3,4)) / complex(24.3333334, 0.9),
+    torch.core.array.complex128_3(range(24), (2,3,4)) / complex(0.1, -52.9),
+    torch.core.array.complex128_3(range(24), (2,3,4)) / complex(37, -1e18),
+    ]
+data_4 = [
+    torch.core.array.complex128_4(range(24000), (4,30,40,5)) / complex(24.3333334, 0.9),
+    torch.core.array.complex128_4(range(24000), (4,30,40,5)) / complex(0.1, -52.9),
+    torch.core.array.complex128_4(range(24000), (4,30,40,5)) / complex(37, -1e18),
+
+    ]
+data_4 = 100 * data_4 # 1'200 x 24'000 position complex<double> arrays
+
+data_5 = [
+    torch.core.array.complex128_4(range(240), (4,3,4,5)) / complex(24.3333334, 0.9),
+    torch.core.array.complex128_4(range(240), (4,3,4,5)) / complex(0.1, -52.9),
+    torch.core.array.complex128_4(range(240), (4,3,4,5)) / complex(37, -1e18),
+
+    ]
+
 class ArraysetCodecTest(unittest.TestCase):
   """Performs various tests for the Torch::database::*Codec* types."""
 
-  def test01_t3binary(self):
-    self.transcode("torch3.arrayset.binary", "torch3.bindata")
-    floatdata = [
-        torch.core.array.float32_1(range(24), (24,)) / 24.,
-        torch.core.array.float32_1(range(24), (24,)) / 48.,
-        torch.core.array.float32_1(range(24), (24,)) / 0.25,
-    ]
-    self.readwrite("torch3.arrayset.binary", floatdata)
-    doubledata = [
-        torch.core.array.float64_1(range(24), (24,)) / 24.3333334,
-        torch.core.array.float64_1(range(24), (24,)) / -52.9,
-        torch.core.array.float64_1(range(24), (24,)) / 37,
-    ]
-    self.readwrite("torch3.arrayset.binary", doubledata)
+  def test01_binary(self):
 
-  def test02_matlab(self):
-    #self.transcode("torch3.arrayset.binary", "torch3.bindata")
-    floatdata = [
-        torch.core.array.float32_1(range(24), (24,)) / 24.,
-        torch.core.array.float32_1(range(24), (24,)) / 48.,
-        torch.core.array.float32_1(range(24), (24,)) / 0.25,
-    ]
-    self.readwrite("matlab.arrayset.binary", floatdata)
-    doubledata = [
-        torch.core.array.float64_1(range(24), (24,)) / 24.3333334,
-        torch.core.array.float64_1(range(24), (24,)) / -52.9,
-        torch.core.array.float64_1(range(24), (24,)) / 37,
-    ]
-    self.readwrite("matlab.arrayset.binary", doubledata)
+    # The matlab codec accepts arbitrary input arrays if ints, floats, doubles
+    # and complex values
+    codec = "torch.arrayset.binary"
+    self.readwrite(codec, data_1)
+    self.readwrite(codec, data_2)
+    self.readwrite(codec, data_3)
+    self.readwrite(codec, data_4)
+    self.append_load(codec, data_1)
+    self.append_load(codec, data_2)
+    self.append_load(codec, data_3)
+    self.append_load(codec, data_4)
+    self.transcode(codec, "test1.bin")
+
+  def test02_t3binary(self):
+
+    # The torch3 file format only accepts single dimension floats or doubles
+    codec = "torch3.arrayset.binary"
+    self.readwrite(codec, data_1)
+    self.readwrite(codec, data_2)
+    self.append_load(codec, data_1)
+    self.append_load(codec, data_2)
+    self.transcode(codec, "torch3.bindata")
+
+  def test03_matlab(self):
+
+    # The matlab codec accepts arbitrary input arrays if ints, floats, doubles
+    # and complex values
+    codec = "matlab.arrayset.binary"
+    self.readwrite(codec, data_1)
+    self.readwrite(codec, data_2)
+    self.readwrite(codec, data_3)
+    self.readwrite(codec, data_4)
+    self.append_load(codec, data_1)
+    self.append_load(codec, data_2)
+    self.append_load(codec, data_3)
+    self.append_load(codec, data_4)
+    self.transcode(codec, "test.mat")
 
 if __name__ == '__main__':
   sys.argv.append('-v')

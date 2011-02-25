@@ -219,6 +219,10 @@ static boost::shared_ptr<db::Array> cxx_array_codec_load (boost::shared_ptr<cons
   return boost::make_shared<db::Array>(codec->load(filename));
 }
 
+static const char* cxx_array_codec_name (boost::shared_ptr<const db::ArrayCodec> codec) {
+  return codec->name().c_str();
+}
+
 static tuple cxx_array_extensions (boost::shared_ptr<const db::ArrayCodec> codec) {
   list retval;
   for (std::vector<std::string>::const_iterator it=codec->extensions().begin(); it != codec->extensions().end(); ++it) retval.append(*it);
@@ -262,12 +266,16 @@ static tuple cxx_arrayset_extensions (boost::shared_ptr<const db::ArraysetCodec>
   return tuple(retval);
 }
 
+static const char* cxx_arrayset_codec_name (boost::shared_ptr<const db::ArraysetCodec> codec) {
+  return codec->name().c_str();
+}
+
 void bind_database_codec() {
   class_<boost::shared_ptr<const db::ArrayCodec> >("CxxArrayCodec", no_init)
     .def("peek", &cxx_array_codec_peek)
     .def("load", &cxx_array_codec_load)
     .def("save", &cxx_array_codec_save)
-    .def("name", &db::ArrayCodec::name, return_internal_reference<>())
+    .def("name", &cxx_array_codec_name)
     .def("extensions", &cxx_array_extensions)
     ;
 
@@ -277,7 +285,7 @@ void bind_database_codec() {
     .def("load", &cxx_arrayset_codec_load_one)
     .def("save", &cxx_arrayset_codec_save)
     .def("append", &cxx_arrayset_codec_append)
-    .def("name", &db::ArraysetCodec::name, return_internal_reference<>())
+    .def("name", &cxx_arrayset_codec_name)
     .def("extensions", &cxx_arrayset_extensions)
     ;
 

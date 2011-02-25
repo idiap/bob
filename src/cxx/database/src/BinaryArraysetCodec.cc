@@ -5,6 +5,8 @@
  * @brief Implements the BinaryArraysetCodec type 
  */
 
+#include <boost/filesystem.hpp>
+
 #include "database/BinaryArraysetCodec.h"
 #include "database/ArraysetCodecRegistry.h"
 #include "database/BinFile.h"
@@ -46,6 +48,7 @@ void db::BinaryArraysetCodec::peek(const std::string& filename,
 
 db::detail::InlinedArraysetImpl db::BinaryArraysetCodec::load
 (const std::string& filename) const {
+  if (! boost::filesystem::exists(filename)) throw db::FileNotReadable(filename); 
   db::BinFile f(filename, db::BinFile::in);
   db::detail::InlinedArraysetImpl retval;
   for (size_t i=0; i<f.getNSamples(); ++i) retval.add(f.read());
@@ -54,6 +57,7 @@ db::detail::InlinedArraysetImpl db::BinaryArraysetCodec::load
 
 db::Array db::BinaryArraysetCodec::load
 (const std::string& filename, size_t id) const {
+  if (! boost::filesystem::exists(filename)) throw db::FileNotReadable(filename); 
   db::BinFile f(filename, db::BinFile::in);
   if (!f) throw db::FileNotReadable(filename);
   return f.read(id-1);
@@ -61,8 +65,14 @@ db::Array db::BinaryArraysetCodec::load
 
 void db::BinaryArraysetCodec::append
 (const std::string& filename, const Array& array) const {
-  db::BinFile f(filename, db::BinFile::out | db::BinFile::append);
-  f.write(array.get());
+  if (boost::filesystem::exists(filename)) { //real append
+    db::BinFile f(filename, db::BinFile::out | db::BinFile::append);
+    f.write(array.get());
+  } 
+  else { //new file
+    db::BinFile f(filename, db::BinFile::out);
+    f.write(array.get());
+  }
 }
 
 void db::BinaryArraysetCodec::save (const std::string& filename, 

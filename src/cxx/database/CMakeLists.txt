@@ -41,6 +41,7 @@ set(src
     "src/XMLParser.cc"
     "src/XMLWriter.cc"
     "src/Exception.cc"
+    "src/transcode.cc"
     )
 
 # If we have matio installed, enable the compilation of relevant modules

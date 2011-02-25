@@ -140,6 +140,8 @@ db::Array db::T3BinaryArraysetCodec::load
 void db::T3BinaryArraysetCodec::append
 (const std::string& filename, const Array& array) const {
 
+  std::ofstream ofile;
+
   if (boost::filesystem::exists(filename)) { //the new array must conform!
     //peek the data to see we are ok by looking existing specifications on file
     Torch::core::array::ElementType eltype;
@@ -152,9 +154,27 @@ void db::T3BinaryArraysetCodec::append
     if (array.getNDim() != ndim) throw db::DimensionError(array.getNDim(), ndim);
     if (shape[0] != array.getShape()[0]) throw db::DimensionError(array.getShape()[0], shape[0]);
     if (array.getElementType() != eltype) throw db::TypeError(array.getElementType(), eltype);
+
+    //and we open it to append - we need to re-write a bit of the header. NB:
+    //if you open the file with only std::ios::out, it will truncate it; we use
+    //both std::ios::out and std::ios::in to achieve the desired effect
+    ofile.open(filename.c_str(), std::ios::binary|std::ios::in|std::ios::out);
+    uint32_t nsamples = samples + 1;
+    ofile.write((const char*)&nsamples, sizeof(uint32_t));
+    ofile.close();
+    ofile.open(filename.c_str(), std::ios::binary|std::ios::app);
+  }
+  else {
+    //if the file does not exist, we must start it...
+    ofile.open(filename.c_str(), std::ios::binary|std::ios::out);
+    //and write some of the variables we need to
+    uint32_t nsamples = 1;
+    uint32_t framesize = array.getShape()[0];
+    ofile.write((const char*)&nsamples, sizeof(uint32_t));
+    ofile.write((const char*)&framesize, sizeof(uint32_t));
   }
 
-  std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::app);
+  //now we let it append
   if (array.getElementType() == Torch::core::array::t_float32) {
     blitz::Array<float, 1> save = array.get<float,1>();
     ofile.write((const char*)save.data(), save.extent(0)*sizeof(float));
@@ -174,7 +194,7 @@ void db::T3BinaryArraysetCodec::save (const std::string& filename,
   //can only save float32 or float64, otherwise, throw.
   if ((data.getElementType() != Torch::core::array::t_float32) && 
       (data.getElementType() != Torch::core::array::t_float64)) {
-    throw db::TypeError(data.getElementType(), Torch::core::array::t_float32); 
+    throw db::UnsupportedTypeError(data.getElementType());
   }
 
   std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::out);
