@@ -13,6 +13,7 @@ set(pysrc
    "src/binfile.cc"
    "src/codec.cc"
    "src/transcode.cc"
+   "src/datetime.cc"
    "src/main.cc"
    )
  

@@ -13,6 +13,7 @@
 #include <map>
 #include <cstdlib>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time.hpp>
 
 #include "database/Arrayset.h"
 #include "database/Relationset.h"
@@ -60,6 +61,16 @@ namespace Torch {
         /**
          * @brief Get the name of the Dataset
          */
+        inline const std::wstring& getAuthor() const { return m_author; }
+
+        /**
+         * @brief Set the name of the Dataset. Note
+         */
+        inline void setAuthor(const std::wstring& author) { m_author = author; }
+
+        /**
+         * @brief Get the name of the Dataset
+         */
         inline const std::string& getName() const { return m_name; }
 
         /**
@@ -76,6 +87,20 @@ namespace Torch {
          * @brief Set the version of the Dataset
          */
         inline void setVersion(const size_t version) { m_version = version; }
+
+        /**
+         * @brief Get the date from the dataset
+         */
+        inline const boost::posix_time::ptime& getDateTime() const {
+          return m_datetime; 
+        }
+
+        /**
+         * @brief Set the date of the Dataset
+         */
+        inline void setDateTime(const boost::posix_time::ptime& datetime) { 
+          m_datetime = datetime; 
+        }
 
         /**
          * Appends a copy of an Arrayset into this Dataset. 
@@ -228,6 +253,8 @@ namespace Torch {
       private:
         std::string m_name;
         size_t m_version;
+        std::wstring m_author;
+        boost::posix_time::ptime m_datetime;
         std::map<size_t, boost::shared_ptr<Arrayset> > m_id2arrayset;
         std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;
     };
