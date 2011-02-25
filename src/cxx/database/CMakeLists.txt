@@ -22,10 +22,11 @@ set(src
     "src/BinFileHeader.cc"
     "src/BinFile.cc"
     "src/BinaryArrayCodec.cc"
-    "src/JPEGImageArrayCodec.cc"
-    "src/PBMImageArrayCodec.cc"
-    "src/PGMImageArrayCodec.cc"
-    "src/PPMImageArrayCodec.cc"
+    "src/ImageArrayCodec.cc"
+#    "src/JPEGImageArrayCodec.cc"
+#    "src/PBMImageArrayCodec.cc"
+#    "src/PGMImageArrayCodec.cc"
+#    "src/PPMImageArrayCodec.cc"
     "src/T3BinaryArrayCodec.cc"
     "src/InlinedArraysetImpl.cc"
     "src/ArraysetCodec.cc"
@@ -59,6 +60,9 @@ torch_test(database binary_file test/binary_file.cc)
 torch_test(database array test/array.cc)
 torch_test(database arrayset test/arrayset.cc)
 torch_test(database dataset test/dataset.cc)
+torch_test(database image_codec test/image_codec.cc)
+
+# Defines environment variable used to localize data for the tests
 set_property(TEST cxx-database-dataset APPEND PROPERTY ENVIRONMENT
   "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 
