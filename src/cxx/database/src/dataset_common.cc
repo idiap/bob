@@ -27,6 +27,8 @@ namespace Torch { namespace database {
     const char *array             = "array";
     const char *external_array    = "external-array";
     const char *name              = "name";
+    const char *author            = "author";
+    const char *datetime          = "datetime";
     const char *rule              = "rule";
     const char *relation          = "relation";
     const char *member            = "member";
