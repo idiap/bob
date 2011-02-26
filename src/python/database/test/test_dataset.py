@@ -24,7 +24,7 @@ class DatasetTest(unittest.TestCase):
     db = torch.database.Dataset(INPUT_DATABASE)
 
     # You can have unicode author names with accents
-    self.assertEqual(db.author, u"André Anjos &lt;andre.anjos@idiap.ch&gt;")
+    self.assertEqual(db.author, "André Anjos <andre.anjos@idiap.ch>")
 
     # The date field is auto-converted into a pythonic standard
     # datetime.datetime() object.

@@ -50,6 +50,11 @@ namespace Torch {
         xmlNewProp( rootnode, (const xmlChar*)db::version, (const xmlChar*)
           (boost::lexical_cast<std::string>(dataset.getVersion())).c_str() );
 
+      // Write author attribute if any
+      if(dataset.getAuthor().compare("") )
+        xmlNewProp( rootnode, (const xmlChar*)db::author, 
+          (const xmlChar*)dataset.getAuthor().c_str() );
+
       // Write datetime attribute
       // if set use the existing date/time
       if(!dataset.getDateTime().is_not_a_date_time() )

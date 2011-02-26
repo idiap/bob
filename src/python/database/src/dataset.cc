@@ -22,11 +22,11 @@ static void set_name(db::Dataset& ds, const char* name) {
   ds.setName(n);
 }
 
-static std::wstring get_author(const db::Dataset& ds) {
+static std::string get_author(const db::Dataset& ds) {
   return ds.getAuthor();
 }
 
-static void set_author(db::Dataset& ds, const std::wstring& author) {
+static void set_author(db::Dataset& ds, const std::string& author) {
   ds.setAuthor(author);
 }
 

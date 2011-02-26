@@ -61,12 +61,12 @@ namespace Torch {
         /**
          * @brief Get the name of the Dataset
          */
-        inline const std::wstring& getAuthor() const { return m_author; }
+        inline const std::string& getAuthor() const { return m_author; }
 
         /**
          * @brief Set the name of the Dataset. Note
          */
-        inline void setAuthor(const std::wstring& author) { m_author = author; }
+        inline void setAuthor(const std::string& author) { m_author = author; }
 
         /**
          * @brief Get the name of the Dataset
@@ -253,7 +253,7 @@ namespace Torch {
       private:
         std::string m_name;
         size_t m_version;
-        std::wstring m_author;
+        std::string m_author;
         boost::posix_time::ptime m_datetime;
         std::map<size_t, boost::shared_ptr<Arrayset> > m_id2arrayset;
         std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;

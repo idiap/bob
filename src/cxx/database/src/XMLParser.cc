@@ -141,12 +141,11 @@ namespace Torch { namespace database { namespace detail {
     TDEBUG3("Version: " << dataset.getVersion());
     xmlFree(str);
 
-    // 3/ Parse author TODO
-//    str = xmlGetProp(cur, (const xmlChar*)db::author);
-//    dataset.setAuthor( str!=0 ? 
-//        boost::lexical_cast<std::wstring>((const char *)str) : 0 );
-//    TDEBUG3("Author: " << dataset.getAuthor());
-//    xmlFree(str);
+    // 3/ Parse author
+    str = xmlGetProp(cur, (const xmlChar*)db::author);
+    dataset.setAuthor( ( (str!=0?(const char *)str:"") ) );
+    TDEBUG3("Author: " << dataset.getAuthor());
+    xmlFree(str);
 
     // 4/ Parse date
     str = xmlGetProp(cur, (const xmlChar*)db::datetime);
