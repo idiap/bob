@@ -45,14 +45,16 @@ namespace Torch { namespace database {
       PathList& operator= (const PathList& other);
 
       /**
-       * Adds another searchable path, if it is not already there. If the path
-       * is not complete, it is completed with boost::filesystem::complete()
+       * Appends another searchable path, if it is not already there. If the
+       * path is not complete, it is completed with
+       * boost::filesystem::complete()
        */
       void append(const boost::filesystem::path& path);
 
       /**
-       * Adds another searchable path, if it is not already there. If the path
-       * is not complete, it is completed with boost::filesystem::complete()
+       * Prepends another searchable path, if it is not already there. If the
+       * path is not complete, it is completed with
+       * boost::filesystem::complete()
        */
       void prepend(const boost::filesystem::path& path);
 
@@ -76,7 +78,7 @@ namespace Torch { namespace database {
        * as the input path iff the file or directory pointed by the input path
        * exists.
        */
-      boost::filesystem::path locate(boost::filesystem::path& path) const;
+      boost::filesystem::path locate(const boost::filesystem::path& path) const;
 
       /**
        * This method will search internally for the longest possible path
@@ -88,7 +90,7 @@ namespace Torch { namespace database {
        *       input path is '/path1/other/arrays/data54.bin'
        *       return value: 'arrays/data54.bin'
        */
-      boost::filesystem::path reduce(boost::filesystem::path& input) const;
+      boost::filesystem::path reduce(const boost::filesystem::path& input) const;
 
     private:
 

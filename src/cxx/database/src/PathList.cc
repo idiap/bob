@@ -46,7 +46,7 @@ void db::PathList::remove(const fs::path& path) {
   m_list.remove(fs::complete(path));
 }
 
-fs::path db::PathList::locate(fs::path& path) const {
+fs::path db::PathList::locate(const fs::path& path) const {
   if (path.is_complete()) return path; //can only locate relative paths
   for (std::list<fs::path>::const_iterator 
       it=m_list.begin(); it!=m_list.end(); ++it) {
@@ -59,7 +59,7 @@ static bool starts_with(const fs::path& input, const fs::path& path) {
   return (input.string().find(path.string()) == 0);
 }
 
-fs::path db::PathList::reduce(fs::path& input) const {
+fs::path db::PathList::reduce(const fs::path& input) const {
   if (!input.is_complete()) return input; //can only reduce absolute paths
   const fs::path* best_match = 0; //holds the best match so far
   for (std::list<fs::path>::const_iterator 
