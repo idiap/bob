@@ -34,6 +34,10 @@ static boost::posix_time::ptime get_datetime(const db::Dataset& ds) {
   return ds.getDateTime();
 }
 
+static db::PathList get_pathlist (const db::Dataset& ds) {
+  return ds.getPathList();
+}
+
 static tuple get_arrayset_ids(db::Dataset& ds) {
   list l;
   for(std::map<size_t, boost::shared_ptr<db::Arrayset> >::const_iterator it=ds.arraysetIndex().begin(); it!=ds.arraysetIndex().end(); ++it) {
@@ -92,6 +96,7 @@ void bind_database_dataset() {
 
     .add_property("name", &get_name, &set_name, "The name of this Dataset")
     .add_property("author", &get_author, &set_author, "The author of this Dataset")
+    .add_property("pathlist", &get_pathlist, &db::Dataset::setPathList, "The PathList objects tells how relative paths need to be resolved in a Dataset")
     .add_property("datetime", &get_datetime, &db::Dataset::setDateTime, "The date in which this Dataset was last modified.")
     .add_property("version", &db::Dataset::getVersion, &db::Dataset::setVersion, "The version of this Dataset")
     
