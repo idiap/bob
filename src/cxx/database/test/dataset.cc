@@ -14,6 +14,8 @@
 #include <vector>
 
 #include <blitz/array.h>
+#include <boost/date_time.hpp>
+#include "boost/date_time/gregorian/gregorian.hpp"
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Dataset.h"
@@ -261,18 +263,32 @@ BOOST_AUTO_TEST_CASE( dbDataset_construction )
   std::string name = "Novel dataset example";
   size_t version = 1;
   Torch::database::Dataset d(name, version);
+  std::string author = "Laurent El Shafey";
+  boost::posix_time::ptime dt(boost::gregorian::date(2011,boost::gregorian::Feb,28), 
+    boost::posix_time::time_duration(1,2,3));
+  d.setAuthor(author);
+  d.setDateTime(dt);
   // Check that the name and the version are correctly set
   BOOST_CHECK_EQUAL( d.getName().compare(name), 0);
   BOOST_CHECK_EQUAL( d.getVersion(), version);
+  BOOST_CHECK_EQUAL( d.getAuthor(), author);
+  BOOST_CHECK_EQUAL( d.getDateTime(), dt);
 
-  // Update the name and the version
+  // Update the name, the version, the author and the date
   std::string name2 = "Novel dataset example2";
   size_t version2 = 2;  
+  std::string author2 = "Laurent T. El Shafey";
+  boost::posix_time::ptime dt2(boost::gregorian::date(2011,boost::gregorian::Mar,1),
+    boost::posix_time::time_duration(3,2,1));
   d.setName(name2);
   d.setVersion(version2);
+  d.setAuthor(author2);
+  d.setDateTime(dt2);
   // Check that the name and the version are correctly updated
   BOOST_CHECK_EQUAL( d.getName().compare(name2), 0);
   BOOST_CHECK_EQUAL( d.getVersion(), version2);
+  BOOST_CHECK_EQUAL( d.getAuthor(), author2);
+  BOOST_CHECK_EQUAL( d.getDateTime(), dt2);
 
   // Check that the next free id is equal to 1
   BOOST_CHECK_EQUAL( d.getNextFreeId(), 1);
