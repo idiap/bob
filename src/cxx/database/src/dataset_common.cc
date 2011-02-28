@@ -17,6 +17,7 @@ namespace Torch { namespace database {
     const char *arrayset          = "arrayset";
     const char *external_arrayset = "external-arrayset";
     const char *relationset       = "relationset";
+    const char *pathlist          = "pathlist";
     const char *version           = "version";
     const char *id                = "id";
     const char *role              = "role";
@@ -38,6 +39,8 @@ namespace Torch { namespace database {
     const char *max               = "max";
     const char *array_id          = "array-id";
     const char *arrayset_id       = "arrayset-id";
+    const char *entry             = "entry";
+    const char *path              = "path";
 
     // elementtype
     const char *t_bool        = "bool";

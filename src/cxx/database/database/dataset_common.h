@@ -27,6 +27,7 @@ namespace Torch {
     extern const char *arrayset;
     extern const char *external_arrayset;
     extern const char *relationset;
+    extern const char *pathlist;
     extern const char *version;
     extern const char *id;
     extern const char *role;
@@ -48,6 +49,8 @@ namespace Torch {
     extern const char *max;
     extern const char *array_id;
     extern const char *arrayset_id;
+    extern const char *entry;
+    extern const char *path;
 
     // elementtype
     extern const char *t_bool;

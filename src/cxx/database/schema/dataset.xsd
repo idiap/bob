@@ -4,6 +4,7 @@
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element name="comment" minOccurs="0" maxOccurs="1" type="xsd:string" />
+        <xsd:element name="pathlist" minOccurs="0" maxOccurs="1" type="PathListType" />
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
           <xsd:element name="arrayset" minOccurs="0" maxOccurs="unbounded" type="ArraysetInlineType" >
             <xsd:key name="ArrayKey">
@@ -15,7 +16,6 @@
           <xsd:element name="external-arrayset" minOccurs="0" maxOccurs="unbounded" type="ArraysetFileType" />
         </xsd:choice>
         <xsd:element name="relationset" minOccurs="0" maxOccurs="unbounded" type="RelationsetType" />
-        <xsd:element name="pathlist" minOccurs="0" maxOccurs="1" type="PathListType" />
       </xsd:sequence>
       <xsd:attribute name="name" type="xsd:string" use="optional" />
       <xsd:attribute name="version" type="xsd:positiveInteger" use="optional" />
