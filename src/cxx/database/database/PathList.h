@@ -65,6 +65,17 @@ namespace Torch { namespace database {
       void remove(const boost::filesystem::path& path);
 
       /**
+       * Tells if a certain path is present in the inner list
+       */
+      bool contains(const boost::filesystem::path& path) const;
+
+      /**
+       * Filters all paths and deletes the ones that do not represent existing
+       * paths in the file system.
+       */
+      PathList& existing();
+
+      /**
        * Returns all paths defined inside
        */
       inline const std::list<boost::filesystem::path>& paths() const 

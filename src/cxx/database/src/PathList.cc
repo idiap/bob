@@ -5,6 +5,7 @@
  * @brief Implements path search for Torch::database 
  */
 
+#include <algorithm>
 #include <boost/tokenizer.hpp>
 #include "database/PathList.h"
 
@@ -44,6 +45,19 @@ void db::PathList::prepend(const fs::path& path) {
 
 void db::PathList::remove(const fs::path& path) {
   m_list.remove(fs::complete(path));
+}
+
+bool db::PathList::contains(const fs::path& path) const {
+  return std::find(m_list.begin(), m_list.end(), path) != m_list.end();
+}
+
+db::PathList& db::PathList::existing() {
+  for (std::list<fs::path>::iterator
+      it=m_list.begin(); it!=m_list.end();) { //N.B. we don't increment it!
+    if (!fs::exists(*it)) m_list.erase(it++);
+    else ++it;
+  }
+  return *this;
 }
 
 fs::path db::PathList::locate(const fs::path& path) const {
