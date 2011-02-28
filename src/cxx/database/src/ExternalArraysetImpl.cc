@@ -12,10 +12,11 @@
 #include "database/ArraysetCodecRegistry.h"
 
 namespace tdd = Torch::database::detail;
+namespace fs = boost::filesystem;
 
 tdd::ExternalArraysetImpl::ExternalArraysetImpl(const std::string& filename, 
     const std::string& codecname, bool newfile)
-  : m_filename(filename)
+  : m_filename(fs::complete(filename).string())
 {
   //the next instructions will raise an exception if the code is not found.
   if (codecname.size()) {
@@ -35,21 +36,20 @@ void tdd::ExternalArraysetImpl::reloadSpecification() {
 
 void tdd::ExternalArraysetImpl::move(const std::string& filename,
     const std::string& codecname) {
+  fs::path destination = fs::complete(filename);
   boost::shared_ptr<const Torch::database::ArraysetCodec> newcodec;
   if (codecname.size())
     newcodec = Torch::database::ArraysetCodecRegistry::getCodecByName(codecname);
   else
     newcodec = Torch::database::ArraysetCodecRegistry::getCodecByExtension(filename);
   if (newcodec == m_codec) { //just rename the file
-    boost::filesystem::path path(m_filename);
-    boost::filesystem::rename(boost::filesystem::path(m_filename),
-        boost::filesystem::path(filename));
-    m_filename = filename;
+    fs::rename(m_filename, destination);
   }
   else { //the user wants to re-write it in a different format. DON'T erase!
     newcodec->save(filename, m_codec->load(m_filename));
     m_codec = newcodec;
   }
+  m_filename = destination.string();
   reloadSpecification();
 }
 
