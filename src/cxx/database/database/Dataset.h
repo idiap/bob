@@ -16,6 +16,7 @@
 
 #include "database/Arrayset.h"
 #include "database/Relationset.h"
+#include "database/PathList.h"
 
 namespace Torch {   
   /**
@@ -58,24 +59,37 @@ namespace Torch {
         Dataset& operator= (const Dataset& other);
 
         /**
-         * @brief Get the name of the Dataset
+         * Gets the name of the Dataset
          */
         inline const std::string& getName() const { return m_name; }
 
         /**
-         * @brief Set the name of the Dataset
+         * Sets the name of the Dataset
          */
         inline void setName(const std::string& name) { m_name = name; }
 
         /**
-         * @brief Get the version of the Dataset
+         * Gets the version of the Dataset
          */
         inline size_t getVersion() const { return m_version; }
 
         /**
-         * @brief Set the version of the Dataset
+         * Sets the version of the Dataset
          */
         inline void setVersion(const size_t version) { m_version = version; }
+
+        /**
+         * Gets the current PathList to which Array/Arraysets are resolved.
+         */
+        inline const PathList& getPathList() const { return m_pathlist; }
+
+        /**
+         * Sets the current PathList. Please note that this will not modify the
+         * location of the underlying (external) Arrays and Arraysets. BUT, 
+         * If you decide to save this Dataset after this modification, the
+         * Arrays/Arraysets will be relate-vized w.r.t. to this new list.
+         */
+        inline void setPathList(const PathList& list) { m_pathlist = list; }
 
         /**
          * Appends a copy of an Arrayset into this Dataset. 
@@ -230,6 +244,7 @@ namespace Torch {
         size_t m_version;
         std::map<size_t, boost::shared_ptr<Arrayset> > m_id2arrayset;
         std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;
+        PathList m_pathlist; ///< how to relativize my external arraysets/arrays
     };
 
   }

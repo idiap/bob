@@ -19,7 +19,8 @@ db::Dataset::Dataset(const std::string& name, size_t version) :
   m_name(name),
   m_version(version),
   m_id2arrayset(),
-  m_name2relationset()
+  m_name2relationset(),
+  m_pathlist(".")
 {
 }
 
@@ -27,7 +28,8 @@ db::Dataset::Dataset(const std::string& path) :
   m_name(),
   m_version(0),
   m_id2arrayset(),
-  m_name2relationset()
+  m_name2relationset(),
+  m_pathlist(".")
 {
   db::detail::XMLParser parser;
   parser.load(path.c_str(), *this, 2); 
@@ -37,7 +39,8 @@ db::Dataset::Dataset(const db::Dataset& other) :
   m_name(other.m_name),
   m_version(other.m_version),
   m_id2arrayset(other.m_id2arrayset),
-  m_name2relationset(other.m_name2relationset)
+  m_name2relationset(other.m_name2relationset),
+  m_pathlist(other.m_pathlist)
 {
 }
 
@@ -48,6 +51,7 @@ db::Dataset& db::Dataset::operator= (const db::Dataset& other) {
   m_version = other.m_version;
   m_id2arrayset = other.m_id2arrayset;
   m_name2relationset = other.m_name2relationset;
+  m_pathlist = other.m_pathlist;
   return *this;
 }
 
