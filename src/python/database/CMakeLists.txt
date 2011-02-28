@@ -41,3 +41,5 @@ torch_python_add_test(python-database-array-cxxcodec-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_arraycodecs.py)
 torch_python_add_test(python-database-arrayset-cxxcodec-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_arraysetcodecs.py)
+torch_python_add_test(python-database-pathlist-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_pathlist.py)
