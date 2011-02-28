@@ -65,13 +65,18 @@ namespace Torch {
         xmlNewProp( rootnode, (const xmlChar*)db::datetime, (const xmlChar*)
           (boost::posix_time::to_iso_extended_string(boost::posix_time::second_clock::local_time())).c_str() );
 
+      // Create PathList node if required
+      const PathList& pl = dataset.getPathList();
+      if( pl.paths().size() > 0 )
+        xmlAddChild( rootnode, writePathList( doc, pl) );
+
       // Create Arrayset nodes
       const std::map<size_t, boost::shared_ptr<Arrayset> >&
         arraysets = dataset.arraysetIndex(); 
       for(std::map<size_t, boost::shared_ptr<Arrayset> >::const_iterator 
           it=arraysets.begin(); it!=arraysets.end(); ++it)
       {
-        xmlAddChild( rootnode, writeArrayset( doc, it->first, it->second) );
+        xmlAddChild( rootnode, writeArrayset( doc, it->first, it->second, pl) );
       }
       // Create Relationset nodes
       const std::map<std::string, boost::shared_ptr<Relationset> >&
@@ -92,7 +97,7 @@ namespace Torch {
 
     xmlNodePtr XMLWriter::writeArrayset( xmlDocPtr doc, 
         size_t id, boost::shared_ptr<const Arrayset> a, 
-        int precision, bool scientific) 
+        const PathList& pl, int precision, bool scientific) 
     {
       // Create the Arrayset node
       xmlNodePtr arraysetnode; 
@@ -161,9 +166,11 @@ namespace Torch {
       // Write file and loader attributes if any
       if( a->getFilename().compare("") )
       {
-        // Write file attribute
+        // Reduce filename
+        boost::filesystem::path red_filename = pl.reduce( a->getFilename() );
+        // Write (reduced) file attribute
         xmlNewProp( arraysetnode, (const xmlChar*)db::file, (const xmlChar*)
-          a->getFilename().c_str() );
+          red_filename.string().c_str() );
 
         // Write codec attribute
         str = a->getCodec()->name();
@@ -179,7 +186,7 @@ namespace Torch {
           a_id!=ids.end(); ++a_id)
         {
           xmlAddChild( arraysetnode, writeArray( doc, *a_id, a->operator[](*a_id),
-            precision, scientific) );
+            pl, precision, scientific) );
         }
       }
 
@@ -188,7 +195,7 @@ namespace Torch {
 
 
     xmlNodePtr XMLWriter::writeArray( xmlDocPtr doc, 
-      size_t id, const Array a, int precision, bool scientific)
+      size_t id, const Array a, const PathList& pl, int precision, bool scientific)
     {
       // Create the Arrayset node
       xmlNodePtr arraynode;
@@ -198,9 +205,11 @@ namespace Torch {
         arraynode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::external_array, 0);
 
-        // Write file attribute
+        // Reduce filename
+        boost::filesystem::path red_filename = pl.reduce( a.getFilename() );
+        // Write (reduced) file attribute
         xmlNewProp( arraynode, (const xmlChar*)db::file, (const xmlChar*)
-          a.getFilename().c_str() );
+          red_filename.string().c_str() );
 
         // Write codec attribute
         std::string str( a.getCodec()->name() );
@@ -382,6 +391,28 @@ namespace Torch {
           (boost::lexical_cast<std::string>(array_id)).c_str() );
 
       return membernode;
+    }
+
+    xmlNodePtr XMLWriter::writePathList( xmlDocPtr doc,
+      const db::PathList& pl)
+    {
+      // Create the PathList node
+      xmlNodePtr pathlistnode = 
+        xmlNewDocNode(doc, 0, (const xmlChar*)db::pathlist, 0);
+      
+      // Add the Entry nodes to the PathList node
+      const std::list<boost::filesystem::path>& entries = pl.paths();
+      for(std::list<boost::filesystem::path>::const_iterator 
+        it=entries.begin(); it!=entries.end(); ++it)
+      {
+        xmlNodePtr entrynode = 
+          xmlNewDocNode(doc, 0, (const xmlChar*)db::entry, 0);
+        xmlNewProp( entrynode, (const xmlChar*)db::path, 
+          (const xmlChar*)((*it).string().c_str()) );
+        xmlAddChild( pathlistnode, entrynode );
+      }
+
+      return pathlistnode;
     }
 
   }}
