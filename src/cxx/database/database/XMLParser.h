@@ -34,8 +34,8 @@ namespace Torch {
     class Array;
     class Relationset;
     class Rule;
-    //class Member;
     class Relation;
+    class PathList;
 
     namespace detail {
 
@@ -79,7 +79,7 @@ namespace Torch {
            * corresponding object.
            */
           std::pair<size_t, boost::shared_ptr<Arrayset> >
-            parseArrayset( xmlNodePtr node);
+            parseArrayset( xmlNodePtr node, const PathList& pl);
 
           /**
            * @brief Parse a relationset given an XML node and return the 
@@ -89,13 +89,19 @@ namespace Torch {
             parseRelationset(xmlNodePtr node, const Dataset& d);
 
           /**
+           * @brief Parse a pathlist given an XML node and update the 
+           * corresponding object.
+           */
+          void parsePathList(xmlNodePtr node, PathList& pl);
+
+          /**
            * @brief Parse an array given an XML node and return the 
            * corresponding object.
            */
           std::pair<size_t, boost::shared_ptr<Array> >
             parseArray( xmlNodePtr node, Torch::core::array::ElementType elem,
             size_t shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY], 
-            size_t nb_dim );
+            size_t nb_dim, const PathList& pl );
 
           /**
            * @brief Parse a rule given an XML node and return the 

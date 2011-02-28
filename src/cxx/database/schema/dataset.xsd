@@ -4,6 +4,7 @@
     <xsd:complexType>
       <xsd:sequence>
         <xsd:element name="comment" minOccurs="0" maxOccurs="1" type="xsd:string" />
+        <xsd:element name="pathlist" minOccurs="0" maxOccurs="1" type="PathListType" />
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
           <xsd:element name="arrayset" minOccurs="0" maxOccurs="unbounded" type="ArraysetInlineType" >
             <xsd:key name="ArrayKey">
@@ -151,5 +152,14 @@
     <xsd:attribute name="arrayset-id" type="xsd:positiveInteger" use="required" />
   </xsd:complexType>
 
+  <xsd:complexType name="PathListType">
+    <xsd:sequence>
+      <xsd:element name="entry" minOccurs="0" maxOccurs="unbounded" type="EntryType" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="EntryType">
+    <xsd:attribute name="path" type="xsd:string" use="required" />
+  </xsd:complexType>
 </xsd:schema>
 

@@ -12,6 +12,7 @@
 #include "database/XMLParser.h"
 #include "database/Dataset.h"
 #include "database/Arrayset.h"
+#include "database/PathList.h"
 #include "database/Exception.h"
 #include "database/dataset_common.h"
 //#include "database/Relationset.h"
@@ -97,6 +98,7 @@ namespace Torch { namespace database { namespace detail {
     // Parse the XML file with libxml2
     xmlDocPtr doc = xmlParseFile(filename);
     xmlNodePtr cur; 
+    xmlNodePtr cur_svg; 
 
     // Check validity of the XML file
     if(doc == 0 ) {
@@ -159,15 +161,37 @@ namespace Torch { namespace database { namespace detail {
     TDEBUG3("DateTime: " << boost::posix_time::to_iso_extended_string(dataset.getDateTime()));
     xmlFree(str);
 
+    // 5/ Create an empty PathList and parse the PathList if any
+    db::PathList pl;
+    // Parse the PathList in the XML file if any
+    cur = cur_svg = cur->xmlChildrenNode;
+    while(cur != 0) { 
+      if( !strcmp((const char*)cur->name, db::pathlist) ) {
+        parsePathList(cur, pl);
+        break; // At most 1 PathList
+      }
+      else if( !strcmp((const char*)cur->name, db::arrayset) || 
+          !strcmp((const char*)cur->name, db::external_arrayset) ) 
+        break; // PathList should be defined before Arraysets/Arrays
+      cur = cur->next;
+    }
+    // Add the parent_path of the XML Dataset to the PathList
+    boost::filesystem::path dataset_path(filename);
+    // TODO: Are the following append always done?
+    pl.append( dataset_path.parent_path() );
+    // Add the current directory to the PathList
+    pl.append( boost::filesystem::current_path() );
+    // Attach the pathlist to the Dataset
+    dataset.setPathList( pl );
 
     // Parse Arraysets and Relationsets
-    cur = cur->xmlChildrenNode;
+    cur = cur_svg;
     while(cur != 0) { 
       // Parse an arrayset and add it to the dataset
       if( !strcmp((const char*)cur->name, db::arrayset) || 
           !strcmp((const char*)cur->name, db::external_arrayset) ) {
         std::pair<size_t, boost::shared_ptr<db::Arrayset> >
-          pcur = parseArrayset(cur);
+          pcur = parseArrayset(cur, pl);
         dataset.add(pcur.first, pcur.second);
       }
       // Parse a relationset and add it to the dataset
@@ -179,6 +203,7 @@ namespace Torch { namespace database { namespace detail {
       cur = cur->next;
     }
 
+    
 
     // High-level checks (which can not be done by libxml2)
     /*    if( check_level>= 1)
@@ -445,7 +470,7 @@ namespace Torch { namespace database { namespace detail {
   } 
 
   std::pair<size_t, boost::shared_ptr<db::Arrayset> >
-  XMLParser::parseArrayset( const xmlNodePtr cur)
+  XMLParser::parseArrayset( const xmlNodePtr cur, const PathList& pl)
   {
     // Parse filename
     xmlChar *str;
@@ -557,7 +582,7 @@ namespace Torch { namespace database { namespace detail {
         if ( !strcmp( (const char*)cur_data->name, db::array) || 
             !strcmp( (const char*)cur_data->name, db::external_array) ) {
           std::pair<size_t, boost::shared_ptr<db::Array> > 
-            pcur = parseArray( cur_data, elem_type, shape, count);
+            pcur = parseArray( cur_data, elem_type, shape, count, pl);
           array_ids.push_back(pcur.first);
           arrays.push_back(pcur.second);
         }
@@ -571,8 +596,9 @@ namespace Torch { namespace database { namespace detail {
       
       //arrayset->m_is_loaded = true;
     }
-    else // External Arrayset
-      arrayset.reset( new db::Arrayset(str_filename, str_codecname) );
+    else // External Arrayset 
+      arrayset.reset( 
+        new db::Arrayset(pl.locate(str_filename).string(), str_codecname) );
 
     // Parse id
     str = xmlGetProp(cur, (const xmlChar*)db::id);
@@ -595,7 +621,7 @@ namespace Torch { namespace database { namespace detail {
   std::pair<size_t, boost::shared_ptr<db::Array> > 
   XMLParser::parseArray( const xmlNodePtr cur, 
     tca::ElementType elem, size_t shape[tca::N_MAX_DIMENSIONS_ARRAY], 
-    size_t nb_dim)
+    size_t nb_dim, const PathList& pl)
   {
     // Parse codec
     xmlChar *str;
@@ -702,7 +728,8 @@ namespace Torch { namespace database { namespace detail {
 //      array->setIsLoaded( true );
     }
     else // External Array
-      array.reset( new db::Array(str_filename, str_codecname) );
+      array.reset( 
+        new db::Array(pl.locate(str_filename).string(), str_codecname) );
 
     // Parse id
     str = xmlGetProp(cur, (const xmlChar*)db::id);
@@ -711,6 +738,27 @@ namespace Torch { namespace database { namespace detail {
     xmlFree(str);
 
     return std::make_pair(id, array);
+  }
+
+
+  void XMLParser::parsePathList(const xmlNodePtr cur, db::PathList& pl)
+  {
+    // Parse the entries
+    xmlNodePtr cur_entry = cur->xmlChildrenNode;
+    while(cur_entry != 0) { 
+      // Parse an entry and add it to the PathList
+      if( !strcmp((const char*)cur_entry->name, db::entry) ) {
+        // Parse the path of the entry
+        xmlChar *str;
+        str = xmlGetProp(cur_entry, (const xmlChar*)db::path);
+        std::string str_path( str!=0 ? (const char*)str: "" );
+        TDEBUG3("  Entry path: " << str_path);
+        xmlFree(str);
+        // Add it to the path list
+        pl.append( str_path );
+      }
+      cur_entry = cur_entry->next;
+    }
   }
 
 }}}
