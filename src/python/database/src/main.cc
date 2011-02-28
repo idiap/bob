@@ -18,6 +18,8 @@ void bind_database_relationset();
 void bind_database_binfile();
 void bind_database_codec();
 void bind_database_pathlist();
+void bind_database_transcode();
+void bind_database_datetime();
 
 BOOST_PYTHON_MODULE(libpytorch_database) {
   scope().attr("__doc__") = "Torch classes and sub-classes for database access";
@@ -31,4 +33,6 @@ BOOST_PYTHON_MODULE(libpytorch_database) {
   bind_database_binfile();
   bind_database_codec();
   bind_database_pathlist();
+  bind_database_transcode();
+  bind_database_datetime();
 }

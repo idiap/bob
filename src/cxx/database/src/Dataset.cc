@@ -18,6 +18,8 @@ namespace tdd = Torch::database::detail;
 db::Dataset::Dataset(const std::string& name, size_t version) :
   m_name(name),
   m_version(version),
+  m_author(),
+  m_datetime(boost::posix_time::second_clock::local_time()),
   m_id2arrayset(),
   m_name2relationset(),
   m_pathlist(".")
@@ -27,6 +29,8 @@ db::Dataset::Dataset(const std::string& name, size_t version) :
 db::Dataset::Dataset(const std::string& path) :
   m_name(),
   m_version(0),
+  m_author(),
+  m_datetime(boost::posix_time::second_clock::local_time()),
   m_id2arrayset(),
   m_name2relationset(),
   m_pathlist(".")
@@ -38,6 +42,8 @@ db::Dataset::Dataset(const std::string& path) :
 db::Dataset::Dataset(const db::Dataset& other) :
   m_name(other.m_name),
   m_version(other.m_version),
+  m_author(other.m_author),
+  m_datetime(other.m_datetime),
   m_id2arrayset(other.m_id2arrayset),
   m_name2relationset(other.m_name2relationset),
   m_pathlist(other.m_pathlist)
@@ -49,6 +55,8 @@ db::Dataset::~Dataset() { }
 db::Dataset& db::Dataset::operator= (const db::Dataset& other) {
   m_name = other.m_name;
   m_version = other.m_version;
+  m_author = other.m_author;
+  m_datetime = other.m_datetime;
   m_id2arrayset = other.m_id2arrayset;
   m_name2relationset = other.m_name2relationset;
   m_pathlist = other.m_pathlist;

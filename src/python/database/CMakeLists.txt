@@ -13,6 +13,8 @@ set(pysrc
    "src/binfile.cc"
    "src/codec.cc"
    "src/pathlist.cc"
+   "src/transcode.cc"
+   "src/datetime.cc"
    "src/main.cc"
    )
  
@@ -20,6 +22,9 @@ include(../../cmake/macros.cmake)
 
 torch_python_bindings(database "${pysrc}" "database" "")
 torch_python_install(database)
+
+# Installs all python scripts
+file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our test units
 torch_python_add_test(python-database-dataset-read-tests

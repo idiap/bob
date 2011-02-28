@@ -1,9 +1,9 @@
 /**
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief Implements an image format reader/writer
+ * @brief Implements an image format reader/writer using ImageMagick.
  *
- * This codec will only be able to work with three-dimension input.
+ * This codec will only be able to work with 2D and 3D input.
  */
 
 #include "database/ImageArrayCodec.h"
@@ -15,9 +15,13 @@
 #include <unistd.h>
 
 #include <ImageMagick/Magick++.h> 
+#include <ImageMagick/magick/MagickCore.h>
+
+#include <iostream>
 
 namespace db = Torch::database;
 
+// TODO: define more specific exceptions
 namespace Torch { namespace database {
   class ImageException: public Torch::core::Exception { };
 }}
@@ -55,139 +59,237 @@ void db::ImageArrayCodec::peek(const std::string& filename,
     Torch::core::array::ElementType& eltype, size_t& ndim,
     size_t* shape) const 
 {
-  Magick::Image image;
   try {
     // Read a file into image object
     // TODO: Does ping() retrieve the colorspace and the depth?
-    image.read(filename.c_str());
+    Magick::Image image(filename.c_str());
   
-    if( image.colorSpace() == Magick::GRAYColorspace)
-      shape[0] = 1;
-    else if( image.colorSpace() == Magick::RGBColorspace)
+    // Assume Grayscale image
+    if( !image.magick().compare("PBM") || !image.magick().compare("PGM")) {
+      image.colorSpace( Magick::GRAYColorspace);
+      ndim = 2;
+      shape[0] = image.rows();
+      shape[1] = image.columns();
+    // Assume RGB image
+    } else {
+      image.colorSpace( Magick::RGBColorspace);
+      ndim = 3;
       shape[0] = 3;
-    else // Unsupported colorspace TODO: additional ones?
-      throw db::ImageException();
-    shape[1] = image.rows();
-    shape[2] = image.columns();
+      shape[1] = image.rows();
+      shape[2] = image.columns();
+    }
 
-    // Set other attributes TODO: depth
-    if( image.depth() == 16)
+    // Set depth
+    if( image.depth() <= 8)
+      eltype = Torch::core::array::t_uint8;
+    else if( image.depth() <= 16)
       eltype = Torch::core::array::t_uint16;
-    else 
+    else {
       throw db::ImageException();
-    ndim = 3; 
+    }
   }
-  catch( Magick::Exception &error_ )
-  {
+  catch( Magick::Exception &error_ ) {
     throw db::FileNotReadable(filename);
-  } 
+  }
 }
 
 db::detail::InlinedArrayImpl 
 db::ImageArrayCodec::load(const std::string& filename) const {
-  Magick::Image image;
-  size_t shape[3];
-  Torch::core::array::ElementType eltype;
   try {
     // Read a file into image object
     // TODO: Does ping() retrieve the colorspace and the depth?
-    image.read(filename.c_str());
+    Magick::Image image(filename.c_str());
+    // Declare variables
+    int ndim;
+    int n_c;
+    int height;
+    int width;
+    Torch::core::array::ElementType eltype;
   
-    if( image.colorSpace() == Magick::GRAYColorspace)
-      shape[0] = 1;
-    else if( image.colorSpace() == Magick::RGBColorspace)
-      shape[0] = 3;
-    else // Unsupported colorspace TODO: additional ones?
-      throw db::ImageException();
-    shape[1] = image.rows();
-    shape[2] = image.columns();
-
-    // Set other attributes TODO: depth
-    if( image.depth() == 16)
+    // Assume Grayscale image
+    if( !image.magick().compare("PBM") || !image.magick().compare("PGM")) {
+      image.colorSpace( Magick::GRAYColorspace);
+      ndim = 2;
+      n_c = 1;
+      height = image.rows();
+      width = image.columns();
+    // Assume RGB image
+    } else {
+      image.colorSpace( Magick::RGBColorspace);
+      ndim = 3;
+      n_c = 3;
+      height = image.rows();
+      width = image.columns();
+    }
+    // Set depth
+    if( image.depth() <= 8)
+      eltype = Torch::core::array::t_uint8;
+    else if( image.depth() <= 16)
       eltype = Torch::core::array::t_uint16;
-    else 
+    else {
+      throw db::ImageException();
+    }
+
+    // Read the data
+    if( eltype == Torch::core::array::t_uint8) {
+      // Grayscale
+      if( ndim == 2) {
+        blitz::Array<uint8_t,2> data( height, width);
+        uint8_t *pixels = new uint8_t[width*height];
+        image.write( 0, 0, width, height, "I", Magick::CharPixel, pixels );
+        for (int h=0; h<height; ++h)
+          for (int w=0; w<width; ++w)
+            data(h,w) = pixels[h*width+w]; 
+        delete [] pixels;
+        return db::detail::InlinedArrayImpl(data);
+      // RGB
+      } else if( ndim == 3) {
+        blitz::Array<uint8_t,3> data( n_c, height, width);
+        uint8_t *pixels = new uint8_t[n_c*width*height];
+        image.write( 0, 0, width, height, "RGB", Magick::CharPixel, pixels );
+        for (int h=0; h<height; ++h)
+          for (int w=0; w<width; ++w)
+            for (int c=0; c<n_c; ++c)
+              data(c,h,w) = pixels[n_c*h*width+w*n_c+c]; 
+        delete [] pixels;
+        return db::detail::InlinedArrayImpl(data);
+      }
+      else
+        throw db::ImageException();
+    } else if( eltype == Torch::core::array::t_uint16) {
+      // Grayscale
+      if( ndim == 2) {
+        blitz::Array<uint16_t,2> data( height, width);
+        uint16_t *pixels = new uint16_t[width*height];
+        image.write( 0, 0, width, height, "I", Magick::ShortPixel, pixels );
+        for (int h=0; h<height; ++h)
+          for (int w=0; w<width; ++w)
+            data(h,w) = pixels[h*width+w]; 
+        delete [] pixels;
+        return db::detail::InlinedArrayImpl(data);
+      // RGB
+      } else if( ndim == 3) {
+        blitz::Array<uint16_t,3> data( n_c, height, width);
+        uint16_t *pixels = new uint16_t[n_c*width*height];
+        image.write( 0, 0, width, height, "RGB", Magick::ShortPixel, pixels );
+        for (int h=0; h<height; ++h)
+          for (int w=0; w<width; ++w)
+            for (int c=0; c<n_c; ++c)
+              data(c,h,w) = pixels[n_c*h*width+w*n_c+c]; 
+        delete [] pixels;
+        return db::detail::InlinedArrayImpl(data);
+      }
+      else
+        throw db::ImageException();
+    }
+    else
       throw db::ImageException();
   }
-  catch( Magick::Exception &error_ )
-  {
-    throw db::ImageException();
-  } 
-
-  // Get the with and the height
-  int n_c = shape[0];
-  int height = shape[1];
-  int width = shape[2];
-
-  if( eltype == Torch::core::array::t_uint16) {
-    blitz::Array<uint16_t,3> data(n_c, height, width);
-    if(n_c == 1) {
-      uint16_t *pixels = new uint16_t[width*height];
-      image.write( 0, 0, width, height, "I", Magick::ShortPixel, pixels );
-      for (int h=0; h<height; ++h)
-        for (int w=0; w<width; ++w)
-          data(0,h,w) = pixels[h*width+w]; 
-      delete [] pixels;
-    }
-    else if(n_c == 3) {
-      const Magick::PixelPacket *pixels=image.getConstPixels(0,0,width,height);
-      for (int h=0; h<height; ++h)
-        for (int w=0; w<width; ++w) {
-          data(0,h,w) = pixels[h*width+w].red; 
-          data(1,h,w) = pixels[h*width+w].green; 
-          data(2,h,w) = pixels[h*width+w].blue; 
-        }
-    }
-    return db::detail::InlinedArrayImpl(data);
-  }
-  else
-  {
-    throw db::ImageException();
+  catch( Magick::Exception &error_ ) {
+    throw db::FileNotReadable(filename);
   }
 }
 
 void db::ImageArrayCodec::save (const std::string& filename,
     const db::detail::InlinedArrayImpl& data) const {
-  //can only save tree-dimensional data, so throw if that is not the case
-  if (data.getNDim() != 3) throw db::DimensionError(data.getNDim(), 3);
+  // Declare variables
+  int n_c = 1;
+  int ndim;
+  int height;
+  int width;
 
-  if(data.getElementType() != Torch::core::array::t_uint16)
-    throw db::ImageException();
-
+  // Get the shape of the array
   const size_t *shape = data.getShape();
-  if (shape[0] != 1 && shape[0] != 3) throw db::ImageException();
 
-  //
-  int height = shape[1];
-  int width = shape[2];
-
-  // Write image
-  Magick::Image image;
-  blitz::Array<uint16_t,3> img = data.get<uint16_t,3>();
-  if( shape[0] == 1) // Grayscale
-  {
-    uint16_t *pixels = new uint16_t[width*height];
-    for (int h=0; h<height; ++h)
-      for (int w=0; w<width; ++w)
-        pixels[h*width+w] = img(0,h,w);
-    image.read( shape[2], shape[1], "I", Magick::ShortPixel, pixels );
-    image.write( filename.c_str());
-    delete [] pixels;
+  // Save two-dimensional (Grayscale) or tree-dimensional (RGB) array
+  // Grayscale
+  if(data.getNDim() == 2) {
+    ndim = 2;
+    height = shape[0];
+    width = shape[1];
+  // RGB
+  } else if( data.getNDim() == 3) {
+    ndim = 3;
+    n_c = 3;
+    // Accept only 3 color channels (RGB)
+    if( shape[0] != 3)
+      throw db::ImageException();
+    height = shape[1];
+    width = shape[2];
   }
-  else if( shape[0] == 3) // RGB
-  {
-    // Ensure that there is only one reference to underlying image
-    // If this is not done, then image pixels will not be modified.
-    image.modifyImage();
-    // Allocate pixel view
-    Magick::Pixels view(image); 
-    Magick::PixelPacket *pixels = view.get(0,0,width,height);
-    for (int h=0; h<height; ++h )
-      for (int w=0; w<width; ++w ) {
-        pixels[h*width+w].red = img(0,h,w); 
-        pixels[h*width+w].green = img(1,h,w); 
-        pixels[h*width+w].blue = img(2,h,w); 
-      }
-     // Save changes to image.
-     view.sync();
+  // Throw an exception if not supported
+  else {
+    throw db::ImageException();
+  }
+
+  // Create an ImageMagick image
+  Magick::Image image;
+  image.size( Magick::Geometry( width, height) );
+  // Save array/image to file
+  if( data.getElementType() == Torch::core::array::t_uint8) {
+    // Grayscale
+    if( ndim == 2) {
+      blitz::Array<uint8_t,2> img = data.get<uint8_t,2>();
+      image.colorSpace( Magick::GRAYColorspace);
+      uint8_t *pixels = new uint8_t[width*height];
+      for (int h=0; h<height; ++h)
+        for (int w=0; w<width; ++w)
+          pixels[h*width+w] = img(h,w);
+      image.read( width, height, "I", Magick::CharPixel, pixels );
+      image.depth(8);
+      image.write( filename.c_str());
+      delete [] pixels;
+    }
+    // RGB
+    else if( ndim == 3) {
+      blitz::Array<uint8_t,3> img = data.get<uint8_t,3>();
+      image.colorSpace( Magick::RGBColorspace);
+      uint8_t *pixels = new uint8_t[width*height*n_c];
+      for (int h=0; h<height; ++h)
+        for (int w=0; w<width; ++w)
+          for (int c=0; c<n_c; ++c)
+            pixels[h*width*n_c+w*n_c+c] = img(c,h,w);
+      image.read( width, height, "RGB", Magick::CharPixel, pixels );
+      image.depth(8);
+      image.write( filename.c_str());
+      delete [] pixels;
+    }
+    else {
+      throw db::ImageException();
+    }
+  } else if( data.getElementType() == Torch::core::array::t_uint16) {
+    // Grayscale
+    if( ndim == 2) {
+      blitz::Array<uint16_t,2> img = data.get<uint16_t,2>();
+      image.colorSpace( Magick::GRAYColorspace);
+      uint16_t *pixels = new uint16_t[width*height];
+      for (int h=0; h<height; ++h)
+        for (int w=0; w<width; ++w)
+          pixels[h*width+w] = img(h,w);
+      image.read( width, height, "I", Magick::ShortPixel, pixels );
+      image.depth(16);
+      image.write( filename.c_str());
+      delete [] pixels;
+    }
+    // RGB
+    else if( ndim == 3) {
+      blitz::Array<uint16_t,3> img = data.get<uint16_t,3>();
+      image.colorSpace( Magick::RGBColorspace);
+      uint16_t *pixels = new uint16_t[width*height*n_c];
+      for (int h=0; h<height; ++h)
+        for (int w=0; w<width; ++w)
+          for (int c=0; c<n_c; ++c)
+            pixels[h*width*n_c+w*n_c+c] = img(c,h,w);
+      image.read( width, height, "RGB", Magick::CharPixel, pixels );
+      image.depth(16);
+      image.write( filename.c_str());
+      delete [] pixels;
+    }
+    else {
+      throw db::ImageException();
+    }
+  }
+  else {
+    throw db::ImageException();
   }
 }

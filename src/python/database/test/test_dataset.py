@@ -8,6 +8,7 @@ data.
 """
 
 import os, sys
+import datetime
 import unittest
 import torch
 
@@ -21,6 +22,13 @@ class DatasetTest(unittest.TestCase):
     # you have to do is to pass the relative (or absolute) location of the
     # input file containing the dataset to torch.database.Dataset().
     db = torch.database.Dataset(INPUT_DATABASE)
+
+    # You can have unicode author names with accents
+    self.assertEqual(db.author, "André Anjos <andre.anjos@idiap.ch>")
+
+    # The date field is auto-converted into a pythonic standard
+    # datetime.datetime() object.
+    self.assertEqual(db.datetime, datetime.datetime(2011, 02, 25, 12, 49, 23))
 
   def test02_CanBrowseArraysets(self):
     # This example shows how to access the arraysets from a dataset and how to

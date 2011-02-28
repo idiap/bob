@@ -13,6 +13,7 @@
 #include <map>
 #include <cstdlib>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time.hpp>
 
 #include "database/Arrayset.h"
 #include "database/Relationset.h"
@@ -61,6 +62,16 @@ namespace Torch {
         /**
          * Gets the name of the Dataset
          */
+        inline const std::string& getAuthor() const { return m_author; }
+
+        /**
+         * @brief Set the name of the Dataset. Note
+         */
+        inline void setAuthor(const std::string& author) { m_author = author; }
+
+        /**
+         * @brief Get the name of the Dataset
+         */
         inline const std::string& getName() const { return m_name; }
 
         /**
@@ -90,6 +101,20 @@ namespace Torch {
          * Arrays/Arraysets will be relate-vized w.r.t. to this new list.
          */
         inline void setPathList(const PathList& list) { m_pathlist = list; }
+
+        /**
+         * @brief Get the date from the dataset
+         */
+        inline const boost::posix_time::ptime& getDateTime() const {
+          return m_datetime; 
+        }
+
+        /**
+         * @brief Set the date of the Dataset
+         */
+        inline void setDateTime(const boost::posix_time::ptime& datetime) { 
+          m_datetime = datetime; 
+        }
 
         /**
          * Appends a copy of an Arrayset into this Dataset. 
@@ -242,6 +267,8 @@ namespace Torch {
       private:
         std::string m_name;
         size_t m_version;
+        std::string m_author;
+        boost::posix_time::ptime m_datetime;
         std::map<size_t, boost::shared_ptr<Arrayset> > m_id2arrayset;
         std::map<std::string, boost::shared_ptr<Relationset> > m_name2relationset;
         PathList m_pathlist; ///< how to relativize my external arraysets/arrays

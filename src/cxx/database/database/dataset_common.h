@@ -37,6 +37,8 @@ namespace Torch {
     extern const char *array;
     extern const char *external_array;
     extern const char *name;
+    extern const char *author;
+    extern const char *datetime;
     extern const char *rule;
     extern const char *relation;
     extern const char *member;

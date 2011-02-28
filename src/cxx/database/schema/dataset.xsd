@@ -19,7 +19,7 @@
       <xsd:attribute name="name" type="xsd:string" use="optional" />
       <xsd:attribute name="version" type="xsd:positiveInteger" use="optional" />
       <xsd:attribute name="author" type="xsd:string" use="optional" />
-      <xsd:attribute name="date" type="xsd:date" use="optional" />
+      <xsd:attribute name="datetime" type="xsd:dateTime" use="optional" />
     </xsd:complexType>
 
     <xsd:key name="ArraysetKey">

@@ -141,8 +141,23 @@ namespace Torch { namespace database { namespace detail {
     TDEBUG3("Version: " << dataset.getVersion());
     xmlFree(str);
 
-    // 3/ Parse date
-    // TODO: implementation
+    // 3/ Parse author
+    str = xmlGetProp(cur, (const xmlChar*)db::author);
+    dataset.setAuthor( ( (str!=0?(const char *)str:"") ) );
+    TDEBUG3("Author: " << dataset.getAuthor());
+    xmlFree(str);
+
+    // 4/ Parse date
+    str = xmlGetProp(cur, (const xmlChar*)db::datetime);
+    std::string str_iso_extended( str!=0 ? (const char *)str : "" );
+    // Make an iso_extended string
+    str_iso_extended[10] = ' ';
+    dataset.setDateTime( str!=0 ? 
+      boost::posix_time::ptime(boost::posix_time::time_from_string(
+        str_iso_extended)) :
+      boost::posix_time::ptime() );
+    TDEBUG3("DateTime: " << boost::posix_time::to_iso_extended_string(dataset.getDateTime()));
+    xmlFree(str);
 
 
     // Parse Arraysets and Relationsets
