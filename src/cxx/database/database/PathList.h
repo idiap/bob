@@ -65,7 +65,8 @@ namespace Torch { namespace database {
       /**
        * Returns all paths defined inside
        */
-      const std::list<boost::filesystem::path>& paths() const { return m_list; }
+      inline const std::list<boost::filesystem::path>& paths() const 
+      { return m_list; }
 
       /**
        * Searches a file or directory in all the paths and returns the first
