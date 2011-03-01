@@ -34,17 +34,17 @@ db::PathList& db::PathList::operator= (const db::PathList& other) {
 }
 
 void db::PathList::append(const fs::path& path) {
-  m_list.remove(fs::complete(path));
-  m_list.push_back(fs::complete(path));
+  m_list.remove(path);
+  m_list.push_back(path);
 }
 
 void db::PathList::prepend(const fs::path& path) {
-  m_list.remove(fs::complete(path));
-  m_list.push_front(fs::complete(path));
+  m_list.remove(path);
+  m_list.push_front(path);
 }
 
 void db::PathList::remove(const fs::path& path) {
-  m_list.remove(fs::complete(path));
+  m_list.remove(path);
 }
 
 bool db::PathList::contains(const fs::path& path) const {
@@ -64,13 +64,13 @@ fs::path db::PathList::locate(const fs::path& path) const {
   if (path.is_complete()) return path; //can only locate relative paths
   for (std::list<fs::path>::const_iterator 
       it=m_list.begin(); it!=m_list.end(); ++it) {
-    if (fs::exists(*it / path)) return *it / path;
+    if (fs::exists(*it / path)) return fs::complete(*it / path);
   }
   return fs::path(); //emtpy
 }
 
 static bool starts_with(const fs::path& input, const fs::path& path) {
-  return (input.string().find(path.string()) == 0);
+  return (input.string().find(fs::complete(path).string()) == 0);
 }
 
 fs::path db::PathList::reduce(const fs::path& input) const {
@@ -92,5 +92,5 @@ fs::path db::PathList::reduce(const fs::path& input) const {
   if (!best_match) return input; //no match found
   
   //if you get to this point, you have found a match, return "input-best_match"
-  return input.string().substr(best_match->string().size()+1);
+  return input.string().substr(fs::complete(*best_match).string().size()+1);
 }
