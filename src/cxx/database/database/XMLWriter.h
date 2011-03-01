@@ -68,7 +68,7 @@ namespace Torch {
            * @brief Write the (casted) data in the given stringstrean
            */
           template <typename T, int D> void writeData( 
-              std::stringstream& content, const blitz::Array<T,D> b) 
+              std::ostringstream& content, const blitz::Array<T,D> b) 
           {
             const T* data = b.data();
             for(blitz::sizeType i=0; i<b.numElements(); ++i)

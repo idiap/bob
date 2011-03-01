@@ -219,7 +219,7 @@ namespace Torch {
       // Inline Array
       else { 
         // Prepare the string stream
-        std::stringstream content;
+        std::ostringstream content;
         content << std::setprecision(precision);
         if( scientific)
           content << std::scientific;
