@@ -15,7 +15,7 @@
 
 #include <blitz/array.h>
 #include <boost/date_time.hpp>
-#include "boost/date_time/gregorian/gregorian.hpp"
+#include <boost/date_time/gregorian/gregorian.hpp>
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Dataset.h"
@@ -272,7 +272,9 @@ BOOST_AUTO_TEST_CASE( dbDataset_construction )
   BOOST_CHECK_EQUAL( d.getName().compare(name), 0);
   BOOST_CHECK_EQUAL( d.getVersion(), version);
   BOOST_CHECK_EQUAL( d.getAuthor(), author);
-  BOOST_CHECK_EQUAL( d.getDateTime(), dt);
+  bool same_dt = d.getDateTime() == dt;
+  BOOST_CHECK_EQUAL( same_dt, true);
+//  BOOST_CHECK_EQUAL( d.getDateTime(), dt); // is source of segfault
 
   // Update the name, the version, the author and the date
   std::string name2 = "Novel dataset example2";
@@ -288,7 +290,9 @@ BOOST_AUTO_TEST_CASE( dbDataset_construction )
   BOOST_CHECK_EQUAL( d.getName().compare(name2), 0);
   BOOST_CHECK_EQUAL( d.getVersion(), version2);
   BOOST_CHECK_EQUAL( d.getAuthor(), author2);
-  BOOST_CHECK_EQUAL( d.getDateTime(), dt2);
+  same_dt = d.getDateTime() == dt2;
+  BOOST_CHECK_EQUAL( same_dt, true);
+//  BOOST_CHECK_EQUAL( d.getDateTime(), dt2); // is source of segfault
 
   // Check that the next free id is equal to 1
   BOOST_CHECK_EQUAL( d.getNextFreeId(), 1);
