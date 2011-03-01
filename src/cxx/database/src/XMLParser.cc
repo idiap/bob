@@ -11,11 +11,8 @@
 
 #include "database/XMLParser.h"
 #include "database/Dataset.h"
-#include "database/Arrayset.h"
-#include "database/PathList.h"
 #include "database/Exception.h"
 #include "database/dataset_common.h"
-//#include "database/Relationset.h"
 
 namespace db = Torch::database;
 namespace tdd = Torch::database::detail;
@@ -95,6 +92,9 @@ namespace Torch { namespace database { namespace detail {
   void XMLParser::load(const char* filename, db::Dataset& dataset, 
       size_t check_level) 
   {
+    // Prepare the XML parser
+    xmlInitParser();    
+
     // Parse the XML file with libxml2
     xmlDocPtr doc = xmlParseFile(filename);
     xmlNodePtr cur; 
@@ -162,7 +162,7 @@ namespace Torch { namespace database { namespace detail {
     xmlFree(str);
 
     // 5/ Create an empty PathList and parse the PathList if any
-    db::PathList pl;
+    db::PathList pl(".");
     // Parse the PathList in the XML file if any
     cur = cur_svg = cur->xmlChildrenNode;
     while(cur != 0) { 
@@ -175,12 +175,6 @@ namespace Torch { namespace database { namespace detail {
         break; // PathList should be defined before Arraysets/Arrays
       cur = cur->next;
     }
-    // Add the parent_path of the XML Dataset to the PathList
-    boost::filesystem::path dataset_path(filename);
-    // TODO: Are the following append always done?
-    pl.append( dataset_path.parent_path() );
-    // Add the current directory to the PathList
-    pl.append( boost::filesystem::current_path() );
     // Attach the pathlist to the Dataset
     dataset.setPathList( pl );
 
@@ -336,7 +330,9 @@ namespace Torch { namespace database { namespace detail {
   }
   */
 
+    // Deallocates memory
     xmlFreeDoc(doc);
+    xmlCleanupParser();    
   }
 
 
