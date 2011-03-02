@@ -45,6 +45,20 @@ namespace Torch { namespace database {
       PathList& operator= (const PathList& other);
 
       /**
+       * Sets the "current path" which is the path that is used for resolving
+       * relative directories. By default, we start with the current process
+       * working directory, but in special cases you may want to reset it to
+       * something else. The input path must be complete (absolute).
+       */
+      void setCurrentPath (const boost::filesystem::path& path);
+
+      /**
+       * Returns the current path
+       */
+      inline const boost::filesystem::path& getCurrentPath() const 
+      { return m_current_path; }
+
+      /**
        * Appends another searchable path, if it is not already there. If the
        * path is not complete, it is completed with
        * boost::filesystem::complete()
@@ -106,6 +120,7 @@ namespace Torch { namespace database {
     private:
 
       std::list<boost::filesystem::path> m_list; ///< all added paths
+      boost::filesystem::path m_current_path; ///< how to resolve relative paths
 
   };
 

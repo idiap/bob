@@ -8,14 +8,21 @@
 #include <algorithm>
 #include <boost/tokenizer.hpp>
 #include "database/PathList.h"
+#include "database/Exception.h"
 
 namespace db = Torch::database;
 namespace fs = boost::filesystem;
 
-db::PathList::PathList() : m_list() {
+db::PathList::PathList() : 
+  m_list(),
+  m_current_path(fs::current_path())
+{
 }
 
-db::PathList::PathList(const std::string& unixpath) : m_list() {
+db::PathList::PathList(const std::string& unixpath) : 
+  m_list(), 
+  m_current_path(fs::current_path())
+{
   typedef boost::tokenizer<boost::char_separator<char> > tok_t;
   static boost::char_separator<char> sep(":");
   tok_t tokens(unixpath, sep);
@@ -23,14 +30,23 @@ db::PathList::PathList(const std::string& unixpath) : m_list() {
     append(*it);
 }
 
-db::PathList::PathList(const db::PathList& other) : m_list(other.m_list) {
+db::PathList::PathList(const db::PathList& other) : 
+  m_list(other.m_list),
+  m_current_path(other.m_current_path)
+{
 }
 
 db::PathList::~PathList() { }
 
 db::PathList& db::PathList::operator= (const db::PathList& other) {
   m_list = other.m_list;
+  m_current_path = other.m_current_path;
   return *this;
+}
+
+void db::PathList::setCurrentPath(const fs::path& path) {
+  if (!path.is_complete()) throw db::PathIsNotAbsolute(path.string()); 
+  m_current_path = path;
 }
 
 void db::PathList::append(const fs::path& path) {
@@ -83,8 +99,8 @@ static fs::path trim_one(const fs::path& p) {
  * method, just re-think about using boost::filesystem::absolute, if v3 is
  * already available.
  */
-static fs::path absolute(const fs::path& p) {
-  fs::path completed = fs::complete(p, fs::current_path());
+static fs::path absolute(const fs::path& p, const fs::path& current) {
+  fs::path completed = fs::complete(p, current);
   fs::path retval;
   for (fs::path::iterator it = completed.begin(); it != completed.end(); ++it) {
     if (*it == "..") {
@@ -103,7 +119,8 @@ fs::path db::PathList::locate(const fs::path& path) const {
   if (path.is_complete()) return path; //can only locate relative paths
   for (std::list<fs::path>::const_iterator 
       it=m_list.begin(); it!=m_list.end(); ++it) {
-    if (fs::exists(*it / path)) return absolute(*it / path);
+    fs::path check = absolute(*it / path, m_current_path);
+    if (fs::exists(check)) return check;
   }
   return fs::path(); //emtpy
 }
@@ -114,11 +131,11 @@ static bool starts_with(const fs::path& input, const fs::path& path) {
 
 fs::path db::PathList::reduce(const fs::path& input) const {
   if (!input.is_complete()) return input; //can only reduce absolute paths
-  fs::path abs_input = absolute(input);
+  fs::path abs_input = absolute(input, m_current_path);
   const fs::path* best_match = 0; //holds the best match so far
   for (std::list<fs::path>::const_iterator 
       it=m_list.begin(); it!=m_list.end(); ++it) {
-    fs::path abs_path = absolute(*it);
+    fs::path abs_path = absolute(*it, m_current_path);
     if (starts_with(abs_input, abs_path)) {
       if (best_match) {
         if (it->string().size() > best_match->string().size()) best_match = &(*it);
@@ -133,8 +150,8 @@ fs::path db::PathList::reduce(const fs::path& input) const {
   if (!best_match) return input; //no match found
   
   //if you get to this point, you have found a match, return "input-best_match"
-  size_t psize = absolute(*best_match).string().size();
-  if (absolute(*best_match) != abs_input.root_path()) {
+  size_t psize = absolute(*best_match, m_current_path).string().size();
+  if (absolute(*best_match, m_current_path) != abs_input.root_path()) {
     //if we are anywhere but in the root directory, we need to remove the extra
     //slash after the path name being clipped.
     psize += 1;

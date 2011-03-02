@@ -200,7 +200,6 @@ const char* db::ExtensionNotRegistered::what() const throw() {
   }
 }
 
-
 db::CodecNotFound::CodecNotFound(const std::string& codecname) throw()
   : m_name(codecname)
 {
@@ -217,6 +216,26 @@ const char* db::CodecNotFound::what() const throw() {
     return m_message.c_str();
   } catch (...) {
     static const char* emergency = "database::CodecNotFound: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+db::PathIsNotAbsolute::PathIsNotAbsolute(const std::string& path) throw()
+  : m_path(path)
+{
+}
+
+db::PathIsNotAbsolute::~PathIsNotAbsolute() throw() {
+}
+
+const char* db::PathIsNotAbsolute::what() const throw() {
+  try {
+    boost::format message("'%s' is not absolute");
+    message % m_path;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::PathIsNotAbsolute: cannot format, exception raised";
     return emergency;
   }
 }

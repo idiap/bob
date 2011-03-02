@@ -76,16 +76,18 @@ class PathListTest(unittest.TestCase):
   def test04_resolution(self):
 
     # The paths in the PathList are not resolved until they are neded. Suppose
-    # for example I put '.' in the PathList, then if I switch to '/bin', I
-    # should be able to locate 'ls'. The use of locate() or reduce() will use
-    # always absolute paths
+    # for example I put '.' in the PathList, then if I ask my PathList to
+    # resolve the relative directories with respect to '/bin', I should be able
+    # to locate 'ls'. The use of locate() or reduce() will use always absolute
+    # paths
     pl = torch.database.PathList('.')
 
     # Make sure '.' is in there
     self.assertTrue('.' in pl)
 
-    os.chdir('/bin')
-    
+    # Make it resolve w.r.t. '/bin'
+    pl.current_path = '/bin'
+
     # Now I can resolve ls, since I have '.' in PathList and ls is in /bin,
     # please note that the locate() method always returns full paths, even if
     # it contains relative paths inside.
@@ -117,7 +119,7 @@ class PathListTest(unittest.TestCase):
     # resolution stops working. This works as designed. It is important that
     # locate() always returns an existing path, while reduce() leaves alone
     # paths it cannot resolve for some reason.
-    os.chdir('/')
+    pl.current_path = '/'
     self.assertEqual(pl.locate('ls'), '')
 
     # localisation will work again if I specify a bit more on the path

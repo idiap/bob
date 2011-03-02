@@ -146,6 +146,17 @@ namespace Torch { namespace database {
       mutable std::string m_message;
   };
 
+  class PathIsNotAbsolute: public Exception {
+    public:
+      PathIsNotAbsolute(const std::string& path) throw();
+      virtual ~PathIsNotAbsolute() throw();
+      virtual const char* what() const throw();
+
+    private:
+      std::string m_path;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* TORCH_DATABASE_EXCEPTION_H */

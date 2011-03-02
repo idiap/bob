@@ -140,4 +140,6 @@ void bind_database_exception() {
   CxxToPythonTranslatorPar<Torch::database::ExtensionNotRegistered, const std::string&>("ExtensionNotRegistered", "Raised when Codec Registry lookups by extension do not find a codec match for the given string");
 
   CxxToPythonTranslatorPar<Torch::database::CodecNotFound, const std::string&>("CodecNotFound", "Raised when the codec is looked-up by name and is not found");
+
+  CxxToPythonTranslatorPar<Torch::database::PathIsNotAbsolute, const std::string&>("PathIsNotAbsolute", "Raised when an absolute path is required and the user fails to comply");
 }

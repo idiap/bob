@@ -39,6 +39,14 @@ static str pathlist_reduce(const db::PathList& pl, const char* path) {
   return str(pl.reduce(path).string());
 }
 
+static str pathlist_getcurrent(const db::PathList& pl) {
+  return str(pl.getCurrentPath().string());
+}
+
+static void pathlist_setcurrent(db::PathList& pl, const char* path) {
+  pl.setCurrentPath(path);
+}
+
 static tuple pathlist_paths(const db::PathList& pl) {
   list retval;
   for (std::list<fs::path>::const_iterator it = pl.paths().begin();
@@ -49,6 +57,7 @@ static tuple pathlist_paths(const db::PathList& pl) {
 void bind_database_pathlist() {
   class_<db::PathList, boost::shared_ptr<db::PathList> >("PathList", "Holds a list of searcheable paths", init<>("Initializes a new, empty PathList"))
     .def(init<const std::string&>((arg("unixpath")), "Constructs a PathList object starting from a UNIX like path (separated by ':'. E.g. '.:/my/path1:/my/path2'"))
+    .add_property("current_path", &pathlist_getcurrent, &pathlist_setcurrent, "The absolute path to use for resolving contained relative paths")
     .def("append", &pathlist_append, (arg("self"), arg("path")), "Appends another searchable path, if it is not already there. If the path is not complete, it is completed with boost::filesystem::complete().")
     .def("prepend", &pathlist_prepend, (arg("self"), arg("path")), "Prepends another searchable path, if it is not already there. If the path is not complete, it is completed with boost::filesystem::complete().")
     .def("remove", &pathlist_remove, (arg("self"), arg("path")), "Removes a path if it is listed inside. If the path is not complete, it is completed with boost::filesystem::complete()")
