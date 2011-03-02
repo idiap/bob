@@ -66,9 +66,12 @@ namespace Torch {
           (boost::posix_time::to_iso_extended_string(boost::posix_time::second_clock::local_time())).c_str() );
 
       // Create PathList node if required
-      const PathList& pl = dataset.getPathList();
-      if( pl.paths().size() > 0 )
-        xmlAddChild( rootnode, writePathList( doc, pl) );
+      PathList pl = dataset.getPathList();
+      if( pl.paths().size() > 0 ) {
+        xmlNodePtr pl_node = writePathList( doc, pl);
+        if( pl.paths().size() > 0) // size after removing relative paths
+          xmlAddChild( rootnode, pl_node );
+      }
 
       // Create Arrayset nodes
       const std::map<size_t, boost::shared_ptr<Arrayset> >&
@@ -394,7 +397,7 @@ namespace Torch {
     }
 
     xmlNodePtr XMLWriter::writePathList( xmlDocPtr doc,
-      const db::PathList& pl)
+      db::PathList& pl)
     {
       // Create the PathList node
       xmlNodePtr pathlistnode = 
@@ -402,15 +405,27 @@ namespace Torch {
       
       // Add the Entry nodes to the PathList node
       const std::list<boost::filesystem::path>& entries = pl.paths();
+      std::list<boost::filesystem::path> to_remove;
       for(std::list<boost::filesystem::path>::const_iterator 
         it=entries.begin(); it!=entries.end(); ++it)
       {
         xmlNodePtr entrynode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::entry, 0);
-        xmlNewProp( entrynode, (const xmlChar*)db::path, 
-          (const xmlChar*)((*it).string().c_str()) );
-        xmlAddChild( pathlistnode, entrynode );
+        if( (*it).has_relative_path() )
+          // Add in the list of paths to be removed
+          to_remove.push_back( *it);
+        else {
+          // Add a path entry
+          xmlNewProp( entrynode, (const xmlChar*)db::path, 
+            (const xmlChar*)((*it).string().c_str()) );
+          xmlAddChild( pathlistnode, entrynode );
+        }
       }
+
+      // Remove relative path
+      for(std::list<boost::filesystem::path>::const_iterator 
+        it=to_remove.begin(); it!=to_remove.end(); ++it)
+        pl.remove( *it);
 
       return pathlistnode;
     }

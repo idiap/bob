@@ -99,7 +99,7 @@ namespace Torch {
           /**
            * @brief Return an XML node containing a PathList
            */
-          xmlNodePtr writePathList( xmlDocPtr doc, const db::PathList& pl);
+          xmlNodePtr writePathList( xmlDocPtr doc, db::PathList& pl);
       };
 
     }
