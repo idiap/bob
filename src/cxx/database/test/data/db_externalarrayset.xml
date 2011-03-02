@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset name="Novel dataset example" version="1" datetime="2011-03-02T16:21:01">
+  <pathlist>
+    <entry path="subdata"/>
+  </pathlist>
+  <external-arrayset id="1" elementtype="float64" shape="4" role="" file="arrayset1.bin" codec="torch.arrayset.binary"/>
+  <external-arrayset id="2" elementtype="float64" shape="4" role="" file="arrayset2.bin" codec="torch.arrayset.binary"/>
+</dataset>

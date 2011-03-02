@@ -18,15 +18,31 @@ namespace db = Torch::database;
 namespace tdd = Torch::database::detail;
 namespace tca = Torch::core::array;
 
+namespace fs = boost::filesystem;
+
+/**
+ * Removes the last component from the path, supposing it is complete. If it is
+ * only root_path(), just return it.
+ */
+static fs::path trim_one(const fs::path& p) {
+  if (p == p.root_path()) return p;
+
+  fs::path retval;
+  for (fs::path::iterator it = p.begin(); it!=p.end(); ++it) {
+    fs::path::iterator next = it; 
+    ++next; //< for the lack of better support in boost::filesystem V2
+    if (next == p.end()) break; //< == skip the last bit
+    retval /= *it;
+  }
+  return retval;
+}
+
 namespace Torch { namespace database { namespace detail {
 
 
-  XMLParser::XMLParser()/*: m_id_role( new std::map<size_t,std::string>() )*/
-  {
-  }
+  XMLParser::XMLParser() { }
 
   XMLParser::~XMLParser() { }
-
 
   void XMLParser::validateXMLSchema(xmlDocPtr doc) {
     // Get path to the XML Schema definition
@@ -162,8 +178,11 @@ namespace Torch { namespace database { namespace detail {
     xmlFree(str);
 
     // 5/ Create an empty PathList and parse the PathList if any
-    db::PathList pl(".");
     // Parse the PathList in the XML file if any
+    db::PathList pl(".");
+    db::PathList pl_tmp(".");
+    boost::filesystem::path full_path = pl_tmp.locate( filename );
+    pl.setCurrentPath( trim_one(full_path) );
     cur = cur_svg = cur->xmlChildrenNode;
     while(cur != 0) { 
       if( !strcmp((const char*)cur->name, db::pathlist) ) {
@@ -487,10 +506,6 @@ namespace Torch { namespace database { namespace detail {
     // Inline arrayset
     if( !str_filename.compare("") )
     {
-      // Add id-role to the mapping of the XMLParser. This will be used for
-      // checking the members of a relation.
-      //m_id_role->insert( std::pair<size_t,std::string>( id, str_role) );
-
       // Parse elementtype
       str = xmlGetProp(cur, (const xmlChar*)db::elementtype);
       if( str==0 ) {
@@ -589,8 +604,7 @@ namespace Torch { namespace database { namespace detail {
       arrayset.reset(new db::Arrayset());
       for (size_t i=0; i<arrays.size(); ++i) 
         arrayset->add(array_ids[i], arrays[i]);
-      
-      //arrayset->m_is_loaded = true;
+
     }
     else // External Arrayset 
       arrayset.reset( 
@@ -721,7 +735,6 @@ namespace Torch { namespace database { namespace detail {
           throw XMLException();
           break;
       }
-//      array->setIsLoaded( true );
     }
     else // External Array
       array.reset( 

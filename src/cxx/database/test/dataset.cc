@@ -23,6 +23,7 @@
 #include "database/Array.h"
 
 #include <unistd.h>
+#include <iostream>
 
 struct T {
   blitz::Array<double,1> a;
@@ -73,6 +74,53 @@ std::string temp_xml_file() {
 std::string temp_bin_file() {
   boost::filesystem::path tpl = Torch::core::tmpdir();
   tpl /= "torchtest_database_datasetXXXXXX.bin";
+  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
+  strcpy(char_tpl.get(), tpl.file_string().c_str());
+  int fd = mkstemps(char_tpl.get(),4);
+  close(fd);
+  boost::filesystem::remove(char_tpl.get());
+  std::string res = char_tpl.get();
+  return res;
+}
+
+/**
+ * @brief Generates a unique temporary .bin filename, and returns the file
+ * descriptor
+ */
+std::string temp_dir() {
+  boost::filesystem::path tpl = Torch::core::tmpdir();
+  tpl /= "torchtest_database_dataset_dirXXXXXX";
+  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
+  strcpy(char_tpl.get(), tpl.file_string().c_str());
+  if( !mkdtemp(char_tpl.get()) )
+    throw Torch::core::Exception();
+  std::string res = char_tpl.get();
+  return res;
+}
+
+/**
+ * @brief Generates a unique temporary .bin filename in a given directory, and
+ * returns the file descriptor
+ */
+std::string temp_bin_file(const std::string& dir) {
+  boost::filesystem::path tpl = dir.c_str();
+  tpl /= "torchtest_database_datasetXXXXXX.bin";
+  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
+  strcpy(char_tpl.get(), tpl.file_string().c_str());
+  int fd = mkstemps(char_tpl.get(),4);
+  close(fd);
+  boost::filesystem::remove(char_tpl.get());
+  std::string res = char_tpl.get();
+  return res;
+}
+
+/**
+ * @brief Generates a unique temporary XML filename in a given directory, and 
+ * returns the file descriptor
+ */
+std::string temp_xml_file(const std::string& dir) {
+  boost::filesystem::path tpl = dir.c_str();
+  tpl /= "torchtest_database_datasetXXXXXX.xml";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),4);
@@ -615,6 +663,52 @@ BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_withexternal )
   
   // Check that the Datasets are similar
   check_equal( ds1, ds2);
+}
+
+
+BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
+{
+  // Make the inline array of id 1 of the inline arrayset of id 3 an 
+  // Get path to the XML Schema definition
+  char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw Torch::core::Exception();
+  }
+  boost::filesystem::path testdata_path( testdata_cpath);
+  testdata_path /= "db_externalarrayset.xml";
+  std::cout << testdata_path << std::endl;
+
+  // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
+  Torch::database::Dataset ds1(testdata_path.string());
+
+  // Access Arrayset 1 and 3 and check content
+  check_equal( ds1[1][1].get<double,1>(), a);
+  check_equal( ds1[1][2].get<double,1>(), c);
+  check_equal( ds1[2][1].get<double,1>(), c);
+  check_equal( ds1[2][2].get<double,1>(), a);  
+
+  // Define a temporary directory to store external data and add it to the
+  // PathList of the dataset
+  std::string path_dir = temp_dir();
+  std::string dataset_xml2( temp_xml_file( path_dir) );
+  ds1.save( dataset_xml2 );
+
+/*  // Add a relative path in the pathlist 
+  Torch::database::Dataset ds2 = ds1;
+  Torch::database::PathList pl2 = ds2.getPathList();
+  pl2.setCurrentDirectory( path_dir );
+
+
+  boost::filesystem::path data_dir( path_dir );
+  data_dir /= "data";
+  boost::filesystem::create_directory( data_dir );
+  std::cout << data_dir << std::endl;
+  Torch::database::PathList pl( "data/" );
+  ds2.setPathList( pl );*/
 }
 
 
