@@ -23,7 +23,6 @@
 #include "database/Array.h"
 
 #include <unistd.h>
-#include <iostream>
 
 struct T {
   blitz::Array<double,1> a;
@@ -666,7 +665,7 @@ BOOST_AUTO_TEST_CASE( dbDataset_parsewrite_withexternal )
 }
 
 
-BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
+BOOST_AUTO_TEST_CASE( dbDataset_pathlist1 )
 {
   // Make the inline array of id 1 of the inline arrayset of id 3 an 
   // Get path to the XML Schema definition
@@ -679,7 +678,6 @@ BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
   }
   boost::filesystem::path testdata_path( testdata_cpath);
   testdata_path /= "db_externalarrayset.xml";
-  std::cout << testdata_path << std::endl;
 
   // Load from XML
   BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
@@ -691,11 +689,6 @@ BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
   check_equal( ds1[2][1].get<double,1>(), c);
   check_equal( ds1[2][2].get<double,1>(), a);  
 
-  // Define a temporary directory to store external data and add it to the
-  // PathList of the dataset
-  std::string path_dir = temp_dir();
-  std::cout << path_dir << std::endl;
- 
   // Add path to external arraysets in PathList
   Torch::database::PathList pl = ds1.getPathList();
   boost::filesystem::path arrayset1_full(ds1[1].getFilename() );
@@ -703,10 +696,137 @@ BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
   BOOST_REQUIRE_NO_THROW( ds1.setPathList( pl ) );
 
   // Save dataset into a new XML file
-  std::string dataset_xml2( temp_xml_file( path_dir) );
+  std::string dataset_xml2( temp_xml_file() );
   BOOST_REQUIRE_NO_THROW( ds1.save( dataset_xml2 ) );
+
+  // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d(testdata_path.string()));
+  Torch::database::Dataset ds2(testdata_path.string());
+
+  // Access Arrayset 1 and 3 and check content
+  check_equal( ds2[1][1].get<double,1>(), a);
+  check_equal( ds2[1][2].get<double,1>(), c);
+  check_equal( ds2[2][1].get<double,1>(), c);
+  check_equal( ds2[2][2].get<double,1>(), a);  
 }
 
+
+BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
+{
+  // Create a dataset and save it in the given XML file
+  std::string name = "Novel dataset example";
+  size_t version = 1;
+  Torch::database::Dataset ds(name, version);
+
+  // Create database Arrays from blitz::arrays
+  boost::shared_ptr<Torch::database::Array> db_a1(
+    new Torch::database::Array(a));
+  boost::shared_ptr<Torch::database::Array> db_c1(
+    new Torch::database::Array(c));
+
+  // Put these database Arrays in a STL vector
+  std::vector<boost::shared_ptr<Torch::database::Array> > vec1;
+  vec1.push_back(db_a1);
+  vec1.push_back(db_c1);
+
+  // Create an Arrayset from the STL vector
+  Torch::database::Arrayset db_Ar1(vec1);
+
+  // Add the arrayset to the dataset and check the id
+  size_t id;
+  BOOST_REQUIRE_NO_THROW( id = ds.add(db_Ar1) );
+  BOOST_CHECK_EQUAL( id, 1 );
+
+  // Create database Arrays from blitz::arrays
+  boost::shared_ptr<Torch::database::Array> db_a2(
+    new Torch::database::Array(a));
+  boost::shared_ptr<Torch::database::Array> db_c2(
+    new Torch::database::Array(c));
+
+  // Put these database Arrays in a STL vector
+  std::vector<boost::shared_ptr<Torch::database::Array> > vec2;
+  vec2.push_back(db_c2);
+  vec2.push_back(db_a2);
+
+  // Create an Arrayset from the STL vector
+  Torch::database::Arrayset db_Ar2(vec2);
+
+  // Add the arrayset to the dataset
+  BOOST_REQUIRE_NO_THROW( id = ds.add( db_Ar2) );
+  BOOST_CHECK_EQUAL( id, 2 );
+
+  // Access Arrayset 1 and 3 and check content
+  check_equal( ds[1][1].get<double,1>(), a);
+  check_equal( ds[1][2].get<double,1>(), c);
+  check_equal( ds[2][1].get<double,1>(), c);
+  check_equal( ds[2][2].get<double,1>(), a);  
+
+  // Define a temporary directory to store external data and add it to the
+  // PathList of the dataset
+  std::string path_dir = temp_dir();
+ 
+  // Add path to external arraysets in PathList
+  Torch::database::PathList pl = ds.getPathList();
+  pl.append( path_dir ); 
+  BOOST_REQUIRE_NO_THROW( ds.setPathList( pl ) );
+
+  // Save arraysets into external file
+  std::string file1( path_dir );
+  file1 += "/arrayset1.bin";
+  BOOST_REQUIRE_NO_THROW( ds[1].save( file1) );
+  std::string file2( path_dir );
+  file2 += "/arrayset2.bin";
+  BOOST_REQUIRE_NO_THROW( ds[2].save( file2) );
+
+  // Save dataset into a new XML file
+  std::string dataset_xml( temp_xml_file( path_dir) );
+  BOOST_REQUIRE_NO_THROW( ds.save( dataset_xml ) );  
+
+  // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d( dataset_xml));
+  Torch::database::Dataset ds1( dataset_xml );
+
+  // Access Arrayset 1 and 3 and check content
+  check_equal( ds1[1][1].get<double,1>(), a);
+  check_equal( ds1[1][2].get<double,1>(), c);
+  check_equal( ds1[2][1].get<double,1>(), c);
+  check_equal( ds1[2][2].get<double,1>(), a);  
+
+
+  /////////////////////////////////////////////////////////////////
+  // Copy the dataset into a new directory, external data inclusive
+  /////////////////////////////////////////////////////////////////
+
+  // Generate a new temporary directory
+  std::string path_dir2 = temp_dir();
+ 
+  // Add path to external arraysets in PathList
+  Torch::database::PathList pl2 = ds1.getPathList();
+  pl2.append( path_dir2 ); 
+  BOOST_REQUIRE_NO_THROW( ds1.setPathList( pl2 ) );
+
+  // Save arraysets into external file
+  std::string file1_2( path_dir2 );
+  file1_2 += "/arrayset1.bin";
+  BOOST_REQUIRE_NO_THROW( ds1[1].save( file1_2) );
+  std::string file2_2( path_dir2 );
+  file2_2 += "/arrayset2.bin";
+  BOOST_REQUIRE_NO_THROW( ds1[2].save( file2_2) );
+
+  // Save dataset into a new XML file
+  std::string dataset_xml2( temp_xml_file( path_dir2) );
+  BOOST_REQUIRE_NO_THROW( ds1.save( dataset_xml2 ) );  
+
+  // Load from XML
+  BOOST_REQUIRE_NO_THROW(Torch::database::Dataset d( dataset_xml2));
+  Torch::database::Dataset ds2( dataset_xml2 );
+
+  // Access Arrayset 1 and 3 and check content
+  check_equal( ds2[1][1].get<double,1>(), a);
+  check_equal( ds2[1][2].get<double,1>(), c);
+  check_equal( ds2[2][1].get<double,1>(), c);
+  check_equal( ds2[2][2].get<double,1>(), a);    
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
