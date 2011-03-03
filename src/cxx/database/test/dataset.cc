@@ -694,8 +694,11 @@ BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
   // Define a temporary directory to store external data and add it to the
   // PathList of the dataset
   std::string path_dir = temp_dir();
+  std::cout << path_dir << std::endl;
   std::string dataset_xml2( temp_xml_file( path_dir) );
   ds1.save( dataset_xml2 );
+
+  std::cout << dataset_xml2 << std::endl;
 
 /*  // Add a relative path in the pathlist 
   Torch::database::Dataset ds2 = ds1;

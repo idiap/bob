@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset name="Coco" version="1" author="André Anjos &lt;andre.anjos@idiap.ch&gt;" datetime="2011-02-25T12:49:23">
+  <pathlist>
+    <entry path="."/>
+  </pathlist>
   <arrayset role="pattern1" elementtype="uint16" shape="3" id="1">
     <array id="1" >43 21 58</array>
     <external-array id="3" file="test1.bin" codec="torch.array.binary" />

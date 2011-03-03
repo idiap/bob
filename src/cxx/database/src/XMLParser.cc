@@ -179,7 +179,7 @@ namespace Torch { namespace database { namespace detail {
 
     // 5/ Create an empty PathList and parse the PathList if any
     // Parse the PathList in the XML file if any
-    db::PathList pl(".");
+    db::PathList pl;
     db::PathList pl_tmp(".");
     boost::filesystem::path full_path = pl_tmp.locate( filename );
     pl.setCurrentPath( trim_one(full_path) );

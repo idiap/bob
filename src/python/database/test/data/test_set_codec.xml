@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset name="Coco" version="1">
+  <pathlist>
+    <entry path="."/>
+  </pathlist>
   <external-arrayset role="pattern1" elementtype="uint16" shape="3" id="1" file="test_arrayset_codec.txt" codec="example.arrayset.text" />
 </dataset>

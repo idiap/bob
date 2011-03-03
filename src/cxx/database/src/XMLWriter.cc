@@ -66,12 +66,8 @@ namespace Torch {
           (boost::posix_time::to_iso_extended_string(boost::posix_time::second_clock::local_time())).c_str() );
 
       // Create PathList node if required
-      PathList pl = dataset.getPathList();
-      if( pl.paths().size() > 0 ) {
-        xmlNodePtr pl_node = writePathList( doc, pl);
-        if( pl.paths().size() > 0) // size after removing relative paths
-          xmlAddChild( rootnode, pl_node );
-      }
+      const db::PathList& pl = dataset.getPathList();
+      xmlAddChild( rootnode, writePathList( doc, pl ) );
 
       // Create Arrayset nodes
       const std::map<size_t, boost::shared_ptr<Arrayset> >&
@@ -396,8 +392,8 @@ namespace Torch {
       return membernode;
     }
 
-    xmlNodePtr XMLWriter::writePathList( xmlDocPtr doc,
-      db::PathList& pl)
+    xmlNodePtr XMLWriter::writePathList( xmlDocPtr doc, 
+      const db::PathList& pl)
     {
       // Create the PathList node
       xmlNodePtr pathlistnode = 
@@ -411,21 +407,11 @@ namespace Torch {
       {
         xmlNodePtr entrynode = 
           xmlNewDocNode(doc, 0, (const xmlChar*)db::entry, 0);
-        if( (*it).has_relative_path() )
-          // Add in the list of paths to be removed
-          to_remove.push_back( *it);
-        else {
-          // Add a path entry
-          xmlNewProp( entrynode, (const xmlChar*)db::path, 
-            (const xmlChar*)((*it).string().c_str()) );
-          xmlAddChild( pathlistnode, entrynode );
-        }
+        // Add a path entry
+        xmlNewProp( entrynode, (const xmlChar*)db::path, 
+          (const xmlChar*)((*it).string().c_str()) );
+        xmlAddChild( pathlistnode, entrynode );
       }
-
-      // Remove relative path
-      for(std::list<boost::filesystem::path>::const_iterator 
-        it=to_remove.begin(); it!=to_remove.end(); ++it)
-        pl.remove( *it);
 
       return pathlistnode;
     }
