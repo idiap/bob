@@ -66,7 +66,9 @@ namespace Torch {
           (boost::posix_time::to_iso_extended_string(boost::posix_time::second_clock::local_time())).c_str() );
 
       // Create PathList node if required
-      const db::PathList& pl = dataset.getPathList();
+      db::PathList pl = dataset.getPathList();
+      boost::filesystem::path file_full( filename);
+      pl.setCurrentPath( file_full.parent_path() );
       xmlAddChild( rootnode, writePathList( doc, pl ) );
 
       // Create Arrayset nodes
