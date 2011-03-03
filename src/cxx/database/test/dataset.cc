@@ -695,23 +695,16 @@ BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
   // PathList of the dataset
   std::string path_dir = temp_dir();
   std::cout << path_dir << std::endl;
+ 
+  // Add path to external arraysets in PathList
+  Torch::database::PathList pl = ds1.getPathList();
+  boost::filesystem::path arrayset1_full(ds1[1].getFilename() );
+  pl.append( arrayset1_full.parent_path() ); 
+  BOOST_REQUIRE_NO_THROW( ds1.setPathList( pl ) );
+
+  // Save dataset into a new XML file
   std::string dataset_xml2( temp_xml_file( path_dir) );
-  ds1.save( dataset_xml2 );
-
-  std::cout << dataset_xml2 << std::endl;
-
-/*  // Add a relative path in the pathlist 
-  Torch::database::Dataset ds2 = ds1;
-  Torch::database::PathList pl2 = ds2.getPathList();
-  pl2.setCurrentDirectory( path_dir );
-
-
-  boost::filesystem::path data_dir( path_dir );
-  data_dir /= "data";
-  boost::filesystem::create_directory( data_dir );
-  std::cout << data_dir << std::endl;
-  Torch::database::PathList pl( "data/" );
-  ds2.setPathList( pl );*/
+  BOOST_REQUIRE_NO_THROW( ds1.save( dataset_xml2 ) );
 }
 
 
