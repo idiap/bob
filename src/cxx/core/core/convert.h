@@ -39,11 +39,12 @@ namespace Torch {
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i) {
-        if( src(i) < src_min || src(i) > src_max )
+        if( src(i+src.lbound(0)) < src_min || src(i+src.lbound(0)) > src_max )
           throw Torch::core::Exception();
         // If the destination is an integer-like type, we need to add 0.5 s.t.
         // the round done by the implicit conversion is correct
-        dst(i) = dst_min + (((src(i)-src_min)*src_ratio) * dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
+        dst(i) = dst_min + (((src(i+src.lbound(0))-src_min)*src_ratio) * 
+          dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
       }
       return dst;
     }
@@ -63,12 +64,13 @@ namespace Torch {
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i) 
         for( int j=0; j<src.extent(1); ++j) {
-          if( src(i,j) < src_min || src(i,j) > src_max )
+          if( src(i+src.lbound(0),j+src.lbound(1)) < src_min || 
+            src(i+src.lbound(0),j+src.lbound(1)) > src_max )
             throw Torch::core::Exception();
           // If the destination is an integer-like type, we need to add 0.5 
           // s.t. the round done by the implicit conversion is correct
-          dst(i,j) = dst_min + (((src(i,j)-src_min)*src_ratio) * dst_diff + 
-            (std::numeric_limits<T>::is_integer?0.5:0));
+          dst(i,j) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1))-src_min)*src_ratio) * 
+            dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
         }
       return dst;
     }
@@ -89,11 +91,12 @@ namespace Torch {
       for( int i=0; i<src.extent(0); ++i)
         for( int j=0; j<src.extent(1); ++j) 
           for( int k=0; k<src.extent(2); ++k) {
-            if( src(i,j,k) < src_min || src(i,j,k) > src_max )
+            if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) < src_min || 
+              src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) > src_max )
               throw Torch::core::Exception();
             // If the destination is an integer-like type, we need to add 0.5 
             // s.t. the round done by the implicit conversion is correct
-            dst(i,j,k) = dst_min + (((src(i,j,k)-src_min)*src_ratio) * 
+            dst(i,j,k) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2))-src_min)*src_ratio) * 
               dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
           }
       return dst;
@@ -117,11 +120,12 @@ namespace Torch {
         for( int j=0; j<src.extent(1); ++j) 
           for( int k=0; k<src.extent(2); ++k)
             for( int l=0; l<src.extent(3); ++l) {
-              if( src(i,j,k,l) < src_min || src(i,j,k,l) > src_max )
+              if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) < src_min || 
+                src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) > src_max )
                 throw Torch::core::Exception();
               // If the destination is an integer-like type, we need to add 0.5
               // s.t. the round done by the implicit conversion is correct
-              dst(i,j,k,l) = dst_min + (((src(i,j,k,l)-src_min)*src_ratio) *
+              dst(i,j,k,l) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3))-src_min)*src_ratio) *
                 dst_diff + (std::numeric_limits<T>::is_integer?0.5:0));
             }
       return dst;
