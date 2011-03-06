@@ -2,7 +2,7 @@ project(config-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps "core") #other torch subprojects
+set(deps "database") #other torch subprojects
 set(shared "${Boost_PYTHON_LIBRARY_RELEASE};${PYTHON_LIBRARIES}")
 
 # This defines the list of source files inside this package.
