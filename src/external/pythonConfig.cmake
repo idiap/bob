@@ -16,3 +16,5 @@ get_filename_component(python_LIBRARY_DIRS ${PYTHON_LIBRARY} PATH CACHE)
   
 set(PYTHON_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}
   CACHE INTERNAL "python")
+
+include_directories(SYSTEM ${python_INCLUDE_DIRS})
