@@ -86,3 +86,4 @@ torch_header_install(ip "torch::ip")
 
 # Defines tests for this package
 torch_test(ip crop test/crop.cc)
+torch_test(ip shift test/shift.cc)
