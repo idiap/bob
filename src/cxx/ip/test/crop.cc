@@ -11,7 +11,6 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include <iostream>
 #include "core/logging.h"
 #include "ip/crop.h"
 
