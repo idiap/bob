@@ -34,7 +34,7 @@ namespace Torch {
             if( is_y_out || x+crop_x<0 || x+crop_x>=src.extent(1) )
               dst(y,x) = 0;
             else
-              dst(y,x) = src(y+crop_y, x+crop_x);
+              dst(y,x) = src( y+crop_y+src.lbound(0), x+crop_x+src.lbound(1));
           }
         }
       }
@@ -44,6 +44,8 @@ namespace Torch {
 
     /**
      * @brief Function which crops a 2D blitz::array/image of a given type.
+     *   The first dimension is the height (y-axis), whereas the second
+     *   one is the width (x-axis).
      * @param src The input blitz array
      * @param dst The output blitz array
      * @param crop_x The x-offset of the top left corner of the cropping area 
@@ -79,6 +81,8 @@ namespace Torch {
 
     /**
      * @brief Function which crops a 3D blitz::array/image of a given type.
+     *   The first dimension is the number of planes, the second one the 
+     *   height (y-axis), whereas the third one is the width (x-axis).
      * @param src The input blitz array
      * @param dst The output blitz array
      * @param crop_x The x-offset of the top left corner of the cropping area 
