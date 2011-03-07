@@ -83,3 +83,6 @@ set(src
 include(../../cmake/macros.cmake)
 torch_library(ip "${src}" "${deps}" "${shared}")
 torch_header_install(ip "torch::ip")
+
+# Defines tests for this package
+torch_test(ip crop test/crop.cc)
