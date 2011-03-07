@@ -81,9 +81,9 @@ BOOST_AUTO_TEST_CASE ( transparent_retrieval ) {
   //You can proceed the way you want with the array from this point onwards.
   //The following iteration just checks that the values I set in the
   //configuration file are the same.
-  for (blitz::sizeType i=0; i<par3.extent(0); ++i)
-    for (blitz::sizeType j=0; j<par3.extent(1); ++j)
-      for (blitz::sizeType k=0; k<par3.extent(2); ++k)
+  for (int i=0; i<par3.extent(0); ++i)
+    for (int j=0; j<par3.extent(1); ++j)
+      for (int k=0; k<par3.extent(2); ++k)
         BOOST_CHECK_EQUAL(par3(i,j,k), v++);
 
   //The correctness of the input for the other parameters will not be checked
