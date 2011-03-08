@@ -15,15 +15,19 @@
 #include "ip/shift.h"
 
 struct T {
-  blitz::Array<uint32_t,2> a2, a2s;
-  blitz::Array<uint32_t,3> a3, a3s;
+  blitz::Array<uint32_t,2> a2, a2s_1, a2s_2;
+  blitz::Array<uint32_t,3> a3, a3s_1, a3s_2;
 
-  T(): a2(4,4), a2s(4,4), a3(3,4,4), a3s(3,4,4)  {
+  T(): a2(4,4), a2s_1(4,4), a2s_2(4,4), a3(3,4,4), a3s_1(3,4,4), a3s_2(3,4,4) 
+  {
     a2 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15;
 
-   a2s = 9, 10, 11, 0, 13, 14, 15, 0,
+    a2s_1 = 9, 10, 11, 0, 13, 14, 15, 0,
         0, 0, 0, 0, 0, 0, 0, 0;
+
+    a2s_2 = 9, 10, 11, 11, 13, 14, 15, 15,
+        13, 14, 15, 15, 13, 14, 15, 15;
 
     a3 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15,
@@ -32,12 +36,19 @@ struct T {
         32, 33, 34, 35, 36, 37, 38, 39,
         40, 41, 42, 43, 44, 45, 46, 47;
 
-    a3s = 9, 10, 11, 0, 13, 14, 15, 0,
+    a3s_1 = 9, 10, 11, 0, 13, 14, 15, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
         25, 26, 27, 0, 29, 30, 31, 0,
         0, 0, 0, 0, 0, 0, 0, 0,
         41, 42, 43, 0, 45, 46, 47, 0,
         0, 0, 0, 0, 0, 0, 0, 0;
+
+    a3s_2 = 9, 10, 11, 11, 13, 14, 15, 15,
+        13, 14, 15, 15, 13, 14, 15, 15,
+        25, 26, 27, 27, 29, 30, 31, 31,
+        29, 30, 31, 31, 29, 30, 31, 31,
+        41, 42, 43, 43, 45, 46, 47, 47,
+        45, 46, 47, 47, 45, 46, 47, 47;
   }
 
   ~T() {}
@@ -79,9 +90,17 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
   Torch::ip::shift(a2, b2, 0, 0);
   checkBlitzEqual(a2, b2); 
 
-  // Shift +2y +1x
+  // Shift fully out and check exception
+  BOOST_CHECK_THROW( Torch::ip::shift(a2, b2, 0, 4),
+    Torch::ip::ParamOutOfBoundaryError );
+
+  // Shift +2y +1x (fill with zero)
+  Torch::ip::shift(a2, b2, 1, 2, false, true);
+  checkBlitzEqual(a2s_1, b2); 
+
+  // Shift +2y +1x (fill with closest neighbour)
   Torch::ip::shift(a2, b2, 1, 2);
-  checkBlitzEqual(a2s, b2); 
+  checkBlitzEqual(a2s_2, b2); 
 }
   
 BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
@@ -91,9 +110,17 @@ BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
   Torch::ip::shift(a3, b3, 0, 0);
   checkBlitzEqual(a3, b3); 
 
-  // Shift +2y +1x
+  // Shift fully out and check exception
+  BOOST_CHECK_THROW( Torch::ip::shift(a3, b3, 0, 4),
+    Torch::ip::ParamOutOfBoundaryError );
+
+  // Shift +2y +1x (fill with zero)
+  Torch::ip::shift(a3, b3, 1, 2, false, true);
+  checkBlitzEqual(a3s_1, b3);
+
+  // Shift +2y +1x (fill with closest neighbour)
   Torch::ip::shift(a3, b3, 1, 2);
-  checkBlitzEqual(a3s, b3); 
+  checkBlitzEqual(a3s_2, b3); 
 }
 
 BOOST_AUTO_TEST_SUITE_END()

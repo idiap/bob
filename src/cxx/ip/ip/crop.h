@@ -89,7 +89,6 @@ namespace Torch {
       * @param crop_h The desired height of the cropped blitz::array.
       * @param allow_out Whether an exception should be raised or not if a part
       * of the cropping area is out of the boundary of the input blitz array.
-      * If not, pixels cropped out of the input blitz array have zero values. 
       * @param zero_out Whether the cropping area which is out of the boundary
       * of the input blitz array should be filled with zero values, or with 
       * the intensity of the closest pixel in the neighbourhood.
@@ -159,7 +158,6 @@ namespace Torch {
       * @param crop_h The desired height of the cropped blitz::array.
       * @param allow_out Whether an exception should be raised or not if a part
       * of the cropping area is out of the boundary of the input blitz array.
-      * If not, pixels cropped out of the input blitz array have zero values. 
       * @param zero_out Whether the cropping area which is out of the boundary
       * of the input blitz array should be filled with zero values, or with 
       * the intensity of the closest pixel in the neighbourhood.

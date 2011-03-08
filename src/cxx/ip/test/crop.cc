@@ -14,7 +14,6 @@
 #include "core/logging.h"
 #include "ip/crop.h"
 
-#include <iostream>
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2c_1, a2c_2, a2c_3;
