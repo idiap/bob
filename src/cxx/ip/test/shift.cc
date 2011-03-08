@@ -124,4 +124,3 @@ BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
