@@ -19,6 +19,7 @@ void bind_core_profiler();
 void bind_core_DataSet();
 void bind_core_ListDataSet();
 void bind_core_cast();
+void bind_core_convert();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
   scope().attr("__doc__") = "Torch core classes and sub-classes";
@@ -32,4 +33,5 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_DataSet();
   bind_core_ListDataSet();
   bind_core_cast();
+  bind_core_convert();
 }

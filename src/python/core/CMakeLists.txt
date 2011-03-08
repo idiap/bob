@@ -13,6 +13,7 @@ set(pysrc
    "src/DataSet.cc"
    "src/ListDataSet.cc"
    "src/cast.cc"
+   "src/convert.cc"
    "src/main.cc"
    )
  
