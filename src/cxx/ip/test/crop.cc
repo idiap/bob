@@ -14,15 +14,25 @@
 #include "core/logging.h"
 #include "ip/crop.h"
 
-struct T {
-  blitz::Array<uint32_t,2> a2, a2c;
-  blitz::Array<uint32_t,3> a3, a3c;
+#include <iostream>
 
-  T(): a2(4,4), a2c(2,2), a3(3,4,4), a3c(3,2,2)  {
+struct T {
+  blitz::Array<uint32_t,2> a2, a2c_1, a2c_2, a2c_3;
+  blitz::Array<uint32_t,3> a3, a3c_1, a3c_2, a3c_3;
+
+  T(): a2(4,4), a2c_1(2,2), a2c_2(2,6), a2c_3(2,6),
+       a3(3,4,4), a3c_1(3,2,2), a3c_2(3,2,6), a3c_3(3,2,6)
+  {
     a2 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15;
 
-    a2c = 5, 6, 9, 10;
+    a2c_1 = 5, 6, 9, 10;
+
+    a2c_2 = 0, 4, 5, 6, 7, 0,
+            0, 8, 9, 10, 11, 0;
+
+    a2c_3 = 4, 4, 5, 6, 7, 7,
+            8, 8, 9, 10, 11, 11;
 
     a3 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15,
@@ -31,9 +41,23 @@ struct T {
         32, 33, 34, 35, 36, 37, 38, 39,
         40, 41, 42, 43, 44, 45, 46, 47;
 
-    a3c = 5, 6, 9, 10,
+    a3c_1 = 5, 6, 9, 10,
         21, 22, 25, 26,
         37, 38, 41, 42;
+
+    a3c_2 = 0, 4, 5, 6, 7, 0,
+            0, 8, 9, 10, 11, 0,
+            0, 20, 21, 22, 23, 0,
+            0, 24, 25, 26, 27, 0,
+            0, 36, 37, 38, 39, 0,
+            0, 40, 41, 42, 43, 0; 
+
+    a3c_3 = 4, 4, 5, 6, 7, 7,
+            8, 8, 9, 10, 11, 11,
+            20, 20, 21, 22, 23, 23,
+            24, 24, 25, 26, 27, 27,
+            36, 36, 37, 38, 39, 39,
+            40, 40, 41, 42, 43, 43; 
   }
 
   ~T() {}
@@ -77,7 +101,19 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_uint8 )
 
   // Crop the middle part
   Torch::ip::crop(a2, b2, 1, 1, 2, 2);
-  checkBlitzEqual(a2c, b2); 
+  checkBlitzEqual(a2c_1, b2); 
+
+  // Crop the middle part with out of boundary and check exception
+  BOOST_CHECK_THROW( Torch::ip::crop(a2, b2, -1, 1, 6, 2), 
+    Torch::ip::ParamOutOfBoundaryError );
+
+  // Crop the middle part with out of boundary (fill with zero)
+  Torch::ip::crop(a2, b2, -1, 1, 6, 2, true, true);
+  checkBlitzEqual(a2c_2, b2); 
+
+  // Crop the middle part with out of boundary (fill with closest neighbour)
+  Torch::ip::crop(a2, b2, -1, 1, 6, 2, true);
+  checkBlitzEqual(a2c_3, b2); 
 }
   
 BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
@@ -89,7 +125,19 @@ BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
 
   // Crop the middle part
   Torch::ip::crop(a3, b3, 1, 1, 2, 2);
-  checkBlitzEqual(a3c, b3); 
+  checkBlitzEqual(a3c_1, b3); 
+
+  // Crop the middle part with out of boundary and check exception
+  BOOST_CHECK_THROW( Torch::ip::crop(a3, b3, -1, 1, 6, 2), 
+    Torch::ip::ParamOutOfBoundaryError );
+
+  // Crop the middle part with out of boundary (fill with zero)
+  Torch::ip::crop(a3, b3, -1, 1, 6, 2, true, true);
+  checkBlitzEqual(a3c_2, b3); 
+
+  // Crop the middle part with out of boundary (fill with closest neighbour)
+  Torch::ip::crop(a3, b3, -1, 1, 6, 2, true);
+  checkBlitzEqual(a3c_3, b3); 
 }
 
 BOOST_AUTO_TEST_SUITE_END()
