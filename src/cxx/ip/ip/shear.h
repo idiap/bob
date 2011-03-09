@@ -6,6 +6,7 @@
  * The algorithm is strongly inspired by the following article:
  * 'A Fast Algorithm for General Raster Rotation', Alan Paeth, in the 
  * proceedings of Graphics Interface '86, p. 77-81.
+ * The notes of Tobin Fricke about this article might also be of interest.
  */
 
 #ifndef TORCH5SPRO_IP_SHEAR_H
@@ -121,7 +122,7 @@ namespace Torch {
               else 
                 residual = 0.;
               pixel = (pixel - residual) + old_residual;
-              int x_dst = floor(x - x_c_src + x_c_dst + skew_i+0.5);
+              int x_dst = ceil(x - x_c_src + x_c_dst + skew_i-0.5);
               if( x_dst >= 0 && x_dst < dst.extent(1) )
                 dst(y,x_dst) = (T)pixel; //TODO: check C-like cast
               old_residual = residual;
