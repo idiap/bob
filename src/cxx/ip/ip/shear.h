@@ -101,15 +101,15 @@ namespace Torch {
                 residual = 0.;
               pixel = (pixel - residual) + old_residual;
               // Determine x-location on dst row
-              int x_dst = floor(x - x_c_src + x_c_dst - skew_i+0.5);
+              int x_dst = ceil(x - x_c_src + x_c_dst - skew_i-0.5);
               if( x_dst >= 0 && x_dst < dst.extent(1) )
                 dst(y,x_dst) = (T)pixel; //TODO: check C-like cast
               old_residual = residual;
             }
             // Add remaining residual if possible
-            double next_ind = -x_c_src + x_c_dst - skew_i - 1 + 0.5;
-            if( next_ind >= 0)
-              dst(y,(int)next_ind) = (T)old_residual; //TODO: check C-like cast
+            double next_ind = -x_c_src + x_c_dst - skew_i - 1 - 0.5;
+            if( ceil(next_ind) >= 0)
+              dst(y,(int)ceil(next_ind)) = (T)old_residual; //TODO: check C-like cast
           }
           // Transfer pixels left-to-right
           else {
@@ -129,9 +129,9 @@ namespace Torch {
             }
             // Add remaining residual if possible
             double next_ind = 
-              -x_c_src + x_c_dst + skew_i + src.extent(1) + 0.5;
-            if( next_ind < dst.extent(1))
-              dst(y,(int)next_ind) = (T)old_residual; //TODO: check C-like cast
+              -x_c_src + x_c_dst + skew_i + src.extent(1) - 0.5;
+            if( ceil(next_ind) < dst.extent(1))
+              dst(y,(int)ceil(next_ind)) = (T)old_residual; //TODO: check C-like cast
           } 
         }    
       }
