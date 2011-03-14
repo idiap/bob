@@ -14,6 +14,7 @@
 
 #include "core/logging.h"
 #include "ip/Exception.h"
+#include "ip/common.h"
 
 namespace Torch {
 /**
@@ -24,21 +25,6 @@ namespace Torch {
   namespace ip {
 
     namespace detail {
-      /**
-        * @brief Function which copies a 2D blitz::array/image of a given type.
-        * @warning No check is performed on the dst blitz::array/image.
-        * @param src The input blitz array
-        * @param dst The output blitz array
-        */
-      template<typename T>
-      void copyNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
-      { 
-        for( int y=0; y<dst.extent(0); ++y)
-          for( int x=0; x<dst.extent(1); ++x)
-            dst(y,x) = src( y+src.lbound(0), x+src.lbound(1) );
-      }
-
-      
       /**
         * @brief Function which shears a 2D blitz::array/image of a given type
         *   along the X-axis.

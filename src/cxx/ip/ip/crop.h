@@ -11,6 +11,7 @@
 
 #include "core/logging.h"
 #include "ip/Exception.h"
+#include "ip/common.h"
 
 namespace Torch {
 /**
@@ -21,16 +22,6 @@ namespace Torch {
   namespace ip {
 
     namespace detail {
-      /**
-        * @brief Force value to stay in a given range [min, max]
-        * @param val The value to be considered
-        * @param min The minimum of the range
-        * @param max The maximum of the range
-        */
-      inline int keepInRange( const int val, const int min, const int max) {
-        return (val < min ? min : (val > max ? max : val ) );
-      }
-
       /**
         * @brief Function which crops a 2D blitz::array/image of a given type.
         *   The first dimension is the height (y-axis), whereas the second
@@ -49,7 +40,7 @@ namespace Torch {
         * the intensity of the closest pixel in the neighbourhood.
         */
       template<typename T>
-      void cropNoCheck2D(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
+      void cropNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
         const int crop_x, const int crop_y, const int crop_w, const int crop_h,
         const bool zero_out)
       {
@@ -137,8 +128,7 @@ namespace Torch {
       }
     
       // Crop the 2D array
-      detail::cropNoCheck2D<T>(src, dst, crop_x, crop_y, crop_w, crop_h, 
-        zero_out);
+      detail::cropNoCheck(src, dst, crop_x, crop_y, crop_w, crop_h, zero_out);
     }
 
 
@@ -213,7 +203,7 @@ namespace Torch {
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
         // Crop the 2D array
-        detail::cropNoCheck2D(src_slice, dst_slice, crop_x, crop_y, crop_w,
+        detail::cropNoCheck(src_slice, dst_slice, crop_x, crop_y, crop_w,
           crop_h, zero_out);
       }
     }

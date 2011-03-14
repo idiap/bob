@@ -14,6 +14,7 @@
 
 #include "core/logging.h"
 #include "ip/Exception.h"
+#include "ip/common.h"
 #include "ip/shear.h"
 #include "ip/crop.h"
 
@@ -30,29 +31,13 @@ namespace Torch {
     namespace detail {
       /**
         * @brief Function which rotates a 2D blitz::array/image of a given type
-        *   with an angle of 0 degree, i.e. make a copy.
-        * @warning No check is performed on the dst blitz::array/image.
-        * @param src The input blitz array
-        * @param dst The output blitz array
-        */
-      template<typename T>
-      void rotateNoCheck2D_0(const blitz::Array<T,2>& src, 
-        blitz::Array<T,2>& dst)
-      { 
-        for( int y=0; y<dst.extent(0); ++y)
-          for( int x=0; x<dst.extent(1); ++x)
-            dst(y,x) = src( y+src.lbound(0), x+src.lbound(1) );
-      }
-
-      /**
-        * @brief Function which rotates a 2D blitz::array/image of a given type
         *   with an angle of 90 degrees.
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
         * @param dst The output blitz array
         */
       template<typename T>
-      void rotateNoCheck2D_90(const blitz::Array<T,2>& src, 
+      void rotateNoCheck_90(const blitz::Array<T,2>& src, 
         blitz::Array<T,2>& dst)
       { 
         for( int y=0; y<dst.extent(0); ++y)
@@ -68,7 +53,7 @@ namespace Torch {
         * @param dst The output blitz array
         */
       template<typename T>
-      void rotateNoCheck2D_180(const blitz::Array<T,2>& src, 
+      void rotateNoCheck_180(const blitz::Array<T,2>& src, 
         blitz::Array<T,2>& dst)
       { 
         for( int y=0; y<dst.extent(0); ++y)
@@ -84,7 +69,7 @@ namespace Torch {
         * @param dst The output blitz array
         */
       template<typename T>
-      void rotateNoCheck2D_270(const blitz::Array<T,2>& src, 
+      void rotateNoCheck_270(const blitz::Array<T,2>& src, 
         blitz::Array<T,2>& dst)
       { 
         for( int y=0; y<dst.extent(0); ++y)
@@ -94,10 +79,12 @@ namespace Torch {
 
     }
 
-    enum RotationAlgorithm {
-      Shearing,
-      BilinearInterp
-    };
+    namespace Rotation {
+      enum Algorithm {
+        Shearing,
+        BilinearInterp
+      };
+    }
 
     /**
       * @brief Function which rotates a 2D blitz::array/image of a given type.
@@ -113,7 +100,8 @@ namespace Torch {
       */
     template<typename T>
     void rotate(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const double angle, const enum RotationAlgorithm alg=Shearing)
+      const double angle, 
+      const enum Rotation::Algorithm alg=Rotation::Shearing)
     {
       // Check and reindex if required
       if( dst.base(0) != 0 || dst.base(1) != 0 ) {
@@ -137,9 +125,9 @@ namespace Torch {
           dst.resize( src.extent(0), src.extent(1) );
         // Perform rotation
         if(angle_norm == 0.)
-          detail::rotateNoCheck2D_0(src, dst);
+          detail::copyNoCheck(src, dst);
         else
-          detail::rotateNoCheck2D_180(src, dst);
+          detail::rotateNoCheck_180(src, dst);
         return;
       }
       else if(angle_norm == 90. || angle_norm == 270. || angle_norm == -45.)
@@ -149,9 +137,9 @@ namespace Torch {
           dst.resize( src.extent(1), src.extent(0) );
         // Perform rotation
         if(angle_norm == 90.)
-          detail::rotateNoCheck2D_90(src, dst);
+          detail::rotateNoCheck_90(src, dst);
         else
-          detail::rotateNoCheck2D_270(src, dst);
+          detail::rotateNoCheck_270(src, dst);
         return;
       }
 
@@ -164,9 +152,9 @@ namespace Torch {
 
       switch(alg)
       {
-        case Shearing:
+        case Rotation::Shearing:
           {
-            // Declare a intermediate arrays
+            // Declare an intermediate arrays
             blitz::Array<T,2> dst_int1, dst_int2;;
             // Perform simple rotation. After that, there is one more rotation 
             // to do with an angle in [-45,45].
@@ -175,15 +163,15 @@ namespace Torch {
             }
             else if( quadrant == 1) {
               dst_int1.resize( src.extent(1), src.extent(0) );
-              detail::rotateNoCheck2D_90(src, dst_int1);  
+              detail::rotateNoCheck_90(src, dst_int1);  
             }
             else if( quadrant == 2) {
               dst_int1.resize( src.extent(0), src.extent(1) );
-              detail::rotateNoCheck2D_180(src, dst_int1);  
+              detail::rotateNoCheck_180(src, dst_int1);  
             }
             else { // quadrant == 3
               dst_int1.resize( src.extent(1), src.extent(0) );
-              detail::rotateNoCheck2D_270(src, dst_int1);  
+              detail::rotateNoCheck_270(src, dst_int1);  
             }
 
             // Compute shearing values required for the rotation

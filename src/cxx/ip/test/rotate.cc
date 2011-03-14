@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   // Warning: ImageMagick considers opposite angles wrt. to us
 
   // 5 degrees 
-  Torch::ip::rotate( img, img_processed, 5., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, 5., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
   Torch::database::Array ar_img_r5(testdata_path_img.string());
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r5, img_processed, eps);
 
   // 10 degrees 
-  Torch::ip::rotate( img, img_processed, 10., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, 10., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10.pgm";
   Torch::database::Array ar_img_r10(testdata_path_img.string());
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r10, img_processed, eps);
 
   // 15 degrees 
-  Torch::ip::rotate( img, img_processed, 15., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, 15., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r15.pgm";
   Torch::database::Array ar_img_r15(testdata_path_img.string());
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r15, img_processed, eps);
 
   // 30 degrees 
-  Torch::ip::rotate( img, img_processed, 30., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, 30., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r30.pgm";
   Torch::database::Array ar_img_r30(testdata_path_img.string());
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r30, img_processed, eps);
 
   // 45 degrees 
-  Torch::ip::rotate( img, img_processed, 45., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, 45., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r45.pgm";
   Torch::database::Array ar_img_r45(testdata_path_img.string());
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r45, img_processed, eps);
 
   // 70 degrees 
-  Torch::ip::rotate( img, img_processed, 70., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, 70., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r70.pgm";
   Torch::database::Array ar_img_r70(testdata_path_img.string());
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r70, img_processed, eps);
 
   // 237 degrees 
-  Torch::ip::rotate( img, img_processed, 237., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, 237., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r237.pgm";
   Torch::database::Array ar_img_r237(testdata_path_img.string());
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r237, img_processed, eps);
 
   // -25 degrees 
-  Torch::ip::rotate( img, img_processed, -25., Torch::ip::Shearing);
+  Torch::ip::rotate( img, img_processed, -25., Torch::ip::Rotation::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_rn25.pgm";
   Torch::database::Array ar_img_rn25(testdata_path_img.string());
