@@ -203,8 +203,8 @@ namespace Torch {
         dst.resize( height_dst, src.extent(1) );
 
       // Create transposed view arrays for both src and dst
-      const blitz::Array<T,2> src_transpose(src.transpose(1,0));
-      blitz::Array<T,2> dst_transpose(dst.transpose(1,0));
+      const blitz::Array<T,2> src_transpose = src.transpose(1,0);
+      blitz::Array<T,2> dst_transpose = dst.transpose(1,0);
 
       // Call the shearXNoCheck function
       detail::shearXNoCheck( src_transpose, dst_transpose, shear, antialias);
