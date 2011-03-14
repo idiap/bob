@@ -11,6 +11,7 @@
 
 #include "core/logging.h"
 #include "ip/Exception.h"
+#include "ip/common.h"
 
 namespace Torch {
 /**
@@ -21,16 +22,6 @@ namespace Torch {
   namespace ip {
 
     namespace detail {
-      /**
-        * @brief Force value to stay in a given range [min, max]
-        * @param val The value to be considered
-        * @param min The minimum of the range
-        * @param max The maximum of the range
-        */
-      inline int keepInRange( const int val, const int min, const int max) {
-        return (val < min ? min : (val > max ? max : val ) );
-      }
-
       /**
         * @brief Function which shifts a 2D blitz::array/image of a given type.
         *   The first dimension is the height (y-axis), whereas the second
@@ -193,7 +184,7 @@ namespace Torch {
     
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
-        blitz::Array<T,2> src_slice = 
+        const blitz::Array<T,2> src_slice = 
           src( p, blitz::Range::all(), blitz::Range::all() );
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );

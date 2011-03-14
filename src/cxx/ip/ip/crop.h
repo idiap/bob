@@ -198,7 +198,7 @@ namespace Torch {
     
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
-        blitz::Array<T,2> src_slice = 
+        const blitz::Array<T,2> src_slice = 
           src( p, blitz::Range::all(), blitz::Range::all() );
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
