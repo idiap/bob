@@ -21,35 +21,37 @@ namespace Torch {
   namespace sp {
 
     /**
-     * @brief Enumeration of the possible options
+     * @brief Enumeration of the possible size options
      */
-    enum ConvolutionOption {
-      FULL,
-      SAME,
-      VALID
-    };
+    namespace Convolution {
+      enum SizeOption {
+        FULL,
+        SAME,
+        VALID
+      };
+    }
 
     /**
      * @brief 1D convolution of blitz arrays using zero padding
      * @param option:  * 0: full size (default)
      *                 * 1: same size as B
      *                 * 2: valid (part without zero padding)
-     * @warning Assume size(A) > size(B)
+     * @warning Assume size(C) > size(B)
      */
-    template<typename T>
-      blitz::Array<T,1> convolve(const blitz::Array<T,1>& B, 
-        const blitz::Array<T,1>& C, const ConvolutionOption option = FULL);
+    template<typename T> void convolve(const blitz::Array<T,1>& B, 
+      const blitz::Array<T,1>& C, blitz::Array<T,1>& A,
+      const enum Convolution::SizeOption option = Convolution::FULL);
 
     /**
      * @brief 2D convolution of blitz arrays using zero padding
      * @param option:  * 0: full size
      *                 * 1: same size as B
      *                 * 2: valid (part without zero padding)
-     * @warning Assume size(A) > size(B)
+     * @warning Assume size(C) > size(B)
      */
-    template<typename T>
-      blitz::Array<T,2> convolve(const blitz::Array<T,2>& B, 
-        const blitz::Array<T,2>& C, const ConvolutionOption option = FULL);
+    template<typename T> void convolve(const blitz::Array<T,2>& B, 
+      const blitz::Array<T,2>& C, blitz::Array<T,2>& A,
+      const enum Convolution::SizeOption option = Convolution::FULL);
 
   }
 /**
