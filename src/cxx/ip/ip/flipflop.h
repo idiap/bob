@@ -127,7 +127,7 @@ namespace Torch {
         dst.resize( src.extent(0), src.extent(1) );
 
       // Flip the 2D array
-      const blitz::Array<T,2> src_t = src.transpose(1,0);
+      const blitz::Array<T,2> src_t = (src.copy()).transpose(1,0);
       blitz::Array<T,2> dst_t = dst.transpose(1,0);
       detail::flipNoCheck(src_t, dst_t);
     }
@@ -162,7 +162,7 @@ namespace Torch {
           src( p, blitz::Range::all(), blitz::Range::all() );
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
-        const blitz::Array<T,2> src_t = src_slice.transpose(1,0);
+        const blitz::Array<T,2> src_t = (src_slice.copy()).transpose(1,0);
         blitz::Array<T,2> dst_t = dst_slice.transpose(1,0);
         // Flip the 2D array
         detail::flipNoCheck(src_t, dst_t);
