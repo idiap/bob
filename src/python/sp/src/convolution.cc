@@ -15,11 +15,11 @@ using namespace boost::python;
 static const char* CONVOLVE_DOC = "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array. The option field allows to give information about the size of the output (FULL, SAME, VALID)";
 
 #define CONVOLVE_DECL(T,N) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_overloads_ ## N, Torch::sp::convolve<T>, 3, 4)
+  BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_overloads_ ## N, Torch::sp::convolve<T>, 3, 5)
 
 #define CONVOLVE_DEF(T,N) \
-  def("convolve", (void (*)(const blitz::Array<T,1>&, const blitz::Array<T,1>&, blitz::Array<T,1>&, const enum Torch::sp::Convolution::SizeOption))&Torch::sp::convolve<T>, convolve_overloads_ ## N ((arg("b"), arg("c"), arg("a"), arg("opt")="FULL"), CONVOLVE_DOC)); \
-  def("convolve", (void (*)(const blitz::Array<T,2>&, const blitz::Array<T,2>&, blitz::Array<T,2>&, const enum Torch::sp::Convolution::SizeOption))&Torch::sp::convolve<T>, convolve_overloads_ ## N ((arg("b"), arg("c"), arg("a"), arg("opt")="FULL"), CONVOLVE_DOC));
+  def("convolve", (void (*)(const blitz::Array<T,1>&, const blitz::Array<T,1>&, blitz::Array<T,1>&, const enum Torch::sp::Convolution::SizeOption, const enum Torch::sp::Convolution::BorderOption))&Torch::sp::convolve<T>, convolve_overloads_ ## N ((arg("b"), arg("c"), arg("a"), arg("size_opt")="Full", arg("border_opt")="Zero"), CONVOLVE_DOC)); \
+  def("convolve", (void (*)(const blitz::Array<T,2>&, const blitz::Array<T,2>&, blitz::Array<T,2>&, const enum Torch::sp::Convolution::SizeOption, const enum Torch::sp::Convolution::BorderOption))&Torch::sp::convolve<T>, convolve_overloads_ ## N ((arg("b"), arg("c"), arg("a"), arg("size_opt")="Full", arg("border_opt")="Zero"), CONVOLVE_DOC));
 
 CONVOLVE_DECL(bool,bool)
 CONVOLVE_DECL(int8_t,int8)
@@ -37,10 +37,16 @@ CONVOLVE_DECL(std::complex<double>,complex128)
 
 void bind_sp_convolution()
 {
-  enum_<Torch::sp::Convolution::SizeOption>("ConvolutionOption")
-    .value("FULL", Torch::sp::Convolution::FULL)
-    .value("SAME", Torch::sp::Convolution::SAME)
-    .value("VALID", Torch::sp::Convolution::VALID)
+  enum_<Torch::sp::Convolution::SizeOption>("SizeOption")
+    .value("Full", Torch::sp::Convolution::Full)
+    .value("Same", Torch::sp::Convolution::Same)
+    .value("Valid", Torch::sp::Convolution::Valid)
+    ;
+ 
+  enum_<Torch::sp::Convolution::BorderOption>("BorderOption")
+    .value("Zero", Torch::sp::Convolution::Zero)
+    .value("NearestNeighbour", Torch::sp::Convolution::NearestNeighbour)
+    .value("Circular", Torch::sp::Convolution::Circular)
     ;
  
   CONVOLVE_DEF(bool,bool)
