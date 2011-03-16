@@ -43,6 +43,7 @@ set(src
 include(../../cmake/macros.cmake)
 torch_header_install(core-cxx core "torch::core")
 torch_library(core "${src}" "${deps}" "${shared}")
+add_dependencies(torch_core core-cxx_header_install)
 
 # Defines tests for this package
 torch_test(core tensor test/tensor.cc)

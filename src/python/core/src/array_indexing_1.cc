@@ -63,13 +63,13 @@ template <typename T> static bp::object getset
     blitz::Range r1 = r1c(); 
     tp::check_range(0, r1, a.lbound(0), a.extent(0));
     bp::object retval(a(r1));
-    if (!value.is_none()) retval.attr("fill")(value);
+    if (value.ptr() != Py_None) retval.attr("fill")(value);
     return retval;
   }
   if (i1c.check()) {
     int r1 = i1c();
     r1 = tp::check_range(0, r1, a.lbound(0), a.extent(0));
-    if (!value.is_none()) a(r1) = bp::extract<T>(value);
+    if (value.ptr() != Py_None) a(r1) = bp::extract<T>(value);
     return bp::object(a(r1));
   }
 

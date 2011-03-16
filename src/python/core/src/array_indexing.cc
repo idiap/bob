@@ -19,16 +19,16 @@ bool tp::check_index(int index, int base, int extent) {
 }
 
 void tp::check_range(int dimension, const blitz::Range& r, int base, int extent) {
-  int first = r.first(blitz::Range::fromStart);
-  if ((first != blitz::Range::fromStart) && !tp::check_index(first, base, extent)) {
+  int first = r.first(tp::range::fromStart);
+  if ((first != tp::range::fromStart) && !tp::check_index(first, base, extent)) {
     boost::format msg("This blitz array (base: %d) has %d elements on dimension %d, but I got %d for the slice start, that is not invalid");
     msg % base % extent % dimension;
     msg % first;
     PyErr_SetString(PyExc_IndexError, msg.str().c_str());
     bp::throw_error_already_set();
   }
-  int last = r.last(blitz::Range::toEnd);
-  if ((last != blitz::Range::toEnd) && !tp::check_index(last, base, extent)) {
+  int last = r.last(tp::range::toEnd);
+  if ((last != tp::range::toEnd) && !tp::check_index(last, base, extent)) {
     boost::format msg("This blitz array (base: %d) has %d elements on dimension %d, but I got %d for the slice end, that is not invalid");
     msg % base % extent % dimension;
     msg % last;

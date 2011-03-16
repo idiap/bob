@@ -8,6 +8,9 @@
 #include <boost/python/slice.hpp>
 #include <blitz/range.h>
 
+#include "core/python/array_indexing.h"
+
+namespace tp = Torch::python;
 namespace bp = boost::python;
 
 /**
@@ -69,7 +72,7 @@ struct range_from_slice {
     //retrieves the indexes and sets the Range object
 
     //the start value may be None
-    int start = blitz::Range::fromStart;
+    int start = tp::range::fromStart;
     if (slice->start != Py_None) {
       bp::handle<> handle(slice->start);
       bp::object obj(handle);
@@ -77,7 +80,7 @@ struct range_from_slice {
     }
 
     //the stop value may be None
-    int stop = blitz::Range::toEnd;
+    int stop = tp::range::toEnd;
     if (slice->stop != Py_None) {
       bp::handle<> handle(slice->stop);
       bp::object obj(handle);
@@ -108,8 +111,8 @@ struct range_to_slice {
   static PyObject* convert(const container_type& tv) {
     static const bp::slice_nil _;
     bp::object retval;
-    if (tv.first(blitz::Range::fromStart) == blitz::Range::fromStart) {
-      if (tv.last(blitz::Range::toEnd) == blitz::Range::toEnd) {
+    if (tv.first(tp::range::fromStart) == tp::range::fromStart) {
+      if (tv.last(tp::range::toEnd) == tp::range::toEnd) {
         retval = bp::slice(_, _, tv.stride());
       }
       else {
@@ -117,7 +120,7 @@ struct range_to_slice {
       }
     }
     else {
-      if (tv.last(blitz::Range::toEnd) == blitz::Range::toEnd) {
+      if (tv.last(tp::range::toEnd) == tp::range::toEnd) {
         retval = bp::slice(tv.first(), _, tv.stride());
       }
       else {

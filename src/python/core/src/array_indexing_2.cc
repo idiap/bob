@@ -57,14 +57,14 @@ template <typename T> static bp::object getset
       blitz::Range r2 = r2c(); 
       tp::check_range(1, r2, a.lbound(1), a.extent(1));
       bp::object retval(a(r1,r2));
-      if (!value.is_none()) retval.attr("fill")(value);
+      if (value.ptr() != Py_None) retval.attr("fill")(value);
       return retval;
     }
     if (i2c.check()) {
       int r2 = i2c();
       r2 = tp::check_range(1, r2, a.lbound(1), a.extent(1));
       bp::object retval(a(r1,r2));
-      if (!value.is_none()) retval.attr("fill")(value);
+      if (value.ptr() != Py_None) retval.attr("fill")(value);
       return retval;
     }
   }
@@ -75,13 +75,13 @@ template <typename T> static bp::object getset
       blitz::Range r2 = r2c(); 
       tp::check_range(1, r2, a.lbound(1), a.extent(1));
       bp::object retval(a(r1,r2));
-      if (!value.is_none()) retval.attr("fill")(value);
+      if (value.ptr() != Py_None) retval.attr("fill")(value);
       return retval;
     }
     if (i2c.check()) {
       int r2 = i2c();
       r2 = tp::check_range(1, r2, a.lbound(1), a.extent(1));
-      if (!value.is_none()) a(r1,r2) = bp::extract<T>(value);
+      if (value.ptr() != Py_None) a(r1,r2) = bp::extract<T>(value);
       return bp::object(a(r1,r2));
     }
   }

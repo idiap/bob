@@ -57,3 +57,4 @@ set(src
 include(../../cmake/macros.cmake)
 torch_header_install(dfftpack41-cxx dfftpack41 "torch::dfftpack41")
 torch_library(dfftpack41 "${src}" "" "")
+add_dependencies(torch_dfftpack41 dfftpack41-cxx_header_install)

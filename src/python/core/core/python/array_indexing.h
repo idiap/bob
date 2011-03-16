@@ -14,6 +14,16 @@
 
 namespace Torch { namespace python {
 
+  namespace range {
+#ifdef HAVE_BLITZ_SIZETYPE
+    int fromStart = blitz::fromStart;
+    int toEnd = blitz::toEnd;
+#else
+    int fromStart = blitz::Range::fromStart;
+    int toEnd = blitz::Range::toEnd;
+#endif
+  }
+
   /**
    * Returns true or false if the index is inside the given bounds or not.
    */

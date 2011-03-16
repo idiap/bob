@@ -15,6 +15,7 @@ set(src
 include(../../cmake/macros.cmake)
 torch_header_install(config-cxx config "torch::config")
 torch_library(config "${src}" "${deps}" "${shared}")
+add_dependencies(torch_config config-cxx_header_install)
 
 # Defines tests for this package
 torch_test(config basic test/basic.cc)

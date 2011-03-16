@@ -13,3 +13,4 @@ SET(src
 include(../../cmake/macros.cmake)
 torch_header_install(ap-cxx ap "torch::ap")
 torch_library(ap "${src}" "${deps}" "${shared}")
+add_dependencies(torch_ap ap-cxx_header_install)

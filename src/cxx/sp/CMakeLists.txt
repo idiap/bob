@@ -19,6 +19,7 @@ set(src
 include(../../cmake/macros.cmake)
 torch_header_install(sp-cxx sp "torch::sp")
 torch_library(sp "${src}" "${deps}" "")
+add_dependencies(torch_sp sp-cxx_header_install)
 
 # Defines tests for this package
 torch_test(sp dftdct_naive test/dftdctnaive.cc)

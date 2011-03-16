@@ -61,14 +61,14 @@ template <typename T> static bp::object getset
         blitz::Range r3 = r3c(); 
         tp::check_range(2, r3, a.lbound(2), a.extent(2));
         bp::object retval(a(r1,r2,r3));
-        if (!value.is_none()) retval.attr("fill")(value);
+        if (value.ptr() != Py_None) retval.attr("fill")(value);
         return retval;
       }
       if (i3c.check()) {
         int r3 = i3c();
         r3 = tp::check_range(2, r3, a.lbound(2), a.extent(2));
         bp::object retval(a(r1,r2,r3));
-        if (!value.is_none()) retval.attr("fill")(value);
+        if (value.ptr() != Py_None) retval.attr("fill")(value);
         return retval;
       }
     }
@@ -79,14 +79,14 @@ template <typename T> static bp::object getset
         blitz::Range r3 = r3c(); 
         tp::check_range(2, r3, a.lbound(2), a.extent(2));
         bp::object retval(a(r1,r2,r3));
-        if (!value.is_none()) retval.attr("fill")(value);
+        if (value.ptr() != Py_None) retval.attr("fill")(value);
         return retval;
       }
       if (i3c.check()) {
         int r3 = i3c();
         r3 = tp::check_range(2, r3, a.lbound(2), a.extent(2));
         bp::object retval(a(r1,r2,r3));
-        if (!value.is_none()) retval.attr("fill")(value);
+        if (value.ptr() != Py_None) retval.attr("fill")(value);
         return retval;
       }
     }
@@ -101,14 +101,14 @@ template <typename T> static bp::object getset
         blitz::Range r3 = r3c(); 
         tp::check_range(2, r3, a.lbound(2), a.extent(2));
         bp::object retval(a(r1,r2,r3));
-        if (!value.is_none()) retval.attr("fill")(value);
+        if (value.ptr() != Py_None) retval.attr("fill")(value);
         return retval;
       }
       if (i3c.check()) {
         int r3 = i3c();
         r3 = tp::check_range(2, r3, a.lbound(2), a.extent(2));
         bp::object retval(a(r1,r2,r3));
-        if (!value.is_none()) retval.attr("fill")(value);
+        if (value.ptr() != Py_None) retval.attr("fill")(value);
         return retval;
       }
     }
@@ -119,13 +119,13 @@ template <typename T> static bp::object getset
         blitz::Range r3 = r3c(); 
         tp::check_range(2, r3, a.lbound(2), a.extent(2));
         bp::object retval(a(r1,r2,r3));
-        if (!value.is_none()) retval.attr("fill")(value);
+        if (value.ptr() != Py_None) retval.attr("fill")(value);
         return retval;
       }
       if (i3c.check()) {
         int r3 = i3c();
         r3 = tp::check_range(2, r3, a.lbound(2), a.extent(2));
-        if (!value.is_none()) a(r1,r2,r3) = bp::extract<T>(value);
+        if (value.ptr() != Py_None) a(r1,r2,r3) = bp::extract<T>(value);
         return bp::object(a(r1,r2,r3));
       }
     }

@@ -55,6 +55,7 @@ endif(MATIO_FOUND)
 include(../../cmake/macros.cmake)
 torch_header_install(database-cxx database "torch::database")
 torch_library(database "${src}" "${deps}" "${shared}")
+add_dependencies(torch_database database-cxx_header_install)
 
 # Defines tests for this package
 torch_test(database binary_file test/binary_file.cc)

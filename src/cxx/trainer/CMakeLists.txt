@@ -29,3 +29,4 @@ set(src
 include(../../cmake/macros.cmake)
 torch_header_install(trainer-cxx trainer "torch::trainer")
 torch_library(trainer "${src}" "${deps}" "${shared}")
+add_dependencies(torch_trainer trainer-cxx_header_install)
