@@ -45,6 +45,7 @@ set(src_ip
    "src/ipLBPTopOperator.cc"
    "src/ImageScanDataSet.cc"
    "src/Exception.cc"
+   "src/HornAndSchunckFlow.cc"
 )
 #   "src/ipHOG.cc"
 #   "src/ipGabor.cc"
@@ -82,8 +83,9 @@ set(src
    "${src_geometry}")
 
 include(../../cmake/macros.cmake)
+torch_header_install(ip-cxx ip "torch::ip")
 torch_library(ip "${src}" "${deps}" "${shared}")
-torch_header_install(ip "torch::ip")
+add_dependencies(torch_ip ip-cxx_header_install)
 
 # Defines tests for this package
 torch_test(ip crop test/crop.cc)

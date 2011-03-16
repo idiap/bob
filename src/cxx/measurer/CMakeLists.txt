@@ -7,5 +7,6 @@ set(deps core) #other torch subprojects
 set(src "src/measurer.cc")
 
 include(../../cmake/macros.cmake)
+torch_header_install(measurer-cxx measurer "torch::measurer")
 torch_library(measurer "${src}" "${deps}" "${shared}")
-torch_header_install(measurer "torch::measurer")
+add_dependencies(torch_measurer measurer-cxx_header_install)

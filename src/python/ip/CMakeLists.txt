@@ -11,6 +11,7 @@ set(pysrc
    "src/video.cc"
    "src/videotensor.cc"
    "src/vision.cc"
+   "src/flow.cc"
    "src/main.cc"
    )
 

@@ -51,5 +51,6 @@ set(src
 	"${src_boosting}")
 
 include(../../cmake/macros.cmake)
+torch_header_install(machine-cxx machine "torch::machine")
 torch_library(machine "${src}" "${deps}" "${shared}")
-torch_header_install(machine "torch::machine")
+add_dependencies(torch_machine machine-cxx_header_install)

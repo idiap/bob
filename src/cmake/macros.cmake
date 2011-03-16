@@ -38,10 +38,9 @@ endmacro(torch_archive sources dependencies)
 # package -- The base name of this package, so everything besides "torch_"
 # comment -- This will be used to print a nice comment when installing the
 #            header. Something like "torch::core" will look nice
-macro(torch_header_install package comment)
-  set(libname torch_${package})
+macro(torch_header_install target_name package comment)
   set(incdir include/torch)
-  add_custom_command(TARGET ${libname} PRE_BUILD COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND rsync -a ${CMAKE_CURRENT_SOURCE_DIR}/${package}/ ${CMAKE_INSTALL_PREFIX}/${incdir}/${package} COMMENT "Installing ${comment} headers...")
+  add_custom_target(${target_name}_header_install ALL COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND rsync -a ${CMAKE_CURRENT_SOURCE_DIR}/${package}/ ${CMAKE_INSTALL_PREFIX}/${incdir}/${package} COMMENT "Installing ${comment} headers...")
 endmacro(torch_header_install package comment)
 
 # Builds libraries for a subproject. Wraps every of those items in an exported
@@ -77,6 +76,7 @@ macro(torch_test package name src)
 
   # Please note we don't install test executables
   add_executable(${testname} ${src})
+  add_dependencies(${testname} torch_${package})
   target_link_libraries(${testname} torch_${package})
   target_link_libraries(${testname} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
   add_test(cxx-${package}-${name} ${testname} --log_level=test_suite)
