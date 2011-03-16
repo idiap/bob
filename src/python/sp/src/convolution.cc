@@ -47,6 +47,7 @@ void bind_sp_convolution()
     .value("Zero", Torch::sp::Convolution::Zero)
     .value("NearestNeighbour", Torch::sp::Convolution::NearestNeighbour)
     .value("Circular", Torch::sp::Convolution::Circular)
+    .value("Mirror", Torch::sp::Convolution::Mirror)
     ;
  
   CONVOLVE_DEF(bool,bool)

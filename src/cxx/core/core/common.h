@@ -18,15 +18,30 @@ namespace Torch {
  *
  */
   namespace core {
-
     /**
-      * @brief Force value to stay in a given range [min, max]
+      * @brief Force value to stay in a given range [min, max]. In case of out
+      *   of range values, the closest value is returned (i.e. min or max)
       * @param val The value to be considered
       * @param min The minimum of the range
       * @param max The maximum of the range
       */
     inline int keepInRange( const int val, const int min, const int max) {
       return (val < min ? min : (val > max ? max : val ) );
+    }
+
+    /**
+      * @brief Force value to stay in a given range [min, max]. In case of out
+      *   of range values, 'mirroring' is performed. For instance:
+      *     mirrorInRange(-1, 0, 5) will return 0.
+      *     mirrorInRange(-2, 0, 5) will return 1.
+      *     mirrorInRange(17, 3, 15) will return 14.
+      * @param val The value to be considered
+      * @param min The minimum of the range
+      * @param max The maximum of the range
+      */
+    inline int mirrorInRange( const int val, const int min, const int max) {
+      return (val < min ? mirrorInRange(min-val-1, min, max) : 
+                (val > max ? mirrorInRange(2*max-val+1, min, max) : val ) );
     }
   }
 /**

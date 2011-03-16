@@ -53,9 +53,11 @@ struct T {
   blitz::Array<double,1> res_A1b_5_b1b_3_full_zero;
   blitz::Array<double,1> res_A1b_5_b1b_3_full_near;
   blitz::Array<double,1> res_A1b_5_b1b_3_full_circ;
+  blitz::Array<double,1> res_A1b_5_b1b_3_full_mirr;
   blitz::Array<double,1> res_A1b_5_b1b_3_same_zero;
   blitz::Array<double,1> res_A1b_5_b1b_3_same_near;
   blitz::Array<double,1> res_A1b_5_b1b_3_same_circ;
+  blitz::Array<double,1> res_A1b_5_b1b_3_same_mirr;
   blitz::Array<double,1> res_A1b_5_b1b_3_valid;
 
   blitz::Array<double,2> A2b_3x4;
@@ -64,9 +66,11 @@ struct T {
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_zero;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_near;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_circ;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_mirr;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_zero;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_near;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_circ;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_mirr;
   blitz::Array<double,2> res_A2b_3x4_b2b_2x2_valid;
 
   double eps_d;
@@ -190,12 +194,16 @@ struct T {
     res_A1b_5_b1b_3_full_near = 0, 3, 7, 13, 19, 22, 24;
     res_A1b_5_b1b_3_full_circ.resize(7);
     res_A1b_5_b1b_3_full_circ = 10, 11, 7, 13, 19, 10, 11;
+    res_A1b_5_b1b_3_full_mirr.resize(7);
+    res_A1b_5_b1b_3_full_mirr = 2, 3, 7, 13, 19, 22, 21;
     res_A1b_5_b1b_3_same_zero.resize(5);
     res_A1b_5_b1b_3_same_zero = 3, 7, 13, 19, 10;
     res_A1b_5_b1b_3_same_near.resize(5);
     res_A1b_5_b1b_3_same_near = 3, 7, 13, 19, 22;
     res_A1b_5_b1b_3_same_circ.resize(5);
     res_A1b_5_b1b_3_same_circ = 11, 7, 13, 19, 10;
+    res_A1b_5_b1b_3_same_mirr.resize(5);
+    res_A1b_5_b1b_3_same_mirr = 3, 7, 13, 19, 22;
     res_A1b_5_b1b_3_valid.resize(3);
     res_A1b_5_b1b_3_valid = 7, 13, 19;
     
@@ -221,6 +229,11 @@ struct T {
       29, 27, 37, 47, 29,
       69, 67, 77, 87, 69,
       49, 47, 57, 67, 49;
+    res_A2b_3x4_b2b_2x2_full_mirr.resize(4,5);
+    res_A2b_3x4_b2b_2x2_full_mirr = 0, 7, 17, 27, 30,
+      20, 27, 37, 47, 50,
+      60, 67, 77, 87, 90,
+      80, 87, 97, 107, 110;
     res_A2b_3x4_b2b_2x2_same_zero.resize(3,4);
     res_A2b_3x4_b2b_2x2_same_zero = 27, 37, 47, 13,
       67, 77, 87, 25,
@@ -233,6 +246,10 @@ struct T {
     res_A2b_3x4_b2b_2x2_same_circ = 27, 37, 47, 29,
       67, 77, 87, 69,
       47, 57, 67, 49;
+    res_A2b_3x4_b2b_2x2_same_mirr.resize(3,4);
+    res_A2b_3x4_b2b_2x2_same_mirr = 27, 37, 47, 50,
+      67, 77, 87, 90,
+      87, 97, 107, 110;
     res_A2b_3x4_b2b_2x2_valid.resize(2,3);
     res_A2b_3x4_b2b_2x2_valid = 27, 37, 47,
       67, 77, 87;
@@ -422,6 +439,8 @@ BOOST_AUTO_TEST_CASE( test_convolve_1D_5_3 )
     conv::Full, conv::NearestNeighbour);
   test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_circ, 
     conv::Full, conv::Circular);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_mirr, 
+    conv::Full, conv::Mirror);
 
   // Same size
   test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_zero, 
@@ -430,6 +449,8 @@ BOOST_AUTO_TEST_CASE( test_convolve_1D_5_3 )
     conv::Same, conv::NearestNeighbour);
   test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_circ, 
     conv::Same, conv::Circular);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_mirr, 
+    conv::Same, conv::Mirror);
 
   // Valid size
   test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
@@ -438,6 +459,8 @@ BOOST_AUTO_TEST_CASE( test_convolve_1D_5_3 )
     conv::Valid, conv::NearestNeighbour);
   test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
     conv::Valid, conv::Circular);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
+    conv::Valid, conv::Mirror);
 }
 
 // 2D convolution between a 2D vector of length 3x4 and 2x2
@@ -450,14 +473,16 @@ BOOST_AUTO_TEST_CASE( test_convolve_2D_3x4_2x2 )
     conv::Full, conv::NearestNeighbour);
   test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_circ, 
     conv::Full, conv::Circular);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_mirr, 
+    conv::Full, conv::Mirror);
 
   // Same size
   test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_zero, 
     conv::Same, conv::Zero);
   test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_near, 
     conv::Same, conv::NearestNeighbour);
-  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_circ, 
-    conv::Same, conv::Circular);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_mirr, 
+    conv::Same, conv::Mirror);
 
   // Valid size
   test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
@@ -466,6 +491,8 @@ BOOST_AUTO_TEST_CASE( test_convolve_2D_3x4_2x2 )
     conv::Valid, conv::NearestNeighbour);
   test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
     conv::Valid, conv::Circular);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
+    conv::Valid, conv::Mirror);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

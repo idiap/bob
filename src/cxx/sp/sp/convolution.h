@@ -36,7 +36,8 @@ namespace Torch {
       enum BorderOption {
         Zero,
         NearestNeighbour,
-        Circular
+        Circular,
+        Mirror
       };
     }
 
@@ -52,7 +53,9 @@ namespace Torch {
      *                     * Nearest Neighbour: extrapolate with nearest 
      *                         neighbour
      *                     * Circular: extrapolate by considering tiled arrays
-     *                         fir B and C (<-> modulo arrays)
+     *                         for B and C (<-> modulo arrays)
+     *                     * Mirror: extrapolate by mirroring the arrays
+     *                         for B and C
      * @warning If size(C) < size(B),  B and C are reversed and the convolve
      *   function is called again.
      */
@@ -131,6 +134,12 @@ namespace Torch {
               result += B( (((j%Bsize)+Bsize) % Bsize) + Bl) * 
                 C( i_shifted-j + Cl);
           }
+          else if( border_opt == Convolution::Mirror )
+          {
+            for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
+              result += B( tc::mirrorInRange(j,0,Bsize-1) + Bl) * 
+                C( tc::mirrorInRange(i_shifted-j,0,Csize-1) + Cl);
+          }
         }
         else if( size_opt == Convolution::Valid )
         {
@@ -159,6 +168,8 @@ namespace Torch {
      *                         neighbour
      *                     * Circular: extrapolate by considering tiled arrays
      *                         fir B and C (<-> modulo arrays)
+     *                     * Mirror: extrapolate by mirroring the arrays
+     *                         for B and C
      * @warning If size(C) < size(B),  B and C are reversed and the convolve
      *   function is called again. If both B and C have a leading dimension,
      *   an exception is thrown
@@ -271,6 +282,15 @@ namespace Torch {
                   result += B( (((j1%Bsize1)+Bsize1) % Bsize1) + Bl1, 
                                (((j2%Bsize2)+Bsize2) % Bsize2) + Bl2) * 
                     C( i1_shifted-j1 + Cl1, i2_shifted-j2 + Cl2);
+            }
+            else if( border_opt == Convolution::Mirror )
+            {
+              for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
+                for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
+                  result += B( tc::mirrorInRange(j1,0,Bsize1-1) + Bl1, 
+                               tc::mirrorInRange(j2,0,Bsize2-1) + Bl2) *
+                    C( tc::mirrorInRange(i1_shifted-j1,0,Csize1-1) + Cl1,
+                       tc::mirrorInRange(i2_shifted-j2,0,Csize2-1) + Cl2);
             }
           }
           else if( size_opt == Convolution::Valid )
