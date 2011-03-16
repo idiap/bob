@@ -62,5 +62,5 @@ set(src
 	"${src_selectors}")
 
 include(../../cmake/macros.cmake)
+torch_header_install(scanning-cxx scanning "torch::scanning")
 torch_library(scanning "${src}" "${deps}" "${shared}")
-torch_header_install(scanning "torch::scanning")

@@ -47,9 +47,10 @@ set(pysrc_array
 
 include(../../cmake/macros.cmake)
 
-torch_header_install(core "torch::python::core")
 torch_python_package_bindings(core "${pysrc}")
+torch_header_install(core-array-python core "torch::python::core")
 torch_python_submodule_bindings(core array "${pysrc_array}")
+add_dependencies(pytorch_core_array core-array-python_header_install)
 torch_python_install(core)
 
 # Our test units

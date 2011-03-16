@@ -55,5 +55,5 @@ set(src
   "src/sinti.f")
 
 include(../../cmake/macros.cmake)
+torch_header_install(dfftpack41-cxx dfftpack41 "torch::dfftpack41")
 torch_library(dfftpack41 "${src}" "" "")
-torch_header_install(dfftpack41 "torch::dfftpack41")

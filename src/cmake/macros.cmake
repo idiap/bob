@@ -6,6 +6,7 @@
 # Builds and installs a shared library with dependencies
 macro(torch_shlib libname sources dependencies externals installdir)
   add_library(${libname} SHARED ${sources})
+  add_dependencies(${libname} ${libname}_header_install)
   if(NOT ("${dependencies}" STREQUAL ""))
     foreach(dep ${dependencies})
       target_link_libraries(${libname} torch_${dep})
@@ -22,6 +23,7 @@ endmacro(torch_shlib libname sources dependencies)
 # Builds and installs a shared library with dependencies
 macro(torch_archive libname sources dependencies installdir)
   add_library(${libname}-static STATIC ${sources})
+  add_dependencies(${libname}-static ${libname}_header_install)
   if(NOT ("${dependencies}" STREQUAL ""))
     foreach(dep ${dependencies})
       target_link_libraries(${libname}-static torch_${dep}-static)
@@ -38,10 +40,10 @@ endmacro(torch_archive sources dependencies)
 # package -- The base name of this package, so everything besides "torch_"
 # comment -- This will be used to print a nice comment when installing the
 #            header. Something like "torch::core" will look nice
-macro(torch_header_install package comment)
-  set(libname torch_${package})
+macro(torch_header_install target_name package comment)
   set(incdir include/torch)
-  add_custom_command(TARGET ${libname} PRE_BUILD COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND rsync -a ${CMAKE_CURRENT_SOURCE_DIR}/${package}/ ${CMAKE_INSTALL_PREFIX}/${incdir}/${package} COMMENT "Installing ${comment} headers...")
+  #add_custom_command(TARGET ${libname} PRE_BUILD COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND rsync -a ${CMAKE_CURRENT_SOURCE_DIR}/${package}/ ${CMAKE_INSTALL_PREFIX}/${incdir}/${package} COMMENT "Installing ${comment} headers...")
+  add_custom_target(${target_name}_header_install ALL COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/${incdir} COMMAND rsync -a ${CMAKE_CURRENT_SOURCE_DIR}/${package}/ ${CMAKE_INSTALL_PREFIX}/${incdir}/${package} COMMENT "Installing ${comment} headers...")
 endmacro(torch_header_install package comment)
 
 # Builds libraries for a subproject. Wraps every of those items in an exported

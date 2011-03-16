@@ -17,8 +17,8 @@ set(src
     "src/FCT.cc")
 
 include(../../cmake/macros.cmake)
+torch_header_install(sp-cxx sp "torch::sp")
 torch_library(sp "${src}" "${deps}" "")
-torch_header_install(sp "torch::sp")
 
 # Defines tests for this package
 torch_test(sp dftdct_naive test/dftdctnaive.cc)
