@@ -86,7 +86,7 @@ ip::HornAndSchunckFlow& ip::HornAndSchunckFlow::operator=
  */
 static void Ex(const blitz::Array<uint8_t,2>& i1, 
     const blitz::Array<uint8_t,2>& i2, blitz::Array<double,2>& result) {
-  blitz::Range i(0,i1.extent(0)-1), j(0,i1.extent(1)-1);
+  blitz::Range i(0,i1.extent(0)-2), j(0,i1.extent(1)-2);
   result = 0;
   result = 0.25 * ( i1(i,j+1) - i1(i,j) +
                     i1(i+1,j+1) - i1(i+1,j) +
@@ -115,7 +115,7 @@ static void Ex(const blitz::Array<uint8_t,2>& i1,
  */
 static void Ey(const blitz::Array<uint8_t,2>& i1, 
     const blitz::Array<uint8_t,2>& i2, blitz::Array<double,2>& result) {
-  blitz::Range i(0,i1.extent(0)-1), j(0,i1.extent(1)-1);
+  blitz::Range i(0,i1.extent(0)-2), j(0,i1.extent(1)-2);
   result = 0;
   result = 0.25 * ( i1(i+1,j) - i1(i,j) +
                     i1(i+1,j+1) - i1(i,j+1) +
@@ -144,7 +144,7 @@ static void Ey(const blitz::Array<uint8_t,2>& i1,
  */
 static void Et(const blitz::Array<uint8_t,2>& i1, 
     const blitz::Array<uint8_t,2>& i2, blitz::Array<double,2>& result) {
-  blitz::Range i(0,i1.extent(0)-1), j(0,i1.extent(1)-1);
+  blitz::Range i(0,i1.extent(0)-2), j(0,i1.extent(1)-2);
   result = 0;
   result = 0.25 * ( i2(i,j) - i1(i,j) +
                     i2(i+1,j) - i1(i+1,j) +
@@ -166,7 +166,7 @@ static void Et(const blitz::Array<uint8_t,2>& i1,
  * velocities (namely 1:extent-1), because it has a 1 pixel window.
  */
 static void U(const blitz::Array<double,2>& u, blitz::Array<double,2>& result) {
-  blitz::Range i(1,u.extent(0)-1), j(1,u.extent(1)-1);
+  blitz::Range i(1,u.extent(0)-2), j(1,u.extent(1)-2);
   result = 0;
   result = 1.0/6 *  ( u(i-1,j) + u(i,j+1) + u(i+1,j) + u(i,j-1) ) +
            1.0/12 * ( u(i-1,j-1) + u(i-1,j+1) + u(i+1,j+1), u(i+1,j-1) );
@@ -186,7 +186,7 @@ static void U(const blitz::Array<double,2>& u, blitz::Array<double,2>& result) {
  * velocities (namely 1:extent-1), because it has a 1 pixel window.
  */
 static void V(const blitz::Array<double,2>& v, blitz::Array<double,2>& result) {
-  blitz::Range i(1,v.extent(0)-1), j(1,v.extent(1)-1);
+  blitz::Range i(1,v.extent(0)-2), j(1,v.extent(1)-2);
   result = 0;
   result = 1.0/6 *  ( v(i-1,j) + v(i,j+1) + v(i+1,j) + v(i,j-1) ) +
            1.0/12 * ( v(i-1,j-1) + v(i-1,j+1) + v(i+1,j+1), v(i+1,j-1) );

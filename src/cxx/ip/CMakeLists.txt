@@ -45,6 +45,7 @@ set(src_ip
    "src/ipLBPTopOperator.cc"
    "src/ImageScanDataSet.cc"
    "src/Exception.cc"
+   "src/HornAndSchunckFlow.cc"
 )
 #   "src/ipHOG.cc"
 #   "src/ipGabor.cc"

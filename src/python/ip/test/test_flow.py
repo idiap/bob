@@ -15,8 +15,7 @@ def load_gray(relative_filename):
   # grayscaled version of the image, I just select one of the planes. 
   filename = os.path.join("data", "flow", relative_filename)
   array = torch.database.Array(filename)
-  frame0 = frame0_array.get()
-
+  return array.get()[0,:,:] 
 
 class FlowTest(unittest.TestCase):
   """Performs various combined optical flow tests."""
