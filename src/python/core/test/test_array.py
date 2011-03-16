@@ -34,6 +34,27 @@ class ArrayTest(unittest.TestCase):
     # torch.core.array.float64_2 object.
     t5_array = torch.core.array.float64_2([1, 2, 3, 4, 5, 6], (2,3))
 
+    # Construction of arrays from scratch requires always that you pass a
+    # non-nested iterable followed by a shape. Sometimes you want python to
+    # just do a best guess. For example:
+    # [[1, 2], [2, 3]] could be interpreted as a 2D integer array. Numpy offers
+    # this functionality. We have created a factory-function that just does the
+    # same, using the numpy.array() method:
+    t5_array_1 = torch.core.array.array([[1,2,3], [4,5,6]])
+
+    # By default, the array elements (or data-type - dtype) will be chosen by
+    # numpy and uses the smallest possible type that can represent the input
+    # data. You can force the element type by passing a second parameter that
+    # informs torch which element to use:
+    t5_array_2 = torch.core.array.array([[1,2,3], [4,5,6]], 'float64')
+
+    # Note that t5_array and t5_array_2 are equal
+    self.assertEqual( (t5_array == t5_array_2).all(), True )
+    
+    # 
+    # SHAPE 
+    #
+
     # The shape is a tuple
     self.assertEqual(t5_array.shape(), (2,3))
 
@@ -44,6 +65,10 @@ class ArrayTest(unittest.TestCase):
     # Please note that we provide pointers for firstDim (0), secondDim (1),
     # etc, so your code looks more intuitive than: t5_array.extent(1) -- is it
     # the first or the second dimension we are referring to here?
+
+    # 
+    # SLICING
+    #
 
     # You can access each individual value of the array with python indexes, no
     # problem:
@@ -65,6 +90,13 @@ class ArrayTest(unittest.TestCase):
     for i in range(t5_sliced.extent(torch.core.array.firstDim)):
       for j in range(t5_sliced.extent(torch.core.array.secondDim)):
         self.assertEqual(t5_sliced[i,j], t5_array[i+1,j+1])
+
+    # Mixed slicing with integer indexes returns you a *reference* to an
+    # subarray. Here is an example:
+    t5_sliced = t5_array[0,1:] # t5_slice == [2 3]
+    self.assertEqual(t5_sliced.shape(), (2,))
+    self.assertEqual(t5_sliced[0], 2)
+    self.assertEqual(t5_sliced[1], 3)
 
     # The slice operations can also use negative indexes. Here are some
     # examples of addressing you can use

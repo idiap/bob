@@ -9,30 +9,72 @@
 #include <boost/python/refcount.hpp>
 #include <boost/python/type_id.hpp>
 #include <boost/format.hpp>
+#include <valarray>
 
 namespace bp = boost::python;
 namespace tp = Torch::python;
 
-template<typename T, int N> 
-static bp::ndarray from_blitz(const blitz::Array<T,N>& b) {
+template<typename T>
+static bp::ndarray from_blitz_1(const blitz::Array<T,1>& b) {
   //if we get called, it is because we have one of the allowed types and the
   //number of dimensions was already checked.
-  npy_intp dims[N];
-  for (size_t i=0; i<N; ++i) dims[i] = b.extent(i);
-  bp::ndarray npy = bp::new_ndarray(N, dims, tp::TYPEMAP.type_to_enum<T>());
-  T* data = (T*)npy.data();
-  size_t i = 0;
-  for (typename blitz::Array<T,N>::const_iterator it=b.begin(); it!=b.end(); ++it, ++i) {
-    data[i] = *it;
-  }
+  npy_intp dims[1];
+  for (size_t i=0; i<1; ++i) dims[i] = b.extent(i);
+  bp::ndarray npy = bp::new_ndarray(1, dims, tp::TYPEMAP.type_to_enum<T>());
+  blitz::Array<T,1> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
+  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2) dest(i) = b(i2);
+  return npy;
+}
+
+template<typename T>
+static bp::ndarray from_blitz_2(const blitz::Array<T,2>& b) {
+  //if we get called, it is because we have one of the allowed types and the
+  //number of dimensions was already checked.
+  npy_intp dims[2];
+  for (size_t i=0; i<2; ++i) dims[i] = b.extent(i);
+  bp::ndarray npy = bp::new_ndarray(2, dims, tp::TYPEMAP.type_to_enum<T>());
+  blitz::Array<T,2> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
+  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2)
+    for (int j=0, j2=b.base(1); j<b.extent(1); ++j, ++j2) dest(i,j) = b(i2,j2);
+  return npy;
+}
+
+template<typename T>
+static bp::ndarray from_blitz_3(const blitz::Array<T,3>& b) {
+  //if we get called, it is because we have one of the allowed types and the
+  //number of dimensions was already checked.
+  npy_intp dims[3];
+  for (size_t i=0; i<3; ++i) dims[i] = b.extent(i);
+  bp::ndarray npy = bp::new_ndarray(3, dims, tp::TYPEMAP.type_to_enum<T>());
+  blitz::Array<T,3> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
+  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2)
+    for (int j=0, j2=b.base(1); j<b.extent(1); ++j, ++j2)
+      for (int k=0, k2=b.base(2); k<b.extent(2); ++k, ++k2) 
+        dest(i,j,k) = b(i2,j2,k2);
+  return npy;
+}
+
+template<typename T>
+static bp::ndarray from_blitz_4(const blitz::Array<T,4>& b) {
+  //if we get called, it is because we have one of the allowed types and the
+  //number of dimensions was already checked.
+  npy_intp dims[4];
+  for (size_t i=0; i<4; ++i) dims[i] = b.extent(i);
+  bp::ndarray npy = bp::new_ndarray(4, dims, tp::TYPEMAP.type_to_enum<T>());
+  blitz::Array<T,4> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
+  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2)
+    for (int j=0, j2=b.base(1); j<b.extent(1); ++j, ++j2)
+      for (int k=0, k2=b.base(2); k<b.extent(2); ++k, ++k2) 
+        for (int l=0, l2=b.base(3); l<b.extent(3); ++l, ++l2) 
+          dest(i,j,k,l) = b(i2,j2,k2,l2);
   return npy;
 }
 
 #define NDARRAY_CTOR(BZ_ELEMENT_TYPE) \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz) : m_obj() { *this = from_blitz(bz); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz) : m_obj() { *this = from_blitz(bz); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz) : m_obj() { *this = from_blitz(bz); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz) : m_obj() { *this = from_blitz(bz); } 
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz) : m_obj() { *this = from_blitz_1(bz); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz) : m_obj() { *this = from_blitz_2(bz); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz) : m_obj() { *this = from_blitz_3(bz); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz) : m_obj() { *this = from_blitz_4(bz); } 
 NDARRAY_CTOR(bool)
 NDARRAY_CTOR(int8_t)
 NDARRAY_CTOR(uint8_t)
@@ -50,26 +92,31 @@ NDARRAY_CTOR(std::complex<double>)
 NDARRAY_CTOR(std::complex<long double>)
 #undef NDARRAY_CTOR
 
-template<typename T, int N> 
-static bp::ndarray from_blitz(const blitz::Array<T,N>& b, NPY_TYPES cast_to) {
-  //if we get called, it is because we have one of the allowed types and the
-  //number of dimensions was already checked.
-  npy_intp dims[N];
-  for (size_t i=0; i<N; ++i) dims[i] = b.extent(i);
-  bp::ndarray npy = bp::new_ndarray(N, dims, tp::TYPEMAP.type_to_enum<T>());
-  T* data = (T*)npy.data();
-  size_t i = 0;
-  for (typename blitz::Array<T,N>::const_iterator it=b.begin(); it!=b.end(); ++it, ++i) {
-    data[i] = *it;
-  }
-  return npy.astype(cast_to);
+template<typename T> static inline 
+bp::ndarray from_blitz_1(const blitz::Array<T,1>& b, NPY_TYPES cast_to) {
+  return from_blitz_1(b).astype(cast_to);
+}
+
+template<typename T> static inline 
+bp::ndarray from_blitz_2(const blitz::Array<T,2>& b, NPY_TYPES cast_to) {
+  return from_blitz_2(b).astype(cast_to);
+}
+
+template<typename T> static inline 
+bp::ndarray from_blitz_3(const blitz::Array<T,3>& b, NPY_TYPES cast_to) {
+  return from_blitz_3(b).astype(cast_to);
+}
+
+template<typename T> static inline 
+bp::ndarray from_blitz_4(const blitz::Array<T,4>& b, NPY_TYPES cast_to) {
+  return from_blitz_4(b).astype(cast_to);
 }
 
 #define NDARRAY_CTOR(BZ_ELEMENT_TYPE) \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz(bz, cast_to); } 
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_1(bz, cast_to); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_2(bz, cast_to); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_3(bz, cast_to); } \
+template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_4(bz, cast_to); } 
 NDARRAY_CTOR(bool)
 NDARRAY_CTOR(int8_t)
 NDARRAY_CTOR(uint8_t)

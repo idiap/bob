@@ -53,6 +53,11 @@ namespace Torch {
       const char* stringize(ElementType t);
 
       /**
+       * Returns the ElementType given the string representation
+       */
+      ElementType unstringize(const char* name);
+
+      /**
        * @brief Maximum number of supported dimensions for multidimensional 
        * arrays.
        */
