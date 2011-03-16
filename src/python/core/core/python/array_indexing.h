@@ -15,13 +15,8 @@
 namespace Torch { namespace python {
 
   namespace range {
-#ifdef HAVE_BLITZ_SIZETYPE
-    int fromStart = blitz::fromStart;
-    int toEnd = blitz::toEnd;
-#else
-    int fromStart = blitz::Range::fromStart;
-    int toEnd = blitz::Range::toEnd;
-#endif
+    extern int fromStart;
+    extern int toEnd;
   }
 
   /**

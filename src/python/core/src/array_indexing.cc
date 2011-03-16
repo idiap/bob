@@ -10,6 +10,14 @@
 namespace tp = Torch::python;
 namespace bp = boost::python;
 
+#ifdef HAVE_BLITZ_SIZETYPE
+int tp::range::fromStart = blitz::fromStart;
+int tp::range::toEnd = blitz::toEnd;
+#else
+int tp::range::fromStart = blitz::Range::fromStart;
+int tp::range::toEnd = blitz::Range::toEnd;
+#endif
+
 bool tp::check_index(int index, int base, int extent) {
   const int limit = base + extent;
   index = (index<0)? index + limit : index;
