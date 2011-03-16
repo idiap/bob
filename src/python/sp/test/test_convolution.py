@@ -109,40 +109,43 @@ RES_A2_5_b2_3_valid = torch.core.array.float64_2([
   1.9583, 1.7152, 1.7309,
   1.8242, 2.0354, 2.0621,
   2.5338, 2.1359, 2.4450], (3,3));
+
+RES_1 = torch.core.array.float64_1([0.], (1,));
+RES_2 = torch.core.array.float64_2([1.], (1,1));
 #############################################################################
 
 
 def compare(v1, v2, width):
   return abs(v1-v2) <= width
 
-def test_convolve_1D_nopt(A, b, reference, obj):
+def test_convolve_1D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
-  res = torch.sp.convolve(A, b)
+  torch.sp.convolve(A, b, res)
   
   obj.assertEqual(res.shape(), reference.shape())
   for i in range(res.extent(0)):
     obj.assertTrue(compare(res[i], reference[i], eps))
 
-def test_convolve_1D(A, b, reference, obj, option):
+def test_convolve_1D(A, b, res, reference, obj, option):
   # Compute the convolution product
-  res = torch.sp.convolve(A, b, option)
+  torch.sp.convolve(A, b, res, option)
 
   obj.assertEqual(res.shape(), reference.shape())
   for i in range(res.extent(0)):
     obj.assertTrue(compare(res[i], reference[i], eps))
 
-def test_convolve_2D_nopt(A, b, reference, obj):
+def test_convolve_2D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
-  res = torch.sp.convolve(A, b)
+  torch.sp.convolve(A, b, res)
   
   obj.assertEqual(res.shape(), reference.shape())
   for i in range(res.extent(0)):
     for j in range(res.extent(1)):
       obj.assertTrue(compare(res[i,j], reference[i,j], eps))
 
-def test_convolve_2D(A, b, reference, obj, option):
+def test_convolve_2D(A, b, res, reference, obj, option):
   # Compute the convolution product
-  res = torch.sp.convolve(A, b, option)
+  torch.sp.convolve(A, b, res, option)
 
   obj.assertEqual(res.shape(), reference.shape())
   for i in range(res.extent(0)):
@@ -156,78 +159,78 @@ class ConvolutionTest(unittest.TestCase):
 
 ##################### Convolution Tests ##################  
   def test_convolution_1D_10_3_n(self):
-    test_convolve_1D_nopt( A10, b1_3, RES_A1_10_b1_3_full, self)
+    test_convolve_1D_nopt( A10, b1_3, RES_1, RES_A1_10_b1_3_full, self)
 
   def test_convolution_1D_10_3_F(self):
-    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_full, self, 
+    test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_full, self, 
       torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_1D_10_3_S(self):
-    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_same, self, 
+    test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_same, self, 
       torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_1D_10_3_V(self):
-    test_convolve_1D( A10, b1_3, RES_A1_10_b1_3_valid, self, 
+    test_convolve_1D( A10, b1_3, RES_1, RES_A1_10_b1_3_valid, self, 
       torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_1D_10_4_n(self):
-    test_convolve_1D_nopt( A10, b1_4, RES_A1_10_b1_4_full, self)
+    test_convolve_1D_nopt( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self)
 
   def test_convolution_1D_10_4_F(self):
-    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_full, self, 
+    test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_full, self, 
       torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_1D_10_4_S(self):
-    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_same, self, 
+    test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_same, self, 
       torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_1D_10_4_V(self):
-    test_convolve_1D( A10, b1_4, RES_A1_10_b1_4_valid, self, 
+    test_convolve_1D( A10, b1_4, RES_1, RES_A1_10_b1_4_valid, self, 
       torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_1D_10_5_n(self):
-    test_convolve_1D_nopt( A10, b1_5, RES_A1_10_b1_5_full, self)
+    test_convolve_1D_nopt( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self)
 
   def test_convolution_1D_10_5_F(self):
-    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_full, self, 
+    test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_full, self, 
       torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_1D_10_5_S(self):
-    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_same, self, 
+    test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_same, self, 
       torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_1D_10_5_V(self):
-    test_convolve_1D( A10, b1_5, RES_A1_10_b1_5_valid, self, 
+    test_convolve_1D( A10, b1_5, RES_1, RES_A1_10_b1_5_valid, self, 
       torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_2D_5_2_n(self):
-    test_convolve_2D_nopt( A2_5, b2_2, RES_A2_5_b2_2_full, self)
+    test_convolve_2D_nopt( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self)
 
   def test_convolution_2D_5_2_F(self):
-    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_full, self, 
+    test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_full, self, 
       torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_2D_5_2_S(self):
-    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_same, self, 
+    test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_same, self, 
       torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_2D_5_2_V(self):
-    test_convolve_2D( A2_5, b2_2, RES_A2_5_b2_2_valid, self, 
+    test_convolve_2D( A2_5, b2_2, RES_2, RES_A2_5_b2_2_valid, self, 
       torch.sp.ConvolutionOption.VALID)
 
   def test_convolution_2D_5_3_n(self):
-    test_convolve_2D_nopt( A2_5, b2_3, RES_A2_5_b2_3_full, self)
+    test_convolve_2D_nopt( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self)
 
   def test_convolution_2D_5_3_F(self):
-    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_full, self, 
+    test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_full, self, 
       torch.sp.ConvolutionOption.FULL)
 
   def test_convolution_2D_5_3_S(self):
-    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_same, self, 
+    test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_same, self, 
       torch.sp.ConvolutionOption.SAME)
 
   def test_convolution_2D_5_3_V(self):
-    test_convolve_2D( A2_5, b2_3, RES_A2_5_b2_3_valid, self, 
+    test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_valid, self, 
       torch.sp.ConvolutionOption.VALID)
 
 

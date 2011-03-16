@@ -7,6 +7,7 @@ set(pysrc
    "src/image.cc"
    "src/lbp.cc"
    "src/filters.cc"
+   "src/filters_new.cc"
    "src/video.cc"
    "src/videotensor.cc"
    "src/vision.cc"

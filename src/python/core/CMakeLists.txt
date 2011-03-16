@@ -12,6 +12,7 @@ set(pysrc
    "src/profile.cc"
    "src/DataSet.cc"
    "src/ListDataSet.cc"
+   "src/convert.cc"
    "src/main.cc"
    )
  

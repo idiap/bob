@@ -20,7 +20,7 @@ import torch
 
 class FilterTest(unittest.TestCase):
   """Performs various combined filter tests."""
-  
+  """  
   def test01_crop(self):
     v = torch.ip.Image(1, 1, 3) 
     self.assertTrue(v.load(INPUT_IMAGE))
@@ -57,7 +57,8 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
-  
+  """
+
   def test03_histo(self):
     v = torch.ip.Image(1, 1, 3) 
     self.assertTrue(v.load(INPUT_IMAGE))
@@ -172,6 +173,7 @@ class FilterTest(unittest.TestCase):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
+  """
   def test09_rescaleGray(self):
     v_file = torch.core.TensorFile()
     v_file.openRead(test_file('integralimage.tensorfile'))
@@ -229,6 +231,7 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+  """
 
   def test12_selfQuotientImage(self):
     v = torch.ip.Image(1, 1, 1) #histo equalization only works on grayscaled
@@ -251,6 +254,7 @@ class FilterTest(unittest.TestCase):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
 
+  """
   def test13_shift(self):
     v = torch.ip.Image(1, 1, 1)
     self.assertTrue(v.load(INPUT_IMAGE))
@@ -269,6 +273,7 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
+  """
 
   def test14_smoothGaussian(self):
     v = torch.ip.Image(1, 1, 3)
