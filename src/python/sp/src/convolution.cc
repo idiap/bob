@@ -37,13 +37,13 @@ CONVOLVE_DECL(std::complex<double>,complex128)
 
 void bind_sp_convolution()
 {
-  enum_<Torch::sp::Convolution::SizeOption>("SizeOption")
+  enum_<Torch::sp::Convolution::SizeOption>("ConvolutionSize")
     .value("Full", Torch::sp::Convolution::Full)
     .value("Same", Torch::sp::Convolution::Same)
     .value("Valid", Torch::sp::Convolution::Valid)
     ;
  
-  enum_<Torch::sp::Convolution::BorderOption>("BorderOption")
+  enum_<Torch::sp::Convolution::BorderOption>("ConvolutionBorder")
     .value("Zero", Torch::sp::Convolution::Zero)
     .value("NearestNeighbour", Torch::sp::Convolution::NearestNeighbour)
     .value("Circular", Torch::sp::Convolution::Circular)
