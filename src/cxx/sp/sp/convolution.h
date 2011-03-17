@@ -102,10 +102,9 @@ namespace Torch {
         A.reindexSelf( zero_base );
       }
 
-      T result;
       for(int i=0; i < Asize; ++i)
       {
-        result = 0;
+        A(i) = 0;
 
         int i_shifted;
         if( size_opt == Convolution::Full )
@@ -119,39 +118,36 @@ namespace Torch {
           {
             int jl = ( i_shifted - (Csize-1) > 0 ? i_shifted - (Csize-1) : 0 );
             int jh = ( i_shifted < Bsize ? i_shifted : Bsize-1 ); 
-            for(int j=jl; j <= jh; ++j)
-              result += B(j + Bl) * C(i_shifted-j + Cl);
+            blitz::Range jb( jl, jh), jc( i_shifted-jl, i_shifted-jh, -1); 
+            A(i) = blitz::sum(B(jb + Bl) * C(jc + Cl) );
           }
           else if( border_opt == Convolution::NearestNeighbour )
           {
             for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
-              result += B( tc::keepInRange(j,0,Bsize-1) + Bl) * 
+              A(i) += B( tc::keepInRange(j,0,Bsize-1) + Bl) * 
                 C( tc::keepInRange(i_shifted-j,0,Csize-1) + Cl);
           }
           else if( border_opt == Convolution::Circular )
           {
             for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
-              result += B( (((j%Bsize)+Bsize) % Bsize) + Bl) * 
+              A(i) += B( (((j%Bsize)+Bsize) % Bsize) + Bl) * 
                 C( i_shifted-j + Cl);
           }
           else if( border_opt == Convolution::Mirror )
           {
             for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
-              result += B( tc::mirrorInRange(j,0,Bsize-1) + Bl) * 
+              A(i) += B( tc::mirrorInRange(j,0,Bsize-1) + Bl) * 
                 C( tc::mirrorInRange(i_shifted-j,0,Csize-1) + Cl);
           }
         }
         else if( size_opt == Convolution::Valid )
         {
           // Interpolation is useless in this case
-          for(int j=0; j < Csize; ++j)
-            result += B(j + i + Bl) * C(Csize - 1 - j + Cl);
+          blitz::Range jb( i, i + Csize - 1), jc( Csize - 1, 0, -1); 
+          A(i) = blitz::sum(B(jb + Bl) * C(jc + Cl) );
         }
         else
           throw Torch::core::Exception();
-
-        A(i) = result;
-
       }
     }
 
@@ -232,7 +228,6 @@ namespace Torch {
         A.reindexSelf( zero_base );
       }
 
-      T result;
       for(int i1=0; i1 < Asize1; ++i1)
       {
         int i1_shifted;
@@ -243,7 +238,7 @@ namespace Torch {
 
         for(int i2=0; i2 < Asize2; ++i2)
         {
-          result = 0;
+          A(i1,i2) = 0;
 
           int i2_shifted = i2;
           if( size_opt == Convolution::Full )
@@ -261,16 +256,17 @@ namespace Torch {
               int jl2 = ( i2_shifted - (Csize2-1) > 0 ? 
                 i2_shifted - (Csize2-1) : 0 );
               int jh2 = ( i2_shifted < Bsize2 ? i2_shifted : Bsize2-1 );
-              for(int j1=jl1; j1 <= jh1; ++j1)
-                for(int j2=jl2; j2 <= jh2; ++j2)
-                  result += B(j1+Bl1,j2+Bl2) * 
-                    C(i1_shifted-j1 + Cl1, i2_shifted-j2 +Cl2);
+              blitz::Range jb1( jl1, jh1), jb2( jl2, jh2);
+              blitz::Range jc1( i1_shifted-jl1, i1_shifted-jh1,-1), 
+                           jc2( i2_shifted-jl2, i2_shifted-jh2,-1);
+              A(i1,i2) = blitz::sum(B(jb1 + Bl1, jb2 + Bl2) * 
+                            C(jc1 + Cl1, jc2 + Cl2) );
             }
             else if( border_opt == Convolution::NearestNeighbour )
             {
               for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
                 for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
-                  result += B( tc::keepInRange(j1,0,Bsize1-1) + Bl1, 
+                  A(i1,i2) += B( tc::keepInRange(j1,0,Bsize1-1) + Bl1, 
                                tc::keepInRange(j2,0,Bsize2-1) + Bl2) *
                     C( tc::keepInRange(i1_shifted-j1,0,Csize1-1) + Cl1,
                        tc::keepInRange(i2_shifted-j2,0,Csize2-1) + Cl2);
@@ -279,7 +275,7 @@ namespace Torch {
             {
               for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
                 for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
-                  result += B( (((j1%Bsize1)+Bsize1) % Bsize1) + Bl1, 
+                  A(i1,i2) += B( (((j1%Bsize1)+Bsize1) % Bsize1) + Bl1, 
                                (((j2%Bsize2)+Bsize2) % Bsize2) + Bl2) * 
                     C( i1_shifted-j1 + Cl1, i2_shifted-j2 + Cl2);
             }
@@ -287,7 +283,7 @@ namespace Torch {
             {
               for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
                 for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
-                  result += B( tc::mirrorInRange(j1,0,Bsize1-1) + Bl1, 
+                  A(i1,i2) += B( tc::mirrorInRange(j1,0,Bsize1-1) + Bl1, 
                                tc::mirrorInRange(j2,0,Bsize2-1) + Bl2) *
                     C( tc::mirrorInRange(i1_shifted-j1,0,Csize1-1) + Cl1,
                        tc::mirrorInRange(i2_shifted-j2,0,Csize2-1) + Cl2);
@@ -296,16 +292,17 @@ namespace Torch {
           else if( size_opt == Convolution::Valid )
           {
             // Interpolation is useless in this case
-            for(int j1=0; j1 < Csize1; ++j1)
+/*            for(int j1=0; j1 < Csize1; ++j1)
               for(int j2=0; j2 < Csize2; ++j2)
-                result += B(j1+i1+Bl1,j2+i2+Bl2) * 
-                  C(Csize1 - 1 - j1 + Cl1, Csize2 - 1 - j2 +Cl2);
+                A(i1,i2) += B(j1+i1+Bl1,j2+i2+Bl2) * 
+                  C(Csize1 - 1 - j1 + Cl1, Csize2 - 1 - j2 +Cl2);*/
+            blitz::Range jb1( i1, i1 + Csize1 - 1), jb2( i2, i2 + Csize2 - 1);
+            blitz::Range jc1( Csize1 - 1, 0,-1), jc2( Csize2 - 1, 0,-1);
+            A(i1,i2) = blitz::sum(B(jb1 + Bl1, jb2 + Bl2) * 
+                         C(jc1 + Cl1, jc2 + Cl2) );
           }
           else
             throw Torch::core::Exception();
-
-
-          A(i1,i2) = result;
         }
       }
     }
