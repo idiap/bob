@@ -292,10 +292,6 @@ namespace Torch {
           else if( size_opt == Convolution::Valid )
           {
             // Interpolation is useless in this case
-/*            for(int j1=0; j1 < Csize1; ++j1)
-              for(int j2=0; j2 < Csize2; ++j2)
-                A(i1,i2) += B(j1+i1+Bl1,j2+i2+Bl2) * 
-                  C(Csize1 - 1 - j1 + Cl1, Csize2 - 1 - j2 +Cl2);*/
             blitz::Range jb1( i1, i1 + Csize1 - 1), jb2( i2, i2 + Csize2 - 1);
             blitz::Range jc1( Csize1 - 1, 0,-1), jc2( Csize2 - 1, 0,-1);
             A(i1,i2) = blitz::sum(B(jb1 + Bl1, jb2 + Bl2) * 
