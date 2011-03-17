@@ -24,5 +24,5 @@ add_dependencies(torch_sp sp-cxx_header_install)
 # Defines tests for this package
 torch_test(sp dftdct_naive test/dftdctnaive.cc)
 torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
-torch_test(sp convolution_zeropadding test/convolution.cc)
+torch_test(sp convolution test/convolution.cc)
 torch_test(sp fftfct_fftpack_blitz test/fftfctfftpack_blitz.cc)
