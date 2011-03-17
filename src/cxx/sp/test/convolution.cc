@@ -13,6 +13,8 @@
 
 #include "sp/convolution.h"
 
+namespace conv = Torch::sp::Convolution;
+
 struct T {
   blitz::Array<double,1> A1_10;
   blitz::Array<double,1> b1_3;
@@ -44,6 +46,32 @@ struct T {
   blitz::Array<double,2> res_A2_5_b2_3_same;
   blitz::Array<double,2> res_A2_5_b2_3_valid;
 
+
+  blitz::Array<double,1> A1b_5;
+  blitz::Array<double,1> b1b_3;
+
+  blitz::Array<double,1> res_A1b_5_b1b_3_full_zero;
+  blitz::Array<double,1> res_A1b_5_b1b_3_full_near;
+  blitz::Array<double,1> res_A1b_5_b1b_3_full_circ;
+  blitz::Array<double,1> res_A1b_5_b1b_3_full_mirr;
+  blitz::Array<double,1> res_A1b_5_b1b_3_same_zero;
+  blitz::Array<double,1> res_A1b_5_b1b_3_same_near;
+  blitz::Array<double,1> res_A1b_5_b1b_3_same_circ;
+  blitz::Array<double,1> res_A1b_5_b1b_3_same_mirr;
+  blitz::Array<double,1> res_A1b_5_b1b_3_valid;
+
+  blitz::Array<double,2> A2b_3x4;
+  blitz::Array<double,2> b2b_2x2;
+
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_zero;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_near;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_circ;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_full_mirr;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_zero;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_near;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_circ;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_same_mirr;
+  blitz::Array<double,2> res_A2b_3x4_b2b_2x2_valid;
 
   double eps_d;
   T(): eps_d(1e-3) {
@@ -154,6 +182,78 @@ struct T {
     res_A2_5_b2_3_valid = 1.9583, 1.7152, 1.7309,
       1.8242, 2.0354, 2.0621,
       2.5338, 2.1359, 2.4450;
+
+    A1b_5.resize(5);
+    A1b_5 = 0, 1, 2, 3, 4;
+    b1b_3.resize(3);
+    b1b_3 = 3, 1, 2;
+
+    res_A1b_5_b1b_3_full_zero.resize(7);
+    res_A1b_5_b1b_3_full_zero = 0, 3, 7, 13, 19, 10, 8;
+    res_A1b_5_b1b_3_full_near.resize(7);
+    res_A1b_5_b1b_3_full_near = 0, 3, 7, 13, 19, 22, 24;
+    res_A1b_5_b1b_3_full_circ.resize(7);
+    res_A1b_5_b1b_3_full_circ = 10, 11, 7, 13, 19, 10, 11;
+    res_A1b_5_b1b_3_full_mirr.resize(7);
+    res_A1b_5_b1b_3_full_mirr = 2, 3, 7, 13, 19, 22, 21;
+    res_A1b_5_b1b_3_same_zero.resize(5);
+    res_A1b_5_b1b_3_same_zero = 3, 7, 13, 19, 10;
+    res_A1b_5_b1b_3_same_near.resize(5);
+    res_A1b_5_b1b_3_same_near = 3, 7, 13, 19, 22;
+    res_A1b_5_b1b_3_same_circ.resize(5);
+    res_A1b_5_b1b_3_same_circ = 11, 7, 13, 19, 10;
+    res_A1b_5_b1b_3_same_mirr.resize(5);
+    res_A1b_5_b1b_3_same_mirr = 3, 7, 13, 19, 22;
+    res_A1b_5_b1b_3_valid.resize(3);
+    res_A1b_5_b1b_3_valid = 7, 13, 19;
+    
+    A2b_3x4.resize(3,4);
+    A2b_3x4 = 0, 1, 2, 3, 
+      4, 5, 6, 7, 
+      8, 9, 10, 11;
+    b2b_2x2.resize(2,2);
+    b2b_2x2 = 4, 1, 3, 2;
+
+    res_A2b_3x4_b2b_2x2_full_zero.resize(4,5);
+    res_A2b_3x4_b2b_2x2_full_zero = 0, 4, 9, 14, 3,
+      16, 27, 37, 47, 13,
+      44, 67, 77, 87, 25,
+      24, 43, 48, 53, 22;
+    res_A2b_3x4_b2b_2x2_full_near.resize(4,5);
+    res_A2b_3x4_b2b_2x2_full_near = 0, 7, 17, 27, 30,
+      20, 27, 37, 47, 50,
+      60, 67, 77, 87, 90,
+      80, 87, 97, 107, 110;
+    res_A2b_3x4_b2b_2x2_full_circ.resize(4,5);
+    res_A2b_3x4_b2b_2x2_full_circ = 49, 47, 57, 67, 49,
+      29, 27, 37, 47, 29,
+      69, 67, 77, 87, 69,
+      49, 47, 57, 67, 49;
+    res_A2b_3x4_b2b_2x2_full_mirr.resize(4,5);
+    res_A2b_3x4_b2b_2x2_full_mirr = 0, 7, 17, 27, 30,
+      20, 27, 37, 47, 50,
+      60, 67, 77, 87, 90,
+      80, 87, 97, 107, 110;
+    res_A2b_3x4_b2b_2x2_same_zero.resize(3,4);
+    res_A2b_3x4_b2b_2x2_same_zero = 27, 37, 47, 13,
+      67, 77, 87, 25,
+      43, 48, 53, 22;
+    res_A2b_3x4_b2b_2x2_same_near.resize(3,4);
+    res_A2b_3x4_b2b_2x2_same_near = 27, 37, 47, 50,
+      67, 77, 87, 90,
+      87, 97, 107, 110;
+    res_A2b_3x4_b2b_2x2_same_circ.resize(3,4);
+    res_A2b_3x4_b2b_2x2_same_circ = 27, 37, 47, 29,
+      67, 77, 87, 69,
+      47, 57, 67, 49;
+    res_A2b_3x4_b2b_2x2_same_mirr.resize(3,4);
+    res_A2b_3x4_b2b_2x2_same_mirr = 27, 37, 47, 50,
+      67, 77, 87, 90,
+      87, 97, 107, 110;
+    res_A2b_3x4_b2b_2x2_valid.resize(2,3);
+    res_A2b_3x4_b2b_2x2_valid = 27, 37, 47,
+      67, 77, 87;
+    
   }
   ~T() {}
 };
@@ -183,10 +283,11 @@ void test_convolve_2D_nopt( T eps, const blitz::Array<T,2>& a1,
 template <typename T> 
 void test_convolve_1D( T eps, const blitz::Array<T,1>& a1, 
   const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat, 
-  const enum Torch::sp::Convolution::SizeOption option = Torch::sp::Convolution::FULL)
+  const enum conv::SizeOption opt1 = conv::Full,
+  const enum conv::BorderOption opt2 = conv::Zero)
 {
   blitz::Array<T,1> res;
-  Torch::sp::convolve( a1, a2, res, option);
+  Torch::sp::convolve( a1, a2, res, opt1, opt2);
   for(int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
 }
@@ -194,10 +295,11 @@ void test_convolve_1D( T eps, const blitz::Array<T,1>& a1,
 template <typename T> 
 void test_convolve_2D( T eps, const blitz::Array<T,2>& a1, 
   const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat,
-  const enum Torch::sp::Convolution::SizeOption option = Torch::sp::Convolution::FULL)
+  const enum conv::SizeOption opt1 = conv::Full,
+  const enum conv::BorderOption opt2 = conv::Zero)
 {
   blitz::Array<T,2> res;
-  Torch::sp::convolve( a1, a2, res, option);
+  Torch::sp::convolve( a1, a2, res, opt1, opt2);
   for(int i=0; i<res.extent(0); ++i)
     for(int j=0; j<res.extent(1); ++j)
       BOOST_CHECK_SMALL(res(i,j) - mat(i,j), eps);
@@ -216,22 +318,19 @@ BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_nopt )
 // 1D convolution between a 1D vector of length 10 and 3 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full, 
-    Torch::sp::Convolution::FULL);
+  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_full, conv::Full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 3 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_same, 
-    Torch::sp::Convolution::SAME);
+  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_same, conv::Same);
 }
 
 // 1D convolution between a 1D vector of length 10 and 3 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_3_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_valid, 
-    Torch::sp::Convolution::VALID);
+  test_convolve_1D( eps_d, A1_10, b1_3, res_A1_10_b1_3_valid, conv::Valid);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (no option)
@@ -243,22 +342,19 @@ BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_nopt )
 // 1D convolution between a 1D vector of length 10 and 4 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full, 
-    Torch::sp::Convolution::FULL);
+  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_full, conv::Full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_same, 
-    Torch::sp::Convolution::SAME);
+  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_same, conv::Same);
 }
 
 // 1D convolution between a 1D vector of length 10 and 4 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_4_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_valid, 
-    Torch::sp::Convolution::VALID);
+  test_convolve_1D( eps_d, A1_10, b1_4, res_A1_10_b1_4_valid, conv::Valid);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (no option)
@@ -270,22 +366,19 @@ BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_nopt )
 // 1D convolution between a 1D vector of length 10 and 5 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_full )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full, 
-    Torch::sp::Convolution::FULL);
+  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_full, conv::Full);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_same )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_same, 
-    Torch::sp::Convolution::SAME);
+  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_same, conv::Same);
 }
 
 // 1D convolution between a 1D vector of length 10 and 5 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_1D_10_5_valid )
 {
-  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_valid, 
-    Torch::sp::Convolution::VALID);
+  test_convolve_1D( eps_d, A1_10, b1_5, res_A1_10_b1_5_valid, conv::Valid);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (no option)
@@ -297,22 +390,19 @@ BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_nopt )
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_full )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full,
-    Torch::sp::Convolution::FULL);
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_full, conv::Full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_same )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_same, 
-    Torch::sp::Convolution::SAME);
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_same, conv::Same);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 2x2 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_2_valid )
 {
-  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_valid, 
-    Torch::sp::Convolution::VALID);
+  test_convolve_2D( eps_d, A2_5, b2_2, res_A2_5_b2_2_valid, conv::Valid);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (no option)
@@ -324,22 +414,85 @@ BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_nopt )
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (full)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_full )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full, 
-    Torch::sp::Convolution::FULL);
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_full, conv::Full);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (same)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_same )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_same, 
-    Torch::sp::Convolution::SAME);
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_same, conv::Same);
 }
 
 // 2D convolution between a 2D vector of length 5x5 and 3x3 (valid)
 BOOST_AUTO_TEST_CASE( test_convolve_2D_5_3_valid )
 {
-  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_valid, 
-    Torch::sp::Convolution::VALID);
+  test_convolve_2D( eps_d, A2_5, b2_3, res_A2_5_b2_3_valid, conv::Valid);
+}
+
+// 1D convolution between a 1D vector of length 5 and 3
+BOOST_AUTO_TEST_CASE( test_convolve_1D_5_3 )
+{
+  // Full size
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_zero, 
+    conv::Full, conv::Zero);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_near, 
+    conv::Full, conv::NearestNeighbour);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_circ, 
+    conv::Full, conv::Circular);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_full_mirr, 
+    conv::Full, conv::Mirror);
+
+  // Same size
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_zero, 
+    conv::Same, conv::Zero);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_near, 
+    conv::Same, conv::NearestNeighbour);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_circ, 
+    conv::Same, conv::Circular);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_same_mirr, 
+    conv::Same, conv::Mirror);
+
+  // Valid size
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
+    conv::Valid, conv::Zero);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
+    conv::Valid, conv::NearestNeighbour);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
+    conv::Valid, conv::Circular);
+  test_convolve_1D( eps_d, A1b_5, b1b_3, res_A1b_5_b1b_3_valid, 
+    conv::Valid, conv::Mirror);
+}
+
+// 2D convolution between a 2D vector of length 3x4 and 2x2
+BOOST_AUTO_TEST_CASE( test_convolve_2D_3x4_2x2 )
+{
+  // Full size
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_zero, 
+    conv::Full, conv::Zero);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_near, 
+    conv::Full, conv::NearestNeighbour);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_circ, 
+    conv::Full, conv::Circular);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_full_mirr, 
+    conv::Full, conv::Mirror);
+
+  // Same size
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_zero, 
+    conv::Same, conv::Zero);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_near, 
+    conv::Same, conv::NearestNeighbour);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_same_mirr, 
+    conv::Same, conv::Mirror);
+
+  // Valid size
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
+    conv::Valid, conv::Zero);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
+    conv::Valid, conv::NearestNeighbour);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
+    conv::Valid, conv::Circular);
+  test_convolve_2D( eps_d, A2b_3x4, b2b_2x2, res_A2b_3x4_b2b_2x2_valid, 
+    conv::Valid, conv::Mirror);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

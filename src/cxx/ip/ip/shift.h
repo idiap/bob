@@ -45,10 +45,10 @@ namespace Torch {
         int y_src, x_src;
         for( int y=0; y<dst.extent(0); ++y) {
           is_y_out = y+shift_y<0 || y+shift_y>=src.extent(0);
-          y_src = keepInRange( y+shift_y, 0, src.extent(0)-1);
+          y_src = Torch::core::keepInRange( y+shift_y, 0, src.extent(0)-1);
           for( int x=0; x<dst.extent(1); ++x) {
             if( is_y_out || x+shift_x<0 || x+shift_x>=src.extent(1) ) {
-              x_src = keepInRange( x+shift_x, 0, src.extent(1)-1);
+              x_src = Torch::core::keepInRange( x+shift_x, 0, src.extent(1)-1);
               dst(y,x) = (zero_out ? 0 : 
                 src( y_src+src.lbound(0), x_src+src.lbound(1)) );
             }

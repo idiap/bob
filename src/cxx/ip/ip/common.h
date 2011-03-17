@@ -10,6 +10,7 @@
 #define TORCH5SPRO_IP_COMMON_H 1
 
 #include "core/logging.h"
+#include "core/common.h"
 #include "ip/Exception.h"
 
 namespace Torch {
@@ -21,16 +22,6 @@ namespace Torch {
   namespace ip {
 
     namespace detail {
-      /**
-        * @brief Force value to stay in a given range [min, max]
-        * @param val The value to be considered
-        * @param min The minimum of the range
-        * @param max The maximum of the range
-        */
-      inline int keepInRange( const int val, const int min, const int max) {
-        return (val < min ? min : (val > max ? max : val ) );
-      }
-
       /**
         * @brief Function which copies a 2D blitz::array/image of a given type.
         * @warning No check is performed on the dst blitz::array/image.
