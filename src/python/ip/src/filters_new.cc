@@ -10,6 +10,7 @@
 #include "core/logging.h"
 #include "ip/crop.h"
 #include "ip/flipflop.h"
+#include "ip/gammaCorrection.h"
 #include "ip/rotate.h"
 #include "ip/scale.h"
 #include "ip/shear.h"
@@ -29,6 +30,7 @@ static const char* SHEARX2D_DOC = "Shear a 2D blitz array/image with the given s
 static const char* SHEARY2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the Y-dimension.";
 static const char* SHIFT2D_DOC = "Shift a 2D blitz array/image.";
 static const char* SHIFT3D_DOC = "Shift a 3D blitz array/image.";
+static const char* GAMMACORRECTION2D_DOC = "Perform a power-law gamma correction on a 2D blitz array/image.";
 
 #define FILTER_DECL(T,N) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(crop_overloads_ ## N, Torch::ip::crop<T>, 6, 8) \
@@ -50,7 +52,8 @@ static const char* SHIFT3D_DOC = "Shift a 3D blitz array/image.";
   def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARX2D_DOC)); \
   def("shearY", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARY2D_DOC)); \
   def("shift", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_x"), arg("shift_y"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT2D_DOC)); \
-  def("shift", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_x"), arg("shift_y"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT3D_DOC));
+  def("shift", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_x"), arg("shift_y"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT3D_DOC)); \
+  def("gammaCorrection", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double))&Torch::ip::gammaCorrection<T>, (arg("src"), arg("dst"), arg("gamma")), GAMMACORRECTION2D_DOC);
 
 
 /*
