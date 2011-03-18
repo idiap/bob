@@ -161,6 +161,16 @@ namespace Torch { namespace python {
     i = 1; 
   }
 
+  template <typename T, int N> blitz::Array<T,N> atan2(blitz::Array<T,N>& x,
+      blitz::Array<T,N>& y) {
+    return blitz::Array<T,N>(blitz::atan2(x, y));
+  }
+
+  template <typename T, int N> blitz::Array<T,N> radius(blitz::Array<T,N>& x,
+      blitz::Array<T,N>& y) {
+    return blitz::Array<T,N>(blitz::sqrt(blitz::pow2(x) + blitz::pow2(y)));
+  }
+
   /**
    * Methods that operate on integer, float and complex arrays
    */
@@ -230,6 +240,10 @@ namespace Torch { namespace python {
 
     array.object()->def("ceil", &ceil<T,N>, "Ceiling function: smallest floating-point integer value not less than the argument."); 
     array.object()->def("floor", &floor<T,N>, "Floor function: largest floating-point integer value not greater than the argument.");
+
+    //these are some free-standing operators
+    boost::python::def("atan2", &atan2<T,N>, (boost::python::arg("x"), boost::python::arg("y")), "Inverse tangent of (y/x). The signs of both parameters are used to determine the quadrant of the return value, which is in the range [-pi, pi]. Works for complex<T>.");
+    boost::python::def("radius", &radius<T,N>, (boost::python::arg("x"), boost::python::arg("y")), "Calculates the radius component in a cartesian-polar coordinate conversion");
   }
 
   template <typename T, int N> 
