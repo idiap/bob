@@ -14,147 +14,65 @@
 #include "core/python/array_base.h"
 #include "core/python/blitz_extra.h"
 
+#define ARITH_COMP_OP(T,N,NAME,OP) template <typename T, int N> boost::python::object NAME(const blitz::Array<T,N>& i1, boost::python::object i2) { \
+      boost::python::extract<T> try_t(i2); \
+      if (try_t.check()) return boost::python::object(blitz::Array<bool,N>(i1 OP try_t())); \
+      boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
+      if (try_bz.check()) return boost::python::object(blitz::Array<bool,N>(i1 OP try_bz())); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      boost::python::throw_error_already_set(); \
+      return boost::python::object(); \
+    }
+
+#define ARITH_OP(T,N,NAME,OP) template <typename T, int N> boost::python::object NAME(const blitz::Array<T,N>& i1, boost::python::object i2) { \
+      boost::python::extract<T> try_t(i2); \
+      if (try_t.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_t())); \
+      boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
+      if (try_bz.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_bz())); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      boost::python::throw_error_already_set(); \
+      return boost::python::object(); \
+    }
+
+#define ARITH_IOP(T,N,NAME,OP) template <typename T, int N> boost::python::object NAME(blitz::Array<T,N>& i1, boost::python::object i2) { \
+      boost::python::extract<T> try_t(i2); \
+      if (try_t.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_t())); \
+      boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
+      if (try_bz.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_bz())); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      boost::python::throw_error_already_set(); \
+      return boost::python::object(); \
+    }
+
 namespace Torch { namespace python {
 
-  template <typename T, int N> 
-    blitz::Array<T,N> add(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<T,N>(i1 + i2); 
-    }
+  ARITH_OP(T,N,bzadd,+)
+  ARITH_OP(T,N,bzsub,-)
+  ARITH_OP(T,N,bzmul,*)
+  ARITH_OP(T,N,bzdiv,/)
+  ARITH_OP(T,N,bzmod,%)
 
-  template <typename T, int N> 
-    blitz::Array<T,N> add_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<T,N>(i1 + i2); 
-    }
+  ARITH_COMP_OP(T,N,bzlt,<)
+  ARITH_COMP_OP(T,N,bzle,<=)
+  ARITH_COMP_OP(T,N,bzgt,>)
+  ARITH_COMP_OP(T,N,bzge,>=)
+  ARITH_COMP_OP(T,N,bzne,!=)
+  ARITH_COMP_OP(T,N,bzeq,==)
 
-  template <typename T, int N> 
-    blitz::Array<T,N> sub(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<T,N>(i1 - i2); 
-    }
+  ARITH_OP(T,N,bzand,&)
+  ARITH_OP(T,N,bzor,|)
+  ARITH_OP(T,N,bzxor,^)
 
-  template <typename T, int N> 
-    blitz::Array<T,N> sub_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<T,N>(i1 - i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<T,N> mul(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<T,N>(i1 * i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<T,N> mul_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<T,N>(i1 * i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<T,N> div(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<T,N>(i1 / i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<T,N> div_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<T,N>(i1 / i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<T,N> mod(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<T,N>(i1 % i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<T,N> mod_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<T,N>(i1 % i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> lt(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 < i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> lt_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 < i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> le(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 <= i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> le_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 <= i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> gt(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 > i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> gt_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 > i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> ge(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 >= i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> ge_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 >= i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> ne(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 != i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> ne_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 != i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> eq(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 == i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> eq_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 == i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> and_(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 & i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> and_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 & i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> or_(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 | i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> or_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 | i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> xor_(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<bool,N>(i1 ^ i2); 
-    }
-
-  template <typename T, int N> 
-    blitz::Array<bool,N> xor_c(blitz::Array<T,N>& i1, const T& i2) {
-      return blitz::Array<bool,N>(i1 ^ i2); 
-    }
+  ARITH_IOP(T,N,bziadd,+=)
+  ARITH_IOP(T,N,bzisub,-=)
+  ARITH_IOP(T,N,bzimul,*=)
+  ARITH_IOP(T,N,bzidiv,/=)
+  ARITH_IOP(T,N,bzimod,%=)
+  ARITH_IOP(T,N,bzilshift,<<=)
+  ARITH_IOP(T,N,bzirshift,>>=)
+  ARITH_IOP(T,N,bziand,&=)
+  ARITH_IOP(T,N,bzior,|=)
+  ARITH_IOP(T,N,bzixor,^=)
 
   template <typename T, int N> 
     blitz::Array<T,N> invert(blitz::Array<T,N>& i) {
@@ -171,17 +89,22 @@ namespace Torch { namespace python {
       return blitz::Array<T,N>(blitz::abs(i)); 
     }
 
-  //Some special functions with 2 arguments
+  //The power function requires a special treatment
   template <typename T, int N> 
-    blitz::Array<T,N> pow(blitz::Array<T,N>& i1, blitz::Array<T,N>& i2) {
-      return blitz::Array<T,N>(blitz::pow(i1, i2)); 
-    }
+    boost::python::object pow(blitz::Array<T,N>& i1, boost::python::object i2) {
+      boost::python::extract<T> try_t(i2);
+      if (try_t.check()) {
+        blitz::Array<T,N> tmp(i1.shape());
+        tmp = try_t();
+        return boost::python::object(blitz::Array<T,N>(blitz::pow(i1, tmp)));
+      }
+      boost::python::extract<const blitz::Array<T,N>&> try_bz(i2);
+      if (try_bz.check()) 
+        return boost::python::object(blitz::Array<T,N>(blitz::pow(i1, try_bz())));
 
-  template <typename T, int N> 
-    blitz::Array<T,N> pow_c(blitz::Array<T,N>& i1, const T& i2) {
-      blitz::Array<T,N> tmp(i1.shape());
-      tmp = i2;
-      return blitz::Array<T,N>(blitz::pow(i1, tmp)); 
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>");
+      boost::python::throw_error_already_set();
+      return boost::python::object();
     }
 
   template <typename T, int N>
@@ -195,77 +118,44 @@ namespace Torch { namespace python {
   template <typename T, int N>
     void bind_float_complex_arith (Torch::python::array<T,N>& array) {
       array.object()->def("__pow__", &pow<T,N>, "Computes self**argument.");
-      array.object()->def("__pow__", &pow_c<T,N>, "Computes self**argument.");
     }
 
   template <typename T, int N>
     void bind_common_arith (Torch::python::array<T,N>& array) {
-      typedef typename Torch::python::array<T,N>::array_type array_type;
-      typedef array_type& (array_type::*inplace_const_op)(const T&); 
-      typedef array_type& (array_type::*inplace_array_op)(const array_type&);
-
-      array.object()->def("__add__", &add<T,N>, "Adds two arrays element-wise"); 
-      array.object()->def("__add__", &add_c<T,N>, "Adds an array with a constant element-wise"); 
-      array.object()->def("__sub__", &sub<T,N>, "Subtracts two arrays element-wise"); 
-      array.object()->def("__sub__", &sub_c<T,N>, "Subtracts an array with a constant element-wise"); 
-      array.object()->def("__mul__", &mul<T,N>, "Multiplies two arrays element-wise");
-      array.object()->def("__mul__", &mul_c<T,N>, "Multiplies an array with a constant element-wise"); 
-      array.object()->def("__div__", &div<T,N>, "Divides two arrays element-wise"); 
-      array.object()->def("__div__", &div_c<T,N>, "Divides an array with a constant element-wise"); 
-      array.object()->def("__iadd__", (inplace_const_op)&array_type::operator+=, boost::python::return_self<>(), "Inplace addition with constant.");
-      array.object()->def("__iadd__", (inplace_array_op)&array_type::operator+=, boost::python::return_self<>(), "Inplace addition with array, elementwise.");
-      array.object()->def("__isub__", (inplace_const_op)&array_type::operator-=, boost::python::return_self<>(), "Inplace subtraction by constant.");
-      array.object()->def("__isub__", (inplace_array_op)&array_type::operator-=, boost::python::return_self<>(), "Inplace subtraction by array, elementwise.");
-      array.object()->def("__imul__", (inplace_const_op)&array_type::operator*=, boost::python::return_self<>(), "Inplace multiplication by constant");
-      array.object()->def("__imul__", (inplace_array_op)&array_type::operator*=, boost::python::return_self<>(), "Inplace multiplication by array, elementwise.");
-      array.object()->def("__idiv__", (inplace_const_op)&array_type::operator/=, boost::python::return_self<>(), "Inplace division by constant");
-      array.object()->def("__idiv__", (inplace_array_op)&array_type::operator/=, boost::python::return_self<>(), "Inplace division by array, elementwise.");
-      array.object()->def("__eq__", &eq<T,N>, "Compares two arrays element-wise"); 
-      array.object()->def("__eq__", &eq_c<T,N>, "Compares an array to a constant element-wise"); 
-      array.object()->def("__ne__", &ne<T,N>, "Compares two arrays element-wise"); 
-      array.object()->def("__ne__", &ne_c<T,N>, "Compares an array to a constant element-wise"); 
-      array.object()->def("__neg__", &neg<T,N>, "The negated values of the array element-wise"); 
+      array.object()->def("__add__", &bzadd<T,N>);
+      array.object()->def("__sub__", &bzsub<T,N>);
+      array.object()->def("__mul__", &bzmul<T,N>);
+      array.object()->def("__div__", &bzdiv<T,N>);
+      array.object()->def("__eq__", &bzeq<T,N>);
+      array.object()->def("__ne__", &bzne<T,N>);
+      array.object()->def("__iadd__", &bziadd<T,N>);
+      array.object()->def("__isub__", &bzisub<T,N>);
+      array.object()->def("__imul__", &bzimul<T,N>);
+      array.object()->def("__idiv__", &bzidiv<T,N>);
+      array.object()->def("__neg__", &neg<T,N>);
     }
 
   template <typename T, int N>
     void bind_non_float_or_complex_arith (Torch::python::array<T,N>& array) {
-      typedef typename Torch::python::array<T,N>::array_type array_type;
-      typedef array_type& (array_type::*inplace_const_op)(const T&); 
-      typedef array_type& (array_type::*inplace_array_op)(const array_type&);
-
-      array.object()->def("__and__", &and_<T,N>, "Performs a bitwise and operation on two arrays, element-wise."); 
-      array.object()->def("__and__", &and_c<T,N>, "Performs a bitwise and operation on two arrays, element-wise."); 
-      array.object()->def("__or__", &or_<T,N>, "Performs a bitwise or operation on two arrays, element-wise."); 
-      array.object()->def("__or__", &or_c<T,N>, "Performs a bitwise or operation on two arrays, element-wise."); 
-      array.object()->def("__xor__", &xor_<T,N>, "Performs a bitwise xor operation on two arrays, element-wise."); 
-      array.object()->def("__xor__", &xor_c<T,N>, "Performs a bitwise xor operation on two arrays, element-wise."); 
-      array.object()->def("__ilshift__", (inplace_const_op)&array_type::operator<<=, boost::python::return_self<>(), "Inplace bitwise left-shift by constant.");
-      array.object()->def("__ilshift__", (inplace_array_op)&array_type::operator<<=, boost::python::return_self<>(), "Inplace bitwise left-shift by array, elementwise.");
-      array.object()->def("__irshift__", (inplace_const_op)&array_type::operator>>=, boost::python::return_self<>(), "Inplace bitwise right-shift by constant.");
-      array.object()->def("__irshift__", (inplace_array_op)&array_type::operator>>=, boost::python::return_self<>(), "Inplace bitwise right-shift by array, elementwise.");
-      array.object()->def("__iand__", (inplace_const_op)&array_type::operator&=, boost::python::return_self<>(), "Inplace bitwise and operation with constant.");
-      array.object()->def("__iand__", (inplace_array_op)&array_type::operator&=, boost::python::return_self<>(), "Inplace bitwise and operation with array, elementwise.");
-      array.object()->def("__ior__", (inplace_const_op)&array_type::operator|=, boost::python::return_self<>(), "Inplace bitwise or operation with constant.");
-      array.object()->def("__ior__", (inplace_array_op)&array_type::operator|=, boost::python::return_self<>(), "Inplace bitwise or operation with array, elementwise.");
-      array.object()->def("__ixor__", (inplace_const_op)&array_type::operator^=, boost::python::return_self<>(), "Inplace bitwise xor operation with constant.");
-      array.object()->def("__ixor__", (inplace_array_op)&array_type::operator^=, boost::python::return_self<>(), "Inplace bitwise xor operation with array, elementwise.");
-      array.object()->def("__invert__", &invert<T,N>, "The inverted values of the array element-wise"); 
-      array.object()->def("__mod__", &mod<T,N>, "Executes the reminder of division between two arrays, element-wise.");
-      array.object()->def("__mod__", &mod_c<T,N>, "Executes the reminder of division between two arrays, element-wise.");
-      array.object()->def("__imod__", (inplace_const_op)&array_type::operator%=, boost::python::return_self<>(), "Inplace reminder of division by constant");
-      array.object()->def("__imod__", (inplace_array_op)&array_type::operator%=, boost::python::return_self<>(), "Inplace reminder division by array, elementwise.");
+      array.object()->def("__mod__", &bzmod<T,N>);
+      array.object()->def("__and__", &bzand<T,N>);
+      array.object()->def("__or__", &bzor<T,N>);
+      array.object()->def("__xor__", &bzxor<T,N>);
+      array.object()->def("__imod__", &bzimod<T,N>);
+      array.object()->def("__ilshift__", &bzilshift<T,N>);
+      array.object()->def("__irshift__", &bzirshift<T,N>);
+      array.object()->def("__iand__", &bziand<T,N>);
+      array.object()->def("__ior__", &bzior<T,N>);
+      array.object()->def("__ixor__", &bzixor<T,N>);
+      array.object()->def("__invert__", &invert<T,N>);
     }
 
   template <typename T, int N>
     void bind_non_complex_arith (Torch::python::array<T,N>& array) {
-      array.object()->def("__lt__", &lt<T,N>, "Compares two arrays element-wise"); 
-      array.object()->def("__lt__", &lt_c<T,N>, "Compares an array to a constant element-wise"); 
-      array.object()->def("__le__", &le<T,N>, "Compares two arrays element-wise"); 
-      array.object()->def("__le__", &le_c<T,N>, "Compares an array to a constant element-wise"); 
-      array.object()->def("__gt__", &gt<T,N>, "Compares two arrays element-wise"); 
-      array.object()->def("__gt__", &gt_c<T,N>, "Compares an array to a constant element-wise"); 
-      array.object()->def("__ge__", &ge<T,N>, "Compares two arrays element-wise"); 
-      array.object()->def("__ge__", &ge_c<T,N>, "Compares an array to a constant element-wise"); 
+      array.object()->def("__lt__", &bzlt<T,N>);
+      array.object()->def("__le__", &bzle<T,N>);
+      array.object()->def("__gt__", &bzgt<T,N>);
+      array.object()->def("__ge__", &bzge<T,N>);
     }
 
   template <typename T, int N> void bind_bool_arith (Torch::python::array<T,N>& array) {

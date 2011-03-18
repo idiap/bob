@@ -10,15 +10,13 @@
 #include "ip/HornAndSchunckFlow.h"
 
 using namespace boost::python;
-namespace ip = Torch::ip;
+namespace of = Torch::ip::optflow;
 
-static const char* hsdoc = "Objects of this class, after configuration, can calculate the Optical Flow between two sequences of images (i1, the starting image and i2, the final image). It does this using the iterative method described by Horn & Schunck in the paper titled \"Determining Optical Flow\", published in 1981, Artificial Intelligence, Vol. 17, No. 1-3, pp. 185-203.";
+static const char* hsdoc = "Calculates the Optical Flow between two sequences of images (i1, the starting image and i2, the final image). It does this using the iterative method described by Horn & Schunck in the paper titled \"Determining Optical Flow\", published in 1981, Artificial Intelligence, Vol. 17, No. 1-3, pp. 185-203. Parameters: i1 -- first frame, i2 -- second frame, (u,v) -- estimates of the speed in x,y directions (zero if uninitialized).";
 
 void bind_ip_flow() {
-  //Horn & Schunck operator
-  class_<ip::HornAndSchunckFlow, boost::shared_ptr<ip::HornAndSchunckFlow> >("HornAndSchunckFlow", hsdoc, init<float, size_t>((arg("alpha"), arg("iterations")), "Constructs a new HornAndSchunckFlow estimator using a certain weight alpha and pre-programmed to perform a number of iterations."))
-    .add_property("alpha", &ip::HornAndSchunckFlow::getAlpha, &ip::HornAndSchunckFlow::setAlpha)
-    .add_property("iterations", &ip::HornAndSchunckFlow::getIterations, &ip::HornAndSchunckFlow::setIterations)
-    .def("__call__", &ip::HornAndSchunckFlow::operator(), (arg("image1"), arg("image2"), arg("u"), arg("v")), "Call an object of this type to compute the flow. u and v should be initialized or set to zero (if we are to compute the flow from scratch).")
-    ;
+  //Horn & Schunck 
+  def("evalHornAndSchunckFlow", of::evalHornAndSchunckFlow, (arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("u"), arg("v")), hsdoc);
+  def("evalHornAndSchunckEc2", &of::evalHornAndSchunckEc2, (arg("u"), arg("v"), arg("square_error")), "Calculates the square of the smoothness error (Ec^2) by using the formula described in the paper: Ec^2 = (u_bar - u)^2 + (v_bar - v)^2. Sets the input matrix with the discrete values.");
+  def("evalHornAndSchunckEb", &of::evalHornAndSchunckEb, (arg("i1"), arg("i2"), arg("u"), arg("v"), arg("error")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values");
 }

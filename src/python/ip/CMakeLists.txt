@@ -30,3 +30,5 @@ torch_python_add_test(python-ip-lbp-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp.py)
 torch_python_add_test(python-ip-filter-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters.py)
+torch_python_add_test(python-ip-test-optflow
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_flow.py)
