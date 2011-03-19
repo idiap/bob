@@ -29,13 +29,15 @@ struct T {
 void test_fct1D(const int N, const blitz::Array<double,1> t, double eps) 
 {
   // process using FCT
-  blitz::Array<double,1> t_fct = Torch::sp::fct(t);
+  blitz::Array<double,1> t_fct;
+  Torch::sp::fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
 
   // TODO: get DCT answer and compare with FCT
 
   // process using inverse FCT
-  blitz::Array<double,1> t_fct_ifct = Torch::sp::ifct(t_fct);
+  blitz::Array<double,1> t_fct_ifct;
+  Torch::sp::ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
 
   // Compare to original
@@ -48,14 +50,16 @@ void test_fct2D(const int M, const int N,
   const blitz::Array<double,2> t, double eps) 
 {
   // process using FCT
-  blitz::Array<double,2> t_fct = Torch::sp::fct(t);
+  blitz::Array<double,2> t_fct;
+  Torch::sp::fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct.extent(1), t.extent(1));
 
   // TODO: get DCT answer and compare with FCT
 
   // process using inverse FCT
-  blitz::Array<double,2> t_fct_ifct = Torch::sp::ifct(t_fct);
+  blitz::Array<double,2> t_fct_ifct;
+  Torch::sp::ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(1), t.extent(1));
 
@@ -68,13 +72,15 @@ void test_fct2D(const int M, const int N,
 void test_fft1D(const int N, const blitz::Array<std::complex<double>,1> t, double eps) 
 {
   // process using FFT
-  blitz::Array<std::complex<double>,1> t_fft = Torch::sp::fft(t);
+  blitz::Array<std::complex<double>,1> t_fft;
+  Torch::sp::fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
 
   // TODO: get DFT answer and compare with FFT
 
   // process using inverse FFT
-  blitz::Array<std::complex<double>,1> t_fft_ifft = Torch::sp::ifft(t_fft);
+  blitz::Array<std::complex<double>,1> t_fft_ifft;
+  Torch::sp::ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
 
   // Compare to original
@@ -87,14 +93,16 @@ void test_fft2D(const int M, const int N,
   const blitz::Array<std::complex<double>,2> t, double eps) 
 {
   // process using FFT
-  blitz::Array<std::complex<double>,2> t_fft = Torch::sp::fft(t);
+  blitz::Array<std::complex<double>,2> t_fft;
+  Torch::sp::fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft.extent(1), t.extent(1));
 
   // TODO: get DFT answer and compare with FFT
 
   // process using inverse FFT
-  blitz::Array<std::complex<double>,2> t_fft_ifft = Torch::sp::ifft(t_fft);
+  blitz::Array<std::complex<double>,2> t_fft_ifft;
+  Torch::sp::ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(1), t.extent(1));
 
