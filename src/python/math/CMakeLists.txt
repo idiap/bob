@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
    "src/linsolve.cc"
+   "src/svd.cc"
    "src/main.cc"
    )
  

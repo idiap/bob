@@ -12,6 +12,7 @@ set(src_blas
 
 set(src_lapack
   "src/linsolve.cc"
+  "src/svd.cc"
 )
 
 set(src_optimization
@@ -30,4 +31,5 @@ add_dependencies(torch_math math-cxx_header_install)
 
 # Defines tests for this package
 torch_test(math linsolve test/linsolve.cc)
+torch_test(math svd test/svd.cc)
 #torch_test(math interiorpoint test/interiorpoint.cc)
