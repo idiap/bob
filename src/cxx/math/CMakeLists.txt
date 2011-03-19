@@ -15,7 +15,7 @@ set(src_lapack
 )
 
 set(src_optimization
-  "src/interiorpoint.cc"
+#  "src/interiorpoint.cc"
 )
 
 set(src 
@@ -30,4 +30,4 @@ add_dependencies(torch_math math-cxx_header_install)
 
 # Defines tests for this package
 torch_test(math linsolve test/linsolve.cc)
-torch_test(math interiorpoint test/interiorpoint.cc)
+#torch_test(math interiorpoint test/interiorpoint.cc)
