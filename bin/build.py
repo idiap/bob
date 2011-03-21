@@ -33,7 +33,8 @@ def parse_args():
   default_log_prefix = os.path.join('logs')
   sources=os.path.realpath(os.path.dirname(os.path.dirname(sys.argv[0])))
   sources=os.path.join(sources, 'src')
-  default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'Doxyfile')
+  default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'doxygen', 'Doxyfile')
+  default_sphinxdir = os.path.join(os.path.dirname(sources), 'doc', 'sphinx')
 
   #our gigantic list of options...
   parser = optparse.OptionParser(description=__doc__)
@@ -70,6 +71,10 @@ def parse_args():
   parser.add_option("--doxyfile", action="store", dest="doxyfile",
       default=default_doxyfile, metavar="FILE",
       help="path of a doxygen file to be used as configuration basis (defaults to %default)",
+      )
+  parser.add_option("--sphinxdir", action="store", dest="sphinxdir",
+      default=default_sphinxdir, metavar="DIR",
+      help="path of the sphinx directory to be used (defaults to %default)",
       )
   parser.add_option("-c", "--cleanup-before", action="store_true",
       dest="cleanup", default=False, help="remove output directories before respective actions",
@@ -169,6 +174,7 @@ def parse_args():
   if options.action in ('all', 'documentation'):
     logging.info("Documentation directory: %s" % options.doc_prefix)
     logging.info("Doxyfile base configuration: %s" % options.doxyfile)
+    logging.info("Sphinx base directory: %s" % options.sphinxdir)
   if options.action in ('all', 'test'):
     logging.info("Run tests after build: YES")
   
@@ -228,7 +234,7 @@ if __name__ == '__main__':
   if options.action in ('all', 'documentation'):
     phase = 'documentation'
     time_track[phase], problem_track[phase] = \
-        adm.build.action(adm.build.doxygen, options)
+        adm.build.action(adm.build.documentation, options)
 
   #test, depends on install
   if options.action in ('all', 'test'):

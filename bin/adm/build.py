@@ -243,11 +243,11 @@ def ctest(option):
     raise RuntimeError, '** ERROR: "ctest" did not work as expected.'
   logging.debug('Finished running ctest.')
 
-def doxygen(option):
-  """Builds the project documentation using doxygen. If there is a problem,
-  throws a RuntimeError."""
+def documentation(option):
+  """Builds the project documentation using doxygen and sphinx. If there is
+  a problem, throws a RuntimeError."""
 
-  logging.debug('Running doxygen...')
+  logging.debug('Building documentation...')
 
   if os.path.exists(option.doc_prefix) and hasattr(option, "cleanup") and \
       option.cleanup:
@@ -257,11 +257,25 @@ def doxygen(option):
 
   if not os.path.exists(option.doc_prefix): os.makedirs(option.doc_prefix)
 
+  doxygen(option)
+  #sphinx(option)
+
+  logging.debug('Finished building documentation.')
+
+def doxygen(option):
+  """Builds the project documentation using doxygen. If there is a problem,
+  throws a RuntimeError."""
+
+  logging.debug('Running doxygen...')
+
+  doxygen_prefix = os.path.join(option.doc_prefix, "doxygen")
+  if not os.path.exists(doxygen_prefix): os.makedirs(doxygen_prefix)
+  
   overwrite_options = {}
   overwrite_options['PROJECT_NUMBER'] = option.version
   overwrite_options['INPUT'] = option.source_dir
   overwrite_options['STRIP_FROM_PATH'] = option.source_dir
-  overwrite_options['OUTPUT_DIRECTORY'] = option.doc_prefix
+  overwrite_options['OUTPUT_DIRECTORY'] = doxygen_prefix
   if option.debug_build: overwrite_options['QUIET'] = 'NO'
   extras = []
   for k,v in overwrite_options.iteritems(): extras.append('%s = %s\n' % (k, v))
@@ -291,6 +305,40 @@ def doxygen(option):
     shutil.copy('index.html', 'main.html')
 
   logging.debug('Finished running doxygen.')
+
+def sphinx(option):
+  """Builds the project user guide using sphinx. If there is a problem,
+  throws a RuntimeError."""
+
+  logging.debug('Running Sphinx...')
+
+  sphinx_prefix = os.path.join(option.doc_prefix, "sphinx")
+  if not os.path.exists(sphinx_prefix): os.makedirs(sphinx_prefix)
+  
+  overwrite_options = {}
+  overwrite_options['PROJECT_NUMBER'] = option.version
+  overwrite_options['INPUT'] = option.source_dir
+  overwrite_options['STRIP_FROM_PATH'] = option.source_dir
+  overwrite_options['OUTPUT_DIRECTORY'] = sphinx_prefix
+
+  cmdline = ['sphinx-build']
+  #cmdline.append('-c %s' % option.sphinxconf)
+  sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
+  if not os.path.exists(sphinx_prefix_html): os.makedirs(sphinx_prefix_html)
+  cmdline.append('-b html')
+  cmdline.append(option.sphinxdir)
+  cmdline.append(sphinx_prefix_html)
+  print cmdline
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+  else:
+    status = run(cmdline)
+  if status != 0:
+    raise RuntimeError, '** ERROR: "sphinx-build" did not work as expected.'
+  tmpfile.close()
+  os.unlink(tmpname)
+
+  logging.debug('Finished running Sphinx.')
 
 def differences(option):
   """Calculates the repository differences since the time specified."""

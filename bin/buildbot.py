@@ -37,7 +37,8 @@ def parse_args():
   default_build_prefix = os.path.join(pwd, 'build', '%(platform)s')
   sources = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
   sources = os.path.join(sources, 'src')
-  default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'Doxyfile')
+  default_doxyfile = os.path.join(os.path.dirname(sources), 'doc', 'doxygen', 'Doxyfile')
+  default_sphinxdir = os.path.join(os.path.dirname(sources), 'doc', 'sphinx')
 
   #our gigantic list of options...
   parser = optparse.OptionParser(description=__doc__)
@@ -70,6 +71,10 @@ def parse_args():
   parser.add_option("--doxyfile", action="store", dest="doxyfile",
       default=default_doxyfile, metavar="FILE",
       help="path of a doxygen file to be used as configuration basis (defaults to %default)",
+      )
+  parser.add_option("--sphinxdir", action="store", dest="sphinxdir",
+      default=default_sphinxdir, metavar="DIR",
+      help="path of the sphinx directory to be used (defaults to %default)",
       )
   parser.add_option("-j", "--jobs", type="int", action="store", dest="jobs",
       default=1, metavar="INT(>=1)",
@@ -142,7 +147,7 @@ if __name__ == '__main__':
     adm.build.make(options, 'all')
     adm.build.write_header(options)
   elif options.action == 'make_install': adm.build.install(options)
-  elif options.action == 'documentation': adm.build.doxygen(options)
+  elif options.action == 'documentation': adm.build.documentation(options)
   elif options.action == 'ctest': adm.build.ctest(options)
   elif options.action == 'make_clean': adm.build.make(options, 'clean')
   elif options.action == 'mrproper': adm.build.mrproper(options)
