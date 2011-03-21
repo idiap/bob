@@ -23,15 +23,39 @@ namespace Torch {
     /**
      * @brief Compute the 1D FFT of a 1D blitz array
      */
-    blitz::Array<std::complex<double>,1> 
-      fft(const blitz::Array<std::complex<double>,1>& A)
+    void fft(const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FFT.
-      blitz::Array<std::complex<double>,1> res = blitz::copySafedata(A);
+      // Check and reindex if required
+      if( B.base(0) != 0 ) {
+        const blitz::TinyVector<int,1> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) )
+        B.resize( A.extent(0) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<std::complex<double>,1> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      // and copy content from A required by Lapack
+      if( B_ok )
+      {
+        B_int.reference( B );
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_A( A.lbound(0), A.ubound(0) );
+        B_int(r_B_int) = A(r_A);
+      }
+      // Otherwise make a full copy
+      else
+        B_int.reference( blitz::copySafedata(A) );
 
       // Declare variables for Lapack
-      int n_input = res.extent(0);
+      int n_input = B_int.extent(0);
       // According to Lapack documentation, the work array must be 
       // dimensioned at least 4*n+15, n being the size of the signal to 
       // process.
@@ -41,26 +65,56 @@ namespace Torch {
       cffti_( &n_input, wsave);
 
       // Compute the FFT
-      cfftf_( &n_input, reinterpret_cast<complex_*>(res.data()), wsave);
+      cfftf_( &n_input, reinterpret_cast<complex_*>(B_int.data()), wsave);
 
       // Deallocate work array
       delete [] wsave;
 
-      return res;
+      // If required, copy the result back to B
+      if( !B_ok )
+      {
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_B( B.lbound(0), B.ubound(0) );
+        B(r_B) = B_int(r_B_int);
+      }
     }
 
     /**
      * @brief Compute the 1D inverse FFT of a 1D blitz array
      */
-    blitz::Array<std::complex<double>,1> 
-      ifft(const blitz::Array<std::complex<double>,1>& A)
+    void ifft(const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FFT.
-      blitz::Array<std::complex<double>,1> res = copySafedata(A);
+      // Check and reindex if required
+      if( B.base(0) != 0 ) {
+        const blitz::TinyVector<int,1> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) )
+        B.resize( A.extent(0) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<std::complex<double>,1> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      // and copy content from A required by Lapack
+      if( B_ok )
+      {
+        B_int.reference( B );
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_A( A.lbound(0), A.ubound(0) );
+        B_int(r_B_int) = A(r_A);
+      }
+      // Otherwise make a full copy
+      else
+        B_int.reference( blitz::copySafedata(A) );
 
       // Declare variables for Lapack
-      int n_input = res.extent(0);
+      int n_input = B_int.extent(0);
       // According to Lapack documentation, the work array must be 
       // dimensioned at least 4*n+15, n being the size of the signal to 
       // process.
@@ -70,32 +124,56 @@ namespace Torch {
       cffti_( &n_input, wsave);
 
       // Compute the FFT
-      cfftb_( &n_input, reinterpret_cast<complex_*>(res.data()), wsave);
+      cfftb_( &n_input, reinterpret_cast<complex_*>(B_int.data()), wsave);
 
       // Deallocate work array
       delete [] wsave;
 
       // Rescale the result by the size of the input 
       // (as this is not performed by Lapack)
-      res /= static_cast<double>(n_input);
+      B_int /= static_cast<double>(n_input);
 
-      return res;
+      // If required, copy the result back to B
+      if( !B_ok )
+      {
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_B( B.lbound(0), B.ubound(0) );
+        B(r_B) = B_int(r_B_int);
+      }
     }
 
 
     /**
      * @brief Compute the 2D FFT of a 2D blitz array
      */
-    blitz::Array<std::complex<double>,2> 
-      fft(const blitz::Array<std::complex<double>,2>& A)
+    void fft(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FFT.
-      blitz::Array<std::complex<double>,2> res(A.extent(0), A.extent(1));
+      // Check and reindex if required
+      if( B.base(0) != 0 || B.base(1) != 0 ) {
+        const blitz::TinyVector<int,2> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) || B.extent(1) != A.extent(1) )
+        B.resize( A.extent(0), A.extent(1) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<std::complex<double>,2> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      if( B_ok )
+        B_int.reference( B );
+      // Otherwise, allocate a new "safe data()" array
+      else
+        B_int.resize( A.extent(0), A.extent(1) );
 
       // Declare variables for Lapack
-      int n_input_H = res.extent(0);
-      int n_input_W = res.extent(1);
+      int n_input_H = B_int.extent(0);
+      int n_input_W = B_int.extent(1);
       // According to Lapack documentation, the work array must be 
       // dimensioned at least 4*n+15, n being the size of the signal to 
       // process.
@@ -120,14 +198,14 @@ namespace Torch {
 
         // Update the column
         for( int i=0; i<n_input_H; ++i)
-          res(i,j) = col_tmp[i];
+          B(i,j) = col_tmp[i];
       }
 
       // Apply 1D FFT to each row of the resulting matrix
       for(int i=0; i<n_input_H; ++i)
       {
         // Compute the FFT of one row
-        cfftf_( &n_input_W, reinterpret_cast<complex_*>(&(res.data()[i*n_input_W])), wsave_W);
+        cfftf_( &n_input_W, reinterpret_cast<complex_*>(&(B_int.data()[i*n_input_W])), wsave_W);
       }
 
       // Deallocate memory
@@ -135,23 +213,49 @@ namespace Torch {
       delete [] wsave_H;
       delete [] wsave_W;
 
-      return res;
+      // If required, copy the result back to B
+      if( B_ok )
+      {
+        blitz::Range  r_B_int0( B_int.lbound(0), B_int.ubound(0) ),
+                      r_B_int1( B_int.lbound(1), B_int.ubound(1) ),
+                      r_B0( B.lbound(0), B.ubound(0) ),
+                      r_B1( B.lbound(1), B.ubound(1) );
+        B(r_B0, r_B1) = B_int(r_B_int0,r_B_int1);
+      }
     }
 
 
     /**
      * @brief Compute the 2D inverse FFT of a 2D blitz array
      */
-    blitz::Array<std::complex<double>,2> 
-      ifft(const blitz::Array<std::complex<double>,2>& A)
+    void ifft(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FFT.
-      blitz::Array<std::complex<double>,2> res(A.extent(0), A.extent(1));
+      // Check and reindex if required
+      if( B.base(0) != 0 || B.base(1) != 0 ) {
+        const blitz::TinyVector<int,2> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) || B.extent(1) != A.extent(1) )
+        B.resize( A.extent(0), A.extent(1) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<std::complex<double>,2> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      if( B_ok )
+        B_int.reference( B );
+      // Otherwise, allocate a new "safe data()" array
+      else
+        B_int.resize( A.extent(0), A.extent(1) );
 
       // Declare variables for Lapack
-      int n_input_H = res.extent(0);
-      int n_input_W = res.extent(1);
+      int n_input_H = B_int.extent(0);
+      int n_input_W = B_int.extent(1);
       // According to Lapack documentation, the work array must be 
       // dimensioned at least 4*n+15, n being the size of the signal to 
       // process.
@@ -176,14 +280,14 @@ namespace Torch {
 
         // Update the column
         for( int i=0; i<n_input_H; ++i)
-          res(i,j) = col_tmp[i];
+          B_int(i,j) = col_tmp[i];
       }
 
       // Apply 1D FFT to each row of the resulting matrix
       for(int i=0; i<n_input_H; ++i)
       {
         // Compute the FFT of one row
-        cfftb_( &n_input_W, reinterpret_cast<complex_*>(&(res.data()[i*n_input_W])), wsave_W);
+        cfftb_( &n_input_W, reinterpret_cast<complex_*>(&(B_int.data()[i*n_input_W])), wsave_W);
       }
 
       // Deallocate memory
@@ -194,9 +298,17 @@ namespace Torch {
       // Rescale the result by the size of the input 
       // (as this is not performed by Lapack)
       int n_input = n_input_H * n_input_W;
-      res /= static_cast<double>(n_input);
+      B_int /= static_cast<double>(n_input);
 
-      return res;
+      // If required, copy the result back to B
+      if( B_ok )
+      {
+        blitz::Range  r_B_int0( B_int.lbound(0), B_int.ubound(0) ),
+                      r_B_int1( B_int.lbound(1), B_int.ubound(1) ),
+                      r_B0( B.lbound(0), B.ubound(0) ),
+                      r_B1( B.lbound(1), B.ubound(1) );
+        B(r_B0, r_B1) = B_int(r_B_int0,r_B_int1);
+      }
     }
 
   }

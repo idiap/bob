@@ -90,30 +90,27 @@ inline bool checkSafedata( const Array<T,4>& src)
 }
 
 
-template <typename T>
-void makeSafedata( Array<T,1>& src)
-{ 
-  int n_0 = src.extent(0);
-  Array<T,1> dst( n_0 );
-  for( int i=0; i<n_0; ++i )
-    dst(i) = src(i+src.lbound(0));
-  return dst;
-}
-
-
 /**
  * @brief This copies a 1D blitz array and guaranties that:
  *   * the memory is stored contiguously
  *   * indices start at 0 and data are not reversed in each dimension
  *   * Row major storage order is used
+ * @warning If you want to use the output of this function, you can use:
+ *   * The blitz copy constructor
+ *   * The reference() function
+ * Please note than using the assignment will require to do a full copy.
  */
 template <typename T> 
 Array<T,1> copySafedata( const Array<T,1>& src)
 {
-  int n_0 = src.extent(0);
-  Array<T,1> dst( n_0 );
-  for( int i=0; i<n_0; ++i )
-    dst(i) = src(i+src.lbound(0));
+  // Create dst array
+  Array<T,1> dst( src.extent(0) );
+
+  // Make a (safe) copy
+  Range r_src( src.lbound(0), src.ubound(0) ),
+        r_dst( dst.lbound(0), dst.ubound(0) ); 
+  dst(r_dst) = src(r_src);
+  
   return dst;
 }
 
@@ -126,12 +123,16 @@ Array<T,1> copySafedata( const Array<T,1>& src)
 template <typename T> 
 Array<T,2> copySafedata( const Array<T,2>& src)
 {
-  int n_0 = src.extent(0);
-  int n_1 = src.extent(1);
-  Array<T,2> dst( n_0, n_1 );
-  for( int i=0; i<n_0; ++i )
-    for( int j=0; j<n_1; ++j )
-      dst(i,j) = src(i+src.lbound(0),j+src.lbound(1));
+  // Create dst array
+  Array<T,2> dst( src.extent(0), src.extent(1) );
+
+  // Make a (safe) copy
+  Range r_src0( src.lbound(0), src.ubound(0) ),
+        r_src1( src.lbound(1), src.ubound(1) ),
+        r_dst0( dst.lbound(0), dst.ubound(0) ),
+        r_dst1( dst.lbound(1), dst.ubound(1) ); 
+  dst(r_dst0,r_dst1) = src(r_src0,r_src1);
+
   return dst;
 }
 
@@ -144,14 +145,18 @@ Array<T,2> copySafedata( const Array<T,2>& src)
 template <typename T> 
 Array<T,3> copySafedata( const Array<T,3>& src)
 {
-  int n_0 = src.extent(0);
-  int n_1 = src.extent(1);
-  int n_2 = src.extent(2);
-  Array<T,3> dst( n_0, n_1, n_2 );
-  for( int i=0; i<n_0; ++i )
-    for( int j=0; j<n_1; ++j )
-      for( int k=0; k<n_2; ++k )
-        dst(i,j,k) = src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2));
+  // Create dst array
+  Array<T,3> dst( src.extent(0), src.extent(1), src.extent(2) );
+
+  // Make a (safe) copy
+  Range r_src0( src.lbound(0), src.ubound(0) ),
+        r_src1( src.lbound(1), src.ubound(1) ),
+        r_src2( src.lbound(2), src.ubound(2) ),
+        r_dst0( dst.lbound(0), dst.ubound(0) ),
+        r_dst1( dst.lbound(1), dst.ubound(1) ), 
+        r_dst2( dst.lbound(2), dst.ubound(2) ); 
+  dst(r_dst0,r_dst1,r_dst2) = src(r_src0,r_src1,r_src2);
+
   return dst;
 }
 
@@ -164,17 +169,20 @@ Array<T,3> copySafedata( const Array<T,3>& src)
 template <typename T> 
 Array<T,4> copySafedata( const Array<T,4>& src)
 {
-  int n_0 = src.extent(0);
-  int n_1 = src.extent(1);
-  int n_2 = src.extent(2);
-  int n_3 = src.extent(3);
-  Array<T,4> dst( n_0, n_1, n_2, n_3 );
-  for( int i=0; i<n_0; ++i )
-    for( int j=0; j<n_1; ++j )
-      for( int k=0; k<n_2; ++k )
-        for( int l=0; l<n_3; ++l )
-          dst(i,j,k,l) = src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),
-            l+src.lbound(3));
+  // Create dst array
+  Array<T,4> dst( src.extent(0), src.extent(1), src.extent(2), src.exent(3) );
+
+  // Make a (safe) copy
+  Range r_src0( src.lbound(0), src.ubound(0) ),
+        r_src1( src.lbound(1), src.ubound(1) ),
+        r_src2( src.lbound(2), src.ubound(2) ),
+        r_src3( src.lbound(3), src.ubound(3) ),
+        r_dst0( dst.lbound(0), dst.ubound(0) ),
+        r_dst1( dst.lbound(1), dst.ubound(1) ), 
+        r_dst2( dst.lbound(2), dst.ubound(2) ),
+        r_dst3( dst.lbound(3), dst.ubound(3) );
+  dst(r_dst0,r_dst1,r_dst2,r_dst3) = src(r_src0,r_src1,r_src2,r_src3);
+
   return dst;
 }
 

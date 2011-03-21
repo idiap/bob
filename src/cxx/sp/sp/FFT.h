@@ -22,26 +22,26 @@ namespace Torch {
     /**
      * @brief 1D FFT of a 1D blitz array
      */
-    blitz::Array<std::complex<double>,1> 
-      fft(const blitz::Array<std::complex<double>,1>& A);
+    void fft(const blitz::Array<std::complex<double>,1>& A, 
+      blitz::Array<std::complex<double>,1>& B);
 
     /**
      * @brief 1D inverse FFT of a 1D blitz array
      */
-    blitz::Array<std::complex<double>,1> 
-      ifft(const blitz::Array<std::complex<double>,1>& A);
+    void ifft(const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B);
 
     /**
      * @brief 2D FFT of a 2D blitz array
      */
-    blitz::Array<std::complex<double>,2> 
-      fft(const blitz::Array<std::complex<double>,2>& A);
+    void fft(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B);
 
     /**
      * @brief 2D inverse FFT of a 2D blitz array
      */
-    blitz::Array<std::complex<double>,2> 
-      ifft(const blitz::Array<std::complex<double>,2>& A);
+    void ifft(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B);
 
   }
 /**

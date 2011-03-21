@@ -20,14 +20,38 @@ namespace Torch {
     /**
      * @brief Compute the 1D FCT of a 1D blitz array
      */
-    blitz::Array<double,1> fct(const blitz::Array<double,1>& A)
+    void fct(const blitz::Array<double,1>& A, blitz::Array<double,1>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FCT.
-      blitz::Array<double,1> res = blitz::copySafedata(A);
+      // Check and reindex if required
+      if( B.base(0) != 0 ) {
+        const blitz::TinyVector<int,1> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) )
+        B.resize( A.extent(0) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<double,1> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      // and copy content from A required by Lapack
+      if( B_ok )
+      {
+        B_int.reference( B );
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_A( A.lbound(0), A.ubound(0) );
+        B_int(r_B_int) = A(r_A);
+      }
+      // Otherwise make a full copy
+      else
+        B_int.reference( blitz::copySafedata(A) );
 
       // Declare variables for Lapack
-      int n_input = res.extent(0);
+      int n_input = B_int.extent(0);
       // According to Lapack documentation, the work array must be 
       // dimensioned at least 3*n+15, n being the size of the signal to 
       // process.
@@ -37,29 +61,60 @@ namespace Torch {
       cosqi_( &n_input, wsave);
 
       // Compute the FCT
-      cosqb_( &n_input, res.data(), wsave);
+      cosqb_( &n_input, B_int.data(), wsave);
  
       double sqrt2N = sqrt(2./n_input);
-      for(int i=0; i<n_input; ++i) 
-        res(i) = res(i)/4*(i==0?sqrt(1./n_input):sqrt2N);
+      B_int(0) *= sqrt(1./n_input)/4;
+      blitz::Range r_B_int_x(B_int.lbound(0)+1, B_int.ubound(0) );
+      B_int(r_B_int_x) *= sqrt2N/4;
 
       // Deallocate work array
       delete [] wsave;
 
-      return res;
+      // If required, copy the result back to B
+      if( !B_ok )
+      {
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_B( B.lbound(0), B.ubound(0) );
+        B(r_B) = B_int(r_B_int);
+      }
     }
 
     /**
      * @brief Compute the 1D inverse FCT of a 1D blitz array
      */
-    blitz::Array<double,1> ifct(const blitz::Array<double,1>& A)
+    void ifct(const blitz::Array<double,1>& A, blitz::Array<double,1>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FCT.
-      blitz::Array<double,1> res = copySafedata(A);
+      // Check and reindex if required
+      if( B.base(0) != 0 ) {
+        const blitz::TinyVector<int,1> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) )
+        B.resize( A.extent(0) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<double,1> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      // and copy content from A required by Lapack
+      if( B_ok )
+      {
+        B_int.reference( B );
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_A( A.lbound(0), A.ubound(0) );
+        B_int(r_B_int) = A(r_A);
+      }
+      // Otherwise make a full copy
+      else
+        B_int.reference( blitz::copySafedata(A) );
 
       // Declare variables for Lapack
-      int n_input = res.extent(0);
+      int n_input = B_int.extent(0);
       // According to Lapack documentation, the work array must be 
       // dimensioned at least 3*n+15, n being the size of the signal to 
       // process.
@@ -69,31 +124,56 @@ namespace Torch {
       cosqi_( &n_input, wsave);
 
       double sqrt2N = sqrt(2.*n_input);
-      for(int i=0; i<n_input; ++i) 
-        res(i) = res(i)/(i==0?sqrt(n_input):sqrt2N);
+      B_int(0) /= sqrt(n_input);
+      blitz::Range r_B_int_x(B_int.lbound(0)+1, B_int.ubound(0) );
+      B_int(r_B_int_x) /= sqrt2N;
 
       // Compute the FCT
-      cosqf_( &n_input, res.data(), wsave);
+      cosqf_( &n_input, B_int.data(), wsave);
 
       // Deallocate work array
       delete [] wsave;
 
-      return res;
+      // If required, copy the result back to B
+      if( !B_ok )
+      {
+        blitz::Range r_B_int( B_int.lbound(0), B_int.ubound(0) );
+        blitz::Range r_B( B.lbound(0), B.ubound(0) );
+        B(r_B) = B_int(r_B_int);
+      }
     }
 
 
     /**
      * @brief Compute the 2D FCT of a 2D blitz array
      */
-    blitz::Array<double,2> fct(const blitz::Array<double,2>& A)
+    void fct(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FCT.
-      blitz::Array<double,2> res(A.extent(0), A.extent(1));
+      // Check and reindex if required
+      if( B.base(0) != 0 || B.base(1) != 0) {
+        const blitz::TinyVector<int,2> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) || B.extent(1) != A.extent(1) )
+        B.resize( A.extent(0), A.extent(1) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<double,2> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      if( B_ok )
+        B_int.reference( B );
+      // Otherwise, allocate a new "safe data()" array
+      else
+        B_int.resize( A.extent(0), A.extent(1) );
 
       // Declare variables for Lapack
-      int n_input_H = res.extent(0);
-      int n_input_W = res.extent(1);
+      int n_input_H = B_int.extent(0);
+      int n_input_W = B_int.extent(1);
 
       // Precompute multiplicative factors
       double sqrt1H=sqrt(1./n_input_H);
@@ -125,14 +205,14 @@ namespace Torch {
 
         // Update the column
         for( int i=0; i<n_input_H; ++i)
-          res(i,j) = col_tmp[i];
+          B_int(i,j) = col_tmp[i];
       }
 
       // Apply 1D FCT to each row of the resulting matrix
       for(int i=0; i<n_input_H; ++i)
       {
         // Compute the FCT of one row
-        cosqb_( &n_input_W, &(res.data()[i*n_input_W]), wsave_W);
+        cosqb_( &n_input_W, &(B_int.data()[i*n_input_W]), wsave_W);
       }
 
       // Deallocate memory
@@ -143,24 +223,50 @@ namespace Torch {
       // Rescale the result
       for(int i=0; i<n_input_H; ++i)
         for(int j=0; j<n_input_W; ++j)
-          res(i,j) = res(i,j)/16.*(i==0?sqrt1H:sqrt2H)*(j==0?sqrt1W:sqrt2W);
+          B_int(i,j) = B_int(i,j)/16.*(i==0?sqrt1H:sqrt2H)*(j==0?sqrt1W:sqrt2W);
 
-      return res;
+      // If required, copy the result back to B
+      if( B_ok )
+      {
+        blitz::Range  r_B_int0( B_int.lbound(0), B_int.ubound(0) ),
+                      r_B_int1( B_int.lbound(1), B_int.ubound(1) ),
+                      r_B0( B.lbound(0), B.ubound(0) ),
+                      r_B1( B.lbound(1), B.ubound(1) );
+        B(r_B0, r_B1) = B_int(r_B_int0,r_B_int1);
+      }
     }
 
 
     /**
      * @brief Compute the 2D inverse FCT of a 2D blitz array
      */
-    blitz::Array<double,2> ifct(const blitz::Array<double,2>& A)
+    void ifct(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
     {
-      // Make a copy of the blitz array. This will allocate a new memory area
-      // which will be used to stored the result of the FCT.
-      blitz::Array<double,2> res(A.extent(0), A.extent(1));
+      // Check and reindex if required
+      if( B.base(0) != 0 || B.base(1) != 0) {
+        const blitz::TinyVector<int,2> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) || B.extent(1) != A.extent(1) )
+        B.resize( A.extent(0), A.extent(1) );
+
+      // Initialize a blitz array for the result
+      blitz::Array<double,2> B_int;
+
+      // Check if B can be directly used
+      bool B_ok = checkSafedata(B);
+
+      // Make a reference to B if this is posible.
+      if( B_ok )
+        B_int.reference( B );
+      // Otherwise, allocate a new "safe data()" array
+      else
+        B_int.resize( A.extent(0), A.extent(1) );
 
       // Declare variables for Lapack
-      int n_input_H = res.extent(0);
-      int n_input_W = res.extent(1);
+      int n_input_H = B_int.extent(0);
+      int n_input_W = B_int.extent(1);
 
       // Precompute multiplicative factors
       double sqrt1H=sqrt(1./n_input_H);
@@ -192,14 +298,14 @@ namespace Torch {
 
         // Update the column
         for( int i=0; i<n_input_H; ++i)
-          res(i,j) = col_tmp[i];
+          B_int(i,j) = col_tmp[i];
       }
 
       // Apply 1D FCT to each row of the resulting matrix
       for(int i=0; i<n_input_H; ++i)
       {
         // Compute the FCT of one row
-        cosqf_( &n_input_W, &(res.data()[i*n_input_W]), wsave_W);
+        cosqf_( &n_input_W, &(B_int.data()[i*n_input_W]), wsave_W);
       }
 
       // Deallocate memory
@@ -210,9 +316,17 @@ namespace Torch {
       // Rescale the result by the size of the input 
       // (as this is not performed by Lapack)
       double norm_factor = 16*n_input_W*n_input_H;
-      res /= norm_factor;
+      B_int /= norm_factor;
 
-      return res;
+      // If required, copy the result back to B
+      if( B_ok )
+      {
+        blitz::Range  r_B_int0( B_int.lbound(0), B_int.ubound(0) ),
+                      r_B_int1( B_int.lbound(1), B_int.ubound(1) ),
+                      r_B0( B.lbound(0), B.ubound(0) ),
+                      r_B1( B.lbound(1), B.ubound(1) );
+        B(r_B0, r_B1) = B_int(r_B_int0,r_B_int1);
+      }
     }
 
   }

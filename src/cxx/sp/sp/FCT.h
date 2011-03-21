@@ -22,22 +22,22 @@ namespace Torch {
     /**
      * @brief 1D FCT of a 1D blitz array
      */
-    blitz::Array<double,1> fct(const blitz::Array<double,1>& A);
+    void fct(const blitz::Array<double,1>& A, blitz::Array<double,1>& B);
 
     /**
      * @brief 1D inverse FCT of a 1D blitz array
      */
-    blitz::Array<double,1> ifct(const blitz::Array<double,1>& A);
+    void ifct(const blitz::Array<double,1>& A, blitz::Array<double,1>& B);
 
     /**
      * @brief 2D FCT of a 2D blitz array
      */
-    blitz::Array<double,2> fct(const blitz::Array<double,2>& A);
+    void fct(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
 
     /**
      * @brief 2D inverse FCT of a 2D blitz array
      */
-    blitz::Array<double,2> ifct(const blitz::Array<double,2>& A);
+    void ifct(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
 
   }
 /**
