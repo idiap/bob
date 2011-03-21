@@ -299,7 +299,7 @@ def doxygen(option):
   os.unlink(tmpname)
 
   #create a link from index.html to main.html 
-  os.chdir(os.path.join(option.doc_prefix, 'html'))
+  os.chdir(os.path.join(option.doc_prefix, 'doxygen', 'html'))
   if not os.path.exists('main.html'):
     logging.debug("Copying index.html -> main.html")
     shutil.copy('index.html', 'main.html')
