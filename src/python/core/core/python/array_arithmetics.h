@@ -34,6 +34,10 @@
       return boost::python::object(); \
     }
 
+#define ARITH_ROP(T,N,NAME,OP) template <typename T, int N> boost::python::object r ## NAME(boost::python::object i1, const blitz::Array<T,N>& i2) { \
+      return NAME(i2, i1); \
+    }
+
 #define ARITH_IOP(T,N,NAME,OP) template <typename T, int N> boost::python::object NAME(blitz::Array<T,N>& i1, boost::python::object i2) { \
       boost::python::extract<T> try_t(i2); \
       if (try_t.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_t())); \
@@ -47,10 +51,15 @@
 namespace Torch { namespace python {
 
   ARITH_OP(T,N,bzadd,+)
+  ARITH_ROP(T,N,bzadd,+)
   ARITH_OP(T,N,bzsub,-)
+  ARITH_ROP(T,N,bzsub,-)
   ARITH_OP(T,N,bzmul,*)
+  ARITH_ROP(T,N,bzmul,*)
   ARITH_OP(T,N,bzdiv,/)
+  ARITH_ROP(T,N,bzdiv,/)
   ARITH_OP(T,N,bzmod,%)
+  ARITH_ROP(T,N,bzmod,%)
 
   ARITH_COMP_OP(T,N,bzlt,<)
   ARITH_COMP_OP(T,N,bzle,<=)
@@ -60,8 +69,15 @@ namespace Torch { namespace python {
   ARITH_COMP_OP(T,N,bzeq,==)
 
   ARITH_OP(T,N,bzand,&)
+  ARITH_ROP(T,N,bzand,&)
   ARITH_OP(T,N,bzor,|)
+  ARITH_ROP(T,N,bzor,|)
   ARITH_OP(T,N,bzxor,^)
+  ARITH_ROP(T,N,bzxor,^)
+  ARITH_OP(T,N,bzlshift,<<)
+  ARITH_ROP(T,N,bzlshift,<<)
+  ARITH_OP(T,N,bzrshift,>>)
+  ARITH_ROP(T,N,bzrshift,>>)
 
   ARITH_IOP(T,N,bziadd,+=)
   ARITH_IOP(T,N,bzisub,-=)
@@ -107,6 +123,11 @@ namespace Torch { namespace python {
       return boost::python::object();
     }
 
+  template <typename T, int N> 
+    boost::python::object rpow(boost::python::object i1, blitz::Array<T,N>& i2) {
+      return pow(i2, i1);
+    }
+
   template <typename T, int N>
     void bind_non_bool_or_uint_arith (Torch::python::array<T,N>& array) {
       array.object()->def("__abs__", &abs<T,N>, "Absolute value");
@@ -118,6 +139,7 @@ namespace Torch { namespace python {
   template <typename T, int N>
     void bind_float_complex_arith (Torch::python::array<T,N>& array) {
       array.object()->def("__pow__", &pow<T,N>, "Computes self**argument.");
+      array.object()->def("__rpow__", &rpow<T,N>, "Computes self**argument.");
     }
 
   template <typename T, int N>
@@ -133,6 +155,10 @@ namespace Torch { namespace python {
       array.object()->def("__imul__", &bzimul<T,N>);
       array.object()->def("__idiv__", &bzidiv<T,N>);
       array.object()->def("__neg__", &neg<T,N>);
+      array.object()->def("__radd__", &rbzadd<T,N>);
+      array.object()->def("__rsub__", &rbzsub<T,N>);
+      array.object()->def("__rmul__", &rbzmul<T,N>);
+      array.object()->def("__rdiv__", &rbzdiv<T,N>);
     }
 
   template <typename T, int N>
@@ -148,6 +174,10 @@ namespace Torch { namespace python {
       array.object()->def("__ior__", &bzior<T,N>);
       array.object()->def("__ixor__", &bzixor<T,N>);
       array.object()->def("__invert__", &invert<T,N>);
+      array.object()->def("__rmod__", &rbzmod<T,N>);
+      array.object()->def("__rand__", &rbzand<T,N>);
+      array.object()->def("__ror__", &rbzor<T,N>);
+      array.object()->def("__rxor__", &rbzxor<T,N>);
     }
 
   template <typename T, int N>
