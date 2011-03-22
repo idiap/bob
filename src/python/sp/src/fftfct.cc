@@ -19,6 +19,11 @@ static const char* IFFT1_DOC = "Compute the inverse Fast Fourier Transform of a 
 static const char* FFT2_DOC = "Compute the Fast Fourier Transform of a 2D blitz array and return the result as a blitz array.";
 static const char* IFFT2_DOC = "Compute the inverse Fast Fourier Transform of a 2D blitz array and return the result as a blitz array.";
 
+static const char* FFTSHIFT1_DOC = "Inverse the two halves of a 1D blitz array and return the result as a blitz array.";
+static const char* IFFTSHIFT1_DOC = "Inverse the two halves of a 1D blitz array and return the result as a blitz array. Calling iffshift over an fftshifted array should give the original array back.";
+static const char* FFTSHIFT2_DOC = "Swap the four quadrants of a 2D blitz array and return the result as a blitz array.";
+static const char* IFFTSHIFT2_DOC = "Swap the four quadrants of a 2D blitz array and return the result as a blitz array. Calling iffshift over an fftshifted array should give the original array back.";
+
 static const char* FCT1_DOC = "Compute the Fast Cosine Transform of a 1D blitz array and return the result as a blitz array.";
 static const char* IFCT1_DOC = "Compute the inverse Fast Cosine Transform of a 1D blitz array and return the result as a blitz array.";
 static const char* FCT2_DOC = "Compute the Fast Cosine Transform of a 2D blitz array and return the result as a blitz array.";
@@ -49,6 +54,34 @@ static blitz::Array<std::complex<double>,2> script_ifft(const blitz::Array<std::
 {
   blitz::Array<std::complex<double>,2> res;
   Torch::sp::ifft( ar, res);
+  return res;
+}
+
+static blitz::Array<std::complex<double>,1> script_fftshift(const blitz::Array<std::complex<double>,1>& ar)
+{
+  blitz::Array<std::complex<double>,1> res;
+  Torch::sp::fftshift( ar, res);
+  return res;
+}
+
+static blitz::Array<std::complex<double>,1> script_ifftshift(const blitz::Array<std::complex<double>,1>& ar)
+{
+  blitz::Array<std::complex<double>,1> res;
+  Torch::sp::ifftshift( ar, res);
+  return res;
+}
+
+static blitz::Array<std::complex<double>,2> script_fftshift(const blitz::Array<std::complex<double>,2>& ar)
+{
+  blitz::Array<std::complex<double>,2> res;
+  Torch::sp::fftshift( ar, res);
+  return res;
+}
+
+static blitz::Array<std::complex<double>,2> script_ifftshift(const blitz::Array<std::complex<double>,2>& ar)
+{
+  blitz::Array<std::complex<double>,2> res;
+  Torch::sp::ifftshift( ar, res);
   return res;
 }
 
@@ -92,6 +125,16 @@ void bind_sp_fft_fct()
   def("ifft", (void (*)(const blitz::Array<std::complex<double>,1>& ar, blitz::Array<std::complex<double>,1>& t))&Torch::sp::ifft, (arg("input"),arg("output")), IFFT1_DOC);
   def("fft", (void (*)(const blitz::Array<std::complex<double>,2>& ar, blitz::Array<std::complex<double>,2>& t))&Torch::sp::fft, (arg("input"),arg("output")), FFT2_DOC);
   def("ifft", (void (*)(const blitz::Array<std::complex<double>,2>& ar, blitz::Array<std::complex<double>,2>& t))&Torch::sp::ifft, (arg("input"),arg("output")), IFFT2_DOC);
+
+  // Shift halves/quadrants putting zero frequency in the center
+  def("fftshift", (blitz::Array<std::complex<double>,1> (*)(const blitz::Array<std::complex<double>,1>& ar))&script_fftshift, (arg("array")), FFTSHIFT1_DOC);
+  def("ifftshift", (blitz::Array<std::complex<double>,1> (*)(const blitz::Array<std::complex<double>,1>& ar))&script_ifftshift, (arg("array")), IFFTSHIFT1_DOC);
+  def("fftshift", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_fftshift, (arg("array")), FFTSHIFT2_DOC);
+  def("ifftshift", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_ifftshift, (arg("array")), IFFTSHIFT2_DOC);
+  def("fftshift", (void (*)(const blitz::Array<std::complex<double>,1>& ar, blitz::Array<std::complex<double>,1>& t))&Torch::sp::fftshift, (arg("input"),arg("output")), FFTSHIFT1_DOC);
+  def("ifftshift", (void (*)(const blitz::Array<std::complex<double>,1>& ar, blitz::Array<std::complex<double>,1>& t))&Torch::sp::ifftshift, (arg("input"),arg("output")), IFFTSHIFT1_DOC);
+  def("fftshift", (void (*)(const blitz::Array<std::complex<double>,2>& ar, blitz::Array<std::complex<double>,2>& t))&Torch::sp::fftshift, (arg("input"),arg("output")), FFTSHIFT2_DOC);
+  def("ifftshift", (void (*)(const blitz::Array<std::complex<double>,2>& ar, blitz::Array<std::complex<double>,2>& t))&Torch::sp::ifftshift, (arg("input"),arg("output")), IFFTSHIFT2_DOC);
 
   // Fast Cosine Transform
   def("fct", (blitz::Array<double,1> (*)(const blitz::Array<double,1>& ar))&script_fct, (arg("array")), FCT1_DOC);
