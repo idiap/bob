@@ -257,7 +257,7 @@ def documentation(option):
 
   if not os.path.exists(option.doc_prefix): os.makedirs(option.doc_prefix)
 
-#  doxygen(option)
+  doxygen(option)
   sphinx(option)
 
   logging.debug('Finished building documentation.')
