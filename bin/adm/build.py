@@ -322,8 +322,8 @@ def sphinx(option):
   overwrite_options['OUTPUT_DIRECTORY'] = sphinx_prefix
 
   cmdline = ['sphinx-build','-c', option.sphinxdir]
-  cmdline.extend(['-d','version=\'%s\'' % option.version])
-  cmdline.extend(['-A', 'SRC_DIR=%s' % option.source_dir])
+  cmdline.extend(['-D','version=%s' % option.version])
+  cmdline.extend(['-A','SRC_DIR=%s' % option.source_dir])
 
   sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
   print cmdline
