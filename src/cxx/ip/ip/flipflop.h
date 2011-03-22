@@ -34,9 +34,11 @@ namespace Torch {
       template<typename T>
       void flipNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
       {
-        for( int y=0; y<src.extent(0); ++y)
-          for( int x=0; x<src.extent(1); ++x)
-            dst(y,x) = src( src.ubound(0)-y, x+src.lbound(0));
+        blitz::Range  src_y( src.ubound(0), src.lbound(0), - 1 ),
+                      src_x( src.lbound(1), src.ubound(1) ), 
+                      dst_y( dst.lbound(0), dst.ubound(0) ),
+                      dst_x( dst.lbound(1), dst.ubound(1) );
+        dst(dst_y,dst_x) = src(src_y,src_x);
       }
 
     }
