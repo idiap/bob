@@ -258,7 +258,7 @@ def documentation(option):
   if not os.path.exists(option.doc_prefix): os.makedirs(option.doc_prefix)
 
   doxygen(option)
-  #sphinx(option)
+  sphinx(option)
 
   logging.debug('Finished building documentation.')
 
@@ -321,22 +321,19 @@ def sphinx(option):
   overwrite_options['STRIP_FROM_PATH'] = option.source_dir
   overwrite_options['OUTPUT_DIRECTORY'] = sphinx_prefix
 
-  cmdline = ['sphinx-build']
-  #cmdline.append('-c %s' % option.sphinxconf)
+  cmdline = ['sphinx-build','-c', option.sphinxdir]
+  cmdline.extend(['-d','version=\'%s\'' % option.version])
+  cmdline.extend(['-A', 'SRC_DIR=%s' % option.source_dir])
+  cmdline.extend(['-b', 'html'])
   sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
+  cmdline.extend([option.sphinxdir, sphinx_prefix_html])
   if not os.path.exists(sphinx_prefix_html): os.makedirs(sphinx_prefix_html)
-  cmdline.append('-b html')
-  cmdline.append(option.sphinxdir)
-  cmdline.append(sphinx_prefix_html)
-  print cmdline
   if hasattr(option, "log_prefix"):
     status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
   else:
     status = run(cmdline)
   if status != 0:
     raise RuntimeError, '** ERROR: "sphinx-build" did not work as expected.'
-  tmpfile.close()
-  os.unlink(tmpname)
 
   logging.debug('Finished running Sphinx.')
 
