@@ -320,16 +320,25 @@ def sphinx(option):
   overwrite_options['INPUT'] = option.source_dir
   overwrite_options['STRIP_FROM_PATH'] = option.source_dir
   overwrite_options['OUTPUT_DIRECTORY'] = sphinx_prefix
-
-  cmdline = ['sphinx-build','-c', option.sphinxdir]
-  cmdline.extend(['-D','version=%s' % option.version])
-  cmdline.extend(['-A','SRC_DIR=%s' % option.source_dir])
-
+  
+  # Look for sphinx-build executable
+  try:
+    cmdline = ['sphinx-build']
+  except OSError:
+    try:
+      py_version = '.'.join(str(n) for n in sys.version_info[0:2])
+      sphinx_bin = 'sphinx-build-' + py_version
+      cmdline = [sphinx_bin]
+    except OSError:
+      raise RuntimeError, '** ERROR: Not able to find "sphinx-build" executable.'
+  
+  cmdline.extend(['-c', option.sphinxdir])
+  # TODO: Parse version
+  cmdline.extend(['-D','version=\'%s\'' % option.version])
+  
   sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
-  print cmdline
   cmdline_html = cmdline[:]
   cmdline_html.extend(['-b', 'html', option.sphinxdir, sphinx_prefix_html])
-  print cmdline
   if not os.path.exists(sphinx_prefix_html): os.makedirs(sphinx_prefix_html)
   if hasattr(option, "log_prefix"):
     status = run(cmdline_html, option.save_output, option.log_prefix, cmdline_html[0])
