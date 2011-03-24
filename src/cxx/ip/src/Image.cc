@@ -1,5 +1,5 @@
 #include "ip/Image.h"
-#include "ip/Color.h"
+#include "ip/OldColor.h"
 #include "ip/vision.h"
 
 namespace Torch {

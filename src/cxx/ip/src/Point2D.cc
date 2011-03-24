@@ -1,7 +1,7 @@
 #include "ip/Point2D.h"
 #include "ip/Vector2D.h"
 #include "ip/Matrix2D.h"
-#include "ip/Color.h"
+#include "ip/OldColor.h"
 
 namespace Torch {
 

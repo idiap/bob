@@ -4,7 +4,7 @@
 #include "ip/RotationMatrix2D.h"
 #include "ip/Point2D.h"
 #include "ip/Image.h"
-#include "ip/Color.h"
+#include "ip/OldColor.h"
 #include "ip/xtprobeImageFile.h"
 #include "scanning/GTFile.h"
 

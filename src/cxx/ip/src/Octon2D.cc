@@ -1,5 +1,5 @@
 #include "ip/Octon2D.h"
-#include "ip/Color.h"
+#include "ip/OldColor.h"
 
 namespace Torch {
 

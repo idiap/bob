@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/ipcore.cc"
    "src/color.cc"
+   "src/oldcolor.cc"
    "src/image.cc"
    "src/lbp.cc"
    "src/filters.cc"
