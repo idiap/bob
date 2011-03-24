@@ -311,6 +311,123 @@ namespace Torch {
       }
     }
 
+    void fftshiftNoCheck( const int center,
+      const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B)
+    {
+      // Process source left
+      blitz::Range  A_d1(A.lbound(0), center-1+A.lbound(0)),
+                    B_d1(B.ubound(0)-center+1, B.ubound(0));
+      B(B_d1) = A(A_d1);
+      // Process source right
+      blitz::Range  A_d2(center+A.lbound(0), A.ubound(0)),
+                    B_d2(0, B.extent(0)-center-1);
+      B(B_d2) = A(A_d2);
+    }
+
+    void fftshift(const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B) 
+    {
+      // Check and reindex if required
+      if( B.base(0) != 0 ) {
+        const blitz::TinyVector<int,1> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) )
+        B.resize( A.extent(0) );
+
+      // Center location
+      int size_by_2 = A.extent(0)/2 + (A.extent(0) % 2);
+    
+      fftshiftNoCheck(size_by_2, A, B);
+    }
+
+    void ifftshift(const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B) 
+    {
+      // Check and reindex if required
+      if( B.base(0) != 0 ) {
+        const blitz::TinyVector<int,1> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) )
+        B.resize( A.extent(0) );
+
+      // Center location
+      int size_by_2 = A.extent(0)/2;
+    
+      fftshiftNoCheck(size_by_2, A, B);
+    }
+
+    void fftshiftNoCheck( const int centerY, const int centerX, 
+      const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B)
+    {
+      // Process source quadrant 1 (Top left)
+      blitz::Range  A_y1(A.lbound(0), centerY-1+A.lbound(0)),
+                    A_x1(A.lbound(1), centerX-1+A.lbound(1)),
+                    B_y1(B.ubound(0)-centerY+1, B.ubound(0)),
+                    B_x1(B.ubound(1)-centerX+1, B.ubound(1));
+      B(B_y1,B_x1) = A(A_y1,A_x1);
+      // Process source quadrant 3 (Bottom right)
+      blitz::Range  A_y3(centerY, A.ubound(0)),
+                    A_x3(centerX, A.ubound(1)),
+                    B_y3(0, B.extent(0)-centerY-1),
+                    B_x3(0, B.extent(1)-centerX-1);
+      B(B_y3,B_x3) = A(A_y3,A_x3);
+      // Process source quadrant 2 (Top right)
+      blitz::Range  A_y2(A.lbound(0), centerY-1+A.lbound(0)),
+                    A_x2(centerX, A.ubound(1)),
+                    B_y2(B.ubound(0)-centerY+1, B.ubound(0)),
+                    B_x2(0, B.extent(1)-centerX-1);
+      B(B_y2,B_x2) = A(A_y2,A_x2);
+      // Process source quadrant 4 (Bottom left)
+      blitz::Range  A_y4(centerY, A.ubound(0)),
+                    A_x4(A.lbound(1), centerX-1+A.lbound(1)),
+                    B_y4(0, B.extent(0)-centerY-1),
+                    B_x4(B.ubound(1)-centerX+1, B.ubound(1));
+      B(B_y4,B_x4) = A(A_y4,A_x4);
+    }
+
+    void fftshift(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B) 
+    {
+      // Check and reindex if required
+      if( B.base(0) != 0 || B.base(1) != 0 ) {
+        const blitz::TinyVector<int,2> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) || B.extent(1) != A.extent(1) )
+        B.resize( A.extent(0), A.extent(1) );
+
+      // Center location
+      int h_by_2 = A.extent(0)/2 + (A.extent(0) % 2);
+      int w_by_2 = A.extent(1)/2 + (A.extent(1) % 2); 
+    
+      fftshiftNoCheck(h_by_2, w_by_2, A, B);
+    }
+
+    void ifftshift(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B) 
+    {
+      // Check and reindex if required
+      if( B.base(0) != 0 || B.base(1) != 0 ) {
+        const blitz::TinyVector<int,2> zero_base = 0;
+        B.reindexSelf( zero_base );
+      }
+      // Check and resize dst if required
+      if( B.extent(0) != A.extent(0) || B.extent(1) != A.extent(1) )
+        B.resize( A.extent(0), A.extent(1) );
+
+      // Center location
+      int h_by_2 = A.extent(0)/2;
+      int w_by_2 = A.extent(1)/2; 
+
+      fftshiftNoCheck(h_by_2, w_by_2, A, B);
+    }
   }
 }
 

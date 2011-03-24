@@ -258,7 +258,7 @@ def documentation(option):
   if not os.path.exists(option.doc_prefix): os.makedirs(option.doc_prefix)
 
   doxygen(option)
-  #sphinx(option)
+  sphinx(option)
 
   logging.debug('Finished building documentation.')
 
@@ -320,23 +320,52 @@ def sphinx(option):
   overwrite_options['INPUT'] = option.source_dir
   overwrite_options['STRIP_FROM_PATH'] = option.source_dir
   overwrite_options['OUTPUT_DIRECTORY'] = sphinx_prefix
-
-  cmdline = ['sphinx-build']
-  #cmdline.append('-c %s' % option.sphinxconf)
+  
+  # Look for sphinx-build executable
+  #cmdline = ['sphinx-build']
+  try:
+    py_version = '.'.join(str(n) for n in sys.version_info[0:2])
+    sphinx_bin = 'sphinx-build-' + py_version
+    cmdline = [sphinx_bin]
+    fnull = open(os.devnull, 'w') 
+    p = subprocess.Popen(cmdline, stdin=None, stdout=fnull, stderr=fnull)
+    p.wait()
+    fnull.close()
+  except OSError:
+    try:
+      cmdline = ['sphinx-build']
+      fnull = open(os.devnull, 'w') 
+      p = subprocess.Popen(cmdline, stdin=None, stdout=fnull, stderr=fnull)
+      p.wait()
+      fnull.close()
+    except OSError:
+      raise RuntimeError, '** ERROR: Not able to find "sphinx-build" executable.'
+   
+  cmdline.extend(['-c', option.sphinxdir])
+  # TODO: Parse version
+  cmdline.extend(['-D','version=\'%s\'' % option.version])
+  
   sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
+  cmdline_html = cmdline[:]
+  cmdline_html.extend(['-b', 'html', option.sphinxdir, sphinx_prefix_html])
   if not os.path.exists(sphinx_prefix_html): os.makedirs(sphinx_prefix_html)
-  cmdline.append('-b html')
-  cmdline.append(option.sphinxdir)
-  cmdline.append(sphinx_prefix_html)
-  print cmdline
   if hasattr(option, "log_prefix"):
-    status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
+    status = run(cmdline_html, option.save_output, option.log_prefix)
   else:
-    status = run(cmdline)
+    status = run(cmdline_html)
   if status != 0:
-    raise RuntimeError, '** ERROR: "sphinx-build" did not work as expected.'
-  tmpfile.close()
-  os.unlink(tmpname)
+    raise RuntimeError, '** ERROR: "sphinx-build -b html" did not work as expected.'
+
+  sphinx_prefix_latex = os.path.join(sphinx_prefix, "latex")
+  cmdline_latex = cmdline[:]
+  cmdline_latex.extend(['-b', 'latex', option.sphinxdir, sphinx_prefix_latex])
+  if not os.path.exists(sphinx_prefix_latex): os.makedirs(sphinx_prefix_latex)
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline_latex, option.save_output, option.log_prefix)
+  else:
+    status = run(cmdline_latex)
+  if status != 0:
+    raise RuntimeError, '** ERROR: "sphinx-build -b html" did not work as expected.'
 
   logging.debug('Finished running Sphinx.')
 

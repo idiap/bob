@@ -31,10 +31,12 @@ namespace Torch {
       template<typename T>
       void copyNoCheck(const blitz::Array<T,2>& src, 
         blitz::Array<T,2>& dst)
-      { 
-        for( int y=0; y<dst.extent(0); ++y)
-          for( int x=0; x<dst.extent(1); ++x)
-            dst(y,x) = src( y+src.lbound(0), x+src.lbound(1) );
+      {
+        blitz::Range  src_y( src.lbound(0), src.ubound(0) ),
+                      src_x( src.lbound(1), src.ubound(1) ), 
+                      dst_y( dst.lbound(0), dst.ubound(0) ),
+                      dst_x( dst.lbound(1), dst.ubound(1) );
+        dst(dst_y,dst_x) = src(src_y,src_x);
       }
 
       /**
@@ -47,11 +49,13 @@ namespace Torch {
       void copyNoCheck(const blitz::Array<T,3>& src, 
         blitz::Array<T,3>& dst)
       { 
-        for( int p=0; p<dst.extent(0); ++p)
-          for( int y=0; y<dst.extent(1); ++y)
-            for( int x=0; x<dst.extent(2); ++x)
-              dst(p,y,x) = src( p+src.lbound(0), y+src.lbound(1), 
-                x+src.lbound(2) );
+        blitz::Range  src_p( src.lbound(0), src.ubound(0) ),
+                      src_y( src.lbound(1), src.ubound(1) ),
+                      src_x( src.lbound(2), src.ubound(2) ), 
+                      dst_p( dst.lbound(0), dst.ubound(0) ),
+                      dst_y( dst.lbound(1), dst.ubound(1) ),
+                      dst_x( dst.lbound(2), dst.ubound(2) );
+        dst(dst_p,dst_y,dst_x) = src(src_p,src_y,src_x);
       }
     }
 

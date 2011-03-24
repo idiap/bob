@@ -43,6 +43,39 @@ namespace Torch {
     void ifft(const blitz::Array<std::complex<double>,2>& A,
       blitz::Array<std::complex<double>,2>& B);
 
+
+    /**
+     * @brief Rearrange the output of the fft by moving the zero-frequency 
+     * component to the center of the 1D blitz array. 
+     */
+    void fftshift(const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B);
+
+    /**
+     * @brief Swap the two halves of the 1D blitz array wrt. to its center
+     * ifftshift reverts the result of fftshift, which is important for 
+     * dimensions of odd size.
+     */
+    void ifftshift(const blitz::Array<std::complex<double>,1>& A,
+      blitz::Array<std::complex<double>,1>& B);
+
+    /**
+     * @brief Rearrange the output of the fft by moving the zero-frequency 
+     * component to the center of the 2D blitz array. Therefore, it swaps 
+     * the first quadrant with the third and the second quadrant with the 
+     * fourth.
+     */
+    void fftshift(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B);
+
+    /**
+     * @brief Swap the first quadrant with the third and the second quadrant 
+     * with the fourth. ifftshift reverts the result of fftshift, which is 
+     * important for dimensions of odd size.
+     */
+    void ifftshift(const blitz::Array<std::complex<double>,2>& A,
+      blitz::Array<std::complex<double>,2>& B);
+
   }
 /**
  * @}
