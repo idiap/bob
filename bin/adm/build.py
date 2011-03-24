@@ -322,16 +322,25 @@ def sphinx(option):
   overwrite_options['OUTPUT_DIRECTORY'] = sphinx_prefix
   
   # Look for sphinx-build executable
+  #cmdline = ['sphinx-build']
   try:
-    cmdline = ['sphinx-build']
+    py_version = '.'.join(str(n) for n in sys.version_info[0:2])
+    sphinx_bin = 'sphinx-build-' + py_version
+    cmdline = [sphinx_bin]
+    fnull = open(os.devnull, 'w') 
+    p = subprocess.Popen(cmdline, stdin=None, stdout=fnull, stderr=fnull)
+    p.wait()
+    fnull.close()
   except OSError:
     try:
-      py_version = '.'.join(str(n) for n in sys.version_info[0:2])
-      sphinx_bin = 'sphinx-build-' + py_version
-      cmdline = [sphinx_bin]
+      cmdline = ['sphinx-build']
+      fnull = open(os.devnull, 'w') 
+      p = subprocess.Popen(cmdline, stdin=None, stdout=fnull, stderr=fnull)
+      p.wait()
+      fnull.close()
     except OSError:
       raise RuntimeError, '** ERROR: Not able to find "sphinx-build" executable.'
-  
+   
   cmdline.extend(['-c', option.sphinxdir])
   # TODO: Parse version
   cmdline.extend(['-D','version=\'%s\'' % option.version])
@@ -341,7 +350,7 @@ def sphinx(option):
   cmdline_html.extend(['-b', 'html', option.sphinxdir, sphinx_prefix_html])
   if not os.path.exists(sphinx_prefix_html): os.makedirs(sphinx_prefix_html)
   if hasattr(option, "log_prefix"):
-    status = run(cmdline_html, option.save_output, option.log_prefix, cmdline_html[0])
+    status = run(cmdline_html, option.save_output, option.log_prefix)
   else:
     status = run(cmdline_html)
   if status != 0:
@@ -352,7 +361,7 @@ def sphinx(option):
   cmdline_latex.extend(['-b', 'latex', option.sphinxdir, sphinx_prefix_latex])
   if not os.path.exists(sphinx_prefix_latex): os.makedirs(sphinx_prefix_latex)
   if hasattr(option, "log_prefix"):
-    status = run(cmdline_latex, option.save_output, option.log_prefix, cmdline_latex[0])
+    status = run(cmdline_latex, option.save_output, option.log_prefix)
   else:
     status = run(cmdline_latex)
   if status != 0:
