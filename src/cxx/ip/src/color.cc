@@ -276,7 +276,7 @@ template <> void ip::hsl_to_rgb_one (float h, float s, float l,
   float C = s*(1-fabsf(2*l - 1)); //Chroma (0-255)
   const float v = (2*l + C)/2; //Value (0-255)
   
-  if(!s) { // achromatic (gray)
+  if(v == 0.f) { // achromatic (gray)
 		r = g = b = round(v); //Value
 		return;
 	}
