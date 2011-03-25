@@ -347,7 +347,7 @@ def sphinx(option):
   
   sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
   cmdline_html = cmdline[:]
-  cmdline_html.extend(['-b', 'html', option.sphinxdir, sphinx_prefix_html])
+  cmdline_html.extend(['-b', 'html', option.source_dir, sphinx_prefix_html])
   if not os.path.exists(sphinx_prefix_html): os.makedirs(sphinx_prefix_html)
   if hasattr(option, "log_prefix"):
     status = run(cmdline_html, option.save_output, option.log_prefix)
@@ -358,7 +358,7 @@ def sphinx(option):
 
   sphinx_prefix_latex = os.path.join(sphinx_prefix, "latex")
   cmdline_latex = cmdline[:]
-  cmdline_latex.extend(['-b', 'latex', option.sphinxdir, sphinx_prefix_latex])
+  cmdline_latex.extend(['-b', 'latex', option.source_dir, sphinx_prefix_latex])
   if not os.path.exists(sphinx_prefix_latex): os.makedirs(sphinx_prefix_latex)
   if hasattr(option, "log_prefix"):
     status = run(cmdline_latex, option.save_output, option.log_prefix)
