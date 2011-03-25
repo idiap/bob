@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include <limits>
 #include <boost/format.hpp>
 #include "ip/color.h"
 
@@ -51,11 +52,21 @@ const char* ip::UnsupportedRowExtent::what() const throw() {
 }
 
 /**
- * This method will round and cast to uint8_t a single float value, using the
+ * This method will scale and cast to integer a single float value, using the
  * standard library
  */
-static inline uint8_t round (float value) {
-  return static_cast<uint8_t>(rintf(value));
+template <typename T>
+static inline T scale (float value) {
+  return static_cast<T>(rintf(std::numeric_limits<T>::max()*value));
+}
+
+/**
+ * This method will scale and cast to float a single integer value, using the
+ * standard library
+ */
+template <typename T>
+static inline float normalize (T value) {
+  return static_cast<float>(value)/static_cast<float>(std::numeric_limits<T>::max());
 }
 
 /**
@@ -84,18 +95,25 @@ static T tmin (T c1, T c2, T c3) {
   return c3;
 }
 
+/**
+ * This method clamps the float value between 0 and 1
+ */
+static float clamp (float f) {
+  return (f<0)? 0.f : (f>1)? 1.f: f;
+}
+
 template <> void ip::rgb_to_hsv_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& h, uint8_t& s, uint8_t& v) {
   float H, S, V;
-  rgb_to_hsv_one(r/255.f, g/255.f, b/255.f, H, S, V);
-  h = round(255*H); s = round(255*S); v = round(255*V);
+  rgb_to_hsv_one(normalize(r), normalize(g), normalize(b), H, S, V);
+  h = scale<uint8_t>(H); s = scale<uint8_t>(S); v = scale<uint8_t>(V);
 }
 
 template <> void ip::rgb_to_hsv_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& h, uint16_t& s, uint16_t& v) {
   float H, S, V;
-  rgb_to_hsv_one(r/65535.f, g/65535.f, b/65535.f, H, S, V);
-  h = round(65535*H); s = round(65535*S); v = round(65535*V);
+  rgb_to_hsv_one(normalize(r), normalize(g), normalize(b), H, S, V);
+  h = scale<uint16_t>(H); s = scale<uint16_t>(S); v = scale<uint16_t>(V);
 }
 
 template <> void ip::rgb_to_hsv_one (float r, float g, float b,
@@ -129,25 +147,25 @@ template <> void ip::rgb_to_hsv_one (float r, float g, float b,
   C *= 6;
   if (v == r) {
     //When V == Red, we need to be careful because the Hue will wrap
-    if (g >= b) h = (g - b)/C; //first sextant
-    else h = 1 - ((b - g)/C); //sextant 6
+    if (g >= b) h = clamp((g - b)/C); //first sextant
+    else h = clamp(1 - ((b - g)/C)); //sextant 6
   }
-  else if (v == g) h = 1.0f/3 + (b - r)/C; //sextants 2/3
-  else h = 2.0f/3 + (r - g)/C; //sextants 4/5
+  else if (v == g) h = clamp(1.0f/3 + (b - r)/C); //sextants 2/3
+  else h = clamp(2.0f/3 + (r - g)/C); //sextants 4/5
 }
 
 template <> void ip::hsv_to_rgb_one (uint8_t h, uint8_t s, uint8_t v,
     uint8_t& r, uint8_t& g, uint8_t& b) {
   float R, G, B;
-  hsv_to_rgb_one(h/255.f, s/255.f, v/255.f, R, G, B);
-  r = round(255*R); g = round(255*G); b = round(255*B);
+  hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
+  r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
 template <> void ip::hsv_to_rgb_one (uint16_t h, uint16_t s, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   float R, G, B;
-  hsv_to_rgb_one(h/65535.f, s/65535.f, v/65535.f, R, G, B);
-  r = round(65535*R); g = round(65535*G); b = round(65535*B);
+  hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
+  r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
 	
 template <> void ip::hsv_to_rgb_one (float h, float s, float v,
@@ -168,34 +186,34 @@ template <> void ip::hsv_to_rgb_one (float h, float s, float v,
 
 	switch(sextant) {
 		case 0: //Hue is between red and yellow (red + green)
-			r = v;
-			g = X;
-			b = m;
+			r = clamp(v);
+			g = clamp(X);
+			b = clamp(m);
 			break;
 		case 1: //Hue is between yellow (red + green) and green
-			r = X;
-			g = v;
-			b = m;
+			r = clamp(X);
+			g = clamp(v);
+			b = clamp(m);
 			break;
 		case 2: //Hue is between green and cyan (green + blue)
-			r = m;
-			g = v;
-			b = X;
+			r = clamp(m);
+			g = clamp(v);
+			b = clamp(X);
 			break;
 		case 3: //Hue is between cyan (green + blue) and blue
-			r = m;
-			g = X;
-			b = v;
+			r = clamp(m);
+			g = clamp(X);
+			b = clamp(v);
 			break;
 		case 4: //Hue is between blue and magenta (blue + red)
-			r = X;
-			g = m;
-			b = v;
+			r = clamp(X);
+			g = clamp(m);
+			b = clamp(v);
 			break;
 		default: //Hue is between magenta (blue + red) and red
-			r = v;
-			g = m;
-			b = X;
+			r = clamp(v);
+			g = clamp(m);
+			b = clamp(X);
 			break;
 	}
 }
@@ -203,15 +221,15 @@ template <> void ip::hsv_to_rgb_one (float h, float s, float v,
 template <> void ip::rgb_to_hsl_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& h, uint8_t& s, uint8_t& l) {
   float H, S, L;
-  rgb_to_hsl_one(r/255.f, g/255.f, b/255.f, H, S, L);
-  h = round(255*H); s = round(255*S); l = round(255*L);
+  rgb_to_hsl_one(normalize(r), normalize(g), normalize(b), H, S, L);
+  h = scale<uint8_t>(H); s = scale<uint8_t>(S); l = scale<uint8_t>(L);
 }
 
 template <> void ip::rgb_to_hsl_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& h, uint16_t& s, uint16_t& l) {
   float H, S, L;
-  rgb_to_hsl_one(r/65535.f, g/65535.f, b/65535.f, H, S, L);
-  h = round(65535*H); s = round(65535*S); l = round(65535*L);
+  rgb_to_hsl_one(normalize(r), normalize(g), normalize(b), H, S, L);
+  h = scale<uint16_t>(H); s = scale<uint16_t>(S); l = scale<uint16_t>(L);
 }
 
 template <> void ip::rgb_to_hsl_one (float r, float g, float b,
@@ -228,9 +246,9 @@ template <> void ip::rgb_to_hsl_one (float r, float g, float b,
   }
 
   //computing the saturation based on the lightness:
-  //S = 255 * C / (1 - |2*L -1|)
+  //S = C / (1 - |2*L -1|)
   float C = M - m; //chroma
-  s = C / (1-fabsf(2*l - 1));
+  s = clamp(C / (1-fabsf(2*l - 1)));
 
   //if the Saturation value is zero, set Hue to zero and return
   if (s == 0) {
@@ -249,35 +267,35 @@ template <> void ip::rgb_to_hsl_one (float r, float g, float b,
   C *= 6;
   if (M == r) {
     //When V == Red, we need to be careful because the Hue will wrap
-    if (g >= b) h = (g - b)/C; //first sextant
-    else h = 1 - ((b - g)/C); //sextant 6
+    if (g >= b) h = clamp((g - b)/C); //first sextant
+    else h = clamp(1 - ((b - g)/C)); //sextant 6
   }
-  else if (M == g) h = 1.0f/3 + (b - r)/C; //sextants 2/3
-  else h = 2.0f/3 + (r - g)/C; //sextants 4/5
+  else if (M == g) h = clamp(1.0f/3 + (b - r)/C); //sextants 2/3
+  else h = clamp(2.0f/3 + (r - g)/C); //sextants 4/5
 }
 
 template <> void ip::hsl_to_rgb_one (uint8_t h, uint8_t s, uint8_t l,
     uint8_t& r, uint8_t& g, uint8_t& b) {
   float R, G, B;
-  hsl_to_rgb_one(h/255.f, s/255.f, l/255.f, R, G, B);
-  r = round(255*R); g = round(255*G); b = round(255*B);
+  hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
+  r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
 template <> void ip::hsl_to_rgb_one (uint16_t h, uint16_t s, uint16_t l,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   float R, G, B;
-  hsl_to_rgb_one(h/65535.f, s/65535.f, l/65535.f, R, G, B);
-  r = round(65535*R); g = round(65535*G); b = round(65535*B);
+  hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
+  r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
 	
 template <> void ip::hsl_to_rgb_one (float h, float s, float l,
     float& r, float& g, float& b) {
   
-  float C = s*(1-fabsf(2*l - 1)); //Chroma (0-255)
-  const float v = (2*l + C)/2; //Value (0-255)
+  float C = s*(1-fabsf(2*l - 1)); //Chroma [0,1]
+  const float v = (2*l + C)/2; //Value [0,1]
   
   if(v == 0.f) { // achromatic (gray)
-		r = g = b = round(v); //Value
+		r = g = b = v; //Value
 		return;
 	}
 
@@ -290,34 +308,34 @@ template <> void ip::hsl_to_rgb_one (float h, float s, float l,
 
 	switch(sextant) {
 		case 0: //Hue is between red and yellow (red + green)
-			r = v;
-			g = X;
-			b = m;
+			r = clamp(v);
+			g = clamp(X);
+			b = clamp(m);
 			break;
 		case 1: //Hue is between yellow (red + green) and green
-			r = X;
-			g = v;
-			b = m;
+			r = clamp(X);
+			g = clamp(v);
+			b = clamp(m);
 			break;
 		case 2: //Hue is between green and cyan (green + blue)
-			r = m;
-			g = v;
-			b = X;
+			r = clamp(m);
+			g = clamp(v);
+			b = clamp(X);
 			break;
 		case 3: //Hue is between cyan (green + blue) and blue
-			r = m;
-			g = X;
-			b = v;
+			r = clamp(m);
+			g = clamp(X);
+			b = clamp(v);
 			break;
 		case 4: //Hue is between blue and magenta (blue + red)
-			r = X;
-			g = m;
-			b = v;
+			r = clamp(X);
+			g = clamp(m);
+			b = clamp(v);
 			break;
 		default: //Hue is between magenta (blue + red) and red
-			r = v;
-			g = m;
-			b = X;
+			r = clamp(v);
+			g = clamp(m);
+			b = clamp(X);
 			break;
 	}
 }
@@ -325,15 +343,15 @@ template <> void ip::hsl_to_rgb_one (float h, float s, float l,
 template <> void ip::rgb_to_yuv_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& y, uint8_t& u, uint8_t& v) {
   float Y, U, V;
-  rgb_to_yuv_one(r/255.f, g/255.f, b/255.f, Y, U, V);
-  y = round(255*Y); u = round(255*U); v = round(255*V);
+  rgb_to_yuv_one(normalize(r), normalize(g), normalize(b), Y, U, V);
+  y = scale<uint8_t>(Y); u = scale<uint8_t>(U); v = scale<uint8_t>(V);
 }
 
 template <> void ip::rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& y, uint16_t& u, uint16_t& v) {
   float Y, U, V;
-  rgb_to_yuv_one(r/65535.f, g/65535.f, b/65535.f, Y, U, V);
-  y = round(65535*Y); u = round(65535*U); v = round(65535*V);
+  rgb_to_yuv_one(normalize(r), normalize(g), normalize(b), Y, U, V);
+  y = scale<uint16_t>(Y); u = scale<uint16_t>(U); v = scale<uint16_t>(V);
 }
 
 /**
@@ -342,22 +360,22 @@ template <> void ip::rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
 template <> void ip::rgb_to_yuv_one (float r, float g, float b,
     float& y, float& u, float& v) {
   ip::rgb_to_gray_one(r, g, b, y); //Y'
-  u = 128 - 0.168736f*r - 0.331264f*g + 0.5f*b; //Cb
-  v = 128 + 0.5f*r - 0.418688f*g - 0.081312f*b; //Cr
+  u = clamp(0.5f - 0.168736f*r - 0.331264f*g + 0.5f*b); //Cb [0, 1]
+  v = clamp(0.5f + 0.5f*r - 0.418688f*g - 0.081312*b); //Cr [0, 1]
 }
 
 template <> void ip::yuv_to_rgb_one (uint8_t y, uint8_t u, uint8_t v,
     uint8_t& r, uint8_t& g, uint8_t& b) {
   float R, G, B;
-  yuv_to_rgb_one(y/255.f, u/255.f, v/255.f, R, G, B);
-  r = round(255*R); g = round(255*G); b = round(255*B);
+  yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
+  r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
 template <> void ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
   float R, G, B;
-  yuv_to_rgb_one(y/65535.f, u/65535.f, v/65535.f, R, G, B);
-  r = round(65535*R); g = round(65535*G); b = round(65535*B);
+  yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
+  r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
 	
 /**
@@ -365,23 +383,23 @@ template <> void ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
  */
 template <> void ip::yuv_to_rgb_one (float y, float u, float v,
     float& r, float& g, float& b) {
-  r = y + 1.40199959f*(v-128);
-  b = y + 1.772000066f*(u-128);
-  g =  - 0.71413616f*(v-128);
+  r = clamp(y + 1.40199959f*(v-0.5f));
+  b = clamp(y + 1.772000066f*(u-0.5f));
+  g = clamp(y - 0.344135678f*(u-0.5f) - 0.714136156f*(v-0.5f));
 }
 
 template <> void ip::rgb_to_gray_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& y) {
   float Y;
-  rgb_to_gray_one(r/255.f, g/255.f, b/255.f, Y);
-  y = round(255.f*Y);
+  rgb_to_gray_one(normalize(r), normalize(g), normalize(b), Y);
+  y = scale<uint8_t>(Y);
 }
 
 template <> void ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& y) {
   float Y;
-  rgb_to_gray_one(r/65535.f, g/65535.f, b/65535.f, Y);
-  y = round(65535.f*Y);
+  rgb_to_gray_one(normalize(r), normalize(g), normalize(b), Y);
+  y = scale<uint16_t>(Y);
 }
 
 /**
@@ -389,5 +407,5 @@ template <> void ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
  */
 template <> void ip::rgb_to_gray_one (float r, float g, float b, 
     float& gray) {
-  gray = 0.299f*r + 0.587f*g + 0.114f*b;
+  gray = clamp(0.299f*r + 0.587f*g + 0.114f*b);
 }

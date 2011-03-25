@@ -196,9 +196,9 @@ namespace Torch { namespace ip {
   /** ------------------- **/
 
   /**
-   * Converts a RGB color-coded pixel to YUV (Y'CbCr) using the CCIR 601 as
-   * discussed here: http://en.wikipedia.org/wiki/YCbCr and here:
-   * http://www.fourcc.org/fccyvrgb.php
+   * Converts a RGB color-coded pixel to YUV (Y'CbCr) using the CCIR 601 (Kb =
+   * 0.114, Kr = 0.299) as discussed here: http://en.wikipedia.org/wiki/YCbCr
+   * and here: http://www.fourcc.org/fccyvrgb.php
    *
    * @warn: This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
@@ -208,36 +208,47 @@ namespace Torch { namespace ip {
   }
 
   /**
-   * Converts a RGB color-coded pixel (3-bands each with 256 levels of gray)
-   * to YUV (Y'CbCr) using the CCIR 601 norm as discussed here: 
-   * http://en.wikipedia.org/wiki/YCbCr and here:
+   * Converts a RGB color-coded pixel (3-bands each with 256 levels of gray) to
+   * YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed
+   * here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
+   *
+   * @warn: This implementation returns U and V values varying from 0 to the
+   * maximum range for mapping norm ranges [-0.5, 0.5] into unsigned integer
+   * values.
    */
   template <> void rgb_to_yuv_one (uint8_t r, uint8_t g, uint8_t b,
       uint8_t& y, uint8_t& u, uint8_t& v);
 
   /**
    * Converts a RGB color-coded pixel (3-bands each with 65535 levels of gray)
-   * to YUV (Y'CbCr) using the CCIR 601 norm as discussed here: 
-   * http://en.wikipedia.org/wiki/YCbCr and here:
+   * to YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as
+   * discussed here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
+   *
+   * @warn: This implementation returns U and V values varying from 0 to the
+   * maximum range for mapping norm ranges [-0.5, 0.5] into unsigned integer
+   * values.
    */
   template <> void rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
       uint16_t& y, uint16_t& u, uint16_t& v);
 
   /**
-   * Converts a RGB color-coded pixel (3-bands of floats between 0 and 1)
-   * to YUV (Y'CbCr) using the CCIR 601 norm as discussed here: 
-   * http://en.wikipedia.org/wiki/YCbCr and here:
+   * Converts a RGB color-coded pixel (3-bands of floats between 0 and 1) to
+   * YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed
+   * here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
+   *
+   * @warn: This implementation returns U and V values varying from 0 to 1
+   * for mapping norm ranges [-0.5, 0.5] into a more standard setting.
    */
   template <> void rgb_to_yuv_one (float r, float g, float b,
       float& y, float& u, float& v);
 
   /**
-   * Converts a YUV (Y'CbCr) color-coded pixel using the CCIR 601 to RGB as
-   * discussed here: http://en.wikipedia.org/wiki/YCbCr and here:
-   * http://www.fourcc.org/fccyvrgb.php
+   * Converts a YUV (Y'CbCr) color-coded pixel using the CCIR 601 (Kb = 0.114,
+   * Kr = 0.299) to RGB as discussed here: http://en.wikipedia.org/wiki/YCbCr
+   * and here: http://www.fourcc.org/fccyvrgb.php
    *
    * @warn: This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
@@ -248,8 +259,8 @@ namespace Torch { namespace ip {
   
   /**
    * Converts a YUV (Y'CbCr) color-coded pixel (3-bands each with 256 levels of
-   * gray) using the CCIR 601 to RGB as discussed here:
-   * http://en.wikipedia.org/wiki/YCbCr and here:
+   * gray) using the CCIR 601 (Kb = 0.114, Kr = 0.299) to RGB as discussed
+   * here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
    */
   template <> void yuv_to_rgb_one (uint8_t y, uint8_t u, uint8_t v,
@@ -257,8 +268,8 @@ namespace Torch { namespace ip {
 
   /**
    * Converts a YUV (Y'CbCr) color-coded pixel (3-bands each with 65535 levels
-   * of gray) using the CCIR 601 to RGB as discussed here:
-   * http://en.wikipedia.org/wiki/YCbCr and here:
+   * of gray) using the CCIR 601 (Kb = 0.114, Kr = 0.299) to RGB as discussed
+   * here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
    */
   template <> void yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
@@ -266,7 +277,7 @@ namespace Torch { namespace ip {
 
   /**
    * Converts a YUV (Y'CbCr) color-coded pixel (3-bands of floats between 0 and
-   * 1) using the CCIR 601 to RGB as discussed here:
+   * 1) using the CCIR 601 (Kb = 0.114, Kr = 0.299) to RGB as discussed here:
    * http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
    */
@@ -278,8 +289,8 @@ namespace Torch { namespace ip {
   /** ------------------------- **/
 
   /**
-   * Converts a RGB color-coded pixel to grayscale using the CCIR 601 "Y'"
-   * (luma) component conversion.
+   * Converts a RGB color-coded pixel to grayscale using the CCIR 601 (Kb =
+   * 0.114, Kr = 0.299) "Y'" (luma) component conversion.
    *
    * @warn: This method is just an API definition. Look for the type-specific
    * implementations in this file to understand supported types.
@@ -290,22 +301,22 @@ namespace Torch { namespace ip {
   
   /**
    * Converts a RGB color-coded pixel (256 levels of gray) to grayscale using
-   * the CCIR 601 "Y'" (luma) component conversion as discussed here:
-   * http://www.fourcc.org/fccyvrgb.php
+   * the CCIR 601 (Kb = 0.114, Kr = 0.299) "Y'" (luma) component conversion as
+   * discussed here: http://www.fourcc.org/fccyvrgb.php
    */
   template <> void rgb_to_gray_one (uint8_t r, uint8_t g, uint8_t b, uint8_t& gray);
 
   /**
    * Converts a RGB color-coded pixel (65535 levels of gray) to grayscale using
-   * the CCIR 601 "Y'" (luma) component conversion as discussed here:
-   * http://www.fourcc.org/fccyvrgb.php
+   * the CCIR 601 (Kb = 0.114, Kr = 0.299) "Y'" (luma) component conversion as
+   * discussed here: http://www.fourcc.org/fccyvrgb.php
    */
   template <> void rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b, uint16_t& gray);
 
   /**
    * Converts a RGB color-coded pixel (each band as a float between 0 and 1) to
-   * grayscale using the CCIR 601 "Y'" (luma) component conversion as discussed
-   * here: http://www.fourcc.org/fccyvrgb.php
+   * grayscale using the CCIR 601 (Kb = 0.114, Kr = 0.299) "Y'" (luma)
+   * component conversion as discussed here: http://www.fourcc.org/fccyvrgb.php
    */
   template <> void rgb_to_gray_one (float r, float g, float b, float& gray);
 
