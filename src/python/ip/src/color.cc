@@ -12,113 +12,97 @@
 using namespace boost::python;
 namespace ip = Torch::ip;
 
-template <typename T>
-static tuple rgb_to_hsv_one_python(T r, T g, T b) {
+template <typename T> tuple rgb_to_hsv_one_python(T r, T g, T b) {
   T h, s, v;
   ip::rgb_to_hsv_one(r, g, b, h, s, v);
   return make_tuple(h, s, v);
 }
 
-template <>
-static tuple rgb_to_hsv_one_python(uint8_t r, uint8_t g, uint8_t b) {
+template <> tuple rgb_to_hsv_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t h, s, v;
   ip::rgb_to_hsv_one(r, g, b, h, s, v);
   return make_tuple((uint32_t)h, (uint32_t)s, (uint32_t)v);
 }
 
-template <typename T>
-static tuple hsv_to_rgb_one_python(T h, T s, T v) {
+template <typename T> tuple hsv_to_rgb_one_python(T h, T s, T v) {
   T r, g, b;
   ip::hsv_to_rgb_one(h, s, v, r, g, b);
   return make_tuple(r, g, b);
 }
 
-template <>
-static tuple hsv_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t v) {
+template <> tuple hsv_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t v) {
   uint8_t r, g, b;
   ip::hsv_to_rgb_one(h, s, v, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
 }
 
-template <typename T>
-static tuple rgb_to_hsl_one_python(T r, T g, T b) {
+template <typename T> tuple rgb_to_hsl_one_python(T r, T g, T b) {
   T h, s, l;
   ip::rgb_to_hsl_one(r, g, b, h, s, l);
   return make_tuple(h, s, l);
 }
 
-template <>
-static tuple rgb_to_hsl_one_python(uint8_t r, uint8_t g, uint8_t b) {
+template <> tuple rgb_to_hsl_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t h, s, l;
   ip::rgb_to_hsl_one(r, g, b, h, s, l);
   return make_tuple((uint32_t)h, (uint32_t)s, (uint32_t)l);
 }
 
-template <typename T>
-static tuple hsl_to_rgb_one_python(T h, T s, T l) {
+template <typename T> tuple hsl_to_rgb_one_python(T h, T s, T l) {
   T r, g, b;
   ip::hsl_to_rgb_one(h, s, l, r, g, b);
   return make_tuple(r, g, b);
 }
 
-template <>
-static tuple hsl_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t l) {
+template <> tuple hsl_to_rgb_one_python(uint8_t h, uint8_t s, uint8_t l) {
   uint8_t r, g, b;
   ip::hsl_to_rgb_one(h, s, l, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
 }
 
-template <typename T>
-static tuple rgb_to_yuv_one_python(T r, T g, T b) {
+template <typename T> tuple rgb_to_yuv_one_python(T r, T g, T b) {
   T y, u, v;
   ip::rgb_to_yuv_one(r, g, b, y, u, v);
   return make_tuple(y, u, v);
 }
 
-template <>
-static tuple rgb_to_yuv_one_python(uint8_t r, uint8_t g, uint8_t b) {
+template <> tuple rgb_to_yuv_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t y, u, v;
   ip::rgb_to_yuv_one(r, g, b, y, u, v);
   return make_tuple((uint32_t)y, (uint32_t)u, (uint32_t)v);
 }
 
-template <typename T>
-static tuple yuv_to_rgb_one_python(T y, T u, T v) {
+template <typename T> tuple yuv_to_rgb_one_python(T y, T u, T v) {
   T r, g, b;
   ip::yuv_to_rgb_one(y, u, v, r, g, b);
   return make_tuple(r, g, b);
 }
 
-template <>
-static tuple yuv_to_rgb_one_python(uint8_t y, uint8_t u, uint8_t v) {
+template <> tuple yuv_to_rgb_one_python(uint8_t y, uint8_t u, uint8_t v) {
   uint8_t r, g, b;
   ip::yuv_to_rgb_one(y, u, v, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
 }
 
-template <typename T>
-static object rgb_to_gray_one_python(T r, T g, T b) {
+template <typename T> object rgb_to_gray_one_python(T r, T g, T b) {
   T y;
   ip::rgb_to_gray_one(r, g, b, y);
   return object(y);
 }
 
-template <>
-static object rgb_to_gray_one_python(uint8_t r, uint8_t g, uint8_t b) {
+template <> object rgb_to_gray_one_python(uint8_t r, uint8_t g, uint8_t b) {
   uint8_t y;
   ip::rgb_to_gray_one(r, g, b, y);
   return object((uint32_t)y);
 }
 
-template <typename T>
-static tuple gray_to_rgb_one_python(T y) {
+template <typename T> tuple gray_to_rgb_one_python(T y) {
   T r, g, b;
   ip::gray_to_rgb_one(y, r, g, b);
   return make_tuple(r, g, b);
 }
 
-template <>
-static tuple gray_to_rgb_one_python(uint8_t y) {
+template <> tuple gray_to_rgb_one_python(uint8_t y) {
   uint8_t r, g, b;
   ip::gray_to_rgb_one(y, r, g, b);
   return make_tuple((uint32_t)r, (uint32_t)g, (uint32_t)b);
