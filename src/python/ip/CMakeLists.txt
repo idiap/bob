@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/ipcore.cc"
    "src/color.cc"
+   "src/oldcolor.cc"
    "src/image.cc"
    "src/lbp.cc"
    "src/filters.cc"
@@ -32,3 +33,5 @@ torch_python_add_test(python-ip-filter-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters.py)
 torch_python_add_test(python-ip-test-optflow
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_flow.py)
+torch_python_add_test(python-ip-test-color
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_color.py)

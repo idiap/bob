@@ -1,6 +1,6 @@
 #include "ip/Rectangle2D.h"
 #include "ip/Matrix2D.h"
-#include "ip/Color.h"
+#include "ip/OldColor.h"
 
 namespace Torch {
 

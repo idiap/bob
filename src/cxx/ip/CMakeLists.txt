@@ -9,7 +9,8 @@ set(shared "${JPEG_LIBRARIES};${ffmpeg_LIBRARIES}")
 set(src_ip
    "src/ipCore.cc"
    "src/vision.cc"
-   "src/Color.cc"
+   "src/OldColor.cc"
+   "src/color.cc"
    "src/Complex.cc"
    "src/Convert.cc"
    "src/Image.cc"

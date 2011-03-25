@@ -21,6 +21,7 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_bindings(database "${pysrc}" "database" "")
+add_dependencies(pytorch_database core-array-python_header_install)
 torch_python_install(database)
 
 # Installs all python scripts

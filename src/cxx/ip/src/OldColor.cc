@@ -1,4 +1,4 @@
-#include "ip/Color.h"
+#include "ip/OldColor.h"
 
 namespace Torch {
 

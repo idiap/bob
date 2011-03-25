@@ -12,7 +12,7 @@
 #include "core/Object.h"
 #include "core/Tensor.h"
 #include "ip/vision.h"
-#include "ip/Color.h"
+#include "ip/OldColor.h"
 #include "ip/Image.h"
 #include "ip/ImageFile.h"
 #include "ip/xtprobeImageFile.h"
