@@ -15,6 +15,7 @@ set(pysrc
    "src/pathlist.cc"
    "src/transcode.cc"
    "src/datetime.cc"
+   "src/video.cc"
    "src/main.cc"
    )
  

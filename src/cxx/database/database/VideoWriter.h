@@ -28,7 +28,9 @@ namespace Torch { namespace database {
     public:
     
       /**
-       * Default constructor
+       * Default constructor, creates a new output file given the input
+       * parameters. The codec to be used will be derived from the filename
+       * extension.
        *
        * @param filename The name of the file that will contain the video
        * output. If it exists, it will be truncated.
@@ -65,12 +67,12 @@ namespace Torch { namespace database {
       /**
        * Returns the target bitrate for this encoding
        */
-      inline float bitrate() const { return m_bitrate; }
+      inline float bitRate() const { return m_bitrate; }
 
       /**
        * Returns the frame rate to be set in the header
        */
-      inline float framerate() const { return m_framerate; }
+      inline float frameRate() const { return m_framerate; }
 
       /**
        * Returns the group of pictures around key frames

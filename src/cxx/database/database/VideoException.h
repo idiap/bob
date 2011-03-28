@@ -28,23 +28,6 @@ namespace Torch { namespace database {
       mutable std::string m_message;
   };
 
-  /**
-   * Unsupported operation is thrown when you open a video for writing and try
-   * to read something from it or vice-versa.
-   */
-  class UnsupportedOperation: public database::Exception {
-    public:
-      UnsupportedOperation(const char* filename, bool read) throw();
-      virtual ~UnsupportedOperation() throw();
-      virtual const char* what() const throw();
-
-    private:
-
-      const char* m_filename;
-      bool m_read;
-      mutable std::string m_message;
-  };
-
 }}
 
 #endif /* TORCH_DATABASE_VIDEOEXCEPTION_H */

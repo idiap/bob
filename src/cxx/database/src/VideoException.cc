@@ -31,32 +31,3 @@ const char* db::FFmpegException::what() const throw() {
     return emergency;
   }
 }
-
-db::UnsupportedOperation::UnsupportedOperation(const char* filename,
-    bool read) throw(): 
-  m_filename(filename),
-  m_read(read)
-{
-}
-
-db::UnsupportedOperation::~UnsupportedOperation() throw() {
-}
-
-const char* db::UnsupportedOperation::what() const throw() {
-  try {
-    if (m_read) {
-      boost::format message("unsupported operation: %s was opened for reading");
-      message % m_filename;
-      m_message = message.str();
-    }
-    else {
-      boost::format message("unsupported operation: %s was opened for writing");
-      message % m_filename;
-      m_message = message.str();
-    }
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "database::UnsupportedOperation: cannot format, exception raised";
-    return emergency;
-  }
-}

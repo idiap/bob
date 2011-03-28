@@ -204,6 +204,11 @@ namespace Torch { namespace database {
            */
           inline size_t cur() const { return m_current_frame; }
 
+          /**
+           * Gets the parent
+           */
+          const VideoReader* parent() const { return m_parent; }
+
         private: //cannot create or copy iterators
          
           /**
