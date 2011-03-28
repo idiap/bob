@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Thu 08 Jul 2010 09:18:28 CEST 
 
-import sys, os
+import sys, os, subprocess
 
 # Imports our admin toolkit
 install_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -39,7 +39,16 @@ if __name__ == '__main__':
 
   if options.verbose >= 2: print "Executing '%s'" % ' '.join(arguments)
 
-  retval = os.spawnvpe(os.P_WAIT, arguments[0], arguments, new_environ)
+  try:
+    p = subprocess.Popen(arguments, env=new_environ)
+  except OSError, e:
+    # occurs when the file is not executable or not found
+    print "Error executing '%s': %s (%d)" % (' '.join(arguments), e.strerror,
+        e.errno)
+    sys.exit(e.errno)
+
+  (stdout, stderr) = p.communicate()
   if options.verbose >= 1:
-    print "Program '%s' exited with status %d" % (arguments[0], retval)
-  sys.exit(retval)
+    if p.returncode != 0: print "Error:",
+    print "Program '%s' exited with status %d" % (' '.join(arguments), p.returncode)
+  sys.exit(p.returncode)
