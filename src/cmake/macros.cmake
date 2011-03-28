@@ -247,3 +247,9 @@ function(torch_python_add_test)
   set_property(TEST ${ARGV0} APPEND PROPERTY ENVIRONMENT
     "DYLD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$ENV{DYLD_LIBRARY_PATH};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/lib:${PYTHON_INSTALL_DIRECTORY}:$ENV{PYTHONPATH}")
 endfunction(torch_python_add_test)
+
+# This macro installs an example in a standard location
+macro(torch_example_install subsys package file)
+  set(exdir share/doc/examples/${subsys}/${package})
+  install(PROGRAMS ${file} DESTINATION ${exdir})
+endmacro(torch_example_install subsys package file)
