@@ -32,7 +32,7 @@ static bool initialize_ffmpeg() {
   return true;
 }
 
-bool db::s_ffmpeg_initialized = initialize_ffmpeg();
+bool db::VideoReader::s_ffmpeg_initialized = initialize_ffmpeg();
 
 db::VideoReader::VideoReader(const std::string& filename):
   m_filepath(filename),
