@@ -34,8 +34,14 @@
       return boost::python::object(); \
     }
 
-#define ARITH_ROP(T,N,NAME,OP) template <typename T, int N> boost::python::object r ## NAME(boost::python::object i1, const blitz::Array<T,N>& i2) { \
-      return NAME(i2, i1); \
+#define ARITH_ROP(T,N,NAME,OP) template <typename T, int N> boost::python::object r ## NAME(const blitz::Array<T,N>& i1, boost::python::object i2) { \
+      boost::python::extract<T> try_t(i2); \
+      if (try_t.check()) return boost::python::object(blitz::Array<T,N>(try_t() OP i1)); \
+      boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
+      if (try_bz.check()) return boost::python::object(blitz::Array<T,N>(try_bz() OP i1)); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      boost::python::throw_error_already_set(); \
+      return boost::python::object(); \
     }
 
 #define ARITH_IOP(T,N,NAME,OP) template <typename T, int N> boost::python::object NAME(blitz::Array<T,N>& i1, boost::python::object i2) { \
