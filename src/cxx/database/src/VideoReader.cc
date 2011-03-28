@@ -328,13 +328,17 @@ void db::VideoReader::const_iterator::reset() {
   }
   
   //closes the codec we used
-  avcodec_close(m_codec_ctxt);
-  m_codec = 0;
+  if (m_codec_ctxt) {
+    avcodec_close(m_codec_ctxt);
+    m_codec = 0;
+  }
   
   //closes the video file we opened
-  av_close_input_file(m_format_ctxt);
-  m_codec_ctxt = 0;
-  m_format_ctxt = 0;
+  if (m_format_ctxt) {
+    av_close_input_file(m_format_ctxt);
+    m_codec_ctxt = 0;
+    m_format_ctxt = 0;
+  }
 
   m_current_frame = std::numeric_limits<size_t>::max(); //that means "end" 
 
