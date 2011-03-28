@@ -47,6 +47,7 @@ set(src
     "src/VideoReader.cc"
     "src/VideoException.cc"
     "src/VideoWriter.cc"
+    "src/VideoArrayCodec.cc"
     )
 
 # If we have matio installed, enable the compilation of relevant modules
