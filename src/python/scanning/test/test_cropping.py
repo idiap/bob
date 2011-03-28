@@ -10,7 +10,7 @@ import os, sys
 import unittest
 import torch
 
-INPUT_VIDEO = '../../../ip/test/data/video/test.mov'
+INPUT_VIDEO = '../../../database/test/data/test.mov'
 FACE_FINDER_PARAMETERS = 'facefinder.multiscale.params'
 GEOMNORM_PARAMETERS = 'geom.norm-64x80.cfg'
 
