@@ -271,7 +271,7 @@ void db::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
       tmp_picture->linesize[0] = c->width*3;
       blitz::Array<uint8_t,3> ordered(tmp_picture->data[0],
           blitz::shape(c->height, c->width, 3), blitz::neverDeleteData);
-      ordered = data.transpose(1,2,0); //organize for ffmpeg
+      ordered = const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0); //organize for ffmpeg
       sws_scale(m_sws_context, tmp_picture->data, tmp_picture->linesize,
           0, c->height, picture->data, picture->linesize);
     }
@@ -279,7 +279,7 @@ void db::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
       picture->linesize[0] = c->width*3;
       blitz::Array<uint8_t,3> ordered(picture->data[0],
           blitz::shape(c->height, c->width, 3), blitz::neverDeleteData);
-      ordered = data.transpose(1,2,0); //organize for ffmpeg
+      ordered = const_cast<blitz::Array<uint8_t,3>&>(data).transpose(1,2,0); //organize for ffmpeg
     }
   }
 
