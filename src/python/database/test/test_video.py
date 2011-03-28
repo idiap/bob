@@ -11,7 +11,7 @@ import tempfile
 
 def test_file(name):
   """Returns the path to the filename for this test."""
-  return os.path.join("..", "..", "ip", "test", "data", "video", name)
+  return os.path.join("data", name)
 
 def get_tempfilename(prefix='torchtest_', suffix='.avi'):
   (fd, name) = tempfile.mkstemp(suffix, prefix)

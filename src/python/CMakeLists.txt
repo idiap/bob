@@ -8,8 +8,6 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   # We need first to create the basic python targets before including the
   # directories containing the python modules
   add_custom_target(torch-python-install ALL mkdir -p ${PYTHON_INSTALL_DIRECTORY} COMMAND rsync -a ${CMAKE_CURRENT_SOURCE_DIR}/lib/ ${PYTHON_INSTALL_DIRECTORY}/torch/ COMMENT "Installing root torch python files...")
-  # Installs all python scripts
-  file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
   # Compiles all installed python files
   add_custom_target(python-compilation ALL ${PYTHON_EXECUTABLE} -m compileall . 

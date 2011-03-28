@@ -29,3 +29,6 @@ torch_python_add_test(python-ip-test-optflow
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_flow.py)
 torch_python_add_test(python-ip-test-color
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_color.py)
+
+# Installs all python scripts
+file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")

@@ -47,3 +47,8 @@ torch_python_add_test(python-database-pathlist-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_pathlist.py)
 torch_python_add_test(python-database-video-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py)
+
+# Our examples (run and install)
+torch_python_add_test(python-database-video2frame-example
+  ${CMAKE_CURRENT_SOURCE_DIR}/example/video2frame.py --test)
+torch_example_install("python" "database" example/video2frame.py)
