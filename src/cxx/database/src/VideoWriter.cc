@@ -253,10 +253,8 @@ void db::VideoWriter::open_video() {
 /**
  * Very chaotic implementation extracted from the old Video implementation in
  * Torch. Seems to work, but is probably doing too many memcpy's.
- *
- * TODO: Revise for efficiency, given the input buffer is contiguous
  */
-void db::VideoWriter::write_video_frame(const uint8_t* restrict pixmap) {
+void db::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
   int out_size, ret;
   AVCodecContext *c;
 
@@ -271,13 +269,17 @@ void db::VideoWriter::write_video_frame(const uint8_t* restrict pixmap) {
     if (c->pix_fmt != PIX_FMT_RGB24) {
       // replace data in the buffer frame by the pixmap to encode
       tmp_picture->linesize[0] = c->width*3;
-      memcpy(tmp_picture->data[0], pixmap, 3*c->width*c->height);
+      blitz::Array<uint8_t,3> ordered(tmp_picture->data[0],
+          blitz::shape(c->height, c->width, 3), blitz::neverDeleteData);
+      ordered = data.transpose(1,2,0); //organize for ffmpeg
       sws_scale(m_sws_context, tmp_picture->data, tmp_picture->linesize,
           0, c->height, picture->data, picture->linesize);
     }
     else {
       picture->linesize[0] = c->width*3;
-      memcpy(picture->data[0], pixmap, 3*c->width*c->height);
+      blitz::Array<uint8_t,3> ordered(picture->data[0],
+          blitz::shape(c->height, c->width, 3), blitz::neverDeleteData);
+      ordered = data.transpose(1,2,0); //organize for ffmpeg
     }
   }
 
@@ -342,13 +344,7 @@ void db::VideoWriter::append(const blitz::Array<uint8_t,3>& data) {
     throw db::FFmpegException(m_filename.c_str(), 
         "input data does not conform with video specifications");
   }
-
-  //if storage is not contiguous, we have to copy once
-  if (data.isStorageContiguous()) write_video_frame(data.data());
-  else { //we must create contiguous copy
-    blitz::Array<uint8_t,3> cont(data.copy());
-    write_video_frame(data.data());
-  }
+  write_video_frame(data);
 }
 
 void db::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
@@ -361,13 +357,7 @@ void db::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
 
   blitz::Range a = blitz::Range::all();
   for(int i=data.lbound(0); i<(data.extent(0)+data.lbound(0)); ++i) {
-    //if storage is not contiguous, we have to copy once
-    blitz::Array<uint8_t,3> use = data(i, a, a, a);
-    if (use.isStorageContiguous()) write_video_frame(use.data());
-    else { //we must create contiguous copy
-      blitz::Array<uint8_t,3> cont(use.copy());
-      write_video_frame(use.data());
-    }
+    write_video_frame(data(i, a, a, a));
   }
 }
 

@@ -183,12 +183,6 @@ namespace Torch { namespace database {
            * re-load of that infrastructure. If we have reached the end
            * position, an exception is raised if you try to read() the
            * iterator.
-           *
-           * Also note that for efficiency reasons we read the data from the
-           * stream directly into blitz::Array<> buffer. Therefore, we require
-           * it to be contiguous (i.e. array.isStorageContiguous() must answer
-           * true). Otherwise, we will scratch its data and create a new
-           * contiguous-storage C-style array on it.
            */
           void read (blitz::Array<uint8_t,3>& data);
 

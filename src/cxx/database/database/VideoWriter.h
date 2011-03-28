@@ -115,9 +115,7 @@ namespace Torch { namespace database {
        *
        * @warn At present time we only support arrays that have C-style
        * storages (if you pass reversed arrays or arrays with Fortran-style
-       * storage, the result is undefined). The data should preferably be
-       * contiguous in memory. If that is not the case, a extra copy will be
-       * done.
+       * storage, the result is undefined).
        */
       void append(const blitz::Array<uint8_t,4>& data);
     
@@ -128,9 +126,7 @@ namespace Torch { namespace database {
        *
        * @warn At present time we only support arrays that have C-style
        * storages (if you pass reversed arrays or arrays with Fortran-style
-       * storage, the result is undefined). The data should preferably be
-       * contiguous in memory. If that is not the case, a extra copy will be
-       * done.
+       * storage, the result is undefined). 
        */
       void append(const blitz::Array<uint8_t,3>& data);
 
@@ -159,7 +155,7 @@ namespace Torch { namespace database {
       /**
        * Writes a single video frame into the video file.
        */
-      void write_video_frame(const uint8_t* restrict pixmap);
+      void write_video_frame(const blitz::Array<uint8_t,3>& data);
 
     private: //representation
 

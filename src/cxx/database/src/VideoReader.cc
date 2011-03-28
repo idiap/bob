@@ -29,6 +29,7 @@ namespace db = Torch::database;
  */
 static bool initialize_ffmpeg() {
   av_register_all();
+  av_log_set_level(-1);
   return true;
 }
 
@@ -263,7 +264,7 @@ void db::VideoReader::const_iterator::init() {
     throw db::FFmpegException(filename, "cannot allocate frame buffer");
   }
 
-  // Allocate memory for a second buffer that contains RGB converted data
+  // Allocate memory for a second buffer that contains RGB converted data.
   m_rgb_frame_buffer = avcodec_alloc_frame();
   if (!m_rgb_frame_buffer) {
     throw db::FFmpegException(filename, "cannot allocate RGB frame buffer");
@@ -276,7 +277,7 @@ void db::VideoReader::const_iterator::init() {
   if (!m_raw_buffer) {
     throw db::FFmpegException(filename, "cannot allocate raw frame buffer");
   }
- 
+  
   // Assign appropriate parts of buffer to image planes in m_rgb_frame_buffer
   avpicture_fill((AVPicture *)m_rgb_frame_buffer, m_raw_buffer, PIX_FMT_RGB24,
       m_parent->width(), m_parent->height());
@@ -316,7 +317,7 @@ void db::VideoReader::const_iterator::reset() {
     av_free(m_rgb_frame_buffer); 
     m_rgb_frame_buffer = 0;
   }
-  
+
   if (m_raw_buffer) { 
     av_free(m_raw_buffer); 
     m_raw_buffer=0; 
@@ -355,27 +356,12 @@ void db::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data) {
   //otherwise, resize it.
   if (data.extent(0) != 3 || 
       (size_t)data.extent(1) != m_parent->height() || 
-      (size_t)data.extent(2) != m_parent->width() ||
-      !data.isStorageContiguous())
+      (size_t)data.extent(2) != m_parent->width())
     data.resize(3, m_parent->height(), m_parent->width());
 
   int gotPicture = 0;
   AVPacket packet;
   av_init_packet(&packet);
-
-  //we temporarily replace the m_rgb_frame_buffer->data[0] pointer so it points
-  //to the given blitz::Array storage (that was tested to be contiguous).
-  uint8_t* tmp[4] = {
-    m_rgb_frame_buffer->data[0],
-    m_rgb_frame_buffer->data[1],
-    m_rgb_frame_buffer->data[2],
-    m_rgb_frame_buffer->data[3]
-  };
-  const size_t plane_size = sizeof(uint8_t) * m_parent->width() * m_parent->height();
-  m_rgb_frame_buffer->data[0] = data.data();
-  m_rgb_frame_buffer->data[1] = m_rgb_frame_buffer->data[0] + plane_size;
-  m_rgb_frame_buffer->data[2] = m_rgb_frame_buffer->data[1] + plane_size;
-  m_rgb_frame_buffer->data[3] = 0; //no transparency plane
 
   while (av_read_frame(m_format_ctxt, &packet) >= 0) {
     // Is this a packet from the video stream?
@@ -385,7 +371,6 @@ void db::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data) {
 
       // Did we get a video frame?
       if (gotPicture) {
-        // If so, convert the frame information into RGB
         sws_scale(m_sws_context, m_frame_buffer->data, m_frame_buffer->linesize,
             0, m_parent->height(), m_rgb_frame_buffer->data, 
             m_rgb_frame_buffer->linesize);
@@ -403,11 +388,20 @@ void db::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data) {
     av_free_packet(&packet);
   }
 
-  //reset the frame buffer with its original data pointer
-  m_rgb_frame_buffer->data[0] = tmp[0];
-  m_rgb_frame_buffer->data[1] = tmp[1];
-  m_rgb_frame_buffer->data[2] = tmp[2];
-  m_rgb_frame_buffer->data[3] = tmp[3];
+  // Copies the data into the destination array. Here is some background: Torch
+  // arranges the data for a colored image like: (color-bands, height, width).
+  // That makes it easy to extract a given band from the image as its memory is
+  // contiguous. FFmpeg prefers the following encoding (height, width,
+  // color-bands). So, we have no other choice than copying the data twice. The
+  // most practical would be, of course, to have the software scaler lay down
+  // the data directly onto the blitz::Array memory, but with the current
+  // settings, that is not possible. 
+  //
+  // The FFmpeg way to read and write image data is hard-coded and impossible
+  // to circumvent by passing a different stride setup.
+  data = blitz::Array<uint8_t,3>(m_rgb_frame_buffer->data[0],
+      blitz::shape(m_parent->height(), m_parent->width(), 3),
+      blitz::neverDeleteData).transpose(2,0,1);
 
   if (m_current_frame >= m_parent->numberOfFrames()) {
     //transform the current iterator in "end"
