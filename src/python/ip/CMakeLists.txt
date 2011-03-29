@@ -33,3 +33,8 @@ torch_python_add_test(python-ip-test-color
 
 # Installs all python scripts
 file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
+
+# Our examples (run and install)
+torch_python_add_test(python-ip-optflowHS-example
+  ${CMAKE_CURRENT_SOURCE_DIR}/example/optflowHS.py --test)
+torch_example_install("python" "ip" example/optflowHS.py)
