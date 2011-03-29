@@ -181,7 +181,7 @@ class FlowTest(unittest.TestCase):
     v = torch.core.array.float64_2(i1.shape()); v.fill(0)
     for k in range(N): 
       torch.ip.evalHornAndSchunckFlow(alpha, 1, i1, i2, u, v)
-      array = torch.database.Array(torch.ip.flowutils.flow2color(u,v))
+      array = torch.database.Array(torch.ip.flowutils.flow2hsv(u,v))
       array.save("hs_rubberwhale-%d.png" % k)
 
   def notest02_VanillaHornAndSchunckAgainstOpenCV(self):
