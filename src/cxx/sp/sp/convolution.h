@@ -76,7 +76,7 @@ namespace Torch {
         return;
       }
 
-      int Asize;
+      int Asize=0;
 
       // Size of "B + C - 1"
       if( size_opt == Convolution::Full )
@@ -106,7 +106,7 @@ namespace Torch {
       {
         A(i) = 0;
 
-        int i_shifted;
+        int i_shifted=0;
         if( size_opt == Convolution::Full )
           i_shifted = i;
         else if( size_opt == Convolution::Same )
@@ -197,8 +197,8 @@ namespace Torch {
       }
 
 
-      int Asize1;
-      int Asize2;
+      int Asize1=0;
+      int Asize2=0;
 
       if( size_opt == Convolution::Full )
       {
@@ -230,7 +230,7 @@ namespace Torch {
 
       for(int i1=0; i1 < Asize1; ++i1)
       {
-        int i1_shifted;
+        int i1_shifted=0;
         if( size_opt == Convolution::Full )
           i1_shifted = i1;
         else if( size_opt == Convolution::Same )
