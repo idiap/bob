@@ -46,8 +46,15 @@ if __name__ == '__main__':
     print "Error executing '%s': %s (%d)" % (' '.join(arguments), e.strerror,
         e.errno)
     sys.exit(e.errno)
-
-  (stdout, stderr) = p.communicate()
+  
+  try:
+    p.communicate()
+  except KeyboardInterrupt: # the user CTRL-C'ed
+    if options.verbose >= 1:
+      print "User interrupt, killing '%s'..." % (' '.join(arguments))
+    import signal
+    os.kill(p.pid, signal.SIGTERM)
+    sys.exit(signal.SIGTERM)
   if options.verbose >= 1:
     if p.returncode != 0: print "Error:",
     print "Program '%s' exited with status %d" % (' '.join(arguments), p.returncode)
