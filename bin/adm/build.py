@@ -146,8 +146,6 @@ def cmake(option):
     cmake_options['-DTORCH_FORCE_32BITS'] = 'yes'
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
   cmake_options['-DCMAKE_INSTALL_PREFIX'] = option.install_prefix
-  cmake_options['-DINCLUDE_DIR'] = \
-      os.path.join(option.install_prefix, 'include')
   cmake_options['-DTORCH_LINKAGE'] = 'dynamic'
   if option.static_linkage: cmake_options['-DTORCH_LINKAGE'] = 'static'
   if option.build_block == 'all':

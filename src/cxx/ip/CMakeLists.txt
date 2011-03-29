@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps core database sp) #other torch subprojects
-set(shared "${JPEG_LIBRARIES};${ffmpeg_LIBRARIES}")
+set(shared "${JPEG_LIBRARIES}")
 
 # This defines the list of source files inside this package.
 set(src_ip
@@ -32,8 +32,6 @@ set(src_ip
    "src/ipFlip.cc"
    "src/ipRotate.cc"
    "src/ipShift.cc"
-   "src/Video.cc"
-   "src/VideoTensor.cc"
    "src/ipHistoEqual.cc"
    "src/ipMSRSQIGaussian.cc"
    "src/ipMultiscaleRetinex.cc"

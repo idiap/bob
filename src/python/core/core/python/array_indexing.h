@@ -11,6 +11,7 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 #include <blitz/array.h>
+#include <blitz/tinyvec-et.h>
 
 namespace Torch { namespace python {
 
@@ -55,20 +56,18 @@ namespace Torch { namespace python {
    */
   template <typename T, int N> void fill
     (blitz::Array<T,N>& a1, const blitz::Array<T,N>& a2) {
-    for (size_t i=0; i<N; ++i) {
-      if (a1.extent(i) != a2.extent(i)) {
+      if (blitz::any(a1.shape() != a2.shape())) {
         boost::format msg("Assignment using arrays with different sizes %s != %s");
         boost::python::str bs1(boost::python::tuple(a1.extent()));
-        const std::string& s1 = boost::python::extract<const std::string&>(bs1);
+        std::string s1 = boost::python::extract<std::string>(bs1);
         boost::python::str bs2(boost::python::tuple(a2.extent()));
-        const std::string& s2 = boost::python::extract<const std::string&>(bs2);
+        std::string s2 = boost::python::extract<std::string>(bs2);
         msg % s1 % s2;
         PyErr_SetString(PyExc_RuntimeError, msg.str().c_str());
         boost::python::throw_error_already_set();
       }
+      a1 = a2; //simple copy through blitz standard c++ operator
     }
-    a1 = a2; //simple copy through blitz standard c++ operator
-  }
 
 }}
 
