@@ -10,17 +10,19 @@
 
 namespace conf = Torch::config;
 
-boost::shared_ptr<conf::Python> conf::Python::s_instance;
+boost::shared_ptr<conf::detail::Python> conf::detail::Python::s_instance;
 
-conf::Python::Python () {
-  Py_Initialize();
+conf::detail::Python::Python () {
+  Py_Initialize(); //no-op if Python is already initialized
 }
 
-conf::Python::~Python () {
-  Py_Finalize();
+conf::detail::Python::~Python () {
+  //this is called at the end of the program
+  if (Py_IsInitialized()) Py_Finalize();
 }
 
-boost::shared_ptr<conf::Python> conf::Python::instance () {
-  if (!conf::Python::s_instance) s_instance.reset(new conf::Python());
+boost::shared_ptr<conf::detail::Python> conf::detail::Python::instance () {
+  if (!conf::detail::Python::s_instance)
+    s_instance.reset(new conf::detail::Python());
   return s_instance;
 }

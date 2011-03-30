@@ -5,48 +5,30 @@
  * @brief Implementation of the Configuration main class
  */
 
+#include <boost/filesystem.hpp>
 #include "config/Configuration.h"
+#include "config/PythonConfig.h"
+#include "config/HDF5Config.h"
 
 namespace conf = Torch::config;
 namespace bp = boost::python;
 
 conf::Configuration::Configuration(const std::string& s):
-  m_py(conf::Python::instance()),
   m_dict()
 {
-  try {
-    bp::object module = bp::import("__main__");
-    bp::object name_space = module.attr("__dict__");
-    name_space["__file__"] = bp::str(s.c_str());
-    bp::exec_file(s.c_str(), name_space, m_dict);
-  }
-  catch (bp::error_already_set) {
-    /**
-    PyObject *ptype, *pvalue, *ptraceback;
-    PyErr_Fetch(&ptype, &pvalue, &ptraceback); //this will clear the error
-
-    bp::object exception_type(bp::handle<>(ptype));
-    bp::object exception_value(bp::handle<>(pvalue));
-    bp::object traceback(bp::handle<>(ptraceback));
-
-    str exception_typename = bp::extract<str>(exception_type.attr("__name__"));
-
-    throw conf::ParserError(bp::extrac<std::string>(exception_typename), 
-        bp::extract<std::string>(pvalue));
-    **/
-    PyErr_Print();
-    throw conf::PythonError();
-  }
+  boost::filesystem::path p(s);
+  //based on the extension, choose how to populate internal dictionary
+  if (p.extension() == ".py") conf::detail::pyload(p, m_dict);
+  else if (p.extension() == ".hdf5") conf::detail::hdf5load(p, m_dict);
+  else throw conf::NotImplemented("load", p.extension());
 }
 
 conf::Configuration::Configuration(): 
-  m_py(conf::Python::instance()),
   m_dict()
 {
 }
 
 conf::Configuration::Configuration(const conf::Configuration& other):
-  m_py(conf::Python::instance()),
   m_dict(other.m_dict)
 {
 }
@@ -59,6 +41,14 @@ conf::Configuration& conf::Configuration::operator= (const conf::Configuration& 
   m_dict = bp::dict();
   m_dict.update(other.m_dict);
   return *this;
+}
+
+void conf::Configuration::save (const std::string& s) const {
+  boost::filesystem::path p(s);
+  //based on the extension, choose how to populate internal dictionary
+  if (p.extension() == ".py") conf::detail::pysave(p, m_dict);
+  else if (p.extension() == ".hdf5") conf::detail::hdf5save(p, m_dict);
+  else throw conf::NotImplemented("save", p.extension());
 }
 
 conf::Configuration& conf::Configuration::update (const conf::Configuration& other) {

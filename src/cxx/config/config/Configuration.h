@@ -11,7 +11,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/python.hpp>
 
-#include "config/Python.h"
 #include "config/Exception.h"
 
 namespace Torch { namespace config {
@@ -48,6 +47,11 @@ namespace Torch { namespace config {
        * Assignment operator: copies everything.
        */
       Configuration& operator= (const Configuration& other);
+
+      /**
+       * Saves the configuration to an external file.
+       */
+      void save (const std::string& path) const;
 
       /**
        * Merges two configurations together. Items that exist on both get the
@@ -119,8 +123,17 @@ namespace Torch { namespace config {
         return m_dict.has_key(name);
       }
 
+    protected:
+
+      /**
+       * Returns the current implementation as a python dictionary. This method
+       * is useful if you are writing python bindings to the configuration
+       * class and wants to have direct access to the dictionary hold the
+       * variables. DO NOT USE THIS OTHERWISE.
+       */
+      inline boost::python::dict& dict() { return m_dict; }
+
     private: //representation 
-      boost::shared_ptr<Python> m_py; ///< interpreter management
       boost::python::dict m_dict; ///< place where my elements are stored
 
   };

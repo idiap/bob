@@ -9,6 +9,7 @@ default_flags = sys.getdlopenflags()
 sys.setdlopenflags(default_flags|ctypes.RTLD_GLOBAL)
 
 import core
+import config
 import database
 import sp
 import ip
@@ -19,4 +20,4 @@ import math
 sys.setdlopenflags(default_flags)
 del default_flags
 
-__all__ = ['core', 'database', 'sp', 'ip', 'scanning', 'machine', 'math']
+__all__ = ['core', 'config', 'database', 'sp', 'ip', 'scanning', 'machine', 'math']

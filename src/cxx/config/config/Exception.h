@@ -61,6 +61,18 @@ namespace Torch { namespace config {
       mutable std::string m_message;
   };
 
+  class NotImplemented: public Exception {
+    public:
+      NotImplemented(const std::string& operation, const std::string& filetype) throw();
+      virtual ~NotImplemented() throw();
+      virtual const char* what() const throw();
+
+    private:
+      std::string m_operation;
+      std::string m_filetype;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* TORCH_CONFIG_EXCEPTION_H */

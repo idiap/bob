@@ -10,7 +10,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-namespace Torch { namespace config {
+namespace Torch { namespace config { namespace detail {
 
   class Python {
 
@@ -46,6 +46,6 @@ namespace Torch { namespace config {
 
   };
 
-}}
+}}}
 
 #endif /* TORCH_CONFIG_PYTHON_H */

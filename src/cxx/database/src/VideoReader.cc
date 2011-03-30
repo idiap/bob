@@ -58,7 +58,7 @@ db::VideoReader::VideoReader(const std::string& filename):
   }
 
   // Look for the first video stream in the file
-  int stream_index;
+  int stream_index = -1;
   for (size_t i=0; i<format_ctxt->nb_streams; ++i) {
     if (format_ctxt->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) {
       stream_index = i;
