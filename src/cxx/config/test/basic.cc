@@ -42,6 +42,7 @@ BOOST_AUTO_TEST_CASE ( transparent_retrieval ) {
    * Constructing a new Configuration object is as easy as passing the name of
    * the file that contains the objects you want to load.
    */
+  BOOST_REQUIRE_NO_THROW(conf::Configuration c_try(file.string()));
   conf::Configuration c(file.string());
 
   BOOST_CHECK_EQUAL(c.size(), 9);
@@ -98,6 +99,7 @@ BOOST_AUTO_TEST_CASE ( extraction_error ) {
    * Constructing a new Configuration object is as easy as passing the name of
    * the file that contains the objects you want to load.
    */
+  BOOST_REQUIRE_NO_THROW(conf::Configuration c_try(file.string()));
   conf::Configuration c(file.string());
 
   //If you try to extract the wrong type of parameter, you will get an

@@ -11,7 +11,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/python.hpp>
 
-#include "config/Python.h"
 #include "config/Exception.h"
 
 namespace Torch { namespace config {
@@ -48,6 +47,11 @@ namespace Torch { namespace config {
        * Assignment operator: copies everything.
        */
       Configuration& operator= (const Configuration& other);
+
+      /**
+       * Saves the configuration to an external file.
+       */
+      void save (const std::string& path) const;
 
       /**
        * Merges two configurations together. Items that exist on both get the
@@ -120,7 +124,6 @@ namespace Torch { namespace config {
       }
 
     private: //representation 
-      boost::shared_ptr<Python> m_py; ///< interpreter management
       boost::python::dict m_dict; ///< place where my elements are stored
 
   };

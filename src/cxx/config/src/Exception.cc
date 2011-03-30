@@ -78,3 +78,24 @@ const char* conf::PythonError::what() const throw() {
   return emergency;
 }
 
+conf::NotImplemented::NotImplemented(const std::string& operation,
+    const std::string& filetype) throw(): 
+  m_operation(operation),
+  m_filetype(filetype)
+{
+}
+
+conf::NotImplemented::~NotImplemented() throw() {
+}
+
+const char* conf::NotImplemented::what() const throw() {
+  try {
+    boost::format message("Operation '%s' is not implemented for filetype '%s'");
+    message % m_operation % m_filetype;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "config::NotImplemented: cannot format, exception raised";
+    return emergency;
+  }
+}
