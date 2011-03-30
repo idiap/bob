@@ -14,6 +14,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
     WORKING_DIRECTORY ${PYTHON_INSTALL_DIRECTORY} COMMENT "Compiling python files")
 
   add_subdirectory(core)
+  add_subdirectory(config)
   add_subdirectory(database)
   add_subdirectory(ip)
   add_subdirectory(machine)
@@ -22,5 +23,3 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_subdirectory(sp)
 
 endif (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
-
-

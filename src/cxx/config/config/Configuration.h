@@ -123,6 +123,16 @@ namespace Torch { namespace config {
         return m_dict.has_key(name);
       }
 
+    protected:
+
+      /**
+       * Returns the current implementation as a python dictionary. This method
+       * is useful if you are writing python bindings to the configuration
+       * class and wants to have direct access to the dictionary hold the
+       * variables. DO NOT USE THIS OTHERWISE.
+       */
+      inline boost::python::dict& dict() { return m_dict; }
+
     private: //representation 
       boost::python::dict m_dict; ///< place where my elements are stored
 
