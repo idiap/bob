@@ -102,57 +102,6 @@ namespace Torch { namespace database {
       }
 
       /**
-       * Specific implementations bind the type T to the support_t enum
-       */
-/*
-#define DEFINE_SUPPORT(T,E) template <> support_t supported<T>(const T& value, std::vector<size_t>& shape);
-      DEFINE_SUPPORT(bool,b)
-      DEFINE_SUPPORT(int8_t,i8)
-      DEFINE_SUPPORT(int16_t,i16)
-      DEFINE_SUPPORT(int32_t,i32)
-      DEFINE_SUPPORT(int64_t,i64)
-      DEFINE_SUPPORT(uint8_t,u8)
-      DEFINE_SUPPORT(uint16_t,u16)
-      DEFINE_SUPPORT(uint32_t,u32)
-      DEFINE_SUPPORT(uint64_t,u64)
-      DEFINE_SUPPORT(float,f32)
-      DEFINE_SUPPORT(double,f64)
-      DEFINE_SUPPORT(long double,f128)
-      DEFINE_SUPPORT(std::complex<float>,c64)
-      DEFINE_SUPPORT(std::complex<double>,c128)
-      DEFINE_SUPPORT(std::complex<long double>,c256)
-      DEFINE_SUPPORT(std::string,s)
-#undef DEFINE_SUPPORT
-
-
-#define DEFINE_BZ_SUPPORT_N(T,E,N) template <> support_t \
-      supported<blitz::Array<T,N> >(const blitz::Array<T,N>& value, std::vector<size_t>& shape);
-
-#define DEFINE_BZ_SUPPORT(T,E) \
-      DEFINE_BZ_SUPPORT_N(T,E,1) \
-      DEFINE_BZ_SUPPORT_N(T,E,2) \
-      DEFINE_BZ_SUPPORT_N(T,E,3) \
-      DEFINE_BZ_SUPPORT_N(T,E,4) 
-
-      DEFINE_BZ_SUPPORT(bool,ba)
-      DEFINE_BZ_SUPPORT(int8_t,i8a)
-      DEFINE_BZ_SUPPORT(int16_t,i16a)
-      DEFINE_BZ_SUPPORT(int32_t,i32a)
-      DEFINE_BZ_SUPPORT(int64_t,i64a)
-      DEFINE_BZ_SUPPORT(uint8_t,u8a)
-      DEFINE_BZ_SUPPORT(uint16_t,u16a)
-      DEFINE_BZ_SUPPORT(uint32_t,u32a)
-      DEFINE_BZ_SUPPORT(uint64_t,u64a)
-      DEFINE_BZ_SUPPORT(float,f32a)
-      DEFINE_BZ_SUPPORT(double,f64a)
-      DEFINE_BZ_SUPPORT(long double,f128a)
-      DEFINE_BZ_SUPPORT(std::complex<float>,c64a)
-      DEFINE_BZ_SUPPORT(std::complex<double>,c128a)
-      DEFINE_BZ_SUPPORT(std::complex<long double>,c256a)
-#undef DEFINE_BZ_SUPPORT
-#undef DEFINE_BZ_SUPPORT_N
-*/
-      /**
        * Condenses information about a certain dataset
        */
       typedef struct typeinfo {
@@ -308,6 +257,9 @@ namespace Torch { namespace database {
 
   };
 
+/**
+  * Specific implementations bind the type T to the support_t enum
+  */
 #define DEFINE_SUPPORT(T,E) template <> HDF5File::support_t HDF5File::supported<T>(const T& value, std::vector<size_t>& shape) { shape.clear(); return HDF5File::E; }
       DEFINE_SUPPORT(bool,b)
       DEFINE_SUPPORT(int8_t,i8)
