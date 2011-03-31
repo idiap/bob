@@ -9,6 +9,7 @@
 #define TORCH_CORE_PYTHON_ARRAY_INDEXING_H
 
 #include <boost/python.hpp>
+#include <boost/python/slice.hpp>
 #include <boost/format.hpp>
 #include <blitz/array.h>
 #include <blitz/tinyvec-et.h>
@@ -35,6 +36,11 @@ namespace Torch { namespace python {
    * Checks a single index. Raises a proper exception if that is not ok.
    */
   int check_range(int dimension, int index, int base, int extent);
+
+  /**
+   * Converts a slice object into a range
+   */
+  void slice2range(const boost::python::slice& s, blitz::Range& r);
 
   /**
    * Checks two sizes for equality, if they are different, throw a nice
