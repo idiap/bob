@@ -10,13 +10,13 @@
 #ifndef TORCH_DATABASE_HDF5FILE_H 
 #define TORCH_DATABASE_HDF5FILE_H
 
-#include <typeinfo>
 #include <map>
+#include <vector>
 #include <boost/filesystem.hpp>
-#include <boost/make_shared.hpp>
 #include <blitz/array.h>
-#include <blitz/tinyvec-et.h>
 #include <H5Cpp.h>
+
+#include "core/array_common.h"
 
 namespace Torch { namespace database {
 
@@ -46,62 +46,132 @@ namespace Torch { namespace database {
        * the files with
        */
       typedef enum mode_t {
-        excl = H5F_ACC_EXCL
-          trunc = H5F_ACC_TRUNC,
-        in = H5F_ACC_RDONLY,
-        inout = H5F_ACC_RDWR,
+        excl = H5F_ACC_EXCL, ///< if file exists, raise, otherwise == inout
+        trunc = H5F_ACC_TRUNC, ///< if file exists, truncate it and open
+        in = H5F_ACC_RDONLY, ///< can only read file
+        inout = H5F_ACC_RDWR, ///< open file for reading and writing
       } mode_t;
 
       /**
        * Supported types
        */
-      typedef enum scalar_t {
+      typedef enum support_t {
         b = 0, //boolean
-        i8 = 1, //int8_t
-        i16 = 2, //int16_t
-        i32 = 3, //int32_t
-        i64 = 4, //int64_t
-        u8 = 5, //uint8_t
-        u16 = 6, //uint16_t
-        u32 = 7, //uint32_t
-        u64 = 8, //uint64_t
-        f32 = 9, //float
-        f64 = 10, //double
-        f128 = 11, //long double
-        c64 = 12, //std::complex<float>
-        c128 = 13, //std::complex<double>
-        c256 = 14, //std::complex<long double>
-        ch = 15, //char
-        s = 16 //std::string
-      } scalar_t;
+        i8, //int8_t
+        i16, //int16_t
+        i32, //int32_t
+        i64, //int64_t
+        u8, //uint8_t
+        u16, //uint16_t
+        u32, //uint32_t
+        u64, //uint64_t
+        f32, //float
+        f64, //double
+        f128, //long double
+        c64, //std::complex<float>
+        c128, //std::complex<double>
+        c256, //std::complex<long double>
+        s, //std::string
+        array, //a marker for when enumeration starts for arrays
+        ba, //blitz::Array<bool, N>
+        i8a, //blitz::Array<int8_t, N>
+        i16a, //blitz::Array<int16_t, N>
+        i32a, //blitz::Array<int32_t, N>
+        i64a, //blitz::Array<int64_t, N>
+        u8a, //blitz::Array<uint8_t, N>
+        u16a, //blitz::Array<uint16_t, N>
+        u32a, //blitz::Array<uint32_t, N>
+        i64a, //blitz::Array<uint64_t, N>
+        f32a, //blitz::Array<float, N>
+        f64a, //blitz::Array<double, N>
+        f128a, //blitz::Array<long double, N>
+        c64a, //blitz::Array<std::complex<float>, N>
+        c128a, //blitz::Array<std::complex<double>, N>
+        c256a, //blitz::Array<std::complex<long double>, N>
+      } support_t;
+
+      /**
+       * Converts a C++ type T into one of the supported types or raise an
+       * Unsupported exception.
+       */
+      template <typename T> support_t supported() {
+        //TODO: raise Unsupported Type
+      }
+
+      /**
+       * Specific implementations bind the type T to the support_t enum
+       */
+#define DEFINE_SUPPORT(T,E) template <> support_t supported<T>(const T& value, std::vector<size_t>& shape) { shape.clear(); return E; }
+      DEFINE_SUPPORT(bool,b)
+      DEFINE_SUPPORT(int8_t,i8)
+      DEFINE_SUPPORT(int16_t,i16)
+      DEFINE_SUPPORT(int32_t,i32)
+      DEFINE_SUPPORT(int64_t,i64)
+      DEFINE_SUPPORT(uint8_t,u8)
+      DEFINE_SUPPORT(uint16_t,u16)
+      DEFINE_SUPPORT(uint32_t,u32)
+      DEFINE_SUPPORT(uint64_t,u64)
+      DEFINE_SUPPORT(float,f32)
+      DEFINE_SUPPORT(double,f64)
+      DEFINE_SUPPORT(long double,f128)
+      DEFINE_SUPPORT(std::complex<float>,c64)
+      DEFINE_SUPPORT(std::complex<double>,c128)
+      DEFINE_SUPPORT(std::complex<long double>,c256)
+      DEFINE_SUPPORT(std::string,s)
+#undef DEFINE_SUPPORT
+#define DEFINE_BZ_SUPPORT(T,E) template <> support_t supported<blitz::Array<T,N> >(const blitz::Array<T,N>& value, std::vector<size_t>& shape) { \
+  if (N > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) throw Unsupported(); \
+  shape.clear(); \
+  for (int i=0; i<N; ++i) shape.push_back(value.extent(i)); \
+  return E; \
+}
+      DEFINE_BZ_SUPPORT(bool,ba)
+      DEFINE_BZ_SUPPORT(int8_t,i8a)
+      DEFINE_BZ_SUPPORT(int16_t,i16a)
+      DEFINE_BZ_SUPPORT(int32_t,i32a)
+      DEFINE_BZ_SUPPORT(int64_t,i64a)
+      DEFINE_BZ_SUPPORT(uint8_t,u8a)
+      DEFINE_BZ_SUPPORT(uint16_t,u16a)
+      DEFINE_BZ_SUPPORT(uint32_t,u32a)
+      DEFINE_BZ_SUPPORT(uint64_t,u64a)
+      DEFINE_BZ_SUPPORT(float,f32a)
+      DEFINE_BZ_SUPPORT(double,f64a)
+      DEFINE_BZ_SUPPORT(long double,f128a)
+      DEFINE_BZ_SUPPORT(std::complex<float>,c64a)
+      DEFINE_BZ_SUPPORT(std::complex<double>,c128a)
+      DEFINE_BZ_SUPPORT(std::complex<long double>,c256a)
+#undef DEFINE_BZ_SUPPORT
 
       /**
        * Condenses information about a certain dataset
        */
       struct typeinfo {
 
-        boost::filesystem::path path; ///< full path to this object
-        scalar_t scalar; ///< the type of scalar in the dataset
-        size_t rank; ///< the number of dimensions: 0 means is a scalar
-        std::vector<size_t> shape; ///< the shape of the array if rank != 0
+        support_t type; ///< the type of data in the dataset
+        std::vector<size_t> shape; ///< the shape of the array. 0 -> scalar
+
         size_t length; ///< the number of objects in the dataset
-        const std::type_info& cxxinfo; ///< equivalent C++ runtime type
+        boost::filesystem::path path; ///< full path to this object
+        H5::Dataset dataset; ///< the HDF5 Dataset this type points to
 
         /**
          * Checks if a typeinfo object is compatible with a given object
          */
         template <typename T> bool compatible (const T& value) const {
-          if (cxxinfo != typeid(value)) return false;
-          if (rank) { //is array: verify shape is compatible
-            if (shape.size() != value.shape().length()) return false;
-            for (size_t i=0; i<shape.size(); ++i) {
-              if (shape[i] != value.shape()[i]) return false;
-            }
-          }
-          return true;
+          typeinfo vinfo(value); //raises for any unsupported type
+          return (type == vinfo.type) && (shape == vinfo.shape);
+        }
+
+        /**
+         * Creates a typeinfo representation from an an existing C++ type
+         */
+        template <typename T> typeinfo(const T& value) {
+          type = supported<T>(value, shape);
         }
 
       };
+
+    public: //api
 
       /**
        * Constructor, starts a new HDF5File object giving it a file name and an
@@ -110,19 +180,9 @@ namespace Torch { namespace database {
       HDF5File (const boost::filesystem::path& filename, mode_t mode); 
 
       /**
-       * Copy construct an already opened HDF5File
-       */
-      HDF5File (const HDF5File& other);
-
-      /**
        * Destructor virtualization
        */
       virtual ~HDF5File();
-
-      /**
-       * Drop the current settings and load new ones from the other file.
-       */
-      HDF5File& operator= (const HDF5File& other);
 
       /**
        * READING FUNCTIONALITY
@@ -136,21 +196,29 @@ namespace Torch { namespace database {
       /**
        * Describe a certain dataset path
        */
-      boost::shared_ptr<typeinfo> describe (const boost::filesystem::path& path);
+      const typeinfo& describe (const boost::filesystem::path& path);
 
       /**
        * Returns a scalar with a given name from the file. If the name contains
        * a path like structure, we search for inside the named subgroups.
        */
       template <typename T> T getScalar(const boost::filesystem::path& path,
-          size_t index=0);
+          size_t index=0) {
+        const typeinfo& info = describe(path);
+        //TODO: read contents of info.dataset => T for every supported T
+        //Note: take "index" into consideration
+      }
 
       /**
        * Returns an array with a given name from the file. If the name contains
        * a path like structure, we search for inside the named subgroups.
        */
       template <typename T> T getArray(const boost::filesystem::path& path,
-          size_t index=0);
+          size_t index=0) {
+        const typeinfo& info = describe(path); 
+        //TODO: read contents of info.dataset => T for every supported T,shape
+        //Note: take "index" into consideration
+      }
 
       /**
        * WRITING FUNCTIONALITY
@@ -166,7 +234,13 @@ namespace Torch { namespace database {
        * than use one of the add methods.
        */
       template <typename T> void addScalar(const boost::filesystem::path& path,
-          const T& value);
+          const T& value) {
+        //TODO: check that T is supported otherwise raise
+        //TODO: check that path exists and T is compatible otherwise raise
+        //TODO: if path does not exist, create and set dataspace
+        //      create a new index entry pointing to the new dataspace
+        //TODO: if path exists, add scalar to that path, update index
+      }
 
       /**
        * Inserts a array in a certain subdirectory of the file. If that
@@ -177,7 +251,13 @@ namespace Torch { namespace database {
        * this, first unlink and than use one of the add methods.
        */
       template <typename T> void addArray(const boost::filesystem::path& path,
-          const T& value);
+          const T& value) {
+        //TODO: check that T is supported otherwise raise
+        //TODO: check that path exists and T is compatible otherwise raise
+        //TODO: if path does not exist, create and set dataspace
+        //      create a new index entry pointing to the new dataspace
+        //TODO: if path exists, add array to that path, update index
+      }
 
       /**
        * Unlinks a particular dataset from the file. Please note that this will
@@ -194,10 +274,22 @@ namespace Torch { namespace database {
        */
       void copy (const HDF5File& other);
 
+    private: //not implemented
+
+      /**
+       * Copy construct an already opened HDF5File
+       */
+      HDF5File (const HDF5File& other);
+
+      /**
+       * Drop the current settings and load new ones from the other file.
+       */
+      HDF5File& operator= (const HDF5File& other);
+
     private: //representation
 
-      boost::filesystem::path m_path;
-      //HDF5File??
+      boost::filesystem::path m_path; ///< the path to this file
+      H5::H5File m_file; ///< the opened HDF5 file
       std::map<boost::filesystem::path, typeinfo> m_index;
 
   };
