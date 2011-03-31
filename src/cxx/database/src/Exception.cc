@@ -239,3 +239,78 @@ const char* db::PathIsNotAbsolute::what() const throw() {
     return emergency;
   }
 }
+
+db::HDF5UnsupportedTypeError::HDF5UnsupportedTypeError() throw()
+{
+}
+
+db::HDF5UnsupportedTypeError::~HDF5UnsupportedTypeError() throw() { }
+
+const char* db::HDF5UnsupportedTypeError::what() const throw() {
+  try {
+    boost::format message("The type given is not supported by our HDF5 interface");
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::HDF5UnsupportedTypeError: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+db::HDF5UnsupportedDimensionError::HDF5UnsupportedDimensionError(size_t n_dim) throw() :
+  m_n_dim(n_dim)
+{
+}
+
+db::HDF5UnsupportedDimensionError::~HDF5UnsupportedDimensionError() throw() { }
+
+const char* db::HDF5UnsupportedDimensionError::what() const throw() {
+  try {
+    boost::format message("Got an array with '%u' dimensions, but we only support up to 4 dimensions.");
+    message % m_n_dim;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::HDF5UnsupportedDimensionError: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+db::HDF5ObjectNotFoundError::HDF5ObjectNotFoundError(const std::string& path, const std::string& filename) throw() :
+  m_path(path), m_filename(filename)
+{
+}
+
+db::HDF5ObjectNotFoundError::~HDF5ObjectNotFoundError() throw() { }
+
+const char* db::HDF5ObjectNotFoundError::what() const throw() {
+  try {
+    boost::format message("Cannot find object '%s' in the HDF5 file '%s'.");
+    message % m_path % m_filename;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::HDF5ObjectNotFoundError: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+
+db::HDF5InvalidFileAccessModeError::HDF5InvalidFileAccessModeError(const unsigned int mode) throw() :
+  m_mode(mode)
+{
+}
+
+db::HDF5InvalidFileAccessModeError::~HDF5InvalidFileAccessModeError() throw() { }
+
+const char* db::HDF5InvalidFileAccessModeError::what() const throw() {
+  try {
+    boost::format message("Trying to use an undefined access mode ('%d')'.");
+    message % m_mode;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::HDF5InvalidFileAccessModeError: cannot format, exception raised";
+    return emergency;
+  }
+}
