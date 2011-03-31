@@ -6,6 +6,7 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/python/slice.hpp>
 #include <blitz/array.h>
 
 #include "core/python/array_base.h"
@@ -54,13 +55,16 @@ template <typename T> static bp::object getset
   }
 
   //consider now holds the index to the 1-D blitz array. Let's see what it is
-  bp::extract<blitz::Range> r1c(consider);
+  bp::extract<bp::slice> r1c(consider);
   bp::extract<int> i1c(consider);
 
   //switch through the different possibilities we must cover
   if (r1c.check()) {
-    //ERROR: Cannot do this twice in a row: python crashes!
-    blitz::Range r1 = r1c(); 
+    //ERROR: Cannot do this twice in a row: python crashes. The reason is
+    //probably related to the tuple code just before this one. This error does
+    //not show up for other ranks!!
+    blitz::Range r1;
+    tp::slice2range(r1c(), r1);
     tp::check_range(0, r1, a.lbound(0), a.extent(0));
     bp::object retval(a(r1));
     if (value.ptr() != Py_None) retval.attr("fill")(value);
