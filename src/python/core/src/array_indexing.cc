@@ -55,3 +55,19 @@ int tp::check_range(int dimension, int index, int base, int extent) {
   }
   return (index<0)? index + base + extent : index;
 }
+
+void tp::slice2range(const boost::python::slice& s, blitz::Range& r) {
+  //the start value may be None
+  int start = tp::range::fromStart;
+  if (s.start().ptr() != Py_None) start = bp::extract<int>(s.start());
+
+  //the stop value may be None
+  int stop = tp::range::toEnd;
+  if (s.stop().ptr() != Py_None) stop = bp::extract<int>(s.stop()) - 1;
+
+  //the step value may be None
+  int step = 1;
+  if (s.step().ptr() != Py_None) step = bp::extract<int>(s.step());
+
+  r.setRange(start, stop, step);
+}

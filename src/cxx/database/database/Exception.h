@@ -157,6 +157,49 @@ namespace Torch { namespace database {
       mutable std::string m_message;
   };
 
+  class HDF5UnsupportedTypeError: public Exception {
+    public:
+      HDF5UnsupportedTypeError() throw();
+      virtual ~HDF5UnsupportedTypeError() throw();
+      virtual const char* what() const throw();
+
+    private:
+      mutable std::string m_message;
+  };
+
+  class HDF5UnsupportedDimensionError: public Exception {
+    public:
+      HDF5UnsupportedDimensionError(size_t n_dim) throw();
+      virtual ~HDF5UnsupportedDimensionError() throw();
+      virtual const char* what() const throw();
+
+    private:
+      size_t m_n_dim;
+      mutable std::string m_message;
+  };
+
+  class HDF5ObjectNotFoundError: public Exception {
+    public:
+      HDF5ObjectNotFoundError(const std::string& path, const std::string& filename) throw();
+      virtual ~HDF5ObjectNotFoundError() throw();
+      virtual const char* what() const throw();
+
+    private:
+      std::string m_path;
+      std::string m_filename;
+      mutable std::string m_message;
+  };
+
+  class HDF5InvalidFileAccessModeError: public Exception {
+    public:
+      HDF5InvalidFileAccessModeError(const unsigned int mode) throw();
+      virtual ~HDF5InvalidFileAccessModeError() throw();
+      virtual const char* what() const throw();
+
+    private:
+      unsigned int m_mode;
+      mutable std::string m_message;
+  };
 }}
 
 #endif /* TORCH_DATABASE_EXCEPTION_H */
