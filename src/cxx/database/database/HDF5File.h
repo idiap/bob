@@ -1,5 +1,6 @@
 /**
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  * @date Wed 30 Mar 21:06:28 2011 
  *
  * @brief Torch support for HDF5 files. HDF5 is a open standard for
@@ -17,6 +18,7 @@
 #include <H5Cpp.h>
 
 #include "core/array_common.h"
+#include "database/Exception.h"
 
 namespace Torch { namespace database {
 
@@ -46,10 +48,10 @@ namespace Torch { namespace database {
        * the files with
        */
       typedef enum mode_t {
-        excl = H5F_ACC_EXCL, ///< if file exists, raise, otherwise == inout
-        trunc = H5F_ACC_TRUNC, ///< if file exists, truncate it and open
-        in = H5F_ACC_RDONLY, ///< can only read file
-        inout = H5F_ACC_RDWR, ///< open file for reading and writing
+        excl = 4, //H5F_ACC_EXCL    < if file exists, raise, otherwise == inout
+        trunc = 2, //H5F_ACC_TRUNC  < if file exists, truncate it and open
+        in = 0, //H5F_ACC_RDONLY    < can only read file
+        inout = 1  //H5F_ACC_RDWR   < open file for reading and writing
       } mode_t;
 
       /**
@@ -81,27 +83,29 @@ namespace Torch { namespace database {
         u8a, //blitz::Array<uint8_t, N>
         u16a, //blitz::Array<uint16_t, N>
         u32a, //blitz::Array<uint32_t, N>
-        i64a, //blitz::Array<uint64_t, N>
+        u64a, //blitz::Array<uint64_t, N>
         f32a, //blitz::Array<float, N>
         f64a, //blitz::Array<double, N>
         f128a, //blitz::Array<long double, N>
         c64a, //blitz::Array<std::complex<float>, N>
         c128a, //blitz::Array<std::complex<double>, N>
-        c256a, //blitz::Array<std::complex<long double>, N>
+        c256a //blitz::Array<std::complex<long double>, N>
       } support_t;
 
       /**
        * Converts a C++ type T into one of the supported types or raise an
        * Unsupported exception.
        */
-      template <typename T> support_t supported() {
-        //TODO: raise Unsupported Type
+      template <typename T> support_t supported(const T& value, std::vector<size_t>& shape) {
+        //TODO: DONE: raise Unsupported Type
+        throw HDF5UnsupportedTypeError();
       }
 
       /**
        * Specific implementations bind the type T to the support_t enum
        */
-#define DEFINE_SUPPORT(T,E) template <> support_t supported<T>(const T& value, std::vector<size_t>& shape) { shape.clear(); return E; }
+/*
+#define DEFINE_SUPPORT(T,E) template <> support_t supported<T>(const T& value, std::vector<size_t>& shape);
       DEFINE_SUPPORT(bool,b)
       DEFINE_SUPPORT(int8_t,i8)
       DEFINE_SUPPORT(int16_t,i16)
@@ -119,12 +123,17 @@ namespace Torch { namespace database {
       DEFINE_SUPPORT(std::complex<long double>,c256)
       DEFINE_SUPPORT(std::string,s)
 #undef DEFINE_SUPPORT
-#define DEFINE_BZ_SUPPORT(T,E) template <> support_t supported<blitz::Array<T,N> >(const blitz::Array<T,N>& value, std::vector<size_t>& shape) { \
-  if (N > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) throw Unsupported(); \
-  shape.clear(); \
-  for (int i=0; i<N; ++i) shape.push_back(value.extent(i)); \
-  return E; \
-}
+
+
+#define DEFINE_BZ_SUPPORT_N(T,E,N) template <> support_t \
+      supported<blitz::Array<T,N> >(const blitz::Array<T,N>& value, std::vector<size_t>& shape);
+
+#define DEFINE_BZ_SUPPORT(T,E) \
+      DEFINE_BZ_SUPPORT_N(T,E,1) \
+      DEFINE_BZ_SUPPORT_N(T,E,2) \
+      DEFINE_BZ_SUPPORT_N(T,E,3) \
+      DEFINE_BZ_SUPPORT_N(T,E,4) 
+
       DEFINE_BZ_SUPPORT(bool,ba)
       DEFINE_BZ_SUPPORT(int8_t,i8a)
       DEFINE_BZ_SUPPORT(int16_t,i16a)
@@ -141,18 +150,19 @@ namespace Torch { namespace database {
       DEFINE_BZ_SUPPORT(std::complex<double>,c128a)
       DEFINE_BZ_SUPPORT(std::complex<long double>,c256a)
 #undef DEFINE_BZ_SUPPORT
-
+#undef DEFINE_BZ_SUPPORT_N
+*/
       /**
        * Condenses information about a certain dataset
        */
-      struct typeinfo {
+      typedef struct typeinfo {
 
         support_t type; ///< the type of data in the dataset
         std::vector<size_t> shape; ///< the shape of the array. 0 -> scalar
 
         size_t length; ///< the number of objects in the dataset
         boost::filesystem::path path; ///< full path to this object
-        H5::Dataset dataset; ///< the HDF5 Dataset this type points to
+        H5::DataSet dataset; ///< the HDF5 Dataset this type points to
 
         /**
          * Checks if a typeinfo object is compatible with a given object
@@ -169,7 +179,7 @@ namespace Torch { namespace database {
           type = supported<T>(value, shape);
         }
 
-      };
+      } typeinfo;
 
     public: //api
 
@@ -207,6 +217,8 @@ namespace Torch { namespace database {
         const typeinfo& info = describe(path);
         //TODO: read contents of info.dataset => T for every supported T
         //Note: take "index" into consideration
+        T res = 0;
+        return res;
       }
 
       /**
@@ -218,6 +230,8 @@ namespace Torch { namespace database {
         const typeinfo& info = describe(path); 
         //TODO: read contents of info.dataset => T for every supported T,shape
         //Note: take "index" into consideration
+        T res = 0;
+        return res;
       }
 
       /**
@@ -293,6 +307,57 @@ namespace Torch { namespace database {
       std::map<boost::filesystem::path, typeinfo> m_index;
 
   };
+
+#define DEFINE_SUPPORT(T,E) template <> HDF5File::support_t HDF5File::supported<T>(const T& value, std::vector<size_t>& shape) { shape.clear(); return HDF5File::E; }
+      DEFINE_SUPPORT(bool,b)
+      DEFINE_SUPPORT(int8_t,i8)
+      DEFINE_SUPPORT(int16_t,i16)
+      DEFINE_SUPPORT(int32_t,i32)
+      DEFINE_SUPPORT(int64_t,i64)
+      DEFINE_SUPPORT(uint8_t,u8)
+      DEFINE_SUPPORT(uint16_t,u16)
+      DEFINE_SUPPORT(uint32_t,u32)
+      DEFINE_SUPPORT(uint64_t,u64)
+      DEFINE_SUPPORT(float,f32)
+      DEFINE_SUPPORT(double,f64)
+      DEFINE_SUPPORT(long double,f128)
+      DEFINE_SUPPORT(std::complex<float>,c64)
+      DEFINE_SUPPORT(std::complex<double>,c128)
+      DEFINE_SUPPORT(std::complex<long double>,c256)
+      DEFINE_SUPPORT(std::string,s)
+#undef DEFINE_SUPPORT
+
+#define DEFINE_BZ_SUPPORT_N(T,E,N) template <> HDF5File::support_t \
+      HDF5File::supported<blitz::Array<T,N> >(const blitz::Array<T,N>& value, std::vector<size_t>& shape) { \
+        if (N > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) throw HDF5UnsupportedDimensionError(N); \
+        shape.clear(); \
+        for (int i=0; i<N; ++i) shape.push_back(value.extent(i)); \
+        return HDF5File::E; \
+      }
+
+#define DEFINE_BZ_SUPPORT(T,E) \
+      DEFINE_BZ_SUPPORT_N(T,E,1) \
+      DEFINE_BZ_SUPPORT_N(T,E,2) \
+      DEFINE_BZ_SUPPORT_N(T,E,3) \
+      DEFINE_BZ_SUPPORT_N(T,E,4) 
+
+      DEFINE_BZ_SUPPORT(bool,ba)
+      DEFINE_BZ_SUPPORT(int8_t,i8a)
+      DEFINE_BZ_SUPPORT(int16_t,i16a)
+      DEFINE_BZ_SUPPORT(int32_t,i32a)
+      DEFINE_BZ_SUPPORT(int64_t,i64a)
+      DEFINE_BZ_SUPPORT(uint8_t,u8a)
+      DEFINE_BZ_SUPPORT(uint16_t,u16a)
+      DEFINE_BZ_SUPPORT(uint32_t,u32a)
+      DEFINE_BZ_SUPPORT(uint64_t,u64a)
+      DEFINE_BZ_SUPPORT(float,f32a)
+      DEFINE_BZ_SUPPORT(double,f64a)
+      DEFINE_BZ_SUPPORT(long double,f128a)
+      DEFINE_BZ_SUPPORT(std::complex<float>,c64a)
+      DEFINE_BZ_SUPPORT(std::complex<double>,c128a)
+      DEFINE_BZ_SUPPORT(std::complex<long double>,c256a)
+#undef DEFINE_BZ_SUPPORT
+#undef DEFINE_BZ_SUPPORT_N
 
 }}
 
