@@ -19,7 +19,7 @@ conf::Configuration::Configuration(const std::string& s):
   boost::filesystem::path p(s);
   //based on the extension, choose how to populate internal dictionary
   if (p.extension() == ".py") conf::detail::pyload(p, m_dict);
-  else if (p.extension() == ".hdf5") conf::detail::hdf5load(p, m_dict);
+  else if (p.extension() == ".h5") conf::detail::hdf5load(p, m_dict);
   else throw conf::NotImplemented("load", p.extension());
 }
 
@@ -47,7 +47,7 @@ void conf::Configuration::save (const std::string& s) const {
   boost::filesystem::path p(s);
   //based on the extension, choose how to populate internal dictionary
   if (p.extension() == ".py") conf::detail::pysave(p, m_dict);
-  else if (p.extension() == ".hdf5") conf::detail::hdf5save(p, m_dict);
+  else if (p.extension() == ".h5") conf::detail::hdf5save(p, m_dict);
   else throw conf::NotImplemented("save", p.extension());
 }
 
