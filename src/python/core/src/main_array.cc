@@ -30,7 +30,10 @@ void bind_array_math_3();
 void bind_array_math_4();
 void bind_array_memory();
 void bind_array_order();
-void bind_array_reduction();
+void bind_array_reductions_1();
+void bind_array_reductions_2();
+void bind_array_reductions_3();
+void bind_array_reductions_4();
 void bind_array_storage();
 
 BOOST_PYTHON_MODULE(libpytorch_core_array) {
@@ -57,6 +60,9 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_array_math_4();
   bind_array_memory();
   bind_array_order();
-  bind_array_reduction();
+  bind_array_reductions_1();
+  bind_array_reductions_2();
+  bind_array_reductions_3();
+  bind_array_reductions_4();
   bind_array_storage();
 }

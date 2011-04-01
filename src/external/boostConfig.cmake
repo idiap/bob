@@ -13,3 +13,6 @@ find_package(Boost COMPONENTS python unit_test_framework iostreams thread filesy
 set(boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} CACHE INTERNAL "incdirs")
 include_directories(SYSTEM ${boost_INCLUDE_DIRS})
 set(boost_LIBRARY_DIRS ${Boost_LIBRARY_DIRS} CACHE INTERNAL "libdirs")
+
+# Makes sure we use boost filesystem v2
+add_definitions(-DBOOST_FILESYSTEM_VERSION=2)
