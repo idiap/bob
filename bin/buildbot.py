@@ -27,8 +27,8 @@ def parse_args():
   import optparse
   
   #some defaults
-  actions = ('cmake', 'make_all', 'documentation', 'make_install', 'ctest', 
-      'make_clean', 'mrproper')
+  actions = ('cmake', 'make_all', 'documentation', 'sphinx', 'doxygen',
+      'make_install', 'ctest', 'make_clean', 'mrproper')
   build_types = ('release', 'debug') #default is #0
   build_blocks = ('all', 'cxx', 'python') #default is #0
   pwd = os.path.realpath(os.curdir)
@@ -89,7 +89,7 @@ def parse_args():
       help="executes all stages with lots of verbose output",
       )
   parser.add_option("-V", "--version", action="store", dest="version",
-      default="%(name)s-x.y.z", metavar="VERSION",
+      default="x.y.z", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
       )
   
@@ -143,11 +143,11 @@ if __name__ == '__main__':
     adm.build.cmake(options)
     adm.build.dot(options)
 
-  elif options.action == 'make_all':
-    adm.build.make(options, 'all')
-    adm.build.write_header(options)
+  elif options.action == 'make_all': adm.build.make(options, 'all')
   elif options.action == 'make_install': adm.build.install(options)
   elif options.action == 'documentation': adm.build.documentation(options)
+  elif options.action == 'doxygen': adm.build.doxygen(options)
+  elif options.action == 'sphinx': adm.build.sphinx(options)
   elif options.action == 'ctest': adm.build.ctest(options)
   elif options.action == 'make_clean': adm.build.make(options, 'clean')
   elif options.action == 'mrproper': adm.build.mrproper(options)

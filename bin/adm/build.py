@@ -341,7 +341,8 @@ def sphinx(option):
    
   cmdline.extend(['-c', option.sphinxdir])
   # TODO: Parse version
-  cmdline.extend(['-D','version=\'%s\'' % option.version])
+  cmdline.extend(['-D','version=%s' % option.version])
+  cmdline.extend(['-D','release=%s' % option.version])
   
   sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
   cmdline_html = cmdline[:]
