@@ -155,12 +155,14 @@ plain gcc. After running the command above, do the following:
 .. code-block:: sh
 
    $ sudo gcc_select llvm-gcc42
+   #or
+   $ sudo gcc_select mp-llvm-gcc42
 
 We also have fortran files that need compilation. Make sure ``gfortran`` is
 accessible from the command line before trying to compile. Specifically, the
 MacPorts installation may not put ``gfortran`` on the command line and call the
-executable in a weird way (in my system it is called ``gfortran-mp-4.4``). To
-make cmake find the fortran compiler you will have to create, manually, a
+executable in a different way (in my system it is called ``gfortran-mp-4.4``).
+To make cmake find the fortran compiler you will have to create, manually, a
 symbolic link from this binary. Here are the instructions:
 
 .. code-block:: sh
