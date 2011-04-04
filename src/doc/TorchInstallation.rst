@@ -282,3 +282,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _tables: http://www.pytables.org
 .. _matplotlib: http://matplotlib.sourceforge.net
 .. _torchidiapguide: https://www.idiap.ch/software/torch5spro/wiki/TorchIdiapGuide
+.. _buildbot: http://http://trac.buildbot.net
