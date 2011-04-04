@@ -16,13 +16,6 @@
 #include "core/convert.h"
 #include "core/cast.h"
 
-#ifdef __APPLE__
-# include <CoreServices/CoreServices.h>
-# include <stdint.h>
-#else
-# include <unistd.h>
-#endif
-
 struct T {
   blitz::Array<uint8_t,1> a8;
   blitz::Array<uint16_t,1> a16;
