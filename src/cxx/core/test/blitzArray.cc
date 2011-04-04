@@ -16,8 +16,8 @@
 #include "core/logging.h"
 
 #ifdef __APPLE__
-# include <CoreServices/CoreServices.h>
-# include <stdint.h>
+# include <sys/types.h>
+# include <sys/sysctl.h>
 #else
 # include <unistd.h>
 #endif
@@ -33,9 +33,11 @@ struct T {
  */
 size_t maxRAMInMegabytes () {
 #ifdef __APPLE__
-  int32_t memsize;
-  Gestalt(gestaltPhysicalRAMSizeInMegabytes, &memsize);
-  return memsize;
+  int64_t memsize;
+  size_t len = sizeof(memsize);
+  int mib[] = { CTL_HW, HW_MEMSIZE };
+  if (sysctl(mib, 2, &memsize, &len, 0, 0) != 0) return 1024; //returns 1G
+  return memsize / (1024 * 1024);
 #else
   return sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) / (1024 * 1024);
 #endif

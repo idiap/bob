@@ -1,6 +1,7 @@
 #ifndef TORCH5SPRO_CORE_TENSOR_H
 #define TORCH5SPRO_CORE_TENSOR_H
 
+#include "core/array_common.h"
 #include <blitz/array.h>
 #include "core/TensorWrapper.h"
 

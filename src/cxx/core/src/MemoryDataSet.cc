@@ -1,3 +1,4 @@
+#include "core/array_common.h"
 #include "core/Tensor.h"
 #include "core/MemoryDataSet.h"
 

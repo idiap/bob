@@ -8,14 +8,15 @@
 #ifndef TORCH_DATABASE_MATUTILS_H 
 #define TORCH_DATABASE_MATUTILS_H
 
-#include <matio.h>
+#include "core/array_common.h"
 #include <blitz/array.h>
+
+#include <matio.h>
 #include <boost/format.hpp>
 #include <boost/shared_ptr.hpp>
 #include <map>
 #include <string>
 
-#include "core/array_common.h"
 #include "database/InlinedArrayImpl.h"
 #include "database/InlinedArraysetImpl.h"
 #include "database/Exception.h"
