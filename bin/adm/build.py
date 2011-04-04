@@ -266,8 +266,6 @@ def doxygen(option):
 
   logging.debug('Running doxygen...')
 
-  os.chdir(option.build_prefix)
-
   doxygen_prefix = os.path.join(option.doc_prefix, "doxygen")
   if not os.path.exists(doxygen_prefix): os.makedirs(doxygen_prefix)
   
