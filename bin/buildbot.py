@@ -27,8 +27,9 @@ def parse_args():
   import optparse
   
   #some defaults
-  actions = ('cmake', 'make_all', 'build', 'documentation', 'sphinx', 'doxygen',
-      'make_install', 'ctest', 'test', 'make_clean', 'mrproper')
+  actions = ('cmake', 'make_all', 'all', 'build', 'documentation', 'docs',
+      'sphinx', 'doxygen', 'make_install', 'install', 'ctest', 'test',
+      'make_clean', 'clean', 'mrproper')
   build_types = ('release', 'debug') #default is #0
   build_blocks = ('all', 'cxx', 'python') #default is #0
   pwd = os.path.realpath(os.curdir)
@@ -146,13 +147,13 @@ if __name__ == '__main__':
   elif options.action == 'cmake': 
     adm.build.cmake(options)
     adm.build.dot(options)
-  elif options.action == 'make_all': adm.build.make(options, 'all')
-  elif options.action == 'make_install': adm.build.install(options)
-  elif options.action == 'documentation': adm.build.documentation(options)
+  elif options.action in ('make_all', 'all'): adm.build.make(options, 'all')
+  elif options.action in ('make_install', 'install'): adm.build.install(options)
+  elif options.action in ('documentation', 'docs'): adm.build.documentation(options)
   elif options.action == 'doxygen': adm.build.doxygen(options)
   elif options.action == 'sphinx': adm.build.sphinx(options)
   elif options.action in ('ctest', 'test'): adm.build.ctest(options)
-  elif options.action == 'make_clean': adm.build.make(options, 'clean')
+  elif options.action in ('make_clean', 'clean'): adm.build.make(options, 'clean')
   elif options.action == 'mrproper': adm.build.mrproper(options)
 
   sys.exit(0)

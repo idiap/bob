@@ -80,6 +80,11 @@ class ArrayCodecTest(unittest.TestCase):
     self.transcode("torch3.array.binary", "torch3.bindata")
 
   def test02_matlab(self):
+    try:
+      testcodec = torch.database.ArrayCodecRegistry.getCodecByName('matlab.array.binary')
+    except torch.database.CodecNotFound:
+      #if the codec is not found, skip this test
+      return
     self.readwrite("matlab.array.binary",
         torch.core.array.float32_1(range(24), (24,)) / 24.)
     self.readwrite("matlab.array.binary",
