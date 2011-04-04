@@ -103,7 +103,7 @@ namespace Torch {
      * contiguous memory area, with one base indices. 
      */
     template <typename T, int D>
-    inline bool isFortanOneBaseContiguous( const blitz::Array<T,D>& a) 
+    inline bool isFortranOneBaseContiguous( const blitz::Array<T,D>& a) 
     {
       if( !isOneBase(a) )
         return false;
