@@ -28,7 +28,7 @@ def parse_args():
   
   #some defaults
   actions = ('cmake', 'make_all', 'build', 'documentation', 'sphinx', 'doxygen',
-      'make_install', 'ctest', 'test', 'make_clean', 'mrproper')
+      'make_install', 'ctest', 'test', 'make_clean', 'clean', 'mrproper')
   build_types = ('release', 'debug') #default is #0
   build_blocks = ('all', 'cxx', 'python') #default is #0
   pwd = os.path.realpath(os.curdir)
@@ -152,7 +152,7 @@ if __name__ == '__main__':
   elif options.action == 'doxygen': adm.build.doxygen(options)
   elif options.action == 'sphinx': adm.build.sphinx(options)
   elif options.action in ('ctest', 'test'): adm.build.ctest(options)
-  elif options.action == 'make_clean': adm.build.make(options, 'clean')
+  elif options.action in ('make_clean', 'clean'): adm.build.make(options, 'clean')
   elif options.action == 'mrproper': adm.build.mrproper(options)
 
   sys.exit(0)
