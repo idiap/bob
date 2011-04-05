@@ -71,34 +71,27 @@ namespace Torch {
       detail::assertZeroBase( src);
 
       // Check parameters and throw exception if required
-      /*
-      if( block_w<src.extent(1) || block_h<src.extent(0) || 
-          overlap_w<block_w || overlap_h<block_h )
-      {
-        if( block_w<0 ) {
-          throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
-        }
-        else if( crop_y<0) {
-          throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
-        }
-        else if( crop_w<0) {
-          throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
-        }
-        else if( crop_h<0) {
-          throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
-        }
-        else if( crop_x+crop_w>src.extent(1)) {
-          throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
-            src.extent(1) );
-        }
-        else if( crop_y+crop_h>src.extent(0)) {
-          throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
-            src.extent(0) );
-        }
-        else
-          throw Exception();
-      }*/
-    
+      if( block_w<1)
+        throw ParamOutOfBoundaryError("block_w", false, block_w, 1); 
+      if( block_w>src.extent(1) )
+        throw ParamOutOfBoundaryError("block_w", true, block_w, 
+          src.extent(1)); 
+      if( block_h<1)
+        throw ParamOutOfBoundaryError("block_h", false, block_h, 1); 
+      if( block_h>src.extent(1) )
+        throw ParamOutOfBoundaryError("block_h", true, block_h, 
+          src.extent(0)); 
+      if( overlap_w<0)
+        throw ParamOutOfBoundaryError("overlap_w", false, overlap_w, 1);
+      if( overlap_w>=block_w )
+        throw ParamOutOfBoundaryError("overlap_w", true, overlap_w, 
+          block_w); 
+      if( overlap_h<0)
+        throw ParamOutOfBoundaryError("overlap_h", false, overlap_h, 1);
+      if( overlap_h>=block_h )
+        throw ParamOutOfBoundaryError("overlap_h", true, overlap_h, 
+          block_h); 
+
       // Crop the 2D array
       detail::blockNoCheck(src, dst, block_w, block_h, overlap_w, overlap_h);
     }
