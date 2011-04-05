@@ -15,68 +15,77 @@
 #include "ip/common.h"
 
 namespace Torch {
-/**
- * \ingroup libip_api
- * @{
- *
- */
-  namespace ip {
+	/**
+	 * \ingroup libip_api
+	 * @{
+	 *
+	 */
+	namespace ip {
 
-    	  template<typename T>
-	  void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, int n_dct_coefficients_kept = -1)
-	  {
-		  // the maximum number of dct coeff:s that we can handle rhight now
-		  const int size = src.extent(0);
-		  const int max_n_dct = size * (size - 1) / 2;
-		  
-		  // Checks that the src array has zero base indices
-		  detail::assertZeroBase( src);
+		/**
+		 * @brief Extract the zigzag pattern from a 2D blitz::array
+		 * as presented in 
+		 * @param src The input blitz array
+		 * @param dst The output blitz array
+		 * @param n_dct_kept The number of DCT coefficiants that are kept
+		 * @param zigzag_order Set to true to change the zigzag order.
+		 */
+		template<typename T>
+			void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
+				    int n_dct_kept = -1, const bool zigzag_order = false)
+			{
+				// Checks that the src array has zero base indices
+				detail::assertZeroBase( src);
 
-		  // we can currently only handle up to the major diagonal
-		  if( n_dct_coefficients_kept > max_n_dct )
-			  throw ParamOutOfBoundaryError("n_dct_coefficients_kept", false, n_dct_coefficients_kept, 0);
+				// the maximum number of dct coeff:s that we can handle rhight now
+				const int size = src.extent(0);
+				const int max_n_dct = size * (size - 1) / 2;
 
-		  // make sure that destination is of correct size
-		  if( dst.extent(0) != n_dct_coefficients_kept ) 
-			  dst.resize( n_dct_coefficients_kept );
+				// we can currently only handle up to the major diagonal
+				if( n_dct_kept > max_n_dct )
+					throw ParamOutOfBoundaryError("n_dct_kept", false, n_dct_kept, 0);
 
-		  // 
-		  if (-1 == n_dct_coefficients_kept) 
-			  n_dct_coefficients_kept = max_n_dct;
+				// make sure that destination is of correct size
+				if( dst.extent(0) != n_dct_kept ) 
+					dst.resize( n_dct_kept );
 
-		  //
-		  int current_diagonal         = 0;
-		  int diagonal_left_to_right_p = false;
-		  int diagonal_index           = 0;
+				// if the number of DCT kept is not specified, set it to the MAX 
+				if (-1 == n_dct_kept) 
+					n_dct_kept = max_n_dct;
 
-		  for (int iii = 0; iii < n_dct_coefficients_kept; ++iii ) {
-			  int x, y;
+				// help variables
+				int current_diagonal         = 0;
+				int diagonal_left_to_right_p = zigzag_order;
+				int diagonal_index           = 0;
+
+				for (int iii = 0; iii < n_dct_kept; ++iii ) {
+					int x, y;
 			  
-			  if (diagonal_left_to_right_p) {
-				  x = diagonal_index;
-				  y = current_diagonal - x;
-			  } else {
-				  y = diagonal_index;
-				  x = current_diagonal - y;
-			  }
+					if (diagonal_left_to_right_p) {
+						x = diagonal_index;
+						y = current_diagonal - x;
+					} else {
+						y = diagonal_index;
+						x = current_diagonal - y;
+					}
 
-			  // save the value
-			  dst(iii) = src(x, y);
+					// save the value
+					dst(iii) = src(x, y);
 
-			  if (current_diagonal <= diagonal_index) {
-				  ++current_diagonal;
-				  diagonal_left_to_right_p = !diagonal_left_to_right_p;
-				  diagonal_index = 0; 
-			  }  else {
-				  ++diagonal_index;
-			  }
-		  }
-	  }
-  }
+					if (current_diagonal <= diagonal_index) {
+						++current_diagonal;
+						diagonal_left_to_right_p = !diagonal_left_to_right_p;
+						diagonal_index = 0; 
+					}  else {
+						++diagonal_index;
+					}
+				}
+			}
+	}
 
-/**
- * @}
- */
+	/**
+	 * @}
+	 */
 }
 
 #endif /* TORCH5SPRO_IP_ZIGZAG_H */
