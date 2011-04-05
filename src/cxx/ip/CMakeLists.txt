@@ -88,6 +88,7 @@ torch_library(ip "${src}" "${deps}" "${shared}")
 add_dependencies(torch_ip ip-cxx_header_install)
 
 # Defines tests for this package
+torch_test(ip block test/block.cc)
 torch_test(ip crop test/crop.cc)
 torch_test(ip flipflop test/flipflop.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
