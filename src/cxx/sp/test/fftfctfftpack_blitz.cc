@@ -14,6 +14,7 @@
 
 #include "sp/FFT.h"
 #include "sp/FCT.h"
+#include "sp/DCT2D.h"
 // Random number
 #include <cstdlib>
 
@@ -387,5 +388,39 @@ BOOST_AUTO_TEST_CASE( test_fftshift2D_random )
   }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
 
+
+BOOST_AUTO_TEST_CASE( test_DCT2D )
+{
+  // This tests the 2D DCT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 64.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 64 + 1);
+    int N = (rand() % 64 + 1);
+
+    Torch::sp::DCT2D dct_new(M,N);
+
+    blitz::Array<double,2> t(M,N), res(M,N);
+    for( int i=0; i < M; ++i)
+      for( int j=0; j < N; ++j)
+        t(i,j) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new DCT2D class
+    dct_new(t, res);
+
+    // process using FCT
+    blitz::Array<double,2> t_fct;
+    Torch::sp::fct(t, t_fct);
+
+    // Compare to old implementation
+    BOOST_REQUIRE_EQUAL(t_fct.extent(0), res.extent(0));
+    BOOST_REQUIRE_EQUAL(t_fct.extent(1), res.extent(1));
+    for(int i=0; i < res.extent(0); ++i)
+      for(int j=0; j < res.extent(1); ++j)
+        BOOST_CHECK_SMALL( fabs(t_fct(i,j)-res(i,j)), eps);
+  }
+}
+
+
+BOOST_AUTO_TEST_SUITE_END()

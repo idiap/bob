@@ -14,7 +14,8 @@ set(src
     "src/spFCT.cc"
     "src/spDeltaOne.cc"
     "src/FFT.cc"
-    "src/FCT.cc")
+    "src/FCT.cc"
+    "src/DCT2D.cc")
 
 include(../../cmake/macros.cmake)
 torch_header_install(sp-cxx sp "torch::sp")
