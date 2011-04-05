@@ -41,17 +41,17 @@ namespace Torch {
 				const int size = src.extent(0);
 				const int max_n_dct = size * (size - 1) / 2;
 
+ 				// if the number of DCT kept is not specified, set it to the MAX 
+				if (-1 == n_dct_kept) 
+					n_dct_kept = max_n_dct;
+
 				// we can currently only handle up to the major diagonal
 				if( n_dct_kept > max_n_dct )
-					throw ParamOutOfBoundaryError("n_dct_kept", false, n_dct_kept, 0);
+					throw ParamOutOfBoundaryError("n_dct_kept", true, n_dct_kept, max_n_dct);
 
 				// make sure that destination is of correct size
 				if( dst.extent(0) != n_dct_kept ) 
 					dst.resize( n_dct_kept );
-
-				// if the number of DCT kept is not specified, set it to the MAX 
-				if (-1 == n_dct_kept) 
-					n_dct_kept = max_n_dct;
 
 				// help variables
 				int current_diagonal         = 0;
