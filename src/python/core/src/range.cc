@@ -62,9 +62,6 @@ struct range_from_slice {
     //interactive shells. I don't understand the reason for that, but casting
     //to PySliceObject and then accessing the individual components of the
     //slice seems to work reliably.
-    // OBSERVATION: Problems only appear for indexing 1D arrays and is probably
-    // due to some code in the begin of the index method. See
-    // array_indexing_1.cc for the code and more comments.
 
     //prepares the inner Range object (storage) that will be constructed
     void* storage = ((bp::converter::rvalue_from_python_storage<container_type>*)data)->storage.bytes;
@@ -77,25 +74,19 @@ struct range_from_slice {
     //the start value may be None
     int start = tp::range::fromStart;
     if (slice->start != Py_None) {
-      bp::handle<> handle(slice->start);
-      bp::object obj(handle);
-      start = bp::extract<int>(obj);
+      start = PyInt_AsLong(slice->start);
     }
 
     //the stop value may be None
     int stop = tp::range::toEnd;
     if (slice->stop != Py_None) {
-      bp::handle<> handle(slice->stop);
-      bp::object obj(handle);
-      stop = bp::extract<int>(obj) - 1;
+      stop = PyInt_AsLong(slice->stop);
     }
 
     //the step value may be None
     int step = 1;
     if (slice->step != Py_None) {
-      bp::handle<> handle(slice->step);
-      bp::object obj(handle);
-      step = bp::extract<int>(obj);
+      stop = PyInt_AsLong(slice->stop);
     }
     
     result.setRange(start, stop, step);
