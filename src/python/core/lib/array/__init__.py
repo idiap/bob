@@ -45,7 +45,7 @@ def array(data, dtype=None):
   """Creates a new blitz::Array<T,N> through numpy. 
   
   The dimensionality is extracted from the data. The data-type (dtype) is
-  inferred from the data if not given à là numpy.
+  inferred from the data if not given a la numpy.
 
   This method is handy for python -> blitz array conversions and may be
   inefficient for production code. In the latter case, please directly use the
