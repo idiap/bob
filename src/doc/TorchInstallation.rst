@@ -170,8 +170,6 @@ symbolic link from this binary. Here are the instructions:
    $ cd /opt/local/bin; sudo ln -s gfortran-mp-4.4 gfortran
 
 .. warning::
-   * Blitz-0.9 will not compile with gcc v4.4, you will need the CVS version
-     for that;
    * Torch/Blitz python bindings will not compile in _release_ mode with plain
      gcc-4.2 (blitz causes a segmentation fault at the compiler). This is why
      we recommend to use the llvm gcc bridge instead.
@@ -200,6 +198,25 @@ Grab a tarball and change into the directory of your choice, let's say
   $ cd WORKDIR
   $ wget |torchweb|/nightlies/torch-nightly-latest.tar.gz
   $ tar xvfz torch-nightly-latest.tar.gz
+
+.. _section-checkout:
+
+Checking out |project|
+----------------------
+
+To checkout you currently need access to Idiap's internal filesystem (to be
+open-sourced soon!):
+
+.. code-block:: sh
+
+   $ git clone username@machine.idiap.ch:/idiap/group/torch5spro/git/torch5spro.git
+
+You have to fill the ``username`` and ``machine`` bits with your Idiap username
+and the machine you want to use for ssh. Please note that in order to push
+changes you need that ``machine`` does have `BuildBot`_ packages installed so
+that our build server is correctly informed of changes. Please contact one of
+the |project| developers to learn about existing machines with packages
+pre-installed.
 
 .. _section-compilation:
 
@@ -265,3 +282,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _tables: http://www.pytables.org
 .. _matplotlib: http://matplotlib.sourceforge.net
 .. _torchidiapguide: https://www.idiap.ch/software/torch5spro/wiki/TorchIdiapGuide
+.. _buildbot: http://http://trac.buildbot.net

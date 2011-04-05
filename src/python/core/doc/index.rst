@@ -8,5 +8,7 @@
  Basic Functionality
 =====================
 
-.. automodule:: torch.core
-   :members:
+.. toctree::
+   :maxdepth: 2
+
+   UsingBlitzArrays
