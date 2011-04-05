@@ -54,7 +54,7 @@ namespace Torch {
      * dimension.
      */
     template <typename T, int D>
-    inline bool isCContiguous( const blitz::Array<T,D>& a) 
+    bool isCContiguous( const blitz::Array<T,D>& a) 
     {
       if( !a.isStorageContiguous() )
         return false;
@@ -74,7 +74,7 @@ namespace Torch {
      * ascending order in each dimension.
      */
     template <typename T, int D>
-    inline bool isFortranContiguous( const blitz::Array<T,D>& a) 
+    bool isFortranContiguous( const blitz::Array<T,D>& a) 
     {
       if( !a.isStorageContiguous() )
         return false;
@@ -91,7 +91,7 @@ namespace Torch {
      * contiguous memory area, with zero base indices. 
      */
     template <typename T, int D>
-    inline bool isCZeroBaseContiguous( const blitz::Array<T,D>& a) 
+    bool isCZeroBaseContiguous( const blitz::Array<T,D>& a) 
     {
       if( !isZeroBase(a) )
         return false;
@@ -103,7 +103,7 @@ namespace Torch {
      * contiguous memory area, with one base indices. 
      */
     template <typename T, int D>
-    inline bool isFortranOneBaseContiguous( const blitz::Array<T,D>& a) 
+    bool isFortranOneBaseContiguous( const blitz::Array<T,D>& a) 
     {
       if( !isOneBase(a) )
         return false;
