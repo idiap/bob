@@ -9,10 +9,12 @@
 #ifndef TORCH5SPRO_IP_DCTFEATUREEXTRACT_H
 #define TORCH5SPRO_IP_DCTFEATUREEXTRACT_H
 
+#include <list>
 #include "core/logging.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
 #include "sp/FCT.h"
+#include "ip/block.h"
 
 namespace Torch {
 /**
@@ -46,7 +48,7 @@ namespace Torch {
 		  blitz::Array<T, 2> dct_tmp_block;
 
 		  /// dct extract each block
-		  for (U::const_iterator it = dst.begin(); it != dst.end(); ++it) {
+		  for (typename U::const_iterator it = dst.begin(); it != dst.end(); ++it) {
 
 			  // dct require double type, therefore cast it
 			  double_version = Torch::core::cast<double>(*it);
