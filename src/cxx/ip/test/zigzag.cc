@@ -38,25 +38,55 @@ struct T {
 	~T() {}
 };
 
+template<typename T, typename U, int d>  
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+{
+  BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
+  for( int i=0; i<t1.dimensions(); ++i)
+    BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+      BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      for( int k=0; k<t1.extent(2); ++k)
+        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+}
+
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_zigzag )
 {
 	blitz::Array<uint32_t,1> dst;
 
-	std::cout << "SRC: " << src << std::endl;
+	Torch::ip::zigzag(src, dst, 3);
+	checkBlitzEqual(dst, dst3);
 
-	Torch::ip::zigzagt(src, dst, 3);
-	std::cout << "3 dct kept: " << dst << std::endl;
-	std::cout << "3 dct kept: " << dst3 << std::endl;
+	Torch::ip::zigzag(src, dst, 6);
+	checkBlitzEqual(dst, dst6);
 
-	Torch::ip::zigzagt(src, dst, 6);
-	std::cout << "6 dct kept: " << dst << std::endl;
-	std::cout << "6 dct kept: " << dst6 << std::endl;
-
-	Torch::ip::zigzagt(src, dst, 10);
-	std::cout << "10 dct kept: " << dst << std::endl;
-	std::cout << "10 dct kept: " << dst10 << std::endl;
+	Torch::ip::zigzag(src, dst, 10);
+	checkBlitzEqual(dst, dst10);
 }
   
 BOOST_AUTO_TEST_SUITE_END()
