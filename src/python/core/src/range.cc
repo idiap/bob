@@ -80,7 +80,7 @@ struct range_from_slice {
     //the stop value may be None
     int stop = tp::range::toEnd;
     if (slice->stop != Py_None) {
-      stop = PyInt_AsLong(slice->stop);
+      stop = PyInt_AsLong(slice->stop) - 1;
     }
 
     //the step value may be None
