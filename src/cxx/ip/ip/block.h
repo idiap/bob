@@ -27,21 +27,21 @@ namespace Torch {
         */
       template<typename T, typename U>
       void blockNoCheck(const blitz::Array<T,2>& src, U& dst, 
-          const int block_w, const int block_h, const int overlap_w, 
-          const int overlap_h)
+          const int block_h, const int block_w, const int overlap_h, 
+          const int overlap_w)
       {
         // Determine the number of block per row and column
-        const int size_ov_w = block_w - overlap_w;
         const int size_ov_h = block_h - overlap_h;
-        const int n_blocks_w = (src.extent(1)-overlap_w)/ size_ov_w;
+        const int size_ov_w = block_w - overlap_w;
         const int n_blocks_h = (src.extent(0)-overlap_h)/ size_ov_h;
+        const int n_blocks_w = (src.extent(1)-overlap_w)/ size_ov_w;
 
         // Perform the block decomposition
         blitz::Array<T,2> current_block;
         for( int h=0; h<n_blocks_h; ++h)
           for( int w=0; w<n_blocks_w; ++w) {
-            detail::cropNoCheckReference( src, current_block, w*size_ov_w, 
-              h*size_ov_h, block_w, block_h);
+            detail::cropNoCheckReference( src, current_block, h*size_ov_h,
+              w*size_ov_w, block_h, block_w);
             dst.push_back( current_block );
           }
       }
@@ -64,36 +64,36 @@ namespace Torch {
       */
     template<typename T, typename U>
     void block(const blitz::Array<T,2>& src, U& dst, 
-      const int block_w, const int block_h, const int overlap_w, 
-      const int overlap_h)
+      const int block_h, const int block_w, const int overlap_h, 
+      const int overlap_w)
     {
       // Checks that the src array has zero base indices
       detail::assertZeroBase( src);
 
       // Check parameters and throw exception if required
-      if( block_w<1)
-        throw ParamOutOfBoundaryError("block_w", false, block_w, 1); 
-      if( block_w>src.extent(1) )
-        throw ParamOutOfBoundaryError("block_w", true, block_w, 
-          src.extent(1)); 
       if( block_h<1)
         throw ParamOutOfBoundaryError("block_h", false, block_h, 1); 
       if( block_h>src.extent(1) )
         throw ParamOutOfBoundaryError("block_h", true, block_h, 
           src.extent(0)); 
-      if( overlap_w<0)
-        throw ParamOutOfBoundaryError("overlap_w", false, overlap_w, 1);
-      if( overlap_w>=block_w )
-        throw ParamOutOfBoundaryError("overlap_w", true, overlap_w, 
-          block_w); 
+      if( block_w<1)
+        throw ParamOutOfBoundaryError("block_w", false, block_w, 1); 
+      if( block_w>src.extent(1) )
+        throw ParamOutOfBoundaryError("block_w", true, block_w, 
+          src.extent(1)); 
       if( overlap_h<0)
         throw ParamOutOfBoundaryError("overlap_h", false, overlap_h, 1);
       if( overlap_h>=block_h )
         throw ParamOutOfBoundaryError("overlap_h", true, overlap_h, 
           block_h); 
+      if( overlap_w<0)
+        throw ParamOutOfBoundaryError("overlap_w", false, overlap_w, 1);
+      if( overlap_w>=block_w )
+        throw ParamOutOfBoundaryError("overlap_w", true, overlap_w, 
+          block_w); 
 
       // Crop the 2D array
-      detail::blockNoCheck(src, dst, block_w, block_h, overlap_w, overlap_h);
+      detail::blockNoCheck(src, dst, block_h, block_w, overlap_h, overlap_w);
     }
   }
 

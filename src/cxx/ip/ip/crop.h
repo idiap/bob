@@ -37,8 +37,8 @@ namespace Torch {
         */
       template<typename T>
       void cropNoCheckReference(const blitz::Array<T,2>& src, 
-        blitz::Array<T,2>& dst, const int crop_x, const int crop_y, 
-        const int crop_w, const int crop_h)
+        blitz::Array<T,2>& dst, const int crop_y, const int crop_x, 
+        const int crop_h, const int crop_w)
       {
         blitz::Range ry( crop_y, crop_y+crop_h-1);
         blitz::Range rx( crop_x, crop_x+crop_w-1);
@@ -102,7 +102,7 @@ namespace Torch {
       */
     template<typename T>
     void cropReference(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const int crop_x, const int crop_y, const int crop_w, const int crop_h)
+      const int crop_y, const int crop_x, const int crop_h, const int crop_w)
     {
       // Checks that the src array has zero base indices
       detail::assertZeroBase( src);
@@ -136,7 +136,7 @@ namespace Torch {
       }
     
       // Crop the 2D array
-      detail::cropNoCheckReference(src, dst, crop_x, crop_y, crop_w, crop_h);
+      detail::cropNoCheckReference(src, dst, crop_y, crop_x, crop_h, crop_w);
     }
 
     /**
