@@ -23,6 +23,18 @@ namespace Torch {
 
     namespace detail {
       /**
+        * @brief Checks that a blitz array has zero base indices, and throws
+        * a NonZeroBaseError exception if this is not the case.
+        */
+      template<typename T, int D>
+      void assertZeroBase(const blitz::Array<T,D>& src)
+      {
+        for(int i=0; i<src.rank(); ++i)
+          if( src.base(i)!=0)
+            throw NonZeroBaseError( i, src.base(i));
+      }
+
+      /**
         * @brief Function which copies a 2D blitz::array/image of a given type.
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
