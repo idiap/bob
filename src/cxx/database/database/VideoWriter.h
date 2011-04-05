@@ -36,13 +36,13 @@ namespace Torch { namespace database {
        * output. If it exists, it will be truncated.
        * @param height The height of the video
        * @param width The width of the video
-       * @param bitrate The estimated bitrate of the output video
        * @param framerate The number of frames per second
+       * @param bitrate The estimated bitrate of the output video
        * @param gop Group-of-Pictures (how many non-key frames to have per
        * frame group)
        */
       VideoWriter(const std::string& filename, size_t height, size_t width, 
-          float bitrate=1500000.f, float framerate=25.f, size_t gop=12);
+          float framerate=25.f, float bitrate=1500000.f, size_t gop=12);
 
       /**
        * Destructor virtualization
@@ -130,6 +130,12 @@ namespace Torch { namespace database {
        */
       void append(const blitz::Array<uint8_t,3>& data);
 
+    private: //not implemented
+
+      VideoWriter(const VideoWriter& other);
+
+      VideoWriter& operator= (const VideoWriter& other);
+
     private: //ffmpeg methods
 
       /**
@@ -159,11 +165,11 @@ namespace Torch { namespace database {
 
     private: //representation
 
-      const std::string& m_filename;
+      std::string m_filename;
       size_t m_height;
       size_t m_width;
-      float m_bitrate;
       float m_framerate;
+      float m_bitrate;
       size_t m_gop;
       std::string m_codecname;
       std::string m_codecname_long;

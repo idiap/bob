@@ -46,15 +46,47 @@ db::VideoReader::VideoReader(const std::string& filename):
   m_codecname_long(""),
   m_formatted_info("")
 {
+  open();
+}
+
+db::VideoReader::VideoReader(const db::VideoReader& other):
+  m_filepath(other.m_filepath),
+  m_height(0),
+  m_width(0),
+  m_nframes(0),
+  m_framerate(0),
+  m_duration(0),
+  m_codecname(""),
+  m_codecname_long(""),
+  m_formatted_info("")
+{
+  open();
+}
+
+db::VideoReader& db::VideoReader::operator= (const db::VideoReader& other) {
+  m_filepath = other.m_filepath;
+  m_height = 0;
+  m_width = 0;
+  m_nframes = 0;
+  m_framerate = 0.0;
+  m_duration = 0;
+  m_codecname = "";
+  m_codecname_long = "";
+  m_formatted_info = "";
+  open();
+  return *this;
+}
+
+void db::VideoReader::open() {
   AVFormatContext* format_ctxt;
 
-  if (av_open_input_file(&format_ctxt, filename.c_str(), NULL, 0, NULL) != 0) {
-    throw db::FileNotReadable(filename);
+  if (av_open_input_file(&format_ctxt, m_filepath.c_str(),NULL,0,NULL) != 0) {
+    throw db::FileNotReadable(m_filepath);
   }
 
   // Retrieve stream information
   if (av_find_stream_info(format_ctxt)<0) {
-    throw db::FFmpegException(filename.c_str(), "cannot find stream info");
+    throw db::FFmpegException(m_filepath.c_str(), "cannot find stream info");
   }
 
   // Look for the first video stream in the file
@@ -66,7 +98,7 @@ db::VideoReader::VideoReader(const std::string& filename):
     }
   }
   if(stream_index == -1) {
-    throw db::FFmpegException(filename.c_str(), "cannot find any video stream");
+    throw db::FFmpegException(m_filepath.c_str(), "cannot find any video stream");
   }
 
   // Get a pointer to the codec context for the video stream
@@ -81,12 +113,12 @@ db::VideoReader::VideoReader(const std::string& filename):
   AVCodec* codec = avcodec_find_decoder(codec_ctxt->codec_id);
 
   if (!codec) {
-    throw db::FFmpegException(filename.c_str(), "unsupported codec required");
+    throw db::FFmpegException(m_filepath.c_str(), "unsupported codec required");
   }
 
   // Open codec
   if (avcodec_open(codec_ctxt, codec) < 0) {
-    throw db::FFmpegException(filename.c_str(), "cannot open supported codec");
+    throw db::FFmpegException(m_filepath.c_str(), "cannot open supported codec");
   }
 
   /**

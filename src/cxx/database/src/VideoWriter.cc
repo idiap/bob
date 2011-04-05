@@ -16,12 +16,12 @@
 namespace db = Torch::database;
 
 db::VideoWriter::VideoWriter(const std::string& filename, size_t height,
-    size_t width, float bitrate, float framerate, size_t gop):
+    size_t width, float framerate, float bitrate, size_t gop):
   m_filename(filename),
   m_height(height),
   m_width(width),
-  m_bitrate(bitrate),
   m_framerate(framerate),
+  m_bitrate(bitrate),
   m_gop(gop),
   m_codecname(""),
   m_codecname_long(""),

@@ -74,9 +74,9 @@ void bind_database_video() {
     .def("__iter__", &db::VideoReader::begin)
     ;
 
-  class_<db::VideoWriter, boost::shared_ptr<db::VideoWriter> >("VideoWriter",
+  class_<db::VideoWriter, boost::shared_ptr<db::VideoWriter>, boost::noncopyable>("VideoWriter",
      "Use objects of this class to create and write video files using FFMPEG.",
-     init<const std::string&, size_t, size_t, optional<float, float, size_t> >((arg("filename"), arg("height"), arg("width"), arg("bitrate")=1500000, arg("framerate")=25, arg("gop")=12), "Creates a new output file given the input parameters. The codec to be used will be derived from the filename extension."))
+     init<const std::string&, size_t, size_t, optional<float, float, size_t> >((arg("filename"), arg("height"), arg("width"), arg("framerate")=25.f, arg("bitrate")=1500000.f, arg("gop")=12), "Creates a new output file given the input parameters. The codec to be used will be derived from the filename extension."))
     .add_property("filename", make_function(&db::VideoWriter::filename, return_value_policy<copy_const_reference>()))
     .add_property("height", &db::VideoWriter::height)
     .add_property("width", &db::VideoWriter::width)

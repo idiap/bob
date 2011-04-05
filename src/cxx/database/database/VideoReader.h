@@ -47,9 +47,19 @@ namespace Torch { namespace database {
       VideoReader(const std::string& filename);
 
       /**
+       * Opens a new Video stream copying information from another VideoStream
+       */
+      VideoReader(const VideoReader& other);
+
+      /**
        * Destructor virtualization
        */
       virtual ~VideoReader();
+
+      /**
+       * Copy operator
+       */
+      VideoReader& operator= (const VideoReader& other);
 
       /**
        * Returns the name of the file I'm reading
@@ -104,6 +114,13 @@ namespace Torch { namespace database {
        * resized if required.
        */
       void load(blitz::Array<uint8_t,4>& data) const;
+
+    private: //methods
+
+      /**
+       * Opens the previously set up Video stream for the reader
+       */
+      void open();
 
     public: //iterators
 
