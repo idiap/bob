@@ -68,7 +68,7 @@ void bind_database_video() {
     .add_property("duration", &db::VideoReader::duration)
     .add_property("codecName", make_function(&db::VideoReader::codecName, return_value_policy<copy_const_reference>()))
     .add_property("codecLongName", make_function(&db::VideoReader::codecLongName, return_value_policy<copy_const_reference>()))
-    .add_property("frameRate", &db::VideoWriter::frameRate)
+    .add_property("frameRate", &db::VideoReader::frameRate)
     .add_property("info", make_function(&db::VideoReader::info, return_value_policy<copy_const_reference>()))
     .def("load", &db::VideoReader::load, (arg("array")), "Loads all of the video stream in a blitz array organized in this way: (frames, color-bands, height, width). The 'data' parameter will be resized if required.")
     .def("__iter__", &db::VideoReader::begin)
