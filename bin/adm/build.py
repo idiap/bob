@@ -310,8 +310,6 @@ def sphinx(option):
 
   logging.debug('Running Sphinx...')
 
-  os.chdir(option.build_prefix)
-
   sphinx_prefix = os.path.join(option.doc_prefix, "sphinx")
   if not os.path.exists(sphinx_prefix): os.makedirs(sphinx_prefix)
   
