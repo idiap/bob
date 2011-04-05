@@ -26,6 +26,29 @@ namespace Torch {
         * @brief Function which crops a 2D blitz::array/image of a given type.
         *   The first dimension is the height (y-axis), whereas the second
         *   one is the width (x-axis).
+        * @param src The input blitz array
+        * @param dst The output blitz array
+        * @param crop_x The x-offset of the top left corner of the cropping area 
+        * wrt. to the x-index of the top left corner of the blitz::array.
+        * @param crop_y The y-offset of the top left corner of the cropping area 
+        * wrt. to the y-index of the top left corner of the blitz::array.
+        * @param crop_w The desired width of the cropped blitz::array.
+        * @param crop_h The desired height of the cropped blitz::array.
+        */
+      template<typename T>
+      void cropNoCheckReference(const blitz::Array<T,2>& src, 
+        blitz::Array<T,2>& dst, const int crop_x, const int crop_y, 
+        const int crop_w, const int crop_h)
+      {
+        blitz::Range ry( crop_y, crop_y+crop_h-1);
+        blitz::Range rx( crop_x, crop_x+crop_w-1);
+        dst.reference( src( ry, rx));
+      }
+
+      /**
+        * @brief Function which crops a 2D blitz::array/image of a given type.
+        *   The first dimension is the height (y-axis), whereas the second
+        *   one is the width (x-axis).
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
         * @param dst The output blitz array
@@ -63,6 +86,58 @@ namespace Torch {
 
     }
 
+
+    /**
+      * @brief Function which crops a 2D blitz::array/image of a given type.
+      *   The first dimension is the height (y-axis), whereas the second
+      *   one is the width (x-axis).
+      * @param src The input blitz array
+      * @param dst The output blitz array
+      * @param crop_x The x-offset of the top left corner of the cropping area 
+      * wrt. to the x-index of the top left corner of the blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping area 
+      * wrt. to the y-index of the top left corner of the blitz::array.
+      * @param crop_w The desired width of the cropped blitz::array.
+      * @param crop_h The desired height of the cropped blitz::array.
+      */
+    template<typename T>
+    void cropReference(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+      const int crop_x, const int crop_y, const int crop_w, const int crop_h)
+    {
+      // Checks that the src array has zero base indices
+      detail::assertZeroBase( src);
+
+      // Check parameters and throw exception if required
+      if( crop_x<0 || crop_y<0 || crop_w<0 || crop_h<0 || 
+        crop_x+crop_w>src.extent(1) || crop_y+crop_h>src.extent(0) ) 
+      {
+        if( crop_x<0 ) {
+          throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
+        }
+        else if( crop_y<0) {
+          throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
+        }
+        else if( crop_w<0) {
+          throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
+        }
+        else if( crop_h<0) {
+          throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
+        }
+        else if( crop_x+crop_w>src.extent(1)) {
+          throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
+            src.extent(1) );
+        }
+        else if( crop_y+crop_h>src.extent(0)) {
+          throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
+            src.extent(0) );
+        }
+        else
+          throw Exception();
+      }
+    
+      // Crop the 2D array
+      detail::cropNoCheckReference(src, dst, crop_x, crop_y, crop_w, crop_h);
+    }
 
     /**
       * @brief Function which crops a 2D blitz::array/image of a given type.
