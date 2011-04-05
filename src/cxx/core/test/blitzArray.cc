@@ -16,8 +16,8 @@
 #include "core/logging.h"
 
 #ifdef __APPLE__
-# include <CoreServices/CoreServices.h>
-# include <stdint.h>
+# include <sys/types.h>
+# include <sys/sysctl.h>
 #else
 # include <unistd.h>
 #endif
@@ -33,9 +33,11 @@ struct T {
  */
 size_t maxRAMInMegabytes () {
 #ifdef __APPLE__
-  int32_t memsize;
-  Gestalt(gestaltPhysicalRAMSizeInMegabytes, &memsize);
-  return memsize;
+  int64_t memsize;
+  size_t len = sizeof(memsize);
+  int mib[] = { CTL_HW, HW_MEMSIZE };
+  if (sysctl(mib, 2, &memsize, &len, 0, 0) != 0) return 1024; //returns 1G
+  return memsize / (1024 * 1024);
 #else
   return sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) / (1024 * 1024);
 #endif
@@ -353,5 +355,65 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_4D )
   checkBlitzEqual( Y, ref);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_CASE( test_blitz_array_check_C_fortran)
+{
+  blitz::Array<uint8_t,2> a(4,7);
+  a = 0;
+  // Check contiguous C-style array
+  BOOST_CHECK_EQUAL( Torch::core::isZeroBase(a), true);
+  BOOST_CHECK_EQUAL( Torch::core::isCContiguous(a), true);
+  BOOST_CHECK_EQUAL( Torch::core::isCZeroBaseContiguous(a), true);
+  BOOST_CHECK_EQUAL( Torch::core::isOneBase(a), false);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranContiguous(a), false);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranOneBaseContiguous(a), false);
 
+  blitz::Array<uint8_t,2> b = a.transpose(1,0);
+  // Check non-contiguous C-style array
+  BOOST_CHECK_EQUAL( Torch::core::isZeroBase(b), true);
+  BOOST_CHECK_EQUAL( Torch::core::isCContiguous(b), false);
+  BOOST_CHECK_EQUAL( Torch::core::isCZeroBaseContiguous(b), false);
+  BOOST_CHECK_EQUAL( Torch::core::isOneBase(b), false);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranContiguous(b), true);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranOneBaseContiguous(b), false);
+
+  blitz::Array<uint8_t,2> c(blitz::Range(1,4),blitz::Range(1,2));
+  c = 0;
+  // Check contiguous C-style array (non-zero base indices)
+  BOOST_CHECK_EQUAL( Torch::core::isZeroBase(c), false);
+  BOOST_CHECK_EQUAL( Torch::core::isCContiguous(c), true);
+  BOOST_CHECK_EQUAL( Torch::core::isCZeroBaseContiguous(c), false);
+  BOOST_CHECK_EQUAL( Torch::core::isOneBase(c), true);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranContiguous(c), false);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranOneBaseContiguous(c), false);
+
+  blitz::Array<uint8_t,2> d(5,2,blitz::FortranArray<2>());
+  d = 0;
+  // Check contiguous Fortran array
+  BOOST_CHECK_EQUAL( Torch::core::isZeroBase(d), false);
+  BOOST_CHECK_EQUAL( Torch::core::isCContiguous(d), false);
+  BOOST_CHECK_EQUAL( Torch::core::isCZeroBaseContiguous(d), false);
+  BOOST_CHECK_EQUAL( Torch::core::isOneBase(d), true);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranContiguous(d), true);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranOneBaseContiguous(d), true);
+
+  blitz::Array<uint8_t,2> e = d.transpose(1,0);
+  // Check non-contiguous Fortran array
+  BOOST_CHECK_EQUAL( Torch::core::isZeroBase(e), false);
+  BOOST_CHECK_EQUAL( Torch::core::isCContiguous(e), true);
+  BOOST_CHECK_EQUAL( Torch::core::isCZeroBaseContiguous(e), false);
+  BOOST_CHECK_EQUAL( Torch::core::isOneBase(e), true);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranContiguous(e), false);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranOneBaseContiguous(e), false);
+
+  blitz::Array<uint8_t,2> f(blitz::Range(0,4), blitz::Range(0,2),blitz::FortranArray<2>());
+  f = 0;
+  // Check contiguous C-style array (non-zero base indices)
+  BOOST_CHECK_EQUAL( Torch::core::isZeroBase(f), true);
+  BOOST_CHECK_EQUAL( Torch::core::isCContiguous(f), false);
+  BOOST_CHECK_EQUAL( Torch::core::isCZeroBaseContiguous(f), false);
+  BOOST_CHECK_EQUAL( Torch::core::isOneBase(f), false);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranContiguous(f), true);
+  BOOST_CHECK_EQUAL( Torch::core::isFortranOneBaseContiguous(f), false);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -27,8 +27,9 @@ def parse_args():
   import optparse
   
   #some defaults
-  actions = ('cmake', 'make_all', 'documentation', 'make_install', 'ctest', 
-      'make_clean', 'mrproper')
+  actions = ('cmake', 'make_all', 'all', 'build', 'documentation', 'docs',
+      'sphinx', 'doxygen', 'make_install', 'install', 'ctest', 'test',
+      'make_clean', 'clean', 'mrproper')
   build_types = ('release', 'debug') #default is #0
   build_blocks = ('all', 'cxx', 'python') #default is #0
   pwd = os.path.realpath(os.curdir)
@@ -89,7 +90,7 @@ def parse_args():
       help="executes all stages with lots of verbose output",
       )
   parser.add_option("-V", "--version", action="store", dest="version",
-      default="%(name)s-x.y.z", metavar="VERSION",
+      default="x.y.z", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
       )
   
@@ -139,17 +140,20 @@ def parse_args():
 if __name__ == '__main__':
   (options, args) = parse_args()
 
-  if options.action == 'cmake': 
+  if options.action == 'build':
+    #special option to run cmake/make_install
+    adm.build.cmake(options)
+    adm.build.install(options)
+  elif options.action == 'cmake': 
     adm.build.cmake(options)
     adm.build.dot(options)
-
-  elif options.action == 'make_all':
-    adm.build.make(options, 'all')
-    adm.build.write_header(options)
-  elif options.action == 'make_install': adm.build.install(options)
-  elif options.action == 'documentation': adm.build.documentation(options)
-  elif options.action == 'ctest': adm.build.ctest(options)
-  elif options.action == 'make_clean': adm.build.make(options, 'clean')
+  elif options.action in ('make_all', 'all'): adm.build.make(options, 'all')
+  elif options.action in ('make_install', 'install'): adm.build.install(options)
+  elif options.action in ('documentation', 'docs'): adm.build.documentation(options)
+  elif options.action == 'doxygen': adm.build.doxygen(options)
+  elif options.action == 'sphinx': adm.build.sphinx(options)
+  elif options.action in ('ctest', 'test'): adm.build.ctest(options)
+  elif options.action in ('make_clean', 'clean'): adm.build.make(options, 'clean')
   elif options.action == 'mrproper': adm.build.mrproper(options)
 
   sys.exit(0)

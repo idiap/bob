@@ -153,6 +153,12 @@ class ArraysetCodecTest(unittest.TestCase):
     self.transcode(codec, "torch3.bindata")
 
   def test03_matlab(self):
+    
+    try:
+      testcodec = torch.database.ArraysetCodecRegistry.getCodecByName('matlab.arrayset.binary')
+    except torch.database.CodecNotFound:
+      #if the codec is not found, skip this test
+      return
 
     # The matlab codec accepts arbitrary input arrays if ints, floats, doubles
     # and complex values

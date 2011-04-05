@@ -10,6 +10,7 @@
 #ifndef TORCH_CORE_BLITZ_MISC_H
 #define TORCH_CORE_BLITZ_MISC_H
 
+#include <cstdlib>
 #include <blitz/array.h>
 
 BZ_NAMESPACE(blitz)

@@ -13,6 +13,7 @@ set(pysrc
    "src/DataSet.cc"
    "src/ListDataSet.cc"
    "src/convert.cc"
+   "src/blitz_addon.cc"
    "src/main.cc"
    )
  

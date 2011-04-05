@@ -139,5 +139,17 @@ BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
   checkBlitzEqual(a3c_3, b3); 
 }
 
+BOOST_AUTO_TEST_CASE( test_crop_2d_ref )
+{
+  blitz::Array<uint32_t,2> b2;
+  // Full crop
+  Torch::ip::cropReference(a2, b2, 0, 0, 4, 4);
+  checkBlitzEqual(a2, b2); 
+
+  // Crop the middle part
+  Torch::ip::cropReference(a2, b2, 1, 1, 2, 2);
+  checkBlitzEqual(a2c_1, b2); 
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

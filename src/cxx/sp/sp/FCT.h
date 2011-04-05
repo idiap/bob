@@ -8,6 +8,7 @@
 #ifndef TORCH5SPRO_SP_FCT_H
 #define TORCH5SPRO_SP_FCT_H
 
+#include "core/array_common.h"
 #include "core/logging.h"
 #include <blitz/array.h>
 
