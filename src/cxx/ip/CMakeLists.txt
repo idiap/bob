@@ -90,6 +90,7 @@ add_dependencies(torch_ip ip-cxx_header_install)
 # Defines tests for this package
 torch_test(ip crop test/crop.cc)
 torch_test(ip flipflop test/flipflop.cc)
+torch_test(ip dctfeatureextract test/dctfeatureextract.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
