@@ -35,7 +35,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
 {
-	std::vector<blitz::Array<uint32_t,2> > dst;
+	std::vector<blitz::Array<double, 2> > dst;
 	Torch::ip::dctFeatureExtract(src, dst, 3, 3, 0, 0);
 }
   
