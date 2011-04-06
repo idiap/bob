@@ -25,29 +25,6 @@ const char* ip::Exception::what() const throw() {
   return what_string;
 }
 
-ip::NonZeroBaseError::NonZeroBaseError( const int dim, 
-  const int base) throw(): 
-    m_dim(dim), m_base(base) 
-{
-}
-
-ip::NonZeroBaseError::~NonZeroBaseError() throw() {
-}
-
-const char* ip::NonZeroBaseError::what() const throw() {
-  try {
-    boost::format message(
-      "The input array has dimension '%d' with a non-zero base index (base=%d).");
-    message % m_dim;
-    message % m_base;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "ip::NonZeroBaseError: cannot \
-      format, exception raised";
-    return emergency;
-  }
-}
 
 ip::ParamOutOfBoundaryError::ParamOutOfBoundaryError(
   const std::string& paramname, const bool larger, const int value, 

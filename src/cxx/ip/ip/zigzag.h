@@ -35,7 +35,7 @@ namespace Torch {
 				    int n_dct_kept = -1, const bool zigzag_order = false)
 			{
 				// Checks that the src array has zero base indices
-				detail::assertZeroBase( src);
+				Torch::core::assertZeroBase( src);
 
 				// the maximum number of dct coeff:s that we can handle rhight now
 				const int size = src.extent(0);

@@ -11,7 +11,7 @@
 
 #include "core/logging.h"
 #include "ip/Exception.h"
-#include "ip/common.h"
+#include "core/common.h"
 #include "ip/crop.h"
 
 namespace Torch {
@@ -68,7 +68,7 @@ namespace Torch {
       const int overlap_w)
     {
       // Checks that the src array has zero base indices
-      detail::assertZeroBase( src);
+      Torch::core::assertZeroBase( src);
 
       // Check parameters and throw exception if required
       if( block_h<1)
