@@ -9,7 +9,6 @@
 #define TORCH5SPRO_SP_DCT2D_H
 
 #include "core/logging.h"
-#include <blitz/array.h>
 
 namespace Torch {
 /**
@@ -43,11 +42,36 @@ namespace Torch {
         virtual void operator()(const blitz::Array<double,2>& src, 
           blitz::Array<double,2>& dst) = 0;
 
+        /**
+          * @brief Reset the DCT2D object for the given 2D shape
+          */
+        void reset(const int height, const int width);
+
+        /**
+          * @brief Get the current height of the DCT2D object
+          */
+        inline const int getHeight() { return m_height; }
+
+        /**
+          * @brief Get the current width of the DCT2D object
+          */
+        inline const int getWidth() { return m_width; }
+
       private:
+        /**
+          * @brief Initialize the normalization factors
+          */
+        void initNormFactors();
+
         /**
           * @brief Initialize the working arrays
           */
         void initWorkingArrays();
+
+        /**
+          * @brief Call the initialization procedures
+          */
+        void reset();
 
         /**
           * @brief Deallocate memory
@@ -60,10 +84,17 @@ namespace Torch {
           */
         int m_height;
         int m_width;
+
+        /**
+          * Working arrays
+          */
         double *m_wsave_w; 
         double *m_wsave_h; 
         double *m_col_tmp;
 
+        /**
+          * Normalization factors
+          */
         double m_sqrt_1h;
         double m_sqrt_2h;
         double m_sqrt_1w;

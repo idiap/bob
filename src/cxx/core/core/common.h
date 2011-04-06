@@ -10,6 +10,7 @@
 #define TORCH5SPRO_CORE_COMMON_H 1
 
 #include "core/Exception.h"
+#include <blitz/tinyvec-et.h>
 
 namespace Torch {
 /**
@@ -89,6 +90,30 @@ namespace Torch {
     {
       assertOneBase(src);
       assertFortranContiguous(src);
+    }
+
+    /**
+     * @brief Checks that a blitz array has the expected shape, and throws an
+     * UnexpectedShapeError exception if this is not the case.
+     */
+    template<typename T, int D>
+    void assertSameShape(const blitz::Array<T,D>& ar, 
+      const blitz::TinyVector<int, D>& shape)
+    {
+      if( !isSameShape(ar,shape) )
+        throw UnexpectedShapeError();
+    }
+
+    /**
+     * @brief Checks that two blitz arrays have the same shape, and throws an
+     * UnexpectedShapeError exception if this is not the case.
+     */
+    template<typename T, typename U, int D>
+    void assertSameShape(const blitz::Array<T,D>& a, 
+      const blitz::Array<U,D>& b)
+    {
+      if( !isSameShape(a,b) )
+        throw UnexpectedShapeError();
     }
 
 

@@ -126,6 +126,21 @@ namespace Torch {
       private:
         mutable std::string m_message;
     };
+
+    /**
+     * The UnexpectedShapeError exception occurs when a blitz array does not
+     * have the expected size.
+     */
+    class UnexpectedShapeError: public Exception {
+      public:
+        UnexpectedShapeError() throw();
+        virtual ~UnexpectedShapeError() throw();
+        virtual const char* what() const throw();
+
+      private:
+        mutable std::string m_message;
+    };
+
   }
 
 }
