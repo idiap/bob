@@ -38,8 +38,8 @@ namespace Torch {
 				Torch::core::assertZeroBase( src);
 
 				// the maximum number of dct coeff:s that we can handle rhight now
-				const int size = src.extent(0);
-				const int max_n_dct = size * (size - 1) / 2;
+				const int size = std::min(src.extent(0), src.extent(1));
+				const int max_n_dct = size * (size + 1) / 2;
 
  				// if the number of DCT kept is not specified, set it to the MAX 
 				if (-1 == n_dct_kept) 
