@@ -24,11 +24,8 @@ class FilterNewTest(unittest.TestCase):
   def test01_rotate(self):
     print ""
 
-    if1 = os.path.join("rubberwhale", "frame10_gray.png")
-    i1 = load_gray(if1)
-    u = torch.core.array.float64_2(i1.shape()); u.fill(0)
-
-    torch.ip.shift(i1, u, 10, 20)
+    
+    v = torch.database.VideoReader()
 
 if __name__ == '__main__':
   sys.argv.append('-v')
