@@ -97,6 +97,7 @@ torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
 torch_test(ip shear test/shear.cc)
 torch_test(ip shift test/shift.cc)
+torch_test(ip shifttocenter test/shifttocenter.cc)
 
 # Defines environment variable used to localize data for the tests
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
