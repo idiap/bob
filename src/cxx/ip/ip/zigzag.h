@@ -35,12 +35,12 @@ namespace Torch {
 		 * @param src The input blitz array
 		 * @param dst The output blitz array
 		 * @param n_coef_kept The number of coefficients to be kept
-		 * @param zigzag_order Set to true to change the zigzag order. By default,
-     *   the direction is left-to-right for the first diagonal
+		 * @param right_first Set to true to reverse the initial zigzag order. 
+     *   By default, the direction is left-to-right for the first diagonal.
 		 */
 		template<typename T>
     void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
-          int n_coef_kept = 0, const bool zigzag_order = false)
+          int n_coef_kept = 0, const bool right_first = false)
     {
       // Checks that the src array has zero base indices
       Torch::core::assertZeroBase( src);
@@ -57,7 +57,7 @@ namespace Torch {
 
       // Checks that the dst array has zero base indices and is of
       // the expected size
-      Torch::core::assertZeroBase( dst);
+      Torch::core::assertZeroBase(dst);
       blitz::TinyVector<int,1> shape( n_coef_kept);
       Torch::core::assertSameShape(dst,shape);
       
@@ -72,7 +72,7 @@ namespace Torch {
       // Index of the current diagonal
       int current_diagonal = 0;
       // Direction of the current diagonal
-      int diagonal_left_to_right_p = !zigzag_order; // Direction of the current diagonal
+      int diagonal_left_to_right_p = !right_first;
       // Offset the point in the current diagonal from its origin
       int diagonal_offset = 0;
       // Length of the current diagonal
