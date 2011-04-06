@@ -14,6 +14,7 @@
 
 #include "sp/FFT.h"
 #include "sp/FCT.h"
+#include "sp/DCT1D.h"
 #include "sp/DCT2D.h"
 // Random number
 #include <cstdlib>
@@ -390,6 +391,44 @@ BOOST_AUTO_TEST_CASE( test_fftshift2D_random )
 
 
 
+BOOST_AUTO_TEST_CASE( test_DCT1D )
+{
+  // This tests the 1D DCT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 2048.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 2048 + 1);
+
+    Torch::sp::DCT1D dct_new(M);
+    Torch::sp::IDCT1D idct_new(M);
+
+    blitz::Array<double,1> t(M), res(M), it(M);
+    for( int i=0; i < M; ++i)
+      t(i) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new DCT1D class
+    dct_new(t, res);
+
+    // process using FCT
+    blitz::Array<double,1> t_fct;
+    Torch::sp::fct(t, t_fct);
+
+    // Compare to old implementation
+    BOOST_REQUIRE_EQUAL(t_fct.extent(0), res.extent(0));
+    for(int i=0; i < res.extent(0); ++i)
+      BOOST_CHECK_SMALL( fabs(t_fct(i)-res(i)), eps);
+
+    // Processe using IFCT
+    idct_new(res, it);
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    for(int i=0; i < t.extent(0); ++i)
+      BOOST_CHECK_SMALL( fabs(t(i)-it(i)), eps);
+  }
+}
+
+
 BOOST_AUTO_TEST_CASE( test_DCT2D )
 {
   // This tests the 2D DCT using 10 random vectors
@@ -401,8 +440,9 @@ BOOST_AUTO_TEST_CASE( test_DCT2D )
     int N = (rand() % 64 + 1);
 
     Torch::sp::DCT2D dct_new(M,N);
+    Torch::sp::IDCT2D idct_new(M,N);
 
-    blitz::Array<double,2> t(M,N), res(M,N);
+    blitz::Array<double,2> t(M,N), res(M,N), it(M,N);
     for( int i=0; i < M; ++i)
       for( int j=0; j < N; ++j)
         t(i,j) = (rand()/(double)RAND_MAX)*10.;
@@ -419,6 +459,17 @@ BOOST_AUTO_TEST_CASE( test_DCT2D )
     for(int i=0; i < res.extent(0); ++i)
       for(int j=0; j < res.extent(1); ++j)
         BOOST_CHECK_SMALL( fabs(t_fct(i,j)-res(i,j)), eps);
+
+    // Processe using IFCT
+    idct_new(res, it);
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
+    for(int i=0; i < t.extent(0); ++i)
+      for(int j=0; j < t.extent(1); ++j)
+        BOOST_CHECK_SMALL( fabs(t(i,j)-it(i,j)), eps);
+
   }
 }
 
