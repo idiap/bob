@@ -56,25 +56,46 @@ static herr_t fill_index_callback( hid_t g_id, const char *name, const H5L_info_
 
       // Parse the type from the HDF5 dataset/datatype
       // Get the class
+      Torch::database::HDF5File::support_t el_type;
       switch (H5Tget_class(dtype_id)) {
         case H5T_INTEGER:
+        // Get signed/unsigned
+          switch(H5Tget_sign(dtype_id)) {
+            case H5T_SGN_NONE: // unsigned
+              switch(H5Tget_size(dtype_id)) {
+                case 1: el_type = Torch::database::HDF5File::u8; break;
+                case 2: el_type = Torch::database::HDF5File::u16; break;
+                case 4: el_type = Torch::database::HDF5File::u32; break;
+                case 8: el_type = Torch::database::HDF5File::u64; break;
+                default: Torch::database::Exception(); break;
+              }
+              break;
+            case H5T_SGN_2: // signed
+              switch(H5Tget_size(dtype_id)) {
+                case 1: el_type = Torch::database::HDF5File::i8; break;
+                case 2: el_type = Torch::database::HDF5File::i16; break;
+                case 4: el_type = Torch::database::HDF5File::i32; break;
+                case 8: el_type = Torch::database::HDF5File::i64; break;
+                default: Torch::database::Exception(); break;
+              }
+              break;
+            default:
+              break;
+          }
           break;
         case H5T_FLOAT:
+          switch(H5Tget_size(dtype_id)) {
+            case 4: el_type = Torch::database::HDF5File::f32; break;
+            case 8: el_type = Torch::database::HDF5File::f64; break;
+            case 16: el_type = Torch::database::HDF5File::f128; break;
+            default: Torch::database::Exception(); break;
+          }
           break;
         case H5T_STRING:
           break;
         // TODO: complex? boolean? HDF5 dataset-level Array?
         default: 
           throw Torch::database::Exception(); // TODO: add a specialized exception
-      }
-      // Get signed/unsigned
-      switch(H5Tget_sign(dtype_id)) {
-        case H5T_SGN_NONE: // unsigned
-          break;
-        case H5T_SGN_2: // signed
-          break;
-        default:
-          break;
       }
       // Get the size
       size_t sz = H5Tget_size(dtype_id);
