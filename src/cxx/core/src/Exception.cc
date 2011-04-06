@@ -75,8 +75,7 @@ const char* Torch::core::NonOneBaseError::what() const throw() {
 }
 
 
-Torch::core::NonCContiguousError::NonCContiguousError() throw()
-{
+Torch::core::NonCContiguousError::NonCContiguousError() throw() {
 }
 
 Torch::core::NonCContiguousError::~NonCContiguousError() throw() {
@@ -96,8 +95,7 @@ const char* Torch::core::NonCContiguousError::what() const throw() {
 }
 
 
-Torch::core::NonFortranContiguousError::NonFortranContiguousError() throw()
-{
+Torch::core::NonFortranContiguousError::NonFortranContiguousError() throw() {
 }
 
 Torch::core::NonFortranContiguousError::~NonFortranContiguousError() throw() {
@@ -111,6 +109,26 @@ const char* Torch::core::NonFortranContiguousError::what() const throw() {
     return m_message.c_str();
   } catch (...) {
     static const char* emergency = "core::NonFortranContiguousError: cannot \
+      format, exception raised";
+    return emergency;
+  }
+}
+
+
+Torch::core::UnexpectedShapeError::UnexpectedShapeError() throw() {
+}
+
+Torch::core::UnexpectedShapeError::~UnexpectedShapeError() throw() {
+}
+
+const char* Torch::core::UnexpectedShapeError::what() const throw() {
+  try {
+    boost::format message(
+      "The array does not have the expected size.");
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::UnexpectedShapeError: cannot \
       format, exception raised";
     return emergency;
   }
