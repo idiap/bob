@@ -22,18 +22,6 @@ namespace Torch { namespace ip {
 
   };
 
-  class NonZeroBaseError: public Exception {
-    public:
-      NonZeroBaseError(const int dim, const int base) throw();
-      virtual ~NonZeroBaseError() throw();
-      virtual const char* what() const throw();
-
-    private:
-      int m_dim;
-      int m_base;
-      mutable std::string m_message;
-  };
-
   class ParamOutOfBoundaryError: public Exception {
     public:
       ParamOutOfBoundaryError(const std::string& paramname, const bool larger, 

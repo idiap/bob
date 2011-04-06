@@ -8,9 +8,10 @@
  */
 
 #ifndef TORCH_CORE_BLITZ_ADDON_H
-#define TORCH_CORE_BLITZ_ADDON_H
+#define TORCH_CORE_BLITZ_ADDON_H 1
 
 #include <blitz/array.h>
+#include <blitz/tinyvec-et.h>
 
 namespace Torch {
 /**
@@ -108,6 +109,36 @@ namespace Torch {
       if( !isOneBase(a) )
         return false;
       return isFortranContiguous(a);
+    }
+
+    /**
+     * @brief Checks that a blitz array has the same shape as the one
+     * given in the second argument.
+     */
+    template <typename T, int D>
+    bool isSameShape( const blitz::Array<T,D>& ar, 
+      const blitz::TinyVector<int, D>& shape)
+    {
+      const blitz::TinyVector<int, D>& ar_shape = ar.shape();
+      for( int i=0; i<D; ++i)
+        if( ar_shape(i) != shape(i) )
+          return false;
+      return true;
+    }
+
+    /**
+     * @brief Checks that two blitz arrays have the same shape.
+     */
+    template <typename T, typename U, int D>
+    bool isSameShape( const blitz::Array<T,D>& a, 
+      const blitz::Array<U,D>& b)
+    {
+      const blitz::TinyVector<int, D>& a_shape = a.shape();
+      const blitz::TinyVector<int, D>& b_shape = b.shape();
+      for( int i=0; i<D; ++i)
+        if( a_shape(i) != b_shape(i) )
+          return false;
+      return true;
     }
 
 

@@ -11,7 +11,7 @@
 
 #include "core/logging.h"
 #include "ip/Exception.h"
-#include "ip/common.h"
+#include "core/common.h"
 
 namespace Torch {
 /**
@@ -105,7 +105,7 @@ namespace Torch {
       const int crop_y, const int crop_x, const int crop_h, const int crop_w)
     {
       // Checks that the src array has zero base indices
-      detail::assertZeroBase( src);
+      Torch::core::assertZeroBase( src);
 
       // Check parameters and throw exception if required
       if( crop_x<0 || crop_y<0 || crop_w<0 || crop_h<0 || 

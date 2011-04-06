@@ -71,10 +71,10 @@ void generateProblem( const int n, blitz::Array<double,2>& A,
   blitz::Array<double,1>& b, blitz::Array<double,1>& c, 
   blitz::Array<double,1>& x0)
 {
-  blitz::reindexAndResize( A, 0, 0, n, 2*n);
-  blitz::reindexAndResize( b, 0, n);
-  blitz::reindexAndResize( c, 0, 2*n);
-  blitz::reindexAndResize( x0, 0, 2*n);
+  Torch::core::reindexAndResize( A, 0, 0, n, 2*n);
+  Torch::core::reindexAndResize( b, 0, n);
+  Torch::core::reindexAndResize( c, 0, 2*n);
+  Torch::core::reindexAndResize( x0, 0, 2*n);
   A = 0.;
   c = 0.;
   for( int i=0; i<n; ++i) {

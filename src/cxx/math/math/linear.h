@@ -11,7 +11,7 @@
 #define TORCH5SPRO_MATH_LINEAR_H 1
 
 #include "core/logging.h"
-#include "core/Exception.h"
+#include "core/common.h"
 //#include "math/Exception.h"
 
 namespace Torch {
@@ -40,7 +40,7 @@ namespace Torch {
         throw Torch::core::Exception();
 
       // Reindex and resize output array
-      blitz::reindexAndResize( C, A.base(0), B.base(1), A.extent(0), 
+      Torch::core::reindexAndResize( C, A.base(0), B.base(1), A.extent(0), 
         B.extent(1));
 
       // Perform multiplication
@@ -60,7 +60,7 @@ namespace Torch {
         throw Torch::core::Exception();
 
       // Reindex and resize output array
-      blitz::reindexAndResize( c, A.base(0), A.extent(0));
+      Torch::core::reindexAndResize( c, A.base(0), A.extent(0));
 
       // Perform multiplication
       blitz::firstIndex i;

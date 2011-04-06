@@ -15,6 +15,7 @@ set(src
     "src/spDeltaOne.cc"
     "src/FFT.cc"
     "src/FCT.cc"
+    "src/DCT1D.cc"
     "src/DCT2D.cc")
 
 include(../../cmake/macros.cmake)

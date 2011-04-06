@@ -9,7 +9,8 @@
 #ifndef TORCH5SPRO_CORE_COMMON_H
 #define TORCH5SPRO_CORE_COMMON_H 1
 
-#include "core/logging.h"
+#include "core/Exception.h"
+#include <blitz/tinyvec-et.h>
 
 namespace Torch {
 /**
@@ -18,6 +19,104 @@ namespace Torch {
  *
  */
   namespace core {
+    /**
+     * @brief Checks that a blitz array has zero base indices, and throws
+     * a NonZeroBaseError exception if this is not the case.
+     */
+    template<typename T, int D>
+    void assertZeroBase(const blitz::Array<T,D>& src)
+    {
+      for( int i=0; i<src.rank(); ++i)
+        if( src.base(i)!=0 )
+          throw NonZeroBaseError( i, src.base(i));
+    }
+
+    /**
+     * @brief Checks that a blitz array has one base indices, and throws
+     * a NonOneBaseError exception if this is not the case.
+     */
+    template<typename T, int D>
+    void assertOneBase(const blitz::Array<T,D>& src)
+    {
+      for( int i=0; i<src.rank(); ++i)
+        if( src.base(i)!=1)
+          throw NonOneBaseError( i, src.base(i));
+    }
+
+    /**
+     * @brief Checks that a blitz array is a C-style array stored contiguously
+     * in memory, and throws a NonCContiguousError exception if this is not 
+     * the case.
+     */
+    template<typename T, int D>
+    void assertCContiguous(const blitz::Array<T,D>& src)
+    {
+      if( !isCContiguous(src) )
+        throw NonCContiguousError();
+    }
+
+    /**
+     * @brief Checks that a blitz array is a Fortran-style array stored 
+     * contiguously in memory, and throws a NonCContiguousError exception if 
+     * this is not the case.
+     */
+    template<typename T, int D>
+    void assertFortranContiguous(const blitz::Array<T,D>& src)
+    {
+      if( !isFortranContiguous(src) )
+        throw NonFortranContiguousError();
+    }
+
+    /**
+     * @brief Checks that a blitz array is a C-style array stored contiguously
+     * in memory with zero base indices, and throws a 
+     * NonCContiguousError/NonZeroBaseError exception if this is not the case.
+     */
+    template<typename T, int D>
+    void assertCZeroBaseContiguous(const blitz::Array<T,D>& src)
+    {
+      assertZeroBase(src);
+      assertCContiguous(src);
+    }
+
+    /**
+     * @brief Checks that a blitz array is a Fortran-style array stored 
+     * contiguously in memory with one base indices, and throws a 
+     * NonFortranContiguousError/NonZeroBaseError exception if this 
+     * is not the case.
+     */
+    template<typename T, int D>
+    void assertFortranOneBaseContiguous(const blitz::Array<T,D>& src)
+    {
+      assertOneBase(src);
+      assertFortranContiguous(src);
+    }
+
+    /**
+     * @brief Checks that a blitz array has the expected shape, and throws an
+     * UnexpectedShapeError exception if this is not the case.
+     */
+    template<typename T, int D>
+    void assertSameShape(const blitz::Array<T,D>& ar, 
+      const blitz::TinyVector<int, D>& shape)
+    {
+      if( !isSameShape(ar,shape) )
+        throw UnexpectedShapeError();
+    }
+
+    /**
+     * @brief Checks that two blitz arrays have the same shape, and throws an
+     * UnexpectedShapeError exception if this is not the case.
+     */
+    template<typename T, typename U, int D>
+    void assertSameShape(const blitz::Array<T,D>& a, 
+      const blitz::Array<U,D>& b)
+    {
+      if( !isSameShape(a,b) )
+        throw UnexpectedShapeError();
+    }
+
+
     /**
       * @brief Force value to stay in a given range [min, max]. In case of out
       *   of range values, the closest value is returned (i.e. min or max)
