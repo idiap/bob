@@ -1,9 +1,13 @@
 /**
- * @file src/cxx/ip/ip/dctFeatureExtract.h
+ * @file src/cxx/ip/ip/zigzag.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author <a href="mailto:Niklas.Johansson@idiap.ch">Niklas Johansson</a> 
  *
- * @brief This file defines a function to dctFeatureExtract a 2D or 3D array/image.
- * The algorithm is strongly inspired by the following article:
+ * @brief This file defines a function to extract a 1D zigzag pattern from
+ * 2D dimensional array as described in:
+ *   "Polynomial Features for Robust Face Authentication", 
+ *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+ *   IEEE International Conference on Image Processing 2002.
  * 
  */
 
@@ -23,64 +27,104 @@ namespace Torch {
 	namespace ip {
 
 		/**
-		 * @brief Extract the zigzag pattern from a 2D blitz::array
-		 * as presented in 
+		 * @brief Extract the zigzag pattern from a 2D blitz::array, as described 
+     * in:
+     *   "Polynomial Features for Robust Face Authentication", 
+     *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+     *   IEEE International Conference on Image Processing 2002.
 		 * @param src The input blitz array
 		 * @param dst The output blitz array
-		 * @param n_dct_kept The number of DCT coefficiants that are kept
-		 * @param zigzag_order Set to true to change the zigzag order.
+		 * @param n_coef_kept The number of coefficients to be kept
+		 * @param zigzag_order Set to true to change the zigzag order. By default,
+     *   the direction is left-to-right for the first diagonal
 		 */
 		template<typename T>
-			void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
-				    int n_dct_kept = -1, const bool zigzag_order = false)
-			{
-				// Checks that the src array has zero base indices
-				Torch::core::assertZeroBase( src);
+    void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
+          int n_coef_kept = 0, const bool zigzag_order = false)
+    {
+      // Checks that the src array has zero base indices
+      Torch::core::assertZeroBase( src);
 
-				// the maximum number of dct coeff:s that we can handle rhight now
-				const int size = std::min(src.extent(0), src.extent(1));
-				const int max_n_dct = size * (size + 1) / 2;
+      // Define useful constants
+      const int min_dim = std::min(src.extent(0), src.extent(1));
+      const int max_dim = std::max(src.extent(0), src.extent(1));
+      const int max_n_coef = src.extent(0)*src.extent(1);
 
- 				// if the number of DCT kept is not specified, set it to the MAX 
-				if (-1 == n_dct_kept) 
-					n_dct_kept = max_n_dct;
+      // if the number of coefficients to be kept is not specified, 
+      // set it to the MAX 
+      if(0 == n_coef_kept) 
+        n_coef_kept = max_n_coef;
 
-				// we can currently only handle up to the major diagonal
-				if( n_dct_kept > max_n_dct )
-					throw ParamOutOfBoundaryError("n_dct_kept", true, n_dct_kept, max_n_dct);
+      // Checks that the dst array has zero base indices and is of
+      // the expected size
+      Torch::core::assertZeroBase( dst);
+      blitz::TinyVector<int,1> shape( n_coef_kept);
+      Torch::core::assertSameShape(dst,shape);
+      
+      // Check that we ask to keep a valid number of coefficients
+      if( n_coef_kept > max_n_coef )
+        throw ParamOutOfBoundaryError("n_coef_kept", true, 
+          n_coef_kept, max_n_coef);
+      if( n_coef_kept < 0 )
+        throw ParamOutOfBoundaryError("n_coef_kept", false, 
+          n_coef_kept, 0);
 
-				// make sure that destination is of correct size
-				if( dst.extent(0) != n_dct_kept ) 
-					dst.resize( n_dct_kept );
+      // Index of the current diagonal
+      int current_diagonal = 0;
+      // Direction of the current diagonal
+      int diagonal_left_to_right_p = !zigzag_order; // Direction of the current diagonal
+      // Offset the point in the current diagonal from its origin
+      int diagonal_offset = 0;
+      // Length of the current diagonal
+      int diagonal_length = 1;
 
-				// help variables
-				int current_diagonal         = 0;
-				int diagonal_left_to_right_p = zigzag_order;
-				int diagonal_index           = 0;
+      // Get all required coefficients 
+      for(int ind=0; ind < n_coef_kept; ++ind ) {
+        int x, y;
+     
+        // Conditions used to determine the coordinates (x,y) in the 2D 
+        // array given the 1D index in the zigzag
+        if(diagonal_left_to_right_p) {
+          if( current_diagonal>src.extent(0)-1 ) {
+            x = current_diagonal-(src.extent(0)-1) + diagonal_offset;
+            y = (src.extent(0)-1) - diagonal_offset;
+          }
+          else {
+            x = diagonal_offset;
+            y = current_diagonal - diagonal_offset;
+          }
+        } else {
+          if( current_diagonal>src.extent(1)-1 ) {
+            x = (src.extent(1)-1) - diagonal_offset;
+            y = current_diagonal-(src.extent(1)-1) + diagonal_offset;
+          }
+          else {
+            x = current_diagonal - diagonal_offset;
+            y = diagonal_offset;
+          }
+        }
 
-				for (int iii = 0; iii < n_dct_kept; ++iii ) {
-					int x, y;
-			  
-					if (diagonal_left_to_right_p) {
-						x = diagonal_index;
-						y = current_diagonal - x;
-					} else {
-						y = diagonal_index;
-						x = current_diagonal - y;
-					}
+        // save the value in the 1D array
+        dst(ind) = src(y, x);
 
-					// save the value
-					dst(iii) = src(x, y);
-
-					if (current_diagonal <= diagonal_index) {
-						++current_diagonal;
-						diagonal_left_to_right_p = !diagonal_left_to_right_p;
-						diagonal_index = 0; 
-					}  else {
-						++diagonal_index;
-					}
-				}
-			}
+        // Increment the diagonal offset
+        ++diagonal_offset;
+        // Update information about the current diagonal if required
+        if(diagonal_length <= diagonal_offset) {
+          // Increment current diagonal
+          ++current_diagonal;
+          // Reverse the direction in the diagonal
+          diagonal_left_to_right_p = !diagonal_left_to_right_p; 
+          // Reset the offset in the diagonal to 0
+          diagonal_offset = 0; 
+          // Determine the new size of the diagonal
+          if( current_diagonal<min_dim )
+            ++diagonal_length;
+          else if( current_diagonal>=max_dim)
+            --diagonal_length;
+        }
+      }
+    }
 	}
 
 	/**

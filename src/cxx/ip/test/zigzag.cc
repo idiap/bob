@@ -1,38 +1,57 @@
 /**
- * @file src/cxx/ip/test/block.cc
+ * @file src/cxx/ip/test/zigzag.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief Test the block decomposition function for 2D arrays/images
+ * @brief Test the zigzag decomposition function for 2D arrays/images, 
+ *   which is used by the DCT features
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE IP-ZigZag Tests
+#define BOOST_TEST_MODULE IP-zigzag Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
-#include <stdint.h>
-#include <vector>
 #include "core/logging.h"
 #include "ip/zigzag.h"
 
 struct T {
-	blitz::Array<uint32_t,2> src;
-	blitz::Array<uint32_t,1> dst3, dst6, dst10;
+	blitz::Array<uint32_t,2> src_a, src_b;
+	blitz::Array<uint32_t,1>  dst_a3, dst_a6, dst_a10, dst_a21, dst_a26, dst_a36,
+                            dst_b2, dst_b3, dst_b6, dst_b8, dst_b8r;
 
-	T(): src(6,6), dst3(3), dst6(6), dst10(10)
+	T(): src_a(6,6), src_b(4,2),
+     dst_a3(3), dst_a6(6), dst_a10(10), dst_a21(21), dst_a26(26), dst_a36(36),
+     dst_b2(2), dst_b3(3), dst_b6(6), dst_b8(8), dst_b8r(8)
 	{
-		src = 0, 1, 2, 3, 4, 5, 
-			6, 7, 8, 9, 10, 11, 
-			12, 13, 14, 15, 16, 17, 
-			18, 19, 20, 21, 22, 23, 
-			24, 25, 26, 27, 28, 29,
-			30, 31, 32, 33, 34, 35;
+		src_a =  0,  1,  2,  3,  4,  5, 
+      			 6,  7,  8,  9, 10, 11, 
+			      12, 13, 14, 15, 16, 17, 
+      			18, 19, 20, 21, 22, 23, 
+			      24, 25, 26, 27, 28, 29,
+      			30, 31, 32, 33, 34, 35;
 
-		dst3 = 0, 1, 6;
-		
-		dst6 = 0, 1, 6, 12, 7, 2;
-		
-		dst10 = 0, 1, 6, 12, 7, 2, 3, 8, 13, 18;
+		dst_a3 = 0, 1, 6;
+		dst_a6 = 0, 1, 6, 12, 7, 2;
+		dst_a10 = 0, 1, 6, 12, 7, 2, 3, 8, 13, 18;
+		dst_a21 = 0, 1, 6, 12, 7, 2, 3, 8, 13, 18, 24, 19, 14, 9, 4, 5, 10, 15, 
+              20, 25, 30;
+		dst_a26 = 0, 1, 6, 12, 7, 2, 3, 8, 13, 18, 24, 19, 14, 9, 4, 5, 10, 15, 
+              20, 25, 30, 31, 26, 21, 16, 11;
+		dst_a36 = 0, 1, 6, 12, 7, 2, 3, 8, 13, 18, 24, 19, 14, 9, 4, 5, 10, 15, 
+              20, 25, 30, 31, 26, 21, 16, 11, 17, 22, 27, 32, 33, 28, 23, 29, 
+              34, 35;
+
+
+    src_b = 0, 1, 
+            2, 3, 
+            4, 5,
+            6, 7;
+
+    dst_b2 = 0, 1;
+    dst_b3 = 0, 1, 2;
+    dst_b6 = 0, 1, 2, 4, 3, 5;
+    dst_b8 = 0, 1, 2, 4, 3, 5, 6, 7;
+    dst_b8r = 0, 2, 1, 3, 4, 6, 5, 7;
 	}
 	
 	~T() {}
@@ -75,18 +94,64 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( test_zigzag )
+BOOST_AUTO_TEST_CASE( test_zigzag_input1 )
 {
 	blitz::Array<uint32_t,1> dst;
 
-	Torch::ip::zigzag(src, dst, 3);
-	checkBlitzEqual(dst, dst3);
+  // Process src_a for various number of DCT coefficients
+  dst.resize(3);
+	Torch::ip::zigzag(src_a, dst, 3);
+	checkBlitzEqual(dst, dst_a3);
 
-	Torch::ip::zigzag(src, dst, 6);
-	checkBlitzEqual(dst, dst6);
+  dst.resize(6);
+	Torch::ip::zigzag(src_a, dst, 6);
+	checkBlitzEqual(dst, dst_a6);
 
-	Torch::ip::zigzag(src, dst, 10);
-	checkBlitzEqual(dst, dst10);
+  dst.resize(10);
+	Torch::ip::zigzag(src_a, dst, 10);
+	checkBlitzEqual(dst, dst_a10);
+
+  dst.resize(21);
+	Torch::ip::zigzag(src_a, dst, 21);
+	checkBlitzEqual(dst, dst_a21);
+
+  dst.resize(26);
+	Torch::ip::zigzag(src_a, dst, 26);
+	checkBlitzEqual(dst, dst_a26);
+ 
+  dst.resize(36);
+	Torch::ip::zigzag(src_a, dst, 36);
+	checkBlitzEqual(dst, dst_a36);
+}
+
+BOOST_AUTO_TEST_CASE( test_zigzag_input2 )
+{
+	blitz::Array<uint32_t,1> dst;
+
+  // Process src_b for various number of DCT coefficients
+  dst.resize(2);
+	Torch::ip::zigzag(src_b, dst, 2);
+	checkBlitzEqual(dst, dst_b2);
+
+  dst.resize(3);
+	Torch::ip::zigzag(src_b, dst, 3);
+	checkBlitzEqual(dst, dst_b3);
+
+  dst.resize(6);
+	Torch::ip::zigzag(src_b, dst, 6);
+	checkBlitzEqual(dst, dst_b6);
+
+  dst.resize(8);
+	Torch::ip::zigzag(src_b, dst, 8);
+	checkBlitzEqual(dst, dst_b8);
+
+  // Process fully
+	Torch::ip::zigzag(src_b, dst);
+	checkBlitzEqual(dst, dst_b8);
+
+  // Reverse order
+	Torch::ip::zigzag(src_b, dst, 8, true);
+	checkBlitzEqual(dst, dst_b8r);
 }
   
 BOOST_AUTO_TEST_SUITE_END()
