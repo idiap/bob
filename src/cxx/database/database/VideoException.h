@@ -8,6 +8,7 @@
 #ifndef TORCH_DATABASE_VIDEOEXCEPTION_H 
 #define TORCH_DATABASE_VIDEOEXCEPTION_H
 
+#include <string>
 #include "database/Exception.h"
 
 namespace Torch { namespace database {
@@ -23,8 +24,8 @@ namespace Torch { namespace database {
 
     private:
 
-      const char* m_filename;
-      const char* m_issue;
+      std::string m_filename;
+      std::string m_issue;
       mutable std::string m_message;
   };
 
