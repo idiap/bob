@@ -25,6 +25,7 @@ static const char* FLIP3D_DOC = "Flip a 3D blitz array/image upside-down.";
 static const char* FLOP2D_DOC = "Flop a 2D blitz array/image left-right.";
 static const char* FLOP3D_DOC = "Flop a 3D blitz array/image left-right.";
 static const char* ROTATE2D_DOC = "Rotate a 2D blitz array/image with a given angle in degrees.";
+static const char* ROTATED2D_SHAPE_DOC = "Get the shape of the rotated image for the given input and angle.";
 static const char* RESCALE2D_DOC = "Rescale a 2D blitz array/image with the given dimensions.";
 static const char* SHEARX2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the X-dimension.";
 static const char* SHEARY2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the Y-dimension.";
@@ -47,6 +48,7 @@ static const char* GAMMACORRECTION2D_DOC = "Perform a power-law gamma correction
   def("flip", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP3D_DOC); \
   def("flop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP2D_DOC); \
   def("flop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP3D_DOC); \
+  def("getShapeRotated", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::getShapeRotated<T>, (arg("src"), arg("angle")), ROTATED2D_SHAPE_DOC); \
   def("rotate", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const enum Torch::ip::Rotation::Algorithm))&Torch::ip::rotate<T>, rotate_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("algorithm")="Shearing"), ROTATE2D_DOC)); \
   def("scale", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const enum Torch::ip::Rescale::Algorithm))&Torch::ip::scale<T>, rescale_overloads_ ## N ((arg("src"), arg("dst"), arg("new_width"), arg("new_height"), arg("algorithm")="BilinearInterp"), RESCALE2D_DOC)); \
   def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARX2D_DOC)); \
