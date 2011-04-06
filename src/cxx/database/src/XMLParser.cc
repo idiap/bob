@@ -7,6 +7,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/tokenizer.hpp>
 #include <libxml/xmlschemas.h>
 
 #include "database/XMLParser.h"
@@ -53,12 +54,32 @@ namespace Torch { namespace database { namespace detail {
         "correctly?" << std::endl;
       throw XMLException();
     }
-    char schema_full_path[1024];
-    strcpy( schema_full_path, schema_path);
-    strcat( schema_full_path, "/dataset.xsd" );
-
+    // Parse the directories contained in $TORCH_SCHEMA_PATH 
+    std::string schema_path_str( schema_path );
+    typedef boost::tokenizer<boost::char_separator<char> > tok_t;
+    static boost::char_separator<char> sep(":");
+    tok_t tokens(schema_path_str, sep);
+    // Try to locate a dataset.xsd file in one of the directories given by
+    // the $TORCH_SCHEMA_PATH environment variable
+    boost::filesystem::path schema_dir;
+    bool found_xsd = false;
+    for (tok_t::iterator it = tokens.begin(); it != tokens.end(); ++it)
+    {
+      schema_dir = *it;
+      schema_dir /= "/dataset.xsd";
+      if( boost::filesystem::exists( schema_dir) ) {
+        found_xsd = true;
+        break;
+      }
+    }
+    if( !found_xsd) {
+      Torch::core::error << "Unable to found a dataset.xsd file in " << 
+        "the path $TORCH_SCHEMA_PATH" << std::endl;
+      throw XMLException();        
+    }
+    
     // Load the XML schema from the file
-    xmlDocPtr xsd_doc = xmlReadFile(schema_full_path, 0, 0);
+    xmlDocPtr xsd_doc = xmlReadFile(schema_dir.string().c_str(), 0, 0);
     if(xsd_doc == 0) {
       Torch::core::error << "Unable to load the XML schema" << std::endl;
       throw XMLException();        

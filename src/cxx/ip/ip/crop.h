@@ -49,7 +49,8 @@ namespace Torch {
         * @brief Function which crops a 2D blitz::array/image of a given type.
         *   The first dimension is the height (y-axis), whereas the second
         *   one is the width (x-axis).
-        * @warning No check is performed on the dst blitz::array/image.
+        * @warning The destination array will contain a reference to the 
+        *   cropped area of the source array
         * @param src The input blitz array
         * @param dst The output blitz array
         * @param crop_x The x-offset of the top left corner of the cropping area 

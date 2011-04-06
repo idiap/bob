@@ -6,11 +6,9 @@
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE IP-Crop Tests
+#define BOOST_TEST_MODULE IP-flipflop Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include <blitz/array.h>
-#include <stdint.h>
 #include "core/logging.h"
 #include "ip/flipflop.h"
 
@@ -87,7 +85,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_flipflop_2d_uint8 )
 {
-  blitz::Array<uint32_t,2> b2;
+  blitz::Array<uint32_t,2> b2(a2.shape());
   // Flip
   Torch::ip::flip(a2, b2);
   checkBlitzEqual(a2_flip, b2); 
@@ -99,7 +97,7 @@ BOOST_AUTO_TEST_CASE( test_flipflop_2d_uint8 )
   
 BOOST_AUTO_TEST_CASE( test_flipflop_3d_uint8 )
 {
-  blitz::Array<uint32_t,3> b3;
+  blitz::Array<uint32_t,3> b3(a3.shape());
   // Flip
   Torch::ip::flip(a3, b3);
   checkBlitzEqual(a3_flip, b3); 

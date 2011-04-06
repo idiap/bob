@@ -53,6 +53,8 @@ namespace Torch {
       *   blitz::array/image of a given type.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
+      * @warning The returned blocks will refer to the same data as the in
+      *   input 2D blitz array.
       * @param src The input blitz array
       * @param dst The STL container of 2D block blitz arrays. The STL 
       *   container requires to support the push_back method, such as

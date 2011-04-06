@@ -13,6 +13,7 @@
 #define TORCH5SPRO_IP_ROTATE_H 1
 
 #include "core/logging.h"
+#include "core/common.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
 #include "ip/shear.h"
@@ -76,7 +77,6 @@ namespace Torch {
           for( int x=0; x<dst.extent(1); ++x)
             dst(y,x) = src( (src.extent(0)-1-x)+src.lbound(0), y+src.lbound(1) );
       }
-
     }
 
     namespace Rotation {
@@ -84,6 +84,47 @@ namespace Torch {
         Shearing,
         BilinearInterp
       };
+    }
+
+    /**
+      * @brief Function which returns the shape of a rotated image, given
+      *   an input 2D blitz array and an angle (in degrees).
+      * @param src The input 2D blitz array
+      * @param angle The angle of the rotation (in degrees)
+      * @return A TinyVector with the shape of the rotated image
+      */
+    template<typename T>
+    const blitz::TinyVector<int,2> getShapeRotated( 
+      const blitz::Array<T,2>& src, const double angle) 
+    {
+      // Initialize TinyVector
+      blitz::TinyVector<int,2> dim;
+
+      // Force the angle to be in range [-45,45]
+      double angle_norm = angle;
+      while(angle_norm < -45.)
+        angle_norm += 360.;
+
+      // Determine the size of the rotated image
+      if(angle_norm == 0. || angle_norm == 180.)
+      {
+        dim(0) = src.extent(0);
+        dim(1) = src.extent(1);
+      }
+      else if(angle_norm == 90. || angle_norm == 270. || angle_norm == -90.)
+      {
+        dim(0) = src.extent(1);
+        dim(1) = src.extent(0);
+      }
+      else {
+        double rad_angle = angle_norm * M_PI / 180.;
+        // Crop obtained sheared image
+        const double dAbsSin = fabs(sin(rad_angle));
+        const double dAbsCos = fabs(cos(rad_angle));
+        dim(0) = floor(src.extent(0)*dAbsCos + src.extent(1)*dAbsSin + 0.5);
+        dim(1) = floor(src.extent(0)*dAbsSin + src.extent(1)*dAbsCos + 0.5);
+      }
+      return dim;
     }
 
     /**
@@ -103,6 +144,13 @@ namespace Torch {
       const double angle, 
       const enum Rotation::Algorithm alg=Rotation::Shearing)
     {
+      // Check input
+      Torch::core::assertZeroBase(src);
+
+      // Check output
+      Torch::core::assertZeroBase(dst);
+      Torch::core::assertSameShape(dst, getShapeRotated(src,angle));
+
       // Check and reindex if required
       if( dst.base(0) != 0 || dst.base(1) != 0 ) {
         const blitz::TinyVector<int,2> zero_base = 0;
@@ -120,9 +168,6 @@ namespace Torch {
       // Check and resize dst if required
       if(angle_norm == 0. || angle_norm == 180.)
       {
-        // Resize output
-        if( dst.extent(0) != src.extent(0) || dst.extent(1) != src.extent(1) )
-          dst.resize( src.extent(0), src.extent(1) );
         // Perform rotation
         if(angle_norm == 0.)
           detail::copyNoCheck(src, dst);
@@ -130,11 +175,8 @@ namespace Torch {
           detail::rotateNoCheck_180(src, dst);
         return;
       }
-      else if(angle_norm == 90. || angle_norm == 270. || angle_norm == -45.)
+      else if(angle_norm == 90. || angle_norm == 270. || angle_norm == -90.)
       {
-        // Resize output
-        if( dst.extent(0) != src.extent(1) || dst.extent(1) != src.extent(0) )
-          dst.resize( src.extent(1), src.extent(0) );
         // Perform rotation
         if(angle_norm == 90.)
           detail::rotateNoCheck_90(src, dst);
