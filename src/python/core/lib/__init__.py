@@ -36,10 +36,3 @@ def variable_dict(self):
 
 Object.variables = variables
 Object.variable_dict = variable_dict
-
-def tensor_str(i):
-  v = 'Tensor(type=%d, dimensions=%d)[' % (i.getDatatype(), i.nDimension())
-  dimensions = []
-  for k in range(i.nDimension()): dimensions.append(str(i.size(k)))
-  return v + ','.join(dimensions) + ']'
-Tensor.__str__ = tensor_str

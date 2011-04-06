@@ -42,7 +42,6 @@ set(src_ip
    "src/ipTanTriggs.cc"
    "src/ipRescaleGray.cc"
    "src/ipLBPTopOperator.cc"
-   "src/ImageScanDataSet.cc"
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
    "src/TanTriggs.cc"

@@ -12,12 +12,8 @@ using namespace boost::python;
 void bind_core_exception();
 void bind_core_logging();
 void bind_core_object();
-void bind_core_file();
 void bind_core_tensor();
-void bind_core_tensorfile();
 void bind_core_profiler();
-void bind_core_DataSet();
-void bind_core_ListDataSet();
 void bind_core_convert();
 void bind_core_blitz_addon();
 
@@ -26,12 +22,8 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_exception();
   bind_core_logging();
   bind_core_object();
-  bind_core_file();
   bind_core_tensor();
-  bind_core_tensorfile();
   bind_core_profiler();
-  bind_core_DataSet();
-  bind_core_ListDataSet();
   bind_core_convert();
   bind_core_blitz_addon();
 }

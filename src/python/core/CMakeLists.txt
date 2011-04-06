@@ -6,12 +6,8 @@ set(pysrc
    "src/exception.cc"
    "src/logging.cc"
    "src/object.cc"
-   "src/file.cc"
    "src/tensor.cc"
-   "src/tensorfile.cc"
    "src/profile.cc"
-   "src/DataSet.cc"
-   "src/ListDataSet.cc"
    "src/convert.cc"
    "src/blitz_addon.cc"
    "src/main.cc"
@@ -62,5 +58,3 @@ torch_python_add_test(python-core-array-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
 torch_python_add_test(python-core-exception-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
-torch_python_add_test(python-core-listdataset-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_listdataset.py)
