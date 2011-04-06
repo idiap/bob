@@ -40,7 +40,7 @@ namespace Torch {
 		 */
 		template<typename T>
     void zigzag(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
-          int n_coef_kept = 0, const bool right_first = false)
+      int n_coef_kept = 0, const bool right_first = false)
     {
       // Checks that the src array has zero base indices
       Torch::core::assertZeroBase( src);
