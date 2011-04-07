@@ -91,15 +91,15 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
   checkBlitzEqual(a2, b2); 
 
   // Shift fully out and check exception
-  BOOST_CHECK_THROW( Torch::ip::shift(a2, b2, 0, 4),
+  BOOST_CHECK_THROW( Torch::ip::shift(a2, b2, 4, 0),
     Torch::ip::ParamOutOfBoundaryError );
 
   // Shift +2y +1x (fill with zero)
-  Torch::ip::shift(a2, b2, 1, 2, false, true);
+  Torch::ip::shift(a2, b2, 2, 1, false, true);
   checkBlitzEqual(a2s_1, b2); 
 
   // Shift +2y +1x (fill with closest neighbour)
-  Torch::ip::shift(a2, b2, 1, 2);
+  Torch::ip::shift(a2, b2, 2, 1);
   checkBlitzEqual(a2s_2, b2); 
 }
   
@@ -111,15 +111,15 @@ BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
   checkBlitzEqual(a3, b3); 
 
   // Shift fully out and check exception
-  BOOST_CHECK_THROW( Torch::ip::shift(a3, b3, 0, 4),
+  BOOST_CHECK_THROW( Torch::ip::shift(a3, b3, 4, 0),
     Torch::ip::ParamOutOfBoundaryError );
 
   // Shift +2y +1x (fill with zero)
-  Torch::ip::shift(a3, b3, 1, 2, false, true);
+  Torch::ip::shift(a3, b3, 2, 1, false, true);
   checkBlitzEqual(a3s_1, b3);
 
   // Shift +2y +1x (fill with closest neighbour)
-  Torch::ip::shift(a3, b3, 1, 2);
+  Torch::ip::shift(a3, b3, 2, 1);
   checkBlitzEqual(a3s_2, b3); 
 }
 
