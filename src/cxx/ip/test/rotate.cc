@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_mod90_uint32 )
 
 BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
 {
-// Get path to the XML Schema definition
+  // Get path to the XML Schema definition
   char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
     Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
@@ -239,6 +239,33 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   Torch::database::Array ar_img_rn25(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_rn25 = ar_img_rn25.get<uint8_t,2>();
   checkBlitzClose( img_ref_rn25, img_processed, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
+{
+  // Get path to the XML Schema definition
+  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw Torch::core::Exception();
+  }
+  // Load original image
+  boost::filesystem::path testdata_path_img( testdata_cpath);
+  testdata_path_img /= "imageColor.ppm";
+  Torch::database::Array ar_img(testdata_path_img.string());
+  blitz::Array<uint8_t,3> img = ar_img.get<uint8_t,3>();
+  blitz::Array<uint8_t,3> img_processed;
+
+  // 5 degrees 
+  img_processed.resize(Torch::ip::getShapeRotated(img,5.) ); 
+  Torch::ip::rotate( img, img_processed, 5., Torch::ip::Rotation::Shearing);
+  testdata_path_img = testdata_cpath;
+  testdata_path_img /= "imageColor_r5.ppm";
+  Torch::database::Array ar_img_r5(testdata_path_img.string());
+  blitz::Array<uint8_t,3> img_ref_r5 = ar_img_r5.get<uint8_t,3>();
+  checkBlitzClose( img_ref_r5, img_processed, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
