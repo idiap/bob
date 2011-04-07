@@ -16,7 +16,9 @@ set(src
     "src/FFT.cc"
     "src/FCT.cc"
     "src/DCT1D.cc"
-    "src/DCT2D.cc")
+    "src/DCT1DNaive.cc"
+    "src/DCT2D.cc"
+    "src/DCT2DNaive.cc")
 
 include(../../cmake/macros.cmake)
 torch_header_install(sp-cxx sp "torch::sp")
@@ -27,4 +29,5 @@ add_dependencies(torch_sp sp-cxx_header_install)
 torch_test(sp dftdct_naive test/dftdctnaive.cc)
 torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
 torch_test(sp convolution test/convolution.cc)
+torch_test(sp extrapolation test/extrapolation.cc)
 torch_test(sp fftfct_fftpack_blitz test/fftfctfftpack_blitz.cc)

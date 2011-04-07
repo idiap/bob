@@ -1,13 +1,12 @@
 /**
- * @file src/cxx/sp/sp/DCT2D.h
+ * @file src/cxx/sp/sp/DCT2DNaive.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
- * @brief Implement a blitz-based 2D Fast Cosine Transform using FFTPACK 
- * functions
+ * @brief Implement a naive 2D Discrete Cosine Transform
  */
 
-#ifndef TORCH5SPRO_SP_DCT2D_H
-#define TORCH5SPRO_SP_DCT2D_H
+#ifndef TORCH5SPRO_SP_DCT2D_NAIVE_H
+#define TORCH5SPRO_SP_DCT2D_NAIVE_H
 
 #include "core/logging.h"
 
@@ -17,25 +16,23 @@ namespace Torch {
  * @{
  *
  */
-  namespace sp {
+  namespace sp { namespace detail {
 
     /**
-      * @brief This class implements a Discrete Cosine Transform based on the
-      * Netlib FFTPACK library. It is used as a base class for DCT2D and 
-      * IDCT2D classes.
+      * @brief This class implements a naive 1D Discrete Cosine Transform.
       */
-    class DCT2DAbstract
+    class DCT2DNaiveAbstract
     {
       public:
         /**
           * @brief Constructor: Initialize working arrays
           */
-        DCT2DAbstract( const int height, const int width);
+        DCT2DNaiveAbstract( const int height, const int width);
 
         /**
           * @brief Destructor
           */
-        virtual ~DCT2DAbstract();
+        virtual ~DCT2DNaiveAbstract();
 
         /**
           * @brief process an array by applying the DCT
@@ -44,7 +41,7 @@ namespace Torch {
           blitz::Array<double,2>& dst) = 0;
 
         /**
-          * @brief Reset the DCT2D object for the given 2D shape
+          * @brief Reset the DCT2DNaive object for the given 2D shape
           */
         void reset(const int height, const int width);
 
@@ -74,11 +71,6 @@ namespace Torch {
           */
         void reset();
 
-        /**
-          * @brief Deallocate memory
-          */
-        void cleanup();
-
       protected:
         /**
           * Private attributes
@@ -87,11 +79,10 @@ namespace Torch {
         int m_width;
 
         /**
-          * Working arrays
+          * Working array
           */
-        double *m_wsave_w; 
-        double *m_wsave_h; 
-        double *m_col_tmp;
+        blitz::Array<double,1> m_wsave_h; 
+        blitz::Array<double,1> m_wsave_w;
 
         /**
           * Normalization factors
@@ -104,48 +95,62 @@ namespace Torch {
 
 
     /**
-      * @brief This class implements a direct 2D Discrete Cosine Transform 
-      * based on the FFTPACK library
+      * @brief This class implements a naive direct 1D Discrete Cosine 
+      * Transform
       */
-    class DCT2D: public DCT2DAbstract
+    class DCT2DNaive: public DCT2DNaiveAbstract
     {
       public:
         /**
           * @brief Constructor: Initialize working arrays
           */ 
-        DCT2D( const int height, const int width);
+        DCT2DNaive( const int height, const int width);
 
         /**
           * @brief process an array by applying the direct DCT
           */
         virtual void operator()(const blitz::Array<double,2>& src, 
           blitz::Array<double,2>& dst);
+      
+      private:
+        /**
+          * @brief process an array assuming that all the 'check' are done
+          */
+        void processNoCheck(const blitz::Array<double,2>& src,
+          blitz::Array<double,2>& dst);
     };
 
 
     /**
-      * @brief This class implements a inverse 2D Discrete Cosine Transform 
-      * based on the FFTPACK library
+      * @brief This class implements a naive inverse 1D Discrete Cosine 
+      * Transform 
       */
-    class IDCT2D: public DCT2DAbstract
+    class IDCT2DNaive: public DCT2DNaiveAbstract
     {
       public:
         /**
-          * @brief Constructor: Initialize working arrays
+          * @brief Constructor: Initialize working array
           */ 
-        IDCT2D( const int height, const int width);
+        IDCT2DNaive( const int height, const int width);
 
         /**
           * @brief process an array by applying the inverse DCT
           */
         virtual void operator()(const blitz::Array<double,2>& src, 
           blitz::Array<double,2>& dst);
+
+      private:
+        /**
+          * @brief process an array assuming that all the 'check' are done
+          */
+        void processNoCheck(const blitz::Array<double,2>& src,
+          blitz::Array<double,2>& dst);
     };
 
-  }
+  }}
 /**
  * @}
  */
 }
 
-#endif /* TORCH5SPRO_SP_DCT2D_H */
+#endif /* TORCH5SPRO_SP_DCT2D_NAIVE_H */
