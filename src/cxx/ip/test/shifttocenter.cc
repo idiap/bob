@@ -15,9 +15,9 @@
 #include "ip/shiftToCenter.h"
 
 struct T {
-	blitz::Array<uint32_t,2> a2, a2s_1, a2s_2;
+	blitz::Array<uint32_t,2> a2, a2s_1, a2s_2, a2s_3, a2s_4;
 
-	T(): a2(4,4), a2s_1(4,4), a2s_2(4,4)
+	T(): a2(4,4), a2s_1(4,4), a2s_2(4,4), a2s_3(4,4), a2s_4(4,4)
 	{
 		a2 = 
 			0, 1, 2, 3, 
@@ -36,6 +36,18 @@ struct T {
 			0, 0, 1, 2, 
 			4, 4, 5, 6,
 			8, 8, 9, 10;
+
+		a2s_3 = 
+			0, 1, 2, 3, 
+			0, 1, 2, 3, 
+			4, 5, 6, 7,
+			8, 9, 10, 11;
+
+		a2s_4 = 
+			0, 0, 1, 2,
+			4, 4, 5, 6,
+			8, 8, 9, 10, 
+			12, 12, 13, 14;
 	}
 
 	~T() {}
@@ -85,6 +97,18 @@ BOOST_AUTO_TEST_CASE( test_shift_up_left )
 	Torch::ip::shiftToCenter(a2, b2, 1, 1);
 
 	checkBlitzEqual(a2s_2, b2); 
+}
+
+BOOST_AUTO_TEST_CASE( test_shift_down )
+{
+	blitz::Array<uint32_t,2> b2;
+	Torch::ip::shiftToCenter(a2, b2, 1, 2);
+
+	std::cout << a2 << std::endl;
+	std::cout << b2 << std::endl;
+	std::cout << a2s_3 << std::endl;
+
+	checkBlitzEqual(a2s_3, b2); 
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -44,6 +44,27 @@ namespace Torch {
 
 			shiftToCenter(src, dst, target_center_h, target_center_w);
 		}
+
+		template<typename T>
+		void shiftToCenter(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst,
+				   const int target_center_h, const int target_center_w)
+		{
+			const int delta_h = target_center_h - src.extent(0) / 2;
+			const int delta_w = target_center_w - src.extent(1) / 2;
+
+			shift(src, dst, delta_h, delta_w);
+		}
+
+		template<typename T>
+		void shiftToCenterOfPoints(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst,
+					   const int point_one_h, const int point_one_w,
+					   const int point_two_h, const int point_two_w)
+		{
+			const int target_center_h = (point_one_h + point_two_h) / 2;
+			const int target_center_w = (point_one_w + point_two_w) / 2;
+
+			shiftToCenter(src, dst, target_center_h, target_center_w);
+		}
 	}
 
 	/**

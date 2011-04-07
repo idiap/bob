@@ -10,3 +10,5 @@ python/tests/out.mov
 .gdb_history
 ctags
 etags
+src/python/ip/test/data/faceextract/test_001.blue.answer.png
+src/python/ip/test/data/faceextract/test_001.shift.png
