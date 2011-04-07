@@ -30,12 +30,12 @@ namespace Torch {
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
         * @param dst The output blitz array
-        * @param width The width of the dst blitz::array.
         * @param height The height of the dst blitz::array.
+        * @param width The width of the dst blitz::array.
         */
       template<typename T>
       void scaleNoCheck2D_BI(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
-        const int width, const int height)
+        const int height, const int width)
       {
         const double x_ratio = (src.extent(1)-1.) / (width-1.);
         const double y_ratio = (src.extent(0)-1.) / (height-1.);
@@ -75,13 +75,13 @@ namespace Torch {
       *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array
-      * @param width The width of the dst blitz::array.
       * @param height The height of the dst blitz::array.
+      * @param width The width of the dst blitz::array.
       * @param alg The algorithm used for rescaling.
       */
     template<typename T>
     void scale(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const int width, const int height, 
+      const int height, const int width, 
       const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize dst if required
@@ -114,7 +114,7 @@ namespace Torch {
         case Rescale::BilinearInterp:
           {
             // Rescale using Bilinear Interpolation
-            detail::scaleNoCheck2D_BI<T>(src, dst, width, height);
+            detail::scaleNoCheck2D_BI<T>(src, dst, height, width);
           }
           break;
         default:
