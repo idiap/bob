@@ -11,22 +11,17 @@ import os, sys
 import unittest
 import torch
 
-def load_gray(relative_filename):
-  # Please note our PNG loader will always load in RGB, but since that is a
-  # grayscaled version of the image, I just select one of the planes. 
-  filename = os.path.join("data", "flow", relative_filename)
-  array = torch.database.Array(filename)
-  return array.get()[0,:,:] 
-
-
 class FilterNewTest(unittest.TestCase):
   """Performs various combined filter tests."""
   def test01_rotate(self):
     print ""
 
-    
-    v = torch.database.VideoReader()
+    img = torch.database.Array('data/faceextract/test_001.png')
+    A = img.get()[1,:,:] ## get the gray plane as blitzarray
 
+    ## 
+    # B = A.sameAs();
+    
 if __name__ == '__main__':
   sys.argv.append('-v')
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
