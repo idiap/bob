@@ -62,10 +62,12 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
   dctfeatures( src, dst);
   // Iterate over the blocks and compare the vector of DCT coefficients with 
   // the one obtained using matlab
+  int i=0;
   for( std::vector<blitz::Array<double,1> >::const_iterator it = dst.begin();
     it != dst.end(); ++it)
   {
     checkBlitzClose( *it, dst_mat[i], eps);
+    ++i;
   }
 }
   
