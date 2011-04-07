@@ -137,14 +137,14 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   blitz::Array<uint8_t,2> img_ref_s77 = ar_img_s77.get<uint8_t,2>();
   checkBlitzClose( img_ref_s77, img_processed, eps);
 
-  // 75x125
-  Torch::ip::scale( img, img_processed, 75, 125,
+  // 125x75
+  Torch::ip::scale( img, img_processed, 125, 75,
     Torch::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_s75x125.pgm";
-  Torch::database::Array ar_img_s75x125(testdata_path_img.string());
-  blitz::Array<uint8_t,2> img_ref_s75x125 = ar_img_s75x125.get<uint8_t,2>();
-  checkBlitzClose( img_ref_s75x125, img_processed, eps);
+  testdata_path_img /= "image_s125x75.pgm";
+  Torch::database::Array ar_img_s125x75(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img_ref_s125x75 = ar_img_s125x75.get<uint8_t,2>();
+  checkBlitzClose( img_ref_s125x75, img_processed, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
