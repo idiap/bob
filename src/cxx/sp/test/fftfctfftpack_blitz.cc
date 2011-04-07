@@ -15,7 +15,9 @@
 #include "sp/FFT.h"
 #include "sp/FCT.h"
 #include "sp/DCT1D.h"
+#include "sp/DCT1DNaive.h"
 #include "sp/DCT2D.h"
+#include "sp/DCT2DNaive.h"
 // Random number
 #include <cstdlib>
 
@@ -29,12 +31,17 @@ struct T {
 void test_fct1D( const blitz::Array<double,1> t, double eps) 
 {
   // process using FCT
-  blitz::Array<double,1> t_fct;
+  blitz::Array<double,1> t_fct, t_dct(t.extent(0));
   Torch::sp::fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
 
-  // TODO: get DCT answer and compare with FCT
-
+  // get DCT answer and compare with FCT
+  Torch::sp::detail::DCT1DNaive dct_new_naive(t.extent(0));
+  dct_new_naive(t, t_dct);
+  // Compare
+  for(int i=0; i < t_fct.extent(0); ++i)
+    BOOST_CHECK_SMALL( fabs(t_fct(i)-t_dct(i)), eps);
+  
   // process using inverse FCT
   blitz::Array<double,1> t_fct_ifct;
   Torch::sp::ifct(t_fct, t_fct_ifct);
@@ -49,12 +56,18 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
 void test_fct2D( const blitz::Array<double,2> t, double eps) 
 {
   // process using FCT
-  blitz::Array<double,2> t_fct;
+  blitz::Array<double,2> t_fct, t_dct(t.extent(0), t.extent(1));
   Torch::sp::fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct.extent(1), t.extent(1));
 
-  // TODO: get DCT answer and compare with FCT
+  // get DCT answer and compare with FCT
+  Torch::sp::detail::DCT2DNaive dct_new_naive(t.extent(0), t.extent(1));
+  dct_new_naive(t, t_dct);
+  // Compare
+  for(int i=0; i < t_fct.extent(0); ++i)
+    for(int j=0; j < t_fct.extent(1); ++j)
+      BOOST_CHECK_SMALL( fabs(t_fct(i,j)-t_dct(i,j)), eps);
 
   // process using inverse FCT
   blitz::Array<double,2> t_fct_ifct;
@@ -389,8 +402,6 @@ BOOST_AUTO_TEST_CASE( test_fftshift2D_random )
   }
 }
 
-
-
 BOOST_AUTO_TEST_CASE( test_DCT1D )
 {
   // This tests the 1D DCT using 10 random vectors
@@ -469,9 +480,63 @@ BOOST_AUTO_TEST_CASE( test_DCT2D )
     for(int i=0; i < t.extent(0); ++i)
       for(int j=0; j < t.extent(1); ++j)
         BOOST_CHECK_SMALL( fabs(t(i,j)-it(i,j)), eps);
-
   }
 }
 
+BOOST_AUTO_TEST_CASE( test_DCT1DNaive )
+{
+  // This tests the 1D DCT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 2048.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 2048 + 1);
+
+    Torch::sp::detail::DCT1DNaive dct_new_naive(M);
+    Torch::sp::detail::IDCT1DNaive idct_new_naive(M);
+
+    blitz::Array<double,1> t(M), res(M), it(M);
+    for( int i=0; i < M; ++i)
+      t(i) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new DCT1D class
+    dct_new_naive(t, res); // direct
+    idct_new_naive(res, it); // inverse
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    for(int i=0; i < t.extent(0); ++i)
+      BOOST_CHECK_SMALL( fabs(t(i)-it(i)), eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_DCT2DNaive )
+{
+  // This tests the 2D DCT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 64.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 64 + 1);
+    int N = (rand() % 64 + 1);
+
+    Torch::sp::detail::DCT2DNaive dct_new_naive(M,N);
+    Torch::sp::detail::IDCT2DNaive idct_new_naive(M,N);
+
+    blitz::Array<double,2> t(M,N), res(M,N), it(M,N);
+    for( int i=0; i < M; ++i)
+      for( int j=0; j < N; ++j)
+        t(i,j) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new DCT2D class
+    dct_new_naive(t, res); // direct
+    idct_new_naive(res, it); // inverse
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
+    for(int i=0; i < t.extent(0); ++i)
+      for(int j=0; j < t.extent(1); ++j)
+        BOOST_CHECK_SMALL( fabs(t(i,j)-it(i,j)), eps);
+  }
+}
 
 BOOST_AUTO_TEST_SUITE_END()
