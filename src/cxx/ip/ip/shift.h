@@ -7,7 +7,7 @@
  */
 
 #ifndef TORCH5SPRO_IP_SHIFT_H
-#define TORCH5SPRO_IP_SHIFT_H 1
+#define TORCH5SPRO_IP_SHIFT_H
 
 #include "core/logging.h"
 #include "ip/Exception.h"
@@ -29,17 +29,17 @@ namespace Torch {
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
         * @param dst The output blitz array
-        * @param shift_x The x-offset of the top left corner of the shifted 
-        * area wrt. to the x-index of the top left corner of the blitz::array.
         * @param shift_y The y-offset of the top left corner of the shifted 
         * area wrt. to the y-index of the top left corner of the blitz::array.
+        * @param shift_x The x-offset of the top left corner of the shifted 
+        * area wrt. to the x-index of the top left corner of the blitz::array.
         * @param zero_out Whether the shifted area which is out of the boundary
         * of the input blitz array should be filled with zero values, or with 
         * the intensity of the closest pixel in the neighbourhood.
         */
       template<typename T>
       void shiftNoCheck2D(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
-        const int shift_x, const int shift_y, const bool zero_out)
+        const int shift_y, const int shift_x, const bool zero_out)
       {
         bool is_y_out;
         int y_src, x_src;
@@ -70,10 +70,10 @@ namespace Torch {
       *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array
-      * @param shift_x The x-offset of the top left corner of the shifted area 
-      * wrt. to the x-index of the top left corner of the blitz::array.
       * @param shift_y The y-offset of the top left corner of the shifted area
       * wrt. to the y-index of the top left corner of the blitz::array.
+      * @param shift_x The x-offset of the top left corner of the shifted area 
+      * wrt. to the x-index of the top left corner of the blitz::array.
       * @param allow_out Whether an exception should be raised or not if the 
       * shifted blitz::array has no pixel in common with the input blitz::array.
       * @param zero_out Whether the shifted which is out of the boundary
@@ -82,7 +82,7 @@ namespace Torch {
       */
     template<typename T>
     void shift(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const int shift_x, const int shift_y, const bool allow_out = false,
+      const int shift_y, const int shift_x, const bool allow_out = false,
       const bool zero_out = false)
     {
       // Check and resize dst if required
@@ -120,7 +120,7 @@ namespace Torch {
       }
     
       // Shift the 2D array
-      detail::shiftNoCheck2D<T>(src, dst, shift_x, shift_y, zero_out);
+      detail::shiftNoCheck2D<T>(src, dst, shift_y, shift_x, zero_out);
     }
 
 
@@ -132,10 +132,10 @@ namespace Torch {
       *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array
-      * @param shift_x The x-offset of the top left corner of the shifted area 
-      * wrt. to the x-index of the top left corner of the blitz::array.
       * @param shift_y The y-offset of the top left corner of the shifted area
       * wrt. to the y-index of the top left corner of the blitz::array.
+      * @param shift_x The x-offset of the top left corner of the shifted area 
+      * wrt. to the x-index of the top left corner of the blitz::array.
       * @param allow_out Whether an exception should be raised or not if the 
       * shifted blitz::array has no pixel in common with the input blitz::array.
       * @param zero_out Whether the shifted which is out of the boundary
@@ -144,7 +144,7 @@ namespace Torch {
       */
     template<typename T>
     void shift(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst, 
-      const int shift_x, const int shift_y, const bool allow_out = false,
+      const int shift_y, const int shift_x, const bool allow_out = false,
       const bool zero_out = false)
     {
       // Check and resize dst if required
@@ -189,7 +189,7 @@ namespace Torch {
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
         // Shift the 2D array
-        detail::shiftNoCheck2D(src_slice, dst_slice, shift_x, shift_y, 
+        detail::shiftNoCheck2D(src_slice, dst_slice, shift_y, shift_x, 
           zero_out);
       }
     }
