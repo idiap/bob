@@ -49,9 +49,9 @@ namespace Torch {
 		void shiftToCenter(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst,
 				   const int target_center_h, const int target_center_w)
 		{
-			const int delta_h = target_center_h - src.extent(0) / 2;
-			const int delta_w = target_center_w - src.extent(1) / 2;
-
+			const int delta_h = target_center_h - src.extent(1) / 2;
+			const int delta_w = target_center_w - src.extent(2) / 2;
+      
 			shift(src, dst, delta_h, delta_w);
 		}
 
