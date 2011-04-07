@@ -104,11 +104,31 @@ BOOST_AUTO_TEST_CASE( test_shift_down )
 	blitz::Array<uint32_t,2> b2;
 	Torch::ip::shiftToCenter(a2, b2, 1, 2);
 
-	std::cout << a2 << std::endl;
-	std::cout << b2 << std::endl;
-	std::cout << a2s_3 << std::endl;
+	checkBlitzEqual(a2s_3, b2); 
+}
+
+BOOST_AUTO_TEST_CASE( test_shift_right )
+{
+	blitz::Array<uint32_t,2> b2;
+	Torch::ip::shiftToCenter(a2, b2, 2, 1);
+
+	checkBlitzEqual(a2s_4, b2); 
+}
+
+BOOST_AUTO_TEST_CASE( test_shift_to_center_of_down )
+{
+	blitz::Array<uint32_t,2> b2;
+	Torch::ip::shiftToCenterOfPoints(a2, b2, 0, 2, 2, 2);
 
 	checkBlitzEqual(a2s_3, b2); 
+}
+
+BOOST_AUTO_TEST_CASE( test_shift_to_center_of_right )
+{
+	blitz::Array<uint32_t,2> b2;
+	Torch::ip::shiftToCenterOfPoints(a2, b2, 2, 2, 2, 1);
+
+	checkBlitzEqual(a2s_4, b2); 
 }
 
 BOOST_AUTO_TEST_SUITE_END()

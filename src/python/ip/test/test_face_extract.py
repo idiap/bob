@@ -20,8 +20,8 @@ class FilterNewTest(unittest.TestCase):
     A = img.get()
     B = A.copy()
 
-    delta_h = -100;
-    delta_w = -200; 
+    delta_h = 100
+    delta_w = 100
 
     # shift to center
     torch.ip.shift(A, B, delta_h, delta_w);
@@ -37,7 +37,7 @@ class FilterNewTest(unittest.TestCase):
     B = A.sameAs();
 
     # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, 120, 146, 88, 213)
+    torch.ip.shiftToCenterOfPoints(A, B, 400, 400, 400, 400)
 
     # save image
     torch.database.Array(B).save(os.path.join('data', 'faceextract', 'test_001.blue.answer.png'));
