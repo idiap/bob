@@ -37,8 +37,7 @@ static const char* GAMMACORRECTION2D_DOC = "Perform a power-law gamma correction
 static const char* ZIGZAG2D_DOC = "Extract a 1D blitz array using a zigzag pattern from a 2D blitz array/image.";
 static const char* SHIFTTOCENTER_DOC = "Shift a 2D blitz array/image to target center.";
 static const char* SHIFTTOCENTEROFPONTS_DOC = "Shift a 2D blitz array/image to the center of two points.";
-static const char* LEVEL_OUT_DOC = "Rotate a 2D blitz array after to horizontally level out two points.";
-
+static const char* LEVEL_OUT_DOC = "Rotate a 2D/3D blitz array after to horizontally level out two points.";
 
 #define FILTER_DECL(T,N) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(crop_overloads_ ## N, Torch::ip::crop<T>, 6, 8) \
@@ -70,7 +69,7 @@ static const char* LEVEL_OUT_DOC = "Rotate a 2D blitz array after to horizontall
   def("shiftToCenter", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int))&Torch::ip::shiftToCenter<T>, (arg("src"), arg("dst"), arg("target_h"), arg("target_w")), SHIFTTOCENTER_DOC); \
   def("shiftToCenterOfPoints", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const int, const int))&Torch::ip::shiftToCenterOfPoints<T>, (arg("src"), arg("dst"), arg("point_one_h"), arg("point_one_w"), arg("point_two_h"), arg("point_two_w")), SHIFTTOCENTEROFPONTS_DOC); \
   def("horizontalTwoPoints", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const int, const int))&Torch::ip::horizontalTwoPoints<T>, (arg("src"), arg("dst"), arg("point_one_h"), arg("point_one_w"), arg("point_two_h"), arg("point_two_w")), LEVEL_OUT_DOC); \
-
+  def("horizontalTwoPoints", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const int, const int))&Torch::ip::horizontalTwoPoints<T>, (arg("src"), arg("dst"), arg("point_one_h"), arg("point_one_w"), arg("point_two_h"), arg("point_two_w")), LEVEL_OUT_DOC); \
 
 /*
 FILTER_DECL(bool,bool)

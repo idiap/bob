@@ -45,7 +45,7 @@ class FilterNewTest(unittest.TestCase):
   def test03_shiftToCenterBlue_And_LevelOut(self):
     print ""
 
-    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.png'))
+    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()
     B = A.sameAs();
 

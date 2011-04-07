@@ -246,26 +246,45 @@ namespace Torch {
       }
     }
 
-        /**
-      * @brief Function which rotates a 2D blitz::array/image of a given type.
-      *   The center of the rotation is the center of the image.
-      *   The first dimension is the height (y-axis), whereas the second
-      *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
-      * @param src The input blitz array
-      * @param dst The output blitz array
-      * @param angle The angle of the rotation (in degrees)
-      * @param alg The algorithm which should be used to perform the rotation.
-      */
-    template<typename T>
-    void horizontalTwoPoints(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-			     const int left_h, const int left_w,
-			     const int right_h, const int right_w)
-    {
-	    const double angleTOLevelOut = std::tan(1.0 * (right_h - left_h) / (right_w - left_h)) * 180 / M_PI;
-	    rotate(src, dst, -angleTOLevelOut);
-    }
+	  /**
+	   * @brief Function to horizontally level out two points (by rotation).
+	   * @param src The input blitz array
+	   * @param dst The output blitz array
+	   * @param left_h The height of the left point
+	   * @param left_w The width of the left point
+	   * @param right_h The height of the right point
+	   * @param right_w The width of the right point
+	   * @param alg The algorithm which should be used to perform the rotation.
+	   */
+	  template<typename T>
+	  void horizontalTwoPoints(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+				   const int left_h, const int left_w,
+				   const int right_h, const int right_w,
+				   const enum Rotation::Algorithm alg=Rotation::Shearing)
+	  {
+		  const double angleTOLevelOut = std::tan(1.0 * (right_h - left_h) / (right_w - left_h)) * 180 / M_PI;
+		  rotate(src, dst, -angleTOLevelOut, alg);
+	  }
+
+	  /**
+	   * @brief Function to horizontally level out two points (by rotation).
+	   * @param src The input blitz array
+	   * @param dst The output blitz array
+	   * @param left_h The height of the left point
+	   * @param left_w The width of the left point
+	   * @param right_h The height of the right point
+	   * @param right_w The width of the right point
+	   * @param alg The algorithm which should be used to perform the rotation.
+	   */
+	  template<typename T>
+	  void horizontalTwoPoints(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst, 
+				   const int left_h, const int left_w,
+				   const int right_h, const int right_w,
+				   const enum Rotation::Algorithm alg=Rotation::Shearing)
+	  {
+		  const double angleTOLevelOut = std::tan(1.0 * (right_h - left_h) / (right_w - left_h)) * 180 / M_PI;
+		  rotate(src, dst, -angleTOLevelOut, alg);
+	  }
 
   }
 /**
