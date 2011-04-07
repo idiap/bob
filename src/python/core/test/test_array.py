@@ -705,6 +705,12 @@ class ArrayTest(unittest.TestCase):
     self.assertTrue(isinstance(t5_complex[0,0], complex))
     self.assertEqual(t5_complex[1,1], complex(5,0))
 
+  def test10_sameAs(self):
+    Array    = torch.core.array.array([[1,2,3], [4,5,6]], 'float64')
+    Array_sa = Array.sameAs();
+
+    self.assertEqual(Array.shape(), Array_sa.shape())
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
