@@ -42,6 +42,23 @@ class FilterNewTest(unittest.TestCase):
     # save image
     torch.database.Array(B).save(os.path.join('data', 'faceextract', 'test_001.blue.answer.png'));
 
+  def test03_shiftToCenterBlue_And_LevelOut(self):
+    print ""
+
+    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.png'))
+    A = img.get()
+    B = A.sameAs();
+
+    # shift to center
+    torch.ip.shiftToCenterOfPoints(A, B, 120, 147, 90, 213)
+
+    # rotate
+    C = B.sameAs();
+    torch.ip.horizontalTwoPoints(B, C, 120, 147, 90, 213);
+
+    # save image
+    torch.database.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
