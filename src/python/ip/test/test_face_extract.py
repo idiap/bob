@@ -46,16 +46,19 @@ class FilterNewTest(unittest.TestCase):
     print ""
 
     img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
-    A = img.get()
-    B = A.sameAs();
+    A = img.get()[1,:,:]
+    B = A.sameAs()
 
     # shift to center
     torch.ip.shiftToCenterOfPoints(A, B, 120, 147, 90, 213)
 
     # rotate
-    C = B.sameAs();
-    torch.ip.horizontalTwoPoints(B, C, 120, 147, 90, 213);
-
+    angle = torch.ip.getRotateAngleToLevelOutHorizontal(120, 147, 90, 213)
+    shape = torch.ip.getShapeRotated(B, angle)
+    C = B.sameAs()
+    C.resize(shape)
+    torch.ip.rotate(B, C, angle)
+    
     # save image
     torch.database.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
 
