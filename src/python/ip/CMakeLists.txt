@@ -11,6 +11,7 @@ set(pysrc
    "src/filters_new.cc"
    "src/vision.cc"
    "src/flow.cc"
+   "src/DCTFeatures.cc"
    "src/TanTriggs.cc"
    "src/main.cc"
    )
