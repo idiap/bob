@@ -62,6 +62,31 @@ class FilterNewTest(unittest.TestCase):
     # save image
     torch.database.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
 
+  def test04_shiftToCenterBlue_RotateAndStretch(self):
+    print ""
+
+    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
+    A = img.get()[1,:,:]
+    B = A.sameAs()
+
+    # shift to center
+    torch.ip.shiftToCenterOfPoints(A, B, 120, 147, 90, 213)
+
+    # rotate
+    angle = torch.ip.getRotateAngleToLevelOutHorizontal(120, 147, 90, 213)
+    shape = torch.ip.getShapeRotated(B, angle)
+    C = B.sameAs()
+    C.resize(shape)
+    torch.ip.rotate(B, C, angle)
+
+    # scale
+    D = C.copy()
+    torch.ip.scale(C, D, 50, 50)
+
+    # save image
+    torch.database.Array(D).save(os.path.join('data', 'faceextract', 'test_001.blue.norm.answer.png'));
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
