@@ -2,17 +2,16 @@
  * @file src/cxx/math/math/linear.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief This file defines basic matrix and vector operation using 1D and 2D
+ * @brief This file defines basic matrix and vector operations using 1D and 2D
  * blitz arrays.
  * 
  */
 
 #ifndef TORCH5SPRO_MATH_LINEAR_H
-#define TORCH5SPRO_MATH_LINEAR_H 1
+#define TORCH5SPRO_MATH_LINEAR_H
 
 #include "core/logging.h"
 #include "core/common.h"
-//#include "math/Exception.h"
 
 namespace Torch {
 /**
@@ -34,14 +33,15 @@ namespace Torch {
     void prod(const blitz::Array<T,2>& A, const blitz::Array<T,2>& B,
       blitz::Array<T,2>& C)
     {
-      // Check that the dimensions of the input arrays are compatible for
-      // matrix multiplication
-      if( A.extent(1) != B.extent(0) || A.base(1) != B.base(0) )
-        throw Torch::core::Exception();
+      // Check inputs
+      Torch::core::assertZeroBase(A);
+      Torch::core::assertZeroBase(B);
+      Torch::core::assertSameDimensionLength(A.extent(1),B.extent(0));
 
-      // Reindex and resize output array
-      Torch::core::reindexAndResize( C, A.base(0), B.base(1), A.extent(0), 
-        B.extent(1));
+      // Check output
+      Torch::core::assertZeroBase(C);
+      Torch::core::assertSameDimensionLength(A.extent(0), C.extent(0));
+      Torch::core::assertSameDimensionLength(B.extent(1), C.extent(1));
 
       // Perform multiplication
       blitz::firstIndex i;
@@ -54,13 +54,14 @@ namespace Torch {
     void prod(const blitz::Array<T,2>& A, const blitz::Array<T,1>& b,
       blitz::Array<T,1>& c)
     {
-      // Check that the dimensions of the input arrays are compatible for
-      // matrix multiplication
-      if( A.extent(1) != b.extent(0) || A.base(1) != b.base(0) )
-        throw Torch::core::Exception();
+      // Check inputs
+      Torch::core::assertZeroBase(A);
+      Torch::core::assertZeroBase(b);
+      Torch::core::assertSameDimensionLength(A.extent(1),b.extent(0));
 
-      // Reindex and resize output array
-      Torch::core::reindexAndResize( c, A.base(0), A.extent(0));
+      // Check output
+      Torch::core::assertZeroBase(c);
+      Torch::core::assertSameDimensionLength(c.extent(0), A.extent(0));
 
       // Perform multiplication
       blitz::firstIndex i;
@@ -77,10 +78,10 @@ namespace Torch {
     template<typename T>
     T dot(const blitz::Array<T,1>& a, const blitz::Array<T,1>& b)
     {
-      // Check that the dimensions of the input arrays are compatible for
-      // the dot product
-      if( a.extent(0) != b.extent(0) || a.base(0) != b.base(0) )
-        throw Torch::core::Exception();
+      // Check inputs
+      Torch::core::assertZeroBase(a);
+      Torch::core::assertZeroBase(b);
+      Torch::core::assertSameDimensionLength(a.extent(0),b.extent(0));
 
       // Compute the dot product
       blitz::firstIndex i;

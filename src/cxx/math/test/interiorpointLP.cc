@@ -89,7 +89,7 @@ void generateProblem( const int n, blitz::Array<double,2>& A,
   blitz::Array<double,2> A1 = A(blitz::Range::all(), blitz::Range( 0, n-1));
   blitz::Array<double,1> ones(n);
   ones = 1.;
-  blitz::Array<double,1> A1_1;
+  blitz::Array<double,1> A1_1(n);
   Torch::math::prod(A1, ones, A1_1);
   for( int i=0; i<n; ++i) {
     x0(n+i) = b(i) - A1_1(i);
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE( test_dual_variables_init )
     BOOST_CHECK_EQUAL( true, mu(i) >= 0);
   //  transpose(A)*lambda+mu=c
   blitz::Array<double,2> A_t = A.transpose(1,0);
-  blitz::Array<double,1> left_vec;
+  blitz::Array<double,1> left_vec(A_t.extent(0));
   Torch::math::prod( A_t, lambda, left_vec);
   left_vec += mu;
   for( int i=c.lbound(0); i<=c.ubound(0); ++i )

@@ -20,6 +20,7 @@ set(src_optimization
 )
 
 set(src 
+   "${src_linear}" 
    "${src_blas}" 
    "${src_lapack}"
    "${src_optimization}")
@@ -30,6 +31,7 @@ torch_library(math "${src}" "${deps}" "${shared}")
 add_dependencies(torch_math math-cxx_header_install)
 
 # Defines tests for this package
+torch_test(math linear test/linear.cc)
 torch_test(math linsolve test/linsolve.cc)
 torch_test(math svd test/svd.cc)
 torch_test(math interiorpointLP test/interiorpointLP.cc)
