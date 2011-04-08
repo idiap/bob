@@ -284,6 +284,20 @@ namespace Torch {
       }
     }
 
+    template<typename T, int N>
+    void cropAroundCenter(const blitz::Array<T,N>& src, blitz::Array<T,N>& dst,
+	      const int crop_h, const int crop_w,
+	      const bool allow_out=false, const bool zero_out=false)
+    {
+	    const int center_h = src.extent(N - 2);
+	    const int center_w = src.extent(N - 1);
+
+	    const int crop_y   = center_h - crop_h / 2;
+	    const int crop_x   = center_w - crop_w / 2;
+
+	    crop(src, dst, crop_x, crop_y, crop_w, crop_h, allow_out, zero_out);
+    }
+
   }
 /**
  * @}
