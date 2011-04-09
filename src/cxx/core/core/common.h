@@ -116,6 +116,15 @@ namespace Torch {
         throw UnexpectedShapeError();
     }
 
+    /**
+     * @brief Checks that two dimensions (values) have the same length (value),
+     * and throws an UnexpectedShapeError exception if this is not the case.
+     */
+    inline void assertSameDimensionLength(const int d1, const int d2)
+    {
+      if( d1!=d2 )
+        throw UnexpectedShapeError();
+    }
 
     /**
       * @brief Force value to stay in a given range [min, max]. In case of out

@@ -36,7 +36,7 @@ bool mathdetail::isFeasible(const blitz::Array<double,2>& A,
     return false;
 
   // A*x = b (abs(A*x-b)<=epsilon)
-  blitz::Array<double,1> Ax;
+  blitz::Array<double,1> Ax(A.extent(0));
   math::prod(A,x,Ax);
   Ax -= b;
   for( int i=Ax.lbound(0); i<=Ax.ubound(0); ++i)
@@ -46,7 +46,7 @@ bool mathdetail::isFeasible(const blitz::Array<double,2>& A,
   // A'*lambda + mu = c (abs(A'*lambda+mu-c)<=epsilon)
   const blitz::Array<double,2> A_t = 
     const_cast<blitz::Array<double,2>&>(A).transpose(1,0); 
-  blitz::Array<double,1> A_t_lambda;
+  blitz::Array<double,1> A_t_lambda(A_t.extent(0));
   math::prod(A_t,lambda,A_t_lambda);
   A_t_lambda += mu - c;
   for( int i=A_t_lambda.lbound(0); i<=A_t_lambda.ubound(0); ++i)
@@ -119,7 +119,7 @@ bool mathdetail::isInVinfS(const blitz::Array<double,2>& A,
 double mathdetail::logBarrierLP(const blitz::Array<double,2>& A_t,
   const blitz::Array<double,1>& c, blitz::Array<double,1>& lambda)
 {
-  blitz::Array<double,1> A_t_lambda;
+  blitz::Array<double,1> A_t_lambda(A_t.extent(0));
   math::prod( A_t, lambda, A_t_lambda);
   double res = 0.;
   for( int i=c.lbound(0); i<=c.ubound(0); ++i) {
