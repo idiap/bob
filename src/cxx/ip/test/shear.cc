@@ -12,7 +12,7 @@
 #include <blitz/array.h>
 #include <random/uniform.h>
 #include <stdint.h>
-#include "core/logging.h"
+#include "core/cast.h"
 #include "ip/shear.h"
 
 struct T {

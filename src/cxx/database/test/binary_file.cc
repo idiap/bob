@@ -13,6 +13,8 @@
 #include <boost/shared_array.hpp>
 
 #include <blitz/array.h>
+#include <string>
+#include "core/logging.h"
 #include "core/cast.h"
 #include "database/BinFile.h"
 
@@ -63,7 +65,6 @@ std::string temp_file() {
   boost::filesystem::remove(char_tpl.get());
   std::string res = char_tpl.get();
   return res;
-//  return char_tpl.get();
 }
 
 template<typename T, typename U> 
@@ -265,4 +266,3 @@ BOOST_AUTO_TEST_CASE( blitz4d_slice )
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

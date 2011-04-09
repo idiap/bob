@@ -11,7 +11,7 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include "core/logging.h"
+#include "core/cast.h"
 #include "ip/shiftToCenter.h"
 
 struct T {
