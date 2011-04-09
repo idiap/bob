@@ -14,7 +14,7 @@
 #include <blitz/array.h>
 #include <boost/shared_ptr.hpp>
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 
 #include "database/InlinedArrayImpl.h"
 #include "database/ArrayCodec.h"

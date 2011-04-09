@@ -6,7 +6,7 @@
  */
 
 #include "sp/DCT2DNaive.h"
-#include "core/common.h"
+#include "core/array_assert.h"
 
 namespace spd = Torch::sp::detail;
 

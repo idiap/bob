@@ -23,7 +23,8 @@ set(src
     "src/File.cc"
     "src/Exception.cc"
     "src/logging.cc"
-    "src/array_common.cc"
+    "src/array_exception.cc"
+    "src/array_type.cc"
     "src/cast.cc"
     )
 

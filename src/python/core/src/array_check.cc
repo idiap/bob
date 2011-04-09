@@ -10,7 +10,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/preprocessor/stringize.hpp>
 
-#include "core/blitz_addon.h"
+#include "core/array_check.h"
 
 using namespace boost::python;
 
@@ -34,7 +34,7 @@ static const char* FORTRAN_ONE_BASE_CONTIGUOUS_DOC = "Checks that a blitz array 
   ARRAY_CHECK_DEF(T,3) \
   ARRAY_CHECK_DEF(T,4) 
 
-void bind_core_blitz_addon() {
+void bind_core_array_check() {
     ARRAY_CHECK_DEFS(bool)
     ARRAY_CHECK_DEFS(int8_t)
     ARRAY_CHECK_DEFS(int16_t)

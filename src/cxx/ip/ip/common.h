@@ -7,11 +7,7 @@
  */
 
 #ifndef TORCH5SPRO_IP_COMMON_H
-#define TORCH5SPRO_IP_COMMON_H 1
-
-#include "core/logging.h"
-#include "core/common.h"
-#include "ip/Exception.h"
+#define TORCH5SPRO_IP_COMMON_H
 
 namespace Torch {
 /**

@@ -11,7 +11,7 @@
 #define TORCH5SPRO_MATH_LINEAR_H
 
 #include "core/logging.h"
-#include "core/common.h"
+#include "core/array_assert.h"
 
 namespace Torch {
 /**

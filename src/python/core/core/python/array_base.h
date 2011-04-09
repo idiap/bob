@@ -14,7 +14,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 
 namespace Torch { namespace python {
 

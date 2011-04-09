@@ -10,7 +10,7 @@
 
 #include <cstdlib>
 #include "core/Exception.h"
-#include "core/array_common.h"
+#include "core/array_type.h"
 
 namespace Torch { namespace database {
 

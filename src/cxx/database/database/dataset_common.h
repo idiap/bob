@@ -10,7 +10,7 @@
 #ifndef TORCH_DATABASE_DATASET_COMMON_H
 #define TORCH_DATABASE_DATASET_COMMON_H
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 
 namespace Torch {
 /**

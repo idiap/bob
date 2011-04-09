@@ -13,6 +13,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "core/cast.h"
+#include "core/array_check.h"
 #include "core/logging.h"
 
 #ifdef __APPLE__

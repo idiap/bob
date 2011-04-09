@@ -15,7 +15,7 @@
 
 #include "ip/Exception.h"
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 
 namespace Torch { namespace ip {
 

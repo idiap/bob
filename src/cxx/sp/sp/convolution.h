@@ -8,9 +8,8 @@
 #ifndef TORCH5SPRO_SP_CONVOLVE_H
 #define TORCH5SPRO_SP_CONVOLVE_H
 
-#include "core/logging.h"
-#include "core/common.h"
 #include "core/Exception.h"
+#include "core/array_type.h"
 #include <blitz/array.h>
 
 namespace tc = Torch::core;

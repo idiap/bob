@@ -9,7 +9,7 @@ set(pysrc
    "src/tensor.cc"
    "src/profile.cc"
    "src/convert.cc"
-   "src/blitz_addon.cc"
+   "src/array_check.cc"
    "src/main.cc"
    )
  

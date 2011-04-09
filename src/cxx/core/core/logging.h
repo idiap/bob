@@ -22,9 +22,8 @@
 /*************************************************************************/
 //TODO: might be better to create a "core/torch.h" header containing the 
 // following header and to force people to include it when using torch
-#include "core/blitz_addon.h"
 #include "core/blitz_misc.h"
-#include "core/array_common.h"
+#include "core/array_type.h"
 /*************************************************************************/
 
 namespace Torch {
