@@ -6,9 +6,18 @@
 """Test all ip image filters.
 """
 
+import math
 import os, sys
 import unittest
 import torch
+
+# face data
+LH = 120 # Left eye height
+LW = 147 # Left eye width
+RH = 90  # Right eye height
+RW = 213 # Right eye width
+
+GOAL_EYE_DISTANCE = 18
 
 class FilterNewTest(unittest.TestCase):
   """Performs various combined filter tests."""
@@ -37,7 +46,7 @@ class FilterNewTest(unittest.TestCase):
     B = A.sameAs();
 
     # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, 120, 147, 90, 213)
+    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # save image
     torch.database.Array(B).save(os.path.join('data', 'faceextract', 'test_001.blue.answer.png'));
@@ -50,10 +59,10 @@ class FilterNewTest(unittest.TestCase):
     B = A.sameAs()
 
     # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, 120, 147, 90, 213)
+    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # rotate
-    angle = torch.ip.getRotateAngleToLevelOutHorizontal(120, 147, 90, 213)
+    angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
     shape = torch.ip.getShapeRotated(B, angle)
     C = B.sameAs()
     C.resize(shape)
@@ -70,10 +79,10 @@ class FilterNewTest(unittest.TestCase):
     B = A.sameAs()
 
     # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, 120, 147, 90, 213)
+    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # rotate
-    angle = torch.ip.getRotateAngleToLevelOutHorizontal(120, 147, 90, 213)
+    angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
     shape = torch.ip.getShapeRotated(B, angle)
     C = B.sameAs()
     C.resize(shape)
@@ -87,10 +96,33 @@ class FilterNewTest(unittest.TestCase):
     torch.database.Array(D).save(os.path.join('data', 'faceextract', 'test_001.blue.norm.answer.png'));
 
   def test04_geoNormBlue(self):
-        print ""
+    print ""
 
+    # read up image
     img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()[1,:,:]
+    B = A.sameAs()
+
+    # shift to center
+    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
+
+    # rotate
+    angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
+    shape = torch.ip.getShapeRotated(B, angle)
+    C = B.sameAs()
+    C.resize(shape)
+    torch.ip.rotate(B, C, angle)
+
+    # normalise
+    previous_eye_distance = math.sqrt((RH - LH) * (RH - LH) + (RW - LW) * (RW - LW))
+    print previous_eye_distance
+
+    scale_factor = GOAL_EYE_DISTANCE / previous_eye_distance;
+
+    #
+    D = scaleAs(C, scale_factor)
+    torch.ip.scale(C, D)
+
 
 if __name__ == '__main__':
   sys.argv.append('-v')
