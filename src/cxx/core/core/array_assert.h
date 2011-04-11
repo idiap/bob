@@ -44,6 +44,18 @@ namespace Torch {
     }
 
     /**
+     * @brief Checks that two blitz arrays have the same base, and throws an
+     * DifferentBaseError exception if this is not the case.
+     */
+    template<typename T, typename U, int D>
+    void assertSameBase(const blitz::Array<T,D>& a, 
+      const blitz::Array<U,D>& b)
+    {
+      if( !hasSameBase(a,b) )
+        throw DifferentBaseError();
+    }
+
+    /**
      * @brief Checks that a blitz array is a C-style array stored contiguously
      * in memory, and throws a NonCContiguousError exception if this is not 
      * the case.
@@ -100,7 +112,7 @@ namespace Torch {
     void assertSameShape(const blitz::Array<T,D>& ar, 
       const blitz::TinyVector<int, D>& shape)
     {
-      if( !isSameShape(ar,shape) )
+      if( !hasSameShape(ar,shape) )
         throw UnexpectedShapeError();
     }
 
@@ -112,7 +124,7 @@ namespace Torch {
     void assertSameShape(const blitz::Array<T,D>& a, 
       const blitz::Array<U,D>& b)
     {
-      if( !isSameShape(a,b) )
+      if( !hasSameShape(a,b) )
         throw UnexpectedShapeError();
     }
 

@@ -97,6 +97,20 @@ namespace Torch {
         mutable std::string m_message;
     };
 
+    /**
+     * The DifferentBaseError exception occurs when two blitz arrays do not
+     * have the same base indices, whereas this is required.
+     */
+    class DifferentBaseError: public Exception {
+      public:
+        DifferentBaseError() throw();
+        virtual ~DifferentBaseError() throw();
+        virtual const char* what() const throw();
+
+      private:
+        mutable std::string m_message;
+    };
+
   }
 
 }
