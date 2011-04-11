@@ -120,7 +120,7 @@ class FilterNewTest(unittest.TestCase):
     scale_factor = GOAL_EYE_DISTANCE / previous_eye_distance;
 
     #
-    D = scaleAs(C, scale_factor)
+    D = torch.ip.scaleAs(C, scale_factor)
     torch.ip.scale(C, D)
 
 

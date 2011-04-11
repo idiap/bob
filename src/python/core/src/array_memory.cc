@@ -19,24 +19,6 @@ static blitz::Array<T,N> sameAs(const blitz::Array<T,N>& original) {
 	return blitz::Array<T,N>(original.shape());
 }
 
-template <typename T>
-static blitz::Array<T,2> scaleAs(const blitz::Array<T,2>& original, count double scale_factor) 
-{
-	TinyVector<int, 2> new_shape = floor(original.shape() * scale_factor + 0.5);
-	return blitz::Array<T,2>(new_shape);
-}
-
-template <typename T>
-static blitz::Array<T,3> scaleAs(const blitz::Array<T,3>& original, count double scale_factor) 
-{
-	// with 3d Blitz arrays (e.g, color image) we do not want to scale the number of planes :)
-	TinyVector<int, 3> new_shape = original.shape();
-	new_shape(1) = floor(new_shape(1) * scale_factor + 0.5);
-	new_shape(2) = floor(new_shape(2) * scale_factor + 0.5);
-
-	return blitz::Array<T,2>(new_shape);
-}
-
 template <typename T, int N>
 static void bind_memory_common (tp::array<T,N>& array) {
   typedef typename tp::array<T,N>::array_type array_type;
