@@ -297,7 +297,7 @@ namespace Torch {
 	    const int crop_x   = center_w - crop_w / 2;
 
 */
-	    crop(src, dst, y0, x0, crop_h, crop_w);
+	    crop(src, dst, y0, x0, crop_h, crop_w, true);
     }
 
   }
