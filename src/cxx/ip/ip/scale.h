@@ -9,9 +9,10 @@
 #ifndef TORCH5SPRO_IP_SCALE_H
 #define TORCH5SPRO_IP_SCALE_H
 
+#include "core/array_assert.h"
 #include "core/array_index.h"
 #include "ip/Exception.h"
-#include "ip/crop.h"
+#include "ip/common.h"
 
 namespace tca = Torch::core::array;
 
@@ -36,9 +37,12 @@ namespace Torch {
         * @param width The width of the dst blitz::array.
         */
       template<typename T>
-      void scaleNoCheck2D_BI(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
-        const int height, const int width)
+      void scaleNoCheck2D_BI(const blitz::Array<T,2>& src, 
+        blitz::Array<T,2>& dst)
       {
+        const int height = dst.extent(0);
+        const int width = dst.extent(1);
+
         const double x_ratio = (src.extent(1)-1.) / (width-1.);
         const double y_ratio = (src.extent(0)-1.) / (height-1.);
         for( int y=0; y<height; ++y) {
@@ -73,54 +77,51 @@ namespace Torch {
       * @brief Function which rescales a 2D blitz::array/image of a given type.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
       * @param src The input blitz array
-      * @param dst The output blitz array
-      * @param height The height of the dst blitz::array.
-      * @param width The width of the dst blitz::array.
+      * @param dst The output blitz array. The new array is resized according
+      *   to the dimensions of this dst array.
       * @param alg The algorithm used for rescaling.
       */
     template<typename T>
     void scale(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const int height, const int width, 
       const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
+      // Check and resize src if required
+      tca::assertZeroBase(src);
+
       // Check and resize dst if required
-      if( dst.extent(0) != height || dst.extent(1) != width )
-        dst.resize( height, width );
-      // Check and reindex if required
-      if( dst.base(0) != 0 || dst.base(1) != 0 ) {
-        const blitz::TinyVector<int,2> zero_base = 0;
-        dst.reindexSelf( zero_base );
-      }
+      tca::assertZeroBase(dst);
+
+      // Defines output height and width
+      const int height = dst.extent(0);
+      const int width = dst.extent(1);
 
       // Check parameters and throw exception if required
-      if( width<0 || height<0 ) 
-      {
-        if( width<0 ) {
-          throw ParamOutOfBoundaryError("width", false, width, 0);
-        }
-        else if( height<0 ) {
-          throw ParamOutOfBoundaryError("height", false, height, 0);
-        }
-        else
-          throw Exception();
+      if( height<1 ) {
+        throw ParamOutOfBoundaryError("height", false, height, 1);
+      }
+      else if( width<1 ) {
+        throw ParamOutOfBoundaryError("width", false, width, 1);
       }
   
-      // TODO: if same dimension, make a simple copy
-    
-      // Rescale the 2D array
-      switch(alg)
-      {
-        case Rescale::BilinearInterp:
-          {
-            // Rescale using Bilinear Interpolation
-            detail::scaleNoCheck2D_BI<T>(src, dst, height, width);
-          }
-          break;
-        default:
-          throw Torch::ip::Exception();
+      // If src and dst have the same shape, do a simple copy
+      if( height==src.extent(0) && width==src.extent(1))
+        detail::copyNoCheck(src,dst);
+      // Otherwise, do the rescaling
+      else
+      {    
+        // Rescale the 2D array
+        switch(alg)
+        {
+          case Rescale::BilinearInterp:
+            {
+              // Rescale using Bilinear Interpolation
+              detail::scaleNoCheck2D_BI<T>(src, dst);
+            }
+            break;
+          default:
+            throw Torch::ip::Exception();
+        }
       }
     }
 
@@ -131,4 +132,3 @@ namespace Torch {
 }
 
 #endif /* TORCH5SPRO_IP_SCALE_H */
-

@@ -42,7 +42,7 @@ static const char* LEVEL_OUT_DOC = "Get the angle needed to level out (horizonta
 #define FILTER_DECL(T,N) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(crop_overloads_ ## N, Torch::ip::crop<T>, 6, 8) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(rotate_overloads_ ## N, Torch::ip::rotate<T>, 3, 4) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(rescale_overloads_ ## N, Torch::ip::scale<T>, 4, 5) \
+  BOOST_PYTHON_FUNCTION_OVERLOADS(rescale_overloads_ ## N, Torch::ip::scale<T>, 2, 3) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shearX_overloads_ ## N, Torch::ip::shearX<T>, 3, 4) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shearY_overloads_ ## N, Torch::ip::shearY<T>, 3, 4) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shift_overloads_ ## N, Torch::ip::shift<T>, 4, 6) \
@@ -57,7 +57,7 @@ static const char* LEVEL_OUT_DOC = "Get the angle needed to level out (horizonta
   def("flop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP3D_DOC); \
   def("getShapeRotated", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::getShapeRotated<T>, (arg("src"), arg("angle")), ROTATED2D_SHAPE_DOC); \
   def("rotate", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const enum Torch::ip::Rotation::Algorithm))&Torch::ip::rotate<T>, rotate_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("algorithm")="Shearing"), ROTATE2D_DOC)); \
-  def("scale", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const enum Torch::ip::Rescale::Algorithm))&Torch::ip::scale<T>, rescale_overloads_ ## N ((arg("src"), arg("dst"), arg("new_width"), arg("new_height"), arg("algorithm")="BilinearInterp"), RESCALE2D_DOC)); \
+  def("scale", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const enum Torch::ip::Rescale::Algorithm))&Torch::ip::scale<T>, rescale_overloads_ ## N ((arg("src"), arg("dst"), arg("algorithm")="BilinearInterp"), RESCALE2D_DOC)); \
   def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARX2D_DOC)); \
   def("shearY", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARY2D_DOC)); \
   def("shift", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT2D_DOC)); \

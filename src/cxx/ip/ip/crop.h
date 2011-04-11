@@ -112,31 +112,25 @@ namespace Torch {
       tca::assertZeroBase( src);
 
       // Check parameters and throw exception if required
-      if( crop_x<0 || crop_y<0 || crop_w<0 || crop_h<0 || 
-        crop_x+crop_w>src.extent(1) || crop_y+crop_h>src.extent(0) ) 
-      {
-        if( crop_x<0 ) {
-          throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
-        }
-        else if( crop_y<0) {
-          throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
-        }
-        else if( crop_w<0) {
-          throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
-        }
-        else if( crop_h<0) {
-          throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
-        }
-        else if( crop_x+crop_w>src.extent(1)) {
-          throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
-            src.extent(1) );
-        }
-        else if( crop_y+crop_h>src.extent(0)) {
-          throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
-            src.extent(0) );
-        }
-        else
-          throw Exception();
+      if( crop_x<0 ) {
+        throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
+      }
+      if( crop_y<0) {
+        throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
+      }
+      if( crop_w<0) {
+        throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
+      }
+      if( crop_h<0) {
+        throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
+      }
+      if( crop_x+crop_w>src.extent(1)) {
+        throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
+          src.extent(1) );
+      }
+      if( crop_y+crop_h>src.extent(0)) {
+        throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
+          src.extent(0) );
       }
     
       // Crop the 2D array
@@ -178,32 +172,28 @@ namespace Torch {
       }
 
       // Check parameters and throw exception if required
-      if( (crop_x<0 || crop_y<0 || crop_w<0 || crop_h<0 || 
-        crop_x+crop_w>src.extent(1) || crop_y+crop_h>src.extent(0) ) &&
-        !allow_out) 
+      if(!allow_out) 
       {
         if( crop_x<0 ) {
           throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
         }
-        else if( crop_y<0) {
+        if( crop_y<0) {
           throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
         }
-        else if( crop_w<0) {
+        if( crop_w<0) {
           throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
         }
-        else if( crop_h<0) {
+        if( crop_h<0) {
           throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
         }
-        else if( crop_x+crop_w>src.extent(1)) {
+        if( crop_x+crop_w>src.extent(1)) {
           throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
             src.extent(1) );
         }
-        else if( crop_y+crop_h>src.extent(0)) {
+        if( crop_y+crop_h>src.extent(0)) {
           throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
             src.extent(0) );
         }
-        else
-          throw Exception();
       }
     
       // Crop the 2D array
@@ -247,32 +237,28 @@ namespace Torch {
       }
 
       // Check parameters and throw exception if required
-      if( (crop_x<0 || crop_y<0 || crop_w<0 || crop_h<0 || 
-        crop_x+crop_w>src.extent(2) || crop_y+crop_h>src.extent(1) ) &&
-        !allow_out) 
+      if(!allow_out) 
       {
         if( crop_x<0 ) {
           throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
         }
-        else if( crop_y<0) {
+        if( crop_y<0) {
           throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
         }
-        else if( crop_w<0) {
+        if( crop_w<0) {
           throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
         }
-        else if( crop_h<0) {
+        if( crop_h<0) {
           throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
         }
-        else if( crop_x+crop_w>src.extent(2)) {
+        if( crop_x+crop_w>src.extent(2)) {
           throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
             src.extent(2) );
         }
-        else if( crop_y+crop_h>src.extent(1)) {
+        if( crop_y+crop_h>src.extent(1)) {
           throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
             src.extent(1) );
         }
-        else
-          throw Exception();
       }
     
       for( int p=0; p<dst.extent(0); ++p) {
@@ -308,4 +294,3 @@ namespace Torch {
 }
 
 #endif /* TORCH5SPRO_IP_CROP_H */
-
