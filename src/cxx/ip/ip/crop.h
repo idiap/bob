@@ -158,7 +158,7 @@ namespace Torch {
       */
     template<typename T>
     void crop(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
-      const int crop_x, const int crop_y, const int crop_w, const int crop_h,
+      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
       const bool allow_out=false, const bool zero_out=false)
     {
       // Check and resize dst if required
@@ -222,7 +222,7 @@ namespace Torch {
       */
     template<typename T>
     void crop(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst, 
-      const int crop_x, const int crop_y, const int crop_w, const int crop_h,
+      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
       const bool allow_out=false, const bool zero_out=false)
     {
       // Check and resize dst if required
