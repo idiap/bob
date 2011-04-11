@@ -72,7 +72,6 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
       diff += abs( t1(i,j) - t2(i,j) );
   diff = (diff/(y_min*x_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
-  std::cout << diff << std::endl;
   BOOST_CHECK_SMALL( diff, eps );
 }
 
@@ -145,6 +144,11 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   Torch::database::Array ar_img_s125x75(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_s125x75 = ar_img_s125x75.get<uint8_t,2>();
   checkBlitzClose( img_ref_s125x75, img_processed, eps);
+
+  // 100x100
+  img_processed.resize(100,100); 
+  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
+  checkBlitzClose( img, img_processed, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

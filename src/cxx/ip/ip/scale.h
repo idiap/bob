@@ -9,9 +9,10 @@
 #ifndef TORCH5SPRO_IP_SCALE_H
 #define TORCH5SPRO_IP_SCALE_H
 
+#include "core/array_assert.h"
 #include "core/array_index.h"
 #include "ip/Exception.h"
-#include "ip/crop.h"
+#include "ip/common.h"
 
 namespace tca = Torch::core::array;
 
@@ -91,30 +92,36 @@ namespace Torch {
       // Check and resize dst if required
       tca::assertZeroBase(dst);
 
+      // Defines output height and width
       const int height = dst.extent(0);
       const int width = dst.extent(1);
 
       // Check parameters and throw exception if required
-      if( width<1 ) {
-        throw ParamOutOfBoundaryError("width", false, width, 1);
-      }
-      else if( height<0 ) {
+      if( height<1 ) {
         throw ParamOutOfBoundaryError("height", false, height, 1);
       }
+      else if( width<1 ) {
+        throw ParamOutOfBoundaryError("width", false, width, 1);
+      }
   
-      // TODO: if same dimension, make a simple copy
-    
-      // Rescale the 2D array
-      switch(alg)
-      {
-        case Rescale::BilinearInterp:
-          {
-            // Rescale using Bilinear Interpolation
-            detail::scaleNoCheck2D_BI<T>(src, dst);
-          }
-          break;
-        default:
-          throw Torch::ip::Exception();
+      // If src and dst have the same shape, do a simple copy
+      if( height==src.extent(0) && width==src.extent(1))
+        detail::copyNoCheck(src,dst);
+      // Otherwise, do the rescaling
+      else
+      {    
+        // Rescale the 2D array
+        switch(alg)
+        {
+          case Rescale::BilinearInterp:
+            {
+              // Rescale using Bilinear Interpolation
+              detail::scaleNoCheck2D_BI<T>(src, dst);
+            }
+            break;
+          default:
+            throw Torch::ip::Exception();
+        }
       }
     }
 
