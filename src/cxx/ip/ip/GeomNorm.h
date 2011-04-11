@@ -115,7 +115,7 @@ namespace Torch {
       generateWithCenter(src_d,m_centered,yc,xc);
         
       // 2/ Rotate to align the image with the x-axis
-      const double angle = getRotateAngleToLevelOutHorizontal(y1, x1, y2, x2);
+      const double angle = getAngleToHorizontal(y1, x1, y2, x2);
       shape = getShapeRotated(m_centered, angle);
       if( !tca::hasSameShape(m_rotated, shape) )
         m_rotated.resize( shape );

@@ -233,14 +233,14 @@ namespace Torch {
     }
 
     /**
-     * @brief Function to calcuation the angle we need to rotate to level out two points
-     * horizontally
-     * @param left_h The hight of the left point
+     * @brief Function to calculate the angle we need to rotate to level out two points
+     *  horizontally
+     * @param left_h The height of the left point
      * @param left_w The width of the left point
-     * @param right_h The hight of the right point
+     * @param right_h The height of the right point
      * @param right_w The width of the right point
      */
-    double getRotateAngleToLevelOutHorizontal(const int left_h, const int left_w,
+    inline double getAngleToHorizontal(const int left_h, const int left_w,
 					      const int right_h, const int right_w)
     {
 	    static const double RAD_TO_DEGREES   = 180. / M_PI;

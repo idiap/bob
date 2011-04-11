@@ -12,6 +12,7 @@ set(pysrc
    "src/vision.cc"
    "src/flow.cc"
    "src/DCTFeatures.cc"
+   "src/GeomNorm.cc"
    "src/TanTriggs.cc"
    "src/main.cc"
    )

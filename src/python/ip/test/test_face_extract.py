@@ -62,7 +62,7 @@ class FilterNewTest(unittest.TestCase):
     torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # rotate
-    angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
+    angle = torch.ip.getAngleToHorizontal(LH, LW, RH, RW)
     shape = torch.ip.getShapeRotated(B, angle)
     C = B.sameAs()
     C.resize(shape)

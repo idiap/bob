@@ -75,7 +75,7 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
 
 #define SCALE_AS(T) \
 	def("scaleAs", (blitz::Array<T,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::scaleAs<T>, (arg("original"), arg("scale_factor")), SCALE_DOC); \
-	def("scaleAs", (blitz::Array<T,3> (*)(const blitz::Array<T,3>&, const double))&Torch::ip::scaleAs<T>, (arg("original"), arg("scale_factor")), SCALE_DOC); \
+	def("scaleAs", (blitz::Array<T,3> (*)(const blitz::Array<T,3>&, const double))&Torch::ip::scaleAs<T>, (arg("original"), arg("scale_factor")), SCALE_DOC); 
 
 /*
 FILTER_DECL(bool,bool)
@@ -129,13 +129,13 @@ void bind_ip_filters_new()
   FILTER_DEF(std::complex<float>,complex64)
   FILTER_DEF(std::complex<double>,complex128)
 */
-	  
-	  SCALE_AS(uint8_t)
-	  SCALE_AS(uint16_t)
-	  SCALE_AS(double)
+
+  SCALE_AS(uint8_t)
+  SCALE_AS(uint16_t)
+  SCALE_AS(double)
 
 	  // help function
-	  def("getRotateAngleToLevelOutHorizontal", (const double (*)(const int, const int, const int, const int))&Torch::ip::getRotateAngleToLevelOutHorizontal, (arg("left_h"), arg("left_w"), arg("right_h"), arg("right_w")), LEVEL_OUT_DOC);
+	  def("getAngleToHorizontal", (const double (*)(const int, const int, const int, const int))&Torch::ip::getAngleToHorizontal, (arg("left_h"), arg("left_w"), arg("right_h"), arg("right_w")), LEVEL_OUT_DOC);
 
 }
 

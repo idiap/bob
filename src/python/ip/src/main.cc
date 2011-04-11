@@ -19,6 +19,7 @@ void bind_ip_filters();
 void bind_ip_filters_new();
 void bind_ip_flow();
 void bind_ip_dctfeatures();
+void bind_ip_geomnorm();
 void bind_ip_tantriggs();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
@@ -33,5 +34,6 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_filters_new();
   bind_ip_flow();
   bind_ip_dctfeatures();
+  bind_ip_geomnorm();
   bind_ip_tantriggs();
 }
