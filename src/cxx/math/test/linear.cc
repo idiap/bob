@@ -9,7 +9,7 @@
 #define BOOST_TEST_MODULE math-linear Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-#include "core/logging.h"
+#include "core/cast.h"
 #include "math/linear.h"
 
 

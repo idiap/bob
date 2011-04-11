@@ -6,7 +6,7 @@
  */
 
 #include "core/logging.h"
-#include "core/array_common.h"
+#include "core/array_type.h"
 
 #include "database/BinFile.h"
 #include "database/dataset_common.h"

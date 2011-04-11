@@ -14,6 +14,8 @@
 #include <vector>
 
 #include <blitz/array.h>
+#include <string>
+#include "core/logging.h" // for Torch::core::tmpdir()
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Arrayset.h"

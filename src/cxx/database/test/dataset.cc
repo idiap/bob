@@ -16,6 +16,7 @@
 #include <blitz/array.h>
 #include <boost/date_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include "core/logging.h"
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Dataset.h"

@@ -7,7 +7,7 @@
  */
 
 #include "sp/DCT1D.h"
-#include "core/common.h"
+#include "core/array_assert.h"
 
 // Declaration of FORTRAN functions from FFTPACK4.1
 extern "C" void cosqi_( int *n, double *wsave);

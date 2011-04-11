@@ -13,7 +13,7 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 #include "database/Array.h"
 
 namespace Torch { namespace database { namespace detail {

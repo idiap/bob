@@ -11,7 +11,7 @@
 #ifndef TORCH5SPRO_IP_DCT_FEATURES_H
 #define TORCH5SPRO_IP_DCT_FEATURES_H
 
-#include "core/logging.h"
+#include "core/cast.h"
 #include "ip/Exception.h"
 
 #include <list>

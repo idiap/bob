@@ -10,7 +10,8 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
-#include "core/logging.h" // for "core/blitz_misc.h"
+#include "core/logging.h"
+#include "core/cast.h"
 #include "core/Tensor.h"
 #include "core/BlitzAdapter.h"
 #include <iostream>

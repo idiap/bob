@@ -1,14 +1,12 @@
 /**
- * @file src/cxx/core/core/blitz_addon.h
+ * @file src/cxx/core/core/array_check.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief This file contains miscellaneous additions for blitz++ arrays
- *
- * http://www.oonumerics.org/blitz/
+ * @brief This file defines miscellaneous checks for blitz++ arrays
  */
 
-#ifndef TORCH_CORE_BLITZ_ADDON_H
-#define TORCH_CORE_BLITZ_ADDON_H 1
+#ifndef TORCH_CORE_ARRAY_CHECK_H
+#define TORCH_CORE_ARRAY_CHECK_H
 
 #include <blitz/array.h>
 #include <blitz/tinyvec-et.h>
@@ -256,4 +254,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_CORE_BLITZ_ADDON_H */
+#endif /* TORCH5SPRO_CORE_ARRAY_CHECK_H */

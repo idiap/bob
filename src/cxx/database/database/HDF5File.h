@@ -17,7 +17,7 @@
 #include <blitz/array.h>
 #include <H5Cpp.h>
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 #include "database/Exception.h"
 
 namespace Torch { namespace database {

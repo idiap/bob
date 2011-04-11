@@ -14,9 +14,8 @@
 #ifndef TORCH5SPRO_IP_ZIGZAG_H
 #define TORCH5SPRO_IP_ZIGZAG_H
 
-#include "core/logging.h"
+#include "core/array_assert.h"
 #include "ip/Exception.h"
-#include "ip/common.h"
 
 namespace Torch {
 	/**

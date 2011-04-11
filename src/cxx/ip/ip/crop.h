@@ -7,11 +7,11 @@
  */
 
 #ifndef TORCH5SPRO_IP_CROP_H
-#define TORCH5SPRO_IP_CROP_H 1
+#define TORCH5SPRO_IP_CROP_H
 
 #include "core/logging.h"
 #include "ip/Exception.h"
-#include "core/common.h"
+#include "core/array_assert.h"
 
 namespace Torch {
 /**

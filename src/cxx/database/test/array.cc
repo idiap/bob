@@ -14,6 +14,8 @@
 
 #include <blitz/array.h>
 #include <complex>
+#include <string>
+#include "core/logging.h" // for Torch::core::tmpdir()
 #include "core/cast.h"
 #include "database/BinFile.h"
 #include "database/Array.h"
@@ -71,7 +73,6 @@ std::string temp_file() {
   boost::filesystem::remove(char_tpl.get());
   std::string res = char_tpl.get();
   return res;
-//  return char_tpl.get();
 }
 
 template<typename T, typename U> 

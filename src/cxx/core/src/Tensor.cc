@@ -6,7 +6,7 @@
  * @brief Implements the Tensor(Wrapper) class
  */
 
-#include "core/array_common.h"
+//#include "core/array_common.h"
 #include "core/Tensor.h"
 
 namespace Torch {

@@ -7,9 +7,10 @@
  */
 
 #ifndef TORCH5SPRO_CORE_CAST_H
-#define TORCH5SPRO_CORE_CAST_H 1
+#define TORCH5SPRO_CORE_CAST_H
 
-#include "core/logging.h"
+#include <blitz/array.h>
+#include <stdint.h>
 #include <complex>
 
 namespace Torch {

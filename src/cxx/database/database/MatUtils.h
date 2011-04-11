@@ -8,7 +8,7 @@
 #ifndef TORCH_DATABASE_MATUTILS_H 
 #define TORCH_DATABASE_MATUTILS_H
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 #include <blitz/array.h>
 
 #include <matio.h>

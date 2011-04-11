@@ -12,7 +12,8 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
-#include <iostream>
+#include "core/cast.h"
+#include "core/array_check.h"
 #include "core/logging.h"
 
 #ifdef __APPLE__

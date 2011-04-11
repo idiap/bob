@@ -13,7 +13,7 @@
 #define TORCH5SPRO_IP_ROTATE_H
 
 #include "core/logging.h"
-#include "core/common.h"
+#include "core/array_assert.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
 #include "ip/shear.h"

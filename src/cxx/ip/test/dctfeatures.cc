@@ -9,10 +9,10 @@
 #define BOOST_TEST_MODULE IP-DCTFeatures Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
-
-#include "core/logging.h"
-#include "ip/DCTFeatures.h"
 #include <vector>
+
+#include "core/cast.h"
+#include "ip/DCTFeatures.h"
 
 struct T {
 	blitz::Array<uint32_t,2> src;

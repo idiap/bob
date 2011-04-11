@@ -13,6 +13,7 @@
 #include <boost/shared_array.hpp>
 
 #include <blitz/array.h>
+#include "core/logging.h"
 #include "database/Array.h"
 #include "database/ImageArrayCodec.h"
 

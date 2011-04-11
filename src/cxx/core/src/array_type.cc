@@ -2,10 +2,10 @@
  * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
  * @date Tue  8 Feb 16:35:57 2011 
  *
- * @brief Some common array utilities 
+ * @brief Some type-related array utilities 
  */
 
-#include "core/array_common.h"
+#include "core/array_type.h"
 #include "core/Exception.h"
 
 namespace tca = Torch::core::array;

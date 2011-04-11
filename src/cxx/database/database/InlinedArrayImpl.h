@@ -9,11 +9,10 @@
 #ifndef TORCH_DATABASE_INLINEDARRAYIMPL_H
 #define TORCH_DATABASE_INLINEDARRAYIMPL_H
 
-#include "core/array_common.h"
 #include <cstdlib>
 #include <blitz/array.h>
-#include <core/array_common.h>
-#include <database/Exception.h>
+#include "core/array_type.h"
+#include "database/Exception.h"
 #include "core/cast.h"
 
 namespace Torch { namespace database { namespace detail {
