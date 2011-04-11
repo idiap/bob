@@ -138,12 +138,12 @@ class FilterNewTest(unittest.TestCase):
     torch.ip.scale(C, D)
     torch.database.Array(D).save(os.path.join('data', 'faceextract', 'test-faces.1.jpg'));
 
-    """
+    
     # crop face
     E = torch.core.array.uint8_2(30, 30)
     torch.ip.cropAroundCenter(D, E, 30, 30)
     torch.database.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
-    """
+
 
 if __name__ == '__main__':
   sys.argv.append('-v')

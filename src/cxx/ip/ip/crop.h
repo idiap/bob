@@ -275,16 +275,29 @@ namespace Torch {
 
     template<typename T, int N>
     void cropAroundCenter(const blitz::Array<T,N>& src, blitz::Array<T,N>& dst,
-	      const int crop_h, const int crop_w,
-	      const bool allow_out=false, const bool zero_out=false)
+	      const int eyes_distance)
     {
 	    const int center_h = src.extent(N - 2);
 	    const int center_w = src.extent(N - 1);
 
-	    const int crop_y   = center_h - crop_h / 2;
+      const int crop_h = dst.extent(N - 2);
+      const int crop_w = dst.extent(N - 1);
+
+      // From Cosmin code
+      const double D_EYES = 10.0;
+      const double Y_UPPER = 5.0;
+      const double model_size = 2 * D_EYES;
+  
+      const double ratio = eyes_distance / D_EYES;
+      
+      const double x0 = center_w * 0.5 * model_size;
+      const double y0 = center_h - ratio * Y_UPPER;
+
+/*	    const int crop_y   = center_h - crop_h / 2;
 	    const int crop_x   = center_w - crop_w / 2;
 
-	    crop(src, dst, crop_x, crop_y, crop_w, crop_h, allow_out, zero_out);
+*/
+	    crop(src, dst, y0, x0, crop_h, crop_w);
     }
 
   }
