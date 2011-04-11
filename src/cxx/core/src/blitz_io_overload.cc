@@ -1,13 +1,14 @@
 /**
- * @file src/cxx/core/src/blitz_misc.cc
+ * @file src/cxx/core/src/blitz_io_overload.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief This file contains miscellaneous additions for blitz++ arrays
+ * @brief This file overloads the Input/Output stream operations on blitz++
+ *   multidimensional arrays.
  *
  * http://www.oonumerics.org/blitz/
  */
 
-#include "core/blitz_misc.h"
+#include "core/blitz_io_overload.h"
 
 BZ_NAMESPACE(blitz)
 // TODO
@@ -88,4 +89,3 @@ ostream& operator<<(ostream& os, const Array<uint8_t,4>& x)
 
 #endif
 BZ_NAMESPACE_END
-

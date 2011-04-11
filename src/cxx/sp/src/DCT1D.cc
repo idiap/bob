@@ -14,7 +14,7 @@ extern "C" void cosqi_( int *n, double *wsave);
 extern "C" void cosqf_( int *n, double *x, double *wsave);
 extern "C" void cosqb_( int *n, double *x, double *wsave);
 
-
+namespace tca = Torch::core::array;
 namespace sp = Torch::sp;
 
 sp::DCT1DAbstract::DCT1DAbstract( const int length):
@@ -77,11 +77,11 @@ void sp::DCT1D::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // check input
-  Torch::core::assertZeroBase(src);
+  tca::assertZeroBase(src);
 
   // Check output
-  Torch::core::assertCZeroBaseContiguous(dst);
-  Torch::core::assertSameShape( dst, src);
+  tca::assertCZeroBaseContiguous(dst);
+  tca::assertSameShape( dst, src);
 
   // Copy content from src to dst
   dst = src;
@@ -105,11 +105,11 @@ void sp::IDCT1D::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // check input
-  Torch::core::assertZeroBase(src);
+  tca::assertZeroBase(src);
 
   // Check output
-  Torch::core::assertCZeroBaseContiguous(dst);
-  Torch::core::assertSameShape( dst, src);
+  tca::assertCZeroBaseContiguous(dst);
+  tca::assertSameShape( dst, src);
 
   // Copy content from src to dst
   dst = src;

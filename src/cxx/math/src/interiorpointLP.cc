@@ -332,10 +332,10 @@ void mathdetail::initializeLargeSystem(const blitz::Array<double,2>& A,
   const int n = A.extent(1);
 
   // Reindex and resize A_large, b_large and x_large
-  Torch::core::reindexAndResize( A_large, 0, 0, m+2*n, m+2*n);
-  Torch::core::reindexAndResize( b_large, 0, m+2*n);
-  Torch::core::reindexAndResize( b_large, 0, m+2*n);
-  Torch::core::reindexAndResize( x_large, 0, m+2*n);
+  Torch::core::array::reindexAndResize( A_large, 0, 0, m+2*n, m+2*n);
+  Torch::core::array::reindexAndResize( b_large, 0, m+2*n);
+  Torch::core::array::reindexAndResize( b_large, 0, m+2*n);
+  Torch::core::array::reindexAndResize( x_large, 0, m+2*n);
 
   // 'Compute' transpose(A)
   const blitz::Array<double,2> A_t = 

@@ -1,4 +1,5 @@
 #include "math/linsolve.h"
+#include "core/array_old.h"
 
 namespace math = Torch::math;
 

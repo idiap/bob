@@ -17,7 +17,7 @@ namespace Torch {
  * @{
  *
  */
-  namespace core {
+  namespace core { namespace array {
 
     /**
      * @brief Checks if a blitz array has zero base indices, for each of its 
@@ -248,7 +248,7 @@ namespace Torch {
         array.resize( size0, size1, size2, size3);
     }
 
-  }
+  }}
 /**
  * @}
  */

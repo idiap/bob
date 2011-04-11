@@ -15,6 +15,7 @@
 #include <stdint.h>
 
 #include "core/array_type.h"
+#include "core/blitz_compat.h"
 
 namespace Torch { namespace python {
 

@@ -11,6 +11,8 @@
 #include "core/python/array_base.h"
 #include "core/python/blitz_extra.h"
 
+#include "core/blitz_compat.h"
+
 namespace tp = Torch::python;
 namespace bp = boost::python;
 

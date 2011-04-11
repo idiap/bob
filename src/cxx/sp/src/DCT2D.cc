@@ -14,7 +14,7 @@ extern "C" void cosqi_( int *n, double *wsave);
 extern "C" void cosqf_( int *n, double *x, double *wsave);
 extern "C" void cosqb_( int *n, double *x, double *wsave);
 
-
+namespace tca = Torch::core::array;
 namespace sp = Torch::sp;
 
 sp::DCT2DAbstract::DCT2DAbstract( const int height, const int width):
@@ -89,11 +89,11 @@ void sp::DCT2D::operator()(const blitz::Array<double,2>& src,
   blitz::Array<double,2>& dst)
 {
   // check input
-  Torch::core::assertZeroBase(src);
+  tca::assertZeroBase(src);
 
   // Check output
-  Torch::core::assertCZeroBaseContiguous(dst);
-  Torch::core::assertSameShape( dst, src);
+  tca::assertCZeroBaseContiguous(dst);
+  tca::assertSameShape( dst, src);
 
   // Apply 1D FCT to each column of the 2D array (array(id_row,id_column))
   for(int j=0; j<m_width; ++j)
@@ -133,11 +133,11 @@ void sp::IDCT2D::operator()(const blitz::Array<double,2>& src,
   blitz::Array<double,2>& dst)
 {
   // check input
-  Torch::core::assertZeroBase(src);
+  tca::assertZeroBase(src);
 
   // Check output
-  Torch::core::assertCZeroBaseContiguous(dst);
-  Torch::core::assertSameShape( dst, src);
+  tca::assertCZeroBaseContiguous(dst);
+  tca::assertSameShape( dst, src);
 
   // Apply 1D inverse FCT to each column of the 2D array (array(id_row,id_column))
   for(int j=0; j<m_width; ++j)

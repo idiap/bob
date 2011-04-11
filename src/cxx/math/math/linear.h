@@ -13,6 +13,8 @@
 #include "core/logging.h"
 #include "core/array_assert.h"
 
+namespace tca = Torch::core::array;
+
 namespace Torch {
 /**
  * \ingroup libmath_api
@@ -34,14 +36,14 @@ namespace Torch {
       blitz::Array<T,2>& C)
     {
       // Check inputs
-      Torch::core::assertZeroBase(A);
-      Torch::core::assertZeroBase(B);
-      Torch::core::assertSameDimensionLength(A.extent(1),B.extent(0));
+      tca::assertZeroBase(A);
+      tca::assertZeroBase(B);
+      tca::assertSameDimensionLength(A.extent(1),B.extent(0));
 
       // Check output
-      Torch::core::assertZeroBase(C);
-      Torch::core::assertSameDimensionLength(A.extent(0), C.extent(0));
-      Torch::core::assertSameDimensionLength(B.extent(1), C.extent(1));
+      tca::assertZeroBase(C);
+      tca::assertSameDimensionLength(A.extent(0), C.extent(0));
+      tca::assertSameDimensionLength(B.extent(1), C.extent(1));
 
       // Perform multiplication
       blitz::firstIndex i;
@@ -55,13 +57,13 @@ namespace Torch {
       blitz::Array<T,1>& c)
     {
       // Check inputs
-      Torch::core::assertZeroBase(A);
-      Torch::core::assertZeroBase(b);
-      Torch::core::assertSameDimensionLength(A.extent(1),b.extent(0));
+      tca::assertZeroBase(A);
+      tca::assertZeroBase(b);
+      tca::assertSameDimensionLength(A.extent(1),b.extent(0));
 
       // Check output
-      Torch::core::assertZeroBase(c);
-      Torch::core::assertSameDimensionLength(c.extent(0), A.extent(0));
+      tca::assertZeroBase(c);
+      tca::assertSameDimensionLength(c.extent(0), A.extent(0));
 
       // Perform multiplication
       blitz::firstIndex i;
@@ -79,9 +81,9 @@ namespace Torch {
     T dot(const blitz::Array<T,1>& a, const blitz::Array<T,1>& b)
     {
       // Check inputs
-      Torch::core::assertZeroBase(a);
-      Torch::core::assertZeroBase(b);
-      Torch::core::assertSameDimensionLength(a.extent(0),b.extent(0));
+      tca::assertZeroBase(a);
+      tca::assertZeroBase(b);
+      tca::assertSameDimensionLength(a.extent(0),b.extent(0));
 
       // Compute the dot product
       blitz::firstIndex i;

@@ -12,6 +12,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "core/cast.h"
+#include "core/array_type.h"
 #include "math/linear.h"
 #include "math/interiorpointLP.h"
 
@@ -71,10 +72,10 @@ void generateProblem( const int n, blitz::Array<double,2>& A,
   blitz::Array<double,1>& b, blitz::Array<double,1>& c, 
   blitz::Array<double,1>& x0)
 {
-  Torch::core::reindexAndResize( A, 0, 0, n, 2*n);
-  Torch::core::reindexAndResize( b, 0, n);
-  Torch::core::reindexAndResize( c, 0, 2*n);
-  Torch::core::reindexAndResize( x0, 0, 2*n);
+  Torch::core::array::reindexAndResize( A, 0, 0, n, 2*n);
+  Torch::core::array::reindexAndResize( b, 0, n);
+  Torch::core::array::reindexAndResize( c, 0, 2*n);
+  Torch::core::array::reindexAndResize( x0, 0, 2*n);
   A = 0.;
   c = 0.;
   for( int i=0; i<n; ++i) {

@@ -8,6 +8,7 @@
 #include "sp/DCT1DNaive.h"
 #include "core/array_assert.h"
 
+namespace tca = Torch::core::array;
 namespace spd = Torch::sp::detail;
 
 spd::DCT1DNaiveAbstract::DCT1DNaiveAbstract( const int length):
@@ -65,13 +66,13 @@ void spd::DCT1DNaive::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // Check input, inclusive dimension
-  Torch::core::assertZeroBase(src);
+  tca::assertZeroBase(src);
   const blitz::TinyVector<int,1> shape(m_length);
-  Torch::core::assertSameShape(src, shape);
+  tca::assertSameShape(src, shape);
 
   // Check output
-  Torch::core::assertCZeroBaseContiguous(dst);
-  Torch::core::assertSameShape( dst, src);
+  tca::assertCZeroBaseContiguous(dst);
+  tca::assertSameShape( dst, src);
 
   // Process
   processNoCheck(src, dst);
@@ -103,13 +104,13 @@ void spd::IDCT1DNaive::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // Check input, inclusive dimension
-  Torch::core::assertZeroBase(src);
+  tca::assertZeroBase(src);
   const blitz::TinyVector<int,1> shape(m_length);
-  Torch::core::assertSameShape(src, shape);
+  tca::assertSameShape(src, shape);
 
   // Check output
-  Torch::core::assertCZeroBaseContiguous(dst);
-  Torch::core::assertSameShape( dst, src);
+  tca::assertCZeroBaseContiguous(dst);
+  tca::assertSameShape( dst, src);
 
   // Process
   processNoCheck(src, dst);

@@ -16,6 +16,7 @@
 #include "database/Arrayset.h"
 #include "database/Array.h"
 #include "database/Relationset.h"
+#include "core/blitz_compat.h"
 
 namespace db = Torch::database;
 

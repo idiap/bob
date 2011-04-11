@@ -19,6 +19,8 @@
 #include "ip/shear.h"
 #include "ip/crop.h"
 
+namespace tca = Torch::core::array;
+
 namespace Torch {
 /**
  * \ingroup libip_api
@@ -294,11 +296,11 @@ namespace Torch {
       const enum Rotation::Algorithm alg=Rotation::Shearing)
     {
       // Check input
-      Torch::core::assertZeroBase(src);
+      tca::assertZeroBase(src);
 
       // Check output
-      Torch::core::assertZeroBase(dst);
-      Torch::core::assertSameShape(dst, getShapeRotated(src,angle));
+      tca::assertZeroBase(dst);
+      tca::assertSameShape(dst, getShapeRotated(src,angle));
 
       // Perform the rotation
       detail::rotateNoCheck(src, dst, angle, alg);
@@ -322,11 +324,11 @@ namespace Torch {
       const enum Rotation::Algorithm alg=Rotation::Shearing)
     {
       // Check input
-      Torch::core::assertZeroBase(src);
+      tca::assertZeroBase(src);
 
       // Check output
-      Torch::core::assertZeroBase(dst);
-      Torch::core::assertSameShape(dst, getShapeRotated(src,angle));
+      tca::assertZeroBase(dst);
+      tca::assertSameShape(dst, getShapeRotated(src,angle));
 
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices

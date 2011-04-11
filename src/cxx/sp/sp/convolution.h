@@ -9,10 +9,10 @@
 #define TORCH5SPRO_SP_CONVOLVE_H
 
 #include "core/Exception.h"
-#include "core/array_type.h"
+#include "core/array_index.h"
 #include <blitz/array.h>
 
-namespace tc = Torch::core;
+namespace tca = Torch::core::array;
 
 namespace Torch {
   /**
@@ -123,8 +123,8 @@ namespace Torch {
           else if( border_opt == Convolution::NearestNeighbour )
           {
             for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
-              A(i) += B( tc::keepInRange(j,0,Bsize-1) + Bl) * 
-                C( tc::keepInRange(i_shifted-j,0,Csize-1) + Cl);
+              A(i) += B( tca::keepInRange(j,0,Bsize-1) + Bl) * 
+                C( tca::keepInRange(i_shifted-j,0,Csize-1) + Cl);
           }
           else if( border_opt == Convolution::Circular )
           {
@@ -135,8 +135,8 @@ namespace Torch {
           else if( border_opt == Convolution::Mirror )
           {
             for(int j=i_shifted-(Csize-1); j <= i_shifted; ++j)
-              A(i) += B( tc::mirrorInRange(j,0,Bsize-1) + Bl) * 
-                C( tc::mirrorInRange(i_shifted-j,0,Csize-1) + Cl);
+              A(i) += B( tca::mirrorInRange(j,0,Bsize-1) + Bl) * 
+                C( tca::mirrorInRange(i_shifted-j,0,Csize-1) + Cl);
           }
         }
         else if( size_opt == Convolution::Valid )
@@ -265,10 +265,10 @@ namespace Torch {
             {
               for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
                 for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
-                  A(i1,i2) += B( tc::keepInRange(j1,0,Bsize1-1) + Bl1, 
-                               tc::keepInRange(j2,0,Bsize2-1) + Bl2) *
-                    C( tc::keepInRange(i1_shifted-j1,0,Csize1-1) + Cl1,
-                       tc::keepInRange(i2_shifted-j2,0,Csize2-1) + Cl2);
+                  A(i1,i2) += B( tca::keepInRange(j1,0,Bsize1-1) + Bl1, 
+                               tca::keepInRange(j2,0,Bsize2-1) + Bl2) *
+                    C( tca::keepInRange(i1_shifted-j1,0,Csize1-1) + Cl1,
+                       tca::keepInRange(i2_shifted-j2,0,Csize2-1) + Cl2);
             }
             else if( border_opt == Convolution::Circular )
             {
@@ -282,10 +282,10 @@ namespace Torch {
             {
               for(int j1=i1_shifted-(Csize1-1); j1 <= i1_shifted; ++j1)
                 for(int j2=i2_shifted-(Csize2-1); j2 <= i2_shifted; ++j2)
-                  A(i1,i2) += B( tc::mirrorInRange(j1,0,Bsize1-1) + Bl1, 
-                               tc::mirrorInRange(j2,0,Bsize2-1) + Bl2) *
-                    C( tc::mirrorInRange(i1_shifted-j1,0,Csize1-1) + Cl1,
-                       tc::mirrorInRange(i2_shifted-j2,0,Csize2-1) + Cl2);
+                  A(i1,i2) += B( tca::mirrorInRange(j1,0,Bsize1-1) + Bl1, 
+                               tca::mirrorInRange(j2,0,Bsize2-1) + Bl2) *
+                    C( tca::mirrorInRange(i1_shifted-j1,0,Csize1-1) + Cl1,
+                       tca::mirrorInRange(i2_shifted-j2,0,Csize2-1) + Cl2);
             }
           }
           else if( size_opt == Convolution::Valid )

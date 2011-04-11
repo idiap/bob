@@ -19,6 +19,8 @@
 
 #include "core/Exception.h"
 #include "core/logging.h"
+#include "core/array_type.h"
+#include "core/blitz_compat.h"
 
 namespace Torch {   
   /**

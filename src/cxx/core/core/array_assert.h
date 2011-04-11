@@ -18,7 +18,7 @@ namespace Torch {
  * @{
  *
  */
-  namespace core {
+  namespace core { namespace array {
     /**
      * @brief Checks that a blitz array has zero base indices, and throws
      * a NonZeroBaseError exception if this is not the case.
@@ -126,7 +126,7 @@ namespace Torch {
         throw UnexpectedShapeError();
     }
 
-  }
+  }}
 /**
  * @}
  */
