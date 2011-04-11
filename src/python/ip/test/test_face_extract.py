@@ -141,7 +141,7 @@ class FilterNewTest(unittest.TestCase):
     
     # crop face
     E = torch.core.array.uint8_2(30, 30)
-    torch.ip.cropAroundCenter(D, E, 30, 30)
+    torch.ip.cropFace(D, E, 10)
     torch.database.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
 
 
