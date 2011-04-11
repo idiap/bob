@@ -104,15 +104,15 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_uint8 )
   checkBlitzEqual(a2c_1, b2); 
 
   // Crop the middle part with out of boundary and check exception
-  BOOST_CHECK_THROW( Torch::ip::crop(a2, b2, -1, 1, 6, 2), 
+  BOOST_CHECK_THROW( Torch::ip::crop(a2, b2, 1, -1, 2, 6), 
     Torch::ip::ParamOutOfBoundaryError );
 
   // Crop the middle part with out of boundary (fill with zero)
-  Torch::ip::crop(a2, b2, -1, 1, 6, 2, true, true);
+  Torch::ip::crop(a2, b2, 1, -1, 2, 6, true, true);
   checkBlitzEqual(a2c_2, b2); 
 
   // Crop the middle part with out of boundary (fill with closest neighbour)
-  Torch::ip::crop(a2, b2, -1, 1, 6, 2, true);
+  Torch::ip::crop(a2, b2, 1, -1, 2, 6, true);
   checkBlitzEqual(a2c_3, b2); 
 }
   
@@ -128,15 +128,15 @@ BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
   checkBlitzEqual(a3c_1, b3); 
 
   // Crop the middle part with out of boundary and check exception
-  BOOST_CHECK_THROW( Torch::ip::crop(a3, b3, -1, 1, 6, 2), 
+  BOOST_CHECK_THROW( Torch::ip::crop(a3, b3, 1, -1, 2, 6), 
     Torch::ip::ParamOutOfBoundaryError );
 
   // Crop the middle part with out of boundary (fill with zero)
-  Torch::ip::crop(a3, b3, -1, 1, 6, 2, true, true);
+  Torch::ip::crop(a3, b3, 1, -1, 2, 6, true, true);
   checkBlitzEqual(a3c_2, b3); 
 
   // Crop the middle part with out of boundary (fill with closest neighbour)
-  Torch::ip::crop(a3, b3, -1, 1, 6, 2, true);
+  Torch::ip::crop(a3, b3, 1, -1, 2, 6, true);
   checkBlitzEqual(a3c_3, b3); 
 }
 

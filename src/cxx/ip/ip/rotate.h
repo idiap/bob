@@ -178,7 +178,7 @@ namespace Torch {
         
               int crop_x = (dst_int2.extent(1) - dst_width) / 2;
               int crop_y = (dst_int2.extent(0) - dst_height) / 2;
-              crop( dst_int2, dst, crop_x, crop_y, dst_width, dst_height, 
+              crop( dst_int2, dst, crop_y, crop_x, dst_height, dst_width, 
                 true, true);
             }
             break;

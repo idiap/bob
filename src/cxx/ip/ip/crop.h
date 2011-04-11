@@ -9,7 +9,6 @@
 #ifndef TORCH5SPRO_IP_CROP_H
 #define TORCH5SPRO_IP_CROP_H
 
-#include "core/logging.h"
 #include "ip/Exception.h"
 #include "core/array_assert.h"
 #include "core/array_index.h"
@@ -68,7 +67,7 @@ namespace Torch {
         */
       template<typename T>
       void cropNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
-        const int crop_x, const int crop_y, const int crop_w, const int crop_h,
+        const int crop_y, const int crop_x, const int crop_h, const int crop_w,
         const bool zero_out)
       {
         bool is_y_out;
@@ -197,7 +196,7 @@ namespace Torch {
       }
     
       // Crop the 2D array
-      detail::cropNoCheck(src, dst, crop_x, crop_y, crop_w, crop_h, zero_out);
+      detail::cropNoCheck(src, dst, crop_y, crop_x, crop_h, crop_w, zero_out);
     }
 
 
@@ -268,8 +267,8 @@ namespace Torch {
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
         // Crop the 2D array
-        detail::cropNoCheck(src_slice, dst_slice, crop_x, crop_y, crop_w,
-          crop_h, zero_out);
+        detail::cropNoCheck(src_slice, dst_slice, crop_y, crop_x, crop_h,
+          crop_w, zero_out);
       }
     }
 
@@ -298,7 +297,7 @@ namespace Torch {
 	    const int crop_x   = center_w - crop_w / 2;
 
 */
-	    crop(src, dst, x0, y0, crop_w, crop_h, true);
+	    crop(src, dst, y0, x0, crop_h, crop_w, true);
     }
 
   }
