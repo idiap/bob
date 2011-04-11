@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/ip/test/shift.cc
+ * @file src/cxx/ip/test/shiftToCenter.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief Test the shift function for 2D and 3D arrays/images
@@ -11,13 +11,15 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
+#include <boost/filesystem.hpp>
 #include "core/cast.h"
 #include "ip/shiftToCenter.h"
+#include "database/Array.h"
 
 struct T {
-	blitz::Array<uint32_t,2> a2, a2s_1, a2s_2, a2s_3, a2s_4;
+	blitz::Array<uint32_t,2> a2, a2s_1, a2s_2, a2s_3, a2s_4, a2_centered;
 
-	T(): a2(4,4), a2s_1(4,4), a2s_2(4,4), a2s_3(4,4), a2s_4(4,4)
+	T(): a2(4,4), a2s_1(4,4), a2s_2(4,4), a2s_3(4,4), a2s_4(4,4), a2_centered(5,5)
 	{
 		a2 = 
 			0, 1, 2, 3, 
@@ -48,6 +50,13 @@ struct T {
 			4, 4, 5, 6,
 			8, 8, 9, 10, 
 			12, 12, 13, 14;
+
+		a2_centered = 
+      0, 0, 0, 0, 0,
+			0, 0, 1, 2, 3, 
+			0, 4, 5, 6, 7,
+			0, 8, 9, 10, 11, 
+			0, 12, 13, 14, 15;
 	}
 
 	~T() {}

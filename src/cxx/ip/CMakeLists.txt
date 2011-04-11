@@ -45,6 +45,7 @@ set(src_ip
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
    "src/TanTriggs.cc"
+   "src/GeomNorm.cc"
 )
 #   "src/ipHOG.cc"
 #   "src/ipGabor.cc"
@@ -89,17 +90,20 @@ add_dependencies(torch_ip ip-cxx_header_install)
 # Defines tests for this package
 torch_test(ip block test/block.cc)
 torch_test(ip crop test/crop.cc)
-torch_test(ip flipflop test/flipflop.cc)
-torch_test(ip zigzag test/zigzag.cc)
 torch_test(ip dctfeatures test/dctfeatures.cc)
+torch_test(ip flipflop test/flipflop.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
+torch_test(ip geomnorm test/geomnorm.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
 torch_test(ip shear test/shear.cc)
 torch_test(ip shift test/shift.cc)
 torch_test(ip shifttocenter test/shifttocenter.cc)
+torch_test(ip zigzag test/zigzag.cc)
 
 # Defines environment variable used to localize data for the tests
+set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
+  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-scale APPEND PROPERTY ENVIRONMENT
