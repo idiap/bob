@@ -119,9 +119,9 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
 
   // Scale original image and compare with ImageMagick reference image
 
-  // 137x137 
-  Torch::ip::scale( img, img_processed, 137, 137, 
-    Torch::ip::Rescale::BilinearInterp);
+  // 137x137
+  img_processed.resize(137,137); 
+  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s137x137.pgm";
   Torch::database::Array ar_img_s137(testdata_path_img.string());
@@ -129,8 +129,8 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   checkBlitzClose( img_ref_s137, img_processed, eps);
 
   // 77x77
-  Torch::ip::scale( img, img_processed, 77, 77, 
-    Torch::ip::Rescale::BilinearInterp);
+  img_processed.resize(77,77); 
+  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s77x77.pgm";
   Torch::database::Array ar_img_s77(testdata_path_img.string());
@@ -138,8 +138,8 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   checkBlitzClose( img_ref_s77, img_processed, eps);
 
   // 125x75
-  Torch::ip::scale( img, img_processed, 125, 75,
-    Torch::ip::Rescale::BilinearInterp);
+  img_processed.resize(125,75);
+  Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s125x75.pgm";
   Torch::database::Array ar_img_s125x75(testdata_path_img.string());
