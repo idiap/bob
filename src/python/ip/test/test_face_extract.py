@@ -17,7 +17,7 @@ LW = 147 # Left eye width
 RH = 90  # Right eye height
 RW = 213 # Right eye width
 
-GOAL_EYE_DISTANCE = 18
+GOAL_EYE_DISTANCE = 30
 
 class FilterNewTest(unittest.TestCase):
   """Performs various combined filter tests."""
@@ -140,8 +140,8 @@ class FilterNewTest(unittest.TestCase):
 
     
     # crop face
-    E = torch.core.array.uint8_2(30, 30)
-    torch.ip.cropFace(D, E, 10)
+    E = torch.core.array.uint8_2(100, 100)
+    torch.ip.cropFace(D, E, 30)
     torch.database.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
 
 
