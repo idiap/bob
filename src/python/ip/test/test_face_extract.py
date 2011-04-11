@@ -71,30 +71,6 @@ class FilterNewTest(unittest.TestCase):
     # save image
     torch.database.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
 
-  def test04_shiftToCenterBlue_RotateAndStretch(self):
-    print ""
-
-    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
-    A = img.get()[1,:,:]
-    B = A.sameAs()
-
-    # shift to center
-    torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
-
-    # rotate
-    angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
-    shape = torch.ip.getShapeRotated(B, angle)
-    C = B.sameAs()
-    C.resize(shape)
-    torch.ip.rotate(B, C, angle)
-
-    # scale
-    D = C.copy()
-    torch.ip.scale(C, D, 50, 50)
-
-    # save image
-    torch.database.Array(D).save(os.path.join('data', 'faceextract', 'test_001.blue.norm.answer.png'));
-
   def test04_geoNormBlue(self):
     print ""
 
