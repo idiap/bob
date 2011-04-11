@@ -243,8 +243,8 @@ namespace Torch {
     double getRotateAngleToLevelOutHorizontal(const int left_h, const int left_w,
 					      const int right_h, const int right_w)
     {
-	    static const double RAD_TO_DEGREES   = 180 / M_PI;
-	    return std::tan(1.0 * (right_h - left_h) / (right_w - left_h)) 
+	    static const double RAD_TO_DEGREES   = 180. / M_PI;
+	    return std::tan(1.0 * (right_h - left_h) / (right_w - left_w)) 
 		    * 
 		    RAD_TO_DEGREES;
     }
