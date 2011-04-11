@@ -13,6 +13,8 @@
 #include "ip/Exception.h"
 #include "ip/common.h"
 
+namespace tca = Torch::core::array;
+
 namespace Torch {
 /**
  * \ingroup libip_api
@@ -58,7 +60,7 @@ namespace Torch {
     void flip(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
       // Check output
-      Torch::core::assertSameShape(dst,src);
+      tca::assertSameShape(dst,src);
 
       // Flip the 2D array
       detail::flipNoCheck(src, dst);
@@ -79,7 +81,7 @@ namespace Torch {
     void flip(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst) 
     {
       // Check output
-      Torch::core::assertSameShape(dst,src);
+      tca::assertSameShape(dst,src);
 
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
@@ -107,7 +109,7 @@ namespace Torch {
     void flop(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
       // Check output
-      Torch::core::assertSameShape(dst,src);
+      tca::assertSameShape(dst,src);
 
       // Flip the 2D array
       const blitz::Array<T,2> src_t = const_cast<blitz::Array<T,2>&>(src).transpose(1,0);
@@ -130,7 +132,7 @@ namespace Torch {
     void flop(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst) 
     {
       // Check output
-      Torch::core::assertSameShape(dst,src);
+      tca::assertSameShape(dst,src);
 
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices

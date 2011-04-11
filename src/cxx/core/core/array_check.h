@@ -17,7 +17,7 @@ namespace Torch {
  * @{
  *
  */
-  namespace core {
+  namespace core { namespace array {
 
     /**
      * @brief Checks if a blitz array has zero base indices, for each of its 
@@ -41,6 +41,20 @@ namespace Torch {
     {
       for( int i=0; i<a.rank(); ++i)
         if( a.base(i)!=1 )
+          return false;
+      return true;
+    }
+
+    /**
+     * @brief Checks that one blitz array has the same base indices as another
+     * blitz array.
+     */
+    template <typename T, typename U, int D>
+    bool hasSameBase( const blitz::Array<T,D>& a, 
+      const blitz::Array<U,D>& b)
+    {
+      for( int i=0; i<D; ++i)
+        if( a.base(i) != b.base(i) )
           return false;
       return true;
     }
@@ -114,7 +128,7 @@ namespace Torch {
      * given in the second argument.
      */
     template <typename T, int D>
-    bool isSameShape( const blitz::Array<T,D>& ar, 
+    bool hasSameShape( const blitz::Array<T,D>& ar, 
       const blitz::TinyVector<int, D>& shape)
     {
       const blitz::TinyVector<int, D>& ar_shape = ar.shape();
@@ -128,7 +142,7 @@ namespace Torch {
      * @brief Checks that two blitz arrays have the same shape.
      */
     template <typename T, typename U, int D>
-    bool isSameShape( const blitz::Array<T,D>& a, 
+    bool hasSameShape( const blitz::Array<T,D>& a, 
       const blitz::Array<U,D>& b)
     {
       const blitz::TinyVector<int, D>& a_shape = a.shape();
@@ -248,7 +262,7 @@ namespace Torch {
         array.resize( size0, size1, size2, size3);
     }
 
-  }
+  }}
 /**
  * @}
  */

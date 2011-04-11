@@ -117,3 +117,23 @@ const char* Torch::core::UnexpectedShapeError::what() const throw() {
   }
 }
 
+
+Torch::core::DifferentBaseError::DifferentBaseError() throw() {
+}
+
+Torch::core::DifferentBaseError::~DifferentBaseError() throw() {
+}
+
+const char* Torch::core::DifferentBaseError::what() const throw() {
+  try {
+    boost::format message(
+      "The array does not have the expected size.");
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::DifferentBaseError: cannot \
+      format, exception raised";
+    return emergency;
+  }
+}
+

@@ -1,4 +1,5 @@
 #include "math/svd.h"
+#include "core/array_old.h"
 
 namespace math = Torch::math;
 

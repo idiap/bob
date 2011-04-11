@@ -12,6 +12,9 @@
 #include "core/logging.h"
 #include "ip/Exception.h"
 #include "core/array_assert.h"
+#include "core/array_index.h"
+
+namespace tca = Torch::core::array;
 
 namespace Torch {
 /**
@@ -72,10 +75,10 @@ namespace Torch {
         int y_src, x_src;
         for( int y=0; y<crop_h; ++y) {
           is_y_out = y+crop_y<0 || y+crop_y>=src.extent(0);
-          y_src = Torch::core::keepInRange( y+crop_y, 0, src.extent(0)-1);
+          y_src = tca::keepInRange( y+crop_y, 0, src.extent(0)-1);
           for( int x=0; x<crop_w; ++x) {
             if( is_y_out || x+crop_x<0 || x+crop_x>=src.extent(1) ) {
-              x_src = Torch::core::keepInRange( x+crop_x, 0, src.extent(1)-1);
+              x_src = tca::keepInRange( x+crop_x, 0, src.extent(1)-1);
               dst(y,x) = (zero_out ? 0 : 
                 src( y_src+src.lbound(0), x_src+src.lbound(1)) );
             }
@@ -106,7 +109,7 @@ namespace Torch {
       const int crop_y, const int crop_x, const int crop_h, const int crop_w)
     {
       // Checks that the src array has zero base indices
-      Torch::core::assertZeroBase( src);
+      tca::assertZeroBase( src);
 
       // Check parameters and throw exception if required
       if( crop_x<0 || crop_y<0 || crop_w<0 || crop_h<0 || 

@@ -6,6 +6,7 @@
  */
 
 #include "sp/FCT.h"
+#include "core/array_old.h"
 
 // Declaration of FORTRAN functions from FCTPACK4.1
 extern "C" void cosqi_( int *n, double *wsave);

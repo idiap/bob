@@ -9,6 +9,8 @@
 #include <boost/format.hpp>
 #include <blitz/tinyvec.h>
 
+#include "core/blitz_compat.h"
+
 namespace bp = boost::python;
 
 /**

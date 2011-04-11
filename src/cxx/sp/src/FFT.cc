@@ -6,6 +6,7 @@
  */
 
 #include "sp/FFT.h"
+#include "core/array_old.h"
 
 // To deal with Fotran complex type
 typedef struct { double real, imag; } complex_;

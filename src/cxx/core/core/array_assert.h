@@ -18,7 +18,7 @@ namespace Torch {
  * @{
  *
  */
-  namespace core {
+  namespace core { namespace array {
     /**
      * @brief Checks that a blitz array has zero base indices, and throws
      * a NonZeroBaseError exception if this is not the case.
@@ -41,6 +41,18 @@ namespace Torch {
       for( int i=0; i<src.rank(); ++i)
         if( src.base(i)!=1)
           throw NonOneBaseError( i, src.base(i));
+    }
+
+    /**
+     * @brief Checks that two blitz arrays have the same base, and throws an
+     * DifferentBaseError exception if this is not the case.
+     */
+    template<typename T, typename U, int D>
+    void assertSameBase(const blitz::Array<T,D>& a, 
+      const blitz::Array<U,D>& b)
+    {
+      if( !hasSameBase(a,b) )
+        throw DifferentBaseError();
     }
 
     /**
@@ -100,7 +112,7 @@ namespace Torch {
     void assertSameShape(const blitz::Array<T,D>& ar, 
       const blitz::TinyVector<int, D>& shape)
     {
-      if( !isSameShape(ar,shape) )
+      if( !hasSameShape(ar,shape) )
         throw UnexpectedShapeError();
     }
 
@@ -112,7 +124,7 @@ namespace Torch {
     void assertSameShape(const blitz::Array<T,D>& a, 
       const blitz::Array<U,D>& b)
     {
-      if( !isSameShape(a,b) )
+      if( !hasSameShape(a,b) )
         throw UnexpectedShapeError();
     }
 
@@ -126,7 +138,7 @@ namespace Torch {
         throw UnexpectedShapeError();
     }
 
-  }
+  }}
 /**
  * @}
  */

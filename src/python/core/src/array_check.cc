@@ -21,12 +21,12 @@ static const char* FORTRAN_CONTIGUOUS_DOC = "Checks that a blitz array is stored
 static const char* C_ZERO_BASE_CONTIGUOUS_DOC = "Checks that a blitz array is stored contiguously in memory, in row-major order (C-style), and with zero base indices.";
 static const char* FORTRAN_ONE_BASE_CONTIGUOUS_DOC = "Checks that a blitz array is stored contiguously in memory, in column-major order (Fortran-like), and with one base indices.";
 #define ARRAY_CHECK_DEF(T,D) \
-  def("isZeroBase", (bool (*)(const blitz::Array<T,D>&))&Torch::core::isZeroBase<T,D>, (arg("array")), ZERO_BASE_DOC); \
-  def("isOneBase", (bool (*)(const blitz::Array<T,D>&))&Torch::core::isOneBase<T,D>, (arg("array")), ONE_BASE_DOC); \
-  def("isCContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::isCContiguous<T,D>, (arg("array")), C_CONTIGUOUS_DOC); \
-  def("isFortranContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::isFortranContiguous<T,D>, (arg("array")), FORTRAN_CONTIGUOUS_DOC); \
-  def("isCZeroBaseContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::isCZeroBaseContiguous<T,D>, (arg("array")), C_ZERO_BASE_CONTIGUOUS_DOC); \
-  def("isFortranOneBaseContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::isFortranOneBaseContiguous<T,D>, (arg("array")), FORTRAN_ONE_BASE_CONTIGUOUS_DOC); 
+  def("isZeroBase", (bool (*)(const blitz::Array<T,D>&))&Torch::core::array::isZeroBase<T,D>, (arg("array")), ZERO_BASE_DOC); \
+  def("isOneBase", (bool (*)(const blitz::Array<T,D>&))&Torch::core::array::isOneBase<T,D>, (arg("array")), ONE_BASE_DOC); \
+  def("isCContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::array::isCContiguous<T,D>, (arg("array")), C_CONTIGUOUS_DOC); \
+  def("isFortranContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::array::isFortranContiguous<T,D>, (arg("array")), FORTRAN_CONTIGUOUS_DOC); \
+  def("isCZeroBaseContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::array::isCZeroBaseContiguous<T,D>, (arg("array")), C_ZERO_BASE_CONTIGUOUS_DOC); \
+  def("isFortranOneBaseContiguous", (bool (*)(const blitz::Array<T,D>&))&Torch::core::array::isFortranOneBaseContiguous<T,D>, (arg("array")), FORTRAN_ONE_BASE_CONTIGUOUS_DOC); 
 
 #define ARRAY_CHECK_DEFS(T)\
   ARRAY_CHECK_DEF(T,1) \

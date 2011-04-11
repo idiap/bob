@@ -17,6 +17,8 @@
 #include "core/array_assert.h"
 #include "ip/Exception.h"
 
+namespace tca = Torch::core::array;
+
 namespace Torch {
 	/**
 	 * \ingroup libip_api
@@ -42,7 +44,7 @@ namespace Torch {
       int n_coef_kept = 0, const bool right_first = false)
     {
       // Checks that the src array has zero base indices
-      Torch::core::assertZeroBase( src);
+      tca::assertZeroBase( src);
 
       // Define useful constants
       const int min_dim = std::min(src.extent(0), src.extent(1));
@@ -56,9 +58,9 @@ namespace Torch {
 
       // Checks that the dst array has zero base indices and is of
       // the expected size
-      Torch::core::assertZeroBase(dst);
+      tca::assertZeroBase(dst);
       blitz::TinyVector<int,1> shape( n_coef_kept);
-      Torch::core::assertSameShape(dst,shape);
+      tca::assertSameShape(dst,shape);
       
       // Check that we ask to keep a valid number of coefficients
       if( n_coef_kept > max_n_coef )

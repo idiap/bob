@@ -69,7 +69,7 @@ namespace Torch {
       const int overlap_w)
     {
       // Checks that the src array has zero base indices
-      Torch::core::assertZeroBase( src);
+      Torch::core::array::assertZeroBase( src);
 
       // Check parameters and throw exception if required
       if( block_h<1)
