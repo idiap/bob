@@ -86,6 +86,11 @@ class FilterNewTest(unittest.TestCase):
     # save image
     torch.database.Array(D).save(os.path.join('data', 'faceextract', 'test_001.blue.norm.answer.png'));
 
+  def test04_geoNormBlue(self):
+        print ""
+
+    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
+    A = img.get()[1,:,:]
 
 if __name__ == '__main__':
   sys.argv.append('-v')
