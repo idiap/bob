@@ -27,6 +27,86 @@ namespace Torch {
 	 */
 	namespace ip {
 
+    namespace detail {
+      /**
+       * @brief Extract the zigzag pattern from a 2D blitz::array, as
+       * described in:
+       *   "Polynomial Features for Robust Face Authentication", 
+       *   from C. Sanderson and K. Paliwal, in the proceedings of the 
+       *   IEEE International Conference on Image Processing 2002.
+       * @param src The input blitz array
+       * @param dst The output blitz array
+       * @param right_first Set to true to reverse the initial zigzag order. 
+       *   By default, the direction is left-to-right for the first diagonal.
+       */
+      template<typename T>
+      void zigzagNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst, 
+        const bool right_first)
+      {
+        // Number of coefficients to keep
+        const int n_coef_kept = dst.extent(0);
+
+        // Define constants
+        const int min_dim = std::min(src.extent(0), src.extent(1));
+        const int max_dim = std::max(src.extent(0), src.extent(1));
+        // Index of the current diagonal
+        int current_diagonal = 0;
+        // Direction of the current diagonal
+        int diagonal_left_to_right_p = !right_first;
+        // Offset the point in the current diagonal from its origin
+        int diagonal_offset = 0;
+        // Length of the current diagonal
+        int diagonal_length = 1;
+
+        // Get all required coefficients 
+        for(int ind=0; ind < n_coef_kept; ++ind ) {
+          int x, y;
+       
+          // Conditions used to determine the coordinates (x,y) in the 2D 
+          // array given the 1D index in the zigzag
+          if(diagonal_left_to_right_p) {
+            if( current_diagonal>src.extent(0)-1 ) {
+              x = current_diagonal-(src.extent(0)-1) + diagonal_offset;
+              y = (src.extent(0)-1) - diagonal_offset;
+            }
+            else {
+              x = diagonal_offset;
+              y = current_diagonal - diagonal_offset;
+            }
+          } else {
+            if( current_diagonal>src.extent(1)-1 ) {
+              x = (src.extent(1)-1) - diagonal_offset;
+              y = current_diagonal-(src.extent(1)-1) + diagonal_offset;
+            }
+            else {
+              x = current_diagonal - diagonal_offset;
+              y = diagonal_offset;
+            }
+          }
+
+          // save the value in the 1D array
+          dst(ind) = src(y, x);
+
+          // Increment the diagonal offset
+          ++diagonal_offset;
+          // Update information about the current diagonal if required
+          if(diagonal_length <= diagonal_offset) {
+            // Increment current diagonal
+            ++current_diagonal;
+            // Reverse the direction in the diagonal
+            diagonal_left_to_right_p = !diagonal_left_to_right_p; 
+            // Reset the offset in the diagonal to 0
+            diagonal_offset = 0; 
+            // Determine the new size of the diagonal
+            if( current_diagonal<min_dim )
+              ++diagonal_length;
+            else if( current_diagonal>=max_dim)
+              --diagonal_length;
+          }
+        }
+      }
+    }
+
 		/**
 		 * @brief Extract the zigzag pattern from a 2D blitz::array, as described 
      * in:
@@ -46,9 +126,7 @@ namespace Torch {
       // Checks that the src array has zero base indices
       tca::assertZeroBase( src);
 
-      // Define useful constants
-      const int min_dim = std::min(src.extent(0), src.extent(1));
-      const int max_dim = std::max(src.extent(0), src.extent(1));
+      // Define constant
       const int max_n_coef = src.extent(0)*src.extent(1);
 
       // if the number of coefficients to be kept is not specified, 
@@ -70,61 +148,8 @@ namespace Torch {
         throw ParamOutOfBoundaryError("n_coef_kept", false, 
           n_coef_kept, 0);
 
-      // Index of the current diagonal
-      int current_diagonal = 0;
-      // Direction of the current diagonal
-      int diagonal_left_to_right_p = !right_first;
-      // Offset the point in the current diagonal from its origin
-      int diagonal_offset = 0;
-      // Length of the current diagonal
-      int diagonal_length = 1;
-
-      // Get all required coefficients 
-      for(int ind=0; ind < n_coef_kept; ++ind ) {
-        int x, y;
-     
-        // Conditions used to determine the coordinates (x,y) in the 2D 
-        // array given the 1D index in the zigzag
-        if(diagonal_left_to_right_p) {
-          if( current_diagonal>src.extent(0)-1 ) {
-            x = current_diagonal-(src.extent(0)-1) + diagonal_offset;
-            y = (src.extent(0)-1) - diagonal_offset;
-          }
-          else {
-            x = diagonal_offset;
-            y = current_diagonal - diagonal_offset;
-          }
-        } else {
-          if( current_diagonal>src.extent(1)-1 ) {
-            x = (src.extent(1)-1) - diagonal_offset;
-            y = current_diagonal-(src.extent(1)-1) + diagonal_offset;
-          }
-          else {
-            x = current_diagonal - diagonal_offset;
-            y = diagonal_offset;
-          }
-        }
-
-        // save the value in the 1D array
-        dst(ind) = src(y, x);
-
-        // Increment the diagonal offset
-        ++diagonal_offset;
-        // Update information about the current diagonal if required
-        if(diagonal_length <= diagonal_offset) {
-          // Increment current diagonal
-          ++current_diagonal;
-          // Reverse the direction in the diagonal
-          diagonal_left_to_right_p = !diagonal_left_to_right_p; 
-          // Reset the offset in the diagonal to 0
-          diagonal_offset = 0; 
-          // Determine the new size of the diagonal
-          if( current_diagonal<min_dim )
-            ++diagonal_length;
-          else if( current_diagonal>=max_dim)
-            --diagonal_length;
-        }
-      }
+      // Apply the zigzag function
+      detail::zigzagNoCheck( src, dst, right_first);
     }
 	}
 
