@@ -274,30 +274,16 @@ namespace Torch {
 
     template<typename T>
     void cropFace(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
-	      const int eyes_distance)
+	      const int eyes_distance, const int border_h, const int border_w)
     {
-      const int crop_h = eyes_distance*2;
-      const int crop_w = eyes_distance*2;
-      dst.resize(crop_h, crop_w);
-
+      // TODO: transmits h/w-ratio
 	    const int center_h = src.extent(0)/2;
 	    const int center_w = src.extent(1)/2;
 
-      // From Cosmin code
-      const double D_EYES = 10.0;
-      const double Y_UPPER = 5.0;
-      const double model_size = 2 * D_EYES;
-  
-      const double ratio = eyes_distance / D_EYES;
-      
-      const double y0 = center_h - ratio * Y_UPPER;
-      const double x0 = center_w - ratio * 0.5 * model_size;
+      const int crop_y0 = center_h - 5./19.*(dst.extent(0)-2*border_h) - border_h;
+      const int crop_x0 = center_w - 0.5*(dst.extent(1)-2*border_w) - border_w;
 
-/*	    const int crop_y   = center_h - crop_h / 2;
-	    const int crop_x   = center_w - crop_w / 2;
-
-*/
-	    crop(src, dst, y0, x0, crop_h, crop_w, true);
+	    crop(src, dst, crop_y0, crop_x0, dst.extent(0), dst.extent(1), true);
     }
 
   }

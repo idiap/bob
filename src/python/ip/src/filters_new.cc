@@ -54,7 +54,7 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
 #define FILTER_DEF(T,N) \
   def("crop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")="False", arg("zero_out")="False"), CROP2D_DOC)); \
   def("crop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")="False", arg("zero_out")="False"), CROP3D_DOC)); \
-  def("cropFace", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int))&Torch::ip::cropFace<T>, (arg("src"), arg("dst"), arg("eyes_dist")), CROPFACE2D_DOC); \
+  def("cropFace", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const int))&Torch::ip::cropFace<T>, (arg("src"), arg("dst"), arg("eyes_dist"), arg("border_h"), arg("border_w")), CROPFACE2D_DOC); \
   def("flip", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP2D_DOC); \
   def("flip", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP3D_DOC); \
   def("flop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP2D_DOC); \

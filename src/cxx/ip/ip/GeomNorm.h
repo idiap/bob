@@ -133,7 +133,7 @@ namespace Torch {
       scale(m_rotated,m_scaled);
 
       // 4/ Crop the face
-      cropFace(m_scaled,dst,m_eyes_distance);
+      cropFace(m_scaled, dst, m_eyes_distance, m_border_h, m_border_w);
     }
 
   }
