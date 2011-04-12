@@ -676,7 +676,7 @@ namespace Torch { namespace database { namespace detail {
       // Preliminary for the processing of the content of the array
       xmlChar* content = xmlNodeGetContent(cur);
       std::string data( (const char *)content);
-      boost::char_separator<char> sep(" ;|");
+      boost::char_separator<char> sep(" ;|\n");
       boost::tokenizer<boost::char_separator<char> > tok(data, sep);
       xmlFree(content);
 
