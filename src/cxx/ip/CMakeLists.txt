@@ -2,7 +2,7 @@ PROJECT(ip-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core database sp) #other torch subprojects
+set(deps core database math sp) #other torch subprojects
 set(shared "${JPEG_LIBRARIES}")
 
 # This defines the list of source files inside this package.
@@ -46,9 +46,12 @@ set(src_ip
    "src/HornAndSchunckFlow.cc"
    "src/TanTriggs.cc"
    "src/GeomNorm.cc"
+   "src/GaborFrequency.cc"
+   "src/GaborSpatial.cc"
 )
 #   "src/ipHOG.cc"
-#   "src/ipGabor.cc"
+#   "src/GaborBankFrequency.cc"
+#   "src/GaborBankSpatial.cc"
 
 
 set(src_imagefiles
@@ -92,6 +95,7 @@ torch_test(ip block test/block.cc)
 torch_test(ip crop test/crop.cc)
 torch_test(ip dctfeatures test/dctfeatures.cc)
 torch_test(ip flipflop test/flipflop.cc)
+torch_test(ip gabor test/Gabor.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
 torch_test(ip geomnorm test/geomnorm.cc)
 torch_test(ip rotate test/rotate.cc)
