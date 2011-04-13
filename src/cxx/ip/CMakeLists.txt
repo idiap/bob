@@ -48,10 +48,10 @@ set(src_ip
    "src/GeomNorm.cc"
    "src/GaborFrequency.cc"
    "src/GaborSpatial.cc"
+   "src/GaborBankFrequency.cc"
+   "src/GaborBankSpatial.cc"
 )
 #   "src/ipHOG.cc"
-#   "src/GaborBankFrequency.cc"
-#   "src/GaborBankSpatial.cc"
 
 
 set(src_imagefiles
