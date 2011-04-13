@@ -106,6 +106,8 @@ torch_test(ip shifttocenter test/shifttocenter.cc)
 torch_test(ip zigzag test/zigzag.cc)
 
 # Defines environment variable used to localize data for the tests
+set_property(TEST cxx-ip-gabor APPEND PROPERTY ENVIRONMENT
+  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
