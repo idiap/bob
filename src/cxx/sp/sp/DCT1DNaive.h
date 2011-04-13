@@ -8,7 +8,7 @@
 #ifndef TORCH5SPRO_SP_DCT1D_NAIVE_H
 #define TORCH5SPRO_SP_DCT1D_NAIVE_H
 
-#include "core/logging.h"
+#include <blitz/array.h>
 
 namespace Torch {
 /**

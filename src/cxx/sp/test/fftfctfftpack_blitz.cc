@@ -14,6 +14,10 @@
 
 #include "sp/FFT.h"
 #include "sp/FCT.h"
+#include "sp/FFT1D.h"
+#include "sp/FFT1DNaive.h"
+#include "sp/FFT2D.h"
+#include "sp/FFT2DNaive.h"
 #include "sp/DCT1D.h"
 #include "sp/DCT1DNaive.h"
 #include "sp/DCT2D.h"
@@ -536,6 +540,118 @@ BOOST_AUTO_TEST_CASE( test_DCT2DNaive )
     for(int i=0; i < t.extent(0); ++i)
       for(int j=0; j < t.extent(1); ++j)
         BOOST_CHECK_SMALL( fabs(t(i,j)-it(i,j)), eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_FFT1DNaive )
+{
+  // This tests the 1D FFT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 2048.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 2048 + 1);
+
+    Torch::sp::detail::FFT1DNaive fft_new_naive(M);
+    Torch::sp::detail::IFFT1DNaive ifft_new_naive(M);
+
+    blitz::Array<std::complex<double>,1> t(M), res(M), it(M);
+    for( int i=0; i < M; ++i)
+      t(i) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new DCT1D class
+    fft_new_naive(t, res); // direct
+    ifft_new_naive(res, it); // inverse
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    for(int i=0; i < t.extent(0); ++i)
+      BOOST_CHECK_SMALL( abs(t(i)-it(i)), eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_FFT2DNaive )
+{
+  // This tests the 2D FFT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 64.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 64 + 1);
+    int N = (rand() % 64 + 1);
+
+    Torch::sp::detail::FFT2DNaive fft_new_naive(M,N);
+    Torch::sp::detail::IFFT2DNaive ifft_new_naive(M,N);
+
+    blitz::Array<std::complex<double>,2> t(M,N), res(M,N), it(M,N);
+    for( int i=0; i < M; ++i)
+      for( int j=0; j < N; ++j)
+        t(i,j) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new FFT2D class
+    fft_new_naive(t, res); // direct
+    ifft_new_naive(res, it); // inverse
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
+    for(int i=0; i < t.extent(0); ++i)
+      for(int j=0; j < t.extent(1); ++j)
+        BOOST_CHECK_SMALL( abs(t(i,j)-it(i,j)), eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_FFT1D )
+{
+  // This tests the 1D FFT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 2048.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 2048 + 1);
+
+    Torch::sp::FFT1D fft_new(M);
+    Torch::sp::IFFT1D ifft_new(M);
+
+    blitz::Array<std::complex<double>,1> t(M), res(M), it(M);
+    for( int i=0; i < M; ++i)
+      t(i) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new DCT1D class
+    fft_new(t, res); // direct
+    ifft_new(res, it); // inverse
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    for(int i=0; i < t.extent(0); ++i)
+      BOOST_CHECK_SMALL( abs(t(i)-it(i)), eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_FFT2D )
+{
+  // This tests the 2D FFT using 10 random vectors
+  // The size of each dimension of each 2D array is randomly chosen 
+  // between 1 and 64.
+  for(int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 64 + 1);
+    int N = (rand() % 64 + 1);
+
+    Torch::sp::FFT2D fft_new(M,N);
+    Torch::sp::IFFT2D ifft_new(M,N);
+
+    blitz::Array<std::complex<double>,2> t(M,N), res(M,N), it(M,N);
+    for( int i=0; i < M; ++i)
+      for( int j=0; j < N; ++j)
+        t(i,j) = (rand()/(double)RAND_MAX)*10.;
+    // Process using new FFT2D class
+    fft_new(t, res); // direct
+    ifft_new(res, it); // inverse
+
+    // Compare to initial signal
+    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
+    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
+    for(int i=0; i < t.extent(0); ++i)
+      for(int j=0; j < t.extent(1); ++j)
+        BOOST_CHECK_SMALL( abs(t(i,j)-it(i,j)), eps);
   }
 }
 
