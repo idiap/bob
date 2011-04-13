@@ -70,6 +70,9 @@ void ip::GaborBankSpatial::computeFilters()
   computeFreqs();
   computeOrients();
 
+  // Erase previous filters if any
+  m_filters.clear();
+
   // Filter using the filter bank
   for( int i=0; i<m_n_freq*m_n_orient; ++i) {
     
