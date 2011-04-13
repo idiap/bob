@@ -44,4 +44,5 @@ if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 # Defines benchmarks we make available
-torch_benchmark(core tensor benchmark/tensor.cc)
+torch_benchmark(core bigtensor2d "benchmark/bigtensor2d.cc")
+torch_example_install("cxx" "core" "benchmark/bigtensor2d.cc")
