@@ -8,12 +8,6 @@ set(deps dfftpack41 core) #other torch subprojects
 set(src 
     "src/spCore.cc"
     "src/spCoreChain.cc"
-    "src/spDFT.cc"
-    "src/spFFT.cc"
-    "src/spDCT.cc"
-    "src/spFCT.cc"
-    "src/FFT.cc"
-    "src/FCT.cc"
     "src/FFT1D.cc"
     "src/FFT1DNaive.cc"
     "src/FFT2D.cc"
@@ -29,8 +23,8 @@ torch_library(sp "${src}" "${deps}" "")
 add_dependencies(torch_sp sp-cxx_header_install)
 
 # Defines tests for this package
-torch_test(sp dftdct_naive test/dftdctnaive.cc)
-torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
+#torch_test(sp dftdct_naive test/dftdctnaive.cc)
+#torch_test(sp fftfct_fftpack test/fftfctfftpack.cc)
 torch_test(sp convolution test/convolution.cc)
 #torch_test(sp extrapolation test/extrapolation.cc)
-torch_test(sp fftfct_fftpack_blitz test/fftfctfftpack_blitz.cc)
+torch_test(sp fft_fct test/fft_fct.cc)

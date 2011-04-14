@@ -8,7 +8,8 @@
 
 #include "core/array_assert.h"
 #include "ip/GaborFrequency.h"
-#include "sp/FFT.h"
+#include "sp/FFT2D.h"
+#include "sp/fftshift.h"
 #include "math/norminv.h"
 
 namespace ip = Torch::ip;
@@ -44,18 +45,21 @@ void ip::GaborFrequency::operator()(
   if( !m_use_envelope)
   {
     // 1/ Compute FFT
-    blitz::Array<std::complex<double>,2> src_fft;
-    Torch::sp::fft( src, src_fft);
+    blitz::Array<std::complex<double>,2> src_fft(src.shape());
+    Torch::sp::FFT2D fft(src.extent(0),src.extent(1));
+    fft( src, src_fft);
     // 2/ Filter in the frequency domain (elementwise multiplication)
     m_work1 = src_fft * m_kernel;
     // 3/ Output back in the spatial domain (IFFT)
-    Torch::sp::ifft( m_work1, dst);
+    Torch::sp::IFFT2D ifft(src.extent(0),src.extent(1));
+    ifft( m_work1, dst);
   }
   else
   {
     // 1/ Compute FFT
-    Torch::sp::fft( src, m_work1);
-    Torch::sp::fftshift( m_work1, m_work2); // m_work2 <-> src_fft_shift
+    Torch::sp::FFT2D fft(src.extent(0),src.extent(1));
+    fft( src, m_work1);
+    Torch::sp::fftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> src_fft_shift
 
     // 2/ Filter in the frequency domain 
     //    (elementwise multiplication of the non-zero area)
@@ -67,8 +71,9 @@ void ip::GaborFrequency::operator()(
     m_work1(k_h,k_w) = m_work2(k_h,k_w) * m_kernel_shifted(k_h,k_w);
 
     // 3/ Output back in the spatial domain (IFFT)
-    Torch::sp::ifftshift( m_work1, m_work2); // m_work2 <-> dst_fft
-    Torch::sp::ifft( m_work2, dst);
+    Torch::sp::ifftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> dst_fft
+    Torch::sp::IFFT2D ifft(src.extent(0),src.extent(1));
+    ifft( m_work2, dst);
   }
 }
 
@@ -173,7 +178,7 @@ void ip::GaborFrequency::computeFilter()
       );
 
   // Compute the non_shifted version
-  Torch::sp::ifftshift( m_kernel_shifted, m_kernel );
+  Torch::sp::ifftshift<std::complex<double> >( m_kernel_shifted, m_kernel );
 }
 
 // TODO: Needs to be refactored: Geometry module/functions: Rotation, ellipsoid

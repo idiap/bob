@@ -7,13 +7,12 @@
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE sp-FCT_FFT-fftpack-blitz Tests
+#define BOOST_TEST_MODULE sp-FCT_FFT-FFTPACK Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
-#include "sp/FFT.h"
-#include "sp/FCT.h"
+#include "sp/fftshift.h"
 #include "sp/FFT1D.h"
 #include "sp/FFT1DNaive.h"
 #include "sp/FFT2D.h"
@@ -35,8 +34,9 @@ struct T {
 void test_fct1D( const blitz::Array<double,1> t, double eps) 
 {
   // process using FCT
-  blitz::Array<double,1> t_fct, t_dct(t.extent(0));
-  Torch::sp::fct(t, t_fct);
+  blitz::Array<double,1> t_fct(t.extent(0)), t_dct(t.extent(0));
+  Torch::sp::DCT1D fct(t.extent(0));
+  fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
 
   // get DCT answer and compare with FCT
@@ -47,21 +47,34 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
     BOOST_CHECK_SMALL( fabs(t_fct(i)-t_dct(i)), eps);
   
   // process using inverse FCT
-  blitz::Array<double,1> t_fct_ifct;
-  Torch::sp::ifct(t_fct, t_fct_ifct);
+  blitz::Array<double,1> t_fct_ifct(t.extent(0));
+  Torch::sp::IDCT1D ifct(t.extent(0));
+  ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
 
   // Compare to original
   for(int i=0; i < t.extent(0); ++i)
     BOOST_CHECK_SMALL( fabs(t_fct_ifct(i)-t(i)), eps);
+
+  // process using inverse DCT
+  blitz::Array<double,1> t_dct_idct(t.extent(0));
+  Torch::sp::detail::IDCT1DNaive idct_naive(t.extent(0));
+  ifct(t_dct, t_dct_idct);
+  BOOST_REQUIRE_EQUAL(t_dct_idct.extent(0), t.extent(0));
+
+  // Compare to original
+  for(int i=0; i < t.extent(0); ++i)
+    BOOST_CHECK_SMALL( fabs(t_dct_idct(i)-t(i)), eps);
 }
 
 
 void test_fct2D( const blitz::Array<double,2> t, double eps) 
 {
   // process using FCT
-  blitz::Array<double,2> t_fct, t_dct(t.extent(0), t.extent(1));
-  Torch::sp::fct(t, t_fct);
+  blitz::Array<double,2> t_fct(t.extent(0), t.extent(1)), 
+    t_dct(t.extent(0), t.extent(1));
+  Torch::sp::DCT2D fct(t.extent(0), t.extent(1));
+  fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct.extent(1), t.extent(1));
 
@@ -74,8 +87,9 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
       BOOST_CHECK_SMALL( fabs(t_fct(i,j)-t_dct(i,j)), eps);
 
   // process using inverse FCT
-  blitz::Array<double,2> t_fct_ifct;
-  Torch::sp::ifct(t_fct, t_fct_ifct);
+  blitz::Array<double,2> t_fct_ifct(t.extent(0), t.extent(1));
+  Torch::sp::IDCT2D ifct(t.extent(0), t.extent(1));
+  ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(1), t.extent(1));
 
@@ -83,20 +97,39 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
   for(int i=0; i < t.extent(0); ++i)
     for(int j=0; j < t.extent(1); ++j)
       BOOST_CHECK_SMALL( fabs(t_fct_ifct(i,j)-t(i,j)), eps);
+
+  // process using inverse DCT
+  blitz::Array<double,2> t_dct_idct(t.extent(0), t.extent(1));
+  Torch::sp::detail::IDCT2DNaive idct_naive(t.extent(0), t.extent(1));
+  ifct(t_dct, t_dct_idct);
+  BOOST_REQUIRE_EQUAL(t_dct_idct.extent(0), t.extent(0));
+  BOOST_REQUIRE_EQUAL(t_dct_idct.extent(1), t.extent(1));
+
+  // Compare to original
+  for(int i=0; i < t.extent(0); ++i)
+    for(int j=0; j < t.extent(1); ++j)
+      BOOST_CHECK_SMALL( fabs(t_dct_idct(i,j)-t(i,j)), eps);
 }
 
 void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps) 
 {
   // process using FFT
-  blitz::Array<std::complex<double>,1> t_fft;
-  Torch::sp::fft(t, t_fft);
+  blitz::Array<std::complex<double>,1> t_fft(t.extent(0)), t_dft(t.extent(0));
+  Torch::sp::FFT1D fft(t.extent(0));
+  fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
 
-  // TODO: get DFT answer and compare with FFT
+  // get DFT answer and compare with FFT
+  Torch::sp::detail::FFT1DNaive dft_new_naive(t.extent(0));
+  dft_new_naive(t, t_dft);
+  // Compare
+  for(int i=0; i < t_fft.extent(0); ++i)
+    BOOST_CHECK_SMALL( abs(t_fft(i)-t_dft(i)), eps);
 
   // process using inverse FFT
-  blitz::Array<std::complex<double>,1> t_fft_ifft;
-  Torch::sp::ifft(t_fft, t_fft_ifft);
+  blitz::Array<std::complex<double>,1> t_fft_ifft(t.extent(0));
+  Torch::sp::IFFT1D ifft(t.extent(0));
+  ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
 
   // Compare to original
@@ -108,16 +141,25 @@ void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps)
 void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps) 
 {
   // process using FFT
-  blitz::Array<std::complex<double>,2> t_fft;
-  Torch::sp::fft(t, t_fft);
+  blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1)),
+    t_dft(t.extent(0), t.extent(1));
+  Torch::sp::FFT2D fft(t.extent(0), t.extent(1));
+  fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft.extent(1), t.extent(1));
 
-  // TODO: get DFT answer and compare with FFT
+  // get DFT answer and compare with FFT
+  Torch::sp::detail::FFT2DNaive dft_new_naive(t.extent(0), t.extent(1));
+  dft_new_naive(t, t_dft);
+  // Compare
+  for(int i=0; i < t_fft.extent(0); ++i)
+    for(int j=0; j < t_fft.extent(1); ++j)
+      BOOST_CHECK_SMALL( abs(t_fft(i,j)-t_dft(i,j)), eps);
 
   // process using inverse FFT
-  blitz::Array<std::complex<double>,2> t_fft_ifft;
-  Torch::sp::ifft(t_fft, t_fft_ifft);
+  blitz::Array<std::complex<double>,2> t_fft_ifft(t.extent(0), t.extent(1));
+  Torch::sp::IFFT2D ifft(t.extent(0), t.extent(1));
+  ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(1), t.extent(1));
 
@@ -130,13 +172,13 @@ void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
 void test_fftshift( const blitz::Array<std::complex<double>,1> t, double eps) 
 {
   // process using fftshift
-  blitz::Array<std::complex<double>,1> t_fft;
-  Torch::sp::fftshift(t, t_fft);
+  blitz::Array<std::complex<double>,1> t_fft(t.extent(0));
+  Torch::sp::fftshift<std::complex<double> >(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
 
   // process using ifftshift
-  blitz::Array<std::complex<double>,1> t_fft_ifft;
-  Torch::sp::ifftshift(t_fft, t_fft_ifft);
+  blitz::Array<std::complex<double>,1> t_fft_ifft(t.extent(0));
+  Torch::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
 
   // Compare to original
@@ -147,14 +189,14 @@ void test_fftshift( const blitz::Array<std::complex<double>,1> t, double eps)
 void test_fftshift( const blitz::Array<std::complex<double>,2> t, double eps) 
 {
   // process using fftshift
-  blitz::Array<std::complex<double>,2> t_fft;
-  Torch::sp::fftshift(t, t_fft);
+  blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1));
+  Torch::sp::fftshift<std::complex<double> >(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft.extent(1), t.extent(1));
 
   // process using ifftshift
-  blitz::Array<std::complex<double>,2> t_fft_ifft;
-  Torch::sp::ifftshift(t_fft, t_fft_ifft);
+  blitz::Array<std::complex<double>,2> t_fft_ifft(t.extent(0), t.extent(1));
+  Torch::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(1), t.extent(1));
 
@@ -306,6 +348,7 @@ BOOST_AUTO_TEST_CASE( test_fft2D_range1x1to64x64_random )
   }
 }
 
+
 BOOST_AUTO_TEST_CASE( test_fftshift1D_simple )
 {
   // set up simple 1D random tensor 
@@ -316,14 +359,14 @@ BOOST_AUTO_TEST_CASE( test_fftshift1D_simple )
   t5_s_ref = 3, 4, 0, 1, 2;
 
   // 1/ Process t4
-  blitz::Array<std::complex<double>,1> t4_s;
+  blitz::Array<std::complex<double>,1> t4_s(4);
   Torch::sp::fftshift(t4, t4_s);
   // Compare to reference
   for(int i=0; i < t4.extent(0); ++i)
     for(int j=0; j < t4.extent(1); ++j)
       BOOST_CHECK_SMALL( abs(t4_s(i,j)-t4_s_ref(i,j)), eps);
   
-  blitz::Array<std::complex<double>,1> t4_si;
+  blitz::Array<std::complex<double>,1> t4_si(4);
   Torch::sp::ifftshift(t4_s, t4_si);
   // Compare to original
   for(int i=0; i < t4.extent(0); ++i)
@@ -331,14 +374,14 @@ BOOST_AUTO_TEST_CASE( test_fftshift1D_simple )
       BOOST_CHECK_SMALL( abs(t4_si(i,j)-t4(i,j)), eps);
 
   // 2/ Process t5
-  blitz::Array<std::complex<double>,1> t5_s;
+  blitz::Array<std::complex<double>,1> t5_s(5);
   Torch::sp::fftshift(t5, t5_s);
   // Compare to reference
   for(int i=0; i < t5.extent(0); ++i)
     for(int j=0; j < t5.extent(1); ++j)
       BOOST_CHECK_SMALL( abs(t5_s(i,j)-t5_s_ref(i,j)), eps);
   
-  blitz::Array<std::complex<double>,1> t5_si;
+  blitz::Array<std::complex<double>,1> t5_si(5);
   Torch::sp::ifftshift(t5_s, t5_si);
   // Compare to original
   for(int i=0; i < t5.extent(0); ++i)
@@ -353,14 +396,14 @@ BOOST_AUTO_TEST_CASE( test_fftshift2D_simple )
   t = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11;
   t_s_ref = 10, 11, 8, 9, 2, 3, 0, 1, 6, 7, 4, 5;
 
-  blitz::Array<std::complex<double>,2> t_s;
+  blitz::Array<std::complex<double>,2> t_s(3,4);
   Torch::sp::fftshift(t, t_s);
   // Compare to reference
   for(int i=0; i < t.extent(0); ++i)
     for(int j=0; j < t.extent(1); ++j)
       BOOST_CHECK_SMALL( abs(t_s(i,j)-t_s_ref(i,j)), eps);
   
-  blitz::Array<std::complex<double>,2> t_si;
+  blitz::Array<std::complex<double>,2> t_si(3,4);
   Torch::sp::ifftshift(t_s, t_si);
   // Compare to original
   for(int i=0; i < t.extent(0); ++i)
@@ -403,255 +446,6 @@ BOOST_AUTO_TEST_CASE( test_fftshift2D_random )
 
     // call the test function
     test_fftshift( t, eps);
-  }
-}
-
-BOOST_AUTO_TEST_CASE( test_DCT1D )
-{
-  // This tests the 1D DCT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 2048.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 2048 + 1);
-
-    Torch::sp::DCT1D dct_new(M);
-    Torch::sp::IDCT1D idct_new(M);
-
-    blitz::Array<double,1> t(M), res(M), it(M);
-    for( int i=0; i < M; ++i)
-      t(i) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new DCT1D class
-    dct_new(t, res);
-
-    // process using FCT
-    blitz::Array<double,1> t_fct;
-    Torch::sp::fct(t, t_fct);
-
-    // Compare to old implementation
-    BOOST_REQUIRE_EQUAL(t_fct.extent(0), res.extent(0));
-    for(int i=0; i < res.extent(0); ++i)
-      BOOST_CHECK_SMALL( fabs(t_fct(i)-res(i)), eps);
-
-    // Processe using IFCT
-    idct_new(res, it);
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    for(int i=0; i < t.extent(0); ++i)
-      BOOST_CHECK_SMALL( fabs(t(i)-it(i)), eps);
-  }
-}
-
-
-BOOST_AUTO_TEST_CASE( test_DCT2D )
-{
-  // This tests the 2D DCT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 64.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 64 + 1);
-    int N = (rand() % 64 + 1);
-
-    Torch::sp::DCT2D dct_new(M,N);
-    Torch::sp::IDCT2D idct_new(M,N);
-
-    blitz::Array<double,2> t(M,N), res(M,N), it(M,N);
-    for( int i=0; i < M; ++i)
-      for( int j=0; j < N; ++j)
-        t(i,j) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new DCT2D class
-    dct_new(t, res);
-
-    // process using FCT
-    blitz::Array<double,2> t_fct;
-    Torch::sp::fct(t, t_fct);
-
-    // Compare to old implementation
-    BOOST_REQUIRE_EQUAL(t_fct.extent(0), res.extent(0));
-    BOOST_REQUIRE_EQUAL(t_fct.extent(1), res.extent(1));
-    for(int i=0; i < res.extent(0); ++i)
-      for(int j=0; j < res.extent(1); ++j)
-        BOOST_CHECK_SMALL( fabs(t_fct(i,j)-res(i,j)), eps);
-
-    // Processe using IFCT
-    idct_new(res, it);
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
-    for(int i=0; i < t.extent(0); ++i)
-      for(int j=0; j < t.extent(1); ++j)
-        BOOST_CHECK_SMALL( fabs(t(i,j)-it(i,j)), eps);
-  }
-}
-
-BOOST_AUTO_TEST_CASE( test_DCT1DNaive )
-{
-  // This tests the 1D DCT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 2048.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 2048 + 1);
-
-    Torch::sp::detail::DCT1DNaive dct_new_naive(M);
-    Torch::sp::detail::IDCT1DNaive idct_new_naive(M);
-
-    blitz::Array<double,1> t(M), res(M), it(M);
-    for( int i=0; i < M; ++i)
-      t(i) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new DCT1D class
-    dct_new_naive(t, res); // direct
-    idct_new_naive(res, it); // inverse
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    for(int i=0; i < t.extent(0); ++i)
-      BOOST_CHECK_SMALL( fabs(t(i)-it(i)), eps);
-  }
-}
-
-BOOST_AUTO_TEST_CASE( test_DCT2DNaive )
-{
-  // This tests the 2D DCT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 64.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 64 + 1);
-    int N = (rand() % 64 + 1);
-
-    Torch::sp::detail::DCT2DNaive dct_new_naive(M,N);
-    Torch::sp::detail::IDCT2DNaive idct_new_naive(M,N);
-
-    blitz::Array<double,2> t(M,N), res(M,N), it(M,N);
-    for( int i=0; i < M; ++i)
-      for( int j=0; j < N; ++j)
-        t(i,j) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new DCT2D class
-    dct_new_naive(t, res); // direct
-    idct_new_naive(res, it); // inverse
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
-    for(int i=0; i < t.extent(0); ++i)
-      for(int j=0; j < t.extent(1); ++j)
-        BOOST_CHECK_SMALL( fabs(t(i,j)-it(i,j)), eps);
-  }
-}
-
-BOOST_AUTO_TEST_CASE( test_FFT1DNaive )
-{
-  // This tests the 1D FFT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 2048.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 2048 + 1);
-
-    Torch::sp::detail::FFT1DNaive fft_new_naive(M);
-    Torch::sp::detail::IFFT1DNaive ifft_new_naive(M);
-
-    blitz::Array<std::complex<double>,1> t(M), res(M), it(M);
-    for( int i=0; i < M; ++i)
-      t(i) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new DCT1D class
-    fft_new_naive(t, res); // direct
-    ifft_new_naive(res, it); // inverse
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    for(int i=0; i < t.extent(0); ++i)
-      BOOST_CHECK_SMALL( abs(t(i)-it(i)), eps);
-  }
-}
-
-BOOST_AUTO_TEST_CASE( test_FFT2DNaive )
-{
-  // This tests the 2D FFT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 64.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 64 + 1);
-    int N = (rand() % 64 + 1);
-
-    Torch::sp::detail::FFT2DNaive fft_new_naive(M,N);
-    Torch::sp::detail::IFFT2DNaive ifft_new_naive(M,N);
-
-    blitz::Array<std::complex<double>,2> t(M,N), res(M,N), it(M,N);
-    for( int i=0; i < M; ++i)
-      for( int j=0; j < N; ++j)
-        t(i,j) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new FFT2D class
-    fft_new_naive(t, res); // direct
-    ifft_new_naive(res, it); // inverse
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
-    for(int i=0; i < t.extent(0); ++i)
-      for(int j=0; j < t.extent(1); ++j)
-        BOOST_CHECK_SMALL( abs(t(i,j)-it(i,j)), eps);
-  }
-}
-
-BOOST_AUTO_TEST_CASE( test_FFT1D )
-{
-  // This tests the 1D FFT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 2048.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 2048 + 1);
-
-    Torch::sp::FFT1D fft_new(M);
-    Torch::sp::IFFT1D ifft_new(M);
-
-    blitz::Array<std::complex<double>,1> t(M), res(M), it(M);
-    for( int i=0; i < M; ++i)
-      t(i) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new DCT1D class
-    fft_new(t, res); // direct
-    ifft_new(res, it); // inverse
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    for(int i=0; i < t.extent(0); ++i)
-      BOOST_CHECK_SMALL( abs(t(i)-it(i)), eps);
-  }
-}
-
-BOOST_AUTO_TEST_CASE( test_FFT2D )
-{
-  // This tests the 2D FFT using 10 random vectors
-  // The size of each dimension of each 2D array is randomly chosen 
-  // between 1 and 64.
-  for(int loop=0; loop < 10; ++loop) {
-    // size of the data
-    int M = (rand() % 64 + 1);
-    int N = (rand() % 64 + 1);
-
-    Torch::sp::FFT2D fft_new(M,N);
-    Torch::sp::IFFT2D ifft_new(M,N);
-
-    blitz::Array<std::complex<double>,2> t(M,N), res(M,N), it(M,N);
-    for( int i=0; i < M; ++i)
-      for( int j=0; j < N; ++j)
-        t(i,j) = (rand()/(double)RAND_MAX)*10.;
-    // Process using new FFT2D class
-    fft_new(t, res); // direct
-    ifft_new(res, it); // inverse
-
-    // Compare to initial signal
-    BOOST_REQUIRE_EQUAL(t.extent(0), it.extent(0));
-    BOOST_REQUIRE_EQUAL(t.extent(1), it.extent(1));
-    for(int i=0; i < t.extent(0); ++i)
-      for(int j=0; j < t.extent(1); ++j)
-        BOOST_CHECK_SMALL( abs(t(i,j)-it(i,j)), eps);
   }
 }
 
