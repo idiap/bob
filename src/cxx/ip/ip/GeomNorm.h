@@ -51,9 +51,8 @@ namespace Torch {
         /**
           * @brief Constructor
           */
-        GeomNorm(const int eyes_distance, const int center_eyes_h, const int 
-          center_eyes_w, const int height, const int width, const int border_h,
-          const int border_w);
+        GeomNorm(const int eyes_distance, const int height, const int width, 
+          const int border_h, const int border_w);
 
         /**
           * @brief Destructor
@@ -73,8 +72,6 @@ namespace Torch {
           * Attributes
           */
         int m_eyes_distance;
-        int m_center_eyes_h;
-        int m_center_eyes_w;
         int m_height;
         int m_width;
         int m_border_h;
