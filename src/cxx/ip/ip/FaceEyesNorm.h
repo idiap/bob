@@ -1,0 +1,125 @@
+/**
+ * @file src/cxx/ip/ip/FaceEyesNorm.h
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ *
+ */
+
+#ifndef TORCH5SPRO_IP_FACE_EYES_NORM_H
+#define TORCH5SPRO_IP_FACE_EYES_NORM_H
+
+#include <boost/shared_ptr.hpp>
+#include "core/array_assert.h"
+#include "core/array_check.h"
+#include "ip/rotate.h"
+#include "ip/GeomNorm2.h"
+
+namespace tca = Torch::core::array;
+
+namespace Torch {
+/**
+ * \ingroup libip_api
+ * @{
+ *
+ */
+  namespace ip {
+
+    /**
+     * @brief This file defines a class to perform a normalization of 
+     * a face based on the eye center locations.
+    */
+    class FaceEyesNorm
+    {
+      public:
+
+        /**
+          * @brief Constructor
+          */
+        FaceEyesNorm( const int eyes_distance, const int crop_height, 
+          const int crop_width, const int crop_offset_h, 
+          const int crop_offset_w);
+
+        /**
+          * @brief Destructor
+          */
+        virtual ~FaceEyesNorm();
+
+        /**
+          * @brief Accessors
+          */
+        inline const int getEyesDistance() { return m_eyes_distance; }
+        inline const int getCropHeight() { return m_crop_height; }
+        inline const int getCropWidth() { return m_crop_width; }
+        inline const int getCropOffsetH() { return m_crop_offset_h; }
+        inline const int getCropOffsetW() { return m_crop_offset_w; }
+
+        /**
+          * @brief Mutators
+          */
+        inline void setEyesDistance(const int eyes_distance) 
+          { m_eyes_distance = eyes_distance; }
+        inline void setCropHeight(const int crop_h) 
+          { m_crop_height = crop_h; m_geom_norm->setCropHeight(crop_h); }
+        inline void setCropWidth(const int crop_w) 
+          { m_crop_width = crop_w; m_geom_norm->setCropWidth(crop_w); }
+        inline void setCropOffsetH(const int crop_dh) 
+          { m_crop_offset_h = crop_dh; m_geom_norm->setCropOffsetH(crop_dh); }
+        inline void setCropOffsetW(const int crop_dw) 
+          { m_crop_offset_w = crop_dw; m_geom_norm->setCropOffsetW(crop_dw); }
+
+        /**
+          * @brief Process a 2D blitz Array/Image by applying the geometric
+          * normalization
+          */
+        template <typename T> void operator()(const blitz::Array<T,2>& src, 
+          blitz::Array<double,2>& dst, const int e1_y, const int e1_x, 
+          const int e2_y, const int e2_x);
+
+      private:
+        /**
+          * Attributes
+          */
+        double m_eyes_distance;
+        int m_crop_height;
+        int m_crop_width;
+        int m_crop_offset_h;
+        int m_crop_offset_w;
+
+        blitz::TinyVector<int,2> m_out_shape;
+        boost::shared_ptr<GeomNormNew> m_geom_norm;
+    };
+
+    template <typename T> 
+    void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+      blitz::Array<double,2>& dst, const int e1_y, const int e1_x,
+      const int e2_y, const int e2_x) 
+    { 
+      // Check input
+      tca::assertZeroBase(src);
+
+      // Check output
+      tca::assertZeroBase(dst);
+      tca::assertSameShape(dst, m_out_shape);
+
+      // Get angle to horizontal
+      const double angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x);
+      m_geom_norm->setRotationAngle( angle);
+
+      // Get scaling factor
+      const double eyes_distance = sqrt( (e1_y-e2_y)*(e1_y-e2_y) + (e1_x-e2_x)*(e1_x-e2_x) );
+      m_geom_norm->setScalingFactor( m_eyes_distance / eyes_distance);
+
+      // Get the center (of the eye centers segment)
+      int center_y = (e1_y + e2_y) / 2;
+      int center_x = (e1_x + e2_x) / 2;
+
+      // Perform the normalization
+      m_geom_norm->operator()(src, dst, center_y, center_x, center_y, center_x);
+    }
+
+  }
+/**
+ * @}
+ */
+}
+
+#endif /* TORCH5SPRO_IP_GEOM_NORM2_H */

@@ -46,6 +46,8 @@ set(src_ip
    "src/HornAndSchunckFlow.cc"
    "src/TanTriggs.cc"
    "src/GeomNorm.cc"
+   "src/GeomNorm2.cc"
+   "src/FaceEyesNorm.cc"
    "src/GaborFrequency.cc"
    "src/GaborSpatial.cc"
    "src/GaborBankFrequency.cc"
@@ -98,6 +100,7 @@ torch_test(ip flipflop test/flipflop.cc)
 torch_test(ip gabor test/Gabor.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
 torch_test(ip geomnorm test/geomnorm.cc)
+torch_test(ip facenorm test/facenorm.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
 torch_test(ip shear test/shear.cc)
@@ -109,6 +112,8 @@ torch_test(ip zigzag test/zigzag.cc)
 set_property(TEST cxx-ip-gabor APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
+  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")

@@ -48,6 +48,31 @@ namespace Torch {
     }
 
     /**
+      * @brief Return the offsets, such that using these offsets, we get
+      * the initial image on the new shifted image. The center of the new 
+      * (larger) image will be the point with the given coordinates on the 
+      * input array/image.
+      */
+    template <typename T>
+    const blitz::TinyVector<int,2> getGenerateWithCenterOffset(
+      const blitz::Array<T,2>& src, const int target_center_h, 
+      const int target_center_w)
+    {
+      // Compute current center coordinates
+      const double src_center_h = (src.extent(0)-1) / 2.;
+      const double src_center_w = (src.extent(1)-1) / 2.;
+
+      // Compute the extra boundaries needed
+      blitz::TinyVector<int,2> res;
+      res(0) = (target_center_h>=src_center_h ? 0 : 
+        floor(2*fabs(src_center_h-target_center_h)) );
+      res(1) = (target_center_w>=src_center_w ? 0 : 
+        floor(2*fabs(src_center_w-target_center_w)) );
+
+      return res;
+    }
+
+    /**
       * @brief Update the output array by making the point with the given
       * coordinates on the input array/image, the center of the output 
       * (larger) array/image.
@@ -73,22 +98,15 @@ namespace Torch {
       tca::assertSameShape(dst,
         getGenerateWithCenterShape(src,target_center_h,target_center_w));
 
-      // Compute center coordinates of the input
-      const double src_center_h = (src.extent(0)-1) / 2.;
-      const double src_center_w = (src.extent(1)-1) / 2.;
-  
-      // Compute offset in the output image
-      const int h_offset = (target_center_h>=src_center_h ? 0 : 
-        floor(2*fabs(src_center_h-target_center_h)) );
-      const int w_offset = (target_center_w>=src_center_w ? 0 : 
-        floor(2*fabs(src_center_w-target_center_w)) );
+      const blitz::TinyVector<int,2> offset =
+        getGenerateWithCenterOffset(src,target_center_h,target_center_w);
 
       /// Update output content
       dst = 0.;
       blitz::Range src_h(0,src.extent(0)-1);
       blitz::Range src_w(0,src.extent(1)-1);
-      blitz::Range dst1_h(h_offset,h_offset+src.extent(0)-1);
-      blitz::Range dst1_w(w_offset,w_offset+src.extent(1)-1);
+      blitz::Range dst1_h(offset(0),offset(0)+src.extent(0)-1);
+      blitz::Range dst1_w(offset(1),offset(1)+src.extent(1)-1);
       dst(dst1_h,dst1_w) = src(src_h,src_w);
     }
 
