@@ -94,16 +94,18 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_crop_2d_uint8 )
 {
-  blitz::Array<uint32_t,2> b2;
+  blitz::Array<uint32_t,2> b2(4,4);
   // Full crop
   Torch::ip::crop(a2, b2, 0, 0, 4, 4);
   checkBlitzEqual(a2, b2); 
 
   // Crop the middle part
+  b2.resize(2,2);
   Torch::ip::crop(a2, b2, 1, 1, 2, 2);
   checkBlitzEqual(a2c_1, b2); 
 
   // Crop the middle part with out of boundary and check exception
+  b2.resize(2,6);
   BOOST_CHECK_THROW( Torch::ip::crop(a2, b2, 1, -1, 2, 6), 
     Torch::ip::ParamOutOfBoundaryError );
 
@@ -118,16 +120,18 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_uint8 )
   
 BOOST_AUTO_TEST_CASE( test_crop_3d_uint8 )
 {
-  blitz::Array<uint32_t,3> b3;
+  blitz::Array<uint32_t,3> b3(3,4,4);
   // Full crop
   Torch::ip::crop(a3, b3, 0, 0, 4, 4);
   checkBlitzEqual(a3, b3); 
 
   // Crop the middle part
+  b3.resize(3,2,2);
   Torch::ip::crop(a3, b3, 1, 1, 2, 2);
   checkBlitzEqual(a3c_1, b3); 
 
   // Crop the middle part with out of boundary and check exception
+  b3.resize(3,2,6);
   BOOST_CHECK_THROW( Torch::ip::crop(a3, b3, 1, -1, 2, 6), 
     Torch::ip::ParamOutOfBoundaryError );
 

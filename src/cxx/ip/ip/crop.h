@@ -161,14 +161,10 @@ namespace Torch {
       const int crop_y, const int crop_x, const int crop_h, const int crop_w,
       const bool allow_out=false, const bool zero_out=false)
     {
-      // Check and resize dst if required
-      if( dst.extent(0) != crop_h || dst.extent(1) != crop_w )
-        dst.resize( crop_h, crop_w );
-      // Check and reindex if required
-      if( dst.base(0) != 0 || dst.base(1) != 0 ) {
-        const blitz::TinyVector<int,2> zero_base = 0;
-        dst.reindexSelf( zero_base );
-      }
+      // Check output
+      const blitz::TinyVector<int,2> shape(crop_h,crop_w);
+      tca::assertZeroBase(dst);
+      tca::assertSameShape(dst, shape);
 
       // Check parameters and throw exception if required
       if(!allow_out) 
@@ -225,15 +221,10 @@ namespace Torch {
       const int crop_y, const int crop_x, const int crop_h, const int crop_w,
       const bool allow_out=false, const bool zero_out=false)
     {
-      // Check and resize dst if required
-      if( dst.extent(0) != src.extent(0) || dst.extent(1) != crop_h || 
-          dst.extent(2) != crop_w )
-        dst.resize( src.extent(0), crop_h, crop_w );
-      // Check and reindex if required
-      if( dst.base(0) != 0 || dst.base(1) != 0 || dst.base(2) != 0 ) {
-        const blitz::TinyVector<int,3> zero_base = 0;
-        dst.reindexSelf( zero_base );
-      }
+      // Check output
+      const blitz::TinyVector<int,3> shape(src.extent(0), crop_h, crop_w);
+      tca::assertZeroBase(dst);
+      tca::assertSameShape(dst, shape);
 
       // Check parameters and throw exception if required
       if(!allow_out) 
@@ -272,6 +263,10 @@ namespace Torch {
       }
     }
 
+    /**
+      * TODO
+      * @deprecated To be remove (replaced using the FaceEyesNorm )
+      */
     template<typename T>
     void cropFace(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
 	      const int eyes_distance, const int border_h, const int border_w)
