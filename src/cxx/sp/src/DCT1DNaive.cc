@@ -52,7 +52,6 @@ void spd::DCT1DNaiveAbstract::initWorkingArray()
 {
   int n_wsave = 4*m_length;
   m_wsave.resize(n_wsave);
-//  for(int i=0; i<n_wsave; ++i)
   blitz::firstIndex i;
   m_wsave = cos(M_PI/(2*m_length)*i);
 }
@@ -83,11 +82,10 @@ void spd::DCT1DNaive::processNoCheck(const blitz::Array<double,1>& src,
 {
   // Compute the DCT
   dst = 0.;
-  const int length = src.extent(0);
   int ind; // index in the working array using the periodicity of cos()
-  for( int k=0; k<length; ++k) {
-    for( int n=0; n<length; ++n) {
-      ind = ((2*n+1)*k) % (4*length);
+  for( int k=0; k<m_length; ++k) {
+    for( int n=0; n<m_length; ++n) {
+      ind = ((2*n+1)*k) % (4*m_length);
       dst(k) += src(n) * m_wsave(ind);
     }
     dst(k) *= (k==0?m_sqrt_1l:m_sqrt_2l);
@@ -120,14 +118,13 @@ void spd::IDCT1DNaive::processNoCheck(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // Compute the DCT
-  const int length = src.extent(0);
   // Process n==0 with different normalization factor separately
   dst = m_sqrt_1l * src(0) * m_wsave(0);
   // Process n==1 to length
   int ind;
-  for( int k=0; k<length; ++k) {
-    for( int n=1; n<length; ++n) {
-      ind = ((2*k+1)*n) % (4*length);
+  for( int k=0; k<m_length; ++k) {
+    for( int n=1; n<m_length; ++n) {
+      ind = ((2*k+1)*n) % (4*m_length);
       dst(k) += m_sqrt_2l * src(n) * m_wsave(ind);
     }
   }

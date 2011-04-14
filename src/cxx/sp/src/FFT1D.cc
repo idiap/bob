@@ -26,11 +26,15 @@ sp::FFT1DAbstract::FFT1DAbstract( const int length):
 
 void sp::FFT1DAbstract::reset(const int length)
 {
-  // Update the length
-  m_length = length;
-
-  // Reset given the new height and width
-  reset();
+  // Reset if required
+  if( m_length != length) {
+    // Update the length
+    m_length = length;
+    // Deallocate memory
+    cleanup();
+    // Reset given the new height and width
+    reset();
+  }
 }
  
 void sp::FFT1DAbstract::reset()

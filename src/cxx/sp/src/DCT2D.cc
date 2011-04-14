@@ -30,12 +30,15 @@ sp::DCT2DAbstract::~DCT2DAbstract()
 
 void sp::DCT2DAbstract::reset(const int height, const int width)
 {
-  // Update the height and width
-  m_height = height;
-  m_width = width;
-
-  // Reset given the new height and width
-  reset();
+  if( m_height != height && m_width != width) {
+    // Update the height and width
+    m_height = height;
+    m_width = width;
+    // Deallocate memory
+    cleanup();
+    // Reset given the new height and width
+    reset();
+  }
 }
  
 void sp::DCT2DAbstract::reset()

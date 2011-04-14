@@ -30,12 +30,16 @@ sp::FFT2DAbstract::~FFT2DAbstract()
 
 void sp::FFT2DAbstract::reset(const int height, const int width)
 {
-  // Update the height and width
-  m_height = height;
-  m_width = width;
-
-  // Reset given the new height and width
-  reset();
+  // Reset if required
+  if( m_height != height || m_width != width) {
+    // Update the height and width
+    m_height = height;
+    m_width = width;
+    // Deallocate memory
+    cleanup();
+    // Reset given the new height and width
+    reset();
+  }
 }
  
 void sp::FFT2DAbstract::reset()

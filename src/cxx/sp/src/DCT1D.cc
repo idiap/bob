@@ -26,11 +26,14 @@ sp::DCT1DAbstract::DCT1DAbstract( const int length):
 
 void sp::DCT1DAbstract::reset(const int length)
 {
-  // Update the length
-  m_length = length;
-
-  // Reset given the new height and width
-  reset();
+  if( m_length != length) {
+    // Update the length
+    m_length = length;
+    // Deallocate memory
+    cleanup();
+    // Reset given the new height and width
+    reset();
+  }
 }
  
 void sp::DCT1DAbstract::reset()
