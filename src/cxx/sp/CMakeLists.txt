@@ -12,7 +12,6 @@ set(src
     "src/spFFT.cc"
     "src/spDCT.cc"
     "src/spFCT.cc"
-    "src/spDeltaOne.cc"
     "src/FFT.cc"
     "src/FCT.cc"
     "src/FFT1D.cc"
