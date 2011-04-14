@@ -9,7 +9,9 @@
 #ifndef TORCH5SPRO_IP_GABOR_FREQUENCY_H
 #define TORCH5SPRO_IP_GABOR_FREQUENCY_H
 
+#include <boost/shared_ptr.hpp>
 #include "ip/Exception.h"
+#include "sp/FFT2D.h"
 
 namespace Torch {
 /**
@@ -170,6 +172,8 @@ namespace Torch {
         // Intermediate working arrays
         blitz::Array<std::complex<double>, 2> m_work1;
         blitz::Array<std::complex<double>, 2> m_work2;
+        boost::shared_ptr<Torch::sp::FFT2D> m_fft;
+        boost::shared_ptr<Torch::sp::IFFT2D> m_ifft;
 //        enum ip::Gabor::NormOption m_norm_opt;
     };
 }}

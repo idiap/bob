@@ -22,7 +22,9 @@ ip::GaborFrequency::GaborFrequency( const int height, const int width,
 //  const enum ip::Gabor::NormOption norm_opt):
   m_height(height), m_width(width), m_f(f), m_theta(theta), m_gamma(gamma),
   m_eta(eta), m_pf(pf), m_cancel_dc(cancel_dc), m_use_envelope(use_envelope),
-  m_output_in_frequency(output_in_frequency)//, m_norm_opt(norm_opt)
+  m_output_in_frequency(output_in_frequency), //m_norm_opt(norm_opt),
+  m_fft(new Torch::sp::FFT2D(height,width)), 
+  m_ifft(new Torch::sp::IFFT2D(height,width))
 {
   computeFilter();
   initWorkArrays();
@@ -46,19 +48,16 @@ void ip::GaborFrequency::operator()(
   {
     // 1/ Compute FFT
     blitz::Array<std::complex<double>,2> src_fft(src.shape());
-    Torch::sp::FFT2D fft(src.extent(0),src.extent(1));
-    fft( src, src_fft);
+    m_fft->operator()( src, src_fft);
     // 2/ Filter in the frequency domain (elementwise multiplication)
     m_work1 = src_fft * m_kernel;
     // 3/ Output back in the spatial domain (IFFT)
-    Torch::sp::IFFT2D ifft(src.extent(0),src.extent(1));
-    ifft( m_work1, dst);
+    m_ifft->operator()( m_work1, dst);
   }
   else
   {
     // 1/ Compute FFT
-    Torch::sp::FFT2D fft(src.extent(0),src.extent(1));
-    fft( src, m_work1);
+    m_fft->operator()( src, m_work1);
     Torch::sp::fftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> src_fft_shift
 
     // 2/ Filter in the frequency domain 
@@ -72,8 +71,7 @@ void ip::GaborFrequency::operator()(
 
     // 3/ Output back in the spatial domain (IFFT)
     Torch::sp::ifftshift<std::complex<double> >( m_work1, m_work2); // m_work2 <-> dst_fft
-    Torch::sp::IFFT2D ifft(src.extent(0),src.extent(1));
-    ifft( m_work2, dst);
+    m_ifft->operator()( m_work2, dst);
   }
 }
 
