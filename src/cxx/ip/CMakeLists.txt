@@ -44,6 +44,7 @@ set(src_ip
    "src/ipLBPTopOperator.cc"
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
+   "src/crop.cc"
    "src/TanTriggs.cc"
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
