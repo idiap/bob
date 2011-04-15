@@ -263,24 +263,6 @@ namespace Torch {
       }
     }
 
-    /**
-      * TODO
-      * @deprecated To be remove (replaced using the FaceEyesNorm )
-      */
-    template<typename T>
-    void cropFace(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
-	      const int eyes_distance, const int border_h, const int border_w)
-    {
-      // TODO: transmits h/w-ratio
-	    const int center_h = src.extent(0)/2;
-	    const int center_w = src.extent(1)/2;
-
-      const int crop_y0 = center_h - 5./19.*(dst.extent(0)-2*border_h) - border_h;
-      const int crop_x0 = center_w - 0.5*(dst.extent(1)-2*border_w) - border_w;
-
-	    crop(src, dst, crop_y0, crop_x0, dst.extent(0), dst.extent(1), true);
-    }
-
   }
 /**
  * @}
