@@ -21,6 +21,7 @@ void bind_ip_flow();
 void bind_ip_dctfeatures();
 void bind_ip_gabor();
 void bind_ip_geomnorm();
+void bind_ip_faceeyesnorm();
 void bind_ip_tantriggs();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
@@ -37,5 +38,6 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_dctfeatures();
   bind_ip_gabor();
   bind_ip_geomnorm();
+  bind_ip_faceeyesnorm();
   bind_ip_tantriggs();
 }
