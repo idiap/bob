@@ -106,7 +106,10 @@ static float randomize(float)
   float d = die();
   return d; 
 }
-BZ_DECLARE_FUNCTION(randomize)
+
+namespace blitz {
+    BZ_DECLARE_FUNCTION(randomize)
+}
 
 /// Maximum number of tests
 #define NB_MAX_TEST 20
