@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/ip/src/GeomNorm2.cc
+ * @file src/cxx/ip/src/GeomNorm.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file provides a class to perform geometric normalization.
@@ -9,7 +9,7 @@
 
 namespace ip = Torch::ip;
 
-ip::GeomNormNew::GeomNormNew( const double rotation_angle, const int scaling_factor,
+ip::GeomNorm::GeomNorm( const double rotation_angle, const double scaling_factor,
   const int crop_height, const int crop_width, const int crop_offset_h, 
   const int crop_offset_w): 
   m_rotation_angle(rotation_angle), m_scaling_factor(scaling_factor),
@@ -19,5 +19,5 @@ ip::GeomNormNew::GeomNormNew( const double rotation_angle, const int scaling_fac
 {
 }
 
-ip::GeomNormNew::~GeomNormNew() { }
+ip::GeomNorm::~GeomNorm() { }
 

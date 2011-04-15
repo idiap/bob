@@ -15,7 +15,7 @@ ip::FaceEyesNorm::FaceEyesNorm( const int eyes_distance,
   m_eyes_distance(eyes_distance), m_crop_height(crop_height),
   m_crop_width(crop_width), m_crop_offset_h(crop_offset_h),
   m_crop_offset_w(crop_offset_w), m_out_shape(crop_height, crop_width), 
-  m_geom_norm(new GeomNormNew(0., 0, crop_height, crop_width, crop_offset_h, 
+  m_geom_norm(new GeomNorm(0., 0, crop_height, crop_width, crop_offset_h, 
     crop_offset_w) )
 {
 }

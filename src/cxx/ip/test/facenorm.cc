@@ -1,12 +1,12 @@
 /**
- * @file src/cxx/ip/test/geomnorm2.cc
+ * @file src/cxx/ip/test/facenorm.cc
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief Test the geometric normalization function for 2D arrays/images
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE IP-GeomNorm2 Tests
+#define BOOST_TEST_MODULE IP-FaceNorm Tests
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>

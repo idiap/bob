@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/ip/ip/geomNorm2.h
+ * @file src/cxx/ip/ip/geomNorm.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines a class to perform geometric normalization of an
@@ -10,8 +10,8 @@
  *        cropping parameters.
  */
 
-#ifndef TORCH5SPRO_IP_GEOM_NORM2_H
-#define TORCH5SPRO_IP_GROM_NORM2_H
+#ifndef TORCH5SPRO_IP_GEOM_NORM_H
+#define TORCH5SPRO_IP_GROM_NORM_H
 
 #include "core/array_assert.h"
 #include "core/array_check.h"
@@ -40,21 +40,21 @@ namespace Torch {
      *   3/ cropped with respect to the point given and the additional
      *        cropping parameters.
      */
-    class GeomNormNew
+    class GeomNorm
     {
       public:
 
         /**
           * @brief Constructor
           */
-        GeomNormNew(const double rotation_angle, const int scaling_factor, 
+        GeomNorm(const double rotation_angle, const double scaling_factor, 
           const int crop_height, const int crop_width, 
           const int crop_offset_h, const int crop_offset_w);
 
         /**
           * @brief Destructor
           */
-        virtual ~GeomNormNew();
+        virtual ~GeomNorm();
 
         /**
           * @brief Accessors
@@ -110,7 +110,7 @@ namespace Torch {
     // TODO: Refactor with Geometry module to keep track of the cropping
     // point coordinates after each operation
     template <typename T> 
-    void GeomNormNew::operator()(const blitz::Array<T,2>& src, 
+    void GeomNorm::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x,
       const int crop_ref_y, const int crop_ref_x) 
     { 
@@ -171,4 +171,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_GEOM_NORM2_H */
+#endif /* TORCH5SPRO_IP_GEOM_NORM_H */

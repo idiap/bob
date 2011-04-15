@@ -85,11 +85,11 @@ namespace Torch {
         int m_crop_offset_w;
 
         blitz::TinyVector<int,2> m_out_shape;
-        boost::shared_ptr<GeomNormNew> m_geom_norm;
+        boost::shared_ptr<GeomNorm> m_geom_norm;
     };
 
     template <typename T> 
-    void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+    inline void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst, const int e1_y, const int e1_x,
       const int e2_y, const int e2_x) 
     { 
