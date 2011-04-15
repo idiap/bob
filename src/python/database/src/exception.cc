@@ -38,4 +38,10 @@ void bind_database_exception() {
   CxxToPythonTranslatorPar<Torch::database::CodecNotFound, const std::string&>("CodecNotFound", "Raised when the codec is looked-up by name and is not found");
 
   CxxToPythonTranslatorPar<Torch::database::PathIsNotAbsolute, const std::string&>("PathIsNotAbsolute", "Raised when an absolute path is required and the user fails to comply");
+
+  CxxToPythonTranslatorPar<Torch::database::ImageUnsupportedDimension, const size_t>("ImageUnsupportedDimension", "Raised when an image has not a valid number of dimensions (2 for grayscale and 3 for RGB)");
+
+  CxxToPythonTranslatorPar<Torch::database::ImageUnsupportedType, Torch::core::array::ElementType>("ImageUnsupportedType", "Raised when an image has not a valid type (uint8_t or uint16_t)");
+
+  CxxToPythonTranslatorPar<Torch::database::ImageUnsupportedDepth, const unsigned int>("ImageUnsupportedDepth", "Raised when an image has not a valid depth (up to 16 bits depth images are supported)");
 }

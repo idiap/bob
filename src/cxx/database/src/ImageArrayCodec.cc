@@ -21,11 +21,6 @@
 
 namespace db = Torch::database;
 
-// TODO: define more specific exceptions
-namespace Torch { namespace database {
-  class ImageException: public Torch::core::Exception { };
-}}
-
 //Takes care of the codec registration.
 static bool register_codec() {
   db::ArrayCodecRegistry::addCodec(boost::shared_ptr<db::ArrayCodec>(new db::ImageArrayCodec())); 
@@ -85,7 +80,7 @@ void db::ImageArrayCodec::peek(const std::string& filename,
     else if( image.depth() <= 16)
       eltype = Torch::core::array::t_uint16;
     else {
-      throw db::ImageException();
+      throw db::ImageUnsupportedDepth(image.depth());
     }
   }
   catch( Magick::Exception &error_ ) {
@@ -127,7 +122,7 @@ db::ImageArrayCodec::load(const std::string& filename) const {
     else if( image.depth() <= 16)
       eltype = Torch::core::array::t_uint16;
     else {
-      throw db::ImageException();
+      throw db::ImageUnsupportedDepth(image.depth());
     }
 
     // Read the data
@@ -155,7 +150,7 @@ db::ImageArrayCodec::load(const std::string& filename) const {
         return db::detail::InlinedArrayImpl(data);
       }
       else
-        throw db::ImageException();
+        throw db::ImageUnsupportedDimension(ndim);
     } else if( eltype == Torch::core::array::t_uint16) {
       // Grayscale
       if( ndim == 2) {
@@ -180,10 +175,10 @@ db::ImageArrayCodec::load(const std::string& filename) const {
         return db::detail::InlinedArrayImpl(data);
       }
       else
-        throw db::ImageException();
+        throw db::ImageUnsupportedDimension(ndim);
     }
     else
-      throw db::ImageException();
+      throw db::ImageUnsupportedType(eltype);
   }
   catch( Magick::Exception &error_ ) {
     throw db::FileNotReadable(filename);
@@ -213,13 +208,13 @@ void db::ImageArrayCodec::save (const std::string& filename,
     n_c = 3;
     // Accept only 3 color channels (RGB)
     if( shape[0] != 3)
-      throw db::ImageException();
+      throw db::ImageUnsupportedDimension(ndim);
     height = shape[1];
     width = shape[2];
   }
   // Throw an exception if not supported
   else {
-    throw db::ImageException();
+    throw db::ImageUnsupportedDimension(data.getNDim());
   }
 
   // Create an ImageMagick image
@@ -255,7 +250,7 @@ void db::ImageArrayCodec::save (const std::string& filename,
       delete [] pixels;
     }
     else {
-      throw db::ImageException();
+      throw db::ImageUnsupportedDimension(ndim);
     }
   } else if( data.getElementType() == Torch::core::array::t_uint16) {
     // Grayscale
@@ -286,10 +281,10 @@ void db::ImageArrayCodec::save (const std::string& filename,
       delete [] pixels;
     }
     else {
-      throw db::ImageException();
+      throw db::ImageUnsupportedDimension(ndim);
     }
   }
   else {
-    throw db::ImageException();
+    throw db::ImageUnsupportedType(data.getElementType());
   }
 }

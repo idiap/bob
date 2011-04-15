@@ -200,6 +200,41 @@ namespace Torch { namespace database {
       unsigned int m_mode;
       mutable std::string m_message;
   };
+
+  class ImageUnsupportedDimension: public Exception {
+    public:
+      ImageUnsupportedDimension(const size_t n_dim) throw();
+      virtual ~ImageUnsupportedDimension() throw();
+      virtual const char* what() const throw();
+
+    private:
+      unsigned int m_n_dim;
+      mutable std::string m_message;
+  };
+  
+  class ImageUnsupportedType: public Exception {
+    public:
+      ImageUnsupportedType(const Torch::core::array::ElementType el_type)
+        throw();
+      virtual ~ImageUnsupportedType() throw();
+      virtual const char* what() const throw();
+
+    private:
+      Torch::core::array::ElementType m_el_type;
+      mutable std::string m_message;
+  };
+
+  class ImageUnsupportedDepth: public Exception {
+    public:
+      ImageUnsupportedDepth(const unsigned int depth) throw();
+      virtual ~ImageUnsupportedDepth() throw();
+      virtual const char* what() const throw();
+
+    private:
+      unsigned int m_depth;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* TORCH_DATABASE_EXCEPTION_H */

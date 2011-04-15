@@ -314,3 +314,62 @@ const char* db::HDF5InvalidFileAccessModeError::what() const throw() {
     return emergency;
   }
 }
+
+db::ImageUnsupportedDimension::ImageUnsupportedDimension(size_t n_dim) throw() :
+  m_n_dim(n_dim)
+{
+}
+
+db::ImageUnsupportedDimension::~ImageUnsupportedDimension() throw() { }
+
+const char* db::ImageUnsupportedDimension::what() const throw() {
+  try {
+    boost::format message("Got an array with '%u' dimensions. ImageArrayCodec only supports 2 or 3 dimensions. For the 3D case, the size of the first dimension should be 3, which corresponds to the 3 RGB planes.");
+    message % m_n_dim;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::ImageUnsupportedDimension: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+db::ImageUnsupportedType::ImageUnsupportedType(
+    const Torch::core::array::ElementType el_type) throw() :
+  m_el_type(el_type)
+{
+}
+
+db::ImageUnsupportedType::~ImageUnsupportedType() throw() { }
+
+const char* db::ImageUnsupportedType::what() const throw() {
+  try {
+    boost::format message("Got an array of unsupported type. Only uint8_t and uint16_t array types are supported.");
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::ImageUnsupportedType: cannot format, exception raised";
+    return emergency;
+  }
+}
+
+db::ImageUnsupportedDepth::ImageUnsupportedDepth(
+    const unsigned int depth) throw() :
+  m_depth(depth)
+{
+}
+
+db::ImageUnsupportedDepth::~ImageUnsupportedDepth() throw() { }
+
+const char* db::ImageUnsupportedDepth::what() const throw() {
+  try {
+    boost::format message("Does not support image with depth '%u' (only depth up to 16bits is supported).");
+    message % m_depth;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "database::ImageUnsupportedDepth: cannot format, exception raised";
+    return emergency;
+  }
+}
+
