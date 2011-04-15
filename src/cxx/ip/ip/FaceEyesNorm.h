@@ -11,7 +11,7 @@
 #include "core/array_assert.h"
 #include "core/array_check.h"
 #include "ip/rotate.h"
-#include "ip/GeomNorm2.h"
+#include "ip/GeomNorm.h"
 
 namespace tca = Torch::core::array;
 
@@ -122,4 +122,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_GEOM_NORM2_H */
+#endif /* TORCH5SPRO_IP_FACE_EYES_NORM_H */

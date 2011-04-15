@@ -5,7 +5,7 @@
  * @brief This file provides a class to perform geometric normalization.
  */
 
-#include "ip/GeomNorm2.h"
+#include "ip/GeomNorm.h"
 
 namespace ip = Torch::ip;
 

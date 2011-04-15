@@ -45,7 +45,7 @@ set(src_ip
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
    "src/TanTriggs.cc"
-   "src/GeomNorm2.cc"
+   "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
    "src/GaborFrequency.cc"
    "src/GaborSpatial.cc"
