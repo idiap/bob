@@ -16,6 +16,7 @@ set(pysrc
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
    "src/TanTriggs.cc"
+   "src/exception.cc"
    "src/main.cc"
    )
 

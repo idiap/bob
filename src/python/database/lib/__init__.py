@@ -215,3 +215,105 @@ Rule.__eq__ = rule_eq
 def rule_ne(self, other):
   return not (self == other)
 Rule.__ne__ = rule_ne
+
+# Some HDF5 addons
+def hdf5type_array_class(self):
+  """Returns the array class in torch.core.array that is good type for me"""
+  from ..core import array
+  return getattr(array, '%s_%d' % (self.element_type_str(), len(self.shape())))
+HDF5Type.array_class = hdf5type_array_class
+
+def hdf5file_read(self, path, pos=-1):
+  """Reads elements from the current file.
+  
+  Parameters:
+  path -- This is the path to the HDF5 dataset to read data from
+  pos -- This is the position in the dataset to readout. If the given value is
+  smaller than zero, we read all positions in the dataset and return you a
+  list. If the position is specific, we return a single element.
+  """
+  dtype = self.describe(path)
+  if dtype.is_array():
+    if pos < 0: # read all
+      return [self.read(path, k) for k in range(self.size(path))]
+    else:
+      retval = dtype.array_class()(dtype.shape())
+      self.__read_array__(path, pos, retval)
+      return retval
+  else:
+    if pos < 0: # read all
+      return [self.read(path, k) for k in range(self.size(path))]
+    else:
+      return getattr(self, '__read_%s__' % dtype.element_type_str())(path, pos)
+HDF5File.read = hdf5file_read
+
+def hdf5file_append(self, path, data, dtype=None):
+  """Appends data to a certain HDF5 dataset in this file.
+
+  Parameters:
+  path -- This is the path to the HDF5 dataset to append data to
+  data -- This is the data that will be appended. If this element is an
+  interable element (list or tuple), we will append all elements in such
+  iterable.
+  dtype -- Is an optional parameter that forces the conversion from the type
+  given in 'data' to one of the supported torch element types. Please note that
+  the data has to be convertible to the given type by means of boost::python
+  otherwise an error is raised. Also note this has no effect in case data are
+  composed of arrays (in which case the selection is automatic).
+  """
+  from ..core import array
+
+  def best_type (value):
+    """Returns the approximate best type for a given python value"""
+    if isinstance(value, bool): return 'bool'
+    elif isinstance(value, int): return 'int32'
+    elif isinstance(value, long): return 'int64'
+    elif isinstance(value, float): return 'float64'
+    elif isinstance(value, complex): return 'complex128'
+    elif isinstance(value, (str, unicode)): return 'string'
+    return 'UNSUPPORTED'
+  
+  if not isinstance(data, (list, tuple)): data = [data]
+
+  if array.is_blitz_array(data[0]):
+    for k in data: self.__append_array__(path, k)
+
+  else: #is scalar, in which case the user may have given a dtype
+    if dtype is None: dtype = best_type(data[0])
+    meth = getattr(self, '__append_%s__' % dtype)
+    for k in data: meth(path, k)
+HDF5File.append = hdf5file_append
+
+def hdf5file_replace(self, path, pos, data, dtype=None):
+  """Replaces data to a certain HDF5 dataset in this file.
+
+  Parameters:
+  path -- This is the path to the HDF5 dataset to append data to
+  pos -- This is the position we should replace
+  data -- This is the data that will be appended. 
+  dtype -- Is an optional parameter that forces the conversion from the type
+  given in 'data' to one of the supported torch element types. Please note that
+  the data has to be convertible to the given type by means of boost::python
+  otherwise an error is raised. Also note this has no effect in case data are
+  composed of arrays (in which case the selection is automatic).
+  """
+  from ..core import array
+
+  def best_type (value):
+    """Returns the approximate best type for a given python value"""
+    if isinstance(value, bool): return 'bool'
+    elif isinstance(value, int): return 'int32'
+    elif isinstance(value, long): return 'int64'
+    elif isinstance(value, float): return 'float64'
+    elif isinstance(value, complex): return 'complex128'
+    elif isinstance(value, (str, unicode)): return 'string'
+    return 'UNSUPPORTED'
+  
+  if array.is_blitz_array(data):
+    for k in data: self.__replace_array__(path, pos, k)
+
+  else: #is scalar, in which case the user may have given a dtype
+    if dtype is None: dtype = best_type(data[0])
+    meth = getattr(self, '__replace_%s__' % dtype)
+    for k in data: meth(path, pos, k)
+HDF5File.append = hdf5file_append

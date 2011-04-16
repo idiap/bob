@@ -54,7 +54,7 @@ struct iterator_wrapper {
 
 void bind_database_video() {
   //exceptions for videos
-  CxxToPythonTranslatorPar2<Torch::database::FFmpegException, const char*, const char*>("FFmpegException", "Thrown when there is a problem with a Video file.");
+  CxxToPythonTranslatorPar2<Torch::database::FFmpegException, Torch::database::Exception, const char*, const char*>("FFmpegException", "Thrown when there is a problem with a Video file.");
 
   iterator_wrapper().wrap(); //wraps db::VideoReader::const_iterator
 

@@ -48,6 +48,9 @@ set(src
     "src/VideoException.cc"
     "src/VideoWriter.cc"
     "src/VideoArrayCodec.cc"
+    "src/HDF5Exception.cc"
+    "src/HDF5Types.cc"
+    "src/HDF5Utils.cc"
     "src/HDF5File.cc"
     )
 
