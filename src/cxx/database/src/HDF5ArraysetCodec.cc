@@ -289,8 +289,9 @@ void db::HDF5ArraysetCodec::append
 template <typename T, int N>
 static void add_arrayset(db::HDF5File& f, const std::string& path, 
     const db::detail::InlinedArraysetImpl& data) {
-  for (size_t i=0; i<data.getNSamples(); ++i) 
-    f.appendArray(path, data[i+1].get<T,N>());
+  for (std::map<size_t, boost::shared_ptr<Torch::database::Array> >::const_iterator it = data.index().begin(); it != data.index().end(); ++it) {
+    f.appendArray(path, it->second->get<T,N>());
+  }
 }
 
 #define DIMSWITCH(T) switch(data.getNDim()) { \

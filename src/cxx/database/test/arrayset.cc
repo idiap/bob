@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
 
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::DimensionError );
+  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::Exception );
 
 
   // Copy constructor
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("hdf5.arrayset.binary"), 0);
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::DimensionError );
+  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::Exception );
   
   // Create an Arrayset from a file and check its properties
   Torch::database::Arrayset db_Ar_read(tmp_file);
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare(db_Ar_read.getCodec()->name()), 0); 
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar_read.add(g), Torch::database::DimensionError );
+  BOOST_CHECK_THROW( db_Ar_read.add(g), Torch::database::Exception );
 
   db_Ar_read.load();
   BOOST_CHECK_EQUAL(db_Ar_read.isLoaded(), true);
