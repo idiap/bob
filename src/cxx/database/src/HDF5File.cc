@@ -26,7 +26,6 @@ db::HDF5File::HDF5File(const std::string& filename, mode_t mode):
   m_index()
 {
   //makes sure we will shut-up the HDF5 automatic logging before we start
-  static boost::shared_ptr<db::HDF5Error> init = db::HDF5Error::instance();
   db::detail::hdf5::index(m_file, m_index);   
 }
 

@@ -271,11 +271,11 @@ static void delete_h5file (hid_t* p) {
 static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
     unsigned int flags) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5file));
-  if (boost::filesystem::exists(path)) { //file already exists
+  if (boost::filesystem::exists(path) && flags != H5F_ACC_TRUNC) { //open
     *retval = H5Fopen(path.string().c_str(), flags, H5P_DEFAULT);
     if (*retval < 0) throw db::HDF5StatusError("H5Fopen", *retval);
   }
-  else { //file needs to be created
+  else { //file needs to be created or truncated
     *retval = H5Fcreate(path.string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     if (*retval < 0) throw db::HDF5StatusError("H5Fcreate", *retval);
   }

@@ -150,7 +150,8 @@ void bind_database_hdf5() {
     .def("is_array", &db::HDF5Type::is_array, (arg("self")), "Tests if this type is an array")
     .def("__str__", &db::HDF5Type::str)
     .def("shape", &hdf5type_shape, (arg("self")), "Returns the shape of the elements described by this type")
-    .def("element_type_str", &db::HDF5Type::element_type_str, (arg("self")), "Returns a representation of the element type as a string")
+    .def("type_str", &db::HDF5Type::type_str, (arg("self")), "Returns a stringified representation of the base element type")
+    .def("element_type", &db::HDF5Type::element_type, (arg("self")), "Returns a representation of the element type one of the Torch supported element types.")
     ;
 
   //this is the main class

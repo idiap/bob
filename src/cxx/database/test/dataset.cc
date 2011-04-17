@@ -68,12 +68,12 @@ std::string temp_xml_file() {
 }
 
 /**
- * @brief Generates a unique temporary .bin filename, and returns the file
+ * @brief Generates a unique temporary .hdf5 filename, and returns the file
  * descriptor
  */
 std::string temp_bin_file() {
   boost::filesystem::path tpl = Torch::core::tmpdir();
-  tpl /= "torchtest_database_datasetXXXXXX.bin";
+  tpl /= "torchtest_database_datasetXXXXXX.hdf5";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),4);
@@ -84,7 +84,7 @@ std::string temp_bin_file() {
 }
 
 /**
- * @brief Generates a unique temporary .bin filename, and returns the file
+ * @brief Generates a unique temporary .hdf5 filename, and returns the file
  * descriptor
  */
 std::string temp_dir() {
@@ -99,12 +99,12 @@ std::string temp_dir() {
 }
 
 /**
- * @brief Generates a unique temporary .bin filename in a given directory, and
+ * @brief Generates a unique temporary .hdf5 filename in a given directory, and
  * returns the file descriptor
  */
 std::string temp_bin_file(const std::string& dir) {
   boost::filesystem::path tpl = dir.c_str();
-  tpl /= "torchtest_database_datasetXXXXXX.bin";
+  tpl /= "torchtest_database_datasetXXXXXX.hdf5";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
   int fd = mkstemps(char_tpl.get(),4);
@@ -773,10 +773,10 @@ BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
 
   // Save arraysets into external file
   std::string file1( path_dir );
-  file1 += "/arrayset1.bin";
+  file1 += "/arrayset1.hdf5";
   BOOST_REQUIRE_NO_THROW( ds[1].save( file1) );
   std::string file2( path_dir );
-  file2 += "/arrayset2.bin";
+  file2 += "/arrayset2.hdf5";
   BOOST_REQUIRE_NO_THROW( ds[2].save( file2) );
 
   // Save dataset into a new XML file
@@ -808,10 +808,10 @@ BOOST_AUTO_TEST_CASE( dbDataset_pathlist2 )
 
   // Save arraysets into external file
   std::string file1_2( path_dir2 );
-  file1_2 += "/arrayset1.bin";
+  file1_2 += "/arrayset1.hdf5";
   BOOST_REQUIRE_NO_THROW( ds1[1].save( file1_2) );
   std::string file2_2( path_dir2 );
-  file2_2 += "/arrayset2.bin";
+  file2_2 += "/arrayset2.hdf5";
   BOOST_REQUIRE_NO_THROW( ds1[2].save( file2_2) );
 
   // Save dataset into a new XML file

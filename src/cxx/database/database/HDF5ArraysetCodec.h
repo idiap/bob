@@ -1,29 +1,29 @@
 /**
- * @file database/BinaryArrayCodec.h
+ * @file database/HDF5ArraysetCodec.h
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Describes a generic API for reading and writing data to external
  * files.
  */
 
-#ifndef TORCH_DATABASE_BINARYARRAYCODEC_H 
-#define TORCH_DATABASE_BINARYARRAYCODEC_H
+#ifndef TORCH_DATABASE_HDF5ARRAYSETCODEC_H 
+#define TORCH_DATABASE_HDF5ARRAYSETCODEC_H
 
-#include "database/ArrayCodec.h"
+#include "database/ArraysetCodec.h"
 
 namespace Torch { namespace database {
 
   /**
-   * BinaryArrayCodecs can read and write single arrays into a Torch-compatible
-   * binary file.
+   * HDF5ArraysetCodecs can read and write single arrays into a
+   * Torch-compatible binary file.
    */
-  class BinaryArrayCodec : public ArrayCodec {
+  class HDF5ArraysetCodec : public ArraysetCodec {
 
     public:
 
-      BinaryArrayCodec();
+      HDF5ArraysetCodec();
 
-      virtual ~BinaryArrayCodec();
+      virtual ~HDF5ArraysetCodec();
 
       /**
        * Returns the element type and the number of dimensions of the stored
@@ -31,21 +31,37 @@ namespace Torch { namespace database {
        */
       virtual void peek(const std::string& filename, 
           Torch::core::array::ElementType& eltype, size_t& ndim,
-          size_t* shape) const;
+          size_t* shape, size_t& samples) const;
 
       /**
-       * Returns the stored array in a InlinedArrayImpl
+       * Returns the fully stored Arrayset in a InlinedArraysetImpl
        */
-      virtual detail::InlinedArrayImpl load(const std::string& filename) const;
+      virtual detail::InlinedArraysetImpl load(const std::string& filename) const;
 
       /**
-       * Saves a representation of the given array in the file.
+       * Loads a single Array from the array set. Please note that this may
+       * raise exceptions in case the index positioning in the file exceeds
+       * the number of arrays saved in that file.
+       */
+      virtual Array load(const std::string& filename, size_t index) const;
+
+      /**
+       * Appends a new Array in the file. Please note that there may be
+       * restrictions on which kinds of arrays each file type can receive.
+       *
+       * @warning: Please convert your files to HDF5, this codec is deprecated
+       * starting on 16.04.2011 - AA
+       */
+      virtual void append(const std::string& filename, const Array& array) const;
+
+      /**
+       * Saves a representation of the given arrayset in the file.
        *
        * @warning: Please convert your files to HDF5, this codec is deprecated
        * starting on 16.04.2011 - AA
        */
       virtual void save (const std::string& filename, 
-          const detail::InlinedArrayImpl& data) const;
+          const detail::InlinedArraysetImpl& data) const;
 
       /**
        * Returns the name of this codec
@@ -70,4 +86,4 @@ namespace Torch { namespace database {
 
 }}
 
-#endif /* TORCH_DATABASE_BINARYARRAYCODEC_H */
+#endif /* TORCH_DATABASE_HDF5ARRAYSETCODEC_H */

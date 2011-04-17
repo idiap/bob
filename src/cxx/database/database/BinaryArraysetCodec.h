@@ -48,11 +48,17 @@ namespace Torch { namespace database {
       /**
        * Appends a new Array in the file. Please note that there may be
        * restrictions on which kinds of arrays each file type can receive.
+       *
+       * @warning: Please convert your files to HDF5, this codec is deprecated
+       * starting on 16.04.2011 - AA
        */
       virtual void append(const std::string& filename, const Array& array) const;
 
       /**
        * Saves a representation of the given arrayset in the file.
+       *
+       * @warning: Please convert your files to HDF5, this codec is deprecated
+       * starting on 16.04.2011 - AA
        */
       virtual void save (const std::string& filename, 
           const detail::InlinedArraysetImpl& data) const;

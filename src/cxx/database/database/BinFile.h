@@ -76,11 +76,17 @@ namespace Torch {
          *
          * Please note that blitz::Array<> will be implicitly constructed as
          * required and respecting those norms.
+         *
+         * @warning: Please convert your files to HDF5, this format is
+         * deprecated starting on 16.04.2011 - AA
          */
         void write(const detail::InlinedArrayImpl& data);
 
         /**
          * A shortcut to write a blitz::Array<T,D>
+         *
+         * @warning: Please convert your files to HDF5, this format is
+         * deprecated starting on 16.04.2011 - AA
          */
         template <typename T, int D> 
           inline void write(blitz::Array<T,D>& bz) {

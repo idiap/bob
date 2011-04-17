@@ -57,6 +57,23 @@ namespace Torch {
 
     };
 
+    /**
+     * A deprecation error is raised when the developer wants to avoid the use
+     * of certain functionality in the code and for the user to migrate his
+     * code.
+     */
+    class DeprecationError: public Exception {
+
+      public:
+        DeprecationError(const std::string& op) throw();
+        virtual ~DeprecationError() throw();
+        virtual const char* what() const throw();
+
+      private:
+        std::string m_op;
+        mutable std::string m_message;
+    };
+
   }
 
 }

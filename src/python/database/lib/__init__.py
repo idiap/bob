@@ -220,7 +220,7 @@ Rule.__ne__ = rule_ne
 def hdf5type_array_class(self):
   """Returns the array class in torch.core.array that is good type for me"""
   from ..core import array
-  return getattr(array, '%s_%d' % (self.element_type_str(), len(self.shape())))
+  return getattr(array, '%s_%d' % (self.type_str(), len(self.shape())))
 HDF5Type.array_class = hdf5type_array_class
 
 def hdf5file_read(self, path, pos=-1):
@@ -244,7 +244,7 @@ def hdf5file_read(self, path, pos=-1):
     if pos < 0: # read all
       return [self.read(path, k) for k in range(self.size(path))]
     else:
-      return getattr(self, '__read_%s__' % dtype.element_type_str())(path, pos)
+      return getattr(self, '__read_%s__' % dtype.type_str())(path, pos)
 HDF5File.read = hdf5file_read
 
 def hdf5file_append(self, path, data, dtype=None):

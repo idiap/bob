@@ -16,6 +16,8 @@
 #include <blitz/tinyvec-et.h>
 #include <hdf5.h>
 
+#include "core/array_type.h"
+
 namespace Torch { namespace database {
 
   /**
@@ -229,6 +231,17 @@ namespace Torch { namespace database {
        * if it is bigger, will copy up to my number of positions.
        */
       void copy(const HDF5Shape& other);
+      
+      /**
+       * Sets a TinyVector with the contents of this shape. If the tinyvector
+       * shape is smaller, will copy up to the number of positions in the
+       * current shape. If that is bigger, will copy up to my number of
+       * positions
+       */
+      template <int N> void set (blitz::TinyVector<int,N>& v) const {
+        if (N >= m_n) for (size_t i=0; i<m_n; ++i) v[i] = m_shape[i]; 
+        else for (size_t i=0; i<N; ++i) v[i] = m_shape[i];
+      }
 
       /**
        * Resets the current shape so it becomes zero-sized.
@@ -413,7 +426,18 @@ namespace Torch { namespace database {
       /**
        * Returns a string representation of the element type.
        */
-      std::string element_type_str() const { return stringize(m_type); }
+      std::string type_str() const { return stringize(m_type); }
+
+      /**
+       * Returns the current enumeration for the type
+       */
+      inline hdf5type type() const { return m_type; }
+
+      /**
+       * Returns a mapping between the current type and the supported element
+       * types in Torch::core::array
+       */
+      Torch::core::array::ElementType element_type() const;
 
     private: //representation
 

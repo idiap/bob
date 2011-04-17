@@ -5,10 +5,10 @@
   </pathlist>
   <arrayset role="pattern1" elementtype="uint16" shape="3" id="1">
     <array id="1" >43 21 58</array>
-    <external-array id="3" file="test1.bin" codec="torch.array.binary" />
+    <external-array id="3" file="test1.hdf5" codec="hdf5.array.binary" />
     <array id="2" >43 21 58</array>
   </arrayset>
-  <external-arrayset role="pattern2" elementtype="uint16" shape="3" id="2" file="test1.bin" codec="torch.arrayset.binary"/>
+  <external-arrayset role="pattern2" elementtype="uint16" shape="3" id="2" file="test1.hdf5" codec="hdf5.arrayset.binary"/>
   <arrayset role="pattern3" elementtype="int16" shape="3" id="3">
     <array id="1" >43 -21 -58</array>
   </arrayset>

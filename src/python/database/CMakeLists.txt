@@ -34,8 +34,9 @@ torch_python_add_test(python-database-dataset-read-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_dataset.py)
 torch_python_add_test(python-database-dataset-write-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_writing.py)
-torch_python_add_test(python-database-binfile-tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_binfile.py)
+#deprecated:
+#torch_python_add_test(python-database-binfile-tests
+#  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_binfile.py)
 torch_python_add_test(python-database-array-pycodec-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_codec.py)
 torch_python_add_test(python-database-arrayset-pycodec-tests
@@ -48,6 +49,8 @@ torch_python_add_test(python-database-pathlist-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_pathlist.py)
 torch_python_add_test(python-database-video-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py)
+torch_python_add_test(python-database-hdf5-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_hdf5.py)
 
 # Our examples (run and install)
 torch_python_add_test(python-database-video2frame-example

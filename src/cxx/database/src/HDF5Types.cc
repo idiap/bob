@@ -494,3 +494,39 @@ std::string db::HDF5Type::str() const {
   retval % db::stringize(m_type) % m_shape.str();
   return retval.str();
 }
+
+Torch::core::array::ElementType db::HDF5Type::element_type() const {
+  switch (m_type) {
+    case i8:
+      return Torch::core::array::t_int8;
+    case i16:
+      return Torch::core::array::t_int16;
+    case i32:
+      return Torch::core::array::t_int32;
+    case i64:
+      return Torch::core::array::t_int64;
+    case u8:
+      return Torch::core::array::t_uint8;
+    case u16:
+      return Torch::core::array::t_uint16;
+    case u32:
+      return Torch::core::array::t_uint32;
+    case u64:
+      return Torch::core::array::t_uint64;
+    case f32:
+      return Torch::core::array::t_float32;
+    case f64:
+      return Torch::core::array::t_float64;
+    case f128:
+      return Torch::core::array::t_float128;
+    case c64:
+      return Torch::core::array::t_complex64;
+    case c128:
+      return Torch::core::array::t_complex128;
+    case c256:
+      return Torch::core::array::t_complex256;
+    default:
+      break;
+  }
+  return Torch::core::array::t_unknown;
+}

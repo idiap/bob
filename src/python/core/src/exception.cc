@@ -21,5 +21,6 @@ static void throw_exception(void) {
 
 void bind_core_exception() {
   BaseCxxToPythonTranslator<Torch::core::Exception>("Exception", "The core Exception class should be used as a basis for all Torch-Python exceptions.");
+  CxxToPythonTranslatorPar<Torch::core::DeprecationError, Torch::core::Exception, const std::string&>("DeprecationError", "A deprecation error is raised when the developer wants to avoid the use of certain functionality in the code and for the user to migrate his code.");
   boost::python::def("throw_exception", &throw_exception);
 }

@@ -24,3 +24,22 @@ const char* Torch::core::Exception::what() const throw() {
  return what_string;
 }
 
+Torch::core::DeprecationError::DeprecationError(const std::string& op) throw(): 
+  m_op(op) {
+}
+
+Torch::core::DeprecationError::~DeprecationError() throw() {
+}
+
+const char* Torch::core::DeprecationError::what() const throw() {
+  try {
+    boost::format message("Deprecated operation: %s");
+    message % m_op;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "core::DeprecationError: cannot format, exception raised";
+    return emergency;
+  }
+}
+
