@@ -12,7 +12,8 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "core/logging.h"
-#include "ip/rotate.h"
+#include "core/convert.h"
+#include "ip/Rotate.h"
 #include "ip/shear.h"
 
 #include "database/Array.h"
@@ -81,8 +82,8 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 }
 
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
+template<typename T, typename U>  
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2,
   const double eps )
 {
   int y_min = std::min( t1.extent(0), t2.extent(0));
@@ -92,14 +93,14 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   double diff = 0.;
   for( int i=0; i<y_min; ++i)
     for( int j=0; j<x_min; ++j)
-      diff += abs( t1(i,j) - t2(i,j) );
+      diff += abs( t1(i,j) - Torch::core::cast<T>(t2(i,j)) );
   diff = (diff/(y_min*x_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2, 
+template<typename T,typename U>  
+void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2,
   const double eps )
 {
   int p_min = std::min( t1.extent(0), t2.extent(0));
@@ -112,7 +113,7 @@ void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2,
   for( int i=0; i<p_min; ++i)
     for( int j=0; j<y_min; ++j)
       for( int k=0; k<x_min; ++k)
-        diff += abs( t1(i,j,k) - t2(i,j,k) );
+        diff += abs( t1(i,j,k) - Torch::core::cast<T>(t2(i,j,k)) );
   diff = (diff/(y_min*x_min*p_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
@@ -123,26 +124,27 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_rotate_2d_mod90_uint32 )
 {
-  blitz::Array<uint32_t,2> b2;
+  blitz::Array<double,2> b2;
 
   // Rotation of 0
-  b2.resize( Torch::ip::getShapeRotated(a2,0.) );
-  Torch::ip::rotate(a2, b2, 0);
+  Torch::ip::Rotate rotate(0.);
+  b2.resize( rotate.getOutputShape(a2,0.) );
+  rotate(a2, b2, 0.);
   checkBlitzEqual(a2, b2); 
 
   // Rotation of 90
-  b2.resize( Torch::ip::getShapeRotated(a2,90.) );
-  Torch::ip::rotate(a2, b2, 90.);
+  b2.resize( rotate.getOutputShape(a2,90.) );
+  rotate(a2, b2, 90.);
   checkBlitzEqual(a2r_90, b2); 
 
   // Rotation of 180
-  b2.resize( Torch::ip::getShapeRotated(a2,180.) );
-  Torch::ip::rotate(a2, b2, 180.);
+  b2.resize( rotate.getOutputShape(a2,180.) );
+  rotate(a2, b2, 180.);
   checkBlitzEqual(a2r_180, b2); 
 
   // Rotation of 270
-  b2.resize( Torch::ip::getShapeRotated(a2,270.) );
-  Torch::ip::rotate(a2, b2, 270.);
+  b2.resize( rotate.getOutputShape(a2,270.) );
+  rotate(a2, b2, 270.);
   checkBlitzEqual(a2r_270, b2); 
 }
 
@@ -162,15 +164,21 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   testdata_path_img /= "image.pgm";
   Torch::database::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
-  blitz::Array<uint8_t,2> img_processed;
+  blitz::Array<double,2> img_processed;
+  blitz::Array<bool,2> src_mask(img.shape());
+  blitz::Array<bool,2> dst_mask;
+  src_mask = true;
 
 
   // Rotate original image and compare with ImageMagick reference image
   // Warning: ImageMagick considers opposite angles wrt. to us
+  Torch::ip::Rotate rotate(5., Torch::ip::Rotate::Shearing);
 
   // 5 degrees
-  img_processed.resize(Torch::ip::getShapeRotated(img,5.) ); 
-  Torch::ip::rotate( img, img_processed, 5., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,5.) ); 
+  dst_mask.resize(rotate.getOutputShape(img,5.) ); 
+  rotate( img, src_mask, img_processed, dst_mask, 5.);
+  std::cout << dst_mask << std::endl;
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
   Torch::database::Array ar_img_r5(testdata_path_img.string());
@@ -178,8 +186,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r5, img_processed, eps);
 
   // 10 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,10.) ); 
-  Torch::ip::rotate( img, img_processed, 10., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,10.) ); 
+  rotate( img, img_processed, 10.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10.pgm";
   Torch::database::Array ar_img_r10(testdata_path_img.string());
@@ -187,8 +195,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r10, img_processed, eps);
 
   // 15 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,15.) ); 
-  Torch::ip::rotate( img, img_processed, 15., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,15.) ); 
+  rotate( img, img_processed, 15.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r15.pgm";
   Torch::database::Array ar_img_r15(testdata_path_img.string());
@@ -196,8 +204,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r15, img_processed, eps);
 
   // 30 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,30.) ); 
-  Torch::ip::rotate( img, img_processed, 30., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,30.) ); 
+  rotate( img, img_processed, 30.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r30.pgm";
   Torch::database::Array ar_img_r30(testdata_path_img.string());
@@ -205,8 +213,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r30, img_processed, eps);
 
   // 45 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,45.) ); 
-  Torch::ip::rotate( img, img_processed, 45., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,45.) ); 
+  rotate( img, img_processed, 45.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r45.pgm";
   Torch::database::Array ar_img_r45(testdata_path_img.string());
@@ -214,8 +222,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r45, img_processed, eps);
 
   // 70 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,70.) ); 
-  Torch::ip::rotate( img, img_processed, 70., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,70.) ); 
+  rotate( img, img_processed, 70.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r70.pgm";
   Torch::database::Array ar_img_r70(testdata_path_img.string());
@@ -223,8 +231,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r70, img_processed, eps);
 
   // 237 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,237.) ); 
-  Torch::ip::rotate( img, img_processed, 237., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,237.) ); 
+  rotate( img, img_processed, 237.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r237.pgm";
   Torch::database::Array ar_img_r237(testdata_path_img.string());
@@ -232,8 +240,8 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   checkBlitzClose( img_ref_r237, img_processed, eps);
 
   // -25 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,-25.) ); 
-  Torch::ip::rotate( img, img_processed, -25., Torch::ip::Rotation::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,-25.) ); 
+  rotate( img, img_processed, -25.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_rn25.pgm";
   Torch::database::Array ar_img_rn25(testdata_path_img.string());
@@ -256,11 +264,12 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   testdata_path_img /= "imageColor.ppm";
   Torch::database::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,3> img = ar_img.get<uint8_t,3>();
-  blitz::Array<uint8_t,3> img_processed;
+  blitz::Array<double,3> img_processed;
 
   // 5 degrees 
-  img_processed.resize(Torch::ip::getShapeRotated(img,5.) ); 
-  Torch::ip::rotate( img, img_processed, 5., Torch::ip::Rotation::Shearing);
+  Torch::ip::Rotate rotate(5., Torch::ip::Rotate::Shearing);
+  img_processed.resize(rotate.getOutputShape(img,5.) ); 
+  rotate( img, img_processed, 5.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "imageColor_r5.ppm";
   Torch::database::Array ar_img_r5(testdata_path_img.string());

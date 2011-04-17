@@ -85,7 +85,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
 {
-  blitz::Array<uint32_t,2> b2;
+  blitz::Array<uint32_t,2> b2(a2.shape());
   // "No" shift +0 +0
   Torch::ip::shift(a2, b2, 0, 0);
   checkBlitzEqual(a2, b2); 
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
   
 BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
 {
-  blitz::Array<uint32_t,3> b3;
+  blitz::Array<uint32_t,3> b3(a3.shape());
   // "No" shift +0 +0 
   Torch::ip::shift(a3, b3, 0, 0);
   checkBlitzEqual(a3, b3); 

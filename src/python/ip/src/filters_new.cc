@@ -15,7 +15,7 @@
 #include "ip/scale.h"
 #include "ip/shear.h"
 #include "ip/shift.h"
-#include "ip/shiftToCenter.h"
+#include "ip/generateWithCenter.h"
 #include "ip/zigzag.h"
 
 using namespace boost::python;
@@ -35,8 +35,6 @@ static const char* SHIFT2D_DOC = "Shift a 2D blitz array/image.";
 static const char* SHIFT3D_DOC = "Shift a 3D blitz array/image.";
 static const char* GAMMACORRECTION2D_DOC = "Perform a power-law gamma correction on a 2D blitz array/image.";
 static const char* ZIGZAG2D_DOC = "Extract a 1D blitz array using a zigzag pattern from a 2D blitz array/image.";
-static const char* SHIFTTOCENTER_DOC = "Shift a 2D blitz array/image to target center.";
-static const char* SHIFTTOCENTEROFPONTS_DOC = "Shift a 2D blitz array/image to the center of two points.";
 static const char* LEVEL_OUT_DOC = "Get the angle needed to level out (horizontally) two points.";
 static const char* SCALE_DOC = "Gives back a scaled version of the original blitz array (image)";
 
@@ -60,16 +58,13 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
   def("getShapeRotated", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::getShapeRotated<T>, (arg("src"), arg("angle")), ROTATED2D_SHAPE_DOC); \
   def("rotate", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const enum Torch::ip::Rotation::Algorithm))&Torch::ip::rotate<T>, rotate_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("algorithm")="Shearing"), ROTATE2D_DOC)); \
   def("scale", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const enum Torch::ip::Rescale::Algorithm))&Torch::ip::scale<T>, rescale_overloads_ ## N ((arg("src"), arg("dst"), arg("algorithm")="BilinearInterp"), RESCALE2D_DOC)); \
-  def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARX2D_DOC)); \
-  def("shearY", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARY2D_DOC)); \
+  def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARX2D_DOC)); \
+  def("shearY", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARY2D_DOC)); \
   def("shift", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT2D_DOC)); \
   def("shift", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT3D_DOC)); \
   def("gammaCorrection", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double))&Torch::ip::gammaCorrection<T>, (arg("src"), arg("dst"), arg("gamma")), GAMMACORRECTION2D_DOC); \
-  def("zigzag", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,1>&, int, const bool))&Torch::ip::zigzag<T>, zigzag_overloads_ ## N ((arg("src"), arg("dst"), arg("n_coef")="0", arg("right_first")="False"), ZIGZAG2D_DOC)); \
-  def("shiftToCenter", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int))&Torch::ip::shiftToCenter<T>, (arg("src"), arg("dst"), arg("target_h"), arg("target_w")), SHIFTTOCENTER_DOC); \
-  def("shiftToCenterOfPoints", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const int, const int))&Torch::ip::shiftToCenterOfPoints<T>, (arg("src"), arg("dst"), arg("point_one_h"), arg("point_one_w"), arg("point_two_h"), arg("point_two_w")), SHIFTTOCENTEROFPONTS_DOC); \
-  def("shiftToCenter", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int))&Torch::ip::shiftToCenter<T>, (arg("src"), arg("dst"), arg("target_h"), arg("target_w")), SHIFTTOCENTER_DOC); \
-  def("shiftToCenterOfPoints", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const int, const int))&Torch::ip::shiftToCenterOfPoints<T>, (arg("src"), arg("dst"), arg("point_one_h"), arg("point_one_w"), arg("point_two_h"), arg("point_two_w")), SHIFTTOCENTEROFPONTS_DOC);
+  def("zigzag", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,1>&, int, const bool))&Torch::ip::zigzag<T>, zigzag_overloads_ ## N ((arg("src"), arg("dst"), arg("n_coef")="0", arg("right_first")="False"), ZIGZAG2D_DOC)); 
+
 
 #define SCALE_AS(T) \
 	def("scaleAs", (blitz::Array<T,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::scaleAs<T>, (arg("original"), arg("scale_factor")), SCALE_DOC); \

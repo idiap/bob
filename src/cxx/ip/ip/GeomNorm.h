@@ -17,7 +17,7 @@
 #include "core/array_check.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
-#include "ip/shiftToCenter.h"
+#include "ip/generateWithCenter.h"
 #include "ip/rotate.h"
 #include "ip/scale.h"
 #include "ip/crop.h"

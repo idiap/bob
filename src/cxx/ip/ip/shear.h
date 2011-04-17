@@ -10,11 +10,15 @@
  */
 
 #ifndef TORCH5SPRO_IP_SHEAR_H
-#define TORCH5SPRO_IP_SHEAR_H 1
+#define TORCH5SPRO_IP_SHEAR_H
 
-#include "core/logging.h"
+#include <blitz/array.h>
+#include "core/array_assert.h"
+#include "core/cast.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
+
+namespace tca = Torch::core::array;
 
 namespace Torch {
 /**
@@ -35,8 +39,10 @@ namespace Torch {
         * @param dst The output blitz array
         * @param shear The shear parameter in the matrix [1 shear; 0 1]
         */
-      template<typename T>
-      void shearXNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
+      template<typename T, bool mask>
+      void shearXNoCheck(
+        const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
+        blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask, 
         const double shear, const bool antialias)
       {
         // Compute center coordinates in src and dst image
@@ -46,12 +52,15 @@ namespace Torch {
 
         // If shear is equal to zero, we just need to do a simple copy
         if(shear == 0.) {
-          copyNoCheck(src,dst);
+          for( int y=0; y<src.extent(0); ++y) 
+            for( int x=0; x<src.extent(1); ++x) 
+              dst(y,x) = Torch::core::cast<double>(src(y,x));
           return;
         }
 
         // Initialize dst to background value
         dst = 0;
+        dst_mask = false;
 
         // Loop over the rows and skew them horizontally
         for( int y=0; y<src.extent(0); ++y) {
@@ -79,7 +88,7 @@ namespace Torch {
           if( dir_right) {
             // Loop over all the input pixels of the row
             for( int x=src.extent(1)-1; x>=0; --x) {
-              double pixel = src(y+src.lbound(0),x+src.lbound(1));
+              double pixel = static_cast<double>(src(y,x));
               double residual;
               if( antialias )
                 residual = pixel * skew_f;
@@ -88,20 +97,26 @@ namespace Torch {
               pixel = (pixel - residual) + old_residual;
               // Determine x-location on dst row
               int x_dst = ceil(x - x_c_src + x_c_dst - skew_i-0.5);
-              if( x_dst >= 0 && x_dst < dst.extent(1) )
-                dst(y,x_dst) = (T)pixel; //TODO: check C-like cast
+              if( x_dst >= 0 && x_dst < dst.extent(1) ) {
+                dst(y,x_dst) = pixel; //TODO: check C-like cast
+                if(mask) 
+                  dst_mask(y,x_dst) = src_mask(y,x);
+              }
               old_residual = residual;
             }
             // Add remaining residual if possible
             double next_ind = -x_c_src + x_c_dst - skew_i - 1 - 0.5;
-            if( ceil(next_ind) >= 0)
-              dst(y,(int)ceil(next_ind)) = (T)old_residual; //TODO: check C-like cast
+            if( ceil(next_ind) >= 0) {
+              dst(y,(int)ceil(next_ind)) = old_residual;
+              if(mask) 
+                dst_mask(y,(int)ceil(next_ind)) = false;
+            }
           }
           // Transfer pixels left-to-right
           else {
             // Loop over all the input pixels of the row
             for( int x=0; x<src.extent(1); ++x) {
-              double pixel = src(y+src.lbound(0),x+src.lbound(1));
+              double pixel = static_cast<double>(src(y,x));
               double residual;
               if( antialias )
                 residual = pixel * skew_f;
@@ -109,15 +124,21 @@ namespace Torch {
                 residual = 0.;
               pixel = (pixel - residual) + old_residual;
               int x_dst = ceil(x - x_c_src + x_c_dst + skew_i-0.5);
-              if( x_dst >= 0 && x_dst < dst.extent(1) )
-                dst(y,x_dst) = (T)pixel; //TODO: check C-like cast
+              if( x_dst >= 0 && x_dst < dst.extent(1) ) {
+                dst(y,x_dst) = pixel; //TODO: check C-like cast
+                if(mask) 
+                  dst_mask(y,x_dst) = src_mask(y,x);
+              }
               old_residual = residual;
             }
             // Add remaining residual if possible
             double next_ind = 
               -x_c_src + x_c_dst + skew_i + src.extent(1) - 0.5;
-            if( ceil(next_ind) < dst.extent(1))
-              dst(y,(int)ceil(next_ind)) = (T)old_residual; //TODO: check C-like cast
+            if( ceil(next_ind) < dst.extent(1)) {
+              dst(y,(int)ceil(next_ind)) = old_residual;
+              if(mask) 
+                dst_mask(y,(int)ceil(next_ind)) = false;
+            }
           } 
         }    
       }
@@ -126,74 +147,168 @@ namespace Torch {
 
 
     /**
+      * @brief Return the shape of the output image/array, when performing
+      * a shearing along the X-axis, with the given input image/array and 
+      * shear parameter.
+      * @param src the input array
+      * @param shear The shear parameter in the matrix [1 shear; 0 1]
+      */
+    template <typename T>
+    const blitz::TinyVector<int,2> getShearXShape( 
+      const blitz::Array<T,2>& src, const double shear)
+    {
+      // Compute the required output size when applying shearX
+      blitz::TinyVector<int,2> res;
+      res(0) = src.extent(0);
+      res(1) = src.extent(1) + floor(fabs(shear)*(src.extent(0)-1)+0.5);
+      return res;
+    }
+
+    /**
+      * @brief Return the shape of the output image/array, when performing
+      * a shearing along the Y-axis, with the given input image/array and 
+      * shear parameter.
+      * @param src the input array
+      * @param shear The shear parameter in the matrix [1 shear; 0 1]
+      */
+    template <typename T>
+    const blitz::TinyVector<int,2> getShearYShape( 
+      const blitz::Array<T,2>& src, const double shear)
+    {
+      // Compute the required output size when applying shearX
+      blitz::TinyVector<int,2> res;
+      res(0) = src.extent(0) + floor(fabs(shear)*(src.extent(1)-1)+0.5);
+      res(1) = src.extent(1);
+      return res;
+    }
+
+
+    /**
       * @brief Function which shears a 2D blitz::array/image of a given type
       *   along the X-axis.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
       * @param antialias Whether antialiasing should be used or not 
       */
     template<typename T>
-    void shearX(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+    void shearX(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
       const double shear, const bool antialias=true)
     {
-      // Check and reindex if required
-      if( dst.base(0) != 0 || dst.base(1) != 0 ) {
-        const blitz::TinyVector<int,2> zero_base = 0;
-        dst.reindexSelf( zero_base );
-      }
-
-      // Determine the new width of the image
-      int width_dst = src.extent(1) + 
-        floor(fabs(shear)*(src.extent(0)-1)+0.5);
-      // Check and resize if required
-      if( dst.extent(0) != src.extent(0) || dst.extent(1) != width_dst)
-        dst.resize( src.extent(0), width_dst );
+      // Check input
+      tca::assertZeroBase(src);
+      // Check output
+      tca::assertZeroBase(dst);
+      const blitz::TinyVector<int,2> shape = getShearXShape(src, shear); 
+      tca::assertSameShape(dst, shape);
 
       // Call the shearXNoCheck function
-      detail::shearXNoCheck( src, dst, shear, antialias);
+      blitz::Array<bool,2> src_mask, dst_mask;
+      detail::shearXNoCheck<T,false>( src, src_mask, dst, dst_mask, shear, 
+        antialias);
     }
 
+    /**
+      * @brief Function which shears a 2D blitz::array/image of a given type
+      *   along the X-axis.
+      *   The first dimension is the height (y-axis), whereas the second
+      *   one is the width (x-axis).
+      * @param src The input blitz array
+      * @param dst The output blitz array
+      * @param shear The shear parameter in the matrix [1 shear; 0 1]
+      * @param antialias Whether antialiasing should be used or not 
+      */
+    template<typename T>
+    void shearX(const blitz::Array<T,2>& src, 
+      const blitz::Array<bool,2>& src_mask,
+      blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask,
+      const double shear, const bool antialias=true)
+    {
+      // Check input
+      tca::assertZeroBase(src);
+      tca::assertZeroBase(src_mask);
+      tca::assertSameShape(src, src_mask);
+      // Check output
+      tca::assertZeroBase(dst);
+      tca::assertZeroBase(dst_mask);
+      tca::assertSameShape(dst, dst_mask);
+      const blitz::TinyVector<int,2> shape = getShearXShape(src, shear); 
+      tca::assertSameShape(dst, shape);
+
+      // Call the shearXNoCheck function
+      detail::shearXNoCheck<T,true>( src, src_mask, dst, dst_mask, shear, 
+        antialias);
+    }
 
     /**
       * @brief Function which shears a 2D blitz::array/image of a given type
       *   along the Y-axis.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array
       * @param shear The shear parameter in the matrix [1 0; shear 1]
       * @param antialias Whether antialiasing should be used or not 
       */
     template<typename T>
-    void shearY(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+    void shearY(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
       const double shear, const bool antialias=true)
     {
-      // Check and reindex if required
-      if( dst.base(0) != 0 || dst.base(1) != 0 ) {
-        const blitz::TinyVector<int,2> zero_base = 0;
-        dst.reindexSelf( zero_base );
-      }
-
-      // Determine the new width of the image
-      int height_dst = src.extent(0) + 
-        floor(fabs(shear)*(src.extent(1)-1)+0.5);
-      // Check and resize if required
-      if( dst.extent(0) != height_dst || dst.extent(1) != src.extent(1))
-        dst.resize( height_dst, src.extent(1) );
+      // Check input
+      tca::assertZeroBase(src);
+      // Check output
+      tca::assertZeroBase(dst);
+      const blitz::TinyVector<int,2> shape = getShearYShape(src, shear); 
+      tca::assertSameShape(dst, shape);
 
       // Create transposed view arrays for both src and dst
       const blitz::Array<T,2> src_transpose = (src.copy()).transpose(1,0);
-      blitz::Array<T,2> dst_transpose = dst.transpose(1,0);
+      blitz::Array<double,2> dst_transpose = dst.transpose(1,0);
 
       // Call the shearXNoCheck function
-      detail::shearXNoCheck( src_transpose, dst_transpose, shear, antialias);
+      blitz::Array<bool,2> src_mask_transpose, dst_mask_transpose; 
+      detail::shearXNoCheck<T,false>( src_transpose, src_mask_transpose,
+        dst_transpose, dst_mask_transpose, shear, antialias);
+    }
+
+    /**
+      * @brief Function which shears a 2D blitz::array/image of a given type
+      *   along the Y-axis.
+      *   The first dimension is the height (y-axis), whereas the second
+      *   one is the width (x-axis).
+      * @param src The input blitz array
+      * @param dst The output blitz array
+      * @param shear The shear parameter in the matrix [1 0; shear 1]
+      * @param antialias Whether antialiasing should be used or not 
+      */
+    template<typename T>
+    void shearY(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
+      blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask,
+      const double shear, const bool antialias=true)
+    {
+      // Check input
+      tca::assertZeroBase(src);
+      tca::assertZeroBase(src_mask);
+      tca::assertSameShape(src, src_mask);
+      // Check output
+      tca::assertZeroBase(dst);
+      tca::assertZeroBase(dst_mask);
+      tca::assertSameShape(dst, dst_mask);
+      const blitz::TinyVector<int,2> shape = getShearYShape(src, shear); 
+      tca::assertSameShape(dst, shape);
+
+      // Create transposed view arrays for both src and dst
+      const blitz::Array<T,2> src_transpose = (src.copy()).transpose(1,0);
+      const blitz::Array<bool,2> src_mask_transpose = 
+        (src_mask.copy()).transpose(1,0);
+      blitz::Array<double,2> dst_transpose = dst.transpose(1,0);
+      blitz::Array<bool,2> dst_mask_transpose = dst_mask.transpose(1,0);
+
+      // Call the shearXNoCheck function
+      detail::shearXNoCheck<T,true>( src_transpose, src_mask_transpose, 
+        dst_transpose, dst_mask_transpose, shear, antialias);
     }
 
   }
@@ -203,4 +318,3 @@ namespace Torch {
 }
 
 #endif /* TORCH5SPRO_IP_SHEAR_H */
-
