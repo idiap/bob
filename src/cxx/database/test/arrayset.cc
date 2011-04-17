@@ -61,7 +61,7 @@ std::string temp_file() {
   tpl /= "torchtest_core_binformatXXXXXX.hdf5";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(),4);
+  int fd = mkstemps(char_tpl.get(),5);
   close(fd);
   boost::filesystem::remove(char_tpl.get());
   std::string res = char_tpl.get();
