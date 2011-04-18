@@ -9,11 +9,11 @@
 
 using namespace boost::python;
 
-void bind_config_configuration();
 void bind_config_exception();
+void bind_config_configuration();
 
 BOOST_PYTHON_MODULE(libpytorch_config) {
   scope().attr("__doc__") = "Torch configuration classes and sub-classes";
-  bind_config_configuration();
   bind_config_exception();
+  bind_config_configuration();
 }

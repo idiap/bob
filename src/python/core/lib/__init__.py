@@ -1,5 +1,6 @@
 from libpytorch_core import *
 from . import array
+from . import vector
 __all__ = dir()
 
 #this will setup divergence from C++ into python.logging correctly
