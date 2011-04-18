@@ -15,3 +15,4 @@ src/python/ip/test/data/faceextract/test_001.shift.png
 src/python/ip/test/data/faceextract/test_001.blue.level.answer.png
 src/python/ip/test/data/faceextract/test_001.blue.norm.answer.png
 sandbox_snowowl
+my-sphinx.html

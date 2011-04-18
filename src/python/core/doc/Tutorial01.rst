@@ -6,7 +6,7 @@
  Tutorial 01. Basic usage of Arrays
 ====================
 
-In this section we will illustrate the basic python usage of Arrays
+In this section we will illustrate the basic python usage of Arrays.
 
 Some basic usage of Arrays / Matrices
 -------------------------------------
@@ -15,25 +15,32 @@ Some basic usage of Arrays / Matrices
 
    import torch
 
-   # create two Matrices
-   A = torch.core.array.float64_2(3, 2)         # Straight forward
+   # Create two 2D-double arrays  (float64_2) of size 5 times 7.
+   # Terminology
+   #   With "the type" we describe the number of dimensions (2D) and the data type (double = float64).
+   #   With "the shape" we describe the size (5 times 7) of the array.
+
+   A = torch.core.array.float64_2(5, 7)         # Specify directly the type and shape
    B = torch.core.array.float64_2(A.shape())    # Using A' shape
 
-   # Look closer
-   # Notice that the elements in the matrices are not gauarantied to be initialized to zeros
+   # Closer look:  
+   #    Notice that the elements in the matrices are not gauarantied to be initialized to zeros
+   
    print A
    print B
 
-   # Assign a value to "whole" Matrix
+   # It is possible to assign the whole matrix to either zeros or ones.
+
    A.ones()                    # Set all values to one
    B.zeros()                   # Set all values to zero
 
    # Look closer
-   # The matrices are now properaly initialized
+   #    The arrays are now properaly initialized
    print A
    print B
 
-   # Mathematical operations
+   # |project| provide most mathematical operations in a powerful way
+
    print 0.45 * A             # It is possible to directly mulitple with a scalar
    print B + 5                # It is possible to add a scalar to all element in matrix
 
@@ -42,9 +49,38 @@ Some basic usage of Arrays / Matrices
 Converting and casting in Python
 --------------------------------
 
-It is sometimes nessassary to cast or convert arrays.
+There are many cases where we have to cast or convert arrays.
 
 .. code-block:: python
 
    import torch
+
+   # We will illustrate a simple cast between uint8 and float64
+
+   # Create a 2D uint8 array of size 4 times 5.
+   # Make sure it is properly initialized (set it to ones)
+   # Look closer (by printing the data).
+
+   A = torch.core.array.uint8_2(4,5)
+   A.ones()
+   print A
+
+   # All elements are exactly 1. We will contrast this we an 2D array with float64 (doubles).
+   #
+   # [[1 1 1 1 1]
+   #  [1 1 1 1 1]
+   #  [1 1 1 1 1]
+   #  [1 1 1 1 1]]
+   #
+   # All thoses elements well be exactly 1. (notice the dot)
+   #
+   # [[ 1.  1.  1.  1.  1.]
+   #  [ 1.  1.  1.  1.  1.]
+   #  [ 1.  1.  1.  1.  1.]
+   #  [ 1.  1.  1.  1.  1.]]
+   #   
+
+   # Cast A to a float64 (double)
+   B = A.cast("float64")
+   print B
 
