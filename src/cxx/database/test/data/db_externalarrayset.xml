@@ -3,6 +3,6 @@
   <pathlist>
     <entry path="subdata"/>
   </pathlist>
-  <external-arrayset id="1" elementtype="float64" shape="4" role="" file="arrayset1.bin" codec="torch.arrayset.binary"/>
-  <external-arrayset id="2" elementtype="float64" shape="4" role="" file="arrayset2.bin" codec="torch.arrayset.binary"/>
+  <external-arrayset id="1" elementtype="float64" shape="4" role="" file="arrayset1.hdf5" codec="hdf5.arrayset.binary"/>
+  <external-arrayset id="2" elementtype="float64" shape="4" role="" file="arrayset2.hdf5" codec="hdf5.arrayset.binary"/>
 </dataset>

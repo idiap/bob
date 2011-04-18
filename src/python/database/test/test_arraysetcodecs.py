@@ -26,10 +26,10 @@ def testcase_transcode(self, codecname, filename):
   """Runs a complete transcoding test, to and from the binary format."""
 
   testcodec = torch.database.ArraysetCodecRegistry.getCodecByName(codecname)
-  bincodec = torch.database.ArraysetCodecRegistry.getCodecByName("torch.arrayset.binary")
+  bincodec = torch.database.ArraysetCodecRegistry.getCodecByName("hdf5.arrayset.binary")
 
   # transcode to binary
-  tmpname = tempname('.bin')
+  tmpname = tempname('.hdf5')
   bincodec.save(tmpname, testcodec.load(filename))
   self.assertEqual(bincodec.load(tmpname), testcodec.load(filename))
 
@@ -131,7 +131,7 @@ class ArraysetCodecTest(unittest.TestCase):
 
     # The matlab codec accepts arbitrary input arrays if ints, floats, doubles
     # and complex values
-    codec = "torch.arrayset.binary"
+    codec = "hdf5.arrayset.binary"
     self.readwrite(codec, data_1)
     self.readwrite(codec, data_2)
     self.readwrite(codec, data_3)
@@ -140,7 +140,7 @@ class ArraysetCodecTest(unittest.TestCase):
     self.append_load(codec, data_2)
     self.append_load(codec, data_3)
     self.append_load(codec, data_4)
-    self.transcode(codec, "test1.bin")
+    self.transcode(codec, "test1.hdf5")
 
   def test02_t3binary(self):
 

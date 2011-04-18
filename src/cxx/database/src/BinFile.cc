@@ -148,6 +148,13 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
 }
 
 void db::BinFile::write(const db::detail::InlinedArrayImpl& data) {
+
+  /**
+   * @warning: Please convert your files to HDF5, this format is
+   * deprecated starting on 16.04.2011 - AA
+   */
+  throw core::DeprecationError("BinFile format deprecated on 16.04.2011, use HDF5");
+
   if(!m_header_init) {
     //initializes the header
     initHeader(data.getElementType(), data.getNDim(), data.getShape());

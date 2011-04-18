@@ -114,9 +114,9 @@ void bind_ip_color()
 {
   //Exceptions for this functionality
 
-  tpy::CxxToPythonTranslatorPar<Torch::ip::UnsupportedTypeForColorConversion, Torch::core::array::ElementType>("UnsupportedTypeForColorConversion", "This exception is thrown when the color conversion for a particular type is not implemented in torch");
+  tpy::CxxToPythonTranslatorPar<Torch::ip::UnsupportedTypeForColorConversion, Torch::ip::Exception, Torch::core::array::ElementType>("UnsupportedTypeForColorConversion", "This exception is thrown when the color conversion for a particular type is not implemented in torch");
 
-  tpy::CxxToPythonTranslatorPar2<Torch::ip::UnsupportedRowExtent, int, int>("UnsupportedRowExtent", "This exception is thrown when the input matrix does not conform to the method specifications in number of rows.");
+  tpy::CxxToPythonTranslatorPar2<Torch::ip::UnsupportedRowExtent, Torch::ip::Exception, int, int>("UnsupportedRowExtent", "This exception is thrown when the input matrix does not conform to the method specifications in number of rows.");
 #include "core/python/exception.h"
 
   //Single pixel conversions

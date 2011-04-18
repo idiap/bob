@@ -17,6 +17,7 @@ set(pysrc
    "src/FaceEyesNorm.cc"
    "src/Rotate.cc"
    "src/TanTriggs.cc"
+   "src/exception.cc"
    "src/main.cc"
    )
 

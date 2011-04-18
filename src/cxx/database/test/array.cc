@@ -17,7 +17,6 @@
 #include <string>
 #include "core/logging.h" // for Torch::core::tmpdir()
 #include "core/cast.h"
-#include "database/BinFile.h"
 #include "database/Array.h"
 
 struct T {
@@ -65,10 +64,10 @@ struct T {
  */
 std::string temp_file() {
   boost::filesystem::path tpl = Torch::core::tmpdir();
-  tpl /= "torchtest_core_binformatXXXXXX.bin";
+  tpl /= "torchtest_core_binformatXXXXXX.hdf5";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(),4);
+  int fd = mkstemps(char_tpl.get(),5);
   close(fd);
   boost::filesystem::remove(char_tpl.get());
   std::string res = char_tpl.get();
@@ -214,7 +213,7 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
   BOOST_CHECK_EQUAL(db_a_read.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a_read.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(
-    db_a_read.getCodec()->name().compare("torch.array.binary"), 0);
+    db_a_read.getCodec()->name().compare("hdf5.array.binary"), 0);
   for(size_t i=0; i<db_a_read.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a_read.getShape()[i], a.extent(i));
 
@@ -246,7 +245,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("torch.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 
@@ -256,7 +255,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("torch.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   // Check that the 'get' array is unchanged
@@ -297,7 +296,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("torch.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   // Check that the 'get' array is unchanged
@@ -310,7 +309,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file2), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("torch.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   check_equal( a, db_a.get<double,1>());
@@ -457,7 +456,7 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("torch.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 
