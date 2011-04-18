@@ -85,7 +85,7 @@ class TextArrayCodec(torch.database.ArrayCodec):
     tradition, we like to use '.' separated namespaces. The first name
     indicates the origin framework of the codec, the second what it encodes
     or decodes (array vs. arrayset) and the third is the format name in
-    which it saves. For example: "torch.array.binary" is the name of an
+    which it saves. For example: "hdf5.array.binary" is the name of an
     array codec built-in Torch that defines our binary file formats."""
 
     return "example.array.text"
@@ -150,9 +150,9 @@ class CodecTest(unittest.TestCase):
     # problems.
 
     text = torch.database.ArrayCodecRegistry.getCodecByName("example.array.text")
-    binary = torch.database.ArrayCodecRegistry.getCodecByName("torch.array.binary")
+    binary = torch.database.ArrayCodecRegistry.getCodecByName("hdf5.array.binary")
     # Lets put the results on a temporary file we scratch later
-    tmpname = get_tempfilename(suffix='.bin')
+    tmpname = get_tempfilename(suffix='.hdf5')
     binary.save(tmpname, text.load('test_array_codec.txt'))
 
     # Lets make sure the binary data saved is the same:

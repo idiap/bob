@@ -44,9 +44,9 @@ set(src_ip
    "src/ipLBPTopOperator.cc"
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
+   "src/crop.cc"
    "src/TanTriggs.cc"
    "src/GeomNorm.cc"
-   "src/GeomNorm2.cc"
    "src/FaceEyesNorm.cc"
    "src/GaborFrequency.cc"
    "src/GaborSpatial.cc"
@@ -99,7 +99,7 @@ torch_test(ip dctfeatures test/dctfeatures.cc)
 torch_test(ip flipflop test/flipflop.cc)
 torch_test(ip gabor test/Gabor.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
-torch_test(ip geomnorm test/geomnorm.cc)
+#torch_test(ip geomnorm test/geomnorm.cc)
 torch_test(ip facenorm test/facenorm.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
@@ -111,8 +111,8 @@ torch_test(ip zigzag test/zigzag.cc)
 # Defines environment variable used to localize data for the tests
 set_property(TEST cxx-ip-gabor APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
-set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
-  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+#set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
+#  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT

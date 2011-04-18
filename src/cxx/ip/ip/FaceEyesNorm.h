@@ -11,7 +11,7 @@
 #include "core/array_assert.h"
 #include "core/array_check.h"
 #include "ip/rotate.h"
-#include "ip/GeomNorm2.h"
+#include "ip/GeomNorm.h"
 
 namespace tca = Torch::core::array;
 
@@ -85,11 +85,11 @@ namespace Torch {
         int m_crop_offset_w;
 
         blitz::TinyVector<int,2> m_out_shape;
-        boost::shared_ptr<GeomNormNew> m_geom_norm;
+        boost::shared_ptr<GeomNorm> m_geom_norm;
     };
 
     template <typename T> 
-    void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+    inline void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst, const int e1_y, const int e1_x,
       const int e2_y, const int e2_x) 
     { 
@@ -122,4 +122,4 @@ namespace Torch {
  */
 }
 
-#endif /* TORCH5SPRO_IP_GEOM_NORM2_H */
+#endif /* TORCH5SPRO_IP_FACE_EYES_NORM_H */

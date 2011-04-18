@@ -1,29 +1,29 @@
 /**
- * @file database/BinaryArrayCodec.h
+ * @file database/HDF5ArrayCodec.h
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Describes a generic API for reading and writing data to external
  * files.
  */
 
-#ifndef TORCH_DATABASE_BINARYARRAYCODEC_H 
-#define TORCH_DATABASE_BINARYARRAYCODEC_H
+#ifndef TORCH_DATABASE_HDF5ARRAYCODEC_H 
+#define TORCH_DATABASE_HDF5ARRAYCODEC_H
 
 #include "database/ArrayCodec.h"
 
 namespace Torch { namespace database {
 
   /**
-   * BinaryArrayCodecs can read and write single arrays into a Torch-compatible
+   * HDF5ArrayCodecs can read and write single arrays into a Torch-compatible
    * binary file.
    */
-  class BinaryArrayCodec : public ArrayCodec {
+  class HDF5ArrayCodec : public ArrayCodec {
 
     public:
 
-      BinaryArrayCodec();
+      HDF5ArrayCodec();
 
-      virtual ~BinaryArrayCodec();
+      virtual ~HDF5ArrayCodec();
 
       /**
        * Returns the element type and the number of dimensions of the stored
@@ -70,4 +70,4 @@ namespace Torch { namespace database {
 
 }}
 
-#endif /* TORCH_DATABASE_BINARYARRAYCODEC_H */
+#endif /* TORCH_DATABASE_HDF5ARRAYCODEC_H */

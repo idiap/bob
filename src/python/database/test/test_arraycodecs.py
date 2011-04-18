@@ -27,10 +27,10 @@ def testcase_transcode(self, codecname, filename):
   """Runs a complete transcoding test, to and from the binary format."""
 
   testcodec = torch.database.ArrayCodecRegistry.getCodecByName(codecname)
-  bincodec = torch.database.ArrayCodecRegistry.getCodecByName("torch.array.binary")
+  bincodec = torch.database.ArrayCodecRegistry.getCodecByName("hdf5.array.binary")
 
   # transcode to binary
-  tmpname = tempname('.bin')
+  tmpname = tempname('.hdf5')
   bincodec.save(tmpname, testcodec.load(filename))
   self.assertEqual(bincodec.load(tmpname).get(), testcodec.load(filename).get())
 

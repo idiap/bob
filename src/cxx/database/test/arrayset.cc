@@ -58,10 +58,10 @@ struct T {
  */
 std::string temp_file() {
   boost::filesystem::path tpl = Torch::core::tmpdir();
-  tpl /= "torchtest_core_binformatXXXXXX.bin";
+  tpl /= "torchtest_core_binformatXXXXXX.hdf5";
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
   strcpy(char_tpl.get(), tpl.file_string().c_str());
-  int fd = mkstemps(char_tpl.get(),4);
+  int fd = mkstemps(char_tpl.get(),5);
   close(fd);
   boost::filesystem::remove(char_tpl.get());
   std::string res = char_tpl.get();
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
 
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::DimensionError );
+  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::Exception );
 
 
   // Copy constructor
@@ -283,10 +283,10 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);
+  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("hdf5.arrayset.binary"), 0);
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::DimensionError );
+  BOOST_CHECK_THROW( db_Ar.add(g), Torch::database::Exception );
   
   // Create an Arrayset from a file and check its properties
   Torch::database::Arrayset db_Ar_read(tmp_file);
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare(db_Ar_read.getCodec()->name()), 0); 
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar_read.add(g), Torch::database::DimensionError );
+  BOOST_CHECK_THROW( db_Ar_read.add(g), Torch::database::Exception );
 
   db_Ar_read.load();
   BOOST_CHECK_EQUAL(db_Ar_read.isLoaded(), true);
@@ -489,7 +489,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
   BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("torch.arrayset.binary"), 0);
+  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("hdf5.arrayset.binary"), 0);
   // Check data
   ids.clear();
   db_Ar.index( ids);

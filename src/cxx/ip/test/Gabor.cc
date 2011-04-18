@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_spatial )
 
   // Check the kernel
   boost::filesystem::path path_kernel_ref( testdata_cpath);
-  path_kernel_ref /= "Gabor/gabor_spatial_filter.bin";
+  path_kernel_ref /= "Gabor/gabor_spatial_filter.hdf5";
   Torch::database::Array ar_spatial_kernel(path_kernel_ref.string());
   blitz::Array<std::complex<double>,2> ref_kernel = ar_spatial_kernel.get<std::complex<double>,2>();
   checkBlitzClose( GS_filter.getKernel(), ref_kernel, eps1);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_spatial )
   // Check the filtered image
   GS_filter(img_src,img_processed);
   boost::filesystem::path path_img_ref( testdata_cpath);
-  path_img_ref /= "Gabor/gabor_spatial_filtered.bin";
+  path_img_ref /= "Gabor/gabor_spatial_filtered.hdf5";
   Torch::database::Array ar_spatial_image(path_img_ref.string());
   blitz::Array<std::complex<double>,2> ref_image = ar_spatial_image.get<std::complex<double>,2>();
   checkBlitzClose( img_processed, ref_image, eps1);
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency )
 
   // Check the kernel
   boost::filesystem::path path_kernel_ref( testdata_cpath);
-  path_kernel_ref /= "Gabor/gabor_frequency_filter.bin";
+  path_kernel_ref /= "Gabor/gabor_frequency_filter.hdf5";
   Torch::database::Array ar_frequency_kernel(path_kernel_ref.string());
   blitz::Array<std::complex<double>,2> ref_kernel = ar_frequency_kernel.get<std::complex<double>,2>();
   checkBlitzClose( GF_filter.getKernelShifted(), ref_kernel, eps1);
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency )
   // Check the filtered image
   GF_filter(img_src,img_processed);
   boost::filesystem::path path_img_ref( testdata_cpath);
-  path_img_ref /= "Gabor/gabor_frequency_filtered.bin";
+  path_img_ref /= "Gabor/gabor_frequency_filtered.hdf5";
   Torch::database::Array ar_frequency_image(path_img_ref.string());
   blitz::Array<std::complex<double>,2> ref_image = ar_frequency_image.get<std::complex<double>,2>();
   checkBlitzClose( img_processed, ref_image, eps2);
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency_envelope )
 
   // Check the kernel
   boost::filesystem::path path_kernel_ref( testdata_cpath);
-  path_kernel_ref /= "Gabor/gabor_frequency_filter.bin";
+  path_kernel_ref /= "Gabor/gabor_frequency_filter.hdf5";
   Torch::database::Array ar_frequency_kernel(path_kernel_ref.string());
   blitz::Array<std::complex<double>,2> ref_kernel = ar_frequency_kernel.get<std::complex<double>,2>();
   checkBlitzClose( GF_filter.getKernelShifted(), ref_kernel, eps1);
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE( test_Gabor_2d_frequency_envelope )
   // Check the filtered image
   GF_filter(img_src,img_processed);
   boost::filesystem::path path_img_ref( testdata_cpath);
-  path_img_ref /= "Gabor/gabor_frequency_filtered.bin";
+  path_img_ref /= "Gabor/gabor_frequency_filtered.hdf5";
   Torch::database::Array ar_frequency_image(path_img_ref.string());
   blitz::Array<std::complex<double>,2> ref_image = ar_frequency_image.get<std::complex<double>,2>();
   checkBlitzClose( img_processed, ref_image, eps2);

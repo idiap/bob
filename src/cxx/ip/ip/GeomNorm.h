@@ -3,12 +3,11 @@
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines a class to perform geometric normalization of an
- * image. This means that given two points, the image is:
- *   1/ rotated such that the angle between the x-axis and the line connecting
- *       the two points is set to some given value,
- *   2/ rescaled such that the distance between the two (rotated) points is set
- *       to some given value,
- *   3/ cropped with respect to the two points given, and to a given size.
+ * image. This means that the image is:
+ *   1/ rotated with a given angle and a rotation center
+ *   2/ rescaled according to a given scaling factor
+ *   3/ cropped with respect to the point given and the additional
+ *        cropping parameters.
  */
 
 #ifndef TORCH5SPRO_IP_GEOM_NORM_H
@@ -35,15 +34,12 @@ namespace Torch {
 
     /**
      * @brief This file defines a class to perform geometric normalization of 
-     * an image. This means that given two points, the image is:
-     *   1/ rotated such that the angle between the x-axis and the line
-     *       connecting the two points is set to some given value,
-     *   2/ rescaled such that the distance between the two (rotated) points
-     *       is set to some given value,
-     *   3/ cropped with respect to the two points given, and to a given size.
-     * In particular, this is the case when we want to crop a face from an 
-     * image, into a rotated sample image of a given size.
-    */
+     * an image. This means that the image is:
+     *   1/ rotated with a given angle and a rotation center
+     *   2/ rescaled according to a given scaling factor
+     *   3/ cropped with respect to the point given and the additional
+     *        cropping parameters.
+     */
     class GeomNorm
     {
       public:
@@ -51,8 +47,9 @@ namespace Torch {
         /**
           * @brief Constructor
           */
-        GeomNorm(const int eyes_distance, const int height, const int width, 
-          const int border_h, const int border_w);
+        GeomNorm(const double rotation_angle, const double scaling_factor, 
+          const int crop_height, const int crop_width, 
+          const int crop_offset_h, const int crop_offset_w);
 
         /**
           * @brief Destructor
@@ -60,77 +57,112 @@ namespace Torch {
         virtual ~GeomNorm();
 
         /**
+          * @brief Accessors
+          */
+        inline const double getRotationAngle() { return m_rotation_angle; }
+        inline const double getScalingFactor() { return m_scaling_factor; }
+        inline const int getCropHeight() { return m_crop_height; }
+        inline const int getCropWidth() { return m_crop_width; }
+        inline const int getCropOffsetH() { return m_crop_offset_h; }
+        inline const int getCropOffsetW() { return m_crop_offset_w; }
+
+        /**
+          * @brief Mutators
+          */
+        inline void setRotationAngle(const double angle) 
+          { m_rotation_angle = angle; }
+        inline void setScalingFactor(const double scaling_factor) 
+          { m_scaling_factor = scaling_factor; }
+        inline void setCropHeight(const int crop_h) 
+          { m_crop_height = crop_h; }
+        inline void setCropWidth(const int crop_w) 
+          { m_crop_width = crop_w; }
+        inline void setCropOffsetH(const int crop_dh) 
+          { m_crop_offset_h = crop_dh; }
+        inline void setCropOffsetW(const int crop_dw) 
+          { m_crop_offset_w = crop_dw; }
+
+        /**
           * @brief Process a 2D blitz Array/Image by applying the geometric
           * normalization
           */
         template <typename T> void operator()(const blitz::Array<T,2>& src, 
-          blitz::Array<double,2>& dst, const int y1, const int x1, 
-          const int y2, const int x2);
+          blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x, 
+          const int crop_ref_y, const int crop_ref_x);
 
       private:
         /**
           * Attributes
           */
-        int m_eyes_distance;
-        int m_height;
-        int m_width;
-        int m_border_h;
-        int m_border_w;
+        double m_rotation_angle;
+        double m_scaling_factor;
+        int m_crop_height;
+        int m_crop_width;
+        int m_crop_offset_h;
+        int m_crop_offset_w;
 
         blitz::TinyVector<int,2> m_out_shape; 
-        blitz::Array<double, 2> m_src_d;
         blitz::Array<double, 2> m_centered;
         blitz::Array<double, 2> m_rotated;
         blitz::Array<double, 2> m_scaled;
     };
 
+    // TODO: Refactor with Geometry module to keep track of the cropping
+    // point coordinates after each operation
     template <typename T> 
     void GeomNorm::operator()(const blitz::Array<T,2>& src, 
-      blitz::Array<double,2>& dst, const int y1, const int x1,
-      const int y2, const int x2) 
+      blitz::Array<double,2>& dst, const int rot_c_y, const int rot_c_x,
+      const int crop_ref_y, const int crop_ref_x) 
     { 
       // Check input
       tca::assertZeroBase(src);
 
       // Check output
       tca::assertZeroBase(dst);
-      tca::assertSameShape(dst,m_out_shape);
+      tca::assertSameShape(dst, m_out_shape);
 
-      // Compute the coordinates of the point defined as the center of the
-      // segment of the two points (/eyes).
-      const int yc = abs(y1+y2) / 2;
-      const int xc = abs(x1+x2) / 2;
-    
       // 0/ Cast input to double
       blitz::Array<double,2> src_d = Torch::core::cast<double>(src);
  
       // 1/ Expand the image such the the point (yc,xc) is at the center
       blitz::TinyVector<int,2> shape = 
-        getGenerateWithCenterShape(src_d,yc,xc);
+        getGenerateWithCenterShape(src_d, rot_c_y, rot_c_x);
+      blitz::TinyVector<int,2> offset = 
+        getGenerateWithCenterOffset(src_d, rot_c_y, rot_c_x);
       if( !tca::hasSameShape(m_centered, shape) )
         m_centered.resize( shape );
-      generateWithCenter(src_d,m_centered,yc,xc);
-        
+      generateWithCenter(src_d, m_centered, rot_c_y, rot_c_x);
+
+      // new coordinate of the cropping reference point
+      int crop_ref_y1 = offset(0) + crop_ref_y;
+      int crop_ref_x1 = offset(1) + crop_ref_x;
+
       // 2/ Rotate to align the image with the x-axis
-      const double angle = getAngleToHorizontal(y1, x1, y2, x2);
-      shape = getShapeRotated(m_centered, angle);
+      shape = getShapeRotated(m_centered, m_rotation_angle);
       if( !tca::hasSameShape(m_rotated, shape) )
         m_rotated.resize( shape );
-      rotate(m_centered,m_rotated,angle);
+      rotate(m_centered, m_rotated, m_rotation_angle);
 
-      // 3/ Rescale such that the distance between the points/eyes is as expected
-      const double eyes_distance_init = 
-        sqrt((y1-y2)*(y1-y2) + (x1-x2)*(x1-x2));
+      // new coordinate of the cropping reference point
+      crop_ref_y1 = crop_ref_y1 - m_centered.extent(0)/2;
+      crop_ref_x1 = crop_ref_x1 - m_centered.extent(1)/2;
+      int crop_ref_y2 = crop_ref_y1 * cos(m_rotation_angle) - crop_ref_x1 * sin(m_rotation_angle) + m_rotated.extent(0)/2;
+      int crop_ref_x2 = crop_ref_x1 * cos(m_rotation_angle) + crop_ref_y1 * sin(m_rotation_angle) + m_rotated.extent(1)/2;
 
-      const double scale_factor = m_eyes_distance / eyes_distance_init;
-      shape(0) = src.extent(0) * scale_factor;
-      shape(1) = src.extent(1) * scale_factor;
+      // 3/ Scale with the given scaling factor
+      shape(0) = m_rotated.extent(0) * m_scaling_factor;
+      shape(1) = m_rotated.extent(1) * m_scaling_factor;
       if( !tca::hasSameShape(m_scaled, shape) )
         m_scaled.resize( shape );
-      scale(m_rotated,m_scaled);
+      scale(m_rotated, m_scaled);
+
+      // new coordinate of the cropping reference point
+      int crop_ref_y3 = crop_ref_y2 * m_scaling_factor;
+      int crop_ref_x3 = crop_ref_x2 * m_scaling_factor;
 
       // 4/ Crop the face
-      cropFace(m_scaled, dst, m_eyes_distance, m_border_h, m_border_w);
+      crop(m_scaled, dst, crop_ref_y3 - m_crop_offset_h, 
+        crop_ref_x3 - m_crop_offset_w, m_crop_height, m_crop_width);
     }
 
   }

@@ -10,6 +10,6 @@
 
 using namespace Torch::core::python;
 
-void bind_database_exception() {
-  CxxToPythonTranslator<Torch::ip::Exception>("Exception", "Raised when no other exception type is better to describe the problem. You should never use this!");
+void bind_ip_exception() {
+  CxxToPythonTranslator<Torch::ip::Exception, Torch::core::Exception>("Exception", "Raised when no other exception type is better to describe the problem. You should never use this!");
 }

@@ -9,6 +9,7 @@
 
 using namespace boost::python;
 
+void bind_ip_exception();
 void bind_ip_ipcore();
 void bind_ip_color();
 void bind_ip_oldcolor();
@@ -21,10 +22,12 @@ void bind_ip_flow();
 void bind_ip_dctfeatures();
 void bind_ip_gabor();
 void bind_ip_geomnorm();
+void bind_ip_faceeyesnorm();
 void bind_ip_tantriggs();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
   scope().attr("__doc__") = "Torch image processing classes and sub-classes";
+  bind_ip_exception();
   bind_ip_ipcore();
   bind_ip_color();
   bind_ip_oldcolor();
@@ -37,5 +40,6 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_dctfeatures();
   bind_ip_gabor();
   bind_ip_geomnorm();
+  bind_ip_faceeyesnorm();
   bind_ip_tantriggs();
 }

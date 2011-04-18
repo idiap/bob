@@ -25,7 +25,25 @@ namespace Torch {
 
     namespace detail {
       /**
-        * @brief Function which crops a 2D blitz::array/image of a given type.
+        * @brief Checks the given cropping parameters wrt. given input 
+        *   dimensions, and throws an exception if one part of the cropping
+        *   area is outside the boundary of the source array.
+        * @param crop_x The x-offset of the top left corner of the cropping area 
+        * wrt. to the x-index of the top left corner of the blitz::array.
+        * @param crop_y The y-offset of the top left corner of the cropping area 
+        * wrt. to the y-index of the top left corner of the blitz::array.
+        * @param crop_w The desired width of the cropped blitz::array.
+        * @param crop_h The desired height of the cropped blitz::array.
+        * @param src_height The height of the input image
+        * @param src_width The width of the input image
+        */
+      void cropParameterCheck( const int crop_y, const int crop_x,
+        const int crop_h, const int crop_w, const int src_height, 
+        const int src_width);
+
+      /**
+        * @brief Function which crops a 2D blitz::array/image of a given type,
+        *   and references to the data of the src array.
         *   The first dimension is the height (y-axis), whereas the second
         *   one is the width (x-axis).
         * @param src The input blitz array
@@ -65,8 +83,9 @@ namespace Torch {
         * of the input blitz array should be filled with zero values, or with 
         * the intensity of the closest pixel in the neighbourhood.
         */
-      template<typename T>
-      void cropNoCheck(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
+      template<typename T, bool mask>
+      void cropNoCheck(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
+        blitz::Array<T,2>& dst, blitz::Array<bool,2>& dst_mask,
         const int crop_y, const int crop_x, const int crop_h, const int crop_w,
         const bool zero_out)
       {
@@ -79,10 +98,16 @@ namespace Torch {
             if( is_y_out || x+crop_x<0 || x+crop_x>=src.extent(1) ) {
               x_src = tca::keepInRange( x+crop_x, 0, src.extent(1)-1);
               dst(y,x) = (zero_out ? 0 : 
-                src( y_src+src.lbound(0), x_src+src.lbound(1)) );
+                src( y_src, x_src) );
+              if( mask )
+                dst(y,x) = false;
             }
-            else
-              dst(y,x) = src( y+crop_y+src.lbound(0), x+crop_x+src.lbound(1));
+            else {
+              dst(y,x) = src( y+crop_y, x+crop_x);
+              if( mask )
+                dst(y,x) = true;
+              
+            } 
           }
         }
       }
@@ -107,31 +132,12 @@ namespace Torch {
     void cropReference(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
       const int crop_y, const int crop_x, const int crop_h, const int crop_w)
     {
+      // Check parameters and throw exception if required
+      detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
+        src.extent(0), src.extent(1) );
       // Checks that the src array has zero base indices
       tca::assertZeroBase( src);
 
-      // Check parameters and throw exception if required
-      if( crop_x<0 ) {
-        throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
-      }
-      if( crop_y<0) {
-        throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
-      }
-      if( crop_w<0) {
-        throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
-      }
-      if( crop_h<0) {
-        throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
-      }
-      if( crop_x+crop_w>src.extent(1)) {
-        throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
-          src.extent(1) );
-      }
-      if( crop_y+crop_h>src.extent(0)) {
-        throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
-          src.extent(0) );
-      }
-    
       // Crop the 2D array
       detail::cropNoCheckReference(src, dst, crop_y, crop_x, crop_h, crop_w);
     }
@@ -140,8 +146,6 @@ namespace Torch {
       * @brief Function which crops a 2D blitz::array/image of a given type.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array
       * @param crop_x The x-offset of the top left corner of the cropping area 
@@ -161,38 +165,21 @@ namespace Torch {
       const int crop_y, const int crop_x, const int crop_h, const int crop_w,
       const bool allow_out=false, const bool zero_out=false)
     {
+      // Check parameters and throw exception if required
+      if(!allow_out) 
+        detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
+          src.extent(0), src.extent(1) );
+      // Check input 
+      tca::assertZeroBase(src);
       // Check output
       const blitz::TinyVector<int,2> shape(crop_h,crop_w);
       tca::assertZeroBase(dst);
       tca::assertSameShape(dst, shape);
-
-      // Check parameters and throw exception if required
-      if(!allow_out) 
-      {
-        if( crop_x<0 ) {
-          throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
-        }
-        if( crop_y<0) {
-          throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
-        }
-        if( crop_w<0) {
-          throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
-        }
-        if( crop_h<0) {
-          throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
-        }
-        if( crop_x+crop_w>src.extent(1)) {
-          throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
-            src.extent(1) );
-        }
-        if( crop_y+crop_h>src.extent(0)) {
-          throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
-            src.extent(0) );
-        }
-      }
     
       // Crop the 2D array
-      detail::cropNoCheck(src, dst, crop_y, crop_x, crop_h, crop_w, zero_out);
+      blitz::Array<bool,2> src_mask, dst_mask; 
+      detail::cropNoCheck<T,false>(src, src_mask, dst, dst_mask, crop_y, 
+        crop_x, crop_h, crop_w, zero_out);
     }
 
 
@@ -200,8 +187,6 @@ namespace Torch {
       * @brief Function which crops a 3D blitz::array/image of a given type.
       *   The first dimension is the number of planes, the second one the 
       *   height (y-axis), whereas the third one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero 
-      *   base index.
       * @param src The input blitz array
       * @param dst The output blitz array
       * @param crop_x The x-offset of the top left corner of the cropping area 
@@ -221,36 +206,18 @@ namespace Torch {
       const int crop_y, const int crop_x, const int crop_h, const int crop_w,
       const bool allow_out=false, const bool zero_out=false)
     {
+      // Check parameters and throw exception if required
+      if(!allow_out) 
+        detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
+          src.extent(1), src.extent(2) );
+      // Check input
+      tca::assertZeroBase( src);
       // Check output
       const blitz::TinyVector<int,3> shape(src.extent(0), crop_h, crop_w);
       tca::assertZeroBase(dst);
       tca::assertSameShape(dst, shape);
-
-      // Check parameters and throw exception if required
-      if(!allow_out) 
-      {
-        if( crop_x<0 ) {
-          throw ParamOutOfBoundaryError("crop_x", false, crop_x, 0);
-        }
-        if( crop_y<0) {
-          throw ParamOutOfBoundaryError("crop_y", false, crop_y, 0);
-        }
-        if( crop_w<0) {
-          throw ParamOutOfBoundaryError("crop_w", false, crop_w, 0);
-        }
-        if( crop_h<0) {
-          throw ParamOutOfBoundaryError("crop_h", false, crop_h, 0);
-        }
-        if( crop_x+crop_w>src.extent(2)) {
-          throw ParamOutOfBoundaryError("crop_x+crop_w", true, crop_x+crop_w, 
-            src.extent(2) );
-        }
-        if( crop_y+crop_h>src.extent(1)) {
-          throw ParamOutOfBoundaryError("crop_y+crop_h", true, crop_y+crop_h, 
-            src.extent(1) );
-        }
-      }
-    
+ 
+      blitz::Array<bool,2> src_mask, dst_mask; 
       for( int p=0; p<dst.extent(0); ++p) {
         // Prepare reference array to 2D slices
         const blitz::Array<T,2> src_slice = 
@@ -258,29 +225,116 @@ namespace Torch {
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
         // Crop the 2D array
-        detail::cropNoCheck(src_slice, dst_slice, crop_y, crop_x, crop_h,
-          crop_w, zero_out);
+        detail::cropNoCheck<T,false>(src_slice, src_mask, dst_slice, dst_mask,
+          crop_y, crop_x, crop_h, crop_w, zero_out);
       }
     }
 
     /**
-      * TODO
-      * @deprecated To be remove (replaced using the FaceEyesNorm )
+      * @brief Function which crops a 2D blitz::array/image of a given type,
+      *   taking into consideration masks. Masks are used to specify which
+      *   pixels are 'valid' in the input and output arrays/images.
+      *   The first dimension is the height (y-axis), whereas the second
+      *   one is the width (x-axis).
+      * @param src The input blitz array
+      * @param src_mask The input blitz array mask, specifying the valid
+      *   pixels of src.
+      * @param dst The output blitz array
+      * @param dst_mask The output blitz array mask, specifying the valid
+      *   pixels of dst.
+      * @param crop_x The x-offset of the top left corner of the cropping area 
+      * wrt. to the x-index of the top left corner of the blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping area 
+      * wrt. to the y-index of the top left corner of the blitz::array.
+      * @param crop_w The desired width of the cropped blitz::array.
+      * @param crop_h The desired height of the cropped blitz::array.
+      * @param allow_out Whether an exception should be raised or not if a part
+      * of the cropping area is out of the boundary of the input blitz array.
+      * @param zero_out Whether the cropping area which is out of the boundary
+      * of the input blitz array should be filled with zero values, or with 
+      * the intensity of the closest pixel in the neighbourhood.
       */
     template<typename T>
-    void cropFace(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst,
-	      const int eyes_distance, const int border_h, const int border_w)
+    void crop(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
+      blitz::Array<T,2>& dst, blitz::Array<bool,2>& dst_mask,
+      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
+      const bool allow_out=false, const bool zero_out=false)
     {
-      // TODO: transmits h/w-ratio
-	    const int center_h = src.extent(0)/2;
-	    const int center_w = src.extent(1)/2;
-
-      const int crop_y0 = center_h - 5./19.*(dst.extent(0)-2*border_h) - border_h;
-      const int crop_x0 = center_w - 0.5*(dst.extent(1)-2*border_w) - border_w;
-
-	    crop(src, dst, crop_y0, crop_x0, dst.extent(0), dst.extent(1), true);
+      // Check parameters and throw exception if required
+      if(!allow_out) 
+        detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
+          src.extent(0), src.extent(1) );
+      // Check input 
+      tca::assertZeroBase(src);
+      tca::assertZeroBase(src_mask);
+      tca::assertSameShape(src, src_mask);
+      // Check output
+      const blitz::TinyVector<int,2> shape(crop_h,crop_w);
+      tca::assertZeroBase(dst);
+      tca::assertZeroBase(dst_mask);
+      tca::assertSameShape(dst, dst_mask);
+      tca::assertSameShape(dst, shape);
+    
+      // Crop the 2D array
+      detail::cropNoCheck<T,true>(src, src_mask, dst, dst_mask, crop_y, 
+        crop_x, crop_h, crop_w, zero_out);
     }
 
+
+    /**
+      * @brief Function which crops a 3D blitz::array/image of a given type.
+      *   The first dimension is the number of planes, the second one the 
+      *   height (y-axis), whereas the third one is the width (x-axis).
+      * @param src The input blitz array
+      * @param src_mask The input blitz array mask, specifying the valid
+      *   pixels of src.
+      * @param dst The output blitz array
+      * @param dst_mask The output blitz array mask, specifying the valid
+      *   pixels of dst.
+      * @param crop_x The x-offset of the top left corner of the cropping area 
+      * wrt. to the x-index of the top left corner of the blitz::array.
+      * @param crop_y The y-offset of the top left corner of the cropping area 
+      * wrt. to the y-index of the top left corner of the blitz::array.
+      * @param crop_w The desired width of the cropped blitz::array.
+      * @param crop_h The desired height of the cropped blitz::array.
+      * @param allow_out Whether an exception should be raised or not if a part
+      * of the cropping area is out of the boundary of the input blitz array.
+      * @param zero_out Whether the cropping area which is out of the boundary
+      * of the input blitz array should be filled with zero values, or with 
+      * the intensity of the closest pixel in the neighbourhood.
+      */
+    template<typename T>
+    void crop(const blitz::Array<T,3>& src, const blitz::Array<bool,3>& src_mask,
+      blitz::Array<T,3>& dst, blitz::Array<bool,3>& dst_mask,
+      const int crop_y, const int crop_x, const int crop_h, const int crop_w,
+      const bool allow_out=false, const bool zero_out=false)
+    {
+      // Check parameters and throw exception if required
+      if(!allow_out) 
+        detail::cropParameterCheck( crop_y, crop_x, crop_h, crop_w, 
+          src.extent(1), src.extent(2) );
+      // Check input
+      tca::assertZeroBase(src);
+      tca::assertZeroBase(src_mask);
+      tca::assertSameShape(src, src_mask);
+      // Check output
+      const blitz::TinyVector<int,3> shape(src.extent(0), crop_h, crop_w);
+      tca::assertZeroBase(dst);
+      tca::assertZeroBase(dst_mask);
+      tca::assertSameShape(dst, dst_mask);
+      tca::assertSameShape(dst, shape);
+ 
+      for( int p=0; p<dst.extent(0); ++p) {
+        // Prepare reference array to 2D slices
+        const blitz::Array<T,2> src_slice = 
+          src( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<T,2> dst_slice = 
+          dst( p, blitz::Range::all(), blitz::Range::all() );
+        // Crop the 2D array
+        detail::cropNoCheck<T,true>(src_slice, src_mask, dst_slice, dst_mask,
+          crop_y, crop_x, crop_h, crop_w, zero_out);
+      }
+    }
   }
 /**
  * @}

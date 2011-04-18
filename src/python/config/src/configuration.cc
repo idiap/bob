@@ -92,7 +92,6 @@ class PythonBindingsConfig: public conf::Configuration {
 
 };
 
-
 void bind_config_configuration() {
   class_<PythonBindingsConfig>("Configuration", "The configuration class allows easy access to values encoded in a supported configuration file format using a map/dictionary like interface.", init<const std::string&>(arg("filename"), "Initializes a new Configuration object giving it the filename that contains the configuration items you want to load."))
     .def(init<>("Initializes a new empty Configuration object"))

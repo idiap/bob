@@ -14,7 +14,9 @@ set(pysrc
    "src/DCTFeatures.cc"
    "src/Gabor.cc"
    "src/GeomNorm.cc"
+   "src/FaceEyesNorm.cc"
    "src/TanTriggs.cc"
+   "src/exception.cc"
    "src/main.cc"
    )
 

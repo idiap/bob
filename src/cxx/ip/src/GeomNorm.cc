@@ -9,12 +9,13 @@
 
 namespace ip = Torch::ip;
 
-ip::GeomNorm::GeomNorm( const int eyes_distance,  
-  const int height, const int width, 
-  const int border_h, const int border_w):
-  m_eyes_distance(eyes_distance), m_height(height), m_width(width),
-  m_border_h(border_h), m_border_w(border_w), 
-  m_out_shape(height+border_h*2,width+border_w*2)
+ip::GeomNorm::GeomNorm( const double rotation_angle, const double scaling_factor,
+  const int crop_height, const int crop_width, const int crop_offset_h, 
+  const int crop_offset_w): 
+  m_rotation_angle(rotation_angle), m_scaling_factor(scaling_factor),
+  m_crop_height(crop_height), m_crop_width(crop_width),
+  m_crop_offset_h(crop_offset_h), m_crop_offset_w(crop_offset_w),
+  m_out_shape(crop_height, crop_width)
 {
 }
 
