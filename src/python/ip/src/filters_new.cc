@@ -27,6 +27,10 @@ static const char* FLIP2D_DOC = "Flip a 2D blitz array/image upside-down.";
 static const char* FLIP3D_DOC = "Flip a 3D blitz array/image upside-down.";
 static const char* FLOP2D_DOC = "Flop a 2D blitz array/image left-right.";
 static const char* FLOP3D_DOC = "Flop a 3D blitz array/image left-right.";
+static const char* GENERATEWITHCENTER2D_DOC = "Extend a 2D blitz array/image, putting a given point in the center.";
+static const char* GENERATEWITHCENTER2D_MASK_DOC = "Extend a 2D blitz array/image, putting a given point in the center, taking mask into account.";
+static const char* GET_GENERATEWITHCENTER_SHAPE2D_DOC = "Return the shape of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.";
+static const char* GET_GENERATEWITHCENTER_OFFSET2D_DOC = "Return the offset of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.";
 static const char* RESCALE2D_DOC = "Rescale a 2D blitz array/image with the given dimensions.";
 static const char* SHEARX2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the X-dimension.";
 static const char* SHEARY2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the Y-dimension.";
@@ -58,6 +62,10 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
   def("flip", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP3D_DOC); \
   def("flop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP2D_DOC); \
   def("flop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP3D_DOC); \
+  def("getGenerateWithCenterShape", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const int, const int))&Torch::ip::getGenerateWithCenterShape<T>, (arg("src"), arg("center_y"), arg("center_x")), GET_GENERATEWITHCENTER_SHAPE2D_DOC); \
+  def("getGenerateWithCenterOffset", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const int, const int))&Torch::ip::getGenerateWithCenterOffset<T>, (arg("src"), arg("center_y"), arg("center_x")), GET_GENERATEWITHCENTER_OFFSET2D_DOC); \
+  def("generateWithCenter", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int))&Torch::ip::generateWithCenter<T>, (arg("src"), arg("dst"), arg("center_y"), arg("center_x")), GENERATEWITHCENTER2D_DOC); \
+  def("generateWithCenter", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<T,2>&, blitz::Array<bool,2>&, const int, const int))&Torch::ip::generateWithCenter<T>, (arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("center_y"), arg("center_x")), GENERATEWITHCENTER2D_MASK_DOC); \
   def("scale", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const enum Torch::ip::Rescale::Algorithm))&Torch::ip::scale<T>, rescale_overloads_ ## N ((arg("src"), arg("dst"), arg("algorithm")="BilinearInterp"), RESCALE2D_DOC)); \
   def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARX2D_DOC)); \
   def("shearY", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARY2D_DOC)); \
