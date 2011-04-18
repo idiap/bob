@@ -25,12 +25,13 @@
 #include <boost/filesystem.hpp>
 
 struct T {
-  blitz::Array<uint32_t,2> a2, a2r_90, a2r_180, a2r_270;
+  blitz::Array<uint32_t,2> a2, a2r_90, a2r_180, a2r_270, a8;
   blitz::Array<uint32_t,2> a5, a55, a33;
+  blitz::Array<bool,2> a8m, a8m_45;
   double eps;
 
-  T(): a2(3,4), a2r_90(4,3), a2r_180(3,4), a2r_270(4,3),
-       a5(3,5), a55(5,5), a33(3,3), eps(0.03)
+  T(): a2(3,4), a2r_90(4,3), a2r_180(3,4), a2r_270(4,3), a8(8,8),
+       a5(3,5), a55(5,5), a33(3,3), a8m(8,8), a8m_45(11,11), eps(0.03)
   {
     a2 = 0, 1, 2, 3,
         4, 5, 6, 7,
@@ -49,6 +50,25 @@ struct T {
         9, 5, 1,
         10, 6, 2,
         11, 7, 3;
+
+    a8 = 1;
+    a8m = true;
+    // The following might likely be improved. Do not consider that as a pure 
+    // reference mask. Bilinear interpolation might be better with masks, as
+    // the mask keep decreasing in size while performing successive shearing 
+    // operations.
+    a8m_45 = 
+      false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false, true, true, true, false, false, false, false, false,
+      false, false, false, true, true, true, true, true, false, false, false,
+      false, true, true, true, true, true, true, true, false, false, false,
+      false, true, true, true, true, true, true, true, true, true, false,
+      false, false, true, true, true, true, true, true, false, false, false,
+      false, false, false, true, true, true, true, false, false, false, false,
+      false, false, false, false, true, true, true, false, false, false, false,
+      false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false, false, false, false, false, false, false, false, false;
   }
 
   ~T() {}
@@ -269,6 +289,19 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   Torch::database::Array ar_img_r5(testdata_path_img.string());
   blitz::Array<uint8_t,3> img_ref_r5 = ar_img_r5.get<uint8_t,3>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_rotate_2d_mask )
+{
+  blitz::Array<double,2> b8;
+  blitz::Array<bool,2> b8_mask;
+
+  // Rotation of 45
+  Torch::ip::Rotate rotate(45.);
+  b8.resize( rotate.getOutputShape(a8, 45.) );
+  b8_mask.resize( b8.shape() );
+  rotate(a8, a8m, b8, b8_mask, 45.);
+  checkBlitzEqual(a8m_45, b8_mask); 
 }
 
 BOOST_AUTO_TEST_SUITE_END()
