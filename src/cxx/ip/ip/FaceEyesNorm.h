@@ -10,7 +10,6 @@
 #include <boost/shared_ptr.hpp>
 #include "core/array_assert.h"
 #include "core/array_check.h"
-#include "ip/Rotate.h"
 #include "ip/GeomNorm.h"
 
 namespace tca = Torch::core::array;
@@ -67,7 +66,7 @@ namespace Torch {
           { m_crop_offset_w = crop_dw; m_geom_norm->setCropOffsetW(crop_dw); }
 
         /**
-          * @brief Process a 2D blitz Array/Image by applying the geometric
+          * @brief Process a 2D face image by applying the geometric
           * normalization
           */
         template <typename T> void operator()(const blitz::Array<T,2>& src, 

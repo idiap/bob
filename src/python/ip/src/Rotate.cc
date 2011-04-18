@@ -29,6 +29,8 @@ ROTATE_DECL(double)
 #define ROTATE_DEF(T) \
   .def("__call__", (void (ip::Rotate::*)(const blitz::Array<T,2>&, blitz::Array<double,2>&))&ip::Rotate::operator()<T>, (arg("self"), arg("input"), arg("output")), "Call an object of this type to perform a rotation of an image.") \
   .def("__call__", (void (ip::Rotate::*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double))&ip::Rotate::operator()<T>, (arg("self"), arg("input"), arg("output"), arg("rotation_angle")), "Call an object of this type to perform a rotation of an image with the given angle.") \
+  .def("__call__", (void (ip::Rotate::*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<double,2>&, blitz::Array<bool,2>&))&ip::Rotate::operator()<T>, (arg("self"), arg("input"), arg("input_mask"), arg("output"), arg("output_mask")), "Call an object of this type to perform a rotation of an image.") \
+  .def("__call__", (void (ip::Rotate::*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<double,2>&, blitz::Array<bool,2>&, const double))&ip::Rotate::operator()<T>, (arg("self"), arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("rotation_angle")), "Call an object of this type to perform a rotation of an image.") \
   .def("getOutputShape", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const double))&getOutputShape, (arg("input"), arg("rotation_angle")), "Return the required output shape for the given input and rotation angle.")
 
 void bind_ip_rotate() {
@@ -38,6 +40,8 @@ void bind_ip_rotate() {
     ;
 
   class_<ip::Rotate, boost::shared_ptr<ip::Rotate> >("Rotate", rotate_doc, init<const double, optional<const Torch::ip::Rotate::Algorithm> >((arg("rotation_angle"), arg("rotation_algorithm")="Shearing"), "Constructs a Rotate object."))
+    .add_property("angle", &ip::Rotate::getAngle, &ip::Rotate::setAngle)
+    .add_property("algorithm", &ip::Rotate::getAlgorithm, &ip::Rotate::setAlgorithm)
     ROTATE_DEF(uint8_t)
     ROTATE_DEF(uint16_t)
     ROTATE_DEF(double)
