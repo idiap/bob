@@ -12,6 +12,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "core/logging.h"
+#include "core/cast.h"
 #include "ip/scale.h"
 
 #include "database/Array.h"
@@ -24,8 +25,22 @@
 
 struct T {
   double eps;
+  blitz::Array<uint8_t,2> img_44, img_22;
+  blitz::Array<bool,2> img_m44, img_m22;
 
-  T(): eps(0.01) {}
+  T(): eps(0.01), img_44(4,4), img_22(2,2), img_m44(4,4), img_m22(2,2)
+  {
+    img_44 = 0;
+    img_22 = 0;
+
+    img_m44 = false, false, true, true, 
+              false, false, true, true,
+              true, true, true, true, 
+              true, true, true, true;
+    
+    img_m22  = false, true, 
+               true, true;
+  }
 
   ~T() {}
 };
@@ -58,8 +73,8 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 }
 
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
+template<typename T, typename U>  
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2, 
   const double eps )
 {
   int y_min = std::min( t1.extent(0), t2.extent(0));
@@ -69,14 +84,14 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   double diff = 0.;
   for( int i=0; i<y_min; ++i)
     for( int j=0; j<x_min; ++j)
-      diff += abs( t1(i,j) - t2(i,j) );
+      diff += abs( t1(i,j) - Torch::core::cast<T>(t2(i,j)) );
   diff = (diff/(y_min*x_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2, 
+template<typename T, typename U>  
+void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2, 
   const double eps )
 {
   int p_min = std::min( t1.extent(0), t2.extent(0));
@@ -89,7 +104,7 @@ void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2,
   for( int i=0; i<p_min; ++i)
     for( int j=0; j<y_min; ++j)
       for( int k=0; k<x_min; ++k)
-        diff += abs( t1(i,j,k) - t2(i,j,k) );
+        diff += abs( t1(i,j,k) - Torch::core::cast<T>(t2(i,j,k)) );
   diff = (diff/(y_min*x_min*p_min)) / 
     (std::numeric_limits<T>::max()-std::numeric_limits<T>::min()+1);
   BOOST_CHECK_SMALL( diff, eps );
@@ -113,7 +128,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   testdata_path_img /= "image.pgm";
   Torch::database::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
-  blitz::Array<uint8_t,2> img_processed;
+  blitz::Array<double,2> img_processed;
 
 
   // Scale original image and compare with ImageMagick reference image
@@ -149,6 +164,15 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   img_processed.resize(100,100); 
   Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
   checkBlitzClose( img, img_processed, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_scale_2d_mask )
+{
+  blitz::Array<double,2> b2(2,2);
+  blitz::Array<bool,2> b2_mask(2,2);
+  Torch::ip::scale( img_44, img_m44, b2, b2_mask, Torch::ip::Rescale::BilinearInterp);
+  checkBlitzEqual( img_22, b2);
+  checkBlitzEqual( img_m22, b2_mask);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

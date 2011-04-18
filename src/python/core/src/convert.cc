@@ -33,4 +33,10 @@ void bind_core_convert() {
     ARRAY_CONVERT_DEFS(uint8_t, uint8, 1)
     ARRAY_CONVERT_DEFS(uint16_t, uint16, 1)
     ARRAY_CONVERT_DEFS(double, float64, 1)
+    ARRAY_CONVERT_DEFS(uint8_t, uint8, 2)
+    ARRAY_CONVERT_DEFS(uint16_t, uint16, 2)
+    ARRAY_CONVERT_DEFS(double, float64, 2)
+    ARRAY_CONVERT_DEFS(uint8_t, uint8, 3)
+    ARRAY_CONVERT_DEFS(uint16_t, uint16, 3)
+    ARRAY_CONVERT_DEFS(double, float64, 3)
 }

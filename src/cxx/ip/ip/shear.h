@@ -36,7 +36,11 @@ namespace Torch {
         *   one is the width (x-axis).
         * @warning No check is performed on the dst blitz::array/image.
         * @param src The input blitz array
+        * @param src_mask The input blitz array mask, specifying the valid
+        *   pixels of src.
         * @param dst The output blitz array
+        * @param dst_mask The output blitz array mask, specifying the valid
+        *   pixels of dst.
         * @param shear The shear parameter in the matrix [1 shear; 0 1]
         */
       template<typename T, bool mask>
@@ -190,6 +194,8 @@ namespace Torch {
       *   one is the width (x-axis).
       * @param src The input blitz array
       * @param dst The output blitz array
+      * @param dst_mask The output blitz array mask, specifying the valid
+      *   pixels of dst.
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
       * @param antialias Whether antialiasing should be used or not 
       */
@@ -216,7 +222,11 @@ namespace Torch {
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
       * @param src The input blitz array
+      * @param src_mask The input blitz array mask, specifying the valid
+      *   pixels of src.
       * @param dst The output blitz array
+      * @param dst_mask The output blitz array mask, specifying the valid
+      *   pixels of dst.
       * @param shear The shear parameter in the matrix [1 shear; 0 1]
       * @param antialias Whether antialiasing should be used or not 
       */
@@ -279,7 +289,11 @@ namespace Torch {
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
       * @param src The input blitz array
+      * @param src_mask The input blitz array mask, specifying the valid
+      *   pixels of src.
       * @param dst The output blitz array
+      * @param dst_mask The output blitz array mask, specifying the valid
+      *   pixels of dst.
       * @param shear The shear parameter in the matrix [1 0; shear 1]
       * @param antialias Whether antialiasing should be used or not 
       */

@@ -11,6 +11,7 @@
 
 #include "core/array_assert.h"
 #include "core/array_index.h"
+#include "core/cast.h"
 #include "ip/Exception.h"
 #include "ip/common.h"
 
@@ -38,7 +39,7 @@ namespace Torch {
         */
       template<typename T, bool mask>
       void scaleNoCheck2D_BI(const blitz::Array<T,2>& src, 
-        const blitz::Array<bool,2>& src_mask, blitz::Array<T,2>& dst,
+        const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
         blitz::Array<bool,2>& dst_mask)
       {
         const int height = dst.extent(0);
@@ -60,7 +61,7 @@ namespace Torch {
             int x_ind2 = tca::keepInRange( x_ind1+1, 0, src.extent(1)-1);
             double val = dx1*dy1*src(y_ind1, x_ind1)+dx1*dy2*src(y_ind2, x_ind1)
               + dx2*dy1*src(y_ind1, x_ind2 )+dx2*dy2*src(y_ind2, x_ind2 );
-            dst(y,x) = (T)val; // TODO Check C-style cast
+            dst(y,x) = val; // TODO Check C-style cast
             if( mask) {
               bool all_in_mask = true;
               for( int ym=y_ind1; ym<=y_ind2; ++ym)
@@ -91,7 +92,7 @@ namespace Torch {
       * @param alg The algorithm used for rescaling.
       */
     template<typename T>
-    void scale(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+    void scale(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
       const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize src if required
@@ -113,8 +114,11 @@ namespace Torch {
       }
   
       // If src and dst have the same shape, do a simple copy
-      if( height==src.extent(0) && width==src.extent(1))
-        detail::copyNoCheck(src,dst);
+      if( height==src.extent(0) && width==src.extent(1)) {
+        for( int y=0; y<src.extent(0); ++y)
+          for( int x=0; x<src.extent(1); ++x)
+            dst(y,x) = Torch::core::cast<double>(src(y,x));
+      }
       // Otherwise, do the rescaling
       else
       {    
@@ -129,7 +133,7 @@ namespace Torch {
             }
             break;
           default:
-            throw Torch::ip::Exception();
+            throw Torch::ip::Exception(); // TODO: specialized exception
         }
       }
     }
@@ -145,7 +149,7 @@ namespace Torch {
       */
     template<typename T>
     void scale(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
-      blitz::Array<T,2>& dst, blitz::Array<bool,2>& dst_mask,
+      blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask,
       const enum Rescale::Algorithm alg=Rescale::BilinearInterp)
     {
       // Check and resize src if required
@@ -172,7 +176,9 @@ namespace Torch {
   
       // If src and dst have the same shape, do a simple copy
       if( height==src.extent(0) && width==src.extent(1)) {
-        detail::copyNoCheck(src,dst);
+        for( int y=0; y<src.extent(0); ++y)
+          for( int x=0; x<src.extent(1); ++x)
+            dst(y,x) = Torch::core::cast<double>(src(y,x));
         detail::copyNoCheck(src_mask,dst_mask); 
       }
       // Otherwise, do the rescaling

@@ -17,8 +17,10 @@
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2sX_p27, a2sX_m27, a2sY_p27, a2sY_m27;
+  blitz::Array<bool,2> b2sX_m27;
 
-  T(): a2(8,8), a2sX_p27(8,10), a2sX_m27(8,10), a2sY_p27(10,8), a2sY_m27(10,8)
+  T(): a2(8,8), a2sX_p27(8,10), a2sX_m27(8,10), a2sY_p27(10,8), a2sY_m27(10,8),
+       b2sX_m27(8,10)
   {
     a2 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15,
@@ -68,6 +70,15 @@ struct T {
                56, 57, 50, 51, 52, 53, 46, 47,
                0, 0, 58, 59, 60, 61, 54, 55,
                0, 0, 0, 0, 0, 0, 62, 63;
+
+    b2sX_m27 = false, false, true, true, true, true, true, true, true, true,
+               false, false, true, true, true, true, true, true, true, true,
+               false, true, true, true, true, true, true, true, true, false,
+               false, true, true, true, true, true, true, true, true, false,
+               false, true, true, true, true, true, true, true, true, false,
+               false, true, true, true, true, true, true, true, true, false,
+               true, true, true, true, true, true, true, true, false, false,
+               true, true, true, true, true, true, true, true, false, false;
   }
 
   ~T() {}
@@ -136,14 +147,8 @@ BOOST_AUTO_TEST_CASE( test_shearX_2d_uint32_mask )
   // X-axis Shear +2px
   b2.resize(Torch::ip::getShearXShape(a2, 2./7.));
   Torch::ip::shearX( a2, a2_mask, b2, b2_mask, 2./7., false);
-  std::cout << a2 << std::endl;
-  std::cout << b2 << std::endl;
-  std::cout << b2_mask << std::endl;
-
-/*  checkBlitzEqual( a2sY_p27, b2);
-  // Y-axis Shear -2px
-  Torch::ip::shearY( a2, b2, -2./7., false);
-  checkBlitzEqual( a2sY_m27, b2);*/
+  checkBlitzEqual( a2sX_p27, b2);
+  checkBlitzEqual( b2sX_m27, b2_mask);
 }
 
 BOOST_AUTO_TEST_CASE( test_shearXY_2d_double_random )
