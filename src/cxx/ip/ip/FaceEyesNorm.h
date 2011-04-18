@@ -10,7 +10,7 @@
 #include <boost/shared_ptr.hpp>
 #include "core/array_assert.h"
 #include "core/array_check.h"
-#include "ip/rotate.h"
+#include "ip/Rotate.h"
 #include "ip/GeomNorm.h"
 
 namespace tca = Torch::core::array;
@@ -73,8 +73,18 @@ namespace Torch {
         template <typename T> void operator()(const blitz::Array<T,2>& src, 
           blitz::Array<double,2>& dst, const int e1_y, const int e1_x, 
           const int e2_y, const int e2_x);
+        template <typename T> void operator()(const blitz::Array<T,2>& src, 
+          const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
+          blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x, 
+          const int e2_y, const int e2_x);
 
       private:
+        template <typename T, bool mask> 
+        void processNoCheck(const blitz::Array<T,2>& src, 
+          const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
+          blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x, 
+          const int e2_y, const int e2_x);
+
         /**
           * Attributes
           */
@@ -100,6 +110,40 @@ namespace Torch {
       tca::assertZeroBase(dst);
       tca::assertSameShape(dst, m_out_shape);
 
+      // Process
+      blitz::Array<bool,2> src_mask, dst_mask;
+      processNoCheck<T,false>(src, src_mask, dst, dst_mask, e1_y, e1_x, e2_y, 
+        e2_x); 
+    }
+
+    template <typename T> 
+    inline void FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+      const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
+      blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x,
+      const int e2_y, const int e2_x) 
+    { 
+      // Check input
+      tca::assertZeroBase(src);
+      tca::assertZeroBase(src_mask);
+      tca::assertSameShape(src,src_mask);
+
+      // Check output
+      tca::assertZeroBase(dst);
+      tca::assertZeroBase(dst_mask);
+      tca::assertSameShape(dst,dst_mask);
+      tca::assertSameShape(dst, m_out_shape);
+
+      // Process
+      processNoCheck<T,true>(src, src_mask, dst, dst_mask, e1_y, e1_x, e2_y, 
+        e2_x); 
+    }
+
+    template <typename T, bool mask> 
+    inline void FaceEyesNorm::processNoCheck(const blitz::Array<T,2>& src, 
+      const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
+      blitz::Array<bool,2>& dst_mask, const int e1_y, const int e1_x,
+      const int e2_y, const int e2_x) 
+    { 
       // Get angle to horizontal
       const double angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x);
       m_geom_norm->setRotationAngle( angle);
@@ -113,7 +157,12 @@ namespace Torch {
       int center_x = (e1_x + e2_x) / 2;
 
       // Perform the normalization
-      m_geom_norm->operator()(src, dst, center_y, center_x, center_y, center_x);
+      if(mask)
+        m_geom_norm->operator()(src, src_mask, dst, dst_mask, center_y, 
+          center_x, center_y, center_x);
+      else
+        m_geom_norm->operator()(src, dst, center_y, center_x, center_y, 
+          center_x);
     }
 
   }

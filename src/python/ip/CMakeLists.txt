@@ -15,6 +15,7 @@ set(pysrc
    "src/Gabor.cc"
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
+   "src/Rotate.cc"
    "src/TanTriggs.cc"
    "src/main.cc"
    )

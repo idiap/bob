@@ -165,10 +165,6 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   Torch::database::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed;
-  blitz::Array<bool,2> src_mask(img.shape());
-  blitz::Array<bool,2> dst_mask;
-  src_mask = true;
-
 
   // Rotate original image and compare with ImageMagick reference image
   // Warning: ImageMagick considers opposite angles wrt. to us
@@ -176,9 +172,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
 
   // 5 degrees
   img_processed.resize(rotate.getOutputShape(img,5.) ); 
-  dst_mask.resize(rotate.getOutputShape(img,5.) ); 
-  rotate( img, src_mask, img_processed, dst_mask, 5.);
-  std::cout << dst_mask << std::endl;
+  rotate( img, img_processed, 5.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
   Torch::database::Array ar_img_r5(testdata_path_img.string());

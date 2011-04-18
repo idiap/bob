@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/ip/ip/rotate.h
+ * @file src/cxx/ip/ip/Rotate.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines a function to rotate a 2D or 3D array/image.
