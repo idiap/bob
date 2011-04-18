@@ -484,7 +484,7 @@ namespace Torch {
           }
           break;
         default:
-          throw Torch::ip::Exception();
+          throw Torch::ip::UnknownRotatingAlgorithm();
       }
     }
 

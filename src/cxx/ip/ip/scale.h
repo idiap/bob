@@ -133,7 +133,7 @@ namespace Torch {
             }
             break;
           default:
-            throw Torch::ip::Exception(); // TODO: specialized exception
+            throw Torch::ip::UnknownScalingAlgorithm();
         }
       }
     }
@@ -194,7 +194,7 @@ namespace Torch {
             }
             break;
           default:
-            throw Torch::ip::Exception();
+            throw Torch::ip::UnknownScalingAlgorithm();
         }
       }
     }
