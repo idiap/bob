@@ -38,3 +38,13 @@ Some basic usage of Arrays / Matrices
    print B + 5                # It is possible to add a scalar to all element in matrix
 
    print  0.45 * A + B + 1    # Example of rich expressions
+
+Converting and casting in Python
+--------------------------------
+
+It is sometimes nessassary to cast or convert arrays.
+
+.. code-block:: python
+
+   import torch
+
