@@ -6,13 +6,78 @@
 """Tests basic Configuration functionality available for the python bindings
 """
 
-import os, sys
+import os, sys, tempfile, random
 import unittest
 import torch
+import numpy
 
 DATADIR = os.path.join('..', '..', '..', 'cxx', 'config', 'test', 'data')
 EX1 = os.path.join(DATADIR, 'example1.py')
 EX2BROKEN = os.path.join(DATADIR, 'example2.py')
+
+def tempname(suffix, prefix='torchtest_'):
+  (fd, name) = tempfile.mkstemp(suffix, prefix)
+  os.close(fd)
+  os.unlink(name)
+  return name
+
+def gen_array(dtype):
+  SHAPE = (2, 3, 4, 2) #48 elements in arrays
+  data = [random.uniform(0, 10) for z in range(numpy.product(SHAPE))]
+  nparray = numpy.array(data).reshape(SHAPE)
+  return torch.database.Array(torch.core.array.array(nparray, dtype))
+
+def gen_arrayset(dtype):
+  N = 10
+  SHAPE = (2, 3, 4, 2) #48 elements in arrays
+  aset = torch.database.Arrayset()
+  for k in range(N):
+    data = [random.uniform(0,N) for z in range(numpy.product(SHAPE))]
+    nparray = numpy.array(data).reshape(SHAPE)
+    aset.append(torch.core.array.array(nparray, dtype))
+  return aset
+
+def gen_vector(dtype):
+  cls = getattr(torch.core.vector, dtype)
+  obj = cls()
+  obj[:] = [1, 2, 3, 4, 5, 6, 10, 9, 8, 7]
+  return obj
+
+def test_readwrite(self, var):
+  """Tests a full chain write/read for HDF5 configuration support"""
+
+  cfg = torch.config.Configuration()
+  cfg['variable'] = var
+  tmp = tempname('.hdf5')
+  cfg.save(tmp)
+  cfg2 = torch.config.Configuration(tmp) #re-open
+  self.assertEqual(cfg2['variable'], var)
+  os.unlink(tmp)
+unittest.TestCase.hdf5ReadWrite = test_readwrite
+
+def test_readwrite_single(self, var):
+  """Tests a full chain write/read for HDF5 configuration support"""
+
+  cfg = torch.config.Configuration()
+  cfg['variable'] = var
+  tmp = tempname('.hdf5')
+  cfg.save(tmp)
+  cfg2 = torch.config.Configuration(tmp) #re-open
+  self.assertEqual(cfg2['variable'][0], var)
+  os.unlink(tmp)
+unittest.TestCase.hdf5ReadWriteSingle = test_readwrite_single
+
+def test_readwrite_array(self, var):
+  """Tests a full chain write/read for HDF5 configuration support"""
+
+  cfg = torch.config.Configuration()
+  cfg['variable'] = var
+  tmp = tempname('.hdf5')
+  cfg.save(tmp)
+  cfg2 = torch.config.Configuration(tmp) #re-open
+  self.assertEqual(cfg2['variable'][1], var)
+  os.unlink(tmp)
+unittest.TestCase.hdf5ReadWriteArray = test_readwrite_array
 
 class ConfigTest(unittest.TestCase):
   """Various configuration tests."""
@@ -112,6 +177,74 @@ class ConfigTest(unittest.TestCase):
     # Syntax errors on the configuration (python version) will be automatically
     # caught by the Python interpreter itself
     self.assertRaises(torch.config.PythonError, torch.config.Configuration, EX2BROKEN)
+
+  def test05_canReadWriteHDF5Config(self):
+
+    # This test examplifies how to read/write HDF5-based configuration files in
+    # torch.
+    config = torch.config.Configuration()
+    
+    # Test writing of all supported vector types
+    #self.hdf5ReadWrite(gen_vector('bool')) #not supported by HDF5
+    self.hdf5ReadWrite(gen_vector('int8'))
+    self.hdf5ReadWrite(gen_vector('int16'))
+    self.hdf5ReadWrite(gen_vector('int32'))
+    self.hdf5ReadWrite(gen_vector('int64'))
+    self.hdf5ReadWrite(gen_vector('uint8'))
+    self.hdf5ReadWrite(gen_vector('uint16'))
+    self.hdf5ReadWrite(gen_vector('uint32'))
+    self.hdf5ReadWrite(gen_vector('uint64'))
+    self.hdf5ReadWrite(gen_vector('float32'))
+    self.hdf5ReadWrite(gen_vector('float64'))
+    self.hdf5ReadWrite(gen_vector('float128'))
+    self.hdf5ReadWrite(gen_vector('complex64'))
+    self.hdf5ReadWrite(gen_vector('complex128'))
+    self.hdf5ReadWrite(gen_vector('complex256'))
+
+    # Test writing of all supported array/set types
+    #self.hdf5ReadWrite(gen_arrayset('bool')) #not supported by HDF5
+    self.hdf5ReadWrite(gen_arrayset('int8'))
+    self.hdf5ReadWrite(gen_arrayset('int16'))
+    self.hdf5ReadWrite(gen_arrayset('int32'))
+    self.hdf5ReadWrite(gen_arrayset('int64'))
+    self.hdf5ReadWrite(gen_arrayset('uint8'))
+    self.hdf5ReadWrite(gen_arrayset('uint16'))
+    self.hdf5ReadWrite(gen_arrayset('uint32'))
+    self.hdf5ReadWrite(gen_arrayset('uint64'))
+    self.hdf5ReadWrite(gen_arrayset('float32'))
+    self.hdf5ReadWrite(gen_arrayset('float64'))
+    # The following will not work in python because numpy does not support it
+    #self.hdf5ReadWrite(gen_arrayset('float128'))
+    self.hdf5ReadWrite(gen_arrayset('complex64'))
+    self.hdf5ReadWrite(gen_arrayset('complex128'))
+    # The following will not work in python because numpy does not support it
+    #self.hdf5ReadWrite(gen_arrayset('complex256'))
+
+    # This is a special case of vectors (single scalars)
+    self.hdf5ReadWriteSingle(7) #integer
+    self.hdf5ReadWriteSingle(3.14) #double
+    self.hdf5ReadWriteSingle(complex(2, -1)) #complex<double>
+
+    # This is a special case for arraysets (single arrays)
+    #self.hdf5ReadWriteArray(gen_array('bool')) #not supported by HDF5
+    self.hdf5ReadWriteArray(gen_array('int8'))
+    self.hdf5ReadWriteArray(gen_array('int16'))
+    self.hdf5ReadWriteArray(gen_array('int32'))
+    self.hdf5ReadWriteArray(gen_array('int64'))
+    self.hdf5ReadWriteArray(gen_array('uint8'))
+    self.hdf5ReadWriteArray(gen_array('uint16'))
+    self.hdf5ReadWriteArray(gen_array('uint32'))
+    self.hdf5ReadWriteArray(gen_array('uint64'))
+    self.hdf5ReadWriteArray(gen_array('float32'))
+    self.hdf5ReadWriteArray(gen_array('float64'))
+    # The following will not work in python because numpy does not support it
+    #self.hdf5ReadWriteArray(gen_array('float128'))
+    self.hdf5ReadWriteArray(gen_array('complex64'))
+    self.hdf5ReadWriteArray(gen_array('complex128'))
+    # The following will not work in python because numpy does not support it
+    #self.hdf5ReadWriteArray(gen_array('complex256'))
+    cname = tempname('.hdf5')
+    config.save(cname)
 
 if __name__ == '__main__':
   sys.argv.append('-v')

@@ -26,7 +26,6 @@ set(src_ip
    "src/ipLBP4R.cc"
    "src/ipLBP8R.cc"
    "src/ipLBPBitmap.cc"
-   "src/ipHisto.cc"
    "src/ipSmoothGaussian.cc"
    "src/ipSobel.cc"
    "src/ipFlip.cc"
@@ -55,6 +54,7 @@ set(src_ip
    "src/GaborSpatial.cc"
    "src/GaborBankFrequency.cc"
    "src/GaborBankSpatial.cc"
+   "src/histo.cc"
 )
 #   "src/ipHOG.cc"
 

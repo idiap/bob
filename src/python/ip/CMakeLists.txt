@@ -19,6 +19,7 @@ set(pysrc
    "src/TanTriggs.cc"
    "src/exception.cc"
    "src/main.cc"
+   "src/histo.cc"
    )
 
 include(../../cmake/macros.cmake)
