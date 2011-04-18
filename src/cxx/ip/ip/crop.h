@@ -9,7 +9,6 @@
 #ifndef TORCH5SPRO_IP_CROP_H
 #define TORCH5SPRO_IP_CROP_H
 
-#include "ip/Exception.h"
 #include "core/array_assert.h"
 #include "core/array_index.h"
 

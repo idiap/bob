@@ -5,6 +5,7 @@
  */
 
 #include "ip/crop.h"
+#include "ip/Exception.h"
 
 namespace ipd = Torch::ip::detail;
 

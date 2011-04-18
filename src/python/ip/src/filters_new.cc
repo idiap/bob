@@ -20,7 +20,9 @@
 using namespace boost::python;
 
 static const char* CROP2D_DOC = "Crop a 2D blitz array/image.";
+static const char* CROP2D_MASK_DOC = "Crop a 2D blitz array/image, taking mask into account.";
 static const char* CROP3D_DOC = "Crop a 3D blitz array/image.";
+static const char* CROP3D_MASK_DOC = "Crop a 3D blitz array/image, taking mask into account.";
 static const char* FLIP2D_DOC = "Flip a 2D blitz array/image upside-down.";
 static const char* FLIP3D_DOC = "Flip a 3D blitz array/image upside-down.";
 static const char* FLOP2D_DOC = "Flop a 2D blitz array/image left-right.";
@@ -36,6 +38,7 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
 
 #define FILTER_DECL(T,N) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(crop_overloads_ ## N, Torch::ip::crop<T>, 6, 8) \
+  BOOST_PYTHON_FUNCTION_OVERLOADS(crop_mask_overloads_ ## N, Torch::ip::crop<T>, 8, 10) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(rescale_overloads_ ## N, Torch::ip::scale<T>, 2, 3) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shearX_overloads_ ## N, Torch::ip::shearX<T>, 3, 4) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shearY_overloads_ ## N, Torch::ip::shearY<T>, 3, 4) \
@@ -45,7 +48,9 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
 
 #define FILTER_DEF(T,N) \
   def("crop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")="False", arg("zero_out")="False"), CROP2D_DOC)); \
+  def("crop", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<T,2>&, blitz::Array<bool,2>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")="False", arg("zero_out")="False"), CROP2D_MASK_DOC)); \
   def("crop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")="False", arg("zero_out")="False"), CROP3D_DOC)); \
+  def("crop", (void (*)(const blitz::Array<T,3>&, const blitz::Array<bool,3>&, blitz::Array<T,3>&, blitz::Array<bool,3>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")="False", arg("zero_out")="False"), CROP3D_MASK_DOC)); \
   def("flip", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP2D_DOC); \
   def("flip", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP3D_DOC); \
   def("flop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP2D_DOC); \

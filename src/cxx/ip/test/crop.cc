@@ -14,14 +14,17 @@
 
 #include "core/cast.h"
 #include "ip/crop.h"
+#include "ip/Exception.h"
 
 
 struct T {
-  blitz::Array<uint32_t,2> a2, a2c_1, a2c_2, a2c_3;
+  blitz::Array<uint32_t,2> a2, a2c_1, a2c_2, a2c_3, a2c_4;
   blitz::Array<uint32_t,3> a3, a3c_1, a3c_2, a3c_3;
+  blitz::Array<bool,2> a2_m44, a2_m22, a2_m33;
 
-  T(): a2(4,4), a2c_1(2,2), a2c_2(2,6), a2c_3(2,6),
-       a3(3,4,4), a3c_1(3,2,2), a3c_2(3,2,6), a3c_3(3,2,6)
+  T(): a2(4,4), a2c_1(2,2), a2c_2(2,6), a2c_3(2,6), a2c_4(3,3),
+       a3(3,4,4), a3c_1(3,2,2), a3c_2(3,2,6), a3c_3(3,2,6),
+       a2_m44(4,4), a2_m22(2,2), a2_m33(3,3)
   {
     a2 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15;
@@ -33,6 +36,8 @@ struct T {
 
     a2c_3 = 4, 4, 5, 6, 7, 7,
             8, 8, 9, 10, 11, 11;
+
+    a2c_4 = 0;
 
     a3 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15,
@@ -57,7 +62,13 @@ struct T {
             20, 20, 21, 22, 23, 23,
             24, 24, 25, 26, 27, 27,
             36, 36, 37, 38, 39, 39,
-            40, 40, 41, 42, 43, 43; 
+            40, 40, 41, 42, 43, 43;
+
+    a2_m44 = false, false, false, false, true, true, true, true,
+             true, true, true, true, false, false, false, false;
+
+    a2_m22 = true;
+    a2_m33 = false;
   }
 
   ~T() {}
@@ -156,5 +167,28 @@ BOOST_AUTO_TEST_CASE( test_crop_2d_ref )
   checkBlitzEqual(a2c_1, b2); 
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_CASE( test_crop_2d_mask_uint8 )
+{
+  blitz::Array<uint32_t,2> b2(4,4);
+  blitz::Array<bool,2> b2_mask(4,4);
+  // Full crop
+  Torch::ip::crop(a2, a2_m44, b2, b2_mask, 0, 0, 4, 4);
+  checkBlitzEqual(a2, b2); 
+  checkBlitzEqual(a2_m44, b2_mask); 
 
+  // Crop the middle part
+  b2.resize(2,2);
+  b2_mask.resize(2,2);
+  Torch::ip::crop(a2, a2_m44, b2, b2_mask, 1, 1, 2, 2);
+  checkBlitzEqual(a2c_1, b2); 
+  checkBlitzEqual(a2_m22, b2_mask); 
+
+  // Crop the upper left part
+  b2.resize(3,3);
+  b2_mask.resize(3,3);
+  Torch::ip::crop(a2, a2_m44, b2, b2_mask, -2, -2, 3, 3, true, true);
+  checkBlitzEqual(a2c_4, b2);
+  checkBlitzEqual(a2_m33, b2_mask);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
