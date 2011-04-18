@@ -90,6 +90,11 @@ void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2)
 }
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
+
+BOOST_AUTO_TEST_CASE( test_shift )
+{
+}
+
 /*
 BOOST_AUTO_TEST_CASE( test_shift_down_right )
 {
