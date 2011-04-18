@@ -271,6 +271,10 @@ static void delete_h5file (hid_t* p) {
 static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
     unsigned int flags) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5file));
+  if (!boost::filesystem::exists(path) && flags == H5F_ACC_RDONLY) {
+    //file was opened for reading, but does not exist... Raise
+    throw db::FileNotReadable(path.string());
+  }
   if (boost::filesystem::exists(path) && flags != H5F_ACC_TRUNC) { //open
     *retval = H5Fopen(path.string().c_str(), flags, H5P_DEFAULT);
     if (*retval < 0) throw db::HDF5StatusError("H5Fopen", *retval);

@@ -21,6 +21,7 @@
  * @todo Missing support for arbitrary groups (80% done see TODOs)
  * @todo Inprint file creation time, author, comments?
  * @todo Missing support for automatic endianness conversion
+ * @todo Missing true support for scalars
  */
 
 #ifndef TORCH_DATABASE_HDF5UTILS_H 
