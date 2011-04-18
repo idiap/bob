@@ -44,6 +44,8 @@ namespace Torch {
       *   2D mask of booleans (i.e. a 2D blitz array).
       *   The first dimension is the height (y-axis), whereas the second one
       *   is the width (x-axis).
+      * @warning The function assumes that the true values on the mask form
+      *   a convex area.
       * @param src The 2D input blitz array mask.
       * @result A blitz::TinyVector which contains in the following order:
       *   0/ The y-coordinate of the top left corner
