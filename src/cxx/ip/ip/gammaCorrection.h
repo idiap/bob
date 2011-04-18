@@ -8,12 +8,12 @@
  */
 
 #ifndef TORCH5SPRO_IP_GAMMA_CORRECTION_H
-#define TORCH5SPRO_IP_GAMMA_CORRECTION_H 1
+#define TORCH5SPRO_IP_GAMMA_CORRECTION_H
 
-#include "core/logging.h"
-#include "ip/Exception.h"
-#include "ip/common.h"
+#include <blitz/array.h>
 #include <cmath>
+#include "core/array_assert.h"
+#include "ip/Exception.h"
 
 namespace Torch {
 /**
@@ -63,14 +63,9 @@ namespace Torch {
     void gammaCorrection(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst, const double gamma)
     {
-      // Check and reindex if required
-      if( dst.base(0) != 0 || dst.base(1) != 0 ) {
-        const blitz::TinyVector<int,2> zero_base = 0;
-        dst.reindexSelf( zero_base );
-      }
-      // Check and resize dst if required
-      if( dst.extent(0) != src.extent(0) || dst.extent(1) != src.extent(1) )
-        dst.resize( src.extent(0), src.extent(1) );
+      // Check output
+      Torch::core::array::assertZeroBase(dst);
+      Torch::core::array::assertSameShape(dst, src); 
 
       // Check parameters and throw exception if required
       if( gamma < 0.) 

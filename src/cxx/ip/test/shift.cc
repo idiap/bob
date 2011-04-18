@@ -13,12 +13,15 @@
 #include <stdint.h>
 #include "core/cast.h"
 #include "ip/shift.h"
+#include "ip/Exception.h"
 
 struct T {
   blitz::Array<uint32_t,2> a2, a2s_1, a2s_2;
   blitz::Array<uint32_t,3> a3, a3s_1, a3s_2;
+  blitz::Array<bool,2> a2_m1, a2_m2;
 
-  T(): a2(4,4), a2s_1(4,4), a2s_2(4,4), a3(3,4,4), a3s_1(3,4,4), a3s_2(3,4,4) 
+  T(): a2(4,4), a2s_1(4,4), a2s_2(4,4), a3(3,4,4), a3s_1(3,4,4), a3s_2(3,4,4),
+       a2_m1(4,4), a2_m2(4,4)
   {
     a2 = 0, 1, 2, 3, 4, 5, 6, 7,
         8, 9, 10, 11, 12, 13, 14, 15;
@@ -49,6 +52,11 @@ struct T {
         29, 30, 31, 31, 29, 30, 31, 31,
         41, 42, 43, 43, 45, 46, 47, 47,
         45, 46, 47, 47, 45, 46, 47, 47;
+
+    a2_m1 = true;
+
+    a2_m2 = true, true, true, false, true, true, true, false,
+            false, false, false, false, false, false, false, false;
   }
 
   ~T() {}
@@ -85,7 +93,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
 {
-  blitz::Array<uint32_t,2> b2;
+  blitz::Array<uint32_t,2> b2(a2.shape());
   // "No" shift +0 +0
   Torch::ip::shift(a2, b2, 0, 0);
   checkBlitzEqual(a2, b2); 
@@ -105,7 +113,7 @@ BOOST_AUTO_TEST_CASE( test_shift_2d_uint8 )
   
 BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
 {
-  blitz::Array<uint32_t,3> b3;
+  blitz::Array<uint32_t,3> b3(a3.shape());
   // "No" shift +0 +0 
   Torch::ip::shift(a3, b3, 0, 0);
   checkBlitzEqual(a3, b3); 
@@ -123,4 +131,14 @@ BOOST_AUTO_TEST_CASE( test_shift_3d_uint8 )
   checkBlitzEqual(a3s_2, b3); 
 }
 
+BOOST_AUTO_TEST_CASE( test_shift_2d_mask_uint8 )
+{
+  blitz::Array<uint32_t,2> b2(a2.shape());
+  blitz::Array<bool,2> b2_mask(b2.shape());
+  // Shift +2y +1x (fill with zero)
+  Torch::ip::shift(a2, a2_m1, b2, b2_mask, 2, 1, false, true);
+  checkBlitzEqual(a2s_1, b2); 
+  checkBlitzEqual(a2_m2, b2); 
+}
+  
 BOOST_AUTO_TEST_SUITE_END()

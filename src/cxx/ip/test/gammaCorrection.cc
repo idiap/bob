@@ -65,7 +65,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_gammacorrection_2d_uint32 )
 {
-  blitz::Array<double,2> b2;
+  blitz::Array<double,2> b2(a2.shape());
   
   // gamma == 0.1
   Torch::ip::gammaCorrection(a2, b2, 0.1);

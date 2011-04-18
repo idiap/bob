@@ -104,24 +104,46 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_shearX_2d_uint32 )
 {
-  blitz::Array<uint32_t,2> b2;  
+  blitz::Array<double,2> b2;
   // X-axis Shear +2px
+  b2.resize(Torch::ip::getShearXShape(a2, 2./7.));
   Torch::ip::shearX( a2, b2, 2./7., false);
   checkBlitzEqual( a2sX_p27, b2);
   // X-axis Shear -2px
+  b2.resize(Torch::ip::getShearXShape(a2, -2./7.));
   Torch::ip::shearX( a2, b2, -2./7., false);
   checkBlitzEqual( a2sX_m27, b2);
 }
 
 BOOST_AUTO_TEST_CASE( test_shearY_2d_uint32 )
 {
-  blitz::Array<uint32_t,2> b2;  
+  blitz::Array<double,2> b2;  
   // Y-axis Shear +2px
+  b2.resize(Torch::ip::getShearYShape(a2, 2./7.));
   Torch::ip::shearY( a2, b2, 2./7., false);
   checkBlitzEqual( a2sY_p27, b2);
   // Y-axis Shear -2px
+  b2.resize(Torch::ip::getShearYShape(a2, -2./7.));
   Torch::ip::shearY( a2, b2, -2./7., false);
   checkBlitzEqual( a2sY_m27, b2);
+}
+
+BOOST_AUTO_TEST_CASE( test_shearX_2d_uint32_mask )
+{
+  blitz::Array<double,2> b2;  
+  blitz::Array<bool,2> a2_mask(8,8), b2_mask(8,10);
+  a2_mask = true;
+  // X-axis Shear +2px
+  b2.resize(Torch::ip::getShearXShape(a2, 2./7.));
+  Torch::ip::shearX( a2, a2_mask, b2, b2_mask, 2./7., false);
+  std::cout << a2 << std::endl;
+  std::cout << b2 << std::endl;
+  std::cout << b2_mask << std::endl;
+
+/*  checkBlitzEqual( a2sY_p27, b2);
+  // Y-axis Shear -2px
+  Torch::ip::shearY( a2, b2, -2./7., false);
+  checkBlitzEqual( a2sY_m27, b2);*/
 }
 
 BOOST_AUTO_TEST_CASE( test_shearXY_2d_double_random )
@@ -140,16 +162,20 @@ BOOST_AUTO_TEST_CASE( test_shearXY_2d_double_random )
   blitz::Array<double,2> tmp2, out2, out2_crop;  
 
   // X-axis Shear +m px
+  tmp2.resize(Torch::ip::getShearXShape(in2, (double)m/(Ny-1)));
   Torch::ip::shearX( in2, tmp2, (double)m/(Ny-1), false);
   // X-axis Shear -m px
+  out2.resize(Torch::ip::getShearXShape(tmp2, -(double)m/(Ny-1)));
   Torch::ip::shearX( tmp2, out2, -(double)m/(Ny-1), false);
   // Crop and compare with input
   out2_crop.reference( out2( blitz::Range::all(), blitz::Range(m,m+Nx-1) ) );
   checkBlitzEqual( in2, out2_crop);
   
   // Y-axis Shear +m px
+  tmp2.resize(Torch::ip::getShearYShape(in2, (double)m/(Nx-1)));
   Torch::ip::shearY( in2, tmp2, (double)m/(Nx-1), false);
   // X-axis Shear -m px
+  out2.resize(Torch::ip::getShearYShape(tmp2, -(double)m/(Nx-1)));
   Torch::ip::shearY( tmp2, out2, -(double)m/(Nx-1), false);
   // Crop and compare with input
   out2_crop.reference( out2( blitz::Range(m,m+Ny-1), blitz::Range::all() ) );

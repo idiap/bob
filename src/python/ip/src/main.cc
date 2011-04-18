@@ -18,6 +18,7 @@ void bind_ip_image();
 void bind_ip_lbp();
 void bind_ip_filters();
 void bind_ip_filters_new();
+void bind_ip_rotate();
 void bind_ip_flow();
 void bind_ip_dctfeatures();
 void bind_ip_gabor();
@@ -36,6 +37,7 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_lbp();
   bind_ip_filters();
   bind_ip_filters_new();
+  bind_ip_rotate();
   bind_ip_flow();
   bind_ip_dctfeatures();
   bind_ip_gabor();

@@ -9,6 +9,8 @@
 #ifndef TORCH5SPRO_IP_COMMON_H
 #define TORCH5SPRO_IP_COMMON_H
 
+#include <blitz/array.h>
+
 namespace Torch {
 /**
  * \ingroup libip_api

@@ -9,7 +9,6 @@
 #ifndef TORCH5SPRO_IP_CROP_H
 #define TORCH5SPRO_IP_CROP_H
 
-#include "ip/Exception.h"
 #include "core/array_assert.h"
 #include "core/array_index.h"
 
@@ -69,10 +68,12 @@ namespace Torch {
         * @brief Function which crops a 2D blitz::array/image of a given type.
         *   The first dimension is the height (y-axis), whereas the second
         *   one is the width (x-axis).
-        * @warning The destination array will contain a reference to the 
-        *   cropped area of the source array
         * @param src The input blitz array
+        * @param src_mask The input blitz array mask, specifying the valid
+        *   pixels of src.
         * @param dst The output blitz array
+        * @param dst_mask The input blitz array mask, specifying the valid
+        *   pixels of dst.
         * @param crop_x The x-offset of the top left corner of the cropping area 
         * wrt. to the x-index of the top left corner of the blitz::array.
         * @param crop_y The y-offset of the top left corner of the cropping area 
@@ -100,12 +101,12 @@ namespace Torch {
               dst(y,x) = (zero_out ? 0 : 
                 src( y_src, x_src) );
               if( mask )
-                dst(y,x) = false;
+                dst_mask(y,x) = false;
             }
             else {
               dst(y,x) = src( y+crop_y, x+crop_x);
               if( mask )
-                dst(y,x) = true;
+                dst_mask(y,x) = src_mask( y+crop_y, x+crop_x);
               
             } 
           }
@@ -328,11 +329,15 @@ namespace Torch {
         // Prepare reference array to 2D slices
         const blitz::Array<T,2> src_slice = 
           src( p, blitz::Range::all(), blitz::Range::all() );
+        const blitz::Array<bool,2> src_mask_slice = 
+          src_mask( p, blitz::Range::all(), blitz::Range::all() );
         blitz::Array<T,2> dst_slice = 
           dst( p, blitz::Range::all(), blitz::Range::all() );
+        blitz::Array<bool,2> dst_mask_slice = 
+          dst_mask( p, blitz::Range::all(), blitz::Range::all() );
         // Crop the 2D array
-        detail::cropNoCheck<T,true>(src_slice, src_mask, dst_slice, dst_mask,
-          crop_y, crop_x, crop_h, crop_w, zero_out);
+        detail::cropNoCheck<T,true>(src_slice, src_mask_slice, dst_slice, 
+          dst_mask_slice, crop_y, crop_x, crop_h, crop_w, zero_out);
       }
     }
   }

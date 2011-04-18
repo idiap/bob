@@ -45,6 +45,8 @@ set(src_ip
    "src/Exception.cc"
    "src/HornAndSchunckFlow.cc"
    "src/crop.cc"
+   "src/shift.cc"
+   "src/Rotate.cc"
    "src/TanTriggs.cc"
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
@@ -105,7 +107,7 @@ torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
 torch_test(ip shear test/shear.cc)
 torch_test(ip shift test/shift.cc)
-torch_test(ip shifttocenter test/shifttocenter.cc)
+torch_test(ip generatewithcenter test/generatewithcenter.cc)
 torch_test(ip zigzag test/zigzag.cc)
 
 # Defines environment variable used to localize data for the tests
