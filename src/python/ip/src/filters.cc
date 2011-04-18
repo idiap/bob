@@ -9,7 +9,7 @@
 
 //#include "ip/ipCrop.h"
 //#include "ip/ipFlip.h"
-#include "ip/ipHisto.h"
+//#include "ip/ipHisto.h"
 #include "ip/ipHistoEqual.h"
 #include "ip/ipIntegral.h"
 #include "ip/ipMSRSQIGaussian.h"
@@ -31,7 +31,7 @@ void bind_ip_filters()
 {
 //  class_<Torch::ipCrop, bases<Torch::ipCore> >("ipCrop", "A filter to crop images. Paramters (x,y,w,h). The result is a tensor of the same storage type.", init<>());
 //  class_<Torch::ipFlip, bases<Torch::ipCore> >("ipFlip", "A filter to flip images. Parameters (vertical). The result is a tensor of the same storage type.", init<>());
-  class_<Torch::ipHisto, bases<Torch::ipCore> >("ipHisto", "This class is designed to compute the histogram of some Image (3D ShortTensor). The result is 2D IntTensor with the dimensions (bin counts, planes)", init<>());
+//  class_<Torch::ipHisto, bases<Torch::ipCore> >("ipHisto", "This class is designed to compute the histogram of some Image (3D ShortTensor). The result is 2D IntTensor with the dimensions (bin counts, planes)", init<>());
   class_<Torch::ipHistoEqual, bases<Torch::ipCore> >("ipHistoEqual", "This class is designed to enhance an image using histogram equalisation. The output is the normalized image.", init<>());
   class_<Torch::ipIntegral, bases<Torch::ipCore> >("ipIntegral", "This class is designed to compute the integral image of any 2D/3D tensor type like (height x width [x color channels/modes]). The result will have the same dimensions and size/dimension as the input, but the input type will vary like: Char => Int; Short => Int; Int => Int; Long => Long; Float => Double; Double => Double. NB: For a 3D tensor, the integral image is computed for each 3D channel (that is the third dimension -> e.g. color channels).",  init<>());
   class_<Torch::ipMSRSQIGaussian, bases<Torch::ipCore> >("ipMSRSQIGaussian", "This class is designed to apply a normalize Gaussian or Weighed Gaussian filtering to an image (3D ShortTensor) by convolving a NxM Gaussian or Weighed Gaussianfilter. The implementation is described in: 'Face Recognition under Varying Lighting conditions using Self Quotient Image from Wang, Li and Wang, 2004' for the SelfQuotientImage. In particular, it performs: 1. Normalization by the area of the filter; 2. Mirror interpolation at the border. The result will be a 3D ShortTensor image having the same number of planes. Parameters (RadiusX, RadiusY, Sigma, Weighed).", init<>());
