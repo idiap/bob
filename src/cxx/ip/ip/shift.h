@@ -128,8 +128,6 @@ namespace Torch {
       *   pixels are 'valid' in the input and output arrays/images.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
       * @param src The input blitz array
       * @param src_mask The input blitz array mask, specifying the valid
       *   pixels of src.
@@ -177,8 +175,6 @@ namespace Torch {
       *   pixels are 'valid' in the input and output arrays/images.
       *   The first dimension is the height (y-axis), whereas the second
       *   one is the width (x-axis).
-      * @warning The dst blitz::array/image is resized and reindexed with zero
-      *   base index.
       * @param src The input blitz array
       * @param src_mask The input blitz array mask, specifying the valid
       *   pixels of src.

@@ -31,7 +31,9 @@ static const char* RESCALE2D_DOC = "Rescale a 2D blitz array/image with the give
 static const char* SHEARX2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the X-dimension.";
 static const char* SHEARY2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the Y-dimension.";
 static const char* SHIFT2D_DOC = "Shift a 2D blitz array/image.";
+static const char* SHIFT2D_MASK_DOC = "Shift a 2D blitz array/image, taking mask into account.";
 static const char* SHIFT3D_DOC = "Shift a 3D blitz array/image.";
+static const char* SHIFT3D_MASK_DOC = "Shift a 3D blitz array/image, taking mask into account.";
 static const char* GAMMACORRECTION2D_DOC = "Perform a power-law gamma correction on a 2D blitz array/image.";
 static const char* ZIGZAG2D_DOC = "Extract a 1D blitz array using a zigzag pattern from a 2D blitz array/image.";
 static const char* SCALE_DOC = "Gives back a scaled version of the original blitz array (image)";
@@ -43,6 +45,7 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
   BOOST_PYTHON_FUNCTION_OVERLOADS(shearX_overloads_ ## N, Torch::ip::shearX<T>, 3, 4) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shearY_overloads_ ## N, Torch::ip::shearY<T>, 3, 4) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shift_overloads_ ## N, Torch::ip::shift<T>, 4, 6) \
+  BOOST_PYTHON_FUNCTION_OVERLOADS(shift_mask_overloads_ ## N, Torch::ip::shift<T>, 6, 8) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(zigzag_overloads_ ## N, Torch::ip::zigzag<T>, 2, 4)
 
 
@@ -59,7 +62,9 @@ static const char* SCALE_DOC = "Gives back a scaled version of the original blit
   def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARX2D_DOC)); \
   def("shearY", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")="True"), SHEARY2D_DOC)); \
   def("shift", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT2D_DOC)); \
+  def("shift", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<T,2>&, blitz::Array<bool,2>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("shift_y"), arg("shift_x"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT2D_MASK_DOC)); \
   def("shift", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT3D_DOC)); \
+  def("shift", (void (*)(const blitz::Array<T,3>&, const blitz::Array<bool,3>&, blitz::Array<T,3>&, blitz::Array<bool,3>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("shift_y"), arg("shift_x"), arg("allow_out")="False", arg("zero_out")="False"), SHIFT3D_MASK_DOC)); \
   def("gammaCorrection", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double))&Torch::ip::gammaCorrection<T>, (arg("src"), arg("dst"), arg("gamma")), GAMMACORRECTION2D_DOC); \
   def("zigzag", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,1>&, int, const bool))&Torch::ip::zigzag<T>, zigzag_overloads_ ## N ((arg("src"), arg("dst"), arg("n_coef")="0", arg("right_first")="False"), ZIGZAG2D_DOC)); 
 
