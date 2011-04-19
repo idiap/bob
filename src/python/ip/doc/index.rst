@@ -8,7 +8,11 @@
  Image Processing
 ==================
 
+.. toctree::
+   :maxdepth: 2
+   
+   ExampleUsage01.rst
+   
 .. automodule:: torch.ip
    :members:
-
-   ExampleUsage01
+   
