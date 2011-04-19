@@ -61,7 +61,7 @@ namespace Torch { namespace error {
    *   if positive[k] >= threshold: returnValue[k] = true
    *   else: returnValue[k] = false
    */
-  inline blitz::Array<bool,1> classifyPositives
+  inline blitz::Array<bool,1> correctlyClassifiedPositives
     (const blitz::Array<double,1>& positives, double threshold) {
       return blitz::Array<bool,1>(positives >= threshold);
     }
@@ -75,10 +75,58 @@ namespace Torch { namespace error {
    *   if negative[k] < threshold: returnValue[k] = true
    *   else: returnValue[k] = false
    */
-  inline blitz::Array<bool,1> classifyNegatives
+  inline blitz::Array<bool,1> correctlyClassifiedNegatives
     (const blitz::Array<double,1>& negatives, double threshold) {
       return blitz::Array<bool,1>(negatives < threshold);
     }
+
+  /**
+   * Recursively minimizes w.r.t. to the given predicate method. Please refer
+   * to minimizingThreshold() for a full explanation. This method is only
+   * supposed to be used through that method.
+   */
+  template <typename T>
+  static double recursive_minimization(const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives, T& predicate, 
+      double min, double max, size_t steps) {
+    double step_size = (max-min)/steps;
+    double min_value = predicate(1.0, 0.0); ///< to the left of the range
+   
+    //the accumulator holds the thresholds that given the minimum value for the
+    //input predicate.
+    std::vector<double> accumulator;
+    accumulator.reserve(steps);
+    accumulator.push_back(min);
+
+    for (size_t i=0; i<steps; ++i) {
+      double threshold = (i * step_size) + min;
+      
+      std::pair<double, double> ratios = 
+        farfrr(negatives, positives, threshold);
+      
+      double current_cost = predicate(ratios.first, ratios.second);
+    
+      if (current_cost < min_value) {
+        min_value = current_cost;
+        accumulator.clear(); ///< clean-up, we got a better minima
+        accumulator.push_back(threshold); ///< remember this threshold
+      }
+      else if (current_cost == min_value) { //accumulate to later decide...
+        accumulator.push_back(threshold);
+      }
+    }
+
+    //we stop when it doesn't matter anymore to threshold.
+    if (accumulator.size() != steps) { 
+      //still needs some refinement: pick-up the middle of the range and go
+      return recursive_minimization(negatives, positives, predicate,
+          accumulator[accumulator.size()/2]-step_size,
+          accumulator[accumulator.size()/2]+step_size,
+          steps);
+    }
+   
+    return accumulator[accumulator.size()/2];
+  }
 
   /**
    * This method can calculate a threshold based on a set of scores (positives
@@ -92,6 +140,9 @@ namespace Torch { namespace error {
    * use operator(). The API for the method is:
    *
    * double predicate(double fa_ratio, double fr_ratio);
+   *
+   * Please note that this method will only work with single-minima smooth
+   * predicates.
    *
    * The minimization is carried out in a recursive manner. First, we identify
    * the threshold that minimizes the predicate given a set of N (N=100)
@@ -107,9 +158,15 @@ namespace Torch { namespace error {
    * give the same minima. At this point, the center threshold is picked up and
    * returned.
    */
-  double minimizingThreshold(const blitz::Array<double,1>& negatives,
-      const blitz::Array<double,1>& positives,
-      double (*predicate)(double, double));
+  template <typename T> double 
+    minimizingThreshold(const blitz::Array<double,1>& negatives,
+        const blitz::Array<double,1>& positives, T& predicate) {
+      const size_t N = 100; ///< number of steps in each iteration
+      double min = std::min(blitz::min(negatives), blitz::min(positives));
+      double max = std::max(blitz::max(negatives), blitz::max(positives));
+      return recursive_minimization(negatives, positives, predicate, min,
+          max, N);
+    }
 
   /**
    * Calculates the threshold that is, as close as possible, to the
@@ -121,50 +178,64 @@ namespace Torch { namespace error {
       const blitz::Array<double,1>& positives);
 
   /**
-   * Calculates the threshold that minimizes the half-total error rate (HTER),
-   * given the input data. An optional parameter 'cost' determines the relative
-   * importance between false-accepts and false-rejections. This number should
-   * be between 0 and 1 and will be clipped to those extremes.
+   * Calculates the threshold that minimizes the error rate, given the input
+   * data. An optional parameter 'cost' determines the relative importance
+   * between false-accepts and false-rejections. This number should be between
+   * 0 and 1 and will be clipped to those extremes.
    *
    * The value to minimize becomes:
    *
-   * HTER_cost = [cost * FAR] + [(1-cost) * FRR]
+   * ER_cost = [cost * FAR] + [(1-cost) * FRR]
    *
    * The higher the cost, the higher the importance given to *not* making
    * mistakes classifying negatives/noise/impostors.
    */
-  double minHterThreshold(const blitz::Array<double,1>& negatives,
-      const blitz::Array<double,1>& positives, double cost=0.5);
+  double minWeightedErrorRateThreshold(const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives, double cost);
+
+  /**
+   * Calculates the minWeightedErrorRateThreshold() when the cost is 0.5.
+   */
+  inline double minHterThreshold(const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives) {
+    return minWeightedErrorRateThreshold(negatives, positives, 0.5);
+  }
 
   /**
    * Calculates the ROC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
-   * doubles that express the X and Y coordinates in this order.
+   * doubles that express the X and Y coordinates in this order. The points in
+   * which the ROC curve are calculated are distributed uniformily in the range
+   * [min(negatives, positives), max(negatives, positives)].
    */
   blitz::Array<double,2> roc
     (const blitz::Array<double,1>& negatives,
      const blitz::Array<double,1>& positives, size_t points);
 
   /**
-   * Calculates the DET curve given a set of positive and negative scores and a
-   * number of desired points. Returns a two-dimensional blitz::Array of
-   * doubles that express the X and Y coordinates in this order.
-   */
-  blitz::Array<double,2> det
-    (const blitz::Array<double,1>& negatives,
-     const blitz::Array<double,1>& positives, size_t points);
-
-  /**
    * Calculates the EPC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
-   * doubles that express the X and Y coordinates in this order.
+   * doubles that express the X and Y coordinates in this order. Please note
+   * that, in order to calculate the EPC curve, one needs two sets of data
+   * comprising a development set and a test set. The minimum weighted error is
+   * calculated on the development set and then applied to the test set to
+   * evaluate the half-total error rate at that position.
    *
-   * The EPC curve defines the minimum HTER with a varying cost between 0 and
-   * 1. 
+   * The EPC curve plots the HTER on the test set for various values of 'cost'.
+   * For each value of 'cost', a threshold is found that provides the minimum
+   * weighted error (see minWeightedErrorRateThreshold()) on the development
+   * set. Each threshold is consecutively applied to the test set and the
+   * resulting HTER values are plotted in the EPC.
+   *
+   * The cost points in which the EPC curve are calculated are distributed
+   * uniformily in the range [0.0, 1.0].
    */
   blitz::Array<double,2> epc
-    (const blitz::Array<double,1>& negatives,
-     const blitz::Array<double,1>& positives, size_t points);
+    (const blitz::Array<double,1>& dev_negatives,
+     const blitz::Array<double,1>& dev_positives, 
+     const blitz::Array<double,1>& test_negatives,
+     const blitz::Array<double,1>& test_positives, 
+     size_t points);
 
 }}
 
