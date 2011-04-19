@@ -19,6 +19,12 @@ static blitz::Array<T,N> sameAs(const blitz::Array<T,N>& original) {
 	return blitz::Array<T,N>(original.shape());
 }
 
+template <typename T>
+static blitz::Array<T,2> grayAs(const blitz::Array<T,3>& original) {
+	// WARNING: ignore the color dim / planes (original.extent(0))
+	return blitz::Array<T,2>(original.extent(1), original.extent(2));
+} 
+
 template <typename T, int N>
 static void bind_memory_common (tp::array<T,N>& array) {
   typedef typename tp::array<T,N>::array_type array_type;
@@ -29,9 +35,9 @@ static void bind_memory_common (tp::array<T,N>& array) {
   array.object()->def("resizeAndPreserve", (void (array_type::*)(const shape_type&))(&array_type::resizeAndPreserve), boost::python::arg("shape"), "If the array is already the size specified, then no change occurs (the array is not reallocated and copied). The contents of the array are preserved whenever possible; if the new array size is smaller, then some data will be lost. Any new elements created by resizing the array are left uninitialized.");
   array.object()->def("copy", &array_type::copy, "This method creates a copy of the array's data, using the same storage ordering as the current array. The returned array is guaranteed to be stored contiguously in memory, and to be the only object referring to its memory block (i.e. the data isn't shared with any other array object).");
   array.object()->def("sameAs", &sameAs<T,N>, "This method creates a new array with the same basic type and shape of the current array. The returned array is guaranteed to be stored contiguously in memory, and to be the only object referring to its memory block (i.e. the data isn't shared with any other array object).");
+  array.object()->def("grayAs", &grayAs<T>, "This method creates a new array with the same basic type and shape of the current array. Except it donegrades 3D (color) to 2D (gray). The returned array is guaranteed to be stored contiguously in memory, and to be the only object referring to its memory block (i.e. the data isn't shared with any other array object).");
   array.object()->def("makeUnique", &array_type::makeUnique, "If the array's data is being shared with another Blitz++ array object, this member function creates a copy so the array object has a unique view of the data.");
 }
-
 
 template <typename T>
 static void bind_memory_1 (tp::array<T,1>& array) {

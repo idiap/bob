@@ -12,3 +12,6 @@
    :maxdepth: 2
 
    UsingBlitzArrays
+
+   Tutorial01
+   

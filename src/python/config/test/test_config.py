@@ -196,10 +196,10 @@ class ConfigTest(unittest.TestCase):
     self.hdf5ReadWrite(gen_vector('uint64'))
     self.hdf5ReadWrite(gen_vector('float32'))
     self.hdf5ReadWrite(gen_vector('float64'))
-    self.hdf5ReadWrite(gen_vector('float128'))
+    #self.hdf5ReadWrite(gen_vector('float128')) #not supported by Torch
     self.hdf5ReadWrite(gen_vector('complex64'))
     self.hdf5ReadWrite(gen_vector('complex128'))
-    self.hdf5ReadWrite(gen_vector('complex256'))
+    #self.hdf5ReadWrite(gen_vector('complex256')) #not supported by Torch
 
     # Test writing of all supported array/set types
     #self.hdf5ReadWrite(gen_arrayset('bool')) #not supported by HDF5
