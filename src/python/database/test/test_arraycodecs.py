@@ -102,6 +102,7 @@ class ArrayCodecTest(unittest.TestCase):
         torch.core.array.float32_1(range(24), (24,)) / 24.)
     self.readwrite("torch.array.tensor",
         torch.core.array.float64_1(range(24), (24,)) / 3.33336)
+    self.transcode("torch.array.tensor", "torch.tensor")
 
 if __name__ == '__main__':
   sys.argv.append('-v')
