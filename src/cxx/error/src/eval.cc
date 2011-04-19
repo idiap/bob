@@ -6,6 +6,7 @@
 
 #include <vector>
 #include "error/eval.h"
+#include "core/blitz_compat.h"
 
 namespace err = Torch::error;
 
