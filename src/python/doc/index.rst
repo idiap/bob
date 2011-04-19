@@ -18,8 +18,6 @@ Most of the |project| C++ functionality is bound to Python using
    ../config/doc/index
    ../sp/doc/index
    ../ip/doc/index
-   ../machine/doc/index
-   ../scanning/doc/index
 
 .. References
 
