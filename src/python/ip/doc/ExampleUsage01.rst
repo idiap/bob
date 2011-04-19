@@ -2,9 +2,9 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Tue  5 Apr 07:46:12 2011 
 
-====================
+===================================================
  Tutorial 01. Cropping face images using a database
-====================
+===================================================
 
 Part 1. Basic usage of an ip functionality
 ------------------------------------------
@@ -83,7 +83,8 @@ Part 2. Cropping face images with a database
 
 This is a more extensive example how to crop images using a database
 
-.. code-block:: rest
+.. code-block:: xml
+
    <dataset>
      <pathlist>
        <entry path="/mnt/jupiter/databases_raw/BANCA_PGM_IMAGES/"/>
