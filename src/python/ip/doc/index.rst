@@ -10,3 +10,5 @@
 
 .. automodule:: torch.ip
    :members:
+
+   ExampleUsage01
