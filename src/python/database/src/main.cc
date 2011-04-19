@@ -16,6 +16,7 @@ void bind_database_rule();
 void bind_database_relation();
 void bind_database_relationset();
 void bind_database_binfile();
+void bind_database_tensorfile();
 void bind_database_hdf5();
 void bind_database_codec();
 void bind_database_pathlist();
@@ -33,6 +34,7 @@ BOOST_PYTHON_MODULE(libpytorch_database) {
   bind_database_relation();
   bind_database_relationset();
   bind_database_binfile();
+  bind_database_tensorfile();
   bind_database_hdf5();
   bind_database_codec();
   bind_database_pathlist();

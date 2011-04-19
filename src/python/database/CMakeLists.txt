@@ -11,6 +11,7 @@ set(pysrc
    "src/relation.cc"
    "src/relationset.cc"
    "src/binfile.cc"
+   "src/tensorfile.cc"
    "src/hdf5.cc"
    "src/codec.cc"
    "src/pathlist.cc"
