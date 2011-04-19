@@ -57,8 +57,7 @@ void dbd::TensorFileHeader::read(std::istream& str) {
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
   m_shape[3] = (size_t)val;
 
-  if(!header_ok())
-    throw Torch::database::Exception();
+  header_ok();
 }
 
 void dbd::TensorFileHeader::write(std::ostream& str) const
@@ -83,7 +82,7 @@ void dbd::TensorFileHeader::write(std::ostream& str) const
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
 }
 
-bool dbd::TensorFileHeader::header_ok()
+void dbd::TensorFileHeader::header_ok()
 {
   // Check the type
   switch (m_tensor_type)
@@ -98,17 +97,16 @@ bool dbd::TensorFileHeader::header_ok()
       break;
     // error
     default:
-      return false;
+      throw Torch::database::UnsupportedTypeError(Torch::core::array::t_unknown);
   }
 
   // Check the number of samples and dimensions
   if( m_n_samples < 0 || m_n_dimensions < 1 ||
       m_n_dimensions > 4)
-    return false;
+    throw Torch::database::DimensionError(m_n_dimensions,4);
 
   // OK
   update();
-  return true;
 }
 
 void dbd::TensorFileHeader::update()
@@ -122,6 +120,8 @@ void dbd::TensorFileHeader::update()
     case db::Long:    base_size = sizeof(long); break;
     case db::Float:   base_size = sizeof(float); break;
     case db::Double:  base_size = sizeof(double); break;
+    default:
+      throw Torch::database::UnsupportedTypeError(Torch::core::array::t_unknown);
   }
 
   size_t tsize = 1;
