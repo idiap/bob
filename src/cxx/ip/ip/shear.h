@@ -106,8 +106,9 @@ namespace Torch {
               if( x_dst >= 0 && x_dst < dst.extent(1) ) {
                 dst(y,x_dst) = pixel; //TODO: check C-like cast
                 if(mask) 
-                  dst_mask(y,x_dst) = (antialias && (x==src.extent(1)-1) && skew_f!=0. ?
-                                        false : src_mask(y,x) && src_mask(y,x+1));
+                  dst_mask(y,x_dst) = ( x==src.extent(1)-1 ?
+                      (antialias && skew_f !=0. ? false : src_mask(y,x))
+                    : src_mask(y,x) && src_mask(y,x+1));
               }
               old_residual = residual;
             }
@@ -134,8 +135,9 @@ namespace Torch {
               if( x_dst >= 0 && x_dst < dst.extent(1) ) {
                 dst(y,x_dst) = pixel; //TODO: check C-like cast
                 if(mask) 
-                  dst_mask(y,x_dst) = (antialias && x==0 && skew_f!=0. ? 
-                                        false : src_mask(y,x) && src_mask(y,x-1));
+                  dst_mask(y,x_dst) = (x==0 ? 
+                      (antialias && skew_f !=0. ? false : src_mask(y,x))
+                    : src_mask(y,x) && src_mask(y,x-1));
               }
               old_residual = residual;
             }
