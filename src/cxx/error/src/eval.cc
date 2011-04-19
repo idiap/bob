@@ -4,7 +4,6 @@
  * @brief Implements the error evaluation routines 
  */
 
-#include <vector>
 #include "error/eval.h"
 #include "core/blitz_compat.h"
 

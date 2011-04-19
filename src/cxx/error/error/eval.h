@@ -10,6 +10,7 @@
 
 #include <blitz/array.h>
 #include <utility>
+#include <vector>
 
 namespace Torch { namespace error {
 
