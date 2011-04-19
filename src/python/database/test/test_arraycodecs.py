@@ -97,6 +97,11 @@ class ArrayCodecTest(unittest.TestCase):
         torch.core.array.complex128_2(range(24), (6,4)) / complex(3.1416,-3.1416))
     self.transcode("matlab.array.binary", "test.mat")
 
+  def test03_tensorfile(self):
+    self.readwrite("torch.array.tensor",
+        torch.core.array.float32_1(range(24), (24,)) / 24.)
+    self.readwrite("torch.array.tensor",
+        torch.core.array.float64_1(range(24), (24,)) / 3.33336)
 
 if __name__ == '__main__':
   sys.argv.append('-v')

@@ -200,6 +200,13 @@ def binfile_getitem(self, i):
 
 BinFile.__getitem__ = binfile_getitem
 
+def tensorfile_getitem(self, i):
+  """Returns a blitz::Array<> object with the expected element type and shape"""
+  return getattr(self, '__getitem_%s_%d__' % \
+      (self.elementType.name, len(self.shape)))(i)
+
+TensorFile.__getitem__ = tensorfile_getitem
+
 def relation_eq(self, other):
   return sorted(self.members()) == sorted(other.members())
 Relation.__eq__ = relation_eq

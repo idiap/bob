@@ -50,6 +50,9 @@ set(src
     "src/HDF5File.cc"
     "src/HDF5ArrayCodec.cc"
     "src/HDF5ArraysetCodec.cc"
+    "src/TensorFileHeader.cc"
+    "src/TensorFile.cc"
+    "src/TensorArrayCodec.cc"
     )
 
 # If we have matio installed, enable the compilation of relevant modules
