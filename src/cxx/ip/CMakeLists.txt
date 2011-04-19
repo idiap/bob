@@ -26,7 +26,6 @@ set(src_ip
    "src/ipLBP4R.cc"
    "src/ipLBP8R.cc"
    "src/ipLBPBitmap.cc"
-   "src/ipHisto.cc"
    "src/ipSmoothGaussian.cc"
    "src/ipSobel.cc"
    "src/ipFlip.cc"
@@ -49,11 +48,13 @@ set(src_ip
    "src/Rotate.cc"
    "src/TanTriggs.cc"
    "src/GeomNorm.cc"
+   "src/maxRectInMask.cc"
    "src/FaceEyesNorm.cc"
    "src/GaborFrequency.cc"
    "src/GaborSpatial.cc"
    "src/GaborBankFrequency.cc"
    "src/GaborBankSpatial.cc"
+   "src/histo.cc"
 )
 #   "src/ipHOG.cc"
 
@@ -103,6 +104,7 @@ torch_test(ip gabor test/Gabor.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
 #torch_test(ip geomnorm test/geomnorm.cc)
 torch_test(ip facenorm test/facenorm.cc)
+torch_test(ip maxRectInMask test/maxRectInMask.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
 torch_test(ip shear test/shear.cc)

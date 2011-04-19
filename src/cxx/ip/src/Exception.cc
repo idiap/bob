@@ -56,3 +56,29 @@ const char* ip::ParamOutOfBoundaryError::what() const throw() {
   }
 }
 
+
+ip::UnknownScalingAlgorithm::UnknownScalingAlgorithm() throw() {
+}
+
+ip::UnknownScalingAlgorithm::~UnknownScalingAlgorithm() throw() {
+}
+
+const char* ip::UnknownScalingAlgorithm::what() const throw() {
+  static const char* what_string = "Generic ip::UnknownScalingAlgorithm:  \
+    The given scaling algorithm is not valid!";
+  return what_string;
+}
+
+
+ip::UnknownRotatingAlgorithm::UnknownRotatingAlgorithm() throw() {
+}
+
+ip::UnknownRotatingAlgorithm::~UnknownRotatingAlgorithm() throw() {
+}
+
+const char* ip::UnknownRotatingAlgorithm::what() const throw() {
+  static const char* what_string = "Generic ip::UnknownRotatingAlgorithm:  \
+    The given rotating algorithm is not valid!";
+  return what_string;
+}
+

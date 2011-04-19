@@ -144,7 +144,8 @@ class HDF5FileTest(unittest.TestCase):
     #fail. Python floats are actually double precision.
     #self.readWriteTest(outfile, 'float32_data', data, 'float32')
     self.readWriteTest(outfile, 'float64_data', data, 'float64')
-    self.readWriteTest(outfile, 'float128_data', data, 'float128')
+    #The next construction is not supported by Torch
+    #self.readWriteTest(outfile, 'float128_data', data, 'float128')
 
     data = [complex(random.uniform(0,1),random.uniform(-1,0)) for z in range(N)]
     self.readWriteTest(outfile, 'complex_data', data)
@@ -152,7 +153,8 @@ class HDF5FileTest(unittest.TestCase):
     #fail. Python floats are actually double precision.
     #self.readWriteTest(outfile, 'complex64_data', data, 'complex64')
     self.readWriteTest(outfile, 'complex128_data', data, 'complex128')
-    self.readWriteTest(outfile, 'complex256_data', data, 'complex256')
+    #The next construction is not supported by Torch
+    #self.readWriteTest(outfile, 'complex256_data', data, 'complex256')
 
     self.readWriteTestArray(outfile, 'int8')
     self.readWriteTestArray(outfile, 'int16')

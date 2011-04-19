@@ -11,7 +11,6 @@
 #ifndef TORCH5SPRO_IP_GENERATE_WITH_CENTER_H
 #define TORCH5SPRO_IP_GENERATE_WITH_CENTER_H
 
-#include "ip/Exception.h"
 #include "ip/shift.h"
 #include "core/array_assert.h"
 

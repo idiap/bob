@@ -36,6 +36,26 @@ namespace Torch { namespace ip {
       int m_limit;
       mutable std::string m_message;
   };
+
+  class UnknownScalingAlgorithm: public Exception {
+    public:
+      UnknownScalingAlgorithm() throw();
+      virtual ~UnknownScalingAlgorithm() throw();
+      virtual const char* what() const throw();
+
+    private:
+      mutable std::string m_message;
+  };
+
+  class UnknownRotatingAlgorithm: public Exception {
+    public:
+      UnknownRotatingAlgorithm() throw();
+      virtual ~UnknownRotatingAlgorithm() throw();
+      virtual const char* what() const throw();
+
+    private:
+      mutable std::string m_message;
+  };
 }}
 
 #endif /* TORCH_IP_EXCEPTION_H */

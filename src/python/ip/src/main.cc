@@ -25,6 +25,7 @@ void bind_ip_gabor();
 void bind_ip_geomnorm();
 void bind_ip_faceeyesnorm();
 void bind_ip_tantriggs();
+void bind_ip_histogram();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
   scope().attr("__doc__") = "Torch image processing classes and sub-classes";
@@ -44,4 +45,5 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_geomnorm();
   bind_ip_faceeyesnorm();
   bind_ip_tantriggs();
+  bind_ip_histogram();
 }

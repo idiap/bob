@@ -237,10 +237,10 @@ namespace Torch {
       // 4/ Crop the face
       if(mask)
         crop(m_scaled, m_mask_int3, dst, dst_mask, crop_ref_y3-m_crop_offset_h,
-          crop_ref_x3-m_crop_offset_w, m_crop_height, m_crop_width);
+          crop_ref_x3-m_crop_offset_w, m_crop_height, m_crop_width, true, true);
       else
         crop(m_scaled, dst, crop_ref_y3-m_crop_offset_h, 
-          crop_ref_x3-m_crop_offset_w, m_crop_height, m_crop_width);
+          crop_ref_x3-m_crop_offset_w, m_crop_height, m_crop_width, true, true);
     }
 
   }
