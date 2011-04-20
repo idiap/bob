@@ -151,7 +151,7 @@ class ErrorTest(unittest.TestCase):
     xy = torch.measure.epc(dev_negatives, dev_positives, 
         test_negatives, test_positives, 100)
     # uncomment the next line to save a reference value
-    save('nonsep-epc.hdf5', xy)
+    # save('nonsep-epc.hdf5', xy)
     xyref = load('nonsep-epc.hdf5')
     self.assertEqual(xy, xyref)
 
