@@ -47,9 +47,12 @@ namespace Torch {
 
 		    /////////////////////////////////////////////////////////////////
     		// Initialize the conversion table for rotation invariant and uniform LBP patterns
-		    //void			init_lut_RI();
-    		//void			init_lut_U2();
-    		//void			init_lut_U2RI();
+		    virtual void init_lut_RI() = 0;
+    		virtual void init_lut_U2() = 0;
+    		virtual void init_lut_U2RI()= 0;
+    		virtual void init_lut_add_average_bit()= 0;
+    		virtual void init_lut_normal()= 0;
+    		void init_lut_current();
 
         int m_P;
         int m_R;

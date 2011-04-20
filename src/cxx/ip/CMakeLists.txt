@@ -57,6 +57,7 @@ set(src_ip
    "src/histo.cc"
    "src/LBP.cc"
    "src/LBP4R.cc"
+   "src/LBP8R.cc"
 )
 #   "src/ipHOG.cc"
 

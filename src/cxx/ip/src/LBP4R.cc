@@ -14,42 +14,13 @@ ip::LBP4R::LBP4R(const int R, const bool to_average,
     const bool rotation_invariant): 
   LBP(4,R,to_average,add_average_bit,uniform,rotation_invariant)
 {
-  // Allocate the lookup tables
-  m_lut_RI.resize(16);
-  m_lut_U2.resize(16);
-  m_lut_U2RI.resize(16);
-  m_lut_add_average_bit.resize(32);
-  m_lut_normal.resize(16);
-
   // Initialize the lookup tables
   init_lut_RI();
   init_lut_U2();
   init_lut_U2RI();
-
-  blitz::firstIndex i;
-  m_lut_normal = i;
-  m_lut_add_average_bit = i;
-
-  // Reference to the current lookup table
-  if(m_rotation_invariant)
-  {
-    if(m_uniform)
-      m_lut_current.reference( m_lut_U2RI );
-    else
-      m_lut_current.reference( m_lut_RI );
-  }
-  else
-  {
-    if(m_uniform)
-      m_lut_current.reference( m_lut_U2 );
-    else
-    {
-      if(m_add_average_bit && m_to_average)
-        m_lut_current.reference( m_lut_add_average_bit );
-      else
-        m_lut_current.reference( m_lut_normal );
-    }   
-  }
+  init_lut_normal();
+  init_lut_add_average_bit();
+  init_lut_current();
 }
 
 int ip::LBP4R::getMaxLabel() const
@@ -64,6 +35,7 @@ int ip::LBP4R::getMaxLabel() const
 
 void ip::LBP4R::init_lut_RI()
 {
+  m_lut_RI.resize(16);
   // all 0's
   m_lut_RI(0) = 1;
   // 3 0's + 1 1's
@@ -90,6 +62,7 @@ void ip::LBP4R::init_lut_RI()
 
 void ip::LBP4R::init_lut_U2()
 {
+  m_lut_U2.resize(16);
   // A) All non uniform patterns have a label of 0.
   m_lut_U2 = 0;
 
@@ -120,6 +93,7 @@ void ip::LBP4R::init_lut_U2()
 
 void ip::LBP4R::init_lut_U2RI()
 {
+  m_lut_U2RI.resize(16);
   // A) All non uniform patterns have a label of 0.
   m_lut_U2RI(0) = 0;
 
@@ -145,4 +119,16 @@ void ip::LBP4R::init_lut_U2RI()
   m_lut_U2RI(15) = 5;
 }
 
+void ip::LBP4R::init_lut_add_average_bit()
+{
+  m_lut_add_average_bit.resize(32);
+  blitz::firstIndex i;
+  m_lut_add_average_bit = i;
+}
 
+void ip::LBP4R::init_lut_normal()
+{
+  m_lut_normal.resize(16);
+  blitz::firstIndex i;
+  m_lut_normal = i;
+}
