@@ -55,6 +55,8 @@ set(src_ip
    "src/GaborBankFrequency.cc"
    "src/GaborBankSpatial.cc"
    "src/histo.cc"
+   "src/LBP.cc"
+   "src/LBP4R.cc"
 )
 #   "src/ipHOG.cc"
 
@@ -104,6 +106,7 @@ torch_test(ip gabor test/Gabor.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
 #torch_test(ip geomnorm test/geomnorm.cc)
 torch_test(ip facenorm test/facenorm.cc)
+torch_test(ip lbp test/LBP.cc)
 torch_test(ip maxRectInMask test/maxRectInMask.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
