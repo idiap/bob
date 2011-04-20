@@ -25,6 +25,10 @@ void bind_database_datetime();
 void bind_database_video();
 
 BOOST_PYTHON_MODULE(libpytorch_database) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
   scope().attr("__doc__") = "Torch classes and sub-classes for database access";
   bind_database_exception();
   bind_database_array();

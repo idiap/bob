@@ -14,6 +14,21 @@
 
 namespace Torch { namespace database {
 
+  /**
+   * We wrote this method because we are using boost::filesystem v2 and the name
+   * resolution in this version sucks. If you find yourself maintaining this
+   * method, just re-think about using boost::filesystem::absolute, if v3 is
+   * already available.
+   */
+  boost::filesystem::path absolute(const boost::filesystem::path& p, 
+    const boost::filesystem::path& current);
+
+  /**
+   * Removes the last component from the path, supposing it is complete. If it is
+   * only root_path(), just return it.
+   */
+  boost::filesystem::path trim_one(const boost::filesystem::path& p);
+
   class PathList {
     
     public:

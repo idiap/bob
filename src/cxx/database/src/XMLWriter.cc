@@ -15,6 +15,7 @@
 #include "database/Relationset.h"
 #include "database/dataset_common.h"
 #include "database/Exception.h"
+#include "database/PathList.h"
 
 #include "core/logging.h"
 
@@ -67,7 +68,7 @@ namespace Torch {
 
       // Create PathList node if required
       db::PathList pl = dataset.getPathList();
-      boost::filesystem::path file_full( filename);
+      boost::filesystem::path file_full( db::absolute(filename, boost::filesystem::current_path()) );
       pl.setCurrentPath( file_full.parent_path() );
       xmlAddChild( rootnode, writePathList( doc, pl ) );
 

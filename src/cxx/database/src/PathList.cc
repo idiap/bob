@@ -76,11 +76,7 @@ db::PathList& db::PathList::existing() {
   return *this;
 }
 
-/**
- * Removes the last component from the path, supposing it is complete. If it is
- * only root_path(), just return it.
- */
-static fs::path trim_one(const fs::path& p) {
+fs::path db::trim_one(const fs::path& p) {
   if (p == p.root_path()) return p;
 
   fs::path retval;
@@ -93,18 +89,12 @@ static fs::path trim_one(const fs::path& p) {
   return retval;
 }
 
-/**
- * We wrote this method because we are using boost::filesystem v2 and the name
- * resolution in this version sucks. If you find yourself maintaining this
- * method, just re-think about using boost::filesystem::absolute, if v3 is
- * already available.
- */
-static fs::path absolute(const fs::path& p, const fs::path& current) {
+fs::path db::absolute(const fs::path& p, const fs::path& current) {
   fs::path completed = fs::complete(p, current);
   fs::path retval;
   for (fs::path::iterator it = completed.begin(); it != completed.end(); ++it) {
     if (*it == "..") {
-      retval = trim_one(retval); 
+      retval = db::trim_one(retval); 
       continue;
     }
     if (*it == ".") { //ignore '.'
@@ -119,7 +109,7 @@ fs::path db::PathList::locate(const fs::path& path) const {
   if (path.is_complete()) return path; //can only locate relative paths
   for (std::list<fs::path>::const_iterator 
       it=m_list.begin(); it!=m_list.end(); ++it) {
-    fs::path check = absolute(*it / path, m_current_path);
+    fs::path check = db::absolute(*it / path, m_current_path);
     if (fs::exists(check)) return check;
   }
   return fs::path(); //emtpy
@@ -131,11 +121,11 @@ static bool starts_with(const fs::path& input, const fs::path& path) {
 
 fs::path db::PathList::reduce(const fs::path& input) const {
   if (!input.is_complete()) return input; //can only reduce absolute paths
-  fs::path abs_input = absolute(input, m_current_path);
+  fs::path abs_input = db::absolute(input, m_current_path);
   const fs::path* best_match = 0; //holds the best match so far
   for (std::list<fs::path>::const_iterator 
       it=m_list.begin(); it!=m_list.end(); ++it) {
-    fs::path abs_path = absolute(*it, m_current_path);
+    fs::path abs_path = db::absolute(*it, m_current_path);
     if (starts_with(abs_input, abs_path)) {
       if (best_match) {
         if (it->string().size() > best_match->string().size()) best_match = &(*it);
@@ -150,8 +140,8 @@ fs::path db::PathList::reduce(const fs::path& input) const {
   if (!best_match) return input; //no match found
   
   //if you get to this point, you have found a match, return "input-best_match"
-  size_t psize = absolute(*best_match, m_current_path).string().size();
-  if (absolute(*best_match, m_current_path) != abs_input.root_path()) {
+  size_t psize = db::absolute(*best_match, m_current_path).string().size();
+  if (db::absolute(*best_match, m_current_path) != abs_input.root_path()) {
     //if we are anywhere but in the root directory, we need to remove the extra
     //slash after the path name being clipped.
     psize += 1;

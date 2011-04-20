@@ -1,4 +1,5 @@
 /**
+ * @file python/config/src/main.cc 
  * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
  *
  * @brief Combines all modules to make up the complete bindings
@@ -8,13 +9,13 @@
 
 using namespace boost::python;
 
-void bind_core_vectors();
+void bind_measure_error();
 
-BOOST_PYTHON_MODULE(libpytorch_core_vector) {
+BOOST_PYTHON_MODULE(libpytorch_measure) {
   docstring_options docopt; 
 # if !defined(TORCH_DEBUG)
   docopt.disable_cpp_signatures();
 # endif
-  scope().attr("__doc__") = "Torch core classes and sub-classes for std::vector manipulation from python";
-  bind_core_vectors();
+  scope().attr("__doc__") = "Torch error measure classes and sub-classes";
+  bind_measure_error();
 }

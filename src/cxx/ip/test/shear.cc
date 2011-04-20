@@ -71,14 +71,14 @@ struct T {
                0, 0, 58, 59, 60, 61, 54, 55,
                0, 0, 0, 0, 0, 0, 62, 63;
 
-    b2sX_m27 = false, false, false, true, true, true, true, true, true, true,
+    b2sX_m27 = false, false, true, true, true, true, true, true, true, true,
                false, false, true, true, true, true, true, true, true, true,
                false, true, true, true, true, true, true, true, true, false,
                false, true, true, true, true, true, true, true, true, false,
                false, true, true, true, true, true, true, true, true, false,
                false, true, true, true, true, true, true, true, true, false,
                true, true, true, true, true, true, true, true, false, false,
-               true, true, true, true, true, true, true, false, false, false;
+               true, true, true, true, true, true, true, true, false, false;
   }
 
   ~T() {}

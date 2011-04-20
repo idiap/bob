@@ -1,0 +1,3 @@
+<dataset name="testNoPathList" author="Sébastien Marcel" version="1" datetime="2011-04-19T18:09:00">
+	<external-arrayset id="1" role="pattern" file="test1.hdf5" elementtype="uint16" shape="3" codec="hdf5.arrayset.binary" />
+</dataset>

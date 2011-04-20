@@ -5,13 +5,14 @@
  * @brief A set of methods that evaluates error from score sets
  */
 
-#ifndef TORCH_ERROR_EVALUATOR_H 
-#define TORCH_ERROR_EVALUATOR_H
+#ifndef TORCH_MEASURE_ERROR_H 
+#define TORCH_MEASURE_ERROR_H
 
 #include <blitz/array.h>
 #include <utility>
+#include <vector>
 
-namespace Torch { namespace error {
+namespace Torch { namespace measure {
 
   /**
    * Calculates the FA ratio and the FR ratio given positive and negative
@@ -132,7 +133,7 @@ namespace Torch { namespace error {
    * This method can calculate a threshold based on a set of scores (positives
    * and negatives) given a certain minimization criteria, input as a
    * functional predicate. For a discussion on 'positive' and 'negative' see
-   * Torch::error::fafr().
+   * Torch::measure::fafr().
    *
    * The predicate method gives back the current minimum given false-acceptance
    * (FA) and false-rejection (FR) ratios for the input data. As a predicate,
@@ -204,9 +205,10 @@ namespace Torch { namespace error {
   /**
    * Calculates the ROC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
-   * doubles that express the X and Y coordinates in this order. The points in
-   * which the ROC curve are calculated are distributed uniformily in the range
-   * [min(negatives, positives), max(negatives, positives)].
+   * doubles that express the X (FRR) and Y (FAR) coordinates in this order.
+   * The points in which the ROC curve are calculated are distributed
+   * uniformily in the range [min(negatives, positives), max(negatives,
+   * positives)].
    */
   blitz::Array<double,2> roc
     (const blitz::Array<double,1>& negatives,
@@ -215,11 +217,38 @@ namespace Torch { namespace error {
   /**
    * Calculates the EPC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
-   * doubles that express the X and Y coordinates in this order. Please note
-   * that, in order to calculate the EPC curve, one needs two sets of data
-   * comprising a development set and a test set. The minimum weighted error is
-   * calculated on the development set and then applied to the test set to
-   * evaluate the half-total error rate at that position.
+   * doubles that express on its rows:
+   *
+   * 0: X axis values in the normal deviate scale for the false-rejections
+   * 1: Y axis values in the normal deviate scale for the false-acepts
+   * 2: X axis tick marks for the equivalent points in row 0, in FAR scale
+   * 3: Y axis tick marks for the equivalent points in row 1, in FRR scale
+   *
+   * You can plot the results using your preferred tool to first create a plot
+   * using rows 0 and 1 from the returned value and then place replace the X/Y
+   * axis annotation using either the values of rows 2 and 3 or a
+   * pre-determined set of tickmarks as recommended by NIST.
+   *
+   * The algorithm that calculates the deviate scale is based on function
+   * ppndf() from the NIST package DETware version 2.1, freely available on the
+   * internet. Please consult it for more details.
+   *
+   * By 20.04.2011, you could find such package here:
+   * http://www.itl.nist.gov/iad/mig/tools/
+   */
+  blitz::Array<double,2> det
+    (const blitz::Array<double,1>& negatives,
+     const blitz::Array<double,1>& positives, size_t points);
+
+  /**
+   * Calculates the EPC curve given a set of positive and negative scores and a
+   * number of desired points. Returns a two-dimensional blitz::Array of
+   * doubles that express the X (cost) and Y (HTER on the test set given the
+   * min. HTER threshold on the development set) coordinates in this order.
+   * Please note that, in order to calculate the EPC curve, one needs two sets
+   * of data comprising a development set and a test set. The minimum weighted
+   * error is calculated on the development set and then applied to the test
+   * set to evaluate the half-total error rate at that position.
    *
    * The EPC curve plots the HTER on the test set for various values of 'cost'.
    * For each value of 'cost', a threshold is found that provides the minimum
@@ -239,4 +268,4 @@ namespace Torch { namespace error {
 
 }}
 
-#endif /* TORCH_ERROR_EVALUATOR_H */
+#endif /* TORCH_MEASURE_ERROR_H */

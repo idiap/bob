@@ -40,7 +40,23 @@ class DatasetWritingTest(unittest.TestCase):
 
     # TODO: check db == db2 == db3
 
-  def test02_CanCreateFromScratch(self):
+  def test02_CanResaveRelative(self):
+    # This test demonstrates how to re-save the database. It uses the most
+    # basic primitives for such operation. load() to load the dataset and
+    # save() to save it back.
+    db = torch.database.Dataset(INPUT_DATABASE)
+
+    # In python, you can also load from a string containing the XML dataset
+    # description using torch.database.loadString("<xml..."). Similarly, you 
+    # can get a string representation of the Dataset by touching the Datset.xml
+    # property. This will test the cycle a bit:
+    tmpname = get_tempfilename()
+    os.chdir( os.path.dirname(tmpname) )
+    db.save( os.path.basename(tmpname) )
+    db2 = torch.database.Dataset(tmpname)
+    os.unlink(tmpname)
+
+  def test03_CanCreateFromScratch(self):
     # This test demonstrates how to create a very basic but complete Dataset
     # that contains two Arraysets and a single Relationset.
 

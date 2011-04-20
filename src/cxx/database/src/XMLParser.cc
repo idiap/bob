@@ -21,23 +21,6 @@ namespace tca = Torch::core::array;
 
 namespace fs = boost::filesystem;
 
-/**
- * Removes the last component from the path, supposing it is complete. If it is
- * only root_path(), just return it.
- */
-static fs::path trim_one(const fs::path& p) {
-  if (p == p.root_path()) return p;
-
-  fs::path retval;
-  for (fs::path::iterator it = p.begin(); it!=p.end(); ++it) {
-    fs::path::iterator next = it; 
-    ++next; //< for the lack of better support in boost::filesystem V2
-    if (next == p.end()) break; //< == skip the last bit
-    retval /= *it;
-  }
-  return retval;
-}
-
 namespace Torch { namespace database { namespace detail {
 
 
@@ -200,10 +183,9 @@ namespace Torch { namespace database { namespace detail {
 
     // 5/ Create an empty PathList and parse the PathList if any
     // Parse the PathList in the XML file if any
-    db::PathList pl;
-    db::PathList pl_tmp(".");
-    boost::filesystem::path full_path = pl_tmp.locate( filename );
-    pl.setCurrentPath( trim_one(full_path) );
+    db::PathList pl(".");
+    boost::filesystem::path full_path = pl.locate( filename );
+    pl.setCurrentPath( db::trim_one(full_path) );
     cur = cur_svg = cur->xmlChildrenNode;
     while(cur != 0) { 
       if( !strcmp((const char*)cur->name, db::pathlist) ) {
