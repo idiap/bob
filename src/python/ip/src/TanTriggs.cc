@@ -19,7 +19,7 @@ static const char* ttdoc = "Objects of this class, after configuration, can prep
   .def("__call__", (void (ip::TanTriggs::*)(const blitz::Array<T,2>&, blitz::Array<double,2>&))&ip::TanTriggs::operator()<T>, (arg("input"), arg("output")), "Call an object of this type to compute a preprocessed image.")
 
 void bind_ip_tantriggs() {
-  class_<ip::TanTriggs, boost::shared_ptr<ip::TanTriggs> >("TanTriggs", ttdoc, init<optional<const double, const double, const double, const double, const double> >((arg("gamma")="0.1", arg("sigma0")="1", arg("sigma1")="2", arg("size")="2", arg("threshold")="10.", arg("alpha")="0.1"), "Constructs a new Tan and Triggs filter."))
+  class_<ip::TanTriggs, boost::shared_ptr<ip::TanTriggs> >("TanTriggs", ttdoc, init<optional<const double, const double, const double, const int, const double, const double> >((arg("gamma")="0.1", arg("sigma0")="1", arg("sigma1")="2", arg("size")="2", arg("threshold")="10.", arg("alpha")="0.1"), "Constructs a new Tan and Triggs filter."))
     //.add_property("test", &ip::TanTriggs::getTest, &ip::TanTriggs::setTest)
     TANTRIGGS_CALL_DEF(uint8_t)
     TANTRIGGS_CALL_DEF(uint16_t)

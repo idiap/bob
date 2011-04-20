@@ -67,7 +67,7 @@ Data access
   Please note we make use of the C++ API (a.k.a. ImageMagick++).
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
   or configuration items in Torch. We currently compile against version 1.8.6,
-  but any version on that branch should work without problems.
+  and version 1.8.4 might not work.
 * `MatIO`_: is used for reading and writing Matlab compatible (.mat) files.
   Our nightly builds compile against version 1.34, but version 1.33 is known to
   work. Other versions should also work. Please note this dependence is

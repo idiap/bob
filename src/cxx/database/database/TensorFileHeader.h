@@ -108,7 +108,7 @@ namespace Torch { namespace database {
       /**
         * Checks if the header is valid
         */
-      bool header_ok();
+      void header_ok();
 
       /**
         * Update the TensorSize value
