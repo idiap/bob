@@ -14,8 +14,8 @@ std::pair<double, double> err::farfrr(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives, double threshold) {
   blitz::sizeType total_negatives = negatives.extent(blitz::firstDim);
   blitz::sizeType total_positives = positives.extent(blitz::firstDim);
-  blitz::sizeType false_accepts = total_negatives - blitz::count(negatives < threshold);
-  blitz::sizeType false_rejects = total_positives - blitz::count(positives >= threshold);
+  blitz::sizeType false_accepts = blitz::count(negatives >= threshold);
+  blitz::sizeType false_rejects = blitz::count(positives < threshold);
   if (!total_negatives) total_negatives = 1; //avoids division by zero
   if (!total_positives) total_positives = 1; //avoids division by zero
   return std::make_pair(false_accepts/(double)total_negatives,
