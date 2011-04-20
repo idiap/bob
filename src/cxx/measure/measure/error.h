@@ -217,6 +217,32 @@ namespace Torch { namespace measure {
   /**
    * Calculates the EPC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
+   * doubles that express on its rows:
+   *
+   * 0: X axis values in the normal deviate scale for the false-rejections
+   * 1: Y axis values in the normal deviate scale for the false-acepts
+   * 2: X axis tick marks for the equivalent points in row 0, in FAR scale
+   * 3: Y axis tick marks for the equivalent points in row 1, in FRR scale
+   *
+   * You can plot the results using your preferred tool to first create a plot
+   * using rows 0 and 1 from the returned value and then place replace the X/Y
+   * axis annotation using either the values of rows 2 and 3 or a
+   * pre-determined set of tickmarks as recommended by NIST.
+   *
+   * The algorithm that calculates the deviate scale is based on function
+   * ppndf() from the NIST package DETware version 2.1, freely available on the
+   * internet. Please consult it for more details.
+   *
+   * By 20.04.2011, you could find such package here:
+   * http://www.itl.nist.gov/iad/mig/tools/
+   */
+  blitz::Array<double,2> det
+    (const blitz::Array<double,1>& negatives,
+     const blitz::Array<double,1>& positives, size_t points);
+
+  /**
+   * Calculates the EPC curve given a set of positive and negative scores and a
+   * number of desired points. Returns a two-dimensional blitz::Array of
    * doubles that express the X (cost) and Y (HTER on the test set given the
    * min. HTER threshold on the development set) coordinates in this order.
    * Please note that, in order to calculate the EPC curve, one needs two sets
