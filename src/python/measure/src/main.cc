@@ -9,9 +9,9 @@
 
 using namespace boost::python;
 
-void bind_error_eval();
+void bind_measure_error();
 
-BOOST_PYTHON_MODULE(libpytorch_error) {
-  scope().attr("__doc__") = "Torch error classes and sub-classes";
-  bind_error_eval();
+BOOST_PYTHON_MODULE(libpytorch_measure) {
+  scope().attr("__doc__") = "Torch error measure classes and sub-classes";
+  bind_measure_error();
 }

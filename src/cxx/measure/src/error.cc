@@ -4,10 +4,10 @@
  * @brief Implements the error evaluation routines 
  */
 
-#include "error/eval.h"
+#include "measure/error.h"
 #include "core/blitz_compat.h"
 
-namespace err = Torch::error;
+namespace err = Torch::measure;
 
 std::pair<double, double> err::farfrr(const blitz::Array<double,1>& negatives, 
     const blitz::Array<double,1>& positives, double threshold) {

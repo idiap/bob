@@ -5,14 +5,14 @@
  * @brief A set of methods that evaluates error from score sets
  */
 
-#ifndef TORCH_ERROR_EVALUATOR_H 
-#define TORCH_ERROR_EVALUATOR_H
+#ifndef TORCH_MEASURE_ERROR_H 
+#define TORCH_MEASURE_ERROR_H
 
 #include <blitz/array.h>
 #include <utility>
 #include <vector>
 
-namespace Torch { namespace error {
+namespace Torch { namespace measure {
 
   /**
    * Calculates the FA ratio and the FR ratio given positive and negative
@@ -133,7 +133,7 @@ namespace Torch { namespace error {
    * This method can calculate a threshold based on a set of scores (positives
    * and negatives) given a certain minimization criteria, input as a
    * functional predicate. For a discussion on 'positive' and 'negative' see
-   * Torch::error::fafr().
+   * Torch::measure::fafr().
    *
    * The predicate method gives back the current minimum given false-acceptance
    * (FA) and false-rejection (FR) ratios for the input data. As a predicate,
@@ -242,4 +242,4 @@ namespace Torch { namespace error {
 
 }}
 
-#endif /* TORCH_ERROR_EVALUATOR_H */
+#endif /* TORCH_MEASURE_ERROR_H */

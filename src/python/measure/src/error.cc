@@ -6,10 +6,10 @@
  */
 
 #include <boost/python.hpp>
-#include "error/eval.h"
+#include "measure/error.h"
 
 using namespace boost::python;
-namespace err = Torch::error;
+namespace err = Torch::measure;
 
 /**
  * A nicer python wrapper for the FAR x FRR computation
@@ -21,7 +21,7 @@ static tuple farfrr(const blitz::Array<double,1>& negatives,
   return make_tuple(retval.first, retval.second);
 }
 
-void bind_error_eval() {
+void bind_measure_error() {
  def("farfrr", &farfrr, (arg("negatives"), arg("positives"), arg("threshold")),
      "Calculates the FA ratio and the FR ratio given positive and negative scores and a threshold. 'positives' holds the score information for samples that are labelled to belong to a certain class (a.k.a., 'signal' or 'client'). 'negatives' holds the score information for samples that are labelled *not* to belong to the class (a.k.a., 'noise' or 'impostor').\n\nIt is expected that 'positive' scores are, at least by design, greater than 'negative' scores. So, every positive value that falls bellow the threshold is considered a false-rejection (FR). 'negative' samples that fall above the threshold are considered a false-accept (FA).\n\nPositives that fall on the threshold (exactly) are considered correctly classified. Negatives that fall on the threshold (exactly) are considered *incorrectly* classified. This equivalent to setting the comparision like this pseudo-code:\n\nforeach (positive as K) if K < threshold: falseRejectionCount += 1\nforeach (negative as K) if K >= threshold: falseAcceptCount += 1\n\nThe 'threshold' value does not necessarily have to fall in the range covered by the input scores (negatives and positives altogether), but if it does not, the output will be either (1.0, 0.0) or (0.0, 1.0) depending on the side the threshold falls.\n\nThe output is in form of a std::pair of two double-precision real numbers. The numbers range from 0 to 1. The first element of the pair is the false-accept ratio. The second element of the pair is the false-rejection ratio.\n\nIt is possible that scores are inverted in the negative/positive sense. In some setups the designer may have setup the system so 'positive' samples have a smaller score than the 'negative' ones. In this case, make sure you normalize the scores so positive samples have greater scores before feeding them into this method.");
  def("correctlyClassifiedPositives", &err::correctlyClassifiedPositives, (arg("positives"), arg("threshold")), "This method returns a blitz::Array composed of booleans that pin-point which positives where correctly classified in a 'positive' score sample, given a threshold. It runs the formula: foreach (element k in positive) if positive[k] >= threshold: returnValue[k] = true else: returnValue[k] = false");
