@@ -5,13 +5,14 @@
  * @brief A set of methods that evaluates error from score sets
  */
 
-#ifndef TORCH_ERROR_EVALUATOR_H 
-#define TORCH_ERROR_EVALUATOR_H
+#ifndef TORCH_MEASURE_ERROR_H 
+#define TORCH_MEASURE_ERROR_H
 
 #include <blitz/array.h>
 #include <utility>
+#include <vector>
 
-namespace Torch { namespace error {
+namespace Torch { namespace measure {
 
   /**
    * Calculates the FA ratio and the FR ratio given positive and negative
@@ -132,7 +133,7 @@ namespace Torch { namespace error {
    * This method can calculate a threshold based on a set of scores (positives
    * and negatives) given a certain minimization criteria, input as a
    * functional predicate. For a discussion on 'positive' and 'negative' see
-   * Torch::error::fafr().
+   * Torch::measure::fafr().
    *
    * The predicate method gives back the current minimum given false-acceptance
    * (FA) and false-rejection (FR) ratios for the input data. As a predicate,
@@ -204,9 +205,10 @@ namespace Torch { namespace error {
   /**
    * Calculates the ROC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
-   * doubles that express the X and Y coordinates in this order. The points in
-   * which the ROC curve are calculated are distributed uniformily in the range
-   * [min(negatives, positives), max(negatives, positives)].
+   * doubles that express the X (FRR) and Y (FAR) coordinates in this order.
+   * The points in which the ROC curve are calculated are distributed
+   * uniformily in the range [min(negatives, positives), max(negatives,
+   * positives)].
    */
   blitz::Array<double,2> roc
     (const blitz::Array<double,1>& negatives,
@@ -215,11 +217,12 @@ namespace Torch { namespace error {
   /**
    * Calculates the EPC curve given a set of positive and negative scores and a
    * number of desired points. Returns a two-dimensional blitz::Array of
-   * doubles that express the X and Y coordinates in this order. Please note
-   * that, in order to calculate the EPC curve, one needs two sets of data
-   * comprising a development set and a test set. The minimum weighted error is
-   * calculated on the development set and then applied to the test set to
-   * evaluate the half-total error rate at that position.
+   * doubles that express the X (cost) and Y (HTER on the test set given the
+   * min. HTER threshold on the development set) coordinates in this order.
+   * Please note that, in order to calculate the EPC curve, one needs two sets
+   * of data comprising a development set and a test set. The minimum weighted
+   * error is calculated on the development set and then applied to the test
+   * set to evaluate the half-total error rate at that position.
    *
    * The EPC curve plots the HTER on the test set for various values of 'cost'.
    * For each value of 'cost', a threshold is found that provides the minimum
@@ -239,4 +242,4 @@ namespace Torch { namespace error {
 
 }}
 
-#endif /* TORCH_ERROR_EVALUATOR_H */
+#endif /* TORCH_MEASURE_ERROR_H */

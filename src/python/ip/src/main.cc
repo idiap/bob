@@ -28,6 +28,10 @@ void bind_ip_tantriggs();
 void bind_ip_histogram();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
   scope().attr("__doc__") = "Torch image processing classes and sub-classes";
   bind_ip_exception();
   bind_ip_ipcore();
