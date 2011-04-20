@@ -63,8 +63,8 @@ void db::T3BinaryArrayCodec::peek(const std::string& filename,
   if (!ifile) throw db::FileNotReadable(filename);
   uint32_t nsamples, framesize;
   nsamples = framesize = 0;
-  ifile.read((char*)nsamples, sizeof(uint32_t));
-  ifile.read((char*)framesize, sizeof(uint32_t));
+  ifile.read((char*)&nsamples, sizeof(uint32_t));
+  ifile.read((char*)&framesize, sizeof(uint32_t));
   ifile.close();
   // are those floats or doubles?
   if (fsize == (nsamples*framesize*sizeof(float))) eltype = Torch::core::array::t_float32;

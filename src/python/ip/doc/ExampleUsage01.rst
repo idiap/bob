@@ -83,17 +83,20 @@ Part 2. Cropping face images with a database
 
 This is a more extensive example how to crop images using a database
 
+Example xml file that we will use in this tutorial.
+
 .. code-block:: xml
 
    <dataset>
      <pathlist>
-       <entry path="/mnt/jupiter/databases_raw/BANCA_PGM_IMAGES/"/>
+       <entry path="data/"/>
      </pathlist>
      <arrayset id="1" role="Pattern" elementtype="uint8" shape="576 720">
        <external-array id="1" codec="torch.image" file="9049_m_wm_s09_9049_en_4.pgm"/>
        <external-array id="2" codec="torch.image" file="1008_f_g1_s02_1010_en_5.pgm"/>
      </arrayset>
      <arrayset id="2" role="EyeCenters" elementtype="uint32" shape="4">
+       <!-- Please note that height comes before width -->
        <array id="1">
          197 319 195 385 
        </array>
@@ -103,6 +106,8 @@ This is a more extensive example how to crop images using a database
      </arrayset>
    </dataset>
    
+Example how to wrap the cropping process, using a database, into a python class.
+
 .. code-block:: python
 
    import math
