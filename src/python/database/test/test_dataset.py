@@ -13,6 +13,7 @@ import unittest
 import torch
 
 INPUT_DATABASE = 'test1.xml'
+INPUT_DATABASE2 = 'testNoPathList.xml'
 
 class DatasetTest(unittest.TestCase):
   """Performs various tests for the Torch::database::Dataset object."""
@@ -209,6 +210,10 @@ class DatasetTest(unittest.TestCase):
     self.assertEqual(len(index['pattern1']), len(db.relationsets()[0].relations()))
     self.assertEqual(len(index['pattern1']), len(index['pattern9']))
     self.assertEqual(len(index['pattern1']), len(index['__id__']))
+
+  def test07_CanLoadWithoutPathList(self):
+    db = torch.database.Dataset(INPUT_DATABASE2)
+
 
 if __name__ == '__main__':
   sys.argv.append('-v')
