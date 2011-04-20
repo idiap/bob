@@ -132,13 +132,15 @@ double ppndf(double p) {
   return retval;
 }
 
-BZ_DECLARE_FUNCTION(ppndf) ///< A blitz::Array binding
+namespace blitz {
+  BZ_DECLARE_FUNCTION(ppndf) ///< A blitz::Array binding
+}
 
 blitz::Array<double,2> err::det(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives, size_t points) {
   blitz::Array<double,2> retval(4, points);
   retval(blitz::Range(2,3), blitz::Range::all()) = err::roc(negatives, positives, points);
-  retval(blitz::Range(0,1), blitz::Range::all()) = ppndf(retval(blitz::Range(2,3), blitz::Range::all()));
+  retval(blitz::Range(0,1), blitz::Range::all()) = blitz::ppndf(retval(blitz::Range(2,3), blitz::Range::all()));
   return retval;
 }
 
