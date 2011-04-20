@@ -18,6 +18,10 @@ void bind_core_convert();
 void bind_core_array_check();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
   scope().attr("__doc__") = "Torch core classes and sub-classes";
   bind_core_exception();
   bind_core_logging();

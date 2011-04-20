@@ -37,6 +37,10 @@ void bind_array_reductions_4();
 void bind_array_storage();
 
 BOOST_PYTHON_MODULE(libpytorch_core_array) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
   bind_ndarray();
   scope().attr("__doc__") = "Torch core classes and sub-classes for array manipulation";
   bind_core_array_tinyvector();

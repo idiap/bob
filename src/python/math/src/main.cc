@@ -14,6 +14,10 @@ void bind_math_norminv();
 void bind_math_svd();
 
 BOOST_PYTHON_MODULE(libpytorch_math) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
   scope().attr("__doc__") = "Torch mathematical classes and sub-classes";
   bind_math_linsolve();
   bind_math_norminv();

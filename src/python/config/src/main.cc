@@ -13,6 +13,10 @@ void bind_config_exception();
 void bind_config_configuration();
 
 BOOST_PYTHON_MODULE(libpytorch_config) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
   scope().attr("__doc__") = "Torch configuration classes and sub-classes";
   bind_config_exception();
   bind_config_configuration();

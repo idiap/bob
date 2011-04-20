@@ -12,6 +12,10 @@ using namespace boost::python;
 void bind_measure_error();
 
 BOOST_PYTHON_MODULE(libpytorch_measure) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
   scope().attr("__doc__") = "Torch error measure classes and sub-classes";
   bind_measure_error();
 }

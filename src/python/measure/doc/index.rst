@@ -2,11 +2,11 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Tue 19 Apr 19:00:07 2011 CEST
 
-.. Index file for the Python Torch::error bindings
+.. Index file for the Python Torch::measure bindings
 
-==================
- Error Evaluation
-==================
+========================
+ Performance Evaluation
+========================
 
-.. automodule:: torch.error
+.. automodule:: torch.measure
    :members:
