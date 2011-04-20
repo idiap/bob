@@ -11,11 +11,13 @@
 #include <boost/test/unit_test.hpp>
 #include "ip/LBP.h"
 #include "ip/LBP4R.h"
+#include "ip/LBP8R.h"
 
 #include <iostream>
 
 struct T {
   blitz::Array<uint8_t,2> a1, a2;
+  uint16_t b1, b2;
   uint16_t c1, c2;
 
   T(): a1(3,3), a2(3,3)
@@ -28,8 +30,11 @@ struct T {
          5, 4, 3,
          2, 1, 0;
 
-    c1 = 6;
-    c2 = 9;
+    b1 = 6;
+    b2 = 9;
+
+    c1 = 30;
+    c2 = 225;
   }
 
   ~T() {}
@@ -68,6 +73,15 @@ BOOST_AUTO_TEST_CASE( test_lbp41_2d_uint8 )
 {
   // LBP 4,1
   Torch::ip::LBP4R lbp;
+
+  BOOST_CHECK_EQUAL( b1, lbp(a1,1,1) );
+  BOOST_CHECK_EQUAL( b2, lbp(a2,1,1) );
+}
+
+BOOST_AUTO_TEST_CASE( test_lbp81_2d_uint8 )
+{
+  // LBP 8,1
+  Torch::ip::LBP8R lbp;
 
   BOOST_CHECK_EQUAL( c1, lbp(a1,1,1) );
   BOOST_CHECK_EQUAL( c2, lbp(a2,1,1) );
