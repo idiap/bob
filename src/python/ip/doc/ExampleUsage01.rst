@@ -83,11 +83,12 @@ Part 2. Cropping face images with a database
 
 This is a more extensive example how to crop images using a database
 
+Example xml file that we will use in this tutorial
 .. code-block:: xml
 
    <dataset>
      <pathlist>
-       <entry path="/mnt/jupiter/databases_raw/BANCA_PGM_IMAGES/"/>
+       <entry path="data/"/>
      </pathlist>
      <arrayset id="1" role="Pattern" elementtype="uint8" shape="576 720">
        <external-array id="1" codec="torch.image" file="9049_m_wm_s09_9049_en_4.pgm"/>
