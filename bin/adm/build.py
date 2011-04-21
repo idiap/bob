@@ -155,14 +155,14 @@ def cmake(option):
     cmake_options['-DTORCH_%s' % option.build_block.upper()] = 'ON'
   cmdline = ['cmake']
   if option.debug_build: cmdline.append('--debug-output')
-  for k,v in cmake_options.iteritems(): cmdline.append('%s=%s' % (k, v))
+  for k,v in cmake_options.items(): cmdline.append('%s=%s' % (k, v))
   cmdline.append(option.source_dir)
   if hasattr(option, "log_prefix"):
     status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
   else:
     status = run(cmdline)
   if status != 0:
-    raise RuntimeError, '** ERROR: "cmake" did not work as expected.'
+    raise RuntimeError('** ERROR: "cmake" did not work as expected.')
   logging.debug('Finished running cmake.')
 
 def install(option):
@@ -218,7 +218,7 @@ def make(option, target="all"):
   else:
     status = run(cmdline)
   if status != 0:
-    raise RuntimeError, '** ERROR: "make %s" did not work as expected.' % target
+    raise RuntimeError('** ERROR: "make %s" did not work as expected.' % target)
   logging.debug('Finished running make %s.' % target)
 
 def ctest(option):
@@ -238,7 +238,7 @@ def ctest(option):
   else:
     status = run(cmdline)
   if status != 0:
-    raise RuntimeError, '** ERROR: "ctest" did not work as expected.'
+    raise RuntimeError('** ERROR: "ctest" did not work as expected.')
   logging.debug('Finished running ctest.')
 
 def documentation(option):
@@ -276,7 +276,7 @@ def doxygen(option):
   overwrite_options['OUTPUT_DIRECTORY'] = doxygen_prefix
   if option.debug_build: overwrite_options['QUIET'] = 'NO'
   extras = []
-  for k,v in overwrite_options.iteritems(): extras.append('%s = %s\n' % (k, v))
+  for k,v in overwrite_options.items(): extras.append('%s = %s\n' % (k, v))
 
   original = file(option.doxyfile, 'rt')
   lines = original.readlines() + extras
@@ -292,7 +292,7 @@ def doxygen(option):
   else:
     status = run(cmdline)
   if status != 0:
-    raise RuntimeError, '** ERROR: "doxygen" did not work as expected.'
+    raise RuntimeError('** ERROR: "doxygen" did not work as expected.')
   tmpfile.close()
   os.unlink(tmpname)
 
@@ -337,7 +337,7 @@ def sphinx(option):
       p.wait()
       fnull.close()
     except OSError:
-      raise RuntimeError, '** ERROR: Not able to find "sphinx-build" executable.'
+      raise RuntimeError('** ERROR: Not able to find "sphinx-build" executable.')
    
   cmdline.extend(['-c', option.sphinxdir])
   # TODO: Parse version
@@ -353,7 +353,7 @@ def sphinx(option):
   else:
     status = run(cmdline_html)
   if status != 0:
-    raise RuntimeError, '** ERROR: "sphinx-build -b html" did not work as expected.'
+    raise RuntimeError('** ERROR: "sphinx-build -b html" did not work as expected.')
 
   sphinx_prefix_latex = os.path.join(sphinx_prefix, "latex")
   cmdline_latex = cmdline[:]
@@ -364,7 +364,7 @@ def sphinx(option):
   else:
     status = run(cmdline_latex)
   if status != 0:
-    raise RuntimeError, '** ERROR: "sphinx-build -b html" did not work as expected.'
+    raise RuntimeError('** ERROR: "sphinx-build -b html" did not work as expected.')
 
   logging.debug('Finished running Sphinx.')
 
@@ -389,7 +389,7 @@ def differences(option):
   else:
     status = run(cmd)
   if status != 0:
-    raise RuntimeError, '** ERROR: "git-log" did not work as expected.'
+    raise RuntimeError('** ERROR: "git-log" did not work as expected.')
 
   logging.debug('Finished running git diff.')
 
@@ -448,7 +448,7 @@ def dot(option):
   else:
     status = run(cmdline)
   if status != 0:
-    raise RuntimeError, '** ERROR: "dot" did not work as expected.'
+    raise RuntimeError('** ERROR: "dot" did not work as expected.')
   logging.debug('Finished running dot.')
 
 def platform(option):
@@ -474,7 +474,7 @@ def action(what, option, *args):
   problems = ('success',)
   try:
     what(option, *args)
-  except Exception, e:
+  except Exception as e:
     logging.error('Executing action "%s": %s' % (what.__name__, e))
     problems = ('failed', '%s' % e)
   total_time = time.time() - start 
@@ -509,7 +509,7 @@ def untemplatize_path(path, option):
       }
   retval = path % replacements
   if retval.find('%(') != -1:
-    raise RuntimeError, "Cannot fully expand path `%s'" % retval
+    raise RuntimeError("Cannot fully expand path `%s'" % retval)
   return retval
 
 def untemplatize_version(version, option):
@@ -524,5 +524,5 @@ def untemplatize_version(version, option):
       }
   retval = version % replacements
   if retval.find('%(') != -1:
-    raise RuntimeError, "Cannot fully expand version `%s'" % retval
+    raise RuntimeError("Cannot fully expand version `%s'" % retval)
   return retval
