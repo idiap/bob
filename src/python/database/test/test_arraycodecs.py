@@ -74,9 +74,9 @@ class ArrayCodecTest(unittest.TestCase):
 
   def test01_t3binary(self):
     self.readwrite("torch3.array.binary",
-        torch.core.array.float32_1(range(24), (24,)) / 24.)
+        torch.core.array.float32_2(range(24), (6,4)) / 24.)
     self.readwrite("torch3.array.binary",
-        torch.core.array.float64_1(range(24), (24,)) / 3.33336)
+        torch.core.array.float64_2(range(24), (2,12)) / 3.33336)
     self.transcode("torch3.array.binary", "torch3.bindata")
 
   def test02_matlab(self):
