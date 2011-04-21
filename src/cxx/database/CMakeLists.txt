@@ -71,12 +71,15 @@ torch_test(database array test/array.cc)
 torch_test(database arrayset test/arrayset.cc)
 torch_test(database dataset test/dataset.cc)
 torch_test(database image_codec test/image_codec.cc)
+torch_test(database tensor_codec test/tensor_codec.cc)
 
 # Deprecated as of 17.04.2011:
 #torch_test(database binary_file test/binary_file.cc)
 
 # Defines environment variable used to localize data for the tests
 set_property(TEST cxx-database-dataset APPEND PROPERTY ENVIRONMENT
+  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-database-tensor_codec APPEND PROPERTY ENVIRONMENT
   "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 
 # This is where we install the XML schema definition
