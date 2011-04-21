@@ -2,14 +2,62 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Tue  5 Apr 07:46:12 2011 
 
-====================
+===================================
  Tutorial 01. Basic usage of Arrays
-====================
+===================================
 
 In this section we will illustrate the basic python usage of Arrays.
 
 Some basic usage of Arrays / Matrices
 -------------------------------------
+
+We use torch to create a simple array.
+
+.. code-block:: python
+
+   import torch
+
+   # create a array of size 5 times 7, of type uint8
+   my_array = torch.core.array.uint8_2(5, 7)
+
+The array is not gauranted to be initialize during allocation.
+It is therefore often useful to set the whole array to either zeros or ones.
+
+.. code-block:: python
+
+   # set all the values (globally) to 1
+   my_array.ones()
+
+   # set all the values (globally) to 0
+   my_array.zeros()
+
+   # set all teh values to 17
+   my_array.ones()
+   my_array = my_array * 17
+
+In the last line we used a powerful feature in this library.
+It is possible to multiply all the elements in a array with a scalar as 
+well as adding a scalar value to all of the elements
+
+.. code-block:: python
+
+   # multiply with 13
+   my_array * 13
+
+   # add 33
+   my_array + 33
+
+If you wish to use a slice (part) of array this is possible with the normal 
+python syntax
+
+.. code-block:: python
+
+   # select the first row
+   my_array[1, :]
+
+   # select the second column
+   my_array[:, 2]
+
 
 .. code-block:: python
 
