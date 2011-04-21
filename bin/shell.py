@@ -19,7 +19,6 @@ if __name__ == '__main__':
     # Assuming this is a shebang call, only use 1st argument
     args = [sys.argv[0]] + shlex.split(sys.argv[1]) + sys.argv[2:]
 
-  print args
   options, arguments = adm.environment.parse_args(args)
   if not arguments: arguments = [os.environ['SHELL']]
 
