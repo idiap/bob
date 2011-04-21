@@ -4,6 +4,7 @@
 # Thu 08 Jul 2010 09:18:28 CEST 
 
 import sys, os, subprocess
+import shlex
 
 # Imports our admin toolkit
 install_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -11,8 +12,15 @@ sys.path.append(install_dir)
 import adm
 
 if __name__ == '__main__':
+  
+  # A little help if we are called in shebang mode
+  args = sys.argv
+  if len(sys.argv) > 1 and sys.argv[1].find(' ') != -1:
+    # Assuming this is a shebang call, only use 1st argument
+    args = [sys.argv[0]] + shlex.split(sys.argv[1]) + sys.argv[2:]
 
-  options, arguments = adm.environment.parse_args()
+  print args
+  options, arguments = adm.environment.parse_args(args)
   if not arguments: arguments = [os.environ['SHELL']]
 
   if options.verbose:

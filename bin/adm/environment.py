@@ -53,7 +53,7 @@ def current_arch(debug):
   if debug: btype = 'debug'
   return '%s-%s-%s' % (base, arch, btype)
 
-def parse_args():
+def parse_args(argv):
   """Parses the command line input."""
 
   class MyParser(optparse.OptionParser):
@@ -61,9 +61,9 @@ def parse_args():
     def format_epilog(self, formatter):
       return self.epilog
 
-  prog =  os.path.basename(sys.argv[0])
-  if len(sys.argv) > 1 and sys.argv[1][0] != '-': 
-    prog = os.path.basename(sys.argv[1])
+  prog =  os.path.basename(argv[0])
+  if len(argv) > 1 and argv[1][0] != '-':
+    prog = os.path.basename(argv[1])
 
   default_arch = current_arch(debug=False)
 
@@ -127,7 +127,7 @@ def parse_args():
                    )
                     
 
-  options, arguments = parser.parse_args()
+  options, arguments = parser.parse_args(argv[1:])
 
   if options.help:
     parser.print_help()
