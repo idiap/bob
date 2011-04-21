@@ -44,12 +44,12 @@ Creating complete self-contained scripts
 ----------------------------------------
 
 You can also create scripts that can run standalone and require no
-configuration. For those, ``/usr/bin/env`` is your dearest friend. Here is an
-example of a python script that executes in a Torch-enabled environment:
+configuration. Here is an example of a python script that executes in a
+Torch-enabled environment:
 
 .. code-block:: python
 
-  #/usr/bin/env /WORKDIR/torch-x.y/bin/shell.py -- python
+  #!/WORKDIR/torch-x.y/bin/shell.py python
   import torch
   print torch.core.array.int16_2()
 
@@ -57,8 +57,8 @@ Here is another one that is just a shell script using ``bash``:
 
 .. code-block:: sh
 
-  #/usr/bin/env /WORKDIR/torch-x.y/bin/shell.py -- bash
-  echo $TORCH_VERSION
+  #!/WORKDIR/torch-x.y/bin/shebang.py -d bash
+  echo $TORCH_PLATFORM
 
 C++ development
 ---------------
@@ -173,3 +173,4 @@ system, so ``help()`` is your friend. Use it.
 .. _include_directories: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:include_directories
 .. _target_link_libraries: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:target_link_libraries
 .. _cmake list: http://www.cmake.org/cmake/help/syntax.html 
+.. _shebang: http://en.wikipedia.org/wiki/Shebang_(Unix)

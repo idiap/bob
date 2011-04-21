@@ -1,6 +1,6 @@
 """Torch::adm is a toolkit for helping you to build and maintain torch in an easy way
 """
-import build, environment
+from . import build, environment
 
 __all__ = ['build', 'environment']
 
