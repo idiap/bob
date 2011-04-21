@@ -13,7 +13,7 @@ torch_python_package_bindings(measure "${pysrc}")
 torch_python_install(measure)
   
 # Our test units
-#torch_python_add_test(python-measure-basic ${CMAKE_CURRENT_SOURCE_DIR}/test/test_measure.py)
+torch_python_add_test(python-measure-error ${CMAKE_CURRENT_SOURCE_DIR}/test/test_error.py)
 
 # Installs all python scripts
 #file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")

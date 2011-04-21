@@ -97,7 +97,6 @@ namespace Torch { namespace measure {
     //input predicate.
     std::vector<double> accumulator;
     accumulator.reserve(steps);
-    accumulator.push_back(min);
 
     for (size_t i=0; i<steps; ++i) {
       double threshold = (i * step_size) + min;
@@ -118,7 +117,7 @@ namespace Torch { namespace measure {
     }
 
     //we stop when it doesn't matter anymore to threshold.
-    if (accumulator.size() != steps) { 
+    if (accumulator.size() != steps) {
       //still needs some refinement: pick-up the middle of the range and go
       return recursive_minimization(negatives, positives, predicate,
           accumulator[accumulator.size()/2]-step_size,
