@@ -152,7 +152,7 @@ def version(dir, verbose):
     if lines: retval = lines[0].strip()
     f.close()
   else:
-    if verbose >= 3: print "Version file '%s' does not exist" % version_file
+    if verbose >= 3: print("Version file '%s' does not exist" % version_file)
   return retval
 
 def self_root():
@@ -164,7 +164,7 @@ def python_version(environment):
   already setup."""
   try:
     return subprocess.Popen(["python", "-c", "import sys; print 'python%d.%d' % sys.version_info[0:2]"], stdout=subprocess.PIPE, env=environment).communicate()[0].strip()
-  except OSError, e:
+  except OSError as e:
     return None
 
 class PathJoiner(object):
@@ -196,20 +196,20 @@ class PathManipulator(object):
     self.dictionary[key].append(value)
 
   def before(self, key, *args):
-    if not self.dictionary.has_key(key): self.dictionary[key] = []
+    if key not in self.dictionary: self.dictionary[key] = []
     elif not isinstance(self.dictionary[key], list): 
       #break-up and remove empty
       self.dictionary[key] = [v for v in self.dictionary[key].split(os.pathsep) if v]
     for value in args: self.prepend_one(key, value)
 
   def after(self, key, *args):
-    if not self.dictionary.has_key(key): self.dictionary[key] = []
+    if key not in self.dictionary: self.dictionary[key] = []
     for value in args: self.append_one(key, value)
 
   def consolidate(self):
     """Returns a copy of the environment dict where all entries are strings."""
     retval = dict(self.dictionary)
-    for key, value in retval.iteritems():
+    for key, value in retval.items():
       if isinstance(value, list): retval[key] = os.pathsep.join(value)
     return retval
 
@@ -218,7 +218,7 @@ def setup_external_dir(environment, directory, arch, verbose):
   "directory"."""
 
   if not os.path.exists(directory):
-    if verbose >= 3: print "External '%s' ignored -- not accessible!"
+    if verbose >= 3: print("External '%s' ignored -- not accessible!")
     return
 
   J = PathJoiner(directory)
@@ -274,9 +274,9 @@ def generate_environment(options):
 
   pyver = python_version(P.consolidate())
   if pyver:
-    if options.verbose >= 3: print "Python version detected: %s" % pyver
+    if options.verbose >= 3: print("Python version detected: %s" % pyver)
   else:
-    if options.verbose >= 3: print "No python interpreter detected - using current"
+    if options.verbose >= 3: print("No python interpreter detected - using current")
     pyver = 'python%d.%d' % sys.version_info[0:2]
 
   P.before('PATH', J('bin'), JIA('bin'))
@@ -324,5 +324,5 @@ def untemplatize_path(path, options):
       }
   retval = path % replacements
   if retval.find('%(') != -1:
-    raise RuntimeError, "Cannot fully expand path `%s'" % retval
+    raise RuntimeError("Cannot fully expand path `%s'" % retval)
   return retval
