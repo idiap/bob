@@ -32,7 +32,7 @@ namespace Torch { namespace database {
   namespace detail {
     /**
      * The Header for storing arrays into binary files. Please note that this
-     * class is for private use of the BinFile type.
+     * class is for private use of the TensorFile type.
      */
     struct TensorFileHeader {
 

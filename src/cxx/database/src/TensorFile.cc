@@ -37,7 +37,8 @@ db::TensorFile::TensorFile(const std::string& filename, db::TensorFile::openmode
   }
   else if(flag & db::TensorFile::out) {  
     if(m_stream && (flag & db::TensorFile::append)) {
-      m_stream.open(filename.c_str(), std::ios::out | std::ios::in);
+      m_stream.open(filename.c_str(), std::ios::out | std::ios::in |
+          std::ios::binary);
       m_header.read(m_stream);
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
@@ -112,8 +113,8 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
     case 2:
       {
         const blitz::Array<T,2>& bz = data.get<T,2>();
-        for (int i=0; i<(int)data.getShape()[0]; ++i)
-          for (int j=0; j<(int)data.getShape()[1]; ++j) {
+        for (int j=0; j<(int)data.getShape()[1]; ++j)
+          for (int i=0; i<(int)data.getShape()[0]; ++i) {
             T val = bz(i,j);
             s.write((const char*)&val, core::array::getElementSize<T>());
           }
@@ -122,9 +123,9 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
     case 3:
       {
         const blitz::Array<T,3>& bz = data.get<T,3>();
-        for (int i=0; i<(int)data.getShape()[0]; ++i)
+        for (int k=0; k<(int)data.getShape()[2]; ++k)
           for (int j=0; j<(int)data.getShape()[1]; ++j)
-            for (int k=0; k<(int)data.getShape()[2]; ++k) {
+            for (int i=0; i<(int)data.getShape()[0]; ++i) {
               T val = bz(i,j,k);
               s.write((const char*)&val, core::array::getElementSize<T>());
             }
@@ -133,10 +134,10 @@ void write_inlined(const db::detail::InlinedArrayImpl& data, std::ostream& s) {
     case 4:
       {
         const blitz::Array<T,4>& bz = data.get<T,4>();
-        for (int i=0; i<(int)data.getShape()[0]; ++i)
-          for (int j=0; j<(int)data.getShape()[1]; ++j)
-            for (int k=0; k<(int)data.getShape()[2]; ++k)
-              for (int l=0; l<(int)data.getShape()[3]; ++l) {
+        for (int l=0; l<(int)data.getShape()[3]; ++l)
+          for (int k=0; k<(int)data.getShape()[2]; ++k)
+            for (int j=0; j<(int)data.getShape()[1]; ++j)
+              for (int i=0; i<(int)data.getShape()[0]; ++i) {
                 T val = bz(i,j,k,l);
                 s.write((const char*)&val, core::array::getElementSize<T>());
               }
@@ -187,34 +188,47 @@ void db::TensorFile::write(const db::detail::InlinedArrayImpl& data) {
 }
 
 template <typename T>
-db::detail::InlinedArrayImpl read_inlined(size_t ndim, const size_t* shape,
+db::detail::InlinedArrayImpl read_inlined_tensor(size_t ndim, const size_t* shape,
     std::istream& s) {
   switch(ndim) {
     case 1:
       {
         blitz::Array<T,1> bz(shape[0]);
-        s.read(reinterpret_cast<char*>(bz.data()), shape[0]*sizeof(T));
+        s.read(reinterpret_cast<char*>(bz.data()), 
+          shape[0]*core::array::getElementSize<T>());
         return bz;
       }
     case 2:
       {
         //arrays are always stored in C-style ordering
         blitz::Array<T,2> bz(shape[0], shape[1]);
-        s.read(reinterpret_cast<char*>(bz.data()), shape[0]*shape[1]*sizeof(T));
+        for (int j=0; j<(int)shape[1]; ++j)
+          for (int i=0; i<(int)shape[0]; ++i)
+            s.read(reinterpret_cast<char*>(&bz(i,j)), 
+              core::array::getElementSize<T>());
         return bz;
       }
     case 3:
       {
         //arrays are always stored in C-style ordering
         blitz::Array<T,3> bz(shape[0], shape[1], shape[2]);
-        s.read(reinterpret_cast<char*>(bz.data()), shape[0]*shape[1]*shape[2]*sizeof(T));
+        for (int k=0; k<(int)shape[2]; ++k)
+          for (int j=0; j<(int)shape[1]; ++j)
+            for (int i=0; i<(int)shape[0]; ++i)
+              s.read(reinterpret_cast<char*>(&bz(i,j,k)), 
+                core::array::getElementSize<T>());
         return bz;
       }
     case 4:
       {
         //arrays are always stored in C-style ordering
         blitz::Array<T,4> bz(shape[0], shape[1], shape[2], shape[3]);
-        s.read(reinterpret_cast<char*>(bz.data()), shape[0]*shape[1]*shape[2]*shape[3]*sizeof(T));
+        for (int l=0; l<(int)shape[3]; ++l)
+          for (int k=0; k<(int)shape[2]; ++k)
+            for (int j=0; j<(int)shape[1]; ++j)
+              for (int i=0; i<(int)shape[0]; ++i)
+                s.read(reinterpret_cast<char*>(&bz(i,j,k,l)), 
+                  core::array::getElementSize<T>());
         return bz;
       }
     default:
@@ -225,21 +239,21 @@ db::detail::InlinedArrayImpl read_inlined(size_t ndim, const size_t* shape,
 db::detail::InlinedArrayImpl db::TensorFile::read() {
   if(!m_header_init) throw Uninitialized();
   switch(getElementType()) {
-    case Torch::core::array::t_bool: return read_inlined<bool>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_int8: return read_inlined<int8_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_int16: return read_inlined<int16_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_int32: return read_inlined<int32_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_int64: return read_inlined<int64_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_uint8: return read_inlined<uint8_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_uint16: return read_inlined<uint16_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_uint32: return read_inlined<uint32_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_uint64: return read_inlined<uint64_t>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_float32: return read_inlined<float>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_float64: return read_inlined<double>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_float128: return read_inlined<long double>(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_complex64: return read_inlined<std::complex<float> >(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_complex128: return read_inlined<std::complex<double> >(m_header.getNDim(), m_header.getShape(), m_stream);
-    case Torch::core::array::t_complex256: return read_inlined<std::complex<long double> >(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_bool: return read_inlined_tensor<bool>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_int8: return read_inlined_tensor<int8_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_int16: return read_inlined_tensor<int16_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_int32: return read_inlined_tensor<int32_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_int64: return read_inlined_tensor<int64_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_uint8: return read_inlined_tensor<uint8_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_uint16: return read_inlined_tensor<uint16_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_uint32: return read_inlined_tensor<uint32_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_uint64: return read_inlined_tensor<uint64_t>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_float32: return read_inlined_tensor<float>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_float64: return read_inlined_tensor<double>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_float128: return read_inlined_tensor<long double>(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_complex64: return read_inlined_tensor<std::complex<float> >(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_complex128: return read_inlined_tensor<std::complex<double> >(m_header.getNDim(), m_header.getShape(), m_stream);
+    case Torch::core::array::t_complex256: return read_inlined_tensor<std::complex<long double> >(m_header.getNDim(), m_header.getShape(), m_stream);
     default: throw Torch::database::TypeError(getElementType(), Torch::core::array::t_unknown);
   }
   ++m_current_array;
