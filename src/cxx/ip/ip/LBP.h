@@ -24,27 +24,20 @@ namespace Torch {
     class LBP
     {
       public:
-        // TODO Make the radius R a float?
-        LBP(const int P, const int R=1, const bool to_average=false, 
-          const bool add_average_bit=false, const bool uniform=false, 
-          const bool rotation_invariant=false);
+        LBP(const int P, const double R=1., const bool circular=true,
+          const bool to_average=false, const bool add_average_bit=false, 
+          const bool uniform=false, const bool rotation_invariant=false);
 
         virtual ~LBP() { }
 
 		    // Get the maximum possible label
   		  virtual int getMaxLabel() const = 0;
 
-        void setRadius(const int R) { m_R = R; }
-        int getRadius() const { return m_R; }
+        void setRadius(const double R) { m_R = R; updateR(); }
+        double getRadius() const { return m_R; }
         int getNNeighbours() const { return m_P; }
 
-/*
-        template<typename T> virtual void 
-        operator()(const blitz::Array<T,2>& src, 
-          blitz::Array<uint16_t,2>& dst) const = 0;
-*/
     	protected:
-
 		    /////////////////////////////////////////////////////////////////
     		// Initialize the conversion table for rotation invariant and uniform LBP patterns
 		    virtual void init_lut_RI() = 0;
@@ -54,12 +47,16 @@ namespace Torch {
     		virtual void init_lut_normal()= 0;
     		void init_lut_current();
 
+        inline void updateR() { m_R_rect = static_cast<int>(floor(m_R+0.5)); }
+
         int m_P;
-        int m_R;
+        double m_R;
+        bool m_circular;
         bool m_to_average;
         bool m_add_average_bit;
         bool m_uniform;
         bool m_rotation_invariant;
+        int m_R_rect;
 
         blitz::Array<uint16_t,1> m_lut_RI;
         blitz::Array<uint16_t,1> m_lut_U2;
