@@ -94,8 +94,8 @@ def arrayset_setitem(self, id, *args):
       raise RuntimeError, "Can only set (filename,codecname) to Arrayset"
   raise RuntimeError, "This cannot happen!"
 
-Arrayset.append = arrayset_append
-del arrayset_append
+Arrayset.append = arrayset_setitem
+del arrayset_setitem
 
 def arrayset_eq(self, other):
   """Compares two arraysets for content equality. We don't compare roles!"""
