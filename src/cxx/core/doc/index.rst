@@ -10,4 +10,4 @@ Basic Funcionality
    :maxdepth: 2
 
    UsingBlitzArrays
-   ErrorReportingAndLogging
+   ErrorReporting
