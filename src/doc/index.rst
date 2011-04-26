@@ -50,6 +50,8 @@ Developer's Guide
 .. toctree::
    :maxdepth: 2
 
+   GoldenRules
+   CodingGuidelines
    OptimizingTorch
 
 Indices and tables
