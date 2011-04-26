@@ -58,6 +58,7 @@ set(src_ip
    "src/LBP.cc"
    "src/LBP4R.cc"
    "src/LBP8R.cc"
+   "src/LBPTopOperator.cc"
 )
 #   "src/ipHOG.cc"
 

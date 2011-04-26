@@ -34,7 +34,7 @@ namespace Torch {
         /**
           * @brief Constructor
           */
-        LBP(const int P, const double R=1., const bool circular=true,
+        LBP(const int P, const double R=1., const bool circular=false,
           const bool to_average=false, const bool add_average_bit=false, 
           const bool uniform=false, const bool rotation_invariant=false);
 
