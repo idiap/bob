@@ -3,7 +3,7 @@
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines a function to rotate a 2D or 3D array/image.
- * The algorithm is strongly inspired by the following article:
+ * The shearing-based algorithm is strongly inspired by the following article:
  * 'A Fast Algorithm for General Raster Rotation', Alan Paeth, in the 
  * proceedings of Graphics Interface '86, p. 77-81.
  * The notes of Tobin Fricke about this article might also be of interest.
@@ -18,8 +18,6 @@
 #include "ip/Exception.h"
 #include "ip/shear.h"
 #include "ip/crop.h"
-
-namespace tca = Torch::core::array;
 
 namespace Torch {
 /**
@@ -102,7 +100,8 @@ namespace Torch {
       private:
 
         /**
-          * @brief Private methods used to rotate an array
+          * @brief Private methods used to rotate an array with a 'common'
+          *   angle (0, 90, 180 and 270 degrees)
           */
         template<typename T, bool mask>
         static void rotateNoCheck_0(const blitz::Array<T,2>& src, 
@@ -121,9 +120,22 @@ namespace Torch {
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
           blitz::Array<bool,2>& dst_mask);
         template<typename T, bool mask>
+
+        /**
+          * @brief Private method which selects the rotating algorithm
+          */
         void rotateNoCheck(const blitz::Array<T,2>& src, 
           const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
           blitz::Array<bool,2>& dst_mask);
+
+        /**
+          * @brief Private method which applies the shearing-based rotating 
+          *   algorithm
+          */
+        template<typename T, bool mask>
+        void rotateShearingNoCheck(const blitz::Array<T,2>& src,
+          const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
+          blitz::Array<bool,2>& dst_mask, const double angle);
 
         /**
           * Attributes
@@ -156,11 +168,11 @@ namespace Torch {
       blitz::Array<double,2>& dst)
     {
       // Check input
-      tca::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(src);
 
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, getOutputShape(src,m_angle));
+      Torch::core::array::assertZeroBase(dst);
+      Torch::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
 
       // Perform the rotation
       blitz::Array<bool,2> src_mask, dst_mask;
@@ -182,15 +194,15 @@ namespace Torch {
       blitz::Array<bool,2>& dst_mask)
     {
       // Check input
-      tca::assertZeroBase(src);
-      tca::assertZeroBase(src_mask);
-      tca::assertSameShape(src, src_mask);
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(src_mask);
+      Torch::core::array::assertSameShape(src, src_mask);
 
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertZeroBase(dst_mask);
-      tca::assertSameShape(dst, dst_mask);
-      tca::assertSameShape(dst, getOutputShape(src,m_angle));
+      Torch::core::array::assertZeroBase(dst);
+      Torch::core::array::assertZeroBase(dst_mask);
+      Torch::core::array::assertSameShape(dst, dst_mask);
+      Torch::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
 
       // Perform the rotation
       rotateNoCheck<T,true>(src, src_mask, dst, dst_mask);
@@ -210,11 +222,11 @@ namespace Torch {
       blitz::Array<double,3>& dst)
     {
       // Check input
-      tca::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(src);
 
       // Check output
-      tca::assertZeroBase(dst);
-      tca::assertSameShape(dst, getOutputShape(src,m_angle));
+      Torch::core::array::assertZeroBase(dst);
+      Torch::core::array::assertSameShape(dst, getOutputShape(src,m_angle));
 
       // Perform the rotation
       for( int p=0; p<dst.extent(0); ++p) {
@@ -335,13 +347,12 @@ namespace Torch {
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
       blitz::Array<bool,2>& dst_mask)
     { 
-      // Force the angle to be in range [-45,45] and determine the quadrant
-      // of the original angle:
-      //   0:[-45,45] -- 1:[45,135] -- 2:[135,225] -- 3:[225,315(i.e. -45)]
+      // Force the angle to be in range [-45,315] 
       double angle_norm = m_angle;
-      size_t quadrant;
       while(angle_norm < -45.)
         angle_norm += 360.;
+      while(angle_norm > 315.)
+        angle_norm -= 360.;
 
       // Check and resize dst if required
       if(angle_norm == 0. || angle_norm == 180.)
@@ -353,7 +364,7 @@ namespace Torch {
           rotateNoCheck_180<T,mask>(src, src_mask, dst, dst_mask);
         return;
       }
-      else if(angle_norm == 90. || angle_norm == 270. || angle_norm == -90.)
+      else if(angle_norm == 90. || angle_norm == 270.)
       {
         // Perform rotation
         if(angle_norm == 90.)
@@ -363,6 +374,36 @@ namespace Torch {
         return;
       }
 
+      switch(m_algo)
+      {
+        case Rotate::Shearing:
+          rotateShearingNoCheck<T,mask>(src, src_mask, dst, dst_mask, 
+            angle_norm);
+          break;
+        default:
+          throw Torch::ip::UnknownRotatingAlgorithm();
+      }
+    }
+
+    /**
+      * @brief Function which rotates a 2D blitz::array/image using a
+      *   shearing algorithm.
+      * @warning No check is performed on the dst blitz::array/image.
+      * @param src The input blitz array
+      * @param dst The output blitz array
+      * @param angle The angle of the rotation (in degrees)
+      * @param alg The algorithm which should be used to perform the 
+      *   rotation.
+      */
+    template<typename T, bool mask>
+    void Rotate::rotateShearingNoCheck(const blitz::Array<T,2>& src, 
+      const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
+      blitz::Array<bool,2>& dst_mask, const double angle)
+    { 
+      // Determine the quadrant of the original angle:
+      //   0:[-45,45] -- 1:[45,135] -- 2:[135,225] -- 3:[225,315(i.e. -45)]
+      double angle_norm = angle;
+      size_t quadrant;
       for( quadrant=0; angle_norm > 45.; ++quadrant)
         angle_norm -= 90.;
       quadrant %= 4;
@@ -370,123 +411,107 @@ namespace Torch {
       // Compute useful values 
       double rad_angle = angle_norm * M_PI / 180.;
 
-      switch(m_algo)
-      {
-        case Rotate::Shearing:
-          {
-            // Declare an intermediate arrays
-            // Perform simple rotation. After that, there is one more
-            //  rotation to do with an angle in [-45,45].
-            if( quadrant == 0 ) {
-              if( m_dst_int1.extent(0) != src.extent(0) || 
-                  m_dst_int1.extent(1) != src.extent(1) ) {
-                m_dst_int1.resize( src.extent(0), src.extent(1) );
-                if(mask)
-                  m_mask_int1.resize( src.extent(0), src.extent(1) );
-              }
-              rotateNoCheck_0<T,mask>(src, src_mask, m_dst_int1, 
-                m_mask_int1);
-            }
-            else if( quadrant == 1) {
-              if( m_dst_int1.extent(0) != src.extent(1) || 
-                  m_dst_int1.extent(1) != src.extent(0) ) {
-                m_dst_int1.resize( src.extent(1), src.extent(0) );
-                if(mask)
-                  m_mask_int1.resize( src.extent(1), src.extent(0) );
-              }
-              rotateNoCheck_90<T,mask>(src, src_mask, m_dst_int1, 
-                m_mask_int1);
-            }
-            else if( quadrant == 2) {
-              if( m_dst_int1.extent(0) != src.extent(0) || 
-                  m_dst_int1.extent(1) != src.extent(1) ) {
-                m_dst_int1.resize( src.extent(0), src.extent(1) );
-                if(mask)
-                  m_mask_int1.resize( src.extent(0), src.extent(1) );
-              }
-              rotateNoCheck_180<T,mask>(src, src_mask, m_dst_int1, 
-                m_mask_int1);
-            }
-            else { // quadrant == 3
-              if( m_dst_int1.extent(0) != src.extent(1) || 
-                  m_dst_int1.extent(1) != src.extent(0) ) {
-                m_dst_int1.resize( src.extent(1), src.extent(0) );
-                if(mask)
-                  m_mask_int1.resize( src.extent(1), src.extent(0) );
-              }
-              rotateNoCheck_270<T,mask>(src, src_mask, m_dst_int1, 
-                m_mask_int1);
-            }
-
-            // Compute shearing values required for the rotation
-            const double shear_x = -tan( rad_angle / 2. );
-            const double shear_y = sin( rad_angle );
-  
-            // Performs first shear (shearX)
-            const blitz::TinyVector<int,2> s1 = 
-              getShearXShape(m_dst_int1, shear_x);
-            if( m_dst_int2.extent(0) != s1(0) || 
-                m_dst_int2.extent(1) != s1(1) ) {
-              m_dst_int2.resize(s1);
-              if(mask)
-                m_mask_int2.resize( s1 );
-            }
-            if(mask)
-              shearX( m_dst_int1, m_mask_int1, m_dst_int2, m_mask_int2, 
-                shear_x, true);
-            else 
-              shearX( m_dst_int1, m_dst_int2, shear_x, true);
-            // Performs second shear (shearY)
-            const blitz::TinyVector<int,2> s2 = 
-              getShearYShape(m_dst_int2, shear_y);
-            if( m_dst_int3.extent(0) != s2(0) || 
-                m_dst_int3.extent(1) != s2(1) ) {
-              m_dst_int3.resize(s2);
-              if(mask)
-                m_mask_int3.resize( s2 );
-            }
-            if(mask)
-              shearY( m_dst_int2, m_mask_int2, m_dst_int3, m_mask_int3,
-                shear_y, true);
-            else
-              shearY( m_dst_int2, m_dst_int3, shear_y, true);
-            // Performs third shear (shearX)
-            const blitz::TinyVector<int,2> s3 = 
-              getShearXShape(m_dst_int3, shear_x);
-            if( m_dst_int4.extent(0) != s3(0) || 
-                m_dst_int4.extent(1) != s3(1) ) {
-              m_dst_int4.resize(s3);
-              if(mask)
-                m_mask_int4.resize( s3 );
-            }
-            if(mask)
-              shearX( m_dst_int3, m_mask_int3, m_dst_int4, m_mask_int4,
-                shear_x, true);
-            else
-              shearX( m_dst_int3, m_dst_int4, shear_x, true);
-
-            // Crop obtained sheared image
-            const double dAbsSin = fabs(sin(rad_angle));
-            const double dAbsCos = fabs(cos(rad_angle));
-            const int dst_width = 
-              floor(src.extent(0)*dAbsSin + src.extent(1)*dAbsCos + 0.5);
-            const int dst_height = 
-              floor(src.extent(0)*dAbsCos + src.extent(1)*dAbsSin + 0.5);
-      
-            int crop_x = (m_dst_int4.extent(1) - dst_width) / 2;
-            int crop_y = (m_dst_int4.extent(0) - dst_height) / 2;
-            if(mask)
-              crop( m_dst_int4, m_mask_int4, dst, dst_mask, crop_y, crop_x,
-                dst_height, dst_width, true, true);
-            else 
-              crop( m_dst_int4, dst, crop_y, crop_x, dst_height, dst_width,
-                true, true);
-          }
-          break;
-        default:
-          throw Torch::ip::UnknownRotatingAlgorithm();
+      // Declare an intermediate arrays
+      // Perform simple rotation. After that, there is one more
+      //  rotation to do with an angle in [-45,45].
+      if( quadrant == 0 ) {
+        if( m_dst_int1.extent(0) != src.extent(0) || 
+            m_dst_int1.extent(1) != src.extent(1) ) {
+          m_dst_int1.resize( src.extent(0), src.extent(1) );
+          if(mask)
+            m_mask_int1.resize( src.extent(0), src.extent(1) );
+        }
+        rotateNoCheck_0<T,mask>(src, src_mask, m_dst_int1, m_mask_int1);
       }
+      else if( quadrant == 1) {
+        if( m_dst_int1.extent(0) != src.extent(1) || 
+            m_dst_int1.extent(1) != src.extent(0) ) {
+          m_dst_int1.resize( src.extent(1), src.extent(0) );
+          if(mask)
+            m_mask_int1.resize( src.extent(1), src.extent(0) );
+        }
+        rotateNoCheck_90<T,mask>(src, src_mask, m_dst_int1, m_mask_int1);
+      }
+      else if( quadrant == 2) {
+        if( m_dst_int1.extent(0) != src.extent(0) || 
+            m_dst_int1.extent(1) != src.extent(1) ) {
+          m_dst_int1.resize( src.extent(0), src.extent(1) );
+          if(mask)
+            m_mask_int1.resize( src.extent(0), src.extent(1) );
+        }
+        rotateNoCheck_180<T,mask>(src, src_mask, m_dst_int1, m_mask_int1);
+      }
+      else { // quadrant == 3
+        if( m_dst_int1.extent(0) != src.extent(1) || 
+            m_dst_int1.extent(1) != src.extent(0) ) {
+          m_dst_int1.resize( src.extent(1), src.extent(0) );
+          if(mask)
+            m_mask_int1.resize( src.extent(1), src.extent(0) );
+        }
+        rotateNoCheck_270<T,mask>(src, src_mask, m_dst_int1, m_mask_int1);
+      }
+
+      // Compute shearing values required for the rotation
+      const double shear_x = -tan( rad_angle / 2. );
+      const double shear_y = sin( rad_angle );
+
+      // Performs first shear (shearX)
+      const blitz::TinyVector<int,2> s1 = 
+        getShearXShape(m_dst_int1, shear_x);
+      if( m_dst_int2.extent(0) != s1(0) || 
+          m_dst_int2.extent(1) != s1(1) ) {
+        m_dst_int2.resize(s1);
+        if(mask)
+          m_mask_int2.resize( s1 );
+      }
+      if(mask)
+        shearX( m_dst_int1, m_mask_int1, m_dst_int2, m_mask_int2, 
+            shear_x, true);
+      else 
+        shearX( m_dst_int1, m_dst_int2, shear_x, true);
+      // Performs second shear (shearY)
+      const blitz::TinyVector<int,2> s2 = 
+        getShearYShape(m_dst_int2, shear_y);
+      if( m_dst_int3.extent(0) != s2(0) || 
+          m_dst_int3.extent(1) != s2(1) ) {
+        m_dst_int3.resize(s2);
+        if(mask)
+          m_mask_int3.resize( s2 );
+      }
+      if(mask)
+        shearY( m_dst_int2, m_mask_int2, m_dst_int3, m_mask_int3,
+            shear_y, true);
+      else
+        shearY( m_dst_int2, m_dst_int3, shear_y, true);
+      // Performs third shear (shearX)
+      const blitz::TinyVector<int,2> s3 = 
+        getShearXShape(m_dst_int3, shear_x);
+      if( m_dst_int4.extent(0) != s3(0) || 
+          m_dst_int4.extent(1) != s3(1) ) {
+        m_dst_int4.resize(s3);
+        if(mask)
+          m_mask_int4.resize( s3 );
+      }
+      if(mask)
+        shearX( m_dst_int3, m_mask_int3, m_dst_int4, m_mask_int4,
+            shear_x, true);
+      else
+        shearX( m_dst_int3, m_dst_int4, shear_x, true);
+
+      // Crop obtained sheared image
+      const blitz::TinyVector<int,2> crop_d = getOutputShape(src, angle);
+
+      int crop_x = (m_dst_int4.extent(1) - crop_d(1)) / 2;
+      int crop_y = (m_dst_int4.extent(0) - crop_d(0)) / 2;
+      if(mask)
+        crop( m_dst_int4, m_mask_int4, dst, dst_mask, crop_y, crop_x,
+            crop_d(0), crop_d(1), true, true);
+      else 
+        crop( m_dst_int4, dst, crop_y, crop_x, crop_d(0), crop_d(1),
+            true, true);
     }
+
+
 
     /**
       * @brief Function which returns the shape of a rotated image, given
@@ -508,6 +533,8 @@ namespace Torch {
       double angle_norm = angle;
       while(angle_norm < -45.)
         angle_norm += 360.;
+      while(angle_norm > 315.)
+        angle_norm -= 360.;
 
       // Determine the size of the rotated image
       if(angle_norm == 0. || angle_norm == 180.)
@@ -515,7 +542,7 @@ namespace Torch {
         dim(0) = src.extent(0);
         dim(1) = src.extent(1);
       }
-      else if(angle_norm == 90. || angle_norm == 270. || angle_norm == -90.)
+      else if(angle_norm == 90. || angle_norm == 270.)
       {
         dim(0) = src.extent(1);
         dim(1) = src.extent(0);

@@ -42,7 +42,7 @@ struct T {
  */
 std::string temp_file(const std::string& ext) {
   boost::filesystem::path tpl = Torch::core::tmpdir();
-  std::string filename("torchtest_core_binformatXXXXXX");
+  std::string filename("torchtest_core_tensorformatXXXXXX");
   filename.append(ext);
   tpl /= filename;
   boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
@@ -100,6 +100,10 @@ BOOST_AUTO_TEST_CASE( tensor_2d )
   // Save to .tensor
   std::string filename = temp_file(".tensor");
   db_a.save( filename, "torch.array.tensor" );
+
+  // Readd .tensor
+  Torch::database::Array db_a_read(filename);
+  check_equal( db_a_read.get<int8_t,2>(), a);
 }
 
 BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )
