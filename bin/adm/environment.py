@@ -104,6 +104,7 @@ def parse_args(argv):
                     )
   parser.add_option("-v", "--verbose",
                     action="count",
+                    default=0,
                     dest="verbose",
                     help="Prints messages during execution. Using this option multiple times increases the verbosity level"
                     )
@@ -163,7 +164,8 @@ def python_version(environment):
   """Finds out the python version taking into consideration the external paths
   already setup."""
   try:
-    return subprocess.Popen(["python", "-c", "import sys; print 'python%d.%d' % sys.version_info[0:2]"], stdout=subprocess.PIPE, env=environment).communicate()[0].strip()
+    retval = subprocess.Popen(["python", "-c", "import sys; print 'python%d.%d' % sys.version_info[0:2]"], stdout=subprocess.PIPE, env=environment).communicate()[0].strip()
+    return str(retval)
   except OSError as e:
     return None
 

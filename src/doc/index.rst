@@ -44,6 +44,14 @@ User Guide
    ../cxx/doc/index
    ../python/doc/index
 
+Developer's Guide
+-----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   OptimizingTorch
+
 Indices and tables
 ------------------
 

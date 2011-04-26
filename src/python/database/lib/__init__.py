@@ -8,14 +8,17 @@ def dataset_arrayset_index(self):
   for k, v in zip(self.ids(), self.arraysets()): retval[k] = v
   return retval
 Dataset.arraysetIndex = dataset_arrayset_index
+del dataset_arrayset_index
 
 def dataset_relationset_index(self):
   """Returns a dictionary containing the relationset-name (key) and the 
-  relationset itself (value)."""
+  relationset itself (value).
+  """
   retval = {}
   for k, v in zip(self.names(), self.relationsets()): retval[k] = v
   return retval
 Dataset.relationsetIndex = dataset_relationset_index
+del dataset_relationset_index
 
 def dataset_eq(self, other):
   """Compares two datasets for equality, by comparing if their arraysets and
@@ -30,10 +33,12 @@ def dataset_eq(self, other):
     if self[name] != other[name]: return False
   return True
 Dataset.__eq__ = dataset_eq
+del dataset_eq
 
 def dataset_ne(self, other):
   return not (self == other)
 Dataset.__ne__ = dataset_ne
+del dataset_ne
 
 def arrayset_array_index(self):
   """Returns a dictionary containing the array ids (keys) and the arrays
@@ -42,6 +47,7 @@ def arrayset_array_index(self):
   for k in self.ids(): retval[k] = self[k]
   return retval
 Arrayset.arrayIndex = arrayset_array_index
+del arrayset_array_index
 
 def arrayset_append(self, *args):
   import numpy
@@ -63,6 +69,7 @@ def arrayset_append(self, *args):
   raise RuntimeError, "This cannot happen!"
 
 Arrayset.append = arrayset_append
+del arrayset_append
 
 def arrayset_setitem(self, id, *args):
   import numpy
@@ -88,6 +95,7 @@ def arrayset_setitem(self, id, *args):
   raise RuntimeError, "This cannot happen!"
 
 Arrayset.append = arrayset_append
+del arrayset_append
 
 def arrayset_eq(self, other):
   """Compares two arraysets for content equality. We don't compare roles!"""
@@ -99,36 +107,43 @@ def arrayset_eq(self, other):
     if self[id] != other[id]: return False
   return True
 Arrayset.__eq__ = arrayset_eq
+del arrayset_eq
 
 def arrayset_ne(self, other):
   """Compares two arraysets for content inequality. We don't compare roles!"""
   return not (self == other)
 Arrayset.__ne__ = arrayset_ne
+del arrayset_ne
 
 def array_get(self):
   """Returns a blitz::Array object with the internal element type"""
   return getattr(self, '__get_%s_%d__' % (self.elementType.name, len(self.shape)))()
 Array.get = array_get
+del array_get
 
 def array_cast(self, eltype):
   """Returns a blitz::Array object with the required element type"""
   return getattr(self, '__cast_%s_%d__' % (eltype.name, len(self.shape)))()
 Array.cast = array_cast
+del array_cast
 
 def array_copy(self):
   """Returns a blitz::Array object which is a copy of the internal data"""
   return getattr(self, '__cast_%s_%d__' % (self.elementType.name, len(self.shape)))()
 Array.copy = array_copy
+del array_copy
 
 def array_eq(self, other):
   """Compares two arrays for numeric equality"""
   return (self.get() == other.get()).all()
 Array.__eq__ = array_eq
+del array_eq
 
 def array_ne(self, other):
   """Compares two arrays for numeric equality"""
   return not (self == other)
 Array.__ne__ = array_ne
+del array_ne
 
 def relationset_index(self):
   """Returns a standard python dictionary that contains as keys, the roles and
@@ -158,6 +173,7 @@ def relationset_index(self):
   return retval
 
 Relationset.index = relationset_index
+del relationset_index
 
 def relationset_eq(self, other):
   """Compares the contents of two relationsets to see if they match"""
@@ -169,10 +185,12 @@ def relationset_eq(self, other):
     if self[k] != other[k]: return False
   return True
 Relationset.__eq__ = relationset_eq
+del relationset_eq
 
 def relationset_ne(self, other):
   return not (self == other)
 Relationset.__ne__ = relationset_ne
+del relationset_ne
 
 def dataset_relationset_index_by_name(self, name):
   """Returns a dictionary like the one in Relationset.index(), but replaces the
@@ -192,6 +210,7 @@ def dataset_relationset_index_by_name(self, name):
   return retval
 
 Dataset.relationsetIndexByName = dataset_relationset_index_by_name
+del dataset_relationset_index_by_name
 
 def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""
@@ -199,6 +218,7 @@ def binfile_getitem(self, i):
       (self.elementType.name, len(self.shape)))(i)
 
 BinFile.__getitem__ = binfile_getitem
+del binfile_getitem
 
 def tensorfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""
@@ -206,22 +226,27 @@ def tensorfile_getitem(self, i):
       (self.elementType.name, len(self.shape)))(i)
 
 TensorFile.__getitem__ = tensorfile_getitem
+del tensorfile_getitem
 
 def relation_eq(self, other):
   return sorted(self.members()) == sorted(other.members())
 Relation.__eq__ = relation_eq
+del relation_eq
 
 def relation_ne(self, other):
   return not (self == other)
 Relation.__ne__ = relation_ne
+del relation_ne
 
 def rule_eq(self, other):
   return (self.min == other.min) and (self.max == other.max)
 Rule.__eq__ = rule_eq
+del rule_eq
 
 def rule_ne(self, other):
   return not (self == other)
 Rule.__ne__ = rule_ne
+del rule_ne
 
 # Some HDF5 addons
 def hdf5type_array_class(self):
@@ -229,6 +254,7 @@ def hdf5type_array_class(self):
   from ..core import array
   return getattr(array, '%s_%d' % (self.type_str(), len(self.shape())))
 HDF5Type.array_class = hdf5type_array_class
+del hdf5type_array_class
 
 def hdf5file_read(self, path, pos=-1):
   """Reads elements from the current file.
@@ -253,6 +279,7 @@ def hdf5file_read(self, path, pos=-1):
     else:
       return getattr(self, '__read_%s__' % dtype.type_str())(path, pos)
 HDF5File.read = hdf5file_read
+del hdf5file_read
 
 def hdf5file_append(self, path, data, dtype=None):
   """Appends data to a certain HDF5 dataset in this file.
@@ -290,6 +317,7 @@ def hdf5file_append(self, path, data, dtype=None):
     meth = getattr(self, '__append_%s__' % dtype)
     for k in data: meth(path, k)
 HDF5File.append = hdf5file_append
+del hdf5file_append
 
 def hdf5file_replace(self, path, pos, data, dtype=None):
   """Replaces data to a certain HDF5 dataset in this file.
@@ -323,4 +351,5 @@ def hdf5file_replace(self, path, pos, data, dtype=None):
     if dtype is None: dtype = best_type(data[0])
     meth = getattr(self, '__replace_%s__' % dtype)
     for k in data: meth(path, pos, k)
-HDF5File.append = hdf5file_append
+HDF5File.replace = hdf5file_replace
+del hdf5file_replace
