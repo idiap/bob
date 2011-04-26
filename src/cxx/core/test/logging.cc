@@ -10,6 +10,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/shared_array.hpp>
 
 #include "core/logging.h"
 #include <cstdio>
@@ -25,7 +26,7 @@ using namespace Torch::core;
 std::string temp_file() {
   std::string tpl = Torch::core::tmpdir();
   tpl += "/torchtest_core_loggingXXXXXX";
-  boost::shared_ptr<char> char_tpl(new char[tpl.size()+1]);
+  boost::shared_array<char> char_tpl(new char[tpl.size()+1]);
   strcpy(char_tpl.get(), tpl.c_str());
   int fd = mkstemp(char_tpl.get());
   close(fd);

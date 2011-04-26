@@ -9,10 +9,10 @@
 
 namespace ip = Torch::ip;
 
-ip::LBP8R::LBP8R(const int R, const bool to_average, 
+ip::LBP8R::LBP8R(const double R, const bool circular, const bool to_average,
     const bool add_average_bit, const bool uniform, 
     const bool rotation_invariant): 
-  LBP(8,R,to_average,add_average_bit,uniform,rotation_invariant)
+  LBP(8,R,circular,to_average,add_average_bit,uniform,rotation_invariant)
 {
   // Initialize the lookup tables
   init_lut_RI();

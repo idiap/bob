@@ -13,6 +13,7 @@
 #include "core/cast.h"
 #include "ip/Exception.h"
 #include "ip/LBP.h"
+#include "sp/interpolate.h"
 
 namespace Torch {
 /**
@@ -25,9 +26,9 @@ namespace Torch {
     class LBP4R: public LBP
     {
       public:
-        LBP4R(const int R=1, const bool to_average=false, 
-            const bool add_average_bit=false, const bool uniform=false, 
-            const bool rotation_invariant=false); 
+        LBP4R(const double R=1., const bool circular=false, 
+            const bool to_average=false, const bool add_average_bit=false,
+            const bool uniform=false, const bool rotation_invariant=false);
 
         virtual ~LBP4R() { }
 
@@ -47,7 +48,7 @@ namespace Torch {
         getLBPShape(const blitz::Array<T,2>& src) const;
 
     	private:
-        template <typename T>
+        template <typename T, bool circular>
         uint16_t processNoCheck(const blitz::Array<T,2>& src, int y, int x) 
           const;
 
@@ -65,9 +66,20 @@ namespace Torch {
       blitz::Array<uint16_t,2>& dst) const
     {
       Torch::core::array::assertSameShape(dst, getLBPShape(src) );
-      for(int y=0; y<dst.extent(0); ++y)
-        for(int x=0; x<dst.extent(1); ++x)
-          dst(y,x) = Torch::ip::LBP4R::processNoCheck(src, m_R+y, m_R+x);
+      if( m_circular)
+      {
+        for(int y=0; y<dst.extent(0); ++y)
+          for(int x=0; x<dst.extent(1); ++x)
+            dst(y,x) = 
+              Torch::ip::LBP4R::processNoCheck<T,true>(src, m_R+y, m_R+x);
+      }
+      else
+      {
+        for(int y=0; y<dst.extent(0); ++y)
+          for(int x=0; x<dst.extent(1); ++x)
+            dst(y,x) = 
+              Torch::ip::LBP4R::processNoCheck<T,false>(src, m_R+y, m_R+x);
+      }
     }
     
     template <typename T> 
@@ -75,21 +87,41 @@ namespace Torch {
       int yc, int xc) const
     {
       // TODO: check inputs (xc, yc, etc.)
-      if( yc<m_R || yc>=src.extent(0)-m_R || xc<m_R || xc>=src.extent(1)-m_R)
-        throw Torch::ip::Exception();
-      
-      return Torch::ip::LBP4R::processNoCheck( src, yc, xc);
+      if( m_circular)
+      {
+        if( yc<m_R_rect || yc>=src.extent(0)-m_R_rect || 
+            xc<m_R_rect || xc>=src.extent(1)-m_R_rect)
+          throw Torch::ip::Exception();
+        return Torch::ip::LBP4R::processNoCheck<T,true>( src, yc, xc);
+      }
+      else
+      {
+        if( yc<m_R || yc>=src.extent(0)-m_R || 
+            xc<m_R || xc>=src.extent(1)-m_R)
+          throw Torch::ip::Exception();
+        return Torch::ip::LBP4R::processNoCheck<T,false>( src, yc, xc);
+      }
     }
     
-    template <typename T> 
+    template <typename T, bool circular> 
     uint16_t Torch::ip::LBP4R::processNoCheck( const blitz::Array<T,2>& src,
       int yc, int xc) const
     {
-      T tab[4];
-      tab[0] = src(yc-m_R,xc);
-      tab[1] = src(yc,xc+m_R);
-      tab[2] = src(yc+m_R,xc);
-      tab[3] = src(yc,xc-m_R);
+      double tab[4];
+      if(circular)
+      {
+        tab[0] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc-m_R,xc);
+        tab[1] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc,xc+m_R);
+        tab[2] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc+m_R,xc);
+        tab[3] = Torch::sp::detail::bilinearInterpolationNoCheck(src,yc,xc-m_R);
+      }
+      else
+      {
+        tab[0] = static_cast<double>(src(yc-m_R_rect,xc));
+        tab[1] = static_cast<double>(src(yc,xc+m_R_rect));
+        tab[2] = static_cast<double>(src(yc+m_R_rect,xc));
+        tab[3] = static_cast<double>(src(yc,xc-m_R_rect));
+      }
   
       const T center = src(yc,xc);
       const double cmp_point = (m_to_average ? 
