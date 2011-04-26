@@ -15,12 +15,7 @@ ip::LBP4R::LBP4R(const double R, const bool circular, const bool to_average,
   LBP(4,R,circular,to_average,add_average_bit,uniform,rotation_invariant)
 {
   // Initialize the lookup tables
-  init_lut_RI();
-  init_lut_U2();
-  init_lut_U2RI();
-  init_lut_normal();
-  init_lut_add_average_bit();
-  init_lut_current();
+  init_luts();
 }
 
 int ip::LBP4R::getMaxLabel() const

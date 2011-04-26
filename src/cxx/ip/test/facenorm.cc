@@ -85,5 +85,29 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   blitz::Array<uint8_t,2> img_ref_facenorm = ar_img_facenorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_facenorm, img_processed, eps);
 }
+  
+BOOST_AUTO_TEST_CASE( test_facenorm_b )
+{
+  // Get path to the XML Schema definition
+  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw Torch::core::Exception();
+  }
+  // Load original image
+  boost::filesystem::path testdata_path_img( testdata_cpath);
+  testdata_path_img /= "mobio.pgm";
+  Torch::database::Array ar_img(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
+  blitz::Array<double,2> img_processed_d(84,68);
+
+  Torch::ip::FaceEyesNorm facenorm(33, 84, 68, 16, 32);
+  
+  // Process giving the coordinates of the eyes
+  facenorm(img,img_processed_d, 455, 501, 463, 512);
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
