@@ -1,0 +1,43 @@
+===================================
+ Tutorial 02. Basic usage of Arrays
+===================================
+
+Selection / slicing different parts of arrays
+---------------------------------------------
+
+If you wish to use a slice (part) of array this is possible with the normal 
+python syntax
+
+.. code-block:: python
+
+   import torch
+
+   # create an array (guess size and shape)
+   my_array = torch.core.array.array([[1,2,3], [4,5,6]])
+
+   # select the first row
+   my_array[1, :]
+
+   # select the second column
+   my_array[:, 2]
+
+Some mathematic operations on arrays
+------------------------------------
+
+.. code-block:: python
+
+   import torch
+
+   # create two arrays (guess type and shape)
+   A = torch.core.array.array([[1,2,3], [4,5,6]])
+   B = torch.core.array.array([[7,7,8], [8,8,9]])
+
+   # It is possible to directly mulitple with a scalar
+   A1 = 0.45 * A
+
+   # It is possible to add a scalar to all element in matrix
+   B1 = B + 5
+
+   # Example of rich expressions
+   C = 0.45 * A + B / 0.18 + 1
+
