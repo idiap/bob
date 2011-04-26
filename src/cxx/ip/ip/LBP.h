@@ -20,7 +20,13 @@ namespace Torch {
   namespace ip {
 
     /**
-      * @brief This class is an abstraction for all the LBP variants
+      * @brief This class is an abstraction for all the Local Binary Patterns
+      *   variants. For more information, please refer to the following 
+      *   article:
+      *     "Face Recognition with Local Binary Patterns", from T. Ahonen,
+      *     A. Hadid and M. Pietikainen
+      *     in the proceedings of the European Conference on Computer Vision
+      *     (ECCV'2004), p. 469-481
       */
     class LBP
     {

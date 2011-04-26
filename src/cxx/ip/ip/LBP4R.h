@@ -25,8 +25,13 @@ namespace Torch {
   namespace ip {
 
     /**
-      * @brief This class allows to extract LBP-like features based on 4 
-      *   neighbour pixels
+      * @brief This class allows to extract Local Binary Pattern-like features
+      *   based on 4 neighbour pixels.
+      *   For more information, please refer to the following article:
+      *     "Face Recognition with Local Binary Patterns", from T. Ahonen,
+      *     A. Hadid and M. Pietikainen
+      *     in the proceedings of the European Conference on Computer Vision
+      *     (ECCV'2004), p. 469-481
       */
     class LBP4R: public LBP
     {
