@@ -9,6 +9,7 @@
 #define TORCH5SPRO_IP_LBP4R_H
 
 #include <blitz/array.h>
+#include <algorithm>
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "ip/Exception.h"
@@ -23,37 +24,72 @@ namespace Torch {
  */
   namespace ip {
 
+    /**
+      * @brief This class allows to extract Local Binary Pattern-like features
+      *   based on 4 neighbour pixels.
+      *   For more information, please refer to the following article:
+      *     "Face Recognition with Local Binary Patterns", from T. Ahonen,
+      *     A. Hadid and M. Pietikainen
+      *     in the proceedings of the European Conference on Computer Vision
+      *     (ECCV'2004), p. 469-481
+      */
     class LBP4R: public LBP
     {
       public:
+        /**
+          * @brief Constructor
+          */
         LBP4R(const double R=1., const bool circular=false, 
             const bool to_average=false, const bool add_average_bit=false,
             const bool uniform=false, const bool rotation_invariant=false);
 
+        /**
+          * @brief Destructor
+          */
         virtual ~LBP4R() { }
 
-
-		    // Get the maximum possible label
+		    /**
+          * @brief Return the maximum number of labels for the current LBP 
+          *   variant
+          */
   		  virtual int getMaxLabel() const;
 
+        /**
+          * @brief Extract LBP features from a 2D blitz::Array, and save 
+          *   the resulting LBP codes in the dst 2D blitz::Array.
+          */
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
           blitz::Array<uint16_t,2>& dst) const;
 
+        /**
+          * @brief Extract the LBP code of a 2D blitz::Array at the given 
+          *   location, and return it.
+          */
         template <typename T> 
         uint16_t operator()(const blitz::Array<T,2>& src, int y, int x) const;
 
+        /**
+          * @brief Get the required shape of the dst output blitz array, 
+          *   before calling the operator() method.
+          */
         template <typename T>
         const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<T,2>& src) const;
 
     	private:
+        /**
+          * @brief Extract the LBP code of a 2D blitz::Array at the given 
+          *   location, and return it, without performing any check.
+          */
         template <typename T, bool circular>
         uint16_t processNoCheck(const blitz::Array<T,2>& src, int y, int x) 
           const;
 
-		    /////////////////////////////////////////////////////////////////
-    		// Initialize the conversion table for rotation invariant and uniform LBP patterns
+		    /**
+    		  * @brief Initialize the conversion table for rotation invariant and
+          * uniform LBP patterns
+          */
 		    virtual void init_lut_RI();
     		virtual void init_lut_U2();
     		virtual void init_lut_U2RI();
@@ -71,14 +107,16 @@ namespace Torch {
         for(int y=0; y<dst.extent(0); ++y)
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
-              Torch::ip::LBP4R::processNoCheck<T,true>(src, m_R+y, m_R+x);
+              Torch::ip::LBP4R::processNoCheck<T,true>(src, 
+                static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
       }
       else
       {
         for(int y=0; y<dst.extent(0); ++y)
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
-              Torch::ip::LBP4R::processNoCheck<T,false>(src, m_R+y, m_R+x);
+              Torch::ip::LBP4R::processNoCheck<T,false>(src, 
+                static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
       }
     }
     
@@ -89,8 +127,8 @@ namespace Torch {
       // TODO: check inputs (xc, yc, etc.)
       if( m_circular)
       {
-        if( yc<m_R_rect || yc>=src.extent(0)-m_R_rect || 
-            xc<m_R_rect || xc>=src.extent(1)-m_R_rect)
+        if( yc<ceil(m_R) || yc>=src.extent(0)-ceil(m_R) || 
+            xc<ceil(m_R) || xc>=src.extent(1)-ceil(m_R) )
           throw Torch::ip::Exception();
         return Torch::ip::LBP4R::processNoCheck<T,true>( src, yc, xc);
       }
@@ -150,8 +188,8 @@ namespace Torch {
     Torch::ip::LBP4R::getLBPShape(const blitz::Array<T,2>& src) const
     {
       blitz::TinyVector<int,2> res;
-      res(0) = std::max(0, src.extent(0)-2*m_R);
-      res(1) = std::max(0, src.extent(1)-2*m_R);
+      res(0) = std::max(0, src.extent(0)-2*static_cast<int>(ceil(m_R)));
+      res(1) = std::max(0, src.extent(1)-2*static_cast<int>(ceil(m_R)));
       return res;
     }
 

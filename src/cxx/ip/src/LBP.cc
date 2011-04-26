@@ -44,3 +44,14 @@ void ip::LBP::init_lut_current()
     }   
   }
 }
+
+void ip::LBP::init_luts()
+{
+  // Initialize the lookup tables
+  init_lut_RI();
+  init_lut_U2();
+  init_lut_U2RI();
+  init_lut_normal();
+  init_lut_add_average_bit();
+  init_lut_current();
+}
