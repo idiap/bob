@@ -196,8 +196,8 @@ namespace Torch {
         generateWithCenter(src_d, m_centered, rot_c_y, rot_c_x);
 
       // new coordinate of the cropping reference point
-      int crop_ref_y1 = offset(0) + crop_ref_y;
-      int crop_ref_x1 = offset(1) + crop_ref_x;
+      double crop_ref_y1 = offset(0) + crop_ref_y;
+      double crop_ref_x1 = offset(1) + crop_ref_x;
 
       // 2/ Rotate to align the image with the x-axis
       shape = m_rotate->getOutputShape(m_centered, m_rotate->getAngle());
@@ -212,10 +212,10 @@ namespace Torch {
         m_rotate->operator()(m_centered, m_rotated);
 
       // new coordinate of the cropping reference point
-      crop_ref_y1 = crop_ref_y1 - m_centered.extent(0)/2;
-      crop_ref_x1 = crop_ref_x1 - m_centered.extent(1)/2;
-      int crop_ref_y2 = crop_ref_y1 * cos(m_rotate->getAngle()) - crop_ref_x1 * sin(m_rotate->getAngle()) + m_rotated.extent(0)/2;
-      int crop_ref_x2 = crop_ref_x1 * cos(m_rotate->getAngle()) + crop_ref_y1 * sin(m_rotate->getAngle()) + m_rotated.extent(1)/2;
+      crop_ref_y1 = crop_ref_y1 - (m_centered.extent(0)-1)/2.;
+      crop_ref_x1 = crop_ref_x1 - (m_centered.extent(1)-1)/2.;
+      double crop_ref_y2 = crop_ref_y1 * cos(m_rotate->getAngle()) - crop_ref_x1 * sin(m_rotate->getAngle()) + (m_rotated.extent(0)-1)/2.;
+      double crop_ref_x2 = crop_ref_x1 * cos(m_rotate->getAngle()) + crop_ref_y1 * sin(m_rotate->getAngle()) + (m_rotated.extent(1)-1)/2.;
 
       // 3/ Scale with the given scaling factor
       shape(0) = m_rotated.extent(0) * m_scaling_factor;
@@ -231,8 +231,8 @@ namespace Torch {
         scale(m_rotated, m_scaled);
 
       // new coordinate of the cropping reference point
-      int crop_ref_y3 = crop_ref_y2 * m_scaling_factor;
-      int crop_ref_x3 = crop_ref_x2 * m_scaling_factor;
+      int crop_ref_y3 = static_cast<int>(floor(crop_ref_y2 * m_scaling_factor + 0.5));
+      int crop_ref_x3 = static_cast<int>(floor(crop_ref_x2 * m_scaling_factor + 0.5));
 
       // 4/ Crop the face
       if(mask)
