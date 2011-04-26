@@ -30,12 +30,15 @@ static const char* ARRAY_CONVERT_DOC_FROMRANGE = "Return a blitz array of the sp
   ARRAY_CONVERT_DEF(double,float64,U,N,D) 
 
 void bind_core_convert() {
+    ARRAY_CONVERT_DEFS(int8_t, int8, 1)
     ARRAY_CONVERT_DEFS(uint8_t, uint8, 1)
     ARRAY_CONVERT_DEFS(uint16_t, uint16, 1)
     ARRAY_CONVERT_DEFS(double, float64, 1)
+    ARRAY_CONVERT_DEFS(int8_t, int8, 2)
     ARRAY_CONVERT_DEFS(uint8_t, uint8, 2)
     ARRAY_CONVERT_DEFS(uint16_t, uint16, 2)
     ARRAY_CONVERT_DEFS(double, float64, 2)
+    ARRAY_CONVERT_DEFS(int8_t, int8, 3)
     ARRAY_CONVERT_DEFS(uint8_t, uint8, 3)
     ARRAY_CONVERT_DEFS(uint16_t, uint16, 3)
     ARRAY_CONVERT_DEFS(double, float64, 3)
