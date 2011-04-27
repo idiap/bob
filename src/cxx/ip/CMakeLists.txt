@@ -19,7 +19,6 @@ set(src_ip
    "src/xtprobeImageFile.cc"
    "src/ipScaleYX.cc"
    "src/ipCrop.cc"
-   "src/ipBlock.cc"
    "src/ipHaarLienhart.cc"
    "src/ipHLBPLienhart.cc"
    "src/ipLBP.cc"
