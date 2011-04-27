@@ -170,7 +170,7 @@ symbolic link from this binary. Here are the instructions:
    $ cd /opt/local/bin; sudo ln -s gfortran-mp-4.4 gfortran
 
 .. warning::
-   * Torch/Blitz python bindings will not compile in _release_ mode with plain
+   * Torch/Blitz python bindings will not compile in **release** mode with plain
      gcc-4.2 (blitz causes a segmentation fault at the compiler). This is why
      we recommend to use the llvm gcc bridge instead.
 
