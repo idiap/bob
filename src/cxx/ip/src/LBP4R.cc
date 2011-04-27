@@ -15,12 +15,7 @@ ip::LBP4R::LBP4R(const double R, const bool circular, const bool to_average,
   LBP(4,R,circular,to_average,add_average_bit,uniform,rotation_invariant)
 {
   // Initialize the lookup tables
-  init_lut_RI();
-  init_lut_U2();
-  init_lut_U2RI();
-  init_lut_normal();
-  init_lut_add_average_bit();
-  init_lut_current();
+  init_luts();
 }
 
 int ip::LBP4R::getMaxLabel() const
@@ -37,24 +32,25 @@ void ip::LBP4R::init_lut_RI()
 {
   m_lut_RI.resize(16);
   // all 0's
-  m_lut_RI(0) = 1;
-  // 3 0's + 1 1's
-  m_lut_RI(1) = 2;
-  m_lut_RI(2) = 2;
-  m_lut_RI(4) = 2;
-  m_lut_RI(8) = 2;
-  // 2 0's + 2 1's
-  m_lut_RI(3) = 3;
+  m_lut_RI(0) = 0;
+  // binary pattern 0001
+  m_lut_RI(1) = 1;
+  m_lut_RI(2) = 1;
+  m_lut_RI(4) = 1;
+  m_lut_RI(8) = 1;
+  // binary pattern 0011
+  m_lut_RI(3) = 2;
+  m_lut_RI(6) = 2;
+  m_lut_RI(12) = 2;
+  m_lut_RI(9) = 2;
+  // binary pattern 0101
   m_lut_RI(5) = 3;
-  m_lut_RI(6) = 3;
-  m_lut_RI(9) = 3;
   m_lut_RI(10) = 3;
-  m_lut_RI(12) = 3;
-  // 1 0's + 3 1's
+  // binary pattern 0111
   m_lut_RI(7) = 4;
+  m_lut_RI(14) = 4;
   m_lut_RI(11) = 4;
   m_lut_RI(13) = 4;
-  m_lut_RI(14) = 4;
   // all 1's
   m_lut_RI(15) = 5;
 }
@@ -109,10 +105,13 @@ void ip::LBP4R::init_lut_U2RI()
   // D) Only two adjacent bits are 1 rest are 0's
   m_lut_U2RI(3) = 3;
   m_lut_U2RI(6) = 3;
+  m_lut_U2RI(9) = 3;
   m_lut_U2RI(12) = 3;
 
   // E) Only three adjacent bits are 1 rest are 0's
   m_lut_U2RI(7) = 4;
+  m_lut_U2RI(11) = 4;
+  m_lut_U2RI(13) = 4;
   m_lut_U2RI(14) = 4;
 
   // F) four adjacent bits are 1

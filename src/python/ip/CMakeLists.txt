@@ -6,7 +6,7 @@ set(pysrc
    "src/color.cc"
    "src/oldcolor.cc"
    "src/image.cc"
-   "src/lbp.cc"
+   "src/oldlbp.cc"
    "src/filters.cc"
    "src/filters_new.cc"
    "src/vision.cc"
@@ -19,8 +19,9 @@ set(pysrc
    "src/Rotate.cc"
    "src/TanTriggs.cc"
    "src/exception.cc"
-   "src/main.cc"
    "src/histo.cc"
+   "src/LBP.cc"
+   "src/main.cc"
    )
 
 include(../../cmake/macros.cmake)
@@ -32,6 +33,8 @@ torch_python_install(ip)
 # Our test units
 torch_python_add_test(python-ip-lbp-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp.py)
+torch_python_add_test(python-ip-lbp-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp_new.py)
 torch_python_add_test(python-ip-filter-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters.py)
 torch_python_add_test(python-ip-test-optflow

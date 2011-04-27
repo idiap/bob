@@ -44,6 +44,16 @@ User Guide
    ../cxx/doc/index
    ../python/doc/index
 
+Developer's Guide
+-----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   GoldenRules
+   CodingGuidelines
+   OptimizingTorch
+
 Indices and tables
 ------------------
 

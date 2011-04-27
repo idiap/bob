@@ -58,6 +58,7 @@ set(src_ip
    "src/LBP.cc"
    "src/LBP4R.cc"
    "src/LBP8R.cc"
+   "src/LBPTopOperator.cc"
 )
 #   "src/ipHOG.cc"
 
@@ -114,6 +115,7 @@ torch_test(ip scale test/scale.cc)
 torch_test(ip shear test/shear.cc)
 torch_test(ip shift test/shift.cc)
 torch_test(ip generatewithcenter test/generatewithcenter.cc)
+torch_test(ip tantriggs test/TanTriggs.cc)
 torch_test(ip zigzag test/zigzag.cc)
 
 # Defines environment variable used to localize data for the tests
@@ -126,5 +128,7 @@ set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-scale APPEND PROPERTY ENVIRONMENT
+  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-ip-tantriggs APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 

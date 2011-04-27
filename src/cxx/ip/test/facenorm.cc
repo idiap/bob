@@ -85,5 +85,5 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   blitz::Array<uint8_t,2> img_ref_facenorm = ar_img_facenorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_facenorm, img_processed, eps);
 }
-
+  
 BOOST_AUTO_TEST_SUITE_END()
