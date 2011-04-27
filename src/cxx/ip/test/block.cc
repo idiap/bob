@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( test_block_2d_nooverlap )
 {
   std::vector<blitz::Array<uint32_t,2> > dst; 
   // 2x2 block decomposition without overlap
-  Torch::ip::block(a2, dst, 3, 3, 0, 0);
+  Torch::ip::blockReference(a2, dst, 3, 3, 0, 0);
 
   // Compare to reference
   checkVectorBlitzEqual(dst, dst_a); 
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE( test_block_2d_overlap )
 {
   std::vector<blitz::Array<uint32_t,2> > dst; 
   // 2x2 block decomposition without overlap
-  Torch::ip::block(a2, dst, 3, 3, 1, 1);
+  Torch::ip::blockReference(a2, dst, 3, 3, 1, 1);
 
   // Compare to reference
   checkVectorBlitzEqual(dst, dst_b); 
