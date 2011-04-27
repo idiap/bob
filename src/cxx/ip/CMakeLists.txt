@@ -19,7 +19,6 @@ set(src_ip
    "src/xtprobeImageFile.cc"
    "src/ipScaleYX.cc"
    "src/ipCrop.cc"
-   "src/ipBlock.cc"
    "src/ipHaarLienhart.cc"
    "src/ipHLBPLienhart.cc"
    "src/ipLBP.cc"
@@ -109,6 +108,7 @@ torch_test(ip gammaCorrection test/gammaCorrection.cc)
 #torch_test(ip geomnorm test/geomnorm.cc)
 torch_test(ip facenorm test/facenorm.cc)
 torch_test(ip lbp test/LBP.cc)
+torch_test(ip lbphsfeatures test/lbphsfeatures.cc)
 torch_test(ip maxRectInMask test/maxRectInMask.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)

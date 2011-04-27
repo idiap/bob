@@ -82,3 +82,27 @@ const char* ip::UnknownRotatingAlgorithm::what() const throw() {
   return what_string;
 }
 
+
+ip::LBPUnsupportedNNeighbours::LBPUnsupportedNNeighbours(
+  const int N) throw(): 
+    m_n_neighbours(N)
+{
+}
+
+ip::LBPUnsupportedNNeighbours::~LBPUnsupportedNNeighbours() throw() {
+}
+
+const char* ip::LBPUnsupportedNNeighbours::what() const throw() {
+  try {
+    boost::format message(
+      "The LBP operator is not implemented for a number '%d' of neighbour \
+        pixels. Only LBP4R and LBP8R are currently supported.");
+    message % m_n_neighbours;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "ip::LBPUnsupportedNNeighbours: cannot \
+      format, exception raised";
+    return emergency;
+  }
+}

@@ -56,6 +56,22 @@ namespace Torch { namespace ip {
     private:
       mutable std::string m_message;
   };
+  
+  /**
+    * This exception is thrown when using a LBP with a non-common number
+    * of neighbours ( != 4 && != 8)
+   */
+  class LBPUnsupportedNNeighbours: public Exception {
+    public:
+      LBPUnsupportedNNeighbours(const int N)  throw();
+      virtual ~LBPUnsupportedNNeighbours() throw();
+      virtual const char* what() const throw();
+
+    private:
+      int m_n_neighbours;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* TORCH_IP_EXCEPTION_H */
