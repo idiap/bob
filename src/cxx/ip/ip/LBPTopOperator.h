@@ -79,7 +79,7 @@ namespace Torch {
 
         /**
          * Processes a 3D tensor representing a set of <b>grayscale</b> images 
-         * and returns (by argument) the three LBP planes calculated. The 4D 
+         * and returns (by argument) the three LBP planes calculated. The 3D 
          * tensor has to be arranged in this way:
          *
          * 1st dimension => frame height
@@ -103,13 +103,32 @@ namespace Torch {
          * input tensor along the time direction. 
          *
          */
+        void operator()(const blitz::Array<uint8_t,3>& src, 
+          blitz::Array<uint16_t,2>& xy,
+          blitz::Array<uint16_t,2>& xt,
+          blitz::Array<uint16_t,2>& yt) const
+        { process<uint8_t>( src, xy, xt, yt); }
+        void operator()(const blitz::Array<uint16_t,3>& src, 
+          blitz::Array<uint16_t,2>& xy,
+          blitz::Array<uint16_t,2>& xt,
+          blitz::Array<uint16_t,2>& yt) const
+        { process<uint16_t>( src, xy, xt, yt); }
+        void operator()(const blitz::Array<double,3>& src, 
+          blitz::Array<uint16_t,2>& xy,
+          blitz::Array<uint16_t,2>& xt,
+          blitz::Array<uint16_t,2>& yt) const
+        { process<double>( src, xy, xt, yt); }
+
+      private:
+        /**
+          * Processes a 3D tensor representing a set of <b>grayscale</b> images
+          * and returns (by argument) the three LBP planes calculated.
+          */
         template <typename T> 
-        void operator()(const blitz::Array<T,3>& src, 
+        void process(const blitz::Array<T,3>& src, 
           blitz::Array<uint16_t,2>& xy,
           blitz::Array<uint16_t,2>& xt,
           blitz::Array<uint16_t,2>& yt) const;
-
-      private:
 
         int m_radius_xy; ///< The LBPu2,i radius in XY
         int m_points_xy; ///< The number of points in the XY LBPu2,i
@@ -123,7 +142,7 @@ namespace Torch {
     };
 
     template <typename T>
-    void Torch::ip::LBPTopOperator::operator()(const blitz::Array<T,3>& src,
+    void Torch::ip::LBPTopOperator::process(const blitz::Array<T,3>& src,
       blitz::Array<uint16_t,2>& xy,
       blitz::Array<uint16_t,2>& xt,
       blitz::Array<uint16_t,2>& yt) const
@@ -155,10 +174,7 @@ namespace Torch {
       for (int x=m_radius_xy; x < (width-m_radius_xy); ++x) {
         for (int y=m_radius_xy; y < (height-m_radius_xy); ++y) {
           //m_lbp_xy->setXY(x, y);
-          if(m_points_xy == 4)
-            xy(y,x) = static_cast<uint16_t>(  floor( ((Torch::ip::LBP4R*)m_lbp_xy)->operator()(k, y, x) * inv_max_lbp_xy + 0.5));
-          else
-            xy(y,x) = static_cast<uint16_t>(  floor( ((Torch::ip::LBP8R*)m_lbp_xy)->operator()(k, y, x) * inv_max_lbp_xy + 0.5));
+          xy(y,x) = static_cast<uint16_t>(  floor( m_lbp_xy->operator()(k, y, x) * inv_max_lbp_xy + 0.5));
           //xy(y,x) = static_cast<uint16_t>(  
           //  floor(m_lbp_xy->operator()(k, y, x) * inv_max_lbp_xy + 0.5));
           //xy.set(y, x, 0, (short)(inv_max_lbp_xy * m_lbp_xy->getLBP() + 0.5f));
@@ -180,10 +196,7 @@ namespace Torch {
           //m_lbp_xt->setXY(x, 2*N);
           //m_lbp_xt->process(kt);
           //xt.set(y, x, 0, (short)(inv_max_lbp_xt * m_lbp_xt->getLBP() + 0.5f));
-          if(m_points_xt == 4)
-            xt(y,x) = static_cast<uint16_t>(  floor( ((Torch::ip::LBP4R*)m_lbp_xt)->operator()(k, 2*N, x) * inv_max_lbp_xt + 0.5));
-          else
-            xt(y,x) = static_cast<uint16_t>(  floor( ((Torch::ip::LBP8R*)m_lbp_xt)->operator()(k, 2*N, x) * inv_max_lbp_xt + 0.5));
+          xt(y,x) = static_cast<uint16_t>(  floor( m_lbp_xt->operator()(k, 2*N, x) * inv_max_lbp_xt + 0.5));
           //xt(y,x) = static_cast<uint16_t>(
           //   floor(m_lbp_xt->operator()(k, 2*N, x) * inv_max_lbp_xt + 0.5));
         }
@@ -204,10 +217,7 @@ namespace Torch {
           //m_lbp_yt->setXY(y, 2*N);
           //m_lbp_yt->process(kt);
           //yt.set(y, x, 0, (short)(inv_max_lbp_yt * m_lbp_yt->getLBP() + 0.5f));
-          if(m_points_yt == 4)
-            yt(y,x) = static_cast<uint16_t>(  floor( ((Torch::ip::LBP4R*)m_lbp_yt)->operator()(k, 2*N, y) * inv_max_lbp_yt + 0.5));
-          else
-            yt(y,x) = static_cast<uint16_t>(  floor( ((Torch::ip::LBP8R*)m_lbp_yt)->operator()(k, 2*N, y) * inv_max_lbp_yt + 0.5));
+          yt(y,x) = static_cast<uint16_t>(  floor( m_lbp_yt->operator()(k, 2*N, y) * inv_max_lbp_yt + 0.5));
           //yt(y,x) = static_cast<uint16_t>(
           //   floor(m_lbp_yt->operator()(k, 2*N, y) * inv_max_lbp_yt + 0.5));
         }

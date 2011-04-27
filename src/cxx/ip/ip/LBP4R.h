@@ -61,6 +61,18 @@ namespace Torch {
         template <typename T> 
         void operator()(const blitz::Array<T,2>& src, 
           blitz::Array<uint16_t,2>& dst) const;
+        void 
+        operator()(const blitz::Array<uint8_t,2>& src, 
+            blitz::Array<uint16_t,2>& dst) const 
+          { operator()<uint8_t>(src, dst); }
+        void 
+        operator()(const blitz::Array<uint16_t,2>& src, 
+            blitz::Array<uint16_t,2>& dst) const 
+          { operator()<uint16_t>(src, dst); }
+        void 
+        operator()(const blitz::Array<double,2>& src, 
+            blitz::Array<uint16_t,2>& dst) const 
+          { operator()<double>(src, dst); }
 
         /**
           * @brief Extract the LBP code of a 2D blitz::Array at the given 
@@ -68,6 +80,15 @@ namespace Torch {
           */
         template <typename T> 
         uint16_t operator()(const blitz::Array<T,2>& src, int y, int x) const;
+        uint16_t 
+        operator()(const blitz::Array<uint8_t,2>& src, int y, int x) const 
+          { return operator()<uint8_t>( src, y, x); }
+        uint16_t 
+        operator()(const blitz::Array<uint16_t,2>& src, int y, int x) const 
+          { return operator()<uint16_t>( src, y, x); }
+        uint16_t 
+        operator()(const blitz::Array<double,2>& src, int y, int x) const 
+          { return operator()<double>( src, y, x); }
 
         /**
           * @brief Get the required shape of the dst output blitz array, 
