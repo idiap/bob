@@ -129,10 +129,6 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc('011111111'), 0xf)
     #please note that the Torch implementation of LBPs is slightly different
     #then that of the original LBP paper:
-    # paper:
-    # s(x) >= 0 => LBP digit = 1
-    # s(x) <  0 => LBP digit = 0
-    # torch's: (FIXED)
     # s(x) >= 0 => LBP digit = 1
     # s(x) <  0 => LBO digit = 0
     self.assertEqual(proc('100000000'), 0x0)
@@ -151,30 +147,29 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc('100020002'), 0x5)
     self.assertEqual(proc('102000200'), 0xa)
     self.assertEqual(proc('102020202'), 0xf)
-    #self.assertEqual(op.max_label, 0xf) this is set to 16!
+    self.assertEqual(op.max_label, 0x10) # this is set to 16!
 
   def test02_rotinvariant_4p1r(self):
     op = torch.ip.LBP4R(1,False,False,False,False,True)
     proc = Processor(op, generate_3x3_image, (1,1))
-    #torch's implementation start labelling the patterns from 1
-    self.assertEqual(proc('100000000'), 0x1) #0x0
-    self.assertEqual(proc('102000000'), 0x2) #0x1
-    self.assertEqual(proc('100020000'), 0x2) #0x1
-    self.assertEqual(proc('100000200'), 0x2) #0x1
-    self.assertEqual(proc('100000002'), 0x2) #0x1
-    self.assertEqual(proc('102020000'), 0x3) #0x3
-    self.assertEqual(proc('100020200'), 0x3) #0x3
-    self.assertEqual(proc('100000202'), 0x3) #0x3
-    self.assertEqual(proc('102000002'), 0x3) #0x3
+    #torch's implementation start labelling the patterns from 0
+    self.assertEqual(proc('100000000'), 0x0) #0x0
+    self.assertEqual(proc('102000000'), 0x1) #0x1
+    self.assertEqual(proc('100020000'), 0x1) #0x1
+    self.assertEqual(proc('100000200'), 0x1) #0x1
+    self.assertEqual(proc('100000002'), 0x1) #0x1
+    self.assertEqual(proc('102020000'), 0x2) #0x3
+    self.assertEqual(proc('100020200'), 0x2) #0x3
+    self.assertEqual(proc('100000202'), 0x2) #0x3
+    self.assertEqual(proc('102000002'), 0x2) #0x3
+    self.assertEqual(proc('100020002'), 0x3) #0x5
+    self.assertEqual(proc('102000200'), 0x3) #0x5
     self.assertEqual(proc('102020200'), 0x4) #0x7
     self.assertEqual(proc('100020202'), 0x4) #0x7
     self.assertEqual(proc('102000202'), 0x4) #0x7
     self.assertEqual(proc('102020002'), 0x4) #0x7
-    #torch has these labels wrong
-    #self.assertEqual(proc('100020002'), 0x5) #0x5
-    #self.assertEqual(proc('102000200'), 0x5) #0x5
-    #self.assertEqual(proc('102020202'), 0x6) #0xf
-    #self.assertEqual(op.max_label, 0xf) this is set to 16!
+    self.assertEqual(proc('102020202'), 0x5) #0xf
+    self.assertEqual(op.max_label, 0x6) # this is set to 6!
 
   def test03_u2_4p1r(self):
     op = torch.ip.LBP4R(1,False,False,False,True)
@@ -195,6 +190,7 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc('100020002'), 0x0) #non-uniform(2) => 0x0
     self.assertEqual(proc('102000200'), 0x0) #non-uniform(2) => 0x0
     self.assertEqual(proc('102020202'), 0xe) #0xf
+    self.assertEqual(op.max_label, 0xf) # this is set to 15!
 
   def test04_rotinvariant_u2_4p1r(self):
     op = torch.ip.LBP4R(1,False,False,False,True,True)
@@ -207,14 +203,15 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc('102020000'), 0x3) #0xc
     self.assertEqual(proc('100020200'), 0x3) #0x6
     self.assertEqual(proc('100000202'), 0x3) #0x3
-    #self.assertEqual(proc('102000002'), 0x3) #0x9 #missing from torch
+    self.assertEqual(proc('102000002'), 0x3) #0x9 #missing from torch
     self.assertEqual(proc('102020200'), 0x4) #0xe
     self.assertEqual(proc('100020202'), 0x4) #0x7
-    #self.assertEqual(proc('102000202'), 0x4) #0xb #missing from torch
-    #self.assertEqual(proc('102020002'), 0x4) #0xd #missing from torch
+    self.assertEqual(proc('102000202'), 0x4) #0xb #missing from torch
+    self.assertEqual(proc('102020002'), 0x4) #0xd #missing from torch
     self.assertEqual(proc('100020002'), 0x0) #non-uniform(2) => 0x0
     self.assertEqual(proc('102000200'), 0x0) #non-uniform(2) => 0x0
     self.assertEqual(proc('102020202'), 0x5) #0xf
+    self.assertEqual(op.max_label, 0x6) # this is set to 6!
 
   def test05_vanilla_4p1r_toaverage(self):
     op = torch.ip.LBP4R(1,False,True)
@@ -235,7 +232,7 @@ class LBPTest(unittest.TestCase):
     self.assertEqual(proc('100020002'), 0x5) #average is 1.0
     self.assertEqual(proc('102000200'), 0xa) #average is 1.0
     self.assertEqual(proc('102020202'), 0xf) #average is 1.8
-    #self.assertEqual(op.max_label, 0xf) this is set to 16!
+    self.assertEqual(op.max_label, 0x10) # this is set to 16!
 
   def test06_vanilla_8p1r(self):
     op = torch.ip.LBP8R(1)

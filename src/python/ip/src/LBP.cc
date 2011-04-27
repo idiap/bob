@@ -35,7 +35,6 @@ static const char* lbp8r_doc = "Objects of this class, after configuration, can 
 
 void bind_ip_lbp_new() {
   class_<ip::LBP, boost::noncopyable>("LBP", "A base class for the LBP-like operators", no_init)
-    .def("max_label", boost::python::pure_virtual(&ip::LBP::getMaxLabel))
     .add_property("R", &ip::LBP::getRadius, &ip::LBP::setRadius)
     .add_property("P", &ip::LBP::getNNeighbours)
     .add_property("circular", &ip::LBP::getCircular, &ip::LBP::setCircular)
@@ -46,12 +45,14 @@ void bind_ip_lbp_new() {
     ;
 
   class_<ip::LBP4R, boost::shared_ptr<ip::LBP4R>, bases<ip::LBP> >("LBP4R", lbp4r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")="1.",arg("circular")="False",arg("to_average")="False",arg("add_average_bit")="False",arg("uniform")="False", arg("rotation_invariant")="False"), "Construct a new LBP4R object"))
+    .add_property("max_label", &ip::LBP4R::getMaxLabel)
     LBP4R_CALL_DEF(uint8_t)
     LBP4R_CALL_DEF(uint16_t)
     LBP4R_CALL_DEF(double)
     ;
 
   class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")="1.",arg("circular")="False",arg("to_average")="False",arg("add_average_bit")="False",arg("uniform")="False", arg("rotation_invariant")="False"), "Construct a new LBP8R object"))
+    .add_property("max_label", &ip::LBP4R::getMaxLabel)
     LBP8R_CALL_DEF(uint8_t)
     LBP8R_CALL_DEF(uint16_t)
     LBP8R_CALL_DEF(double)
