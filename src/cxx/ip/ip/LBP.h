@@ -104,6 +104,17 @@ namespace Torch {
         operator()(const blitz::Array<double,2>& src, 
           int y, int x) const = 0;
 
+        /**
+          * @brief Get the required shape of the dst output blitz array, 
+          *   before calling the operator() method.
+          */
+        virtual const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<uint8_t,2>& src) const = 0;
+        virtual const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<uint16_t,2>& src) const = 0;
+        virtual const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<double,2>& src) const = 0;
+
     	protected:
 		    /**
           * @brief Initialize the conversion table for rotation invariant and 

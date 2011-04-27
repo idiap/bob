@@ -97,6 +97,15 @@ namespace Torch {
         template <typename T>
         const blitz::TinyVector<int,2> 
         getLBPShape(const blitz::Array<T,2>& src) const;
+        const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<uint8_t,2>& src) const
+          { return getLBPShape<uint8_t>(src); }
+        const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<uint16_t,2>& src) const
+          { return getLBPShape<uint16_t>(src); }
+        const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<double,2>& src) const
+          { return getLBPShape<double>(src); }
 
     	private:
         /**
