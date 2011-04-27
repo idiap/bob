@@ -6,7 +6,7 @@ set(pysrc
    "src/color.cc"
    "src/oldcolor.cc"
    "src/image.cc"
-   "src/lbp.cc"
+   "src/oldlbp.cc"
    "src/filters.cc"
    "src/filters_new.cc"
    "src/vision.cc"
