@@ -37,8 +37,6 @@
 #include "core/cast.h"
 #include "ip/Exception.h"
 
-#include "ip/block.h"
-
 namespace Torch {
 
 	/**
@@ -51,12 +49,11 @@ namespace Torch {
 		class GaussianSmooth
 		{
 		public:
-
 			GaussianSmooth(const int radius_x, const int radius_y, const double sigma = 0.25)
 			{
 				m_radius_x = radius_x;
 				m_radius_y = radius_y;
-				m_rigma   = sigma;
+				m_sigma   = sigma;
 			  
 				m_kernel = blitz::Array<double, 2>(2 * radius_y + 1, 2 * radius_x + 1);
 				compute_kernel();
@@ -67,28 +64,28 @@ namespace Torch {
 			 * @param src The 2D input blitz array
 			 * @param src The 2D input blitz array
 			 */
-			template <typename T, typename U> 
+			template <typename T> 
 			void operator()(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
 			{
 				const int height = src.extent(0);
 				const int width  = src.extent(1);
 
-				const int start_x = radius_x;
-				const int start_y = radius_y;
-				const int stop_x  = width - radius_x;
-				const int stop_y  = height - radius_y;
+				const int start_x = m_radius_x;
+				const int start_y = m_radius_y;
+				const int stop_x  = width  - m_radius_x;
+				const int stop_y  = height - m_radius_y;
 
 				// Fill with 0 the output image (to clear boundaries)
-				dst.zeros();
+				// dst.zeros(); // function missing
 
 				// apply kernel
 				for (int y = start_y; y < stop_y; y ++) {
 					for (int x = start_x; x < stop_x; x ++) {
 						// Apply the kernel for the <y, x> pixel
 						double sum = 0.0;
-						for (int yy = -radius_y; yy <= radius_y; yy ++) {
-							for (int xx = -radius_x; xx <= radius_x; xx ++) {
-								sum += 	m_kernel(yy + radius_y, xx + radius_x) * src(y + yy, x + xx);
+						for (int yy = -m_radius_y; yy <= m_radius_y; yy ++) {
+							for (int xx = -m_radius_x; xx <= m_radius_x; xx ++) {
+								sum += 	m_kernel(yy + m_radius_y, xx + m_radius_x) * src(y + yy, x + xx);
 							}
 						}
 						
@@ -102,7 +99,7 @@ namespace Torch {
 			 * @param src The 3D input blitz array
 			 * @param src The 3D input blitz array
 			 */
-			template <typename T, typename U> 
+			template <typename T> 
 			void operator()(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst) 
 			{
 				for( int p=0; p<dst.extent(0); ++p) {
@@ -113,35 +110,37 @@ namespace Torch {
 					
 					// Gaussian smooth plane
 					this(src_slice, dst_slice);
+				}
 			}
 
 		private:
 			void compute_kernel() 
 			{
 				// compute the kernel
-				const double inv_sigma = 1.0  / sigma;
+				const double inv_sigma = 1.0  / m_sigma;
 				double sum = 0.0;
-		
-				for (int i = -radius_x; i <= radius_x; i++) {
-					for (int j = -radius_y; j <= radius_y; j ++) {
+				
+				for (int i = -m_radius_x; i <= m_radius_x; i++) {
+					for (int j = -m_radius_y; j <= m_radius_y; j ++) {
 						const double weight = exp(- inv_sigma * (i * i + j * j));
-
-						m_kernel(j + radius_y, i + radius_x) = weight;
+						
+						m_kernel(j + m_radius_y, i + m_radius_x) = weight;
 						sum += weight;
 					}
 				}
-
+				
 				// normalize the kernel
 				const double inv_sum = 1.0 / sum;
-				for (int i = -radius_x; i <= radius_x; i++)
-					for (int j = -radius_y; j <= radius_y; j ++)
-						m_kernel(j + radius_y, i + radius_x) *= inv_sum;
+				for (int i = -m_radius_x; i <= m_radius_x; i++)
+					for (int j = -m_radius_y; j <= m_radius_y; j ++)
+						m_kernel(j + m_radius_y, i + m_radius_x) *= inv_sum;
 			}
-
-			int m_radius_x = radius_x;
-			int m_radius_y = radius_y;
-			int m_rigma   = sigma;
-			  
+			
+		private:
+			int m_radius_x;
+			int m_radius_y;
+			int m_sigma;
+			
 			blitz::Array<double, 2> m_kernel;
 		};
 	}
