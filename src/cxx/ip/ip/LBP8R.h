@@ -101,6 +101,8 @@ namespace Torch {
     void Torch::ip::LBP8R::operator()(const blitz::Array<T,2>& src,  
       blitz::Array<uint16_t,2>& dst) const
     {
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
       Torch::core::array::assertSameShape(dst, getLBPShape(src) );
       if( m_circular)
       {
@@ -116,7 +118,7 @@ namespace Torch {
           for(int x=0; x<dst.extent(1); ++x)
             dst(y,x) = 
               Torch::ip::LBP8R::processNoCheck<T,false>(src,
-                static_cast<int>(ceil(m_R))+y, static_cast<int>(ceil(m_R))+x);
+                static_cast<int>(m_R_rect)+y, static_cast<int>(m_R_rect)+x);
       }
     }
     
@@ -124,19 +126,29 @@ namespace Torch {
     uint16_t Torch::ip::LBP8R::operator()(const blitz::Array<T,2>& src, 
       int yc, int xc) const
     {
-      // TODO: check inputs (xc, yc, etc.)
+      Torch::core::array::assertZeroBase(src);
       if( m_circular)
       {
-        if( yc<ceil(m_R) || yc>=src.extent(0)-ceil(m_R) || 
-            xc<ceil(m_R) || xc>=src.extent(1)-ceil(m_R) )
-          throw Torch::ip::Exception();
+        if( yc<ceil(m_R) )
+          throw ParamOutOfBoundaryError("yc", false, yc, ceil(m_R));
+        if( yc>=src.extent(0)-ceil(m_R) )
+          throw ParamOutOfBoundaryError("yc", true, yc, src.extent(0)-ceil(m_R)-1);
+        if( xc<ceil(m_R) )
+          throw ParamOutOfBoundaryError("xc", false, xc, ceil(m_R));
+        if( xc>=src.extent(1)-ceil(m_R) )
+          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-ceil(m_R)-1);
         return Torch::ip::LBP8R::processNoCheck<T,true>( src, yc, xc);
       }
       else
       {
-        if( yc<m_R || yc>=src.extent(0)-m_R || 
-            xc<m_R || xc>=src.extent(1)-m_R)
-          throw Torch::ip::Exception();
+        if( yc<m_R_rect )
+          throw ParamOutOfBoundaryError("yc", false, yc, m_R_rect);
+        if( yc>=src.extent(0)-m_R_rect )
+          throw ParamOutOfBoundaryError("yc", true, yc, src.extent(0)-m_R_rect-1);
+        if( xc<m_R_rect )
+          throw ParamOutOfBoundaryError("xc", false, xc, m_R_rect);
+        if( xc>=src.extent(1)-m_R_rect )
+          throw ParamOutOfBoundaryError("xc", true, xc, src.extent(1)-m_R_rect-1);
         return Torch::ip::LBP8R::processNoCheck<T,false>( src, yc, xc);
       }
     }
