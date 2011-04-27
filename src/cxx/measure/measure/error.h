@@ -90,7 +90,14 @@ namespace Torch { namespace measure {
   static double recursive_minimization(const blitz::Array<double,1>& negatives,
       const blitz::Array<double,1>& positives, T& predicate, 
       double min, double max, size_t steps) {
-    double step_size = (max-min)/steps;
+    static const double QUIT_THRESHOLD = 1e-10;
+    const double diff = max - min;
+    const double too_small = std::abs(diff/max);
+    
+    //if the difference between max and min is too small, we quit.
+    if ( too_small < QUIT_THRESHOLD ) return min; //or max, does not matter...
+
+    double step_size = diff/steps;
     double min_value = predicate(1.0, 0.0); ///< to the left of the range
    
     //the accumulator holds the thresholds that given the minimum value for the
