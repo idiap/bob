@@ -2,11 +2,8 @@
  Tutorial 02. Basic usage of Arrays
 ===================================
 
-Selection / slicing different parts of arrays
----------------------------------------------
-
 If you wish to use a slice (part) of array this is possible with the normal 
-python syntax
+python syntax.
 
 .. code-block:: python
 
@@ -21,8 +18,7 @@ python syntax
    # select the second column
    my_array[:, 2]
 
-Some mathematic operations on arrays
-------------------------------------
+Some mathematic operations on arrays.
 
 .. code-block:: python
 
@@ -41,3 +37,4 @@ Some mathematic operations on arrays
    # Example of rich expressions
    C = 0.45 * A + B / 0.18 + 1
 
+For a complete list of possible mathematical expressions look here : TODO
