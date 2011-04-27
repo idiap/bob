@@ -53,7 +53,7 @@ def calculate_lbp8r_rotinvariant_value(v):
 def calculate_lbp8r_rotinvariant_table():
   retval = []
   map = {} #map into torch values
-  last = 1
+  last = 0
   for k in range(256):
     v = calculate_lbp8r_rotinvariant_value(k)
     if not v in map.keys():
