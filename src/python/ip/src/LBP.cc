@@ -52,7 +52,7 @@ void bind_ip_lbp_new() {
     ;
 
   class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP8R object"))
-    .add_property("max_label", &ip::LBP4R::getMaxLabel)
+    .add_property("max_label", &ip::LBP8R::getMaxLabel)
     LBP8R_CALL_DEF(uint8_t)
     LBP8R_CALL_DEF(uint16_t)
     LBP8R_CALL_DEF(double)
