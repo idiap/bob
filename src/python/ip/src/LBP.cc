@@ -44,14 +44,14 @@ void bind_ip_lbp_new() {
     .add_property("rotation_invariant", &ip::LBP::getRotationInvariant, &ip::LBP::setRotationInvariant)
     ;
 
-  class_<ip::LBP4R, boost::shared_ptr<ip::LBP4R>, bases<ip::LBP> >("LBP4R", lbp4r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")="1.",arg("circular")="False",arg("to_average")="False",arg("add_average_bit")="False",arg("uniform")="False", arg("rotation_invariant")="False"), "Construct a new LBP4R object"))
+  class_<ip::LBP4R, boost::shared_ptr<ip::LBP4R>, bases<ip::LBP> >("LBP4R", lbp4r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP4R object"))
     .add_property("max_label", &ip::LBP4R::getMaxLabel)
     LBP4R_CALL_DEF(uint8_t)
     LBP4R_CALL_DEF(uint16_t)
     LBP4R_CALL_DEF(double)
     ;
 
-  class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")="1.",arg("circular")="False",arg("to_average")="False",arg("add_average_bit")="False",arg("uniform")="False", arg("rotation_invariant")="False"), "Construct a new LBP8R object"))
+  class_<ip::LBP8R, boost::shared_ptr<ip::LBP8R>, bases<ip::LBP> >("LBP8R", lbp8r_doc, init<optional<const double, const bool, const bool, const bool, const bool, const bool> >((arg("R")=1.0,arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Construct a new LBP8R object"))
     .add_property("max_label", &ip::LBP4R::getMaxLabel)
     LBP8R_CALL_DEF(uint8_t)
     LBP8R_CALL_DEF(uint16_t)
