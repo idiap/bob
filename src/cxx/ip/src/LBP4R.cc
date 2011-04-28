@@ -91,7 +91,7 @@ void ip::LBP4R::init_lut_U2RI()
 {
   m_lut_U2RI.resize(16);
   // A) All non uniform patterns have a label of 0.
-  m_lut_U2RI(0) = 0;
+  m_lut_U2RI = 0;
 
   // B) All bits are 0
   m_lut_U2RI(0) = 1;
