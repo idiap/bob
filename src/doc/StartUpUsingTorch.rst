@@ -45,7 +45,7 @@ Creating complete self-contained scripts
 
 You can also create scripts that can run standalone and require no
 configuration. Here is an example of a python script that executes in a
-Torch-enabled environment:
+Torch-enabled environment under Linux:
 
 .. code-block:: python
 
@@ -57,8 +57,18 @@ Here is another one that is just a shell script using ``bash``:
 
 .. code-block:: sh
 
-  #!/WORKDIR/torch-x.y/bin/shebang.py -d bash
+  #!/WORKDIR/torch-x.y/bin/shell.py -d bash
   echo $TORCH_PLATFORM
+
+.. note::
+
+  Please note that under BSD/MacOSX the ``/usr/bin/env`` works as expected and
+  should be used instead of the single shebang line showed above. Here is an
+  example:
+
+  .. code-block:: sh
+
+    #!/usr/bin/env /WORKDIR/torch-x.y/bin/shell.py --debug -- python
 
 C++ development
 ---------------
