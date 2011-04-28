@@ -91,14 +91,6 @@ just do a best guess.
 
 First try with doctests
 
-.. testsetup:: *
-
-   import torch
-
-.. doctest::
-
-   >>> 1 + 3
-   4
 
 
 
