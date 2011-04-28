@@ -117,10 +117,10 @@ void bind_database_hdf5() {
     DECLARE_SUPPORT(uint64_t)
     DECLARE_SUPPORT(float)
     DECLARE_SUPPORT(double)
-    DECLARE_SUPPORT(long double)
+    //DECLARE_SUPPORT(long double)
     DECLARE_SUPPORT(std::complex<float>)
     DECLARE_SUPPORT(std::complex<double>)
-    DECLARE_SUPPORT(std::complex<long double>)
+    //DECLARE_SUPPORT(std::complex<long double>)
     DECLARE_SUPPORT(std::string)
 #   undef DECLARE_SUPPORT
 #   define DECLARE_SUPPORT(T,N) .def("compatible", &db::HDF5Type::compatible<blitz::Array<T,N> >, (arg("self"), arg("value")), "Tests compatibility of this type against a given array")
@@ -141,10 +141,10 @@ void bind_database_hdf5() {
     DECLARE_BZ_SUPPORT(uint64_t)
     DECLARE_BZ_SUPPORT(float)
     DECLARE_BZ_SUPPORT(double)
-    DECLARE_BZ_SUPPORT(long double)
+    //DECLARE_BZ_SUPPORT(long double)
     DECLARE_BZ_SUPPORT(std::complex<float>)
     DECLARE_BZ_SUPPORT(std::complex<double>)
-    DECLARE_BZ_SUPPORT(std::complex<long double>)
+    //DECLARE_BZ_SUPPORT(std::complex<long double>)
 #   undef DECLARE_BZ_SUPPORT
 #   undef DECLARE_SUPPORT
     .def("is_array", &db::HDF5Type::is_array, (arg("self")), "Tests if this type is an array")
@@ -182,10 +182,10 @@ void bind_database_hdf5() {
     DECLARE_SUPPORT(uint64_t, uint64)
     DECLARE_SUPPORT(float, float32)
     DECLARE_SUPPORT(double, float64)
-    DECLARE_SUPPORT(long double, float128)
+    //DECLARE_SUPPORT(long double, float128)
     DECLARE_SUPPORT(std::complex<float>, complex64)
     DECLARE_SUPPORT(std::complex<double>, complex128)
-    DECLARE_SUPPORT(std::complex<long double>, complex256)
+    //DECLARE_SUPPORT(std::complex<long double>, complex256)
     DECLARE_SUPPORT(std::string, string)
 #   undef DECLARE_SUPPORT
 #   define DECLARE_SUPPORT(T,N) .def("__read_array__", &db::HDF5File::readArray<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
@@ -207,10 +207,10 @@ void bind_database_hdf5() {
     DECLARE_BZ_SUPPORT(uint64_t)
     DECLARE_BZ_SUPPORT(float)
     DECLARE_BZ_SUPPORT(double)
-    DECLARE_BZ_SUPPORT(long double)
+    //DECLARE_BZ_SUPPORT(long double)
     DECLARE_BZ_SUPPORT(std::complex<float>)
     DECLARE_BZ_SUPPORT(std::complex<double>)
-    DECLARE_BZ_SUPPORT(std::complex<long double>)
+    //DECLARE_BZ_SUPPORT(std::complex<long double>)
 #   undef DECLARE_BZ_SUPPORT
 #   undef DECLARE_SUPPORT
     ;
