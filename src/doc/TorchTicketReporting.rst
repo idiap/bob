@@ -82,7 +82,13 @@ A few things to note:
     nobody will look at these. Focus in finding an easy way to explain your
     problem and make it reproducible;
   - The specific versions of |project| and the operating system that you are
-    using (*not* "I'm using the latest/previous version").
+    using (*not* "I'm using the latest/previous version"). You can obtain
+    version numbers by executing the following script that is provided with
+    |project|:
+
+.. code-block:: sh
+   
+   $ info_table.py
 
 .. Place here all external references
 

@@ -88,7 +88,8 @@ namespace Torch {
 
     // get all the blocks
     std::list<blitz::Array<double,2> > blocks;
-    block(double_version, blocks, m_block_h, m_block_w, m_overlap_h, m_overlap_w);
+    blockReference(double_version, blocks, m_block_h, m_block_w, m_overlap_h, 
+      m_overlap_w);
   
     /// dct extract each block
     for( std::list<blitz::Array<double,2> >::const_iterator it = blocks.begin(); 

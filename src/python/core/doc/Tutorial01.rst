@@ -60,9 +60,10 @@ We may initialize the elements directly when we create a array.
 In the following example we create a 2D array of size 2x3 and specify the values to use for initialization.
 
 .. code-block:: python
-    # [1, 2, 3, 4, 5, 6] are the values and (2,3) is the 'shape'
-    # the values will be fill row by row
-    my_array = torch.core.array.float64_2([1, 2, 3, 4, 5, 6], (2,3))
+
+   # [1, 2, 3, 4, 5, 6] are the values and (2,3) is the 'shape'
+   # the values will be fill row by row
+   my_array = torch.core.array.float64_2([1, 2, 3, 4, 5, 6], (2,3))
 
 Guess the type
 --------------

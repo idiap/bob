@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # Python bindings
 set(pysrc
+   "src/version.cc"
    "src/exception.cc"
    "src/logging.cc"
    "src/object.cc"
@@ -64,3 +65,6 @@ torch_python_add_test(python-core-array-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
 torch_python_add_test(python-core-exception-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
+
+# Installs all python scripts
+file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
