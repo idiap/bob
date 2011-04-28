@@ -22,6 +22,7 @@ set(src
     "src/Random.cc"
     "src/File.cc"
     "src/Exception.cc"
+    "src/convert_exception.cc"
     "src/logging.cc"
     "src/array_exception.cc"
     "src/array_type.cc"

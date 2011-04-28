@@ -11,6 +11,7 @@
 #include <boost/test/unit_test.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
+#include "core/logging.h"
 #include "core/convert.h"
 #include "ip/GaborSpatial.h"
 //#include "ip/GaborBankSpatial.h"

@@ -19,9 +19,11 @@
 struct T {
   blitz::Array<uint8_t,1> a8;
   blitz::Array<uint16_t,1> a16;
-  T(): a8(3), a16(3) {
+  blitz::Array<double,1> f64;
+  T(): a8(3), a16(3), f64(3) {
     a8 = 0, 127, 255;
     a16 = 0, 32639, 65535;
+    f64 = 0, 128, 255;
   }
   ~T() {}
 };
@@ -89,6 +91,9 @@ BOOST_AUTO_TEST_CASE( test_convert_uint8_to_uint16 )
 
   blitz::Array<uint16_t,1> e = Torch::core::convertToRange<uint16_t,uint8_t>(a8,0,255);
   checkBlitzEqual( e, a8);
+
+  blitz::Array<uint8_t,1> f = Torch::core::convertFromRange<uint8_t,double>(f64,0.,255.);
+  checkBlitzEqual( f, f64);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

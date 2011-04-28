@@ -12,6 +12,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <boost/filesystem.hpp>
+#include "core/logging.h"
 #include "core/cast.h"
 #include "core/convert.h"
 #include "ip/FaceEyesNorm.h"

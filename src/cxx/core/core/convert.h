@@ -11,11 +11,11 @@
  */
 
 #ifndef TORCH5SPRO_CORE_CONVERT_H
-#define TORCH5SPRO_CORE_CONVERT_H 1
+#define TORCH5SPRO_CORE_CONVERT_H
 
-#include "core/logging.h"
-#include "core/Exception.h"
 #include <limits>
+#include <blitz/array.h>
+#include "core/convert_exception.h"
 
 namespace Torch {
 /**
@@ -35,12 +35,14 @@ namespace Torch {
     {
       blitz::Array<T,1> dst( src.extent(0) );
       if( src_min == src_max)
-        throw Torch::core::Exception();
+        throw Torch::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i) {
-        if( src(i+src.lbound(0)) < src_min || src(i+src.lbound(0)) > src_max )
-          throw Torch::core::Exception();
+        if( src(i+src.lbound(0)) < src_min)
+          throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0)), src_min);
+        if( src(i+src.lbound(0)) > src_max)
+          throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0)), src_max);
         // If the destination is an integer-like type, we need to add 0.5 s.t.
         // the round done by the implicit conversion is correct
         dst(i) = dst_min + (((src(i+src.lbound(0))-src_min)*src_ratio) * 
@@ -59,14 +61,15 @@ namespace Torch {
     {
       blitz::Array<T,2> dst( src.extent(0), src.extent(1) );
       if( src_min == src_max)
-        throw Torch::core::Exception();
+        throw Torch::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i) 
         for( int j=0; j<src.extent(1); ++j) {
-          if( src(i+src.lbound(0),j+src.lbound(1)) < src_min || 
-            src(i+src.lbound(0),j+src.lbound(1)) > src_max )
-            throw Torch::core::Exception();
+          if( src(i+src.lbound(0),j+src.lbound(1)) < src_min)
+            throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1)), src_min); 
+          if( src(i+src.lbound(0),j+src.lbound(1)) > src_max )
+            throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1)), src_max);
           // If the destination is an integer-like type, we need to add 0.5 
           // s.t. the round done by the implicit conversion is correct
           dst(i,j) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1))-src_min)*src_ratio) * 
@@ -85,15 +88,16 @@ namespace Torch {
     {
       blitz::Array<T,3> dst( src.extent(0), src.extent(1), src.extent(2) );
       if( src_min == src_max)
-        throw Torch::core::Exception();
+        throw Torch::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i)
         for( int j=0; j<src.extent(1); ++j) 
           for( int k=0; k<src.extent(2); ++k) {
-            if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) < src_min || 
-              src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) > src_max )
-              throw Torch::core::Exception();
+            if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) < src_min)
+              throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_min); 
+            if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)) > src_max )
+              throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2)), src_max);
             // If the destination is an integer-like type, we need to add 0.5 
             // s.t. the round done by the implicit conversion is correct
             dst(i,j,k) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2))-src_min)*src_ratio) * 
@@ -113,16 +117,17 @@ namespace Torch {
       blitz::Array<T,4> dst( src.extent(0), src.extent(1), src.extent(2),
         src.extent(3) );
       if( src_min == src_max)
-        throw Torch::core::Exception();
+        throw Torch::core::ConvertZeroInputRange();
       double src_ratio = 1. / ( src_max - src_min);
       T dst_diff = dst_max - dst_min;
       for( int i=0; i<src.extent(0); ++i)
         for( int j=0; j<src.extent(1); ++j) 
           for( int k=0; k<src.extent(2); ++k)
             for( int l=0; l<src.extent(3); ++l) {
-              if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) < src_min || 
-                src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) > src_max )
-                throw Torch::core::Exception();
+              if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) < src_min)
+                throw Torch::core::ConvertInputBelowMinRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_min); 
+              if( src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)) > src_max )
+                throw Torch::core::ConvertInputAboveMaxRange(src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3)), src_max);
               // If the destination is an integer-like type, we need to add 0.5
               // s.t. the round done by the implicit conversion is correct
               dst(i,j,k,l) = dst_min + (((src(i+src.lbound(0),j+src.lbound(1),k+src.lbound(2),l+src.lbound(3))-src_min)*src_ratio) *
@@ -139,8 +144,11 @@ namespace Torch {
     template<typename T, typename U, int d> 
     blitz::Array<T,d> convert(const blitz::Array<U,d>& src)
     {
-      return convert<T,U>( src, std::numeric_limits<T>::min(), 
-        std::numeric_limits<T>::max(), std::numeric_limits<U>::min(), 
+      T tmin = (std::numeric_limits<T>::is_iec559 ? 
+        -std::numeric_limits<T>::max() : std::numeric_limits<T>::min());
+      U umin = (std::numeric_limits<U>::is_iec559 ? 
+        -std::numeric_limits<U>::max() : std::numeric_limits<U>::min());
+      return convert<T,U>( src, tmin, std::numeric_limits<T>::max(), umin, 
         std::numeric_limits<U>::max() );
     }
 
@@ -153,8 +161,10 @@ namespace Torch {
     blitz::Array<T,d> convertToRange(const blitz::Array<U,d>& src, 
       T dst_min, T dst_max) 
     {
+      U umin = (std::numeric_limits<U>::is_iec559 ? 
+        -std::numeric_limits<U>::max() : std::numeric_limits<U>::min());
       return convert<T,U>( src, dst_min, dst_max, 
-        std::numeric_limits<U>::min(), std::numeric_limits<U>::max() );
+        umin, std::numeric_limits<U>::max() );
     }
 
     /**
@@ -166,7 +176,9 @@ namespace Torch {
     blitz::Array<T,d> convertFromRange(const blitz::Array<U,d>& src, 
       U src_min, U src_max) 
     {
-      return convert<T,U>( src, std::numeric_limits<T>::min(), 
+      T tmin = (std::numeric_limits<T>::is_iec559 ? 
+        -std::numeric_limits<T>::max() : std::numeric_limits<T>::min());
+      return convert<T,U>( src, tmin, 
         std::numeric_limits<T>::max(), src_min, src_max );
     }
 
