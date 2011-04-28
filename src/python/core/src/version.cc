@@ -21,7 +21,9 @@ extern "C" {
 #include <numpy/arrayobject.h>
 #include <libxml/xmlversion.h>
 #include <hdf5.h>
+#ifdef HAVE_MATIO
 #include <matio.h>
+#endif
 }
 
 using namespace boost::python;
