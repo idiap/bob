@@ -88,7 +88,7 @@ blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
  *  0.99  |  2.326
  *  0.999 |  3.090
  */
-double ppndf(double p) {
+static double _ppndf(double p) {
   //some constants we need for the calculation. 
   //these come from the NIST implementation...
   static const double SPLIT = 0.42;
@@ -133,14 +133,15 @@ double ppndf(double p) {
 }
 
 namespace blitz {
-  BZ_DECLARE_FUNCTION(ppndf) ///< A blitz::Array binding
+  BZ_DECLARE_FUNCTION(_ppndf) ///< A blitz::Array binding
 }
+
+double err::ppndf (double value) { return _ppndf(value); }
 
 blitz::Array<double,2> err::det(const blitz::Array<double,1>& negatives,
     const blitz::Array<double,1>& positives, size_t points) {
-  blitz::Array<double,2> retval(4, points);
-  retval(blitz::Range(2,3), blitz::Range::all()) = err::roc(negatives, positives, points);
-  retval(blitz::Range(0,1), blitz::Range::all()) = blitz::ppndf(retval(blitz::Range(2,3), blitz::Range::all()));
+  blitz::Array<double,2> retval(2, points);
+  retval = blitz::_ppndf(err::roc(negatives, positives, points));
   return retval;
 }
 
