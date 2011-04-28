@@ -88,4 +88,16 @@ just do a best guess.
     # [[1, 2], [2, 3]] could be interpreted as a 2D integer array.
     t5_array_1 = torch.core.array.array([[1,2,3], [4,5,6]])
 
-      
+First try with doctests
+
+.. testsetup:: *
+
+   import torch
+
+.. doctest::
+
+   >>> 1 + 3
+   4
+
+
+

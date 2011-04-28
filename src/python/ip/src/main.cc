@@ -27,6 +27,7 @@ void bind_ip_faceeyesnorm();
 void bind_ip_tantriggs();
 void bind_ip_histogram();
 void bind_ip_lbp_new();
+void bind_ip_gaussian();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
   docstring_options docopt; 
@@ -52,4 +53,5 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_tantriggs();
   bind_ip_histogram();
   bind_ip_lbp_new();
+  bind_ip_gaussian();
 }
