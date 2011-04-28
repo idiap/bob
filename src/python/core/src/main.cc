@@ -15,7 +15,6 @@ void bind_core_logging();
 void bind_core_object();
 void bind_core_tensor();
 void bind_core_profiler();
-void bind_core_convert();
 void bind_core_array_check();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
@@ -30,6 +29,5 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_object();
   bind_core_tensor();
   bind_core_profiler();
-  bind_core_convert();
   bind_core_array_check();
 }

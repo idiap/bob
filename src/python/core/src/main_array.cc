@@ -18,6 +18,7 @@ void bind_array_arithmetics_3();
 void bind_array_arithmetics_4();
 void bind_array_base();
 void bind_array_cast();
+void bind_array_convert();
 void bind_array_constructors();
 void bind_array_indexing_1();
 void bind_array_indexing_2();
@@ -52,6 +53,7 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_array_arithmetics_3();
   bind_array_arithmetics_4();
   bind_array_cast();
+  bind_array_convert();
   bind_array_constructors();
   bind_array_indexing_1();
   bind_array_indexing_2();

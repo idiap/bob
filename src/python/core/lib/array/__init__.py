@@ -32,14 +32,43 @@ del __BlitzArrayTypeTester__
 def array_str(self):
   """String representation. Used when printing or string conversion."""
   return "%s" % self.as_ndarray()
+
 def array_repr(self):
   """Simplified string representation."""
   return "%s %s (0x%x)" % (self.cxx_blitz_typename, self.shape(), id(self)) 
+
+def array_convert(self, dtype, dstRange=None, srcRange=None):
+  """Function which allows to convert/rescale a blitz array of a given type
+     into a blitz array of an other type. Typically, this can be used to rescale a
+     16 bit precision grayscale image (2d array) into an 8 bit precision grayscale
+     image.
+
+     Paramters:
+     dtype -- (string) Controls the output element type for the returned array
+     dstRange -- (tuple) Determines the range to be deployed at the returned array
+     srcRange -- (tuple) Determines the input range that will be used for the scaling
+
+     Returns:
+     A blitz::Array with the same shape as this one, but re-scaled and with its element
+     type as indicated by the user.
+  """
+
+  if dstRange is None and srcRange is None:
+    return getattr(self, '__convert_%s__' % dtype)()
+  elif dstRange is None:
+    return getattr(self, '__convert_%s__' % dtype)(destRange=dstRange)
+  elif srcRange is None:
+    return getattr(self, '__convert_%s__' % dtype)(sourceRange=srcRange)
+  else:
+    return getattr(self, '__convert_%s__' % dtype)(destRange=dstRange, sourceRange=srcRange)
+
 for array_class in [k[1] for k in get_array_types()]:
   array_class.__str__ = array_str
   array_class.__repr__ = array_repr
+  array_class.convert = array_convert
 del array_str
 del array_repr
+del array_convert
 
 def array(data, dtype=None):
   """Creates a new blitz::Array<T,N> through numpy. 

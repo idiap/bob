@@ -9,7 +9,6 @@ set(pysrc
    "src/object.cc"
    "src/tensor.cc"
    "src/profile.cc"
-   "src/convert.cc"
    "src/array_check.cc"
    "src/main.cc"
    )
@@ -42,6 +41,7 @@ set(pysrc_array
    "src/array_arithmetics_4.cc"
    "src/array_order.cc"
    "src/array_cast.cc"
+   "src/array_convert.cc"
    "src/array_storage.cc"
    "src/main_array.cc"
    )
