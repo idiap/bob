@@ -62,13 +62,40 @@ def array_convert(self, dtype, dstRange=None, srcRange=None):
   else:
     return getattr(self, '__convert_%s__' % dtype)(destRange=dstRange, sourceRange=srcRange)
 
+def array_save(self, filename, codecname=''):
+  """Saves the current array at the file path specified.
+
+  Parameters:
+  filename -- (string) The path to the file in which this array will be saved
+  to.
+  codecname -- (string, optional) The name of the Array codec that will be
+  used. If not provided, I will try to derive the codec to be used from the
+  filename extension.
+  """
+  from ...database import Array
+  Array(self).save(filename, codecname=codecname)
+
 for array_class in [k[1] for k in get_array_types()]:
   array_class.__str__ = array_str
   array_class.__repr__ = array_repr
   array_class.convert = array_convert
+  array_class.save = array_save
 del array_str
 del array_repr
 del array_convert
+
+def load(filename, codecname=''):
+  """Loads an array from a given file path specified
+  
+  Parameters:
+  filename -- (string) The path to the file from which an array will be loaded
+  in memory.
+  codecname -- (string, optional) The name of the Array codec that will be used
+  to decode the information in the file. If not provided, I will try to derive
+  the codec to be used from the filename extension.
+  """
+  from ...database import Array
+  return Array(filename, codecname=codecname).get()
 
 def array(data, dtype=None):
   """Creates a new blitz::Array<T,N> through numpy. 
