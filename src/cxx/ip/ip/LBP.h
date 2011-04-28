@@ -76,6 +76,45 @@ namespace Torch {
         void setRotationInvariant(const bool rot_i) 
           { m_rotation_invariant = rot_i; init_lut_current(); }
 
+        /**
+          * @brief Extract LBP features from a 2D blitz::Array, and save 
+          *   the resulting LBP codes in the dst 2D blitz::Array.
+          */
+        virtual void 
+        operator()(const blitz::Array<uint8_t,2>& src, 
+          blitz::Array<uint16_t,2>& dst) const = 0;
+        virtual void 
+        operator()(const blitz::Array<uint16_t,2>& src, 
+          blitz::Array<uint16_t,2>& dst) const = 0;
+        virtual void 
+        operator()(const blitz::Array<double,2>& src, 
+          blitz::Array<uint16_t,2>& dst) const = 0;
+
+        /**
+          * @brief Extract the LBP code of a 2D blitz::Array at the given 
+          *   location, and return it.
+          */
+        virtual uint16_t 
+        operator()(const blitz::Array<uint8_t,2>& src, 
+          int y, int x) const = 0;
+        virtual uint16_t 
+        operator()(const blitz::Array<uint16_t,2>& src, 
+          int y, int x) const = 0;
+        virtual uint16_t 
+        operator()(const blitz::Array<double,2>& src, 
+          int y, int x) const = 0;
+
+        /**
+          * @brief Get the required shape of the dst output blitz array, 
+          *   before calling the operator() method.
+          */
+        virtual const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<uint8_t,2>& src) const = 0;
+        virtual const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<uint16_t,2>& src) const = 0;
+        virtual const blitz::TinyVector<int,2> 
+        getLBPShape(const blitz::Array<double,2>& src) const = 0;
+
     	protected:
 		    /**
           * @brief Initialize the conversion table for rotation invariant and 

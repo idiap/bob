@@ -9,6 +9,7 @@
 
 using namespace boost::python;
 
+void bind_version_info();
 void bind_core_exception();
 void bind_core_logging();
 void bind_core_object();
@@ -23,6 +24,7 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   docopt.disable_cpp_signatures();
 # endif
   scope().attr("__doc__") = "Torch core classes and sub-classes";
+  bind_version_info();
   bind_core_exception();
   bind_core_logging();
   bind_core_object();
