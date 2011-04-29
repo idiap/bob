@@ -60,7 +60,6 @@ Data access
   '''private development''', you can use version 0.5.1 and above. Torch will
   work seemlessly. Please note that if you decide to distribute Torch compiled
   with a version of ffmpeg prior to 0.6, then the whole package becomes GPL'ed;
-* `Jpeglib`_: for JPEG support. You need version 6 at least;
 * `LibXML2`_: this dependence is used for the XML Dataset implementation.
 * `ImageMagick`_: is used for reading and writing image output. We
   currently compile against version 6.6.7, but other versions should work.
@@ -123,7 +122,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install cmake libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev libjpeg-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-1.8.4 libhdf5-serial-dev
+   $ sudo apt-get install cmake libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-1.8.4 libhdf5-serial-dev
 
 Mac OSX
 =======
@@ -140,7 +139,7 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg jpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx hdf5-18 py26-h5py py26-tables boost +python26
+   $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx hdf5-18 py26-h5py py26-tables boost +python26
    $ # go for a long coffee
 
 You can install also git if you want to submit patches to us:
@@ -264,7 +263,6 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _blitz++: http://www.oonumerics.org/blitz
 .. _cmake: http://www.cmake.org
 .. _ffmpeg: http://www.ffmpeg.org
-.. _jpeglib: http://www.ijg.org
 .. _cblas/lapack/atlas: http://www.netlib.org Cblas/Lapack/Atlas
 .. _boost: http://www.boost.org
 .. _python: http://www.python.org
