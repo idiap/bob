@@ -12,6 +12,7 @@
 #include "ip/crop.h"
 #include "ip/flipflop.h"
 #include "ip/gammaCorrection.h"
+#include "ip/integral.h"
 #include "ip/scale.h"
 #include "ip/shear.h"
 #include "ip/shift.h"
@@ -34,6 +35,7 @@ static const char* GENERATEWITHCENTER2D_DOC = "Extend a 2D blitz array/image, pu
 static const char* GENERATEWITHCENTER2D_MASK_DOC = "Extend a 2D blitz array/image, putting a given point in the center, taking mask into account.";
 static const char* GET_GENERATEWITHCENTER_SHAPE2D_DOC = "Return the shape of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.";
 static const char* GET_GENERATEWITHCENTER_OFFSET2D_DOC = "Return the offset of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.";
+static const char* INTEGRAL2D_DOC = "Compute the integral image of a 2D blitz array (image).";
 static const char* SCALEAS_DOC = "Gives back a scaled version of the original blitz array (image)";
 static const char* SCALE2D_DOC = "Rescale a 2D blitz array/image with the given dimensions.";
 static const char* SCALE2D_MASK_DOC = "Rescale a 2D blitz array/image with the given dimensions, taking mask into account.";
@@ -63,7 +65,6 @@ static const char* ZIGZAG2D_DOC = "Extract a 1D blitz array using a zigzag patte
   BOOST_PYTHON_FUNCTION_OVERLOADS(shift_overloads_ ## N, Torch::ip::shift<T>, 4, 6) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(shift_mask_overloads_ ## N, Torch::ip::shift<T>, 6, 8) \
   BOOST_PYTHON_FUNCTION_OVERLOADS(zigzag_overloads_ ## N, Torch::ip::zigzag<T>, 2, 4)
-
 
 #define FILTER_DEF(T,N) \
  def("block", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,3>&, const int, const int, const int, const int))&Torch::ip::block<T>, (arg("src"), arg("dst"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), BLOCK2D_DOC); \
@@ -97,6 +98,40 @@ static const char* ZIGZAG2D_DOC = "Extract a 1D blitz array using a zigzag patte
   def("gammaCorrection", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double))&Torch::ip::gammaCorrection<T>, (arg("src"), arg("dst"), arg("gamma")), GAMMACORRECTION2D_DOC); \
   def("zigzag", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,1>&, int, const bool))&Torch::ip::zigzag<T>, zigzag_overloads_ ## N ((arg("src"), arg("dst"), arg("n_coef")=0, arg("right_first")=false), ZIGZAG2D_DOC)); 
 
+template <typename U>
+static inline void integral_uint8(const blitz::Array<uint8_t,2>& src, blitz::Array<U,2>& dst, const bool addZeroBorder=false)
+  { Torch::ip::integral<uint8_t,U>(src,dst,addZeroBorder); }
+
+template <typename U>
+static inline void integral_uint16(const blitz::Array<uint16_t,2>& src, blitz::Array<U,2>& dst, const bool addZeroBorder=false)
+  { Torch::ip::integral<uint16_t,U>(src,dst,addZeroBorder); }
+
+template <typename U>
+static inline void integral_float64(const blitz::Array<double,2>& src, blitz::Array<U,2>& dst, const bool addZeroBorder=false)
+  { Torch::ip::integral<double,U>(src,dst,addZeroBorder); }
+
+#define INTEGRAL_DECL(U,N) \
+  BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads_uint8_ ## N, integral_uint8<U>, 2, 3) \
+  BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads_uint16_ ## N, integral_uint16<U>, 2, 3) \
+  BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads_float64_ ## N, integral_float64<U>, 2, 3)
+
+#define INTEGRAL_DEF(U,N) \
+  def(BOOST_PP_STRINGIZE(integral), (void (*)(const blitz::Array<uint8_t,2>&, blitz::Array<U,2>&, const bool))&integral_uint8<U>, integral_overloads_uint8_ ## N ((arg("src"), arg("dst"), arg("addZeroBorder")=false), INTEGRAL2D_DOC)); \
+  def(BOOST_PP_STRINGIZE(integral), (void (*)(const blitz::Array<uint16_t,2>&, blitz::Array<U,2>&, const bool))&integral_uint16<U>, integral_overloads_uint16_ ## N ((arg("src"), arg("dst"), arg("addZeroBorder")=false), INTEGRAL2D_DOC)); \
+  def(BOOST_PP_STRINGIZE(integral), (void (*)(const blitz::Array<double,2>&, blitz::Array<U,2>&, const bool))&integral_float64<U>, integral_overloads_float64_ ## N ((arg("src"), arg("dst"), arg("addZeroBorder")=false), INTEGRAL2D_DOC)); 
+
+
+INTEGRAL_DECL(int8_t,int8)
+INTEGRAL_DECL(int16_t,int16)
+INTEGRAL_DECL(int32_t,int32)
+INTEGRAL_DECL(int64_t,int64)
+INTEGRAL_DECL(uint8_t,uint8)
+INTEGRAL_DECL(uint16_t,uint16)
+INTEGRAL_DECL(uint32_t,uint32)
+INTEGRAL_DECL(uint64_t,uint64)
+INTEGRAL_DECL(float,float32)
+INTEGRAL_DECL(double,float64)
+
 
 /*
 FILTER_DECL(bool,bool)
@@ -125,7 +160,18 @@ void bind_ip_filters_new()
     .value("NearesetNeighbour", Torch::ip::Rescale::NearestNeighbour)
     .value("BilinearInterp", Torch::ip::Rescale::BilinearInterp)
     ;
- 
+
+  INTEGRAL_DEF(int8_t,int8)
+  INTEGRAL_DEF(int16_t,int16)
+  INTEGRAL_DEF(int32_t,int32)
+  INTEGRAL_DEF(int64_t,int64)
+  INTEGRAL_DEF(uint8_t,uint8)
+  INTEGRAL_DEF(uint16_t,uint16)
+  INTEGRAL_DEF(uint32_t,uint32)
+  INTEGRAL_DEF(uint64_t,uint64)
+  INTEGRAL_DEF(float,float32)
+  INTEGRAL_DEF(double,float64)
+
 /*
   FILTER_DEF(bool,bool)
   FILTER_DEF(int8_t,int8)

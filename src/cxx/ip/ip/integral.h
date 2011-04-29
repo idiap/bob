@@ -87,9 +87,9 @@ namespace Torch {
       // Compute the integral image of the 2D array
       if(addZeroBorder)
       {
-        for(int y=0; y<src.extent(0); ++y)
+        for(int y=0; y<dst.extent(0); ++y)
           dst(y,0) = 0;
-        for(int x=0; x<src.extent(1); ++x)
+        for(int x=1; x<dst.extent(1); ++x)
           dst(0,x) = 0;
         blitz::Array<U,2> dst_c = 
           dst(blitz::Range(1,src.extent(0)), blitz::Range(1,src.extent(1)));
