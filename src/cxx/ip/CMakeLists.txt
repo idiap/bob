@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps core database math sp) #other torch subprojects
-set(shared "${JPEG_LIBRARIES}")
+set(shared "")
 
 # This defines the list of source files inside this package.
 set(src_ip
