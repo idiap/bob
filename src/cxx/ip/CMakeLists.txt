@@ -58,6 +58,7 @@ set(src_ip
    "src/LBP4R.cc"
    "src/LBP8R.cc"
    "src/LBPTopOperator.cc"
+   "src/Sobel.cc"
 )
 #   "src/ipHOG.cc"
 
@@ -117,6 +118,7 @@ torch_test(ip shear test/shear.cc)
 torch_test(ip shift test/shift.cc)
 torch_test(ip generatewithcenter test/generatewithcenter.cc)
 torch_test(ip tantriggs test/TanTriggs.cc)
+torch_test(ip sobel test/Sobel.cc)
 torch_test(ip zigzag test/zigzag.cc)
 
 # Defines environment variable used to localize data for the tests
