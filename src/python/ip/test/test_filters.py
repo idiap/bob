@@ -298,9 +298,8 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
-
+"""
   def test15_sobel(self):
-    """
     v = torch.ip.Image(1, 1, 1)
     self.assertTrue(v.load(INPUT_IMAGE))
     f = torch.ip.ipSobel()
@@ -323,8 +322,7 @@ class FilterTest(unittest.TestCase):
           for k in range(reference.size(2)):
             self.assertEqual(t.get(i, j, k), reference.get(i, j, k))
     ref_file.close()
-    """
-
+   
   def test16_TanTriggs(self):
     v = torch.ip.Image(1, 1, 1) #Tan/Triggs only work with grayscaled images
     self.assertTrue(v.load(INPUT_IMAGE))
@@ -341,7 +339,7 @@ class FilterTest(unittest.TestCase):
       for j in range(reference.height):
         for k in range(reference.nplanes):
           self.assertEqual(processed.get(j, i, k), reference.get(j, i, k))
-
+"""
   def test17_vcycle(self):
     v = torch.ip.Image(1, 1, 1) #Tan/Triggs only work with grayscaled images
     self.assertTrue(v.load(INPUT_IMAGE))
