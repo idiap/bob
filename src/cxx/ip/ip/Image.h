@@ -5,7 +5,7 @@
 
 namespace Torch {
 
-	class ImageFile;
+	// class ImageFile; // @deprecated
 	class Color;
 	struct sRect2D;
 

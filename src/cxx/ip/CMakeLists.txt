@@ -14,9 +14,9 @@ set(src_ip
    "src/Complex.cc"
    "src/Convert.cc"
    "src/Image.cc"
-   "src/ImageFile.cc"
+#   "src/ImageFile.cc"
    "src/ipIntegral.cc"
-   "src/xtprobeImageFile.cc"
+#   "src/xtprobeImageFile.cc"
    "src/ipScaleYX.cc"
    "src/ipCrop.cc"
    "src/ipHaarLienhart.cc"
@@ -64,12 +64,12 @@ set(src_ip
 #   "src/ipHOG.cc"
 
 
-set(src_imagefiles
-   "src/pgmImageFile.cc"
-   "src/ppmImageFile.cc"
-   "src/gifImageFile.cc"
-   "src/jpegImageFile.cc"
-   "src/tiffImageFile.cc")
+#set(src_imagefiles
+#   "src/pgmImageFile.cc"
+#   "src/ppmImageFile.cc"
+#   "src/gifImageFile.cc"
+#   "src/jpegImageFile.cc"
+#   "src/tiffImageFile.cc")
 
 set(src_geometry
    "src/Affine2D.cc"
@@ -92,7 +92,7 @@ set(src_geometry
 
 set(src 
    "${src_ip}" 
-   "${src_imagefiles}"
+#   "${src_imagefiles}"
    "${src_geometry}")
 
 include(../../cmake/macros.cmake)

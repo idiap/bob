@@ -43,7 +43,7 @@ def color_eq(c1, c2):
   return ((c1.coding == c2.coding) and (c1.data0 == c2.data0) and \
       (c1.data1 == c2.data1) and (c1.data2 == c2.data2))
 Color.__eq__ = color_eq
-
+"""
 def image_as_gray(i):
   if i.getNPlanes() == 1: return i
   return i._toGray()
@@ -57,5 +57,5 @@ Image.as_rgb = image_as_rgb
 def image_str(i):
   return 'Image(width=%d, height=%d, planes=%d)' % (i.width, i.height, i.nplanes)
 Image.__str__ = image_str
-
+"""
 __all__ = dir()

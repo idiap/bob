@@ -14,7 +14,6 @@ void bind_ip_ipcore();
 void bind_ip_color();
 void bind_ip_oldcolor();
 void bind_ip_vision();
-void bind_ip_image();
 void bind_ip_lbp();
 void bind_ip_filters();
 void bind_ip_filters_new();
@@ -40,7 +39,6 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_color();
   bind_ip_oldcolor();
   bind_ip_vision();
-  bind_ip_image();
   bind_ip_lbp();
   bind_ip_filters();
   bind_ip_filters_new();
