@@ -59,6 +59,7 @@ set(src_ip
    "src/LBP8R.cc"
    "src/LBPTopOperator.cc"
    "src/Sobel.cc"
+   "src/Gaussian.cc"
 )
 #   "src/ipHOG.cc"
 
@@ -105,6 +106,7 @@ torch_test(ip crop test/crop.cc)
 torch_test(ip dctfeatures test/dctfeatures.cc)
 torch_test(ip flipflop test/flipflop.cc)
 torch_test(ip gabor test/Gabor.cc)
+torch_test(ip gaussian test/Gaussian.cc)
 torch_test(ip gammaCorrection test/gammaCorrection.cc)
 #torch_test(ip geomnorm test/geomnorm.cc)
 torch_test(ip facenorm test/facenorm.cc)
@@ -127,6 +129,8 @@ set_property(TEST cxx-ip-gabor APPEND PROPERTY ENVIRONMENT
 #set_property(TEST cxx-ip-geomnorm APPEND PROPERTY ENVIRONMENT
 #  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
+  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-ip-gaussian APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
