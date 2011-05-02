@@ -77,7 +77,12 @@ namespace Torch { namespace database { namespace detail {
     (const std::string& varname, const InlinedArrayImpl& data) {
 
       Torch::core::array::ElementType eltype = data.getElementType();
-      blitz::Array<T,D> bzdata = data.get<T,D>().copy();
+      blitz::Array<T,D> c_style = data.get<T,D>();
+
+      //transform the input data into a fortran-style array as Matlab requires
+      //fortran order for storage.
+      blitz::Array<T,D> bzdata(c_style.shape(), blitz::FortranArray<D>());
+      bzdata = c_style; //copy
 
       //matio gets dimensions as integers
       int mio_dims[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
@@ -97,12 +102,14 @@ namespace Torch { namespace database { namespace detail {
 
       Torch::core::array::ElementType eltype = data.getElementType();
       blitz::Array<T,D> bzdata = data.get<T,D>();
-
+      
       //matio accepts real/imaginary parts separated in a ComplexSplit struct.
       //The user must do the separation him/herself. 
 
-      blitz::Array<F,D> bzre = blitz::real(bzdata).copy(); //makes contiguous
-      blitz::Array<F,D> bzim = blitz::imag(bzdata).copy(); //makes contiguous
+      blitz::Array<F,D> bzre(bzdata.shape(), blitz::FortranArray<D>());
+      bzre = blitz::real(bzdata).copy(); //makes contiguous
+      blitz::Array<F,D> bzim(bzdata.shape(), blitz::FortranArray<D>());
+      bzim = blitz::imag(bzdata).copy(); //makes contiguous
 
       ComplexSplit mio_complex = { 
         static_cast<void*>(bzre.data()),
@@ -136,11 +143,28 @@ namespace Torch { namespace database { namespace detail {
    */
   template <typename T, int D> InlinedArrayImpl assign_array
     (boost::shared_ptr<matvar_t> matvar) {
-
     blitz::Array<T,D> data(static_cast<T*>(matvar->data), 
         make_shape<D>(matvar->dims), blitz::duplicateData);
-    return InlinedArrayImpl(data); 
+    
+    //matlab provides arrays in column-major order
+    switch (D) {
+      case 1:
+        break;
+      case 2:
+        data = data.transpose(1,0).copy();
+        break;
+      case 3:
+        data = data.transpose(2,1,0).copy();
+        break;
+      case 4:
+        data = data.transpose(3,2,1,0).copy();
+        break;
+      default:
+        throw Torch::database::DimensionError(D, 
+            Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
+    }
 
+    return InlinedArrayImpl(data); 
   }
  
   /**
