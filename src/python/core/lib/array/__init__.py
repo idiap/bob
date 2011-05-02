@@ -16,6 +16,20 @@ def get_array_types():
 
   return inspect.getmembers(libpytorch_core_array, is_array)
 
+def get_3d_array_types():
+  import inspect
+  import libpytorch_core_array
+
+  def is_array(t):
+    if not inspect.isclass(t): return False
+    cparts = t.__name__.split('_')
+    if len(cparts) == 2 and \
+        cparts[0][:3] in ('boo','int','uin','flo','com') and \
+        int(cparts[1]) in (3): return True
+    return False
+
+  return inspect.getmembers(libpytorch_core_array, is_array)
+
 class __BlitzArrayTypeTester__(object):
   """A tester for blitz::Array<> types."""
 
@@ -27,6 +41,10 @@ class __BlitzArrayTypeTester__(object):
 
 is_blitz_array = __BlitzArrayTypeTester__()
 del __BlitzArrayTypeTester__
+
+# to create a similar tensor as before
+def __sameAs__(self):
+  return self.__class__(self.shape())
 
 # binds string and representation
 def array_str(self):
@@ -80,9 +98,11 @@ for array_class in [k[1] for k in get_array_types()]:
   array_class.__repr__ = array_repr
   array_class.convert = array_convert
   array_class.save = array_save
+  array_class.sameAs = __sameAs__
 del array_str
 del array_repr
 del array_convert
+del __sameAs__
 
 def load(filename, codecname=''):
   """Loads an array from a given file path specified
