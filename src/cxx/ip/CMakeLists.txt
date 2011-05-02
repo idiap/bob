@@ -60,6 +60,7 @@ set(src_ip
    "src/LBPTopOperator.cc"
    "src/Sobel.cc"
    "src/Gaussian.cc"
+   "src/MultiscaleRetinex.cc"
 )
 #   "src/ipHOG.cc"
 
@@ -114,6 +115,7 @@ torch_test(ip integral test/integral.cc)
 torch_test(ip lbp test/LBP.cc)
 torch_test(ip lbphsfeatures test/lbphsfeatures.cc)
 torch_test(ip maxRectInMask test/maxRectInMask.cc)
+torch_test(ip msr test/MSR.cc)
 torch_test(ip rotate test/rotate.cc)
 torch_test(ip scale test/scale.cc)
 torch_test(ip shear test/shear.cc)
@@ -131,6 +133,8 @@ set_property(TEST cxx-ip-gabor APPEND PROPERTY ENVIRONMENT
 set_property(TEST cxx-ip-facenorm APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-gaussian APPEND PROPERTY ENVIRONMENT
+  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-ip-msr APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
 set_property(TEST cxx-ip-rotate APPEND PROPERTY ENVIRONMENT
   "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")

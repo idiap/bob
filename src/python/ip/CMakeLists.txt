@@ -20,6 +20,7 @@ set(pysrc
    "src/exception.cc"
    "src/histo.cc"
    "src/LBP.cc"
+   "src/MultiscaleRetinex.cc"
    "src/main.cc"
    )
 
