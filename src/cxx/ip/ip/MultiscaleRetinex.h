@@ -14,7 +14,6 @@
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "sp/convolution.h"
-#include "ip/Exception.h"
 #include "ip/Gaussian.h"
 #include <boost/shared_array.hpp>
 
