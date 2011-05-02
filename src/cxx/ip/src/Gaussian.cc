@@ -23,3 +23,15 @@ void ip::Gaussian::computeKernel()
   // normalize the kernel
   m_kernel /= blitz::sum(m_kernel);
 }
+
+void ip::Gaussian::reset(const int radius_y, const int radius_x,
+  const double sigma, const enum Torch::sp::Convolution::SizeOption size_opt,
+  const enum Torch::sp::Convolution::BorderOption border_opt)
+{
+  m_radius_y = radius_y;
+  m_radius_x = radius_x;
+  m_sigma = sigma;
+  m_conv_size = size_opt;
+  m_conv_border = border_opt;
+  computeKernel();
+}

@@ -23,9 +23,9 @@ static void gaussian_apply(ip::Gaussian& self, const blitz::Array<T,N>& src, bli
 
 void bind_ip_gaussian() {
 	class_<ip::Gaussian, boost::shared_ptr<ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const int, const int, const double> >((arg("radius_x")=1, arg("radius_y")=1, arg("sigma")=5.), "Create a gaussian smoother"))
-		.def("__call__",  &gaussian_apply<uint8_t, 2>, (arg("self"), arg("src"), arg("dst")), "Smooth an image")
-		.def("__call__",  &gaussian_apply<uint16_t, 2>, (arg("self"), arg("src"), arg("dst")), "Smooth an image")
-		.def("__call__",  &gaussian_apply<double, 2>, (arg("self"), arg("src"), arg("dst")), "Smooth an image")
+		.def("__call__",  &ip::Gaussian::operator()<uint8_t>, (arg("self"), arg("src"), arg("dst")), "Smooth an image")
+		.def("__call__",  &ip::Gaussian::operator()<uint16_t>, (arg("self"), arg("src"), arg("dst")), "Smooth an image")
+		.def("__call__",  &ip::Gaussian::operator()<double>, (arg("self"), arg("src"), arg("dst")), "Smooth an image")
 		;
 }
 

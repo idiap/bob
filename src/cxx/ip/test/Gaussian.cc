@@ -99,7 +99,7 @@ void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2,
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
+BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d )
 {
 // Get path to the XML Schema definition
   char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");

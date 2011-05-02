@@ -37,20 +37,23 @@ namespace Torch {
 		  	 * @param border_opt The interpolation type for the convolution
 			   */
 	  		Gaussian(const int radius_y=1, const int radius_x=1, 
+            const double sigma=5.,
+            const enum Torch::sp::Convolution::SizeOption size_opt =
+              Torch::sp::Convolution::Same,
+            const enum Torch::sp::Convolution::BorderOption border_opt =
+              Torch::sp::Convolution::Mirror):
+          m_radius_y(radius_y), m_radius_x(radius_x), m_sigma(sigma),
+          m_conv_size(size_opt), m_conv_border(border_opt)
+  			{
+          computeKernel();
+        }
+
+        void reset( const int radius_y=1, const int radius_x=1,
           const double sigma=5.,
           const enum Torch::sp::Convolution::SizeOption size_opt =
             Torch::sp::Convolution::Same,
           const enum Torch::sp::Convolution::BorderOption border_opt =
-            Torch::sp::Convolution::Mirror)
-  			{
-          m_radius_x    = radius_x;
-          m_radius_y    = radius_y;
-          m_sigma       = sigma;
-          m_conv_size   = size_opt;
-          m_conv_border = border_opt;
-
-          computeKernel();
-        }
+            Torch::sp::Convolution::Mirror);
 
         /**
          * @brief Process a 2D blitz Array/Image
@@ -58,7 +61,7 @@ namespace Torch {
          * @param src The 2D input blitz array
          */
         template <typename T> 
-        void operator()(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst);
+        void operator()(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst);
 
         /**
          * @brief Process a 3D blitz Array/Image
@@ -66,7 +69,7 @@ namespace Torch {
          * @param src The 3D input blitz array
          */
         template <typename T> 
-        void operator()(const blitz::Array<T,3>& src, blitz::Array<T,3>& dst);
+        void operator()(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst);
 
       private:
         void computeKernel(); 
@@ -74,9 +77,9 @@ namespace Torch {
         /**
          * @brief Attributes
          */	
-        int m_radius_x;
         int m_radius_y;
-        int m_sigma;
+        int m_radius_x;
+        double m_sigma;
         enum Torch::sp::Convolution::SizeOption m_conv_size;
         enum Torch::sp::Convolution::BorderOption m_conv_border;
 
@@ -85,17 +88,17 @@ namespace Torch {
 
     template <typename T> 
     void Torch::ip::Gaussian::operator()(const blitz::Array<T,2>& src, 
-      blitz::Array<T,2>& dst)
+      blitz::Array<double,2>& dst)
     {
       // Checks are postponed to the convolution function.
       // TODO: Find a way to avoid the cast/copy
-      Torch::sp::convolve(src, Torch::core::cast<T>(m_kernel), dst, 
+      Torch::sp::convolve(Torch::core::cast<double>(src), m_kernel, dst, 
         m_conv_size, m_conv_border);
     }
 
     template <typename T> 
     void Torch::ip::Gaussian::operator()(const blitz::Array<T,3>& src, 
-      blitz::Array<T,3>& dst)
+      blitz::Array<double,3>& dst)
     {
       for( int p=0; p<dst.extent(0); ++p) {
         const blitz::Array<T,2> src_slice = 
