@@ -106,6 +106,8 @@ namespace Torch { namespace database { namespace detail {
       //matio accepts real/imaginary parts separated in a ComplexSplit struct.
       //The user must do the separation him/herself. 
 
+      //transform the input data into a fortran-style array as Matlab requires
+      //fortran order for storage.
       blitz::Array<F,D> bzre(bzdata.shape(), blitz::FortranArray<D>());
       bzre = blitz::real(bzdata).copy(); //makes contiguous
       blitz::Array<F,D> bzim(bzdata.shape(), blitz::FortranArray<D>());
@@ -143,27 +145,12 @@ namespace Torch { namespace database { namespace detail {
    */
   template <typename T, int D> InlinedArrayImpl assign_array
     (boost::shared_ptr<matvar_t> matvar) {
-    blitz::Array<T,D> data(static_cast<T*>(matvar->data), 
-        make_shape<D>(matvar->dims), blitz::duplicateData);
-    
-    //matlab provides arrays in column-major order
-    switch (D) {
-      case 1:
-        break;
-      case 2:
-        data = data.transpose(1,0).copy();
-        break;
-      case 3:
-        data = data.transpose(2,1,0).copy();
-        break;
-      case 4:
-        data = data.transpose(3,2,1,0).copy();
-        break;
-      default:
-        throw Torch::database::DimensionError(D, 
-            Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
-    }
-
+    //note: Matlab saves data in fortran style (column major order)
+    blitz::Array<T,D> f_data(static_cast<T*>(matvar->data), 
+        make_shape<D>(matvar->dims), blitz::duplicateData, 
+        blitz::FortranArray<D>());
+    blitz::Array<T,D> data(f_data.shape());
+    data = f_data; //copies data to c-style array
     return InlinedArrayImpl(data); 
   }
  
@@ -203,12 +190,16 @@ namespace Torch { namespace database { namespace detail {
       F* real = static_cast<F*>(mio_complex.Re);
       F* imag = static_cast<F*>(mio_complex.Im);
 
-      blitz::Array<T,D> data(make_shape<D>(matvar->dims));
+      //note: Matlab saves data in fortran style (column major order)
+      blitz::Array<T,D> f_data(make_shape<D>(matvar->dims),
+          blitz::FortranArray<D>());
       size_t n=0;
       for (typename blitz::Array<T,D>::iterator 
-          it=data.begin(); it!=data.end(); ++it, ++n) {
+          it=f_data.begin(); it!=f_data.end(); ++it, ++n) {
         (*it) = std::complex<F>(real[n], imag[n]);
       }
+      blitz::Array<T,D> data(f_data.shape());
+      data = f_data; //copies data to c-style array
       return InlinedArrayImpl(data); 
     }
 
