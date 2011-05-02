@@ -16,6 +16,20 @@ def get_array_types():
 
   return inspect.getmembers(libpytorch_core_array, is_array)
 
+def get_3d_array_types():
+  import inspect
+  import libpytorch_core_array
+
+  def is_array(t):
+    if not inspect.isclass(t): return False
+    cparts = t.__name__.split('_')
+    if len(cparts) == 2 and \
+        cparts[0][:3] in ('boo','int','uin','flo','com') and \
+        int(cparts[1]) in (3): return True
+    return False
+
+  return inspect.getmembers(libpytorch_core_array, is_array)
+
 class __BlitzArrayTypeTester__(object):
   """A tester for blitz::Array<> types."""
 
@@ -30,7 +44,7 @@ del __BlitzArrayTypeTester__
 
 # to create a similar tensor as before
 def __sameAs__(self):
-    return self.__class__(self.shape())
+  return self.__class__(self.shape())
 
 # binds string and representation
 def array_str(self):
