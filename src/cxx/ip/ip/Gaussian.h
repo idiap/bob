@@ -88,7 +88,9 @@ namespace Torch {
       blitz::Array<T,2>& dst)
     {
       // Checks are postponed to the convolution function.
-      Torch::sp::convolve(src, m_kernel, dst, m_conv_size, m_conv_border);
+      // TODO: Find a way to avoid the cast/copy
+      Torch::sp::convolve(src, Torch::core::cast<T>(m_kernel), dst, 
+        m_conv_size, m_conv_border);
     }
 
     template <typename T> 
