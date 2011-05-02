@@ -101,7 +101,6 @@ namespace Torch {
         m_tmp.resize(src.extent(0), src.extent(1) );
       for(size_t s=0; s<m_n_scales; ++s) {
         m_gaussians[s](src,m_tmp);
-        // TODO: add other non-linear function
         dst += log(src+1) - log(m_tmp+1);
       }
       dst /= m_n_scales;

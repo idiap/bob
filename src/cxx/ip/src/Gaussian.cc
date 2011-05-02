@@ -35,3 +35,14 @@ void ip::Gaussian::reset(const int radius_y, const int radius_x,
   m_conv_border = border_opt;
   computeKernel();
 }
+
+
+template <>
+void ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src,
+   blitz::Array<double,2>& dst)
+{
+  // Checks are postponed to the convolution function.
+  Torch::sp::convolve(src, m_kernel, dst,
+  m_conv_size, m_conv_border);
+}
+

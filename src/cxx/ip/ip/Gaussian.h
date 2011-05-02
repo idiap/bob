@@ -11,7 +11,6 @@
 #include "core/array_assert.h"
 #include "core/cast.h"
 #include "sp/convolution.h"
-#include "ip/Exception.h"
 
 namespace Torch {
 
@@ -61,7 +60,8 @@ namespace Torch {
          * @param src The 2D input blitz array
          */
         template <typename T> 
-        void operator()(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst);
+        void operator()(const blitz::Array<T,2>& src, 
+          blitz::Array<double,2>& dst);
 
         /**
          * @brief Process a 3D blitz Array/Image
@@ -69,7 +69,8 @@ namespace Torch {
          * @param src The 3D input blitz array
          */
         template <typename T> 
-        void operator()(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst);
+        void operator()(const blitz::Array<T,3>& src, 
+          blitz::Array<double,3>& dst);
 
       private:
         void computeKernel(); 
@@ -86,12 +87,16 @@ namespace Torch {
         blitz::Array<double, 2> m_kernel;
     };
 
+    // Declare template method full specialization
+    template <> 
+    void Torch::ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src, 
+      blitz::Array<double,2>& dst);
+
     template <typename T> 
     void Torch::ip::Gaussian::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst)
     {
       // Checks are postponed to the convolution function.
-      // TODO: Find a way to avoid the cast/copy
       Torch::sp::convolve(Torch::core::cast<double>(src), m_kernel, dst, 
         m_conv_size, m_conv_border);
     }
