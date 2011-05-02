@@ -1,5 +1,9 @@
 .. vim: set fileencoding=utf-8 :
 
+.. testsetup::
+
+  import torch
+
 ======================================
  Tutorial 01. Initialization of Arrays
 ======================================
@@ -91,6 +95,13 @@ just do a best guess.
 
 First try with doctests
 
+.. testcode::
+
+  print 'Output   text.'
+
+.. testoutput::
+
+  Output text.
 
 
 

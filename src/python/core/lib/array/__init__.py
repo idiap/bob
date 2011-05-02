@@ -28,6 +28,10 @@ class __BlitzArrayTypeTester__(object):
 is_blitz_array = __BlitzArrayTypeTester__()
 del __BlitzArrayTypeTester__
 
+# to create a similar tensor as before
+def __sameAs__(self):
+    return self.__class__(self.shape())
+
 # binds string and representation
 def array_str(self):
   """String representation. Used when printing or string conversion."""
@@ -80,9 +84,11 @@ for array_class in [k[1] for k in get_array_types()]:
   array_class.__repr__ = array_repr
   array_class.convert = array_convert
   array_class.save = array_save
+  array_class.sameAs = __sameAs__
 del array_str
 del array_repr
 del array_convert
+del __sameAs__
 
 def load(filename, codecname=''):
   """Loads an array from a given file path specified
