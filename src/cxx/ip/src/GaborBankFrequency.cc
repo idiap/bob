@@ -14,11 +14,13 @@ namespace ip = Torch::ip;
 ip::GaborBankFrequency::GaborBankFrequency( const int height, const int width,
   const int n_orient, const int n_freq, const double fmax, 
   const bool orientation_full, const double k, 
-  const double p, const double gamma, const double eta, 
+  const double p, const bool optimal_gamma_eta, 
+  const double gamma, const double eta, 
   const double pf, const bool cancel_dc, 
   const bool use_envelope, const bool output_in_frequency):
   m_height(height), m_width(width), m_n_orient(n_orient), m_n_freq(n_freq), 
   m_fmax(fmax), m_orientation_full(orientation_full), m_k(k), m_p(p), 
+  m_optimal_gamma_eta(optimal_gamma_eta),
   m_gamma(gamma), m_eta(eta), m_pf(pf), m_cancel_dc(cancel_dc),
   m_use_envelope(use_envelope), m_output_in_frequency(output_in_frequency) 
 {
@@ -69,6 +71,10 @@ void ip::GaborBankFrequency::computeFilters()
   computeFreqs();
   computeOrients();
 
+  // Compute eta and gamma if required
+  if(m_optimal_gamma_eta)
+    setOptimalGammaEta();
+
   // Erase previous filters if any
   m_filters.clear();
 
@@ -85,3 +91,10 @@ void ip::GaborBankFrequency::computeFilters()
   }
 }
 
+void ip::GaborBankFrequency::setOptimalGammaEta()
+{
+  // Compute and set gamma and eta
+  m_gamma =  ((m_k+1)/(m_k-1)) * sqrt(-log(m_p)) / M_PI;
+  m_eta = 1. / ( tan( M_PI / ((m_orientation_full?1:2)*m_n_orient) ) *
+                 sqrt(M_PI*M_PI/log(1./m_p) - 1./(m_gamma*m_gamma)) );
+}

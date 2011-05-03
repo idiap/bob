@@ -76,6 +76,7 @@ namespace Torch {
         inline double getEta() const { return m_eta; }
         inline double getPf() const { return m_pf; }
         inline bool getCancelDc() const { return m_cancel_dc; }
+        inline bool getUseEnvelope() const { return m_use_envelope; }
         // inline enum ip::Gabor::NormOption getNormOption() const
           // { return m_norm_opt; }
 
@@ -126,6 +127,8 @@ namespace Torch {
           { m_pf = pf; computeFilter(); }
         inline void setCancelDc(const bool cancel_dc) 
           { m_cancel_dc = cancel_dc; computeFilter(); }
+        inline void setUseEnvelope(const bool use_envelope) 
+          { m_use_envelope = use_envelope; computeFilter(); }
         // inline void setNormOption(const enum ip::Gabor::NormOption norm_opt)
           // { m_norm_opt = norm_opt; computeFilter(); }
 

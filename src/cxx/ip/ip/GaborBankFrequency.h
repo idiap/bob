@@ -36,8 +36,8 @@ namespace Torch {
         GaborBankFrequency(const int height, const int width, 
           const int n_orient=8, const int n_freq=5, const double fmax=0.25, 
           const bool orientation_full=false, const double k=1.414, 
-          const double p=0.5, 
-          // Gabor Spatial filter options
+          const double p=0.5, const bool optimal_gamma_eta=false,
+          // Gabor Frequency filter options
           const double gamma=1., const double eta=1.,
           const double pf=0.99, const bool cancel_dc=false, 
           const bool use_envelope=false, const bool output_in_frequency=false);
@@ -64,6 +64,7 @@ namespace Torch {
         inline bool getOrientationFull() const { return m_orientation_full; }
         inline double getK() const { return m_k; }
         inline double getP() const { return m_p; }
+        inline bool getOptimalGammaEta() const { return m_optimal_gamma_eta; }
         inline double getGamma() const { return m_gamma; }
         inline double getEta() const { return m_eta; }
         inline double getPf() const { return m_pf; }
@@ -92,6 +93,8 @@ namespace Torch {
           { m_k = k; computeFilters(); }
         inline void setP(const double p) 
           { m_p = p; computeFilters(); }
+        inline void setOptimalGammaEta(const bool opt)
+          { m_optimal_gamma_eta = opt; computeFilters(); }
         inline void setGamma(const double gamma) 
           { m_gamma = gamma; computeFilters(); }
         inline void setEta(const double eta) 
@@ -123,6 +126,15 @@ namespace Torch {
          */
         void computeFilters();
 
+        /**
+         * @brief Compute and set "optimal" gamma and eta from m_n_orient, 
+         *   m_orientation_full, m_k, m_p as described in:
+         * "Rotation-invariant and scale-invariant Gabor features for texture
+         *  image retrieval", by J. Han and K.K. Ma 
+         * in Image and Vision Computing 25 (2007), 1474-1481
+         */
+        void setOptimalGammaEta();
+
         // Attributes
         int m_height;
         int m_width;
@@ -132,6 +144,7 @@ namespace Torch {
         bool m_orientation_full;
         double m_k;
         double m_p;
+        bool m_optimal_gamma_eta;
         double m_gamma;
         double m_eta;
         double m_pf;
