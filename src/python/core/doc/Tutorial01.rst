@@ -2,7 +2,7 @@
 
 .. testsetup::
 
-  import torch
+   import torch
 
 ======================================
  Tutorial 01. Initialization of Arrays
@@ -16,6 +16,8 @@ In summary you can
 
 Simply allocate the space
 -------------------------
+
+TODO look :ref:`_supported-element-types`.
 
 We create a simple array by specifying the shape.
 This is equivalent to allocating (reserving) the memory.
@@ -86,7 +88,7 @@ Construction of arrays from scratch requires always that you pass a
 non-nested iterable followed by a shape. Sometimes you want python to
 just do a best guess.
 
-.. code-block:: python
+.. code-block:: python 
 
     # [[1, 2], [2, 3]] could be interpreted as a 2D integer array.
     t5_array_1 = torch.core.array.array([[1,2,3], [4,5,6]])
@@ -95,11 +97,9 @@ First try with doctests
 
 .. testcode::
 
-  print 'Output   text.'
+   1+1        # this will give no output!
+   print 2+2  # this will give output
 
 .. testoutput::
 
-  Output text.
-
-
-
+   4
