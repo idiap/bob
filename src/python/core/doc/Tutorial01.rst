@@ -11,17 +11,15 @@
 In this section we will illustrate the many different ways to initialize an array.
 In summary you can
 
-.. code-block:: python
-
-  specify shape vs. guess shape
-  specify type  vs. guess type
+* specify shape vs. guess shape
+* specify type  vs. guess type
 
 Simply allocate the space
 -------------------------
 
 We create a simple array by specifying the shape.
 This is equivalent to allocating (reserving) the memory.
-Please not that there are no gauranties of the values. 
+Please not that there are no guaranties of the values. 
 
 .. code-block:: python
 
@@ -30,7 +28,7 @@ Please not that there are no gauranties of the values.
    # create a array of size 5 times 7, of type uint8
    my_array = torch.core.array.uint8_2(5, 7)
 
-The array is not gauranted to be initialize during allocation.
+The array is not guaranteed to be initialize during allocation.
 It is therefore often useful to set the whole array to either zeros or ones.
 
 .. code-block:: python
