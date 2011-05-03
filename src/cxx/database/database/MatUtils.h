@@ -77,7 +77,12 @@ namespace Torch { namespace database { namespace detail {
     (const std::string& varname, const InlinedArrayImpl& data) {
 
       Torch::core::array::ElementType eltype = data.getElementType();
-      blitz::Array<T,D> bzdata = data.get<T,D>().copy();
+      blitz::Array<T,D> c_style = data.get<T,D>();
+
+      //transform the input data into a fortran-style array as Matlab requires
+      //fortran order for storage.
+      blitz::Array<T,D> bzdata(c_style.shape(), blitz::FortranArray<D>());
+      bzdata = c_style; //copy
 
       //matio gets dimensions as integers
       int mio_dims[Torch::core::array::N_MAX_DIMENSIONS_ARRAY];
@@ -97,12 +102,16 @@ namespace Torch { namespace database { namespace detail {
 
       Torch::core::array::ElementType eltype = data.getElementType();
       blitz::Array<T,D> bzdata = data.get<T,D>();
-
+      
       //matio accepts real/imaginary parts separated in a ComplexSplit struct.
       //The user must do the separation him/herself. 
 
-      blitz::Array<F,D> bzre = blitz::real(bzdata).copy(); //makes contiguous
-      blitz::Array<F,D> bzim = blitz::imag(bzdata).copy(); //makes contiguous
+      //transform the input data into a fortran-style array as Matlab requires
+      //fortran order for storage.
+      blitz::Array<F,D> bzre(bzdata.shape(), blitz::FortranArray<D>());
+      bzre = blitz::real(bzdata).copy(); //makes contiguous
+      blitz::Array<F,D> bzim(bzdata.shape(), blitz::FortranArray<D>());
+      bzim = blitz::imag(bzdata).copy(); //makes contiguous
 
       ComplexSplit mio_complex = { 
         static_cast<void*>(bzre.data()),
@@ -136,11 +145,13 @@ namespace Torch { namespace database { namespace detail {
    */
   template <typename T, int D> InlinedArrayImpl assign_array
     (boost::shared_ptr<matvar_t> matvar) {
-
-    blitz::Array<T,D> data(static_cast<T*>(matvar->data), 
-        make_shape<D>(matvar->dims), blitz::duplicateData);
+    //note: Matlab saves data in fortran style (column major order)
+    blitz::Array<T,D> f_data(static_cast<T*>(matvar->data), 
+        make_shape<D>(matvar->dims), blitz::duplicateData, 
+        blitz::FortranArray<D>());
+    blitz::Array<T,D> data(f_data.shape());
+    data = f_data; //copies data to c-style array
     return InlinedArrayImpl(data); 
-
   }
  
   /**
@@ -179,12 +190,16 @@ namespace Torch { namespace database { namespace detail {
       F* real = static_cast<F*>(mio_complex.Re);
       F* imag = static_cast<F*>(mio_complex.Im);
 
-      blitz::Array<T,D> data(make_shape<D>(matvar->dims));
+      //note: Matlab saves data in fortran style (column major order)
+      blitz::Array<T,D> f_data(make_shape<D>(matvar->dims),
+          blitz::FortranArray<D>());
       size_t n=0;
       for (typename blitz::Array<T,D>::iterator 
-          it=data.begin(); it!=data.end(); ++it, ++n) {
+          it=f_data.begin(); it!=f_data.end(); ++it, ++n) {
         (*it) = std::complex<F>(real[n], imag[n]);
       }
+      blitz::Array<T,D> data(f_data.shape());
+      data = f_data; //copies data to c-style array
       return InlinedArrayImpl(data); 
     }
 
