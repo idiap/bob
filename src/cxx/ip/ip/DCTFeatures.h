@@ -67,6 +67,16 @@ namespace Torch {
 	    template <typename T, typename U> 
       void operator()(const blitz::Array<T,2>& src, U& dst);
 
+      /**
+        * @brief Function which returns the number of blocks when applying 
+        *   the DCTFeatures extractor on a 2D blitz::array/image.
+        *   The first dimension is the height (y-axis), whereas the second
+        *   one is the width (x-axis).
+        * @param src The input blitz array
+        */
+      template<typename T>
+      const int getNBlocks(const blitz::Array<T,2>& src);
+
 	  private:
       /**
         * Attributes
@@ -106,6 +116,14 @@ namespace Torch {
       // Push the resulting processed block in the container
       dst.push_back(dct_block_zigzag);
     }
+  }
+
+  template<typename T>
+  const int DCTFeatures::getNBlocks(const blitz::Array<T,2>& src)
+  {
+    const blitz::TinyVector<int,3> res = getBlockShape(src, m_block_h, 
+      m_block_w, m_overlap_h, m_overlap_w); 
+    return res(0);
   }
 
 }}

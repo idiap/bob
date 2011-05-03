@@ -55,7 +55,7 @@ def array_repr(self):
   """Simplified string representation."""
   return "%s %s (0x%x)" % (self.cxx_blitz_typename, self.shape(), id(self)) 
 
-def array_convert(self, dtype, dstRange=None, srcRange=None):
+def array_convert(self, dtype, destRange=None, sourceRange=None):
   """Function which allows to convert/rescale a blitz array of a given type
      into a blitz array of an other type. Typically, this can be used to rescale a
      16 bit precision grayscale image (2d array) into an 8 bit precision grayscale
@@ -71,14 +71,14 @@ def array_convert(self, dtype, dstRange=None, srcRange=None):
      type as indicated by the user.
   """
 
-  if dstRange is None and srcRange is None:
+  if destRange is None and sourceRange is None:
     return getattr(self, '__convert_%s__' % dtype)()
-  elif dstRange is None:
-    return getattr(self, '__convert_%s__' % dtype)(destRange=dstRange)
-  elif srcRange is None:
-    return getattr(self, '__convert_%s__' % dtype)(sourceRange=srcRange)
+  elif sourceRange is None:
+    return getattr(self, '__convert_%s__' % dtype)(destRange=destRange)
+  elif destRange is None:
+    return getattr(self, '__convert_%s__' % dtype)(sourceRange=sourceRange)
   else:
-    return getattr(self, '__convert_%s__' % dtype)(destRange=dstRange, sourceRange=srcRange)
+    return getattr(self, '__convert_%s__' % dtype)(destRange=destRange, sourceRange=sourceRange)
 
 def array_save(self, filename, codecname=''):
   """Saves the current array at the file path specified.
