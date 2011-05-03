@@ -18,7 +18,7 @@ python syntax.
    # select the second column
    my_array[:, 2]
 
-Some mathematic operations on arrays.
+Some mathematical operations on arrays.
 
 .. code-block:: python
 
@@ -28,7 +28,7 @@ Some mathematic operations on arrays.
    A = torch.core.array.array([[1,2,3], [4,5,6]])
    B = torch.core.array.array([[7,7,8], [8,8,9]])
 
-   # It is possible to directly mulitple with a scalar
+   # It is possible to directly multiple with a scalar
    A1 = 0.45 * A
 
    # It is possible to add a scalar to all element in matrix
