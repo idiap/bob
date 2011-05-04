@@ -11,8 +11,10 @@
 In this section we will illustrate the many different ways to initialize an array.
 In summary you can
 
-* specify shape vs. guess shape
-* specify type  vs. guess type
+* specify shape
+* guess shape
+* specify type
+* guess type
 
 Simply allocate the space
 -------------------------
