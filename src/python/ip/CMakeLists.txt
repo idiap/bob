@@ -4,11 +4,9 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/ipcore.cc"
    "src/color.cc"
-   "src/oldcolor.cc"
    "src/oldlbp.cc"
    "src/filters.cc"
    "src/filters_new.cc"
-   "src/vision.cc"
    "src/flow.cc"
    "src/DCTFeatures.cc"
    "src/gaussian.cc"
