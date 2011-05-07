@@ -133,7 +133,7 @@ namespace Torch {
          *  image retrieval", by J. Han and K.K. Ma 
          * in Image and Vision Computing 25 (2007), 1474-1481
          */
-        void setOptimalGammaEta();
+        void computeOptimalGammaEta();
 
         // Attributes
         int m_height;

@@ -73,7 +73,7 @@ void ip::GaborBankFrequency::computeFilters()
 
   // Compute eta and gamma if required
   if(m_optimal_gamma_eta)
-    setOptimalGammaEta();
+    computeOptimalGammaEta();
 
   // Erase previous filters if any
   m_filters.clear();
@@ -91,7 +91,7 @@ void ip::GaborBankFrequency::computeFilters()
   }
 }
 
-void ip::GaborBankFrequency::setOptimalGammaEta()
+void ip::GaborBankFrequency::computeOptimalGammaEta()
 {
   // Compute and set gamma and eta
   m_gamma =  ((m_k+1)/(m_k-1)) * sqrt(-log(m_p)) / M_PI;

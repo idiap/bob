@@ -84,7 +84,7 @@ void bind_ip_gabor() {
     .add_property("orientation_full", &ip::GaborBankFrequency::getOrientationFull, &ip::GaborBankFrequency::setOrientationFull)
     .add_property("k", &ip::GaborBankFrequency::getK, &ip::GaborBankFrequency::setK)
     .add_property("p", &ip::GaborBankFrequency::getP, &ip::GaborBankFrequency::setP)
-//    .add_property("optimal_gamma_eta", &ip::GaborBankFrequency::getOptimalGammaEta, &ip::GaborBankFrequency::setOptimalGammaEta)
+    .add_property("optimal_gamma_eta", &ip::GaborBankFrequency::getOptimalGammaEta, &ip::GaborBankFrequency::setOptimalGammaEta)
     .add_property("gamma", &ip::GaborBankFrequency::getGamma, &ip::GaborBankFrequency::setGamma)
     .add_property("eta", &ip::GaborBankFrequency::getEta, &ip::GaborBankFrequency::setEta)
     .add_property("pf", &ip::GaborBankFrequency::getPf, &ip::GaborBankFrequency::setPf)
