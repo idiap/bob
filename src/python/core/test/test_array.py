@@ -15,6 +15,23 @@ import torch
 # should just bind the name to this module.
 import numpy
 
+# help to control the sameAs properties
+# Only shape and cxx_blitz_typename is controlled here, the rest in assert_grayAs
+def assert_sameAs(self, t1, t2):
+    self.assertEqual(t1.shape(), t2.shape())
+    self.assertEqual(t1.cxx_blitz_typename, t2.cxx_blitz_typename)
+    assert_grayAs(self, t1, t2)
+
+def assert_grayAs(self, t1, t2):
+    self.assertEqual(t1.cxx_element_typename, t2.cxx_element_typename)
+
+def assert_vectorOf(self, t, v):
+    cnt = 0;
+    for i in range(t.extent(torch.core.array.firstDim)):
+      for j in range(t.extent(torch.core.array.secondDim)):
+        self.assertEqual(t[i,j], v[cnt])
+        cnt = cnt + 1
+
 class ArrayTest(unittest.TestCase):
   """Performs various tests for the blitz::Array<> object."""
 
@@ -709,8 +726,24 @@ class ArrayTest(unittest.TestCase):
     Array    = torch.core.array.array([[1,2,3], [4,5,6]], 'float64')
     Array_sa = Array.sameAs();
 
-    self.assertEqual(Array.shape(), Array_sa.shape())
+    assert_sameAs(self, Array, Array_sa)
 
+    Array    = torch.core.array.array([1,2,3], 'uint8')
+    Array_sa = Array.sameAs();
+    assert_sameAs(self, Array, Array_sa)
+
+  def test11_grayAs(self):
+    Array    = torch.core.array.uint8_3([1,2,3,4,5,6,7,8], (2,2,2))
+    Array_ga = Array.grayAs()
+    
+    assert_grayAs(self, Array, Array_ga)
+
+  def test12_vectorOf(self):
+      Array    = torch.core.array.uint8_2([1,2,3,4,5,6,7,8], (2,4))
+      Array_vo = Array.vectorOf();
+
+      assert_vectorOf(self, Array, Array_vo)
+    
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
