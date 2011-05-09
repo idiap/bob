@@ -25,6 +25,13 @@ def assert_sameAs(self, t1, t2):
 def assert_grayAs(self, t1, t2):
     self.assertEqual(t1.cxx_element_typename, t2.cxx_element_typename)
 
+def assert_vectorOf(self, t, v):
+    cnt = 0;
+    for i in range(t.extent(torch.core.array.firstDim)):
+      for j in range(t.extent(torch.core.array.secondDim)):
+        self.assertEqual(t[i,j], v[cnt])
+        cnt = cnt + 1
+
 class ArrayTest(unittest.TestCase):
   """Performs various tests for the blitz::Array<> object."""
 
@@ -730,6 +737,12 @@ class ArrayTest(unittest.TestCase):
     Array_ga = Array.grayAs()
     
     assert_grayAs(self, Array, Array_ga)
+
+  def test12_vectorOf(self):
+      Array    = torch.core.array.uint8_2([1,2,3,4,5,6,7,8], (2,4))
+      Array_vo = Array.vectorOf();
+
+      assert_vectorOf(self, Array, Array_vo)
     
 if __name__ == '__main__':
   sys.argv.append('-v')

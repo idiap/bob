@@ -8,18 +8,16 @@
  Tutorial 01. Initialization of Arrays
 ======================================
 
-In this section we will illustrate the many different ways to initialize an array.
+In this section we will illustrate the many different ways to initialize an array in |project|.
 In summary you can
 
-* specify shape
-* guess shape
-* specify type
-* guess type
+* specify shape or guess shape
+* specify type or guess type
 
 Simply allocate the space
 -------------------------
 
-TODO look :ref:`_supported-element-types`.
+Please look in :doc:`UsingBlitzArrays` for the different types of arrays.
 
 We create a simple array by specifying the shape.
 This is equivalent to allocating (reserving) the memory.
