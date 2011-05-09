@@ -25,7 +25,7 @@
 struct T {
   double eps;
 
-  T(): eps(0.03) {}
+  T(): eps(0.06) {}
 
   ~T() {}
 };
@@ -117,6 +117,7 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
   Torch::ip::TanTriggs tt_filter;
   tt_filter(img,img_processed);
 
+  // First test
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_tantriggs.pgm";
   Torch::database::Array ar_img_ref(testdata_path_img.string());
@@ -124,6 +125,19 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
   blitz::Array<uint8_t,2> img_processed_u = Torch::core::convertFromRange<uint8_t>(
       img_processed, blitz::min(img_processed), blitz::max(img_processed));
   checkBlitzClose( img_processed_u, img_ref, eps);
+
+  // Second test (comparison with matlab implementation from X. Tan)
+  Torch::ip::TanTriggs tt_filter2(0.2, 1., 2., 6, 10., 0.1, 
+    Torch::sp::Convolution::Same, Torch::sp::Convolution::Mirror);
+  tt_filter2(img,img_processed);
+
+  testdata_path_img = testdata_cpath;
+  testdata_path_img /= "image_tantriggs_MATLABREF.pgm";
+  Torch::database::Array ar_img_ref2(testdata_path_img.string());
+  img_ref = ar_img_ref2.get<uint8_t,2>();
+  img_processed_u = Torch::core::convertFromRange<uint8_t>(
+      img_processed, blitz::min(img_processed), blitz::max(img_processed));
+  checkBlitzClose( img_processed_u, img_ref, eps); 
 }
 
 BOOST_AUTO_TEST_SUITE_END()
