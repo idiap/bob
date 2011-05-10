@@ -15,6 +15,8 @@ import database
 import measure
 import sp
 import ip
+import machine
+import trainer
 
 sys.setdlopenflags(default_flags)
 del default_flags

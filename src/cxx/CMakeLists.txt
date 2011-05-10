@@ -13,3 +13,6 @@ add_subdirectory(measure)
 add_subdirectory(sp)
 add_subdirectory(ip)
 add_subdirectory(math)
+add_subdirectory(machine)
+add_subdirectory(trainer)
+
