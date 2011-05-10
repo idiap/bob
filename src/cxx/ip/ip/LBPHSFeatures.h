@@ -85,6 +85,11 @@ namespace Torch {
       template<typename T>
       const int getNBlocks(const blitz::Array<T,2>& src);
 
+      /**
+        * @brief Returns the number of bins in each LBP histogram
+        */
+      inline const uint64_t getNBins() { return m_lbp->getMaxLabel(); }
+
 	  private:
       /**
         * Attributes
