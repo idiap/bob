@@ -27,9 +27,9 @@ static object dct_apply( ip::DCTFeatures& dct_features, const blitz::Array<T,2>&
 
 void bind_ip_dctfeatures() {
   class_<ip::DCTFeatures, boost::shared_ptr<ip::DCTFeatures> >("DCTFeatures", dctdoc, init<const int, const int, const int, const int, const int>((arg("block_h")="8", arg("block_w")="8", arg("overlap_h")="0", arg("overlap_w")="0", arg("n_dct_coefs")="15."), "Constructs a new DCT features extractor."))   
-    .def("getNBlocks", (const int (ip::DCTFeatures::*)(const blitz::Array<uint8_t,2>& src))&ip::DCTFeatures::getNBlocks<uint8_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extraction DCT Features on the given input")
-    .def("getNBlocks", (const int (ip::DCTFeatures::*)(const blitz::Array<uint16_t,2>& src))&ip::DCTFeatures::getNBlocks<uint16_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extraction DCT Features on the given input")
-    .def("getNBlocks", (const int (ip::DCTFeatures::*)(const blitz::Array<double,2>& src))&ip::DCTFeatures::getNBlocks<double>, (arg("self"),arg("input")), "Return the number of blocks generated when extraction DCT Features on the given input")
+    .def("getNBlocks", (const int (ip::DCTFeatures::*)(const blitz::Array<uint8_t,2>& src))&ip::DCTFeatures::getNBlocks<uint8_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting DCT Features on the given input")
+    .def("getNBlocks", (const int (ip::DCTFeatures::*)(const blitz::Array<uint16_t,2>& src))&ip::DCTFeatures::getNBlocks<uint16_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting DCT Features on the given input")
+    .def("getNBlocks", (const int (ip::DCTFeatures::*)(const blitz::Array<double,2>& src))&ip::DCTFeatures::getNBlocks<double>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting DCT Features on the given input")
     .def("__call__", &dct_apply<uint8_t>, (arg("self"),arg("input")), "Call an object of this type to extract DCT features.")
     .def("__call__", &dct_apply<uint16_t>, (arg("self"),arg("input")), "Call an object of this type to extract DCT features.")
     .def("__call__", &dct_apply<double>, (arg("self"),arg("input")), "Call an object of this type to extract DCT features.")

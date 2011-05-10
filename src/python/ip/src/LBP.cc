@@ -77,6 +77,9 @@ void bind_ip_lbp_new() {
     ;
 
   class_<ip::LBPHSFeatures, boost::shared_ptr<ip::LBPHSFeatures> >("LBPHSFeatures", "Constructs a new LBPHSFeatures object to extract histogram of LBP over 2D blitz arrays/images.", init<const int, const int, const int, const int, optional<const double, const int, const bool, const bool, const bool, const bool, const bool> >((arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("lbp_radius")=1., arg("lbp_neighbours")=8, arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Constructs a new DCT features extractor."))
+    .def("getNBlocks", (const int (ip::LBPHSFeatures::*)(const blitz::Array<uint8_t,2>& src))&ip::LBPHSFeatures::getNBlocks<uint8_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting LBPHS Features on the given input")
+    .def("getNBlocks", (const int (ip::LBPHSFeatures::*)(const blitz::Array<uint16_t,2>& src))&ip::LBPHSFeatures::getNBlocks<uint16_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting LBPHS Features on the given input")
+    .def("getNBlocks", (const int (ip::LBPHSFeatures::*)(const blitz::Array<double,2>& src))&ip::LBPHSFeatures::getNBlocks<double>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting LBPHS Features on the given input")
     .def("__call__", &lbp_apply<uint8_t>, (arg("self"),arg("input")), "Call an object of this type to extract LBP Histogram features.")
     .def("__call__", &lbp_apply<uint16_t>, (arg("self"),arg("input")), "Call an object of this type to extract LBP Histogram features.")
     .def("__call__", &lbp_apply<double>, (arg("self"),arg("input")), "Call an object of this type to extract LBP Histogram features.")
