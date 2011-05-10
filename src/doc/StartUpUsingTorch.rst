@@ -51,7 +51,7 @@ Torch-enabled environment under *Linux*:
 
 .. code-block:: python
 
-  #!/WORKDIR/torch-x.y/bin/shell.py python
+  #!/WORKDIR/torch-x.y/bin/shell.py -- python
   import torch
   print torch.core.array.int16_2()
 
@@ -59,7 +59,7 @@ Here is another one that is just a shell script using ``bash``:
 
 .. code-block:: sh
 
-  #!/WORKDIR/torch-x.y/bin/shell.py -d bash
+  #!/WORKDIR/torch-x.y/bin/shell.py --debug -- bash
   echo $TORCH_PLATFORM
 
 .. note::
