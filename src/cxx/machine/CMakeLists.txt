@@ -2,7 +2,7 @@ PROJECT(machine-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core database machine) #other torch subprojects
+set(deps core database) #other torch subprojects
 set(shared "")
 
 # This defines the list of source files inside this package.
@@ -17,7 +17,7 @@ set(src
 include(../../cmake/macros.cmake)
 torch_header_install(machine-cxx machine "torch::machine")
 torch_library(machine "${src}" "${deps}" "${shared}")
-add_dependencies(torch_machine machine-cxx_header_install)
+add_dependencies(torch_machine machine-cxx_header_install trainer-cxx_header_install)
 
 # Defines tests for this package
 #torch_test(machine block test/block.cc)
