@@ -23,10 +23,10 @@ static const char* lbp8r_doc = "Objects of this class, after configuration, can 
 
 template<typename T>
 static object lbp_apply( ip::LBPHSFeatures& lbphs_features, const blitz::Array<T,2>& src) {
-  std::vector<blitz::Array<uint32_t,1> > dst;
+  std::vector<blitz::Array<uint64_t,1> > dst;
   lbphs_features( src, dst);
   list t;
-  for(std::vector<blitz::Array<uint32_t,1> >::const_iterator it=dst.begin(); it!=dst.end(); ++it)
+  for(std::vector<blitz::Array<uint64_t,1> >::const_iterator it=dst.begin(); it!=dst.end(); ++it)
     t.append(*it);
   return t;
 }

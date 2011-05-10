@@ -37,14 +37,14 @@ class HistogramTest(unittest.TestCase):
     """Compute the histogram of a uint8 image"""
     input_image = load_gray('image.ppm')
     
-    histo = torch.core.array.uint32_1(256)
-    histo2 = torch.core.array.uint32_1(256)
+    histo = torch.core.array.uint64_1(256)
+    histo2 = torch.core.array.uint64_1(256)
     
     torch.ip.histogram(input_image, histo)
     torch.ip.histogram(input_image, histo2, 0, 255, 256)
     
     # Save the computed data
-    #torch.database.Array(histo).save(os.path.join('data', 'histo','image_histo.hdf5'))
+    torch.database.Array(histo).save(os.path.join('data', 'histo','image_histo.hdf5'))
     
     histo_ref = torch.database.Array(os.path.join('data', 'histo','image_histo.hdf5')).get()
     
@@ -63,8 +63,8 @@ class HistogramTest(unittest.TestCase):
     
     input_array = torch.database.Array(os.path.join('data', 'histo','input_uint16.hdf5')).get()
     
-    histo = torch.core.array.uint32_1(65536)
-    histo2 = torch.core.array.uint32_1(65536)
+    histo = torch.core.array.uint64_1(65536)
+    histo2 = torch.core.array.uint64_1(65536)
     
     torch.ip.histogram(input_array, histo)
     torch.ip.histogram(input_array, histo2, 0, 65535, 65536)
@@ -79,17 +79,17 @@ class HistogramTest(unittest.TestCase):
     self.assertTrue((histo_ref == histo).all())
     self.assertTrue((histo_ref == histo2).all())
     
-  def test02_float_histoPython(self):
+  def test03_float_histoPython(self):
     """Compute the histogram of a float random array"""
     
-    # Generate random uint16 array
+    # Generate random float32 array
     #input_array = torch.core.array.float32_2(50, 70)
     #random_float(input_array, 0, 1)
     #torch.database.Array(input_array).save(os.path.join('data', 'histo','input_float.hdf5'))
     
     input_array = torch.database.Array(os.path.join('data', 'histo','input_float.hdf5')).get()
     
-    histo = torch.core.array.uint32_1(10)
+    histo = torch.core.array.uint64_1(10)
     
     torch.ip.histogram(input_array, histo, 0, 1, 10)
     
@@ -101,17 +101,17 @@ class HistogramTest(unittest.TestCase):
     self.assertTrue(input_array.size() == histo.sum())
     self.assertTrue((histo_ref == histo).all())
     
-  def test02_int32_histoPython(self):
+  def test04_int32_histoPython(self):
     """Compute the histogram of a int32 random array"""
     
-    # Generate random uint16 array
+    # Generate random int32 array
     #input_array = torch.core.array.int32_2(50, 70)
     #random_int(input_array, -20,20)
     #torch.database.Array(input_array).save(os.path.join('data', 'histo','input_int32.hdf5'))
     
     input_array = torch.database.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
     
-    histo = torch.core.array.uint32_1(41)
+    histo = torch.core.array.uint64_1(41)
     
     torch.ip.histogram(input_array, histo, -20, 20, 41)
     

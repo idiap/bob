@@ -16,8 +16,8 @@
 
 struct T {
 	blitz::Array<uint32_t,2> src;
-	blitz::Array<uint32_t,1> dst1, dst2, dst3, dst4;
-  std::vector<blitz::Array<uint32_t,1> > dst_mat;
+	blitz::Array<uint64_t,1> dst1, dst2, dst3, dst4;
+  std::vector<blitz::Array<uint64_t,1> > dst_mat;
   double eps;
 
 	T(): src(10,10), dst1(16), dst2(16), dst3(16), dst4(16), dst_mat(0), eps(1e-3)
@@ -70,7 +70,7 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_lbphs_feature_extract )
 {
-	std::vector<blitz::Array<uint32_t,1> > dst;
+	std::vector<blitz::Array<uint64_t,1> > dst;
 	Torch::ip::LBPHSFeatures lbphsfeatures( 5, 5, 0, 0, 1., 4, false, false, 
     false, false, false);
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( test_lbphs_feature_extract )
   // Iterate over the blocks and compare the vector of LBP coefficients with 
   // the one obtained by hand
   int i=0;
-  for( std::vector<blitz::Array<uint32_t,1> >::const_iterator it = dst.begin();
+  for( std::vector<blitz::Array<uint64_t,1> >::const_iterator it = dst.begin();
     it != dst.end(); ++it)
   {
     checkBlitzClose( *it, dst_mat[i], eps);

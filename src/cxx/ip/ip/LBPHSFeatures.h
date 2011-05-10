@@ -108,7 +108,7 @@ namespace Torch {
       m_lbp->operator()(*it, lbp_tmp_block);
 
       // Compute the LBP histogram
-      blitz::Array<uint32_t, 1> lbp_histo(m_lbp->getMaxLabel());
+      blitz::Array<uint64_t, 1> lbp_histo(m_lbp->getMaxLabel());
       histogram<uint16_t>(lbp_tmp_block, lbp_histo, 0, m_lbp->getMaxLabel()-1, 
         m_lbp->getMaxLabel());
 

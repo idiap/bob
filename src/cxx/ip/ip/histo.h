@@ -72,7 +72,7 @@ namespace Torch {
         //You need the following public typedefs and statics as blitz use them
         //internally.
         typedef T T_sourcetype;
-        typedef blitz::Array<uint32_t,1> T_resulttype;
+        typedef blitz::Array<uint64_t,1> T_resulttype;
         typedef T_resulttype T_numtype;
         
         static const bool canProvideInitialValue = true;
@@ -85,7 +85,7 @@ namespace Torch {
           reset(); 
         }
         
-        ReduceHisto(blitz::Array<uint32_t, 1> initialValue) {
+        ReduceHisto(blitz::Array<uint64_t, 1> initialValue) {
           histo_size = detail::getHistoSize<T>();
           m_result.resize(histo_size);
           reset(initialValue);
@@ -104,7 +104,7 @@ namespace Torch {
         }
         
         //gets the result, tells us how many items we have seen
-        inline blitz::Array<uint32_t, 1> result(int count) const {
+        inline blitz::Array<uint64_t, 1> result(int count) const {
           return m_result;
         }
         
@@ -112,7 +112,7 @@ namespace Torch {
           m_result = 0;
         }
         
-        void reset(blitz::Array<uint32_t, 1> initialValue) { 
+        void reset(blitz::Array<uint64_t, 1> initialValue) {
           m_result = initialValue; 
         }
         
@@ -120,9 +120,9 @@ namespace Torch {
           return "histo"; 
         }
         
-      protected: //representation    
+      protected: //representation
         int histo_size;
-        mutable blitz::Array<uint32_t, 1> m_result;
+        mutable blitz::Array<uint64_t, 1> m_result;
       };
     }
   }
@@ -153,12 +153,12 @@ namespace Torch {
      *              for @c uint8_t or 65536 for @c uint16_t
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint32_t, 1>& histo) {
+    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo) {
       // GetHistoSize returns an exception if T is not uint8_t or uint16_t
       int histo_size = detail::getHistoSize<T>();
       
-      tca::assertSameShape<uint32_t, 1>(histo, blitz::shape(histo_size));
-      tca::assertZeroBase<uint32_t, 1>(histo);
+      tca::assertSameShape<uint64_t, 1>(histo, blitz::shape(histo_size));
+      tca::assertZeroBase<uint64_t, 1>(histo);
       
       histo = blitz::histo(src);
     }
@@ -181,7 +181,7 @@ namespace Torch {
      * @param nb_bins number of bins (must not be zero)
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint32_t, 1>& histo, T min, T max, uint32_t nb_bins) {
+    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins) {
       tca::ElementType element_type = Torch::core::array::getElementType<T>();
       
       // Check that the given type is supported
@@ -209,8 +209,8 @@ namespace Torch {
         throw InvalidArgument();
       }
       
-      tca::assertSameShape<uint32_t, 1>(histo, blitz::shape(nb_bins));
-      tca::assertZeroBase<uint32_t, 1>(histo);
+      tca::assertSameShape<uint64_t, 1>(histo, blitz::shape(nb_bins));
+      tca::assertZeroBase<uint64_t, 1>(histo);
       
       // Handle the special case nb_bins == 1
       if (nb_bins == 1) {
