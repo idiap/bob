@@ -151,16 +151,22 @@ namespace Torch {
      * @param src source 2D array
      * @param histo result of the function. This array must have 256 elements
      *              for @c uint8_t or 65536 for @c uint16_t
+     * @param accumulate if true the result is added to @c histo
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo) {
+    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, bool accumulate = false) {
       // GetHistoSize returns an exception if T is not uint8_t or uint16_t
       int histo_size = detail::getHistoSize<T>();
       
       tca::assertSameShape<uint64_t, 1>(histo, blitz::shape(histo_size));
       tca::assertZeroBase<uint64_t, 1>(histo);
-      
-      histo = blitz::histo(src);
+
+      if (accumulate) {
+        histo += blitz::histo(src);
+      }
+      else {
+        histo = blitz::histo(src);
+      }
     }
     
     /**
@@ -168,7 +174,7 @@ namespace Torch {
      * 
      * @warning This function only accepts arrays of int or float (int8, int16,
      *          int32, int64, uint8, uint16, uint32, float32, float64 
-     *          and float 128)
+     *          and float128)
      *          Any other type raises a UnsupportedTypeForHistogram exception
      * @warning You must have @c min <= @c src(i,j) <= @c max, for every i and j
      * @warning If @c min >= @c max or @c nb_bins == 0, a 
@@ -179,9 +185,10 @@ namespace Torch {
      * @param min least possible value in @c src
      * @param max greatest possible value in @c src
      * @param nb_bins number of bins (must not be zero)
+     * @param accumulate if true the result is added to @c histo
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins) {
+    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins, bool accumulate = false) {
       tca::ElementType element_type = Torch::core::array::getElementType<T>();
       
       // Check that the given type is supported
@@ -214,14 +221,22 @@ namespace Torch {
       
       // Handle the special case nb_bins == 1
       if (nb_bins == 1) {
-        histo(0) = histo.size();
+        if (accumulate) {
+          histo(0) += histo.size();
+        }
+        else {
+          histo(0) = histo.size();
+        }
+        
         return;
       }
       
       T width = max - min;
       T bin_size = width / (nb_bins - 1);
-      
-      histo = 0;
+
+      if (!accumulate) {
+        histo = 0;
+      }
       
       for(int i = src.lbound(0); i <= src.ubound(0); i++) {
         for(int j = src.lbound(1); j <= src.ubound(1); j++) {
