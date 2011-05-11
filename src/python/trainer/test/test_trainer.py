@@ -98,6 +98,9 @@ class TrainerTest(unittest.TestCase):
   def test00_kmeans(self):
     """Train a KMeansMachine"""
 
+    # This files contains draws from two 1D Gaussian distributions:
+    #   * 100 samples from N(-10,1)
+    #   * 100 samples from N(10,1)
     sampler = MyFrameSampler("data/samplesFrom2G.hdf5")
 
     machine = torch.machine.KMeansMachine(2, 1)
