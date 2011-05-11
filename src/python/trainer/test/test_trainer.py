@@ -33,9 +33,9 @@ def equals(x, y, epsilon):
 
 class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
   """Simple example of python sampler: get samples from an Arrayset"""
-  def __init__(self):
+  def __init__(self,path):
     torch.trainer.Sampler_FrameSample_.__init__(self)
-    self.arrayset = torch.database.Arrayset("data/faithful.torch3.bindata")
+    self.arrayset = torch.database.Arrayset(path)
     self.arrayset.load()
   
   def getSample(self, index):
@@ -92,9 +92,34 @@ class MyTrainer(torch.trainer.Trainer_KMeansMachine_FrameSample_):
     a[1, :] = data.getSample(1).getFrame().cast('float64')
     machine.means = a
 
-class TerainerTest(unittest.TestCase):
+class TrainerTest(unittest.TestCase):
   """Performs various trainer tests."""
   
+  def test00_kmeans(self):
+    """Train a KMeansMachine"""
+
+    sampler = MyFrameSampler("data/samplesFrom2G.hdf5")
+
+    machine = torch.machine.KMeansMachine(2, 1)
+
+    trainer = torch.trainer.KMeansTrainer()
+    trainer.train(machine, sampler)
+
+    [variances, weights] = machine.getVariancesAndWeightsForEachCluster(sampler)
+    m1=torch.core.array.float64_1((1,))
+    m2=torch.core.array.float64_1((1,))
+    machine.getMean(0,m1)
+    machine.getMean(1,m2)
+
+    # Check means [-10,10] / variances [1,1] / weights [0.5,0.5]
+    if(m1<m2):
+      means=torch.core.array.float64_1([m1[0],m2[0]],(2,))
+    else:
+      means=torch.core.array.float64_1([m2[0],m1[0]],(2,))
+    self.assertTrue(equals(means, torch.core.array.float64_1([-10.,10.], (2,)), 2e-1))
+    self.assertTrue(equals(variances,torch.core.array.float64_2([1.,1.],(2,1)),2e-1))
+    self.assertTrue(equals(weights,torch.core.array.float64_1([0.5,0.5],(2,)),1e-3))
+
   def test01_kmeans(self):
     """Train a KMeansMachine"""
 
@@ -162,7 +187,7 @@ class TerainerTest(unittest.TestCase):
     """Custom python sampler"""
     
     sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
-    mysampler = MyFrameSampler()
+    mysampler = MyFrameSampler("data/faithful.torch3.bindata")
 
     self.assertTrue(sampler.getNSamples() == mysampler.getNSamples())
 
