@@ -30,6 +30,13 @@ def multiplyVectorsByFactors(matrix, vector):
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon).all()
 
+def flipRows(array):
+  if type(array).__name__ == 'float64_2':
+    return torch.core.array.array([array[1, :].as_ndarray(), array[0, :].as_ndarray()], 'float64')
+  elif type(array).__name__ == 'float64_1':
+    return torch.core.array.array([array[1], array[0]], 'float64')
+  else:
+    raise Exception('Input type not supportd by flipRows')
 
 class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
   """Simple example of python sampler: get samples from an Arrayset"""
@@ -80,7 +87,6 @@ class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
   def getNSamples(self):
     return len(self.arrayset)
 
-
 class MyTrainer(torch.trainer.Trainer_KMeansMachine_FrameSample_):
   """Simple example of python trainer: """
   def __init__(self):
@@ -109,10 +115,8 @@ class TrainerTest(unittest.TestCase):
     trainer.train(machine, sampler)
 
     [variances, weights] = machine.getVariancesAndWeightsForEachCluster(sampler)
-    m1=torch.core.array.float64_1((1,))
-    m2=torch.core.array.float64_1((1,))
-    machine.getMean(0,m1)
-    machine.getMean(1,m2)
+    m1 = machine.getMean(0)
+    m2 = machine.getMean(1)
 
     # Check means [-10,10] / variances [1,1] / weights [0.5,0.5]
     if(m1<m2):
@@ -131,7 +135,7 @@ class TrainerTest(unittest.TestCase):
     machine = torch.machine.KMeansMachine(2, 2)
 
     trainer = torch.trainer.KMeansTrainer()
-    trainer.seed = 1337
+    #trainer.seed = 1337
     trainer.train(machine, sampler)
 
 
@@ -145,11 +149,14 @@ class TrainerTest(unittest.TestCase):
     gmmMeans = torch.core.array.load('data/gmm.init_means.bin')
     gmmVariances = torch.core.array.load('data/gmm.init_variances.bin')
 
-    """
+    if (means[0, 0] < means[1, 0]):
+      means = flipRows(means)
+      variances = flipRows(variances)
+      weights = flipRows(weights)
+    
     self.assertTrue(equals(means, gmmMeans, 1e-7))
     self.assertTrue(equals(weights, gmmWeights, 1e-7))
     self.assertTrue(equals(variances, gmmVariances, 1e-7))
-    """
     
   def test02_gmm_ML(self):
     """Train a GMMMachine with ML_GMMTrainer"""

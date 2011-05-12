@@ -22,6 +22,12 @@ static tuple getVariancesAndWeightsForEachCluster(const KMeansMachine& machine, 
   return boost::python::make_tuple(variances, weights);
 }
 
+static boost::shared_ptr<blitz::Array<double, 1> > KMeansMachine_getMean(const KMeansMachine& kMeansMachine, int i) {
+  boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
+  kMeansMachine.getMean(i, *mean.get());
+  return mean;
+}
+
 BOOST_PYTHON_MODULE(libpytorch_machine) {
   
   class_<FrameSample>("FrameSample", init<const blitz::Array<float, 1>& >())
@@ -35,6 +41,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   class_<KMeansMachine, bases<Machine<FrameSample, double> > >("KMeansMachine", init<int, int>())
   .add_property("means", (blitz::Array<double,2> (KMeansMachine::*)() const)&KMeansMachine::getMeans, &KMeansMachine::setMeans)
   .def("getMean", &KMeansMachine::getMean, args("i", "mean"))
+  .def("getMean", &KMeansMachine_getMean, args("i", "mean"))
   .def("setMean", &KMeansMachine::setMean, args("i" "mean"))
   .def("getDistanceFromMean", &KMeansMachine::getDistanceFromMean, args("x", "i"))
   .def("getClosestMean", &KMeansMachine::getClosestMean, args("x", "closest_mean", "min_distance"))
