@@ -43,46 +43,48 @@ class Gaussian {
     /// Assigment
     Gaussian& operator= (const Gaussian &other);
     
-    /// Set the feature dimensionality
-    /// Overrides Machine::setNInputs
-    void setNInputs(int n_inputs);
-
     /// Set the input dimensionality, reset the mean to zero
     /// and the variance to one.
+    /// @see resize()
     /// @param n_inputs The feature dimensionality
-    bool resize(int n_inputs);
+    void setNInputs(int n_inputs);
 
+    /// Get the input dimensionality
+    int getNInputs();
+    
+    /// Set the input dimensionality, reset the mean to zero
+    /// and the variance to one.
+    /// @see setNInputs()
+    /// @param n_inputs The feature dimensionality
+    void resize(int n_inputs);
+    
+    /// Get the mean
+    void getMean(blitz::Array<double,1> &mean) const;
+    
     /// Set the mean
-    bool setMean(const blitz::Array<double,1> &mean);
+    void setMean(const blitz::Array<double,1> &mean);
 
+    /// Get the variance (the diagonal of the covariance matrix)
+    void getVariance(blitz::Array<double,1> &variance) const;
+    
     /// Set the variance
-    bool setVariance(const blitz::Array<double,1> &variance);
+    void setVariance(const blitz::Array<double,1> &variance);
+
+    /// Get the variance flooring thresholds
+    void getVarianceThresholds(blitz::Array<double,1> &variance_thresholds) const;
+    
+    /// Set the variance flooring thresholds
+    void setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds);
 
     /// Set the variance flooring thresholds
-    bool setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds);
-
-    /// Set the variance flooring thresholds
-    bool setVarianceThresholds(double factor);
+    void setVarianceThresholds(double factor);
 
     /// Output the log likelihood of the sample, x 
     /// @param x The data sample (feature vector)
     double logLikelihood(const blitz::Array<float,1> &x) const;
 
-    /// Output the logLikelihood of the sample, x 
-    /// (overrides Machine::forward)
-    double forward(const blitz::Array<float,1> &input) const;
-
-    /// Get the variance flooring thresholds
-    bool getVarianceThresholds(blitz::Array<double,1> &variance_thresholds) const;
-
-    /// Get the mean
-    bool getMean(blitz::Array<double,1> &mean) const;
-
-    /// Get the variance (the diagonal of the covariance matrix)
-    bool getVariance(blitz::Array<double,1> &variance) const;
-
     /// Print the mean and variance of the Gaussian
-    bool print() const;
+    void print() const;
 
   protected:
 
@@ -94,7 +96,7 @@ class Gaussian {
     /// Note: g_norm is defined as follows:
     /// log(Gaussian pdf) = log(1/((2pi)^(k/2)(det)^(1/2)) * exp(...))
     ///                   = -1/2 * g_norm * (...)
-    bool preComputeConstants();
+    void preComputeConstants();
 
     /// The mean
     blitz::Array<double,1> m_mean;

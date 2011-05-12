@@ -22,6 +22,24 @@ static tuple getVariancesAndWeightsForEachCluster(const KMeansMachine& machine, 
   return boost::python::make_tuple(variances, weights);
 }
 
+static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getMean(const Gaussian& gaussian) {
+  boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
+  gaussian.getMean(*mean.get());
+  return mean;
+}
+
+static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getVariance(const Gaussian& gaussian) {
+  boost::shared_ptr<blitz::Array<double, 1> > variance(new blitz::Array<double, 1>);
+  gaussian.getVariance(*variance.get());
+  return variance;
+}
+
+static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getVarianceThresholds(const Gaussian& gaussian) {
+  boost::shared_ptr<blitz::Array<double, 1> > varianceThresholds(new blitz::Array<double, 1>);
+  gaussian.getVarianceThresholds(*varianceThresholds.get());
+  return varianceThresholds;
+}
+
 static boost::shared_ptr<blitz::Array<double, 1> > KMeansMachine_getMean(const KMeansMachine& kMeansMachine, int i) {
   boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
   kMeansMachine.getMean(i, *mean.get());
@@ -54,6 +72,13 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   
   class_<Gaussian>("Gaussian", init<int>())
   .def(init<Gaussian&>(args("other")))
+  .add_property("nInputs", &Gaussian::getNInputs, &Gaussian::setNInputs)
+  .add_property("mean", &Gaussian_getMean, &Gaussian::setMean)
+  .add_property("variance", &Gaussian_getVariance, &Gaussian::setVariance)
+  .add_property("varianceThresholds", &Gaussian_getVarianceThresholds, (void (Gaussian::*)(const blitz::Array<double,1>&)) &Gaussian::setVarianceThresholds)
+  .def("setVarianceThresholds", (void (Gaussian::*)(double))&Gaussian::setVarianceThresholds)
+  .def("resize", &Gaussian::resize)
+  .def("logLikelihood", &Gaussian::logLikelihood)
   .def("print_", &Gaussian::print)
   ;
 

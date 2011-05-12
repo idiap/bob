@@ -9,10 +9,20 @@ import os, sys
 import unittest
 import torch
 
+def equals(x, y, epsilon):
+  return (abs(x - y) < epsilon)
+  
 class MachineTest(unittest.TestCase):
   """Performs various machine tests."""
+
+  def test01_Gaussian(self):
+    """Test Gaussian"""
+    gaussian = torch.machine.Gaussian(2)
+
+    logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float32'))
+    self.assertTrue(equals(logLH, -1.93787706939, 1e-11))
   
-  def test01_GMMMachine(self):
+  def test02_GMMMachine(self):
     """Test a GMMMachine"""
     
     sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
