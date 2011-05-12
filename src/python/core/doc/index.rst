@@ -21,4 +21,9 @@
 
    Tutorial04
 
+   Tutorial05
+
    Tutorial10
+
+   PCA
+
