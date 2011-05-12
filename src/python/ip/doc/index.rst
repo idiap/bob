@@ -10,8 +10,10 @@
 
 .. toctree::
    :maxdepth: 2
-   
+
    ExampleUsage01.rst
+
+   Practical01
    
 .. automodule:: torch.ip
    :members:
