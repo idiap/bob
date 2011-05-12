@@ -2,12 +2,9 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Tue  5 Apr 07:46:12 2011 
 
-===================================================
- Tutorial 01. Cropping face images using a database
-===================================================
-
-Part 1. Basic usage of an ip functionality
-------------------------------------------
+====================================
+ Tutorial 01. Basic ip functionality
+====================================
 
 In this section we present a small example how to use a ip (image processing) function.
 Our goal is to take an image, in our case a 2D uint8 array, and crop it.
@@ -36,7 +33,7 @@ Our goal is to take an image, in our case a 2D uint8 array, and crop it.
    top_left_width   = 0
    torch.ip.crop(image, my_crop, top_left_height, top_left_width, crop_height, crop_width)
 
-Now let's see a more comples ip fucntion: Face crop + normalization.
+Now let's see a more complete ip function: Face crop + normalization.
 
 .. code-block:: python
 
@@ -52,18 +49,18 @@ Now let's see a more comples ip fucntion: Face crop + normalization.
    overlap_w    = 0 # used if we need a bigger crop (width)
    my_face_normer = torch.ip.FaceEyesNorm(eye_distance, final_height, final_width, overlap_h, overlap_w) 
 
-   # create an psuedo image (instead of loading an image)
+   # create an pseudo image (instead of loading an image)
    
    image = torch.core.array.uint8_2(240, 320)
    image.ones() 
 
    # as with all ip functions, we need to create the destination
-   # our selfs
+   # our selves
 
    dst = torch.core.array.uint8_2(final_height, final_width)
 
    # lets crop and normalize the image using eye locations
-   # first we will start by specifiying the eye locations
+   # first we will start by specifying the eye locations
    
    height_left_eye = 120
    width_left_eye  = 100
@@ -71,9 +68,9 @@ Now let's see a more comples ip fucntion: Face crop + normalization.
    height_right_eye = 130
    width_right_eye  = 140
 
-   # we now crop and normalise by using the object (my_face_normer) we created above
+   # we now crop and normalize by using the object (my_face_normer) we created above
    # not that it is smart to use the same object for many images, if all images
-   # should be normalised and have the same final size.
+   # should be normalized and have the same final size.
 
    my_face_normer.__call__(image, dst, height_left_eye, width_left_eye, height_right_eye, width_right_eye)   
 
