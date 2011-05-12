@@ -2,7 +2,7 @@ PROJECT(machine-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core database) #other torch subprojects
+set(deps core database config) #other torch subprojects
 set(shared "")
 
 # This defines the list of source files inside this package.

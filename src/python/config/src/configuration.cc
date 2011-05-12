@@ -15,7 +15,7 @@ namespace conf = Torch::config;
  * Provides a dict like API to the Configuration object with some bells and
  * whistles.
  */
-class PythonBindingsConfig: public conf::Configuration {
+class PythonBindingsConfig: public conf::Configuration, public wrapper<conf::Configuration> {
   
   public:
 
@@ -38,6 +38,11 @@ class PythonBindingsConfig: public conf::Configuration {
     PythonBindingsConfig(const PythonBindingsConfig& other)
       : conf::Configuration(other)
     {
+    }
+    
+    PythonBindingsConfig(const conf::Configuration& other)
+      : conf::Configuration(other) {
+      
     }
 
     virtual ~PythonBindingsConfig() {}

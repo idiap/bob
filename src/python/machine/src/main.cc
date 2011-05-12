@@ -84,8 +84,14 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
 
   class_<GMMStats>("GMMStats", init<>())
   .def(init<int, int>(args("n_gaussians","n_inputs")))
+  .def_readwrite("T", &GMMStats::T)
+  .def_readwrite("n", &GMMStats::n)
+  .def_readwrite("sumPx", &GMMStats::sumPx)
+  .def_readwrite("sumPxx", &GMMStats::sumPxx)
   .def("resize", &GMMStats::resize, args("n_gaussians", "n_inputs"))
   .def("init", &GMMStats::init)
+  .def("save", &GMMStats::save)
+  .def("load", &GMMStats::load)
   .def("print_", &GMMStats::print)
   ;
   

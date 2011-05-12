@@ -24,7 +24,7 @@ class MachineTest(unittest.TestCase):
   
   def test02_GMMMachine(self):
     """Test a GMMMachine"""
-    
+
     sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
 
     gmm = torch.machine.GMMMachine(2, 2)
@@ -33,16 +33,21 @@ class MachineTest(unittest.TestCase):
     gmm.variances = torch.core.array.array([[1, 10], [2, 5]], 'float64')
     gmm.varianceThresholds = torch.core.array.array([[0, 0], [0, 0]], 'float64')
 
-    gmm.print_()
-
     stats = torch.machine.GMMStats(2, 2)
-
     gmm.accStatistics(sampler, stats)
     
-    stats.print_()
+    #config = torch.config.Configuration()
+    #stats.save(config)
+    #config.save("data/stats.hdf5")
 
-    #TODO Add asserts
+    config_ref = torch.config.Configuration("data/stats.hdf5")
+    stats_ref = torch.machine.GMMStats(2, 2)
+    stats_ref.load(config_ref)
 
+    self.assertTrue(stats.T == stats_ref.T)
+    self.assertTrue(stats.n == stats_ref.n)
+    self.assertTrue(stats.sumPx == stats_ref.sumPx)
+    self.assertTrue(stats.sumPxx == stats_ref.sumPxx)
 
 
 if __name__ == '__main__':
