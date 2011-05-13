@@ -72,6 +72,7 @@ namespace Torch {
         const blitz::Array<double,2>& getEigenvectors() const;
 
         /// Remove means before the projection (in particular for PCA)
+        /// Should be set after the Eigenvalues/Eigenvectors
         void setPreMean(const blitz::Array<double,1>& eigenvalues);
 
         const blitz::Array<double,1>& getPreMean() const;

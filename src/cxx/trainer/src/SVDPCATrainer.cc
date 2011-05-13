@@ -11,10 +11,8 @@ void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine,
   mean = 0.;
   // 1/ Compute the mean of the training data
   for( int i=0; i<n_samples; ++i)
-  {
     mean += data.getSample(i).getFrame();
-  }
-  mean /= (double)n_samples;
+  mean /= static_cast<double>(n_samples);
 
   // 2/ Generate the data matrix
   blitz::Array<double,2> data_mat(n_features,n_samples);

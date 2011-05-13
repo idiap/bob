@@ -11,7 +11,8 @@
 #include "math/linear.h"
 
 Torch::machine::EigenMachine::EigenMachine():
-  m_p_variance(0.), m_n_outputs(0), m_eigenvalues(0), m_eigenvectors(0)
+  m_p_variance(0.), m_n_outputs(0), m_eigenvalues(0), m_eigenvectors(0), 
+  m_pre_mean(0)
 {
 }
 
@@ -21,6 +22,7 @@ Torch::machine::EigenMachine::EigenMachine(
   m_p_variance(0.), m_n_outputs(0)
 {
   setEigenvaluesvectors(eigenvalues, eigenvectors);
+  m_n_outputs = m_eigenvectors.extent(0);
 }
 
 Torch::machine::EigenMachine::EigenMachine(
@@ -106,7 +108,13 @@ void Torch::machine::EigenMachine::setEigenvaluesvectors(
   m_eigenvalues.resize(eigenvalues.shape());
   m_eigenvalues = eigenvalues;
   m_eigenvectors.resize(eigenvectors.shape());
-  m_eigenvectors = eigenvectors;  
+  m_eigenvectors = eigenvectors;
+
+  m_pre_mean.resize(eigenvectors.extent(1));
+  m_pre_mean = 0.;
+
+  if( m_n_outputs == 0 || m_n_outputs>m_eigenvectors.extent(0) )
+    m_n_outputs = m_eigenvectors.extent(0);
 }
 
 int Torch::machine::EigenMachine::getNOutputs() const 
@@ -145,8 +153,10 @@ const blitz::Array<double,1>& Torch::machine::EigenMachine::getPreMean() const
 blitz::Array<double,1> Torch::machine::EigenMachine::forward(const FrameSample& input) const
 {
   const blitz::Array<double,2> mat=m_eigenvectors(blitz::Range(0,m_n_outputs-1),blitz::Range::all());
-  blitz::Array<double,1> output(0,m_n_outputs-1);
-  Torch::math::prod(mat, Torch::core::cast<double>(input.getFrame()), output);
+  blitz::Array<double,1> output(m_n_outputs);
+  blitz::Array<double,1> input_nomean(m_pre_mean.extent(0));
+  input_nomean = input.getFrame() - m_pre_mean;
+  Torch::math::prod(mat, input_nomean, output);
   return output; 
 }
 
