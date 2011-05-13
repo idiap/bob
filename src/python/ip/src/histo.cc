@@ -12,12 +12,11 @@
 
 using namespace boost::python;
 namespace ip = Torch::ip;
-//namespace tpy = Torch::core::python;
 
 template<typename T>
 boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram1(blitz::Array<T, 2>& input) {
   int size = Torch::ip::detail::getHistoSize<T>();
-  boost::shared_ptr<blitz::Array<uint64_t, 1> > output = boost::shared_ptr<blitz::Array<uint64_t, 1> >(new blitz::Array<uint64_t, 1>(size));
+  boost::shared_ptr<blitz::Array<uint64_t, 1> > output(new blitz::Array<uint64_t, 1>(size));
   
   ip::histogram(input, *output.get());
   return output;
@@ -80,7 +79,7 @@ boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram3_(blitz::Array<T, 2>& sr
     throw ip::UnsupportedTypeForHistogram(Torch::core::array::getElementType<T>());
   }
   
-  boost::shared_ptr<blitz::Array<uint64_t, 1> > output = boost::shared_ptr<blitz::Array<uint64_t, 1> >(new blitz::Array<uint64_t, 1>(size));
+  boost::shared_ptr<blitz::Array<uint64_t, 1> > output(new blitz::Array<uint64_t, 1>(size));
   ip::histogram<T>(src, *output.get(), 0, max, size, false);
 
   return output;
@@ -94,7 +93,7 @@ boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram4_(blitz::Array<T, 2>& sr
     throw ip::UnsupportedTypeForHistogram(Torch::core::array::getElementType<T>());
   }
   
-  boost::shared_ptr<blitz::Array<uint64_t, 1> > output = boost::shared_ptr<blitz::Array<uint64_t, 1> >(new blitz::Array<uint64_t, 1>(size));
+  boost::shared_ptr<blitz::Array<uint64_t, 1> > output(new blitz::Array<uint64_t, 1>(size));
   ip::histogram<T>(src, *output.get(), min, max, size, false);
 
   return output;
@@ -108,7 +107,7 @@ boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram5_(blitz::Array<T, 2>& sr
     throw ip::UnsupportedTypeForHistogram(Torch::core::array::getElementType<T>());
   }
   
-  boost::shared_ptr<blitz::Array<uint64_t, 1> > output = boost::shared_ptr<blitz::Array<uint64_t, 1> >(new blitz::Array<uint64_t, 1>(size));
+  boost::shared_ptr<blitz::Array<uint64_t, 1> > output(new blitz::Array<uint64_t, 1>(size));
   ip::histogram<T>(src, *output.get(), min, max, nb_bins, false);
 
   return output;
@@ -121,7 +120,7 @@ void bind_ip_histogram()
   Torch::core::python::CxxToPythonTranslatorPar<Torch::ip::UnsupportedTypeForHistogram, Torch::core::Exception , Torch::core::array::ElementType>("UnsupportedTypeForHistogram", "This exception is thrown when the histogram computation for a particular type is not implemented in torch");
   Torch::core::python::CxxToPythonTranslator<Torch::ip::InvalidArgument, Torch::core::Exception>("InvalidArgument", "This exception is thrown when a function argument is invalid");
 
-  histo_uint8_uint16("histogram", &histogram1, args("input"), "Compute an histogram of a 2D array");
+  histo_uint8_uint16("histogram", &histogram1, args("src"), "Compute an histogram of a 2D array");
   
   histo_uint8_uint16("histogram", &histogram2,
                      (arg("src"), arg("histo")),

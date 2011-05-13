@@ -16,6 +16,7 @@ void Torch::trainer::GMMTrainer::initialization(Torch::machine::GMMMachine& gmm,
 }
 
 double Torch::trainer::GMMTrainer::eStep(Torch::machine::GMMMachine& gmm, const Sampler<FrameSample>& data) {
+  m_ss.init();
   // Calculate the sufficient statistics and save in m_ss
   gmm.accStatistics(data, m_ss);
   return m_ss.log_likelihood / m_ss.T;

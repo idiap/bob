@@ -1,6 +1,6 @@
-====================================
- Tutorial 04. Interacting with numpy
-====================================
+========================================
+ Tutorial 05. Some useful help functions
+========================================
 
 In order to make the ip (image processing) part of |project| fast, the user is 
 responsible to allocate the destination of the operation. For example, if you 
@@ -47,6 +47,10 @@ grayAs() that will do exactly that.
   # a gray scale version of the src image. same size and shape but without
   # copying the data
   dst_image = src_image.grayAs()
+
+  # transform the pseudo RGB image to grayscale
+  torch.ip.rgb_to_gray(src_img, dst_img)
+
 
 
 

@@ -4,7 +4,8 @@
 #ifndef _GMMSTATS_H
 #define _GMMSTATS_H
 
-#include "blitz/array.h"
+#include <blitz/array.h>
+#include <config/Configuration.h>
 
 namespace Torch {
 namespace machine {
@@ -57,6 +58,8 @@ class GMMStats {
     /// For each Gaussian, the accumulated sum of responsibility times the sample squared
     blitz::Array<double,2> sumPxx;
 
+    void save(Torch::config::Configuration& config);
+    void load(const Torch::config::Configuration& config);
 };
 
 }

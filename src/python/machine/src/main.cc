@@ -30,6 +30,30 @@ static tuple getVariancesAndWeightsForEachCluster(const KMeansMachine& machine, 
   return boost::python::make_tuple(variances, weights);
 }
 
+static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getMean(const Gaussian& gaussian) {
+  boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
+  gaussian.getMean(*mean.get());
+  return mean;
+}
+
+static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getVariance(const Gaussian& gaussian) {
+  boost::shared_ptr<blitz::Array<double, 1> > variance(new blitz::Array<double, 1>);
+  gaussian.getVariance(*variance.get());
+  return variance;
+}
+
+static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getVarianceThresholds(const Gaussian& gaussian) {
+  boost::shared_ptr<blitz::Array<double, 1> > varianceThresholds(new blitz::Array<double, 1>);
+  gaussian.getVarianceThresholds(*varianceThresholds.get());
+  return varianceThresholds;
+}
+
+static boost::shared_ptr<blitz::Array<double, 1> > KMeansMachine_getMean(const KMeansMachine& kMeansMachine, int i) {
+  boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
+  kMeansMachine.getMean(i, *mean.get());
+  return mean;
+}
+
 BOOST_PYTHON_MODULE(libpytorch_machine) {
   
   class_<FrameSample>("FrameSample", init<const blitz::Array<float, 1>& >())
@@ -47,6 +71,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   class_<KMeansMachine, bases<Machine<FrameSample, double> > >("KMeansMachine", init<int, int>())
   .add_property("means", (blitz::Array<double,2> (KMeansMachine::*)() const)&KMeansMachine::getMeans, &KMeansMachine::setMeans)
   .def("getMean", &KMeansMachine::getMean, args("i", "mean"))
+  .def("getMean", &KMeansMachine_getMean, args("i", "mean"))
   .def("setMean", &KMeansMachine::setMean, args("i" "mean"))
   .def("getDistanceFromMean", &KMeansMachine::getDistanceFromMean, args("x", "i"))
   .def("getClosestMean", &KMeansMachine::getClosestMean, args("x", "closest_mean", "min_distance"))
@@ -59,13 +84,26 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   
   class_<Gaussian>("Gaussian", init<int>())
   .def(init<Gaussian&>(args("other")))
+  .add_property("nInputs", &Gaussian::getNInputs, &Gaussian::setNInputs)
+  .add_property("mean", &Gaussian_getMean, &Gaussian::setMean)
+  .add_property("variance", &Gaussian_getVariance, &Gaussian::setVariance)
+  .add_property("varianceThresholds", &Gaussian_getVarianceThresholds, (void (Gaussian::*)(const blitz::Array<double,1>&)) &Gaussian::setVarianceThresholds)
+  .def("setVarianceThresholds", (void (Gaussian::*)(double))&Gaussian::setVarianceThresholds)
+  .def("resize", &Gaussian::resize)
+  .def("logLikelihood", &Gaussian::logLikelihood)
   .def("print_", &Gaussian::print)
   ;
 
   class_<GMMStats>("GMMStats", init<>())
   .def(init<int, int>(args("n_gaussians","n_inputs")))
+  .def_readwrite("T", &GMMStats::T)
+  .def_readwrite("n", &GMMStats::n)
+  .def_readwrite("sumPx", &GMMStats::sumPx)
+  .def_readwrite("sumPxx", &GMMStats::sumPxx)
   .def("resize", &GMMStats::resize, args("n_gaussians", "n_inputs"))
   .def("init", &GMMStats::init)
+  .def("save", &GMMStats::save)
+  .def("load", &GMMStats::load)
   .def("print_", &GMMStats::print)
   ;
   

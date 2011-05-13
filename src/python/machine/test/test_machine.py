@@ -9,12 +9,22 @@ import os, sys
 import unittest
 import torch
 
+def equals(x, y, epsilon):
+  return (abs(x - y) < epsilon)
+  
 class MachineTest(unittest.TestCase):
   """Performs various machine tests."""
+
+  def test01_Gaussian(self):
+    """Test Gaussian"""
+    gaussian = torch.machine.Gaussian(2)
+
+    logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float32'))
+    self.assertTrue(equals(logLH, -1.93787706939, 1e-11))
   
-  def test01_GMMMachine(self):
+  def test02_GMMMachine(self):
     """Test a GMMMachine"""
-    
+
     sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
 
     gmm = torch.machine.GMMMachine(2, 2)
@@ -23,16 +33,21 @@ class MachineTest(unittest.TestCase):
     gmm.variances = torch.core.array.array([[1, 10], [2, 5]], 'float64')
     gmm.varianceThresholds = torch.core.array.array([[0, 0], [0, 0]], 'float64')
 
-    gmm.print_()
-
     stats = torch.machine.GMMStats(2, 2)
-
     gmm.accStatistics(sampler, stats)
     
-    stats.print_()
+    #config = torch.config.Configuration()
+    #stats.save(config)
+    #config.save("data/stats.hdf5")
 
-    #TODO Add asserts
+    config_ref = torch.config.Configuration("data/stats.hdf5")
+    stats_ref = torch.machine.GMMStats(2, 2)
+    stats_ref.load(config_ref)
 
+    self.assertTrue(stats.T == stats_ref.T)
+    self.assertTrue(stats.n == stats_ref.n)
+    self.assertTrue(stats.sumPx == stats_ref.sumPx)
+    self.assertTrue(stats.sumPxx == stats_ref.sumPxx)
 
 
 if __name__ == '__main__':

@@ -1,9 +1,5 @@
 .. vim: set fileencoding=utf-8 :
 
-.. testsetup::
-
-   import torch
-
 ======================================
  Tutorial 01. Initialization of Arrays
 ======================================
@@ -92,14 +88,3 @@ just do a best guess.
 
     # [[1, 2], [2, 3]] could be interpreted as a 2D integer array.
     t5_array_1 = torch.core.array.array([[1,2,3], [4,5,6]])
-
-First try with doctests
-
-.. testcode::
-
-   1+1        # this will give no output!
-   print 2+2  # this will give output
-
-.. testoutput::
-
-   4
