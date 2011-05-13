@@ -54,6 +54,8 @@ static boost::shared_ptr<blitz::Array<double, 1> > KMeansMachine_getMean(const K
   return mean;
 }
 
+void bind_machine_exception();
+
 BOOST_PYTHON_MODULE(libpytorch_machine) {
   
   class_<FrameSample>("FrameSample", init<const blitz::Array<float, 1>& >())
@@ -126,6 +128,8 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   .def("getNGaussians", &GMMMachine::getNGaussians)
   .def("print_", &GMMMachine::print)
   ;
+
+  bind_machine_exception();
 
   // TODO: add constructor variants, get/set: functions or properties?
   class_<EigenMachine, bases<Machine<FrameSample, blitz::Array<double,1> > > >("EigenMachine", init<>())

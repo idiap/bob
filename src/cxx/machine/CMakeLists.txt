@@ -7,12 +7,14 @@ set(shared "")
 
 # This defines the list of source files inside this package.
 set(src
+    "src/Exception.cc"
     "src/KMeansMachine.cc"
     "src/FrameSample.cc"
     "src/Gaussian.cc"
     "src/GMMMachine.cc"
     "src/GMMStats.cc"
     "src/EigenMachine.cc"
+    "src/EigenMachineException.cc"
 )
 
 include(../../cmake/macros.cmake)

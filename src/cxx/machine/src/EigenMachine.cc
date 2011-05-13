@@ -6,6 +6,8 @@
  */
 
 #include "machine/EigenMachine.h"
+#include "machine/Exception.h"
+#include "machine/EigenMachineException.h"
 #include "core/cast.h"
 #include "core/logging.h"
 #include "math/linear.h"
@@ -31,8 +33,8 @@ Torch::machine::EigenMachine::EigenMachine(
   m_p_variance(0.)
 {
   setEigenvaluesvectors(eigenvalues, eigenvectors);
-  if( n_outputs > eigenvectors.extent(0))
-    ; // TODO: throw an exception
+  if( n_outputs > m_eigenvectors.extent(0))
+    throw Torch::machine::EigenMachineNOutputsTooLarge(n_outputs, m_eigenvectors.extent(0));
   else
     m_n_outputs = n_outputs;
 }
@@ -79,7 +81,7 @@ Torch::machine::EigenMachine::~EigenMachine()
 void Torch::machine::EigenMachine::setNOutputs(int n_outputs) 
 {
   if( n_outputs > m_eigenvectors.extent(0))
-    ; // TODO: throw an exception
+    throw Torch::machine::EigenMachineNOutputsTooLarge(n_outputs, m_eigenvectors.extent(0));
   else
     m_n_outputs = n_outputs;
 }
@@ -91,7 +93,7 @@ void Torch::machine::EigenMachine::setPVariance(double p_variance)
   while(current_var < m_p_variance)
   {
     if( current_index >= m_eigenvalues.extent(0) )
-      ; // TODO: throw an exception
+      throw Torch::machine::EigenMachineNOutputsTooLarge(current_index+1, m_eigenvectors.extent(0));
     current_var += m_eigenvalues(current_index);
     ++current_index;
   }
@@ -103,8 +105,8 @@ void Torch::machine::EigenMachine::setEigenvaluesvectors(
   const blitz::Array<double,1>& eigenvalues, 
   const blitz::Array<double,2>& eigenvectors)
 {
-  if( eigenvectors.extent(0) != eigenvalues.extent(0) )
-    ; // TODO: throw an exception
+  if( eigenvectors.extent(1) != eigenvalues.extent(0) )
+    throw Torch::machine::NInputsMismatch(eigenvectors.extent(1), eigenvalues.extent(0));
   m_eigenvalues.resize(eigenvalues.shape());
   m_eigenvalues = eigenvalues;
   m_eigenvectors.resize(eigenvectors.shape());
@@ -141,7 +143,7 @@ void Torch::machine::EigenMachine::setPreMean( const blitz::Array<double,1>& pre
 {
   m_pre_mean.resize(pre_mean.shape());
   if( m_eigenvectors.extent(1) != m_pre_mean.extent(0) )
-    ; // TODO: throw an exception
+    throw Torch::machine::NInputsMismatch(m_eigenvectors.extent(1), m_pre_mean.extent(0));
   m_pre_mean = pre_mean;
 }
  
