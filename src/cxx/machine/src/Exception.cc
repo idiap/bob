@@ -43,3 +43,22 @@ const char* machine::NInputsMismatch::what() const throw() {
   }
 }
 
+machine::NOutputsMismatch::NOutputsMismatch(const int n1, const int n2) throw(): m_n_outputs1(n1), m_n_outputs2(n2) {
+}
+
+machine::NOutputsMismatch::~NOutputsMismatch() throw() {
+}
+
+const char* machine::NOutputsMismatch::what() const throw() {
+  try {
+    boost::format message("Mismatch in the number of outputs: '%d' vs '%d'.");
+    message % m_n_outputs1;
+    message % m_n_outputs2;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "machine::NOutputsMismatch: cannot format, exception raised";
+    return emergency;
+  }
+}
+

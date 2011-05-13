@@ -105,8 +105,8 @@ void Torch::machine::EigenMachine::setEigenvaluesvectors(
   const blitz::Array<double,1>& eigenvalues, 
   const blitz::Array<double,2>& eigenvectors)
 {
-  if( eigenvectors.extent(1) != eigenvalues.extent(0) )
-    throw Torch::machine::NInputsMismatch(eigenvectors.extent(1), eigenvalues.extent(0));
+  if( eigenvectors.extent(0) != eigenvalues.extent(0) )
+    throw Torch::machine::NOutputsMismatch(eigenvectors.extent(0), eigenvalues.extent(0));
   m_eigenvalues.resize(eigenvalues.shape());
   m_eigenvalues = eigenvalues;
   m_eigenvectors.resize(eigenvectors.shape());

@@ -35,6 +35,18 @@ namespace Torch { namespace machine {
       mutable std::string m_message;
   };
 
+  class NOutputsMismatch: public Exception {
+    public:
+      NOutputsMismatch(const int n_outputs1, const int n_outputs2) throw();
+      virtual ~NOutputsMismatch() throw();
+      virtual const char* what() const throw();
+
+    private:
+      int m_n_outputs1;
+      int m_n_outputs2;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* TORCH5SPRO_MACHINE_EXCEPTION_H */
