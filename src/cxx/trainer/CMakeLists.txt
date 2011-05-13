@@ -8,6 +8,7 @@ set(shared "")
 # This defines the list of source files inside this package.
 set(src
     "src/SimpleFrameSampler.cc"
+    "src/SVDPCATrainer.cc"
     "src/KMeansTrainer.cc"
     "src/GMMTrainer.cc"
     "src/MAP_GMMTrainer.cc"
@@ -25,3 +26,4 @@ add_dependencies(torch_trainer trainer-cxx_header_install)
 # Defines environment variable used to localize data for the tests
 #set_property(TEST cxx-trainer-gabor APPEND PROPERTY ENVIRONMENT
 #  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+

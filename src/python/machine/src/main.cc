@@ -2,6 +2,7 @@
 #include <database/Arrayset.h>
 #include <machine/KMeansMachine.h>
 #include <machine/GMMMachine.h>
+#include <machine/EigenMachine.h>
 
 using namespace boost::python;
 using namespace Torch::machine;
@@ -10,6 +11,13 @@ using namespace Torch::machine;
 class Machine_FrameSample_double_Wrapper : public Machine<FrameSample, double>, public wrapper<Machine<FrameSample, double> > {
 public:
   double forward (const FrameSample& input) const {
+    return this->get_override("forward")(input);
+  }
+};
+
+class Machine_FrameSample_A1double_Wrapper : public Machine<FrameSample, blitz::Array<double,1> >, public wrapper<Machine<FrameSample, blitz::Array<double,1> > > {
+public:
+  blitz::Array<double,1> forward (const FrameSample& input) const {
     return this->get_override("forward")(input);
   }
 };
@@ -30,6 +38,10 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   
   class_<Machine_FrameSample_double_Wrapper, boost::noncopyable>("Machine_FrameSample_double_")
   .def("forward", &Machine<FrameSample, double>::forward, args("input"))
+  ;
+  
+  class_<Machine_FrameSample_A1double_Wrapper, boost::noncopyable>("Machine_FrameSample_A1double_")
+  .def("forward", &Machine<FrameSample, blitz::Array<double,1> >::forward, args("input"))
   ;
   
   class_<KMeansMachine, bases<Machine<FrameSample, double> > >("KMeansMachine", init<int, int>())
@@ -75,5 +87,19 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   .def("getGaussian", &GMMMachine::getGaussian, return_value_policy<reference_existing_object>(), args("i"))
   .def("getNGaussians", &GMMMachine::getNGaussians)
   .def("print_", &GMMMachine::print)
+  ;
+
+  // TODO: add constructor variants, get/set: functions or properties?
+  class_<EigenMachine, bases<Machine<FrameSample, blitz::Array<double,1> > > >("EigenMachine", init<>())
+  .def("getNOutputs", &EigenMachine::getNOutputs)
+  .def("setNOutputs", &EigenMachine::setNOutputs, args("n_outputs"))
+  .def("getPVariance", &EigenMachine::getPVariance)
+  .def("setPVariance", &EigenMachine::setPVariance, args("p_variance"))
+  .def("getEigenvalues", make_function(&EigenMachine::getEigenvalues, return_value_policy<copy_const_reference>()))
+  .def("getEigenvectors", make_function(&EigenMachine::getEigenvectors, return_value_policy<copy_const_reference>()))
+  .def("setEigenvaluesvectors", &EigenMachine::setEigenvaluesvectors, args("eigenvalues","eigenvectors"))
+  .def("getPreMean", make_function(&EigenMachine::getPreMean, return_value_policy<copy_const_reference>()))
+  .def("setPreMean", &EigenMachine::setPreMean, args("pre_mean"))
+  .def("forward", &EigenMachine::forward, args("input"))
   ;
 }

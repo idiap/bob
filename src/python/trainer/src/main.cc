@@ -5,6 +5,7 @@
 #include <trainer/GMMTrainer.h>
 #include <trainer/MAP_GMMTrainer.h>
 #include <trainer/ML_GMMTrainer.h>
+#include <trainer/SVDPCATrainer.h>
 
 using namespace boost::python;
 using namespace Torch::machine;
@@ -59,6 +60,12 @@ public:
   
 };
 
+class Trainer_EigenMachine_FrameSample_Wrapper: public Trainer<EigenMachine, FrameSample>, public wrapper<Trainer<EigenMachine, FrameSample> > {
+    void train(EigenMachine& machine, const Sampler<FrameSample>& data) {
+      this->get_override("train")(machine, data);
+    }
+};
+
 
 BOOST_PYTHON_MODULE(libpytorch_trainer) {
   class_<Sampler_FrameSample_Wrapper, boost::noncopyable>("Sampler_FrameSample_")
@@ -70,6 +77,10 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   
   class_<Trainer_KMeansMachine_FrameSample_Wrapper, boost::noncopyable>("Trainer_KMeansMachine_FrameSample_")
   .def("train", &Trainer<KMeansMachine, FrameSample>::train, args("machine", "sampler"));
+  ;
+  
+  class_<Trainer_EigenMachine_FrameSample_Wrapper, boost::noncopyable>("Trainer_EigenMachine_FrameSample_")
+  .def("train", &Trainer<EigenMachine, FrameSample>::train, args("machine", "sampler"));
   ;
   
   class_<EMTrainer_Machine_FrameSample_double_FrameSample_Wrapper, boost::noncopyable>("EMTrainer_Machine_FrameSample_double_FrameSample_", init<int, int>((arg("convergence_threshold") = 0.001, arg("max_iterations") = 10)))
@@ -94,4 +105,9 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   
   class_<ML_GMMTrainer, bases<GMMTrainer> >("ML_GMMTrainer")
   ;
+
+  class_<SVDPCATrainer, bases<Trainer<EigenMachine, FrameSample>, FrameSample>, boost::noncopyable >("SVDPCATrainer", init<>())
+  .def("train", &SVDPCATrainer::train, args("machine", "sampler"))
+  ;
+  
 }
