@@ -2,7 +2,6 @@
 #include <database/Arrayset.h>
 #include <machine/KMeansMachine.h>
 #include <machine/GMMMachine.h>
-#include <machine/EigenMachine.h>
 
 using namespace boost::python;
 using namespace Torch::machine;
@@ -14,14 +13,6 @@ public:
     return this->get_override("forward")(input);
   }
 };
-
-class Machine_FrameSample_A1double_Wrapper : public Machine<FrameSample, blitz::Array<double,1> >, public wrapper<Machine<FrameSample, blitz::Array<double,1> > > {
-public:
-  blitz::Array<double,1> forward (const FrameSample& input) const {
-    return this->get_override("forward")(input);
-  }
-};
-
 
 static tuple getVariancesAndWeightsForEachCluster(const KMeansMachine& machine, Torch::trainer::Sampler<FrameSample>& sampler) {
   boost::shared_ptr<blitz::Array<double, 2> > variances(new blitz::Array<double, 2>);
@@ -55,8 +46,16 @@ static boost::shared_ptr<blitz::Array<double, 1> > KMeansMachine_getMean(const K
 }
 
 void bind_machine_exception();
+void bind_machine_eigenmachine();
 
-BOOST_PYTHON_MODULE(libpytorch_machine) {
+BOOST_PYTHON_MODULE(libpytorch_machine) 
+{
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
+  scope().attr("__doc__") = "Torch classes and sub-classes for machine access";
+
   
   class_<FrameSample>("FrameSample", init<const blitz::Array<float, 1>& >())
   .def("getFrame", &FrameSample::getFrame, return_value_policy<copy_const_reference>())
@@ -64,10 +63,6 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   
   class_<Machine_FrameSample_double_Wrapper, boost::noncopyable>("Machine_FrameSample_double_")
   .def("forward", &Machine<FrameSample, double>::forward, args("input"))
-  ;
-  
-  class_<Machine_FrameSample_A1double_Wrapper, boost::noncopyable>("Machine_FrameSample_A1double_")
-  .def("forward", &Machine<FrameSample, blitz::Array<double,1> >::forward, args("input"))
   ;
   
   class_<KMeansMachine, bases<Machine<FrameSample, double> > >("KMeansMachine", init<int, int>())
@@ -129,19 +124,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine) {
   .def("print_", &GMMMachine::print)
   ;
 
-  bind_machine_exception();
 
-  // TODO: add constructor variants, get/set: functions or properties?
-  class_<EigenMachine, bases<Machine<FrameSample, blitz::Array<double,1> > > >("EigenMachine", init<>())
-  .def("getNOutputs", &EigenMachine::getNOutputs)
-  .def("setNOutputs", &EigenMachine::setNOutputs, args("n_outputs"))
-  .def("getPVariance", &EigenMachine::getPVariance)
-  .def("setPVariance", &EigenMachine::setPVariance, args("p_variance"))
-  .def("getEigenvalues", make_function(&EigenMachine::getEigenvalues, return_value_policy<copy_const_reference>()))
-  .def("getEigenvectors", make_function(&EigenMachine::getEigenvectors, return_value_policy<copy_const_reference>()))
-  .def("setEigenvaluesvectors", &EigenMachine::setEigenvaluesvectors, args("eigenvalues","eigenvectors"))
-  .def("getPreMean", make_function(&EigenMachine::getPreMean, return_value_policy<copy_const_reference>()))
-  .def("setPreMean", &EigenMachine::setPreMean, args("pre_mean"))
-  .def("forward", &EigenMachine::forward, args("input"))
-  ;
+  bind_machine_exception();
+  bind_machine_eigenmachine();
 }
