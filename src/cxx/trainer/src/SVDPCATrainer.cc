@@ -1,4 +1,5 @@
 #include "trainer/SVDPCATrainer.h"
+#include "math/svd.h"
 
 void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine, const Sampler<Torch::machine::FrameSample>& data) 
 {
@@ -28,11 +29,12 @@ void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine,
   const int n_sigma = std::min(n_features,n_samples);
   blitz::Array<double,1> sigma(n_sigma);
   blitz::Array<double,2> V(n_samples,n_samples);
+  Torch::math::svd(data_mat, U, sigma, V);
 
   // 4/ Sort the eigenvalues/eigenvectors (no blitz++ way unfortunately)
   std::vector< std::pair<double,int> > eigenvalues_sort;
   for( int i=0; i<n_sigma; ++i)
-    eigenvalues_sort.push_back( std::pair<double,int>(sigma(0),i) );
+    eigenvalues_sort.push_back( std::pair<double,int>(sigma(i),i) );
   std::sort(eigenvalues_sort.begin(), eigenvalues_sort.end());
 
   // 5/ Update the machine
@@ -40,7 +42,8 @@ void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine,
   blitz::Array<double,2> eigenvectors(machine.getNOutputs(),n_features);
   for(int ind=0; ind<machine.getNOutputs(); ++ind)
   {
-    eigenvalues(ind) = eigenvalues_sort[ind].first;
+    // Convert them to covariance matrix eigenvalues
+    eigenvalues(ind) = eigenvalues_sort[ind].first * eigenvalues_sort[ind].first;
     blitz::Array<double,1> vec = U(eigenvalues_sort[ind].second, blitz::Range::all());
     double norm = sqrt( blitz::sum(vec*vec) );
     blitz::Array<double,1> eigen_vec = eigenvectors(ind,blitz::Range::all());
