@@ -83,7 +83,7 @@ namespace Torch {
       {
         if(true_min_index>0)
           img(i,r_left) = img(i,true_min_index);
-        if(true_max_index+1<src_mask.extent(0))
+        if(true_max_index+1<src_mask.extent(1))
           img(i,r_right) = img(i,true_max_index);
       }
     }
