@@ -78,7 +78,7 @@ namespace Torch {
 
       // Extrapolate the rows
       blitz::Range r_left(0,true_min_index-1);
-      blitz::Range r_right(true_max_index+1,src_mask.extent(0)-1);
+      blitz::Range r_right(true_max_index+1,src_mask.extent(1)-1);
       for(int i=0; i<src_mask.extent(0); ++i)
       {
         if(true_min_index>0)
