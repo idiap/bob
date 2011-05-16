@@ -12,6 +12,7 @@ The goal is that only you (your face) should unlock a system and that everyone e
 |   :width: 180                         |    :width: 180                         |    :width: 180                         |
 |   :alt: Reference 1                   |    :alt: Reference 2                   |    :alt: Reference 3                   |
 +---------------------------------------+----------------------------------------+----------------------------------------+
+
 (We will refer to these 3 images as training images.)
 
 The problem of using the 3 images directly for template matching (when you match a new image pixel-by-pixel to an old) 
@@ -27,19 +28,16 @@ In this practical tutorial we will demonstrate one possible way to implement a e
 
 In summary we will perform the following steps to train our system
 
-* Crop and normalize all images
-* Derive a subspace (principal components) using a seperate set of images (not including training images)
-* Project the training images into this subspace
-* Create model of training images in subspace (simple mean vector)
+* Derive a subspace which represent a "face"
+* Using the above subspace, create a model of the user
+* Compare an unknown image to the model of the user
 
-Thereafter we will perform the following systems to test our system
-
-* Crop and normalize all images
-* Project the all test images into this subspace
-* Compare the test images to the model (point in space)
 
 Deriving a better representation (finding principal components)
 ---------------------------------------------------------------
+
+.. image:: dia-1.svg
+   :width: 800
 
 Imagine that you toke all the photos of all your friends.
 You crop those images so only the face is visible and you align their eye-centers.
@@ -75,5 +73,16 @@ If we pick out the values row-by-row from the image (2D array) we can easily cre
   world_vectors = map(torch.core.array.uint8_2.vectorOf, world_images)
 
 
-  
+Create a model of the user
+--------------------------
+
+.. image:: dia-2.svg
+   :width: 800
+
+Test system with unknown image
+------------------------------
+
+.. image:: dia-3.svg
+   :width: 800
+
 
