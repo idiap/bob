@@ -56,7 +56,7 @@ void Torch::machine::GMMStats::save(Torch::config::Configuration& config) {
 void Torch::machine::GMMStats::load(const Torch::config::Configuration& config) {
   log_likelihood = config.get<std::vector<double> >("log_liklihood").at(0);
 
-  T = (int)config.get<std::vector<long> >("T").at(0);
+  T = (int)config.get<std::vector<int64_t> >("T").at(0);
   n = config.get<Torch::database::Arrayset>("n").get<double, 1>(1);
   sumPx = config.get<Torch::database::Arrayset>("sumPx").get<double, 2>(1);
   sumPxx = config.get<Torch::database::Arrayset>("sumPxx").get<double, 2>(1);

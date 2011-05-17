@@ -156,7 +156,7 @@ class TrainerTest(unittest.TestCase):
     
     self.assertTrue(equals(means, gmmMeans, 1e-7))
     self.assertTrue(equals(weights, gmmWeights, 1e-7))
-    self.assertTrue(equals(variances, gmmVariances, 1e-7))
+    self.assertTrue(equals(variances, gmmVariances, 1e-5))
     
   def test02_gmm_ML(self):
     """Train a GMMMachine with ML_GMMTrainer"""
