@@ -81,7 +81,7 @@ class Gaussian {
 
     /// Output the log likelihood of the sample, x 
     /// @param x The data sample (feature vector)
-    double logLikelihood(const blitz::Array<float,1> &x) const;
+    double logLikelihood(const blitz::Array<double, 1> &x) const;
 
     /// Print the mean and variance of the Gaussian
     void print() const;

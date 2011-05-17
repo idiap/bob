@@ -91,11 +91,11 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// @param[in]  x                                 The sample
     /// @param[out] log_weighted_gaussian_likelihoods For each Gaussian, i: log(weight_i*p(x|Gaussian_i))
     /// @return     The GMMMachine log likelihood, i.e. log(p(x|GMMMachine))
-    double logLikelihood(const blitz::Array<float,1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const;
+    double logLikelihood(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const;
 
     /// Output the log likelihood of the sample, x, i.e. log(p(x|GMM))
     /// @param[in]  x The sample
-    double logLikelihood(const blitz::Array<float,1> &x) const;
+    double logLikelihood(const blitz::Array<double, 1> &x) const;
 
     /// Output the log likelihood of the sample, x 
     /// (overrides Machine::forward)
@@ -109,7 +109,7 @@ class GMMMachine : public Machine<FrameSample, double> {
     ///
     /// @param[in]  x     The current sample
     /// @param[out] stats The accumulated statistics
-    void accStatistics(const blitz::Array<float,1> &x, GMMStats &stats) const;
+    void accStatistics(const blitz::Array<double,1> &x, GMMStats &stats) const;
     
     /// Get the weights
     /// @param[out] weights The weights ("mixing coefficients") of the Gaussian components

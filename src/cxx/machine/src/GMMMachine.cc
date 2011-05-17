@@ -169,7 +169,7 @@ blitz::Array<double,2> Torch::machine::GMMMachine::getVarianceThresholds() const
   return varianceThresholds;
 }
 
-double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<float,1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const {
+double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const {
   // Initialise variables
   log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
   double log_likelihood = LogZero;
@@ -185,7 +185,7 @@ double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<float,1> &x,
   return log_likelihood;
 }
 
-double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<float,1> &x) const {
+double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x) const {
   // Call the other logLikelihood (overloaded) function
   // (log_weighted_gaussian_likelihoods will be discarded)
   blitz::Array<double,1> log_weighted_gaussian_likelihoods;
@@ -201,14 +201,14 @@ void Torch::machine::GMMMachine::accStatistics(const Torch::trainer::Sampler<Tor
   for (int64_t i=0; i < sampler.getNSamples(); ++i) {
 
     // Get example
-    blitz::Array<float,1> x(sampler.getSample(i).getFrame());
+    blitz::Array<double,1> x(sampler.getSample(i).getFrame());
 
     // Accumulate statistics
     accStatistics(x,stats);
   }
 }
 
-void Torch::machine::GMMMachine::accStatistics(const blitz::Array<float, 1>& x, Torch::machine::GMMStats& stats) const {
+void Torch::machine::GMMMachine::accStatistics(const blitz::Array<double, 1>& x, Torch::machine::GMMStats& stats) const {
 
   // Calculate Gaussian and GMM likelihoods
   // - log_weighted_gaussian_likelihoods(i) = log(weight_i*p(x|gaussian_i))

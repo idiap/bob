@@ -35,11 +35,11 @@ blitz::Array<double,2> Torch::machine::KMeansMachine::getMeans() const {
   return means;
 }
 
-double Torch::machine::KMeansMachine::getDistanceFromMean(const blitz::Array<float,1> &x, int i) const {
+double Torch::machine::KMeansMachine::getDistanceFromMean(const blitz::Array<double,1> &x, int i) const {
   return blitz::sum(blitz::pow2(m_means(i,blitz::Range::all()) - x));
 }
 
-void Torch::machine::KMeansMachine::getClosestMean(const blitz::Array<float,1> &x, int &closest_mean, double &min_distance) const {
+void Torch::machine::KMeansMachine::getClosestMean(const blitz::Array<double,1> &x, int &closest_mean, double &min_distance) const {
   
   min_distance = DBL_MAX;
   
@@ -53,7 +53,7 @@ void Torch::machine::KMeansMachine::getClosestMean(const blitz::Array<float,1> &
   
 }
 
-double Torch::machine::KMeansMachine::getMinDistance(const blitz::Array<float,1> &input) const {
+double Torch::machine::KMeansMachine::getMinDistance(const blitz::Array<double,1> &input) const {
   int closest_mean = -1;
   double min_distance = -1;
   getClosestMean(input,closest_mean,min_distance);
@@ -74,7 +74,7 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   // iterate over data
   for (int64_t i=0; i < sampler.getNSamples(); ++i) {
     // - get example
-    blitz::Array<float,1> x = sampler.getSample(i).getFrame();
+    blitz::Array<double,1> x = sampler.getSample(i).getFrame();
     
     // - find closest mean
     int closest_mean = -1;

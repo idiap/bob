@@ -11,7 +11,7 @@ Torch::trainer::SimpleFrameSampler::SimpleFrameSampler(const SimpleFrameSampler&
 }
 
 const Torch::machine::FrameSample Torch::trainer::SimpleFrameSampler::getSample(int index) const {
-  return Torch::machine::FrameSample(arrayset[index+1].get<float, 1>());
+  return Torch::machine::FrameSample(arrayset[index+1].cast<double, 1>());
 }
 
 int Torch::trainer::SimpleFrameSampler::getNSamples() const {

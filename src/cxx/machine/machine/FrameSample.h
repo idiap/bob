@@ -6,7 +6,7 @@ namespace Torch {
 namespace machine {
 
 /**
- * This class represents one Frame. It encapsulate a blitz::Array<float, 1>
+ * This class represents one Frame. It encapsulates a blitz::Array<double, 1>
  */
 class FrameSample {
 public:
@@ -14,16 +14,16 @@ public:
   virtual ~FrameSample();
 
   /// Constructor
-  FrameSample(const blitz::Array<float, 1>& array);
+  FrameSample(const blitz::Array<double, 1>& array);
   
   /// Copy constructor
   FrameSample(const FrameSample& copy);
 
   /// Get the Frame
-  const blitz::Array<float, 1>& getFrame() const; 
+  const blitz::Array<double, 1>& getFrame() const;
   
 private:
-  blitz::Array<float, 1> array;
+  blitz::Array<double, 1> array;
 };
 }
 }

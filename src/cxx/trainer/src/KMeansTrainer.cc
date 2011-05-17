@@ -33,12 +33,10 @@ void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine,
     // get the example at that index
     FrameSample frame = sampler.getSample(index);
     
-    const blitz::Array<float, 1>& x = frame.getFrame();
-    // cast the example from float (data type) to double (parameter type)
-    blitz::Array<double,1> mean(blitz::cast<double>(x));
+    const blitz::Array<double, 1>& mean = frame.getFrame();
     
     // set the mean
-    kMeansMachine.setMean(i,mean);
+    kMeansMachine.setMean(i, mean);
   } 
 }
 
@@ -50,7 +48,7 @@ double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Sampler
     // iterate over data samples
     for (int64_t i=0; i < data.getNSamples(); i++) {
       // get example
-      blitz::Array<float,1> x(data.getSample(i).getFrame());
+      blitz::Array<double, 1> x(data.getSample(i).getFrame());
 
       // find closest mean, and distance from that mean
       int closest_mean = -1;

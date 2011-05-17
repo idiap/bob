@@ -46,7 +46,11 @@ class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
     self.arrayset.load()
   
   def getSample(self, index):
-    return torch.machine.FrameSample(self.arrayset[index+1].get())
+    array = self.arrayset[index+1].get()
+    if type(array).__name__ == 'float64_t':
+      return torch.machine.FrameSample(array)
+    else:
+      return torch.machine.FrameSample(array.cast('float64'))
   
   def getNSamples(self):
     return len(self.arrayset)
@@ -82,7 +86,7 @@ class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
   
   
   def getSample(self, index):
-    return torch.machine.FrameSample((self.arrayset[index+1].get().cast('float64') / self.std).cast('float32'))
+    return torch.machine.FrameSample((self.arrayset[index+1].get().cast('float64') / self.std))
   
   def getNSamples(self):
     return len(self.arrayset)
@@ -154,9 +158,9 @@ class TrainerTest(unittest.TestCase):
       variances = flipRows(variances)
       weights = flipRows(weights)
     
-    self.assertTrue(equals(means, gmmMeans, 1e-7))
-    self.assertTrue(equals(weights, gmmWeights, 1e-7))
-    self.assertTrue(equals(variances, gmmVariances, 1e-5))
+    self.assertTrue(equals(means, gmmMeans, 1e-3))
+    self.assertTrue(equals(weights, gmmWeights, 1e-3))
+    self.assertTrue(equals(variances, gmmVariances, 1e-3))
     
   def test02_gmm_ML(self):
     """Train a GMMMachine with ML_GMMTrainer"""

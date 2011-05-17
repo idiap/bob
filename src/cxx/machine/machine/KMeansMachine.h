@@ -47,17 +47,17 @@ public:
   /// to the i'th mean
   /// @param x The data sample (feature vector)
   /// @param i The index of the mean
-  double getDistanceFromMean(const blitz::Array<float,1> &x, int i) const;
+  double getDistanceFromMean(const blitz::Array<double,1> &x, int i) const;
   
   /// Calculate the index of the mean that is closest
   /// (in terms of Euclidean distance) to the data sample, x
   /// @param x The data sample (feature vector)
   /// @param closest_mean (output) The index of the mean closest to the sample
   /// @param distance (output) The distance of the sample from the closest mean
-  void getClosestMean(const blitz::Array<float,1> &x, int &closest_mean, double &min_distance) const;
+  void getClosestMean(const blitz::Array<double,1> &x, int &closest_mean, double &min_distance) const;
   
   /// Output the minimum distance between the input and one of the means
-  double getMinDistance(const blitz::Array <float, 1> & input) const;
+  double getMinDistance(const blitz::Array <double, 1> & input) const;
 
   /// For each mean, find the subset of the dataset
   /// that is closest to that mean, and calculate

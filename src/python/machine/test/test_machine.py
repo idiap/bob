@@ -19,8 +19,9 @@ class MachineTest(unittest.TestCase):
     """Test Gaussian"""
     gaussian = torch.machine.Gaussian(2)
 
-    logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float32'))
-    self.assertTrue(equals(logLH, -1.93787706939, 1e-11))
+    logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float64'))
+    print logLH
+    self.assertTrue(equals(logLH, -1.93787706641, 1e-11))
   
   def test02_GMMMachine(self):
     """Test a GMMMachine"""
@@ -60,8 +61,8 @@ class MachineTest(unittest.TestCase):
     m.setNOutputs(2)
     
     # Define input samples
-    s1 = torch.machine.FrameSample(torch.core.array.float32_1([2,1,1],(3,)))
-    s2 = torch.machine.FrameSample(torch.core.array.float32_1([2,1,37],(3,)))
+    s1 = torch.machine.FrameSample(torch.core.array.float64_1([2,1,1],(3,)))
+    s2 = torch.machine.FrameSample(torch.core.array.float64_1([2,1,37],(3,)))
     
     # Define reference array of projected data
     sol1 = torch.core.array.float64_1([2,1],(2,))

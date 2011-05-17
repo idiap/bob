@@ -57,7 +57,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   scope().attr("__doc__") = "Torch classes and sub-classes for machine access";
 
   
-  class_<FrameSample>("FrameSample", init<const blitz::Array<float, 1>& >())
+  class_<FrameSample>("FrameSample", init<const blitz::Array<double, 1>& >())
   .def("getFrame", &FrameSample::getFrame, return_value_policy<copy_const_reference>())
   ;
   
@@ -75,7 +75,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("getMinDistance", &KMeansMachine::getMinDistance, args("input"))
   .def("getNMeans", &KMeansMachine::getNMeans)
   .def("getNInputs", &KMeansMachine::getNInputs)
-  .def("forward", &KMeansMachine::forward, args("input"))
+  .def("forward", &KMeansMachine::forward, args("input", "output"))
   .def("getVariancesAndWeightsForEachCluster", &getVariancesAndWeightsForEachCluster, args("machine", "sampler"))
   ;
   
@@ -114,11 +114,11 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .add_property("varianceThresholds", (blitz::Array<double, 2> (GMMMachine::*)() const) &GMMMachine::getVarianceThresholds, (void (GMMMachine::*)(const blitz::Array<double,2>&))&GMMMachine::setVarianceThresholds)
   .def("setVarianceThresholds", (void (GMMMachine::*)(double))&GMMMachine::setVarianceThresholds, args("factor"))
   .def("setVarianceThresholds", (void (GMMMachine::*)(blitz::Array<double,1>))&GMMMachine::setVarianceThresholds, args("variance_thresholds"))
-  .def("logLikelihood", (double (GMMMachine::*)(const blitz::Array<float,1>&, blitz::Array<double,1>&) const)&GMMMachine::logLikelihood, args("x", "log_weighted_gaussian_likelihoods"))
-  .def("logLikelihood", (double (GMMMachine::*)(const blitz::Array<float,1>&) const)&GMMMachine::logLikelihood, args("x"))
-  .def("forward", &GMMMachine::forward, args("input"))
+  .def("logLikelihood", (double (GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&GMMMachine::logLikelihood, args("x", "log_weighted_gaussian_likelihoods"))
+  .def("logLikelihood", (double (GMMMachine::*)(const blitz::Array<double,1>&) const)&GMMMachine::logLikelihood, args("x"))
+  .def("forward", &GMMMachine::forward, args("input", "output"))
   .def("accStatistics", (void (GMMMachine::*)(const Torch::trainer::Sampler<FrameSample>&, GMMStats&) const)&GMMMachine::accStatistics, args("sampler", "stats"))
-  .def("accStatistics", (void (GMMMachine::*)(const blitz::Array<float,1>&, GMMStats&) const)&GMMMachine::accStatistics, args("x", "stats"))
+  .def("accStatistics", (void (GMMMachine::*)(const blitz::Array<double,1>&, GMMStats&) const)&GMMMachine::accStatistics, args("x", "stats"))
   .def("getGaussian", &GMMMachine::getGaussian, return_value_policy<reference_existing_object>(), args("i"))
   .def("getNGaussians", &GMMMachine::getNGaussians)
   .def("print_", &GMMMachine::print)

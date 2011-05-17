@@ -130,7 +130,7 @@ void Torch::machine::Gaussian::setVarianceThresholds(double factor) {
   setVarianceThresholds(variance_thresholds);
 }
 
-double Torch::machine::Gaussian::logLikelihood(const blitz::Array<float,1> &x) const {
+double Torch::machine::Gaussian::logLikelihood(const blitz::Array<double, 1> &x) const {
   double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance);
   double logLikelihood = (-0.5 * (g_norm + z));
   return logLikelihood;
