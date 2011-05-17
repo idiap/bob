@@ -70,7 +70,7 @@ public:
   
   /// Output the minimum distance between the input and one of the means
   /// (overrides Machine::forward)
-  double forward(const FrameSample& input) const;
+  void forward(const FrameSample& input, double& output) const;
   
   /// Return the number of means
   int getNMeans() const;

@@ -192,8 +192,8 @@ double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<float,1> &x)
   return logLikelihood(x,log_weighted_gaussian_likelihoods);
 }
 
-double Torch::machine::GMMMachine::forward (const FrameSample& input) const {
-  return logLikelihood(input.getFrame());
+void Torch::machine::GMMMachine::forward (const FrameSample& input, double& output) const {
+  output = logLikelihood(input.getFrame());
 }
 
 void Torch::machine::GMMMachine::accStatistics(const Torch::trainer::Sampler<Torch::machine::FrameSample>& sampler, Torch::machine::GMMStats& stats) const {

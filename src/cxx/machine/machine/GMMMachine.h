@@ -99,7 +99,7 @@ class GMMMachine : public Machine<FrameSample, double> {
 
     /// Output the log likelihood of the sample, x 
     /// (overrides Machine::forward)
-    double forward (const FrameSample& input) const;
+    void forward (const FrameSample& input, double& output) const;
     
     /// Accumulates the GMM statistics over a dataset.
     /// @see bool accStatistics(const blitz::Array<float,1> &x, GMMStats stats)

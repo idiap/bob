@@ -79,7 +79,7 @@ namespace Torch {
 
         /// Output the projected sample, x 
         /// (overrides Machine::forward)
-        blitz::Array<double,1> forward(const FrameSample& input) const;
+        void forward(const FrameSample& input, blitz::Array<double,1>& output) const;
 
         /// Print the parameters of the GMM
         void print() const;

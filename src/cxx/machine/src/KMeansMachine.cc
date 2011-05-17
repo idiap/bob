@@ -102,8 +102,8 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   weights = weights / blitz::sum(weights);
 }
 
-double Torch::machine::KMeansMachine::forward(const FrameSample& input) const {
-  return getMinDistance(input.getFrame());
+void Torch::machine::KMeansMachine::forward(const FrameSample& input, double& output) const {
+  output = getMinDistance(input.getFrame());
 }
 
 int Torch::machine::KMeansMachine::getNMeans() const {

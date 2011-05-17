@@ -9,8 +9,8 @@ using namespace Torch::machine;
 
 class Machine_FrameSample_double_Wrapper : public Machine<FrameSample, double>, public wrapper<Machine<FrameSample, double> > {
 public:
-  double forward (const FrameSample& input) const {
-    return this->get_override("forward")(input);
+  void forward (const FrameSample& input, double& output) const {
+    this->get_override("forward")(input, output);
   }
 };
 
@@ -62,7 +62,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   ;
   
   class_<Machine_FrameSample_double_Wrapper, boost::noncopyable>("Machine_FrameSample_double_")
-  .def("forward", &Machine<FrameSample, double>::forward, args("input"))
+  .def("forward", &Machine<FrameSample, double>::forward, args("input", "output"))
   ;
   
   class_<KMeansMachine, bases<Machine<FrameSample, double> > >("KMeansMachine", init<int, int>())
