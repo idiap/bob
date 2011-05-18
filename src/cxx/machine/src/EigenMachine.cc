@@ -152,20 +152,23 @@ const blitz::Array<double,1>& Torch::machine::EigenMachine::getPreMean() const
   return m_pre_mean;
 }
 
-blitz::Array<double,1> Torch::machine::EigenMachine::forward(const FrameSample& input) const
+void Torch::machine::EigenMachine::forward(const FrameSample& input, blitz::Array<double,1>& output) const
 {
   const blitz::Array<double,2> mat=m_eigenvectors(blitz::Range(0,m_n_outputs-1),blitz::Range::all());
-  blitz::Array<double,1> output(m_n_outputs);
+  output.resize(m_n_outputs);
   blitz::Array<double,1> input_nomean(m_pre_mean.extent(0));
   input_nomean = input.getFrame() - m_pre_mean;
   Torch::math::prod(mat, input_nomean, output);
-  return output; 
 }
 
-void Torch::machine::EigenMachine::print() const 
-{
-  Torch::core::info << "Output dimensionality = " << m_n_outputs << std::endl;
-  Torch::core::info << "Eigenvalues = " << std::endl << m_eigenvalues << std::endl;
-  Torch::core::info << "Eigenvectors = " << std::endl << m_eigenvectors << std::endl;
-}
+namespace Torch {
+  namespace machine {
+    std::ostream& operator<<(std::ostream& os, const EigenMachine& machine) {
+      os << "Output dimensionality = " << machine.m_n_outputs << std::endl;
+      os << "Eigenvalues = " << std::endl << machine.m_eigenvalues << std::endl;
+      os << "Eigenvectors = " << std::endl << machine.m_eigenvectors << std::endl;
 
+      return os;
+    }
+  }
+}

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
    "src/main.cc"
+   "src/exception.cc"
    )
 
 include(../../cmake/macros.cmake)

@@ -66,8 +66,15 @@ class Trainer_EigenMachine_FrameSample_Wrapper: public Trainer<EigenMachine, Fra
     }
 };
 
+void bind_trainer_exception();
 
 BOOST_PYTHON_MODULE(libpytorch_trainer) {
+  docstring_options docopt; 
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
+  scope().attr("__doc__") = "Torch classes and sub-classes for trainers";
+  
   class_<Sampler_FrameSample_Wrapper, boost::noncopyable>("Sampler_FrameSample_")
   .def("getSample", &Sampler<FrameSample>::getSample, args("index"))
   .def("getNSamples", &Sampler<FrameSample>::getNSamples)
@@ -103,11 +110,12 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   .def("setPriorGMM", &MAP_GMMTrainer::setPriorGMM)
   ;
   
-  class_<ML_GMMTrainer, bases<GMMTrainer> >("ML_GMMTrainer")
+  class_<ML_GMMTrainer, bases<GMMTrainer> >("ML_GMMTrainer", init<bool, bool, bool>((arg("update_means") = true, arg("update_variances") = false, arg("update_weights") = false)))
   ;
 
   class_<SVDPCATrainer, bases<Trainer<EigenMachine, FrameSample>, FrameSample>, boost::noncopyable >("SVDPCATrainer", init<>())
   .def("train", &SVDPCATrainer::train, args("machine", "sampler"))
   ;
   
+  bind_trainer_exception();
 }

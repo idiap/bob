@@ -21,7 +21,7 @@ public:
      * @param input input data used by the machine
      * @return output value computed by the machine
      */
-    virtual T_output forward(const T_input& input) const = 0;
+    virtual void forward(const T_input& input, T_output& output) const = 0;
 };
 
 

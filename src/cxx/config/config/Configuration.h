@@ -12,6 +12,7 @@
 #include <boost/python.hpp>
 
 #include "config/Exception.h"
+#include <boost/filesystem/path.hpp>
 
 namespace Torch { namespace config {
 
@@ -65,18 +66,20 @@ namespace Torch { namespace config {
        * given type T, an exception is also raised.
        */
       template <typename T> inline const T get (const std::string& name) const {
-        if (!m_dict.has_key(name)) throw KeyError(name); 
-        boost::python::extract<T> extractor(m_dict.get(name));
+        std::string full_path = getAbsolutePath(name);
+        if (!m_dict.has_key(full_path)) throw KeyError(full_path);
+        boost::python::extract<T> extractor(m_dict.get(full_path));
         if (!extractor.check())
-          throw UnsupportedConversion(name, typeid(T), m_dict.get(name));
+          throw UnsupportedConversion(full_path, typeid(T), m_dict.get(full_path));
         return extractor();
       }
 
       template <typename T> inline T get (const std::string& name) {
-        if (!m_dict.has_key(name)) throw KeyError(name); 
-        boost::python::extract<T> extractor(m_dict.get(name));
+        std::string full_path = getAbsolutePath(name);
+        if (!m_dict.has_key(full_path)) throw KeyError(full_path);
+        boost::python::extract<T> extractor(m_dict.get(full_path));
         if (!extractor.check())
-          throw UnsupportedConversion(name, typeid(T), m_dict.get(name));
+          throw UnsupportedConversion(full_path, typeid(T), m_dict.get(full_path));
         return extractor();
       }
 
@@ -87,7 +90,8 @@ namespace Torch { namespace config {
        */
       template <typename T> inline void set
         (const std::string& name, const T& object) {
-          m_dict[name] = object;
+        std::string full_path = getAbsolutePath(name);
+        m_dict[full_path] = object;
       }
 
       /**
@@ -120,11 +124,28 @@ namespace Torch { namespace config {
        * Tells us if this Configuration has a certain key
        */
       inline bool has_key (const std::string& name) const {
-        return m_dict.has_key(name);
+        std::string full_path = getAbsolutePath(name);
+        return m_dict.has_key(full_path);
       }
+
+      /**
+       * Change current path.
+       * 
+       * @param path If path starts with '/', it is treated as an absolute path. '..' and
+       * '.' are supported.
+       */
+      void cd(std::string path);
 
     protected:
 
+      boost::filesystem::path m_current_path;
+
+      /**
+       * Returns an absolute path using the current path. The return string doesn't start
+       * with '/' and can directly be used as key for the dictionnary 
+       */
+      std::string getAbsolutePath(const std::string path) const;
+      
       /**
        * Returns the current implementation as a python dictionary. This method
        * is useful if you are writing python bindings to the configuration

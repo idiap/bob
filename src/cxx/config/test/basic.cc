@@ -20,6 +20,7 @@
 #include "config/Configuration.h"
 #include "database/Array.h"
 #include "database/Arrayset.h"
+#include <boost/shared_array.hpp>
 
 namespace conf = Torch::config;
 namespace fs = boost::filesystem;
@@ -33,6 +34,33 @@ static fs::path datapath () {
     throw Torch::core::Exception();
   }
   return fs::path(cpath);
+}
+
+
+/**
+ * @brief Generates a unique temporary filename, and returns the file
+ * descriptor
+ */
+std::string temp_file(const std::string& ext) {
+  boost::filesystem::path tpl = Torch::core::tmpdir();
+  std::string filename("torchtest_config_basicXXXXXX");
+  filename.append(ext);
+  tpl /= filename;
+  boost::shared_array<char> char_tpl(new char[tpl.file_string().size()+1]);
+  strcpy(char_tpl.get(), tpl.file_string().c_str());
+  int fd = mkstemps(char_tpl.get(), ext.size());
+  close(fd);
+  boost::filesystem::remove(char_tpl.get());
+  std::string res = char_tpl.get();
+  return res;
+}
+
+void check_equal(const conf::Configuration& c, const std::string& path, const int value) {
+  int v;
+  std::cout << "Testing " << path;
+  BOOST_REQUIRE_NO_THROW(v = (int)c.get<int64_t>(path));
+  BOOST_CHECK_EQUAL(v, value);
+  std::cout << "  Ok" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE ( transparent_retrieval ) {
@@ -111,4 +139,45 @@ BOOST_AUTO_TEST_CASE ( extraction_error ) {
 BOOST_AUTO_TEST_CASE ( syntax_error ) {
   fs::path file = datapath() / "example2.py";
   BOOST_CHECK_THROW(conf::Configuration c(file.string()), conf::PythonError);
+}
+
+
+BOOST_AUTO_TEST_CASE ( cd_path ) {
+  conf::Configuration c;
+  int value = 10;
+
+  c.set("value", value);
+  check_equal(c, "value", value);
+  
+  c.set("a/value", value);
+  check_equal(c, "a/value", value);
+  
+  c.cd("b");
+  c.set("value", value);
+  check_equal(c, "/b/value", value);
+
+  c.set("c/value", value);
+  check_equal(c, "/b/c/value", value);
+
+  c.cd("d");
+  c.set("value", value);
+  check_equal(c, "/b/d/value", value);
+
+  c.cd("../e");
+  c.set("value", value);
+  check_equal(c, "/b/e/value", value);
+
+  c.set("/f/value", value);
+  check_equal(c, "/f/value", value);
+  c.cd("../..");
+  check_equal(c, "f/value", value);
+
+  c.cd("..");
+  c.set("/g/value", value);
+  check_equal(c, "/g/value", value);
+
+  c.cd("b/d");
+  c.cd("/h");
+  c.set("value", value);
+  check_equal(c, "/h/value", value);
 }

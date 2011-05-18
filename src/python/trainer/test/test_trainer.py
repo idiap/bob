@@ -14,9 +14,9 @@ import random
 def loadGMM():
   gmm = torch.machine.GMMMachine(2, 2)
 
-  gmm.weights = torch.core.array.load('data/gmm.init_weights.bin')
-  gmm.means = torch.core.array.load('data/gmm.init_means.bin')
-  gmm.variances = torch.core.array.load('data/gmm.init_variances.bin')
+  gmm.weights = torch.core.array.load('data/gmm.init_weights.hdf5')
+  gmm.means = torch.core.array.load('data/gmm.init_means.hdf5')
+  gmm.variances = torch.core.array.load('data/gmm.init_variances.hdf5')
   gmm.varianceThreshold = torch.core.array.array([0.001, 0.001], 'float64')
 
   return gmm
@@ -46,7 +46,11 @@ class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
     self.arrayset.load()
   
   def getSample(self, index):
-    return torch.machine.FrameSample(self.arrayset[index+1].get())
+    array = self.arrayset[index+1].get()
+    if type(array).__name__ == 'float64_t':
+      return torch.machine.FrameSample(array)
+    else:
+      return torch.machine.FrameSample(array.cast('float64'))
   
   def getNSamples(self):
     return len(self.arrayset)
@@ -82,7 +86,7 @@ class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
   
   
   def getSample(self, index):
-    return torch.machine.FrameSample((self.arrayset[index+1].get().cast('float64') / self.std).cast('float32'))
+    return torch.machine.FrameSample((self.arrayset[index+1].get().cast('float64') / self.std))
   
   def getNSamples(self):
     return len(self.arrayset)
@@ -130,7 +134,7 @@ class TrainerTest(unittest.TestCase):
   def test01_kmeans(self):
     """Train a KMeansMachine"""
 
-    sampler = NormalizeStdFrameSampler("data/faithful.torch3.bindata")
+    sampler = NormalizeStdFrameSampler("data/faithful.torch3.hdf5")
 
     machine = torch.machine.KMeansMachine(2, 2)
 
@@ -145,59 +149,62 @@ class TrainerTest(unittest.TestCase):
     multiplyVectorsByFactors(means, sampler.std)
     multiplyVectorsByFactors(variances, sampler.std ** 2)
 
-    gmmWeights = torch.core.array.load('data/gmm.init_weights.bin')
-    gmmMeans = torch.core.array.load('data/gmm.init_means.bin')
-    gmmVariances = torch.core.array.load('data/gmm.init_variances.bin')
+    gmmWeights = torch.core.array.load('data/gmm.init_weights.hdf5')
+    gmmMeans = torch.core.array.load('data/gmm.init_means.hdf5')
+    gmmVariances = torch.core.array.load('data/gmm.init_variances.hdf5')
 
     if (means[0, 0] < means[1, 0]):
       means = flipRows(means)
       variances = flipRows(variances)
       weights = flipRows(weights)
     
-    self.assertTrue(equals(means, gmmMeans, 1e-7))
-    self.assertTrue(equals(weights, gmmWeights, 1e-7))
-    self.assertTrue(equals(variances, gmmVariances, 1e-7))
+    self.assertTrue(equals(means, gmmMeans, 1e-3))
+    self.assertTrue(equals(weights, gmmWeights, 1e-3))
+    self.assertTrue(equals(variances, gmmVariances, 1e-3))
     
   def test02_gmm_ML(self):
     """Train a GMMMachine with ML_GMMTrainer"""
     
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
+    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
     
     gmm = loadGMM()
 
-    ml_gmmtrainer = torch.trainer.ML_GMMTrainer()
-
-    print "GMM Before:"
-    print gmm.print_()
-
+    ml_gmmtrainer = torch.trainer.ML_GMMTrainer(True, True, True)
     ml_gmmtrainer.train(gmm, sampler)
-    
-    print "GMM After:"
-    print gmm.print_()
 
-    #TODO Add asserts
+    #config = torch.config.Configuration()
+    #gmm.save(config)
+    #config.save("data/gmm_ML.hdf5")
+
+    gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    
+    self.assertTrue(gmm == gmm_ref)
     
   def test03_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer"""
     
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
+    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
     
-    gmm = loadGMM()
-    gmmprior = loadGMM()
-
-    print gmm.print_()
+    gmm = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    gmmprior = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    
     map_gmmtrainer = torch.trainer.MAP_GMMTrainer(16)
     map_gmmtrainer.setPriorGMM(gmmprior)
     map_gmmtrainer.train(gmm, sampler)
-    print gmm.print_()
+
+    #config = torch.config.Configuration()
+    #gmm.save(config)
+    #config.save("data/gmm_MAP.hdf5")
     
-    #TODO Add asserts
+    gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_MAP.hdf5"))
+
+    self.assertTrue(gmm == gmm_ref)
     
   def test04_custom_samplers(self):
     """Custom python sampler"""
     
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
-    mysampler = MyFrameSampler("data/faithful.torch3.bindata")
+    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
+    mysampler = MyFrameSampler("data/faithful.torch3.hdf5")
 
     self.assertTrue(sampler.getNSamples() == mysampler.getNSamples())
 
@@ -207,7 +214,7 @@ class TrainerTest(unittest.TestCase):
   def test05_custom_trainer(self):
     """Custom python trainer"""
     
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
+    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
     
     mytrainer = MyTrainer()
 

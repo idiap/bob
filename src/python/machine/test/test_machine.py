@@ -19,14 +19,13 @@ class MachineTest(unittest.TestCase):
     """Test Gaussian"""
     gaussian = torch.machine.Gaussian(2)
 
-    logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float32'))
-    self.assertTrue(equals(logLH, -1.93787706939, 1e-11))
+    logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float64'))
+    self.assertTrue(equals(logLH, -1.93787706641, 1e-11))
   
   def test02_GMMMachine(self):
     """Test a GMMMachine"""
 
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
-
+    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
     gmm = torch.machine.GMMMachine(2, 2)
     gmm.weights   = torch.core.array.array([0.5, 0.5], 'float64')
     gmm.means     = torch.core.array.array([[3, 70], [4, 72]], 'float64')
@@ -40,9 +39,7 @@ class MachineTest(unittest.TestCase):
     #stats.save(config)
     #config.save("data/stats.hdf5")
 
-    config_ref = torch.config.Configuration("data/stats.hdf5")
-    stats_ref = torch.machine.GMMStats(2, 2)
-    stats_ref.load(config_ref)
+    stats_ref = torch.machine.GMMStats(torch.config.Configuration("data/stats.hdf5"))
 
     self.assertTrue(stats.T == stats_ref.T)
     self.assertTrue(stats.n == stats_ref.n)
@@ -60,8 +57,8 @@ class MachineTest(unittest.TestCase):
     m.setNOutputs(2)
     
     # Define input samples
-    s1 = torch.machine.FrameSample(torch.core.array.float32_1([2,1,1],(3,)))
-    s2 = torch.machine.FrameSample(torch.core.array.float32_1([2,1,37],(3,)))
+    s1 = torch.machine.FrameSample(torch.core.array.float64_1([2,1,1],(3,)))
+    s2 = torch.machine.FrameSample(torch.core.array.float64_1([2,1,37],(3,)))
     
     # Define reference array of projected data
     sol1 = torch.core.array.float64_1([2,1],(2,))

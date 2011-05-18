@@ -8,10 +8,10 @@ Torch::machine::FrameSample::FrameSample(const FrameSample& copy) : array(copy.a
   
 }
 
-Torch::machine::FrameSample::FrameSample(const blitz::Array<float, 1>& array): array(array) {
+Torch::machine::FrameSample::FrameSample(const blitz::Array<double, 1>& array): array(array) {
   
 }
 
-const blitz::Array<float, 1>& Torch::machine::FrameSample::getFrame() const {
+const blitz::Array<double, 1>& Torch::machine::FrameSample::getFrame() const {
   return array;
 }

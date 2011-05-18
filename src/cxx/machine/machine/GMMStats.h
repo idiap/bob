@@ -29,6 +29,9 @@ class GMMStats {
     /// @param n_inputs    Feature dimensionality.
     GMMStats(int n_gaussians, int n_inputs);
 
+    /// Constructor
+    GMMStats(Torch::config::Configuration& config);
+    
     /// Destructor
     ~GMMStats();
 
@@ -38,11 +41,8 @@ class GMMStats {
     void resize(int n_gaussians, int n_inputs);
 
     /// Resets statistics to zero.
-    bool init();
+    void init();
  
-    /// Print the statistics 
-    bool print();
-    
     /// The accumulated log likelihood of all samples
     double log_likelihood;
 
@@ -58,8 +58,13 @@ class GMMStats {
     /// For each Gaussian, the accumulated sum of responsibility times the sample squared
     blitz::Array<double,2> sumPxx;
 
+    /// Save to a Configuration
     void save(Torch::config::Configuration& config);
+    
+    /// Load from a Configuration
     void load(const Torch::config::Configuration& config);
+    
+    friend std::ostream& operator<<(std::ostream& os, const GMMStats& g);
 };
 
 }

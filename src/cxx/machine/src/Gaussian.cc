@@ -1,5 +1,8 @@
 #include "machine/Gaussian.h"
 #include <cfloat>
+#include <config/Configuration.h>
+#include <database/Array.h>
+#include <database/Arrayset.h>
 
 double Torch::machine::Log::LogAdd(double log_a, double log_b) {
   double minusdif;
@@ -46,6 +49,10 @@ Torch::machine::Gaussian::Gaussian(int n_inputs) {
   resize(n_inputs);
 }
 
+Torch::machine::Gaussian::Gaussian(Torch::config::Configuration& config) {
+  load(config);
+}
+
 Torch::machine::Gaussian::~Gaussian() {
 }
 
@@ -59,6 +66,13 @@ Torch::machine::Gaussian& Torch::machine::Gaussian::operator= (const Gaussian &o
   }
 
   return *this;
+}
+
+bool Torch::machine::Gaussian::operator ==(const Gaussian& b) const {
+  return m_n_inputs == b.m_n_inputs &&
+         blitz::all(m_mean == b.m_mean) &&
+         blitz::all(m_variance == b.m_variance) &&
+         blitz::all(m_variance_thresholds == b.m_variance_thresholds);
 }
 
 
@@ -130,13 +144,8 @@ void Torch::machine::Gaussian::setVarianceThresholds(double factor) {
   setVarianceThresholds(variance_thresholds);
 }
 
-double Torch::machine::Gaussian::logLikelihood(const blitz::Array<float,1> &x) const {
-  
-  // double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance); // Benchmark: 0.95s
-
-  double z = 0;
-  for (int i=0; i<x.extent(0); ++i)
-	  z += std::pow(x(i)-m_mean(i), 2) / m_variance(i); // Benchmark: 1.47s
+double Torch::machine::Gaussian::logLikelihood(const blitz::Array<double, 1> &x) const {
+  double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance);
 
   double logLikelihood = (-0.5 * (g_norm + z));
   return logLikelihood;
@@ -157,13 +166,6 @@ void Torch::machine::Gaussian::getVariance(blitz::Array<double,1> &variance) con
   variance = m_variance;
 }
 
-void Torch::machine::Gaussian::print() const {
-  //Torch::core::info << "Mean = " << m_mean << std::endl;
-  //Torch::core::info << "Variance = " << m_variance << std::endl;
-  std::cout  << "Mean = " << m_mean << std::endl;
-  std::cout << "Variance = " << m_variance << std::endl;
-}
-
 void Torch::machine::Gaussian::preComputeConstants() {
   double c = m_n_inputs * Log::Log2Pi;
   double log_det = 0.0;
@@ -173,3 +175,39 @@ void Torch::machine::Gaussian::preComputeConstants() {
   g_norm = c + log_det;
 }
 
+
+void Torch::machine::Gaussian::save(Torch::config::Configuration& config) {
+  Torch::database::Array m_meanArray(m_mean);
+  Torch::database::Array m_varianceArray(m_variance);
+  Torch::database::Array m_variance_thresholdsArray(m_variance_thresholds);
+
+  config.set("m_mean", m_meanArray);
+  config.set("m_variance", m_varianceArray);
+  config.set("m_variance_thresholds", m_variance_thresholdsArray);
+  config.set("g_norm", g_norm);
+  config.set("m_n_inputs", m_n_inputs);
+}
+
+void Torch::machine::Gaussian::load(const Torch::config::Configuration& config) {
+  m_n_inputs = (int)config.get<std::vector<int64_t> >("m_n_inputs").at(0);
+
+  m_mean.resize(m_n_inputs);
+  m_variance.resize(m_n_inputs);
+  m_variance_thresholds.resize(m_n_inputs);
+  
+  m_mean = config.get<Torch::database::Arrayset>("m_mean").get<double, 1>(1);
+  m_variance = config.get<Torch::database::Arrayset>("m_variance").get<double, 1>(1);
+  m_variance_thresholds = config.get<Torch::database::Arrayset>("m_variance_thresholds").get<double, 1>(1);
+
+  g_norm = config.get<std::vector<double> >("g_norm").at(0);
+}
+
+namespace Torch{
+  namespace machine{
+    std::ostream& operator<<(std::ostream& os, const Gaussian& g) {
+      os << "Mean = " << g.m_mean << std::endl;
+      os << "Variance = " << g.m_variance << std::endl;
+      return os;
+    }
+  }
+}

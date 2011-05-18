@@ -15,6 +15,7 @@ set(src_blas
 )
 
 set(src_lapack
+  "src/eig.cc"
   "src/linsolve.cc"
   "src/svd.cc"
 )

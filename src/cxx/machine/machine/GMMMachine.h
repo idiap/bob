@@ -11,6 +11,7 @@
 #include "trainer/Sampler.h"
 #include "machine/GMMStats.h"
 #include "machine/Gaussian.h"
+#include <iostream>
 
 namespace Torch {
 namespace machine {
@@ -28,6 +29,9 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// @param[in] n_inputs     The feature dimensionality
     GMMMachine(int n_gaussians, int n_inputs);
 
+    /// Constructor from a Configuration
+    GMMMachine(Torch::config::Configuration& config);
+
     /// Copy constructor
     /// (Needed because the GMM points to its constituent Gaussian members)
     GMMMachine(const GMMMachine& other);
@@ -35,6 +39,9 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Assigment
     GMMMachine & operator= (const GMMMachine &other);
 
+    /// Equal to
+    bool operator ==(const GMMMachine& b) const;
+    
     /// Destructor
     virtual ~GMMMachine(); 
 
@@ -91,15 +98,15 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// @param[in]  x                                 The sample
     /// @param[out] log_weighted_gaussian_likelihoods For each Gaussian, i: log(weight_i*p(x|Gaussian_i))
     /// @return     The GMMMachine log likelihood, i.e. log(p(x|GMMMachine))
-    double logLikelihood(const blitz::Array<float,1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const;
+    double logLikelihood(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const;
 
     /// Output the log likelihood of the sample, x, i.e. log(p(x|GMM))
     /// @param[in]  x The sample
-    double logLikelihood(const blitz::Array<float,1> &x) const;
+    double logLikelihood(const blitz::Array<double, 1> &x) const;
 
     /// Output the log likelihood of the sample, x 
     /// (overrides Machine::forward)
-    double forward (const FrameSample& input) const;
+    void forward (const FrameSample& input, double& output) const;
     
     /// Accumulates the GMM statistics over a dataset.
     /// @see bool accStatistics(const blitz::Array<float,1> &x, GMMStats stats)
@@ -109,7 +116,7 @@ class GMMMachine : public Machine<FrameSample, double> {
     ///
     /// @param[in]  x     The current sample
     /// @param[out] stats The accumulated statistics
-    void accStatistics(const blitz::Array<float,1> &x, GMMStats &stats) const;
+    void accStatistics(const blitz::Array<double,1> &x, GMMStats &stats) const;
     
     /// Get the weights
     /// @param[out] weights The weights ("mixing coefficients") of the Gaussian components
@@ -127,9 +134,14 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Return the number of Gaussian components
     int getNGaussians() const;
 
-    /// Print the parameters of the GMM
-    void print() const;
-
+    /// Save to a Configuration
+    void save(Torch::config::Configuration& config);
+    
+    /// Load from a Configuration
+    void load(Torch::config::Configuration& config);
+    
+    friend std::ostream& operator<<(std::ostream& os, const GMMMachine& machine);
+    
   protected:
 
     /// Copy another GMMMachine
@@ -146,7 +158,9 @@ class GMMMachine : public Machine<FrameSample, double> {
     blitz::Array<double,1> m_weights;
 };
 
+
 }
 }
+
 
 #endif

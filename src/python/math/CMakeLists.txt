@@ -2,6 +2,8 @@ project(math-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/eig.cc"
+   "src/linear.cc"
    "src/linsolve.cc"
    "src/norminv.cc"
    "src/svd.cc"
@@ -14,3 +16,5 @@ torch_python_package_bindings(math "${pysrc}")
 torch_python_install(math)
 
 # Our test units
+torch_python_add_test(python-ip-eigenvalue-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_eig.py)

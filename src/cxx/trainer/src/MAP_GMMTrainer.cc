@@ -1,4 +1,5 @@
 #include "trainer/MAP_GMMTrainer.h"
+#include "trainer/Exception.h"
 
 Torch::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor) : GMMTrainer(), relevance_factor(relevance_factor), m_prior_gmm(NULL) {
   
@@ -21,8 +22,7 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
   
   // Check that the prior GMM has been specified
   if (m_prior_gmm == NULL) {
-    Torch::core::error << "Cannot do MAP mStep() because prior GMM has not been set." << std::endl;
-    throw Torch::core::Exception();
+    throw NoPriorGMM();
   }
 
   blitz::firstIndex i;
