@@ -20,7 +20,7 @@ machine::Exception::~Exception() throw() {
 }
 
 const char* machine::Exception::what() const throw() {
- static const char* what_string = "Generic database::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
+ static const char* what_string = "Generic machine::Exception: user specialization has not overwritten what() or is throwing an object of this class (in which case, please fix it!)";
  return what_string;
 }
 
