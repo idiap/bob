@@ -1,5 +1,7 @@
 #include "machine/GMMMachine.h"
 #include <core/logging.h>
+#include <database/Array.h>
+#include <database/Arrayset.h>
 
 using namespace Torch::machine::Log;
 
@@ -9,6 +11,10 @@ Torch::machine::GMMMachine::GMMMachine() : m_gaussians(NULL) {
 
 Torch::machine::GMMMachine::GMMMachine(int n_gaussians, int n_inputs) : m_gaussians(NULL) {
   resize(n_gaussians,n_inputs);
+}
+
+Torch::machine::GMMMachine::GMMMachine(Torch::config::Configuration& config) : m_gaussians(NULL) {
+  load(config);
 }
 
 Torch::machine::GMMMachine::GMMMachine(const GMMMachine& other) : Machine<FrameSample, double>(other), m_gaussians(NULL) {
@@ -23,6 +29,26 @@ Torch::machine::GMMMachine & Torch::machine::GMMMachine::operator= (const GMMMac
   
   // by convention, always return *this
   return *this;
+}
+
+
+
+bool Torch::machine::GMMMachine::operator==(const Torch::machine::GMMMachine& b) const {
+  if (m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs) {
+    return false;
+  }
+
+  for(int i = 0; i < m_n_gaussians; i++) {
+    if (!(m_gaussians[i] == b.m_gaussians[i])) {
+      return false;
+    }
+  }
+
+  if (blitz::all(m_weights != b.m_weights)) {
+    return false;
+  }
+
+  return true;
 }
 
 void Torch::machine::GMMMachine::copy(const GMMMachine& other) {
@@ -273,5 +299,45 @@ void Torch::machine::GMMMachine::print() const {
     Torch::core::info << "Gaussian " << i << ": " << std::endl;
     m_gaussians[i].print();
   }
+}
+
+void Torch::machine::GMMMachine::save(Torch::config::Configuration& config) {
+  config.set("m_n_gaussians", m_n_gaussians);
+  config.set("m_n_inputs", m_n_inputs);
+
+  for(int i = 0; i < m_n_gaussians; i++) {
+    std::ostringstream oss;
+    oss << "m_gaussians" << i;
+    
+    config.cd(oss.str());
+    m_gaussians[i].save(config);
+    config.cd("..");
+  }
+
+  Torch::database::Array m_weightsArray(m_weights);
+  config.set("m_weights", m_weightsArray);
+}
+
+void Torch::machine::GMMMachine::load(Torch::config::Configuration& config) {
+  m_n_gaussians = (int)config.get<std::vector<int64_t> >("m_n_gaussians").at(0);
+  m_n_inputs    = (int)config.get<std::vector<int64_t> >("m_n_inputs").at(0);
+  
+  if (m_gaussians != NULL) {
+    delete [] m_gaussians;
+  }
+
+  m_gaussians = new Gaussian[m_n_gaussians];
+  
+  for(int i = 0; i < m_n_gaussians; i++) {
+    std::ostringstream oss;
+    oss << "m_gaussians" << i;
+
+    config.cd(oss.str());
+    m_gaussians[i].load(config);
+    config.cd("..");
+  }
+
+  m_weights.resize(m_n_gaussians);
+  m_weights = config.get<Torch::database::Arrayset>("m_weights").get<double, 1>(1);
 }
 

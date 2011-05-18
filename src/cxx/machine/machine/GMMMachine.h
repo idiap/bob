@@ -28,6 +28,9 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// @param[in] n_inputs     The feature dimensionality
     GMMMachine(int n_gaussians, int n_inputs);
 
+    /// Constructor from a Configuration
+    GMMMachine(Torch::config::Configuration& config);
+
     /// Copy constructor
     /// (Needed because the GMM points to its constituent Gaussian members)
     GMMMachine(const GMMMachine& other);
@@ -35,6 +38,9 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Assigment
     GMMMachine & operator= (const GMMMachine &other);
 
+    /// Equal to
+    bool operator ==(const GMMMachine& b) const;
+    
     /// Destructor
     virtual ~GMMMachine(); 
 
@@ -130,6 +136,12 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Print the parameters of the GMM
     void print() const;
 
+    /// Save to a Configuration
+    void save(Torch::config::Configuration& config);
+    
+    /// Load from a Configuration
+    void load(Torch::config::Configuration& config);
+    
   protected:
 
     /// Copy another GMMMachine

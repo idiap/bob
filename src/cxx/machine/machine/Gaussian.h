@@ -7,6 +7,7 @@
 
 #include <blitz/array.h>
 #include <cfloat>
+#include <config/Configuration.h>
 
 namespace Torch {
 namespace machine {
@@ -34,6 +35,9 @@ class Gaussian {
     /// @param[in] n_inputs The feature dimensionality
     Gaussian(int n_inputs);
 
+    /// Constructor
+    Gaussian(Torch::config::Configuration& config);
+
     /// Destructor
     virtual ~Gaussian();
 
@@ -42,6 +46,9 @@ class Gaussian {
 
     /// Assigment
     Gaussian& operator= (const Gaussian &other);
+
+    /// Equal to
+    bool operator ==(const Gaussian& b) const;
     
     /// Set the input dimensionality, reset the mean to zero
     /// and the variance to one.
@@ -86,6 +93,12 @@ class Gaussian {
     /// Print the mean and variance of the Gaussian
     void print() const;
 
+    /// Save to a Configuration
+    void save(Torch::config::Configuration& config);
+    
+    /// Load from a Configuration
+    void load(const Torch::config::Configuration& config);
+    
   protected:
 
     /// Copy another Gaussian

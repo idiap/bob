@@ -56,7 +56,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
 # endif
   scope().attr("__doc__") = "Torch classes and sub-classes for machine access";
 
-  
+
   class_<FrameSample>("FrameSample", init<const blitz::Array<double, 1>& >())
   .def("getFrame", &FrameSample::getFrame, return_value_policy<copy_const_reference>())
   ;
@@ -81,6 +81,8 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   
   class_<Gaussian>("Gaussian", init<int>())
   .def(init<Gaussian&>(args("other")))
+  .def(init<Torch::config::Configuration&>(args("config")))
+  .def(self == self)
   .add_property("nInputs", &Gaussian::getNInputs, &Gaussian::setNInputs)
   .add_property("mean", &Gaussian_getMean, &Gaussian::setMean)
   .add_property("variance", &Gaussian_getVariance, &Gaussian::setVariance)
@@ -88,11 +90,14 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("setVarianceThresholds", (void (Gaussian::*)(double))&Gaussian::setVarianceThresholds)
   .def("resize", &Gaussian::resize)
   .def("logLikelihood", &Gaussian::logLikelihood)
+  .def("save", &Gaussian::save)
+  .def("load", &Gaussian::load)
   .def("print_", &Gaussian::print)
   ;
 
   class_<GMMStats>("GMMStats", init<>())
   .def(init<int, int>(args("n_gaussians","n_inputs")))
+  .def(init<Torch::config::Configuration&>(args("config")))
   .def_readwrite("T", &GMMStats::T)
   .def_readwrite("n", &GMMStats::n)
   .def_readwrite("sumPx", &GMMStats::sumPx)
@@ -106,6 +111,8 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   
   class_<GMMMachine, bases<Machine<FrameSample, double> > >("GMMMachine", init<int, int>())
   .def(init<GMMMachine&>())
+  .def(init<Torch::config::Configuration&>(args("config")))
+  .def(self == self)
   .add_property("nInputs", &GMMMachine::getNInputs, &GMMMachine::setNInputs)
   .def("resize", &GMMMachine::resize, args("n_gaussians", "n_inputs"))
   .add_property("weights", (blitz::Array<double, 1> (GMMMachine::*)() const)&GMMMachine::getWeights, &GMMMachine::setWeights)
@@ -121,6 +128,8 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("accStatistics", (void (GMMMachine::*)(const blitz::Array<double,1>&, GMMStats&) const)&GMMMachine::accStatistics, args("x", "stats"))
   .def("getGaussian", &GMMMachine::getGaussian, return_value_policy<reference_existing_object>(), args("i"))
   .def("getNGaussians", &GMMMachine::getNGaussians)
+  .def("load", &GMMMachine::load)
+  .def("save", &GMMMachine::save)
   .def("print_", &GMMMachine::print)
   ;
 

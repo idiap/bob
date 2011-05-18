@@ -41,9 +41,7 @@ class MachineTest(unittest.TestCase):
     #stats.save(config)
     #config.save("data/stats.hdf5")
 
-    config_ref = torch.config.Configuration("data/stats.hdf5")
-    stats_ref = torch.machine.GMMStats(2, 2)
-    stats_ref.load(config_ref)
+    stats_ref = torch.machine.GMMStats(torch.config.Configuration("data/stats.hdf5"))
 
     self.assertTrue(stats.T == stats_ref.T)
     self.assertTrue(stats.n == stats_ref.n)
