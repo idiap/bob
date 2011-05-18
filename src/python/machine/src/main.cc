@@ -92,7 +92,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("logLikelihood", &Gaussian::logLikelihood)
   .def("save", &Gaussian::save)
   .def("load", &Gaussian::load)
-  .def("print_", &Gaussian::print)
+  .def(self_ns::str(self_ns::self))
   ;
 
   class_<GMMStats>("GMMStats", init<>())
@@ -106,7 +106,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("init", &GMMStats::init)
   .def("save", &GMMStats::save)
   .def("load", &GMMStats::load)
-  .def("print_", &GMMStats::print)
+  .def(self_ns::str(self_ns::self))
   ;
   
   class_<GMMMachine, bases<Machine<FrameSample, double> > >("GMMMachine", init<int, int>())
@@ -130,7 +130,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("getNGaussians", &GMMMachine::getNGaussians)
   .def("load", &GMMMachine::load)
   .def("save", &GMMMachine::save)
-  .def("print_", &GMMMachine::print)
+  .def(self_ns::str(self_ns::self))
   ;
 
 

@@ -36,5 +36,6 @@ void bind_machine_eigenmachine()
   .def("getPreMean", make_function(&EigenMachine::getPreMean, return_value_policy<copy_const_reference>()))
   .def("setPreMean", &EigenMachine::setPreMean, args("pre_mean"))
   .def("forward", &forward, args("input"))
+  .def(self_ns::str(self_ns::self))
   ;
 }

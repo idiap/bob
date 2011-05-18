@@ -20,7 +20,6 @@ class MachineTest(unittest.TestCase):
     gaussian = torch.machine.Gaussian(2)
 
     logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float64'))
-    print logLH
     self.assertTrue(equals(logLH, -1.93787706641, 1e-11))
   
   def test02_GMMMachine(self):

@@ -81,9 +81,7 @@ namespace Torch {
         /// (overrides Machine::forward)
         void forward(const FrameSample& input, blitz::Array<double,1>& output) const;
 
-        /// Print the parameters of the GMM
-        void print() const;
-
+        friend std::ostream& operator<<(std::ostream& os, const EigenMachine& machine);
       protected:
         /// Copy another EigenMachine
         void copy(const EigenMachine&);

@@ -292,15 +292,6 @@ int Torch::machine::GMMMachine::getNGaussians() const {
   return m_n_gaussians;
 }
 
-
-void Torch::machine::GMMMachine::print() const {
-  Torch::core::info << "Weights = " << m_weights << std::endl;
-  for (int i=0; i < m_n_gaussians; ++i) {
-    Torch::core::info << "Gaussian " << i << ": " << std::endl;
-    m_gaussians[i].print();
-  }
-}
-
 void Torch::machine::GMMMachine::save(Torch::config::Configuration& config) {
   config.set("m_n_gaussians", m_n_gaussians);
   config.set("m_n_inputs", m_n_inputs);
@@ -341,3 +332,15 @@ void Torch::machine::GMMMachine::load(Torch::config::Configuration& config) {
   m_weights = config.get<Torch::database::Arrayset>("m_weights").get<double, 1>(1);
 }
 
+namespace Torch {
+  namespace machine {
+    std::ostream& operator<<(std::ostream& os, const GMMMachine& machine) {
+      os << "Weights = " << machine.m_weights << std::endl;
+      for (int i=0; i < machine.m_n_gaussians; ++i) {
+        os << "Gaussian " << i << ": " << std::endl << machine.m_gaussians[i];
+      }
+
+      return os;
+    }
+  }
+}

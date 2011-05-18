@@ -43,9 +43,6 @@ class GMMStats {
     /// Resets statistics to zero.
     void init();
  
-    /// Print the statistics 
-    void print();
-    
     /// The accumulated log likelihood of all samples
     double log_likelihood;
 
@@ -66,6 +63,8 @@ class GMMStats {
     
     /// Load from a Configuration
     void load(const Torch::config::Configuration& config);
+    
+    friend std::ostream& operator<<(std::ostream& os, const GMMStats& g);
 };
 
 }

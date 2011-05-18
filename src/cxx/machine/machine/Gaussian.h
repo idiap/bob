@@ -90,14 +90,13 @@ class Gaussian {
     /// @param x The data sample (feature vector)
     double logLikelihood(const blitz::Array<double, 1> &x) const;
 
-    /// Print the mean and variance of the Gaussian
-    void print() const;
-
     /// Save to a Configuration
     void save(Torch::config::Configuration& config);
     
     /// Load from a Configuration
     void load(const Torch::config::Configuration& config);
+
+    friend std::ostream& operator<<(std::ostream& os, const Gaussian& g);
     
   protected:
 
@@ -131,6 +130,7 @@ class Gaussian {
     /// The number of inputs
     int m_n_inputs;
 };
+
 
 }
 }

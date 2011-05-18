@@ -35,14 +35,6 @@ void Torch::machine::GMMStats::init() {
   sumPxx = 0.0;
 }
 
-void Torch::machine::GMMStats::print() {
-  Torch::core::info << "log_likelihood = " << log_likelihood << std::endl;
-  Torch::core::info << "T = " << T << std::endl;
-  Torch::core::info << "n = " << n;
-  Torch::core::info << "sumPx = " << sumPx;
-  Torch::core::info << "sumPxx = " << sumPxx;
-}
-
 void Torch::machine::GMMStats::save(Torch::config::Configuration& config) {
   Torch::database::Array arrayn(n);
   Torch::database::Array arraySumPx(sumPx);
@@ -70,4 +62,18 @@ void Torch::machine::GMMStats::load(const Torch::config::Configuration& config) 
   n = config.get<Torch::database::Arrayset>("n").get<double, 1>(1);
   sumPx = config.get<Torch::database::Arrayset>("sumPx").get<double, 2>(1);
   sumPxx = config.get<Torch::database::Arrayset>("sumPxx").get<double, 2>(1);
+}
+
+namespace Torch {
+  namespace machine {
+    std::ostream& operator<<(std::ostream& os, const GMMStats& g) {
+      os << "log_likelihood = " << g.log_likelihood << std::endl;
+      os << "T = " << g.T << std::endl;
+      os << "n = " << g.n;
+      os << "sumPx = " << g.sumPx;
+      os << "sumPxx = " << g.sumPxx;
+      
+      return os;
+    }
+  }
 }

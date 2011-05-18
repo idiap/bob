@@ -161,10 +161,14 @@ void Torch::machine::EigenMachine::forward(const FrameSample& input, blitz::Arra
   Torch::math::prod(mat, input_nomean, output);
 }
 
-void Torch::machine::EigenMachine::print() const 
-{
-  Torch::core::info << "Output dimensionality = " << m_n_outputs << std::endl;
-  Torch::core::info << "Eigenvalues = " << std::endl << m_eigenvalues << std::endl;
-  Torch::core::info << "Eigenvectors = " << std::endl << m_eigenvectors << std::endl;
-}
+namespace Torch {
+  namespace machine {
+    std::ostream& operator<<(std::ostream& os, const EigenMachine& machine) {
+      os << "Output dimensionality = " << machine.m_n_outputs << std::endl;
+      os << "Eigenvalues = " << std::endl << machine.m_eigenvalues << std::endl;
+      os << "Eigenvectors = " << std::endl << machine.m_eigenvectors << std::endl;
 
+      return os;
+    }
+  }
+}

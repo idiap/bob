@@ -11,6 +11,7 @@
 #include "trainer/Sampler.h"
 #include "machine/GMMStats.h"
 #include "machine/Gaussian.h"
+#include <iostream>
 
 namespace Torch {
 namespace machine {
@@ -133,14 +134,13 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Return the number of Gaussian components
     int getNGaussians() const;
 
-    /// Print the parameters of the GMM
-    void print() const;
-
     /// Save to a Configuration
     void save(Torch::config::Configuration& config);
     
     /// Load from a Configuration
     void load(Torch::config::Configuration& config);
+    
+    friend std::ostream& operator<<(std::ostream& os, const GMMMachine& machine);
     
   protected:
 
@@ -158,7 +158,9 @@ class GMMMachine : public Machine<FrameSample, double> {
     blitz::Array<double,1> m_weights;
 };
 
+
 }
 }
+
 
 #endif
