@@ -36,8 +36,7 @@ In summary we will perform the following steps to train our system
 Deriving a better representation (finding principal components)
 ---------------------------------------------------------------
 
-.. image:: dia-1.svg
-   :width: 800px
+.. image:: dia-1.png
 
 Imagine that you toke all the photos of all your friends.
 You crop those images so only the face is visible and you align their eye-centers.
@@ -76,14 +75,14 @@ If we pick out the values row-by-row from the image (2D array) we can easily cre
 Create a model of the user
 --------------------------
 
-.. image:: dia-2.svg
-   :width: 800px
+.. image:: dia-2.png
+
 
 Test system with unknown image
 ------------------------------
 
-.. image:: dia-3.svg
-   :width: 800px
+.. image:: dia-3.png
+
 
 
 
