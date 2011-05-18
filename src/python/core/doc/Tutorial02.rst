@@ -13,10 +13,11 @@ python syntax.
    my_array = torch.core.array.array([[1,2,3], [4,5,6]])
 
    # select the first row
-   my_array[1, :]
+   # Please note that the answer is a 1D array with the first dimension containing a single row
+   my_array[0, :]
 
    # select the second column
-   my_array[:, 2]
+   my_array[:, 1]
 
 Some mathematical operations on arrays.
 

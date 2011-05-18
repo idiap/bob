@@ -37,7 +37,7 @@ Deriving a better representation (finding principal components)
 ---------------------------------------------------------------
 
 .. image:: dia-1.svg
-   :width: 800
+   :width: 800px
 
 Imagine that you toke all the photos of all your friends.
 You crop those images so only the face is visible and you align their eye-centers.
@@ -77,12 +77,14 @@ Create a model of the user
 --------------------------
 
 .. image:: dia-2.svg
-   :width: 800
+   :width: 800px
 
 Test system with unknown image
 ------------------------------
 
 .. image:: dia-3.svg
-   :width: 800
+   :width: 800px
+
+
 
 

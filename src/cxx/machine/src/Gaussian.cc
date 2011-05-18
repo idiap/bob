@@ -3,14 +3,14 @@
 
 double Torch::machine::Log::LogAdd(double log_a, double log_b) {
   double minusdif;
-  
+
   if (log_a < log_b)
   {
     double tmp = log_a;
     log_a = log_b;
     log_b = tmp;
   }
-  
+
   minusdif = log_b - log_a;
   //#ifdef DEBUG
   if (std::isnan(minusdif))
@@ -22,10 +22,10 @@ double Torch::machine::Log::LogAdd(double log_a, double log_b) {
 
 double Torch::machine::Log::LogSub(double log_a, double log_b) {
   double minusdif;
-  
+
   if (log_a < log_b)
     printf("LogSub: log_a (%f) should be greater than log_b (%f)", log_a, log_b);
-  
+
   minusdif = log_b - log_a;
   //#ifdef DEBUG
   if (std::isnan(minusdif))
@@ -64,13 +64,13 @@ Torch::machine::Gaussian& Torch::machine::Gaussian::operator= (const Gaussian &o
 
 void Torch::machine::Gaussian::copy(const Gaussian& other) {
   m_n_inputs = other.m_n_inputs;
-  
+
   m_mean.resize(m_n_inputs);
   m_mean = other.m_mean;
-  
+
   m_variance.resize(m_n_inputs);
   m_variance = other.m_variance;
-  
+
   m_variance_thresholds.resize(m_n_inputs);
   m_variance_thresholds = other.m_variance_thresholds;
 
@@ -112,14 +112,14 @@ void Torch::machine::Gaussian::setVariance(const blitz::Array<double,1> &varianc
   blitz::Array<bool,1> isTooSmall(m_n_inputs);
   isTooSmall = m_variance < m_variance_thresholds;
   m_variance += (m_variance_thresholds - m_variance) * isTooSmall;
-  
+
   // Re-compute g_norm, because m_variance has changed
   preComputeConstants();
 }
 
 void Torch::machine::Gaussian::setVarianceThresholds(const blitz::Array<double,1> &variance_thresholds) {
   m_variance_thresholds = variance_thresholds;
-  
+
   // setVariance() will reset the variances that are now too small
   setVariance(m_variance);
 }
@@ -131,7 +131,13 @@ void Torch::machine::Gaussian::setVarianceThresholds(double factor) {
 }
 
 double Torch::machine::Gaussian::logLikelihood(const blitz::Array<float,1> &x) const {
-  double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance);
+  
+  // double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance); // Benchmark: 0.95s
+
+  double z = 0;
+  for (int i=0; i<x.extent(0); ++i)
+	  z += std::pow(x(i)-m_mean(i), 2) / m_variance(i); // Benchmark: 1.47s
+
   double logLikelihood = (-0.5 * (g_norm + z));
   return logLikelihood;
 }
