@@ -169,33 +169,36 @@ class TrainerTest(unittest.TestCase):
     
     gmm = loadGMM()
 
-    ml_gmmtrainer = torch.trainer.ML_GMMTrainer()
-
-    print "GMM Before:"
-    print gmm.print_()
-
+    ml_gmmtrainer = torch.trainer.ML_GMMTrainer(True, True, True)
     ml_gmmtrainer.train(gmm, sampler)
-    
-    print "GMM After:"
-    print gmm.print_()
 
-    #TODO Add asserts
+    #config = torch.config.Configuration()
+    #gmm.save(config)
+    #config.save("data/gmm_ML.hdf5")
+
+    gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    
+    self.assertTrue(gmm == gmm_ref)
     
   def test03_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer"""
     
     sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
     
-    gmm = loadGMM()
-    gmmprior = loadGMM()
-
-    print gmm.print_()
+    gmm = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    gmmprior = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    
     map_gmmtrainer = torch.trainer.MAP_GMMTrainer(16)
     map_gmmtrainer.setPriorGMM(gmmprior)
     map_gmmtrainer.train(gmm, sampler)
-    print gmm.print_()
+
+    #config = torch.config.Configuration()
+    #gmm.save(config)
+    #config.save("data/gmm_MAP.hdf5")
     
-    #TODO Add asserts
+    gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_MAP.hdf5"))
+
+    self.assertTrue(gmm == gmm_ref)
     
   def test04_custom_samplers(self):
     """Custom python sampler"""

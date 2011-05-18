@@ -16,7 +16,7 @@ class ML_GMMTrainer : public GMMTrainer {
   public:
 
     /// Default constructor
-    ML_GMMTrainer();
+    ML_GMMTrainer(bool update_means = true, bool update_variances = false, bool update_weights = false);
 
     /// Destructor
     virtual ~ML_GMMTrainer();

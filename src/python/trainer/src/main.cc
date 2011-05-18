@@ -103,7 +103,7 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   .def("setPriorGMM", &MAP_GMMTrainer::setPriorGMM)
   ;
   
-  class_<ML_GMMTrainer, bases<GMMTrainer> >("ML_GMMTrainer")
+  class_<ML_GMMTrainer, bases<GMMTrainer> >("ML_GMMTrainer", init<bool, bool, bool>((arg("update_means") = true, arg("update_variances") = false, arg("update_weights") = false)))
   ;
 
   class_<SVDPCATrainer, bases<Trainer<EigenMachine, FrameSample>, FrameSample>, boost::noncopyable >("SVDPCATrainer", init<>())
