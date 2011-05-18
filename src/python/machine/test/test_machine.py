@@ -25,8 +25,7 @@ class MachineTest(unittest.TestCase):
   def test02_GMMMachine(self):
     """Test a GMMMachine"""
 
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.bindata"))
-
+    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
     gmm = torch.machine.GMMMachine(2, 2)
     gmm.weights   = torch.core.array.array([0.5, 0.5], 'float64')
     gmm.means     = torch.core.array.array([[3, 70], [4, 72]], 'float64')
