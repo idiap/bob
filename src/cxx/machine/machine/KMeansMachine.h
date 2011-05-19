@@ -59,11 +59,11 @@ public:
   /// Output the minimum distance between the input and one of the means
   double getMinDistance(const blitz::Array <double, 1> & input) const;
 
-  /// For each mean, find the subset of the dataset
+  /// For each mean, find the subset of the samples
   /// that is closest to that mean, and calculate
   /// 1) the variance of that subset (the cluster variance)
-  /// 2) the proportion of the dataset represented by that subset (the cluster weight)
-  /// @param[in]  dataset   The dataset
+  /// 2) the proportion of the samples represented by that subset (the cluster weight)
+  /// @param[in]  sampler   The sampler
   /// @param[out] variances The cluster variances (one row per cluster), with as many columns as feature dimensions.
   /// @param[out] weights   A vector of weights, one per cluster
   void getVariancesAndWeightsForEachCluster(const Torch::trainer::Sampler<FrameSample> &sampler, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const;
@@ -75,7 +75,7 @@ public:
   /// Return the number of means
   int getNMeans() const;
   
-  /// Return the number of means
+  /// Return the number of inputs
   int getNInputs() const;
   
 protected:
