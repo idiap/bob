@@ -21,29 +21,30 @@ static tuple getVariancesAndWeightsForEachCluster(const KMeansMachine& machine, 
   return boost::python::make_tuple(variances, weights);
 }
 
-static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getMean(const Gaussian& gaussian) {
-  boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
-  gaussian.getMean(*mean.get());
-  return mean;
+
+#define GETTER(class, fct, type, dim) \
+static boost::shared_ptr<blitz::Array<type, dim> > class##_##fct(const class& c) {\
+  boost::shared_ptr<blitz::Array<type, dim> > v(new blitz::Array<type, dim>);\
+  c.fct(*v.get());\
+  return v;\
 }
 
-static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getVariance(const Gaussian& gaussian) {
-  boost::shared_ptr<blitz::Array<double, 1> > variance(new blitz::Array<double, 1>);
-  gaussian.getVariance(*variance.get());
-  return variance;
-}
+GETTER(Gaussian, getMean, double, 1)
+GETTER(Gaussian, getVariance, double, 1)
+GETTER(Gaussian, getVarianceThresholds, double, 1)
 
-static boost::shared_ptr<blitz::Array<double, 1> > Gaussian_getVarianceThresholds(const Gaussian& gaussian) {
-  boost::shared_ptr<blitz::Array<double, 1> > varianceThresholds(new blitz::Array<double, 1>);
-  gaussian.getVarianceThresholds(*varianceThresholds.get());
-  return varianceThresholds;
-}
+GETTER(KMeansMachine, getMeans, double, 2)
 
 static boost::shared_ptr<blitz::Array<double, 1> > KMeansMachine_getMean(const KMeansMachine& kMeansMachine, int i) {
   boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
   kMeansMachine.getMean(i, *mean.get());
   return mean;
 }
+
+GETTER(GMMMachine, getMeans, double, 2)
+GETTER(GMMMachine, getWeights, double, 1)
+GETTER(GMMMachine, getVariances, double, 2)
+GETTER(GMMMachine, getVarianceThresholds, double, 2)
 
 void bind_machine_exception();
 void bind_machine_eigenmachine();
@@ -77,7 +78,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
                                                                "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                                init<int, int>(args("n_means", "n_inputs")))
   .add_property("means",
-                (blitz::Array<double,2> (KMeansMachine::*)() const)&KMeansMachine::getMeans,
+                &KMeansMachine_getMeans,
                 &KMeansMachine::setMeans,
                "Means")
   .add_property("nInputs",
@@ -108,7 +109,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
        "Return the number of means")
   .def("forward",
        &KMeansMachine::forward, args("input", "output"),
-       "Output the minimum distance between the input and one of the means"
+       "Output the minimum distance between the input and one of the means "
        "(overrides Machine::forward)")
   .def("getVariancesAndWeightsForEachCluster",
        &getVariancesAndWeightsForEachCluster,
@@ -140,7 +141,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .add_property("varianceThresholds",
                 &Gaussian_getVarianceThresholds,
                 (void (Gaussian::*)(const blitz::Array<double,1>&)) &Gaussian::setVarianceThresholds,
-                "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension."
+                "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
                 "The variance will be set to this value if an attempt is made to set it to a smaller value.")
   .def("setVarianceThresholds",
        (void (Gaussian::*)(double))&Gaussian::setVarianceThresholds,
@@ -162,7 +163,7 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
 
   class_<GMMStats>("GMMStats",
                    "A container for GMM statistics.\n"
-                   "With respect to Reynolds, \"Speaker Verification Using Adapted"
+                   "With respect to Reynolds, \"Speaker Verification Using Adapted "
                    "Gaussian Mixture Models\", DSP, 2000:\n"
                    "Eq (8) is n(i)\n"
                    "Eq (9) is sumPx(i) / n(i)\n"
@@ -212,19 +213,19 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
                 &GMMMachine::setNInputs,
                 "The feature dimensionality")
   .add_property("weights",
-                (blitz::Array<double, 1> (GMMMachine::*)() const)&GMMMachine::getWeights,
+                &GMMMachine_getWeights,
                 &GMMMachine::setWeights,
                 "The weights (also known as \"mixing coefficients\")")
   .add_property("means",
-                (blitz::Array<double, 2> (GMMMachine::*)() const) &GMMMachine::getMeans,
+                &GMMMachine_getMeans,
                 &GMMMachine::setMeans,
                 "The means of the gaussians")
   .add_property("variances",
-                (blitz::Array<double, 2> (GMMMachine::*)() const) &GMMMachine::getVariances,
+                &GMMMachine_getVariances,
                 &GMMMachine::setVariances,
                 "The variances")
   .add_property("varianceThresholds",
-                (blitz::Array<double, 2> (GMMMachine::*)() const) &GMMMachine::getVarianceThresholds,
+                &GMMMachine_getVarianceThresholds,
                 (void (GMMMachine::*)(const blitz::Array<double,2>&))&GMMMachine::setVarianceThresholds,
                 "The variance flooring thresholds for each Gaussian in each dimension")
   .def("resize",
@@ -235,12 +236,12 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("setVarianceThresholds",
        (void (GMMMachine::*)(double))&GMMMachine::setVarianceThresholds,
        args("factor"),
-       "Set the variance flooring thresholds in each dimension"
+       "Set the variance flooring thresholds in each dimension "
        "to a proportion of the current variance, for each Gaussian")
   .def("setVarianceThresholds",
        (void (GMMMachine::*)(blitz::Array<double,1>))&GMMMachine::setVarianceThresholds,
        args("variance_thresholds"),
-       "Set the variance flooring thresholds in each dimension"
+       "Set the variance flooring thresholds in each dimension "
        "(equal for all Gaussian components)")
   .def("logLikelihood",
        (double (GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&GMMMachine::logLikelihood,
@@ -266,10 +267,10 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("getGaussian",
        &GMMMachine::getGaussian, return_value_policy<reference_existing_object>(),
        args("i"),
-       "")
+       "Get a pointer to a particular Gaussian component")
   .def("getNGaussians",
        &GMMMachine::getNGaussians,
-       "Get a pointer to a particular Gaussian component")
+       "Return the number of Gaussian components")
   .def("load",
        &GMMMachine::load,
        "Load from a Configuration")

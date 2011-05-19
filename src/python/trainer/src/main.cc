@@ -78,7 +78,8 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   class_<Sampler_FrameSample_Wrapper, boost::noncopyable>("Sampler_FrameSample_",
                                                           "This class provides a list of FrameSample.")
   .def("getSample",
-       &Sampler<FrameSample>::getSample, args("index"),
+       &Sampler<FrameSample>::getSample,
+       args("index"),
        "Get a sample")
   .def("getNSamples",
        &Sampler<FrameSample>::getNSamples,
@@ -136,7 +137,8 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
                                                                                        "It uses a random initialisation of the means followed by the expectation-maximization algorithm"
                                                                                        )
   .add_property("seed",
-                &KMeansTrainer::getSeed, &KMeansTrainer::setSeed,
+                &KMeansTrainer::getSeed,
+                &KMeansTrainer::setSeed,
                 "Seed used to genrated pseudo-random numbers")
   .def("train",
        &KMeansTrainer::train,

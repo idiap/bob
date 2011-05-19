@@ -67,16 +67,12 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Get the means
     void getMeans(blitz::Array<double,2> &means) const;
     
-    blitz::Array<double,2> getMeans() const;
-
     /// Set the variances
     void setVariances(const blitz::Array<double,2> &variances);
 
     /// Get the variances
     void getVariances(blitz::Array<double,2> &variances) const;
     
-    blitz::Array<double,2> getVariances() const;
-
     /// Set the variance flooring thresholds in each dimension 
     /// to a proportion of the current variance, for each Gaussian
     void setVarianceThresholds(double factor);
@@ -91,9 +87,6 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Get the variance flooring thresholds for each Gaussian in each dimension
     void getVarianceThresholds(blitz::Array<double,2> &variance_thresholds) const;
     
-    /// Get the variance flooring thresholds
-    blitz::Array<double,2> getVarianceThresholds() const;
-
     /// Output the log likelihood of the sample, x, i.e. log(p(x|GMMMachine))
     /// @param[in]  x                                 The sample
     /// @param[out] log_weighted_gaussian_likelihoods For each Gaussian, i: log(weight_i*p(x|Gaussian_i))
@@ -121,9 +114,6 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// Get the weights
     /// @param[out] weights The weights ("mixing coefficients") of the Gaussian components
     void getWeights(blitz::Array<double,1> &weights) const;
-
-    ///Get the weights
-    blitz::Array<double, 1> getWeights() const;
 
     /// Get a pointer to a particular Gaussian component
     /// @param[i] i The index of the Gaussian component
