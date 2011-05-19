@@ -742,6 +742,9 @@ class ArrayTest(unittest.TestCase):
       Array    = torch.core.array.uint8_2([1,2,3,4,5,6,7,8], (2,4))
       Array_vo = Array.asOneRow();
 
+      print Array
+      print Array_vo
+
       assert_asOneRow(self, Array, Array_vo)
     
 if __name__ == '__main__':

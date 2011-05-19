@@ -32,15 +32,15 @@ In summary we will perform the following steps to train our system
 * Using the above subspace, create a model of the user
 * Compare an unknown image to the model of the user
 
-+-------------------------------------------------------------------------------------------------------------+
-| Nomenclature                                                                                                |
-+==================================+==========================================================================+
-| World data / samples / images    | Used to train a subspace in which it is easier to represent a face       |
-+----------------------------------+--------------------------------------------------------------------------+
-| Training data / samples / images | Used to create user model                                                |
-+----------------------------------+--------------------------------------------------------------------------+
-| Test data / samples / images     | Used to evaluate the system. Includes both the target user and impostors |
-+----------------------------------+--------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------------------+
+| Nomenclature                                                                                      |
++========================+==========================================================================+
+| World data / images    | Used to train a subspace in which it is easier to represent a face       |
++------------------------+--------------------------------------------------------------------------+
+| Training data / images | Used to create user model                                                |
++------------------------+--------------------------------------------------------------------------+
+| Test data / images     | Used to evaluate the system. Includes both the target user and impostors |
++------------------------+--------------------------------------------------------------------------+
 
 Deriving a better representation (finding principal components)
 ---------------------------------------------------------------
@@ -70,11 +70,30 @@ If we pick out the values row-by-row from the image (2D array) we can easily cre
 
 .. code-block:: python
 
+  """
+  Crop and normalize all the images needed
+  """
+
   import Cropper
 
   # crop all the images in our database
   myCropper = Cropper.Cropper('my-world-database.xml')
   world_images = myCropper.get_all()
+
++------------------------------------------+-------------------------------------------+-------------------------------------------+
+|.. image:: 1001_f_g1_s01_1001_en_1.cn.jpg | .. image:: 1001_f_g1_s01_1001_en_2.cn.jpg | .. image:: 1001_f_g1_s01_1001_en_3.cn.jpg |
+|   :height: 144                           |    :height: 144                           |    :height: 144                           |
+|   :width: 180                            |    :width: 180                            |    :width: 180                            |
+|   :alt: Reference 1                      |    :alt: Reference 2                      |    :alt: Reference 3                      |
++------------------------------------------+-------------------------------------------+-------------------------------------------+
+
+After cropping and normalizing all the images it is time to derive the subspace.
+
+.. code-block:: python
+  
+  """
+  To derive the subspace using Single Value Composition
+  """
 
   # turn all images into vectors (from 2D arrays -> 1D arrays)
   # the function vectorOf is a help function to exactly this
@@ -82,6 +101,7 @@ If we pick out the values row-by-row from the image (2D array) we can easily cre
 
   # Vertically stack all the vectors in to an 2D array
   A = torch.core.array.float64_2(len(world_vectors), world_vectors[0].extent(0))
+  # TODO, STACK THE ARRAYS
 
   # Find the principal components 
   U = torch.core.array.float64_2()
@@ -90,8 +110,10 @@ If we pick out the values row-by-row from the image (2D array) we can easily cre
 
   torch.math.svd(A, U, S, V)
 
-.. image:: eigenfaces.jpg
+Below is 4 example images of principal eigenfaces.
+Each eigenface is orthogonal to all the rest and they each spann one direction in our eigenface space.
 
+.. image:: eigenfaces.jpg
 
 Create a model of the user
 --------------------------
