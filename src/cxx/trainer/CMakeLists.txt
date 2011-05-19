@@ -14,6 +14,7 @@ set(src
     "src/MAP_GMMTrainer.cc"
     "src/ML_GMMTrainer.cc"
     "src/Exception.cc"
+    "src/TwoDPCATrainer.cc"
 )
 
 include(../../cmake/macros.cmake)

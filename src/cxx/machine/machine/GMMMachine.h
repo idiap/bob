@@ -108,7 +108,7 @@ class GMMMachine : public Machine<FrameSample, double> {
     /// (overrides Machine::forward)
     void forward (const FrameSample& input, double& output) const;
     
-    /// Accumulates the GMM statistics over a dataset.
+    /// Accumulates the GMM statistics over a set of samples.
     /// @see bool accStatistics(const blitz::Array<float,1> &x, GMMStats stats)
     void accStatistics(const Torch::trainer::Sampler<FrameSample> &sampler, GMMStats &stats) const;
 
@@ -149,6 +149,8 @@ class GMMMachine : public Machine<FrameSample, double> {
     
     /// The number of Gaussian components
     int m_n_gaussians;
+    
+    /// The feature dimensionality
     int m_n_inputs;
 
     /// The Gaussian components

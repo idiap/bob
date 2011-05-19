@@ -15,6 +15,8 @@ set(src
     "src/GMMStats.cc"
     "src/EigenMachine.cc"
     "src/EigenMachineException.cc"
+    "src/ImageSample.cc"
+    "src/TwoDPCAMachine.cc"
 )
 
 include(../../cmake/macros.cmake)
