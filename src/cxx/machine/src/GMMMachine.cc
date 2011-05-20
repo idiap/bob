@@ -2,6 +2,7 @@
 #include <core/logging.h>
 #include <database/Array.h>
 #include <database/Arrayset.h>
+#include <machine/Exception.h>
 
 using namespace Torch::machine::Log;
 
@@ -194,6 +195,10 @@ double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &
 }
 
 void Torch::machine::GMMMachine::forward (const FrameSample& input, double& output) const {
+  if (input.getFrameSize() != m_n_inputs) {
+    throw IncompatibleFrameSample(m_n_inputs, input.getFrameSize());
+  }
+
   output = logLikelihood(input.getFrame());
 }
 
