@@ -1,4 +1,5 @@
 #include "machine/KMeansMachine.h"
+#include <machine/Exception.h>
 
 using namespace std;
 
@@ -28,12 +29,6 @@ void Torch::machine::KMeansMachine::getMeans(blitz::Array<double,2> &means) cons
   means = m_means;
 }
 
-
-blitz::Array<double,2> Torch::machine::KMeansMachine::getMeans() const {
-  blitz::Array<double,2> means(m_n_means, m_n_inputs);
-  getMeans(means);
-  return means;
-}
 
 double Torch::machine::KMeansMachine::getDistanceFromMean(const blitz::Array<double,1> &x, int i) const {
   return blitz::sum(blitz::pow2(m_means(i,blitz::Range::all()) - x));
@@ -103,6 +98,10 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
 }
 
 void Torch::machine::KMeansMachine::forward(const FrameSample& input, double& output) const {
+  if (input.getFrameSize() != m_n_inputs) {
+    throw IncompatibleFrameSample(m_n_inputs, input.getFrameSize());
+  }
+  
   output = getMinDistance(input.getFrame());
 }
 

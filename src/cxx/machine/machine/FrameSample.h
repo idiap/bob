@@ -21,9 +21,13 @@ public:
 
   /// Get the Frame
   const blitz::Array<double, 1>& getFrame() const;
+
+  /// Get the frame size
+  int getFrameSize() const;
   
 private:
   blitz::Array<double, 1> array;
+  const int frameSize;
 };
 }
 }

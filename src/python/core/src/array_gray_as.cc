@@ -13,7 +13,7 @@ namespace tp = Torch::python;
 namespace bp = boost::python;
 
 template <typename T>
-blitz::Array<T,1> vectorOf(const blitz::Array<T,2>& original) {
+blitz::Array<T,1> asOneRow(const blitz::Array<T,2>& original) {
 	blitz::Array<T,1> dst(original.numElements());
 
 	typename blitz::Array<T,2>::const_iterator src_it = original.begin();
@@ -23,33 +23,11 @@ blitz::Array<T,1> vectorOf(const blitz::Array<T,2>& original) {
 		*dst_it++ = *src_it++;
 
 	return dst;
-
-	/*
-	  boost::shared_ptr<blitz::Array<T,N> >retval(new blitz::Array<T,N>(shape, storage));
-	  typename blitz::Array<T,N>::iterator j(retval->begin());
-	  bp::handle<> obj_iter(PyObject_GetIter(o.ptr()));
-	  for(Py_ssize_t i=0; i<length;++i,++j) {
-	  bp::handle<> py_elem_hdl(
-	  bp::allow_null(PyIter_Next(obj_iter.get())));
-	  if (PyErr_Occurred()) {
-	  PyErr_Clear();
-	  boost::format s("element %d is not accessible?");
-	  s % i;
-	  PyErr_SetString(PyExc_RuntimeError, s.str().c_str());
-	  bp::throw_error_already_set();
-	  }
-	  if (!py_elem_hdl.get()) break; // end of iteration
-	  bp::object py_elem_obj(py_elem_hdl);
-	  (*j) = bp::extract<T>(py_elem_obj);
-	  }
-	  
-	  return retval;
-	*/
 }
 
 template <typename T>
-static void create_vector_of(tp::array<T,2>&array) {
-	array.object()->def("vectorOf", &vectorOf<T>, "This method will take a 2d blitz array and turn it into a 1d blitz array.");
+static void create_as_one_row(tp::array<T,2>&array) {
+	array.object()->def("asOneRow", &asOneRow<T>, "This method will take a 2d blitz array and turn it into a 1d blitz array.");
 }
 
 template <typename T>
@@ -80,20 +58,20 @@ void bind_gray_as()
   create_gray_as(tp::complex128_3);
 }
 
-void bind_vector_of()
+void bind_as_one_row()
 {
-  create_vector_of(tp::bool_2);
-  create_vector_of(tp::int8_2);
-  create_vector_of(tp::int16_2);
-  create_vector_of(tp::int32_2);
-  create_vector_of(tp::int64_2);
-  create_vector_of(tp::uint8_2);
-  create_vector_of(tp::uint16_2);
-  create_vector_of(tp::uint32_2);
-  create_vector_of(tp::uint64_2);
-  create_vector_of(tp::float32_2);
-  create_vector_of(tp::float64_2);
-  create_vector_of(tp::complex64_2);
-  create_vector_of(tp::complex128_2);
+  create_as_one_row(tp::bool_2);
+  create_as_one_row(tp::int8_2);
+  create_as_one_row(tp::int16_2);
+  create_as_one_row(tp::int32_2);
+  create_as_one_row(tp::int64_2);
+  create_as_one_row(tp::uint8_2);
+  create_as_one_row(tp::uint16_2);
+  create_as_one_row(tp::uint32_2);
+  create_as_one_row(tp::uint64_2);
+  create_as_one_row(tp::float32_2);
+  create_as_one_row(tp::float64_2);
+  create_as_one_row(tp::complex64_2);
+  create_as_one_row(tp::complex128_2);
 }
 

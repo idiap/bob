@@ -40,9 +40,6 @@ public:
   /// @param[out] means A 2D array, with as many rows as means, and as many columns as feature dimensions.
   void getMeans(blitz::Array <double, 2> & means) const;
   
-  /// Get the means
-  blitz::Array<double, 2> getMeans() const;
-  
   /// Return the Euclidean distance of the sample, x, 
   /// to the i'th mean
   /// @param x The data sample (feature vector)

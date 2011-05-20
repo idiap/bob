@@ -15,7 +15,7 @@ Simply allocate the space
 
 Please look in :doc:`UsingBlitzArrays` for the different types of arrays.
 
-We create a simple array by specifying the shape.
+We can create a simple array by directly specifying its shape.
 This is equivalent to allocating (reserving) the memory.
 Please not that there are no guaranties of the values. 
 
@@ -26,8 +26,8 @@ Please not that there are no guaranties of the values.
    # create a array of size 5 times 7, of type uint8
    my_array = torch.core.array.uint8_2(5, 7)
 
-The array is not guaranteed to be initialize during allocation.
-It is therefore often useful to set the whole array to either zeros or ones.
+As the array is not guaranteed to be initialize during allocation,
+it is often useful to set the whole array to either zeros or ones.
 
 .. code-block:: python
 
@@ -41,7 +41,7 @@ It is therefore often useful to set the whole array to either zeros or ones.
    my_array.ones()
    my_array = my_array * 17
 
-In the last line we used a powerful feature in this library.
+In the last line we take advantage of a useful feature in |project|.
 It is possible to multiply all the elements in a array with a scalar as 
 well as adding a scalar value to all of the elements
 

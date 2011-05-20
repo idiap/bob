@@ -2,6 +2,7 @@
 #include <core/logging.h>
 #include <database/Array.h>
 #include <database/Arrayset.h>
+#include <machine/Exception.h>
 
 using namespace Torch::machine::Log;
 
@@ -109,12 +110,6 @@ void Torch::machine::GMMMachine::getWeights(blitz::Array<double,1> &weights) con
   weights = m_weights;
 }
 
-blitz::Array<double, 1> Torch::machine::GMMMachine::getWeights() const {
-  blitz::Array<double, 1> weights(m_n_gaussians);
-  getWeights(weights);
-  return weights;
-}
-
 void Torch::machine::GMMMachine::setWeights(const blitz::Array< double, 1 >& weights) {
   m_weights = weights;
 }
@@ -134,12 +129,6 @@ void Torch::machine::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
   }
 }
 
-blitz::Array<double,2> Torch::machine::GMMMachine::getMeans() const {
-  blitz::Array<double, 2> means(m_n_gaussians, m_n_inputs);
-  getMeans(means);
-  return means;
-}
-
 void Torch::machine::GMMMachine::setVariances(const blitz::Array< double, 2 >& variances) {
   for (int i=0; i < m_n_gaussians; ++i) {
     m_gaussians[i].setVariance(variances(i,blitz::Range::all()));
@@ -153,12 +142,6 @@ void Torch::machine::GMMMachine::getVariances( blitz::Array< double, 2 >& varian
     m_gaussians[i].getVariance(variance);
     variances(i,blitz::Range::all()) = variance;
   }
-}
-
-blitz::Array<double,2> Torch::machine::GMMMachine::getVariances() const {
-  blitz::Array<double, 2> variances(m_n_gaussians, m_n_inputs);
-  getVariances(variances);
-  return variances;
 }
 
 void Torch::machine::GMMMachine::setVarianceThresholds(double factor) {
@@ -188,13 +171,6 @@ void Torch::machine::GMMMachine::getVarianceThresholds(blitz::Array<double, 2>& 
   }
 }
 
-
-blitz::Array<double,2> Torch::machine::GMMMachine::getVarianceThresholds() const {
-  blitz::Array<double, 2> varianceThresholds(m_n_gaussians, m_n_inputs);
-  getVarianceThresholds(varianceThresholds);
-  return varianceThresholds;
-}
-
 double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const {
   // Initialise variables
   log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
@@ -219,6 +195,10 @@ double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &
 }
 
 void Torch::machine::GMMMachine::forward (const FrameSample& input, double& output) const {
+  if (input.getFrameSize() != m_n_inputs) {
+    throw IncompatibleFrameSample(m_n_inputs, input.getFrameSize());
+  }
+
   output = logLikelihood(input.getFrame());
 }
 

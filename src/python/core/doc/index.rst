@@ -11,8 +11,6 @@
 .. toctree::
    :maxdepth: 2
 
-   UsingBlitzArrays
-
    Tutorial01
 
    Tutorial02
@@ -23,7 +21,8 @@
 
    Tutorial05
 
-   Tutorial10
-
    PCA
+
+   UsingBlitzArrays
+
 

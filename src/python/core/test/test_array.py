@@ -25,7 +25,7 @@ def assert_sameAs(self, t1, t2):
 def assert_grayAs(self, t1, t2):
     self.assertEqual(t1.cxx_element_typename, t2.cxx_element_typename)
 
-def assert_vectorOf(self, t, v):
+def assert_asOneRow(self, t, v):
     cnt = 0;
     for i in range(t.extent(torch.core.array.firstDim)):
       for j in range(t.extent(torch.core.array.secondDim)):
@@ -738,11 +738,14 @@ class ArrayTest(unittest.TestCase):
     
     assert_grayAs(self, Array, Array_ga)
 
-  def test12_vectorOf(self):
+  def test12_asOneRow(self):
       Array    = torch.core.array.uint8_2([1,2,3,4,5,6,7,8], (2,4))
-      Array_vo = Array.vectorOf();
+      Array_vo = Array.asOneRow();
 
-      assert_vectorOf(self, Array, Array_vo)
+      print Array
+      print Array_vo
+
+      assert_asOneRow(self, Array, Array_vo)
     
 if __name__ == '__main__':
   sys.argv.append('-v')

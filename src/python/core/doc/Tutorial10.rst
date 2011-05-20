@@ -76,19 +76,13 @@ Perform the eigenface decomposition using SVD (PCA)
       print "NO:( - not good", number_of_samples, " < ", dims_of_data
       print ""
   else:
-      print "Hell yeah!"
+      print "Yes"
       global U, S, V
       U, S, Vh = numpy.linalg.svd(data); V=Vh.T
   
   
   # columns of V are eigenvectors, to the values in S
-  # read:
-  # http://www.mathworks.com/matlabcentral/newsreader/view_thread/241607
-  # http://en.wikipedia.org/wiki/Singular_value_decomposition#Relation_to_eigenvalue_decomposition
-  
-  # we want to whiten the space later,
-  
-  # we have to transpose the matrix
+   # we have to transpose the matrix
   VT = V.transpose()
   
   # save all the image

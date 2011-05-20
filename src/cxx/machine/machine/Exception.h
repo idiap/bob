@@ -47,6 +47,20 @@ namespace Torch { namespace machine {
       mutable std::string m_message;
   };
 
+  /**
+   * Raised when the frames of a FrameSample have not the expected size
+   */
+  class IncompatibleFrameSample: public Exception {
+    public:
+      IncompatibleFrameSample (const int expected_framesize, const int received_framesize) throw();
+      virtual ~IncompatibleFrameSample () throw();
+      virtual const char* what() const throw();
+
+    private:
+      int expected_framesize;
+      int received_framesize;
+      mutable std::string m_message;
+  };
 }}
 
 #endif /* TORCH5SPRO_MACHINE_EXCEPTION_H */

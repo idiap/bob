@@ -11,7 +11,7 @@ To make this process a bit easier there are three help functions defined in |pro
 
 * sameAs()
 * grayAs()
-* vectorOf()
+* asOneRow()
 
 sameAs() - to allocate an array of the same size and shape
 ----------------------------------------------------------
@@ -27,7 +27,7 @@ This is useful when working with the ip package. An example use is the following
   # allocate a destination
   dst_image = src_image.sameAs()
 
-  # Smooth the image (here we are using a 3x3 gaussian filter)
+  # Smooth the image (here we are using a 3x3 Gaussian filter)
   # MySmoother = torch.ip.Gaussian(3, 3, 0.25)
   # MySmoother(src_image, dst_image)
   # TODO, It seems like we have to have a double as output :(
@@ -35,7 +35,7 @@ This is useful when working with the ip package. An example use is the following
 grayAs() - when converting from color images to gray
 ----------------------------------------------------
 
-When converting a color image to a grayscale image we need to have allocate an array
+When converting a color image to a gray-scale image we need to have allocate an array
 of the same size but that is 2D instead of 3D. To ease the burden there is a function called
 grayAs() that will do exactly that. 
 
@@ -48,8 +48,24 @@ grayAs() that will do exactly that.
   # copying the data
   dst_image = src_image.grayAs()
 
-  # transform the pseudo RGB image to grayscale
+  # transform the pseudo RGB image to gray-scale
   torch.ip.rgb_to_gray(src_img, dst_img)
+
+asOneRow() - to take an 2D array and turn it into 1D
+----------------------------------------------------
+
+It is often necessary to transform a 2D array into an 1D array. 
+A good example is when you need to create a sample out of an image.
+To do this there is a help function implemented which is called asOneRow().
+This function takes each row in the 2D array and saves it into one big array.
+
+.. code-block:: python
+
+  # create an array (pseudo image)
+  src_image = torch.core.array.uint8_2([1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8], (4, 4))
+
+  # turn into a 1D vector
+  my_sample = src_image.asOneRow()
 
 
 
