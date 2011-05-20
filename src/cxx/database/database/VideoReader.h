@@ -190,7 +190,7 @@ namespace Torch { namespace database {
           /**
            * Reads the currently pointed frame and advances one position.
            * Please note that when you call this method in a loop, you don't
-           * need to increment the iterator as it auto-increments it. The
+           * need to increment the iterator as it auto-increments itself. The
            * 'data' format is (color-bands, height, width). If the size does
            * not match the movie specifications, the array data will be
            * resized.
