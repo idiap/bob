@@ -6,6 +6,8 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/python/slice.hpp>
+
 #include "database/Video.h"
 #include "core/python/exception.h"
 
@@ -52,6 +54,74 @@ struct iterator_wrapper {
 
 };
 
+/**
+ * Python wrapper to read a single frame from a video sequence, allowing the
+ * implementation of a __getitem__() functionality on VideoReader objects.
+ */
+static blitz::Array<uint8_t,3> videoreader_getitem (db::VideoReader& v, Py_ssize_t sframe) {
+  size_t frame = sframe;
+  if (sframe < 0) frame = v.numberOfFrames() + sframe;
+
+  if (frame >= v.numberOfFrames()) { //basic check
+    PyErr_SetString(PyExc_IndexError, "Invalid index");
+    throw_error_already_set();
+  }
+
+  blitz::Array<uint8_t,3> retval(3, v.height(), v.width());
+  db::VideoReader::const_iterator it = v.begin();
+  it += frame;
+  it.read(retval);
+  return retval;
+}
+
+/**
+ * Python wrapper to read multiple frames from a video sequence, allowing the
+ * implementation of a __getitem__() functionality on VideoReader objects.
+ */
+static blitz::Array<uint8_t,4> videoreader_getslice (db::VideoReader& v, slice sobj) {
+  size_t start = 0;
+  PySliceObject* sl = (PySliceObject*)sobj.ptr();
+  if (sl->start != Py_None) {
+    Py_ssize_t sstart = PyInt_AsLong(sl->start);
+    start = sstart;
+    if (sstart < 0) start = v.numberOfFrames() + sstart;
+  }
+
+  if (start >= v.numberOfFrames()) { //basic check
+    PyErr_SetString(PyExc_IndexError, "Invalid start");
+    throw_error_already_set();
+  }
+
+  //the stop value may be None
+  size_t stop = v.numberOfFrames();
+  if (sl->stop != Py_None) {
+    Py_ssize_t sstop = PyInt_AsLong(sl->stop);
+    stop = sstop;
+    if (sstop < 0) stop = v.numberOfFrames() + sstop;
+  }
+  if (stop >= v.numberOfFrames()) stop = v.numberOfFrames()+1;
+
+  //the step value may be None
+  int64_t step = 1;
+  if (sl->step != Py_None) {
+    step = PyInt_AsLong(sl->step);
+  }
+
+  //length of the sequence
+  int length = (stop-start)/step;
+  if (length == 0) length = 1; //a single return
+
+  blitz::Array<uint8_t,4> retval(length, 3, v.height(), v.width());
+  db::VideoReader::const_iterator it = v.begin();
+  it += start;
+  blitz::Range a = blitz::Range::all();
+  for (size_t i=start, j=0; i<stop; i+=step, ++j, it+=(step-1)) {
+    blitz::Array<uint8_t,3> ref = retval(j, a, a, a);
+    it.read(ref);
+  }
+  return retval;
+}
+
 void bind_database_video() {
   //exceptions for videos
   CxxToPythonTranslatorPar2<Torch::database::FFmpegException, Torch::database::Exception, const char*, const char*>("FFmpegException", "Thrown when there is a problem with a Video file.");
@@ -72,6 +142,8 @@ void bind_database_video() {
     .add_property("info", make_function(&db::VideoReader::info, return_value_policy<copy_const_reference>()))
     .def("load", &db::VideoReader::load, (arg("array")), "Loads all of the video stream in a blitz array organized in this way: (frames, color-bands, height, width). The 'data' parameter will be resized if required.")
     .def("__iter__", &db::VideoReader::begin)
+    .def("__getitem__", &videoreader_getitem)
+    .def("__getitem__", &videoreader_getslice)
     ;
 
   class_<db::VideoWriter, boost::shared_ptr<db::VideoWriter>, boost::noncopyable>("VideoWriter",
