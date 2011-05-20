@@ -177,8 +177,9 @@ class TrainerTest(unittest.TestCase):
     #config.save("data/gmm_ML.hdf5")
 
     gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML_32bit_release.hdf5"))
     
-    self.assertTrue(gmm == gmm_ref)
+    self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
   def test03_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer"""
@@ -197,8 +198,9 @@ class TrainerTest(unittest.TestCase):
     #config.save("data/gmm_MAP.hdf5")
     
     gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_MAP.hdf5"))
+    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_MAP_32bit_release.hdf5"))
 
-    self.assertTrue(gmm == gmm_ref)
+    self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
   def test04_custom_samplers(self):
     """Custom python sampler"""
