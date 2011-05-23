@@ -2,9 +2,9 @@
 Practical torch5spro: Face verification system
 ==============================================
 
-Imagine the following setup: you want to create a face verification system.
+You want to create a face verification system.
 You have 3 images of yourself (frontal faces) that you want to use as template (reference).
-The goal is that only you (your face) can unlock the system and that everyone else are impostors.
+The goal is that only you (your face) can unlock the system and that everyone else is considered to be an impostors.
 
 +---------------------------------------+----------------------------------------+----------------------------------------+
 |.. image:: 1001_f_g1_s01_1001_en_1.jpg | .. image:: 1001_f_g1_s01_1001_en_2.jpg | .. image:: 1001_f_g1_s01_1001_en_3.jpg |
@@ -45,7 +45,7 @@ In summary we will perform the following steps to train our system
 Deriving a better representation (finding principal components)
 ---------------------------------------------------------------
 
-Imagine that you toke all the photos of all your friends.
+Imagine that you took all the photos of all your friends.
 You crop those images so only the face is visible and you align their eye-centers.
 If you take the average of all this images, you will get an average "face" of all your friends.
 
@@ -88,6 +88,9 @@ If we pick out the values row-by-row from the image (2D array) we can easily cre
 +------------------------------------------+-------------------------------------------+-------------------------------------------+
 
 After cropping and normalizing all the images it is time to derive the subspace.
+There are a couple of different ways of doing this but we will do it the most common way by using Singular Value Decomposition (SVD).
+As a side effect of this algorithm we do not have to calculate a covariance matrix which is the normal way.
+In |project| we perform SVD as follows,
 
 .. code-block:: python
   
@@ -110,7 +113,13 @@ After cropping and normalizing all the images it is time to derive the subspace.
 
   torch.math.svd(A, U, S, V)
 
-Below is 4 example images of principal eigenfaces.
+The columns of V are the eigenvectors whereas the values in S are the eigenvalues.
+The eigenvectors are the basis in our new subspace and they are ranked (according to their eigenvalues).
+The eigenvalues are directly correlated to the amount of variance a certain direction holds.
+If all eigenvectors are keep we have not gained anything, our subspace will have the exact same dimension as the original one.
+We therefore select the strongest eigenvectors (hightest eigenvalues).
+
+Below is 4 example images of principal eigenvectors / eigenfaces.
 Each eigenface is orthogonal to all the rest and they each spann one direction in our eigenface space.
 
 .. image:: eigenfaces.jpg
@@ -118,10 +127,9 @@ Each eigenface is orthogonal to all the rest and they each spann one direction i
 Create a model of the user
 --------------------------
 
-Now when we have derived a more a subspace, 
-in which it is better to work with out face images,
-it is time to create a user model.
+Now when we have derived a more useful subspace it is time to create a user model.
 The purpose of the user model is to have something to compare against.
+
 
 .. image:: dia-2.png
 
@@ -130,6 +138,14 @@ Test system with unknown image
 
 .. image:: dia-3.png
 
+
+When an eigenface system does not work
+--------------------------------------
+
+There are a couple of situations when an eigenface system will not work. Two examples that will yield poor performance:
+
+* Shifting pose (both in-plane and outer-plane rotation)
+* Bad alignment (eye-centers are not aligned correctly)
 
 
 
