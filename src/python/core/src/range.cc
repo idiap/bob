@@ -86,7 +86,7 @@ struct range_from_slice {
     //the step value may be None
     int step = 1;
     if (slice->step != Py_None) {
-      stop = PyInt_AsLong(slice->stop);
+      step = PyInt_AsLong(slice->step);
     }
     
     result.setRange(start, stop, step);

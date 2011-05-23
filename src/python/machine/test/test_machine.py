@@ -78,7 +78,15 @@ class MachineTest(unittest.TestCase):
     self.assertTrue(equals(p3, sol2, 1e-7))
     p4 = m.forward(s2)
     self.assertTrue(equals(p4, sol2, 1e-7))
+
+  def test04_IncompatibleFrameSample(self):
+    fs = torch.machine.FrameSample(torch.core.array.float64_1([2,1,1],(3,)))
+
+    gmm = torch.machine.GMMMachine(2,2)
+    self.assertRaises(torch.machine.IncompatibleFrameSample, gmm.forward, fs)
     
+    kmeans = torch.machine.KMeansMachine(2,2)
+    self.assertRaises(torch.machine.IncompatibleFrameSample, kmeans.forward, fs)
 
 if __name__ == '__main__':
   sys.argv.append('-v')

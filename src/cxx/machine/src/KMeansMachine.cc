@@ -1,4 +1,5 @@
 #include "machine/KMeansMachine.h"
+#include <machine/Exception.h>
 
 using namespace std;
 
@@ -97,6 +98,10 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
 }
 
 void Torch::machine::KMeansMachine::forward(const FrameSample& input, double& output) const {
+  if (input.getFrameSize() != m_n_inputs) {
+    throw IncompatibleFrameSample(m_n_inputs, input.getFrameSize());
+  }
+  
   output = getMinDistance(input.getFrame());
 }
 

@@ -56,7 +56,34 @@ class VideoTest(unittest.TestCase):
       self.assertEqual(frame.extent(1), 240) #height
       self.assertEqual(frame.extent(2), 320) #width
 
-  def test03_CanWriteVideo(self):
+  def test03_CanGetSpecificFrames(self):
+
+    # This test shows how to get specific frames from a VideoReader
+
+    v = torch.database.VideoReader(INPUT_VIDEO)
+
+    # get frame 27 (we start counting at zero)
+    f27 = v[27]
+
+    self.assertTrue(torch.core.array.is_blitz_array(f27))
+    self.assertEqual(f27.dimensions(), 3)
+    self.assertEqual(f27.shape(), (3, 240, 320))
+
+    # you can also use negative notation...
+    self.assertTrue(torch.core.array.is_blitz_array(v[-1]))
+    self.assertEqual(v[-1].dimensions(), 3)
+    self.assertEqual(v[-1].shape(), (3, 240, 320))
+
+    # get frames 18 a 30 (exclusive), skipping 3: 18, 21, 24, 27
+    f18_30 = v[18:30:3]
+    self.assertTrue(torch.core.array.is_blitz_array(f18_30))
+    self.assertEqual(f18_30.dimensions(), 4)
+    self.assertEqual(f18_30.shape(), (4, 3, 240, 320))
+
+    # the last frame in the sequence is frame 27 as you can check
+    self.assertEqual(f18_30[-1,:,:,:], f27)
+
+  def test04_CanWriteVideo(self):
 
     # This test reads all frames in sequence from a initial video and records
     # them into an output video, possibly transcoding it.

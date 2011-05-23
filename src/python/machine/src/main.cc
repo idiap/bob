@@ -2,6 +2,7 @@
 #include <database/Arrayset.h>
 #include <machine/KMeansMachine.h>
 #include <machine/GMMMachine.h>
+#include <boost/concept_check.hpp>
 
 using namespace boost::python;
 using namespace Torch::machine;
@@ -14,6 +15,12 @@ public:
   }
 };
 
+static double Machine_FrameSample_double_forward(const Machine<FrameSample, double>& machine, const FrameSample& input) {
+  double output;
+  machine.forward(input, output);
+  return output;
+}
+  
 static tuple getVariancesAndWeightsForEachCluster(const KMeansMachine& machine, Torch::trainer::Sampler<FrameSample>& sampler) {
   boost::shared_ptr<blitz::Array<double, 2> > variances(new blitz::Array<double, 2>);
   boost::shared_ptr<blitz::Array<double, 1> > weights(new blitz::Array<double, 1>);
@@ -46,6 +53,8 @@ GETTER(GMMMachine, getWeights, double, 1)
 GETTER(GMMMachine, getVariances, double, 2)
 GETTER(GMMMachine, getVarianceThresholds, double, 2)
 
+
+
 void bind_machine_exception();
 void bind_machine_eigenmachine();
 
@@ -64,12 +73,16 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("getFrame",
        &FrameSample::getFrame, return_value_policy<copy_const_reference>(),
        "Get the Frame")
+  .def("getFrameSize",
+       &FrameSample::getFrameSize,
+       "Get the frame size")
   ;
   
   class_<Machine_FrameSample_double_Wrapper, boost::noncopyable>("Machine_FrameSample_double_",
                                                                  "Root class for all Machine<FrameSample, double>")
   .def("forward",
-       &Machine<FrameSample, double>::forward, args("input", "output"),
+       &Machine_FrameSample_double_forward,
+       args("input"),
        "Execute the machine")
   ;
   
@@ -107,10 +120,6 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   .def("getNMeans",
        &KMeansMachine::getNMeans,
        "Return the number of means")
-  .def("forward",
-       &KMeansMachine::forward, args("input", "output"),
-       "Output the minimum distance between the input and one of the means "
-       "(overrides Machine::forward)")
   .def("getVariancesAndWeightsForEachCluster",
        &getVariancesAndWeightsForEachCluster,
        args("machine", "sampler"),
@@ -251,11 +260,6 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
        (double (GMMMachine::*)(const blitz::Array<double,1>&) const)&GMMMachine::logLikelihood,
        args("x"),
        " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
-  .def("forward",
-       &GMMMachine::forward,
-       args("input", "output"),
-       "Output the log likelihood of the sample, x"
-       "(overrides Machine::forward)")
   .def("accStatistics",
        (void (GMMMachine::*)(const Torch::trainer::Sampler<FrameSample>&, GMMStats&) const)&GMMMachine::accStatistics,
        args("sampler", "stats"),
