@@ -109,7 +109,7 @@ if __name__ == '__main__':
     movie = os.path.join(packdir, '..', 'database', 'test', 'data', 'test.mov')
     output = os.path.join(outputdir, "%(stem)s.avi")
     optflowHS(movie, 1, options.alpha, output, 10) #1 iter. per cycle is faster
-    #shutil.rmtree(outputdir)
+    shutil.rmtree(outputdir)
 
   else:
     # a user is trying to execute the example, act normally
