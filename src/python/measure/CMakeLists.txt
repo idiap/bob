@@ -15,10 +15,12 @@ torch_python_install(measure)
 # Our test units
 torch_python_add_test(python-measure-error ${CMAKE_CURRENT_SOURCE_DIR}/test/test_error.py)
 
-# Installs all python scripts
-#file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
+# Installs and tests all python scripts
+torch_python_add_test(python-compute-perf
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/compute_perf.py --self-test)
+torch_python_add_test(python-eval-threshold
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/eval_threshold.py --self-test)
+torch_python_add_test(python-apply-threshold
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/apply_threshold.py --self-test)
 
-# Our examples (run and install)
-#torch_python_add_test(python-measure-load-example
-#  ${CMAKE_CURRENT_SOURCE_DIR}/example/loadConfig.py --test)
-#torch_example_install("python" "measure" example/loadConfig.py)
+file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
