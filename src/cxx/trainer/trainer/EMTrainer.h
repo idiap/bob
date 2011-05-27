@@ -79,7 +79,27 @@ public:
   
   /// Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)
   virtual void mStep(T_machine& machine, const Sampler<T_data>& data) = 0;
-  
+
+  /// Set convergence threshold
+  void setConvergenceThreshold(double threshold) {
+    convergence_threshold = threshold;
+  }
+
+  /// Get convergence threshold
+  double getConvergenceThreshold() {
+    return convergence_threshold;
+  }
+
+  /// Set max iterations
+  void setMaxIterations(int max_iterations) {
+    this->max_iterations = max_iterations;
+  }
+
+  /// Get max iterations
+  int getMaxIterations() {
+    return max_iterations;
+  }
+
 protected:
   double convergence_threshold;
   int max_iterations;

@@ -108,6 +108,14 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   
   class_<EMTrainer_Machine_FrameSample_double_FrameSample_Wrapper, boost::noncopyable>("EMTrainer_Machine_FrameSample_double_FrameSample_",
                                                                                        init<optional<int, int> >(args("convergence_threshold", "max_iterations")))
+  .add_property("convergenceThreshold",
+                &EMTrainer<Machine<FrameSample, double>, FrameSample>::getConvergenceThreshold,
+                &EMTrainer<Machine<FrameSample, double>, FrameSample>::setConvergenceThreshold,
+                "Convergence threshold")
+  .add_property("maxIterations",
+                &EMTrainer<Machine<FrameSample, double>, FrameSample>::getMaxIterations,
+                &EMTrainer<Machine<FrameSample, double>, FrameSample>::setMaxIterations,
+                "Max iterations")
   .def("train",
        &EMTrainer<Machine<FrameSample, double>, FrameSample>::train,
        args("machine", "sampler"),
@@ -136,6 +144,14 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
                                                                                        "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006\n"
                                                                                        "It uses a random initialisation of the means followed by the expectation-maximization algorithm"
                                                                                        )
+  .add_property("convergenceThreshold",
+                &KMeansTrainer::getConvergenceThreshold,
+                &KMeansTrainer::setConvergenceThreshold,
+                "Convergence threshold")
+  .add_property("maxIterations",
+                &KMeansTrainer::getMaxIterations,
+                &KMeansTrainer::setMaxIterations,
+                "Max iterations")
   .add_property("seed",
                 &KMeansTrainer::getSeed,
                 &KMeansTrainer::setSeed,
@@ -150,6 +166,14 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
                                                                                                                 "This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.\n"
                                                                                                                 "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                                                                                 init<optional<bool, bool, bool> >(args("update_means", "update_variances", "update_weights")))
+  .add_property("convergenceThreshold",
+                &GMMTrainer::getConvergenceThreshold,
+                &GMMTrainer::setConvergenceThreshold,
+                "Convergence threshold")
+  .add_property("maxIterations",
+                &GMMTrainer::getMaxIterations,
+                &GMMTrainer::setMaxIterations,
+                "Max iterations")
   .def("train",
        &GMMTrainer::train,
        args("machine", "sampler"),
@@ -163,6 +187,14 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
                                              "The EM algorithm thus performs GMM adaptation.\n"
                                              "See Section 3.4 of Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000. We use a \"single adaptation coefficient\", alpha_i, and thus a single relevance factor, r.",
                                              init<optional<double> >(args("relevance_factor")))
+  .add_property("convergenceThreshold",
+                &MAP_GMMTrainer::getConvergenceThreshold,
+                &MAP_GMMTrainer::setConvergenceThreshold,
+                "Convergence threshold")
+  .add_property("maxIterations",
+                &MAP_GMMTrainer::getMaxIterations,
+                &MAP_GMMTrainer::setMaxIterations,
+                "Max iterations")
   .def("setPriorGMM",
        &MAP_GMMTrainer::setPriorGMM,
        "Set the GMM to use as a prior for MAP adaptation. "
@@ -174,6 +206,14 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
                                             "This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.\n"
                                             "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                             init<optional<bool, bool, bool> >(args("update_means", "update_variances", "update_weights")))
+  .add_property("convergenceThreshold",
+                &ML_GMMTrainer::getConvergenceThreshold,
+                &ML_GMMTrainer::setConvergenceThreshold,
+                "Convergence threshold")
+  .add_property("maxIterations",
+                &ML_GMMTrainer::getMaxIterations,
+                &ML_GMMTrainer::setMaxIterations,
+                "Max iterations")
   ;
 
   class_<SVDPCATrainer, bases<Trainer<EigenMachine, FrameSample>, FrameSample>, boost::noncopyable >("SVDPCATrainer", init<>())
