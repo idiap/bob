@@ -40,6 +40,13 @@ torch_python_add_test(python-ip-test-optflow
 torch_python_add_test(python-ip-test-color
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_color.py)
 
+torch_python_add_test(python-ip-facenorm
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/facenorm.py --self-test)
+torch_python_add_test(python-ip-tantriggs
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/tantriggs.py --self-test)
+torch_python_add_test(python-ip-blockDCT
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/blockDCT.py --self-test)
+
 # Installs all python scripts
 file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
