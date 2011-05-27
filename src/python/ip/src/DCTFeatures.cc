@@ -25,6 +25,13 @@ static object dct_apply( ip::DCTFeatures& dct_features, const blitz::Array<T,2>&
   return t;
 }
 
+template<typename T>
+static boost::shared_ptr<blitz::Array<double, 2> > dct_apply2(const ip::DCTFeatures& dct_features, const blitz::Array<T, 3>& src) {
+  boost::shared_ptr<blitz::Array<double, 2> > dst(new blitz::Array<double, 2>());
+  dct_features(src, *(dst.get()));
+  return dst;
+}
+
 void bind_ip_dctfeatures() {
   class_<ip::DCTFeatures, boost::shared_ptr<ip::DCTFeatures> >("DCTFeatures", dctdoc, init<const int, const int, const int, const int, const int>((arg("block_h")="8", arg("block_w")="8", arg("overlap_h")="0", arg("overlap_w")="0", arg("n_dct_coefs")="15."), "Constructs a new DCT features extractor."))   
     .def("getNBlocks", (const int (ip::DCTFeatures::*)(const blitz::Array<uint8_t,2>& src))&ip::DCTFeatures::getNBlocks<uint8_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting DCT Features on the given input")
@@ -33,5 +40,8 @@ void bind_ip_dctfeatures() {
     .def("__call__", &dct_apply<uint8_t>, (arg("self"),arg("input")), "Call an object of this type to extract DCT features.")
     .def("__call__", &dct_apply<uint16_t>, (arg("self"),arg("input")), "Call an object of this type to extract DCT features.")
     .def("__call__", &dct_apply<double>, (arg("self"),arg("input")), "Call an object of this type to extract DCT features.")
+    .def("__call__", &dct_apply2<uint8_t>, (arg("self"), arg("blocks")), "Extract DCT features from a list of blocks.")
+    .def("__call__", &dct_apply2<uint16_t>, (arg("self"), arg("blocks")), "Extract DCT features from a list of blocks.")
+    .def("__call__", &dct_apply2<double>, (arg("self"), arg("blocks")), "Extract DCT features from a list of blocks.")
     ;
 }

@@ -56,8 +56,8 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
 {
-	std::vector<blitz::Array<double,1> > dst;
-	Torch::ip::DCTFeatures dctfeatures( 3, 4, 0, 0, 6);
+  std::vector<blitz::Array<double,1> > dst;
+  Torch::ip::DCTFeatures dctfeatures( 3, 4, 0, 0, 6);
 
   dctfeatures( src, dst);
   // Iterate over the blocks and compare the vector of DCT coefficients with 
@@ -68,6 +68,31 @@ BOOST_AUTO_TEST_CASE( test_dct_feature_extract )
   {
     checkBlitzClose( *it, dst_mat[i], eps);
     ++i;
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_dct_feature_extract_norm )
+{
+  // Get the block shape
+  blitz::TinyVector<int, 3> shape = Torch::ip::getBlockShape(src, 3, 4, 0, 0);
+
+  // Get the blocks
+  blitz::Array<double, 3> block_dst(shape);
+  Torch::ip::block(Torch::core::cast<double>(src), block_dst, 3, 4 , 0, 0);
+
+  // Initialize the destination
+  blitz::Array<double, 2> dst;
+
+  // Compute the DCT
+  Torch::ip::DCTFeatures dctfeatures(3, 4, 0, 0, 6);
+  dctfeatures(block_dst, dst);
+
+  // Iterate over the blocks and compare the vector of DCT coefficients with
+  // the one obtained using matlab
+  for(int i = 0; i < dst.extent(0); i++)
+  {
+    blitz::Array<double, 1> row = dst(i, blitz::Range::all());
+    checkBlitzClose(row, dst_mat[i], eps);
   }
 }
   

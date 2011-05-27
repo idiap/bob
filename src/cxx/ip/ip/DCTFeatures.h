@@ -68,6 +68,14 @@ namespace Torch {
       void operator()(const blitz::Array<T,2>& src, U& dst);
 
       /**
+       * @brief Process a list of blocks by extracting DCT features.
+       * @param src 3D input blitz array (list of 2D blocks)
+       * @param dst 2D output blitz array
+       */
+      template <typename T>
+      void operator()(const blitz::Array<T,3>& src, blitz::Array<double, 2>& dst) const;
+      
+      /**
         * @brief Function which returns the number of blocks when applying 
         *   the DCTFeatures extractor on a 2D blitz::array/image.
         *   The first dimension is the height (y-axis), whereas the second
@@ -118,6 +126,35 @@ namespace Torch {
     }
   }
 
+  template <typename T> 
+  void DCTFeatures::operator()(const blitz::Array<T,3>& src, blitz::Array<double, 2>& dst) const
+  { 
+    // Cast to double
+    blitz::Array<double,3> double_version = Torch::core::cast<double>(src);
+
+    Torch::core::array::assertSameShape(src, blitz::TinyVector<int, 3>(src.extent(0), m_block_h, m_block_w));
+    dst.resize(src.extent(0), m_n_dct_coefs);
+    
+    // Dct extract each block
+    for(int i = 0; i < double_version.extent(0); i++)
+    {
+      // Get the current block
+      blitz::Array<double,2> dct_input = double_version(i, blitz::Range::all(), blitz::Range::all());
+
+      // Extract dct using operator()
+      blitz::Array<double,2> dct_tmp_block(m_block_h, m_block_w);
+      m_dct2d->operator()(dct_input, dct_tmp_block);
+
+      // Extract the required number of coefficients using the zigzag pattern
+      blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);
+      zigzag(dct_tmp_block, dct_block_zigzag, m_n_dct_coefs);
+      
+      // Push the resulting processed block in the right dst row
+      blitz::Array<double, 1> dst_row = dst(i, blitz::Range::all());
+      dst_row = dct_block_zigzag;
+    }
+  }
+  
   template<typename T>
   const int DCTFeatures::getNBlocks(const blitz::Array<T,2>& src)
   {

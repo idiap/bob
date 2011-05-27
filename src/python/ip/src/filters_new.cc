@@ -24,6 +24,7 @@ using namespace boost::python;
 
 static const char* BLOCK2D_DOC = "Perform a block decomposition of a 2D blitz array/image.";
 static const char* GETBLOCKSHAPE2D_DOC = "Return the shape of the output 2D blitz array/image, when calling block which performs a block decomposition of a 2D blitz array/image.";
+static const char* GETNBLOCKS2D_DOC = "Return the number of blocks of the output 2D blitz array/image, when calling block which performs a block decomposition of a 2D blitz array/image.";
 static const char* CROP2D_DOC = "Crop a 2D blitz array/image.";
 static const char* CROP2D_MASK_DOC = "Crop a 2D blitz array/image, taking mask into account.";
 static const char* CROP3D_DOC = "Crop a 3D blitz array/image.";
@@ -71,6 +72,7 @@ static const char* ZIGZAG2D_DOC = "Extract a 1D blitz array using a zigzag patte
 #define FILTER_DEF(T,N) \
  def("block", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,3>&, const int, const int, const int, const int))&Torch::ip::block<T>, (arg("src"), arg("dst"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), BLOCK2D_DOC); \
   def("getBlockShape", (const blitz::TinyVector<int,3> (*)(const blitz::Array<T,2>&, const int, const int, const int, const int))&Torch::ip::getBlockShape<T>, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETBLOCKSHAPE2D_DOC); \
+  def("getNBlocks", &Torch::ip::getNBlocks<T>, (arg("src"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w")), GETNBLOCKS2D_DOC); \
   def("crop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), CROP2D_DOC)); \
   def("crop", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<T,2>&, blitz::Array<bool,2>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), CROP2D_MASK_DOC)); \
   def("crop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), CROP3D_DOC)); \

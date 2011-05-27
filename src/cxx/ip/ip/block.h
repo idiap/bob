@@ -193,10 +193,41 @@ namespace Torch {
       const int n_blocks_w = (src.extent(1)-overlap_w)/ size_ov_w;
 
       // Return the shape of the output
-      blitz::TinyVector<int,3> res( n_blocks_h*n_blocks_w, src.extent(0), 
-        src.extent(1));
+      blitz::TinyVector<int,3> res( n_blocks_h*n_blocks_w, block_h, block_w);
       return res;
     }
+
+    /**
+      * @brief Function which returns the number of blocks along y and x when
+      *   applying a decomposition by block of a 2D blitz::array/image.
+      *   The first dimension is the number of blocks along y-axis, whereas the second
+      *   one is the nomber of blocks along x-axis.
+      * @param src The input blitz array
+      * @param block_w The desired width of the blocks.
+      * @param block_h The desired height of the blocks.
+      * @param overlap_w The overlap between each block along the x axis.
+      * @param overlap_h The overlap between each block along the y axis.
+      * @return Number of blocks along y and x-axis
+      */
+    template<typename T>
+    const blitz::TinyVector<int,2> getNBlocks(const blitz::Array<T,2>& src,
+                                              const int block_h, const int block_w,
+                                              const int overlap_h, const int overlap_w)
+    {
+      // Check input
+      detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
+
+      // Determine the number of block per row and column
+      const int size_ov_h = block_h - overlap_h;
+      const int size_ov_w = block_w - overlap_w;
+      const int n_blocks_h = (src.extent(0)-overlap_h)/ size_ov_h;
+      const int n_blocks_w = (src.extent(1)-overlap_w)/ size_ov_w;
+
+      // Return the number of blocks
+      blitz::TinyVector<int, 2> res(n_blocks_h, n_blocks_w);
+      return res;
+    }
+    
   }
 
 /**
