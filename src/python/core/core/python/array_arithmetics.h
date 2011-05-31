@@ -19,7 +19,7 @@
       if (try_t.check()) return boost::python::object(blitz::Array<bool,N>(i1 OP try_t())); \
       boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
       if (try_bz.check()) return boost::python::object(blitz::Array<bool,N>(i1 OP try_bz())); \
-      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<> with the same element type and number of dimensions"); \
       boost::python::throw_error_already_set(); \
       return boost::python::object(); \
     }
@@ -29,7 +29,7 @@
       if (try_t.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_t())); \
       boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
       if (try_bz.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_bz())); \
-      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<> with the same element type and number of dimensions"); \
       boost::python::throw_error_already_set(); \
       return boost::python::object(); \
     }
@@ -39,7 +39,7 @@
       if (try_t.check()) return boost::python::object(blitz::Array<T,N>(try_t() OP i1)); \
       boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
       if (try_bz.check()) return boost::python::object(blitz::Array<T,N>(try_bz() OP i1)); \
-      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<> with the same element type and number of dimensions"); \
       boost::python::throw_error_already_set(); \
       return boost::python::object(); \
     }
@@ -49,7 +49,7 @@
       if (try_t.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_t())); \
       boost::python::extract<const blitz::Array<T,N>&> try_bz(i2); \
       if (try_bz.check()) return boost::python::object(blitz::Array<T,N>(i1 OP try_bz())); \
-      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>"); \
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<> with the same element type and number of dimensions"); \
       boost::python::throw_error_already_set(); \
       return boost::python::object(); \
     }
@@ -124,7 +124,7 @@ namespace Torch { namespace python {
       if (try_bz.check()) 
         return boost::python::object(blitz::Array<T,N>(blitz::pow(i1, try_bz())));
 
-      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<>");
+      PyErr_SetString(PyExc_TypeError, "arithmetic operation against this blitz::Array<> requires a constant or another blitz::Array<> with the same element type and number of dimensions");
       boost::python::throw_error_already_set();
       return boost::python::object();
     }
