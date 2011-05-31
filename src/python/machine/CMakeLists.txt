@@ -18,6 +18,8 @@ torch_python_install(machine)
 # Our test units
 torch_python_add_test(python-machine-kmeans-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)
+torch_python_add_test(python-machine-linear-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
 
 # Installs all python scripts
 #file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
