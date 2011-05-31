@@ -2,6 +2,7 @@ project(machine-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/base.cc"
    "src/exception.cc"
    "src/eigenmachine.cc"
    "src/main.cc"
