@@ -20,7 +20,7 @@ mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight,
   m_bias.reference(bias.copy());
 }
 
-mach::LinearMachine::LinearMachine(int n_input, int n_output):
+mach::LinearMachine::LinearMachine(size_t n_input, size_t n_output):
   m_weight(n_output, n_input),
   m_bias(n_output)
 {
@@ -30,15 +30,15 @@ mach::LinearMachine::LinearMachine(int n_input, int n_output):
 
 mach::LinearMachine::LinearMachine(const mach::LinearMachine& other) {
   //no need to check, it was done at the other machine.
-  m_weight.reference(weight.copy());
-  m_bias.reference(bias.copy());
+  m_weight.reference(other.m_weight.copy());
+  m_bias.reference(other.m_bias.copy());
 }
 
 mach::LinearMachine::~LinearMachine() {}
 
 mach::LinearMachine& mach::LinearMachine::operator=(const mach::LinearMachine& other) {
-  m_weight.reference(weight.copy());
-  m_bias.reference(bias.copy());
+  m_weight.reference(other.m_weight.copy());
+  m_bias.reference(other.m_bias.copy());
   return *this;
 }
 
@@ -51,7 +51,7 @@ void Torch::machine::LinearMachine::forward
 
   blitz::Range a = blitz::Range::all();
   for (int i=0; i<m_weight.extent(0); ++i)
-    output(i) = blitz::sum(m_weight(i,a)*m_input) + m_bias(i);
+    output(i) = blitz::sum(m_weight(i,a)*input) + m_bias(i);
 }
 
 void Torch::machine::LinearMachine::setWeightsAndBiases
