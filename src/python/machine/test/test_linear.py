@@ -46,7 +46,28 @@ class MachineTest(unittest.TestCase):
   def test02_Correctness(self):
 
     # Tests the correctness of a linear machine
-    pass
+    c = torch.config.Configuration(MACHINE)
+    m = torch.machine.LinearMachine(c)
+
+    def presumed(ivalue):
+      """Calculates, by hand, the presumed output given the input"""
+
+      # These are the supposed preloaded values from the file "MACHINE"
+      w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
+      b = torch.core.array.array([0.3, -3.0], 'float64')
+  
+      return torch.core.array.array([ (w[i,:]*ivalue).sum() + b[i] for i in range(w.extent(0)) ], 'float64')
+
+    testing = [
+        [1,1,1],
+        [0.5,0.2,200],
+        [-27,35.77,0],
+        [12,0,0],
+        ]
+
+    for k in testing:
+      input = torch.core.array.array(k, 'float64')
+      self.assertTrue ( (presumed(input) == m(input)).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
