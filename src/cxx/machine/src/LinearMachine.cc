@@ -14,8 +14,8 @@ namespace mach = Torch::machine;
 mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight, 
     const blitz::Array<double,1>& bias)
 {
-  if (weight.extent(1) != bias.extent(0)) {
-    throw Torch::machine::NInputsMismatch(weight.extent(1), bias.extent(0));
+  if (weight.extent(0) != bias.extent(0)) {
+    throw Torch::machine::NInputsMismatch(weight.extent(0), bias.extent(0));
   }
   m_weight.reference(weight.copy());
   m_bias.reference(bias.copy());
@@ -55,8 +55,8 @@ void mach::LinearMachine::load (const Torch::config::Configuration& config) {
 }
 
 void mach::LinearMachine::save (Torch::config::Configuration& config) const {
-  config.set("weights", m_weight);
-  config.set("biases", m_bias);
+  config.set("weights", Torch::database::Array(m_weight));
+  config.set("biases", Torch::database::Array(m_bias));
 }
 
 void Torch::machine::LinearMachine::forward
