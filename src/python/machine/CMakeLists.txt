@@ -5,6 +5,7 @@ set(pysrc
    "src/base.cc"
    "src/exception.cc"
    "src/eigenmachine.cc"
+   "src/linear.cc"
    "src/main.cc"
    )
 
