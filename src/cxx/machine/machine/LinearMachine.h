@@ -38,7 +38,7 @@ namespace Torch { namespace machine {
 
       /**
        * Builds a new machine with a set of given weights and biases. We will
-       * check that the number of inputs (second dimension of weights) matches
+       * check that the number of inputs (first dimension of weights) matches
        * the number of biases and will raise an exception if that is not the
        * case.
        */
@@ -95,14 +95,28 @@ namespace Torch { namespace machine {
       { return m_weight; }
 
       /**
+       * Sets the current weights. We will check that the number of inputs
+       * (first dimension of weights) matches the number of biases currently
+       * set and will raise an exception if that is not the case.
+       */
+      void setWeights(const blitz::Array<double,2>& weight);
+
+      /**
        * Returns the biases of this classifier.
        */
       inline const blitz::Array<double, 1> getBiases() const 
       { return m_bias; }
 
       /**
+       * Sets the current biases. We will check that the number of biases
+       * matches the number of weights (first dimension) currently set and
+       * will raise an exception if that is not the case.
+       */
+      void setBiases(const blitz::Array<double,1>& bias);
+
+      /**
        * Sets the current weight and bias representation. We will check that
-       * the number of inputs (second dimension of weights) matches the number
+       * the number of inputs (first dimension of weights) matches the number
        * of biases and will raise an exception if that is not the case.
        */
       void setWeightsAndBiases(const blitz::Array<double,2>& weight, const

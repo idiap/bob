@@ -73,10 +73,26 @@ void Torch::machine::LinearMachine::forward
     output(i) = blitz::sum(m_weight(i,a)*input) + m_bias(i);
 }
 
+void Torch::machine::LinearMachine::setWeights
+(const blitz::Array<double,2>& weight) {
+  if (weight.extent(0) != m_bias.extent(0)) {
+    throw Torch::machine::NInputsMismatch(weight.extent(0), m_bias.extent(0));
+  }
+  m_weight.reference(weight.copy());
+}
+
+void Torch::machine::LinearMachine::setBiases
+(const blitz::Array<double,1>& bias) {
+  if (m_weight.extent(0) != bias.extent(0)) {
+    throw Torch::machine::NInputsMismatch(m_weight.extent(0), bias.extent(0));
+  }
+  m_bias.reference(bias.copy());
+}
+
 void Torch::machine::LinearMachine::setWeightsAndBiases
 (const blitz::Array<double,2>& weight, const blitz::Array<double,1>& bias) {
-  if (weight.extent(1) != bias.extent(0)) {
-    throw Torch::machine::NInputsMismatch(weight.extent(1), bias.extent(0));
+  if (weight.extent(0) != bias.extent(0)) {
+    throw Torch::machine::NInputsMismatch(weight.extent(0), bias.extent(0));
   }
   m_weight.reference(weight.copy());
   m_bias.reference(bias.copy());
