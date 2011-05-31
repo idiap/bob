@@ -93,6 +93,10 @@ def parse_args():
       default="x.y.z", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
       )
+  parser.add_option("-T", "--tests-regex", action="store", dest="tregex",
+      default="", metavar="REGEXP",
+      help="Filter tests to be executed by setting this option with a regular expression matching the test or tests you want to execute. This option is only in action if the action 'test' is used. (defaults to '%default')"
+      )
   
   options, args = parser.parse_args()
 
