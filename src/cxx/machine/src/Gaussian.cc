@@ -176,7 +176,7 @@ void Torch::machine::Gaussian::preComputeConstants() {
 }
 
 
-void Torch::machine::Gaussian::save(Torch::config::Configuration& config) {
+void Torch::machine::Gaussian::save(Torch::config::Configuration& config) const {
   Torch::database::Array m_meanArray(m_mean);
   Torch::database::Array m_varianceArray(m_variance);
   Torch::database::Array m_variance_thresholdsArray(m_variance_thresholds);

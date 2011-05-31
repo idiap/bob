@@ -125,7 +125,7 @@ class GMMMachine : public Machine<FrameSample, double> {
     int getNGaussians() const;
 
     /// Save to a Configuration
-    void save(Torch::config::Configuration& config);
+    void save(Torch::config::Configuration& config) const;
     
     /// Load from a Configuration
     void load(Torch::config::Configuration& config);

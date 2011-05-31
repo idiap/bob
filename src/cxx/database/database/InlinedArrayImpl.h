@@ -29,6 +29,14 @@ namespace Torch { namespace database { namespace detail {
       template<typename T, int D> InlinedArrayImpl(blitz::Array<T,D>& data);
 
       /**
+       * Starts me with new arbitrary data. Please note we copy the given
+       * array. External modifications to the array memory will not affect me.
+       * If you don't want that to be the case, start with a non-const
+       * reference.
+       */
+      template<typename T, int D> InlinedArrayImpl(const blitz::Array<T,D>& data);
+
+      /**
        * Copy construct by getting an extra reference to somebodies' array.
        */
       InlinedArrayImpl(const InlinedArrayImpl& other);
@@ -98,6 +106,11 @@ namespace Torch { namespace database { namespace detail {
     set(data);
   }
 
+  template<typename T, int D> 
+    InlinedArrayImpl::InlinedArrayImpl (const blitz::Array<T,D>& data) {
+    setCopy(data);
+  }
+
   template<typename T, int D> void InlinedArrayImpl::set(blitz::Array<T,D>& data) {
     if (D > Torch::core::array::N_MAX_DIMENSIONS_ARRAY) throw DimensionError(D, Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
     m_elementtype = Torch::core::array::getElementType<T>();
@@ -108,7 +121,8 @@ namespace Torch { namespace database { namespace detail {
 
   template<typename T, int D> 
     void InlinedArrayImpl::setCopy(const blitz::Array<T,D>& data) {
-      set(data.copy());
+      blitz::Array<T,D> tmp = data.copy();
+      set(tmp);
   }
 
   template<typename T, int D> const blitz::Array<T,D>& InlinedArrayImpl::get() const {

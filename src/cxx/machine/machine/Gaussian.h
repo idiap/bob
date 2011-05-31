@@ -91,7 +91,7 @@ class Gaussian {
     double logLikelihood(const blitz::Array<double, 1> &x) const;
 
     /// Save to a Configuration
-    void save(Torch::config::Configuration& config);
+    void save(Torch::config::Configuration& config) const;
     
     /// Load from a Configuration
     void load(const Torch::config::Configuration& config);

@@ -272,7 +272,7 @@ int Torch::machine::GMMMachine::getNGaussians() const {
   return m_n_gaussians;
 }
 
-void Torch::machine::GMMMachine::save(Torch::config::Configuration& config) {
+void Torch::machine::GMMMachine::save(Torch::config::Configuration& config) const {
   config.set("m_n_gaussians", m_n_gaussians);
   config.set("m_n_inputs", m_n_inputs);
 
