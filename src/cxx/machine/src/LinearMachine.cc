@@ -5,6 +5,7 @@
  * @brief Implements a LinearMachine
  */
 
+#include "database/Arrayset.h"
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"
 
@@ -34,20 +35,38 @@ mach::LinearMachine::LinearMachine(const mach::LinearMachine& other) {
   m_bias.reference(other.m_bias.copy());
 }
 
+mach::LinearMachine::LinearMachine (const Torch::config::Configuration& config) {
+  load(config);
+}
+
 mach::LinearMachine::~LinearMachine() {}
 
-mach::LinearMachine& mach::LinearMachine::operator=(const mach::LinearMachine& other) {
+mach::LinearMachine& mach::LinearMachine::operator=
+(const mach::LinearMachine& other) {
   m_weight.reference(other.m_weight.copy());
   m_bias.reference(other.m_bias.copy());
   return *this;
 }
 
+void mach::LinearMachine::load (const Torch::config::Configuration& config) {
+  setWeightsAndBiases
+    (config.get<Torch::database::Arrayset>("weights").get<double,2>(1),
+     config.get<Torch::database::Arrayset>("biases").get<double,1>(1));
+}
+
+void mach::LinearMachine::save (Torch::config::Configuration& config) const {
+  config.set("weights", m_weight);
+  config.set("biases", m_bias);
+}
+
 void Torch::machine::LinearMachine::forward
 (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const {
   if (m_weight.extent(0) != output.extent(0))
-    throw Torch::machine::NOutputsMismatch(m_weight.extent(0), output.extent(0));
+    throw Torch::machine::NOutputsMismatch(m_weight.extent(0),
+        output.extent(0));
   if (m_weight.extent(1) != input.extent(0))
-    throw Torch::machine::NInputsMismatch(m_weight.extent(1), input.extent(0));
+    throw Torch::machine::NInputsMismatch(m_weight.extent(1),
+        input.extent(0));
 
   blitz::Range a = blitz::Range::all();
   for (int i=0; i<m_weight.extent(0); ++i)

@@ -15,6 +15,7 @@
 #define TORCH_MACHINE_LINEARMACHINE_H
 
 #include <blitz/array.h>
+#include "config/Configuration.h"
 
 namespace Torch { namespace machine {
 
@@ -50,6 +51,11 @@ namespace Torch { namespace machine {
       LinearMachine (const LinearMachine& other);
 
       /**
+       * Starts a new LinearMachine from an existing Configuration object.
+       */
+      LinearMachine (const Torch::config::Configuration& config);
+
+      /**
        * Just to virtualise the destructor
        */
       virtual ~LinearMachine();
@@ -58,6 +64,17 @@ namespace Torch { namespace machine {
        * Assigns from a different machine
        */
       LinearMachine& operator= (const LinearMachine& other);
+
+      /**
+       * Loads data from an existing configuration object. Resets the current
+       * state.
+       */
+      void load (const Torch::config::Configuration& config);
+
+      /**
+       * Saves an existing machine to a Configuration object.
+       */
+      void save (Torch::config::Configuration& config) const;
 
       /**
        * Forwards data through the network, outputs the values of each linear
