@@ -2,8 +2,9 @@ project(trainer-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
-   "src/main.cc"
    "src/exception.cc"
+   "src/base.cc"
+   "src/main.cc"
    )
 
 include(../../cmake/macros.cmake)
