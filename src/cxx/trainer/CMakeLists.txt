@@ -9,6 +9,7 @@ set(shared "")
 set(src
     "src/SimpleFrameSampler.cc"
     "src/SVDPCATrainer.cc"
+    "src/FisherLDATrainer.cc"
     "src/KMeansTrainer.cc"
     "src/GMMTrainer.cc"
     "src/MAP_GMMTrainer.cc"
