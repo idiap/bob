@@ -71,6 +71,26 @@ namespace Torch {
       c = sum(A(i,j) * b(j), j);
     }
 
+    template <typename T>
+    void prod(const blitz::Array<T,1>& a, const blitz::Array<T,1>& b,
+      blitz::Array<T,2>& C)
+    {
+      // Check inputs
+      tca::assertZeroBase(a);
+      tca::assertZeroBase(b);
+      tca::assertSameDimensionLength(a.extent(0),b.extent(0));
+
+      // Check output
+      tca::assertZeroBase(C);
+      tca::assertSameDimensionLength(C.extent(0), a.extent(0));
+      tca::assertSameDimensionLength(C.extent(1), a.extent(0));
+
+      // Perform multiplication
+      blitz::firstIndex i;
+      blitz::secondIndex j;
+      C = a(i) * b(j);
+    }
+
     /**
       * @brief Function which computes the dot product <a,b> between two 1D
       * blitz array.
