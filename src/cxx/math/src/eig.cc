@@ -11,8 +11,13 @@ extern "C" void dsyev_( char *jobz, char *uplo, int *N, double *A,
   int *lda, double *W, double *work, int *lwork, int *info);
 // Generalized eigenvalue decomposition of real symmetric matrices (dsygv)
 extern "C" void dsygv_( int *itype, char *jobz, char *uplo, int *N, double *A, 
-  int *lda, double *B, int *ldb, double *W, double *work, int *lwork, int *info);
-
+  int *lda, double *B, int *ldb, double *W, double *work, int *lwork, 
+  int *info);
+// Generalized eigenvalue decomposition of matrices (dggev)
+extern "C" void dggev_( char *jobvl, char *jobvr, int *N, double *A, 
+  int *lda, double *B, int*ldb, double *alphar, double *alphai, double *beta,
+  double *vl, int *ldvl, double *vr, int *ldvr, double *work, int *lwork, 
+  int *info);
 
 void math::eigSymReal(const blitz::Array<double,2>& A, 
   blitz::Array<double,2>& V, blitz::Array<double,1>& D)
@@ -76,7 +81,7 @@ void math::eigSymReal(const blitz::Array<double,2>& A,
 }
 
 
-void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
+void math::eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   blitz::Array<double,2>& V, blitz::Array<double,1>& D)
 {
   // Size variable
@@ -145,4 +150,81 @@ void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   delete [] A_lapack;
   delete [] B_lapack;
   delete [] work;
+}
+
+
+void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
+  blitz::Array<double,2>& V, blitz::Array<double,1>& D)
+{
+  // Size variable
+  int N = A.extent(0);
+  const blitz::TinyVector<int,1> shape1(N);
+  const blitz::TinyVector<int,2> shape2(N,N);
+  Torch::core::array::assertZeroBase(A);
+  Torch::core::array::assertZeroBase(B);
+  Torch::core::array::assertZeroBase(V);
+  Torch::core::array::assertZeroBase(D);
+
+  Torch::core::array::assertSameShape(A,shape2);
+  Torch::core::array::assertSameShape(B,shape2);
+  Torch::core::array::assertSameShape(A,V);
+  Torch::core::array::assertSameShape(D,shape1);
+
+
+  ///////////////////////////////////
+  // Prepare to call LAPACK function
+
+  // Initialize LAPACK variables
+  char jobvl = 'N'; // Ignore left eigenvalues/vectors
+  char jobvr = 'V'; // Get both the right eigenvalues and the eigenvectors
+  int info = 0;  
+  int lda = N;
+  int ldb = N;
+  int ldvl = 1;
+  int ldvr = N;
+  int lwork = std::max(1,8*N);
+
+  // Initialize LAPACK arrays
+  double *work = new double[lwork];
+  double *alphar = new double[N];
+  double *alphai = new double[N];
+  double *beta = new double[N];
+  double *vl = new double[ldvl*N];
+  double *vr = new double[ldvr*N];
+  double *A_lapack = new double[N*N];
+  double *B_lapack = new double[N*N];
+  for(int j=0; j<N; ++j)
+    for(int i=0; i<N; ++i)
+    {
+      A_lapack[j+i*N] = A(j,i);
+      B_lapack[j+i*N] = B(j,i);
+    }
+ 
+  // Call the LAPACK function 
+  dggev_( &jobvl, &jobvr, &N, A_lapack, &lda, B_lapack, &ldb, alphar, alphai, 
+    beta, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
+
+  // TODO: check info variable
+ 
+  // TODO: reorder wrt. eigenvalues magnitude?
+
+  // Copy singular vectors back to V (column-major order)
+  for(int j=0; j<N; ++j)
+    for(int i=0; i<N; ++i)
+      V(j,i) = vr[j+i*N];
+
+  // Copy result back to D
+  for(int i=0; i<N; ++i)
+    // TODO: Check that alphai is zero (otherwise complex eigenvalue)
+    D(i) = alphar[i] / beta[i];
+
+  // Free memory
+  delete [] work;
+  delete [] alphar;
+  delete [] alphai;
+  delete [] beta;
+  delete [] vl;
+  delete [] vr;
+  delete [] A_lapack;
+  delete [] B_lapack;
 }

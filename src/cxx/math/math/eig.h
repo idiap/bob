@@ -25,7 +25,7 @@ namespace Torch {
       *   symmetric matrix, using the dsyev LAPACK function.
       * @warning The input matrix should be symmetric.
       * @param A The A matrix to decompose (size NxN)
-      * @param V The V matrix of eigenvectors (size NxN)
+      * @param V The V matrix of eigenvectors (size NxN) stored in columns
       * @param D The vector of eigenvalues (size N)
       *    Please note that this is a 1D array rather than a 2D diagonal matrix!
       */
@@ -40,7 +40,20 @@ namespace Torch {
       *   is also positive definite.
       * @param A The A input matrix (size NxN) of the problem
       * @param B The B input matrix (size NxN) of the problem
-      * @param V The V matrix of eigenvectors (size NxN)
+      * @param V The V matrix of eigenvectors (size NxN) stored in columns
+      * @param D The vector of eigenvalues (size N)
+      *    Please note that this is a 1D array rather than a 2D diagonal matrix!
+      */
+    void eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
+      blitz::Array<double,2>& V, blitz::Array<double,1>& D);
+
+    /**
+      * @brief Computes all the eigenvalues and the eigenvectors of a real 
+      *   generalized eigenproblem, of the form:
+      *   A*x=(lambda)*B*x, using the dggev LAPACK function.
+      * @param A The A input matrix (size NxN) of the problem
+      * @param B The B input matrix (size NxN) of the problem
+      * @param V The V matrix of eigenvectors (size NxN) stored in columns
       * @param D The vector of eigenvalues (size N)
       *    Please note that this is a 1D array rather than a 2D diagonal matrix!
       */
