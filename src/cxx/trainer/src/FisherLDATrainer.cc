@@ -1,5 +1,6 @@
 #include "trainer/FisherLDATrainer.h"
 #include "math/linear.h"
+#include "math/eig.h"
 
 void Torch::trainer::FisherLDATrainer::computeScatterMatrices( const Sampler<Torch::machine::FrameClassificationSample>& data) 
 {
@@ -81,40 +82,39 @@ void Torch::trainer::FisherLDATrainer::computeScatterMatrices( const Sampler<Tor
 
 void Torch::trainer::FisherLDATrainer::train(Torch::machine::EigenMachine& machine, const Sampler<Torch::machine::FrameClassificationSample>& data) 
 {
-  /*
-  int n_samples = data.getNSamples();
+  // 1/ Compute the scatter matrices
+  computeScatterMatrices(data);
+
+  // 2/ Compute the generalized eigenvalue decomposition 
   int n_features = data.getSample(0).getFrame().extent(0);
+  blitz::Array<double,2> V(n_features,n_features);
+  blitz::Array<double,1> sigma(n_features);
+  Torch::math::eig(m_Sb, m_Sw, V, sigma);
 
-  // 3/ Compute the singular value decomposition 
-  blitz::Array<double,2> U(n_features,n_features);
-  const int n_sigma = std::min(n_features,n_samples);
-  blitz::Array<double,1> sigma(n_sigma);
-  blitz::Array<double,2> V(n_samples,n_samples);
-  Torch::math::svd(data_mat, U, sigma, V);
-
-  // 4/ Sort the eigenvalues/eigenvectors (no blitz++ way unfortunately)
+  // 3/ Sort the eigenvalues/eigenvectors (no blitz++ way unfortunately)
   std::vector< std::pair<double,int> > eigenvalues_sort;
-  for( int i=0; i<n_sigma; ++i)
+  for( int i=0; i<n_features; ++i)
     eigenvalues_sort.push_back( std::pair<double,int>(sigma(i),i) );
   std::sort(eigenvalues_sort.begin(), eigenvalues_sort.end());
 
-  // 5/ Update the machine
+  // 4/ Update the machine
   int n_outputs_set = machine.getNOutputs();
-  if( n_outputs_set <=0 || n_outputs_set > n_sigma)
-    n_outputs_set = n_sigma;
+  if( n_outputs_set <=0 || n_outputs_set > n_features)
+    n_outputs_set = n_features;
   blitz::Array<double,1> eigenvalues(n_outputs_set);
   blitz::Array<double,2> eigenvectors(n_outputs_set,n_features);
   for(int ind=0; ind<n_outputs_set; ++ind)
   {
-    // Convert them to covariance matrix eigenvalues
-    eigenvalues(n_outputs_set-ind-1) = eigenvalues_sort[ind].first * eigenvalues_sort[ind].first / (n_samples - 1);
-    blitz::Array<double,1> vec = U(eigenvalues_sort[ind].second, blitz::Range::all());
+    eigenvalues(n_outputs_set-ind-1) = eigenvalues_sort[ind].first;
+    // Put a normalized eigenvector into the projection matrix eigen_vec
+    blitz::Array<double,1> vec = V(blitz::Range::all(), eigenvalues_sort[ind].second);
     double norm = sqrt( blitz::sum(vec*vec) );
     blitz::Array<double,1> eigen_vec = eigenvectors(n_outputs_set-ind-1,blitz::Range::all());
     eigen_vec = vec / norm;
   }
   machine.setEigenvaluesvectors(eigenvalues,eigenvectors);
-  machine.setPreMean(mean);
-  */
+  blitz::Array<double,1> pre_mean(n_features);
+  pre_mean = 0.;
+  machine.setPreMean(pre_mean);
 }
 
