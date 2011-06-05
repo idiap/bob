@@ -59,7 +59,7 @@ void Torch::trainer::FisherLDATrainer::computeScatterMatrices( const Sampler<Tor
     tmp_vec = current_class_mean - full_mean;
     Torch::math::prod( tmp_vec, tmp_vec, tmp_mat);
 
-    m_Sb += class_n_samples(i) * tmp_mat;
+    m_Sb += static_cast<double>(class_n_samples(i)) * tmp_mat;
   }
 
   // Compute the within-class scatter matrix
@@ -75,7 +75,7 @@ void Torch::trainer::FisherLDATrainer::computeScatterMatrices( const Sampler<Tor
     tmp_vec = sample_data - current_class_mean;
     Torch::math::prod( tmp_vec, tmp_vec, tmp_mat);
 
-    m_Sw += class_n_samples(i) * tmp_mat;
+    m_Sw += static_cast<double>(class_n_samples(i)) * tmp_mat;
   }
 }
 
