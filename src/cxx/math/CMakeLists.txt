@@ -7,6 +7,7 @@ set(shared "")
 
 # This defines the list of source files inside this package.
 set(src
+   "src/Exception.cc"
    "src/norminv.cc"
 )
 

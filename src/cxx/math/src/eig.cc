@@ -1,4 +1,5 @@
 #include "math/eig.h"
+#include "math/Exception.h"
 #include "core/array_assert.h"
 #include "core/array_old.h"
 #include <blitz/tinyvec-et.h>
@@ -61,7 +62,9 @@ void math::eigSymReal(const blitz::Array<double,2>& A,
   // Call the LAPACK function 
   dsyev_( &jobz, &uplo, &N, A_lapack, &lda, D_lapack, work, &lwork, &info);
  
-  // TODO: check info variable
+  // Check info variable
+  if( info != 0)
+    throw Torch::math::LapackError("The LAPACK dsyev function returned a non-zero value.");
 
   // Copy singular vectors back to V (column-major order)
   for(int j=0; j<N; ++j)
@@ -132,7 +135,11 @@ void math::eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>&
   dsygv_( &itype, &jobz, &uplo, &N, A_lapack, &lda, B_lapack, &ldb, D_lapack, 
     work, &lwork, &info);
 
-  // TODO: check info variable
+  // Check info variable
+  if( info != 0)
+    throw Torch::math::LapackError("The LAPACK dsygv function returned a \
+      non-zero value. This might be caused by a non-positive definite B \
+      matrix.");
  
   // Copy singular vectors back to V (column-major order)
   for(int j=0; j<N; ++j)
@@ -204,7 +211,10 @@ void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   dggev_( &jobvl, &jobvr, &N, A_lapack, &lda, B_lapack, &ldb, alphar, alphai, 
     beta, vl, &ldvl, vr, &ldvr, work, &lwork, &info);
 
-  // TODO: check info variable
+  // Check info variable
+  if( info != 0)
+    throw Torch::math::LapackError("The LAPACK dggev function returned a \
+      non-zero value.");
  
   // TODO: reorder wrt. eigenvalues magnitude?
 
@@ -215,8 +225,13 @@ void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
 
   // Copy result back to D
   for(int i=0; i<N; ++i)
+  {
     // TODO: Check that alphai is zero (otherwise complex eigenvalue)
+    if( alphai[i]>1e-12 )
+      throw Torch::math::LapackError("The LAPACK dggev function returned a \
+        non-real (i.e. complex) eigenvalue.");
     D(i) = alphar[i] / beta[i];
+  }
 
   // Free memory
   delete [] work;

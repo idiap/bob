@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
    "src/eig.cc"
+   "src/exception.cc"
    "src/linear.cc"
    "src/linsolve.cc"
    "src/norminv.cc"
