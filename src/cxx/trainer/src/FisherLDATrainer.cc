@@ -14,7 +14,7 @@ void Torch::trainer::FisherLDATrainer::computeScatterMatrices( const Sampler<Tor
   full_mean = 0.;
   blitz::Array<double,2> class_mean(m_n_classes,n_features);
   class_mean = 0.;
-  blitz::Array<uint64_t,1> class_n_samples(m_n_classes);
+  blitz::Array<int,1> class_n_samples(m_n_classes);
   class_n_samples = 0;
 
   // Compute the mean vectors

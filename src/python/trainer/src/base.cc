@@ -6,6 +6,7 @@
 #include <trainer/MAP_GMMTrainer.h>
 #include <trainer/ML_GMMTrainer.h>
 #include <trainer/SVDPCATrainer.h>
+#include <trainer/FisherLDATrainer.h>
 
 using namespace boost::python;
 using namespace Torch::machine;
@@ -66,6 +67,12 @@ class Trainer_EigenMachine_FrameSample_Wrapper: public Trainer<EigenMachine, Fra
     }
 };
 
+class Trainer_EigenMachine_FrameClassificationSample_Wrapper: public Trainer<EigenMachine, FrameClassificationSample>, public wrapper<Trainer<EigenMachine, FrameClassificationSample> > {
+    void train(EigenMachine& machine, const Sampler<FrameClassificationSample>& data) {
+      this->get_override("train")(machine, data);
+    }
+};
+
 void bind_trainer_base() {
   class_<Sampler_FrameSample_Wrapper, boost::noncopyable>("Sampler_FrameSample_",
                                                           "This class provides a list of FrameSample.")
@@ -98,6 +105,14 @@ void bind_trainer_base() {
        "Train a machine using a sampler")
   ;
   
+  class_<Trainer_EigenMachine_FrameClassificationSample_Wrapper, boost::noncopyable>("Trainer_EigenMachine_FrameClassificationSample_",
+                                                                       "Trainer<EigenMachine, FrameClassificationSample>")
+  .def("train",
+       &Trainer<EigenMachine, FrameClassificationSample>::train,
+       args("machine", "sampler"),
+       "Train a machine using a sampler")
+  ;
+
   class_<EMTrainer_Machine_FrameSample_double_FrameSample_Wrapper, boost::noncopyable>("EMTrainer_Machine_FrameSample_double_FrameSample_",
                                                                                        init<optional<int, int> >(args("convergence_threshold", "max_iterations")))
   .add_property("convergenceThreshold",
@@ -211,6 +226,13 @@ void bind_trainer_base() {
   class_<SVDPCATrainer, bases<Trainer<EigenMachine, FrameSample>, FrameSample>, boost::noncopyable >("SVDPCATrainer", init<>())
   .def("train",
        &SVDPCATrainer::train,
+       args("machine", "sampler"),
+       "Train a machine using a sampler")
+  ;
+
+  class_<FisherLDATrainer, bases<Trainer<EigenMachine, FrameClassificationSample>, FrameClassificationSample>, boost::noncopyable >("FisherLDATrainer", init<int>())
+  .def("train",
+       &FisherLDATrainer::train,
        args("machine", "sampler"),
        "Train a machine using a sampler")
   ;

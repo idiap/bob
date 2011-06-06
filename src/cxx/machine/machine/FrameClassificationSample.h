@@ -1,5 +1,5 @@
 /**
- * @file src/cxx/math/math/FrameClassificationSample.h
+ * @file src/cxx/machine/machine/FrameClassificationSample.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines a sample with a target for dealing with 
@@ -11,7 +11,7 @@
 #define TORCH5SPRO_MACHINE_FRAME_CLASSIFICATION_SAMPLE_H
 
 #include <blitz/array.h>
-#include <stdint.h> // for uint32_t declaration/typedef
+#include <stdint.h> // for int64_t declaration/typedef
 
 namespace Torch {
 namespace machine {
@@ -27,7 +27,7 @@ public:
 
   /// Constructor
   FrameClassificationSample(const blitz::Array<double, 1>& array, 
-    const uint32_t target);
+    int64_t target);
   
   /// Copy constructor
   FrameClassificationSample(const FrameClassificationSample& copy);
@@ -36,14 +36,14 @@ public:
   const blitz::Array<double, 1>& getFrame() const;
 
   /// Get the Target
-  uint32_t getTarget() const;
+  int64_t getTarget() const;
 
   /// Get the frame size
   int getFrameSize() const;
   
 private:
   blitz::Array<double, 1> m_array;
-  const uint32_t m_target;
+  int64_t m_target;
 };
 }
 }

@@ -1,4 +1,4 @@
-#include <machine/FrameClassificationSample.h>
+#include "machine/FrameClassificationSample.h"
 
 Torch::machine::FrameClassificationSample::~FrameClassificationSample() 
 {
@@ -9,7 +9,7 @@ Torch::machine::FrameClassificationSample::FrameClassificationSample(const Frame
 {  
 }
 
-Torch::machine::FrameClassificationSample::FrameClassificationSample(const blitz::Array<double, 1>& array, const uint32_t target): 
+Torch::machine::FrameClassificationSample::FrameClassificationSample(const blitz::Array<double, 1>& array, int64_t target): 
   m_array(array), m_target(target) 
 {  
 }
@@ -23,6 +23,6 @@ int Torch::machine::FrameClassificationSample::getFrameSize() const {
   return m_array.extent(0);
 }
 
-uint32_t Torch::machine::FrameClassificationSample::getTarget() const {
+int64_t Torch::machine::FrameClassificationSample::getTarget() const {
   return m_target;
 }

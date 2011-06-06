@@ -2,6 +2,7 @@
 #include <database/Arrayset.h>
 #include <machine/KMeansMachine.h>
 #include <machine/GMMMachine.h>
+#include <machine/FrameClassificationSample.h>
 #include <boost/concept_check.hpp>
 
 using namespace boost::python;
@@ -64,6 +65,20 @@ void bind_machine_base() {
   .def("getFrameSize",
        &FrameSample::getFrameSize,
        "Get the frame size")
+  ;
+  
+  class_<FrameClassificationSample>("FrameClassificationSample",
+                      "This class represents one Frame with a classification label. It encapsulates a blitz::Array<double, 1> and an int",
+                      init<const blitz::Array<double, 1>&, int64_t >(args("array","target")))
+  .def("getFrame",
+       &FrameClassificationSample::getFrame, return_value_policy<copy_const_reference>(),
+       "Get the Frame")
+  .def("getFrameSize",
+       &FrameClassificationSample::getFrameSize,
+       "Get the frame size")
+  .def("getTarget",
+       &FrameClassificationSample::getTarget,
+       "Get the target")
   ;
   
   class_<Machine_FrameSample_double_Wrapper, boost::noncopyable>("Machine_FrameSample_double_",
