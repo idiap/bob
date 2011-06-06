@@ -1,0 +1,134 @@
+/**
+ * @file src/cxx/math/test/lu_det.cc
+ * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ *
+ * @brief Test the LU decomposition and the determinant
+ */
+
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE math-lu_det Tests
+#define BOOST_TEST_MAIN
+#include <boost/test/unit_test.hpp>
+#include <blitz/array.h>
+#include <stdint.h>
+#include "core/cast.h"
+#include "math/lu_det.h"
+
+
+struct T {
+  blitz::Array<double,2> A33_1, A24_1;
+  blitz::Array<double,2> L33_1, L24_1;
+  blitz::Array<double,2> U33_1, U24_1;
+  blitz::Array<double,2> P33_1, P24_1;
+  double det_A33_1, eps;
+
+  T(): A33_1(3,3), A24_1(2,4), L33_1(3,3), L24_1(2,2), U33_1(3,3), U24_1(2,4), 
+    P33_1(3,3), P24_1(2,2), det_A33_1(-0.2766), eps(2e-4)
+  {
+    A33_1 = 0.8147, 0.9134, 0.2785, 0.9058, 0.6324, 0.5469, 0.1270, 0.0975, 
+      0.9575;
+    L33_1 = 1.0000, 0., 0., 0.8994, 1.0000, 0., 0.1402, 0.0256, 1.0000;
+    U33_1 = 0.9058, 0.6324, 0.5469, 0., 0.3446, -0.2134, 0., 0., 0.8863;
+    P33_1 = 0, 1, 0, 1, 0, 0, 0, 0, 1;
+
+    A24_1 = 0.7922, 0.6557, 0.8491, 0.6787,
+      0.9595, 0.0357, 0.9340, 0.7577;
+    L24_1 = 1., 0., 0.8256, 1.;
+    U24_1 = 0.9595, 0.0357, 0.9340, 0.7577, 0., 0.6262, 0.0780, 0.0531;
+    P24_1 = 0, 1, 1, 0;
+  }
+
+  ~T() {}
+};
+
+template<typename T, typename U, int d>  
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+{
+  BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
+  for( int i=0; i<t1.dimensions(); ++i)
+    BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,1>& t1, blitz::Array<U,1>& t2)
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    BOOST_CHECK_EQUAL(t1(i), Torch::core::cast<T>(t2(i)));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<U,2>& t2)
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      BOOST_CHECK_EQUAL(t1(i,j), Torch::core::cast<T>(t2(i,j)));
+}
+
+template<typename T, typename U>  
+void checkBlitzEqual( blitz::Array<T,3>& t1, blitz::Array<U,3>& t2) 
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      for( int k=0; k<t1.extent(2); ++k)
+        BOOST_CHECK_EQUAL(t1(i,j,k), Torch::core::cast<T>(t2(i,j,k)));
+}
+
+template<typename T>  
+void checkBlitzClose( blitz::Array<T,1>& t1, blitz::Array<T,1>& t2, 
+  const double eps )
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    BOOST_CHECK_SMALL( fabs( t2(i)-t1(i) ), eps);
+}
+
+template<typename T>  
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
+  const double eps )
+{
+  check_dimensions( t1, t2);
+  for( int i=0; i<t1.extent(0); ++i)
+    for( int j=0; j<t1.extent(1); ++j)
+      BOOST_CHECK_SMALL( fabs( t2(i,j)-t1(i,j) ), eps);
+}
+
+BOOST_FIXTURE_TEST_SUITE( test_setup, T )
+
+BOOST_AUTO_TEST_CASE( test_lu_3x3 )
+{
+  blitz::Array<double,2> L(3,3);
+  blitz::Array<double,2> U(3,3);
+  blitz::Array<double,2> P(3,3);
+
+  Torch::math::lu(A33_1, L, U, P);
+
+  checkBlitzClose(L, L33_1, eps);
+  checkBlitzClose(U, U33_1, eps);
+  checkBlitzClose(P, P33_1, eps);
+}
+  
+BOOST_AUTO_TEST_CASE( test_lu_2x4 )
+{
+  blitz::Array<double,2> L(2,2);
+  blitz::Array<double,2> U(2,4);
+  blitz::Array<double,2> P(2,2);
+
+  Torch::math::lu(A24_1, L, U, P);
+
+  checkBlitzClose(L, L24_1, eps);
+  checkBlitzClose(U, U24_1, eps);
+  checkBlitzClose(P, P24_1, eps);
+}
+  
+BOOST_AUTO_TEST_CASE( test_det_3x3 )
+{
+  blitz::Array<double,2> det(3,3);
+
+  BOOST_CHECK_SMALL( fabs(Torch::math::det(A33_1) - det_A33_1), eps);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
