@@ -67,7 +67,7 @@ class MachineTest(unittest.TestCase):
 
     for k in testing:
       input = torch.core.array.array(k, 'float64')
-      self.assertTrue ( (presumed(input) == m(input)).all() )
+      self.assertTrue ( (abs(presumed(input) - m(input)) < 1e-10).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
