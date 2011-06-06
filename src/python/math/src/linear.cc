@@ -15,6 +15,7 @@ using namespace boost::python;
 static const char* PROD_MATMAT_DOC = "Compute the product of two matrices.";
 static const char* PROD_MATVEC_DOC = "Compute the product of a matrix and a vector.";
 static const char* PROD_VECVEC_DOC = "Compute the product of a (column-)vector and a transposed/row-vector and generate a matrix.";
+static const char* TRACE_DOC = "Compute the trace of a matrix.";
 
 
 void bind_math_linear()
@@ -23,5 +24,6 @@ void bind_math_linear()
   def("prod", (void (*)(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B, blitz::Array<double,2>& C))&Torch::math::prod, (arg("A"), arg("B"), arg("C")), PROD_MATMAT_DOC);
   def("prod", (void (*)(const blitz::Array<double,2>& A, const blitz::Array<double,1>& b, blitz::Array<double,1>& c))&Torch::math::prod, (arg("A"), arg("b")), PROD_MATVEC_DOC);
   def("prod", (void (*)(const blitz::Array<double,1>& a, const blitz::Array<double,1>& b, blitz::Array<double,2>& C))&Torch::math::prod, (arg("a"), arg("b")), PROD_VECVEC_DOC);
+  def("trace", (double (*)(const blitz::Array<double,2>& A))&Torch::math::trace, (arg("A")), TRACE_DOC);
 }
 
