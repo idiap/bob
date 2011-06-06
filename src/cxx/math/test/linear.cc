@@ -16,7 +16,7 @@
 struct T {
   blitz::Array<double,2> A_24, A_43, A_23, Asol_44;
   blitz::Array<double,1> b_4, b_2, b_5a, b_5b;
-  double b5_dot;
+  double b5_dot, tr_Asol_44;
   double eps;
 
   T(): A_24(2,4), A_43(4,3), A_23(2,3), Asol_44(4,4), b_4(4), b_2(2), b_5a(5), 
@@ -36,6 +36,8 @@ struct T {
               12.,  9., 6., 3.,
                8.,  6., 4., 2.,
                4.,  3., 2., 1.;
+
+    tr_Asol_44 = 30.;
   }
 
   ~T() {}
@@ -125,6 +127,12 @@ BOOST_AUTO_TEST_CASE( test_vector_vector_dot )
 {
   double sol = Torch::math::dot( b_5a, b_5b);
   BOOST_CHECK_SMALL( fabs(b5_dot - sol), eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_matrix_trace )
+{
+  double sol = Torch::math::trace( Asol_44);
+  BOOST_CHECK_SMALL( fabs(tr_Asol_44 - sol), eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

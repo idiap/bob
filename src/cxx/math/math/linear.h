@@ -109,6 +109,23 @@ namespace Torch {
       blitz::firstIndex i;
       return sum(a(i) * b(i));
     }
+
+    /**
+      * @brief Function which compute the trace of a square matrix
+      * @param A The A matrix (size NxN)
+      */
+    template<typename T>
+    T trace(const blitz::Array<T,2>& A)
+    {
+      // Check input
+      tca::assertZeroBase(A);
+      tca::assertSameDimensionLength(A.extent(0),A.extent(1));
+
+      // Perform multiplication
+      blitz::firstIndex i;
+      return blitz::sum(A(i,i));
+    }
+
   }
 /**
  * @}
