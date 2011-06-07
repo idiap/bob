@@ -8,6 +8,7 @@
 
 import os, sys
 import unittest
+import math
 import torch
 
 MACHINE = 'data/linear-test.hdf5'
@@ -28,8 +29,21 @@ class MachineTest(unittest.TestCase):
     w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
     b = torch.core.array.array([0.3, -3.0], 'float64')
     m = torch.machine.LinearMachine(w, b)
+    isub = torch.core.array.array([0., 0.5, 0.5], 'float64')
+    idiv = torch.core.array.array([0.5, 1.0, 1.0], 'float64')
+    m.input_subtract = isub
+    m.input_divide = idiv
+    m.activation = torch.machine.Activation.TANH
+
+    self.assertTrue( (m.input_subtract == isub).all() )
+    self.assertTrue( (m.input_divide == idiv).all() )
     self.assertTrue( (m.weights == w).all() )
     self.assertTrue( (m.biases == b). all() )
+    self.assertEqual(m.activation, torch.machine.Activation.TANH)
+    # Save to file
+    # c = torch.config.Configuration()
+    # m.save(c)
+    # c.save("bla.hdf5")
 
     # Start by reading data from a file
     c = torch.config.Configuration(MACHINE)
@@ -53,10 +67,13 @@ class MachineTest(unittest.TestCase):
       """Calculates, by hand, the presumed output given the input"""
 
       # These are the supposed preloaded values from the file "MACHINE"
+      isub = torch.core.array.array([0., 0.5, 0.5], 'float64')
+      idiv = torch.core.array.array([0.5, 1.0, 1.0], 'float64')
       w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
       b = torch.core.array.array([0.3, -3.0], 'float64')
+      act = math.tanh
   
-      return torch.core.array.array([ (w[i,:]*ivalue).sum() + b[i] for i in range(w.extent(0)) ], 'float64')
+      return torch.core.array.array([ act((w[i,:]*((ivalue-isub)/idiv)).sum() + b[i]) for i in range(w.extent(0)) ], 'float64')
 
     testing = [
         [1,1,1],
