@@ -37,6 +37,14 @@ namespace Torch {
       */
     double det(const blitz::Array<double,2>& A);
 
+    /**
+      * @brief Function which computes the inverse of a matrix,
+      *   using the dgetrf and dgetri LAPACK functions.
+      * @param A The A matrix to decompose (size NxN)
+      * @param B The B=inverse(A) matrix (size NxN)
+      */
+    void inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
+
   }
 /**
  * @}

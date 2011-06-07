@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "core/cast.h"
 #include "math/lu_det.h"
+#include "math/linear.h"
 
 
 struct T {
@@ -20,10 +21,12 @@ struct T {
   blitz::Array<double,2> L33_1, L24_1;
   blitz::Array<double,2> U33_1, U24_1;
   blitz::Array<double,2> P33_1, P24_1;
+  blitz::Array<double,2> A33_1_inv, I33;
   double det_A33_1, eps;
 
   T(): A33_1(3,3), A24_1(2,4), L33_1(3,3), L24_1(2,2), U33_1(3,3), U24_1(2,4), 
-    P33_1(3,3), P24_1(2,2), det_A33_1(-0.2766), eps(2e-4)
+    P33_1(3,3), P24_1(2,2), A33_1_inv(3,3), I33(3,3), det_A33_1(-0.2766), 
+    eps(2e-4)
   {
     A33_1 = 0.8147, 0.9134, 0.2785, 0.9058, 0.6324, 0.5469, 0.1270, 0.0975, 
       0.9575;
@@ -36,6 +39,11 @@ struct T {
     L24_1 = 1., 0., 0.8256, 1.;
     U24_1 = 0.9595, 0.0357, 0.9340, 0.7577, 0., 0.6262, 0.0780, 0.0531;
     P24_1 = 0, 1, 1, 0;
+
+    A33_1_inv = -1.9960, 3.0632, -1.1690, 2.8840, -2.6919, 0.6987, -0.0289, 
+                -0.1322, 1.1283;
+    I33 = 1., 0., 0., 0., 1., 0., 0., 0., 1.;
+
   }
 
   ~T() {}
@@ -128,6 +136,19 @@ BOOST_AUTO_TEST_CASE( test_det_3x3 )
   blitz::Array<double,2> det(3,3);
 
   BOOST_CHECK_SMALL( fabs(Torch::math::det(A33_1) - det_A33_1), eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_inv_3x3 )
+{
+  blitz::Array<double,2> inv(3,3);
+
+  // Invert a matrix and compare to reference
+  Torch::math::inv(A33_1, inv);
+  checkBlitzClose(inv, A33_1_inv, eps);
+
+  blitz::Array<double,2> I(3,3);
+  Torch::math::prod(A33_1, inv, I);
+  checkBlitzClose(I, I33, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -9,9 +9,13 @@
 namespace math = Torch::math;
 
 // Declaration of the external LAPACK functions
-// Eigenvalue decomposition of real symmetric matrix (dgetrf)
+// LU decomposition of a general matrix (dgetrf)
 extern "C" void dgetrf_( int *M, int *N, double *A, int *lda, int *ipiv, 
   int *info);
+// Inverse of a general matrix (dgetri)
+extern "C" void dgetri_( int *N, double *A, int *lda, int *ipiv, double *work,
+  int *lwork, int *info);
+
 
 void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   blitz::Array<double,2>& U, blitz::Array<double,2>& P)
@@ -124,5 +128,62 @@ double math::det(const blitz::Array<double,2>& A)
   }
 
   return s*Udiag;
+}
+
+
+void math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
+{
+  // Size variable
+  int N = A.extent(0);
+  const blitz::TinyVector<int,2> shapeA(N,N);
+  Torch::core::array::assertZeroBase(A);
+  Torch::core::array::assertZeroBase(B);
+
+  Torch::core::array::assertSameShape(A,shapeA);
+  Torch::core::array::assertSameShape(B,shapeA);
+
+
+  ///////////////////////////////////
+  // Prepare to call LAPACK function
+
+  // Initialize LAPACK variables
+  int info = 0;  
+  int lda = N;
+  int lwork = N;
+
+  // Initialize LAPACK arrays
+  double *A_lapack = new double[N*N];
+  int *ipiv = new int[N];
+  double *work = new double[N];
+  for(int j=0; j<N; ++j)
+    for(int i=0; i<N; ++i)
+      A_lapack[j+i*N] = A(j,i);
+ 
+  // Call the LAPACK functions
+  // 1/ Compute LU decomposition
+  dgetrf_( &N, &N, A_lapack, &lda, ipiv, &info);
+ 
+  // Check info variable
+  if( info != 0)
+    throw Torch::math::LapackError("The LAPACK dgetrf function returned a \
+      non-zero value.");
+
+  // 2/ Compute the inverse
+  dgetri_( &N, A_lapack, &lda, ipiv, work, &lwork, &info);
+ 
+  // Check info variable
+  if( info != 0)
+    throw Torch::math::LapackError("The LAPACK dgetri function returned a \
+      non-zero value. The matrix might not be invertible.");
+
+  // Copy result back to B
+  for(int j=0; j<N; ++j)
+    for(int i=0; i<N; ++i)
+      B(j,i) = A_lapack[j+i*N];
+
+  // Free memory
+  delete [] A_lapack;
+  delete [] ipiv;
+  delete [] work;
 }
 
