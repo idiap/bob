@@ -236,13 +236,6 @@ Actually, you can go beyond just reading out parameters. If you consider the
 example above, you could have instantiated the Dataset directly from within the
 configuration file! Your choice.
 
-Loading and Saving HDF5 Configuration
--------------------------------------
-
-.. todo::
-
-  This section still needs some work!
-
 .. Place your links here:
 .. _more info here: http://www.boost.org/doc/libs/1_40_0/doc/html/program_options.html
 .. _boost program-options: http://www.boost.org/doc/libs/1_40_0/doc/html/program_options.html

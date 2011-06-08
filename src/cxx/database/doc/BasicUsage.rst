@@ -116,8 +116,8 @@ enclosed in ``[]``):
   * Torch5spro (``.bin``), supports all element types in |project| and any
     dimensionality [``torch.arrayset.binary``] (*deprecated*)
   * **HDF5** (``.hdf5``), supports all element types in |project| and any
-    dimensionality [``torch.arrayset.binary``] and is the prefered format for
-    encoding |project| data
+    dimensionality [``torch.arrayset.binary``] and is **the prefered format for
+    encoding |project| data**
 
 If you want to have arrays and arraysets in external files, you have to either
 know their codec names and specify that while creating the dataset or make sure
@@ -129,15 +129,14 @@ Loading an existing Dataset
 ---------------------------
 
 Please see the documented test program (in particular, the tests named
-"dbDataset_parsewrite_XYZ"): [source:src/cxx/database/test/dataset.cc
-dataset.cc]
+"dbDataset_parsewrite_XYZ" in `src/cxx/database/test/dataset.cc`_).
 
 Creating a new Dataset
 ----------------------
 
 Please see the documented test program (in particular, the tests named
-"dbDataset_construction", "dbDataset_arrayset", "dbDataset_relationset"):
-[source:src/cxx/database/test/dataset.cc dataset.cc]
+"dbDataset_construction", "dbDataset_arrayset", "dbDataset_relationset" at
+`src/cxx/database/test/dataset.cc`_).
 
 Transcoding (binary) files
 --------------------------
@@ -175,7 +174,15 @@ Extending Array and Arrayset Codecs
 -----------------------------------
 
 Please see these documented sources:
-[source:src/cxx/database/database/BinaryArrayCodec.h BinaryArrayCodec header]
-and [source:src/cxx/database/src/BinaryArrayCodec.cc BinaryArrayCodec
-implementation]. You can also checkout other implementations inside the
-[source:src/cxx/database/database Database headers] directory.
+
+* `src/cxx/database/database/BinaryArrayCodec.h`_: BinaryArrayCodec header;
+* `src/cxx/database/src/BinaryArrayCodec.cc`_: BinaryArrayCodec implementation.
+
+You can also checkout other implementations inside the `Database package
+headers`_.
+
+.. place here your references
+.. _`src/cxx/database/test/dataset.cc`: http://www.idiap.ch/software/torch5spro/browser/src/cxx/database/test/dataset.cc
+.. _`src/cxx/database/database/BinaryArrayCodec.h`: http://www.idiap.ch/software/torch5spro/browser/src/cxx/database/database/BinaryArrayCodec.h
+.. _`src/cxx/database/src/BinaryArrayCodec.cc`: http://www.idiap.ch/software/torch5spro/browser/src/cxx/database/src/BinaryArrayCodec.cc
+.. _`Database package headers`: http://www.idiap.ch/software/torch5spro/browser/src/cxx/database/database
