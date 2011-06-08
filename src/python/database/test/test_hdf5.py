@@ -76,7 +76,7 @@ class HDF5FileTest(unittest.TestCase):
     # Data that is thrown in the file is immediately accessible, so you can
     # interleave read and write operations without any problems.
     # There is a single variable in the file, which is a torch arrayset:
-    self.assertEqual(outfile.paths(), ['testdata'])
+    self.assertEqual(outfile.paths(), ['/testdata'])
     
     # And all the data is *exactly* the same recorded, bit by bit
     back = outfile.read('testdata') # this is how to read the whole data back
@@ -91,7 +91,7 @@ class HDF5FileTest(unittest.TestCase):
     readonly = torch.database.HDF5File(tmpname, 'r')
 
     # There is a single variable in the file, which is a torch arrayset:
-    self.assertEqual(readonly.paths(), ['testdata'])
+    self.assertEqual(readonly.paths(), ['/testdata'])
 
     # You can get an overview of what is in the HDF5 dataset using the
     # describe() method
@@ -199,7 +199,7 @@ class HDF5FileTest(unittest.TestCase):
     outfile.rename('NewDirectory1/Dir2/MyDataset', 'Test2/Bla')
 
     # So, now the original dataset name does not exist anymore
-    self.assertEqual(outfile.paths(), ['Test2/Bla'])
+    self.assertEqual(outfile.paths(), ['/Test2/Bla'])
 
     # We can also unlink the dataset from the file. Please note this will not
     # erase the data in the file, just make it inaccessible
