@@ -10,7 +10,7 @@
 
 using namespace boost::python;
 namespace mach = Torch::machine;
-namespace conf = Torch::config;
+namespace db = Torch::database;
 
 static blitz::Array<double,1> forward(const mach::LinearMachine& m,
     const blitz::Array<double,1>& input) {
@@ -29,7 +29,7 @@ void bind_machine_linear() {
   class_<mach::LinearMachine, boost::shared_ptr<mach::LinearMachine>
     >("LinearMachine", "A linear classifier. See C. M. Bishop, 'Pattern Recognition and Machine  Learning', chapter 4 for more details", init<size_t,size_t>((arg("input_size"), arg("output_size")), "Constructs a new linear machine with a certain input and output sizes. The weights and biases are initialized to zero."))
     .def(init<const blitz::Array<double,2>&, const blitz::Array<double,1>&>((arg("weights"),arg("biases")), "Constructs a new LinearMachine from a set of weights and biases values. Both weights and biases have their dimensionalities checked between each other for consistency."))
-    .def(init<const conf::Configuration&>((arg("config")), "Constructs a new LinearMachine from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
+    .def(init<db::HDF5File&>((arg("config")), "Constructs a new LinearMachine from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
     .def("load", &mach::LinearMachine::load, (arg("self"), arg("config")), "Loads the weights and biases from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency.")
     .def("save", &mach::LinearMachine::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
     .add_property("input_subtract", &mach::LinearMachine::getInputSubraction, &mach::LinearMachine::setInputSubtraction)

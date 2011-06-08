@@ -136,7 +136,7 @@ void bind_machine_base() {
                    init<>())
   .def(init<int>(args("n_inputs")))
   .def(init<Gaussian&>(args("other")))
-  .def(init<Torch::config::Configuration&>(args("config")))
+  .def(init<Torch::database::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
                 &Gaussian::getNInputs,
@@ -182,7 +182,7 @@ void bind_machine_base() {
                    "Eq (10) is sumPxx(i) / n(i)\n",
                    init<>())
   .def(init<int, int>(args("n_gaussians","n_inputs")))
-  .def(init<Torch::config::Configuration&>(args("config")))
+  .def(init<Torch::database::HDF5File&>(args("config")))
   .def_readwrite("log_likelihood",
                  &GMMStats::log_likelihood,
                  "The accumulated log likelihood of all samples")
@@ -218,7 +218,7 @@ void bind_machine_base() {
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                             init<int, int>(args("n_gaussians", "n_inputs")))
   .def(init<GMMMachine&>())
-  .def(init<Torch::config::Configuration&>(args("config")))
+  .def(init<Torch::database::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
                 &GMMMachine::getNInputs,

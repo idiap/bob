@@ -210,6 +210,50 @@ class HDF5FileTest(unittest.TestCase):
 
     os.unlink(tmpname)
 
+  def test04_directory_support(self):
+
+    """
+    conf::Configuration c;
+    int value = 10;
+
+    c.set("value", value);
+    check_equal(c, "value", value);
+    
+    c.set("a/value", value);
+    check_equal(c, "a/value", value);
+    
+    c.cd("b");
+    c.set("value", value);
+    check_equal(c, "/b/value", value);
+
+    c.set("c/value", value);
+    check_equal(c, "/b/c/value", value);
+
+    c.cd("d");
+    c.set("value", value);
+    check_equal(c, "/b/d/value", value);
+
+    c.cd("../e");
+    c.set("value", value);
+    check_equal(c, "/b/e/value", value);
+
+    c.set("/f/value", value);
+    check_equal(c, "/f/value", value);
+    c.cd("../..");
+    check_equal(c, "f/value", value);
+
+    c.cd("..");
+    c.set("/g/value", value);
+    check_equal(c, "/g/value", value);
+
+    c.cd("b/d");
+    c.cd("/h");
+    c.set("value", value);
+    check_equal(c, "/h/value", value);
+    """
+
+    pass
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \

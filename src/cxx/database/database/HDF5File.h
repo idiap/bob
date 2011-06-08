@@ -144,6 +144,15 @@ namespace Torch { namespace database {
       }
 
       /**
+       * Reads data from the file into a scalar. Raises an exception if the
+       * type is incompatible. Relative paths are accepted. Calling this method
+       * is equivalent to calling read(path, 0, value).
+       */
+      template <typename T> void read(const std::string& path, T& value) {
+        read(path, 0, value);
+      }
+
+      /**
        * Reads data from the file into a array. Raises an exception if the type
        * is incompatible. Relative paths are accepted.
        */
@@ -153,6 +162,15 @@ namespace Torch { namespace database {
         if (!contains(absolute)) 
           throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), absolute);
         m_index[absolute]->readArray(pos, value);
+      }
+
+      /**
+       * Reads data from the file into a array. Raises an exception if the type
+       * is incompatible. Relative paths are accepted. Calling this method is
+       * equivalent to calling readArray(path, 0, value).
+       */
+      template <typename T> void readArray(const std::string& path, T& value) {
+        readArray(path, 0, value);
       }
 
       /**
@@ -168,6 +186,16 @@ namespace Torch { namespace database {
       }
 
       /**
+       * Modifies the value of a scalar inside the file. Relative paths are
+       * accepted. Calling this method is equivalent to calling replace(path,
+       * 0, value).
+       */
+      template <typename T> void replace(const std::string& path, 
+          const T& value) {
+        replace(path, 0, value);
+      }
+
+      /**
        * Modifies the value of a array inside the file. Relative paths are
        * accepted.
        */
@@ -177,6 +205,16 @@ namespace Torch { namespace database {
         if (!contains(absolute)) 
           throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), absolute);
         m_index[absolute]->replaceArray(pos, value);
+      }
+
+      /**
+       * Modifies the value of a array inside the file. Relative paths are
+       * accepted. Calling this method is equivalent to calling
+       * replaceArray(path, 0, value).
+       */
+      template <typename T> void replaceArray(const std::string& path,
+          const T& value) {
+        replaceArray(path, 0, value);
       }
 
       /**

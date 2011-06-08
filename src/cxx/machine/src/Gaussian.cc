@@ -1,8 +1,5 @@
 #include "machine/Gaussian.h"
 #include <cfloat>
-#include <config/Configuration.h>
-#include <database/Array.h>
-#include <database/Arrayset.h>
 
 double Torch::machine::Log::LogAdd(double log_a, double log_b) {
   double minusdif;
@@ -49,7 +46,7 @@ Torch::machine::Gaussian::Gaussian(int n_inputs) {
   resize(n_inputs);
 }
 
-Torch::machine::Gaussian::Gaussian(Torch::config::Configuration& config) {
+Torch::machine::Gaussian::Gaussian(Torch::database::HDF5File& config) {
   load(config);
 }
 
@@ -176,30 +173,26 @@ void Torch::machine::Gaussian::preComputeConstants() {
 }
 
 
-void Torch::machine::Gaussian::save(Torch::config::Configuration& config) const {
-  Torch::database::Array m_meanArray(m_mean);
-  Torch::database::Array m_varianceArray(m_variance);
-  Torch::database::Array m_variance_thresholdsArray(m_variance_thresholds);
-
-  config.set("m_mean", m_meanArray);
-  config.set("m_variance", m_varianceArray);
-  config.set("m_variance_thresholds", m_variance_thresholdsArray);
-  config.set("g_norm", g_norm);
-  config.set("m_n_inputs", m_n_inputs);
+void Torch::machine::Gaussian::save(Torch::database::HDF5File& config) const {
+  config.appendArray("m_mean", m_mean);
+  config.appendArray("m_variance", m_variance);
+  config.appendArray("m_variance_thresholds", m_variance_thresholds);
+  config.append("g_norm", g_norm);
+  config.append("m_n_inputs", m_n_inputs);
 }
 
-void Torch::machine::Gaussian::load(const Torch::config::Configuration& config) {
-  m_n_inputs = (int)config.get<std::vector<int64_t> >("m_n_inputs").at(0);
-
+void Torch::machine::Gaussian::load(Torch::database::HDF5File& config) {
+  config.read("m_n_inputs", m_n_inputs);
+  
   m_mean.resize(m_n_inputs);
   m_variance.resize(m_n_inputs);
   m_variance_thresholds.resize(m_n_inputs);
-  
-  m_mean = config.get<Torch::database::Arrayset>("m_mean").get<double, 1>(1);
-  m_variance = config.get<Torch::database::Arrayset>("m_variance").get<double, 1>(1);
-  m_variance_thresholds = config.get<Torch::database::Arrayset>("m_variance_thresholds").get<double, 1>(1);
+ 
+  config.readArray("m_mean", m_mean);
+  config.readArray("m_variance", m_variance);
+  config.readArray("m_variance_thresholds", m_variance_thresholds);
 
-  g_norm = config.get<std::vector<double> >("g_norm").at(0);
+  config.read("g_norm", g_norm);
 }
 
 namespace Torch{

@@ -59,7 +59,7 @@ mach::LinearMachine::LinearMachine(const mach::LinearMachine& other):
 {
 }
 
-mach::LinearMachine::LinearMachine (const Torch::config::Configuration& config) {
+mach::LinearMachine::LinearMachine (Torch::database::HDF5File& config) {
   load(config);
 }
 
@@ -77,22 +77,38 @@ mach::LinearMachine& mach::LinearMachine::operator=
   return *this;
 }
 
-void mach::LinearMachine::load (const Torch::config::Configuration& config) {
-  setAll
-    (config.get<Torch::database::Arrayset>("input_sub").get<double,1>(1),
-     config.get<Torch::database::Arrayset>("input_div").get<double,1>(1),
-     config.get<Torch::database::Arrayset>("weights").get<double,2>(1),
-     config.get<Torch::database::Arrayset>("biases").get<double,1>(1));
-  setActivation(static_cast<mach::LinearMachine::Activation>(config.get<std::vector<unsigned> >("activation")[0]));
+void mach::LinearMachine::load (Torch::database::HDF5File& config) {
+  //query linear machine shape
+  const Torch::database::HDF5Type& t = config.describe("weights");
+  size_t n_output = t.shape()[0];
+  size_t n_input = t.shape()[1];
+
+  //reset all members to prepare the data copy using HDF5
+  m_input_sub.resize(n_input);
+  m_input_div.resize(n_input);
+  m_buffer.resize(n_input);
+  m_weight.resize(n_output, n_input);
+  m_bias.resize(n_output);
+
+  //reads all data directly into the member variables
+  config.readArray("input_sub", m_input_sub);
+  config.readArray("input_div", m_input_div);
+  config.readArray("weights", m_weight);
+  config.readArray("biases", m_bias);
+
+  //reads the activation function
+  uint32_t act = 0;
+  config.read("activation", act);
+  setActivation(static_cast<mach::LinearMachine::Activation>(act));
 }
 
-void mach::LinearMachine::save (Torch::config::Configuration& config) const {
-  config.set("input_sub", Torch::database::Array(m_input_sub));
-  config.set("input_div", Torch::database::Array(m_input_div));
-  config.set("weights", Torch::database::Array(m_weight));
-  config.set("biases", Torch::database::Array(m_bias));
-  std::vector<unsigned> actv(1, m_activation);
-  config.set("activation", actv);
+void mach::LinearMachine::save (Torch::database::HDF5File& config) const {
+  config.appendArray("input_sub", m_input_sub);
+  config.appendArray("input_div", m_input_div);
+  config.appendArray("weights", m_weight);
+  config.appendArray("biases", m_bias);
+  //torch's hdf5 implementation does not support enumerations yet...
+  config.append("activation", static_cast<uint32_t>(m_activation));
 }
 
 void mach::LinearMachine::forward

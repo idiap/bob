@@ -5,7 +5,7 @@
 #define _GMMSTATS_H
 
 #include <blitz/array.h>
-#include <config/Configuration.h>
+#include <database/HDF5File.h>
 
 namespace Torch {
 namespace machine {
@@ -30,7 +30,7 @@ class GMMStats {
     GMMStats(int n_gaussians, int n_inputs);
 
     /// Constructor
-    GMMStats(Torch::config::Configuration& config);
+    GMMStats(Torch::database::HDF5File& config);
     
     /// Destructor
     ~GMMStats();
@@ -47,7 +47,7 @@ class GMMStats {
     double log_likelihood;
 
     /// The accumulated number of samples
-    int T;
+    int64_t T;
 
     /// For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)
     blitz::Array<double,1> n;
@@ -59,10 +59,10 @@ class GMMStats {
     blitz::Array<double,2> sumPxx;
 
     /// Save to a Configuration
-    void save(Torch::config::Configuration& config);
+    void save(Torch::database::HDF5File& config) const;
     
     /// Load from a Configuration
-    void load(const Torch::config::Configuration& config);
+    void load(Torch::database::HDF5File& config);
     
     friend std::ostream& operator<<(std::ostream& os, const GMMStats& g);
 };

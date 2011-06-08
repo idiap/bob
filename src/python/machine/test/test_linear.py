@@ -41,12 +41,11 @@ class MachineTest(unittest.TestCase):
     self.assertTrue( (m.biases == b). all() )
     self.assertEqual(m.activation, torch.machine.Activation.TANH)
     # Save to file
-    # c = torch.config.Configuration()
+    # c = torch.database.HDF5File("bla.hdf5")
     # m.save(c)
-    # c.save("bla.hdf5")
 
     # Start by reading data from a file
-    c = torch.config.Configuration(MACHINE)
+    c = torch.database.HDF5File(MACHINE)
     m = torch.machine.LinearMachine(c)
     self.assertTrue( (m.weights == w).all() )
     self.assertTrue( (m.biases == b). all() )
@@ -60,7 +59,7 @@ class MachineTest(unittest.TestCase):
   def test02_Correctness(self):
 
     # Tests the correctness of a linear machine
-    c = torch.config.Configuration(MACHINE)
+    c = torch.database.HDF5File(MACHINE)
     m = torch.machine.LinearMachine(c)
 
     def presumed(ivalue):
