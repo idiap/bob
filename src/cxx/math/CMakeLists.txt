@@ -18,6 +18,7 @@ set(src_blas
 set(src_lapack
   "src/eig.cc"
   "src/linsolve.cc"
+  "src/lu_det.cc"
   "src/svd.cc"
 )
 
@@ -39,6 +40,7 @@ add_dependencies(torch_math math-cxx_header_install)
 # Defines tests for this package
 torch_test(math linear test/linear.cc)
 torch_test(math linsolve test/linsolve.cc)
+torch_test(math lu_det test/lu_det.cc)
 torch_test(math norminv test/norminv.cc)
 torch_test(math svd test/svd.cc)
 torch_test(math interiorpointLP test/interiorpointLP.cc)
