@@ -79,12 +79,24 @@ static list hdf5file_paths(const db::HDF5File& f) {
 }
 
 /**
- * Functionality to read from HDF5File's
+ * Functionality to read from or replace at HDF5File's
  */
-template <typename T> T hdf5file_read_scalar(db::HDF5File& f, const std::string& p, size_t pos) {
+template <typename T> static T hdf5file_read_scalar(db::HDF5File& f, const std::string& p, size_t pos) {
   T tmp;
   f.read(p, pos, tmp);
   return tmp;
+}
+
+template <typename T> static void hdf5file_replace_scalar(db::HDF5File& f, const std::string& p, size_t pos, const T& value) {
+  f.replace(p, pos, value);
+}
+
+template <typename T> static void hdf5file_read_array(db::HDF5File& f, const std::string& p, size_t pos, T& value) {
+  f.readArray(p, pos, value);
+}
+
+template <typename T> static void hdf5file_replace_array(db::HDF5File& f, const std::string& p, size_t pos, const T& value) {
+  f.replaceArray(p, pos, value);
 }
 
 void bind_database_hdf5() {
@@ -171,7 +183,7 @@ void bind_database_hdf5() {
     .def("copy", &db::HDF5File::copy, (arg("self"), arg("file")), "Copies all accessible content to another HDF5 file")
 #   define DECLARE_SUPPORT(T,E) \
     .def(BOOST_PP_STRINGIZE(__read_ ## E ## __), &hdf5file_read_scalar<T>, (arg("self"), arg("key"), arg("pos")), "Reads a given scalar from a dataset") \
-    .def(BOOST_PP_STRINGIZE(__replace_ ## E ## __), &db::HDF5File::replace<T>, (arg("self"), arg("key"), arg("pos"), arg("value")), "Modifies the value of a scalar inside the file.") \
+    .def(BOOST_PP_STRINGIZE(__replace_ ## E ## __), &hdf5file_replace_scalar<T>, (arg("self"), arg("key"), arg("pos"), arg("value")), "Modifies the value of a scalar inside the file.") \
     .def(BOOST_PP_STRINGIZE(__append_ ## E ## __), &db::HDF5File::append<T>, (arg("self"), arg("key"), arg("value")), "Appends a scalar to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") 
     DECLARE_SUPPORT(bool, bool)
     DECLARE_SUPPORT(int8_t, int8)
@@ -190,8 +202,8 @@ void bind_database_hdf5() {
     //DECLARE_SUPPORT(std::complex<long double>, complex256)
     DECLARE_SUPPORT(std::string, string)
 #   undef DECLARE_SUPPORT
-#   define DECLARE_SUPPORT(T,N) .def("__read_array__", &db::HDF5File::readArray<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
-    .def("__replace_array__", &db::HDF5File::replaceArray<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
+#   define DECLARE_SUPPORT(T,N) .def("__read_array__", &hdf5file_read_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
+    .def("__replace_array__", &hdf5file_replace_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
     .def("__append_array__", &db::HDF5File::appendArray<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") 
 #   define DECLARE_BZ_SUPPORT(T) \
     DECLARE_SUPPORT(T,1) \
