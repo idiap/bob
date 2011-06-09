@@ -199,9 +199,8 @@ trainer.maxIterations = options.iterg
 trainer.train(gmm, sampler)
 
 # Save gmm
-config = torch.config.Configuration()
+config = torch.database.HDF5File(options.output_file)
 gmm.save(config)
-config.save(options.output_file)
 
 if options.test:
   os.remove("/tmp/input.hdf5")

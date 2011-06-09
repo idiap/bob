@@ -81,7 +81,7 @@ db::detail::InlinedArraysetImpl db::HDF5ArraysetCodec::load
   db::HDF5File f(filename, db::HDF5File::in);
   std::vector<std::string> paths;
   f.paths(paths);
-  if (!paths.size()) throw db::HDF5InvalidPath(filename, "arrayset");
+  if (!paths.size()) throw db::HDF5InvalidPath(filename, "/arrayset");
   const std::string& name = paths[0];
   const db::HDF5Type& descr = f.describe(name);
   switch (descr.element_type()) {
@@ -162,7 +162,7 @@ db::Array db::HDF5ArraysetCodec::load
   db::HDF5File f(filename, db::HDF5File::in);
   std::vector<std::string> paths;
   f.paths(paths);
-  if (!paths.size()) throw db::HDF5InvalidPath(filename, "arrayset");
+  if (!paths.size()) throw db::HDF5InvalidPath(filename, "/arrayset");
   const std::string& name = paths[0];
   if (id > f.size(name)) throw db::IndexError(id);
   const db::HDF5Type& descr = f.describe(name);

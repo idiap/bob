@@ -9,7 +9,6 @@ set(shared "${Boost_PYTHON_LIBRARY_RELEASE};${PYTHON_LIBRARIES}")
 set(src
     "src/Python.cc"
     "src/Exception.cc"
-    "src/HDF5Config.cc"
     "src/PythonConfig.cc"
     "src/Configuration.cc"
     )

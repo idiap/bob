@@ -172,12 +172,11 @@ class TrainerTest(unittest.TestCase):
     ml_gmmtrainer = torch.trainer.ML_GMMTrainer(True, True, True)
     ml_gmmtrainer.train(gmm, sampler)
 
-    #config = torch.config.Configuration()
+    #config = torch.database.HDF5File("data/gmm_ML.hdf5")
     #gmm.save(config)
-    #config.save("data/gmm_ML.hdf5")
 
-    gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
-    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML_32bit_release.hdf5"))
+    gmm_ref = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
+    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML_32bit_release.hdf5"))
     
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
@@ -186,19 +185,18 @@ class TrainerTest(unittest.TestCase):
     
     sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
     
-    gmm = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
-    gmmprior = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_ML.hdf5"))
+    gmm = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
+    gmmprior = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
     
     map_gmmtrainer = torch.trainer.MAP_GMMTrainer(16)
     map_gmmtrainer.setPriorGMM(gmmprior)
     map_gmmtrainer.train(gmm, sampler)
 
-    #config = torch.config.Configuration()
+    #config = torch.database.HDF5File("data/gmm_MAP.hdf5")
     #gmm.save(config)
-    #config.save("data/gmm_MAP.hdf5")
     
-    gmm_ref = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_MAP.hdf5"))
-    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.config.Configuration("data/gmm_MAP_32bit_release.hdf5"))
+    gmm_ref = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_MAP.hdf5"))
+    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_MAP_32bit_release.hdf5"))
 
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     

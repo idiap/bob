@@ -20,7 +20,7 @@ void Torch::trainer::ML_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const
   //   Equation 9.26 of Bishop, "Pattern recognition and machine learning", 2006
   if (update_weights) {
     blitz::Array<double, 1> new_weights(n_gaussians);
-    new_weights = m_ss.n / m_ss.T;
+    new_weights = m_ss.n / (int32_t)m_ss.T; //cast req. for linux/32-bits & osx
     gmm.setWeights(new_weights);
   }
 

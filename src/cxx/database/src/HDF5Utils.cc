@@ -341,7 +341,9 @@ static herr_t fill_index_callback(hid_t group, const char *name,
   // If the object we are currently reading is not a Dataset, just ignore
   if (obj_info.type != H5O_TYPE_DATASET) return 0;
 
-  dict[name].reset(new h5::Dataset(file, name));
+  std::string complete("/");
+  complete += name;
+  dict[complete].reset(new h5::Dataset(file, complete));
   return 0;
 }
 

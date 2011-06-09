@@ -11,6 +11,7 @@
 #include "trainer/Sampler.h"
 #include "machine/GMMStats.h"
 #include "machine/Gaussian.h"
+#include "database/HDF5File.h"
 #include <iostream>
 
 namespace Torch {
@@ -30,7 +31,7 @@ class GMMMachine : public Machine<FrameSample, double> {
     GMMMachine(int n_gaussians, int n_inputs);
 
     /// Constructor from a Configuration
-    GMMMachine(Torch::config::Configuration& config);
+    GMMMachine(Torch::database::HDF5File& config);
 
     /// Copy constructor
     /// (Needed because the GMM points to its constituent Gaussian members)
@@ -125,10 +126,10 @@ class GMMMachine : public Machine<FrameSample, double> {
     int getNGaussians() const;
 
     /// Save to a Configuration
-    void save(Torch::config::Configuration& config) const;
+    void save(Torch::database::HDF5File& config) const;
     
     /// Load from a Configuration
-    void load(Torch::config::Configuration& config);
+    void load(Torch::database::HDF5File& config);
     
     friend std::ostream& operator<<(std::ostream& os, const GMMMachine& machine);
     
@@ -138,10 +139,10 @@ class GMMMachine : public Machine<FrameSample, double> {
     void copy(const GMMMachine&);
     
     /// The number of Gaussian components
-    int m_n_gaussians;
+    int64_t m_n_gaussians;
     
     /// The feature dimensionality
-    int m_n_inputs;
+    int64_t m_n_inputs;
 
     /// The Gaussian components
     Gaussian *m_gaussians;

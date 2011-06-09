@@ -38,7 +38,7 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
 
     // Calculate the maximum likelihood weights
     blitz::Array<double,1> ml_weights(n_gaussians);
-    ml_weights = m_ss.n / m_ss.T;
+    ml_weights = m_ss.n / (int32_t)m_ss.T; //cast req. for linux/32-bits & osx
 
     // Get the prior weights
     blitz::Array<double,1> prior_weights(n_gaussians);

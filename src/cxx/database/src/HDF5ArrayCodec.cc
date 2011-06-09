@@ -39,7 +39,7 @@ void db::HDF5ArrayCodec::peek(const std::string& filename,
   db::HDF5File f(filename, db::HDF5File::in);
   std::vector<std::string> paths;
   f.paths(paths);
-  if (!paths.size()) throw db::HDF5InvalidPath(filename, "array");
+  if (!paths.size()) throw db::HDF5InvalidPath(filename, "/array");
   const std::string& name = paths[0];
   const db::HDF5Type& descr = f.describe(name);
   eltype = descr.element_type(); 
@@ -77,7 +77,7 @@ db::HDF5ArrayCodec::load(const std::string& filename) const {
   db::HDF5File f(filename, db::HDF5File::in);
   std::vector<std::string> paths;
   f.paths(paths);
-  if (!paths.size()) throw db::HDF5InvalidPath(filename, "array");
+  if (!paths.size()) throw db::HDF5InvalidPath(filename, "/array");
   const std::string& name = paths[0];
   const db::HDF5Type& descr = f.describe(name);
   switch (descr.element_type()) {

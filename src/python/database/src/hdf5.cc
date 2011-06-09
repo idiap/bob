@@ -79,12 +79,24 @@ static list hdf5file_paths(const db::HDF5File& f) {
 }
 
 /**
- * Functionality to read from HDF5File's
+ * Functionality to read from or replace at HDF5File's
  */
-template <typename T> T hdf5file_read_scalar(db::HDF5File& f, const std::string& p, size_t pos) {
+template <typename T> static T hdf5file_read_scalar(db::HDF5File& f, const std::string& p, size_t pos) {
   T tmp;
   f.read(p, pos, tmp);
   return tmp;
+}
+
+template <typename T> static void hdf5file_replace_scalar(db::HDF5File& f, const std::string& p, size_t pos, const T& value) {
+  f.replace(p, pos, value);
+}
+
+template <typename T> static void hdf5file_read_array(db::HDF5File& f, const std::string& p, size_t pos, T& value) {
+  f.readArray(p, pos, value);
+}
+
+template <typename T> static void hdf5file_replace_array(db::HDF5File& f, const std::string& p, size_t pos, const T& value) {
+  f.replaceArray(p, pos, value);
 }
 
 void bind_database_hdf5() {
@@ -158,6 +170,8 @@ void bind_database_hdf5() {
   class_<db::HDF5File, boost::shared_ptr<db::HDF5File>, boost::noncopyable>("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard Torch binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
     .def("__init__", make_constructor(hdf5file_make_fromstr, default_call_policies(), (arg("filename"), arg("openmode_string"))), "Opens a new file in one of these supported modes: 'r' (read-only), 'w' (read/write/append), 't' (read/write/truncate) or 'x' (read/write/exclusive)")
     .def("__init__", make_constructor(hdf5file_make_readwrite, default_call_policies(), (arg("filename"))), "Opens a new HDF5File for reading and writing.")
+    .def("cd", &db::HDF5File::cd, (arg("self"), arg("path")), "Changes the current prefix path. When this object is started, the prefix path is empty, which means all following paths to data objects should be given using the full path. If you set this to a different value, it will be used as a prefix to any subsequent operation until you reset it. If path starts with '/', it is treated as an absolute path. '..' and '.' are supported. This object should be a std::string. If the value is relative, it is added to the current path. If it is absolute, it causes the prefix to be reset. Note all operations taking a relative path, following a cd(), will be considered relative to the value defined by the 'cwd' property of this object.")
+    .add_property("cwd", make_function(&db::HDF5File::cwd, return_value_policy<copy_const_reference>()), &db::HDF5File::cd)
     .def("__contains__", &db::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
     .def("has_key", &db::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
     .def("describe", &db::HDF5File::describe, return_value_policy<copy_const_reference>(), (arg("self"), arg("key")), "If a given path to an HDF5 dataset exists inside the file, return a type description of objects recorded in such a dataset, otherwise, raises an exception.")
@@ -169,7 +183,7 @@ void bind_database_hdf5() {
     .def("copy", &db::HDF5File::copy, (arg("self"), arg("file")), "Copies all accessible content to another HDF5 file")
 #   define DECLARE_SUPPORT(T,E) \
     .def(BOOST_PP_STRINGIZE(__read_ ## E ## __), &hdf5file_read_scalar<T>, (arg("self"), arg("key"), arg("pos")), "Reads a given scalar from a dataset") \
-    .def(BOOST_PP_STRINGIZE(__replace_ ## E ## __), &db::HDF5File::replace<T>, (arg("self"), arg("key"), arg("pos"), arg("value")), "Modifies the value of a scalar inside the file.") \
+    .def(BOOST_PP_STRINGIZE(__replace_ ## E ## __), &hdf5file_replace_scalar<T>, (arg("self"), arg("key"), arg("pos"), arg("value")), "Modifies the value of a scalar inside the file.") \
     .def(BOOST_PP_STRINGIZE(__append_ ## E ## __), &db::HDF5File::append<T>, (arg("self"), arg("key"), arg("value")), "Appends a scalar to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") 
     DECLARE_SUPPORT(bool, bool)
     DECLARE_SUPPORT(int8_t, int8)
@@ -188,8 +202,8 @@ void bind_database_hdf5() {
     //DECLARE_SUPPORT(std::complex<long double>, complex256)
     DECLARE_SUPPORT(std::string, string)
 #   undef DECLARE_SUPPORT
-#   define DECLARE_SUPPORT(T,N) .def("__read_array__", &db::HDF5File::readArray<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
-    .def("__replace_array__", &db::HDF5File::replaceArray<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
+#   define DECLARE_SUPPORT(T,N) .def("__read_array__", &hdf5file_read_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
+    .def("__replace_array__", &hdf5file_replace_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
     .def("__append_array__", &db::HDF5File::appendArray<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") 
 #   define DECLARE_BZ_SUPPORT(T) \
     DECLARE_SUPPORT(T,1) \

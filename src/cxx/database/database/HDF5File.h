@@ -12,6 +12,7 @@
 #define TORCH_DATABASE_HDF5FILE_H
 
 #include <boost/ref.hpp>
+#include <boost/filesystem.hpp>
 
 #include "database/HDF5Utils.h"
 
@@ -53,22 +54,48 @@ namespace Torch { namespace database {
       virtual ~HDF5File();
 
       /**
+       * Changes the current prefix path. When this object is started, the
+       * prefix path is empty, which means all following paths to data objects
+       * should be given using the full path. If you set this to a different
+       * value, it will be used as a prefix to any subsequent operation until
+       * you reset it.
+       * 
+       * @param path If path starts with '/', it is treated as an absolute
+       * path. '..' and '.' are supported. This object should be a std::string.
+       * If the value is relative, it is added to the current path. If it is
+       * absolute, it causes the prefix to be reset.
+       *
+       * @note All operations taking a relative path, following a cd(), will be
+       * considered relative to the value returned by cwd().
+       */
+      void cd(const std::string& path);
+
+      /**
+       * Returns the current working path, fully resolved
+       */
+      const std::string& cwd() const;
+
+      /**
        * Tells if we have a variable with the given name inside the HDF5 file.
+       * If the file path given is a relative file path, it is taken w.r.t. the
+       * current working directory, as returned by cwd().
        */
       bool contains(const std::string& path) const;
 
       /**
-       * Describe a certain dataset path
+       * Describe a certain dataset path. If the file path is a relative one,
+       * it is taken w.r.t. the current working directory, as returned by
+       * cwd().
        */
       const HDF5Type& describe (const std::string& path) const;
 
       /**
-       * Unlinks a particular dataset from the file. Please note that this will
+       * Unlinks a particular dataset from the file. Note that this will
        * not erase the data on the current file as that functionality is not
        * provided by HDF5. To actually reclaim the space occupied by the
        * unlinked structure, you must re-save this file to another file. The
        * new file will not contain the data of any dangling datasets (datasets
-       * w/o names or links).
+       * w/o names or links). Relative paths are allowed.
        */
       void unlink (const std::string& path);
 
@@ -93,83 +120,133 @@ namespace Torch { namespace database {
       }
 
       /**
-       * Copies the contents of the current file to another file, already
-       * opened. This is a blind operation, so we try to copy everything from
-       * the current file to the other file. It is the user responsibility to
-       * make sure the "path" slots in the other file are not already taken.
+       * Copies the contents of the other file to this file. This is a blind
+       * operation, so we try to copy everything from the given file to the
+       * current one. It is the user responsibility to make sure the "path"
+       * slots in the other file are not already taken. If that is detected, an
+       * exception will be raised.
+       *
+       * This operation will be conducted w.r.t. the currently set prefix path
+       * (verifiable using cwd()).
        */
       void copy (HDF5File& other);
 
       /**
        * Reads data from the file into a scalar. Raises an exception if the
-       * type is incompatible.
+       * type is incompatible. Relative paths are accepted.
        */
       template <typename T> void read(const std::string& path, size_t pos, 
           T& value) {
-        if (!contains(path)) 
-          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), path);
-        m_index[path]->read(pos, value);
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) 
+          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), absolute);
+        m_index[absolute]->read(pos, value);
+      }
+
+      /**
+       * Reads data from the file into a scalar. Raises an exception if the
+       * type is incompatible. Relative paths are accepted. Calling this method
+       * is equivalent to calling read(path, 0, value).
+       */
+      template <typename T> void read(const std::string& path, T& value) {
+        read(path, 0, value);
       }
 
       /**
        * Reads data from the file into a array. Raises an exception if the type
-       * is incompatible.
+       * is incompatible. Relative paths are accepted.
        */
       template <typename T> void readArray(const std::string& path, size_t pos, 
           T& value) {
-        if (!contains(path)) 
-          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), path);
-        m_index[path]->readArray(pos, value);
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) 
+          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), absolute);
+        m_index[absolute]->readArray(pos, value);
       }
 
       /**
-       * Modifies the value of a scalar inside the file.
+       * Reads data from the file into a array. Raises an exception if the type
+       * is incompatible. Relative paths are accepted. Calling this method is
+       * equivalent to calling readArray(path, 0, value).
+       */
+      template <typename T> void readArray(const std::string& path, T& value) {
+        readArray(path, 0, value);
+      }
+
+      /**
+       * Modifies the value of a scalar inside the file. Relative paths are
+       * accepted.
        */
       template <typename T> void replace(const std::string& path, size_t pos, 
           const T& value) {
-        if (!contains(path)) 
-          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), path);
-        m_index[path]->replace(pos, value);
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) 
+          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), absolute);
+        m_index[absolute]->replace(pos, value);
       }
 
       /**
-       * Modifies the value of a array inside the file.
+       * Modifies the value of a scalar inside the file. Relative paths are
+       * accepted. Calling this method is equivalent to calling replace(path,
+       * 0, value).
+       */
+      template <typename T> void replace(const std::string& path, 
+          const T& value) {
+        replace(path, 0, value);
+      }
+
+      /**
+       * Modifies the value of a array inside the file. Relative paths are
+       * accepted.
        */
       template <typename T> void replaceArray(const std::string& path,
           size_t pos, const T& value) {
-        if (!contains(path)) 
-          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), path);
-        m_index[path]->replaceArray(pos, value);
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) 
+          throw Torch::database::HDF5InvalidPath(m_file->m_path.string(), absolute);
+        m_index[absolute]->replaceArray(pos, value);
+      }
+
+      /**
+       * Modifies the value of a array inside the file. Relative paths are
+       * accepted. Calling this method is equivalent to calling
+       * replaceArray(path, 0, value).
+       */
+      template <typename T> void replaceArray(const std::string& path,
+          const T& value) {
+        replaceArray(path, 0, value);
       }
 
       /**
        * Appends a scalar in a dataset. If the dataset does not yet exist, one
-       * is created with the type characteristics.
+       * is created with the type characteristics. Relative paths are accepted.
        */
       template <typename T> void append(const std::string& path,
           const T& value) {
-        if (!contains(path)) { //create dataset
-          m_index[path] =
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) { //create dataset
+          m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              path, Torch::database::HDF5Type(value));
+              absolute, Torch::database::HDF5Type(value));
         }
-        m_index[path]->add(value);
+        m_index[absolute]->add(value);
       }
 
       /**
        * Appends a array in a dataset. If the dataset does not yet exist, one
-       * is created with the type characteristics.
+       * is created with the type characteristics. Relative paths are accepted.
        */
       template <typename T> void appendArray(const std::string& path,
           const T& value) {
-        if (!contains(path)) { //create dataset
-          m_index[path] =
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) { //create dataset
+          m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              path, Torch::database::HDF5Type(value));
+              absolute, Torch::database::HDF5Type(value));
         }
-        m_index[path]->addArray(value);
+        m_index[absolute]->addArray(value);
       }
-
+      
     private: //not implemented
 
       /**
@@ -182,10 +259,19 @@ namespace Torch { namespace database {
        */
       HDF5File& operator= (const HDF5File& other);
 
+    private: //helpers
+
+      /**
+       * Resolves the given path in light of the current prefix set
+       * (potentially set with cd()).
+       */
+      std::string resolve(const std::string& path) const;
+
     private: //representation
 
       boost::shared_ptr<detail::hdf5::File> m_file; ///< the opened HDF5 file
       std::map<std::string, boost::shared_ptr<detail::hdf5::Dataset> > m_index; ///< index of datasets currently available on that file
+      boost::filesystem::path m_cwd; ///< my current working directory
 
   };
 

@@ -8,6 +8,7 @@
 #include "database/HDF5File.h"
 
 namespace db = Torch::database;
+namespace fs = boost::filesystem;
 
 static unsigned int getH5Access (db::HDF5File::mode_t v) {
   switch(v)
@@ -23,40 +24,89 @@ static unsigned int getH5Access (db::HDF5File::mode_t v) {
 
 db::HDF5File::HDF5File(const std::string& filename, mode_t mode):
   m_file(new db::detail::hdf5::File(filename, getH5Access(mode))),
-  m_index()
+  m_index(),
+  m_cwd("/") ///< we start by looking at the root directory
 {
   //makes sure we will shut-up the HDF5 automatic logging before we start
-  db::detail::hdf5::index(m_file, m_index);   
+  db::detail::hdf5::index(m_file, m_index);
 }
 
 db::HDF5File::~HDF5File() {
 }
 
+void db::HDF5File::cd(const std::string& path) {
+  m_cwd = resolve(path);
+}
+
+const std::string& db::HDF5File::cwd() const {
+  return m_cwd.string();
+}
+
+static fs::path trim_one(const fs::path& p) {
+  if (p == p.root_path()) return p;
+  fs::path retval;
+  for (fs::path::iterator it = p.begin(); it!=p.end(); ++it) {
+    fs::path::iterator next = it;
+    ++next; //< for the lack of better support in boost::filesystem V2
+    if (next == p.end()) break; //< == skip the last bit
+    retval /= *it;
+  }
+  return retval;
+}
+
+std::string db::HDF5File::resolve(const std::string& path) const {
+  //the path to be solved is what the user inputs, unless (s)he inputs a
+  //relative path, in which case we complete from him/her.
+  fs::path completed(path);
+  if (! completed.is_complete()) completed = fs::complete(completed, m_cwd);
+
+  //now we prune the path to make sure we don't have relative bits inside, like
+  //'..' or '.'
+  fs::path retval;
+  for (fs::path::iterator it = completed.begin(); it != completed.end(); ++it) {
+    if (*it == "..") {
+      retval = trim_one(retval);
+      continue;
+    }
+    if (*it == ".") { //ignore '.'
+      continue;
+    }
+    retval /= *it;
+  }
+  return retval.string();
+}
+
 bool db::HDF5File::contains (const std::string& path) const {
-  return m_index.find(path) != m_index.end();
+  return m_index.find(resolve(path)) != m_index.end();
 }
 
 const db::HDF5Type& db::HDF5File::describe (const std::string& path) const {
-  if (!contains(path)) throw db::HDF5InvalidPath(m_file->m_path.string(), path);
-  return m_index.find(path)->second->m_type;
+  std::string absolute = resolve(path);
+  if (!contains(path)) throw db::HDF5InvalidPath(m_file->m_path.string(), absolute);
+  return m_index.find(absolute)->second->m_type;
 }
 
 void db::HDF5File::unlink (const std::string& path) {
-  if (!contains(path)) throw db::HDF5InvalidPath(m_file->m_path.string(), path);
-  m_file->unlink(path);
-  m_index.erase(path);
+  std::string absolute = resolve(path);
+  if (!contains(path)) throw db::HDF5InvalidPath(m_file->m_path.string(), absolute);
+  m_file->unlink(absolute);
+  m_index.erase(absolute);
 }
 
 void db::HDF5File::rename (const std::string& from, const std::string& to) {
-  if (!contains(from)) throw db::HDF5InvalidPath(m_file->m_path.string(), from);
-  m_file->rename(from, to);
-  m_index[to] = m_index[from];
-  m_index.erase(from);
+  std::string absfrom = resolve(from);
+  std::string absto = resolve(to);
+  if (!contains(absfrom)) 
+    throw db::HDF5InvalidPath(m_file->m_path.string(), absfrom);
+  m_file->rename(absfrom, absto);
+  m_index[absto] = m_index[absfrom];
+  m_index.erase(absfrom);
 }
 
 size_t db::HDF5File::size (const std::string& path) const {
-  if (!contains(path)) throw db::HDF5InvalidPath(m_file->m_path.string(), path);
-  return m_index.find(path)->second->size();
+  std::string absolute = resolve(path);
+  if (!contains(absolute)) throw db::HDF5InvalidPath(m_file->m_path.string(), absolute);
+  return m_index.find(absolute)->second->size();
 }
       
 void db::HDF5File::copy (HDF5File& other) {

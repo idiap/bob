@@ -1,7 +1,5 @@
 #include "machine/GMMMachine.h"
 #include <core/logging.h>
-#include <database/Array.h>
-#include <database/Arrayset.h>
 #include <machine/Exception.h>
 
 using namespace Torch::machine::Log;
@@ -14,7 +12,7 @@ Torch::machine::GMMMachine::GMMMachine(int n_gaussians, int n_inputs) : m_gaussi
   resize(n_gaussians,n_inputs);
 }
 
-Torch::machine::GMMMachine::GMMMachine(Torch::config::Configuration& config) : m_gaussians(NULL) {
+Torch::machine::GMMMachine::GMMMachine(Torch::database::HDF5File& config) : m_gaussians(NULL) {
   load(config);
 }
 
@@ -272,9 +270,9 @@ int Torch::machine::GMMMachine::getNGaussians() const {
   return m_n_gaussians;
 }
 
-void Torch::machine::GMMMachine::save(Torch::config::Configuration& config) const {
-  config.set("m_n_gaussians", m_n_gaussians);
-  config.set("m_n_inputs", m_n_inputs);
+void Torch::machine::GMMMachine::save(Torch::database::HDF5File& config) const {
+  config.append("m_n_gaussians", m_n_gaussians);
+  config.append("m_n_inputs", m_n_inputs);
 
   for(int i = 0; i < m_n_gaussians; i++) {
     std::ostringstream oss;
@@ -285,13 +283,12 @@ void Torch::machine::GMMMachine::save(Torch::config::Configuration& config) cons
     config.cd("..");
   }
 
-  Torch::database::Array m_weightsArray(m_weights);
-  config.set("m_weights", m_weightsArray);
+  config.appendArray("m_weights", m_weights);
 }
 
-void Torch::machine::GMMMachine::load(Torch::config::Configuration& config) {
-  m_n_gaussians = (int)config.get<std::vector<int64_t> >("m_n_gaussians").at(0);
-  m_n_inputs    = (int)config.get<std::vector<int64_t> >("m_n_inputs").at(0);
+void Torch::machine::GMMMachine::load(Torch::database::HDF5File& config) {
+  config.read("m_n_gaussians", m_n_gaussians);
+  config.read("m_n_inputs", m_n_inputs);
   
   if (m_gaussians != NULL) {
     delete [] m_gaussians;
@@ -302,14 +299,13 @@ void Torch::machine::GMMMachine::load(Torch::config::Configuration& config) {
   for(int i = 0; i < m_n_gaussians; i++) {
     std::ostringstream oss;
     oss << "m_gaussians" << i;
-
     config.cd(oss.str());
     m_gaussians[i].load(config);
     config.cd("..");
   }
 
   m_weights.resize(m_n_gaussians);
-  m_weights = config.get<Torch::database::Arrayset>("m_weights").get<double, 1>(1);
+  config.readArray("m_weights", m_weights);
 }
 
 namespace Torch {

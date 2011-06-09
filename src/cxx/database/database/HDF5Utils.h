@@ -150,6 +150,14 @@ namespace Torch { namespace database { namespace detail { namespace hdf5 {
       }
 
       /**
+       * Reads data from the file into a scalar. This is equivalent to using
+       * read(0, value).
+       */
+      template <typename T> void read(T& value) {
+        return read(0, value);
+      }
+
+      /**
        * Reads data from the file into a array.
        *
        * @param index Which of the arrays to read in the current dataset, by
@@ -173,6 +181,21 @@ namespace Torch { namespace database { namespace detail { namespace hdf5 {
         }
 
       /**
+       * Reads data from the file into a array. This is equivalent to using
+       * readArray(0, value).
+       *
+       * @param index Which of the arrays to read in the current dataset, by
+       * order
+       * @param value The output array data will be stored inside this
+       * variable. This variable has to be a zero-based C-style contiguous
+       * storage array. If that is not the case, we will raise an exception.
+       */
+      template <typename T, int N> 
+        void readArray(blitz::Array<T,N>& value) {
+          readArray(0, value);
+        }
+
+      /**
        * DATA WRITING FUNCTIONALITY
        */
 
@@ -188,6 +211,14 @@ namespace Torch { namespace database { namespace detail { namespace hdf5 {
               m_path, m_type.str(), Torch::database::HDF5Type(value).str());
         select(index);
         write(reinterpret_cast<const void*>(&value));
+      }
+
+      /**
+       * Modifies the value of a scalar inside the file. This is equivalent to
+       * using replace(0, value).
+       */
+      template <typename T> void replace(const T& value) {
+        replace(0, value);
       }
 
       /**
@@ -207,7 +238,7 @@ namespace Torch { namespace database { namespace detail { namespace hdf5 {
       }
 
       /**
-       * Reads data from the file into a array.
+       * Replaces data at the file using a new array.
        *
        * @param index Which of the arrays to read in the current dataset, by
        * order
@@ -227,6 +258,19 @@ namespace Torch { namespace database { namespace detail { namespace hdf5 {
           Torch::core::array::assertCZeroBaseContiguous(value);
           select(index);
           write(reinterpret_cast<const void*>(value.data()));
+        }
+
+      /**
+       * Replaces data at the file using a new array. This is equivalent to
+       * calling replaceArray(0, value). 
+       *
+       * @param value The output array data will be stored inside this
+       * variable. This variable has to be a zero-based C-style contiguous
+       * storage array. If that is not the case, we will raise an exception.
+       */
+      template <typename T, int N> 
+        void replaceArray(const blitz::Array<T,N>& value) {
+          replaceArray(0, value);
         }
 
       /**
