@@ -163,50 +163,32 @@ void bind_machine_base() {
         "2) the proportion of the samples represented by that subset (the cluster weight)")
   ;
   
-<<<<<<< Updated upstream
-  class_<Gaussian>("Gaussian",
-                   "This class implements a multivariate diagonal Gaussian distribution",
+  class_<mach::Gaussian>("mach::Gaussian",
+                   "This class implements a multivariate diagonal mach::Gaussian distribution",
                    init<>())
   .def(init<int>(args("n_inputs")))
-  .def(init<Gaussian&>(args("other")))
+  .def(init<mach::Gaussian&>(args("other")))
   .def(init<Torch::database::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
-                &Gaussian::getNInputs,
-                &Gaussian::setNInputs,
+                &mach::Gaussian::getNInputs,
+                &mach::Gaussian::setNInputs,
                 "Input dimensionality")
   .add_property("mean",
-                &Gaussian_getMean,
-                &Gaussian::setMean,
-                "Mean of the Gaussian")
+                &mach::Gaussian_getMean,
+                &mach::Gaussian::setMean,
+                "Mean of the mach::Gaussian")
   .add_property("variance",
-                &Gaussian_getVariance,
-                &Gaussian::setVariance,
+                &mach::Gaussian_getVariance,
+                &mach::Gaussian::setVariance,
                 "The diagonal of the covariance matrix")
   .add_property("varianceThresholds",
-                &Gaussian_getVarianceThresholds,
-                (void (Gaussian::*)(const blitz::Array<double,1>&)) &Gaussian::setVarianceThresholds,
+                &mach::Gaussian_getVarianceThresholds,
+                (void (mach::Gaussian::*)(const blitz::Array<double,1>&)) &mach::Gaussian::setVarianceThresholds,
                 "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
                 "The variance will be set to this value if an attempt is made to set it to a smaller value.")
   .def("setVarianceThresholds",
-       (void (Gaussian::*)(double))&Gaussian::setVarianceThresholds,
-=======
-  class_<mach::Gaussian, bases<mach::Machine<blitz::Array<double,1>, double> > >("Gaussian",
-      "This class implements a multivariate diagonal Gaussian distribution",
-      init<>())
-    .def(init<int>((arg("n_inputs"))))
-    .def(init<mach::Gaussian&>((arg("other"))))
-    .def(init<Torch::config::Configuration&>(args("config")))
-    .def(self == self)
-    .add_property("nInputs", &mach::Gaussian::getNInputs, &mach::Gaussian::setNInputs, "Input dimensionality")
-    .add_property("mean", &mach_Gaussian_getMean, &mach::Gaussian::setMean, "Mean of the Gaussian")
-    .add_property("variance", &mach_Gaussian_getVariance, &mach::Gaussian::setVariance, "The diagonal of the covariance matrix")
-    .add_property("varianceThresholds", &mach_Gaussian_getVarianceThresholds,
-      (void (mach::Gaussian::*)(const blitz::Array<double,1>&)) &mach::Gaussian::setVarianceThresholds,
-      "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
-      "The variance will be set to this value if an attempt is made to set it to a smaller value.")
-    .def("setVarianceThresholds", (void (mach::Gaussian::*)(double))&mach::Gaussian::setVarianceThresholds,
->>>>>>> Stashed changes
+       (void (mach::Gaussian::*)(double))&mach::Gaussian::setVarianceThresholds,
        "Set the variance flooring thresholds")
     .def("resize", &mach::Gaussian::resize, "Set the input dimensionality, reset the mean to zero and the variance to one.")
     .def("logLikelihood", &mach::Gaussian::logLikelihood, "Output the log likelihood of the sample, x")
@@ -214,9 +196,8 @@ void bind_machine_base() {
     .def("load", &mach::Gaussian::load, "Load from a Configuration")
     .def(self_ns::str(self_ns::self))
   ;
-<<<<<<< Updated upstream
 
-  class_<GMMStats>("GMMStats",
+  class_<mach::GMMStats>("mach::GMMStats",
                    "A container for GMM statistics.\n"
                    "With respect to Reynolds, \"Speaker Verification Using Adapted "
                    "Gaussian Mixture Models\", DSP, 2000:\n"
@@ -227,184 +208,107 @@ void bind_machine_base() {
   .def(init<int, int>(args("n_gaussians","n_inputs")))
   .def(init<Torch::database::HDF5File&>(args("config")))
   .def_readwrite("log_likelihood",
-                 &GMMStats::log_likelihood,
+                 &mach::GMMStats::log_likelihood,
                  "The accumulated log likelihood of all samples")
   .def_readwrite("T",
-                 &GMMStats::T,
+                 &mach::GMMStats::T,
                  "The accumulated number of samples")
   .def_readwrite("n",
-                 &GMMStats::n,
+                 &mach::GMMStats::n,
                  "For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)")
   .def_readwrite("sumPx",
-                 &GMMStats::sumPx,
+                 &mach::GMMStats::sumPx,
                  "For each Gaussian, the accumulated sum of responsibility times the sample ")
   .def_readwrite("sumPxx",
-                 &GMMStats::sumPxx,
+                 &mach::GMMStats::sumPxx,
                  "For each Gaussian, the accumulated sum of responsibility times the sample squared")
   .def("resize",
-       &GMMStats::resize, args("n_gaussians", "n_inputs"),
+       &mach::GMMStats::resize, args("n_gaussians", "n_inputs"),
        " Allocates space for the statistics and resets to zero.")
   .def("init",
-       &GMMStats::init,
+       &mach::GMMStats::init,
        "Resets statistics to zero.")
   .def("save",
-       &GMMStats::save,
+       &mach::GMMStats::save,
        " Save to a Configuration")
   .def("load",
-       &GMMStats::load,
+       &mach::GMMStats::load,
        "Load from a Configuration")
   .def(self_ns::str(self_ns::self))
   ;
   
-  class_<GMMMachine, bases<Machine<FrameSample, double> > >("GMMMachine",
+  class_<mach::GMMMachine, bases<Machine<FrameSample, double> > >("mach::GMMMachine",
                                                             "This class implements a multivariate diagonal Gaussian distribution.\n"
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                             init<int, int>(args("n_gaussians", "n_inputs")))
-  .def(init<GMMMachine&>())
+  .def(init<mach::GMMMachine&>())
   .def(init<Torch::database::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
-                &GMMMachine::getNInputs,
-                &GMMMachine::setNInputs,
+                &mach::GMMMachine::getNInputs,
+                &mach::GMMMachine::setNInputs,
                 "The feature dimensionality")
   .add_property("weights",
-                &GMMMachine_getWeights,
-                &GMMMachine::setWeights,
+                &mach::GMMMachine_getWeights,
+                &mach::GMMMachine::setWeights,
                 "The weights (also known as \"mixing coefficients\")")
   .add_property("means",
-                &GMMMachine_getMeans,
-                &GMMMachine::setMeans,
+                &mach::GMMMachine_getMeans,
+                &mach::GMMMachine::setMeans,
                 "The means of the gaussians")
   .add_property("variances",
-                &GMMMachine_getVariances,
-                &GMMMachine::setVariances,
+                &mach::GMMMachine_getVariances,
+                &mach::GMMMachine::setVariances,
                 "The variances")
   .add_property("varianceThresholds",
-                &GMMMachine_getVarianceThresholds,
-                (void (GMMMachine::*)(const blitz::Array<double,2>&))&GMMMachine::setVarianceThresholds,
+                &mach::GMMMachine_getVarianceThresholds,
+                (void (mach::GMMMachine::*)(const blitz::Array<double,2>&))&mach::GMMMachine::setVarianceThresholds,
                 "The variance flooring thresholds for each Gaussian in each dimension")
   .def("resize",
-       &GMMMachine::resize,
+       &mach::GMMMachine::resize,
        args("n_gaussians", "n_inputs"),
        "Reset the input dimensionality, and the number of Gaussian components.\n"
        "Initialises the weights to uniform distribution.")
   .def("setVarianceThresholds",
-       (void (GMMMachine::*)(double))&GMMMachine::setVarianceThresholds,
+       (void (mach::GMMMachine::*)(double))&mach::GMMMachine::setVarianceThresholds,
        args("factor"),
        "Set the variance flooring thresholds in each dimension "
        "to a proportion of the current variance, for each Gaussian")
   .def("setVarianceThresholds",
-       (void (GMMMachine::*)(blitz::Array<double,1>))&GMMMachine::setVarianceThresholds,
+       (void (mach::GMMMachine::*)(blitz::Array<double,1>))&mach::GMMMachine::setVarianceThresholds,
        args("variance_thresholds"),
        "Set the variance flooring thresholds in each dimension "
        "(equal for all Gaussian components)")
   .def("logLikelihood",
-       (double (GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&GMMMachine::logLikelihood,
+       (double (mach::GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
        args("x", "log_weighted_gaussian_likelihoods"),
-       "Output the log likelihood of the sample, x, i.e. log(p(x|GMMMachine))")
+       "Output the log likelihood of the sample, x, i.e. log(p(x|mach::GMMMachine))")
   .def("logLikelihood",
-       (double (GMMMachine::*)(const blitz::Array<double,1>&) const)&GMMMachine::logLikelihood,
+       (double (mach::GMMMachine::*)(const blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
        args("x"),
        " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
   .def("accStatistics",
-       (void (GMMMachine::*)(const Torch::trainer::Sampler<FrameSample>&, GMMStats&) const)&GMMMachine::accStatistics,
+       (void (mach::GMMMachine::*)(const Torch::trainer::Sampler<FrameSample>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
        args("sampler", "stats"),
        "Accumulates the GMM statistics over a set of samples.")
   .def("accStatistics",
-       (void (GMMMachine::*)(const blitz::Array<double,1>&, GMMStats&) const)&GMMMachine::accStatistics,
+       (void (mach::GMMMachine::*)(const blitz::Array<double,1>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
        args("x", "stats"),
        "Accumulate the GMM statistics for this sample.")
   .def("getGaussian",
-       &GMMMachine::getGaussian, return_value_policy<reference_existing_object>(),
+       &mach::GMMMachine::getGaussian, return_value_policy<reference_existing_object>(),
        args("i"),
        "Get a pointer to a particular Gaussian component")
   .def("getNGaussians",
-       &GMMMachine::getNGaussians,
+       &mach::GMMMachine::getNGaussians,
        "Return the number of Gaussian components")
   .def("load",
-       &GMMMachine::load,
+       &mach::GMMMachine::load,
        "Load from a Configuration")
   .def("save",
-       &GMMMachine::save,
+       &mach::GMMMachine::save,
        "Save to a Configuration")
   .def(self_ns::str(self_ns::self))
-=======
-  
-  class_<mach::GMMStats>("GMMStats",
-      "A container for GMM statistics.\n"
-      "With respect to Reynolds, \"Speaker Verification Using Adapted "
-      "Gaussian Mixture Models\", DSP, 2000:\n"
-      "Eq (8) is n(i)\n"
-      "Eq (9) is sumPx(i) / n(i)\n"
-      "Eq (10) is sumPxx(i) / n(i)\n",
-      init<>())
-    .def(init<int, int>((arg("n_gaussians"),arg("n_inputs"))))
-    .def(init<Torch::config::Configuration&>((arg("config"))))
-    .def_readwrite("log_likelihood", &mach::GMMStats::log_likelihood, "The accumulated log likelihood of all samples")
-    .def_readwrite("T", &mach::GMMStats::T, "The accumulated number of samples")
-    .def_readwrite("n", &mach::GMMStats::n, "For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)")
-    .def_readwrite("sumPx", &mach::GMMStats::sumPx, "For each Gaussian, the accumulated sum of responsibility times the sample ")
-    .def_readwrite("sumPxx", &mach::GMMStats::sumPxx, "For each Gaussian, the accumulated sum of responsibility times the sample squared")
-    .def("resize", &mach::GMMStats::resize, (arg("n_gaussians"), arg("n_inputs")), " Allocates space for the statistics and resets to zero.")
-    .def("init", &mach::GMMStats::init, "Resets statistics to zero.")
-    .def("save", &mach::GMMStats::save, "Save to a Configuration")
-    .def("load", &mach::GMMStats::load, "Load from a Configuration")
-    .def(self_ns::str(self_ns::self))
-  ;
-  
-  class_<mach::GMMMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
-      "This class implements a multivariate diagonal Gaussian distribution.\n"
-      "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<int, int>((arg("n_gaussians"), arg("n_inputs"))))
-    .def(init<mach::GMMMachine&>())
-    .def(init<Torch::config::Configuration&>((arg("config"))))
-    .def(self == self)
-    .add_property("nInputs", &mach::GMMMachine::getNInputs, &mach::GMMMachine::setNInputs, "The feature dimensionality")
-    .add_property("weights", &mach_GMMMachine_getWeights, &mach::GMMMachine::setWeights,
-      "The weights (also known as \"mixing coefficients\")")
-    .add_property("means", &mach_GMMMachine_getMeans, &mach::GMMMachine::setMeans, "The means of the gaussians")
-    .add_property("variances", &mach_GMMMachine_getVariances, &mach::GMMMachine::setVariances, "The variances")
-    .add_property("varianceThresholds", &mach_GMMMachine_getVarianceThresholds,
-      (void (mach::GMMMachine::*)(const blitz::Array<double,2>&))&mach::GMMMachine::setVarianceThresholds,
-      "The variance flooring thresholds for each Gaussian in each dimension")
-    .def("resize", &mach::GMMMachine::resize, (arg("n_gaussians"), arg("n_inputs")),
-      "Reset the input dimensionality, and the number of Gaussian components.\n"
-      "Initialises the weights to uniform distribution.")
-    .def("setVarianceThresholds", 
-      (void (mach::GMMMachine::*)(double))&mach::GMMMachine::setVarianceThresholds,
-      (arg("factor")),
-      "Set the variance flooring thresholds in each dimension "
-      "to a proportion of the current variance, for each Gaussian")
-    .def("setVarianceThresholds",
-      (void (mach::GMMMachine::*)(blitz::Array<double,1>))&mach::GMMMachine::setVarianceThresholds,
-      (arg("variance_thresholds")),
-      "Set the variance flooring thresholds in each dimension "
-      "(equal for all Gaussian components)")
-    .def("logLikelihood",
-      (double (mach::GMMMachine::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
-      (arg("x"), arg("log_weighted_gaussian_likelihoods")),
-      "Output the log likelihood of the sample, x, i.e. log(p(x|GMMMachine))")
-    .def("logLikelihood",
-      (double (mach::GMMMachine::*)(const blitz::Array<double,1>&) const)&mach::GMMMachine::logLikelihood,
-      (arg("x")),
-      " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
-    .def("accStatistics",
-      (void (mach::GMMMachine::*)(const db::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
-      (arg("sampler"), arg("stats")),
-      "Accumulates the GMM statistics over a set of samples.")
-    .def("accStatistics",
-      (void (mach::GMMMachine::*)(const blitz::Array<double,1>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
-      (arg("x"), arg("stats")),
-      "Accumulate the GMM statistics for this sample.")
-    .def("getGaussian",
-      &mach::GMMMachine::getGaussian, return_value_policy<reference_existing_object>(),
-      (arg("i")),
-      "Get a pointer to a particular Gaussian component")
-    .def("getNGaussians", &mach::GMMMachine::getNGaussians, "Return the number of Gaussian components")
-    .def("load", &mach::GMMMachine::load, "Load from a Configuration")
-    .def("save", &mach::GMMMachine::save, "Save to a Configuration")
-    .def(self_ns::str(self_ns::self))
->>>>>>> Stashed changes
   ;
 
 }
