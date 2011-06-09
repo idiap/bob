@@ -6,6 +6,7 @@ set(pysrc
    "src/exception.cc"
    "src/linear.cc"
    "src/linsolve.cc"
+   "src/lu_det.cc"
    "src/norminv.cc"
    "src/svd.cc"
    "src/main.cc"
