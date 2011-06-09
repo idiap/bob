@@ -38,8 +38,10 @@ def flipRows(array):
   else:
     raise Exception('Input type not supportd by flipRows')
 
-class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
+
+#class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
   """Simple example of python sampler: get samples from an Arrayset"""
+"""
   def __init__(self,path):
     torch.trainer.Sampler_FrameSample_.__init__(self)
     self.arrayset = torch.database.Arrayset(path)
@@ -54,13 +56,15 @@ class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
   
   def getNSamples(self):
     return len(self.arrayset)
+"""
 
-
-class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
-  """
+#class NormalizeStdArrayset(torch.trainer.Sampler_FrameSample_):
+"""
   Sampler that opens an array set from a file and normalizes the standard deviation
   of the array set to 1
-  """
+"""
+
+"""
   def __init__(self, path):
     torch.trainer.Sampler_FrameSample_.__init__(self)
     self.arrayset = torch.database.Arrayset(path)
@@ -90,17 +94,61 @@ class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
   
   def getNSamples(self):
     return len(self.arrayset)
+"""
 
-class MyTrainer(torch.trainer.Trainer_KMeansMachine_FrameSample_):
+def NormalizeStdArrayset(path):
+  arrayset = torch.database.Arrayset(path)
+  arrayset.load()
+
+  length = arrayset.shape[0]
+  n_samples = len(arrayset)
+  mean = torch.core.array.float64_1(length)
+  std = torch.core.array.float64_1(length)
+
+  mean.fill(0)
+  std.fill(0)
+
+  
+  for i in range(0, n_samples):
+    x = arrayset[i+1].get().cast('float64')
+    mean += x
+    std += (x ** 2)
+
+  mean /= n_samples
+  std /= n_samples
+  std -= (mean ** 2)
+  std = std ** 0.5 # sqrt(std)
+
+  arStd = torch.database.Arrayset()
+  for i in range(0, n_samples):
+    x = arrayset[i+1].get().cast('float64')
+    arStd.append(x / std)
+
+  return (arStd,std)
+
+
+class MyTrainer1(torch.trainer.KMeansTrainer):
   """Simple example of python trainer: """
   def __init__(self):
-    torch.trainer.Trainer_KMeansMachine_FrameSample_.__init__(self)
+    torch.trainer.KMeansTrainer.__init__(self)
   
   def train(self, machine, data):
     a = torch.core.array.float64_2(2, 2)
-    a[0, :] = data.getSample(0).getFrame().cast('float64')
-    a[1, :] = data.getSample(1).getFrame().cast('float64')
+    a[0, :] = data[1].get()
+    a[1, :] = data[2].get()
     machine.means = a
+
+
+class MyTrainer2(torch.trainer.overload.KMeansTrainer):
+  """Simple example of python trainer: """
+  def __init__(self):
+    torch.trainer.overload.KMeansTrainer.__init__(self)
+ 
+  def initialization(self, machine, data):
+    print "Called by C++ method train()"
+    torch.trainer.overload.KMeansTrainer.initialization(self, machine, data)
+    print "Leaving initialization(), back into C++"
+
 
 class TrainerTest(unittest.TestCase):
   """Performs various trainer tests."""
@@ -111,14 +159,15 @@ class TrainerTest(unittest.TestCase):
     # This files contains draws from two 1D Gaussian distributions:
     #   * 100 samples from N(-10,1)
     #   * 100 samples from N(10,1)
-    sampler = MyFrameSampler("data/samplesFrom2G.hdf5")
+    #sampler = MyFrameSampler("data/samplesFrom2G.hdf5")
+    data = torch.database.Arrayset("data/samplesFrom2G_f64.hdf5")
 
     machine = torch.machine.KMeansMachine(2, 1)
 
     trainer = torch.trainer.KMeansTrainer()
-    trainer.train(machine, sampler)
+    trainer.train(machine, data)
 
-    [variances, weights] = machine.getVariancesAndWeightsForEachCluster(sampler)
+    [variances, weights] = machine.getVariancesAndWeightsForEachCluster(data)
     m1 = machine.getMean(0)
     m2 = machine.getMean(1)
 
@@ -134,20 +183,21 @@ class TrainerTest(unittest.TestCase):
   def test01_kmeans(self):
     """Train a KMeansMachine"""
 
-    sampler = NormalizeStdFrameSampler("data/faithful.torch3.hdf5")
+    #sampler = NormalizeStdFrameSampler("data/faithful.torch3.hdf5")
+    (arStd,std) = NormalizeStdArrayset("data/faithful.torch3.hdf5")
 
     machine = torch.machine.KMeansMachine(2, 2)
 
     trainer = torch.trainer.KMeansTrainer()
     #trainer.seed = 1337
-    trainer.train(machine, sampler)
+    trainer.train(machine, arStd)
 
 
-    [variances, weights] = machine.getVariancesAndWeightsForEachCluster(sampler)
+    [variances, weights] = machine.getVariancesAndWeightsForEachCluster(arStd)
     means = machine.means
 
-    multiplyVectorsByFactors(means, sampler.std)
-    multiplyVectorsByFactors(variances, sampler.std ** 2)
+    multiplyVectorsByFactors(means, std)
+    multiplyVectorsByFactors(variances, std ** 2)
 
     gmmWeights = torch.core.array.load('data/gmm.init_weights.hdf5')
     gmmMeans = torch.core.array.load('data/gmm.init_means.hdf5')
@@ -165,12 +215,12 @@ class TrainerTest(unittest.TestCase):
   def test02_gmm_ML(self):
     """Train a GMMMachine with ML_GMMTrainer"""
     
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
+    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
     
     gmm = loadGMM()
 
     ml_gmmtrainer = torch.trainer.ML_GMMTrainer(True, True, True)
-    ml_gmmtrainer.train(gmm, sampler)
+    ml_gmmtrainer.train(gmm, ar)
 
     #config = torch.database.HDF5File("data/gmm_ML.hdf5")
     #gmm.save(config)
@@ -183,14 +233,14 @@ class TrainerTest(unittest.TestCase):
   def test03_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer"""
     
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
+    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
     
     gmm = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
     gmmprior = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
     
     map_gmmtrainer = torch.trainer.MAP_GMMTrainer(16)
     map_gmmtrainer.setPriorGMM(gmmprior)
-    map_gmmtrainer.train(gmm, sampler)
+    map_gmmtrainer.train(gmm, ar)
 
     #config = torch.database.HDF5File("data/gmm_MAP.hdf5")
     #gmm.save(config)
@@ -200,9 +250,9 @@ class TrainerTest(unittest.TestCase):
 
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
-  def test04_custom_samplers(self):
+  #def test04_custom_samplers(self):
     """Custom python sampler"""
-    
+  """  
     sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
     mysampler = MyFrameSampler("data/faithful.torch3.hdf5")
 
@@ -210,41 +260,52 @@ class TrainerTest(unittest.TestCase):
 
     for i in range(0, sampler.getNSamples()):
       self.assertTrue((sampler.getSample(i).getFrame() == mysampler.getSample(i).getFrame()).all())
+  """
     
   def test05_custom_trainer(self):
     """Custom python trainer"""
     
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
+    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
     
-    mytrainer = MyTrainer()
+    mytrainer = MyTrainer1()
 
     machine = torch.machine.KMeansMachine(2, 2)
-    mytrainer.train(machine, sampler)
+    mytrainer.train(machine, ar)
     
     for i in range(0, 2):
-      self.assertTrue((sampler.getSample(i).getFrame().cast('float64') == machine.means[i, :]).all())
+      self.assertTrue((ar[i+1].get() == machine.means[i, :]).all())
 
-  def test06_pca(self):
+
+  def test06_custom_initialization(self):
+    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
+    
+    mytrainer = MyTrainer2()
+
+    machine = torch.machine.KMeansMachine(2, 2)
+    mytrainer.train(machine, ar)
+    
+
+  def test07_pca(self):
     # Define input samples
     s = range(0,10)
-    s[0] = torch.core.array.float32_1([2.5, 2.4],(2,))
-    s[1] = torch.core.array.float32_1([0.5, 0.7],(2,))
-    s[2] = torch.core.array.float32_1([2.2, 2.9],(2,))
-    s[3] = torch.core.array.float32_1([1.9, 2.2],(2,))
-    s[4] = torch.core.array.float32_1([3.1, 3.0],(2,))
-    s[5] = torch.core.array.float32_1([2.3, 2.7],(2,))
-    s[6] = torch.core.array.float32_1([2., 1.6],(2,))
-    s[7] = torch.core.array.float32_1([1., 1.1],(2,))
-    s[8] = torch.core.array.float32_1([1.5, 1.6],(2,))
-    s[9] = torch.core.array.float32_1([1.1, 0.9],(2,))
+    s[0] = torch.core.array.float64_1([2.5, 2.4],(2,))
+    s[1] = torch.core.array.float64_1([0.5, 0.7],(2,))
+    s[2] = torch.core.array.float64_1([2.2, 2.9],(2,))
+    s[3] = torch.core.array.float64_1([1.9, 2.2],(2,))
+    s[4] = torch.core.array.float64_1([3.1, 3.0],(2,))
+    s[5] = torch.core.array.float64_1([2.3, 2.7],(2,))
+    s[6] = torch.core.array.float64_1([2., 1.6],(2,))
+    s[7] = torch.core.array.float64_1([1., 1.1],(2,))
+    s[8] = torch.core.array.float64_1([1.5, 1.6],(2,))
+    s[9] = torch.core.array.float64_1([1.1, 0.9],(2,))
     a = torch.database.Arrayset()
     for i in range(0,10):
       a.append(s[i])
-    sampler = torch.trainer.SimpleFrameSampler(a)
+    #sampler = torch.trainer.SimpleFrameSampler(a)
 
     mymachine = torch.machine.EigenMachine()
     mytrainer = torch.trainer.SVDPCATrainer()
-    mytrainer.train(mymachine, sampler)
+    mytrainer.train(mymachine, a)
 
     print mymachine.getEigenvalues()
     print mymachine.getEigenvectors()

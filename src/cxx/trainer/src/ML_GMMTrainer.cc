@@ -8,7 +8,7 @@ Torch::trainer::ML_GMMTrainer::~ML_GMMTrainer() {
   
 }
 
-void Torch::trainer::ML_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const Sampler< Torch::machine::FrameSample >& data){
+void Torch::trainer::ML_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const Torch::database::Arrayset& data){
   // Read options and variables
   int n_gaussians = gmm.getNGaussians();
   int n_inputs = gmm.getNInputs();

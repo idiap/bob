@@ -11,6 +11,15 @@
 
 #include <boost/python.hpp>
 
+/**
+  * Raise a python exception from c++
+  */
+#define PYTHON_ERROR(TYPE, REASON) \
+{ \
+  PyErr_SetString(PyExc_##TYPE, REASON); \
+  throw boost::python::error_already_set(); \
+} 
+
 namespace Torch { namespace core { namespace python {
 
   /**

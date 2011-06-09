@@ -8,8 +8,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include "database/Arrayset.h"
+#include "core/python/exception.h"
 
 using namespace boost::python;
 namespace db = Torch::database;
@@ -63,6 +65,25 @@ static void pythonic_set (db::Arrayset& as, size_t id, T obj) {
   else as.add(id, obj);
 }
 
+/*
+bool operator==(const db::Arrayset& as1, const db::Arrayset& as2) {
+  return &as1==&as2;
+}
+*/
+
+/**
+ * This trick allows for vectors in which the contained element does not provide
+ * a operator==().
+ */
+template <class T>
+class no_compare_indexing_suite : public boost::python::vector_indexing_suite<T, false, no_compare_indexing_suite<T> >
+{
+  public:
+    static bool contains(T &container, typename T::value_type const &key) { 
+      PYTHON_ERROR(NotImplementedError, "containment checking not supported on this container"); 
+    }
+};
+
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(arrayset_save_overloads, save, 1, 2) 
 
 void bind_database_arrayset() {
@@ -89,5 +110,9 @@ void bind_database_arrayset() {
     .def("__delitem__", &db::Arrayset::remove, (arg("self"), arg("id")), "Removes the array given its id. May raise an exception if there is no such array inside.")
     .def("__setitem_array__", &pythonic_set<const db::Array>, (arg("self"), arg("id"), arg("array")), "Adds a plain array to this set. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")
     .def("__setitem_array__", &pythonic_set<boost::shared_ptr<const db::Array> >, (arg("self"), arg("id"), arg("array")), "Adds a plain array to this set. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")
+    ;
+
+  class_<std::vector<db::Arrayset> >("ArraysetVector")
+    .def(no_compare_indexing_suite<std::vector<db::Arrayset> >())
     ;
 }

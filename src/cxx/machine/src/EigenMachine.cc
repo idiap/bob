@@ -51,7 +51,7 @@ Torch::machine::EigenMachine::EigenMachine(
 }
 
 Torch::machine::EigenMachine::EigenMachine(const EigenMachine& other): 
-  Machine<FrameSample, blitz::Array<double,1> >(other) 
+  Machine<blitz::Array<double,1>, blitz::Array<double,1> >(other) 
 {
   copy(other);
 }
@@ -152,12 +152,12 @@ const blitz::Array<double,1>& Torch::machine::EigenMachine::getPreMean() const
   return m_pre_mean;
 }
 
-void Torch::machine::EigenMachine::forward(const FrameSample& input, blitz::Array<double,1>& output) const
+void Torch::machine::EigenMachine::forward(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const
 {
   const blitz::Array<double,2> mat=m_eigenvectors(blitz::Range(0,m_n_outputs-1),blitz::Range::all());
   output.resize(m_n_outputs);
   blitz::Array<double,1> input_nomean(m_pre_mean.extent(0));
-  input_nomean = input.getFrame() - m_pre_mean;
+  input_nomean = input - m_pre_mean;
   Torch::math::prod(mat, input_nomean, output);
 }
 

@@ -8,8 +8,8 @@
 #ifndef TORCH5SPRO_MACHINE_EIGENMACHINE_H
 #define TORCH5SPRO_MACHINE_EIGENMACHINE_H
 
+#include <blitz/array.h>
 #include "machine/Machine.h"
-#include "machine/FrameSample.h"
 #include "trainer/Sampler.h"
 
 namespace Torch {
@@ -24,7 +24,7 @@ namespace Torch {
     /**
       * @brief Class which implements subspace projection.
       */
-    class EigenMachine : public Machine<FrameSample, blitz::Array<double,1> > {
+    class EigenMachine : public Machine<blitz::Array<double,1>, blitz::Array<double,1> > {
       public:
         /**
          * Default constructor
@@ -79,7 +79,7 @@ namespace Torch {
 
         /// Output the projected sample, x 
         /// (overrides Machine::forward)
-        void forward(const FrameSample& input, blitz::Array<double,1>& output) const;
+        void forward(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const;
 
         friend std::ostream& operator<<(std::ostream& os, const EigenMachine& machine);
       protected:

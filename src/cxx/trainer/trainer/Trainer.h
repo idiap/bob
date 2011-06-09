@@ -9,7 +9,7 @@ namespace trainer {
 /**
  * Root class for all trainers
  */
-template<class T_machine, class T_data>
+template<class T_machine, class T_sampler>
 class Trainer
 {
 public:
@@ -21,7 +21,7 @@ public:
    * @param machine machine to train
    * @param sampler sampler that provides training data
    */
-  virtual void train (T_machine& machine, const Sampler<T_data>& sampler) = 0;
+  virtual void train (T_machine& machine, const T_sampler& sampler) = 0;
 };
 
 }

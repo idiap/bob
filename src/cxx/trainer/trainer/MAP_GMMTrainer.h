@@ -28,14 +28,14 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// also referred to as a "world model".
     bool setPriorGMM(Torch::machine::GMMMachine *prior_gmm);
 
-  protected:
-
     /// Performs a maximum a posteriori (MAP) update of the GMM parameters
     /// using the accumulated statistics in m_ss and the 
     /// parameters of the prior model
     /// Implements EMTrainer::mStep()
-    void mStep(Torch::machine::GMMMachine& gmm, const Sampler<Torch::machine::FrameSample>& data);
+    void mStep(Torch::machine::GMMMachine& gmm, const Torch::database::Arrayset& data);
     
+  protected:
+
     /// The relevance factor for MAP adaptation, r (see Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000).
     double relevance_factor;
     

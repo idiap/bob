@@ -6,8 +6,8 @@
 #ifndef _GMMMACHINE_H
 #define _GMMMACHINE_H
 
+#include "database/Arrayset.h"
 #include "machine/Machine.h"
-#include "machine/FrameSample.h"
 #include "trainer/Sampler.h"
 #include "machine/GMMStats.h"
 #include "machine/Gaussian.h"
@@ -19,7 +19,7 @@ namespace machine {
   
 /// @brief This class implements a multivariate diagonal Gaussian distribution.
 /// @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
-class GMMMachine : public Machine<FrameSample, double> {
+class GMMMachine : public Machine<blitz::Array<double,1>, double> {
   public:
 
     /// Default constructor
@@ -100,11 +100,11 @@ class GMMMachine : public Machine<FrameSample, double> {
 
     /// Output the log likelihood of the sample, x 
     /// (overrides Machine::forward)
-    void forward (const FrameSample& input, double& output) const;
+    void forward (const blitz::Array<double,1>& input, double& output) const;
     
     /// Accumulates the GMM statistics over a set of samples.
     /// @see bool accStatistics(const blitz::Array<float,1> &x, GMMStats stats)
-    void accStatistics(const Torch::trainer::Sampler<FrameSample> &sampler, GMMStats &stats) const;
+    void accStatistics(const Torch::database::Arrayset &sampler, GMMStats &stats) const;
 
     /// Accumulate the GMM statistics for this sample.
     ///

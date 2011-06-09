@@ -1,16 +1,19 @@
 #include "trainer/SVDPCATrainer.h"
 #include "math/svd.h"
 
-void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine, const Sampler<Torch::machine::FrameSample>& data) 
+void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine, const Torch::database::Arrayset& data) 
 {
   int n_samples = data.getNSamples();
-  int n_features = data.getSample(0).getFrame().extent(0);
+  int n_features = data.getShape()[0];
+
+  std::vector<size_t> ids;
+  data.index(ids);
 
   blitz::Array<double,1> mean(n_features);
   mean = 0.;
   // 1/ Compute the mean of the training data
   for( int i=0; i<n_samples; ++i)
-    mean += data.getSample(i).getFrame();
+    mean += data.get<double,1>(ids[i]);
   mean /= static_cast<double>(n_samples);
 
   // 2/ Generate the data matrix
@@ -18,7 +21,7 @@ void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine,
   for( int i=0; i<n_samples; ++i)
   {
     blitz::Array<double,1> data_col = data_mat(blitz::Range::all(), i);
-    data_col = (data.getSample(i).getFrame() - mean);
+    data_col = (data.get<double,1>(ids[i]) - mean);
   } 
 
   // 3/ Compute the singular value decomposition 

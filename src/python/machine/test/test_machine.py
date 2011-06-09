@@ -25,7 +25,7 @@ class MachineTest(unittest.TestCase):
   def test02_GMMMachine(self):
     """Test a GMMMachine"""
 
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
+    arrayset = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
     gmm = torch.machine.GMMMachine(2, 2)
     gmm.weights   = torch.core.array.array([0.5, 0.5], 'float64')
     gmm.means     = torch.core.array.array([[3, 70], [4, 72]], 'float64')
@@ -33,7 +33,7 @@ class MachineTest(unittest.TestCase):
     gmm.varianceThresholds = torch.core.array.array([[0, 0], [0, 0]], 'float64')
 
     stats = torch.machine.GMMStats(2, 2)
-    gmm.accStatistics(sampler, stats)
+    gmm.accStatistics(arrayset, stats)
     
     #config = torch.database.HDF5File("data/stats.hdf5")
     #stats.save(config)
@@ -56,8 +56,8 @@ class MachineTest(unittest.TestCase):
     m.setNOutputs(2)
     
     # Define input samples
-    s1 = torch.machine.FrameSample(torch.core.array.float64_1([2,1,1],(3,)))
-    s2 = torch.machine.FrameSample(torch.core.array.float64_1([2,1,37],(3,)))
+    s1 = torch.core.array.float64_1([2,1,1],(3,))
+    s2 = torch.core.array.float64_1([2,1,37],(3,))
     
     # Define reference array of projected data
     sol1 = torch.core.array.float64_1([2,1],(2,))
@@ -78,6 +78,7 @@ class MachineTest(unittest.TestCase):
     p4 = m.forward(s2)
     self.assertTrue(equals(p4, sol2, 1e-7))
 
+  """
   def test04_IncompatibleFrameSample(self):
     fs = torch.machine.FrameSample(torch.core.array.float64_1([2,1,1],(3,)))
 
@@ -86,6 +87,7 @@ class MachineTest(unittest.TestCase):
     
     kmeans = torch.machine.KMeansMachine(2,2)
     self.assertRaises(torch.machine.IncompatibleFrameSample, kmeans.forward, fs)
+  """
 
 if __name__ == '__main__':
   sys.argv.append('-v')

@@ -96,7 +96,18 @@ for line in fileinput.input(args):
   filelist.append(line.rstrip('\r\n'))
 
 # Create a sampler for the input files
-sampler = FileListFrameSampler(filelist, None)
+ar = torch.database.Arrayset()
+for myfile in filelist:
+  myarray = torch.database.Array(myfile)
+  n_blocks = myarray.shape[0]
+  for b in range(0,n_blocks):
+    x = myarray.get().cast('float64')[b,:]
+    ar.append(x)
+#ar = FileListFrameSampler(filelist, None)
+
+# Compute input size
+input_size = ar.shape[0]
+
 
 # Load prior gmm
 prior_gmm = torch.machine.GMMMachine(torch.config.Configuration(options.prior_model))
@@ -113,7 +124,7 @@ gmm = torch.machine.GMMMachine(torch.config.Configuration(options.prior_model))
 gmm.setVarianceThreshold = options.variance_threshold
 
 # Train gmm
-trainer.train(gmm, sampler)
+trainer.train(gmm, ar)
 
 # Save gmm
 config = torch.config.Configuration()

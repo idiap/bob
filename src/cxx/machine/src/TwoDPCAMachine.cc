@@ -57,7 +57,7 @@ Torch::machine::TwoDPCAMachine::TwoDPCAMachine(
 }
 
 Torch::machine::TwoDPCAMachine::TwoDPCAMachine(const TwoDPCAMachine& other): 
-  Machine<ImageSample, blitz::Array<double,2> >(other) 
+  Machine<blitz::Array<double,2>, blitz::Array<double,2> >(other) 
 {
   copy(other);
 }
@@ -171,12 +171,12 @@ const blitz::Array<double,2>& Torch::machine::TwoDPCAMachine::getPreMean() const
   return m_pre_mean;
 }
 
-void Torch::machine::TwoDPCAMachine::forward(const ImageSample& input, blitz::Array<double,2>& output) const
+void Torch::machine::TwoDPCAMachine::forward(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const
 {
   output.resize(m_dim_outputs, m_n_outputs);
   const blitz::Array<double,2> mat=m_eigenvectors(blitz::Range::all(), blitz::Range(0,m_n_outputs-1));
   blitz::Array<double,2> input_nomean(m_pre_mean.extent(0), m_pre_mean.extent(1));
-  input_nomean = input.getImage() - m_pre_mean;
+  input_nomean = input - m_pre_mean;
   Torch::math::prod(input_nomean, mat, output);
 }
 

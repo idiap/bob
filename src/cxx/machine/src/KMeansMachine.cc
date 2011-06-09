@@ -1,5 +1,5 @@
 #include "machine/KMeansMachine.h"
-#include <machine/Exception.h>
+#include "machine/Exception.h"
 
 using namespace std;
 
@@ -55,7 +55,7 @@ double Torch::machine::KMeansMachine::getMinDistance(const blitz::Array<double,1
   return min_distance;
 }
 
-void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const Torch::trainer::Sampler<FrameSample> &sampler, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const {
+void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const Torch::database::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const {
   // initialise output arrays
   variances.resize(m_n_means, m_n_inputs);
   weights.resize(m_n_means);
@@ -67,9 +67,11 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   means = 0;
   
   // iterate over data
-  for (int64_t i=0; i < sampler.getNSamples(); ++i) {
+  std::vector<size_t> ids;
+  ar.index(ids); 
+  for (size_t i=0; i < ids.size(); ++i) {
     // - get example
-    blitz::Array<double,1> x = sampler.getSample(i).getFrame();
+    blitz::Array<double,1> x = ar.get<double,1>(ids[i]);
     
     // - find closest mean
     int closest_mean = -1;
@@ -97,12 +99,12 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   weights = weights / blitz::sum(weights);
 }
 
-void Torch::machine::KMeansMachine::forward(const FrameSample& input, double& output) const {
-  if (input.getFrameSize() != m_n_inputs) {
-    throw IncompatibleFrameSample(m_n_inputs, input.getFrameSize());
+void Torch::machine::KMeansMachine::forward(const blitz::Array<double,1>& input, double& output) const {
+  if (input.extent(0) != m_n_inputs) {
+    throw IncompatibleFrameSample(m_n_inputs, input.extent(0));
   }
   
-  output = getMinDistance(input.getFrame());
+  output = getMinDistance(input);
 }
 
 int Torch::machine::KMeansMachine::getNMeans() const {

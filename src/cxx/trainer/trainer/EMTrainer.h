@@ -13,14 +13,14 @@ namespace trainer {
 /// @brief This class implements the general expectation-maximisation algorithm.
 /// @details See Section 9.3 of Bishop, "Pattern recognition and machine learning", 2006
 /// Derived classes must implement the initialization(), eStep() and mStep() methods.
-template<class T_machine, class T_data>
-class EMTrainer : virtual public Trainer<T_machine, T_data>
+template<class T_machine, class T_sampler>
+class EMTrainer : virtual public Trainer<T_machine, T_sampler>
 {
 public:
   virtual ~EMTrainer() {}
   
 
-  void train(T_machine& machine, const Sampler<T_data>& data) {
+  virtual void train(T_machine& machine, const T_sampler& sampler) {
     Torch::core::info << "# EMTrainer:" << std::endl;
     
     /*
@@ -31,11 +31,11 @@ public:
     }
     */
     
-    initialization(machine, data);
+    initialization(machine, sampler);
     // Do the expectation-maximisation algorithm
     double average_output_previous = DBL_MIN;
     // - initial eStep (and calculate average output)
-    double average_output = eStep(machine, data);
+    double average_output = eStep(machine, sampler);
     
     // - iterate...
     for(int iter=1; true; ++iter) {
@@ -44,10 +44,10 @@ public:
       average_output_previous = average_output;
       
       // - mStep
-      mStep(machine, data);
+      mStep(machine, sampler);
       
       // - eStep (and re-calculate average output)
-      average_output = eStep(machine, data);
+      average_output = eStep(machine, sampler);
       
       Torch::core::info << "# Iter " << iter << ": " 
         << average_output_previous << " -> " 
@@ -68,17 +68,17 @@ public:
   }
 
   /// This method is called before the EM algorithm 
-  virtual void initialization(T_machine& machine, const Sampler<T_data>& data) = 0;
+  virtual void initialization(T_machine& machine, const T_sampler& sampler) = 0;
   
   /// Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters.
   /// Also, calculate the average output of the Machine given these parameters.
   /// @return The average output of the Machine across the dataset.
   ///         The EM algorithm will terminate once the change in average_output
   ///         is less than the convergence_threshold.
-  virtual double eStep(T_machine& machine, const Sampler<T_data>& data) = 0;
+  virtual double eStep(T_machine& machine, const T_sampler& sampler) = 0;
   
   /// Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)
-  virtual void mStep(T_machine& machine, const Sampler<T_data>& data) = 0;
+  virtual void mStep(T_machine& machine, const T_sampler& sampler) = 0;
 
   /// Set convergence threshold
   void setConvergenceThreshold(double threshold) {

@@ -24,7 +24,7 @@ namespace Torch {
     /**
       * @brief Class which implements subspace projection.
       */
-    class TwoDPCAMachine : public Machine<ImageSample, blitz::Array<double,2> > {
+    class TwoDPCAMachine : public Machine<blitz::Array<double,2>, blitz::Array<double,2> > {
       public:
         /**
          * Default constructor
@@ -82,7 +82,7 @@ namespace Torch {
 
         /// Output the projected sample, x 
         /// (overrides Machine::forward)
-        void forward(const ImageSample& input, blitz::Array<double,2>& output) const;
+        void forward(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const;
 
         /// Print the parameters of the GMM
         void print() const;

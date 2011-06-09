@@ -4,6 +4,7 @@
 #include <blitz/array.h>
 #include <cfloat>
 
+#include "database/Arrayset.h"
 #include "machine/FrameSample.h"
 #include "machine/Machine.h"
 #include "trainer/Sampler.h"
@@ -14,7 +15,7 @@ namespace machine {
 
 /// @brief This class implements a k-means classifier.
 /// @details See Section 9.1 of Bishop, "Pattern recognition and machine learning", 2006
-class KMeansMachine : public Machine<FrameSample, double> {
+class KMeansMachine : public Machine<blitz::Array<double,1>, double> {
 public:
   
   /// Constructor
@@ -63,11 +64,11 @@ public:
   /// @param[in]  sampler   The sampler
   /// @param[out] variances The cluster variances (one row per cluster), with as many columns as feature dimensions.
   /// @param[out] weights   A vector of weights, one per cluster
-  void getVariancesAndWeightsForEachCluster(const Torch::trainer::Sampler<FrameSample> &sampler, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const;
+  void getVariancesAndWeightsForEachCluster(const Torch::database::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const;
   
   /// Output the minimum distance between the input and one of the means
   /// (overrides Machine::forward)
-  void forward(const FrameSample& input, double& output) const;
+  void forward(const blitz::Array<double,1>& input, double& output) const;
   
   /// Return the number of means
   int getNMeans() const;

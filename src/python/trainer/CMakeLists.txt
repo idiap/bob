@@ -3,13 +3,22 @@ cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
    "src/exception.cc"
-   "src/base.cc"
+   "src/eigen.cc"
+   "src/kmeans.cc"
+   "src/gmm.cc"
    "src/main.cc"
+   )
+
+set(pysrc_overload
+   "src/kmeans_wrappers.cc"
+   "src/gmm_wrappers.cc"
+   "src/main_overload.cc"
    )
 
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(trainer "${pysrc}") 
+torch_python_submodule_bindings(trainer overload "${pysrc_overload}")
 add_dependencies(pytorch_trainer core-array-python_header_install trainer-cxx_header_install)
 torch_python_install(trainer)
   

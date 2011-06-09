@@ -3,6 +3,7 @@
 
 #include "Trainer.h"
 #include "core/logging.h"
+#include "database/Arrayset.h"
 #include "machine/EigenMachine.h"
 #include "math/svd.h"
 #include <algorithm>
@@ -14,13 +15,13 @@ namespace Torch
   namespace trainer 
   {
   
-    class SVDPCATrainer : virtual public Trainer<Torch::machine::EigenMachine, Torch::machine::FrameSample>
+    class SVDPCATrainer : virtual public Trainer<Torch::machine::EigenMachine, Torch::database::Arrayset>
     {
       public:
         SVDPCATrainer() {}
         virtual ~SVDPCATrainer() {}
   
-        void train(Torch::machine::EigenMachine& machine, const Sampler<Torch::machine::FrameSample>& data); 
+        void train(Torch::machine::EigenMachine& machine, const Torch::database::Arrayset& data); 
 
       protected:
 

@@ -21,12 +21,10 @@ class ML_GMMTrainer : public GMMTrainer {
     /// Destructor
     virtual ~ML_GMMTrainer();
 
-  protected:
-
     /// Performs a maximum likelihood (ML) update of the GMM parameters
     /// using the accumulated statistics in m_ss
     /// Implements EMTrainer::mStep()
-    void mStep (Torch::machine::GMMMachine& gmm, const Sampler<Torch::machine::FrameSample>& data);
+    void mStep (Torch::machine::GMMMachine& gmm, const Torch::database::Arrayset& data);
 };
 
 }

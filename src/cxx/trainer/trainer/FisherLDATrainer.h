@@ -3,14 +3,15 @@
 
 #include "trainer/Trainer.h"
 #include "machine/EigenMachine.h"
-#include "machine/FrameClassificationSample.h"
+#include "database/Arrayset.h"
+#include <vector>
 
 namespace Torch 
 {
   namespace trainer 
   {
   
-    class FisherLDATrainer : virtual public Trainer<Torch::machine::EigenMachine, Torch::machine::FrameClassificationSample>
+    class FisherLDATrainer : virtual public Trainer<Torch::machine::EigenMachine, std::vector<Torch::database::Arrayset> >
     {
       public:
         /**
@@ -26,10 +27,10 @@ namespace Torch
         /**
           * @brief Start the training process
           */
-        void train(Torch::machine::EigenMachine& machine, const Sampler<Torch::machine::FrameClassificationSample>& data); 
+        void train(Torch::machine::EigenMachine& machine, const std::vector<Torch::database::Arrayset>& sampler); 
 
       private:
-        void computeScatterMatrices( const Sampler<Torch::machine::FrameClassificationSample>& data);
+        void computeScatterMatrices( const std::vector<Torch::database::Arrayset>& sampler);
 
         int m_n_classes;
         blitz::Array<double,2> m_Sb; // Between-class scatter matrix

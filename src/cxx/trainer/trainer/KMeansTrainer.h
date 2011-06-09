@@ -1,8 +1,8 @@
 #ifndef KMEANSTRAINER_H
 #define KMEANSTRAINER_H
 
+#include "database/Arrayset.h"
 #include "machine/KMeansMachine.h"
-#include "machine/FrameSample.h"
 #include "trainer/Sampler.h"
 #include "trainer/EMTrainer.h"
 
@@ -13,7 +13,7 @@ namespace trainer {
 /// @brief This class implements the expectation-maximisation algorithm for a k-means machine.
 /// @details See Section 9.1 of Bishop, "Pattern recognition and machine learning", 2006
 ///          It uses a random initialisation of the means followed by the expectation-maximization algorithm
-class KMeansTrainer : public EMTrainer<Torch::machine::KMeansMachine, Torch::machine::FrameSample>
+class KMeansTrainer : public EMTrainer<Torch::machine::KMeansMachine, Torch::database::Arrayset>
 {
 public:
   
@@ -26,15 +26,15 @@ public:
   /// Initialise the means randomly. 
   /// Data is split into as many chunks as there are means, 
   /// then each mean is set to a random example within each chunk.
-  void initialization(Torch::machine::KMeansMachine& kMeansMachine, const Sampler<Torch::machine::FrameSample>& sampler);
+  virtual void initialization(Torch::machine::KMeansMachine& kMeansMachine, const Torch::database::Arrayset& sampler);
   
   /// Accumulate across the dataset:
   /// - zeroeth and first order statistics
   /// - average distance from the closest mean 
   /// Implements EMTrainer::eStep(double &)
-  double eStep(Torch::machine::KMeansMachine& kmeans, const Sampler<Torch::machine::FrameSample>& data);
+  virtual double eStep(Torch::machine::KMeansMachine& kmeans, const Torch::database::Arrayset& data);
   
-  void mStep(Torch::machine::KMeansMachine& kmeans, const Sampler<Torch::machine::FrameSample>&);
+  virtual void mStep(Torch::machine::KMeansMachine& kmeans, const Torch::database::Arrayset&);
   
   /// Reset the statistics accumulators
   /// to the correct size and a value of zero.

@@ -16,7 +16,7 @@ Torch::machine::GMMMachine::GMMMachine(Torch::database::HDF5File& config) : m_ga
   load(config);
 }
 
-Torch::machine::GMMMachine::GMMMachine(const GMMMachine& other) : Machine<FrameSample, double>(other), m_gaussians(NULL) {
+Torch::machine::GMMMachine::GMMMachine(const GMMMachine& other) : Machine<blitz::Array<double,1>, double>(other), m_gaussians(NULL) {
   copy(other);
 }
 
@@ -192,20 +192,22 @@ double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &
   return logLikelihood(x,log_weighted_gaussian_likelihoods);
 }
 
-void Torch::machine::GMMMachine::forward (const FrameSample& input, double& output) const {
-  if (input.getFrameSize() != m_n_inputs) {
-    throw IncompatibleFrameSample(m_n_inputs, input.getFrameSize());
+void Torch::machine::GMMMachine::forward (const blitz::Array<double,1>& input, double& output) const {
+  if (input.extent(0) != m_n_inputs) {
+    throw IncompatibleFrameSample(m_n_inputs, input.extent(0));
   }
 
-  output = logLikelihood(input.getFrame());
+  output = logLikelihood(input);
 }
 
-void Torch::machine::GMMMachine::accStatistics(const Torch::trainer::Sampler<Torch::machine::FrameSample>& sampler, Torch::machine::GMMStats& stats) const {
+void Torch::machine::GMMMachine::accStatistics(const Torch::database::Arrayset& ar, Torch::machine::GMMStats& stats) const {
   // iterate over data
-  for (int64_t i=0; i < sampler.getNSamples(); ++i) {
+  std::vector<size_t> index;
+  ar.index(index);
+  for (size_t i=0; i < index.size(); ++i) {
 
     // Get example
-    blitz::Array<double,1> x(sampler.getSample(i).getFrame());
+    blitz::Array<double,1> x(ar.get<double,1>(index[i]));
 
     // Accumulate statistics
     accStatistics(x,stats);

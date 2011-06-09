@@ -5,9 +5,9 @@ import os, sys
 import optparse
 import math
 
-
-class FileListFrameSampler(torch.trainer.Sampler_FrameSample_):
-  """Get samples from a list of files Arrayset"""
+#class FileListFrameSampler(torch.trainer.Sampler_FrameSample_):
+#  """Get samples from a list of files Arrayset"""
+"""
   def __init__(self, list_files, n_blocks):
     torch.trainer.Sampler_FrameSample_.__init__(self)
     self.list_files = list_files
@@ -42,12 +42,44 @@ class FileListFrameSampler(torch.trainer.Sampler_FrameSample_):
   
   def getNSamples(self):
     return len(self.list_files)*self.n_blocks
+"""
 
-class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
+def NormalizeStdArrayset(arrayset):
+  arrayset.load()
+
+  length = arrayset.shape[0]
+  n_samples = len(arrayset.ids())
+  mean = torch.core.array.float64_1(length)
+  std = torch.core.array.float64_1(length)
+
+  mean.fill(0)
+  std.fill(0)
+
+  for k, id in enumerate(arrayset.ids()):
+    x = arrayset[id].get().cast('float64')
+    mean += x
+    std += (x ** 2)
+
+  mean /= n_samples
+  std /= n_samples
+  std -= (mean ** 2)
+  std = std ** 0.5 # sqrt(std)
+
+  arStd = torch.database.Arrayset()
+  for k, id in enumerate(arrayset.ids()):
+    x = arrayset[id].get().cast('float64')
+    type(arStd)
+    arStd.append(x / std)
+
+  return (arStd,std)
+
+
+#class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
   """
   Sampler that opens an array set from a file and normalizes the standard deviation
   of the array set to 1
   """
+"""
   def __init__(self, sampler):
     torch.trainer.Sampler_FrameSample_.__init__(self)
     self.sampler = sampler
@@ -76,6 +108,7 @@ class NormalizeStdFrameSampler(torch.trainer.Sampler_FrameSample_):
 
   def getNSamples(self):
     return self.sampler.getNSamples()
+"""
 
 def multiplyVectorsByFactors(matrix, vector):
   for i in range(0, matrix.rows()):
@@ -160,13 +193,21 @@ for line in fileinput.input(args):
   filelist.append(line.rstrip('\r\n'))
 
 # Create a sampler for the input files
-sampler = FileListFrameSampler(filelist, None)
+ar = torch.database.Arrayset()
+for myfile in filelist:
+  myarray = torch.database.Array(myfile)
+  n_blocks = myarray.shape[0]
+  for b in range(0,n_blocks):
+    x = myarray.get().cast('float64')[b,:]
+    ar.append(x)
+#ar = FileListFrameSampler(filelist, None)
 
 # Compute input size
-input_size = sampler.getSample(0).getFrame().extent(0)
+input_size = ar.shape[0]
 
 # Create a normalized sampler
-normalizedSampler = NormalizeStdFrameSampler(sampler)
+#normalizedSampler = NormalizeStdFrameSampler(sampler)
+(normalizedAr,stdAr) = NormalizeStdArrayset(ar)
 
 # Create the machines
 kmeans = torch.machine.KMeansMachine(options.n_gaussians, input_size)
@@ -178,13 +219,13 @@ kmeansTrainer.convergenceThreshold = options.convergence_threshold
 kmeansTrainer.maxIterations = options.iterk
 
 # Train the KMeansTrainer
-kmeansTrainer.train(kmeans, normalizedSampler)
+kmeansTrainer.train(kmeans, normalizedAr)
 
-[variances, weights] = kmeans.getVariancesAndWeightsForEachCluster(normalizedSampler)
+[variances, weights] = kmeans.getVariancesAndWeightsForEachCluster(normalizedAr)
 means = kmeans.means
 
-multiplyVectorsByFactors(means, normalizedSampler.std)
-multiplyVectorsByFactors(variances, normalizedSampler.std ** 2)
+multiplyVectorsByFactors(means, stdAr)
+multiplyVectorsByFactors(variances, stdAr ** 2)
 
 # Initialize gmm
 gmm.means = means
@@ -196,7 +237,7 @@ gmm.setVarianceThreshold = options.variance_threshold
 trainer = torch.trainer.ML_GMMTrainer(True, True, True)
 trainer.convergenceThreshold = options.convergence_threshold
 trainer.maxIterations = options.iterg
-trainer.train(gmm, sampler)
+trainer.train(gmm, ar) # TODO: Should it rather be the normalized arrayset?
 
 # Save gmm
 config = torch.database.HDF5File(options.output_file)

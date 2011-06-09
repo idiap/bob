@@ -5,14 +5,22 @@ using namespace boost::python;
 using namespace Torch::machine;
 
 
+/*
 class Machine_FrameSample_A1double_Wrapper : public Machine<FrameSample, blitz::Array<double,1> >, public wrapper<Machine<FrameSample, blitz::Array<double,1> > > {
 public:
   void forward (const FrameSample& input, blitz::Array<double,1>& output) const {
     this->get_override("forward")(input, output);
   }
 };
+*/
+class Machine_BAdouble1_BAdouble1_Wrapper : public Machine<blitz::Array<double,1>, blitz::Array<double,1> >, public wrapper<Machine<blitz::Array<double,1>, blitz::Array<double,1> > > {
+public:
+  void forward (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const {
+    this->get_override("forward")(input, output);
+  }
+};
 
-static boost::shared_ptr<blitz::Array<double,1> > forward(const Machine<FrameSample, blitz::Array<double,1> >& machine, const FrameSample& input) {
+static boost::shared_ptr<blitz::Array<double,1> > forward(const Machine<blitz::Array<double,1>, blitz::Array<double,1> >& machine, const blitz::Array<double,1>& input) {
   boost::shared_ptr<blitz::Array<double,1> > output(new blitz::Array<double,1>());
   machine.forward(input, *output.get());
   return output;
@@ -20,12 +28,16 @@ static boost::shared_ptr<blitz::Array<double,1> > forward(const Machine<FrameSam
 
 void bind_machine_eigenmachine()
 {
-  class_<Machine_FrameSample_A1double_Wrapper, boost::noncopyable>("Machine_FrameSample_A1double_")
+  /*class_<Machine_FrameSample_A1double_Wrapper, boost::noncopyable>("Machine_FrameSample_A1double_")
   .def("forward", &Machine<FrameSample, blitz::Array<double,1> >::forward, args("input", "output"))
   ;
-  
+  */
+  class_<Machine_BAdouble1_BAdouble1_Wrapper, boost::noncopyable>("Machine_BAdouble1_BAdouble1_")
+    .def("forward", &Machine<blitz::Array<double,1>, blitz::Array<double,1> >::forward, args("input", "output"))
+  ;
+
   // TODO: add constructor variants, get/set: functions or properties?
-  class_<EigenMachine, bases<Machine<FrameSample, blitz::Array<double,1> > > >("EigenMachine", init<>())
+  class_<EigenMachine, bases<Machine<blitz::Array<double,1>, blitz::Array<double,1> > > >("EigenMachine", init<>())
   .def("getNOutputs", &EigenMachine::getNOutputs)
   .def("setNOutputs", &EigenMachine::setNOutputs, args("n_outputs"))
   .def("getPVariance", &EigenMachine::getPVariance)
