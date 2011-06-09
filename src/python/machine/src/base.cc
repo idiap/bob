@@ -2,55 +2,12 @@
 #include <database/Arrayset.h>
 #include <machine/KMeansMachine.h>
 #include <machine/GMMMachine.h>
-#include <machine/FrameClassificationSample.h>
 #include <boost/concept_check.hpp>
 
 using namespace boost::python;
 namespace db = Torch::database;
 namespace mach = Torch::machine;
 
-/*
-class Machine_FrameSample_double_Wrapper : public Machine<FrameSample, double>, public wrapper<Machine<FrameSample, double> > {
-public:
-  void forward (const FrameSample& input, double& output) const {
-    this->get_override("forward")(input, output);
-  }
-};
-
-static double Machine_FrameSample_double_forward(const Machine<FrameSample, double>& machine, const FrameSample& input) {
-  double output;
-  machine.forward(input, output);
-  return output;
-}
-*/
-/*
-class Machine_BAdouble1_double_Wrapper : public Machine<blitz::Array<double,1>, double>, public wrapper<Machine<blitz::Array<double,1>, double> > {
-public:
-  void forward (const blitz::Array<double,1>& input, double& output) const {
-    this->get_override("forward")(input, output);
-  }
-};
-
-static double Machine_BAdouble1_double_forward(const Machine<blitz::Array<double,1>, double>& machine, const blitz::Array<double,1>& input) {
-  double output;
-  machine.forward(input, output);
-  return output;
-}
-*/
-/*
-class Machine_BAdouble1_BAdouble1_Wrapper : public Machine<blitz::Array<double,1>, blitz::Array<double,1> >, public wrapper<Machine<blitz::Array<double,1>, blitz::Array<double,1> > > {
-public:
-  void forward (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const {
-    this->get_override("forward")(input, output);
-  }
-};
-
-static double Machine_BAdouble1_BAdouble1_forward(const Machine<blitz::Array<double,1>, blitz::Array<double,1> >& machine, const blitz::Array<double,1>& input) {
-  blitz::Array<double,1> output;
-  machine.forward(input, output);
-  return output;
-}
-*/
 
 static tuple getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, db::Arrayset& ar) {
   boost::shared_ptr<blitz::Array<double, 2> > variances(new blitz::Array<double, 2>);
@@ -85,58 +42,7 @@ GETTER(mach::GMMMachine, mach_GMMMachine, getVariances, double, 2)
 GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceThresholds, double, 2)
 
 void bind_machine_base() {
-/*
-  class_<FrameSample>("FrameSample",
-                      "This class represents one Frame. It encapsulates a blitz::Array<double, 1>",
-                      init<const blitz::Array<double, 1>& >(args("array")))
-  .def("getFrame",
-       &FrameSample::getFrame, return_value_policy<copy_const_reference>(),
-       "Get the Frame")
-  .def("getFrameSize",
-       &FrameSample::getFrameSize,
-       "Get the frame size")
-  ;
-  
-  class_<FrameClassificationSample>("FrameClassificationSample",
-                      "This class represents one Frame with a classification label. It encapsulates a blitz::Array<double, 1> and an int",
-                      init<const blitz::Array<double, 1>&, int64_t >(args("array","target")))
-  .def("getFrame",
-       &FrameClassificationSample::getFrame, return_value_policy<copy_const_reference>(),
-       "Get the Frame")
-  .def("getFrameSize",
-       &FrameClassificationSample::getFrameSize,
-       "Get the frame size")
-  .def("getTarget",
-       &FrameClassificationSample::getTarget,
-       "Get the target")
-  ;
-  
-  class_<Machine_FrameSample_double_Wrapper, boost::noncopyable>("Machine_FrameSample_double_",
-                                                                 "Root class for all Machine<FrameSample, double>")
-  .def("forward",
-       &Machine_FrameSample_double_forward,
-       args("input"),
-       "Execute the machine")
-  ;
-  */
-  /*
-  class_<Machine_BAdouble1_double_Wrapper, boost::noncopyable>("Machine_BAdouble1_double_",
-                                                                 "Root class for all Machine<blitz::Array<double,1>, double>")
-  .def("forward",
-       &Machine_BAdouble1_double_forward,
-       args("input"),
-       "Execute the machine")
-  ;
-  */
-/*
-  class_<Machine_BAdouble1_BAdouble1_Wrapper, boost::noncopyable>("Machine_BAdouble1_BAdouble1_",
-                                                                 "Root class for all Machine<blitz::Array<double,1>, blitz::Array<double,1> >")
-  .def("forward",
-       &Machine_BAdouble1_BAdouble1_forward,
-       args("input"),
-       "Execute the machine")
-  ;
-*/
+
   class_<mach::Machine<blitz::Array<double,1>, double>, boost::noncopyable>("MachineDoubleBase", 
       "Root class for all Machine<blitz::Array<double,1>, double>", no_init)
     .def("forward", &mach::Machine<blitz::Array<double,1>, double>::forward, (arg("input"), arg("output")), "Execute the machine")
@@ -163,7 +69,7 @@ void bind_machine_base() {
         "2) the proportion of the samples represented by that subset (the cluster weight)")
   ;
   
-  class_<mach::Gaussian>("mach::Gaussian",
+  class_<mach::Gaussian>("Gaussian",
                    "This class implements a multivariate diagonal mach::Gaussian distribution",
                    init<>())
   .def(init<int>(args("n_inputs")))
@@ -175,15 +81,15 @@ void bind_machine_base() {
                 &mach::Gaussian::setNInputs,
                 "Input dimensionality")
   .add_property("mean",
-                &mach::Gaussian_getMean,
+                &mach_Gaussian_getMean,
                 &mach::Gaussian::setMean,
                 "Mean of the mach::Gaussian")
   .add_property("variance",
-                &mach::Gaussian_getVariance,
+                &mach_Gaussian_getVariance,
                 &mach::Gaussian::setVariance,
                 "The diagonal of the covariance matrix")
   .add_property("varianceThresholds",
-                &mach::Gaussian_getVarianceThresholds,
+                &mach_Gaussian_getVarianceThresholds,
                 (void (mach::Gaussian::*)(const blitz::Array<double,1>&)) &mach::Gaussian::setVarianceThresholds,
                 "The variance flooring thresholds, i.e. the minimum allowed value of variance in each dimension. "
                 "The variance will be set to this value if an attempt is made to set it to a smaller value.")
@@ -197,7 +103,7 @@ void bind_machine_base() {
     .def(self_ns::str(self_ns::self))
   ;
 
-  class_<mach::GMMStats>("mach::GMMStats",
+  class_<mach::GMMStats>("GMMStats",
                    "A container for GMM statistics.\n"
                    "With respect to Reynolds, \"Speaker Verification Using Adapted "
                    "Gaussian Mixture Models\", DSP, 2000:\n"
@@ -237,7 +143,7 @@ void bind_machine_base() {
   .def(self_ns::str(self_ns::self))
   ;
   
-  class_<mach::GMMMachine, bases<Machine<FrameSample, double> > >("mach::GMMMachine",
+  class_<mach::GMMMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
                                                             "This class implements a multivariate diagonal Gaussian distribution.\n"
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                             init<int, int>(args("n_gaussians", "n_inputs")))
@@ -249,19 +155,19 @@ void bind_machine_base() {
                 &mach::GMMMachine::setNInputs,
                 "The feature dimensionality")
   .add_property("weights",
-                &mach::GMMMachine_getWeights,
+                &mach_GMMMachine_getWeights,
                 &mach::GMMMachine::setWeights,
                 "The weights (also known as \"mixing coefficients\")")
   .add_property("means",
-                &mach::GMMMachine_getMeans,
+                &mach_GMMMachine_getMeans,
                 &mach::GMMMachine::setMeans,
                 "The means of the gaussians")
   .add_property("variances",
-                &mach::GMMMachine_getVariances,
+                &mach_GMMMachine_getVariances,
                 &mach::GMMMachine::setVariances,
                 "The variances")
   .add_property("varianceThresholds",
-                &mach::GMMMachine_getVarianceThresholds,
+                &mach_GMMMachine_getVarianceThresholds,
                 (void (mach::GMMMachine::*)(const blitz::Array<double,2>&))&mach::GMMMachine::setVarianceThresholds,
                 "The variance flooring thresholds for each Gaussian in each dimension")
   .def("resize",
@@ -288,7 +194,7 @@ void bind_machine_base() {
        args("x"),
        " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
   .def("accStatistics",
-       (void (mach::GMMMachine::*)(const Torch::trainer::Sampler<FrameSample>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
+       (void (mach::GMMMachine::*)(const db::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
        args("sampler", "stats"),
        "Accumulates the GMM statistics over a set of samples.")
   .def("accStatistics",

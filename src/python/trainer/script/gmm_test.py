@@ -6,8 +6,9 @@ import optparse
 import math
 
 
-class FileListFrameSampler(torch.trainer.Sampler_FrameSample_):
-  """Get samples from a list of files Arrayset"""
+#class FileListFrameSampler(torch.trainer.Sampler_FrameSample_):
+"""Get samples from a list of files Arrayset"""
+"""
   def __init__(self, list_files, n_blocks):
     torch.trainer.Sampler_FrameSample_.__init__(self)
     self.list_files = list_files
@@ -42,6 +43,7 @@ class FileListFrameSampler(torch.trainer.Sampler_FrameSample_):
   
   def getNSamples(self):
     return len(self.list_files)*self.n_blocks
+"""
 
 
 import fileinput
@@ -69,10 +71,18 @@ parser.add_option("-w",
 
 filelist = []
 for line in fileinput.input(args):
-  filelist = [line.rstrip('\r\n')]
+  myfile = line.rstrip('\r\n')
 
-  # Create a simpler with only one file
-  sampler = FileListFrameSampler(filelist, None)
+  # Create data with only one file
+  ar = torch.database.Arrayset()
+  myarray = torch.database.Array(myfile)
+  n_blocks = myarray.shape[0]
+  for b in range(0,n_blocks):
+    x = myarray.get().cast('float64')[b,:]
+    ar.append(x)
+
+  # Compute input size
+  input_size = ar.shape[0]
 
   # Load the gmm
   prior_gmm = torch.machine.GMMMachine(torch.config.Configuration(options.world_model))
@@ -81,9 +91,10 @@ for line in fileinput.input(args):
   # Compute the score
   scoreCL = 0.
   scoreWM = 0.
-  for i in range(0, sampler.getNSamples()):
-    scoreCL += gmm.forward(sampler.getSample(i))
-    scoreWM += prior_gmm.forward(sampler.getSample(i))
+  ids = ar.ids()
+  for v, id in ids:
+    scoreCL += gmm.forward(ar[id].get())
+    scoreWM += prior_gmm.forward(ar[id].get())
 
   score = scoreCL - scoreWM
 
