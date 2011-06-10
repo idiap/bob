@@ -1,58 +1,113 @@
+/**
+ * @author Laurent El-Shafey <Laurent.El-Shafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Fri 10 Jun 2011 09:21:16 CEST
+ *
+ * @brief Principal Component Analysis implemented with Singular Value
+ * Decomposition (lapack). Implementation.
+ */
+
+#include <vector>
+#include <algorithm>
+
 #include "trainer/SVDPCATrainer.h"
 #include "math/svd.h"
+#include "database/Exception.h"
+#include "core/array_type.h"
 
-void Torch::trainer::SVDPCATrainer::train(Torch::machine::EigenMachine& machine, const Torch::database::Arrayset& data) 
-{
-  int n_samples = data.getNSamples();
-  int n_features = data.getShape()[0];
+namespace db = Torch::database;
+namespace mach = Torch::machine;
+namespace train = Torch::trainer;
 
-  std::vector<size_t> ids;
-  data.index(ids);
-
-  blitz::Array<double,1> mean(n_features);
-  mean = 0.;
-  // 1/ Compute the mean of the training data
-  for( int i=0; i<n_samples; ++i)
-    mean += data.get<double,1>(ids[i]);
-  mean /= static_cast<double>(n_samples);
-
-  // 2/ Generate the data matrix
-  blitz::Array<double,2> data_mat(n_features,n_samples);
-  for( int i=0; i<n_samples; ++i)
-  {
-    blitz::Array<double,1> data_col = data_mat(blitz::Range::all(), i);
-    data_col = (data.get<double,1>(ids[i]) - mean);
-  } 
-
-  // 3/ Compute the singular value decomposition 
-  blitz::Array<double,2> U(n_features,n_features);
-  const int n_sigma = std::min(n_features,n_samples);
-  blitz::Array<double,1> sigma(n_sigma);
-  blitz::Array<double,2> V(n_samples,n_samples);
-  Torch::math::svd(data_mat, U, sigma, V);
-
-  // 4/ Sort the eigenvalues/eigenvectors (no blitz++ way unfortunately)
-  std::vector< std::pair<double,int> > eigenvalues_sort;
-  for( int i=0; i<n_sigma; ++i)
-    eigenvalues_sort.push_back( std::pair<double,int>(sigma(i),i) );
-  std::sort(eigenvalues_sort.begin(), eigenvalues_sort.end());
-
-  // 5/ Update the machine
-  int n_outputs_set = machine.getNOutputs();
-  if( n_outputs_set <=0 || n_outputs_set > n_sigma)
-    n_outputs_set = n_sigma;
-  blitz::Array<double,1> eigenvalues(n_outputs_set);
-  blitz::Array<double,2> eigenvectors(n_outputs_set,n_features);
-  for(int ind=0; ind<n_outputs_set; ++ind)
-  {
-    // Convert them to covariance matrix eigenvalues
-    eigenvalues(n_outputs_set-ind-1) = eigenvalues_sort[ind].first * eigenvalues_sort[ind].first / (n_samples - 1);
-    blitz::Array<double,1> vec = U(eigenvalues_sort[ind].second, blitz::Range::all());
-    double norm = sqrt( blitz::sum(vec*vec) );
-    blitz::Array<double,1> eigen_vec = eigenvectors(n_outputs_set-ind-1,blitz::Range::all());
-    eigen_vec = vec / norm;
+train::SVDPCATrainer::SVDPCATrainer(bool zscore_convert)
+  : m_zscore_convert(zscore_convert) {
   }
-  machine.setEigenvaluesvectors(eigenvalues,eigenvectors);
-  machine.setPreMean(mean);
+
+train::SVDPCATrainer::SVDPCATrainer()
+  : m_zscore_convert(false) {
+  }
+
+train::SVDPCATrainer::SVDPCATrainer(const train::SVDPCATrainer& other)
+  : m_zscore_convert(other.m_zscore_convert) {
+  }
+
+train::SVDPCATrainer::~SVDPCATrainer() {}
+
+train::SVDPCATrainer& train::SVDPCATrainer::operator=
+(const train::SVDPCATrainer& other) {
+  m_zscore_convert = other.m_zscore_convert;
+  return *this;
 }
 
+void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine, 
+    blitz::Array<double,1>& eigen_values, const db::Arrayset& ar) const {
+
+  // checks for arrayset data type and shape once
+  if (ar.getElementType() != Torch::core::array::t_float64) {
+    throw Torch::database::TypeError(ar.getElementType(),
+        Torch::core::array::t_float64);
+  }
+  if (ar.getNDim() != 2) {
+    throw Torch::database::DimensionError(ar.getNDim(), 2);
+  }
+
+  // data is checked now and conforms, just proceed w/o any further checks.
+  std::vector<size_t> index;
+  ar.index(index);
+
+  size_t n_samples = index.size();
+  size_t n_features = ar.getShape()[0];
+
+  // loads all the data in a single shot - required for SVD
+  blitz::Array<double,2> data(n_features, n_samples);
+  blitz::Range all = blitz::Range::all();
+  for (size_t i=0; i<n_samples; ++i) {
+    data(all,i) = ar.get<double,1>(index[i]);
+  }
+
+  // computes the mean of the training data
+  blitz::secondIndex j;
+  blitz::Array<double,1> mean(n_features);
+  mean = blitz::mean(data, j);
+
+  // removes the empirical mean from the training data
+  for (size_t i=0; i<n_samples; ++i) data(all,i) -= mean;
+
+  /**
+   * computes the singular value decomposition using lapack
+   *
+   * note: Lapack already organizes the U,Sigma,V**T matrixes so that the
+   * singular values in Sigma are organized by decreasing order of magnitude.
+   * You **don't** need sorting after this.
+   */
+  blitz::Array<double,2> U(n_features, n_features);
+  const int n_sigma = std::min(n_features, n_samples);
+  blitz::Array<double,1> sigma(n_sigma);
+  blitz::Array<double,2> V(n_samples, n_samples);
+  Torch::math::svd(data, U, sigma, V);
+
+  /**
+   * sets the linear machine with the results:
+   *
+   * note: eigen values are sigma^2/n_samples diagonal
+   *       eigen vectors are the rows of U
+   */
+  machine.resize(n_features, n_features);
+  machine.setInputSubtraction(mean);
+  machine.setInputDivision(1.0);
+  machine.setBiases(0.0);
+  machine.setWeights(U);
+
+  //weight normalization (if necessary):
+  //norm_factor = blitz::sum(blitz::pow2(U(i,all)))
+
+  // finally, we set also the eigen values in this version
+  eigen_values.resize(n_sigma);
+  eigen_values = blitz::pow2(sigma)/(n_samples-1);
+}
+
+void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine, 
+    const db::Arrayset& ar) const {
+  blitz::Array<double,1> throw_away;
+  train(machine, throw_away, ar);
+}
