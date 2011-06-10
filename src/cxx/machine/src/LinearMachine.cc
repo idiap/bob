@@ -16,21 +16,18 @@ namespace mach = Torch::machine;
 inline static double linear(double x) { return x; }
 inline static double logistic(double x) { return 1.0 / (1.0 + std::exp(-x)); }
       
-mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight, 
-    const blitz::Array<double,1>& bias)
+mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
   : m_input_sub(weight.extent(1)),
     m_input_div(weight.extent(1)),
+    m_bias(weight.extent(0)),
     m_activation(mach::LinearMachine::LINEAR),
     m_actfun(linear),
     m_buffer(weight.extent(1))
 {
   m_input_sub = 0.0;
   m_input_div = 1.0;
-  if (weight.extent(0) != bias.extent(0)) {
-    throw mach::NInputsMismatch(weight.extent(0), bias.extent(0));
-  }
+  m_bias = 0.0;
   m_weight.reference(weight.copy());
-  m_bias.reference(bias.copy());
 }
 
 mach::LinearMachine::LinearMachine(size_t n_input, size_t n_output):
@@ -44,8 +41,8 @@ mach::LinearMachine::LinearMachine(size_t n_input, size_t n_output):
 {
   m_input_sub = 0.0;
   m_input_div = 1.0;
-  m_weight = 0;
-  m_bias = 0;
+  m_weight = 0.0;
+  m_bias = 0.0;
 }
 
 mach::LinearMachine::LinearMachine(const mach::LinearMachine& other):
@@ -102,6 +99,14 @@ void mach::LinearMachine::load (Torch::database::HDF5File& config) {
   setActivation(static_cast<mach::LinearMachine::Activation>(act));
 }
 
+void mach::LinearMachine::resize (size_t input, size_t output) {
+  m_input_sub.resizeAndPreserve(input);
+  m_input_div.resizeAndPreserve(input);
+  m_buffer.resizeAndPreserve(input);
+  m_weight.resizeAndPreserve(output, input);
+  m_bias.resizeAndPreserve(output);
+}
+
 void mach::LinearMachine::save (Torch::database::HDF5File& config) const {
   config.appendArray("input_sub", m_input_sub);
   config.appendArray("input_div", m_input_div);
@@ -131,13 +136,16 @@ void mach::LinearMachine::setWeights
   if (weight.extent(0) != m_bias.extent(0)) {
     throw mach::NOutputsMismatch(weight.extent(0), m_bias.extent(0));
   }
+  if (weight.extent(1) != m_input_sub.extent(0)) {
+    throw mach::NInputsMismatch(weight.extent(1), m_bias.extent(0));
+  }
   m_weight.reference(weight.copy());
 }
 
 void mach::LinearMachine::setBiases
 (const blitz::Array<double,1>& bias) {
   if (m_weight.extent(0) != bias.extent(0)) {
-    throw mach::NInputsMismatch(m_weight.extent(0), bias.extent(0));
+    throw mach::NOutputsMismatch(m_weight.extent(0), bias.extent(0));
   }
   m_bias.reference(bias.copy());
 }
@@ -171,25 +179,4 @@ void mach::LinearMachine::setActivation (mach::LinearMachine::Activation a) {
       break;
   }
   m_activation = a;
-}
-
-void mach::LinearMachine::setAll(const blitz::Array<double,1> input_sub,
-    const blitz::Array<double,1> input_div,
-    const blitz::Array<double,2>& weight, 
-    const blitz::Array<double,1>& bias) {
-  //some size checking...
-  if (weight.extent(0) != bias.extent(0)) {
-    throw mach::NOutputsMismatch(weight.extent(0), bias.extent(0));
-  }
-  if (input_sub.extent(0) != input_div.extent(0)) {
-    throw mach::NInputsMismatch(input_sub.extent(0), input_div.extent(0));
-  }
-  if (input_sub.extent(0) != weight.extent(1)) {
-    throw mach::NInputsMismatch(input_sub.extent(0), weight.extent(1));
-  }
-  m_input_sub.reference(input_sub.copy());
-  m_input_div.reference(input_div.copy());
-  m_weight.reference(weight.copy());
-  m_bias.reference(bias.copy());
-  m_buffer.resize(m_input_sub.shape());
 }

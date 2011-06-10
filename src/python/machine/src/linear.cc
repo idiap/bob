@@ -19,6 +19,63 @@ static blitz::Array<double,1> forward(const mach::LinearMachine& m,
   return output;
 }
 
+static tuple get_shape(const mach::LinearMachine& m) {
+  return make_tuple(m.inputSize(), m.outputSize());
+}
+
+static void set_shape(mach::LinearMachine& m, 
+    const blitz::TinyVector<int,2>& s) {
+  m.resize(s(0), s(1));
+}
+
+static void set_input_sub(mach::LinearMachine& m, object o) {
+  extract<int> int_check(o);
+  extract<double> float_check(o);
+  if (int_check.check()) { //is int
+    m.setInputSubtraction(int_check());
+  }
+  else if (float_check.check()) { //is float
+    m.setInputSubtraction(float_check());
+  }
+  else {
+    //try hard-core extraction - throws TypeError, if not possible
+    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
+    m.setInputSubtraction(val);
+  }
+}
+
+static void set_input_div(mach::LinearMachine& m, object o) {
+  extract<int> int_check(o);
+  extract<double> float_check(o);
+  if (int_check.check()) { //is int
+    m.setInputDivision(int_check());
+  }
+  else if (float_check.check()) { //is float
+    m.setInputDivision(float_check());
+  }
+  else {
+    //try hard-core extraction - throws TypeError, if not possible
+    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
+    m.setInputDivision(val);
+  }
+}
+
+static void set_bias(mach::LinearMachine& m, object o) {
+  extract<int> int_check(o);
+  extract<double> float_check(o);
+  if (int_check.check()) { //is int
+    m.setBiases(int_check());
+  }
+  else if (float_check.check()) { //is float
+    m.setBiases(float_check());
+  }
+  else {
+    //try hard-core extraction - throws TypeError, if not possible
+    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
+    m.setBiases(val);
+  }
+}
+
 void bind_machine_linear() {
   enum_<mach::LinearMachine::Activation>("Activation")
     .value("LINEAR", mach::LinearMachine::LINEAR)
@@ -28,17 +85,17 @@ void bind_machine_linear() {
 
   class_<mach::LinearMachine, boost::shared_ptr<mach::LinearMachine>
     >("LinearMachine", "A linear classifier. See C. M. Bishop, 'Pattern Recognition and Machine  Learning', chapter 4 for more details", init<size_t,size_t>((arg("input_size"), arg("output_size")), "Constructs a new linear machine with a certain input and output sizes. The weights and biases are initialized to zero."))
-    .def(init<const blitz::Array<double,2>&, const blitz::Array<double,1>&>((arg("weights"),arg("biases")), "Constructs a new LinearMachine from a set of weights and biases values. Both weights and biases have their dimensionalities checked between each other for consistency."))
+    .def(init<const blitz::Array<double,2>&>((arg("weights")), "Constructs a new LinearMachine from a set of weight values."))
     .def(init<db::HDF5File&>((arg("config")), "Constructs a new LinearMachine from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
     .def("load", &mach::LinearMachine::load, (arg("self"), arg("config")), "Loads the weights and biases from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency.")
     .def("save", &mach::LinearMachine::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
-    .add_property("input_subtract", &mach::LinearMachine::getInputSubraction, &mach::LinearMachine::setInputSubtraction)
-    .add_property("input_divide", &mach::LinearMachine::getInputDivision, &mach::LinearMachine::setInputDivision)
-    .add_property("weights", &mach::LinearMachine::getWeights, &mach::LinearMachine::setWeights)
-    .add_property("biases", &mach::LinearMachine::getBiases, &mach::LinearMachine::setBiases)
+    .add_property("input_subtract", make_function(&mach::LinearMachine::getInputSubraction, return_internal_reference<>()), &set_input_sub)
+    .add_property("input_divide", make_function(&mach::LinearMachine::getInputDivision, return_internal_reference<>()), &set_input_div)
+    .add_property("weights", make_function(&mach::LinearMachine::getWeights, return_internal_reference<>()), &mach::LinearMachine::setWeights)
+    .add_property("biases", make_function(&mach::LinearMachine::getBiases, return_internal_reference<>()), &set_bias)
     .add_property("activation", &mach::LinearMachine::getActivation, &mach::LinearMachine::setActivation)
-    .def("setAll", &mach::LinearMachine::setAll,
-        (arg("self"), arg("input_subtract"), arg("input_divide"), arg("weights"), arg("biases")), "Sets the weights, biases and input normalization parameters of the current machine, checking dimensions so they are compatible with each other.")
+    .add_property("shape", &get_shape, &set_shape)
+    .def("resize", &mach::LinearMachine::resize, (arg("self"), arg("input"), arg("output")), "Resizes the machine. If either the input or output increases in size, the weights and other factors should be considered uninitialized. If the size is preserved or reduced, already initialized values will not be changed.\n\nTip: Use this method to force data compression. All will work out given most relevant factors to be preserved are organized on the top of the weight matrix. In this way, reducing the system size will supress less relevant projections.")
     .def("__call__", &mach::LinearMachine::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
     .def("forward", &mach::LinearMachine::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
     .def("__call__", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
