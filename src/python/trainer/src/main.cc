@@ -3,7 +3,7 @@
 using namespace boost::python;
 
 void bind_trainer_exception();
-void bind_trainer_eigen();
+void bind_trainer_linear();
 void bind_trainer_gmm();
 void bind_trainer_kmeans();
 
@@ -15,7 +15,7 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   scope().attr("__doc__") = "Torch classes and sub-classes for trainers";
   
   bind_trainer_exception();
-  bind_trainer_eigen();
+  bind_trainer_linear();
   bind_trainer_gmm();
   bind_trainer_kmeans();
 }

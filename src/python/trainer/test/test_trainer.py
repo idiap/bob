@@ -284,32 +284,6 @@ class TrainerTest(unittest.TestCase):
     machine = torch.machine.KMeansMachine(2, 2)
     mytrainer.train(machine, ar)
     
-
-  def test07_pca(self):
-    # Define input samples
-    s = range(0,10)
-    s[0] = torch.core.array.float64_1([2.5, 2.4],(2,))
-    s[1] = torch.core.array.float64_1([0.5, 0.7],(2,))
-    s[2] = torch.core.array.float64_1([2.2, 2.9],(2,))
-    s[3] = torch.core.array.float64_1([1.9, 2.2],(2,))
-    s[4] = torch.core.array.float64_1([3.1, 3.0],(2,))
-    s[5] = torch.core.array.float64_1([2.3, 2.7],(2,))
-    s[6] = torch.core.array.float64_1([2., 1.6],(2,))
-    s[7] = torch.core.array.float64_1([1., 1.1],(2,))
-    s[8] = torch.core.array.float64_1([1.5, 1.6],(2,))
-    s[9] = torch.core.array.float64_1([1.1, 0.9],(2,))
-    a = torch.database.Arrayset()
-    for i in range(0,10):
-      a.append(s[i])
-    #sampler = torch.trainer.SimpleFrameSampler(a)
-
-    mymachine = torch.machine.EigenMachine()
-    mytrainer = torch.trainer.SVDPCATrainer()
-    mytrainer.train(mymachine, a)
-
-    print mymachine.getEigenvalues()
-    print mymachine.getEigenvectors()
-
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \

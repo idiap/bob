@@ -47,7 +47,7 @@ namespace Torch { namespace trainer {
       SVDPCATrainer(bool zscore_convert);
 
       /**
-       * Default constructor. This is equivalent of calling 
+       * Default constructor. This is equivalent to calling 
        * SVDPCATrainer(false).
        */
       SVDPCATrainer();

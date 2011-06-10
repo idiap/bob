@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
    "src/exception.cc"
-   "src/eigen.cc"
+   "src/linear.cc"
    "src/kmeans.cc"
    "src/gmm.cc"
    "src/main.cc"
@@ -25,6 +25,9 @@ torch_python_install(trainer)
 # Our test units
 torch_python_add_test(python-trainer-kmeans-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_trainer.py)
+
+torch_python_add_test(python-trainer-linear-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/test_linear.py)
 
 torch_python_add_test(python-trainer-gmm_train
   ${CMAKE_CURRENT_SOURCE_DIR}/script/gmm_train.py --self-test)
