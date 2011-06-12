@@ -66,11 +66,13 @@ Data access
   Please note we make use of the C++ API (a.k.a. ImageMagick++).
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
   or configuration items in Torch. We currently compile against version 1.8.6,
-  and version 1.8.4 might not work.
+  Version 1.8.4 (and before) might not work.
 * `MatIO`_: is used for reading and writing Matlab compatible (.mat) files.
   Our nightly builds compile against version 1.34, but version 1.33 is known to
   work. Other versions should also work. Please note this dependence is
   *optional*.
+
+.. _basic-build:
 
 Building and debugging
 ======================
@@ -114,15 +116,54 @@ ability to plot and interact with Torch:
 Notes for specific platforms
 ----------------------------
 
-Ubuntu
-======
+Ubuntu 10.04 (LTS)
+==================
 
 A single command line that will install all required packages under Ubuntu
 (tested on Ubuntu 10.04 LTS):
 
 .. code-block:: sh
 
-   $ sudo apt-get install cmake libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-1.8.4 libhdf5-serial-dev
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev
+
+.. note::
+
+  Support for libgoogle-perftools-dev in Ubuntu 10.04 LTS is broken so you will
+  not be able to profile |project| using this support. You may still use
+  Valgrind or other profiling tools of your choice.
+
+.. warning::
+
+  There are couple of API modifications that currently affect the build of
+  |project| on Ubuntu 10.04 (LTS). Please have a look at `the Ubuntu 10.04
+  ticket`_ before trying any of this by yourself.
+
+  You may overcome these limitations by installing both HDF5 (and dependencies)
+  and FFMPEG on a private directory and informing CMake of that using
+  the CMAKE_PREFIX_PATH environment variable as explained before at
+  :ref:`basic-build`.
+
+Ubuntu 11.04
+============
+
+A single command line that will install all required packages under Ubuntu
+(tested on Ubuntu 11.04):
+
+.. code-block:: sh
+
+   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev
+
+.. warning::
+
+  There are couple of API modifications that currently affect the build of
+  |project| on Ubuntu 11.04. Please have a look at `the Ubuntu 10.04
+  ticket`_ before trying any of this by yourself. Some of the issues reported
+  there are still present in Ubuntu 11.04. FFMPEG issues are cured though.
+
+  You may overcome these limitations by installing HDF5 (and dependencies)
+  on a private directory and informing CMake of that using the
+  CMAKE_PREFIX_PATH environment variable as explained before at
+  :ref:`basic-build`.
 
 Mac OSX
 =======
@@ -140,9 +181,9 @@ your shell prompt:
 .. code-block:: sh
 
    $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx hdf5-18 py26-h5py py26-tables boost +python26
-   $ # go for a long coffee
+   $ # go for a long coffee ('atlas' may take up to 12 hours to install!)
 
-You can install also git if you want to submit patches to us:
+You can also install git if you want to submit patches to us:
 
 .. code-block:: sh
 
@@ -293,4 +334,5 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _tables: http://www.pytables.org
 .. _matplotlib: http://matplotlib.sourceforge.net
 .. _torchidiapguide: https://www.idiap.ch/software/torch5spro/wiki/TorchIdiapGuide
-.. _buildbot: http://http://trac.buildbot.net
+.. _buildbot: http://trac.buildbot.net
+.. _the Ubuntu 10.04 ticket: http://www.idiap.ch/software/torch5spro/ticket/89/
