@@ -6,7 +6,7 @@ set(cblas_FOUND "NO" CACHE INTERNAL "package")
 
 # Here we do some variable cleanup and adjustments
 find_path(cblas_INCLUDE NAMES cblas.h)
-find_path(lapack_INCLUDE NAMES clapack.h)
+find_path(lapack_INCLUDE NAMES clapack.h PATHS "/usr/include/atlas")
 set(cblas_INCLUDE_DIRS ${cblas_INCLUDE};${lapack_INCLUDE})
 list(REMOVE_DUPLICATES cblas_INCLUDE_DIRS)
 set(cblas_INCLUDE_DIRS ${cblas_INCLUDE_DIRS} CACHE INTERNAL "incdirs")
