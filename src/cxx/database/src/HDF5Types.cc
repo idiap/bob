@@ -63,8 +63,8 @@ static herr_t walker(unsigned n, const H5E_error2_t *desc, void *cookie) {
 
 static herr_t err_callback(hid_t stack, void* cookie) {
   db::HDF5ErrorStack& err_stack = *(db::HDF5ErrorStack*)cookie;
-  if (!err_stack.muted()) H5Ewalk(stack, H5E_WALK_DOWNWARD, walker, cookie);
-  H5Eclear(stack);
+  if (!err_stack.muted()) H5Ewalk2(stack, H5E_WALK_DOWNWARD, walker, cookie);
+  H5Eclear2(stack);
   return 0;
 }
 
@@ -75,8 +75,8 @@ db::HDF5ErrorStack::HDF5ErrorStack ():
   m_func(0),
   m_client_data(0)
 {
-  H5Eget_auto(m_stack, &m_func, &m_client_data);
-  H5Eset_auto(m_stack, err_callback, this);
+  H5Eget_auto2(m_stack, &m_func, &m_client_data);
+  H5Eset_auto2(m_stack, err_callback, this);
 }
 
 db::HDF5ErrorStack::HDF5ErrorStack (hid_t stack):
@@ -86,12 +86,12 @@ db::HDF5ErrorStack::HDF5ErrorStack (hid_t stack):
   m_func(0),
   m_client_data(0)
 {
-  H5Eget_auto(m_stack, &m_func, &m_client_data);
-  H5Eset_auto(m_stack, err_callback, this);
+  H5Eget_auto2(m_stack, &m_func, &m_client_data);
+  H5Eset_auto2(m_stack, err_callback, this);
 }
 
 db::HDF5ErrorStack::~HDF5ErrorStack () {
-  H5Eset_auto(m_stack, m_func, m_client_data);
+  H5Eset_auto2(m_stack, m_func, m_client_data);
 }
 
 boost::shared_ptr<db::HDF5Error> db::HDF5Error::s_instance;
