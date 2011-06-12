@@ -30,7 +30,7 @@ db::Arrayset::Arrayset(const std::string& filename, const std::string& codec):
 {
 }
 
-db::Arrayset::Arrayset(const db::Arrayset::Arrayset& other):
+db::Arrayset::Arrayset(const db::Arrayset& other):
   m_inlined(other.m_inlined),
   m_external(other.m_external),
   m_role(other.m_role)
