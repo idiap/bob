@@ -153,16 +153,26 @@ plain gcc. After running the command above, do the following:
 
 .. code-block:: sh
 
-   $ sudo gcc_select llvm-gcc42
+   $ sudo port select gcc llvm-gcc42
    #or
-   $ sudo gcc_select mp-llvm-gcc42
+   $ sudo port select gcc mp-llvm-gcc42
+
+.. warning::
+
+  If you have an old ports tree, you may have to do instead:
+
+  .. code-block:: sh
+
+     $ sudo gcc_select llvm-gcc42
+     #or
+     $ sudo gcc_select mp-llvm-gcc42
 
 We also have fortran files that need compilation. Make sure ``gfortran`` is
 accessible from the command line before trying to compile. Specifically, the
-MacPorts installation may not put ``gfortran`` on the command line and call the
-executable in a different way (in my system it is called ``gfortran-mp-4.4``).
-To make cmake find the fortran compiler you will have to create, manually, a
-symbolic link from this binary. Here are the instructions:
+MacPorts installation may not put ``gfortran`` on the command line if you
+select specific compilers which don't have a gfortran frontend.  To make cmake
+find the fortran compiler you will have to create, manually, a symbolic link
+from this binary. Here are the instructions:
 
 .. code-block:: sh
 
@@ -172,6 +182,9 @@ symbolic link from this binary. Here are the instructions:
    * Torch/Blitz python bindings will not compile in **release** mode with plain
      gcc-4.2 (blitz causes a segmentation fault at the compiler). This is why
      we recommend to use the llvm gcc bridge instead.
+
+   * The current MacPorts versionf blitz does not compile with anything newer
+     than gcc-4.2.
 
 After you have gone through these installation steps, you can proceed with the
 normal TorchCompilation instructions. If you have followed the
