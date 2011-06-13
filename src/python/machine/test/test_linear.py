@@ -27,12 +27,13 @@ class MachineTest(unittest.TestCase):
 
     # Start by providing the data
     w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
+    m = torch.machine.LinearMachine(w)
     b = torch.core.array.array([0.3, -3.0], 'float64')
-    m = torch.machine.LinearMachine(w, b)
     isub = torch.core.array.array([0., 0.5, 0.5], 'float64')
     idiv = torch.core.array.array([0.5, 1.0, 1.0], 'float64')
     m.input_subtract = isub
     m.input_divide = idiv
+    m.biases = b
     m.activation = torch.machine.Activation.TANH
 
     self.assertTrue( (m.input_subtract == isub).all() )
@@ -50,11 +51,16 @@ class MachineTest(unittest.TestCase):
     self.assertTrue( (m.weights == w).all() )
     self.assertTrue( (m.biases == b). all() )
 
-    # Makes sure we cannot start with incompatible data
+    # Makes sure we cannot stuff incompatible data
     w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
-    b = torch.core.array.array([0.3, -3.0, 2.7], 'float64') #wrong
+    m = torch.machine.LinearMachine(w)
+    b = torch.core.array.array([0.3, -3.0, 2.7, -18, 52], 'float64') #wrong
+    self.assertRaises( torch.machine.NOutputsMismatch, 
+        setattr, m, 'biases', b)
     self.assertRaises( torch.machine.NInputsMismatch, 
-        torch.machine.LinearMachine, w, b )
+        setattr, m, 'input_subtract', b)
+    self.assertRaises( torch.machine.NInputsMismatch, 
+        setattr, m, 'input_divide', b)
 
   def test02_Correctness(self):
 
