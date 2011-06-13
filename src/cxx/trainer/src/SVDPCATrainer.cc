@@ -47,8 +47,8 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
     throw Torch::database::TypeError(ar.getElementType(),
         Torch::core::array::t_float64);
   }
-  if (ar.getNDim() != 2) {
-    throw Torch::database::DimensionError(ar.getNDim(), 2);
+  if (ar.getNDim() != 1) {
+    throw Torch::database::DimensionError(ar.getNDim(), 1);
   }
 
   // data is checked now and conforms, just proceed w/o any further checks.
@@ -96,10 +96,11 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
   machine.setInputSubtraction(mean);
   machine.setInputDivision(1.0);
   machine.setBiases(0.0);
+  U.transposeSelf(1,0);
   machine.setWeights(U);
 
   //weight normalization (if necessary):
-  //norm_factor = blitz::sum(blitz::pow2(U(i,all)))
+  //norm_factor = blitz::sum(blitz::pow2(V(all,i)))
 
   // finally, we set also the eigen values in this version
   eigen_values.resize(n_sigma);

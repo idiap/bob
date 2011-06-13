@@ -18,28 +18,28 @@ class TrainerTest(unittest.TestCase):
   def test01_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
-
-    s = range(0,10)
-    s[0] = torch.core.array.float64_1([2.5, 2.4],(2,))
-    s[1] = torch.core.array.float64_1([0.5, 0.7],(2,))
-    s[2] = torch.core.array.float64_1([2.2, 2.9],(2,))
-    s[3] = torch.core.array.float64_1([1.9, 2.2],(2,))
-    s[4] = torch.core.array.float64_1([3.1, 3.0],(2,))
-    s[5] = torch.core.array.float64_1([2.3, 2.7],(2,))
-    s[6] = torch.core.array.float64_1([2., 1.6],(2,))
-    s[7] = torch.core.array.float64_1([1., 1.1],(2,))
-    s[8] = torch.core.array.float64_1([1.5, 1.6],(2,))
-    s[9] = torch.core.array.float64_1([1.1, 0.9],(2,))
-
     data = torch.database.Arrayset()
-    for i in range(0,10): data.append(s[i])
+    data.append(torch.core.array.float64_1([2.5, 2.4],(2,)))
+    data.append(torch.core.array.float64_1([0.5, 0.7],(2,)))
+    data.append(torch.core.array.float64_1([2.2, 2.9],(2,)))
+    data.append(torch.core.array.float64_1([1.9, 2.2],(2,)))
+    data.append(torch.core.array.float64_1([3.1, 3.0],(2,)))
+    data.append(torch.core.array.float64_1([2.3, 2.7],(2,)))
+    data.append(torch.core.array.float64_1([2., 1.6],(2,)))
+    data.append(torch.core.array.float64_1([1., 1.1],(2,)))
+    data.append(torch.core.array.float64_1([1.5, 1.6],(2,)))
+    data.append(torch.core.array.float64_1([1.1, 0.9],(2,)))
 
-    M = torch.machine.LinearMachine()
+    # Expected results
+    eig_val_correct = torch.core.array.array([1.28402771, 0.0490834], 'float64')
+    eig_vec_correct = torch.core.array.array([[-0.6778734, -0.73517866], [-0.73517866, 0.6778734]], 'float64')
+
     T = torch.trainer.SVDPCATrainer()
-    T.train(M, data)
+    machine, eig_vals = T.train(data)
 
-    print mymachine.getEigenvalues()
-    print mymachine.getEigenvectors()
+    # Makes sure results are good
+    self.assertTrue( ((machine.weights - eig_vec_correct) < 1e-6).all() )
+    self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')

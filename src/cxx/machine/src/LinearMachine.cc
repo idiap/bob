@@ -17,12 +17,12 @@ inline static double linear(double x) { return x; }
 inline static double logistic(double x) { return 1.0 / (1.0 + std::exp(-x)); }
       
 mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
-  : m_input_sub(weight.extent(1)),
-    m_input_div(weight.extent(1)),
-    m_bias(weight.extent(0)),
+  : m_input_sub(weight.extent(0)),
+    m_input_div(weight.extent(0)),
+    m_bias(weight.extent(1)),
     m_activation(mach::LinearMachine::LINEAR),
     m_actfun(linear),
-    m_buffer(weight.extent(1))
+    m_buffer(weight.extent(0))
 {
   m_input_sub = 0.0;
   m_input_div = 1.0;
@@ -30,10 +30,21 @@ mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
   m_weight.reference(weight.copy());
 }
 
+mach::LinearMachine::LinearMachine():
+  m_input_sub(0),
+  m_input_div(0),
+  m_weight(0, 0),
+  m_bias(0),
+  m_activation(mach::LinearMachine::LINEAR),
+  m_actfun(linear),
+  m_buffer(0)
+{
+}
+
 mach::LinearMachine::LinearMachine(size_t n_input, size_t n_output):
   m_input_sub(n_input),
   m_input_div(n_input),
-  m_weight(n_output, n_input),
+  m_weight(n_input, n_output),
   m_bias(n_output),
   m_activation(mach::LinearMachine::LINEAR),
   m_actfun(linear),
@@ -77,14 +88,14 @@ mach::LinearMachine& mach::LinearMachine::operator=
 void mach::LinearMachine::load (Torch::database::HDF5File& config) {
   //query linear machine shape
   const Torch::database::HDF5Type& t = config.describe("weights");
-  size_t n_output = t.shape()[0];
-  size_t n_input = t.shape()[1];
+  size_t n_input = t.shape()[0];
+  size_t n_output = t.shape()[1];
 
   //reset all members to prepare the data copy using HDF5
   m_input_sub.resize(n_input);
   m_input_div.resize(n_input);
   m_buffer.resize(n_input);
-  m_weight.resize(n_output, n_input);
+  m_weight.resize(n_input, n_output);
   m_bias.resize(n_output);
 
   //reads all data directly into the member variables
@@ -118,50 +129,50 @@ void mach::LinearMachine::save (Torch::database::HDF5File& config) const {
 
 void mach::LinearMachine::forward
 (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const {
-  if (m_weight.extent(0) != output.extent(0))
-    throw mach::NOutputsMismatch(m_weight.extent(0),
-        output.extent(0));
-  if (m_weight.extent(1) != input.extent(0))
-    throw mach::NInputsMismatch(m_weight.extent(1),
+  if (m_weight.extent(0) != input.extent(0)) //checks input
+    throw mach::NInputsMismatch(m_weight.extent(0),
         input.extent(0));
+  if (m_weight.extent(1) != output.extent(0)) //checks output
+    throw mach::NOutputsMismatch(m_weight.extent(1),
+        output.extent(0));
 
   m_buffer = (input - m_input_sub) / m_input_div;
   blitz::Range a = blitz::Range::all();
   for (int i=0; i<m_weight.extent(0); ++i)
-    output(i) = m_actfun(blitz::sum(m_weight(i,a)*m_buffer) + m_bias(i));
+    output(i) = m_actfun(blitz::sum(m_weight(a,i)*m_buffer) + m_bias(i));
 }
 
 void mach::LinearMachine::setWeights
 (const blitz::Array<double,2>& weight) {
-  if (weight.extent(0) != m_bias.extent(0)) {
-    throw mach::NOutputsMismatch(weight.extent(0), m_bias.extent(0));
+  if (weight.extent(0) != m_input_sub.extent(0)) { //checks input
+    throw mach::NInputsMismatch(weight.extent(0), m_bias.extent(0));
   }
-  if (weight.extent(1) != m_input_sub.extent(0)) {
-    throw mach::NInputsMismatch(weight.extent(1), m_bias.extent(0));
+  if (weight.extent(1) != m_bias.extent(0)) { //checks output
+    throw mach::NOutputsMismatch(weight.extent(1), m_bias.extent(0));
   }
   m_weight.reference(weight.copy());
 }
 
 void mach::LinearMachine::setBiases
 (const blitz::Array<double,1>& bias) {
-  if (m_weight.extent(0) != bias.extent(0)) {
-    throw mach::NOutputsMismatch(m_weight.extent(0), bias.extent(0));
+  if (m_weight.extent(1) != bias.extent(0)) {
+    throw mach::NOutputsMismatch(m_weight.extent(1), bias.extent(0));
   }
   m_bias.reference(bias.copy());
 }
 
 void mach::LinearMachine::setInputSubtraction
 (const blitz::Array<double,1>& v) {
-  if (m_weight.extent(1) != v.extent(0)) {
-    throw mach::NInputsMismatch(m_weight.extent(1), v.extent(0));
+  if (m_weight.extent(0) != v.extent(0)) {
+    throw mach::NInputsMismatch(m_weight.extent(0), v.extent(0));
   }
   m_input_sub.reference(v.copy());
 }
 
 void mach::LinearMachine::setInputDivision
 (const blitz::Array<double,1>& v) {
-  if (m_weight.extent(1) != v.extent(0)) {
-    throw mach::NInputsMismatch(m_weight.extent(1), v.extent(0));
+  if (m_weight.extent(0) != v.extent(0)) {
+    throw mach::NInputsMismatch(m_weight.extent(0), v.extent(0));
   }
   m_input_div.reference(v.copy());
 }

@@ -21,12 +21,12 @@ class MachineTest(unittest.TestCase):
     # Two inputs and 1 output
     m = torch.machine.LinearMachine(2,1)
     self.assertTrue( (m.weights == 0.0).all() )
-    self.assertEqual( m.weights.shape(), (1,2) )
+    self.assertEqual( m.weights.shape(), (2,1) )
     self.assertTrue( (m.biases == 0.0).all() )
     self.assertEqual( m.biases.shape(), (1,) )
 
     # Start by providing the data
-    w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
+    w = torch.core.array.array([[0.4, 0.1], [0.4, 0.2], [0.2, 0.7]], 'float64')
     m = torch.machine.LinearMachine(w)
     b = torch.core.array.array([0.3, -3.0], 'float64')
     isub = torch.core.array.array([0., 0.5, 0.5], 'float64')
@@ -87,9 +87,11 @@ class MachineTest(unittest.TestCase):
         [12,0,0],
         ]
 
+    maxerr = torch.core.array.float64_1(2)
+    maxerr.fill(1e-10)
     for k in testing:
       input = torch.core.array.array(k, 'float64')
-      self.assertTrue ( (abs(presumed(input) - m(input)) < 1e-10).all() )
+      self.assertTrue ( (abs(presumed(input) - m(input)) < maxerr).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
