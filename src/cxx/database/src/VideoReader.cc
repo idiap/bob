@@ -398,8 +398,14 @@ void db::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data) {
   while (av_read_frame(m_format_ctxt, &packet) >= 0) {
     // Is this a packet from the video stream?
     if (packet.stream_index == m_stream_index) {
+  
       // Decodes video frame, store it on my buffer
+      // ffmpeg 0.6 and above [libavcodec 52.72.2 = 0x344802]
+#if LIBAVCODEC_VERSION_INT >= 0x344802
       avcodec_decode_video2(m_codec_ctxt, m_frame_buffer, &gotPicture, &packet);
+#else
+      avcodec_decode_video(m_codec_ctxt, m_frame_buffer, &gotPicture, packet.data, packet.size);
+#endif
 
       // Did we get a video frame?
       if (gotPicture) {
@@ -459,7 +465,11 @@ db::VideoReader::const_iterator& db::VideoReader::const_iterator::operator++ () 
     // Is this a packet from the video stream?
     if (packet.stream_index == m_stream_index) {
       // Decodes video frame, store it on my buffer
+#if LIBAVCODEC_VERSION_INT >= 0x344802
       avcodec_decode_video2(m_codec_ctxt, m_frame_buffer, &gotPicture, &packet);
+#else
+      avcodec_decode_video(m_codec_ctxt, m_frame_buffer, &gotPicture, packet.data, packet.size);
+#endif
 
       // Did we get a video frame?
       if (gotPicture) {
