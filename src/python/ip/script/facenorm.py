@@ -14,11 +14,11 @@ A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW):
   FEN = torch.ip.FaceEyesNorm(A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW)
   cropped_img = torch.core.array.float64_2(A_CROP_H, A_CROP_W)
 
-  # Process one file
-  img = torch.database.Array(image_file).get()
-  
   # Display file processed
   print >> sys.stderr, "Crop: " + image_file
+  
+  # Process one file
+  img = torch.database.Array(image_file).get()
 
   # Extract the eye position
   fpos = open(pos_file)
@@ -34,7 +34,7 @@ A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW):
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(image_file))[0] + '.hdf5')
 
   # Save the outpu file
-  torch.database.Array(cropped_img).save(output_file)
+  torch.database.Array(cropped_img.cast('uint8')).save(output_file)
   print output_file
 
   # Close the .pos file

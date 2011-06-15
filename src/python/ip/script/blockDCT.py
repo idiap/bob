@@ -122,12 +122,14 @@ parser.add_option("-b",
                   "--norm-before",
                   dest="norm_before",
                   help="Normalize each block before DCT",
-                  action="store_false")
+                  action="store_true",
+                  default=False)
 parser.add_option("-a",
                   "--norm-after",
                   dest="norm_after",
                   help="Normalize the DCT coefficients",
-                  action="store_false")
+                  action="store_true",
+                  default=False)
 parser.add_option('--self-test',
                   action="store_true",
                   dest="test",
