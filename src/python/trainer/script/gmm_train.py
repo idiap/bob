@@ -82,6 +82,22 @@ parser.add_option("-v",
                   help="Variance threshold",
                   type="float",
                   default=0.001)
+parser.add_option('--adapt-weight',
+                  action="store_true",
+                  dest="adapt_weight",
+                  help="Adapt weight",
+                  default=False)
+parser.add_option('--adapt-variance',
+                  action="store_true",
+                  dest="adapt_variance",
+                  help="Adapt variance",
+                  default=False)
+parser.add_option("-n",
+                  "--norm",
+                  action="store_true",
+                  dest="norm",
+                  help="Normalize input features",
+                  default=False)
 parser.add_option('--self-test',
                   action="store_true",
                   dest="test",
@@ -132,8 +148,11 @@ input_size = ar.shape[0]
 
 # Create a normalized sampler
 #normalizedSampler = NormalizeStdFrameSampler(sampler)
-(normalizedAr,stdAr) = NormalizeStdArrayset(ar)
-
+if options.norm:
+	(normalizedAr,stdAr) = NormalizeStdArrayset(ar)
+else:
+	normalizedAr = ar
+	
 # Create the machines
 kmeans = torch.machine.KMeansMachine(options.n_gaussians, input_size)
 gmm = torch.machine.GMMMachine(options.n_gaussians, input_size)
@@ -149,8 +168,10 @@ kmeansTrainer.train(kmeans, normalizedAr)
 [variances, weights] = kmeans.getVariancesAndWeightsForEachCluster(normalizedAr)
 means = kmeans.means
 
-multiplyVectorsByFactors(means, stdAr)
-multiplyVectorsByFactors(variances, stdAr ** 2)
+# Undo normalization
+if options.norm:
+	multiplyVectorsByFactors(means, stdAr)
+	multiplyVectorsByFactors(variances, stdAr ** 2)
 
 # Initialize gmm
 gmm.means = means
