@@ -26,7 +26,7 @@ void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine,
   std::vector<size_t> ids;
   ar.index(ids);
   for(int i = 0; i < kMeansMachine.getNMeans(); i++) {
-    boost::uniform_int<> range(i*n_chunk,(i+1)*n_chunk);
+    boost::uniform_int<> range(i*n_chunk, (i+1)*n_chunk-1);
     boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(rng, range);
     
     // get random index within chunk
