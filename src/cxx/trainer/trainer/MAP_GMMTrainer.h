@@ -18,7 +18,7 @@ class MAP_GMMTrainer : public GMMTrainer {
   public:
 
     /// Default constructor
-    MAP_GMMTrainer(double relevance_factor = 0);
+    MAP_GMMTrainer(double relevance_factor = 0, bool update_means = true, bool update_variances = false, bool update_weights = false);
 
     /// Destructor
     virtual ~MAP_GMMTrainer();

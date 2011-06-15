@@ -1,7 +1,7 @@
 #include "trainer/MAP_GMMTrainer.h"
 #include "trainer/Exception.h"
 
-Torch::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor) : GMMTrainer(), relevance_factor(relevance_factor), m_prior_gmm(NULL) {
+Torch::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, bool update_weights) : GMMTrainer(update_means, update_variances, update_weights), relevance_factor(relevance_factor), m_prior_gmm(NULL) {
   
 }
 
@@ -71,7 +71,15 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
 
     // Calculate new means
     blitz::Array<double,2> new_means(n_gaussians,n_inputs);
-    new_means = alpha(i) * ml_means(i,j) + (1-alpha(i)) * prior_means(i,j);
+    for (int i = 0; i < n_gaussians; i++) {
+      blitz::Array<double,1> means(new_means(i, blitz::Range::all()));
+      if (m_ss.n(i) <= (1e-3 + DBL_EPSILON*10)) {
+        means = prior_means(i, blitz::Range::all());
+      }
+      else {
+        means = alpha(i) * ml_means(i, blitz::Range::all()) + (1-alpha(i)) * prior_means(i, blitz::Range::all());
+      }
+    }
 
     // Set the new means
     gmm.setMeans(new_means);
