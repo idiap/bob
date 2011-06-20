@@ -17,7 +17,6 @@ static const char* PROD_MATVEC_DOC = "Compute the product of a matrix and a vect
 static const char* PROD_VECVEC_DOC = "Compute the product of a (column-)vector and a transposed/row-vector and generate a matrix.";
 static const char* TRACE_DOC = "Compute the trace of a matrix.";
 
-
 void bind_math_linear()
 {
   // Linear system solver
@@ -26,4 +25,3 @@ void bind_math_linear()
   def("prod", (void (*)(const blitz::Array<double,1>& a, const blitz::Array<double,1>& b, blitz::Array<double,2>& C))&Torch::math::prod, (arg("a"), arg("b")), PROD_VECVEC_DOC);
   def("trace", (double (*)(const blitz::Array<double,2>& A))&Torch::math::trace, (arg("A")), TRACE_DOC);
 }
-

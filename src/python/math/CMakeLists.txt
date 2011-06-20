@@ -9,6 +9,7 @@ set(pysrc
    "src/lu_det.cc"
    "src/norminv.cc"
    "src/svd.cc"
+   "src/stats.cc"
    "src/main.cc"
    )
  
