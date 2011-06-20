@@ -14,7 +14,6 @@ set(src
     "src/Gaussian.cc"
     "src/GMMMachine.cc"
     "src/GMMStats.cc"
-    "src/EigenMachine.cc"
     "src/EigenMachineException.cc"
     "src/ImageSample.cc"
     "src/TwoDPCAMachine.cc"
