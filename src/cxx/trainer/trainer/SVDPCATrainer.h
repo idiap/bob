@@ -24,8 +24,6 @@ namespace Torch { namespace trainer {
    *    Pages: 71-86
    * 2. http://en.wikipedia.org/wiki/Singular_value_decomposition
    * 3. http://en.wikipedia.org/wiki/Principal_component_analysis
-   *
-   * Tests are executed against the Matlab printcomp output for correctness.
    */
   class SVDPCATrainer {
 
