@@ -105,6 +105,13 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
   // finally, we set also the eigen values in this version
   eigen_values.resize(n_sigma);
   eigen_values = blitz::pow2(sigma)/(n_samples-1);
+
+  // if the user wants z-score normalization
+  if (m_zscore_convert) {
+    blitz::Array<double,1> tmp(eigen_values.extent(0));
+    tmp = blitz::sqrt(eigen_values);
+    machine.setInputDivision(tmp);
+  }
 }
 
 void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine, 
