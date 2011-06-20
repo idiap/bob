@@ -26,8 +26,6 @@ torch_library(machine "${src}" "${deps}" "${shared}")
 add_dependencies(torch_machine machine-cxx_header_install trainer-cxx_header_install)
 
 # Defines tests for this package
-#torch_test(machine block test/block.cc)
-
-# Defines environment variable used to localize data for the tests
-#set_property(TEST cxx-machine-gabor APPEND PROPERTY ENVIRONMENT
-#  "TORCH_IP_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+torch_test(machine linear test/linear.cc)
+set_property(TEST cxx-machine-linear APPEND PROPERTY ENVIRONMENT
+  "TORCH_MACHINE_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../../python/machine/test/data")
