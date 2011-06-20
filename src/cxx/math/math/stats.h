@@ -33,7 +33,7 @@ namespace Torch { namespace math {
       S = 0;
 
       blitz::Array<T,1> buffer(A.extent(0));
-      for (int z=0; z<A.extent(0); ++z) {
+      for (int z=0; z<A.extent(1); ++z) {
         buffer = A(a,z) - M;
         S += buffer(i) * buffer(j); //outer product
       }
