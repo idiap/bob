@@ -59,7 +59,7 @@ static void evalCorrelations (const std::vector<blitz::Array<double,2> >& data,
   for (size_t cl=0; cl<data.size(); ++cl) { //class loop
     counts = data[cl].extent(1);
     classMeans(a,cl) = blitz::mean(data[cl],j);
-    for (blitz::sizeType z=0; z<data[cl].extent(1); ++z) { //examples 
+    for (int z=0; z<data[cl].extent(1); ++z) { //examples
       buffer = data[cl](a,z) - classMeans(a,cl);
       Sw += buffer(i) * buffer(j); //outer product
     }
