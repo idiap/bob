@@ -19,5 +19,7 @@ torch_python_package_bindings(math "${pysrc}")
 torch_python_install(math)
 
 # Our test units
-torch_python_add_test(python-ip-eigenvalue-tests 
+torch_python_add_test(python-math-eigenvalue-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_eig.py)
+torch_python_add_test(python-math-stats-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_stats.py)
