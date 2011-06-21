@@ -10,8 +10,10 @@
 #include "database/Arrayset.h"
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"
+#include "math/linear.h"
 
 namespace mach = Torch::machine;
+namespace math = Torch::math;
 
 inline static double linear(double x) { return x; }
 inline static double logistic(double x) { return 1.0 / (1.0 + std::exp(-x)); }
@@ -127,6 +129,14 @@ void mach::LinearMachine::save (Torch::database::HDF5File& config) const {
   config.append("activation", static_cast<uint32_t>(m_activation));
 }
 
+void mach::LinearMachine::forward_
+(const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const {
+  m_buffer = (input - m_input_sub) / m_input_div;
+  math::prod_(m_buffer, m_weight, output);
+  for (int i=0; i<m_weight.extent(1); ++i)
+    output(i) = m_actfun(output(i) + m_bias(i));
+}
+
 void mach::LinearMachine::forward
 (const blitz::Array<double,1>& input, blitz::Array<double,1>& output) const {
   if (m_weight.extent(0) != input.extent(0)) //checks input
@@ -135,11 +145,7 @@ void mach::LinearMachine::forward
   if (m_weight.extent(1) != output.extent(0)) //checks output
     throw mach::NOutputsMismatch(m_weight.extent(1),
         output.extent(0));
-
-  m_buffer = (input - m_input_sub) / m_input_div;
-  blitz::Range a = blitz::Range::all();
-  for (int i=0; i<m_weight.extent(0); ++i)
-    output(i) = m_actfun(blitz::sum(m_weight(a,i)*m_buffer) + m_bias(i));
+  forward_(input, output);
 }
 
 void mach::LinearMachine::setWeights
