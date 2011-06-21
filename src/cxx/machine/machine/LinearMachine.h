@@ -95,6 +95,16 @@ namespace Torch { namespace machine {
        * Forwards data through the network, outputs the values of each linear
        * component the input signal is decomposed at.
        *
+       * The input and output are NOT checked for compatibility each time. It
+       * is your responsibility to do it.
+       */
+      void forward_ (const blitz::Array<double,1>& input,
+          blitz::Array<double,1>& output) const;
+
+      /**
+       * Forwards data through the network, outputs the values of each linear
+       * component the input signal is decomposed at.
+       *
        * The input and output are checked for compatibility each time the
        * forward method is applied.
        */
