@@ -1,5 +1,9 @@
 #include "machine/Gaussian.h"
 #include <cfloat>
+#include <config/Configuration.h>
+#include <database/Array.h>
+#include <database/Arrayset.h>
+#include <machine/Exception.h>
 
 double Torch::machine::Log::LogAdd(double log_a, double log_b) {
   double minusdif;
@@ -13,8 +17,10 @@ double Torch::machine::Log::LogAdd(double log_a, double log_b) {
 
   minusdif = log_b - log_a;
   //#ifdef DEBUG
-  if (std::isnan(minusdif))
-  printf("LogAdd: minusdif (%f) log_b (%f) or log_a (%f) is nan\n", minusdif, log_b, log_a);
+  if (std::isnan(minusdif)) {
+    printf("LogAdd: minusdif (%f) log_b (%f) or log_a (%f) is nan\n", minusdif, log_b, log_a);
+    throw Torch::machine::Exception();
+  }
   //#endif
   if (minusdif < MINUS_LOG_THRESHOLD) return log_a;
   else return log_a + log1p(exp(minusdif));
@@ -23,13 +29,17 @@ double Torch::machine::Log::LogAdd(double log_a, double log_b) {
 double Torch::machine::Log::LogSub(double log_a, double log_b) {
   double minusdif;
 
-  if (log_a < log_b)
+  if (log_a < log_b) {
     printf("LogSub: log_a (%f) should be greater than log_b (%f)", log_a, log_b);
+    throw Torch::machine::Exception();
+  }
 
   minusdif = log_b - log_a;
   //#ifdef DEBUG
-  if (std::isnan(minusdif))
+  if (std::isnan(minusdif)) {
     printf("LogSub: minusdif (%f) log_b (%f) or log_a (%f) is nan", minusdif, log_b, log_a);
+    throw Torch::machine::Exception();
+  }
   //#endif
   if (log_a == log_b) return LogZero;
   else if (minusdif < MINUS_LOG_THRESHOLD) return log_a;

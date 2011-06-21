@@ -54,13 +54,13 @@ public:
         << average_output << std::endl;
       
       // - terminate if converged 
-      if (fabs(average_output_previous - average_output) <= convergence_threshold) {
+      if (fabs((average_output_previous - average_output)/average_output_previous) <= convergence_threshold) {
         Torch::core::info << "# EM terminated: likelihood converged" << std::endl;
         break;
       }
       
        // - terminate if done max iterations 
-      if (max_iterations > 0 && iter >= max_iterations) {
+      if (max_iterations > 0 && iter >= max_iterations-1) {
         Torch::core::info << "# EM terminated: maximum number of iterations reached." << std::endl;
         break;
       }
