@@ -54,4 +54,3 @@ namespace Torch { namespace math {
 }}
 
 #endif /* TORCH_MATH_STATS_H */
-
