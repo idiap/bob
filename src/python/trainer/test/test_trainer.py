@@ -177,8 +177,8 @@ class TrainerTest(unittest.TestCase):
     else:
       means=torch.core.array.float64_1([m2[0],m1[0]],(2,))
     self.assertTrue(equals(means, torch.core.array.float64_1([-10.,10.], (2,)), 2e-1))
-    self.assertTrue(equals(variances,torch.core.array.float64_2([1.,1.],(2,1)),2e-1))
-    self.assertTrue(equals(weights,torch.core.array.float64_1([0.5,0.5],(2,)),1e-3))
+    self.assertTrue(equals(variances,torch.core.array.float64_2([1.,1.], (2,1)), 2e-1))
+    self.assertTrue(equals(weights,torch.core.array.float64_1([0.5,0.5], (2,)), 1e-3))
 
   def test01_kmeans(self):
     """Train a KMeansMachine"""
