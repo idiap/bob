@@ -1,6 +1,5 @@
 #include "machine/Gaussian.h"
 #include <cfloat>
-#include <config/Configuration.h>
 #include <database/Array.h>
 #include <database/Arrayset.h>
 #include <machine/Exception.h>
