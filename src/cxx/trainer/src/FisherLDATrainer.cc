@@ -67,7 +67,7 @@ static void evalCorrelations (const std::vector<blitz::Array<double,2> >& data,
 
   // between class correlations
   // Note: The global mean is calculated according to formula 4.44 on Bishop's
-  // book: the global mean is the mean of all samples.
+  // book -- the global mean is the mean of all samples.
   preMean = blitz::mean(classMeans(i,j)*counts(j),j);
   for (size_t cl=0; cl<data.size(); ++cl) { //class loop
     buffer = classMeans(a,cl) - preMean;

@@ -41,6 +41,38 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue( ((machine.weights - eig_vec_correct) < 1e-6).all() )
     self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
 
+  def no_test02_fisher_lda(self):
+
+    # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
+    # "fake" problem:
+    data = [torch.database.Arrayset(), torch.database.Arrayset()]
+    data[0].append(torch.core.array.float64_1([2.5, 2.4],(2,)))
+    data[0].append(torch.core.array.float64_1([2.2, 2.9],(2,)))
+    data[0].append(torch.core.array.float64_1([1.9, 2.2],(2,)))
+    data[0].append(torch.core.array.float64_1([3.1, 3.0],(2,)))
+    data[0].append(torch.core.array.float64_1([2.3, 2.7],(2,)))
+    data[1].append(torch.core.array.float64_1([0.5, 0.7],(2,)))
+    data[1].append(torch.core.array.float64_1([2., 1.6],(2,)))
+    data[1].append(torch.core.array.float64_1([1., 1.1],(2,)))
+    data[1].append(torch.core.array.float64_1([1.5, 1.6],(2,)))
+    data[1].append(torch.core.array.float64_1([1.1, 0.9],(2,)))
+
+    # Expected results
+    exp_trans_data = [
+        [1.0019, 3.1205, 0.9405, 2.4962, 2.2949], 
+        [-2.9042, -1.3179, -2.0172, -0.7720, -2.8428]
+        ]
+    exp_mean = [1.8100, 1.9100]
+    exp_val = [4.1156, -0.200]
+    exp_M = [-1.0917, 3.5821]
+
+    T = torch.trainer.FisherLDATrainer()
+    machine, eig_vals = T.train(data)
+
+    # Makes sure results are good
+    #self.assertTrue( ((machine.weights - eig_vec_correct) < 1e-6).all() )
+    #self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
