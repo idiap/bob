@@ -17,6 +17,35 @@
 #include "machine/Exception.h"
 #include "core/logging.h"
 #include "database/HDF5File.h"
+#include "math/linear.h"
+
+/**
+ * Evalutes the presumed output of a linear machine through a different path.
+ */
+static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
+  blitz::Array<double,1> buffer(input.copy());
+  
+  blitz::Array<double,2> weights(3,2);
+  weights = 0.4, 0.1, 0.4, 0.2, 0.2, 0.7;
+  blitz::Array<double,1> biases(weights.extent(1));
+  biases = 0.3, -3.0;
+  blitz::Array<double,1> isub(weights.extent(0));
+  isub = 0, 0.5, 0.5;
+  blitz::Array<double,1> idiv(weights.extent(0));
+  idiv = 0.5, 1.0, 1.0;
+  
+  buffer -= isub;
+  buffer /= idiv;
+
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+
+  blitz::Array<double,1> output(weights.extent(1));
+  Torch::math::prod(buffer, weights, output);
+  output += biases;
+  output = blitz::tanh(output);
+  return output;
+}
 
 BOOST_AUTO_TEST_CASE( test_empty_initialization )
 {
@@ -93,4 +122,36 @@ BOOST_AUTO_TEST_CASE( test_error_check )
   BOOST_CHECK_THROW(M.setBiases(X), Torch::machine::NOutputsMismatch);
   BOOST_CHECK_THROW(M.setInputSubtraction(X), Torch::machine::NInputsMismatch);
   BOOST_CHECK_THROW(M.setInputDivision(X), Torch::machine::NInputsMismatch);
+}
+
+BOOST_AUTO_TEST_CASE( test_correctness )
+{
+  //loads a known machine from the file
+  char *testdata_cpath = getenv("TORCH_MACHINE_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    Torch::core::error << "Environment variable $TORCH_MACHINE_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw Torch::core::Exception();
+  }
+  boost::filesystem::path testdata(testdata_cpath);
+  testdata /= "linear-test.hdf5";
+  Torch::database::HDF5File config(testdata.string(), Torch::database::HDF5File::in);
+  Torch::machine::LinearMachine M(config);
+
+  blitz::Array<double,2> in(4,3);
+  in = 1, 1, 1, 
+       0.5, 0.2, 200,
+       -27, 35.77, 0,
+       12, 0, 0;
+
+  blitz::Array<double,1> maxerr(2);
+  maxerr = 1e-10, 1e-10;
+
+  blitz::Range a = blitz::Range::all();
+  for (int i=0; i<in.extent(0); ++i) {
+    blitz::Array<double,1> output(M.outputSize());
+    M.forward(in(i,a), output);
+    BOOST_CHECK(blitz::all(blitz::abs(presumed(in(i,a)) - output) < maxerr));
+  }
 }
