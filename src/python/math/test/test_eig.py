@@ -50,7 +50,7 @@ class EigTest(unittest.TestCase):
     torch.math.eigSym(A,B,V,D)
 
     # Compare eigenvalues to matlab reference
-    ref=torch.core.array.float64_1([-0.2728,0.0510,17.9718], (3,))
+    ref=torch.core.array.float64_1([17.9718,0.510,-0.2728], (3,))
 
     self.assertEqual( ((D-ref) < 1e-3).all(), True )
 
