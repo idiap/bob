@@ -18,17 +18,25 @@ static const char* SCATTER_DOC3 = "Computes the scatter matrix of a 2D array con
 
 template <typename T>
 static tuple scatter(const blitz::Array<T,2>& A) {
-  blitz::Array<T,1> M;
-  blitz::Array<T,2> S;
-  Torch::math::scatter<T>(A,M,S);
-  return make_tuple(M, S);
+  blitz::Array<T,2> S(A.extent(0), A.extent(0));
+  blitz::Array<T,1> M(A.extent(0));
+  Torch::math::scatter<T>(A,S,M);
+  return make_tuple(S,M);
 }
 
 void bind_math_stats() {
+  def("scatter_", (void (*)(const blitz::Array<float,2>&, blitz::Array<float,2>&))&Torch::math::scatter_<float>, (arg("A"),arg("S")), SCATTER_DOC1);
   def("scatter", (void (*)(const blitz::Array<float,2>&, blitz::Array<float,2>&))&Torch::math::scatter<float>, (arg("A"),arg("S")), SCATTER_DOC1);
+  
+  def("scatter_", (void (*)(const blitz::Array<double,2>&, blitz::Array<double,2>&))&Torch::math::scatter_<double>, (arg("A"),arg("S")), SCATTER_DOC1);
   def("scatter", (void (*)(const blitz::Array<double,2>&, blitz::Array<double,2>&))&Torch::math::scatter<double>, (arg("A"),arg("S")), SCATTER_DOC1);
-  def("scatter", (void (*)(const blitz::Array<float,2>&, blitz::Array<float,1>&, blitz::Array<float,2>&))&Torch::math::scatter<float>, (arg("A"),arg("S")), SCATTER_DOC2);
-  def("scatter", (void (*)(const blitz::Array<double,2>&, blitz::Array<double,1>&, blitz::Array<double,2>&))&Torch::math::scatter<double>, (arg("A"),arg("S")), SCATTER_DOC2);
+  
+  def("scatter_", (void (*)(const blitz::Array<float,2>&, blitz::Array<float,2>&, blitz::Array<float,1>&))&Torch::math::scatter_<float>, (arg("A"),arg("S"),arg("M")), SCATTER_DOC2);
+  def("scatter", (void (*)(const blitz::Array<float,2>&, blitz::Array<float,2>&, blitz::Array<float,1>&))&Torch::math::scatter<float>, (arg("A"),arg("S"),arg("M")), SCATTER_DOC2);
+  
+  def("scatter_", (void (*)(const blitz::Array<double,2>&, blitz::Array<double,2>&, blitz::Array<double,1>&))&Torch::math::scatter_<double>, (arg("A"),arg("S"),arg("M")), SCATTER_DOC2);
+  def("scatter", (void (*)(const blitz::Array<double,2>&, blitz::Array<double,2>&, blitz::Array<double,1>&))&Torch::math::scatter<double>, (arg("A"),arg("S"),arg("M")), SCATTER_DOC2);
+  
   def("scatter", &scatter<float>, (arg("A")), SCATTER_DOC3);
   def("scatter", &scatter<double>, (arg("A")), SCATTER_DOC3);
 }

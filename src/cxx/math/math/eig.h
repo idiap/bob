@@ -56,6 +56,9 @@ namespace Torch {
       * @param V The V matrix of eigenvectors (size NxN) stored in columns
       * @param D The vector of eigenvalues (size N)
       *    Please note that this is a 1D array rather than a 2D diagonal matrix!
+      *
+      * AA: Note the returned vectors and values are pre-sorted in decreasing
+      * eigen-value order.
       */
     void eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
       blitz::Array<double,2>& V, blitz::Array<double,1>& D);

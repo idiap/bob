@@ -10,9 +10,8 @@
 #ifndef TORCH_MATH_LINEAR_H
 #define TORCH_MATH_LINEAR_H
 
+#include <blitz/array.h>
 #include "core/array_assert.h"
-
-namespace tca = Torch::core::array;
 
 namespace Torch { namespace math {
 
@@ -51,14 +50,14 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,2>& A, const blitz::Array<T2,2>& B,
         blitz::Array<T3,2>& C) {
       // Check inputs
-      tca::assertZeroBase(A);
-      tca::assertZeroBase(B);
-      tca::assertSameDimensionLength(A.extent(1),B.extent(0));
+      Torch::core::array::assertZeroBase(A);
+      Torch::core::array::assertZeroBase(B);
+      Torch::core::array::assertSameDimensionLength(A.extent(1),B.extent(0));
 
       // Check output
-      tca::assertZeroBase(C);
-      tca::assertSameDimensionLength(A.extent(0), C.extent(0));
-      tca::assertSameDimensionLength(B.extent(1), C.extent(1));
+      Torch::core::array::assertZeroBase(C);
+      Torch::core::array::assertSameDimensionLength(A.extent(0), C.extent(0));
+      Torch::core::array::assertSameDimensionLength(B.extent(1), C.extent(1));
 
       prod_(A, B, C);
     }
@@ -97,13 +96,13 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,2>& A, const blitz::Array<T2,1>& b,
         blitz::Array<T3,1>& c) {
       // Check inputs
-      tca::assertZeroBase(A);
-      tca::assertZeroBase(b);
-      tca::assertSameDimensionLength(A.extent(1),b.extent(0));
+      Torch::core::array::assertZeroBase(A);
+      Torch::core::array::assertZeroBase(b);
+      Torch::core::array::assertSameDimensionLength(A.extent(1),b.extent(0));
 
       // Check output
-      tca::assertZeroBase(c);
-      tca::assertSameDimensionLength(c.extent(0), A.extent(0));
+      Torch::core::array::assertZeroBase(c);
+      Torch::core::array::assertSameDimensionLength(c.extent(0), A.extent(0));
 
       prod_(A, b, c);
     }
@@ -142,13 +141,13 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,1>& a, const blitz::Array<T2,2>& B,
         blitz::Array<T3,1>& c) {
       // Check inputs
-      tca::assertZeroBase(a);
-      tca::assertZeroBase(B);
-      tca::assertSameDimensionLength(a.extent(0),B.extent(0));
+      Torch::core::array::assertZeroBase(a);
+      Torch::core::array::assertZeroBase(B);
+      Torch::core::array::assertSameDimensionLength(a.extent(0),B.extent(0));
 
       // Check output
-      tca::assertZeroBase(c);
-      tca::assertSameDimensionLength(c.extent(0), B.extent(1));
+      Torch::core::array::assertZeroBase(c);
+      Torch::core::array::assertSameDimensionLength(c.extent(0), B.extent(1));
 
       prod_(a, B, c);
     }
@@ -187,13 +186,13 @@ namespace Torch { namespace math {
     void prod(const blitz::Array<T1,1>& a, const blitz::Array<T2,1>& b,
         blitz::Array<T3,2>& C) {
       // Check inputs
-      tca::assertZeroBase(a);
-      tca::assertZeroBase(b);
+      Torch::core::array::assertZeroBase(a);
+      Torch::core::array::assertZeroBase(b);
 
       // Check output
-      tca::assertZeroBase(C);
-      tca::assertSameDimensionLength(C.extent(0), a.extent(0));
-      tca::assertSameDimensionLength(C.extent(1), b.extent(0));
+      Torch::core::array::assertZeroBase(C);
+      Torch::core::array::assertSameDimensionLength(C.extent(0), a.extent(0));
+      Torch::core::array::assertSameDimensionLength(C.extent(1), b.extent(0));
 
       prod_(a, b, C);
     }
@@ -229,9 +228,9 @@ namespace Torch { namespace math {
   template<typename T1, typename T2>
     T1 dot(const blitz::Array<T1,1>& a, const blitz::Array<T2,1>& b) {
       // Check inputs
-      tca::assertZeroBase(a);
-      tca::assertZeroBase(b);
-      tca::assertSameDimensionLength(a.extent(0),b.extent(0));
+      Torch::core::array::assertZeroBase(a);
+      Torch::core::array::assertZeroBase(b);
+      Torch::core::array::assertSameDimensionLength(a.extent(0),b.extent(0));
 
       return dot_(a, b);
     }
@@ -263,10 +262,46 @@ namespace Torch { namespace math {
    */
   template<typename T> T trace(const blitz::Array<T,2>& A) {
     // Check input
-    tca::assertZeroBase(A);
-    tca::assertSameDimensionLength(A.extent(0),A.extent(1));
+    Torch::core::array::assertZeroBase(A);
+    Torch::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
 
     return trace_(A);
+  }
+
+  /**
+   * Normalizes a vector 'i' and outputs the normalized vector in 'o'.
+   *
+   * @warning This version of the normalize() method does not check for length
+   * consistencies and is given as an API for cases in which you have done
+   * already the check and is focused on speed.
+   */
+  template<typename T1, typename T2> void normalize_
+    (const blitz::Array<T1,1>& i, blitz::Array<T2,1>& o) {
+    o = i / std::sqrt(blitz::sum(blitz::pow2(i)));
+  }
+
+  /**
+   * Normalizes a vector 'i' and outputs the normalized vector in itself.
+   *
+   * @note This method receives an array by *value* and not by reference as in
+   * many cases we iterate over the vectors in a matrix and we cannot get a
+   * non-const reference to a blitz::Array<> slice.
+   */
+  template<typename T> void normalizeSelf (blitz::Array<T,1> i) {
+    i /= std::sqrt(blitz::sum(blitz::pow2(i)));
+  }
+
+  /**
+   * Normalizes a vector 'i' and outputs the normalized vector in 'o'.
+   *
+   * Both vectors are checked to make sure they have the same length. If you
+   * want to use an unchecked version, please use normalize_.
+   */
+  template<typename T1, typename T2> void normalize(const blitz::Array<T1,1>& i,
+      blitz::Array<T2,1>& o) {
+    // Check input
+    Torch::core::array::assertSameDimensionLength(i.extent(0),o.extent(0));
+    normalize_(i, o);
   }
 
 } }

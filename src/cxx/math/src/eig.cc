@@ -3,6 +3,9 @@
 #include "core/array_assert.h"
 #include "core/array_old.h"
 #include <blitz/tinyvec-et.h>
+#include <vector>
+#include <utility>
+#include <algorithm>
 
 namespace math = Torch::math;
 
@@ -144,12 +147,15 @@ void math::eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>&
   // Copy singular vectors back to V (column-major order)
   for(int j=0; j<N; ++j)
     for(int i=0; i<N; ++i)
-      V(j,i) = A_lapack[j+i*N];
+      V(j,N-i-1) = A_lapack[j+i*N];
 
   // Copy result back to sigma if required
-  if( !D_direct_use )
-    for(int i=0; i<N; ++i)
-      D(i) = D_lapack[i];
+  if( !D_direct_use ) {
+    for(int i=0; i<N; ++i) D(N-i-1) = D_lapack[i];
+  }
+  else { //order the blitz array directly using the C-style pointers
+    std::reverse(&D_lapack[0], &D_lapack[N]);
+  }
 
   // Free memory
   if( !D_direct_use )
@@ -159,6 +165,13 @@ void math::eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>&
   delete [] work;
 }
 
+/**
+ * STL-conforming predicate to sort the eigen values by magnitude and preserve
+ * the ordering information.
+ */
+static bool cmp_ev (const std::pair<double,int>& l, const std::pair<double,int>& r) {
+  return l.first > r.first; 
+}
 
 void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   blitz::Array<double,2>& V, blitz::Array<double,1>& D)
@@ -215,23 +228,27 @@ void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   if( info != 0)
     throw Torch::math::LapackError("The LAPACK dggev function returned a \
       non-zero value.");
- 
-  // TODO: reorder wrt. eigenvalues magnitude?
 
-  // Copy singular vectors back to V (column-major order)
-  for(int j=0; j<N; ++j)
-    for(int i=0; i<N; ++i)
-      V(j,i) = vr[j+i*N];
-
-  // Copy result back to D
-  for(int i=0; i<N; ++i)
-  {
+  // AA: Re-ordering using std::vector<std::pair<value, index> >
+  std::vector<std::pair<double, int> > eigv_index(N);
+  for(int i=0; i<N; ++i) {
     // TODO: Check that alphai is zero (otherwise complex eigenvalue)
     if( alphai[i]>1e-12 )
       throw Torch::math::LapackError("The LAPACK dggev function returned a \
         non-real (i.e. complex) eigenvalue.");
-    D(i) = alphar[i] / beta[i];
+    eigv_index[i].first = alphar[i] / beta[i];
+    eigv_index[i].second = i;
   }
+  std::sort(eigv_index.begin(), eigv_index.end(), cmp_ev);
+  //eigv_index should now be sorted by descending order
+
+  // Copy singular vectors back to V (column-major order)
+  for(int j=0; j<N; ++j)
+    for(int i=0; i<N; ++i)
+      V(j,eigv_index[i].second) = vr[j+i*N];
+
+  // Copy eigen values back to D
+  for(int i=0; i<N; ++i) { D(i) = eigv_index[i].first; }
 
   // Free memory
   delete [] work;

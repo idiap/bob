@@ -23,6 +23,9 @@ static const char* DOT_DOC = "Computes the dot product between two vectors (1D a
 static const char* DOT_DOC_ = "Computes the dot product between two vectors (1D arrays). Sizes are NOT checked.";
 static const char* TRACE_DOC = "Computes the trace of a matrix. Sizes are checked (to avoid the check, use the _ variants).";
 static const char* TRACE_DOC_ = "Computes the trace of a matrix. Sizes are NOT checked.";
+static const char* NORM_DOC = "Normalizes a vector 'i' and outputs the normalized vector in 'o'. Sizes are checked (to avoid the check, use the _ variants).";
+static const char* NORM_DOC_ = "Normalizes a vector 'i' and outputs the normalized vector in 'o'. Sizes are NOT checked.";
+static const char* NORM_DOC_SELF = "Normalizes a vector 'i' and outputs the normalized vector vector 'i' (i.e., the same input vector).";
 
 template<typename T1, typename T2, typename T3> 
 static blitz::Array<T3,2> r_prod_mm(const blitz::Array<T1,2>& A, const blitz::Array<T2,2>& B) {
@@ -50,6 +53,13 @@ static blitz::Array<T3,2> r_outer(const blitz::Array<T1,1>& a, const blitz::Arra
   blitz::Array<T3,2> C(a.extent(0), b.extent(0));
   math::prod(a, b, C); //we are slow already, use the checked version
   return C;
+}
+
+template<typename T>
+static blitz::Array<T,1> r_normalize(const blitz::Array<T,1>& i) {
+  blitz::Array<T,1> o(i.shape());
+  math::normalize_(i, o);
+  return o;
 }
 
 /**
@@ -87,6 +97,15 @@ template<typename T1, typename T2, typename T3> void def_linear() {
   //trace
   def("trace_", &Torch::math::trace_<T1>, (arg("A")), TRACE_DOC_);
   def("trace", &Torch::math::trace<T1>, (arg("A")), TRACE_DOC);
+
+  //normalization
+  def("normalize_", &Torch::math::normalize_<T1,T2>, (arg("input"),arg("output")), NORM_DOC_);
+  def("normalize", &Torch::math::normalize<T1,T2>, (arg("input"),arg("output")), NORM_DOC);
+  def("normalize", &r_normalize<T1>, (arg("input")), NORM_DOC);
+
+  //self normalization
+  def("normalizeSelf", &Torch::math::normalizeSelf<T1>, (arg("input")), NORM_DOC_SELF);
+
 }
 
 void bind_math_linear() {
