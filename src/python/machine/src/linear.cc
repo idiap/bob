@@ -60,6 +60,22 @@ static void set_input_div(mach::LinearMachine& m, object o) {
   }
 }
 
+static void set_weight(mach::LinearMachine& m, object o) {
+  extract<int> int_check(o);
+  extract<double> float_check(o);
+  if (int_check.check()) { //is int
+    m.setWeights(int_check());
+  }
+  else if (float_check.check()) { //is float
+    m.setWeights(float_check());
+  }
+  else {
+    //try hard-core extraction - throws TypeError, if not possible
+    blitz::Array<double,2> val = extract<blitz::Array<double,2> >(o);
+    m.setWeights(val);
+  }
+}
+
 static void set_bias(mach::LinearMachine& m, object o) {
   extract<int> int_check(o);
   extract<double> float_check(o);
@@ -92,7 +108,7 @@ void bind_machine_linear() {
     .def("save", &mach::LinearMachine::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
     .add_property("input_subtract", make_function(&mach::LinearMachine::getInputSubraction, return_internal_reference<>()), &set_input_sub)
     .add_property("input_divide", make_function(&mach::LinearMachine::getInputDivision, return_internal_reference<>()), &set_input_div)
-    .add_property("weights", make_function(&mach::LinearMachine::getWeights, return_internal_reference<>()), &mach::LinearMachine::setWeights)
+    .add_property("weights", make_function(&mach::LinearMachine::getWeights, return_internal_reference<>()), &set_weight)
     .add_property("biases", make_function(&mach::LinearMachine::getBiases, return_internal_reference<>()), &set_bias)
     .add_property("activation", &mach::LinearMachine::getActivation, &mach::LinearMachine::setActivation)
     .add_property("shape", &get_shape, &set_shape)

@@ -58,6 +58,10 @@ namespace Torch { namespace trainer {
        * product, arranged by decreasing energy.
        *
        * Each input arrayset represents data from a given input class.
+       *
+       * Note we set only the N-1 eigen vectors in the linear machine since the
+       * last eigen value should be zero anyway. You can compress the machine
+       * output further using resize() if necessary.
        */
       virtual void train(Torch::machine::LinearMachine& machine, 
           const std::vector<Torch::database::Arrayset>& data) const;
@@ -70,6 +74,10 @@ namespace Torch { namespace trainer {
        * product so you can use that to choose which components to keep.
        *
        * Each input arrayset represents data from a given input class.
+       *
+       * Note we set only the N-1 eigen vectors in the linear machine since the
+       * last eigen value should be zero anyway. You can compress the machine
+       * output further using resize() if necessary.
        */
       virtual void train(Torch::machine::LinearMachine& machine,
           blitz::Array<double,1>& eigen_values,

@@ -41,7 +41,7 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue( ((machine.weights - eig_vec_correct) < 1e-6).all() )
     self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
 
-  def no_test02_fisher_lda(self):
+  def test02_fisher_lda(self):
 
     # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
     # "fake" problem:
@@ -62,16 +62,17 @@ class TrainerTest(unittest.TestCase):
         [1.0019, 3.1205, 0.9405, 2.4962, 2.2949], 
         [-2.9042, -1.3179, -2.0172, -0.7720, -2.8428]
         ]
-    exp_mean = [1.8100, 1.9100]
-    exp_val = [4.1156, -0.200]
-    exp_M = [-1.0917, 3.5821]
+    exp_mean = torch.core.array.array([1.8100, 1.9100], 'float64')
+    exp_val = torch.core.array.array([24.27536526], 'float64')
+    exp_mach = torch.core.array.array([[-0.291529], [0.956562]], 'float64')
 
     T = torch.trainer.FisherLDATrainer()
     machine, eig_vals = T.train(data)
 
     # Makes sure results are good
-    #self.assertTrue( ((machine.weights - eig_vec_correct) < 1e-6).all() )
-    #self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
+    self.assertTrue( ((machine.input_subtract - exp_mean) < 1e-6).all() )
+    self.assertTrue( ((machine.weights - exp_mach) < 1e-6).all() )
+    self.assertTrue( ((eig_vals - exp_val) < 1e-6).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')

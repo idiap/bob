@@ -187,6 +187,11 @@ namespace Torch { namespace machine {
       void setWeights(const blitz::Array<double,2>& weight);
 
       /**
+       * Sets all weights to a single specific value.
+       */
+      inline void setWeights(double v) { m_weight = v; }
+
+      /**
        * Returns the biases of this classifier.
        */
       inline const blitz::Array<double, 1>& getBiases() const 
