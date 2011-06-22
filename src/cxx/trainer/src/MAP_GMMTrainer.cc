@@ -15,7 +15,7 @@ bool Torch::trainer::MAP_GMMTrainer::setPriorGMM(Torch::machine::GMMMachine *pri
   return true;
 }
 
-void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const Torch::database::Arrayset& data) {
+void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data) {
   // Read options and variables
   double n_gaussians = gmm.getNGaussians();
   double n_inputs = gmm.getNInputs();

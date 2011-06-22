@@ -26,7 +26,7 @@ def NormalizeStdArrayset(arrayset):
   std -= (mean ** 2)
   std = std ** 0.5 # sqrt(std)
 
-  arStd = torch.database.Arrayset()
+  arStd = torch.io.Arrayset()
   for k, id in enumerate(arrayset.ids()):
     x = arrayset[id].get().cast('float64')
     type(arStd)
@@ -120,7 +120,7 @@ if options.test:
                                   'float64')
 
   options.n_gaussians = 1
-  torch.database.Array(array).save("/tmp/input.hdf5")
+  torch.io.Array(array).save("/tmp/input.hdf5")
 
   f = open("/tmp/input.lst", 'w')
   f.write("/tmp/input.hdf5\n")
@@ -135,9 +135,9 @@ for line in fileinput.input(args):
   filelist.append(line.rstrip('\r\n'))
 
 # Create an arrayset from the input files
-ar = torch.database.Arrayset()
+ar = torch.io.Arrayset()
 for myfile in filelist:
-  myarray = torch.database.Array(myfile)
+  myarray = torch.io.Array(myfile)
   n_blocks = myarray.shape[0]
   for b in range(0,n_blocks):
     x = myarray.get().cast('float64')[b,:]
@@ -186,7 +186,7 @@ trainer.maxIterations = options.iterg
 trainer.train(gmm, ar) # TODO: Should it rather be the normalized arrayset?
 
 # Save gmm
-config = torch.database.HDF5File(options.output_file)
+config = torch.io.HDF5File(options.output_file)
 gmm.save(config)
 
 if options.test:

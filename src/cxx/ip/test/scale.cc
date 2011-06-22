@@ -15,7 +15,7 @@
 #include "core/cast.h"
 #include "ip/scale.h"
 
-#include "database/Array.h"
+#include "io/Array.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::database::Array ar_img(testdata_path_img.string());
+  Torch::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed;
 
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s137x137.pgm";
-  Torch::database::Array ar_img_s137(testdata_path_img.string());
+  Torch::io::Array ar_img_s137(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_s137 = ar_img_s137.get<uint8_t,2>();
   checkBlitzClose( img_ref_s137, img_processed, eps);
 
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s77x77.pgm";
-  Torch::database::Array ar_img_s77(testdata_path_img.string());
+  Torch::io::Array ar_img_s77(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_s77 = ar_img_s77.get<uint8_t,2>();
   checkBlitzClose( img_ref_s77, img_processed, eps);
 
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   Torch::ip::scale( img, img_processed, Torch::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_s125x75.pgm";
-  Torch::database::Array ar_img_s125x75(testdata_path_img.string());
+  Torch::io::Array ar_img_s125x75(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_s125x75 = ar_img_s125x75.get<uint8_t,2>();
   checkBlitzClose( img_ref_s125x75, img_processed, eps);
 

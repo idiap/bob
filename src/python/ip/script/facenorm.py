@@ -18,7 +18,7 @@ A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW):
   print >> sys.stderr, "Crop: " + image_file
   
   # Process one file
-  img = torch.database.Array(image_file).get()
+  img = torch.io.Array(image_file).get()
 
   # Extract the eye position
   fpos = open(pos_file)
@@ -34,7 +34,7 @@ A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW):
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(image_file))[0] + '.hdf5')
 
   # Save the outpu file
-  torch.database.Array(cropped_img.cast('uint8')).save(output_file)
+  torch.io.Array(cropped_img.cast('uint8')).save(output_file)
   print output_file
 
   # Close the .pos file
@@ -118,7 +118,7 @@ if options.test:
   options.crop_eyes_w = 5
   options.crop_eyes_oh = 2
   options.crop_eyes_ow = 2
-  torch.database.Array(array).save("/tmp/input.hdf5")
+  torch.io.Array(array).save("/tmp/input.hdf5")
 
   f = open("/tmp/input.pos", 'w')
   f.write("%d %d %d %d\n" % (3,3 , 6,3))

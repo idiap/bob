@@ -1,16 +1,16 @@
 #include <boost/python.hpp>
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 #include "trainer/KMeansTrainer.h"
 
 using namespace boost::python;
 namespace train = Torch::trainer;
 namespace mach = Torch::machine;
-namespace db = Torch::database;
+namespace io = Torch::io;
 
 
 void bind_trainer_kmeans() {
 
-  typedef train::EMTrainer<mach::KMeansMachine, db::Arrayset> EMTrainerKMeansBase; 
+  typedef train::EMTrainer<mach::KMeansMachine, io::Arrayset> EMTrainerKMeansBase; 
 
   class_<EMTrainerKMeansBase, boost::noncopyable>("EMTrainerKMeans", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")

@@ -15,7 +15,7 @@
 #include "core/convert.h"
 #include "ip/Gaussian.h"
 
-#include "database/Array.h"
+#include "io/Array.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::database::Array ar_img(testdata_path_img.string());
+  Torch::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_d = Torch::core::cast<double>(img);
   blitz::Array<double,2> img_processed_d;
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d )
   // Compare to reference image
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_Gaussian.pgm";
-  Torch::database::Array ar_img_ref(testdata_path_img.string());
+  Torch::io::Array ar_img_ref(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref = ar_img_ref.get<uint8_t,2>();
   checkBlitzClose( img_processed, img_ref, eps);
 }

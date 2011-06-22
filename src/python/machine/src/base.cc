@@ -1,15 +1,15 @@
 #include <boost/python.hpp>
-#include <database/Arrayset.h>
+#include <io/Arrayset.h>
 #include <machine/KMeansMachine.h>
 #include <machine/GMMMachine.h>
 #include <boost/concept_check.hpp>
 
 using namespace boost::python;
-namespace db = Torch::database;
+namespace io = Torch::io;
 namespace mach = Torch::machine;
 
 
-static tuple getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, db::Arrayset& ar) {
+static tuple getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, io::Arrayset& ar) {
   boost::shared_ptr<blitz::Array<double, 2> > variances(new blitz::Array<double, 2>);
   boost::shared_ptr<blitz::Array<double, 1> > weights(new blitz::Array<double, 1>);
   machine.getVariancesAndWeightsForEachCluster(ar, *variances.get(), *weights.get());
@@ -74,7 +74,7 @@ void bind_machine_base() {
                    init<>())
   .def(init<int>(args("n_inputs")))
   .def(init<mach::Gaussian&>(args("other")))
-  .def(init<Torch::database::HDF5File&>(args("config")))
+  .def(init<Torch::io::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
                 &mach::Gaussian::getNInputs,
@@ -112,7 +112,7 @@ void bind_machine_base() {
                    "Eq (10) is sumPxx(i) / n(i)\n",
                    init<>())
   .def(init<int, int>(args("n_gaussians","n_inputs")))
-  .def(init<Torch::database::HDF5File&>(args("config")))
+  .def(init<Torch::io::HDF5File&>(args("config")))
   .def_readwrite("log_likelihood",
                  &mach::GMMStats::log_likelihood,
                  "The accumulated log likelihood of all samples")
@@ -148,7 +148,7 @@ void bind_machine_base() {
                                                             "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
                                                             init<int, int>(args("n_gaussians", "n_inputs")))
   .def(init<mach::GMMMachine&>())
-  .def(init<Torch::database::HDF5File&>(args("config")))
+  .def(init<Torch::io::HDF5File&>(args("config")))
   .def(self == self)
   .add_property("nInputs",
                 &mach::GMMMachine::getNInputs,
@@ -194,7 +194,7 @@ void bind_machine_base() {
        args("x"),
        " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
   .def("accStatistics",
-       (void (mach::GMMMachine::*)(const db::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
+       (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
        args("sampler", "stats"),
        "Accumulates the GMM statistics over a set of samples.")
   .def("accStatistics",

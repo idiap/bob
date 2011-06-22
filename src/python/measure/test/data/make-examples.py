@@ -3,7 +3,7 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Wed 20 Apr 2011 15:01:03 CEST 
 
-"""Separate the Iris database to make up toy examples for us.
+"""Separate the Iris dataset to make up toy examples for us.
 
 For separability information, please consult: http://en.wikipedia.org/wiki/File:Anderson%27s_Iris_data_set.png
 """
@@ -19,7 +19,7 @@ iris_columns = {
     }
 
 def loaddata(filename, column):
-  """Loads the Iris database, returns a list with the values"""
+  """Loads the Iris dataset, returns a list with the values"""
   retval = {'setosa': [], 'versicolor': [], 'virginica': []}
   for l in open(filename, 'rt'):
     s = [k.strip() for k in l.split(',')]
@@ -43,8 +43,8 @@ def example1():
   Separation threshold is about 3.
   """
   data = loaddata('iris.data', 'petal.length')
-  torch.database.Array(torch.core.array.array(data['setosa'])).save('linsep-negatives.hdf5')
-  torch.database.Array(torch.core.array.array(data['virginica'])).save('linsep-positives.hdf5')
+  torch.io.Array(torch.core.array.array(data['setosa'])).save('linsep-negatives.hdf5')
+  torch.io.Array(torch.core.array.array(data['virginica'])).save('linsep-positives.hdf5')
 
 def example2():
   """In the second example we will get a non-linearly separable set of scores:
@@ -56,8 +56,8 @@ def example2():
   Separation threshold is about 5 (min. HTER).
   """
   data = loaddata('iris.data', 'sepal.length')
-  torch.database.Array(torch.core.array.array(data['setosa'])).save('nonsep-negatives.hdf5')
-  torch.database.Array(torch.core.array.array(data['versicolor'])).save('nonsep-positives.hdf5')
+  torch.io.Array(torch.core.array.array(data['setosa'])).save('nonsep-negatives.hdf5')
+  torch.io.Array(torch.core.array.array(data['versicolor'])).save('nonsep-positives.hdf5')
 
 def main():
   """Generates data for all examples."""

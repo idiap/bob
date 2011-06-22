@@ -98,9 +98,9 @@ create a |project| object, do it like this:
 
 .. code-block:: c++
 
-   #include <database/Video.h>
+   #include <io/Video.h>
    ...
-   Torch::database::Video my_video("video.mov");
+   Torch::io::Video my_video("video.mov");
 
 Compiling the code
 ==================
@@ -178,7 +178,7 @@ system, so ``help()`` is your friend. Use it.
 
 .. code-block:: python
 
-   >>> help(torch.database.Video)
+   >>> help(torch.io.Video)
 
 .. Place here references to all citations in lower case
 

@@ -10,7 +10,7 @@ Torch::machine::GMMStats::GMMStats(int n_gaussians, int n_inputs) {
   resize(n_gaussians,n_inputs);
 }
 
-Torch::machine::GMMStats::GMMStats(Torch::database::HDF5File& config) {
+Torch::machine::GMMStats::GMMStats(Torch::io::HDF5File& config) {
   load(config);
 }
 
@@ -33,7 +33,7 @@ void Torch::machine::GMMStats::init() {
   sumPxx = 0.0;
 }
 
-void Torch::machine::GMMStats::save(Torch::database::HDF5File& config) const {
+void Torch::machine::GMMStats::save(Torch::io::HDF5File& config) const {
   //please note we fix the output values to be of a precise type so they can be
   //retrieved at any platform with the exact same precision.
   int64_t sumpx_shape_0 = sumPx.shape()[0];
@@ -47,7 +47,7 @@ void Torch::machine::GMMStats::save(Torch::database::HDF5File& config) const {
   config.appendArray("sumPxx", sumPxx); //Array2d
 }
 
-void Torch::machine::GMMStats::load(Torch::database::HDF5File& config) {
+void Torch::machine::GMMStats::load(Torch::io::HDF5File& config) {
   config.read("log_liklihood", log_likelihood);
   int64_t n_gaussians;
   config.read("n_gaussians", n_gaussians);

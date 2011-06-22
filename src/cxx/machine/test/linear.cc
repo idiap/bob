@@ -16,7 +16,7 @@
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"
 #include "core/logging.h"
-#include "database/HDF5File.h"
+#include "io/HDF5File.h"
 #include "math/linear.h"
 
 /**
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( test_initialization )
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
-  Torch::database::HDF5File config(testdata.string(), Torch::database::HDF5File::in);
+  Torch::io::HDF5File config(testdata.string(), Torch::io::HDF5File::in);
   Torch::machine::LinearMachine N(config);
 
   BOOST_CHECK( blitz::all(M.getWeights() == N.getWeights()) );
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( test_error_check )
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
-  Torch::database::HDF5File config(testdata.string(), Torch::database::HDF5File::in);
+  Torch::io::HDF5File config(testdata.string(), Torch::io::HDF5File::in);
   Torch::machine::LinearMachine M(config);
 
   blitz::Array<double,2> W(2,3);
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE( test_correctness )
   }
   boost::filesystem::path testdata(testdata_cpath);
   testdata /= "linear-test.hdf5";
-  Torch::database::HDF5File config(testdata.string(), Torch::database::HDF5File::in);
+  Torch::io::HDF5File config(testdata.string(), Torch::io::HDF5File::in);
   Torch::machine::LinearMachine M(config);
 
   blitz::Array<double,2> in(4,3);

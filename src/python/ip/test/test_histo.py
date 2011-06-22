@@ -16,7 +16,7 @@ def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
   # grayscaled version of the image, I just select one of the planes. 
   filename = os.path.join('data', 'histo', relative_filename)
-  array = torch.database.Array(filename)
+  array = torch.io.Array(filename)
   return array.get()[0,:,:] 
 
 def random_int(array, min_value, max_value):
@@ -54,9 +54,9 @@ class HistogramTest(unittest.TestCase):
     torch.ip.histogram(input_image, histo8, 0, 255, 256)
     
     # Save the computed data
-    #torch.database.Array(histo1).save(os.path.join('data', 'histo','image_histo.hdf5'))
+    #torch.io.Array(histo1).save(os.path.join('data', 'histo','image_histo.hdf5'))
     
-    histo_ref = torch.database.Array(os.path.join('data', 'histo','image_histo.hdf5')).get()
+    histo_ref = torch.io.Array(os.path.join('data', 'histo','image_histo.hdf5')).get()
 
     self.assertTrue(input_image.size() == histo1.sum())
     self.assertTrue(input_image.size() == histo2.sum())
@@ -81,9 +81,9 @@ class HistogramTest(unittest.TestCase):
     # Generate random uint16 array
     #input_array = torch.core.array.uint16_2(50, 70)
     #random_int(input_array, 0, 65535)
-    #torch.database.Array(input_array).save(os.path.join('data', 'histo','input_uint16.hdf5'))
+    #torch.io.Array(input_array).save(os.path.join('data', 'histo','input_uint16.hdf5'))
     
-    input_array = torch.database.Array(os.path.join('data', 'histo','input_uint16.hdf5')).get()
+    input_array = torch.io.Array(os.path.join('data', 'histo','input_uint16.hdf5')).get()
     
     histo1 = torch.ip.histogram(input_array)
     histo2 = torch.ip.histogram(input_array, 65535)
@@ -101,9 +101,9 @@ class HistogramTest(unittest.TestCase):
     torch.ip.histogram(input_array, histo8, 0, 65535, 65536)
     
     # Save computed data
-    #torch.database.Array(histo1).save(os.path.join('data', 'histo','input_uint16.histo.hdf5'))
+    #torch.io.Array(histo1).save(os.path.join('data', 'histo','input_uint16.histo.hdf5'))
     
-    histo_ref = torch.database.Array(os.path.join('data', 'histo','input_uint16.histo.hdf5')).get()
+    histo_ref = torch.io.Array(os.path.join('data', 'histo','input_uint16.histo.hdf5')).get()
     
     self.assertTrue(input_array.size() == histo1.sum())
     self.assertTrue(input_array.size() == histo2.sum())
@@ -128,9 +128,9 @@ class HistogramTest(unittest.TestCase):
     # Generate random float32 array
     #input_array = torch.core.array.float32_2(50, 70)
     #random_float(input_array, 0, 1)
-    #torch.database.Array(input_array).save(os.path.join('data', 'histo','input_float.hdf5'))
+    #torch.io.Array(input_array).save(os.path.join('data', 'histo','input_float.hdf5'))
     
-    input_array = torch.database.Array(os.path.join('data', 'histo','input_float.hdf5')).get()
+    input_array = torch.io.Array(os.path.join('data', 'histo','input_float.hdf5')).get()
     
     histo2 = torch.core.array.uint64_1(10)
     
@@ -138,9 +138,9 @@ class HistogramTest(unittest.TestCase):
     torch.ip.histogram(input_array, histo2, 0, 1, 10)
     
     # Save computed data
-    #torch.database.Array(histo1).save(os.path.join('data', 'histo','input_float.histo.hdf5'))
+    #torch.io.Array(histo1).save(os.path.join('data', 'histo','input_float.histo.hdf5'))
     
-    histo_ref = torch.database.Array(os.path.join('data', 'histo','input_float.histo.hdf5')).get()
+    histo_ref = torch.io.Array(os.path.join('data', 'histo','input_float.histo.hdf5')).get()
     
     self.assertTrue(input_array.size() == histo1.sum())
     self.assertTrue(input_array.size() == histo2.sum())
@@ -153,9 +153,9 @@ class HistogramTest(unittest.TestCase):
     # Generate random int32 array
     #input_array = torch.core.array.int32_2(50, 70)
     #random_int(input_array, -20,20)
-    #torch.database.Array(input_array).save(os.path.join('data', 'histo','input_int32.hdf5'))
+    #torch.io.Array(input_array).save(os.path.join('data', 'histo','input_int32.hdf5'))
     
-    input_array = torch.database.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
+    input_array = torch.io.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
     
     histo2 = torch.core.array.uint64_1(41)
 
@@ -163,9 +163,9 @@ class HistogramTest(unittest.TestCase):
     torch.ip.histogram(input_array, histo2, -20, 20, 41)
     
     # Save computed data
-    #torch.database.Array(histo).save(os.path.join('data', 'histo','input_int32.histo.hdf5'))
+    #torch.io.Array(histo).save(os.path.join('data', 'histo','input_int32.histo.hdf5'))
     
-    histo_ref = torch.database.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
+    histo_ref = torch.io.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
     
     self.assertTrue(input_array.size() == histo1.sum())
     self.assertTrue(input_array.size() == histo2.sum())
@@ -175,13 +175,13 @@ class HistogramTest(unittest.TestCase):
   def test05_uint32_accumulate_histoPython(self):
     """Accumulate the histogram of a int32 random array"""
     
-    input_array = torch.database.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
+    input_array = torch.io.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
     
     histo = torch.ip.histogram(input_array, -20, 20, 41)
     
     torch.ip.histogramAccumulate(input_array, histo, -20, 20, 41)
 
-    histo_ref = torch.database.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
+    histo_ref = torch.io.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
 
     self.assertTrue(input_array.size() * 2 == histo.sum())
     self.assertTrue((histo_ref * 2 == histo).all())

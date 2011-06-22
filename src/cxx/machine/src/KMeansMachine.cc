@@ -55,7 +55,7 @@ double Torch::machine::KMeansMachine::getMinDistance(const blitz::Array<double,1
   return min_distance;
 }
 
-void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const Torch::database::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const {
+void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const Torch::io::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const {
   // initialise output arrays
   variances.resize(m_n_means, m_n_inputs);
   weights.resize(m_n_means);

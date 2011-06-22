@@ -32,7 +32,7 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// using the accumulated statistics in m_ss and the 
     /// parameters of the prior model
     /// Implements EMTrainer::mStep()
-    void mStep(Torch::machine::GMMMachine& gmm, const Torch::database::Arrayset& data);
+    void mStep(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
     
   protected:
 

@@ -15,7 +15,7 @@ import math
 
     if n_blocks == None:
       # If the number of blocks is not provided, get it from the first file
-      self.n_blocks = torch.database.Array(self.list_files[0]).get().extent(0)
+      self.n_blocks = torch.io.Array(self.list_files[0]).get().extent(0)
     else:
       self.n_blocks = n_blocks
     
@@ -30,7 +30,7 @@ import math
     
     # We don't reload the input file if it is the same as the last one
     if self.last_index_file != index_file:
-      self.arrays = torch.database.Array(self.list_files[index_file]).get()
+      self.arrays = torch.io.Array(self.list_files[index_file]).get()
       self.last_index_file = index_file
 
     # Get the right row
@@ -74,8 +74,8 @@ for line in fileinput.input(args):
   myfile = line.rstrip('\r\n')
 
   # Create data with only one file
-  ar = torch.database.Arrayset()
-  myarray = torch.database.Array(myfile)
+  ar = torch.io.Arrayset()
+  myarray = torch.io.Array(myfile)
   n_blocks = myarray.shape[0]
   for b in range(0,n_blocks):
     x = myarray.get().cast('float64')[b,:]

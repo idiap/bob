@@ -1,5 +1,5 @@
 #include <boost/python.hpp>
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 #include "trainer/GMMTrainer.h"
 #include "trainer/MAP_GMMTrainer.h"
 #include "trainer/ML_GMMTrainer.h"
@@ -7,39 +7,39 @@
 using namespace boost::python;
 namespace train = Torch::trainer;
 namespace mach = Torch::machine;
-namespace db = Torch::database;
+namespace io = Torch::io;
 
 
-class EMTrainerGMMWrapper: public train::EMTrainer<mach::GMMMachine, db::Arrayset>, 
-                           public wrapper<train::EMTrainer<mach::GMMMachine, db::Arrayset> > 
+class EMTrainerGMMWrapper: public train::EMTrainer<mach::GMMMachine, io::Arrayset>, 
+                           public wrapper<train::EMTrainer<mach::GMMMachine, io::Arrayset> > 
 {
 public:
   EMTrainerGMMWrapper(double convergence_threshold = 0.001, int max_iterations = 10):
-    train::EMTrainer<mach::GMMMachine, db::Arrayset >(convergence_threshold, max_iterations) {}
+    train::EMTrainer<mach::GMMMachine, io::Arrayset >(convergence_threshold, max_iterations) {}
 
   virtual ~EMTrainerGMMWrapper() {}
  
-  void initialization(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
     this->get_override("initialization")(machine, data);
   }
   
-  double eStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  double eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     return this->get_override("eStep")(machine, data);
   }
   
-  void mStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     this->get_override("mStep")(machine, data);
   }
 
-  void train(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
-      train::EMTrainer<mach::GMMMachine, db::Arrayset>::train(machine, data);
+      train::EMTrainer<mach::GMMMachine, io::Arrayset>::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const db::Arrayset& data) {
-    train::EMTrainer<mach::GMMMachine, db::Arrayset>::train(machine, data);
+  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
+    train::EMTrainer<mach::GMMMachine, io::Arrayset>::train(machine, data);
   }
 
 };
@@ -54,38 +54,38 @@ public:
 
   virtual ~GMMTrainerWrapper() {}
   
-  void initialization(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_initialization = this->get_override("initialization")) 
       python_initialization(machine, data);
     else
       train::GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::GMMTrainer::initialization(machine, data);
   }
   
-  double eStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  double eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_eStep = this->get_override("eStep")) return python_eStep(machine, data);
     return train::GMMTrainer::eStep(machine, data);
   }
   
-  double d_eStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  double d_eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     return train::GMMTrainer::eStep(machine, data);
   }
 
-  void mStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     this->get_override("mStep")(machine, data);
   }
 
-  void train(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
       train::GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::GMMTrainer::train(machine, data);
   }
  
@@ -101,45 +101,45 @@ public:
 
   virtual ~MAP_GMMTrainerWrapper() {}
 
-  void initialization(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_initialization = this->get_override("initialization")) 
       python_initialization(machine, data);
     else
       train::MAP_GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::MAP_GMMTrainer::initialization(machine, data);
   }
   
-  double eStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  double eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_eStep = this->get_override("eStep")) return python_eStep(machine, data);
     return train::MAP_GMMTrainer::eStep(machine, data);
   }
   
-  double d_eStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  double d_eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     return train::MAP_GMMTrainer::eStep(machine, data);
   }
 
-  void mStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_mStep = this->get_override("mStep")) 
       python_mStep(machine, data);
     else
       train::MAP_GMMTrainer::mStep(machine, data);
   }
   
-  void d_mStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::MAP_GMMTrainer::mStep(machine, data);
   }
 
-  void train(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
       train::MAP_GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::MAP_GMMTrainer::train(machine, data);
   }
  
@@ -154,45 +154,45 @@ public:
 
   virtual ~ML_GMMTrainerWrapper() {}
 
-  void initialization(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_initialization = this->get_override("initialization")) 
       python_initialization(machine, data);
     else
       train::ML_GMMTrainer::initialization(machine, data);
   }
   
-  void d_initialization(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_initialization(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::ML_GMMTrainer::initialization(machine, data);
   }
   
-  double eStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  double eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_eStep = this->get_override("eStep")) return python_eStep(machine, data);
     return train::ML_GMMTrainer::eStep(machine, data);
   }
   
-  double d_eStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  double d_eStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     return train::ML_GMMTrainer::eStep(machine, data);
   }
 
-  void mStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_mStep = this->get_override("mStep")) 
       python_mStep(machine, data);
     else
       train::ML_GMMTrainer::mStep(machine, data);
   }
   
-  void d_mStep(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_mStep(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::ML_GMMTrainer::mStep(machine, data);
   }
 
-  void train(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void train(mach::GMMMachine& machine, const io::Arrayset& data) {
     if (override python_train = this->get_override("train")) 
       python_train(machine, data);
     else
       train::ML_GMMTrainer::train(machine, data);
   }
 
-  void d_train(mach::GMMMachine& machine, const db::Arrayset& data) {
+  void d_train(mach::GMMMachine& machine, const io::Arrayset& data) {
     train::ML_GMMTrainer::train(machine, data);
   }
  
@@ -201,7 +201,7 @@ public:
 
 void bind_trainer_gmm_wrappers() {
 
-  typedef train::EMTrainer<mach::GMMMachine, db::Arrayset> EMTrainerGMMBase; 
+  typedef train::EMTrainer<mach::GMMMachine, io::Arrayset> EMTrainerGMMBase; 
 
   class_<EMTrainerGMMWrapper, boost::noncopyable >("EMTrainerGMM", no_init)
     .def(init<optional<double, int> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10)))

@@ -287,7 +287,7 @@ def generate_environment(options):
   if options.arch.split('-')[0] == 'macosx': # we are under OSX
     P.before('DYLD_LIBRARY_PATH', JIA('lib'))
   P.before('CMAKE_PREFIX_PATH', JIA('share', 'cmake'))
-  P.before('TORCH_SCHEMA_PATH', JIA('share', 'torch', 'schema'))
+  #P.before('TORCH_SCHEMA_PATH', JIA('share', 'torch', 'schema'))
 
   #this will place a few TORCH_ variables into the game, so the user can make
   #adjust its shell behavior accordinly, if he/she ever wants it.

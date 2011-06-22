@@ -16,7 +16,7 @@
 
 #include "trainer/Trainer.h"
 #include "machine/LinearMachine.h"
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 
 namespace Torch { namespace trainer {
   
@@ -64,7 +64,7 @@ namespace Torch { namespace trainer {
        * output further using resize() if necessary.
        */
       virtual void train(Torch::machine::LinearMachine& machine, 
-          const std::vector<Torch::database::Arrayset>& data) const;
+          const std::vector<Torch::io::Arrayset>& data) const;
 
       /**
        * Trains the LinearMachine to perform Fisher/LDA discrimination. The
@@ -81,7 +81,7 @@ namespace Torch { namespace trainer {
        */
       virtual void train(Torch::machine::LinearMachine& machine,
           blitz::Array<double,1>& eigen_values,
-          const std::vector<Torch::database::Arrayset>& data) const;
+          const std::vector<Torch::io::Arrayset>& data) const;
 
   };
 

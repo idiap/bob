@@ -1,5 +1,5 @@
 #include <boost/python.hpp>
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 #include "trainer/GMMTrainer.h"
 #include "trainer/MAP_GMMTrainer.h"
 #include "trainer/ML_GMMTrainer.h"
@@ -7,11 +7,11 @@
 using namespace boost::python;
 namespace train = Torch::trainer;
 namespace mach = Torch::machine;
-namespace db = Torch::database;
+namespace io = Torch::io;
 
 void bind_trainer_gmm() {
 
-  typedef train::EMTrainer<mach::GMMMachine, db::Arrayset> EMTrainerGMMBase; 
+  typedef train::EMTrainer<mach::GMMMachine, io::Arrayset> EMTrainerGMMBase; 
 
   class_<EMTrainerGMMBase, boost::noncopyable>("EMTrainerGMM", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergenceThreshold", &EMTrainerGMMBase::getConvergenceThreshold, &EMTrainerGMMBase::setConvergenceThreshold, "Convergence threshold")

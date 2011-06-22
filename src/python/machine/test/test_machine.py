@@ -25,7 +25,7 @@ class MachineTest(unittest.TestCase):
   def test02_GMMMachine(self):
     """Test a GMMMachine"""
 
-    arrayset = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
+    arrayset = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     gmm = torch.machine.GMMMachine(2, 2)
     gmm.weights   = torch.core.array.array([0.5, 0.5], 'float64')
     gmm.means     = torch.core.array.array([[3, 70], [4, 72]], 'float64')
@@ -35,10 +35,10 @@ class MachineTest(unittest.TestCase):
     stats = torch.machine.GMMStats(2, 2)
     gmm.accStatistics(arrayset, stats)
     
-    #config = torch.database.HDF5File("data/stats.hdf5")
+    #config = torch.io.HDF5File("data/stats.hdf5")
     #stats.save(config)
 
-    stats_ref = torch.machine.GMMStats(torch.database.HDF5File("data/stats.hdf5"))
+    stats_ref = torch.machine.GMMStats(torch.io.HDF5File("data/stats.hdf5"))
 
     self.assertTrue(stats.T == stats_ref.T)
     self.assertTrue(stats.n == stats_ref.n)

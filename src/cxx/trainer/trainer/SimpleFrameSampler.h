@@ -1,6 +1,6 @@
 #ifndef SIMPLEFRAMESAMPLER_H
 #define SIMPLEFRAMESAMPLER_H
-#include <database/Arrayset.h>
+#include <io/Arrayset.h>
 #include <trainer/Sampler.h>
 #include <machine/FrameSample.h>
 
@@ -17,7 +17,7 @@ public:
   virtual ~SimpleFrameSampler() {}
 
   /// Constructor
-  SimpleFrameSampler(const Torch::database::Arrayset& arrayset);
+  SimpleFrameSampler(const Torch::io::Arrayset& arrayset);
 
   /// Copy constructor
   SimpleFrameSampler(const SimpleFrameSampler& other);
@@ -27,7 +27,7 @@ public:
   int getNSamples() const; 
   
 private:
-  Torch::database::Arrayset arrayset;
+  Torch::io::Arrayset arrayset;
 };
 
 }

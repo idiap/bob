@@ -25,12 +25,12 @@ def gen_array(dtype):
   SHAPE = (2, 3, 4, 2) #48 elements in arrays
   data = [random.uniform(0, 10) for z in range(numpy.product(SHAPE))]
   nparray = numpy.array(data).reshape(SHAPE)
-  return torch.database.Array(torch.core.array.array(nparray, dtype))
+  return torch.io.Array(torch.core.array.array(nparray, dtype))
 
 def gen_arrayset(dtype):
   N = 10
   SHAPE = (2, 3, 4, 2) #48 elements in arrays
-  aset = torch.database.Arrayset()
+  aset = torch.io.Arrayset()
   for k in range(N):
     data = [random.uniform(0,N) for z in range(numpy.product(SHAPE))]
     nparray = numpy.array(data).reshape(SHAPE)

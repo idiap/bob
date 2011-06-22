@@ -1,6 +1,6 @@
 #include "trainer/KMeansTrainer.h"
 
-#include <database/Arrayset.h>
+#include <io/Arrayset.h>
 #include <cfloat>
 #include <core/logging.h>
 #include <boost/random.hpp>
@@ -8,11 +8,11 @@
 using namespace Torch::machine;
 
 Torch::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold, int max_iterations) :
-  EMTrainer<KMeansMachine, Torch::database::Arrayset>(convergence_threshold, max_iterations) {
+  EMTrainer<KMeansMachine, Torch::io::Arrayset>(convergence_threshold, max_iterations) {
   seed = -1;
 }
   
-void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine, const Torch::database::Arrayset& ar) {
+void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine, const Torch::io::Arrayset& ar) {
   // split data into as many chunks as there are means
   size_t n_data = ar.getNSamples();
   unsigned int n_chunk = n_data / kMeansMachine.getNMeans();
@@ -40,7 +40,7 @@ void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine,
   } 
 }
 
-double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::database::Arrayset& ar) {
+double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::io::Arrayset& ar) {
     // initialise the accumulators
     double average_min_distance = 0;
     resetAccumulators(kmeans);
@@ -67,7 +67,7 @@ double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::
     return average_min_distance;
 }
 
-void Torch::trainer::KMeansTrainer::mStep(KMeansMachine& kmeans, const Torch::database::Arrayset&) {
+void Torch::trainer::KMeansTrainer::mStep(KMeansMachine& kmeans, const Torch::io::Arrayset&) {
     blitz::Array<double,2> newMeans(kmeans.getNMeans(),kmeans.getNInputs());
     blitz::firstIndex i;
     blitz::secondIndex j;

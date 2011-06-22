@@ -12,11 +12,11 @@ import torch
 
 def load(fname):
   """Loads a single array from the 'data' directory."""
-  return torch.database.Array(os.path.join('data', fname)).get()
+  return torch.io.Array(os.path.join('data', fname)).get()
 
 def save(fname, data):
   """Saves a single array into a file in the 'data' directory."""
-  torch.database.Array(data).save(os.path.join('data', fname))
+  torch.io.Array(data).save(os.path.join('data', fname))
 
 class ErrorTest(unittest.TestCase):
   """Various measure package tests for error evaluation."""

@@ -11,7 +11,7 @@
 #define TORCH5SPRO_TRAINER_SVDPCA_TRAINER_H
 
 #include "machine/LinearMachine.h"
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 
 namespace Torch { namespace trainer {
   
@@ -71,7 +71,7 @@ namespace Torch { namespace trainer {
        * decreasing energy automatically. You don't need to sort the results.
        */
       virtual void train(Torch::machine::LinearMachine& machine, 
-          const Torch::database::Arrayset& data) const;
+          const Torch::io::Arrayset& data) const;
 
       /**
        * Trains the LinearMachine to perform the KLT. The resulting machine
@@ -82,7 +82,7 @@ namespace Torch { namespace trainer {
        */
       virtual void train(Torch::machine::LinearMachine& machine,
           blitz::Array<double,1>& eigen_values,
-          const Torch::database::Arrayset& data) const;
+          const Torch::io::Arrayset& data) const;
 
     private: //representation
 

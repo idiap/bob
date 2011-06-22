@@ -13,7 +13,7 @@ def tantriggs(line, A_OUTPUT_DIR, A_OUT_H, A_OUT_W,
   preprocessed_img = torch.core.array.float64_2(A_OUT_H, A_OUT_W)
 
   # Process one file
-  img = torch.database.Array(line).get()
+  img = torch.io.Array(line).get()
   
   # Display file processed
   print >> sys.stderr, "Tan and Triggs: " + line
@@ -24,7 +24,7 @@ def tantriggs(line, A_OUTPUT_DIR, A_OUT_H, A_OUT_W,
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(line))[0] + ".hdf5")
 
   # Save output file
-  torch.database.Array(preprocessed_img.convert('uint8', sourceRange=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
+  torch.io.Array(preprocessed_img.convert('uint8', sourceRange=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
   print output_file
 
 
@@ -115,7 +115,7 @@ if options.test:
                                   [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]],
                                   'uint8')
 
-  torch.database.Array(array).save("/tmp/input.hdf5")
+  torch.io.Array(array).save("/tmp/input.hdf5")
 
   f = open("/tmp/input.lst", 'w')
   f.write("/tmp/input.hdf5\n")

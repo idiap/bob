@@ -1,13 +1,19 @@
 .. _practical-cropping-images:
 
-===============================================================
-Practical torch5spro: Cropping a set of images using a database
-===============================================================
+================================================================
+ Practical |project|: Cropping a set of images using a dataset
+================================================================
 
-It is common to have a large set of images that you would like to process in the same way.
-In this section we will take a set of images (three) and crop and normalise them using the torch5spro's database format.
+.. warning::
 
-Below is an example of the torch5spro database syntax.
+  This section is outdated. It still refers to the obsolete database format.
+  Please fix it ASAP.
+
+It is common to have a large set of images that you would like to process in
+the same way. In this section we will take a set of images (three) and crop
+and normalise them using the |project|'s database format.
+
+Below is an example of the |project| database syntax.
 
 .. code-block:: xml
   
@@ -73,7 +79,7 @@ However, we want to give a larger example how to but everything together.
       """      
 
       def __init__(self, xml_file, crop_height = 80, crop_width = 64):
-          self.db  = torch.database.Dataset(xml_file)
+          self.db  = torch.io.Dataset(xml_file)
   
           # cropping parameters
           self.H  = crop_height

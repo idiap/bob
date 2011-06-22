@@ -25,7 +25,7 @@ class FilterNewTest(unittest.TestCase):
   def test01_shiftColorImage(self):
     print ""
 
-    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.png'))
+    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.png'))
     A = img.get()
     B = A.copy()
 
@@ -36,12 +36,12 @@ class FilterNewTest(unittest.TestCase):
     torch.ip.shift(A, B, delta_h, delta_w);
 
     # save image
-    torch.database.Array(B).save(os.path.join('data', 'faceextract', 'test_001.shift.png'));
+    torch.io.Array(B).save(os.path.join('data', 'faceextract', 'test_001.shift.png'));
 
   def test02_shiftToCenterBlue(self):
     print ""
 
-    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.png'))
+    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.png'))
     A = img.get()
     B = A.sameAs();
 
@@ -49,12 +49,12 @@ class FilterNewTest(unittest.TestCase):
     torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # save image
-    torch.database.Array(B).save(os.path.join('data', 'faceextract', 'test_001.blue.answer.png'));
+    torch.io.Array(B).save(os.path.join('data', 'faceextract', 'test_001.blue.answer.png'));
 
   def test03_shiftToCenterBlue_And_LevelOut(self):
     print ""
 
-    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
+    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()[1,:,:]
     B = A.sameAs()
 
@@ -69,13 +69,13 @@ class FilterNewTest(unittest.TestCase):
     torch.ip.rotate(B, C, angle)
     
     # save image
-    torch.database.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
+    torch.io.Array(C).save(os.path.join('data', 'faceextract', 'test_001.blue.level.answer.png'));
 
   def test04_geoNormBlue(self):
     print ""
 
     # read up image
-    img = torch.database.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
+    img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()[1,:,:]
     B = A.sameAs()
 
@@ -103,7 +103,7 @@ class FilterNewTest(unittest.TestCase):
     print ""
 
     # read up image
-    img = torch.database.Array(os.path.join('data', 'faceextract', 'test-faces.jpg'))
+    img = torch.io.Array(os.path.join('data', 'faceextract', 'test-faces.jpg'))
     A = img.get()[1,:,:]
 
     # read up the eye coordinates
@@ -136,13 +136,13 @@ class FilterNewTest(unittest.TestCase):
     #
     D = torch.ip.scaleAs(C, scale_factor)
     torch.ip.scale(C, D)
-    torch.database.Array(D).save(os.path.join('data', 'faceextract', 'test-faces.1.jpg'));
+    torch.io.Array(D).save(os.path.join('data', 'faceextract', 'test-faces.1.jpg'));
 
     
     # crop face
     E = torch.core.array.uint8_2(100, 100)
     torch.ip.cropFace(D, E, 30)
-    torch.database.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
+    torch.io.Array(E).save(os.path.join('data', 'faceextract', 'test-faces.E.jpg'));
 
 
 if __name__ == '__main__':

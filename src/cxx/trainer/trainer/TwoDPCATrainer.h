@@ -3,7 +3,7 @@
 
 #include "Trainer.h"
 #include "core/logging.h"
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 #include "machine/TwoDPCAMachine.h"
 #include "machine/ImageSample.h"
 #include <algorithm>
@@ -15,13 +15,13 @@ namespace Torch
   namespace trainer 
   {
   
-    class TwoDPCATrainer : virtual public Trainer<Torch::machine::TwoDPCAMachine, Torch::database::Arrayset>
+    class TwoDPCATrainer : virtual public Trainer<Torch::machine::TwoDPCAMachine, Torch::io::Arrayset>
     {
       public:
         TwoDPCATrainer() {}
         virtual ~TwoDPCATrainer() {}
   
-        void train(Torch::machine::TwoDPCAMachine& machine, const Torch::database::Arrayset& data); 
+        void train(Torch::machine::TwoDPCAMachine& machine, const Torch::io::Arrayset& data); 
 
       protected:
 

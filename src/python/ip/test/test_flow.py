@@ -14,12 +14,12 @@ def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
   # grayscaled version of the image, I just select one of the planes. 
   filename = os.path.join("data", "flow", relative_filename)
-  array = torch.database.Array(filename)
+  array = torch.io.Array(filename)
   return array.get()[0,:,:] 
 
 def load_known_flow(relative_filename):
   filename = os.path.join("data", "flow", relative_filename)
-  array = torch.database.Array(filename)
+  array = torch.io.Array(filename)
   data = array.get()
   return data[:,:,0].cast('float64'), data[:,:,1].cast('float64')
 
@@ -181,7 +181,7 @@ class FlowTest(unittest.TestCase):
     v = torch.core.array.float64_2(i1.shape()); v.fill(0)
     for k in range(N): 
       torch.ip.evalHornAndSchunckFlow(alpha, 1, i1, i2, u, v)
-      array = torch.database.Array(torch.ip.flowutils.flow2hsv(u,v))
+      array = torch.io.Array(torch.ip.flowutils.flow2hsv(u,v))
       array.save("hs_rubberwhale-%d.png" % k)
 
   def notest02_VanillaHornAndSchunckAgainstOpenCV(self):

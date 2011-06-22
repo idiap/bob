@@ -15,7 +15,7 @@
 #include "core/cast.h"
 #include "core/convert.h"
 #include "ip/GeomNorm.h"
-#include "database/Array.h"
+#include "io/Array.h"
 
 
 struct T {
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image_r10.pgm";
-  Torch::database::Array ar_img(testdata_path_img.string());
+  Torch::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed_d(40,40);
   
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   blitz::Array<uint8_t,2> img_processed = Torch::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm.pgm";
-  Torch::database::Array ar_img_geomnorm(testdata_path_img.string());
+  Torch::io::Array ar_img_geomnorm(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_geomnorm = ar_img_geomnorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_geomnorm, img_processed, eps);
 
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   blitz::Array<uint8_t,2> img_processed2 = Torch::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_geomnorm_BORDER25x0.pgm";
-  Torch::database::Array ar_img_geomnorm2(img_processed2);
+  Torch::io::Array ar_img_geomnorm2(img_processed2);
   ar_img_geomnorm2.save(testdata_path_img.string());
 }
 

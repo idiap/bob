@@ -14,7 +14,7 @@
 #include <boost/filesystem.hpp>
 #include "core/cast.h"
 #include "ip/generateWithCenter.h"
-#include "database/Array.h"
+#include "io/Array.h"
 
 struct T {
 	blitz::Array<uint32_t,2> a2, a2g_11, a2g_12;

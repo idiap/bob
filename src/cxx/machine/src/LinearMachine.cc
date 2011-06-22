@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"
 #include "math/linear.h"
@@ -69,7 +69,7 @@ mach::LinearMachine::LinearMachine(const mach::LinearMachine& other):
 {
 }
 
-mach::LinearMachine::LinearMachine (Torch::database::HDF5File& config) {
+mach::LinearMachine::LinearMachine (Torch::io::HDF5File& config) {
   load(config);
 }
 
@@ -87,9 +87,9 @@ mach::LinearMachine& mach::LinearMachine::operator=
   return *this;
 }
 
-void mach::LinearMachine::load (Torch::database::HDF5File& config) {
+void mach::LinearMachine::load (Torch::io::HDF5File& config) {
   //query linear machine shape
-  const Torch::database::HDF5Type& t = config.describe("weights");
+  const Torch::io::HDF5Type& t = config.describe("weights");
   size_t n_input = t.shape()[0];
   size_t n_output = t.shape()[1];
 
@@ -120,7 +120,7 @@ void mach::LinearMachine::resize (size_t input, size_t output) {
   m_bias.resizeAndPreserve(output);
 }
 
-void mach::LinearMachine::save (Torch::database::HDF5File& config) const {
+void mach::LinearMachine::save (Torch::io::HDF5File& config) const {
   config.appendArray("input_sub", m_input_sub);
   config.appendArray("input_div", m_input_div);
   config.appendArray("weights", m_weight);

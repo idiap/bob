@@ -1,7 +1,7 @@
 #include "machine/Gaussian.h"
 #include <cfloat>
-#include <database/Array.h>
-#include <database/Arrayset.h>
+#include <io/Array.h>
+#include <io/Arrayset.h>
 #include <machine/Exception.h>
 
 double Torch::machine::Log::LogAdd(double log_a, double log_b) {
@@ -55,7 +55,7 @@ Torch::machine::Gaussian::Gaussian(int n_inputs) {
   resize(n_inputs);
 }
 
-Torch::machine::Gaussian::Gaussian(Torch::database::HDF5File& config) {
+Torch::machine::Gaussian::Gaussian(Torch::io::HDF5File& config) {
   load(config);
 }
 
@@ -182,7 +182,7 @@ void Torch::machine::Gaussian::preComputeConstants() {
 }
 
 
-void Torch::machine::Gaussian::save(Torch::database::HDF5File& config) const {
+void Torch::machine::Gaussian::save(Torch::io::HDF5File& config) const {
   config.appendArray("m_mean", m_mean);
   config.appendArray("m_variance", m_variance);
   config.appendArray("m_variance_thresholds", m_variance_thresholds);
@@ -190,7 +190,7 @@ void Torch::machine::Gaussian::save(Torch::database::HDF5File& config) const {
   config.append("m_n_inputs", m_n_inputs);
 }
 
-void Torch::machine::Gaussian::load(Torch::database::HDF5File& config) {
+void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {
   config.read("m_n_inputs", m_n_inputs);
   
   m_mean.resize(m_n_inputs);

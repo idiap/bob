@@ -16,6 +16,6 @@ param3 = torch.core.array.int16_3(range(24), (2,3,4))
 
 curdir = os.path.dirname(__file__)
 
-param4 = torch.database.Array(os.path.join(curdir, "arrays.bin"))
+param4 = torch.io.Array(os.path.join(curdir, "arrays.bin"))
 
-param5 = torch.database.Arrayset(os.path.join(curdir, "arrays.bin"))
+param5 = torch.io.Arrayset(os.path.join(curdir, "arrays.bin"))

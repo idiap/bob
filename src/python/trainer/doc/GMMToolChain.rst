@@ -9,7 +9,7 @@ In this section we present a small example how to train GMM with |project|.
 
 Generate features
 -----------------
-We assume that you have 2 directories as database: the first one contains pgm
+We assume that you have 2 directories as datasets: the first one contains pgm
 files and the other one contains pos files. We set these two paths in two
 variables (in this example we use banca english):
 
@@ -31,12 +31,12 @@ variables (in this example we use banca english):
    ...
 
 We also need a list of input files. If you don't have such a list, you can
-generate the list of all database files using the following command:
+generate the list of all dataset files using the following command:
 
 .. code-block:: bash
 
    $ find $PGM_PATH -type f -exec basename {} ".pgm" \; > filelist.list
-   $ #filelist.list contains the list of database files without extension:
+   $ #filelist.list contains the list of dataset files without extension:
    $ cat filelist.list
    1001_f_g1_s01_1001_en_1
    1001_f_g1_s01_1001_en_2

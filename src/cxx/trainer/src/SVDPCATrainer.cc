@@ -12,10 +12,10 @@
 
 #include "trainer/SVDPCATrainer.h"
 #include "math/svd.h"
-#include "database/Exception.h"
+#include "io/Exception.h"
 #include "core/array_type.h"
 
-namespace db = Torch::database;
+namespace io = Torch::io;
 namespace mach = Torch::machine;
 namespace train = Torch::trainer;
 
@@ -40,15 +40,15 @@ train::SVDPCATrainer& train::SVDPCATrainer::operator=
 }
 
 void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine, 
-    blitz::Array<double,1>& eigen_values, const db::Arrayset& ar) const {
+    blitz::Array<double,1>& eigen_values, const io::Arrayset& ar) const {
 
   // checks for arrayset data type and shape once
   if (ar.getElementType() != Torch::core::array::t_float64) {
-    throw Torch::database::TypeError(ar.getElementType(),
+    throw Torch::io::TypeError(ar.getElementType(),
         Torch::core::array::t_float64);
   }
   if (ar.getNDim() != 1) {
-    throw Torch::database::DimensionError(ar.getNDim(), 1);
+    throw Torch::io::DimensionError(ar.getNDim(), 1);
   }
 
   // data is checked now and conforms, just proceed w/o any further checks.
@@ -115,7 +115,7 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
 }
 
 void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine, 
-    const db::Arrayset& ar) const {
+    const io::Arrayset& ar) const {
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, ar);
 }

@@ -6,12 +6,12 @@
 #ifndef _GMMMACHINE_H
 #define _GMMMACHINE_H
 
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 #include "machine/Machine.h"
 #include "trainer/Sampler.h"
 #include "machine/GMMStats.h"
 #include "machine/Gaussian.h"
-#include "database/HDF5File.h"
+#include "io/HDF5File.h"
 #include <iostream>
 
 namespace Torch {
@@ -31,7 +31,7 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
     GMMMachine(int n_gaussians, int n_inputs);
 
     /// Constructor from a Configuration
-    GMMMachine(Torch::database::HDF5File& config);
+    GMMMachine(Torch::io::HDF5File& config);
 
     /// Copy constructor
     /// (Needed because the GMM points to its constituent Gaussian members)
@@ -104,7 +104,7 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
     
     /// Accumulates the GMM statistics over a set of samples.
     /// @see bool accStatistics(const blitz::Array<float,1> &x, GMMStats stats)
-    void accStatistics(const Torch::database::Arrayset &sampler, GMMStats &stats) const;
+    void accStatistics(const Torch::io::Arrayset &sampler, GMMStats &stats) const;
 
     /// Accumulate the GMM statistics for this sample.
     ///
@@ -126,10 +126,10 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
     int getNGaussians() const;
 
     /// Save to a Configuration
-    void save(Torch::database::HDF5File& config) const;
+    void save(Torch::io::HDF5File& config) const;
     
     /// Load from a Configuration
-    void load(Torch::database::HDF5File& config);
+    void load(Torch::io::HDF5File& config);
     
     friend std::ostream& operator<<(std::ostream& os, const GMMMachine& machine);
     

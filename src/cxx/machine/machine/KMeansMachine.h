@@ -4,7 +4,7 @@
 #include <blitz/array.h>
 #include <cfloat>
 
-#include "database/Arrayset.h"
+#include "io/Arrayset.h"
 #include "machine/FrameSample.h"
 #include "machine/Machine.h"
 #include "trainer/Sampler.h"
@@ -64,7 +64,7 @@ public:
   /// @param[in]  sampler   The sampler
   /// @param[out] variances The cluster variances (one row per cluster), with as many columns as feature dimensions.
   /// @param[out] weights   A vector of weights, one per cluster
-  void getVariancesAndWeightsForEachCluster(const Torch::database::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const;
+  void getVariancesAndWeightsForEachCluster(const Torch::io::Arrayset &ar, blitz::Array<double,2> &variances, blitz::Array<double,1> &weights) const;
   
   /// Output the minimum distance between the input and one of the means
   /// (overrides Machine::forward)

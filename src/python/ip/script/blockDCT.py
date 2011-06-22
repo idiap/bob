@@ -38,7 +38,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
   print >> sys.stderr, "DCT: " + line
   
   # Process one file
-  prep = torch.database.Array(line).get().cast('float64')
+  prep = torch.io.Array(line).get().cast('float64')
 
   blockShape = torch.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   blocks = torch.core.array.float64_3(blockShape)
@@ -69,7 +69,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
     normalizeDCT(TMP_tensor)
 
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(line))[0] + ".hdf5")
-  torch.database.Array(TMP_tensor).save(output_file)
+  torch.io.Array(TMP_tensor).save(output_file)
 
   print os.path.join(output_file)
   
@@ -187,7 +187,7 @@ if options.test:
                                   [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]],
                                   'uint8')
 
-  torch.database.Array(array).save("/tmp/input.hdf5")
+  torch.io.Array(array).save("/tmp/input.hdf5")
 
   f = open("/tmp/input.lst", 'w')
   f.write("/tmp/input.hdf5\n")

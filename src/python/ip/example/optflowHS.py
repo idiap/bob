@@ -39,7 +39,7 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
   if not os.path.exists(outputdir): os.makedirs(outputdir)
 
   # To read the input we use the VideoReader class and its iterability
-  video = torch.database.VideoReader(movie)
+  video = torch.io.VideoReader(movie)
   print "Loading", video.info
 
   # The images for the optical flow computation must be grayscale
@@ -50,7 +50,7 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
   v = torch.core.array.float64_2(video.height, video.width)
   
   # Creates the output video (frame rate by default)
-  outvideo = torch.database.VideoWriter(output, video.height, video.width)
+  outvideo = torch.io.VideoWriter(output, video.height, video.width)
 
   print "Horn & Schunck Optical Flow: alpha = %.2f; iterations = %d" % \
       (alpha, iterations)
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     # then we go into test mode, all input is preset
     packdir = os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0])))
     outputdir = tempfile.mkdtemp()
-    movie = os.path.join(packdir, '..', 'database', 'test', 'data', 'test.mov')
+    movie = os.path.join(packdir, '..', 'io', 'test', 'data', 'test.mov')
     output = os.path.join(outputdir, "%(stem)s.avi")
     optflowHS(movie, 1, options.alpha, output, 10) #1 iter. per cycle is faster
     shutil.rmtree(outputdir)

@@ -11,11 +11,11 @@
 #include "trainer/FisherLDATrainer.h"
 
 using namespace boost::python;
-namespace db = Torch::database;
+namespace io = Torch::io;
 namespace mach = Torch::machine;
 namespace train = Torch::trainer;
 
-tuple eig_train1 (const train::SVDPCATrainer& t, const db::Arrayset& data) {
+tuple eig_train1 (const train::SVDPCATrainer& t, const io::Arrayset& data) {
   blitz::Array<double,1> eig_val(data.getShape()[0]);
   mach::LinearMachine m;
   t.train(m, eig_val, data);
@@ -23,14 +23,14 @@ tuple eig_train1 (const train::SVDPCATrainer& t, const db::Arrayset& data) {
 }
 
 object eig_train2 (const train::SVDPCATrainer& t, mach::LinearMachine& m,
-    const db::Arrayset& data) {
+    const io::Arrayset& data) {
   blitz::Array<double,1> eig_val(data.getShape()[0]);
   t.train(m, eig_val, data);
   return object(eig_val);
 }
 
 tuple lda_train1 (const train::FisherLDATrainer& t,
-    const std::vector<db::Arrayset>& data) {
+    const std::vector<io::Arrayset>& data) {
   blitz::Array<double,1> eig_val(data[0].getShape()[0]);
   mach::LinearMachine m;
   t.train(m, eig_val, data);
@@ -38,7 +38,7 @@ tuple lda_train1 (const train::FisherLDATrainer& t,
 }
 
 object lda_train2 (const train::FisherLDATrainer& t, mach::LinearMachine& m,
-    const std::vector<db::Arrayset>& data) {
+    const std::vector<io::Arrayset>& data) {
   blitz::Array<double,1> eig_val(data[0].getShape()[0]);
   t.train(m, eig_val, data);
   return object(eig_val);

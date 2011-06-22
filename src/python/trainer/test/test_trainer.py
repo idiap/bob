@@ -44,7 +44,7 @@ def flipRows(array):
 """
   def __init__(self,path):
     torch.trainer.Sampler_FrameSample_.__init__(self)
-    self.arrayset = torch.database.Arrayset(path)
+    self.arrayset = torch.io.Arrayset(path)
     self.arrayset.load()
   
   def getSample(self, index):
@@ -67,7 +67,7 @@ def flipRows(array):
 """
   def __init__(self, path):
     torch.trainer.Sampler_FrameSample_.__init__(self)
-    self.arrayset = torch.database.Arrayset(path)
+    self.arrayset = torch.io.Arrayset(path)
     self.arrayset.load()
     
     length = self.arrayset.shape[0]
@@ -97,7 +97,7 @@ def flipRows(array):
 """
 
 def NormalizeStdArrayset(path):
-  arrayset = torch.database.Arrayset(path)
+  arrayset = torch.io.Arrayset(path)
   arrayset.load()
 
   length = arrayset.shape[0]
@@ -119,7 +119,7 @@ def NormalizeStdArrayset(path):
   std -= (mean ** 2)
   std = std ** 0.5 # sqrt(std)
 
-  arStd = torch.database.Arrayset()
+  arStd = torch.io.Arrayset()
   for i in range(0, n_samples):
     x = arrayset[i+1].get().cast('float64')
     arStd.append(x / std)
@@ -160,7 +160,7 @@ class TrainerTest(unittest.TestCase):
     #   * 100 samples from N(-10,1)
     #   * 100 samples from N(10,1)
     #sampler = MyFrameSampler("data/samplesFrom2G.hdf5")
-    data = torch.database.Arrayset("data/samplesFrom2G_f64.hdf5")
+    data = torch.io.Arrayset("data/samplesFrom2G_f64.hdf5")
 
     machine = torch.machine.KMeansMachine(2, 1)
 
@@ -215,45 +215,45 @@ class TrainerTest(unittest.TestCase):
   def test02_gmm_ML(self):
     """Train a GMMMachine with ML_GMMTrainer"""
     
-    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
+    ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     
     gmm = loadGMM()
 
     ml_gmmtrainer = torch.trainer.ML_GMMTrainer(True, True, True)
     ml_gmmtrainer.train(gmm, ar)
 
-    #config = torch.database.HDF5File("data/gmm_ML.hdf5")
+    #config = torch.io.HDF5File("data/gmm_ML.hdf5")
     #gmm.save(config)
 
-    gmm_ref = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
-    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML_32bit_release.hdf5"))
+    gmm_ref = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML.hdf5"))
+    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML_32bit_release.hdf5"))
     
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
   def test03_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer"""
     
-    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
+    ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     
-    gmm = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
-    gmmprior = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_ML.hdf5"))
+    gmm = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML.hdf5"))
+    gmmprior = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML.hdf5"))
     
     map_gmmtrainer = torch.trainer.MAP_GMMTrainer(16)
     map_gmmtrainer.setPriorGMM(gmmprior)
     map_gmmtrainer.train(gmm, ar)
 
-    #config = torch.database.HDF5File("data/gmm_MAP.hdf5")
+    #config = torch.io.HDF5File("data/gmm_MAP.hdf5")
     #gmm.save(config)
     
-    gmm_ref = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_MAP.hdf5"))
-    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.database.HDF5File("data/gmm_MAP_32bit_release.hdf5"))
+    gmm_ref = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_MAP.hdf5"))
+    gmm_ref_32bit_release = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_MAP_32bit_release.hdf5"))
 
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
   #def test04_custom_samplers(self):
     """Custom python sampler"""
   """  
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/faithful.torch3.hdf5"))
+    sampler = torch.trainer.SimpleFrameSampler(torch.io.Arrayset("data/faithful.torch3.hdf5"))
     mysampler = MyFrameSampler("data/faithful.torch3.hdf5")
 
     self.assertTrue(sampler.getNSamples() == mysampler.getNSamples())
@@ -265,7 +265,7 @@ class TrainerTest(unittest.TestCase):
   def test05_custom_trainer(self):
     """Custom python trainer"""
     
-    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
+    ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     
     mytrainer = MyTrainer1()
 
@@ -277,7 +277,7 @@ class TrainerTest(unittest.TestCase):
 
 
   def test06_custom_initialization(self):
-    ar = torch.database.Arrayset("data/faithful.torch3_f64.hdf5")
+    ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     
     mytrainer = MyTrainer2()
 

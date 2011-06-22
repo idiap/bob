@@ -87,8 +87,8 @@ formatting with try/catch clauses to avoid surprises.
 If your inherited exception type does not provide a ``what()`` method, the
 default message will be printed.
 
-You can find examples in `database/Exception.h`_ and
-`database/src/Exception.cc`_ examples on how to extend the Exception system to
+You can find examples in `io/Exception.h`_ and
+`io/src/Exception.cc`_ examples on how to extend the Exception system to
 become more specific and format messages.
 
 Logging
@@ -373,5 +373,5 @@ yourself with our logging API for the language you are programming at.
 .. Place your references here:
 .. _some guidelines on error reporting and handling: http://www.boost.org/community/error_handling.html
 .. _here is some lengthier explanation of why: http://www.gotw.ca/publications/mill22.htm
-.. _database/Exception.h: http://www.idiap.ch/software/torch5spro/browser/src/cxx/database/database/Exception.h
-.. _database/src/Exception.cc: http://www.idiap.ch/software/torch5spro/browser/src/cxx/database/src/Exception.cc
+.. _io/Exception.h: http://www.idiap.ch/software/torch5spro/browser/src/cxx/io/io/Exception.h
+.. _io/src/Exception.cc: http://www.idiap.ch/software/torch5spro/browser/src/cxx/io/src/Exception.cc

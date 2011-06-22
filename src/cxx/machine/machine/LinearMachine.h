@@ -19,7 +19,7 @@
 #define TORCH_MACHINE_LINEARMACHINE_H
 
 #include <blitz/array.h>
-#include "database/HDF5File.h"
+#include "io/HDF5File.h"
 
 namespace Torch { namespace machine {
 
@@ -68,7 +68,7 @@ namespace Torch { namespace machine {
       /**
        * Starts a new LinearMachine from an existing Configuration object.
        */
-      LinearMachine (Torch::database::HDF5File& config);
+      LinearMachine (Torch::io::HDF5File& config);
 
       /**
        * Just to virtualise the destructor
@@ -84,12 +84,12 @@ namespace Torch { namespace machine {
        * Loads data from an existing configuration object. Resets the current
        * state.
        */
-      void load (Torch::database::HDF5File& config);
+      void load (Torch::io::HDF5File& config);
 
       /**
        * Saves an existing machine to a Configuration object.
        */
-      void save (Torch::database::HDF5File& config) const;
+      void save (Torch::io::HDF5File& config) const;
 
       /**
        * Forwards data through the network, outputs the values of each linear

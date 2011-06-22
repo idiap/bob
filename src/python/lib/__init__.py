@@ -11,7 +11,7 @@ sys.setdlopenflags(default_flags|ctypes.RTLD_GLOBAL)
 import core
 import math
 import config
-import database
+import io
 import measure
 import sp
 import ip
@@ -21,4 +21,4 @@ import trainer
 sys.setdlopenflags(default_flags)
 del default_flags
 
-__all__ = ['core', 'config', 'database', 'sp', 'ip', 'math']
+__all__ = ['core', 'config', 'io', 'sp', 'ip', 'math']

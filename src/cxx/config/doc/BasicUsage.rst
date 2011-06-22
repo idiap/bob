@@ -164,14 +164,14 @@ In C++, you retrieve the objects naturally:
 
 This mechanism opens the door for re-using any already existing binding to C++
 objects built in |project| or elsewhere. Here is how to load a whole
-``Torch::database::Arrayset`` and a ``Torch::database::BinFile`` from an
+``Torch::io::Arrayset`` and a ``Torch::io::BinFile`` from an
 external file:
 
 .. code-block:: python
 
   import torch
-  mydata = torch.database.BinFile("data-I-produced-before.bin")
-  arrayset = torch.database.Arrayset("some-other-data-in-matlab-format.mat")
+  mydata = torch.io.BinFile("data-I-produced-before.bin")
+  arrayset = torch.io.Arrayset("some-other-data-in-matlab-format.mat")
 
 And you access it just following the patterns explained above:
 
@@ -179,13 +179,13 @@ And you access it just following the patterns explained above:
 
   #include "core/logging.h"
   #include "config/Configuration.h"
-  #include "database/BinFile.h"
-  #include "database/Arrayset.h"
+  #include "io/BinFile.h"
+  #include "io/Arrayset.h"
 
   try {
     Torch::config::Configuration cnf("myoptions.txt");
-    Torch::database::BinFile& data = cnf.get<Torch::database::BinFile&>("mydata");
-    Torch::database::Arrayset& extras = cnf.get<Torch::database::Arrayset&>("mydata");
+    Torch::io::BinFile& data = cnf.get<Torch::io::BinFile&>("mydata");
+    Torch::io::Arrayset& extras = cnf.get<Torch::io::Arrayset&>("mydata");
     //...
   }
   catch (std::except& e) {
@@ -197,7 +197,7 @@ And you access it just following the patterns explained above:
 
 A question that may be popping on your mind is: but how do I produce data on
 those formats? Well, just use the C++ or Python API of (in this case)
-``Torch::database::BinFile`` or ``Torch::database::Arrayset`` to save the data.
+``Torch::io::BinFile`` or ``Torch::io::Arrayset`` to save the data.
 You choose whatever fits your code best!
 
 You can combine the C++ code snippets above with command-line options as you
@@ -219,7 +219,7 @@ Then, within your application, you read it normally:
   try {
     std::string input_file = process_cmdline_and_get("input");
     Torch::config::Configuration input(input_file);
-    Torch::database::Dataset db(input_file.get<std::string>("dataset_name"));
+    Torch::io::Arrayset data(input_file.get<std::string>("set_name"));
 
     std::string gmm_file = process_cmdline_and_get("model");
     Torch::config::Configuration gmm_parameters(gmm_file);
@@ -233,7 +233,7 @@ Then, within your application, you read it normally:
   }
 
 Actually, you can go beyond just reading out parameters. If you consider the
-example above, you could have instantiated the Dataset directly from within the
+example above, you could have instantiated the Arrayset directly from within the
 configuration file! Your choice.
 
 .. Place your links here:

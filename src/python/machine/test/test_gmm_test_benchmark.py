@@ -43,7 +43,7 @@ class MachineTest(unittest.TestCase):
   def test01_GMMMachine(self):
     """Test a GMMMachine"""
 
-    sampler = torch.trainer.SimpleFrameSampler(torch.database.Arrayset("data/1028_m_g1_s03_1028_en_2.bindata"))
+    sampler = torch.trainer.SimpleFrameSampler(torch.io.Arrayset("data/1028_m_g1_s03_1028_en_2.bindata"))
     gmm = torch.machine.GMMMachine(3, 91)
 
     weis, means, varis = read_lightsaber("data/tan-triggs-64x80-normalised-D91-gmm512-B24-BANCA.data.s")

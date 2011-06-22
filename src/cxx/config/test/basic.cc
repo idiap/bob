@@ -18,8 +18,8 @@
 #include "core/logging.h"
 #include "core/Exception.h"
 #include "config/Configuration.h"
-#include "database/Array.h"
-#include "database/Arrayset.h"
+#include "io/Array.h"
+#include "io/Arrayset.h"
 #include <boost/shared_array.hpp>
 
 namespace conf = Torch::config;
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE ( transparent_retrieval ) {
 
   //The correctness of the input for the other parameters will not be checked
   //in this test as this is already covered by other tests, like the ones in
-  //the database or core packages.
+  //the io or core packages.
 }
 
 BOOST_AUTO_TEST_CASE ( extraction_error ) {

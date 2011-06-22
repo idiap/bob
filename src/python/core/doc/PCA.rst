@@ -59,7 +59,7 @@ We start by collecting as many photos as we can from any different individuals.
 This collection is referred to as the world set.
 We crop, normalize and align all those faces.
 Thereafter we compute the average face.
-The task of cropping a set of images using a database we have covered in this practical example
+The task of cropping a set of images using a dataset we have covered in this practical example
 :ref:`practical-cropping-images`.
 
 .. image:: dia-1.png
@@ -76,8 +76,8 @@ If we pick out the values row-by-row from the image (2D array) we can easily cre
 
   import Cropper
 
-  # crop all the images in our database
-  myCropper = Cropper.Cropper('my-world-database.xml')
+  # crop all the images in our dataset
+  myCropper = Cropper.Cropper('my-world-io.xml')
   world_images = myCropper.get_all()
 
 +------------------------------------------+-------------------------------------------+-------------------------------------------+

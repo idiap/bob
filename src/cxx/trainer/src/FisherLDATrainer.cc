@@ -17,7 +17,7 @@
 
 namespace train = Torch::trainer;
 namespace mach = Torch::machine;
-namespace db = Torch::database;
+namespace io = Torch::io;
 
 train::FisherLDATrainer::FisherLDATrainer() { }
 
@@ -36,7 +36,7 @@ train::FisherLDATrainer& train::FisherLDATrainer::operator=
  * class means 'm_k' and computes the total number of elements in each class
  * 'N'.
  */
-static void evalMeans (const std::vector<db::Arrayset>& data,
+static void evalMeans (const std::vector<io::Arrayset>& data,
     blitz::Array<double,1>& m, blitz::Array<double,2>& m_k,
     blitz::Array<double,1>& N) {
   int n_features = data[0].getShape()[0];
@@ -70,7 +70,7 @@ static void evalMeans (const std::vector<db::Arrayset>& data,
  *
  * This code is useless out of a testing scenario.
  */
-static void evalTotalScatter (const std::vector<db::Arrayset>& data,
+static void evalTotalScatter (const std::vector<io::Arrayset>& data,
     blitz::Array<double,1>& m, blitz::Array<double,2>& St) {
 
   int n_features = data[0].getShape()[0];
@@ -123,7 +123,7 @@ static void evalTotalScatter (const std::vector<db::Arrayset>& data,
  * This method was designed based on the previous design at Torch3Vision 2.1,
  * by SM.
  */
-static void evalScatters (const std::vector<db::Arrayset>& data,
+static void evalScatters (const std::vector<io::Arrayset>& data,
     blitz::Array<double,1>& m,
     blitz::Array<double,2>& Sw, blitz::Array<double,2>& Sb) {
   
@@ -176,7 +176,7 @@ static void evalScatters (const std::vector<db::Arrayset>& data,
 
 void train::FisherLDATrainer::train(mach::LinearMachine& machine,
     blitz::Array<double,1>& eigen_values,
-    const std::vector<Torch::database::Arrayset>& data) const {
+    const std::vector<Torch::io::Arrayset>& data) const {
 
   // if #classes < 2, then throw
   if (data.size() < 2) throw train::WrongNumberOfClasses(data.size());
@@ -186,11 +186,11 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
 
   for (size_t cl=0; cl<data.size(); ++cl) {
     if (data[cl].getElementType() != Torch::core::array::t_float64) {
-      throw db::TypeError(data[cl].getElementType(),
+      throw io::TypeError(data[cl].getElementType(),
           Torch::core::array::t_float64);
     }
     if (data[cl].getNDim() != 1) {
-      throw Torch::database::DimensionError(data[cl].getNDim(), 1);
+      throw Torch::io::DimensionError(data[cl].getNDim(), 1);
     }
     if (data[cl].getShape()[0] != (size_t)n_features) {
       throw Torch::trainer::WrongNumberOfFeatures(data[cl].getShape()[0],
@@ -228,7 +228,7 @@ void train::FisherLDATrainer::train(mach::LinearMachine& machine,
 }
 
 void train::FisherLDATrainer::train(mach::LinearMachine& machine,
-    const std::vector<Torch::database::Arrayset>& data) const {
+    const std::vector<Torch::io::Arrayset>& data) const {
   blitz::Array<double,1> throw_away;
   train(machine, throw_away, data);
 }

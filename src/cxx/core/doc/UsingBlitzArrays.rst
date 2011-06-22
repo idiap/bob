@@ -169,7 +169,7 @@ binary file:
 
 .. code-block:: c++
 
-  #include "database/BinFile.h"
+  #include "io/BinFile.h"
 
   int main() {
     // Create and initialize two blitz arrays
@@ -179,7 +179,7 @@ binary file:
     bl2 = 6, 7, 8, 9, 10; 
 
     // save them to a binary file
-    Torch::database::BinFile out("blitz.bin", Torch::core::BinFile::out);
+    Torch::io::BinFile out("blitz.bin", Torch::core::BinFile::out);
     out.write( bl1);
     out.write( bl2);
     // close the output stream

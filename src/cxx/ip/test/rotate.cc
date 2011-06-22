@@ -16,7 +16,7 @@
 #include "ip/Rotate.h"
 #include "ip/shear.h"
 
-#include "database/Array.h"
+#include "io/Array.h"
 #include <algorithm>
 
 #include <random/discrete-uniform.h>
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  Torch::database::Array ar_img(testdata_path_img.string());
+  Torch::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_processed;
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 5.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
-  Torch::database::Array ar_img_r5(testdata_path_img.string());
+  Torch::io::Array ar_img_r5(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r5 = ar_img_r5.get<uint8_t,2>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
 
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 10.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10.pgm";
-  Torch::database::Array ar_img_r10(testdata_path_img.string());
+  Torch::io::Array ar_img_r10(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r10 = ar_img_r10.get<uint8_t,2>();
   checkBlitzClose( img_ref_r10, img_processed, eps);
 
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 15.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r15.pgm";
-  Torch::database::Array ar_img_r15(testdata_path_img.string());
+  Torch::io::Array ar_img_r15(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r15 = ar_img_r15.get<uint8_t,2>();
   checkBlitzClose( img_ref_r15, img_processed, eps);
 
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 30.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r30.pgm";
-  Torch::database::Array ar_img_r30(testdata_path_img.string());
+  Torch::io::Array ar_img_r30(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r30 = ar_img_r30.get<uint8_t,2>();
   checkBlitzClose( img_ref_r30, img_processed, eps);
 
@@ -231,7 +231,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 45.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r45.pgm";
-  Torch::database::Array ar_img_r45(testdata_path_img.string());
+  Torch::io::Array ar_img_r45(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r45 = ar_img_r45.get<uint8_t,2>();
   checkBlitzClose( img_ref_r45, img_processed, eps);
 
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 70.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r70.pgm";
-  Torch::database::Array ar_img_r70(testdata_path_img.string());
+  Torch::io::Array ar_img_r70(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r70 = ar_img_r70.get<uint8_t,2>();
   checkBlitzClose( img_ref_r70, img_processed, eps);
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, 237.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r237.pgm";
-  Torch::database::Array ar_img_r237(testdata_path_img.string());
+  Torch::io::Array ar_img_r237(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_r237 = ar_img_r237.get<uint8_t,2>();
   checkBlitzClose( img_ref_r237, img_processed, eps);
 
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   rotate( img, img_processed, -25.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_rn25.pgm";
-  Torch::database::Array ar_img_rn25(testdata_path_img.string());
+  Torch::io::Array ar_img_rn25(testdata_path_img.string());
   blitz::Array<uint8_t,2> img_ref_rn25 = ar_img_rn25.get<uint8_t,2>();
   checkBlitzClose( img_ref_rn25, img_processed, eps);
 }
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "imageColor.ppm";
-  Torch::database::Array ar_img(testdata_path_img.string());
+  Torch::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,3> img = ar_img.get<uint8_t,3>();
   blitz::Array<double,3> img_processed;
 
@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   rotate( img, img_processed, 5.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "imageColor_r5.ppm";
-  Torch::database::Array ar_img_r5(testdata_path_img.string());
+  Torch::io::Array ar_img_r5(testdata_path_img.string());
   blitz::Array<uint8_t,3> img_ref_r5 = ar_img_r5.get<uint8_t,3>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
 }

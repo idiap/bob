@@ -12,7 +12,7 @@ Torch::machine::GMMMachine::GMMMachine(int n_gaussians, int n_inputs) : m_gaussi
   resize(n_gaussians,n_inputs);
 }
 
-Torch::machine::GMMMachine::GMMMachine(Torch::database::HDF5File& config) : m_gaussians(NULL) {
+Torch::machine::GMMMachine::GMMMachine(Torch::io::HDF5File& config) : m_gaussians(NULL) {
   load(config);
 }
 
@@ -200,7 +200,7 @@ void Torch::machine::GMMMachine::forward (const blitz::Array<double,1>& input, d
   output = logLikelihood(input);
 }
 
-void Torch::machine::GMMMachine::accStatistics(const Torch::database::Arrayset& ar, Torch::machine::GMMStats& stats) const {
+void Torch::machine::GMMMachine::accStatistics(const Torch::io::Arrayset& ar, Torch::machine::GMMStats& stats) const {
   // iterate over data
   std::vector<size_t> index;
   ar.index(index);
@@ -272,7 +272,7 @@ int Torch::machine::GMMMachine::getNGaussians() const {
   return m_n_gaussians;
 }
 
-void Torch::machine::GMMMachine::save(Torch::database::HDF5File& config) const {
+void Torch::machine::GMMMachine::save(Torch::io::HDF5File& config) const {
   config.append("m_n_gaussians", m_n_gaussians);
   config.append("m_n_inputs", m_n_inputs);
 
@@ -288,7 +288,7 @@ void Torch::machine::GMMMachine::save(Torch::database::HDF5File& config) const {
   config.appendArray("m_weights", m_weights);
 }
 
-void Torch::machine::GMMMachine::load(Torch::database::HDF5File& config) {
+void Torch::machine::GMMMachine::load(Torch::io::HDF5File& config) {
   config.read("m_n_gaussians", m_n_gaussians);
   config.read("m_n_inputs", m_n_inputs);
   

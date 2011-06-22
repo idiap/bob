@@ -18,7 +18,7 @@ class TrainerTest(unittest.TestCase):
   def test01_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
-    data = torch.database.Arrayset()
+    data = torch.io.Arrayset()
     data.append(torch.core.array.float64_1([2.5, 2.4],(2,)))
     data.append(torch.core.array.float64_1([0.5, 0.7],(2,)))
     data.append(torch.core.array.float64_1([2.2, 2.9],(2,)))
@@ -45,7 +45,7 @@ class TrainerTest(unittest.TestCase):
 
     # Tests our Fisher/LDA trainer for linear machines for a simple 2-class
     # "fake" problem:
-    data = [torch.database.Arrayset(), torch.database.Arrayset()]
+    data = [torch.io.Arrayset(), torch.io.Arrayset()]
     data[0].append(torch.core.array.float64_1([2.5, 2.4],(2,)))
     data[0].append(torch.core.array.float64_1([2.2, 2.9],(2,)))
     data[0].append(torch.core.array.float64_1([1.9, 2.2],(2,)))

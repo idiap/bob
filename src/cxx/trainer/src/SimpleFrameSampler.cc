@@ -1,6 +1,6 @@
 #include "trainer/SimpleFrameSampler.h"
 
-Torch::trainer::SimpleFrameSampler::SimpleFrameSampler(const Torch::database::Arrayset& arrayset) : 
+Torch::trainer::SimpleFrameSampler::SimpleFrameSampler(const Torch::io::Arrayset& arrayset) : 
   arrayset(arrayset) {
   
 }

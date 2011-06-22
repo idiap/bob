@@ -102,7 +102,7 @@ namespace Torch { namespace config {
       inline void clear () { m_dict.clear(); }
 
       /**
-       * Returns the number of objects in this configuration database.
+       * Returns the number of objects in this configuration.
        */
       inline size_t size() const { return boost::python::len(m_dict); }
 

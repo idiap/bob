@@ -8,7 +8,7 @@
 
 import os, sys
 
-INPUT_VIDEO = '../../../database/test/data/test.mov'
+INPUT_VIDEO = '../../../io/test/data/test.mov'
 PARAMETERS = 'facefinder.multiscale.params'
 CONTEXT_PARAMETERS = 'facefinder.track.context.params'
 

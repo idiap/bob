@@ -57,9 +57,9 @@ for line in fileinput.input(args):
   filelist.append(line.rstrip('\r\n'))
 
 # Create a sampler for the input files
-ar = torch.database.Arrayset()
+ar = torch.io.Arrayset()
 for myfile in filelist:
-  myarray = torch.database.Array(myfile)
+  myarray = torch.io.Array(myfile)
   n_blocks = myarray.shape[0]
   for b in range(0,n_blocks):
     x = myarray.get().cast('float64')[b,:]

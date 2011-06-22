@@ -2,7 +2,7 @@
 #include "math/eig.h"
 #include "math/linear.h"
 
-void Torch::trainer::TwoDPCATrainer::train(Torch::machine::TwoDPCAMachine& machine, const Torch::database::Arrayset& data) 
+void Torch::trainer::TwoDPCATrainer::train(Torch::machine::TwoDPCAMachine& machine, const Torch::io::Arrayset& data) 
 {
   int n_samples = data.getNSamples();
   int m = data.getShape()[0];

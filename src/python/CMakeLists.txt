@@ -15,7 +15,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
 
   add_subdirectory(core)
   add_subdirectory(config)
-  add_subdirectory(database)
+  add_subdirectory(io)
   add_subdirectory(measure)
   add_subdirectory(math)
   add_subdirectory(sp)

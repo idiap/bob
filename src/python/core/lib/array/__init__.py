@@ -90,7 +90,7 @@ def array_save(self, filename, codecname=''):
   used. If not provided, I will try to derive the codec to be used from the
   filename extension.
   """
-  from ...database import Array
+  from ...io import Array
   Array(self).save(filename, codecname=codecname)
 
 for array_class in [k[1] for k in get_array_types()]:
@@ -114,7 +114,7 @@ def load(filename, codecname=''):
   to decode the information in the file. If not provided, I will try to derive
   the codec to be used from the filename extension.
   """
-  from ...database import Array
+  from ...io import Array
   return Array(filename, codecname=codecname).get()
 
 def array(data, dtype=None):

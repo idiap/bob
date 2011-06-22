@@ -7,7 +7,7 @@
 
 #include <blitz/array.h>
 #include <cfloat>
-#include <database/HDF5File.h>
+#include <io/HDF5File.h>
 
 namespace Torch {
 namespace machine {
@@ -36,7 +36,7 @@ class Gaussian {
     Gaussian(int n_inputs);
 
     /// Constructor
-    Gaussian(Torch::database::HDF5File& config);
+    Gaussian(Torch::io::HDF5File& config);
 
     /// Destructor
     virtual ~Gaussian();
@@ -91,10 +91,10 @@ class Gaussian {
     double logLikelihood(const blitz::Array<double, 1> &x) const;
 
     /// Save to a Configuration
-    void save(Torch::database::HDF5File& config) const;
+    void save(Torch::io::HDF5File& config) const;
     
     /// Load from a Configuration
-    void load(Torch::database::HDF5File& config);
+    void load(Torch::io::HDF5File& config);
 
     friend std::ostream& operator<<(std::ostream& os, const Gaussian& g);
     

@@ -15,7 +15,7 @@ def width_offset(crop_width):
 
 class Cropper():
     def __init__(self, xml_file, crop_height = 80, crop_width = 64):
-        self.db  = torch.database.Dataset(xml_file)
+        self.db  = torch.io.Dataset(xml_file)
 
         # cropping parameters
         self.H  = crop_height
