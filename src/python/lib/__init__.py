@@ -15,10 +15,22 @@ import io
 import measure
 import sp
 import ip
+import db
 import machine
 import trainer
 
 sys.setdlopenflags(default_flags)
 del default_flags
 
-__all__ = ['core', 'config', 'io', 'sp', 'ip', 'math']
+__all__ = [
+    'core', 
+    'math',
+    'config',
+    'io',
+    'measure',
+    'sp',
+    'ip',
+    'db',
+    'machine',
+    'trainer'
+    ]

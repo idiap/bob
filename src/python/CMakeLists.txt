@@ -20,6 +20,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   add_subdirectory(math)
   add_subdirectory(sp)
   add_subdirectory(ip)
+  add_subdirectory(db)
   add_subdirectory(machine)
   add_subdirectory(trainer)
 
