@@ -1,5 +1,5 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Sat 19 Mar 15:42:20 2011 
  *
  * @brief Methods to convert between color spaces
@@ -16,6 +16,7 @@
 #include "ip/Exception.h"
 
 #include "core/array_type.h"
+#include "core/array_assert.h"
 
 namespace Torch { namespace ip {
 
@@ -338,15 +339,14 @@ namespace Torch { namespace ip {
    * HSV equivalents as determined by rgb_to_hsv_one(). The array must be
    * organized in such a way that the color bands are represented by the first
    * dimension.  Its shape should be something like (3, width, height) or (3,
-   * height, width). The output array will be automatically resized if
-   * required.
+   * height, width). The output array will be checked for shape conformity.
    *
    * @warn As of this time only C-style storage arrays are supported
    */
   template <typename T> void rgb_to_hsv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    if (blitz::any(to.shape() != from.shape())) to.resize(from.shape());
+    Torch::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_hsv_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -358,15 +358,14 @@ namespace Torch { namespace ip {
    * RGB equivalents as determined by hsv_to_rgb_one(). The array must be
    * organized in such a way that the color bands are represented by the first
    * dimension.  Its shape should be something like (3, width, height) or (3,
-   * height, width). The output array will be automatically resized if
-   * required.
+   * height, width). The output array will be checked for shape conformity.
    *
    * @warn As of this time only C-style storage arrays are supported
    */
   template <typename T> void hsv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    if (blitz::any(to.shape() != from.shape())) to.resize(from.shape());
+    Torch::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         hsv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -378,15 +377,14 @@ namespace Torch { namespace ip {
    * HSL equivalents as determined by rgb_to_hsl_one(). The array must be
    * organized in such a way that the color bands are represented by the first
    * dimension.  Its shape should be something like (3, width, height) or (3,
-   * height, width). The output array will be automatically resized if
-   * required.
+   * height, width). The output array will be checked for shape conformity.
    *
    * @warn As of this time only C-style storage arrays are supported
    */
   template <typename T> void rgb_to_hsl (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    if (blitz::any(to.shape() != from.shape())) to.resize(from.shape());
+    Torch::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_hsl_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -398,15 +396,14 @@ namespace Torch { namespace ip {
    * RGB equivalents as determined by hsl_to_rgb_one(). The array must be
    * organized in such a way that the color bands are represented by the first
    * dimension.  Its shape should be something like (3, width, height) or (3,
-   * height, width). The output array will be automatically resized if
-   * required.
+   * height, width). The output array will be checked for shape conformity.
    *
    * @warn As of this time only C-style storage arrays are supported
    */
   template <typename T> void hsl_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    if (blitz::any(to.shape() != from.shape())) to.resize(from.shape());
+    Torch::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         hsl_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -426,7 +423,7 @@ namespace Torch { namespace ip {
   template <typename T> void rgb_to_yuv (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    if (blitz::any(to.shape() != from.shape())) to.resize(from.shape());
+    Torch::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_yuv_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -438,15 +435,15 @@ namespace Torch { namespace ip {
    * array with RGB equivalents as determined by yuv_to_rgb_one(). The array
    * must be organized in such a way that the color bands are represented by
    * the first dimension.  Its shape should be something like (3, width,
-   * height) or (3, height, width). The output array will be automatically
-   * resized if required.
+   * height) or (3, height, width). The output array will be checked for shape
+   * conformity.
    *
    * @warn As of this time only C-style storage arrays are supported
    */
   template <typename T> void yuv_to_rgb (const blitz::Array<T,3>& from,
       blitz::Array<T,3>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    if (blitz::any(to.shape() != from.shape())) to.resize(from.shape());
+    Torch::core::array::assertSameShape(from, to);
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         yuv_to_rgb_one(from(0,j,k), from(1,j,k), from(2,j,k), 
@@ -459,17 +456,15 @@ namespace Torch { namespace ip {
    * organized in such a way that the color bands are represented by the first
    * dimension. Its shape should be something like (3, width, height) or (3,
    * height, width). The output array is a 2D array with the same element type.
-   * The output array will be automatically resized if required.
+   * The output array will be checked for shape conformity.
    *
    * @warn As of this time only C-style storage arrays are supported
    */
   template <typename T> void rgb_to_gray (const blitz::Array<T,3>& from,
       blitz::Array<T,2>& to) {
     if (from.extent(0) != 3) throw UnsupportedRowExtent(3, from.extent(0));
-    if (to.extent(0) != from.extent(1) ||
-        to.extent(1) != from.extent(2)) {
-      to.resize(from.extent(1), from.extent(2));
-    }
+    Torch::core::array::assertSameDimensionLength(from.extent(1), to.extent(0));
+    Torch::core::array::assertSameDimensionLength(from.extent(2), to.extent(1));
     for (int j=0; j<from.extent(1); ++j)
       for (int k=0; k<from.extent(2); ++k)
         rgb_to_gray_one(from(0,j,k), from(1,j,k), from(2,j,k), to(j,k));
@@ -478,17 +473,15 @@ namespace Torch { namespace ip {
   /**
    * Takes a 2-dimensional array encoded as grays and sets the second array
    * with RGB equivalents as determined by gray_to_rgb_one(). The output array
-   * will be automatically resized if required.
+   * will be checked for shape conformity.
    *
    * @warn As of this time only C-style storage arrays are supported
    */
   template <typename T> void gray_to_rgb (const blitz::Array<T,2>& from,
       blitz::Array<T,3>& to) {
-    if (to.extent(1) != from.extent(0) || 
-        to.extent(2) != from.extent(1) ||
-        to.extent(0) != 3) {
-      to.resize(3, from.extent(0), from.extent(1));
-    }
+    if (to.extent(0) != 3) throw UnsupportedRowExtent(3, to.extent(0));
+    Torch::core::array::assertSameDimensionLength(to.extent(1), from.extent(0));
+    Torch::core::array::assertSameDimensionLength(to.extent(2), from.extent(1));
     for (int j=0; j<from.extent(1); ++j) 
       for (int k=0; k<from.extent(2); ++k)
         gray_to_rgb_one(from(j,k), to(0,j,k), to(1,j,k), to(2,j,k));
