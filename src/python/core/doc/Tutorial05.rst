@@ -9,14 +9,14 @@ array (2d) of the same size and shape as the original image.
 
 To make this process a bit easier there are three help functions defined in |project|:
 
-* sameAs()
+* empty_like()
 * grayAs()
 * asOneRow()
 
-sameAs() - to allocate an array of the same size and shape
+empty_like() - to allocate an array of the same size and shape
 ----------------------------------------------------------
 
-sameAs() - to allocate an array of the same size and shape without copying the data.
+empty_like() - to allocate an array of the same size and shape without copying the data.
 This is useful when working with the ip package. An example use is the following,
 
 .. code-block:: python
@@ -25,7 +25,7 @@ This is useful when working with the ip package. An example use is the following
   src_image = torch.core.array.uint8_2([1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8], (4, 4))
 
   # allocate a destination
-  dst_image = src_image.sameAs()
+  dst_image = src_image.empty_like()
 
   # Smooth the image (here we are using a 3x3 Gaussian filter)
   # MySmoother = torch.ip.Gaussian(3, 3, 0.25)

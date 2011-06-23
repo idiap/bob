@@ -15,9 +15,9 @@ import torch
 # should just bind the name to this module.
 import numpy
 
-# help to control the sameAs properties
+# help to control the empty_like properties
 # Only shape and cxx_blitz_typename is controlled here, the rest in assert_grayAs
-def assert_sameAs(self, t1, t2):
+def assert_empty_like(self, t1, t2):
     self.assertEqual(t1.shape(), t2.shape())
     self.assertEqual(t1.cxx_blitz_typename, t2.cxx_blitz_typename)
     assert_grayAs(self, t1, t2)
@@ -722,15 +722,15 @@ class ArrayTest(unittest.TestCase):
     self.assertTrue(isinstance(t5_complex[0,0], complex))
     self.assertEqual(t5_complex[1,1], complex(5,0))
 
-  def test10_sameAs(self):
+  def test10_empty_like(self):
     Array    = torch.core.array.array([[1,2,3], [4,5,6]], 'float64')
-    Array_sa = Array.sameAs();
+    Array_sa = Array.empty_like();
 
-    assert_sameAs(self, Array, Array_sa)
+    assert_empty_like(self, Array, Array_sa)
 
     Array    = torch.core.array.array([1,2,3], 'uint8')
-    Array_sa = Array.sameAs();
-    assert_sameAs(self, Array, Array_sa)
+    Array_sa = Array.empty_like();
+    assert_empty_like(self, Array, Array_sa)
 
   def test11_grayAs(self):
     Array    = torch.core.array.uint8_3([1,2,3,4,5,6,7,8], (2,2,2))

@@ -43,7 +43,7 @@ class FilterNewTest(unittest.TestCase):
 
     img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.png'))
     A = img.get()
-    B = A.sameAs();
+    B = A.empty_like();
 
     # shift to center
     torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
@@ -56,7 +56,7 @@ class FilterNewTest(unittest.TestCase):
 
     img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()[1,:,:]
-    B = A.sameAs()
+    B = A.empty_like()
 
     # shift to center
     torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
@@ -64,7 +64,7 @@ class FilterNewTest(unittest.TestCase):
     # rotate
     angle = torch.ip.getAngleToHorizontal(LH, LW, RH, RW)
     shape = torch.ip.getShapeRotated(B, angle)
-    C = B.sameAs()
+    C = B.empty_like()
     C.resize(shape)
     torch.ip.rotate(B, C, angle)
     
@@ -77,7 +77,7 @@ class FilterNewTest(unittest.TestCase):
     # read up image
     img = torch.io.Array(os.path.join('data', 'faceextract', 'test_001.gray.png'))
     A = img.get()[1,:,:]
-    B = A.sameAs()
+    B = A.empty_like()
 
     # shift to center
     torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
@@ -85,7 +85,7 @@ class FilterNewTest(unittest.TestCase):
     # rotate
     angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
     shape = torch.ip.getShapeRotated(B, angle)
-    C = B.sameAs()
+    C = B.empty_like()
     C.resize(shape)
     torch.ip.rotate(B, C, angle)
 
@@ -117,13 +117,13 @@ class FilterNewTest(unittest.TestCase):
     RW = int(coord[3])
 
     # shift to center
-    B = A.sameAs()
+    B = A.empty_like()
     torch.ip.shiftToCenterOfPoints(A, B, LH, LW, RH, RW)
 
     # rotate
     angle = torch.ip.getRotateAngleToLevelOutHorizontal(LH, LW, RH, RW)
     shape = torch.ip.getShapeRotated(B, angle)
-    C = B.sameAs()
+    C = B.empty_like()
     C.resize(shape)
     torch.ip.rotate(B, C, angle)
 

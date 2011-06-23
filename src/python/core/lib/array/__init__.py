@@ -43,7 +43,18 @@ is_blitz_array = __BlitzArrayTypeTester__()
 del __BlitzArrayTypeTester__
 
 # to create a similar tensor as before
-def __sameAs__(self):
+def array_empty_like(self):
+  """Returns a new array with the same shape and type as myself."""
+  return self.__class__(self.shape())
+
+def array_zeros_like(self):
+  """Returns a new array with the same shape and type, filled with zeros."""
+  retval = self.__class__(self.shape())
+  retval.fill(0)
+  return retval
+
+def array_ones_like(self):
+  """Returns a new array with the same shape and type, filled with ones."""
   return self.__class__(self.shape())
 
 # binds string and representation
@@ -98,11 +109,15 @@ for array_class in [k[1] for k in get_array_types()]:
   array_class.__repr__ = array_repr
   array_class.convert = array_convert
   array_class.save = array_save
-  array_class.sameAs = __sameAs__
+  array_class.empty_like = array_empty_like
+  array_class.zeros_like = array_zeros_like
+  array_class.ones_like = array_ones_like
 del array_str
 del array_repr
 del array_convert
-del __sameAs__
+del array_empty_like
+del array_zeros_like
+del array_ones_like
 
 def load(filename, codecname=''):
   """Loads an array from a given file path specified
