@@ -44,7 +44,7 @@ set(pysrc_array
    "src/array_convert.cc"
    "src/array_storage.cc"
    "src/main_array.cc"
-   "src/array_gray_as.cc"
+   "src/array_as_row.cc"
    )
 
 set(pysrc_vector

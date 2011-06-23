@@ -16,16 +16,12 @@ import torch
 import numpy
 
 # help to control the empty_like properties
-# Only shape and cxx_blitz_typename is controlled here, the rest in assert_grayAs
+# Only shape and cxx_blitz_typename are controlled here
 def assert_empty_like(self, t1, t2):
     self.assertEqual(t1.shape(), t2.shape())
     self.assertEqual(t1.cxx_blitz_typename, t2.cxx_blitz_typename)
-    assert_grayAs(self, t1, t2)
 
-def assert_grayAs(self, t1, t2):
-    self.assertEqual(t1.cxx_element_typename, t2.cxx_element_typename)
-
-def assert_asOneRow(self, t, v):
+def assert_as_row(self, t, v):
     cnt = 0;
     for i in range(t.extent(torch.core.array.firstDim)):
       for j in range(t.extent(torch.core.array.secondDim)):
@@ -732,20 +728,14 @@ class ArrayTest(unittest.TestCase):
     Array_sa = Array.empty_like();
     assert_empty_like(self, Array, Array_sa)
 
-  def test11_grayAs(self):
-    Array    = torch.core.array.uint8_3([1,2,3,4,5,6,7,8], (2,2,2))
-    Array_ga = Array.grayAs()
-    
-    assert_grayAs(self, Array, Array_ga)
-
-  def test12_asOneRow(self):
+  def test12_as_row(self):
       Array    = torch.core.array.uint8_2([1,2,3,4,5,6,7,8], (2,4))
-      Array_vo = Array.asOneRow();
+      Array_vo = Array.as_row();
 
       print Array
       print Array_vo
 
-      assert_asOneRow(self, Array, Array_vo)
+      assert_as_row(self, Array, Array_vo)
     
 if __name__ == '__main__':
   sys.argv.append('-v')

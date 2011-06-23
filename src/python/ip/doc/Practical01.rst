@@ -116,8 +116,7 @@ However, we want to give a larger example how to but everything together.
           # turn the RGB image to gray if needed
           global img
           if 3 == tmp_img.dimensions():
-              img = tmp_img.grayAs()
-              torch.ip.rgb_to_gray(tmp_img, img)
+              img = torch.ip.rgb_to_gray(tmp_img)
           else:
               img = tmp_img
   
