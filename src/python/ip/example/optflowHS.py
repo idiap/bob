@@ -58,13 +58,11 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
     if previous is None:
       # we need 2 images to compute the flow, if we are on the first iteration,
       # keep the image and defer the calculation until we have a second frame
-      previous = torch.core.array.uint8_2()
-      torch.ip.rgb_to_gray(frame, previous)
+      previous = torch.ip.rgb_to_gray(frame)
       continue
 
     # if you get to this point, we have two consecutive images
-    current = torch.core.array.uint8_2()
-    torch.ip.rgb_to_gray(frame, current)
+    current = torch.ip.rgb_to_gray(frame)
     torch.ip.evalHornAndSchunckFlow(alpha, iterations, previous, current, u, v)
     
     # please note the HS algorithm output is as float64 and that the flow2hsv
