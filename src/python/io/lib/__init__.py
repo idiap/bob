@@ -58,6 +58,13 @@ def arrayset_setitem(self, id, *args):
 Arrayset.__setitem__ = arrayset_setitem
 del arrayset_setitem
 
+def arrayset_repr(self):
+  """A simple representation"""
+  return '<Arrayset[%d] %s@%s>' % (len(self), self.elementType, self.shape)
+Arrayset.__repr__ = arrayset_repr
+Arrayset.__str__ = arrayset_repr
+del arrayset_repr
+
 def arrayset_eq(self, other):
   """Compares two arraysets for content equality."""
   if self.shape != other.shape: return False 
@@ -103,6 +110,18 @@ def array_ne(self, other):
   return not (self == other)
 Array.__ne__ = array_ne
 del array_ne
+
+def array_repr(self):
+  """A simple representation for generic Arrays"""
+  return "<Array %s@%s>" % (self.elementType, self.shape)
+Array.__repr__ = array_repr
+del array_repr
+
+def array_str(self):
+  """A complete representation for arrays"""
+  return str(self.get())
+Array.__str__ = array_str
+del array_str
 
 def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""
