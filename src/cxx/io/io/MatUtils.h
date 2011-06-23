@@ -277,9 +277,9 @@ namespace Torch { namespace io { namespace detail {
   template <typename T, int D> void write_arrayset
     (boost::shared_ptr<mat_t> file, boost::format& fmt_varname,
      const InlinedArraysetImpl& data) {
-      for (size_t i=0; i<data.getNSamples(); ++i) {
-        fmt_varname % (i+1);
-        write_array<T,D>(file, fmt_varname.str(), data[i+1].get());
+      for (size_t i=0; i<data.size(); ++i) {
+        fmt_varname % (i);
+        write_array<T,D>(file, fmt_varname.str(), data[i].get());
       }
   }
 
@@ -302,9 +302,9 @@ namespace Torch { namespace io { namespace detail {
   template <typename T, typename F, int D> void write_complex_arrayset
     (boost::shared_ptr<mat_t> file, boost::format& fmt_varname,
      const InlinedArraysetImpl& data) {
-      for (size_t i=0; i<data.getNSamples(); ++i) {
-        fmt_varname % (i+1);
-        write_complex_array<T,F,D>(file, fmt_varname.str(), data[i+1].get());
+      for (size_t i=0; i<data.size(); ++i) {
+        fmt_varname % (i);
+        write_complex_array<T,F,D>(file, fmt_varname.str(), data[i].get());
       }
   }
 

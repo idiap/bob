@@ -194,7 +194,7 @@ double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &
 
 void Torch::machine::GMMMachine::forward (const blitz::Array<double,1>& input, double& output) const {
   if (input.extent(0) != m_n_inputs) {
-    throw IncompatibleFrameSample(m_n_inputs, input.extent(0));
+    throw NInputsMismatch(m_n_inputs, input.extent(0));
   }
 
   output = logLikelihood(input);
@@ -202,12 +202,10 @@ void Torch::machine::GMMMachine::forward (const blitz::Array<double,1>& input, d
 
 void Torch::machine::GMMMachine::accStatistics(const Torch::io::Arrayset& ar, Torch::machine::GMMStats& stats) const {
   // iterate over data
-  std::vector<size_t> index;
-  ar.index(index);
-  for (size_t i=0; i < index.size(); ++i) {
+  for (size_t i=0; i < ar.size(); ++i) {
 
     // Get example
-    blitz::Array<double,1> x(ar.get<double,1>(index[i]));
+    blitz::Array<double,1> x(ar.get<double,1>(i));
 
     // Accumulate statistics
     accStatistics(x,stats);

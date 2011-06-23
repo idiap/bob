@@ -86,7 +86,7 @@ def testcase_append_load(self, codecname, bzdata_list):
 
   #loads one by one and checks they are individually correct
   for i, k in enumerate(bzdata_list):
-    self.assertEqual(testcodec.load(tmpname, i+1).get(), i)
+    self.assertEqual(testcodec.load(tmpname, i).get(), i)
 
   os.unlink(tmpname)
 

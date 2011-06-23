@@ -5,10 +5,7 @@
 #include <cfloat>
 
 #include "io/Arrayset.h"
-#include "machine/FrameSample.h"
 #include "machine/Machine.h"
-#include "trainer/Sampler.h"
-
 
 namespace Torch {
 namespace machine {

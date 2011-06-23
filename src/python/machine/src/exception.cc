@@ -20,6 +20,4 @@ void bind_machine_exception() {
 
   CxxToPythonTranslatorPar2<Torch::machine::EigenMachineNOutputsTooLarge, Torch::machine::Exception, const int, const int>("EigenMachineNOutputsTooLarge", "Raised when an EigenMachine tries to set a too large number of outputs, wrt. to the number of eigenvectors/eigenvalues.");
   
-  CxxToPythonTranslatorPar2<Torch::machine::IncompatibleFrameSample, Torch::machine::Exception, const int, const int>("IncompatibleFrameSample", "Raised when the frames of a FrameSample have not the expected size");
-
 }

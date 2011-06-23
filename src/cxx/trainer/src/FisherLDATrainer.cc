@@ -44,13 +44,9 @@ static void evalMeans (const std::vector<io::Arrayset>& data,
 
   blitz::Range a = blitz::Range::all();
   for (size_t k=0; k<data.size(); ++k) { //class loop
-    N(k) = data[k].getNSamples();
-    std::vector<size_t> index;
-    index.reserve(data[k].getNSamples());
-    data[k].index(index);
-
-    for (size_t example=0; example<index.size(); ++example) {
-      buffer = data[k].get<double,1>(index[example]);
+    N(k) = data[k].size();
+    for (size_t example=0; example<data[k].size(); ++example) {
+      buffer = data[k].get<double,1>(example);
       m_k(a,k) += buffer;
       m += buffer;
     }
@@ -83,12 +79,8 @@ static void evalTotalScatter (const std::vector<io::Arrayset>& data,
   // within class scatter Sw
   St = 0;
   for (size_t k=0; k<data.size(); ++k) { //class loop
-    std::vector<size_t> index;
-    index.reserve(data[k].getNSamples());
-    data[k].index(index);
-
-    for (size_t example=0; example<index.size(); ++example) {
-      buffer = data[k].get<double,1>(index[example]) - m;
+    for (size_t example=0; example<data[k].size(); ++example) {
+      buffer = data[k].get<double,1>(example) - m;
       St += buffer(i) * buffer(j); //outer product
     }
   }
@@ -154,12 +146,8 @@ static void evalScatters (const std::vector<io::Arrayset>& data,
   // within class scatter Sw
   Sw = 0;
   for (size_t k=0; k<data.size(); ++k) { //class loop
-    std::vector<size_t> index;
-    index.reserve(data[k].getNSamples());
-    data[k].index(index);
-
-    for (size_t example=0; example<index.size(); ++example) {
-      buffer = data[k].get<double,1>(index[example]) - m_k(a,k);
+    for (size_t example=0; example<data[k].size(); ++example) {
+      buffer = data[k].get<double,1>(example) - m_k(a,k);
       Sw += buffer(i) * buffer(j); //outer product
     }
   }

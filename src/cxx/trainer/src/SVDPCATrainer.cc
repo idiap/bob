@@ -52,17 +52,14 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
   }
 
   // data is checked now and conforms, just proceed w/o any further checks.
-  std::vector<size_t> index;
-  ar.index(index);
-
-  size_t n_samples = index.size();
+  size_t n_samples = ar.size();
   size_t n_features = ar.getShape()[0];
 
   // loads all the data in a single shot - required for SVD
   blitz::Array<double,2> data(n_features, n_samples);
   blitz::Range all = blitz::Range::all();
   for (size_t i=0; i<n_samples; ++i) {
-    data(all,i) = ar.get<double,1>(index[i]);
+    data(all,i) = ar.get<double,1>(i);
   }
 
   // computes the mean of the training data

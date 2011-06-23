@@ -7,7 +7,6 @@ set(shared "")
 
 # This defines the list of source files inside this package.
 set(src
-    "src/SimpleFrameSampler.cc"
     "src/SVDPCATrainer.cc"
     "src/FisherLDATrainer.cc"
     "src/KMeansTrainer.cc"

@@ -253,7 +253,7 @@ io::detail::InlinedArrayImpl io::BinFile::read() {
 
 io::detail::InlinedArrayImpl io::BinFile::read (size_t index) {
   // Check that we are reaching an existing array
-  if( index > m_header.m_n_samples ) {
+  if( index >= m_header.m_n_samples ) {
     core::error << "Trying to reach a non-existing array." << std::endl;
     throw IndexError(index);
   }

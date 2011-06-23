@@ -3,7 +3,6 @@
 
 #include "io/Arrayset.h"
 #include "machine/KMeansMachine.h"
-#include "trainer/Sampler.h"
 #include "trainer/EMTrainer.h"
 
 namespace Torch {

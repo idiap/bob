@@ -42,7 +42,7 @@ void io::BinaryArraysetCodec::peek(const std::string& filename,
   }
   eltype = f.getElementType();
   ndim = f.getNDimensions();
-  samples = f.getNSamples();
+  samples = f.size();
   for (size_t i=0; i<ndim; ++i) shape[i] = f.getShape()[i]; 
 }
 
@@ -51,7 +51,7 @@ io::detail::InlinedArraysetImpl io::BinaryArraysetCodec::load
   if (! boost::filesystem::exists(filename)) throw io::FileNotReadable(filename); 
   io::BinFile f(filename, io::BinFile::in);
   io::detail::InlinedArraysetImpl retval;
-  for (size_t i=0; i<f.getNSamples(); ++i) retval.add(f.read());
+  for (size_t i=0; i<f.size(); ++i) retval.add(f.read());
   return retval;
 }
 
@@ -60,7 +60,7 @@ io::Array io::BinaryArraysetCodec::load
   if (! boost::filesystem::exists(filename)) throw io::FileNotReadable(filename); 
   io::BinFile f(filename, io::BinFile::in);
   if (!f) throw io::FileNotReadable(filename);
-  return f.read(id-1);
+  return f.read(id);
 }
 
 void io::BinaryArraysetCodec::append
@@ -78,5 +78,5 @@ void io::BinaryArraysetCodec::append
 void io::BinaryArraysetCodec::save (const std::string& filename, 
     const detail::InlinedArraysetImpl& data) const {
   io::BinFile f(filename, io::BinFile::out);
-  for (std::map<size_t, boost::shared_ptr<io::Array> >::const_iterator it = data.index().begin(); it != data.index().end(); ++it) f.write(it->second.get()->get());
+  for (size_t i=0; i<data.size(); ++i) f.write(data[i].get());
 }

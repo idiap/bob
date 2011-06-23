@@ -4,12 +4,10 @@
 
 """Test trainer package
 """
-
 import os, sys
 import unittest
 import torch
 import random
-
 
 def loadGMM():
   gmm = torch.machine.GMMMachine(2, 2)
@@ -20,7 +18,6 @@ def loadGMM():
   gmm.varianceThreshold = torch.core.array.array([0.001, 0.001], 'float64')
 
   return gmm
-
 
 def multiplyVectorsByFactors(matrix, vector):
   for i in range(0, matrix.rows()):
@@ -38,64 +35,6 @@ def flipRows(array):
   else:
     raise Exception('Input type not supportd by flipRows')
 
-
-#class MyFrameSampler(torch.trainer.Sampler_FrameSample_):
-  """Simple example of python sampler: get samples from an Arrayset"""
-"""
-  def __init__(self,path):
-    torch.trainer.Sampler_FrameSample_.__init__(self)
-    self.arrayset = torch.io.Arrayset(path)
-    self.arrayset.load()
-  
-  def getSample(self, index):
-    array = self.arrayset[index+1].get()
-    if type(array).__name__ == 'float64_t':
-      return torch.machine.FrameSample(array)
-    else:
-      return torch.machine.FrameSample(array.cast('float64'))
-  
-  def getNSamples(self):
-    return len(self.arrayset)
-"""
-
-#class NormalizeStdArrayset(torch.trainer.Sampler_FrameSample_):
-"""
-  Sampler that opens an array set from a file and normalizes the standard deviation
-  of the array set to 1
-"""
-
-"""
-  def __init__(self, path):
-    torch.trainer.Sampler_FrameSample_.__init__(self)
-    self.arrayset = torch.io.Arrayset(path)
-    self.arrayset.load()
-    
-    length = self.arrayset.shape[0]
-    n_samples = len(self.arrayset)
-    mean = torch.core.array.float64_1(length)
-    self.std = torch.core.array.float64_1(length)
-    
-    mean.fill(0)
-    self.std.fill(0)
-    
-    for i in range(0, n_samples):
-      x = self.arrayset[i+1].get().cast('float64')
-      mean += x
-      self.std += (x ** 2)
-    
-    mean /= n_samples
-    self.std /= n_samples
-    self.std -= (mean ** 2)
-    self.std = self.std ** 0.5 # sqrt(std)
-  
-  
-  def getSample(self, index):
-    return torch.machine.FrameSample((self.arrayset[index+1].get().cast('float64') / self.std))
-  
-  def getNSamples(self):
-    return len(self.arrayset)
-"""
-
 def NormalizeStdArrayset(path):
   arrayset = torch.io.Arrayset(path)
   arrayset.load()
@@ -110,7 +49,7 @@ def NormalizeStdArrayset(path):
 
   
   for i in range(0, n_samples):
-    x = arrayset[i+1].get().cast('float64')
+    x = arrayset[i].get().cast('float64')
     mean += x
     std += (x ** 2)
 
@@ -121,7 +60,7 @@ def NormalizeStdArrayset(path):
 
   arStd = torch.io.Arrayset()
   for i in range(0, n_samples):
-    x = arrayset[i+1].get().cast('float64')
+    x = arrayset[i].get().cast('float64')
     arStd.append(x / std)
 
   return (arStd,std)
@@ -159,7 +98,6 @@ class TrainerTest(unittest.TestCase):
     # This files contains draws from two 1D Gaussian distributions:
     #   * 100 samples from N(-10,1)
     #   * 100 samples from N(10,1)
-    #sampler = MyFrameSampler("data/samplesFrom2G.hdf5")
     data = torch.io.Arrayset("data/samplesFrom2G_f64.hdf5")
 
     machine = torch.machine.KMeansMachine(2, 1)
@@ -183,7 +121,6 @@ class TrainerTest(unittest.TestCase):
   def test01_kmeans(self):
     """Train a KMeansMachine"""
 
-    #sampler = NormalizeStdFrameSampler("data/faithful.torch3.hdf5")
     (arStd,std) = NormalizeStdArrayset("data/faithful.torch3.hdf5")
 
     machine = torch.machine.KMeansMachine(2, 2)
@@ -250,18 +187,6 @@ class TrainerTest(unittest.TestCase):
 
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
-  #def test04_custom_samplers(self):
-    """Custom python sampler"""
-  """  
-    sampler = torch.trainer.SimpleFrameSampler(torch.io.Arrayset("data/faithful.torch3.hdf5"))
-    mysampler = MyFrameSampler("data/faithful.torch3.hdf5")
-
-    self.assertTrue(sampler.getNSamples() == mysampler.getNSamples())
-
-    for i in range(0, sampler.getNSamples()):
-      self.assertTrue((sampler.getSample(i).getFrame() == mysampler.getSample(i).getFrame()).all())
-  """
-    
   def test05_custom_trainer(self):
     """Custom python trainer"""
     
@@ -273,6 +198,7 @@ class TrainerTest(unittest.TestCase):
     mytrainer.train(machine, ar)
     
     for i in range(0, 2):
+      print machine.means[i,:]
       self.assertTrue((ar[i+1].get() == machine.means[i, :]).all())
 
 

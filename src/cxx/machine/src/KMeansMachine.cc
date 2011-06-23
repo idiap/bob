@@ -67,11 +67,9 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   means = 0;
   
   // iterate over data
-  std::vector<size_t> ids;
-  ar.index(ids); 
-  for (size_t i=0; i < ids.size(); ++i) {
+  for (size_t i=0; i < ar.size(); ++i) {
     // - get example
-    blitz::Array<double,1> x = ar.get<double,1>(ids[i]);
+    blitz::Array<double,1> x = ar.get<double,1>(i);
     
     // - find closest mean
     int closest_mean = -1;
@@ -101,7 +99,7 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
 
 void Torch::machine::KMeansMachine::forward(const blitz::Array<double,1>& input, double& output) const {
   if (input.extent(0) != m_n_inputs) {
-    throw IncompatibleFrameSample(m_n_inputs, input.extent(0));
+    throw NInputsMismatch(m_n_inputs, input.extent(0));
   }
   
   output = getMinDistance(input);

@@ -84,7 +84,7 @@ void bind_io_binfile() {
     .def("__init__", make_constructor(binfile_make_readable, default_call_policies(), (arg("filename"))), "Opens a new file for reading")
     .add_property("shape", &get_shape<io::BinFile>, "The shape of arrays in this binary file. Please note all arrays in the file have necessarily the same shape.")
     .add_property("elementType", &io::BinFile::getElementType, "The type of array elements contained in this binary file. This would be equivalent to the 'T' bit in blitz::Array<T,D>.")
-    .def("__len__", &io::BinFile::getNSamples, "The number of arrays in this binary file.")
+    .def("__len__", &io::BinFile::size, "The number of arrays in this binary file.")
     ARRAY_DEF(bool, bool, 1)
     ARRAY_DEF(int8_t, int8, 1)
     ARRAY_DEF(int16_t, int16, 1)

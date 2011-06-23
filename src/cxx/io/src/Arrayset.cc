@@ -61,25 +61,6 @@ size_t io::Arrayset::add (const std::string& filename, const std::string& codec)
   else return m_external->add(io::Array(filename, codec));
 }
 
-void io::Arrayset::add (size_t id, boost::shared_ptr<const io::Array> array) {
-  add(id, *array.get());
-}
-
-void io::Arrayset::add (size_t id, const io::Array& array) {
-  if (m_inlined) m_inlined->add(id, array);
-  else m_external->add(id, array);
-}
-
-void io::Arrayset::add (size_t id, const io::detail::InlinedArrayImpl& array) {
-  if (m_inlined) m_inlined->add(id, array);
-  else m_external->add(id, array);
-}
-
-void io::Arrayset::add (size_t id, const std::string& filename, const std::string& codec) {
-  if (m_inlined) m_inlined->add(id, io::Array(filename, codec));
-  else m_external->add(id, io::Array(filename, codec));
-}
-
 void io::Arrayset::set (size_t id, boost::shared_ptr<const io::Array> array) {
   set(id, *array.get());
 }
@@ -119,9 +100,9 @@ const size_t* io::Arrayset::getShape() const {
   return m_external->getShape();
 }
 
-size_t io::Arrayset::getNSamples() const {
-  if (m_inlined) return m_inlined->getNSamples();
-  return m_external->getNSamples();
+size_t io::Arrayset::size() const {
+  if (m_inlined) return m_inlined->size();
+  return m_external->size();
 }
 
 void io::Arrayset::save(const std::string& filename, const std::string& codecname) {
@@ -160,15 +141,6 @@ const io::Array io::Arrayset::operator[] (size_t id) const {
 io::Array io::Arrayset::operator[] (size_t id) {
   if (m_inlined) return (*m_inlined)[id];
   return (*m_external)[id];
-}
-
-bool io::Arrayset::exists (size_t id) const {
-  if (m_inlined) return m_inlined->exists(id);
-  return m_external->exists(id);
-}
-
-void io::Arrayset::consolidateIds () {
-  if (m_inlined) m_inlined->consolidateIds();
 }
 
 io::detail::InlinedArraysetImpl io::Arrayset::get() const {

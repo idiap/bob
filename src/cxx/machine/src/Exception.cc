@@ -61,24 +61,3 @@ const char* machine::NOutputsMismatch::what() const throw() {
     return emergency;
   }
 }
-
-
-machine::IncompatibleFrameSample::IncompatibleFrameSample(int expected_framesize, int received_framesize) throw(): expected_framesize(expected_framesize), received_framesize(received_framesize) {
-  
-}
-
-machine::IncompatibleFrameSample::~IncompatibleFrameSample() throw() {
-}
-
-const char* machine::IncompatibleFrameSample::what() const throw() {
-  try {
-    boost::format message("Received FrameSample is incompatible: expected %d, received %d.");
-    message % expected_framesize;
-    message % received_framesize;
-    m_message = message.str();
-    return m_message.c_str();
-  } catch (...) {
-    static const char* emergency = "machine::FrameSampleIncompatible: cannot format, exception raised";
-    return emergency;
-  }
-}

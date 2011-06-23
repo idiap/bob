@@ -69,13 +69,6 @@ namespace Torch { namespace io { namespace detail {
       Torch::io::Array operator[] (size_t id) const;
 
       /**
-       * This method tells if I have a certain array-id registered inside. It
-       * avoids me loading files to verify that arrays with that id are
-       * available.
-       */
-      bool exists (size_t id) const;
-
-      /**
        * Appends a new array to the file I have. The 'id' field of such array
        * is ignored (even if it is non-zero). You cannot set the array 'id' in 
        * a file-based arrayset. Ids for arrays are given depending on their
@@ -90,18 +83,9 @@ namespace Torch { namespace io { namespace detail {
        * Removes a certain Array from this set. Please note this will trigger
        * loading and re-writing the underlying file. If the id index is out of
        * bounds, I'll raise an exception. The numbering scheme for the ids is
-       * "fortran-based", so we start counting at 1.
+       * "C-based", so we start counting at 0.
        */
       void remove(size_t id);
-
-      /**
-       * Adds a certain Array at this set. I'll throw if you you are not out of
-       * bounds. If I don't throw (good for you!), I'll load, reset and
-       * re-write this file to contain the array you just gave me in the
-       * position you assigned.
-       */
-      void add(size_t id, boost::shared_ptr<const Torch::io::Array> array);
-      void add(size_t id, const Torch::io::Array& array);
 
       /**
        * Sets a certain Array at this set. I'll throw if you you are out of
@@ -130,7 +114,7 @@ namespace Torch { namespace io { namespace detail {
       inline Torch::core::array::ElementType getElementType() const { return m_elementtype; }
       inline size_t getNDim() const { return m_ndim; }
       inline const size_t* getShape() const { return m_shape; }
-      inline size_t getNSamples() const { return m_samples; }
+      inline size_t size() const { return m_samples; }
 
     private: //some helpers
 

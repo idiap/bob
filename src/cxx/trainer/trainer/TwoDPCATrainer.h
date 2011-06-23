@@ -5,7 +5,6 @@
 #include "core/logging.h"
 #include "io/Arrayset.h"
 #include "machine/TwoDPCAMachine.h"
-#include "machine/ImageSample.h"
 #include <algorithm>
 #include <utility>
 #include <vector>

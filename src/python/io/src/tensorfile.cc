@@ -83,7 +83,7 @@ void bind_io_tensorfile() {
     .def("__init__", make_constructor(tensorfile_make_readable, default_call_policies(), (arg("filename"))), "Opens a new file for reading")
     .add_property("shape", &get_shape<io::TensorFile>, "The shape of arrays in this tensor file. Please note all arrays in the file have necessarily the same shape.")
     .add_property("elementType", &io::TensorFile::getElementType, "The type of array elements contained in this tensor file. This would be equivalent to the 'T' bit in blitz::Array<T,D>.")
-    .def("__len__", &io::TensorFile::getNSamples, "The number of arrays in this tensor file.")
+    .def("__len__", &io::TensorFile::size, "The number of arrays in this tensor file.")
     ARRAY_DEF(int8_t, int8, 1)
     ARRAY_DEF(int16_t, int16, 1)
     ARRAY_DEF(int32_t, int32, 1)

@@ -150,10 +150,10 @@ static io::Array read_array (io::HDF5File& f, const std::string& path,
 }
 
 #define DIMSWITCH(T) switch(descr.shape().n()) { \
-  case 1: return read_array<T,1>(f, name, id-1); break; \
-  case 2: return read_array<T,2>(f, name, id-1); break; \
-  case 3: return read_array<T,3>(f, name, id-1); break; \
-  case 4: return read_array<T,4>(f, name, id-1); break; \
+  case 1: return read_array<T,1>(f, name, id); break; \
+  case 2: return read_array<T,2>(f, name, id); break; \
+  case 3: return read_array<T,3>(f, name, id); break; \
+  case 4: return read_array<T,4>(f, name, id); break; \
   default: throw io::DimensionError(descr.shape().n(), Torch::core::array::N_MAX_DIMENSIONS_ARRAY); \
 }
 
@@ -164,7 +164,7 @@ io::Array io::HDF5ArraysetCodec::load
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/arrayset");
   const std::string& name = paths[0];
-  if (id > f.size(name)) throw io::IndexError(id);
+  if (id >= f.size(name)) throw io::IndexError(id);
   const io::HDF5Type& descr = f.describe(name);
   //then we do a normal array readout, as in an ArrayCodec.load()
   switch (descr.element_type()) {
@@ -289,8 +289,8 @@ void io::HDF5ArraysetCodec::append
 template <typename T, int N>
 static void add_arrayset(io::HDF5File& f, const std::string& path, 
     const io::detail::InlinedArraysetImpl& data) {
-  for (std::map<size_t, boost::shared_ptr<Torch::io::Array> >::const_iterator it = data.index().begin(); it != data.index().end(); ++it) {
-    f.appendArray(path, it->second->get<T,N>());
+  for (size_t i=0; i<data.size(); ++i) {
+    f.appendArray(path, data[i].get().get<T,N>());
   }
 }
 

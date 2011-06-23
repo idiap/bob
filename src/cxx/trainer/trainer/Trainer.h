@@ -1,7 +1,5 @@
 #ifndef TRAINER_H
 #define TRAINER_H
-#include "Sampler.h"
-#include <iostream>
 
 namespace Torch {
 namespace trainer {

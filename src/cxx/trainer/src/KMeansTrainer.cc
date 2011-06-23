@@ -14,7 +14,7 @@ Torch::trainer::KMeansTrainer::KMeansTrainer(double convergence_threshold, int m
   
 void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine, const Torch::io::Arrayset& ar) {
   // split data into as many chunks as there are means
-  size_t n_data = ar.getNSamples();
+  size_t n_data = ar.size();
   unsigned int n_chunk = n_data / kMeansMachine.getNMeans();
   
   boost::mt19937 rng;
@@ -23,8 +23,6 @@ void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine,
   }
   
   // assign the i'th mean to a random example within the i'th chunk
-  std::vector<size_t> ids;
-  ar.index(ids);
   for(int i = 0; i < kMeansMachine.getNMeans(); i++) {
     boost::uniform_int<> range(i*n_chunk, (i+1)*n_chunk-1);
     boost::variate_generator<boost::mt19937&, boost::uniform_int<> > die(rng, range);
@@ -33,7 +31,7 @@ void Torch::trainer::KMeansTrainer::initialization(KMeansMachine& kMeansMachine,
     unsigned int index = die();
 
     // get the example at that index
-    const blitz::Array<double, 1>& mean = ar.get<double,1>(ids[index]);
+    const blitz::Array<double, 1>& mean = ar.get<double,1>(index);
     
     // set the mean
     kMeansMachine.setMean(i, mean);
@@ -46,11 +44,9 @@ double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::
     resetAccumulators(kmeans);
 
     // iterate over data samples
-    std::vector<size_t> ids;
-    ar.index(ids);
-    for (size_t i=0; i < ids.size(); ++i) {
+    for (size_t i=0; i < ar.size(); ++i) {
       // get example
-      blitz::Array<double, 1> x(ar.get<double,1>(ids[i]));
+      blitz::Array<double, 1> x(ar.get<double,1>(i));
 
       // find closest mean, and distance from that mean
       int closest_mean = -1;
@@ -62,7 +58,7 @@ double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::
       m_zeroethOrderStats(closest_mean)++;
       m_firstOrderStats(closest_mean,blitz::Range::all()) += x;
     }
-    average_min_distance /= ar.getNSamples();
+    average_min_distance /= ar.size();
     
     return average_min_distance;
 }

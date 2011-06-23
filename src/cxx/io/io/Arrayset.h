@@ -10,7 +10,6 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
 #include <blitz/array.h>
 
 #include "io/Array.h"
@@ -87,27 +86,9 @@ namespace Torch {
         }
 
         /**
-         * Adds a specific array to a new value. Note that if the id already 
-         * exists, I'll raise an exception. You can check existing ids with
-         * exists().
-         */
-        void add (size_t id, boost::shared_ptr<const Array> array);
-        void add (size_t id, const Array& array);
-        void add (size_t id, const detail::InlinedArrayImpl& array);
-        void add (size_t id, const std::string& filename, const std::string& codec="");
-
-        /**
-         * A shortcut to set a blitz::Array<T,D>
-         */
-        template <typename T, int D> 
-          inline void add(size_t id, blitz::Array<T,D>& bz) {
-            add(id, detail::InlinedArrayImpl(bz));
-        }
-
-        /**
          * Sets a specific array to a new value. Note that if the id does not
          * exist, I'll raise an exception. You can check existing ids with
-         * exists().
+         * id < size().
          */
         void set (size_t id, boost::shared_ptr<const Array> array);
         void set (size_t id, const Array& array);
@@ -140,7 +121,7 @@ namespace Torch {
         Torch::core::array::ElementType getElementType() const;
         size_t getNDim() const;
         const size_t* getShape() const;
-        size_t getNSamples() const;
+        size_t size() const;
 
         /**
          * Get the filename containing the data if any. An empty string
@@ -177,20 +158,6 @@ namespace Torch {
         void load();
 
         /**
-         * Inserts, in the given STL-conforming container (has to accept
-         * push_back(size_t)), the identities of the Arrays I have in this
-         * Arrayset.
-         */
-        template <typename T> void index(T& container) const;
-
-        /**
-         * This method tells if I have a certain array-id registered inside. It
-         * avoids me loading files to verify that arrays with that id are
-         * available.
-         */
-        bool exists (size_t id) const;
-
-        /**
          * This set of methods allow you to access the data contained in this
          * Arrayset. Please note that, if this Arrayset is inlined, you will
          * get a reference to the pointed data. Changing it, will be reflected
@@ -212,27 +179,12 @@ namespace Torch {
          */
         detail::InlinedArraysetImpl get() const;
 
-        /**
-         * Consolidates the ids of inner Arrays by re-numbering them
-         * sequentially, starting at 1.
-         */
-        void consolidateIds();
-
       private:
         boost::shared_ptr<detail::InlinedArraysetImpl> m_inlined;
         boost::shared_ptr<detail::ExternalArraysetImpl> m_external;
 
     };
 
-    template <typename T> void Arrayset::index(T& container) const {
-      if (m_inlined) {
-        for (std::map<size_t, boost::shared_ptr<Array> >::const_iterator it=m_inlined->index().begin(); it!=m_inlined->index().end(); ++it) container.push_back(it->first);
-      }
-      else {
-        for (size_t i=0; i<m_external->getNSamples(); ++i) container.push_back(i+1);
-      }
-    }
-        
     template<typename T, int D> const blitz::Array<T,D> Arrayset::get (size_t index) const {
       return (*this)[index].get<T,D>();
     }

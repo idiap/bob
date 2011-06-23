@@ -4,17 +4,15 @@
 
 void Torch::trainer::TwoDPCATrainer::train(Torch::machine::TwoDPCAMachine& machine, const Torch::io::Arrayset& data) 
 {
-  int n_samples = data.getNSamples();
+  int n_samples = data.size();
   int m = data.getShape()[0];
   int n = data.getShape()[1];
 
   blitz::Array<double,2> mean(m,n);
   mean = 0.;
-  std::vector<size_t> ids;
-  data.index(ids);
   // 1/ Compute the mean of the training data
   for( int i=0; i<n_samples; ++i)
-    mean += data.get<double,2>(ids[i]);
+    mean += data.get<double,2>(i);
   mean /= static_cast<double>(n_samples);
 
   // 2/ Generate the image covariance (scatter) matrix
@@ -24,7 +22,7 @@ void Torch::trainer::TwoDPCATrainer::train(Torch::machine::TwoDPCAMachine& machi
   blitz::Array<double,2> sample_nomean(m,n);
   for( int i=0; i<n_samples; ++i)
   {
-    sample_nomean = data.get<double,2>(ids[i]) - mean;
+    sample_nomean = data.get<double,2>(i) - mean;
     blitz::Array<double,2> sample_nomean_t = sample_nomean.transpose(1,0);
     // Compute tmp_i=(Aj-Am)'*(Aj-Am)
     Torch::math::prod(sample_nomean_t, sample_nomean, tmp_i);

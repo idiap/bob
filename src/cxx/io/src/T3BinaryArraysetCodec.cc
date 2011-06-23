@@ -120,13 +120,13 @@ io::Array io::T3BinaryArraysetCodec::load
   ifile.read((char*)&framesize, sizeof(uint32_t));
   // are those floats or doubles?
   if (fsize == (xsamples*framesize*sizeof(float))) { //floats of 32-bits
-    ifile.seekg(8 + (sizeof(float)*(id-1)*framesize)); //move into position
+    ifile.seekg(8 + (sizeof(float)*id*framesize)); //move into position
     blitz::Array<float, 1> data(framesize);
     ifile.read((char*)data.data(), sizeof(float)*framesize);
     return io::Array(data);
   }
   else if (fsize == (xsamples*framesize*sizeof(double))) { //floats of 64-bits
-    ifile.seekg(8 + (sizeof(double)*(id-1)*framesize)); //move into position
+    ifile.seekg(8 + (sizeof(double)*(id)*framesize)); //move into position
     blitz::Array<double, 1> data(framesize);
     ifile.read((char*)data.data(), sizeof(double)*framesize);
     return io::Array(data);
@@ -198,19 +198,19 @@ void io::T3BinaryArraysetCodec::save (const std::string& filename,
   }
 
   std::ofstream ofile(filename.c_str(), std::ios::binary|std::ios::out);
-  uint32_t nsamples = data.getNSamples();
+  uint32_t nsamples = data.size();
   uint32_t framesize = data.getShape()[0];
   ofile.write((const char*)&nsamples, sizeof(uint32_t));
   ofile.write((const char*)&framesize, sizeof(uint32_t));
   if (data.getElementType() == Torch::core::array::t_float32) {
-    for (size_t i=0; i<data.getNSamples(); ++i) {
-      blitz::Array<float, 1> save = data[i+1].get<float,1>();
+    for (size_t i=0; i<data.size(); ++i) {
+      blitz::Array<float, 1> save = data[i].get<float,1>();
       ofile.write((const char*)save.data(), save.extent(0)*sizeof(float));
     }
   }
   else { //must be double
-    for (size_t i=0; i<data.getNSamples(); ++i) {
-      blitz::Array<double, 1> save = data[i+1].get<double,1>();
+    for (size_t i=0; i<data.size(); ++i) {
+      blitz::Array<double, 1> save = data[i].get<double,1>();
       ofile.write((const char*)save.data(), save.extent(0)*sizeof(double));
     }
   }

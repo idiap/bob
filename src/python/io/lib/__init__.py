@@ -59,19 +59,17 @@ Arrayset.__setitem__ = arrayset_setitem
 del arrayset_setitem
 
 def arrayset_eq(self, other):
-  """Compares two arraysets for content equality. We don't compare roles!"""
+  """Compares two arraysets for content equality."""
   if self.shape != other.shape: return False 
-  #if self.role != other.role: return False
   if len(self) != len(other): return False
-  for id in self.ids():
-    if not other.exists(id): return False
-    if self[id] != other[id]: return False
+  for i in range(len(self)):
+    if self[i] != other[i]: return False
   return True
 Arrayset.__eq__ = arrayset_eq
 del arrayset_eq
 
 def arrayset_ne(self, other):
-  """Compares two arraysets for content inequality. We don't compare roles!"""
+  """Compares two arraysets for content inequality."""
   return not (self == other)
 Arrayset.__ne__ = arrayset_ne
 del arrayset_ne

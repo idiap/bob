@@ -16,7 +16,7 @@ namespace iod = io::detail;
 iod::InlinedArraysetImpl::InlinedArraysetImpl()
   : m_elementtype(Torch::core::array::t_unknown),
     m_ndim(0),
-    m_index()
+    m_data()
 {
 }
 
@@ -24,7 +24,7 @@ iod::InlinedArraysetImpl::InlinedArraysetImpl
   (const iod::InlinedArraysetImpl& other)
   : m_elementtype(other.m_elementtype),
     m_ndim(other.m_ndim),
-    m_index(other.m_index)
+    m_data(other.m_data)
 {
   for (size_t i=0; i<m_ndim; ++i) m_shape[i] = other.m_shape[i];
 }
@@ -35,38 +35,30 @@ iod::InlinedArraysetImpl& iod::InlinedArraysetImpl::operator=
 (const InlinedArraysetImpl& other) {
   m_elementtype = other.m_elementtype;
   m_ndim = other.m_ndim;
-  m_index = other.m_index;
+  m_data = other.m_data;
   for (size_t i=0; i<m_ndim; ++i) m_shape[i] = other.m_shape[i];
   return *this;
 }
 
 const io::Array& iod::InlinedArraysetImpl::operator[] (size_t id) const {
-  std::map<size_t, boost::shared_ptr<io::Array> >::const_iterator it = 
-    m_index.find(id);
-  if (it == m_index.end()) throw io::IndexError(id);
-  return *(it->second.get());
+  if (id >= m_data.size()) throw io::IndexError(id);
+  return *(m_data[id].get());
 }
 
 io::Array& iod::InlinedArraysetImpl::operator[] (size_t id) {
-  std::map<size_t, boost::shared_ptr<io::Array> >::iterator it = 
-    m_index.find(id);
-  if (it == m_index.end()) throw io::IndexError(id);
-  return *(it->second.get());
+  if (id >= m_data.size()) throw io::IndexError(id);
+  return *(m_data[id].get());
 }
 
 boost::shared_ptr<const io::Array> iod::InlinedArraysetImpl::ptr
 (size_t id) const {
-  std::map<size_t, boost::shared_ptr<io::Array> >::const_iterator it = 
-    m_index.find(id);
-  if (it == m_index.end()) throw io::IndexError(id);
-  return it->second;
+  if (id >= m_data.size()) throw io::IndexError(id);
+  return m_data[id];
 }
 
 boost::shared_ptr<io::Array> iod::InlinedArraysetImpl::ptr (size_t id) {
-  std::map<size_t, boost::shared_ptr<io::Array> >::iterator it = 
-    m_index.find(id);
-  if (it == m_index.end()) throw io::IndexError(id);
-  return it->second;
+  if (id >= m_data.size()) throw io::IndexError(id);
+  return m_data[id];
 }
 
 void iod::InlinedArraysetImpl::checkCompatibility (const io::Array& array) const {
@@ -94,55 +86,24 @@ size_t iod::InlinedArraysetImpl::add (boost::shared_ptr<const io::Array> array)
 size_t iod::InlinedArraysetImpl::add(const io::Array& array) {
   checkCompatibility(array);
   updateTyping(array);
-  m_index[getNextFreeId()] = boost::make_shared<io::Array>(array); 
-  return m_index.rbegin()->first;
-}
-
-void iod::InlinedArraysetImpl::add(size_t id, boost::shared_ptr<const io::Array> array) {
-  return add(id, *array.get());
-}
-
-void iod::InlinedArraysetImpl::add(size_t id, const io::Array& array) {
-  if (m_index.find(id) != m_index.end()) throw io::IndexError(id);
-  checkCompatibility(array);
-  updateTyping(array);
-  m_index[id] = boost::make_shared<io::Array>(array); 
+  m_data.push_back(boost::make_shared<io::Array>(array));
+  return m_data.size()-1;
 }
 
 size_t iod::InlinedArraysetImpl::adopt (boost::shared_ptr<io::Array> array) {
   checkCompatibility(*array.get());
   updateTyping(*array.get());
-  m_index[getNextFreeId()] = array;
-  return m_index.rbegin()->first;
+  m_data.push_back(array);
+  return m_data.size()-1;
 }
 
 void iod::InlinedArraysetImpl::remove(size_t id) {
-  if (m_index.find(id) == m_index.end()) throw io::IndexError(id);
-  m_index.erase(id);
-  if (m_index.size() == 0) { //uninitialize
+  if (id >= m_data.size()) throw io::IndexError(id);
+  std::vector<boost::shared_ptr<Torch::io::Array> >::iterator it=m_data.begin();
+  it += id;
+  m_data.erase(it);
+  if (m_data.size() == 0) { //uninitialize
     m_elementtype = Torch::core::array::t_unknown;
     m_ndim = 0;
   }
-}
-
-size_t iod::InlinedArraysetImpl::getNextFreeId() const {
-  if (!m_index.size()) return 1;
-  return m_index.rbegin()->first + 1; //remember: std::map is sorted by key!
-}
-
-void iod::InlinedArraysetImpl::consolidateIds() {
-  std::vector<size_t> keys;
-  for (std::map<size_t, boost::shared_ptr<io::Array> >::iterator 
-      it = m_index.begin(); it != m_index.end(); ++it)
-    keys.push_back(it->first);
-
-  for (size_t id=1; id<=m_index.size(); ++id)
-    if (id != keys[id-1]) { //displaced value, reset
-      m_index[id] = m_index[keys[id-1]];
-      m_index.erase(keys[id-1]);
-    }
-}
-
-bool iod::InlinedArraysetImpl::exists(size_t id) const {
-  return (m_index.find(id) != m_index.end());
 }

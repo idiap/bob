@@ -9,13 +9,10 @@ set(shared "")
 set(src
     "src/Exception.cc"
     "src/KMeansMachine.cc"
-    "src/FrameSample.cc"
-    "src/FrameClassificationSample.cc"
     "src/Gaussian.cc"
     "src/GMMMachine.cc"
     "src/GMMStats.cc"
     "src/EigenMachineException.cc"
-    "src/ImageSample.cc"
     "src/TwoDPCAMachine.cc"
     "src/LinearMachine.cc"
 )

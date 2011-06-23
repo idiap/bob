@@ -79,9 +79,7 @@ size_t iod::ExternalArraysetImpl::add(const Torch::io::Array& array) {
 }
 
 void iod::ExternalArraysetImpl::extend(const iod::InlinedArraysetImpl& set) {
-  for(std::map<size_t, boost::shared_ptr<Torch::io::Array> >::const_iterator it= set.index().begin(); it != set.index().end(); ++it) {
-    add(it->second);
-  }
+  for(size_t i=0; i<set.size(); ++i) add(set[i]);
   reloadSpecification();
 }
 
@@ -92,18 +90,6 @@ void iod::ExternalArraysetImpl::remove(size_t id) {
   iod::InlinedArraysetImpl data = get();
   data.remove(id);
   set(data);
-  reloadSpecification();
-}
-
-void iod::ExternalArraysetImpl::add(size_t id, 
-    boost::shared_ptr<const Torch::io::Array> array) {
-  add(id, *array.get());
-}
-
-void iod::ExternalArraysetImpl::add(size_t id,
-    const Torch::io::Array& array) {
-  if (id != (m_samples+1)) throw Torch::io::IndexError(id);
-  add(array);
   reloadSpecification();
 }
 
@@ -130,8 +116,4 @@ iod::InlinedArraysetImpl iod::ExternalArraysetImpl::get() const {
 void iod::ExternalArraysetImpl::set(const InlinedArraysetImpl& set) {
   m_codec->save(m_filename, set);
   reloadSpecification();
-}
-
-bool iod::ExternalArraysetImpl::exists(size_t id) const {
-  return (id <= getNSamples());
 }

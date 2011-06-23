@@ -146,12 +146,12 @@ io::Array io::MatArraysetCodec::load
   
   boost::shared_ptr<std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> > > dict = io::detail::list_variables(filename);
 
-  if (id > dict->size()) throw io::IndexError(id);
+  if (id >= dict->size()) throw io::IndexError(id);
 
   //the name of interest
   std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> >::iterator 
     it = dict->begin();
-  std::advance(it, id-1); //it is now pointing to the correct name to look for.
+  std::advance(it, id); //it is now pointing to the correct name to look for.
 
   //we already did this at peek(), so we know it is not going to fail!
   boost::shared_ptr<mat_t> mat = io::detail::make_matfile(filename, MAT_ACC_RDONLY);

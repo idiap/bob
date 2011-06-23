@@ -8,7 +8,6 @@
 
 #include "io/Arrayset.h"
 #include "machine/Machine.h"
-#include "trainer/Sampler.h"
 #include "machine/GMMStats.h"
 #include "machine/Gaussian.h"
 #include "io/HDF5File.h"

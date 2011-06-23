@@ -153,7 +153,7 @@ namespace Torch {
          *
          * @warning An exception is thrown if nothing was written so far
          */
-        inline size_t getNSamples() const { 
+        inline size_t size() const { 
           headerInitialized(); 
           return m_n_arrays_written; 
         }

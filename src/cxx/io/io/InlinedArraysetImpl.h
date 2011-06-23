@@ -10,7 +10,7 @@
 #define TORCH_IO_INLINEDARRAYSETIMPL_H
 
 #include <map>
-#include <list>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 #include "core/array_type.h"
@@ -40,8 +40,9 @@ namespace Torch { namespace io { namespace detail {
       template <typename T> InlinedArraysetImpl(T begin, T end): 
         m_elementtype(Torch::core::array::t_unknown),
         m_ndim(0),
-        m_index()
+        m_data()
       {
+        m_data.reserve(end-begin);
         for (T it = begin; it != end; ++it) add(*it);
       }
 
@@ -56,8 +57,9 @@ namespace Torch { namespace io { namespace detail {
       template <typename T> InlinedArraysetImpl(const T& iterable):
         m_elementtype(Torch::core::array::t_unknown),
         m_ndim(0),
-        m_index()
+        m_data()
       {
+        m_data.reserve(iterable.end() - iterable.begin());
         for (typename T::const_iterator it = iterable.begin(); it != iterable.end(); ++it) add(*it);
       }
 
@@ -78,11 +80,11 @@ namespace Torch { namespace io { namespace detail {
       InlinedArraysetImpl& operator= (const InlinedArraysetImpl& other);
 
       /**
-       * Gets the table of contents for the current array in a map you have to
-       * pass. The map key represents the array id while the pointee are
+       * Gets the whole contents for the current arrayset in a vector.
+       * The vector index represents the array id while the pointee are
        * boost::shared_ptr to the arrays.
        */
-      inline const std::map<size_t, boost::shared_ptr<Torch::io::Array> >& index() const { return m_index; }
+      inline const std::vector<boost::shared_ptr<Torch::io::Array> >& data() const { return m_data; }
 
       /**
        * Accesses a single array by their id
@@ -98,26 +100,12 @@ namespace Torch { namespace io { namespace detail {
       boost::shared_ptr<Torch::io::Array> ptr (size_t id);
 
       /**
-       * This method tells if I have a certain array-id registered inside. It
-       * avoids me loading files to verify that arrays with that id are
-       * available.
-       */
-      bool exists (size_t id) const;
-
-      /**
        * Adds a copy of an array to the list I have. 
        *
        * @return The id assigned to the array.
        */
       size_t add(boost::shared_ptr<const Torch::io::Array> array);
       size_t add(const Torch::io::Array& array);
-
-      /**
-       * Adds a copy of an array to the list I have, with id setting. It will
-       * work ok if the id is not already set.
-       */
-      void add(size_t id, boost::shared_ptr<const Torch::io::Array> array);
-      void add(size_t id, const Torch::io::Array& array);
 
       /**
        * This is a special version of the add() method that will
@@ -142,20 +130,9 @@ namespace Torch { namespace io { namespace detail {
       { return m_elementtype; }
       inline size_t getNDim() const { return m_ndim; }
       inline const size_t* getShape() const { return m_shape; }
-      inline size_t getNSamples() const { return m_index.size(); }
-
-      /**
-       * Consolidates the array ids by resetting the first array to have id =
-       * 1, the second id = 2 and so on.
-       */
-      void consolidateIds();
+      inline size_t size() const { return m_data.size(); }
 
     private: //checking and typing updating
-
-      /**
-       * Gets the next free id
-       */
-      size_t getNextFreeId() const;
 
       /**
        * Checks that the current Arrayset is compatible with the given Array.
@@ -172,7 +149,7 @@ namespace Torch { namespace io { namespace detail {
       Torch::core::array::ElementType m_elementtype; ///< Elements' type
       size_t m_ndim; ///< The number of dimensions
       size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< The array shape
-      std::map<size_t, boost::shared_ptr<Torch::io::Array> > m_index; ///< My index
+      std::vector<boost::shared_ptr<Torch::io::Array> > m_data; ///< My data
 
   };
 

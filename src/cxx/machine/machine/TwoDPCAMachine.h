@@ -8,9 +8,8 @@
 #ifndef TORCH5SPRO_MACHINE_TWODPCAMACHINE_H
 #define TORCH5SPRO_MACHINE_TWODPCAMACHINE_H
 
+#include <blitz/array.h>
 #include "machine/Machine.h"
-#include "machine/ImageSample.h"
-#include "trainer/Sampler.h"
 
 namespace Torch {
 /**
