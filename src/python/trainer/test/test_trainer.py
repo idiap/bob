@@ -163,9 +163,10 @@ class TrainerTest(unittest.TestCase):
     #gmm.save(config)
 
     gmm_ref = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML.hdf5"))
+    gmm_ref_32bit_debug = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML_32bit_debug.hdf5"))
     gmm_ref_32bit_release = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML_32bit_release.hdf5"))
     
-    self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
+    self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release) or (gmm == gmm_ref_32bit_debug))
     
   def test03_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer"""
