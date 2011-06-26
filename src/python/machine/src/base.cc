@@ -41,11 +41,22 @@ GETTER(mach::GMMMachine, mach_GMMMachine, getWeights, double, 1)
 GETTER(mach::GMMMachine, mach_GMMMachine, getVariances, double, 2)
 GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceThresholds, double, 2)
 
+static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
+    const blitz::Array<double,1>& input) {
+  double output;
+  m.forward(input, output);
+  return output;
+}
+
+
 void bind_machine_base() {
 
   class_<mach::Machine<blitz::Array<double,1>, double>, boost::noncopyable>("MachineDoubleBase", 
       "Root class for all Machine<blitz::Array<double,1>, double>", no_init)
+    .def("__call__", &mach::Machine<blitz::Array<double,1>, double>::forward, (arg("input"), arg("output")), "Execute the machine")
     .def("forward", &mach::Machine<blitz::Array<double,1>, double>::forward, (arg("input"), arg("output")), "Execute the machine")
+    .def("__call__", &forward, (arg("self"), arg("input")), "Execute the machine, and returns the output")
+    .def("forward", &forward, (arg("self"), arg("input")), "Execute the machine, and returns the output")
   ;
 
   class_<mach::KMeansMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("KMeansMachine",
