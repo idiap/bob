@@ -15,12 +15,12 @@
 
 struct T {
   blitz::Array<double,2> A_24, A_43, A_23, Asol_44;
-  blitz::Array<double,1> b_4, b_2, b_5a, b_5b;
-  double b5_dot, tr_Asol_44;
+  blitz::Array<double,1> b_4, b_2, b_5a, b_5b, n_b_4;
+  double b5_dot, tr_Asol_44, ned_b_4;
   double eps;
 
   T(): A_24(2,4), A_43(4,3), A_23(2,3), Asol_44(4,4), b_4(4), b_2(2), b_5a(5), 
-       b_5b(5), b5_dot(99.), eps(1e-3)
+       b_5b(5), n_b_4(4), b5_dot(99.), ned_b_4(5.4772), eps(1e-3)
   {
     A_24 = 1., 2., 3., 4., 5., 6., 7., 8.;
     A_43 = 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1.;
@@ -31,6 +31,7 @@ struct T {
 
     b_5a = 3., 2., 1., 2., 3.;
     b_5b = 7., 8., 9., 10., 11.;
+    n_b_4 = 0.7303, 0.5477, 0.3651, 0.1826;
 
     Asol_44 = 16., 12., 8., 4., 
               12.,  9., 6., 3.,
@@ -133,6 +134,19 @@ BOOST_AUTO_TEST_CASE( test_matrix_trace )
 {
   double sol = Torch::math::trace( Asol_44);
   BOOST_CHECK_SMALL( fabs(tr_Asol_44 - sol), eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_vector_norm )
+{
+  double sol = Torch::math::norm(b_4);
+  BOOST_CHECK_SMALL( fabs(ned_b_4 - sol), eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_vector_normalized )
+{
+  blitz::Array<double,1> sol(4);
+  Torch::math::normalize(b_4, sol);
+  checkBlitzClose( n_b_4, sol, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

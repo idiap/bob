@@ -269,6 +269,13 @@ namespace Torch { namespace math {
   }
 
   /**
+   * Computes the euclidean norm of a vector
+   */
+  template<typename T> inline double norm(const blitz::Array<T,1>& array) {
+    return std::sqrt(blitz::sum(blitz::pow2(array)));
+  }
+
+  /**
    * Normalizes a vector 'i' and outputs the normalized vector in 'o'.
    *
    * @warning This version of the normalize() method does not check for length
@@ -277,7 +284,7 @@ namespace Torch { namespace math {
    */
   template<typename T1, typename T2> void normalize_
     (const blitz::Array<T1,1>& i, blitz::Array<T2,1>& o) {
-    o = i / std::sqrt(blitz::sum(blitz::pow2(i)));
+    o = i / norm(i);
   }
 
   /**
@@ -288,7 +295,7 @@ namespace Torch { namespace math {
    * non-const reference to a blitz::Array<> slice.
    */
   template<typename T> void normalizeSelf (blitz::Array<T,1> i) {
-    i /= std::sqrt(blitz::sum(blitz::pow2(i)));
+    i /= norm(i);
   }
 
   /**
