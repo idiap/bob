@@ -46,6 +46,9 @@ def plotting(output, filename=None):
   """
 
   if not filename: choose_matplotlib_iteractive_backend()
+  else:
+    import matplotlib
+    matplotlib.use('pdf') #non-interactive avoids exception on display
 
   import matplotlib.pyplot as mpl
 
