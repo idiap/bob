@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "core/cast.h"
 #include "math/linsolve.h"
+#include "math/cgsolve.h"
 
 
 struct T {
@@ -106,6 +107,17 @@ BOOST_AUTO_TEST_CASE( test_solveSympos_3x3 )
 
   Torch::math::linsolveSympos(A33_3, x, b3_1);
   checkBlitzClose(s3_3, x, eps); 
+}
+
+BOOST_AUTO_TEST_CASE( test_cgsolve_3x3 )
+{
+  blitz::Array<double,1> x(3);
+
+  Torch::math::cgsolve(A33_1, x, b3_1, 1e-6, 1000);
+  checkBlitzClose(s3_1, x, eps);
+
+  Torch::math::cgsolve(A33_3, x, b3_1, 1e-6, 1000);
+  checkBlitzClose(s3_3, x, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
