@@ -16,17 +16,19 @@ class StatsTest(unittest.TestCase):
 
   def setUp(self):
 
-    self.data = load_iris()
+    tmp = torch.db.iris.data()['setosa']
+    self.data = torch.core.array.float64_2(tmp.shape[0], len(tmp))
+    for i, k in enumerate(tmp): self.data[:,i] = k.get()
  
   def test01_scatter(self):
 
     # This test demonstrates how to use the scatter matrix function of Torch.
-    S, M = torch.math.scatter(self.data['setosa'])
-    S /= (self.data['setosa'].extent(1)-1)
+    S, M = torch.math.scatter(self.data)
+    S /= (self.data.extent(1)-1)
 
     # Do the same with numpy and compare. Note that with numpy we are computing
     # the covariance matrix which is the scatter matrix divided by (N-1).
-    K = torch.core.array.array(numpy.cov(self.data['setosa'].as_ndarray()))
+    K = torch.core.array.array(numpy.cov(self.data.as_ndarray()))
     self.assertTrue( (abs(S-K) < 1e-10).all() )
 
 if __name__ == '__main__':

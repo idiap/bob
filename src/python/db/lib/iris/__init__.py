@@ -11,6 +11,23 @@ because Edgar Anderson collected the data to quantify the geographic
 variation of Iris flowers in the Gaspé Peninsula.  
 
 For more information: http://en.wikipedia.org/wiki/Iris_flower_data_set
+
+References:
+
+1. Fisher,R.A. "The use of multiple measurements in taxonomic problems", Annual
+Eugenics, 7, Part II, 179-188 (1936); also in "Contributions to Mathematical
+Statistics" (John Wiley, NY, 1950).
+
+2. Duda,R.O., & Hart,P.E. (1973) Pattern Classification and Scene Analysis.
+(Q327.D83) John Wiley & Sons. ISBN 0-471-22361-1. See page 218. 
+
+3. Dasarathy, B.V. (1980) "Nosing Around the Neighborhood: A New System
+Structure and Classification Rule for Recognition in Partially Exposed
+Environments". IEEE Transactions on Pattern Analysis and Machine Intelligence,
+Vol. PAMI-2, No. 1, 67-71. 
+
+4. Gates, G.W. (1972) "The Reduced Nearest Neighbor Rule". IEEE Transactions on
+Information Theory, May 1972, 431-433. 
 """
 
 import os
