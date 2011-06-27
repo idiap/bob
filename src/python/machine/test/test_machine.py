@@ -45,6 +45,20 @@ class MachineTest(unittest.TestCase):
     self.assertTrue(stats.sumPx == stats_ref.sumPx)
     self.assertTrue(stats.sumPxx == stats_ref.sumPxx)
 
+  def test03_GMMMachine(self):
+    """Test a GMMMachine (log-likelihood computation)"""
+    
+    data = torch.io.Array('data/data.hdf5').get()
+    gmm = torch.machine.GMMMachine(2, 50)
+    gmm.weights   = torch.io.Array('data/weights.hdf5').get()
+    gmm.means     = torch.io.Array('data/means.hdf5').get()
+    gmm.variances = torch.io.Array('data/variances.hdf5').get()
+
+    # Compare the log-likelihood with the one obtained using Chris Matlab 
+    # implementation
+    matlab_ll_ref = -2.361583051672024e+02
+    self.assertTrue( abs(gmm(data) - matlab_ll_ref) < 1e-4)
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
