@@ -111,16 +111,20 @@ if options.test:
     os.remove("/tmp/input.hdf5")
   
   options.output_file = "/tmp/wm.hdf5"
-  array = torch.core.array.array([[ 0,  1,  2,  3],
-                                  [ 3,  1,  5,  2],
-                                  [ 6,  7,  2,  5],
-                                  [ 3,  6,  2,  3],
-                                  [ 9,  8,  6,  4]
-                                  ],
-                                  'float64')
+  arrayset = torch.io.Arrayset()
+  array1 = torch.core.array.array([ 0,  1,  2,  3], 'float64')
+  arrayset.append(array1)
+  array2 = torch.core.array.array([ 3,  1,  5,  2], 'float64')
+  arrayset.append(array2)
+  array3 = torch.core.array.array([ 6,  7,  2,  5], 'float64')
+  arrayset.append(array3)
+  array4 = torch.core.array.array([ 3,  6,  2,  3], 'float64')
+  arrayset.append(array4)
+  array5 = torch.core.array.array([ 9,  8,  6,  4], 'float64')
+  arrayset.append(array5)
 
   options.n_gaussians = 1
-  torch.io.Array(array).save("/tmp/input.hdf5")
+  arrayset.save("/tmp/input.hdf5")
 
   f = open("/tmp/input.lst", 'w')
   f.write("/tmp/input.hdf5\n")
