@@ -26,6 +26,7 @@ static const char* TRACE_DOC_ = "Computes the trace of a matrix. Sizes are NOT c
 static const char* NORM_DOC = "Normalizes a vector 'i' and outputs the normalized vector in 'o'. Sizes are checked (to avoid the check, use the _ variants).";
 static const char* NORM_DOC_ = "Normalizes a vector 'i' and outputs the normalized vector in 'o'. Sizes are NOT checked.";
 static const char* NORM_DOC_SELF = "Normalizes a vector 'i' and outputs the normalized vector vector 'i' (i.e., the same input vector).";
+static const char* EUCL_NORM_DOC = "Computes the Euclidean norm of a vector 'i'.";
 
 template<typename T1, typename T2, typename T3> 
 static blitz::Array<T3,2> r_prod_mm(const blitz::Array<T1,2>& A, const blitz::Array<T2,2>& B) {
@@ -102,6 +103,7 @@ template<typename T1, typename T2, typename T3> void def_linear() {
   def("normalize_", &Torch::math::normalize_<T1,T2>, (arg("input"),arg("output")), NORM_DOC_);
   def("normalize", &Torch::math::normalize<T1,T2>, (arg("input"),arg("output")), NORM_DOC);
   def("normalize", &r_normalize<T1>, (arg("input")), NORM_DOC);
+  def("norm", &Torch::math::norm<T1>, (arg("input")), EUCL_NORM_DOC);
 
   //self normalization
   def("normalizeSelf", &Torch::math::normalizeSelf<T1>, (arg("input")), NORM_DOC_SELF);
