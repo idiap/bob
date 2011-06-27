@@ -84,8 +84,8 @@ class TextArraysetCodec(torch.io.ArraysetCodec):
     f.write('%d %d\n' % (arrayset.shape[0], len(arrayset)))
     # In our particular case, I need to save the array in uint16, so we
     # just convert it.
-    for k in arrayset.ids():
-      bzarray = arrayset[k].cast(torch.io.ElementType.uint16)
+    for array in arrayset:
+      bzarray = array.cast(torch.io.ElementType.uint16)
       f.write(' '.join(['%d' % bzarray[k] for k in range(bzarray.extent(0))]))
       f.write('\n')
     f.close()

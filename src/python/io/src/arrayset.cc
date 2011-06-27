@@ -41,12 +41,6 @@ static const char* get_filename(io::Arrayset& as) {
   return as.getFilename().c_str();
 }
 
-static tuple get_array_ids(const io::Arrayset& as) {
-  list l;
-  for(size_t id=0; id<as.size(); ++id) l.append(id);
-  return tuple(l);
-}
-
 template <typename T>
 static void pythonic_set (io::Arrayset& as, size_t id, T obj) {
   if (id < as.size()) PYTHON_ERROR(IndexError, "out of range");
@@ -71,7 +65,6 @@ void bind_io_arrayset() {
     .def("__append_array__", (size_t (io::Arrayset::*)(boost::shared_ptr<const io::Array>))&io::Arrayset::add, (arg("self"), arg("array")), "Adds an array to this set")
 
     //some dict-like entries
-    .def("ids", &get_array_ids, "The ids of every array in this set, in a tuple")
     .def("__getitem__", (io::Array (io::Arrayset::*)(size_t))&io::Arrayset::operator[], (arg("self"), arg("array_id")), "Gets an array from this set given its id")
     .def("__delitem__", &io::Arrayset::remove, (arg("self"), arg("id")), "Removes the array given its id. May raise an exception if there is no such array inside.")
     .def("__setitem_array__", &pythonic_set<const io::Array>, (arg("self"), arg("id"), arg("array")), "Adds a plain array to this set. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")

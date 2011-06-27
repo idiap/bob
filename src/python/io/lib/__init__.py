@@ -1,14 +1,15 @@
 from libpytorch_io import *
 import os
 
-def arrayset_array_index(self):
-  """Returns a dictionary containing the array ids (keys) and the arrays
-  themselves (values)."""
-  retval = {}
-  for k in self.ids(): retval[k] = self[k]
-  return retval
-Arrayset.arrayIndex = arrayset_array_index
-del arrayset_array_index
+def arrayset_iter(self):
+  """Allows Arraysets to be iterated in native python"""
+  n = 0
+  while n != len(self):
+    yield self[n]
+    n += 1
+  raise StopIteration
+Arrayset.__iter__ = arrayset_iter
+del arrayset_iter
 
 def arrayset_append(self, *args):
   import numpy
