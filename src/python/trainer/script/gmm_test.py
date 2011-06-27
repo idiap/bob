@@ -19,6 +19,7 @@ parser.add_option("-m",
                   help="Client model",
                   type="string",
                   default="train.hdf5")
+
 parser.add_option("-w",
                   "--world-model",
                   dest="world_model",
@@ -33,30 +34,24 @@ for line in fileinput.input(args):
   myfile = line.rstrip('\r\n')
 
   # Create data with only one file
-  ar = torch.io.Arrayset()
-  myarray = torch.io.Array(myfile)
-  n_blocks = myarray.shape[0]
-  for b in range(0,n_blocks):
-    x = myarray.get().cast('float64')[b,:]
-    ar.append(x)
+  ar = torch.io.Arrayset(myfile)
 
-  # Compute input size
-  input_size = ar.shape[0]
+  # Compute the number of blocks
+  n_blocks = len(ar)
 
   # Load the gmm
-  prior_gmm = torch.machine.GMMMachine(torch.config.Configuration(options.world_model))
-  gmm = torch.machine.GMMMachine(torch.config.Configuration(options.model))
+  prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.world_model))
+  gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.model))
 
   # Compute the score
   scoreCL = 0.
   scoreWM = 0.
-  ids = ar.ids()
-  for v, id in ids:
+  for id in range(0, n_blocks):
     scoreCL += gmm.forward(ar[id].get())
     scoreWM += prior_gmm.forward(ar[id].get())
 
-  score = scoreCL - scoreWM
+  score = (scoreCL - scoreWM) / n_blocks
 
   # Print the score
-  print filelist[0] + " " + str(score)
+  print myfile + " " + str(score)
 

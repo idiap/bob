@@ -137,17 +137,16 @@ for line in fileinput.input(args):
 # Create an arrayset from the input files
 ar = torch.io.Arrayset()
 for myfile in filelist:
-  myarray = torch.io.Array(myfile)
-  n_blocks = myarray.shape[0]
+  myarrayset = torch.io.Arrayset(myfile)
+  n_blocks = len(myarrayset)
   for b in range(0,n_blocks):
-    x = myarray.get().cast('float64')[b,:]
+    x = myarrayset[b].get()
     ar.append(x)
 
 # Compute input size
 input_size = ar.shape[0]
 
 # Create a normalized sampler
-#normalizedSampler = NormalizeStdFrameSampler(sampler)
 if options.norm:
 	(normalizedAr,stdAr) = NormalizeStdArrayset(ar)
 else:

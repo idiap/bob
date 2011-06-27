@@ -59,17 +59,14 @@ for line in fileinput.input(args):
 # Create a sampler for the input files
 ar = torch.io.Arrayset()
 for myfile in filelist:
-  myarray = torch.io.Array(myfile)
-  n_blocks = myarray.shape[0]
+  myarrayset = torch.io.Arrayset(myfile)
+  n_blocks = len(myarrayset)
   for b in range(0,n_blocks):
-    x = myarray.get().cast('float64')[b,:]
+    x = myarrayset[b].get()
     ar.append(x)
 
-# Compute input size
-input_size = ar.shape[0]
-
 # Load prior gmm
-prior_gmm = torch.machine.GMMMachine(torch.config.Configuration(options.prior_model))
+prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
 prior_gmm.setVarianceThreshold = options.variance_threshold
 
 # Create trainer
@@ -79,13 +76,11 @@ trainer.maxIterations = options.iterg
 trainer.setPriorGMM(prior_gmm)
 
 # Load gmm
-gmm = torch.machine.GMMMachine(torch.config.Configuration(options.prior_model))
+gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
 gmm.setVarianceThreshold = options.variance_threshold
 
 # Train gmm
 trainer.train(gmm, ar)
 
 # Save gmm
-config = torch.config.Configuration()
-gmm.save(config)
-config.save(options.output_file)
+gmm.save(torch.io.HDF5File(options.output_file))
