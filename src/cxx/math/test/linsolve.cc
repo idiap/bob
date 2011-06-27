@@ -16,11 +16,12 @@
 
 
 struct T {
-  blitz::Array<double,2> A33_1, A33_2;
-  blitz::Array<double,1> b3_1, b3_2, s3_1, s3_2;
+  blitz::Array<double,2> A33_1, A33_2, A33_3;
+  blitz::Array<double,1> b3_1, b3_2, s3_1, s3_2, s3_3;
   double eps;
 
-  T(): A33_1(3,3), A33_2(3,3), b3_1(3), b3_2(3), s3_1(3), s3_2(3), eps(1e-6)
+  T(): A33_1(3,3), A33_2(3,3), A33_3(3,3), b3_1(3), b3_2(3), s3_1(3), 
+        s3_2(3), s3_3(3), eps(1e-6)
   {
     A33_1 = 1., 0., 0., 0., 1., 0., 0., 0., 1.;
     b3_1 = 7., 5., 3.;
@@ -28,6 +29,8 @@ struct T {
     A33_2 = 1., 3., 5., 7., 9., 1., 3., 5., 7.;
     b3_2 = 2., 4., 6.;
     s3_2 = 3., -2., 1.;
+    A33_3 = 2., -1., 0., -1, 2., -1., 0., -1., 2.;
+    s3_3 = 8.5, 10., 6.5;
   }
 
   ~T() {}
@@ -82,15 +85,28 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 BOOST_AUTO_TEST_CASE( test_solve_3x3 )
 {
-  blitz::Array<double,1> x;
+  blitz::Array<double,1> x(3);
 
   Torch::math::linsolve(A33_1, x, b3_1);
   checkBlitzClose(s3_1, x, eps); 
 
-
   Torch::math::linsolve(A33_2, x, b3_2);
   checkBlitzClose(s3_2, x, eps); 
+
+  Torch::math::linsolve(A33_3, x, b3_1);
+  checkBlitzClose(s3_3, x, eps); 
 }
-  
+
+BOOST_AUTO_TEST_CASE( test_solveSympos_3x3 )
+{
+  blitz::Array<double,1> x(3);
+
+  Torch::math::linsolveSympos(A33_1, x, b3_1);
+  checkBlitzClose(s3_1, x, eps); 
+
+  Torch::math::linsolveSympos(A33_3, x, b3_1);
+  checkBlitzClose(s3_3, x, eps); 
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
