@@ -87,78 +87,20 @@ template <typename T, int N> static void bind_cast (tp::array<T,N>& array) {
 }
 
 void bind_array_cast () {
-  bind_cast(tp::bool_1);
-  bind_cast(tp::bool_2);
-  bind_cast(tp::bool_3);
-  bind_cast(tp::bool_4);
-  
-  bind_cast(tp::int8_1);
-  bind_cast(tp::int8_2);
-  bind_cast(tp::int8_3);
-  bind_cast(tp::int8_4);
-  
-  bind_cast(tp::int16_1);
-  bind_cast(tp::int16_2);
-  bind_cast(tp::int16_3);
-  bind_cast(tp::int16_4);
-  
-  bind_cast(tp::int32_1);
-  bind_cast(tp::int32_2);
-  bind_cast(tp::int32_3);
-  bind_cast(tp::int32_4);
-  
-  bind_cast(tp::int64_1);
-  bind_cast(tp::int64_2);
-  bind_cast(tp::int64_3);
-  bind_cast(tp::int64_4);
-  
-  bind_cast(tp::uint8_1);
-  bind_cast(tp::uint8_2);
-  bind_cast(tp::uint8_3);
-  bind_cast(tp::uint8_4);
-  
-  bind_cast(tp::uint16_1);
-  bind_cast(tp::uint16_2);
-  bind_cast(tp::uint16_3);
-  bind_cast(tp::uint16_4);
-  
-  bind_cast(tp::uint32_1);
-  bind_cast(tp::uint32_2);
-  bind_cast(tp::uint32_3);
-  bind_cast(tp::uint32_4);
-  
-  bind_cast(tp::uint64_1);
-  bind_cast(tp::uint64_2);
-  bind_cast(tp::uint64_3);
-  bind_cast(tp::uint64_4);
-  
-  bind_cast(tp::float32_1);
-  bind_cast(tp::float32_2);
-  bind_cast(tp::float32_3);
-  bind_cast(tp::float32_4);
-  
-  bind_cast(tp::float64_1);
-  bind_cast(tp::float64_2);
-  bind_cast(tp::float64_3);
-  bind_cast(tp::float64_4);
-  
-  //bind_cast(tp::float128_1);
-  //bind_cast(tp::float128_2);
-  //bind_cast(tp::float128_3);
-  //bind_cast(tp::float128_4);
-  
-  bind_cast(tp::complex64_1);
-  bind_cast(tp::complex64_2);
-  bind_cast(tp::complex64_3);
-  bind_cast(tp::complex64_4);
-  
-  bind_cast(tp::complex128_1);
-  bind_cast(tp::complex128_2);
-  bind_cast(tp::complex128_3);
-  bind_cast(tp::complex128_4);
-  
-  //bind_cast(tp::complex256_1);
-  //bind_cast(tp::complex256_2);
-  //bind_cast(tp::complex256_3);
-  //bind_cast(tp::complex256_4);
+# define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+# define BOOST_PP_LOCAL_MACRO(D) \
+  bind_cast(BOOST_PP_CAT(tp::bool_,D));\
+  bind_cast(BOOST_PP_CAT(tp::int8_,D));\
+  bind_cast(BOOST_PP_CAT(tp::int16_,D));\
+  bind_cast(BOOST_PP_CAT(tp::int32_,D));\
+  bind_cast(BOOST_PP_CAT(tp::int64_,D));\
+  bind_cast(BOOST_PP_CAT(tp::uint8_,D));\
+  bind_cast(BOOST_PP_CAT(tp::uint16_,D));\
+  bind_cast(BOOST_PP_CAT(tp::uint32_,D));\
+  bind_cast(BOOST_PP_CAT(tp::uint64_,D));\
+  bind_cast(BOOST_PP_CAT(tp::float32_,D));\
+  bind_cast(BOOST_PP_CAT(tp::float64_,D));\
+  bind_cast(BOOST_PP_CAT(tp::complex64_,D));\
+  bind_cast(BOOST_PP_CAT(tp::complex128_,D));
+# include BOOST_PP_LOCAL_ITERATE()
 }

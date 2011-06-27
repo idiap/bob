@@ -16,7 +16,7 @@ def linearmachine_str(self):
     act = " [act: %s]" % self.activation
   sub = ""
   if not (self.input_subtract == 0.0).all():
-    div = "\n subtract: %s" % self.input_subtract
+    sub = "\n subtract: %s" % self.input_subtract
   div = ""
   if not (self.input_divide == 1.0).all():
     div = "\n divide: %s" % self.input_divide

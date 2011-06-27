@@ -16,9 +16,7 @@ class StatsTest(unittest.TestCase):
 
   def setUp(self):
 
-    tmp = torch.db.iris.data()['setosa']
-    self.data = torch.core.array.float64_2(tmp.shape[0], len(tmp))
-    for i, k in enumerate(tmp): self.data[:,i] = k.get()
+    self.data = torch.db.iris.data()['setosa'].cat()
  
   def test01_scatter(self):
 

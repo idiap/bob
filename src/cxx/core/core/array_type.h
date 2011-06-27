@@ -13,6 +13,14 @@
 #include <cstdlib>
 #include <complex>
 
+/**
+ * This macro defines the maximum number of dimensions supported by torch. A
+ * variable in the Torch.core.array namespace is created from this macro
+ * receiving the same value. Use that variable on your programs, or this macro
+ * on your preprocessor code.
+ */
+#define TORCH_MAX_DIM 4
+
 namespace Torch {
 /**
  * \ingroup libcore_api
@@ -46,20 +54,10 @@ namespace Torch {
     } ElementType;
 
     /**
-     * Gets a string representation of an element type value
-     */
-    const char* stringize(ElementType t);
-
-    /**
-     * Returns the ElementType given the string representation
-     */
-    ElementType unstringize(const char* name);
-
-    /**
      * @brief Maximum number of supported dimensions for multidimensional 
      * arrays.
      */
-    const size_t N_MAX_DIMENSIONS_ARRAY = 4;
+    const size_t N_MAX_DIMENSIONS_ARRAY = TORCH_MAX_DIM;
 
     /**
      * These are some type to element type conversions
@@ -144,6 +142,24 @@ namespace Torch {
      * Returns the type size given the enumeration
      */
     size_t getElementSize(ElementType t);
+    
+    /**
+     * Gets a string representation of an element type value
+     */
+    const char* stringize(ElementType t);
+
+    /**
+     * Equivalent to call stringize() on the result of getElementType<T>().
+     */
+    template<typename T> const char* stringize() {
+      return stringize(getElementType<T>());
+    }
+
+    /**
+     * Returns the ElementType given the string representation
+     */
+    ElementType unstringize(const char* name);
+
   }}
 /**
  * @}
