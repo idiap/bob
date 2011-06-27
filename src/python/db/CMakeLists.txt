@@ -13,6 +13,6 @@ file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN
 #  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_codec.py)
 
 # Our examples (run and install)
-#torch_python_add_test(python-db-video2frame-example
-#  ${CMAKE_CURRENT_SOURCE_DIR}/example/video2frame.py --test)
-#torch_example_install("python" "db" example/video2frame.py)
+torch_python_add_test(python-db-iris_lda-example
+  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_lda.py --self-test)
+torch_example_install("python" "io" example/iris_lda.py)
