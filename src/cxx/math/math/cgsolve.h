@@ -32,7 +32,7 @@ namespace Torch {
       *   norm(Ax-b)/norm(b) < acc
       * @param max_iter The maximum number of iterations
       */
-    void cgsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+    void cgsolveSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
       const blitz::Array<double,1>& b, const double acc, const int max_iter);
 
   }

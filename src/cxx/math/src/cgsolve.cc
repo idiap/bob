@@ -6,7 +6,7 @@
 
 namespace math = Torch::math;
 
-void math::cgsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+void math::cgsolveSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   const blitz::Array<double,1>& b, const double acc, const int max_iter)
 {
   // Dimensionality of the problem
