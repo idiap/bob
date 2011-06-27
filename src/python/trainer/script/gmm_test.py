@@ -46,9 +46,9 @@ for line in fileinput.input(args):
   # Compute the score
   scoreCL = 0.
   scoreWM = 0.
-  for id in range(0, n_blocks):
-    scoreCL += gmm.forward(ar[id].get())
-    scoreWM += prior_gmm.forward(ar[id].get())
+  for v in ar:
+    scoreCL += gmm.forward(v.get())
+    scoreWM += prior_gmm.forward(v.get())
 
   score = (scoreCL - scoreWM) / n_blocks
 
