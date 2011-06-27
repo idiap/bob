@@ -11,6 +11,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/python.hpp>
 #include <boost/format.hpp>
+#include <boost/preprocessor.hpp>
 #include <blitz/array.h>
 #include <stdint.h>
 
@@ -53,11 +54,11 @@ namespace Torch { namespace python {
        * The constructor does the basics for the initialization of objects of
        * this class. It will NOT call all boost methods to build the bindings.
        */
-      array(const char* tname) {
+      array() {
 
-        m_element_type_str = tname;
+        m_element_type_str = Torch::core::array::stringize<T>();
         boost::format blitz_name("blitz::Array<%s,%d>");
-        blitz_name % tname % N;
+        blitz_name % m_element_type_str % N;
         m_blitz_type_str = blitz_name.str();
 
       }
@@ -101,80 +102,24 @@ namespace Torch { namespace python {
   /**
    * The following variables are globals that contain our bindings
    */
-  extern array<bool, 1> bool_1;
-  extern array<bool, 2> bool_2;
-  extern array<bool, 3> bool_3;
-  extern array<bool, 4> bool_4;
-  
-  extern array<int8_t, 1> int8_1;
-  extern array<int8_t, 2> int8_2;
-  extern array<int8_t, 3> int8_3;
-  extern array<int8_t, 4> int8_4;
-  
-  extern array<int16_t, 1> int16_1;
-  extern array<int16_t, 2> int16_2;
-  extern array<int16_t, 3> int16_3;
-  extern array<int16_t, 4> int16_4;
-  
-  extern array<int32_t, 1> int32_1;
-  extern array<int32_t, 2> int32_2;
-  extern array<int32_t, 3> int32_3;
-  extern array<int32_t, 4> int32_4;
-  
-  extern array<int64_t, 1> int64_1;
-  extern array<int64_t, 2> int64_2;
-  extern array<int64_t, 3> int64_3;
-  extern array<int64_t, 4> int64_4;
-  
-  extern array<uint8_t, 1> uint8_1;
-  extern array<uint8_t, 2> uint8_2;
-  extern array<uint8_t, 3> uint8_3;
-  extern array<uint8_t, 4> uint8_4;
-  
-  extern array<uint16_t, 1> uint16_1;
-  extern array<uint16_t, 2> uint16_2;
-  extern array<uint16_t, 3> uint16_3;
-  extern array<uint16_t, 4> uint16_4;
-  
-  extern array<uint32_t, 1> uint32_1;
-  extern array<uint32_t, 2> uint32_2;
-  extern array<uint32_t, 3> uint32_3;
-  extern array<uint32_t, 4> uint32_4;
-  
-  extern array<uint64_t, 1> uint64_1;
-  extern array<uint64_t, 2> uint64_2;
-  extern array<uint64_t, 3> uint64_3;
-  extern array<uint64_t, 4> uint64_4;
-  
-  extern array<float, 1> float32_1;
-  extern array<float, 2> float32_2;
-  extern array<float, 3> float32_3;
-  extern array<float, 4> float32_4;
-  
-  extern array<double, 1> float64_1;
-  extern array<double, 2> float64_2;
-  extern array<double, 3> float64_3;
-  extern array<double, 4> float64_4;
-  
-  extern array<long double, 1> float128_1;
-  extern array<long double, 2> float128_2;
-  extern array<long double, 3> float128_3;
-  extern array<long double, 4> float128_4;
-  
-  extern array<std::complex<float>, 1> complex64_1;
-  extern array<std::complex<float>, 2> complex64_2;
-  extern array<std::complex<float>, 3> complex64_3;
-  extern array<std::complex<float>, 4> complex64_4;
-  
-  extern array<std::complex<double>, 1> complex128_1;
-  extern array<std::complex<double>, 2> complex128_2;
-  extern array<std::complex<double>, 3> complex128_3;
-  extern array<std::complex<double>, 4> complex128_4;
-  
-  extern array<std::complex<long double>, 1> complex256_1;
-  extern array<std::complex<long double>, 2> complex256_2;
-  extern array<std::complex<long double>, 3> complex256_3;
-  extern array<std::complex<long double>, 4> complex256_4;
+# define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+# define BOOST_PP_LOCAL_MACRO(D) \
+  extern array<bool, D> BOOST_PP_CAT(bool_,D);\
+  extern array<int8_t, D> BOOST_PP_CAT(int8_,D);\
+  extern array<int16_t, D> BOOST_PP_CAT(int16_,D);\
+  extern array<int32_t, D> BOOST_PP_CAT(int32_,D);\
+  extern array<int64_t, D> BOOST_PP_CAT(int64_,D);\
+  extern array<uint8_t, D> BOOST_PP_CAT(uint8_,D);\
+  extern array<uint16_t, D> BOOST_PP_CAT(uint16_,D);\
+  extern array<uint32_t, D> BOOST_PP_CAT(uint32_,D);\
+  extern array<uint64_t, D> BOOST_PP_CAT(uint64_,D);\
+  extern array<float, D> BOOST_PP_CAT(float32_,D);\
+  extern array<double, D> BOOST_PP_CAT(float64_,D);\
+  extern array<long double, D> BOOST_PP_CAT(float128_,D);\
+  extern array<std::complex<float>, D> BOOST_PP_CAT(complex64_,D);\
+  extern array<std::complex<double>, D> BOOST_PP_CAT(complex128_,D);\
+  extern array<std::complex<long double>, D> BOOST_PP_CAT(complex256_,D);
+#include BOOST_PP_LOCAL_ITERATE()
 
 }}
 

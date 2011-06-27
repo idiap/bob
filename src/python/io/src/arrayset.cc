@@ -41,22 +41,28 @@ static const char* get_filename(io::Arrayset& as) {
   return as.getFilename().c_str();
 }
 
-static tuple get_array_ids(const io::Arrayset& as) {
-  list l;
-  for(size_t id=0; id<as.size(); ++id) l.append(id);
-  return tuple(l);
-}
-
 template <typename T>
 static void pythonic_set (io::Arrayset& as, size_t id, T obj) {
   if (id < as.size()) PYTHON_ERROR(IndexError, "out of range");
   as.set(id, obj);
 }
 
+template<typename T>
+static boost::shared_ptr<io::Arrayset> make_from_array_iterable(T iter) {
+  boost::shared_ptr<io::Arrayset> retval = boost::make_shared<io::Arrayset>();
+  stl_input_iterator<io::Array> end;
+  for (stl_input_iterator<io::Array> it(iter); it != end; ++it) {
+    retval->add(*it); //calls extract<io::Array>(iter[i])
+  }
+  return retval;
+}
+
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(arrayset_save_overloads, save, 1, 2) 
 
 void bind_io_arrayset() {
   class_<io::Arrayset, boost::shared_ptr<io::Arrayset> >("Arrayset", "Dataset Arraysets represent lists of Arrays that share the same element type and dimension properties and are grouped together by the DB designer.", init<const std::string&, optional<const std::string&> >((arg("filename"),arg("codecname")=""), "Initializes a new arrayset from an external file. An optional codec may be passed."))
+    .def("__init__", make_constructor(make_from_array_iterable<tuple>), "Creates a new Arrayset from a python tuple containing Arrays.")
+    .def("__init__", make_constructor(make_from_array_iterable<list>), "Creates a new Arrayset from a python list containing Arrays.")
     .def(init<>("Creates a new empty arraset with an inlined representation."))
     .add_property("shape", &get_shape, "The shape of each array in this set is determined by this variable.")
     .add_property("loaded", &io::Arrayset::isLoaded, "This variable determines if the arrayset is loaded in memory. This may be false in the case the arrayset is completely stored in an external file.")
@@ -71,7 +77,6 @@ void bind_io_arrayset() {
     .def("__append_array__", (size_t (io::Arrayset::*)(boost::shared_ptr<const io::Array>))&io::Arrayset::add, (arg("self"), arg("array")), "Adds an array to this set")
 
     //some dict-like entries
-    .def("ids", &get_array_ids, "The ids of every array in this set, in a tuple")
     .def("__getitem__", (io::Array (io::Arrayset::*)(size_t))&io::Arrayset::operator[], (arg("self"), arg("array_id")), "Gets an array from this set given its id")
     .def("__delitem__", &io::Arrayset::remove, (arg("self"), arg("id")), "Removes the array given its id. May raise an exception if there is no such array inside.")
     .def("__setitem_array__", &pythonic_set<const io::Array>, (arg("self"), arg("id"), arg("array")), "Adds a plain array to this set. If the array-id already exists internally, calling this method will trigger the overwriting of that existing array data.")

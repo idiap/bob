@@ -1,14 +1,15 @@
 from libpytorch_io import *
 import os
 
-def arrayset_array_index(self):
-  """Returns a dictionary containing the array ids (keys) and the arrays
-  themselves (values)."""
-  retval = {}
-  for k in self.ids(): retval[k] = self[k]
-  return retval
-Arrayset.arrayIndex = arrayset_array_index
-del arrayset_array_index
+def arrayset_iter(self):
+  """Allows Arraysets to be iterated in native python"""
+  n = 0
+  while n != len(self):
+    yield self[n]
+    n += 1
+  raise StopIteration
+Arrayset.__iter__ = arrayset_iter
+del arrayset_iter
 
 def arrayset_append(self, *args):
   import numpy
@@ -58,6 +59,13 @@ def arrayset_setitem(self, id, *args):
 Arrayset.__setitem__ = arrayset_setitem
 del arrayset_setitem
 
+def arrayset_repr(self):
+  """A simple representation"""
+  return '<Arrayset[%d] %s@%s>' % (len(self), self.elementType, self.shape)
+Arrayset.__repr__ = arrayset_repr
+Arrayset.__str__ = arrayset_repr
+del arrayset_repr
+
 def arrayset_eq(self, other):
   """Compares two arraysets for content equality."""
   if self.shape != other.shape: return False 
@@ -73,6 +81,59 @@ def arrayset_ne(self, other):
   return not (self == other)
 Arrayset.__ne__ = arrayset_ne
 del arrayset_ne
+
+def arrayset_cat(self, firstDim=False):
+  """Concatenates an entire Arrayset in a single blitz::Array<T,N>.
+
+  The original arrays will be organized by creating as many entries as
+  necessary in the last dimension of the resulting blitz::Array. If the option
+  'firstDim' is set to True, then the first dimension of the resulting array is
+  used for the disposal of the input arrays. 
+
+  In this way, to retrieve the first array of the arrayset from the resulting
+  blitz::Array, you must either use:
+
+  .. code:: python
+
+    bz = arrayset.cat() #suppose an arrayset with shape == (4,) (1D array)
+    bz[:,0] #retrieves the first array of the set if firstDim is False
+    bz[0,:] #retrieves the first array of the set if firstDim is True
+
+  The same is valid for N (N>1) dimensional arrays.
+
+  Note this will load all the arrayset data in memory if that is not already
+  the case and will copy all the data once (to the resulting blitz::Array).
+
+  .. warning::
+    This method will only work as long as the resulting blitz::Array number of
+    dimensions is supported. Currently this means that self.shape has to have
+    lenght 3 or less. If the Array data is 4D, the resulting blitz Array would
+    have to be 5D and that is not currently supported.
+  """
+  exec 'from ..core.array import %s_%s as cls' % \
+      (self.elementType, len(self.shape) + 1) 
+  ashape = self.shape
+  retshape = list(ashape)
+
+  if firstDim: #first dimension contains examples
+    retshape.insert(0, len(self))
+    retval = cls(tuple(retshape))
+
+    for i, k in enumerate(self): #fill
+      add = tuple([i] + [slice(d) for d in ashape])
+      retval[add] = self[i].get()
+
+  else: #last dimension contains examples
+    retshape.append(len(self))
+    retval = cls(tuple(retshape))
+
+    for i, k in enumerate(self): #fill
+      add = tuple([slice(d) for d in ashape] + [i])
+      retval[add] = self[i].get()
+
+  return retval
+Arrayset.cat = arrayset_cat
+del arrayset_cat
 
 def array_get(self):
   """Returns a blitz::Array object with the internal element type"""
@@ -103,6 +164,18 @@ def array_ne(self, other):
   return not (self == other)
 Array.__ne__ = array_ne
 del array_ne
+
+def array_repr(self):
+  """A simple representation for generic Arrays"""
+  return "<Array %s@%s>" % (self.elementType, self.shape)
+Array.__repr__ = array_repr
+del array_repr
+
+def array_str(self):
+  """A complete representation for arrays"""
+  return str(self.get())
+Array.__str__ = array_str
+del array_str
 
 def binfile_getitem(self, i):
   """Returns a blitz::Array<> object with the expected element type and shape"""

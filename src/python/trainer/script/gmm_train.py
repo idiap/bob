@@ -9,15 +9,15 @@ def NormalizeStdArrayset(arrayset):
   arrayset.load()
 
   length = arrayset.shape[0]
-  n_samples = len(arrayset.ids())
+  n_samples = len(arrayset)
   mean = torch.core.array.float64_1(length)
   std = torch.core.array.float64_1(length)
 
   mean.fill(0)
   std.fill(0)
 
-  for k, id in enumerate(arrayset.ids()):
-    x = arrayset[id].get().cast('float64')
+  for array in arrayset:
+    x = array.cast('float64')
     mean += x
     std += (x ** 2)
 
@@ -27,10 +27,9 @@ def NormalizeStdArrayset(arrayset):
   std = std ** 0.5 # sqrt(std)
 
   arStd = torch.io.Arrayset()
-  for k, id in enumerate(arrayset.ids()):
-    x = arrayset[id].get().cast('float64')
+  for array in arrayset:
     type(arStd)
-    arStd.append(x / std)
+    arStd.append(array.cast('float64') / std)
 
   return (arStd,std)
 
