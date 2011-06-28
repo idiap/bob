@@ -7,8 +7,8 @@
 replay attack database in the most obvious ways.
 """
 
-import utils
-from models import *
+from . import utils
+from .models import *
 
 class Database(object):
   """The dataset class opens and maintains a connection opened to the Database.
@@ -22,7 +22,7 @@ class Database(object):
     self.session = utils.session()
 
   def files(self, directory=None, extension=None, support=None,
-      device=None, groups=None):
+      device=None, groups=None, cls=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -48,9 +48,14 @@ class Database(object):
       tuple with several of them. If 'None' is given (this is the default), it
       is considered the same as a tuple with all possible values.
 
-    Returns: A list containing the resolved filenames considering all
-    the filtering criteria or a full Torch Arrayset if you allow me to check
-    for the existence of files (set check=True).
+    cls
+      Either "attack" or "real". Defines the class of data to be retrieved. If
+      set to None, returns all possible data.
+
+    Returns: A dictionary containing the resolved filenames considering all
+    the filtering criteria. The keys of the dictionary are unique identities 
+    for each file in the replay attack database. Conserve these numbers if you 
+    wish to save processing results later on.
     """
 
     def check_validity(l, obj, valid):
@@ -71,26 +76,30 @@ class Database(object):
     VALID_GROUPS = ('train', 'devel', 'test')
     VALID_SUPPORTS = ('fixed', 'hand')
     VALID_DEVICES = ('mobile', 'highdef', 'print')
+    VALID_CLASSES = ('real', 'attack')
 
     groups = check_validity(groups, "group", VALID_GROUPS)
     device = check_validity(device, "device", VALID_DEVICES)
     support = check_validity(support, "support", VALID_SUPPORTS)
+    cls = check_validity(cls, "class", VALID_CLASSES)
 
-    retval = {'real': {}, 'attack': {}}
+    retval = {}
 
     # real-accesses are simpler to query
-    q = self.session.query(RealAccess).join(File).join(Client).filter(
-        Client.set.in_(groups)).order_by(Client.id)
-    for key, value in [(k.file.id, k.file.path) for k in q]: 
-      retval['real'][key] = make_path(str(value), directory, extension)
+    if 'real' in cls:
+      q = self.session.query(RealAccess).join(File).join(Client).filter(
+          Client.set.in_(groups)).order_by(Client.id)
+      for key, value in [(k.file.id, k.file.path) for k in q]: 
+        retval[key] = make_path(str(value), directory, extension)
       
     # attacks will have to be filtered a little bit more
-    q = self.session.query(Attack).join(File).join(Client).\
-        filter(Client.set.in_(groups)).\
-        filter(Attack.attack_device.in_(device)).\
-        filter(Attack.attack_support.in_(support)).order_by(Client.id)
-    for key, value in [(k.file.id, k.file.path) for k in q]: 
-      retval['real'][key] = make_path(str(value), directory, extension)
+    if 'attack' in cls:
+      q = self.session.query(Attack).join(File).join(Client).\
+          filter(Client.set.in_(groups)).\
+          filter(Attack.attack_device.in_(device)).\
+          filter(Attack.attack_support.in_(support)).order_by(Client.id)
+      for key, value in [(k.file.id, k.file.path) for k in q]: 
+        retval[key] = make_path(str(value), directory, extension)
 
     return retval
 
@@ -145,6 +154,5 @@ class Database(object):
       The extension determines the way each of the arrays will be saved.
     """
     
-    for group in data.keys():
-      for key, value in data[group]: 
-        self.save_one(key, value, directory, extension)
+    for key, value in data:
+      self.save_one(key, value, directory, extension)

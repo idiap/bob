@@ -7,5 +7,6 @@
 that can be used in Biometry, Machine Learning or Pattern Classification."""
 
 import iris
+import replay
 
 __all__ = dir()
