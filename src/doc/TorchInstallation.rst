@@ -71,6 +71,9 @@ Data access
   Our nightly builds compile against version 1.34, but version 1.33 is known to
   work. Other versions should also work. Please note this dependence is
   *optional*.
+* `argparse`_: is used for argument parsing in some of our python utilities. If
+  you are not compiling against Python 2.7 or superior, you need to install it
+  separately.
 
 .. _basic-build:
 
@@ -124,7 +127,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse
 
 .. note::
 
@@ -180,7 +183,7 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx hdf5-18 py26-h5py py26-tables boost +python26
+   $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx hdf5-18 py26-h5py py26-tables py26-argparse boost +python26 
    $ # go for a long coffee ('atlas' may take up to 12 hours to install!)
 
 You can also install git if you want to submit patches to us:
@@ -336,3 +339,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _torchidiapguide: https://www.idiap.ch/software/torch5spro/wiki/TorchIdiapGuide
 .. _buildbot: http://trac.buildbot.net
 .. _the Ubuntu 10.04 ticket: http://www.idiap.ch/software/torch5spro/ticket/89/
+.. _argparse: http://code.google.com/p/argparse/
