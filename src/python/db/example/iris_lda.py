@@ -5,6 +5,21 @@
 
 """This example shows how to use the Iris Flower (Fisher's) Dataset to create
 3-class classifier based on Linear Discriminant Analysis.
+
+Note: This example will consider all 3 classes for the LDA training. This is
+*not* what Fisher did on his paper entitled "The Use of Multiple Measurements
+in Taxonomic Problems", Annals of Eugenics, pp. 179-188, 1936. In that work
+Fisher does the "right" thing only for the first 2-class problem (setosa x
+versicolor). You can reproduce the 2-class LDA using Torch's LDA training
+system w/o problems. When inserting the virginica class, Fisher decides for a
+different metric (4vi + ve -5se) and solves lambda for the matrices in the last
+row of Table VIII. 
+
+This is OK, but does not generalize the method proposed on the begining of his
+paper. Results achieved by the generalized LDA method will not match Fisher's
+result on that last table, be aware. That being said, the final histogram
+presented on that paper looks quite similar to the one produced by this script,
+showing that Fisher's solution was approximately correct.
 """
 
 import os
