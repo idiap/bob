@@ -7,8 +7,9 @@
 replay attack database in the most obvious ways.
 """
 
-from . import utils
+from .. import utils
 from .models import *
+from . import dbname
 
 class Database(object):
   """The dataset class opens and maintains a connection opened to the Database.
@@ -19,7 +20,7 @@ class Database(object):
 
   def __init__(self):
     # opens a session to the database - keep it open until the end
-    self.session = utils.session()
+    self.session = utils.session(dbname())
 
   def files(self, directory=None, extension=None, support=None,
       device=None, groups=None, cls=None):
