@@ -12,6 +12,5 @@ def dbname():
   import os
   return os.path.basename(os.path.dirname(__file__))
 
-from .utils import location, dbshell
 from .query import Database
 from .commands import add_commands
