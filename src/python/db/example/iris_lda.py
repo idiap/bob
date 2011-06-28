@@ -36,7 +36,7 @@ def process_data(machine, data):
   
   output = {}
   for cl in data.keys():
-    output[cl]=torch.io.Arrayset([machine.forward(ex.get()) for ex in data[cl]])
+    output[cl]=data[cl].foreach(machine.forward)
 
   return output
 
