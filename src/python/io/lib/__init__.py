@@ -135,6 +135,19 @@ def arrayset_cat(self, firstDim=False):
 Arrayset.cat = arrayset_cat
 del arrayset_cat
 
+def arrayset_foreach(self, meth):
+  """Applies a transformation to the Arrayset data by passing every
+  blitz::Array to the given method
+  
+  .. note::
+
+    This will trigger loading all data elements within the Array and will
+    create copies of the array data (that is returned).
+  """
+  return self.__class__([meth(k.get()) for k in self])
+Arrayset.foreach = arrayset_foreach
+del arrayset_foreach
+
 def array_get(self):
   """Returns a blitz::Array object with the internal element type"""
   return getattr(self, '__get_%s_%d__' % (self.elementType.name, len(self.shape)))()
