@@ -50,6 +50,10 @@ Core dependencies
 * `Python`_: if you want to compile our python bindings we recommend using
   Python 2.5 or up;
 * `NumPy`_: this dependence is used to bind blitz::Arrays to python.
+* `Matplotlib`_: A matlab-like python plotting environment
+* `SqlAlchemy`_: A Python SQL toolkit and Object Relational Mapper. This is
+  used for storing and querying more complex databases. You need at least
+  version 0.6.
 
 Data access
 ===========
@@ -111,7 +115,6 @@ but make a nice complement to the installation and provides you with the
 ability to plot and interact with Torch:
 
 * `Scipy`_: A set of scientific-related python-based utilities
-* `Matplotlib`_: A matlab-like python plotting environment
 * `IPython`_: A powerful replacement for your python shell that provides bells
   and whistles
 * `H5py`_ and `Tables`_: HDF5 bindings to Python
@@ -127,7 +130,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy
 
 .. note::
 
@@ -154,7 +157,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev
+   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy
 
 .. warning::
 
@@ -340,3 +343,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _buildbot: http://trac.buildbot.net
 .. _the Ubuntu 10.04 ticket: http://www.idiap.ch/software/torch5spro/ticket/89/
 .. _argparse: http://code.google.com/p/argparse/
+.. _sqlalchemy: http://www.sqlalchemy.org/
