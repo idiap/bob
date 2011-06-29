@@ -14,6 +14,14 @@ file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN
 
 # Test some of our scripts
 
+# Iris database driver and example tests
+torch_python_add_test(python-db-iris-dump
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py iris dump --self-test)
+torch_python_add_test(python-db-iris-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py iris dump --class=versicolor --self-test)
+torch_python_add_test(python-db-iris-lda-example
+  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_lda.py --self-test)
+
 # Replay attack database driver tests
 torch_python_add_test(python-db-replay-dumplist
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay dumplist --self-test)
@@ -25,6 +33,4 @@ torch_python_add_test(python-db-replay-dumplist2
 #  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay create --recreate)
 
 # Our examples (run and install)
-torch_python_add_test(python-db-iris_lda-example
-  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_lda.py --self-test)
 torch_example_install("python" "io" example/iris_lda.py)

@@ -135,4 +135,5 @@ def add_commands(parser):
       default='/idiap/group/replay/database/protocols',
       metavar='DIR',
       help="Change the relative path to the directory containing the protocol definitions for replay attacks (defaults to %(default)s)")
-  parser.set_defaults(func=create)
+  
+  parser.set_defaults(func=create) #action

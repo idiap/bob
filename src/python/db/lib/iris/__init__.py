@@ -31,6 +31,7 @@ Information Theory, May 1972, 431-433.
 """
 
 import os
+import sys
 from ...io import Arrayset
 from ...core.array import array
 
@@ -84,3 +85,48 @@ def data():
       retval['virginica'].append(array([float(k) for k in s[0:4]], 'float64'))
 
   return retval
+
+def dbname():
+  """Calculates my own name automatically."""
+  import os
+  return os.path.basename(os.path.dirname(__file__))
+
+def dump(args):
+
+  d = data()
+  if args.cls: d = {args.cls: d[args.cls]}
+
+  output = sys.stdout
+  if args.selftest:
+    from ..utils import null
+    output = null()
+
+  for k, v in d.items():
+    for array in v:
+      bz = array.get()
+      s = ','.join(['%.1f' % bz[i] for i in range(bz.extent(0))] + [k])
+      output.write('%s\n' % (s,))
+
+def add_commands(parser):
+  """A few commands this database can respond to."""
+  
+  from . import dbname
+  from argparse import RawDescriptionHelpFormatter, SUPPRESS
+
+  # creates a top-level parser for this database
+  top_level = parser.add_parser(dbname(),
+      formatter_class=RawDescriptionHelpFormatter,
+      help="Fisher's Iris plants database",
+      description=__doc__)
+
+  # declare it has subparsers for each of the supported commands
+  subparsers = top_level.add_subparsers(title="subcommands")
+
+  # get the "dumplist" action from a submodule
+  dump_message = "Dumps the database in comma-separate-value format"
+  dump_parser = subparsers.add_parser('dump', help=dump_message)
+  dump_parser.add_argument('-c', '--class', dest="cls", default='', help="if given, limits the dump to a particular subset of the data that corresponds to the given class (defaults to '%(default)s')", choices=('setosa', 'versicolor', 'virginica', ''))
+  dump_parser.add_argument('--self-test', dest="selftest", default=False,
+      action='store_true', help=SUPPRESS)
+
+  dump_parser.set_defaults(func=dump)

@@ -37,6 +37,8 @@ def dumplist(args):
 def add_commands(parser):
   """Add specific subcommands that the action "dumplist" can use"""
 
+  from argparse import SUPPRESS
+
   parser.add_argument('-d', '--directory', dest="directory", default='', help="if given, this path will be prepended to every entry returned (defaults to '%(default)s')")
   parser.add_argument('-e', '--extension', dest="extension", default='', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
   parser.add_argument('-c', '--class', dest="cls", default='', help="if given, limits the dump to a particular subset of the data that corresponds to the given class (defaults to '%(default)s')", choices=('real', 'attack', ''))
@@ -44,5 +46,6 @@ def add_commands(parser):
   parser.add_argument('-s', '--support', dest="support", default='', help="if given, this value will limit the output files to those using this type of attack support. (defaults to '%(default)s')", choices=('fixed', 'hand', ''))
   parser.add_argument('-x', '--device', dest="device", default='', help="if given, this value will limit the output files to those using this type of device for attacks. (defaults to '%(default)s')", choices=('print', 'mobile', 'highdef', ''))
   parser.add_argument('--self-test', dest="selftest", default=False,
-      action='store_true')
-  parser.set_defaults(func=dumplist)
+      action='store_true', help=SUPPRESS)
+
+  parser.set_defaults(func=dumplist) #action

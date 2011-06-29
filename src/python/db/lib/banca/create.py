@@ -122,6 +122,11 @@ def create_tables(verbose):
   Session.metadata.create_all(engine)
   Protocol.metadata.create_all(engine)
 
+# Driver API
+# ==========
+
+help_message = 'Creates or re-creates this database'
+
 def create(args):
   """Central creation method."""
 
@@ -139,3 +144,16 @@ def create(args):
   add_protocols(s)
   s.commit()
   s.close()
+
+def add_commands(parser):
+  """Add specific subcommands that the action "create" can use"""
+
+  parser.add_argument('--recreate', action='store_true', default=False,
+      help="If set, I'll first erase the current database")
+  parser.add_argument('--verbose', action='store_true', default=False,
+      help="Do SQL operations in a verbose way")
+  parser.add_argument('--imagedir', action='store', metavar='DIR',
+      default='/idiap/group/vision/visidiap/databases/banca/english/images_gray',
+      help="Change the relative path to the directory containing the images of the BANCA database (defaults to %(default)s)")
+  
+  parser.set_defaults(func=create) #action
