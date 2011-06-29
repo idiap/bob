@@ -255,9 +255,13 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
             throw Torch::io::HDF5IncompatibleIO
               (m_parent->m_path.string(), 
                 m_path, m_type.str(), Torch::io::HDF5Type(value).str());
-          Torch::core::array::assertCZeroBaseContiguous(value);
           select(index);
-          write(reinterpret_cast<const void*>(value.data()));
+          if(Torch::core::array::isCContiguous(value)) {
+            blitz::Array<T,N> tmp = value.copy();
+            write(reinterpret_cast<const void*>(tmp.data()));
+          }
+          else
+            write(reinterpret_cast<const void*>(value.data()));
         }
 
       /**
@@ -289,10 +293,14 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         if (m_type != Torch::io::HDF5Type(value))
           throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
               m_path, m_type.str(), Torch::io::HDF5Type(value).str());
-        Torch::core::array::assertCZeroBaseContiguous(value);
         extend();
         select(m_extent[0]-1);
-        write(reinterpret_cast<const void*>(value.data()));
+        if(Torch::core::array::isCContiguous(value)) {
+          blitz::Array<T,N> tmp = value.copy();
+          write(reinterpret_cast<const void*>(tmp.data()));
+        }
+        else
+          write(reinterpret_cast<const void*>(value.data()));
       }
 
     private: //not implemented

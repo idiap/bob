@@ -254,6 +254,21 @@ class HDF5FileTest(unittest.TestCase):
 
     pass
 
+  def test05_resizeAndPreserve(self):
+    
+    # This test checks that non-contiguous C-style array can be saved
+    # into an HDF5 file.
+
+    # Let's just create some dummy data to play with
+    SHAPE = (2, 3) #6 elements
+    NELEMENT = SHAPE[0] * SHAPE[1]
+    data = [int(random.uniform(0,10)) for z in range(NELEMENT)]
+    array = torch.core.array.int32_2(data, SHAPE)
+
+    # Try to save a slice
+    tmpname = get_tempfilename()
+    array[:,0].save(tmpname, "hdf5.array.binary")
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
