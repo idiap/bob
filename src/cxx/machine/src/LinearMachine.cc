@@ -116,7 +116,7 @@ void mach::LinearMachine::resize (size_t input, size_t output) {
   m_input_sub.resizeAndPreserve(input);
   m_input_div.resizeAndPreserve(input);
   m_buffer.resizeAndPreserve(input);
-  m_weight.resizeAndPreserve(output, input);
+  m_weight.resizeAndPreserve(input, output);
   m_bias.resizeAndPreserve(output);
 }
 
