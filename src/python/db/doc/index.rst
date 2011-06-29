@@ -12,4 +12,25 @@ Reference
 ---------
 
 .. automodule:: torch.db
+
+BANCA Database
+==============
+
+.. automodule:: torch.db.banca
+
+.. autoclass:: torch.db.banca.Database
+  :members:
+
+Replay Attack Database
+======================
+
+.. automodule:: torch.db.replay
+
+.. autoclass:: torch.db.replay.Database
+  :members:
+
+Iris Database
+=============
+
+.. automodule:: torch.db.iris
   :members:
