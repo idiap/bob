@@ -101,6 +101,11 @@ def create_tables(verbose):
   RealAccess.metadata.create_all(engine)
   Attack.metadata.create_all(engine)
 
+# Driver API
+# ==========
+
+help_message = 'Creates or re-creates this database'
+
 def create(args):
   """Central creation method."""
 
@@ -118,3 +123,16 @@ def create(args):
   add_attack_lists(s, args.protodir)
   s.commit()
   s.close()
+
+def add_commands(parser):
+  """Add specific subcommands that the action "create" can use"""
+
+  parser.add_argument('--recreate', action='store_true', default=False,
+      help="If set, I'll first erase the current database")
+  parser.add_argument('--verbose', action='store_true', default=False,
+      help="Do SQL operations in a verbose way")
+  parser.add_argument('--protodir', action='store', 
+      default='/idiap/group/replay/database/protocols',
+      metavar='DIR',
+      help="Change the relative path to the directory containing the protocol definitions for replay attacks (defaults to %(default)s)")
+  parser.set_defaults(func=create)
