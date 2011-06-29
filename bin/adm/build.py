@@ -142,8 +142,6 @@ def cmake(option):
 
   cmake_options = {}
   cmake_options['--graphviz'] = "dependencies.dot"
-  if hasattr(option, "force_32bits") and option.force_32bits: 
-    cmake_options['-DTORCH_FORCE_32BITS'] = 'yes'
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
   cmake_options['-DCMAKE_INSTALL_PREFIX'] = option.install_prefix
   cmake_options['-DTORCH_LINKAGE'] = 'dynamic'
@@ -153,6 +151,8 @@ def cmake(option):
     cmake_options['-DTORCH_PYTHON'] = 'ON'
   else: 
     cmake_options['-DTORCH_%s' % option.build_block.upper()] = 'ON'
+  if option.createdb:
+    cmake_options['-DTORCH_CREATE_DATABASES'] = 'ON'
   cmdline = ['cmake']
   if option.debug_build: cmdline.append('--debug-output')
   for k,v in cmake_options.items(): cmdline.append('%s=%s' % (k, v))

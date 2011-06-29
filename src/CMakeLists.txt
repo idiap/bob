@@ -4,6 +4,10 @@
 project(torch5spro)
 cmake_minimum_required(VERSION 2.6)
 
+# The central database version and location
+set(TORCH_DATABASE_URL "http://www.idiap.ch/software/torch5spro/chrome/site/databases/")
+set(TORCH_DATABASE_VERSION "nightlies/last")
+
 # Force __LP64__ scheme on OSX
 if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
   set(COMMON_FLAGS "-m64")

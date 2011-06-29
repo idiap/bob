@@ -14,9 +14,28 @@ file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN
 # the right places to create the databases (original protocol files and data).
 # To trigger the database creation, a special CMake variable needs to be set.
 # This is done once per nightly build.
+if (TORCH_CREATE_DATABASES)
+  # Replay Attack Database
+  torch_python_add_test(python-db-0-replay-create
+    ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay create --recreate)
+  set_property(TEST python-db-0-replay-create APPEND PROPERTY ENVIRONMENT
+  "TORCH_DB_DIR=${CMAKE_INSTALL_PREFIX}/share/database")
+  
+  # BANCA Database
+  torch_python_add_test(python-db-0-banca-create
+    ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca create --recreate)
+  set_property(TEST python-db-0-banca-create APPEND PROPERTY ENVIRONMENT
+  "TORCH_DB_DIR=${CMAKE_INSTALL_PREFIX}/share/database")
+endif (TORCH_CREATE_DATABASES)
 
-#torch_python_add_test(python-db-replay-create
-#  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay create --recreate)
+# The next tests will complete the installation of torch by downloading the
+# database files required for each database operation.
+torch_python_add_test(python-db-1-replay-download
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay download
+  --url=${TORCH_DATABASE_URL} --version=${TORCH_DATABASE_VERSION})
+torch_python_add_test(python-db-1-banca-download
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca download
+  --url=${TORCH_DATABASE_URL} --version=${TORCH_DATABASE_VERSION})
 
 # Iris database driver and example tests
 torch_python_add_test(python-db-iris-dump
@@ -34,4 +53,4 @@ torch_python_add_test(python-db-replay-dumplist2
   --group=devel --support=hand --device=highdef --self-test)
 
 # Our examples (run and install)
-torch_example_install("python" "io" example/iris_lda.py)
+torch_example_install("python" "io" example/iris_lda.py --self-test)

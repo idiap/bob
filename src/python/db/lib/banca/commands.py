@@ -26,31 +26,31 @@ def add_commands(parser):
   options that are relevant to that command. So, we just scan such commands and
   attach the options from those.
   """
-
+  
   from . import dbname
-  from . import __doc__ as top_doc
+  from ..utils import location, dbshell_command, download_command
+  from . import __doc__ as dbdoc
+  from argparse import RawDescriptionHelpFormatter
 
   # creates a top-level parser for this database
-  top_level = parser.add_parser(dbname(),
-      help="BANCA database",
-      description=top_doc)
+  myname = dbname()
+  top_level = parser.add_parser(myname,
+      formatter_class=RawDescriptionHelpFormatter,
+      help="BANCA database", description=dbdoc)
+  top_level.set_defaults(dbname=myname)
+  top_level.set_defaults(location=location(myname))
 
   # declare it has subparsers for each of the supported commands
   subparsers = top_level.add_subparsers(title="subcommands")
 
-  # declare the "dbshell" command, no options for this one
-  dbshell_parser = subparsers.add_parser('dbshell',
-      help='Starts a new backend specific shell')
-  dbshell_parser.set_defaults(func=dbshell)
+  # attach standard commands
+  dbshell_command(subparsers)
+  download_command(subparsers)
 
   # get the "create" action from a submodule
-  from .create import add_commands as create_commands
-  from .create import help_message as create_message
-  create_parser = subparsers.add_parser('create', help=create_message)
-  create_commands(create_parser)
+  from .create import add_command as create_command
+  create_command(subparsers)
 
   # get the "dumplist" action from a submodule
-  from .dumplist import add_commands as dumplist_commands
-  from .dumplist import help_message as dumplist_message
-  dumplist_parser = subparsers.add_parser('dumplist', help=dumplist_message)
-  dumplist_commands(dumplist_parser)
+  from .dumplist import add_command as dumplist_command
+  dumplist_command(subparsers)

@@ -8,9 +8,8 @@
 
 import os
 
-from . import dbname
-from ..utils import session, location
 from .models import *
+from ..utils import session
 
 def add_clients(session, protodir):
   """Add clients to the replay attack database."""
@@ -92,11 +91,11 @@ def add_attack_lists(session, protodir):
   add_attack_list(session,os.path.join(protodir, 'attack.grandtest.devel.list'))
   add_attack_list(session,os.path.join(protodir, 'attack.grandtest.test.list'))
 
-def create_tables(verbose):
+def create_tables(args):
   """Creates all necessary tables (only to be used at the first time)"""
 
   from sqlalchemy import create_engine
-  engine = create_engine(location(dbname()), echo=verbose)
+  engine = create_engine(args.location, echo=args.verbose)
   Client.metadata.create_all(engine)
   RealAccess.metadata.create_all(engine)
   Attack.metadata.create_all(engine)
@@ -104,28 +103,31 @@ def create_tables(verbose):
 # Driver API
 # ==========
 
-help_message = 'Creates or re-creates this database'
-
 def create(args):
-  """Central creation method."""
+  """Creates or re-creates this database"""
 
   if args.recreate: 
-    dbfile = location(dbname()).replace('sqlite:///','')
+    dbfile = args.location.replace('sqlite:///','')
     if args.verbose and os.path.exists(dbfile):
       print('unlinking %s...' % dbfile)
     if os.path.exists(dbfile): os.unlink(dbfile)
 
+  if not os.path.exists(os.path.dirname(dbfile)):
+    os.makedirs(os.path.dirname(dbfile))
+
   # the real work...
-  create_tables(args.verbose)
-  s = session(dbname(), echo=args.verbose)
+  create_tables(args)
+  s = session(args.dbname, echo=args.verbose)
   add_clients(s, args.protodir)
   add_real_lists(s, args.protodir)
   add_attack_lists(s, args.protodir)
   s.commit()
   s.close()
 
-def add_commands(parser):
+def add_command(subparsers):
   """Add specific subcommands that the action "create" can use"""
+
+  parser = subparsers.add_parser('create', help=create.__doc__)
 
   parser.add_argument('--recreate', action='store_true', default=False,
       help="If set, I'll first erase the current database")

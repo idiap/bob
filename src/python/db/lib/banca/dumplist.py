@@ -10,9 +10,9 @@ import sys
 
 # Driver API
 # ==========
-help_message = 'Dumps lists of files based on your criteria'
 
 def dumplist(args):
+  """Dumps lists of files based on your criteria"""
 
   from .query import Database
   db = Database()
@@ -35,10 +35,12 @@ def dumplist(args):
   for id, f in r.items():
     output.write('%s\n' % (f,))
 
-def add_commands(parser):
+def add_command(subparsers):
   """Add specific subcommands that the action "dumplist" can use"""
-  
+
   from argparse import SUPPRESS
+
+  parser = subparsers.add_parser('dumplist', help=dumplist.__doc__)
 
   parser.add_argument('-d', '--directory', dest="directory", default='', help="if given, this path will be prepended to every entry returned (defaults to '%(default)s')")
   parser.add_argument('-e', '--extension', dest="extension", default='', help="if given, this extension will be appended to every entry returned (defaults to '%(default)s')")
@@ -49,6 +51,5 @@ def add_commands(parser):
   parser.add_argument('-l', '--languages', dest="languages", default='', help="if given, this value will limit the output files to those belonging to the given languages. (defaults to '%(default)s')", choices=('en', ''))
   parser.add_argument('--self-test', dest="selftest", default=False,
       action='store_true', help=SUPPRESS)
-
 
   parser.set_defaults(func=dumplist) #action

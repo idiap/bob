@@ -89,6 +89,10 @@ def parse_args():
       dest="debug_build", default=False,
       help="executes all stages with lots of verbose output",
       )
+  parser.add_option("-k", "--create-databases", action="store_true",
+      dest="createdb", default=False,
+      help="issues the create database commands during the test phase",
+      )
   parser.add_option("-V", "--version", action="store", dest="version",
       default="x.y.z", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
