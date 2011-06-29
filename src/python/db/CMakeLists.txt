@@ -8,11 +8,15 @@ torch_python_install(db)
 # Installs all python scripts
 file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
-# Our test units
-#torch_python_add_test(python-db-array-pycodec-tests
-#  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_codec.py)
-
 # Test some of our scripts
+
+# Database creation can only be tested at Idiap as we have all the files in
+# the right places to create the databases (original protocol files and data).
+# To trigger the database creation, a special CMake variable needs to be set.
+# This is done once per nightly build.
+
+#torch_python_add_test(python-db-replay-create
+#  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay create --recreate)
 
 # Iris database driver and example tests
 torch_python_add_test(python-db-iris-dump
@@ -28,9 +32,6 @@ torch_python_add_test(python-db-replay-dumplist
 torch_python_add_test(python-db-replay-dumplist2
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay dumplist --class=attack
   --group=devel --support=hand --device=highdef --self-test)
-# This can only be tested at Idiap!
-#torch_python_add_test(python-db-replay-create
-#  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay create --recreate)
 
 # Our examples (run and install)
 torch_example_install("python" "io" example/iris_lda.py)
