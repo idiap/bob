@@ -8,6 +8,15 @@
 
 import os, sys
 
+class null(object):
+  """A look-alike stream that discards the input"""
+
+  def write(self, s):
+    pass
+  
+  def flush(self):
+    pass
+
 def location(dbname):
   """Returns the location of the database. The location of the database, by
   default, is the directory containing the database library. If the environment
