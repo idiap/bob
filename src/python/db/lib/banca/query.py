@@ -60,10 +60,23 @@ class Database(object):
           filter(Client.gender.in_(gender)).\
           filter(Client.language.in_(language)).\
           order_by(Client.id)
-    retval = {'clients': [] }
+    retval = []
     for id in [k.id for k in q]: 
-      retval['clients'].append(id)
+      retval.append(id)
     return retval
+
+  def models(self, groups=None):
+    """Returns a set of models for the specific query by the user.
+
+    Keyword Parameters:
+
+    groups
+      The groups to which the subjects attached to the models belong ("g1", "g2", "wm")
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.clients(groups)
 
   def files(self, directory=None, extension=None, protocol=None,
       purposes=None, client_ids=None, groups=None, languages=None,
@@ -86,10 +99,10 @@ class Database(object):
       with several of them. If 'None' is given (this is the default), it is 
       considered the same as a tuple with all possible values.
 
-    client_ids
-      Only retrieves the files for the provided list of client ids (claimed 
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
       client id).  If 'None' is given (this is the default), no filter over 
-      the client_ids is performed.
+      the model_ids is performed.
 
     groups
       One of the groups ("g1", "g2", "wm") or a tuple with several of them. 
