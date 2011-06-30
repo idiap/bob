@@ -49,6 +49,7 @@ def add_command(subparsers):
   # TODO: client_ids
   parser.add_argument('-g', '--groups', dest="groups", default='', help="if given, this value will limit the output files to those belonging to a particular protocolar group. (defaults to '%(default)s')", choices=('g1', 'g2', 'wm', ''))
   parser.add_argument('-l', '--languages', dest="languages", default='', help="if given, this value will limit the output files to those belonging to the given languages. (defaults to '%(default)s')", choices=('en', ''))
+  parser.add_argument('-c', '--classes', dest="classes", default='', help="if given, this value will limit the output files to those belonging to the given classes. (defaults to '%(default)s')", choices=('client', 'impostor', ''))
   parser.add_argument('--self-test', dest="selftest", default=False,
       action='store_true', help=SUPPRESS)
 

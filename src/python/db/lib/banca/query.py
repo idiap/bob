@@ -66,7 +66,8 @@ class Database(object):
     return retval
 
   def files(self, directory=None, extension=None, protocol=None,
-      purposes=None, client_ids=None, groups=None, languages=None):
+      purposes=None, client_ids=None, groups=None, languages=None,
+      classes=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -101,6 +102,10 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
+    classes
+      The classes (types of accesses) to be retrieved ('client', 'impostor') 
+      or a tuple with several of them. If 'None' is given (this is the 
+      default), it is considered the same as a tuple with all possible values.
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
@@ -127,11 +132,13 @@ class Database(object):
     VALID_PURPOSES = ('enrol', 'probe', 'world')
     VALID_GROUPS = ('g1', 'g2', 'wm')
     VALID_LANGUAGES = ('en', 'fr', 'sp')
+    VALID_CLASSES = ('client', 'impostor')
 
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     languages = self.__check_validity__(languages, "language", VALID_LANGUAGES)
+    classes = self.__check_validity__(classes, "class", VALID_CLASSES)
     retval = {}
     
     if 'wm' in groups and 'world' in purposes:
@@ -171,24 +178,47 @@ class Database(object):
         for k in q:
           retval[k.id] = make_path(k.path, directory, extension)
       if('probe' in purposes):
-        if not client_ids:
-          q = self.session.query(File).join(Client).join(Session).join(Protocol).\
-                filter(Client.sgroup.in_(groups)).\
-                filter(Client.language.in_(languages)).\
-                filter(Protocol.name.in_(protocol)).\
-                filter(or_(Protocol.purpose == 'probe', and_(File.claimed_id != File.real_id, Protocol.purpose == 'probeImpostor'))).\
-                order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
-        else:
-          q = self.session.query(File).join(Client).join(Session).join(Protocol).\
-                filter(File.claimed_id.in_(client_ids)).\
-                filter(Client.sgroup.in_(groups)).\
-                filter(Client.language.in_(languages)).\
-                filter(Protocol.name.in_(protocol)).\
-                filter(or_(Protocol.purpose == 'probe', and_(File.claimed_id != File.real_id, Protocol.purpose == 'probeImpostor'))).\
-                order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
-        for k in q:
-          retval[k.id] = make_path(k.path, directory, extension)
-
+        if('client' in classes):
+          if not client_ids:
+            q = self.session.query(File).join(Client).join(Session).join(Protocol).\
+                  filter(File.claimed_id == File.real_id).\
+                  filter(Client.sgroup.in_(groups)).\
+                  filter(Client.language.in_(languages)).\
+                  filter(Protocol.name.in_(protocol)).\
+                  filter(Protocol.purpose == 'probe').\
+                  order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
+          else:
+            q = self.session.query(File).join(Client).join(Session).join(Protocol).\
+                  filter(File.claimed_id.in_(client_ids)).\
+                  filter(File.claimed_id == File.real_id).\
+                  filter(Client.sgroup.in_(groups)).\
+                  filter(Client.language.in_(languages)).\
+                  filter(Protocol.name.in_(protocol)).\
+                  filter(Protocol.purpose == 'probe').\
+                  order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
+          for k in q:
+            retval[k.id] = make_path(k.path, directory, extension)
+        if('impostor' in classes):
+          if not client_ids:
+            q = self.session.query(File).join(Client).join(Session).join(Protocol).\
+                  filter(File.claimed_id != File.real_id).\
+                  filter(Client.sgroup.in_(groups)).\
+                  filter(Client.language.in_(languages)).\
+                  filter(Protocol.name.in_(protocol)).\
+                  filter(or_(Protocol.purpose == 'probe', Protocol.purpose == 'probeImpostor')).\
+                  order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
+          else:
+            q = self.session.query(File).join(Client).join(Session).join(Protocol).\
+                  filter(File.claimed_id.in_(client_ids)).\
+                  filter(File.claimed_id != File.real_id).\
+                  filter(Client.sgroup.in_(groups)).\
+                  filter(Client.language.in_(languages)).\
+                  filter(Protocol.name.in_(protocol)).\
+                  filter(or_(Protocol.purpose == 'probe', Protocol.purpose == 'probeImpostor')).\
+                  order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
+          for k in q:
+            retval[k.id] = make_path(k.path, directory, extension)
+        
     return retval
 
   # TODO: dictionary interface
