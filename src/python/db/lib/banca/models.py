@@ -16,7 +16,7 @@ class Client(Base):
   
   id = Column(Integer, primary_key=True)
   gender = Column(Enum('m','f'))
-  sgroup = Column(Enum('g1','g2','wm')) # do NOT use group (SQL keyword)
+  sgroup = Column(Enum('g1','g2','world')) # do NOT use group (SQL keyword)
   language = Column(Enum('en','fr','sp'))
 
   def __init__(self, id, gender, group, language):

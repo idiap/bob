@@ -36,7 +36,7 @@ class Database(object):
     Keyword Parameters:
 
     groups
-      The groups to which the clients belong ("g1", "g2", "wm")
+      The groups to which the clients belong ("g1", "g2", "world")
 
     gender
       The genders to which the clients belong ("f", "m")
@@ -49,7 +49,7 @@ class Database(object):
     properties.
     """
 
-    VALID_GROUPS = ('g1', 'g2', 'wm')
+    VALID_GROUPS = ('g1', 'g2', 'world')
     VALID_GENDERS = ('m', 'f')
     VALID_LANGUAGES = ('en',)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
@@ -74,7 +74,7 @@ class Database(object):
       One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
     
     groups
-      The groups to which the subjects attached to the models belong ("g1", "g2", "wm")
+      The groups to which the subjects attached to the models belong ("g1", "g2", "world")
 
     Returns: A list containing all the model ids belonging to the given group.
     """
@@ -98,9 +98,10 @@ class Database(object):
       One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
 
     purposes
-      The purposes required to be retrieved ("enrol", "probe", "world") or a tuple
+      The purposes required to be retrieved ("enrol", "probe") or a tuple
       with several of them. If 'None' is given (this is the default), it is 
-      considered the same as a tuple with all possible values.
+      considered the same as a tuple with all possible values. This field is
+      ignored for the data from the "world" group.
 
     model_ids
       Only retrieves the files for the provided list of model ids (claimed 
@@ -108,7 +109,7 @@ class Database(object):
       the model_ids is performed.
 
     groups
-      One of the groups ("g1", "g2", "wm") or a tuple with several of them. 
+      One of the groups ("g1", "g2", "world") or a tuple with several of them. 
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
@@ -145,8 +146,8 @@ class Database(object):
       return stem + extension
 
     VALID_PROTOCOLS = ('Mc', 'Md', 'Ma', 'Ud', 'Ua', 'P', 'G')
-    VALID_PURPOSES = ('enrol', 'probe', 'world')
-    VALID_GROUPS = ('g1', 'g2', 'wm')
+    VALID_PURPOSES = ('enrol', 'probe')
+    VALID_GROUPS = ('g1', 'g2', 'world')
     VALID_LANGUAGES = ('en', 'fr', 'sp')
     VALID_CLASSES = ('client', 'impostor')
 
@@ -157,16 +158,16 @@ class Database(object):
     classes = self.__check_validity__(classes, "class", VALID_CLASSES)
     retval = {}
     
-    if 'wm' in groups and 'world' in purposes:
+    if 'world' in groups:
       if not client_ids:
         q = self.session.query(File).join(Client).\
-              filter(Client.sgroup == 'wm').\
+              filter(Client.sgroup == 'world').\
               filter(Client.language.in_(languages)).\
               order_by(File.real_id, File.session_id, File.claimed_id, File.shot)
       else:
         q = self.session.query(File).join(Client).\
               filter(File.claimed_id.in_(client_ids)).\
-              filter(Client.sgroup == 'wm').\
+              filter(Client.sgroup == 'world').\
               filter(Client.language.in_(languages)).\
               order_by(File.real_id, File.session_id, File.claimed_id, File.shot) 
       for k in q:
@@ -295,7 +296,7 @@ class Database(object):
 
     # Add world data if required
     if 'world' in purpose:
-      q = self.session.query(File).join(Client).filter(File.real_id == Client.id).filter(Client.sgroup == 'wm').order_by(File.real_id, File.session_id, File.claimed_id, File.shot)
+      q = self.session.query(File).join(Client).filter(File.real_id == Client.id).filter(Client.sgroup == 'world').order_by(File.real_id, File.session_id, File.claimed_id, File.shot)
       for k in q: 
         if not str(k.claimed_id) in retval['world']:
           retval['world'][str(k.claimed_id)] = {'client': {}, 'impostor': {} }

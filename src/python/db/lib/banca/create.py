@@ -20,6 +20,8 @@ def add_files(session, imagedir):
 
     v = os.path.splitext(os.path.basename(filename))[0].split('_')
     if not (v[0] in client_dict):
+      if (v[2] == 'wm'):
+        v[2] = 'world'
       session.add(Client(int(v[0]), v[1], v[2], v[5]))
       client_dict[v[0]] = True
     session_id = int(v[3].split('s')[1])
