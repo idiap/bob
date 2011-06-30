@@ -153,6 +153,8 @@ def cmake(option):
     cmake_options['-DTORCH_%s' % option.build_block.upper()] = 'ON'
   if option.createdb:
     cmake_options['-DTORCH_CREATE_DATABASES'] = 'ON'
+  else:
+    cmake_options['-DTORCH_CREATE_DATABASES'] = 'OFF'
   cmdline = ['cmake']
   if option.debug_build: cmdline.append('--debug-output')
   for k,v in cmake_options.items(): cmdline.append('%s=%s' % (k, v))
