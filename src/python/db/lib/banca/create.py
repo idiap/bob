@@ -127,8 +127,9 @@ def create_tables(args):
 def create(args):
   """Creates or re-creates this database"""
 
+  dbfile = args.location.replace('sqlite:///','')
+
   if args.recreate: 
-    dbfile = args.location.replace('sqlite:///','')
     if args.verbose and os.path.exists(dbfile):
       print('unlinking %s...' % dbfile)
     if os.path.exists(dbfile): os.unlink(dbfile)
