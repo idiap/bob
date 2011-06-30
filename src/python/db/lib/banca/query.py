@@ -65,11 +65,14 @@ class Database(object):
       retval.append(id)
     return retval
 
-  def models(self, groups=None):
+  def models(self, protocol=None, groups=None):
     """Returns a set of models for the specific query by the user.
 
     Keyword Parameters:
 
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+    
     groups
       The groups to which the subjects attached to the models belong ("g1", "g2", "wm")
 
@@ -79,8 +82,8 @@ class Database(object):
     return self.clients(groups)
 
   def files(self, directory=None, extension=None, protocol=None,
-      purposes=None, client_ids=None, groups=None, languages=None,
-      classes=None):
+      purposes=None, client_ids=None, groups=None, classes=None, 
+      languages=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -109,16 +112,16 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
+    classes
+      The classes (types of accesses) to be retrieved ('client', 'impostor') 
+      or a tuple with several of them. If 'None' is given (this is the 
+      default), it is considered the same as a tuple with all possible values.
+
     languages
       The language spoken by the clients ("en")
       TODO: only English is currently supported
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
-
-    classes
-      The classes (types of accesses) to be retrieved ('client', 'impostor') 
-      or a tuple with several of them. If 'None' is given (this is the 
-      default), it is considered the same as a tuple with all possible values.
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
