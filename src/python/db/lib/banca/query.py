@@ -30,10 +30,13 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
     return l
 
-  def clients(self, groups=None, gender=None, language=None):
+  def clients(self, protocol=None, groups=None, gender=None, language=None):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua")
 
     groups
       The groups to which the clients belong ("g1", "g2", "world")
@@ -79,10 +82,10 @@ class Database(object):
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    return self.clients(groups)
+    return self.clients(protocol, groups)
 
   def files(self, directory=None, extension=None, protocol=None,
-      purposes=None, client_ids=None, groups=None, classes=None, 
+      purposes=None, model_ids=None, groups=None, classes=None, 
       languages=None):
     """Returns a set of filenames for the specific query by the user.
 
@@ -159,14 +162,14 @@ class Database(object):
     retval = {}
     
     if 'world' in groups:
-      if not client_ids:
+      if not model_ids:
         q = self.session.query(File).join(Client).\
               filter(Client.sgroup == 'world').\
               filter(Client.language.in_(languages)).\
               order_by(File.real_id, File.session_id, File.claimed_id, File.shot)
       else:
         q = self.session.query(File).join(Client).\
-              filter(File.claimed_id.in_(client_ids)).\
+              filter(File.claimed_id.in_(model_ids)).\
               filter(Client.sgroup == 'world').\
               filter(Client.language.in_(languages)).\
               order_by(File.real_id, File.session_id, File.claimed_id, File.shot) 
@@ -175,7 +178,7 @@ class Database(object):
     
     if ('g1' in groups or 'g2' in groups):
       if('enrol' in purposes):
-        if not client_ids:
+        if not model_ids:
           q = self.session.query(File).join(Client).join(Session).join(Protocol).\
                 filter(File.claimed_id == File.real_id).\
                 filter(Client.sgroup.in_(groups)).\
@@ -186,7 +189,7 @@ class Database(object):
         else:
           q = self.session.query(File).join(Client).join(Session).join(Protocol).\
                 filter(File.claimed_id == File.real_id).\
-                filter(File.claimed_id.in_(client_ids)).\
+                filter(File.claimed_id.in_(model_ids)).\
                 filter(Client.sgroup.in_(groups)).\
                 filter(Client.language.in_(languages)).\
                 filter(Protocol.name.in_(protocol)).\
@@ -196,7 +199,7 @@ class Database(object):
           retval[k.id] = make_path(k.path, directory, extension)
       if('probe' in purposes):
         if('client' in classes):
-          if not client_ids:
+          if not model_ids:
             q = self.session.query(File).join(Client).join(Session).join(Protocol).\
                   filter(File.claimed_id == File.real_id).\
                   filter(Client.sgroup.in_(groups)).\
@@ -206,7 +209,7 @@ class Database(object):
                   order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
           else:
             q = self.session.query(File).join(Client).join(Session).join(Protocol).\
-                  filter(File.claimed_id.in_(client_ids)).\
+                  filter(File.claimed_id.in_(model_ids)).\
                   filter(File.claimed_id == File.real_id).\
                   filter(Client.sgroup.in_(groups)).\
                   filter(Client.language.in_(languages)).\
@@ -216,7 +219,7 @@ class Database(object):
           for k in q:
             retval[k.id] = make_path(k.path, directory, extension)
         if('impostor' in classes):
-          if not client_ids:
+          if not model_ids:
             q = self.session.query(File).join(Client).join(Session).join(Protocol).\
                   filter(File.claimed_id != File.real_id).\
                   filter(Client.sgroup.in_(groups)).\
@@ -226,7 +229,7 @@ class Database(object):
                   order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
           else:
             q = self.session.query(File).join(Client).join(Session).join(Protocol).\
-                  filter(File.claimed_id.in_(client_ids)).\
+                  filter(File.claimed_id.in_(model_ids)).\
                   filter(File.claimed_id != File.real_id).\
                   filter(Client.sgroup.in_(groups)).\
                   filter(Client.language.in_(languages)).\
