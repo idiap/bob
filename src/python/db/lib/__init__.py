@@ -9,5 +9,6 @@ that can be used in Biometry, Machine Learning or Pattern Classification."""
 import iris
 import replay
 import banca
+import biosecure
 
 __all__ = dir()

@@ -28,7 +28,13 @@ if (TORCH_CREATE_DATABASES)
   set_property(TEST python-db-banca-create APPEND PROPERTY ENVIRONMENT
   "TORCH_DB_DIR=${CMAKE_INSTALL_PREFIX}/share/database")
 
-  set(DATABASE_TEST_DEPENDENCIES "python-db-replay-create;python-db-banca-create")
+  # Biosecure Database
+  torch_python_add_test(python-db-biosecure-create
+    ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure create --recreate)
+  set_property(TEST python-db-banca-create APPEND PROPERTY ENVIRONMENT
+  "TORCH_DB_DIR=${CMAKE_INSTALL_PREFIX}/share/database")
+
+  set(DATABASE_TEST_DEPENDENCIES "python-db-replay-create;python-db-banca-create;python-db-biosecure-create")
 
 else (TORCH_CREATE_DATABASES)
 
@@ -42,7 +48,11 @@ else (TORCH_CREATE_DATABASES)
     ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca download
     --url=${TORCH_DATABASE_URL} --version=${TORCH_DATABASE_VERSION})
 
-  set(DATABASE_TEST_DEPENDENCIES "python-db-replay-download;python-db-banca-download")
+  torch_python_add_test(python-db-biosecure-download
+    ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure download
+    --url=${TORCH_DATABASE_URL} --version=${TORCH_DATABASE_VERSION})
+
+  set(DATABASE_TEST_DEPENDENCIES "python-db-replay-download;python-db-banca-download;python-db-biosecure-download")
 
 endif (TORCH_CREATE_DATABASES)
 
@@ -64,6 +74,30 @@ torch_python_add_test(python-db-replay-dumplist2
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay dumplist --class=attack
   --group=devel --support=hand --device=highdef --self-test)
 set_property(TEST python-db-replay-dumplist2 APPEND PROPERTY DEPENDS 
+  ${DATABASE_TEST_DEPENDENCIES})
+
+# BANCA database driver tests.
+# ######### Notice test dependencies!! ##################
+torch_python_add_test(python-db-banca-dumplist
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca dumplist --self-test)
+set_property(TEST python-db-banca-dumplist APPEND PROPERTY DEPENDS
+  ${DATABASE_TEST_DEPENDENCIES})
+torch_python_add_test(python-db-banca-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca dumplist --class=client
+  --group=g1 --purpose=enrol --self-test)
+set_property(TEST python-db-banca-dumplist2 APPEND PROPERTY DEPENDS 
+  ${DATABASE_TEST_DEPENDENCIES})
+
+# Biosecure database driver tests.
+# ######### Notice test dependencies!! ##################
+torch_python_add_test(python-db-biosecure-dumplist
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure dumplist --self-test)
+set_property(TEST python-db-biosecure-dumplist APPEND PROPERTY DEPENDS
+  ${DATABASE_TEST_DEPENDENCIES})
+torch_python_add_test(python-db-biosecure-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure dumplist --class=client
+  --group=g1 --purpose=enrol --self-test)
+set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS 
   ${DATABASE_TEST_DEPENDENCIES})
 
 # Our examples (run and install)
