@@ -217,7 +217,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+      One of the Biosecure protocols ('ca0', 'caf', 'wc').
 
     purpose
       The purpose required to be retrieved ("enrol", "probe", "world") or a tuple
