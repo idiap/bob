@@ -102,6 +102,12 @@ def parse_args(argv):
                     default=default_externals,
                     help="Prepends external paths containing library installations to the list of searched paths. Please note that this list is taken backwards. (defaults to %default)."
                     )
+  parser.add_option("-E", "--no-externals",
+                    action="store_true",
+                    dest="no_externals",
+                    default=False,
+                    help="If set, no externals will be taken into consideration, even if there is a default."
+                    )
   parser.add_option("-v", "--verbose",
                     action="count",
                     default=0,
@@ -129,6 +135,8 @@ def parse_args(argv):
                     
 
   options, arguments = parser.parse_args(argv[1:])
+  if options.no_externals: options.externals = []
+  del options.no_externals
 
   if options.help:
     parser.print_help()
