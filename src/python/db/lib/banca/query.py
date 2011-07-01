@@ -133,15 +133,6 @@ class Database(object):
     wish to save processing results later on.
     """
 
-    def check_validity(l, obj, valid):
-      """Checks validity of user input data against a set of valid values"""
-      if not l: return valid
-      elif isinstance(l, str): return check_validity((l,), obj, valid)
-      for k in l:
-        if k not in valid:
-          raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
-      return l
-
     def make_path(stem, directory, extension):
       import os
       if not extension: extension = ''
