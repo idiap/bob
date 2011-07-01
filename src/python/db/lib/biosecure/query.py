@@ -184,7 +184,7 @@ class Database(object):
           for k in q:
             retval[k[0].id] = make_path(k[0].path, directory, extension)
         if('impostor' in classes):
-          if not model_ids or len(model_ids>1):
+          if(not model_ids or len(model_ids)>1):
             q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
                   filter(Client.sgroup.in_(groups)).\
                   filter(Protocol.name == ProtocolPurpose.name).\

@@ -5,7 +5,7 @@
 """Table models and functionality for the Biosecure database.
 """
 
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, not_
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
