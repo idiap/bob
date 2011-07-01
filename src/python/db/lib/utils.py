@@ -141,9 +141,9 @@ def print_location(options):
   """Prints the current location of the database SQL file."""
   
   if options.with_protocol:
-    print(options.location + '\n')
+    print(options.location)
   else:
-    print(options.location.replace('sqlite:///','') + '\n')
+    print(options.location.replace('sqlite:///',''))
 
 def location_command(subparsers):
   """Adds a new location subcommand to your parser"""
@@ -158,9 +158,9 @@ def copy(options):
   """Copies the database to a given directory."""
 
   import shutil
-
-  if not os.path.exists(options.directory): os.makedirs(options.directory)
-  dest = os.path.join(options.directory, dbname + '.sql3')
+  d = options.directory[0]
+  if not os.path.exists(d): os.makedirs(d)
+  dest = os.path.join(d, options.dbname + '.sql3')
   shutil.copy2(options.location.replace('sqlite:///',''), dest)
 
 def copy_command(subparsers):
@@ -168,3 +168,11 @@ def copy_command(subparsers):
   parser = subparsers.add_parser('copy', help=copy.__doc__)
   parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
   parser.set_defaults(func=copy)
+
+def standard_commands(subparsers):
+  """Adds all standard commands to databases that can respond to them."""
+
+  dbshell_command(subparsers)
+  download_command(subparsers)
+  location_command(subparsers)
+  copy_command(subparsers)

@@ -8,14 +8,6 @@
 import os
 import sys
 
-def dbshell(options):
-  """Runs a DB interactive shell for the user."""
-  
-  from ..utils import dbshell as dbs
-  from . import dbname
-
-  sys.exit(dbs(dbname()))
-
 def add_commands(parser):
   """Adds my subset of options and arguments to the top-level parser. For
   details on syntax, please consult:
@@ -28,7 +20,7 @@ def add_commands(parser):
   """
   
   from . import dbname
-  from ..utils import location, dbshell_command, download_command
+  from ..utils import location, standard_commands
   from . import __doc__ as dbdoc
   from argparse import RawDescriptionHelpFormatter
 
@@ -44,8 +36,7 @@ def add_commands(parser):
   subparsers = top_level.add_subparsers(title="subcommands")
 
   # attach standard commands
-  dbshell_command(subparsers)
-  download_command(subparsers)
+  standard_commands(subparsers)
 
   # get the "create" action from a submodule
   from .create import add_command as create_command
