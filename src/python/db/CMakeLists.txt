@@ -31,7 +31,7 @@ if (TORCH_CREATE_DATABASES)
   # Biosecure Database
   torch_python_add_test(python-db-biosecure-create
     ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure create --recreate)
-  set_property(TEST python-db-banca-create APPEND PROPERTY ENVIRONMENT
+  set_property(TEST python-db-biosecure-create APPEND PROPERTY ENVIRONMENT
   "TORCH_DB_DIR=${CMAKE_INSTALL_PREFIX}/share/database")
 
   set(DATABASE_TEST_DEPENDENCIES "python-db-replay-create;python-db-banca-create;python-db-biosecure-create")
