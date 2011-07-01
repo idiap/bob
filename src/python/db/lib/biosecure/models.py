@@ -5,7 +5,7 @@
 """Table models and functionality for the Biosecure database.
 """
 
-from sqlalchemy import Column, Integer, Enum, String, ForeignKey, or_, and_
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -14,6 +14,7 @@ Base = declarative_base()
 class Client(Base):
   __tablename__ = 'client'
   
+  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
   id = Column(Integer, primary_key=True)
   sgroup = Column(Enum('dev','eval','world')) # do NOT use group (SQL keyword)
 
@@ -64,6 +65,7 @@ class Protocol(Base):
 class ProtocolPurpose(Base):
   __tablename__ = 'protocolPurpose'
   
+  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
   id = Column(Integer, primary_key=True)
   name = Column(String(4), ForeignKey('protocol.name')) # for SQL
   sgroup = Column(Enum('dev','eval','world')) # DO NOT USE GROUP (LIKELY KEYWORD)
