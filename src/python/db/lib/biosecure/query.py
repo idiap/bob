@@ -70,6 +70,55 @@ class Database(object):
 
     return self.clients(protocol, groups)
 
+  def getClientIdFromModelId(self, model_id):
+    """Returns the client_id attached to the given model_id
+    
+    Keyword Parameters:
+
+    model_id
+      The model_id to consider
+
+    Returns: The client_id attached to the given model_id
+    """
+    return model_id
+
+  def getClientIdFromFileId(self, file_id):
+    """Returns the client_id (real client id) attached to the given file_id
+    
+    Keyword Parameters:
+
+    file_id
+      The file_id to consider
+
+    Returns: The client_id attached to the given file_id
+    """
+    q = self.session.query(File).\
+          filter(File.id == file_id)
+    if q.count() !=1:
+      #throw exception?
+      return None
+    else:
+      return q.first().client_id
+
+  def getInternalPathFromFileId(self, file_id):
+    """Returns the unique "internal path" attached to the given file_id
+    
+    Keyword Parameters:
+
+    file_id
+      The file_id to consider
+
+    Returns: The internal path attached to the given file_id
+    """
+    q = self.session.query(File).\
+          filter(File.id == file_id)
+    if q.count() !=1:
+      #throw exception?
+      return None
+    else:
+      return q.first().path
+
+
   def files(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None):
     """Returns a set of filenames for the specific query by the user.
