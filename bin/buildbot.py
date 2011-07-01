@@ -101,7 +101,7 @@ def parse_args():
       default="x.y.z", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
       )
-  parser.add_option("-dry-run", action="store_true", dest="dryrun",
+  parser.add_option("--dry-run", action="store_true", dest="dryrun",
       default=False, help="If set, doesn't execute the action, just test."
       )
   parser.add_option("-T", "--tests-regex", action="store", dest="tregex",
