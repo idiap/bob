@@ -136,3 +136,35 @@ def download_command(subparsers):
   parser.add_argument('--verbose', dest="verbose", default=False,
       action='store_true', help="produces more output while downloading")
   parser.set_defaults(func=download)
+
+def print_location(options):
+  """Prints the current location of the database SQL file."""
+  
+  if options.with_protocol:
+    print(options.location + '\n')
+  else:
+    print(options.location.replace('sqlite:///','') + '\n')
+
+def location_command(subparsers):
+  """Adds a new location subcommand to your parser"""
+
+  parser = subparsers.add_parser('location', help=print_location.__doc__)
+  parser.add_argument('--with-protocol', dest="with_protocol", 
+      default=False, action='store_true', 
+      help="prints the filepath or directory leading to the database with the specific database protocol prepended")
+  parser.set_defaults(func=print_location)
+
+def copy(options):
+  """Copies the database to a given directory."""
+
+  import shutil
+
+  if not os.path.exists(options.directory): os.makedirs(options.directory)
+  dest = os.path.join(options.directory, dbname + '.sql3')
+  shutil.copy2(options.location.replace('sqlite:///',''), dest)
+
+def copy_command(subparsers):
+  
+  parser = subparsers.add_parser('copy', help=copy.__doc__)
+  parser.add_argument('directory', help="sets the directory to which the database will be copied to", nargs=1)
+  parser.set_defaults(func=copy)

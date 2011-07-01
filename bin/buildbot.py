@@ -93,9 +93,16 @@ def parse_args():
       dest="createdb", default=False,
       help="issues the create database commands during the test phase",
       )
+  parser.add_option("-K", "--database-prefix", action="store",
+      dest="db_prefix", default=None, metavar="DIR",
+      help="if set, will copy the download or created databases to the given path location.",
+      )
   parser.add_option("-V", "--version", action="store", dest="version",
       default="x.y.z", metavar="VERSION",
       help="if it makes sense, choose a version name that will be used to mark the project documentation, otherwise, leave it unassigned (defaults to '%default')"
+      )
+  parser.add_option("-dry-run", action="store_true", dest="dryrun",
+      default=False, help="If set, doesn't execute the action, just test."
       )
   parser.add_option("-T", "--tests-regex", action="store", dest="tregex",
       default="", metavar="REGEXP",
@@ -132,8 +139,10 @@ def parse_args():
   options.install_prefix = adm.build.untemplatize_path(options.install_prefix,
       options)
   options.doc_prefix = options.doc_prefix.strip()
-  options.doc_prefix = adm.build.untemplatize_path(options.doc_prefix,
-      options)
+  options.doc_prefix = adm.build.untemplatize_path(options.doc_prefix, options)
+  if options.db_prefix:
+    options.db_prefix = options.db_prefix.strip()
+    options.db_prefix = adm.build.untemplatize_path(options.db_prefix, options)
 
   #some fixing
   if options.install_prefix and options.install_prefix[0] != os.path.sep:

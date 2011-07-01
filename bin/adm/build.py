@@ -27,38 +27,6 @@ CURRENT_LOGGING_LEVEL = 2
 logging.basicConfig(level=LOGGING_LEVELS[CURRENT_LOGGING_LEVEL], 
                     format="%(asctime)s | %(levelname)s | %(message)s")
 
-def get_headers(dir, excludes):
-  """Gets all files ending in '.h' from the directory, recursively, except for
-  what is defined in the input argument "excludes"."""
-  retval = []
-  for (path, dirs, files) in os.walk(dir):
-    for f in fnmatch.filter(files, '*.h'):
-      if f in excludes: continue
-      sub = path.replace(dir+os.sep, '')
-      retval.append(os.path.join(sub, f))
-  return retval
-
-def write_header(option):
-  """Writes a new header file that incorporates all existing ones."""
-  scandir = os.path.join(option.install_prefix, 'include', 'torch')
-  if not os.path.exists(scandir): os.makedirs(scandir)
-  output = os.path.join(scandir, 'torch5spro.h')
-  excludes = [
-              os.path.basename(output),
-              'THTensorGen.h', 
-              'THStorageGen.h', 
-              'TensorGen.h',
-             ]
-  headers = get_headers(scandir, excludes)
-  f = open(output, 'wt')
-  f.write('/* This file was automatically generated -- DO NOT CHANGE IT */\n')
-  f.write('/* Date: %s */\n\n' % time.asctime())
-  f.write('#ifndef __TORCH5SPROC_H__\n')
-  f.write('#define __TORCH5SPROC_H__\n\n')
-  f.writelines(['#include "%s"\n' % k for k in headers])
-  f.write('\n#endif /* __TORCH5SPROC_H__ */\n')
-  f.close()
-
 def increase_verbosity(option, opt, value, parser):
   """Increases the current verbosity level for the logging module. 
   
@@ -124,6 +92,10 @@ def cmake(option):
   
   If there is a problem, throw a RuntimeError.
   """
+  if (option.dryrun):
+    logging.info("Dry run: action 'cmake' will not be executed")
+    return
+
   logging.debug('Running cmake...')
   
   if os.path.exists(option.build_prefix) and hasattr(option, "cleanup") and \
@@ -146,31 +118,46 @@ def cmake(option):
   cmake_options['-DCMAKE_INSTALL_PREFIX'] = option.install_prefix
   cmake_options['-DTORCH_LINKAGE'] = 'dynamic'
   if option.static_linkage: cmake_options['-DTORCH_LINKAGE'] = 'static'
+  
   if option.build_block == 'all':
     cmake_options['-DTORCH_CXX'] = 'ON'
     cmake_options['-DTORCH_PYTHON'] = 'ON'
   else: 
     cmake_options['-DTORCH_%s' % option.build_block.upper()] = 'ON'
+  
   if option.createdb:
     cmake_options['-DTORCH_CREATE_DATABASES'] = 'ON'
   else:
     cmake_options['-DTORCH_CREATE_DATABASES'] = 'OFF'
+
+  if option.db_prefix:
+    cmake_options['-DTORCH_DB_INSTALL_PREFIX'] = option.db_prefix
+  else:
+    cmake_options['-DTORCH_DB_INSTALL_PREFIX'] = 'OFF'
+
   cmdline = ['cmake']
   if option.debug_build: cmdline.append('--debug-output')
+  
   for k,v in cmake_options.items(): cmdline.append('%s=%s' % (k, v))
   cmdline.append(option.source_dir)
+  
   if hasattr(option, "log_prefix"):
     status = run(cmdline, option.save_output, option.log_prefix, cmdline[0])
   else:
     status = run(cmdline)
   if status != 0:
     raise RuntimeError('** ERROR: "cmake" did not work as expected.')
+  
   logging.debug('Finished running cmake.')
 
 def install(option):
   """Runs "make install" on the 'option.build_prefix'. If there is a problem, 
   throws RuntimeError.
   """
+  if (option.dryrun):
+    logging.info("Dry run: action 'install' will not be executed")
+    return
+
   import shutil
 
   logging.debug('Running make install...')
@@ -205,6 +192,10 @@ def make(option, target="all"):
   throws RuntimeError.
   """
 
+  if (option.dryrun):
+    logging.info("Dry run: action 'make' for target '%s' will not be executed" % target)
+    return
+
   logging.debug('Running make %s...' % target)
 
   os.chdir(option.build_prefix)
@@ -228,6 +219,10 @@ def ctest(option):
   throws RuntimeError.
   """
 
+  if (option.dryrun):
+    logging.info("Dry run: action 'ctest' will not be executed")
+    return
+
   logging.debug('Running ctest...')
 
   os.chdir(option.build_prefix)
@@ -248,6 +243,10 @@ def ctest(option):
 def documentation(option):
   """Builds the project documentation using doxygen and sphinx. If there is
   a problem, throws a RuntimeError."""
+  
+  if (option.dryrun):
+    logging.info("Dry run: action 'documentation' will not be executed")
+    return
 
   logging.debug('Building documentation...')
 
@@ -267,6 +266,10 @@ def documentation(option):
 def doxygen(option):
   """Builds the project documentation using doxygen. If there is a problem,
   throws a RuntimeError."""
+
+  if (option.dryrun):
+    logging.info("Dry run: action 'doxygen' will not be executed")
+    return
 
   logging.debug('Running doxygen...')
 
@@ -311,6 +314,10 @@ def doxygen(option):
 def sphinx(option):
   """Builds the project user guide using sphinx. If there is a problem,
   throws a RuntimeError."""
+
+  if (option.dryrun):
+    logging.info("Dry run: action 'sphinx' will not be executed")
+    return
 
   logging.debug('Running Sphinx...')
 
@@ -375,6 +382,10 @@ def sphinx(option):
 def differences(option):
   """Calculates the repository differences since the time specified."""
   
+  if (option.dryrun):
+    logging.info("Dry run: action 'differences' will not be executed")
+    return
+
   logging.debug('Running git diff...')
 
   try:
@@ -438,6 +449,10 @@ def dot(option):
   """Runs dot on the output of cmake/graphviz. Raises a RuntimeError if there
   is any problem."""
 
+  if (option.dryrun):
+    logging.info("Dry run: action 'dot' will not be executed")
+    return
+
   logging.debug('Running dot...')
 
   os.chdir(option.build_prefix)
@@ -487,6 +502,11 @@ def action(what, option, *args):
 
 def mrproper(option):
   """Completely sanitizes the build and installation areas"""
+
+  if (option.dryrun):
+    logging.info("Dry run: action 'mrproper' will not be executed")
+    return
+
   import shutil
   shutil.rmtree(option.install_prefix, ignore_errors=True)
   shutil.rmtree(option.build_prefix, ignore_errors=True)
