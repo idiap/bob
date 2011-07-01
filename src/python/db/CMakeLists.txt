@@ -83,7 +83,7 @@ torch_python_add_test(python-db-biosecure-dumplist
 set_property(TEST python-db-biosecure-dumplist APPEND PROPERTY DEPENDS
   ${python-db-biosecure-instantiation})
 torch_python_add_test(python-db-biosecure-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure dumplist --class=client --group=g1 --purpose=enrol --self-test)
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure dumplist --class=client --group=dev --purpose=enrol --self-test)
 set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS 
   ${python-db-biosecure-instantiation})
 
