@@ -21,6 +21,16 @@ class Database(object):
     # opens a session to the database - keep it open until the end
     self.session = utils.session(dbname())
 
+  def __group_replace_alias__(self, l):
+    """Replace 'dev' by 'g1' and 'eval' by 'g2' in a list of groups, and 
+       returns the new list"""
+    l = []
+    for val in l:
+      if(val == 'dev'): l.append('g1')
+      elif(val == 'eval'): l.append('g2')
+      else: l.append(val)
+    return tuple(l)
+
   def __check_validity__(self, l, obj, valid):
     """Checks validity of user input data against a set of valid values"""
     if not l: return valid
@@ -39,7 +49,8 @@ class Database(object):
       One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua")
 
     groups
-      The groups to which the clients belong ("g1", "g2", "world")
+      The groups to which the clients belong ("g1", "g2", "world").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
 
     gender
       The genders to which the clients belong ("f", "m")
@@ -52,6 +63,7 @@ class Database(object):
     properties.
     """
 
+    groups = self.__group_replace_alias__(groups)
     VALID_GROUPS = ('g1', 'g2', 'world')
     VALID_GENDERS = ('m', 'f')
     VALID_LANGUAGES = ('en',)
@@ -78,6 +90,7 @@ class Database(object):
     
     groups
       The groups to which the subjects attached to the models belong ("g1", "g2", "world")
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
 
     Returns: A list containing all the model ids belonging to the given group.
     """
@@ -163,6 +176,7 @@ class Database(object):
       One of the groups ("g1", "g2", "world") or a tuple with several of them. 
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
 
     classes
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
@@ -187,6 +201,8 @@ class Database(object):
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
 
+    type(groups)
+    groups = self.__group_replace_alias__(groups)
     VALID_PROTOCOLS = ('Mc', 'Md', 'Ma', 'Ud', 'Ua', 'P', 'G')
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('g1', 'g2', 'world')
