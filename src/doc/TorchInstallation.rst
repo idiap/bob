@@ -23,7 +23,7 @@ Platforms
 
 We maintain nightly builds and unit tests that cover the following platforms:
 
-* **Linux**: tested on Ubuntu 10.04 and it should work without problems on
+* **Linux**: tested on Ubuntu 11.04 and it should work without problems on
   other distributions as long as you satisfy the dependencies listed bellow.
 * **Mac OSX**: tested on Snow Leopard (10.6), with `MacPorts`_, but it should
   work fine on other OSX versions as well or using `Fink`_ instead.
@@ -130,7 +130,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx
 
 .. note::
 
@@ -157,7 +157,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy
+   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx
 
 .. warning::
 
