@@ -5,6 +5,7 @@
 """Table models and functionality for the Biosecure database.
 """
 
+import sqlalchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, not_
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,9 +15,8 @@ Base = declarative_base()
 class Client(Base):
   __tablename__ = 'client'
   
-  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
   id = Column(Integer, primary_key=True)
-  sgroup = Column(Enum('dev','eval','world')) # do NOT use group (SQL keyword)
+  sgroup = Column(sqlalchemy.Enum('dev','eval','world')) # do NOT use group (SQL keyword)
 
   def __init__(self, id, group):
     self.id = id
@@ -65,11 +65,10 @@ class Protocol(Base):
 class ProtocolPurpose(Base):
   __tablename__ = 'protocolPurpose'
   
-  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
   id = Column(Integer, primary_key=True)
   name = Column(String(4), ForeignKey('protocol.name')) # for SQL
-  sgroup = Column(Enum('dev','eval','world')) # DO NOT USE GROUP (LIKELY KEYWORD)
-  purpose = Column(Enum('enrol', 'probe', 'world'))
+  sgroup = Column(sqlalchemy.Enum('dev','eval','world')) # DO NOT USE GROUP (LIKELY KEYWORD)
+  purpose = Column(sqlalchemy.Enum('enrol', 'probe', 'world'))
   session = Column(Integer)
 
   # for Python

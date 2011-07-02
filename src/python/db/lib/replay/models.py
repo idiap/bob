@@ -6,7 +6,8 @@
 """Table models and functionality for the Replay Attack DB.
 """
 
-from sqlalchemy import Column, Integer, Enum, String, ForeignKey
+import sqlalchemy
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -16,7 +17,7 @@ class Client(Base):
   __tablename__ = 'client'
   
   id = Column(Integer, primary_key=True)
-  set = Column(Enum('train', 'devel', 'test'))
+  set = Column(sqlalchemy.Enum('train', 'devel', 'test'))
 
   def __init__(self, id, set):
     self.id = id
@@ -31,7 +32,7 @@ class File(Base):
   id = Column(Integer, primary_key=True)
   client_id = Column(Integer, ForeignKey('client.id')) # for SQL
   path = Column(String(100), unique=True)
-  light = Column(Enum('controlled', 'adverse'))
+  light = Column(sqlalchemy.Enum('controlled', 'adverse'))
 
   # for Python
   client = relationship(Client, backref=backref('realaccesses', order_by=id))
@@ -49,7 +50,7 @@ class RealAccess(Base):
 
   id = Column(Integer, primary_key=True)
   file_id = Column(Integer, ForeignKey('file.id')) # for SQL
-  purpose = Column(Enum('authenticate', 'enroll'))
+  purpose = Column(sqlalchemy.Enum('authenticate', 'enroll'))
   take = Column(Integer)
 
   # for Python
@@ -68,10 +69,10 @@ class Attack(Base):
 
   id = Column(Integer, primary_key=True)
   file_id = Column(Integer, ForeignKey('file.id')) # for SQL
-  attack_support = Column(Enum('fixed', 'hand'))
-  attack_device = Column(Enum('print', 'mobile', 'highdef', 'mask'))
-  sample_type = Column(Enum('video', 'photo'))
-  sample_device = Column(Enum('mobile', 'highdef'))
+  attack_support = Column(sqlalchemy.Enum('fixed', 'hand'))
+  attack_device = Column(sqlalchemy.Enum('print', 'mobile', 'highdef', 'mask'))
+  sample_type = Column(sqlalchemy.Enum('video', 'photo'))
+  sample_device = Column(sqlalchemy.Enum('mobile', 'highdef'))
 
   # for Python
   file = relationship(File, backref=backref('attack', order_by=id))

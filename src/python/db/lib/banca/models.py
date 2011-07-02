@@ -5,6 +5,7 @@
 """Table models and functionality for the BANCA database.
 """
 
+import sqlalchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,11 +15,10 @@ Base = declarative_base()
 class Client(Base):
   __tablename__ = 'client'
 
-  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
   id = Column(Integer, primary_key=True)
-  gender = Column(Enum('m','f'))
-  sgroup = Column(Enum('g1','g2','world')) # do NOT use group (SQL keyword)
-  language = Column(Enum('en','fr','sp'))
+  gender = Column(sqlalchemy.Enum('m','f'))
+  sgroup = Column(sqlalchemy.Enum('g1','g2','world')) # do NOT use group (SQL keyword)
+  language = Column(sqlalchemy.Enum('en','fr','sp'))
 
   def __init__(self, id, gender, group, language):
     self.id = id
@@ -33,9 +33,8 @@ class Client(Base):
 class Session(Base):
   __tablename__ = 'session'
   
-  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
   id = Column(Integer, primary_key=True)
-  scenario = Column(Enum('controlled','degraded','adverse'))
+  scenario = Column(sqlalchemy.Enum('controlled','degraded','adverse'))
 
   def __init__(self, id, scenario):
     self.id = id
@@ -73,11 +72,10 @@ class File(Base):
 class Protocol(Base):
   __tablename__ = 'protocol'
   
-  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
   id = Column(Integer, primary_key=True)
   session_id = Column(Integer, ForeignKey('session.id'))
-  name = Column(Enum('P','G','Mc','Md','Ma','Ud','Ua'))
-  purpose = Column(Enum('enrol','probe','probeImpostor'))
+  name = Column(sqlalchemy.Enum('P','G','Mc','Md','Ma','Ud','Ua'))
+  purpose = Column(sqlalchemy.Enum('enrol','probe','probeImpostor'))
 
   # for python
   session = relationship("Session", backref="session_protocol")
