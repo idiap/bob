@@ -93,7 +93,7 @@ def arrayset_cat(self, firstDim=False):
   In this way, to retrieve the first array of the arrayset from the resulting
   blitz::Array, you must either use:
 
-  .. code:: python
+  .. code-block:: python
 
     bz = arrayset.cat() #suppose an arrayset with shape == (4,) (1D array)
     bz[:,0] #retrieves the first array of the set if firstDim is False
