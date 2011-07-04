@@ -26,7 +26,7 @@ macro(torch_build_db dbname)
     torch_python_add_test(python-db-${dbname}-download
       ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py ${dbname} download
       --url=${TORCH_DATABASE_URL} --version=${TORCH_DATABASE_VERSION})
-    set(python-db-${dbname}-instantiation ${python-db-${dbname}-create})
+    set(python-db-${dbname}-instantiation ${python-db-${dbname}-download})
   endif (TORCH_CREATE_DATABASES)
 
   # If the copying has been set through the commandline, after creation or
