@@ -142,20 +142,3 @@ class ProtocolMultiview(Base):
   def __repr__(self):
     print "<ProtocolMultiview('%d','%d')>" % (self.camera_id, self.shot_id)
 
-class ProtocolProbeImpostorId(Base):
-  __tablename__ = 'ProtocolProbeImpostorId'
-
-  from sqlalchemy import Enum # import locally (not supported by old 10.04 Ubuntu package)
-  id = Column(Integer, primary_key=True)
-  name = Column(String(6), ForeignKey('protocolName.name'))
-  claimed_id = Column(Integer, ForeignKey('client.id')) # for SQL
-  real_id = Column(Integer, ForeignKey('client.id')) # for SQL
-
-  def __init__(self, name, claimed_id, real_id, group):
-    self.name = name
-    self.claimed_id = claimed_id
-    self.real_id = real_id
-
-  def __repr__(self):
-    return "<ProtocolProbeImpostorId('%s', '%d', '%d')>" % (self.name, self.claimed_id, self.real_id)
-
