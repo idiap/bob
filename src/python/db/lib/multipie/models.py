@@ -6,7 +6,7 @@
 """
 
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, not_
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -113,15 +113,16 @@ class Protocol(Base):
   # for Python
   protocol = relationship("ProtocolName", backref=backref("protocolName_protocol"))
 
-  def __init__(self, name, group, purpose, session_id, recording_id):
+  def __init__(self, name, group, purpose, session_id, recording_id, img_type):
     self.name = name
     self.sgroup = group
     self.purpose = purpose
     self.session_id = session_id
     self.recording_id = recording_id
+    self.img_type = img_type
 
   def __repr__(self):
-    return "<ProtocolMultiview('%s', '%s', '%s', '%d', '%d')>" % (self.name, self.sgroup, self.purpose, self.session_id, self.recording_id)
+    return "<ProtocolMultiview('%s', '%s', '%s', '%d', '%d', '%s')>" % (self.name, self.sgroup, self.purpose, self.session_id, self.recording_id, self.img_type)
 
 class ProtocolMultiview(Base):
   __tablename__ = 'protocolMultiview'

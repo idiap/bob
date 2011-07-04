@@ -134,7 +134,7 @@ class Database(object):
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
 
-    VALID_PROTOCOLS = ('Mc', )
+    VALID_PROTOCOLS = ('M', )
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
@@ -147,52 +147,105 @@ class Database(object):
     
     if 'world' in groups:
       # Highres
-      """
-      if not model_ids:
-        q = self.session.query(FileHighres, ProtocolHighres, ProtocolClientGroup).\
-              filter(and_(ProtocolHighres.name.in_(protocol), ProtocolHighres.sgroup == 'world', \
-                          ProtocolHighres.session_id == FileHighres.session_id, ProtocolHighres.shot == FileHighres.shot)).\
-              join(Client).\
-              filter(and_(Client.id == ProtocolClientGroup.client_id, ProtocolClientGroup.sgroup == 'world',\
-                          ProtocolClientGroup.name.in_(protocol), FileHighres.client_id == ProtocolClientGroup.client_id)).\
-              order_by(FileHighres.client_id, FileHighres.session_id, FileHighres.shot)
-      else:
-        q = self.session.query(FileHighres, ProtocolHighres, ProtocolClientGroup).\
-              filter(and_(ProtocolHighres.name.in_(protocol), ProtocolHighres.sgroup == 'world', \
-                          ProtocolHighres.session_id == FileHighres.session_id, ProtocolHighres.shot == FileHighres.shot)).\
-              join(Client).\
-              filter(and_(Client.id.in_(model_ids), Client.id == ProtocolClientGroup.client_id, ProtocolClientGroup.sgroup == 'world',\
-                          ProtocolClientGroup.name.in_(protocol), FileHighres.client_id == ProtocolClientGroup.client_id)).\
-              order_by(FileHighres.client_id, FileHighres.session_id, FileHighres.shot)
-      for k in q:
-        retval[k[0].id] = make_path(k[0].path, directory, extension)
-      """
+      # TODO
+
       # Multiview
       if not model_ids:
-        q = self.session.query(File, ProtocolMultiview).join(Client).join(FileMultiview).\
-              filter(and_(ProtocolMultiview.name.in_(protocol), ProtocolMultiview.sgroup == 'world', \
-                          ProtocolMultiview.session_id == File.session_id, ProtocolMultiview.shot_id == FileMultiview.shot_id, \
-                          ProtocolMultiview.recording_id == File.recording_id, ProtocolMultiview.camera_id == FileMultiview.camera_id)).\
+        q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
               filter(Client.sgroup == 'world').\
+              filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup == 'world',\
+                          Protocol.img_type == 'multiview', Protocol.session_id == File.session_id, 
+                          Protocol.recording_id == File.recording_id)).\
+              filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                          ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
               order_by(File.client_id, File.session_id, FileMultiview.shot_id)
       else:
-        """
-        q = self.session.query(File, ProtocolMultiview).join(Client).join(FileMultiview).\
-              filter(and_(ProtocolMultiview.name.in_(protocol), ProtocolMultiview.sgroup == 'world', \
-                          ProtocolMultiview.session_id == File.session_id, ProtocolMultiview.shot_id == FileMultiview.shot_id, \
-                          ProtocolMultiview.recording_id == File.recording_id, ProtocolMultiview.camera_id == FileMultiview.camera_id)).\
+        q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
               filter(and_(Client.id.in_(model_ids), Client.sgroup == 'world')).\
-              order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-        """
-        q = self.session.query(File, ProtocolMultiview).join(Client).join(FileMultiview).\
-              filter(and_(Client.id.in_(model_ids), Client.sgroup == 'world')).\
+              filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup == 'world',\
+                          Protocol.img_type == 'multiview', Protocol.session_id == File.session_id, 
+                          Protocol.recording_id == File.recording_id)).\
+              filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                          ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
               order_by(File.client_id, File.session_id, FileMultiview.shot_id)
       print q.count()
       for k in q:
         retval[k[0].id] = make_path(k[0].path, directory, extension)
     
     if('dev' in groups or 'eval' in groups):
-      dev_eval_groups = groups
+      # Multiview
+      if('enrol' in purposes):
+        if not model_ids:
+          q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
+                filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+                filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
+                            Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
+                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'enrol')).\
+                filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                            ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
+                order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+        else:
+          q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
+                filter(and_(Client.id.in_(model_ids), Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+                filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
+                            Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
+                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'enrol')).\
+                filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                            ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
+                order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+        print q.count()
+        for k in q:
+          retval[k[0].id] = make_path(k[0].path, directory, extension)
+
+      if('probe' in purposes):
+        if('client' in classes):
+          if not model_ids:
+            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
+                  filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
+                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
+                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
+                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
+                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+          else:
+            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
+                  filter(and_(Client.id.in_(model_ids), Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
+                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
+                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
+                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
+                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+          print q.count()
+          for k in q:
+            retval[k[0].id] = make_path(k[0].path, directory, extension)
+        if('impostor' in classes):
+          if (not model_ids or len(model_ids)>1):
+            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
+                  filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
+                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
+                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
+                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
+                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+          else:
+            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
+                  filter(and_(not_(Client.id.in_(model_ids)), Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
+                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
+                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
+                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
+                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+          print q.count()
+          for k in q:
+            retval[k[0].id] = make_path(k[0].path, directory, extension)
+
+
+
+
       # Highres
       """
       if('enrol' in purposes):
