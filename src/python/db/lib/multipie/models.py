@@ -35,7 +35,7 @@ class File(Base):
   id = Column(Integer, primary_key=True)
   client_id = Column(Integer, ForeignKey('client.id')) # for SQL
   path = Column(String(100), unique=True)
-  session_id = Column(Integer)#, ForeignKey('session.id'))
+  session_id = Column(Integer)
   recording_id = Column(Integer)
   img_type = Column(sqlalchemy.Enum('multiview', 'highres'))
 
@@ -106,7 +106,7 @@ class Protocol(Base):
   name = Column(String(6), ForeignKey('protocolName.name'))
   sgroup = Column(sqlalchemy.Enum('dev','eval','world')) # DO NOT USE GROUP (LIKELY KEYWORD)
   purpose = Column(sqlalchemy.Enum('enrol', 'probe', 'probeImpostor', 'world'))
-  session_id = Column(Integer)#, ForeignKey('session.id'))
+  session_id = Column(Integer)
   recording_id = Column(Integer)
   img_type = Column(sqlalchemy.Enum('multiview', 'highres'))
 
