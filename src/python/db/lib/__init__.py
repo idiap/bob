@@ -10,5 +10,6 @@ import iris
 import replay
 import banca
 import biosecure
+import multipie
 
 __all__ = dir()
