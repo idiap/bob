@@ -10,6 +10,7 @@
 #include <boost/make_shared.hpp>
 
 #include "io/HDF5Types.h"
+#include "io/HDF5Utils.h"
 #include "io/HDF5Exception.h"
 
 namespace io = Torch::io;
@@ -265,9 +266,19 @@ static io::hdf5type get_datatype
   
   //we only support little-endian byte-ordering
   H5T_order_t ordertype = H5Tget_order(*dt);
+
+  //please note that checking compound types for hdf5 < 1.8.6 does not work.
+# if H5_VERSION_GE(1,8,6)
+  if (ordertype < 0) throw io::HDF5StatusError("H5Tget_order", ordertype);
+
   if (ordertype != H5T_ORDER_LE) {
     throw io::HDF5UnsupportedTypeError(dt);
   }
+# else
+  if ((ordertype >= 0) && (ordertype != H5T_ORDER_LE)) {
+    throw io::HDF5UnsupportedTypeError(dt);
+  }
+# endif
   
   switch (classtype) {
     case H5T_INTEGER:
