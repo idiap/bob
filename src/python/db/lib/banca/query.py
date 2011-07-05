@@ -24,7 +24,8 @@ class Database(object):
   def __group_replace_alias__(self, l):
     """Replace 'dev' by 'g1' and 'eval' by 'g2' in a list of groups, and 
        returns the new list"""
-    if isinstance(l, str): return self.__group_replace_alias__((l,))
+    if not l: return l
+    elif isinstance(l, str): return self.__group_replace_alias__((l,))
     l2 = []
     for val in l:
       if(val == 'dev'): l2.append('g1')
