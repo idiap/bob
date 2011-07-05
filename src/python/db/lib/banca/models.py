@@ -5,9 +5,9 @@
 """Table models and functionality for the BANCA database.
 """
 
-import sqlalchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_
-from sqlalchemy.orm import relationship, backref
+from ..sqlalchemy_migration import Enum, relationship
+from sqlalchemy.orm import backref
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -16,9 +16,9 @@ class Client(Base):
   __tablename__ = 'client'
 
   id = Column(Integer, primary_key=True)
-  gender = Column(sqlalchemy.Enum('m','f'))
-  sgroup = Column(sqlalchemy.Enum('g1','g2','world')) # do NOT use group (SQL keyword)
-  language = Column(sqlalchemy.Enum('en','fr','sp'))
+  gender = Column(Enum('m','f'))
+  sgroup = Column(Enum('g1','g2','world')) # do NOT use group (SQL keyword)
+  language = Column(Enum('en','fr','sp'))
 
   def __init__(self, id, gender, group, language):
     self.id = id
@@ -34,7 +34,7 @@ class Session(Base):
   __tablename__ = 'session'
   
   id = Column(Integer, primary_key=True)
-  scenario = Column(sqlalchemy.Enum('controlled','degraded','adverse'))
+  scenario = Column(Enum('controlled','degraded','adverse'))
 
   def __init__(self, id, scenario):
     self.id = id
@@ -55,8 +55,8 @@ class File(Base):
   session_id = Column(Integer, ForeignKey('session.id'))
 
   # for Python
-  session = relationship("Session", backref="session_file")
-  real_client = relationship("Client", backref="real_client_file")
+  session = relationship("Session", backref=backref("session_file"))
+  real_client = relationship("Client", backref=backref("real_client_file"))
 
   def __init__(self, real_id, path, claimed_id, shot, session_id):
     self.real_id = real_id
@@ -74,11 +74,11 @@ class Protocol(Base):
   
   id = Column(Integer, primary_key=True)
   session_id = Column(Integer, ForeignKey('session.id'))
-  name = Column(sqlalchemy.Enum('P','G','Mc','Md','Ma','Ud','Ua'))
-  purpose = Column(sqlalchemy.Enum('enrol','probe','probeImpostor'))
+  name = Column(Enum('P','G','Mc','Md','Ma','Ud','Ua'))
+  purpose = Column(Enum('enrol','probe','probeImpostor'))
 
   # for python
-  session = relationship("Session", backref="session_protocol")
+  session = relationship("Session", backref=backref("session_protocol"))
 
   def __init__(self, session_id, name, purpose):
     self.session_id = session_id
