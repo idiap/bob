@@ -119,6 +119,125 @@ class Database(object):
       return q.first().path
 
 
+  def objects(self, directory=None, extension=None, protocol=None,
+      purposes=None, model_ids=None, groups=None, classes=None):
+    """Returns a set of filenames for the specific query by the user.
+    WARNING: Files used as impostor access for several different models are
+    only listed one and refer to only a single model
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the Biosecure protocols ('ca0', 'caf', 'wc').
+
+    purposes
+      The purposes required to be retrieved ('enrol', 'probe') or a tuple
+      with several of them. If 'None' is given (this is the default), it is 
+      considered the same as a tuple with all possible values. This field is
+      ignored for the data from the "world" group.
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id). The model ids are string.  If 'None' is given (this is 
+      the default), no filter over the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    classes
+      The classes (types of accesses) to be retrieved ('client', 'impostor') 
+      or a tuple with several of them. If 'None' is given (this is the 
+      default), it is considered the same as a tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the Biosecure database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    def make_path(stem, directory, extension):
+      import os
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+
+    VALID_PROTOCOLS = ('ca0', 'caf', 'wc')
+    VALID_PURPOSES = ('enrol', 'probe')
+    VALID_GROUPS = ('dev', 'eval', 'world')
+    VALID_CLASSES = ('client', 'impostor')
+
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    classes = self.__check_validity__(classes, "class", VALID_CLASSES)
+    retval = {}
+    
+    if(isinstance(model_ids,str)):
+      model_ids = (model_ids,)
+    
+    if 'world' in groups:
+      q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
+            filter(Client.sgroup == 'world').\
+            filter(Protocol.name == ProtocolPurpose.name).\
+            filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == 'world')).\
+            filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera))
+      if model_ids:
+        q = q.filter(Client.id.in_(model_ids))
+      q = q.order_by(File.camera, File.client_id, File.session, File.shot)
+      for k in q:
+        retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+    
+    if ('dev' in groups or 'eval' in groups):
+      if('enrol' in purposes):
+        q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
+              filter(Client.sgroup.in_(groups)).\
+              filter(Protocol.name == ProtocolPurpose.name).\
+              filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'enrol')).\
+              filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera))
+        if model_ids:
+          q = q.filter(Client.id.in_(model_ids))
+        q = q.order_by(File.camera, File.client_id, File.session, File.shot)
+        for k in q:
+          retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+      if('probe' in purposes):
+        if('client' in classes):
+          q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
+                filter(Client.sgroup.in_(groups)).\
+                filter(Protocol.name == ProtocolPurpose.name).\
+                filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'probe')).\
+                filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera))
+          if model_ids:
+            q = q.filter(Client.id.in_(model_ids))
+          q = q.order_by(File.camera, File.client_id, File.session, File.shot)
+          for k in q:
+            retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+        if('impostor' in classes):
+          q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
+                filter(Client.sgroup.in_(groups)).\
+                filter(Protocol.name == ProtocolPurpose.name).\
+                filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'probe')).\
+                filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera))
+          if(model_ids and len(model_ids)==1):
+            q = q.filter(not_(Client.id.in_(model_ids)))
+          q = q.order_by(File.camera, File.client_id, File.session, File.shot)
+          for k in q:
+            retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+        
+    return retval
+
   def files(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None):
     """Returns a set of filenames for the specific query by the user.
@@ -161,96 +280,12 @@ class Database(object):
     wish to save processing results later on.
     """
 
-    def make_path(stem, directory, extension):
-      import os
-      if not extension: extension = ''
-      if directory: return os.path.join(directory, stem + extension)
-      return stem + extension
-
-    VALID_PROTOCOLS = ('ca0', 'caf', 'wc')
-    VALID_PURPOSES = ('enrol', 'probe')
-    VALID_GROUPS = ('dev', 'eval', 'world')
-    VALID_CLASSES = ('client', 'impostor')
-
-    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
-    purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
-    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
-    classes = self.__check_validity__(classes, "class", VALID_CLASSES)
     retval = {}
-    
-    if 'world' in groups:
-      if not model_ids:
-        q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-              filter(Client.sgroup == 'world').\
-              filter(Protocol.name == ProtocolPurpose.name).\
-              filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == 'world')).\
-              filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-              order_by(File.camera, File.client_id, File.session, File.shot)
-      else:
-        q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-              filter(and_(Client.id.in_(model_ids), Client.sgroup == 'world')).\
-              filter(Protocol.name == ProtocolPurpose.name).\
-              filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == 'world')).\
-              filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-              order_by(File.camera, File.client_id, File.session, File.shot)
-      for k in q:
-        retval[k[0].id] = make_path(k[0].path, directory, extension)
-    
-    if ('dev' in groups or 'eval' in groups):
-      if('enrol' in purposes):
-        if not model_ids:
-          q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-                filter(Client.sgroup.in_(groups)).\
-                filter(Protocol.name == ProtocolPurpose.name).\
-                filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'enrol')).\
-                filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-                order_by(File.camera, File.client_id, File.session, File.shot)
-        else:
-          q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-                filter(and_(Client.id.in_(model_ids), Client.sgroup.in_(groups))).\
-                filter(Protocol.name == ProtocolPurpose.name).\
-                filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'enrol')).\
-                filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-                order_by(File.camera, File.client_id, File.session, File.shot)
-        for k in q:
-          retval[k[0].id] = make_path(k[0].path, directory, extension)
-      if('probe' in purposes):
-        if('client' in classes):
-          if not model_ids:
-            q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-                  filter(Client.sgroup.in_(groups)).\
-                  filter(Protocol.name == ProtocolPurpose.name).\
-                  filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'probe')).\
-                  filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-                  order_by(File.camera, File.client_id, File.session, File.shot)
-          else:
-            q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-                  filter(and_(Client.id.in_(model_ids), Client.sgroup.in_(groups))).\
-                  filter(Protocol.name == ProtocolPurpose.name).\
-                  filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'probe')).\
-                  filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-                  order_by(File.camera, File.client_id, File.session, File.shot)
-          for k in q:
-            retval[k[0].id] = make_path(k[0].path, directory, extension)
-        if('impostor' in classes):
-          if(not model_ids or len(model_ids)>1):
-            q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-                  filter(Client.sgroup.in_(groups)).\
-                  filter(Protocol.name == ProtocolPurpose.name).\
-                  filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'probe')).\
-                  filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-                  order_by(File.camera, File.client_id, File.session, File.shot)
-          else:
-            q = self.session.query(File, Protocol, ProtocolPurpose).join(Client).\
-                  filter(and_(not_(Client.id.in_(model_ids)), Client.sgroup.in_(groups))).\
-                  filter(Protocol.name == ProtocolPurpose.name).\
-                  filter(and_(Protocol.name.in_(protocol), ProtocolPurpose.sgroup == Client.sgroup, ProtocolPurpose.purpose == 'probe')).\
-                  filter(and_(File.session == ProtocolPurpose.session, File.camera == Protocol.camera)).\
-                  order_by(File.camera, File.client_id, File.session, File.shot)
-          for k in q:
-            retval[k[0].id] = make_path(k[0].path, directory, extension)
-        
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes)
+    for k in d: retval[k] = d[k][0]
+
     return retval
+
 
   # TODO: dictionary interface
   #def dictionary(self, directory=None, extension=None, protocol=None,
