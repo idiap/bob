@@ -24,12 +24,13 @@ class Database(object):
   def __group_replace_alias__(self, l):
     """Replace 'dev' by 'g1' and 'eval' by 'g2' in a list of groups, and 
        returns the new list"""
-    l = []
+    if isinstance(l, str): return self.__group_replace_alias__((l,))
+    l2 = []
     for val in l:
-      if(val == 'dev'): l.append('g1')
-      elif(val == 'eval'): l.append('g2')
-      else: l.append(val)
-    return tuple(l)
+      if(val == 'dev'): l2.append('g1')
+      elif(val == 'eval'): l2.append('g2')
+      else: l2.append(val)
+    return tuple(l2)
 
   def __check_validity__(self, l, obj, valid):
     """Checks validity of user input data against a set of valid values"""
