@@ -5,9 +5,9 @@
 """Table models and functionality for the Multi-PIE database.
 """
 
-import sqlalchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, not_
-from sqlalchemy.orm import relationship, backref
+from ..sqlalchemy_migration import Enum, relationship
+from sqlalchemy.orm import backref
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -16,9 +16,9 @@ class Client(Base):
   __tablename__ = 'client'
 
   id = Column(Integer, primary_key=True)
-  sgroup = Column(sqlalchemy.Enum('dev', 'eval', 'world'))
+  sgroup = Column(Enum('dev', 'eval', 'world'))
   birthyear = Column(Integer)
-  gender = Column(sqlalchemy.Enum('m','f'))
+  gender = Column(Enum('m','f'))
 
   def __init__(self, id, group, birthyear, gender):
     self.id = id
@@ -37,7 +37,7 @@ class File(Base):
   path = Column(String(100), unique=True)
   session_id = Column(Integer)
   recording_id = Column(Integer)
-  img_type = Column(sqlalchemy.Enum('multiview', 'highres'))
+  img_type = Column(Enum('multiview', 'highres'))
 
   # for Python
   client = relationship("Client", backref=backref("client_file"))
@@ -74,8 +74,8 @@ class Expression(Base):
   __tablename__ = 'expression'
   
   id = Column(Integer, primary_key=True)
-  name = Column(sqlalchemy.Enum('neutral', 'smile', 'surprise', 'squint', 'disgust', 'scream'))
-  img_type = Column(sqlalchemy.Enum('multiview', 'highres'))
+  name = Column(Enum('neutral', 'smile', 'surprise', 'squint', 'disgust', 'scream'))
+  img_type = Column(Enum('multiview', 'highres'))
   session_id = Column(Integer)
   recording_id = Column(Integer)
 
@@ -104,11 +104,11 @@ class Protocol(Base):
 
   id = Column(Integer, primary_key=True)
   name = Column(String(6), ForeignKey('protocolName.name'))
-  sgroup = Column(sqlalchemy.Enum('dev','eval','world')) # DO NOT USE GROUP (LIKELY KEYWORD)
-  purpose = Column(sqlalchemy.Enum('enrol', 'probe', 'probeImpostor', 'world'))
+  sgroup = Column(Enum('dev','eval','world')) # DO NOT USE GROUP (LIKELY KEYWORD)
+  purpose = Column(Enum('enrol', 'probe', 'probeImpostor', 'world'))
   session_id = Column(Integer)
   recording_id = Column(Integer)
-  img_type = Column(sqlalchemy.Enum('multiview', 'highres'))
+  img_type = Column(Enum('multiview', 'highres'))
 
   # for Python
   protocol = relationship("ProtocolName", backref=backref("protocolName_protocol"))

@@ -135,7 +135,7 @@ def add_command(subparsers):
   parser.add_argument('--verbose', action='store_true', default=False,
       help="Do SQL operations in a verbose way")
   parser.add_argument('--protodir', action='store', 
-      default='/idiap/group/torch5spro/rawdata/replay',
+      default='/idiap/group/replay/database/protocols',
       metavar='DIR',
       help="Change the relative path to the directory containing the protocol definitions for replay attacks (defaults to %(default)s)")
   
