@@ -13,7 +13,7 @@ To make this process a bit easier there are three help functions defined in |pro
 * as_row()
 
 empty_like() - to allocate an array of the same size and shape
-----------------------------------------------------------
+--------------------------------------------------------------
 
 empty_like() - to allocate an array of the same size and shape without copying the data.
 This is useful when working with the ip package. An example use is the following,
@@ -32,7 +32,7 @@ This is useful when working with the ip package. An example use is the following
   # TODO, It seems like we have to have a double as output :(
 
 as_row() - to take an 2D array and turn it into 1D
-----------------------------------------------------
+--------------------------------------------------
 
 It is often necessary to transform a 2D array into an 1D array. 
 A good example is when you need to create a sample out of an image.

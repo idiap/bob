@@ -21,6 +21,14 @@ BANCA Database
 .. autoclass:: torch.db.banca.Database
   :members:
 
+Multipie Database
+=================
+
+.. automodule:: torch.db.multipie
+
+.. autoclass:: torch.db.multipie.Database
+  :members:
+
 Replay Attack Database
 ======================
 
