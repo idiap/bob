@@ -45,6 +45,7 @@ endmacro(torch_build_db dbname)
 torch_build_db(replay)
 torch_build_db(banca)
 torch_build_db(biosecure)
+torch_build_db(mobio)
 torch_build_db(multipie)
 
 # Iris database driver and example tests
@@ -86,6 +87,17 @@ set_property(TEST python-db-biosecure-dumplist APPEND PROPERTY DEPENDS
 torch_python_add_test(python-db-biosecure-dumplist2
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py biosecure dumplist --class=client --group=dev --purpose=enrol --self-test)
 set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS 
+  ${python-db-biosecure-instantiation})
+
+# MOBIO database driver tests.
+# ######### Notice test dependencies!! ##################
+torch_python_add_test(python-db-mobio-dumplist
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py mobio dumplist --self-test)
+set_property(TEST python-db-mobio-dumplist APPEND PROPERTY DEPENDS
+  ${python-db-biosecure-instantiation})
+torch_python_add_test(python-db-mobio-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py mobio dumplist --class=client --group=dev --purpose=enrol --self-test)
+set_property(TEST python-db-mobio-dumplist2 APPEND PROPERTY DEPENDS 
   ${python-db-biosecure-instantiation})
 
 # Multi-PIE database driver tests.
