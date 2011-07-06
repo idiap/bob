@@ -21,6 +21,22 @@ BANCA Database
 .. autoclass:: torch.db.banca.Database
   :members:
 
+Biosecure Database
+==============
+
+.. automodule:: torch.db.biosecure
+
+.. autoclass:: torch.db.biosecure.Database
+  :members:
+
+MOBIO Database
+==============
+
+.. automodule:: torch.db.mobio
+
+.. autoclass:: torch.db.mobio.Database
+  :members:
+
 Multipie Database
 =================
 
