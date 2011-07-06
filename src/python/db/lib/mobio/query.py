@@ -245,10 +245,10 @@ class Database(object):
             q = q.filter(not_(Client.id.in_(model_ids)))
           q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
           for k in q:
-            if not model_ids or len(model_ids) != 1:
-              retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
-            else:
+            if(model_ids and len(model_ids) == 1):
               retval[k[0].id] = (make_path(k[0].path, directory, extension), model_ids[0], model_ids[0], k[0].client_id, k[0].path)
+            else:
+              retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
         
     return retval
 

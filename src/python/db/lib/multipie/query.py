@@ -203,7 +203,10 @@ class Database(object):
             q = q.filter(Client.id.in_(model_ids))
           q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
           for k in q:
-            retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+            if(model_ids and len(model_ids) == 1):
+              retval[k[0].id] = (make_path(k[0].path, directory, extension), model_ids[0], model_ids[0], k[0].client_id, k[0].path)
+            else:
+              retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
 
       # Highres
       # TODO

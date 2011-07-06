@@ -234,7 +234,10 @@ class Database(object):
             q = q.filter(not_(Client.id.in_(model_ids)))
           q = q.order_by(File.camera, File.client_id, File.session, File.shot)
           for k in q:
-            retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+            if(model_ids and len(model_ids) == 1):
+              retval[k[0].id] = (make_path(k[0].path, directory, extension), model_ids[0], model_ids[0], k[0].client_id, k[0].path)
+            else:
+              retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
         
     return retval
 
