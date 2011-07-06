@@ -86,7 +86,7 @@ class Database(object):
 
     return self.clients(protocol, groups)
 
-  def files(self, directory=None, extension=None, protocol=None,
+  def objects(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None):
     """Returns a set of filenames for the specific query by the user.
 
@@ -145,18 +145,18 @@ class Database(object):
     classes = self.__check_validity__(classes, "class", VALID_CLASSES)
     retval = {}
     
+    if(isinstance(model_ids,str)):
+      model_ids = (model_ids,)
+    
     if 'world' in groups:
       # Multiview
-      if not model_ids:
-        q = self.session.query(File).join(Client).join(FileMultiview).\
-              filter(Client.sgroup == 'world').\
-              order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-      else:
-        q = self.session.query(File).join(Client).join(FileMultiview).\
-              filter(and_(Client.id.in_(model_ids), Client.sgroup == 'world')).\
-              order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+      q = self.session.query(File).join(Client).join(FileMultiview).\
+            filter(Client.sgroup == 'world')
+      if model_ids:
+        q = q.filter(Client_id.in_(model_ids))
+      q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
       for k in q:
-        retval[k.id] = make_path(k.path, directory, extension)
+        retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
     
       # Highres
       # TODO
@@ -164,76 +164,99 @@ class Database(object):
     if('dev' in groups or 'eval' in groups):
       # Multiview
       if('enrol' in purposes):
-        if not model_ids:
+        q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
+              filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+              filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
+                          Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
+                          Protocol.recording_id == File.recording_id, Protocol.purpose == 'enrol')).\
+              filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
+                          ProtocolMultiview.shot_id == FileMultiview.shot_id))
+        if model_ids:
+          q = q.filter(and_(Client.id.in_(model_ids)))
+        q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+        for k in q:
+          retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+
+      if('probe' in purposes):
+        if('client' in classes):
           q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
                 filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
                 filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
                             Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'enrol')).\
+                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
                 filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                            ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
-                order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-        else:
+                            ProtocolMultiview.shot_id == FileMultiview.shot_id))
+          if model_ids:
+            q = q.filter(Client.id.in_(model_ids))
+          q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+          for k in q:
+            retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
+        if('impostor' in classes):
           q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-                filter(and_(Client.id.in_(model_ids), Client.sgroup.in_(groups), Client.sgroup != 'world')).\
+                filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
                 filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
                             Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'enrol')).\
+                            Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
                 filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                            ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
-                order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-        for k in q:
-          retval[k[0].id] = make_path(k[0].path, directory, extension)
-
-      if('probe' in purposes):
-        if('client' in classes):
-          if not model_ids:
-            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-                  filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
-                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
-                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
-                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
-                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-          else:
-            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-                  filter(and_(Client.id.in_(model_ids), Client.sgroup.in_(groups), Client.sgroup != 'world')).\
-                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
-                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
-                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
-                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
+                            ProtocolMultiview.shot_id == FileMultiview.shot_id))
+          if(model_ids and len(model_ids)==1):
+            q = q.filter(Client.id.in_(model_ids))
+          q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
           for k in q:
-            retval[k[0].id] = make_path(k[0].path, directory, extension)
-        if('impostor' in classes):
-          if (not model_ids or len(model_ids)>1):
-            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-                  filter(and_(Client.sgroup.in_(groups), Client.sgroup != 'world')).\
-                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
-                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
-                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
-                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-          else:
-            q = self.session.query(File, Protocol, ProtocolName, ProtocolMultiview).join(Client).join(FileMultiview).\
-                  filter(and_(not_(Client.id.in_(model_ids)), Client.sgroup.in_(groups), Client.sgroup != 'world')).\
-                  filter(and_(ProtocolName.name.in_(protocol), Protocol.name == ProtocolName.name, Protocol.sgroup.in_(groups),\
-                              Protocol.sgroup != 'world', Protocol.img_type == 'multiview', Protocol.session_id == File.session_id,\
-                              Protocol.recording_id == File.recording_id, Protocol.purpose == 'probe')).\
-                  filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
-                              ProtocolMultiview.shot_id == FileMultiview.shot_id)).\
-                  order_by(File.client_id, File.session_id, FileMultiview.shot_id)
-          for k in q:
-            retval[k[0].id] = make_path(k[0].path, directory, extension)
+            retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
 
       # Highres
       # TODO
 
     return retval
 
+  def files(self, directory=None, extension=None, protocol=None,
+      purposes=None, model_ids=None, groups=None, classes=None):
+    """Returns a set of filenames for the specific query by the user.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the BANCA protocols ('M0', 'M1', 'M7', 'Mf', 'Ma', 'G').
+
+    purposes
+      The purposes required to be retrieved ("enrol", "probe") or a tuple
+      with several of them. If 'None' is given (this is the default), it is 
+      considered the same as a tuple with all possible values. This field is
+      ignored for the data from the "world" group.
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ("dev", "eval", "world") or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    classes
+      The classes (types of accesses) to be retrieved ('client', 'impostor') 
+      or a tuple with several of them. If 'None' is given (this is the 
+      default), it is considered the same as a tuple with all possible values.
+
+    Returns: A dictionary containing the resolved filenames considering all
+    the filtering criteria. The keys of the dictionary are unique identities 
+    for each file in the Multi-PIE database. Conserve these numbers if you 
+    wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
 
   def save_one(self, id, obj, directory, extension):
     """Saves a single object supporting the torch save() protocol.
