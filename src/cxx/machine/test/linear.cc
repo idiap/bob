@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( test_initialization )
   idiv = 0.5, 1.0, 1.0;
   M.setInputDivision(idiv);
 
-  M.setActivation(Torch::machine::LinearMachine::TANH);
+  M.setActivation(Torch::machine::TANH);
   
   //now load the same machine from the file and compare
   char *testdata_cpath = getenv("TORCH_MACHINE_TESTDATA_DIR");

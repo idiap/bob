@@ -15,6 +15,8 @@ set(src
     "src/EigenMachineException.cc"
     "src/TwoDPCAMachine.cc"
     "src/LinearMachine.cc"
+    "src/MLP.cc"
+    "src/MLPException.cc"
 )
 
 include(../../cmake/macros.cmake)

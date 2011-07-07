@@ -20,6 +20,7 @@
 
 #include <blitz/array.h>
 #include "io/HDF5File.h"
+#include "machine/Activation.h"
 
 namespace Torch { namespace machine {
 
@@ -30,12 +31,6 @@ namespace Torch { namespace machine {
   class LinearMachine {
 
     public: //api
-
-      typedef enum Activation {
-        LINEAR = 0, //Linear: y = x [this is the default]
-        TANH = 1, //Hyperbolic tangent: y = (e^x - e^(-x))/(e^x + e^(-x))
-        LOG = 2 //Logistic function: y = 1/(1 + e^(-x))
-      } Activation;
 
       /**
        * Default constructor. Builds an otherwise invalid 0 x 0 linear machine.

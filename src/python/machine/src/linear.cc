@@ -14,7 +14,7 @@ namespace io = Torch::io;
 
 static blitz::Array<double,1> forward(const mach::LinearMachine& m,
     const blitz::Array<double,1>& input) {
-  blitz::Array<double,1> output(m.getBiases().extent(0));
+  blitz::Array<double,1> output(m.outputSize());
   m.forward(input, output);
   return output;
 }
@@ -93,12 +93,6 @@ static void set_bias(mach::LinearMachine& m, object o) {
 }
 
 void bind_machine_linear() {
-  enum_<mach::LinearMachine::Activation>("Activation")
-    .value("LINEAR", mach::LinearMachine::LINEAR)
-    .value("TANH", mach::LinearMachine::TANH)
-    .value("LOG", mach::LinearMachine::LOG)
-    ;
-
   class_<mach::LinearMachine, boost::shared_ptr<mach::LinearMachine>
     >("LinearMachine", "A linear classifier. See C. M. Bishop, 'Pattern Recognition and Machine  Learning', chapter 4 for more details.\n\nThe basic matrix operation performed for projecting the input to the output is: output = weights * input. The 'weights' matrix is therefore organized column-wise. In this scheme, each column of the weights matrix can be interpreted as vector to which the input is projected.\n\nThe number of columns of the weights matrix determines the number of outputs this linear machine will have. The number of rows, the number of allowed inputs it can process.", init<size_t,size_t>((arg("input_size"), arg("output_size")), "Constructs a new linear machine with a certain input and output sizes. The weights and biases are initialized to zero."))
     .def(init<const blitz::Array<double,2>&>((arg("weights")), "Constructs a new LinearMachine from a set of weight values. Each column of the weight matrix should represent a direction to which the input is projected."))

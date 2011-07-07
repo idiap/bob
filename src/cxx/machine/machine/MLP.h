@@ -11,7 +11,7 @@
 #include <blitz/array.h>
 
 #include "io/HDF5File.h"
-#include "machine/MLP.h"
+#include "machine/Activation.h"
 
 namespace Torch { namespace machine {
 
@@ -22,6 +22,12 @@ namespace Torch { namespace machine {
    * function. References to fully-connected feed-forward networks: Bishop's
    * Pattern Recognition and Machine Learning, Chapter 5. Figure 5.1 shows what
    * we mean.
+   *
+   * MLPs normally are multi-layered systems, with 1 or more hidden layers. As
+   * a special case, this implementation also supports connecting the input
+   * directly to the output by means of a single weight matrix. This is
+   * equivalent of a LinearMachine, with the advantage it can be trained by MLP
+   * trainers.
    */
   class MLP {
     
@@ -29,29 +35,48 @@ namespace Torch { namespace machine {
 
       /**
        * Constructor, builds a new MLP. Internal values are uninitialized. In
+       * this case, there are no hidden layers and the resulting machine is
+       * equivalent to a linear machine except, perhaps for the activation
+       * function which is set to be a hyperbolic tangent.
+       *
+       * @param input Size of input vector
+       * @param output Size of output vector
+       */
+      MLP (size_t input, size_t output);
+
+      /**
+       * Constructor, builds a new MLP. Internal values are uninitialized. In
        * this case, the number of hidden layers equals 1 and its size can be
-       * defined by the middle parameter.
+       * defined by the middle parameter. The default activation function will
+       * be set to hyperbolic tangent.
        *
        * @param input Size of input vector
        * @param hidden Size of the hidden layer
        * @param output Size of output vector
-       * @param bias If we should bias hidden and output nodes
        */
-      MLP (size_t input, size_t hidden, size_t output, bool bias=true);
+      MLP (size_t input, size_t hidden, size_t output);
 
       /**
        * Constructor, builds a new MLP. Internal values are uninitialized. With
        * this constructor you can control the number of hidden layers your MLP
-       * will have.
+       * will have. The default activation function will be set to hyperbolic
+       * tangent.
        *
        * @param input Size of input vector 
        * @param hidden The number and size of each hidden layer 
        * @param output Size of output vector
-       * @param bias If we should bias hidden and output nodes
        */
-      MLP (size_t input, std::vector<size_t> hidden, size_t output, 
-          bool bias=true);
-
+      MLP (size_t input, const std::vector<size_t>& hidden, size_t output);
+      
+      /**
+       * Builds a new MLP with a shape containing the number of inputs (first
+       * element), number of outputs (last element) and the number of neurons
+       * in each hidden layer (elements between the first and last element of
+       * the vector). The default activation function will be set to hyperbolic
+       * tangent.
+       */
+      MLP (const std::vector<size_t>& shape);
+      
       /**
        * Copies another machine
        */
@@ -84,7 +109,8 @@ namespace Torch { namespace machine {
       void save (Torch::io::HDF5File& config) const;
 
       /**
-       * Forwards data through the network, outputs the values of each output.
+       * Forwards data through the network, outputs the values of each output
+       * neuron.
        *
        * The input and output are NOT checked for compatibility each time. It
        * is your responsibility to do it.
@@ -93,8 +119,8 @@ namespace Torch { namespace machine {
           blitz::Array<double,1>& output) const;
 
       /**
-       * Forwards data through the network, outputs the values of each linear
-       * component the input signal is decomposed at.
+       * Forwards data through the network, outputs the values of each output
+       * neuron. 
        *
        * The input and output are checked for compatibility each time the
        * forward method is applied.
@@ -103,31 +129,52 @@ namespace Torch { namespace machine {
           blitz::Array<double,1>& output) const;
 
       /**
-       * Resizes the machine. If either the input or output increases in size,
-       * the weights and other factors should be considered uninitialized. If
-       * the size is preserved or reduced, already initialized values will not
-       * be changed. 
+       * Resizes the machine. This causes this MLP to be completely
+       * re-initialized and should be considered invalid for calculation after
+       * this operation. Using this method there will be no hidden layers in
+       * the resized machine.
        */
-      void resize (size_t input, size_t hidden, size_t output, bool bias=true);
+      void resize (size_t input, size_t output);
 
       /**
-       * Resizes the machine. If either the input or output increases in size,
-       * the weights and other factors should be considered uninitialized. If
-       * the size is preserved or reduced, already initialized values will not
-       * be changed. 
+       * Resizes the machine. This causes this MLP to be completely
+       * re-initialized and should be considered invalid for calculation after
+       * this operation. Using this method there will be precisely 1 hidden
+       * layer in the resized machine.
        */
-      void resize (size_t input, std::vector<size_t> hidden, size_t output, 
-          bool bias=true);
+      void resize (size_t input, size_t hidden, size_t output);
+
+      /**
+       * Resizes the machine. This causes this MLP to be completely
+       * re-initialized and should be considered invalid for calculation after
+       * this operation. Using this method there will be as many hidden layers
+       * as there are size_t's in the vector parameter "hidden".
+       */
+      void resize (size_t input, const std::vector<size_t>& hidden,
+          size_t output);
+
+      /**
+       * Resizes the machine. This causes this MLP to be completely
+       * re-initialized and should be considered invalid for calculation after
+       * this operation. Using this method there will be as many hidden layers
+       * as there are size_t's in the vector parameter "hidden".
+       */
+      void resize (const std::vector<size_t>& shape);
 
       /**
        * Returns the number of inputs expected by this machine
        */
-      inline size_t inputSize () const { return m_weight.extent(0); }
+      inline size_t inputSize () const { return m_weight.front().extent(0); }
+
+      /**
+       * Returns the number of hidden layers this MLP has
+       */
+      inline size_t numOfHiddenLayers() const { return m_weight.size() - 1; }
 
       /**
        * Returns the number of outputs generated by this machine
        */
-      inline size_t outputSize () const { return m_weight.extent(1); }
+      inline size_t outputSize () const { return m_weight.back().extent(1); }
 
       /**
        * Returns the input subtraction factor
@@ -173,17 +220,17 @@ namespace Torch { namespace machine {
       { return m_weight; }
 
       /**
-       * Sets weights for all layers. The number of inputs and total number of
-       * weights should be the same as set before, or this method will raise.
-       * If you would like to set this MLP to a different weight configuration,
-       * consider first using resize().
+       * Sets weights for all layers. The number of inputs, outputs and total
+       * number of weights should be the same as set before, or this method
+       * will raise.  If you would like to set this MLP to a different weight
+       * configuration, consider first using resize().
        */
-      void setWeights(std::vector<const blitz::Array<double,2> >& weight);
+      void setWeights(const std::vector<blitz::Array<double,2> >& weight);
 
       /**
        * Sets all weights to a single specific value.
        */
-      inline void setWeights(double v) { m_weight = v; }
+      void setWeights(double v);
 
       /**
        * Returns the biases of this classifier, for every hidden layer and
@@ -202,7 +249,7 @@ namespace Torch { namespace machine {
       /**
        * Sets all output bias values to a specific value.
        */
-      inline void setBiases(double v) { m_bias = v; }
+      void setBiases(double v);
 
       /**
        * Returns the currently set activation function
@@ -220,17 +267,13 @@ namespace Torch { namespace machine {
 
       blitz::Array<double, 1> m_input_sub; ///< input subtraction
       blitz::Array<double, 1> m_input_div; ///< input division
-      blitz::Array<double, 2> m_weight; ///< weights
-      blitz::Array<double, 1> m_bias; ///< biases for the output
+      std::vector<blitz::Array<double, 2> > m_weight; ///< weights
+      std::vector<blitz::Array<double, 1> > m_bias; ///< biases for the output
       Activation m_activation; ///< currently set activation type
       actfun_t m_actfun; ///< currently set activation function
 
-      mutable blitz::Array<double, 1> m_buffer; ///< a buffer for speed
+      mutable std::vector<blitz::Array<double, 1> > m_buffer; ///< a buffer for speed
   
-  };
-
-}}
-
   };
 
 }}
