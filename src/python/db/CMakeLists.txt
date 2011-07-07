@@ -47,6 +47,8 @@ torch_build_db(banca)
 torch_build_db(biosecure)
 torch_build_db(mobio)
 torch_build_db(multipie)
+torch_build_db(scface)
+torch_build_db(xm2vts)
 
 # Iris database driver and example tests
 torch_python_add_test(python-db-iris-dump
@@ -94,22 +96,44 @@ set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS
 torch_python_add_test(python-db-mobio-dumplist
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py mobio dumplist --self-test)
 set_property(TEST python-db-mobio-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-biosecure-instantiation})
+  ${python-db-mobio-instantiation})
 torch_python_add_test(python-db-mobio-dumplist2
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py mobio dumplist --class=client --group=dev --purpose=enrol --self-test)
 set_property(TEST python-db-mobio-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-biosecure-instantiation})
+  ${python-db-mobio-instantiation})
 
 # Multi-PIE database driver tests.
 # ######### Notice test dependencies!! ##################
 torch_python_add_test(python-db-multipie-dumplist
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py multipie dumplist --self-test)
-set_property(TEST python-db-biosecure-dumplist APPEND PROPERTY DEPENDS
-  ${python-db-biosecure-instantiation})
+set_property(TEST python-db-multipie-dumplist APPEND PROPERTY DEPENDS
+  ${python-db-multipie-instantiation})
 torch_python_add_test(python-db-multipie-dumplist2
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py multipie dumplist --class=client --group=dev --purpose=enrol --self-test)
-set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS 
-  ${python-db-biosecure-instantiation})
+set_property(TEST python-db-multipie-dumplist2 APPEND PROPERTY DEPENDS 
+  ${python-db-multipie-instantiation})
+
+# SCface database driver tests.
+# ######### Notice test dependencies!! ##################
+torch_python_add_test(python-db-scface-dumplist
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py scface dumplist --self-test)
+set_property(TEST python-db-scface-dumplist APPEND PROPERTY DEPENDS
+  ${python-db-scface-instantiation})
+torch_python_add_test(python-db-scface-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py scface dumplist --class=client --group=dev --purpose=enrol --self-test)
+set_property(TEST python-db-scface-dumplist2 APPEND PROPERTY DEPENDS 
+  ${python-db-scface-instantiation})
+
+# XM2VTS database driver tests.
+# ######### Notice test dependencies!! ##################
+torch_python_add_test(python-db-xm2vts-dumplist
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py xm2vts dumplist --self-test)
+set_property(TEST python-db-xm2vts-dumplist APPEND PROPERTY DEPENDS
+  ${python-db-xm2vts-instantiation})
+torch_python_add_test(python-db-xm2vts-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py xm2vts dumplist --class=client --group=dev --purpose=enrol --self-test)
+set_property(TEST python-db-xm2vts-dumplist2 APPEND PROPERTY DEPENDS 
+  ${python-db-xm2vts-instantiation})
 
 # Our examples (run and install)
 torch_python_add_test(python-db-iris-lda-example
