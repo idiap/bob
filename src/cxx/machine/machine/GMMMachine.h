@@ -66,12 +66,16 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
 
     /// Get the means
     void getMeans(blitz::Array<double,2> &means) const;
+    /// Get the mean supervector
+    void getMeanSupervector(blitz::Array<double,1> &mean_supervector) const;
     
     /// Set the variances
     void setVariances(const blitz::Array<double,2> &variances);
 
     /// Get the variances
     void getVariances(blitz::Array<double,2> &variances) const;
+    /// Get the variance supervector
+    void getVarianceSupervector(blitz::Array<double,1> &variance_supervector) const;
     
     /// Set the variance flooring thresholds in each dimension 
     /// to a proportion of the current variance, for each Gaussian

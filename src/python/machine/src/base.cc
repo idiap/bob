@@ -219,6 +219,16 @@ void bind_machine_base() {
   .def("getNGaussians",
        &mach::GMMMachine::getNGaussians,
        "Return the number of Gaussian components")
+  .def("getMeanSupervector",
+       (void (mach::GMMMachine::*)(blitz::Array<double,1>&))&mach::GMMMachine::getMeanSupervector,
+       args("mean_supervector"),
+       "Get the mean supervector of the GMMMachine "
+       "(concatenation of the mean vectors of each Gaussian of the GMMMachine)")
+  .def("getVarianceSupervector",
+       (void (mach::GMMMachine::*)(blitz::Array<double,1>&))&mach::GMMMachine::getVarianceSupervector,
+       args("variance_supervector"),
+       "Get the variance supervector of the GMMMachine "
+       "(concatenation of the variance vectors of each Gaussian of the GMMMachine)")
   .def("load",
        &mach::GMMMachine::load,
        "Load from a Configuration")

@@ -108,11 +108,11 @@ void Torch::machine::GMMMachine::getWeights(blitz::Array<double,1> &weights) con
   weights = m_weights;
 }
 
-void Torch::machine::GMMMachine::setWeights(const blitz::Array< double, 1 >& weights) {
+void Torch::machine::GMMMachine::setWeights(const blitz::Array<double, 1 >& weights) {
   m_weights = weights;
 }
 
-void Torch::machine::GMMMachine::setMeans(const blitz::Array< double, 2 >& means) {
+void Torch::machine::GMMMachine::setMeans(const blitz::Array<double, 2 >& means) {
   for (int i=0; i < m_n_gaussians; ++i) {
     m_gaussians[i].setMean(means(i,blitz::Range::all()));
   }
@@ -127,18 +127,34 @@ void Torch::machine::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
   }
 }
 
-void Torch::machine::GMMMachine::setVariances(const blitz::Array< double, 2 >& variances) {
+void Torch::machine::GMMMachine::getMeanSupervector(blitz::Array<double,1> &mean_supervector) const {
+  mean_supervector.resize(m_n_gaussians*m_n_inputs);
+  for (int i=0; i < m_n_gaussians; ++i) {
+    blitz::Array<double,1> mean = mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
+    m_gaussians[i].getMean(mean);
+  }
+}
+
+void Torch::machine::GMMMachine::setVariances(const blitz::Array<double, 2 >& variances) {
   for (int i=0; i < m_n_gaussians; ++i) {
     m_gaussians[i].setVariance(variances(i,blitz::Range::all()));
   }
 }
 
-void Torch::machine::GMMMachine::getVariances( blitz::Array< double, 2 >& variances) const {
+void Torch::machine::GMMMachine::getVariances( blitz::Array<double, 2 >& variances) const {
   variances.resize(m_n_gaussians,m_n_inputs);
   blitz::Array<double,1> variance(m_n_inputs);
   for (int i=0; i < m_n_gaussians; ++i) {
     m_gaussians[i].getVariance(variance);
     variances(i,blitz::Range::all()) = variance;
+  }
+}
+
+void Torch::machine::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_supervector) const {
+  variance_supervector.resize(m_n_gaussians*m_n_inputs);
+  for (int i=0; i < m_n_gaussians; ++i) {
+    blitz::Array<double,1> variance = variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
+    m_gaussians[i].getVariance(variance);
   }
 }
 

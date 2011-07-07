@@ -23,7 +23,7 @@ class MachineTest(unittest.TestCase):
     self.assertTrue(equals(logLH, -1.93787706641, 1e-11))
   
   def test02_GMMMachine(self):
-    """Test a GMMMachine"""
+    """Test a GMMMachine (statistics)"""
 
     arrayset = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     gmm = torch.machine.GMMMachine(2, 2)
@@ -58,6 +58,26 @@ class MachineTest(unittest.TestCase):
     # implementation
     matlab_ll_ref = -2.361583051672024e+02
     self.assertTrue( abs(gmm(data) - matlab_ll_ref) < 1e-4)
+
+  def test04_GMMMachine(self):
+    """Test a GMMMachine (Supervectors)"""
+
+    gmm = torch.machine.GMMMachine(2, 3)
+    gmm.weights   = torch.core.array.array([0.5, 0.5], 'float64')
+    gmm.means     = torch.core.array.array([[3, 70, 5], [4, 72, 14]], 'float64')
+    gmm.variances = torch.core.array.array([[1, 10, 9], [2, 5, 5]], 'float64')
+
+    mean_ref = torch.core.array.array([3, 70, 5, 4, 72, 14], 'float64')
+    var_ref = torch.core.array.array([1, 10, 9, 2, 5, 5], 'float64')
+
+    array = torch.core.array.float64_1((6,))
+    # Check mean supervector
+    gmm.getMeanSupervector(array)
+    self.assertTrue( array == mean_ref )
+
+    # Check variance supervector
+    gmm.getVarianceSupervector(array)
+    self.assertTrue( array == var_ref )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
