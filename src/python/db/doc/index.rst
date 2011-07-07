@@ -22,7 +22,7 @@ BANCA Database
   :members:
 
 Biosecure Database
-==============
+==================
 
 .. automodule:: torch.db.biosecure
 
@@ -51,6 +51,14 @@ Replay Attack Database
 .. automodule:: torch.db.replay
 
 .. autoclass:: torch.db.replay.Database
+  :members:
+
+SCface Database
+===============
+
+.. automodule:: torch.db.scface
+
+.. autoclass:: torch.db.scface.Database
   :members:
 
 Iris Database
