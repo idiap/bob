@@ -7,7 +7,8 @@
 
 import sqlalchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, not_
-from sqlalchemy.orm import relationship, backref
+from ..sqlalchemy_migration import Enum, relationship
+from sqlalchemy.orm import backref
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -16,9 +17,9 @@ class Client(Base):
   __tablename__ = 'client'
   
   id = Column(Integer, primary_key=True)
-  sgroup = Column(sqlalchemy.Enum('dev','eval','world')) # do NOT use group (SQL keyword)
-  gender = Column(sqlalchemy.Enum('f','m'))
-  institute = Column(sqlalchemy.Enum('idiap', 'manchester', 'surrey', 'oulu', 'brno', 'avignon'))
+  sgroup = Column(Enum('dev','eval','world')) # do NOT use group (SQL keyword)
+  gender = Column(Enum('f','m'))
+  institute = Column(Enum('idiap', 'manchester', 'surrey', 'oulu', 'brno', 'avignon'))
 
   def __init__(self, id, group, gender, institute):
     self.id = id
@@ -36,10 +37,10 @@ class File(Base):
   client_id = Column(Integer, ForeignKey('client.id')) # for SQL
   path = Column(String(100), unique=True)
   session_id = Column(Integer)
-  speech_type = Column(sqlalchemy.Enum('p','l','r','f'))
+  speech_type = Column(Enum('p','l','r','f'))
   shot_id = Column(Integer)
-  environment = Column(sqlalchemy.Enum('i','o'))
-  device = Column(sqlalchemy.Enum('mobile', 'laptop'))
+  environment = Column(Enum('i','o'))
+  device = Column(Enum('mobile', 'laptop'))
   channel_id = Column(Integer)
 
   # for Python
@@ -63,8 +64,8 @@ class Protocol(Base):
   
   id = Column(Integer, primary_key=True)
   name = Column(String(8))
-  purpose = Column(sqlalchemy.Enum('enrol', 'probe'))
-  speech_type = Column(sqlalchemy.Enum('p','l','r','f'))
+  purpose = Column(Enum('enrol', 'probe'))
+  speech_type = Column(Enum('p','l','r','f'))
   
   def __init__(self, name, purpose, speech_type):
     self.name = name
