@@ -6,7 +6,7 @@
  */
 
 #include <boost/python.hpp>
-#include "core/python/Exception.h"
+#include "core/python/exception.h"
 #include "machine/MLP.h"
 #include "machine/MLPException.h"
 
