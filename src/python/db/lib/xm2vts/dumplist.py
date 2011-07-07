@@ -23,8 +23,7 @@ def dumplist(args):
       protocol=args.protocol,
       purposes=args.purposes,
       #model_ids=args.model_ids,
-      groups=args.groups,
-      languages=args.languages
+      groups=args.groups
       )
 
   output = sys.stdout
@@ -48,7 +47,6 @@ def add_command(subparsers):
   parser.add_argument('-u', '--purposes', dest="purposes", default='', help="if given, this value will limit the output files to those designed for the given purposes. (defaults to '%(default)s')", choices=('enrol', 'probe', ''))
   # TODO: model_ids
   parser.add_argument('-g', '--groups', dest="groups", default='', help="if given, this value will limit the output files to those belonging to a particular protocolar group. (defaults to '%(default)s')", choices=('dev', 'eval', ''))
-  parser.add_argument('-l', '--languages', dest="languages", default='', help="if given, this value will limit the output files to those belonging to the given languages. (defaults to '%(default)s')", choices=('en', ''))
   parser.add_argument('-c', '--classes', dest="classes", default='', help="if given, this value will limit the output files to those belonging to the given classes. (defaults to '%(default)s')", choices=('client', 'impostor', ''))
   parser.add_argument('--self-test', dest="selftest", default=False,
       action='store_true', help=SUPPRESS)
