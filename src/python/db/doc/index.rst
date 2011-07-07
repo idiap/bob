@@ -66,3 +66,11 @@ Iris Database
 
 .. automodule:: torch.db.iris
   :members:
+
+XM2VTS Database
+===============
+
+.. automodule:: torch.db.xm2vts
+
+.. autoclass:: torch.db.xm2vts.Database
+  :members:
