@@ -4,7 +4,9 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/base.cc"
    "src/exception.cc"
+   "src/activation.cc"
    "src/linear.cc"
+   "src/mlp.cc"
    "src/main.cc"
    )
 

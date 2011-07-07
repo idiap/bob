@@ -144,6 +144,17 @@ namespace Torch { namespace io {
       }
 
       /**
+       * Reads data from the file into a scalar. Returns by copy. Raises if the
+       * type T is incompatible. Relative paths are accepted.
+       */
+      template <typename T> T read(const std::string& path, size_t pos) {
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) 
+          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+        return m_index[absolute]->read(pos);
+      }
+
+      /**
        * Reads data from the file into a scalar. Raises an exception if the
        * type is incompatible. Relative paths are accepted. Calling this method
        * is equivalent to calling read(path, 0, value).
@@ -153,11 +164,20 @@ namespace Torch { namespace io {
       }
 
       /**
+       * Reads data from the file into a scalar. Raises an exception if the
+       * type is incompatible. Relative paths are accepted. Calling this method
+       * is equivalent to calling read(path, 0). Returns by copy.
+       */
+      template <typename T> void read(const std::string& path) {
+        read<T>(path, 0);
+      }
+
+      /**
        * Reads data from the file into a array. Raises an exception if the type
        * is incompatible. Relative paths are accepted.
        */
-      template <typename T> void readArray(const std::string& path, size_t pos, 
-          T& value) {
+      template <typename T, int N> void readArray(const std::string& path,
+          size_t pos, blitz::Array<T,N>& value) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
           throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
@@ -166,11 +186,36 @@ namespace Torch { namespace io {
 
       /**
        * Reads data from the file into a array. Raises an exception if the type
+       * is incompatible. Relative paths are accepted. Destination array is
+       * allocated internally and returned by value.
+       */
+      template <typename T, int N> blitz::Array<T,N> readArray
+        (const std::string& path, size_t pos) {
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) 
+          throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+        return m_index[absolute]->readArray<T,N>(pos);
+      }
+
+      /**
+       * Reads data from the file into a array. Raises an exception if the type
        * is incompatible. Relative paths are accepted. Calling this method is
        * equivalent to calling readArray(path, 0, value).
        */
-      template <typename T> void readArray(const std::string& path, T& value) {
+      template <typename T, int N> void readArray(const std::string& path,
+          blitz::Array<T,N>& value) {
         readArray(path, 0, value);
+      }
+
+      /**
+       * Reads data from the file into a array. Raises an exception if the type
+       * is incompatible. Relative paths are accepted. Calling this method is
+       * equivalent to calling readArray(path, 0). Destination array is
+       * allocated internally.
+       */
+      template <typename T, int N> blitz::Array<T,N> readArray
+        (const std::string& path) { 
+          return readArray<T,N>(path, 0);
       }
 
       /**

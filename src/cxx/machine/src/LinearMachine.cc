@@ -15,14 +15,11 @@
 namespace mach = Torch::machine;
 namespace math = Torch::math;
 
-inline static double linear(double x) { return x; }
-inline static double logistic(double x) { return 1.0 / (1.0 + std::exp(-x)); }
-      
 mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
   : m_input_sub(weight.extent(0)),
     m_input_div(weight.extent(0)),
     m_bias(weight.extent(1)),
-    m_activation(mach::LinearMachine::LINEAR),
+    m_activation(mach::LINEAR),
     m_actfun(linear),
     m_buffer(weight.extent(0))
 {
@@ -37,7 +34,7 @@ mach::LinearMachine::LinearMachine():
   m_input_div(0),
   m_weight(0, 0),
   m_bias(0),
-  m_activation(mach::LinearMachine::LINEAR),
+  m_activation(mach::LINEAR),
   m_actfun(linear),
   m_buffer(0)
 {
@@ -48,7 +45,7 @@ mach::LinearMachine::LinearMachine(size_t n_input, size_t n_output):
   m_input_div(n_input),
   m_weight(n_input, n_output),
   m_bias(n_output),
-  m_activation(mach::LinearMachine::LINEAR),
+  m_activation(mach::LINEAR),
   m_actfun(linear),
   m_buffer(n_input)
 {
@@ -88,28 +85,17 @@ mach::LinearMachine& mach::LinearMachine::operator=
 }
 
 void mach::LinearMachine::load (Torch::io::HDF5File& config) {
-  //query linear machine shape
-  const Torch::io::HDF5Type& t = config.describe("weights");
-  size_t n_input = t.shape()[0];
-  size_t n_output = t.shape()[1];
-
-  //reset all members to prepare the data copy using HDF5
-  m_input_sub.resize(n_input);
-  m_input_div.resize(n_input);
-  m_buffer.resize(n_input);
-  m_weight.resize(n_input, n_output);
-  m_bias.resize(n_output);
-
   //reads all data directly into the member variables
-  config.readArray("input_sub", m_input_sub);
-  config.readArray("input_div", m_input_div);
-  config.readArray("weights", m_weight);
-  config.readArray("biases", m_bias);
+  m_input_sub.reference(config.readArray<double,1>("input_sub"));
+  m_input_div.reference(config.readArray<double,1>("input_div"));
+  m_weight.reference(config.readArray<double,2>("weights"));
+  m_bias.reference(config.readArray<double,1>("biases"));
+  m_buffer.resize(m_input_sub.extent(0));
 
   //reads the activation function
   uint32_t act = 0;
   config.read("activation", act);
-  setActivation(static_cast<mach::LinearMachine::Activation>(act));
+  setActivation(static_cast<mach::Activation>(act));
 }
 
 void mach::LinearMachine::resize (size_t input, size_t output) {
@@ -183,16 +169,16 @@ void mach::LinearMachine::setInputDivision
   m_input_div.reference(v.copy());
 }
 
-void mach::LinearMachine::setActivation (mach::LinearMachine::Activation a) {
+void mach::LinearMachine::setActivation (mach::Activation a) {
   switch (a) {
-    case mach::LinearMachine::LINEAR:
-      m_actfun = linear;
+    case mach::LINEAR:
+      m_actfun = mach::linear;
       break;
-    case mach::LinearMachine::TANH:
+    case mach::TANH:
       m_actfun = std::tanh;
       break;
-    case mach::LinearMachine::LOG:
-      m_actfun = logistic;
+    case mach::LOG:
+      m_actfun = mach::logistic;
       break;
   }
   m_activation = a;

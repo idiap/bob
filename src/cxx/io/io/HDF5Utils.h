@@ -161,11 +161,30 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       }
 
       /**
+       * Reads data from the file into a scalar (allocated internally).
+       */
+      template <typename T> T read(size_t index) {
+        T retval;
+        read(index, retval);
+        return retval;
+      }
+
+      /**
        * Reads data from the file into a scalar. This is equivalent to using
        * read(0, value).
        */
       template <typename T> void read(T& value) {
-        return read(0, value);
+        read(0, value);
+      }
+
+      /**
+       * Reads data from the file into a scalar. This is equivalent to using
+       * read(0).
+       */
+      template <typename T> T read() {
+        T retval;
+        read(0, retval);
+        return retval;
       }
 
       /**
@@ -192,6 +211,21 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         }
 
       /**
+       * Reads data from the file into an array allocated dynamically.
+       *
+       * @param index Which of the arrays to read in the current dataset, by
+       * order
+       */
+      template <typename T, int N> 
+        blitz::Array<T,N> readArray(size_t index) {
+          blitz::TinyVector<int,N> shape;
+          m_type.shape().set(shape);
+          blitz::Array<T,N> retval(shape);
+          readArray(index, retval);
+          return retval;
+        }
+
+      /**
        * Reads data from the file into a array. This is equivalent to using
        * readArray(0, value).
        *
@@ -204,6 +238,15 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       template <typename T, int N> 
         void readArray(blitz::Array<T,N>& value) {
           readArray(0, value);
+        }
+
+      /**
+       * Reads data from the file into a array. This is equivalent to using
+       * readArray(0).
+       */
+      template <typename T, int N> 
+        blitz::Array<T,N> readArray() {
+          return readArray<T,N>(0);
         }
 
       /**
