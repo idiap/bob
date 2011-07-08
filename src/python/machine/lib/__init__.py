@@ -29,3 +29,36 @@ def linearmachine_str(self):
           bias, self.weights)
 LinearMachine.__str__ = linearmachine_str
 del linearmachine_str
+
+def mlp_repr(self):
+  """A funky way to display a torch MLP"""
+  bias = False
+  for i, k in enumerate(self.biases): 
+    if not (k == 0.0).all(): bias = True
+  return '<MLP %s@%s [bias: %s][act: %s]>' % (self.weights[0].cxx_element_typename, self.shape, str(bias).lower(), self.activation)
+MLP.__repr__ = mlp_repr
+del mlp_repr
+
+def mlp_str(self):
+  """A funky way to print a torch MLP"""
+  act = "[act: %s]" % self.activation
+  sub = ""
+  if not (self.input_subtract == 0.0).all():
+    sub = "\n subtract: %s" % self.input_subtract
+  div = ""
+  if not (self.input_divide == 1.0).all():
+    div = "\n divide: %s" % self.input_divide
+  has_bias = False
+  bias = ""
+  for i, k in enumerate(self.biases):
+    if not (k == 0.0).all():
+      has_bias = True
+      bias += "\n bias[%d]:\n %s" % (i, k)
+  weight = ""
+  for i, k in enumerate(self.weights):
+    weight += "\n weight[%d]:\n %s" % (i, k)
+  return 'MLP %s@%s [bias: %s]%s%s%s%s%s' % \
+      (self.weights[0].cxx_element_typename, self.shape, str(has_bias).lower(), 
+          act, sub, div, bias, weight)
+MLP.__str__ = mlp_str
+del mlp_str
