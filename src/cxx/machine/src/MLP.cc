@@ -28,6 +28,10 @@ mach::MLP::MLP (size_t input, size_t output):
   m_buffer(1)
 {
   resize(input, output);
+  m_input_sub = 0;
+  m_input_div = 1;
+  setWeights(0);
+  setBiases(0);
 }
 
 mach::MLP::MLP (size_t input, size_t hidden, size_t output):
@@ -40,6 +44,10 @@ mach::MLP::MLP (size_t input, size_t hidden, size_t output):
   m_buffer(2)
 {
   resize(input, hidden, output);
+  m_input_sub = 0;
+  m_input_div = 1;
+  setWeights(0);
+  setBiases(0);
 }
 
 mach::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t output):
@@ -52,6 +60,10 @@ mach::MLP::MLP (size_t input, const std::vector<size_t>& hidden, size_t output):
   m_buffer(hidden.size()+1)
 {
   resize(input, hidden, output);
+  m_input_sub = 0;
+  m_input_div = 1;
+  setWeights(0);
+  setBiases(0);
 }
 
 mach::MLP::MLP (const std::vector<size_t>& shape):
@@ -59,6 +71,10 @@ mach::MLP::MLP (const std::vector<size_t>& shape):
   m_actfun(std::tanh)
 {
   resize(shape);
+  m_input_sub = 0;
+  m_input_div = 1;
+  setWeights(0);
+  setBiases(0);
 }
 
 mach::MLP::MLP (const mach::MLP& other):
@@ -134,19 +150,19 @@ void mach::MLP::load (Torch::io::HDF5File& config) {
 }
 
 void mach::MLP::save (Torch::io::HDF5File& config) const {
-  config.appendArray("input_sub", m_input_sub);
-  config.appendArray("input_div", m_input_div);
-  config.append("nhidden", (uint8_t)(m_weight.size()-1));
+  config.setArray("input_sub", m_input_sub);
+  config.setArray("input_div", m_input_div);
+  config.set("nhidden", (uint8_t)(m_weight.size()-1));
   boost::format weight("weight_%d");
   boost::format bias("bias_%d");
   for (size_t i=0; i<m_weight.size(); ++i) {
     weight % i;
     bias % i;
-    config.appendArray(weight.str(), m_weight[i]);
-    config.appendArray(bias.str(), m_bias[i]);
+    config.setArray(weight.str(), m_weight[i]);
+    config.setArray(bias.str(), m_bias[i]);
   }
   //torch's hdf5 implementation does not support enumerations yet...
-  config.append("activation", static_cast<uint32_t>(m_activation));
+  config.set("activation", static_cast<uint32_t>(m_activation));
 }
 
 void mach::MLP::forward_ (const blitz::Array<double,1>& input,
@@ -225,20 +241,21 @@ void mach::MLP::resize (size_t input, const std::vector<size_t>& hidden,
 
   //initializes hidden layers
   for (size_t i=0; i<(hidden.size()-1); ++i) {
-    m_weight[i+1] = blitz::Array<double,2>(hidden[i], hidden[i+1]);
-    m_bias[i+1] = blitz::Array<double,1>(hidden[i+1]);
-    m_buffer[i+1] = blitz::Array<double,1>(hidden[i]);
+    m_weight[i+1].reference(blitz::Array<double,2>(hidden[i], hidden[i+1]));
+    m_bias[i+1].reference(blitz::Array<double,1>(hidden[i+1]));
+    m_buffer[i+1].reference(blitz::Array<double,1>(hidden[i]));
   }
 
   //initializes the last layer
-  m_weight.back() = blitz::Array<double,2>(hidden.back(), output);
-  m_bias.back() = blitz::Array<double,1>(output);
+  m_weight.back().reference(blitz::Array<double,2>(hidden.back(), output));
+  m_bias.back().reference(blitz::Array<double,1>(output));
 }
 
 void mach::MLP::resize (const std::vector<size_t>& shape) {
 
   if (shape.size() < 2) throw mach::InvalidShape();
-  else if (shape.size() == 2) {
+  
+  if (shape.size() == 2) {
     resize(shape[0], shape[1]);
     return;
   }

@@ -107,12 +107,12 @@ void mach::LinearMachine::resize (size_t input, size_t output) {
 }
 
 void mach::LinearMachine::save (Torch::io::HDF5File& config) const {
-  config.appendArray("input_sub", m_input_sub);
-  config.appendArray("input_div", m_input_div);
-  config.appendArray("weights", m_weight);
-  config.appendArray("biases", m_bias);
+  config.setArray("input_sub", m_input_sub);
+  config.setArray("input_div", m_input_div);
+  config.setArray("weights", m_weight);
+  config.setArray("biases", m_bias);
   //torch's hdf5 implementation does not support enumerations yet...
-  config.append("activation", static_cast<uint32_t>(m_activation));
+  config.set("activation", static_cast<uint32_t>(m_activation));
 }
 
 void mach::LinearMachine::forward_
