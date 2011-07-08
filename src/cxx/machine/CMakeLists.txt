@@ -11,6 +11,7 @@ set(src
     "src/KMeansMachine.cc"
     "src/Gaussian.cc"
     "src/GMMMachine.cc"
+    "src/GMMLLRMachine.cc"
     "src/GMMStats.cc"
     "src/EigenMachineException.cc"
     "src/TwoDPCAMachine.cc"

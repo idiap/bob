@@ -1,8 +1,9 @@
 #include <boost/python.hpp>
-#include <io/Arrayset.h>
-#include <machine/KMeansMachine.h>
-#include <machine/GMMMachine.h>
 #include <boost/concept_check.hpp>
+#include "io/Arrayset.h"
+#include "machine/KMeansMachine.h"
+#include "machine/GMMMachine.h"
+#include "machine/GMMLLRMachine.h"
 
 using namespace boost::python;
 namespace io = Torch::io;
@@ -238,4 +239,27 @@ void bind_machine_base() {
   .def(self_ns::str(self_ns::self))
   ;
 
+  class_<mach::GMMLLRMachine, bases<mach::Machine<blitz::Array<double,1>, double> > >("GMMLLRMachine",
+       "This class implements computes log likelihood ratio, given a client and a UBM GMM.\n",
+        no_init)
+  .def(init<mach::GMMLLRMachine&>())
+  .def(init<Torch::io::HDF5File&>(args("config")))
+  .def(init<Torch::io::HDF5File&,Torch::io::HDF5File&>(args("client", "ubm")))
+  .def(init<mach::GMMMachine&,mach::GMMMachine&>(args("client", "ubm")))
+  .def(self == self)
+  .def("getGMMClient",
+       &mach::GMMLLRMachine::getGMMClient, return_value_policy<reference_existing_object>(),
+       "Get a pointer to the client GMM")
+  .def("getGMMUBM",
+       &mach::GMMLLRMachine::getGMMUBM, return_value_policy<reference_existing_object>(),
+       "Get a pointer to the UBM GMM")
+ .add_property("nInputs", &mach::GMMMachine::getNInputs, "The feature dimensionality")
+  .def("load",
+       &mach::GMMLLRMachine::load,
+       "Load from a Configuration")
+  .def("save",
+       &mach::GMMLLRMachine::save,
+       "Save to a Configuration")
+  .def(self_ns::str(self_ns::self))
+  ;
 }
