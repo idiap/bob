@@ -60,7 +60,10 @@ void io::ImageArrayCodec::peek(const std::string& filename,
     Magick::Image image(filename.c_str());
   
     // Assume Grayscale image
-    if( !image.magick().compare("PBM") || !image.magick().compare("PGM")) {
+    if( !image.magick().compare("PBM") || !image.magick().compare("PGM") ||
+        (!image.magick().compare("PNM") && (image.type() == Magick::BilevelType ||
+        image.type() == Magick::GrayscaleMatteType || image.type() == Magick::GrayscaleType) ))
+    {
       image.colorSpace( Magick::GRAYColorspace);
       ndim = 2;
       shape[0] = image.rows();
@@ -102,7 +105,10 @@ io::ImageArrayCodec::load(const std::string& filename) const {
     Torch::core::array::ElementType eltype;
   
     // Assume Grayscale image
-    if( !image.magick().compare("PBM") || !image.magick().compare("PGM")) {
+    if( !image.magick().compare("PBM") || !image.magick().compare("PGM") ||
+        (!image.magick().compare("PNM") && (image.type() == Magick::BilevelType ||
+        image.type() == Magick::GrayscaleMatteType || image.type() == Magick::GrayscaleType) ))
+    {
       image.colorSpace( Magick::GRAYColorspace);
       ndim = 2;
       n_c = 1;
