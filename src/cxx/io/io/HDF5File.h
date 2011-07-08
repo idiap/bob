@@ -291,6 +291,29 @@ namespace Torch { namespace io {
         }
         m_index[absolute]->addArray(value);
       }
+
+      /**
+       * Sets the scalar at position 0 to the given value. This method is
+       * equivalent to checking if the scalar at position 0 exists and then
+       * replacing it. If the path does not exist, we append the new scalar.
+       */
+      template <typename T> void set(const std::string& path, const T& value) {
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) append(path, value);
+        else replace(path, value);
+      }
+
+      /**
+       * Sets the array at position 0 to the given value. This method is
+       * equivalent to checking if the array at position 0 exists and then
+       * replacing it. If the path does not exist, we append the new array.
+       */
+      template <typename T> void setArray(const std::string& path,
+          const T& value) {
+        std::string absolute = resolve(path);
+        if (!contains(absolute)) appendArray(path, value);
+        else replaceArray(path, value);
+      }
       
     private: //not implemented
 
