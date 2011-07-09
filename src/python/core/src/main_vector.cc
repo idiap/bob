@@ -9,6 +9,7 @@
 using namespace boost::python;
 
 void bind_core_vectors();
+void bind_core_arrayvectors();
 
 BOOST_PYTHON_MODULE(libpytorch_core_vector) {
   docstring_options docopt; 
@@ -17,4 +18,5 @@ BOOST_PYTHON_MODULE(libpytorch_core_vector) {
 # endif
   scope().attr("__doc__") = "Torch core classes and sub-classes for std::vector manipulation from python";
   bind_core_vectors();
+  bind_core_arrayvectors();
 }
