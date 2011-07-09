@@ -12,6 +12,8 @@ import math
 import torch
 
 MACHINE = 'data/mlp-test.hdf5'
+COMPLICATED = 'data/mlp-big.hdf5'
+COMPLICATED_NOBIAS = 'data/mlp-big-nobias.hdf5'
 
 class MLPTest(unittest.TestCase):
   """Performs various MLP tests."""
@@ -143,7 +145,7 @@ class MLPTest(unittest.TestCase):
     i = torch.core.array.array([.1, .7])
     y = m(i)
     y_exp = torch.core.array.array([0.09596993, 0.6175601])
-    self.assertTrue( ((y - y_exp) < 1e-6).all() )
+    self.assertTrue( (abs(y - y_exp) < 1e-6).all() )
 
     # compares a simple (logistic activation, 1 layer) MLP with a LinearMachine
     mlinear = torch.machine.LinearMachine(2,1)
@@ -157,6 +159,29 @@ class MLPTest(unittest.TestCase):
     mlp.biases = [torch.core.array.array([-.7])]
 
     self.assertTrue( (mlinear(i) == mlp(i)).all() )
+
+  def xtest05_ComplicatedCorrectness(self):
+
+    # this test is about importing an already create neural network from
+    # NeralLab and trying it with Torch clothes.
+
+    # STOPPED HERE: Have to run neurallab to determine ex*
+    data1 = torch.core.array.array([-.1, .1, .75, .37542, 42])
+    ex1 = torch.core.array.array([])
+    data2 = torch.core.array.array([.1, -.1, -.75, -.37542, .2])
+    ex2 = torch.core.array.array([])
+    data3 = torch.core.array.array([5, 6, -7, 9, 1052])
+    ex3 = torch.core.array.array([])
+
+    m = torch.machine.MLP(torch.io.HDF5File(COMPLICATED))
+    self.assertEqual( (abs(m(data1) - ex1) < 1e-6).all(), True)
+    self.assertEqual( (abs(m(data2) - ex2) < 1e-6).all(), True)
+    self.assertEqual( (abs(m(data3) - ex3) < 1e-6).all(), True)
+
+    m = torch.machine.MLP(torch.io.HDF5File(COMPLICATED_NOBIAS))
+    self.assertEqual( (abs(m(data1) - ex1) < 1e-6).all(), True)
+    self.assertEqual( (abs(m(data2) - ex2) < 1e-6).all(), True)
+    self.assertEqual( (abs(m(data3) - ex3) < 1e-6).all(), True)
 
 if __name__ == '__main__':
   sys.argv.append('-v')
