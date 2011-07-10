@@ -363,6 +363,8 @@ def sphinx(option):
     status = run(cmdline_html, option.save_output, option.log_prefix)
   else:
     status = run(cmdline_html)
+  print str(cmdline_html)
+  logging.debug(str(cmdline_html))
   if status != 0:
     raise RuntimeError('** ERROR: "sphinx-build -b html" did not work as expected.')
 
