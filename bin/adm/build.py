@@ -360,11 +360,12 @@ def sphinx(option):
   cmdline_html.extend(['-b', 'html', option.source_dir, sphinx_prefix_html])
   if not os.path.exists(sphinx_prefix_html): os.makedirs(sphinx_prefix_html)
   if hasattr(option, "log_prefix"):
+    print "option.save_output: " + str(option.save_output)
+    print "option.log_prefix: " + str(option.log_prefix)
     status = run(cmdline_html, option.save_output, option.log_prefix)
   else:
     status = run(cmdline_html)
   print str(cmdline_html)
-  logging.debug(str(cmdline_html))
   if status != 0:
     raise RuntimeError('** ERROR: "sphinx-build -b html" did not work as expected.')
 
