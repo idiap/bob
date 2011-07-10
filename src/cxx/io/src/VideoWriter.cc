@@ -18,6 +18,7 @@ namespace io = Torch::io;
 io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
     size_t width, float framerate, float bitrate, size_t gop):
   m_filename(filename),
+  m_isopen(true),
   m_height(height),
   m_width(width),
   m_framerate(framerate),
@@ -119,6 +120,10 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
 }
 
 io::VideoWriter::~VideoWriter() {
+  close();
+}
+
+void io::VideoWriter::close() {
   // writes the trailer, if any.  the trailer must be written
   // before you close the CodecContexts open when you wrote the
   // header; otherwise write_trailer may try to use memory that
@@ -147,7 +152,8 @@ io::VideoWriter::~VideoWriter() {
     sws_freeContext(m_sws_context);
     m_sws_context=0; 
   }
-  
+ 
+  m_isopen = false;
 }
 
 AVStream* io::VideoWriter::add_video_stream() {
@@ -338,6 +344,9 @@ void io::VideoWriter::close_video() {
 }
 
 void io::VideoWriter::append(const blitz::Array<uint8_t,3>& data) {
+  //are we still opened?
+  if (!m_isopen) throw io::VideoIsClosed(m_filename.c_str());
+
   //checks data specifications
   if (data.extent(0) != 3 || (size_t)data.extent(1) != m_height || 
       (size_t)data.extent(2) != m_width) {
@@ -348,6 +357,9 @@ void io::VideoWriter::append(const blitz::Array<uint8_t,3>& data) {
 }
 
 void io::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
+  //are we still opened?
+  if (!m_isopen) throw io::VideoIsClosed(m_filename.c_str());
+
   //checks data specifications
   if (data.extent(1) != 3 || (size_t)data.extent(2) != m_height || 
       (size_t)data.extent(3) != m_width) {

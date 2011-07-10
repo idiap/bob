@@ -31,3 +31,23 @@ const char* io::FFmpegException::what() const throw() {
     return emergency;
   }
 }
+
+io::VideoIsClosed::VideoIsClosed(const char* filename) throw(): 
+  m_filename(filename)
+{
+}
+
+io::VideoIsClosed::~VideoIsClosed() throw() {
+}
+
+const char* io::VideoIsClosed::what() const throw() {
+  try {
+    boost::format message("Cannot write to %s anymore, video was already closed by user");
+    message % m_filename;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "io::VideoIsClosed: cannot format, exception raised";
+    return emergency;
+  }
+}

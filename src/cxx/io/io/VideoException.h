@@ -29,6 +29,22 @@ namespace Torch { namespace io {
       mutable std::string m_message;
   };
 
+  /**
+   * Thrown if a writeable video is already closed and the user tries to write
+   * on it.
+   */
+  class VideoIsClosed: public io::Exception {
+    public:
+      VideoIsClosed(const char* filename) throw();
+      virtual ~VideoIsClosed() throw();
+      virtual const char* what() const throw();
+
+    private:
+
+      std::string m_filename;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* TORCH_IO_VIDEOEXCEPTION_H */

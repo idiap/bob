@@ -125,6 +125,7 @@ static blitz::Array<uint8_t,4> videoreader_getslice (io::VideoReader& v, slice s
 void bind_io_video() {
   //exceptions for videos
   CxxToPythonTranslatorPar2<Torch::io::FFmpegException, Torch::io::Exception, const char*, const char*>("FFmpegException", "Thrown when there is a problem with a Video file.");
+  CxxToPythonTranslatorPar<Torch::io::VideoIsClosed, Torch::io::Exception, const char*>("VideoIsClosed", "Thrown if a writeable video is already closed and the user tries to write on it.");
 
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 
@@ -161,6 +162,8 @@ void bind_io_video() {
     .add_property("bitRate", &io::VideoWriter::bitRate)
     .add_property("gop", &io::VideoWriter::gop)
     .add_property("info", &io::VideoWriter::info)
+    .add_property("is_opened", &io::VideoWriter::is_opened)
+    .def("close", &io::VideoWriter::close, "Closes the current video stream and forces writing the trailer. After this point the video is finalized and cannot be written to anymore.")
     .def("append", (void (io::VideoWriter::*)(const blitz::Array<uint8_t,3>&))&io::VideoWriter::append, (arg("frame")), "Writes a new frame to the file. The frame should be setup as a blitz::Array<> with 3 dimensions organized in this way (RGB color-bands, height, width). WARNING: At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
     .def("append", (void (io::VideoWriter::*)(const blitz::Array<uint8_t,4>&))&io::VideoWriter::append, (arg("frame")), "Writes a set of frames to the file. The frame set should be setup as a blitz::Array<> with 4 dimensions organized in this way: (frame-number, RGB color-bands, height, width). WARNING: At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
     ;
