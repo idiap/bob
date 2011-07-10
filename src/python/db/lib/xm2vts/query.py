@@ -42,12 +42,14 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
     return l
 
-  def clients(self, groups=None, purposes=None):
+  def clients(self, protocol=None, groups=None):
     """Returns a set of clients for the specific query by the user.
-    TODO
 
     Keyword Parameters:
 
+    protocol
+      One of the XM2VTS protocols ('lp1', 'lp2').
+    
     groups
       The groups to which the clients belong ('dev', 'eval', 'world').
       Note that 'dev', 'eval' and 'world' are alias for 'client'.
@@ -62,8 +64,6 @@ class Database(object):
       ngroups = ('client', 'impostorDev', 'impostorEval')
     else:
       ngroups = ('client',)
-    #VALID_GROUPS = ('dev', 'eval', 'world')
-    #groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     # List of the clients
     q = self.session.query(Client).filter(Client.sgroup.in_(ngroups)).\
           order_by(Client.id)
@@ -78,11 +78,12 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+      One of the XM2VTS protocols ('lp1', 'lp2').
     
     groups
-      The groups to which the subjects attached to the models belong ("g1", "g2", "world")
-      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+      The groups to which the subjects attached to the models belong ('dev', 'eval', 'world')
+      Note that 'dev', 'eval' and 'world' are alias for 'client'.
+      If no groups are specified, then both clients are impostors are listed.
 
     Returns: A list containing all the model ids belonging to the given group.
     """
@@ -234,10 +235,16 @@ class Database(object):
         for k in q:
           retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
       if('probe' in purposes):
+        ltmp = []
+        if( 'dev' in groups):
+          ltmp.append('dev')
+        if( 'eval' in groups):
+          ltmp.append('eval')
+        dev_eval = tuple(ltmp)
         if('client' in classes):
           q = self.session.query(File, Protocol).join(Client).\
                 filter(Client.sgroup.in_(clientGroup)).\
-                filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', Protocol.sgroup.in_(groups))).\
+                filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', Protocol.sgroup.in_(dev_eval))).\
                 filter(and_(File.session_id == Protocol.session_id, File.shot_id == Protocol.shot_id))
           if model_ids:
             q = q.filter(Client.id.in_(model_ids))
@@ -254,7 +261,7 @@ class Database(object):
           impostorGroups = tuple(ltmp)
           q = self.session.query(File, Protocol).join(Client).\
                 filter(Client.sgroup.in_(impostorGroups)).\
-                filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', Protocol.sgroup.in_(groups))).\
+                filter(and_(Protocol.name.in_(protocol), Protocol.purpose == 'probe', Protocol.sgroup.in_(dev_eval))).\
                 filter(and_(File.session_id == Protocol.session_id, File.shot_id == Protocol.shot_id))
           q = q.order_by(File.client_id, File.session_id, File.shot_id)
           for k in q:
