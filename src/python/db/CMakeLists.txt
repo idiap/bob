@@ -123,7 +123,7 @@ torch_python_add_test(python-db-scface-dumplist
 set_property(TEST python-db-scface-dumplist APPEND PROPERTY DEPENDS
   ${python-db-scface-instantiation})
 torch_python_add_test(python-db-scface-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py multipie dumplist --protocol=combined --classes=client 
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py scface dumplist --protocol=combined --classes=client 
   --groups=dev --purposes=enrol --self-test)
 set_property(TEST python-db-scface-dumplist2 APPEND PROPERTY DEPENDS 
   ${python-db-scface-instantiation})
