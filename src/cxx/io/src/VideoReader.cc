@@ -125,9 +125,17 @@ void io::VideoReader::open() {
    */
   m_width = codec_ctxt->width;
   m_height = codec_ctxt->height;
-  m_nframes = format_ctxt->streams[stream_index]->nb_frames;
-  m_framerate = m_nframes * AV_TIME_BASE / format_ctxt->duration;
   m_duration = format_ctxt->duration;
+  m_nframes = format_ctxt->streams[stream_index]->nb_frames;
+  if (m_nframes > 0) {
+    //number of frames is known
+    m_framerate = m_nframes * AV_TIME_BASE / m_duration;
+  }
+  else {
+    //number of frames is not known
+    m_framerate = av_q2d(format_ctxt->streams[stream_index]->r_frame_rate);
+    m_nframes = (int)(m_framerate * m_duration / AV_TIME_BASE);
+  }
   m_codecname = codec->name;
   m_codecname_long = codec->long_name;
 
