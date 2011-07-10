@@ -177,7 +177,7 @@ void io::VideoReader::load(blitz::Array<uint8_t,4>& data) const {
 }
 
 io::VideoReader::const_iterator io::VideoReader::begin() const {
-  return this;
+  return io::VideoReader::const_iterator(this);
 }
 
 io::VideoReader::const_iterator io::VideoReader::end() const {

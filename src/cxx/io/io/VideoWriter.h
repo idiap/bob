@@ -50,6 +50,12 @@ namespace Torch { namespace io {
       virtual ~VideoWriter();
 
       /**
+       * Closes the current video stream and forces writing the trailer. After
+       * this point the video becomes invalid.
+       */
+      void close();
+
+      /**
        * Access to the filename
        */
       inline const std::string& filename() const { return m_filename; }
@@ -102,6 +108,11 @@ namespace Torch { namespace io {
       inline const std::string& codecLongName() const {
         return m_codecname_long; 
       }
+
+      /**
+       * Returns if the video is currently opened for writing
+       */
+      inline bool is_opened() const { return m_isopen; }
       
       /**
        * Returns a string containing the format information
@@ -166,6 +177,7 @@ namespace Torch { namespace io {
     private: //representation
 
       std::string m_filename;
+      bool m_isopen;
       size_t m_height;
       size_t m_width;
       float m_framerate;
