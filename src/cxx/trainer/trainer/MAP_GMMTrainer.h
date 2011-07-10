@@ -1,5 +1,6 @@
 /// @file MAP_GMMTrainer.h
 /// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
 /// @brief This class implements the maximum a posteriori M-step of the expectation-maximisation algorithm for a GMM Machine. The prior parameters are encoded in the form of a GMM (e.g. a universal background model). The EM algorithm thus performs GMM adaptation.
 /// @details See Section 3.4 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000. We use a "single adaptation coefficient", alpha_i, and thus a single relevance factor, r.
 
@@ -7,6 +8,7 @@
 #define _MAP_GMMTRAINER_H
 
 #include "GMMTrainer.h"
+#include <limits>
 #include <core/Exception.h>
 
 namespace Torch {
@@ -18,7 +20,8 @@ class MAP_GMMTrainer : public GMMTrainer {
   public:
 
     /// Default constructor
-    MAP_GMMTrainer(double relevance_factor = 0, bool update_means = true, bool update_variances = false, bool update_weights = false);
+    MAP_GMMTrainer(double relevance_factor = 0, bool update_means = true, bool update_variances = false, 
+      bool update_weights = false, double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon());
 
     /// Destructor
     virtual ~MAP_GMMTrainer();

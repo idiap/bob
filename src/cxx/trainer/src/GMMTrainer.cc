@@ -2,8 +2,11 @@
 
 using namespace Torch::machine;
 
-Torch::trainer::GMMTrainer::GMMTrainer(bool update_means, bool update_variances, bool update_weights) :
-  EMTrainer<GMMMachine, Torch::io::Arrayset>(), update_means(update_means), update_variances(update_variances), update_weights(update_weights) {
+Torch::trainer::GMMTrainer::GMMTrainer(bool update_means, bool update_variances, bool update_weights, 
+    double mean_var_update_responsibilities_threshold):
+  EMTrainer<GMMMachine, Torch::io::Arrayset>(), update_means(update_means), update_variances(update_variances), 
+  update_weights(update_weights), m_mean_var_update_responsibilities_threshold(mean_var_update_responsibilities_threshold) {
+
 }
 
 Torch::trainer::GMMTrainer::~GMMTrainer() {

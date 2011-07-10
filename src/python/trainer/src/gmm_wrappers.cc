@@ -3,6 +3,7 @@
 #include "trainer/GMMTrainer.h"
 #include "trainer/MAP_GMMTrainer.h"
 #include "trainer/ML_GMMTrainer.h"
+#include <limits>
 
 using namespace boost::python;
 namespace train = Torch::trainer;
@@ -49,8 +50,9 @@ class GMMTrainerWrapper: public train::GMMTrainer,
                          public wrapper<train::GMMTrainer>
 {
 public:
-  GMMTrainerWrapper(bool update_means = true, bool update_variances = false, bool update_weights = false):
-    train::GMMTrainer(update_means, update_variances, update_weights) {}
+  GMMTrainerWrapper(bool update_means = true, bool update_variances = false, bool update_weights = false,
+      double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon()):
+    train::GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
 
   virtual ~GMMTrainerWrapper() {}
   
@@ -96,8 +98,9 @@ class MAP_GMMTrainerWrapper: public train::MAP_GMMTrainer,
                              public wrapper<train::MAP_GMMTrainer>
 {
 public:
-  MAP_GMMTrainerWrapper(double relevance_factor = 0):
-    train::MAP_GMMTrainer(relevance_factor) {}
+  MAP_GMMTrainerWrapper(double relevance_factor = 0, bool update_means = true, bool update_variances = false, bool update_weights = false,
+      double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon()):
+    train::MAP_GMMTrainer(relevance_factor, update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
 
   virtual ~MAP_GMMTrainerWrapper() {}
 
@@ -149,8 +152,9 @@ class ML_GMMTrainerWrapper: public train::ML_GMMTrainer,
                             public wrapper<train::ML_GMMTrainer>
 {
 public:
-  ML_GMMTrainerWrapper(bool update_means = true, bool update_variances = false, bool update_weights = false):
-    train::ML_GMMTrainer(update_means, update_variances, update_weights) {}
+  ML_GMMTrainerWrapper(bool update_means = true, bool update_variances = false, bool update_weights = false,
+      double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon()):
+    train::ML_GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold) {}
 
   virtual ~ML_GMMTrainerWrapper() {}
 
@@ -222,7 +226,7 @@ void bind_trainer_gmm_wrappers() {
   class_<GMMTrainerWrapper, boost::noncopyable >("GMMTrainer",
       "This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<optional<bool, bool, bool> >((arg("update_means"), arg("update_variances"), arg("update_weights"))))
+      init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
     .add_property("convergenceThreshold", &train::GMMTrainer::getConvergenceThreshold, &train::GMMTrainer::setConvergenceThreshold, "Convergence threshold")
     .add_property("maxIterations", &train::GMMTrainer::getMaxIterations, &train::GMMTrainer::setMaxIterations, "Max iterations")
     .def("train", &train::GMMTrainer::train, &GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")
@@ -238,7 +242,7 @@ void bind_trainer_gmm_wrappers() {
       "The prior parameters are encoded in the form of a GMM (e.g. a universal background model). "
       "The EM algorithm thus performs GMM adaptation.\n"
       "See Section 3.4 of Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000. We use a \"single adaptation coefficient\", alpha_i, and thus a single relevance factor, r.",
-      init<optional<double> >((arg("relevance_factor"))))
+      init<optional<double, bool, bool, bool, double> >((arg("relevance_factor"), arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
     .def("setPriorGMM", &train::MAP_GMMTrainer::setPriorGMM, 
       "Set the GMM to use as a prior for MAP adaptation. "
       "Generally, this is a \"universal background model\" (UBM), "
@@ -255,7 +259,7 @@ void bind_trainer_gmm_wrappers() {
   class_<ML_GMMTrainerWrapper, boost::noncopyable >("ML_GMMTrainer",
       "This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<optional<bool, bool, bool> >((arg("update_means"), arg("update_variances"), arg("update_weights"))))
+      init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("mean_var_update_responsibilities_threshold"))))
     .add_property("convergenceThreshold", &train::ML_GMMTrainer::getConvergenceThreshold, &train::ML_GMMTrainer::setConvergenceThreshold, "Convergence threshold")
     .add_property("maxIterations", &train::ML_GMMTrainer::getMaxIterations, &train::ML_GMMTrainer::setMaxIterations, "Max iterations")
     .def("train", &train::ML_GMMTrainer::train, &ML_GMMTrainerWrapper::d_train, (arg("machine"), arg("data")), "Train a machine using some data")

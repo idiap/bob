@@ -1,5 +1,6 @@
 /// @file GMMTrainer.h
 /// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
 /// @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
 /// @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
 
@@ -10,6 +11,7 @@
 #include "trainer/EMTrainer.h"
 #include "machine/GMMMachine.h"
 #include "machine/GMMStats.h"
+#include <limits>
 
 namespace Torch {
 namespace trainer {
@@ -20,7 +22,8 @@ class GMMTrainer : public EMTrainer<Torch::machine::GMMMachine, Torch::io::Array
   public:
 
     /// Default constructor
-    GMMTrainer(bool update_means = true, bool update_variances = false, bool update_weights = false);
+    GMMTrainer(bool update_means = true, bool update_variances = false, bool update_weights = false,
+      double mean_var_update_responsibilities_threshold = std::numeric_limits<double>::epsilon());
     
     /// Destructor
     virtual ~GMMTrainer();
@@ -51,6 +54,12 @@ class GMMTrainer : public EMTrainer<Torch::machine::GMMMachine, Torch::io::Array
     
     /// update weights on each iteration
     bool update_weights;
+
+    /// threshold over the responsibilities of the Gaussians
+    /// Equations 9.24, 9.25 of Bishop, "Pattern recognition and machine learning", 2006
+    /// require a division by the responsibilities, which might be equal to zero
+    /// because of numerical issue. This threshold is used to avoid such divisions.
+    double m_mean_var_update_responsibilities_threshold;
 };
 
 }

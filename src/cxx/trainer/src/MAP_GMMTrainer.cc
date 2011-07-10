@@ -1,7 +1,10 @@
 #include "trainer/MAP_GMMTrainer.h"
 #include "trainer/Exception.h"
 
-Torch::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, bool update_weights) : GMMTrainer(update_means, update_variances, update_weights), relevance_factor(relevance_factor), m_prior_gmm(NULL) {
+Torch::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, 
+    bool update_weights, double mean_var_update_responsibilities_threshold): 
+  GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold), 
+  relevance_factor(relevance_factor), m_prior_gmm(NULL) {
   
 }
 
