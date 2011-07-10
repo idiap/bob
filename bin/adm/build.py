@@ -354,7 +354,8 @@ def sphinx(option):
   # TODO: Parse version
   cmdline.extend(['-D','version=%s' % option.version])
   cmdline.extend(['-D','release=%s' % option.version])
-  
+ 
+  # Generates HTML
   sphinx_prefix_html = os.path.join(sphinx_prefix, "html")
   cmdline_html = cmdline[:]
   cmdline_html.extend(['-b', 'html', option.source_dir, sphinx_prefix_html])
@@ -366,6 +367,7 @@ def sphinx(option):
   if status != 0:
     raise RuntimeError('** ERROR: "sphinx-build -b html" did not work as expected.')
 
+  # Generates the LaTeX sources (not the final PDF)
   sphinx_prefix_latex = os.path.join(sphinx_prefix, "latex")
   cmdline_latex = cmdline[:]
   cmdline_latex.extend(['-b', 'latex', option.source_dir, sphinx_prefix_latex])
@@ -375,7 +377,19 @@ def sphinx(option):
   else:
     status = run(cmdline_latex)
   if status != 0:
-    raise RuntimeError('** ERROR: "sphinx-build -b html" did not work as expected.')
+    raise RuntimeError('** ERROR: "sphinx-build -b latex" did not work as expected.')
+
+  # Runs the coverage tests
+  sphinx_prefix_latex = os.path.join(sphinx_prefix, "coverage")
+  cmdline_latex = cmdline[:]
+  cmdline_latex.extend(['-b', 'coverage', option.source_dir, sphinx_prefix_latex])
+  if not os.path.exists(sphinx_prefix_latex): os.makedirs(sphinx_prefix_latex)
+  if hasattr(option, "log_prefix"):
+    status = run(cmdline_latex, option.save_output, option.log_prefix)
+  else:
+    status = run(cmdline_latex)
+  if status != 0:
+    raise RuntimeError('** ERROR: "sphinx-build -b coverage" did not work as expected.')
 
   logging.debug('Finished running Sphinx.')
 
