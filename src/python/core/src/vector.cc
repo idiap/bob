@@ -26,5 +26,9 @@ void bind_core_vectors () {
   tp::vector<std::complex<float> >("complex64");
   tp::vector<std::complex<double> >("complex128");
   tp::vector<std::complex<long double> >("complex256");
+
+# ifdef __APPLE__
+  //for some unknown reason, on OSX we need to define the vector<size_t>
   tp::vector<size_t>("size");
+# endif
 }

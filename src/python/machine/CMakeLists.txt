@@ -21,9 +21,13 @@ torch_python_add_test(python-machine-kmeans-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_machine.py)
 torch_python_add_test(python-machine-linear-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
+torch_python_add_test(python-machine-mlp-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mlp.py)
 
 # Installs all python scripts
 #file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our examples (run and install)
-#torch_example_install("python" "machine" example/optflowHS.py)
+torch_python_add_test(python-machine-xml2hdf5-example
+  ${CMAKE_CURRENT_SOURCE_DIR}/example/xml2hdf5.py ignore --self-test)
+torch_example_install("python" "machine" example/xml2hdf5.py)

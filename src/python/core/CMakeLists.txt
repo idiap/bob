@@ -49,6 +49,7 @@ set(pysrc_array
 
 set(pysrc_vector
    "src/vector.cc"
+   "src/arrayvector.cc"
    "src/main_vector.cc"
    )
 

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<network version="0.3">
+  <header>
+    <author>UNSET AUTHOR</author>
+    <name>UNSET NAME</name>
+    <version>0.0</version>
+    <created>2011-02-08T12:16:49</created>
+    <lastSaved>2011-02-08T12:18:57</lastSaved>
+    <comment>UNSET COMMENT</comment>
+  </header>
+  <layout>
+    <input id="0" subtract="9.298831e-01" divide="1.503821e-01"/>
+    <input id="1" subtract="1.647518e+00" divide="6.398099e-01"/>
+    <input id="2" subtract="1.159940e+00" divide="2.378277e-01"/>
+    <input id="3" subtract="1.953502e-01" divide="1.444659e-01"/>
+    <input id="4" subtract="5.654814e-01" divide="2.594478e-01"/>
+    <hidden id="5">
+      <backPropagation activationFunction="tanh"/>
+    </hidden>
+    <hidden id="6">
+      <backPropagation activationFunction="tanh"/>
+    </hidden>
+    <hidden id="7">
+      <backPropagation activationFunction="tanh"/>
+    </hidden>
+    <hidden id="8">
+      <backPropagation activationFunction="tanh"/>
+    </hidden>
+    <hidden id="9">
+      <backPropagation activationFunction="tanh"/>
+    </hidden>
+    <output id="10">
+      <backPropagation activationFunction="tanh"/>
+    </output>
+    <synapse id="0" from="0" to="5">
+      <weight>-1.363994e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="1" from="0" to="6">
+      <weight>-1.153702e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="2" from="0" to="7">
+      <weight>-1.366947e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="3" from="0" to="8">
+      <weight>-6.558911e-02</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="4" from="0" to="9">
+      <weight>-2.844122e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="5" from="1" to="5">
+      <weight>8.068541e-02</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="6" from="1" to="6">
+      <weight>-4.781569e-02</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="7" from="1" to="7">
+      <weight>1.760635e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="8" from="1" to="8">
+      <weight>-6.270816e-02</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="9" from="1" to="9">
+      <weight>8.029069e-02</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="10" from="2" to="5">
+      <weight>-2.217765e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="11" from="2" to="6">
+      <weight>7.478788e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="12" from="2" to="7">
+      <weight>-1.516070e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="13" from="2" to="8">
+      <weight>9.443527e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="14" from="2" to="9">
+      <weight>-1.161007e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="15" from="3" to="5">
+      <weight>-2.620089e-02</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="16" from="3" to="6">
+      <weight>3.167663e-02</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="17" from="3" to="7">
+      <weight>-1.478464e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="18" from="3" to="8">
+      <weight>1.624294e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="19" from="3" to="9">
+      <weight>-1.227872e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="20" from="4" to="5">
+      <weight>2.764505e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="21" from="4" to="6">
+      <weight>-2.034957e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="22" from="4" to="7">
+      <weight>1.697920e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="23" from="4" to="8">
+      <weight>-2.205752e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="24" from="4" to="9">
+      <weight>1.903350e-01</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="25" from="5" to="10">
+      <weight>2.114975e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="26" from="6" to="10">
+      <weight>-1.289029e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="27" from="7" to="10">
+      <weight>1.626394e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="28" from="8" to="10">
+      <weight>-1.715078e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+    <synapse id="29" from="9" to="10">
+      <weight>1.327868e+00</weight>
+      <rBackPropagation weightUpdate="1.000000e-06"/>
+    </synapse>
+  </layout>
+</network>
