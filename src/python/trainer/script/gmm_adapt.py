@@ -62,7 +62,7 @@ parser.add_option("--responsibilities-threshold",
                   dest="responsibilities_threshold",
                   help="Mean and variance update responsibilities threshold",
                   type="float",
-                  default=0.001)
+                  default=0.)
 
 
 (options, args) = parser.parse_args()
@@ -86,7 +86,10 @@ prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
 prior_gmm.setVarianceThreshold = options.variance_threshold
 
 # Create trainer
-trainer = torch.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight, options.responsibilities_threshold)
+if options.responsibilities_threshold == 0.:
+  trainer = torch.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight)
+else:
+  trainer = torch.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight, options.responsibilities_threshold)
 trainer.convergenceThreshold = options.convergence_threshold
 trainer.maxIterations = options.iterg
 trainer.setPriorGMM(prior_gmm)
