@@ -42,12 +42,28 @@ parser.add_option("-v",
                   help="Variance threshold",
                   type="float",
                   default=0.001)
+parser.add_option('--adapt-weight',
+                  action="store_true",
+                  dest="adapt_weight",
+                  help="Adapt weight",
+                  default=False)
+parser.add_option('--adapt-variance',
+                  action="store_true",
+                  dest="adapt_variance",
+                  help="Adapt variance",
+                  default=False)
 parser.add_option("-r",
                   "--relevance-factor",
                   dest="relevance_factor",
                   help="Relevance factor",
                   type="float",
                   default=0.001)
+parser.add_option("--responsibilities-threshold",
+                  dest="responsibilities_threshold",
+                  help="Mean and variance update responsibilities threshold",
+                  type="float",
+                  default=0.001)
+
 
 (options, args) = parser.parse_args()
 
@@ -70,7 +86,7 @@ prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
 prior_gmm.setVarianceThreshold = options.variance_threshold
 
 # Create trainer
-trainer = torch.trainer.MAP_GMMTrainer(options.relevance_factor)
+trainer = torch.trainer.MAP_GMMTrainer(options.relevance_factor, True, options.adapt_variance, options.adapt_weight, options.responsibilities_threshold)
 trainer.convergenceThreshold = options.convergence_threshold
 trainer.maxIterations = options.iterg
 trainer.setPriorGMM(prior_gmm)

@@ -181,7 +181,7 @@ gmm.weights = weights
 gmm.setVarianceThreshold = options.variance_threshold
 
 # Train gmm
-trainer = torch.trainer.ML_GMMTrainer(True, True, True)
+trainer = torch.trainer.ML_GMMTrainer(True, options.adapt_variance, options.adapt_weight)
 trainer.convergenceThreshold = options.convergence_threshold
 trainer.maxIterations = options.iterg
 trainer.train(gmm, ar) # TODO: Should it rather be the normalized arrayset?
