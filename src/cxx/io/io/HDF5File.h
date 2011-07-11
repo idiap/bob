@@ -46,7 +46,7 @@ namespace Torch { namespace io {
        * Constructor, starts a new HDF5File object giving it a file name and an
        * action: excl/trunc/in/inout
        */
-      HDF5File (const std::string& filename, mode_t mode); 
+      HDF5File (const std::string& filename, mode_t mode);
 
       /**
        * Destructor virtualization
@@ -280,14 +280,20 @@ namespace Torch { namespace io {
       /**
        * Appends a array in a dataset. If the dataset does not yet exist, one
        * is created with the type characteristics. Relative paths are accepted.
+       *
+       * If a new Dataset is to be created, you can also set the compression
+       * level. Note this setting has no effect if the Dataset already exists
+       * on file, in which case the current setting for that dataset is
+       * respected. The maximum value for the gzip compression is 9. The value
+       * of zero turns compression off (the default).
        */
       template <typename T> void appendArray(const std::string& path,
-          const T& value) {
+          const T& value, size_t compression=0) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value));
+              absolute, Torch::io::HDF5Type(value), compression);
         }
         m_index[absolute]->addArray(value);
       }
@@ -307,11 +313,17 @@ namespace Torch { namespace io {
        * Sets the array at position 0 to the given value. This method is
        * equivalent to checking if the array at position 0 exists and then
        * replacing it. If the path does not exist, we append the new array.
+       *
+       * If a new Dataset is to be created, you can also set the compression
+       * level. Note this setting has no effect if the Dataset already exists
+       * on file, in which case the current setting for that dataset is
+       * respected. The maximum value for the gzip compression is 9. The value
+       * of zero turns compression off (the default).
        */
       template <typename T> void setArray(const std::string& path,
-          const T& value) {
+          const T& value, size_t compression=0) {
         std::string absolute = resolve(path);
-        if (!contains(absolute)) appendArray(path, value);
+        if (!contains(absolute)) appendArray(path, value, compression);
         else replaceArray(path, value);
       }
       
