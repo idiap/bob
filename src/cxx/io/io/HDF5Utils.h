@@ -123,9 +123,15 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * Creates a new HDF5 dataset from scratch and inserts it in the given
        * file. If the Dataset already exists on file and the types are
        * compatible, we attach to that type, otherwise, we raise an exception.
+       *
+       * If a new Dataset is to be created, you can also set the compression
+       * level. Note this setting has no effect if the Dataset already exists
+       * on file, in which case the current setting for that dataset is
+       * respected. The maximum value for the gzip compression is 9. The value
+       * of zero turns compression off (the default).
        */
       Dataset(boost::shared_ptr<File>& f, const std::string&, 
-          const Torch::io::HDF5Type& type);
+          const Torch::io::HDF5Type& type, size_t compression=0);
 
       /**
        * Destructor virtualization

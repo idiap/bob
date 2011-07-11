@@ -168,6 +168,7 @@ static void create_dataset (boost::shared_ptr<h5::File>& file,
 
   //if the user has decided to compress the dataset, do it with gzip.
   if (compression) {
+    if (compression > 9) compression = 9;
     status = H5Pset_deflate(*dcpl, compression);
     if (status < 0) throw io::HDF5StatusError("H5Pset_deflate", status);
   }
@@ -191,7 +192,8 @@ static void create_dataset (boost::shared_ptr<h5::File>& file,
 }
 
 h5::Dataset::Dataset(boost::shared_ptr<File>& f,
-    const std::string& path, const io::HDF5Type& type):
+    const std::string& path, const io::HDF5Type& type,
+    size_t compression):
   m_parent(f),
   m_path(path),
   m_id(),
@@ -209,7 +211,7 @@ h5::Dataset::Dataset(boost::shared_ptr<File>& f,
   hid_t set_id = H5Dopen2(*m_parent->m_id,m_path.c_str(),H5P_DEFAULT);
   io::HDF5Error::unmute();
 
-  if (set_id < 0) create_dataset(m_parent, m_path, m_type, 9);
+  if (set_id < 0) create_dataset(m_parent, m_path, m_type, compression);
   else H5Dclose(set_id); //close it, will re-open it properly
 
   m_id = open_dataset(m_parent, m_path);
