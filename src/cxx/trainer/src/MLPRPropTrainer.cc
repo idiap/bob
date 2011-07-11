@@ -36,5 +36,4 @@ void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
     const std::vector<Torch::io::Arrayset>& train_data,
     const std::vector<Torch::io::Array>& train_target,
     size_t batch_size) const {
-
 }
