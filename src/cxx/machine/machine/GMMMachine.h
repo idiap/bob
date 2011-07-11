@@ -1,5 +1,6 @@
 /// @file GMMMachine.h
 /// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
 /// @brief This class implements a multivariate diagonal Gaussian distribution.
 /// @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
 
@@ -152,11 +153,17 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
 
     /// The weights (also known as "mixing coefficients")
     blitz::Array<double,1> m_weights;
+
+  private:
+
+    /// Some cache arrays to avoid re-allocation when computing log-likelihoods
+    mutable blitz::Array<double,1> m_cache_log_weighted_gaussian_likelihoods;
+    mutable blitz::Array<double,1> m_cache_P;
+    mutable blitz::Array<double,2> m_cache_Px;
+    mutable blitz::Array<double,2> m_cache_Pxx;
+    
 };
 
-
-}
-}
-
+}}
 
 #endif

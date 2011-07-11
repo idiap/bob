@@ -66,7 +66,7 @@ Torch::machine::Gaussian::Gaussian(const Gaussian& other) {
   copy(other);
 }
 
-Torch::machine::Gaussian& Torch::machine::Gaussian::operator= (const Gaussian &other) {
+Torch::machine::Gaussian& Torch::machine::Gaussian::operator=(const Gaussian &other) {
   if (this != &other) {
     copy(other);
   }
@@ -74,7 +74,7 @@ Torch::machine::Gaussian& Torch::machine::Gaussian::operator= (const Gaussian &o
   return *this;
 }
 
-bool Torch::machine::Gaussian::operator ==(const Gaussian& b) const {
+bool Torch::machine::Gaussian::operator==(const Gaussian& b) const {
   return m_n_inputs == b.m_n_inputs &&
          blitz::all(m_mean == b.m_mean) &&
          blitz::all(m_variance == b.m_variance) &&
@@ -150,11 +150,11 @@ void Torch::machine::Gaussian::setVarianceThresholds(double factor) {
   setVarianceThresholds(variance_thresholds);
 }
 
-double Torch::machine::Gaussian::logLikelihood(const blitz::Array<double, 1> &x) const {
+double Torch::machine::Gaussian::logLikelihood(const blitz::Array<double,1> &x) const {
   double z = blitz::sum(blitz::pow2(x - m_mean) / m_variance);
 
-  double logLikelihood = (-0.5 * (g_norm + z));
-  return logLikelihood;
+  // Log Likelihood
+  return (-0.5 * (g_norm + z));
 }
 
 void Torch::machine::Gaussian::getVarianceThresholds(blitz::Array<double,1> &variance_thresholds) const {
@@ -174,10 +174,7 @@ void Torch::machine::Gaussian::getVariance(blitz::Array<double,1> &variance) con
 
 void Torch::machine::Gaussian::preComputeConstants() {
   double c = m_n_inputs * Log::Log2Pi;
-  double log_det = 0.0;
-  for(int i=0; i < m_n_inputs; ++i) {
-    log_det += log(m_variance(i));
-  }
+  double log_det = blitz::sum(blitz::log(m_variance));
   g_norm = c + log_det;
 }
 
