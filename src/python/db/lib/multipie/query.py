@@ -153,7 +153,7 @@ class Database(object):
       q = self.session.query(File).join(Client).join(FileMultiview).\
             filter(Client.sgroup == 'world')
       if model_ids:
-        q = q.filter(Client_id.in_(model_ids))
+        q = q.filter(File.client_id.in_(model_ids))
       q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
       for k in q:
         retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
@@ -200,7 +200,7 @@ class Database(object):
                 filter(and_(Protocol.id == ProtocolMultiview.id, ProtocolMultiview.camera_id == FileMultiview.camera_id,\
                             ProtocolMultiview.shot_id == FileMultiview.shot_id))
           if(model_ids and len(model_ids)==1):
-            q = q.filter(Client.id.in_(model_ids))
+            q = q.filter(not_(Client.id.in_(model_ids)))
           q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
           for k in q:
             if(model_ids and len(model_ids) == 1):
