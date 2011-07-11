@@ -8,6 +8,7 @@
 #ifndef TORCH_TRAINER_MLPSTOPCRITERIA_H 
 #define TORCH_TRAINER_MLPSTOPCRITERIA_H
 
+#include <boost/function.hpp>
 #include "machine/MLP.h"
 
 namespace Torch { namespace trainer {
@@ -48,7 +49,7 @@ namespace Torch { namespace trainer {
        * Set and get
        */
       size_t getN() const { return m_n; }
-      void setN(size_t n) const { m_n = n; }
+      void setN(size_t n) { m_n = n; }
 
       /**
        * Checks the number of iterations and report a should stop flag back.
@@ -61,7 +62,7 @@ namespace Torch { namespace trainer {
       size_t m_n; ///< number of iterations value
 
   };
-  
+ 
+}}
 
 #endif /* TORCH_TRAINER_MLPSTOPCRITERIA_H */
-
