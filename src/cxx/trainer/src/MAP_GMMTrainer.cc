@@ -76,7 +76,7 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
     blitz::Array<double,2> new_means(n_gaussians,n_inputs);
     for (int i = 0; i < n_gaussians; i++) {
       blitz::Array<double,1> means(new_means(i, blitz::Range::all()));
-      if (m_ss.n(i) <= (1e-3 + DBL_EPSILON*10)) {
+      if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
         means = prior_means(i, blitz::Range::all());
       }
       else {
@@ -108,7 +108,15 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
 
     // Calculate new variances (equation 13)
     blitz::Array<double,2> new_variances(n_gaussians,n_inputs);
-    new_variances = alpha(i) * Exx(i,j) + (1-alpha(i)) * (prior_variances(i,j) + prior_means(i,j)) - blitz::pow2(means(i,j));
+    for (int i=0; i<n_gaussians; ++i) {
+      blitz::Array<double,1> variances(new_variances(i, blitz::Range::all()));
+      if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
+        variances = (prior_variances(i,blitz::Range::all()) + prior_means(i,blitz::Range::all())) - blitz::pow2(means(i,blitz::Range::all()));
+      }
+      else {
+        variances = alpha(i) * Exx(i,blitz::Range::all()) + (1-alpha(i)) * (prior_variances(i,blitz::Range::all()) + prior_means(i,blitz::Range::all())) - blitz::pow2(means(i,blitz::Range::all()));
+      }
+    }
 
     // Set the new variances
     gmm.setVariances(new_variances);

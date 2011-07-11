@@ -38,7 +38,7 @@ void bind_trainer_gmm() {
       "The prior parameters are encoded in the form of a GMM (e.g. a universal background model). "
       "The EM algorithm thus performs GMM adaptation.\n"
       "See Section 3.4 of Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000. We use a \"single adaptation coefficient\", alpha_i, and thus a single relevance factor, r.",
-      init<optional<double> >((arg("relevance_factor"))))
+      init<optional<double, bool, bool, bool, double> >((arg("relevance_factor"), arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
     .def("setPriorGMM", &train::MAP_GMMTrainer::setPriorGMM, 
       "Set the GMM to use as a prior for MAP adaptation. "
       "Generally, this is a \"universal background model\" (UBM), "

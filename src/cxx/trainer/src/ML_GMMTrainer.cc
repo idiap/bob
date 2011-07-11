@@ -26,12 +26,19 @@ void Torch::trainer::ML_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const
     gmm.setWeights(new_weights);
   }
 
+  // Generate a thresholded version of m_ss.n
+  blitz::Array<double, 1> m_ss_n_thresholded(n_gaussians);
+  m_ss_n_thresholded = m_ss.n;
+  for(int i=0; i<n_gaussians; ++i) {
+    m_ss_n_thresholded(i) = (m_ss.n(i) < m_mean_var_update_responsibilities_threshold? m_mean_var_update_responsibilities_threshold : m_ss.n(i) );
+  }
+
   // Update GMM parameters using the sufficient statistics (m_ss)
   // - Update means if requested
   //   Equation 9.24 of Bishop, "Pattern recognition and machine learning", 2006
   if (update_means) {
     blitz::Array<double, 2> new_means(n_gaussians, n_inputs);
-    new_means = m_ss.sumPx(i, j) / m_ss.n(i);
+    new_means = m_ss.sumPx(i, j) / m_ss_n_thresholded(i);
     gmm.setMeans(new_means);
   }
 
@@ -44,9 +51,8 @@ void Torch::trainer::ML_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const
     blitz::Array<double, 2> means;
     gmm.getMeans(means);
     blitz::Array<double, 2> new_variances(n_gaussians, n_inputs);
-    new_variances = m_ss.sumPxx(i, j) / m_ss.n(i) - blitz::pow2(means(i, j));
+    new_variances = m_ss.sumPxx(i, j) / m_ss_n_thresholded(i) - blitz::pow2(means(i, j));
     gmm.setVariances(new_variances);
   }
 }
-
 
