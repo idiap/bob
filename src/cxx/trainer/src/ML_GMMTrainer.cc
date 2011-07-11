@@ -28,7 +28,6 @@ void Torch::trainer::ML_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, const
 
   // Generate a thresholded version of m_ss.n
   m_cache_ss_n_thresholded.resize(n_gaussians);
-  //m_cache_ss_n_thresholded = m_ss.n;
   for(int i=0; i<n_gaussians; ++i) {
     m_cache_ss_n_thresholded(i) = (m_ss.n(i) < m_mean_var_update_responsibilities_threshold? m_mean_var_update_responsibilities_threshold : m_ss.n(i) );
   }
