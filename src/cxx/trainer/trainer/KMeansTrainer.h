@@ -59,6 +59,11 @@ protected:
   /// The k'th row of m_firstOrderStats is the numerator of 
   /// equation 9.4, Bishop, "Pattern recognition and machine learning", 2006
   blitz::Array<double,2> m_firstOrderStats;
+
+private:
+
+  /// Cache to avoid re-allocation
+  mutable blitz::Array<double,2> m_cache_newMeans;
 };
 
 }

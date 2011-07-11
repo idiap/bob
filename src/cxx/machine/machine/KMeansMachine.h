@@ -83,6 +83,10 @@ protected:
   
   /// The means (each row is a mean)
   blitz::Array<double,2> m_means;
+
+private:
+  /// cache to avoid re-allocation
+  mutable blitz::Array<double,2> m_cache_means;
 };
 
 }

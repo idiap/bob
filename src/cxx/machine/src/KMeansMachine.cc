@@ -3,7 +3,8 @@
 
 using namespace std;
 
-Torch::machine::KMeansMachine::KMeansMachine(int n_means, int n_inputs) : m_n_means(n_means), m_n_inputs(n_inputs), m_means(n_means, n_inputs) {
+Torch::machine::KMeansMachine::KMeansMachine(int n_means, int n_inputs): m_n_means(n_means), 
+    m_n_inputs(n_inputs), m_means(n_means, n_inputs), m_cache_means(n_means, n_inputs) {
   m_means = 0;
 }
 
@@ -63,8 +64,8 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   weights = 0;
   
   // initialise (temporary) mean array
-  blitz::Array<double,2> means(m_n_means, m_n_inputs);
-  means = 0;
+  m_cache_means.resize(m_n_means, m_n_inputs);
+  m_cache_means = 0;
   
   // iterate over data
   for (size_t i=0; i < ar.size(); ++i) {
@@ -77,7 +78,7 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
     getClosestMean(x,closest_mean,min_distance);
     
     // - accumulate stats
-    means(closest_mean, blitz::Range::all()) += x;
+    m_cache_means(closest_mean, blitz::Range::all()) += x;
     variances(closest_mean, blitz::Range::all()) += blitz::pow2(x);
     weights(closest_mean)++;
   }
@@ -87,11 +88,11 @@ void Torch::machine::KMeansMachine::getVariancesAndWeightsForEachCluster(const T
   blitz::secondIndex idx2;
   
   // find means
-  means = means(idx1,idx2) / weights(idx1);
+  m_cache_means = m_cache_means(idx1,idx2) / weights(idx1);
   
   // find variances
   variances = variances(idx1,idx2) / weights(idx1);
-  variances -= blitz::pow2(means);
+  variances -= blitz::pow2(m_cache_means);
   
   // find weights
   weights = weights / blitz::sum(weights);

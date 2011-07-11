@@ -64,11 +64,11 @@ double Torch::trainer::KMeansTrainer::eStep(KMeansMachine& kmeans, const Torch::
 }
 
 void Torch::trainer::KMeansTrainer::mStep(KMeansMachine& kmeans, const Torch::io::Arrayset&) {
-    blitz::Array<double,2> newMeans(kmeans.getNMeans(),kmeans.getNInputs());
+    m_cache_newMeans.resize(kmeans.getNMeans(),kmeans.getNInputs());
     blitz::firstIndex i;
     blitz::secondIndex j;
-    newMeans = m_firstOrderStats(i,j) / m_zeroethOrderStats(i);
-    kmeans.setMeans(newMeans);
+    m_cache_newMeans = m_firstOrderStats(i,j) / m_zeroethOrderStats(i);
+    kmeans.setMeans(m_cache_newMeans);
 }
 
 bool Torch::trainer::KMeansTrainer::resetAccumulators(KMeansMachine& kMeansMachine) {
