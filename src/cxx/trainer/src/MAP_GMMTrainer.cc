@@ -32,31 +32,31 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
   blitz::secondIndex j;
 
   // Calculate the "data-dependent adaptation coefficient", alpha_i
-  blitz::Array<double,1> alpha(n_gaussians);
-  alpha = m_ss.n(i) / (m_ss.n(i) + relevance_factor);
+  m_cache_alpha.resize(n_gaussians);
+  m_cache_alpha = m_ss.n(i) / (m_ss.n(i) + relevance_factor);
 
   // - Update weights if requested
   //   Equation 11 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000
   if (update_weights) {
 
     // Calculate the maximum likelihood weights
-    blitz::Array<double,1> ml_weights(n_gaussians);
-    ml_weights = m_ss.n / (int32_t)m_ss.T; //cast req. for linux/32-bits & osx
+    m_cache_ml_weights.resize(n_gaussians);
+    m_cache_ml_weights = m_ss.n / (int32_t)m_ss.T; //cast req. for linux/32-bits & osx
 
     // Get the prior weights
-    blitz::Array<double,1> prior_weights(n_gaussians);
-    m_prior_gmm->getWeights(prior_weights);
+    m_cache_prior_weights.resize(n_gaussians);
+    m_prior_gmm->getWeights(m_cache_prior_weights);
 
     // Calculate the new weights
-    blitz::Array<double,1> new_weights(n_gaussians);
-    new_weights = alpha * ml_weights + (1-alpha) * prior_weights;
+    m_cache_new_weights.resize(n_gaussians);
+    m_cache_new_weights = m_cache_alpha * m_cache_ml_weights + (1-m_cache_alpha) * m_cache_prior_weights;
 
     // Apply the scale factor, gamma, to ensure the new weights sum to unity 
-    double gamma = blitz::sum(new_weights);
-    new_weights /= gamma;
+    double gamma = blitz::sum(m_cache_new_weights);
+    m_cache_new_weights /= gamma;
 
     // Set the new weights
-    gmm.setWeights(new_weights);
+    gmm.setWeights(m_cache_new_weights);
   }
 
   // Update GMM parameters
@@ -65,27 +65,27 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
   if (update_means) {
 
     // Calculate the maximum likelihood means
-    blitz::Array<double,2> ml_means(n_gaussians,n_inputs);
-    ml_means = m_ss.sumPx(i,j) / m_ss.n(i);
+    m_cache_ml_means.resize(n_gaussians,n_inputs);
+    m_cache_ml_means = m_ss.sumPx(i,j) / m_ss.n(i);
 
     // Get the prior means
-    blitz::Array<double,2> prior_means(n_gaussians,n_inputs);
-    m_prior_gmm->getMeans(prior_means);
+    m_cache_prior_means.resize(n_gaussians,n_inputs);
+    m_prior_gmm->getMeans(m_cache_prior_means);
 
     // Calculate new means
-    blitz::Array<double,2> new_means(n_gaussians,n_inputs);
+    m_cache_new_means.resize(n_gaussians,n_inputs);
     for (int i = 0; i < n_gaussians; i++) {
-      blitz::Array<double,1> means(new_means(i, blitz::Range::all()));
+      blitz::Array<double,1> means(m_cache_new_means(i, blitz::Range::all()));
       if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
-        means = prior_means(i, blitz::Range::all());
+        means = m_cache_prior_means(i, blitz::Range::all());
       }
       else {
-        means = alpha(i) * ml_means(i, blitz::Range::all()) + (1-alpha(i)) * prior_means(i, blitz::Range::all());
+        means = m_cache_alpha(i) * m_cache_ml_means(i, blitz::Range::all()) + (1-m_cache_alpha(i)) * m_cache_prior_means(i, blitz::Range::all());
       }
     }
 
     // Set the new means
-    gmm.setMeans(new_means);
+    gmm.setMeans(m_cache_new_means);
   }
 
   // - Update variance if requested
@@ -93,28 +93,28 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
   if (update_variances) {
 
     // Get the prior variances
-    blitz::Array<double,2> prior_variances(n_gaussians,n_inputs);
-    m_prior_gmm->getVariances(prior_variances);
+    m_cache_prior_variances.resize(n_gaussians,n_inputs);
+    m_prior_gmm->getVariances(m_cache_prior_variances);
 
     // Calculate E_i(x^2) (equation 10)
-    blitz::Array<double,2> Exx(n_gaussians,n_inputs);
-    Exx = m_ss.sumPxx(i,j) / m_ss.n(i);
+    m_cache_Exx.resize(n_gaussians,n_inputs);
+    m_cache_Exx = m_ss.sumPxx(i,j) / m_ss.n(i);
 
     // Get means and prior means
-    blitz::Array<double,2> means; 
-    gmm.getMeans(means);
-    blitz::Array<double,2> prior_means; 
-    m_prior_gmm->getMeans(prior_means);
+    m_cache_means.resize(n_gaussians,n_inputs);
+    gmm.getMeans(m_cache_means);
+    m_cache_prior_means.resize(n_gaussians,n_inputs); 
+    m_prior_gmm->getMeans(m_cache_prior_means);
 
     // Calculate new variances (equation 13)
     blitz::Array<double,2> new_variances(n_gaussians,n_inputs);
     for (int i=0; i<n_gaussians; ++i) {
       blitz::Array<double,1> variances(new_variances(i, blitz::Range::all()));
       if(m_ss.n(i) < m_mean_var_update_responsibilities_threshold) {
-        variances = (prior_variances(i,blitz::Range::all()) + prior_means(i,blitz::Range::all())) - blitz::pow2(means(i,blitz::Range::all()));
+        variances = (m_cache_prior_variances(i,blitz::Range::all()) + m_cache_prior_means(i,blitz::Range::all())) - blitz::pow2(m_cache_means(i,blitz::Range::all()));
       }
       else {
-        variances = alpha(i) * Exx(i,blitz::Range::all()) + (1-alpha(i)) * (prior_variances(i,blitz::Range::all()) + prior_means(i,blitz::Range::all())) - blitz::pow2(means(i,blitz::Range::all()));
+        variances = m_cache_alpha(i) * m_cache_Exx(i,blitz::Range::all()) + (1-m_cache_alpha(i)) * (m_cache_prior_variances(i,blitz::Range::all()) + m_cache_prior_means(i,blitz::Range::all())) - blitz::pow2(m_cache_means(i,blitz::Range::all()));
       }
     }
 

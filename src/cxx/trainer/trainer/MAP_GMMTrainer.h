@@ -46,6 +46,22 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// Generally, this is a "universal background model" (UBM),
     /// also referred to as a "world model"
     Torch::machine::GMMMachine *m_prior_gmm;
+
+  private:
+
+    /// cache to avoid re-allocation
+    mutable blitz::Array<double,1> m_cache_alpha;
+    mutable blitz::Array<double,1> m_cache_ml_weights;
+    mutable blitz::Array<double,1> m_cache_prior_weights;
+    mutable blitz::Array<double,1> m_cache_new_weights;
+    mutable blitz::Array<double,2> m_cache_ml_means;
+    mutable blitz::Array<double,2> m_cache_prior_means;
+    mutable blitz::Array<double,2> m_cache_new_means;
+    mutable blitz::Array<double,2> m_cache_prior_variances;
+    mutable blitz::Array<double,2> m_cache_Exx;
+    mutable blitz::Array<double,2> m_cache_means;
+    mutable blitz::Array<double,2> m_cache_new_variances;
+
 };
 
 }
