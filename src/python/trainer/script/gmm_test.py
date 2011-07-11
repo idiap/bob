@@ -20,6 +20,13 @@ parser.add_option("-m",
                   type="string",
                   default="train.hdf5")
 
+parser.add_option("-n",
+                  "--noworld",
+                  dest="noworld",
+                  help="Do not use a world model"
+                  type="bool",
+                  default=false)
+
 parser.add_option("-w",
                   "--world-model",
                   dest="world_model",
@@ -40,7 +47,8 @@ for line in fileinput.input(args):
   n_blocks = len(ar)
 
   # Load the gmm
-  prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.world_model))
+  if not noworld:
+    prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.world_model))
   gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.model))
 
   # Compute the score
@@ -48,8 +56,10 @@ for line in fileinput.input(args):
   scoreWM = 0.
   for v in ar:
     scoreCL += gmm.forward(v.get())
-    scoreWM += prior_gmm.forward(v.get())
+    if not noworld:
+      scoreWM += prior_gmm.forward(v.get())
 
+  # scoreWM is equal to zero if noworld is not set
   score = (scoreCL - scoreWM) / n_blocks
 
   # Print the score
