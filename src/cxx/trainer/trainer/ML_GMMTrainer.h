@@ -28,9 +28,16 @@ class ML_GMMTrainer : public GMMTrainer {
     /// using the accumulated statistics in m_ss
     /// Implements EMTrainer::mStep()
     void mStep (Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+  
+  private:
+
+    /// Add cache to avoid re-allocation at each iteration
+    mutable blitz::Array<double,1> m_cache_weights;
+    mutable blitz::Array<double,1> m_cache_ss_n_thresholded;
+    mutable blitz::Array<double,2> m_cache_means;
+    mutable blitz::Array<double,2> m_cache_variances;
 };
 
-}
-}
+}}
 
 #endif
