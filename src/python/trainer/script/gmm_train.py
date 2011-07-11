@@ -17,7 +17,7 @@ def NormalizeStdArrayset(arrayset):
   std.fill(0)
 
   for array in arrayset:
-    x = array.cast('float64')
+    x = array.get().cast('float64')
     mean += x
     std += (x ** 2)
 
@@ -28,8 +28,7 @@ def NormalizeStdArrayset(arrayset):
 
   arStd = torch.io.Arrayset()
   for array in arrayset:
-    type(arStd)
-    arStd.append(array.cast('float64') / std)
+    arStd.append(array.get().cast('float64') / std)
 
   return (arStd,std)
 
