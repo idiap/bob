@@ -235,3 +235,22 @@ man_pages = [
     ('index', 'torch5spro', u'Torch5spro Documentation',
      [u'Idiap Research Institute'], 1)
 ]
+
+# Skips selected members in auto-generated documentation. Unfortunately, old
+# versions of Boost.Python will note generate a __self__ member for static
+# methods and that screws-up Sphinx processing
+def skip_member(app, what, name, obj, skip, options):
+  # We don't use this technique if the version of Sphinx is relatively new
+  if sphinx.__version__ >= "1.0": return False
+
+  # Else, we have to remove objects that do not have a __self__ attribute set
+  import types
+  if isinstance(obj, types.BuiltinFunctionType) and \
+    not hasattr(obj, '__self__') and what == 'class':
+      app.warn("Skipping %s %s (no __self__)" % (what, name))
+      return True
+
+  return False
+
+def setup(app):
+  app.connect('autodoc-skip-member', skip_member)
