@@ -22,10 +22,10 @@ parser.add_option("-m",
 
 parser.add_option("-n",
                   "--noworld",
+                  action="store_true",
                   dest="noworld",
-                  help="Do not use a world model"
-                  type="bool",
-                  default=false)
+                  default="False",
+                  help="Do not use a world model")
 
 parser.add_option("-w",
                   "--world-model",
@@ -47,7 +47,7 @@ for line in fileinput.input(args):
   n_blocks = len(ar)
 
   # Load the gmm
-  if not noworld:
+  if not options.noworld:
     prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.world_model))
   gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.model))
 
@@ -56,7 +56,7 @@ for line in fileinput.input(args):
   scoreWM = 0.
   for v in ar:
     scoreCL += gmm.forward(v.get())
-    if not noworld:
+    if not options.noworld:
       scoreWM += prior_gmm.forward(v.get())
 
   # scoreWM is equal to zero if noworld is not set
