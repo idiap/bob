@@ -213,15 +213,11 @@ class TrainerTest(unittest.TestCase):
     gmm_adapted.weights = weights
 
     map_adapt.maxIterations = 1
-
     map_adapt.train(gmm_adapted,arrayset)
 
-    print gmm_adapted.means[:,0]
-
     new_means = torch.core.array.load('data/new_adapted_mean.hdf5')
-    print new_means[0,:]
 
-    print gmm_adapted.means.shape(), new_means.shape() 
+    # Compare to matlab reference
     self.assertTrue(equals(new_means[0,:], gmm_adapted.means[:,0], 1e-4))
     self.assertTrue(equals(new_means[1,:], gmm_adapted.means[:,1], 1e-4))
     
