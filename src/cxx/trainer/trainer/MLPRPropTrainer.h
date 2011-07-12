@@ -65,7 +65,8 @@ namespace Torch { namespace trainer {
       inline void setSeed(size_t s) { m_rng.seed(s); }
 
       /**
-       * Trains the MLP to perform discrimination.
+       * Trains the MLP to perform discrimination. The training is executed
+       * outside the machine context, but uses all the current machine layout.
        *
        * Each input arrayset represents data from a given input class. One
        * should also give a matching target for each of the input classes.
@@ -75,13 +76,7 @@ namespace Torch { namespace trainer {
        * Note: In RProp, training is done in batches. You should set the
        * batch size.
        *       
-       * Note 2: We ignore most of the properties in the current machine as
-       * they can be correctly inferred from the training data. This avoids
-       * hassles concerning the currently set machine size. The only property
-       * we keep is the user-set activation function. Just make sure you set
-       * that correctly before starting.
-       *
-       * Note 3: Weights and biases are randomly initialized between -0.1 and
+       * Note 2: Weights and biases are randomly initialized between -0.1 and
        * 0.1 as recommended in many text books. If you want to be able to
        * foresee the values that will be set upon initialization, just set the
        * random seed using the setSeed() method.
@@ -94,7 +89,7 @@ namespace Torch { namespace trainer {
     private: //representation
 
       MLPStopCriteria m_stop; ///< stopping criteria for MLP training
-      boost::mt19937  m_rng; ///< our random number generator
+      mutable boost::mt19937  m_rng; ///< our random number generator
 
   };
 

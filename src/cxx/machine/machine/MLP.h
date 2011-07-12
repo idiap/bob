@@ -33,6 +33,8 @@ namespace Torch { namespace machine {
     
     public: //api
 
+      typedef double (*actfun_t)(double); ///< activation function type
+
       /**
        * Constructor, builds a new MLP. Internal values are uninitialized. In
        * this case, there are no hidden layers and the resulting machine is
@@ -261,9 +263,12 @@ namespace Torch { namespace machine {
        */
       void setActivation(Activation a);
 
-    private: //representation
+      /**
+       * A pointer to the actual activation function
+       */
+      inline actfun_t getActivationFunction() const { return m_actfun; }
 
-      typedef double (*actfun_t)(double); ///< activation function type
+    private: //representation
 
       blitz::Array<double, 1> m_input_sub; ///< input subtraction
       blitz::Array<double, 1> m_input_div; ///< input division

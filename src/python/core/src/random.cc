@@ -26,6 +26,12 @@ template <typename T, typename Distribution> struct binder {
   typedef boost::variate_generator<boost::mt19937&, Distribution > dtype;
   typedef typename dtype::result_type result_type;
 
+  boost::shared_ptr<dtype> make_dtype_default() {
+    boost::mt19937 rng;
+    Distribution d;
+    return boost::shared_ptr<dtype>(new dtype(rng, d));
+  }
+
   boost::shared_ptr<dtype> make_dtype(T arg1) {
     boost::mt19937 rng;
     Distribution d(arg1);
@@ -39,7 +45,8 @@ template <typename T, typename Distribution> struct binder {
 
   binder(const char* name, const char* par1) {
     class_<dtype, boost::shared_ptr<dtype> >(name, "A variate generator", no_init)
-      .def("__init__", make_constructor(&binder<T,Distribution>::make_dtype, default_call_policies(), (arg(par1))), "Starts a new generator with parameters.")
+      .def("__init__", make_constructor(&binder<T,Distribution>::make_dtype_default), "Starts a new generator with default parameters. For information about defaults, consult the C++ boost::random documentation available on the web.")
+      .def("__init__", make_constructor(&binder<T,Distribution>::make_dtype, default_call_policies(), (arg(par1))), "Starts a new generator with parameters. For detailed information and range inclusion, consult the C++ boost::random documentation available on the web.")
       .def("seed", &binder<T,Distribution>::set_seed, (arg("self"), arg("seed")), "Sets the internal seed of my own RNG and reset my distribution")
       .def("__call__", (result_type (dtype::*)())&dtype::operator(), (arg("self")), "Draws a new number")
       ;
@@ -51,6 +58,12 @@ template <typename T, typename Distribution> struct binder2 {
 
   typedef boost::variate_generator<boost::mt19937&, Distribution > dtype;
   typedef typename dtype::result_type result_type;
+
+  boost::shared_ptr<dtype> make_dtype_default() {
+    boost::mt19937 rng;
+    Distribution d;
+    return boost::shared_ptr<dtype>(new dtype(rng, d));
+  }
 
   boost::shared_ptr<dtype> make_dtype(T arg1, T arg2) {
     boost::mt19937 rng;
@@ -65,8 +78,9 @@ template <typename T, typename Distribution> struct binder2 {
 
   binder2(const char* name, const char* par1, const char* par2) {
     class_<dtype, boost::shared_ptr<dtype> >(name, "A variate generator", no_init)
-      .def("__init__", make_constructor(&binder<T,Distribution>::make_dtype, default_call_policies(), (arg(par1), arg(par2))), "Starts a new generator with parameters")
-      .def("seed", &binder<T,Distribution>::set_seed, (arg("self"), arg("seed")), "Sets the internal seed of my own RNG and reset my distribution")
+      .def("__init__", make_constructor(&binder2<T,Distribution>::make_dtype_default), "Starts a new generator with default parameters. For information about defaults, consult the C++ boost::random documentation available on the web.")
+      .def("__init__", make_constructor(&binder2<T,Distribution>::make_dtype, default_call_policies(), (arg(par1), arg(par2))), "Starts a new generator with parameters. Note that, for range style parameters (in uniform distributions for example), integer ranges include border values while for real-valued distributions, the lower end is included but not the upper end [to,from). For detailed information and range inclusion, consult the C++ boost::random documentation available on the web.")
+      .def("seed", &binder2<T,Distribution>::set_seed, (arg("self"), arg("seed")), "Sets the internal seed of my own RNG and reset my distribution")
       .def("__call__", (result_type (dtype::*)())&dtype::operator(), (arg("self")), "Draws a new number")
       ;
   }
@@ -82,8 +96,6 @@ void bind_core_random () {
   //single argument methods
   binder<float, boost::gamma_distribution<float> >("gamma_float32", "alpha");
   binder<double, boost::gamma_distribution<double> >("gamma_float64", "alpha");
-  //binder<float, boost::poisson_distribution<float> >("poisson_float32", "mean");
-  //binder<double, boost::poisson_distribution<double> >("poisson_float64", "mean");
 
   //two-argument methods
   binder2<int8_t, boost::uniform_smallint<int8_t> >("uniform_int8", "from", "to");

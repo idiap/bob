@@ -10,6 +10,7 @@
 
 #include <blitz/tinyvec.h>
 #include "machine/Exception.h"
+#include "machine/Activation.h"
 
 namespace Torch { namespace machine {
 
@@ -72,6 +73,21 @@ namespace Torch { namespace machine {
       size_t m_layer;
       size_t m_expected;
       size_t m_given;
+      mutable std::string m_message;
+  };
+
+  /**
+   * Exception raised when machine (or trainers) do not support a certain
+   * activation function.
+   */
+  class UnsupportedActivation: public Exception {
+    public:
+      UnsupportedActivation(Torch::machine::Activation act) throw();
+      virtual ~UnsupportedActivation() throw();
+      virtual const char* what() const throw();
+      
+    private:
+      Torch::machine::Activation m_act;
       mutable std::string m_message;
   };
 

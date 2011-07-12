@@ -325,6 +325,8 @@ void mach::MLP::setActivation(mach::Activation a) {
     case mach::LOG:
       m_actfun = mach::logistic;
       break;
+    default:
+      throw mach::UnsupportedActivation(a);
   }
   m_activation = a;
 }

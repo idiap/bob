@@ -92,3 +92,24 @@ const char* mach::BiasShapeMismatch::what() const throw() {
     return emergency;
   }
 }
+
+mach::UnsupportedActivation::UnsupportedActivation(mach::Activation act) 
+  throw():
+  m_act(act)
+{
+}
+
+mach::UnsupportedActivation::~UnsupportedActivation() throw() {
+}
+
+const char* mach::UnsupportedActivation::what() const throw() {
+  try {
+    boost::format message("Object does not support use of activation function %d.");
+    message % (unsigned)m_act;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "mach::UnsupportedActivation: cannot format, exception raised";
+    return emergency;
+  }
+}
