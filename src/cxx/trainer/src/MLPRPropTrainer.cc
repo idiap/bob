@@ -10,25 +10,29 @@
 namespace train = Torch::trainer;
 
 train::MLPRPropTrainer::MLPRPropTrainer(const MLPStopCriteria& s):
-  m_stop(s)
+  m_stop(s),
+  m_rng()
 {
 }
 
 train::MLPRPropTrainer::MLPRPropTrainer(size_t max_iterations):
-  m_stop(NumberOfIterationsCriteria(max_iterations))
+  m_stop(NumberOfIterationsCriteria(max_iterations)),
+  m_rng()
 {
 }
 
 train::MLPRPropTrainer::~MLPRPropTrainer() { }
 
 train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
-  m_stop(other.m_stop)
+  m_stop(other.m_stop),
+  m_rng()
 {
 }
 
 train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
 (const train::MLPRPropTrainer::MLPRPropTrainer& other) {
   m_stop = other.m_stop;
+  m_rng = other.m_rng;
   return *this;
 }
 

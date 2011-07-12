@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <boost/function.hpp>
+#include <boost/random.hpp>
 
 #include "io/Arrayset.h"
 #include "machine/MLP.h"
@@ -59,6 +60,11 @@ namespace Torch { namespace trainer {
       MLPRPropTrainer& operator=(const MLPRPropTrainer& other);
 
       /**
+       * Sets the seed of our random number generator
+       */
+      inline void setSeed(size_t s) { m_rng.seed(s); }
+
+      /**
        * Trains the MLP to perform discrimination.
        *
        * Each input arrayset represents data from a given input class. One
@@ -78,7 +84,7 @@ namespace Torch { namespace trainer {
        * Note 3: Weights and biases are randomly initialized between -0.1 and
        * 0.1 as recommended in many text books. If you want to be able to
        * foresee the values that will be set upon initialization, just set the
-       * random seed of boost::mt19937.
+       * random seed using the setSeed() method.
        */
       virtual void train(Torch::machine::MLP& machine,
           const std::vector<Torch::io::Arrayset>& train_data,
@@ -88,6 +94,7 @@ namespace Torch { namespace trainer {
     private: //representation
 
       MLPStopCriteria m_stop; ///< stopping criteria for MLP training
+      boost::mt19937  m_rng; ///< our random number generator
 
   };
 

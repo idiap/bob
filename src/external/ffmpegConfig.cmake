@@ -13,7 +13,7 @@ include(FindPkgConfig)
 # 0.5.3  | 52.31.0  | 52.20.1 | 49.15.0 | 0.7.1   | yes       | yes
 # 0.6    | 52.64.2  | 52.72.2 | 50.15.1 | 0.11.0  | no        | no
 # 0.6.1  | 52.64.2  | 52.72.2 | 50.15.1 | 0.11.0  | no        | no
-# trunk  | 52.78.4  | 52.88.0 | 50.26.0 | 0.11.0  | no        | no
+# 0.7.1  | 53.4.0   | 53.7.0  | 51.10.0 | 2.0.0   | no        | no
 
 # Our base build requires ffmpeg >= 0.5. This is available on most platforms,
 # but please note that if you link to anything <= 0.6, your code will become

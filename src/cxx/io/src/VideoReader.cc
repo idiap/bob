@@ -77,26 +77,40 @@ io::VideoReader& io::VideoReader::operator= (const io::VideoReader& other) {
 }
 
 void io::VideoReader::open() {
-  AVFormatContext* format_ctxt;
+  AVFormatContext* format_ctxt = 0;
 
-  if (av_open_input_file(&format_ctxt, m_filepath.c_str(),NULL,0,NULL) != 0) {
+  // Opens a video file
+  // ffmpeg 0.7 and above [libavformat 53.0.0 = 0x350000]
+# if LIBAVCODEC_VERSION_INT >= 0x350000
+  if (avformat_open_input(&format_ctxt, m_filepath.c_str(), NULL, NULL) != 0) 
+# else
+  if (av_open_input_file(&format_ctxt, m_filepath.c_str(), NULL, 0, NULL) != 0) 
+# endif
+  {
     throw io::FileNotReadable(m_filepath);
   }
 
   // Retrieve stream information
   if (av_find_stream_info(format_ctxt)<0) {
+    av_close_input_file(format_ctxt);
     throw io::FFmpegException(m_filepath.c_str(), "cannot find stream info");
   }
 
   // Look for the first video stream in the file
   int stream_index = -1;
   for (size_t i=0; i<format_ctxt->nb_streams; ++i) {
-    if (format_ctxt->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) {
+#   if LIBAVUTIL_VERSION_INT >= 0x330000
+    if (format_ctxt->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) 
+#   else
+    if (format_ctxt->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) 
+#   endif
+    {
       stream_index = i;
       break;
     }
   }
   if(stream_index == -1) {
+    av_close_input_file(format_ctxt);
     throw io::FFmpegException(m_filepath.c_str(), "cannot find any video stream");
   }
 
@@ -112,11 +126,13 @@ void io::VideoReader::open() {
   AVCodec* codec = avcodec_find_decoder(codec_ctxt->codec_id);
 
   if (!codec) {
+    av_close_input_file(format_ctxt);
     throw io::FFmpegException(m_filepath.c_str(), "unsupported codec required");
   }
 
   // Open codec
   if (avcodec_open(codec_ctxt, codec) < 0) {
+    av_close_input_file(format_ctxt);
     throw io::FFmpegException(m_filepath.c_str(), "cannot open supported codec");
   }
 
@@ -258,7 +274,14 @@ void io::VideoReader::const_iterator::init() {
   const char* filename = m_parent->filename().c_str();
 
   //basic constructor, prepare readout
-  if (av_open_input_file(&m_format_ctxt, filename, NULL, 0, NULL) != 0) {
+  // Opens a video file
+  // ffmpeg 0.7 and above [libavformat 53.0.0 = 0x350000]
+# if LIBAVCODEC_VERSION_INT >= 0x350000
+  if (avformat_open_input(&m_format_ctxt, filename, NULL, NULL) != 0) 
+# else
+  if (av_open_input_file(&m_format_ctxt, filename, NULL, 0, NULL) != 0) 
+# endif
+  {
     throw io::FileNotReadable(filename);
   }
 
@@ -269,7 +292,12 @@ void io::VideoReader::const_iterator::init() {
 
   // Look for the first video stream in the file
   for (size_t i=0; i<m_format_ctxt->nb_streams; ++i) {
-    if (m_format_ctxt->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) {
+#   if LIBAVUTIL_VERSION_INT >= 0x330000
+    if (m_format_ctxt->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) 
+#   else
+    if (m_format_ctxt->streams[i]->codec->codec_type==CODEC_TYPE_VIDEO) 
+#   endif
+    {
       m_stream_index = i;
       break;
     }

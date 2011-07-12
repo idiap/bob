@@ -84,12 +84,16 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
   // adds the video stream using the default format codec and initializes it
   m_video_stream = add_video_stream();
 
+  // Sets parameters of output video file
+  // ffmpeg 0.7 and above [libavformat 53.0.0 = 0x350000] does not require that
+# if LIBAVFORMAT_VERSION_INT < 0x350000
   // sets the output parameters (must be done even if no parameters).
   if (av_set_parameters(m_format_ctxt, NULL) < 0) {
     throw io::FFmpegException(m_filename.c_str(), "invalid output parameters");
   }
 
   dump_format(m_format_ctxt, 0, m_filename.c_str(), 1);
+# endif
 
   // now that all the parameters are set, we can open the video codecs
   // and allocate the necessary encode buffers
@@ -97,13 +101,22 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
 
   // opens the output file, if needed
   if (!(m_oformat_ctxt->flags & AVFMT_NOFILE)) {
-    if (url_fopen(&m_format_ctxt->pb, m_filename.c_str(), URL_WRONLY) < 0) {
+#   if LIBAVFORMAT_VERSION_INT >= 0x350000
+    if (avio_open(&m_format_ctxt->pb, m_filename.c_str(), AVIO_FLAG_WRITE) < 0) 
+#   else
+    if (url_fopen(&m_format_ctxt->pb, m_filename.c_str(), URL_WRONLY) < 0) 
+#   endif
+    {
       throw io::FFmpegException(m_filename.c_str(), "cannot open file");
     }
   }
 
   // writes the stream header, if any
+# if LIBAVFORMAT_VERSION_INT >= 0x350000
+  avformat_write_header(m_format_ctxt, NULL);
+# else
   av_write_header(m_format_ctxt);
+# endif
   
   /**
    * Initializes the software scaler (SWScale) so we can convert images from
@@ -142,7 +155,12 @@ void io::VideoWriter::close() {
   }
 
   // closes the output file
-  if (m_oformat_ctxt != 0 && !(m_oformat_ctxt->flags & AVFMT_NOFILE)) url_fclose(m_format_ctxt->pb);
+  if (m_oformat_ctxt != 0 && !(m_oformat_ctxt->flags & AVFMT_NOFILE)) 
+#   if LIBAVFORMAT_VERSION_INT >= 0x350000
+    avio_close(m_format_ctxt->pb);
+#   else
+    url_fclose(m_format_ctxt->pb);
+#   endif
 
   // frees the stream
   if (m_format_ctxt != 0) av_free(m_format_ctxt);
@@ -166,7 +184,11 @@ AVStream* io::VideoWriter::add_video_stream() {
 
   c = st->codec;
   c->codec_id = m_oformat_ctxt->video_codec;
+# if LIBAVUTIL_VERSION_INT >= 0x330000
+  c->codec_type = AVMEDIA_TYPE_VIDEO;
+# else
   c->codec_type = CODEC_TYPE_VIDEO;
+# endif
 
   // puts sample parameters
   c->bit_rate = m_bitrate;
@@ -294,7 +316,11 @@ void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
     AVPacket pkt;
     av_init_packet(&pkt);
 
+#   if LIBAVCODEC_VERSION_INT >= 0x350000
+    pkt.flags |= AV_PKT_FLAG_KEY;
+#   else
     pkt.flags |= PKT_FLAG_KEY;
+#   endif
     pkt.stream_index= m_video_stream->index;
     pkt.data= (uint8_t *)picture;
     pkt.size= sizeof(AVPicture);
@@ -312,7 +338,11 @@ void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
       if (static_cast<uint64_t>(c->coded_frame->pts) != AV_NOPTS_VALUE)
         pkt.pts= av_rescale_q(c->coded_frame->pts, c->time_base, m_video_stream->time_base);
       if(c->coded_frame->key_frame)
+#       if LIBAVCODEC_VERSION_INT >= 0x350000
+        pkt.flags |= AV_PKT_FLAG_KEY;
+#       else
         pkt.flags |= PKT_FLAG_KEY;
+#       endif
       pkt.stream_index= m_video_stream->index;
       pkt.data= video_outbuf;
       pkt.size= out_size;
