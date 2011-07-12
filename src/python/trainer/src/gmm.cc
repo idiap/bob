@@ -43,6 +43,10 @@ void bind_trainer_gmm() {
       "Set the GMM to use as a prior for MAP adaptation. "
       "Generally, this is a \"universal background model\" (UBM), "
       "also referred to as a \"world model\".")
+    .def("setT3MAP", &train::MAP_GMMTrainer::setT3MAP,
+      "Use a Torch3-like MAP adaptation rule instead of Reynolds'one.")
+    .def("unsetT3MAP", &train::MAP_GMMTrainer::unsetT3MAP,
+      "Use a Reynolds' MAP adaptation (rather than Torch3-like).")
   ;
  
   class_<train::ML_GMMTrainer, boost::noncopyable, bases<train::GMMTrainer> >("ML_GMMTrainer",

@@ -36,6 +36,12 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// parameters of the prior model
     /// Implements EMTrainer::mStep()
     void mStep(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+
+    /// Use a Torch3-like adaptation rule rather than Reynolds'one
+    /// In this case, alpha is a configuration variable rather than a function of the zeroth 
+    /// order statistics and a relevance factor (should be in range [0,1])
+    void setT3MAP(const double alpha) { m_T3_adaptation = true; m_T3_alpha = alpha; }
+    void unsetT3MAP() { m_T3_adaptation = false; }
     
   protected:
 
@@ -46,6 +52,11 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// Generally, this is a "universal background model" (UBM),
     /// also referred to as a "world model"
     Torch::machine::GMMMachine *m_prior_gmm;
+
+    /// The alpha for the Torch3-like adaptation
+    double m_T3_alpha;
+    /// Whether Torch3-like adaptation should be used or not
+    bool m_T3_adaptation;
 
   private:
 
@@ -64,7 +75,6 @@ class MAP_GMMTrainer : public GMMTrainer {
 
 };
 
-}
-}
+}}
 
 #endif

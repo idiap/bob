@@ -4,7 +4,7 @@
 Torch::trainer::MAP_GMMTrainer::MAP_GMMTrainer(double relevance_factor, bool update_means, bool update_variances, 
     bool update_weights, double mean_var_update_responsibilities_threshold): 
   GMMTrainer(update_means, update_variances, update_weights, mean_var_update_responsibilities_threshold), 
-  relevance_factor(relevance_factor), m_prior_gmm(NULL) {
+  relevance_factor(relevance_factor), m_prior_gmm(NULL), m_T3_alpha(0.), m_T3_adaptation(false) {
   
 }
 
@@ -33,7 +33,10 @@ void Torch::trainer::MAP_GMMTrainer::mStep(Torch::machine::GMMMachine& gmm, cons
 
   // Calculate the "data-dependent adaptation coefficient", alpha_i
   m_cache_alpha.resize(n_gaussians);
-  m_cache_alpha = m_ss.n(i) / (m_ss.n(i) + relevance_factor);
+  if( m_T3_adaptation )
+    m_cache_alpha = m_T3_alpha;
+  else
+    m_cache_alpha = m_ss.n(i) / (m_ss.n(i) + relevance_factor);
 
   // - Update weights if requested
   //   Equation 11 of Reynolds et al., "Speaker Verification Using Adapted Gaussian Mixture Models", Digital Signal Processing, 2000
