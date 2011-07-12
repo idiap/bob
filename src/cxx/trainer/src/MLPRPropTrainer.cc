@@ -40,6 +40,24 @@ train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
   return *this;
 }
 
+/**
+ * Constants taken from the paper:
+ */
+static const double DELTA0 = 0.1;
+static const double MIN_STEP = 0.5;
+static const double MAX_STEP = 1.2;
+static const double DELTA_MAX = 50.0;
+static const double DELTA_MIN = 1e-6;
+
+/**
+ * A convinient sign function
+ */
+static uint8_t sign (double x) {
+  if (x>0) return +1;
+  else if (x<0) return -1;
+  return 0;
+}
+
 void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
     const std::vector<Torch::io::Arrayset>& train_data,
     const std::vector<Torch::io::Array>& train_target,
@@ -166,4 +184,36 @@ void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
     }
   }
 
+  // (5.5) Weight update -- calculates the weight-update using the RProp rule.
+  // This is the place where standard backprop and rprop diverge.
+  /*
+
+  data::MeanExtractor mean;
+  data::Feature deriv = mean(lesson * input);
+  RINGER_DEBUG1("Calculating synaptic weight adjustment with change = "
+                << deriv << ", weight update = " << m_weight_update
+                << ", previous derivative = " << m_prev_deriv
+                << ", previous delta = " << m_prev_delta);
+
+  data::Feature retval = 0;
+  int sign_change = SIGN(deriv*m_prev_deriv);
+
+  if (sign_change > 0) {
+    m_weight_update = std::min(m_weight_update*MAX_STEP, DELTA_MAX);
+  }
+  else if (sign_change < 0) {
+    m_weight_update = std::max(m_weight_update*MIN_STEP, DELTA_MIN);
+    m_prev_deriv = 0;
+  }
+  else {
+    retval = -1 * m_prev_delta;
+  }
+
+  if (deriv < 0) retval = -1 * m_weight_update;
+  else retval = m_weight_update;
+  
+  m_prev_deriv = deriv;
+  m_prev_delta = retval;
+  return retval;
+  */
 }
