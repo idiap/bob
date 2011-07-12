@@ -38,13 +38,13 @@ void Torch::machine::GMMStats::save(Torch::io::HDF5File& config) const {
   //retrieved at any platform with the exact same precision.
   int64_t sumpx_shape_0 = sumPx.shape()[0];
   int64_t sumpx_shape_1 = sumPx.shape()[1];
-  config.append("n_gaussians", sumpx_shape_0);
-  config.append("n_inputs", sumpx_shape_1);
-  config.append("log_liklihood", log_likelihood); //double
-  config.append("T", T);
-  config.appendArray("n", n); //Array1d
-  config.appendArray("sumPx", sumPx); //Array2d
-  config.appendArray("sumPxx", sumPxx); //Array2d
+  config.set("n_gaussians", sumpx_shape_0);
+  config.set("n_inputs", sumpx_shape_1);
+  config.set("log_liklihood", log_likelihood); //double
+  config.set("T", T);
+  config.setArray("n", n); //Array1d
+  config.setArray("sumPx", sumPx); //Array2d
+  config.setArray("sumPxx", sumPxx); //Array2d
 }
 
 void Torch::machine::GMMStats::load(Torch::io::HDF5File& config) {

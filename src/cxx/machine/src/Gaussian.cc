@@ -180,11 +180,11 @@ void Torch::machine::Gaussian::preComputeConstants() {
 
 
 void Torch::machine::Gaussian::save(Torch::io::HDF5File& config) const {
-  config.appendArray("m_mean", m_mean);
-  config.appendArray("m_variance", m_variance);
-  config.appendArray("m_variance_thresholds", m_variance_thresholds);
-  config.append("g_norm", g_norm);
-  config.append("m_n_inputs", m_n_inputs);
+  config.setArray("m_mean", m_mean);
+  config.setArray("m_variance", m_variance);
+  config.setArray("m_variance_thresholds", m_variance_thresholds);
+  config.set("g_norm", g_norm);
+  config.set("m_n_inputs", m_n_inputs);
 }
 
 void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {

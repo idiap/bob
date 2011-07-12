@@ -96,7 +96,7 @@ Torch::machine::GMMMachine* Torch::machine::GMMLLRMachine::getGMMUBM() const {
 }
 
 void Torch::machine::GMMLLRMachine::save(Torch::io::HDF5File& config) const {
-  config.append("m_n_inputs", m_n_inputs);
+  config.set("m_n_inputs", m_n_inputs);
 
   std::ostringstream oss_client;
   oss_client << "m_gmm_client";

@@ -291,8 +291,8 @@ int Torch::machine::GMMMachine::getNGaussians() const {
 }
 
 void Torch::machine::GMMMachine::save(Torch::io::HDF5File& config) const {
-  config.append("m_n_gaussians", m_n_gaussians);
-  config.append("m_n_inputs", m_n_inputs);
+  config.set("m_n_gaussians", m_n_gaussians);
+  config.set("m_n_inputs", m_n_inputs);
 
   for(int i=0; i<m_n_gaussians; i++) {
     std::ostringstream oss;
@@ -303,7 +303,7 @@ void Torch::machine::GMMMachine::save(Torch::io::HDF5File& config) const {
     config.cd("..");
   }
 
-  config.appendArray("m_weights", m_weights);
+  config.setArray("m_weights", m_weights);
 }
 
 void Torch::machine::GMMMachine::load(Torch::io::HDF5File& config) {
