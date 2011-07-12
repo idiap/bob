@@ -63,13 +63,13 @@ parser.add_option("--responsibilities-threshold",
                   help="Mean and variance update responsibilities threshold",
                   type="float",
                   default=0.)
-parset.add_option("--set-torch3-map",
+parser.add_option("--set-torch3-map",
                   action="store_true",
-                  dest="torch3_map"
+                  dest="torch3_map",
                   help="Use torch3-like MAP adaptation rather than Reynolds'one",
                   default=False)
-parset.add_option("--alpha-torch3-map",
-                  dest="alpha_torch3"
+parser.add_option("--alpha-torch3-map",
+                  dest="alpha_torch3",
                   help="Set alpha to use with torch3-like MAP adaptation",
                   type="float",
                   default=0.5)
