@@ -21,6 +21,21 @@ namespace Torch { namespace machine {
   inline double logistic(double x) { return 1.0 / (1.0 + std::exp(-x)); }
   //tanh already exists in the standard cmath
 
+  /**
+   * The next functions are the derivative versions of all activation
+   * functions, expressed in terms of the same 'x' as the input value used for
+   * the activation. Here are the examples:
+   *
+   *  F           | derivative as a function of F
+   *  ------------+------------------------------------------
+   *  tanh(x)     | tanh'(x) = 1-(tanh(x))^2 = 1-F^2
+   *  logistic(x) | logistic'(x) = logistic(x) * (1-logistic(x)) = F*(1-F)
+   *  linear(x)   | linear'(x) = 1
+   */
+  inline double linear_derivative(double x) { return 1; }
+  inline double tanh_derivative(double x) { return 1-(x*x); }
+  inline double logistic_derivative(double x) { return x*(1-x); }
+
 }}
       
 #endif /* TORCH_MACHINE_ACTIVATION_H */

@@ -20,4 +20,6 @@ void bind_trainer_exception() {
 
   CxxToPythonTranslatorPar3<Torch::trainer::WrongNumberOfFeatures, Torch::trainer::Exception, size_t, size_t, size_t>("WrongNumberOfFeatures", "Raised when the number of features is different from other classes in the dataset");
 
+  CxxToPythonTranslator<Torch::trainer::IncompatibleMachine, Torch::trainer::Exception>("IncompatibleMachine", "Raised when the given machine is incompatible with the current settings for a given trainer.");
+
 }

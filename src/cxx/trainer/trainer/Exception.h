@@ -55,6 +55,17 @@ namespace Torch { namespace trainer {
       mutable std::string m_message;
   };
 
+  /**
+   * Raised when the given machine is incompatible with the current settings
+   * for a given trainer.
+   */
+  class IncompatibleMachine: public Exception {
+    public:
+      IncompatibleMachine() throw();
+      virtual ~IncompatibleMachine() throw();
+      virtual const char* what() const throw();
+  };
+
 }}
 
 #endif /* TORCH5SPRO_TRAINER_EXCEPTION_H */
