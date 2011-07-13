@@ -26,6 +26,9 @@ class MAP_GMMTrainer : public GMMTrainer {
     /// Destructor
     virtual ~MAP_GMMTrainer();
 
+    /// Initialization
+    virtual void initialization(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data);
+
     /// Set the GMM to use as a prior for MAP adaptation.
     /// Generally, this is a "universal background model" (UBM),
     /// also referred to as a "world model".

@@ -12,6 +12,19 @@ Torch::trainer::MAP_GMMTrainer::~MAP_GMMTrainer() {
   
 }
 
+void Torch::trainer::MAP_GMMTrainer::initialization(Torch::machine::GMMMachine& gmm, const Torch::io::Arrayset& data) {
+  // Allocate memory for the sufficient statistics and initialise
+  m_ss.resize(gmm.getNGaussians(),gmm.getNInputs());
+  blitz::Array<double,1> ar1(gmm.getNGaussians());
+  blitz::Array<double,2> ar2(gmm.getNGaussians(),gmm.getNInputs());
+  m_prior_gmm->getWeights(ar1);
+  gmm.setWeights(ar1);
+  m_prior_gmm->getMeans(ar2);
+  gmm.setMeans(ar2);
+  m_prior_gmm->getVariances(ar2);
+  gmm.setVariances(ar2);
+}
+
 bool Torch::trainer::MAP_GMMTrainer::setPriorGMM(Torch::machine::GMMMachine *prior_gmm) {
   if (prior_gmm == NULL) return false;
   m_prior_gmm = prior_gmm;
