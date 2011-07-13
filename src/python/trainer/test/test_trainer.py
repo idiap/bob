@@ -199,8 +199,6 @@ class TrainerTest(unittest.TestCase):
     variancesML_ref = torch.core.array.load("data/variancesAfterML.hdf5")
     weightsML_ref = torch.core.array.load("data/weightsAfterML.hdf5")
 
-    print (gmm.variances - variancesML_ref)
-
     # Compare to current results
     self.assertTrue(equals(gmm.means, meansML_ref, 3e-3))
     self.assertTrue(equals(gmm.variances, variancesML_ref, 3e-3))
@@ -258,8 +256,56 @@ class TrainerTest(unittest.TestCase):
     # Compare to matlab reference
     self.assertTrue(equals(new_means[0,:], gmm_adapted.means[:,0], 1e-4))
     self.assertTrue(equals(new_means[1,:], gmm_adapted.means[:,1], 1e-4))
+   
+  def test06_gmm_MAP(self):
+    """Train a GMMMachine with MAP_GMMTrainer and compare to Torch3vision reference"""
+   
+    ar = torch.io.Arrayset("data/dataforMAP.hdf5") 
+
+    # Initialize GMMMachine
+    n_gaussians = 5
+    n_inputs = 45
+    prior_gmm = torch.machine.GMMMachine(n_gaussians, n_inputs)
+    prior_gmm.means = torch.core.array.load("data/meansAfterML.hdf5")
+    prior_gmm.variances = torch.core.array.load("data/variancesAfterML.hdf5")
+    prior_gmm.weights = torch.core.array.load("data/weightsAfterML.hdf5")
+  
+    threshold = 0.001
+    prior_gmm.setVarianceThresholds(threshold)
     
-  def test06_custom_trainer(self):
+    # Initialize MAP Trainer
+    relevance_factor = 0.1
+    prior = 0.001
+    max_iter_gmm = 1
+    accuracy = 0.00001
+    map_factor = 0.5
+    map_gmmtrainer = torch.trainer.MAP_GMMTrainer(relevance_factor, True, False, False, prior)
+    map_gmmtrainer.maxIterations = max_iter_gmm
+    map_gmmtrainer.convergenceThreshold = accuracy
+    map_gmmtrainer.setPriorGMM(prior_gmm) 
+    map_gmmtrainer.setT3MAP(map_factor); 
+
+    gmm = torch.machine.GMMMachine(n_gaussians, n_inputs)
+    gmm.setVarianceThresholds(threshold)
+
+    # Train
+    map_gmmtrainer.train(gmm, ar)
+ 
+    # Test results
+    # Load Torch3vision reference
+    meansMAP_ref = torch.core.array.load("data/meansAfterMAP.hdf5")
+    variancesMAP_ref = torch.core.array.load("data/variancesAfterMAP.hdf5")
+    weightsMAP_ref = torch.core.array.load("data/weightsAfterMAP.hdf5")
+
+    # Compare to current results
+    # Gaps are quite large. This might be explained by the fact that there is no 
+    # adaptation of a given Gaussian in torch3 when the corresponding responsibilities
+    # are below the responsibilities threshold
+    self.assertTrue(equals(gmm.means, meansMAP_ref, 2e-1))
+    self.assertTrue(equals(gmm.variances, variancesMAP_ref, 1e-4))
+    self.assertTrue(equals(gmm.weights, weightsMAP_ref, 1e-4))
+ 
+  def test07_custom_trainer(self):
     """Custom python trainer"""
     
     ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
@@ -274,7 +320,7 @@ class TrainerTest(unittest.TestCase):
       self.assertTrue((ar[i+1].get() == machine.means[i, :]).all())
 
 
-  def test06_custom_initialization(self):
+  def test08_custom_initialization(self):
     ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     
     mytrainer = MyTrainer2()
