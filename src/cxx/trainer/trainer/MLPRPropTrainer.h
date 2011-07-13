@@ -101,9 +101,8 @@ namespace Torch { namespace trainer {
        * Trains the MLP to perform discrimination. The training is executed
        * outside the machine context, but uses all the current machine layout.
        * The given machine is updated with new weights and biases on the end of
-       * the training that is performed as many times (with a different number
-       * of randomly selected samples from the DataShuffler) as you have set me
-       * for (defaults to 1).
+       * the training that is performed a single time. Iterate as much as you
+       * want to refine the training.
        *
        * The machine given as input is checked for compatibility with the
        * current initialized settings. If the two are not compatible, an
@@ -119,8 +118,13 @@ namespace Torch { namespace trainer {
        * outside the scope of this trainer and to this type to focus only on
        * applying the training when requested to.
        */
-      virtual void train(Torch::machine::MLP& machine,
-          const DataShuffler& shuffler, size_t steps=1);
+      void train(Torch::machine::MLP& machine, const DataShuffler& shuffler);
+
+      /**
+       * This is a version of the train() method above, which does no
+       * compatibility check on the input machine.
+       */
+      void train_(Torch::machine::MLP& machine, const DataShuffler& shuffler);
 
     private: //useful methods
 

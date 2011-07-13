@@ -312,10 +312,8 @@ void train::MLPRPropTrainer::rprop_weight_update() {
   }
 }
 
-void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
-    const train::DataShuffler& shuffler, size_t steps) {
-
-  if (!checkCompatibility(machine)) throw train::IncompatibleMachine();
+void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
+    const train::DataShuffler& shuffler) {
 
   // We refer to the machine's weights and biases
   for (size_t k=0;k<m_weight_ref.size();++k)
@@ -323,15 +321,19 @@ void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
   for (size_t k=0;k<m_bias_ref.size();++k)
     m_bias_ref[k].reference(machine.getBiases()[k]);
 
-  for (size_t i=0; i<steps; ++i) {
+  // Gets fresh data for training.
+  shuffler(m_output[0], m_target);
 
-    // Gets fresh data for training.
-    shuffler(m_output[0], m_target);
+  // To be called in this sequence for a general backprop algorithm
+  forward_step();
+  backward_step();
+  rprop_weight_update();
+}
 
-    // To be called in this sequence for a general backprop algorithm
-    forward_step();
-    backward_step();
-    rprop_weight_update();
-  
-  }
+void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
+    const train::DataShuffler& shuffler) {
+
+  if (!checkCompatibility(machine)) throw train::IncompatibleMachine();
+
+  train_(machine, shuffler);
 }
