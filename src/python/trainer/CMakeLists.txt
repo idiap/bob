@@ -6,6 +6,7 @@ set(pysrc
    "src/linear.cc"
    "src/kmeans.cc"
    "src/gmm.cc"
+   "src/rprop.cc"
    "src/main.cc"
    )
 

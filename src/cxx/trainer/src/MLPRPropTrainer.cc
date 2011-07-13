@@ -49,7 +49,7 @@ train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
     m_prev_deriv_bias[k].reference(blitz::Array<double,1>(machine_bias[k].shape()));
   }
 
-  reInitialize();
+  reset();
 
   switch (machine.getActivation()) {
     case mach::LINEAR:
@@ -133,7 +133,7 @@ train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
   return *this;
 }
 
-void train::MLPRPropTrainer::reInitialize() {
+void train::MLPRPropTrainer::reset() {
   static const double DELTA0 = 0.1; ///< taken from the paper, section II.C
 
   for (size_t k=0; k<(m_H + 1); ++k) {
@@ -164,7 +164,7 @@ void train::MLPRPropTrainer::setBatchSize (size_t batch_size) {
   }
 }
 
-void train::MLPRPropTrainer::initializeRandomly(mach::MLP& machine,
+void train::MLPRPropTrainer::random(mach::MLP& machine,
     double lower_bound, double upper_bound) const {
   
   std::vector<blitz::Array<double,2> > W(machine.numOfHiddenLayers()+1);
@@ -190,7 +190,7 @@ void train::MLPRPropTrainer::initializeRandomly(mach::MLP& machine,
 
 }
 
-bool train::MLPRPropTrainer::checkCompatibility(const mach::MLP& machine) const 
+bool train::MLPRPropTrainer::isCompatible(const mach::MLP& machine) const 
 {
   if (m_H != machine.numOfHiddenLayers()) return false;
   
@@ -333,7 +333,7 @@ void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
 void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
     const train::DataShuffler& shuffler) {
 
-  if (!checkCompatibility(machine)) throw train::IncompatibleMachine();
+  if (!isCompatible(machine)) throw train::IncompatibleMachine();
 
   train_(machine, shuffler);
 }
