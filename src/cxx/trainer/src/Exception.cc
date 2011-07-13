@@ -74,3 +74,15 @@ const char* train::WrongNumberOfFeatures::what() const throw() {
   }
 }
 
+train::IncompatibleMachine::IncompatibleMachine() throw() {
+}
+
+train::IncompatibleMachine::~IncompatibleMachine() throw() {
+}
+
+const char* train::IncompatibleMachine::IncompatibleMachine::what() const throw() {
+ static const char* what_string = "trainer::IncompatibleMachine: you are trying to provide a machine this trained was not tailored for";
+ return what_string;
+}
+
+

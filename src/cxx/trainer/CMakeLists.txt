@@ -15,7 +15,7 @@ set(src
     "src/ML_GMMTrainer.cc"
     "src/Exception.cc"
     "src/TwoDPCATrainer.cc"
-    "src/MLPStopCriteria.cc"
+    "src/DataShuffler.cc"
     "src/MLPRPropTrainer.cc"
 )
 
