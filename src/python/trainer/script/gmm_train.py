@@ -82,17 +82,17 @@ parser.add_option("-v",
                   default=0.001)
 parser.add_option('--no-update-weights',
                   action="store_true",
-                  dest="no_update_weight",
+                  dest="no_update_weights",
                   help="Do not update the weights",
                   default=False)
 parser.add_option('--no-update-means',
                   action="store_true",
-                  dest="no_update_mean",
+                  dest="no_update_means",
                   help="Do not update the means",
                   default=False)
 parser.add_option('--no-adapt-variances',
                   action="store_true",
-                  dest="no_update_variance",
+                  dest="no_update_variances",
                   help="Do not update the variances",
                   default=False)
 parser.add_option("-n",
