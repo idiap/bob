@@ -80,21 +80,26 @@ parser.add_option("-v",
                   help="Variance threshold",
                   type="float",
                   default=0.001)
-parser.add_option('--adapt-weight',
+parser.add_option('--no-update-weights',
                   action="store_true",
-                  dest="adapt_weight",
-                  help="Adapt weight",
+                  dest="no_update_weight",
+                  help="Do not update the weights",
                   default=False)
-parser.add_option('--adapt-variance',
+parser.add_option('--no-update-means',
                   action="store_true",
-                  dest="adapt_variance",
-                  help="Adapt variance",
+                  dest="no_update_mean",
+                  help="Do not update the means",
+                  default=False)
+parser.add_option('--no-adapt-variances',
+                  action="store_true",
+                  dest="no_update_variance",
+                  help="Do not update the variances",
                   default=False)
 parser.add_option("-n",
-                  "--norm",
+                  "--no-norm",
                   action="store_true",
-                  dest="norm",
-                  help="Normalize input features",
+                  dest="no_norm",
+                  help="Do not normalize input features for KMeans",
                   default=False)
 parser.add_option('--self-test',
                   action="store_true",
@@ -149,10 +154,10 @@ for myfile in filelist:
 input_size = ar.shape[0]
 
 # Create a normalized sampler
-if options.norm:
-	(normalizedAr,stdAr) = NormalizeStdArrayset(ar)
-else:
+if options.no_norm:
 	normalizedAr = ar
+else:
+	(normalizedAr,stdAr) = NormalizeStdArrayset(ar)
 	
 # Create the machines
 kmeans = torch.machine.KMeansMachine(options.n_gaussians, input_size)
@@ -170,7 +175,7 @@ kmeansTrainer.train(kmeans, normalizedAr)
 means = kmeans.means
 
 # Undo normalization
-if options.norm:
+if not options.no_norm:
 	multiplyVectorsByFactors(means, stdAr)
 	multiplyVectorsByFactors(variances, stdAr ** 2)
 
@@ -181,10 +186,10 @@ gmm.weights = weights
 gmm.setVarianceThreshold = options.variance_threshold
 
 # Train gmm
-trainer = torch.trainer.ML_GMMTrainer(True, options.adapt_variance, options.adapt_weight)
+trainer = torch.trainer.ML_GMMTrainer(not options.no_update_means, not options.no_update_variances, not options.no_update_weights)
 trainer.convergenceThreshold = options.convergence_threshold
 trainer.maxIterations = options.iterg
-trainer.train(gmm, ar) # TODO: Should it rather be the normalized arrayset?
+trainer.train(gmm, ar)
 
 # Save gmm
 config = torch.io.HDF5File(options.output_file)
