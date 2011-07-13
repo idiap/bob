@@ -23,11 +23,21 @@ static void random2(const train::MLPRPropTrainer& T, Torch::machine::MLP& M,
   T.random(M, lower_bound, upper_bound);
 }
 
+static tuple call_shuffler(const train::DataShuffler& s, size_t N) {
+  blitz::Array<double,2> data(N, s.getDataWidth());
+  blitz::Array<double,2> target(N, s.getTargetWidth());
+  s(data, target);
+  return make_tuple(data, target);
+}
+
 void bind_trainer_rprop() {
   class_<train::DataShuffler>("DataShuffler", "A data shuffler is capable of being populated with data from one or multiple classes and matching target values. Once setup, the shuffer can randomly select a number of vectors and accompaning targets for the different classes, filling up user containers.\n\nData shufflers are particular useful for training neural networks.", init<const std::vector<io::Arrayset>&, const std::vector<blitz::Array<double,1> >&>((arg("data"), arg("target")), "Initializes the shuffler with some data classes and corresponding targets. Note that Arraysets must have (for the time being), a shape of (1,) and an element type == double."))
     .def("setSeed", &train::DataShuffler::setSeed, (arg("self"), arg("seed")), "Sets the seed of the internal random number generator. We actually keep as many random generators as classes so we will set the first generator with the seed you give and the next ones with an incremented seed value until all generators have had their seeds set.")
     .def("stdnorm", &train::DataShuffler::getStdNorm, (arg("self"), arg("mean"), arg("stddev")), "Calculates and returns mean and standard deviation from the input data.")
     .add_property("auto_stdnorm", &train::DataShuffler::getAutoStdNorm, &train::DataShuffler::setAutoStdNorm)
+    .add_property("dataWidth", &train::DataShuffler::getDataWidth)
+    .add_property("targetWidth", &train::DataShuffler::getTargetWidth)
+    .def("__call__", &call_shuffler, (arg("self"), arg("N")), "Populates the output matrices (data, target) by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target array widths.")
     .def("__call__", &train::DataShuffler::operator(), (arg("self"), arg("data"), arg("target")), "Populates the output matrices by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target arrays.\n\n.. note::\n   We check don't 'data' and 'target' for size compatibility and is your responsibility to do so prior to calling this method.")
     ;
 

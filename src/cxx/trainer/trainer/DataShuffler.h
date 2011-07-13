@@ -75,6 +75,16 @@ namespace Torch { namespace trainer {
       inline bool getAutoStdNorm() const { return m_do_stdnorm; }
 
       /**
+       * The data shape
+       */
+      inline size_t getDataWidth() const { return m_data[0].getShape()[0]; }
+
+      /**
+       * The target shape
+       */
+      inline size_t getTargetWidth() const { return m_target[0].extent(0); }
+
+      /**
        * Populates the output matrices by randomly selecting N arrays from the
        * input arraysets and matching targets in the most possible fair way.
        * The 'data' and 'target' matrices will contain N rows and the number of

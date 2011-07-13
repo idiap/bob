@@ -147,11 +147,10 @@ void train::MLPRPropTrainer::reset() {
 void train::MLPRPropTrainer::setBatchSize (size_t batch_size) {
   // m_output: values after the activation function; note that "output" will
   //           accomodate the input to ease on the calculations
-  // m_target: sampled target values (note on "error" bellow)
-  // m_error: error values; note the matrix is transposed compared to the
-  //          output to make it more convinient for the calculations
+  // m_target: sampled target values
+  // m_error: error values;
   
-  m_target.resize(m_deriv.back().extent(1), batch_size);
+  m_target.resize(batch_size, m_deriv.back().extent(1));
 
   m_output[0].resize(batch_size, m_deriv[0].extent(0));
 
@@ -160,7 +159,7 @@ void train::MLPRPropTrainer::setBatchSize (size_t batch_size) {
   }
 
   for (size_t k=0; k<m_error.size(); ++k) {
-    m_error[k].resize(m_deriv[k].extent(1), batch_size);
+    m_error[k].resize(batch_size, m_deriv[k].extent(1));
   }
 }
 
@@ -194,9 +193,9 @@ bool train::MLPRPropTrainer::isCompatible(const mach::MLP& machine) const
 {
   if (m_H != machine.numOfHiddenLayers()) return false;
   
-  if (m_target.extent(0) != (int)machine.outputSize()) return false;
+  if (m_target.extent(1) != (int)machine.outputSize()) return false;
 
-  if (m_output[0].extent(0) != (int)machine.inputSize()) return false;
+  if (m_output[0].extent(1) != (int)machine.inputSize()) return false;
 
   //also, each layer should be of the same size
   for (size_t k=0; k<(m_H + 1); ++k) {
@@ -222,19 +221,19 @@ void train::MLPRPropTrainer::forward_step() {
 void train::MLPRPropTrainer::backward_step() {
   size_t batch_size = m_target.extent(1);
   //last layer
-  m_error[m_H] = m_target - m_output.back().transpose(1,0);
+  m_error[m_H] = m_target - m_output.back();
   for (int i=0; i<(int)batch_size; ++i) { //for every example
-    for (int j=0; j<m_error[m_H+1].extent(0); ++j) { //for all variables
-      m_error[m_H](j,i) *= m_bwdfun(m_output[m_H+1](i,j));
+    for (int j=0; j<m_error[m_H+1].extent(1); ++j) { //for all variables
+      m_error[m_H](i,j) *= m_bwdfun(m_output[m_H+1](i,j));
     }
   }
 
   //all other layers
   for (size_t k=m_H; k>0; --k) {
-    math::prod_(m_weight_ref[k], m_error[k+1], m_error[k]);
+    math::prod_(m_error[k+1], m_weight_ref[k].transpose(1,0), m_error[k]);
     for (int i=0; i<(int)batch_size; ++i) { //for every example
       for (int j=0; j<m_error[k+1].extent(0); ++j) { //for all variables
-        m_error[k](j,i) *= m_bwdfun(m_output[k+1](i,j));
+        m_error[k](i,j) *= m_bwdfun(m_output[k+1](i,j));
       }
     }
   }
@@ -257,8 +256,7 @@ void train::MLPRPropTrainer::rprop_weight_update() {
   static const double DELTA_MIN = 1e-6;
 
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
-    math::prod_(m_output[k].transpose(1,0), m_error[k].transpose(1,0), 
-        m_deriv[k]);
+    math::prod_(m_output[k].transpose(1,0), m_error[k], m_deriv[k]);
 
     // Note that we don't need to estimate the mean since we are only
     // interested in the sign of the derivative and dividing by the mean makes
@@ -292,7 +290,7 @@ void train::MLPRPropTrainer::rprop_weight_update() {
     // fixed input = +1. This means we only need to probe for the error at
     // layer k.
     blitz::secondIndex J;
-    m_deriv_bias[k] = blitz::sum(m_error[k], J);
+    m_deriv_bias[k] = blitz::sum(m_error[k].transpose(1,0), J);
     for (int i=0; i<m_deriv_bias[k].extent(0); ++i) {
       int8_t M = sign(m_deriv_bias[k](i));
       // Implementations equations (4-6) on the RProp paper:
@@ -356,4 +354,3 @@ void train::MLPRPropTrainer::__test__(Torch::machine::MLP& machine,
   backward_step();
   rprop_weight_update();
 }
-
