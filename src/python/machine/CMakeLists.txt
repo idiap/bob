@@ -7,6 +7,7 @@ set(pysrc
    "src/activation.cc"
    "src/linear.cc"
    "src/mlp.cc"
+   "src/linearscoring.cc"
    "src/main.cc"
    )
 
@@ -23,6 +24,8 @@ torch_python_add_test(python-machine-linear-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
 torch_python_add_test(python-machine-mlp-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mlp.py)
+torch_python_add_test(python-machine-linearscoring-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linearscoring.py)
 
 # Installs all python scripts
 #file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")

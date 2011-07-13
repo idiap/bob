@@ -18,6 +18,7 @@ set(src
     "src/LinearMachine.cc"
     "src/MLP.cc"
     "src/MLPException.cc"
+    "src/LinearScoring.cc"
 )
 
 include(../../cmake/macros.cmake)
