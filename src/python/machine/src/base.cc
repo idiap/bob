@@ -41,6 +41,8 @@ GETTER(mach::GMMMachine, mach_GMMMachine, getMeans, double, 2)
 GETTER(mach::GMMMachine, mach_GMMMachine, getWeights, double, 1)
 GETTER(mach::GMMMachine, mach_GMMMachine, getVariances, double, 2)
 GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceThresholds, double, 2)
+GETTER(mach::GMMMachine, mach_GMMMachine, getMeanSupervector, double, 1)
+GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceSupervector, double, 1)
 
 static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
     const blitz::Array<double,1>& input) {
@@ -166,6 +168,9 @@ void bind_machine_base() {
                 &mach::GMMMachine::getNInputs,
                 &mach::GMMMachine::setNInputs,
                 "The feature dimensionality")
+  .add_property("nGaussians",
+                &mach::GMMMachine::getNGaussians,
+                "The number of Gaussian components")
   .add_property("weights",
                 &mach_GMMMachine_getWeights,
                 &mach::GMMMachine::setWeights,
@@ -174,6 +179,14 @@ void bind_machine_base() {
                 &mach_GMMMachine_getMeans,
                 &mach::GMMMachine::setMeans,
                 "The means of the gaussians")
+  .add_property("meanSupervector",
+                &mach_GMMMachine_getMeanSupervector,
+                "The mean supervector of the GMMMachine "
+                "(concatenation of the mean vectors of each Gaussian of the GMMMachine")
+  .add_property("varianceSupervector",
+                &mach_GMMMachine_getVarianceSupervector,
+                "The variance supervector of the GMMMachine "
+                "(concatenation of the variance vectors of each Gaussian of the GMMMachine")
   .add_property("variances",
                 &mach_GMMMachine_getVariances,
                 &mach::GMMMachine::setVariances,
@@ -217,9 +230,6 @@ void bind_machine_base() {
        &mach::GMMMachine::getGaussian, return_value_policy<reference_existing_object>(),
        args("i"),
        "Get a pointer to a particular Gaussian component")
-  .def("getNGaussians",
-       &mach::GMMMachine::getNGaussians,
-       "Return the number of Gaussian components")
   .def("getMeanSupervector",
        (void (mach::GMMMachine::*)(blitz::Array<double,1>&))&mach::GMMMachine::getMeanSupervector,
        args("mean_supervector"),
