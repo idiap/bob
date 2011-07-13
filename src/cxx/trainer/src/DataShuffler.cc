@@ -162,7 +162,7 @@ void train::DataShuffler::operator() (blitz::Array<double,2>& data,
         data(counter, all) = (m_data[i].get<double,1>(index) - m_mean)/m_stddev;
       else
         data(counter, all) = m_data[i].get<double,1>(index);
-      target(all, counter) = m_target[i];
+      target(counter, all) = m_target[i];
       --counter;
       if (counter == 0) break;
     }
