@@ -167,8 +167,46 @@ class TrainerTest(unittest.TestCase):
     gmm_ref_32bit_release = torch.machine.GMMMachine(torch.io.HDF5File("data/gmm_ML_32bit_release.hdf5"))
     
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release) or (gmm == gmm_ref_32bit_debug))
+
+  def test03_gmm_ML(self):
+    """Train a GMMMachine with ML_GMMTrainer and compare to Torch3vision reference"""
+   
+    ar = torch.io.Arrayset("data/dataNormalized.hdf5") 
+
+    # Initialize GMMMachine
+    gmm = torch.machine.GMMMachine(5, 45)
+    gmm.means = torch.core.array.load("data/meansAfterKMeans.hdf5").cast('float64')
+    gmm.variances = torch.core.array.load("data/variancesAfterKMeans.hdf5").cast('float64')
+    gmm.weights = torch.core.array.load("data/weightsAfterKMeans.hdf5").cast('float64').exp()
+   
+    threshold = 0.001
+    gmm.setVarianceThresholds(threshold)
     
-  def test03_gmm_MAP(self):
+    # Initialize ML Trainer
+    prior = 0.001
+    max_iter_gmm = 25+1
+    accuracy = 0.00001
+    ml_gmmtrainer = torch.trainer.ML_GMMTrainer(True, True, True, prior)
+    ml_gmmtrainer.maxIterations = max_iter_gmm
+    ml_gmmtrainer.convergenceThreshold = accuracy
+
+    # Run ML
+    ml_gmmtrainer.train(gmm, ar)
+
+    # Test results
+    # Load Torch3vision reference
+    meansML_ref = torch.core.array.load("data/meansAfterML.hdf5")
+    variancesML_ref = torch.core.array.load("data/variancesAfterML.hdf5")
+    weightsML_ref = torch.core.array.load("data/weightsAfterML.hdf5")
+
+    print (gmm.variances - variancesML_ref)
+
+    # Compare to current results
+    self.assertTrue(equals(gmm.means, meansML_ref, 3e-3))
+    self.assertTrue(equals(gmm.variances, variancesML_ref, 3e-3))
+    self.assertTrue(equals(gmm.weights, weightsML_ref, 1e-4))
+    
+  def test04_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer"""
     
     ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
@@ -188,7 +226,7 @@ class TrainerTest(unittest.TestCase):
 
     self.assertTrue((gmm == gmm_ref) or (gmm == gmm_ref_32bit_release))
     
-  def test04_gmm_MAP(self):
+  def test05_gmm_MAP(self):
     """Train a GMMMachine with MAP_GMMTrainer and compare with matlab reference"""
 
     map_adapt = torch.trainer.MAP_GMMTrainer(4., True, False, False, 0.)
@@ -221,7 +259,7 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(new_means[0,:], gmm_adapted.means[:,0], 1e-4))
     self.assertTrue(equals(new_means[1,:], gmm_adapted.means[:,1], 1e-4))
     
-  def test05_custom_trainer(self):
+  def test06_custom_trainer(self):
     """Custom python trainer"""
     
     ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")

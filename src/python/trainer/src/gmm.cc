@@ -52,7 +52,7 @@ void bind_trainer_gmm() {
   class_<train::ML_GMMTrainer, boost::noncopyable, bases<train::GMMTrainer> >("ML_GMMTrainer",
       "This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<optional<bool, bool, bool> >((arg("update_means"), arg("update_variances"), arg("update_weights"))))
+      init<optional<bool, bool, bool, double> >((arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
   ;
 
 }
