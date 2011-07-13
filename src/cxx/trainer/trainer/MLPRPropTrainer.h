@@ -126,6 +126,16 @@ namespace Torch { namespace trainer {
        */
       void train_(Torch::machine::MLP& machine, const DataShuffler& shuffler);
 
+      /**
+       * This is a version of the train() method above which receives a single
+       * input blitz::Array<double,2> and a target and trains the network using
+       * this. Note this method is not useful for real training sessions, only
+       * for testing the code. Avoid using this!
+       */
+      void __test__(Torch::machine::MLP& machine, 
+          const blitz::Array<double,2>& input,
+          const blitz::Array<double,2>& target);
+
     private: //useful methods
 
       /**

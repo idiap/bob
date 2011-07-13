@@ -315,14 +315,14 @@ void train::MLPRPropTrainer::rprop_weight_update() {
 void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
     const train::DataShuffler& shuffler) {
 
+  // Gets fresh data for training.
+  shuffler(m_output[0], m_target);
+
   // We refer to the machine's weights and biases
   for (size_t k=0;k<m_weight_ref.size();++k)
     m_weight_ref[k].reference(machine.getWeights()[k]);
   for (size_t k=0;k<m_bias_ref.size();++k)
     m_bias_ref[k].reference(machine.getBiases()[k]);
-
-  // Gets fresh data for training.
-  shuffler(m_output[0], m_target);
 
   // To be called in this sequence for a general backprop algorithm
   forward_step();
@@ -337,3 +337,23 @@ void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
 
   train_(machine, shuffler);
 }
+
+void train::MLPRPropTrainer::__test__(Torch::machine::MLP& machine,
+    const blitz::Array<double,2>& input,
+    const blitz::Array<double,2>& target) {
+
+  m_output[0] = input;
+  m_target = target;
+
+  // We refer to the machine's weights and biases
+  for (size_t k=0;k<m_weight_ref.size();++k)
+    m_weight_ref[k].reference(machine.getWeights()[k]);
+  for (size_t k=0;k<m_bias_ref.size();++k)
+    m_bias_ref[k].reference(machine.getBiases()[k]);
+
+  // To be called in this sequence for a general backprop algorithm
+  forward_step();
+  backward_step();
+  rprop_weight_update();
+}
+
