@@ -304,8 +304,35 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue(equals(gmm.means, meansMAP_ref, 2e-1))
     self.assertTrue(equals(gmm.variances, variancesMAP_ref, 1e-4))
     self.assertTrue(equals(gmm.weights, weightsMAP_ref, 1e-4))
+
+  def test07_gmm_test(self):
+    """Test a GMMMachine by computing scores against a model and compare to 
+    Torch3vision reference"""
+   
+    ar = torch.io.Arrayset("data/dataforMAP.hdf5") 
+
+    # Initialize GMMMachine
+    n_gaussians = 5
+    n_inputs = 45
+    gmm = torch.machine.GMMMachine(n_gaussians, n_inputs)
+    gmm.means = torch.core.array.load("data/meansAfterML.hdf5")
+    gmm.variances = torch.core.array.load("data/variancesAfterML.hdf5")
+    gmm.weights = torch.core.array.load("data/weightsAfterML.hdf5")
+  
+    threshold = 0.001
+    gmm.setVarianceThresholds(threshold)
+    
+    # Test against the model
+    score_mean_ref = -1.50379e+06
+    score = 0.
+    for v in ar:
+      score += gmm.forward(v.get())
+    score /= len(ar)
+  
+    # Compare current results to Torch3vision
+    self.assertTrue(abs(score-score_mean_ref)/score_mean_ref<1e-4)
  
-  def test07_custom_trainer(self):
+  def test08_custom_trainer(self):
     """Custom python trainer"""
     
     ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
@@ -319,8 +346,7 @@ class TrainerTest(unittest.TestCase):
       print machine.means[i,:]
       self.assertTrue((ar[i+1].get() == machine.means[i, :]).all())
 
-
-  def test08_custom_initialization(self):
+  def test09_custom_initialization(self):
     ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     
     mytrainer = MyTrainer2()
