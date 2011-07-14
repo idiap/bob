@@ -10,108 +10,158 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/format.hpp>
 
 using namespace boost::python;
 
-static boost::shared_ptr<boost::mt19937> make_with_seed(size_t s) {
+template <typename T>
+static boost::shared_ptr<boost::mt19937> make_with_seed(T s) {
   return boost::make_shared<boost::mt19937>(s);
 }
 
-static void set_seed(boost::mt19937& o, size_t s) {
+template <typename T>
+static void set_seed(boost::mt19937& o, T s) {
   o.seed(s);
 }
 
-template <typename T, typename Distribution> struct binder {
+template <typename T, typename Engine>
+static void uniform_int(const char* vartype) {
+  typedef boost::uniform_int<T> D;
 
-  typedef boost::variate_generator<boost::mt19937&, Distribution > dtype;
-  typedef typename dtype::result_type result_type;
+  boost::format name("uniform_%s");
+  name % vartype;
 
-  boost::shared_ptr<dtype> make_dtype_default() {
-    boost::mt19937 rng;
-    Distribution d;
-    return boost::shared_ptr<dtype>(new dtype(rng, d));
-  }
+  boost::format doc("The distribution class %s (boost::uniform_int<%s>) models a uniform random distribution. On each invocation, it returns a random integer value uniformly distributed in the set of integer numbers {min, min+1, min+2, ..., max}.");
+  doc % name.str() % vartype;
 
-  boost::shared_ptr<dtype> make_dtype(T arg1) {
-    boost::mt19937 rng;
-    Distribution d(arg1);
-    return boost::shared_ptr<dtype>(new dtype(rng, d));
-  }
+  class_<D>(name.str().c_str(), doc.str().c_str(), no_init)
+    .def(init<optional<T, T> >((arg("min")=0, arg("max")=9), "Constructs a new object of this type, 'min' and 'max' are parameters of the distribution"))
+    .add_property("min", &D::min)
+    .add_property("max", &D::max)
+    .def("reset", &D::reset, "This is a noop for this distribution, here only for consistency")
+    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    ;
+}
 
-  void set_seed(dtype& gen, size_t s) {
-    gen.engine().seed(s);
-    gen.distribution().reset();
-  }
+template <typename T, typename Engine>
+static void uniform_real(const char* vartype) {
+  typedef boost::uniform_real<T> D;
 
-  binder(const char* name, const char* par1) {
-    class_<dtype, boost::shared_ptr<dtype> >(name, "A variate generator", no_init)
-      .def("__init__", make_constructor(&binder<T,Distribution>::make_dtype_default), "Starts a new generator with default parameters. For information about defaults, consult the C++ boost::random documentation available on the web.")
-      .def("__init__", make_constructor(&binder<T,Distribution>::make_dtype, default_call_policies(), (arg(par1))), "Starts a new generator with parameters. For detailed information and range inclusion, consult the C++ boost::random documentation available on the web.")
-      .def("seed", &binder<T,Distribution>::set_seed, (arg("self"), arg("seed")), "Sets the internal seed of my own RNG and reset my distribution")
-      .def("__call__", (result_type (dtype::*)())&dtype::operator(), (arg("self")), "Draws a new number")
-      ;
-  }
+  boost::format name("uniform_%s");
+  name % vartype;
 
-};
+  boost::format doc("The distribution class %s (boost::uniform_real<%s>) models a random distribution. On each invocation, it returns a random floating-point value uniformly distributed in the range [min..max). The value is computed using std::numeric_limits<RealType>::digits random binary digits, i.e. the mantissa of the floating-point value is completely filled with random bits.\n\n.. note::\n   The current implementation is buggy, because it may not fill all of the mantissa with random bits.");
+  doc % name.str() % vartype;
 
-template <typename T, typename Distribution> struct binder2 {
+  class_<D>(name.str().c_str(), doc.str().c_str(), no_init)
+    .def(init<optional<T, T> >((arg("min")=0, arg("max")=1), "Constructs a new object of this type, 'min' and 'max' are parameters of the distribution. 'min' has to be <= 'max'."))
+    .add_property("min", &D::min)
+    .add_property("max", &D::max)
+    .def("reset", &D::reset, "This is a noop for this distribution, here only for consistency")
+    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    ;
+}
 
-  typedef boost::variate_generator<boost::mt19937&, Distribution > dtype;
-  typedef typename dtype::result_type result_type;
+template <typename T, typename Engine>
+static void normal_distribution(const char* vartype) {
+  typedef boost::normal_distribution<T> D;
 
-  boost::shared_ptr<dtype> make_dtype_default() {
-    boost::mt19937 rng;
-    Distribution d;
-    return boost::shared_ptr<dtype>(new dtype(rng, d));
-  }
+  boost::format name("normal_%s");
+  name % vartype;
 
-  boost::shared_ptr<dtype> make_dtype(T arg1, T arg2) {
-    boost::mt19937 rng;
-    Distribution d(arg1, arg2);
-    return boost::shared_ptr<dtype>(new dtype(rng, d));
-  }
+  boost::format doc("The distribution class %s (boost::normal_distribution<%s>) models a random distribution. Such a distribution produces random numbers 'x' distributed with the probability density function :math:`p(x) = \\frac{1}{\\sqrt{2\\pi\\sigma}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}`, where mean and sigma are the parameters of the distribution.");
+  doc % name.str() % vartype;
 
-  void set_seed(dtype& gen, size_t s) {
-    gen.engine().seed(s);
-    gen.distribution().reset();
-  }
+  class_<D>(name.str().c_str(), doc.str().c_str(), no_init)
+    .def(init<optional<T, T> >((arg("mean")=0, arg("sigma")=1), "Constructs a new object of this type, 'mean' and 'sigma' are parameters of the distribution."))
+    .add_property("mean", &D::mean)
+    .add_property("sigma", &D::sigma)
+    .def("reset", &D::reset, "resets the internal state")
+    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    ;
+}
 
-  binder2(const char* name, const char* par1, const char* par2) {
-    class_<dtype, boost::shared_ptr<dtype> >(name, "A variate generator", no_init)
-      .def("__init__", make_constructor(&binder2<T,Distribution>::make_dtype_default), "Starts a new generator with default parameters. For information about defaults, consult the C++ boost::random documentation available on the web.")
-      .def("__init__", make_constructor(&binder2<T,Distribution>::make_dtype, default_call_policies(), (arg(par1), arg(par2))), "Starts a new generator with parameters. Note that, for range style parameters (in uniform distributions for example), integer ranges include border values while for real-valued distributions, the lower end is included but not the upper end [to,from). For detailed information and range inclusion, consult the C++ boost::random documentation available on the web.")
-      .def("seed", &binder2<T,Distribution>::set_seed, (arg("self"), arg("seed")), "Sets the internal seed of my own RNG and reset my distribution")
-      .def("__call__", (result_type (dtype::*)())&dtype::operator(), (arg("self")), "Draws a new number")
-      ;
-  }
+template <typename T, typename Engine>
+static void lognormal_distribution(const char* vartype) {
+  typedef boost::lognormal_distribution<T> D;
 
-};
+  boost::format name("lognormal_%s");
+  name % vartype;
+
+  boost::format doc("The distribution class %s (boost::lognormal_distribution<%s>) models a random distribution. Such a distribution produces random numbers 'x' distributed with the probability density function :math:`$p(x) = \\frac{1}{x \\sigma_N \\sqrt{2\\pi}} e^{\\frac{-\\left(\\log(x)-\\mu_N\\right)^2}{2\\sigma_N^2}}`, for :math:`x > 0` and :math:`$\\sigma_N = \\sqrt{\\log\\left(1 + \\frac{\\sigma^2}{\\mu^2}\\right)}`.");
+  doc % name.str() % vartype;
+
+  class_<D>(name.str().c_str(), doc.str().c_str(), no_init)
+    .def(init<optional<T, T> >((arg("mean")=1, arg("sigma")=1), "Constructs a new object of this type, 'mean' and 'sigma' are parameters of the distribution."))
+    .add_property("mean", &D::mean)
+    .add_property("sigma", &D::sigma)
+    .def("reset", &D::reset, "resets the internal state")
+    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    ;
+}
+
+template <typename T, typename Engine>
+static void gamma_distribution(const char* vartype) {
+  typedef boost::gamma_distribution<T> D;
+
+  boost::format name("gamma_%s");
+  name % vartype;
+
+  boost::format doc("The distribution class %s (boost::gamma_distribution<%s>) models a random distribution. The gamma distribution is a continuous distribution with a single parameter 'alpha'. It has :math:`p(x) = x^{\\alpha-1}\\frac{e^{-x}}{\\Gamma(\\alpha)}`.");
+  doc % name.str() % vartype;
+
+  class_<D>(name.str().c_str(), doc.str().c_str(), no_init)
+    .def(init<optional<T> >((arg("alpha")=1), "Constructs a new object of this type, 'alpha' is a parameter of the distribution."))
+    .add_property("alpha", &D::alpha)
+    .def("reset", &D::reset, "resets the internal state")
+    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    ;
+}
+
+template <typename T, typename I, typename Engine>
+static void binomial_distribution(const char* vartype) {
+  typedef boost::binomial_distribution<T, I> D;
+
+  boost::format name("binomial_%s");
+  name % vartype;
+
+  boost::format doc("The distribution class %s (boost::binomial_distribution<%s>) models a random distribution. The binomial distribution is an integer valued distribution with two parameters, 't' and 'p'. The values of the distribution are within the range [0,t]. The probability that the distribution produces a value k is :math:`{t \\choose k}p^k(1-p)^{t-k}\\`.");
+  doc % name.str() % vartype;
+
+  class_<D>(name.str().c_str(), doc.str().c_str(), no_init)
+    .def(init<optional<T, T> >((arg("t")=1, arg("p")=0.5), "Constructs a new object of this type, 't' and 'p' are parameters of the distribution. Requires :math:`t >=0` and :math:`0 <= p <= 1`."))
+    .add_property("t", &D::t)
+    .add_property("p", &D::p)
+    .def("reset", &D::reset, "this is a noop for this distribution, but is here for consistence with other APIs")
+    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    ;
+}
 
 void bind_core_random () {
   class_<boost::mt19937, boost::shared_ptr<boost::mt19937> >("mt19937", "A Random Number Generator (RNG) based on the work 'Mersenne Twister: A 623-dimensionally equidistributed uniform pseudo-random number generator, Makoto Matsumoto and Takuji Nishimura, ACM Transactions on Modeling and Computer Simulation: Special Issue on Uniform Random Number Generation, Vol. 8, No. 1, January 1998, pp. 3-30'", init<>("Default constructor"))
-    .def("__init__", make_constructor(&make_with_seed, default_call_policies(), (arg("seed"))), "Builds a new generator with a specific seed")
-    .add_property("seed", &set_seed, "Sets the seed of the random number generator")
+    .def("__init__", make_constructor(&make_with_seed<int16_t>, default_call_policies(), (arg("seed"))), "Builds a new generator with a specific seed")
+    .def("__init__", make_constructor(&make_with_seed<int32_t>, default_call_policies(), (arg("seed"))), "Builds a new generator with a specific seed")
+    .def("__init__", make_constructor(&make_with_seed<int64_t>, default_call_policies(), (arg("seed"))), "Builds a new generator with a specific seed")
+    .def("__init__", make_constructor(&make_with_seed<double>, default_call_policies(), (arg("seed"))), "Builds a new generator with a specific seed")
+    .def("seed", &set_seed<double>, "Sets my internal seed")
     ;
 
-  //single argument methods
-  binder<float, boost::gamma_distribution<float> >("gamma_float32", "alpha");
-  binder<double, boost::gamma_distribution<double> >("gamma_float64", "alpha");
-
-  //two-argument methods
-  binder2<int8_t, boost::uniform_smallint<int8_t> >("uniform_int8", "from", "to");
-  binder2<int16_t, boost::uniform_int<int16_t> >("uniform_int16", "from", "to");
-  binder2<int32_t, boost::uniform_int<int32_t> >("uniform_int32", "from", "to");
-  binder2<int64_t, boost::uniform_int<int64_t> >("uniform_int64", "from", "to");
-  binder2<uint8_t, boost::uniform_smallint<uint8_t> >("uniform_uint8", "from", "to");
-  binder2<uint16_t, boost::uniform_int<uint16_t> >("uniform_uint16", "from", "to");
-  binder2<uint32_t, boost::uniform_int<uint32_t> >("uniform_uint32", "from", "to");
-  binder2<uint64_t, boost::uniform_int<uint64_t> >("uniform_uint64", "from", "to");
-  binder2<float, boost::uniform_real<float> >("uniform_float32", "from", "to");
-  binder2<double, boost::uniform_real<double> >("uniform_float64", "from", "to");
-  binder2<float, boost::binomial_distribution<float> >("binomial_float32", "from", "to");
-  binder2<double, boost::binomial_distribution<double> >("binomial_float64", "from", "to");
-  binder2<float, boost::normal_distribution<float> >("normal_float32", "mean", "sigma");
-  binder2<double, boost::normal_distribution<double> >("normal_float64", "mean", "sigma");
-  binder2<float, boost::lognormal_distribution<float> >("lognormal_float32", "mean", "sigma");
-  binder2<double, boost::lognormal_distribution<double> >("lognormal_float64", "mean", "sigma");
+  uniform_int<int8_t, boost::mt19937>("int8");
+  uniform_int<int16_t, boost::mt19937>("int16");
+  uniform_int<int32_t, boost::mt19937>("int32");
+  uniform_int<int64_t, boost::mt19937>("int64");
+  uniform_int<uint8_t, boost::mt19937>("uint16");
+  uniform_int<uint16_t, boost::mt19937>("uint32");
+  uniform_int<uint32_t, boost::mt19937>("uint64");
+  uniform_int<uint64_t, boost::mt19937>("uint64");
+  uniform_real<float, boost::mt19937>("float32");
+  uniform_real<double, boost::mt19937>("float64");
+  normal_distribution<float, boost::mt19937>("float32");
+  normal_distribution<double, boost::mt19937>("float64");
+  lognormal_distribution<float, boost::mt19937>("float32");
+  lognormal_distribution<double, boost::mt19937>("float64");
+  gamma_distribution<float, boost::mt19937>("float32");
+  gamma_distribution<double, boost::mt19937>("float64");
+  binomial_distribution<float, uint64_t, boost::mt19937>("float32");
+  binomial_distribution<double, uint64_t, boost::mt19937>("float64");
 }

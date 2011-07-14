@@ -92,15 +92,19 @@ namespace Torch { namespace trainer {
        *
        * We check don't 'data' and 'target' for size compatibility and is your
        * responsibility to do so.
+       *
+       * Note this operation is non-const - we do alter the state of our random
+       * generator when you call this.
        */
       void operator() (blitz::Array<double,2>& data,
-          blitz::Array<double,2>& target) const;
+          blitz::Array<double,2>& target);
 
     private: //representation
 
       std::vector<Torch::io::Arrayset> m_data;
       std::vector<blitz::Array<double,1> > m_target;
-      mutable std::vector<boost::shared_ptr<boost::variate_generator<boost::mt19937&, boost::uniform_int<size_t> > > > m_selector;
+      boost::mt19937 m_rng;
+      std::vector<boost::uniform_int<size_t> > m_range;
       bool m_do_stdnorm; ///< should we apply standard normalization
       blitz::Array<double,1> m_mean; ///< mean to be used for std. norm.
       blitz::Array<double,1> m_stddev; ///< std.dev for std. norm.

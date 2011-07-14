@@ -16,7 +16,8 @@ train::DataShuffler::DataShuffler(const std::vector<Torch::io::Arrayset>& data,
     const std::vector<blitz::Array<double,1> >& target):
   m_data(data),
   m_target(target.size()),
-  m_selector(data.size()),
+  m_rng(), ///< note this will be initialized with fixed, predetermined seed!
+  m_range(),
   m_do_stdnorm(false),
   m_mean(),
   m_stddev()
@@ -44,33 +45,23 @@ train::DataShuffler::DataShuffler(const std::vector<Torch::io::Arrayset>& data,
   for (size_t k=0; k<target.size(); ++k) 
     m_target[k].reference(target[k].copy());
 
-  // creates one generator tailored for the range of each Arrayset
-  boost::mt19937 rng;
-  for (size_t i=0; i<m_selector.size(); ++i) {
-    boost::uniform_int<size_t> range(0, m_data[i].size()-1);
-    m_selector[i].reset(new 
-        boost::variate_generator<boost::mt19937&, boost::uniform_int<size_t> >
-        (rng, range));
+  // creates one range tailored for the range of each Arrayset
+  for (size_t i=0; i<data.size(); ++i) {
+    m_range.push_back(boost::uniform_int<size_t>(0, m_data[i].size()-1));
   }
 }
 
 train::DataShuffler::DataShuffler(const train::DataShuffler& other):
   m_data(other.m_data),
   m_target(other.m_target.size()),
-  m_selector(other.m_data.size()),
+  m_rng(other.m_rng),
+  m_range(other.m_range),
   m_do_stdnorm(other.m_do_stdnorm),
   m_mean(other.m_mean.copy()),
   m_stddev(other.m_stddev.copy())
 {
   for (size_t k=0; k<m_target.size(); ++k) 
     m_target[k].reference(other.m_target[k].copy());
-
-  // One generator tailored for the range of each Arrayset
-  for (size_t i=0; i<m_selector.size(); ++i) {
-    m_selector[i].reset(new 
-        boost::variate_generator<boost::mt19937&, boost::uniform_int<size_t> >
-        (other.m_selector[i]->engine(), other.m_selector[i]->distribution()));
-  }
 }
 
 train::DataShuffler::~DataShuffler() { }
@@ -81,13 +72,8 @@ train::DataShuffler& train::DataShuffler::operator=
   m_target.resize(other.m_target.size());
   for (size_t k=0; k<m_target.size(); ++k) 
     m_target[k].reference(other.m_target[k].copy());
- 
-  m_selector.resize(other.m_selector.size());
-  for (size_t i=0; i<m_selector.size(); ++i) {
-    m_selector[i].reset(new 
-        boost::variate_generator<boost::mt19937&, boost::uniform_int<size_t> >
-        (other.m_selector[i]->engine(), other.m_selector[i]->distribution()));
-  }
+
+  m_range = other.m_range;
   
   m_mean.reference(other.m_mean.copy());
   m_stddev.reference(other.m_stddev.copy());
@@ -96,10 +82,8 @@ train::DataShuffler& train::DataShuffler::operator=
 }
 
 void train::DataShuffler::setSeed(size_t s) {
-  for (size_t i=0; i<m_selector.size(); ++i) {
-    m_selector[i]->engine().seed(s++); //don't use the same seed for all dist.
-    m_selector[i]->distribution().reset(); //needs to reset distribution
-  }
+  m_rng.seed(s);
+  for (size_t i=0; i<m_range.size(); ++i) m_range[i].reset();
 }
 
 /**
@@ -149,24 +133,25 @@ void train::DataShuffler::getStdNorm(blitz::Array<double,1>& mean,
 }
 
 void train::DataShuffler::operator() (blitz::Array<double,2>& data,
-    blitz::Array<double,2>& target) const {
+    blitz::Array<double,2>& target) {
   
   array::assertSameDimensionLength(data.extent(0), target.extent(0));
 
-  size_t counter = data.extent(0);
+  size_t counter = 0;
+  size_t max = data.extent(0);
   blitz::Range all = blitz::Range::all();
   while (true) {
     for (size_t i=0; i<m_data.size(); ++i) { //for all classes
-      size_t index = (*m_selector[i])(); //pick a random position within class
+      size_t index = m_range[i](m_rng); //pick a random position within class
       if (m_do_stdnorm)
         data(counter, all) = (m_data[i].get<double,1>(index) - m_mean)/m_stddev;
       else
         data(counter, all) = m_data[i].get<double,1>(index);
       target(counter, all) = m_target[i];
-      --counter;
-      if (counter == 0) break;
+      ++counter;
+      if (counter >= max) break;
     }
-    if (counter == 0) break;
+    if (counter >= max) break;
   }
 
 }
