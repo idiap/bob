@@ -281,38 +281,21 @@ void train::MLPRPropTrainer::rprop_weight_update() {
   }
 }
 
-void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
-    train::DataShuffler& shuffler) {
-
-  // Gets fresh data for training.
-  shuffler(m_output[0], m_target);
-
-  // We refer to the machine's weights and biases
-  for (size_t k=0;k<m_weight_ref.size();++k)
-    m_weight_ref[k].reference(machine.getWeights()[k]);
-  for (size_t k=0;k<m_bias_ref.size();++k)
-    m_bias_ref[k].reference(machine.getBiases()[k]);
-
-  // To be called in this sequence for a general backprop algorithm
-  forward_step();
-  backward_step();
-  rprop_weight_update();
-}
-
 void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
-    train::DataShuffler& shuffler) {
-
+    const blitz::Array<double,2>& input,
+    const blitz::Array<double,2>& target) {
   if (!isCompatible(machine)) throw train::IncompatibleMachine();
-
-  train_(machine, shuffler);
+  array::assertSameDimensionLength(getBatchSize(), input.extent(0));
+  array::assertSameDimensionLength(getBatchSize(), target.extent(0));
+  train_(machine, input, target);
 }
 
-void train::MLPRPropTrainer::__test__(Torch::machine::MLP& machine,
+void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
 
-  m_output[0] = input;
-  m_target = target;
+  m_output[0].reference(input);
+  m_target.reference(target);
 
   // We refer to the machine's weights and biases
   for (size_t k=0;k<m_weight_ref.size();++k)

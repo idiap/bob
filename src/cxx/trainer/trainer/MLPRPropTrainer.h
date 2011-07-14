@@ -16,7 +16,6 @@
 
 #include "io/Arrayset.h"
 #include "machine/MLP.h"
-#include "trainer/DataShuffler.h"
 
 namespace Torch { namespace trainer {
 
@@ -65,7 +64,7 @@ namespace Torch { namespace trainer {
       /**
        * Gets the batch size
        */
-      size_t getBatchSize() const { return m_target.extent(1); }
+      size_t getBatchSize() const { return m_target.extent(0); }
 
       /**
        * Sets the batch size
@@ -88,31 +87,27 @@ namespace Torch { namespace trainer {
        * current initialized settings. If the two are not compatible, an
        * exception is thrown.
        *
-       * Note: In RProp, training is done in batches. You should set the
-       * batch size properly at class initialization or use setBatchSize().
+       * Note: In RProp, training is done in batches. The number of rows in the
+       * input (and target) determines the batch size. If the batch size
+       * currently set is incompatible with the given data an exception is
+       * raised.
        *       
        * Note2: The machine is not initialized randomly at each train() call.
        * It is your task to call MLP::randomize() once on the machine you
        * want to train and then call train() as many times as you think are
        * necessary. This design allows for a training criteria to be encoded
        * outside the scope of this trainer and to this type to focus only on
-       * applying the training when requested to.
+       input, target applying the training when requested to.
        */
-      void train(Torch::machine::MLP& machine, DataShuffler& shuffler);
+      void train(Torch::machine::MLP& machine, 
+          const blitz::Array<double,2>& input,
+          const blitz::Array<double,2>& target);
 
       /**
        * This is a version of the train() method above, which does no
        * compatibility check on the input machine.
        */
-      void train_(Torch::machine::MLP& machine, DataShuffler& shuffler);
-
-      /**
-       * This is a version of the train() method above which receives a single
-       * input blitz::Array<double,2> and a target and trains the network using
-       * this. Note this method is not useful for real training sessions, only
-       * for testing the code. Avoid using this!
-       */
-      void __test__(Torch::machine::MLP& machine, 
+      void train_(Torch::machine::MLP& machine, 
           const blitz::Array<double,2>& input,
           const blitz::Array<double,2>& target);
 
