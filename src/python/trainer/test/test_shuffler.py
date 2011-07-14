@@ -96,7 +96,7 @@ class DataShufferTest(unittest.TestCase):
 
     # Test if we can correctly set the seed and that this act is effective
 
-    # First test that, by making two shufflers, we get the same replies!
+    # First test that, by making two shufflers, we get different replies
     shuffle1 = torch.trainer.DataShuffler([self.set1, self.set2, self.set3],
         [self.target1, self.target2, self.target3])
     shuffle2 = torch.trainer.DataShuffler([self.set1, self.set2, self.set3],
@@ -107,7 +107,7 @@ class DataShufferTest(unittest.TestCase):
     [data1, target1] = shuffle1(N)
     [data2, target2] = shuffle2(N)
 
-    self.assertTrue( (data1 == data2).all() )
+    self.assertFalse( (data1 == data2).all() )
     # Note targets will always be the same given N because of the internal
     # design of the C++ DataShuffler.
 
@@ -118,20 +118,20 @@ class DataShufferTest(unittest.TestCase):
     
     self.assertFalse( (data1 == data1_2).all() )
 
-    # Finally show that, by setting the seed, we also can get a different data
-    # distribution.
+    # Finally show that, by setting the seed, we can get the same results
     shuffle1 = torch.trainer.DataShuffler([self.set1, self.set2, self.set3],
         [self.target1, self.target2, self.target3])
     shuffle2 = torch.trainer.DataShuffler([self.set1, self.set2, self.set3],
         [self.target1, self.target2, self.target3])
 
     # A great seed if you are working in python (the microseconds)
-    shuffle1.seed(int(1e12 * (time.time() - int(time.time()))))
+    rng1 = torch.core.random.mt19937(32)
+    rng2 = torch.core.random.mt19937(32)
 
-    [data1, target1] = shuffle1(N)
-    [data2, target2] = shuffle2(N)
+    [data1, target1] = shuffle1(rng1, N)
+    [data2, target2] = shuffle2(rng2, N)
 
-    self.assertFalse( (data1 == data2).all() )
+    self.assertTrue( (data1 == data2).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')

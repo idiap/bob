@@ -14,10 +14,18 @@ namespace io = Torch::io;
 namespace mach = Torch::machine;
 namespace train = Torch::trainer;
 
-static tuple call_shuffler(train::DataShuffler& s, size_t N) {
+static tuple call_shuffler1(train::DataShuffler& s, size_t N) {
   blitz::Array<double,2> data(N, s.getDataWidth());
   blitz::Array<double,2> target(N, s.getTargetWidth());
   s(data, target);
+  return make_tuple(data, target);
+}
+
+static tuple call_shuffler2(train::DataShuffler& s, boost::mt19937& rng,
+    size_t N) {
+  blitz::Array<double,2> data(N, s.getDataWidth());
+  blitz::Array<double,2> target(N, s.getTargetWidth());
+  s(rng, data, target);
   return make_tuple(data, target);
 }
 
@@ -27,7 +35,8 @@ void bind_trainer_rprop() {
     .add_property("auto_stdnorm", &train::DataShuffler::getAutoStdNorm, &train::DataShuffler::setAutoStdNorm)
     .add_property("dataWidth", &train::DataShuffler::getDataWidth)
     .add_property("targetWidth", &train::DataShuffler::getTargetWidth)
-    .def("__call__", &call_shuffler, (arg("self"), arg("N")), "Populates the output matrices (data, target) by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target array widths.")
+    .def("__call__", &call_shuffler1, (arg("self"), arg("N")), "Populates the output matrices (data, target) by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target array widths.")
+    .def("__call__", &call_shuffler2, (arg("self"), arg("rng"), arg("N")), "Populates the output matrices (data, target) by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target array widths. In this version you should provide your own random number generator, already initialized.")
     .def("__call__", (void (train::DataShuffler::*)(boost::mt19937&, blitz::Array<double,2>&, blitz::Array<double,2>&))&train::DataShuffler::operator(), (arg("self"), arg("data"), arg("target")), "Populates the output matrices by randomly selecting N arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain N rows and the number of columns that are dependent on input arraysets and target arrays.\n\nWe check don't 'data' and 'target' for size compatibility and is your responsibility to do so.")
     .def("__call__", (void (train::DataShuffler::*)(blitz::Array<double,2>&, blitz::Array<double,2>&))&train::DataShuffler::operator(), (arg("self"), arg("data"), arg("target")), "This version is a shortcut to the previous declaration of operator() that actually instantiates its own random number generator and seed it a time-based variable. We guarantee two calls will lead to different results if they are at least 1 microsecond appart (procedure uses the machine clock).")
     ;
