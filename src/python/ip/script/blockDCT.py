@@ -57,9 +57,9 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
   TMP_tensor = torch.core.array.float64_2(n_blocks, A_N_DCT_COEF)
   
   nBlocks = torch.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
-  for bx in range(nBlocks[0]):
-    for by in range(nBlocks[1]):
-      bi = bx + by * nBlocks[0]
+  for by in range(nBlocks[0]):
+    for bx in range(nBlocks[1]):
+      bi = bx + by * nBlocks[1]
       TMP_tensor[bi, 0] = bx
       TMP_tensor[bi, 1] = by
       for j in range(A_N_DCT_COEF-2):
