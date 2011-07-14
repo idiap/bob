@@ -98,7 +98,7 @@ void evaluateStdNormParameters(const std::vector<Torch::io::Arrayset>& data,
       ++samples;
     }
   }
-  stddev -= blitz::pow2(mean);
+  stddev -= blitz::pow2(mean) / samples;
   stddev /= (samples-1); ///< note: unbiased sample variance
   stddev = blitz::sqrt(stddev);
 

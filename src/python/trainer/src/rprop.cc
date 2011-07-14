@@ -29,9 +29,17 @@ static tuple call_shuffler2(train::DataShuffler& s, boost::mt19937& rng,
   return make_tuple(data, target);
 }
 
+static tuple stdnorm(train::DataShuffler& s) {
+  blitz::Array<double,1> mean(s.getDataWidth());
+  blitz::Array<double,1> stddev(s.getDataWidth());
+  s.getStdNorm(mean, stddev);
+  return make_tuple(mean, stddev);
+}
+
 void bind_trainer_rprop() {
   class_<train::DataShuffler>("DataShuffler", "A data shuffler is capable of being populated with data from one or multiple classes and matching target values. Once setup, the shuffer can randomly select a number of vectors and accompaning targets for the different classes, filling up user containers.\n\nData shufflers are particular useful for training neural networks.", init<const std::vector<io::Arrayset>&, const std::vector<blitz::Array<double,1> >&>((arg("data"), arg("target")), "Initializes the shuffler with some data classes and corresponding targets. Note that Arraysets must have (for the time being), a shape of (1,) and an element type == double."))
     .def("stdnorm", &train::DataShuffler::getStdNorm, (arg("self"), arg("mean"), arg("stddev")), "Calculates and returns mean and standard deviation from the input data.")
+    .def("stdnorm", &stdnorm, (arg("self")), "Calculates and returns mean and standard deviation from the input data.")
     .add_property("auto_stdnorm", &train::DataShuffler::getAutoStdNorm, &train::DataShuffler::setAutoStdNorm)
     .add_property("dataWidth", &train::DataShuffler::getDataWidth)
     .add_property("targetWidth", &train::DataShuffler::getTargetWidth)
