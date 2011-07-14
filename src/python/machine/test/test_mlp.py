@@ -178,6 +178,51 @@ class MLPTest(unittest.TestCase):
     for pattern, expected in zip(data.read("pattern"), data.read("result")):
       self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
 
+  def test06_Randomization(self):
+
+    # this test makes sure randomization is working as expected on MLPs
+
+    m1 = torch.machine.MLP((2,3,2))
+    m1.randomize()
+
+    for k in m1.weights:
+      self.assertTrue( (abs(k) <= 0.1).all() )
+      self.assertTrue( (k != 0).any() )
+    for k in m1.biases:
+      self.assertTrue( (abs(k) <= 0.1).all() )
+      self.assertTrue( (k != 0).any() )
+
+    for k in range(10): 
+      m2 = torch.machine.MLP((2,3,2))
+      m2.randomize()
+      for w1, w2 in zip(m1.weights, m2.weights):
+        self.assertFalse( (w1 == w2).all() )
+      for b1, b2 in zip(m1.biases, m2.biases):
+        self.assertFalse( (b1 == b2).all() )
+      for k in m2.weights:
+        self.assertTrue( (abs(k) <= 0.1).all() )
+        self.assertTrue( (k != 0).any() )
+      for k in m2.biases:
+        self.assertTrue( (abs(k) <= 0.1).all() )
+        self.assertTrue( (k != 0).any() )
+
+    # we can also reset the margins for randomization
+    for k in range(10): 
+      m2 = torch.machine.MLP((2,3,2))
+      m2.randomize(-0.001, 0.001)
+      for w1, w2 in zip(m1.weights, m2.weights):
+        self.assertFalse( (w1 == w2).all() )
+      for b1, b2 in zip(m1.biases, m2.biases):
+        self.assertFalse( (b1 == b2).all() )
+      for k in m2.weights:
+        self.assertTrue( (abs(k) <= 0.001).all() )
+        self.assertTrue( (k != 0).any() )
+      for k in m2.biases:
+        self.assertTrue( (abs(k) <= 0.001).all() )
+        self.assertTrue( (k != 0).any() )
+
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
