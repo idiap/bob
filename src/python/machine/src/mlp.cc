@@ -93,6 +93,24 @@ static void set_bias(mach::MLP& m, object o) {
   }
 }
 
+static void random0(Torch::machine::MLP& M) {
+  M.randomize();
+}
+
+static void random1(Torch::machine::MLP& M,
+    double lower_bound, double upper_bound) {
+  M.randomize(lower_bound, upper_bound);
+}
+
+static void random2(Torch::machine::MLP& M, boost::mt19937& rng) {
+  M.randomize(rng);
+}
+
+static void random3(Torch::machine::MLP& M,
+   boost::mt19937& rng, double lower_bound, double upper_bound) {
+  M.randomize(rng, lower_bound, upper_bound);
+}
+
 void bind_machine_mlp() {
   //exceptions thrown by MLPs
   tp::CxxToPythonTranslator<mach::InvalidShape, mach::Exception>("InvalidShape", "Exception raised when the resizing shape has less than 2 components");
@@ -116,5 +134,9 @@ void bind_machine_mlp() {
     .def("forward", &mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
     .def("__call__", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
     .def("forward", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
+    .def("randomize", &random0, (arg("self")), "Sets all weights and biases of this MLP, with random values between [-0.1, 0.1) as advised in textbooks.\n\nValues are drawn using boost::uniform_real class. The seed is picked using a time-based algorithm. Different calls spaced of at least 1 microsecond (machine clock) will be seeded differently. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
+    .def("randomize", &random1, (arg("self"), arg("lower_bound"), arg("upper_bound")), "Sets all weights and biases of this MLP, with random values between [lower_bound, upper_bound).\n\nValues are drawn using boost::uniform_real class. The seed is picked using a time-based algorithm. Different calls spaced of at least 1 microsecond (machine clock) will be seeded differently. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
+    .def("randomize", &random2, (arg("self"), arg("rng")), "Sets all weights and biases of this MLP, with random values between [-0.1, 0.1) as advised in textbooks.\n\nValues are drawn using boost::uniform_real class. You should pass the generator in this variant. You can seed it the way it pleases you. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
+    .def("randomize", &random3, (arg("self"), arg("rng"), arg("lower_bound"), arg("upper_bound")), "Sets all weights and biases of this MLP, with random values between [lower_bound, upper_bound).\n\nValues are drawn using boost::uniform_real class. In this variant you can pass your own random number generate as well as the limits from where the random numbers will be chosen from. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
     ;
 }

@@ -13,7 +13,6 @@
 
 #include <vector>
 #include <boost/function.hpp>
-#include <boost/random.hpp>
 
 #include "io/Arrayset.h"
 #include "machine/MLP.h"
@@ -74,25 +73,6 @@ namespace Torch { namespace trainer {
       void setBatchSize(size_t batch_size);
 
       /**
-       * Sets the seed of our random number generator
-       */
-      inline void setSeed(size_t s) { m_rng.seed(s); }
-
-      /**
-       * Initializes a given MLP randomly. You can (optionally) specify the
-       * lower and upper bound for the uniform distribution that will be used
-       * to draw values from. The default values are the ones recommended by
-       * most implementations. Be sure of what you are doing before training to
-       * change this too radically.
-       *
-       * Values are drawn using boost::uniform_real class. Values are taken
-       * from the range [lower_bound, upper_bound) according to the
-       * boost::random documentation.
-       */
-      void random(Torch::machine::MLP& machine,
-          double lower_bound=-0.1, double upper_bound=+0.1) const;
-
-      /**
        * Checks if a given machine is compatible with my inner settings.
        */
       bool isCompatible(const Torch::machine::MLP& machine) const;
@@ -112,7 +92,7 @@ namespace Torch { namespace trainer {
        * batch size properly at class initialization or use setBatchSize().
        *       
        * Note2: The machine is not initialized randomly at each train() call.
-       * It is your task to call random() once on the machine you
+       * It is your task to call MLP::randomize() once on the machine you
        * want to train and then call train() as many times as you think are
        * necessary. This design allows for a training criteria to be encoded
        * outside the scope of this trainer and to this type to focus only on
@@ -176,8 +156,6 @@ namespace Torch { namespace trainer {
       void rprop_weight_update();
 
     private: //representation
-
-      mutable boost::mt19937 m_rng; ///< our random number generator
 
       size_t m_H; ///< number of hidden layers on the target machine
 

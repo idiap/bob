@@ -5,6 +5,7 @@
  * @brief Implementation of MLPs 
  */
 
+#include <sys/time.h>
 #include <cmath>
 #include <boost/format.hpp>
 
@@ -329,4 +330,24 @@ void mach::MLP::setActivation(mach::Activation a) {
       throw mach::UnsupportedActivation(a);
   }
   m_activation = a;
+}
+
+void mach::MLP::randomize(boost::mt19937& rng, double lower_bound, double upper_bound) {
+  boost::uniform_real<double> draw(lower_bound, upper_bound);
+
+  for (size_t k=0; k<m_weight.size(); ++k) {
+    for (int i=0; i<m_weight[k].extent(0); ++i) {
+      for (int j=0; j<m_weight[k].extent(1); ++j) {
+        m_weight[k](i,j) = draw(rng);
+      }
+    }
+    for (int i=0; i<m_bias[k].extent(0); ++i) m_bias[k](i) = draw(rng);
+  }
+}
+
+void mach::MLP::randomize(double lower_bound, double upper_bound) {
+  struct timeval tv;
+  gettimeofday(&tv, 0);
+  boost::mt19937 rng(tv.tv_sec + tv.tv_usec);
+  randomize(rng, lower_bound, upper_bound);
 }

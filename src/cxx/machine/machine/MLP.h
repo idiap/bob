@@ -8,6 +8,7 @@
 #ifndef TORCH_MACHINE_MLP_H 
 #define TORCH_MACHINE_MLP_H
 
+#include <boost/random.hpp>
 #include <blitz/array.h>
 
 #include "io/HDF5File.h"
@@ -267,6 +268,28 @@ namespace Torch { namespace machine {
        * A pointer to the actual activation function
        */
       inline actfun_t getActivationFunction() const { return m_actfun; }
+
+      /**
+       * Reset all weights and biases. You can (optionally) specify the
+       * lower and upper bound for the uniform distribution that will be used
+       * to draw values from. The default values are the ones recommended by
+       * most implementations. Be sure of what you are doing before training to
+       * change this too radically.
+       *
+       * Values are drawn using boost::uniform_real class. Values are taken
+       * from the range [lower_bound, upper_bound) according to the
+       * boost::random documentation.
+       */
+      void randomize(boost::mt19937& rng, double lower_bound=-0.1, 
+          double upper_bound=+0.1);
+
+      /**
+       * This is equivalent to randomize() above, but we will create the boost
+       * random number generator ourselves using a time-based seed. Results
+       * after each call will be probably different as long as they are
+       * separated by at least 1 microsecond (from the machine clock).
+       */
+      void randomize(double lower_bound=-0.1, double upper_bound=+0.1);
 
     private: //representation
 

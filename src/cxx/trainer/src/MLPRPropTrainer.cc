@@ -19,7 +19,6 @@ namespace train = Torch::trainer;
 
 train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
     size_t batch_size):
-  m_rng(),
   m_H(machine.numOfHiddenLayers()), ///< handy!
   m_weight_ref(m_H + 1),
   m_bias_ref(m_H + 1),
@@ -71,7 +70,6 @@ train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
 train::MLPRPropTrainer::~MLPRPropTrainer() { }
 
 train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
-  m_rng(other.m_rng),
   m_H(other.m_H),
   m_weight_ref(m_H + 1),
   m_bias_ref(m_H + 1),
@@ -102,7 +100,6 @@ train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
 
 train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
 (const train::MLPRPropTrainer::MLPRPropTrainer& other) {
-  m_rng = other.m_rng;
   m_H = other.m_H;
   m_weight_ref.resize(m_H + 1);
   m_bias_ref.resize(m_H + 1);
@@ -161,32 +158,6 @@ void train::MLPRPropTrainer::setBatchSize (size_t batch_size) {
   for (size_t k=0; k<m_error.size(); ++k) {
     m_error[k].resize(batch_size, m_deriv[k].extent(1));
   }
-}
-
-void train::MLPRPropTrainer::random(mach::MLP& machine,
-    double lower_bound, double upper_bound) const {
-  
-  std::vector<blitz::Array<double,2> > W(machine.numOfHiddenLayers()+1);
-  std::vector<blitz::Array<double,1> > B(machine.numOfHiddenLayers()+1);
-
-  // Initializes the new biases (B) and weights (W) to a random value
-  boost::uniform_real<double> range(lower_bound, upper_bound);
-  boost::variate_generator<boost::mt19937&, boost::uniform_real<double> >
-    draw(m_rng, range);
-
-  for (size_t k=0; k<W.size(); ++k) {
-    for (int i=0; i<W[k].extent(0); ++i) {
-      for (int j=0; j<W[k].extent(1); ++j) {
-        W[k](i,j) = draw();
-      }
-    }
-    for (int i=0; i<B[k].extent(0); ++i) B[k](i) = draw();
-  }
-
-  // Sets the new values that the machine
-  machine.setWeights(W);
-  machine.setBiases(B);
-
 }
 
 bool train::MLPRPropTrainer::isCompatible(const mach::MLP& machine) const 
