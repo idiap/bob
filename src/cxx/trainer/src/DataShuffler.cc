@@ -5,6 +5,7 @@
  * @brief Implementation of the DataShuffler.
  */
 
+#include <sys/time.h>
 #include "core/array_assert.h"
 #include "trainer/Exception.h"
 #include "trainer/DataShuffler.h"
@@ -16,7 +17,6 @@ train::DataShuffler::DataShuffler(const std::vector<Torch::io::Arrayset>& data,
     const std::vector<blitz::Array<double,1> >& target):
   m_data(data),
   m_target(target.size()),
-  m_rng(), ///< note this will be initialized with fixed, predetermined seed!
   m_range(),
   m_do_stdnorm(false),
   m_mean(),
@@ -54,7 +54,6 @@ train::DataShuffler::DataShuffler(const std::vector<Torch::io::Arrayset>& data,
 train::DataShuffler::DataShuffler(const train::DataShuffler& other):
   m_data(other.m_data),
   m_target(other.m_target.size()),
-  m_rng(other.m_rng),
   m_range(other.m_range),
   m_do_stdnorm(other.m_do_stdnorm),
   m_mean(other.m_mean.copy()),
@@ -79,11 +78,6 @@ train::DataShuffler& train::DataShuffler::operator=
   m_stddev.reference(other.m_stddev.copy());
 
   return *this;
-}
-
-void train::DataShuffler::setSeed(size_t s) {
-  m_rng.seed(s);
-  for (size_t i=0; i<m_range.size(); ++i) m_range[i].reset();
 }
 
 /**
@@ -132,8 +126,8 @@ void train::DataShuffler::getStdNorm(blitz::Array<double,1>& mean,
   }
 }
 
-void train::DataShuffler::operator() (blitz::Array<double,2>& data,
-    blitz::Array<double,2>& target) {
+void train::DataShuffler::operator() (boost::mt19937& rng, 
+    blitz::Array<double,2>& data, blitz::Array<double,2>& target) {
   
   array::assertSameDimensionLength(data.extent(0), target.extent(0));
 
@@ -142,7 +136,7 @@ void train::DataShuffler::operator() (blitz::Array<double,2>& data,
   blitz::Range all = blitz::Range::all();
   while (true) {
     for (size_t i=0; i<m_data.size(); ++i) { //for all classes
-      size_t index = m_range[i](m_rng); //pick a random position within class
+      size_t index = m_range[i](rng); //pick a random position within class
       if (m_do_stdnorm)
         data(counter, all) = (m_data[i].get<double,1>(index) - m_mean)/m_stddev;
       else
@@ -154,4 +148,12 @@ void train::DataShuffler::operator() (blitz::Array<double,2>& data,
     if (counter >= max) break;
   }
 
+}
+
+void train::DataShuffler::operator() (blitz::Array<double,2>& data,
+    blitz::Array<double,2>& target) {
+  struct timeval tv;
+  gettimeofday(&tv, 0);
+  boost::mt19937 rng(tv.tv_sec + tv.tv_usec);
+  operator()(rng, data, target); 
 }
