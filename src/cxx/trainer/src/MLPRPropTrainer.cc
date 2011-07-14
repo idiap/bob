@@ -311,7 +311,7 @@ void train::MLPRPropTrainer::rprop_weight_update() {
 }
 
 void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
-    const train::DataShuffler& shuffler) {
+    train::DataShuffler& shuffler) {
 
   // Gets fresh data for training.
   shuffler(m_output[0], m_target);
@@ -329,7 +329,7 @@ void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
 }
 
 void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
-    const train::DataShuffler& shuffler) {
+    train::DataShuffler& shuffler) {
 
   if (!isCompatible(machine)) throw train::IncompatibleMachine();
 

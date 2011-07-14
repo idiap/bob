@@ -118,13 +118,13 @@ namespace Torch { namespace trainer {
        * outside the scope of this trainer and to this type to focus only on
        * applying the training when requested to.
        */
-      void train(Torch::machine::MLP& machine, const DataShuffler& shuffler);
+      void train(Torch::machine::MLP& machine, DataShuffler& shuffler);
 
       /**
        * This is a version of the train() method above, which does no
        * compatibility check on the input machine.
        */
-      void train_(Torch::machine::MLP& machine, const DataShuffler& shuffler);
+      void train_(Torch::machine::MLP& machine, DataShuffler& shuffler);
 
       /**
        * This is a version of the train() method above which receives a single
