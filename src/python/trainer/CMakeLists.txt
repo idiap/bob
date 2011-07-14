@@ -30,6 +30,9 @@ torch_python_add_test(python-trainer-kmeans-tests
 torch_python_add_test(python-trainer-linear-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linear.py)
 
+torch_python_add_test(python-trainer-mlp-shuffler-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_shuffler.py)
+
 torch_python_add_test(python-trainer-gmm_train
   ${CMAKE_CURRENT_SOURCE_DIR}/script/gmm_train.py --self-test)
 
