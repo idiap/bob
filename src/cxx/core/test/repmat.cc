@@ -15,9 +15,9 @@
 
 struct T {
   blitz::Array<uint32_t,2> a, a33_s;
-  blitz::Array<uint32_t,1> b;
+  blitz::Array<uint32_t,1> b, b3_s;
   blitz::Array<uint32_t,2> b23_s, b23_s_row;
-  T(): a(2,3), a33_s(6,9), b(2), b23_s(4,3), b23_s_row(2,6) {
+  T(): a(2,3), a33_s(6,9), b(2), b3_s(6), b23_s(4,3), b23_s_row(2,6) {
     a = 1, 2, 3, 4, 5, 6;
     a33_s = 1, 2, 3, 1, 2, 3, 1, 2, 3,
         4, 5, 6, 4, 5, 6, 4, 5, 6,
@@ -29,6 +29,7 @@ struct T {
     b = 1, 2;
     b23_s = 1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2;
     b23_s_row = 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2;
+    b3_s = 1, 2, 1, 2, 1, 2;
   }
   ~T() {}
 };
@@ -61,13 +62,6 @@ void checkBlitzEqual( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2)
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
 /*************************** ALLOCATION TESTS ******************************/
-BOOST_AUTO_TEST_CASE( test_repmat_2d )
-{
-  blitz::Array<uint32_t,2> a33(3*a.extent(0), 3*a.extent(1));
-  Torch::core::repmat(a, 3, 3, a33);
-  checkBlitzEqual(a33, a33_s);
-}
-
 BOOST_AUTO_TEST_CASE( test_repmat_1d )
 {
   blitz::Array<uint32_t,2> b23_a(2*b.extent(0), 3);
@@ -78,5 +72,20 @@ BOOST_AUTO_TEST_CASE( test_repmat_1d )
   Torch::core::repmat(b, 2, 3, b23_b, true);
   checkBlitzEqual(b23_b, b23_s_row);
 }
+
+BOOST_AUTO_TEST_CASE( test_repmat_2d )
+{
+  blitz::Array<uint32_t,2> a33(3*a.extent(0), 3*a.extent(1));
+  Torch::core::repmat(a, 3, 3, a33);
+  checkBlitzEqual(a33, a33_s);
+}
+
+BOOST_AUTO_TEST_CASE( test_repvec )
+{
+  blitz::Array<uint32_t,1> b3(3*b.extent(0));
+  Torch::core::repvec(b, 3, b3);
+  checkBlitzEqual(b3, b3_s);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 

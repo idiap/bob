@@ -3,9 +3,8 @@
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief This file defines functions which allow to replicate 
- * (matlab repmat-like) a 2D (or 1D) blitz array of a given type. The output 
- * blitz array will have two dimensions, and should be allocated and sized 
- * by the user.
+ * (matlab repmat-like) a 2D (or 1D) blitz array of a given type. 
+ * The output should be allocated and sized by the user.
  * 
  */
 
@@ -49,8 +48,8 @@ namespace Torch {
     }
 
     /**
-     * @brief Function which replicates an input 1D array like the matlab
-     * repmat function.
+     * @brief Function which replicates an input 1D array, and generates a 2D 
+     * array like the matlab repmat function.
      *
      * @param row_vector_src Indicates whether the vector is considered as a
      *   row or as a column.
@@ -90,6 +89,25 @@ namespace Torch {
         }
       }
     }
+
+    /**
+     * @brief Function which replicates an input 1D array, generating a new 
+     * (larger) 1D array.
+     */
+    template<typename T> 
+    void repvec(const blitz::Array<T,1>& src, int m, blitz::Array<T,1>& dst)
+    {
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+      Torch::core::array::assertSameDimensionLength(dst.extent(0), m*src.extent(0));
+      for(int i=0; i<m; ++i)
+      {
+        blitz::Array<T,1> dst_m = 
+          dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1));
+        dst_m = src;
+      }
+    }
+
   }
 /**
  * @}
