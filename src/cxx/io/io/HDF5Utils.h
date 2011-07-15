@@ -67,9 +67,11 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
     public:
 
       /**
-       * Creates a new HDF5 file.
+       * Creates a new HDF5 file. Optionally set the userblock size (multiple
+       * of 2 number of bytes).
        */
-      File(const boost::filesystem::path& path, unsigned int flags);
+      File(const boost::filesystem::path& path, unsigned int flags,
+          size_t userblock_size=0);
 
       /**
        * Destructor virtualization
@@ -93,6 +95,11 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       void rename (const std::string& from,
           const std::string& to);
 
+      /**
+       * Returns the userblock size
+       */
+      size_t userblock_size() const;
+
     private: //not implemented
 
       File(const File& other);
@@ -103,6 +110,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       const boost::filesystem::path m_path; ///< path to the file
       unsigned int m_flags; ///< flags used to open it
+      boost::shared_ptr<hid_t> m_fcpl; ///< file creation property lists
       boost::shared_ptr<hid_t> m_id; ///< the HDF5 id attributed to this file.
   };
 

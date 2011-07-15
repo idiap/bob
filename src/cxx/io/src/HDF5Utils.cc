@@ -270,8 +270,19 @@ static void delete_h5file (hid_t* p) {
   p=0; 
 }
 
+/**
+ * Opens/Creates and "auto-destructible" HDF5 file creation property list
+ */
+static void delete_h5p (hid_t* p) {
+  if (*p >= 0) {
+    H5Pclose(*p);
+  }
+  delete p;
+  p=0; 
+}
+
 static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
-    unsigned int flags) {
+    unsigned int flags, boost::shared_ptr<hid_t>& fcpl) {
   boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5file));
   if (!boost::filesystem::exists(path) && flags == H5F_ACC_RDONLY) {
     //file was opened for reading, but does not exist... Raise
@@ -280,16 +291,36 @@ static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
   if (boost::filesystem::exists(path) && flags != H5F_ACC_TRUNC) { //open
     *retval = H5Fopen(path.string().c_str(), flags, H5P_DEFAULT);
     if (*retval < 0) throw io::HDF5StatusError("H5Fopen", *retval);
+    //replaces the file create list properties with the one from the file
+    fcpl = boost::shared_ptr<hid_t>(new hid_t(-1), std::ptr_fun(delete_h5p));
+    *fcpl = H5Fget_create_plist(*retval);
+    if (*fcpl < 0) throw io::HDF5StatusError("H5Fget_create_list", *fcpl);
   }
-  else { //file needs to be created or truncated
-    *retval = H5Fcreate(path.string().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  else { //file needs to be created or truncated (can set user block)
+    *retval = H5Fcreate(path.string().c_str(), H5F_ACC_TRUNC, *fcpl, H5P_DEFAULT);
     if (*retval < 0) throw io::HDF5StatusError("H5Fcreate", *retval);
   }
   return retval;
 }
 
-h5::File::File(const boost::filesystem::path& path, unsigned int flags):
-  m_path(path), m_flags(flags), m_id(open_file(m_path, m_flags)) {
+static boost::shared_ptr<hid_t> create_fcpl(hsize_t userblock_size) {
+  if (!userblock_size) return boost::make_shared<hid_t>(H5P_DEFAULT);
+  //otherwise we have to go through the settings
+  boost::shared_ptr<hid_t> retval(new hid_t(-1), std::ptr_fun(delete_h5p));
+  *retval = H5Pcreate(H5P_FILE_CREATE);
+  if (*retval < 0) throw io::HDF5StatusError("H5Pcreate", *retval);
+  herr_t err = H5Pset_userblock(*retval, userblock_size);
+  if (err < 0) throw io::HDF5StatusError("H5Pset_userblock", err);
+  return retval; 
+}
+
+h5::File::File(const boost::filesystem::path& path, unsigned int flags,
+    size_t userblock_size):
+  m_path(path), 
+  m_flags(flags), 
+  m_fcpl(create_fcpl(userblock_size)), 
+  m_id(open_file(m_path, m_flags, m_fcpl))
+{
 }
 
 h5::File::~File() {
@@ -315,6 +346,13 @@ void h5::File::rename (const std::string& from,
   if (status < 0) throw io::HDF5StatusError("H5Lmove", status);
   
   //TODO: Recursively erase empty groups.
+}
+
+size_t h5::File::userblock_size() const {
+  hsize_t retval;
+  herr_t err = H5Pget_userblock(*m_fcpl, &retval);
+  if (err < 0) throw io::HDF5StatusError("H5Pget_create_plist", err);
+  return retval;
 }
 
 /**
