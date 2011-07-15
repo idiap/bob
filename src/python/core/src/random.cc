@@ -24,6 +24,11 @@ static void set_seed(boost::mt19937& o, T s) {
   o.seed(s);
 }
 
+template <typename Distribution, typename Engine>
+static typename Distribution::result_type __call__(Distribution& d, Engine& e) {
+  return boost::variate_generator<Engine&,Distribution>(e,d)();
+}
+
 template <typename T, typename Engine>
 static void uniform_int(const char* vartype) {
   typedef boost::uniform_int<T> D;
@@ -39,7 +44,7 @@ static void uniform_int(const char* vartype) {
     .add_property("min", &D::min)
     .add_property("max", &D::max)
     .def("reset", &D::reset, "This is a noop for this distribution, here only for consistency")
-    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    .def("__call__", __call__<D,Engine>, (arg("self"), arg("rng")))
     ;
 }
 
@@ -58,7 +63,7 @@ static void uniform_real(const char* vartype) {
     .add_property("min", &D::min)
     .add_property("max", &D::max)
     .def("reset", &D::reset, "This is a noop for this distribution, here only for consistency")
-    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    .def("__call__", __call__<D,Engine>, (arg("self"), arg("rng")))
     ;
 }
 
@@ -77,7 +82,7 @@ static void normal_distribution(const char* vartype) {
     .add_property("mean", &D::mean)
     .add_property("sigma", &D::sigma)
     .def("reset", &D::reset, "resets the internal state")
-    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    .def("__call__", __call__<D,Engine>, (arg("self"), arg("rng")))
     ;
 }
 
@@ -96,7 +101,7 @@ static void lognormal_distribution(const char* vartype) {
     .add_property("mean", &D::mean)
     .add_property("sigma", &D::sigma)
     .def("reset", &D::reset, "resets the internal state")
-    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    .def("__call__", __call__<D,Engine>, (arg("self"), arg("rng")))
     ;
 }
 
@@ -114,7 +119,7 @@ static void gamma_distribution(const char* vartype) {
     .def(init<optional<T> >((arg("alpha")=1), "Constructs a new object of this type, 'alpha' is a parameter of the distribution."))
     .add_property("alpha", &D::alpha)
     .def("reset", &D::reset, "resets the internal state")
-    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    .def("__call__", __call__<D,Engine>, (arg("self"), arg("rng")))
     ;
 }
 
@@ -133,7 +138,7 @@ static void binomial_distribution(const char* vartype) {
     .add_property("t", &D::t)
     .add_property("p", &D::p)
     .def("reset", &D::reset, "this is a noop for this distribution, but is here for consistence with other APIs")
-    .def("__call__", (T (D::*)(Engine&))&D::operator(), (arg("self"), arg("rng")))
+    .def("__call__", __call__<D,Engine>, (arg("self"), arg("rng")))
     ;
 }
 

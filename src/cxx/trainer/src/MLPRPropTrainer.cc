@@ -19,6 +19,7 @@ namespace train = Torch::trainer;
 
 train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
     size_t batch_size):
+  m_train_bias(true),
   m_H(machine.numOfHiddenLayers()), ///< handy!
   m_weight_ref(m_H + 1),
   m_bias_ref(m_H + 1),
@@ -70,6 +71,7 @@ train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
 train::MLPRPropTrainer::~MLPRPropTrainer() { }
 
 train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
+  m_train_bias(other.m_train_bias),
   m_H(other.m_H),
   m_weight_ref(m_H + 1),
   m_bias_ref(m_H + 1),
@@ -100,6 +102,7 @@ train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
 
 train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
 (const train::MLPRPropTrainer::MLPRPropTrainer& other) {
+  m_train_bias = other.m_train_bias;
   m_H = other.m_H;
   m_weight_ref.resize(m_H + 1);
   m_bias_ref.resize(m_H + 1);
@@ -152,7 +155,7 @@ void train::MLPRPropTrainer::setBatchSize (size_t batch_size) {
   m_output[0].resize(batch_size, m_deriv[0].extent(0));
 
   for (size_t k=1; k<m_output.size(); ++k) {
-    m_output[k].resize(batch_size, m_deriv[k].extent(1));
+    m_output[k].resize(batch_size, m_deriv[k-1].extent(1));
   }
 
   for (size_t k=0; k<m_error.size(); ++k) {
@@ -178,7 +181,8 @@ bool train::MLPRPropTrainer::isCompatible(const mach::MLP& machine) const
 }
 
 void train::MLPRPropTrainer::forward_step() {
-  size_t batch_size = m_target.extent(1);
+  size_t batch_size = m_target.extent(0);
+  std::cout << "C++ output[0] " << m_output[0] << std::endl;
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
     math::prod_(m_output[k], m_weight_ref[k], m_output[k+1]);
     for (int i=0; i<(int)batch_size; ++i) { //for every example
@@ -186,25 +190,26 @@ void train::MLPRPropTrainer::forward_step() {
         m_output[k+1](i,j) = m_actfun(m_output[k+1](i,j) + m_bias_ref[k](j));
       }
     }
+    std::cout << "C++ output " << m_output[k+1] << std::endl;
   }
 }
 
 void train::MLPRPropTrainer::backward_step() {
-  size_t batch_size = m_target.extent(1);
+  size_t batch_size = m_target.extent(0);
   //last layer
-  m_error[m_H] = m_target - m_output.back();
+  m_error[m_H] = m_output.back() - m_target;
   for (int i=0; i<(int)batch_size; ++i) { //for every example
-    for (int j=0; j<m_error[m_H+1].extent(1); ++j) { //for all variables
+    for (int j=0; j<m_error[m_H].extent(1); ++j) { //for all variables
       m_error[m_H](i,j) *= m_bwdfun(m_output[m_H+1](i,j));
     }
   }
 
   //all other layers
   for (size_t k=m_H; k>0; --k) {
-    math::prod_(m_error[k+1], m_weight_ref[k].transpose(1,0), m_error[k]);
+    math::prod_(m_error[k], m_weight_ref[k].transpose(1,0), m_error[k-1]);
     for (int i=0; i<(int)batch_size; ++i) { //for every example
-      for (int j=0; j<m_error[k+1].extent(0); ++j) { //for all variables
-        m_error[k](i,j) *= m_bwdfun(m_output[k+1](i,j));
+      for (int j=0; j<m_error[k-1].extent(1); ++j) { //for all variables
+        m_error[k-1](i,j) *= m_bwdfun(m_output[k](i,j));
       }
     }
   }
@@ -252,9 +257,13 @@ void train::MLPRPropTrainer::rprop_weight_update() {
         }
         else { //M == 0
           m_weight_ref[k](i,j) -= sign(m_deriv[k](i,j)) * m_delta[k](i,j);
+          m_prev_deriv[k](i,j) = m_deriv[k](i,j);
         }
       }
     }
+
+    // Here we decide if we should train the biases or not
+    if (!m_train_bias) continue;
 
     // We do the same for the biases, with the exception that biases can be
     // considered as input neurons connecting the respective layers, with a
@@ -276,43 +285,27 @@ void train::MLPRPropTrainer::rprop_weight_update() {
       }
       else { //M == 0
         m_bias_ref[k](i) -= sign(m_deriv_bias[k](i)) * m_delta_bias[k](i);
+        m_prev_deriv_bias[k](i) = m_deriv_bias[k](i);
       }
     }
   }
 }
 
-void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
-    train::DataShuffler& shuffler) {
-
-  // Gets fresh data for training.
-  shuffler(m_output[0], m_target);
-
-  // We refer to the machine's weights and biases
-  for (size_t k=0;k<m_weight_ref.size();++k)
-    m_weight_ref[k].reference(machine.getWeights()[k]);
-  for (size_t k=0;k<m_bias_ref.size();++k)
-    m_bias_ref[k].reference(machine.getBiases()[k]);
-
-  // To be called in this sequence for a general backprop algorithm
-  forward_step();
-  backward_step();
-  rprop_weight_update();
-}
-
 void train::MLPRPropTrainer::train(Torch::machine::MLP& machine,
-    train::DataShuffler& shuffler) {
-
+    const blitz::Array<double,2>& input,
+    const blitz::Array<double,2>& target) {
   if (!isCompatible(machine)) throw train::IncompatibleMachine();
-
-  train_(machine, shuffler);
+  array::assertSameDimensionLength(getBatchSize(), input.extent(0));
+  array::assertSameDimensionLength(getBatchSize(), target.extent(0));
+  train_(machine, input, target);
 }
 
-void train::MLPRPropTrainer::__test__(Torch::machine::MLP& machine,
+void train::MLPRPropTrainer::train_(Torch::machine::MLP& machine,
     const blitz::Array<double,2>& input,
     const blitz::Array<double,2>& target) {
 
-  m_output[0] = input;
-  m_target = target;
+  m_output[0].reference(input);
+  m_target.reference(target);
 
   // We refer to the machine's weights and biases
   for (size_t k=0;k<m_weight_ref.size();++k)

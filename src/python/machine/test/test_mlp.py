@@ -178,6 +178,67 @@ class MLPTest(unittest.TestCase):
     for pattern, expected in zip(data.read("pattern"), data.read("result")):
       self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
 
+  def test05a_ComplicatedCorrectness(self):
+
+    # the same as test05, but with a single pass using the MLP's matrix input
+
+    m = torch.machine.MLP(torch.io.HDF5File(COMPLICATED))
+    data = torch.io.HDF5File(COMPLICATED_OUTPUT)
+    input = torch.core.array.float64_2(data.size('pattern'), 
+        data.describe('pattern').shape()[0])
+    target = torch.core.array.float64_2(data.size('result'), 
+        data.describe('result').shape()[0])
+    for i, (pattern, expected) in enumerate(zip(data.read("pattern"), data.read("result"))):
+      input[i,:] = pattern
+      target[i,:] = expected
+    output = m(input)
+    self.assertTrue ( (abs(output - target) < 1e-8).all() )
+
+  def test06_Randomization(self):
+
+    # this test makes sure randomization is working as expected on MLPs
+
+    m1 = torch.machine.MLP((2,3,2))
+    m1.randomize()
+
+    for k in m1.weights:
+      self.assertTrue( (abs(k) <= 0.1).all() )
+      self.assertTrue( (k != 0).any() )
+    for k in m1.biases:
+      self.assertTrue( (abs(k) <= 0.1).all() )
+      self.assertTrue( (k != 0).any() )
+
+    for k in range(10): 
+      m2 = torch.machine.MLP((2,3,2))
+      m2.randomize()
+      for w1, w2 in zip(m1.weights, m2.weights):
+        self.assertFalse( (w1 == w2).all() )
+      for b1, b2 in zip(m1.biases, m2.biases):
+        self.assertFalse( (b1 == b2).all() )
+      for k in m2.weights:
+        self.assertTrue( (abs(k) <= 0.1).all() )
+        self.assertTrue( (k != 0).any() )
+      for k in m2.biases:
+        self.assertTrue( (abs(k) <= 0.1).all() )
+        self.assertTrue( (k != 0).any() )
+
+    # we can also reset the margins for randomization
+    for k in range(10): 
+      m2 = torch.machine.MLP((2,3,2))
+      m2.randomize(-0.001, 0.001)
+      for w1, w2 in zip(m1.weights, m2.weights):
+        self.assertFalse( (w1 == w2).all() )
+      for b1, b2 in zip(m1.biases, m2.biases):
+        self.assertFalse( (b1 == b2).all() )
+      for k in m2.weights:
+        self.assertTrue( (abs(k) <= 0.001).all() )
+        self.assertTrue( (k != 0).any() )
+      for k in m2.biases:
+        self.assertTrue( (abs(k) <= 0.001).all() )
+        self.assertTrue( (k != 0).any() )
+
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
