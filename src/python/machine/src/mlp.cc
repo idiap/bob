@@ -24,9 +24,16 @@ static tuple get_shape(const mach::MLP& m) {
   return tuple(retval);
 }
 
-static blitz::Array<double,1> forward(const mach::MLP& m,
+static blitz::Array<double,1> forward1(const mach::MLP& m,
     const blitz::Array<double,1>& input) {
   blitz::Array<double,1> output(m.outputSize());
+  m.forward(input, output);
+  return output;
+}
+
+static blitz::Array<double,2> forward2(const mach::MLP& m,
+    const blitz::Array<double,2>& input) {
+  blitz::Array<double,2> output(input.extent(0), m.outputSize());
   m.forward(input, output);
   return output;
 }
@@ -130,10 +137,16 @@ void bind_machine_mlp() {
     .add_property("biases", make_function(&mach::MLP::getBiases, return_internal_reference<>()), &set_bias)
     .add_property("activation", &mach::MLP::getActivation, &mach::MLP::setActivation)
     .add_property("shape", &get_shape, (void (mach::MLP::*)(const std::vector<size_t>&))&mach::MLP::resize)
-    .def("__call__", &mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
-    .def("forward", &mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
-    .def("__call__", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
-    .def("forward", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
+    .def("__call__", (void (mach::MLP::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output.")
+    .def("forward", (void (mach::MLP::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output.")
+    .def("forward_", (void (mach::MLP::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::MLP::forward_, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output.")
+    .def("__call__", (void (mach::MLP::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
+    .def("forward", (void (mach::MLP::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
+    .def("forward_", (void (mach::MLP::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&) const)&mach::MLP::forward_, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
+    .def("__call__", &forward1, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
+    .def("forward", &forward1, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
+    .def("__call__", &forward2, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
+    .def("forward", &forward2, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
     .def("randomize", &random0, (arg("self")), "Sets all weights and biases of this MLP, with random values between [-0.1, 0.1) as advised in textbooks.\n\nValues are drawn using boost::uniform_real class. The seed is picked using a time-based algorithm. Different calls spaced of at least 1 microsecond (machine clock) will be seeded differently. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
     .def("randomize", &random1, (arg("self"), arg("lower_bound"), arg("upper_bound")), "Sets all weights and biases of this MLP, with random values between [lower_bound, upper_bound).\n\nValues are drawn using boost::uniform_real class. The seed is picked using a time-based algorithm. Different calls spaced of at least 1 microsecond (machine clock) will be seeded differently. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
     .def("randomize", &random2, (arg("self"), arg("rng")), "Sets all weights and biases of this MLP, with random values between [-0.1, 0.1) as advised in textbooks.\n\nValues are drawn using boost::uniform_real class. You should pass the generator in this variant. You can seed it the way it pleases you. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")

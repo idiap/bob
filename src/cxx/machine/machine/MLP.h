@@ -132,6 +132,30 @@ namespace Torch { namespace machine {
           blitz::Array<double,1>& output) const;
 
       /**
+       * Forwards data through the network, outputs the values of each output
+       * neuron. This variant will take a number of inputs in one single input
+       * matrix with inputs arranged row-wise (i.e., every row contains an
+       * individual input).
+       *
+       * The input and output are NOT checked for compatibility each time. It
+       * is your responsibility to do it.
+       */
+      void forward_ (const blitz::Array<double,2>& input,
+          blitz::Array<double,2>& output) const;
+
+      /**
+       * Forwards data through the network, outputs the values of each output
+       * neuron. This variant will take a number of inputs in one single input
+       * matrix with inputs arranged row-wise (i.e., every row contains an
+       * individual input).
+       *
+       * The input and output are checked for compatibility each time the
+       * forward method is applied.
+       */
+      void forward (const blitz::Array<double,2>& input,
+          blitz::Array<double,2>& output) const;
+
+      /**
        * Resizes the machine. This causes this MLP to be completely
        * re-initialized and should be considered invalid for calculation after
        * this operation. Using this method there will be no hidden layers in

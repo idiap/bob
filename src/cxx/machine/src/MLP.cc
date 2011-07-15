@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 
 #include "core/array_check.h"
+#include "core/array_assert.h"
 #include "io/Arrayset.h"
 #include "machine/MLP.h"
 #include "machine/MLPException.h"
@@ -198,6 +199,32 @@ void mach::MLP::forward (const blitz::Array<double,1>& input,
   if (m_weight.back().extent(1) != output.extent(0)) //checks output
     throw mach::NOutputsMismatch(m_weight.back().extent(1),
         output.extent(0));
+  forward_(input, output); 
+}
+
+void mach::MLP::forward_ (const blitz::Array<double,2>& input,
+    blitz::Array<double,2>& output) const {
+
+  blitz::Range all = blitz::Range::all();
+  for (int i=0; i<input.extent(0); ++i) {
+    blitz::Array<double,1> inref(input(i,all));
+    blitz::Array<double,1> outref(output(i,all));
+    forward_(inref, outref);
+  }
+}
+
+void mach::MLP::forward (const blitz::Array<double,2>& input,
+    blitz::Array<double,2>& output) const {
+
+  //checks input
+  if (m_weight.front().extent(0) != input.extent(1)) //checks input
+    throw mach::NInputsMismatch(m_weight.front().extent(0),
+        input.extent(1));
+  if (m_weight.back().extent(1) != output.extent(1)) //checks output
+    throw mach::NOutputsMismatch(m_weight.back().extent(1),
+        output.extent(1));
+  //checks output
+  array::assertSameDimensionLength(input.extent(0), output.extent(0));
   forward_(input, output); 
 }
 
