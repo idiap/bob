@@ -23,17 +23,30 @@ class RPropTest(unittest.TestCase):
     trainer = torch.trainer.MLPRPropTrainer(machine, B)
     self.assertEqual( trainer.batchSize, B )
     self.assertTrue ( trainer.isCompatible(machine) )
+    self.assertTrue ( trainer.trainBiases )
 
     machine = torch.machine.MLP((7, 2))
     self.assertFalse ( trainer.isCompatible(machine) )
 
-  def test02_SingleLayerSingleStep(self):
+    trainer.trainBiases = False
+    self.assertFalse ( trainer.trainBiases )
+
+  def test02_SingleLayerSingleStepNoBias(self):
 
     # Trains a simple network with one single step, verifies
     # the training works as expected by calculating the same
     # as the trainer should do using numpy.
     machine = torch.machine.MLP((4, 1))
-    trainer = torch.trainer.MLPRPropTrainer(machine, 10)
+    machine.biases = 0
+    w0 = torch.core.array.array([[.1],[.2],[-.1],[-.05]])
+    machine.weights = [w0]
+    print machine.weights[0]
+    trainer = torch.trainer.MLPRPropTrainer(machine, 1)
+    trainer.trainBiases = False
+    d0 = torch.core.array.array([[1., 2., 0., 2.]])
+    t0 = torch.core.array.array([[1.]])
+    trainer.train_(machine, d0, t0)
+    print machine.weights[0]
 
   def xtest03_Fisher(self):
     

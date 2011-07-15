@@ -72,6 +72,16 @@ namespace Torch { namespace trainer {
       void setBatchSize(size_t batch_size);
 
       /**
+       * Gets the current settings for bias training (defaults to true)
+       */
+      inline bool getTrainBiases() const { return m_train_bias; }
+
+      /**
+       * Sets the bias training option
+       */
+      inline void setTrainBiases(bool v) { m_train_bias = v; }
+
+      /**
        * Checks if a given machine is compatible with my inner settings.
        */
       bool isCompatible(const Torch::machine::MLP& machine) const;
@@ -152,6 +162,7 @@ namespace Torch { namespace trainer {
 
     private: //representation
 
+      bool m_train_bias; ///< shall we be training biases? (default: true)
       size_t m_H; ///< number of hidden layers on the target machine
 
       std::vector<blitz::Array<double,2> > m_weight_ref; ///< machine weights

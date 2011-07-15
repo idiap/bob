@@ -19,6 +19,7 @@ namespace train = Torch::trainer;
 
 train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
     size_t batch_size):
+  m_train_bias(true),
   m_H(machine.numOfHiddenLayers()), ///< handy!
   m_weight_ref(m_H + 1),
   m_bias_ref(m_H + 1),
@@ -70,6 +71,7 @@ train::MLPRPropTrainer::MLPRPropTrainer(const mach::MLP& machine,
 train::MLPRPropTrainer::~MLPRPropTrainer() { }
 
 train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
+  m_train_bias(other.m_train_bias),
   m_H(other.m_H),
   m_weight_ref(m_H + 1),
   m_bias_ref(m_H + 1),
@@ -100,6 +102,7 @@ train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
 
 train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
 (const train::MLPRPropTrainer::MLPRPropTrainer& other) {
+  m_train_bias = other.m_train_bias;
   m_H = other.m_H;
   m_weight_ref.resize(m_H + 1);
   m_bias_ref.resize(m_H + 1);
@@ -255,6 +258,9 @@ void train::MLPRPropTrainer::rprop_weight_update() {
         }
       }
     }
+
+    // Here we decide if we should train the biases or not
+    if (!m_train_bias) continue;
 
     // We do the same for the biases, with the exception that biases can be
     // considered as input neurons connecting the respective layers, with a
