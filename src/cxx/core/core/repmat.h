@@ -35,9 +35,11 @@ namespace Torch {
     template<typename T> 
     void repmat_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
-      for(int i=0; i<dst.extent(0); ++i)
+      int m = dst.extent(0) / src.extent(0);
+      int n = dst.extent(1) / src.extent(1);
+      for(int i=0; i<m; ++i)
       {
-        for(int j=0; j<dst.extent(1); ++j)
+        for(int j=0; j<n; ++j)
         {
           blitz::Array<T,2> dst_mn = 
             dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1), 
