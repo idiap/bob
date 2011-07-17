@@ -10,6 +10,7 @@ set(pysrc
    "src/tensor.cc"
    "src/profile.cc"
    "src/array_check.cc"
+   "src/repmat.cc"
    "src/main.cc"
    )
  

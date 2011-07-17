@@ -16,6 +16,7 @@ void bind_core_object();
 void bind_core_tensor();
 void bind_core_profiler();
 void bind_core_array_check();
+void bind_core_repmat();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
   docstring_options docopt; 
@@ -30,4 +31,5 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_tensor();
   bind_core_profiler();
   bind_core_array_check();
+  bind_core_repmat();
 }
