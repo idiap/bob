@@ -11,6 +11,7 @@ set(pysrc
    "src/profile.cc"
    "src/array_check.cc"
    "src/repmat.cc"
+   "src/reshape.cc"
    "src/main.cc"
    )
  
