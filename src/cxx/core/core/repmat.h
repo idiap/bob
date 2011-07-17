@@ -13,6 +13,7 @@
 
 #include <limits>
 #include <blitz/array.h>
+#include "core/repmat_exception.h"
 #include "core/array_assert.h"
 
 namespace Torch {
@@ -26,18 +27,17 @@ namespace Torch {
     /**
      * @brief Function which replicates an input 2D array like the matlab
      * repmat function.
+     * 
+     * @warning No checks are performed on the array sizes and is recommended
+     * only in scenarios where you have previously checked conformity and is
+     * focused only on speed.
      */
     template<typename T> 
-    void repmat(const blitz::Array<T,2>& src, int m, int n, 
-      blitz::Array<T,2>& dst) 
+    void repmat_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::array::assertSameDimensionLength(dst.extent(0), m*src.extent(0));
-      Torch::core::array::assertSameDimensionLength(dst.extent(1), n*src.extent(1));
-      for(int i=0; i<m; ++i)
+      for(int i=0; i<dst.extent(0); ++i)
       {
-        for(int j=0; j<n; ++j)
+        for(int j=0; j<dst.extent(1); ++j)
         {
           blitz::Array<T,2> dst_mn = 
             dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1), 
@@ -48,36 +48,49 @@ namespace Torch {
     }
 
     /**
+     * @brief Function which replicates an input 2D array like the matlab
+     * repmat function.
+     *
+     * The input and output data have their sizes checked and this method will
+     * raise an appropriate exception if that is not cased. If you know that the
+     * input and output matrices conform, use the repmat_() variant.
+     */
+    template<typename T> 
+    void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
+    {
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+      if(dst.extent(0) % src.extent(0) != 0)
+        throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+      if(dst.extent(1) % src.extent(1) != 0)
+        throw Torch::core::RepmatNonMultipleLength(src.extent(1), dst.extent(1));
+      repmat_(src, dst);
+    }
+
+    /**
      * @brief Function which replicates an input 1D array, and generates a 2D 
      * array like the matlab repmat function.
      *
      * @param row_vector_src Indicates whether the vector is considered as a
      *   row or as a column.
+     *
+     * @warning No checks are performed on the array sizes and is recommended
+     * only in scenarios where you have previously checked conformity and is
+     * focused only on speed.
      */
     template<typename T> 
-    void repmat(const blitz::Array<T,1>& src, int m, int n, 
-      blitz::Array<T,2>& dst, bool row_vector_src=false)
+    void repmat_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst, 
+      bool row_vector_src=false)
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
       if(row_vector_src)
       {
-        Torch::core::array::assertSameDimensionLength(dst.extent(0), m);
-        Torch::core::array::assertSameDimensionLength(dst.extent(1), n*src.extent(0));
-        for(int i=0; i<m; ++i)
-        {
-          for(int j=0; j<n; ++j)
-          {
-            blitz::Array<T,1> dst_mn = 
-              dst(i, blitz::Range(src.extent(0)*j,src.extent(0)*(j+1)-1));
-            dst_mn = src;
-          }
-        }
+        blitz::Array<T,2> dst_t = dst.transpose(1,0);
+        repmat_(src, dst_t, false);
       }
       else // src is a column vector
       {
-        Torch::core::array::assertSameDimensionLength(dst.extent(0), m*src.extent(0));
-        Torch::core::array::assertSameDimensionLength(dst.extent(1), n);
+        int m = dst.extent(0) / src.extent(0);
+        int n = dst.extent(1) / src.extent(1);
         for(int i=0; i<m; ++i)
         {
           for(int j=0; j<n; ++j)
@@ -89,23 +102,74 @@ namespace Torch {
         }
       }
     }
+    /**
+     * @brief Function which replicates an input 1D array, and generates a 2D 
+     * array like the matlab repmat function.
+     *
+     * @param row_vector_src Indicates whether the vector is considered as a
+     *   row or as a column.
+     *
+     * The input and output data have their sizes checked and this method will
+     * raise an appropriate exception if that is not cased. If you know that the
+     * input and output matrices conform, use the repmat_() variant.
+     */ 
+    template<typename T> 
+    void repmat(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst, 
+      bool row_vector_src=false)
+    {
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+      // Check dst length
+      if(row_vector_src)
+      {
+        if(dst.extent(1) % src.extent(0) != 0)
+          throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(1));
+      }
+      else // src is a column vector
+      {
+        if(dst.extent(0) % src.extent(0) != 0)
+          throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+      }
+      repmat_(src, dst, row_vector_src);
+    }
 
     /**
      * @brief Function which replicates an input 1D array, generating a new 
      * (larger) 1D array.
+     *
+     * @warning No checks are performed on the array sizes and is recommended
+     * only in scenarios where you have previously checked conformity and is
+     * focused only on speed.
      */
     template<typename T> 
-    void repvec(const blitz::Array<T,1>& src, int m, blitz::Array<T,1>& dst)
+    void repvec_(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
-      Torch::core::array::assertZeroBase(src);
-      Torch::core::array::assertZeroBase(dst);
-      Torch::core::array::assertSameDimensionLength(dst.extent(0), m*src.extent(0));
+      int m = dst.extent(0) / src.extent(0);
       for(int i=0; i<m; ++i)
       {
         blitz::Array<T,1> dst_m = 
           dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1));
         dst_m = src;
       }
+    }
+
+
+    /**
+     * @brief Function which replicates an input 1D array, generating a new 
+     * (larger) 1D array.
+     *
+     * The input and output data have their sizes checked and this method will
+     * raise an appropriate exception if that is not cased. If you know that the
+     * input and output matrices conform, use the repmat_() variant.
+     */
+    template<typename T> 
+    void repvec(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
+    {
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+      if(dst.extent(0) % src.extent(0) != 0)
+        throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+      repvec_(src,dst);
     }
 
   }

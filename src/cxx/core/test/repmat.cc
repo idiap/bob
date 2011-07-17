@@ -65,25 +65,25 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( test_repmat_1d )
 {
   blitz::Array<uint32_t,2> b23_a(2*b.extent(0), 3);
-  Torch::core::repmat(b, 2, 3, b23_a);
+  Torch::core::repmat(b, b23_a);
   checkBlitzEqual(b23_a, b23_s);
 
   blitz::Array<uint32_t,2> b23_b(b.extent(0), 3*b.extent(0));
-  Torch::core::repmat(b, 2, 3, b23_b, true);
+  Torch::core::repmat(b, b23_b, true);
   checkBlitzEqual(b23_b, b23_s_row);
 }
 
 BOOST_AUTO_TEST_CASE( test_repmat_2d )
 {
   blitz::Array<uint32_t,2> a33(3*a.extent(0), 3*a.extent(1));
-  Torch::core::repmat(a, 3, 3, a33);
+  Torch::core::repmat(a, a33);
   checkBlitzEqual(a33, a33_s);
 }
 
 BOOST_AUTO_TEST_CASE( test_repvec )
 {
   blitz::Array<uint32_t,1> b3(3*b.extent(0));
-  Torch::core::repvec(b, 3, b3);
+  Torch::core::repvec(b, b3);
   checkBlitzEqual(b3, b3_s);
 }
 

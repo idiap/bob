@@ -28,6 +28,7 @@ set(src
     "src/array_type.cc"
     "src/cast.cc"
     "src/reshape_exception.cc"
+    "src/repmat_exception.cc"
     )
 
 include(../../cmake/macros.cmake)
