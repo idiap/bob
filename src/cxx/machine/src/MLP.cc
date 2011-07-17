@@ -277,6 +277,7 @@ void mach::MLP::resize (size_t input, const std::vector<size_t>& hidden,
   //initializes the last layer
   m_weight.back().reference(blitz::Array<double,2>(hidden.back(), output));
   m_bias.back().reference(blitz::Array<double,1>(output));
+  m_buffer.back().reference(blitz::Array<double,1>(hidden.back()));
 }
 
 void mach::MLP::resize (const std::vector<size_t>& shape) {
