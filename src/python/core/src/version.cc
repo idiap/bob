@@ -19,7 +19,6 @@ extern "C" {
 #include <libavutil/avutil.h>
 #include <libswscale/swscale.h>
 #include <numpy/arrayobject.h>
-#include <libxml/xmlversion.h>
 #include <hdf5.h>
 #ifdef HAVE_MATIO
 #include <matio.h>
@@ -122,13 +121,6 @@ str numpy_version() {
 }
 
 /**
- * Libxml2
- */
-str libxml2_version() {
-  return str(LIBXML_DOTTED_VERSION);
-}
-
-/**
  * Matio, if compiled with such support
  */
 str matio_version() {
@@ -152,6 +144,5 @@ void bind_version_info() {
   def("ffmpeg_version", &ffmpeg_version);
   def("magick_version", &magick_version);
   def("numpy_version", &numpy_version);
-  def("libxml2_version", &libxml2_version);
   def("matio_version", &matio_version);
 }

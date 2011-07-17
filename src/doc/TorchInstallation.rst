@@ -7,6 +7,70 @@
 Dependencies
 ------------
 
+This is a listing of current |project| dependencies showing minimum required
+versions where relevant and the respective project licenses. When a project is
+covered by multiple licenses, we show which we are presently using (using
+**bold** face). The following sections have detailed information on why the
+dependence is required for the project and installation instructions for
+specific platforms.
+
++----------------------+--------------+------------------------------------+
+| Package Name         | Min. Version | License                            | 
++======================+==============+====================================+ 
+| |project|            | -            | BSD license                        | 
++----------------------+--------------+------------------------------------+
+| **Required Runtime Dependencies**                                        | 
++----------------------+--------------+------------------------------------+
+| Std. C/C++ Libraries | gcc 4.2?     | Depends on the compiler            | 
++----------------------+--------------+------------------------------------+
+| `Blitz++`_           | 0.9          | **Artistic** or LGPLv3+ or GPLv3+  | 
++----------------------+--------------+------------------------------------+
+| CBlas, Lapack, Atlas | -            | BSD-style                          | 
++----------------------+--------------+------------------------------------+
+| `Python`_            | 2.5          | PSF license (BSD-style)            | 
++----------------------+--------------+------------------------------------+
+| `Boost`_             | 1.34         | Boost license (BSD-style)          | 
++----------------------+--------------+------------------------------------+
+| `NumPy`_             | 1.3?         | BSD license                        | 
++----------------------+--------------+------------------------------------+
+| `Matplotlib`_        | 0.99?        | PSF license (BSD-style)            | 
++----------------------+--------------+------------------------------------+
+| `SQLAlchemy`_        | 0.5          | MIT license (BSD-style)            | 
++----------------------+--------------+------------------------------------+
+| `FFMpeg`_            | 0.5          | **LGPLv3+** or GPLv3+              | 
++----------------------+--------------+------------------------------------+
+| `ImageMagick`_       | 6.5?         | Apache 2.0                         | 
++----------------------+--------------+------------------------------------+
+| `HDF5`_              | 1.8.4        | BSD-style                          | 
++----------------------+--------------+------------------------------------+
+| `MatIO`_             | 1.3.3?       | LGPLv2.1                           | 
++----------------------+--------------+------------------------------------+
+| `argparse`_          | 1.1?         | PSF License (BSD-style)            | 
++----------------------+--------------+------------------------------------+
+| **Building and Debugging Dependencies**                                  | 
++----------------------+--------------+------------------------------------+
+| `CMake`_             | 2.8          | Creative Commons (3.0)             |
++----------------------+--------------+------------------------------------+
+| `Google Perftools`_  | 0.8?         | New BSD License                    |
++----------------------+--------------+------------------------------------+
+| `Sphinx`_            | 0.6          | BSD License                        |
++----------------------+--------------+------------------------------------+
+| `Doxygen`_           | 1.6?         | GPLv2                              |
++----------------------+--------------+------------------------------------+
+| `Dvipng`_            | 1.12?        | LGPLv3+                            |
++----------------------+--------------+------------------------------------+
+| **Extra Recommended Software**                                           | 
++----------------------+--------------+------------------------------------+
+| `Scipy`_             | -            | BSD License                        |
++----------------------+--------------+------------------------------------+
+| `IPython`_           | -            | New BSD License                    |
++----------------------+--------------+------------------------------------+
+| `H5py`_              | -            | New BSD License                    |
++----------------------+--------------+------------------------------------+
+| `Tables`_            | -            | BSD License                        |
++----------------------+--------------+------------------------------------+
+
+
 Installing |project| Dependencies
 =================================
 
@@ -64,7 +128,6 @@ Data access
   '''private development''', you can use version 0.5.1 and above. Torch will
   work seemlessly. Please note that if you decide to distribute Torch compiled
   with a version of ffmpeg prior to 0.6, then the whole package becomes GPL'ed;
-* `LibXML2`_: this dependence is used for the XML Dataset implementation.
 * `ImageMagick`_: is used for reading and writing image output. We
   currently compile against version 6.6.7, but other versions should work.
   Please note we make use of the C++ API (a.k.a. ImageMagick++).
@@ -94,6 +157,9 @@ Building and debugging
   should work.
 * `Doxygen`_: is used for extracting C/C++ documentation strings from code
   and building a system of webpages describing the C/C++ Torch API.
+* `Dvipng`_: is required for LaTeX-like code conversion to HTML. Not having it
+  will cause equations to be displayed using LaTeX-code instead of being nicely
+  formatted.
 
 .. note::
    If your OS cannot satisfy the minimal required versions of the packages, you
@@ -130,7 +196,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng
 
 .. note::
 
@@ -157,7 +223,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx
+   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng
 
 .. warning::
 
@@ -186,7 +252,7 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx hdf5-18 py26-h5py py26-tables py26-argparse boost +python26 
+   $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse boost +python26 
    $ # go for a long coffee ('atlas' may take up to 12 hours to install!)
 
 You can also install git if you want to submit patches to us:
@@ -246,6 +312,7 @@ choose between a released stable version from :doc:`TorchDistribution` or
 checkout and build yourself following :ref:`section-compilation`.
 
 .. warning::
+
   *Make sure to read  and install all requirements defined in*
   :ref:`section-dependencies`, *prior to running Torch applications.*
 
@@ -313,7 +380,6 @@ expected. If you cannot go through, please `submit a new bug report`_ in
 our tracking system. At this time make sure to specify your OS version and the
 versions of the external dependencies so we can try to reproduce the failure.
 
-
 .. Place here references to all citations in lower case
 
 .. _macports: http://www.macports.org
@@ -344,3 +410,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _the Ubuntu 10.04 ticket: http://www.idiap.ch/software/torch5spro/ticket/89/
 .. _argparse: http://code.google.com/p/argparse/
 .. _sqlalchemy: http://www.sqlalchemy.org/
+.. _dvipng: http://savannah.nongnu.org/projects/dvipng/
