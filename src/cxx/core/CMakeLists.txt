@@ -27,6 +27,7 @@ set(src
     "src/array_exception.cc"
     "src/array_type.cc"
     "src/cast.cc"
+    "src/reshape_exception.cc"
     )
 
 include(../../cmake/macros.cmake)
@@ -41,6 +42,7 @@ torch_test(core logging test/logging.cc)
 torch_test(core blitzarray test/blitzArray.cc)
 torch_test(core convertarray test/convert.cc)
 torch_test(core repmat test/repmat.cc)
+torch_test(core reshape test/reshape.cc)
 if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
   target_link_libraries(torchtest_core_blitzarray "-framework CoreServices")
 endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
