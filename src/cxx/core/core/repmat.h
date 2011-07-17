@@ -174,6 +174,47 @@ namespace Torch {
       repvec_(src,dst);
     }
 
+    /**
+     * @brief Function which replicates the elements of an input 1D array, 
+     * generating a new (larger) 1D array. In contrast to repvec, repetitions
+     * occur at the element level, rather than at the vector level.
+     *
+     * @warning No checks are performed on the array sizes and is recommended
+     * only in scenarios where you have previously checked conformity and is
+     * focused only on speed.
+     */
+    template<typename T> 
+    void repelem_(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
+    {
+      int size_block = dst.extent(0) / src.extent(0);
+      for(int i=0; i<src.extent(0); ++i)
+      {
+        blitz::Array<T,1> dst_m = 
+          dst(blitz::Range(size_block*i, size_block*(i+1)-1));
+        dst_m = src(i);
+      }
+    }
+
+
+    /**
+     * @brief Function which replicates the elements of an input 1D array, 
+     * generating a new (larger) 1D array. In contrast to repvec, repetitions
+     * occur at the element level, rather than at the vector level.
+     *
+     * The input and output data have their sizes checked and this method will
+     * raise an appropriate exception if that is not cased. If you know that the
+     * input and output matrices conform, use the repmat_() variant.
+     */
+    template<typename T> 
+    void repelem(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
+    {
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+      if(dst.extent(0) % src.extent(0) != 0)
+        throw Torch::core::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+      repelem_(src,dst);
+    }
+
   }
 /**
  * @}

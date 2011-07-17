@@ -15,9 +15,9 @@
 
 struct T {
   blitz::Array<uint32_t,2> a, a33_s;
-  blitz::Array<uint32_t,1> b, b3_s;
+  blitz::Array<uint32_t,1> b, b3_s, b4_s;
   blitz::Array<uint32_t,2> b23_s, b23_s_row;
-  T(): a(2,3), a33_s(6,9), b(2), b3_s(6), b23_s(4,3), b23_s_row(2,6) {
+  T(): a(2,3), a33_s(6,9), b(2), b3_s(6), b4_s(8), b23_s(4,3), b23_s_row(2,6) {
     a = 1, 2, 3, 4, 5, 6;
     a33_s = 1, 2, 3, 1, 2, 3, 1, 2, 3,
         4, 5, 6, 4, 5, 6, 4, 5, 6,
@@ -27,9 +27,11 @@ struct T {
         4, 5, 6, 4, 5, 6, 4, 5, 6;
 
     b = 1, 2;
+    b3_s = 1, 2, 1, 2, 1, 2;
+    b4_s = 1, 1, 1, 1, 2, 2, 2, 2;
+
     b23_s = 1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2;
     b23_s_row = 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2;
-    b3_s = 1, 2, 1, 2, 1, 2;
   }
   ~T() {}
 };
@@ -85,6 +87,13 @@ BOOST_AUTO_TEST_CASE( test_repvec )
   blitz::Array<uint32_t,1> b3(3*b.extent(0));
   Torch::core::repvec(b, b3);
   checkBlitzEqual(b3, b3_s);
+}
+
+BOOST_AUTO_TEST_CASE( test_repelem )
+{
+  blitz::Array<uint32_t,1> b4(4*b.extent(0));
+  Torch::core::repelem(b, b4);
+  checkBlitzEqual(b4, b4_s);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

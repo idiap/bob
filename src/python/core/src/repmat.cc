@@ -1,7 +1,7 @@
 /**
  * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief Python bindings for the repmat function
+ * @brief Python bindings for the repmat-like functions
  */
 
 #include <boost/python.hpp>
@@ -23,6 +23,11 @@ static const char* REPMAT1D_DOC_ALLOC = "Replicates a 1D array and generates a 2
 static const char* REPVEC_DOC_NOCHECK = "Replicates a 1D array and generates a larger 1D array. Does not perform any check on the destination array.";
 static const char* REPVEC_DOC_CHECK = "Replicates a 1D array and generates a larger 1D array. Checks are performed on the 2D destination array.";
 static const char* REPVEC_DOC_ALLOC = "Replicates a 1D array and generates a larger 1D array (in the matlab way). Allocation of the destination array is performed by this function.";
+static const char* REPELEM_DOC_NOCHECK = "Replicates the elements of a 1D array and generates a larger 1D array. Does not perform any check on the destination array.";
+static const char* REPELEM_DOC_CHECK = "Replicates the elements of a 1D array and generates a larger 1D array. Checks are performed on the 2D destination array.";
+static const char* REPELEM_DOC_ALLOC = "Replicates the elements of a 1D array and generates a larger 1D array (in the matlab way). Allocation of the destination array is performed by this function.";
+
+
 
 template<typename T>
 static blitz::Array<T,2> repmat2d_r(const blitz::Array<T,2>& A, const int m, const int n) {
@@ -32,21 +37,28 @@ static blitz::Array<T,2> repmat2d_r(const blitz::Array<T,2>& A, const int m, con
 }
 
 template<typename T>
-static blitz::Array<T,2> repmat1d_r(const blitz::Array<T,1>& A, const int m, const int n, bool row_vector_src) {
+static blitz::Array<T,2> repmat1d_r(const blitz::Array<T,1>& a, const int m, const int n, bool row_vector_src) {
   blitz::Array<T,2> B;
   if(row_vector_src)
-    B.resize(m, n*A.extent(0));
+    B.resize(m, n*a.extent(0));
   else
-    B.resize(m*A.extent(0), n);
-  core::repmat_(A, B, row_vector_src);
+    B.resize(m*a.extent(0), n);
+  core::repmat_(a, B, row_vector_src);
   return B;
 }
 
 template<typename T>
-static blitz::Array<T,1> repvec_r(const blitz::Array<T,1>& A, const int m) {
-  blitz::Array<T,1> B(m*A.extent(0));
-  core::repvec_(A, B);
-  return B;
+static blitz::Array<T,1> repvec_r(const blitz::Array<T,1>& a, const int m) {
+  blitz::Array<T,1> b(m*a.extent(0));
+  core::repvec_(a, b);
+  return b;
+}
+
+template<typename T>
+static blitz::Array<T,1> repelem_r(const blitz::Array<T,1>& a, const int m) {
+  blitz::Array<T,1> b(m*a.extent(0));
+  core::repelem_(a, b);
+  return b;
 }
 
 /**
@@ -61,9 +73,13 @@ template<typename T> void def_repmat() {
   def("repmat", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,2>&, const bool))&core::repmat, (arg("a"), arg("B"), arg("row_vector_src")=false), REPMAT1D_DOC_CHECK);
   def("repmat", &repmat1d_r<T>, (arg("a"), arg("m"), arg("n"), arg("row_vector_src")=false), REPMAT1D_DOC_ALLOC);
 
-  def("repvec_", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&core::repvec_, (arg("A"), arg("B")), REPVEC_DOC_NOCHECK);
-  def("repvec", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&core::repvec_, (arg("A"), arg("B")), REPVEC_DOC_CHECK);
+  def("repvec_", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&core::repvec_, (arg("a"), arg("b")), REPVEC_DOC_NOCHECK);
+  def("repvec", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&core::repvec, (arg("a"), arg("b")), REPVEC_DOC_CHECK);
   def("repvec", &repvec_r<T>, (arg("A"), arg("m")), REPVEC_DOC_ALLOC);
+
+  def("repelem_", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&core::repelem_, (arg("a"), arg("b")), REPELEM_DOC_NOCHECK);
+  def("repelem", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&core::repelem, (arg("a"), arg("b")), REPELEM_DOC_CHECK);
+  def("repelem", &repelem_r<T>, (arg("A"), arg("m")), REPELEM_DOC_ALLOC);
 }
 
 void bind_core_repmat() {
