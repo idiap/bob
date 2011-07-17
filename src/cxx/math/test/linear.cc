@@ -116,6 +116,14 @@ BOOST_AUTO_TEST_CASE( test_matrix_vector_prod )
   checkBlitzClose( b_2, sol, eps);
 }
 
+BOOST_AUTO_TEST_CASE( test_vector_matrix_prod )
+{
+  blitz::Array<double,1> sol(2);
+
+  Torch::math::prod( b_4, A_24.transpose(1,0), sol);
+  checkBlitzClose( b_2, sol, eps);
+}
+
 BOOST_AUTO_TEST_CASE( test_vector_vector_prod )
 {
   blitz::Array<double,2> sol(4,4);

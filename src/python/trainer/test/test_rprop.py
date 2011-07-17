@@ -49,6 +49,24 @@ class PythonRProp:
       if (x == 0): return 0
       if (x < 0) : return -1
       return +1
+
+    def logistic(x):
+      return 1 / (1 + exp(-x))
+
+    def logistic_bwd(x):
+      return x * (1-x)
+
+    def tanh(x):
+      return x.tanh()
+
+    def tanh_bwd(x):
+      return (1 - x**2)
+
+    def linear(x):
+      return x
+
+    def linear_bwd(x):
+      return 1
     
     # some constants for RProp
     DELTA0 = 0.1
@@ -59,6 +77,18 @@ class PythonRProp:
 
     W = machine.weights #weights
     B = machine.biases #biases
+
+    if machine.activation == torch.machine.Activation.TANH:
+      forward = tanh
+      backward = tanh_bwd
+    elif machine.activation == torch.machine.Activation.LOG:
+      forward = logistic
+      backward = logistic_bwd
+    elif machine.activation == torch.machine.Activation.LINEAR:
+      forward = linear
+      backward = linear_bwd
+    else:
+      raise RuntimeError, "Cannot deal with activation %s" % machine.activation
     
     #simulated bias input...
     BI = [torch.core.array.float64_1(input.extent(0)) for k in B]
@@ -85,12 +115,12 @@ class PythonRProp:
       O[k+1] = torch.math.prod(O[k], W[k])
       for sample in range(O[k+1].extent(0)):
         O[k+1][sample,:] += B[k]
-      O[k+1] = O[k+1].tanh()
+      O[k+1] = forward(O[k+1])
 
     # Feeds backward
-    E[-1] = (1-(O[-1]**2)) * (O[-1] - target) #last layer
+    E[-1] = backward(O[-1]) * (O[-1] - target) #last layer
     for k in reversed(range(len(W)-1)): #for all remaining layers
-      E[k] = (1-(O[k]**2)) * torch.math.prod(E[k+1], W[k].transpose(1,0))
+      E[k] = backward(O[k+1]) * torch.math.prod(E[k+1], W[k+1].transpose(1,0))
 
     # Calculates partial derivatives, accumulate
     self.PDW = [torch.math.prod(O[k].transpose(1,0), E[k]) for k in range(len(W))]
@@ -142,6 +172,7 @@ class RPropTest(unittest.TestCase):
     # Initializes an MLPRPropTrainer and checks all seems consistent
     # with the proposed API.
     machine = torch.machine.MLP((4, 1))
+    machine.activation = torch.machine.Activation.LINEAR
     B = 10
     trainer = torch.trainer.MLPRPropTrainer(machine, B)
     self.assertEqual( trainer.batchSize, B )
@@ -160,6 +191,7 @@ class RPropTest(unittest.TestCase):
     # the training works as expected by calculating the same
     # as the trainer should do using python.
     machine = torch.machine.MLP((4, 1))
+    machine.activation = torch.machine.Activation.LINEAR
     machine.biases = 0
     w0 = torch.core.array.array([[.1],[.2],[-.1],[-.05]])
     machine.weights = [w0]
@@ -200,6 +232,7 @@ class RPropTest(unittest.TestCase):
     N = 60
 
     machine = torch.machine.MLP((4, 1))
+    machine.activation = torch.machine.Activation.LINEAR
     machine.randomize()
     machine.biases = 0
     trainer = torch.trainer.MLPRPropTrainer(machine, N)
@@ -222,6 +255,8 @@ class RPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
+      #print "[Python] RMSE:", rmse(pymachine(input), target)
+      #print "[C++] RMSE:", rmse(machine(input), target)
       self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
 
   def test04_Fisher(self):
@@ -233,6 +268,7 @@ class RPropTest(unittest.TestCase):
     N = 60
 
     machine = torch.machine.MLP((4, 1))
+    machine.activation = torch.machine.Activation.LINEAR
     machine.randomize()
     trainer = torch.trainer.MLPRPropTrainer(machine, N)
     trainer.trainBiases = True
@@ -254,8 +290,84 @@ class RPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
+      #print "[Python] RMSE:", rmse(pymachine(input), target)
+      #print "[C++] RMSE:", rmse(machine(input), target)
       self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
       self.assertTrue( (pymachine.biases[0] == machine.biases[0]).all() )
+
+  def test05_FisherWithOneHiddenLayer(self):
+
+    # Trains a multilayer biased MLP to perform discrimination on the Fisher
+    # data set.
+
+    N = 50
+
+    machine = torch.machine.MLP((4, 4, 1))
+    machine.activation = torch.machine.Activation.TANH
+    machine.randomize()
+    trainer = torch.trainer.MLPRPropTrainer(machine, N)
+    trainer.trainBiases = True
+
+    # A helper to select and shuffle the data
+    targets = [ #we choose the approximate Fisher response!
+        torch.core.array.array([-1.0]), #setosa
+        torch.core.array.array([0.5]), #versicolor
+        torch.core.array.array([+1.0]), #virginica
+        ]
+    S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
+
+    # trains in python first
+    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pymachine = torch.machine.MLP(machine) #a copy
+
+    # We now iterate for several steps, look for the convergence
+    for k in range(50):
+      input, target = S(N)
+      pytrainer.train(pymachine, input, target)
+      trainer.train_(machine, input, target)
+      #print "[Python] RMSE:", rmse(pymachine(input), target)
+      #print "[C++] RMSE:", rmse(machine(input), target)
+      for i, w in enumerate(pymachine.weights):
+        self.assertTrue( (w == machine.weights[i]).all() )
+      for i, b in enumerate(pymachine.biases):
+        self.assertTrue( (b == machine.biases[i]).all() )
+
+  def test06_FisherMultiLayer(self):
+
+    # Trains a multilayer biased MLP to perform discrimination on the Fisher
+    # data set.
+
+    N = 50
+
+    machine = torch.machine.MLP((4, 3, 3, 1))
+    machine.activation = torch.machine.Activation.TANH
+    machine.randomize()
+    trainer = torch.trainer.MLPRPropTrainer(machine, N)
+    trainer.trainBiases = True
+
+    # A helper to select and shuffle the data
+    targets = [ #we choose the approximate Fisher response!
+        torch.core.array.array([-1.0]), #setosa
+        torch.core.array.array([0.5]), #versicolor
+        torch.core.array.array([+1.0]), #virginica
+        ]
+    S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
+
+    # trains in python first
+    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pymachine = torch.machine.MLP(machine) #a copy
+
+    # We now iterate for several steps, look for the convergence
+    for k in range(50):
+      input, target = S(N)
+      pytrainer.train(pymachine, input, target)
+      trainer.train_(machine, input, target)
+      #print "[Python] RMSE:", rmse(pymachine(input), target)
+      #print "[C++] RMSE:", rmse(machine(input), target)
+      for i, w in enumerate(pymachine.weights):
+        self.assertTrue( (w == machine.weights[i]).all() )
+      for i, b in enumerate(pymachine.biases):
+        self.assertTrue( (b == machine.biases[i]).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
