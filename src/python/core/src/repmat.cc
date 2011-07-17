@@ -1,7 +1,7 @@
 /**
  * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief Python bindings for torch::core::cast
+ * @brief Python bindings for the repmat function
  */
 
 #include <boost/python.hpp>
