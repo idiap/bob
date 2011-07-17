@@ -10,10 +10,6 @@ import os, sys
 import unittest
 import torch
 
-def rmse(output, target):
-  """Evaluates the mean-square error between outputs and targets."""
-  return ((output - target)**2).transpose(1,0).partial_mean().sqrt()
-
 class PythonRProp:
   """A simplified (and slower) version of RProp training written in python.
   
@@ -255,8 +251,8 @@ class RPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] RMSE:", rmse(pymachine(input), target)
-      #print "[C++] RMSE:", rmse(machine(input), target)
+      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
       self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
 
   def test04_Fisher(self):
@@ -290,8 +286,8 @@ class RPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] RMSE:", rmse(pymachine(input), target)
-      #print "[C++] RMSE:", rmse(machine(input), target)
+      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
       self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
       self.assertTrue( (pymachine.biases[0] == machine.biases[0]).all() )
 
@@ -302,7 +298,7 @@ class RPropTest(unittest.TestCase):
 
     N = 50
 
-    machine = torch.machine.MLP((4, 4, 1))
+    machine = torch.machine.MLP((4, 4, 3))
     machine.activation = torch.machine.Activation.TANH
     machine.randomize()
     trainer = torch.trainer.MLPRPropTrainer(machine, N)
@@ -310,9 +306,9 @@ class RPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([-1.0]), #setosa
-        torch.core.array.array([0.5]), #versicolor
-        torch.core.array.array([+1.0]), #virginica
+        torch.core.array.array([+1., -1., -1.]), #setosa
+        torch.core.array.array([-1., +1., -1.]), #versicolor
+        torch.core.array.array([-1., -1., +1.]), #virginica
         ]
     S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
 
@@ -325,8 +321,8 @@ class RPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] RMSE:", rmse(pymachine(input), target)
-      #print "[C++] RMSE:", rmse(machine(input), target)
+      #print "[Python] |RMSE|:", torch.math.norm(torch.measure.rmse(pymachine(input), target))
+      #print "[C++] |RMSE|:", torch.math.norm(torch.measure.rmse(machine(input), target))
       for i, w in enumerate(pymachine.weights):
         self.assertTrue( (w == machine.weights[i]).all() )
       for i, b in enumerate(pymachine.biases):
@@ -362,8 +358,8 @@ class RPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] RMSE:", rmse(pymachine(input), target)
-      #print "[C++] RMSE:", rmse(machine(input), target)
+      #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
+      #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
       for i, w in enumerate(pymachine.weights):
         self.assertTrue( (w == machine.weights[i]).all() )
       for i, b in enumerate(pymachine.biases):

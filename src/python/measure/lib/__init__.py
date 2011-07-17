@@ -17,6 +17,21 @@ def mse (estimation, target):
   """
   return ((estimation - target)**2).transpose(1,0).partial_mean()
 
+def rmse (estimation, target):
+  """Calculates the root mean square error between a set of outputs and target
+  values using the following formula:
+
+  .. math::
+
+    MSE(\hat{\Theta}) = \sqrt(E[(\hat{\Theta} - \Theta)^2])
+
+  Estimation (:math:`\hat{\Theta}`) and target (:math:`\Theta`) are supposed to
+  have 2 dimensions. Different examples are organized as rows while different
+  features in the estimated values or targets are organized as different
+  columns.
+  """
+  return mse(estimation, target).sqrt()
+
 def relevance (input, machine):
   """Calculates the relevance of every input feature to the estimation process
   using the following definition from:
@@ -44,7 +59,7 @@ def relevance (input, machine):
   for k in range(input.extent(1)):
     i2[:,:] = input #reset
     i2[:,k] = input[:,k].mean()
-    retval[k] = ((mse(machine(i2), o)**2).sum())**0.5
+    retval[k] = (mse(machine(i2), o).sum())**0.5
 
   return retval
 
