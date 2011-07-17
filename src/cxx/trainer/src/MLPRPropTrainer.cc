@@ -182,7 +182,6 @@ bool train::MLPRPropTrainer::isCompatible(const mach::MLP& machine) const
 
 void train::MLPRPropTrainer::forward_step() {
   size_t batch_size = m_target.extent(0);
-  std::cout << "C++ output[0] " << m_output[0] << std::endl;
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
     math::prod_(m_output[k], m_weight_ref[k], m_output[k+1]);
     for (int i=0; i<(int)batch_size; ++i) { //for every example
@@ -190,7 +189,6 @@ void train::MLPRPropTrainer::forward_step() {
         m_output[k+1](i,j) = m_actfun(m_output[k+1](i,j) + m_bias_ref[k](j));
       }
     }
-    std::cout << "C++ output " << m_output[k+1] << std::endl;
   }
 }
 
@@ -272,7 +270,7 @@ void train::MLPRPropTrainer::rprop_weight_update() {
     blitz::secondIndex J;
     m_deriv_bias[k] = blitz::sum(m_error[k].transpose(1,0), J);
     for (int i=0; i<m_deriv_bias[k].extent(0); ++i) {
-      int8_t M = sign(m_deriv_bias[k](i));
+      int8_t M = sign(m_deriv_bias[k](i) * m_prev_deriv_bias[k](i));
       // Implementations equations (4-6) on the RProp paper:
       if (M > 0) {
         m_delta_bias[k](i) = std::min(m_delta_bias[k](i)*ETA_PLUS, DELTA_MAX); 

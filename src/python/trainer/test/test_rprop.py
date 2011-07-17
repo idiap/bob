@@ -86,20 +86,15 @@ class PythonRProp:
       for sample in range(O[k+1].extent(0)):
         O[k+1][sample,:] += B[k]
       O[k+1] = O[k+1].tanh()
-      print "Output[%d]" % (k+1), O[k+1]
 
     # Feeds backward
     E[-1] = (1-(O[-1]**2)) * (O[-1] - target) #last layer
-    print "Error[-1]", E[-1]
     for k in reversed(range(len(W)-1)): #for all remaining layers
       E[k] = (1-(O[k]**2)) * torch.math.prod(E[k+1], W[k].transpose(1,0))
-      print "Error[%d]" % k, E[k]
 
     # Calculates partial derivatives, accumulate
     self.PDW = [torch.math.prod(O[k].transpose(1,0), E[k]) for k in range(len(W))]
-    for i, k in enumerate(self.PDW): print "PDW[%d]: %s" % (i, k)
     self.PDB = [torch.math.prod(BI[k], E[k]) for k in range(len(W))]
-    for i, k in enumerate(self.PDB): print "PDB[%d]: %s" % (i, k)
 
     # Updates weights and biases
     WUP = [i * j for (i,j) in zip(self.PPDW, self.PDW)]
@@ -202,10 +197,12 @@ class RPropTest(unittest.TestCase):
     # Fisher's paper. Checks we get a performance close to the one on
     # that paper.
 
+    N = 60
+
     machine = torch.machine.MLP((4, 1))
     machine.randomize()
     machine.biases = 0
-    trainer = torch.trainer.MLPRPropTrainer(machine, 10)
+    trainer = torch.trainer.MLPRPropTrainer(machine, N)
     trainer.trainBiases = False
 
     # A helper to select and shuffle the data
@@ -221,16 +218,44 @@ class RPropTest(unittest.TestCase):
     pymachine = torch.machine.MLP(machine) #a copy
 
     # We now iterate for several steps, look for the convergence
-    for k in range(5):
-      print "Iteration %d..." % k
-      input, target = S(30)
+    for k in range(100):
+      input, target = S(N)
       pytrainer.train(pymachine, input, target)
-      print "Py MSE:", rmse(pymachine(input), target)
-      print pymachine
       trainer.train_(machine, input, target)
-      print "C++ MSE:", rmse(machine(input), target)
-      print machine
-      #self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
+      self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
+
+  def test04_Fisher(self):
+    
+    # Trains single layer MLP to discriminate the iris plants from
+    # Fisher's paper. Checks we get a performance close to the one on
+    # that paper.
+
+    N = 60
+
+    machine = torch.machine.MLP((4, 1))
+    machine.randomize()
+    trainer = torch.trainer.MLPRPropTrainer(machine, N)
+    trainer.trainBiases = True
+
+    # A helper to select and shuffle the data
+    targets = [ #we choose the approximate Fisher response!
+        torch.core.array.array([-2.0]), #setosa
+        torch.core.array.array([1.5]), #versicolor
+        torch.core.array.array([0.5]), #virginica
+        ]
+    S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
+
+    # trains in python first
+    pytrainer = PythonRProp(train_biases=trainer.trainBiases)
+    pymachine = torch.machine.MLP(machine) #a copy
+
+    # We now iterate for several steps, look for the convergence
+    for k in range(100):
+      input, target = S(N)
+      pytrainer.train(pymachine, input, target)
+      trainer.train_(machine, input, target)
+      self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
+      self.assertTrue( (pymachine.biases[0] == machine.biases[0]).all() )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
