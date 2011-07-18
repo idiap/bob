@@ -7,6 +7,7 @@ set(pysrc
    "src/kmeans.cc"
    "src/gmm.cc"
    "src/rprop.cc"
+   "src/backprop.cc"
    "src/main.cc"
    )
 
