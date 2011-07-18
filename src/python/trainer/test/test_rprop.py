@@ -240,7 +240,11 @@ class RPropTest(unittest.TestCase):
         torch.core.array.array([1.5]), #versicolor
         torch.core.array.array([0.5]), #virginica
         ]
-    S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
+    # Associate the data to targets, by setting the arrayset order explicetly
+    data = torch.db.iris.data()
+    datalist = [data['setosa'], data['versicolor'], data['virginica']]
+
+    S = torch.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
@@ -275,7 +279,11 @@ class RPropTest(unittest.TestCase):
         torch.core.array.array([1.5]), #versicolor
         torch.core.array.array([0.5]), #virginica
         ]
-    S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
+    # Associate the data to targets, by setting the arrayset order explicetly
+    data = torch.db.iris.data()
+    datalist = [data['setosa'], data['versicolor'], data['virginica']]
+
+    S = torch.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
@@ -310,7 +318,11 @@ class RPropTest(unittest.TestCase):
         torch.core.array.array([-1., +1., -1.]), #versicolor
         torch.core.array.array([-1., -1., +1.]), #virginica
         ]
-    S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
+    # Associate the data to targets, by setting the arrayset order explicetly
+    data = torch.db.iris.data()
+    datalist = [data['setosa'], data['versicolor'], data['virginica']]
+
+    S = torch.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
@@ -347,7 +359,11 @@ class RPropTest(unittest.TestCase):
         torch.core.array.array([0.5]), #versicolor
         torch.core.array.array([+1.0]), #virginica
         ]
-    S = torch.trainer.DataShuffler(torch.db.iris.data().values(), targets)
+    # Associate the data to targets, by setting the arrayset order explicetly
+    data = torch.db.iris.data()
+    datalist = [data['setosa'], data['versicolor'], data['virginica']]
+
+    S = torch.trainer.DataShuffler(datalist, targets)
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
