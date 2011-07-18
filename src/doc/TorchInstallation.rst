@@ -35,6 +35,8 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `Matplotlib`_        | 0.99?        | PSF license (BSD-style)            | 
 +----------------------+--------------+------------------------------------+
+| **Data Access (runtime)**                                                | 
++----------------------+--------------+------------------------------------+
 | `SQLAlchemy`_        | 0.5          | MIT license (BSD-style)            | 
 +----------------------+--------------+------------------------------------+
 | `FFMpeg`_            | 0.5          | **LGPLv3+** or GPLv3+              | 
@@ -47,7 +49,9 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `argparse`_          | 1.1?         | PSF License (BSD-style)            | 
 +----------------------+--------------+------------------------------------+
-| **Building and Debugging Dependencies**                                  | 
+| **Building and Debugging Dependencies** (not required for runtime)       | 
++----------------------+--------------+------------------------------------+
+| `Git`_               | 1.6?         | GPLv2                              |
 +----------------------+--------------+------------------------------------+
 | `CMake`_             | 2.8          | Creative Commons (3.0)             |
 +----------------------+--------------+------------------------------------+
@@ -59,7 +63,7 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `Dvipng`_            | 1.12?        | LGPLv3+                            |
 +----------------------+--------------+------------------------------------+
-| **Extra Recommended Software**                                           | 
+| **Extra Recommended Software** (not distributed with or required to run) | 
 +----------------------+--------------+------------------------------------+
 | `Scipy`_             | -            | BSD License                        |
 +----------------------+--------------+------------------------------------+
@@ -71,8 +75,8 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 
 
-Installing |project| Dependencies
-=================================
+Description |project| Dependencies
+==================================
 
 In order to compile and develop against Torch, you must have a few tools
 installed. Here is a brief description of what you need.
@@ -115,13 +119,13 @@ Core dependencies
   Python 2.5 or up;
 * `NumPy`_: this dependence is used to bind blitz::Arrays to python.
 * `Matplotlib`_: A matlab-like python plotting environment
-* `SqlAlchemy`_: A Python SQL toolkit and Object Relational Mapper. This is
-  used for storing and querying more complex databases. You need at least
-  version 0.6.
 
 Data access
 ===========
 
+* `SqlAlchemy`_: A Python SQL toolkit and Object Relational Mapper. This is
+  used for storing and querying more complex databases. You need at least
+  version 0.5.
 * `FFMpeg`_: is used to give Torch support for input and output videos.
   Torch distributions will be compiled and shipped against version 0.6 or
   superior because of licensing incompatibilities. That being said, for
@@ -147,6 +151,11 @@ Data access
 Building and debugging
 ======================
 
+These are packages you need for compiling |project|, but do not depend at
+during runtime.
+
+* `Git`_: is used as our version control system. You need it if you want to
+  perform a fresh checkout of sources beforem compiling;
 * `CMake`_: is used to build Torch and to compile examples. You need at
   least version 2.8;
 * `Google Perftools`_: if you want to compile profiling extensions. We have
