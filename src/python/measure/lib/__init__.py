@@ -23,7 +23,7 @@ def rmse (estimation, target):
 
   .. math::
 
-    MSE(\hat{\Theta}) = \sqrt(E[(\hat{\Theta} - \Theta)^2])
+    RMSE(\hat{\Theta}) = \sqrt(E[(\hat{\Theta} - \Theta)^2])
 
   Estimation (:math:`\hat{\Theta}`) and target (:math:`\Theta`) are supposed to
   have 2 dimensions. Different examples are organized as rows while different
