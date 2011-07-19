@@ -122,6 +122,13 @@ static blitz::Array<uint8_t,4> videoreader_getslice (io::VideoReader& v, slice s
   return retval;
 }
 
+static blitz::Array<uint8_t,4> videoreader_load(io::VideoReader& reader) {
+  blitz::Array<uint8_t,4> retval(reader.numberOfFrames(), 3,
+      reader.height(), reader.width());
+  reader.load(retval);
+  return retval;
+}
+
 void bind_io_video() {
   //exceptions for videos
   CxxToPythonTranslatorPar2<Torch::io::FFmpegException, Torch::io::Exception, const char*, const char*>("FFmpegException", "Thrown when there is a problem with a Video file.");
@@ -141,7 +148,8 @@ void bind_io_video() {
     .add_property("codecLongName", make_function(&io::VideoReader::codecLongName, return_value_policy<copy_const_reference>()))
     .add_property("frameRate", &io::VideoReader::frameRate)
     .add_property("info", make_function(&io::VideoReader::info, return_value_policy<copy_const_reference>()))
-    .def("load", &io::VideoReader::load, (arg("array")), "Loads all of the video stream in a blitz array organized in this way: (frames, color-bands, height, width). The 'data' parameter will be resized if required.")
+    .def("load", &io::VideoReader::load, (arg("self"), arg("array")), "Loads all of the video stream in a blitz array organized in this way: (frames, color-bands, height, width). The 'array' parameter will be resized if required.")
+    .def("load", &videoreader_load, (arg("self")), "Loads all of the video stream in a blitz array organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you. This is only (very) marginally worst than using the other variant of this method. It will only make a difference using the other (faster) load() implementation when video sequences are very short and you are not doing any network readout. Otherwise, stick to this variant, it is safer!")
     .def("__iter__", &io::VideoReader::begin)
     .def("__getitem__", &videoreader_getitem)
     .def("__getitem__", &videoreader_getslice)
