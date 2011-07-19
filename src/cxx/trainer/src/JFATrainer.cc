@@ -192,7 +192,7 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
       // update x
       blitz::Array<double,1> x_jj = x(jj,blitz::Range::all());
       Fh /= E;
-      blitz::Array<double,2> u_t = u.transpose(1,0);
+      blitz::Array<double,2> u_t = u.copy().transpose(1,0);
       Torch::math::prod(Fh, u_t, tmp3);
       Torch::math::prod(tmp3, Linv, x_jj);
     }
