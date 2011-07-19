@@ -169,13 +169,13 @@ def get_options():
   
   # This option is not normally shown to the user...
   parser.add_option("--self-test",
-      action="store_true", dest="test", default=False,
+      action="store_true", dest="selftest", default=False,
       help=optparse.SUPPRESS_HELP)
       #help="if set, runs an internal verification test and erases any output")
 
   options, args = parser.parse_args()
 
-  if options.test:
+  if options.selftest:
     import tempfile
 
     # then we go into test mode, all input is preset
@@ -233,7 +233,7 @@ if __name__ == '__main__':
         options.npoints, options.plotfile)
     print("[Plots] Performance curves => '%s'" % options.plotfile)
 
-  if options.test: #remove output file + tmp directory
+  if options.selftest: #remove output file + tmp directory
     import shutil
     shutil.rmtree(os.path.dirname(options.plotfile))
 
