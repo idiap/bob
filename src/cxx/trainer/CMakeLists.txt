@@ -18,6 +18,7 @@ set(src
     "src/DataShuffler.cc"
     "src/MLPRPropTrainer.cc"
     "src/MLPBackPropTrainer.cc"
+    "src/JFATrainer.cc"
 )
 
 include(../../cmake/macros.cmake)
