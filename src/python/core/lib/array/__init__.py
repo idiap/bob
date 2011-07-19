@@ -94,16 +94,24 @@ def array_save(self, filename, codecname=''):
   from ...io import Array
   Array(self).save(filename, codecname=codecname)
 
+def array_numeq(self, other):
+  """Makes sure two arrays are the same, numerically"""
+  if self.__class__ != other.__class__: return false
+  if self.shape() != other.shape(): return false
+  return ( (self == other).all() )
+
 for array_class in [k[1] for k in get_array_types()]:
   array_class.__str__ = array_str
   array_class.__repr__ = array_repr
   array_class.convert = array_convert
   array_class.save = array_save
   array_class.empty_like = array_empty_like
+  array_class.numeq = array_numeq
 del array_str
 del array_repr
 del array_convert
 del array_empty_like
+del array_numeq
 
 def load(filename, codecname=''):
   """Loads an array from a given file path specified
