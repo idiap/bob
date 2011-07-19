@@ -40,6 +40,10 @@ import sphinx
 if sphinx.__version__ >= "1.0":
   extensions.append('sphinx.ext.viewcode')
 
+# If we are on OSX, the 'dvipng' path maybe different
+dvipng_osx = '/opt/local/libexec/texlive/binaries/dvipng'
+if os.path.exists(dvipng_osx): pngmath_dvipng = dvipng_osx
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

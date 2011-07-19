@@ -40,8 +40,8 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
 {
   //opens the video file and wait for user input
 
-  if (m_height%2 != 0 || m_width%2 != 0) {
-    throw io::FFmpegException(m_filename.c_str(), "height and width must be multiples of 2");
+  if (m_height%2 != 0 || m_height == 0 || m_width%2 != 0 || m_width == 0) {
+    throw io::FFmpegException(m_filename.c_str(), "height and width must be non-zero multiples of 2");
   }
 
   // auto detects the output format from the name. default is mpeg.

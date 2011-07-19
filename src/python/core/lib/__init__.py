@@ -53,7 +53,6 @@ def version_table():
   retval['numpy'] = numpy_version()
   retval['ffmpeg'] = ';'.join(['-'.join(k) for k in ffmpeg_version()])
   retval['image magick'] = magick_version()
-  retval['libxml2'] = libxml2_version()
   retval['matio'] = matio_version()
 
   return retval

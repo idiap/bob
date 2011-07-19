@@ -144,3 +144,6 @@ set_property(TEST python-db-xm2vts-dumplist2 APPEND PROPERTY DEPENDS
 torch_python_add_test(python-db-iris-lda-example
   ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_lda.py --self-test)
 torch_example_install("python" "db" example/iris_lda.py)
+torch_python_add_test(python-db-iris-mlp-example
+  ${CMAKE_CURRENT_SOURCE_DIR}/example/iris_mlp.py --self-test)
+torch_example_install("python" "db" example/iris_mlp.py)

@@ -17,6 +17,7 @@ set(src
     "src/TwoDPCATrainer.cc"
     "src/DataShuffler.cc"
     "src/MLPRPropTrainer.cc"
+    "src/MLPBackPropTrainer.cc"
 )
 
 include(../../cmake/macros.cmake)

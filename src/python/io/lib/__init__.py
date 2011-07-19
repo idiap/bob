@@ -107,7 +107,7 @@ def arrayset_cat(self, firstDim=False):
   .. warning::
     This method will only work as long as the resulting blitz::Array number of
     dimensions is supported. Currently this means that self.shape has to have
-    lenght 3 or less. If the Array data is 4D, the resulting blitz Array would
+    length 3 or less. If the Array data is 4D, the resulting blitz Array would
     have to be 5D and that is not currently supported.
   """
   exec 'from ..core.array import %s_%s as cls' % \
