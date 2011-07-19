@@ -8,6 +8,7 @@ void bind_machine_activation();
 void bind_machine_linear();
 void bind_machine_mlp();
 void bind_machine_linear_scoring();
+void bind_machine_ztnorm();
 
 BOOST_PYTHON_MODULE(libpytorch_machine)
 {
@@ -23,4 +24,5 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   bind_machine_linear();
   bind_machine_mlp();
   bind_machine_linear_scoring();
+  bind_machine_ztnorm();
 }
