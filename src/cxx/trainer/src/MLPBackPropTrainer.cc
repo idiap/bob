@@ -185,7 +185,7 @@ void train::MLPBackPropTrainer::forward_step() {
 void train::MLPBackPropTrainer::backward_step() {
   size_t batch_size = m_target.extent(0);
   //last layer
-  m_error[m_H] = m_output.back() - m_target;
+  m_error[m_H] = m_target - m_output.back();
   for (int i=0; i<(int)batch_size; ++i) { //for every example
     for (int j=0; j<m_error[m_H].extent(1); ++j) { //for all variables
       m_error[m_H](i,j) *= m_bwdfun(m_output[m_H+1](i,j));
@@ -204,10 +204,11 @@ void train::MLPBackPropTrainer::backward_step() {
 }
 
 void train::MLPBackPropTrainer::backprop_weight_update() {
+  size_t batch_size = m_target.extent(0);
   for (size_t k=0; k<m_weight_ref.size(); ++k) { //for all layers
     math::prod_(m_output[k].transpose(1,0), m_error[k], m_delta[k]);
-    m_delta[k] = m_learning_rate * m_delta[k] / m_error[k].extent(0);
-    m_weight_ref[k] -= ((1-m_momentum)*m_delta[k]) + 
+    m_delta[k] *= m_learning_rate / batch_size;
+    m_weight_ref[k] += ((1-m_momentum)*m_delta[k]) + 
       (m_momentum*m_prev_delta[k]);
     m_prev_delta[k] = m_delta[k];
 
@@ -221,7 +222,7 @@ void train::MLPBackPropTrainer::backprop_weight_update() {
     blitz::secondIndex J;
     m_delta_bias[k] = m_learning_rate * 
       blitz::mean(m_error[k].transpose(1,0), J);
-    m_bias_ref[k] -= ((1-m_momentum)*m_delta_bias[k]) + 
+    m_bias_ref[k] += ((1-m_momentum)*m_delta_bias[k]) + 
       (m_momentum*m_prev_delta_bias[k]);
     m_prev_delta_bias[k] = m_delta_bias[k];
   }

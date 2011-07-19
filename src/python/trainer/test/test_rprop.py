@@ -203,21 +203,21 @@ class RPropTest(unittest.TestCase):
 
     # trains with our C++ implementation
     trainer.train_(machine, d0, t0)
-    self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
+    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
 
     # a second passage
     d0 = torch.core.array.array([[4., 0., -3., 1.]])
     t0 = torch.core.array.array([[2.]])
     pytrainer.train(pymachine, d0, t0)
     trainer.train_(machine, d0, t0)
-    self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
+    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
 
     # a third passage
     d0 = torch.core.array.array([[-0.5, -9.0, 2.0, 1.1]])
     t0 = torch.core.array.array([[3.]])
     pytrainer.train(pymachine, d0, t0)
     trainer.train_(machine, d0, t0)
-    self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
+    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
 
   def test03_FisherNoBias(self):
     
@@ -257,7 +257,7 @@ class RPropTest(unittest.TestCase):
       trainer.train_(machine, input, target)
       #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
+      self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
 
   def test04_Fisher(self):
     
@@ -296,8 +296,8 @@ class RPropTest(unittest.TestCase):
       trainer.train_(machine, input, target)
       #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( (pymachine.weights[0] == machine.weights[0]).all() )
-      self.assertTrue( (pymachine.biases[0] == machine.biases[0]).all() )
+      self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
+      self.assertTrue( pymachine.biases[0].numeq(machine.biases[0]) )
 
   def test05_FisherWithOneHiddenLayer(self):
 
@@ -336,9 +336,9 @@ class RPropTest(unittest.TestCase):
       #print "[Python] |RMSE|:", torch.math.norm(torch.measure.rmse(pymachine(input), target))
       #print "[C++] |RMSE|:", torch.math.norm(torch.measure.rmse(machine(input), target))
       for i, w in enumerate(pymachine.weights):
-        self.assertTrue( (w == machine.weights[i]).all() )
+        self.assertTrue( w.numeq(machine.weights[i]) )
       for i, b in enumerate(pymachine.biases):
-        self.assertTrue( (b == machine.biases[i]).all() )
+        self.assertTrue( b.numeq(machine.biases[i]) )
 
   def test06_FisherMultiLayer(self):
 
@@ -377,9 +377,9 @@ class RPropTest(unittest.TestCase):
       #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
       for i, w in enumerate(pymachine.weights):
-        self.assertTrue( (w == machine.weights[i]).all() )
+        self.assertTrue( w.numeq(machine.weights[i]) )
       for i, b in enumerate(pymachine.biases):
-        self.assertTrue( (b == machine.biases[i]).all() )
+        self.assertTrue( b.numeq(machine.biases[i]) )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
