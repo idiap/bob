@@ -7,6 +7,7 @@
 replay attack database in the most obvious ways.
 """
 
+import os
 from .. import utils
 from .models import *
 from . import dbname
@@ -69,7 +70,6 @@ class Database(object):
       return l
 
     def make_path(stem, directory, extension):
-      import os
       if not extension: extension = ''
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
@@ -104,6 +104,51 @@ class Database(object):
 
     return retval
 
+  def paths(self, ids, prefix='', suffix=''):
+    """Returns a full file paths considering particular file ids, a given
+    directory and an extension
+    
+    Keyword Parameters:
+
+    id
+      The ids of the object in the database table "file". This object should be
+      a python iterable (such as a tuple or list).
+
+    prefix
+      The bit of path to be prepended to the filename stem
+
+    suffix
+      The extension determines the suffix that will be appended to the filename
+      stem.
+
+    Returns a list (that may be empty) of the fully constructed paths given the
+    file ids.
+    """
+    fobj = self.session.query(File).filter(File.id.in_(ids))
+    retval = []
+    for p in ids:
+      retval.extend([os.path.join(prefix, str(k.path) + suffix) 
+        for k in fobj if k.id == p])
+    return retval
+
+  def reverse(self, paths):
+    """Reverses the lookup: from certain stems, returning file ids
+    
+    Keyword Parameters:
+
+    paths
+      The filename stems I'll query for. This object should be a python
+      iterable (such as a tuple or list)
+
+    Returns a list (that may be empty).
+    """
+
+    fobj = self.session.query(File).filter(File.path.in_(paths))
+    retval = []
+    for p in paths:
+      retval.extend([k.id for k in fobj if k.path == p])
+    return retval
+
   def save_one(self, id, obj, directory, extension):
     """Saves a single object supporting the torch save() protocol.
 
@@ -127,7 +172,6 @@ class Database(object):
       The extension determines the way each of the arrays will be saved.
     """
 
-    import os
     fobj = self.session.query(File).filter_by(id=id).one()
     fullpath = os.path.join(directory, str(fobj.path) + extension)
     fulldir = os.path.dirname(fullpath)
