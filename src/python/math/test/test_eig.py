@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Andre Anjos <laurent.el-shafey@idiap.ch>
+# Andre Anjos <andre.anjos@idiap.ch>
+# Laurent El Shafey <laurent.el-shafey@idiap.ch>
 
 """Tests Torch eigenvalue decomposition.
 """
@@ -94,4 +95,3 @@ if __name__ == '__main__':
       os.environ['TORCH_PROFILE'] and \
       hasattr(torch.core, 'ProfilerStop'):
     torch.core.ProfilerStop()
-

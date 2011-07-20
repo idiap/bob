@@ -311,6 +311,67 @@ namespace Torch { namespace math {
     normalize_(i, o);
   }
 
-} }
+  /**
+   * Generates an eye 2D matrix. If the matrix is squared, then it returns the 
+   * identity matrix.
+   *
+   * @warning No checks are performed on the array and is recommended
+   * only in scenarios where you have previously checked conformity and is
+   * focused only on speed.
+   *
+   * @param A The 2D destination matrix (size MxN)
+   */
+  template<typename T>
+    void eye_(blitz::Array<T,2>& A) {
+      A = 0.;
+      for(int i=0; i<std::min(A.extent(0), A.extent(1)); ++i)
+        A(i,i) = 1.;
+    }
+
+  /**
+   * Generates an eye 2D matrix. If the matrix is squared, then it returns the 
+   * identity matrix.
+   *
+   * @param A The 2D destination matrix (size MxN)
+   */
+  template<typename T>
+    void eye(blitz::Array<T,2>& A) {
+      Torch::core::array::assertZeroBase(A);
+      eye_(A);
+    }
+
+  /**
+   * Generates a 2D square diagonal matrix from a 1D vector.
+   *
+   * @warning No checks are performed on the array sizes and is recommended
+   * only in scenarios where you have previously checked conformity and is
+   * focused only on speed.
+   *
+   * @param d The 1D vector which contains the diagonal (size N)
+   * @param A The 2D destination matrix (size NxN)
+   */
+  template<typename T>
+    void diag_(const blitz::Array<T,1>& d, blitz::Array<T,2>& A) {
+      A = 0.;
+      for(int i=0; i<A.extent(0); ++i)
+        A(i,i) = d(i);
+    }
+
+  /**
+   * Generates a 2D square diagonal matrix from a 1D vector.
+   *
+   * @param d The 1D vector which contains the diagonal (size N)
+   * @param A The 2D destination matrix (size MxN)
+   */
+  template<typename T>
+    void diag(const blitz::Array<T,1>& d, blitz::Array<T,2>& A) {
+      Torch::core::array::assertZeroBase(d);
+      Torch::core::array::assertZeroBase(A);
+      Torch::core::array::assertSameDimensionLength(d.extent(0),A.extent(0));
+      Torch::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
+      diag_(d, A);
+    }
+
+}}
 
 #endif /* TORCH_MATH_LINEAR_H */

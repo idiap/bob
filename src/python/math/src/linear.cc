@@ -27,6 +27,10 @@ static const char* NORM_DOC = "Normalizes a vector 'i' and outputs the normalize
 static const char* NORM_DOC_ = "Normalizes a vector 'i' and outputs the normalized vector in 'o'. Sizes are NOT checked.";
 static const char* NORM_DOC_SELF = "Normalizes a vector 'i' and outputs the normalized vector vector 'i' (i.e., the same input vector).";
 static const char* EUCL_NORM_DOC = "Computes the Euclidean norm of a vector 'i'.";
+static const char* EYE_DOC = "Generates an eye 2D matrix. Sizes are checked (to avoid the check, use the _ variants).";
+static const char* EYE_DOC_ = "Generates an eye 2D matrix. Sizes are NOT checked.";
+static const char* DIAG_DOC = "Generates a diagonal 2D matrix from a 1D vector. Sizes are checked (to avoid the check, use the _ variants).";
+static const char* DIAG_DOC_ = "Generates a diagonal 2D matrix from a 1D vector. Sizes are NOT checked.";
 
 template<typename T1, typename T2, typename T3> 
 static blitz::Array<T3,2> r_prod_mm(const blitz::Array<T1,2>& A, const blitz::Array<T2,2>& B) {
@@ -60,6 +64,27 @@ template<typename T>
 static blitz::Array<T,1> r_normalize(const blitz::Array<T,1>& i) {
   blitz::Array<T,1> o(i.shape());
   math::normalize_(i, o);
+  return o;
+}
+/*
+template<typename T>
+static blitz::Array<T,2> r1_eye(const int m) {
+  blitz::Array<T,2> o(m,m);
+  math::eye_(o);
+  return o;
+}
+
+template<typename T>
+static blitz::Array<T,2> r2_eye(const int m, const int n) {
+  blitz::Array<T,2> o(m,n);
+  math::eye_(o);
+  return o;
+}
+*/
+template<typename T>
+static blitz::Array<T,2> r_diag(const blitz::Array<T,1>& i) {
+  blitz::Array<T,2> o(i.extent(0), i.extent(0));
+  math::diag(i, o); //Required to check zero base input
   return o;
 }
 
@@ -107,6 +132,16 @@ template<typename T1, typename T2, typename T3> void def_linear() {
 
   //self normalization
   def("normalizeSelf", &Torch::math::normalizeSelf<T1>, (arg("input")), NORM_DOC_SELF);
+
+  //eye
+  def("eye_", (void (*)(blitz::Array<T1,2>&))&Torch::math::eye_, (arg("A")), EYE_DOC_);
+  def("eye", (void (*)(blitz::Array<T1,2>&))&Torch::math::eye, (arg("A")), EYE_DOC);
+  //def("eye", &r1_eye<T1>, (arg("A")), EYE_DOC); // TODO: pass type
+
+  //diag
+  def("diag_", (void (*)(const blitz::Array<T1,1>&, blitz::Array<T1,2>&))&Torch::math::diag_, (arg("d"), arg("A")), DIAG_DOC_);
+  def("diag", (void (*)(const blitz::Array<T1,1>&, blitz::Array<T1,2>&))&Torch::math::diag, (arg("d"), arg("A")), DIAG_DOC);
+  def("diag", &r_diag<T1>, (arg("d")), DIAG_DOC); 
 
 }
 
