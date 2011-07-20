@@ -15,4 +15,4 @@ add_subdirectory(ip)
 add_subdirectory(math)
 add_subdirectory(machine)
 add_subdirectory(trainer)
-
+#add_subdirectory(visioner)
