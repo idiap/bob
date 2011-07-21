@@ -19,6 +19,13 @@ import db
 import machine
 import trainer
 
+try:
+  # the visioner may not be built if Qt4 is not installed
+  import visioner
+  has_visioner = True
+except ImportError:
+  has_visioner = False
+
 sys.setdlopenflags(default_flags)
 del default_flags
 
@@ -34,3 +41,5 @@ __all__ = [
     'machine',
     'trainer'
     ]
+
+if has_visioner: __all__.append('visioner')
