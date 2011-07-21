@@ -12,6 +12,18 @@ include(../../cmake/macros.cmake)
 # comes from an external build.
 find_library(torch_visioner torch_visioner)
 torch_python_bindings(visioner "${pysrc}" "" ${torch_visioner})
+
+# The visioner expects a flat directory structure
+get_target_property(save pytorch_visioner COMPILE_FLAGS)
+if(NOT save)
+  set(save "")
+endif(NOT save)
+set(baseinc ${CMAKE_INSTALL_PREFIX}/include/torch/visioner)
+set_target_properties(pytorch_visioner PROPERTIES COMPILE_FLAGS "${save} -I${baseinc}/vision -I${baseinc}/ml -I${baseinc}/proc -I${baseinc}/util")
+
+# Visioner depends on Qt4
+include (${QT_USE_FILE})
+
 add_dependencies(pytorch_visioner core-array-python_header_install visioner)
 torch_python_install(visioner)
   
