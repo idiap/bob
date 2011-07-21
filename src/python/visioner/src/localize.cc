@@ -53,6 +53,15 @@ static tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
   return make_tuple(bbox, tmp);
 }
 
+static tuple load_model(const std::string& filename) {
+  visioner::Model model;
+	visioner::param_t param;
+  if (visioner::load_model(param, model, filename) == false) {				
+    PYTHON_ERROR(IOError, "failed to load the model");
+	}
+  return make_tuple(model, param);
+}
+
 void bind_visioner_localize() {
   //opaque, just needs to pass around.
   class_<visioner::Model, boost::shared_ptr<visioner::Model> >("Model",
@@ -68,6 +77,8 @@ void bind_visioner_localize() {
     .def("load", &load, (arg("image")), "Loads an int16 2D array into the scanner. You must convert the image to a 16-bit integer representation first.")
     ;
 
-  def("locate", &locate, (arg("cmodel"), arg("lmodel"), arg("levels"),
-        arg("cscanner"), arg("lscanner")), "Locates faces on an image preloaded by the scanners. Returns a tuple with the detected region and all detected landmarks");
+  def("locate", &locate, (arg("class_model"), arg("loc_model"), arg("levels"),
+        arg("class_scanner"), arg("loc_scanner")), "Locates faces on an image preloaded by the (classification and localization) scanners. Returns a tuple with the detected region and all detected landmarks");
+
+  def("load_model", &load_model, (arg("filename")), "Loads the model and parameters from a given file");
 }
