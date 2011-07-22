@@ -3,11 +3,11 @@
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Fri 22 Jul 2011 15:05:48 CEST
  *
- * Custom to/from C++ conversion for std::map
+ * Custom to/from C++ conversion for std::map with std::string keys
  */
 
-#ifndef TORCH_CORE_PYTHON_MAP_H 
-#define TORCH_CORE_PYTHON_MAP_H
+#ifndef TORCH_CORE_PYTHON_MAPSTRING_H 
+#define TORCH_CORE_PYTHON_MAPSTRING_H
 
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>
@@ -21,7 +21,7 @@ namespace Torch { namespace python {
    * Main method to defined bindings for std::map<std::string,T>. Please note that the
    * type T should have a defined operator==() in explicit or implicit way.
    */
-  template <typename T> void map(const char* basename) {
+  template <typename T> void mapstring(const char* basename) {
 
     //defines basic bindings for methods manipulating std::map<std::string, T>.
     boost::python::class_<std::map<std::string, T> >(basename)
@@ -44,7 +44,7 @@ namespace Torch { namespace python {
       }
   };
 
-  template <typename T> void map_no_compare(const char* basename) {
+  template <typename T> void mapstring_no_compare(const char* basename) {
 
     //defines basic bindings for methods manipulating std::maps.
     boost::python::class_<std::map<std::string, T> >(basename)

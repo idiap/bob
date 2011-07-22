@@ -9,15 +9,15 @@
 
 using namespace boost::python;
 
-void bind_core_maps();
-void bind_core_arraymaps();
+void bind_core_mapstrings();
+void bind_core_arraymapstrings();
 
-BOOST_PYTHON_MODULE(libpytorch_core_map) {
+BOOST_PYTHON_MODULE(libpytorch_core_mapstring) {
   docstring_options docopt; 
 # if !defined(TORCH_DEBUG)
   docopt.disable_cpp_signatures();
 # endif
-  scope().attr("__doc__") = "Torch core classes and sub-classes for std::map manipulation from python";
-  bind_core_maps();
-  bind_core_arraymaps();
+  scope().attr("__doc__") = "Torch core classes and sub-classes for std::map manipulation with std::string keys from python";
+  bind_core_mapstrings();
+  bind_core_arraymapstrings();
 }
