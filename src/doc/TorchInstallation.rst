@@ -45,8 +45,6 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `HDF5`_              | 1.8.4        | BSD-style                          | 
 +----------------------+--------------+------------------------------------+
-| `MatIO`_             | 1.3.3?       | LGPLv2.1                           | 
-+----------------------+--------------+------------------------------------+
 | `argparse`_          | 1.1?         | PSF License (BSD-style)            | 
 +----------------------+--------------+------------------------------------+
 | **Building and Debugging Dependencies** (not required for runtime)       | 
@@ -73,6 +71,12 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `Tables`_            | -            | BSD License                        |
 +----------------------+--------------+------------------------------------+
+| **Optional Software** (if present, compiles more extensions)             | 
++----------------------+--------------+------------------------------------+
+| `MatIO`_             | 1.3.3?       | LGPLv2.1 (.mat array/set support)  | 
++----------------------+--------------+------------------------------------+
+| `Qt4`_               | 4.7?         | **LGPLv2**, GPLv3 (face localiz.)  |
++----------------------+--------------+------------------------------------+
 
 
 Description |project| Dependencies
@@ -94,7 +98,8 @@ We maintain nightly builds and unit tests that cover the following platforms:
 * **Linux**: tested on Ubuntu 11.04 and it should work without problems on
   other distributions as long as you satisfy the dependencies listed bellow.
 * **Mac OSX**: tested on Snow Leopard (10.6), with `MacPorts`_, but it should
-  work fine on other OSX versions as well or using `Fink`_ instead.
+  work fine on other OSX versions as well or using `Fink`_ instead as long as
+  you install all required dependencies.
 
 If you find problems with a particular OS version, please `submit a new bug
 report`_ so we can try to help you.
@@ -119,6 +124,9 @@ Core dependencies
   Python 2.5 or up;
 * `NumPy`_: this dependence is used to bind blitz::Arrays to python.
 * `Matplotlib`_: A matlab-like python plotting environment
+* `Qt4`_: This library is used as the basis for the face detection and
+  localization framework (Visioner). This dependence is optional. Face
+  localization and detection will only be compiled if you have that installed.
 
 Data access
 ===========
@@ -420,3 +428,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _argparse: http://code.google.com/p/argparse/
 .. _sqlalchemy: http://www.sqlalchemy.org/
 .. _dvipng: http://savannah.nongnu.org/projects/dvipng/
+.. _qt4: http://qt.nokia.com/ 
