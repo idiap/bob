@@ -125,7 +125,7 @@ static void gamma_distribution(const char* vartype) {
 
 template <typename T, typename I, typename Engine>
 static void binomial_distribution(const char* vartype) {
-  typedef boost::binomial_distribution<T, I> D;
+  typedef boost::binomial_distribution<I, T> D;
 
   boost::format name("binomial_%s");
   name % vartype;
