@@ -25,10 +25,10 @@ class Localizer:
 
     self.cmodel, self.cparam = load_model(cmodel_file)
     self.cparam.ds = scale_var
-    self.cscanner = SWScanner(cparam)
+    self.cscanner = SWScanner(self.cparam)
     self.lmodel, self.lparam = load_model(lmodel_file)
     self.lparam.ds = scale_var
-    self.lscanner = SWScanner(lparam)
+    self.lscanner = SWScanner(self.lparam)
     self.scan_levels = scan_levels
 
   def __call__(self, grayimage):
