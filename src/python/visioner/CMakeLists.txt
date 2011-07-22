@@ -8,7 +8,7 @@ set(pysrc
 
 include(../../cmake/macros.cmake)
 
-torch_python_bindings(visioner "${pysrc}" "" "torch_visioner")
+torch_python_bindings(visioner "${pysrc}" "core" "torch_visioner")
 
 # The visioner expects a flat directory structure
 get_target_property(save pytorch_visioner COMPILE_FLAGS)
