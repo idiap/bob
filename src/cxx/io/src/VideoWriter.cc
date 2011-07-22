@@ -116,7 +116,7 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
   if (!(m_oformat_ctxt->flags & AVFMT_NOFILE)) {
 #   if LIBAVFORMAT_VERSION_INT >= 0x346e00 && LIBAVFORMAT_VERSION_INT < 0x350400
     if (avio_open(&m_format_ctxt->pb, m_filename.c_str(), URL_WRONLY) < 0) 
-#   elif LIBAVFORMAT_VERSION >= 0x350400
+#   elif LIBAVFORMAT_VERSION_INT >= 0x350400
     if (avio_open(&m_format_ctxt->pb, m_filename.c_str(), AVIO_FLAG_WRITE) < 0) 
 #   else
     if (url_fopen(&m_format_ctxt->pb, m_filename.c_str(), URL_WRONLY) < 0) 

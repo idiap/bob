@@ -12,8 +12,8 @@ import time
 import unittest
 import torch
 
-OBJ_CLASSIF_MODEL = "data/"
-KEYP_LOC_MODEL = "data/"
+OBJ_CLASSIF_MODEL = "data/Face.MCT9"
+KEYP_LOC_MODEL = "data/Facial.MCT9.TMaxBoost"
 TEST_VIDEO = "../../io/test/data/test.mov"
 
 class LocalizationTest(unittest.TestCase):
