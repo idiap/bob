@@ -5,6 +5,7 @@
  * @brief Machine exception bindings
  */
 
+#include <Python.h>
 #include "machine/Exception.h"
 #include "machine/EigenMachineException.h"
 #include "core/python/exception.h"

@@ -53,7 +53,7 @@ namespace Torch { namespace machine {
     if (test_channelOffset == NULL) {
       for(int t = 0; t < Tt; t++) {
         for(int s = 0; s < S; s++) {
-          B(s, t) = test_stats[t]->sumPx(s/C, s%C) - (ubm_meanSupervector(s) * test_stats[t]->n(s/Dx));
+          B(s, t) = test_stats[t]->sumPx(s/Dx, s%Dx) - (ubm_meanSupervector(s) * test_stats[t]->n(s/Dx));
         }
       }
     }
@@ -63,7 +63,7 @@ namespace Torch { namespace machine {
       
       for(int t = 0; t < Tt; t++) {
         for(int s = 0; s < S; s++) {
-          B(s, t) = test_stats[t]->sumPx(s/C, s%C) - (test_stats[t]->n(s/Dx) * (ubm_meanSupervector(s) + (*test_channelOffset)(t,s)));
+          B(s, t) = test_stats[t]->sumPx(s/Dx, s%Dx) - (test_stats[t]->n(s/Dx) * (ubm_meanSupervector(s) + (*test_channelOffset)(t,s)));
         }
       }
     }

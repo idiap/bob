@@ -45,8 +45,6 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `HDF5`_              | 1.8.4        | BSD-style                          | 
 +----------------------+--------------+------------------------------------+
-| `MatIO`_             | 1.3.3?       | LGPLv2.1                           | 
-+----------------------+--------------+------------------------------------+
 | `argparse`_          | 1.1?         | PSF License (BSD-style)            | 
 +----------------------+--------------+------------------------------------+
 | **Building and Debugging Dependencies** (not required for runtime)       | 
@@ -73,6 +71,12 @@ specific platforms.
 +----------------------+--------------+------------------------------------+
 | `Tables`_            | -            | BSD License                        |
 +----------------------+--------------+------------------------------------+
+| **Optional Software** (if present, compiles more extensions)             | 
++----------------------+--------------+------------------------------------+
+| `MatIO`_             | 1.3.3?       | LGPLv2.1 (.mat array/set support)  | 
++----------------------+--------------+------------------------------------+
+| `Qt4`_               | 4.7?         | **LGPLv2**, GPLv3 (face localiz.)  |
++----------------------+--------------+------------------------------------+
 
 
 Description |project| Dependencies
@@ -94,7 +98,8 @@ We maintain nightly builds and unit tests that cover the following platforms:
 * **Linux**: tested on Ubuntu 11.04 and it should work without problems on
   other distributions as long as you satisfy the dependencies listed bellow.
 * **Mac OSX**: tested on Snow Leopard (10.6), with `MacPorts`_, but it should
-  work fine on other OSX versions as well or using `Fink`_ instead.
+  work fine on other OSX versions as well or using `Fink`_ instead as long as
+  you install all required dependencies.
 
 If you find problems with a particular OS version, please `submit a new bug
 report`_ so we can try to help you.
@@ -119,6 +124,9 @@ Core dependencies
   Python 2.5 or up;
 * `NumPy`_: this dependence is used to bind blitz::Arrays to python.
 * `Matplotlib`_: A matlab-like python plotting environment
+* `Qt4`_: This library is used as the basis for the face detection and
+  localization framework (Visioner). This dependence is optional. Face
+  localization and detection will only be compiled if you have that installed.
 
 Data access
 ===========
@@ -205,7 +213,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev
 
 .. note::
 
@@ -232,7 +240,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng
+   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev
 
 .. warning::
 
@@ -261,8 +269,13 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse boost +python26 
-   $ # go for a long coffee ('atlas' may take up to 12 hours to install!)
+   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas
+   $ # go for a long coffee 
+
+.. note::
+
+  It is possible to install the base software without compiling the atlas
+  libraries. To do so, manually
 
 You can also install git if you want to submit patches to us:
 
@@ -420,3 +433,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _argparse: http://code.google.com/p/argparse/
 .. _sqlalchemy: http://www.sqlalchemy.org/
 .. _dvipng: http://savannah.nongnu.org/projects/dvipng/
+.. _qt4: http://qt.nokia.com/ 

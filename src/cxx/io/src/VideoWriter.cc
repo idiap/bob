@@ -5,6 +5,19 @@
  * Implementation of a video writer based on ffmpeg, from example output
  * program:
  * http://cekirdek.pardus.org.tr/~ismail/ffmpeg-docs/output-example_8c-source.html.
+ *
+ * FFMpeg versions for your reference
+ * ffmpeg | avformat | avcodec  | avutil  | swscale | old style | swscale GPL?
+ * =======+==========+==========+=========+=========+===========+==============
+ * 0.5    | 52.31.0  | 52.20.0  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.5.1  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.5.2  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.5.3  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.6    | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
+ * 0.6.1  | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
+ * 0.7    | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
+ * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
+ * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
  */
 
 #include <boost/format.hpp>
@@ -85,8 +98,8 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
   m_video_stream = add_video_stream();
 
   // Sets parameters of output video file
-  // ffmpeg 0.7 and above [libavformat 53.0.0 = 0x350000] does not require that
-# if LIBAVFORMAT_VERSION_INT < 0x350000
+  // ffmpeg 0.7 and above [libavformat 52.110.0 = 0x346e00] doesn't require it
+# if LIBAVFORMAT_VERSION_INT < 0x346e00
   // sets the output parameters (must be done even if no parameters).
   if (av_set_parameters(m_format_ctxt, NULL) < 0) {
     throw io::FFmpegException(m_filename.c_str(), "invalid output parameters");
@@ -101,7 +114,9 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
 
   // opens the output file, if needed
   if (!(m_oformat_ctxt->flags & AVFMT_NOFILE)) {
-#   if LIBAVFORMAT_VERSION_INT >= 0x350000
+#   if LIBAVFORMAT_VERSION_INT >= 0x346e00 && LIBAVFORMAT_VERSION_INT < 0x350400
+    if (avio_open(&m_format_ctxt->pb, m_filename.c_str(), URL_WRONLY) < 0) 
+#   elif LIBAVFORMAT_VERSION_INT >= 0x350400
     if (avio_open(&m_format_ctxt->pb, m_filename.c_str(), AVIO_FLAG_WRITE) < 0) 
 #   else
     if (url_fopen(&m_format_ctxt->pb, m_filename.c_str(), URL_WRONLY) < 0) 
@@ -112,7 +127,7 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
   }
 
   // writes the stream header, if any
-# if LIBAVFORMAT_VERSION_INT >= 0x350000
+# if LIBAVFORMAT_VERSION_INT >= 0x346e00
   avformat_write_header(m_format_ctxt, NULL);
 # else
   av_write_header(m_format_ctxt);
@@ -156,7 +171,7 @@ void io::VideoWriter::close() {
 
   // closes the output file
   if (m_oformat_ctxt != 0 && !(m_oformat_ctxt->flags & AVFMT_NOFILE)) 
-#   if LIBAVFORMAT_VERSION_INT >= 0x350000
+#   if LIBAVFORMAT_VERSION_INT >= 0x346e00
     avio_close(m_format_ctxt->pb);
 #   else
     url_fclose(m_format_ctxt->pb);

@@ -125,7 +125,7 @@ static void gamma_distribution(const char* vartype) {
 
 template <typename T, typename I, typename Engine>
 static void binomial_distribution(const char* vartype) {
-  typedef boost::binomial_distribution<T, I> D;
+  typedef boost::binomial_distribution<I, T> D;
 
   boost::format name("binomial_%s");
   name % vartype;
@@ -167,6 +167,6 @@ void bind_core_random () {
   lognormal_distribution<double, boost::mt19937>("float64");
   gamma_distribution<float, boost::mt19937>("float32");
   gamma_distribution<double, boost::mt19937>("float64");
-  binomial_distribution<float, uint64_t, boost::mt19937>("float32");
-  binomial_distribution<double, uint64_t, boost::mt19937>("float64");
+  binomial_distribution<float, int64_t, boost::mt19937>("float32");
+  binomial_distribution<double, int64_t, boost::mt19937>("float64");
 }
