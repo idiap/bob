@@ -5,6 +5,7 @@
  * @brief Math exception bindings
  */
 
+#include <Python.h>
 #include "math/Exception.h"
 #include "core/python/exception.h"
 

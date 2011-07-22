@@ -7,6 +7,7 @@
  * modules will benefit from it automatically.
  */
 
+#include <Python.h>
 #include "core/Exception.h"
 #include "core/array_exception.h"
 #include "core/convert_exception.h"
