@@ -269,8 +269,13 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg atlas python26 python_select gcc44 gcc_select py26-numpy matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse qt4-mac boost +python26 
-   $ # go for a long coffee ('atlas' may take up to 12 hours to install!)
+   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy +no_atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas
+   $ # go for a long coffee 
+
+.. note::
+
+  It is possible to install the base software without compiling the atlas
+  libraries. To do so, manually
 
 You can also install git if you want to submit patches to us:
 
