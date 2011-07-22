@@ -14,6 +14,7 @@
 #include "core/python/exception.h"
 
 #include "visioner/proc/localization.h"
+#include "visioner/proc/detection.h"
 
 using namespace boost::python;
 namespace array = Torch::core::array;
@@ -26,12 +27,25 @@ static void load(visioner::SWScanner& s,
   if (!err) PYTHON_ERROR(RuntimeError, "failed to load image at subwindow scanner");
 }
 
+static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
+    visioner::SWScanner& cscanner) {
+  // Locate keypoints
+  visioner::detections_t detections;
+  visioner::detect(cmodel[0], threshold, levels, cscanner, detections);
+
+  // Returns a tuple containing all detections
+  list tmp;
+  qreal x, y, width, height;
+  for (size_t i=0; i<detections.size(); ++i) {
+    detections[i].second.getRect(&x, &y, &width, &height);
+    tmp.append(make_tuple(x, y, width, height));
+  }
+  return tuple(tmp);
+}
+
 static tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
     size_t levels, visioner::SWScanner& cscanner, 
     visioner::SWScanner& lscanner) {
-  const visioner::fimage_info_t& iinfo = lscanner.iinfos()[0];
-  if (iinfo.m_objects.empty()) return tuple();
-
   // Locate keypoints
   visioner::points_t dt_points;
   visioner::rect_t dt_region;
@@ -76,6 +90,9 @@ void bind_visioner_localize() {
   class_<visioner::SWScanner, boost::shared_ptr<visioner::SWScanner> >("SWScanner", "Process the sub-windows of the given scaled images: (1) validated by the tagger or (2) processed by the model", init<visioner::param_t>((arg("parameters")), "Constructor"))
     .def("load", &load, (arg("image")), "Loads an int16 2D array into the scanner. You must convert the image to a 16-bit integer representation first.")
     ;
+
+  def("detect", &detect, (arg("class_model"), arg("threshold"), arg("levels"),
+        arg("class_scanner")), "Detects faces on an image preloaded by the (classification) scanners. Returns a tuple with the detected regions");
 
   def("locate", &locate, (arg("class_model"), arg("loc_model"), arg("levels"),
         arg("class_scanner"), arg("loc_scanner")), "Locates faces on an image preloaded by the (classification and localization) scanners. Returns a tuple with the detected region and all detected landmarks");

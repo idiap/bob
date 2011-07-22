@@ -434,3 +434,4 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _sqlalchemy: http://www.sqlalchemy.org/
 .. _dvipng: http://savannah.nongnu.org/projects/dvipng/
 .. _qt4: http://qt.nokia.com/ 
+.. _git: http://git-scm.com/
