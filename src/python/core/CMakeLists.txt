@@ -55,6 +55,12 @@ set(pysrc_vector
    "src/main_vector.cc"
    )
 
+set(pysrc_map
+   "src/map.cc"
+   "src/arraymap.cc"
+   "src/main_map.cc"
+   )
+
 set(pysrc_random
    "src/random.cc"
    "src/main_random.cc"
@@ -67,6 +73,7 @@ torch_header_install(core-array-python core "torch::python::core")
 torch_python_submodule_bindings(core array "${pysrc_array}")
 add_dependencies(pytorch_core_array core-array-python_header_install)
 torch_python_submodule_bindings(core vector "${pysrc_vector}")
+torch_python_submodule_bindings(core map "${pysrc_map}")
 torch_python_submodule_bindings(core random "${pysrc_random}")
 torch_python_install(core)
 
