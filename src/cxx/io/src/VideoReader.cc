@@ -5,6 +5,19 @@
  * something that torch can understand. This implementation is heavily based on
  * the excellent tutorial here: http://dranger.com/ffmpeg/, with some personal
  * modifications.
+ *
+ * FFMpeg versions for your reference
+ * ffmpeg | avformat | avcodec  | avutil  | swscale | old style | swscale GPL?
+ * =======+==========+==========+=========+=========+===========+==============
+ * 0.5    | 52.31.0  | 52.20.0  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.5.1  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.5.2  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.5.3  | 52.31.0  | 52.20.1  | 49.15.0 | 0.7.1   | yes       | yes
+ * 0.6    | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
+ * 0.6.1  | 52.64.2  | 52.72.2  | 50.15.1 | 0.11.0  | no        | no
+ * 0.7    | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
+ * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
+ * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
  */
 
 #include <stdexcept>
@@ -80,8 +93,8 @@ void io::VideoReader::open() {
   AVFormatContext* format_ctxt = 0;
 
   // Opens a video file
-  // ffmpeg 0.7 and above [libavformat 53.0.0 = 0x350000]
-# if LIBAVCODEC_VERSION_INT >= 0x350000
+  // ffmpeg 0.7 and above [libavformat 52.122.0 = 0x347a00]
+# if LIBAVCODEC_VERSION_INT >= 0x347a00
   if (avformat_open_input(&format_ctxt, m_filepath.c_str(), NULL, NULL) != 0) 
 # else
   if (av_open_input_file(&format_ctxt, m_filepath.c_str(), NULL, 0, NULL) != 0) 
@@ -276,7 +289,7 @@ void io::VideoReader::const_iterator::init() {
   //basic constructor, prepare readout
   // Opens a video file
   // ffmpeg 0.7 and above [libavformat 53.0.0 = 0x350000]
-# if LIBAVCODEC_VERSION_INT >= 0x350000
+# if LIBAVCODEC_VERSION_INT >= 0x347a00
   if (avformat_open_input(&m_format_ctxt, filename, NULL, NULL) != 0) 
 # else
   if (av_open_input_file(&m_format_ctxt, filename, NULL, 0, NULL) != 0) 
