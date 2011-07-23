@@ -78,7 +78,7 @@ static blitz::Array<uint8_t,3> videoreader_getitem (io::VideoReader& v, Py_ssize
  * Python wrapper to read multiple frames from a video sequence, allowing the
  * implementation of a __getitem__() functionality on VideoReader objects.
  */
-static blitz::Array<uint8_t,4> videoreader_getslice (io::VideoReader& v, slice sobj) {
+static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   size_t start = 0;
   PySliceObject* sl = (PySliceObject*)sobj.ptr();
   if (sl->start != Py_None) {
@@ -111,15 +111,16 @@ static blitz::Array<uint8_t,4> videoreader_getslice (io::VideoReader& v, slice s
   int length = (stop-start)/step;
   if (length == 0) length = 1; //a single return
 
-  blitz::Array<uint8_t,4> retval(length, 3, v.height(), v.width());
+  list retval;
   io::VideoReader::const_iterator it = v.begin();
   it += start;
-  blitz::Range a = blitz::Range::all();
   for (size_t i=start, j=0; i<stop; i+=step, ++j, it+=(step-1)) {
-    blitz::Array<uint8_t,3> ref = retval(j, a, a, a);
-    it.read(ref);
+    blitz::Array<uint8_t,3> tmp(3, v.height(), v.width());
+    it.read(tmp);
+    retval.append(tmp);
   }
-  return retval;
+ 
+  return tuple(retval);
 }
 
 static blitz::Array<uint8_t,4> videoreader_load(io::VideoReader& reader) {
