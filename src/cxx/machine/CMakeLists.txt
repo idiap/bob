@@ -20,6 +20,7 @@ set(src
     "src/MLPException.cc"
     "src/LinearScoring.cc"
     "src/ZTNorm.cc"
+    "src/JFAMachine.cc"
 )
 
 include(../../cmake/macros.cmake)

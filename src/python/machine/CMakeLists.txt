@@ -9,6 +9,7 @@ set(pysrc
    "src/mlp.cc"
    "src/linearscoring.cc"
    "src/ztnorm.cc"
+   "src/jfa.cc"
    "src/main.cc"
    )
 
