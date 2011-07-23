@@ -42,7 +42,7 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
     return l
 
-  def clients(self, protocol=None, groups=None, gender=None, language=None):
+  def clients(self, protocol=None, groups=None, gender=None, language=None, subworld=None):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
@@ -61,6 +61,11 @@ class Database(object):
       TODO: only English is currently supported
       The language spoken by the clients ("en",)
 
+    subworld
+      Specify a split of the world data ("onethird", "twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A list containing all the client ids which have the given
     properties.
     """
@@ -69,17 +74,34 @@ class Database(object):
     VALID_GROUPS = ('g1', 'g2', 'world')
     VALID_GENDERS = ('m', 'f')
     VALID_LANGUAGES = ('en',)
+    VALID_SUBWORLDS = ('onethird', 'twothirds')
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     gender = self.__check_validity__(gender, "gender", VALID_GENDERS)
     language = self.__check_validity__(language, "language", VALID_LANGUAGES)
-    # List of the clients
-    q = self.session.query(Client).filter(Client.sgroup.in_(groups)).\
-          filter(Client.gender.in_(gender)).\
-          filter(Client.language.in_(language)).\
-          order_by(Client.id)
+    subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
+
     retval = []
-    for id in [k.id for k in q]: 
-      retval.append(id)
+    # List of the clients
+    if "world" in groups:
+      if len(subworld)==1:
+        q = self.session.query(Client).join(Subworld).filter(Subworld.name.in_(subworld))
+      else:
+        q = self.session.query(Client).filter(Client.sgroup == 'world')
+      q = q.filter(Client.gender.in_(gender)).\
+            filter(Client.language.in_(language)).\
+          order_by(Client.id)
+      for id in [k.id for k in q]: 
+        retval.append(id)
+
+    if 'g1' in groups or 'g2' in groups:
+      q = self.session.query(Client).filter(Client.sgroup != 'world').\
+            filter(Client.sgroup.in_(groups)).\
+            filter(Client.gender.in_(gender)).\
+            filter(Client.language.in_(language)).\
+            order_by(Client.id)
+      for id in [k.id for k in q]: 
+        retval.append(id)
+
     return retval
 
   def models(self, protocol=None, groups=None):
@@ -149,7 +171,7 @@ class Database(object):
 
   def objects(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None, 
-      languages=None):
+      languages=None, subworld=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -191,6 +213,11 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
+    subworld
+      Specify a split of the world data ("onethird", "twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A dictionary containing:
       - 0: the resolved filenames 
       - 1: the model id
@@ -214,20 +241,26 @@ class Database(object):
     VALID_GROUPS = ('g1', 'g2', 'world')
     VALID_LANGUAGES = ('en', 'fr', 'sp')
     VALID_CLASSES = ('client', 'impostor')
+    VALID_SUBWORLDS = ('onethird', 'twothirds')
 
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     languages = self.__check_validity__(languages, "language", VALID_LANGUAGES)
     classes = self.__check_validity__(classes, "class", VALID_CLASSES)
+    subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
+
     retval = {}
 
     if(isinstance(model_ids,str)):
       model_ids = (model_ids,)
     
     if 'world' in groups:
-      q = self.session.query(File).join(Client).\
-            filter(Client.sgroup == 'world').\
+      if len(subworld) == 1:
+        q = self.session.query(File).join(Client).join(Subworld).filter(Subworld.name.in_(subworld))
+      else:
+        q = self.session.query(File).join(Client)
+      q = q.filter(Client.sgroup == 'world').\
             filter(Client.language.in_(languages))
       if model_ids:
         q = q.filter(File.claimed_id.in_(model_ids))
@@ -277,7 +310,7 @@ class Database(object):
 
   def files(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None, 
-      languages=None):
+      languages=None, subworld=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -319,6 +352,12 @@ class Database(object):
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
+    subworld
+      Specify a split of the world data ("onethird", "twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. Clients from other groups ("dev", "eval")
+      will in this case be ignored.
+
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
     for each file in the BANCA database. Conserve these numbers if you 
@@ -326,7 +365,7 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, languages)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, languages, subworld)
     for k in d: retval[k] = d[k][0]
 
     return retval

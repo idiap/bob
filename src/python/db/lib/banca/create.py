@@ -32,6 +32,41 @@ def add_files(session, imagedir):
   for filename in file_list:
     add_file(session, os.path.join(imagedir, filename), client_dict)
 
+def add_subworlds(session):
+  """Adds splits in the world set, based on the client ids"""
+  # one third
+  session.add(Subworld("onethird", 9003))
+  session.add(Subworld("onethird", 9005))
+  session.add(Subworld("onethird", 9027))
+  session.add(Subworld("onethird", 9033))
+  session.add(Subworld("onethird", 9035))
+  session.add(Subworld("onethird", 9043))
+  session.add(Subworld("onethird", 9049))
+  session.add(Subworld("onethird", 9053))
+  session.add(Subworld("onethird", 9055))
+  session.add(Subworld("onethird", 9057))
+  
+  # two thirds
+  session.add(Subworld("twothirds", 9001))
+  session.add(Subworld("twothirds", 9007))
+  session.add(Subworld("twothirds", 9009))
+  session.add(Subworld("twothirds", 9011))
+  session.add(Subworld("twothirds", 9013))
+  session.add(Subworld("twothirds", 9015))
+  session.add(Subworld("twothirds", 9017))
+  session.add(Subworld("twothirds", 9019))
+  session.add(Subworld("twothirds", 9021))
+  session.add(Subworld("twothirds", 9023))
+  session.add(Subworld("twothirds", 9025))
+  session.add(Subworld("twothirds", 9029))
+  session.add(Subworld("twothirds", 9031))
+  session.add(Subworld("twothirds", 9037))
+  session.add(Subworld("twothirds", 9039))
+  session.add(Subworld("twothirds", 9041))
+  session.add(Subworld("twothirds", 9045))
+  session.add(Subworld("twothirds", 9047))
+  session.add(Subworld("twothirds", 9051))
+  session.add(Subworld("twothirds", 9059))
 
 def add_sessions(session):
   """Adds relations between sessions and scenarios"""
@@ -120,6 +155,7 @@ def create_tables(args):
   engine = create_engine(args.location, echo=args.verbose)
   File.metadata.create_all(engine)
   Client.metadata.create_all(engine)
+  Subworld.metadata.create_all(engine)
   Session.metadata.create_all(engine)
   Protocol.metadata.create_all(engine)
 
@@ -143,6 +179,7 @@ def create(args):
   create_tables(args)
   s = session(args.dbname, echo=args.verbose)
   add_files(s, args.imagedir)
+  add_subworlds(s)
   add_sessions(s)
   add_protocols(s)
   s.commit()
