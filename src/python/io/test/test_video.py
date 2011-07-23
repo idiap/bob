@@ -76,12 +76,13 @@ class VideoTest(unittest.TestCase):
 
     # get frames 18 a 30 (exclusive), skipping 3: 18, 21, 24, 27
     f18_30 = v[18:30:3]
-    self.assertTrue(torch.core.array.is_blitz_array(f18_30))
-    self.assertEqual(f18_30.dimensions(), 4)
-    self.assertEqual(f18_30.shape(), (4, 3, 240, 320))
+    for k in f18_30:
+      self.assertTrue(torch.core.array.is_blitz_array(k))
+      self.assertEqual(k.dimensions(), 3)
+      self.assertEqual(k.shape(), (3, 240, 320))
 
     # the last frame in the sequence is frame 27 as you can check
-    self.assertEqual(f18_30[-1,:,:,:], f27)
+    self.assertEqual(f18_30[-1], f27)
 
   def test04_CanWriteVideo(self):
 
@@ -106,6 +107,16 @@ class VideoTest(unittest.TestCase):
       m = diff.mean()
       self.assertTrue(m < 3.0) # average difference is less than 3 gray levels
     os.unlink(OUTPUT_VIDEO)
+
+  def test05_CanUseArrayInterface(self):
+
+    # This shows you can use the array interface to read an entire video
+    # sequence in a single shot
+    array = torch.core.array.load(INPUT_VIDEO)
+    iv = torch.io.VideoReader(INPUT_VIDEO)
+   
+    for frame_id, frame in zip(range(array.extent(0)), iv.__iter__()):
+      self.assertTrue ( array[frame_id,:,:,:].numeq(frame) )
 
 if __name__ == '__main__':
   import sys
