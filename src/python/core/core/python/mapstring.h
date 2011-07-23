@@ -36,7 +36,6 @@ namespace Torch { namespace python {
    * This trick allows for maps in which the contained element does not
    * provide a operator==().
    */
-  // TODO
   template <class T> class no_compare_indexing_suite : public boost::python::map_indexing_suite<T, false, no_compare_indexing_suite<T> > {
     public:
       static bool contains(T &container, typename T::key_type const &key) { 
@@ -50,8 +49,7 @@ namespace Torch { namespace python {
     boost::python::class_<std::map<std::string, T> >(basename)
       .def(no_compare_indexing_suite<std::map<std::string, T> >());
 
-    //register the TODO: python::sequence to C++ std::map<std::string,T> auto conversion.
-    // TODO: from_python_dict ?
+    //register the python::dict to C++ std::map<std::string,T> auto conversion.
     from_python_dict<std::map<std::string,T> >();
 
   }
