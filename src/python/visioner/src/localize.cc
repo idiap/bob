@@ -61,7 +61,7 @@ static tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
   
   list tmp;
   for (size_t i=0; i<dt_points.size(); ++i) {
-    tmp.append(make_tuple(dt_points[i].x(), dt_points[i]));
+    tmp.append(make_tuple(dt_points[i].x(), dt_points[i].y()));
   }
 
   return make_tuple(bbox, tmp);
@@ -88,7 +88,7 @@ void bind_visioner_localize() {
     ;
 
   class_<visioner::SWScanner, boost::shared_ptr<visioner::SWScanner> >("SWScanner", "Process the sub-windows of the given scaled images: (1) validated by the tagger or (2) processed by the model", init<visioner::param_t>((arg("parameters")), "Constructor"))
-    .def("load", &load, (arg("image")), "Loads an int16 2D array into the scanner. You must convert the image to a 16-bit integer representation first.")
+    .def("load", &load, (arg("self"), arg("image")), "Loads an int16 2D array into the scanner. You must convert the image to a 16-bit integer representation first.")
     ;
 
   def("detect", &detect, (arg("class_model"), arg("threshold"), arg("levels"),

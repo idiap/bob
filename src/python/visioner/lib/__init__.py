@@ -37,9 +37,8 @@ class Detector:
   def __call__(self, grayimage):
     """Runs the detection machinery, returns bounding boxes"""
 
-    self.cmodel.load(grayimage)
-    self.lmodel.load(grayimage)
-    return detect(self.cmodel, self.threshold, self.scan_levels, self.lscanner)
+    self.cscanner.load(grayimage)
+    return detect(self.cmodel, self.threshold, self.scan_levels, self.cscanner)
 
 class Localizer:
   """A class that bridging the Visioner to torch so as to localize face in 
@@ -75,8 +74,8 @@ class Localizer:
   def __call__(self, grayimage):
     """Runs the localization machinery, returns points"""
 
-    self.cmodel.load(grayimage)
-    self.lmodel.load(grayimage)
+    self.cscanner.load(grayimage)
+    self.lscanner.load(grayimage)
     return locate(self.cmodel, self.lmodel, self.scan_levels, 
         self.cscanner, self.lscanner)
 
