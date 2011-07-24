@@ -11,7 +11,6 @@ import sys
 import unittest
 import torch
 
-OBJ_CLASSIF_MODEL = "data/Face.MCT9"
 TEST_VIDEO = "../../io/test/data/test.mov"
 
 class DetectionTest(unittest.TestCase):
@@ -20,7 +19,7 @@ class DetectionTest(unittest.TestCase):
   def test00_one(self):
 
     # scan_levels = 0, 8 scales
-    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL)
+    loc = torch.visioner.Detector()
     iv = torch.io.VideoReader(TEST_VIDEO)
 
     # do a gray-scale conversion for all frames and cast to int16
@@ -35,7 +34,7 @@ class DetectionTest(unittest.TestCase):
   def test01_Thourough(self):
 
     # scan_levels = 0, 8 scales
-    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL)
+    loc = torch.visioner.Detector()
     iv = torch.io.VideoReader(TEST_VIDEO)
 
     # do a gray-scale conversion for all frames and cast to int16
@@ -50,7 +49,7 @@ class DetectionTest(unittest.TestCase):
   def test02_Fast(self):
 
     # scan_levels = 3, 8 scales
-    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL, scan_levels=3)
+    loc = torch.visioner.Detector(scan_levels=3)
     iv = torch.io.VideoReader(TEST_VIDEO) #4D uint8 array
 
     # do a gray-scale conversion for all frames
@@ -65,7 +64,7 @@ class DetectionTest(unittest.TestCase):
   def xtest03_Faster(self):
 
     # scan_levels = 3, 4 scales
-    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL, scan_levels=3, scale_var=4)
+    loc = torch.visioner.Detector(scan_levels=3, scale_var=4)
     iv = torch.io.VideoReader(TEST_VIDEO) #4D uint8 array
 
     # do a gray-scale conversion for all frames

@@ -11,8 +11,6 @@ import sys
 import unittest
 import torch
 
-OBJ_CLASSIF_MODEL = "data/Face.MCT9"
-KEYP_LOC_MODEL = "data/Facial.MCT9.TMaxBoost"
 TEST_VIDEO = "../../io/test/data/test.mov"
 
 class LocalizationTest(unittest.TestCase):
@@ -21,7 +19,7 @@ class LocalizationTest(unittest.TestCase):
   def test00_one(self):
 
     # scan_levels = 0, 8 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL)
+    loc = torch.visioner.Localizer()
     iv = torch.io.VideoReader(TEST_VIDEO)
 
     # do a gray-scale conversion for all frames and cast to int16
@@ -37,7 +35,7 @@ class LocalizationTest(unittest.TestCase):
   def test01_Thourough(self):
 
     # scan_levels = 0, 8 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL)
+    loc = torch.visioner.Localizer()
     iv = torch.io.VideoReader(TEST_VIDEO)
 
     # do a gray-scale conversion for all frames and cast to int16
@@ -55,8 +53,7 @@ class LocalizationTest(unittest.TestCase):
     # TODO: temporarily disabled due to the slowness of model loading
 
     # scan_levels = 3, 8 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL,
-        scan_levels=3)
+    loc = torch.visioner.Localizer(scan_levels=3)
     iv = torch.core.array.load(TEST_VIDEO) #4D uint8 array
 
     # do a gray-scale conversion for all frames
@@ -73,8 +70,7 @@ class LocalizationTest(unittest.TestCase):
     # TODO: temporarily disabled due to the slowness of model loading
 
     # scan_levels = 3, 4 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL,
-        scan_levels=3, scale_var=4)
+    loc = torch.visioner.Localizer(scan_levels=3, scale_var=4)
     iv = torch.core.array.load(TEST_VIDEO) #4D uint8 array
 
     # do a gray-scale conversion for all frames
