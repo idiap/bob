@@ -3,7 +3,7 @@
 # Andre Anjos <andre.dos.anjos@gmail.com>
 # Fri 22 Jul 07:38:58 2011 
 
-"""Tests bindings to the Visioner face localization framework.
+"""Tests bindings to the Visioner face detection framework.
 """
 
 import os
@@ -12,20 +12,18 @@ import unittest
 import torch
 
 OBJ_CLASSIF_MODEL = "data/Face.MCT9"
-KEYP_LOC_MODEL = "data/Facial.MCT9.TMaxBoost"
 TEST_VIDEO = "../../io/test/data/test.mov"
 
-class LocalizationTest(unittest.TestCase):
-  """Performs various face localization tests."""
+class DetectionTest(unittest.TestCase):
+  """Performs various face detection tests."""
   
   def test00_one(self):
 
     # scan_levels = 0, 8 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL)
+    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL)
     iv = torch.io.VideoReader(TEST_VIDEO)
 
     # do a gray-scale conversion for all frames and cast to int16
-    #print "Converting video..."
     images = [torch.ip.rgb_to_gray(k).cast('int16') for k in iv[:100]]
 
     # find faces on the video
@@ -37,7 +35,7 @@ class LocalizationTest(unittest.TestCase):
   def test01_Thourough(self):
 
     # scan_levels = 0, 8 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL)
+    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL)
     iv = torch.io.VideoReader(TEST_VIDEO)
 
     # do a gray-scale conversion for all frames and cast to int16
@@ -47,17 +45,13 @@ class LocalizationTest(unittest.TestCase):
     locdata = [loc(k) for k in images]
 
     # asserts at least 97% detections
-    print len(locdata)
     self.assertTrue ( (0.97 * len(images)) <= len(locdata) )
 
-  def xtest02_Fast(self):
-
-    # TODO: temporarily disabled due to the slowness of model loading
+  def test02_Fast(self):
 
     # scan_levels = 3, 8 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL,
-        scan_levels=3)
-    iv = torch.core.array.load(TEST_VIDEO) #4D uint8 array
+    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL, scan_levels=3)
+    iv = torch.io.VideoReader(TEST_VIDEO) #4D uint8 array
 
     # do a gray-scale conversion for all frames
     images = [torch.ip.rgb_to_gray(k).cast('int16') for k in iv]
@@ -66,16 +60,13 @@ class LocalizationTest(unittest.TestCase):
     locdata = [loc(k) for k in images]
 
     # asserts at least 93% detections
-    self.asserttrue ( (0.93 * len(images)) > len(locdata) )
+    self.assertTrue ( (0.93 * len(images)) <= len(locdata) )
 
   def xtest03_Faster(self):
 
-    # TODO: temporarily disabled due to the slowness of model loading
-
     # scan_levels = 3, 4 scales
-    loc = torch.visioner.Localizer(OBJ_CLASSIF_MODEL, KEYP_LOC_MODEL,
-        scan_levels=3, scale_var=4)
-    iv = torch.core.array.load(TEST_VIDEO) #4D uint8 array
+    loc = torch.visioner.Detector(OBJ_CLASSIF_MODEL, scan_levels=3, scale_var=4)
+    iv = torch.io.VideoReader(TEST_VIDEO) #4D uint8 array
 
     # do a gray-scale conversion for all frames
     images = [torch.ip.rgb_to_gray(k).cast('int16') for k in iv]
@@ -98,4 +89,3 @@ if __name__ == '__main__':
       os.environ['TORCH_PROFILE'] and \
       hasattr(torch.core, 'ProfilerStop'):
     torch.core.ProfilerStop()
-
