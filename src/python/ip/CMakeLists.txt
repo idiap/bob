@@ -28,6 +28,7 @@ set(pysrc
    "src/histo.cc"
    "src/LBP.cc"
    "src/MultiscaleRetinex.cc"
+   "src/drawing.cc"
    "src/main.cc"
    )
 
