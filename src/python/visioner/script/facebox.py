@@ -154,6 +154,12 @@ def main():
       help="the input filename")
   parser.add_argument("output", metavar='FILE', type=str, nargs='?',
       help="the output filename; if this filename is omitted, output for the detections is dumped in text format to the screen")
+  parser.add_argument("-c", "--classification-model", metavar='FILE',
+      type=str, dest="cmodel", default=None,
+      help="use a classification model file different than the default")
+  parser.add_argument("-t", "--threshold", metavar='FLOAT',
+      type=float, dest='threshold', default=-sys.float_info.max,
+      help="classifier threshold (defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
@@ -178,8 +184,9 @@ def main():
     args.output = filename
     args.verbose = True
 
-  start = time.clock()  
-  processor = torch.visioner.Detector()
+  start = time.clock() 
+  processor = torch.visioner.Detector(cmodel_file=args.cmodel,
+      threshold=args.threshold)
   total = time.clock() - start
 
   if args.verbose:
