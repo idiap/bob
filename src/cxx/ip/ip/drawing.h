@@ -20,7 +20,7 @@ namespace Torch { namespace ip {
    * segmentation fault.
    */
   template <typename T>
-  void draw_point_ (blitz::Array<T,2>& image, size_t x, size_t y, T color) {
+  void draw_point_ (blitz::Array<T,2>& image, int x, int y, T color) {
     image(y,x) = color;
   }
 
@@ -30,7 +30,7 @@ namespace Torch { namespace ip {
    * fault.
    */
   template <typename T>
-  void draw_point_ (blitz::Array<T,3>& image, size_t x, size_t y,  
+  void draw_point_ (blitz::Array<T,3>& image, int x, int y,  
       const boost::tuple<T,T,T>& color) {
     image(0,y,x) = boost::get<0>(color);
     image(1,y,x) = boost::get<1>(color);
@@ -41,11 +41,22 @@ namespace Torch { namespace ip {
    * Draws a point in the given image. Trying to access outside the image range
    * will trigger a std::range_error.
    */
-  template <typename ImageType, typename ColorType>
-  void draw_point (ImageType& image, size_t x, size_t y, 
-      const ColorType& color) {
-    if (x >= image.cols() || y >= image.rows()) 
-      throw std::range_error("out of range");
+  template <typename T>
+  void draw_point (blitz::Array<T,2>& image, int x, int y, T color) {
+    if (x >= image.extent(1) || y >= image.extent(0))
+      throw std::out_of_range("out of range");
+    draw_point_(image, x, y, color);
+  }
+
+  /**
+   * Draws a point in the given image. Trying to access outside the image range
+   * will trigger a std::range_error.
+   */
+  template <typename T>
+  void draw_point (blitz::Array<T,3>& image, int x, int y, 
+      const boost::tuple<T,T,T>& color) {
+    if (x >= image.extent(2) || y >= image.extent(1))
+      throw std::out_of_range("out of range");
     draw_point_(image, x, y, color);
   }
 
@@ -53,10 +64,20 @@ namespace Torch { namespace ip {
    * Tries to draw a point at the given image. If the point is out of range,
    * just ignores the request. This is what is used for drawing lines.
    */
-  template <typename ImageType, typename ColorType>
-  void try_draw_point (ImageType& image, size_t x, size_t y,
-      const ColorType& color) {
-    if (x >= image.cols() || y >= image.rows()) return; 
+  template <typename T>
+  void try_draw_point (blitz::Array<T,2>& image, int x, int y, T color) {
+    if (x >= image.extent(1) || y >= image.extent(0)) return;
+    draw_point_(image, x, y, color);
+  }
+
+  /**
+   * Tries to draw a point at the given image. If the point is out of range,
+   * just ignores the request. This is what is used for drawing lines.
+   */
+  template <typename T>
+  void try_draw_point (blitz::Array<T,3>& image, int x, int y,
+      const boost::tuple<T,T,T>& color) {
+    if (x >= image.extent(2) || y >= image.extent(1)) return;
     draw_point_(image, x, y, color);
   }
 
@@ -74,8 +95,8 @@ namespace Torch { namespace ip {
    * http://en.wikipedia.org/wiki/Bresenham's_line_algorithm
    */
   template <typename ImageType, typename ColorType>
-  void draw_line (ImageType& image, size_t p1x, size_t p1y,
-      size_t p2x, size_t p2y, const ColorType& color) {
+  void draw_line (ImageType& image, int p1x, int p1y,
+      int p2x, int p2y, const ColorType& color) {
 
     int F, x, y;
 
@@ -215,7 +236,7 @@ namespace Torch { namespace ip {
    * a '+'. To get a '+' sign, use the draw_cross_plus() variant.
    */
   template <typename ImageType, typename ColorType>
-  void draw_cross (ImageType& image, size_t x, size_t y, size_t radius,
+  void draw_cross (ImageType& image, int x, int y, size_t radius,
       const ColorType& color) {
     draw_line(image, x-radius, y-radius, x+radius, y+radius, color);
     draw_line(image, x-radius, y+radius, x+radius, y-radius, color);
@@ -227,7 +248,7 @@ namespace Torch { namespace ip {
    * a 'x'. To get an 'x' sign, use the draw_cross() variant.
    */
   template <typename ImageType, typename ColorType>
-  void draw_cross_plus (ImageType& image, size_t x, size_t y, size_t radius,
+  void draw_cross_plus (ImageType& image, int x, int y, int radius,
       const ColorType& color) {
     draw_line(image, x, y-radius, x, y+radius, color);
     draw_line(image, x-radius, y, x+radius, y, color);
@@ -237,7 +258,7 @@ namespace Torch { namespace ip {
    * Draws a box at the image using the draw_line() primitive above.
    */
   template <typename ImageType, typename ColorType>
-  void draw_box (ImageType& image, size_t x, size_t y, size_t width, 
+  void draw_box (ImageType& image, int x, int y, size_t width, 
       size_t height, const ColorType& color) {
     draw_line(image, x, y, x + width, y, color);
     draw_line(image, x, y + height, x + width, y + height, color);

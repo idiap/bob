@@ -45,10 +45,12 @@ torch_python_add_test(python-ip-lbp-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp_new.py)
 torch_python_add_test(python-ip-filter_new-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters_new.py)
-torch_python_add_test(python-ip-test-optflow
+torch_python_add_test(python-ip-optflow-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_flow.py)
-torch_python_add_test(python-ip-test-color
+torch_python_add_test(python-ip-color-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_color.py)
+torch_python_add_test(python-ip-drawing-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_drawing.py)
 
 torch_python_add_test(python-ip-facenorm
   ${CMAKE_CURRENT_SOURCE_DIR}/script/facenorm.py --self-test)
