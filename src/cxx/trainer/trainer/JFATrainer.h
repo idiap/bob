@@ -129,7 +129,8 @@ class JFATrainer {
 
   public:
     /**
-     * Initializes a new JFA trainer 
+     * Initializes a new JFA trainer. This implementation is consistent with the 
+     * JFA cookbook implementation. 
      */
     JFATrainer(Torch::machine::JFAMachine& jfa_machine);
 
@@ -348,7 +349,7 @@ class JFATrainer {
     { return m_cache_IdPlusVProd_i; }
     const blitz::Array<double,1>& getFn_y_i() const
     { return m_cache_Fn_y_i; }
-    const blitz::Array<double,2>& getA1_y() const
+    const blitz::Array<double,3>& getA1_y() const
     { return m_cache_A1_y; }
     const blitz::Array<double,2>& getA2_y() const
     { return m_cache_A2_y; }
@@ -358,7 +359,7 @@ class JFATrainer {
     { return m_cache_IdPlusVProd_i; }
     blitz::Array<double,1>& updateFn_y_i()
     { return m_cache_Fn_y_i; }
-    blitz::Array<double,2>& updateA1_y()
+    blitz::Array<double,3>& updateA1_y()
     { return m_cache_A1_y; }
     blitz::Array<double,2>& updateA2_y()
     { return m_cache_A2_y; }
@@ -368,7 +369,7 @@ class JFATrainer {
     { m_cache_IdPlusVProd_i.reference(IdPlusVProd_i.copy()); }
     void setFn_y_i(const blitz::Array<double,1>& Fn_y_i)
     { m_cache_Fn_y_i.reference(Fn_y_i.copy()); }
-    void setA1_y(const blitz::Array<double,2>& A1_y)
+    void setA1_y(const blitz::Array<double,3>& A1_y)
     { m_cache_A1_y.reference(A1_y.copy()); }
     void setA2_y(const blitz::Array<double,2>& A2_y)
     { m_cache_A2_y.reference(A2_y.copy()); }
@@ -402,22 +403,22 @@ class JFATrainer {
     blitz::Array<double,3> m_cache_VProd; // first dimension is the Gaussian id
     blitz::Array<double,2> m_cache_IdPlusVProd_i;
     blitz::Array<double,1> m_cache_Fn_y_i;
-    blitz::Array<double,2> m_cache_A1_y;
+    blitz::Array<double,3> m_cache_A1_y;
     blitz::Array<double,2> m_cache_A2_y;
 
     blitz::Array<double,2> m_cache_UtSigmaInv; // Ut * diag(sigma)^-1
     blitz::Array<double,3> m_cache_UProd; // first dimension is the Gaussian id
     blitz::Array<double,2> m_cache_IdPlusUProd_ih;
     blitz::Array<double,1> m_cache_Fn_x_ih;
-    blitz::Array<double,2> m_cache_A1_x;
+    blitz::Array<double,3> m_cache_A1_x;
     blitz::Array<double,2> m_cache_A2_x;
 
     blitz::Array<double,1> m_cache_DtSigmaInv; // Dt * diag(sigma)^-1
     blitz::Array<double,1> m_cache_DProd; // supervector length dimension
     blitz::Array<double,1> m_cache_IdPlusDProd_i;
     blitz::Array<double,1> m_cache_Fn_z_i;
-    blitz::Array<double,2> m_cache_A1_z;
-    blitz::Array<double,2> m_cache_A2_z;
+    blitz::Array<double,1> m_cache_A1_z;
+    blitz::Array<double,1> m_cache_A2_z;
 
     mutable blitz::Array<double,2> m_tmp_rvrv;
     mutable blitz::Array<double,2> m_tmp_rvCD;

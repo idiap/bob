@@ -201,6 +201,13 @@ class JFATrainerTest(unittest.TestCase):
       0.2955, 0.5835,
       0.6802, 0.5518,
       0.5278,0.5836], (6,2))
+    v_ref=torch.core.array.float64_2(
+      [0.7228, 0.7892,
+      0.6475, 0.6080, 
+      0.8631, 0.8416, 
+      1.6512, 1.6068, 
+      0.0500, 0.0101, 
+      0.4325, 0.6719], (6,2))
     u=torch.core.array.float64_2(
       [0.5118, 0.3464,
       0.0826, 0.8865,
@@ -239,10 +246,12 @@ class JFATrainerTest(unittest.TestCase):
     jfat.precomputeSumStatisticsF()
 
     jfat.updateY()
+    jfat.updateV()
 
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.Y[0], y3, 2e-4))
     self.assertTrue(equals(jfat.Y[1], y4, 2e-4))
+    self.assertTrue(equals(jfam.V, v_ref, 2e-4))
 
 
   def test06_JFATrainer_Xupdate(self):
@@ -288,6 +297,14 @@ class JFATrainerTest(unittest.TestCase):
       0.3545, 0.2177,
       0.9713, 0.1257], (6,2))
 
+    u_ref=torch.core.array.float64_2(
+      [0.6729, 0.3408,
+      0.0544, 1.0653,
+      0.5399, 1.3035,
+      2.4995, 0.4385,
+      0.1292, -0.0576,
+      1.1962, 0.0117], (6,2))
+
     z1=torch.core.array.float64_1([0.3089, 0.7261, 0.7829, 0.6938, 0.0098, 0.8432], (6,))
     z2=torch.core.array.float64_1([0.9223, 0.7710, 0.0427, 0.3782, 0.7043, 0.7295], (6,))
     y1=torch.core.array.float64_1([0.2243, 0.2691], (2,))
@@ -318,10 +335,12 @@ class JFATrainerTest(unittest.TestCase):
     jfat.precomputeSumStatisticsF()
 
     jfat.updateX()
+    jfat.updateU()
 
     # Expected results(JFA cookbook, matlab)
     self.assertTrue(equals(jfat.X[0], x3, 2e-4))
     self.assertTrue(equals(jfat.X[1], x4, 2e-4))
+    self.assertTrue(equals(jfam.U, u_ref, 2e-4))
 
 
   def test07_JFATrainer_Zupdate(self):
@@ -352,6 +371,7 @@ class JFATrainerTest(unittest.TestCase):
     m=torch.core.array.float64_1([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839], (6,))
     E=torch.core.array.float64_1([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131], (6,))
     d=torch.core.array.float64_1([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668], (6,))
+    d_ref=torch.core.array.float64_1([0.3110, 1.0138, 0.8297, 1.0382, 0.0095, 0.6320], (6,))
     v=torch.core.array.float64_2(
       [0.3367, 0.4116,
       0.6624, 0.6026,
@@ -369,8 +389,8 @@ class JFATrainerTest(unittest.TestCase):
 
     z1=torch.core.array.float64_1([0, 0, 0, 0, 0, 0], (6,))
     z2=torch.core.array.float64_1([0, 0, 0, 0, 0, 0], (6,))
-    z3=torch.core.array.float64_1([0.3256, 1.8633, 0.6480, 0.8085, -0.0432, 0.2885], (6,))
-    z4=torch.core.array.float64_1([-0.3324, -0.1474, -0.4404, -0.4529, 0.0484, -0.5848], (6,))
+    z3_ref=torch.core.array.float64_1([0.3256, 1.8633, 0.6480, 0.8085, -0.0432, 0.2885], (6,))
+    z4_ref=torch.core.array.float64_1([-0.3324, -0.1474, -0.4404, -0.4529, 0.0484, -0.5848], (6,))
     y1=torch.core.array.float64_1([0.2243, 0.2691], (2,))
     y2=torch.core.array.float64_1([0.6730, 0.4775], (2,))
     x1=torch.core.array.float64_2([0.9976, 0.8116,
@@ -397,10 +417,12 @@ class JFATrainerTest(unittest.TestCase):
     jfat.precomputeSumStatisticsF()
 
     jfat.updateZ()
+    jfat.updateD()
 
     # Expected results(JFA cookbook, matlab)
-    self.assertTrue(equals(jfat.Z[0], z3, 2e-4))
-    self.assertTrue(equals(jfat.Z[1], z4, 2e-4))
+    self.assertTrue(equals(jfat.Z[0], z3_ref, 2e-4))
+    self.assertTrue(equals(jfat.Z[1], z4_ref, 2e-4))
+    self.assertTrue(equals(jfam.D, d_ref, 2e-4))
 
 
 if __name__ == '__main__':

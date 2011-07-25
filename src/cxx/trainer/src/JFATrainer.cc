@@ -703,16 +703,24 @@ void train::JFATrainer::updateY_i(const int id)
 
   // Needs to return values to be accumulated for estimating V
   blitz::firstIndex i;
-  blitz::secondIndex j; 
-  m_cache_A1_y += y(i) * y(j) + m_cache_IdPlusVProd_i(i,j);
+  blitz::secondIndex j;
+  m_tmp_rvrv = m_cache_IdPlusVProd_i;
+  m_tmp_rvrv += y(i) * y(j); 
+  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  {
+    blitz::Array<double,2> A1_y_c = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
+    A1_y_c += m_tmp_rvrv * m_Nacc[id](c);
+  }
   m_cache_A2_y += m_cache_Fn_y_i(i) * y(j);
+  //m_cache_A1_y += y(i) * y(j) + m_cache_IdPlusVProd_i(i,j);
+  //m_cache_A2_y += m_cache_Fn_y_i(i) * y(j);
 }
 
 void train::JFATrainer::updateY()
 {
   // Initialize the cache accumulator
-  m_cache_A1_y.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
-  m_cache_A2_y.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimCD());
+  m_cache_A1_y.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
+  m_cache_A2_y.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRv());
   m_cache_A1_y = 0.;
   m_cache_A2_y = 0.;
   // Precompute Vt*diag(sigma)^-1
@@ -727,10 +735,17 @@ void train::JFATrainer::updateY()
 }
 
 void train::JFATrainer::updateV()
-{
-  Torch::math::inv(m_cache_A1_y, m_tmp_rvrv);
-  blitz::Array<double,2>& V = m_jfa_machine.updateV();
-  Torch::math::prod(m_cache_A2_y, m_tmp_rvrv, V);
+{  
+  int dim = m_jfa_machine.getDimD();
+  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  {
+    const blitz::Array<double,2> A1 = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
+    Torch::math::inv(A1, m_tmp_rvrv);
+    const blitz::Array<double,2> A2 = m_cache_A2_y(blitz::Range(c*dim,(c+1)*dim-1), blitz::Range::all());
+    blitz::Array<double,2>& V = m_jfa_machine.updateV();
+    blitz::Array<double,2> V_c = V(blitz::Range(c*dim,(c+1)*dim-1), blitz::Range::all());
+    Torch::math::prod(A2, m_tmp_rvrv, V_c);
+  }
 }
 
 
@@ -815,15 +830,23 @@ void train::JFATrainer::updateX_ih(const int id, const int h)
   // Needs to return values to be accumulated for estimating U
   blitz::firstIndex i;
   blitz::secondIndex j; 
-  m_cache_A1_x += x(i) * x(j) + m_cache_IdPlusUProd_ih(i,j);
+  m_tmp_ruru = m_cache_IdPlusUProd_ih;
+  m_tmp_ruru += x(i) * x(j); 
+  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  {
+    blitz::Array<double,2> A1_x_c = m_cache_A1_x(c,blitz::Range::all(),blitz::Range::all());
+    A1_x_c += m_tmp_ruru * m_N[id](c,h);
+  }
   m_cache_A2_x += m_cache_Fn_x_ih(i) * x(j);
+  //m_cache_A1_x += x(i) * x(j) + m_cache_IdPlusUProd_ih(i,j);
+  //m_cache_A2_x += m_cache_Fn_x_ih(i) * x(j);
 }
 
 void train::JFATrainer::updateX()
 {
   // Initialize the cache accumulator
-  m_cache_A1_x.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
-  m_cache_A2_x.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimCD());
+  m_cache_A1_x.resize(m_jfa_machine.getDimC(),m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
+  m_cache_A2_x.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimRu());
   m_cache_A1_x = 0.;
   m_cache_A2_x = 0.;
   // Precompute Ut*diag(sigma)^-1
@@ -842,11 +865,21 @@ void train::JFATrainer::updateX()
 
 void train::JFATrainer::updateU()
 {
-  Torch::math::inv(m_cache_A1_x, m_tmp_ruru);
-  blitz::Array<double,2>& U = m_jfa_machine.updateU();
-  Torch::math::prod(m_cache_A2_x, m_tmp_ruru, U);
+  //Torch::math::inv(m_cache_A1_x, m_tmp_ruru);
+  //blitz::Array<double,2>& U = m_jfa_machine.updateU();
+  //Torch::math::prod(m_cache_A2_x, m_tmp_ruru, U);
+  int dim = m_jfa_machine.getDimD();
+  m_tmp_ruru.resize(m_jfa_machine.getDimRu(),m_jfa_machine.getDimRu());
+  for(int c=0; c<m_jfa_machine.getDimC(); ++c)
+  {
+    const blitz::Array<double,2> A1 = m_cache_A1_x(c,blitz::Range::all(),blitz::Range::all());
+    Torch::math::inv(A1, m_tmp_ruru);
+    const blitz::Array<double,2> A2 = m_cache_A2_x(blitz::Range(c*dim,(c+1)*dim-1),blitz::Range::all());
+    blitz::Array<double,2>& U = m_jfa_machine.updateU();
+    blitz::Array<double,2> U_c = U(blitz::Range(c*dim,(c+1)*dim-1),blitz::Range::all());
+    Torch::math::prod(A2, m_tmp_ruru, U_c);
+  }
 }
-
 
 void train::JFATrainer::computeDtSigmaInv()
 {
@@ -917,17 +950,19 @@ void train::JFATrainer::updateZ_i(const int id)
   // Needs to return values to be accumulated for estimating D
   blitz::firstIndex i;
   blitz::secondIndex j; 
-  m_tmp_CDCD.resize(m_jfa_machine.getDimCD(), m_jfa_machine.getDimCD());
-  Torch::math::diag(m_cache_IdPlusDProd_i, m_tmp_CDCD);
-  m_cache_A1_z += z(i) * z(j) + m_tmp_CD(i,j);
-  m_cache_A2_z += m_cache_Fn_z_i(i) * z(j);
+  m_tmp_CD.resize(m_jfa_machine.getDimCD());
+  Torch::core::repelem(m_Nacc[id], m_tmp_CD);
+  m_cache_A1_z += (m_cache_IdPlusDProd_i + z * z) * m_tmp_CD;
+  m_cache_A2_z += m_cache_Fn_z_i * z;
+  //m_cache_A1_z += z(i) * z(j) + m_tmp_CD(i,j);
+  //m_cache_A2_z += m_cache_Fn_z_i(i) * z(j);
 }
 
 void train::JFATrainer::updateZ()
 {
   // Initialize the cache accumulator
-  m_cache_A1_z.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimCD());
-  m_cache_A2_z.resize(m_jfa_machine.getDimCD(),m_jfa_machine.getDimCD());
+  m_cache_A1_z.resize(m_jfa_machine.getDimCD());
+  m_cache_A2_z.resize(m_jfa_machine.getDimCD());
   m_cache_A1_z = 0.;
   m_cache_A2_z = 0.;
   // Precompute Dt*diag(sigma)^-1
@@ -943,6 +978,9 @@ void train::JFATrainer::updateZ()
 
 void train::JFATrainer::updateD()
 {
+  blitz::Array<double,1>& d = m_jfa_machine.updateD();
+  d = m_cache_A2_z / m_cache_A1_z;
+/*
   Torch::math::inv(m_cache_A1_z, m_tmp_CDCD);
   blitz::Array<double,1>& d = m_jfa_machine.updateD();
   // TODO: Keep accumulator A1_z ?
@@ -950,6 +988,7 @@ void train::JFATrainer::updateD()
   // TODO: check that it is really diagonal
   for(int i=0; i<m_jfa_machine.getDimCD(); ++i)
     d(i) = m_cache_A1_z(i,i);
+*/
 }
 
 
