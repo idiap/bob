@@ -18,7 +18,12 @@ __epilog__ = """Example usage:
 
   $ face_detect.py myimage.jpg
 
-3. Detect faces in an image, imprint results on an image copy
+3. Detect faces in a video, imprint results on an output video copy, shows
+optional verbose output
+
+  $ face_detect.py --verbose myvideo.mov result.avi
+
+4. Detect faces in an image, imprint results on output image
 
   $ face_detect.py myimage.jpg result.png
 """
@@ -28,6 +33,12 @@ import sys
 import time
 import argparse
 import torch
+import tempfile #for package tests
+
+def testfile(path):
+  """Computes the path to a test file"""
+  d = os.path.join(os.path.dirname(__file__))
+  return os.path.realpath(os.path.join(d, path))
 
 def process_video_data(filename, processor, verbose, output):
   """A more efficienty (memory-wise) way to process video data"""
@@ -132,6 +143,9 @@ def process_image_data(filename, processor, verbose, output):
 
     input.save(output)
 
+    if verbose:
+      print "Output file (with detections, if any) saved at %s" % output
+
 def main():
 
   parser = argparse.ArgumentParser(description=__doc__, epilog=__epilog__,
@@ -143,8 +157,26 @@ def main():
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
+  parser.add_argument("--self-test", metavar='INT', type=int, default=False,
+      dest='selftest', help=argparse.SUPPRESS)
 
   args = parser.parse_args()
+
+  if args.selftest == 1:
+    args.input = testfile('../../io/test/data/test.mov')
+    (fd, filename) = tempfile.mkstemp('.avi', 'torchtest_')
+    os.close(fd)
+    os.unlink(filename)
+    args.output = filename
+    args.verbose = True
+
+  elif args.selftest == 2:
+    args.input = testfile('../../ip/test/data/faceextract/test-faces.jpg')
+    (fd, filename) = tempfile.mkstemp('.jpg', 'torchtest_')
+    os.close(fd)
+    os.unlink(filename)
+    args.output = filename
+    args.verbose = True
 
   start = time.clock()  
   processor = torch.visioner.Detector()
@@ -156,12 +188,13 @@ def main():
   is_video = (os.path.splitext(args.input)[1] in torch.io.video_extensions())
 
   if is_video:
-
     process_video_data(args.input, processor, args.verbose, args.output)
 
   else:
-
     process_image_data(args.input, processor, args.verbose, args.output)
+
+  if args.selftest:
+    os.unlink(args.output)
 
 if __name__ == '__main__':
   main()
