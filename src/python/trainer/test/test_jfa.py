@@ -166,8 +166,8 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(z, z_ref, 2e-4))
 
 
-  def test05_JFATrainer_Yupdate(self):
-    # test the JFATrainer for updating Y
+  def test05_JFATrainer_updateYandV(self):
+    # test the JFATrainer for updating Y and V
 
     F1=torch.core.array.float64_2(
       [0.3833, 0.4516,
@@ -254,8 +254,8 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(jfam.V, v_ref, 2e-4))
 
 
-  def test06_JFATrainer_Xupdate(self):
-    # test the JFATrainer for updating X
+  def test06_JFATrainer_updateXandU(self):
+    # test the JFATrainer for updating X and U
 
     F1=torch.core.array.float64_2(
       [0.3833, 0.4516,
@@ -343,8 +343,8 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(jfam.U, u_ref, 2e-4))
 
 
-  def test07_JFATrainer_Zupdate(self):
-    # test the JFATrainer for updating Z
+  def test07_JFATrainer_updateZandD(self):
+    # test the JFATrainer for updating Z and D
 
     F1=torch.core.array.float64_2(
       [0.3833, 0.4516,
