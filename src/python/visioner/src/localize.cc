@@ -44,7 +44,7 @@ static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
   qreal x, y, width, height;
   for (size_t i=0; i<detections.size(); ++i) {
     detections[i].second.getRect(&x, &y, &width, &height);
-    tmp.append(make_tuple(x, y, width, height));
+    tmp.append(make_tuple(x, y, width, height, detections[i].first));
   }
   return tuple(tmp);
 }
@@ -98,7 +98,7 @@ void bind_visioner_localize() {
     ;
 
   def("detect", &detect, (arg("class_model"), arg("threshold"), arg("levels"),
-        arg("class_scanner")), "Detects faces on an image preloaded by the (classification) scanners. Returns a tuple with the detected regions");
+        arg("class_scanner")), "Detects faces on an image preloaded by the (classification) scanners. Returns a tuple with the detected regions and associated scores in the following order (x, y, width, height, score). All values are floating-point numbers.");
 
   def("locate", &locate, (arg("class_model"), arg("loc_model"), arg("levels"),
         arg("class_scanner"), arg("loc_scanner")), "Locates faces on an image preloaded by the (classification and localization) scanners. Returns a tuple with the detected region and all detected landmarks");

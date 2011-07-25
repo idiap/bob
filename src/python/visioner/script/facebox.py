@@ -40,22 +40,26 @@ def testfile(path):
   d = os.path.join(os.path.dirname(__file__))
   return os.path.realpath(os.path.join(d, path))
 
-def process_video_data(filename, processor, verbose, output):
+def r(v):
+  """Rounds the given float value to the nearest integer"""
+  return int(round(v))
+
+def process_video_data(args):
   """A more efficienty (memory-wise) way to process video data"""
 
-  input = torch.io.VideoReader(filename)
+  input = torch.io.VideoReader(args.input)
   gray_buffer = torch.core.array.uint8_2(input.height, input.width)
   data = []
   total = 0
-  if verbose:
+  if args.verbose:
     sys.stdout.write("Detecting (single) faces in %d frames from file %s" % \
-        (input.numberOfFrames, filename))
+        (input.numberOfFrames, args.input))
   for k in input:
     torch.ip.rgb_to_gray(k, gray_buffer)
     int16_buffer = gray_buffer.cast('int16')
     start = time.clock()
-    detections = processor(int16_buffer)
-    if verbose:
+    detections = args.processor(int16_buffer)
+    if args.verbose:
       sys.stdout.write('.')
       sys.stdout.flush()
     total += time.clock() - start
@@ -63,30 +67,31 @@ def process_video_data(filename, processor, verbose, output):
     else: best = detections[0]
     data.append(best)
 
-  if verbose: sys.stdout.write('\n')
+  if args.verbose: sys.stdout.write('\n')
 
-  if verbose:
+  if args.verbose:
     print "Total localization/detection time was %.2f seconds" % total
     print " -> Per image/frame %.3f seconds" % (total/input.numberOfFrames)
 
-  if not output:
+  if not args.output:
     for k, det in enumerate(data):
-      if det:
-        det = [int(round(v)) for v in det]
-        print k, det[0], det[1], det[2], det[3]
+      if not det: det = (0, 0, 0, 0, -sys.float_info.max)
+      else: det = (r(det[0]), r(det[1]), r(det[2]), r(det[3]), det[4])
+      if args.dump_scores:
+        sys.stdout.write("%d %d %d %d %.4e\n" % det)
       else:
-        print k, 0, 0, 0, 0
+        sys.stdout.write("%d %d %d %d\n" % det[:4])
 
   else: #use wants to record a video with the output
    
-    if verbose:
+    if args.verbose:
       sys.stdout.write("Saving %d frames with detections to %s" % \
-          (len(data), output))
+          (len(data), args.output))
 
     color = (255, 0, 0) #red
     orows = 2*(input.height/2)
     ocolumns = 2*(input.width/2)
-    ov = torch.io.VideoWriter(output, orows, ocolumns, input.frameRate)
+    ov = torch.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
     for frame,bbox in zip(input,data):
       if bbox:
         bbox = [int(round(v)) for v in bbox]
@@ -97,16 +102,17 @@ def process_video_data(filename, processor, verbose, output):
         torch.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2, 
             color)
       ov.append(frame[:,:orows,:ocolumns])
-      if verbose:
+      if args.verbose:
         sys.stdout.write('.')
         sys.stdout.flush()
 
-    if verbose: sys.stdout.write('\n')
+    if args.verbose: sys.stdout.write('\n')
 
-def process_image_data(filename, processor, verbose, output):
+def process_image_data(args):
   """Process any kind of image data"""
 
-  input = torch.core.array.load(filename) #load the image
+  if args.verbose: print "Loading file %s..." % args.input
+  input = torch.core.array.load(args.input) #load the image
 
   if input.rank() == 3: #it is a color image
     graydata = torch.ip.rgb_to_gray(input).cast('int16')
@@ -114,20 +120,20 @@ def process_image_data(filename, processor, verbose, output):
     graydata = input.cast('int16')
 
   start = time.clock()
-  detections = processor(graydata)
+  detections = args.processor(graydata)
   total = time.clock() - start
   if len(detections) == 0: data = None
   else: data = detections[0]
-  if verbose:
+  if args.verbose:
     print "Total localization/detection time was %.3f seconds" % total
 
-  if not output:
+  if not args.output:
     
-    if data:
-      det = [int(round(v)) for v in data]
-      print det[0], det[1], det[2], det[3]
+    if not data: data =(0, 0, 0, 0, -sys.float_info.max)
+    if args.dump_scores:
+      sys.stdout.write("%d %d %d %d %.4e\n" % data)
     else:
-      print 0, 0, 0, 0
+      sys.stdout.write("%d %d %d %d\n" % data[:4])
 
   else: #use wants to record an image with the output
 
@@ -141,10 +147,10 @@ def process_image_data(filename, processor, verbose, output):
       torch.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
           color)
 
-    input.save(output)
+    input.save(args.output)
 
-    if verbose:
-      print "Output file (with detections, if any) saved at %s" % output
+    if args.verbose:
+      print "Output file (with detections, if any) saved at %s" % args.output
 
 def main():
 
@@ -160,6 +166,9 @@ def main():
   parser.add_argument("-t", "--threshold", metavar='FLOAT',
       type=float, dest='threshold', default=-sys.float_info.max,
       help="classifier threshold (defaults to %(default)s)")
+  parser.add_argument("-d", "--dump-scores",
+      default=False, action='store_true', dest='dump_scores',
+      help="if set, also dump scores after every bounding box")
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
@@ -174,7 +183,6 @@ def main():
     os.close(fd)
     os.unlink(filename)
     args.output = filename
-    args.verbose = True
 
   elif args.selftest == 2:
     args.input = testfile('../../ip/test/data/faceextract/test-faces.jpg')
@@ -182,10 +190,13 @@ def main():
     os.close(fd)
     os.unlink(filename)
     args.output = filename
+
+  if args.selftest:
     args.verbose = True
+    args.dump_scores = True
 
   start = time.clock() 
-  processor = torch.visioner.Detector(cmodel_file=args.cmodel,
+  args.processor = torch.visioner.Detector(cmodel_file=args.cmodel,
       threshold=args.threshold)
   total = time.clock() - start
 
@@ -195,10 +206,10 @@ def main():
   is_video = (os.path.splitext(args.input)[1] in torch.io.video_extensions())
 
   if is_video:
-    process_video_data(args.input, processor, args.verbose, args.output)
+    process_video_data(args)
 
   else:
-    process_image_data(args.input, processor, args.verbose, args.output)
+    process_image_data(args)
 
   if args.selftest:
     os.unlink(args.output)
