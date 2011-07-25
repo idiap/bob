@@ -70,7 +70,7 @@ def process_video_data(args):
   if args.verbose: sys.stdout.write('\n')
 
   if args.verbose:
-    print "Total localization/detection time was %.2f seconds" % total
+    print "Total detection time was %.2f seconds" % total
     print " -> Per image/frame %.3f seconds" % (total/input.numberOfFrames)
 
   if not args.output:
@@ -125,7 +125,7 @@ def process_image_data(args):
   if len(detections) == 0: data = None
   else: data = detections[0]
   if args.verbose:
-    print "Total localization/detection time was %.3f seconds" % total
+    print "Total detection time was %.3f seconds" % total
 
   if not args.output:
     
