@@ -12,20 +12,20 @@ __epilog__ = """Example usage:
 
 1. Detect faces in a video
 
-  $ face_detect.py myvideo.mov
+  $ %(prog)s myvideo.mov
 
 2. Detect faces in an image
 
-  $ face_detect.py myimage.jpg
+  $ %(prog)s myimage.jpg
 
 3. Detect faces in a video, imprint results on an output video copy, shows
-optional verbose output
+   optional verbose output
 
-  $ face_detect.py --verbose myvideo.mov result.avi
+  $ %(prog)s --verbose myvideo.mov result.avi
 
 4. Detect faces in an image, imprint results on output image
 
-  $ face_detect.py myimage.jpg result.png
+  $ %(prog)s myimage.jpg result.png
 """
 
 import os
