@@ -183,7 +183,7 @@ if not options.no_norm:
 gmm.means = means
 gmm.variances = variances
 gmm.weights = weights
-gmm.setVarianceThreshold = options.variance_threshold
+gmm.setVarianceThresholds(options.variance_threshold)
 
 # Train gmm
 trainer = torch.trainer.ML_GMMTrainer(not options.no_update_means, not options.no_update_variances, not options.no_update_weights)

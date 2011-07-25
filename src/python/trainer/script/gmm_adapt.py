@@ -93,7 +93,7 @@ for myfile in filelist:
 
 # Load prior gmm
 prior_gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
-prior_gmm.setVarianceThreshold = options.variance_threshold
+prior_gmm.setVarianceThresholds(options.variance_threshold)
 
 # Create trainer
 if options.responsibilities_threshold == 0.:
@@ -109,7 +109,7 @@ if options.torch3_map:
 
 # Load gmm
 gmm = torch.machine.GMMMachine(torch.io.HDF5File(options.prior_model))
-gmm.setVarianceThreshold = options.variance_threshold
+gmm.setVarianceThresholds(options.variance_threshold)
 
 # Train gmm
 trainer.train(gmm, ar)
