@@ -95,8 +95,7 @@ def main():
     print "Total localization/detection time was %.3f seconds" % total
 
   # at this point, data is a list full of entries
-  import pdb; pdb.set_trace()
-
+  #import pdb; pdb.set_trace()
 
 if __name__ == '__main__':
   main()
