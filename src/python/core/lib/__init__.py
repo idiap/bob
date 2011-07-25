@@ -2,6 +2,7 @@ from libpytorch_core import *
 from . import array
 from . import mapstring
 from . import vector
+from . import boost_tuple
 from . import random
 __all__ = dir()
 

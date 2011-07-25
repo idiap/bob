@@ -14,6 +14,7 @@
 #include "core/python/exception.h"
 
 using namespace Torch::core::python;
+using namespace boost::python;
 
 /**
  * This method is only useful to test exception throwing in Python code.
@@ -22,7 +23,105 @@ static void throw_exception(void) {
   throw Torch::core::Exception();
 }
 
+/**
+ * PYTHON EXCEPTION HIERARCHY:
+ * ---------------------------
+ *
+ * BaseException
+ *  +-- SystemExit
+ *  +-- KeyboardInterrupt
+ *  +-- GeneratorExit
+ *  +-- Exception
+ *       +-- StopIteration
+ *       +-- StandardError
+ *       |    +-- BufferError
+ *       |    +-- ArithmeticError
+ *       |    |    +-- FloatingPointError
+ *       |    |    +-- OverflowError
+ *       |    |    +-- ZeroDivisionError
+ *       |    +-- AssertionError
+ *       |    +-- AttributeError
+ *       |    +-- EnvironmentError
+ *       |    |    +-- IOError
+ *       |    |    +-- OSError
+ *       |    |         +-- WindowsError (Windows)
+ *       |    |         +-- VMSError (VMS)
+ *       |    +-- EOFError
+ *       |    +-- ImportError
+ *       |    +-- LookupError
+ *       |    |    +-- IndexError
+ *       |    |    +-- KeyError
+ *       |    +-- MemoryError
+ *       |    +-- NameError
+ *       |    |    +-- UnboundLocalError
+ *       |    +-- ReferenceError
+ *       |    +-- RuntimeError
+ *       |    |    +-- NotImplementedError
+ *       |    +-- SyntaxError
+ *       |    |    +-- IndentationError
+ *       |    |         +-- TabError
+ *       |    +-- SystemError
+ *       |    +-- TypeError
+ *       |    +-- ValueError
+ *       |         +-- UnicodeError
+ *       |              +-- UnicodeDecodeError
+ *       |              +-- UnicodeEncodeError
+ *       |              +-- UnicodeTranslateError
+ */
+
+// Here, a few bindings to standard exceptions.
+void translator_except(std::exception const& x) { 
+  PYTHON_ERROR(Exception, x.what()); 
+}
+
+void translator_logic_error(std::logic_error const& x) { 
+  PYTHON_ERROR(RuntimeError, x.what()); 
+}
+
+void translator_domain_error(std::domain_error const& x) { 
+  PYTHON_ERROR(RuntimeError, x.what()); 
+}
+
+void translator_invalid_argument(std::invalid_argument const& x) { 
+  PYTHON_ERROR(RuntimeError, x.what()); 
+}
+
+void translator_length_error(std::length_error const& x) { 
+  PYTHON_ERROR(IndexError, x.what()); 
+}
+
+void translator_out_of_range(std::out_of_range const& x) { 
+  PYTHON_ERROR(IndexError, x.what()); 
+}
+
+void translator_runtime_error(std::runtime_error const& x) { 
+  PYTHON_ERROR(RuntimeError, x.what()); 
+}
+
+void translator_range_error(std::range_error const& x) { 
+  PYTHON_ERROR(IndexError, x.what()); 
+}
+
+void translator_overflow_error(std::overflow_error const& x) { 
+  PYTHON_ERROR(OverflowError, x.what()); 
+}
+
+void translator_underflow_error(std::underflow_error const& x) { 
+  PYTHON_ERROR(ArithmeticError, x.what()); 
+}
+
 void bind_core_exception() {
+  register_exception_translator<std::exception>(translator_except);
+  register_exception_translator<std::logic_error>(translator_logic_error);
+  register_exception_translator<std::domain_error>(translator_domain_error);
+  register_exception_translator<std::invalid_argument>(translator_invalid_argument);
+  register_exception_translator<std::length_error>(translator_length_error);
+  register_exception_translator<std::out_of_range>(translator_out_of_range);
+  register_exception_translator<std::runtime_error>(translator_runtime_error);
+  register_exception_translator<std::range_error>(translator_range_error);
+  register_exception_translator<std::overflow_error>(translator_overflow_error);
+  register_exception_translator<std::underflow_error>(translator_underflow_error);
+
   BaseCxxToPythonTranslator<Torch::core::Exception>("Exception", "The core Exception class should be used as a basis for all Torch-Python exceptions.");
   CxxToPythonTranslatorPar<Torch::core::DeprecationError, Torch::core::Exception, const std::string&>("DeprecationError", "A deprecation error is raised when the developer wants to avoid the use of certain functionality in the code and for the user to migrate his code.");
   CxxToPythonTranslator<Torch::core::ConvertZeroInputRange, Torch::core::Exception>("ConvertZeroInputRange", "A ConvertZeroInputRange error is raised when the user try to convert an array which has a zero width input range.");

@@ -61,6 +61,11 @@ set(pysrc_mapstring
    "src/main_mapstring.cc"
    )
 
+set(pysrc_tuple
+   "src/tuple.cc"
+   "src/main_tuple.cc"
+   )
+
 set(pysrc_random
    "src/random.cc"
    "src/main_random.cc"
@@ -74,6 +79,7 @@ torch_python_submodule_bindings(core array "${pysrc_array}")
 add_dependencies(pytorch_core_array core-array-python_header_install)
 torch_python_submodule_bindings(core vector "${pysrc_vector}")
 torch_python_submodule_bindings(core mapstring "${pysrc_mapstring}")
+torch_python_submodule_bindings(core tuple "${pysrc_tuple}")
 torch_python_submodule_bindings(core random "${pysrc_random}")
 torch_python_install(core)
 
