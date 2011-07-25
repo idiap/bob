@@ -111,7 +111,9 @@ void translator_underflow_error(std::underflow_error const& x) {
 }
 
 void bind_core_exception() {
-  register_exception_translator<std::exception>(translator_except);
+  //avoid binding std::except as boost::python uses it...
+  //register_exception_translator<std::exception>(translator_except);
+  
   register_exception_translator<std::logic_error>(translator_logic_error);
   register_exception_translator<std::domain_error>(translator_domain_error);
   register_exception_translator<std::invalid_argument>(translator_invalid_argument);
