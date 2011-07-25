@@ -28,10 +28,13 @@ static void load(visioner::SWScanner& s,
 }
 
 static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
-    visioner::SWScanner& cscanner) {
-  // Locate keypoints
+    float cluster, visioner::SWScanner& cscanner) {
+  // detect faces
   visioner::detections_t detections;
   visioner::detect(cmodel[0], threshold, levels, cscanner, detections);
+
+  // cluster detections
+  visioner::nms(detections, cluster);	
 
   // Returns a tuple containing all detections
   list tmp;
