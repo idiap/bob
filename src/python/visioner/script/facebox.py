@@ -3,10 +3,10 @@
 # Andre Anjos <andre.dos.anjos@gmail.com>
 # Mon 25 Jul 14:07:42 2011 
 
-"""Detects faces on video or images, imprint bounding boxes, landmarks or just
-do a textual dump of such values. Bounding boxes are 4-tuples containing the
-upper left corner x and y coordinates followed by the bounding box window
-width and its height. Keypoints are printed as 2-tuples."""
+"""Detects faces on video or images, imprint bounding boxes or just do a
+textual dump of such values. Bounding boxes are 4-tuples containing the upper
+left corner x and y coordinates followed by the bounding box window width and
+its height."""
 
 __epilog__ = """Example usage:
 
@@ -140,9 +140,6 @@ def main():
       help="the input filename")
   parser.add_argument("output", metavar='FILE', type=str, nargs='?',
       help="the output filename; if this filename is omitted, output for the detections is dumped in text format to the screen")
-  parser.add_argument("-l", "--localization", dest="localize",
-      default=False, action='store_true',
-      help="enables full keypoint localization")
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
@@ -150,21 +147,21 @@ def main():
   args = parser.parse_args()
 
   start = time.clock()  
-  Obj = None
-  if args.localize:
-    Obj = torch.visioner.Localizer()
-  else:
-    Obj = torch.visioner.Detector()
+  processor = torch.visioner.Detector()
   total = time.clock() - start
+
   if args.verbose:
     print "Model loading took %.2f seconds" % total
 
   is_video = (os.path.splitext(args.input)[1] in torch.io.video_extensions())
 
   if is_video:
-    process_video_data(args.input, Obj, args.verbose, args.output)
+
+    process_video_data(args.input, processor, args.verbose, args.output)
+
   else:
-    process_image_data(args.input, Obj, args.verbose, args.output)
+
+    process_image_data(args.input, processor, args.verbose, args.output)
 
 if __name__ == '__main__':
   main()
