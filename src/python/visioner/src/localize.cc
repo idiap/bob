@@ -36,7 +36,10 @@ static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
   // cluster detections
   visioner::nms(detections, cluster);	
 
-  // Returns a tuple containing all detections
+  // order detections by descending order
+  visioner::sort_desc(detections);
+
+  // Returns a tuple containing all detections, with descending scores
   list tmp;
   qreal x, y, width, height;
   for (size_t i=0; i<detections.size(); ++i) {
