@@ -9,6 +9,7 @@
 #include <boost/python/slice.hpp>
 
 #include "io/Video.h"
+#include "io/VideoArrayCodec.h"
 #include "core/python/exception.h"
 
 using namespace boost::python;
@@ -130,12 +131,24 @@ static blitz::Array<uint8_t,4> videoreader_load(io::VideoReader& reader) {
   return retval;
 }
 
+static tuple extensions() {
+  io::VideoArrayCodec c;
+  list retval;
+  for (size_t i=0; i<c.extensions().size(); ++i) {
+    retval.append(c.extensions()[i]);
+  }
+  return tuple(retval);
+}
+
 void bind_io_video() {
   //exceptions for videos
   CxxToPythonTranslatorPar2<Torch::io::FFmpegException, Torch::io::Exception, const char*, const char*>("FFmpegException", "Thrown when there is a problem with a Video file.");
   CxxToPythonTranslatorPar<Torch::io::VideoIsClosed, Torch::io::Exception, const char*>("VideoIsClosed", "Thrown if a writeable video is already closed and the user tries to write on it.");
 
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
+
+  //supported extensions for video files
+  def("video_extensions", &extensions, "Returns all extensions supported by the video loading subsystem");
 
   class_<io::VideoReader, boost::shared_ptr<io::VideoReader> >("VideoReader",
       "VideoReader objects can read data from video files. The current implementation uses FFMPEG which is a stable freely available implementation for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read frame-by-frame and avoid overloading your machine's memory. The maximum precision FFMPEG will output is a 24-bit (8-bit per band) representation of each pixel (32-bit with transparency when supported by Torch, which is not the case presently). So, the input of data using this class uses uint8_t as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&>((arg("filename")), "Initializes a new VideoReader object by giving the input file name to read"))

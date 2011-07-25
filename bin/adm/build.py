@@ -135,6 +135,10 @@ def cmake(option):
   else:
     cmake_options['-DTORCH_DB_INSTALL_PREFIX'] = 'OFF'
 
+  if option.createdb and option.db_prefix and os.path.exists(option.db_prefix):
+    # touch it so to modify the last modification time
+    os.utime(option.db_prefix, None)
+
   cmdline = ['cmake']
   if option.debug_build: cmdline.append('--debug-output')
   

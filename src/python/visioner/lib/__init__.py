@@ -15,7 +15,7 @@ class Detector:
   still images or video frames"""
 
   def __init__(self, cmodel_file=None, threshold=-float_info.max, 
-      scan_levels=0, scale_var=8):
+      scan_levels=0, scale_var=8, cluster=0.10):
     """Creates a new face localization object by loading object classification
     and keypoint localization models from visioner model files.
 
@@ -34,6 +34,9 @@ class Detector:
 
     scale_var
       scanning: scale variation in pixels
+    
+    cluster
+      NMS clustering: overlapping threshold
     """
 
     if cmodel_file is None: cmodel_file = DEFAULT_CMODEL
@@ -43,12 +46,14 @@ class Detector:
     self.cscanner = SWScanner(self.cparam)
     self.threshold = threshold
     self.scan_levels = scan_levels
+    self.cluster = cluster
 
   def __call__(self, grayimage):
     """Runs the detection machinery, returns bounding boxes"""
 
     self.cscanner.load(grayimage)
-    return detect(self.cmodel, self.threshold, self.scan_levels, self.cscanner)
+    return detect(self.cmodel, self.threshold, self.scan_levels, 
+        self.cluster, self.cscanner)
 
 class Localizer:
   """A class that bridging the Visioner to torch so as to localize face in 

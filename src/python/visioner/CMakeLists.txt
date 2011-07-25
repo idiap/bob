@@ -38,3 +38,10 @@ torch_python_add_test(python-visioner-detection-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_detection.py)
 torch_python_add_test(python-visioner-localization-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_localization.py)
+torch_python_add_test(python-visioner-facebox-script-1
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/visioner_facebox.py dummy --self-test=1)
+torch_python_add_test(python-visioner-facebox-script-2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/visioner_facebox.py dummy --self-test=2)
+
+# Installs all python scripts
+file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
