@@ -166,6 +166,243 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(z, z_ref, 2e-4))
 
 
+  def test05_JFATrainer_Yupdate(self):
+    # test the JFATrainer for updating Y
+
+    F1=torch.core.array.float64_2(
+      [0.3833, 0.4516,
+      0.6173, 0.2277,
+      0.5755, 0.8044,
+      0.5301, 0.9861,
+      0.2751, 0.0300,
+      0.2486, 0.5357], (6,2))
+    F2=torch.core.array.float64_2(
+      [0.0871, 0.6838,
+      0.8021, 0.7837,
+      0.9891, 0.5341,
+      0.0669, 0.8854,
+      0.9394, 0.8990,
+      0.0182, 0.6259], (6,2))
+    F=[F1, F2]
+
+    N1=torch.core.array.float64_2([0.1379, 0.1821, 
+                                   0.2178, 0.0418], (2,2))
+    N2=torch.core.array.float64_2([0.1069, 0.9397, 
+                                   0.6164, 0.3545], (2,2))
+    N=[N1, N2]
+
+    m=torch.core.array.float64_1([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839], (6,))
+    E=torch.core.array.float64_1([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131], (6,))
+    d=torch.core.array.float64_1([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668], (6,))
+    v=torch.core.array.float64_2(
+      [0.3367, 0.4116,
+      0.6624, 0.6026,
+      0.2442, 0.7505,
+      0.2955, 0.5835,
+      0.6802, 0.5518,
+      0.5278,0.5836], (6,2))
+    u=torch.core.array.float64_2(
+      [0.5118, 0.3464,
+      0.0826, 0.8865,
+      0.7196, 0.4547,
+      0.9962, 0.4134,
+      0.3545, 0.2177,
+      0.9713, 0.1257], (6,2))
+
+    z1=torch.core.array.float64_1([0.3089, 0.7261, 0.7829, 0.6938, 0.0098, 0.8432], (6,))
+    z2=torch.core.array.float64_1([0.9223, 0.7710, 0.0427, 0.3782, 0.7043, 0.7295], (6,))
+    y1=torch.core.array.float64_1([0, 0], (2,))
+    y2=torch.core.array.float64_1([0, 0], (2,))
+    y3=torch.core.array.float64_1([0.9630, 1.3868], (2,))
+    y4=torch.core.array.float64_1([0.0426, -0.3721], (2,))
+    x1=torch.core.array.float64_2([0.9976, 0.8116,
+                                  0.1375, 0.3900], (2,2))
+    x2=torch.core.array.float64_2([0.4857, 0.8944, 
+                                  0.9274, 0.9175], (2,2))
+    z=[z1, z2]
+    y=[y1, y2]
+    x=[x1, x2]
+
+    # call the updateY function
+    jfam = torch.machine.JFAMachine(2,3,2,2)
+    jfam.ubm_mean = m
+    jfam.ubm_var = E
+    jfam.U = u
+    jfam.V = v
+    jfam.D = d
+    jfat = torch.trainer.JFATrainer(jfam)
+
+    jfat.setStatistics(N, F)
+    jfat.setSpeakerFactors(x,y,z)
+
+    jfat.precomputeSumStatisticsN()
+    jfat.precomputeSumStatisticsF()
+
+    jfat.updateY()
+
+    # Expected results(JFA cookbook, matlab)
+    self.assertTrue(equals(jfat.Y[0], y3, 2e-4))
+    self.assertTrue(equals(jfat.Y[1], y4, 2e-4))
+
+
+  def test06_JFATrainer_Xupdate(self):
+    # test the JFATrainer for updating X
+
+    F1=torch.core.array.float64_2(
+      [0.3833, 0.4516,
+      0.6173, 0.2277,
+      0.5755, 0.8044,
+      0.5301, 0.9861,
+      0.2751, 0.0300,
+      0.2486, 0.5357], (6,2))
+    F2=torch.core.array.float64_2(
+      [0.0871, 0.6838,
+      0.8021, 0.7837,
+      0.9891, 0.5341,
+      0.0669, 0.8854,
+      0.9394, 0.8990,
+      0.0182, 0.6259], (6,2))
+    F=[F1, F2]
+
+    N1=torch.core.array.float64_2([0.1379, 0.1821, 
+                                   0.2178, 0.0418], (2,2))
+    N2=torch.core.array.float64_2([0.1069, 0.9397, 
+                                   0.6164, 0.3545], (2,2))
+    N=[N1, N2]
+
+    m=torch.core.array.float64_1([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839], (6,))
+    E=torch.core.array.float64_1([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131], (6,))
+    d=torch.core.array.float64_1([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668], (6,))
+    v=torch.core.array.float64_2(
+      [0.3367, 0.4116,
+      0.6624, 0.6026,
+      0.2442, 0.7505,
+      0.2955, 0.5835,
+      0.6802, 0.5518,
+      0.5278,0.5836], (6,2))
+    u=torch.core.array.float64_2(
+      [0.5118, 0.3464,
+      0.0826, 0.8865,
+      0.7196, 0.4547,
+      0.9962, 0.4134,
+      0.3545, 0.2177,
+      0.9713, 0.1257], (6,2))
+
+    z1=torch.core.array.float64_1([0.3089, 0.7261, 0.7829, 0.6938, 0.0098, 0.8432], (6,))
+    z2=torch.core.array.float64_1([0.9223, 0.7710, 0.0427, 0.3782, 0.7043, 0.7295], (6,))
+    y1=torch.core.array.float64_1([0.2243, 0.2691], (2,))
+    y2=torch.core.array.float64_1([0.6730, 0.4775], (2,))
+    x1=torch.core.array.float64_2([0, 0, 0, 0], (2,2))
+    x2=torch.core.array.float64_2([0, 0, 0, 0], (2,2))
+    x3=torch.core.array.float64_2([0.2143, 1.8275,
+                                  3.1979, 0.1227], (2,2))
+    x4=torch.core.array.float64_2([-1.3861, 0.2359,
+                                  5.3326, -0.7914], (2,2))
+    z=[z1, z2]
+    y=[y1, y2]
+    x=[x1, x2]
+
+    # call the updateX function
+    jfam = torch.machine.JFAMachine(2,3,2,2)
+    jfam.ubm_mean = m
+    jfam.ubm_var = E
+    jfam.U = u
+    jfam.V = v
+    jfam.D = d
+    jfat = torch.trainer.JFATrainer(jfam)
+
+    jfat.setStatistics(N, F)
+    jfat.setSpeakerFactors(x,y,z)
+
+    jfat.precomputeSumStatisticsN()
+    jfat.precomputeSumStatisticsF()
+
+    jfat.updateX()
+
+    # Expected results(JFA cookbook, matlab)
+    self.assertTrue(equals(jfat.X[0], x3, 2e-4))
+    self.assertTrue(equals(jfat.X[1], x4, 2e-4))
+
+
+  def test07_JFATrainer_Zupdate(self):
+    # test the JFATrainer for updating Z
+
+    F1=torch.core.array.float64_2(
+      [0.3833, 0.4516,
+      0.6173, 0.2277,
+      0.5755, 0.8044,
+      0.5301, 0.9861,
+      0.2751, 0.0300,
+      0.2486, 0.5357], (6,2))
+    F2=torch.core.array.float64_2(
+      [0.0871, 0.6838,
+      0.8021, 0.7837,
+      0.9891, 0.5341,
+      0.0669, 0.8854,
+      0.9394, 0.8990,
+      0.0182, 0.6259], (6,2))
+    F=[F1, F2]
+
+    N1=torch.core.array.float64_2([0.1379, 0.1821, 
+                                   0.2178, 0.0418], (2,2))
+    N2=torch.core.array.float64_2([0.1069, 0.9397, 
+                                   0.6164, 0.3545], (2,2))
+    N=[N1, N2]
+
+    m=torch.core.array.float64_1([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839], (6,))
+    E=torch.core.array.float64_1([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131], (6,))
+    d=torch.core.array.float64_1([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668], (6,))
+    v=torch.core.array.float64_2(
+      [0.3367, 0.4116,
+      0.6624, 0.6026,
+      0.2442, 0.7505,
+      0.2955, 0.5835,
+      0.6802, 0.5518,
+      0.5278,0.5836], (6,2))
+    u=torch.core.array.float64_2(
+      [0.5118, 0.3464,
+      0.0826, 0.8865,
+      0.7196, 0.4547,
+      0.9962, 0.4134,
+      0.3545, 0.2177,
+      0.9713, 0.1257], (6,2))
+
+    z1=torch.core.array.float64_1([0, 0, 0, 0, 0, 0], (6,))
+    z2=torch.core.array.float64_1([0, 0, 0, 0, 0, 0], (6,))
+    z3=torch.core.array.float64_1([0.3256, 1.8633, 0.6480, 0.8085, -0.0432, 0.2885], (6,))
+    z4=torch.core.array.float64_1([-0.3324, -0.1474, -0.4404, -0.4529, 0.0484, -0.5848], (6,))
+    y1=torch.core.array.float64_1([0.2243, 0.2691], (2,))
+    y2=torch.core.array.float64_1([0.6730, 0.4775], (2,))
+    x1=torch.core.array.float64_2([0.9976, 0.8116,
+                                  0.1375, 0.3900], (2,2))
+    x2=torch.core.array.float64_2([0.4857, 0.8944, 
+                                  0.9274, 0.9175], (2,2))
+    z=[z1, z2]
+    y=[y1, y2]
+    x=[x1, x2]
+
+    # call the updateZ function
+    jfam = torch.machine.JFAMachine(2,3,2,2)
+    jfam.ubm_mean = m
+    jfam.ubm_var = E
+    jfam.U = u
+    jfam.V = v
+    jfam.D = d
+    jfat = torch.trainer.JFATrainer(jfam)
+
+    jfat.setStatistics(N, F)
+    jfat.setSpeakerFactors(x,y,z)
+
+    jfat.precomputeSumStatisticsN()
+    jfat.precomputeSumStatisticsF()
+
+    jfat.updateZ()
+
+    # Expected results(JFA cookbook, matlab)
+    self.assertTrue(equals(jfat.Z[0], z3, 2e-4))
+    self.assertTrue(equals(jfat.Z[1], z4, 2e-4))
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \

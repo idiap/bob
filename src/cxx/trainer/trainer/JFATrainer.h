@@ -10,6 +10,12 @@
 
 #include <blitz/array.h>
 #include "io/Arrayset.h"
+#include "machine/JFAMachine.h"
+#include  <map>
+#include  <vector>
+#include  <string>
+
+#include "core/logging.h"
 
 namespace Torch { namespace trainer { namespace jfa {
 
@@ -115,7 +121,318 @@ void estimateZandD(const blitz::Array<double,2> &F, const blitz::Array<double,2>
   const blitz::Array<double,2> &u, blitz::Array<double,2> &z, 
   const blitz::Array<double,2> &y, const blitz::Array<double,2> &x,
   const blitz::Array<uint32_t,1> &spk_ids);
+} // close JFA namespace
 
-}}}
+
+
+class JFATrainer {
+
+  public:
+    /**
+     * Initializes a new JFA trainer 
+     */
+    JFATrainer(Torch::machine::JFAMachine& jfa_machine);
+
+    /**
+     * Destructor virtualisation
+     */
+    ~JFATrainer() {}
+
+    /**
+     * Set the zeroth and first order statistics to train
+     * @warning the JFA machine should be set before
+     */
+    void setStatistics(const std::vector<blitz::Array<double,2> >& N, 
+      const std::vector<blitz::Array<double,2> >& F);
+
+    /**
+     * Set the x, y, z speaker factors
+     * @warning the JFA machine should be set before
+     */
+    void setSpeakerFactors(const std::vector<blitz::Array<double,2> >& x, 
+      const std::vector<blitz::Array<double,1> >& y,
+      const std::vector<blitz::Array<double,1> >& z);
+
+    /**
+     * Initializes randomly the U, V and D=diag(d) matrices of the JFA machine
+     */
+    void initializeRandomU();
+    void initializeRandomV();
+    void initializeRandomD();
+
+
+    /**** Y and V functions ****/
+    /**
+     * Computes Vt * diag(sigma)^-1
+     */
+    void computeVtSigmaInv();
+    /**
+     * Computes Vt_{c} * diag(sigma)^-1 * V_{c} for each Gaussian c
+     */
+    void computeVProd();
+    /**
+     * Computes (I+Vt*diag(sigma)^-1*Ni*V)^-1 which occurs in the y estimation
+     * for the given person
+     */
+    void computeIdPlusVProd_i(const int id);
+    /**
+     * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) 
+     * which occurs in the y estimation of the given person
+     */
+    void computeFn_y_i(const int id);
+    /**
+     * Updates y_i (of the current person) and the accumulators to compute V 
+     * with the cache values m_cache_IdPlusVprod_i, m_VtSigmaInv and 
+     * m_cache_Fn_y_i
+     */
+    void updateY_i(const int id);
+    /**
+     * Updates y and the accumulators to compute V 
+     */
+    void updateY();
+    /**
+     * Updates V by using the accumulators m_cache_A1_x and m_cache_A2_x
+     * V = A2 * A1^-1
+     */
+    void updateV();
+
+
+    /**** X and U functions ****/
+    /**
+     * Computes Ut * diag(sigma)^-1
+     */
+    void computeUtSigmaInv();
+    /**
+     * Computes Ut_{c} * diag(sigma)^-1 * U_{c} for each Gaussian c
+     */
+    void computeUProd();
+    /**
+     * Computes (I+Vt*diag(sigma)^-1*Ni*V)^-1 which occurs in the y estimation
+     * for the given person
+     */
+    void computeIdPlusUProd_ih(const int id, const int h);
+    /**
+     * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - D*z_{i} - U*x_{i,h}) 
+     * which occurs in the y estimation of the given person
+     */
+    void computeFn_x_ih(const int id, const int h);
+    /**
+     * Updates x_ih (of the current person/session) and the accumulators to compute V 
+     * with the cache values m_cache_IdPlusVprod_i, m_VtSigmaInv and 
+     * m_cache_Fn_y_i
+     */
+    void updateX_ih(const int id, const int h);
+    /**
+     * Updates x and the accumulators to compute U
+     */
+    void updateX();
+    /**
+     * Updates U by using the accumulators m_cache_A1_y and m_cache_A2_y
+     * U = A2 * A1^-1
+     */
+    void updateU();
+
+
+    /**** z and D functions ****/
+    /**
+     * Computes diag(D) * diag(sigma)^-1
+     */
+    void computeDtSigmaInv();
+    /**
+     * Computes Dt_{c} * diag(sigma)^-1 * D_{c} for each Gaussian c
+     */
+    void computeDProd();
+    /**
+     * Computes (I+diag(d)t*diag(sigma)^-1*Ni*diag(d))^-1 which occurs in the z estimation
+     * for the given person
+     */
+    void computeIdPlusDProd_i(const int id);
+    /**
+     * Computes sum_{sessions h}(N_{i,h}*(o_{i,h} - m - V*y_{i} - U*x_{i,h}) 
+     * which occurs in the y estimation of the given person
+     */
+    void computeFn_z_i(const int id);
+    /**
+     * Updates z_i (of the current person) and the accumulators to compute D
+     * with the cache values m_cache_IdPlusDProd_i, m_VtSigmaInv and 
+     * m_cache_Fn_z_i
+     */
+    void updateZ_i(const int id);
+    /**
+     * Updates z and the accumulators to compute D
+     */
+    void updateZ();
+    /**
+     * Updates D by using the accumulators m_cache_A1_z and m_cache_A2_z
+     * V = A2 * A1^-1
+     */
+    void updateD();
+
+
+
+    /**
+     * Precomputes the sums of the zeroth order statistics over the sessions 
+     * for each client
+     */
+    void precomputeSumStatisticsN();
+    /**
+     * Precomputes the sums of the first order statistics over the sessions 
+     * for each client
+     */
+    void precomputeSumStatisticsF();
+
+
+    /**
+     * Get the zeroth order statistics
+     */
+    const std::vector<blitz::Array<double,2> >& getN()
+    { return m_N; }
+    const std::vector<blitz::Array<double,1> >& getNacc()
+    { return m_Nacc; }
+    /**
+     * Get the first order statistics
+     */
+    const std::vector<blitz::Array<double,2> >& getF()
+    { return m_F; }
+    const std::vector<blitz::Array<double,1> >& getFacc()
+    { return m_Facc; }
+    /**
+     * Get the x speaker factors
+     */
+    const std::vector<blitz::Array<double,2> >& getX()
+    { return m_x; }
+    /**
+     * Get the y speaker factors
+     */
+    const std::vector<blitz::Array<double,1> >& getY()
+    { return m_y; }
+    /**
+     * Get the z speaker factors
+     */
+    const std::vector<blitz::Array<double,1> >& getZ()
+    { return m_z; }
+
+    /**
+      * Set the zeroth order statistics
+      */
+    void setN(const std::vector<blitz::Array<double,2> >& N)
+    { m_N = N; }
+    /**
+      * Set the first order statistics
+      */
+    void setF(const std::vector<blitz::Array<double,2> >& F)
+    { m_F = F; }
+    /**
+      * Set the x speaker factors
+      */
+    void setX(const std::vector<blitz::Array<double,2> >& X)
+    { m_x = X; }
+    /**
+      * Set the y speaker factors
+      */
+    void setY(const std::vector<blitz::Array<double,1> >& y)
+    { m_y = y; }
+    /**
+      * Set the z speaker factors
+      */
+    void setZ(const std::vector<blitz::Array<double,1> >& z)
+    { m_z = z; }
+
+
+    /**
+      * For debugging only
+      */
+    const blitz::Array<double,2>& getVtSigmaInv() const
+    { return m_cache_VtSigmaInv; }
+    const blitz::Array<double,2>& getIdPlusVProd_i() const
+    { return m_cache_IdPlusVProd_i; }
+    const blitz::Array<double,1>& getFn_y_i() const
+    { return m_cache_Fn_y_i; }
+    const blitz::Array<double,2>& getA1_y() const
+    { return m_cache_A1_y; }
+    const blitz::Array<double,2>& getA2_y() const
+    { return m_cache_A2_y; }
+    blitz::Array<double,2>& updateVtSigmaInv()
+    { return m_cache_VtSigmaInv; }
+    blitz::Array<double,2>& updateIdPlusVProd_i()
+    { return m_cache_IdPlusVProd_i; }
+    blitz::Array<double,1>& updateFn_y_i()
+    { return m_cache_Fn_y_i; }
+    blitz::Array<double,2>& updateA1_y()
+    { return m_cache_A1_y; }
+    blitz::Array<double,2>& updateA2_y()
+    { return m_cache_A2_y; }
+    void setVtSigmaInv(const blitz::Array<double,2>& VtSigmaInv)
+    { m_cache_VtSigmaInv.reference(VtSigmaInv.copy()); }
+    void setIdPlusVProd_i(const blitz::Array<double,2>& IdPlusVProd_i)
+    { m_cache_IdPlusVProd_i.reference(IdPlusVProd_i.copy()); }
+    void setFn_y_i(const blitz::Array<double,1>& Fn_y_i)
+    { m_cache_Fn_y_i.reference(Fn_y_i.copy()); }
+    void setA1_y(const blitz::Array<double,2>& A1_y)
+    { m_cache_A1_y.reference(A1_y.copy()); }
+    void setA2_y(const blitz::Array<double,2>& A2_y)
+    { m_cache_A2_y.reference(A2_y.copy()); }
+
+
+  private:
+    /**
+     * Initializes randomly a 1D vector
+     */
+    void initializeRandom(blitz::Array<double,1>& vector);
+    /**
+     * Initializes randomly a 2D matrix
+     */
+    void initializeRandom(blitz::Array<double,2>& matrix);
+
+
+    Torch::machine::JFAMachine& m_jfa_machine; // JFA machine
+    size_t m_Nid; // Number of identities
+    std::vector<blitz::Array<double,2> > m_N; // Zeroth order statistics
+    std::vector<blitz::Array<double,2> > m_F; // First order statistics
+
+    std::vector<blitz::Array<double,2> > m_x; // matrix x of speaker factors for eigenchannels U, for each client
+    std::vector<blitz::Array<double,1> > m_y; // vector y of spealer factors for eigenvoices V, for each client
+    std::vector<blitz::Array<double,1> > m_z; // vector z of spealer factors for eigenvoices Z, for each client
+
+    // Cache/Precomputation
+    std::vector<blitz::Array<double,1> > m_Nacc; // Sum of the zeroth order statistics over the sessions for each client
+    std::vector<blitz::Array<double,1> > m_Facc; // Sum of the first order statistics over the sessions for each client
+
+    blitz::Array<double,2> m_cache_VtSigmaInv; // Vt * diag(sigma)^-1
+    blitz::Array<double,3> m_cache_VProd; // first dimension is the Gaussian id
+    blitz::Array<double,2> m_cache_IdPlusVProd_i;
+    blitz::Array<double,1> m_cache_Fn_y_i;
+    blitz::Array<double,2> m_cache_A1_y;
+    blitz::Array<double,2> m_cache_A2_y;
+
+    blitz::Array<double,2> m_cache_UtSigmaInv; // Ut * diag(sigma)^-1
+    blitz::Array<double,3> m_cache_UProd; // first dimension is the Gaussian id
+    blitz::Array<double,2> m_cache_IdPlusUProd_ih;
+    blitz::Array<double,1> m_cache_Fn_x_ih;
+    blitz::Array<double,2> m_cache_A1_x;
+    blitz::Array<double,2> m_cache_A2_x;
+
+    blitz::Array<double,1> m_cache_DtSigmaInv; // Dt * diag(sigma)^-1
+    blitz::Array<double,1> m_cache_DProd; // supervector length dimension
+    blitz::Array<double,1> m_cache_IdPlusDProd_i;
+    blitz::Array<double,1> m_cache_Fn_z_i;
+    blitz::Array<double,2> m_cache_A1_z;
+    blitz::Array<double,2> m_cache_A2_z;
+
+    mutable blitz::Array<double,2> m_tmp_rvrv;
+    mutable blitz::Array<double,2> m_tmp_rvCD;
+    mutable blitz::Array<double,2> m_tmp_rvD;
+    mutable blitz::Array<double,2> m_tmp_ruD;
+    mutable blitz::Array<double,2> m_tmp_ruru;
+    mutable blitz::Array<double,1> m_tmp_rv;
+    mutable blitz::Array<double,1> m_tmp_ru;
+    mutable blitz::Array<double,1> m_tmp_CD;
+    mutable blitz::Array<double,1> m_tmp_CD_b;
+    mutable blitz::Array<double,1> m_tmp_D;
+    mutable blitz::Array<double,2> m_tmp_CDCD;
+};
+
+
+}}
 
 #endif /* TORCH5SPRO_TRAINER_JFATRAINER_H */
