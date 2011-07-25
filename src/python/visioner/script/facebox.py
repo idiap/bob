@@ -129,7 +129,8 @@ def process_image_data(args):
 
   if not args.output:
     
-    if not data: data =(0, 0, 0, 0, -sys.float_info.max)
+    if not data: data = (0, 0, 0, 0, -sys.float_info.max)
+    else: data = (r(data[0]), r(data[1]), r(data[2]), r(data[3]), det[4])
     if args.dump_scores:
       sys.stdout.write("%d %d %d %d %.4e\n" % data)
     else:
