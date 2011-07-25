@@ -12,8 +12,27 @@
 #define TORCH_CORE_PYTHON_MAP_CONTAINER_H
 
 #include <boost/python.hpp>
+#include <blitz/array.h>
+#include "core/python/exception.h"
 
 namespace Torch { namespace python {
+
+  //helps assignment with specific types
+  template <typename T>
+    struct assign {
+      void operator() (std::map<std::string, T>& self, const std::string& key, const T& value) {
+        self[key] = value;
+      }
+    };
+
+  //assignment specialization for blitz::Array<V,N>
+  template <>
+    template <typename V, int N>
+    struct assign<blitz::Array<V,N> > {
+      void operator() (std::map<std::string, blitz::Array<V,N> >& self, const std::string& key, const blitz::Array<V,N>& value) {
+        self[key].reference(value.copy());
+      }
+    };
 
   template <typename MapType>
   struct from_python_dict
@@ -54,18 +73,14 @@ namespace Torch { namespace python {
         boost::python::object key_obj = keys[i];
         boost::python::extract<k_t> key_proxy(key_obj);
         if (!key_proxy.check()) {
-          PyErr_SetString(PyExc_KeyError, "Unsuitable type.");
-          boost::python::throw_error_already_set();
+          PYTHON_ERROR(KeyError, "unsuitable type");
         }
         boost::python::object value_obj = other[key_obj];
         boost::python::extract<m_t> value_proxy(value_obj);
         if (!value_proxy.check()) {
-          PyErr_SetString(PyExc_ValueError, "Unsuitable type.");
-          boost::python::throw_error_already_set();
+          PYTHON_ERROR(ValueError, "unsuitable value");
         }
-        k_t key = key_proxy();
-        m_t value = value_proxy();
-        self[key] = value;
+        assign<m_t>()(self, key_proxy(), value_proxy());
       }
     }
   };
