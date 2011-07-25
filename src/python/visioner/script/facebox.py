@@ -75,12 +75,12 @@ def process_video_data(args):
 
   if not args.output:
     for k, det in enumerate(data):
-      if not det: det = (0, 0, 0, 0, -sys.float_info.max)
-      else: det = (r(det[0]), r(det[1]), r(det[2]), r(det[3]), det[4])
+      if not det: det = (k, 0, 0, 0, 0, -sys.float_info.max)
+      else: det = (k, r(det[0]), r(det[1]), r(det[2]), r(det[3]), det[4])
       if args.dump_scores:
-        sys.stdout.write("%d %d %d %d %.4e\n" % det)
+        sys.stdout.write("%d %d %d %d %d %.4e\n" % det)
       else:
-        sys.stdout.write("%d %d %d %d\n" % det[:4])
+        sys.stdout.write("%d %d %d %d %d\n" % det[:5])
 
   else: #use wants to record a video with the output
    
