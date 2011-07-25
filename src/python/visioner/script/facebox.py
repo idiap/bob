@@ -94,7 +94,7 @@ def process_video_data(args):
     ov = torch.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
     for frame,bbox in zip(input,data):
       if bbox:
-        bbox = [int(round(v)) for v in bbox]
+        bbox = [r(v) for v in bbox[:4]]
         # 3-pixels width box
         torch.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], color)
         torch.ip.draw_box(frame, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2, 
@@ -141,7 +141,7 @@ def process_image_data(args):
     if data:
       if input.rank() == 3: color = (255, 0, 0) #red
       else: color = 255
-      bbox = [int(round(v)) for v in data]
+      bbox = [r(v) for v in data[:4]]
       torch.ip.draw_box(input, bbox[0], bbox[1], bbox[2], bbox[3], color)
       torch.ip.draw_box(input, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
           color)
