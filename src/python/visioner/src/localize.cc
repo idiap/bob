@@ -70,7 +70,7 @@ static tuple locate(visioner::Model& cmodel, visioner::Model& lmodel,
     tmp.append(make_tuple(dt_points[i].x(), dt_points[i].y()));
   }
 
-  return make_tuple(bbox, tmp);
+  return make_tuple(bbox, tuple(tmp));
 }
 
 static tuple load_model(const std::string& filename) {
