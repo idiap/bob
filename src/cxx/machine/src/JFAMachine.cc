@@ -74,21 +74,6 @@ void mach::JFABaseMachine::save(Torch::io::HDF5File& config) const {
   config.setArray("d", m_d);
 }
 
-/*
-void mach::JFAMachine::setUbmMean(const blitz::Array<double,1>& mean) {
-  if(mean.extent(0) != m_ubm_mean.extent(0)) { //checks dimension
-    throw mach::NInputsMismatch(mean.extent(0), m_ubm_mean.extent(0));
-  }
-  m_ubm_mean.reference(mean.copy());
-}
-
-void mach::JFAMachine::setUbmVar(const blitz::Array<double,1>& var) {
-  if(var.extent(0) != m_ubm_var.extent(0)) { //checks dimension
-    throw mach::NInputsMismatch(var.extent(0), m_ubm_var.extent(0));
-  }
-  m_ubm_var.reference(var.copy());
-}
-*/
 void mach::JFABaseMachine::setUbm(const boost::shared_ptr<Torch::machine::GMMMachine> ubm) {
   m_ubm = ubm;
 }
