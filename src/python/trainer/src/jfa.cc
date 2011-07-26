@@ -18,7 +18,7 @@ void bind_trainer_jfa() {
   def("jfa_estimateYandV", &train::jfa::estimateYandV, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors y.");
   def("jfa_estimateZandD", &train::jfa::estimateZandD, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
 
-  class_<train::JFATrainer, boost::noncopyable>("JFATrainer", "Create a trainer for the JFA.", init<mach::JFAMachine&>((arg("jfa_machine")),"Initializes a new JFATrainer."))
+  class_<train::JFATrainer, boost::noncopyable>("JFATrainer", "Create a trainer for the JFA.", init<mach::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFATrainer."))
     .add_property("N", make_function(&train::JFATrainer::getN, return_internal_reference<>()), &train::JFATrainer::setN)
     .add_property("F", make_function(&train::JFATrainer::getF, return_internal_reference<>()), &train::JFATrainer::setF)
     .add_property("X", make_function(&train::JFATrainer::getX, return_internal_reference<>()), &train::JFATrainer::setX)

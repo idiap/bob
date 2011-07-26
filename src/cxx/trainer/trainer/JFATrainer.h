@@ -132,7 +132,7 @@ class JFATrainer {
      * Initializes a new JFA trainer. This implementation is consistent with the 
      * JFA cookbook implementation. 
      */
-    JFATrainer(Torch::machine::JFAMachine& jfa_machine);
+    JFATrainer(Torch::machine::JFABaseMachine& jfa_machine);
 
     /**
      * Destructor virtualisation
@@ -402,7 +402,7 @@ class JFATrainer {
     void initializeRandom(blitz::Array<double,2>& matrix);
 
 
-    Torch::machine::JFAMachine& m_jfa_machine; // JFA machine
+    Torch::machine::JFABaseMachine& m_jfa_machine; // JFA machine
     size_t m_Nid; // Number of identities
     std::vector<blitz::Array<double,2> > m_N; // Zeroth order statistics
     std::vector<blitz::Array<double,2> > m_F; // First order statistics
@@ -414,6 +414,9 @@ class JFATrainer {
     // Cache/Precomputation
     std::vector<blitz::Array<double,1> > m_Nacc; // Sum of the zeroth order statistics over the sessions for each client
     std::vector<blitz::Array<double,1> > m_Facc; // Sum of the first order statistics over the sessions for each client
+
+    blitz::Array<double,1> m_cache_ubm_mean;
+    blitz::Array<double,1> m_cache_ubm_var;
 
     blitz::Array<double,2> m_cache_VtSigmaInv; // Vt * diag(sigma)^-1
     blitz::Array<double,3> m_cache_VProd; // first dimension is the Gaussian id

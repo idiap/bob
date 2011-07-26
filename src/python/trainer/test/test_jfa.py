@@ -231,9 +231,10 @@ class JFATrainerTest(unittest.TestCase):
     x=[x1, x2]
 
     # call the updateY function
-    jfam = torch.machine.JFAMachine(2,3,2,2)
-    jfam.ubm_mean = m
-    jfam.ubm_var = E
+    ubm = torch.machine.GMMMachine(2,3)
+    ubm.meanSupervector = m
+    ubm.varianceSupervector = E
+    jfam = torch.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
@@ -320,9 +321,10 @@ class JFATrainerTest(unittest.TestCase):
     x=[x1, x2]
 
     # call the updateX function
-    jfam = torch.machine.JFAMachine(2,3,2,2)
-    jfam.ubm_mean = m
-    jfam.ubm_var = E
+    ubm = torch.machine.GMMMachine(2,3)
+    ubm.meanSupervector = m
+    ubm.varianceSupervector = E
+    jfam = torch.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
@@ -402,9 +404,10 @@ class JFATrainerTest(unittest.TestCase):
     x=[x1, x2]
 
     # call the updateZ function
-    jfam = torch.machine.JFAMachine(2,3,2,2)
-    jfam.ubm_mean = m
-    jfam.ubm_var = E
+    ubm = torch.machine.GMMMachine(2,3)
+    ubm.meanSupervector = m
+    ubm.varianceSupervector = E
+    jfam = torch.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
@@ -469,9 +472,10 @@ class JFATrainerTest(unittest.TestCase):
       0.9713, 0.1257], (6,2))
 
     # call the train function
-    jfam = torch.machine.JFAMachine(2,3,2,2)
-    jfam.ubm_mean = m
-    jfam.ubm_var = E
+    ubm = torch.machine.GMMMachine(2,3)
+    ubm.meanSupervector = m
+    ubm.varianceSupervector = E
+    jfam = torch.machine.JFABaseMachine(ubm,2,2)
     jfam.U = u
     jfam.V = v
     jfam.D = d
