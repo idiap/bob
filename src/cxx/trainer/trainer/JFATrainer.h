@@ -455,6 +455,36 @@ class JFABaseTrainer {
 };
 
 
+class JFATrainer {
+
+  public:
+    /**
+     * Initializes a new JFA trainer. This implementation is consistent with the 
+     * JFA cookbook implementation. 
+     */
+    JFATrainer(Torch::machine::JFAMachine& jfa_machine, Torch::trainer::JFABaseTrainer& base_trainer);
+
+    /**
+     * Destructor virtualisation
+     */
+    ~JFATrainer() {}
+
+    /**
+      * Main procedure for enroling with Joint Factor Analysis
+      */
+    void enrol(const blitz::Array<double,2>& N,
+      const blitz::Array<double,2>& F, 
+      const size_t n_iter); 
+    void enrol(const Torch::io::Arrayset& features,
+      const size_t n_iter);
+
+  private:
+
+    Torch::machine::JFAMachine& m_jfa_machine; // JFA machine
+    Torch::trainer::JFABaseTrainer& m_base_trainer; // JFABaseTrainer
+};
+
+
 }}
 
 #endif /* TORCH5SPRO_TRAINER_JFATRAINER_H */

@@ -1064,7 +1064,7 @@ void train::JFABaseTrainer::train(const std::vector<Torch::io::Arrayset>& vec,
       // TODO: check type/dimensions?
       stats.init();
       blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
-      blitz::Array<double,1> Fid_s = Nid(blitz::Range::all(),s);
+      blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
       for(int f=0; f<vec[id].get<double,2>(s).extent(0); ++f)
       {
         const blitz::Array<double,1> features = vec[id].get<double,2>(s)(f,blitz::Range::all());
@@ -1081,5 +1081,64 @@ void train::JFABaseTrainer::train(const std::vector<Torch::io::Arrayset>& vec,
   }
   train(vec_N, vec_F, n_iter);
 }
+
+
+
+train::JFATrainer::JFATrainer(Torch::machine::JFAMachine& jfa_machine, Torch::trainer::JFABaseTrainer& base_trainer): 
+  m_jfa_machine(jfa_machine),
+  m_base_trainer(base_trainer)
+{
+}
+
+void train::JFATrainer::enrol(const blitz::Array<double,2>& N,
+  const blitz::Array<double,2>& F, const size_t n_iter)
+{
+  std::vector<blitz::Array<double,2> > Nv;
+  Nv.push_back(N.copy());
+  std::vector<blitz::Array<double,2> > Fv;
+  Fv.push_back(F.copy());
+  m_base_trainer.setStatistics(Nv,Fv);
+  m_base_trainer.precomputeSumStatisticsN();
+  m_base_trainer.precomputeSumStatisticsF();
+
+  for(size_t i=0; i<n_iter; ++i) {
+    m_base_trainer.updateY();
+    m_base_trainer.updateX();
+    m_base_trainer.updateZ();
+  }
+
+  const blitz::Array<double,1> y(m_base_trainer.getY()[0]);
+  const blitz::Array<double,1> z(m_base_trainer.getZ()[0]);
+  m_jfa_machine.setY(y);
+  m_jfa_machine.setZ(z);
+}
+
+void train::JFATrainer::enrol(const Torch::io::Arrayset& vec,
+  const size_t n_iter)
+{
+  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getJFABase()->getUbm());
+  Torch::machine::GMMStats stats(ubm->getNGaussians(),ubm->getNInputs()); 
+  blitz::Array<double,2> N(ubm->getNGaussians(), vec.size());
+  blitz::Array<double,2> F(ubm->getNGaussians()*ubm->getNInputs(), vec.size());
+  for(size_t s=0; s<vec.size(); ++s)
+  {
+    // TODO: check type/dimensions?
+    stats.init();
+    blitz::Array<double,1> N_s = N(blitz::Range::all(),s);
+    blitz::Array<double,1> F_s = F(blitz::Range::all(),s);
+    for(int f=0; f<vec.get<double,2>(s).extent(0); ++f)
+    {
+      const blitz::Array<double,1> features = vec.get<double,2>(s)(f,blitz::Range::all());
+      ubm->accStatistics(features, stats);
+    }
+    N_s = stats.n;
+    for(int g=0; g<ubm->getNGaussians(); ++g) {
+      blitz::Array<double,1> F_s_g = F_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
+      F_s_g = stats.sumPx(g,blitz::Range::all());
+    }
+  }
+  enrol(N, F, n_iter);
+}
+
 
 
