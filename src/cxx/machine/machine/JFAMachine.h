@@ -10,11 +10,177 @@
 
 #include "io/Arrayset.h"
 #include "io/HDF5File.h"
+#include "machine/GMMMachine.h"
+#include <boost/shared_ptr.hpp>
 
 namespace Torch { namespace machine {
   
   /**
-   * A JFA machine
+   * A JFA Base machine which contains U, V and D matrices
+   */
+  class JFABaseMachine {
+
+    public:
+
+      /**
+       * Default constructor. Builds an otherwise invalid 0 x 0 jfa machine.
+       * This is equivalent to construct a JFA with five int parameters set 
+       * to 0.
+       */
+      JFABaseMachine();
+
+      /**
+       * Constructor, builds a new jfa machine. UBM, U, V and d are
+       * not initialized.
+       *
+       * @param C Number of gaussian components
+       * @param D Dimensionality of the feature vector
+       * @param ru size of U (CD x ru)
+       * @param rv size of U (CD x rv)
+       */ 
+      JFABaseMachine(const boost::shared_ptr<Torch::machine::GMMMachine> ubm, int ru, int rv);
+
+      /**
+       * Copies another machine
+       */
+      JFABaseMachine(const JFABaseMachine& other);
+
+      /**
+       * Starts a new JFAMachine from an existing Configuration object.
+       */
+      JFABaseMachine(Torch::io::HDF5File& config);
+
+      /**
+       * Just to virtualise the destructor
+       */
+      virtual ~JFABaseMachine(); 
+
+      /**
+       * Assigns from a different machine
+       */
+      JFABaseMachine& operator= (const JFABaseMachine &other);
+
+      /**
+       * Loads data from an existing configuration object. Resets the current
+       * state.
+       */
+      void load(Torch::io::HDF5File& config);
+
+      /**
+       * Saves an existing machine to a Configuration object.
+       */
+      void save(Torch::io::HDF5File& config) const;
+
+      /**
+        * Get the UBM
+        */
+      const boost::shared_ptr<Torch::machine::GMMMachine> getUbm() const 
+      { return m_ubm; }
+
+      /**
+        * Get the U matrix
+        */
+      const blitz::Array<double,2>& getU() const 
+      { return m_U; }
+
+      /**
+        * Get the V matrix
+        */
+      const blitz::Array<double,2>& getV() const 
+      { return m_V; }
+
+      /**
+        * Get the d diagonal matrix/vector
+        */
+      const blitz::Array<double,1>& getD() const 
+      { return m_d; }
+
+      /**
+        * Get the number of Gaussian components
+        */
+      const int getDimC() const 
+      { return m_ubm->getNGaussians(); }
+
+      /**
+        * Get the feature dimensionality
+        */
+      const int getDimD() const 
+      { return m_ubm->getNInputs(); }
+
+      /**
+        * Get the supervector length
+        */
+      const int getDimCD() const 
+      { return m_ubm->getNInputs()*m_ubm->getNGaussians(); }
+
+      /**
+        * Get the size/rank ru of the U matrix
+        */
+      const int getDimRu() const 
+      { return m_ru; }
+
+      /**
+        * Get the size/rank rv of the V matrix
+        */
+      const int getDimRv() const 
+      { return m_rv; }
+
+
+      /**
+        * Get the U matrix in order to update it
+        */
+      blitz::Array<double,2>& updateU() 
+      { return m_U; }
+
+      /**
+        * Get the V matrix in order to update it
+        */
+      blitz::Array<double,2>& updateV() 
+      { return m_V; }
+
+      /**
+        * Get the d diagonal matrix/vector in order to update it
+        */
+      blitz::Array<double,1>& updateD() 
+      { return m_d; }
+
+
+      /**
+        * Set the mean supervector of the UBM
+        */
+      void setUbm(const boost::shared_ptr<Torch::machine::GMMMachine> ubm);
+
+      /**
+        * Set the U matrix
+        */
+      void setU(const blitz::Array<double,2>& U);
+
+      /**
+        * Set the V matrix
+        */
+      void setV(const blitz::Array<double,2>& V);
+
+      /**
+        * Set the d diagonal matrix/vector
+        */
+      void setD(const blitz::Array<double,1>& d);
+
+    private:
+
+      boost::shared_ptr<Torch::machine::GMMMachine> m_ubm;
+
+      // dimensionality
+      int m_ru; // size of U (CD x ru)
+      int m_rv; // size of V (CD x rv)
+
+      blitz::Array<double,2> m_U;
+      blitz::Array<double,2> m_V;
+      blitz::Array<double,1> m_d;
+  };
+
+
+  /**
+   * A JFA Base machine which contains U, V and D matrices
    */
   class JFAMachine {
 
@@ -30,13 +196,8 @@ namespace Torch { namespace machine {
       /**
        * Constructor, builds a new jfa machine. UBM, U, V and d are
        * not initialized.
-       *
-       * @param C Number of gaussian components
-       * @param D Dimensionality of the feature vector
-       * @param ru size of U (CD x ru)
-       * @param rv size of U (CD x rv)
        */ 
-      JFAMachine(int C, int D, int ru, int rv);
+      JFAMachine(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfabase);
 
       /**
        * Copies another machine
@@ -70,139 +231,90 @@ namespace Torch { namespace machine {
       void save(Torch::io::HDF5File& config) const;
 
       /**
-        * Get the mean supervector of the UBM
+        * Get the JFABaseMachine
         */
-      const blitz::Array<double,1>& getUbmMean() const 
-      { return m_ubm_mean; }
-
-      /**
-        * Get the variance supervector of the UBM
-        */
-      const blitz::Array<double,1>& getUbmVar() const 
-      { return m_ubm_var; }
-
-      /**
-        * Get the U matrix
-        */
-      const blitz::Array<double,2>& getU() const 
-      { return m_U; }
-
-      /**
-        * Get the V matrix
-        */
-      const blitz::Array<double,2>& getV() const 
-      { return m_V; }
-
-      /**
-        * Get the d diagonal matrix/vector
-        */
-      const blitz::Array<double,1>& getD() const 
-      { return m_d; }
+      const boost::shared_ptr<Torch::machine::JFABaseMachine> getJFABase() const 
+      { return m_jfa_base; }
 
       /**
         * Get the number of Gaussian components
         */
       const int getDimC() const 
-      { return m_C; }
+      { return m_jfa_base->getUbm()->getNGaussians(); }
 
       /**
         * Get the feature dimensionality
         */
       const int getDimD() const 
-      { return m_D; }
+      { return m_jfa_base->getUbm()->getNInputs(); }
 
       /**
         * Get the supervector length
         */
       const int getDimCD() const 
-      { return m_CD; }
+      { return m_jfa_base->getUbm()->getNInputs()*m_jfa_base->getUbm()->getNGaussians(); }
 
       /**
         * Get the size/rank ru of the U matrix
         */
       const int getDimRu() const 
-      { return m_ru; }
+      { return m_jfa_base->getDimRu(); }
 
       /**
         * Get the size/rank rv of the V matrix
         */
       const int getDimRv() const 
-      { return m_rv; }
+      { return m_jfa_base->getDimRv(); }
 
       /**
-        * Get the mean supervector of the UBM in order to update it
+        * Get the y speaker factors
         */
-      blitz::Array<double,1>& updateUbmMean()
-      { return m_ubm_mean; }
+      const blitz::Array<double,1>& getY() const 
+      { return m_y; }
 
       /**
-        * Get the variance supervector of the UBM in order to update it
+        * Get the z speaker factors
         */
-      blitz::Array<double,1>& updateUbmVar() 
-      { return m_ubm_var; }
+      const blitz::Array<double,1>& getZ() const 
+      { return m_z; }
+
 
       /**
-        * Get the U matrix in order to update it
+        * Get the y speaker factors in order to update it
         */
-      blitz::Array<double,2>& updateU() 
-      { return m_U; }
+      blitz::Array<double,1>& updateY() 
+      { return m_y; }
 
       /**
-        * Get the V matrix in order to update it
+        * Get the z speaker factors in order to update it
         */
-      blitz::Array<double,2>& updateV() 
-      { return m_V; }
+      blitz::Array<double,1>& updateZ()
+      { return m_z; }
 
       /**
-        * Get the d diagonal matrix/vector in order to update it
+        * Set the y speaker factors
         */
-      blitz::Array<double,1>& updateD() 
-      { return m_d; }
-
-      /**
-        * Set the mean supervector of the UBM
-        */
-      void setUbmMean(const blitz::Array<double,1>& mean);
-
-      /**
-        * Set the variance supervector of the UBM
-        */
-      void setUbmVar(const blitz::Array<double,1>& var);
-
-      /**
-        * Set the U matrix
-        */
-      void setU(const blitz::Array<double,2>& U);
+      void setY(const blitz::Array<double,1>& y);
 
       /**
         * Set the V matrix
         */
-      void setV(const blitz::Array<double,2>& V);
+      void setZ(const blitz::Array<double,1>& z);
+
 
       /**
-        * Set the d diagonal matrix/vector
+        * Set the JFABaseMachine
         */
-      void setD(const blitz::Array<double,1>& d);
+      void setJFABase(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfa_base);
 
     private:
 
-      // dimensionality
-      int m_C; // Number of Gaussian components
-      int m_D; // Feature dimensionality
-      int m_CD; // Product CD
-      int m_ru; // size of U (CD x ru)
-      int m_rv; // size of V (CD x rv)
+      boost::shared_ptr<Torch::machine::JFABaseMachine> m_jfa_base;
 
-      blitz::Array<double,1> m_ubm_mean;
-      blitz::Array<double,1> m_ubm_var;
-      blitz::Array<double,2> m_U;
-      blitz::Array<double,2> m_V;
-      blitz::Array<double,1> m_d;
-
-      blitz::Array<double,2> m_X;
-      blitz::Array<double,2> m_Y;
-      blitz::Array<double,2> m_Z;
+      blitz::Array<double,1> m_y;
+      blitz::Array<double,1> m_z;
   };
+
 
 }}
 
