@@ -166,8 +166,8 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(z, z_ref, 2e-4))
 
 
-  def test05_JFATrainer_updateYandV(self):
-    # test the JFATrainer for updating Y and V
+  def test05_JFABaseTrainer_updateYandV(self):
+    # test the JFABaseTrainer for updating Y and V
 
     F1=torch.core.array.float64_2(
       [0.3833, 0.4516,
@@ -238,7 +238,7 @@ class JFATrainerTest(unittest.TestCase):
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFATrainer(jfam)
+    jfat = torch.trainer.JFABaseTrainer(jfam)
 
     jfat.setStatistics(N, F)
     jfat.setSpeakerFactors(x,y,z)
@@ -255,8 +255,8 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(jfam.V, v_ref, 2e-4))
 
 
-  def test06_JFATrainer_updateXandU(self):
-    # test the JFATrainer for updating X and U
+  def test06_JFABaseTrainer_updateXandU(self):
+    # test the JFABaseTrainer for updating X and U
 
     F1=torch.core.array.float64_2(
       [0.3833, 0.4516,
@@ -328,7 +328,7 @@ class JFATrainerTest(unittest.TestCase):
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFATrainer(jfam)
+    jfat = torch.trainer.JFABaseTrainer(jfam)
 
     jfat.setStatistics(N, F)
     jfat.setSpeakerFactors(x,y,z)
@@ -345,8 +345,8 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(jfam.U, u_ref, 2e-4))
 
 
-  def test07_JFATrainer_updateZandD(self):
-    # test the JFATrainer for updating Z and D
+  def test07_JFABaseTrainer_updateZandD(self):
+    # test the JFABaseTrainer for updating Z and D
 
     F1=torch.core.array.float64_2(
       [0.3833, 0.4516,
@@ -411,7 +411,7 @@ class JFATrainerTest(unittest.TestCase):
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFATrainer(jfam)
+    jfat = torch.trainer.JFABaseTrainer(jfam)
 
     jfat.setStatistics(N, F)
     jfat.setSpeakerFactors(x,y,z)
@@ -428,8 +428,8 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(jfam.D, d_ref, 2e-4))
 
 
-  def test08_JFATrainer_train(self):
-    # train a JFATrainer
+  def test08_JFABaseTrainer_train(self):
+    # train a JFABaseTrainer
 
     F1=torch.core.array.float64_2(
       [0.3833, 0.4516,
@@ -479,7 +479,7 @@ class JFATrainerTest(unittest.TestCase):
     jfam.U = u
     jfam.V = v
     jfam.D = d
-    jfat = torch.trainer.JFATrainer(jfam)
+    jfat = torch.trainer.JFABaseTrainer(jfam)
 
     jfat.train(N,F,5)
 

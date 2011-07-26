@@ -125,19 +125,19 @@ void estimateZandD(const blitz::Array<double,2> &F, const blitz::Array<double,2>
 
 
 
-class JFATrainer {
+class JFABaseTrainer {
 
   public:
     /**
      * Initializes a new JFA trainer. This implementation is consistent with the 
      * JFA cookbook implementation. 
      */
-    JFATrainer(Torch::machine::JFABaseMachine& jfa_machine);
+    JFABaseTrainer(Torch::machine::JFABaseMachine& jfa_machine);
 
     /**
      * Destructor virtualisation
      */
-    ~JFATrainer() {}
+    ~JFABaseTrainer() {}
 
     /**
      * Set the zeroth and first order statistics to train
