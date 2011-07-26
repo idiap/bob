@@ -64,6 +64,8 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
 
     /// Set the means
     void setMeans(const blitz::Array<double,2> &means);
+    /// Set the means from a supervector
+    void setMeanSupervector(const blitz::Array<double,1> &mean_supervector);
 
     /// Get the means
     void getMeans(blitz::Array<double,2> &means) const;
@@ -72,6 +74,8 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
     
     /// Set the variances
     void setVariances(const blitz::Array<double,2> &variances);
+    /// Set the variances from a supervector
+    void setVarianceSupervector(const blitz::Array<double,1> &variance_supervector);
 
     /// Get the variances
     void getVariances(blitz::Array<double,2> &variances) const;

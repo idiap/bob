@@ -133,6 +133,13 @@ void Torch::machine::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
   }
 }
 
+void Torch::machine::GMMMachine::setMeanSupervector(const blitz::Array<double,1> &mean_supervector) {
+  for(int i=0; i<m_n_gaussians; ++i) {
+    const blitz::Array<double,1> mean = mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
+    m_gaussians[i].setMean(mean);
+  }
+}
+
 void Torch::machine::GMMMachine::getMeanSupervector(blitz::Array<double,1> &mean_supervector) const {
   mean_supervector.resize(m_n_gaussians*m_n_inputs);
   for(int i=0; i<m_n_gaussians; ++i) {
@@ -153,6 +160,13 @@ void Torch::machine::GMMMachine::getVariances(blitz::Array<double, 2 >& variance
   for(int i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i].getVariance(variance);
     variances(i,blitz::Range::all()) = variance;
+  }
+}
+
+void Torch::machine::GMMMachine::setVarianceSupervector(const blitz::Array<double,1> &variance_supervector) {
+  for(int i=0; i<m_n_gaussians; ++i) {
+    const blitz::Array<double,1> variance = variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
+    m_gaussians[i].setVariance(variance);
   }
 }
 

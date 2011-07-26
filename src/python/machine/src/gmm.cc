@@ -52,7 +52,7 @@ static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
 }
 
 
-void bind_machine_base() {
+void bind_machine_gmm() {
 
   class_<mach::Machine<blitz::Array<double,1>, double>, boost::noncopyable>("MachineDoubleBase", 
       "Root class for all Machine<blitz::Array<double,1>, double>", no_init)
@@ -181,16 +181,18 @@ void bind_machine_base() {
                 "The means of the gaussians")
   .add_property("meanSupervector",
                 &mach_GMMMachine_getMeanSupervector,
+                &mach::GMMMachine::setMeanSupervector,
                 "The mean supervector of the GMMMachine "
                 "(concatenation of the mean vectors of each Gaussian of the GMMMachine")
-  .add_property("varianceSupervector",
-                &mach_GMMMachine_getVarianceSupervector,
-                "The variance supervector of the GMMMachine "
-                "(concatenation of the variance vectors of each Gaussian of the GMMMachine")
   .add_property("variances",
                 &mach_GMMMachine_getVariances,
                 &mach::GMMMachine::setVariances,
                 "The variances")
+  .add_property("varianceSupervector",
+                &mach_GMMMachine_getVarianceSupervector,
+                &mach::GMMMachine::setVarianceSupervector,
+                "The variance supervector of the GMMMachine "
+                "(concatenation of the variance vectors of each Gaussian of the GMMMachine")
   .add_property("varianceThresholds",
                 &mach_GMMMachine_getVarianceThresholds,
                 (void (mach::GMMMachine::*)(const blitz::Array<double,2>&))&mach::GMMMachine::setVarianceThresholds,
