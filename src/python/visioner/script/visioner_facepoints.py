@@ -74,8 +74,8 @@ def process_video_data(args):
   if not args.output:
 
     for k, (bbox,points) in enumerate(data):
-      if box:
-        data = [k] + [r(i) for i in bbox]
+      if bbox:
+        data = tuple([k] + [r(i) for i in bbox])
         sys.stdout.write("%d %d %d %d %d" % data)
         for p in points:
           sys.stdout.write(" %d %d" % (r(p[0]), r(p[1])))
