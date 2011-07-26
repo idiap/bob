@@ -1048,3 +1048,38 @@ void train::JFABaseTrainer::initializeXYZ()
   setSpeakerFactors(x,y,z);
 }
 
+void train::JFABaseTrainer::train(const std::vector<Torch::io::Arrayset>& vec,
+  const size_t n_iter)
+{
+  std::vector<blitz::Array<double,2> > vec_N;
+  std::vector<blitz::Array<double,2> > vec_F;
+  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  Torch::machine::GMMStats stats(ubm->getNGaussians(),ubm->getNInputs()); 
+  for(size_t id=0; id<vec.size(); ++id)
+  {
+    blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
+    blitz::Array<double,2> Fid(ubm->getNGaussians()*ubm->getNInputs(), vec[id].size());
+    for(size_t s=0; s<vec[id].size(); ++s)
+    {
+      // TODO: check type/dimensions?
+      stats.init();
+      blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
+      blitz::Array<double,1> Fid_s = Nid(blitz::Range::all(),s);
+      for(int f=0; f<vec[id].get<double,2>(s).extent(0); ++f)
+      {
+        const blitz::Array<double,1> features = vec[id].get<double,2>(s)(f,blitz::Range::all());
+        ubm->accStatistics(features, stats);
+      }
+      Nid_s = stats.n;
+      for(int g=0; g<ubm->getNGaussians(); ++g) {
+        blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
+        Fid_s_g = stats.sumPx(g,blitz::Range::all());
+      }
+    }
+    vec_N.push_back(Nid);
+    vec_F.push_back(Fid);
+  }
+  train(vec_N, vec_F, n_iter);
+}
+
+

@@ -290,6 +290,8 @@ class JFABaseTrainer {
     void train(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
+    void train(const std::vector<Torch::io::Arrayset>& features,
+      const size_t n_iter); 
     /**
       * Initializes U, V and D
       */
