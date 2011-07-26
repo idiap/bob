@@ -283,6 +283,22 @@ class JFATrainer {
     void precomputeSumStatisticsF();
 
 
+
+    /**
+      * Main procedure for training the Joint Factor Analysis
+      */
+    void train(const std::vector<blitz::Array<double,2> >& N,
+      const std::vector<blitz::Array<double,2> >& F, 
+      const size_t n_iter); 
+    /**
+      * Initializes U, V and D
+      */
+    void initializeUVD();
+    /**
+      * Initializes X, Y and Z
+      */
+    void initializeXYZ();
+
     /**
      * Get the zeroth order statistics
      */

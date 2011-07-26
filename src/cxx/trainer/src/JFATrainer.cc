@@ -992,3 +992,55 @@ void train::JFATrainer::updateD()
 }
 
 
+void train::JFATrainer::train(const std::vector<blitz::Array<double,2> >& N,
+  const std::vector<blitz::Array<double,2> >& F, const size_t n_iter)
+{
+  setStatistics(N,F);
+  precomputeSumStatisticsN();
+  precomputeSumStatisticsF();
+
+  initializeUVD();
+  initializeXYZ();
+  for(size_t i=0; i<n_iter; ++i) {
+    updateY();
+    updateV();
+  }
+  for(size_t i=0; i<n_iter; ++i) {
+    updateX();
+    updateU();
+  }
+  for(size_t i=0; i<n_iter; ++i) {
+    updateZ();
+    updateD();
+  }
+}
+
+void train::JFATrainer::initializeUVD()
+{
+  initializeRandomV();
+  initializeRandomU();
+  initializeRandomD();
+}
+
+void train::JFATrainer::initializeXYZ()
+{
+  std::vector<blitz::Array<double,1> > z;
+  std::vector<blitz::Array<double,1> > y;
+  std::vector<blitz::Array<double,2> > x;
+
+  blitz::Array<double,1> z0(m_jfa_machine.getDimCD());
+  z0 = 0;
+  blitz::Array<double,1> y0(m_jfa_machine.getDimRv());
+  y0 = 0;
+  blitz::Array<double,2> x0(m_jfa_machine.getDimRu(),0);
+  x0 = 0;
+  for(size_t i=0; i<m_Nid; ++i)
+  {
+    z.push_back(z0.copy());
+    y.push_back(y0.copy());
+    x0.resize(m_jfa_machine.getDimRu(),m_N[i].extent(1));
+    x.push_back(x0.copy());
+  }
+  setSpeakerFactors(x,y,z);
+}
+

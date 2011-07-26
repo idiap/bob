@@ -31,6 +31,7 @@ void bind_trainer_jfa() {
     .add_property("A2_y", make_function(&train::JFATrainer::getA2_y, return_internal_reference<>()), &train::JFATrainer::setA2_y)
     .def("setStatistics", &train::JFATrainer::setStatistics, (arg("self"), arg("N"), arg("F")), "Set the zeroth and first order statistics.")
     .def("setSpeakerFactors", &train::JFATrainer::setSpeakerFactors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
+    .def("train", &train::JFATrainer::train, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
     .def("initializeRandomU", &train::JFATrainer::initializeRandomU, (arg("self")), "Initializes randomly U.")
     .def("initializeRandomV", &train::JFATrainer::initializeRandomV, (arg("self")), "Initializes randomly V.")
     .def("initializeRandomD", &train::JFATrainer::initializeRandomD, (arg("self")), "Initializes randomly D.")

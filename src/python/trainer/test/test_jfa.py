@@ -425,6 +425,61 @@ class JFATrainerTest(unittest.TestCase):
     self.assertTrue(equals(jfam.D, d_ref, 2e-4))
 
 
+  def test08_JFATrainer_train(self):
+    # train a JFATrainer
+
+    F1=torch.core.array.float64_2(
+      [0.3833, 0.4516,
+      0.6173, 0.2277,
+      0.5755, 0.8044,
+      0.5301, 0.9861,
+      0.2751, 0.0300,
+      0.2486, 0.5357], (6,2))
+    F2=torch.core.array.float64_2(
+      [0.0871, 0.6838,
+      0.8021, 0.7837,
+      0.9891, 0.5341,
+      0.0669, 0.8854,
+      0.9394, 0.8990,
+      0.0182, 0.6259], (6,2))
+    F=[F1, F2]
+
+    N1=torch.core.array.float64_2([0.1379, 0.1821, 
+                                   0.2178, 0.0418], (2,2))
+    N2=torch.core.array.float64_2([0.1069, 0.9397, 
+                                   0.6164, 0.3545], (2,2))
+    N=[N1, N2]
+
+    m=torch.core.array.float64_1([0.1806, 0.0451, 0.7232, 0.3474, 0.6606, 0.3839], (6,))
+    E=torch.core.array.float64_1([0.6273, 0.0216, 0.9106, 0.8006, 0.7458, 0.8131], (6,))
+    d=torch.core.array.float64_1([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668], (6,))
+    v=torch.core.array.float64_2(
+      [0.3367, 0.4116,
+      0.6624, 0.6026,
+      0.2442, 0.7505,
+      0.2955, 0.5835,
+      0.6802, 0.5518,
+      0.5278,0.5836], (6,2))
+    u=torch.core.array.float64_2(
+      [0.5118, 0.3464,
+      0.0826, 0.8865,
+      0.7196, 0.4547,
+      0.9962, 0.4134,
+      0.3545, 0.2177,
+      0.9713, 0.1257], (6,2))
+
+    # call the train function
+    jfam = torch.machine.JFAMachine(2,3,2,2)
+    jfam.ubm_mean = m
+    jfam.ubm_var = E
+    jfam.U = u
+    jfam.V = v
+    jfam.D = d
+    jfat = torch.trainer.JFATrainer(jfam)
+
+    jfat.train(N,F,5)
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
