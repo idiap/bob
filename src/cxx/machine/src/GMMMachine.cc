@@ -21,7 +21,7 @@ mach::GMMMachine::GMMMachine(const GMMMachine& other): Machine<blitz::Array<doub
   copy(other);
 }
 
-mach::GMMMachine& mach::GMMMachine::operator=(const GMMMachine &other) {
+mach::GMMMachine& mach::GMMMachine::operator=(const mach::GMMMachine &other) {
   // protect against invalid self-assignment
   if (this != &other) {
     copy(other);
@@ -32,8 +32,6 @@ mach::GMMMachine& mach::GMMMachine::operator=(const GMMMachine &other) {
   // by convention, always return *this
   return *this;
 }
-
-
 
 bool mach::GMMMachine::operator==(const mach::GMMMachine& b) const {
   if (m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs) {
