@@ -1,11 +1,12 @@
 /// @file GMMStats.h
 /// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
+/// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
 
-#ifndef _GMMSTATS_H
-#define _GMMSTATS_H
+#ifndef TORCH5SPRO_MACHINE_GMMSTATS_H
+#define TORCH5SPRO_MACHINE_GMMSTATS_H
 
 #include <blitz/array.h>
-#include <io/HDF5File.h>
+#include "io/HDF5File.h"
 
 namespace Torch {
 namespace machine {
@@ -29,9 +30,18 @@ class GMMStats {
     /// @param n_inputs    Feature dimensionality.
     GMMStats(int n_gaussians, int n_inputs);
 
+    /// Copy constructor
+    GMMStats(const GMMStats& other);
+
     /// Constructor
     GMMStats(Torch::io::HDF5File& config);
     
+    /// Assigment
+    GMMStats& operator=(const GMMStats& other);
+
+    /// Equal to
+    bool operator==(const GMMStats& b) const;
+
     /// Destructor
     ~GMMStats();
 
@@ -65,6 +75,10 @@ class GMMStats {
     void load(Torch::io::HDF5File& config);
     
     friend std::ostream& operator<<(std::ostream& os, const GMMStats& g);
+
+  protected:
+    /// Copy another GMMStats
+    void copy(const GMMStats&);
 };
 
 }
