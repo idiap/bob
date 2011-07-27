@@ -2,37 +2,40 @@
 #include "core/logging.h"
 #include "machine/Exception.h"
 
-using namespace Torch::machine::Log;
+namespace TLog = Torch::machine::Log;
+namespace mach = Torch::machine;
 
-Torch::machine::GMMMachine::GMMMachine(): m_gaussians(0) {
+mach::GMMMachine::GMMMachine(): m_gaussians(0), m_cache_supervector(false) {
   resize(0,0);
 }
 
-Torch::machine::GMMMachine::GMMMachine(int n_gaussians, int n_inputs): m_gaussians(0) {
+mach::GMMMachine::GMMMachine(int n_gaussians, int n_inputs): m_gaussians(0), m_cache_supervector(false) {
   resize(n_gaussians,n_inputs);
 }
 
-Torch::machine::GMMMachine::GMMMachine(Torch::io::HDF5File& config): m_gaussians(0) {
+mach::GMMMachine::GMMMachine(Torch::io::HDF5File& config): m_gaussians(0), m_cache_supervector(false) {
   load(config);
 }
 
-Torch::machine::GMMMachine::GMMMachine(const GMMMachine& other): Machine<blitz::Array<double,1>, double>(other), m_gaussians(0) {
+mach::GMMMachine::GMMMachine(const GMMMachine& other): Machine<blitz::Array<double,1>, double>(other), m_gaussians(0), m_cache_supervector(false) {
   copy(other);
 }
 
-Torch::machine::GMMMachine & Torch::machine::GMMMachine::operator= (const GMMMachine &other) {
+mach::GMMMachine& mach::GMMMachine::operator=(const GMMMachine &other) {
   // protect against invalid self-assignment
   if (this != &other) {
     copy(other);
   }
   
+  // Always ignore the cache
+  m_cache_supervector = false;
   // by convention, always return *this
   return *this;
 }
 
 
 
-bool Torch::machine::GMMMachine::operator==(const Torch::machine::GMMMachine& b) const {
+bool mach::GMMMachine::operator==(const mach::GMMMachine& b) const {
   if (m_n_gaussians != b.m_n_gaussians || m_n_inputs != b.m_n_inputs) {
     return false;
   }
@@ -50,7 +53,7 @@ bool Torch::machine::GMMMachine::operator==(const Torch::machine::GMMMachine& b)
   return true;
 }
 
-void Torch::machine::GMMMachine::copy(const GMMMachine& other) {
+void mach::GMMMachine::copy(const GMMMachine& other) {
   m_n_gaussians = other.m_n_gaussians;
   m_n_inputs = other.m_n_inputs;
 
@@ -70,19 +73,20 @@ void Torch::machine::GMMMachine::copy(const GMMMachine& other) {
   }
 }
 
-Torch::machine::GMMMachine:: ~GMMMachine() {
+mach::GMMMachine::~GMMMachine() {
   if(m_gaussians != 0) delete [] m_gaussians;
 }
 
-void Torch::machine::GMMMachine::setNInputs(int n_inputs) {
+void mach::GMMMachine::setNInputs(int n_inputs) {
   resize(m_n_gaussians,n_inputs);
+  m_cache_supervector = false;
 }
 
-int Torch::machine::GMMMachine::getNInputs() const {
+int mach::GMMMachine::getNInputs() const {
   return m_n_inputs;
 }
 
-void Torch::machine::GMMMachine::resize(int n_gaussians, int n_inputs) {
+void mach::GMMMachine::resize(int n_gaussians, int n_inputs) {
   m_n_gaussians = n_gaussians;
   m_n_inputs = n_inputs;
 
@@ -106,25 +110,27 @@ void Torch::machine::GMMMachine::resize(int n_gaussians, int n_inputs) {
   m_cache_P.resize(m_n_gaussians);
   m_cache_Px.resize(m_n_gaussians,m_n_inputs);
   m_cache_Pxx.resize(m_n_gaussians,m_n_inputs);
+  m_cache_supervector = false;
 }
 
 
-void Torch::machine::GMMMachine::getWeights(blitz::Array<double,1> &weights) const {
+void mach::GMMMachine::setWeights(const blitz::Array<double,1> &weights) {
+  m_weights = weights;
+}
+
+void mach::GMMMachine::getWeights(blitz::Array<double,1> &weights) const {
   weights.resize(m_n_gaussians);
   weights = m_weights;
 }
 
-void Torch::machine::GMMMachine::setWeights(const blitz::Array<double,1> &weights) {
-  m_weights = weights;
-}
-
-void Torch::machine::GMMMachine::setMeans(const blitz::Array<double,2> &means) {
+void mach::GMMMachine::setMeans(const blitz::Array<double,2> &means) {
   for(int i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i].setMean(means(i,blitz::Range::all()));
   }
+  m_cache_supervector = false;
 }
 
-void Torch::machine::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
+void mach::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
   means.resize(m_n_gaussians,m_n_inputs);
   blitz::Array<double,1> mean(m_n_inputs);
   for(int i=0; i<m_n_gaussians; ++i) {
@@ -133,14 +139,15 @@ void Torch::machine::GMMMachine::getMeans(blitz::Array<double,2> &means) const {
   }
 }
 
-void Torch::machine::GMMMachine::setMeanSupervector(const blitz::Array<double,1> &mean_supervector) {
+void mach::GMMMachine::setMeanSupervector(const blitz::Array<double,1> &mean_supervector) {
   for(int i=0; i<m_n_gaussians; ++i) {
     const blitz::Array<double,1> mean = mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
     m_gaussians[i].setMean(mean);
   }
+  m_cache_supervector = false;
 }
 
-void Torch::machine::GMMMachine::getMeanSupervector(blitz::Array<double,1> &mean_supervector) const {
+void mach::GMMMachine::getMeanSupervector(blitz::Array<double,1> &mean_supervector) const {
   mean_supervector.resize(m_n_gaussians*m_n_inputs);
   for(int i=0; i<m_n_gaussians; ++i) {
     blitz::Array<double,1> mean = mean_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
@@ -148,13 +155,14 @@ void Torch::machine::GMMMachine::getMeanSupervector(blitz::Array<double,1> &mean
   }
 }
 
-void Torch::machine::GMMMachine::setVariances(const blitz::Array<double, 2 >& variances) {
+void mach::GMMMachine::setVariances(const blitz::Array<double, 2 >& variances) {
   for(int i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i].setVariance(variances(i,blitz::Range::all()));
   }
+  m_cache_supervector = false;
 }
 
-void Torch::machine::GMMMachine::getVariances(blitz::Array<double, 2 >& variances) const {
+void mach::GMMMachine::getVariances(blitz::Array<double, 2 >& variances) const {
   variances.resize(m_n_gaussians,m_n_inputs);
   blitz::Array<double,1> variance(m_n_inputs);
   for(int i=0; i<m_n_gaussians; ++i) {
@@ -163,14 +171,15 @@ void Torch::machine::GMMMachine::getVariances(blitz::Array<double, 2 >& variance
   }
 }
 
-void Torch::machine::GMMMachine::setVarianceSupervector(const blitz::Array<double,1> &variance_supervector) {
+void mach::GMMMachine::setVarianceSupervector(const blitz::Array<double,1> &variance_supervector) {
   for(int i=0; i<m_n_gaussians; ++i) {
     const blitz::Array<double,1> variance = variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
     m_gaussians[i].setVariance(variance);
   }
+  m_cache_supervector = false;
 }
 
-void Torch::machine::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_supervector) const {
+void mach::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &variance_supervector) const {
   variance_supervector.resize(m_n_gaussians*m_n_inputs);
   for(int i=0; i<m_n_gaussians; ++i) {
     blitz::Array<double,1> variance = variance_supervector(blitz::Range(i*m_n_inputs, (i+1)*m_n_inputs-1));
@@ -178,25 +187,27 @@ void Torch::machine::GMMMachine::getVarianceSupervector(blitz::Array<double,1> &
   }
 }
 
-void Torch::machine::GMMMachine::setVarianceThresholds(double factor) {
+void mach::GMMMachine::setVarianceThresholds(double factor) {
   for(int i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i].setVarianceThresholds(factor);
   } 
 }
 
-void Torch::machine::GMMMachine::setVarianceThresholds(blitz::Array<double, 1> variance_thresholds) {
+void mach::GMMMachine::setVarianceThresholds(blitz::Array<double, 1> variance_thresholds) {
   for(int i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i].setVarianceThresholds(variance_thresholds);
   }
+  m_cache_supervector = false;
 }
 
-void Torch::machine::GMMMachine::setVarianceThresholds(const blitz::Array<double, 2>& variance_thresholds) {
+void mach::GMMMachine::setVarianceThresholds(const blitz::Array<double, 2>& variance_thresholds) {
   for(int i=0; i<m_n_gaussians; ++i) {
     m_gaussians[i].setVarianceThresholds(variance_thresholds(i,blitz::Range::all()));
   }
+  m_cache_supervector = false;
 }
 
-void Torch::machine::GMMMachine::getVarianceThresholds(blitz::Array<double, 2>& variance_thresholds) const {
+void mach::GMMMachine::getVarianceThresholds(blitz::Array<double, 2>& variance_thresholds) const {
   variance_thresholds.resize(m_n_gaussians,m_n_inputs);
   blitz::Array<double,1> this_variance_thresholds(m_n_inputs);
   for(int i=0; i<m_n_gaussians; ++i) {
@@ -205,37 +216,41 @@ void Torch::machine::GMMMachine::getVarianceThresholds(blitz::Array<double, 2>& 
   }
 }
 
-double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const {
+double mach::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x, blitz::Array<double,1> &log_weighted_gaussian_likelihoods) const {
   // Initialise variables
   log_weighted_gaussian_likelihoods.resize(m_n_gaussians);
-  double log_likelihood = LogZero;
+  double log_likelihood = TLog::LogZero;
 
   // Accumulate the weighted log likelihoods from each Gaussian
   for(int i=0; i<m_n_gaussians; ++i) {
     double l = log(m_weights(i)) + m_gaussians[i].logLikelihood(x);
     log_weighted_gaussian_likelihoods(i) = l;
-    log_likelihood = LogAdd(log_likelihood, l);
+    log_likelihood = TLog::LogAdd(log_likelihood, l);
   }
 
   // Return log(p(x|GMMMachine))
   return log_likelihood;
 }
 
-double Torch::machine::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x) const {
+double mach::GMMMachine::logLikelihood(const blitz::Array<double, 1> &x) const {
   // Call the other logLikelihood (overloaded) function
   // (log_weighted_gaussian_likelihoods will be discarded)
   return logLikelihood(x,m_cache_log_weighted_gaussian_likelihoods);
 }
 
-void Torch::machine::GMMMachine::forward (const blitz::Array<double,1>& input, double& output) const {
+void mach::GMMMachine::forward(const blitz::Array<double,1>& input, double& output) const {
   if(input.extent(0) != m_n_inputs) {
     throw NInputsMismatch(m_n_inputs, input.extent(0));
   }
 
+  forward_(input,output);
+}
+
+void mach::GMMMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
   output = logLikelihood(input);
 }
 
-void Torch::machine::GMMMachine::accStatistics(const Torch::io::Arrayset& ar, Torch::machine::GMMStats& stats) const {
+void mach::GMMMachine::accStatistics(const Torch::io::Arrayset& ar, mach::GMMStats& stats) const {
   // iterate over data
   for(size_t i=0; i<ar.size(); ++i) {
 
@@ -247,7 +262,7 @@ void Torch::machine::GMMMachine::accStatistics(const Torch::io::Arrayset& ar, To
   }
 }
 
-void Torch::machine::GMMMachine::accStatistics(const blitz::Array<double, 1>& x, Torch::machine::GMMStats& stats) const {
+void mach::GMMMachine::accStatistics(const blitz::Array<double, 1>& x, mach::GMMStats& stats) const {
 
   // Calculate Gaussian and GMM likelihoods
   // - m_cache_log_weighted_gaussian_likelihoods(i) = log(weight_i*p(x|gaussian_i))
@@ -291,7 +306,7 @@ void Torch::machine::GMMMachine::accStatistics(const blitz::Array<double, 1>& x,
 }
 
 
-Torch::machine::Gaussian* Torch::machine::GMMMachine::getGaussian(int i) const {
+mach::Gaussian* mach::GMMMachine::getGaussian(int i) const {
   if(i >= 0 && i < m_n_gaussians) {
     return &(m_gaussians[i]);
   }
@@ -300,11 +315,11 @@ Torch::machine::Gaussian* Torch::machine::GMMMachine::getGaussian(int i) const {
   }
 }
 
-int Torch::machine::GMMMachine::getNGaussians() const {
+int mach::GMMMachine::getNGaussians() const {
   return m_n_gaussians;
 }
 
-void Torch::machine::GMMMachine::save(Torch::io::HDF5File& config) const {
+void mach::GMMMachine::save(Torch::io::HDF5File& config) const {
   config.set("m_n_gaussians", m_n_gaussians);
   config.set("m_n_inputs", m_n_inputs);
 
@@ -320,7 +335,7 @@ void Torch::machine::GMMMachine::save(Torch::io::HDF5File& config) const {
   config.setArray("m_weights", m_weights);
 }
 
-void Torch::machine::GMMMachine::load(Torch::io::HDF5File& config) {
+void mach::GMMMachine::load(Torch::io::HDF5File& config) {
   config.read("m_n_gaussians", m_n_gaussians);
   config.read("m_n_inputs", m_n_inputs);
   
@@ -340,7 +355,39 @@ void Torch::machine::GMMMachine::load(Torch::io::HDF5File& config) {
 
   m_weights.resize(m_n_gaussians);
   config.readArray("m_weights", m_weights);
+  m_cache_supervector = false;
 }
+
+void mach::GMMMachine::updateCacheSupervectors() const
+{
+  m_cache_mean_supervector.resize(m_n_gaussians*m_n_inputs);
+  m_cache_variance_supervector.resize(m_n_gaussians*m_n_inputs);
+  
+  for(int i=0; i<m_n_gaussians; ++i) {
+    blitz::Range range(i*m_n_inputs, (i+1)*m_n_inputs-1);
+    blitz::Array<double,1> mean = m_cache_mean_supervector(range);
+    m_gaussians[i].getMean(mean);
+    blitz::Array<double,1> variance = m_cache_variance_supervector(range);
+    m_gaussians[i].getVariance(variance);
+  }
+}
+
+void mach::GMMMachine::reloadCacheSupervectors() const {
+  if(!m_cache_supervector)
+    updateCacheSupervectors();
+}
+
+const blitz::Array<double,1>& mach::GMMMachine::getMeanSupervector() const {
+  if(!m_cache_supervector)
+    updateCacheSupervectors();
+  return m_cache_mean_supervector;
+} 
+
+const blitz::Array<double,1>& mach::GMMMachine::getVarianceSupervector() const {
+  if(!m_cache_supervector)
+    updateCacheSupervectors();
+  return m_cache_variance_supervector;
+} 
 
 namespace Torch {
   namespace machine {

@@ -80,7 +80,10 @@ void Torch::machine::GMMLLRMachine::forward(const blitz::Array<double,1>& input,
   if (input.extent(0) != m_n_inputs) {
     throw NInputsMismatch(m_n_inputs, input.extent(0));
   }
+  forward_(input,output);
+}
 
+void Torch::machine::GMMLLRMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
   double s_u;
   m_gmm_client->forward(input,output);
   m_gmm_ubm->forward(input, s_u);

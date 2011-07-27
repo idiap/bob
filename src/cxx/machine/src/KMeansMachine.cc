@@ -102,7 +102,10 @@ void Torch::machine::KMeansMachine::forward(const blitz::Array<double,1>& input,
   if (input.extent(0) != m_n_inputs) {
     throw NInputsMismatch(m_n_inputs, input.extent(0));
   }
-  
+  forward_(input,output); 
+}
+
+void Torch::machine::KMeansMachine::forward_(const blitz::Array<double,1>& input, double& output) const {
   output = getMinDistance(input);
 }
 

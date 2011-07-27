@@ -58,6 +58,7 @@ void bind_machine_gmm() {
       "Root class for all Machine<blitz::Array<double,1>, double>", no_init)
     .def("__call__", &mach::Machine<blitz::Array<double,1>, double>::forward, (arg("input"), arg("output")), "Execute the machine")
     .def("forward", &mach::Machine<blitz::Array<double,1>, double>::forward, (arg("input"), arg("output")), "Execute the machine")
+    .def("forward_", &mach::Machine<blitz::Array<double,1>, double>::forward_, (arg("input"), arg("output")), "Execute the machine. NO check is performed.")
     .def("__call__", &forward, (arg("self"), arg("input")), "Execute the machine, and returns the output")
     .def("forward", &forward, (arg("self"), arg("input")), "Execute the machine, and returns the output")
   ;
@@ -233,12 +234,12 @@ void bind_machine_gmm() {
        args("i"),
        "Get a pointer to a particular Gaussian component")
   .def("getMeanSupervector",
-       (void (mach::GMMMachine::*)(blitz::Array<double,1>&))&mach::GMMMachine::getMeanSupervector,
+       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getMeanSupervector,
        args("mean_supervector"),
        "Get the mean supervector of the GMMMachine "
        "(concatenation of the mean vectors of each Gaussian of the GMMMachine)")
   .def("getVarianceSupervector",
-       (void (mach::GMMMachine::*)(blitz::Array<double,1>&))&mach::GMMMachine::getVarianceSupervector,
+       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getVarianceSupervector,
        args("variance_supervector"),
        "Get the variance supervector of the GMMMachine "
        "(concatenation of the variance vectors of each Gaussian of the GMMMachine)")
