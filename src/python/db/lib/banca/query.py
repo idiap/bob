@@ -397,7 +397,7 @@ class Database(object):
     fobj = self.session.query(File).filter_by(id=id).one()
     fullpath = os.path.join(directory, str(fobj.path) + extension)
     fulldir = os.path.dirname(fullpath)
-    if not os.path.exists(fulldir): os.makedirs(fulldir)
+    utils.makedirs_safe(fulldir)
     obj.save(fullpath)
 
   def save(self, data, directory, extension):

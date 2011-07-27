@@ -6,7 +6,7 @@
 """Some utilities to talk to torch SQLite databases.
 """
 
-import os, sys
+import os, sys, errno
 
 class null(object):
   """A look-alike stream that discards the input"""
@@ -176,3 +176,11 @@ def standard_commands(subparsers):
   download_command(subparsers)
   location_command(subparsers)
   copy_command(subparsers)
+
+def makedirs_safe(fulldir):
+  """Creates a directory if it does not exists, with concurrent access support"""
+  try:
+    if not os.path.exists(fulldir): os.makedirs(fulldir)
+  except OSError as exc: # Python >2.5
+    if exc.errno == errno.EEXIST: pass
+    else: raise

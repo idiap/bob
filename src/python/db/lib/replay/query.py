@@ -8,7 +8,6 @@ replay attack database in the most obvious ways.
 """
 
 import os
-import errno
 from .. import utils
 from .models import *
 from . import dbname
@@ -176,11 +175,7 @@ class Database(object):
     fobj = self.session.query(File).filter_by(id=id).one()
     fullpath = os.path.join(directory, str(fobj.path) + extension)
     fulldir = os.path.dirname(fullpath)
-    try:
-      if not os.path.exists(fulldir): os.makedirs(fulldir)
-    except OSError as exc: # Python >2.5
-      if exc.errno == errno.EEXIST: pass
-      else: raise
+    utils.makedirs_safe(fulldir)
     obj.save(fullpath)
 
   def save(self, data, directory, extension):
