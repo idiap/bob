@@ -67,6 +67,11 @@ public:
   /// (overrides Machine::forward)
   void forward(const blitz::Array<double,1>& input, double& output) const;
   
+  /// Output the minimum distance between the input and one of the means
+  /// (overrides Machine::forward_)
+  /// @warning Inputs are NOT checked
+  void forward_(const blitz::Array<double,1>& input, double& output) const;
+  
   /// Return the number of means
   int getNMeans() const;
   

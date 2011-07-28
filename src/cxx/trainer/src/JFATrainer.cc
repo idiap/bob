@@ -118,7 +118,7 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
   // 3/ Determine the vector of speaker ids
   //    Assume that samples from the same speaker are consecutive
   std::vector<uint32_t> ids;
-  uint32_t last_elem;
+  uint32_t last_elem=0;
   for(int ind=0; ind<T; ++ind)
   {
     if(ids.empty())
@@ -261,7 +261,7 @@ void train::jfa::estimateYandV(const blitz::Array<double,2> &F, const blitz::Arr
 
   // Determine a vector of speaker ids
   std::vector<uint32_t> ids;
-  uint32_t last_elem;
+  uint32_t last_elem=0;
   for(int ind=0; ind<spk_ids.extent(0); ++ind)
   {
     if(ids.empty())
@@ -398,7 +398,7 @@ void train::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Arr
 
   // Determine a vector of speaker ids
   std::vector<uint32_t> ids;
-  uint32_t last_elem;
+  uint32_t last_elem=0;
   for(int ind=0; ind<T; ++ind)
   {
     if(ids.empty())
@@ -1139,6 +1139,4 @@ void train::JFATrainer::enrol(const Torch::io::Arrayset& vec,
   }
   enrol(N, F, n_iter);
 }
-
-
 

@@ -48,6 +48,7 @@ namespace Torch { namespace machine {
 
       /// Output the log likelihood ratio for the sample input
       void forward(const blitz::Array<double,1>& input, double& output) const;
+      void forward_(const blitz::Array<double,1>& input, double& output) const;
 
       /// Get a pointer to the client or UBM GMMMachine
       GMMMachine* getGMMClient() const;

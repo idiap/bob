@@ -4,8 +4,8 @@
 /// @brief This class implements a multivariate diagonal Gaussian distribution.
 /// @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
 
-#ifndef _GMMMACHINE_H
-#define _GMMMACHINE_H
+#ifndef TORCH5SPRO_MACHINE_GMMMACHINE_H
+#define TORCH5SPRO_MACHINE_GMMMACHINE_H
 
 #include "io/Arrayset.h"
 #include "machine/Machine.h"
@@ -19,7 +19,7 @@ namespace machine {
   
 /// @brief This class implements a multivariate diagonal Gaussian distribution.
 /// @details See Section 2.3.9 of Bishop, "Pattern recognition and machine learning", 2006
-class GMMMachine : public Machine<blitz::Array<double,1>, double> {
+class GMMMachine: public Machine<blitz::Array<double,1>, double> {
   public:
 
     /// Default constructor
@@ -38,10 +38,10 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
     GMMMachine(const GMMMachine& other);
 
     /// Assigment
-    GMMMachine & operator= (const GMMMachine &other);
+    GMMMachine& operator=(const GMMMachine &other);
 
     /// Equal to
-    bool operator ==(const GMMMachine& b) const;
+    bool operator==(const GMMMachine& b) const;
     
     /// Destructor
     virtual ~GMMMachine(); 
@@ -76,11 +76,15 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
     void setVariances(const blitz::Array<double,2> &variances);
     /// Set the variances from a supervector
     void setVarianceSupervector(const blitz::Array<double,1> &variance_supervector);
+    /// Returns a const reference to the supervector (Put in cache)
+    const blitz::Array<double,1>& getMeanSupervector() const;
 
     /// Get the variances
     void getVariances(blitz::Array<double,2> &variances) const;
     /// Get the variance supervector
     void getVarianceSupervector(blitz::Array<double,1> &variance_supervector) const;
+    /// Returns a const reference to the supervector (Put in cache)
+    const blitz::Array<double,1>& getVarianceSupervector() const;
     
     /// Set the variance flooring thresholds in each dimension 
     /// to a proportion of the current variance, for each Gaussian
@@ -108,11 +112,17 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
 
     /// Output the log likelihood of the sample, x 
     /// (overrides Machine::forward)
-    void forward (const blitz::Array<double,1>& input, double& output) const;
+    /// Dimension of the input is checked
+    void forward(const blitz::Array<double,1>& input, double& output) const;
+    
+    /// Output the log likelihood of the sample, x 
+    /// (overrides Machine::forward_)
+    /// @warning Dimension of the input is not checked
+    void forward_(const blitz::Array<double,1>& input, double& output) const;
     
     /// Accumulates the GMM statistics over a set of samples.
-    /// @see bool accStatistics(const blitz::Array<float,1> &x, GMMStats stats)
-    void accStatistics(const Torch::io::Arrayset &sampler, GMMStats &stats) const;
+    /// @see bool accStatistics(const blitz::Array<double,1> &x, GMMStats stats)
+    void accStatistics(const Torch::io::Arrayset &arrayset, GMMStats &stats) const;
 
     /// Accumulate the GMM statistics for this sample.
     ///
@@ -138,6 +148,9 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
     
     /// Load from a Configuration
     void load(Torch::io::HDF5File& config);
+
+    /// Load/Reload mean/variance supervector in cache
+    void reloadCacheSupervectors() const;
     
     friend std::ostream& operator<<(std::ostream& os, const GMMMachine& machine);
     
@@ -160,11 +173,19 @@ class GMMMachine : public Machine<blitz::Array<double,1>, double> {
 
   private:
 
+    /// Update the mean and variance supervectors 
+    /// in cache (into a 1D blitz array)
+    void updateCacheSupervectors() const;
+
     /// Some cache arrays to avoid re-allocation when computing log-likelihoods
     mutable blitz::Array<double,1> m_cache_log_weighted_gaussian_likelihoods;
     mutable blitz::Array<double,1> m_cache_P;
     mutable blitz::Array<double,2> m_cache_Px;
     mutable blitz::Array<double,2> m_cache_Pxx;
+
+    mutable blitz::Array<double,1> m_cache_mean_supervector;
+    mutable blitz::Array<double,1> m_cache_variance_supervector;
+    mutable bool m_cache_supervector;
     
 };
 

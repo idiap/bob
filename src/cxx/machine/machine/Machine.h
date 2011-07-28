@@ -1,5 +1,5 @@
-#ifndef MACHINE_H
-#define MACHINE_H
+#ifndef TORCH5SPRO_MACHINE_MACHINE_H
+#define TORCH5SPRO_MACHINE_MACHINE_H
 #include <cstring>
 
 namespace Torch {
@@ -20,11 +20,21 @@ public:
      *
      * @param input input data used by the machine
      * @param output value computed by the machine
+     * @warning Inputs are checked
      */
     virtual void forward(const T_input& input, T_output& output) const = 0;
+
+    /**
+     * Execute the machine
+     *
+     * @param input input data used by the machine
+     * @param output value computed by the machine
+     * @warning Inputs are NOT checked
+     */
+    virtual void forward_(const T_input& input, T_output& output) const = 0;
 };
 
 
 }
 }
-#endif // MACHINE_H
+#endif // TORCH5SPRO_MACHINE_MACHINE_H
