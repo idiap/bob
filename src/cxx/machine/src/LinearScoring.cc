@@ -64,7 +64,7 @@ namespace Torch { namespace machine {
 
 
   void linearScoring(std::vector<blitz::Array<double,1>*>& models,
-                     blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
+                     const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
                      std::vector<Torch::machine::GMMStats*>& test_stats,
                      std::vector<blitz::Array<double,1>*>& test_channelOffset,
                      bool frame_length_normalisation,
@@ -74,7 +74,7 @@ namespace Torch { namespace machine {
   }
 
   void linearScoring(std::vector<blitz::Array<double,1>*>& models,
-                     blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
+                     const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
                      std::vector<Torch::machine::GMMStats*>& test_stats,
                      bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores)
@@ -86,7 +86,7 @@ namespace Torch { namespace machine {
   }
 
   void linearScoring(std::vector<Torch::machine::GMMMachine*>& models,
-                     Torch::machine::GMMMachine& ubm,
+                     const Torch::machine::GMMMachine& ubm,
                      std::vector<Torch::machine::GMMStats*>& test_stats,
                      bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores) 
