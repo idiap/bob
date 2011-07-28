@@ -4,177 +4,113 @@
 namespace Torch { namespace machine {
 
   namespace detail {
-    void allocAB(const int Tm,
-                 std::vector<Torch::machine::GMMStats*>& test_stats,
-                 blitz::Array<double, 2>& A, blitz::Array<double, 2>& B)
+
+    void linearScoring(std::vector<blitz::Array<double,1>*>& models,
+                       const blitz::Array<double,1>& ubm_mean,
+                       const blitz::Array<double,1>& ubm_variance,
+                       std::vector<Torch::machine::GMMStats*>& test_stats,
+                       std::vector<blitz::Array<double,1>*>& test_channelOffset,
+                       bool frame_length_normalisation,
+                       blitz::Array<double,2>& scores) 
     {
       int C = test_stats[0]->sumPx.extent(0);
       int D = test_stats[0]->sumPx.extent(1);
       int CD = C*D;
       int Tt = test_stats.size();
-
-      A.resize(Tm, CD);
-      B.resize(CD, Tt);
-    }
-
-    void computeA(std::vector<blitz::Array<double,1> >& models, 
-                  const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                  blitz::Array<double, 2>& A)
-    {
       int Tm = models.size();
 
-      // Compute A
-      for(int t=0; t<Tm; ++t) {
-        blitz::Array<double, 1> tmp = A(t, blitz::Range::all());
-        tmp = (models[t] - ubm_mean) / ubm_variance;
-      }
-    }
-
-    void computeA(std::vector<Torch::machine::GMMMachine*>& models, 
-                  const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                  blitz::Array<double, 2>& A)
-    {
-      int Tm = models.size();
+      blitz::Array<double,2> A(Tm, CD);
+      blitz::Array<double,2> B(CD, Tt);
 
       // 1) Compute A
       for(int t=0; t<Tm; ++t) {
-        const blitz::Array<double, 1>& model_mean = models[t]->getMeanSupervector();
         blitz::Array<double, 1> tmp = A(t, blitz::Range::all());
-        tmp = (model_mean - ubm_mean) / ubm_variance;
+        tmp = (*(models[t]) - ubm_mean) / ubm_variance;
       }
-    }
 
-    void computeB(std::vector<Torch::machine::GMMStats*>& test_stats,
-                  const blitz::Array<double,1>& ubm_mean,
-                  std::vector<blitz::Array<double, 1> >& test_channelOffset,
-                  blitz::Array<double, 2>& B)
-    {
-      int Tt = test_stats.size();
-      int CD = test_stats[0]->sumPx.extent(0)*test_stats[0]->sumPx.extent(1);
-      int D = test_stats[0]->sumPx.extent(1);
-
-      // Compute B
-      Torch::core::array::assertSameDimensionLength(test_channelOffset.size(), Tt);
-      Torch::core::array::assertSameDimensionLength(test_channelOffset[0].extent(0), CD);
-      
-      for(int t = 0; t<Tt; ++t) 
-        for(int s = 0; s<CD; ++s) 
-          B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (test_stats[t]->n(s/D) * (ubm_mean(s) + test_channelOffset[t](s)));
-    }
-
-    void computeB(std::vector<Torch::machine::GMMStats*>& test_stats,
-                  const blitz::Array<double,1>& ubm_mean,
-                  blitz::Array<double, 2>& B)
-    {
-      int Tt = test_stats.size();
-      int CD = test_stats[0]->sumPx.extent(0)*test_stats[0]->sumPx.extent(1);
-      int D = test_stats[0]->sumPx.extent(1);
-
-      // Compute B
-      for(int t=0; t<Tt; ++t) 
-        for(int s=0; s<CD; ++s) 
-          B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (ubm_mean(s) * test_stats[t]->n(s/D));
-    }
-
-    void frameNormalization(std::vector<Torch::machine::GMMStats*>& test_stats,
-                            blitz::Array<double, 2>& B) 
-    {
-      int Tt = test_stats.size();
-      int D = test_stats[0]->sumPx.extent(1);
-
-      for(int t=0; t<Tt; ++t) {
-        double sum_N = blitz::sum(test_stats[t]->n) * D;
-        blitz::Array<double, 1> v_t = B(blitz::Range::all(),t);
-
-        if(sum_N <= std::numeric_limits<double>::epsilon() && sum_N >= -std::numeric_limits<double>::epsilon()) 
-          v_t = 0;
-        else 
-          v_t /= sum_N;
+      // 2) Compute B
+      if(test_channelOffset[0] == NULL) {
+        for(int t=0; t<Tt; ++t) 
+          for(int s=0; s<CD; ++s)
+            B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (ubm_mean(s) * test_stats[t]->n(s/D));
       }
-    }
+      else {
+        Torch::core::array::assertSameDimensionLength(test_channelOffset[0]->extent(0), Tt);
+        Torch::core::array::assertSameDimensionLength(test_channelOffset[0]->extent(1), CD);
+        
+        for(int t=0; t<Tt; ++t) 
+          for(int s=0; s<CD; ++s) 
+            B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (test_stats[t]->n(s/D) * (ubm_mean(s) + ((*(test_channelOffset[t]))(s))));
+      }
+
+      // Apply the normalization if needed
+      if(frame_length_normalisation) {
+        for(int t=0; t<Tt; ++t) {
+          double sum_N = blitz::sum(test_stats[t]->n) * D;
+          blitz::Array<double, 1> v_t = B(blitz::Range::all(),t);
+
+          if (sum_N <= std::numeric_limits<double>::epsilon() && sum_N >= -std::numeric_limits<double>::epsilon())
+            v_t = 0;
+          else 
+            v_t /= sum_N;
+        }
+      }
+
+      // 3) Compute LLR
+      scores.resize(Tm, Tt);
+      Torch::math::prod(A, B, scores);
+    } 
   }
 
 
+  void linearScoring(std::vector<blitz::Array<double,1>*>& models,
+                     blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
+                     std::vector<Torch::machine::GMMStats*>& test_stats,
+                     std::vector<blitz::Array<double,1>*>& test_channelOffset,
+                     bool frame_length_normalisation,
+                     blitz::Array<double, 2>& scores)
+  {
+    detail::linearScoring(models, ubm_mean, ubm_variance, test_stats, test_channelOffset, frame_length_normalisation, scores);
+  }
+
+  void linearScoring(std::vector<blitz::Array<double,1>*>& models,
+                     blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
+                     std::vector<Torch::machine::GMMStats*>& test_stats,
+                     bool frame_length_normalisation,
+                     blitz::Array<double, 2>& scores)
+  {
+    std::vector<blitz::Array<double,1>*> test_channelOffset;
+    for(size_t i=0; i<test_stats.size(); ++i)
+      test_channelOffset.push_back(NULL);
+    detail::linearScoring(models, ubm_mean, ubm_variance, test_stats, test_channelOffset, frame_length_normalisation, scores);
+  }
 
   void linearScoring(std::vector<Torch::machine::GMMMachine*>& models,
                      Torch::machine::GMMMachine& ubm,
                      std::vector<Torch::machine::GMMStats*>& test_stats,
                      bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores) {
-    // 0/ Allocate A an B arrays
-    blitz::Array<double, 2> A;
-    blitz::Array<double, 2> B;
-    detail::allocAB(models.size(), test_stats, A, B);
-    // 1/ Compute A
-    const blitz::Array<double, 1>& ubm_mean = ubm.getMeanSupervector();
-    const blitz::Array<double, 1>& ubm_variance = ubm.getVarianceSupervector();
-    detail::computeA(models, ubm_mean, ubm_variance, A);
-    // 2/ Compute B
-    detail::computeB(test_stats, ubm_mean, B);
-    // 3/ Apply the normalization if needed
-    if(frame_length_normalisation)
-      detail::frameNormalization(test_stats, B);
-    // 4/ Compute LLR
-    // TODO: We should not resized any array: Just throw an exception if size is not valid
-    int Tm = models.size();
-    int Tt = test_stats.size();
-    scores.resize(Tm, Tt);
-    Torch::math::prod(A, B, scores);
-  }
-
-  void linearScoring(std::vector<blitz::Array<double,1> >& models,
-                     blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
-                     std::vector<Torch::machine::GMMStats*>& test_stats,
-                     std::vector<blitz::Array<double, 1> >& test_channelOffset,
-                     bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores)
+                     blitz::Array<double, 2>& scores) 
   {
-    // 0/ Allocate A an B arrays
-    blitz::Array<double, 2> A;
-    blitz::Array<double, 2> B;
-    detail::allocAB(models.size(), test_stats, A, B);
-    // 1/ Compute A
-    detail::computeA(models, ubm_mean, ubm_variance, A);
-    // 2/ Compute B
-    detail::computeB(test_stats, ubm_mean, test_channelOffset, B);
-    // 3/ Apply the normalization if needed
-    if(frame_length_normalisation)
-      detail::frameNormalization(test_stats, B);
-    // 4/ Compute LLR
-    // TODO: We should not resized any array: Just throw an exception if size is not valid
-    int Tm = models.size();
-    int Tt = test_stats.size();
-    scores.resize(Tm, Tt);
-    Torch::math::prod(A, B, scores);
+    int C = test_stats[0]->sumPx.extent(0);
+    int D = test_stats[0]->sumPx.extent(1);
+    int CD = C*D;
+    std::vector<blitz::Array<double,1>*> models_b;
+    // Allocate and get the mean supervector
+    for(size_t i=0; i<models.size(); ++i) {
+      blitz::Array<double,1> *mod = new blitz::Array<double,1>(CD);
+      models[i]->getMeanSupervector(*mod);
+      models_b.push_back(mod);
+    }
+    const blitz::Array<double,1>& ubm_mean = ubm.getMeanSupervector();
+    const blitz::Array<double,1>& ubm_variance = ubm.getVarianceSupervector();
+    std::vector<blitz::Array<double,1>*> test_channelOffset;
+    for(size_t i=0; i<test_stats.size(); ++i)
+      test_channelOffset.push_back(NULL);
+    detail::linearScoring(models_b, ubm_mean, ubm_variance, test_stats, test_channelOffset, frame_length_normalisation, scores);
+    // Clear the Mean Supervector
+    for(size_t i=0; i<models.size(); ++i) 
+      delete models_b[i];
   }
-
-  void linearScoring(std::vector<blitz::Array<double,1> >& models,
-                     blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
-                     std::vector<Torch::machine::GMMStats*>& test_stats,
-                     bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores)
-  {
-    // 0/ Allocate A an B arrays
-    blitz::Array<double, 2> A;
-    blitz::Array<double, 2> B;
-    detail::allocAB(models.size(), test_stats, A, B);
-    // 1/ Compute A
-    detail::computeA(models, ubm_mean, ubm_variance, A);
-    // 2/ Compute B
-    detail::computeB(test_stats, ubm_mean, B);
-    // 3/ Apply the normalization if needed
-    if(frame_length_normalisation)
-      detail::frameNormalization(test_stats, B);
-    // 4/ Compute LLR
-    // TODO: We should not resized any array: Just throw an exception if size is not valid
-    int Tm = models.size();
-    int Tt = test_stats.size();
-    scores.resize(Tm, Tt);
-    Torch::math::prod(A, B, scores);
-  }
-
-
-
 
 
   /**

@@ -1,17 +1,12 @@
-#ifndef _LINEARSCORING_H
-#define _LINEARSCORING_H
+#ifndef TORCH5SPRO_MACHINE_LINEARSCORING_H
+#define TORCH5SPRO_MACHINE_LINEARSCORING_H
 
 #include <blitz/array.h>
-#include <machine/GMMMachine.h>
 #include <vector>
+#include "machine/GMMMachine.h"
 
 namespace Torch { namespace machine {
 
-  void linearScoring(std::vector<Torch::machine::GMMMachine*>& models,
-                     Torch::machine::GMMMachine& ubm,
-                     std::vector<Torch::machine::GMMStats*>& test_stats,
-                     bool frame_length_normalisation,
-                     blitz::Array<double, 2>& scores);
   void linearScoring(std::vector<blitz::Array<double,1> >& models,
                      blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
                      std::vector<Torch::machine::GMMStats*>& test_stats,
@@ -20,6 +15,11 @@ namespace Torch { namespace machine {
                      blitz::Array<double, 2>& scores);
   void linearScoring(std::vector<blitz::Array<double,1> >& models,
                      blitz::Array<double,1>& ubm_mean, blitz::Array<double,1>& ubm_variance,
+                     std::vector<Torch::machine::GMMStats*>& test_stats,
+                     bool frame_length_normalisation,
+                     blitz::Array<double, 2>& scores);
+  void linearScoring(std::vector<Torch::machine::GMMMachine*>& models,
+                     Torch::machine::GMMMachine& ubm,
                      std::vector<Torch::machine::GMMStats*>& test_stats,
                      bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores);
@@ -45,4 +45,4 @@ namespace Torch { namespace machine {
 }
 }
 
-#endif // _LINEARSCORING_H
+#endif // TORCH5SPRO_MACHINE_LINEARSCORING_H
