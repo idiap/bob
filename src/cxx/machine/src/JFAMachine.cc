@@ -11,6 +11,9 @@
 #include "machine/JFAMachine.h"
 #include "machine/Exception.h"
 #include "math/linear.h"
+#include "math/lu_det.h"
+#include "core/repmat.h"
+#include "machine/LinearScoring.h"
 
 namespace mach = Torch::machine;
 namespace math = Torch::math;
@@ -171,5 +174,138 @@ void mach::JFAMachine::setZ(const blitz::Array<double,1>& z) {
     throw mach::NInputsMismatch(z.extent(0), m_z.extent(0));
   }
   m_z.reference(z.copy());
+}
+
+void mach::JFAMachine::updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F)
+{
+  // Precompute Ut*diag(sigma)^-1
+  m_x.resize(getDimRu());
+  computeUtSigmaInv();
+  computeUProd();
+  computeIdPlusUProd(N,F);
+  computeFn_x(N,F);
+  updateX_fromCache();
+}
+
+void mach::JFAMachine::computeUtSigmaInv()
+{
+  m_cache_UtSigmaInv.resizeAndPreserve(getDimRu(), getDimCD());
+  const blitz::Array<double,2>& U = m_jfa_base->getU();
+  blitz::Array<double,2> Uu = U(blitz::Range::all(), blitz::Range::all()); // Blitz compatibility
+  blitz::Array<double,2> Ut = Uu.transpose(1,0);
+  m_cache_sigma.resizeAndPreserve(getDimCD());
+  m_jfa_base->getUbm()->getVarianceSupervector(m_cache_sigma);
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  m_cache_UtSigmaInv = Ut(i,j) / m_cache_sigma(j); // Ut * diag(sigma)^-1
+}
+
+void mach::JFAMachine::computeUProd()
+{
+  m_cache_UProd.resizeAndPreserve(getDimC(),getDimRu(),getDimRu());
+  m_tmp_ruD.resize(getDimRu(),getDimD());
+  m_cache_sigma.resizeAndPreserve(getDimCD());
+  m_jfa_base->getUbm()->getVarianceSupervector(m_cache_sigma);
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  for(int c=0; c<getDimC(); ++c)
+  {
+    blitz::Array<double,2> UProd_c = m_cache_UProd(c, blitz::Range::all(), blitz::Range::all());
+    const blitz::Array<double,2>& U = m_jfa_base->getU();
+    blitz::Array<double,2> Uu_c = U(blitz::Range(c*getDimD(),(c+1)*getDimD()-1), blitz::Range::all());
+    blitz::Array<double,2> Ut_c = Uu_c.transpose(1,0);
+    blitz::Array<double,1> sigma_c = m_cache_sigma(blitz::Range(c*getDimD(),(c+1)*getDimD()-1));
+    m_tmp_ruD = Ut_c(i,j) / sigma_c(j); // Ut_c * diag(sigma)^-1 
+    Torch::math::prod(m_tmp_ruD, Uu_c, UProd_c);
+  }
+}
+
+void mach::JFAMachine::computeIdPlusUProd(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F) 
+{
+  m_cache_IdPlusUProd.resizeAndPreserve(getDimRu(),getDimRu());
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  m_tmp_ruru.resize(getDimRu(), getDimRu());
+  Torch::math::eye(m_tmp_ruru); // m_tmp_ruru = I
+  for(int c=0; c<getDimC(); ++c) {
+    blitz::Array<double,2> UProd_c = m_cache_UProd(c,blitz::Range::all(),blitz::Range::all());
+    m_tmp_ruru += UProd_c * N(c);
+  }
+  Torch::math::inv(m_tmp_ruru, m_cache_IdPlusUProd); // m_cache_IdPlusUProdh = ( I+Ut*diag(sigma)^-1*N*U)^-1
+}
+
+void mach::JFAMachine::computeFn_x(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F)
+{
+  // Compute Fn_x = sum_{sessions h}(N*(o - m - D*z - V*y) (Normalised first order statistics)
+  m_cache_Fn_x.resize(getDimCD());
+  m_cache_mean.resizeAndPreserve(getDimCD());
+  m_jfa_base->getUbm()->getMeanSupervector(m_cache_mean);
+  const blitz::Array<double,1>& d = m_jfa_base->getD();
+  m_tmp_CD.resize(getDimCD());
+  Torch::core::repelem(N, m_tmp_CD);
+  m_cache_Fn_x = F - m_tmp_CD * (m_cache_mean + d * m_z); // Fn_x = N*(o - m - D*z) 
+
+  const blitz::Array<double,2>& V = m_jfa_base->getV();
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  m_tmp_CD_b.resize(getDimCD());
+  Torch::math::prod(V, m_y, m_tmp_CD_b);
+  m_cache_Fn_x -= m_tmp_CD * m_tmp_CD_b;
+  // Fn_x = N*(o - m - D*z - V*y)
+}
+
+void mach::JFAMachine::updateX_fromCache()
+{
+  // Compute x = Ax * Cus * Fn_x
+  m_tmp_ru.resize(getDimRu());
+  // m_tmp_ru = m_cache_UtSigmaInv * m_cache_Fn_x = Ut*diag(sigma)^-1 * N*(o - m - D*z - V*y)
+  Torch::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x, m_tmp_ru); 
+  Torch::math::prod(m_cache_IdPlusUProd, m_tmp_ru, m_x);
+}
+
+void mach::JFAMachine::estimateX(const blitz::Array<double,2>& features) {
+  boost::shared_ptr<Torch::machine::GMMMachine> ubm(getJFABase()->getUbm());
+  m_cache_gmmstats.resize(ubm->getNGaussians(),ubm->getNInputs()); 
+  blitz::Array<double,1> N(ubm->getNGaussians());
+  blitz::Array<double,1> F(ubm->getNGaussians()*ubm->getNInputs());
+  // TODO: check type/dimensions?
+  m_cache_gmmstats.init();
+  for(int f=0; f<features.extent(0); ++f)
+  {
+    const blitz::Array<double,1> features1d = features(f,blitz::Range::all());
+    ubm->accStatistics(features1d, m_cache_gmmstats);
+    N = m_cache_gmmstats.n;
+    for(int g=0; g<ubm->getNGaussians(); ++g) {
+      blitz::Array<double,1> F_g = F(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
+      F_g = m_cache_gmmstats.sumPx(g,blitz::Range::all());
+    }
+  }
+  updateX(N, F);
+}
+
+
+void mach::JFAMachine::forward(const blitz::Array<double,2>& features)
+{
+  // Ux and GMMStats
+  estimateX(features);
+  std::vector<Torch::machine::GMMStats*> stats;
+  stats.push_back(&m_cache_gmmstats);
+  m_cache_Ux.resize(getDimCD());
+  Torch::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
+  std::vector<blitz::Array<double,1>*> channelOffset;
+  channelOffset.push_back(&m_cache_Ux);
+
+  // m + Vy + Dz
+  m_cache_mVyDz.resize(getDimCD());
+  Torch::math::prod(m_jfa_base->getV(), getY(), m_cache_mVyDz);
+  m_cache_mVyDz += m_jfa_base->getD()*getZ() + m_jfa_base->getUbm()->getMeanSupervector();
+  std::vector<blitz::Array<double,1>*> models;
+  models.push_back(&m_cache_mVyDz);
+
+  // Linear scoring
+  blitz::Array<double,2> scores(1,1);
+  mach::linearScoring(models, 
+    m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
+    stats, channelOffset, true, scores);
 }
 

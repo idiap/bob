@@ -11,6 +11,7 @@
 #include "io/Arrayset.h"
 #include "io/HDF5File.h"
 #include "machine/GMMMachine.h"
+#include "machine/LinearScoring.h"
 #include <boost/shared_ptr.hpp>
 
 namespace Torch { namespace machine {
@@ -301,11 +302,23 @@ namespace Torch { namespace machine {
         */
       void setZ(const blitz::Array<double,1>& z);
 
-
       /**
         * Set the JFABaseMachine
         */
       void setJFABase(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfa_base);
+
+
+      /**
+        * Estimates from a 2D blitz::Array
+        */
+      void forward(const blitz::Array<double,2>& features);
+      void estimateX(const blitz::Array<double,2>& features);
+      void updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
+      void computeUtSigmaInv();
+      void computeUProd();
+      void computeIdPlusUProd(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
+      void computeFn_x(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
+      void updateX_fromCache();
 
     private:
 
@@ -313,6 +326,25 @@ namespace Torch { namespace machine {
 
       blitz::Array<double,1> m_y;
       blitz::Array<double,1> m_z;
+
+      blitz::Array<double,1> m_x;
+
+      mutable Torch::machine::GMMStats m_cache_gmmstats;
+      mutable blitz::Array<double,1> m_cache_Ux;
+      mutable blitz::Array<double,1> m_cache_mVyDz;
+
+      mutable blitz::Array<double,2> m_cache_UtSigmaInv;
+      mutable blitz::Array<double,1> m_cache_sigma;
+      mutable blitz::Array<double,1> m_cache_mean;
+      mutable blitz::Array<double,3> m_cache_UProd;
+      mutable blitz::Array<double,2> m_cache_IdPlusUProd;
+      mutable blitz::Array<double,1> m_cache_Fn_x;
+
+      mutable blitz::Array<double,2> m_tmp_ruD;
+      mutable blitz::Array<double,2> m_tmp_ruru;
+      mutable blitz::Array<double,1> m_tmp_ru;
+      mutable blitz::Array<double,1> m_tmp_CD;
+      mutable blitz::Array<double,1> m_tmp_CD_b;
   };
 
 
