@@ -3,10 +3,10 @@
 # Andre Anjos <andre.dos.anjos@gmail.com>
 # Mon 25 Jul 14:07:42 2011 
 
-"""Detects faces on video or images, imprint bounding boxes or just do a
-textual dump of such values. Bounding boxes are 4-tuples containing the upper
-left corner x and y coordinates followed by the bounding box window width and
-its height."""
+"""Detects the most face-like object on video or images, imprint bounding boxes
+or just do a textual dump of such values. Bounding boxes are 4-tuples
+containing the upper left corner x and y coordinates followed by the bounding
+box window width and its height."""
 
 __epilog__ = """Example usage:
 
@@ -58,14 +58,12 @@ def process_video_data(args):
     torch.ip.rgb_to_gray(k, gray_buffer)
     int16_buffer = gray_buffer.cast('int16')
     start = time.clock()
-    detections = args.processor(int16_buffer)
+    detection = args.processor(int16_buffer)
     if args.verbose:
       sys.stdout.write('.')
       sys.stdout.flush()
     total += time.clock() - start
-    if len(detections) == 0: best = None
-    else: best = detections[0]
-    data.append(best)
+    data.append(detection)
 
   if args.verbose: sys.stdout.write('\n')
 
@@ -164,9 +162,6 @@ def main():
   parser.add_argument("-c", "--classification-model", metavar='FILE',
       type=str, dest="cmodel", default=None,
       help="use a classification model file different than the default")
-  parser.add_argument("-t", "--threshold", metavar='FLOAT',
-      type=float, dest='threshold', default=-sys.float_info.max,
-      help="classifier threshold (defaults to %(default)s)")
   parser.add_argument("-d", "--dump-scores",
       default=False, action='store_true', dest='dump_scores',
       help="if set, also dump scores after every bounding box")
@@ -197,8 +192,7 @@ def main():
     args.dump_scores = True
 
   start = time.clock() 
-  args.processor = torch.visioner.Detector(cmodel_file=args.cmodel,
-      threshold=args.threshold)
+  args.processor = torch.visioner.MaxDetector(cmodel_file=args.cmodel)
   total = time.clock() - start
 
   if args.verbose:
