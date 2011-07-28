@@ -27,6 +27,19 @@ static void load(visioner::SWScanner& s,
   if (!err) PYTHON_ERROR(RuntimeError, "failed to load image at subwindow scanner");
 }
 
+static tuple detect_max(visioner::Model& cmodel, size_t levels,
+    visioner::SWScanner& cscanner) {
+
+  // detect faces
+  visioner::detection_t detection;
+  visioner::detect_max(cmodel[0], levels, cscanner, detection);
+
+  // Returns a tuple containing the detection bbox
+  qreal x, y, width, height;
+  detection.second.getRect(&x, &y, &width, &height);
+  return make_tuple(x, y, width, height, detection.first);
+}
+
 static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
     float cluster, visioner::SWScanner& cscanner) {
   // detect faces
@@ -34,7 +47,7 @@ static tuple detect(visioner::Model& cmodel, double threshold, size_t levels,
   visioner::detect(cmodel[0], threshold, levels, cscanner, detections);
 
   // cluster detections
-  visioner::nms(detections, cluster);	
+  visioner::nms(detections, cluster);
 
   // order detections by descending order
   visioner::sort_desc(detections);
@@ -97,8 +110,11 @@ void bind_visioner_localize() {
     .def("load", &load, (arg("self"), arg("image")), "Loads an int16 2D array into the scanner. You must convert the image to a 16-bit integer representation first.")
     ;
 
+  def("detect_max", &detect_max, (arg("class_model"), arg("levels"),
+        arg("class_scanner")), "Detects the most likely face on an image preloaded by the (classification) scanner. Returns a tuple with the detected region and associated score in the following order (x, y, width, height, score). All values are floating-point numbers.");
+
   def("detect", &detect, (arg("class_model"), arg("threshold"), arg("levels"),
-        arg("class_scanner")), "Detects faces on an image preloaded by the (classification) scanners. Returns a tuple with the detected regions and associated scores in the following order (x, y, width, height, score). All values are floating-point numbers.");
+        arg("class_scanner")), "Detects faces on an image preloaded by the (classification) scanner. Returns a tuple with the detected regions and associated scores in the following order (x, y, width, height, score). All values are floating-point numbers.");
 
   def("locate", &locate, (arg("class_model"), arg("loc_model"), arg("levels"),
         arg("class_scanner"), arg("loc_scanner")), "Locates faces on an image preloaded by the (classification and localization) scanners. Returns a tuple with the detected region and all detected landmarks");
