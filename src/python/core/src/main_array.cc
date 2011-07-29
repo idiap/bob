@@ -37,6 +37,7 @@ void bind_array_reductions_3();
 void bind_array_reductions_4();
 void bind_array_storage();
 void bind_as_one_row();
+void bind_array_cat();
 
 BOOST_PYTHON_MODULE(libpytorch_core_array) {
   docstring_options docopt; 
@@ -73,4 +74,5 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_array_reductions_4();
   bind_array_storage();
   bind_as_one_row();
+  bind_array_cat();
 }

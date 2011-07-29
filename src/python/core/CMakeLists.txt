@@ -47,11 +47,15 @@ set(pysrc_array
    "src/array_storage.cc"
    "src/main_array.cc"
    "src/array_as_row.cc"
+   "src/array_cat.cc"
    )
 
 set(pysrc_vector
    "src/vector.cc"
-   "src/arrayvector.cc"
+   "src/array_vector_1.cc"
+   "src/array_vector_2.cc"
+   "src/array_vector_3.cc"
+   "src/array_vector_4.cc"
    "src/main_vector.cc"
    )
 
