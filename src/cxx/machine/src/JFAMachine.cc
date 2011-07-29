@@ -284,7 +284,7 @@ void mach::JFAMachine::estimateX(const blitz::Array<double,2>& features) {
 }
 
 
-void mach::JFAMachine::forward(const blitz::Array<double,2>& features)
+void mach::JFAMachine::forward(const blitz::Array<double,2>& features, double& score)
 {
   // Ux and GMMStats
   estimateX(features);
@@ -292,20 +292,56 @@ void mach::JFAMachine::forward(const blitz::Array<double,2>& features)
   stats.push_back(&m_cache_gmmstats);
   m_cache_Ux.resize(getDimCD());
   Torch::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
-  std::vector<blitz::Array<double,1>*> channelOffset;
-  channelOffset.push_back(&m_cache_Ux);
+  std::vector<blitz::Array<double,1> > channelOffset;
+  channelOffset.push_back(m_cache_Ux);
 
   // m + Vy + Dz
   m_cache_mVyDz.resize(getDimCD());
   Torch::math::prod(m_jfa_base->getV(), getY(), m_cache_mVyDz);
   m_cache_mVyDz += m_jfa_base->getD()*getZ() + m_jfa_base->getUbm()->getMeanSupervector();
-  std::vector<blitz::Array<double,1>*> models;
-  models.push_back(&m_cache_mVyDz);
+  std::vector<blitz::Array<double,1> > models;
+  models.push_back(m_cache_mVyDz);
 
   // Linear scoring
   blitz::Array<double,2> scores(1,1);
   mach::linearScoring(models, 
     m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
     stats, channelOffset, true, scores);
+  score = scores(0,0);
+}
+
+void mach::JFAMachine::forward(const Torch::io::Arrayset& samples, blitz::Array<double,1>& score)
+{
+  std::vector<Torch::machine::GMMStats*> stats;
+  std::vector<blitz::Array<double,1> > channelOffset;
+  for(size_t i=0; i<samples.size(); ++i)
+  {
+    // Ux and GMMStats
+    estimateX(samples.get<double,2>(i));
+    Torch::machine::GMMStats* st = new Torch::machine::GMMStats(m_cache_gmmstats);
+    stats.push_back(st);
+    m_cache_Ux.resize(getDimCD());
+    Torch::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
+    channelOffset.push_back(m_cache_Ux.copy());
+  }
+
+  // m + Vy + Dz
+  m_cache_mVyDz.resize(getDimCD());
+  Torch::math::prod(m_jfa_base->getV(), getY(), m_cache_mVyDz);
+  m_cache_mVyDz += m_jfa_base->getD()*getZ() + m_jfa_base->getUbm()->getMeanSupervector();
+  std::vector<blitz::Array<double,1> > models;
+  models.push_back(m_cache_mVyDz);
+
+  // Linear scoring
+  blitz::Array<double,2> scores(samples.size(),1);
+  mach::linearScoring(models, 
+    m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
+    stats, channelOffset, true, scores);
+  blitz::Array<double,1> scores_sl = scores(blitz::Range::all(), 0);
+  score = scores_sl;  
+
+  // Delete the GMMStats
+  for(size_t i=0; i<samples.size(); ++i)
+    delete stats[i];
 }
 

@@ -37,6 +37,8 @@ void bind_machine_jfa() {
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFAMachine from a configuration file."))
     .def(init<const mach::JFAMachine&>((arg("machine")), "Copy constructs a JFAMachine"))
     .def("load", &mach::JFAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
+    .def("forward", (void (mach::JFAMachine::*)(const blitz::Array<double,2>&, double&))&mach::JFAMachine::forward, (arg("self"), arg("b_array"), arg("score")), "Processes a 2D blitz::Array using.")
+    .def("forward", (void (mach::JFAMachine::*)(const Torch::io::Arrayset& samples, blitz::Array<double,1>& score))&mach::JFAMachine::forward, (arg("self"), arg("arrayset"), arg("scores")), "Processes a 2D blitz::Array using.")
     .add_property("ubm", &mach::JFAMachine::getJFABase, &mach::JFAMachine::setJFABase)
     .add_property("y", make_function(&mach::JFAMachine::getY, return_internal_reference<>()), &mach::JFAMachine::setY)
     .add_property("z", make_function(&mach::JFAMachine::getZ, return_internal_reference<>()), &mach::JFAMachine::setZ)

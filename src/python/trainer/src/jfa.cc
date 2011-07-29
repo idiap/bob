@@ -32,6 +32,7 @@ void bind_trainer_jfa() {
     .def("setStatistics", &train::JFABaseTrainer::setStatistics, (arg("self"), arg("N"), arg("F")), "Set the zeroth and first order statistics.")
     .def("setSpeakerFactors", &train::JFABaseTrainer::setSpeakerFactors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
     .def("train", (void (train::JFABaseTrainer::*)(const std::vector<blitz::Array<double,2> >&, const std::vector<blitz::Array<double,2> >&, const size_t))&train::JFABaseTrainer::train, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
+    .def("train", (void (train::JFABaseTrainer::*)(const std::vector<Torch::io::Arrayset>&, const size_t))&train::JFABaseTrainer::train, (arg("self"), arg("arrayset"), arg("n_iter")), "Call the training procedure.")
     .def("initializeRandomU", &train::JFABaseTrainer::initializeRandomU, (arg("self")), "Initializes randomly U.")
     .def("initializeRandomV", &train::JFABaseTrainer::initializeRandomV, (arg("self")), "Initializes randomly V.")
     .def("initializeRandomD", &train::JFABaseTrainer::initializeRandomD, (arg("self")), "Initializes randomly D.")
@@ -57,5 +58,11 @@ void bind_trainer_jfa() {
     .def("precomputeSumStatisticsN", &train::JFABaseTrainer::precomputeSumStatisticsN, (arg("self")), "Precomputes zeroth order statistics over sessions.")
     .def("precomputeSumStatisticsF", &train::JFABaseTrainer::precomputeSumStatisticsF, (arg("self")), "Precomputes first order statistics over sessions.")
     ;
+
+  class_<train::JFATrainer, boost::noncopyable>("JFATrainer", "Create a trainer for the JFA.", init<mach::JFAMachine&, train::JFABaseTrainer&>((arg("jfa"), arg("base_trainer")),"Initializes a new JFATrainer."))
+    .def("enrol", (void (train::JFATrainer::*)(const blitz::Array<double,2>&, const blitz::Array<double,2>&, const size_t))&train::JFATrainer::enrol, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
+    .def("enrol", (void (train::JFATrainer::*)(const Torch::io::Arrayset&, const size_t))&train::JFATrainer::enrol, (arg("self"), arg("arrayset"), arg("n_iter")), "Call the training procedure.")
+    ;
+
 
 }
