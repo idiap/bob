@@ -118,10 +118,8 @@ def process_image_data(args):
     graydata = input.cast('int16')
 
   start = time.clock()
-  detections = args.processor(graydata)
+  data = args.processor(graydata)
   total = time.clock() - start
-  if len(detections) == 0: data = None
-  else: data = detections[0]
   if args.verbose:
     print "Total detection time was %.3f seconds" % total
 
