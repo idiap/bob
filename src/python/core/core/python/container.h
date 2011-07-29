@@ -96,6 +96,8 @@ namespace Torch { namespace python {
 
   struct variable_capacity_policy : default_policy
   {
+    static bool check_convertibility_per_element() { return true; }
+
     template <typename ContainerType>
     static void reserve(ContainerType& a, std::size_t sz)
     {
