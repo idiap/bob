@@ -10,8 +10,9 @@
 #include <boost/make_shared.hpp>
 #include <blitz/array.h>
 
-#include "core/array_assert.h"
 #include "core/python/exception.h"
+
+#include "core/array_assert.h"
 
 #include "visioner/proc/localization.h"
 #include "visioner/proc/detection.h"

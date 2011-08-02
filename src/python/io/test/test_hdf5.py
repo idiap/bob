@@ -101,8 +101,7 @@ class HDF5FileTest(unittest.TestCase):
     self.assertEqual(readonly.size('testdata'), N)
 
     # Test that writing will really fail
-    self.assertRaises(torch.io.HDF5StatusError, readonly.append,
-        "testdata", arrays[0])
+    self.assertRaises(RuntimeError, readonly.append, "testdata", arrays[0])
 
     # And all the data is *exactly* the same recorded, bit by bit
     back = readonly.read('testdata') # this is how to read the whole data back

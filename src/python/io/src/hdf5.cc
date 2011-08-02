@@ -111,17 +111,12 @@ template <typename T> static void hdf5file_set_array(io::HDF5File& f,
 
 void bind_io_hdf5() {
 
-  //the exceptions that can be thrown are catchable in python
-  core::CxxToPythonTranslator<io::HDF5Exception, Torch::io::Exception>("HDF5Exception", "Generic exception, should never be raised or used, here just as a general catcher.");
-  core::CxxToPythonTranslatorPar<io::HDF5InvalidFileAccessModeError, io::HDF5Exception, const unsigned int>("HDF5InvalidFileAccessModeError", "Thrown when the user tries to open an HDF5 file with a mode that is not supported by the HDF5 library");
-  core::CxxToPythonTranslator<io::HDF5UnsupportedCxxTypeError, io::HDF5Exception>("HDF5UnsupportedCxxTypeError", "Thrown when we don't support the input type that we got from our API.");
-  core::CxxToPythonTranslatorPar<io::HDF5UnsupportedTypeError, io::HDF5Exception, const boost::shared_ptr<hid_t>&>("HDF5UnsupportedTypeError", "Thrown when we don't support a type that was read from the input file.");
-  core::CxxToPythonTranslatorPar<io::HDF5UnsupportedDimensionError, io::HDF5Exception, size_t>("HDF5UnsupportedDimensionError", "Thrown when the user tries to read/write using an unsupported number of dimensions from arrays.");
-  core::CxxToPythonTranslatorPar2<io::HDF5InvalidPath, io::HDF5Exception, const std::string&, const std::string&>("HDF5InvalidPath", "This exception is raised when the user asks for a particular path (i.e. 'group' in HDF5 jargon) that does not exist in the file.");
-  core::CxxToPythonTranslatorPar2<io::HDF5StatusError, io::HDF5Exception, const std::string&, herr_t>("HDF5StatusError", "This exception is raised when we call the HDF5 C-API and that returns less than zero as a status output.");
-  core::CxxToPythonTranslatorPar4<io::HDF5IndexError, io::HDF5Exception, const std::string&, const std::string&, size_t, size_t>("HDF5IndexError", "This exception is raised when the user asks for a certain array in an array list that is out of bounds.");
-  core::CxxToPythonTranslatorPar4<io::HDF5IncompatibleIO, io::HDF5Exception, const std::string&, const std::string&, const std::string&, const std::string&>("HDF5IncompatibleIO", "This exception is raised when the user tries to read or write to or from an existing dataset using a type that is incompatible with the established one for that dataset.");
-  core::CxxToPythonTranslatorPar2<io::HDF5NotExpandible, io::HDF5Exception, const std::string&, const std::string&>("HDF5NotExpandible", "This exception is raised when the user tries to append to a certain dataset that is not expandible.");
+  //specific exceptions that require special bindings
+  core::register_exception_translator<io::HDF5Exception>(PyExc_RuntimeError);
+  core::register_exception_translator<io::HDF5UnsupportedCxxTypeError>(PyExc_TypeError);
+  core::register_exception_translator<io::HDF5UnsupportedTypeError>(PyExc_TypeError);
+  core::register_exception_translator<io::HDF5IndexError>(PyExc_IndexError);
+  core::register_exception_translator<io::HDF5IncompatibleIO>(PyExc_IOError);
 
   //this class describes an HDF5 type
   class_<io::HDF5Type, boost::shared_ptr<io::HDF5Type> >("HDF5Type", "Support to compare data types, convert types into runtime equivalents and make our life easier when deciding what to input and output.", no_init)

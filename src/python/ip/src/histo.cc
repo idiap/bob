@@ -12,6 +12,7 @@
 
 using namespace boost::python;
 namespace ip = Torch::ip;
+namespace tpy = Torch::core::python;
 
 template<typename T>
 boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram1(blitz::Array<T, 2>& input) {
@@ -117,8 +118,7 @@ boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram5_(blitz::Array<T, 2>& sr
 void bind_ip_histogram()
 {
   //Exceptions for this functionality
-  Torch::core::python::CxxToPythonTranslatorPar<Torch::ip::UnsupportedTypeForHistogram, Torch::core::Exception , Torch::core::array::ElementType>("UnsupportedTypeForHistogram", "This exception is thrown when the histogram computation for a particular type is not implemented in torch");
-  Torch::core::python::CxxToPythonTranslator<Torch::ip::InvalidArgument, Torch::core::Exception>("InvalidArgument", "This exception is thrown when a function argument is invalid");
+  tpy::register_exception_translator<ip::UnsupportedTypeForHistogram>(PyExc_TypeError);
 
   histo_uint8_uint16("histogram", &histogram1, args("src"), "Compute an histogram of a 2D array");
   

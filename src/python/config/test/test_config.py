@@ -140,7 +140,7 @@ class ConfigTest(unittest.TestCase):
 
     # Syntax errors on the configuration (python version) will be automatically
     # caught by the Python interpreter itself
-    self.assertRaises(torch.config.PythonError, torch.config.Configuration, EX2BROKEN)
+    self.assertRaises(RuntimeError, torch.config.Configuration, EX2BROKEN)
 
 if __name__ == '__main__':
   sys.argv.append('-v')

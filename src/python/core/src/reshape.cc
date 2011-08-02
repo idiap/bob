@@ -6,7 +6,6 @@
 
 #include <boost/python.hpp>
 #include "core/python/array_base.h"
-#include "core/python/exception.h"
 
 #include "core/reshape.h"
 
@@ -64,8 +63,6 @@ template<typename T> void def_reshape() {
 }
 
 void bind_core_reshape() {
-  Torch::core::python::CxxToPythonTranslatorPar2<Torch::core::ReshapeDifferentNumberOfElements, Torch::core::Exception, const int, const int>("ReshapeDifferentNumberOfElements", "This exception is thrown when the source array and the destination array which are passed to the reshape function do not have the same number of elements.");
-
   def_reshape<bool>();
   def_reshape<int8_t>();
   def_reshape<int16_t>();

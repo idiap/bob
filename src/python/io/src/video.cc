@@ -13,8 +13,8 @@
 #include "core/python/exception.h"
 
 using namespace boost::python;
-using namespace Torch::core::python;
 namespace io = Torch::io;
+namespace py = Torch::core::python;
 
 /**
  * Helper method for the the iterator wrapping
@@ -141,9 +141,8 @@ static tuple extensions() {
 }
 
 void bind_io_video() {
-  //exceptions for videos
-  CxxToPythonTranslatorPar2<Torch::io::FFmpegException, Torch::io::Exception, const char*, const char*>("FFmpegException", "Thrown when there is a problem with a Video file.");
-  CxxToPythonTranslatorPar<Torch::io::VideoIsClosed, Torch::io::Exception, const char*>("VideoIsClosed", "Thrown if a writeable video is already closed and the user tries to write on it.");
+  //special exceptions for videos
+  py::register_exception_translator<Torch::io::VideoIsClosed>(PyExc_IOError);
 
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 
