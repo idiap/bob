@@ -6,8 +6,8 @@
 from libpytorch_visioner import *
 from os import path
 
-DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9')
-DEFAULT_LMODEL = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost')
+DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.vbgz')
+DEFAULT_LMODEL = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.vbgz')
 
 class MaxDetector:
   """A class that bridges the Visioner to torch so as to detect the most
@@ -134,5 +134,12 @@ class Localizer:
     self.lscanner.load(grayimage)
     return locate(self.cmodel, self.lmodel, self.scan_levels, 
         self.cscanner, self.lscanner)
+
+def model_transcode(iname, oname):
+  """Transcodes the model in a certain input file to another format also
+  supported by the visioner"""
+
+  model, params = load_model(iname)
+  save_model(model, params, oname)
 
 __all__ = dir()
