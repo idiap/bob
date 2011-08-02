@@ -8,8 +8,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
+#include <blitz/array.h>
 
 #include "io/Arrayset.h"
+#include "core/array_assert.h"
 #include "core/python/vector.h"
 #include "core/python/exception.h"
 
@@ -57,7 +59,67 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable(T iter) {
   return retval;
 }
 
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(arrayset_save_overloads, save, 1, 2) 
+template<typename T>
+static void add_2d_array_(io::Arrayset& arrayset, const blitz::Array<T, 2>& array_2d) {
+  for (int i = 0; i < array_2d.extent(0); i++) {
+    blitz::Array<T, 1> tmp = array_2d(i, blitz::Range::all());
+    arrayset.add(tmp);
+  }
+}
+
+static void add_2d_array(io::Arrayset& arrayset, io::Array& array_2d) {
+
+  switch (array_2d.getElementType()) {
+    case array::t_bool:
+      add_2d_array_(arrayset, array_2d.get<bool, 2>());
+      break;
+    case array::t_int8:
+      add_2d_array_(arrayset, array_2d.get<int8_t, 2>());
+      break;
+    case array::t_int16:
+      add_2d_array_(arrayset, array_2d.get<int16_t, 2>());
+      break;
+    case array::t_int32:
+      add_2d_array_(arrayset, array_2d.get<int32_t, 2>());
+      break;
+    case array::t_uint8:
+      add_2d_array_(arrayset, array_2d.get<uint8_t, 2>());
+      break;
+    case array::t_uint16:
+      add_2d_array_(arrayset, array_2d.get<uint16_t, 2>());
+      break;
+    case array::t_uint32:
+      add_2d_array_(arrayset, array_2d.get<uint32_t, 2>());
+      break;
+    case array::t_uint64:
+      add_2d_array_(arrayset, array_2d.get<uint64_t, 2>());
+      break;
+    case array::t_float32:
+      add_2d_array_(arrayset, array_2d.get<float, 2>());
+      break;
+    case array::t_float64:
+      add_2d_array_(arrayset, array_2d.get<double, 2>());
+      break;
+    case array::t_float128:
+      add_2d_array_(arrayset, array_2d.get<long double, 2>());
+      break;
+    case array::t_complex64:
+      add_2d_array_(arrayset, array_2d.get<std::complex<float>, 2>());
+      break;
+    case array::t_complex128:
+      add_2d_array_(arrayset, array_2d.get<std::complex<double>, 2>());
+      break;
+    case array::t_complex256:
+      add_2d_array_(arrayset, array_2d.get<std::complex<long double>, 2>());
+      break;
+
+    default:
+      throw io::TypeError(array_2d.getElementType(), array::getElementType<double>());
+  }
+}
+
+
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(arrayset_save_overloads, save, 1, 2)
 
 void bind_io_arrayset() {
   class_<io::Arrayset, boost::shared_ptr<io::Arrayset> >("Arrayset", "Dataset Arraysets represent lists of Arrays that share the same element type and dimension properties and are grouped together by the DB designer.", init<const std::string&, optional<const std::string&> >((arg("filename"),arg("codecname")=""), "Initializes a new arrayset from an external file. An optional codec may be passed."))
@@ -70,6 +132,7 @@ void bind_io_arrayset() {
     .add_property("elementType", &io::Arrayset::getElementType, "This property indicates the type of element used for each array in the current set.")
     .def("save", &io::Arrayset::save, arrayset_save_overloads((arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the arrayset into a file. It will save if the arrayset is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."))
     .def("load", &io::Arrayset::load)
+    .def("append_2d_array", &add_2d_array, "Add each line of a 2d array to the Arrayset")
 
     //some list-like entries
     .def("__len__", &io::Arrayset::size, "The number of arrays stored in this set.")
