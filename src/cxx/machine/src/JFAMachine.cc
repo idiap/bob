@@ -263,31 +263,26 @@ void mach::JFAMachine::updateX_fromCache()
   Torch::math::prod(m_cache_IdPlusUProd, m_tmp_ru, m_x);
 }
 
-void mach::JFAMachine::estimateX(const blitz::Array<double,2>& features) {
+void mach::JFAMachine::estimateX(mach::GMMStats* gmm_stats) {
   boost::shared_ptr<Torch::machine::GMMMachine> ubm(getJFABase()->getUbm());
   m_cache_gmmstats.resize(ubm->getNGaussians(),ubm->getNInputs()); 
   blitz::Array<double,1> N(ubm->getNGaussians());
   blitz::Array<double,1> F(ubm->getNGaussians()*ubm->getNInputs());
   // TODO: check type/dimensions?
-  m_cache_gmmstats.init();
-  for(int f=0; f<features.extent(0); ++f)
-  {
-    const blitz::Array<double,1> features1d = features(f,blitz::Range::all());
-    ubm->accStatistics(features1d, m_cache_gmmstats);
-    N = m_cache_gmmstats.n;
-    for(int g=0; g<ubm->getNGaussians(); ++g) {
-      blitz::Array<double,1> F_g = F(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
-      F_g = m_cache_gmmstats.sumPx(g,blitz::Range::all());
-    }
+  m_cache_gmmstats = *gmm_stats;
+  N = m_cache_gmmstats.n;
+  for(int g=0; g<ubm->getNGaussians(); ++g) {
+    blitz::Array<double,1> F_g = F(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
+    F_g = m_cache_gmmstats.sumPx(g,blitz::Range::all());
   }
   updateX(N, F);
 }
 
 
-void mach::JFAMachine::forward(const blitz::Array<double,2>& features, double& score)
+void mach::JFAMachine::forward(mach::GMMStats* gmm_stats, double& score)
 {
   // Ux and GMMStats
-  estimateX(features);
+  estimateX(gmm_stats);
   std::vector<Torch::machine::GMMStats*> stats;
   stats.push_back(&m_cache_gmmstats);
   m_cache_Ux.resize(getDimCD());
@@ -310,17 +305,14 @@ void mach::JFAMachine::forward(const blitz::Array<double,2>& features, double& s
   score = scores(0,0);
 }
 
-void mach::JFAMachine::forward(const Torch::io::Arrayset& samples, blitz::Array<double,1>& score)
+void mach::JFAMachine::forward(std::vector<mach::GMMStats*>& samples, blitz::Array<double,1>& score)
 {
-  std::vector<Torch::machine::GMMStats*> stats;
   std::vector<blitz::Array<double,1> > channelOffset;
+    m_cache_Ux.resize(getDimCD());
   for(size_t i=0; i<samples.size(); ++i)
   {
     // Ux and GMMStats
-    estimateX(samples.get<double,2>(i));
-    Torch::machine::GMMStats* st = new Torch::machine::GMMStats(m_cache_gmmstats);
-    stats.push_back(st);
-    m_cache_Ux.resize(getDimCD());
+    estimateX(samples[i]);
     Torch::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
     channelOffset.push_back(m_cache_Ux.copy());
   }
@@ -336,12 +328,7 @@ void mach::JFAMachine::forward(const Torch::io::Arrayset& samples, blitz::Array<
   blitz::Array<double,2> scores(samples.size(),1);
   mach::linearScoring(models, 
     m_jfa_base->getUbm()->getMeanSupervector(), m_jfa_base->getUbm()->getVarianceSupervector(),
-    stats, channelOffset, true, scores);
+    samples, channelOffset, true, scores);
   blitz::Array<double,1> scores_sl = scores(blitz::Range::all(), 0);
   score = scores_sl;  
-
-  // Delete the GMMStats
-  for(size_t i=0; i<samples.size(); ++i)
-    delete stats[i];
 }
-

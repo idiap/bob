@@ -480,7 +480,6 @@ class JFATrainerTest(unittest.TestCase):
     jfam.V = v
     jfam.D = d
     jfat = torch.trainer.JFABaseTrainer(jfam)
-
     jfat.train(N,F,5)
 
 

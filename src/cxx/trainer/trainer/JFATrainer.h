@@ -290,7 +290,7 @@ class JFABaseTrainer {
     void train(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
-    void train(const std::vector<Torch::io::Arrayset>& features,
+    void train(const std::vector<std::vector<Torch::machine::GMMStats*> >& features,
       const size_t n_iter); 
     /**
       * Initializes U, V and D
@@ -475,7 +475,7 @@ class JFATrainer {
     void enrol(const blitz::Array<double,2>& N,
       const blitz::Array<double,2>& F, 
       const size_t n_iter); 
-    void enrol(const Torch::io::Arrayset& features,
+    void enrol(const std::vector<Torch::machine::GMMStats*>& features,
       const size_t n_iter);
 
   private:

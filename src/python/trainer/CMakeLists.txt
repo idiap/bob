@@ -41,6 +41,9 @@ torch_python_add_test(python-trainer-mlp-rprop-tests
 torch_python_add_test(python-trainer-mlp-backprop-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_backprop.py)
 
+torch_python_add_test(python-trainer-jfa-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_jfa.py)
+
 torch_python_add_test(python-trainer-gmm_train
   ${CMAKE_CURRENT_SOURCE_DIR}/script/gmm_train.py --self-test)
 
