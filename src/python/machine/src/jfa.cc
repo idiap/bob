@@ -17,6 +17,27 @@ namespace io = Torch::io;
 namespace tp = Torch::core::python;
 
 
+static void jfa_forward_list(mach::JFAMachine& m, list stats, blitz::Array<double,1>& score)
+{
+  // Extracts the vector of pointers from the python list
+  int n_samples = len(stats);
+  std::vector<Torch::machine::GMMStats*> gmm_stats;
+  for(int s=0; s<n_samples; ++s)
+    gmm_stats.push_back(extract<Torch::machine::GMMStats*>(stats[s]));
+
+  // Calls the forward function
+  m.forward(gmm_stats, score);
+}
+
+static double jfa_forward_sample(mach::JFAMachine& m, Torch::machine::GMMStats& stats)
+{
+  double score;
+  // Calls the forward function
+  m.forward(&stats, score);
+  return score;
+}
+
+
 void bind_machine_jfa() {
   class_<mach::JFABaseMachine, boost::shared_ptr<mach::JFABaseMachine> >("JFABaseMachine", "A JFABaseMachine", init<boost::shared_ptr<mach::GMMMachine>, int, int>((arg("ubm"), arg("ru"), arg("rv")), "Builds a new JFABaseMachine."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFABaseMachine from a configuration file."))
@@ -37,8 +58,8 @@ void bind_machine_jfa() {
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFAMachine from a configuration file."))
     .def(init<const mach::JFAMachine&>((arg("machine")), "Copy constructs a JFAMachine"))
     .def("load", &mach::JFAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
-    .def("forward", (void (mach::JFAMachine::*)(mach::GMMStats*, double&))&mach::JFAMachine::forward, (arg("self"), arg("gmm_stats"), arg("score")), "Processes GMM statistics.")
-    .def("forward", (void (mach::JFAMachine::*)(std::vector<mach::GMMStats*>& samples, blitz::Array<double,1>& score))&mach::JFAMachine::forward, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics.")
+    .def("forward", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
+    .def("forward", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .add_property("ubm", &mach::JFAMachine::getJFABase, &mach::JFAMachine::setJFABase)
     .add_property("y", make_function(&mach::JFAMachine::getY, return_internal_reference<>()), &mach::JFAMachine::setY)
     .add_property("z", make_function(&mach::JFAMachine::getZ, return_internal_reference<>()), &mach::JFAMachine::setZ)
