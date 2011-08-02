@@ -13,5 +13,4 @@
 using namespace Torch::core::python;
 
 void bind_ip_exception() {
-  register_exception_translator<Torch::ip::ParamOutOfBoundaryError>(PyExc_AssertionError);
 }

@@ -6,13 +6,10 @@
  */
 
 #include <boost/python.hpp>
-
 #include "ip/histo.h"
-#include "core/python/exception.h"
 
 using namespace boost::python;
 namespace ip = Torch::ip;
-namespace tpy = Torch::core::python;
 
 template<typename T>
 boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram1(blitz::Array<T, 2>& input) {
@@ -117,9 +114,6 @@ boost::shared_ptr<blitz::Array<uint64_t, 1> > histogram5_(blitz::Array<T, 2>& sr
 
 void bind_ip_histogram()
 {
-  //Exceptions for this functionality
-  tpy::register_exception_translator<ip::UnsupportedTypeForHistogram>(PyExc_TypeError);
-
   histo_uint8_uint16("histogram", &histogram1, args("src"), "Compute an histogram of a 2D array");
   
   histo_uint8_uint16("histogram", &histogram2,

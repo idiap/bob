@@ -92,14 +92,14 @@ class MLPTest(unittest.TestCase):
     m = torch.machine.MLP((2,1))
 
     # the MLP shape cannot have a single entry
-    self.assertRaises(AssertionError, setattr, m, 'shape', (5,))
+    self.assertRaises(RuntimeError, setattr, m, 'shape', (5,))
 
     # you cannot set the weights vector with the wrong size
-    self.assertRaises(AssertionError,
+    self.assertRaises(RuntimeError,
         setattr, m, 'weights', [torch.core.array.float64_2((3,1))])
 
     # the same for the bias
-    self.assertRaises(AssertionError,
+    self.assertRaises(RuntimeError,
         setattr, m, 'biases', [torch.core.array.float64_1((5,))])
     
     # it works though if the sizes are correct

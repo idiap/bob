@@ -6,13 +6,10 @@
  */
 
 #include <boost/python.hpp>
-
 #include "ip/color.h"
-#include "core/python/exception.h"
 
 using namespace boost::python;
 namespace ip = Torch::ip;
-namespace tpy = Torch::core::python;
 
 template <typename T> static tuple rgb_to_hsv_one_python(T r, T g, T b) {
   T h, s, v;
@@ -199,11 +196,7 @@ template <typename T> static void bind_type() {
 
 void bind_ip_color()
 {
-  //Exceptions for this functionality
-  tpy::register_exception_translator<Torch::ip::UnsupportedTypeForColorConversion>(PyExc_TypeError);
-
   //Single pixel conversions
-  
   def("rgb_to_hsv_u8", &rgb_to_hsv_one_python<uint8_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band with 256 gray levels) to HSV as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,v) values.");
   def("rgb_to_hsv_u16", &rgb_to_hsv_one_python<uint16_t>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band with 65535 gray levels) to HSV as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,v) values.");
   def("rgb_to_hsv_f", &rgb_to_hsv_one_python<float>, (arg("red"), arg("green"), arg("blue")), "Converts a RGB color-pixel (each band using a float between 0 and 1) to HSV as defined in http://en.wikipedia.org/wiki/HSL_and_HSV. Returns a tuple with (h,s,v) values.");

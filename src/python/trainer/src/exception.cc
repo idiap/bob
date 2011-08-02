@@ -12,5 +12,4 @@
 using namespace Torch::core::python;
 
 void bind_trainer_exception() {
-  register_exception_translator<Torch::trainer::IncompatibleMachine>(PyExc_TypeError);
 }
