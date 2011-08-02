@@ -12,7 +12,8 @@
 
 #include <vector>
 #include <blitz/array.h>
-#include <core/array_assert.h>
+#include <blitz/tinyvec-et.h>
+#include <core/Exception.h>
 
 namespace Torch { namespace core { namespace array {
 
@@ -54,17 +55,19 @@ namespace Torch { namespace core { namespace array {
     void dcopy(const blitz::Array<T,N>& source, blitz::Array<T,N>& dest,
         int D, int pos) {
 
-      if ( D > (N-1) ) throw UnexpectedShapeError();
+      if ( D >= N ) 
+        throw std::range_error("Copy dimension greater or equal total number of dimensions");
 
       //checks arrays are compatible
       blitz::TinyVector<int,N> v1 = source.shape();
       blitz::TinyVector<int,N> v2 = dest.shape();
       v1(D) = v2(D) = 0;
-      if ( blitz::all(v1 != v2) ) throw UnexpectedShapeError();
+      if ( blitz::any(v1 != v2) ) 
+        throw std::runtime_error("Arrays are not compatible for copy along the given dimension");
 
       //checks destination has enough room
       if ( (source.extent(D) + pos) > dest.extent(D) )
-        throw UnexpectedShapeError();
+        throw std::range_error("Destination array does not hold enough space");
 
       dcopy_(source, dest, D, pos);
     }
@@ -184,20 +187,21 @@ namespace Torch { namespace core { namespace array {
     void dcopy(const blitz::Array<T,N-1>& source, blitz::Array<T,N>& dest, 
         int D, int pos) {
 
-      if ( D > (N-1) ) throw UnexpectedShapeError();
+      if ( D >= N )
+        throw std::range_error("Copy dimension greater or equal total number of dimensions");
 
       //checks arrays are compatible
-      blitz::TinyVector<int,N> v1 = dest.shape();
-      blitz::TinyVector<int,N> v2;
-      for (int k=0, l=0; k<N; ++k) {
-        if (k == D) v2(k) = 0;
-        else v2(l++) = source.shape()(k);
+      for (int k=0, l=0; k<N; ++k) { //k => dest; l => source
+        if (k != D) { //skip comparison if k == D
+          if (dest.shape()(k) != source.shape()(l++)) { //increment l
+            throw std::runtime_error("Arrays are not compatible for copy along the given dimension");
+          }
+        }
       }
-      v1(D) = 0;
-      if ( blitz::all(v1 != v2) ) throw UnexpectedShapeError();
 
       //checks destination has enough room
-      if ( pos >= dest.extent(D) ) throw UnexpectedShapeError();
+      if ( pos >= dest.extent(D) )
+        throw std::range_error("Destination array does not hold enough space");
 
       copy__<T,N>::f(source, dest, D, pos);
     }
@@ -241,8 +245,11 @@ namespace Torch { namespace core { namespace array {
     }
 
   /**
-   * Concatenates a bunch of arrays with N-1 dimensions together, along
-   * dimension D of the destination array. Does not check the user input.
+   * Stacks a bunch of arrays with N-1 dimensions together, along the first
+   * dimension of the destination array. Does not check the user input.
+   *
+   * Note: If you want to stack along a different dimension, just transpose the
+   * result or give a transposed destination.
    *
    * Requires: The source and destination shapes are identical except along
    * dimension D.
@@ -250,17 +257,20 @@ namespace Torch { namespace core { namespace array {
    * Requires: The destination array has enough space.
    */
   template <typename T, int N>
-    void cat_(const std::vector<blitz::Array<T,N-1> >& source,
-        blitz::Array<T,N>& dest, int D) {
+    void stack_(const std::vector<blitz::Array<T,N-1> >& source,
+        blitz::Array<T,N>& dest) {
       int pos = 0;
       for (size_t i=0; i<source.size(); ++i) {
-        dcopy_(source[i], dest, D, pos++);
+        dcopy_(source[i], dest, 0, pos++);
       }
     }
 
   /**
-   * Concatenates a bunch of arrays with N-1 dimensions together, along
-   * dimension D of the destination array.
+   * Stacks a bunch of arrays with N-1 dimensions together, along the first
+   * dimension of the destination array.
+   *
+   * Note: If you want to stack along a different dimension, just transpose the
+   * result or give a transposed destination.
    *
    * Requires: The source and destination shapes are identical except along
    * dimension D.
@@ -268,11 +278,11 @@ namespace Torch { namespace core { namespace array {
    * Requires: The destination array has enough space.
    */
   template <typename T, int N>
-    void cat(const std::vector<blitz::Array<T,N-1> >& source,
-        blitz::Array<T,N>& dest, int D) {
+    void stack(const std::vector<blitz::Array<T,N-1> >& source,
+        blitz::Array<T,N>& dest) {
       int pos = 0;
       for (size_t i=0; i<source.size(); ++i) {
-        dcopy(source[i], dest, D, pos++);
+        dcopy(source[i], dest, 0, pos++);
       }
     }
 

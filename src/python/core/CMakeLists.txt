@@ -90,6 +90,8 @@ torch_python_install(core)
 # Our test units
 torch_python_add_test(python-core-array-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
+torch_python_add_test(python-core-array-concatenation-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array_cat.py)
 torch_python_add_test(python-core-exception-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
 
