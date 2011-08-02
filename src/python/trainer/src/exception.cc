@@ -12,14 +12,4 @@
 using namespace Torch::core::python;
 
 void bind_trainer_exception() {
-  CxxToPythonTranslator<Torch::trainer::Exception, Torch::core::Exception>("Exception", "Raised when no other exception type is better to describe the problem. You should never use this!");
-
-  CxxToPythonTranslator<Torch::trainer::NoPriorGMM, Torch::trainer::Exception>("NoPriorGMM", "Raised when some computations need a prior GMM and no one is set");
-
-  CxxToPythonTranslatorPar<Torch::trainer::WrongNumberOfClasses, Torch::trainer::Exception, size_t>("WrongNumberOfClasses", "Raised when the number of classes is insufficient");
-
-  CxxToPythonTranslatorPar3<Torch::trainer::WrongNumberOfFeatures, Torch::trainer::Exception, size_t, size_t, size_t>("WrongNumberOfFeatures", "Raised when the number of features is different from other classes in the dataset");
-
-  CxxToPythonTranslator<Torch::trainer::IncompatibleMachine, Torch::trainer::Exception>("IncompatibleMachine", "Raised when the given machine is incompatible with the current settings for a given trainer.");
-
 }

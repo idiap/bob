@@ -6,7 +6,6 @@
  */
 
 #include <boost/python.hpp>
-#include "core/python/exception.h"
 #include "core/python/vector.h"
 #include "machine/MLP.h"
 #include "machine/MLPException.h"
@@ -119,13 +118,6 @@ static void random3(Torch::machine::MLP& M,
 }
 
 void bind_machine_mlp() {
-  //exceptions thrown by MLPs
-  tp::CxxToPythonTranslator<mach::InvalidShape, mach::Exception>("InvalidShape", "Exception raised when the resizing shape has less than 2 components");
-  tp::CxxToPythonTranslatorPar2<mach::NumberOfLayersMismatch, mach::Exception, size_t, size_t>("NumberOfLayersMismatch", "Exception raised when there is a mismatch between the number of layers");
-  tp::CxxToPythonTranslatorPar3<mach::WeightShapeMismatch, mach::Exception, size_t, const blitz::TinyVector<int,2>&, const blitz::TinyVector<int,2>&>("WeightShapeMismatch", "Exception raised when there is a mismatch between the shapes of weights to be set and the current MLP size.");
-  tp::CxxToPythonTranslatorPar3<mach::BiasShapeMismatch, mach::Exception, size_t, size_t, size_t>("BiasShapeMismatch", "Exception raised when there is a mismatch between the shapes of biases to be set and the current MLP size.");
-  tp::CxxToPythonTranslatorPar<mach::UnsupportedActivation, mach::Exception, mach::Activation>("UnsupportedActivation", "Raised when a machine (or trainer) does not support the use of a certain activation function");
-
   class_<mach::MLP, boost::shared_ptr<mach::MLP>
     >("MLP", "An MLP object is a representation of a Multi-Layer Perceptron. This implementation is feed-forward and fully-connected. The implementation allows setting of input normalization values and a global activation function. References to fully-connected feed-forward networks: Bishop's Pattern Recognition and Machine Learning, Chapter 5. Figure 5.1 shows what we mean.\n\nMLPs normally are multi-layered systems, with 1 or more hidden layers. As a special case, this implementation also supports connecting the input directly to the output by means of a single weight matrix. This is equivalent of a LinearMachine, with the advantage it can be trained by MLP trainers.", init<const std::vector<size_t>&>((arg("shape")), "Builds a new MLP with a shape containing the number of inputs (first element), number of outputs (last element) and the number of neurons in each hidden layer (elements between the first and last element of given tuple). The default activation function will be set to hyperbolic tangent."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new MLP from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))

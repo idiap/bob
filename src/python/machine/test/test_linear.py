@@ -55,12 +55,9 @@ class MachineTest(unittest.TestCase):
     w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
     m = torch.machine.LinearMachine(w)
     b = torch.core.array.array([0.3, -3.0, 2.7, -18, 52], 'float64') #wrong
-    self.assertRaises( torch.machine.NOutputsMismatch, 
-        setattr, m, 'biases', b)
-    self.assertRaises( torch.machine.NInputsMismatch, 
-        setattr, m, 'input_subtract', b)
-    self.assertRaises( torch.machine.NInputsMismatch, 
-        setattr, m, 'input_divide', b)
+    self.assertRaises(RuntimeError, setattr, m, 'biases', b)
+    self.assertRaises(RuntimeError, setattr, m, 'input_subtract', b)
+    self.assertRaises(RuntimeError, setattr, m, 'input_divide', b)
 
   def test02_Correctness(self):
 

@@ -6,7 +6,6 @@
 
 #include <boost/python.hpp>
 #include "core/python/array_base.h"
-#include "core/python/exception.h"
 
 #include "core/repmat.h"
 
@@ -83,8 +82,6 @@ template<typename T> void def_repmat() {
 }
 
 void bind_core_repmat() {
-  Torch::core::python::CxxToPythonTranslatorPar2<Torch::core::RepmatNonMultipleLength, Torch::core::Exception, const int, const int>("RepmatNonMultipleLength", "This exception is thrown in the repmat function when one dimension length of the destination array is not a multiple of the corresponding dimension length of the source array.");
-
   def_repmat<bool>();
   def_repmat<int8_t>();
   def_repmat<int16_t>();

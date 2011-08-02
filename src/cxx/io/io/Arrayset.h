@@ -1,6 +1,6 @@
 /**
- * @file io/Arrayset.h
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A torch representation of an Arrayset for a Dataset.
  */
