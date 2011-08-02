@@ -8,7 +8,7 @@ include("ExternalProject")
 # reach the directory ${VISIONER_REPO} directly.
 set(VISIONER_REPO "/idiap/group/torch5spro/sandboxes/visioner.git")
 set(VISIONER_BRANCH "v1.5.2-analyzer-tmax-faster")
-set(IDIAP_LOGIN "aanjos@idiap")
+set(IDIAP_LOGIN "aanjos@idiap" CACHE STRING "Idiap login")
 
 # Here we test to see if the directory is visible from the build spot
 if(IS_DIRECTORY ${VISIONER_REPO})

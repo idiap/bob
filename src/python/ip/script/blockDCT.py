@@ -32,7 +32,7 @@ def normalizeDCT(src):
 
 def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
     A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, A_N_DCT_COEF,
-    norm_before, norm_after):
+    norm_before, norm_after, add_xy):
   
   # Display file processed
   print >> sys.stderr, "DCT: " + line
@@ -46,24 +46,45 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
 
   if norm_before:
     normalizeBlocks(blocks)
+
+  if add_xy:
+    real_DCT_coef = A_N_DCT_COEF - 2
+  else:
+    real_DCT_coef = A_N_DCT_COEF
+
   
   # Initialize cropper and destination array
-  DCTF = torch.ip.DCTFeatures(A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, A_N_DCT_COEF - 2)
+  DCTF = torch.ip.DCTFeatures(A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, real_DCT_coef)
   
   # Call the preprocessing algorithm
   dct_blocks = DCTF(blocks)
-  
+
   n_blocks = blockShape[0]
-  TMP_tensor = torch.core.array.float64_2(n_blocks, A_N_DCT_COEF)
+
+  dct_blocks_min = 0
+  dct_blocks_max = A_N_DCT_COEF
+  TMP_tensor_min = 0
+  TMP_tensor_max = A_N_DCT_COEF
+
+  if norm_before:
+    dct_blocks_min += 1
+    TMP_tensor_max -= 1
+
+  if add_xy:
+    dct_blocks_max -= 2
+    TMP_tensor_min += 2
+  
+  TMP_tensor = torch.core.array.float64_2(n_blocks, TMP_tensor_max)
   
   nBlocks = torch.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   for by in range(nBlocks[0]):
     for bx in range(nBlocks[1]):
       bi = bx + by * nBlocks[1]
-      TMP_tensor[bi, 0] = bx
-      TMP_tensor[bi, 1] = by
-      for j in range(A_N_DCT_COEF-2):
-          TMP_tensor[bi,j+2] = dct_blocks[bi, j]
+      if add_xy:
+        TMP_tensor[bi, 0] = bx
+        TMP_tensor[bi, 1] = by
+      
+      TMP_tensor[bi, TMP_tensor_min:TMP_tensor_max] = dct_blocks[bi, dct_blocks_min:dct_blocks_max]
 
   if norm_after:
     normalizeDCT(TMP_tensor)
@@ -121,13 +142,23 @@ parser.add_option("-n",
 parser.add_option("-b",
                   "--norm-before",
                   dest="norm_before",
-                  help="Normalize each block before DCT",
+                  help="Normalize each block before DCT\n" +
+                       "Warning: If you use this option, the first " +
+                       "coefficient of the DCT is always 0 and is " +
+                       "removed for the results. So if you choose n DCT " +
+                       "coefficients, the results have (n-1) values.",
                   action="store_true",
                   default=False)
 parser.add_option("-a",
                   "--norm-after",
                   dest="norm_after",
                   help="Normalize the DCT coefficients",
+                  action="store_true",
+                  default=False)
+parser.add_option("-x",
+                  "--add-xy",
+                  dest="add_xy",
+                  help="Add (x,y) block location to the DCT coefficients",
                   action="store_true",
                   default=False)
 parser.add_option('--self-test',
@@ -194,6 +225,7 @@ if options.test:
   f.close()
   
   args.append("/tmp/input.lst")
+  options.add_xy = True
 
 # Create output directory
 if not os.path.exists(options.output_dir):
@@ -203,7 +235,7 @@ for line in fileinput.input(args):
   # Compute the dct of all files
   dctfeatures(line.rstrip('\r\n').strip(), options.output_dir, "", options.block_h, options.block_w,
   options.overlap_h, options.overlap_w, options.n_dct_coef,
-  options.norm_before, options.norm_after)
+  options.norm_before, options.norm_after, options.add_xy)
   
 
 if options.test:

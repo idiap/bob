@@ -311,7 +311,8 @@ namespace Torch { namespace machine {
       /**
         * Estimates from a 2D blitz::Array
         */
-      void forward(const blitz::Array<double,2>& features);
+      void forward(const blitz::Array<double,2>& features, double& score);
+      void forward(const Torch::io::Arrayset& samples, blitz::Array<double,1>& scores);
       void estimateX(const blitz::Array<double,2>& features);
       void updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
       void computeUtSigmaInv();
