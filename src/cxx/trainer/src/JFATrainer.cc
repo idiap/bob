@@ -1096,6 +1096,7 @@ void train::JFATrainer::enrol(const blitz::Array<double,2>& N,
   m_base_trainer.precomputeSumStatisticsN();
   m_base_trainer.precomputeSumStatisticsF();
 
+  m_base_trainer.initializeXYZ();
   for(size_t i=0; i<n_iter; ++i) {
     m_base_trainer.updateY();
     m_base_trainer.updateX();

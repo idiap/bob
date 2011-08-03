@@ -119,8 +119,8 @@ mach::JFAMachine::JFAMachine():
 
 mach::JFAMachine::JFAMachine(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfa_base): 
   m_jfa_base(jfa_base),
-  m_y(0),
-  m_z(0)
+  m_y(jfa_base->getDimRv()),
+  m_z(jfa_base->getDimCD())
 {
 }
 
