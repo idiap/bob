@@ -96,8 +96,8 @@ def array_save(self, filename, codecname=''):
 
 def array_numeq(self, other):
   """Makes sure two arrays are the same, numerically"""
-  if self.__class__ != other.__class__: return false
-  if self.shape() != other.shape(): return false
+  if self.__class__ != other.__class__: return False
+  if self.shape() != other.shape(): return False
   return ( (self == other).all() )
 
 for array_class in [k[1] for k in get_array_types()]:
