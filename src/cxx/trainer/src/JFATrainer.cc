@@ -486,7 +486,20 @@ void train::jfa::estimateZandD(const blitz::Array<double,2> &F, const blitz::Arr
 ////// JFATrainer class methods ////////
 ////////////////////////////////////////
 
-train::JFABaseTrainer::JFABaseTrainer(Torch::machine::JFABaseMachine& m): m_jfa_machine(m) {
+train::JFABaseTrainer::JFABaseTrainer(Torch::machine::JFABaseMachine& m): 
+  m_jfa_machine(m), 
+  m_Nid(0), m_N(0), m_F(0), m_x(0),  m_y(0), m_z(0), m_Nacc(0), m_Facc(0), 
+  m_cache_ubm_mean(0), m_cache_ubm_var(0),
+  m_cache_VtSigmaInv(0), m_cache_VProd(0), m_cache_IdPlusVProd_i(0), 
+  m_cache_Fn_y_i(0), m_cache_A1_y(0), m_cache_A2_y(0),
+  m_cache_UtSigmaInv(0), m_cache_UProd(0), m_cache_IdPlusUProd_ih(0),
+  m_cache_Fn_x_ih(0), m_cache_A1_x(0), m_cache_A2_x(0),
+  m_cache_DtSigmaInv(0), m_cache_DProd(0), m_cache_IdPlusDProd_i(0),
+  m_cache_Fn_z_i(0), m_cache_A1_z(0), m_cache_A2_z(0),
+  m_tmp_rvrv(0), m_tmp_rvCD(0), m_tmp_rvD(0), m_tmp_ruD(0),
+  m_tmp_ruru(0), m_tmp_rv(0), m_tmp_ru(0), m_tmp_CD(0), m_tmp_CD_b(0),
+  m_tmp_D(0), m_tmp_CDCD(0)
+{
   m_cache_ubm_mean.resize(m_jfa_machine.getDimCD());
   m_cache_ubm_var.resize(m_jfa_machine.getDimCD());
   m_jfa_machine.getUbm()->getMeanSupervector(m_cache_ubm_mean);
@@ -708,6 +721,7 @@ void train::JFABaseTrainer::updateY_i(const int id)
   // Needs to return values to be accumulated for estimating V
   blitz::firstIndex i;
   blitz::secondIndex j;
+  m_tmp_rvrv.resize(m_jfa_machine.getDimRv(),m_jfa_machine.getDimRv());
   m_tmp_rvrv = m_cache_IdPlusVProd_i;
   m_tmp_rvrv += y(i) * y(j); 
   for(int c=0; c<m_jfa_machine.getDimC(); ++c)
@@ -741,6 +755,7 @@ void train::JFABaseTrainer::updateY()
 void train::JFABaseTrainer::updateV()
 {  
   int dim = m_jfa_machine.getDimD();
+  m_tmp_rvrv.resize(m_jfa_machine.getDimRv(), m_jfa_machine.getDimRv());
   for(int c=0; c<m_jfa_machine.getDimC(); ++c)
   {
     const blitz::Array<double,2> A1 = m_cache_A1_y(c,blitz::Range::all(),blitz::Range::all());
@@ -1005,6 +1020,7 @@ void train::JFABaseTrainer::train(const std::vector<blitz::Array<double,2> >& N,
 
   initializeUVD();
   initializeXYZ();
+
   for(size_t i=0; i<n_iter; ++i) {
     updateY();
     updateV();
@@ -1043,6 +1059,7 @@ void train::JFABaseTrainer::initializeXYZ()
     z.push_back(z0.copy());
     y.push_back(y0.copy());
     x0.resize(m_jfa_machine.getDimRu(),m_N[i].extent(1));
+    x0 = 0;
     x.push_back(x0.copy());
   }
   setSpeakerFactors(x,y,z);
