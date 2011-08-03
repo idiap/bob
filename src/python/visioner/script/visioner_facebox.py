@@ -80,7 +80,7 @@ def process_video_data(args):
       else:
         sys.stdout.write("%d %d %d %d %d\n" % det[:5])
 
-  else: #use wants to record a video with the output
+  else: #user wants to record a video with the output
    
     if args.verbose:
       sys.stdout.write("Saving %d frames with detections to %s" % \
@@ -132,7 +132,7 @@ def process_image_data(args):
     else:
       sys.stdout.write("%d %d %d %d\n" % data[:4])
 
-  else: #use wants to record an image with the output
+  else: #user wants to record an image with the output
 
     if data:
       if input.rank() == 3: color = (255, 0, 0) #red
