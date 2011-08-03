@@ -80,7 +80,7 @@ def process_video_data(args):
       else:
         sys.stdout.write("%d %d %d %d %d\n" % det[:5])
 
-  else: #use wants to record a video with the output
+  else: #user wants to record a video with the output
    
     if args.verbose:
       sys.stdout.write("Saving %d frames with detections to %s" % \
@@ -91,7 +91,7 @@ def process_video_data(args):
     ocolumns = 2*(input.width/2)
     ov = torch.io.VideoWriter(args.output, orows, ocolumns, input.frameRate)
     for frame,bbox in zip(input,data):
-      if bbox:
+      if bbox and sum(bbox) != 0:
         bbox = [r(v) for v in bbox[:4]]
         # 3-pixels width box
         torch.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], color)
@@ -132,17 +132,18 @@ def process_image_data(args):
     else:
       sys.stdout.write("%d %d %d %d\n" % data[:4])
 
-  else: #use wants to record an image with the output
+  else: #user wants to record an image with the output
 
     if data:
       if input.rank() == 3: color = (255, 0, 0) #red
       else: color = 255
       bbox = [r(v) for v in data[:4]]
-      torch.ip.draw_box(input, bbox[0], bbox[1], bbox[2], bbox[3], color)
-      torch.ip.draw_box(input, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
-          color)
-      torch.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
-          color)
+      if sum(bbox):
+        torch.ip.draw_box(input, bbox[0], bbox[1], bbox[2], bbox[3], color)
+        torch.ip.draw_box(input, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
+            color)
+        torch.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
+            color)
 
     input.save(args.output)
 
@@ -163,6 +164,9 @@ def main():
   parser.add_argument("-d", "--dump-scores",
       default=False, action='store_true', dest='dump_scores',
       help="if set, also dump scores after every bounding box")
+  parser.add_argument("-s", "--scan-levels", dest="scan_levels",
+      default=0, type=int, metavar='INT>=0',
+      help="scan levels (the higher, the faster - defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
@@ -170,6 +174,9 @@ def main():
       dest='selftest', help=argparse.SUPPRESS)
 
   args = parser.parse_args()
+
+  if args.scan_levels < 0:
+    parser.error("scanning levels have to be greater or equal 0")
 
   if args.selftest == 1:
     args.input = testfile('../../io/test/data/test.mov')
@@ -188,9 +195,11 @@ def main():
   if args.selftest:
     args.verbose = True
     args.dump_scores = True
+    args.scan_levels = 10
 
   start = time.clock() 
-  args.processor = torch.visioner.MaxDetector(cmodel_file=args.cmodel)
+  args.processor = torch.visioner.MaxDetector(cmodel_file=args.cmodel,
+      scan_levels=args.scan_levels)
   total = time.clock() - start
 
   if args.verbose:

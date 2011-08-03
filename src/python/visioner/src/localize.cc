@@ -96,6 +96,13 @@ static tuple load_model(const std::string& filename) {
   return make_tuple(model, param);
 }
 
+static void save_model(const visioner::Model& model,
+    const visioner::param_t& param, const std::string& filename) {
+  if (visioner::save_model(param, model, filename) == false) {				
+    PYTHON_ERROR(IOError, "failed to save the model");
+	}
+}
+
 void bind_visioner_localize() {
   //opaque, just needs to pass around.
   class_<visioner::Model, boost::shared_ptr<visioner::Model> >("Model",
@@ -120,5 +127,6 @@ void bind_visioner_localize() {
   def("locate", &locate, (arg("class_model"), arg("loc_model"), arg("levels"),
         arg("class_scanner"), arg("loc_scanner")), "Locates faces on an image preloaded by the (classification and localization) scanners. Returns a tuple with the detected region and all detected landmarks");
 
-  def("load_model", &load_model, (arg("filename")), "Loads the model and parameters from a given file");
+  def("load_model", &load_model, (arg("filename")), "Loads the model and parameters from a given file.\n.. note::\n   Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.");
+  def("save_model", &save_model, (arg("model"), arg("parameters"), arg("filename")), "Saves the model and parameters to a given file.\n.. note::\n   Serialization will use a native text format by default. Files that have their name suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.");
 }

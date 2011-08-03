@@ -59,62 +59,108 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable(T iter) {
   return retval;
 }
 
-template<typename T>
-static void add_2d_array_(io::Arrayset& arrayset, const blitz::Array<T, 2>& array_2d) {
-  for (int i = 0; i < array_2d.extent(0); i++) {
-    blitz::Array<T, 1> tmp = array_2d(i, blitz::Range::all());
-    arrayset.add(tmp);
-  }
+
+// Partial list of N ranges
+#define range_1 blitz::Range::all()
+#define range_2 range_1, blitz::Range::all()
+#define range_3 range_2, blitz::Range::all()
+
+// get_arrayX_Y gets the parameters to slice an array of Y dimensions
+// over the X dimension
+#define get_array0_2 i, range_1
+#define get_array1_2 range_1, i
+
+#define get_array0_3 i, range_2
+#define get_array1_3 range_1, i, range_1
+#define get_array2_3 range_2, i
+
+#define get_array0_4 i, range_3
+#define get_array1_4 range_1, i, range_2
+#define get_array2_4 range_2, i, range_1
+#define get_array3_4 range_3, i
+
+// Declare a function add_array_dim_D (add an array to an arrayset)
+#define add_array_(dim, D)\
+template<typename T>\
+static void add_array_##dim##_##D(io::Arrayset& arrayset, const blitz::Array<T, D>& array) {\
+  for (int i = 0; i < array.extent(0); i++) {\
+    blitz::Array<T, D-1> tmp = array(get_array##dim##_##D);\
+    arrayset.add(tmp);\
+  }\
 }
 
-static void add_2d_array(io::Arrayset& arrayset, io::Array& array_2d) {
+// Templated add_array function, specialized below
+template<int dim, int D>
+static void add_array(io::Arrayset& arrayset, io::Array& array) {
+  throw io::DimensionError(0, 0);
+}
 
-  switch (array_2d.getElementType()) {
-    case array::t_bool:
-      add_2d_array_(arrayset, array_2d.get<bool, 2>());
-      break;
-    case array::t_int8:
-      add_2d_array_(arrayset, array_2d.get<int8_t, 2>());
-      break;
-    case array::t_int16:
-      add_2d_array_(arrayset, array_2d.get<int16_t, 2>());
-      break;
-    case array::t_int32:
-      add_2d_array_(arrayset, array_2d.get<int32_t, 2>());
-      break;
-    case array::t_uint8:
-      add_2d_array_(arrayset, array_2d.get<uint8_t, 2>());
-      break;
-    case array::t_uint16:
-      add_2d_array_(arrayset, array_2d.get<uint16_t, 2>());
-      break;
-    case array::t_uint32:
-      add_2d_array_(arrayset, array_2d.get<uint32_t, 2>());
-      break;
-    case array::t_uint64:
-      add_2d_array_(arrayset, array_2d.get<uint64_t, 2>());
-      break;
-    case array::t_float32:
-      add_2d_array_(arrayset, array_2d.get<float, 2>());
-      break;
-    case array::t_float64:
-      add_2d_array_(arrayset, array_2d.get<double, 2>());
-      break;
-    case array::t_float128:
-      add_2d_array_(arrayset, array_2d.get<long double, 2>());
-      break;
-    case array::t_complex64:
-      add_2d_array_(arrayset, array_2d.get<std::complex<float>, 2>());
-      break;
-    case array::t_complex128:
-      add_2d_array_(arrayset, array_2d.get<std::complex<double>, 2>());
-      break;
-    case array::t_complex256:
-      add_2d_array_(arrayset, array_2d.get<std::complex<long double>, 2>());
-      break;
+#define CASE_TYPE(ctype, type, dim, D) \
+case ctype:\
+  add_array_##dim##_##D(arrayset, array.get<type, D>());\
+  break;
 
+
+// Define a specialized add_array function
+#define add_array(dim, D)\
+add_array_(dim, D)\
+template<>\
+inline void add_array<dim, D>(io::Arrayset& arrayset, io::Array& array) {\
+  switch (array.getElementType()) {\
+    CASE_TYPE(array::t_bool,  bool,     dim, D)\
+    \
+    CASE_TYPE(array::t_int8,  int8_t,   dim, D)\
+    CASE_TYPE(array::t_int16, int16_t,  dim, D)\
+    CASE_TYPE(array::t_int32, int32_t,  dim, D)\
+    CASE_TYPE(array::t_int64, int64_t,  dim, D)\
+    \
+    CASE_TYPE(array::t_uint8,  uint8_t,  dim, D)\
+    CASE_TYPE(array::t_uint16, uint16_t, dim, D)\
+    CASE_TYPE(array::t_uint32, uint32_t, dim, D)\
+    CASE_TYPE(array::t_uint64, uint64_t, dim, D)\
+    \
+    CASE_TYPE(array::t_complex64,  std::complex<float>,       dim, D)\
+    CASE_TYPE(array::t_complex128, std::complex<double>,      dim, D)\
+    CASE_TYPE(array::t_complex256, std::complex<long double>, dim, D)\
+    \
+    default:\
+      throw io::TypeError(array.getElementType(), array::getElementType<double>());\
+  }\
+}
+
+// Declare all possible specialized add_array functions
+add_array(0, 2)
+add_array(1, 2)
+
+add_array(0, 3)
+add_array(1, 3)
+add_array(2, 3)
+
+add_array(0, 4)
+add_array(1, 4)
+add_array(2, 4)
+add_array(3, 4)
+
+// Switch case for the D
+#define CASE_DIM(dim, D) \
+case dim:\
+  switch (D) {\
+    case 2:  add_array<dim, 2>(arrayset, array); break;\
+    case 3:  add_array<dim, 3>(arrayset, array); break;\
+    case 4:  add_array<dim, 4>(arrayset, array); break;\
+    default:\
+      throw io::DimensionError(D, 4);\
+  }\
+  break;
+
+void append_array(io::Arrayset& arrayset, io::Array& array, int dim) {
+  switch (dim) {
+    CASE_DIM(0, array.getNDim())
+    CASE_DIM(1, array.getNDim())
+    CASE_DIM(2, array.getNDim())
+    CASE_DIM(3, array.getNDim())
     default:
-      throw io::TypeError(array_2d.getElementType(), array::getElementType<double>());
+      throw io::DimensionError(dim, 3);
   }
 }
 
@@ -132,7 +178,7 @@ void bind_io_arrayset() {
     .add_property("elementType", &io::Arrayset::getElementType, "This property indicates the type of element used for each array in the current set.")
     .def("save", &io::Arrayset::save, arrayset_save_overloads((arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the arrayset into a file. It will save if the arrayset is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."))
     .def("load", &io::Arrayset::load)
-    .def("append_2d_array", &add_2d_array, "Add each line of a 2d array to the Arrayset")
+    .def("extend", &append_array, (arg("array"), arg("dimension")=0), "Slice an array over a dimension and add each slice to an arrayset")
 
     //some list-like entries
     .def("__len__", &io::Arrayset::size, "The number of arrays stored in this set.")

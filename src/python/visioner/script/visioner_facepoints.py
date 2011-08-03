@@ -83,7 +83,7 @@ def process_video_data(args):
       else:
         sys.stdout.write("%d 0 0 0 0\n" % k)
 
-  else: #use wants to record a video with the output
+  else: #user wants to record a video with the output
    
     if args.verbose:
       sys.stdout.write("Saving %d frames with detections to %s" % \
@@ -97,7 +97,7 @@ def process_video_data(args):
 
     for frame,(bbox,points) in zip(input,data):
 
-      if bbox:
+      if bbox and sum(bbox):
         bbox = [r(v) for v in bbox]
         # 3-pixels width box
         torch.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], red)
@@ -106,9 +106,9 @@ def process_video_data(args):
         torch.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2, 
             red)
 
-      for p in points:
-        p = [r(v) for v in p]
-        torch.ip.draw_cross(frame, p[0], p[1], 2, yellow)
+        for p in points:
+          p = [r(v) for v in p]
+          if sum(p): torch.ip.draw_cross(frame, p[0], p[1], 2, yellow)
 
       ov.append(frame[:,:orows,:ocolumns])
 
@@ -149,9 +149,9 @@ def process_image_data(args):
     else:
       sys.stdout.write("0 0 0 0\n")
 
-  else: #use wants to record an image with the output
+  else: #user wants to record an image with the output
 
-    if bbox:
+    if bbox and sum(bbox):
       
       if input.rank() == 3: 
         face = (255, 0, 0) #red
@@ -189,6 +189,9 @@ def main():
   parser.add_argument("-l", "--localization-model", metavar='FILE',
       type=str, dest="lmodel", default=None,
       help="use a keypoint localization model file different than the default")
+  parser.add_argument("-s", "--scan-levels", dest="scan_levels",
+      default=0, type=int, metavar='INT>=0',
+      help="scan levels (the higher, the faster - defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose",
       default=False, action='store_true',
       help="enable verbose output")
@@ -196,6 +199,9 @@ def main():
       dest='selftest', help=argparse.SUPPRESS)
 
   args = parser.parse_args()
+
+  if args.scan_levels < 0:
+    parser.error("scanning levels have to be greater or equal 0")
 
   if args.selftest == 1:
     args.input = testfile('../../io/test/data/test.mov')
@@ -213,10 +219,11 @@ def main():
 
   if args.selftest:
     args.verbose = True
+    args.scan_levels = 10
 
   start = time.clock() 
   args.processor = torch.visioner.Localizer(cmodel_file=args.cmodel,
-      lmodel_file=args.lmodel)
+      lmodel_file=args.lmodel, scan_levels=args.scan_levels)
   total = time.clock() - start
 
   if args.verbose:
