@@ -180,7 +180,7 @@ void train::jfa::estimateXandU(const blitz::Array<double,2> &F, const blitz::Arr
       
       // L=Identity
       L = 0.;
-      for(int k=0; k<CD; ++k)
+      for(int k=0; k<ru; ++k)
         L(k,k) = 1.;
     
       for(int c=0; c<C; ++c)

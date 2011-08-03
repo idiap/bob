@@ -27,7 +27,7 @@ torch_library(trainer "${src}" "${deps}" "${shared}")
 add_dependencies(torch_trainer trainer-cxx_header_install)
 
 # Defines tests for this package
-#torch_test(trainer block test/block.cc)
+torch_test(trainer jfa test/jfa.cc)
 
 # Defines environment variable used to localize data for the tests
 #set_property(TEST cxx-trainer-gabor APPEND PROPERTY ENVIRONMENT
