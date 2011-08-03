@@ -62,7 +62,7 @@ void bind_machine_jfa() {
     .def("save", &mach::JFAMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
     .def("forward", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
     .def("forward", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
-    .add_property("ubm", &mach::JFAMachine::getJFABase, &mach::JFAMachine::setJFABase)
+    .add_property("jfa_base", &mach::JFAMachine::getJFABase, &mach::JFAMachine::setJFABase)
     .add_property("y", make_function(&mach::JFAMachine::getY, return_internal_reference<>()), &mach::JFAMachine::setY)
     .add_property("z", make_function(&mach::JFAMachine::getZ, return_internal_reference<>()), &mach::JFAMachine::setZ)
     .add_property("DimC", &mach::JFAMachine::getDimC)
