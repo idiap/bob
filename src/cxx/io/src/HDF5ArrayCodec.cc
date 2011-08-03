@@ -28,6 +28,7 @@ io::HDF5ArrayCodec::HDF5ArrayCodec()
   : m_name("hdf5.array.binary"),
     m_extensions()
 { 
+  m_extensions.push_back(".h5");
   m_extensions.push_back(".hdf5");
 }
 
