@@ -42,7 +42,7 @@ def multiplyVectorsByFactors(matrix, vector):
 def loadData(files):
   data = torch.io.Arrayset()
   for f in files:
-    data.append_2d_array(torch.io.Array(str(f)))
+    data.extend(torch.io.Array(str(f)))
 
   return data
 
