@@ -33,6 +33,33 @@ def arrayset_append(self, *args):
 Arrayset.append = arrayset_append
 del arrayset_append
 
+def arrayset_extend(self, obj, dim=0):
+  """Extends the current Arrayset by either slicing the given array and
+  appending each individual slice or iterating over an iterable containing
+  blitz::Arrays<>.
+
+  Keyword Parameters:
+
+  obj
+    The object to extend this Arrayset with, may be blitz::Arrays, io.Array's
+    or an iterable full of blitz::Arrays.
+
+  dim
+    **Iff** the input object is a single array, you will be able to specificy
+    along which dimension such array should be sliced using this parameter. The
+    value of `dim` is otherwise ignored.
+  """
+
+  if hasattr(obj, '__iter__'):
+    return self.__iterable_extend__(obj)
+
+  else: #it is an io.Array or a blitz Array
+    if not isinstance(obj, Array): obj = Array(obj) #try cast
+    return self.__array_extend__(obj, dim)
+
+Arrayset.extend = arrayset_extend
+del arrayset_extend
+
 def arrayset_setitem(self, id, *args):
   import numpy
   from .. import core

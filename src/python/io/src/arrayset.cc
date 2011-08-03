@@ -59,111 +59,112 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable(T iter) {
   return retval;
 }
 
+// Partial loop specializations for extending Arraysets 
+// with higher dimensional Arrays
+template <typename T, int N> struct looper {
+  static void call (io::Arrayset& self, const io::Array& A, int D) {
+    PYTHON_ERROR(RuntimeError, "unsupported generic looper");
+  }
+};
 
-// Partial list of N ranges
-#define range_1 blitz::Range::all()
-#define range_2 range_1, blitz::Range::all()
-#define range_3 range_2, blitz::Range::all()
+template <typename T> struct looper<T,2> {
+  static void call (io::Arrayset& self, const io::Array& A, int D) {
+    if (D > 1 || D < 0) PYTHON_ERROR(RuntimeError, "bad dimension index");
+    const blitz::Array<T,2> bz = A.get<T,2>();
+    blitz::Range all = blitz::Range::all();
+    switch (D) {
+      case 0:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(i,all));
+        break;
+      case 1:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(all,i));
+        break;
+    }
+  }
+};
 
-// get_arrayX_Y gets the parameters to slice an array of Y dimensions
-// over the X dimension
-#define get_array0_2 i, range_1
-#define get_array1_2 range_1, i
+template <typename T> struct looper<T,3> {
+  static void call (io::Arrayset& self, const io::Array& A, int D) {
+    if (D > 2 || D < 0) PYTHON_ERROR(RuntimeError, "bad dimension index");
+    const blitz::Array<T,3> bz = A.get<T,3>();
+    blitz::Range all = blitz::Range::all();
+    switch (D) {
+      case 0:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(i,all,all));
+        break;
+      case 1:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(all,i,all));
+        break;
+      case 2:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(all,all,i));
+        break;
+    }
+  }
+};
 
-#define get_array0_3 i, range_2
-#define get_array1_3 range_1, i, range_1
-#define get_array2_3 range_2, i
+template <typename T> struct looper<T,4> {
+  static void call (io::Arrayset& self, const io::Array& A, int D) {
+    if (D > 3 || D < 0) PYTHON_ERROR(RuntimeError, "bad dimension index");
+    const blitz::Array<T,4> bz = A.get<T,4>();
+    blitz::Range all = blitz::Range::all();
+    switch (D) {
+      case 0:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(i,all,all,all));
+        break;
+      case 1:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(all,i,all,all));
+        break;
+      case 2:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(all,all,i,all));
+        break;
+      case 3:
+        for (int i=0; i<bz.extent(D); ++i) self.add(bz(all,all,all,i));
+        break;
+    }
+  }
+};
 
-#define get_array0_4 i, range_3
-#define get_array1_4 range_1, i, range_2
-#define get_array2_4 range_2, i, range_1
-#define get_array3_4 range_3, i
-
-// Declare a function add_array_dim_D (add an array to an arrayset)
-#define add_array_(dim, D)\
-template<typename T>\
-static void add_array_##dim##_##D(io::Arrayset& arrayset, const blitz::Array<T, D>& array) {\
-  for (int i = 0; i < array.extent(0); i++) {\
-    blitz::Array<T, D-1> tmp = array(get_array##dim##_##D);\
-    arrayset.add(tmp);\
-  }\
+// Switch case for the number of dimensions available at the input array
+#define DIM_SWITCH(T) \
+switch (array.getNDim()) {\
+  case 2: \
+    looper<T,2>::call(self, array, D); \
+    break; \
+  case 3: \
+    looper<T,3>::call(self, array, D); \
+    break; \
+  case 4: \
+    looper<T,4>::call(self, array, D); \
+    break; \
+default: \
+    PYTHON_ERROR(RuntimeError, "unsupported number of dimensions for extend"); \
 }
 
-// Templated add_array function, specialized below
-template<int dim, int D>
-static void add_array(io::Arrayset& arrayset, io::Array& array) {
-  throw io::DimensionError(0, 0);
-}
-
-#define CASE_TYPE(ctype, type, dim, D) \
-case ctype:\
-  add_array_##dim##_##D(arrayset, array.get<type, D>());\
-  break;
-
-
-// Define a specialized add_array function
-#define add_array(dim, D)\
-add_array_(dim, D)\
-template<>\
-inline void add_array<dim, D>(io::Arrayset& arrayset, io::Array& array) {\
-  switch (array.getElementType()) {\
-    CASE_TYPE(array::t_bool,  bool,     dim, D)\
-    \
-    CASE_TYPE(array::t_int8,  int8_t,   dim, D)\
-    CASE_TYPE(array::t_int16, int16_t,  dim, D)\
-    CASE_TYPE(array::t_int32, int32_t,  dim, D)\
-    CASE_TYPE(array::t_int64, int64_t,  dim, D)\
-    \
-    CASE_TYPE(array::t_uint8,  uint8_t,  dim, D)\
-    CASE_TYPE(array::t_uint16, uint16_t, dim, D)\
-    CASE_TYPE(array::t_uint32, uint32_t, dim, D)\
-    CASE_TYPE(array::t_uint64, uint64_t, dim, D)\
-    \
-    CASE_TYPE(array::t_complex64,  std::complex<float>,       dim, D)\
-    CASE_TYPE(array::t_complex128, std::complex<double>,      dim, D)\
-    CASE_TYPE(array::t_complex256, std::complex<long double>, dim, D)\
-    \
-    default:\
-      throw io::TypeError(array.getElementType(), array::getElementType<double>());\
-  }\
-}
-
-// Declare all possible specialized add_array functions
-add_array(0, 2)
-add_array(1, 2)
-
-add_array(0, 3)
-add_array(1, 3)
-add_array(2, 3)
-
-add_array(0, 4)
-add_array(1, 4)
-add_array(2, 4)
-add_array(3, 4)
-
-// Switch case for the D
-#define CASE_DIM(dim, D) \
-case dim:\
-  switch (D) {\
-    case 2:  add_array<dim, 2>(arrayset, array); break;\
-    case 3:  add_array<dim, 3>(arrayset, array); break;\
-    case 4:  add_array<dim, 4>(arrayset, array); break;\
-    default:\
-      throw io::DimensionError(D, 4);\
-  }\
-  break;
-
-void append_array(io::Arrayset& arrayset, io::Array& array, int dim) {
-  switch (dim) {
-    CASE_DIM(0, array.getNDim())
-    CASE_DIM(1, array.getNDim())
-    CASE_DIM(2, array.getNDim())
-    CASE_DIM(3, array.getNDim())
+static void array_extend(io::Arrayset& self, const io::Array& array, int D) {
+  switch (array.getElementType()) {
+    case array::t_bool:       DIM_SWITCH(bool);                 break;
+    case array::t_int8:       DIM_SWITCH(int8_t);               break;
+    case array::t_int16:      DIM_SWITCH(int16_t);              break;
+    case array::t_int32:      DIM_SWITCH(int32_t);              break;
+    case array::t_int64:      DIM_SWITCH(int64_t);              break;
+    case array::t_uint8:      DIM_SWITCH(uint8_t);              break;
+    case array::t_uint16:     DIM_SWITCH(uint16_t);             break;
+    case array::t_uint32:     DIM_SWITCH(uint32_t);             break;
+    case array::t_uint64:     DIM_SWITCH(uint64_t);             break;
+    case array::t_float32:    DIM_SWITCH(float);                break;
+    case array::t_float64:    DIM_SWITCH(double);               break;
+    case array::t_complex64:  DIM_SWITCH(std::complex<float>);  break;
+    case array::t_complex128: DIM_SWITCH(std::complex<double>); break;
     default:
-      throw io::DimensionError(dim, 3);
+      PYTHON_ERROR(RuntimeError, "unsupported element type for extend");
   }
 }
 
+template <typename T, int N>
+static void vector_extend(io::Arrayset& self,
+    const std::vector<blitz::Array<T,N> >& v) {
+  for (size_t i=0; i<v.size(); ++i) self.add(v[i]);
+}
 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(arrayset_save_overloads, save, 1, 2)
 
@@ -176,9 +177,25 @@ void bind_io_arrayset() {
     .add_property("loaded", &io::Arrayset::isLoaded, "This variable determines if the arrayset is loaded in memory. This may be false in the case the arrayset is completely stored in an external file.")
     .add_property("filename", &get_filename)
     .add_property("elementType", &io::Arrayset::getElementType, "This property indicates the type of element used for each array in the current set.")
-    .def("save", &io::Arrayset::save, arrayset_save_overloads((arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the arrayset into a file. It will save if the arrayset is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."))
+    .def("save", &io::Arrayset::save, arrayset_save_overloads((arg("self"), arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the arrayset into a file. It will save if the arrayset is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."))
     .def("load", &io::Arrayset::load)
-    .def("extend", &append_array, (arg("array"), arg("dimension")=0), "Slice an array over a dimension and add each slice to an arrayset")
+    .def("__array_extend__", &array_extend, (arg("self"), arg("array"), arg("dimension")), "Slice an array over a dimension and add each slice to the arrayset")
+#   define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+#   define BOOST_PP_LOCAL_MACRO(D) \
+    .def("__iterable_extend__", &vector_extend<bool,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<int8_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<int16_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<int32_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<int64_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<uint8_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<uint16_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<uint32_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<uint64_t,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<float,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<double,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<std::complex<float>,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset") \
+    .def("__iterable_extend__", &vector_extend<std::complex<double>,D>, (arg("self"), arg("iterable")), "Adds a bunch of arrays to this arrayset")
+#   include BOOST_PP_LOCAL_ITERATE()
 
     //some list-like entries
     .def("__len__", &io::Arrayset::size, "The number of arrays stored in this set.")
