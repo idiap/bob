@@ -106,6 +106,10 @@ static bool is_chunked(boost::shared_ptr<hid_t>& dataset) {
 
 /**
  * Figures out the extents of a dataset
+ *
+ * TODO: Check extendibility of the first dimension, check on HDF5Shape that
+ * the type is extendible or not. If type is extendible, may be read as
+ * D-dimensional object or as a list of objects of dimension D-1.
  */
 static io::HDF5Shape get_extents(boost::shared_ptr<hid_t>& space) {
   int rank = H5Sget_simple_extent_ndims(*space);

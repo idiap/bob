@@ -164,7 +164,7 @@ def main():
   parser.add_argument("-d", "--dump-scores",
       default=False, action='store_true', dest='dump_scores',
       help="if set, also dump scores after every bounding box")
-  parser.add_argument("-l", "--scan-levels", dest="scan_levels",
+  parser.add_argument("-s", "--scan-levels", dest="scan_levels",
       default=0, type=int, metavar='INT>=0',
       help="scan levels (the higher, the faster - defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose",

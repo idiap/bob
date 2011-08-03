@@ -6,8 +6,8 @@
 from libpytorch_visioner import *
 from os import path
 
-DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.vbgz')
-DEFAULT_LMODEL = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.vbgz')
+DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.gz')
+DEFAULT_LMODEL = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.gz')
 
 class MaxDetector:
   """A class that bridges the Visioner to torch so as to detect the most

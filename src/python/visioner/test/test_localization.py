@@ -13,74 +13,58 @@ import torch
 
 TEST_VIDEO = "../../io/test/data/test.mov"
 
+class Loader:
+  
+  def __init__(self):
+    pass
+
+  def setUp(self):
+    if not hasattr(self, 'processor'):
+      self.processor = torch.visioner.Localizer()
+
+    if not hasattr(self, 'video'):
+      self.video = torch.io.VideoReader(TEST_VIDEO)
+      self.images = [torch.ip.rgb_to_gray(k).cast('int16') for k in self.video[:100]]
+
+data = Loader()
+
 class LocalizationTest(unittest.TestCase):
   """Performs various face localization tests."""
-  
-  def test00_one(self):
 
-    # scan_levels = 0, 8 scales
-    loc = torch.visioner.Localizer()
-    iv = torch.io.VideoReader(TEST_VIDEO)
+  def setUp(self):
 
-    # do a gray-scale conversion for all frames and cast to int16
-    #print "Converting video..."
-    images = [torch.ip.rgb_to_gray(k).cast('int16') for k in iv[:100]]
-
-    # find faces on the video
-    locdata = [loc(k) for k in images]
-
-    # asserts at least 97% detections
-    self.assertTrue ( (0.97 * len(images)) <= len(locdata) )
+    # load models and video only once
+    if not hasattr(data, 'processor'): data.setUp()
+    self.processor = data.processor
+    self.images = data.images
 
   def test01_Thourough(self):
 
-    # scan_levels = 0, 8 scales
-    loc = torch.visioner.Localizer()
-    iv = torch.io.VideoReader(TEST_VIDEO)
-
-    # do a gray-scale conversion for all frames and cast to int16
-    images = [torch.ip.rgb_to_gray(k).cast('int16') for k in iv]
-
     # find faces on the video
-    locdata = [loc(k) for k in images]
+    locdata = [self.processor(k) for k in self.images]
 
     # asserts at least 97% detections
-    print len(locdata)
-    self.assertTrue ( (0.97 * len(images)) <= len(locdata) )
+    self.assertTrue ( (0.97 * len(self.images)) <= len(locdata) )
 
-  def xtest02_Fast(self):
-
-    # TODO: temporarily disabled due to the slowness of model loading
-
-    # scan_levels = 3, 8 scales
-    loc = torch.visioner.Localizer(scan_levels=3)
-    iv = torch.core.array.load(TEST_VIDEO) #4D uint8 array
-
-    # do a gray-scale conversion for all frames
-    images = [torch.ip.rgb_to_gray(k).cast('int16') for k in iv]
+  def test02_Fast(self):
 
     # find faces on the video
-    locdata = [loc(k) for k in images]
-
-    # asserts at least 93% detections
-    self.asserttrue ( (0.93 * len(images)) > len(locdata) )
-
-  def xtest03_Faster(self):
-
-    # TODO: temporarily disabled due to the slowness of model loading
-
-    # scan_levels = 3, 4 scales
-    loc = torch.visioner.Localizer(scan_levels=3, scale_var=4)
-    iv = torch.core.array.load(TEST_VIDEO) #4D uint8 array
-
-    # do a gray-scale conversion for all frames
-    images = [torch.ip.rgb_to_gray(k).cast('int16') for k in iv]
-
-    # find faces on the video
-    locdata = [loc(k) for k in images]
+    # scan_levels = 5, 8 scales
+    self.processor.scan_levels = 5
+    locdata = [self.processor(k) for k in self.images]
 
     # asserts at least 90% detections
-    self.assertTrue ( (0.9 * len(images)) > len(locdata) )
+    self.assertTrue ( (0.9 * len(self.images)) <= len(locdata) )
+
+  def test03_Faster(self):
+
+    # find faces on the video
+    # scan_levels = 10, 8 scales
+    self.processor.scan_levels = 10
+    locdata = [self.processor(k) for k in self.images]
+
+    # asserts at least 80% detections
+    self.assertTrue ( (0.8 * len(self.images)) <= len(locdata) )
 
 if __name__ == '__main__':
   sys.argv.append('-v')

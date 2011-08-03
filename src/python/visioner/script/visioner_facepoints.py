@@ -189,7 +189,7 @@ def main():
   parser.add_argument("-l", "--localization-model", metavar='FILE',
       type=str, dest="lmodel", default=None,
       help="use a keypoint localization model file different than the default")
-  parser.add_argument("-l", "--scan-levels", dest="scan_levels",
+  parser.add_argument("-s", "--scan-levels", dest="scan_levels",
       default=0, type=int, metavar='INT>=0',
       help="scan levels (the higher, the faster - defaults to %(default)s)")
   parser.add_argument("-v", "--verbose", dest="verbose",
@@ -223,7 +223,7 @@ def main():
 
   start = time.clock() 
   args.processor = torch.visioner.Localizer(cmodel_file=args.cmodel,
-      lmodel_file=args.lmodel)
+      lmodel_file=args.lmodel, scan_levels=args.scan_levels)
   total = time.clock() - start
 
   if args.verbose:
