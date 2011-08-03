@@ -1,6 +1,8 @@
 #include "machine/LinearScoring.h"
 #include "math/linear.h"
 
+#include <iostream>
+
 namespace Torch { namespace machine {
 
   namespace detail {
@@ -35,12 +37,13 @@ namespace Torch { namespace machine {
             B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (ubm_mean(s) * test_stats[t]->n(s/D));
       }
       else {
-        Torch::core::array::assertSameDimensionLength((*test_channelOffset)[0].extent(0), Tt);
-        Torch::core::array::assertSameDimensionLength((*test_channelOffset)[0].extent(1), CD);
+        Torch::core::array::assertSameDimensionLength((*test_channelOffset).size(), Tt);
         
-        for(int t=0; t<Tt; ++t) 
+        for(int t=0; t<Tt; ++t) {
+          Torch::core::array::assertSameDimensionLength((*test_channelOffset)[t].extent(0), CD);
           for(int s=0; s<CD; ++s) 
             B(s, t) = test_stats[t]->sumPx(s/D, s%D) - (test_stats[t]->n(s/D) * (ubm_mean(s) + (*test_channelOffset)[t](s)));
+        }
       }
 
       // Apply the normalization if needed
