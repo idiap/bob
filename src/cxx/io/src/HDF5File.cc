@@ -80,10 +80,31 @@ bool io::HDF5File::contains (const std::string& path) const {
   return m_index.find(resolve(path)) != m_index.end();
 }
 
-const io::HDF5Type& io::HDF5File::describe (const std::string& path) const {
+void io::HDF5File::describe (const std::string& path,
+    std::vector<io::HDF5File::description_t>& description) const {
   std::string absolute = resolve(path);
-  if (!contains(path)) throw io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-  return m_index.find(absolute)->second->m_type;
+  if (!contains(path)) 
+    throw io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+
+  const std::vector<io::detail::hdf5::Dataset::type_t>& tv =
+    m_index.find(absolute)->second->m_type;
+  for (size_t k=0; k<tv.size(); ++k) {
+    description.push_back(boost::make_tuple(boost::get<0>(tv[k]),
+          boost::get<1>(tv[k]), boost::get<2>(tv[k])));
+  }
+}
+
+void io::HDF5File::describe (const std::string& path,
+    description_t& description) const {
+  std::string absolute = resolve(path);
+  if (!contains(path)) 
+    throw io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+
+  const std::vector<io::detail::hdf5::Dataset::type_t>& tv =
+    m_index.find(absolute)->second->m_type;
+  boost::get<0>(description) = boost::get<0>(tv[0]);
+  boost::get<1>(description) = boost::get<1>(tv[0]);
+  boost::get<2>(description) = boost::get<2>(tv[0]);
 }
 
 void io::HDF5File::unlink (const std::string& path) {
@@ -103,12 +124,6 @@ void io::HDF5File::rename (const std::string& from, const std::string& to) {
   m_index.erase(absfrom);
 }
 
-size_t io::HDF5File::size (const std::string& path) const {
-  std::string absolute = resolve(path);
-  if (!contains(absolute)) throw io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-  return m_index.find(absolute)->second->size();
-}
-      
 void io::HDF5File::copy (HDF5File& other) {
   //TODO
 }

@@ -11,7 +11,11 @@
 #ifndef TORCH_IO_HDF5FILE_H 
 #define TORCH_IO_HDF5FILE_H
 
+#include <vector>
+
 #include <boost/ref.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <boost/filesystem.hpp>
 
 #include "io/HDF5Utils.h"
@@ -39,6 +43,15 @@ namespace Torch { namespace io {
         trunc = 2, //H5F_ACC_TRUNC  < if file exists, truncate it and open
         excl = 4 //H5F_ACC_EXCL    < if file exists, raise, otherwise == inout
       } mode_t;
+
+      /**
+       * A precise description of a certain supported type in a dataset.
+       *
+       * [0] => the dataset type and shape of each element
+       * [1] => the number of elements in the dataset
+       * [2] => is this dataset expandible using this type?
+       */
+      typedef boost::tuple<HDF5Type, size_t, bool> description_t;
 
     public: //api
 
@@ -87,7 +100,14 @@ namespace Torch { namespace io {
        * it is taken w.r.t. the current working directory, as returned by
        * cwd().
        */
-      const HDF5Type& describe (const std::string& path) const;
+      void describe (const std::string& path, 
+          std::vector<description_t>& description) const;
+
+      /**
+       * Describes the default binding type for a given dataset.
+       */
+      void describe (const std::string& path,
+          description_t& description) const;
 
       /**
        * Unlinks a particular dataset from the file. Note that this will
@@ -103,11 +123,6 @@ namespace Torch { namespace io {
        * Renames an existing dataset
        */
       void rename (const std::string& from, const std::string& to);
-
-      /**
-       * Returns the number of elements stored in the given dataset
-       */
-      size_t size (const std::string& path) const;
 
       /**
        * Accesses all existing paths in one shot. Input has to be a std
@@ -272,7 +287,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value));
+              absolute, Torch::io::HDF5Type(value), true, 0);
         }
         m_index[absolute]->add(value);
       }
@@ -293,7 +308,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), compression);
+              absolute, Torch::io::HDF5Type(value), true, compression);
         }
         m_index[absolute]->addArray(value);
       }

@@ -10,7 +10,6 @@
 
 #include <vector>
 #include <string>
-#include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 #include <blitz/tinyvec-et.h>
@@ -167,17 +166,24 @@ namespace Torch { namespace io {
 
   /**
    * This class defines the shape type: a counter and a variable-size hsize_t
-   * array that contains the dimensionality of a certain array.
+   * array that contains the dimensionality of a certain array. Internally, we
+   * always allocate a fixed size vector with 12 positions (after the maximum
+   * number of dimensions of a blitz::Array<T,N> + 1).
    */
   class HDF5Shape {
+
+# define MAX_HDF5SHAPE_SIZE 12
 
     public: //api
 
       /**
-       * Builds a new shape with a certain size and values
+       * Builds a new shape with a certain size and values. The size has to be
+       * smaller than the maximum number of supported dimensions (12).
        */
       template <typename T> HDF5Shape(const size_t n, const T* values):
-        m_n(n), m_shape(new hsize_t[n]) {
+        m_n(n), m_shape() {
+          if (n > MAX_HDF5SHAPE_SIZE) 
+            throw std::length_error("maximum number of dimensions exceeded");
           for (size_t i=0; i<n; ++i) m_shape[i] = values[i];
         }
 
@@ -185,7 +191,9 @@ namespace Torch { namespace io {
        * Builds a new shape with data from a blitz::TinyVector
        */
       template <int N> HDF5Shape(const blitz::TinyVector<int,N>& vec):
-        m_n(N), m_shape(new hsize_t[N]) {
+        m_n(N), m_shape() {
+          if (N > MAX_HDF5SHAPE_SIZE) 
+            throw std::length_error("maximum number of dimensions exceeded");
           for (size_t i=0; i<N; ++i) m_shape[i] = vec[i];
         }
 
@@ -195,7 +203,7 @@ namespace Torch { namespace io {
       HDF5Shape (size_t n);
 
       /**
-       * Default constructor (m_n => 0, no shape)
+       * Default constructor (m_n = 0, no shape)
        */
       HDF5Shape ();
 
@@ -215,15 +223,16 @@ namespace Torch { namespace io {
       HDF5Shape& operator= (const HDF5Shape& other);
 
       /**
-       * Returns the current size of shape
+       * Returns the current size of shape. If values are less than zero, the
+       * shape is not valid.
        */
       inline size_t n () const { return m_n; }
 
       /**
        * Returs a pointer to the first element of the shape
        */
-      inline const hsize_t* get() const { return m_shape.get(); }
-      inline hsize_t* get() { return m_shape.get(); }
+      inline const hsize_t* get() const { return m_shape; }
+      inline hsize_t* get() { return m_shape; }
 
       /**
        * Copies the data from the other HDF5Shape. If the other shape is
@@ -244,7 +253,7 @@ namespace Torch { namespace io {
       }
 
       /**
-       * Resets the current shape so it becomes zero-sized.
+       * Resets the current shape so it becomes invalid.
        */
       void reset();
 
@@ -260,8 +269,8 @@ namespace Torch { namespace io {
       HDF5Shape& operator <<= (size_t pos);
 
       /**
-       * Right-shift a number of positions, fills positions to the left with
-       * zeros. Does not increase total size.
+       * Right-shift a number of positions, increases the total size. New
+       * positions are filled with 1's (ones).
        */
       HDF5Shape& operator >>= (size_t pos);
 
@@ -292,9 +301,9 @@ namespace Torch { namespace io {
       }
 
       /**
-       * Tells if this shape is valid
+       * Tells if this shape is invalid
        */
-      inline bool operator! () const { return !m_n; }
+      inline bool operator! () const { return m_n == 0; }
 
       /**
        * Returns a tuple-like string representation for this shape
@@ -302,8 +311,8 @@ namespace Torch { namespace io {
       std::string str() const;
 
     private: //representation
-      size_t m_n; ///< The number of objects in this shape
-      boost::shared_array<hsize_t> m_shape; ///< The actual shape values
+      size_t m_n; ///< The number of valid hsize_t's in this shape
+      hsize_t m_shape[MAX_HDF5SHAPE_SIZE]; ///< The actual shape values
 
   };
 
@@ -318,7 +327,7 @@ namespace Torch { namespace io {
       /**
        * Specific implementations bind the type T to the support_t enum
        */
-#     define DECLARE_SUPPORT(T) HDF5Type(const T& value); 
+#     define DECLARE_SUPPORT(T) HDF5Type(const T& value);
       DECLARE_SUPPORT(bool)
       DECLARE_SUPPORT(int8_t)
       DECLARE_SUPPORT(int16_t)
@@ -364,9 +373,24 @@ namespace Torch { namespace io {
 #     undef DECLARE_SUPPORT
 
       /**
+       * Default constructor, results in an unsupported type with invalid shape
+       */
+      HDF5Type();
+
+      /**
+       * Creates a HDF5Type from a type enumeration, assumes it is a scalar
+       */
+      HDF5Type(hdf5type type);
+
+      /**
+       * Creates a HDF5Type from a type enumeration and an explicit shape
+       */
+      HDF5Type(hdf5type type, const HDF5Shape& extents);
+
+      /**
        * Creates a HDF5Type from a HDF5 Dataset, Datatype and Dataspace
        */
-      HDF5Type(const boost::shared_ptr<hid_t>& type, 
+      HDF5Type(const boost::shared_ptr<hid_t>& type,
           const HDF5Shape& extents);
 
       /**
@@ -385,12 +409,12 @@ namespace Torch { namespace io {
       HDF5Type& operator= (const HDF5Type& other);
 
       /**
-       * Checks if to types are the same
+       * Checks if two types are the same
        */
       bool operator== (const HDF5Type& other) const;
 
       /**
-       * Checks if to types are *not* the same
+       * Checks if two types are *not* the same
        */
       bool operator!= (const HDF5Type& other) const;
 
@@ -402,16 +426,14 @@ namespace Torch { namespace io {
       }
 
       /**
-       * Tells if we have arrays inside
-       */
-      inline bool is_array() const { 
-        return !(m_shape.n() == 1 && m_shape[0] == 1); 
-      }
-
-      /**
-       * Returns the HDF5Shape of the arrays, if we have arrays inside.
+       * Returns the HDF5Shape of this type
        */
       const HDF5Shape& shape() const { return m_shape; }
+
+      /**
+       * Returns the HDF5Shape of this type
+       */
+      HDF5Shape& shape() { return m_shape; }
 
       /**
        * Returns the equivalent HDF5 type info object for this type.
@@ -442,7 +464,7 @@ namespace Torch { namespace io {
     private: //representation
 
       hdf5type m_type; ///< the precise supported type
-      HDF5Shape m_shape; ///< what is the shape of the type
+      HDF5Shape m_shape; ///< what is the shape of the type (scalar)
 
   };
 

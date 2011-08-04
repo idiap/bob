@@ -241,28 +241,51 @@ def hdf5type_array_class(self):
 HDF5Type.array_class = hdf5type_array_class
 del hdf5type_array_class
 
-def hdf5file_read(self, path, pos=-1):
+def hdf5type_str(self):
+  return "%s@%s" % (self.type_str(), self.shape())
+HDF5Type.__str__ = hdf5type_str
+
+def hdf5type_repr(self):
+  return "<HDF5Type: %s (0x%x)>" % (str(self), id(self))
+HDF5Type.__repr__ = hdf5type_repr
+del hdf5type_repr
+
+def hdf5file_read(self, path, pos=-1, fmt=0):
   """Reads elements from the current file.
   
-  Parameters:
-  path -- This is the path to the HDF5 dataset to read data from
-  pos -- This is the position in the dataset to readout. If the given value is
-  smaller than zero, we read all positions in the dataset and return you a
-  list. If the position is specific, we return a single element.
+  Keyword Parameters:
+
+  path
+    This is the path to the HDF5 dataset to read data from
+
+  pos
+    This is the position in the dataset to readout. If the given value is
+    smaller than zero, we read all positions in the dataset and return you a
+    list. If the position is specific, we return a single element.
+
+  fmt
+    If set, read the data using the alternative output format. You can find
+    what such formats are using my describe() method. The default format is the
+    first entry. The alternate formats are the following entries.
   """
+
   dtype = self.describe(path)
-  if dtype.is_array():
-    if pos < 0: # read all
-      return [self.read(path, k) for k in range(self.size(path))]
-    else:
-      retval = dtype.array_class()(dtype.shape())
+  
+  def read_scalar_or_array(self, path, descr, pos):
+    if descr.shape() == (1,):  # read as scalar
+      return getattr(self, '__read_%s__' % descr.type_str())(path, pos)
+
+    else: # read as array
+      retval = descr.array_class()(descr.shape())
       self.__read_array__(path, pos, retval)
       return retval
+
+  if pos < 0: # read all -- recurse
+    return [read_scalar_or_array(self, path, dtype[fmt][0], k) for k in range(dtype[fmt][1])]
+
   else:
-    if pos < 0: # read all
-      return [self.read(path, k) for k in range(self.size(path))]
-    else:
-      return getattr(self, '__read_%s__' % dtype.type_str())(path, pos)
+    return read_scalar_or_array(self, path, dtype[fmt][0], pos)
+
 HDF5File.read = hdf5file_read
 del hdf5file_read
 

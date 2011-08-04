@@ -5,6 +5,7 @@
  * @brief Implements a set of utilities to read HDF5 files. 
  */
 
+#include <boost/make_shared.hpp>
 #include "io/HDF5Utils.h"
 
 namespace h5 = Torch::io::detail::hdf5;
@@ -69,7 +70,7 @@ static boost::shared_ptr<hid_t> open_plist(hid_t classid) {
 }
 
 /**
- * Opens an "auto-destructible" HDF5 file dataspace
+ * Opens an "auto-destructible" HDF5 dataspace
  */
 static void delete_h5dataspace (hid_t* p) {
   if (*p >= 0) H5Sclose(*p);
@@ -94,22 +95,23 @@ static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Type& t) {
 }
 
 /**
- * Figures out if a dataset is chunked and therefore expandible
+ * Figures out if a dataset is expandible
  */
-static bool is_chunked(boost::shared_ptr<hid_t>& dataset) {
-  hid_t plist = H5Dget_create_plist(*dataset);
-  if (plist < 0) throw io::HDF5StatusError("H5Pget_create_plist", plist);
-  bool retval (H5D_CHUNKED == H5Pget_layout(plist));
-  H5Pclose(plist);
-  return retval;
+static bool is_extensible(boost::shared_ptr<hid_t>& space) {
+
+  //has unlimited size on first dimension?
+  int rank = H5Sget_simple_extent_ndims(*space);
+  if (rank < 0) throw io::HDF5StatusError("H5Sget_simple_extent_ndims", rank);
+
+  io::HDF5Shape maxshape(rank);
+  herr_t status = H5Sget_simple_extent_dims(*space, 0, maxshape.get());
+  if (status < 0) throw io::HDF5StatusError("H5Sget_simple_extent_dims",status);
+
+  return (maxshape[0] == H5S_UNLIMITED);
 }
 
 /**
  * Figures out the extents of a dataset
- *
- * TODO: Check extendibility of the first dimension, check on HDF5Shape that
- * the type is extendible or not. If type is extendible, may be read as
- * D-dimensional object or as a list of objects of dimension D-1.
  */
 static io::HDF5Shape get_extents(boost::shared_ptr<hid_t>& space) {
   int rank = H5Sget_simple_extent_ndims(*space);
@@ -121,6 +123,71 @@ static io::HDF5Shape get_extents(boost::shared_ptr<hid_t>& space) {
   return shape;
 }
 
+/**
+ * Creates the extensive list of compatible types for each of possible ways to
+ * read/write this dataset.
+ */
+static void reset_compatibility_list(boost::shared_ptr<hid_t>& space,
+    const io::HDF5Type& file_base, std::vector<h5::Dataset::type_t>& type) {
+
+  type.clear();
+  
+  if (!file_base.shape()) throw std::length_error("empty HDF5 dataset");
+
+  switch (file_base.shape().n()) {
+    case 1: ///< file type has 1 dimension
+      {
+        //by default, read it as a scalar
+        io::HDF5Type scalar(file_base.type());
+        io::HDF5Shape offset(1);
+        io::HDF5Shape count(1); count[0] = 1;
+        type.push_back( make_tuple(scalar,
+                                   file_base.shape()[0],
+                                   is_extensible(space), 
+                                   offset, 
+                                   count,
+                                   open_memspace(scalar))
+                      );
+      }
+      break;
+
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      {
+        //can also read it as a single, expandible 1D blitz array
+        io::HDF5Shape alt = file_base.shape();
+        alt <<= 1; ///< contract shape
+        io::HDF5Type array(file_base.type(), alt);
+        io::HDF5Shape offset(file_base.shape().n());
+        io::HDF5Shape count(file_base.shape()); count[0] = 1;
+        type.push_back( make_tuple(array,
+                                   file_base.shape()[0],
+                                   is_extensible(space), 
+                                   offset, 
+                                   count,
+                                   open_memspace(array)) 
+                      );
+      }
+      break;
+
+    default:
+
+      throw io::HDF5UnsupportedDimensionError(file_base.shape().n());
+  }
+
+  //can always read the data as a single, non-expandible array
+  type.push_back( make_tuple(file_base, 
+                             1, 
+                             false,
+                             io::HDF5Shape(file_base.shape().n()),
+                             file_base.shape(),
+                             open_memspace(file_base))
+                );
+
+}
+
 h5::Dataset::Dataset(boost::shared_ptr<h5::File>& f,
     const std::string& path) :
   m_parent(f),
@@ -128,59 +195,60 @@ h5::Dataset::Dataset(boost::shared_ptr<h5::File>& f,
   m_id(open_dataset(m_parent, m_path)),
   m_dt(open_datatype(m_parent, m_path, m_id)),
   m_filespace(open_filespace(m_parent, m_path, m_id)),
-  m_memspace(),
-  m_extent(get_extents(m_filespace)),
-  m_select_offset(m_extent.n()),
-  m_select_count(m_extent),
-  m_chunked(is_chunked(m_id)),
-  m_type(m_dt, m_extent)
+  m_type()
 {
-  m_select_count[0] = 1;
-  m_memspace = open_memspace(m_type);
+  io::HDF5Type type(m_dt, get_extents(m_filespace));
+  reset_compatibility_list(m_filespace, type, m_type);
 }
 
 /**
- * Creates and writes a "empty" Dataset in an existing file.
+ * Creates and writes an "empty" Dataset in an existing file.
  */
 static void create_dataset (boost::shared_ptr<h5::File>& file, 
- const std::string& path, const io::HDF5Type& type,
+ const std::string& path, const io::HDF5Type& type, bool list,
  size_t compression) {
 
-  io::HDF5Shape xshape(type.shape().n()+1);
-  for (size_t i=0; i<type.shape().n(); ++i) xshape[i+1] = type.shape()[i];
-  xshape[0] = 0; ///< no elements for the time being
+  io::HDF5Shape xshape(type.shape());
+  
+  if (list) { ///< if it is a list, add and extra dimension as dimension 0
+    xshape = type.shape();
+    xshape >>= 1;
+    xshape[0] = 0; ///< no elements for the time being
+  }
 
   io::HDF5Shape maxshape(xshape);
-  maxshape[0] = H5S_UNLIMITED; ///< can expand forever
+  if (list) maxshape[0] = H5S_UNLIMITED; ///< can expand forever
   
-  //creates the data space. first dimension => length of the set
-  boost::shared_ptr<hid_t> space(new hid_t(-1), std::ptr_fun(delete_h5dataspace));
-  *space = H5Screate_simple(type.shape().n()+1, xshape.get(), 
-      maxshape.get());
+  //creates the data space.
+  boost::shared_ptr<hid_t> space(new hid_t(-1), 
+      std::ptr_fun(delete_h5dataspace));
+  *space = H5Screate_simple(xshape.n(), xshape.get(), maxshape.get());
   if (*space < 0) throw io::HDF5StatusError("H5Screate_simple", *space);
 
-  //creates the property list saying we need the data to be chunked. hdf5 only
-  //support expandability like this.
+  //creates the property list saying we need the data to be chunked if this is
+  //supposed to be a list -- HDF5 only support expandability like this.
   boost::shared_ptr<hid_t> dcpl = open_plist(H5P_DATASET_CREATE);
 
   //according to the HDF5 manual, chunks have to have the same rank as the
   //array shape.
   io::HDF5Shape chunking(xshape);
   chunking[0] = 1;
-  herr_t status = H5Pset_chunk(*dcpl, chunking.n(), chunking.get());
-  if (status < 0) throw io::HDF5StatusError("H5Pset_chunk", status);
+  if (list) {
+    herr_t status = H5Pset_chunk(*dcpl, chunking.n(), chunking.get());
+    if (status < 0) throw io::HDF5StatusError("H5Pset_chunk", status);
+  }
 
   //if the user has decided to compress the dataset, do it with gzip.
   if (compression) {
     if (compression > 9) compression = 9;
-    status = H5Pset_deflate(*dcpl, compression);
+    herr_t status = H5Pset_deflate(*dcpl, compression);
     if (status < 0) throw io::HDF5StatusError("H5Pset_deflate", status);
   }
 
   //our link creation property list for HDF5
   boost::shared_ptr<hid_t> lcpl = open_plist(H5P_LINK_CREATE);
-  status = H5Pset_create_intermediate_group(*lcpl, 1); //1 == true
-  if (status < 0) 
+  herr_t status = H5Pset_create_intermediate_group(*lcpl, 1); //1 == true
+  if (status < 0)
     throw io::HDF5StatusError("H5Pset_create_intermediate_group", status);
 
   //please note that we don't define the fill value as in the example, but
@@ -189,7 +257,8 @@ static void create_dataset (boost::shared_ptr<h5::File>& file,
   boost::shared_ptr<hid_t> cls = type.htype();
 
   //finally create the dataset on the file.
-  boost::shared_ptr<hid_t> dataset(new hid_t(-1), std::ptr_fun(delete_h5dataset));
+  boost::shared_ptr<hid_t> dataset(new hid_t(-1), 
+      std::ptr_fun(delete_h5dataset));
   *dataset = H5Dcreate2(*file->m_id, path.c_str(),
       *cls, *space, *lcpl, *dcpl, H5P_DEFAULT);
   if (*dataset < 0) throw io::HDF5StatusError("H5Dcreate2", *dataset);
@@ -197,72 +266,146 @@ static void create_dataset (boost::shared_ptr<h5::File>& file,
 
 h5::Dataset::Dataset(boost::shared_ptr<File>& f,
     const std::string& path, const io::HDF5Type& type,
-    size_t compression):
+    bool list, size_t compression):
   m_parent(f),
   m_path(path),
   m_id(),
   m_dt(),
   m_filespace(),
-  m_memspace(),
-  m_extent(),
-  m_select_offset(),
-  m_select_count(),
-  m_chunked(false),
-  m_type(type)
+  m_type()
 {
   //First, we test to see if we can find the named dataset.
   io::HDF5Error::mute();
   hid_t set_id = H5Dopen2(*m_parent->m_id,m_path.c_str(),H5P_DEFAULT);
   io::HDF5Error::unmute();
 
-  if (set_id < 0) create_dataset(m_parent, m_path, m_type, compression);
+  if (set_id < 0) create_dataset(m_parent, m_path, type, list, compression);
   else H5Dclose(set_id); //close it, will re-open it properly
 
   m_id = open_dataset(m_parent, m_path);
   m_dt = open_datatype(m_parent, m_path, m_id);
   m_filespace = open_filespace(m_parent, m_path, m_id);
-  m_extent = get_extents(m_filespace);
-  m_select_offset = HDF5Shape(m_extent.n());
-  m_select_count = m_extent;
-  m_select_count[0] = 1;
-  m_type = io::HDF5Type(m_dt, m_extent);
-  m_memspace = open_memspace(m_type);
-  m_chunked = is_chunked(m_id);
+  io::HDF5Type file_type(m_dt, get_extents(m_filespace));
+  reset_compatibility_list(m_filespace, file_type, m_type);
 }
 
 h5::Dataset::~Dataset() { }
 
-void h5::Dataset::select (size_t index) {
-  m_select_offset[0] = index;
-  herr_t status = H5Sselect_hyperslab(*m_filespace, H5S_SELECT_SET, 
-      m_select_offset.get(), 0, m_select_count.get(), 0);
-  if (status < 0) throw io::HDF5StatusError("H5Sselect_hyperslab", status);
+size_t h5::Dataset::size () const {
+  return boost::get<1>(m_type[0]);
 }
 
-void h5::Dataset::read (void* buffer) {
-  boost::shared_ptr<hid_t> htype = m_type.htype();
-  herr_t status = H5Dread(*m_id, *htype, *m_memspace, *m_filespace,
-      H5P_DEFAULT, buffer);
-  if (status < 0) throw io::HDF5StatusError("H5Dread", status);
-}
-
-void h5::Dataset::extend () {
-  m_extent[0] += 1;
-  herr_t status = H5Dset_extent(*m_id, m_extent.get());
-  if (status < 0) {
-    m_extent[0] -= 1;
-    throw io::HDF5StatusError("H5Dset_extent", status);
+size_t h5::Dataset::size (const io::HDF5Type& type) const {
+  for (size_t k=0; k<m_type.size(); ++k) {
+    if (boost::get<0>(m_type[k]) == type) return boost::get<1>(m_type[k]);
   }
-  m_filespace = open_filespace(m_parent, m_path, m_id); //update filespace
+  throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+      m_path, boost::get<0>(m_type[0]).str(), type.str());
 }
 
-void h5::Dataset::write (const void* buffer) {
-  boost::shared_ptr<hid_t> htype = m_type.htype();
-  herr_t status = H5Dwrite(*m_id, *htype, *m_memspace, *m_filespace,
-      H5P_DEFAULT, buffer);
+/**
+ * Locates a compatible type or returns end().
+ */
+static std::vector<h5::Dataset::type_t>::iterator 
+  find_type_index(std::vector<h5::Dataset::type_t>& type,
+      const io::HDF5Type& user_type) {
+  std::vector<h5::Dataset::type_t>::iterator it = type.begin();
+  for (; it != type.end(); ++it) {
+    if (boost::get<0>(*it) == user_type) break;
+  }
+  return it;
+}
+
+std::vector<h5::Dataset::type_t>::iterator 
+h5::Dataset::select (size_t index, const io::HDF5Type& dest) {
+
+  //finds compatibility type
+  std::vector<h5::Dataset::type_t>::iterator it = find_type_index(m_type, dest);
+
+  //if we cannot find a compatible type, we throw
+  if (it == m_type.end()) 
+    throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+        m_path, boost::get<0>(m_type[0]).str(), dest.str());
+
+  //checks indexing
+  if (index >= boost::get<1>(*it))
+    throw Torch::io::HDF5IndexError(m_parent->m_path.string(), 
+        m_path, boost::get<1>(*it), index);
+
+  boost::get<3>(*it)[0] = index;
+  herr_t status = H5Sselect_hyperslab(*m_filespace, H5S_SELECT_SET, 
+      boost::get<3>(*it).get(), 0, boost::get<4>(*it).get(), 0);
+  if (status < 0) throw io::HDF5StatusError("H5Sselect_hyperslab", status);
+
+  return it;
+}
+
+void h5::Dataset::read (size_t index, const io::HDF5Type& dest, void* buffer) {
+
+  std::vector<h5::Dataset::type_t>::iterator it = select(index, dest);
+
+  herr_t status = H5Dread(*m_id, *boost::get<0>(*it).htype(),
+      *boost::get<5>(*it), *m_filespace, H5P_DEFAULT, buffer);
+
+  if (status < 0) throw io::HDF5StatusError("H5Dread", status);
+
+}
+
+void h5::Dataset::write (size_t index, const io::HDF5Type& dest, 
+    const void* buffer) {
+
+  std::vector<h5::Dataset::type_t>::iterator it = select(index, dest);
+
+  herr_t status = H5Dwrite(*m_id, *boost::get<0>(*it).htype(),
+      *boost::get<5>(*it), *m_filespace, H5P_DEFAULT, buffer);
+
   if (status < 0) throw io::HDF5StatusError("H5Dwrite", status);
+
 }
     
+void h5::Dataset::extend (const Torch::io::HDF5Type& dest, const void* buffer) {
+  
+  //finds compatibility type
+  std::vector<h5::Dataset::type_t>::iterator it = find_type_index(m_type, dest);
+
+  //if we cannot find a compatible type, we throw
+  if (it == m_type.end()) 
+    throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+        m_path, boost::get<0>(m_type[0]).str(), dest.str());
+
+  if (!boost::get<2>(*it))
+    throw io::HDF5NotExpandible(m_parent->m_path.string(), m_path);
+
+  //if it is expandible, try expansion
+  io::HDF5Shape tmp(boost::get<0>(*it).shape());
+  tmp >>= 1;
+  tmp[0] = boost::get<1>(*it) + 1;
+  herr_t status = H5Dset_extent(*m_id, tmp.get());
+  if (status < 0) throw io::HDF5StatusError("H5Dset_extent", status);
+  
+  //if expansion succeeded, update all compatible types
+  for (size_t k=0; k<m_type.size(); ++k) {
+
+    if (boost::get<2>(m_type[k])) { //is chunked, updated only the length
+
+      boost::get<1>(m_type[k]) += 1;
+
+    }
+
+    else { //not chunked, update the shape/count for a straight read/write
+
+      h5::Dataset::type_t& handle = m_type[k];
+      boost::get<0>(handle).shape()[0] += 1;
+      boost::get<4>(handle)[0] += 1;
+      boost::get<5>(handle) = open_memspace(boost::get<0>(handle)); 
+
+    }
+  }
+      
+  m_filespace = open_filespace(m_parent, m_path, m_id); //update filespace
+  write(tmp[0]-1, dest, buffer);
+}
+
 /**
  * Opens/Creates an "auto-destructible" HDF5 file
  */

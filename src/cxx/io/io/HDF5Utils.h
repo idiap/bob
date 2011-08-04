@@ -28,9 +28,9 @@
 #define TORCH_IO_HDF5UTILS_H
 
 #include <map>
+#include <vector>
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_array.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 #include <blitz/array.h>
@@ -132,14 +132,26 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * file. If the Dataset already exists on file and the types are
        * compatible, we attach to that type, otherwise, we raise an exception.
        *
-       * If a new Dataset is to be created, you can also set the compression
-       * level. Note this setting has no effect if the Dataset already exists
-       * on file, in which case the current setting for that dataset is
-       * respected. The maximum value for the gzip compression is 9. The value
-       * of zero turns compression off (the default).
+       * If a new Dataset is to be created, you can also set if you would like
+       * to have as a list and the compression level. Note these settings have
+       * no effect if the Dataset already exists on file, in which case the
+       * current settings for that dataset are respected. The maximum value for
+       * the gzip compression is 9. The value of zero turns compression off
+       * (the default).
+       *
+       * The effect of setting "list" to false is that the created dataset:
+       *
+       * a) Will not be expandible (chunked)
+       * b) Will contain the exact number of dimensions of the input type.
+       *
+       * When you set "list" to true (the default), datasets are created with
+       * chunking automatically enabled (the chunk size is set to the size of
+       * the given variable) and an extra dimension is inserted to accomodate
+       * list operations.
        */
       Dataset(boost::shared_ptr<File>& f, const std::string&, 
-          const Torch::io::HDF5Type& type, size_t compression=0);
+          const Torch::io::HDF5Type& type, bool list=true,
+          size_t compression=0);
 
       /**
        * Destructor virtualization
@@ -147,35 +159,41 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       virtual ~Dataset();
 
       /**
-       * Returns the number of objects installed at this dataset
+       * Returns the number of objects installed at this dataset from the
+       * perspective of the default compatible type.
        */
-      inline size_t size() const { return m_extent[0]; }
+      size_t size() const;
 
       /**
-       * Tells if this dataset holds arrays (or scalars)
+       * Returns the number of objects installed at this dataset from the
+       * perspective of the default compatible type. If the given type is not
+       * compatible, raises a type error.
        */
-      inline bool is_array() const { return m_type.is_array(); }
+      size_t size(const Torch::io::HDF5Type& type) const;
 
       /**
        * DATA READING FUNCTIONALITY
        */
 
       /**
-       * Reads data from the file into a scalar.
+       * Reads data from the file into a scalar. The conditions bellow have to
+       * be respected:
+       *
+       * a. My internal shape is 1D **OR** my internal shape is 2D, but the
+       *    extent of the second dimension is 1.
+       * b. The indexed position exists
+       *
+       * If the internal shape is not like defined above, raises a type error.
+       * If the indexed position does not exist, raises an index error.
        */
       template <typename T> void read(size_t index, T& value) {
-        if (index >= m_extent[0])
-          throw Torch::io::HDF5IndexError(m_parent->m_path.string(), 
-              m_path, m_extent[0], index);
-        if (m_type != Torch::io::HDF5Type(value))
-          throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-              m_path, m_type.str(), Torch::io::HDF5Type(value).str());
-        select(index);
-        read(reinterpret_cast<void*>(&value));
+        Torch::io::HDF5Type dest_type(value);
+        read(index, dest_type, reinterpret_cast<void*>(&value));
       }
 
       /**
-       * Reads data from the file into a scalar (allocated internally).
+       * Reads data from the file into a scalar (allocated internally). The
+       * same conditions as for read(index, value) apply.
        */
       template <typename T> T read(size_t index) {
         T retval;
@@ -185,7 +203,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       /**
        * Reads data from the file into a scalar. This is equivalent to using
-       * read(0, value).
+       * read(0, value). The same conditions as for read(index=0, value) apply.
        */
       template <typename T> void read(T& value) {
         read(0, value);
@@ -193,7 +211,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       /**
        * Reads data from the file into a scalar. This is equivalent to using
-       * read(0).
+       * read(0). The same conditions as for read(index=0, value) apply.
        */
       template <typename T> T read() {
         T retval;
@@ -202,7 +220,19 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       }
 
       /**
-       * Reads data from the file into a array.
+       * Reads data from the file into a array. The following conditions have
+       * to be respected:
+       *
+       * a. My internal shape is the same as the shape of the given value
+       *    **OR** my internal shape has one more dimension as the given value.
+       *    In this case, the first dimension of the internal shape is
+       *    considered to be an index and the remaining shape values the
+       *    dimension of the value to be read. The given array has to be
+       *    compatible with this re-defined N-1 shape.
+       * b. The indexed position exists
+       *
+       * If the internal shape is not like defined above, raises a type error.
+       * If the index does not exist, raises an index error.
        *
        * @param index Which of the arrays to read in the current dataset, by
        * order
@@ -212,36 +242,38 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T, int N> 
         void readArray(size_t index, blitz::Array<T,N>& value) {
-          if (index >= m_extent[0])
-            throw Torch::io::HDF5IndexError(m_parent->m_path.string(), 
-                m_path, m_extent[0], index);
-          if (m_type != Torch::io::HDF5Type(value))
-            throw Torch::io::HDF5IncompatibleIO
-              (m_parent->m_path.string(), m_path, m_type.str(),
-               Torch::io::HDF5Type(value).str());
           Torch::core::array::assertCZeroBaseContiguous(value);
-          select(index);
-          read(reinterpret_cast<void*>(value.data()));
+          Torch::io::HDF5Type dest_type(value);
+          read(index, dest_type, reinterpret_cast<void*>(value.data()));
         }
 
       /**
-       * Reads data from the file into an array allocated dynamically.
+       * Reads data from the file into an array allocated dynamically. The same
+       * conditions as for readArray(index, value) apply.
        *
        * @param index Which of the arrays to read in the current dataset, by
        * order
        */
       template <typename T, int N> 
         blitz::Array<T,N> readArray(size_t index) {
-          blitz::TinyVector<int,N> shape;
-          m_type.shape().set(shape);
-          blitz::Array<T,N> retval(shape);
-          readArray(index, retval);
-          return retval;
+          for (size_t k=0; k<m_type.size(); ++k) {
+            const Torch::io::HDF5Shape& S = boost::get<0>(m_type[k]).shape();
+            if(S.n() == N) {
+              blitz::TinyVector<int,N> shape;
+              S.set(shape);
+              blitz::Array<T,N> retval(shape);
+              readArray(index, retval);
+              return retval;
+            }
+          }
+          throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
+              m_path, boost::get<0>(m_type[0]).str(), "dynamic shape unknown");
         }
 
       /**
        * Reads data from the file into a array. This is equivalent to using
-       * readArray(0, value).
+       * readArray(0, value). The same conditions as for readArray(index=0,
+       * value) apply.
        *
        * @param index Which of the arrays to read in the current dataset, by
        * order
@@ -256,7 +288,8 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       /**
        * Reads data from the file into a array. This is equivalent to using
-       * readArray(0).
+       * readArray(0). The same conditions as for readArray(index=0, value)
+       * apply.
        */
       template <typename T, int N> 
         blitz::Array<T,N> readArray() {
@@ -268,22 +301,26 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
 
       /**
-       * Modifies the value of a scalar inside the file.
+       * Modifies the value of a scalar inside the file. Modifying a value
+       * requires that the expected internal shape for this dataset and the
+       * shape of the given scalar are consistent. To replace a scalar the
+       * conditions bellow have to be respected:
+       *
+       * a. The internal shape is 1D **OR** the internal shape is 2D, but the
+       *    second dimension of the internal shape has is extent == 1.
+       * b. The given indexing position exists
+       *
+       * If the above conditions are not met, an exception is raised.
        */
       template <typename T> void replace(size_t index, const T& value) {
-        if (index >= m_extent[0])
-          throw Torch::io::HDF5IndexError(m_parent->m_path.string(), 
-              m_path, m_extent[0], index);
-        if (m_type != Torch::io::HDF5Type(value))
-          throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-              m_path, m_type.str(), Torch::io::HDF5Type(value).str());
-        select(index);
-        write(reinterpret_cast<const void*>(&value));
+        Torch::io::HDF5Type dest_type(value);
+        write(index, dest_type, reinterpret_cast<const void*>(&value));
       }
 
       /**
        * Modifies the value of a scalar inside the file. This is equivalent to
-       * using replace(0, value).
+       * using replace(0, value). The same conditions as for replace(index=0,
+       * value) apply. 
        */
       template <typename T> void replace(const T& value) {
         replace(0, value);
@@ -291,22 +328,37 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       /**
        * Inserts a scalar in the current (existing ;-) dataset. This will
-       * trigger writing data to the file.
+       * trigger writing data to the file. Adding a scalar value requires that
+       * the expected internal shape for this dataset and the shape of the
+       * given scalar are consistent. To add a scalar the conditions
+       * bellow have to be respected:
+       *
+       * a. The internal shape is 1D **OR** the internal shape is 2D, but the
+       *    second dimension of the internal shape has is extent == 1.
+       * b. This dataset is expandible (chunked)
+       *
+       * If the above conditions are not met, an exception is raised.
        */
       template <typename T> void add(const T& value) {
-        if (!m_chunked)
-          throw Torch::io::HDF5NotExpandible(m_parent->m_path.string(), 
-              m_path);
-        if (m_type != Torch::io::HDF5Type(value))
-          throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-              m_path, m_type.str(), Torch::io::HDF5Type(value).str());
-        extend();
-        select(m_extent[0]-1);
-        write(reinterpret_cast<const void*>(&value));
+        Torch::io::HDF5Type dest_type(value);
+        extend(dest_type, reinterpret_cast<const void*>(&value));
       }
 
       /**
-       * Replaces data at the file using a new array.
+       * Replaces data at the file using a new array. Replacing an existing
+       * array requires shape consistence. The following conditions should be
+       * met:
+       *
+       * a. My internal shape is the same as the shape of the given value
+       *    **OR** my internal shape has one more dimension as the given value.
+       *    In this case, the first dimension of the internal shape is
+       *    considered to be an index and the remaining shape values the
+       *    dimension of the value to be read. The given array has to be
+       *    compatible with this re-defined N-1 shape.
+       * b. The given indexing position exists.
+       *
+       * If the internal shape is not like defined above, raises a type error.
+       * If the indexed position does not exist, raises an index error.
        *
        * @param index Which of the arrays to read in the current dataset, by
        * order
@@ -316,25 +368,21 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T, int N> 
         void replaceArray(size_t index, const blitz::Array<T,N>& value) {
-          if (index >= m_extent[0])
-            throw Torch::io::HDF5IndexError(m_parent->m_path.string(), 
-                m_path, m_extent[0], index);
-          if (m_type != Torch::io::HDF5Type(value))
-            throw Torch::io::HDF5IncompatibleIO
-              (m_parent->m_path.string(), 
-                m_path, m_type.str(), Torch::io::HDF5Type(value).str());
-          select(index);
-          if(Torch::core::array::isCContiguous(value)) {
+          Torch::io::HDF5Type dest_type(value);
+          if(!Torch::core::array::isCZeroBaseContiguous(value)) {
             blitz::Array<T,N> tmp = value.copy();
-            write(reinterpret_cast<const void*>(tmp.data()));
+            write(index, dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
-          else
-            write(reinterpret_cast<const void*>(value.data()));
+          else {
+            write(index, dest_type,
+                reinterpret_cast<const void*>(value.data()));
+          }
         }
 
       /**
        * Replaces data at the file using a new array. This is equivalent to
-       * calling replaceArray(0, value). 
+       * calling replaceArray(0, value). The conditions for
+       * replaceArray(index=0, value) apply.
        *
        * @param value The output array data will be stored inside this
        * variable. This variable has to be a zero-based C-style contiguous
@@ -347,28 +395,23 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       /**
        * Appends a array in a certain subdirectory of the file. If that
-       * subdirectory does not exist, it is created. If the dataset does not
-       * exist, it is created, otherwise, we append to it. In this case, the
-       * dimensionality of the scalar has to be compatible with the existing
-       * dataset shape (or "dataspace" in HDF5 parlance). If you want to do
-       * this, first unlink and than use one of the add methods.
+       * subdirectory (or a "group" in HDF5 parlance) does not exist, it is
+       * created. If the dataset does not exist, it is created, otherwise, we
+       * append to it. In this case, the dimensionality of the scalar has to be
+       * compatible with the existing dataset shape (or "dataspace" in HDF5
+       * parlance). If you want to do this, first unlink and than use one of
+       * the add() methods.
        */
       template <typename T, int N> 
         void addArray(const blitz::Array<T,N>& value) {
-        if (!m_chunked)
-          throw Torch::io::HDF5NotExpandible(m_parent->m_path.string(), 
-              m_path);
-        if (m_type != Torch::io::HDF5Type(value))
-          throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-              m_path, m_type.str(), Torch::io::HDF5Type(value).str());
-        extend();
-        select(m_extent[0]-1);
-        if(Torch::core::array::isCContiguous(value)) {
-          blitz::Array<T,N> tmp = value.copy();
-          write(reinterpret_cast<const void*>(tmp.data()));
-        }
-        else
-          write(reinterpret_cast<const void*>(value.data()));
+          Torch::io::HDF5Type dest_type(value);
+          if(!Torch::core::array::isCZeroBaseContiguous(value)) {
+            blitz::Array<T,N> tmp = value.copy();
+            extend(dest_type, reinterpret_cast<const void*>(tmp.data()));
+          }
+          else {
+            extend(dest_type, reinterpret_cast<const void*>(value.data()));
+          }
       }
 
     private: //not implemented
@@ -377,31 +420,57 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       Dataset& operator= (const Dataset& other);
 
+    public: //part of the API
+      
+      /**
+       * This is the type compatibility vector. Each object contains a boost
+       * tuple with the following elements: 
+       *
+       * 1. The type object that represents compatibility in this mode
+       * 2. The number of objects inside this dataset, would the user decide to
+       *    read/write using this type
+       * 3. If under these conditions, the type is chunked as expected and more
+       *    atomic objects can be added.
+       * 4. A shape object that helps the hyperslab read/write obj. offset
+       * 5. A shape object that helps the hyperslab read/write obj. counting
+       * 6. A pointer to a pre-allocated, compatible, memory space for data
+       *    transfers
+       */
+      typedef boost::tuple<Torch::io::HDF5Type, 
+                           size_t, 
+                           bool,
+                           Torch::io::HDF5Shape,
+                           Torch::io::HDF5Shape, 
+                           boost::shared_ptr<hid_t> > type_t;
+
     private: //some tricks
 
       /**
        * Selects a bit of the file to be affected at the next read or write
        * operation. This method encapsulate calls to H5Sselect_hyperslab().
-       * The input value "index" is assumed to be safe when this method is
-       * called.
+       *
+       * The index is checked for existence as well as the consistence of the
+       * destination type.
        */
-      void select (size_t index);
+      std::vector<type_t>::iterator select (size_t index,
+          const Torch::io::HDF5Type& dest);
 
       /**
        * Reads a previously selected area into the given (user) buffer.
        */
-      void read (void* buffer);
+      void read (size_t index, const Torch::io::HDF5Type& dest, void* buffer);
 
       /**
        * Writes the contents of a given buffer into the file. The area that the
        * data will occupy should have been selected beforehand.
        */
-      void write (const void* buffer);
+      void write (size_t index, const Torch::io::HDF5Type& dest, 
+          const void* buffer);
 
       /**
        * Extend the dataset with one extra variable.
        */
-      void extend ();
+      void extend (const Torch::io::HDF5Type& dest, const void* buffer);
 
     public: //representation
   
@@ -410,13 +479,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       boost::shared_ptr<hid_t> m_id; ///< the HDF5 Dataset this type points to
       boost::shared_ptr<hid_t> m_dt; ///< the datatype of this Dataset
       boost::shared_ptr<hid_t> m_filespace; ///< the "file" space for this set
-      boost::shared_ptr<hid_t> m_memspace; ///< the "memory" space for this set
-      Torch::io::HDF5Shape m_extent; ///< the actual shape of this set
-      Torch::io::HDF5Shape m_select_offset; ///< hyperslab offset
-      Torch::io::HDF5Shape m_select_count; ///< hyperslab count
-      bool m_chunked; ///< true if this dataset is expandible.
-      Torch::io::HDF5Type m_type; ///< the type information for this set
-
+      std::vector<type_t> m_type;
   };
 
   /**
