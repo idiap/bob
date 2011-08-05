@@ -97,8 +97,8 @@ class HDF5FileTest(unittest.TestCase):
     # describe() method
     description = readonly.describe('testdata')
 
-    self.assertTrue(description[0][0].compatible(arrays[0]))
-    self.assertEqual(description[0][1], N)
+    self.assertTrue(description[0].type.compatible(arrays[0]))
+    self.assertEqual(description[0].size, N)
 
     # Test that writing will really fail
     self.assertRaises(RuntimeError, readonly.append, "testdata", arrays[0])

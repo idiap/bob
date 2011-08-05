@@ -281,10 +281,10 @@ def hdf5file_read(self, path, pos=-1, fmt=0):
       return retval
 
   if pos < 0: # read all -- recurse
-    return [read_scalar_or_array(self, path, dtype[fmt][0], k) for k in range(dtype[fmt][1])]
+    return [read_scalar_or_array(self, path, dtype[fmt].type, k) for k in range(dtype[fmt].size)]
 
   else:
-    return read_scalar_or_array(self, path, dtype[fmt][0], pos)
+    return read_scalar_or_array(self, path, dtype[fmt].type, pos)
 
 HDF5File.read = hdf5file_read
 del hdf5file_read

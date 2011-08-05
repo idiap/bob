@@ -87,9 +87,7 @@ static list hdf5file_paths(const io::HDF5File& f) {
 static tuple hdf5file_describe(const io::HDF5File& f, const std::string& p) {
   const std::vector<io::HDF5Descriptor>& dv = f.describe(p);
   list retval;
-  for (size_t k=0; k<dv.size(); ++k) {
-    retval.append(make_tuple(dv[k].type, dv[k].size, dv[k].expandable));
-  }
+  for (size_t k=0; k<dv.size(); ++k) retval.append(dv[k]);
   return tuple(retval);
 }
 
@@ -182,6 +180,13 @@ void bind_io_hdf5() {
     .def("shape", &hdf5type_shape, (arg("self")), "Returns the shape of the elements described by this type")
     .def("type_str", &io::HDF5Type::type_str, (arg("self")), "Returns a stringified representation of the base element type")
     .def("element_type", &io::HDF5Type::element_type, (arg("self")), "Returns a representation of the element type one of the Torch supported element types.")
+    ;
+
+  //defines the descriptions returned by HDF5File::describe()
+  class_<io::HDF5Descriptor, boost::shared_ptr<io::HDF5Descriptor> >("HDF5Descriptor", "A dataset descriptor describes one of the possible ways to read a dataset", no_init)
+    .def_readonly("type", &io::HDF5Descriptor::type)
+    .def_readonly("size", &io::HDF5Descriptor::size)
+    .def_readonly("expandable", &io::HDF5Descriptor::expandable)
     ;
 
   //this is the main class
