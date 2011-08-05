@@ -113,13 +113,13 @@ template <typename T> static void hdf5file_replace_array(io::HDF5File& f, const 
 }
 
 template <typename T> static void hdf5file_append_array(io::HDF5File& f, 
-    const std::string& path, const T& value, size_t compression) {
-  f.appendArray(path, value, compression);
+    const std::string& path, const T& value, bool list, size_t compression) {
+  f.appendArray(path, value, list, compression);
 }
 
 template <typename T> static void hdf5file_set_array(io::HDF5File& f, 
-    const std::string& path, const T& value, size_t compression) {
-  f.setArray(path, value, compression);
+    const std::string& path, const T& value, bool list, size_t compression) {
+  f.setArray(path, value, list, compression);
 }
 
 void bind_io_hdf5() {
@@ -206,8 +206,8 @@ void bind_io_hdf5() {
 #   define DECLARE_SUPPORT(T,E) \
     .def(BOOST_PP_STRINGIZE(__read_ ## E ## __), &hdf5file_read_scalar<T>, (arg("self"), arg("key"), arg("pos")), "Reads a given scalar from a dataset") \
     .def(BOOST_PP_STRINGIZE(__replace_ ## E ## __), &hdf5file_replace_scalar<T>, (arg("self"), arg("key"), arg("pos"), arg("value")), "Modifies the value of a scalar inside the file.") \
-    .def(BOOST_PP_STRINGIZE(__append_ ## E ## __), &io::HDF5File::append<T>, (arg("self"), arg("key"), arg("value")), "Appends a scalar to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") \
-    .def(BOOST_PP_STRINGIZE(__set_ ## E ## __), &io::HDF5File::set<T>, (arg("self"), arg("key"), arg("value")), "Sets the scalar at position 0 to the given value. This method is equivalent to checking if the scalar at position 0 exists and then replacing it. If the path does not exist, we append the new scalar.") 
+    .def(BOOST_PP_STRINGIZE(__append_ ## E ## __), &io::HDF5File::append<T>, (arg("self"), arg("key"), arg("value"), arg("list")), "Appends a scalar to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") \
+    .def(BOOST_PP_STRINGIZE(__set_ ## E ## __), &io::HDF5File::set<T>, (arg("self"), arg("key"), arg("value"), arg("list")), "Sets the scalar at position 0 to the given value. This method is equivalent to checking if the scalar at position 0 exists and then replacing it. If the path does not exist, we append the new scalar.") 
     DECLARE_SUPPORT(bool, bool)
     DECLARE_SUPPORT(int8_t, int8)
     DECLARE_SUPPORT(int16_t, int16)
@@ -227,8 +227,8 @@ void bind_io_hdf5() {
 #   undef DECLARE_SUPPORT
 #   define DECLARE_SUPPORT(T,N) .def("__read_array__", &hdf5file_read_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
     .def("__replace_array__", &hdf5file_replace_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
-    .def("__append_array__", &hdf5file_append_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created, you can also set the compression level. Note this setting has no effect if the Dataset already exists on file, in which case the current setting for that dataset is respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") \
-    .def("__set_array__", &hdf5file_set_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, we append the new array.\n\nIf a new Dataset is to be created, you can also set the compression level. Note this setting has no effect if the Dataset already exists on file, in which case the current setting for that dataset is respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") 
+    .def("__append_array__", &hdf5file_append_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("list"), arg("compression")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created, you can also set to create it to accomodate a list (as opposed to a single entry) and the compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") \
+    .def("__set_array__", &hdf5file_set_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, we append the new array.\n\nIf a new Dataset is to be created, you can also set to create it to accomodate a list (as opposed to a single entry) and the compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") 
 #   define DECLARE_BZ_SUPPORT(T) \
     DECLARE_SUPPORT(T,1) \
     DECLARE_SUPPORT(T,2) \

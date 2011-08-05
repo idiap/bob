@@ -151,10 +151,10 @@ io::HDF5ArrayCodec::load(const std::string& filename) const {
 #undef DIMSWITCH
 
 #define DIMSWITCH(T) switch(data.getNDim()) { \
-  case 1: f.appendArray(varname, data.get<T,1>()); break; \
-  case 2: f.appendArray(varname, data.get<T,2>()); break; \
-  case 3: f.appendArray(varname, data.get<T,3>()); break; \
-  case 4: f.appendArray(varname, data.get<T,4>()); break; \
+  case 1: f.setArray(varname, data.get<T,1>()); break; \
+  case 2: f.setArray(varname, data.get<T,2>()); break; \
+  case 3: f.setArray(varname, data.get<T,3>()); break; \
+  case 4: f.setArray(varname, data.get<T,4>()); break; \
   default: throw io::DimensionError(data.getNDim(), Torch::core::array::N_MAX_DIMENSIONS_ARRAY); \
 }
 
