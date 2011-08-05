@@ -7,7 +7,13 @@ from libpytorch_visioner import *
 from os import path
 
 DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.vbgz')
-DEFAULT_LMODEL = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.vbgz')
+
+# This model will get you left and right eye centers
+DEFAULT_LMODEL_EC = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.EyeCenters.vbgz')
+
+# This model will get you eye centers, eye corners, nose tip, nostrils, 
+# mouth corners
+DEFAULT_LMODEL_MP = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.MultiPoint.vbgz')
 
 class MaxDetector:
   """A class that bridges the Visioner to torch so as to detect the most
@@ -117,7 +123,7 @@ class Localizer:
     """
 
     if cmodel_file is None: cmodel_file = DEFAULT_CMODEL
-    if lmodel_file is None: lmodel_file = DEFAULT_LMODEL
+    if lmodel_file is None: lmodel_file = DEFAULT_LMODEL_EC
 
     self.cmodel, self.cparam = load_model(cmodel_file)
     self.cparam.ds = scale_var

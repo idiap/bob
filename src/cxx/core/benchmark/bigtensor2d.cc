@@ -174,7 +174,7 @@ static void test_mean_stdv_custom_full_reduction(unit_test& test, blitz::Array<f
  */
 static void do_test(blitz::Array<float, 2>& array, void (*functionB)(unit_test&, blitz::Array<float, 2>&, int)) {
   if (i_test < 0 || i_test >= NB_MAX_TEST) {
-    fprintf(stderr, "Error: \"tests\" is full. (see NB_MAX_TEST)");
+    std::cerr << "Error: \"tests\" is full. (see NB_MAX_TEST)" << std::endl;
     return ;
   }
   
@@ -194,7 +194,7 @@ static void do_test(blitz::Array<float, 2>& array, void (*functionB)(unit_test&,
  */
 static void do_test(float* array, int n_rows, int n_cols, void (*functionC)(unit_test&, float*, int, int, int)) {
   if (i_test < 0 || i_test >= NB_MAX_TEST) {
-    fprintf(stderr, "Error: \"tests\" is full. (see NB_MAX_TEST)");
+    std::cerr << "Error: \"tests\" is full. (see NB_MAX_TEST)" << std::endl;
     return ;
   }
   
@@ -223,11 +223,11 @@ static void display_results(unit_test* tests, int tests_size, Test_type type) {
   }
   
   if (max_index == 0) {
-    printf("No result for this type\n");
+    std::cout << "No result for this type" << std::endl;
     return;
   }
   
-  printf("     msec | speedup | test\n");
+  std::cout << "     msec | speedup | test" << std::endl;
   sort<unit_test*>(tests_, tests_ + max_index);
   
   double reference  = tests_[0].duration;
@@ -261,17 +261,17 @@ int main(int argc, char **argv)
   po::notify(vm);
   
   if (vm.count("help")) {
-    cout << desc << "\n";
+    std::cout << desc << std::endl;
     return 1;
   }
   
   // Print some information 
   printf("Array size: %d x %d = %d elements\n", n_rows, n_cols, n_rows * n_cols);
-  printf("Array memory size: ");
+  std::cout << "Array memory size: ";
   
   size_t memory_size = n_rows * n_cols * sizeof(float);
   if (memory_size < 1024.f) {
-    printf("%ld B", (long)memory_size);
+    std::cout << memory_size << " B";
   }
   else if (memory_size < (1024.f * 1024.f)) {
     printf("%.2f kB", (float)(memory_size / 1024.f));
@@ -282,37 +282,35 @@ int main(int argc, char **argv)
   else {
     printf("%.2f GB", (float)(((memory_size / 1024.f) / 1024.f) / 1024.f));
   }
-  
-  printf("\n");
+ 
+  std::cout << std::endl;
   
   // Initialize the random number generator
   if(seed < 0) 
   {
     int64_t s = std::time(0);
     rng.seed(s);
-    
-    printf("Random seed = %ld\n", s);
+    std::cout << "Random seed = " << s << std::endl; 
   }
   else
   {
-    printf("Setting manual seed = %ld\n", seed);
+    std::cout << "Setting manual seed = " << seed << std::endl; 
     rng.seed(seed);
   }
 
-  printf("\n");
-
+  std::cout << std::endl;
   
-  printf("Creating Blitz array\n");
+  std::cout << "Creating Blitz array" << std::endl;
   blitz::Array<float, 2> blitz_array(n_rows, n_cols);
   
-  printf("Randomizing ...\n");
+  std::cout << "Randomizing ..." << std::endl;
   blitz_array = randomize(blitz_array);
   
   if(verbose > 2) {
     cout << "array: " << blitz_array << endl;
   }
   
-  printf("Creating C array\n");
+  std::cout << "Creating C array" << std::endl;
   float *array = new float[n_rows * n_cols];
   
   // Copy Blitz array to C array
@@ -341,19 +339,19 @@ int main(int argc, char **argv)
   do_test(blitz_array, &test_mean_stdv_custom_full_reduction);
   
   
-  printf("\n");
-  printf("Summary tables:\n");
-  printf("\n");
+  std::cout << std::endl;
+  std::cout << "Summary tables:" << std::endl;
+  std::cout << std::endl;
   
-  printf("Mean:\n");
+  std::cout << "Mean:" << std::endl;
   display_results(tests, i_test, MEAN);
   
-  printf("\nMean and stdv along each column\n");
+  std::cout << std::endl << "Mean and stdv along each column" << std::endl;
   display_results(tests, i_test, MEAN_STDV_COLUMN);
   
-  printf("\nMean and stdv\n");
+  std::cout << std::endl << "Mean and stdv" << std::endl;
   display_results(tests, i_test, MEAN_STDV);
-  printf("\n");
+  std::cout << std::endl;
   return(0);
 }
 

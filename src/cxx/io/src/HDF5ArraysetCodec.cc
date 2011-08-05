@@ -27,6 +27,7 @@ io::HDF5ArraysetCodec::HDF5ArraysetCodec()
   : m_name("hdf5.arrayset.binary"),
     m_extensions()
 { 
+  m_extensions.push_back(".h5");
   m_extensions.push_back(".hdf5");
 }
 
@@ -39,8 +40,8 @@ void io::HDF5ArraysetCodec::peek(const std::string& filename,
   std::vector<std::string> paths;
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "arrayset");
-  const std::string& name = paths[0];
-  const io::HDF5Type& descr = f.describe(name);
+  const io::HDF5Descriptor& h5descr = f.describe(paths[0]).at(0);
+  const io::HDF5Type& descr = h5descr.type;
   eltype = descr.element_type(); 
   if (eltype == Torch::core::array::t_unknown) {
     throw io::UnsupportedTypeError(eltype);
@@ -50,17 +51,18 @@ void io::HDF5ArraysetCodec::peek(const std::string& filename,
     throw io::DimensionError(ndim, Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
   }
   for (size_t i=0; i<ndim; ++i) shape[i] = descr.shape()[i];
-  samples = f.size(name);
+  samples = h5descr.size;
 }
 
 template <typename T, int N>
 static io::detail::InlinedArraysetImpl read_arrayset (io::HDF5File& f,
     const std::string& path) {
-  const io::HDF5Type& descr = f.describe(path);
+  const io::HDF5Descriptor& h5descr = f.describe(path).at(0);
+  const io::HDF5Type& descr = h5descr.type;
   blitz::TinyVector<int,N> shape;
   descr.shape().set(shape);
   io::detail::InlinedArraysetImpl retval;
-  for (size_t i=0; i<f.size(path); ++i) {
+  for (size_t i=0; i<h5descr.size; ++i) {
     blitz::Array<T,N> tmp(shape);
     f.readArray(path, i, tmp);
     retval.add(io::Array(tmp));
@@ -83,7 +85,7 @@ io::detail::InlinedArraysetImpl io::HDF5ArraysetCodec::load
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/arrayset");
   const std::string& name = paths[0];
-  const io::HDF5Type& descr = f.describe(name);
+  const io::HDF5Type& descr = f.describe(name).at(0).type;
   switch (descr.element_type()) {
     case Torch::core::array::t_bool: 
       DIMSWITCH(bool) 
@@ -141,7 +143,7 @@ io::detail::InlinedArraysetImpl io::HDF5ArraysetCodec::load
 template <typename T, int N>
 static io::Array read_array (io::HDF5File& f, const std::string& path, 
     size_t pos) {
-  const io::HDF5Type& descr = f.describe(path);
+  const io::HDF5Type& descr = f.describe(path).at(0).type;
   blitz::TinyVector<int,N> shape;
   descr.shape().set(shape);
   blitz::Array<T,N> retval(shape);
@@ -164,8 +166,9 @@ io::Array io::HDF5ArraysetCodec::load
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/arrayset");
   const std::string& name = paths[0];
-  if (id >= f.size(name)) throw io::IndexError(id);
-  const io::HDF5Type& descr = f.describe(name);
+  const io::HDF5Descriptor& h5descr = f.describe(name).at(0);
+  if (id >= h5descr.size) throw io::IndexError(id);
+  const io::HDF5Type& descr = h5descr.type;
   //then we do a normal array readout, as in an ArrayCodec.load()
   switch (descr.element_type()) {
     case Torch::core::array::t_bool: 

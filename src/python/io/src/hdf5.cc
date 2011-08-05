@@ -61,6 +61,8 @@ static tuple hdf5type_shape(const io::HDF5Type& t) {
       return make_tuple(shape[0], shape[1], shape[2]);
     case 4:
       return make_tuple(shape[0], shape[1], shape[2], shape[3]);
+    case 5:
+      return make_tuple(shape[0], shape[1], shape[2], shape[3], shape[4]);
     default:
       break;
   }
@@ -76,6 +78,17 @@ static list hdf5file_paths(const io::HDF5File& f) {
   f.paths(values);
   for (size_t i=0; i<values.size(); ++i) retval.append(str(values[i]));
   return retval;
+}
+
+/**
+ * Returns tuples for the description of all possible ways to read a certain
+ * path.
+ */
+static tuple hdf5file_describe(const io::HDF5File& f, const std::string& p) {
+  const std::vector<io::HDF5Descriptor>& dv = f.describe(p);
+  list retval;
+  for (size_t k=0; k<dv.size(); ++k) retval.append(dv[k]);
+  return tuple(retval);
 }
 
 /**
@@ -164,11 +177,16 @@ void bind_io_hdf5() {
     //DECLARE_BZ_SUPPORT(std::complex<long double>)
 #   undef DECLARE_BZ_SUPPORT
 #   undef DECLARE_SUPPORT
-    .def("is_array", &io::HDF5Type::is_array, (arg("self")), "Tests if this type is an array")
-    .def("__str__", &io::HDF5Type::str)
     .def("shape", &hdf5type_shape, (arg("self")), "Returns the shape of the elements described by this type")
     .def("type_str", &io::HDF5Type::type_str, (arg("self")), "Returns a stringified representation of the base element type")
     .def("element_type", &io::HDF5Type::element_type, (arg("self")), "Returns a representation of the element type one of the Torch supported element types.")
+    ;
+
+  //defines the descriptions returned by HDF5File::describe()
+  class_<io::HDF5Descriptor, boost::shared_ptr<io::HDF5Descriptor> >("HDF5Descriptor", "A dataset descriptor describes one of the possible ways to read a dataset", no_init)
+    .def_readonly("type", &io::HDF5Descriptor::type)
+    .def_readonly("size", &io::HDF5Descriptor::size)
+    .def_readonly("expandable", &io::HDF5Descriptor::expandable)
     ;
 
   //this is the main class
@@ -179,8 +197,7 @@ void bind_io_hdf5() {
     .add_property("cwd", make_function(&io::HDF5File::cwd, return_value_policy<copy_const_reference>()), &io::HDF5File::cd)
     .def("__contains__", &io::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
     .def("has_key", &io::HDF5File::contains, (arg("self"), arg("key")), "Returns True if the file contains an HDF5 dataset with a given path")
-    .def("describe", &io::HDF5File::describe, return_value_policy<copy_const_reference>(), (arg("self"), arg("key")), "If a given path to an HDF5 dataset exists inside the file, return a type description of objects recorded in such a dataset, otherwise, raises an exception.")
-    .def("size", &io::HDF5File::size, (arg("self"), arg("key")), "Returns the number of objects stored in this dataset")
+    .def("describe", &hdf5file_describe, (arg("self"), arg("key")), "If a given path to an HDF5 dataset exists inside the file, return a type description of objects recorded in such a dataset, otherwise, raises an exception. The returned value type is a tuple of tuples (HDF5Type, number-of-objects, expandible) describing the capabilities if the file is read using theses formats.")
     .def("unlink", &io::HDF5File::unlink, (arg("self"), arg("key")), "If a given path to an HDF5 dataset exists inside the file, unlinks it. Please note this will note remove the data from the file, just make it inaccessible. If you wish to cleanup, save the reacheable objects from this file to another HDF5File object using copy(), for example.")
     .def("rename", &io::HDF5File::rename, (arg("self"), arg("from"), arg("to")), "If a given path to an HDF5 dataset exists in the file, rename it")
     .def("keys", &hdf5file_paths, (arg("self")), "Returns all paths to datasets available inside this file")
@@ -210,8 +227,8 @@ void bind_io_hdf5() {
 #   undef DECLARE_SUPPORT
 #   define DECLARE_SUPPORT(T,N) .def("__read_array__", &hdf5file_read_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
     .def("__replace_array__", &hdf5file_replace_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
-    .def("__append_array__", &hdf5file_append_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created, you can also set the compression level. Note this setting has no effect if the Dataset already exists on file, in which case the current setting for that dataset is respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") \
-    .def("__set_array__", &hdf5file_set_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, we append the new array.\n\nIf a new Dataset is to be created, you can also set the compression level. Note this setting has no effect if the Dataset already exists on file, in which case the current setting for that dataset is respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") 
+    .def("__append_array__", &hdf5file_append_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created you can set its compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") \
+    .def("__set_array__", &hdf5file_set_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, you can set the compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") 
 #   define DECLARE_BZ_SUPPORT(T) \
     DECLARE_SUPPORT(T,1) \
     DECLARE_SUPPORT(T,2) \

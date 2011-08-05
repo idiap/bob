@@ -10,7 +10,6 @@
 #include <boost/make_shared.hpp>
 
 #include "io/HDF5Types.h"
-#include "io/HDF5Utils.h"
 #include "io/HDF5Exception.h"
 
 namespace io = Torch::io;
@@ -113,8 +112,10 @@ io::HDF5Error::~HDF5Error() {
 
 io::HDF5Shape::HDF5Shape (size_t n):
   m_n(n),
-  m_shape(new hsize_t[n])
+  m_shape()
 {
+  if (n > MAX_HDF5SHAPE_SIZE) 
+    throw std::length_error("maximum number of dimensions exceeded");
   for (size_t i=0; i<n; ++i) m_shape[i] = 0;
 }
 
@@ -126,7 +127,7 @@ io::HDF5Shape::HDF5Shape ():
 
 io::HDF5Shape::HDF5Shape (const io::HDF5Shape& other):
   m_n(other.m_n),
-  m_shape(new hsize_t[m_n])
+  m_shape()
 {
   for (size_t i=0; i<m_n; ++i) m_shape[i] = other.m_shape[i];
 }
@@ -136,7 +137,6 @@ io::HDF5Shape::~HDF5Shape() {
 
 io::HDF5Shape& io::HDF5Shape::operator= (const io::HDF5Shape& other) {
   m_n = other.m_n;
-  m_shape.reset(new hsize_t[m_n]);
   for (size_t i=0; i<m_n; ++i) m_shape[i] = other.m_shape[i];
   return *this;
 }
@@ -152,18 +152,22 @@ void io::HDF5Shape::copy(const io::HDF5Shape& other) {
 
 void io::HDF5Shape::reset() {
   m_n = 0;
-  m_shape.reset();
 }
 
 io::HDF5Shape& io::HDF5Shape::operator <<= (size_t pos) {
-  for (size_t i=0; i<(m_n-1); ++i) m_shape[i] = m_shape[i+1];
-  m_n -= 1;
+  if (!m_n || !pos) return *this;
+  for (size_t i=0; i<(m_n-pos); ++i) m_shape[i] = m_shape[i+pos];
+  m_n -= pos;
   return *this;
 }
 
 io::HDF5Shape& io::HDF5Shape::operator >>= (size_t pos) {
-  for (size_t i=(m_n-1); i>0; --i) m_shape[i] = m_shape[i-1];
-  m_shape[0] = 0;
+  if (!pos) return *this;
+  if ( (m_n + pos) > MAX_HDF5SHAPE_SIZE) 
+    throw std::length_error("maximum number of dimensions will exceed");
+  for (size_t i=(m_n+pos-1); i>(pos-1); --i) m_shape[i] = m_shape[i-1];
+  for (size_t i=0; i<pos; ++i) m_shape[i] = 1;
+  m_n += pos;
   return *this;
 }
 
@@ -184,8 +188,8 @@ bool io::HDF5Shape::operator!= (const HDF5Shape& other) const {
 }
 
 std::string io::HDF5Shape::str () const {
+  if (m_n == 0) return "";
   std::ostringstream retval("");
-  if (!m_n) return retval.str();
   retval << m_shape[0];
   for (size_t i=1; i<m_n; ++i) retval << ", " << m_shape[i];
   return retval.str();
@@ -415,10 +419,7 @@ boost::shared_ptr<hid_t> io::HDF5Type::htype() const {
 }
   
 #define DEFINE_SUPPORT(T,E) io::HDF5Type::HDF5Type(const T& value): \
-    m_type(E), \
-    m_shape(1) { \
-      m_shape[0] = 1; \
-    }
+    m_type(E), m_shape(1) { m_shape[0] = 1; }
 DEFINE_SUPPORT(bool,io::u8)
 DEFINE_SUPPORT(int8_t,io::i8)
 DEFINE_SUPPORT(int16_t,io::i16)
@@ -468,13 +469,31 @@ DEFINE_BZ_SUPPORT(std::complex<double>,io::c128)
 DEFINE_BZ_SUPPORT(std::complex<long double>,io::c256)
 #undef DEFINE_BZ_SUPPORT
 #undef DEFINE_SUPPORT
+      
+io::HDF5Type::HDF5Type():
+  m_type(io::unsupported),
+  m_shape()
+{
+}
+
+io::HDF5Type::HDF5Type(io::hdf5type type):
+  m_type(type),
+  m_shape(1)
+{
+  m_shape[0] = 1;
+}
+
+io::HDF5Type::HDF5Type(io::hdf5type type, const io::HDF5Shape& extents):
+  m_type(type),
+  m_shape(extents)
+{
+}
 
 io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type,
     const io::HDF5Shape& extents):
   m_type(get_datatype(type)),
   m_shape(extents)
 {
-  m_shape <<= 1;
 }
 
 io::HDF5Type::HDF5Type(const HDF5Type& other):
@@ -540,4 +559,42 @@ Torch::core::array::ElementType io::HDF5Type::element_type() const {
       break;
   }
   return Torch::core::array::t_unknown;
+}
+      
+io::HDF5Descriptor::HDF5Descriptor(const HDF5Type& type, size_t size, 
+          bool expand):
+  type(type), 
+  size(size),
+  expandable(expand),
+  hyperslab_start(type.shape().n()),
+  hyperslab_count(type.shape())
+{
+}
+
+io::HDF5Descriptor::HDF5Descriptor(const HDF5Descriptor& other):
+  type(other.type),
+  size(other.size),
+  expandable(other.expandable),
+  hyperslab_start(other.hyperslab_start),
+  hyperslab_count(other.hyperslab_count)
+{
+}
+
+io::HDF5Descriptor::~HDF5Descriptor() { }
+
+io::HDF5Descriptor& io::HDF5Descriptor::operator=
+(const io::HDF5Descriptor& other) {
+  type = other.type;
+  size = other.size;
+  expandable = other.expandable;
+  hyperslab_start = other.hyperslab_start;
+  hyperslab_count = other.hyperslab_count;
+  return *this;
+}
+
+io::HDF5Descriptor& io::HDF5Descriptor::subselect() {
+  hyperslab_start >>= 1;
+  hyperslab_count >>= 1;
+  hyperslab_count[0] = 1;
+  return *this;
 }

@@ -183,10 +183,10 @@ class MLPTest(unittest.TestCase):
 
     m = torch.machine.MLP(torch.io.HDF5File(COMPLICATED))
     data = torch.io.HDF5File(COMPLICATED_OUTPUT)
-    input = torch.core.array.float64_2(data.size('pattern'), 
-        data.describe('pattern').shape()[0])
-    target = torch.core.array.float64_2(data.size('result'), 
-        data.describe('result').shape()[0])
+    pat_descr = data.describe('pattern')[0]
+    input = torch.core.array.float64_2(pat_descr.size, pat_descr.type.shape()[0])
+    res_descr = data.describe('result')[0]
+    target = torch.core.array.float64_2(res_descr.size, res_descr.type.shape()[0])
     for i, (pattern, expected) in enumerate(zip(data.read("pattern"), data.read("result"))):
       input[i,:] = pattern
       target[i,:] = expected

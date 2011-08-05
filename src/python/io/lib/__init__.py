@@ -241,33 +241,60 @@ def hdf5type_array_class(self):
 HDF5Type.array_class = hdf5type_array_class
 del hdf5type_array_class
 
-def hdf5file_read(self, path, pos=-1):
+def hdf5type_str(self):
+  return "%s@%s" % (self.type_str(), self.shape())
+HDF5Type.__str__ = hdf5type_str
+
+def hdf5type_repr(self):
+  return "<HDF5Type: %s (0x%x)>" % (str(self), id(self))
+HDF5Type.__repr__ = hdf5type_repr
+del hdf5type_repr
+
+def hdf5file_read(self, path, pos=-1, fmt=0):
   """Reads elements from the current file.
   
-  Parameters:
-  path -- This is the path to the HDF5 dataset to read data from
-  pos -- This is the position in the dataset to readout. If the given value is
-  smaller than zero, we read all positions in the dataset and return you a
-  list. If the position is specific, we return a single element.
+  Keyword Parameters:
+
+  path
+    This is the path to the HDF5 dataset to read data from
+
+  pos
+    This is the position in the dataset to readout. If the given value is
+    smaller than zero, we read all positions in the dataset and return you a
+    list. If the position is specific, we return a single element.
+
+  fmt
+    If set, read the data using the alternative output format. You can find
+    what such formats are using my describe() method. The default format is the
+    first entry. The alternate formats are the following entries.
   """
+
   dtype = self.describe(path)
-  if dtype.is_array():
-    if pos < 0: # read all
-      return [self.read(path, k) for k in range(self.size(path))]
-    else:
-      retval = dtype.array_class()(dtype.shape())
+  
+  def read_scalar_or_array(self, path, descr, pos):
+    if descr.shape() == (1,):  # read as scalar
+      return getattr(self, '__read_%s__' % descr.type_str())(path, pos)
+
+    else: # read as array
+      retval = descr.array_class()(descr.shape())
       self.__read_array__(path, pos, retval)
       return retval
+
+  if pos < 0: # read all -- recurse
+    return [read_scalar_or_array(self, path, dtype[fmt].type, k) for k in range(dtype[fmt].size)]
+
   else:
-    if pos < 0: # read all
-      return [self.read(path, k) for k in range(self.size(path))]
-    else:
-      return getattr(self, '__read_%s__' % dtype.type_str())(path, pos)
+    return read_scalar_or_array(self, path, dtype[fmt].type, pos)
+
 HDF5File.read = hdf5file_read
 del hdf5file_read
 
 def hdf5file_append(self, path, data, compression=0, dtype=None):
-  """Appends data to a certain HDF5 dataset in this file.
+  """Appends data to a certain HDF5 dataset in this file. When you append data
+  to a dataset and such dataset does not yet exist, it is created with an extra
+  dimension to accomodate an unlimited number of appends. If you wish to have a
+  single element of the type, you are better off using set() instead of this
+  method.
 
   Parameters:
 
@@ -316,13 +343,18 @@ def hdf5file_append(self, path, data, compression=0, dtype=None):
     if dtype is None: dtype = best_type(data[0])
     meth = getattr(self, '__append_%s__' % dtype)
     for k in data: meth(path, k)
+
 HDF5File.append = hdf5file_append
 del hdf5file_append
 
 def hdf5file_set(self, path, data, compression=0, dtype=None):
   """Sets the scalar or array at position 0 to the given value. This method is
   equivalent to checking if the scalar/array at position 0 exists and then
-  replacing it. If the path does not exist, we append the new scalar/value.
+  replacing it. If the path does not exist, we create the new scalar/array.
+  In the case the dataset does not exist, a new dataset is created to
+  accomodated your input value. This dataset will not accept expansion and you
+  will not be able to append() to it. If you wish it behaves like that, use
+  append() instead of this method.
 
   Parameters:
 
@@ -370,6 +402,7 @@ def hdf5file_set(self, path, data, compression=0, dtype=None):
     if dtype is None: dtype = best_type(data[0])
     meth = getattr(self, '__set_%s__' % dtype)
     for k in data: meth(path, k)
+
 HDF5File.set = hdf5file_set
 del hdf5file_set
 

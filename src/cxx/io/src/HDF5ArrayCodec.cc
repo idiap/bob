@@ -24,10 +24,27 @@ static bool register_codec() {
 static bool codec_registered = register_codec();
 static boost::shared_ptr<io::HDF5Error> init = io::HDF5Error::instance();
 
+/**
+ * Chooses the best format to read from.
+ *
+ * If the size on the descriptor is bigger than 1, the user is reading either
+ * an arrayset or an HDF5 produced outside torch. In this particular case, read
+ * everything in one shot.
+ */
+static const io::HDF5Descriptor& 
+choose_format(const std::vector<io::HDF5Descriptor>& fmt) {
+  size_t def = 0; ///< by default, we use the first format
+
+  if (fmt.at(def).size > 1) def += 1;
+
+  return fmt.at(def);
+}
+
 io::HDF5ArrayCodec::HDF5ArrayCodec()
   : m_name("hdf5.array.binary"),
     m_extensions()
 { 
+  m_extensions.push_back(".h5");
   m_extensions.push_back(".hdf5");
 }
 
@@ -40,9 +57,8 @@ void io::HDF5ArrayCodec::peek(const std::string& filename,
   std::vector<std::string> paths;
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/array");
-  const std::string& name = paths[0];
-  const io::HDF5Type& descr = f.describe(name);
-  eltype = descr.element_type(); 
+  const io::HDF5Type& descr = choose_format(f.describe(paths[0])).type;
+  eltype = descr.element_type();
   if (eltype == Torch::core::array::t_unknown) {
     throw io::UnsupportedTypeError(eltype);
   }
@@ -56,7 +72,7 @@ void io::HDF5ArrayCodec::peek(const std::string& filename,
 template <typename T, int N>
 static io::detail::InlinedArrayImpl read_array (io::HDF5File& f,
     const std::string& path) {
-  const io::HDF5Type& descr = f.describe(path);
+  const io::HDF5Type& descr = choose_format(f.describe(path)).type;
   blitz::TinyVector<int,N> shape;
   descr.shape().set(shape);
   blitz::Array<T,N> retval(shape);
@@ -79,7 +95,7 @@ io::HDF5ArrayCodec::load(const std::string& filename) const {
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/array");
   const std::string& name = paths[0];
-  const io::HDF5Type& descr = f.describe(name);
+  const io::HDF5Type& descr = choose_format(f.describe(name)).type;
   switch (descr.element_type()) {
     case Torch::core::array::t_bool:
       DIMSWITCH(bool) 
@@ -135,10 +151,10 @@ io::HDF5ArrayCodec::load(const std::string& filename) const {
 #undef DIMSWITCH
 
 #define DIMSWITCH(T) switch(data.getNDim()) { \
-  case 1: f.appendArray(varname, data.get<T,1>()); break; \
-  case 2: f.appendArray(varname, data.get<T,2>()); break; \
-  case 3: f.appendArray(varname, data.get<T,3>()); break; \
-  case 4: f.appendArray(varname, data.get<T,4>()); break; \
+  case 1: f.setArray(varname, data.get<T,1>()); break; \
+  case 2: f.setArray(varname, data.get<T,2>()); break; \
+  case 3: f.setArray(varname, data.get<T,3>()); break; \
+  case 4: f.setArray(varname, data.get<T,4>()); break; \
   default: throw io::DimensionError(data.getNDim(), Torch::core::array::N_MAX_DIMENSIONS_ARRAY); \
 }
 

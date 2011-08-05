@@ -97,8 +97,8 @@ class HDF5FileTest(unittest.TestCase):
     # describe() method
     description = readonly.describe('testdata')
 
-    self.assertTrue(description.compatible(arrays[0]))
-    self.assertEqual(readonly.size('testdata'), N)
+    self.assertTrue(description[0].type.compatible(arrays[0]))
+    self.assertEqual(description[0].size, N)
 
     # Test that writing will really fail
     self.assertRaises(RuntimeError, readonly.append, "testdata", arrays[0])
@@ -268,8 +268,14 @@ class HDF5FileTest(unittest.TestCase):
     tmpname = get_tempfilename()
     array[:,0].save(tmpname, "hdf5.array.binary")
 
+  def test06_matlabImport(self):
+
+    # This test verifies we can import HDF5 datasets generated in Matlab
+    mfile = torch.io.HDF5File('matlab_1d.hdf5')
+    self.assertEqual ( mfile.paths(), ['/array'] )
+
 if __name__ == '__main__':
-  sys.argv.append('-v')
+  sys.argv.insert(1, '-v')
   if os.environ.has_key('TORCH_PROFILE') and \
       os.environ['TORCH_PROFILE'] and \
       hasattr(torch.core, 'ProfilerStart'):

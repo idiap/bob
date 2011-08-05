@@ -11,7 +11,11 @@
 #ifndef TORCH_IO_HDF5FILE_H 
 #define TORCH_IO_HDF5FILE_H
 
+#include <vector>
+
 #include <boost/ref.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/tuple/tuple.hpp>
 #include <boost/filesystem.hpp>
 
 #include "io/HDF5Utils.h"
@@ -87,7 +91,7 @@ namespace Torch { namespace io {
        * it is taken w.r.t. the current working directory, as returned by
        * cwd().
        */
-      const HDF5Type& describe (const std::string& path) const;
+      const std::vector<HDF5Descriptor>& describe (const std::string& path) const;
 
       /**
        * Unlinks a particular dataset from the file. Note that this will
@@ -103,11 +107,6 @@ namespace Torch { namespace io {
        * Renames an existing dataset
        */
       void rename (const std::string& from, const std::string& to);
-
-      /**
-       * Returns the number of elements stored in the given dataset
-       */
-      size_t size (const std::string& path) const;
 
       /**
        * Accesses all existing paths in one shot. Input has to be a std
@@ -272,7 +271,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value));
+              absolute, Torch::io::HDF5Type(value), true, 0);
         }
         m_index[absolute]->add(value);
       }
@@ -293,7 +292,7 @@ namespace Torch { namespace io {
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), compression);
+              absolute, Torch::io::HDF5Type(value), true, compression);
         }
         m_index[absolute]->addArray(value);
       }
@@ -305,8 +304,12 @@ namespace Torch { namespace io {
        */
       template <typename T> void set(const std::string& path, const T& value) {
         std::string absolute = resolve(path);
-        if (!contains(absolute)) append(path, value);
-        else replace(path, value);
+        if (!contains(absolute)) { //create dataset
+          m_index[absolute] =
+            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
+              absolute, Torch::io::HDF5Type(value), false, 0);
+        }
+        m_index[absolute]->replace(0, value);
       }
 
       /**
@@ -323,8 +326,12 @@ namespace Torch { namespace io {
       template <typename T> void setArray(const std::string& path,
           const T& value, size_t compression=0) {
         std::string absolute = resolve(path);
-        if (!contains(absolute)) appendArray(path, value, compression);
-        else replaceArray(path, value);
+        if (!contains(absolute)) { //create dataset
+          m_index[absolute] =
+            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
+              absolute, Torch::io::HDF5Type(value), false, compression);
+        }
+        m_index[absolute]->replaceArray(0, value);
       }
       
     private: //not implemented

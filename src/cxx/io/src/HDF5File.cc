@@ -80,10 +80,12 @@ bool io::HDF5File::contains (const std::string& path) const {
   return m_index.find(resolve(path)) != m_index.end();
 }
 
-const io::HDF5Type& io::HDF5File::describe (const std::string& path) const {
+const std::vector<io::HDF5Descriptor>& io::HDF5File::describe 
+(const std::string& path) const {
   std::string absolute = resolve(path);
-  if (!contains(path)) throw io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-  return m_index.find(absolute)->second->m_type;
+  if (!contains(path)) 
+    throw io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+  return m_index.find(absolute)->second->m_descr;
 }
 
 void io::HDF5File::unlink (const std::string& path) {
@@ -103,12 +105,6 @@ void io::HDF5File::rename (const std::string& from, const std::string& to) {
   m_index.erase(absfrom);
 }
 
-size_t io::HDF5File::size (const std::string& path) const {
-  std::string absolute = resolve(path);
-  if (!contains(absolute)) throw io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-  return m_index.find(absolute)->second->size();
-}
-      
 void io::HDF5File::copy (HDF5File& other) {
   //TODO
 }
