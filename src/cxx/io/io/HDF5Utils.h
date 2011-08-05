@@ -43,17 +43,6 @@
 #include "io/HDF5Exception.h"
 #include "io/HDF5Types.h"
 
-/**
- * Checks if the version of HDF5 installed is greater or equal to some set of
- * values. (extracted from hdf5-1.8.7)
- */
-#ifndef H5_VERSION_GE
-#define H5_VERSION_GE(Maj,Min,Rel) \
- (((H5_VERS_MAJOR==Maj) && (H5_VERS_MINOR==Min) && (H5_VERS_RELEASE>=Rel)) || \
-  ((H5_VERS_MAJOR==Maj) && (H5_VERS_MINOR>Min)) || \
-  (H5_VERS_MAJOR>Maj))
-#endif
-
 namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
   //Forward declaration for File
