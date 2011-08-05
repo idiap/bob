@@ -266,12 +266,12 @@ namespace Torch { namespace io {
        * is created with the type characteristics. Relative paths are accepted.
        */
       template <typename T> void append(const std::string& path,
-          const T& value, bool list=true) {
+          const T& value) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), list, 0);
+              absolute, Torch::io::HDF5Type(value), true, 0);
         }
         m_index[absolute]->add(value);
       }
@@ -287,12 +287,12 @@ namespace Torch { namespace io {
        * of zero turns compression off (the default).
        */
       template <typename T> void appendArray(const std::string& path,
-          const T& value, bool list=true, size_t compression=0) {
+          const T& value, size_t compression=0) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) { //create dataset
           m_index[absolute] =
             boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-              absolute, Torch::io::HDF5Type(value), list, compression);
+              absolute, Torch::io::HDF5Type(value), true, compression);
         }
         m_index[absolute]->addArray(value);
       }
@@ -302,11 +302,14 @@ namespace Torch { namespace io {
        * equivalent to checking if the scalar at position 0 exists and then
        * replacing it. If the path does not exist, we append the new scalar.
        */
-      template <typename T> void set(const std::string& path, const T& value,
-          bool list=false) {
+      template <typename T> void set(const std::string& path, const T& value) {
         std::string absolute = resolve(path);
-        if (!contains(absolute)) append(path, value, list);
-        else replace(path, value);
+        if (!contains(absolute)) { //create dataset
+          m_index[absolute] =
+            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
+              absolute, Torch::io::HDF5Type(value), false, 0);
+        }
+        m_index[absolute]->replace(0, value);
       }
 
       /**
@@ -321,10 +324,14 @@ namespace Torch { namespace io {
        * of zero turns compression off (the default).
        */
       template <typename T> void setArray(const std::string& path,
-          const T& value, bool list=false, size_t compression=0) {
+          const T& value, size_t compression=0) {
         std::string absolute = resolve(path);
-        if (!contains(absolute)) appendArray(path, value, list, compression);
-        else replaceArray(path, value);
+        if (!contains(absolute)) { //create dataset
+          m_index[absolute] =
+            boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
+              absolute, Torch::io::HDF5Type(value), false, compression);
+        }
+        m_index[absolute]->replaceArray(0, value);
       }
       
     private: //not implemented

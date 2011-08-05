@@ -289,8 +289,12 @@ def hdf5file_read(self, path, pos=-1, fmt=0):
 HDF5File.read = hdf5file_read
 del hdf5file_read
 
-def hdf5file_append(self, path, data, as_list=True, compression=0, dtype=None):
-  """Appends data to a certain HDF5 dataset in this file.
+def hdf5file_append(self, path, data, compression=0, dtype=None):
+  """Appends data to a certain HDF5 dataset in this file. When you append data
+  to a dataset and such dataset does not yet exist, it is created with an extra
+  dimension to accomodate an unlimited number of appends. If you wish to have a
+  single element of the type, you are better off using set() instead of this
+  method.
 
   Parameters:
 
@@ -301,13 +305,6 @@ def hdf5file_append(self, path, data, as_list=True, compression=0, dtype=None):
     This is the data that will be appended. If this element is an
     interable element (list or tuple), we will append all elements in such
     iterable.
-
-  as_list
-    This setting defaults to 'True' which means to create (if necessary) the
-    dataset to support a list of the given data type as opposed to a single
-    entry. If you set that to false you will only be allowed to append a value
-    to the current arrayset once. A more convinient way to do this is to use
-    the append() method instead of set().
 
   compression
     If the append instruction creates a new Dataset inside the file, the value
@@ -340,20 +337,24 @@ def hdf5file_append(self, path, data, as_list=True, compression=0, dtype=None):
   if not isinstance(data, (list, tuple)): data = [data]
 
   if array.is_blitz_array(data[0]):
-    for k in data: self.__append_array__(path, k, as_list, compression)
+    for k in data: self.__append_array__(path, k, compression)
 
   else: #is scalar, in which case the user may have given a dtype
     if dtype is None: dtype = best_type(data[0])
     meth = getattr(self, '__append_%s__' % dtype)
-    for k in data: meth(path, k, as_list)
+    for k in data: meth(path, k)
 
 HDF5File.append = hdf5file_append
 del hdf5file_append
 
-def hdf5file_set(self, path, data, as_list=False, compression=0, dtype=None):
+def hdf5file_set(self, path, data, compression=0, dtype=None):
   """Sets the scalar or array at position 0 to the given value. This method is
   equivalent to checking if the scalar/array at position 0 exists and then
-  replacing it. If the path does not exist, we append the new scalar/value.
+  replacing it. If the path does not exist, we create the new scalar/array.
+  In the case the dataset does not exist, a new dataset is created to
+  accomodated your input value. This dataset will not accept expansion and you
+  will not be able to append() to it. If you wish it behaves like that, use
+  append() instead of this method.
 
   Parameters:
 
@@ -363,13 +364,6 @@ def hdf5file_set(self, path, data, as_list=False, compression=0, dtype=None):
   data
     This is the data that will be set. If this element is an interable element
     (list or tuple), we will set all elements in such iterable.
-
-  as_list
-    This setting defaults to 'False' which means to create (if necessary) the
-    dataset to support a list of the given data type as opposed to a single
-    entry. If you set that to True you will be allowed to append more values to
-    this dataset instead of just this one. A more convinient way to do this is
-    to use the append() method instead of set().
 
   compression
     If the set instruction creates a new Dataset inside the file, the value
@@ -402,12 +396,12 @@ def hdf5file_set(self, path, data, as_list=False, compression=0, dtype=None):
   if not isinstance(data, (list, tuple)): data = [data]
 
   if array.is_blitz_array(data[0]):
-    for k in data: self.__set_array__(path, k, as_list, compression)
+    for k in data: self.__set_array__(path, k, compression)
 
   else: #is scalar, in which case the user may have given a dtype
     if dtype is None: dtype = best_type(data[0])
     meth = getattr(self, '__set_%s__' % dtype)
-    for k in data: meth(path, k, as_list)
+    for k in data: meth(path, k)
 
 HDF5File.set = hdf5file_set
 del hdf5file_set
