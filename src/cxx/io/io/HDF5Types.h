@@ -479,6 +479,53 @@ namespace Torch { namespace io {
 
   };
 
+  /**
+   * Describes ways to read a Dataset.
+   */
+  struct HDF5Descriptor {
+
+    public: //api
+
+      /**
+       * Constructor
+       */
+      HDF5Descriptor(const HDF5Type& type, size_t size = 0, bool expand = true);
+
+      /**
+       * Copy constructor
+       */
+      HDF5Descriptor(const HDF5Descriptor& other);
+
+      /**
+       * Virtual destructor
+       */
+      virtual ~HDF5Descriptor();
+
+      /**
+       * Assignment
+       */
+      HDF5Descriptor& operator= (const HDF5Descriptor& other);
+
+      /**
+       * Setup myself as I was supposed to be read from a space with N+1
+       * dimensions.
+       */
+      HDF5Descriptor& subselect();
+
+    public: //representation
+
+      HDF5Type type; ///< base type for read/write operations
+      size_t size; ///< number of objects of this type stored at dataset
+      bool expandable; ///< is this dataset expandable using this type?
+
+      /**
+       * Variables required for fast read/write operations.
+       */
+      HDF5Shape hyperslab_start; ///< offset to read/write operations
+      HDF5Shape hyperslab_count; ///< count for read/write operations
+
+  };
+
 }}
 
 #endif /* TORCH_IO_HDF5TYPES_H */

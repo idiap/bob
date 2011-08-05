@@ -41,10 +41,7 @@ void io::HDF5ArrayCodec::peek(const std::string& filename,
   std::vector<std::string> paths;
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/array");
-  const std::string& name = paths[0];
-  io::HDF5File::description_t defdescr;
-  f.describe(name, defdescr);
-  io::HDF5Type& descr = boost::get<0>(defdescr);
+  const io::HDF5Type& descr = f.describe(paths[0]).at(0).type;
   eltype = descr.element_type();
   if (eltype == Torch::core::array::t_unknown) {
     throw io::UnsupportedTypeError(eltype);
@@ -59,9 +56,7 @@ void io::HDF5ArrayCodec::peek(const std::string& filename,
 template <typename T, int N>
 static io::detail::InlinedArrayImpl read_array (io::HDF5File& f,
     const std::string& path) {
-  io::HDF5File::description_t defdescr;
-  f.describe(path, defdescr);
-  io::HDF5Type& descr = boost::get<0>(defdescr); ///< default description
+  const io::HDF5Type& descr = f.describe(path).at(0).type;
   blitz::TinyVector<int,N> shape;
   descr.shape().set(shape);
   blitz::Array<T,N> retval(shape);
@@ -84,9 +79,7 @@ io::HDF5ArrayCodec::load(const std::string& filename) const {
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/array");
   const std::string& name = paths[0];
-  io::HDF5File::description_t defdescr;
-  f.describe(name, defdescr);
-  io::HDF5Type& descr = boost::get<0>(defdescr);
+  const io::HDF5Type& descr = f.describe(name).at(0).type;
   switch (descr.element_type()) {
     case Torch::core::array::t_bool:
       DIMSWITCH(bool) 

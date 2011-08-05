@@ -44,15 +44,6 @@ namespace Torch { namespace io {
         excl = 4 //H5F_ACC_EXCL    < if file exists, raise, otherwise == inout
       } mode_t;
 
-      /**
-       * A precise description of a certain supported type in a dataset.
-       *
-       * [0] => the dataset type and shape of each element
-       * [1] => the number of elements in the dataset
-       * [2] => is this dataset expandible using this type?
-       */
-      typedef boost::tuple<HDF5Type, size_t, bool> description_t;
-
     public: //api
 
       /**
@@ -100,14 +91,7 @@ namespace Torch { namespace io {
        * it is taken w.r.t. the current working directory, as returned by
        * cwd().
        */
-      void describe (const std::string& path, 
-          std::vector<description_t>& description) const;
-
-      /**
-       * Describes the default binding type for a given dataset.
-       */
-      void describe (const std::string& path,
-          description_t& description) const;
+      const std::vector<HDF5Descriptor>& describe (const std::string& path) const;
 
       /**
        * Unlinks a particular dataset from the file. Note that this will

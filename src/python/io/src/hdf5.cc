@@ -85,12 +85,10 @@ static list hdf5file_paths(const io::HDF5File& f) {
  * path.
  */
 static tuple hdf5file_describe(const io::HDF5File& f, const std::string& p) {
-  std::vector<io::HDF5File::description_t> dv;
-  f.describe(p, dv);
+  const std::vector<io::HDF5Descriptor>& dv = f.describe(p);
   list retval;
   for (size_t k=0; k<dv.size(); ++k) {
-    retval.append(make_tuple(boost::get<0>(dv[k]), boost::get<1>(dv[k]),
-          boost::get<2>(dv[k])));
+    retval.append(make_tuple(dv[k].type, dv[k].size, dv[k].expandable));
   }
   return tuple(retval);
 }

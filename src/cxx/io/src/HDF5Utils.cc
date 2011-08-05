@@ -94,6 +94,11 @@ static boost::shared_ptr<hid_t> open_memspace(const io::HDF5Type& t) {
   return retval;
 }
 
+static void set_memspace(boost::shared_ptr<hid_t> s, const io::HDF5Type& t) {
+  herr_t status = H5Sset_extent_simple(*s, t.shape().n(), t.shape().get(), 0);
+  if (status < 0) throw io::HDF5StatusError("H5Sset_extent_simple", status);
+}
+
 /**
  * Figures out if a dataset is expandible
  */
@@ -128,27 +133,17 @@ static io::HDF5Shape get_extents(boost::shared_ptr<hid_t>& space) {
  * read/write this dataset.
  */
 static void reset_compatibility_list(boost::shared_ptr<hid_t>& space,
-    const io::HDF5Type& file_base, std::vector<h5::Dataset::type_t>& type) {
+    const io::HDF5Type& file_base, std::vector<io::HDF5Descriptor>& descr) {
 
-  type.clear();
-  
   if (!file_base.shape()) throw std::length_error("empty HDF5 dataset");
 
+  descr.clear();
+
   switch (file_base.shape().n()) {
+
     case 1: ///< file type has 1 dimension
-      {
-        //by default, read it as a scalar
-        io::HDF5Type scalar(file_base.type());
-        io::HDF5Shape offset(1);
-        io::HDF5Shape count(1); count[0] = 1;
-        type.push_back( make_tuple(scalar,
-                                   file_base.shape()[0],
-                                   is_extensible(space), 
-                                   offset, 
-                                   count,
-                                   open_memspace(scalar))
-                      );
-      }
+      descr.push_back(io::HDF5Descriptor(file_base.type(),
+            file_base.shape()[0], is_extensible(space)));
       break;
 
     case 2:
@@ -156,36 +151,19 @@ static void reset_compatibility_list(boost::shared_ptr<hid_t>& space,
     case 4:
     case 5:
       {
-        //can also read it as a single, expandible 1D blitz array
         io::HDF5Shape alt = file_base.shape();
         alt <<= 1; ///< contract shape
-        io::HDF5Type array(file_base.type(), alt);
-        io::HDF5Shape offset(file_base.shape().n());
-        io::HDF5Shape count(file_base.shape()); count[0] = 1;
-        type.push_back( make_tuple(array,
-                                   file_base.shape()[0],
-                                   is_extensible(space), 
-                                   offset, 
-                                   count,
-                                   open_memspace(array)) 
-                      );
+        descr.push_back(io::HDF5Descriptor(io::HDF5Type(file_base.type(), alt),
+              file_base.shape()[0], is_extensible(space)).subselect());
       }
       break;
 
     default:
-
       throw io::HDF5UnsupportedDimensionError(file_base.shape().n());
   }
 
   //can always read the data as a single, non-expandible array
-  type.push_back( make_tuple(file_base, 
-                             1, 
-                             false,
-                             io::HDF5Shape(file_base.shape().n()),
-                             file_base.shape(),
-                             open_memspace(file_base))
-                );
-
+  descr.push_back(io::HDF5Descriptor(file_base, 1, false));
 }
 
 h5::Dataset::Dataset(boost::shared_ptr<h5::File>& f,
@@ -195,10 +173,12 @@ h5::Dataset::Dataset(boost::shared_ptr<h5::File>& f,
   m_id(open_dataset(m_parent, m_path)),
   m_dt(open_datatype(m_parent, m_path, m_id)),
   m_filespace(open_filespace(m_parent, m_path, m_id)),
-  m_type()
+  m_descr(),
+  m_memspace()
 {
   io::HDF5Type type(m_dt, get_extents(m_filespace));
-  reset_compatibility_list(m_filespace, type, m_type);
+  reset_compatibility_list(m_filespace, type, m_descr);
+  m_memspace = open_memspace(m_descr[0].type);
 }
 
 /**
@@ -272,7 +252,8 @@ h5::Dataset::Dataset(boost::shared_ptr<File>& f,
   m_id(),
   m_dt(),
   m_filespace(),
-  m_type()
+  m_descr(),
+  m_memspace()
 {
   //First, we test to see if we can find the named dataset.
   io::HDF5Error::mute();
@@ -286,55 +267,59 @@ h5::Dataset::Dataset(boost::shared_ptr<File>& f,
   m_dt = open_datatype(m_parent, m_path, m_id);
   m_filespace = open_filespace(m_parent, m_path, m_id);
   io::HDF5Type file_type(m_dt, get_extents(m_filespace));
-  reset_compatibility_list(m_filespace, file_type, m_type);
+  reset_compatibility_list(m_filespace, file_type, m_descr);
+  m_memspace = open_memspace(m_descr[0].type);
 }
 
 h5::Dataset::~Dataset() { }
 
 size_t h5::Dataset::size () const {
-  return boost::get<1>(m_type[0]);
+  return m_descr[0].size;
 }
 
 size_t h5::Dataset::size (const io::HDF5Type& type) const {
-  for (size_t k=0; k<m_type.size(); ++k) {
-    if (boost::get<0>(m_type[k]) == type) return boost::get<1>(m_type[k]);
+  for (size_t k=0; k<m_descr.size(); ++k) {
+    if (m_descr[k].type == type) return m_descr[k].size;
   }
   throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-      m_path, boost::get<0>(m_type[0]).str(), type.str());
+      m_path, m_descr[0].type.str(), type.str());
 }
 
 /**
  * Locates a compatible type or returns end().
  */
-static std::vector<h5::Dataset::type_t>::iterator 
-  find_type_index(std::vector<h5::Dataset::type_t>& type,
+static std::vector<io::HDF5Descriptor>::iterator 
+  find_type_index(std::vector<io::HDF5Descriptor>& descr,
       const io::HDF5Type& user_type) {
-  std::vector<h5::Dataset::type_t>::iterator it = type.begin();
-  for (; it != type.end(); ++it) {
-    if (boost::get<0>(*it) == user_type) break;
+  std::vector<io::HDF5Descriptor>::iterator it = descr.begin();
+  for (; it != descr.end(); ++it) {
+    if (it->type == user_type) break;
   }
   return it;
 }
 
-std::vector<h5::Dataset::type_t>::iterator 
+std::vector<io::HDF5Descriptor>::iterator 
 h5::Dataset::select (size_t index, const io::HDF5Type& dest) {
 
   //finds compatibility type
-  std::vector<h5::Dataset::type_t>::iterator it = find_type_index(m_type, dest);
+  std::vector<io::HDF5Descriptor>::iterator it = find_type_index(m_descr, dest);
 
   //if we cannot find a compatible type, we throw
-  if (it == m_type.end()) 
+  if (it == m_descr.end()) 
     throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-        m_path, boost::get<0>(m_type[0]).str(), dest.str());
+        m_path, m_descr[0].type.str(), dest.str());
 
   //checks indexing
-  if (index >= boost::get<1>(*it))
-    throw Torch::io::HDF5IndexError(m_parent->m_path.string(), 
-        m_path, boost::get<1>(*it), index);
+  if (index >= it->size)
+    throw Torch::io::HDF5IndexError(m_parent->m_path.string(), m_path,
+        it->size, index);
 
-  boost::get<3>(*it)[0] = index;
+  set_memspace(m_memspace, it->type);
+
+  it->hyperslab_start[0] = index;
+
   herr_t status = H5Sselect_hyperslab(*m_filespace, H5S_SELECT_SET, 
-      boost::get<3>(*it).get(), 0, boost::get<4>(*it).get(), 0);
+      it->hyperslab_start.get(), 0, it->hyperslab_count.get(), 0);
   if (status < 0) throw io::HDF5StatusError("H5Sselect_hyperslab", status);
 
   return it;
@@ -342,67 +327,58 @@ h5::Dataset::select (size_t index, const io::HDF5Type& dest) {
 
 void h5::Dataset::read (size_t index, const io::HDF5Type& dest, void* buffer) {
 
-  std::vector<h5::Dataset::type_t>::iterator it = select(index, dest);
+  std::vector<io::HDF5Descriptor>::iterator it = select(index, dest);
 
-  herr_t status = H5Dread(*m_id, *boost::get<0>(*it).htype(),
-      *boost::get<5>(*it), *m_filespace, H5P_DEFAULT, buffer);
+  herr_t status = H5Dread(*m_id, *it->type.htype(),
+      *m_memspace, *m_filespace, H5P_DEFAULT, buffer);
 
   if (status < 0) throw io::HDF5StatusError("H5Dread", status);
-
 }
 
 void h5::Dataset::write (size_t index, const io::HDF5Type& dest, 
     const void* buffer) {
 
-  std::vector<h5::Dataset::type_t>::iterator it = select(index, dest);
+  std::vector<io::HDF5Descriptor>::iterator it = select(index, dest);
 
-  herr_t status = H5Dwrite(*m_id, *boost::get<0>(*it).htype(),
-      *boost::get<5>(*it), *m_filespace, H5P_DEFAULT, buffer);
+  herr_t status = H5Dwrite(*m_id, *it->type.htype(),
+      *m_memspace, *m_filespace, H5P_DEFAULT, buffer);
 
   if (status < 0) throw io::HDF5StatusError("H5Dwrite", status);
-
 }
     
 void h5::Dataset::extend (const Torch::io::HDF5Type& dest, const void* buffer) {
   
   //finds compatibility type
-  std::vector<h5::Dataset::type_t>::iterator it = find_type_index(m_type, dest);
+  std::vector<io::HDF5Descriptor>::iterator it = find_type_index(m_descr, dest);
 
   //if we cannot find a compatible type, we throw
-  if (it == m_type.end()) 
+  if (it == m_descr.end()) 
     throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-        m_path, boost::get<0>(m_type[0]).str(), dest.str());
+        m_path, m_descr[0].type.str(), dest.str());
 
-  if (!boost::get<2>(*it))
+  if (!it->expandable)
     throw io::HDF5NotExpandible(m_parent->m_path.string(), m_path);
 
   //if it is expandible, try expansion
-  io::HDF5Shape tmp(boost::get<0>(*it).shape());
+  io::HDF5Shape tmp(it->type.shape());
   tmp >>= 1;
-  tmp[0] = boost::get<1>(*it) + 1;
+  tmp[0] = it->size + 1;
   herr_t status = H5Dset_extent(*m_id, tmp.get());
   if (status < 0) throw io::HDF5StatusError("H5Dset_extent", status);
   
   //if expansion succeeded, update all compatible types
-  for (size_t k=0; k<m_type.size(); ++k) {
-
-    if (boost::get<2>(m_type[k])) { //is chunked, updated only the length
-
-      boost::get<1>(m_type[k]) += 1;
-
+  for (size_t k=0; k<m_descr.size(); ++k) {
+    if (m_descr[k].expandable) { //updated only the length
+      m_descr[k].size += 1;
     }
-
-    else { //not chunked, update the shape/count for a straight read/write
-
-      h5::Dataset::type_t& handle = m_type[k];
-      boost::get<0>(handle).shape()[0] += 1;
-      boost::get<4>(handle)[0] += 1;
-      boost::get<5>(handle) = open_memspace(boost::get<0>(handle)); 
-
+    else { //not expandable, update the shape/count for a straight read/write
+      m_descr[k].type.shape()[0] += 1;
+      m_descr[k].hyperslab_count[0] += 1;
     }
   }
       
   m_filespace = open_filespace(m_parent, m_path, m_id); //update filespace
+
   write(tmp[0]-1, dest, buffer);
 }
 

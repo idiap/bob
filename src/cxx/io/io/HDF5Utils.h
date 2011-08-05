@@ -30,7 +30,6 @@
 #include <map>
 #include <vector>
 
-#include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/filesystem.hpp>
 #include <blitz/array.h>
@@ -245,8 +244,8 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T, int N> 
         blitz::Array<T,N> readArray(size_t index) {
-          for (size_t k=0; k<m_type.size(); ++k) {
-            const Torch::io::HDF5Shape& S = boost::get<0>(m_type[k]).shape();
+          for (size_t k=0; k<m_descr.size(); ++k) {
+            const Torch::io::HDF5Shape& S = m_descr[k].type.shape();
             if(S.n() == N) {
               blitz::TinyVector<int,N> shape;
               S.set(shape);
@@ -256,7 +255,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
             }
           }
           throw Torch::io::HDF5IncompatibleIO(m_parent->m_path.string(), 
-              m_path, boost::get<0>(m_type[0]).str(), "dynamic shape unknown");
+              m_path, m_descr[0].type.str(), "dynamic shape unknown");
         }
 
       /**
@@ -409,29 +408,6 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       Dataset& operator= (const Dataset& other);
 
-    public: //part of the API
-      
-      /**
-       * This is the type compatibility vector. Each object contains a boost
-       * tuple with the following elements: 
-       *
-       * 1. The type object that represents compatibility in this mode
-       * 2. The number of objects inside this dataset, would the user decide to
-       *    read/write using this type
-       * 3. If under these conditions, the type is chunked as expected and more
-       *    atomic objects can be added.
-       * 4. A shape object that helps the hyperslab read/write obj. offset
-       * 5. A shape object that helps the hyperslab read/write obj. counting
-       * 6. A pointer to a pre-allocated, compatible, memory space for data
-       *    transfers
-       */
-      typedef boost::tuple<Torch::io::HDF5Type, 
-                           size_t, 
-                           bool,
-                           Torch::io::HDF5Shape,
-                           Torch::io::HDF5Shape, 
-                           boost::shared_ptr<hid_t> > type_t;
-
     private: //some tricks
 
       /**
@@ -441,7 +417,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        * The index is checked for existence as well as the consistence of the
        * destination type.
        */
-      std::vector<type_t>::iterator select (size_t index,
+      std::vector<Torch::io::HDF5Descriptor>::iterator select (size_t index,
           const Torch::io::HDF5Type& dest);
 
       /**
@@ -468,7 +444,9 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       boost::shared_ptr<hid_t> m_id; ///< the HDF5 Dataset this type points to
       boost::shared_ptr<hid_t> m_dt; ///< the datatype of this Dataset
       boost::shared_ptr<hid_t> m_filespace; ///< the "file" space for this set
-      std::vector<type_t> m_type;
+      std::vector<Torch::io::HDF5Descriptor> m_descr; ///< read/write descr.'s
+      boost::shared_ptr<hid_t> m_memspace; ///< read/write space
+
   };
 
   /**

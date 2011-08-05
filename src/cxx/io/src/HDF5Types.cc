@@ -560,3 +560,41 @@ Torch::core::array::ElementType io::HDF5Type::element_type() const {
   }
   return Torch::core::array::t_unknown;
 }
+      
+io::HDF5Descriptor::HDF5Descriptor(const HDF5Type& type, size_t size, 
+          bool expand):
+  type(type), 
+  size(size),
+  expandable(expand),
+  hyperslab_start(type.shape().n()),
+  hyperslab_count(type.shape())
+{
+}
+
+io::HDF5Descriptor::HDF5Descriptor(const HDF5Descriptor& other):
+  type(other.type),
+  size(other.size),
+  expandable(other.expandable),
+  hyperslab_start(other.hyperslab_start),
+  hyperslab_count(other.hyperslab_count)
+{
+}
+
+io::HDF5Descriptor::~HDF5Descriptor() { }
+
+io::HDF5Descriptor& io::HDF5Descriptor::operator=
+(const io::HDF5Descriptor& other) {
+  type = other.type;
+  size = other.size;
+  expandable = other.expandable;
+  hyperslab_start = other.hyperslab_start;
+  hyperslab_count = other.hyperslab_count;
+  return *this;
+}
+
+io::HDF5Descriptor& io::HDF5Descriptor::subselect() {
+  hyperslab_start >>= 1;
+  hyperslab_count >>= 1;
+  hyperslab_count[0] = 1;
+  return *this;
+}
