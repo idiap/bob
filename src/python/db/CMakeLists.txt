@@ -44,6 +44,7 @@ endmacro(torch_build_db dbname)
 # Run creation or downloading
 torch_build_db(replay)
 torch_build_db(banca)
+torch_build_db(banca_small)
 torch_build_db(biosecure)
 torch_build_db(mobio)
 torch_build_db(multipie)
@@ -79,6 +80,18 @@ torch_python_add_test(python-db-banca-dumplist2
   --groups=g1 --purposes=enrol --self-test)
 set_property(TEST python-db-banca-dumplist2 APPEND PROPERTY DEPENDS 
   ${python-db-banca-instantiation})
+
+# BANCA_SMALL database driver tests.
+# ######### Notice test dependencies!! ##################
+torch_python_add_test(python-db-banca_small-dumplist
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca_small dumplist --self-test)
+set_property(TEST python-db-banca_small-dumplist APPEND PROPERTY DEPENDS
+  ${python-db-banca_small-instantiation})
+torch_python_add_test(python-db-banca_small-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py banca_small dumplist --protocol=P --classes=client
+  --groups=g1 --purposes=enrol --self-test)
+set_property(TEST python-db-banca_small-dumplist2 APPEND PROPERTY DEPENDS 
+  ${python-db-banca_small-instantiation})
 
 # Biosecure database driver tests.
 # ######### Notice test dependencies!! ##################

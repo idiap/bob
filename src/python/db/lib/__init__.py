@@ -9,6 +9,7 @@ that can be used in Biometry, Machine Learning or Pattern Classification."""
 import iris
 import replay
 import banca
+import banca_small
 import biosecure
 import mobio
 import multipie
