@@ -35,7 +35,10 @@ static const io::HDF5Descriptor&
 choose_format(const std::vector<io::HDF5Descriptor>& fmt) {
   size_t def = 0; ///< by default, we use the first format
 
-  if (fmt.at(def).size > 1) def += 1;
+  if (!fmt.at(def).expandable || fmt[def].size > 1) {
+    //saved as array or created outside torch
+    def += 1;
+  }
 
   return fmt.at(def);
 }
