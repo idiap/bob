@@ -23,8 +23,7 @@ def dumplist(args):
       protocol=args.protocol,
       purposes=args.purposes,
       #model_ids=args.model_ids,
-      groups=args.groups,
-      languages=args.languages
+      groups=args.groups
       )
 
   output = sys.stdout
