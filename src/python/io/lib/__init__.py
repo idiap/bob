@@ -16,16 +16,16 @@ def arrayset_append(self, *args):
   from .. import core
   if len(args) == 1:
     if isinstance(args[0], Array):
-      return self.__append_array__(args[0])
+      self.__append_array__(args[0])
     elif core.array.is_blitz_array(args[0]):
-      return self.__append_array__(Array(args[0]))
+      self.__append_array__(Array(args[0]))
     elif isinstance(args[0], (str, unicode)):
-      return self.__append_array__(Array(args[0]))
+      self.__append_array__(Array(args[0]))
     else:
       raise RuntimeError, "Can only append io::Array, blitz::Array or filename to Arrayset"
   elif len(args) == 2:
     if isinstance(args[0], (str, unicode)) and instance(args[1], str):
-      return self.__append_array__(args[0], args[1])
+      self.__append_array__(args[0], args[1])
     else: 
       raise RuntimeError, "Can only append (filename,codecname) to Arrayset"
   raise RuntimeError, "This cannot happen!"
@@ -250,8 +250,34 @@ def hdf5type_repr(self):
 HDF5Type.__repr__ = hdf5type_repr
 del hdf5type_repr
 
-def hdf5file_read(self, path, pos=-1, fmt=0):
-  """Reads elements from the current file.
+def hdf5file_read(self, path):
+  """Reads all dataset elements from the current file. In this mode, the
+  dataset is considered to contain a single element that will be read entirely
+  from the file into memory as a blitz::Array.
+  
+  Keyword Parameters:
+
+  path
+    This is the path to the HDF5 dataset to read data from
+  """
+  descr = self.describe(path)[1].type
+
+  if descr.shape() == (1,):  # read as scalar
+    return getattr(self, '__read_%s__' % descr.type_str())(path, 0)
+
+  else: # read as array
+    retval = descr.array_class()(descr.shape())
+    self.__read_array__(path, 0, retval)
+    return retval
+
+HDF5File.read = hdf5file_read
+del hdf5file_read
+
+def hdf5file_lread(self, path, pos=0):
+  """Reads elements from the indicated dataset considering the dataset first
+  dimension contains the number of elements in a list and that the dataset was
+  created with append() instead of set(). Elements read have N-1 dimensions,
+  where N is the number of dimensions displayed at the dataset.
   
   Keyword Parameters:
 
@@ -262,14 +288,10 @@ def hdf5file_read(self, path, pos=-1, fmt=0):
     This is the position in the dataset to readout. If the given value is
     smaller than zero, we read all positions in the dataset and return you a
     list. If the position is specific, we return a single element.
-
-  fmt
-    If set, read the data using the alternative output format. You can find
-    what such formats are using my describe() method. The default format is the
-    first entry. The alternate formats are the following entries.
   """
-
-  dtype = self.describe(path)
+  dtype = self.describe(path)[0]
+  descr = dtype.type
+  size = dtype.size
   
   def read_scalar_or_array(self, path, descr, pos):
     if descr.shape() == (1,):  # read as scalar
@@ -281,13 +303,13 @@ def hdf5file_read(self, path, pos=-1, fmt=0):
       return retval
 
   if pos < 0: # read all -- recurse
-    return [read_scalar_or_array(self, path, dtype[fmt].type, k) for k in range(dtype[fmt].size)]
+    return [read_scalar_or_array(self, path, descr, k) for k in range(size)]
 
   else:
-    return read_scalar_or_array(self, path, dtype[fmt].type, pos)
+    return read_scalar_or_array(self, path, descr, pos)
 
-HDF5File.read = hdf5file_read
-del hdf5file_read
+HDF5File.lread = hdf5file_lread
+del hdf5file_lread
 
 def hdf5file_append(self, path, data, compression=0, dtype=None):
   """Appends data to a certain HDF5 dataset in this file. When you append data

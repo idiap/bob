@@ -13,4 +13,3 @@ This section includes information required to write C++ code using |project|.
 
    ../core/doc/index
    ../config/doc/index
-   ../io/doc/index
