@@ -169,12 +169,12 @@ class MLPTest(unittest.TestCase):
 
     m = torch.machine.MLP(torch.io.HDF5File(COMPLICATED))
     data = torch.io.HDF5File(COMPLICATED_OUTPUT)
-    for pattern, expected in zip(data.read("pattern"), data.read("result")):
+    for pattern, expected in zip(data.lread("pattern"), data.lread("result")):
       self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
 
     m = torch.machine.MLP(torch.io.HDF5File(COMPLICATED_NOBIAS))
     data = torch.io.HDF5File(COMPLICATED_NOBIAS_OUTPUT)
-    for pattern, expected in zip(data.read("pattern"), data.read("result")):
+    for pattern, expected in zip(data.lread("pattern"), data.lread("result")):
       self.assertTrue(abs(m(pattern)[0] - expected) < 1e-8)
 
   def test05a_ComplicatedCorrectness(self):
@@ -187,7 +187,7 @@ class MLPTest(unittest.TestCase):
     input = torch.core.array.float64_2(pat_descr.size, pat_descr.type.shape()[0])
     res_descr = data.describe('result')[0]
     target = torch.core.array.float64_2(res_descr.size, res_descr.type.shape()[0])
-    for i, (pattern, expected) in enumerate(zip(data.read("pattern"), data.read("result"))):
+    for i, (pattern, expected) in enumerate(zip(data.lread("pattern"), data.lread("result"))):
       input[i,:] = pattern
       target[i,:] = expected
     output = m(input)
