@@ -17,15 +17,19 @@ def arrayset_append(self, *args):
   if len(args) == 1:
     if isinstance(args[0], Array):
       self.__append_array__(args[0])
+      return
     elif core.array.is_blitz_array(args[0]):
       self.__append_array__(Array(args[0]))
+      return
     elif isinstance(args[0], (str, unicode)):
       self.__append_array__(Array(args[0]))
+      return
     else:
       raise RuntimeError, "Can only append io::Array, blitz::Array or filename to Arrayset"
   elif len(args) == 2:
     if isinstance(args[0], (str, unicode)) and instance(args[1], str):
       self.__append_array__(args[0], args[1])
+      return
     else: 
       raise RuntimeError, "Can only append (filename,codecname) to Arrayset"
   raise RuntimeError, "This cannot happen!"
