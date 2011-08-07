@@ -277,7 +277,7 @@ def hdf5file_read(self, path):
 HDF5File.read = hdf5file_read
 del hdf5file_read
 
-def hdf5file_lread(self, path, pos=0):
+def hdf5file_lread(self, path, pos=-1):
   """Reads elements from the indicated dataset considering the dataset first
   dimension contains the number of elements in a list and that the dataset was
   created with append() instead of set(). Elements read have N-1 dimensions,
