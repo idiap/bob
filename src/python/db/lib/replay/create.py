@@ -41,7 +41,8 @@ def add_real_lists(session, protodir):
       path = os.path.splitext(f)[0] #keep only the filename stem
       purpose = v[3]
       light = v[4]
-      take = int(v[5])
+      if len(v) == 6: take = int(v[5]) #authentication session
+      else: take = 1 #enrollment session
       return [client_id, path, light], [purpose, take]
 
     for fname in open(filename, 'rt'):
@@ -57,6 +58,7 @@ def add_real_lists(session, protodir):
   add_real_list(session, os.path.join(protodir, 'real.train.list'))
   add_real_list(session, os.path.join(protodir, 'real.devel.list'))
   add_real_list(session, os.path.join(protodir, 'real.test.list'))
+  add_real_list(session, os.path.join(protodir, 'enrollment.list'))
 
 def add_attack_lists(session, protodir):
   """Adds all RAD filelists"""
@@ -68,11 +70,11 @@ def add_attack_lists(session, protodir):
       """Parses the RAD filename and break it in the relevant chunks."""
 
       v = os.path.splitext(os.path.basename(f))[0].split('_')
-      attack_device = v[1]
+      attack_device = v[1] #print, mobile or highdef
       client_id = int(v[2].replace('client',''))
       path = os.path.splitext(f)[0] #keep only the filename stem
-      sample_device = v[4]
-      sample_type = v[5]
+      sample_device = v[4] #highdef or mobile
+      sample_type = v[5] #photo or video
       light = v[6]
       attack_support = f.split('/')[-2]
       return [client_id, path, light], [attack_support, attack_device, sample_type, sample_device]
