@@ -19,13 +19,26 @@ class Client(Base):
   gender = Column(Enum('m','f'))
   sgroup = Column(Enum('g1','world')) # do NOT use group (SQL keyword)
 
-  def __init__(self, id, gender, group, language):
+  def __init__(self, id, gender, group):
     self.id = id
     self.gender = gender
     self.sgroup = group
 
   def __repr__(self):
     return "<Client('%d', '%s', '%s')>" % (self.id, self.gender, self.sgroup)
+
+class TNormClient(Base):
+  __tablename__ = 'tnorm_client'
+
+  id = Column(Integer, primary_key=True) # model_id
+  real_id = Column(Integer) # real_id
+
+  def __init__(self, id, real_id):
+    self.id = id
+    self.real_id = real_id
+
+  def __repr__(self):
+    return "<TNormClient('%d', '%d')>" % (self.id, self.real_id)
 
 class File(Base):
   __tablename__ = 'file'

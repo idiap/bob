@@ -77,6 +77,7 @@ class Database(object):
 
     if 'g1' in groups:
       q = self.session.query(Client).filter(Client.sgroup == 'g1').\
+            filter(Client.id != '1002').\
             filter(Client.gender.in_(gender)).\
             order_by(Client.id)
       for id in [k.id for k in q]: 
@@ -84,7 +85,51 @@ class Database(object):
 
     return retval
 
-  def models(self, protocol=None, groups=None):
+  def tnorm_ids(self, protocol=None):
+    """Returns a set of T-Norm ids for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the BANCA_SMALL protocols ("P")
+
+    Returns: A list containing all the client ids which have the given
+    properties.
+    """
+
+    retval = []
+    # List of the clients
+    q = self.session.query(TNormClient).\
+          order_by(TNormClient.id)
+    for id in [k.id for k in q]: 
+      retval.append(id)
+
+    return retval
+
+  def getRealIdFromTNormId(self, tnorm_id, protocol=None):
+    """Returns the real id of a client from a TNorm client id.
+
+    Keyword Parameters:
+
+    tnorm_client_id
+      the id of the T-Norm client
+
+    protocol
+      One of the BANCA_SMALL protocols ("P")
+
+    Returns: The real_id of the client associated with the T-Norm id    
+    """
+
+    # List of the clients
+    q = self.session.query(TNormClient).filter(TNormClient.id == tnorm_id).\
+          order_by(TNormClient.id)
+    if q.count() !=1:
+      #throw exception?
+      return None
+    else:
+      return q.first().real_id
+
+  def models(self, protocol=None, groups=None, ids_real=None):
     """Returns a set of models for the specific query by the user.
 
     Keyword Parameters:
@@ -99,7 +144,7 @@ class Database(object):
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    return self.clients(protocol, groups)
+    return self.clients(protocol, groups, ids_real)
 
   def getClientIdFromModelId(self, model_id):
     """Returns the client_id attached to the given model_id
@@ -150,7 +195,7 @@ class Database(object):
       return q.first().path
 
   def objects(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None): 
+      purposes=None, model_ids=None, real_ids=None, groups=None, classes=None): 
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -174,6 +219,11 @@ class Database(object):
       Only retrieves the files for the provided list of model ids (claimed 
       client id).  If 'None' is given (this is the default), no filter over 
       the model_ids is performed.
+
+    real_ids
+      Only retrieves the files for the provided list of real ids (real client
+      id). If 'None' is given (this is the default), no filter over real_ids
+      is performed.
 
     groups
       One of the groups ("g1", "world") or a tuple with several of them. 
@@ -223,7 +273,9 @@ class Database(object):
       q = self.session.query(File).join(Client).\
             filter(Client.sgroup == 'world')
       if model_ids:
-        q = q.filter(File.real_id.in_(model_ids))
+        q = q.filter(File.claimed_id.in_(model_ids))
+      if real_ids:
+        q = q.filter(File.real_id.in_(real_ids))
       q = q.order_by(File.real_id, File.session_id, File.claimed_id, File.shot) 
       for k in q:
         retval[k.id] = (make_path(k.path, directory, extension), k.claimed_id, k.claimed_id, k.real_id, k.path)
@@ -238,6 +290,8 @@ class Database(object):
               filter(Protocol.purpose == 'enrol')
         if model_ids:
           q = q.filter(File.claimed_id.in_(model_ids))
+        if real_ids:
+          q = q.filter(File.real_id.in_(real_ids))
         q = q.order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
         for k in q:
           k = k[0]
@@ -252,6 +306,8 @@ class Database(object):
                 filter(Protocol.purpose == 'probe')
           if model_ids:
             q = q.filter(File.claimed_id.in_(model_ids))
+          if real_ids:
+            q = q.filter(File.real_id.in_(real_ids))
           q = q.order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
           for k in q:
             k = k[0]
@@ -265,6 +321,8 @@ class Database(object):
                 filter(or_(Protocol.purpose == 'probe', Protocol.purpose == 'probeImpostor'))
           if model_ids:
             q = q.filter(File.claimed_id.in_(model_ids))
+          if real_ids:
+            q = q.filter(File.real_id.in_(real_ids))
           for k in q:
             k = k[0]
             retval[k.id] = (make_path(k.path, directory, extension), k.claimed_id, k.claimed_id, k.real_id, k.path)
@@ -272,7 +330,7 @@ class Database(object):
     return retval
 
   def files(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None): 
+      purposes=None, model_ids=None, real_ids=None, groups=None, classes=None): 
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -297,6 +355,11 @@ class Database(object):
       client id).  If 'None' is given (this is the default), no filter over 
       the model_ids is performed.
 
+    real_ids
+      Only retrieves the files for the provided list of real ids (real client
+      id). If 'None' is given (this is the default), no filter over real_ids
+      is performed.
+
     groups
       One of the groups ("g1", "world") or a tuple with several of them. 
       If 'None' is given (this is the default), it is considered the same as a 
@@ -315,7 +378,7 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, real_ids, groups, classes)
     for k in d: retval[k] = d[k][0]
 
     return retval

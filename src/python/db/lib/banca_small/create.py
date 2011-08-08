@@ -22,8 +22,9 @@ def add_files(session):
     if not (v[0] in client_dict):
       if (v[2] == 'wm'):
         v[2] = 'world'
-      session.add(Client(int(v[0]), v[1], v[2], v[5]))
+      session.add(Client(int(v[0]), v[1], v[2]))
       client_dict[v[0]] = True
+      
     session_id = int(v[3].split('s')[1])
     session.add(File(int(v[0]), os.path.basename(filename).split('.')[0], v[4], v[6], session_id))
   
@@ -92,6 +93,19 @@ def add_files(session):
   for filename in file_list:
     add_file(session, filename, client_dict)
 
+def add_tnorm_clients(session):
+  """Adds T-Norm clients into the database."""
+  session.add(TNormClient(int(9003), int(9003)))
+  session.add(TNormClient(int(9004), int(9003)))
+  session.add(TNormClient(int(9005), int(9005)))
+  session.add(TNormClient(int(9006), int(9005)))
+  session.add(TNormClient(int(9007), int(9007)))
+  session.add(TNormClient(int(9008), int(9007)))
+  session.add(TNormClient(int(9009), int(9009)))
+  session.add(TNormClient(int(9010), int(9009)))
+  session.add(TNormClient(int(9011), int(9011)))
+  session.add(TNormClient(int(9012), int(9011)))
+
 def add_protocols(session):
   """Adds protocols"""
   # Protocol P
@@ -106,6 +120,7 @@ def create_tables(args):
   engine = create_engine(args.location, echo=args.verbose)
   File.metadata.create_all(engine)
   Client.metadata.create_all(engine)
+  TNormClient.metadata.create_all(engine)
   Protocol.metadata.create_all(engine)
 
 # Driver API
@@ -128,6 +143,7 @@ def create(args):
   create_tables(args)
   s = session(args.dbname, echo=args.verbose)
   add_files(s)
+  add_tnorm_clients(s)
   add_protocols(s)
   s.commit()
   s.close()
