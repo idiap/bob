@@ -21,27 +21,21 @@ if(BLITZ_FOUND)
 
   # and we try to determine if the the found library supports 64-bits array
   # positions.
-  include(CheckTypeSize)
-  set(CMAKE_REQUIRED_DEFINITIONS "-xc++")
-  set(CMAKE_REQUIRED_FLAGS "-lstdc++")
-  set(CMAKE_EXTRA_INCLUDE_FILES "${Blitz_INCLUDE_DIR}/blitz/blitz.h")
-  CHECK_TYPE_SIZE("blitz::sizeType" BLITZ_SIZETYPE)
-  CHECK_TYPE_SIZE("blitz::diffType" BLITZ_DIFFTYPE)
-  set(CMAKE_EXTRA_INCLUDE_FILES)
-  set(CMAKE_REQUIRED_FLAGS)
-  set(CMAKE_REQUIRED_DEFINITIONS)
-  if(HAVE_BLITZ_SIZETYPE)
-    add_definitions(-DHAVE_BLITZ_SIZETYPE=1)
-  else(HAVE_BLITZ_SIZETYPE)
-  endif(HAVE_BLITZ_SIZETYPE)
-  if(HAVE_BLITZ_DIFFTYPE)
-    add_definitions(-DHAVE_BLITZ_DIFFTYPE=1)
-  endif(HAVE_BLITZ_DIFFTYPE)
-  if(HAVE_BLITZ_SIZETYPE AND HAVE_BLITZ_DIFFTYPE)
-    message(STATUS "Blitz has \"sizeType\" and \"diffType\" defined -- you can allocate arrays with more than 2G-pointees")
-  else(HAVE_BLITZ_SIZETYPE AND HAVE_BLITZ_DIFFTYPE)
-    message(STATUS "Older version of Blitz detected -- please note the 2G-pointee limit for arrays!")
-  endif(HAVE_BLITZ_SIZETYPE AND HAVE_BLITZ_DIFFTYPE)
+  include(CheckCxxSourceCompiles)
+  set(CMAKE_REQUIRED_INCLUDES "${Blitz_INCLUDE_DIR}")
+  CHECK_CXX_SOURCE_COMPILES("#include <blitz/blitz.h>
+    int main() { blitz::sizeType s; blitz::diffType d; }" HAVE_BLITZ_SPECIAL_TYPES)
+  set(CMAKE_REQUIRED_INCLUDES)
+
+  if(HAVE_BLITZ_SPECIAL_TYPES)
+    add_definitions(-DHAVE_BLITZ_SPECIAL_TYPES=1)
+  endif(HAVE_BLITZ_SPECIAL_TYPES)
+
+  if(HAVE_BLITZ_SPECIAL_TYPES)
+    message(STATUS "Blitz: you can allocate arrays with more than 2G-pointees")
+  else(HAVE_BLITZ_SPECIAL_TYPES)
+    message(STATUS "Blitz: older version detected -- please note the 2G-pointee limit for arrays!")
+  endif(HAVE_BLITZ_SPECIAL_TYPES)
 
   # and has blitz/tinyvec2.h and not blitz/tinyvec-et.h
   find_file(TINYVEC2_FOUND "blitz/tinyvec2.h" ${Blitz_INCLUDE_DIR})
