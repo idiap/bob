@@ -143,7 +143,7 @@ would have a 64-bit real value, we impose that this variable is saved as a
 32-bit real value. You can verify the dump correctness with ``h5dump``:
 
 .. code-block:: none
-  :linenos::
+  :linenos:
 
   GROUP "/" {
   ...
