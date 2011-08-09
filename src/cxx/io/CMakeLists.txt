@@ -61,6 +61,7 @@ add_dependencies(torch_io io-cxx_header_install)
 # Defines tests for this package
 torch_test(io array test/array.cc)
 torch_test(io arrayset test/arrayset.cc)
+torch_test(io hdf5 test/hdf5.cc)
 torch_test(io image_codec test/image_codec.cc)
 torch_test(io tensor_codec test/tensor_codec.cc)
 
