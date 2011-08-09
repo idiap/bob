@@ -21,7 +21,7 @@ if(BLITZ_FOUND)
 
   # and we try to determine if the the found library supports 64-bits array
   # positions.
-  include(CheckCxxSourceCompiles)
+  include(CheckCXXSourceCompiles)
   set(CMAKE_REQUIRED_INCLUDES "${Blitz_INCLUDE_DIR}")
   CHECK_CXX_SOURCE_COMPILES("#include <blitz/blitz.h>
     int main() { blitz::sizeType s; blitz::diffType d; }" HAVE_BLITZ_SPECIAL_TYPES)
