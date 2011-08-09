@@ -11,7 +11,9 @@
 #include <stdint.h>
 #include <boost/tuple/tuple.hpp>
 #include <blitz/array.h>
+#if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
+#endif
 
 #include "ip/Exception.h"
 

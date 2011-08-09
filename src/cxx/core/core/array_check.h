@@ -9,7 +9,9 @@
 #define TORCH_CORE_ARRAY_CHECK_H
 
 #include <blitz/array.h>
+#if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
+#endif
 
 namespace Torch {
 /**

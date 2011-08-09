@@ -8,7 +8,11 @@
 #ifndef TORCH_MACHINE_MLPEXCEPTION_H 
 #define TORCH_MACHINE_MLPEXCEPTION_H
 
+#if defined(HAVE_BLITZ_TINYVEC2_H)
+#include <blitz/tinyvec2.h>
+#else
 #include <blitz/tinyvec.h>
+#endif
 #include "machine/Exception.h"
 #include "machine/Activation.h"
 

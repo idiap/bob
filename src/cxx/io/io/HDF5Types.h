@@ -12,7 +12,9 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
+#if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
+#endif
 #include <hdf5.h>
 
 /**

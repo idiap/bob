@@ -6,16 +6,31 @@
  */
 
 #include <boost/python.hpp>
+#include "core/array_type.h"
 
 using namespace boost::python;
 
 void bind_ndarray();
 void bind_core_array_tinyvector();
 void bind_core_array_range();
-void bind_array_arithmetics_1();
-void bind_array_arithmetics_2();
-void bind_array_arithmetics_3();
-void bind_array_arithmetics_4();
+
+# define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+# define BOOST_PP_LOCAL_MACRO(D) \
+  void bind_array_arith_bool_ ## D(); \
+  void bind_array_arith_int8_ ## D(); \
+  void bind_array_arith_int16_ ## D(); \
+  void bind_array_arith_int32_ ## D(); \
+  void bind_array_arith_int64_ ## D(); \
+  void bind_array_arith_uint8_ ## D(); \
+  void bind_array_arith_uint16_ ## D(); \
+  void bind_array_arith_uint32_ ## D(); \
+  void bind_array_arith_uint64_ ## D(); \
+  void bind_array_arith_float32_ ## D(); \
+  void bind_array_arith_float64_ ## D(); \
+  void bind_array_arith_complex64_ ## D(); \
+  void bind_array_arith_complex128_ ## D();
+# include BOOST_PP_LOCAL_ITERATE()
+
 void bind_array_base();
 void bind_array_cast();
 void bind_array_convert();
@@ -25,10 +40,24 @@ void bind_array_indexing_2();
 void bind_array_indexing_3();
 void bind_array_indexing_4();
 void bind_array_info();
-void bind_array_math_1();
-void bind_array_math_2();
-void bind_array_math_3();
-void bind_array_math_4();
+
+# define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+# define BOOST_PP_LOCAL_MACRO(D) \
+  void bind_array_math_bool_ ## D(); \
+  void bind_array_math_int8_ ## D(); \
+  void bind_array_math_int16_ ## D(); \
+  void bind_array_math_int32_ ## D(); \
+  void bind_array_math_int64_ ## D(); \
+  void bind_array_math_uint8_ ## D(); \
+  void bind_array_math_uint16_ ## D(); \
+  void bind_array_math_uint32_ ## D(); \
+  void bind_array_math_uint64_ ## D(); \
+  void bind_array_math_float32_ ## D(); \
+  void bind_array_math_float64_ ## D(); \
+  void bind_array_math_complex64_ ## D(); \
+  void bind_array_math_complex128_ ## D();
+# include BOOST_PP_LOCAL_ITERATE()
+
 void bind_array_memory();
 void bind_array_order();
 void bind_array_reductions_1();
@@ -50,10 +79,24 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_core_array_range();
   
   bind_array_base(); //this will create the class and has to come first!
-  bind_array_arithmetics_1();
-  bind_array_arithmetics_2();
-  bind_array_arithmetics_3();
-  bind_array_arithmetics_4();
+  
+# define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+# define BOOST_PP_LOCAL_MACRO(D) \
+  bind_array_arith_bool_ ## D(); \
+  bind_array_arith_int8_ ## D(); \
+  bind_array_arith_int16_ ## D(); \
+  bind_array_arith_int32_ ## D(); \
+  bind_array_arith_int64_ ## D(); \
+  bind_array_arith_uint8_ ## D(); \
+  bind_array_arith_uint16_ ## D(); \
+  bind_array_arith_uint32_ ## D(); \
+  bind_array_arith_uint64_ ## D(); \
+  bind_array_arith_float32_ ## D(); \
+  bind_array_arith_float64_ ## D(); \
+  bind_array_arith_complex64_ ## D(); \
+  bind_array_arith_complex128_ ## D();
+# include BOOST_PP_LOCAL_ITERATE()
+
   bind_array_cast();
   bind_array_convert();
   bind_array_constructors();
@@ -62,10 +105,24 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
   bind_array_indexing_3();
   bind_array_indexing_4();
   bind_array_info();
-  bind_array_math_1();
-  bind_array_math_2();
-  bind_array_math_3();
-  bind_array_math_4();
+
+# define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
+# define BOOST_PP_LOCAL_MACRO(D) \
+  bind_array_math_bool_ ## D(); \
+  bind_array_math_int8_ ## D(); \
+  bind_array_math_int16_ ## D(); \
+  bind_array_math_int32_ ## D(); \
+  bind_array_math_int64_ ## D(); \
+  bind_array_math_uint8_ ## D(); \
+  bind_array_math_uint16_ ## D(); \
+  bind_array_math_uint32_ ## D(); \
+  bind_array_math_uint64_ ## D(); \
+  bind_array_math_float32_ ## D(); \
+  bind_array_math_float64_ ## D(); \
+  bind_array_math_complex64_ ## D(); \
+  bind_array_math_complex128_ ## D();
+# include BOOST_PP_LOCAL_ITERATE()
+
   bind_array_memory();
   bind_array_order();
   bind_array_reductions_1();
