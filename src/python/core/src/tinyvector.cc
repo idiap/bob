@@ -7,7 +7,11 @@
 
 #include <boost/python.hpp>
 #include <boost/format.hpp>
+#if defined(HAVE_BLITZ_TINYVEC2_H)
+#include <blitz/tinyvec2.h>
+#else
 #include <blitz/tinyvec.h>
+#endif
 
 #include "core/blitz_compat.h"
 

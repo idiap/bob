@@ -43,6 +43,12 @@ if(BLITZ_FOUND)
     message(STATUS "Older version of Blitz detected -- please note the 2G-pointee limit for arrays!")
   endif(HAVE_BLITZ_SIZETYPE AND HAVE_BLITZ_DIFFTYPE)
 
+  # and has blitz/tinyvec2.h and not blitz/tinyvec-et.h
+  find_file(TINYVEC2_FOUND "blitz/tinyvec2.h" ${Blitz_INCLUDE_DIR})
+  if(TINYVEC2_FOUND)
+    add_definitions(-DHAVE_BLITZ_TINYVEC2_H=1)
+  endif(TINYVEC2_FOUND)
+
 endif(BLITZ_FOUND)
 
 mark_as_advanced(Blitz_INCLUDE_DIR Blitz_LIBRARY)

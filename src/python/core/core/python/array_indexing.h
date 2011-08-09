@@ -12,7 +12,9 @@
 #include <boost/python/slice.hpp>
 #include <boost/format.hpp>
 #include <blitz/array.h>
+#if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
+#endif
 
 namespace Torch { namespace python {
 

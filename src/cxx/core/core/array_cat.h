@@ -12,7 +12,9 @@
 
 #include <vector>
 #include <blitz/array.h>
+#if !defined (HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec-et.h>
+#endif
 #include <core/Exception.h>
 
 namespace Torch { namespace core { namespace array {
