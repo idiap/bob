@@ -4,9 +4,143 @@
 
 """Test trainer package
 """
-import os, sys, tempfile, shutil
+import os, sys, tempfile, shutil, math
 import unittest
 import torch
+
+def normalizeBlocks(src):
+  for i in range(src.extent(0)):
+    block = src[i, :, :]
+    mean = torch.core.array.float64_2.mean(block)
+    std = torch.core.array.float64_2.sum((block - mean) ** 2) / block.size()
+    if std == 0:
+      std = 1
+    else:
+      std = math.sqrt(std)
+
+    src[i, :, :] = (block - mean) / std
+    
+def normalizeDCT(src):
+  for i in range(src.extent(1)):
+    col = src[:, i]
+    mean = torch.core.array.float64_1.mean(col)
+    std = torch.core.array.float64_1.sum((col - mean) ** 2) / col.size()
+    if std == 0:
+      std = 1
+    else:
+      std = math.sqrt(std)
+
+    src[:, i] = (col - mean) / std
+
+
+def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, 
+    A_N_DCT_COEF, norm_before, norm_after, add_xy):
+  
+  blockShape = torch.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  blocks = torch.core.array.float64_3(blockShape)
+  torch.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+
+  if norm_before:
+    normalizeBlocks(blocks)
+
+  if add_xy:
+    real_DCT_coef = A_N_DCT_COEF - 2
+  else:
+    real_DCT_coef = A_N_DCT_COEF
+
+  
+  # Initialize cropper and destination array
+  DCTF = torch.ip.DCTFeatures(A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W, real_DCT_coef)
+  
+  # Call the preprocessing algorithm
+  dct_blocks = DCTF(blocks)
+
+  n_blocks = blockShape[0]
+
+  dct_blocks_min = 0
+  dct_blocks_max = A_N_DCT_COEF
+  TMP_tensor_min = 0
+  TMP_tensor_max = A_N_DCT_COEF
+
+  if norm_before:
+    dct_blocks_min += 1
+    TMP_tensor_max -= 1
+
+  if add_xy:
+    dct_blocks_max -= 2
+    TMP_tensor_min += 2
+  
+  TMP_tensor = torch.core.array.float64_2(n_blocks, TMP_tensor_max)
+  
+  nBlocks = torch.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
+  for by in range(nBlocks[0]):
+    for bx in range(nBlocks[1]):
+      bi = bx + by * nBlocks[1]
+      if add_xy:
+        TMP_tensor[bi, 0] = bx
+        TMP_tensor[bi, 1] = by
+      
+      TMP_tensor[bi, TMP_tensor_min:TMP_tensor_max] = dct_blocks[bi, dct_blocks_min:dct_blocks_max]
+
+  if norm_after:
+    normalizeDCT(TMP_tensor)
+
+  return TMP_tensor
+
+def face_normalized(img_input, pos_input, features_output):
+  # Parameters
+  # Cropping
+  CROP_EYES_D = 33
+  CROP_H = 80
+  CROP_W = 64
+  CROP_OH = 16
+  CROP_OW = 32
+      
+  # Tan Triggs
+  GAMMA = 0.2 
+  SIGMA0 = 1.
+  SIGMA1 = 2.
+  SIZE = 5
+  THRESHOLD = 10.
+  ALPHA = 0.1
+
+  # DCT blocks
+  BLOCK_H = 8
+  BLOCK_W = 8
+  OVERLAP_H = 7
+  OVERLAP_W = 7
+  N_DCT_COEF = 15
+
+  # Initialize cropper and destination array
+  FEN = torch.ip.FaceEyesNorm( CROP_EYES_D, CROP_H, CROP_W, CROP_OH, CROP_OW)
+  cropped_img = torch.core.array.float64_2(CROP_H, CROP_W)
+
+  # Initialize the Tan and Triggs preprocessing
+  TT = torch.ip.TanTriggs( GAMMA, SIGMA0, SIGMA1, SIZE, THRESHOLD, ALPHA)
+  preprocessed_img = torch.core.array.float64_2(CROP_H, CROP_W)
+
+  # Initialize the DCT feature extractor
+  DCTF = torch.ip.DCTFeatures( BLOCK_H, BLOCK_W, OVERLAP_H, OVERLAP_W, N_DCT_COEF)
+
+  # process the 'dictionary of files'
+  for k in img_input:
+    # input image file
+    img_rgb = torch.core.array.load( str(img_input[k]) )
+    # input eyes position file
+    LW, LH, RW, RH = [int(j.strip()) for j in open(pos_input[k]).read().split()]
+
+    # convert to grayscale
+    img = torch.ip.rgb_to_gray(img_rgb)
+    # extract and crop a face 
+    FEN(img, cropped_img, LH, LW, RH, RW) 
+    # preprocess a face using Tan and Triggs
+    TT(cropped_img, preprocessed_img)
+    # computes DCT features
+    dct_blocks=dctfeatures(preprocessed_img, BLOCK_H, BLOCK_W, OVERLAP_H, OVERLAP_W, N_DCT_COEF,
+      True, True, False)
+
+    # save
+    torch.io.Array(dct_blocks).save(str(features_output[k]))
 
 
 def NormalizeStdArrayset(arrayset):
@@ -51,7 +185,7 @@ def loadData(files):
   return data
 
 
-def trainGMM(data, n_gaussians=5, iterk=25, iterg=25, convergence_threshold=1e-5, variance_threshold=0.001, 
+def trainGMM(data, n_gaussians=32, iterk=25, iterg=25, convergence_threshold=1e-5, variance_threshold=0.001, 
              update_weights=True, update_means=True, update_variances=True, norm_KMeans=False):
   ar = data
 
@@ -86,9 +220,9 @@ def trainGMM(data, n_gaussians=5, iterk=25, iterg=25, convergence_threshold=1e-5
 
   # Initialize gmm
   gmm.means = means
+  gmm.setVarianceThresholds(variance_threshold)
   gmm.variances = variances
   gmm.weights = weights
-  gmm.setVarianceThresholds(variance_threshold)
 
   # Train gmm
   trainer = torch.trainer.ML_GMMTrainer(update_means, update_variances, update_weights)
@@ -144,7 +278,7 @@ class GMMExperiment:
     self.iterg = 50
     self.convergence_threshold = 1e-5
     self.variance_threshold = 0.001
-    self.relevance_factor = 0.001
+    self.relevance_factor = 4
 
   def precomputeZTnorm(self, tnorm_clients, znorm_clients):
     # Loading data for ZTnorm
@@ -171,6 +305,7 @@ class GMMExperiment:
         else:
           data = loadData([f])
           stats = torch.machine.GMMStats(self.wm.nGaussians, self.wm.nInputs)
+          stats.init()
           self.wm.accStatistics(data, stats)
           stats.save(torch.io.HDF5File(str(stat_path)))
 
@@ -261,7 +396,7 @@ class GMMExperiment:
           scores[m, f] = sumc - sumWm
           i+=1
           sys.stdout.flush()
-    
+
     if self.ztnorm:
       # TODO: fix n_blocks
       n_blocks = 4161
@@ -329,6 +464,7 @@ class TestTest(unittest.TestCase):
   def test01_gmm_ztnorm(self):
     # Creates a temporary directory
     output_dir = tempfile.mkdtemp()
+
     # Get the directory where the features and the UBM are stored
     data_dir = os.path.join('data', 'bancasmall')
     
@@ -337,19 +473,28 @@ class TestTest(unittest.TestCase):
     protocol='P'
     extension='.hdf5'
 
+    # Computes the features
+    img_input = db.files(directory=data_dir, extension=".jpg")
+    pos_input = db.files(directory=data_dir, extension=".pos")
+    features_dir = os.path.join(output_dir, 'features')
+    if not os.path.exists(features_dir):
+      os.mkdir(features_dir)
+    features_output = db.files(directory=features_dir, extension=extension)
+    face_normalized(img_input, pos_input, features_output)
+
     # create a subdirectory for the models
     models_dir = os.path.join(output_dir, "models")
     if not os.path.exists(models_dir):
       os.mkdir(models_dir)
 
     # loads the UBM model
-    wm_path = os.path.join(data_dir, "ubmT5.hdf5")
+    wm_path = os.path.join(data_dir, "ubmT5_new.hdf5")
     wm = torch.machine.GMMMachine(torch.io.HDF5File(wm_path))
 
     # creates a GMM experiments using Linear Scoring and ZT-norm
-    exp = GMMExperiment(db, data_dir, extension, protocol, wm, models_dir, True, True)
-    exp.iterg = 1
-    exp.iterk = 50
+    exp = GMMExperiment(db, features_dir, extension, protocol, wm, models_dir, True, True)
+    exp.iterg = 25
+    exp.iterk = 25
     exp.convergence_threshold = 0.0005
     exp.variance_threshold = 0.001
     exp.relevance_factor = 4.
@@ -364,8 +509,9 @@ class TestTest(unittest.TestCase):
     scores=exp.run('dev', open(os.path.join(result_dir, 'scores-dev'), 'w'))
 
     # Check results (scores)
-    scores_ref = torch.core.array.float64_1([2.073368737400600, 1.524833680242284, 
-      2.468051383113884, 1.705402816531652], (4,))
+    #scores_ref = torch.core.array.float64_1([2.073368737400600, 1.524833680242284, 
+    #  2.468051383113884, 1.705402816531652], (4,))
+    scores_ref = torch.core.array.float64_1([1.46379478, 0.69330295, 2.14465708, 1.24284387], (4,))
     self.assertTrue( ((scores - scores_ref) < 1e-4).all() )
 
     # Remove output directory
