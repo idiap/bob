@@ -65,8 +65,11 @@ set_property(TEST python-db-replay-dumplist APPEND PROPERTY DEPENDS
   ${python-db-replay-instantiation})
 torch_python_add_test(python-db-replay-dumplist2
   ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py replay dumplist --class=attack
-  --group=devel --support=hand --device=highdef --self-test)
+  --group=devel --support=hand --protocol=highdef --self-test)
 set_property(TEST python-db-replay-dumplist2 APPEND PROPERTY DEPENDS 
+  ${python-db-replay-instantiation})
+torch_python_add_test(python-db-replay-query ${CMAKE_CURRENT_SOURCE_DIR}/test/test_replay.py)
+set_property(TEST python-db-replay-query APPEND PROPERTY DEPENDS 
   ${python-db-replay-instantiation})
 
 # BANCA database driver tests.
