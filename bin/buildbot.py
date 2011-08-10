@@ -27,8 +27,8 @@ def parse_args():
   import optparse
   
   #some defaults
-  actions = ('cmake', 'make_all', 'all', 'build', 'documentation', 'docs',
-      'sphinx', 'doxygen', 'make_install', 'install', 'ctest', 'test',
+  actions = ('cmake', 'dot', 'make_all', 'all', 'build', 'documentation',
+      'docs', 'sphinx', 'doxygen', 'make_install', 'install', 'ctest', 'test',
       'make_clean', 'clean', 'mrproper')
   build_types = ('release', 'debug') #default is #0
   build_blocks = ('all', 'cxx', 'python') #default is #0
@@ -161,9 +161,8 @@ if __name__ == '__main__':
     #special option to run cmake/make_install
     adm.build.cmake(options)
     adm.build.install(options)
-  elif options.action == 'cmake': 
-    adm.build.cmake(options)
-    adm.build.dot(options)
+  elif options.action == 'cmake': adm.build.cmake(options)
+  elif options.action == 'dot': adm.build.dot(options)
   elif options.action in ('make_all', 'all'): adm.build.make(options, 'all')
   elif options.action in ('make_install', 'install'): adm.build.install(options)
   elif options.action in ('documentation', 'docs'): adm.build.documentation(options)
