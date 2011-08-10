@@ -11,6 +11,7 @@
 
 #include <cstdlib>
 #include <blitz/array.h>
+#include "core/array_check.h"
 #include "core/array_type.h"
 #include "io/Exception.h"
 #include "core/cast.h"
@@ -121,7 +122,7 @@ namespace Torch { namespace io { namespace detail {
 
   template<typename T, int D> 
     void InlinedArrayImpl::setCopy(const blitz::Array<T,D>& data) {
-      blitz::Array<T,D> tmp = data.copy();
+      blitz::Array<T,D> tmp = Torch::core::array::ccopy(data);
       set(tmp);
   }
 
@@ -136,7 +137,7 @@ namespace Torch { namespace io { namespace detail {
   }
 
   template<typename T, int D> blitz::Array<T,D> InlinedArrayImpl::getCopy() const {
-    return get<T,D>()->copy();
+    return Torch::core::array::ccopy(*(get<T,D>()));
   }
 
   template<typename T, int D> blitz::Array<T,D> InlinedArrayImpl::cast() const {

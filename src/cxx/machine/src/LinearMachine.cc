@@ -7,6 +7,7 @@
 
 #include <cmath>
 
+#include "core/array_check.h"
 #include "io/Arrayset.h"
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"
@@ -26,7 +27,7 @@ mach::LinearMachine::LinearMachine(const blitz::Array<double,2>& weight)
   m_input_sub = 0.0;
   m_input_div = 1.0;
   m_bias = 0.0;
-  m_weight.reference(weight.copy());
+  m_weight.reference(Torch::core::array::ccopy(weight));
 }
 
 mach::LinearMachine::LinearMachine():
@@ -56,10 +57,10 @@ mach::LinearMachine::LinearMachine(size_t n_input, size_t n_output):
 }
 
 mach::LinearMachine::LinearMachine(const mach::LinearMachine& other):
-  m_input_sub(other.m_input_sub.copy()),
-  m_input_div(other.m_input_div.copy()),
-  m_weight(other.m_weight.copy()),
-  m_bias(other.m_bias.copy()),
+  m_input_sub(Torch::core::array::ccopy(other.m_input_sub)),
+  m_input_div(Torch::core::array::ccopy(other.m_input_div)),
+  m_weight(Torch::core::array::ccopy(other.m_weight)),
+  m_bias(Torch::core::array::ccopy(other.m_bias)),
   m_activation(other.m_activation),
   m_actfun(other.m_actfun),
   m_buffer(m_input_sub.shape())
@@ -74,10 +75,10 @@ mach::LinearMachine::~LinearMachine() {}
 
 mach::LinearMachine& mach::LinearMachine::operator=
 (const mach::LinearMachine& other) {
-  m_input_sub.reference(other.m_input_sub.copy());
-  m_input_div.reference(other.m_input_div.copy());
-  m_weight.reference(other.m_weight.copy());
-  m_bias.reference(other.m_bias.copy());
+  m_input_sub.reference(Torch::core::array::ccopy(other.m_input_sub));
+  m_input_div.reference(Torch::core::array::ccopy(other.m_input_div));
+  m_weight.reference(Torch::core::array::ccopy(other.m_weight));
+  m_bias.reference(Torch::core::array::ccopy(other.m_bias));
   m_activation = other.m_activation;
   m_actfun = other.m_actfun;
   m_buffer.resize(m_input_sub.shape());
@@ -142,7 +143,7 @@ void mach::LinearMachine::setWeights
   if (weight.extent(1) != m_bias.extent(0)) { //checks output
     throw mach::NOutputsMismatch(weight.extent(1), m_bias.extent(0));
   }
-  m_weight.reference(weight.copy());
+  m_weight.reference(Torch::core::array::ccopy(weight));
 }
 
 void mach::LinearMachine::setBiases
@@ -150,7 +151,7 @@ void mach::LinearMachine::setBiases
   if (m_weight.extent(1) != bias.extent(0)) {
     throw mach::NOutputsMismatch(m_weight.extent(1), bias.extent(0));
   }
-  m_bias.reference(bias.copy());
+  m_bias.reference(Torch::core::array::ccopy(bias));
 }
 
 void mach::LinearMachine::setInputSubtraction
@@ -158,7 +159,7 @@ void mach::LinearMachine::setInputSubtraction
   if (m_weight.extent(0) != v.extent(0)) {
     throw mach::NInputsMismatch(m_weight.extent(0), v.extent(0));
   }
-  m_input_sub.reference(v.copy());
+  m_input_sub.reference(Torch::core::array::ccopy(v));
 }
 
 void mach::LinearMachine::setInputDivision
@@ -166,7 +167,7 @@ void mach::LinearMachine::setInputDivision
   if (m_weight.extent(0) != v.extent(0)) {
     throw mach::NInputsMismatch(m_weight.extent(0), v.extent(0));
   }
-  m_input_div.reference(v.copy());
+  m_input_div.reference(Torch::core::array::ccopy(v));
 }
 
 void mach::LinearMachine::setActivation (mach::Activation a) {

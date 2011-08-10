@@ -16,6 +16,7 @@
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"
 #include "core/logging.h"
+#include "core/array_check.h"
 #include "io/HDF5File.h"
 #include "math/linear.h"
 
@@ -23,7 +24,7 @@
  * Evalutes the presumed output of a linear machine through a different path.
  */
 static blitz::Array<double,1> presumed (const blitz::Array<double,1>& input) {
-  blitz::Array<double,1> buffer(input.copy());
+  blitz::Array<double,1> buffer(Torch::core::array::ccopy(input));
   
   blitz::Array<double,2> weights(3,2);
   weights = 0.4, 0.1, 0.4, 0.2, 0.2, 0.7;

@@ -155,6 +155,17 @@ namespace Torch {
       return true;
     }
 
+    /**
+     * @brief Copies a blitz array like copy() does, but resets the storage 
+     * ordering.
+     */
+    template <typename T, int D>
+    blitz::Array<T,D> ccopy( const blitz::Array<T,D>& a)
+    {
+      blitz::Array<T,D> b(a.shape());
+      b = a;
+      return b;
+    }
 
     /**
      * @brief This function reindex and resize a 1D blitz array with the given

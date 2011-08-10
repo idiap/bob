@@ -43,7 +43,7 @@ train::DataShuffler::DataShuffler(const std::vector<Torch::io::Arrayset>& data,
 
   // copies the target data to my own variable
   for (size_t k=0; k<target.size(); ++k) 
-    m_target[k].reference(target[k].copy());
+    m_target[k].reference(Torch::core::array::ccopy(target[k]));
 
   // creates one range tailored for the range of each Arrayset
   for (size_t i=0; i<data.size(); ++i) {
@@ -56,11 +56,11 @@ train::DataShuffler::DataShuffler(const train::DataShuffler& other):
   m_target(other.m_target.size()),
   m_range(other.m_range),
   m_do_stdnorm(other.m_do_stdnorm),
-  m_mean(other.m_mean.copy()),
-  m_stddev(other.m_stddev.copy())
+  m_mean(Torch::core::array::ccopy(other.m_mean)),
+  m_stddev(Torch::core::array::ccopy(other.m_stddev))
 {
   for (size_t k=0; k<m_target.size(); ++k) 
-    m_target[k].reference(other.m_target[k].copy());
+    m_target[k].reference(Torch::core::array::ccopy(other.m_target[k]));
 }
 
 train::DataShuffler::~DataShuffler() { }
@@ -70,12 +70,12 @@ train::DataShuffler& train::DataShuffler::operator=
   m_data = other.m_data;
   m_target.resize(other.m_target.size());
   for (size_t k=0; k<m_target.size(); ++k) 
-    m_target[k].reference(other.m_target[k].copy());
+    m_target[k].reference(Torch::core::array::ccopy(other.m_target[k]));
 
   m_range = other.m_range;
   
-  m_mean.reference(other.m_mean.copy());
-  m_stddev.reference(other.m_stddev.copy());
+  m_mean.reference(Torch::core::array::ccopy(other.m_mean));
+  m_stddev.reference(Torch::core::array::ccopy(other.m_stddev));
 
   return *this;
 }
@@ -118,8 +118,8 @@ void train::DataShuffler::setAutoStdNorm(bool s) {
 void train::DataShuffler::getStdNorm(blitz::Array<double,1>& mean,
     blitz::Array<double,1>& stddev) const {
   if (m_do_stdnorm) {
-    mean.reference(m_mean.copy());
-    stddev.reference(m_stddev.copy());
+    mean.reference(Torch::core::array::ccopy(m_mean));
+    stddev.reference(Torch::core::array::ccopy(m_stddev));
   }
   else { //do it on-the-fly
     evaluateStdNormParameters(m_data, mean, stddev);

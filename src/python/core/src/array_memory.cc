@@ -8,6 +8,7 @@
 #include <boost/python.hpp>
 #include <blitz/array.h>
 
+#include "core/array_check.h"
 #include "core/python/array_base.h"
 #include "core/python/blitz_extra.h"
 
@@ -22,7 +23,7 @@ static void bind_memory_common (tp::array<T,N>& array) {
   array.object()->def("free", &array_type::free, "This method resizes an array to zero size. If the array data is not being shared with another array object, then it is freed.");
   array.object()->def("resize", (void (array_type::*)(const shape_type&))(&array_type::resize), boost::python::arg("shape"), "If the array is already the size specified, then no memory is allocated. After resizing, the contents of the array are garbage. See also resizeAndPreserve().");
   array.object()->def("resizeAndPreserve", (void (array_type::*)(const shape_type&))(&array_type::resizeAndPreserve), boost::python::arg("shape"), "If the array is already the size specified, then no change occurs (the array is not reallocated and copied). The contents of the array are preserved whenever possible; if the new array size is smaller, then some data will be lost. Any new elements created by resizing the array are left uninitialized.");
-  array.object()->def("copy", &array_type::copy, "This method creates a copy of the array's data, using the same storage ordering as the current array. The returned array is guaranteed to be stored contiguously in memory, and to be the only object referring to its memory block (i.e. the data isn't shared with any other array object).");
+  array.object()->def("copy", &Torch::core::array::ccopy<T,N>, "This method creates a copy of the array's data, using the same storage ordering as the current array. The returned array is guaranteed to be stored contiguously in memory, and to be the only object referring to its memory block (i.e. the data isn't shared with any other array object).");
   array.object()->def("makeUnique", &array_type::makeUnique, "If the array's data is being shared with another Blitz++ array object, this member function creates a copy so the array object has a unique view of the data.");
 }
 

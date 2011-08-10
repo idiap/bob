@@ -12,6 +12,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include "core/cast.h"
+#include "core/array_check.h"
 #include "core/array_type.h"
 #include "math/linear.h"
 #include "math/interiorpointLP.h"
@@ -117,20 +118,20 @@ BOOST_AUTO_TEST_CASE( test_solve_3x3 )
     sol(n-1) = pow(5., n); // Solution to problem 1 is [0 ... 0 5^n] 
 
     // Short step
-    blitz::Array<double,1> x2(x0.copy());
+    blitz::Array<double,1> x2(Torch::core::array::ccopy(x0));
     Torch::math::interiorpointShortstepLP(A, b, c, 0.4, x2, 1e-6);
     for( int i=0; i<n; ++i)
       BOOST_CHECK_SMALL( fabs( x2(i+x2.lbound(0))-sol(i)), eps);
 
     // Predictor corrector
-    blitz::Array<double,1> x3(x0.copy());
+    blitz::Array<double,1> x3(Torch::core::array::ccopy(x0));
     Torch::math::interiorpointPredictorCorrectorLP(
       A, b, c, 0.5, 0.25, x3, 1e-6);
     for( int i=0; i<n; ++i)
       BOOST_CHECK_SMALL( fabs( x3(i+x3.lbound(0))-sol(i)), eps);
 
     // Long step
-    blitz::Array<double,1> x4(x0.copy());
+    blitz::Array<double,1> x4(Torch::core::array::ccopy(x0));
     Torch::math::interiorpointLongstepLP(A, b, c, 1e-3, 0.1, x4, 1e-6);
     for( int i=0; i<n; ++i)
       BOOST_CHECK_SMALL( fabs( x4(i+x4.lbound(0))-sol(i)), eps);
@@ -200,8 +201,8 @@ BOOST_AUTO_TEST_CASE( test_detail_barrier )
   // Check gradientLogBarrier
   blitz::Array<double,1> d_matlab(n);
   d_matlab = -0.54166666, -0.53333333;
-  blitz::Array<double,1> work_ar = c.copy();
-  blitz::Array<double,1> d = lambda.copy();
+  blitz::Array<double,1> work_ar = Torch::core::array::ccopy(c);
+  blitz::Array<double,1> d = Torch::core::array::ccopy(lambda);
   Torch::math::detail::gradientLogBarrierLP(A, c, lambda, work_ar, d);
   for( int i=0; i<n; ++i)
     BOOST_CHECK_SMALL( fabs(d_matlab(i)-d(i+d.lbound(0))), eps);

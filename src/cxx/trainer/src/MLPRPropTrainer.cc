@@ -83,21 +83,21 @@ train::MLPRPropTrainer::MLPRPropTrainer(const MLPRPropTrainer& other):
   m_prev_deriv_bias(m_H + 1),
   m_actfun(other.m_actfun),
   m_bwdfun(other.m_bwdfun),
-  m_target(other.m_target.copy()),
+  m_target(Torch::core::array::ccopy(other.m_target)),
   m_error(m_H + 1),
   m_output(m_H + 2)
 {
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(other.m_delta[k].copy());
-    m_delta_bias[k].reference(other.m_delta_bias[k].copy());
-    m_deriv[k].reference(other.m_deriv[k].copy());
-    m_deriv_bias[k].reference(other.m_deriv_bias[k].copy());
-    m_prev_deriv[k].reference(other.m_prev_deriv[k].copy());
-    m_prev_deriv_bias[k].reference(other.m_prev_deriv_bias[k].copy());
-    m_error[k].reference(other.m_error[k].copy());
-    m_output[k].reference(other.m_output[k].copy());
+    m_delta[k].reference(Torch::core::array::ccopy(other.m_delta[k]));
+    m_delta_bias[k].reference(Torch::core::array::ccopy(other.m_delta_bias[k]));
+    m_deriv[k].reference(Torch::core::array::ccopy(other.m_deriv[k]));
+    m_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_deriv_bias[k]));
+    m_prev_deriv[k].reference(Torch::core::array::ccopy(other.m_prev_deriv[k]));
+    m_prev_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_prev_deriv_bias[k]));
+    m_error[k].reference(Torch::core::array::ccopy(other.m_error[k]));
+    m_output[k].reference(Torch::core::array::ccopy(other.m_output[k]));
   }
-  m_output[m_H + 1].reference(other.m_output[m_H + 1].copy());
+  m_output[m_H + 1].reference(Torch::core::array::ccopy(other.m_output[m_H + 1]));
 }
 
 train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
@@ -114,21 +114,21 @@ train::MLPRPropTrainer& train::MLPRPropTrainer::operator=
   m_prev_deriv_bias.resize(m_H + 1);
   m_actfun = other.m_actfun;
   m_bwdfun = other.m_bwdfun;
-  m_target.reference(other.m_target.copy());
+  m_target.reference(Torch::core::array::ccopy(other.m_target));
   m_error.resize(m_H + 1);
   m_output.resize(m_H + 2);
 
   for (size_t k=0; k<(m_H + 1); ++k) {
-    m_delta[k].reference(other.m_delta[k].copy());
-    m_delta_bias[k].reference(other.m_delta_bias[k].copy());
-    m_deriv[k].reference(other.m_deriv[k].copy());
-    m_deriv_bias[k].reference(other.m_deriv_bias[k].copy());
-    m_prev_deriv[k].reference(other.m_prev_deriv[k].copy());
-    m_prev_deriv_bias[k].reference(other.m_prev_deriv_bias[k].copy());
-    m_error[k].reference(other.m_error[k].copy());
-    m_output[k].reference(other.m_output[k].copy());
+    m_delta[k].reference(Torch::core::array::ccopy(other.m_delta[k]));
+    m_delta_bias[k].reference(Torch::core::array::ccopy(other.m_delta_bias[k]));
+    m_deriv[k].reference(Torch::core::array::ccopy(other.m_deriv[k]));
+    m_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_deriv_bias[k]));
+    m_prev_deriv[k].reference(Torch::core::array::ccopy(other.m_prev_deriv[k]));
+    m_prev_deriv_bias[k].reference(Torch::core::array::ccopy(other.m_prev_deriv_bias[k]));
+    m_error[k].reference(Torch::core::array::ccopy(other.m_error[k]));
+    m_output[k].reference(Torch::core::array::ccopy(other.m_output[k]));
   }
-  m_output[m_H + 1].reference(other.m_output[m_H + 1].copy());
+  m_output[m_H + 1].reference(Torch::core::array::ccopy(other.m_output[m_H + 1]));
 
   return *this;
 }

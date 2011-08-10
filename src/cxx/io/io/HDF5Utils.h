@@ -360,7 +360,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         void replaceArray(size_t index, const blitz::Array<T,N>& value) {
           Torch::io::HDF5Type dest_type(value);
           if(!Torch::core::array::isCZeroBaseContiguous(value)) {
-            blitz::Array<T,N> tmp = value.copy();
+            blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
             write(index, dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {
@@ -396,7 +396,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         void addArray(const blitz::Array<T,N>& value) {
           Torch::io::HDF5Type dest_type(value);
           if(!Torch::core::array::isCZeroBaseContiguous(value)) {
-            blitz::Array<T,N> tmp = value.copy();
+            blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
             extend(dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {

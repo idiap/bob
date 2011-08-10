@@ -14,6 +14,7 @@
 #include <boost/python.hpp>
 #include <blitz/array.h>
 #include "core/python/exception.h"
+#include "core/array_check.h"
 
 namespace Torch { namespace python {
 
@@ -30,7 +31,7 @@ namespace Torch { namespace python {
     template <typename V, int N>
     struct assign<blitz::Array<V,N> > {
       void operator() (std::map<std::string, blitz::Array<V,N> >& self, const std::string& key, const blitz::Array<V,N>& value) {
-        self[key].reference(value.copy());
+        self[key].reference(Torch::core::array::ccopy(value));
       }
     };
 

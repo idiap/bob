@@ -17,6 +17,7 @@
 #include <map>
 #include <string>
 
+#include "core/array_check.h"
 #include "io/InlinedArrayImpl.h"
 #include "io/InlinedArraysetImpl.h"
 #include "io/Exception.h"
@@ -135,9 +136,9 @@ namespace Torch { namespace io { namespace detail {
       //transform the input data into a fortran-style array as Matlab requires
       //fortran order for storage.
       blitz::Array<F,D> bzre(bzdata.shape(), blitz::FortranArray<D>());
-      bzre = blitz::real(bzdata).copy(); //makes contiguous
+      bzre = Torch::core::array::ccopy(blitz::real(bzdata)); //makes contiguous
       blitz::Array<F,D> bzim(bzdata.shape(), blitz::FortranArray<D>());
-      bzim = blitz::imag(bzdata).copy(); //makes contiguous
+      bzim = Torch::core::array::ccopy(blitz::imag(bzdata)); //makes contiguous
 
       ComplexSplit mio_complex = { 
         static_cast<void*>(bzre.data()),

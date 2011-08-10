@@ -18,6 +18,7 @@
  * single-dimension input.
  */
 
+#include "core/array_check.h"
 #include "io/T3BinaryArrayCodec.h"
 #include "io/ArrayCodecRegistry.h"
 #include "io/Exception.h"
@@ -121,12 +122,12 @@ void io::T3BinaryArrayCodec::save (const std::string& filename,
   ofile.write((const char*)&framesize, sizeof(uint32_t));
   if (data.getElementType() == Torch::core::array::t_float32) {
     blitz::Array<float, 2> save = data.get<float,2>();
-    if (!save.isStorageContiguous()) save.reference(save.copy());
+    if (!save.isStorageContiguous()) save.reference(Torch::core::array::ccopy(save));
     ofile.write((const char*)save.data(), save.extent(0)*save.extent(1)*sizeof(float));
   }
   else { //it is a t_float64
     blitz::Array<double, 2> save = data.get<double,2>();
-    if (!save.isStorageContiguous()) save.reference(save.copy());
+    if (!save.isStorageContiguous()) save.reference(Torch::core::array::ccopy(save));
     ofile.write((const char*)save.data(), save.extent(0)*save.extent(1)*sizeof(double));
   }
   ofile.close();
