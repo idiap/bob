@@ -32,7 +32,7 @@ using namespace boost::python;
  */
 str blitz_version() {
   std::string retval(BZ_VERSION);
-# ifdef HAVE_BLITZ_SIZETYPE
+# if defined(HAVE_BLITZ_SPECIAL_TYPES)
   //this is a temporary hack to identify support for more than 2GB big arrays
   retval += "+CVS (>2GB contents supported)";
 # endif

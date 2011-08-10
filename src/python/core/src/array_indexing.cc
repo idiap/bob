@@ -10,7 +10,7 @@
 namespace tp = Torch::python;
 namespace bp = boost::python;
 
-#ifdef HAVE_BLITZ_SIZETYPE
+#if defined(HAVE_BLITZ_SPECIAL_TYPES)
 int tp::range::fromStart = blitz::fromStart;
 int tp::range::toEnd = blitz::toEnd;
 #else
