@@ -202,7 +202,7 @@ void bind_core_array_tinyvector () {
   tinyvec_from_sequence<int,9>();
   tinyvec_from_sequence<int,10>();
   tinyvec_from_sequence<int,11>();
-# ifdef HAVE_BLITZ_DIFFTYPE
+# if defined(HAVE_BLITZ_SPECIAL_TYPES)
   if (typeid(int) != typeid(blitz::diffType)) {
     tinyvec_from_sequence<blitz::diffType,1>();
     tinyvec_from_sequence<blitz::diffType,2>();
@@ -216,7 +216,7 @@ void bind_core_array_tinyvector () {
     tinyvec_from_sequence<blitz::diffType,10>();
     tinyvec_from_sequence<blitz::diffType,11>();
   }
-# endif //HAVE_BLITZ_DIFFTYPE
+# endif //defined(HAVE_BLITZ_SPECIAL_TYPES)
 
   /**
    * The following struct constructors will make C++ return values of type
@@ -233,7 +233,7 @@ void bind_core_array_tinyvector () {
   register_tinyvec_to_tuple<int,9>();
   register_tinyvec_to_tuple<int,10>();
   register_tinyvec_to_tuple<int,11>();
-# ifdef HAVE_BLITZ_DIFFTYPE
+# if defined(HAVE_BLITZ_SPECIAL_TYPES)
   if (typeid(int) != typeid(blitz::diffType)) {
     register_tinyvec_to_tuple<blitz::diffType,1>();
     register_tinyvec_to_tuple<blitz::diffType,2>();
@@ -247,6 +247,6 @@ void bind_core_array_tinyvector () {
     register_tinyvec_to_tuple<blitz::diffType,10>();
     register_tinyvec_to_tuple<blitz::diffType,11>();
   }
-# endif //HAVE_BLITZ_DIFFTYPE
+# endif //defined(HAVE_BLITZ_SPECIAL_TYPES)
 
 }
