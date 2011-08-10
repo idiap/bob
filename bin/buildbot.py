@@ -81,6 +81,10 @@ def parse_args():
       default=1, metavar="INT(>=1)",
       help="where possible, try to launch several jobs at once (defaults to %default)",
       )
+  parser.add_option("-G", "--graphviz", action="store_true", dest="graphviz",
+      default=False,
+      help="also generates the dependence graph in dot format while in cmake",
+      )
   parser.add_option("--static-linkage", action="store_true",
       dest="static_linkage", default=False,
       help="links executables with static libraries when possible",

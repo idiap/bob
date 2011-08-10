@@ -113,7 +113,7 @@ def cmake(option):
   os.chdir(option.build_prefix)
 
   cmake_options = {}
-  cmake_options['--graphviz'] = "dependencies.dot"
+  if option.graphviz: cmake_options['--graphviz'] = "dependencies.dot"
   cmake_options['-DCMAKE_BUILD_TYPE'] = option.build_type
   cmake_options['-DCMAKE_INSTALL_PREFIX'] = option.install_prefix
   cmake_options['-DTORCH_LINKAGE'] = 'dynamic'
