@@ -112,6 +112,10 @@ def parse_args():
       default="", metavar="REGEXP",
       help="Filter tests to be executed by setting this option with a regular expression matching the test or tests you want to execute. This option is only in action if the action 'test' is used. (defaults to '%default')"
       )
+  parser.add_option("-v", "--verbose", action="callback",
+      callback=adm.build.increase_verbosity,
+      help="increases the current verbosity level",
+      )
   
   options, args = parser.parse_args()
 
