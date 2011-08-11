@@ -109,7 +109,8 @@ def cmake(option):
     shutil.rmtree(option.install_prefix)
 
   if not os.path.exists(option.build_prefix): os.makedirs(option.build_prefix)
-
+  
+  logging.debug("Changing directory to '%s'..." % option.build_prefix)
   os.chdir(option.build_prefix)
 
   cmake_options = {}
@@ -202,6 +203,7 @@ def make(option, target="all"):
 
   logging.debug('Running make %s...' % target)
 
+  logging.debug("Changing directory to '%s'..." % option.build_prefix)
   os.chdir(option.build_prefix)
 
   cmdline = ['make', '--keep-going']
@@ -229,6 +231,7 @@ def ctest(option):
 
   logging.debug('Running ctest...')
 
+  logging.debug("Changing directory to '%s'..." % option.build_prefix)
   os.chdir(option.build_prefix)
 
   cmdline = ['ctest']
@@ -310,6 +313,8 @@ def doxygen(option):
   os.unlink(tmpname)
 
   #create a link from index.html to main.html 
+  logging.debug("Changing directory to '%s'..." % \
+      os.path.join(option.doc_prefix, 'doxygen', 'html'))
   os.chdir(os.path.join(option.doc_prefix, 'doxygen', 'html'))
   if not os.path.exists('main.html'):
     logging.debug("Copying index.html -> main.html")
@@ -475,9 +480,11 @@ def dot(option):
 
   logging.debug('Running dot...')
 
+  logging.debug("Changing directory to '%s'..." % option.build_prefix)
   os.chdir(option.build_prefix)
   dotfile = 'dependencies.dot'
   if hasattr(option, "save_output") and option.save_output: 
+    logging.debug("Changing directory to '%s'..." % option.log_prefix)
     os.chdir(option.log_prefix)
     dotfile = os.path.join('..', dotfile)
 
