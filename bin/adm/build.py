@@ -234,6 +234,8 @@ def ctest(option):
   cmdline = ['ctest']
   if option.debug_build:
     cmdline.append('--verbose')
+  else:
+    cmdline.append('-j%d' % option.jobs)
   if option.tregex:
     cmdline.extend(('--tests-regex', option.tregex))
   if hasattr(option, "log_prefix"):
