@@ -14,6 +14,7 @@ void bind_io_arrayset();
 void bind_io_binfile();
 void bind_io_tensorfile();
 void bind_io_hdf5();
+void bind_io_hdf5_extras();
 void bind_io_codec();
 void bind_io_transcode();
 void bind_io_datetime();
@@ -31,6 +32,7 @@ BOOST_PYTHON_MODULE(libpytorch_io) {
   bind_io_binfile();
   bind_io_tensorfile();
   bind_io_hdf5();
+  bind_io_hdf5_extras();
   bind_io_codec();
   bind_io_transcode();
   bind_io_datetime();

@@ -8,6 +8,7 @@ set(pysrc
    "src/exception.cc"
    "src/binfile.cc"
    "src/tensorfile.cc"
+   "src/hdf5_extras.cc"
    "src/hdf5.cc"
    "src/codec.cc"
    "src/transcode.cc"

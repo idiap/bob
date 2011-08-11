@@ -47,7 +47,7 @@ static void bind (tp::array<T,N>& array) {
 
   array.object()->def("dimensions", &array_type::dimensions, "Total number of dimensions on this array");
 
-  array.object()->def("rank", &array_type::rank, "Total number of dimensions on this array");
+  array.object()->def("rank", &array_type::dimensions, "Total number of dimensions on this array");
 
   array.object()->def("rows", &array_type::rows, "Equivalent to extent(firstDim)");
 
