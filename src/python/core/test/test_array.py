@@ -719,6 +719,7 @@ class ArrayTest(unittest.TestCase):
     self.assertEqual(t5_complex[1,1], complex(5,0))
 
   def test10_empty_like(self):
+
     Array    = torch.core.array.array([[1,2,3], [4,5,6]], 'float64')
     Array_sa = Array.empty_like();
 
@@ -728,14 +729,11 @@ class ArrayTest(unittest.TestCase):
     Array_sa = Array.empty_like();
     assert_empty_like(self, Array, Array_sa)
 
-  def test12_as_row(self):
-      Array    = torch.core.array.uint8_2([1,2,3,4,5,6,7,8], (2,4))
-      Array_vo = Array.as_row();
+  def test11_as_row(self):
 
-      print Array
-      print Array_vo
-
-      assert_as_row(self, Array, Array_vo)
+    Array    = torch.core.array.uint8_2([1,2,3,4,5,6,7,8], (2,4))
+    Array_vo = Array.as_row();
+    assert_as_row(self, Array, Array_vo)
     
 if __name__ == '__main__':
   sys.argv.append('-v')
