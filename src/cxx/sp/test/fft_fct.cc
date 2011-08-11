@@ -363,30 +363,26 @@ BOOST_AUTO_TEST_CASE( test_fftshift1D_simple )
   Torch::sp::fftshift(t4, t4_s);
   // Compare to reference
   for(int i=0; i < t4.extent(0); ++i)
-    for(int j=0; j < t4.extent(1); ++j)
-      BOOST_CHECK_SMALL( abs(t4_s(i,j)-t4_s_ref(i,j)), eps);
+    BOOST_CHECK_SMALL( abs(t4_s(i)-t4_s_ref(i)), eps);
   
   blitz::Array<std::complex<double>,1> t4_si(4);
   Torch::sp::ifftshift(t4_s, t4_si);
   // Compare to original
   for(int i=0; i < t4.extent(0); ++i)
-    for(int j=0; j < t4.extent(1); ++j)
-      BOOST_CHECK_SMALL( abs(t4_si(i,j)-t4(i,j)), eps);
+    BOOST_CHECK_SMALL( abs(t4_si(i)-t4(i)), eps);
 
   // 2/ Process t5
   blitz::Array<std::complex<double>,1> t5_s(5);
   Torch::sp::fftshift(t5, t5_s);
   // Compare to reference
   for(int i=0; i < t5.extent(0); ++i)
-    for(int j=0; j < t5.extent(1); ++j)
-      BOOST_CHECK_SMALL( abs(t5_s(i,j)-t5_s_ref(i,j)), eps);
+    BOOST_CHECK_SMALL( abs(t5_s(i)-t5_s_ref(i)), eps);
   
   blitz::Array<std::complex<double>,1> t5_si(5);
   Torch::sp::ifftshift(t5_s, t5_si);
   // Compare to original
   for(int i=0; i < t5.extent(0); ++i)
-    for(int j=0; j < t5.extent(1); ++j)
-      BOOST_CHECK_SMALL( abs(t5_si(i,j)-t5(i,j)), eps);
+    BOOST_CHECK_SMALL( abs(t5_si(i)-t5(i)), eps);
 }
 
 BOOST_AUTO_TEST_CASE( test_fftshift2D_simple )
