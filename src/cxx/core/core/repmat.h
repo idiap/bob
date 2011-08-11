@@ -92,7 +92,7 @@ namespace Torch {
       else // src is a column vector
       {
         int m = dst.extent(0) / src.extent(0);
-        int n = dst.extent(1) / src.extent(1);
+        int n = dst.extent(1);
         for(int i=0; i<m; ++i)
         {
           for(int j=0; j<n; ++j)
