@@ -8,6 +8,7 @@
 #include "trainer/JFATrainer.h"
 #include "math/lu_det.h"
 #include "math/linear.h"
+#include "core/array_check.h"
 #include "core/Exception.h"
 #include "core/repmat.h"
 #include <algorithm>
@@ -528,8 +529,8 @@ void train::JFABaseTrainer::setStatistics(const std::vector<blitz::Array<double,
 
   // Copy the vectors
   for(size_t i=0; i<m_Nid; ++i) {
-    m_N[i].reference(N[i].copy());
-    m_F[i].reference(F[i].copy());
+    m_N[i].reference(Torch::core::array::ccopy(N[i]));
+    m_F[i].reference(Torch::core::array::ccopy(F[i]));
   }
 }
 
@@ -558,10 +559,10 @@ void train::JFABaseTrainer::setSpeakerFactors(const std::vector<blitz::Array<dou
 
   // Copy the vectors
   for(size_t i=0; i<m_x.size(); ++i) 
-    m_x[i].reference(x[i].copy());
+    m_x[i].reference(Torch::core::array::ccopy(x[i]));
   for(size_t i=0; i<m_Nid; ++i) {
-    m_y[i].reference(y[i].copy());
-    m_z[i].reference(z[i].copy());
+    m_y[i].reference(Torch::core::array::ccopy(y[i]));
+    m_z[i].reference(Torch::core::array::ccopy(z[i]));
   }
 }
 
@@ -607,7 +608,7 @@ void train::JFABaseTrainer::precomputeSumStatisticsN()
   blitz::secondIndex j;
   for(size_t id=0; id<m_N.size(); ++id) {
     Nsum = blitz::sum(m_N[id], j);
-    m_Nacc.push_back(Nsum.copy());
+    m_Nacc.push_back(Torch::core::array::ccopy(Nsum));
   }
 /*
   for(size_t id=0; id<m_N.size(); ++id) {
@@ -625,7 +626,7 @@ void train::JFABaseTrainer::precomputeSumStatisticsF()
   blitz::secondIndex j;
   for(size_t id=0; id<m_F.size(); ++id) {
     Fsum = blitz::sum(m_F[id], j);
-    m_Facc.push_back(Fsum.copy());
+    m_Facc.push_back(Torch::core::array::ccopy(Fsum));
   }
 /*
   for(size_t id=0; id<m_F.size(); ++id) {
@@ -1025,10 +1026,37 @@ void train::JFABaseTrainer::train(const std::vector<blitz::Array<double,2> >& N,
     updateY();
     updateV();
   }
+  updateY();
   for(size_t i=0; i<n_iter; ++i) {
     updateX();
     updateU();
   }
+  updateX();
+  for(size_t i=0; i<n_iter; ++i) {
+    updateZ();
+    updateD();
+  }
+}
+
+void train::JFABaseTrainer::trainNoUVDInit(const std::vector<blitz::Array<double,2> >& N,
+  const std::vector<blitz::Array<double,2> >& F, const size_t n_iter)
+{
+  setStatistics(N,F);
+  precomputeSumStatisticsN();
+  precomputeSumStatisticsF();
+
+  initializeXYZ();
+
+  for(size_t i=0; i<n_iter; ++i) {
+    updateY();
+    updateV();
+  }
+  updateY();
+  for(size_t i=0; i<n_iter; ++i) {
+    updateX();
+    updateU();
+  }
+  updateX();
   for(size_t i=0; i<n_iter; ++i) {
     updateZ();
     updateD();
@@ -1056,11 +1084,11 @@ void train::JFABaseTrainer::initializeXYZ()
   x0 = 0;
   for(size_t i=0; i<m_Nid; ++i)
   {
-    z.push_back(z0.copy());
-    y.push_back(y0.copy());
+    z.push_back(Torch::core::array::ccopy(z0));
+    y.push_back(Torch::core::array::ccopy(y0));
     x0.resize(m_jfa_machine.getDimRu(),m_N[i].extent(1));
     x0 = 0;
-    x.push_back(x0.copy());
+    x.push_back(Torch::core::array::ccopy(x0));
   }
   setSpeakerFactors(x,y,z);
 }
@@ -1091,8 +1119,70 @@ void train::JFABaseTrainer::train(const std::vector<std::vector<Torch::machine::
     vec_N.push_back(Nid);
     vec_F.push_back(Fid);
   }
-  train(vec_N, vec_F, n_iter);
+  trainNoUVDInit(vec_N, vec_F, n_iter);
 }
+
+
+void train::JFABaseTrainer::initializeVD_ISV()
+{
+  // V = 0
+  blitz::Array<double,2> V = m_jfa_machine.updateV();
+  V = 0.;
+  // D = variance(UBM) / relevance_factor
+  blitz::Array<double,1> d = m_jfa_machine.updateD();
+  m_jfa_machine.getUbm()->getVarianceSupervector(m_cache_ubm_var);
+  d = m_cache_ubm_var / 4.; // TODO: Remove HARD CODED variable (relevance factor)
+}
+
+
+
+void train::JFABaseTrainer::trainISV(const std::vector<blitz::Array<double,2> >& N,
+  const std::vector<blitz::Array<double,2> >& F, const size_t n_iter)
+{
+  setStatistics(N,F);
+  precomputeSumStatisticsN();
+  precomputeSumStatisticsF();
+
+  initializeVD_ISV();
+  initializeXYZ();
+
+  for(size_t i=0; i<n_iter; ++i) {
+    updateX();
+    updateU();
+  }
+}
+
+
+
+void train::JFABaseTrainer::trainISV(const std::vector<std::vector<Torch::machine::GMMStats*> >& vec,
+  const size_t n_iter)
+{
+  std::vector<blitz::Array<double,2> > vec_N;
+  std::vector<blitz::Array<double,2> > vec_F;
+  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  for(size_t id=0; id<vec.size(); ++id)
+  {
+    blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
+    blitz::Array<double,2> Fid(ubm->getNGaussians()*ubm->getNInputs(), vec[id].size());
+    for(size_t s=0; s<vec[id].size(); ++s)
+    {
+      // TODO: check type/dimensions?
+      blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
+      blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
+      const Torch::machine::GMMStats* stats = vec[id][s];
+      Nid_s = stats->n;
+      for(int g=0; g<ubm->getNGaussians(); ++g)
+      {
+        blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
+        Fid_s_g = stats->sumPx(g,blitz::Range::all());
+      }
+    }
+    vec_N.push_back(Nid);
+    vec_F.push_back(Fid);
+  }
+  trainISV(vec_N, vec_F, n_iter);
+}
+
 
 
 
@@ -1106,14 +1196,15 @@ void train::JFATrainer::enrol(const blitz::Array<double,2>& N,
   const blitz::Array<double,2>& F, const size_t n_iter)
 {
   std::vector<blitz::Array<double,2> > Nv;
-  Nv.push_back(N.copy());
+  Nv.push_back(Torch::core::array::ccopy(N));
   std::vector<blitz::Array<double,2> > Fv;
-  Fv.push_back(F.copy());
+  Fv.push_back(Torch::core::array::ccopy(F));
   m_base_trainer.setStatistics(Nv,Fv);
   m_base_trainer.precomputeSumStatisticsN();
   m_base_trainer.precomputeSumStatisticsF();
 
   m_base_trainer.initializeXYZ();
+  
   for(size_t i=0; i<n_iter; ++i) {
     m_base_trainer.updateY();
     m_base_trainer.updateX();

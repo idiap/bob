@@ -14,6 +14,9 @@
 #include "math/lu_det.h"
 #include "core/repmat.h"
 #include "machine/LinearScoring.h"
+#include "core/array_check.h"
+
+#include "core/logging.h"
 
 namespace mach = Torch::machine;
 namespace math = Torch::math;
@@ -38,9 +41,9 @@ mach::JFABaseMachine::JFABaseMachine(const boost::shared_ptr<Torch::machine::GMM
 
 mach::JFABaseMachine::JFABaseMachine(const mach::JFABaseMachine& other):
   m_ubm(other.m_ubm), m_ru(other.m_ru), m_rv(other.m_rv),
-  m_U(other.m_U.copy()),
-  m_V(other.m_V.copy()),
-  m_d(other.m_d.copy())
+  m_U(Torch::core::array::ccopy(other.m_U)),
+  m_V(Torch::core::array::ccopy(other.m_V)),
+  m_d(Torch::core::array::ccopy(other.m_d))
 {
 }
 
@@ -56,9 +59,9 @@ mach::JFABaseMachine& mach::JFABaseMachine::operator=
   m_ubm = other.m_ubm;
   m_ru = other.m_ru;
   m_rv = other.m_rv;
-  m_U.reference(other.m_U.copy());
-  m_V.reference(other.m_V.copy());
-  m_d.reference(other.m_d.copy());
+  m_U.reference(Torch::core::array::ccopy(other.m_U));
+  m_V.reference(Torch::core::array::ccopy(other.m_V));
+  m_d.reference(Torch::core::array::ccopy(other.m_d));
   return *this;
 }
 
@@ -88,7 +91,7 @@ void mach::JFABaseMachine::setU(const blitz::Array<double,2>& U) {
   if(U.extent(1) != m_U.extent(1)) { //checks dimension
     throw mach::NInputsMismatch(U.extent(1), m_U.extent(1));
   }
-  m_U.reference(U.copy());
+  m_U.reference(Torch::core::array::ccopy(U));
 }
 
 void mach::JFABaseMachine::setV(const blitz::Array<double,2>& V) {
@@ -98,14 +101,14 @@ void mach::JFABaseMachine::setV(const blitz::Array<double,2>& V) {
   if(V.extent(1) != m_V.extent(1)) { //checks dimension
     throw mach::NInputsMismatch(V.extent(1), m_V.extent(1));
   }
-  m_V.reference(V.copy());
+  m_V.reference(Torch::core::array::ccopy(V));
 }
 
 void mach::JFABaseMachine::setD(const blitz::Array<double,1>& d) {
   if(d.extent(0) != m_d.extent(0)) { //checks dimension
     throw mach::NInputsMismatch(d.extent(0), m_d.extent(0));
   }
-  m_d.reference(d.copy());
+  m_d.reference(Torch::core::array::ccopy(d));
 }
 
 
@@ -127,8 +130,8 @@ mach::JFAMachine::JFAMachine(const boost::shared_ptr<Torch::machine::JFABaseMach
 
 mach::JFAMachine::JFAMachine(const mach::JFAMachine& other):
   m_jfa_base(other.m_jfa_base),
-  m_y(other.m_y.copy()),
-  m_z(other.m_z.copy())
+  m_y(Torch::core::array::ccopy(other.m_y)),
+  m_z(Torch::core::array::ccopy(other.m_z))
 {
 }
 
@@ -142,8 +145,8 @@ mach::JFAMachine::~JFAMachine() {
 mach::JFAMachine& mach::JFAMachine::operator=
 (const mach::JFAMachine& other) {
   m_jfa_base = other.m_jfa_base;
-  m_y.reference(other.m_y.copy());
-  m_z.reference(other.m_z.copy());
+  m_y.reference(Torch::core::array::ccopy(other.m_y));
+  m_z.reference(Torch::core::array::ccopy(other.m_z));
   return *this;
 }
 
@@ -159,21 +162,23 @@ void mach::JFAMachine::save(Torch::io::HDF5File& config) const {
 }
 
 void mach::JFAMachine::setJFABase(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfa_base) {
-  m_jfa_base = jfa_base;
+  m_jfa_base = jfa_base; 
+  m_y.resize(jfa_base->getDimRv());
+  m_z.resize(jfa_base->getDimCD());
 }
 
 void mach::JFAMachine::setY(const blitz::Array<double,1>& y) {
   if(y.extent(0) != m_y.extent(0)) { //checks dimension
     throw mach::NInputsMismatch(y.extent(0), m_y.extent(0));
   }
-  m_y.reference(y.copy());
+  m_y.reference(Torch::core::array::ccopy(y));
 }
 
 void mach::JFAMachine::setZ(const blitz::Array<double,1>& z) {
   if(z.extent(0) != m_z.extent(0)) { //checks dimension
     throw mach::NInputsMismatch(z.extent(0), m_z.extent(0));
   }
-  m_z.reference(z.copy());
+  m_z.reference(Torch::core::array::ccopy(z));
 }
 
 void mach::JFAMachine::updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F)
@@ -243,7 +248,14 @@ void mach::JFAMachine::computeFn_x(const blitz::Array<double,1>& N, const blitz:
   const blitz::Array<double,1>& d = m_jfa_base->getD();
   m_tmp_CD.resize(getDimCD());
   Torch::core::repelem(N, m_tmp_CD);
+//  Torch::core::info << "  F" << std::endl << F << std::endl;
+//  Torch::core::info << "  m_tmp_CD" << std::endl << m_tmp_CD << std::endl;
+//  Torch::core::info << "  m_cache_mean " << std::endl << m_cache_mean << std::endl;
+//  Torch::core::info << "  U " << std::endl << m_jfa_base->getU() << std::endl;
+//  Torch::core::info << "  d " << std::endl << d << std::endl;
+//  Torch::core::info << "  m_z " << std::endl << m_z << std::endl;
   m_cache_Fn_x = F - m_tmp_CD * (m_cache_mean + d * m_z); // Fn_x = N*(o - m - D*z) 
+//  Torch::core::info << "m_cache_Fn_x interm" << std::endl <<  m_cache_Fn_x << std::endl;
 
   const blitz::Array<double,2>& V = m_jfa_base->getV();
   blitz::firstIndex i;
@@ -251,6 +263,7 @@ void mach::JFAMachine::computeFn_x(const blitz::Array<double,1>& N, const blitz:
   m_tmp_CD_b.resize(getDimCD());
   Torch::math::prod(V, m_y, m_tmp_CD_b);
   m_cache_Fn_x -= m_tmp_CD * m_tmp_CD_b;
+//  Torch::core::info << "m_cache_Fn_x final" << std::endl <<  m_cache_Fn_x << std::endl;
   // Fn_x = N*(o - m - D*z - V*y)
 }
 
@@ -259,6 +272,7 @@ void mach::JFAMachine::updateX_fromCache()
   // Compute x = Ax * Cus * Fn_x
   m_tmp_ru.resize(getDimRu());
   // m_tmp_ru = m_cache_UtSigmaInv * m_cache_Fn_x = Ut*diag(sigma)^-1 * N*(o - m - D*z - V*y)
+
   Torch::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x, m_tmp_ru); 
   Torch::math::prod(m_cache_IdPlusUProd, m_tmp_ru, m_x);
 }
@@ -286,6 +300,7 @@ void mach::JFAMachine::forward(mach::GMMStats* gmm_stats, double& score)
   std::vector<Torch::machine::GMMStats*> stats;
   stats.push_back(&m_cache_gmmstats);
   m_cache_Ux.resize(getDimCD());
+Torch::core::info << "X estimated: " << m_x << std::endl;
   Torch::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
   std::vector<blitz::Array<double,1> > channelOffset;
   channelOffset.push_back(m_cache_Ux);
@@ -314,7 +329,7 @@ void mach::JFAMachine::forward(std::vector<mach::GMMStats*>& samples, blitz::Arr
     // Ux and GMMStats
     estimateX(samples[i]);
     Torch::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
-    channelOffset.push_back(m_cache_Ux.copy());
+    channelOffset.push_back(Torch::core::array::ccopy(m_cache_Ux));
   }
 
   // m + Vy + Dz
