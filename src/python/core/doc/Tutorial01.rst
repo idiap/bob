@@ -1,11 +1,11 @@
 .. vim: set fileencoding=utf-8 :
 
-======================================
+=======================================
  Tutorial 01. Initialization of Arrays
-======================================
+=======================================
 
-In this section we will illustrate the many different ways to initialize an array in |project|.
-In summary you can
+In this section we will illustrate the many different ways to initialize an
+array in |project|.  In summary you can:
 
 * specify shape or guess shape
 * specify type or guess type

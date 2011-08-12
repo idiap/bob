@@ -2,9 +2,9 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Mon  4 Apr 22:14:21 2011 CEST
 
-==================
-Basic Funcionality
-==================
+====================
+ Basic Funcionality
+====================
 
 .. toctree::
    :maxdepth: 2

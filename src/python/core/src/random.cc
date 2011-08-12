@@ -93,7 +93,7 @@ static void lognormal_distribution(const char* vartype) {
   boost::format name("lognormal_%s");
   name % vartype;
 
-  boost::format doc("The distribution class %s (boost::lognormal_distribution<%s>) models a random distribution. Such a distribution produces random numbers 'x' distributed with the probability density function :math:`$p(x) = \\frac{1}{x \\sigma_N \\sqrt{2\\pi}} e^{\\frac{-\\left(\\log(x)-\\mu_N\\right)^2}{2\\sigma_N^2}}`, for :math:`x > 0` and :math:`$\\sigma_N = \\sqrt{\\log\\left(1 + \\frac{\\sigma^2}{\\mu^2}\\right)}`.");
+  boost::format doc("The distribution class %s (boost::lognormal_distribution<%s>) models a random distribution. Such a distribution produces random numbers 'x' distributed with the probability density function :math:`p(x) = \\frac{1}{x \\sigma_N \\sqrt{2\\pi}} e^{\\frac{-\\left(\\log(x)-\\mu_N\\right)^2}{2\\sigma_N^2}}`, for :math:`x > 0` and :math:`\\sigma_N = \\sqrt{\\log\\left(1 + \\frac{\\sigma^2}{\\mu^2}\\right)}`.");
   doc % name.str() % vartype;
 
   class_<D>(name.str().c_str(), doc.str().c_str(), no_init)
