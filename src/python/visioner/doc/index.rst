@@ -96,6 +96,30 @@ detection system in 3-ways on your script:
         
    Look at the user manual using ``help()`` for operational details.
 
+Applications
+------------
+
+We provide 3 applications that are shipped with |project|:
+
+* visioner_facebox.py: This application takes as input either a video or image
+  file and can output bounding boxes for faces detected on those files. It uses
+  ``torch.visioner.MaxDetector`` for this purpose. You can configure, via
+  command-line parameters, the number of scanning levels or the use of a
+  user-provided classification model for face localization;
+
+* visioner_fecepoints.py: Is similar to the facebox script, but detects both
+  the face and keypoints on the given video or image. You can configure the
+  number of scanning levels, or provide external classification and
+  localization models. By default, this program will use the default
+  localization model provide by |project| which can detect eye-centers;
+
+* visioner_transcode.py: This program can convert text model files to
+  alternative formats that can be more compact.
+
+The face detection and keypoint localization programs can, optionally, create
+an output video or image with the face bounding box and localized keypoints
+drawned, for debugging purposes.
+
 Reference Manual
 ----------------
 
