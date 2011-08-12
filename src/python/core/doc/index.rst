@@ -4,12 +4,16 @@
 
 .. Index file for the Python Torch::core bindings
 
-=====================
- Basic Functionality
-=====================
+====================
+ Core Functionality
+====================
 
 .. toctree::
    :maxdepth: 2
+
+   UsingBlitzArrays
+
+   random
 
    Tutorial01
 
@@ -24,7 +28,4 @@
    Tutorial10
 
    PCA
-
-   UsingBlitzArrays
-
 

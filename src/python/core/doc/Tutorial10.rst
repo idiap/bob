@@ -1,9 +1,10 @@
-=================================
+==================================
  Tutorial 10. Eigenfaces in torch
-=================================
+==================================
 
-In this practical example we will do a eigenface classifier only using core functionality of torch.
-Later we will show something similar but with more powerful torch tools. (TODO).
+In this practical example we will do a eigenface classifier only using core
+functionality of torch.  Later we will show something similar but with more
+powerful torch tools. (TODO).
 
 We will start by only importing the necessary modules.
 

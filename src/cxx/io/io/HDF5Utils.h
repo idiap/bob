@@ -246,8 +246,8 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T, int N> 
         blitz::Array<T,N> readArray(size_t index) {
-          for (size_t k=(m_descr.size()-1); k>=0; --k) {
-            const Torch::io::HDF5Shape& S = m_descr[k].type.shape();
+          for (size_t k=m_descr.size(); k>0; --k) {
+            const Torch::io::HDF5Shape& S = m_descr[k-1].type.shape();
             if(S.n() == N) {
               blitz::TinyVector<int,N> shape;
               S.set(shape);
