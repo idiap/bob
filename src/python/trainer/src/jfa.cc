@@ -31,6 +31,25 @@ static void jfa_train(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
   t.train(gmm_stats, n_iter);
 }
 
+static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
+{
+  int n_ids = len(list_stats);
+  std::vector<std::vector<Torch::machine::GMMStats*> > gmm_stats;
+
+  // Extracts the vector of vector of pointers from the python list of lists
+  for(int id=0; id<n_ids; ++id) {
+    list list_stats_id = extract<list>(list_stats[id]);
+    int n_samples = len(list_stats_id);
+    std::vector<Torch::machine::GMMStats*> gmm_stats_id;
+    for(int s=0; s<n_samples; ++s)
+      gmm_stats_id.push_back(extract<Torch::machine::GMMStats*>(list_stats_id[s]));
+    gmm_stats.push_back(gmm_stats_id);
+  }
+
+  // Calls the train function
+  t.trainISV(gmm_stats, n_iter);
+}
+
 static void jfa_enrol(train::JFATrainer& t, list stats, size_t n_iter)
 {
   int n_samples = len(stats);
@@ -64,6 +83,7 @@ void bind_trainer_jfa() {
     .def("setSpeakerFactors", &train::JFABaseTrainer::setSpeakerFactors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
     .def("train", (void (train::JFABaseTrainer::*)(const std::vector<blitz::Array<double,2> >&, const std::vector<blitz::Array<double,2> >&, const size_t))&train::JFABaseTrainer::train, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
     .def("train", &jfa_train/*(train::JFABaseTrainer::*)(const std::vector<std::vector<mach::GMMStats*> >&, const size_t))&train::JFABaseTrainer::train*/, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
+    .def("trainISV", &jfa_train_ISV/*(train::JFABaseTrainer::*)(const std::vector<std::vector<mach::GMMStats*> >&, const size_t))&train::JFABaseTrainer::train*/, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the ISV training procedure.")
     .def("initializeRandomU", &train::JFABaseTrainer::initializeRandomU, (arg("self")), "Initializes randomly U.")
     .def("initializeRandomV", &train::JFABaseTrainer::initializeRandomV, (arg("self")), "Initializes randomly V.")
     .def("initializeRandomD", &train::JFABaseTrainer::initializeRandomD, (arg("self")), "Initializes randomly D.")

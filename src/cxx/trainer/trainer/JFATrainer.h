@@ -14,6 +14,7 @@
 #include  <map>
 #include  <vector>
 #include  <string>
+#include "core/array_check.h"
 
 #include "core/logging.h"
 
@@ -290,8 +291,19 @@ class JFABaseTrainer {
     void train(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
+    void trainNoUVDInit(const std::vector<blitz::Array<double,2> >& N,
+      const std::vector<blitz::Array<double,2> >& F, 
+      const size_t n_iter); 
     void train(const std::vector<std::vector<Torch::machine::GMMStats*> >& features,
       const size_t n_iter); 
+
+    void trainISV(const std::vector<blitz::Array<double,2> >& N,
+      const std::vector<blitz::Array<double,2> >& F, 
+      const size_t n_iter); 
+    void trainISV(const std::vector<std::vector<Torch::machine::GMMStats*> >& features,
+      const size_t n_iter); 
+    void initializeVD_ISV();
+
     /**
       * Initializes U, V and D
       */
@@ -382,15 +394,15 @@ class JFABaseTrainer {
     blitz::Array<double,2>& updateA2_y()
     { return m_cache_A2_y; }
     void setVtSigmaInv(const blitz::Array<double,2>& VtSigmaInv)
-    { m_cache_VtSigmaInv.reference(VtSigmaInv.copy()); }
+    { m_cache_VtSigmaInv.reference(Torch::core::array::ccopy(VtSigmaInv)); }
     void setIdPlusVProd_i(const blitz::Array<double,2>& IdPlusVProd_i)
-    { m_cache_IdPlusVProd_i.reference(IdPlusVProd_i.copy()); }
+    { m_cache_IdPlusVProd_i.reference(Torch::core::array::ccopy(IdPlusVProd_i)); }
     void setFn_y_i(const blitz::Array<double,1>& Fn_y_i)
-    { m_cache_Fn_y_i.reference(Fn_y_i.copy()); }
+    { m_cache_Fn_y_i.reference(Torch::core::array::ccopy(Fn_y_i)); }
     void setA1_y(const blitz::Array<double,3>& A1_y)
-    { m_cache_A1_y.reference(A1_y.copy()); }
+    { m_cache_A1_y.reference(Torch::core::array::ccopy(A1_y)); }
     void setA2_y(const blitz::Array<double,2>& A2_y)
-    { m_cache_A2_y.reference(A2_y.copy()); }
+    { m_cache_A2_y.reference(Torch::core::array::ccopy(A2_y)); }
 
 
   private:
