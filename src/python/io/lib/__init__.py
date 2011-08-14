@@ -248,6 +248,7 @@ del hdf5type_array_class
 def hdf5type_str(self):
   return "%s@%s" % (self.type_str(), self.shape())
 HDF5Type.__str__ = hdf5type_str
+del hdf5type_str
 
 def hdf5type_repr(self):
   return "<HDF5Type: %s (0x%x)>" % (str(self), id(self))

@@ -10,16 +10,19 @@
 
 Input and output in |project| is focused around three primitives:
 
-io.Array
-  The ``Array`` represents a ``blitz::Array<T,N>`` abstraction. It can hold
-  either a real ``blitz::Array<T,N>`` representation or be just a pointer to a
-  datafile where the actual array can be loaded from.
+:py:class:`torch.io.Array`
 
-io.Arrayset
-  The ``Arrayset`` represents a collection of ``torch.io.Array``'s.
+  The Array represents a :cpp:type:`blitz::Array` abstraction. It can hold
+  either a real :cpp:type:`blitz::Array` representation or be just a
+  pointer to a datafile where the actual array can be loaded from.
 
-io.HDF5File
-  The ``HDF5File`` is our preferred container for all sorts of array and scalar
+:py:class:`torch.io.Arrayset`
+
+  The Arrayset represents a collection of :py:class:`torch.io.Array`'s.
+
+:py:class:`torch.io.HDF5File`
+
+  The HDF5File is our preferred container for all sorts of array and scalar
   data to be produced or consumed from |project|. HDF5_ is a flexible
   open-source scientific data storage format. |project| uses this format as the
   primary input and output format. HDF5_ packaged distributions are available
@@ -28,6 +31,7 @@ io.HDF5File
   from and to |project|.
 
   .. note::
+
     HDF5_ files are normally sufixed with either a ``.hdf5`` or `.h5`
     extensions.
 
@@ -62,7 +66,6 @@ Let's take a look on how to record simple scalar data such as integers or
 floats.
 
 .. code-block:: python
-  :linenos:
 
   import torch
   an_integer = 5
@@ -72,12 +75,12 @@ floats.
   f.set('my_float', a_float)
   del f
 
-This example shows how you how to create a |project| ``HDF5File`` and set two
-values on it. If you use the HDF5_ command line utility ``h5dump`` on the file
-`example1.hdf` you will verify the file now contains:
+This example shows how you how to create a |project|
+:py:class:`torch.io.HDF5File` and set two values on it. If you use the HDF5_
+command line utility ``h5dump`` on the file ``example1.hdf`` you will verify
+the file now contains:
 
 .. code-block:: none
-  :linenos:
 
   HDF5 "example1.hdf5" {
   GROUP "/" {
@@ -100,16 +103,18 @@ values on it. If you use the HDF5_ command line utility ``h5dump`` on the file
 
 
 .. note::
+
   All our types and methods are defined in the ``torch`` package. We omit this
   on the following examples.
 
-  We delete the ``HDF5File`` object in the end of the above script (line 6), to
-  make sure the file will be safely closed and all buffers flushed. You don't
-  need to do that explicetly in your script. As soon as ``HDF5File`` objects go
-  out of scope, proper flushing and closing will take place. We will,
-  therefore, omit this on the following examples.
+  We delete the ``HDF5File`` object in the end of the above script, to make
+  sure the file will be safely closed and all buffers flushed. You don't need
+  to do that explicetly in your script. As soon as ``HDF5File`` objects go out
+  of scope, proper flushing and closing will take place. We will, therefore,
+  omit this on the following examples.
 
 .. note::
+
   In |project|, when you open an HDF5File, you can choose one of the following
   flags:
 
@@ -130,20 +135,18 @@ they live. We could write a new variable in the same file, but in a different
 directory like this:
 
 .. code-block:: python
-  :linenos:
 
   f = torch.io.HDF5File('example1.hdf5', 'w')
   f.set('/test/my_float', 6.28, dtype='float32')
 
 Line 1 shows we open the file again for reading and writing, but without
-truncating it. This will allow us to access the file contents. Next, at line 2,
-we write a new variable inside the ``/test`` subdirectory. As you can verify,
-**for simple scalars**, we can also force the storage type. Where normally one
-would have a 64-bit real value, we impose that this variable is saved as a
-32-bit real value. You can verify the dump correctness with ``h5dump``:
+truncating it. This will allow us to access the file contents. Next, we write a
+new variable inside the ``/test`` subdirectory. As you can verify, **for simple
+scalars**, we can also force the storage type. Where normally one would have a
+64-bit real value, we impose that this variable is saved as a 32-bit real
+value. You can verify the dump correctness with ``h5dump``:
 
 .. code-block:: none
-  :linenos:
 
   GROUP "/" {
   ...
@@ -173,7 +176,6 @@ Writing arrays is a little simpler as ``blitz::Array<>``'s encode all the type
 information we need to write and read them correctly. Here is an example:
 
 .. code-block:: python
-  :linenos:
 
   a = torch.core.array.int8_2(range(4), (2,2))
   f.set('my_array', a)
@@ -181,7 +183,6 @@ information we need to write and read them correctly. Here is an example:
 And the resulting ``h5dump`` would be:
 
 .. code-block:: none
-  :linenos:
 
   ...
    DATASET "my_array" {
@@ -200,12 +201,12 @@ of scalars and arrays using ``append`` instead of ``set``. Try it!
 Reading Data
 ------------
 
-Reading up data you just wrote is as easy. For this task you should use the
-``read`` method in ``HDF5File`` objects. The read method will read all the
+Reading up data you just wrote is as easy. For this task you should use
+:py:meth:`torch.io.HDF5File.read`. The read method will read all the
 contents of the variable pointed by the given path. This is the normal way to
-read a variable you have written with ``HDF5File.set()``. If you decided to
-create a list of scalar or arrays, the way to read that up would be using
-``HDF5File.lread()`` instead. Here is an example:
+read a variable you have written with :py:meth:`torch.io.HDF5File.set()``. If
+you decided to create a list of scalar or arrays, the way to read that up would
+be using :py:meth:`torch.io.HDF5File.lread()` instead. Here is an example:
 
 .. code-block:: python
 
@@ -218,9 +219,10 @@ create a list of scalar or arrays, the way to read that up would be using
   [[0 1]
    [2 3]]
 
-Now let's look at an example where we have used ``HDF5File.append()`` instead
-of ``set()`` to write data to a file. That is normally the case when you write
-lists of variables to a dataset.
+Now let's look at an example where we have used
+:py:meth:`torch.io.HDF5File.append()` instead of
+:py:meth:`torch.io.HDF5File.set()` to write data to a file. That is normally
+the case when you write lists of variables to a dataset.
 
 .. code-block:: python
 
@@ -263,12 +265,13 @@ shot:
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
   
-As you can see, the only difference between ``read()`` and ``lread()`` is on
-how |project| considers the available data (as a single array with N dimensions
-or set of arrays with N-1 dimensions). In the first example, you would have
-also been able to read the variable `my_array` as an arrayset using ``lread()``
-instead of ``read()``. In this case, each position readout would return a 1D
-uint8 array instead of a 2D array.
+As you can see, the only difference between :py:meth:`torch.io.HDF5File.read()`
+and :py:meth:`torch.io.HDF5File.lread()` is on how |project| considers the
+available data (as a single array with N dimensions or set of arrays with N-1
+dimensions). In the first example, you would have also been able to read the
+variable `my_array` as an arrayset using :py:meth:`torch.io.HDF5File.lread()`
+instead of :py:meth:`torch.io.HDF5File.read()`. In this case, each position
+readout would return a 1D uint8 array instead of a 2D array.
 
 Array interfaces
 ----------------
@@ -277,10 +280,11 @@ What we have shown so far is the generic API to read and write data using HDF5.
 You will use it when you want to import or export data from |project| into
 other software frameworks, debug your data or just implement your own classes
 that can serialize and de-serialize from HDF5 file containers. In |project|,
-most of the time you will be working with ``io.Array``\s and ``io.Arrayset``\s
-and it is even simpler to load and save those from/to files. 
+most of the time you will be working with :py:class:`torch.io.Array`\s and
+:py:class:`torch.io.Arrayset`\s and it is even simpler to load and save those
+from/to files. 
 
-To create an `io.Array` from a file, just do the following:
+To create an :py:class:`torch.io.Array` from a file, just do the following:
 
 .. code-block:: python
 
@@ -290,10 +294,11 @@ To create an `io.Array` from a file, just do the following:
   >>> a.loaded
   False
 
-Arrays are containers for ``blitz::Array``\s **or** just pointers to a file.
-When you instantiate an ``Array`` it does **not** load the file contents
-into memory. It waits until you emit another explicit instruction to do so. We
-do this with the `get()` method:
+Arrays are containers for :cpp:class:`blitz::Array`\s **or** just pointers
+to a file.  When you instantiate an :py:class:`torch.io.Array` it does **not**
+load the file contents into memory. It waits until you emit another explicit
+instruction to do so. We do this with the :py:meth:`torch.io.Array.get()`
+method:
 
 .. code-block:: python
 
@@ -306,8 +311,8 @@ do this with the `get()` method:
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
 
-Every time you say ``get()``, the file contents will be read from the file and
-into a new array. Try again:
+Every time you say :py:meth:`torch.io.Array.get()`, the file contents will be
+read from the file and into a new array. Try again:
 
 .. code-block:: python
 
@@ -320,7 +325,7 @@ into a new array. Try again:
   0.0
 
 You can force permanently loading the contents of the file in memory an avoid
-the I/O costs every time you read issue a ``get()``:
+the I/O costs every time you read issue a :py:meth:`torch.io.Array.get()`:
 
 .. code-block:: python
 
@@ -336,9 +341,10 @@ the I/O costs every time you read issue a ``get()``:
   -1.0
 
 Notice that, once the array is loaded in memory, a reference to the same array
-is shared every time you call ``get()``.
+is shared every time you call :py:meth:`torch.io.Array.get()`.
 
-Saving the ``io.Array`` is as easy, just call the ``save()`` method:
+Saving the :py:class:`torch.io.Array` is as easy, just call the
+:py:meth:`torch.io.Array.save()` method:
 
 .. code-block:: python
 
@@ -347,9 +353,9 @@ Saving the ``io.Array`` is as easy, just call the ``save()`` method:
 Blitz Array Shortcuts
 =====================
 
-To just load a ``blitz::Array<>`` in memory, we have written a short cut that
-lives at ``torch.core.array.load`` and saves you from going through the
-``io.Array`` API:
+To just load a :cpp:class:`blitz::Array` in memory, we have written a
+short cut that lives at :py:func:`torch.core.array.load` and saves you from
+going through the :py:class:`torch.io.Array` API:
 
 .. code-block:: python
 
@@ -361,8 +367,8 @@ lives at ``torch.core.array.load`` and saves you from going through the
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
 
-You can also directly save ``blitz::Array<>``\s without going through the
-``io.Array`` container:
+You can also directly save :cpp:class:`blitz::Array`\s without going
+through the :py:class:`torch.io.Array` container:
 
 .. code-block:: python
 
@@ -370,10 +376,10 @@ You can also directly save ``blitz::Array<>``\s without going through the
 
 .. note::
 
-  Under the hood, we still use the ``io.Array`` API to execute the read and
-  write operations. This avoids code duplication and hooks data loading and
-  saving to the powerful |project| transcoding framework that is explained
-  next.
+  Under the hood, we still use the :py:class:`torch.io.Array` API to execute
+  the read and write operations. This avoids code duplication and hooks data
+  loading and saving to the powerful |project| transcoding framework that is
+  explained next.
 
 Array transcoding
 =================
@@ -433,8 +439,8 @@ we currently support:
   * **HDF5** (``.hdf5`` or ``.h5``) [``hdf5.array.binary``], is the **prefered
     format for enconding |project| data** as discussed before.
 
-Saving an ``io.Array`` in a different format is just a matter of choosing the
-right extension:
+Saving a :py:class:`torch.io.Array` in a different format is just a matter of
+choosing the right extension:
 
 .. code-block:: python
 
@@ -443,6 +449,8 @@ right extension:
 You can choose an unconforming extension, but then make sure to choose the
 right codec as defined before:
 
+.. code-block:: python
+
   >>> bzarray.save('data.myweird.extension', 'matlab.array.binary')
   >>> #data is saved in Matlab format
 
@@ -450,10 +458,11 @@ Arrayset interfaces
 -------------------
 
 Arraysets are lists of arrays with the same shape and element type. You can
-load and save ``io.Arrayset``\s pretty much like you do for a plain
-``io.Array``\s.  All constraints and details for data loading hold for this
-class as well such as the deferred loading property we explained earlier. A
-list of arrays can only be serialized and de-serialized from specific formats:
+load and save :py:class:`torch.io.Arrayset`\s pretty much like you do for a
+plain :py:class:`torch.io.Array`\s.  All constraints and details for data
+loading hold for this class as well such as the deferred loading property we
+explained earlier.  A list of arrays can only be serialized and de-serialized
+from specific formats:
 
   * Matlab (``.mat``), supporting all kinds of scalars and array types, with
     the codec ``matlab.arrayset.binary``;
@@ -471,8 +480,8 @@ Load and save operations
 ========================
 
 Loading an arrayset is pretty much like loading an array, but instead,
-internally, the code will use something like ``HDF5File.lread()`` automatically
-for you:
+internally, the code will use something like
+:py:meth:`torch.io.HDF5File.lread()` automatically for you:
 
 .. code-block:: python
 
@@ -496,11 +505,11 @@ Building functionality
 ======================
 
 The loading and saving functionality are a bit of old news... Let's look into
-more interesting operations one can do with an ``io.Arrayset``, specifically to
-build one from ground up.
+more interesting operations one can do with an :py:class:`torch.io.Arrayset`,
+specifically to build one from ground up.
 
-To build an Arrayset, you may call ``io.Arrayset.append()`` as many times you
-need:
+To build an Arrayset, you may call :py:meth:`torch.io.Arrayset.append()` as
+many times you need:
 
 .. code-block:: python
 
@@ -526,9 +535,9 @@ do with a normal python list:
   >>> len(s)
   8
 
-Optionally, you can also extend the Arrayset with a ``blitz::Array<>`` object
-with N dimensions and tell it to iterate through dimension D and add objects
-with N-1 dimensions to it:
+Optionally, you can also extend the Arrayset with a
+:cpp:class:`blitz::Array` object with N dimensions and tell it to iterate
+through dimension D and add objects with N-1 dimensions to it:
 
 .. code-block:: python
 

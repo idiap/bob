@@ -63,20 +63,21 @@ detection system in 3-ways on your script:
    landmarks following the bounding box is determined by the loaded model. In
    |project|, we ship with two basic models:
 
-   * :py:const:`torch.visioner.DEFAULT_LMODE_EC`: this is the default model used for
-     keypoint localization if you don't provide anything to the
+   * :py:const:`torch.visioner.DEFAULT_LMODEL_EC`: this is the default model
+     used for keypoint localization if you don't provide anything to the
      :py:const:`torch.visioner.Localizer` constructor. A call to the function
-     operator (:py:meth:`__call__()`) will return the bounding box followed by the
-     coordinates of the left and right eyes respectively. The format is
+     operator (:py:meth:`__call__()`) will return the bounding box followed by
+     the coordinates of the left and right eyes respectively. The format is
      (top-left b.box x, top-left b.box y, b.box width, b.box height, left-eye
      x, left-eye y, right-eye x, right-eye y).
 
-   * :py:const:`torch.visioner.DEFAULT_LMODE_MP`: this is an alternative model that
-     can be used for keypoint localization. A call to the function operator
-     with a Localizer equipped with this model will return the bounding box
-     followed by the coordinates of the eye centers, eye corners, nose tip,
-     nostrils and mouth corners (always left and then right coordinates, with
-     the x value coming first followed by the y value of the keypoint).
+   * :py:const:`torch.visioner.DEFAULT_LMODEL_MP`: this is an alternative model
+     that can be used for keypoint localization. A call to the function
+     operator with a Localizer equipped with this model will return the
+     bounding box followed by the coordinates of the eye centers, eye corners,
+     nose tip, nostrils and mouth corners (always left and then right
+     coordinates, with the x value coming first followed by the y value of the
+     keypoint).
 
    .. note::
 
@@ -124,5 +125,15 @@ drawned, for debugging purposes.
 Reference Manual
 ----------------
 
-.. automodule:: torch.visioner
-   :members:
+.. autodata:: torch.visioner.DEFAULT_CMODEL
+.. autodata:: torch.visioner.DEFAULT_LMODEL_EC
+.. autodata:: torch.visioner.DEFAULT_LMODEL_MP
+.. autoclass:: torch.visioner.MaxDetector
+  :members:
+  :undoc-members:
+.. autoclass:: torch.visioner.Detector
+  :members:
+  :undoc-members:
+.. autoclass:: torch.visioner.Localizer
+  :members:
+  :undoc-members:

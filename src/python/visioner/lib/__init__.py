@@ -7,13 +7,15 @@ from libpytorch_visioner import *
 from os import path
 
 DEFAULT_CMODEL = path.join(path.dirname(__file__), 'Face.MCT9.gz')
+"""Default classification model for basic face detection"""
 
-# This model will get you left and right eye centers
 DEFAULT_LMODEL_EC = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.EyeCenters.gz')
+"""Default keypoint localization model. This model will get you left and
+right eye centers."""
 
-# This model will get you eye centers, eye corners, nose tip, nostrils, 
-# mouth corners
 DEFAULT_LMODEL_MP = path.join(path.dirname(__file__), 'Facial.MCT9.TMaxBoost.MultiPoint.gz')
+"""Alternative keypoint localization model. This model will get you eye
+centers, eye corners, nose tip, nostrils, mouth corners."""
 
 class MaxDetector:
   """A class that bridges the Visioner to torch so as to detect the most
