@@ -65,6 +65,7 @@ setting :math:`\beta` to 0.5 yields to the Half Total Error Rate (HTER) as
 defined in the first equation.
 
 .. note::
+
   Most of the methods availabe in this module require as input a set of 2
   :py:class:`torch.core.array.float64_1` objects that contain the scores
   obtained by the classification system to be evaluated, without specific
