@@ -31,10 +31,18 @@ namespace Torch { namespace trainer {
 
       /**
        * Initializes the shuffler with some data classes and corresponding
-       * targets. Note that Arraysets must have (for the time being), a shape
-       * of (1,) and an element type == double.
+       * targets. The Arraysets are concatenated and data is copied internally
+       * for faster access.
        */
       DataShuffler(const std::vector<Torch::io::Arrayset>& data,
+          const std::vector<blitz::Array<double,1> >& target);
+
+      /**
+       * Initializes the shuffler with some data classes and corresponding
+       * targets. The data is read by considering examples are lying on
+       * different rows of the input data. Data is copied internally.
+       */
+      DataShuffler(const std::vector<blitz::Array<double,2> >& data,
           const std::vector<blitz::Array<double,1> >& target);
 
       /**
@@ -72,7 +80,7 @@ namespace Torch { namespace trainer {
       /**
        * The data shape
        */
-      inline size_t getDataWidth() const { return m_data[0].getShape()[0]; }
+      inline size_t getDataWidth() const { return m_data[0].extent(1); }
 
       /**
        * The target shape
@@ -114,7 +122,7 @@ namespace Torch { namespace trainer {
 
     private: //representation
 
-      std::vector<Torch::io::Arrayset> m_data;
+      std::vector<blitz::Array<double,2> > m_data;
       std::vector<blitz::Array<double,1> > m_target;
       std::vector<boost::uniform_int<size_t> > m_range;
       bool m_do_stdnorm; ///< should we apply standard normalization
