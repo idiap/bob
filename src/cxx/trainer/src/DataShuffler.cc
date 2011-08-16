@@ -105,10 +105,43 @@ void evaluateStdNormParameters(const std::vector<Torch::io::Arrayset>& data,
   mean /= (samples);
 }
 
+/**
+ * Applies standard normalization parameters to all Arraysets given
+ */
+void applyStdNormParameters(std::vector<Torch::io::Arrayset>& data,
+    const blitz::Array<double,1>& mean, const blitz::Array<double,1>& stddev) {
+  for (size_t k=0; k<data.size(); ++k) {
+    for (size_t i=0; i<data[k].size(); ++i) {
+      blitz::Array<double,1> orig = data[k].get<double,1>(i);
+      blitz::Array<double,1> buffer(orig.shape());
+      buffer = (orig - mean) / stddev;
+      data[k].set(i, buffer);
+    }
+  }
+}
+
+/**
+ * Inverts the application of std normalization parameters
+ */
+void invertApplyStdNormParameters(std::vector<Torch::io::Arrayset>& data,
+    const blitz::Array<double,1>& mean, const blitz::Array<double,1>& stddev) {
+  for (size_t k=0; k<data.size(); ++k) {
+    for (size_t i=0; i<data[k].size(); ++i) {
+      blitz::Array<double,1> orig = data[k].get<double,1>(i);
+      blitz::Array<double,1> buffer(orig.shape());
+      buffer = (orig * stddev) + mean;
+      data[k].set(i, buffer);
+    }
+  }
+}
+
 void train::DataShuffler::setAutoStdNorm(bool s) {
-  if (s) evaluateStdNormParameters(m_data, m_mean, m_stddev);
-  else {
-    //reset mean and std.dev. values (just in case)
+  if (s && !m_do_stdnorm) {
+    evaluateStdNormParameters(m_data, m_mean, m_stddev);
+    applyStdNormParameters(m_data, m_mean, m_stddev);
+  }
+  if (!s && m_do_stdnorm) {
+    invertApplyStdNormParameters(m_data, m_mean, m_stddev);
     m_mean = 0.;
     m_stddev = 1.;
   }
@@ -137,10 +170,7 @@ void train::DataShuffler::operator() (boost::mt19937& rng,
   while (true) {
     for (size_t i=0; i<m_data.size(); ++i) { //for all classes
       size_t index = m_range[i](rng); //pick a random position within class
-      if (m_do_stdnorm)
-        data(counter, all) = (m_data[i].get<double,1>(index) - m_mean)/m_stddev;
-      else
-        data(counter, all) = m_data[i].get<double,1>(index);
+      data(counter, all) = m_data[i].get<double,1>(index);
       target(counter, all) = m_target[i];
       ++counter;
       if (counter >= max) break;

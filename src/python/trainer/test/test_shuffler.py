@@ -171,7 +171,7 @@ class DataShufferTest(unittest.TestCase):
     for i in range(10000):
       set1.append(torch.core.array.array([draw25(rng)], dtype='float64'))
     target1 = torch.core.array.array([1], dtype='float64')
-    
+
     set2 = torch.io.Arrayset()
     draw32 = torch.core.random.normal_float64(mean=3.0, sigma=2.0)
     for i in range(10000):
@@ -180,10 +180,19 @@ class DataShufferTest(unittest.TestCase):
 
     shuffle = torch.trainer.DataShuffler([set1, set2], [target1, target2])
     shuffle.auto_stdnorm = True
+    prev_mean, prev_stddev = shuffle.stdnorm()
 
     [data, target] = shuffle(200000)
     self.assertTrue( abs(data.mean()) < 1e-1 )
     self.assertTrue( abs(numpy.std(data.as_ndarray(), ddof=1) - 1.0) < 1e-1 )
+
+    #note that resetting auto_stdnorm will make the whole go back to normal,
+    #but the std normalization values remain the same...
+    shuffle.auto_stdnorm = False
+    back_mean, back_stddev = shuffle.stdnorm()
+    self.assertTrue( abs( (back_mean   - prev_mean  ).sum() ) < 1e-10)
+    self.assertTrue( abs( (back_stddev - prev_stddev).sum() ) < 1e-10)
+
 
 if __name__ == '__main__':
   sys.argv.append('-v')
