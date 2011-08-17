@@ -67,8 +67,9 @@ blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
   for (int i=0; i<(int)points; ++i) {
     std::pair<double, double> ratios =
       err::farfrr(negatives, positives, min + i*step);
-    retval(0,i) = ratios.first;
-    retval(1,i) = ratios.second;
+    //note: inversion to preserve X x Y ordering (FRR x FAR)
+    retval(0,i) = ratios.second;
+    retval(1,i) = ratios.first;
   }
   return retval;
 }
