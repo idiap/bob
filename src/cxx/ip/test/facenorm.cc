@@ -15,9 +15,11 @@
 #include "core/logging.h"
 #include "core/cast.h"
 #include "core/convert.h"
+#include "ip/color.h"
 #include "ip/FaceEyesNorm.h"
 #include "io/Array.h"
 
+#include <iostream>
 
 struct T {
   double eps;
@@ -86,5 +88,38 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   blitz::Array<uint8_t,2> img_ref_facenorm = ar_img_facenorm.get<uint8_t,2>();
   checkBlitzClose( img_ref_facenorm, img_processed, eps);
 }
+
+BOOST_AUTO_TEST_CASE( test_facenorm2 )
+{
+  // Get path to the XML Schema definition
+  char *testdata_cpath = getenv("TORCH_IP_TESTDATA_DIR");
+  if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
+    Torch::core::error << "Environment variable $TORCH_IP_TESTDATA_DIR " <<
+      "is not set. " << "Have you setup your working environment " <<
+      "correctly?" << std::endl;
+    throw Torch::core::Exception();
+  }
+  // Load original image
+  boost::filesystem::path testdata_path_img( testdata_cpath);
+  testdata_path_img /= "9003_m_wm_s01_9004_en_1.jpg";
+  Torch::io::Array ar_img(testdata_path_img.string());
+  blitz::Array<uint8_t,3> img_rgb = ar_img.get<uint8_t,3>();
+  blitz::Array<uint8_t,2> img(img_rgb.extent(1),img_rgb.extent(2));
+  Torch::ip::rgb_to_gray(img_rgb, img);
+  blitz::Array<double,2> img_processed_d(80,64);
+  
+
+  Torch::ip::FaceEyesNorm facenorm(33,80,64,16,32);
+
+  // Process giving the coordinates of the eyes
+  facenorm(img,img_processed_d,276,276,276,375);
+  blitz::Array<uint8_t,2> img_processed = Torch::core::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
+  testdata_path_img = testdata_cpath;
+  testdata_path_img /= "9003_m_wm_s01_9004_en_1_facenorm.pgm";
+  Torch::io::Array ar_img_facenorm(testdata_path_img.string());
+  blitz::Array<uint8_t,2> img_ref_facenorm = ar_img_facenorm.get<uint8_t,2>();
+  checkBlitzClose( img_ref_facenorm, img_processed, eps);
+}
+ 
   
 BOOST_AUTO_TEST_SUITE_END()

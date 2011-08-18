@@ -218,8 +218,8 @@ namespace Torch {
       double crop_ref_x2 = crop_ref_x1 * cos(m_rotate->getAngle()) + crop_ref_y1 * sin(m_rotate->getAngle()) + (m_rotated.extent(1)-1)/2.;
 
       // 3/ Scale with the given scaling factor
-      shape(0) = m_rotated.extent(0) * m_scaling_factor;
-      shape(1) = m_rotated.extent(1) * m_scaling_factor;
+      shape(0) = static_cast<int>(floor(m_rotated.extent(0) * m_scaling_factor + 0.5));
+      shape(1) = static_cast<int>(floor(m_rotated.extent(1) * m_scaling_factor + 0.5));
       if( !tca::hasSameShape(m_scaled, shape) ) {
         m_scaled.resize( shape );
         if(mask)
