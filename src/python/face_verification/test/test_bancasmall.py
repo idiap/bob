@@ -419,11 +419,11 @@ class GMMExperiment:
       # TODO: fix n_blocks
       n_blocks = 4161
       A = scores / n_blocks
-      print "A: " + str(A)
+      #print "A: " + str(A)
       B = torch.machine.linearScoring(models, self.wm, self.znorm_tests) / n_blocks
-      print "B: " + str(B)
+      #print "B: " + str(B)
       C = torch.machine.linearScoring(self.tnorm_models, self.wm, list_stats) / n_blocks 
-      print "C: " + str(C)
+      #print "C: " + str(C)
       scores = torch.machine.ztnorm(A, B, C, self.D/n_blocks, self.D_sameValue)
     return scores
 
@@ -486,8 +486,6 @@ class TestBancaSmall(unittest.TestCase):
     """Creates the features in a temporary directory"""
     # Creates a temporary directory
     output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
-    print "TMP DIR"
-    print output_dir
     if os.path.exists(output_dir):
       shutil.rmtree(output_dir)
     self.assertTrue( not os.path.exists(output_dir) )
@@ -551,8 +549,8 @@ class TestBancaSmall(unittest.TestCase):
     # Check results (scores)
     #scores_ref = torch.core.array.float64_1([2.073368737400600, 1.524833680242284, 
     #  2.468051383113884, 1.705402816531652], (4,))
-    scores_ref = torch.core.array.float64_1([1.46379478, 0.69330295, 2.14465708, 1.24284387], (4,))
-    self.assertTrue( ((scores - scores_ref) < 2e-2).all() )
+    scores_ref = torch.core.array.float64_1([0.97241023, 0.54142182, 1.57735219, 1.25594364], (4,))
+    self.assertTrue( (abs(scores - scores_ref) < 1e-4).all() )
 
   def test03_jfa(self):
     """Tests JFA"""
