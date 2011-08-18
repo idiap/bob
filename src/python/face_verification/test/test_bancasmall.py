@@ -486,6 +486,8 @@ class TestBancaSmall(unittest.TestCase):
     """Creates the features in a temporary directory"""
     # Creates a temporary directory
     output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
+    print "TMP DIR"
+    print output_dir
     if os.path.exists(output_dir):
       shutil.rmtree(output_dir)
     self.assertTrue( not os.path.exists(output_dir) )
@@ -539,7 +541,7 @@ class TestBancaSmall(unittest.TestCase):
     exp.responsibilities_threshold = 0
 
     # creates a directory for the results
-    result_dir=os.path.join(output_dir, "results", "")
+    result_dir=os.path.join(output_dir, "results")
     if not os.path.exists(result_dir):
       os.makedirs(result_dir)
 
@@ -582,9 +584,9 @@ class TestBancaSmall(unittest.TestCase):
 
     # Remove output directory
     output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
-    if os.path.exists(output_dir):
-      shutil.rmtree(output_dir)
-    self.assertTrue( not os.path.exists(output_dir) )
+    #if os.path.exists(output_dir):
+    #  shutil.rmtree(output_dir)
+    #self.assertTrue( not os.path.exists(output_dir) )
     
 
 if __name__ == '__main__':
