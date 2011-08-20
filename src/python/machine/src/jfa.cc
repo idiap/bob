@@ -21,15 +21,15 @@ static void jfa_forward_list(mach::JFAMachine& m, list stats, blitz::Array<doubl
 {
   // Extracts the vector of pointers from the python list
   int n_samples = len(stats);
-  std::vector<Torch::machine::GMMStats*> gmm_stats;
+  std::vector<const Torch::machine::GMMStats*> gmm_stats;
   for(int s=0; s<n_samples; ++s)
-    gmm_stats.push_back(extract<Torch::machine::GMMStats*>(stats[s]));
+    gmm_stats.push_back(extract<const Torch::machine::GMMStats*>(stats[s]));
 
   // Calls the forward function
   m.forward(gmm_stats, score);
 }
 
-static double jfa_forward_sample(mach::JFAMachine& m, Torch::machine::GMMStats& stats)
+static double jfa_forward_sample(mach::JFAMachine& m, const Torch::machine::GMMStats& stats)
 {
   double score;
   // Calls the forward function

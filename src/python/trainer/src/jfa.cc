@@ -15,15 +15,15 @@ namespace mach = Torch::machine;
 static void jfa_train(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
 {
   int n_ids = len(list_stats);
-  std::vector<std::vector<Torch::machine::GMMStats*> > gmm_stats;
+  std::vector<std::vector<const Torch::machine::GMMStats*> > gmm_stats;
 
   // Extracts the vector of vector of pointers from the python list of lists
   for(int id=0; id<n_ids; ++id) {
     list list_stats_id = extract<list>(list_stats[id]);
     int n_samples = len(list_stats_id);
-    std::vector<Torch::machine::GMMStats*> gmm_stats_id;
+    std::vector<const Torch::machine::GMMStats*> gmm_stats_id;
     for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<Torch::machine::GMMStats*>(list_stats_id[s]));
+      gmm_stats_id.push_back(extract<const Torch::machine::GMMStats*>(list_stats_id[s]));
     gmm_stats.push_back(gmm_stats_id);
   }
 
@@ -34,15 +34,15 @@ static void jfa_train(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
 static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
 {
   int n_ids = len(list_stats);
-  std::vector<std::vector<Torch::machine::GMMStats*> > gmm_stats;
+  std::vector<std::vector<const Torch::machine::GMMStats*> > gmm_stats;
 
   // Extracts the vector of vector of pointers from the python list of lists
   for(int id=0; id<n_ids; ++id) {
     list list_stats_id = extract<list>(list_stats[id]);
     int n_samples = len(list_stats_id);
-    std::vector<Torch::machine::GMMStats*> gmm_stats_id;
+    std::vector<const Torch::machine::GMMStats*> gmm_stats_id;
     for(int s=0; s<n_samples; ++s)
-      gmm_stats_id.push_back(extract<Torch::machine::GMMStats*>(list_stats_id[s]));
+      gmm_stats_id.push_back(extract<const Torch::machine::GMMStats*>(list_stats_id[s]));
     gmm_stats.push_back(gmm_stats_id);
   }
 
@@ -53,9 +53,9 @@ static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, size_t n_it
 static void jfa_enrol(train::JFATrainer& t, list stats, size_t n_iter)
 {
   int n_samples = len(stats);
-  std::vector<Torch::machine::GMMStats*> gmm_stats;
+  std::vector<const Torch::machine::GMMStats*> gmm_stats;
   for(int s=0; s<n_samples; ++s)
-    gmm_stats.push_back(extract<Torch::machine::GMMStats*>(stats[s]));
+    gmm_stats.push_back(extract<const Torch::machine::GMMStats*>(stats[s]));
 
   // Calls the enrol function
   t.enrol(gmm_stats, n_iter);

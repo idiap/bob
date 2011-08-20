@@ -311,9 +311,9 @@ namespace Torch { namespace machine {
       /**
         * Estimates from a 2D blitz::Array
         */
-      void forward(Torch::machine::GMMStats* gmm_stats, double& score);
-      void forward(std::vector<Torch::machine::GMMStats*>& samples, blitz::Array<double,1>& scores);
-      void estimateX(Torch::machine::GMMStats* gmm_stats);
+      void forward(const Torch::machine::GMMStats* gmm_stats, double& score);
+      void forward(const std::vector<const Torch::machine::GMMStats*>& samples, blitz::Array<double,1>& scores);
+      void estimateX(const Torch::machine::GMMStats* gmm_stats);
       void updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F);
       void computeUtSigmaInv();
       void computeUProd();
@@ -327,6 +327,9 @@ namespace Torch { namespace machine {
 
       blitz::Array<double,1> m_y;
       blitz::Array<double,1> m_z;
+
+      blitz::Array<double,1> m_y_for_x;
+      blitz::Array<double,1> m_z_for_x;
 
       blitz::Array<double,1> m_x;
 

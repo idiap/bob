@@ -294,13 +294,13 @@ class JFABaseTrainer {
     void trainNoUVDInit(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
-    void train(const std::vector<std::vector<Torch::machine::GMMStats*> >& features,
+    void train(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
       const size_t n_iter); 
 
     void trainISV(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
-    void trainISV(const std::vector<std::vector<Torch::machine::GMMStats*> >& features,
+    void trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
       const size_t n_iter); 
     void initializeVD_ISV();
 
@@ -487,7 +487,7 @@ class JFATrainer {
     void enrol(const blitz::Array<double,2>& N,
       const blitz::Array<double,2>& F, 
       const size_t n_iter); 
-    void enrol(const std::vector<Torch::machine::GMMStats*>& features,
+    void enrol(const std::vector<const Torch::machine::GMMStats*>& features,
       const size_t n_iter);
 
   private:

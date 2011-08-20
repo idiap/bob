@@ -1093,7 +1093,7 @@ void train::JFABaseTrainer::initializeXYZ()
   setSpeakerFactors(x,y,z);
 }
 
-void train::JFABaseTrainer::train(const std::vector<std::vector<Torch::machine::GMMStats*> >& vec,
+void train::JFABaseTrainer::train(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
   const size_t n_iter)
 {
   std::vector<blitz::Array<double,2> > vec_N;
@@ -1131,7 +1131,7 @@ void train::JFABaseTrainer::initializeVD_ISV()
   // D = variance(UBM) / relevance_factor
   blitz::Array<double,1> d = m_jfa_machine.updateD();
   m_jfa_machine.getUbm()->getVarianceSupervector(m_cache_ubm_var);
-  d = m_cache_ubm_var / 4.; // TODO: Remove HARD CODED variable (relevance factor)
+  d = sqrt(m_cache_ubm_var / 4.); // TODO: Remove HARD CODED variable (relevance factor)
 }
 
 
@@ -1154,7 +1154,7 @@ void train::JFABaseTrainer::trainISV(const std::vector<blitz::Array<double,2> >&
 
 
 
-void train::JFABaseTrainer::trainISV(const std::vector<std::vector<Torch::machine::GMMStats*> >& vec,
+void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
   const size_t n_iter)
 {
   std::vector<blitz::Array<double,2> > vec_N;
@@ -1217,7 +1217,7 @@ void train::JFATrainer::enrol(const blitz::Array<double,2>& N,
   m_jfa_machine.setZ(z);
 }
 
-void train::JFATrainer::enrol(const std::vector<Torch::machine::GMMStats*>& vec,
+void train::JFATrainer::enrol(const std::vector<const Torch::machine::GMMStats*>& vec,
   const size_t n_iter)
 {
   boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getJFABase()->getUbm());

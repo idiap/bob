@@ -116,14 +116,20 @@ void mach::JFABaseMachine::setD(const blitz::Array<double,1>& d) {
 mach::JFAMachine::JFAMachine():
   m_jfa_base(boost::shared_ptr<Torch::machine::JFABaseMachine>()),
   m_y(0),
-  m_z(0)
+  m_z(0),
+  m_y_for_x(0),
+  m_z_for_x(0),
+  m_x(0)
 {
 }
 
 mach::JFAMachine::JFAMachine(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfa_base): 
   m_jfa_base(jfa_base),
   m_y(jfa_base->getDimRv()),
-  m_z(jfa_base->getDimCD())
+  m_z(jfa_base->getDimCD()),
+  m_y_for_x(jfa_base->getDimRv()),
+  m_z_for_x(jfa_base->getDimCD()),
+  m_x(jfa_base->getDimRu())
 {
 }
 
@@ -131,7 +137,10 @@ mach::JFAMachine::JFAMachine(const boost::shared_ptr<Torch::machine::JFABaseMach
 mach::JFAMachine::JFAMachine(const mach::JFAMachine& other):
   m_jfa_base(other.m_jfa_base),
   m_y(Torch::core::array::ccopy(other.m_y)),
-  m_z(Torch::core::array::ccopy(other.m_z))
+  m_z(Torch::core::array::ccopy(other.m_z)),
+  m_y_for_x(Torch::core::array::ccopy(other.m_y_for_x)),
+  m_z_for_x(Torch::core::array::ccopy(other.m_z_for_x)),
+  m_x(Torch::core::array::ccopy(other.m_x))
 {
 }
 
@@ -147,6 +156,9 @@ mach::JFAMachine& mach::JFAMachine::operator=
   m_jfa_base = other.m_jfa_base;
   m_y.reference(Torch::core::array::ccopy(other.m_y));
   m_z.reference(Torch::core::array::ccopy(other.m_z));
+  m_y_for_x.reference(Torch::core::array::ccopy(other.m_y_for_x));
+  m_z_for_x.reference(Torch::core::array::ccopy(other.m_z_for_x));
+  m_x.reference(Torch::core::array::ccopy(other.m_x));
   return *this;
 }
 
@@ -165,6 +177,9 @@ void mach::JFAMachine::setJFABase(const boost::shared_ptr<Torch::machine::JFABas
   m_jfa_base = jfa_base; 
   m_y.resize(jfa_base->getDimRv());
   m_z.resize(jfa_base->getDimCD());
+  m_y_for_x.resize(jfa_base->getDimRv());
+  m_z_for_x.resize(jfa_base->getDimCD());
+  m_x.resize(jfa_base->getDimRu());
 }
 
 void mach::JFAMachine::setY(const blitz::Array<double,1>& y) {
@@ -185,6 +200,10 @@ void mach::JFAMachine::updateX(const blitz::Array<double,1>& N, const blitz::Arr
 {
   // Precompute Ut*diag(sigma)^-1
   m_x.resize(getDimRu());
+  m_y_for_x.resize(getDimRv());
+  m_y_for_x = 0;
+  m_z_for_x.resize(getDimCD());
+  m_z_for_x = 0;
   computeUtSigmaInv();
   computeUProd();
   computeIdPlusUProd(N,F);
@@ -253,15 +272,15 @@ void mach::JFAMachine::computeFn_x(const blitz::Array<double,1>& N, const blitz:
 //  Torch::core::info << "  m_cache_mean " << std::endl << m_cache_mean << std::endl;
 //  Torch::core::info << "  U " << std::endl << m_jfa_base->getU() << std::endl;
 //  Torch::core::info << "  d " << std::endl << d << std::endl;
-//  Torch::core::info << "  m_z " << std::endl << m_z << std::endl;
-  m_cache_Fn_x = F - m_tmp_CD * (m_cache_mean + d * m_z); // Fn_x = N*(o - m - D*z) 
+//  Torch::core::info << "  m_z_for_x " << std::endl << m_z_for_x << std::endl;
+  m_cache_Fn_x = F - m_tmp_CD * (m_cache_mean + d * m_z_for_x); // Fn_x = N*(o - m - D*z) 
 //  Torch::core::info << "m_cache_Fn_x interm" << std::endl <<  m_cache_Fn_x << std::endl;
 
   const blitz::Array<double,2>& V = m_jfa_base->getV();
   blitz::firstIndex i;
   blitz::secondIndex j;
   m_tmp_CD_b.resize(getDimCD());
-  Torch::math::prod(V, m_y, m_tmp_CD_b);
+  Torch::math::prod(V, m_y_for_x, m_tmp_CD_b);
   m_cache_Fn_x -= m_tmp_CD * m_tmp_CD_b;
 //  Torch::core::info << "m_cache_Fn_x final" << std::endl <<  m_cache_Fn_x << std::endl;
   // Fn_x = N*(o - m - D*z - V*y)
@@ -277,7 +296,7 @@ void mach::JFAMachine::updateX_fromCache()
   Torch::math::prod(m_cache_IdPlusUProd, m_tmp_ru, m_x);
 }
 
-void mach::JFAMachine::estimateX(mach::GMMStats* gmm_stats) {
+void mach::JFAMachine::estimateX(const mach::GMMStats* gmm_stats) {
   boost::shared_ptr<Torch::machine::GMMMachine> ubm(getJFABase()->getUbm());
   m_cache_gmmstats.resize(ubm->getNGaussians(),ubm->getNInputs()); 
   blitz::Array<double,1> N(ubm->getNGaussians());
@@ -293,11 +312,11 @@ void mach::JFAMachine::estimateX(mach::GMMStats* gmm_stats) {
 }
 
 
-void mach::JFAMachine::forward(mach::GMMStats* gmm_stats, double& score)
+void mach::JFAMachine::forward(const mach::GMMStats* gmm_stats, double& score)
 {
   // Ux and GMMStats
   estimateX(gmm_stats);
-  std::vector<Torch::machine::GMMStats*> stats;
+  std::vector<const Torch::machine::GMMStats*> stats;
   stats.push_back(&m_cache_gmmstats);
   m_cache_Ux.resize(getDimCD());
 Torch::core::info << "X estimated: " << m_x << std::endl;
@@ -307,8 +326,8 @@ Torch::core::info << "X estimated: " << m_x << std::endl;
 
   // m + Vy + Dz
   m_cache_mVyDz.resize(getDimCD());
-  Torch::math::prod(m_jfa_base->getV(), getY(), m_cache_mVyDz);
-  m_cache_mVyDz += m_jfa_base->getD()*getZ() + m_jfa_base->getUbm()->getMeanSupervector();
+  Torch::math::prod(m_jfa_base->getV(), m_y, m_cache_mVyDz);
+  m_cache_mVyDz += m_jfa_base->getD()*m_z + m_jfa_base->getUbm()->getMeanSupervector();
   std::vector<blitz::Array<double,1> > models;
   models.push_back(m_cache_mVyDz);
 
@@ -320,10 +339,10 @@ Torch::core::info << "X estimated: " << m_x << std::endl;
   score = scores(0,0);
 }
 
-void mach::JFAMachine::forward(std::vector<mach::GMMStats*>& samples, blitz::Array<double,1>& score)
+void mach::JFAMachine::forward(const std::vector<const mach::GMMStats*>& samples, blitz::Array<double,1>& score)
 {
   std::vector<blitz::Array<double,1> > channelOffset;
-    m_cache_Ux.resize(getDimCD());
+  m_cache_Ux.resize(getDimCD());
   for(size_t i=0; i<samples.size(); ++i)
   {
     // Ux and GMMStats
@@ -334,8 +353,8 @@ void mach::JFAMachine::forward(std::vector<mach::GMMStats*>& samples, blitz::Arr
 
   // m + Vy + Dz
   m_cache_mVyDz.resize(getDimCD());
-  Torch::math::prod(m_jfa_base->getV(), getY(), m_cache_mVyDz);
-  m_cache_mVyDz += m_jfa_base->getD()*getZ() + m_jfa_base->getUbm()->getMeanSupervector();
+  Torch::math::prod(m_jfa_base->getV(), m_y, m_cache_mVyDz);
+  m_cache_mVyDz += m_jfa_base->getD()*m_z + m_jfa_base->getUbm()->getMeanSupervector();
   std::vector<blitz::Array<double,1> > models;
   models.push_back(m_cache_mVyDz);
 
