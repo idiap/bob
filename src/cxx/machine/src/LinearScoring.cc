@@ -7,12 +7,12 @@ namespace Torch { namespace machine {
 
   namespace detail {
 
-    void linearScoring(std::vector<blitz::Array<double,1> >& models,
+    void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                        const blitz::Array<double,1>& ubm_mean,
                        const blitz::Array<double,1>& ubm_variance,
-                       std::vector<Torch::machine::GMMStats*>& test_stats,
-                       std::vector<blitz::Array<double,1> >* test_channelOffset,
-                       bool frame_length_normalisation,
+                       const std::vector<const Torch::machine::GMMStats*>& test_stats,
+                       const std::vector<blitz::Array<double,1> >* test_channelOffset,
+                       const bool frame_length_normalisation,
                        blitz::Array<double,2>& scores) 
     {
       int C = test_stats[0]->sumPx.extent(0);
@@ -49,7 +49,7 @@ namespace Torch { namespace machine {
       // Apply the normalization if needed
       if(frame_length_normalisation) {
         for(int t=0; t<Tt; ++t) {
-          double sum_N = blitz::sum(test_stats[t]->n) * D;
+          double sum_N = test_stats[t]->T;
           blitz::Array<double, 1> v_t = B(blitz::Range::all(),t);
 
           if (sum_N <= std::numeric_limits<double>::epsilon() && sum_N >= -std::numeric_limits<double>::epsilon())
@@ -66,29 +66,29 @@ namespace Torch { namespace machine {
   }
 
 
-  void linearScoring(std::vector<blitz::Array<double,1> >& models,
+  void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                      const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     std::vector<Torch::machine::GMMStats*>& test_stats,
-                     std::vector<blitz::Array<double,1> >& test_channelOffset,
-                     bool frame_length_normalisation,
+                     const std::vector<const Torch::machine::GMMStats*>& test_stats,
+                     const std::vector<blitz::Array<double,1> >& test_channelOffset,
+                     const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores)
   {
     detail::linearScoring(models, ubm_mean, ubm_variance, test_stats, &test_channelOffset, frame_length_normalisation, scores);
   }
 
-  void linearScoring(std::vector<blitz::Array<double,1> >& models,
+  void linearScoring(const std::vector<blitz::Array<double,1> >& models,
                      const blitz::Array<double,1>& ubm_mean, const blitz::Array<double,1>& ubm_variance,
-                     std::vector<Torch::machine::GMMStats*>& test_stats,
-                     bool frame_length_normalisation,
+                     const std::vector<const Torch::machine::GMMStats*>& test_stats,
+                     const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores)
   {
     detail::linearScoring(models, ubm_mean, ubm_variance, test_stats, 0, frame_length_normalisation, scores);
   }
 
-  void linearScoring(std::vector<Torch::machine::GMMMachine*>& models,
+  void linearScoring(const std::vector<const Torch::machine::GMMMachine*>& models,
                      const Torch::machine::GMMMachine& ubm,
-                     std::vector<Torch::machine::GMMStats*>& test_stats,
-                     bool frame_length_normalisation,
+                     const std::vector<const Torch::machine::GMMStats*>& test_stats,
+                     const bool frame_length_normalisation,
                      blitz::Array<double, 2>& scores) 
   {
     int C = test_stats[0]->sumPx.extent(0);
