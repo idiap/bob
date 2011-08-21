@@ -9,12 +9,12 @@
 #define TORCH5SPRO_TRAINER_JFATRAINER_H
 
 #include <blitz/array.h>
+#include <map>
+#include <vector>
+#include <string>
+#include "core/array_check.h"
 #include "io/Arrayset.h"
 #include "machine/JFAMachine.h"
-#include  <map>
-#include  <vector>
-#include  <string>
-#include "core/array_check.h"
 
 #include "core/logging.h"
 
@@ -130,7 +130,7 @@ class JFABaseTrainer {
 
   public:
     /**
-     * Initializes a new JFA trainer. This implementation is consistent with the 
+     * Initializes a new JFABaseTrainer. This implementation is consistent with the 
      * JFA cookbook implementation. 
      */
     JFABaseTrainer(Torch::machine::JFABaseMachine& jfa_machine);
@@ -142,14 +142,14 @@ class JFABaseTrainer {
 
     /**
      * Set the zeroth and first order statistics to train
-     * @warning the JFA machine should be set before
+     * @warning the JFABaseMachine should be set before
      */
     void setStatistics(const std::vector<blitz::Array<double,2> >& N, 
       const std::vector<blitz::Array<double,2> >& F);
 
     /**
      * Set the x, y, z speaker factors
-     * @warning the JFA machine should be set before
+     * @warning the JFABaseMachine should be set before
      */
     void setSpeakerFactors(const std::vector<blitz::Array<double,2> >& x, 
       const std::vector<blitz::Array<double,1> >& y,
@@ -286,24 +286,43 @@ class JFABaseTrainer {
 
 
     /**
-      * Main procedure for training the Joint Factor Analysis
+      * Trains the Joint Factor Analysis by initializing U, V, and D randomly
       */
     void train(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
-    void trainNoUVDInit(const std::vector<blitz::Array<double,2> >& N,
-      const std::vector<blitz::Array<double,2> >& F, 
-      const size_t n_iter); 
     void train(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
       const size_t n_iter); 
-
-    void trainISV(const std::vector<blitz::Array<double,2> >& N,
+    /**
+      * Trains the oint Factor Analysis without initializing U, V and D
+      */
+    void trainNoInit(const std::vector<blitz::Array<double,2> >& N,
       const std::vector<blitz::Array<double,2> >& F, 
       const size_t n_iter); 
-    void trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
+    void trainNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
       const size_t n_iter); 
-    void initializeVD_ISV();
 
+    /**
+      * Trains the Inter Session Variability model by initializing U randomly
+      */
+    void trainISV(const std::vector<blitz::Array<double,2> >& N,
+      const std::vector<blitz::Array<double,2> >& F, 
+      const size_t n_iter, const double relevance_factor); 
+    void trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
+      const size_t n_iter, const double relevance_factor); 
+    /**
+      * Trains the Inter Session Variability model without initializing U
+      */
+    void trainISVNoInit(const std::vector<blitz::Array<double,2> >& N,
+      const std::vector<blitz::Array<double,2> >& F, 
+      const size_t n_iter, const double relevance_factor); 
+    void trainISVNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& features,
+      const size_t n_iter, const double relevance_factor); 
+
+    /**
+      * Initializes V=zero and D=srqt(var_UBM / rel_factor) for ISV
+      */
+    void initializeVD_ISV(const double relevance_factor);
     /**
       * Initializes U, V and D
       */
@@ -316,31 +335,31 @@ class JFABaseTrainer {
     /**
      * Get the zeroth order statistics
      */
-    const std::vector<blitz::Array<double,2> >& getN()
+    const std::vector<blitz::Array<double,2> >& getN() const
     { return m_N; }
-    const std::vector<blitz::Array<double,1> >& getNacc()
+    const std::vector<blitz::Array<double,1> >& getNacc() const
     { return m_Nacc; }
     /**
      * Get the first order statistics
      */
-    const std::vector<blitz::Array<double,2> >& getF()
+    const std::vector<blitz::Array<double,2> >& getF() const
     { return m_F; }
-    const std::vector<blitz::Array<double,1> >& getFacc()
+    const std::vector<blitz::Array<double,1> >& getFacc() const
     { return m_Facc; }
     /**
      * Get the x speaker factors
      */
-    const std::vector<blitz::Array<double,2> >& getX()
+    const std::vector<blitz::Array<double,2> >& getX() const
     { return m_x; }
     /**
      * Get the y speaker factors
      */
-    const std::vector<blitz::Array<double,1> >& getY()
+    const std::vector<blitz::Array<double,1> >& getY() const
     { return m_y; }
     /**
      * Get the z speaker factors
      */
-    const std::vector<blitz::Array<double,1> >& getZ()
+    const std::vector<blitz::Array<double,1> >& getZ() const
     { return m_z; }
 
     /**
@@ -416,7 +435,7 @@ class JFABaseTrainer {
     void initializeRandom(blitz::Array<double,2>& matrix);
 
 
-    Torch::machine::JFABaseMachine& m_jfa_machine; // JFA machine
+    Torch::machine::JFABaseMachine& m_jfa_machine; // JFABaseMachine
     size_t m_Nid; // Number of identities
     std::vector<blitz::Array<double,2> > m_N; // Zeroth order statistics
     std::vector<blitz::Array<double,2> > m_F; // First order statistics
@@ -482,17 +501,16 @@ class JFATrainer {
     ~JFATrainer() {}
 
     /**
-      * Main procedure for enroling with Joint Factor Analysis
+      * Main procedures for enroling with Joint Factor Analysis
       */
-    void enrol(const blitz::Array<double,2>& N,
-      const blitz::Array<double,2>& F, 
-      const size_t n_iter); 
+    void enrol(const blitz::Array<double,2>& N, const blitz::Array<double,2>& F,
+      const size_t n_iter);
     void enrol(const std::vector<const Torch::machine::GMMStats*>& features,
       const size_t n_iter);
 
   private:
 
-    Torch::machine::JFAMachine& m_jfa_machine; // JFA machine
+    Torch::machine::JFAMachine& m_jfa_machine; // JFAMachine
     Torch::trainer::JFABaseTrainer& m_base_trainer; // JFABaseTrainer
 };
 

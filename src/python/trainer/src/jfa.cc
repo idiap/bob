@@ -12,7 +12,7 @@ using namespace boost::python;
 namespace train = Torch::trainer;
 namespace mach = Torch::machine;
 
-static void jfa_train(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
+static void jfa_train(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
 {
   int n_ids = len(list_stats);
   std::vector<std::vector<const Torch::machine::GMMStats*> > gmm_stats;
@@ -31,7 +31,7 @@ static void jfa_train(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
   t.train(gmm_stats, n_iter);
 }
 
-static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, size_t n_iter)
+static void jfa_train_noinit(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
 {
   int n_ids = len(list_stats);
   std::vector<std::vector<const Torch::machine::GMMStats*> > gmm_stats;
@@ -47,10 +47,51 @@ static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, size_t n_it
   }
 
   // Calls the train function
-  t.trainISV(gmm_stats, n_iter);
+  t.trainNoInit(gmm_stats, n_iter);
 }
 
-static void jfa_enrol(train::JFATrainer& t, list stats, size_t n_iter)
+
+static void jfa_train_ISV(train::JFABaseTrainer& t, list list_stats, 
+  const size_t n_iter, const double relevance_factor)
+{
+  int n_ids = len(list_stats);
+  std::vector<std::vector<const Torch::machine::GMMStats*> > gmm_stats;
+
+  // Extracts the vector of vector of pointers from the python list of lists
+  for(int id=0; id<n_ids; ++id) {
+    list list_stats_id = extract<list>(list_stats[id]);
+    int n_samples = len(list_stats_id);
+    std::vector<const Torch::machine::GMMStats*> gmm_stats_id;
+    for(int s=0; s<n_samples; ++s)
+      gmm_stats_id.push_back(extract<const Torch::machine::GMMStats*>(list_stats_id[s]));
+    gmm_stats.push_back(gmm_stats_id);
+  }
+
+  // Calls the train function
+  t.trainISV(gmm_stats, n_iter, relevance_factor);
+}
+
+static void jfa_train_ISV_noinit(train::JFABaseTrainer& t, list list_stats, 
+  const size_t n_iter, const double relevance_factor)
+{
+  int n_ids = len(list_stats);
+  std::vector<std::vector<const Torch::machine::GMMStats*> > gmm_stats;
+
+  // Extracts the vector of vector of pointers from the python list of lists
+  for(int id=0; id<n_ids; ++id) {
+    list list_stats_id = extract<list>(list_stats[id]);
+    int n_samples = len(list_stats_id);
+    std::vector<const Torch::machine::GMMStats*> gmm_stats_id;
+    for(int s=0; s<n_samples; ++s)
+      gmm_stats_id.push_back(extract<const Torch::machine::GMMStats*>(list_stats_id[s]));
+    gmm_stats.push_back(gmm_stats_id);
+  }
+
+  // Calls the train function
+  t.trainISVNoInit(gmm_stats, n_iter, relevance_factor);
+}
+
+static void jfa_enrol(train::JFATrainer& t, list stats, const size_t n_iter)
 {
   int n_samples = len(stats);
   std::vector<const Torch::machine::GMMStats*> gmm_stats;
@@ -82,8 +123,10 @@ void bind_trainer_jfa() {
     .def("setStatistics", &train::JFABaseTrainer::setStatistics, (arg("self"), arg("N"), arg("F")), "Set the zeroth and first order statistics.")
     .def("setSpeakerFactors", &train::JFABaseTrainer::setSpeakerFactors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
     .def("train", (void (train::JFABaseTrainer::*)(const std::vector<blitz::Array<double,2> >&, const std::vector<blitz::Array<double,2> >&, const size_t))&train::JFABaseTrainer::train, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
-    .def("train", &jfa_train/*(train::JFABaseTrainer::*)(const std::vector<std::vector<mach::GMMStats*> >&, const size_t))&train::JFABaseTrainer::train*/, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
-    .def("trainISV", &jfa_train_ISV/*(train::JFABaseTrainer::*)(const std::vector<std::vector<mach::GMMStats*> >&, const size_t))&train::JFABaseTrainer::train*/, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the ISV training procedure.")
+    .def("train", &jfa_train, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
+    .def("trainNoInit", &jfa_train_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
+    .def("trainISV", &jfa_train_ISV, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the ISV training procedure.")
+    .def("trainISVNoInit", &jfa_train_ISV_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the ISV training procedure.")
     .def("initializeRandomU", &train::JFABaseTrainer::initializeRandomU, (arg("self")), "Initializes randomly U.")
     .def("initializeRandomV", &train::JFABaseTrainer::initializeRandomV, (arg("self")), "Initializes randomly V.")
     .def("initializeRandomD", &train::JFABaseTrainer::initializeRandomD, (arg("self")), "Initializes randomly D.")
@@ -112,7 +155,7 @@ void bind_trainer_jfa() {
 
   class_<train::JFATrainer, boost::noncopyable>("JFATrainer", "Create a trainer for the JFA.", init<mach::JFAMachine&, train::JFABaseTrainer&>((arg("jfa"), arg("base_trainer")),"Initializes a new JFATrainer."))
     .def("enrol", (void (train::JFATrainer::*)(const blitz::Array<double,2>&, const blitz::Array<double,2>&, const size_t))&train::JFATrainer::enrol, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
-    .def("enrol", &jfa_enrol/*(void (train::JFATrainer::*)(const std::vector<Torch::machine::GMMStats*>&, const size_t))&train::JFATrainer::enrol*/, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
+    .def("enrol", &jfa_enrol, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     ;
 
 

@@ -610,12 +610,6 @@ void train::JFABaseTrainer::precomputeSumStatisticsN()
     Nsum = blitz::sum(m_N[id], j);
     m_Nacc.push_back(Torch::core::array::ccopy(Nsum));
   }
-/*
-  for(size_t id=0; id<m_N.size(); ++id) {
-    Torch::core::info << "N: " << m_N[id];
-    Torch::core::info << "Nsum: " << m_Nacc[id];
-  }
-*/
 }
 
 void train::JFABaseTrainer::precomputeSumStatisticsF()
@@ -628,12 +622,6 @@ void train::JFABaseTrainer::precomputeSumStatisticsF()
     Fsum = blitz::sum(m_F[id], j);
     m_Facc.push_back(Torch::core::array::ccopy(Fsum));
   }
-/*
-  for(size_t id=0; id<m_F.size(); ++id) {
-    Torch::core::info << "F: " << m_F[id];
-    Torch::core::info << "Fsum: " << m_Facc[id];
-  }
-*/
 }
 
 
@@ -1038,7 +1026,7 @@ void train::JFABaseTrainer::train(const std::vector<blitz::Array<double,2> >& N,
   }
 }
 
-void train::JFABaseTrainer::trainNoUVDInit(const std::vector<blitz::Array<double,2> >& N,
+void train::JFABaseTrainer::trainNoInit(const std::vector<blitz::Array<double,2> >& N,
   const std::vector<blitz::Array<double,2> >& F, const size_t n_iter)
 {
   setStatistics(N,F);
@@ -1119,42 +1107,10 @@ void train::JFABaseTrainer::train(const std::vector<std::vector<const Torch::mac
     vec_N.push_back(Nid);
     vec_F.push_back(Fid);
   }
-  trainNoUVDInit(vec_N, vec_F, n_iter);
+  train(vec_N, vec_F, n_iter);
 }
 
-
-void train::JFABaseTrainer::initializeVD_ISV()
-{
-  // V = 0
-  blitz::Array<double,2> V = m_jfa_machine.updateV();
-  V = 0.;
-  // D = variance(UBM) / relevance_factor
-  blitz::Array<double,1> d = m_jfa_machine.updateD();
-  m_jfa_machine.getUbm()->getVarianceSupervector(m_cache_ubm_var);
-  d = sqrt(m_cache_ubm_var / 4.); // TODO: Remove HARD CODED variable (relevance factor)
-}
-
-
-
-void train::JFABaseTrainer::trainISV(const std::vector<blitz::Array<double,2> >& N,
-  const std::vector<blitz::Array<double,2> >& F, const size_t n_iter)
-{
-  setStatistics(N,F);
-  precomputeSumStatisticsN();
-  precomputeSumStatisticsF();
-
-  initializeVD_ISV();
-  initializeXYZ();
-
-  for(size_t i=0; i<n_iter; ++i) {
-    updateX();
-    updateU();
-  }
-}
-
-
-
-void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
+void train::JFABaseTrainer::trainNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
   const size_t n_iter)
 {
   std::vector<blitz::Array<double,2> > vec_N;
@@ -1180,9 +1136,118 @@ void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const Torch::
     vec_N.push_back(Nid);
     vec_F.push_back(Fid);
   }
-  trainISV(vec_N, vec_F, n_iter);
+  trainNoInit(vec_N, vec_F, n_iter);
 }
 
+
+void train::JFABaseTrainer::initializeVD_ISV(const double relevance_factor)
+{
+  // V = 0
+  blitz::Array<double,2> V = m_jfa_machine.updateV();
+  V = 0.;
+  // D = sqrt(variance(UBM) / relevance_factor)
+  blitz::Array<double,1> d = m_jfa_machine.updateD();
+  m_jfa_machine.getUbm()->getVarianceSupervector(m_cache_ubm_var);
+  d = sqrt(m_cache_ubm_var / relevance_factor);
+}
+
+
+void train::JFABaseTrainer::trainISV(const std::vector<blitz::Array<double,2> >& N,
+  const std::vector<blitz::Array<double,2> >& F, const size_t n_iter, 
+  const double relevance_factor)
+{
+  setStatistics(N,F);
+  precomputeSumStatisticsN();
+  precomputeSumStatisticsF();
+
+  initializeRandomU();
+  initializeVD_ISV(relevance_factor);
+  initializeXYZ();
+
+  for(size_t i=0; i<n_iter; ++i) {
+    updateX();
+    updateU();
+  }
+}
+
+
+
+void train::JFABaseTrainer::trainISV(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
+  const size_t n_iter, const double relevance_factor)
+{
+  std::vector<blitz::Array<double,2> > vec_N;
+  std::vector<blitz::Array<double,2> > vec_F;
+  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  for(size_t id=0; id<vec.size(); ++id)
+  {
+    blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
+    blitz::Array<double,2> Fid(ubm->getNGaussians()*ubm->getNInputs(), vec[id].size());
+    for(size_t s=0; s<vec[id].size(); ++s)
+    {
+      // TODO: check type/dimensions?
+      blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
+      blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
+      const Torch::machine::GMMStats* stats = vec[id][s];
+      Nid_s = stats->n;
+      for(int g=0; g<ubm->getNGaussians(); ++g)
+      {
+        blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
+        Fid_s_g = stats->sumPx(g,blitz::Range::all());
+      }
+    }
+    vec_N.push_back(Nid);
+    vec_F.push_back(Fid);
+  }
+  trainISV(vec_N, vec_F, n_iter, relevance_factor);
+}
+
+void train::JFABaseTrainer::trainISVNoInit(const std::vector<blitz::Array<double,2> >& N,
+  const std::vector<blitz::Array<double,2> >& F, const size_t n_iter, 
+  const double relevance_factor)
+{
+  setStatistics(N,F);
+  precomputeSumStatisticsN();
+  precomputeSumStatisticsF();
+
+  initializeVD_ISV(relevance_factor);
+  initializeXYZ();
+
+  for(size_t i=0; i<n_iter; ++i) {
+    updateX();
+    updateU();
+  }
+}
+
+
+
+void train::JFABaseTrainer::trainISVNoInit(const std::vector<std::vector<const Torch::machine::GMMStats*> >& vec,
+  const size_t n_iter, const double relevance_factor)
+{
+  std::vector<blitz::Array<double,2> > vec_N;
+  std::vector<blitz::Array<double,2> > vec_F;
+  boost::shared_ptr<Torch::machine::GMMMachine> ubm(m_jfa_machine.getUbm());
+  for(size_t id=0; id<vec.size(); ++id)
+  {
+    blitz::Array<double,2> Nid(ubm->getNGaussians(), vec[id].size());
+    blitz::Array<double,2> Fid(ubm->getNGaussians()*ubm->getNInputs(), vec[id].size());
+    for(size_t s=0; s<vec[id].size(); ++s)
+    {
+      // TODO: check type/dimensions?
+      blitz::Array<double,1> Nid_s = Nid(blitz::Range::all(),s);
+      blitz::Array<double,1> Fid_s = Fid(blitz::Range::all(),s);
+      const Torch::machine::GMMStats* stats = vec[id][s];
+      Nid_s = stats->n;
+      for(int g=0; g<ubm->getNGaussians(); ++g)
+      {
+        blitz::Array<double,1> Fid_s_g = Fid_s(blitz::Range(g*ubm->getNInputs(),(g+1)*ubm->getNInputs()-1));
+        Fid_s_g = stats->sumPx(g,blitz::Range::all());
+      }
+    }
+    vec_N.push_back(Nid);
+    vec_F.push_back(Fid);
+  }
+  trainISVNoInit(vec_N, vec_F, n_iter, relevance_factor);
+}
 
 
 
