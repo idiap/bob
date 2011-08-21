@@ -2,17 +2,18 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  * @date Wed 20 Jul 2011 19:20:50
  *
- * A machine that implements the Joint Factor Analysis model
+ * @brief Machines that implements the Joint Factor Analysis model
  */
 
 #ifndef TORCH_MACHINE_JFAMACHINE_H
 #define TORCH_MACHINE_JFAMACHINE_H
 
+#include <boost/shared_ptr.hpp>
+
 #include "io/Arrayset.h"
 #include "io/HDF5File.h"
 #include "machine/GMMMachine.h"
 #include "machine/LinearScoring.h"
-#include <boost/shared_ptr.hpp>
 
 namespace Torch { namespace machine {
   
@@ -168,20 +169,24 @@ namespace Torch { namespace machine {
 
     private:
 
+      // UBM
       boost::shared_ptr<Torch::machine::GMMMachine> m_ubm;
 
       // dimensionality
       int m_ru; // size of U (CD x ru)
       int m_rv; // size of V (CD x rv)
 
+      // U, V, D matrices
+      // D is assumed to be diagonal, and only the diagonal is stored
       blitz::Array<double,2> m_U;
       blitz::Array<double,2> m_V;
-      blitz::Array<double,1> m_d;
+      blitz::Array<double,1> m_d; 
   };
 
 
   /**
-   * A JFA Base machine which contains U, V and D matrices
+   * A JFA machine which contains y and z vectors, and can be used to process
+   * data.
    */
   class JFAMachine {
 
@@ -189,14 +194,12 @@ namespace Torch { namespace machine {
 
       /**
        * Default constructor. Builds an otherwise invalid 0 x 0 jfa machine.
-       * This is equivalent to construct a JFA with five int parameters set 
-       * to 0.
        */
       JFAMachine();
 
       /**
-       * Constructor, builds a new jfa machine. UBM, U, V and d are
-       * not initialized.
+       * Constructor, builds a new jfa machine, setting a JFABaseMachine. 
+       * y and z are not initialized.
        */ 
       JFAMachine(const boost::shared_ptr<Torch::machine::JFABaseMachine> jfabase);
 
@@ -325,14 +328,23 @@ namespace Torch { namespace machine {
 
       boost::shared_ptr<Torch::machine::JFABaseMachine> m_jfa_base;
 
+      /**
+        * y and z vectors learned during the enrolment procedure
+        */
       blitz::Array<double,1> m_y;
       blitz::Array<double,1> m_z;
 
+      /**
+        * x vectors estimated when forwarding data
+        * y and z vectors used to estimate x when processing data
+        */
       blitz::Array<double,1> m_y_for_x;
       blitz::Array<double,1> m_z_for_x;
-
       blitz::Array<double,1> m_x;
 
+      /**
+        * data cached used to improve performance
+        */
       mutable Torch::machine::GMMStats m_cache_gmmstats;
       mutable blitz::Array<double,1> m_cache_Ux;
       mutable blitz::Array<double,1> m_cache_mVyDz;

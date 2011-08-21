@@ -1,7 +1,7 @@
 /**
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Python bindings to JFAMachine
+ * @brief Python bindings for the JFA{Base,}Machine
  */
 
 #include <boost/python.hpp>
@@ -39,7 +39,7 @@ static double jfa_forward_sample(mach::JFAMachine& m, const Torch::machine::GMMS
 
 
 void bind_machine_jfa() {
-  class_<mach::JFABaseMachine, boost::shared_ptr<mach::JFABaseMachine> >("JFABaseMachine", "A JFABaseMachine", init<boost::shared_ptr<mach::GMMMachine>, int, int>((arg("ubm"), arg("ru"), arg("rv")), "Builds a new JFABaseMachine."))
+  class_<mach::JFABaseMachine, boost::shared_ptr<mach::JFABaseMachine> >("JFABaseMachine", "A JFABaseMachine", init<boost::shared_ptr<mach::GMMMachine>, int, int>((arg("ubm"), arg("ru"), arg("rv")), "Builds a new JFABaseMachine. A JFABaseMachine can be seen as a container for U, V and D when performing Joint Factor Analysis (JFA)."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFABaseMachine from a configuration file."))
     .def(init<const mach::JFABaseMachine&>((arg("machine")), "Copy constructs a JFABaseMachine"))
     .def("load", &mach::JFABaseMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
@@ -55,12 +55,14 @@ void bind_machine_jfa() {
     .add_property("DimRv", &mach::JFABaseMachine::getDimRv)
   ;
 
-  class_<mach::JFAMachine, boost::shared_ptr<mach::JFAMachine> >("JFAMachine", "A JFAMachine", init<boost::shared_ptr<mach::JFABaseMachine> >((arg("jfa_base")), "Builds a new JFAMachine."))
+  class_<mach::JFAMachine, boost::shared_ptr<mach::JFAMachine> >("JFAMachine", "A JFAMachine", init<boost::shared_ptr<mach::JFABaseMachine> >((arg("jfa_base")), "Builds a new JFAMachine. An attached JFABaseMachine should be provided for Joint Factor Analysis. The JFAMachine carries information about y and z, whereas a JFABaseMachine carries information about U, V and D."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new JFAMachine from a configuration file."))
     .def(init<const mach::JFAMachine&>((arg("machine")), "Copy constructs a JFAMachine"))
     .def("load", &mach::JFAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
     .def("save", &mach::JFAMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
+    .def("__call__", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
     .def("forward", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
+    .def("__call__", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .def("forward", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
     .add_property("jfa_base", &mach::JFAMachine::getJFABase, &mach::JFAMachine::setJFABase)
     .add_property("y", make_function(&mach::JFAMachine::getY, return_internal_reference<>()), &mach::JFAMachine::setY)

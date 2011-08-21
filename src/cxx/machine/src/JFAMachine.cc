@@ -2,21 +2,20 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  * @date Wed 20 Jul 2011 19:29:20
  *
- * @brief Implements a JFABaseMachine
+ * @brief Machines that implements the Joint Factor Analysis model
  */
 
 #include <cmath>
 
+#include "core/array_check.h"
+#include "core/repmat.h"
 #include "io/Arrayset.h"
-#include "machine/JFAMachine.h"
-#include "machine/Exception.h"
 #include "math/linear.h"
 #include "math/lu_det.h"
-#include "core/repmat.h"
+#include "machine/Exception.h"
+#include "machine/JFAMachine.h"
 #include "machine/LinearScoring.h"
-#include "core/array_check.h"
 
-#include "core/logging.h"
 
 namespace mach = Torch::machine;
 namespace math = Torch::math;
@@ -198,12 +197,13 @@ void mach::JFAMachine::setZ(const blitz::Array<double,1>& z) {
 
 void mach::JFAMachine::updateX(const blitz::Array<double,1>& N, const blitz::Array<double,1>& F)
 {
-  // Precompute Ut*diag(sigma)^-1
+  // initialize variables (y=0 and z=0)
   m_x.resize(getDimRu());
   m_y_for_x.resize(getDimRv());
   m_y_for_x = 0;
   m_z_for_x.resize(getDimCD());
   m_z_for_x = 0;
+  // Precompute Ut*diag(sigma)^-1
   computeUtSigmaInv();
   computeUProd();
   computeIdPlusUProd(N,F);
@@ -213,11 +213,11 @@ void mach::JFAMachine::updateX(const blitz::Array<double,1>& N, const blitz::Arr
 
 void mach::JFAMachine::computeUtSigmaInv()
 {
-  m_cache_UtSigmaInv.resizeAndPreserve(getDimRu(), getDimCD());
+  m_cache_UtSigmaInv.resize(getDimRu(), getDimCD());
   const blitz::Array<double,2>& U = m_jfa_base->getU();
   blitz::Array<double,2> Uu = U(blitz::Range::all(), blitz::Range::all()); // Blitz compatibility
   blitz::Array<double,2> Ut = Uu.transpose(1,0);
-  m_cache_sigma.resizeAndPreserve(getDimCD());
+  m_cache_sigma.resize(getDimCD());
   m_jfa_base->getUbm()->getVarianceSupervector(m_cache_sigma);
   blitz::firstIndex i;
   blitz::secondIndex j;
@@ -262,28 +262,19 @@ void mach::JFAMachine::computeFn_x(const blitz::Array<double,1>& N, const blitz:
 {
   // Compute Fn_x = sum_{sessions h}(N*(o - m - D*z - V*y) (Normalised first order statistics)
   m_cache_Fn_x.resize(getDimCD());
-  m_cache_mean.resizeAndPreserve(getDimCD());
+  m_cache_mean.resize(getDimCD());
   m_jfa_base->getUbm()->getMeanSupervector(m_cache_mean);
   const blitz::Array<double,1>& d = m_jfa_base->getD();
   m_tmp_CD.resize(getDimCD());
   Torch::core::repelem(N, m_tmp_CD);
-//  Torch::core::info << "  F" << std::endl << F << std::endl;
-//  Torch::core::info << "  m_tmp_CD" << std::endl << m_tmp_CD << std::endl;
-//  Torch::core::info << "  m_cache_mean " << std::endl << m_cache_mean << std::endl;
-//  Torch::core::info << "  U " << std::endl << m_jfa_base->getU() << std::endl;
-//  Torch::core::info << "  d " << std::endl << d << std::endl;
-//  Torch::core::info << "  m_z_for_x " << std::endl << m_z_for_x << std::endl;
   m_cache_Fn_x = F - m_tmp_CD * (m_cache_mean + d * m_z_for_x); // Fn_x = N*(o - m - D*z) 
-//  Torch::core::info << "m_cache_Fn_x interm" << std::endl <<  m_cache_Fn_x << std::endl;
 
   const blitz::Array<double,2>& V = m_jfa_base->getV();
   blitz::firstIndex i;
   blitz::secondIndex j;
   m_tmp_CD_b.resize(getDimCD());
   Torch::math::prod(V, m_y_for_x, m_tmp_CD_b);
-  m_cache_Fn_x -= m_tmp_CD * m_tmp_CD_b;
-//  Torch::core::info << "m_cache_Fn_x final" << std::endl <<  m_cache_Fn_x << std::endl;
-  // Fn_x = N*(o - m - D*z - V*y)
+  m_cache_Fn_x -= m_tmp_CD * m_tmp_CD_b; // Fn_x = N*(o - m - D*z - V*y)
 }
 
 void mach::JFAMachine::updateX_fromCache()
@@ -291,7 +282,6 @@ void mach::JFAMachine::updateX_fromCache()
   // Compute x = Ax * Cus * Fn_x
   m_tmp_ru.resize(getDimRu());
   // m_tmp_ru = m_cache_UtSigmaInv * m_cache_Fn_x = Ut*diag(sigma)^-1 * N*(o - m - D*z - V*y)
-
   Torch::math::prod(m_cache_UtSigmaInv, m_cache_Fn_x, m_tmp_ru); 
   Torch::math::prod(m_cache_IdPlusUProd, m_tmp_ru, m_x);
 }
@@ -319,7 +309,6 @@ void mach::JFAMachine::forward(const mach::GMMStats* gmm_stats, double& score)
   std::vector<const Torch::machine::GMMStats*> stats;
   stats.push_back(&m_cache_gmmstats);
   m_cache_Ux.resize(getDimCD());
-Torch::core::info << "X estimated: " << m_x << std::endl;
   Torch::math::prod(m_jfa_base->getU(), m_x, m_cache_Ux);
   std::vector<blitz::Array<double,1> > channelOffset;
   channelOffset.push_back(m_cache_Ux);
