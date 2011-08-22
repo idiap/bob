@@ -6,16 +6,7 @@ include("ExternalProject")
 # These are the basic variables to setup the visioner checkout from the proper
 # place and with the supported tag. It also provides basis in case we cannot
 # reach the directory ${VISIONER_REPO} directly.
-set(VISIONER_REPO "/idiap/group/torch5spro/sandboxes/visioner.git")
-set(VISIONER_BRANCH "v1.5.2-analyzer-tmax-faster")
-set(IDIAP_LOGIN "aanjos@idiap" CACHE STRING "Idiap login")
-
-# Here we test to see if the directory is visible from the build spot
-if(IS_DIRECTORY ${VISIONER_REPO})
-  set(USE_VISIONER_REPO "${VISIONER_REPO}")
-else(IS_DIRECTORY ${VISIONER_REPO})
-  set(USE_VISIONER_REPO "${IDIAP_LOGIN}:${VISIONER_REPO}")
-endif(IS_DIRECTORY ${VISIONER_REPO})
+set(VISIONER_REPO "http://www.idiap.ch/software/torch5spro/git/visioner.git/")
 
 # Accesses the git command
 find_program(GIT_EXECUTABLE NAMES git PATH_SUFFIXES Git/cmd Git/bin
@@ -27,7 +18,7 @@ if(NOT GIT_EXECUTABLE)
 endif(NOT GIT_EXECUTABLE)
 
 ExternalProject_Add(visioner
-  DOWNLOAD_COMMAND rm -rf visioner && ${GIT_EXECUTABLE} clone ${USE_VISIONER_REPO}
+  DOWNLOAD_COMMAND rm -rf visioner && ${GIT_EXECUTABLE} clone ${VISIONER_REPO}
   UPDATE_COMMAND git pull origin +HEAD
   PATCH_COMMAND ""
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DTORCH_INCLUDE_DIR=${CMAKE_INSTALL_PREFIX}/include/torch -DTORCH_LIBRARY_DIR=${CMAKE_BINARY_DIR}/cxx/lbfgs
