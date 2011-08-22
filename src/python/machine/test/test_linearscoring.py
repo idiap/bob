@@ -77,22 +77,25 @@ class LinearScoringTest(unittest.TestCase):
     stats1 = torch.machine.GMMStats(2, 2)
     stats1.sumPx = torch.core.array.array([[1, 2], [3, 4]], 'float64')
     stats1.n = torch.core.array.array([1, 2], 'float64')
+    stats1.T = 1+2
     
     stats2 = torch.machine.GMMStats(2, 2)
     stats2.sumPx = torch.core.array.array([[5, 6], [7, 8]], 'float64')
     stats2.n = torch.core.array.array([3, 4], 'float64')
+    stats2.T = 3+4
     
     stats3 = torch.machine.GMMStats(2, 2)
     stats3.sumPx = torch.core.array.array([[5, 6], [7, 3]], 'float64')
     stats3.n = torch.core.array.array([3, 4], 'float64')
+    stats3.T = 3+4
 
-    """ UNCOMMMENT ONCE NORMALIZATION WOULD BE FIXED
+    # with channeloffset
     test_channeloffset = [torch.core.array.array([9, 8, 7, 6], 'float64'), torch.core.array.array([5, 4, 3, 2], 'float64'), torch.core.array.array([1, 0, 1, 2], 'float64')]
     scores = torch.machine.linearScoring1([model1.meanSupervector, model2.meanSupervector], ubm.meanSupervector, ubm.varianceSupervector, [stats1, stats2, stats3], test_channeloffset, True)
-    ref_scores = torch.core.array.array([[435.91666667, 388.15, 385.17857143], [396.91666667, 357.09285714, 358.75]], 'float64')
+    ref_scores = torch.core.array.array([[871.8333333333332, 776.3000000000001, 770.3571428571427], [793.8333333333333, 714.1857142857143, 717.5000000000000]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
-    """
 
+    # without normalisation
     scores = torch.machine.linearScoring2([model1.meanSupervector, model2.meanSupervector], ubm.meanSupervector, ubm.varianceSupervector, [stats1, stats2, stats3])
     ref_scores = torch.core.array.array([[2372.9, 5207.7, 5275.7], [2215.7, 4868.1, 4932.1]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
@@ -101,15 +104,14 @@ class LinearScoringTest(unittest.TestCase):
     ref_scores = torch.core.array.array([[2372.9, 5207.7, 5275.7], [2215.7, 4868.1, 4932.1]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 
-    """ UNCOMMMENT ONCE NORMALIZATION WOULD BE FIXED
+    # with normalisation
     scores = torch.machine.linearScoring2([model1.meanSupervector, model2.meanSupervector], ubm.meanSupervector, ubm.varianceSupervector, [stats1, stats2, stats3], True)
-    ref_scores = torch.core.array.array([[395.48333333, 371.97857143, 376.83571429],[369.28333333, 347.72142857, 352.29285714]], 'float64')
+    ref_scores = torch.core.array.array( [[790.9666666666667, 743.9571428571428, 753.6714285714285], [738.5666666666667, 695.4428571428572, 704.5857142857144]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 
     scores = torch.machine.linearScoring3([model1, model2], ubm, [stats1, stats2, stats3], True)
-    ref_scores = torch.core.array.array([[395.48333333, 371.97857143, 376.83571429],[369.28333333, 347.72142857, 352.29285714]], 'float64')
+    ref_scores = torch.core.array.array( [[790.9666666666667, 743.9571428571428, 753.6714285714285], [738.5666666666667, 695.4428571428572, 704.5857142857144]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
-    """
     
 if __name__ == '__main__':
   sys.argv.append('-v')
