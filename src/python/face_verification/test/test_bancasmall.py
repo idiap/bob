@@ -479,6 +479,63 @@ class GMMExperiment:
     return scores4
 
 
+def jfa_enrol(features_c, ubm, jfa_base, output_machine, n_iter):
+  # Prepare list of GMMStats
+  gmmstats_c = []
+  # Initialize a python list for the GMMStats
+  for k in features_c:
+    # Process one file
+    stats = torch.machine.GMMStats( torch.io.HDF5File(str(features_c[k])) )
+    # append in the list
+    gmmstats_c.append(stats)
+
+  ubm_machine = torch.machine.GMMMachine(torch.io.HDF5File(ubm))
+  base_machine = torch.machine.JFABaseMachine(torch.io.HDF5File(jfa_base))
+  base_machine.ubm = ubm_machine
+  machine = torch.machine.JFAMachine(base_machine)
+  base_trainer = torch.trainer.JFABaseTrainer(base_machine)
+  trainer = torch.trainer.JFATrainer(machine, base_trainer)
+  trainer.enrol(gmmstats_c, n_iter)
+  machine.save(torch.io.HDF5File(output_machine))
+
+def compute_scores(db, group, gmmstats_dir, extension, protocol, clientmodel_dir, ubm, jfa_base, jfa_model_ext, jfa_enrol_n_iter):
+  models = db.models(groups=group)
+  client_scores = []
+  impostor_scores = []
+  ubm_machine = torch.machine.GMMMachine(torch.io.HDF5File(ubm))
+  base_machine = torch.machine.JFABaseMachine(torch.io.HDF5File(jfa_base))
+  base_machine.ubm = ubm_machine
+  for c in models:
+    # 1/ enrol
+    features_c = db.files(directory=gmmstats_dir, extension=extension, protocol=protocol, model_ids=(c,), purposes='enrol')
+    client_model_filename = os.path.join(clientmodel_dir,str(c)+str(jfa_model_ext))
+    jfa_enrol(features_c, ubm, jfa_base, client_model_filename, jfa_enrol_n_iter)
+    machine = torch.machine.JFAMachine(torch.io.HDF5File(client_model_filename))
+    machine.jfa_base = base_machine
+
+    # 2/ probe: client accesses
+    client_probes = db.objects(directory=gmmstats_dir, extension=extension, protocol=protocol, purposes="probe", model_ids=(c,), classes="client")
+    # compute the score for each probe
+    scores_c = []
+    for k in client_probes:
+      probe = torch.machine.GMMStats( torch.io.HDF5File(str(client_probes[k][0])) )
+      new_score = machine.forward(probe)
+      scores_c.append( new_score )
+    client_scores.extend(scores_c)
+
+    # 3/ probe: impostor accesses
+    client_probes = db.objects(directory=gmmstats_dir, extension=extension, protocol=protocol, purposes="probe", model_ids=(c,), classes="impostor")
+    # compute the score for each probe
+    scores_i = []
+    for k in client_probes:
+      probe = torch.machine.GMMStats( torch.io.HDF5File(str(client_probes[k][0])) )
+      new_score = machine.forward(probe)
+      scores_i.append( new_score )
+    impostor_scores.extend(scores_i)
+
+  return (client_scores, impostor_scores)
+
+
 class TestBancaSmall(unittest.TestCase):
   """Performs various face recognition tests using the BANCA_SMALL database."""
   
@@ -576,15 +633,58 @@ class TestBancaSmall(unittest.TestCase):
     img_output = db.files(directory=gmmstats_dir, extension=extension)
     stats_computation(img_input, img_output, wm_path)
 
+    # JFA training
+    jfa_ru = 3
+    jfa_rv = 2 
+    jfa_train_n_iter = 10
+    jfa_train_relevance_factor = 4
+    base_machine = torch.machine.JFABaseMachine(ubm_model, jfa_ru, jfa_rv) 
+    T = torch.trainer.JFABaseTrainer(base_machine)
+    Vinit = torch.core.array.load(os.path.join(data_dir, 'jfa_Vinit.hdf5'))
+    Uinit = torch.core.array.load(os.path.join(data_dir, 'jfa_Uinit.hdf5'))
+    Dinit = torch.core.array.load(os.path.join(data_dir, 'jfa_Dinit.hdf5'))
+    base_machine.V = Vinit
+    base_machine.U = Uinit
+    base_machine.D = Dinit
+    # Load Training Data
+    world_clients = db.clients(protocol=protocol, groups="world")
+    gmmstats = []
+    for c in world_clients:
+      world_features_c = db.files(directory=gmmstats_dir, extension=extension, protocol=protocol, groups="world", real_ids=(c,))
+      # Initialize a python list for the GMMStats
+      gmmstats_c = []
+      for k in world_features_c:
+        # Process one file
+        stats = torch.machine.GMMStats( torch.io.HDF5File(str(world_features_c[k])) )
+        # append in the list
+        gmmstats_c.append(stats)
+      gmmstats.append(gmmstats_c)
+    T.trainNoInit(gmmstats, jfa_train_n_iter)
+    output_machine = os.path.join(output_dir, 'jfa_model_UVD.hdf5')
+    base_machine.save(torch.io.HDF5File(output_machine))
+    # TODO: compare trained and enrolled values?
+ 
+    jfa_enrol_n_iter = 1 
+    clientmodel_dir = os.path.join(output_dir, 'jfamodels')
+    if not os.path.exists(clientmodel_dir):
+      os.makedirs(clientmodel_dir)
+    (client_scores, impostor_scores) = compute_scores(db, 'dev', gmmstats_dir, extension, protocol, clientmodel_dir, wm_path, output_machine, extension, jfa_enrol_n_iter)
+    client_scores_ref = [0.0047346262690337948, 0.0041665160545114235]
+    impostor_scores_ref = [0.01369235497039647, 0.0061709896258120263]
+    self.assertTrue(abs(client_scores[0] - client_scores_ref[0]) < 1e-7)    
+    self.assertTrue(abs(client_scores[1] - client_scores_ref[1]) < 1e-7)    
+    self.assertTrue(abs(impostor_scores[0] - impostor_scores_ref[0]) < 1e-7)
+    self.assertTrue(abs(impostor_scores[1] - impostor_scores_ref[1]) < 1e-7) 
+
 
   def test04_cleanup(self):
     """Cleanup temporary directory"""
 
     # Remove output directory
     output_dir = os.environ['TORCH_FACE_VERIF_TEMP_DIRECTORY']
-    #if os.path.exists(output_dir):
-    #  shutil.rmtree(output_dir)
-    #self.assertTrue( not os.path.exists(output_dir) )
+    if os.path.exists(output_dir):
+      shutil.rmtree(output_dir)
+    self.assertTrue( not os.path.exists(output_dir) )
     
 
 if __name__ == '__main__':
