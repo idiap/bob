@@ -91,7 +91,7 @@ class LinearScoringTest(unittest.TestCase):
 
     # with channeloffset
     test_channeloffset = [torch.core.array.array([9, 8, 7, 6], 'float64'), torch.core.array.array([5, 4, 3, 2], 'float64'), torch.core.array.array([1, 0, 1, 2], 'float64')]
-    scores = torch.machine.linearScoring1([model1.meanSupervector, model2.meanSupervector], ubm.meanSupervector, ubm.varianceSupervector, [stats1, stats2, stats3], test_channeloffset, True)
+    scores = torch.machine.linearScoring2([model1.meanSupervector, model2.meanSupervector], ubm.meanSupervector, ubm.varianceSupervector, [stats1, stats2, stats3], test_channeloffset, True)
     ref_scores = torch.core.array.array([[871.8333333333332, 776.3000000000001, 770.3571428571427], [793.8333333333333, 714.1857142857143, 717.5000000000000]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 
@@ -100,7 +100,7 @@ class LinearScoringTest(unittest.TestCase):
     ref_scores = torch.core.array.array([[2372.9, 5207.7, 5275.7], [2215.7, 4868.1, 4932.1]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 
-    scores = torch.machine.linearScoring3([model1, model2], ubm, [stats1, stats2, stats3])
+    scores = torch.machine.linearScoring2([model1, model2], ubm, [stats1, stats2, stats3])
     ref_scores = torch.core.array.array([[2372.9, 5207.7, 5275.7], [2215.7, 4868.1, 4932.1]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 
@@ -109,7 +109,7 @@ class LinearScoringTest(unittest.TestCase):
     ref_scores = torch.core.array.array( [[790.9666666666667, 743.9571428571428, 753.6714285714285], [738.5666666666667, 695.4428571428572, 704.5857142857144]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 
-    scores = torch.machine.linearScoring3([model1, model2], ubm, [stats1, stats2, stats3], True)
+    scores = torch.machine.linearScoring2([model1, model2], ubm, [stats1, stats2, stats3], True)
     ref_scores = torch.core.array.array( [[790.9666666666667, 743.9571428571428, 753.6714285714285], [738.5666666666667, 695.4428571428572, 704.5857142857144]], 'float64')
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
     
