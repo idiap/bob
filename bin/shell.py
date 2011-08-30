@@ -6,8 +6,13 @@
 import sys, os, subprocess
 import shlex
 
-# Imports our admin toolkit
-install_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
+# Imports our admin toolkit.
+if os.environ.has_key('OVERWRITE_TORCH5SPRO_BINROOT'):
+  # grid environments will use this variant:
+  install_dir = os.environ['OVERWRITE_TORCH5SPRO_BINROOT']
+else:
+  # normal execution path:
+  install_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
 sys.path.append(install_dir)
 import adm
 
@@ -63,6 +68,6 @@ if __name__ == '__main__':
     os.kill(p.pid, signal.SIGTERM)
     sys.exit(signal.SIGTERM)
   if options.verbose >= 1:
-    if p.returncode != 0: 
+    if p.returncode != 0:
       print("Error: Program '%s' exited with status %d" % (' '.join(arguments), p.returncode))
   sys.exit(p.returncode)
