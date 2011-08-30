@@ -9,6 +9,12 @@
 #define TORCH_CORE_PYTHON_TYPEMAPPER_H
 
 #include <boost/python.hpp>
+#if !defined(PY_ARRAY_UNIQUE_SYMBOL)
+#define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
+#endif
+#if !defined(torch_IMPORT_ARRAY) and !defined(NO_IMPORT_ARRAY)
+#define NO_IMPORT_ARRAY
+#endif
 #include <numpy/arrayobject.h>
 #include <boost/format.hpp>
 #include <string>

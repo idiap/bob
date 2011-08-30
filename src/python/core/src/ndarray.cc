@@ -4,12 +4,19 @@
  * @brief Automatic converters for numpy.ndarray.
  */
 
+// Take note on inclusion guidelines for NumPy C/C++ extensions!
+#define torch_IMPORT_ARRAY
 #include "core/python/ndarray.h"
+#undef torch_IMPORT_ARRAY
+
 #include "core/python/TypeMapper.h"
+
 #include <boost/python/refcount.hpp>
 #include <boost/python/type_id.hpp>
 #include <boost/format.hpp>
 #include <valarray>
+#include <stdexcept>
+#include <dlfcn.h>
 
 namespace bp = boost::python;
 namespace tp = Torch::python;
@@ -320,7 +327,18 @@ struct ndarray_to_python {
 
 //to and from python converters
 void bind_ndarray () {
+  // Gets the current dlopenflags and save it
+  PyThreadState *tstate = PyThreadState_GET();
+  if(!tstate)
+    throw std::runtime_error("Can not get python dlopenflags.");
+  int old_value = tstate->interp->dlopenflags;
+
+  // Unsets the RTLD_GLOBAL flag
+  tstate->interp->dlopenflags = old_value & (~RTLD_GLOBAL);
+  // Loads numpy with the RTLD_GLOBAL flag unset
   import_array();
+  // Resets the RTLD_GLOBAL flag
+  tstate->interp->dlopenflags = old_value;
 
   struct from_python {
     static void* convertible(PyObject *py_obj) {
