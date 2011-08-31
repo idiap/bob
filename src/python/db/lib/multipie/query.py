@@ -36,13 +36,13 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M0', 'M1', 'M7', 'Mf', 'Ma', 'G')
+      The protocol to consider ('M', 'U', 'G')
 
     groups
-      The groups to which the clients belong ("dev", "eval", "world")
+      The groups to which the clients belong ('dev', 'eval', 'world')
 
     gender
-      The genders to which the clients belong ("f", "m")
+      The genders to which the clients belong ('f', 'm')
 
     birthyear
       The birth year of the clients (in the range [1900,2050])
@@ -51,14 +51,15 @@ class Database(object):
     properties.
     """
 
-    VALID_PROTOCOLS = ('M0', 'M1', 'M7', 'Mf', 'Ma', 'G')
+    VALID_PROTOCOLS = ('M', 'U', 'G')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_GENDERS = ('m', 'f')
-    VALID_BIRTHYEARS =  range(1900, 2050)
-    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
-    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
-    gender = self.__check_validity__(gender, "gender", VALID_GENDERS)
-    birthyear = self.__check_validity__(birthyear, "birthyear", VALID_BIRTHYEARS)
+    VALID_BIRTHYEARS = range(1900, 2050)
+    VALID_BIRTHYEARS.append(57) # bug in subject_list.txt (57 instead of 1957)
+    protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
+    groups = self.__check_validity__(groups, 'group', VALID_GROUPS)
+    gender = self.__check_validity__(gender, 'gender', VALID_GENDERS)
+    birthyear = self.__check_validity__(birthyear, 'birthyear', VALID_BIRTHYEARS)
     # List of the clients
     q = self.session.query(Client).\
           filter(Client.sgroup.in_(groups)).\
@@ -76,10 +77,10 @@ class Database(object):
     Keyword Parameters:
 
     protocol
-      The protocol to consider ('M0', 'M1', 'M7', 'Mf', 'Ma', 'G')
+      The protocol to consider ('M', 'U', 'G')
     
     groups
-      The groups to which the subjects attached to the models belong ("dev", "eval", "world")
+      The groups to which the subjects attached to the models belong ('dev', 'eval', 'world')
 
     Returns: A list containing all the model ids belonging to the given group.
     """
@@ -87,7 +88,8 @@ class Database(object):
     return self.clients(protocol, groups)
 
   def objects(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None):
+      purposes=None, model_ids=None, groups=None, classes=None, subworld=None,
+      expressions=None, world_sampling=1, world_noflash=False, world_first=False):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -99,10 +101,10 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the BANCA protocols ('M0', 'M1', 'M7', 'Mf', 'Ma', 'G').
+      One of the BANCA protocols ('M', 'U', 'G').
 
     purposes
-      The purposes required to be retrieved ("enrol", "probe") or a tuple
+      The purposes required to be retrieved ('enrol', 'probe') or a tuple
       with several of them. If 'None' is given (this is the default), it is 
       considered the same as a tuple with all possible values. This field is
       ignored for the data from the "world" group.
@@ -113,7 +115,7 @@ class Database(object):
       the model_ids is performed.
 
     groups
-      One of the groups ("dev", "eval", "world") or a tuple with several of them. 
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
@@ -121,6 +123,28 @@ class Database(object):
       The classes (types of accesses) to be retrieved ('client', 'impostor') 
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
+  
+    subworld
+      if only a subset of the world data should be used
+
+    expressions
+      The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
+      'squint', 'disgust', 'scream') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values.
+
+    world_sampling
+      Samples the files from the world data set. Keeps only files such as:
+        File.client_id + File.shot_id % world_sampling == 0
+      This argument should be an integer between 1 (keep everything) and 19.
+      It is not used if world_noflash is also set.
+
+    world_noflash
+      Keeps the files from the world dataset recorded without flash (shot 1)
+      
+    world_first
+      Only uses data from the first recorded session of each user of the world
+      dataset.
 
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
@@ -134,29 +158,41 @@ class Database(object):
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
 
-    VALID_PROTOCOLS = ('M0', 'M1', 'M7', 'Mf', 'Ma', 'G')
+    VALID_PROTOCOLS = ('M', 'U', 'G')
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
+    VALID_EXPRESSIONS = ('neutral', 'smile', 'surprise', 'squint', 'disgust', 'scream')
 
-    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
-    purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
-    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
-    classes = self.__check_validity__(classes, "class", VALID_CLASSES)
+    protocol = self.__check_validity__(protocol, 'protocol', VALID_PROTOCOLS)
+    purposes = self.__check_validity__(purposes, 'purpose', VALID_PURPOSES)
+    groups = self.__check_validity__(groups, 'group', VALID_GROUPS)
+    classes = self.__check_validity__(classes, 'class', VALID_CLASSES)
+    expressions = self.__check_validity__(expressions, 'expression', VALID_EXPRESSIONS)
+
     retval = {}
     
     if(isinstance(model_ids,str)):
       model_ids = (model_ids,)
-    
+   
     if 'world' in groups:
       # Multiview
-      q = self.session.query(File).join(Client).join(FileMultiview).\
-            filter(Client.sgroup == 'world')
+      q = self.session.query(File,Expression).join(Client).join(FileMultiview).\
+            filter(Client.sgroup == 'world').\
+            filter(Expression.name.in_(expressions)).\
+            filter(and_(File.img_type == 'multiview', File.session_id == Expression.session_id,\
+                        File.recording_id == Expression.recording_id, FileMultiview.shot_id != 19))
       if model_ids:
         q = q.filter(File.client_id.in_(model_ids))
+      if( world_sampling != 1 and world_noflash == False):
+        q = q.filter(((File.client_id + FileMultiview.shot_id) % world_sampling) == 0)
+      if( world_noflash == True):
+        q = q.filter(FileMultiview.shot_id == 0)
+      if( world_first == True):
+        q = q.filter(File.session_id == Client.first_session)
       q = q.order_by(File.client_id, File.session_id, FileMultiview.shot_id)
       for k in q:
-        retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
+        retval[k[0].id] = (make_path(k[0].path, directory, extension), k[0].client_id, k[0].client_id, k[0].client_id, k[0].path)
     
       # Highres
       # TODO
@@ -214,7 +250,8 @@ class Database(object):
     return retval
 
   def files(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None):
+      purposes=None, model_ids=None, groups=None, classes=None, subworld=None,
+      expressions=None, world_sampling=1, world_noflash=False, world_first=False):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -226,13 +263,13 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the BANCA protocols ('M0', 'M1', 'M7', 'Mf', 'Ma', 'G').
+      One of the BANCA protocols ('M', 'U', 'G').
 
     purposes
-      The purposes required to be retrieved ("enrol", "probe") or a tuple
+      The purposes required to be retrieved ('enrol', 'probe') or a tuple
       with several of them. If 'None' is given (this is the default), it is 
       considered the same as a tuple with all possible values. This field is
-      ignored for the data from the "world" group.
+      ignored for the data from the 'world' group.
 
     model_ids
       Only retrieves the files for the provided list of model ids (claimed 
@@ -240,7 +277,7 @@ class Database(object):
       the model_ids is performed.
 
     groups
-      One of the groups ("dev", "eval", "world") or a tuple with several of them. 
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
       If 'None' is given (this is the default), it is considered the same as a 
       tuple with all possible values.
 
@@ -249,6 +286,26 @@ class Database(object):
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
 
+    expressions
+      The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
+      'squint', 'disgust', 'scream') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values.
+
+    world_sampling
+      Samples the files from the world data set. Keeps only files such as:
+        File.client_id + File.shot_id % world_sampling == 0
+      This argument should be an integer between 1 (keep everything) and 20.
+      It is not used if world_noflash is also set.
+
+    world_noflash
+      Keeps the files from the world dataset recorded without flash 
+      (shots 1 and 19)
+ 
+    world_first
+      Only uses data from the first recorded session of each user of the world
+      dataset.
+
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
     for each file in the Multi-PIE database. Conserve these numbers if you 
@@ -256,7 +313,7 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld, expressions, world_sampling, world_noflash, world_first)
     for k in d: retval[k] = d[k][0]
 
     return retval
