@@ -127,7 +127,7 @@ torch_python_add_test(python-db-multipie-dumplist
 set_property(TEST python-db-multipie-dumplist APPEND PROPERTY DEPENDS
   ${python-db-multipie-instantiation})
 torch_python_add_test(python-db-multipie-dumplist2
-  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py multipie dumplist --protocol=M0 --classes=client 
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py multipie dumplist --protocol=M --classes=client 
   --groups=dev --purposes=enrol --self-test)
 set_property(TEST python-db-multipie-dumplist2 APPEND PROPERTY DEPENDS 
   ${python-db-multipie-instantiation})
