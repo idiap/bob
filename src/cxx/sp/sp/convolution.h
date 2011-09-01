@@ -12,8 +12,6 @@
 #include "core/array_index.h"
 #include <blitz/array.h>
 
-#include "core/logging.h"
-
 namespace tca = Torch::core::array;
 
 namespace Torch {
