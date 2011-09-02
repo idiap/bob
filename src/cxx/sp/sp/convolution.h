@@ -402,7 +402,7 @@ namespace Torch {
         detail::convolveSep( B, C, A, size_opt, border_opt);
       else if(dim<N)
       {
-        const blitz::Array<T,N> Bp = B.transpose(dim,0);
+        const blitz::Array<T,N> Bp = (Torch::core::array::ccopy(B)).transpose(dim,0);
         blitz::Array<T,N> Ap = A.transpose(dim,0);
         detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
       }
