@@ -112,6 +112,22 @@ RES_A2_5_b2_3_valid = torch.core.array.float64_2([
 
 RES_1 = torch.core.array.float64_1([0.], (1,));
 RES_2 = torch.core.array.float64_2([1.], (1,1));
+
+RES_A2_5_b1_3_0d_full = torch.core.array.float64_2([
+  0.492061710000000, 0.204855000000000, 0.205850010000000, 0.167278740000000, 0.044424270000000,
+  0.336990450000000, 0.193399980000000, 0.564977700000000, 0.507151200000000, 0.048592620000000,
+  1.165140040000000, 0.453922910000000, 0.792741340000000, 0.825323510000000, 0.379786110000000,
+  0.515816480000000, 0.564446560000000, 1.076909590000000, 0.960210540000000, 0.615429000000000,
+  1.210198180000000, 0.603534720000000, 1.099595910000000, 0.983721670000000, 1.119845200000000,
+  0.390918890000000, 0.568725340000000, 0.618258970000000, 0.412868160000000, 0.794442160000000,
+  0.698183090000000, 0.355590290000000, 0.689092360000000, 0.426588140000000, 0.701714200000000], (7,5))
+
+RES_A2_5_b1_3_1d_full = torch.core.array.float64_2([
+  0.492061710000000, 0.393003660000000, 0.915797920000000, 0.508944200000000, 0.372618520000000, 0.231707960000000, 0.057023670000000,
+  0.148841790000000, 0.171982320000000, 0.721321910000000, 0.776827780000000, 0.825247600000000, 0.580969560000000, 0.040570200000000,
+  0.476609790000000, 0.329209170000000, 1.010555860000000, 0.760782180000000, 0.919091190000000, 0.685047850000000, 0.398790040000000,
+  0.142520550000000, 0.415040100000000, 0.642541760000000, 0.808471780000000, 0.954188890000000, 0.460179480000000, 0.585412960000000,
+  0.543919290000000, 0.484999830000000, 1.340944790000000, 0.893192990000000, 1.362836200000000, 0.635617340000000, 0.701714200000000], (5,7))
 #############################################################################
 
 
@@ -237,15 +253,21 @@ class ConvolutionTest(unittest.TestCase):
     test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_valid, self, 
       torch.sp.ConvolutionSize.Valid)
 
+  def test_convolution_2D_sep_0d(self):
+    res0 = torch.core.array.float64_2((7,5))
+    torch.sp.convolveSep(A2_5, b1_3, res0, 0, torch.sp.ConvolutionSize.Full)
+    self.assertEqual(res0.shape(), RES_A2_5_b1_3_0d_full.shape())
+    for i in range(res0.extent(0)):
+      for j in range(res0.extent(1)):
+        self.assertTrue(compare(res0[i,j], RES_A2_5_b1_3_0d_full[i,j], eps))
 
-  res0 = torch.core.array.float64_2((7,5))
-  res1 = torch.core.array.float64_2((5,7))
-  print A2_5
-  print b1_3
-  torch.sp.convolveSep(A2_5, b1_3, res0, 0, torch.sp.ConvolutionSize.Full)
-  print res0
-  torch.sp.convolveSep(A2_5, b1_3, res1, 1, torch.sp.ConvolutionSize.Full)
-  print res1
+  def test_convolution_2D_sep_1d(self):
+    res1 = torch.core.array.float64_2((5,7))
+    torch.sp.convolveSep(A2_5, b1_3, res1, 1, torch.sp.ConvolutionSize.Full)
+    self.assertEqual(res1.shape(), RES_A2_5_b1_3_1d_full.shape())
+    for i in range(res1.extent(0)):
+      for j in range(res1.extent(1)):
+        self.assertTrue(compare(res1[i,j], RES_A2_5_b1_3_1d_full[i,j], eps))
 
 
 ##################### Main ##################  

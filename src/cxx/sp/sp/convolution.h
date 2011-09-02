@@ -376,7 +376,7 @@ namespace Torch {
     }
 
     /**
-     * @brief Convolution of a 2D signal with a 1D kernel (for separable convolution)
+     * @brief Convolution of a X-D signal with a 1D kernel (for separable convolution)
      *        along the specified dimension (A=B*C)
      * @param B The first input array B
      * @param C The second input array C
@@ -393,112 +393,17 @@ namespace Torch {
      *                     * Mirror: extrapolate by mirroring the arrays
      *                         for B and C
      */
-    template<typename T> void convolveSep(const blitz::Array<T,2>& B, 
-      const blitz::Array<T,1>& C, blitz::Array<T,2>& A, const int dim,
+    template<typename T, int N> void convolveSep(const blitz::Array<T,N>& B, 
+      const blitz::Array<T,1>& C, blitz::Array<T,N>& A, const int dim,
       const enum Convolution::SizeOption size_opt = Convolution::Full,
       const enum Convolution::BorderOption border_opt = Convolution::Zero)
     {
       if(dim==0)
-      {
         detail::convolveSep( B, C, A, size_opt, border_opt);
-      }
-      else if(dim==1)
+      else if(dim<N)
       {
-        const blitz::Array<T,2> Bp = B.transpose(1,0);
-        blitz::Array<T,2> Ap = A.transpose(1,0);
-        detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
-      }
-      else
-        throw Torch::core::Exception();
-    }
-
-    /**
-     * @brief Convolution of a 3D signal with a 1D kernel (for separable convolution)
-     *        along the specified dimension (A=B*C)
-     * @param B The first input array B
-     * @param C The second input array C
-     * @param A The output array A=B*C along the dimension d (0, 1, or 2)
-     * @param dim The dimension along which to convolve
-     * @param size_opt:  * Full: full size (default)
-     *                   * Same: same size as the largest between B and C
-     *                   * Valid: valid (part without padding)
-     * @param border_opt:  * Zero: zero padding
-     *                     * Nearest Neighbour: extrapolate with nearest 
-     *                         neighbour
-     *                     * Circular: extrapolate by considering tiled arrays
-     *                         for B and C (<-> modulo arrays)
-     *                     * Mirror: extrapolate by mirroring the arrays
-     *                         for B and C
-     */
-    template<typename T> void convolveSep(const blitz::Array<T,3>& B, 
-      const blitz::Array<T,1>& C, blitz::Array<T,3>& A, const int dim,
-      const enum Convolution::SizeOption size_opt = Convolution::Full,
-      const enum Convolution::BorderOption border_opt = Convolution::Zero)
-    {
-      if(dim==0)
-      {
-        detail::convolveSep( B, C, A, size_opt, border_opt);
-      }
-      else if(dim==1)
-      {
-        const blitz::Array<T,3> Bp = B.transpose(1,0);
-        blitz::Array<T,3> Ap = A.transpose(1,0);
-        detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
-      }
-      else if(dim==2)
-      {
-        const blitz::Array<T,3> Bp = B.transpose(2,0);
-        blitz::Array<T,3> Ap = A.transpose(2,0);
-        detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
-      }
-      else
-        throw Torch::core::Exception();
-    }
-
-
-    /**
-     * @brief Convolution of a 4D signal with a 1D kernel (for separable convolution)
-     *        along the specified dimension (A=B*C)
-     * @param B The first input array B
-     * @param C The second input array C
-     * @param A The output array A=B*C along the dimension d (0, 1, 2, or 3)
-     * @param dim The dimension along which to convolve
-     * @param size_opt:  * Full: full size (default)
-     *                   * Same: same size as the largest between B and C
-     *                   * Valid: valid (part without padding)
-     * @param border_opt:  * Zero: zero padding
-     *                     * Nearest Neighbour: extrapolate with nearest 
-     *                         neighbour
-     *                     * Circular: extrapolate by considering tiled arrays
-     *                         for B and C (<-> modulo arrays)
-     *                     * Mirror: extrapolate by mirroring the arrays
-     *                         for B and C
-     */
-    template<typename T> void convolveSep(const blitz::Array<T,4>& B, 
-      const blitz::Array<T,1>& C, blitz::Array<T,4>& A, const int dim,
-      const enum Convolution::SizeOption size_opt = Convolution::Full,
-      const enum Convolution::BorderOption border_opt = Convolution::Zero)
-    {
-      if(dim==0)
-      {
-        detail::convolveSep( B, C, A, size_opt, border_opt);
-      }
-      else if(dim==1)
-      {
-        const blitz::Array<T,4> Bp = B.transpose(1,0);
-        blitz::Array<T,4> Ap = A.transpose(1,0);
-        detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
-      }
-      else if(dim==2)
-      {
-        const blitz::Array<T,4> Bp = B.transpose(2,0);
-        blitz::Array<T,4> Ap = A.transpose(2,0);
-        detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
-      }
-      else if(dim==3)
-      {
-        const blitz::Array<T,4> Bp = B.transpose(3,0);
-        blitz::Array<T,4> Ap = A.transpose(3,0);
+        const blitz::Array<T,N> Bp = B.transpose(dim,0);
+        blitz::Array<T,N> Ap = A.transpose(dim,0);
         detail::convolveSep( Bp, C, Ap, size_opt, border_opt);
       }
       else
