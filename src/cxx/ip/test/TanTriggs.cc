@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE( test_tantriggs_2d )
   testdata_path_img /= "image.pgm";
   Torch::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
-  blitz::Array<double,2> img_processed;
+  blitz::Array<double,2> img_processed(img.shape());
   Torch::ip::TanTriggs tt_filter;
   tt_filter(img,img_processed);
 

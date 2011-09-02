@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d )
   Torch::io::Array ar_img(testdata_path_img.string());
   blitz::Array<uint8_t,2> img = ar_img.get<uint8_t,2>();
   blitz::Array<double,2> img_d = Torch::core::cast<double>(img);
-  blitz::Array<double,2> img_processed_d;
+  blitz::Array<double,2> img_processed_d(img_d.shape());
   Torch::ip::Gaussian g_filter;
   g_filter(img_d,img_processed_d);
   blitz::Array<uint8_t,2> img_processed = Torch::core::convertFromRange<uint8_t>(
