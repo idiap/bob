@@ -120,6 +120,7 @@ def compare(v1, v2, width):
 
 def test_convolve_1D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
+  res = torch.core.array.float64_1( torch.sp.getConvolveOutputSize(A, b) )
   torch.sp.convolve(A, b, res)
   
   obj.assertEqual(res.shape(), reference.shape())
@@ -128,6 +129,7 @@ def test_convolve_1D_nopt(A, b, res, reference, obj):
 
 def test_convolve_1D(A, b, res, reference, obj, option):
   # Compute the convolution product
+  res = torch.core.array.float64_1( torch.sp.getConvolveOutputSize(A, b, option) )
   torch.sp.convolve(A, b, res, option)
 
   obj.assertEqual(res.shape(), reference.shape())
@@ -136,6 +138,7 @@ def test_convolve_1D(A, b, res, reference, obj, option):
 
 def test_convolve_2D_nopt(A, b, res, reference, obj):
   # Compute the convolution product
+  res = torch.core.array.float64_2( torch.sp.getConvolveOutputSize(A, b) )
   torch.sp.convolve(A, b, res)
   
   obj.assertEqual(res.shape(), reference.shape())
@@ -145,6 +148,7 @@ def test_convolve_2D_nopt(A, b, res, reference, obj):
 
 def test_convolve_2D(A, b, res, reference, obj, option):
   # Compute the convolution product
+  res = torch.core.array.float64_2( torch.sp.getConvolveOutputSize(A, b, option) )
   torch.sp.convolve(A, b, res, option)
 
   obj.assertEqual(res.shape(), reference.shape())
@@ -232,6 +236,16 @@ class ConvolutionTest(unittest.TestCase):
   def test_convolution_2D_5_3_V(self):
     test_convolve_2D( A2_5, b2_3, RES_2, RES_A2_5_b2_3_valid, self, 
       torch.sp.ConvolutionSize.Valid)
+
+
+  res0 = torch.core.array.float64_2((7,5))
+  res1 = torch.core.array.float64_2((5,7))
+  print A2_5
+  print b1_3
+  torch.sp.convolveSep(A2_5, b1_3, res0, 0, torch.sp.ConvolutionSize.Full)
+  print res0
+  torch.sp.convolveSep(A2_5, b1_3, res1, 1, torch.sp.ConvolutionSize.Full)
+  print res1
 
 
 ##################### Main ##################  

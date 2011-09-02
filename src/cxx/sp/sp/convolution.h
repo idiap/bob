@@ -9,6 +9,7 @@
 #define TORCH5SPRO_SP_CONVOLVE_H
 
 #include "core/Exception.h"
+#include "core/array_assert.h"
 #include "core/array_index.h"
 #include <blitz/array.h>
 
@@ -41,6 +42,75 @@ namespace Torch {
     }
 
     /**
+     * @brief Gets the required size of the output of the convolution product
+     * @param B The first input array B
+     * @param C The second input array C
+     * @param size_opt:  * Full: full size (default)
+     *                   * Same: same size as the largest between B and C
+     *                   * Valid: valid (part without padding)
+     * @return Size of the output
+     */
+    template<typename T> 
+    const blitz::TinyVector<int,1> getConvolveOutputSize(
+      const blitz::Array<T,1>& B, const blitz::Array<T,1>& C,
+      const enum Convolution::SizeOption size_opt = Convolution::Full)
+    {
+      blitz::TinyVector<int,1> size;
+      size(0) = 0;
+
+      // Size of "B + C - 1"
+      if( size_opt == Convolution::Full )
+        size(0) = B.extent(0) + C.extent(0) - 1;
+      // Same size as B
+      else if( size_opt == Convolution::Same )
+        size(0) = B.extent(0);
+      // Size when not allowing any padding
+      else if( size_opt == Convolution::Valid )
+        size(0) = B.extent(0) - C.extent(0) + 1;
+    
+      return size;
+    }
+
+
+    /**
+     * @brief Gets the required size of the output of the convolution product
+     * @param B The first input array B
+     * @param C The second input array C
+     * @param size_opt:  * Full: full size (default)
+     *                   * Same: same size as the largest between B and C
+     *                   * Valid: valid (part without padding)
+     * @return Size of the output
+     */
+    template<typename T> 
+    const blitz::TinyVector<int,2> getConvolveOutputSize(
+      const blitz::Array<T,2>& B, const blitz::Array<T,2>& C,
+      const enum Convolution::SizeOption size_opt = Convolution::Full)
+    {
+      blitz::TinyVector<int,2> size;
+      size(0) = 0;
+      size(1) = 0;
+
+      if( size_opt == Convolution::Full )
+      {
+        size(0) = B.extent(0) + C.extent(0) - 1;
+        size(1) = B.extent(1) + C.extent(1) - 1;
+      }
+      else if( size_opt == Convolution::Same )
+      {
+        size(0) = B.extent(0);
+        size(1) = B.extent(1);
+      }
+      else if( size_opt == Convolution::Valid )
+      {
+        size(0) = B.extent(0) - C.extent(0) + 1;
+        size(1) = B.extent(1) - C.extent(1) + 1;
+      }
+
+      return size;
+    }
+
+
+    /**
      * @brief 1D convolution of blitz arrays: A=B*C
      * @param B The first input array B
      * @param C The second input array C
@@ -55,6 +125,7 @@ namespace Torch {
      *                         for B and C (<-> modulo arrays)
      *                     * Mirror: extrapolate by mirroring the arrays
      *                         for B and C
+     * @warning The output A should have the correct size
      * @warning If size(C) < size(B),  B and C are reversed and the convolve
      *   function is called again.
      */
@@ -75,36 +146,16 @@ namespace Torch {
         return;
       }
 
-      int Asize=0;
+      // Gets the expected size for the results
+      const blitz::TinyVector<int,1> Asize = getConvolveOutputSize(B, C, size_opt);
 
-      // Size of "B + C - 1"
-      if( size_opt == Convolution::Full )
-        Asize = Bsize + Csize - 1;
-      // Same size as B
-      else if( size_opt == Convolution::Same )
-        Asize = Bsize;
-      // Size when not allowing any padding
-      else if( size_opt == Convolution::Valid )
+      // Checks that A has the correct size and is zero base
+      tca::assertSameShape(A, Asize);
+      tca::assertZeroBase(A);
+    
+      A = 0;
+      for(int i=0; i < Asize(0); ++i)
       {
-        Asize = Bsize - Csize + 1;
-        // Check that B is larger than C, otherwise, throw an exception
-        if( Bsize < Csize )
-          throw Torch::core::Exception();
-      }
-
-      // Check and resize A if required
-      if( A.extent(0) != Asize )
-        A.resize( Asize );
-      // Check and reindex A if required
-      if( A.base(0) != 0 ) {
-        const blitz::TinyVector<int,1> zero_base = 0;
-        A.reindexSelf( zero_base );
-      }
-
-      for(int i=0; i < Asize; ++i)
-      {
-        A(i) = 0;
-
         int i_shifted=0;
         if( size_opt == Convolution::Full )
           i_shifted = i;
@@ -165,6 +216,7 @@ namespace Torch {
      *                         fir B and C (<-> modulo arrays)
      *                     * Mirror: extrapolate by mirroring the arrays
      *                         for B and C
+     * @warning The output A should have the correct size
      * @warning If size(C) < size(B),  B and C are reversed and the convolve
      *   function is called again. If both B and C have a leading dimension,
      *   an exception is thrown
@@ -195,39 +247,14 @@ namespace Torch {
         throw Torch::core::Exception();
       }
 
+      // Gets the expected size for the results
+      const blitz::TinyVector<int,2> Asize = getConvolveOutputSize(B, C, size_opt);
 
-      int Asize1=0;
-      int Asize2=0;
+      // Checks that A has the correct size and is zero base
+      tca::assertSameShape(A, Asize);
+      tca::assertZeroBase(A);
 
-      if( size_opt == Convolution::Full )
-      {
-        Asize1 = Bsize1 + Csize1 - 1;
-        Asize2 = Bsize2 + Csize2 - 1;
-      }
-      else if( size_opt == Convolution::Same )
-      {
-        Asize1 = Bsize1;
-        Asize2 = Bsize2;
-      }
-      else if( size_opt == Convolution::Valid )
-      {
-        Asize1 = Bsize1 - Csize1 + 1;
-        Asize2 = Bsize2 - Csize2 + 1;
-        // Check that B is larger than C, otherwise, throw an exception
-        if( Bsize1 < Csize1 || Bsize2 < Csize2)
-          throw Torch::core::Exception();
-      }
-
-      // Check and resize A if required
-      if( A.extent(0) != Asize1 || A.extent(1) != Asize2)
-        A.resize( Asize1, Asize2 );
-      // Check and reindex A if required
-      if( A.base(0) != 0 || A.base(1) != 0 ) {
-        const blitz::TinyVector<int,2> zero_base = 0;
-        A.reindexSelf( zero_base );
-      }
-
-      for(int i1=0; i1 < Asize1; ++i1)
+      for(int i1=0; i1 < Asize(0); ++i1)
       {
         int i1_shifted=0;
         if( size_opt == Convolution::Full )
@@ -235,7 +262,7 @@ namespace Torch {
         else if( size_opt == Convolution::Same )
           i1_shifted = i1 + Csize1 / 2;
 
-        for(int i2=0; i2 < Asize2; ++i2)
+        for(int i2=0; i2 < Asize(1); ++i2)
         {
           A(i1,i2) = 0;
 

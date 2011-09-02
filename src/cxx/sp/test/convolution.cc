@@ -263,7 +263,7 @@ template <typename T>
 void test_convolve_1D_nopt( T eps, const blitz::Array<T,1>& a1, 
   const blitz::Array<T,1>& a2, const blitz::Array<T,1>& mat)
 {
-  blitz::Array<T,1> res;
+  blitz::Array<T,1> res( Torch::sp::getConvolveOutputSize(a1, a2) );
   Torch::sp::convolve( a1, a2, res);
   for(int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
@@ -273,7 +273,7 @@ template <typename T>
 void test_convolve_2D_nopt( T eps, const blitz::Array<T,2>& a1, 
   const blitz::Array<T,2>& a2, const blitz::Array<T,2>& mat)
 {
-  blitz::Array<T,2> res;
+  blitz::Array<T,2> res( Torch::sp::getConvolveOutputSize(a1, a2) );
   Torch::sp::convolve( a1, a2, res);
   for(int i=0; i<res.extent(0); ++i)
     for(int j=0; j<res.extent(1); ++j)
@@ -286,7 +286,7 @@ void test_convolve_1D( T eps, const blitz::Array<T,1>& a1,
   const enum conv::SizeOption opt1 = conv::Full,
   const enum conv::BorderOption opt2 = conv::Zero)
 {
-  blitz::Array<T,1> res;
+  blitz::Array<T,1> res( Torch::sp::getConvolveOutputSize(a1, a2, opt1) );
   Torch::sp::convolve( a1, a2, res, opt1, opt2);
   for(int i=0; i<res.extent(0); ++i)
     BOOST_CHECK_SMALL(res(i) - mat(i), eps);
@@ -298,7 +298,7 @@ void test_convolve_2D( T eps, const blitz::Array<T,2>& a1,
   const enum conv::SizeOption opt1 = conv::Full,
   const enum conv::BorderOption opt2 = conv::Zero)
 {
-  blitz::Array<T,2> res;
+  blitz::Array<T,2> res( Torch::sp::getConvolveOutputSize(a1, a2, opt1) );
   Torch::sp::convolve( a1, a2, res, opt1, opt2);
   for(int i=0; i<res.extent(0); ++i)
     for(int j=0; j<res.extent(1); ++j)
