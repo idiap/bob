@@ -11,6 +11,7 @@ import replay
 import banca
 import banca_small
 import biosecure
+import faceverif_fl
 import mobio
 import multipie
 import scface
