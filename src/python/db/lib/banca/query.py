@@ -104,6 +104,57 @@ class Database(object):
 
     return retval
 
+  def Tclients(self, protocol=None, groups=None):
+    """Returns a set of T-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+    
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    groups = self.__group_replace_alias__(groups)
+    VALID_GROUPS = ('g1', 'g2')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    tgroups = []
+    if 'g1' in groups:
+      tgroups.append('g2')
+    if 'g2' in groups:
+      tgroups.append('g1')
+    return self.clients(protocol, tgroups)
+
+  def Zclients(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+    
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    groups = self.__group_replace_alias__(groups)
+    VALID_GROUPS = ('g1', 'g2')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    zgroups = []
+    if 'g1' in groups:
+      zgroups.append('g2')
+    if 'g2' in groups:
+      zgroups.append('g1')
+    return self.clients(protocol, zgroups)
+
+
   def models(self, protocol=None, groups=None):
     """Returns a set of models for the specific query by the user.
 
@@ -120,6 +171,41 @@ class Database(object):
     """
 
     return self.clients(protocol, groups)
+
+  def Tmodels(self, protocol=None, groups=None):
+    """Returns a set of T-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+    
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.Tclients(protocol, groups)
+
+  def Zmodels(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+    
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.Zclients(protocol, groups)
+
 
   def getClientIdFromModelId(self, model_id):
     """Returns the client_id attached to the given model_id
@@ -369,6 +455,249 @@ class Database(object):
     for k in d: retval[k] = d[k][0]
 
     return retval
+
+
+  def Tobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, languages=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    languages
+      The language spoken by the clients ("en")
+      TODO: only English is currently supported
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the BANCA database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    groups = self.__group_replace_alias__(groups)
+    VALID_GROUPS = ('g1', 'g2')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    tgroups = []
+    if 'g1' in groups:
+      tgroups.append('g2')
+    if 'g2' in groups:
+      tgroups.append('g1')
+    return self.objects(directory, extension, protocol, 'enrol', model_ids, tgroups, 'client', languages)
+
+  def Tfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, languages=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    languages
+      The language spoken by the clients ("en")
+      TODO: only English is currently supported
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the BANCA database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Tobjects(directory, extension, protocol, model_ids, groups, languages)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
+
+  def Zobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, languages=None):
+    """Returns a set of filenames to perform Z-norm score normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    languages
+      The language spoken by the clients ("en")
+      TODO: only English is currently supported
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the BANCA database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    def make_path(stem, directory, extension):
+      import os
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+
+    groups = self.__group_replace_alias__(groups)
+    VALID_PROTOCOLS = ('Mc', 'Md', 'Ma', 'Ud', 'Ua', 'P', 'G')
+    VALID_GROUPS = ('g1', 'g2')
+    VALID_LANGUAGES = ('en', 'fr', 'sp')
+
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    languages = self.__check_validity__(languages, "language", VALID_LANGUAGES)
+    zgroups = []
+    if 'g1' in groups:
+      zgroups.append('g2')
+    if 'g2' in groups:
+      zgroups.append('g1')
+
+    retval = {}
+
+    if(isinstance(model_ids,str)):
+      model_ids = (model_ids,)
+ 
+    # Files used as client probes
+    q = self.session.query(File).join(Client).join(Session).join(Protocol).\
+            filter(File.claimed_id == File.real_id).\
+            filter(Client.sgroup.in_(zgroups)).\
+            filter(Client.language.in_(languages)).\
+            filter(Protocol.name.in_(protocol)).\
+            filter(Protocol.purpose == 'probe')
+    if model_ids:
+      q = q.filter(File.real_id.in_(model_ids))
+    q = q.order_by(File.claimed_id, File.session_id, File.real_id, File.shot)
+    for k in q:
+      retval[k.id] = (make_path(k.path, directory, extension), k.claimed_id, k.claimed_id, k.real_id, k.path)
+
+    # Files used as impostor probes
+    q = self.session.query(File).join(Client).join(Session).join(Protocol).\
+            filter(File.claimed_id != File.real_id).\
+            filter(Client.sgroup.in_(zgroups)).\
+            filter(Client.language.in_(languages)).\
+            filter(Protocol.name.in_(protocol)).\
+            filter(or_(Protocol.purpose == 'probe', Protocol.purpose == 'probeImpostor'))
+    if model_ids:
+      q = q.filter(File.real_id.in_(model_ids))
+    for k in q:
+      retval[k.id] = (make_path(k.path, directory, extension), k.claimed_id, k.claimed_id, k.real_id, k.path)
+
+    return retval
+
+  def Zfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, languages=None):
+    """Returns a set of filenames to perform Z-norm score normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the BANCA protocols ("P", "G", "Mc", "Md", "Ma", "Ud", "Ua").
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      The groups to which the clients belong ("g1", "g2").
+      Note that 'dev' is an alias to 'g1' and 'test' an alias to 'g2'
+
+    languages
+      The language spoken by the clients ("en")
+      TODO: only English is currently supported
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the BANCA database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Zobjects(directory, extension, protocol, model_ids, groups, languages)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
 
   def save_one(self, id, obj, directory, extension):
     """Saves a single object supporting the torch save() protocol.
