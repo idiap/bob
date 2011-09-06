@@ -59,6 +59,7 @@ set(src_ip
    "src/Sobel.cc"
    "src/Gaussian.cc"
    "src/MultiscaleRetinex.cc"
+   "src/SpatioTemporalGradient.cc"
 )
 #   "src/ipHOG.cc"
 

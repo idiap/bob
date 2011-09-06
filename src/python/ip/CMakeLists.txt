@@ -29,6 +29,7 @@ set(pysrc
    "src/LBP.cc"
    "src/MultiscaleRetinex.cc"
    "src/drawing.cc"
+   "src/SpatioTemporalGradient.cc"
    "src/main.cc"
    )
 
