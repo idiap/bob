@@ -108,6 +108,9 @@ torch_python_add_test(python-db-biosecure-dumplist2
 set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS 
   ${python-db-biosecure-instantiation})
 
+# Faceverif_fl database (uses file lists).
+torch_python_add_test(python-db-faceverif_fl-query ${CMAKE_CURRENT_SOURCE_DIR}/test/test_faceverif_fl.py)
+
 # MOBIO database driver tests.
 # ######### Notice test dependencies!! ##################
 torch_python_add_test(python-db-mobio-dumplist
