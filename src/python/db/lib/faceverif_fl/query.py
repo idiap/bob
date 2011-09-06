@@ -135,8 +135,8 @@ class Database(object):
       raise RuntimeError, 'File %s does not exist.' % (filename,)
 
 
-  def __getRealIdFromFile__(self, model_id_arg, filename):
-    """Tries to find a real_id corresponding to a model_id in the given file"""
+  def __getClientIdFromFile__(self, model_id_arg, filename):
+    """Tries to find a client id corresponding to a model id in the given file"""
     if os.path.isfile(filename): 
       try: 
         for line in fileinput.input(filename):
@@ -156,35 +156,35 @@ class Database(object):
     # not found
     return (False, '0')
    
-  def getRealIdFromModelId(self, model_id_arg):
-    """Returns a real_id from a model_id"""
+  def getClientIdFromModelId(self, model_id_arg):
+    """Returns a client id from a model id"""
     world_filename = os.path.join(self.base_dir, self.world_subdir, self.world_filename0)
-    (found, value) = self.__getRealIdFromFile__(model_id_arg, world_filename)
+    (found, value) = self.__getClientIdFromFile__(model_id_arg, world_filename)
     if(found == True): return value
 
     devmodels_filename = os.path.join(self.base_dir, self.dev_subdir, self.models_filename)
-    (found, value) = self.__getRealIdFromFile__(model_id_arg, devmodels_filename)
+    (found, value) = self.__getClientIdFromFile__(model_id_arg, devmodels_filename)
     if(found == True): return value
 
     evalmodels_filename = os.path.join(self.base_dir, self.eval_subdir, self.models_filename)
-    (found, value) = self.__getRealIdFromFile__(model_id_arg, evalmodels_filename)
+    (found, value) = self.__getClientIdFromFile__(model_id_arg, evalmodels_filename)
     if(found == True): return value
     
     # not found
-    raise RuntimeError, 'Could not find real_id from the given model id %s.' % (model_id_arg,)
+    raise RuntimeError, 'Could not find client id from the given model id %s.' % (model_id_arg,)
    
-  def getRealIdFromTmodelId(self, model_id_arg):
-    """Returns a real_id from a T-Norm model_id"""
+  def getClientIdFromTmodelId(self, model_id_arg):
+    """Returns a client id from a T-Norm model id"""
     devtnorm_filename = os.path.join(self.base_dir, self.dev_subdir, self.tnorm_filename)
-    (found, value) = self.__getRealIdFromFile__(model_id_arg, devtnorm_filename)
+    (found, value) = self.__getClientIdFromFile__(model_id_arg, devtnorm_filename)
     if(found == True): return value
 
     evaltnorm_filename = os.path.join(self.base_dir, self.eval_subdir, self.tnorm_filename)
-    (found, value) = self.__getRealIdFromFile__(model_id_arg, evaltnorm_filename)
+    (found, value) = self.__getClientIdFromFile__(model_id_arg, evaltnorm_filename)
     if(found == True): return value
 
     # not found
-    raise RuntimeError, 'Could not find real_id from the given T-model id %s.' % (model_id_arg,)
+    raise RuntimeError, 'Could not find real id from the given T-model id %s.' % (model_id_arg,)
 
   def models(self, protocol=None, groups=None, subworld=None):
     """Returns a set of models for the specific query by the user.

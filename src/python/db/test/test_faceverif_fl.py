@@ -40,10 +40,10 @@ class Faceverif_flDatabaseTest(unittest.TestCase):
     self.assertEqual(len(db.Tobjects(groups='eval')), 8) # 8 samples for enroling T-norm models
     self.assertEqual(len(db.Zobjects(groups='eval')), 8) # 8 samples for Z-norm impostor accesses
 
-    self.assertEqual(db.getRealIdFromModelId('1'), '1')
-    self.assertEqual(db.getRealIdFromModelId('3'), '3')
-    self.assertEqual(db.getRealIdFromModelId('6'), '6')
-    self.assertEqual(db.getRealIdFromTmodelId('7'), '7')
+    self.assertEqual(db.getClientIdFromModelId('1'), '1')
+    self.assertEqual(db.getClientIdFromModelId('3'), '3')
+    self.assertEqual(db.getClientIdFromModelId('6'), '6')
+    self.assertEqual(db.getClientIdFromTmodelId('7'), '7')
 
 if __name__ == '__main__':
   sys.argv.append('-v')

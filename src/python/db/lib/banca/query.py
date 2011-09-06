@@ -219,6 +219,18 @@ class Database(object):
     """
     return model_id
 
+  def getClientIdFromTmodelId(self, model_id):
+    """Returns the client_id attached to the given T-Norm model_id
+    
+    Keyword Parameters:
+
+    model_id
+      The model_id to consider
+
+    Returns: The client_id attached to the given T-Norm model_id
+    """
+    return model_id
+
   def getClientIdFromFileId(self, file_id):
     """Returns the client_id (real client id) attached to the given file_id
     
