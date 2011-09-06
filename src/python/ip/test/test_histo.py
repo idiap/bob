@@ -32,7 +32,7 @@ def random_float(array, min_value, max_value):
 
 class HistogramTest(unittest.TestCase):
   """Performs various histogram tests."""
-  
+
   def test01_uint8_histoPython(self):
     """Compute the histogram of a uint8 image"""
     input_image = load_gray('image.ppm')
@@ -145,8 +145,8 @@ class HistogramTest(unittest.TestCase):
     self.assertTrue(input_array.size() == histo1.sum())
     self.assertTrue(input_array.size() == histo2.sum())
     self.assertTrue((histo_ref == histo1).all())
-    self.assertTrue((histo_ref == histo2).all())
-    
+    self.assertTrue((histo_ref == histo2).all())  
+
   def test04_int32_histoPython(self):
     """Compute the histogram of a int32 random array"""
     
@@ -186,7 +186,13 @@ class HistogramTest(unittest.TestCase):
     self.assertTrue(input_array.size() * 2 == histo.sum())
     self.assertTrue((histo_ref * 2 == histo).all())
 
+  def test06_uint16(self):
+    """Simple test as described in ticket #101"""
+    x = torch.core.array.array([[-1., 1.],[-1., 1.]])
+    res = torch.ip.histogram(x, -2, +2, 2)
 
+    histo_ref = torch.core.array.array([2, 2], 'uint64')
+    self.assertTrue((histo_ref == res).all())
     
 if __name__ == '__main__':
   sys.argv.append('-v')

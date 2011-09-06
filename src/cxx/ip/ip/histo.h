@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <blitz/array.h>
+#include <algorithm>
 
 #include "core/array_assert.h"
 #include "core/array_type.h"
@@ -232,7 +233,7 @@ namespace Torch {
       }
       
       T width = max - min;
-      T bin_size = width / (nb_bins - 1);
+      double bin_size = width / static_cast<double>(nb_bins);
 
       if (!accumulate) {
         histo = 0;
@@ -242,8 +243,10 @@ namespace Torch {
         for(int j = src.lbound(1); j <= src.ubound(1); j++) {
           T element = src(i, j);
           // Convert a value into a bin index
-          uint32_t index = (uint32_t)((element - min) / bin_size);
-          histo(index) ++;
+          // TODO: check that element value is in the range [min,max]
+          uint32_t index = static_cast<uint32_t>((element - min) / bin_size);
+          index = std::min(index, nb_bins-1);
+          ++(histo(index));
         }
       }
       
