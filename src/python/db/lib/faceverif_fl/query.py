@@ -23,13 +23,13 @@ class Database(object):
     if not os.path.isdir(self.base_dir):
       raise RuntimeError, 'Invalid directory specified %s.' % (self.base_dir)
     self.world_subdir = 'norm'
-    self.world_filename0 = 'train_world.lst'
+    self.world_filename0 = 'train_world.lst' # filename real_id
     self.dev_subdir = 'dev'
     self.eval_subdir = 'eval'
-    self.models_filename = 'for_models.lst'
-    self.scores_filename = 'for_scores.lst'
-    self.tnorm_filename = 'for_tnorm.lst'
-    self.znorm_filename = 'for_znorm.lst'
+    self.models_filename = 'for_models.lst' # filename model_id real_id
+    self.scores_filename = 'for_scores.lst' # filename model_id claimed_id real_id
+    self.tnorm_filename = 'for_tnorm.lst' # filename model_id real_id
+    self.znorm_filename = 'for_znorm.lst' # filename real_id
       
   def getBaseDirectory(self):
     """Returns the base directory where the filelists defining the database
@@ -61,18 +61,39 @@ class Database(object):
           model_id = re.findall('[\w/]+', line)[1]
           if not model_id in ids_list:
             ids_list.append(model_id)  
+        fileinput.close()
       except IOError as e:
         raise RuntimeError, 'Error reading the file %s.' % (filename,)
     else:
       raise RuntimeError, 'File %s does not exist.' % (filename,)
 
   def __make_path__(self, stem, directory, extension):
+    """Creates a path from a stem, a base directory and an extension"""
     if not extension: extension = ''
     if directory: return os.path.join(directory, stem + extension)
     return stem + extension
 
+  def __append_objects_models__(self, objects_list, filename, directory, extension, model_ids=None):
+    """Appends the files contained in the given filename into the given 
+       list"""
+    if os.path.isfile(filename): 
+      try: 
+        for line in fileinput.input(filename):
+          parsed_list = re.findall('[\w/]+', line)
+          sfile = parsed_list[0]
+          model_id = parsed_list[1]
+          if len(parsed_list)>2: real_id = parsed_list[2] 
+          else: real_id = model_id
+          claimed_id = real_id
+          if (not model_ids) or model_id in model_ids:
+            objects_list.append( (self.__make_path__(sfile, directory, extension), model_id, claimed_id, real_id, sfile))
+        fileinput.close()
+      except IOError as e:
+        raise RuntimeError, 'Error reading the file %s.' % (filename,)
+    else:
+      raise RuntimeError, 'File %s does not exist.' % (filename,)
 
-  def __append_objects__(self, objects_list, model_ids, filename, directory, extension, classes=None):
+  def __append_objects_scores__(self, objects_list, filename, directory, extension, model_ids=None, classes=None):
     """Appends the files contained in the given filename into the given 
        list"""
     if os.path.isfile(filename): 
@@ -90,12 +111,13 @@ class Database(object):
                 or ('client' in classes and claimed_id==real_id) \
                 or ('impostor' in classes and claimed_id!=real_id) ):
               objects_list.append( (self.__make_path__(sfile, directory, extension), model_id, claimed_id, real_id, sfile))
+        fileinput.close()
       except IOError as e:
         raise RuntimeError, 'Error reading the file %s.' % (filename,)
     else:
       raise RuntimeError, 'File %s does not exist.' % (filename,)
 
-  def __append_files__(self, files_list, model_ids, filename, directory, extension):
+  def __append_objects_znorm__(self, objects_list, filename, directory, extension, real_ids=None):
     """Appends the files contained in the given filename into the given 
        list"""
     if os.path.isfile(filename): 
@@ -103,29 +125,81 @@ class Database(object):
         for line in fileinput.input(filename):
           parsed_list = re.findall('[\w/]+', line)
           sfile = parsed_list[0]
-          model_id = parsed_list[1]
-          if model_id in model_ids:
-            files_list.append(self.__make_path__(sfile, directory, extension))
+          real_id = parsed_list[1]
+          if (not real_ids) or real_id in real_ids:
+            objects_list.append( (self.__make_path__(sfile, directory, extension), real_id, sfile))
+        fileinput.close()
       except IOError as e:
         raise RuntimeError, 'Error reading the file %s.' % (filename,)
     else:
       raise RuntimeError, 'File %s does not exist.' % (filename,)
 
 
+  def __getRealIdFromFile__(self, model_id_arg, filename):
+    """Tries to find a real_id corresponding to a model_id in the given file"""
+    if os.path.isfile(filename): 
+      try: 
+        for line in fileinput.input(filename):
+          parsed_list = re.findall('[\w/]+', line)
+          sfile = parsed_list[0]
+          model_id = parsed_list[1]
+          if len(parsed_list)>2: real_id = parsed_list[2] 
+          else: real_id = model_id
+          if model_id_arg == model_id:
+            fileinput.close()
+            return (True, real_id)
+        fileinput.close()
+      except IOError as e:
+        raise RuntimeError, 'Error reading the file %s.' % (filename,)
+    else:
+      raise RuntimeError, 'File %s does not exist.' % (filename,)
+    # not found
+    return (False, '0')
+   
+  def getRealIdFromModelId(self, model_id_arg):
+    """Returns a real_id from a model_id"""
+    world_filename = os.path.join(self.base_dir, self.world_subdir, self.world_filename0)
+    (found, value) = self.__getRealIdFromFile__(model_id_arg, world_filename)
+    if(found == True): return value
+
+    devmodels_filename = os.path.join(self.base_dir, self.dev_subdir, self.models_filename)
+    (found, value) = self.__getRealIdFromFile__(model_id_arg, devmodels_filename)
+    if(found == True): return value
+
+    evalmodels_filename = os.path.join(self.base_dir, self.eval_subdir, self.models_filename)
+    (found, value) = self.__getRealIdFromFile__(model_id_arg, evalmodels_filename)
+    if(found == True): return value
+    
+    # not found
+    raise RuntimeError, 'Could not find real_id from the given model id %s.' % (model_id_arg,)
+   
+  def getRealIdFromTmodelId(self, model_id_arg):
+    """Returns a real_id from a T-Norm model_id"""
+    devtnorm_filename = os.path.join(self.base_dir, self.dev_subdir, self.tnorm_filename)
+    (found, value) = self.__getRealIdFromFile__(model_id_arg, devtnorm_filename)
+    if(found == True): return value
+
+    evaltnorm_filename = os.path.join(self.base_dir, self.eval_subdir, self.tnorm_filename)
+    (found, value) = self.__getRealIdFromFile__(model_id_arg, evaltnorm_filename)
+    if(found == True): return value
+
+    # not found
+    raise RuntimeError, 'Could not find real_id from the given T-model id %s.' % (model_id_arg,)
+
   def models(self, protocol=None, groups=None, subworld=None):
-    """Returns a set of clients for the specific query by the user.
+    """Returns a set of models for the specific query by the user.
 
     Keyword Parameters:
 
     groups
-      The groups to which the clients belong ("dev", "eval", "world").
+      The groups to which the models belong ("dev", "eval", "world").
 
     subworld
       Specify a split of the world data ("")
       In order to be considered, "world" should be in groups and only one 
       split should be specified. 
 
-    Returns: A list containing all the client ids which have the given
+    Returns: A list containing all the model ids which have the given
     properties.
     """
 
@@ -150,12 +224,12 @@ class Database(object):
     return retval
 
   def Tmodels(self, protocol=None, groups=None):
-    """Returns a set of T-Norm clients for the specific query by the user.
+    """Returns a set of T-Norm models for the specific query by the user.
 
     Keyword Parameters:
 
     groups
-      The groups to which the clients belong ("dev", "eval").
+      The groups to which the models belong ("dev", "eval").
 
     Returns: A list containing all the model ids belonging to the given group.
     """
@@ -174,15 +248,13 @@ class Database(object):
 
     return retval
 
-
-
   def Zmodels(self, protocol=None, groups=None):
-    """Returns a set of Z-Norm clients for the specific query by the user.
+    """Returns a set of Z-Norm models for the specific query by the user.
 
     Keyword Parameters:
 
     groups
-      The groups to which the clients belong ("dev", "eval").
+      The groups to which the models belong ("dev", "eval").
 
     Returns: A list containing all the model ids belonging to the given group.
     """
@@ -265,32 +337,32 @@ class Database(object):
       model_ids = (model_ids,)
     
     if 'world' in groups:
-      self.__append_objects__(retval, model_ids, \
-        os.path.join(self.base_dir, self.world_subdir, self.world_filename0), directory, extension)
+      self.__append_objects_models__(retval, os.path.join(self.base_dir, self.world_subdir, self.world_filename0), \
+        directory, extension, model_ids) 
 
     if 'dev' in groups:
       if('enrol' in purposes):
-        self.__append_objects__(retval, model_ids, \
-          os.path.join(self.base_dir, self.dev_subdir, self.models_filename), directory, extension)
+        self.__append_objects_models__(retval, os.path.join(self.base_dir, self.dev_subdir, self.models_filename), \
+          directory, extension, model_ids)
       if('probe' in purposes):
         if('client' in classes):
-          self.__append_objects__(retval, model_ids, \
-            os.path.join(self.base_dir, self.dev_subdir, self.scores_filename), directory, extension, classes=('client',))
+          self.__append_objects_scores__(retval, os.path.join(self.base_dir, self.dev_subdir, self.scores_filename), \
+            directory, extension, model_ids, classes=('client',))
         if('impostor' in classes):
-          self.__append_objects__(retval, model_ids, \
-            os.path.join(self.base_dir, self.dev_subdir, self.scores_filename), directory, extension, classes=('impostor',))
+          self.__append_objects_scores__(retval, os.path.join(self.base_dir, self.dev_subdir, self.scores_filename), \
+            directory, extension, model_ids, classes=('impostor',))
 
     if 'eval' in groups:
       if('enrol' in purposes):
-        self.__append_objects__(retval, model_ids, \
-          os.path.join(self.base_dir, self.eval_subdir, self.models_filename), directory, extension)
+        self.__append_objects_models__(retval, os.path.join(self.base_dir, self.eval_subdir, self.models_filename), \
+          directory, extension, model_ids)
       if('probe' in purposes):
         if('client' in classes):
-          self.__append_objects__(retval, model_ids, \
-            os.path.join(self.base_dir, self.eval_subdir, self.scores_filename), directory, extension, classes=('client',))
+          self.__append_objects_scores__(retval, os.path.join(self.base_dir, self.eval_subdir, self.scores_filename), \
+            directory, extension, model_ids, classes=('client',))
         if('impostor' in classes):
-          self.__append_objects__(retval, model_ids, \
-            os.path.join(self.base_dir, self.eval_subdir, self.scores_filename), directory, extension, classes=('impostor',))
+          self.__append_objects_scores__(retval, os.path.join(self.base_dir, self.eval_subdir, self.scores_filename), \
+            directory, extension, model_ids, classes=('impostor',))
 
     return retval
 
@@ -368,18 +440,13 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the model id
       - 2: the claimed id attached to the model
-      - 3: the real id
+      - 3: the real id (same as claimed id)
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. 
+    considering all the filtering criteria. 
     """
 
-    VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval')
-    VALID_CLASSES = ('client', 'impostor')
-
-    purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
-    classes = self.__check_validity__(classes, "class", VALID_CLASSES)
 
     retval = []
 
@@ -389,14 +456,12 @@ class Database(object):
     # Please note that T-Norm file lists only contain data for enrolling the T-Norm models
     # (i.e. classes == 'client')
     if 'dev' in groups:
-      self.__append_objects__(retval, model_ids, \
-        os.path.join(self.base_dir, self.dev_subdir, self.tnorm_filename), \
-        directory, extension, classes=('client',))
+      self.__append_objects_models__(retval, os.path.join(self.base_dir, self.dev_subdir, self.tnorm_filename), \
+        directory, extension, model_ids)
 
     if 'eval' in groups:
-      self.__append_objects__(retval, model_ids, \
-        os.path.join(self.base_dir, self.eval_subdir, self.tnorm_filename), \
-        directory, extension, classes=('client',))
+      self.__append_objects_models__(retval, os.path.join(self.base_dir, self.eval_subdir, self.tnorm_filename), \
+        directory, extension, model_ids)
 
     return retval
 
@@ -425,9 +490,9 @@ class Database(object):
       - 0: the resolved filenames 
       - 1: the model id
       - 2: the claimed id attached to the model
-      - 3: the real id
+      - 3: the real id (same as claimed id)
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. 
+    considering all the filtering criteria. 
     """
 
     retval = {}
@@ -458,20 +523,13 @@ class Database(object):
 
     Returns: A list containing:
       - 0: the resolved filenames 
-      - 1: the model id
-      - 2: the claimed id attached to the model
-      - 3: the real id
-      - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. 
+      - 1: the real id
+      - 2: the "stem" path (basename of the file)
+    considering all the filtering criteria. 
     """
 
-    VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval')
-    VALID_CLASSES = ('client', 'impostor')
-
-    purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
-    classes = self.__check_validity__(classes, "class", VALID_CLASSES)
 
     retval = []
 
@@ -481,14 +539,12 @@ class Database(object):
     # Please note that Z-Norm file lists only contain impostor accesses
     # (i.e. classes == 'impostor')
     if 'dev' in groups:
-      self.__append_objects__(retval, model_ids, \
-        os.path.join(self.base_dir, self.dev_subdir, self.znorm_filename), \
-        directory, extension, client=('impostor',))
+      self.__append_objects_znorm__(retval, os.path.join(self.base_dir, self.dev_subdir, self.znorm_filename), \
+        directory, extension, model_ids)
 
     if 'eval' in groups:
-      self.__append_objects__(retval, model_ids, \
-        os.path.join(self.base_dir, self.eval_subdir, self.tnorm_filename), \
-        directory, extension, client=('impostor',))
+      self.__append_objects_znorm__(retval, os.path.join(self.base_dir, self.eval_subdir, self.tnorm_filename), \
+        directory, extension, model_ids)
 
     return retval
 
@@ -514,11 +570,9 @@ class Database(object):
 
     Returns: A list containing:
       - 0: the resolved filenames 
-      - 1: the model id
-      - 2: the claimed id attached to the model
-      - 3: the real id
-      - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria.
+      - 1: the real id
+      - 2: the "stem" path (basename of the file)
+    considering all the filtering criteria.
     """
 
     retval = {}
