@@ -11,7 +11,7 @@ import unittest
 import torch
 
 class Faceverif_flDatabaseTest(unittest.TestCase):
-  """Performs various tests on the replay attack database."""
+  """Performs various tests on the faceverif_fl database."""
 
   def test01_query(self):
 
