@@ -10,6 +10,7 @@
 
 #include <boost/python.hpp>
 #include <blitz/array.h>
+#include <blitz/numinquire.h>
 
 #include "core/python/array_base.h"
 
@@ -99,9 +100,9 @@ namespace Torch { namespace python {
     return blitz::Array<T,N>(blitz::ilogb(i)); 
   }
   
-  //TODO: template <typename T, int N> blitz::Array<int,N> isnan(blitz::Array<T,N& i) {
-  //return blitz::Array<int,N>(blitz::blitz_isnan(i)); 
-  //}
+  template <typename T, int N> blitz::Array<int,N> isnan(blitz::Array<T,N>& i) {
+    return blitz::Array<int,N>(blitz::blitz_isnan(i)); 
+  }
 
   template <typename T, int N> blitz::Array<T,N> j0(blitz::Array<T,N>& i) {
     return blitz::Array<T,N>(blitz::j0(i)); 
@@ -163,12 +164,30 @@ namespace Torch { namespace python {
 
   template <typename T, int N> blitz::Array<T,N> atan2(blitz::Array<T,N>& x,
       blitz::Array<T,N>& y) {
-    return blitz::Array<T,N>(blitz::atan2(x, y));
+    return blitz::Array<T,N>(blitz::atan2(y, x));
   }
 
   template <typename T, int N> blitz::Array<T,N> radius(blitz::Array<T,N>& x,
       blitz::Array<T,N>& y) {
     return blitz::Array<T,N>(blitz::sqrt(blitz::pow2(x) + blitz::pow2(y)));
+  }
+
+  template <typename T, int N> blitz::Array<T,N> nan_to_zero(blitz::Array<T,N>& i) {
+    T t = 0;
+    return blitz::Array<T,N>(blitz::where(blitz::blitz_isnan(i), 
+          blitz::zero(t), i));
+  }
+
+  template <typename T, int N> blitz::Array<T,N> nan_to_num(blitz::Array<T,N>& i) {
+    T t = 0;
+    blitz::Array<T,N> retval (blitz::where(blitz::blitz_isnan(i), 
+          blitz::zero(t), i));
+    if (blitz::has_infinity(t)) {
+      T inf = blitz::infinity(t);
+      retval = blitz::where(i == inf, blitz::huge(t), retval);
+      retval = blitz::where(i == -inf, blitz::neghuge(t), retval);
+    }
+    return retval;
   }
 
   /**
@@ -188,7 +207,6 @@ namespace Torch { namespace python {
       array.object()->def("sqrt", &sqrt<T,N>, "self ** 0.5, element-wise");
       array.object()->def("tan", &tan<T,N>, "Tangent, element-wise");
       array.object()->def("tanh", &tanh<T,N>, "Hyperbolic tangent, element-wise");
-      //TODO: array.object()->def("isnan", &isnan<T,N>, "Returns a nonzero integer if the parameter is NaNQ or NaNS (quiet or signalling Not a Number), element-wise.");
     }
 
   /**
@@ -214,6 +232,8 @@ namespace Torch { namespace python {
       array.object()->def("log1p", &log1p<T,N>, "Calculates log(1+x), where x is the parameter.");
       array.object()->def("y0", &y0<T,N>, "Bessel function of the second kind, order 0.");
       array.object()->def("y1", &y1<T,N>, "Bessel function of the second kind, order 1.");
+      array.object()->def("isnan", &isnan<T,N>, "Returns a nonzero integer if the parameter is NaNQ or NaNS (quiet or signalling Not a Number), element-wise.");
+      array.object()->def("nan_to_zero", &nan_to_zero<T,N>, "Replaces all NaN occurrences with zero.");
     }
 
   template <typename T, int N>
@@ -240,6 +260,7 @@ namespace Torch { namespace python {
 
     array.object()->def("ceil", &ceil<T,N>, "Ceiling function: smallest floating-point integer value not less than the argument."); 
     array.object()->def("floor", &floor<T,N>, "Floor function: largest floating-point integer value not greater than the argument.");
+    array.object()->def("nan_to_num", &nan_to_num<T,N>, "Replaces all NaN occurrences with zeros, all -Inf occurrences with the smallest possible value for type T and all Inf occurrences with the highest possible value for type T.");
 
     //these are some free-standing operators
     boost::python::def("atan2", &atan2<T,N>, (boost::python::arg("x"), boost::python::arg("y")), "Inverse tangent of (y/x). The signs of both parameters are used to determine the quadrant of the return value, which is in the range [-pi, pi]. Works for complex<T>.");
