@@ -48,6 +48,8 @@ torch_python_add_test(python-ip-filter_new-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_filters_new.py)
 torch_python_add_test(python-ip-optflow-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_flow.py)
+torch_python_add_test(python-ip-spatio-temporal-gradient-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_tempgrad.py)
 torch_python_add_test(python-ip-color-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_color.py)
 torch_python_add_test(python-ip-drawing-tests
