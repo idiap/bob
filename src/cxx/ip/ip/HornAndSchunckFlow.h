@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <stdint.h>
 #include <blitz/array.h>
+#include "ip/SpatioTemporalGradient.h"
 
 namespace Torch { namespace ip { namespace optflow {
 
@@ -71,30 +72,157 @@ namespace Torch { namespace ip { namespace optflow {
    * Calling it estimates u0 and v0 based on their initial state. If you want
    * to start from scratch, just set u0 and v0 to 0.
    */
-  void evalHornAndSchunckFlow (double alpha, size_t iterations, const
-      blitz::Array<uint8_t,2>& i1, const blitz::Array<uint8_t,2>& i2,
-      blitz::Array<double,2>& u0, blitz::Array<double,2>& v0);
+  class VanillaHornAndSchunckFlow {
+
+    public: //api
+   
+      /**
+       * Constructor, specify shape of images to be treated
+       */
+      VanillaHornAndSchunckFlow(const blitz::TinyVector<int,2>& shape);
+
+      /**
+       * Virtual destructor
+       */
+      virtual ~VanillaHornAndSchunckFlow();
+
+      /**
+       * Returns the current shape supported
+       */
+      inline const blitz::TinyVector<int,2>&
+        getShape(const blitz::TinyVector<int,2>& shape) const {
+          return m_ex.shape();
+        }
+
+      /**
+       * Re-shape internal buffers
+       */
+      void setShape(const blitz::TinyVector<int,2>& shape);
+
+      /**
+       * Calculates the square of the smoothness error (Ec^2) by using the
+       * formula described in the paper:
+       *
+       * Ec^2 = (u_bar - u)^2 + (v_bar - v)^2
+       *
+       * Sets the input matrix with the discrete values.
+       */
+      void evalEc2 (const blitz::Array<double,2>& u,
+          const blitz::Array<double,2>& v, blitz::Array<double,2>& error) const;
+
+      /**
+       * Calculates the brightness error (Eb) as defined in the paper:
+       *
+       * Eb = (Ex*u + Ey*v + Et)
+       *
+       * Sets the input matrix with the discrete values
+       */
+      void evalEb (const blitz::Array<double,2>& i1,
+          const blitz::Array<double,2>& i2, const blitz::Array<double,2>& u,
+          const blitz::Array<double,2>& v, blitz::Array<double,2>& error) const;
+
+      /**
+       * Call this to evaluate the flow
+       */
+      void operator() (double alpha, size_t iterations, const
+          blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2,
+          blitz::Array<double,2>& u0, blitz::Array<double,2>& v0) const;
+
+    private: //representation
+
+      Torch::ip::HornAndSchunckGradient m_gradient; ///< Gradient operator
+      mutable blitz::Array<double,2> m_ex; ///< Ex buffer
+      mutable blitz::Array<double,2> m_ey; ///< Ey buffer
+      mutable blitz::Array<double,2> m_et; ///< Et buffer
+      mutable blitz::Array<double,2> m_u; ///< U (x velocity) buffer
+      mutable blitz::Array<double,2> m_v; ///< V (y velocity) buffer
+      mutable blitz::Array<double, 2> m_cterm; ///< common term buffer
+
+  };
 
   /**
-   * Calculates the square of the smoothness error (Ec^2) by using the
-   * formula described in the paper:
-   *
-   * Ec^2 = (u_bar - u)^2 + (v_bar - v)^2
-   *
-   * Sets the input matrix with the discrete values.
+   * This is a clone of the Vanilla HornAndSchunck method that uses a Sobel
+   * gradient estimator instead of the forward estimator used by the
+   * classical method. The Laplacian operator is also replaced with a more
+   * common method.
    */
-  void evalHornAndSchunckEc2 (const blitz::Array<double,2>& u,
-      const blitz::Array<double,2>& v, blitz::Array<double,2>& error);
+  class HornAndSchunckFlow {
+
+    public: //api
+   
+      /**
+       * Constructor, specify shape of images to be treated
+       */
+      HornAndSchunckFlow(const blitz::TinyVector<int,2>& shape);
+
+      /**
+       * Virtual destructor
+       */
+      virtual ~HornAndSchunckFlow();
+
+      /**
+       * Returns the current shape supported
+       */
+      inline const blitz::TinyVector<int,2>&
+        getShape(const blitz::TinyVector<int,2>& shape) const {
+          return m_ex.shape();
+        }
+
+      /**
+       * Re-shape internal buffers
+       */
+      void setShape(const blitz::TinyVector<int,2>& shape);
+
+      /**
+       * Calculates the square of the smoothness error (Ec^2) by using the
+       * formula described in the paper:
+       *
+       * Ec^2 = (u_bar - u)^2 + (v_bar - v)^2
+       *
+       * Sets the input matrix with the discrete values.
+       */
+      void evalEc2 (const blitz::Array<double,2>& u,
+          const blitz::Array<double,2>& v, blitz::Array<double,2>& error) const;
+
+      /**
+       * Calculates the brightness error (Eb) as defined in the paper:
+       *
+       * Eb = (Ex*u + Ey*v + Et)
+       *
+       * Sets the input matrix with the discrete values
+       */
+      void evalEb (const blitz::Array<double,2>& i1,
+          const blitz::Array<double,2>& i2, const blitz::Array<double,2>& i3, 
+          const blitz::Array<double,2>& u, const blitz::Array<double,2>& v,
+          blitz::Array<double,2>& error) const;
+
+      /**
+       * Call this to evaluate the flow
+       */
+      void operator() (double alpha, size_t iterations, const
+          blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2,
+          const blitz::Array<double,2>& i3,
+          blitz::Array<double,2>& u0, blitz::Array<double,2>& v0) const;
+
+    private: //representation
+
+      Torch::ip::SobelGradient m_gradient; ///< Gradient operator
+      mutable blitz::Array<double,2> m_ex; ///< Ex buffer
+      mutable blitz::Array<double,2> m_ey; ///< Ey buffer
+      mutable blitz::Array<double,2> m_et; ///< Et buffer
+      mutable blitz::Array<double,2> m_u; ///< U (x velocity) buffer
+      mutable blitz::Array<double,2> m_v; ///< V (y velocity) buffer
+      mutable blitz::Array<double, 2> m_cterm; ///< common term buffer
+
+  };
 
   /**
-   * Calculates the brightness error (Eb) as defined in the paper:
+   * Computes the generalized flow error.
    *
-   * Eb = (Ex*u + Ey*v + Et)
-   *
-   * Sets the input matrix with the discrete values
+   * E = i2(x-u,y-v) - i1(x,y))
    */
-  void evalHornAndSchunckEb (const blitz::Array<uint8_t,2>& i1,
-      const blitz::Array<uint8_t,2>& i2, const blitz::Array<double,2>& u,
+  void flowError (const blitz::Array<double,2>& i1,
+      const blitz::Array<double,2>& i2, const blitz::Array<double,2>& u,
       const blitz::Array<double,2>& v, blitz::Array<double,2>& error);
 
 }}}
