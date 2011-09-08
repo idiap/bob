@@ -54,6 +54,7 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
 
   print "Horn & Schunck Optical Flow: alpha = %.2f; iterations = %d" % \
       (alpha, iterations)
+  flow = torch.ip.VanillaHornAndSchunckFlow((video.height, video.width))
   for k, frame in enumerate(video):
     if previous is None:
       # we need 2 images to compute the flow, if we are on the first iteration,
@@ -63,7 +64,7 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
 
     # if you get to this point, we have two consecutive images
     current = torch.ip.rgb_to_gray(frame)
-    torch.ip.evalHornAndSchunckFlow(alpha, iterations, previous, current, u, v)
+    flow(alpha, iterations, previous, current, u, v)
     
     # please note the HS algorithm output is as float64 and that the flow2hsv
     # method outputs in float32 (read respective documentations)
