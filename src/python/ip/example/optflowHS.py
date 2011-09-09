@@ -85,12 +85,12 @@ if __name__ == '__main__':
   parser=optparse.OptionParser(usage="usage: %prog [options] <movie> <output>",
       description=__doc__)
   parser.add_option("-a", "--alpha",
-      action="store", dest="alpha", default=100.0,
-      help="Modifies the proportion of smoothness in the H&S algorithm",
+      action="store", dest="alpha", default=2.0, type=float,
+      help="Modifies the proportion of smoothness in the H&S algorithm (defaults to %default)",
       metavar="FLOAT")
   parser.add_option("-i", "--iterations",
-      action="store", dest="iterations", default=8,
-      help="Modifies the proportion of smoothness in the H&S algorithm",
+      action="store", dest="iterations", default=1, type=int,
+      help="Modifies the proportion of smoothness in the H&S algorithm (defaults to %default)",
       metavar="FLOAT")
 
   # This option is not normally shown to the user...

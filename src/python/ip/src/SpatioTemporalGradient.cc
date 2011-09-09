@@ -102,30 +102,6 @@ static tuple central_gradient_2i(const ip::CentralGradient& g,
   return make_tuple(Ex, Ey, Et);
 }
 
-static blitz::Array<double, 2> laplacian_014(const blitz::Array<double,2>& i) {
-  blitz::Array<double,2> o(i.shape());
-  ip::laplacian_014(i, o);
-  return o;
-}
-
-static blitz::Array<double, 2> laplacian_18(const blitz::Array<double,2>& i) {
-  blitz::Array<double,2> o(i.shape());
-  ip::laplacian_18(i, o);
-  return o;
-}
-
-static blitz::Array<double, 2> laplacian_12(const blitz::Array<double,2>& i) {
-  blitz::Array<double,2> o(i.shape());
-  ip::laplacian_12(i, o);
-  return o;
-}
-
-static const char laplacian_014_doc[] = "An approximation to the Laplacian operator. Using the following (non-separable) kernel:\n\n[ 0 -1  0]\n[-1  4 -1]\n[ 0 -1  0]\n\nThis is used as the Laplacian operator on OpenCV (multiplied by -1)";
-
-static const char laplacian_18_doc[] = "An approximation to the Laplacian operator. Using the following (non-separable) kernel:\n\n[-1 -1 -1]\n[-1  8 -1]\n[-1 -1 -1]";
-
-static const char laplacian_12_doc[] = "An approximation to the Laplacian operator. Using the following (non-separable) kernel:\n\n[-1 -2 -1]\n[-2 12 -2]\n[-1 -2 -1]\n\nThis is used on the Horn & Schunck paper (multiplied by -1/12)";
-
 void bind_ip_spatiotempgrad() {
   class_<ip::ForwardGradient>("ForwardGradient", "This class computes the spatio-temporal gradient using a 2-term approximation composed of 2 separable kernels (one for the diference term and another one for the averaging term).", init<const blitz::Array<double,1>&, const blitz::Array<double,1>&, const blitz::TinyVector<int,2>&>((arg("diff_kernel"), arg("avg_kernel"), arg("shape")), "Constructor. We initialize with the shape of the images we need to treat and with the kernels to be applied. The shape is used by the internal buffers.\n\n  diff_kernel\n    The kernel that contains the difference operation. Typically, this is [1; -1]. Note the kernel is mirrored during the convolution operation. To obtain a [-1; +1] sliding operator, specify [+1; -1]. This kernel must have a size = 2.\n\n  avg_kernel\n    The kernel that contains the spatial averaging operation. This kernel is typically [+1; +1]. This kernel must have a size = 2.\n\n  shape\n    This is the shape of the images to be treated. This has to match the input image height x width specifications (in that order)."))
     .add_property("shape", make_function(&ip::ForwardGradient::getShape, return_value_policy<copy_const_reference>()), &ip::ForwardGradient::setShape, "The internal buffer shape")
@@ -162,11 +138,4 @@ void bind_ip_spatiotempgrad() {
 
   class_<ip::IsotropicGradient, bases<ip::CentralGradient> >("IsotropicGradient", "This class computes the spatio-temporal gradient using a isotropic filter. The gradients are calculated along the x, y and t directions. The Sobel operator can be decomposed into 2 1D kernels that are applied in sequence. Considering h'(.) = [+1 0 -1] and h(.) = [1 sqrt(2) 1] one can represent the operations like this:\n\nEx = h'(x)h(y)h(t)\n\nEy = h(x)h'(y)h(t)\n\nEt = h(x)h(y)h'(t)", init<const blitz::TinyVector<int,2>&>((arg("shape")), "We initialize with the shape of the images we need to treat. The shape is used by the internal buffers.\n\nThe difference kernel for this operator is [+1; 0; -1]\n\nThe averaging kernel for this oeprator is [+1; +sqrt(2); +1]."))
     ;
-
-  def("laplacian_014", &laplacian_014, (arg("input")), laplacian_014_doc);
-  def("laplacian_014", &ip::laplacian_014, (arg("input"), arg("output")), laplacian_014_doc);
-  def("laplacian_18", &laplacian_18, (arg("input")), laplacian_18_doc);
-  def("laplacian_18", &ip::laplacian_18, (arg("input"), arg("output")), laplacian_18_doc);
-  def("laplacian_12", &laplacian_12, (arg("input")), laplacian_12_doc);
-  def("laplacian_12", &ip::laplacian_12, (arg("input"), arg("output")), laplacian_12_doc);
 }

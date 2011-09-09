@@ -16,6 +16,45 @@
 namespace Torch { namespace ip { namespace optflow {
 
   /**
+   * An approximation to the Laplacian (averaging) operator. Using the
+   * following (non-separable) kernel for the Laplacian:
+   *
+   * [ 0 -1  0]
+   * [-1  4 -1]
+   * [ 0 -1  0]
+   *
+   * This is used as the Laplacian operator on OpenCV. To calculate the u_bar
+   * value we must remove the central mean and multiply by -1/4, yielding:
+   *
+   * [ 0  1/4  0  ]
+   * [1/4  0  1/4 ]
+   * [ 0  1/4  0  ]
+   *
+   * Note that you will get the WRONG results if you use the Laplacian kernel
+   * directly...
+   */
+  void laplacian_avg_hs_opencv(const blitz::Array<double,2>& input,
+      blitz::Array<double,2>& output);
+
+  /**
+   * An approximation to the Laplacian operator. Using the following
+   * (non-separable) kernel:
+   *
+   * [-1 -2 -1]
+   * [-2 12 -2]
+   * [-1 -2 -1]
+   *
+   * This is used on the Horn & Schunck paper. To calculate the u_bar value we
+   * must remove the central mean and multiply by -1/12, yielding:
+   *
+   * [1/12 1/6 1/12]
+   * [1/6   0  1/6 ]
+   * [1/12 1/6 1/12]
+   */
+  void laplacian_avg_hs(const blitz::Array<double,2>& input,
+      blitz::Array<double,2>& output);
+
+  /**
    * This can calculate the Optical Flow between two sequences of images (i1,
    * the starting image and i2, the final image). It does this using the
    * iterative method described by Horn & Schunck in the paper titled

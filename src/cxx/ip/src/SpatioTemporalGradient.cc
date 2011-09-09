@@ -274,30 +274,3 @@ ip::IsotropicGradient::IsotropicGradient(const blitz::TinyVector<int,2>& shape):
 }
 
 ip::IsotropicGradient::~IsotropicGradient() { }
-
-static const double LAPLACIAN_014_KERNEL_DATA[] = {0.,-1.,0.,-1.,4.,-1.,0.,-1.,0.};
-static const blitz::Array<double,2> LAPLACIAN_014_KERNEL(const_cast<double*>(LAPLACIAN_014_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
-
-void ip::laplacian_014(const blitz::Array<double,2>& input,
-    blitz::Array<double,2>& output) {
-  Torch::sp::convolve(input, LAPLACIAN_014_KERNEL, output, 
-      sp::Convolution::Same, sp::Convolution::Mirror);
-}
-
-static const double LAPLACIAN_18_KERNEL_DATA[] = {-1.,-1.,-1.,-1.,8.,-1.,-1.,-1.,-1.};
-static const blitz::Array<double,2> LAPLACIAN_18_KERNEL(const_cast<double*>(LAPLACIAN_18_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
-
-void ip::laplacian_18(const blitz::Array<double,2>& input,
-    blitz::Array<double,2>& output) {
-  Torch::sp::convolve(input, LAPLACIAN_18_KERNEL, output, 
-      sp::Convolution::Same, sp::Convolution::Mirror);
-}
-
-static const double LAPLACIAN_12_KERNEL_DATA[] = {-1.,-2.,-1.,-2.,12.,-2.,-1.,-2.,-1.};
-static const blitz::Array<double,2> LAPLACIAN_12_KERNEL(const_cast<double*>(LAPLACIAN_12_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
-
-void ip::laplacian_12(const blitz::Array<double,2>& input,
-    blitz::Array<double,2>& output) {
-  Torch::sp::convolve(input, LAPLACIAN_12_KERNEL, output,
-      sp::Convolution::Same, sp::Convolution::Mirror);
-}

@@ -145,6 +145,22 @@ blitz::Array<double,2> flow_error_u8(const blitz::Array<uint8_t,2>& i1,
   return error;
 }
 
+static blitz::Array<double, 2> laplacian_avg_hs_opencv(const blitz::Array<double,2>& i) {
+  blitz::Array<double,2> o(i.shape());
+  of::laplacian_avg_hs_opencv(i, o);
+  return o;
+}
+
+static blitz::Array<double, 2> laplacian_avg_hs(const blitz::Array<double,2>& i) {
+  blitz::Array<double,2> o(i.shape());
+  of::laplacian_avg_hs(i, o);
+  return o;
+}
+
+static const char laplacian_avg_hs_opencv_doc[] = "An approximation to the Laplacian (averaging) operator. Using the following (non-separable) kernel for the Laplacian:\n\n[ 0 -1  0]\n[-1  4 -1]\n[ 0 -1  0]\n\nThis is used as the Laplacian operator on OpenCV. To calculate the u_bar value we must remove the central mean and multiply by -1/4, yielding:\n\n[ 0  1/4  0  ]\n[1/4  0  1/4 ]\n[ 0  1/4  0  ]\n\nNote that you will get the WRONG results if you use the Laplacian kernel directly...";
+
+static const char laplacian_avg_hs_doc[] = "An approximation to the Laplacian operator. Using the following (non-separable) kernel:\n\n[-1 -2 -1]\n[-2 12 -2]\n[-1 -2 -1]\n\nThis is used on the Horn & Schunck paper. To calculate the u_bar value we must remove the central mean and multiply by -1/12, yielding:\n\n[1/12 1/6 1/12]\n[1/6   0  1/6 ]\n[1/12 1/6 1/12]\n\nNote that you will get the WRONG results if you use the Laplacian kernel directly...";
+
 void bind_ip_flow() {
   //Horn & Schunck 
   class_<of::VanillaHornAndSchunckFlow>("VanillaHornAndSchunckFlow", "Calculates the Optical Flow between two sequences of images (i1, the starting image and i2, the final image). It does this using the iterative method described by Horn & Schunck in the paper titled \"Determining Optical Flow\", published in 1981, Artificial Intelligence, Vol. 17, No. 1-3, pp. 185-203. Parameters: i1 -- first frame, i2 -- second frame, (u,v) -- estimates of the speed in x,y directions (zero if uninitialized)", init<const blitz::TinyVector<int,2>&>((arg("shape")), "Initializes the vanilla Horn&Schunck operator with the size of images to be fed"))
@@ -170,6 +186,11 @@ void bind_ip_flow() {
       .def("evalEb", &hs_eb_d, (arg("self"), arg("i1"), arg("i2"), arg("i3"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
       .def("evalEb", &hs_eb_u8, (arg("self"), arg("i1"), arg("i2"), arg("i3"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
       ;
+
+  def("laplacian_avg_hs_opencv", &laplacian_avg_hs_opencv, (arg("input")), laplacian_avg_hs_opencv_doc);
+  def("laplacian_avg_hs_opencv", &of::laplacian_avg_hs_opencv, (arg("input"), arg("output")), laplacian_avg_hs_doc);
+  def("laplacian_avg_hs", &laplacian_avg_hs, (arg("input")), laplacian_avg_hs_doc);
+  def("laplacian_avg_hs", &of::laplacian_avg_hs, (arg("input"), arg("output")), laplacian_avg_hs_doc);
 
   def("flowError", &of::flowError, (arg("i1"), arg("i2"), arg("u"), arg("v"), arg("error")), "Computes the generalized flow error: E = i2(x-u,y-v) - i1(x,y))");
   def("flowError", &flow_error_d, (arg("i1"), arg("i2"), arg("u"), arg("v")), "Computes the generalized flow error: E = i2(x-u,y-v) - i1(x,y))");

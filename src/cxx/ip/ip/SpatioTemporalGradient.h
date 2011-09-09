@@ -337,42 +337,6 @@ namespace Torch { namespace ip {
 
   };
 
-  /**
-   * An approximation to the Laplacian operator. Using the following
-   * (non-separable) kernel:
-   *
-   * [ 0 -1  0]
-   * [-1  4 -1]
-   * [ 0 -1  0]
-   *
-   * This is used as the Laplacian operator on OpenCV (multiplied by -1)
-   */
-  void laplacian_014(const blitz::Array<double,2>& input,
-      blitz::Array<double,2>& output);
-
-  /**
-   * An approximation to the Laplacian operator. Using the following
-   * (non-separable) kernel:
-   *
-   * [-1 -1 -1]
-   * [-1  8 -1]
-   * [-1 -1 -1]
-   */
-  void laplacian_18(const blitz::Array<double,2>& input,
-      blitz::Array<double,2>& output);
-
-  /**
-   * An approximation to the Laplacian operator. Using the following
-   * (non-separable) kernel:
-   *
-   * [-1 -2 -1]
-   * [-2 12 -2]
-   * [-1 -2 -1]
-   *
-   * This is used on the Horn & Schunck paper (multiplied by -1/12)
-   */
-  void laplacian_12(const blitz::Array<double,2>& input,
-      blitz::Array<double,2>& output);
 }}
 
 #endif /* TORCH_IP_SPATIOTEMPORALGRADIENT_H */
