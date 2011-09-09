@@ -71,6 +71,52 @@ class Database(object):
       retval.append(id)
     return retval
 
+  def Tclients(self, protocol=None, groups=None):
+    """Returns a set of T-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('M', 'U', 'G')
+    
+    groups
+      The groups to which the clients belong ('dev', 'eval').
+
+    Returns: A list containing all the client ids belonging to the given group.
+    """
+
+    VALID_GROUPS = ('dev', 'eval')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    tgroups = []
+    if 'dev' in groups:
+      tgroups.append('eval')
+    if 'eval' in groups:
+      tgroups.append('dev')
+    return self.clients(protocol, tgroups)
+
+  def Zclients(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('M', 'U', 'G')
+    
+    groups
+      The groups to which the clients belong ('dev', 'eval').
+
+    Returns: A list containing all the client ids belonging to the given group.
+    """
+
+    VALID_GROUPS = ('dev', 'eval')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    zgroups = []
+    if 'dev' in groups:
+      zgroups.append('eval')
+    if 'eval' in groups:
+      zgroups.append('dev')
+    return self.clients(protocol, zgroups)
+
   def models(self, protocol=None, groups=None):
     """Returns a set of models for the specific query by the user.
 
@@ -87,6 +133,100 @@ class Database(object):
 
     return self.clients(protocol, groups)
 
+  def Tmodels(self, protocol=None, groups=None):
+    """Returns a set of T-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('M', 'U', 'G')
+    
+    groups
+      The groups to which the models belong ('dev', 'eval').
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.Tclients(protocol, groups)
+
+  def Zmodels(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      The protocol to consider ('M', 'U', 'G')
+    
+    groups
+      The groups to which the models belong ('dev', 'eval').
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.Zclients(protocol, zgroups)
+
+
+  def getClientIdFromModelId(self, model_id):
+    """Returns the client_id attached to the given model_id
+    
+    Keyword Parameters:
+
+    model_id
+      The model_id to consider
+
+    Returns: The client_id attached to the given model_id
+    """
+    return model_id
+
+  def getClientIdFromTmodelId(self, model_id):
+    """Returns the client_id attached to the given T-Norm model_id
+    
+    Keyword Parameters:
+
+    model_id
+      The model_id to consider
+
+    Returns: The client_id attached to the given T-Norm model_id
+    """
+    return model_id
+
+  def getClientIdFromFileId(self, file_id):
+    """Returns the client_id (real client id) attached to the given file_id
+    
+    Keyword Parameters:
+
+    file_id
+      The file_id to consider
+
+    Returns: The client_id attached to the given file_id
+    """
+    q = self.session.query(File).\
+          filter(File.id == file_id)
+    if q.count() !=1:
+      #throw exception?
+      return None
+    else:
+      return q.first().client_id
+
+  def getInternalPathFromFileId(self, file_id):
+    """Returns the unique "internal path" attached to the given file_id
+    
+    Keyword Parameters:
+
+    file_id
+      The file_id to consider
+
+    Returns: The internal path attached to the given file_id
+    """
+    q = self.session.query(File).\
+          filter(File.id == file_id)
+    if q.count() !=1:
+      #throw exception?
+      return None
+    else:
+      return q.first().path
+
+
   def objects(self, directory=None, extension=None, protocol=None,
       purposes=None, model_ids=None, groups=None, classes=None, subworld=None,
       expressions=None, world_sampling=1, world_noflash=False, world_first=False):
@@ -101,7 +241,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the BANCA protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G').
 
     purposes
       The purposes required to be retrieved ('enrol', 'probe') or a tuple
@@ -263,7 +403,7 @@ class Database(object):
       A filename extension that will be appended to the final filepath returned
 
     protocol
-      One of the BANCA protocols ('M', 'U', 'G').
+      One of the Multi-PIE protocols ('M', 'U', 'G').
 
     purposes
       The purposes required to be retrieved ('enrol', 'probe') or a tuple
@@ -317,6 +457,203 @@ class Database(object):
     for k in d: retval[k] = d[k][0]
 
     return retval
+
+
+  def Tobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, expressions=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the Multi-PIE protocols ('M', 'U', 'G').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      The groups to which the clients belong ('dev', 'eval').
+
+    expressions
+      The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
+      'squint', 'disgust', 'scream') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the Multi-PIE database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    VALID_GROUPS = ('dev', 'eval')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    tgroups = []
+    if 'dev' in groups:
+      tgroups.append('eval')
+    if 'eval' in groups:
+      tgroups.append('dev')
+    return self.objects(directory, extension, protocol, 'enrol', model_ids, tgroups, 'client', None, expressions)
+
+  def Tfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, expressions=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the Multi-PIE protocols ('M', 'U', 'G').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      The groups to which the clients belong ('dev', 'eval').
+
+    expressions
+      The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
+      'squint', 'disgust', 'scream') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the Multi-PIE database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Tobjects(directory, extension, protocol, model_ids, groups, expressions)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
+  def Zobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, expressions=None):
+    """Returns a set of filenames of impostors for Z-norm score normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the Multi-PIE protocols ('M', 'U', 'G').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (client id).  
+      If 'None' is given (this is the default), no filter over the model_ids 
+      is performed.
+
+    groups
+      The groups to which the clients belong ('dev', 'eval').
+
+    expressions
+      The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
+      'squint', 'disgust', 'scream') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the client id
+      - 2: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the Multi-PIE database. Conserve these
+    numbers if you wish to save processing results later on.
+    """
+
+    VALID_GROUPS = ('dev', 'eval')
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+
+    zgroups = []
+    if 'dev' in groups:
+      zgroups.append('eval')
+    if 'eval' in groups:
+      zgroups.append('dev')
+
+    retval = {}
+    d = self.objects(directory, extension, protocol, 'probe', model_ids, zgroups, 'client', None, expressions)
+    for k in d: retval[k] = (d[k][0], d[k][3], d[k][4])
+
+    return retval
+
+  def Zfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None, expressions=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the Multi-PIE protocols ('M', 'U', 'G').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      The groups to which the clients belong ('dev', 'eval').
+
+    expressions
+      The (face) expressions to be retrieved ('neutral', 'smile', 'surprise',
+      'squint', 'disgust', 'scream') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as 
+      a tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the client id
+      - 2: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the Multi-PIE database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Zobjects(directory, extension, protocol, model_ids, groups, expressions)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
 
   def save_one(self, id, obj, directory, extension):
     """Saves a single object supporting the torch save() protocol.
