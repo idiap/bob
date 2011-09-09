@@ -4,25 +4,22 @@
 # Tue 27 Jul 2010 17:40:46 CEST 
 
 """This example Torch application produces a video output that shows the
-Optical Flow (using an HSL mapping) of a given input video. You should pass the
-input filename (movie) and the output filename (output) that will contain the
-resulting movie. It is possible that you use the string "%(stem)s" to imply the
-original filename stem (basename minus extension). Example:
+Gradient Flow (using an HSL mapping) of a given input video. You should pass
+the input filename (movie) and the output filename (output) that will contain
+the resulting movie. It is possible that you use the string "%(stem)s" to imply
+the original filename stem (basename minus extension). Example:
 "outdir/%(stem)s.avi"."""
 
 import sys, os, optparse
 import tempfile, shutil #for package tests
 import torch
 
-def optflowHS(movie, iterations, alpha, template, stop=0):
+def eval_gradient(movie, gradtype, template):
   """This method is the one you are interested, it shows how torch reads a
-  video file and computes the optical flow using the Horn & Schunck method,
-  saving the output as a new video in the output directory (using a template
-  based on the original movie filename stem (base filename minus extension).
-  
-  The first flow is calculated from scratch setting the initial velocities in
-  the width and height direction (U and V) to zero. The subsequent flows are
-  calculated using the previous frame flow estimation.
+  video file and computes the gradient flow using either forward or central
+  differences, saving the output as a new video in the output directory (using
+  a template based on the original movie filename stem (base filename minus
+  extension).
   """
 
   tmpl_fill = {'stem': os.path.splitext(os.path.basename(movie))[0]}
@@ -52,46 +49,60 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
   # Creates the output video (frame rate by default)
   outvideo = torch.io.VideoWriter(output, video.height, video.width)
 
-  print "Horn & Schunck Optical Flow: alpha = %.2f; iterations = %d" % \
-      (alpha, iterations)
-  flow = torch.ip.VanillaHornAndSchunckFlow((video.height, video.width))
-  for k, frame in enumerate(video):
-    if previous is None:
-      # we need 2 images to compute the flow, if we are on the first iteration,
-      # keep the image and defer the calculation until we have a second frame
-      previous = torch.ip.rgb_to_gray(frame)
-      continue
+  if gradtype == 'forward':
+    print "Computing Forward Spatio-Temporal Gradient (size 2)"
+    grad = torch.ip.ForwardGradient((video.height, video.width))
+  else:
+    print "Computing Central Spatio-Temporal Gradient (Sobel Filter)"
+    grad = torch.ip.CentralGradient((video.height, video.width))
 
-    # if you get to this point, we have two consecutive images
-    current = torch.ip.rgb_to_gray(frame)
-    flow(alpha, iterations, previous, current, u, v)
+  for k, frame in enumerate(video):
+
+    if gradtype == 'forward':
+      if previous is None:
+        # Need 2 consecutive images to calculate the forward flow
+        previous = [torch.ip.rgb_to_gray(frame).convert('float64',
+            destRange=(0.,1.))]
+        continue
+
+    if gradtype == 'central':
+      # Need 3 consecutive images to calculate the central flow
+      if previous is None:
+        previous = [torch.ip.rgb_to_gray(frame).convert('float64',
+          destRange=(0.,1.))]
+        continue
+      elif previous and len(previous) == 1:
+        previous.append(torch.ip.rgb_to_gray(frame).convert('float64',
+          destRange=(0.,1.)))
+        continue
+
+    # if you get to this point, we have two/three consecutive images
+    current = torch.ip.rgb_to_gray(frame).convert('float64', destRange=(0.,1.))
+    args = previous + [current, u, v]
+    grad(*args)
     
-    # please note the HS algorithm output is as float64 and that the flow2hsv
+    # please note the algorithm output is as float64 and that the flow2hsv
     # method outputs in float32 (read respective documentations)
-    float_rgb = torch.ip.flowutils.flow2hsv(u,v)
-    outvideo.append((255.0*float_rgb).cast('uint8'))
+    rgb = torch.ip.flowutils.flow2hsv(u,v).convert('uint8', sourceRange=(0.,1.))
+    outvideo.append(rgb)
 
     # reset the "previous" frame
-    previous = current
+    if gradtype == 'forward':
+      previous[0] = current
+    elif gradtype == 'central':
+      previous[0] = previous[1]
+      previous[1] = current
     
     sys.stdout.write('.')
     sys.stdout.flush()
-
-    if stop and k > stop: break #for testing purposes, only run a subset
 
   print "\nWrote %d frames to %s" % (k, output)
 
 if __name__ == '__main__':
   parser=optparse.OptionParser(usage="usage: %prog [options] <movie> <output>",
       description=__doc__)
-  parser.add_option("-a", "--alpha",
-      action="store", dest="alpha", default=100.0,
-      help="Modifies the proportion of smoothness in the H&S algorithm",
-      metavar="FLOAT")
-  parser.add_option("-i", "--iterations",
-      action="store", dest="iterations", default=8,
-      help="Modifies the proportion of smoothness in the H&S algorithm",
-      metavar="FLOAT")
+  parser.add_option("-t", "--type", choices=('central', 'forward'),
+      default='central', dest='gtype', help='Defines the type of gradient to apply; options are central or forward (defaults to %default)')
 
   # This option is not normally shown to the user...
   parser.add_option("--test",
@@ -115,6 +126,6 @@ if __name__ == '__main__':
     if len(args) != 2:
       parser.error("requires 2 arguments (the movie path and the output template file name) -- read the help message!")
 
-    optflowHS(args[0], options.iterations, options.alpha, args[1])
+    eval_gradient(args[0], options.gtype, args[1])
 
   sys.exit(0)

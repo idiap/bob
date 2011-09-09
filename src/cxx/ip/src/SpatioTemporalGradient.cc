@@ -21,31 +21,34 @@ static inline void fastconv(const blitz::Array<double,2>& image,
     sp::Convolution::Mirror);
 }
 
-ip::ForwardGradient::ForwardGradient(const blitz::TinyVector<int,2>& shape) :
+ip::ForwardGradient::ForwardGradient(const blitz::Array<double,1>& diff_kernel,
+    const blitz::Array<double,1>& avg_kernel,
+    const blitz::TinyVector<int,2>& shape) :
+  m_diff_kernel(diff_kernel.copy()),
+  m_avg_kernel(avg_kernel.copy()),
   m_buffer1(shape),
-  m_buffer2(shape),
-  m_kernel1(2),
-  m_kernel2(2)
+  m_buffer2(shape)
 {
-  m_kernel1 = +1, -1; //normalization factor: sqrt(2)
-  m_kernel2 = +1, +1; //normalization factor: sqrt(2)
+  blitz::TinyVector<int,1> required_shape(2);
+  Torch::core::array::assertSameShape(m_diff_kernel, required_shape);
+  Torch::core::array::assertSameShape(m_avg_kernel, required_shape);
 }
 
 ip::ForwardGradient::ForwardGradient(const ip::ForwardGradient& other) :
+  m_diff_kernel(other.m_diff_kernel.copy()),
+  m_avg_kernel(other.m_avg_kernel.copy()),
   m_buffer1(other.m_buffer1.shape()),
-  m_buffer2(other.m_buffer2.shape()),
-  m_kernel1(other.m_kernel1.copy()),
-  m_kernel2(other.m_kernel2.copy())
+  m_buffer2(other.m_buffer2.shape())
 {
 }
 
 ip::ForwardGradient::~ForwardGradient() { }
 
 ip::ForwardGradient& ip::ForwardGradient::operator= (const ip::ForwardGradient& other) {
+  m_diff_kernel.reference(other.m_diff_kernel.copy());
+  m_avg_kernel.reference(other.m_avg_kernel.copy());
   m_buffer1.resize(other.m_buffer1.shape());
   m_buffer2.resize(other.m_buffer2.shape());
-  m_kernel1.reference(other.m_kernel1.copy());
-  m_kernel2.reference(other.m_kernel2.copy());
   return *this;
 }
 
@@ -54,108 +57,247 @@ void ip::ForwardGradient::setShape(const blitz::TinyVector<int,2>& shape) {
   m_buffer2.resize(shape);
 }
 
+void ip::ForwardGradient::setDiffKernel(const blitz::Array<double,1>& k) {
+  Torch::core::array::assertSameDimensionLength(k.extent(0), 2);
+  m_diff_kernel.reference(k.copy());
+}
+
+void ip::ForwardGradient::setAvgKernel(const blitz::Array<double,1>& k) {
+  Torch::core::array::assertSameDimensionLength(k.extent(0), 2);
+  m_avg_kernel.reference(k.copy());
+}
+
 void ip::ForwardGradient::operator()(const blitz::Array<double,2>& i1,
-    const blitz::Array<double,2>& i2, blitz::Array<double,2>& u, 
-    blitz::Array<double,2>& v) const {
+    const blitz::Array<double,2>& i2, blitz::Array<double,2>& Ex, 
+    blitz::Array<double,2>& Ey, blitz::Array<double,2>& Et) const {
 
   // all arrays have to have the same shape
   Torch::core::array::assertSameShape(i1, i2);
-  Torch::core::array::assertSameShape(u, v);
-  Torch::core::array::assertSameShape(i1, u);
+  Torch::core::array::assertSameShape(Ex, Ey);
+  Torch::core::array::assertSameShape(Ey, Et);
+  Torch::core::array::assertSameShape(i1, Ex);
   Torch::core::array::assertSameShape(m_buffer1, i1);
 
-  // Movement along the X direction (extent 1) => u matrix
-  fastconv(i1, m_kernel1, m_buffer1, 1); // [-1 +1] * i1
-  fastconv(m_buffer1, m_kernel2, u, 0); // [+1 +1]^T([-1 +1]*(i1))
-  
-  fastconv(i2, m_kernel1, m_buffer1, 1); // [-1 +1] * i2
-  fastconv(m_buffer1, m_kernel2, m_buffer2, 0); // [+1 +1]^T * ([-1 +1]*(i2))
-  
-  u += m_buffer2;
-  u /= 2*std::sqrt(2); //normalization factor for unit length
+  // Notation:
+  // DK - difference kernel
+  // AK - averaging kernel
+  // v^T - vector (v) transposed
+  // A * B - A convolved with B (A is mirrored)
 
-  // Movement along the Y direction (extent 0) => v matrix
-  fastconv(i1, m_kernel2, m_buffer1, 1); // [+1 +1] * i1
-  fastconv(m_buffer1, m_kernel1, v, 0); // [+1 -1]^T * ([+1 +1]*(i1))
+  // Differentiation along the X direction (extent 1) => Ex matrix
+  fastconv(i1, m_diff_kernel, Ex, 1); // Ex =  DK * i1
+  fastconv(Ex, m_avg_kernel, m_buffer1, 0); // Buffer1 = AK^T * Ex
   
-  fastconv(i2, m_kernel2, m_buffer1, 1); // [+1 +1] * i2
-  fastconv(m_buffer1, m_kernel1, m_buffer2, 0); // [+1 -1]^T * ([+1 +1]*(i2))
+  fastconv(i2, m_diff_kernel, Ex, 1); // Ex = DK * i2
+  fastconv(Ex, m_avg_kernel, m_buffer2, 0); // Buffer2 = AK^T * Ex
+  
+  // The averaging operation along the t coordinate is performed by hand
+  Ex = (m_avg_kernel(1) * m_buffer1) + (m_avg_kernel(0) * m_buffer2);
 
-  v += m_buffer2;
-  v /= 2*std::sqrt(2); //normalization factor for unit length
+  // Differentiation along the Y direction (extent 0) => Ey matrix
+  fastconv(i1, m_diff_kernel, Ey, 0); // Ey =  DK^T * i1
+  fastconv(Ey, m_avg_kernel, m_buffer1, 1); // Buffer1 = AK * Ey
+  
+  fastconv(i2, m_diff_kernel, Ey, 0); // Ey =  DK^T * i2
+  fastconv(Ey, m_avg_kernel, m_buffer2, 1); // Buffer2 = AK * Ey
+  
+  // The averaging operation along the t coordinate is performed by hand
+  Ey = (m_avg_kernel(1) * m_buffer1) + (m_avg_kernel(0) * m_buffer2);
+
+  // Differentiation along the T direction i1 -> i2 => Et matrix
+  fastconv(i1, m_avg_kernel, Et, 1); // Et =  AK * i1
+  fastconv(Et, m_avg_kernel, m_buffer1, 0); // Buffer1 = AK^T * Et
+  
+  fastconv(i2, m_avg_kernel, Et, 1); // Et =  AK * i2
+  fastconv(Et, m_avg_kernel, m_buffer2, 0); // Buffer2 = AK^T * Et
+  
+  // The difference operation along the t coordinate is performed by hand
+  Et = (m_diff_kernel(1) * m_buffer1) + (m_diff_kernel(0) * m_buffer2);
 }
 
-ip::CentralGradient::CentralGradient(const blitz::TinyVector<int,2>& shape) :
+static const double HS_DIFF_KERNEL_DATA[] = {+1/4., -1/4.};
+static const blitz::Array<double,1> HS_DIFF_KERNEL(const_cast<double*>(HS_DIFF_KERNEL_DATA), blitz::shape(2), blitz::neverDeleteData);
+static const double HS_AVG_KERNEL_DATA[] = {+1., +1.};
+static const blitz::Array<double,1> HS_AVG_KERNEL(const_cast<double*>(HS_AVG_KERNEL_DATA), blitz::shape(2), blitz::neverDeleteData);
+
+ip::HornAndSchunckGradient::HornAndSchunckGradient(const blitz::TinyVector<int,2>& shape):
+  ip::ForwardGradient(HS_DIFF_KERNEL, HS_AVG_KERNEL, shape)
+{
+}
+
+ip::HornAndSchunckGradient::~HornAndSchunckGradient() { }
+
+ip::CentralGradient::CentralGradient(const blitz::Array<double,1>& diff_kernel,
+    const blitz::Array<double,1>& avg_kernel,
+    const blitz::TinyVector<int,2>& shape) :
+  m_diff_kernel(diff_kernel.copy()),
+  m_avg_kernel(avg_kernel.copy()),
   m_buffer1(shape),
   m_buffer2(shape),
-  m_kernel1(3),
-  m_kernel2(3)
+  m_buffer3(shape)
 {
-  m_kernel1 = +1,  0, -1; //normalization factor: sqrt(2)
-  m_kernel2 = +1, +2, +1; //normalization factor: sqrt(6)
+  blitz::TinyVector<int,1> required_shape(3);
+  Torch::core::array::assertSameShape(m_diff_kernel, required_shape);
+  Torch::core::array::assertSameShape(m_avg_kernel, required_shape);
 }
 
 ip::CentralGradient::CentralGradient(const ip::CentralGradient& other) :
+  m_diff_kernel(other.m_diff_kernel.copy()),
+  m_avg_kernel(other.m_avg_kernel.copy()),
   m_buffer1(other.m_buffer1.shape()),
   m_buffer2(other.m_buffer2.shape()),
-  m_kernel1(other.m_kernel1.copy()),
-  m_kernel2(other.m_kernel2.copy())
+  m_buffer3(other.m_buffer3.shape())
 {
 }
 
 ip::CentralGradient::~CentralGradient() { }
 
 ip::CentralGradient& ip::CentralGradient::operator= (const ip::CentralGradient& other) {
+  m_diff_kernel.reference(other.m_diff_kernel.copy());
+  m_avg_kernel.reference(other.m_avg_kernel.copy());
   m_buffer1.resize(other.m_buffer1.shape());
   m_buffer2.resize(other.m_buffer2.shape());
-  m_kernel1.reference(other.m_kernel1.copy());
-  m_kernel2.reference(other.m_kernel2.copy());
+  m_buffer3.resize(other.m_buffer3.shape());
   return *this;
 }
 
 void ip::CentralGradient::setShape(const blitz::TinyVector<int,2>& shape) {
   m_buffer1.resize(shape);
   m_buffer2.resize(shape);
+  m_buffer3.resize(shape);
 }
 
-void ip::CentralGradient::operator() (const blitz::Array<double,2>& i_prev,
-    const blitz::Array<double,2>& i, const blitz::Array<double,2>& i_after,
-    blitz::Array<double,2>& u, blitz::Array<double,2>& v) const {
+void ip::CentralGradient::setDiffKernel(const blitz::Array<double,1>& k) {
+  Torch::core::array::assertSameDimensionLength(k.extent(0), 3);
+  m_diff_kernel.reference(k.copy());
+}
+
+void ip::CentralGradient::setAvgKernel(const blitz::Array<double,1>& k) {
+  Torch::core::array::assertSameDimensionLength(k.extent(0), 3);
+  m_avg_kernel.reference(k.copy());
+}
+
+void ip::CentralGradient::operator() (const blitz::Array<double,2>& i1,
+    const blitz::Array<double,2>& i2, const blitz::Array<double,2>& i3,
+    blitz::Array<double,2>& Ex, blitz::Array<double,2>& Ey,
+    blitz::Array<double,2>& Et) const {
   
   // all arrays have to have the same shape
-  Torch::core::array::assertSameShape(i_prev, i);
-  Torch::core::array::assertSameShape(i_after, i);
-  Torch::core::array::assertSameShape(u, v);
-  Torch::core::array::assertSameShape(i, u);
-  Torch::core::array::assertSameShape(m_buffer1, i);
+  Torch::core::array::assertSameShape(i1, i2);
+  Torch::core::array::assertSameShape(i2, i3);
+  Torch::core::array::assertSameShape(Ex, Ey);
+  Torch::core::array::assertSameShape(Ey, Et);
+  Torch::core::array::assertSameShape(i1, Ex);
+  Torch::core::array::assertSameShape(m_buffer1, i1);
 
-  // Movement along the Y direction (extent 0) => v matrix
-  fastconv(i_prev, m_kernel2, m_buffer1, 1); // [+1 +2 +1] * i_prev
-  fastconv(m_buffer1, m_kernel1, v, 0); // [-1 0 +1]^T * ([+1 +2 +1]*(i_prev))
+  // Notation:
+  // DK - difference kernel
+  // AK - averaging kernel
+  // v^T - vector (v) transposed
+  // A * B - A convolved with B (A is mirrored)
+
+  // Differentiation along the X direction (extent 1) => Ex matrix
+  fastconv(i1, m_diff_kernel, Ex, 1); // Ex =  DK * i1
+  fastconv(Ex, m_avg_kernel, m_buffer1, 0); // Buffer1 = AK^T * Ex
   
-  fastconv(i, m_kernel2, m_buffer1, 1); // [+1 +2 +1] * i
-  fastconv(m_buffer1, m_kernel1, m_buffer2, 0); // [-1 0 +1]^T * ([+1 +2 +1]*(i))
-
-  v += 2*m_buffer2;
+  fastconv(i2, m_diff_kernel, Ex, 1); // Ex = DK * i2
+  fastconv(Ex, m_avg_kernel, m_buffer2, 0); // Buffer2 = AK^T * Ex
   
-  fastconv(i_after, m_kernel2, m_buffer1, 1); // [+1 +2 +1] * i_after
-  fastconv(m_buffer1, m_kernel1, m_buffer2, 0); // [-1 0 +1]^T * ([+1 +2 +1]*(i_after))
-
-  v += m_buffer2;
-  v /= 6*std::sqrt(2);
-
-  // Movement along the X direction (extent 1) => u matrix
-  fastconv(i_prev, m_kernel1, m_buffer1, 1); // [-1 0 +1] * i_prev
-  fastconv(m_buffer1, m_kernel2, u, 0); // [+1 +2 +1]^T * ([-1 0 +1]*(i_prev))
+  fastconv(i3, m_diff_kernel, Ex, 1); // Ex = DK * i3
+  fastconv(Ex, m_avg_kernel, m_buffer3, 0); // Buffer3 = AK^T * Ex
   
-  fastconv(i, m_kernel1, m_buffer1, 1); // [-1 0 +1] * i
-  fastconv(m_buffer1, m_kernel2, m_buffer2, 0); // [+1 +2 +1]^T * ([-1 0 +1]*(i))
- 
-  u += 2*m_buffer2;
+  // The averaging operation along the t coordinate is performed by hand
+  Ex = (m_avg_kernel(2) * m_buffer1) + (m_avg_kernel(1) * m_buffer2) +
+    (m_avg_kernel(0) * m_buffer3);
 
-  fastconv(i_after, m_kernel1, m_buffer1, 1); // [-1 0 +1] * i_after
-  fastconv(m_buffer1, m_kernel2, m_buffer2, 0); // [+1 +2 +1]^T * ([-1 0 +1]*(i_after))
+  // Differentiation along the Y direction (extent 0) => Ey matrix
+  fastconv(i1, m_diff_kernel, Ey, 0); // Ey =  DK^T * i1
+  fastconv(Ey, m_avg_kernel, m_buffer1, 1); // Buffer1 = AK * Ey
   
-  u += m_buffer2;
-  u /= 6*std::sqrt(2);
+  fastconv(i2, m_diff_kernel, Ey, 0); // Ey =  DK^T * i2
+  fastconv(Ey, m_avg_kernel, m_buffer2, 1); // Buffer2 = AK * Ey
+  
+  fastconv(i3, m_diff_kernel, Ey, 0); // Ey =  DK^T * i3
+  fastconv(Ey, m_avg_kernel, m_buffer3, 1); // Buffer3 = AK * Ey
+  
+  // The averaging operation along the t coordinate is performed by hand
+  Ey = (m_avg_kernel(2) * m_buffer1) + (m_avg_kernel(1) * m_buffer2) +
+    (m_avg_kernel(0) * m_buffer3);
+
+  // Differentiation along the T direction i1 -> i2 => Et matrix
+  fastconv(i1, m_avg_kernel, Et, 1); // Et =  AK * i1
+  fastconv(Et, m_avg_kernel, m_buffer1, 0); // Buffer1 = AK^T * Et
+  
+  fastconv(i2, m_avg_kernel, Et, 1); // Et =  AK * i2
+  fastconv(Et, m_avg_kernel, m_buffer2, 0); // Buffer2 = AK^T * Et
+  
+  fastconv(i3, m_avg_kernel, Et, 1); // Et =  AK * i3
+  fastconv(Et, m_avg_kernel, m_buffer3, 0); // Buffer3 = AK^T * Et
+  
+  // The difference operation along the t coordinate is performed by hand
+  Et = (m_diff_kernel(2) * m_buffer1) + (m_diff_kernel(1) * m_buffer2) +
+    (m_diff_kernel(0) * m_buffer3);
+}
+
+static const double SOBEL_DIFF_KERNEL_DATA[] = {+1., 0., -1.};
+static const blitz::Array<double,1> SOBEL_DIFF_KERNEL(const_cast<double*>(SOBEL_DIFF_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
+static const double SOBEL_AVG_KERNEL_DATA[] = {+1., +2., +1};
+static const blitz::Array<double,1> SOBEL_AVG_KERNEL(const_cast<double*>(SOBEL_AVG_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
+
+ip::SobelGradient::SobelGradient(const blitz::TinyVector<int,2>& shape):
+  ip::CentralGradient(SOBEL_DIFF_KERNEL, SOBEL_AVG_KERNEL, shape)
+{
+}
+
+ip::SobelGradient::~SobelGradient() { }
+
+static const double PREWITT_DIFF_KERNEL_DATA[] = {+1., 0., -1.};
+static const blitz::Array<double,1> PREWITT_DIFF_KERNEL(const_cast<double*>(PREWITT_DIFF_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
+static const double PREWITT_AVG_KERNEL_DATA[] = {+1., +1., +1};
+static const blitz::Array<double,1> PREWITT_AVG_KERNEL(const_cast<double*>(PREWITT_AVG_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
+
+ip::PrewittGradient::PrewittGradient(const blitz::TinyVector<int,2>& shape):
+  ip::CentralGradient(PREWITT_DIFF_KERNEL, PREWITT_AVG_KERNEL, shape)
+{
+}
+
+ip::PrewittGradient::~PrewittGradient() { }
+
+static const double ISOTROPIC_DIFF_KERNEL_DATA[] = {+1., 0., -1.};
+static const blitz::Array<double,1> ISOTROPIC_DIFF_KERNEL(const_cast<double*>(ISOTROPIC_DIFF_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
+static const double ISOTROPIC_AVG_KERNEL_DATA[] = {+1., std::sqrt(2.), +1};
+static const blitz::Array<double,1> ISOTROPIC_AVG_KERNEL(const_cast<double*>(ISOTROPIC_AVG_KERNEL_DATA), blitz::shape(3), blitz::neverDeleteData);
+
+ip::IsotropicGradient::IsotropicGradient(const blitz::TinyVector<int,2>& shape):
+  ip::CentralGradient(ISOTROPIC_DIFF_KERNEL, ISOTROPIC_AVG_KERNEL, shape)
+{
+}
+
+ip::IsotropicGradient::~IsotropicGradient() { }
+
+static const double LAPLACIAN_014_KERNEL_DATA[] = {0.,-1.,0.,-1.,4.,-1.,0.,-1.,0.};
+static const blitz::Array<double,2> LAPLACIAN_014_KERNEL(const_cast<double*>(LAPLACIAN_014_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
+
+void ip::laplacian_014(const blitz::Array<double,2>& input,
+    blitz::Array<double,2>& output) {
+  Torch::sp::convolve(input, LAPLACIAN_014_KERNEL, output, 
+      sp::Convolution::Same, sp::Convolution::Mirror);
+}
+
+static const double LAPLACIAN_18_KERNEL_DATA[] = {-1.,-1.,-1.,-1.,8.,-1.,-1.,-1.,-1.};
+static const blitz::Array<double,2> LAPLACIAN_18_KERNEL(const_cast<double*>(LAPLACIAN_18_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
+
+void ip::laplacian_18(const blitz::Array<double,2>& input,
+    blitz::Array<double,2>& output) {
+  Torch::sp::convolve(input, LAPLACIAN_18_KERNEL, output, 
+      sp::Convolution::Same, sp::Convolution::Mirror);
+}
+
+static const double LAPLACIAN_12_KERNEL_DATA[] = {-1.,-2.,-1.,-2.,12.,-2.,-1.,-2.,-1.};
+static const blitz::Array<double,2> LAPLACIAN_12_KERNEL(const_cast<double*>(LAPLACIAN_12_KERNEL_DATA), blitz::shape(3,3), blitz::neverDeleteData);
+
+void ip::laplacian_12(const blitz::Array<double,2>& input,
+    blitz::Array<double,2>& output) {
+  Torch::sp::convolve(input, LAPLACIAN_12_KERNEL, output,
+      sp::Convolution::Same, sp::Convolution::Mirror);
 }
