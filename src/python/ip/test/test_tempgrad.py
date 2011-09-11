@@ -237,17 +237,6 @@ class GradientTest(unittest.TestCase):
     self.assertTrue( ey_cxx.numeq(ey_python) )
     self.assertTrue( et_cxx.numeq(et_python) )
 
-  def test03_LaplacianCxxAgainstPythonSynthetic(self):
-
-    # Let's run this test on a real image
-    #if1 = os.path.join("rubberwhale", "frame10_gray.png")
-    #i1 = load_gray(if1).cast("float64")
-    i1, i2 = make_image_pair_2()
-    i1 = i1.cast('float64')
-    py = LaplacianBorder(i1)
-    cxx = torch.ip.laplacian_014(i1) / 4 #to compare
-    self.assertTrue( cxx.numeq(py) )
-
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
