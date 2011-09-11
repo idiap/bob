@@ -55,7 +55,7 @@ def add_clients(session, filelist):
   for line in fileinput.input(filelist):
     add_client(session, line, client_dict)
 
-def add_files(session, imagedir, frontal_only):
+def add_files(session, imagedir, all_poses):
   """Add files (and clients) to the Multi-PIE database."""
   
   def add_mv_file(session, filename, session_id, client_id, recording_id, camera_id):
@@ -92,7 +92,7 @@ def add_files(session, imagedir, frontal_only):
         # camera id
         for camera_id in filter(nodot, os.listdir(recording_dir)):
           # Check if it is the frontal camera 05_1
-          if (frontal_only and camera_id != '05_1'):
+          if ((not all_poses) and camera_id != '05_1'):
             continue
           camera_dir = os.path.join(recording_dir, camera_id)
           # flashes/images
@@ -577,7 +577,7 @@ def create(args):
   create_tables(args)
   s = session(args.dbname, echo=args.verbose)
   add_clients(s, args.subjectlist)
-  add_files(s, args.imagedir, args.frontalonly)
+  add_files(s, args.imagedir, args.all_poses)
   add_protocols(s)
   add_expressions(s)
   s.commit()
@@ -598,7 +598,7 @@ def add_command(subparsers):
   parser.add_argument('--subjectlist', action='store',
       default='/idiap/resource/database/Multi-Pie/meta/subject_list.txt',
       help="Change the file containing the subject list of the Multi-PIE database (defaults to %(default)s)")
-  parser.add_argument('--frontalonly', action='store_true', default=False,
-      help="If set, it will create the database for frontal faces only")
+  parser.add_argument('--all_poses', action='store_true', default=False,
+      help="If not set, it will create the database for frontal faces only")
   
   parser.set_defaults(func=create) #action
