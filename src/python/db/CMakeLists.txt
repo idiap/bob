@@ -46,6 +46,7 @@ torch_build_db(replay)
 torch_build_db(banca)
 torch_build_db(banca_small)
 torch_build_db(biosecure)
+torch_build_db(lfw)
 torch_build_db(mobio)
 torch_build_db(multipie)
 torch_build_db(scface)
@@ -110,6 +111,17 @@ set_property(TEST python-db-biosecure-dumplist2 APPEND PROPERTY DEPENDS
 
 # Faceverif_fl database (uses file lists).
 torch_python_add_test(python-db-faceverif_fl-query ${CMAKE_CURRENT_SOURCE_DIR}/test/test_faceverif_fl.py)
+
+# LFW database driver tests.
+# ######### Notice test dependencies!! ##################
+torch_python_add_test(python-db-lfw-dumplist
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py lfw dumplist --self-test)
+set_property(TEST python-db-lfw-dumplist APPEND PROPERTY DEPENDS
+  ${python-db-lfw-instantiation})
+torch_python_add_test(python-db-lfw-dumplist2
+  ${CMAKE_CURRENT_SOURCE_DIR}/script/dbmanage.py lfw dumplist --view=view1 --subset=fold1 --classes=matched --self-test)
+set_property(TEST python-db-lfw-dumplist2 APPEND PROPERTY DEPENDS
+  ${python-db-lfw-instantiation})
 
 # MOBIO database driver tests.
 # ######### Notice test dependencies!! ##################
