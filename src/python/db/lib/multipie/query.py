@@ -163,7 +163,7 @@ class Database(object):
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    return self.Zclients(protocol, zgroups)
+    return self.Zclients(protocol, groups)
 
 
   def getClientIdFromModelId(self, model_id):
