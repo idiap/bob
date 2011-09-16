@@ -10,11 +10,13 @@
 #include "core/python/TypeMapper.h"
 #include "core/python/array_base.h"
 #include "core/python/blitz_extra.h"
-
+#include "core/python/endianness.h"
 #include "core/blitz_compat.h"
 
-namespace tp = Torch::python;
 namespace bp = boost::python;
+
+namespace tca = Torch::core::array;
+namespace tp = Torch::python;
 
 /**
  * Returns the Numpy typecode, typename or C enum for this blitz Array
@@ -34,6 +36,58 @@ template<typename T, int N> static NPY_TYPES to_enum
   return tp::TYPEMAP.type_to_enum<T>();
 }
 
+template<typename T, int N> static bp::dict __array_interface__
+(const blitz::Array<T,N>& a) {
+  for (int d=0; d<N; ++d) {
+    if (!a.isRankStoredAscending(d)) {
+      throw std::runtime_error("Cannot _automatically_ read reverse()'ed blitz array as numpy.ndarray because numpy does not support it. Create a copy of this array using copy() or the direct numpy.ndarray converter as_ndarray() to reset the reversion.");
+    }
+  }
+  bp::dict retval;
+  retval["shape"] = a.shape();
+  bp::str typestr;
+  if (tp::getEndianness() == tp::TORCH_LITTLE_ENDIAN) typestr += "<";
+  else typestr += ">";
+  switch (tca::getElementType<T>()) {
+    case tca::t_bool:
+      typestr += "b";
+      break;
+    case tca::t_int8:
+    case tca::t_int16:
+    case tca::t_int32:
+    case tca::t_int64:
+      typestr += "i";
+      break;
+    case tca::t_uint8:
+    case tca::t_uint16:
+    case tca::t_uint32:
+    case tca::t_uint64:
+      typestr += "u";
+      break;
+    case tca::t_float32:
+    case tca::t_float64:
+    case tca::t_float128:
+      typestr += "f";
+      break;
+    case tca::t_complex64:
+    case tca::t_complex128:
+    case tca::t_complex256:
+      typestr += "c";
+      break;
+    default:
+      throw std::runtime_error("Unknown element type for blitz::Array<> to numpy.ndarray conversion");
+  }
+  typestr += bp::str(sizeof(T));
+  retval["typestr"] = typestr;
+  bp::long_ address(reinterpret_cast<unsigned long>(a.data()));
+  retval["data"] = bp::make_tuple(address, true); //always read-only
+  blitz::TinyVector<uint64_t,N> byte_stride = a.stride();
+  byte_stride *= sizeof(T);
+  retval["strides"] = byte_stride;
+  retval["version"] = 3;
+  return retval;
+}
+
 /**
  * Declares a bunch of informative methods for arrays
  */
@@ -44,6 +98,8 @@ static void bind (tp::array<T,N>& array) {
   typedef typename tp::array<T,N>::stride_type stride_type;
 
   array.object()->def("extent", (int (array_type::*)(int) const)&array_type::extent, (boost::python::arg("self"), boost::python::arg("dimension")), "Returns the array size in one of the dimensions");
+
+  array.object()->add_property("__array_interface__", &__array_interface__<T,N>, "NumPy array interface -- see http://docs.scipy.org/doc/numpy/reference/arrays.interface.html");
 
   array.object()->def("dimensions", &array_type::dimensions, "Total number of dimensions on this array");
 
