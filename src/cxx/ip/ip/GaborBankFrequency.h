@@ -40,7 +40,7 @@ namespace Torch {
           // Gabor Frequency filter options
           const double gamma=1., const double eta=1.,
           const double pf=0.99, const bool cancel_dc=false, 
-          const bool use_envelope=false, const bool output_in_frequency=false);
+          const bool use_envelope=true, const bool output_in_frequency=false);
 
         /**
          * @brief Destructor
