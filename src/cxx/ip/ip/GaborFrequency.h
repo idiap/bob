@@ -12,6 +12,7 @@
 #include <boost/shared_ptr.hpp>
 #include "ip/Exception.h"
 #include "sp/FFT2D.h"
+#include <complex>
 
 namespace Torch {
 /**
@@ -52,7 +53,12 @@ namespace Torch {
           const double theta=0., const double gamma=1., const double eta=1., 
           const double pf=0.99, const bool cancel_dc=false, 
           const bool use_envelope=false, const bool output_in_frequency=false);
-          // const enum ip::Gabor::NormOption norm_opt=ip::Gabor::SpatialFactor);
+
+      
+        /**
+         * @brief Copy constructor
+         */
+        GaborFrequency(const GaborFrequency& copy);
 
         /**
          * @brief Destructor
@@ -60,7 +66,7 @@ namespace Torch {
         virtual ~GaborFrequency();
 
         /**
-         * @brief Process a 2D blitz Array/Image by applying the Gabor filter
+         * @brief Processes a 2D blitz Array/Image by applying the Gabor filter
          */
         void operator()( const blitz::Array<std::complex<double>,2>& src,
             blitz::Array<std::complex<double>,2>& dst);
@@ -77,8 +83,6 @@ namespace Torch {
         inline double getPf() const { return m_pf; }
         inline bool getCancelDc() const { return m_cancel_dc; }
         inline bool getUseEnvelope() const { return m_use_envelope; }
-        // inline enum ip::Gabor::NormOption getNormOption() const
-          // { return m_norm_opt; }
 
         /**
           * @brief Returns the frequency filter, the zero frequency being at 
@@ -129,23 +133,21 @@ namespace Torch {
           { m_cancel_dc = cancel_dc; computeFilter(); }
         inline void setUseEnvelope(const bool use_envelope) 
           { m_use_envelope = use_envelope; computeFilter(); }
-        // inline void setNormOption(const enum ip::Gabor::NormOption norm_opt)
-          // { m_norm_opt = norm_opt; computeFilter(); }
 
       private:
         /**
-         * @brief Generate the frequency Gabor filter. This is a Gaussian in
+         * @brief Generates the frequency Gabor filter. This is a Gaussian in
          *   the frequency domain
          */
         void computeFilter();
 
         /**
-         * @brief Initialize the two working arrays
+         * @brief Initializes the two working arrays
          */
         void initWorkArrays();
 
         /** 
-          * @brief Compute an ellipsoid envelope which contains pf percent of 
+          * @brief Computes an ellipsoid envelope which contains pf percent of 
           *   the energy of the whole frequency filter
           */
         void computeEnvelope();
@@ -177,7 +179,6 @@ namespace Torch {
         blitz::Array<std::complex<double>, 2> m_work2;
         boost::shared_ptr<Torch::sp::FFT2D> m_fft;
         boost::shared_ptr<Torch::sp::IFFT2D> m_ifft;
-//        enum ip::Gabor::NormOption m_norm_opt;
     };
 }}
 

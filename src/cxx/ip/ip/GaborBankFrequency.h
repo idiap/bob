@@ -43,12 +43,17 @@ namespace Torch {
           const bool use_envelope=true, const bool output_in_frequency=false);
 
         /**
+         * @brief Copy constructor
+         */
+        GaborBankFrequency(const GaborBankFrequency& other);
+
+        /**
          * @brief Destructor
          */
         virtual ~GaborBankFrequency();
 
         /**
-         * @brief Process a 2D blitz Array/Image by applying the Gabor filter bank
+         * @brief Processes a 2D blitz Array/Image by applying the Gabor filter bank
          */
         void operator()( const blitz::Array<std::complex<double>,2>& src,
             blitz::Array<std::complex<double>,3>& dst);
