@@ -30,7 +30,19 @@ class Database(object):
         raise RuntimeError, 'Invalid %s "%s". Valid values are %s, or lists/tuples of those' % (obj, k, valid)
     return l
 
-  def clients(self, protocol=None, groups=None):
+  def __gender_replace__(self,l):
+    """Replace 'female' by 'f' and 'male' by 'm', and returns the new list"""
+    if not l: return l
+    elif isinstance(l, str): return self.__group_replace_alias__((l,))
+    l2 = []
+    for val in l:
+      if(val == 'female'): l2.append('f')
+      elif(val == 'male'): l2.append('m')
+      else: l2.append(val)
+    return tuple(l2)
+
+
+  def clients(self, protocol=None, groups=None, subworld=None):
     """Returns a set of clients for the specific query by the user.
 
     Keyword Parameters:
@@ -41,42 +53,107 @@ class Database(object):
     groups
       The groups to which the clients belong ('dev', 'eval', 'world')
 
+    subworld
+      Specify a split of the world data ("twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A list containing all the client ids which have the given
     properties.
     """
 
-    def gender_replace(l):
-      """Replace 'female' by 'f' and 'male' by 'm', and returns the new list"""
-      if not l: return l
-      elif isinstance(l, str): return self.__group_replace_alias__((l,))
-      l2 = []
-      for val in l:
-        if(val == 'female'): l2.append('f')
-        elif(val == 'male'): l2.append('m')
-        else: l2.append(val)
-      return tuple(l2)
-
     VALID_PROTOCOLS = ('female', 'male')
     VALID_GROUPS = ('dev', 'eval', 'world')
+    VALID_SUBWORLDS = ('twothirds',)
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+    subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
 
-    gender = gender_replace(protocol)
+    gender = self.__gender_replace__(protocol)
 
     # List of the clients
-    q = self.session.query(Client).filter(Client.sgroup.in_(groups))
+    if "world" in groups:
+      if len(subworld)==1:
+        q = self.session.query(Client).join(SubworldClient).filter(SubworldClient.name.in_(subworld))
+      else:
+        q = self.session.query(Client).filter(Client.sgroup == 'world')
+      if gender:
+        q = q.filter(Client.gender.in_(gender))
+      q = q.order_by(Client.id)
+      for id in [k.id for k in q]: 
+        retval.append(id)
+
+    if 'dev' in groups or 'eval' in groups:
+      q = self.session.query(Client).filter(Client.sgroup != 'world')
     if gender:
       q = q.filter(Client.gender.in_(gender))
     q = q.order_by(Client.id)
     retval = []
     for id in [k.id for k in q]: 
       retval.append(id)
+
     return retval
+
+  def Tclients(self, protocol=None, groups=None):
+    """Returns a set of T-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the MOBIO protocols ("male", "female").
+    
+    groups
+      The groups to which the clients belong ("dev", "eval").
+      Useless as they are independent from 'dev' and 'eval' for this database
+
+    Returns: A list containing all the client ids belonging to the given group.
+    """
+
+    q = self.session.query(TModel).join(Client)
+    gender = self.__gender_replace__(protocol)
+    if gender:
+      q = q.filter(Client.gender.in_(gender))
+    q = q.order_by(TModel.client_id)
+    
+    tclient = []
+    for cid in [k.client_id for k in q]:
+      if not cid in tclient: tclient.append(cid)
+    return tclient
+
+  def Zclients(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm clients for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the MOBIO protocols ("male", "female").
+    
+    groups
+      The groups to which the clients belong ("dev", "eval").
+      Useless as they are independent from 'dev' and 'eval' for this database
+
+    Returns: A list containing all the client ids belonging to the given group.
+    """
+
+    q = self.session.query(ZClient).join(Client)
+    gender = self.__gender_replace__(protocol)
+    if gender:
+      q = q.filter(Client.gender.in_(gender))
+    q = q.order_by(ZClient.client_id)
+     
+    zclient = []
+    for cid in [k.client_id for k in q]:
+      if not cid in zclient: zclient.append(cid)
+    return zclient
+
 
   def models(self, protocol=None, groups=None):
     """Returns a set of models for the specific query by the user.
 
     Keyword Parameters:
+
+    protocol
+      One of the Mobio protocols ("male", "female").
 
     groups
       The groups to which the subjects attached to the models belong ("dev", "eval", "world")
@@ -85,6 +162,50 @@ class Database(object):
     """
 
     return self.clients(protocol, groups)
+
+
+  def Tmodels(self, protocol=None, groups=None):
+    """Returns a set of T-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the Mobio protocols ("male", "female").
+    
+    groups
+      The groups to which the clients belong ("dev", "eval").
+      Useless as they are independent from 'dev' and 'eval' for this database
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    q = self.session.query(TModel).join(Client)
+    gender = self.__gender_replace__(protocol)
+    if gender:
+      q = q.filter(Client.gender.in_(gender))
+    q = q.order_by(TModel.id)
+     
+    tmodel = []
+    for tid in [k.id for k in q]:
+      if not tid in tmodel: tmodel.append(tid)
+    return tmodel
+
+  def Zmodels(self, protocol=None, groups=None):
+    """Returns a set of Z-Norm models for the specific query by the user.
+
+    Keyword Parameters:
+
+    protocol
+      One of the Mobio protocols ("male", "female").
+    
+    groups
+      The groups to which the clients belong ("dev", "eval").
+      Useless as they are independent from 'dev' and 'eval' for this database
+
+    Returns: A list containing all the model ids belonging to the given group.
+    """
+
+    return self.Zclients(protocol, groups)
 
   def getClientIdFromModelId(self, model_id):
     """Returns the client_id attached to the given model_id
@@ -97,6 +218,25 @@ class Database(object):
     Returns: The client_id attached to the given model_id
     """
     return model_id
+
+  def getClientIdFromTmodelId(self, model_id):
+    """Returns the client_id attached to the given T-Norm model_id
+    
+    Keyword Parameters:
+
+    model_id
+      The model_id to consider
+
+    Returns: The client_id attached to the given T-Norm model_id
+    """
+
+    q = self.session.query(TModel).filter(TModel.id == model_id)
+    q = q.order_by(TModel.id)     
+    if q.count() !=1:
+      #throw exception?
+      return None
+    else:
+      return q.first().client_id
 
   def getClientIdFromFileId(self, file_id):
     """Returns the client_id (real client id) attached to the given file_id
@@ -136,7 +276,8 @@ class Database(object):
 
 
   def objects(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None):
+      purposes=None, model_ids=None, groups=None, classes=None,
+      subworld=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -171,6 +312,11 @@ class Database(object):
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
 
+    subworld
+      Specify a split of the world data ("twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A dictionary containing:
       - 0: the resolved filenames 
       - 1: the model id (only valid if len(model_ids == 1))
@@ -192,13 +338,15 @@ class Database(object):
     VALID_PURPOSES = ('enrol', 'probe')
     VALID_GROUPS = ('dev', 'eval', 'world')
     VALID_CLASSES = ('client', 'impostor')
+    VALID_SUBWORLDS = ('onethird', 'twothirds',)
 
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     purposes = self.__check_validity__(purposes, "purpose", VALID_PURPOSES)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     classes = self.__check_validity__(classes, "class", VALID_CLASSES)
-    retval = {}
-    
+    subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
+
+    retval = {}    
     if(isinstance(model_ids,str)):
       model_ids = (model_ids,)
 
@@ -207,6 +355,11 @@ class Database(object):
             filter(Client.sgroup == 'world')
       if model_ids:
         q = q.filter(Client.id.in_(model_ids))
+      if subworld and len(subworld)==1:
+        q = q.join(SubworldFile).\
+              filter(SubworldFile.name.in_(subworld)).\
+              filter(and_(File.client_id == SubworldFile.client_id, File.session_id == SubworldFile.session_id,
+                          File.speech_type == SubworldFile.speech_type, File.shot_id == SubworldFile.shot_id))
       q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
       for k in q:
         retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
@@ -253,7 +406,8 @@ class Database(object):
     return retval
 
   def files(self, directory=None, extension=None, protocol=None,
-      purposes=None, model_ids=None, groups=None, classes=None):
+      purposes=None, model_ids=None, groups=None, classes=None,
+      subworld=None):
     """Returns a set of filenames for the specific query by the user.
 
     Keyword Parameters:
@@ -288,6 +442,11 @@ class Database(object):
       or a tuple with several of them. If 'None' is given (this is the 
       default), it is considered the same as a tuple with all possible values.
 
+    subworld
+      Specify a split of the world data ("twothirds", "")
+      In order to be considered, "world" should be in groups and only one 
+      split should be specified. 
+
     Returns: A dictionary containing the resolved filenames considering all
     the filtering criteria. The keys of the dictionary are unique identities 
     for each file in the Biosecure database. Conserve these numbers if you 
@@ -295,7 +454,210 @@ class Database(object):
     """
 
     retval = {}
-    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes)
+    d = self.objects(directory, extension, protocol, purposes, model_ids, groups, classes, subworld)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
+
+  def Tobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames for enroling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the MOBIO protocols ('male', 'female').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id
+      - 2: the claimed id attached to the model 
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the BANCA database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    def make_path(stem, directory, extension):
+      import os
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+
+    VALID_PROTOCOLS = ('female', 'male')
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+
+    retval = {}    
+    if(isinstance(model_ids,str)):
+      model_ids = (model_ids,)
+
+    q = self.session.query(File).join(Client).join(TModel).\
+          filter(and_(File.client_id == TModel.client_id, File.session_id == TModel.session_id,
+                      File.speech_type == TModel.speech_type))
+    if model_ids:
+      q = q.filter(TModel.id.in_(model_ids))
+    q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id, File.device)
+    for k in q:
+      retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path) 
+    return retval
+
+  def Tfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames for enrolling T-norm models for score 
+       normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the MOBIO protocols ('male', 'female').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A list of filenames
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the BANCA database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Tobjects(directory, extension, protocol, model_ids, groups)
+    for k in d: retval[k] = d[k][0]
+
+    return retval
+
+
+  def Zobjects(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames to perform Z-norm score normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the MOBIO protocols ('male', 'female').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A dictionary containing:
+      - 0: the resolved filenames 
+      - 1: the model id # not applicable in this case
+      - 2: the claimed id attached to the model # not applicable in this case
+      - 3: the real id
+      - 4: the "stem" path (basename of the file)
+    considering allthe filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the MOBIO database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    def make_path(stem, directory, extension):
+      import os
+      if not extension: extension = ''
+      if directory: return os.path.join(directory, stem + extension)
+      return stem + extension
+
+    groups = self.__group_replace_alias__(groups)
+    VALID_PROTOCOLS = ('female', 'male')
+    VALID_GROUPS = ('dev', 'eval', 'world')
+
+
+    protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
+    groups = self.__check_validity__(groups, "group", VALID_GROUPS)
+
+    retval = {}
+
+    if(isinstance(model_ids,str)):
+      model_ids = (model_ids,)
+ 
+    # Files used as impostor probes (all the samples from the Z-Norm clients)
+    q = self.session.query(File).join(ZClient).\
+            filter(File.client_id == ZClient.client_id)
+    if model_ids:
+      q = q.filter(File.client_id.in_(model_ids))
+    q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot)
+    for k in q:
+      retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
+
+    return retval
+
+  def Zfiles(self, directory=None, extension=None, protocol=None,
+      model_ids=None, groups=None):
+    """Returns a set of filenames to perform Z-norm score normalization.
+
+    Keyword Parameters:
+
+    directory
+      A directory name that will be prepended to the final filepath returned
+
+    extension
+      A filename extension that will be appended to the final filepath returned
+
+    protocol
+      One of the MOBIO protocols ('male', 'female').
+
+    model_ids
+      Only retrieves the files for the provided list of model ids (claimed 
+      client id).  If 'None' is given (this is the default), no filter over 
+      the model_ids is performed.
+
+    groups
+      One of the groups ('dev', 'eval', 'world') or a tuple with several of them. 
+      If 'None' is given (this is the default), it is considered the same as a 
+      tuple with all possible values.
+
+    Returns: A list of filenames
+    considering all the filtering criteria. The keys of the dictionary are 
+    unique identities for each file in the MOBIO database. Conserve these 
+    numbers if you wish to save processing results later on.
+    """
+
+    retval = {}
+    d = self.Zobjects(directory, extension, protocol, model_ids, groups)
     for k in d: retval[k] = d[k][0]
 
     return retval

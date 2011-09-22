@@ -94,3 +94,77 @@ class ProtocolEnrolSession(Base):
   def __repr__(self):
     return "<ProtocolEnrolSession('%s', '%d', '%d')>" % (self.name, self.client_id, self.session_id)
 
+class TModel(Base):
+  __tablename__ = 'tmodel'
+
+  id = Column(String(9), primary_key=True)
+  client_id = Column(Integer, ForeignKey('client.id')) # for SQL
+  session_id = Column(Integer)
+  speech_type = Column(Enum('p','l','r','f'))
+
+  # for Python
+  client = relationship("Client", backref=backref("client_tmodel"))
+ 
+  def __init__(self, mid, client_id, session_id, speech_type):
+    self.id = mid
+    self.client_id = client_id
+    self.session_id = session_id
+    self.speech_type = speech_type
+
+  def __repr__(self):
+    return "<TModel('%d', '%d', '%s')>" % (self.client_id, self.session_id, self.speech_type) 
+
+class ZClient(Base):
+  __tablename__ = 'zclient'
+
+  id = Column(Integer, primary_key=True)
+  client_id = Column(Integer, ForeignKey('client.id')) # for SQL
+
+  # for Python
+  client = relationship("Client", backref=backref("client_zfile"))
+ 
+  def __init__(self, client_id):
+    self.client_id = client_id
+
+  def __repr__(self):
+    return "<ZClient('%d')>" % (self.client_id) 
+
+class SubworldClient(Base):
+  __tablename__ = 'subworldclient'
+
+  id = Column(Integer, primary_key=True)
+  name = Column(String(20)) 
+  client_id = Column(Integer, ForeignKey('client.id')) # for SQL
+
+  # for Python
+  client = relationship("Client", backref=backref("client_subworldClient"))
+ 
+  def __init__(self, name, client_id):
+    self.name = name
+    self.client_id = client_id
+
+  def __repr__(self):
+    return "<SubworldClient('%s', '%d')>" % (self.name, self.client_id) 
+
+class SubworldFile(Base):
+  __tablename__ = 'subworldfile'
+ 
+  id = Column(Integer, primary_key=True)
+  name = Column(String(20)) 
+  client_id = Column(Integer, ForeignKey('client.id')) # for SQL
+  session_id = Column(Integer)
+  speech_type = Column(Enum('p','l','r','f'))
+  shot_id = Column(Integer)
+
+  # for Python
+  client = relationship("Client", backref=backref("client_subworldFile"))
+ 
+  def __init__(self, name, client_id, session_id, speech_type, shot_id):
+    self.name = name
+    self.client_id = client_id
+    self.session_id = session_id
+    self.speech_type = speech_type
+    self.shot_id = shot_id
+
+  def __repr__(self):
+    return "<SubworldFile('%s', '%d', '%d', '%d', '%d')>" % (self.name, self.client_id, self.session_id, self.speech_type, self.shot_id) 
