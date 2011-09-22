@@ -71,14 +71,12 @@ class Database(object):
 
     gender = self.__gender_replace__(protocol)
 
-    # List of the clients
+    # World data (gender independent)
     if "world" in groups:
       if len(subworld)==1:
         q = self.session.query(Client).join(SubworldClient).filter(SubworldClient.name.in_(subworld))
       else:
         q = self.session.query(Client).filter(Client.sgroup == 'world')
-      if gender:
-        q = q.filter(Client.gender.in_(gender))
       q = q.order_by(Client.id)
       for id in [k.id for k in q]: 
         retval.append(id)
