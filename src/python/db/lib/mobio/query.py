@@ -33,7 +33,7 @@ class Database(object):
   def __gender_replace__(self,l):
     """Replace 'female' by 'f' and 'male' by 'm', and returns the new list"""
     if not l: return l
-    elif isinstance(l, str): return self.__group_replace_alias__((l,))
+    elif isinstance(l, str): return self.__gender_replace__((l,))
     l2 = []
     for val in l:
       if(val == 'female'): l2.append('f')
@@ -599,11 +599,8 @@ class Database(object):
       if directory: return os.path.join(directory, stem + extension)
       return stem + extension
 
-    groups = self.__group_replace_alias__(groups)
     VALID_PROTOCOLS = ('female', 'male')
     VALID_GROUPS = ('dev', 'eval', 'world')
-
-
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
 
