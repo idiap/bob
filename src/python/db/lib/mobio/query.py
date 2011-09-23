@@ -82,7 +82,7 @@ class Database(object):
         retval.append(id)
 
     if 'dev' in groups or 'eval' in groups:
-      q = self.session.query(Client).filter(Client.sgroup != 'world')
+      q = self.session.query(Client).filter(and_(Client.sgroup != 'world', Client.sgroup.in_(groups)))
     if gender:
       q = q.filter(Client.gender.in_(gender))
     q = q.order_by(Client.id)
