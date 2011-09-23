@@ -12,6 +12,10 @@ from .models import *
 from ..utils import session
 
 
+def nodot(item):
+  """Can be used to ignore hidden files, starting with the . character."""
+  return item[0] != '.'
+
 def add_clients(session):
   """Add clients to the XM2VTS database."""
   # clients
@@ -322,10 +326,10 @@ def add_files(session, imagedir):
     session.add(File(int(v[0]), os.path.join(client_dir, basename), int(v[1]), int(v[2])))
   
   file_list = os.listdir(imagedir)
-  for cl_dir in file_list:
+  for cl_dir in filter(nodot, file_list):
     if os.path.isdir(os.path.join(imagedir, cl_dir)):
       client_dir = os.path.join(imagedir, cl_dir)
-      for filename in os.listdir(client_dir):
+      for filename in filter(nodot, os.listdir(client_dir)):
         basename, extension = os.path.splitext(filename)
         add_file(session, basename, client_dir)
 
