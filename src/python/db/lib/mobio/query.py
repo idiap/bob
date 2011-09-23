@@ -52,6 +52,7 @@ class Database(object):
 
     groups
       The groups to which the clients belong ('dev', 'eval', 'world')
+      Please note that world data are protocol/gender independent
 
     subworld
       Specify a split of the world data ("twothirds", "")
@@ -64,13 +65,14 @@ class Database(object):
 
     VALID_PROTOCOLS = ('female', 'male')
     VALID_GROUPS = ('dev', 'eval', 'world')
-    VALID_SUBWORLDS = ('twothirds',)
+    VALID_SUBWORLDS = ('onethird','twothirds',)
     protocol = self.__check_validity__(protocol, "protocol", VALID_PROTOCOLS)
     groups = self.__check_validity__(groups, "group", VALID_GROUPS)
     subworld = self.__check_validity__(subworld, "subworld", VALID_SUBWORLDS)
 
     gender = self.__gender_replace__(protocol)
 
+    retval = []
     # World data (gender independent)
     if "world" in groups:
       if len(subworld)==1:
@@ -80,15 +82,15 @@ class Database(object):
       q = q.order_by(Client.id)
       for id in [k.id for k in q]: 
         retval.append(id)
-
+    
+    # dev / eval data
     if 'dev' in groups or 'eval' in groups:
       q = self.session.query(Client).filter(and_(Client.sgroup != 'world', Client.sgroup.in_(groups)))
-    if gender:
-      q = q.filter(Client.gender.in_(gender))
-    q = q.order_by(Client.id)
-    retval = []
-    for id in [k.id for k in q]: 
-      retval.append(id)
+      if gender:
+        q = q.filter(Client.gender.in_(gender))
+      q = q.order_by(Client.id)
+      for id in [k.id for k in q]: 
+        retval.append(id)
 
     return retval
 
@@ -133,19 +135,19 @@ class Database(object):
     Returns: A list containing all the client ids belonging to the given group.
     """
 
-    q = self.session.query(ZClient).join(Client)
     gender = self.__gender_replace__(protocol)
+
+    zclient = []
+    q = self.session.query(ZClient).join(Client)
     if gender:
       q = q.filter(Client.gender.in_(gender))
-    q = q.order_by(ZClient.client_id)
-     
-    zclient = []
+    q = q.order_by(ZClient.client_id)     
     for cid in [k.client_id for k in q]:
       if not cid in zclient: zclient.append(cid)
     return zclient
 
 
-  def models(self, protocol=None, groups=None):
+  def models(self, protocol=None, groups=None, subworld=None):
     """Returns a set of models for the specific query by the user.
 
     Keyword Parameters:
@@ -155,11 +157,12 @@ class Database(object):
 
     groups
       The groups to which the subjects attached to the models belong ("dev", "eval", "world")
+      Please note that world data are protocol/gender independent
 
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    return self.clients(protocol, groups)
+    return self.clients(protocol, groups, subworld)
 
 
   def Tmodels(self, protocol=None, groups=None):
@@ -177,13 +180,13 @@ class Database(object):
     Returns: A list containing all the model ids belonging to the given group.
     """
 
-    q = self.session.query(TModel).join(Client)
     gender = self.__gender_replace__(protocol)
+
+    tmodel = []
+    q = self.session.query(TModel).join(Client)
     if gender:
       q = q.filter(Client.gender.in_(gender))
-    q = q.order_by(TModel.id)
-     
-    tmodel = []
+    q = q.order_by(TModel.id)     
     for tid in [k.id for k in q]:
       if not tid in tmodel: tmodel.append(tid)
     return tmodel
@@ -321,7 +324,7 @@ class Database(object):
       - 2: the claimed id attached to the model (only valid if len(model_ids == 1))
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the BANCA database. Conserve these 
     numbers if you wish to save processing results later on.
     """
@@ -490,7 +493,7 @@ class Database(object):
       - 2: the claimed id attached to the model 
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the BANCA database. Conserve these 
     numbers if you wish to save processing results later on.
     """
@@ -545,7 +548,7 @@ class Database(object):
       tuple with all possible values.
 
     Returns: A list of filenames
-    considering allthe filtering criteria. The keys of the dictionary are 
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the BANCA database. Conserve these 
     numbers if you wish to save processing results later on.
     """
@@ -588,7 +591,7 @@ class Database(object):
       - 2: the claimed id attached to the model # not applicable in this case
       - 3: the real id
       - 4: the "stem" path (basename of the file)
-    considering allthe filtering criteria. The keys of the dictionary are 
+    considering all the filtering criteria. The keys of the dictionary are 
     unique identities for each file in the MOBIO database. Conserve these 
     numbers if you wish to save processing results later on.
     """
@@ -610,11 +613,11 @@ class Database(object):
       model_ids = (model_ids,)
  
     # Files used as impostor probes (all the samples from the Z-Norm clients)
-    q = self.session.query(File).join(ZClient).\
+    q = self.session.query(File).join(Client).join(ZClient).\
             filter(File.client_id == ZClient.client_id)
     if model_ids:
       q = q.filter(File.client_id.in_(model_ids))
-    q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot)
+    q = q.order_by(File.client_id, File.session_id, File.speech_type, File.shot_id)
     for k in q:
       retval[k.id] = (make_path(k.path, directory, extension), k.client_id, k.client_id, k.client_id, k.path)
 
