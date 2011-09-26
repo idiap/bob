@@ -8,6 +8,8 @@
 #include "ip/GaborBankFrequency.h"
 #include "core/array_assert.h"
 
+#include <iostream>
+
 namespace tca = Torch::core::array;
 namespace ip = Torch::ip;
 
@@ -22,27 +24,44 @@ ip::GaborBankFrequency::GaborBankFrequency( const int height, const int width,
   m_fmax(fmax), m_orientation_full(orientation_full), m_k(k), m_p(p), 
   m_optimal_gamma_eta(optimal_gamma_eta),
   m_gamma(gamma), m_eta(eta), m_pf(pf), m_cancel_dc(cancel_dc),
-  m_use_envelope(use_envelope), m_output_in_frequency(output_in_frequency) 
+  m_use_envelope(use_envelope), m_output_in_frequency(output_in_frequency),
+  m_freqs(n_freq), m_orients(n_orient)
 {
   computeFilters();
 }
 
-ip::GaborBankFrequency::~GaborBankFrequency() { }
+ip::GaborBankFrequency::GaborBankFrequency(const GaborBankFrequency& other):
+  m_height(other.m_height), m_width(other.m_width), m_n_orient(other.m_n_orient), m_n_freq(other.m_n_freq),
+  m_fmax(other.m_fmax), m_orientation_full(other.m_orientation_full), m_k(other.m_k), m_p(other.m_p), 
+  m_optimal_gamma_eta(other.m_optimal_gamma_eta), m_gamma(other.m_gamma), m_eta(other.m_eta), 
+  m_pf(other.m_pf), m_cancel_dc(other.m_cancel_dc), m_use_envelope(other.m_use_envelope), 
+  m_output_in_frequency(other.m_output_in_frequency),
+  m_freqs(Torch::core::array::ccopy(other.m_freqs)),
+  m_orients(Torch::core::array::ccopy(other.m_orients))
+{
+  for(size_t i=0; i<other.m_filters.size(); ++i) {
+    boost::shared_ptr<ip::GaborFrequency> ptr(new ip::GaborFrequency(*(other.m_filters[i])) );
+    m_filters.push_back(ptr);
+  }
+}
+
+ip::GaborBankFrequency::~GaborBankFrequency() {
+}
 
 void ip::GaborBankFrequency::operator()( 
   const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,3>& dst)
 { 
-  // Check input
+  // Checks input
   tca::assertZeroBase(src);
 
-  // Check and resize dst if required 
+  // Checks output
   tca::assertZeroBase(dst);
   const blitz::TinyVector<int,3> shape(m_n_freq*m_n_orient, src.extent(0),
     src.extent(1));
   tca::assertSameShape(dst, shape);
 
-  // Filter using the filter bank
+  // Filters using the filter bank
   for( int i=0; i<m_n_freq*m_n_orient; ++i) {
     blitz::Array<std::complex<double>,2> dst_i = 
       dst( i, blitz::Range::all(), blitz::Range::all() );
@@ -67,23 +86,23 @@ void ip::GaborBankFrequency::computeOrients()
 
 void ip::GaborBankFrequency::computeFilters()
 {
-  // Compute the set of frequencies and orientations
+  // Computes the set of frequencies and orientations
   computeFreqs();
   computeOrients();
 
-  // Compute eta and gamma if required
+  // Computes eta and gamma if required
   if(m_optimal_gamma_eta)
     computeOptimalGammaEta();
 
-  // Erase previous filters if any
+  // Erases previous filters if any
   m_filters.clear();
 
-  // Filter using the filter bank
+  // Filters using the filter bank
   for( int i=0; i<m_n_freq*m_n_orient; ++i) {
     
     int f = i / m_n_orient;
     int o = i % m_n_orient;
-    boost::shared_ptr<ip::GaborFrequency> ptr( 
+    boost::shared_ptr<ip::GaborFrequency> ptr(
       new ip::GaborFrequency( m_height, m_width, m_freqs(f), m_orients(o), 
         m_gamma, m_eta, m_pf,  m_cancel_dc, m_use_envelope, 
         m_output_in_frequency) );
@@ -93,7 +112,7 @@ void ip::GaborBankFrequency::computeFilters()
 
 void ip::GaborBankFrequency::computeOptimalGammaEta()
 {
-  // Compute and set gamma and eta
+  // Computes and sets gamma and eta
   m_gamma =  ((m_k+1)/(m_k-1)) * sqrt(-log(m_p)) / M_PI;
   m_eta = 1. / ( tan( M_PI / ((m_orientation_full?1:2)*m_n_orient) ) *
                  sqrt(M_PI*M_PI/log(1./m_p) - 1./(m_gamma*m_gamma)) );
