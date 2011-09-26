@@ -32,8 +32,6 @@ References:
 
 import os
 import sys
-from ...io import Arrayset
-from ...core.array import array
 
 names = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 """Names of the features for each entry in the dataset."""
@@ -61,6 +59,8 @@ def data():
   of 64-bit floats and 50 entries. Each entry is an Array with 4
   features as described by "names". 
   """
+  from ...core.array import array
+  from ...io import Arrayset
   
   data = os.path.join(os.path.dirname(__file__), 'iris.data')
 

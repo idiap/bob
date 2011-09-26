@@ -106,8 +106,19 @@ include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(core "${pysrc}")
 torch_header_install(core-array-python core "torch::python::core")
-torch_python_submodule_bindings(core array "${pysrc_array}")
-add_dependencies(pytorch_core_array core-array-python_header_install)
+
+#torch_python_submodule_bindings(core array "${pysrc_array}")
+#add_dependencies(pytorch_core_array core-array-python_header_install)
+
+set(pysrc_array2 
+   "src/blitz_numpy.cc"
+   "src/TypeMapper.cc"
+   "src/main_array2.cc"
+   )
+
+torch_python_submodule_bindings(core array2 "${pysrc_array2}")
+add_dependencies(pytorch_core_array2 core-array-python_header_install)
+
 torch_python_submodule_bindings(core vector "${pysrc_vector}")
 torch_python_submodule_bindings(core mapstring "${pysrc_mapstring}")
 torch_python_submodule_bindings(core tuple "${pysrc_tuple}")

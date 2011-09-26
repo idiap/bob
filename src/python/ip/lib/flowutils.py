@@ -6,8 +6,6 @@
 """A few common utilities that are useful in Optical Flow studies.
 """
 
-from ..core.array import radius, atan2, float64_3, float32_3
-from . import hsv_to_rgb
 import math
 
 def flow2hsv(u, v):
@@ -28,6 +26,8 @@ def flow2hsv(u, v):
 
   Outputs a HSV image representation (float32_3).
   """
+  from ..core.array import radius, atan2, float64_3, float32_3
+  from . import hsv_to_rgb
   
   # polar coordinate conversion using blitz
   r = radius(u, v)
