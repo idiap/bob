@@ -112,8 +112,9 @@ const blitz::Array<double,2>& get_const_data() {
  * on the top of a numpy.ndarray and pass that to our C++ method.
  */
 
-object py_zeroes_2d(int rows, int cols, const tp::dtype& dtype=object()) {
-  switch(dtype.type()) {
+object py_zeroes_2d(int rows, int cols, object dtype=object()) {
+  tp::dtype dt(dtype);
+  switch(dt.type()) {
     case NPY_FLOAT32:
       return object(zeroes_2d<float>(rows, cols));
     case NPY_FLOAT64:
@@ -168,7 +169,7 @@ void bind_core_array_examples() {
    * Look at the implementation of py_zeroes_2d() above for more details. The
    * last parameter is optional.
    */
-  def("zeroes_2d", (object(*)(int,int,tp::dtype))0, py_zeroes_2d_overloads((arg("rows"), arg("cols"), arg("dtype")=object()), "Creates a 2d matrix filled with zeroes -- user can choose the data type by passing any valid numpy.dtype representation. By default, if dtype is not specified, used the numpy default (normally float64/double)."));
+  def("zeroes_2d", (object(*)(int,int,object))0, py_zeroes_2d_overloads((arg("rows"), arg("cols"), arg("dtype")=object()), "Creates a 2d matrix filled with zeroes -- user can choose the data type by passing any valid numpy.dtype representation. By default, if dtype is not specified, used the numpy default (normally float64/double)."));
 
   /**
    * To bind a method that returns a (newly allocated) blitz::Array<>, you

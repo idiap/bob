@@ -70,7 +70,7 @@ inline static PyArray_Descr* get_descr(int type) {
 inline static PyArrayObject* copy_ndarray(PyObject* any, PyArray_Descr* dt,
     int dims) { 
   return (PyArrayObject*)PyArray_FromAny(any, dt, dims, dims,
-#if NPY_VERSION > 0x01000009 /* > 1.6.1 */
+#if C_API_VERSION >= 6 /* NumPy C-API version > 1.6 */
       NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ALIGNED|NPY_ARRAY_ENSURECOPY
 #else
       NPY_C_CONTIGUOUS|NPY_ALIGNED|NPY_ENSURECOPY
@@ -80,7 +80,8 @@ inline static PyArrayObject* copy_ndarray(PyObject* any, PyArray_Descr* dt,
 
 inline static int check_array(PyObject* any, PyArray_Descr* req_dtype,
     int writeable, PyArray_Descr*& dtype, int& ndim, npy_intp* dims,
-    PyArrayObject* arr) {
+    PyArrayObject*& arr) {
+#if C_API_VERSION >= 6 /* NumPy C-API version < 1.6 */
   return PyArray_GetArrayParamsFromObject(
       any,   //input object pointer
       req_dtype, //requested dtype (if need to enforce)
@@ -91,6 +92,34 @@ inline static int check_array(PyObject* any, PyArray_Descr* req_dtype,
       &arr,     //if obj_ptr is ndarray, return it here
       NULL)      //context?
     ;
+#else
+  //well, in this case we have to implement the above manually.
+  //for sequence conversions, this will be a little more inefficient.
+  if (PyArray_Check(any)) {
+    PyArray_Descr* descr = PyArray_DESCR(any);
+    if (req_dtype) {
+      if (req_dtype->type_num == descr->type_num) {
+        arr = (PyArrayObject*)any;
+      }
+      else { //fill the other variables
+        dtype = descr;
+        ndim = ((PyArrayObject*)any)->nd;
+        for (int k=0; k<ndim; ++k) dims[k] = PyArray_DIM(any, k);
+      }
+    }
+    else { //the user has not requested a specific type, just return
+      arr = (PyArrayObject*)any;
+    }
+  }
+  else { //it is not an array -- try a conversion
+    PyArrayObject* tmp = copy_ndarray(any, 0, 0);
+    dtype = tmp->descr;
+    ndim = tmp->nd;
+    for (int k=0; k<ndim; ++k) dims[k] = PyArray_DIM(tmp, k);
+    Py_DECREF(tmp);
+  }
+  return 0;
+#endif
 }
 
 /**
@@ -233,7 +262,7 @@ template <typename T, int N> struct bz_from_npy {
     shape_type shape;
     for (int k=0; k<arrobj->nd; ++k) shape[k] = arrobj->dimensions[k];
     shape_type stride;
-    for (int k=0; k<arrobj->nd; ++k) stride[k] = (arrobj->strides[k] / 4);
+    for (int k=0; k<arrobj->nd; ++k) stride[k] = (arrobj->strides[k]/sizeof(T));
     new (storage) array_type((T*)arrobj->data, 
         shape, stride, blitz::neverDeleteData); //place operator
     data->convertible = storage;
@@ -267,7 +296,7 @@ template <typename T, int N> struct bz_to_npy {
     shape_type shape;
     for (int k=0; k<retval->nd; ++k) shape[k] = retval->dimensions[k];
     shape_type stride;
-    for (int k=0; k<retval->nd; ++k) stride[k] = retval->strides[k];
+    for (int k=0; k<retval->nd; ++k) stride[k] = (retval->strides[k]/sizeof(T));
     array_type bzdest((T*)retval->data, shape, stride, blitz::neverDeleteData);
     bzdest = tv;
 

@@ -75,17 +75,25 @@ namespace Torch { namespace python {
     }
 
     if (type_to_num<T>() != arr->descr->type_num) {
-      PYTHON_ERROR(TypeError, "input ndarray dtype mismatch");
+      PYTHON_ERROR(TypeError, "ndarray dtype mismatch");
     }
 
-    if (arr->descr->byteorder == '=') {
+    if (!PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE)) {
       PYTHON_ERROR(TypeError, "cannot digest non-native byte order");
+    }
+
+    if (!PyArray_ISWRITEABLE(arr)) {
+      PYTHON_ERROR(TypeError, "cannot apply blitz layer on const ndarray");
+    }
+
+    if (!PyArray_ISBEHAVED(arr)) {
+      PYTHON_ERROR(TypeError, "cannot apply blitz layer ndarray that does not behave (search for what this means with PyArray_ISBEHAVED)");
     }
     
     shape_type shape;
     for (int k=0; k<arr->nd; ++k) shape[k] = arr->dimensions[k];
     shape_type stride;
-    for (int k=0; k<arr->nd; ++k) stride[k] = (arr->strides[k] / 4);
+    for (int k=0; k<arr->nd; ++k) stride[k] = (arr->strides[k] / sizeof(T));
 
     //finally, we return the wrapper.
     return array_type((T*)arr->data, shape, stride, blitz::neverDeleteData);
