@@ -6,6 +6,10 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/python/numeric.hpp>
+#define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
+#include <numpy/arrayobject.h>
+#include <dlfcn.h>
 #include "core/array_type.h"
 
 using namespace boost::python;
@@ -13,6 +17,8 @@ using namespace boost::python;
 void bind_ndarray();
 void bind_core_array_tinyvector();
 void bind_core_array_range();
+void bind_core_bz_numpy();
+//void bind_core_array_examples(); ///< examples
 
 # define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
 # define BOOST_PP_LOCAL_MACRO(D) \
@@ -75,6 +81,27 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
 # endif
   bind_ndarray();
   scope().attr("__doc__") = "Torch core classes and sub-classes for array manipulation";
+  
+  // Gets the current dlopenflags and save it
+  PyThreadState *tstate = PyThreadState_GET();
+  if(!tstate)
+    throw std::runtime_error("Can not get python dlopenflags.");
+  int old_value = tstate->interp->dlopenflags;
+
+  // Unsets the RTLD_GLOBAL flag
+  tstate->interp->dlopenflags = old_value & (~RTLD_GLOBAL);
+  // Loads numpy with the RTLD_GLOBAL flag unset
+  import_array();
+  // Resets the RTLD_GLOBAL flag
+  tstate->interp->dlopenflags = old_value;
+
+  //Sets the boost::python::numeric::array interface to use numpy.ndarray
+  //as basis. This is not strictly required, but good to set as a baseline.
+  numeric::array::set_module_and_type("numpy", "ndarray");
+
+  bind_core_bz_numpy();
+  //bind_core_array_examples(); ///< examples
+
   bind_core_array_tinyvector();
   bind_core_array_range();
   
