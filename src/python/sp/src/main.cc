@@ -11,6 +11,7 @@ using namespace boost::python;
 
 void bind_sp_spcore();
 void bind_sp_convolution();
+void bind_sp_extrapolate();
 void bind_sp_fft_dct();
 
 BOOST_PYTHON_MODULE(libpytorch_sp) {
@@ -21,5 +22,6 @@ BOOST_PYTHON_MODULE(libpytorch_sp) {
   scope().attr("__doc__") = "Torch signal processing classes and sub-classes";
   bind_sp_spcore();
   bind_sp_convolution();
+  bind_sp_extrapolate();
   bind_sp_fft_dct();
 }
