@@ -1,5 +1,5 @@
 from libpytorch_core import *
-import libpytorch_core_array2 as __hidden_array_api__
+import libpytorch_core_array2 as array
 #from . import array
 from . import mapstring
 from . import vector

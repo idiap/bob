@@ -112,7 +112,8 @@ torch_header_install(core-array-python core "torch::python::core")
 
 set(pysrc_array2 
    "src/blitz_numpy.cc"
-   "src/TypeMapper.cc"
+   "src/bzhelper.cc"
+   "src/array_wrapper_example.cc"
    "src/main_array2.cc"
    )
 

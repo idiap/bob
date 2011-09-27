@@ -6,10 +6,9 @@
  */
 
 #include <boost/python.hpp>
-#include <boost/python/numeric.hpp>
 #define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
+#define NO_IMPORT_ARRAY
 #include <numpy/arrayobject.h>
-#include <dlfcn.h>
 
 #include <blitz/array.h>
 #include <stdint.h>
@@ -17,12 +16,11 @@
 #include <boost/preprocessor.hpp>
 
 #include "core/array_type.h"
-#include "core/python/exception.h"
-#include "core/python/TypeMapper.h"
+#include "core/python/bzhelper.h"
 
 namespace bp = boost::python;
 namespace tp = Torch::python;
-
+      
 template<typename T, int N>
 void npy_copy_cast(blitz::Array<T,N>& bz, PyArrayObject* arrobj) {
   PYTHON_ERROR(TypeError, "Unsupported number of dimensions"); 
@@ -59,6 +57,43 @@ static void npy_copy_cast(blitz::Array<T,4>& bz, PyArrayObject* arrobj) {
 }
 
 /**
+ * Warning isolation
+ */
+inline static PyArrayObject* make_ndarray(int nd, npy_intp* dims, int type) {
+  return (PyArrayObject*)PyArray_SimpleNew(nd, dims, type);
+}
+
+inline static PyArray_Descr* get_descr(int type) {
+  return PyArray_DescrFromType(type);
+}
+
+inline static PyArrayObject* copy_ndarray(PyObject* any, PyArray_Descr* dt,
+    int dims) { 
+  return (PyArrayObject*)PyArray_FromAny(any, dt, dims, dims,
+#if NPY_VERSION > 0x01000009 /* > 1.6.1 */
+      NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ALIGNED|NPY_ARRAY_ENSURECOPY
+#else
+      NPY_C_CONTIGUOUS|NPY_ALIGNED|NPY_ENSURECOPY
+#endif
+  ,0);
+}
+
+inline static int check_array(PyObject* any, PyArray_Descr* req_dtype,
+    int writeable, PyArray_Descr*& dtype, int& ndim, npy_intp* dims,
+    PyArrayObject* arr) {
+  return PyArray_GetArrayParamsFromObject(
+      any,   //input object pointer
+      req_dtype, //requested dtype (if need to enforce)
+      0,         //writeable?
+      &dtype,    //dtype assessment
+      &ndim,     //assessed number of dimensions
+      dims,     //assessed shape
+      &arr,     //if obj_ptr is ndarray, return it here
+      NULL)      //context?
+    ;
+}
+
+/**
  * Objects of this type create a binding between blitz::Array<T,N> and
  * NumPy arrays. You can specify a NumPy array as a parameter to a
  * bound method that would normally receive a blitz::Array<T,N> or a const
@@ -89,15 +124,59 @@ template <typename T, int N> struct bz_from_npy {
    * a Array<T,N>
    */
   static void* convertible(PyObject* obj_ptr) {
-    if (!PyArray_Check(obj_ptr)) return 0; //has to be a numpy.ndarray
-    PyArrayObject* arrobj = reinterpret_cast<PyArrayObject*>(obj_ptr);
-    if (arrobj->nd == N     //has to have the number of dimensions == N
-        && tp::TYPEMAP.type_to_enum<T>() == arrobj->descr->type_num //good type
-        && arrobj->descr->byteorder == '=' //native byte order only accepted!
-        ) {
-      return obj_ptr;
+    
+    PyArrayObject *arr = NULL;
+    PyArray_Descr *dtype = NULL;
+    int ndim = 0;
+    npy_intp dims[NPY_MAXDIMS];
+
+    /**
+     * double-checks object "obj_ptr" for convertibility using NumPy's
+     * facilities. Returns non-zero if fails. 
+     *
+     * Two scenarios:
+     *
+     * 1) "arr" is filled, other parameters are untouched. Means the input
+     * object is already an array of the said type. To support overloading from
+     * C++ properly, if the given object is already an numpy.ndarray, then we
+     * require a perfect matching. Otherwise, we would not be able to control
+     * which of the overloaded instances would be called as that is determined
+     * by the overloading mechanism built into boost::python.
+     *
+     * 2) "arr" is not filled, but input object is convertible with the
+     * required specifications.
+     */
+    if (check_array(obj_ptr, 0, 0, dtype, ndim, dims, arr) != 0) {
+      return 0;
     }
-    return 0;
+
+    if (arr) { //check arr parameters -- only a perfect match will be accepted!
+      if (arr->nd == N     //has to have the number of dimensions == N
+          && tp::type_to_num<T>() == arr->descr->type_num //good type
+          && arr->descr->byteorder == '=' //native byte order only accepted!
+         ) {
+        return obj_ptr;
+      }
+    }
+
+    else { //it is not a native array, see if a cast would work...
+
+      //"dry-run" cast
+      PyArray_Descr* req_dtype = get_descr(tp::type_to_num<T>());
+      if (check_array(obj_ptr, req_dtype, 0, dtype, ndim, dims, arr) != 0) {
+        return 0;
+      }
+
+      //check dimensions and byteorder
+      if (ndim == N     //has to have the number of dimensions == N
+          && dtype->byteorder == '=' //native byte order only accepted!
+         ) {
+        return obj_ptr;
+      }
+
+    }
+
+    return 0; //cannot be converted, if you get to this point...
   }
 
   /**
@@ -111,35 +190,63 @@ template <typename T, int N> struct bz_from_npy {
     //black-magic required to setup the blitz::Array<> storage area
     void* storage = ((boost::python::converter::rvalue_from_python_storage<array_type>*)data)->storage.bytes;
 
-    //now we proceed to the conversion.
+    //now we proceed to the conversion -- take a look at the scenarios above
+
+    //conversion happens in the most efficient way possible.
+    PyArrayObject *arr = NULL;
+    PyArray_Descr* req_dtype = get_descr(tp::type_to_num<T>());
+    PyArray_Descr *dtype = NULL;
+    int ndim = 0;
+    npy_intp dims[NPY_MAXDIMS];
 
     /**
-     * We need to tackle the following only use-case:
-     *    The NumPy array type T is the right type for the conversion, in which
-     *    case we just take a pointer to the data and instantiate a
-     *    blitz::Array<T,N> out of that
+     * double-checks object "obj_ptr" for convertibility using NumPy's
+     * facilities. Returns non-zero if fails. 
      *
-     * We cannot support automatic casting because this will not work well with
-     * overloaded methods. The user has to cast manually
+     * Two scenarios:
+     *
+     * 1) "arr" is filled, other parameters are untouched. Means the input
+     * object is already an array of the said type. To support overloading from
+     * C++ properly, if the given object is already an numpy.ndarray, then we
+     * require a perfect matching. Otherwise, we would not be able to control
+     * which of the overloaded instances would be called as that is determined
+     * by the overloading mechanism built into boost::python.
+     *
+     * 2) "arr" is not filled, but input object is convertible with the
+     * required specifications.
      */
-    PyArrayObject* arrobj = reinterpret_cast<PyArrayObject*>(obj_ptr);
+    if (check_array(obj_ptr, req_dtype, 0, dtype, ndim, dims, arr) != 0) {
+      //this should never happen as the object has already been checked
+      PYTHON_ERROR(TypeError, "object cannot be converted to blitz::Array");
+    }
+
+    PyArrayObject* arrobj; ///< holds our ndarray
+
+    if (arr) { //perfect match, just grab the memory area -- fastest option
+      arrobj = reinterpret_cast<PyArrayObject*>(obj_ptr);
+    }
+    else { //needs copying
+      arrobj = copy_ndarray(obj_ptr, req_dtype, N);
+    }
+
+    //mounts the numpy memory at the newly allocated blitz::Array
     shape_type shape;
     for (int k=0; k<arrobj->nd; ++k) shape[k] = arrobj->dimensions[k];
-
-    //perfect match, just grab the memory area -- fastest option
     shape_type stride;
     for (int k=0; k<arrobj->nd; ++k) stride[k] = (arrobj->strides[k] / 4);
     new (storage) array_type((T*)arrobj->data, 
         shape, stride, blitz::neverDeleteData); //place operator
     data->convertible = storage;
 
+    if (!arr) {
+      //dismisses the ndarray object if we created a copy...
+      arrobj->flags &= ~NPY_OWNDATA;
+      Py_DECREF(arrobj);
+    }
+
   }
 
 };
-
-PyArrayObject* make_ndarray(int nd, npy_intp* dims, int type) {
-  return (PyArrayObject*)PyArray_SimpleNew(nd, dims, type);
-}
 
 /**
  * Objects of this type bind blitz::Array<T,N> to numpy arrays. Your method
@@ -154,7 +261,7 @@ template <typename T, int N> struct bz_to_npy {
   static PyObject* convert(const array_type& tv) {
     npy_intp dims[N];
     for (int i=0; i<N; ++i) dims[i] = tv.extent(i);
-    PyArrayObject* retval = make_ndarray(N, dims, tp::TYPEMAP.type_to_enum<T>());
+    PyArrayObject* retval = make_ndarray(N, dims, tp::type_to_num<T>());
 
     //wrap new PyArray in a blitz layer and then copy the data
     shape_type shape;
@@ -181,23 +288,6 @@ void register_bz_to_npy() {
 }
 
 void bind_core_bz_numpy () {
-  // Gets the current dlopenflags and save it
-  PyThreadState *tstate = PyThreadState_GET();
-  if(!tstate)
-    throw std::runtime_error("Can not get python dlopenflags.");
-  int old_value = tstate->interp->dlopenflags;
-
-  // Unsets the RTLD_GLOBAL flag
-  tstate->interp->dlopenflags = old_value & (~RTLD_GLOBAL);
-  // Loads numpy with the RTLD_GLOBAL flag unset
-  import_array();
-  // Resets the RTLD_GLOBAL flag
-  tstate->interp->dlopenflags = old_value;
-
-  //Sets the boost::python::numeric::array interface to use numpy.ndarray
-  //as basis. This is not strictly required, but good to set as a baseline.
-  bp::numeric::array::set_module_and_type("numpy", "ndarray");
-
   /**
    * The following struct constructors will make sure we can input
    * blitz::Array<T,N> in our bound C++ routines w/o needing to specify
