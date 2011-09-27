@@ -22,6 +22,9 @@ namespace Torch {
    */
   namespace sp {
 
+    /**
+      * @brief Extrapolates a 1D array, padding with a constant
+      */
     template<typename T>
     void extrapolateConstant(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst, 
       const T value)
@@ -43,6 +46,36 @@ namespace Torch {
       dst_slice = src;
     }
 
+    /**
+      * @brief Extrapolates a 2D array, padding with a constant
+      */
+    template<typename T>
+    void extrapolateConstant(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst, 
+      const T value)
+    {
+      // Checks zero base
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+
+      if(src.extent(0) > dst.extent(0) || src.extent(1) > dst.extent(1))
+        throw Torch::core::Exception();
+
+      // Sets value everywhere
+      dst = value;
+      // Computes offsets and ranges
+      int offset_y = (dst.extent(0) - src.extent(0)) / 2;
+      int offset_x = (dst.extent(1) - src.extent(1)) / 2;
+      blitz::Range dst_range_y(offset_y, offset_y+src.extent(0)-1);
+      blitz::Range dst_range_x(offset_x, offset_x+src.extent(1)-1);
+      blitz::Array<T,2> dst_slice = dst(dst_range_y,dst_range_x);
+      // Copies data from src array
+      dst_slice = src;
+    }
+
+
+    /**
+      * @brief Extrapolates a 1D array, using zero padding
+      */
     template<typename T>
     void extrapolateZero(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
@@ -51,6 +84,21 @@ namespace Torch {
       Torch::sp::extrapolateConstant(src, dst, zero);
     }
 
+    /**
+      * @brief Extrapolates a 2D array, using zero padding
+      */
+    template<typename T>
+    void extrapolateZero(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
+    {
+      // Calls extrapolate with the constant set to 0
+      T zero = 0;
+      Torch::sp::extrapolateConstant(src, dst, zero);
+    }
+
+
+    /**
+      * @brief Extrapolates a 1D array, using nearest neighbour
+      */
     template<typename T>
     void extrapolateNearest(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
@@ -58,26 +106,35 @@ namespace Torch {
       Torch::core::array::assertZeroBase(src);
       Torch::core::array::assertZeroBase(dst);
 
-      // Determines boundary values
-      T left = src(src.lbound(0));
-      T right = src(src.ubound(0));
       // Computes offsets
-      int l_offset = (dst.extent(0) - src.extent(0)) / 2;
-      int r_offset = l_offset + src.extent(0); 
-      // Sets left values
-      blitz::Range dst_range_l(0, l_offset-1);
-      blitz::Array<T,1> dst_slice_l = dst(dst_range_l);
-      dst_slice_l = left;
-      // Sets middle values
-      blitz::Range dst_range_m(l_offset, r_offset-1);
-      blitz::Array<T,1> dst_slice_m = dst(dst_range_m);
-      dst_slice_m = src;
-      // Sets right values
-      blitz::Range dst_range_r(r_offset, dst.extent(0)-1);
-      blitz::Array<T,1> dst_slice_r = dst(dst_range_r);
-      dst_slice_r = right;
+      int offset = (dst.extent(0) - src.extent(0)) / 2;
+      for(int i=0; i<dst.extent(0); ++i)
+        dst(i) = src( Torch::core::array::keepInRange(i-offset, 0, src.extent(0)-1));
     }
 
+    /**
+      * @brief Extrapolates a 2D array, using nearest neighbour
+      */
+    template<typename T>
+    void extrapolateNearest(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
+    {
+      // Checks zero base
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+
+      // Computes offsets
+      int offset_y = (dst.extent(0) - src.extent(0)) / 2;
+      int offset_x = (dst.extent(1) - src.extent(1)) / 2;
+      for(int j=0; j<dst.extent(0); ++j)
+        for(int i=0; i<dst.extent(1); ++i)
+          dst(j,i) = src( Torch::core::array::keepInRange(j-offset_y, 0, src.extent(0)-1),
+                          Torch::core::array::keepInRange(i-offset_x, 0, src.extent(1)-1));
+    }
+    
+
+    /**
+      * @brief Extrapolates a 1D array, using circular extrapolation
+      */
     template<typename T>
     void extrapolateCircular(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
@@ -85,22 +142,39 @@ namespace Torch {
       Torch::core::array::assertZeroBase(src);
       Torch::core::array::assertZeroBase(dst);
 
-      // Computes offsets
-      int l_offset = (dst.extent(0) - src.extent(0)) / 2;
-      int r_offset = l_offset + src.extent(0);
+      // Computes offset
+      int offset = (dst.extent(0) - src.extent(0)) / 2;
       // Sets left values
       int s = src.extent(0);
-      for(int i=0; i<l_offset; ++i)
-        dst(i) = src( ((i-l_offset % s) + s) % s );
-      // Sets middle values
-      blitz::Range dst_range_m(l_offset, r_offset-1);
-      blitz::Array<T,1> dst_slice_m = dst(dst_range_m);
-      dst_slice_m = src;
-      // Sets right values
-      for(int i=r_offset; i<dst.extent(0); ++i)
-        dst(i) = src( ((i-r_offset % s) + s) % s );
+      for(int i=0; i<dst.extent(0); ++i)
+        dst(i) = src( ((i-offset % s) + s) % s );
     }
 
+    /**
+      * @brief Extrapolates a 2D array, using circular extrapolation
+      */
+    template<typename T>
+    void extrapolateCircular(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
+    {
+      // Checks zero base
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+
+      // Computes offset
+      int offset_y = (dst.extent(0) - src.extent(0)) / 2;
+      int offset_x = (dst.extent(1) - src.extent(1)) / 2;
+      // Sets values
+      int s_y = src.extent(0);
+      int s_x = src.extent(1);
+      for(int j=0; j<dst.extent(0); ++j)
+        for(int i=0; i<dst.extent(1); ++i)
+          dst(j,i) = src( ((j-offset_y % s_y) + s_y) % s_y, ((i-offset_x % s_x) + s_x) % s_x );
+    }
+
+
+    /**
+      * @brief Extrapolates a 1D array, using mirroring
+      */
     template<typename T>
     void extrapolateMirror(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
     {
@@ -109,21 +183,33 @@ namespace Torch {
       Torch::core::array::assertZeroBase(dst);
 
       // Computes offsets
-      int l_offset = (dst.extent(0) - src.extent(0)) / 2;
-      int r_offset = l_offset + src.extent(0); 
+      int offset = (dst.extent(0) - src.extent(0)) / 2;
 
       // Sets left values
-      for(int i=0; i<l_offset; ++i)
-        dst(i) = src( Torch::core::array::mirrorInRange(i-l_offset, 0, src.extent(0)-1));
-      // Sets middle values
-      blitz::Range dst_range_m(l_offset, r_offset-1);
-      blitz::Array<T,1> dst_slice_m = dst(dst_range_m);
-      dst_slice_m = src;
-      // Sets right values
-      for(int i=r_offset; i<dst.extent(0); ++i)
-        dst(i) = src( Torch::core::array::mirrorInRange(i-l_offset, 0, src.extent(0)-1));
+      for(int i=0; i<dst.extent(0); ++i)
+        dst(i) = src( Torch::core::array::mirrorInRange(i-offset, 0, src.extent(0)-1));
     }
- 
+
+    /**
+      * @brief Extrapolates a 2D array, using mirroring
+      */
+    template<typename T>
+    void extrapolateMirror(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
+    {
+      // Checks zero base
+      Torch::core::array::assertZeroBase(src);
+      Torch::core::array::assertZeroBase(dst);
+
+      // Computes offsets
+      int offset_y = (dst.extent(0) - src.extent(0)) / 2;
+      int offset_x = (dst.extent(1) - src.extent(1)) / 2;
+
+      // Sets left values
+      for(int j=0; j<dst.extent(0); ++j)
+        for(int i=0; i<dst.extent(0); ++i)
+          dst(j,i) = src( Torch::core::array::mirrorInRange(j-offset_y, 0, src.extent(0)-1),
+                          Torch::core::array::mirrorInRange(i-offset_x, 0, src.extent(1)-1));
+    }
  
   }
 /**

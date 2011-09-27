@@ -15,7 +15,12 @@ using namespace boost::python;
   def("extrapolateZero", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&Torch::sp::extrapolateZero<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with zeros, given a 1D input array."); \
   def("extrapolateNearest", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&Torch::sp::extrapolateNearest<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with nearest values, given a 1D input array."); \
   def("extrapolateCircular", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&Torch::sp::extrapolateCircular<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using circular extrapolation, given a 1D input array."); \
-  def("extrapolateMirror", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&Torch::sp::extrapolateMirror<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using mirroring, given a 1D input array.");
+  def("extrapolateMirror", (void (*)(const blitz::Array<T,1>&, blitz::Array<T,1>&))&Torch::sp::extrapolateMirror<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using mirroring, given a 1D input array."); \
+  def("extrapolateConstant", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const T))&Torch::sp::extrapolateConstant<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array with a constant, given a 2D input array."); \
+  def("extrapolateZero", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::sp::extrapolateZero<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array with zeros, given a 2D input array."); \
+  def("extrapolateNearest", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::sp::extrapolateNearest<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array with nearest values, given a 2D input array."); \
+  def("extrapolateCircular", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::sp::extrapolateCircular<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array using circular extrapolation, given a 2D input array."); \
+  def("extrapolateMirror", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::sp::extrapolateMirror<T>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array using mirroring, given a 2D input array.");
 
 void bind_sp_extrapolate()
 {
