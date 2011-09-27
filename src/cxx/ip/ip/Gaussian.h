@@ -36,19 +36,19 @@ namespace Torch {
 		  	 * @param border_opt The interpolation type for the convolution
 			   */
 	  		Gaussian(const int radius_y=1, const int radius_x=1, 
-            const double sigma=5.,
+            const double sigma_y=5., const double sigma_x=5.,
             const enum Torch::sp::Convolution::SizeOption size_opt =
               Torch::sp::Convolution::Same,
             const enum Torch::sp::Convolution::BorderOption border_opt =
               Torch::sp::Convolution::Mirror):
-          m_radius_y(radius_y), m_radius_x(radius_x), m_sigma(sigma),
-          m_conv_size(size_opt), m_conv_border(border_opt)
+          m_radius_y(radius_y), m_radius_x(radius_x), m_sigma_y(sigma_y),
+          m_sigma_x(sigma_x), m_conv_size(size_opt), m_conv_border(border_opt)
   			{
           computeKernel();
         }
 
         void reset( const int radius_y=1, const int radius_x=1,
-          const double sigma=5.,
+          const double sigma_y=5., const double sigma_x=5.,
           const enum Torch::sp::Convolution::SizeOption size_opt =
             Torch::sp::Convolution::Same,
           const enum Torch::sp::Convolution::BorderOption border_opt =
@@ -80,11 +80,15 @@ namespace Torch {
          */	
         int m_radius_y;
         int m_radius_x;
-        double m_sigma;
+        double m_sigma_y;
+        double m_sigma_x;
         enum Torch::sp::Convolution::SizeOption m_conv_size;
         enum Torch::sp::Convolution::BorderOption m_conv_border;
 
-        blitz::Array<double, 2> m_kernel;
+        blitz::Array<double, 1> m_kernel_y;
+        blitz::Array<double, 1> m_kernel_x;
+
+        blitz::Array<double, 2> m_tmp_int;
     };
 
     // Declare template method full specialization
@@ -96,8 +100,12 @@ namespace Torch {
     void Torch::ip::Gaussian::operator()(const blitz::Array<T,2>& src, 
       blitz::Array<double,2>& dst)
     {
+      blitz::Array<double,2> src_d = Torch::core::cast<double>(src);
+      m_tmp_int.resize(Torch::sp::getConvolveSepOutputSize(src_d, m_kernel_y, 0, m_conv_size));
       // Checks are postponed to the convolution function.
-      Torch::sp::convolve(Torch::core::cast<double>(src), m_kernel, dst, 
+      Torch::sp::convolveSep(src_d, m_kernel_y, m_tmp_int, 0,
+        m_conv_size, m_conv_border);
+      Torch::sp::convolveSep(m_tmp_int, m_kernel_x, dst, 1,
         m_conv_size, m_conv_border);
     }
 
