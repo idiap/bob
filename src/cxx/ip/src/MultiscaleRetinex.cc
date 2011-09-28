@@ -18,7 +18,7 @@ void ip::MultiscaleRetinex::computeKernels()
     // sigma of the kernel
     double s_sigma = m_sigma * s_size / m_size_min;
     // Initialize the Gaussian
-    m_gaussians[s].reset(s_size, s_size, s_sigma, 
+    m_gaussians[s].reset(s_size, s_size, s_sigma, s_sigma, 
       Torch::sp::Convolution::Same, m_conv_border);
   }
 }
