@@ -15,8 +15,6 @@
 #include "sp/convolution.h"
 #include "ip/Exception.h"
 
-#include <iostream>
-
 namespace Torch {
 
 	/**
@@ -42,8 +40,7 @@ namespace Torch {
       {
         typename std::list<boost::shared_ptr<Pixel<T> > >::iterator it=l.begin();
         for( ; it!=l.end(); ++it)
-          if( p->value > (*it)->value)
-            break;
+          if( p->value > (*it)->value) break;
         l.insert(it, p);
       }
 
@@ -55,7 +52,6 @@ namespace Torch {
         int c=0;
         for( ; it!=l.end(); ++it, ++c)
           if( c==pos) return (*it)->value;
-        Torch::core::info << "Unable to find value at the given position" << std::endl;
         throw Torch::ip::Exception();
       }
     
@@ -89,6 +85,10 @@ namespace Torch {
   			{
         }
 
+        virtual ~Median() 
+        {
+        }
+
         /**
           * @brief Resets the filter with different radius
           */
@@ -115,6 +115,8 @@ namespace Torch {
         void operator()(const blitz::Array<T,3>& src, 
           blitz::Array<T,3>& dst);
 
+
+      private:
         /**
           * @brief Initializes the ordered lists of values
           */
@@ -129,7 +131,6 @@ namespace Torch {
                 const blitz::Array<T,2>& src, 
                 std::list<boost::shared_ptr<struct detail::Pixel<T> > >& l);
 
-      private:
         /**
          * @brief Attributes
          */	
@@ -246,7 +247,7 @@ namespace Torch {
           dst( p, blitz::Range::all(), blitz::Range::all() );
         
         // Apply median filter to the plane
-        this(src_slice, dst_slice);
+        operator()(src_slice, dst_slice);
       }
     }
 

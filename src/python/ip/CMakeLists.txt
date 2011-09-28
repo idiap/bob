@@ -19,6 +19,7 @@ set(pysrc
    "src/flow.cc"
    "src/DCTFeatures.cc"
    "src/gaussian.cc"
+   "src/Median.cc"
    "src/Gabor.cc"
    "src/GeomNorm.cc"
    "src/FaceEyesNorm.cc"
