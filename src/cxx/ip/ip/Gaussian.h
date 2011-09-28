@@ -2,7 +2,7 @@
  * @file src/cxx/ip/ip/Gaussian.h
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
  *
- * @brief This file provides a smooth an image with a Gaussian kernel
+ * @brief This file provides a class to smooth an image with a Gaussian kernel
  */
 
 #ifndef TORCH5SPRO_GAUSSIAN_H
