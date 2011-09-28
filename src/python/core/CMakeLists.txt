@@ -17,7 +17,6 @@ set(pysrc
 
 set(pysrc_array
    "src/TypeMapper.cc"
-   "src/ndarray.cc"
    "src/tinyvector.cc"
    "src/range.cc"
    )

@@ -6,12 +6,17 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/python/numeric.hpp>
+#define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
+#define NO_IMPORT_ARRAY
+#include <numpy/arrayobject.h>
+
 #include <boost/format.hpp>
-#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "core/python/array_base.h"
 #include "core/python/blitz_extra.h"
-#include "core/python/ndarray.h"
+#include "core/python/bzhelper.h"
 
 namespace tp = Torch::python;
 namespace bp = boost::python;
@@ -74,9 +79,45 @@ iterable_to_blitz_c (bp::object o, const blitz::TinyVector<int,N>& shape) {
   return iterable_to_blitz<T,N>(o, shape, blitz::GeneralArrayStorage<N>());
 }
 
-template <typename T, int N> static boost::shared_ptr<blitz::Array<T,N> > 
-make_blitz(const bp::ndarray& array) {
-  return array.to_blitz<T,N>();
+inline static PyArrayObject* copy_ndarray(PyObject* any, PyArray_Descr* dt,
+    int dims) { 
+  return (PyArrayObject*)PyArray_FromAny(any, dt, dims, dims,
+#if C_API_VERSION >= 6 /* NumPy C-API version > 1.6 */
+      NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ALIGNED|NPY_ARRAY_ENSURECOPY
+#else
+      NPY_C_CONTIGUOUS|NPY_ALIGNED|NPY_ENSURECOPY
+#endif
+  ,0);
+}
+
+inline static PyArray_Descr* get_descr(int type) {
+  return PyArray_DescrFromType(type);
+}
+
+template <typename T, int N> 
+static boost::shared_ptr<blitz::Array<T,N> > make_blitz(const bp::numeric::array& ndarr) {
+
+  typedef typename blitz::Array<T,N> array_type;
+  typedef typename blitz::TinyVector<int,N> shape_type;
+
+  PyArray_Descr* dt = get_descr(tp::type_to_num<T>());
+
+  //builds a new object by copying the data from the python object
+  PyArrayObject* arr = copy_ndarray(ndarr.ptr(), dt, N);
+  
+  //copies properties
+  shape_type shape;
+  for (int k=0; k<arr->nd; ++k) shape[k] = arr->dimensions[k];
+  shape_type stride;
+  for (int k=0; k<arr->nd; ++k) stride[k] = (arr->strides[k]/sizeof(T));
+  boost::shared_ptr<array_type> retval(new array_type((T*)arr->data, shape, 
+        stride, blitz::deleteDataWhenDone));
+
+  //dismisses the newly created array - we only need the data pointer
+  arr->flags &= ~NPY_OWNDATA;
+  Py_DECREF(arr);
+
+  return retval;
 }
 
 /**

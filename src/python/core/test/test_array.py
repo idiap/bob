@@ -698,21 +698,21 @@ class ArrayTest(unittest.TestCase):
     # dimensions. This is the exact equivalent of the C++ declaration
     # blitz::Array<float, 3>.
 
-    # And we can convert back using the "as_ndarray()" call available in every
+    # And we can convert back using numpy.array() call available in every
     # torch array bound to python. In this example, converting back should just
     # give us the exact same array as before (minus the element types inside).
     #
     # WARNING: Please note that casting to/from numpy is a constly operation
     # that incurs in data copying. This is done to achieve some level of
     # independence between torch and numpy.
-    np_array_2 = t5_array.as_ndarray()
+    np_array_2 = numpy.array(t5_array)
     for i in range(t5_array.extent(torch.core.array.firstDim)):
       for j in range(t5_array.extent(torch.core.array.secondDim)):
         self.assertEqual(np_array[i,j], np_array_2[i,j]) #despite the cast!
 
     # You can also cast to a different numpy array subtype. The next example
     # demonstrates how you can cast types around.
-    np_array_complex = t5_array.as_ndarray(torch.core.array.NPY_TYPES.NPY_CDOUBLE)
+    np_array_complex = numpy.array(t5_array).astype('complex128')
     t5_complex = torch.core.array.complex128_2(np_array_complex)
 
     self.assertTrue(isinstance(t5_complex[0,0], complex))

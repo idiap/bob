@@ -26,7 +26,7 @@ class StatsTest(unittest.TestCase):
 
     # Do the same with numpy and compare. Note that with numpy we are computing
     # the covariance matrix which is the scatter matrix divided by (N-1).
-    K = torch.core.array.array(numpy.cov(self.data.as_ndarray()))
+    K = torch.core.array.array(numpy.cov(self.data))
     self.assertTrue( (abs(S-K) < 1e-10).all() )
 
 if __name__ == '__main__':

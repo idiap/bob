@@ -6,26 +6,45 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/python/numeric.hpp>
+#define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
+#define NO_IMPORT_ARRAY
+#include <numpy/arrayobject.h>
 #include <boost/format.hpp>
 #include <blitz/array.h>
 
 #include "core/cast.h"
+#include "core/python/bzhelper.h"
 #include "core/python/array_base.h"
 #include "core/python/blitz_extra.h"
-#include "core/python/ndarray.h"
 
 namespace tp = Torch::python;
 namespace bp = boost::python;
 namespace tca = Torch::core::array;
 
-template <typename T, int N> static
-bp::ndarray make_ndarray(const blitz::Array<T,N>& bzarray) {
-  return bp::ndarray(bzarray);
+inline static PyArrayObject* make_new_array(int nd, npy_intp* dims, int type) {
+  return (PyArrayObject*)PyArray_SimpleNew(nd, dims, type);
 }
 
 template <typename T, int N> static
-bp::ndarray cast_ndarray(const blitz::Array<T,N>& bzarray, NPY_TYPES cast_to) {
-  return bp::ndarray(bzarray, cast_to);
+PyObject* make_ndarray(const blitz::Array<T,N>& tv) {
+
+  typedef typename blitz::Array<T,N> array_type;
+  typedef typename blitz::TinyVector<int,N> shape_type;
+
+  npy_intp dims[N];
+  for (int i=0; i<N; ++i) dims[i] = tv.extent(i);
+  PyArrayObject* retval = make_new_array(N, dims, tp::type_to_num<T>());
+
+  //wrap new PyArray in a blitz layer and then copy the data
+  shape_type shape;
+  for (int k=0; k<retval->nd; ++k) shape[k] = retval->dimensions[k];
+  shape_type stride;
+  for (int k=0; k<retval->nd; ++k) stride[k] = (retval->strides[k]/sizeof(T));
+  array_type bzdest((T*)retval->data, shape, stride, blitz::neverDeleteData);
+  bzdest = tv;
+
+  return reinterpret_cast<PyObject*>(retval);
 }
 
 /**
@@ -82,7 +101,6 @@ bp::object cast(blitz::Array<T,N>& array, const char* eltype_string) {
 template <typename T, int N> static void bind_cast (tp::array<T,N>& array) {
   array.object()->def("as_ndarray", &make_ndarray<T,N>, (bp::arg("self")), "Creates a copy of this array as a NumPy Array with the same dimensions and storage type");
   array.object()->def("__array__", &make_ndarray<T,N>, (bp::arg("self")), "Creates a copy of this array as a NumPy Array with the same dimensions and storage type");
-  array.object()->def("as_ndarray", &cast_ndarray<T,N>, (bp::arg("self"), bp::arg("cast_to")), "Creates a copy of this array as a NumPy Array with the same dimensions, but casts the storage type to the (numpy) type defined");
   array.object()->def("cast", &cast<T,N>, (bp::arg("self"), bp::arg("cast_to")), "Creates a copy of this array as another blitz::Array<> with different element type. The cast_to parameter should be picked from one of the allowed values for Torch blitz Arrays");
 }
 

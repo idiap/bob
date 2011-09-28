@@ -69,13 +69,15 @@ inline static PyArray_Descr* get_descr(int type) {
 
 inline static PyArrayObject* copy_ndarray(PyObject* any, PyArray_Descr* dt,
     int dims) { 
-  return (PyArrayObject*)PyArray_FromAny(any, dt, dims, dims,
+  PyArrayObject* retval = (PyArrayObject*)PyArray_FromAny(any, dt, dims, dims,
 #if C_API_VERSION >= 6 /* NumPy C-API version > 1.6 */
       NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ALIGNED|NPY_ARRAY_ENSURECOPY
 #else
       NPY_C_CONTIGUOUS|NPY_ALIGNED|NPY_ENSURECOPY
 #endif
   ,0);
+  if (!retval) bp::throw_error_already_set();
+  return retval;
 }
 
 inline static int check_array(PyObject* any, PyArray_Descr* req_dtype,

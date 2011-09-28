@@ -14,7 +14,6 @@
 
 using namespace boost::python;
 
-void bind_ndarray();
 void bind_core_array_tinyvector();
 void bind_core_array_range();
 void bind_core_bz_numpy();
@@ -79,7 +78,6 @@ BOOST_PYTHON_MODULE(libpytorch_core_array) {
 # if !defined(TORCH_DEBUG)
   docopt.disable_cpp_signatures();
 # endif
-  bind_ndarray();
   scope().attr("__doc__") = "Torch core classes and sub-classes for array manipulation";
   
   // Gets the current dlopenflags and save it

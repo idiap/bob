@@ -8,6 +8,7 @@ import os, sys
 import unittest
 import torch
 import random
+import numpy
 
 def loadGMM():
   gmm = torch.machine.GMMMachine(2, 2)
@@ -29,7 +30,7 @@ def equals(x, y, epsilon):
 
 def flipRows(array):
   if type(array).__name__ == 'float64_2':
-    return torch.core.array.array([array[1, :].as_ndarray(), array[0, :].as_ndarray()], 'float64')
+    return torch.core.array.array([numpy.array(array[1, :]), numpy.array(array[0, :])], 'float64')
   elif type(array).__name__ == 'float64_1':
     return torch.core.array.array([array[1], array[0]], 'float64')
   else:

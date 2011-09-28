@@ -64,6 +64,7 @@ class DataShufferTest(unittest.TestCase):
 
     # Finally, we also test if the data is well separated. We have to have 2 
     # of each class since N is multiple of 9
+    import pdb; pdb.set_trace()
     class1_count = len([data[i,:] for i in range(N) \
         if torch.math.dot_(data[i,:], self.data1) != 0]) 
     self.assertEqual(class1_count, 2)
@@ -160,7 +161,7 @@ class DataShufferTest(unittest.TestCase):
     # Note: Results will not be of a better precision because we only have 9
     # samples in the Shuffler...
     self.assertEqual( round(data.mean()), 0 )
-    self.assertEqual( round(numpy.std(data.as_ndarray(), ddof=1)), 1 )
+    self.assertEqual( round(numpy.std(data), ddof=1), 1 )
 
   def test05_NormalizationBig(self):
 

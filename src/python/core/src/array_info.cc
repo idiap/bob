@@ -40,7 +40,7 @@ template<typename T, int N> static bp::dict __array_interface__
 (const blitz::Array<T,N>& a) {
   for (int d=0; d<N; ++d) {
     if (!a.isRankStoredAscending(d)) {
-      throw std::runtime_error("Cannot _automatically_ read reverse()'ed blitz array as numpy.ndarray because numpy does not support it. Create a copy of this array using copy() or the direct numpy.ndarray converter as_ndarray() to reset the reversion.");
+      throw std::runtime_error("Cannot _automatically_ read reverse()'ed blitz array as numpy.ndarray because numpy does not support it. Create a copy of this array using copy() or numpy.array() to reset the reversion.");
     }
   }
   bp::dict retval;

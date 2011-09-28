@@ -1,6 +1,8 @@
 from libpytorch_core_array import *
 __all__ = dir()
 
+import numpy
+
 # adjustments to the __getitem__/__setitem__ mess
 def get_array_types():
   import inspect
@@ -50,7 +52,7 @@ def array_empty_like(self):
 # binds string and representation
 def array_str(self):
   """String representation. Used when printing or string conversion."""
-  return "%s" % self.as_ndarray()
+  return "%s" % numpy.array(self)
 
 def array_repr(self):
   """Simplified string representation."""
