@@ -76,7 +76,9 @@ inline static PyArrayObject* copy_ndarray(PyObject* any, PyArray_Descr* dt,
       NPY_C_CONTIGUOUS|NPY_ALIGNED|NPY_ENSURECOPY
 #endif
   ,0);
-  if (!retval) bp::throw_error_already_set();
+  if (!retval) {
+    bp::throw_error_already_set();
+  }
   return retval;
 }
 
