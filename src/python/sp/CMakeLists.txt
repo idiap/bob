@@ -20,4 +20,4 @@ torch_python_add_test(python-sp-fft_dct-tests
 torch_python_add_test(python-sp-convolution-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_convolution.py)
 torch_python_add_test(python-sp-extrapolation-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/extrapolation.py)
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/extrapolate.py)
