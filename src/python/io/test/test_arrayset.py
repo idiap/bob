@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
 class ArraysetTest(unittest.TestCase):
   """Performs various tests for the Torch::io::Arrayset objects"""
@@ -18,7 +19,7 @@ class ArraysetTest(unittest.TestCase):
     # shows how to use the extend() method on arraysets.
 
     t = torch.io.Arrayset()
-    data = torch.core.array.float32_2(range(50), (25,2))
+    data = numpy.array(range(50), 'float32').reshape(25,2)
     t.extend(data, 0)
 
     self.assertEqual( len(t), 25 )

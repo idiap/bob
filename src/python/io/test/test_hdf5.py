@@ -44,7 +44,7 @@ def readWriteTestArray(self, outfile, dtype):
   for k in range(N):
     data = [random.uniform(0,N) for z in range(numpy.product(SHAPE))]
     nparray = numpy.array(data).reshape(SHAPE)
-    arrays.append(torch.core.array.array(nparray, dtype))
+    arrays.append(nparray)
   self.readWriteTest(outfile, dtype + '_array', arrays)
 
 unittest.TestCase.readWriteTestArray = readWriteTestArray
@@ -65,7 +65,7 @@ class HDF5FileTest(unittest.TestCase):
     arrays = []
     for k in range(N):
       data = [int(random.uniform(0,10)) for z in range(NELEMENT)]
-      arrays.append(torch.core.array.int32_2(data, SHAPE))
+      arrays.append(numpy.array(data, 'int32').reshape(SHAPE))
 
     # Now we create a new binary output file in a temporary location and save
     # the data there.
@@ -262,11 +262,11 @@ class HDF5FileTest(unittest.TestCase):
     SHAPE = (2, 3) #6 elements
     NELEMENT = SHAPE[0] * SHAPE[1]
     data = [int(random.uniform(0,10)) for z in range(NELEMENT)]
-    array = torch.core.array.int32_2(data, SHAPE)
+    array = numpy.array(data, 'int32').reshape(SHAPE)
 
     # Try to save a slice
     tmpname = get_tempfilename()
-    array[:,0].save(tmpname, "hdf5.array.binary")
+    torch.io.save(array[:,0], tmpname, "hdf5.array.binary")
 
   def test06_matlabImport(self):
 

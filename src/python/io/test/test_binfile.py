@@ -34,7 +34,7 @@ class BinaryFileTest(unittest.TestCase):
     arrays = []
     for k in range(N):
       data = [complex(random.uniform(0,10), random.uniform(0,10)) for z in range(NELEMENT)] 
-      arrays.append(torch.core.array.complex128_3(data, SHAPE))
+      arrays.append(numpy.array(data, 'complex128').reshape(SHAPE))
 
     # Now we create a new binary output file in a temporary location and save
     # the data there.

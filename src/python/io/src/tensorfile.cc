@@ -67,13 +67,13 @@ tensorfile_make_readable(const std::string& filename) {
  * blitz::Array<> writing
  */
 template <typename T, int D> 
-static void bzwrite(io::TensorFile& f, blitz::Array<T,D>& bz) {
+static void bzwrite(io::TensorFile& f, const blitz::Array<T,D>& bz) {
   f.write(io::detail::InlinedArrayImpl(bz));
 }
 
 
-static const char* ARRAY_READ_DOC = "Reads data in the tensor file and return a blitz::Array with a copy of this data.";
-static const char* ARRAY_WRITE_DOC = "Writes a single blitz::Array<> into the tensor file. Please note that this array should conform to the shape and element type of the arrays already inserted. If no array was inserted, the element type and shape will be defined when you first write an array to this tensor file.";
+static const char* ARRAY_READ_DOC = "Reads data in the tensor file and return a array with a copy of this data.";
+static const char* ARRAY_WRITE_DOC = "Writes a single array into the tensor file. Please note that this array should conform to the shape and element type of the arrays already inserted. If no array was inserted, the element type and shape will be defined when you first write an array to this tensor file.";
 #define ARRAY_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(__getitem_ ## N ## _ ## D ## __), (blitz::Array<T,D> (io::TensorFile::*)(size_t))&io::TensorFile::read<T,D>, (arg("self"), arg("index")), ARRAY_READ_DOC) \
 .def("write", &bzwrite<T,D>, (arg("self"), arg("array")), ARRAY_WRITE_DOC)
 
@@ -82,7 +82,7 @@ void bind_io_tensorfile() {
     .def("__init__", make_constructor(tensorfile_make_fromstr, default_call_policies(), (arg("filename"), arg("openmode_string"))), "Opens a new file for reading (pass 'r' as second parameter), writing (pass 'w') or appending (pass 'a') depending on the given flag.")
     .def("__init__", make_constructor(tensorfile_make_readable, default_call_policies(), (arg("filename"))), "Opens a new file for reading")
     .add_property("shape", &get_shape<io::TensorFile>, "The shape of arrays in this tensor file. Please note all arrays in the file have necessarily the same shape.")
-    .add_property("elementType", &io::TensorFile::getElementType, "The type of array elements contained in this tensor file. This would be equivalent to the 'T' bit in blitz::Array<T,D>.")
+    .add_property("elementType", &io::TensorFile::getElementType, "The type of array elements contained in this tensor file. This would be equivalent to the 'T' bit in a array.")
     .def("__len__", &io::TensorFile::size, "The number of arrays in this tensor file.")
     ARRAY_DEF(int8_t, int8, 1)
     ARRAY_DEF(int16_t, int16, 1)

@@ -1,5 +1,5 @@
 from libpytorch_core import *
-from . import array
+import libpytorch_core_array as array
 from . import mapstring
 from . import vector
 from . import boost_tuple

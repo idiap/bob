@@ -10,6 +10,7 @@ import os, sys
 import unittest
 import tempfile
 import torch
+import numpy
 import random
 
 # This test implements a generalized framework for testing Torch codecs. It
@@ -74,9 +75,9 @@ class ArrayCodecTest(unittest.TestCase):
 
   def test01_t3binary(self):
     self.readwrite("torch3.array.binary",
-        torch.core.array.float32_2(range(24), (6,4)) / 24.)
+        numpy.array(range(24), dtype='float32').reshape(6,4) / 24.)
     self.readwrite("torch3.array.binary",
-        torch.core.array.float64_2(range(24), (2,12)) / 3.33336)
+        numpy.array(range(24), dtype='float64').reshape(2,12) / 3.33336)
     self.transcode("torch3.array.binary", "torch3.bindata")
 
   def test02_matlab(self):
@@ -86,22 +87,23 @@ class ArrayCodecTest(unittest.TestCase):
       #if the codec is not found, skip this test
       return
     self.readwrite("matlab.array.binary",
-        torch.core.array.float32_1(range(24), (24,)) / 24.)
+        numpy.array(range(24), dtype='float32').reshape(6,4) / 24.)
     self.readwrite("matlab.array.binary",
-        torch.core.array.float64_1(range(24), (24,)) / 3.33336)
+        numpy.array(range(24), dtype='float64').reshape(2,12) / 3.33336)
     self.readwrite("matlab.array.binary",
-        torch.core.array.complex64_1(range(24), (24,)) / complex(29.5,37.2))
+        numpy.array(range(24), dtype='complex64') / complex(29.5,37.2))
     self.readwrite("matlab.array.binary",
-        torch.core.array.complex128_1(range(24), (24,)) / complex(12.7,-92))
+        numpy.array(range(24), dtype='complex128') / complex(12.7,-92))
     self.readwrite("matlab.array.binary",
-        torch.core.array.complex128_2(range(24), (6,4)) / complex(3.1416,-3.1416))
+        numpy.array(range(24), dtype='complex128').reshape(6,4) / complex(3.1416,-3.1416))
     self.transcode("matlab.array.binary", "test.mat")
 
   def test03_tensorfile(self):
     self.readwrite("torch.array.tensor",
-        torch.core.array.float32_1(range(24), (24,)) / 24.)
+        numpy.array(range(24), dtype='float32').reshape(6,4) / 24.)
     self.readwrite("torch.array.tensor",
-        torch.core.array.float64_1(range(24), (24,)) / 3.33336)
+        numpy.array(range(24), dtype='float64').reshape(2,12) / 3.33336)
+    self.readwrite("matlab.array.binary",
     self.transcode("torch.array.tensor", "torch.tensor")
 
 if __name__ == '__main__':

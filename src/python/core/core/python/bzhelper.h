@@ -10,6 +10,7 @@
 #define TORCH_CORE_PYTHON_BZHELPER_H
 
 #include <boost/python.hpp>
+#include <boost/format.hpp>
 
 // Note: Header files that are distributed and include numpy/arrayobject.h need
 //       to have these protections. Be warned.
@@ -27,6 +28,7 @@
 #include <stdint.h>
 
 #include "core/python/exception.h"
+#include "core/array_type.h"
 
 namespace Torch { namespace python {
 
@@ -71,23 +73,33 @@ namespace Torch { namespace python {
 
     //test exact convertibility -- can only support this mode currently
     if (arr->nd != N) {
-      PYTHON_ERROR(TypeError, "wrong input ndarray number of dimensions");
+      boost::format f("shape mismatch in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%s,%d> wrapping");
+      f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % Torch::core::array::stringize<T>() % N;
+      PYTHON_ERROR(TypeError, f.str().c_str());
     }
 
     if (type_to_num<T>() != arr->descr->type_num) {
-      PYTHON_ERROR(TypeError, "ndarray dtype mismatch");
+      boost::format f("type mismatch in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%s,%d> wrapping");
+      f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % Torch::core::array::stringize<T>() % N;
+      PYTHON_ERROR(TypeError, f.str().c_str());
     }
 
     if (!PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE)) {
-      PYTHON_ERROR(TypeError, "cannot digest non-native byte order");
+      boost::format f("cannot digest non-native byte ordering in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%s,%d> wrapping");
+      f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % Torch::core::array::stringize<T>() % N;
+      PYTHON_ERROR(TypeError, f.str().c_str());
     }
 
     if (!PyArray_ISWRITEABLE(arr)) {
-      PYTHON_ERROR(TypeError, "cannot apply blitz layer on const ndarray");
+      boost::format f("cannot apply blitz layer on const ndarray in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%s,%d> wrapping");
+      f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % Torch::core::array::stringize<T>() % N;
+      PYTHON_ERROR(TypeError, f.str().c_str());
     }
 
     if (!PyArray_ISBEHAVED(arr)) {
-      PYTHON_ERROR(TypeError, "cannot apply blitz layer ndarray that does not behave (search for what this means with PyArray_ISBEHAVED)");
+      boost::format f("cannot apply blitz layer on ndarray that is not well-behaved (search for what this means with PyArray_ISBEHAVE) in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%s,%d> wrapping");
+      f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % Torch::core::array::stringize<T>() % N;
+      PYTHON_ERROR(TypeError, f.str().c_str());
     }
     
     shape_type shape;

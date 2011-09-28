@@ -1,5 +1,31 @@
 from libpytorch_io import *
+import numpy
 import os
+
+# Attach loading and saving functionality to arrays
+def load(filename, codecname=''):
+  """Loads an array from a given file path specified
+  
+  Parameters:
+  filename -- (string) The path to the file from which an array will be loaded
+  in memory.
+  codecname -- (string, optional) The name of the Array codec that will be used
+  to decode the information in the file. If not provided, I will try to derive
+  the codec to be used from the filename extension.
+  """
+  return Array(filename, codecname=codecname).get()
+
+def save(obj, filename, codecname=''):
+  """Saves the current array at the file path specified.
+
+  Parameters:
+  filename -- (string) The path to the file in which this array will be saved
+  to.
+  codecname -- (string, optional) The name of the Array codec that will be
+  used. If not provided, I will try to derive the codec to be used from the
+  filename extension.
+  """
+  Array(obj).save(filename, codecname=codecname)
 
 def arrayset_iter(self):
   """Allows Arraysets to be iterated in native python"""
@@ -12,20 +38,18 @@ Arrayset.__iter__ = arrayset_iter
 del arrayset_iter
 
 def arrayset_append(self, *args):
-  import numpy
-  from .. import core
   if len(args) == 1:
     if isinstance(args[0], Array):
       self.__append_array__(args[0])
       return
-    elif core.array.is_blitz_array(args[0]):
+    elif isinstance(args[0], numpy.ndarray):
       self.__append_array__(Array(args[0]))
       return
     elif isinstance(args[0], (str, unicode)):
       self.__append_array__(Array(args[0]))
       return
     else:
-      raise RuntimeError, "Can only append io::Array, blitz::Array or filename to Arrayset"
+      raise RuntimeError, "Can only append io::Array, array or filename to Arrayset"
   elif len(args) == 2:
     if isinstance(args[0], (str, unicode)) and instance(args[1], str):
       self.__append_array__(args[0], args[1])
@@ -40,13 +64,13 @@ del arrayset_append
 def arrayset_extend(self, obj, dim=0):
   """Extends the current Arrayset by either slicing the given array and
   appending each individual slice or iterating over an iterable containing
-  blitz::Arrays<>.
+  arrays.
 
   Keyword Parameters:
 
   obj
-    The object to extend this Arrayset with, may be blitz::Arrays, io.Array's
-    or an iterable full of blitz::Arrays.
+    The object to extend this Arrayset with, may be arrays, io.Array's
+    or an iterable full of arrays.
 
   dim
     **Iff** the input object is a single array, you will be able to specificy
@@ -57,7 +81,7 @@ def arrayset_extend(self, obj, dim=0):
   if hasattr(obj, '__iter__'):
     return self.__iterable_extend__(obj)
 
-  else: #it is an io.Array or a blitz Array
+  else: #it is an io.Array or a ndarray
     if not isinstance(obj, Array): obj = Array(obj) #try cast
     return self.__array_extend__(obj, dim)
 
@@ -65,20 +89,18 @@ Arrayset.extend = arrayset_extend
 del arrayset_extend
 
 def arrayset_setitem(self, id, *args):
-  import numpy
-  from .. import core
   if len(args) == 1:
     if isinstance(args[0], Array):
       self.__setitem_array__(id, args[0])
       return
-    elif core.array.is_blitz_array(args[0]):
+    elif isinstance(args[0], numpy.ndarray):
       self.__setitem_array__(id, Array(args[0]))
       return
     elif isinstance(args[0], (str, unicode)):
       self.__setitem_array__(id, Array(args[0]))
       return
     else:
-      raise RuntimeError, "Can only set io::Array, blitz::Array or filename to Arrayset"
+      raise RuntimeError, "Can only set io::Array, array or filename to Arrayset"
   elif len(args) == 2:
     if isinstance(args[0], (str, unicode)) and instance(args[1], str):
       self.__setitem_array__(id, Array(args[0], args[1]))
@@ -114,15 +136,15 @@ Arrayset.__ne__ = arrayset_ne
 del arrayset_ne
 
 def arrayset_cat(self, firstDim=False):
-  """Concatenates an entire Arrayset in a single blitz::Array<T,N>.
+  """Concatenates an entire Arrayset in a single array.
 
   The original arrays will be organized by creating as many entries as
-  necessary in the last dimension of the resulting blitz::Array. If the option
+  necessary in the last dimension of the resulting array. If the option
   'firstDim' is set to True, then the first dimension of the resulting array is
   used for the disposal of the input arrays. 
 
   In this way, to retrieve the first array of the arrayset from the resulting
-  blitz::Array, you must either use:
+  array, you must either use:
 
   .. code-block:: python
 
@@ -133,22 +155,20 @@ def arrayset_cat(self, firstDim=False):
   The same is valid for N (N>1) dimensional arrays.
 
   Note this will load all the arrayset data in memory if that is not already
-  the case and will copy all the data once (to the resulting blitz::Array).
+  the case and will copy all the data once (to the resulting array).
 
   .. warning::
-    This method will only work as long as the resulting blitz::Array number of
+    This method will only work as long as the resulting array number of
     dimensions is supported. Currently this means that self.shape has to have
-    length 3 or less. If the Array data is 4D, the resulting blitz Array would
+    length 3 or less. If the Array data is 4D, the resulting ndarray would
     have to be 5D and that is not currently supported.
   """
-  exec 'from ..core.array import %s_%s as cls' % \
-      (self.elementType, len(self.shape) + 1) 
   ashape = self.shape
   retshape = list(ashape)
 
   if firstDim: #first dimension contains examples
     retshape.insert(0, len(self))
-    retval = cls(tuple(retshape))
+    retval = numpy.ndarray(dtype=self.elementType, shape=retshape)
 
     for i, k in enumerate(self): #fill
       add = tuple([i] + [slice(d) for d in ashape])
@@ -156,7 +176,7 @@ def arrayset_cat(self, firstDim=False):
 
   else: #last dimension contains examples
     retshape.append(len(self))
-    retval = cls(tuple(retshape))
+    retval = numpy.ndarray(dtype=self.elementType, shape=retshape)
 
     for i, k in enumerate(self): #fill
       add = tuple([slice(d) for d in ashape] + [i])
@@ -168,7 +188,7 @@ del arrayset_cat
 
 def arrayset_foreach(self, meth):
   """Applies a transformation to the Arrayset data by passing every
-  blitz::Array to the given method
+  array to the given method
   
   .. note::
 
@@ -180,19 +200,19 @@ Arrayset.foreach = arrayset_foreach
 del arrayset_foreach
 
 def array_get(self):
-  """Returns a blitz::Array object with the internal element type"""
+  """Returns a array object with the internal element type"""
   return getattr(self, '__get_%s_%d__' % (self.elementType.name, len(self.shape)))()
 Array.get = array_get
 del array_get
 
 def array_cast(self, eltype):
-  """Returns a blitz::Array object with the required element type"""
+  """Returns a array object with the required element type"""
   return getattr(self, '__cast_%s_%d__' % (eltype.name, len(self.shape)))()
 Array.cast = array_cast
 del array_cast
 
 def array_copy(self):
-  """Returns a blitz::Array object which is a copy of the internal data"""
+  """Returns a array object which is a copy of the internal data"""
   return getattr(self, '__cast_%s_%d__' % (self.elementType.name, len(self.shape)))()
 Array.copy = array_copy
 del array_copy
@@ -222,7 +242,7 @@ Array.__str__ = array_str
 del array_str
 
 def binfile_getitem(self, i):
-  """Returns a blitz::Array<> object with the expected element type and shape"""
+  """Returns a array<> object with the expected element type and shape"""
   return getattr(self, '__getitem_%s_%d__' % \
       (self.elementType.name, len(self.shape)))(i)
 
@@ -230,7 +250,7 @@ BinFile.__getitem__ = binfile_getitem
 del binfile_getitem
 
 def tensorfile_getitem(self, i):
-  """Returns a blitz::Array<> object with the expected element type and shape"""
+  """Returns a array<> object with the expected element type and shape"""
   return getattr(self, '__getitem_%s_%d__' % \
       (self.elementType.name, len(self.shape)))(i)
 
@@ -238,13 +258,6 @@ TensorFile.__getitem__ = tensorfile_getitem
 del tensorfile_getitem
 
 # Some HDF5 addons
-def hdf5type_array_class(self):
-  """Returns the array class in torch.core.array that is good type for me"""
-  from ..core import array
-  return getattr(array, '%s_%d' % (self.type_str(), len(self.shape())))
-HDF5Type.array_class = hdf5type_array_class
-del hdf5type_array_class
-
 def hdf5type_str(self):
   return "%s@%s" % (self.type_str(), self.shape())
 HDF5Type.__str__ = hdf5type_str
@@ -258,7 +271,7 @@ del hdf5type_repr
 def hdf5file_read(self, path):
   """Reads all dataset elements from the current file. In this mode, the
   dataset is considered to contain a single element that will be read entirely
-  from the file into memory as a blitz::Array.
+  from the file into memory as a array.
   
   Keyword Parameters:
 
@@ -271,8 +284,8 @@ def hdf5file_read(self, path):
     return getattr(self, '__read_%s__' % descr.type_str())(path, 0)
 
   else: # read as array
-    retval = descr.array_class()(descr.shape())
-    self.__read_array__(path, 0, retval)
+    retval = numpy.ndarray(dtype=descr.type_str(), shape=self.shape())
+    getattr(self, '__read_%s_array__' % descr.type_str())(path, 0, retval)
     return retval
 
 HDF5File.read = hdf5file_read
@@ -303,8 +316,8 @@ def hdf5file_lread(self, path, pos=-1):
       return getattr(self, '__read_%s__' % descr.type_str())(path, pos)
 
     else: # read as array
-      retval = descr.array_class()(descr.shape())
-      self.__read_array__(path, pos, retval)
+      retval = numpy.ndarray(dtype=descr.type_str(), shape=descr.shape())
+      getattr(self, '__read_%s_array__' % descr.type_str())(path, pos, retval)
       return retval
 
   if pos < 0: # read all -- recurse
@@ -349,7 +362,6 @@ def hdf5file_append(self, path, data, compression=0, dtype=None):
     otherwise an error is raised. Also note this has no effect in case data are
     composed of arrays (in which case the selection is automatic).
   """
-  from ..core import array
 
   def best_type (value):
     """Returns the approximate best type for a given python value"""
@@ -363,7 +375,7 @@ def hdf5file_append(self, path, data, compression=0, dtype=None):
   
   if not isinstance(data, (list, tuple)): data = [data]
 
-  if array.is_blitz_array(data[0]):
+  if isinstance(data[0], numpy.ndarray):
     for k in data: self.__append_array__(path, k, compression)
 
   else: #is scalar, in which case the user may have given a dtype
@@ -408,7 +420,6 @@ def hdf5file_set(self, path, data, compression=0, dtype=None):
     otherwise an error is raised. Also note this has no effect in case data are
     composed of arrays (in which case the selection is automatic).
   """
-  from ..core import array
 
   def best_type (value):
     """Returns the approximate best type for a given python value"""
@@ -422,7 +433,7 @@ def hdf5file_set(self, path, data, compression=0, dtype=None):
   
   if not isinstance(data, (list, tuple)): data = [data]
 
-  if array.is_blitz_array(data[0]):
+  if isinstance(data[0], numpy.ndarray):
     for k in data: self.__set_array__(path, k, compression)
 
   else: #is scalar, in which case the user may have given a dtype
@@ -446,7 +457,6 @@ def hdf5file_replace(self, path, pos, data, dtype=None):
   otherwise an error is raised. Also note this has no effect in case data are
   composed of arrays (in which case the selection is automatic).
   """
-  from ..core import array
 
   def best_type (value):
     """Returns the approximate best type for a given python value"""
@@ -458,7 +468,7 @@ def hdf5file_replace(self, path, pos, data, dtype=None):
     elif isinstance(value, (str, unicode)): return 'string'
     return 'UNSUPPORTED'
   
-  if array.is_blitz_array(data):
+  if isinstance(data, numpy.ndarray):
     for k in data: self.__replace_array__(path, pos, k)
 
   else: #is scalar, in which case the user may have given a dtype

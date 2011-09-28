@@ -57,7 +57,7 @@ class TextArrayCodec(torch.io.ArrayCodec):
     entries = f.read().split() #always keep data in a single line
     f.close()
     length = int(entries[0])
-    bzarray = torch.core.array.uint16_1([int(k) for k in entries[1:]], (length,))
+    bzarray = numpy.array([int(k) for k in entries[1:]], 'uint16')
     return torch.io.Array(bzarray)
 
   def save (self, filename, array):

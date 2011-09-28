@@ -363,7 +363,6 @@ void bind_core_bz_numpy () {
    * The following struct constructors will make C++ return values of type
    * blitz::Array<T,N> to show up in the python side as numpy arrays.
    */
-  /**
 #  define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
 #  define BOOST_PP_LOCAL_MACRO(D) \
    register_bz_to_npy<bool,D>();\
@@ -382,5 +381,4 @@ void bind_core_bz_numpy () {
    register_bz_to_npy<std::complex<double>,D>();\
    register_bz_to_npy<std::complex<long double>,D>();
 #  include BOOST_PP_LOCAL_ITERATE()
-  **/
 }

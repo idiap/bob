@@ -68,13 +68,13 @@ binfile_make_readable(const std::string& filename) {
  * blitz::Array<> writing
  */
 template <typename T, int D> 
-static void bzwrite(io::BinFile& f, blitz::Array<T,D>& bz) {
+static void bzwrite(io::BinFile& f, const blitz::Array<T,D>& bz) {
   f.write(io::detail::InlinedArrayImpl(bz));
 }
 
 
 static const char* ARRAY_READ_DOC = "Reads data in the binary file and return a blitz::Array with a copy of this data.";
-static const char* ARRAY_WRITE_DOC = "Writes a single blitz::Array<> into the binary file. Please note that this array should conform to the shape and element type of the arrays already inserted. If no array was inserted, the element type and shape will be defined when you first write an array to this binary file.";
+static const char* ARRAY_WRITE_DOC = "Writes a single array into the binary file. Please note that this array should conform to the shape and element type of the arrays already inserted. If no array was inserted, the element type and shape will be defined when you first write an array to this binary file.";
 #define ARRAY_DEF(T,N,D) .def(BOOST_PP_STRINGIZE(__getitem_ ## N ## _ ## D ## __), (blitz::Array<T,D> (io::BinFile::*)(size_t))&io::BinFile::read<T,D>, (arg("self"), arg("index")), ARRAY_READ_DOC) \
 .def("write", &bzwrite<T,D>, (arg("self"), arg("array")), ARRAY_WRITE_DOC)
 

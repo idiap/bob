@@ -33,7 +33,7 @@ class TensorFileTest(unittest.TestCase):
     arrays = []
     for k in range(N):
       data = [random.uniform(0,10) for z in range(NELEMENT)] 
-      arrays.append(torch.core.array.float64_3(data, SHAPE))
+      arrays.append(numpy.array(data, 'float64').reshape(SHAPE))
 
     # Now we create a new binary output file in a temporary location and save
     # the data there.

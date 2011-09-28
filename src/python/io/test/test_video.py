@@ -23,6 +23,7 @@ INPUT_VIDEO = test_file('test.mov')
 OUTPUT_VIDEO = get_tempfilename()
 
 import unittest
+import numpy
 import torch
 
 class VideoTest(unittest.TestCase):
@@ -50,7 +51,7 @@ class VideoTest(unittest.TestCase):
       # So, you can use them as you please. The organization of the data
       # follows the other encoding systems in torch: (color-bands, height,
       # width).
-      self.assertTrue(torch.core.array.is_blitz_array(frame))
+      self.assertTrue(isinstancetorch.core.array.is_blitz_array(frame))
       self.assertEqual(frame.dimensions(), 3)
       self.assertEqual(frame.extent(0), 3) #color-bands (RGB)
       self.assertEqual(frame.extent(1), 240) #height
@@ -65,19 +66,19 @@ class VideoTest(unittest.TestCase):
     # get frame 27 (we start counting at zero)
     f27 = v[27]
 
-    self.assertTrue(torch.core.array.is_blitz_array(f27))
+    self.assertTrue(isinstance(f27, numpy.ndarray))
     self.assertEqual(f27.dimensions(), 3)
     self.assertEqual(f27.shape(), (3, 240, 320))
 
     # you can also use negative notation...
-    self.assertTrue(torch.core.array.is_blitz_array(v[-1]))
+    self.assertTrue(isinstance(v[-1], numpy.ndarray))
     self.assertEqual(v[-1].dimensions(), 3)
     self.assertEqual(v[-1].shape(), (3, 240, 320))
 
     # get frames 18 a 30 (exclusive), skipping 3: 18, 21, 24, 27
     f18_30 = v[18:30:3]
     for k in f18_30:
-      self.assertTrue(torch.core.array.is_blitz_array(k))
+      self.assertTrue(instance(k, numpy.ndarray))
       self.assertEqual(k.dimensions(), 3)
       self.assertEqual(k.shape(), (3, 240, 320))
 

@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import tempfile
+import numpy
 import torch
 import random
 
@@ -95,33 +96,31 @@ unittest.TestCase.append_load = testcase_append_load
 
 # This is the data we test with
 data_1 = [
-    torch.core.array.float32_1(range(24), (24,)) / 24.,
-    torch.core.array.float32_1(range(24), (24,)) / 48.,
-    torch.core.array.float32_1(range(24), (24,)) / 0.25,
+    numpy.array(range(24), 'float32') / 24.,
+    numpy.array(range(24), 'float32') / 48.,
+    numpy.array(range(24), 'float32') / 0.25,
     ]
 data_2 = [
-    torch.core.array.float64_1(range(24), (24,)) / 24.3333334,
-    torch.core.array.float64_1(range(24), (24,)) / -52.9,
-    torch.core.array.float64_1(range(24), (24,)) / 37,
+    numpy.array(range(24), 'float64') / 24.33333334,
+    numpy.array(range(24), 'float64') / -52.9,
+    numpy.array(range(24), 'float64') / 37,
     ]
 data_3 = [
-    torch.core.array.complex128_3(range(24), (2,3,4)) / complex(24.3333334, 0.9),
-    torch.core.array.complex128_3(range(24), (2,3,4)) / complex(0.1, -52.9),
-    torch.core.array.complex128_3(range(24), (2,3,4)) / complex(37, -1e18),
+    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(24.33333334, 0.9)
+    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(0.1, -52.9)
+    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(37, -1e18)
     ]
 data_4 = [
-    torch.core.array.complex128_4(range(24000), (4,30,40,5)) / complex(24.3333334, 0.9),
-    torch.core.array.complex128_4(range(24000), (4,30,40,5)) / complex(0.1, -52.9),
-    torch.core.array.complex128_4(range(24000), (4,30,40,5)) / complex(37, -1e18),
-
+    numpy.array(range(24000), 'complex128').reshape(4,30,40,5) / complex(24.3333334, 0.9),
+    numpy.array(range(24000), 'complex128').reshape(4,30,40,5) / complex(0.1, -52.9),
+    numpy.array(range(24000), 'complex128').reshape(4,30,40,5) / complex(37, -1e18),
     ]
 data_4 = 100 * data_4 # 1'200 x 24'000 position complex<double> arrays
 
 data_5 = [
-    torch.core.array.complex128_4(range(240), (4,3,4,5)) / complex(24.3333334, 0.9),
-    torch.core.array.complex128_4(range(240), (4,3,4,5)) / complex(0.1, -52.9),
-    torch.core.array.complex128_4(range(240), (4,3,4,5)) / complex(37, -1e18),
-
+    numpy.array(range(240), 'complex128').reshape(4,3,4,5) / complex(24.3333334, 0.9),
+    numpy.array(range(240), 'complex128').reshape(4,3,4,5) / complex(0.1, -52.9),
+    numpy.array(range(240), 'complex128').reshape(4,3,4,5) / complex(37, -1e18),
     ]
 
 class ArraysetCodecTest(unittest.TestCase):

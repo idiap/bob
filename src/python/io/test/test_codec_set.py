@@ -61,7 +61,7 @@ class TextArraysetCodec(torch.io.ArraysetCodec):
       length = int(info[0])
       retval = torch.io.Arrayset()
       for d in data:
-        bzarray = torch.core.array.uint16_1([int(k) for k in d], (length,))
+        bzarray = numpy.array([int(k) for k in d], 'uint16')
         retval.append(bzarray)
       return retval
 
@@ -70,7 +70,7 @@ class TextArraysetCodec(torch.io.ArraysetCodec):
       info = f.readline().split() #always keep data in a single line
       data = [k.split() for k in f][args[1]-1]
       length = int(info[0])
-      bzarray = torch.core.array.uint16_1([int(k) for k in data], (length,))
+      bzarray = numpy.array([int(k) for k in data], 'uint16')
       return torch.io.Array(bzarray)
 
     #to make it nice, we throw a TypeError indicating the wrong len(args)
