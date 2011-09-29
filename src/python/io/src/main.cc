@@ -4,9 +4,7 @@
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_io_exception();
 void bind_io_array();
@@ -21,11 +19,9 @@ void bind_io_datetime();
 void bind_io_video();
 
 BOOST_PYTHON_MODULE(libpytorch_io) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch classes and sub-classes for io access";
+
+  Torch::python::setup_python("Torch classes and sub-classes for io access");
+
   bind_io_exception();
   bind_io_array();
   bind_io_arrayset();

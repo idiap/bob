@@ -6,13 +6,10 @@
  */
 
 #include <boost/python.hpp>
-#include <boost/python/numeric.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 
 #include "core/python/exception.h"
-#include "core/python/bzhelper.h"
+#include "core/python/pycore.h"
 
 #include "io/HDF5File.h"
 
@@ -86,14 +83,11 @@ template <typename T> static void hdf5file_replace_scalar(io::HDF5File& f, const
   f.replace(p, pos, value);
 }
 
+template <typename T, int N> 
 static void hdf5file_read_array(io::HDF5File& f, const std::string& p, 
-    size_t pos, numeric::array value) {
-  //create a binding so that the function object becames single parameter
-  boost::function<void (PyObject*)> method = 
-    boost::bind(&io::HDF5File::readArray, f, p, pos, _1);
-
-  //call our generalized switch statement
-  //tp::blitz_wrapper_switch(value.ptr(), method);
+    size_t pos, numeric::array& value) {
+  blitz::Array<T,N> bz = tp::numpy_bz<T,N>(value);
+  f.readArray(p, pos, bz);
 }
 
 template <typename T> static void hdf5file_replace_array(io::HDF5File& f, const std::string& p, size_t pos, const T& value) {
@@ -146,7 +140,7 @@ void bind_io_hdf5() {
     //DECLARE_SUPPORT(std::complex<long double>, complex256)
     DECLARE_SUPPORT(std::string, string)
 #   undef DECLARE_SUPPORT
-#   define DECLARE_SUPPORT(T,N,E) .def(BOOST_PP_STRINGIZE(__read_ ## E ## _array__), &hdf5file_read_array<T,N>, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
+#   define DECLARE_SUPPORT(T,N,E) .def(BOOST_PP_STRINGIZE(__read_ ## E ## _ ## N ##__), &hdf5file_read_array<T,N>, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
     .def("__replace_array__", &hdf5file_replace_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
     .def("__append_array__", &hdf5file_append_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created you can set its compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") \
     .def("__set_array__", &hdf5file_set_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, you can set the compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") 

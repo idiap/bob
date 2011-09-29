@@ -8,9 +8,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 #include <boost/python.hpp>
-
-// include this file if you need to design extensions using blitz::Arrays
-#include "core/python/bzhelper.h"
+#include "core/python/pycore.h"
 
 using namespace boost::python;
 namespace tp = Torch::python;
@@ -157,7 +155,10 @@ void bind_core_array_examples() {
    * arguments, which of the variants to call. You have two options:
    *
    * 1. You create each function with a special name extension attached to
-   * them:
+   * them like bellow.
+   *
+   * In python, you write a function "zeroes_2d" that receives a dtype
+   * parameter and chooses dynamically which of the two to call bellow.
    */
   def("zeroes_2d_float32", &zeroes_2d<float>, (arg("rows"), arg("cols")), "Creates a float32-matrix filled with zeroes");
   def("zeroes_2d_float64", &zeroes_2d<double>, (arg("rows"), arg("cols")), "Creates a float64-matrix filled with zeroes");

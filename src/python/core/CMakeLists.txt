@@ -12,9 +12,12 @@ set(pysrc
    "src/main.cc"
    )
 
+set(pysrc_pycore
+   "src/pycore.cc"
+   )
+
 set(pysrc_array
    "src/blitz_numpy.cc"
-   "src/bzhelper.cc"
    "src/array_wrapper_example.cc"
    "src/main_array.cc"
    )
@@ -47,10 +50,15 @@ set(pysrc_random
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(core "${pysrc}")
-torch_header_install(core-array-python core "torch::python::core")
+
+torch_header_install(python-core core "torch::python::core")
+
+torch_python_submodule_bindings(core utils "${pysrc_pycore}")
+add_dependencies(pytorch_core_utils python-core_header_install)
 
 torch_python_submodule_bindings(core array "${pysrc_array}")
-add_dependencies(pytorch_core_array core-array-python_header_install)
+add_dependencies(pytorch_core_array python-core_header_install)
+target_link_libraries(pytorch_core_array pytorch_core_utils)
 
 torch_python_submodule_bindings(core vector "${pysrc_vector}")
 torch_python_submodule_bindings(core mapstring "${pysrc_mapstring}")

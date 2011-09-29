@@ -10,19 +10,28 @@
 #define TORCH_CORE_PYTHON_BZHELPER_H
 
 #include <boost/python.hpp>
+#include <boost/python/numeric.hpp>
 #include <boost/format.hpp>
+#include <stdexcept>
+#include <dlfcn.h>
 
+// ============================================================================
 // Note: Header files that are distributed and include numpy/arrayobject.h need
 //       to have these protections. Be warned.
+
+// Defines a unique symbol for the API
 #if !defined(PY_ARRAY_UNIQUE_SYMBOL)
 #define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
 #endif
+
+// Normally, don't import_array(), except if torch_IMPORT_ARRAY is defined.
 #if !defined(torch_IMPORT_ARRAY) and !defined(NO_IMPORT_ARRAY)
 #define NO_IMPORT_ARRAY
 #endif
-#define PY_ARRAY_UNIQUE_SYMBOL torch_NUMPY_ARRAY_API
-#define NO_IMPORT_ARRAY
+
+// Finally, we include numpy's arrayobject header. Not before!
 #include <numpy/arrayobject.h>
+// ============================================================================
 
 #include <blitz/array.h>
 #include <stdint.h>
@@ -31,6 +40,14 @@
 #include "core/array_type.h"
 
 namespace Torch { namespace python {
+
+  /**
+   * Initializes numpy and boost bindings. Should be called once per module.
+   *
+   * Pass to it the module doc string and it will also update the module
+   * documentation string.
+   */
+  void setup_python(const char* module_docstring);
 
   /**
    * Conversion from C++ type to Numpy C enum
@@ -132,7 +149,43 @@ namespace Torch { namespace python {
 
   };
 
+  /**
+   * Creates a new NumPy ndarray object with a given number of dimensions,
+   * shape and dtype.
+   */
+  PyArrayObject* make_ndarray(int nd, npy_intp* dims, int type);
+
+  /**
+   * Gets the PyArray_Descr* for a given type
+   */
+  PyArray_Descr* describe_ndarray(int type);
+
+  /**
+   * Generates a well behaved copy of an array, starting from any possible
+   * python type. The newly generated array will have the given type "dt" and a
+   * number of dimensions as specified by "dims".
+   */
+  PyArrayObject* copy_ndarray(PyObject* any, PyArray_Descr* dt,
+      int dims);
+
+  /**
+   * Checks convertibility. See the manual page for
+   * PyArray_GetArrayParamsFromObject() for details on the return values.
+   *
+   *  @param any input object
+   *  @param req_dtype requested dtype (if need to enforce) otherwise 0
+   *  @param writeable check for write-ability
+   *  @param dtype output assessement of the object
+   *  @param ndim assessed number of dimensions
+   *  @param dims assessed shape
+   *  @param arr if obj_ptr is ndarray, return it here
+   *
+   *  @return 0, if it worked ok.
+   */
+  int check_ndarray(PyObject* any, PyArray_Descr* req_dtype,
+      int writeable, PyArray_Descr*& dtype, int& ndim, npy_intp* dims,
+      PyArrayObject*& arr);
+
 }}
 
 #endif /* TORCH_CORE_PYTHON_BZHELPER_H */
-

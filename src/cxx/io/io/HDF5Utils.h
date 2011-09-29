@@ -422,6 +422,8 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       std::vector<Torch::io::HDF5Descriptor>::iterator select (size_t index,
           const Torch::io::HDF5Type& dest);
 
+    public: //direct access for other bindings -- don't use these!
+
       /**
        * Reads a previously selected area into the given (user) buffer.
        */

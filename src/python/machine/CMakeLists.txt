@@ -16,7 +16,7 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(machine "${pysrc}")
-add_dependencies(pytorch_machine core-array-python_header_install machine-cxx_header_install)
+add_dependencies(pytorch_machine python-core_header_install machine-cxx_header_install)
 torch_python_install(machine)
   
 # Our test units

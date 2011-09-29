@@ -285,7 +285,7 @@ def hdf5file_read(self, path):
 
   else: # read as array
     retval = numpy.ndarray(dtype=descr.type_str(), shape=self.shape())
-    getattr(self, '__read_%s_array__' % descr.type_str())(path, 0, retval)
+    getattr(self, '__read_%s_%d__' % (descr.type_str(), len(descr.shape())))(path, 0, retval)
     return retval
 
 HDF5File.read = hdf5file_read
@@ -317,7 +317,7 @@ def hdf5file_lread(self, path, pos=-1):
 
     else: # read as array
       retval = numpy.ndarray(dtype=descr.type_str(), shape=descr.shape())
-      getattr(self, '__read_%s_array__' % descr.type_str())(path, pos, retval)
+      getattr(self, '__read_%s_%d__' % (descr.type_str(), len(descr.shape())))(path, pos, retval)
       return retval
 
   if pos < 0: # read all -- recurse

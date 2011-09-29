@@ -20,7 +20,8 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_bindings(io "${pysrc}" "io" "")
-add_dependencies(pytorch_io core-array-python_header_install)
+add_dependencies(pytorch_io python-core_header_install)
+target_link_libraries(pytorch_io pytorch_core_utils)
 torch_python_install(io)
 
 # Installs all python scripts

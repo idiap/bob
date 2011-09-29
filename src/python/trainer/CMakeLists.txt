@@ -22,7 +22,7 @@ include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(trainer "${pysrc}") 
 torch_python_submodule_bindings(trainer overload "${pysrc_overload}")
-add_dependencies(pytorch_trainer core-array-python_header_install trainer-cxx_header_install)
+add_dependencies(pytorch_trainer python-core_header_install trainer-cxx_header_install)
 torch_python_install(trainer)
   
 # Our test units

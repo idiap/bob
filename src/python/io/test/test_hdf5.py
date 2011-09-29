@@ -26,14 +26,14 @@ def readWriteTest(self, outfile, dname, data, dtype=None):
   outfile.append(dname + '_single', data[0], dtype=dtype)
 
   # Makes sure we can read the value out
-  self.assertEqual(outfile.lread(dname + '_single', 0), data[0])
+  self.assertTrue( numpy.array_equal(outfile.lread(dname + '_single', 0), data[0]) )
 
   # Now we go for the full set
   outfile.append(dname, data, dtype=dtype)
 
   # And that we can read it back
   back = outfile.lread(dname) #we read all at once as it is simpler
-  for i, b in enumerate(back): self.assertEqual(b, data[i])
+  for i, b in enumerate(back): self.assertTrue( numpy.array_equal(b, data[i]) )
 
 unittest.TestCase.readWriteTest = readWriteTest
 
@@ -81,7 +81,7 @@ class HDF5FileTest(unittest.TestCase):
     # And all the data is *exactly* the same recorded, bit by bit
     back = outfile.lread('testdata') # this is how to read the whole data back
     for i, b in enumerate(back):
-      self.assertTrue( b.numeq(arrays[i]) )
+      self.assertTrue( numpy.array_equal(b, arrays[i]) )
 
     # If you want to immediately close the HDF5 file, just delete the object
     del outfile
@@ -106,7 +106,7 @@ class HDF5FileTest(unittest.TestCase):
     # And all the data is *exactly* the same recorded, bit by bit
     back = readonly.lread('testdata') # this is how to read the whole data back
     for i, b in enumerate(back):
-      self.assertTrue( b.numeq(arrays[i]) )
+      self.assertTrue( numpy.array_equal(b, arrays[i]) )
 
     os.unlink(tmpname)
 

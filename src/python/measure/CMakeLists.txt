@@ -9,7 +9,7 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(measure "${pysrc}")
-#add_dependencies(pytorch_measure core-array-python_header_install)
+#add_dependencies(pytorch_measure python-core_header_install)
 torch_python_install(measure)
   
 # Our test units
