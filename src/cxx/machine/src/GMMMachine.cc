@@ -334,8 +334,8 @@ void mach::GMMMachine::save(Torch::io::HDF5File& config) const {
 }
 
 void mach::GMMMachine::load(Torch::io::HDF5File& config) {
-  config.read("m_n_gaussians", m_n_gaussians);
-  config.read("m_n_inputs", m_n_inputs);
+  m_n_gaussians = config.read<int64_t>("m_n_gaussians");
+  m_n_inputs = config.read<int64_t>("m_n_inputs");
   
   if(m_gaussians != 0) {
     delete [] m_gaussians;

@@ -188,7 +188,7 @@ void Torch::machine::Gaussian::save(Torch::io::HDF5File& config) const {
 }
 
 void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {
-  config.read("m_n_inputs", m_n_inputs);
+  m_n_inputs = config.read<int64_t>("m_n_inputs");
   
   m_mean.resize(m_n_inputs);
   m_variance.resize(m_n_inputs);
@@ -198,7 +198,7 @@ void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {
   config.readArray("m_variance", m_variance);
   config.readArray("m_variance_thresholds", m_variance_thresholds);
 
-  config.read("g_norm", g_norm);
+  g_norm = config.read<double>("g_norm");
 }
 
 namespace Torch{

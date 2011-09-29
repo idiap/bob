@@ -134,8 +134,8 @@ namespace Torch { namespace io {
        * Reads data from the file into a scalar. Raises an exception if the
        * type is incompatible. Relative paths are accepted.
        */
-      template <typename T> void read(const std::string& path, size_t pos, 
-          T& value) {
+      template <typename T>
+        void read(const std::string& path, size_t pos, T& value) {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
           throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
@@ -150,16 +150,7 @@ namespace Torch { namespace io {
         std::string absolute = resolve(path);
         if (!contains(absolute)) 
           throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-        return m_index[absolute]->read(pos);
-      }
-
-      /**
-       * Reads data from the file into a scalar. Raises an exception if the
-       * type is incompatible. Relative paths are accepted. Calling this method
-       * is equivalent to calling read(path, 0, value).
-       */
-      template <typename T> void read(const std::string& path, T& value) {
-        read(path, 0, value);
+        return m_index[absolute]->read<T>(pos);
       }
 
       /**
@@ -167,8 +158,8 @@ namespace Torch { namespace io {
        * type is incompatible. Relative paths are accepted. Calling this method
        * is equivalent to calling read(path, 0). Returns by copy.
        */
-      template <typename T> void read(const std::string& path) {
-        read<T>(path, 0);
+      template <typename T> T read(const std::string& path) {
+        return read<T>(path, 0);
       }
 
       /**
@@ -333,7 +324,38 @@ namespace Torch { namespace io {
         }
         m_index[absolute]->replaceArray(0, value);
       }
-      
+
+    public: //api shortcuts to deal with buffers -- avoid these at all costs!
+
+      /**
+       * creates a new dataset. If the dataset already exists, checks if the
+       * existing data is compatible with the required type.
+       */
+      void create (const std::string& path, const HDF5Type& dest,
+          bool list, size_t compression);
+
+      /**
+       * Reads data from the file into a buffer. The given buffer contains
+       * sufficient space to hold the type described in "dest". Raises an
+       * exception if the type is incompatible with the expected data in the
+       * file. Relative paths are accepted.
+       */
+      void read_buffer (const std::string& path, size_t pos,
+          const HDF5Type& dest, void* buffer);
+
+      /**
+       * writes the contents of a given buffer into the file. the area that the
+       * data will occupy should have been selected beforehand.
+       */
+      void write_buffer (const std::string& path, size_t pos,
+          const HDF5Type& dest, const void* buffer);
+
+      /**
+       * extend the dataset with one extra variable.
+       */
+      void extend_buffer (const std::string& path, const HDF5Type& dest,
+          const void* buffer);
+
     private: //not implemented
 
       /**

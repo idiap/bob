@@ -94,8 +94,7 @@ void mach::LinearMachine::load (Torch::io::HDF5File& config) {
   m_buffer.resize(m_input_sub.extent(0));
 
   //reads the activation function
-  uint32_t act = 0;
-  config.read("activation", act);
+  uint32_t act = config.read<uint32_t>("activation");
   setActivation(static_cast<mach::Activation>(act));
 }
 

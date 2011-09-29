@@ -43,7 +43,7 @@ def readWriteTestArray(self, outfile, dtype):
   arrays = []
   for k in range(N):
     data = [random.uniform(0,N) for z in range(numpy.product(SHAPE))]
-    nparray = numpy.array(data).reshape(SHAPE)
+    nparray = numpy.array(data, dtype=dtype).reshape(SHAPE)
     arrays.append(nparray)
   self.readWriteTest(outfile, dtype + '_array', arrays)
 

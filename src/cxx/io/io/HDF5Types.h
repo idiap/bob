@@ -398,6 +398,11 @@ namespace Torch { namespace io {
       /**
        * Creates a HDF5Type from a type enumeration and an explicit shape
        */
+      HDF5Type(Torch::core::array::ElementType eltype, const HDF5Shape& extents);
+
+      /**
+       * Creates a HDF5Type from a type enumeration and an explicit shape
+       */
       HDF5Type(hdf5type type, const HDF5Shape& extents);
 
       /**

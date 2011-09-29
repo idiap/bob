@@ -7,6 +7,7 @@
 
 #include <boost/python.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/format.hpp>
 
 #include "core/python/exception.h"
 #include "core/python/pycore.h"
@@ -71,37 +72,119 @@ static tuple hdf5file_describe(const io::HDF5File& f, const std::string& p) {
 }
 
 /**
- * Functionality to read from or replace at HDF5File's
+ * Functionality to read from HDF5File's
  */
-template <typename T> static T hdf5file_read_scalar(io::HDF5File& f, const std::string& p, size_t pos) {
-  T tmp;
-  f.read(p, pos, tmp);
-  return tmp;
+static object hdf5file_xread(io::HDF5File& f, const std::string& p,
+    int descriptor, int pos) {
+
+  const std::vector<io::HDF5Descriptor>& D = f.describe(p);
+
+  //last descriptor always contains the full readout.
+  const io::HDF5Type& type = D[descriptor].type;
+  const io::HDF5Shape& shape = type.shape();
+  
+  if (shape.n() == 1 && shape[0] == 1) { //read as scalar
+    switch(type.type()) {
+      case io::i8: 
+        return object(f.read<int8_t>(p, pos));
+      case io::i16: 
+        return object(f.read<int16_t>(p, pos));
+      case io::i32: 
+        return object(f.read<int32_t>(p, pos));
+      case io::i64: 
+        return object(f.read<int64_t>(p, pos));
+      case io::u8:
+        return object(f.read<uint8_t>(p, pos));
+      case io::u16: 
+        return object(f.read<uint16_t>(p, pos));
+      case io::u32: 
+        return object(f.read<uint32_t>(p, pos));
+      case io::u64: 
+        return object(f.read<uint64_t>(p, pos));
+      case io::f32: 
+        return object(f.read<float>(p, pos));
+      case io::f64: 
+        return object(f.read<double>(p, pos));
+      case io::f128:
+        return object(f.read<long double>(p, pos));
+      case io::c64: 
+        return object(f.read<std::complex<float> >(p, pos));
+      case io::c128:
+        return object(f.read<std::complex<double> >(p, pos));
+      case io::c256:
+        return object(f.read<std::complex<long double> >(p, pos));
+      default:
+        boost::format s("unsupported HDF5 type: %s");
+        s % type.str();
+        PYTHON_ERROR(TypeError, s.str().c_str());
+    }
+  }
+
+  //read as an numpy array
+  npy_intp dims[NPY_MAXDIMS];
+  for (uint64_t k=0; k<shape.n(); ++k) dims[k] = shape[k];
+  PyArrayObject* arr = tp::make_ndarray(shape.n(), dims, tp::eltype_to_num(type.element_type()));
+  f.read_buffer(p, pos, type, arr->data);
+  object retval((PyObject*)arr);
+  return retval;
+}
+
+static object hdf5file_lread(io::HDF5File& f, const std::string& p,
+    int64_t pos=-1) {
+  if (pos >= 0) return hdf5file_xread(f, p, 0, pos);
+
+  //otherwise returns as a list
+  const std::vector<io::HDF5Descriptor>& D = f.describe(p);
+  list retval;
+  for (uint64_t k=0; k<D[0].size; ++k) 
+    retval.append(hdf5file_xread(f, p, 0, k));
+  return retval;
+}
+BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_lread_overloads, hdf5file_lread, 2, 3)
+
+static inline object hdf5file_read(io::HDF5File& f, const std::string& p) {
+  return hdf5file_xread(f, p, 1, 0);
 }
 
 template <typename T> static void hdf5file_replace_scalar(io::HDF5File& f, const std::string& p, size_t pos, const T& value) {
   f.replace(p, pos, value);
 }
 
-template <typename T, int N> 
-static void hdf5file_read_array(io::HDF5File& f, const std::string& p, 
-    size_t pos, numeric::array& value) {
-  blitz::Array<T,N> bz = tp::numpy_bz<T,N>(value);
-  f.readArray(p, pos, bz);
+static void hdf5file_replace_array(io::HDF5File& f, const std::string& p, 
+    size_t pos, numeric::array& arrobj) {
+
+  PyArrayObject* arr = (PyArrayObject*)arrobj.ptr();
+
+  io::HDF5Type type(tp::num_to_eltype(arr->descr->type_num), 
+      io::HDF5Shape(arr->nd, arr->dimensions));
+
+  f.write_buffer(p, pos, type, arr->data);
 }
 
-template <typename T> static void hdf5file_replace_array(io::HDF5File& f, const std::string& p, size_t pos, const T& value) {
-  f.replaceArray(p, pos, value);
+static void hdf5file_append_array(io::HDF5File& f, 
+    const std::string& path, numeric::array& arrobj, size_t compression) {
+
+  PyArrayObject* arr = (PyArrayObject*)arrobj.ptr();
+
+  io::HDF5Type type(tp::num_to_eltype(arr->descr->type_num), 
+      io::HDF5Shape(arr->nd, arr->dimensions));
+
+  if (!f.contains(path)) f.create(path, type, true, compression);
+
+  f.extend_buffer(path, type, arr->data);
 }
 
-template <typename T> static void hdf5file_append_array(io::HDF5File& f, 
-    const std::string& path, const T& value, size_t compression) {
-  f.appendArray(path, value, compression);
-}
+static void hdf5file_set_array(io::HDF5File& f, 
+    const std::string& path, numeric::array& arrobj, size_t compression) {
+  
+  PyArrayObject* arr = (PyArrayObject*)arrobj.ptr();
 
-template <typename T> static void hdf5file_set_array(io::HDF5File& f, 
-    const std::string& path, const T& value, size_t compression) {
-  f.setArray(path, value, compression);
+  io::HDF5Type type(tp::num_to_eltype(arr->descr->type_num), 
+      io::HDF5Shape(arr->nd, arr->dimensions));
+
+  if (!f.contains(path)) f.create(path, type, false, compression);
+
+  f.write_buffer(path, 0, type, arr->data);
 }
 
 void bind_io_hdf5() {
@@ -118,8 +201,9 @@ void bind_io_hdf5() {
     .def("keys", &hdf5file_paths, (arg("self")), "Returns all paths to datasets available inside this file")
     .def("paths", &hdf5file_paths, (arg("self")), "Returns all paths to datasets available inside this file")
     .def("copy", &io::HDF5File::copy, (arg("self"), arg("file")), "Copies all accessible content to another HDF5 file")
+    .def("read", &hdf5file_read, (arg("self"), arg("key")), "Reads the whole dataset in a single shot. Returns a single object with all contents.") 
+    .def("lread", (object(*)(io::HDF5File&, const std::string&, int64_t))0, hdf5file_lread_overloads((arg("self"), arg("key"), arg("pos")=-1), "Reads a given position from the dataset. Returns a single object if 'pos' >= 0, otherwise a list by reading all objects in sequence."))
 #   define DECLARE_SUPPORT(T,E) \
-    .def(BOOST_PP_STRINGIZE(__read_ ## E ## __), &hdf5file_read_scalar<T>, (arg("self"), arg("key"), arg("pos")), "Reads a given scalar from a dataset") \
     .def(BOOST_PP_STRINGIZE(__replace_ ## E ## __), &hdf5file_replace_scalar<T>, (arg("self"), arg("key"), arg("pos"), arg("value")), "Modifies the value of a scalar inside the file.") \
     .def(BOOST_PP_STRINGIZE(__append_ ## E ## __), &io::HDF5File::append<T>, (arg("self"), arg("key"), arg("value")), "Appends a scalar to a dataset. If the dataset does not yet exist, one is created with the type characteristics.") \
     .def(BOOST_PP_STRINGIZE(__set_ ## E ## __), &io::HDF5File::set<T>, (arg("self"), arg("key"), arg("value")), "Sets the scalar at position 0 to the given value. This method is equivalent to checking if the scalar at position 0 exists and then replacing it. If the path does not exist, we append the new scalar.") 
@@ -140,31 +224,8 @@ void bind_io_hdf5() {
     //DECLARE_SUPPORT(std::complex<long double>, complex256)
     DECLARE_SUPPORT(std::string, string)
 #   undef DECLARE_SUPPORT
-#   define DECLARE_SUPPORT(T,N,E) .def(BOOST_PP_STRINGIZE(__read_ ## E ## _ ## N ##__), &hdf5file_read_array<T,N>, (arg("self"), arg("key"), arg("pos"), arg("array")), "Reads a given array from a dataset") \
-    .def("__replace_array__", &hdf5file_replace_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.") \
-    .def("__append_array__", &hdf5file_append_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created you can set its compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") \
-    .def("__set_array__", &hdf5file_set_array<blitz::Array<T,N> >, (arg("self"), arg("key"), arg("array"), arg("compression")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, you can set the compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") 
-#   define DECLARE_BZ_SUPPORT(T,E) \
-    DECLARE_SUPPORT(T,1,E) \
-    DECLARE_SUPPORT(T,2,E) \
-    DECLARE_SUPPORT(T,3,E) \
-    DECLARE_SUPPORT(T,4,E)
-    DECLARE_BZ_SUPPORT(bool,bool)
-    DECLARE_BZ_SUPPORT(int8_t,int8t)
-    DECLARE_BZ_SUPPORT(int16_t,int16)
-    DECLARE_BZ_SUPPORT(int32_t,int32)
-    DECLARE_BZ_SUPPORT(int64_t,int64)
-    DECLARE_BZ_SUPPORT(uint8_t,uint8)
-    DECLARE_BZ_SUPPORT(uint16_t,uint16)
-    DECLARE_BZ_SUPPORT(uint32_t,uint32)
-    DECLARE_BZ_SUPPORT(uint64_t,uint64)
-    DECLARE_BZ_SUPPORT(float,float32)
-    DECLARE_BZ_SUPPORT(double,float64)
-    //DECLARE_BZ_SUPPORT(long double,float128)
-    DECLARE_BZ_SUPPORT(std::complex<float>,complex64)
-    DECLARE_BZ_SUPPORT(std::complex<double>,complex128)
-    //DECLARE_BZ_SUPPORT(std::complex<long double>,complex256)
-#   undef DECLARE_BZ_SUPPORT
-#   undef DECLARE_SUPPORT
+    .def("__append_array__", &hdf5file_append_array, (arg("self"), arg("key"), arg("array"), arg("compression")), "Appends a array to a dataset. If the dataset does not yet exist, one is created with the type characteristics.\n\nIf a new Dataset is to be created you can set its compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).")
+    .def("__replace_array__", &hdf5file_replace_array, (arg("self"), arg("key"), arg("pos"), arg("array")), "Modifies the value of a array inside the file.")
+    .def("__set_array__", &hdf5file_set_array, (arg("self"), arg("key"), arg("array"), arg("compression")), "Sets the array at position 0 to the given value. This method is equivalent to checking if the array at position 0 exists and then replacing it. If the path does not exist, you can set the compression level. Note these settings have no effect if the Dataset already exists on file, in which case the current settings for that dataset are respected. The maximum value for the gzip compression is 9. The value of zero turns compression off (the default).") 
     ;
 }

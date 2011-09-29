@@ -178,7 +178,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T> void read(size_t index, T& value) {
         Torch::io::HDF5Type dest_type(value);
-        read(index, dest_type, reinterpret_cast<void*>(&value));
+        read_buffer(index, dest_type, reinterpret_cast<void*>(&value));
       }
 
       /**
@@ -189,14 +189,6 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         T retval;
         read(index, retval);
         return retval;
-      }
-
-      /**
-       * Reads data from the file into a scalar. This is equivalent to using
-       * read(0, value). The same conditions as for read(index=0, value) apply.
-       */
-      template <typename T> void read(T& value) {
-        read(0, value);
       }
 
       /**
@@ -234,7 +226,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         void readArray(size_t index, blitz::Array<T,N>& value) {
           Torch::core::array::assertCZeroBaseContiguous(value);
           Torch::io::HDF5Type dest_type(value);
-          read(index, dest_type, reinterpret_cast<void*>(value.data()));
+          read_buffer(index, dest_type, reinterpret_cast<void*>(value.data()));
         }
 
       /**
@@ -304,7 +296,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T> void replace(size_t index, const T& value) {
         Torch::io::HDF5Type dest_type(value);
-        write(index, dest_type, reinterpret_cast<const void*>(&value));
+        write_buffer(index, dest_type, reinterpret_cast<const void*>(&value));
       }
 
       /**
@@ -331,7 +323,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T> void add(const T& value) {
         Torch::io::HDF5Type dest_type(value);
-        extend(dest_type, reinterpret_cast<const void*>(&value));
+        extend_buffer(dest_type, reinterpret_cast<const void*>(&value));
       }
 
       /**
@@ -361,10 +353,10 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
           Torch::io::HDF5Type dest_type(value);
           if(!Torch::core::array::isCZeroBaseContiguous(value)) {
             blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
-            write(index, dest_type, reinterpret_cast<const void*>(tmp.data()));
+            write_buffer(index, dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {
-            write(index, dest_type,
+            write_buffer(index, dest_type,
                 reinterpret_cast<const void*>(value.data()));
           }
         }
@@ -397,10 +389,10 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
           Torch::io::HDF5Type dest_type(value);
           if(!Torch::core::array::isCZeroBaseContiguous(value)) {
             blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
-            extend(dest_type, reinterpret_cast<const void*>(tmp.data()));
+            extend_buffer(dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {
-            extend(dest_type, reinterpret_cast<const void*>(value.data()));
+            extend_buffer(dest_type, reinterpret_cast<const void*>(value.data()));
           }
       }
 
@@ -410,7 +402,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       Dataset& operator= (const Dataset& other);
 
-    private: //some tricks
+    private: //apis
 
       /**
        * Selects a bit of the file to be affected at the next read or write
@@ -427,19 +419,19 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       /**
        * Reads a previously selected area into the given (user) buffer.
        */
-      void read (size_t index, const Torch::io::HDF5Type& dest, void* buffer);
+      void read_buffer (size_t index, const Torch::io::HDF5Type& dest, void* buffer);
 
       /**
        * Writes the contents of a given buffer into the file. The area that the
        * data will occupy should have been selected beforehand.
        */
-      void write (size_t index, const Torch::io::HDF5Type& dest, 
+      void write_buffer (size_t index, const Torch::io::HDF5Type& dest, 
           const void* buffer);
 
       /**
        * Extend the dataset with one extra variable.
        */
-      void extend (const Torch::io::HDF5Type& dest, const void* buffer);
+      void extend_buffer (const Torch::io::HDF5Type& dest, const void* buffer);
 
     public: //representation
   

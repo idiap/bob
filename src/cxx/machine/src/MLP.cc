@@ -118,8 +118,7 @@ mach::MLP& mach::MLP::operator= (const MLP& other) {
 }
 
 void mach::MLP::load (Torch::io::HDF5File& config) {
-  uint8_t nhidden;
-  config.read("nhidden", nhidden);
+  uint8_t nhidden = config.read<uint8_t>("nhidden");
   m_weight.resize(nhidden+1);
   m_bias.resize(nhidden+1);
   m_buffer.resize(nhidden+1);
@@ -139,8 +138,7 @@ void mach::MLP::load (Torch::io::HDF5File& config) {
   }
 
   //reads the activation function
-  uint32_t act = 0;
-  config.read("activation", act);
+  uint32_t act = config.read<uint32_t>("activation");
   setActivation(static_cast<mach::Activation>(act));
 
   //setup buffers: first, input

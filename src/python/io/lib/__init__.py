@@ -3,6 +3,7 @@ import numpy
 import os
 
 # Attach loading and saving functionality to arrays
+from ..core import array as core_array
 def load(filename, codecname=''):
   """Loads an array from a given file path specified
   
@@ -14,6 +15,7 @@ def load(filename, codecname=''):
   the codec to be used from the filename extension.
   """
   return Array(filename, codecname=codecname).get()
+core_array.load = load
 
 def save(obj, filename, codecname=''):
   """Saves the current array at the file path specified.
@@ -26,6 +28,7 @@ def save(obj, filename, codecname=''):
   filename extension.
   """
   Array(obj).save(filename, codecname=codecname)
+core_array.save = save
 
 def arrayset_iter(self):
   """Allows Arraysets to be iterated in native python"""
@@ -267,67 +270,6 @@ def hdf5type_repr(self):
   return "<HDF5Type: %s (0x%x)>" % (str(self), id(self))
 HDF5Type.__repr__ = hdf5type_repr
 del hdf5type_repr
-
-def hdf5file_read(self, path):
-  """Reads all dataset elements from the current file. In this mode, the
-  dataset is considered to contain a single element that will be read entirely
-  from the file into memory as a array.
-  
-  Keyword Parameters:
-
-  path
-    This is the path to the HDF5 dataset to read data from
-  """
-  descr = self.describe(path)[1].type
-
-  if descr.shape() == (1,):  # read as scalar
-    return getattr(self, '__read_%s__' % descr.type_str())(path, 0)
-
-  else: # read as array
-    retval = numpy.ndarray(dtype=descr.type_str(), shape=self.shape())
-    getattr(self, '__read_%s_%d__' % (descr.type_str(), len(descr.shape())))(path, 0, retval)
-    return retval
-
-HDF5File.read = hdf5file_read
-del hdf5file_read
-
-def hdf5file_lread(self, path, pos=-1):
-  """Reads elements from the indicated dataset considering the dataset first
-  dimension contains the number of elements in a list and that the dataset was
-  created with append() instead of set(). Elements read have N-1 dimensions,
-  where N is the number of dimensions displayed at the dataset.
-  
-  Keyword Parameters:
-
-  path
-    This is the path to the HDF5 dataset to read data from
-
-  pos
-    This is the position in the dataset to readout. If the given value is
-    smaller than zero, we read all positions in the dataset and return you a
-    list. If the position is specific, we return a single element.
-  """
-  dtype = self.describe(path)[0]
-  descr = dtype.type
-  size = dtype.size
-  
-  def read_scalar_or_array(self, path, descr, pos):
-    if descr.shape() == (1,):  # read as scalar
-      return getattr(self, '__read_%s__' % descr.type_str())(path, pos)
-
-    else: # read as array
-      retval = numpy.ndarray(dtype=descr.type_str(), shape=descr.shape())
-      getattr(self, '__read_%s_%d__' % (descr.type_str(), len(descr.shape())))(path, pos, retval)
-      return retval
-
-  if pos < 0: # read all -- recurse
-    return [read_scalar_or_array(self, path, descr, k) for k in range(size)]
-
-  else:
-    return read_scalar_or_array(self, path, descr, pos)
-
-HDF5File.lread = hdf5file_lread
-del hdf5file_lread
 
 def hdf5file_append(self, path, data, compression=0, dtype=None):
   """Appends data to a certain HDF5 dataset in this file. When you append data

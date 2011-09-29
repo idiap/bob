@@ -489,6 +489,63 @@ io::HDF5Type::HDF5Type(io::hdf5type type, const io::HDF5Shape& extents):
 {
 }
 
+io::HDF5Type::HDF5Type(Torch::core::array::ElementType eltype, 
+    const HDF5Shape& extents): 
+  m_type(),
+  m_shape(extents)
+{
+  switch(eltype) {
+    case Torch::core::array::t_unknown:
+      m_type = io::unsupported;
+      break;
+    case Torch::core::array::t_bool:
+      m_type = io::u8;
+      break;
+    case Torch::core::array::t_int8:
+      m_type = io::i8;
+      break;
+    case Torch::core::array::t_int16:
+      m_type = io::i16;
+      break;
+    case Torch::core::array::t_int32:
+      m_type = io::i32;
+      break;
+    case Torch::core::array::t_int64:
+      m_type = io::i64;
+      break;
+    case Torch::core::array::t_uint8:
+      m_type = io::u8;
+      break;
+    case Torch::core::array::t_uint16:
+      m_type = io::u16;
+      break;
+    case Torch::core::array::t_uint32:
+      m_type = io::u32;
+      break;
+    case Torch::core::array::t_uint64:
+      m_type = io::u64;
+      break;
+    case Torch::core::array::t_float32:
+      m_type = io::f32;
+      break;
+    case Torch::core::array::t_float64:
+      m_type = io::f64;
+      break;
+    case Torch::core::array::t_float128:
+      m_type = io::f128;
+      break;
+    case Torch::core::array::t_complex64:
+      m_type = io::c64;
+      break;
+    case Torch::core::array::t_complex128:
+      m_type = io::c128;
+      break;
+    case Torch::core::array::t_complex256:
+      m_type = io::c256;
+      break;
+  }
+}
+
 io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type,
     const io::HDF5Shape& extents):
   m_type(get_datatype(type)),

@@ -88,12 +88,10 @@ void mach::GMMStats::save(Torch::io::HDF5File& config) const {
 }
 
 void mach::GMMStats::load(Torch::io::HDF5File& config) {
-  config.read("log_liklihood", log_likelihood);
-  int64_t n_gaussians;
-  config.read("n_gaussians", n_gaussians);
-  int64_t n_inputs;
-  config.read("n_inputs", n_inputs);
-  config.read("T", T);
+  log_likelihood = config.read<double>("log_liklihood");
+  int64_t n_gaussians = config.read<int64_t>("n_gaussians");
+  int64_t n_inputs = config.read<int64_t>("n_inputs");
+  T = config.read<int64_t>("T");
   
   //resize arrays to prepare for HDF5 readout
   n.resize(n_gaussians);

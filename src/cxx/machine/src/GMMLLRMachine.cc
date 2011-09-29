@@ -115,7 +115,7 @@ void Torch::machine::GMMLLRMachine::save(Torch::io::HDF5File& config) const {
 }
 
 void Torch::machine::GMMLLRMachine::load(Torch::io::HDF5File& config) {
-  config.read("m_n_inputs", m_n_inputs);
+  m_n_inputs = config.read<int64_t>("m_n_inputs");
 
   std::ostringstream oss_client;
   oss_client << "m_gmm_client";
