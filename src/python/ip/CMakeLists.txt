@@ -36,6 +36,7 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(ip "${pysrc}")
+target_link_libraries(pytorch_ip pytorch_core_utils)
 add_dependencies(pytorch_ip python-core_header_install)
 torch_python_install(ip)
   

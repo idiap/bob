@@ -81,6 +81,9 @@ namespace Torch { namespace python {
   template <> int type_to_num<std::complex<double> >(void);
   template <> int type_to_num<std::complex<long double> >(void);
 
+  //checks
+  bool check_ndarray_byteorder(PyArray_Descr* desc);
+
   //assertions for simple checks
   void assert_ndarray_shape(PyArrayObject* arr, int N);
   void assert_ndarray_type(PyArrayObject* arr, int type_num);

@@ -8,6 +8,7 @@
 import os, sys
 import unittest
 import tempfile
+import numpy
 import torch
 import random
 
@@ -54,7 +55,7 @@ class TensorFileTest(unittest.TestCase):
     self.assertEqual(infile.shape, SHAPE)
     self.assertEqual(infile.elementType, torch.io.ElementType.float64)
     for k in range(N): 
-      self.assertEqual(infile[k], arrays[k])
+      self.assertTrue(numpy.array_equal(infile[k], arrays[k]))
     del infile
 
     # Now we open the tensor file for reading and the data should be all there.
@@ -64,7 +65,7 @@ class TensorFileTest(unittest.TestCase):
     self.assertEqual(inoutfile.shape, SHAPE)
     self.assertEqual(inoutfile.elementType, torch.io.ElementType.float64)
     for k in range(N): 
-      self.assertEqual(inoutfile[k], arrays[k])
+      self.assertTrue(numpy.array_equal(inoutfile[k], arrays[k]))
     del inoutfile
     os.unlink(tmpname)
 

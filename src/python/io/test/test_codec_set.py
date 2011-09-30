@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import tempfile
+import numpy
 import torch
 import random
 

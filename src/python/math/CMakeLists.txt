@@ -16,6 +16,7 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(math "${pysrc}")
+target_link_libraries(pytorch_math pytorch_core_utils)
 torch_python_install(math)
 
 # Our test units

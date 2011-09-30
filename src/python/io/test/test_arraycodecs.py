@@ -33,12 +33,14 @@ def testcase_transcode(self, codecname, filename):
   # transcode to binary
   tmpname = tempname('.hdf5')
   bincodec.save(tmpname, testcodec.load(filename))
-  self.assertEqual(bincodec.load(tmpname).get(), testcodec.load(filename).get())
+  self.assertTrue( numpy.array_equal(bincodec.load(tmpname).get(),
+    testcodec.load(filename).get()) )
 
   # transcode to test format
   tmpname2 = tempname('.test')
   testcodec.save(tmpname2, bincodec.load(tmpname))
-  self.assertEqual(testcodec.load(tmpname2).get(), bincodec.load(tmpname).get())
+  self.assertTrue( numpy.array_equal(testcodec.load(tmpname2).get(),
+    bincodec.load(tmpname).get()) )
 
   # And we erase both files after this
   os.unlink(tmpname)
@@ -54,7 +56,7 @@ def testcase_readwrite(self, codecname, bzdata):
   tmpname = tempname('.test')
   testcodec.save(tmpname, torch.io.Array(bzdata))
   reloaded = testcodec.load(tmpname).get()
-  self.assertEqual(bzdata, reloaded)
+  self.assertTrue( numpy.array_equal(bzdata, reloaded) )
   os.unlink(tmpname)
 
 def testcase_readwrite_ext(self, codecname, bzdata, ext):
@@ -63,7 +65,7 @@ def testcase_readwrite_ext(self, codecname, bzdata, ext):
   tmpname = tempname(ext)
   testcodec.save(tmpname, torch.io.Array(bzdata))
   reloaded = testcodec.load(tmpname).get()
-  self.assertEqual(bzdata, reloaded)
+  self.assertTrue( numpy.array_equal(bzdata, reloaded) )
   os.unlink(tmpname)
 
 # And we attach...
@@ -103,7 +105,6 @@ class ArrayCodecTest(unittest.TestCase):
         numpy.array(range(24), dtype='float32').reshape(6,4) / 24.)
     self.readwrite("torch.array.tensor",
         numpy.array(range(24), dtype='float64').reshape(2,12) / 3.33336)
-    self.readwrite("matlab.array.binary",
     self.transcode("torch.array.tensor", "torch.tensor")
 
 if __name__ == '__main__':

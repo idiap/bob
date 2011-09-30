@@ -32,12 +32,12 @@ def testcase_transcode(self, codecname, filename):
   # transcode to binary
   tmpname = tempname('.hdf5')
   bincodec.save(tmpname, testcodec.load(filename))
-  self.assertEqual(bincodec.load(tmpname), testcodec.load(filename))
+  self.assertTrue( numpy.array_equal(bincodec.load(tmpname), testcodec.load(filename)) )
 
   # transcode to test format
   tmpname2 = tempname('.test')
   testcodec.save(tmpname2, bincodec.load(tmpname))
-  self.assertEqual(testcodec.load(tmpname2), bincodec.load(tmpname))
+  self.assertTrue( numpy.array_equal(testcodec.load(tmpname2), bincodec.load(tmpname)) )
 
   # And we erase both files after this
   os.unlink(tmpname)
@@ -83,11 +83,11 @@ def testcase_append_load(self, codecname, bzdata_list):
 
   #loads everything, see if are exactly the same
   reloaded = testcodec.load(tmpname)
-  self.assertEqual(indata, reloaded)
+  self.assertTrue( numpy.array_equal(indata, reloaded) )
 
   #loads one by one and checks they are individually correct
   for i, k in enumerate(bzdata_list):
-    self.assertEqual(testcodec.load(tmpname, i).get(), i)
+    self.assertTrue( numpy.array_equal(testcodec.load(tmpname, i).get(), k) )
 
   os.unlink(tmpname)
 
@@ -106,9 +106,9 @@ data_2 = [
     numpy.array(range(24), 'float64') / 37,
     ]
 data_3 = [
-    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(24.33333334, 0.9)
-    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(0.1, -52.9)
-    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(37, -1e18)
+    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(24.33333334, 0.9),
+    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(0.1, -52.9),
+    numpy.array(range(24), 'complex128').reshape(2,3,4) / complex(37, -1e18),
     ]
 data_4 = [
     numpy.array(range(24000), 'complex128').reshape(4,30,40,5) / complex(24.3333334, 0.9),

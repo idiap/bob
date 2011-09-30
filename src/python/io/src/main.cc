@@ -1,5 +1,6 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
+ * @author Andre Anjos <andre.anjos@idiap.ch> 
+ * @date Fri 30 Sep 10:25:02 2011 CEST
  *
  * @brief Combines all modules to make up the complete bindings
  */

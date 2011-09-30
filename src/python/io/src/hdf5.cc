@@ -125,8 +125,8 @@ static object hdf5file_xread(io::HDF5File& f, const std::string& p,
   for (uint64_t k=0; k<shape.n(); ++k) dims[k] = shape[k];
   PyArrayObject* arr = tp::make_ndarray(shape.n(), dims, tp::eltype_to_num(type.element_type()));
   f.read_buffer(p, pos, type, arr->data);
-  object retval((PyObject*)arr);
-  return retval;
+  handle<> retval(borrowed<>((PyObject*)arr)); //?
+  return object(retval);
 }
 
 static object hdf5file_lread(io::HDF5File& f, const std::string& p,
@@ -154,6 +154,9 @@ static void hdf5file_replace_array(io::HDF5File& f, const std::string& p,
     size_t pos, numeric::array& arrobj) {
 
   PyArrayObject* arr = (PyArrayObject*)arrobj.ptr();
+    
+  tp::assert_ndarray_byteorder(arr);
+  tp::assert_ndarray_behaved(arr);
 
   io::HDF5Type type(tp::num_to_eltype(arr->descr->type_num), 
       io::HDF5Shape(arr->nd, arr->dimensions));
@@ -165,6 +168,9 @@ static void hdf5file_append_array(io::HDF5File& f,
     const std::string& path, numeric::array& arrobj, size_t compression) {
 
   PyArrayObject* arr = (PyArrayObject*)arrobj.ptr();
+
+  tp::assert_ndarray_byteorder(arr);
+  tp::assert_ndarray_behaved(arr);
 
   io::HDF5Type type(tp::num_to_eltype(arr->descr->type_num), 
       io::HDF5Shape(arr->nd, arr->dimensions));
@@ -178,6 +184,9 @@ static void hdf5file_set_array(io::HDF5File& f,
     const std::string& path, numeric::array& arrobj, size_t compression) {
   
   PyArrayObject* arr = (PyArrayObject*)arrobj.ptr();
+
+  tp::assert_ndarray_byteorder(arr);
+  tp::assert_ndarray_behaved(arr);
 
   io::HDF5Type type(tp::num_to_eltype(arr->descr->type_num), 
       io::HDF5Shape(arr->nd, arr->dimensions));

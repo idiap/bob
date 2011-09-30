@@ -5,9 +5,7 @@
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_math_eig();
 void bind_math_linear();
@@ -18,11 +16,9 @@ void bind_math_svd();
 void bind_math_stats();
 
 BOOST_PYTHON_MODULE(libpytorch_math) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch mathematical classes and sub-classes";
+
+  Torch::python::setup_python("Torch mathematical classes and sub-classes");
+
   bind_math_eig();
   bind_math_linear();
   bind_math_linsolve();

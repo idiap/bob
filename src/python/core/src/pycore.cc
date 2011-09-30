@@ -171,8 +171,12 @@ void tp::assert_ndarray_type(PyArrayObject* arr, int type_num) {
   }
 }
 
+bool tp::check_ndarray_byteorder(PyArray_Descr* desc) {
+  return (PyArray_EquivByteorders(desc->byteorder, NPY_NATIVE) || desc->elsize == 1);
+}
+
 void tp::assert_ndarray_byteorder(PyArrayObject* arr) {
-  if (!PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE)) {
+  if (!tp::check_ndarray_byteorder(arr->descr)) {
     boost::format f("cannot digest non-native byte ordering in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array wrapping");
     f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd;
     PYTHON_ERROR(TypeError, f.str().c_str());

@@ -113,7 +113,7 @@ template <typename T, int N> struct bz_from_npy {
     if (arr) { //check arr parameters -- only a perfect match will be accepted!
       if (arr->nd == N     //has to have the number of dimensions == N
           && tp::type_to_num<T>() == arr->descr->type_num //good type
-          && arr->descr->byteorder == '=' //native byte order only accepted!
+          && tp::check_ndarray_byteorder(arr->descr)
          ) {
         return obj_ptr;
       }
@@ -129,7 +129,7 @@ template <typename T, int N> struct bz_from_npy {
 
       //check dimensions and byteorder
       if (ndim == N     //has to have the number of dimensions == N
-          && dtype->byteorder == '=' //native byte order only accepted!
+          && tp::check_ndarray_byteorder(dtype)
          ) {
         return obj_ptr;
       }

@@ -1,16 +1,20 @@
-#include <boost/python.hpp>
+/**
+ * @author Francois Moulin <francois.moulin@idiap.ch> 
+ * @author Laurent El-Shafey <lelshafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch> 
+ * @date Fri 30 Sep 10:25:02 2011 CEST
+ *
+ * @brief Combines all modules to make up the complete bindings
+ */
 
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_trainer_kmeans_wrappers();
 void bind_trainer_gmm_wrappers();
 
 BOOST_PYTHON_MODULE(libpytorch_trainer_overload) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch classes and sub-classes for overloading trainers";
+
+  Torch::python::setup_python("Torch classes and sub-classes for overloading trainers");
   
   bind_trainer_kmeans_wrappers();
   bind_trainer_gmm_wrappers();

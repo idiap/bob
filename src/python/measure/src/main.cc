@@ -1,21 +1,17 @@
 /**
- * @file python/config/src/main.cc 
- * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Fri 30 Sep 10:32:54 2011 CEST
  *
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_measure_error();
 
 BOOST_PYTHON_MODULE(libpytorch_measure) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch error measure classes and sub-classes";
+
+  Torch::python::setup_python("Torch error measure classes and sub-classes");
+
   bind_measure_error();
 }

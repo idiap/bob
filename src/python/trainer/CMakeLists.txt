@@ -21,8 +21,12 @@ set(pysrc_overload
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(trainer "${pysrc}") 
+target_link_libraries(pytorch_trainer pytorch_core_utils)
+add_dependencies(pytorch_trainer python-core_header_install trainer-cxx_header_install) 
+
 torch_python_submodule_bindings(trainer overload "${pysrc_overload}")
-add_dependencies(pytorch_trainer python-core_header_install trainer-cxx_header_install)
+target_link_libraries(pytorch_trainer_overload pytorch_core_utils)
+add_dependencies(pytorch_trainer_overload python-core_header_install trainer-cxx_header_install) 
 torch_python_install(trainer)
   
 # Our test units

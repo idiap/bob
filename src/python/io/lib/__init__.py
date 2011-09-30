@@ -81,7 +81,7 @@ def arrayset_extend(self, obj, dim=0):
     value of `dim` is otherwise ignored.
   """
 
-  if hasattr(obj, '__iter__'):
+  if isinstance(obj, (tuple,list)):
     return self.__iterable_extend__(obj)
 
   else: #it is an io.Array or a ndarray

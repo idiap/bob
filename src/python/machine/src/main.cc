@@ -1,6 +1,13 @@
-#include <boost/python.hpp>
+/**
+ * @author Francois Moulin <francois.moulin@idiap.ch> 
+ * @author Laurent El-Shafey <lelshafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch> 
+ * @date Fri 30 Sep 10:25:02 2011 CEST
+ *
+ * @brief Combines all modules to make up the complete bindings
+ */
 
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_machine_exception();
 void bind_machine_gmm();
@@ -13,11 +20,7 @@ void bind_machine_jfa();
 
 BOOST_PYTHON_MODULE(libpytorch_machine)
 {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch classes and sub-classes for machine access";
+  Torch::python::setup_python("Torch classes and sub-classes for machine access");
 
   bind_machine_exception();
   bind_machine_gmm();

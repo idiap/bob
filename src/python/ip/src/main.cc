@@ -1,13 +1,11 @@
 /**
- * @file src/python/ip/src/main.cc 
- * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Fri 30 Sep 10:31:08 2011 CEST
  *
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_ip_exception();
 void bind_ip_ipcore();
@@ -38,11 +36,9 @@ void bind_ip_drawing();
 void bind_ip_spatiotempgrad();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch image processing classes and sub-classes";
+
+  Torch::python::setup_python("Torch image processing classes and sub-classes");
+
   bind_ip_exception();
   bind_ip_ipcore();
   bind_ip_color();

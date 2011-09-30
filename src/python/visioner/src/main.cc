@@ -5,17 +5,13 @@
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include <boost/python.hpp>
-
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_visioner_localize();
 
 BOOST_PYTHON_MODULE(libpytorch_visioner) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch face localization bridge for visioner";
+  
+  Torch::python::setup_python("Torch face localization bridge for visioner");
+
   bind_visioner_localize();
 }

@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import tempfile
+import numpy
 import torch
 import random
 
@@ -143,7 +144,8 @@ class CodecTest(unittest.TestCase):
     # Lets make sure the binary data saved is the same:
     bzbin = binary.load(tmpname).get()
     bztxt = text.load('test_array_codec.txt').get()
-    self.assertEqual(bzbin, bztxt)
+    import pdb; pdb.set_trace()
+    self.assertTrue( numpy.array_equal(bzbin, bztxt) )
 
     # This trick can be done both ways!
     tmpname2 = get_tempfilename()
@@ -152,7 +154,7 @@ class CodecTest(unittest.TestCase):
     # Lets make sure the binary data saved is the same:
     bzbin = binary.load(tmpname).get()
     bztxt = text.load(tmpname2).get()
-    self.assertEqual(bzbin, bztxt)
+    self.assertTrue( numpy.array_equal(bzbin, bztxt) )
 
     # And we erase both files after this
     os.unlink(tmpname)

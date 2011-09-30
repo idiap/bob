@@ -1,6 +1,13 @@
-#include <boost/python.hpp>
+/**
+ * @author Francois Moulin <francois.moulin@idiap.ch> 
+ * @author Laurent El-Shafey <lelshafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch> 
+ * @date Fri 30 Sep 10:25:02 2011 CEST
+ *
+ * @brief Combines all modules to make up the complete bindings
+ */
 
-using namespace boost::python;
+#include "core/python/pycore.h"
 
 void bind_trainer_exception();
 void bind_trainer_linear();
@@ -11,11 +18,8 @@ void bind_trainer_backprop();
 void bind_trainer_jfa();
 
 BOOST_PYTHON_MODULE(libpytorch_trainer) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch classes and sub-classes for trainers";
+
+  Torch::python::setup_python("Torch classes and sub-classes for trainers");
   
   bind_trainer_exception();
   bind_trainer_linear();
