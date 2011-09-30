@@ -1,38 +1,63 @@
 #include <boost/python.hpp>
 #include <machine/ZTNorm.h>
 
+#include "core/python/pycore.h"
+
 using namespace boost::python;
+namespace tp = Torch::python;
 
-static boost::shared_ptr<blitz::Array<double, 2> > ztnorm1(blitz::Array<double, 2>& eval_tests_on_eval_models,
-                                                           blitz::Array<double, 2>& znorm_tests_on_eval_models,
-                                                           blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-                                                           blitz::Array<double, 2>& znorm_tests_on_tnorm_models,
-                                                           blitz::Array<bool,   2>& znorm_tests_tnorm_models_same_spk_ids) {
+static blitz::Array<double, 2> ztnorm1(
+    numeric::array eval_tests_on_eval_models,
+    numeric::array znorm_tests_on_eval_models,
+    numeric::array eval_tests_on_tnorm_models,
+    numeric::array znorm_tests_on_tnorm_models,
+    numeric::array znorm_tests_tnorm_models_same_spk_ids) {
 
-  boost::shared_ptr<blitz::Array<double, 2> > ret(new blitz::Array<double, 2>);
+  blitz::Array<double,2> eval_tests_on_eval_models_ = 
+    tp::numpy_bz<double,2>(eval_tests_on_eval_models);
+  blitz::Array<double,2> znorm_tests_on_eval_models_ =
+    tp::numpy_bz<double,2>(znorm_tests_on_eval_models);
+  blitz::Array<double,2> eval_tests_on_tnorm_models_ = 
+    tp::numpy_bz<double,2>(eval_tests_on_tnorm_models);
+  blitz::Array<double,2> znorm_tests_on_tnorm_models_ =
+    tp::numpy_bz<double,2>(znorm_tests_on_tnorm_models);
+  blitz::Array<bool,2> znorm_tests_tnorm_models_same_spk_ids_ = 
+    tp::numpy_bz<bool,2>(znorm_tests_tnorm_models_same_spk_ids);
 
-  Torch::machine::ztNorm(eval_tests_on_eval_models,
-                         znorm_tests_on_eval_models,
-                         eval_tests_on_tnorm_models,
-                         znorm_tests_on_tnorm_models,
-                         znorm_tests_tnorm_models_same_spk_ids,
-                         *ret.get());
+  blitz::Array<double, 2> ret;
+
+  Torch::machine::ztNorm(eval_tests_on_eval_models_,
+                         znorm_tests_on_eval_models_,
+                         eval_tests_on_tnorm_models_,
+                         znorm_tests_on_tnorm_models_,
+                         znorm_tests_tnorm_models_same_spk_ids_,
+                         ret);
 
   return ret;
 }
 
-static boost::shared_ptr<blitz::Array<double, 2> > ztnorm2(blitz::Array<double, 2>& eval_tests_on_eval_models,
-                                                           blitz::Array<double, 2>& znorm_tests_on_eval_models,
-                                                           blitz::Array<double, 2>& eval_tests_on_tnorm_models,
-                                                           blitz::Array<double, 2>& znorm_tests_on_tnorm_models) {
+static blitz::Array<double, 2> ztnorm2(
+    numeric::array eval_tests_on_eval_models,
+    numeric::array znorm_tests_on_eval_models,
+    numeric::array eval_tests_on_tnorm_models,
+    numeric::array znorm_tests_on_tnorm_models) {
 
-  boost::shared_ptr<blitz::Array<double, 2> > ret(new blitz::Array<double, 2>);
+  blitz::Array<double,2> eval_tests_on_eval_models_ = 
+    tp::numpy_bz<double,2>(eval_tests_on_eval_models);
+  blitz::Array<double,2> znorm_tests_on_eval_models_ =
+    tp::numpy_bz<double,2>(znorm_tests_on_eval_models);
+  blitz::Array<double,2> eval_tests_on_tnorm_models_ = 
+    tp::numpy_bz<double,2>(eval_tests_on_tnorm_models);
+  blitz::Array<double,2> znorm_tests_on_tnorm_models_ =
+    tp::numpy_bz<double,2>(znorm_tests_on_tnorm_models);
 
-  Torch::machine::ztNorm(eval_tests_on_eval_models,
-                         znorm_tests_on_eval_models,
-                         eval_tests_on_tnorm_models,
-                         znorm_tests_on_tnorm_models,
-                         *ret.get());
+  blitz::Array<double, 2> ret;
+
+  Torch::machine::ztNorm(eval_tests_on_eval_models_,
+                         znorm_tests_on_eval_models_,
+                         eval_tests_on_tnorm_models_,
+                         znorm_tests_on_tnorm_models_,
+                         ret);
 
   return ret;
 }

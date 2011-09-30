@@ -69,6 +69,15 @@ static void set_input_div(mach::MLP& m, object o) {
   }
 }
 
+static tuple get_weight(mach::MLP& m) {
+  list retval;
+  for (std::vector<blitz::Array<double,2> >::const_iterator
+      it = m.getWeights().begin(); it != m.getWeights().end(); ++it) {
+    retval.append(*it);
+  }
+  return tuple(retval);
+}
+
 static void set_weight(mach::MLP& m, object o) {
   extract<int> int_check(o);
   extract<double> float_check(o);
@@ -82,6 +91,15 @@ static void set_weight(mach::MLP& m, object o) {
     //try hard-core extraction - throws TypeError, if not possible
     m.setWeights(extract<std::vector<blitz::Array<double,2> > >(o));
   }
+}
+
+static tuple get_bias(mach::MLP& m) {
+  list retval;
+  for (std::vector<blitz::Array<double,1> >::const_iterator
+      it = m.getBiases().begin(); it != m.getBiases().end(); ++it) {
+    retval.append(*it);
+  }
+  return tuple(retval);
 }
 
 static void set_bias(mach::MLP& m, object o) {
@@ -124,10 +142,10 @@ void bind_machine_mlp() {
     .def(init<const mach::MLP&>((arg("machine")), "Copy constructs an MLP machine"))
     .def("load", &mach::MLP::load, (arg("self"), arg("config")), "Loads the weights, biases and other configuration parameter sfrom a configuration file.")
     .def("save", &mach::MLP::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
-    .add_property("input_subtract", make_function(&mach::MLP::getInputSubraction, return_internal_reference<>()), &set_input_sub)
-    .add_property("input_divide", make_function(&mach::MLP::getInputDivision, return_internal_reference<>()), &set_input_div)
-    .add_property("weights", make_function(&mach::MLP::getWeights, return_internal_reference<>()), &set_weight)
-    .add_property("biases", make_function(&mach::MLP::getBiases, return_internal_reference<>()), &set_bias)
+    .add_property("input_subtract", make_function(&mach::MLP::getInputSubraction, return_value_policy<copy_const_reference>()), &set_input_sub)
+    .add_property("input_divide", make_function(&mach::MLP::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div)
+    .add_property("weights", &get_weight, &set_weight)
+    .add_property("biases", &get_bias, &set_bias)
     .add_property("activation", &mach::MLP::getActivation, &mach::MLP::setActivation)
     .add_property("shape", &get_shape, (void (mach::MLP::*)(const std::vector<size_t>&))&mach::MLP::resize)
     .def("__call__", (void (mach::MLP::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output.")

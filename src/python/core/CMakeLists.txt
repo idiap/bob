@@ -61,6 +61,8 @@ add_dependencies(pytorch_core_array python-core_header_install)
 target_link_libraries(pytorch_core_array pytorch_core_utils)
 
 torch_python_submodule_bindings(core vector "${pysrc_vector}")
+target_link_libraries(pytorch_core_vector pytorch_core_utils)
+
 torch_python_submodule_bindings(core mapstring "${pysrc_mapstring}")
 torch_python_submodule_bindings(core tuple "${pysrc_tuple}")
 torch_python_submodule_bindings(core random "${pysrc_random}")

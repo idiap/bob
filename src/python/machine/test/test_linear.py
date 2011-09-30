@@ -10,6 +10,7 @@ import os, sys
 import unittest
 import math
 import torch
+import numpy
 
 MACHINE = 'data/linear-test.hdf5'
 
@@ -21,16 +22,16 @@ class MachineTest(unittest.TestCase):
     # Two inputs and 1 output
     m = torch.machine.LinearMachine(2,1)
     self.assertTrue( (m.weights == 0.0).all() )
-    self.assertEqual( m.weights.shape(), (2,1) )
+    self.assertEqual( m.weights.shape, (2,1) )
     self.assertTrue( (m.biases == 0.0).all() )
-    self.assertEqual( m.biases.shape(), (1,) )
+    self.assertEqual( m.biases.shape, (1,) )
 
     # Start by providing the data
-    w = torch.core.array.array([[0.4, 0.1], [0.4, 0.2], [0.2, 0.7]], 'float64')
+    w = numpy.array([[0.4, 0.1], [0.4, 0.2], [0.2, 0.7]], 'float64')
     m = torch.machine.LinearMachine(w)
-    b = torch.core.array.array([0.3, -3.0], 'float64')
-    isub = torch.core.array.array([0., 0.5, 0.5], 'float64')
-    idiv = torch.core.array.array([0.5, 1.0, 1.0], 'float64')
+    b = numpy.array([0.3, -3.0], 'float64')
+    isub = numpy.array([0., 0.5, 0.5], 'float64')
+    idiv = numpy.array([0.5, 1.0, 1.0], 'float64')
     m.input_subtract = isub
     m.input_divide = idiv
     m.biases = b
@@ -52,9 +53,9 @@ class MachineTest(unittest.TestCase):
     self.assertTrue( (m.biases == b). all() )
 
     # Makes sure we cannot stuff incompatible data
-    w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
+    w = numpy.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
     m = torch.machine.LinearMachine(w)
-    b = torch.core.array.array([0.3, -3.0, 2.7, -18, 52], 'float64') #wrong
+    b = numpy.array([0.3, -3.0, 2.7, -18, 52], 'float64') #wrong
     self.assertRaises(RuntimeError, setattr, m, 'biases', b)
     self.assertRaises(RuntimeError, setattr, m, 'input_subtract', b)
     self.assertRaises(RuntimeError, setattr, m, 'input_divide', b)
@@ -69,13 +70,13 @@ class MachineTest(unittest.TestCase):
       """Calculates, by hand, the presumed output given the input"""
 
       # These are the supposed preloaded values from the file "MACHINE"
-      isub = torch.core.array.array([0., 0.5, 0.5], 'float64')
-      idiv = torch.core.array.array([0.5, 1.0, 1.0], 'float64')
-      w = torch.core.array.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
-      b = torch.core.array.array([0.3, -3.0], 'float64')
+      isub = numpy.array([0., 0.5, 0.5], 'float64')
+      idiv = numpy.array([0.5, 1.0, 1.0], 'float64')
+      w = numpy.array([[0.4, 0.4, 0.2], [0.1, 0.2, 0.7]], 'float64')
+      b = numpy.array([0.3, -3.0], 'float64')
       act = math.tanh
   
-      return torch.core.array.array([ act((w[i,:]*((ivalue-isub)/idiv)).sum() + b[i]) for i in range(w.extent(0)) ], 'float64')
+      return numpy.array([ act((w[i,:]*((ivalue-isub)/idiv)).sum() + b[i]) for i in range(w.shape[0]) ], 'float64')
 
     testing = [
         [1,1,1],
@@ -84,10 +85,10 @@ class MachineTest(unittest.TestCase):
         [12,0,0],
         ]
 
-    maxerr = torch.core.array.float64_1(2)
+    maxerr = numpy.ndarray((2,), 'float64')
     maxerr.fill(1e-10)
     for k in testing:
-      input = torch.core.array.array(k, 'float64')
+      input = numpy.array(k, 'float64')
       self.assertTrue ( (abs(presumed(input) - m(input)) < maxerr).all() )
 
 if __name__ == '__main__':
