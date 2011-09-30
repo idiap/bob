@@ -10,6 +10,7 @@ set(pysrc
    "src/linearscoring.cc"
    "src/ztnorm.cc"
    "src/jfa.cc"
+   "src/wiener.cc"
    "src/main.cc"
    )
 

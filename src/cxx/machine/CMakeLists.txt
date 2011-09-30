@@ -2,7 +2,7 @@ PROJECT(machine-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core io math) #other torch subprojects
+set(deps core io math sp) #other torch subprojects
 set(shared "")
 
 # This defines the list of source files inside this package.
@@ -21,6 +21,7 @@ set(src
     "src/LinearScoring.cc"
     "src/ZTNorm.cc"
     "src/JFAMachine.cc"
+    "src/WienerMachine.cc"
 )
 
 include(../../cmake/macros.cmake)

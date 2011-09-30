@@ -19,6 +19,7 @@ set(src
     "src/MLPRPropTrainer.cc"
     "src/MLPBackPropTrainer.cc"
     "src/JFATrainer.cc"
+    "src/WienerTrainer.cc"
 )
 
 include(../../cmake/macros.cmake)

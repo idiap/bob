@@ -9,6 +9,7 @@ void bind_trainer_kmeans();
 void bind_trainer_rprop();
 void bind_trainer_backprop();
 void bind_trainer_jfa();
+void bind_trainer_wiener();
 
 BOOST_PYTHON_MODULE(libpytorch_trainer) {
   docstring_options docopt; 
@@ -24,4 +25,5 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
   bind_trainer_rprop();
   bind_trainer_backprop();
   bind_trainer_jfa();
+  bind_trainer_wiener();
 }
