@@ -18,8 +18,11 @@
 #include "sp/DCT2DNaive.h"
 #include "sp/fftshift.h"
 
+#include "core/python/pycore.h"
+
 using namespace boost::python;
 namespace sp = Torch::sp;
+namespace tp = Torch::python;
 
 static const char* FFT1D_DOC = "Objects of this class, after configuration, can compute the direct FFT of a 1D array/signal.";
 static const char* IFFT1D_DOC = "Objects of this class, after configuration, can compute the inverse FFT of a 1D array/signal.";
@@ -79,7 +82,6 @@ static blitz::Array<std::complex<double>,2> script_ifft(const blitz::Array<std::
   return res;
 }
 
-
 static blitz::Array<double,1> script_dct(const blitz::Array<double,1>& ar)
 {
   Torch::sp::DCT1D dct(ar.extent(0));
@@ -112,8 +114,6 @@ static blitz::Array<double,2> script_idct(const blitz::Array<double,2>& ar)
   return res;
 }
 
-
-
 static blitz::Array<std::complex<double>,1> script_fftshift(const blitz::Array<std::complex<double>,1>& ar)
 {
   blitz::Array<std::complex<double>,1> res(ar.shape());
@@ -142,6 +142,65 @@ static blitz::Array<std::complex<double>,2> script_ifftshift(const blitz::Array<
   return res;
 }
 
+static void py_fft1d_call(sp::FFT1D& a, const blitz::Array<std::complex<double>,1>& b, numeric::array c) {
+  blitz::Array<std::complex<double>,1> c_ =
+    tp::numpy_bz<std::complex<double>,1>(c);
+  a(b, c_);
+}
+
+static void py_ifft1d_call(sp::IFFT1D& a, const blitz::Array<std::complex<double>,1>& b, numeric::array c) {
+  blitz::Array<std::complex<double>,1> c_ =
+    tp::numpy_bz<std::complex<double>,1>(c);
+  a(b, c_);
+}
+
+static void py_fft2d_call(sp::FFT2D& a, const blitz::Array<std::complex<double>,2>& b, numeric::array c) {
+  blitz::Array<std::complex<double>,2> c_ =
+    tp::numpy_bz<std::complex<double>,2>(c);
+  a(b, c_);
+}
+
+static void py_ifft2d_call(sp::IFFT2D& a, const blitz::Array<std::complex<double>,2>& b, numeric::array c) {
+  blitz::Array<std::complex<double>,2> c_ =
+    tp::numpy_bz<std::complex<double>,2>(c);
+  a(b, c_);
+}
+
+static void py_dct1d_call(sp::DCT1D& a, const blitz::Array<double,1>& b, numeric::array c) {
+  blitz::Array<double,1> c_ = tp::numpy_bz<double,1>(c);
+  a(b, c_);
+}
+
+static void py_idct1d_call(sp::IDCT1D& a, const blitz::Array<double,1>& b, numeric::array c) {
+  blitz::Array<double,1> c_ = tp::numpy_bz<double,1>(c);
+  a(b, c_);
+}
+
+static void py_dct2d_call(sp::DCT2D& a, const blitz::Array<double,2>& b, numeric::array c) {
+  blitz::Array<double,2> c_ = tp::numpy_bz<double,2>(c);
+  a(b, c_);
+}
+
+static void py_idct2d_call(sp::IDCT2D& a, const blitz::Array<double,2>& b, numeric::array c) {
+  blitz::Array<double,2> c_ = tp::numpy_bz<double,2>(c);
+  a(b, c_);
+}
+
+template <int N>
+static void py_fftshift(const blitz::Array<std::complex<double>,N>& ar, 
+    numeric::array t) {
+  blitz::Array<std::complex<double>,N> t_ = 
+    tp::numpy_bz<std::complex<double>,N>(t);
+  Torch::sp::fftshift(ar, t_);
+}
+
+template <int N>
+static void py_ifftshift(const blitz::Array<std::complex<double>,N>& ar, 
+    numeric::array t) {
+  blitz::Array<std::complex<double>,N> t_ = 
+    tp::numpy_bz<std::complex<double>,N>(t);
+  Torch::sp::ifftshift(ar, t_);
+}
 
 void bind_sp_fft_dct()
 {
@@ -152,11 +211,11 @@ void bind_sp_fft_dct()
     ;
 
   class_<sp::FFT1D, boost::shared_ptr<sp::FFT1D>, bases<sp::FFT1DAbstract> >("FFT1D", FFT1D_DOC, init<const int>((arg("length"))))
-    .def("__call__", (void (sp::FFT1D::*)(const blitz::Array<std::complex<double>,1>&, blitz::Array<std::complex<double>,1>&))&sp::FFT1D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the FFT of the input 1D array/signal.")
+    .def("__call__", &py_fft1d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the FFT of the input 1D array/signal.")
     ;
 
   class_<sp::IFFT1D, boost::shared_ptr<sp::IFFT1D>, bases<sp::FFT1DAbstract> >("IFFT1D", IFFT1D_DOC, init<const int>((arg("length"))))
-    .def("__call__", (void (sp::IFFT1D::*)(const blitz::Array<std::complex<double>,1>&, blitz::Array<std::complex<double>,1>&))&sp::IFFT1D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IFFT of the input 1D array/signal.")
+    .def("__call__", &py_ifft1d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IFFT of the input 1D array/signal.")
     ;
 
   class_<sp::FFT2DAbstract, boost::noncopyable>("FFT2DAbstract", "Abstract class for FFT2D", no_init)
@@ -166,13 +225,12 @@ void bind_sp_fft_dct()
     ;
 
   class_<sp::FFT2D, boost::shared_ptr<sp::FFT2D>, bases<sp::FFT2DAbstract> >("FFT2D", FFT2D_DOC, init<const int,const int>((arg("height"), arg("width"))))
-    .def("__call__", (void (sp::FFT2D::*)(const blitz::Array<std::complex<double>,2>&, blitz::Array<std::complex<double>,2>&))&sp::FFT2D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the FFT of the input 1D array/signal.")
+    .def("__call__", &py_fft2d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the FFT of the input 1D array/signal.")
     ;
 
   class_<sp::IFFT2D, boost::shared_ptr<sp::IFFT2D>, bases<sp::FFT2DAbstract> >("IFFT2D", IFFT2D_DOC, init<const int,const int>((arg("height"), arg("width"))))
-    .def("__call__", (void (sp::IFFT2D::*)(const blitz::Array<std::complex<double>,2>&, blitz::Array<std::complex<double>,2>&))&sp::IFFT2D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IFFT of the input 1D array/signal.")
+    .def("__call__", &py_ifft2d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IFFT of the input 1D array/signal.")
     ;
-
 
   // (Fast) Discrete Cosine Transform
   class_<sp::DCT1DAbstract, boost::noncopyable>("DCT1DAbstract", "Abstract class for DCT1D", no_init)
@@ -181,11 +239,11 @@ void bind_sp_fft_dct()
     ;
 
   class_<sp::DCT1D, boost::shared_ptr<sp::DCT1D>, bases<sp::DCT1DAbstract> >("DCT1D", DCT1D_DOC, init<const int>((arg("length"))))
-    .def("__call__", (void (sp::DCT1D::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&))&sp::DCT1D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the DCT of the input 1D array/signal.")
+    .def("__call__", &py_dct1d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the DCT of the input 1D array/signal.")
     ;
 
   class_<sp::IDCT1D, boost::shared_ptr<sp::IDCT1D>, bases<sp::DCT1DAbstract> >("IDCT1D", IDCT1D_DOC, init<const int>((arg("length"))))
-    .def("__call__", (void (sp::IDCT1D::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&))&sp::IDCT1D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IDCT of the input 1D array/signal.")
+    .def("__call__", &py_idct1d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IDCT of the input 1D array/signal.")
     ;
 
   class_<sp::DCT2DAbstract, boost::noncopyable>("DCT2DAbstract", "Abstract class for DCT2D", no_init)
@@ -195,11 +253,11 @@ void bind_sp_fft_dct()
     ;
 
   class_<sp::DCT2D, boost::shared_ptr<sp::DCT2D>, bases<sp::DCT2DAbstract> >("DCT2D", DCT2D_DOC, init<const int, const int>((arg("height"), arg("width"))))
-    .def("__call__", (void (sp::DCT2D::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&))&sp::DCT2D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the DCT of the input 1D array/signal.")
+    .def("__call__", &py_dct2d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the DCT of the input 1D array/signal.")
     ;
 
   class_<sp::IDCT2D, boost::shared_ptr<sp::IDCT2D>, bases<sp::DCT2DAbstract> >("IDCT2D", IDCT2D_DOC, init<const int, const int>((arg("height"), arg("width"))))
-    .def("__call__", (void (sp::IDCT2D::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&))&sp::IDCT2D::operator(), (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IDCT of the input 1D array/signal.")
+    .def("__call__", &py_idct2d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IDCT of the input 1D array/signal.")
     ;
 
 
@@ -220,9 +278,9 @@ void bind_sp_fft_dct()
   def("ifftshift", (blitz::Array<std::complex<double>,1> (*)(const blitz::Array<std::complex<double>,1>& ar))&script_ifftshift, (arg("array")), IFFTSHIFT1_DOC);
   def("fftshift", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_fftshift, (arg("array")), FFTSHIFT2_DOC);
   def("ifftshift", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_ifftshift, (arg("array")), IFFTSHIFT2_DOC);
-  def("fftshift", (void (*)(const blitz::Array<std::complex<double>,1>& ar, blitz::Array<std::complex<double>,1>& t))&Torch::sp::fftshift<std::complex<double> >, (arg("input"),arg("output")), FFTSHIFT1_DOC);
-  def("ifftshift", (void (*)(const blitz::Array<std::complex<double>,1>& ar, blitz::Array<std::complex<double>,1>& t))&Torch::sp::ifftshift<std::complex<double> >, (arg("input"),arg("output")), IFFTSHIFT1_DOC);
-  def("fftshift", (void (*)(const blitz::Array<std::complex<double>,2>& ar, blitz::Array<std::complex<double>,2>& t))&Torch::sp::fftshift<std::complex<double> >, (arg("input"),arg("output")), FFTSHIFT2_DOC);
-  def("ifftshift", (void (*)(const blitz::Array<std::complex<double>,2>& ar, blitz::Array<std::complex<double>,2>& t))&Torch::sp::ifftshift<std::complex<double> >, (arg("input"),arg("output")), IFFTSHIFT2_DOC);
+  def("fftshift", &py_fftshift<1>, (arg("input"),arg("output")), FFTSHIFT1_DOC);
+  def("ifftshift", &py_ifftshift<1>, (arg("input"),arg("output")), IFFTSHIFT1_DOC);
+  def("fftshift", &py_fftshift<2>, (arg("input"),arg("output")), FFTSHIFT2_DOC);
+  def("ifftshift", &py_ifftshift<2>, (arg("input"),arg("output")), IFFTSHIFT2_DOC);
 }
 

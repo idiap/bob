@@ -12,6 +12,8 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(sp "${pysrc}")
+add_dependencies(pytorch_sp python-core_header_install)
+target_link_libraries(pytorch_sp pytorch_core_utils)
 torch_python_install(sp)
 
 # Our test units

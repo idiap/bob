@@ -144,7 +144,6 @@ class CodecTest(unittest.TestCase):
     # Lets make sure the binary data saved is the same:
     bzbin = binary.load(tmpname).get()
     bztxt = text.load('test_array_codec.txt').get()
-    import pdb; pdb.set_trace()
     self.assertTrue( numpy.array_equal(bzbin, bztxt) )
 
     # This trick can be done both ways!

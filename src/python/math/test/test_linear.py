@@ -8,6 +8,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
 class LinearTest(unittest.TestCase):
   """Tests the Linear Algebra features"""
@@ -16,24 +17,11 @@ class LinearTest(unittest.TestCase):
     """Tests the eye function"""
     N = 3
     # Matrix to decompose
-    A=torch.core.array.float64_2((N,N))
+    A=numpy.zeros((N,N), 'float64')
     torch.math.eye(A)
 
     # Compare to reference
-    ref=torch.core.array.float64_2([1,0,0,0,1,0,0,0,1], (N,N))
-
-    self.assertEqual( ((A-ref) < 1e-4).all(), True )
-
-
-  def test02_diag(self):
-    """Tests the diag function"""
-    N = 3
-    # Matrix to decompose
-    d=torch.core.array.float64_1([1,2,3], (N,))
-    A=torch.math.diag(d)
-
-    # Compare to reference
-    ref=torch.core.array.float64_2([1,0,0,0,2,0,0,0,3], (N,N))
+    ref=numpy.array([1,0,0,0,1,0,0,0,1], 'float64').reshape(N,N)
 
     self.assertEqual( ((A-ref) < 1e-4).all(), True )
 

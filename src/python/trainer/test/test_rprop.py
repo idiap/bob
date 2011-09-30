@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
 class PythonRProp:
   """A simplified (and slower) version of RProp training written in python.
@@ -47,13 +48,13 @@ class PythonRProp:
       return +1
 
     def logistic(x):
-      return 1 / (1 + exp(-x))
+      return 1 / (1 + numpy.math.exp(-x))
 
     def logistic_bwd(x):
       return x * (1-x)
 
     def tanh(x):
-      return x.tanh()
+      return numpy.math.tanh(x)
 
     def tanh_bwd(x):
       return (1 - x**2)
@@ -87,18 +88,18 @@ class PythonRProp:
       raise RuntimeError, "Cannot deal with activation %s" % machine.activation
     
     #simulated bias input...
-    BI = [torch.core.array.float64_1(input.extent(0)) for k in B]
+    BI = [numpy.zeros((input.shape[0],), 'float64') for k in B]
     for k in BI: k.fill(1)
 
     #state
     if self.DW is None: #first run or just after a reset()
-      self.DW = [k.empty_like() for k in W]
+      self.DW = [numpy.empty_like(k) for k in W]
       for k in self.DW: k.fill(DELTA0)
-      self.DB = [k.empty_like() for k in B]
+      self.DB = [numpy.empty_like(k) for k in B]
       for k in self.DB: k.fill(DELTA0)
-      self.PPDW = [k.empty_like() for k in W]
+      self.PPDW = [numpy.empty_like(k) for k in W]
       for k in self.PPDW: k.fill(0)
-      self.PPDB = [k.empty_like() for k in B]
+      self.PPDB = [numpy.empty_like(k) for k in B]
       for k in self.PPDB: k.fill(0)
 
     # Instantiate partial outputs and errors
@@ -108,19 +109,19 @@ class PythonRProp:
 
     # Feeds forward
     for k in range(len(W)):
-      O[k+1] = torch.math.prod(O[k], W[k])
-      for sample in range(O[k+1].extent(0)):
+      O[k+1] = numpy.dot(O[k], W[k])
+      for sample in range(O[k+1].shape[0]):
         O[k+1][sample,:] += B[k]
       O[k+1] = forward(O[k+1])
 
     # Feeds backward
     E[-1] = backward(O[-1]) * (O[-1] - target) #last layer
     for k in reversed(range(len(W)-1)): #for all remaining layers
-      E[k] = backward(O[k+1]) * torch.math.prod(E[k+1], W[k+1].transpose(1,0))
+      E[k] = backward(O[k+1]) * numpy.dot(E[k+1], W[k+1].transpose(1,0))
 
     # Calculates partial derivatives, accumulate
-    self.PDW = [torch.math.prod(O[k].transpose(1,0), E[k]) for k in range(len(W))]
-    self.PDB = [torch.math.prod(BI[k], E[k]) for k in range(len(W))]
+    self.PDW = [numpy.dot(O[k].transpose(1,0), E[k]) for k in range(len(W))]
+    self.PDB = [numpy.dot(BI[k], E[k]) for k in range(len(W))]
 
     # Updates weights and biases
     WUP = [i * j for (i,j) in zip(self.PPDW, self.PDW)]
@@ -128,8 +129,8 @@ class PythonRProp:
 
     # Iterate over each weight and bias and see what to do:
     for k, up in enumerate(WUP):
-      for i in range(up.extent(0)):
-        for j in range(up.extent(1)):
+      for i in range(up.shape[0]):
+        for j in range(up.shape[1]):
           if up[i,j] > 0:
             self.DW[k][i,j] = min(self.DW[k][i,j]*ETA_PLUS, DELTA_MAX)
             W[k][i,j] -= sign(self.PDW[k][i,j]) * self.DW[k][i,j]
@@ -144,7 +145,7 @@ class PythonRProp:
 
     if self.train_biases:
       for k, up in enumerate(BUP):
-        for i in range(up.extent(0)):
+        for i in range(up.shape[0]):
           if up[i] > 0:
             self.DB[k][i] = min(self.DB[k][i]*ETA_PLUS, DELTA_MAX)
             B[k][i] -= sign(self.PDB[k][i]) * self.DB[k][i]
@@ -189,12 +190,12 @@ class RPropTest(unittest.TestCase):
     machine = torch.machine.MLP((4, 1))
     machine.activation = torch.machine.Activation.LINEAR
     machine.biases = 0
-    w0 = torch.core.array.array([[.1],[.2],[-.1],[-.05]])
+    w0 = numpy.array([[.1],[.2],[-.1],[-.05]])
     machine.weights = [w0]
     trainer = torch.trainer.MLPRPropTrainer(machine, 1)
     trainer.trainBiases = False
-    d0 = torch.core.array.array([[1., 2., 0., 2.]])
-    t0 = torch.core.array.array([[1.]])
+    d0 = numpy.array([[1., 2., 0., 2.]])
+    t0 = numpy.array([[1.]])
 
     # trains in python first
     pytrainer = PythonRProp(train_biases=trainer.trainBiases)
@@ -203,21 +204,21 @@ class RPropTest(unittest.TestCase):
 
     # trains with our C++ implementation
     trainer.train_(machine, d0, t0)
-    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
+    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
 
     # a second passage
-    d0 = torch.core.array.array([[4., 0., -3., 1.]])
-    t0 = torch.core.array.array([[2.]])
+    d0 = numpy.array([[4., 0., -3., 1.]])
+    t0 = numpy.array([[2.]])
     pytrainer.train(pymachine, d0, t0)
     trainer.train_(machine, d0, t0)
-    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
+    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
 
     # a third passage
-    d0 = torch.core.array.array([[-0.5, -9.0, 2.0, 1.1]])
-    t0 = torch.core.array.array([[3.]])
+    d0 = numpy.array([[-0.5, -9.0, 2.0, 1.1]])
+    t0 = numpy.array([[3.]])
     pytrainer.train(pymachine, d0, t0)
     trainer.train_(machine, d0, t0)
-    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
+    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
 
   def test03_FisherNoBias(self):
     
@@ -236,9 +237,9 @@ class RPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([-2.0]), #setosa
-        torch.core.array.array([1.5]), #versicolor
-        torch.core.array.array([0.5]), #virginica
+        numpy.array([-2.0]), #setosa
+        numpy.array([1.5]), #versicolor
+        numpy.array([0.5]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
     data = torch.db.iris.data()
@@ -257,7 +258,7 @@ class RPropTest(unittest.TestCase):
       trainer.train_(machine, input, target)
       #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
+      self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
 
   def test04_Fisher(self):
     
@@ -275,9 +276,9 @@ class RPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([-2.0]), #setosa
-        torch.core.array.array([1.5]), #versicolor
-        torch.core.array.array([0.5]), #virginica
+        numpy.array([-2.0]), #setosa
+        numpy.array([1.5]), #versicolor
+        numpy.array([0.5]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
     data = torch.db.iris.data()
@@ -296,8 +297,8 @@ class RPropTest(unittest.TestCase):
       trainer.train_(machine, input, target)
       #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
-      self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
-      self.assertTrue( pymachine.biases[0].numeq(machine.biases[0]) )
+      self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
+      self.assertTrue( numpy.array_equal(pymachine.biases[0], machine.biases[0]) )
 
   def test05_FisherWithOneHiddenLayer(self):
 
@@ -314,9 +315,9 @@ class RPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([+1., -1., -1.]), #setosa
-        torch.core.array.array([-1., +1., -1.]), #versicolor
-        torch.core.array.array([-1., -1., +1.]), #virginica
+        numpy.array([+1., -1., -1.]), #setosa
+        numpy.array([-1., +1., -1.]), #versicolor
+        numpy.array([-1., -1., +1.]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
     data = torch.db.iris.data()
@@ -336,9 +337,9 @@ class RPropTest(unittest.TestCase):
       #print "[Python] |RMSE|:", torch.math.norm(torch.measure.rmse(pymachine(input), target))
       #print "[C++] |RMSE|:", torch.math.norm(torch.measure.rmse(machine(input), target))
       for i, w in enumerate(pymachine.weights):
-        self.assertTrue( w.numeq(machine.weights[i]) )
+        self.assertTrue( numpy.array_equal(w, machine.weights[i]) )
       for i, b in enumerate(pymachine.biases):
-        self.assertTrue( b.numeq(machine.biases[i]) )
+        self.assertTrue( numpy.array_equal(b, machine.biases[i]) )
 
   def test06_FisherMultiLayer(self):
 
@@ -355,9 +356,9 @@ class RPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([-1.0]), #setosa
-        torch.core.array.array([0.5]), #versicolor
-        torch.core.array.array([+1.0]), #virginica
+        numpy.array([-1.0]), #setosa
+        numpy.array([0.5]), #versicolor
+        numpy.array([+1.0]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
     data = torch.db.iris.data()

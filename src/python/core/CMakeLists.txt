@@ -18,6 +18,7 @@ set(pysrc_pycore
 
 set(pysrc_array
    "src/blitz_numpy.cc"
+   "src/tinyvector.cc"
    "src/array_wrapper_example.cc"
    "src/main_array.cc"
    )

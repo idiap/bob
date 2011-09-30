@@ -32,6 +32,7 @@ References:
 
 import os
 import sys
+import numpy
 
 names = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 """Names of the features for each entry in the dataset."""
@@ -59,7 +60,6 @@ def data():
   of 64-bit floats and 50 entries. Each entry is an Array with 4
   features as described by "names". 
   """
-  from ...core.array import array
   from ...io import Arrayset
   
   data = os.path.join(os.path.dirname(__file__), 'iris.data')
@@ -76,13 +76,13 @@ def data():
     s = [k.strip() for k in line.split(',') if line.strip()]
 
     if s[4].find('setosa') != -1:
-      retval['setosa'].append(array([float(k) for k in s[0:4]], 'float64'))
+      retval['setosa'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
 
     elif s[4].find('versicolor') != -1:
-      retval['versicolor'].append(array([float(k) for k in s[0:4]], 'float64'))
+      retval['versicolor'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
 
     elif s[4].find('virginica') != -1:
-      retval['virginica'].append(array([float(k) for k in s[0:4]], 'float64'))
+      retval['virginica'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
 
   return retval
 

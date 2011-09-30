@@ -8,11 +8,13 @@
 #include "core/python/pycore.h"
 
 void bind_core_bz_numpy();
+void bind_core_array_tinyvector();
 //void bind_core_array_examples(); ///< examples
 
 BOOST_PYTHON_MODULE(libpytorch_core_array) {
   Torch::python::setup_python("Torch core classes and sub-classes for array manipulation");
 
   bind_core_bz_numpy();
+  bind_core_array_tinyvector();
   //bind_core_array_examples(); ///< examples
 }
