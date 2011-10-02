@@ -12,8 +12,6 @@
 #include "machine/Exception.h"
 #include <complex>
 
-#include "core/logging.h"
-
 namespace mach = Torch::machine;
 
 mach::WienerMachine::WienerMachine(const blitz::Array<double,2>& Ps, const double Pn,
@@ -62,7 +60,8 @@ mach::WienerMachine::WienerMachine(const mach::WienerMachine& other):
   m_W(Torch::core::array::ccopy(other.m_W)),
   m_fft(new Torch::sp::FFT2D(m_Ps.extent(0),m_Ps.extent(1))),
   m_ifft(new Torch::sp::IFFT2D(m_Ps.extent(0),m_Ps.extent(1))),
-  m_buffer1(m_Ps.extent(0),m_Ps.extent(1)), m_buffer2(m_Ps.extent(0),m_Ps.extent(1))
+  m_buffer1(m_Ps.extent(0),m_Ps.extent(1)), 
+  m_buffer2(m_Ps.extent(0),m_Ps.extent(1))
 {
 }
 
@@ -91,11 +90,17 @@ void mach::WienerMachine::load (Torch::io::HDF5File& config) {
   config.read("Pn", m_Pn);
   config.read("variance_threshold", m_variance_threshold);
   m_W.reference(config.readArray<double,2>("W"));
+  m_fft.reset(new Torch::sp::FFT2D(m_Ps.extent(0),m_Ps.extent(1)));
+  m_ifft.reset(new Torch::sp::IFFT2D(m_Ps.extent(0),m_Ps.extent(1)));
+  m_buffer1.resize(m_Ps.extent(0),m_Ps.extent(1));
+  m_buffer2.resize(m_Ps.extent(0),m_Ps.extent(1));
 }
 
 void mach::WienerMachine::resize (size_t height, size_t width) {
   m_Ps.resizeAndPreserve(height,width);
   m_W.resizeAndPreserve(height,width);
+  m_fft.reset(new Torch::sp::FFT2D(height,width));
+  m_ifft.reset(new Torch::sp::IFFT2D(height,width));
   m_buffer1.resizeAndPreserve(height,width);
   m_buffer2.resizeAndPreserve(height,width);
 }
@@ -108,19 +113,13 @@ void mach::WienerMachine::save (Torch::io::HDF5File& config) const {
 }
 
 void mach::WienerMachine::computeW () {
-//  Torch::core::info << "Before, W= " << m_W << std::endl;
   m_W = m_Ps;
-//  Torch::core::info << "W=Ps " << m_W << std::endl;
   // Apply variance flooring threshold
   blitz::Array<bool,2> isTooSmall(m_W.shape());
   isTooSmall = m_Ps < m_variance_threshold;
   m_W += (m_variance_threshold - m_W) * isTooSmall; // W = Pn_thresholded
-//  Torch::core::info << "Threshold " << m_variance_threshold << std::endl;
-//  Torch::core::info << "W=Ps thresholded " << m_W << std::endl;
   // W = 1 / (1 + Pn / Ps_thresholded)
   m_W = 1. / (1. + m_Pn / m_W);
-//  Torch::core::info << "Pn = " << m_Pn << std::endl;
-//  Torch::core::info << "W = 1 / (1 + Pn/Ps_t) " << m_W << std::endl;
 }
 
 
@@ -153,7 +152,7 @@ void mach::WienerMachine::setPs(const blitz::Array<double,2>& Ps) {
   if (m_Ps.extent(0) != Ps.extent(0)) {
     throw mach::NInputsMismatch(m_Ps.extent(0), Ps.extent(0));
   }
-  if (m_Ps.extent(1) != Ps.extent(0)) {
+  if (m_Ps.extent(1) != Ps.extent(1)) {
     throw mach::NInputsMismatch(m_Ps.extent(1), Ps.extent(0));
   }
   m_Ps = Torch::core::array::ccopy(Ps);

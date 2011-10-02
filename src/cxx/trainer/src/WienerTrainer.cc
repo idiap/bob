@@ -12,8 +12,6 @@
 #include "core/cast.h"
 #include "sp/FFT2D.h"
 
-#include "core/logging.h"
-
 namespace io = Torch::io;
 namespace mach = Torch::machine;
 namespace train = Torch::trainer;
