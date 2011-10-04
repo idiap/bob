@@ -361,7 +361,7 @@ class Database(object):
       q = q.filter(Client.sgroup == 'world').\
             filter(Client.language.in_(languages))
       if model_ids:
-        q = q.filter(File.claimed_id.in_(model_ids))
+        q = q.filter(File.real_id.in_(model_ids))
       q = q.order_by(File.real_id, File.session_id, File.claimed_id, File.shot) 
       for k in q:
         retval[k.id] = (make_path(k.path, directory, extension), k.claimed_id, k.claimed_id, k.real_id, k.path)
