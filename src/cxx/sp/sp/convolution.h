@@ -51,7 +51,7 @@ namespace Torch {
     inline const int getConvolveOutputSize(const int b, const int c,
       const enum Convolution::SizeOption size_opt = Convolution::Full)
     {
-      int res;
+      int res=0;
       // Size of "B + C - 1"
       if( size_opt == Convolution::Full )
         res = std::max(0, b + c - 1);
