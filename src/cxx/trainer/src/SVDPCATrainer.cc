@@ -77,11 +77,10 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
    * singular values in Sigma are organized by decreasing order of magnitude.
    * You **don't** need sorting after this.
    */
-  blitz::Array<double,2> U(n_features, n_features);
   const int n_sigma = std::min(n_features, n_samples);
+  blitz::Array<double,2> U(n_features, n_sigma);
   blitz::Array<double,1> sigma(n_sigma);
-  blitz::Array<double,2> V(n_samples, n_samples);
-  Torch::math::svd(data, U, sigma, V);
+  Torch::math::svd_(data, U, sigma);
 
   /**
    * sets the linear machine with the results:
@@ -89,7 +88,7 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
    * note: eigen values are sigma^2/n_samples diagonal
    *       eigen vectors are the rows of U
    */
-  machine.resize(n_features, n_features);
+  machine.resize(n_features, std::min(n_features, n_samples));
   machine.setInputSubtraction(mean);
   machine.setInputDivision(1.0);
   machine.setBiases(0.0);

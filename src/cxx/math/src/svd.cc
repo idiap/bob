@@ -1,4 +1,5 @@
 #include "math/svd.h"
+#include "core/array_assert.h"
 #include "core/array_old.h"
 
 namespace math = Torch::math;
@@ -15,29 +16,30 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   // Size variables
   int M = A.extent(0);
   int N = A.extent(1);
-  int nb_singular = std::min(A.extent(0),A.extent(1));
+  int nb_singular = std::min(M,N);
 
-  // Check and reindex if required
-  if( U.base(0) != 0 || U.base(1) != 0) {
-    const blitz::TinyVector<int,2> zero_base = 0;
-    U.reindexSelf( zero_base );
-  }
-  if( sigma.base(0) != 0 ) {
-    const blitz::TinyVector<int,1> zero_base = 0;
-    sigma.reindexSelf( zero_base );
-  }
-  if( V.base(0) != 0 || V.base(1) != 0) {
-    const blitz::TinyVector<int,2> zero_base = 0;
-    V.reindexSelf( zero_base );
-  }
-  // Check and resize if required
-  if( U.extent(0) != M || U.extent(1) != M)
-    U.resize( M, M);
-  if( sigma.extent(0) != nb_singular)
-    sigma.resize( nb_singular );
-  if( V.extent(0) != N || V.extent(1) != N)
-    V.resize( N, N);
+  // Checks zero base
+  Torch::core::array::assertZeroBase(A);
+  Torch::core::array::assertZeroBase(U);
+  Torch::core::array::assertZeroBase(sigma);
+  Torch::core::array::assertZeroBase(V);
+  // Checks and resizes if required
+  Torch::core::array::assertSameDimensionLength(U.extent(0), M);
+  Torch::core::array::assertSameDimensionLength(U.extent(1), M);
+  Torch::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
+  Torch::core::array::assertSameDimensionLength(V.extent(0), N);
+  Torch::core::array::assertSameDimensionLength(V.extent(1), N);
 
+  math::svd_(A, U, sigma, V);
+}
+
+void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
+  blitz::Array<double,1>& sigma, blitz::Array<double,2>& V)
+{
+  // Size variables
+  int M = A.extent(0);
+  int N = A.extent(1);
+  int nb_singular = std::min(M,N);
 
   ///////////////////////////////////
   // Prepare to call LAPACK function
@@ -55,14 +57,14 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   double *work = new double[lwork];
   double *U_lapack = new double[M*M];
   double *VT_lapack = new double[N*N];
-  double* A_lapack = new double[A.extent(0)*A.extent(1)];
+  double* A_lapack = new double[M*N];
   for(int j=0; j<M; ++j)
     for(int i=0; i<N; ++i)
       A_lapack[j+i*M] = A(j,i);
   double *S_lapack;
   bool sigma_direct_use = checkSafedata(sigma);
   if( !sigma_direct_use )
-    S_lapack = new double[sigma.extent(0)];
+    S_lapack = new double[nb_singular];
   else
     S_lapack = sigma.data();
  
@@ -81,8 +83,8 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
 
   // Copy result back to sigma if required
   if( !sigma_direct_use )
-    for(int i=0; i<sigma.extent(0); ++i)
-      sigma(i+sigma.lbound(0)) = S_lapack[i];
+    for(int i=0; i<nb_singular; ++i)
+      sigma(i) = S_lapack[i];
 
   // Free memory
   if( !sigma_direct_use )
@@ -90,5 +92,84 @@ void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   delete [] A_lapack;
   delete [] U_lapack;
   delete [] VT_lapack;
+  delete [] work;
+}
+
+
+void math::svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
+  blitz::Array<double,1>& sigma)
+{
+  // Size variables
+  int M = A.extent(0);
+  int N = A.extent(1);
+  int nb_singular = std::min(M,N);
+
+  // Checks zero base
+  Torch::core::array::assertZeroBase(A);
+  Torch::core::array::assertZeroBase(U);
+  Torch::core::array::assertZeroBase(sigma);
+  // Checks and resizes if required
+  Torch::core::array::assertSameDimensionLength(U.extent(0), M);
+  Torch::core::array::assertSameDimensionLength(U.extent(1), nb_singular);
+  Torch::core::array::assertSameDimensionLength(sigma.extent(0), nb_singular);
+ 
+  math::svd_(A, U, sigma);
+}
+
+void math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
+  blitz::Array<double,1>& sigma)
+{
+  // Size variables
+  int M = A.extent(0);
+  int N = A.extent(1);
+  int nb_singular = std::min(M,N);
+
+
+  ///////////////////////////////////
+  // Prepare to call LAPACK function
+
+  // Initialize LAPACK variables
+  char jobu = 'S'; // Get All left singular vectors
+  char jobvt = 'N'; // Get All right singular vectors
+  int info = 0;  
+  int lda = M;
+  int ldu = M;
+  int ldvt = N;
+  int lwork = std::max(3*std::min(M,N)+std::max(M,N),5*std::min(M,N));
+
+  // Initialize LAPACK arrays
+  double *work = new double[lwork];
+  double *U_lapack = new double[M*nb_singular];
+  double *VT_lapack = 0;
+  double* A_lapack = new double[M*N];
+  for(int j=0; j<M; ++j)
+    for(int i=0; i<N; ++i)
+      A_lapack[j+i*M] = A(j,i);
+  double *S_lapack;
+  bool sigma_direct_use = checkSafedata(sigma);
+  if( !sigma_direct_use )
+    S_lapack = new double[nb_singular];
+  else
+    S_lapack = sigma.data();
+ 
+  // Call the LAPACK function 
+  dgesvd_( &jobu, &jobvt, &M, &N, A_lapack, &lda, S_lapack, U_lapack, &ldu, 
+    VT_lapack, &ldvt, work, &lwork, &info );
+ 
+  // Copy singular vectors back to U and V (column-major order)
+  for(int j=0; j<M; ++j)
+    for(int i=0; i<nb_singular; ++i)
+      U(j,i) = U_lapack[j+i*M];
+
+  // Copy result back to sigma if required
+  if( !sigma_direct_use )
+    for(int i=0; i<nb_singular; ++i)
+      sigma(i) = S_lapack[i];
+
+  // Free memory
+  if( !sigma_direct_use )
+    delete [] S_lapack;
+  delete [] A_lapack;
+  delete [] U_lapack;
   delete [] work;
 }

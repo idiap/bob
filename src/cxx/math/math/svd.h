@@ -8,11 +8,9 @@
  */
 
 #ifndef TORCH5SPRO_MATH_SVD_H
-#define TORCH5SPRO_MATH_SVD_H 1
+#define TORCH5SPRO_MATH_SVD_H
 
-#include "core/logging.h"
-#include "core/Exception.h"
-//#include "math/Exception.h"
+#include <blitz/array.h>
 
 namespace Torch {
 /**
@@ -23,10 +21,10 @@ namespace Torch {
   namespace math {
 
     /**
-      * @brief Function which performs a Singular Value Decomposition using the
-      *   'generic' dgesvd LAPACK function.
-      * @warning The output blitz::array U, sigma and S are resized and 
-      *   reindexed with zero base index.
+      * @brief Function which performs a 'full' Singular Value Decomposition
+      *   using the 'generic' dgesvd LAPACK function.
+      * @warning The output blitz::array U, sigma and V should have the correct 
+      *   size, with zero base index. Checks are performed.
       * @param A The A matrix to decompose (size MxN)
       * @param U The U matrix of left singular vectors (size MxM)
       * @param sigma The vector of singular values (size min(M,N))
@@ -35,6 +33,49 @@ namespace Torch {
       */
     void svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U, 
       blitz::Array<double,1>& sigma, blitz::Array<double,2>& V);
+    /**
+      * @brief Function which performs a 'full' Singular Value Decomposition
+      *   using the 'generic' dgesvd LAPACK function.
+      * @warning The output blitz::array U, sigma and V should have the correct 
+      *   size, with zero base index. Checks are NOT performed.
+      * @param A The A matrix to decompose (size MxN)
+      * @param U The U matrix of left singular vectors (size MxM)
+      * @param sigma The vector of singular values (size min(M,N))
+      *    Please note that this is a 1D array rather than a 2D diagonal matrix!
+      * @param V The V matrix of right singular vectors (size NxN)
+      */
+    void svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U, 
+      blitz::Array<double,1>& sigma, blitz::Array<double,2>& V);
+
+
+    /**
+      * @brief Function which performs a 'partial' Singular Value Decomposition
+      *   using the 'generic' dgesvd LAPACK function. It only returns the first
+      *   min(M,N) columns of U, and is somehow similar to the 'economical' SVD
+      *   variant of matlab (except that it does not return V).
+      * @warning The output blitz::array U and sigma should have the correct 
+      *   size, with zero base index. Checks are performed.
+      * @param A The A matrix to decompose (size MxN)
+      * @param U The U matrix of left singular vectors (size M x min(M,N))
+      * @param sigma The vector of singular values (size min(M,N))
+      *    Please note that this is a 1D array rather than a 2D diagonal matrix!
+      */
+    void svd(const blitz::Array<double,2>& A, blitz::Array<double,2>& U, 
+      blitz::Array<double,1>& sigma);
+    /**
+      * @brief Function which performs a 'partial' Singular Value Decomposition
+      *   using the 'generic' dgesvd LAPACK function. It only returns the first
+      *   min(M,N) columns of U, and is somehow similar to the 'economical' SVD
+      *   variant of matlab (except that it does not return V).
+      * @warning The output blitz::array U and sigma should have the correct 
+      *   size, with zero base index. Checks are NOT performed.
+      * @param A The A matrix to decompose (size MxN)
+      * @param U The U matrix of left singular vectors (size M x min(M,N))
+      * @param sigma The vector of singular values (size min(M,N))
+      *    Please note that this is a 1D array rather than a 2D diagonal matrix!
+      */
+    void svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U, 
+      blitz::Array<double,1>& sigma);
   }
 /**
  * @}
