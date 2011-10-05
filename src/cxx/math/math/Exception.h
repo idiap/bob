@@ -36,6 +36,21 @@ namespace Torch { namespace math {
       mutable std::string m_message;
   };
 
+  /**
+   * Raised when the parameter p of the norminv function is not in the range 
+   * ]0,1[.
+   */
+  class NorminvPNotInRangeError: public Exception {
+    public:
+      NorminvPNotInRangeError(const double p) throw();
+      virtual ~NorminvPNotInRangeError() throw();
+      virtual const char* what() const throw();
+
+    private:
+      double m_p;
+      mutable std::string m_message;
+  };
+
 }}
 
 #endif /* TORCH5SPRO_MATH_EXCEPTION_H */

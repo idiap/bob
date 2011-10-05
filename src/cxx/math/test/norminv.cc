@@ -11,6 +11,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "math/norminv.h"
+#include <cmath>
 
 namespace math = Torch::math;
 

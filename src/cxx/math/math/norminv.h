@@ -11,10 +11,6 @@
 #ifndef TORCH5SPRO_MATH_NORMINV_H
 #define TORCH5SPRO_MATH_NORMINV_H
 
-#include "core/array_assert.h"
-
-namespace tca = Torch::core::array;
-
 namespace Torch {
 /**
  * \ingroup libmath_api

@@ -7,8 +7,7 @@
  */
 
 #include "math/norminv.h"
-#include "core/logging.h"
-#include "core/Exception.h"
+#include "math/Exception.h"
 #include <cmath>
 
 namespace math = Torch::math;
@@ -56,12 +55,9 @@ double math::normsinv(const double p)
 
 	// Error p should be between 0 and 1
 	if (p < 0 || p > 1)
-	{
-		Torch::core::error << "norminv(): p is out of the range ]0,1[." <<
-      std::endl;
-    // TODO: add specialized exception
-    throw Torch::core::Exception();
-	}
+  {
+    throw Torch::math::NorminvPNotInRangeError(p);
+  }
 	// Rational approximation for lower region.
 	else if (0 < p && p < p_low)
 	{

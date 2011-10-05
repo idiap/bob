@@ -42,3 +42,21 @@ const char* math::LapackError::what() const throw() {
   }
 }
 
+math::NorminvPNotInRangeError::NorminvPNotInRangeError(const double p) throw(): m_p(p) {
+}
+
+math::NorminvPNotInRangeError::~NorminvPNotInRangeError() throw() {
+}
+
+const char* math::NorminvPNotInRangeError::what() const throw() {
+  try {
+    boost::format message("The parameter p of the norminv function has value '%f', not in the range [0,1].");
+    message % m_p;
+    m_message = message.str();
+    return m_message.c_str();
+  } catch (...) {
+    static const char* emergency = "math::NorminvPNotInRangeError: cannot format, exception raised";
+    return emergency;
+  }
+}
+
