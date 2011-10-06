@@ -138,7 +138,7 @@ void mach::LinearMachine::forward
 void mach::LinearMachine::setWeights
 (const blitz::Array<double,2>& weight) {
   if (weight.extent(0) != m_input_sub.extent(0)) { //checks input
-    throw mach::NInputsMismatch(weight.extent(0), m_bias.extent(0));
+    throw mach::NInputsMismatch(weight.extent(0), m_input_sub.extent(0));
   }
   if (weight.extent(1) != m_bias.extent(0)) { //checks output
     throw mach::NOutputsMismatch(weight.extent(1), m_bias.extent(0));
