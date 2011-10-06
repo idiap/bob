@@ -51,7 +51,7 @@ double math::normsinv(const double p)
 	static const double p_high = 1 - p_low;
 
 	// Declare output value
-	double x;
+	double x = 0;
 
 	// Error p should be between 0 and 1
 	if (p < 0 || p > 1)
