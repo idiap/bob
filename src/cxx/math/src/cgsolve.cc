@@ -1,8 +1,6 @@
 #include "math/cgsolve.h"
 #include "math/linear.h"
-//#include "math/Exception.h"
-//#include "core/array_old.h"
-//#include "core/array_assert.h"
+#include "core/array_assert.h"
 
 namespace math = Torch::math;
 
@@ -21,6 +19,15 @@ void math::cgsolveSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>
   Torch::core::array::assertZeroBase(A);
   Torch::core::array::assertSameDimensionLength(A.extent(0), N);
   Torch::core::array::assertSameDimensionLength(A.extent(1), N);
+
+  math::cgsolveSympos_(A, x, b, acc, max_iter);
+}
+
+void math::cgsolveSympos_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+  const blitz::Array<double,1>& b, const double acc, const int max_iter)
+{
+  // Dimensionality of the problem
+  int N = b.extent(0);
 
   blitz::Array<double,1> r(N), d(N), best_x(N), q(N), tmp(N);
   x = 0.;

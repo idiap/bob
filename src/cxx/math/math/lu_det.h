@@ -30,12 +30,16 @@ namespace Torch {
       */
     void lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
       blitz::Array<double,2>& U, blitz::Array<double,2>& P);
+    void lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
+      blitz::Array<double,2>& U, blitz::Array<double,2>& P);
+
 
     /**
       * @brief Function which computes the determinant of a square matrix
       * @param A The A matrix to consider (size NxN)
       */
     double det(const blitz::Array<double,2>& A);
+    double det_(const blitz::Array<double,2>& A);
 
     /**
       * @brief Function which computes the inverse of a matrix,
@@ -44,6 +48,7 @@ namespace Torch {
       * @param B The B=inverse(A) matrix (size NxN)
       */
     void inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
+    void inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B);
 
   }
 /**
@@ -52,4 +57,3 @@ namespace Torch {
 }
 
 #endif /* TORCH5SPRO_MATH_LU_DET_H */
-

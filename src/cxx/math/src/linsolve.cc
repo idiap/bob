@@ -24,6 +24,12 @@ void math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   Torch::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
   Torch::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
 
+  math::linsolve_(A, x, b);
+}
+
+void math::linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+  const blitz::Array<double,1>& b)
+{
   ///////////////////////////////////
   // Prepare to call LAPACK function
 
@@ -68,6 +74,7 @@ void math::linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
   delete [] ipiv;
 }
 
+
 void math::linsolveSympos(const blitz::Array<double,2>& A, 
   blitz::Array<double,1>& x, const blitz::Array<double,1>& b)
 {
@@ -81,6 +88,12 @@ void math::linsolveSympos(const blitz::Array<double,2>& A,
   Torch::core::array::assertSameDimensionLength(A.extent(0), A.extent(1));
   Torch::core::array::assertSameDimensionLength(A.extent(1), b.extent(0));
 
+  math::linsolveSympos_(A, x, b);
+}
+
+void math::linsolveSympos_(const blitz::Array<double,2>& A, 
+  blitz::Array<double,1>& x, const blitz::Array<double,1>& b)
+{
   ///////////////////////////////////
   // Prepare to call LAPACK function
 

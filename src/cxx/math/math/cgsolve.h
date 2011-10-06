@@ -34,6 +34,8 @@ namespace Torch {
       */
     void cgsolveSympos(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
       const blitz::Array<double,1>& b, const double acc, const int max_iter);
+    void cgsolveSympos_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+      const blitz::Array<double,1>& b, const double acc, const int max_iter);
 
   }
 /**

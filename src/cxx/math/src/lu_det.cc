@@ -26,7 +26,6 @@ void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   int M = A.extent(0);
   int N = A.extent(1);
   int minMN = std::min(M,N);
-  const blitz::TinyVector<int,2> shapeA(M,N);
   const blitz::TinyVector<int,2> shapeL(M,minMN);
   const blitz::TinyVector<int,2> shapeU(minMN,N);
   const blitz::TinyVector<int,2> shapeP(minMN,minMN);
@@ -35,10 +34,20 @@ void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   Torch::core::array::assertZeroBase(U);
   Torch::core::array::assertZeroBase(P);
 
-  Torch::core::array::assertSameShape(A,shapeA);
   Torch::core::array::assertSameShape(L,shapeL);
   Torch::core::array::assertSameShape(U,shapeU);
   Torch::core::array::assertSameShape(P,shapeP);
+
+  math::lu_(A, L, U, P);
+}
+
+void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
+  blitz::Array<double,2>& U, blitz::Array<double,2>& P)
+{
+  // Size variable
+  int M = A.extent(0);
+  int N = A.extent(1);
+  int minMN = std::min(M,N);
 
 
   ///////////////////////////////////
@@ -98,12 +107,19 @@ void math::lu(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   delete [] ipiv;
 }
 
-
 double math::det(const blitz::Array<double,2>& A)
 {
   // Size variable
   int N = A.extent(0);
   Torch::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
+
+  math::det_(A);
+}
+
+double math::det_(const blitz::Array<double,2>& A)
+{
+  // Size variable
+  int N = A.extent(0);
 
   // Perform an LU decomposition
   blitz::Array<double,2> L(N,N);
@@ -143,6 +159,14 @@ void math::inv(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
 
   Torch::core::array::assertSameShape(A,shapeA);
   Torch::core::array::assertSameShape(B,shapeA);
+
+  math::inv_(A, B);
+}
+
+void math::inv_(const blitz::Array<double,2>& A, blitz::Array<double,2>& B)
+{
+  // Size variable
+  int N = A.extent(0);
 
 
   ///////////////////////////////////

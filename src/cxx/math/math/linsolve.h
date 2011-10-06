@@ -29,6 +29,8 @@ namespace Torch {
       */
     void linsolve(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
       const blitz::Array<double,1>& b);
+    void linsolve_(const blitz::Array<double,2>& A, blitz::Array<double,1>& x,
+      const blitz::Array<double,1>& b);
 
     /**
       * @brief Function which solves a symmetric positive definite linear 
@@ -42,6 +44,8 @@ namespace Torch {
       *   at the end of the function.
       */
     void linsolveSympos(const blitz::Array<double,2>& A, 
+      blitz::Array<double,1>& x, const blitz::Array<double,1>& b); 
+    void linsolveSympos_(const blitz::Array<double,2>& A, 
       blitz::Array<double,1>& x, const blitz::Array<double,1>& b); 
   }
 /**
