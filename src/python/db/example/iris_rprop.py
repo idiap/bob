@@ -12,6 +12,7 @@ import sys
 import torch
 import optparse
 import tempfile #for package tests
+import numpy
 
 def choose_matplotlib_iteractive_backend():
   """Little logic to get interactive plotting right on OSX and Linux"""
@@ -29,8 +30,8 @@ def generate_testdata(data, target):
   """
   destsize = 0
   for d in data: destsize += len(d)
-  retval = torch.core.array.float64_2(destsize, 4)
-  t_retval = torch.core.array.float64_2(destsize, target[0].extent(0))
+  retval = numpy.zeros((destsize, 4), 'float64')
+  t_retval = numpy.zeros((destsize, target[0].shape[0]), 'float64')
   retval.fill(0)
   cur = 0
   for k, d in enumerate(data):
@@ -51,9 +52,9 @@ def create_machine(data, training_steps):
   trainer.trainBiases = True #this is the default, but just to clarify!
 
   targets = [ #we choose the approximate Fisher response!
-      torch.core.array.array([+1., -1., -1.]), #setosa
-      torch.core.array.array([-1., +1., -1.]), #versicolor
-      torch.core.array.array([-1., -1., +1.]), #virginica
+      numpy.array([+1., -1., -1.]), #setosa
+      numpy.array([-1., +1., -1.]), #versicolor
+      numpy.array([-1., -1., +1.]), #virginica
       ]
 
   # Associate the data to targets, by setting the arrayset order explicetly
@@ -77,7 +78,7 @@ def create_machine(data, training_steps):
     # choosing the wrong approach.
     trainer.train_(mlp, input, target)
     print "|RMSE| @%d:" % k,
-    print torch.math.norm(torch.measure.rmse(mlp(AllData), AllTargets))
+    print numpy.linalg.norm(torch.measure.rmse(mlp(AllData), AllTargets))
     retval.append(torch.machine.MLP(mlp))
 
   return retval #all machines => nice plotting!
@@ -93,9 +94,9 @@ def process_data(machine, data):
 
 def vcat(a1, a2):
   """Concatenates 2 1D arrays"""
-  retval = a1.__class__(a1.extent(0) + a2.extent(0))
-  retval[:a1.extent(0)] = a1
-  retval[a1.extent(0):] = a2
+  retval = a1.__class__(a1.shape[0] + a2.shape[0])
+  retval[:a1.shape[0]] = a1
+  retval[a1.shape[0]:] = a2
   return retval
 
 def plot(output):
@@ -159,7 +160,7 @@ def fig2bzarray(fig):
   buf.shape = (h,w,3)
   buf = numpy.transpose(buf, (2,0,1))
 
-  return torch.core.array.array(buf)
+  return numpy.array(buf)
 
 def makemovie(machines, data, filename=None):
   """Plots each of the outputs, with the classes separated by colors.
@@ -183,8 +184,8 @@ def makemovie(machines, data, filename=None):
     processed = process_data(machines[0], data)
     plot(processed)
     refimage = fig2bzarray(mpl.gcf())
-    orows = 2*(refimage.extent(1)/2)
-    ocols = 2*(refimage.extent(2)/2)
+    orows = 2*(refimage.shape[1]/2)
+    ocols = 2*(refimage.shape[2]/2)
     output = torch.io.VideoWriter(filename, orows, ocols, 5) #5 Hz
     print "Saving %d frames to to %s" % (len(machines), filename)
 

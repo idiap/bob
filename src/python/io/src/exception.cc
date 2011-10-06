@@ -13,7 +13,6 @@ namespace io = Torch::io;
 
 void bind_io_exception() {
   register_exception_translator<io::IndexError>(PyExc_IndexError);
-  register_exception_translator<io::IndexError>(PyExc_NameError);
   register_exception_translator<io::TypeError>(PyExc_TypeError);
   register_exception_translator<io::UnsupportedTypeError>(PyExc_TypeError);
   register_exception_translator<io::FileNotReadable>(PyExc_IOError);

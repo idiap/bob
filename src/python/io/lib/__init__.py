@@ -171,7 +171,7 @@ def arrayset_cat(self, firstDim=False):
 
   if firstDim: #first dimension contains examples
     retshape.insert(0, len(self))
-    retval = numpy.ndarray(dtype=self.elementType, shape=retshape)
+    retval = numpy.zeros(retshape, dtype=self.elementType.name)
 
     for i, k in enumerate(self): #fill
       add = tuple([i] + [slice(d) for d in ashape])
@@ -179,7 +179,7 @@ def arrayset_cat(self, firstDim=False):
 
   else: #last dimension contains examples
     retshape.append(len(self))
-    retval = numpy.ndarray(dtype=self.elementType, shape=retshape)
+    retval = numpy.ndarray(retshape, dtype=self.elementType.name)
 
     for i, k in enumerate(self): #fill
       add = tuple([slice(d) for d in ashape] + [i])
@@ -208,9 +208,9 @@ def array_get(self):
 Array.get = array_get
 del array_get
 
-def array_cast(self, eltype):
+def array_cast(self, dtype):
   """Returns a array object with the required element type"""
-  return getattr(self, '__cast_%s_%d__' % (eltype.name, len(self.shape)))()
+  return self.get().astype(dtype)
 Array.cast = array_cast
 del array_cast
 

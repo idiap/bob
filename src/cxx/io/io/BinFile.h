@@ -10,8 +10,8 @@
 
 #include "core/cast.h"
 #include "io/BinFileHeader.h"
-#include "io/InlinedArrayImpl.h"
 #include "io/Exception.h"
+#include "io/buffer.h"
 
 namespace Torch {
   /**
@@ -74,38 +74,17 @@ namespace Torch {
          * and shape given in the blitz array, otherwise the type/shape should
          * match or an exception is thrown.
          *
-         * Please note that blitz::Array<> will be implicitly constructed as
-         * required and respecting those norms.
-         *
          * @warning: Please convert your files to HDF5, this format is
          * deprecated starting on 16.04.2011 - AA
          */
-        void write(const detail::InlinedArrayImpl& data);
+        void write(const Torch::io::buffer& a);
 
         /**
-         * A shortcut to write a blitz::Array<T,D>
-         *
-         * @warning: Please convert your files to HDF5, this format is
-         * deprecated starting on 16.04.2011 - AA
+         * Loads a single array from the file. Checks if the array has the
+         * necessary space, otherwise re-allocates it. 
          */
-        template <typename T, int D> 
-          inline void write(blitz::Array<T,D>& bz) {
-          write(detail::InlinedArrayImpl(bz));
-        }
-
-        /**
-         * Load one blitz++ multiarray from the input stream/file All the
-         * multiarrays saved have the same dimensions.
-         */
-        template <typename T, int D> inline blitz::Array<T,D> read() {
-          return read().cast<T,D>(); 
-        }
- 
-        template <typename T, int D> inline blitz::Array<T,D> read(size_t
-            index) { return read(index).cast<T,D>(); }
-        
-        detail::InlinedArrayImpl read(); 
-        detail::InlinedArrayImpl read (size_t index);
+        void read(Torch::io::buffer& a);
+        void read(size_t index, Torch::io::buffer& a);
 
         /**
          * Gets the Element type

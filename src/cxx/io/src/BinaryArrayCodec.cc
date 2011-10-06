@@ -29,29 +29,24 @@ io::BinaryArrayCodec::BinaryArrayCodec()
 
 io::BinaryArrayCodec::~BinaryArrayCodec() { }
 
-void io::BinaryArrayCodec::peek(const std::string& filename, 
-    Torch::core::array::ElementType& eltype, size_t& ndim,
-    size_t* shape) const {
-  io::BinFile f(filename, io::BinFile::in);
+void io::BinaryArrayCodec::peek(const std::string& file, io::typeinfo& info) const {
+  io::BinFile f(file, io::BinFile::in);
   if (!f) {
-    eltype = Torch::core::array::t_unknown;
-    ndim = 0;
-    throw io::FileNotReadable(filename);
+    info.reset();
+    throw io::FileNotReadable(file);
   }
-  eltype = f.getElementType();
-  ndim = f.getNDimensions();
-  for (size_t i=0; i<ndim; ++i) shape[i] = f.getShape()[i]; 
+  info.set(f.getElementType(), f.getNDimensions(), f.getShape());
 }
 
-io::detail::InlinedArrayImpl 
-io::BinaryArrayCodec::load(const std::string& filename) const {
-  io::BinFile f(filename, io::BinFile::in);
-  if (!f) throw io::FileNotReadable(filename);
-  return f.read();
+void io::BinaryArrayCodec::load(const std::string& file,
+    io::buffer& array) const {
+  io::BinFile f(file, io::BinFile::in);
+  if (!f) throw io::FileNotReadable(file);
+  return f.read(array);
 }
 
-void io::BinaryArrayCodec::save (const std::string& filename, 
-    const io::detail::InlinedArrayImpl& data) const {
-  io::BinFile f(filename, io::BinFile::out);
-  f.write(data);
+void io::BinaryArrayCodec::save (const std::string& file, 
+    const io::buffer& array) const {
+  io::BinFile f(file, io::BinFile::out);
+  f.write(array);
 }

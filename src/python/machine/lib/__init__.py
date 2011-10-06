@@ -3,9 +3,9 @@ from libpytorch_machine import *
 def linearmachine_repr(self):
   """A funky way to display a torch Linear Machine"""
   if self.activation == Activation.LINEAR:
-    return '<LinearMachine %s@%s>' % (self.weights.cxx_element_typename, self.weights.shape())
+    return '<LinearMachine %s@%s>' % (self.weights.dtype, self.weights.shape)
   else:
-    return '<LinearMachine %s@%s [act: %s]>' % (self.weights.cxx_element_typename, self.weights.shape(), self.activation)
+    return '<LinearMachine %s@%s [act: %s]>' % (self.weights.dtype, self.weights.shape, self.activation)
 LinearMachine.__repr__ = linearmachine_repr
 del linearmachine_repr
 
@@ -23,9 +23,9 @@ def linearmachine_str(self):
   bias = ""
   if not (self.biases == 0.0).all():
     bias = "\n bias: %s" % self.biases
-  shape = self.weights.shape()
+  shape = self.weights.shape
   return 'LinearMachine (%s) %d inputs, %d outputs%s%s%s%s\n %s' % \
-      (self.weights.cxx_element_typename, shape[0], shape[1], act, sub, div,
+      (self.weights.dtype, shape[0], shape[1], act, sub, div,
           bias, self.weights)
 LinearMachine.__str__ = linearmachine_str
 del linearmachine_str
@@ -35,7 +35,7 @@ def mlp_repr(self):
   bias = False
   for i, k in enumerate(self.biases): 
     if not (k == 0.0).all(): bias = True
-  return '<MLP %s@%s [bias: %s][act: %s]>' % (self.weights[0].cxx_element_typename, self.shape, str(bias).lower(), self.activation)
+  return '<MLP %s@%s [bias: %s][act: %s]>' % (self.weights[0].dtype, self.shape, str(bias).lower(), self.activation)
 MLP.__repr__ = mlp_repr
 del mlp_repr
 
@@ -58,7 +58,7 @@ def mlp_str(self):
   for i, k in enumerate(self.weights):
     weight += "\n weight[%d]:\n %s" % (i, k)
   return 'MLP %s@%s [bias: %s]%s%s%s%s%s' % \
-      (self.weights[0].cxx_element_typename, self.shape, str(has_bias).lower(), 
+      (self.weights[0].dtype, self.shape, str(has_bias).lower(), 
           act, sub, div, bias, weight)
 MLP.__str__ = mlp_str
 del mlp_str

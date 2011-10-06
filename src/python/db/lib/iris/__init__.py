@@ -104,7 +104,7 @@ def dump(args):
   for k, v in d.items():
     for array in v:
       bz = array.get()
-      s = ','.join(['%.1f' % bz[i] for i in range(bz.extent(0))] + [k])
+      s = ','.join(['%.1f' % bz[i] for i in range(bz.shape[0])] + [k])
       output.write('%s\n' % (s,))
 
 def add_commands(parser):

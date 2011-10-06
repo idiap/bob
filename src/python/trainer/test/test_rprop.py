@@ -334,8 +334,8 @@ class RPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] |RMSE|:", torch.math.norm(torch.measure.rmse(pymachine(input), target))
-      #print "[C++] |RMSE|:", torch.math.norm(torch.measure.rmse(machine(input), target))
+      #print "[Python] |RMSE|:", numpy.linalg.norm(torch.measure.rmse(pymachine(input), target))
+      #print "[C++] |RMSE|:", numpy.linalg.norm(torch.measure.rmse(machine(input), target))
       for i, w in enumerate(pymachine.weights):
         self.assertTrue( numpy.array_equal(w, machine.weights[i]) )
       for i, b in enumerate(pymachine.biases):

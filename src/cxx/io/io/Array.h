@@ -1,6 +1,6 @@
 /**
- * @file io/src/Array.h
- * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Tue  4 Oct 23:13:45 2011 CEST
  *
  * The Array is the basic unit containing data in a Dataset 
  */
@@ -15,15 +15,12 @@
 #include <blitz/array.h>
 
 #include "io/ArrayCodec.h"
-#include "io/InlinedArrayImpl.h"
-#include "io/ExternalArrayImpl.h"
+#include "io/carray.h"
+#include "io/utils.h"
+#include "io/filearray.h"
 
-namespace Torch {   
-  /**
-   * \ingroup libio_api
-   * @{
-   *
-   */
+namespace Torch {
+
   namespace io {
 
     /**
@@ -35,13 +32,14 @@ namespace Torch {
       public:
 
         /**
-         * Starts a new array with in-memory content. We don't ever copy the
-         * data, just refer to it. If you want me to have a private copy, just
-         * copy the data before-hand. Please note this constructor is able to
-         * receive blitz::Array<> elements by implicit construction into
-         * InlinedArrayImpl.
+         * Starts a new array with in-memory content, copies the data.
          */
-        Array(const detail::InlinedArrayImpl& data);
+        Array(const buffer& data);
+
+        /**
+         * Starts a new array with in-memory content, refers to the data.
+         */
+        Array(boost::shared_ptr<buffer> data);
 
         /**
          * Builds an Array that contains data from a file. You can optionally
@@ -50,7 +48,7 @@ namespace Torch {
         Array(const std::string& filename, const std::string& codec="");
 
         /**
-         * Refers to the Array data from another array. 
+         * Refers to the Array data from another array.
          */
         Array(const Array& other);
 
@@ -60,7 +58,7 @@ namespace Torch {
         virtual ~Array();
 
         /**
-         * Copies the data from another array. 
+         * Copies data from another array. 
          */
         Array& operator= (const Array& other);
 
@@ -83,56 +81,30 @@ namespace Torch {
         void load();
 
         /**
-         * If the array is already in memory, we return a copy of it in the
-         * type you wish (just have to get the number of dimensions right!). If
-         * it is in a file, we load it and return a copy of the loaded data.
-         */
-        template <typename T, int D> blitz::Array<T,D> cast() const;
-
-        /**
-         * If the array is already in memory, we return a reference to it. If
-         * it is in a file, we load it and return a reference to the loaded
-         * data.
-         */
-        template <typename T, int D> const blitz::Array<T,D> get() const;
-
-        /**
          * This is a non-templated version of the get() method that returns a
          * generic array, used for typeless manipulations. 
-         *
-         * @warning You do NOT want to use this!
          */
-        detail::InlinedArrayImpl get() const;
+        boost::shared_ptr<buffer> get() const;
 
         /**
          * Sets the current data to the given array
-         *
-         * @warning The data is not copied, but referred so modifications to it
-         * will affect this array.
          */
-        void set(const detail::InlinedArrayImpl& data);
+        void set(boost::shared_ptr<buffer> data); //refer to data
+        void set(const buffer& data); //copy data
 
-        /**
-         * A handle to simplify your life with blitz::Array<>'s
-         */
-        template <typename T, int D> inline void set(blitz::Array<T,D>& bzarray) {
-          set(detail::InlinedArrayImpl(bzarray));
+        inline const typeinfo& type() const {
+          return (m_inlined)?m_inlined->type(): m_external->type(); 
         }
 
-        /**
-         * Returns the current number of dimensions set by this array.
-         */
-        size_t getNDim() const;
+        inline size_t getNDim() const { return type().nd; }
+        
+        inline Torch::core::array::ElementType getElementType() const { 
+          return type().dtype; 
+        }
 
-        /**
-         * Returns the type of element of this array.
-         */
-        Torch::core::array::ElementType getElementType() const; 
-
-        /**
-         * Returns the shape of the current array.
-         */
-        const size_t* getShape() const; 
+        inline const size_t* getShape() const { return type().shape; }
+        
+        inline const size_t* getStride() const { return type().stride; }
 
         /**
          * Get the filename containing the data if any. An empty string
@@ -144,30 +116,94 @@ namespace Torch {
          * Get the codec used to read the data from the external file 
          * if any. This will be non-empty only if the filename is non-empty.
          */
-        boost::shared_ptr<const ArrayCodec> getCodec() const; 
+        boost::shared_ptr<const ArrayCodec> getCodec() const;
 
         /**
          * Get the flag indicating if the array is loaded in memory
          */
         inline bool isLoaded() const { return m_inlined; }
 
+
+        /******************************************************************
+         * Blitz Array specific manipulations
+         ******************************************************************/
+
+        /**
+         * Starts a new array with in-memory content, refers to the data
+         */
+        template <typename T, int N> Array(blitz::Array<T,N>& data):
+          m_inlined(new carray(boost::make_shared<blitz::Array<T,N> >(data))) {}
+
+        /**
+         * Starts a new array with in-memory content, copies the data.
+         */
+        template <typename T, int N> Array(const blitz::Array<T,N>& data):
+          m_inlined(new carray(data)) {}
+
+        /**
+         * If the array is already in memory, we return a copy of it in the
+         * type you wish (just have to get the number of dimensions right!). If
+         * it is in a file, we load it and return a copy of the loaded data.
+         */
+        template <typename T, int N> blitz::Array<T,N> cast() const {
+          if (!m_inlined) {
+            const typeinfo& info = m_external->type();
+            carray tmp(info);
+            m_external->load(tmp);
+            return tmp.cast<T,N>();
+          }
+          else return Torch::io::cast<T,N>(*m_inlined);
+        }
+
+        /**
+         * If the array is already in memory, we return a reference to it. If
+         * it is in a file, we load it and return a reference to the loaded
+         * data.
+         */
+        template <typename T, int N> blitz::Array<T,N> get() const {
+          if (!m_inlined) {
+            const typeinfo& info = m_external->type();
+            carray tmp(info);
+            m_external->load(tmp);
+            return tmp.get<T,N>();
+          }
+          else return Torch::io::wrap<T,N>(*m_inlined);
+        }
+
+        /**
+         * A handle to simplify your life with blitz::Array<>'s
+         */
+        template <typename T, int N> 
+          inline void set(const blitz::Array<T,N>& bzarray) {
+            if (!m_inlined) {
+              carray tmp(boost::make_shared<blitz::Array<T,N> >(bzarray));
+              m_external->save(tmp);
+            }
+            else {
+              //we copy the data only once!
+              set(boost::make_shared<carray>(bzarray));
+            }
+        }
+
+        /**
+         * A handle to simplify your life with blitz::Array<>'s
+         */
+        template <typename T, int N> 
+          inline void set(boost::shared_ptr<blitz::Array<T,N> >& bzarray) {
+            if (!m_inlined) {
+              carray tmp(bzarray);
+              m_external->save(tmp);
+            }
+            else {
+              //no data copying...
+              set(carray(bzarray));
+            }
+        }
+
       private: //representation
-        boost::shared_ptr<detail::InlinedArrayImpl> m_inlined;
-        boost::shared_ptr<detail::ExternalArrayImpl> m_external;
-        mutable size_t m_tmp_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< temporary variable used to return the shape of external arrays.
+        boost::shared_ptr<buffer> m_inlined;
+        boost::shared_ptr<filearray> m_external;
     };
-
-    template <typename T, int D> const blitz::Array<T,D> Array::get() const {
-      if (D != getNDim()) throw DimensionError(D, getNDim());
-      if (!m_inlined) return m_external->get().get<T,D>();
-      return m_inlined->get<T,D>(); 
-    }
-
-    template <typename T, int D> blitz::Array<T,D> Array::cast() const {
-      if (D != getNDim()) throw DimensionError(D, getNDim());
-      if (!m_inlined) return m_external->get().cast<T,D>();
-      return m_inlined->cast<T,D>(); 
-    }
 
   } //closes namespace io
 

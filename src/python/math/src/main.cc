@@ -8,7 +8,6 @@
 #include "core/python/pycore.h"
 
 void bind_math_eig();
-void bind_math_linear();
 void bind_math_linsolve();
 void bind_math_lu_det();
 void bind_math_norminv();
@@ -20,7 +19,6 @@ BOOST_PYTHON_MODULE(libpytorch_math) {
   Torch::python::setup_python("Torch mathematical classes and sub-classes");
 
   bind_math_eig();
-  bind_math_linear();
   bind_math_linsolve();
   bind_math_lu_det();
   bind_math_norminv();

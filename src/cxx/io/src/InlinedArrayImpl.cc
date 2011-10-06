@@ -94,3 +94,49 @@ iod::InlinedArrayImpl& iod::InlinedArrayImpl::operator= (const iod::InlinedArray
   }
   return *this;
 }
+
+template<typename T, int D> static void* getBzArrayPtr(void* bzarray) {
+  blitz::Array<T,D>* tmp = castBzArray<T,D>(bzarray);
+  //normally, the blitz::MemoryBlockReference<T> object does not allow us to
+  //steal the data. Here is what we do. We copy the MemoryBlockReference<T>
+  //object to a memory area that we create ourselves. Then, we just place a
+  //new MemoryBlockReference<T> on that area and this will force the system
+  //not to call the destructor for that instance, leaving the memory block
+  //undeleted.
+  char storage[sizeof(blitz::MemoryBlockReference<T>)];
+  new (storage) blitz::MemoryBlockReference<T>(*tmp); //dangle
+  return reinterpret_cast<void*>(castBzArray<T,D>(bzarray)->data());
+}
+
+#define GETPTRSWITCH(T,N,D) case N: \
+  switch(D) { \
+    case 1: return getBzArrayPtr<T,1>(m_bzarray); break;\
+    case 2: return getBzArrayPtr<T,2>(m_bzarray); break;\
+    case 3: return getBzArrayPtr<T,3>(m_bzarray); break;\
+    case 4: return getBzArrayPtr<T,4>(m_bzarray); break;\
+    default: throw Torch::io::DimensionError(D,4);\
+  }\
+  break;
+
+void* iod::InlinedArrayImpl::steal_data() {
+  switch(m_elementtype) {
+    GETPTRSWITCH(bool, core::array::t_bool, m_ndim)
+    GETPTRSWITCH(int8_t, core::array::t_int8, m_ndim)
+    GETPTRSWITCH(int16_t, core::array::t_int16, m_ndim)
+    GETPTRSWITCH(int32_t, core::array::t_int32, m_ndim)
+    GETPTRSWITCH(int64_t, core::array::t_int64, m_ndim)
+    GETPTRSWITCH(uint8_t, core::array::t_uint8, m_ndim)
+    GETPTRSWITCH(uint16_t, core::array::t_uint16, m_ndim)
+    GETPTRSWITCH(uint32_t, core::array::t_uint32, m_ndim)
+    GETPTRSWITCH(uint64_t, core::array::t_uint64, m_ndim)
+    GETPTRSWITCH(float, core::array::t_float32, m_ndim)
+    GETPTRSWITCH(double, core::array::t_float64, m_ndim)
+    GETPTRSWITCH(long double, core::array::t_float128, m_ndim)
+    GETPTRSWITCH(std::complex<float>, core::array::t_complex64, m_ndim)
+    GETPTRSWITCH(std::complex<double>, core::array::t_complex128, m_ndim)
+    GETPTRSWITCH(std::complex<long double>, core::array::t_complex256, m_ndim)
+    default:
+      throw Torch::io::TypeError(m_elementtype, Torch::core::array::t_unknown);
+  }
+  return 0;
+}

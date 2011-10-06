@@ -198,8 +198,8 @@ class BackPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] |RMSE|@%d:" % k, torch.math.norm(torch.measure.rmse(pymachine(input), target))
-      #print "[C++] |RMSE|@%d:" % k, torch.math.norm(torch.measure.rmse(machine(input), target))
+      #print "[Python] |RMSE|@%d:" % k, numpy.linalg.norm(torch.measure.rmse(pymachine(input), target))
+      #print "[C++] |RMSE|@%d:" % k, numpy.linalg.norm(torch.measure.rmse(machine(input), target))
       # Note we will face precision problems when comparing to the Pythonic
       # implementation. So, let's not be too demanding here. If all values are
       # approximately equal to 1e-10, we consider this is OK.

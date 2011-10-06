@@ -11,8 +11,7 @@
 
 #include <vector>
 #include <string>
-
-#include "io/InlinedArrayImpl.h"
+#include "io/buffer.h"
 
 namespace Torch { namespace io {
 
@@ -29,23 +28,25 @@ namespace Torch { namespace io {
       virtual ~ArrayCodec();
 
       /**
-       * Returns the element type and the number of dimensions of the stored
-       * array.
+       * Peeks the type of array stored inside the file
        */
-      virtual void peek(const std::string& filename, 
-          Torch::core::array::ElementType& eltype, size_t& ndim,
-          size_t* shape) const =0;
+      virtual void peek(const std::string& file, typeinfo& info) const =0;
 
       /**
-       * Returns the stored array in a InlinedArrayImpl
+       * Loads the data of the array into memory.
+       *
+       * This method will check to see if the given array has enough space. If
+       * that is not the case, it will allocate enough space internally by
+       * reseting the input array and putting the data read from the file
+       * inside.
        */
-      virtual detail::InlinedArrayImpl load(const std::string& filename) const =0;
+      virtual void load(const std::string& file, buffer& buffer) const =0;
 
       /**
-       * Saves a representation of the given array in the file.
+       * Saves a representation of the given array in the file and according to
+       * the specifications defined on the interface.
        */
-      virtual void save (const std::string& filename, 
-          const detail::InlinedArrayImpl& data) const =0;
+      virtual void save (const std::string& file, const buffer& buffer) const =0;
 
       /**
        * Returns the name of this codec

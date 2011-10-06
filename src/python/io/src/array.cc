@@ -13,28 +13,43 @@
 #include "io/Array.h"
 #include "core/array_type.h"
 
+#include "core/python/pycore.h"
+
 using namespace boost::python;
 namespace io = Torch::io;
 namespace core = Torch::core;
 namespace array = Torch::core::array;
+namespace tp = Torch::python;
 
 typedef class_<io::Array, boost::shared_ptr<io::Array>, boost::shared_ptr<const io::Array> > PyClass;
 
-template <typename T, int D> static boost::shared_ptr<io::Array> make_array(blitz::Array<T,D> bz) {
-  return boost::make_shared<io::Array>(io::detail::InlinedArrayImpl(bz));
+template <typename T, int D>
+static boost::shared_ptr<io::Array> make_array(const blitz::Array<T,D>& bz) {
+  return boost::make_shared<io::Array>(bz.copy());
+}
+
+/**
+ * Builds a thin wrapper over the internal data of the Array.
+ */
+static numeric::array get(io::Array& a) {
+  io::detail::InlinedArrayImpl ia = a.get();
+  if (a.isLoaded()) { //returns a pointer to the data
+    
+  }
+  else { //returns a copy of the data
+
+  }
 }
 
 template<typename T, int D> static void loop(PyClass& obj) {
 
-  static const char* MAKE_ARRAY_DOC = "Creates a new io.Array from the given numpy ndarray.";
-  static const char* ARRAY_CAST_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the underlying array and *copies* the data in it.";
+  static const char* MAKE_ARRAY_DOC = "Creates a new io.Array from the given numpy ndarray. Note that data is copied internally using this constructor.";
   static const char* ARRAY_GET_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the underlying array and *refers* to the data in it. WARNING: Updating the content of the blitz array will update the content of the corresponding array in the dataset. Use this method with care!";
 
   boost::format f("__%s_%s_%d__");
 
   obj.def("__init__", make_constructor(&make_array<T,D>, default_call_policies(), arg("array")), MAKE_ARRAY_DOC); \
-  obj.def((f % "cast" % array::stringize<T>() % D).str().c_str(), (blitz::Array<T,D> (io::Array::*)(void) const)&io::Array::cast<T,D>, (arg("self")), ARRAY_CAST_DOC); \
-  obj.def((f % "get" % array::stringize<T>() % D).str().c_str(), (const blitz::Array<T,D> (io::Array::*)(void) const)&io::Array::get<T,D>, (arg("self")), ARRAY_GET_DOC); 
+  obj.def((f % "get" % array::stringize<T>() % D).str().c_str(), (const blitz::Array<T,D> (io::Array::*)(void) const)&io::Array::get<T,D>, (arg("self")), ARRAY_GET_DOC);
 
   implicitly_convertible<blitz::Array<T,D>, io::Array>();
 }
@@ -110,9 +125,9 @@ void bind_io_array() {
   loop<uint64_t,D>(array); \
   loop<float,D>(array); \
   loop<double,D>(array); \
-  loop<double,D>(array); \
+  loop<long double,D>(array); \
   loop<std::complex<float>,D>(array); \
   loop<std::complex<double>,D>(array); \
-  loop<std::complex<double>,D>(array);
+  loop<std::complex<long double>,D>(array);
 # include BOOST_PP_LOCAL_ITERATE()
 }

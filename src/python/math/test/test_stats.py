@@ -22,11 +22,11 @@ class StatsTest(unittest.TestCase):
 
     # This test demonstrates how to use the scatter matrix function of Torch.
     S, M = torch.math.scatter(self.data)
-    S /= (self.data.extent(1)-1)
+    S /= (self.data.shape[1]-1)
 
     # Do the same with numpy and compare. Note that with numpy we are computing
     # the covariance matrix which is the scatter matrix divided by (N-1).
-    K = torch.core.array.array(numpy.cov(self.data))
+    K = numpy.array(numpy.cov(self.data))
     self.assertTrue( (abs(S-K) < 1e-10).all() )
 
 if __name__ == '__main__':

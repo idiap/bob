@@ -13,7 +13,12 @@ namespace io = Torch::io;
 void io::array_transcode (const std::string& from, const std::string& to) {
   boost::shared_ptr<const ArrayCodec> fr_codec = io::ArrayCodecRegistry::getCodecByExtension(from);
   boost::shared_ptr<const ArrayCodec> to_codec = io::ArrayCodecRegistry::getCodecByExtension(to);
-  to_codec->save(to, fr_codec->load(from));
+
+  typeinfo info;
+  fr_codec->peek(from, info);
+  carray tmp(info);
+  fr_codec->load(from, tmp);
+  to_codec->save(to  , tmp);
 }
 
 void io::array_transcode (const std::string& from,
@@ -21,7 +26,12 @@ void io::array_transcode (const std::string& from,
     const std::string& to_codecname) {
   boost::shared_ptr<const ArrayCodec> fr_codec = io::ArrayCodecRegistry::getCodecByName(from_codecname);
   boost::shared_ptr<const ArrayCodec> to_codec = io::ArrayCodecRegistry::getCodecByName(to_codecname);
-  to_codec->save(to, fr_codec->load(from));
+
+  typeinfo info;
+  fr_codec->peek(from, info);
+  carray tmp(info);
+  fr_codec->load(from, tmp);
+  to_codec->save(to  , tmp);
 }
 
 void io::arrayset_transcode (const std::string& from, const std::string& to) {
