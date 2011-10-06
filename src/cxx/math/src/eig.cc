@@ -40,6 +40,15 @@ void math::eigSymReal(const blitz::Array<double,2>& A,
   Torch::core::array::assertSameShape(A,V);
   Torch::core::array::assertSameShape(D,shape1);
 
+  math::eigSymReal_(A, V, D);
+}
+
+void math::eigSymReal_(const blitz::Array<double,2>& A, 
+  blitz::Array<double,2>& V, blitz::Array<double,1>& D)
+{
+  // Size variable
+  int N = A.extent(0);
+
 
   ///////////////////////////////////
   // Prepare to call LAPACK function
@@ -105,6 +114,15 @@ void math::eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>&
   Torch::core::array::assertSameShape(B,shape2);
   Torch::core::array::assertSameShape(A,V);
   Torch::core::array::assertSameShape(D,shape1);
+
+  math::eigSym_(A, B, V, D);
+}
+
+void math::eigSym_(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
+  blitz::Array<double,2>& V, blitz::Array<double,1>& D)
+{
+  // Size variable
+  int N = A.extent(0);
 
 
   ///////////////////////////////////
@@ -175,6 +193,7 @@ static bool cmp_ev (const std::pair<double,int>& l, const std::pair<double,int>&
   return l.first > r.first; 
 }
 
+
 void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   blitz::Array<double,2>& V, blitz::Array<double,1>& D)
 {
@@ -191,6 +210,15 @@ void math::eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
   Torch::core::array::assertSameShape(B,shape2);
   Torch::core::array::assertSameShape(A,V);
   Torch::core::array::assertSameShape(D,shape1);
+
+  math::eig_(A, B, V, D);
+}
+
+void math::eig_(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
+  blitz::Array<double,2>& V, blitz::Array<double,1>& D)
+{
+  // Size variable
+  int N = A.extent(0);
 
 
   ///////////////////////////////////

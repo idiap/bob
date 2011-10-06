@@ -40,9 +40,12 @@ static tuple py_eig(const blitz::Array<double,2>& A, const blitz::Array<double,2
 
 void bind_math_eig() {
   def("eigSymReal", &Torch::math::eigSymReal, (arg("A"),arg("V"),arg("D")), EIGSYMREAL_DOC);
+  def("eigSymReal_", &Torch::math::eigSymReal_, (arg("A"),arg("V"),arg("D")), EIGSYMREAL_DOC);
   def("eigSymReal", &py_eig_symreal, (arg("A")), EIGSYMREAL_DOC);
   def("eigSym", &Torch::math::eigSym, (arg("A"),arg("B"),arg("V"),arg("D")), EIGSYMGEN_DOC);
+  def("eigSym_", &Torch::math::eigSym_, (arg("A"),arg("B"),arg("V"),arg("D")), EIGSYMGEN_DOC);
   def("eigSym", &py_eig_sym, (arg("A"),arg("B")), EIGSYMGEN_DOC);
   def("eig", &Torch::math::eig, (arg("A"),arg("B"),arg("V"),arg("D")), EIGGEN_DOC);
+  def("eig_", &Torch::math::eig_, (arg("A"),arg("B"),arg("V"),arg("D")), EIGGEN_DOC);
   def("eig", &py_eig, (arg("A"),arg("B")), EIGGEN_DOC);
 }

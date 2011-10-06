@@ -31,6 +31,9 @@ namespace Torch {
       */
     void eigSymReal(const blitz::Array<double,2>& A, blitz::Array<double,2>& V, 
       blitz::Array<double,1>& D);
+    void eigSymReal_(const blitz::Array<double,2>& A, blitz::Array<double,2>& V, 
+      blitz::Array<double,1>& D);
+
 
     /**
       * @brief Computes all the eigenvalues and the eigenvectors of a real 
@@ -46,6 +49,9 @@ namespace Torch {
       */
     void eigSym(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
       blitz::Array<double,2>& V, blitz::Array<double,1>& D);
+    void eigSym_(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
+      blitz::Array<double,2>& V, blitz::Array<double,1>& D);
+
 
     /**
       * @brief Computes all the eigenvalues and the eigenvectors of a real 
@@ -62,6 +68,9 @@ namespace Torch {
       */
     void eig(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
       blitz::Array<double,2>& V, blitz::Array<double,1>& D);
+    void eig_(const blitz::Array<double,2>& A, const blitz::Array<double,2>& B,
+      blitz::Array<double,2>& V, blitz::Array<double,1>& D);
+
   }
 /**
  * @}
@@ -69,4 +78,3 @@ namespace Torch {
 }
 
 #endif /* TORCH5SPRO_MATH_EIG_H */
-
