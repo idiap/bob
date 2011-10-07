@@ -605,7 +605,7 @@ class Database(object):
 
     retval = {}
     d = self.objects(directory, extension, protocol, 'probe', model_ids, zgroups, 'client', None, expressions)
-    for k in d: retval[k] = (d[k][0], d[k][3], d[k][4])
+    for k in d: retval[k] = d[k]
 
     return retval
 
