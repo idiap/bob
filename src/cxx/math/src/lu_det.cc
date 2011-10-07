@@ -109,11 +109,8 @@ void math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
 
 double math::det(const blitz::Array<double,2>& A)
 {
-  // Size variable
-  int N = A.extent(0);
   Torch::core::array::assertSameDimensionLength(A.extent(0),A.extent(1));
-
-  math::det_(A);
+  return math::det_(A);
 }
 
 double math::det_(const blitz::Array<double,2>& A)
