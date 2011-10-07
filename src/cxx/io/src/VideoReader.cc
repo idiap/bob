@@ -187,6 +187,16 @@ void io::VideoReader::open() {
   fmt % m_height;
   m_formatted_info = fmt.str();
 
+  /**
+   * This will make sure we can interface with the io subsystem
+   */
+  m_typeinfo.dtype = core::array::t_uint8;
+  m_typeinfo.nd = 4;
+  m_typeinfo.shape[0] = m_nframes;
+  m_typeinfo.shape[1] = 3;
+  m_typeinfo.shape[2] = m_height;
+  m_typeinfo.shape[3] = m_width;
+
   //closes the codec we used
   avcodec_close(codec_ctxt);
 
@@ -210,6 +220,23 @@ void io::VideoReader::load(blitz::Array<uint8_t,4>& data) const {
   for (const_iterator it=begin(); it!=end();) {
     blitz::Array<uint8_t,3> ref = data(it.cur(), a, a, a);
     it.read(ref);
+  }
+}
+
+void io::VideoReader::load(io::buffer& b) const {
+  //checks if the output array shape conforms to the video specifications,
+  //otherwise, resize it.
+  if (m_typeinfo.is_compatible(b.type())) b.set(m_typeinfo);
+
+  unsigned long int frame_size = (3*m_height*m_width);
+  uint8_t* ptr = static_cast<uint8_t*>(b.ptr());
+  blitz::TinyVector<int,3> shape3;
+  shape3 = m_typeinfo.shape[1], m_typeinfo.shape[2], m_typeinfo.shape[3];
+
+  for (const_iterator it=begin(); it!=end();) {
+    blitz::Array<uint8_t,3> ref(ptr, shape3, blitz::neverDeleteData);
+    it.read(ref);
+    ptr += frame_size;
   }
 }
 

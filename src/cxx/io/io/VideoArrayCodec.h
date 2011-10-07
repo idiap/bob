@@ -23,38 +23,30 @@ namespace Torch { namespace io {
       virtual ~VideoArrayCodec();
 
       /**
-       * Returns the element type and the number of dimensions of the stored
-       * array.
+       * Returns the total amount of storage required to load the array into
+       * memory, in number of elements of type 'dtype' (**not** the number of
+       * bytes). Fills up array properties such as the element type, number of
+       * dimensions, the shape and strides. The shape and strides use as basis
+       * the sizeof(dtype) and **not** the number of bytes.
        */
-      virtual void peek(const std::string& filename, 
-          Torch::core::array::ElementType& eltype, size_t& ndim,
-          size_t* shape) const;
+      virtual void peek(const std::string& file, typeinfo& info) const;
 
       /**
-       * Returns the stored array in a InlinedArrayImpl. Because of a
-       * limitation of this API you will not be able to retrieve video
-       * information that you may find useful, such as the framerate. If you
-       * need access to these variables then please use io::VideoReader
-       * directly.
+       * Loads the array data into a pre-defined memory area. This memory area
+       * has to have enough space as can be verified by "peek".
+       *
+       * This method will check to see if the given array has enough space. If
+       * that is not the case, it will allocated enough space internally by
+       * reseting the input array and putting the data read from the file
+       * inside.
        */
-      virtual detail::InlinedArrayImpl load(const std::string& filename) const;
+      virtual void load(const std::string& file, buffer& array) const;
 
       /**
-       * Saves a representation of the given array in the file. Please note
-       * that writing a video file requires more parameters than the ones given
-       * in this method. So, we have to assume certain parameters which are
-       * missing and this is a limiation of this implementation. Videos will be
-       * saved using the following parameters:
-       *
-       * -- bitrate = 1500000 bits per second
-       * -- framerate = 25 frames per second
-       * -- gop = 12 keyframes per normal frames
-       *
-       * If that is not what you want, then please use io::VideoWriter
-       * directly.
+       * Saves a representation of the given array in the file and according to
+       * the specifications defined on the interface.
        */
-      virtual void save (const std::string& filename, 
-          const detail::InlinedArrayImpl& data) const;
+      virtual void save (const std::string& file, const buffer& array) const;
 
       /**
        * Returns the name of this codec

@@ -13,6 +13,8 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
+#include "io/buffer.h"
+
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
@@ -120,6 +122,11 @@ namespace Torch { namespace io {
       std::string info() const;
 
       /**
+       * Compatibility layer type information
+       */ 
+      const typeinfo& type() const { return m_typeinfo; }
+
+      /**
        * Writes a set of frames to the file. The frame set should be setup as a
        * blitz::Array<> with 4 dimensions organized in this way:
        * (frame-number, RGB color-bands, height, width).
@@ -141,6 +148,13 @@ namespace Torch { namespace io {
        */
       void append(const blitz::Array<uint8_t,3>& data);
 
+      /**
+       * Writes a set of frames to the file. The frame set should be setup as a
+       * io::buffer organized this way: (frame-number, RGB color-bands, height,
+       * width) or (RGB color-bands, height, width).
+       */
+      void append(const io::buffer& data);
+    
     private: //not implemented
 
       VideoWriter(const VideoWriter& other);
@@ -185,6 +199,7 @@ namespace Torch { namespace io {
       size_t m_gop;
       std::string m_codecname;
       std::string m_codecname_long;
+      io::typeinfo m_typeinfo;
 
       AVOutputFormat* m_oformat_ctxt;
       AVFormatContext* m_format_ctxt;

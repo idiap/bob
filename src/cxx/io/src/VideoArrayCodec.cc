@@ -50,30 +50,22 @@ io::VideoArrayCodec::VideoArrayCodec()
 io::VideoArrayCodec::~VideoArrayCodec() { }
 
 void io::VideoArrayCodec::peek(const std::string& filename, 
-    core::array::ElementType& eltype, size_t& ndim,
-    size_t* shape) const 
+    io::typeinfo& info) const
 {
   io::VideoReader v(filename);
-  eltype = core::array::t_uint8;
-  ndim = 4;
-  shape[0] = v.numberOfFrames();
-  shape[1] = 3;
-  shape[2] = v.height();
-  shape[3] = v.width();
+  info = v.type();
 }
 
-io::detail::InlinedArrayImpl 
-io::VideoArrayCodec::load(const std::string& filename) const {
-  io::VideoReader v(filename);
-  blitz::Array<uint8_t,4> retval;
-  v.load(retval);
-  return retval;
+void io::VideoArrayCodec::load(const std::string& file,
+    io::buffer& array) const {
+  io::VideoReader v(file);
+  v.load(array);
 }
 
-void io::VideoArrayCodec::save (const std::string& filename,
-    const io::detail::InlinedArrayImpl& data) const {
-  if (data.getNDim() != 4) throw io::DimensionError(data.getNDim(), 4);
-  const blitz::Array<uint8_t,4>& array = data.get<uint8_t,4>();
-  io::VideoWriter v(filename, array.extent(2), array.extent(3));
+void io::VideoArrayCodec::save (const std::string& file,
+    const io::buffer& array) const {
+  const io::typeinfo& type = array.type();
+  if (type.nd != 4) throw io::DimensionError(type.nd, 4);
+  io::VideoWriter v(file, type.shape[2], type.shape[3]);
   v.append(array);
 }

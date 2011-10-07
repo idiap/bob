@@ -16,6 +16,8 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
+#include "io/buffer.h"
+
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
@@ -109,11 +111,22 @@ namespace Torch { namespace io {
       inline const std::string& info() const { return m_formatted_info; }
 
       /**
+       * Returns the typing information for this video
+       */
+      inline const io::typeinfo& type() const { return m_typeinfo; }
+
+      /**
        * Loads all of the video stream in a blitz array organized in this way:
        * (frames, color-bands, height, width). The 'data' parameter will be
        * resized if required.
        */
       void load(blitz::Array<uint8_t,4>& data) const;
+
+      /**
+       * Loads all of the video stream in a io::buffer. Resizes the buffer if
+       * the space and type are not good.
+       */
+      void load(io::buffer& b) const;
 
     private: //methods
 
@@ -283,6 +296,7 @@ namespace Torch { namespace io {
       std::string m_codecname; ///< the name of the ffmpeg codec to be used
       std::string m_codecname_long; ///< long version of m_codecname
       std::string m_formatted_info; ///< printable information about the video
+      io::typeinfo m_typeinfo; ///< the io subsystem type information
   };
 
 }}
