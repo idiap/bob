@@ -109,40 +109,39 @@ void io::HDF5File::copy (HDF5File& other) {
   //TODO
 }
 
-void io::HDF5File::create (const std::string& path, const io::HDF5Type& dest,
+void io::HDF5File::create (const std::string& path, const io::typeinfo& ti,
     bool list, size_t compression) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) {
     m_index[absolute] =
       boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
-          absolute, dest, list, compression);
+          absolute, io::HDF5Type(ti), list, compression);
   }
   else {
-    //still make sure the type is good
-    m_index[absolute]->size(dest);
+    //still make sure the type is usable -- that will throw if not
+    m_index[absolute]->size(io::HDF5Type(ti));
   }
 }
 
-void io::HDF5File::read_buffer (const std::string& path, size_t pos, const
-    io::HDF5Type& dest, void* buffer) {
+void io::HDF5File::read_buffer (const std::string& path, size_t pos, 
+    io::buffer& b) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) 
     throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-  m_index[absolute]->read_buffer(pos, dest, buffer);
+  m_index[absolute]->read_buffer(pos, io::HDF5Type(b.type()), b.ptr());
 }
 
 void io::HDF5File::write_buffer (const std::string& path, 
-    size_t pos, const io::HDF5Type& dest, const void* buffer) {
+    size_t pos, const io::buffer& b) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) 
     throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-  m_index[absolute]->write_buffer(pos, dest, buffer);
+  m_index[absolute]->write_buffer(pos, io::HDF5Type(b.type()), b.ptr());
 }
 
-void io::HDF5File::extend_buffer (const std::string& path, 
-    const io::HDF5Type& dest, const void* buffer) {
+void io::HDF5File::extend_buffer(const std::string& path, const io::buffer& b) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) 
     throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
-  m_index[absolute]->extend_buffer(dest, buffer);
+  m_index[absolute]->extend_buffer(io::HDF5Type(b.type()), b.ptr());
 }

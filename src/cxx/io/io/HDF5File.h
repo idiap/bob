@@ -18,6 +18,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/filesystem.hpp>
 
+#include "io/buffer.h"
 #include "io/HDF5Utils.h"
 
 namespace Torch { namespace io {
@@ -331,7 +332,7 @@ namespace Torch { namespace io {
        * creates a new dataset. If the dataset already exists, checks if the
        * existing data is compatible with the required type.
        */
-      void create (const std::string& path, const HDF5Type& dest,
+      void create (const std::string& path, const io::typeinfo& dest,
           bool list, size_t compression);
 
       /**
@@ -340,21 +341,18 @@ namespace Torch { namespace io {
        * exception if the type is incompatible with the expected data in the
        * file. Relative paths are accepted.
        */
-      void read_buffer (const std::string& path, size_t pos,
-          const HDF5Type& dest, void* buffer);
+      void read_buffer (const std::string& path, size_t pos, buffer& b);
 
       /**
        * writes the contents of a given buffer into the file. the area that the
        * data will occupy should have been selected beforehand.
        */
-      void write_buffer (const std::string& path, size_t pos,
-          const HDF5Type& dest, const void* buffer);
+      void write_buffer (const std::string& path, size_t pos, const buffer& b);
 
       /**
        * extend the dataset with one extra variable.
        */
-      void extend_buffer (const std::string& path, const HDF5Type& dest,
-          const void* buffer);
+      void extend_buffer (const std::string& path, const buffer& b);
 
     private: //not implemented
 

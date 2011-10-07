@@ -87,6 +87,28 @@ void check_equal(const blitz::Array<T,3>& a, const blitz::Array<U,3>& b)
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
+BOOST_AUTO_TEST_CASE( image_gif ) 
+{
+  // Prepare io Array from blitz array
+  Torch::io::Array db_b(b);
+  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
+  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
+  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
+  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
+  for(size_t i=0; i<db_b.getNDim(); ++i)
+    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
+  check_equal( db_b.get<uint8_t,3>(), b );
+
+  // Save to gif image
+  std::string filename = temp_file(".gif");
+  db_b.save( filename, "torch.image" );
+
+  // Load from gif image
+  Torch::io::Array db_b_read( filename, "torch.image" );
+  db_b_read.get<uint8_t,3>();
+  check_equal( db_b_read.get<uint8_t,3>(), b );
+}
 
 BOOST_AUTO_TEST_CASE( image_bmp )
 {
@@ -106,29 +128,6 @@ BOOST_AUTO_TEST_CASE( image_bmp )
   db_b.save( filename, "torch.image" );
 
   // Load from bmp image
-  Torch::io::Array db_b_read( filename, "torch.image" );
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-}
-
-BOOST_AUTO_TEST_CASE( image_gif ) 
-{
-  // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to gif image
-  std::string filename = temp_file(".gif");
-  db_b.save( filename, "torch.image" );
-
-  // Load from gif image
   Torch::io::Array db_b_read( filename, "torch.image" );
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );

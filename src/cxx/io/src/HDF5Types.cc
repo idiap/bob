@@ -489,61 +489,55 @@ io::HDF5Type::HDF5Type(io::hdf5type type, const io::HDF5Shape& extents):
 {
 }
 
-io::HDF5Type::HDF5Type(Torch::core::array::ElementType eltype, 
-    const HDF5Shape& extents): 
-  m_type(),
-  m_shape(extents)
-{
+static io::hdf5type array_to_hdf5 (Torch::core::array::ElementType eltype) {
   switch(eltype) {
     case Torch::core::array::t_unknown:
-      m_type = io::unsupported;
-      break;
+      return io::unsupported;
     case Torch::core::array::t_bool:
-      m_type = io::u8;
-      break;
+      return io::u8;
     case Torch::core::array::t_int8:
-      m_type = io::i8;
-      break;
+      return io::i8;
     case Torch::core::array::t_int16:
-      m_type = io::i16;
-      break;
+      return io::i16;
     case Torch::core::array::t_int32:
-      m_type = io::i32;
-      break;
+      return io::i32;
     case Torch::core::array::t_int64:
-      m_type = io::i64;
-      break;
+      return io::i64;
     case Torch::core::array::t_uint8:
-      m_type = io::u8;
-      break;
+      return io::u8;
     case Torch::core::array::t_uint16:
-      m_type = io::u16;
-      break;
+      return io::u16;
     case Torch::core::array::t_uint32:
-      m_type = io::u32;
-      break;
+      return io::u32;
     case Torch::core::array::t_uint64:
-      m_type = io::u64;
-      break;
+      return io::u64;
     case Torch::core::array::t_float32:
-      m_type = io::f32;
-      break;
+      return io::f32;
     case Torch::core::array::t_float64:
-      m_type = io::f64;
-      break;
+      return io::f64;
     case Torch::core::array::t_float128:
-      m_type = io::f128;
-      break;
+      return io::f128;
     case Torch::core::array::t_complex64:
-      m_type = io::c64;
-      break;
+      return io::c64;
     case Torch::core::array::t_complex128:
-      m_type = io::c128;
-      break;
+      return io::c128;
     case Torch::core::array::t_complex256:
-      m_type = io::c256;
-      break;
+      return io::c256;
   }
+  throw std::runtime_error("unsupported dtyle <=> hdf5 type conversion -- debug me");
+}
+
+io::HDF5Type::HDF5Type(const io::typeinfo& ti): 
+  m_type(array_to_hdf5(ti.dtype)),
+  m_shape(ti.nd, ti.shape)
+{
+}
+
+io::HDF5Type::HDF5Type(Torch::core::array::ElementType eltype, 
+    const HDF5Shape& extents): 
+  m_type(array_to_hdf5(eltype)),
+  m_shape(extents)
+{
 }
 
 io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type,
@@ -616,6 +610,13 @@ Torch::core::array::ElementType io::HDF5Type::element_type() const {
       break;
   }
   return Torch::core::array::t_unknown;
+}
+
+void io::HDF5Type::copy_to (io::typeinfo& ti) const {
+  ti.dtype = element_type();
+  ti.nd = shape().n();
+  if (ti.nd > TORCH_MAX_DIM) throw std::runtime_error("HDF5 type has more than the allowed maximum number of dimensions -- debug me");
+  for (size_t i=0; i<ti.nd; ++i) ti.shape[i] = shape()[i];
 }
       
 io::HDF5Descriptor::HDF5Descriptor(const HDF5Type& type, size_t size, 

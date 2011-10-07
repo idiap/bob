@@ -54,166 +54,38 @@ io::HDF5ArrayCodec::HDF5ArrayCodec()
 io::HDF5ArrayCodec::~HDF5ArrayCodec() { }
 
 void io::HDF5ArrayCodec::peek(const std::string& filename, 
-    Torch::core::array::ElementType& eltype, size_t& ndim,
-    size_t* shape) const {
+    io::typeinfo& info) const {
+
   io::HDF5File f(filename, io::HDF5File::in);
   std::vector<std::string> paths;
   f.paths(paths);
   if (!paths.size()) throw io::HDF5InvalidPath(filename, "/array");
-  const io::HDF5Type& descr = choose_format(f.describe(paths[0])).type;
-  eltype = descr.element_type();
-  if (eltype == Torch::core::array::t_unknown) {
-    throw io::UnsupportedTypeError(eltype);
-  }
-  ndim = descr.shape().n();
-  if (ndim > 4) {
-    throw io::DimensionError(ndim, Torch::core::array::N_MAX_DIMENSIONS_ARRAY);
-  }
-  for (size_t i=0; i<ndim; ++i) shape[i] = descr.shape()[i];
+  choose_format(f.describe(paths[0])).type.copy_to(info);
 }
 
-template <typename T, int N>
-static io::detail::InlinedArrayImpl read_array (io::HDF5File& f,
-    const std::string& path) {
-  const io::HDF5Type& descr = choose_format(f.describe(path)).type;
-  blitz::TinyVector<int,N> shape;
-  descr.shape().set(shape);
-  blitz::Array<T,N> retval(shape);
-  f.readArray(path, 0, retval);
-  return io::detail::InlinedArrayImpl(retval);
-}
+void io::HDF5ArrayCodec::load(const std::string& file, buffer& array) const {
 
-#define DIMSWITCH(T) switch(descr.shape().n()) { \
-  case 1: return read_array<T,1>(f, name); break; \
-  case 2: return read_array<T,2>(f, name); break; \
-  case 3: return read_array<T,3>(f, name); break; \
-  case 4: return read_array<T,4>(f, name); break; \
-  default: throw io::DimensionError(descr.shape().n(), Torch::core::array::N_MAX_DIMENSIONS_ARRAY); \
-}
-
-io::detail::InlinedArrayImpl 
-io::HDF5ArrayCodec::load(const std::string& filename) const {
-  io::HDF5File f(filename, io::HDF5File::in);
+  io::HDF5File f(file, io::HDF5File::in);
   std::vector<std::string> paths;
   f.paths(paths);
-  if (!paths.size()) throw io::HDF5InvalidPath(filename, "/array");
+  if (!paths.size()) throw io::HDF5InvalidPath(file, "/array");
+
   const std::string& name = paths[0];
   const io::HDF5Type& descr = choose_format(f.describe(name)).type;
-  switch (descr.element_type()) {
-    case Torch::core::array::t_bool:
-      DIMSWITCH(bool) 
-        break;
-    case Torch::core::array::t_int8:
-      DIMSWITCH(int8_t) 
-        break;
-    case Torch::core::array::t_int16: 
-      DIMSWITCH(int16_t) 
-        break;
-    case Torch::core::array::t_int32: 
-      DIMSWITCH(int32_t) 
-        break;
-    case Torch::core::array::t_int64: 
-      DIMSWITCH(int64_t) 
-        break;
-    case Torch::core::array::t_uint8: 
-      DIMSWITCH(uint8_t) 
-        break;
-    case Torch::core::array::t_uint16: 
-      DIMSWITCH(uint16_t) 
-        break;
-    case Torch::core::array::t_uint32: 
-      DIMSWITCH(uint32_t) 
-        break;
-    case Torch::core::array::t_uint64: 
-      DIMSWITCH(uint64_t) 
-        break;
-    case Torch::core::array::t_float32: 
-      DIMSWITCH(float) 
-        break;
-    case Torch::core::array::t_float64: 
-      DIMSWITCH(double) 
-        break;
-    case Torch::core::array::t_float128: 
-      DIMSWITCH(long double) 
-        break;
-    case Torch::core::array::t_complex64: 
-      DIMSWITCH(std::complex<float>) 
-        break;
-    case Torch::core::array::t_complex128: 
-      DIMSWITCH(std::complex<double>)
-        break;
-    case Torch::core::array::t_complex256: 
-      DIMSWITCH(std::complex<long double>)
-        break;
-    default:
-      break;
-  }
-  throw Torch::io::UnsupportedTypeError(descr.element_type());
-}
 
-#undef DIMSWITCH
+  io::typeinfo info;
+  descr.copy_to(info);
+  if(!array.type().is_compatible(info)) array.set(info);
 
-#define DIMSWITCH(T) switch(data.getNDim()) { \
-  case 1: f.setArray(varname, data.get<T,1>()); break; \
-  case 2: f.setArray(varname, data.get<T,2>()); break; \
-  case 3: f.setArray(varname, data.get<T,3>()); break; \
-  case 4: f.setArray(varname, data.get<T,4>()); break; \
-  default: throw io::DimensionError(data.getNDim(), Torch::core::array::N_MAX_DIMENSIONS_ARRAY); \
+  f.read_buffer(name, 0, array);
 }
 
 void io::HDF5ArrayCodec::save (const std::string& filename,
-    const io::detail::InlinedArrayImpl& data) const {
-  static std::string varname("array");
-  io::HDF5File f(filename, io::HDF5File::trunc);
-  switch(data.getElementType()) {
-    case Torch::core::array::t_bool: 
-      DIMSWITCH(bool) 
-        break;
-    case Torch::core::array::t_int8: 
-      DIMSWITCH(int8_t) 
-        break;
-    case Torch::core::array::t_int16: 
-      DIMSWITCH(int16_t) 
-        break;
-    case Torch::core::array::t_int32: 
-      DIMSWITCH(int32_t) 
-        break;
-    case Torch::core::array::t_int64: 
-      DIMSWITCH(int64_t) 
-        break;
-    case Torch::core::array::t_uint8: 
-      DIMSWITCH(uint8_t) 
-        break;
-    case Torch::core::array::t_uint16: 
-      DIMSWITCH(uint16_t) 
-        break;
-    case Torch::core::array::t_uint32: 
-      DIMSWITCH(uint32_t) 
-        break;
-    case Torch::core::array::t_uint64: 
-      DIMSWITCH(uint64_t) 
-        break;
-    case Torch::core::array::t_float32: 
-      DIMSWITCH(float) 
-        break;
-    case Torch::core::array::t_float64: 
-      DIMSWITCH(double) 
-        break;
-    case Torch::core::array::t_float128: 
-      DIMSWITCH(long double) 
-        break;
-    case Torch::core::array::t_complex64: 
-      DIMSWITCH(std::complex<float>)
-        break;
-    case Torch::core::array::t_complex128: 
-      DIMSWITCH(std::complex<double>)
-        break;
-    case Torch::core::array::t_complex256: 
-      DIMSWITCH(std::complex<long double>)
-        break;
-    default:
-      throw Torch::io::UnsupportedTypeError(data.getElementType());
-  }
-}
+    const io::buffer& data) const {
 
-#undef DIMSWITCH
+  static std::string varname("array");
+
+  io::HDF5File f(filename, io::HDF5File::trunc);
+  f.create(varname, data.type(), false, 0); ///straight array, no compression
+  f.write_buffer(varname, 0, data); 
+}

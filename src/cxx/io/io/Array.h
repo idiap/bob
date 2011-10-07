@@ -132,13 +132,13 @@ namespace Torch {
          * Starts a new array with in-memory content, refers to the data
          */
         template <typename T, int N> Array(blitz::Array<T,N>& data):
-          m_inlined(new carray(boost::make_shared<blitz::Array<T,N> >(data))) {}
+          m_inlined(boost::make_shared<carray>(boost::make_shared<blitz::Array<T,N> >(data))) { }
 
         /**
          * Starts a new array with in-memory content, copies the data.
          */
-        template <typename T, int N> Array(const blitz::Array<T,N>& data):
-          m_inlined(new carray(data)) {}
+        template <typename T, int N> Array(const blitz::Array<T,N>& data): 
+          m_inlined(boost::make_shared<carray>(data)) { }
 
         /**
          * If the array is already in memory, we return a copy of it in the
@@ -174,8 +174,19 @@ namespace Torch {
          * A handle to simplify your life with blitz::Array<>'s
          */
         template <typename T, int N> 
-          inline void set(const blitz::Array<T,N>& bzarray) {
+          void set(blitz::Array<T,N>& bzarray) {
+            boost::shared_ptr<blitz::Array<T,N> > 
+              sbz(new blitz::Array<T,N>(bzarray));
+            set(sbz);
+        }
+
+        /**
+         * A handle to simplify your life with blitz::Array<>'s
+         */
+        template <typename T, int N> 
+          void set(const blitz::Array<T,N>& bzarray) {
             if (!m_inlined) {
+              //use the data only for recording, no need to copy anyway...
               carray tmp(boost::make_shared<blitz::Array<T,N> >(bzarray));
               m_external->save(tmp);
             }
@@ -189,14 +200,15 @@ namespace Torch {
          * A handle to simplify your life with blitz::Array<>'s
          */
         template <typename T, int N> 
-          inline void set(boost::shared_ptr<blitz::Array<T,N> >& bzarray) {
+          void set(boost::shared_ptr<blitz::Array<T,N> >& bzarray) {
             if (!m_inlined) {
+              //use the data only for recording, no need to copy anyway...
               carray tmp(bzarray);
               m_external->save(tmp);
             }
             else {
               //no data copying...
-              set(carray(bzarray));
+              set(boost::make_shared<carray>(bzarray));
             }
         }
 

@@ -86,10 +86,11 @@ static int im_peek(Magick::Image& image, io::typeinfo& info) {
 
 void io::ImageArrayCodec::peek(const std::string& filename, io::typeinfo& info) const {
   try {
-    Magick::Image image(filename.c_str());
+    Magick::Image image;
+    image.ping(filename.c_str());
     im_peek(image, info);
   }
-  catch( Magick::Exception &error_ ) {
+  catch(Magick::Exception &error_ ) {
     throw io::FileNotReadable(filename);
   }
 }
@@ -149,7 +150,7 @@ static void im_load(Magick::Image& image, io::buffer& b) {
     if(info.nd == 2) im_load_gray<uint8_t>(image, b);
     else if( info.nd == 3) im_load_color<uint8_t>(image, b); 
     else throw io::ImageUnsupportedDimension(info.nd);
-  } 
+  }
   
   else if (info.dtype == Torch::core::array::t_uint16) {
     if(info.nd == 2) im_load_gray<uint16_t>(image, b);
