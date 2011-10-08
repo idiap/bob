@@ -130,7 +130,7 @@ void im_load_color(Magick::Image& image, io::buffer& b) {
   const io::typeinfo& info = b.type();
 
   long unsigned int frame_size = info.shape[2] * info.shape[1];
-  boost::shared_array<T> tmp(new T[frame_size]);
+  boost::shared_array<T> tmp(new T[3*frame_size]);
   image.write(0, 0, info.shape[2], info.shape[1], "RGB", 
       magick_storage_type<T>(), tmp.get());
   T* red   = static_cast<T*>(b.ptr());
@@ -207,7 +207,7 @@ static void im_save_color(const io::buffer& b, const std::string& name) {
   const T* red = static_cast<const T*>(b.ptr());
   const T* green = red + frame_size;
   const T* blue = green + frame_size;
-  boost::shared_array<T> tmp(new T[frame_size]);
+  boost::shared_array<T> tmp(new T[3*frame_size]);
   rgb_to_imbuffer(frame_size, red, green, blue, tmp.get());
   image.read(info.shape[2], info.shape[1], "RGB", 
       magick_storage_type<T>(), tmp.get());
