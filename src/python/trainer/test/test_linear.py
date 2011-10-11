@@ -74,6 +74,44 @@ class TrainerTest(unittest.TestCase):
     self.assertTrue( ((machine.weights - exp_mach) < 1e-6).all() )
     self.assertTrue( ((eig_vals - exp_val) < 1e-6).all() )
 
+  def test03_ppca(self):
+
+    # Tests our Probabilistic PCA trainer for linear machines for a simple 
+    # problem:
+    ar=torch.io.Arrayset()
+    ar.append(torch.core.array.float64_1([1,2,3], (3,)))
+    ar.append(torch.core.array.float64_1([2,4,19], (3,)))
+    ar.append(torch.core.array.float64_1([3,6,5], (3,)))
+    ar.append(torch.core.array.float64_1([4,8,13], (3,)))
+    
+    # Expected llh 1 and 2 (Reference values)
+    exp_llh1 =  -32.8443
+    exp_llh2 =  -30.8559
+   
+    # Do two iterations of EM to check the training procedure 
+    T = torch.trainer.EMPCATrainer(2)
+    m = torch.machine.LinearMachine()
+    # Initialization of the trainer
+    T.initialization(m, ar)
+    # Sets ('random') initialization values for test purposes
+    w_init = torch.core.array.float64_2([1.62945, 0.270954, 1.81158, 1.67002, 0.253974, 1.93774], (3,2))
+    sigma2_init = 1.82675
+    m.weights = w_init
+    T.sigma2 = sigma2_init
+    # Checks that the log likehood matches the reference one
+    # This should be sufficient to check everything as it requires to use
+    # the new value of W and sigma2 
+    # This does an E-Step, M-Step, computes the likelihood, and compares it to
+    # the reference value obtained using matlab
+    T.eStep(m, ar)
+    T.mStep(m, ar)
+    llh1 = T.computeLikelihood(m, ar)
+    self.assertTrue( abs(exp_llh1 - llh1) < 2e-4)
+    T.eStep(m, ar)
+    T.mStep(m, ar)
+    llh2 = T.computeLikelihood(m, ar)
+    self.assertTrue( abs(exp_llh2 - llh2) < 2e-4)
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \

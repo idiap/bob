@@ -10,6 +10,7 @@ set(pysrc
    "src/backprop.cc"
    "src/jfa.cc"
    "src/wiener.cc"
+   "src/empca.cc"
    "src/main.cc"
    )
 
