@@ -162,6 +162,15 @@ namespace Torch { namespace machine {
       void setInputDivision(const blitz::Array<double,1>& v);
 
       /**
+       * Returns the current input division factor in order to be updated.
+       * @warning Use with care. Only trainers should use this function for
+       * efficiency reasons.
+       */
+      inline blitz::Array<double, 1>& updateInputDivision()  
+      { return m_input_div; }
+
+
+      /**
        * Sets all input division values to a specific value.
        */
       inline void setInputDivision(double v) { m_input_div = v; }
@@ -180,6 +189,16 @@ namespace Torch { namespace machine {
        * an exception if that is not the case.
        */
       void setWeights(const blitz::Array<double,2>& weight);
+
+      /**
+       * Returns the current weight representation in order to be updated. 
+       * Each column should be considered as a vector from which each of the
+       * output values is derived by projecting the input onto such a vector.
+       * @warning Use with care. Only trainers should use this function for
+       * efficiency reasons.
+       */
+      inline blitz::Array<double, 2>& updateWeights()  
+      { return m_weight; }
 
       /**
        * Sets all weights to a single specific value.
