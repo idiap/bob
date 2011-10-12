@@ -88,11 +88,10 @@ void train::SVDPCATrainer::train(Torch::machine::LinearMachine& machine,
    * note: eigen values are sigma^2/n_samples diagonal
    *       eigen vectors are the rows of U
    */
-  machine.resize(n_features, std::min(n_features, n_samples));
+  machine.resize(n_features, n_sigma);
   machine.setInputSubtraction(mean);
   machine.setInputDivision(1.0);
   machine.setBiases(0.0);
-  U.transposeSelf(1,0);
   machine.setWeights(U);
 
   //weight normalization (if necessary):
