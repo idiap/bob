@@ -32,16 +32,17 @@ namespace Torch { namespace trainer {
     *  - epsilon is the noise of the data (dimension f)
     *      Gaussian with zero-mean and covariance matrix sigma^2 * Id
     */
-  class EMPCATrainer : public EMTrainerNew<Torch::machine::LinearMachine, Torch::io::Arrayset> {
-
+  class EMPCATrainer: public EMTrainerNew<Torch::machine::LinearMachine, 
+                                          Torch::io::Arrayset> 
+  {
     public: //api
-
       /**
         * Initializes a new EM PCA trainer. The training stage will place the
         * resulting components in the linear machine and set it up to
         * extract the variable means automatically. 
         */
-      EMPCATrainer(int dimensionality, double convergence_threshold=0.001, int max_iterations=10, bool compute_likelihood=true); 
+      EMPCATrainer(int dimensionality, double convergence_threshold=0.001, 
+        int max_iterations=10, bool compute_likelihood=true); 
 
       /**
         * Copy construction.
@@ -143,7 +144,8 @@ namespace Torch { namespace trainer {
       /**
         * Computes the mean and the variance (if required) of the training data
         */
-      void computeMeanVariance(Torch::machine::LinearMachine& machine, const io::Arrayset& ar);
+      void computeMeanVariance(Torch::machine::LinearMachine& machine, 
+        const io::Arrayset& ar);
       /**
         * Random initialization of W and sigma2
         * W is the projection matrix (from the LinearMachine)
