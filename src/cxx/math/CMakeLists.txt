@@ -20,6 +20,7 @@ set(src_lapack
   "src/eig.cc"
   "src/linsolve.cc"
   "src/lu_det.cc"
+  "src/sqrtm.cc"
   "src/svd.cc"
 )
 

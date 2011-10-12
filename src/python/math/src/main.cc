@@ -14,6 +14,7 @@ void bind_math_linear();
 void bind_math_linsolve();
 void bind_math_lu_det();
 void bind_math_norminv();
+void bind_math_sqrtm();
 void bind_math_svd();
 void bind_math_stats();
 
@@ -28,6 +29,7 @@ BOOST_PYTHON_MODULE(libpytorch_math) {
   bind_math_linsolve();
   bind_math_lu_det();
   bind_math_norminv();
+  bind_math_sqrtm();
   bind_math_svd();
   bind_math_stats();
 }
