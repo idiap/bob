@@ -141,11 +141,16 @@ namespace Torch { namespace trainer {
       // Cache
       mutable blitz::Array<double,1> m_cache_nf;
       mutable blitz::Array<double,1> m_cache_ng;
+      mutable blitz::Array<double,1> m_cache_D_1; // D=nb features
+      mutable blitz::Array<double,1> m_cache_D_2; // D=nb features
+      mutable std::map<size_t,blitz::Array<double,1> > m_cache_for_y_first_order;
       mutable blitz::Array<double,2> m_cache_nf_nf;
       mutable blitz::Array<double,2> m_cache_ng_ng;
       mutable blitz::Array<double,2> m_cache_nfng_nfng;
+      mutable blitz::Array<double,2> m_cache_D_nfng_1; // D=nb features, nfng=nf+ng
+      mutable blitz::Array<double,2> m_cache_D_nfng_2; // D=nb features, nfng=nf+ng
 
-      // internal method
+      // internal methods
       void computeMeanVariance(Torch::machine::PLDABaseMachine& machine,
         const std::vector<Torch::io::Arrayset>& v_ar);
       void initMembers(const std::vector<Torch::io::Arrayset>& v_ar);

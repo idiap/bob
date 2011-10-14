@@ -33,9 +33,9 @@ train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng,
   m_SI(0), m_FT_SI(0,0), m_GT_SI(0,0), m_FT_SI_F(0,0),
   m_FT_SI_G(0,0), m_GT_SI_F(0,0), m_GT_SI_G(0,0),
   m_I_FT_SI_F(0,0), m_I_GT_SI_G(0,0),
-  m_cache_nf(0), m_cache_ng(0),
+  m_cache_nf(0), m_cache_ng(0), m_cache_D_1(0), m_cache_D_2(0),
   m_cache_nf_nf(0,0), m_cache_ng_ng(0,0),
-  m_cache_nfng_nfng(0,0)
+  m_cache_nfng_nfng(0,0), m_cache_D_nfng_1(0,0), m_cache_D_nfng_2(0,0)
 {
 }
 
@@ -64,9 +64,14 @@ train::PLDABaseTrainer::PLDABaseTrainer(const train::PLDABaseTrainer& other):
   m_I_GT_SI_G(tca::ccopy(other.m_I_GT_SI_G)),
   m_cache_nf(tca::ccopy(other.m_cache_nf)),
   m_cache_ng(tca::ccopy(other.m_cache_ng)),
+  m_cache_D_1(tca::ccopy(other.m_cache_D_1)),
+  m_cache_D_2(tca::ccopy(other.m_cache_D_2)),
+// m_cache_for_y_first_order(),
   m_cache_nf_nf(tca::ccopy(other.m_cache_nf_nf)),
   m_cache_ng_ng(tca::ccopy(other.m_cache_ng_ng)),
-  m_cache_nfng_nfng(tca::ccopy(other.m_cache_nfng_nfng))
+  m_cache_nfng_nfng(tca::ccopy(other.m_cache_nfng_nfng)),
+  m_cache_D_nfng_1(tca::ccopy(other.m_cache_D_nfng_1)),
+  m_cache_D_nfng_2(tca::ccopy(other.m_cache_D_nfng_2))
 {
 }
 
@@ -102,9 +107,14 @@ train::PLDABaseTrainer& train::PLDABaseTrainer::operator=
   m_I_GT_SI_G = tca::ccopy(other.m_I_GT_SI_G);
   m_cache_nf = tca::ccopy(other.m_cache_nf);
   m_cache_ng = tca::ccopy(other.m_cache_ng);
+  m_cache_D_1 = tca::ccopy(other.m_cache_D_1);
+  m_cache_D_2 = tca::ccopy(other.m_cache_D_2);
+// m_cache_for_y_first_order,
   m_cache_nf_nf = tca::ccopy(other.m_cache_nf_nf);
   m_cache_ng_ng = tca::ccopy(other.m_cache_ng_ng);
   m_cache_nfng_nfng = tca::ccopy(other.m_cache_nfng_nfng);
+  m_cache_D_nfng_1 = tca::ccopy(other.m_cache_D_nfng_1);
+  m_cache_D_nfng_2 = tca::ccopy(other.m_cache_D_nfng_2);
   return *this;
 }
 
@@ -186,6 +196,9 @@ void train::PLDABaseTrainer::initMembers(const std::vector<io::Arrayset>& v_ar)
     m_y_first_order.push_back(yi1);
     blitz::Array<double,2> yi2(q_i, q_i);
     m_y_second_order.push_back(yi2);
+    // m_cache_for_y_{first,second}_order
+    m_cache_for_y_first_order[n_i] = blitz::Array<double,1>();
+    m_cache_for_y_first_order[n_i].resize(q_i);
 
     // m_n_samples_per_id
     m_n_samples_per_id.push_back(n_i);
@@ -220,9 +233,13 @@ void train::PLDABaseTrainer::initMembers(const std::vector<io::Arrayset>& v_ar)
   // Cache
   m_cache_nf.resize(m_nf);
   m_cache_ng.resize(m_ng);
+  m_cache_D_1.resize(n_features);
+  m_cache_D_2.resize(n_features);
   m_cache_nf_nf.resize(m_nf,m_ng);
   m_cache_ng_ng.resize(m_ng,m_ng);
   m_cache_nfng_nfng.resize(m_nf+m_ng,m_nf+m_ng);
+  m_cache_D_nfng_1.resize(n_features,m_nf+m_ng);
+  m_cache_D_nfng_2.resize(n_features,m_nf+m_ng);
 }
 
 void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine, 
@@ -296,8 +313,6 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
   precomputeFromFGSigma(machine);
   // Gets the mean mu from the machine
   const blitz::Array<double,1>& mu = machine.getMu();
-  size_t n_features = v_ar[0].getShape()[0]; // dimensionality of the data
-  blitz::Array<double,1> tmp_nfeatures(n_features);
 
   // Initializes sum of z second order statistics to 0
   m_sum_z_second_order = 0.;
@@ -305,25 +320,24 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
   {
     // 1/ First order statistics of y
     blitz::Array<double,1>& y_first_order_i = m_y_first_order[i];
-    // TODO: CACHE: tmp_nfeatures, tmp1
-    blitz::Array<double,1> tmp1(y_first_order_i.extent(0));
+    blitz::Array<double,1>& cache_for_y =  m_cache_for_y_first_order[v_ar[i].size()];
     // Loop over the samples
-    tmp1 = 0.;
+    cache_for_y = 0.;
     // Computes expectation of y_i = [h_i w_i1 ... w_iJ]
     for(size_t j=0; j<v_ar[i].size(); ++j)
     {
-      // tmp_features = x_sj-mu
-      tmp_nfeatures = v_ar[i].get<double,1>(j) - mu;
+      // m_cache_D_1 = x_sj-mu
+      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu;
 
       // m_cache_f = F^T.sigma^-1.(x_sj-mu)
-      Torch::math::prod(m_FT_SI, tmp_nfeatures, m_cache_nf);
-      tmp1(blitz::Range(0, m_nf-1)) += m_cache_nf;
+      Torch::math::prod(m_FT_SI, m_cache_D_1, m_cache_nf);
+      cache_for_y(blitz::Range(0, m_nf-1)) += m_cache_nf;
 
-      // y_i_slice = F^T.sigma^-1.(x_sj-mu)
-      blitz::Array<double,1> tmp1_slice = tmp1(blitz::Range(m_nf + j*m_ng, m_nf + (j+1)*m_ng -1));
-      Torch::math::prod(m_GT_SI, tmp_nfeatures, tmp1_slice);
+      // y_i_slice = G^T.sigma^-1.(x_sj-mu)
+      blitz::Array<double,1> cache_for_y_slice = cache_for_y(blitz::Range(m_nf + j*m_ng, m_nf + (j+1)*m_ng -1));
+      Torch::math::prod(m_GT_SI, m_cache_D_1, cache_for_y_slice);
     }
-    Torch::math::prod(m_inv_I_AT_SI_A[v_ar[i].size()], tmp1, y_first_order_i);
+    Torch::math::prod(m_inv_I_AT_SI_A[v_ar[i].size()], cache_for_y, y_first_order_i);
 
     // TODO: improve second order statistics computation 
     //       (some parts if y_second_order_i are currently useless)
@@ -407,7 +421,6 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
 void train::PLDABaseTrainer::precompute_I_AT_SI_A(size_t n_i)
 {
   size_t q_i = m_nf + n_i * m_ng;
-  blitz::Array<double,2> tmp1(q_i, q_i);
   blitz::Array<double,2>& I_AT_SI_A = m_I_AT_SI_A[n_i]; // reference for easier handling
   // I_AT_SI_A = Id
   math::eye(I_AT_SI_A);
@@ -469,24 +482,19 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
   // 1/ Computes the numerator (sum_ij (x_ij-mu).E{z_i}^T)
   // Gets the mean mu from the machine
   const blitz::Array<double,1>& mu = machine.getMu();
-  size_t n_features = v_ar[0].getShape()[0]; // dimensionality of the data
-  // TODO: CACHE: tmp_nfeatures, tmp_nfeatures_nfng1, tmp_nfeatures_nfng2
-  blitz::Array<double,1> tmp_nfeatures(n_features);
-  blitz::Array<double,2> tmp_nfeatures_nfng1(n_features, m_nf+m_ng);
-  blitz::Array<double,2> tmp_nfeatures_nfng2(n_features, m_nf+m_ng);
-  tmp_nfeatures_nfng2 = 0.;
+  m_cache_D_nfng_2 = 0.;
   for(size_t i=0; i<v_ar.size(); ++i)
   {
     // Loop over the samples
     for(size_t j=0; j<v_ar[i].size(); ++j)
     {
-      // tmp_nfeatures = x_sj-mu
-      tmp_nfeatures = v_ar[i].get<double,1>(j) - mu;
+      // m_cache_D_1 = x_sj-mu
+      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu;
       // z_first_order_ij = E{z_ij}
       blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j, blitz::Range::all());
-      // tmp_nfeatures_nfng1 = (x_sj-mu).E{z_ij}^T
-      Torch::math::prod(tmp_nfeatures, z_first_order_ij, tmp_nfeatures_nfng1);
-      tmp_nfeatures_nfng2 += tmp_nfeatures_nfng1;
+      // m_cache_D_nfng_1 = (x_sj-mu).E{z_ij}^T
+      Torch::math::prod(m_cache_D_1, z_first_order_ij, m_cache_D_nfng_1);
+      m_cache_D_nfng_2 += m_cache_D_nfng_1;
     }
   }
 
@@ -494,7 +502,7 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
   Torch::math::inv(m_sum_z_second_order, m_cache_nfng_nfng);
 
   // 3/ Computes numerator / denominator
-  Torch::math::prod(tmp_nfeatures_nfng2, m_cache_nfng_nfng, m_B);
+  Torch::math::prod(m_cache_D_nfng_2, m_cache_nfng_nfng, m_B);
 
   // 4/ Updates the machine 
   // TODO: Use B as cache in the trainer, and only sets F and G when calling
@@ -514,11 +522,7 @@ void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
   // Gets the mean mu and the matrix sigma from the machine
   blitz::Array<double,1>& sigma = machine.updateSigma();
   const blitz::Array<double,1>& mu = machine.getMu();
-  size_t n_features = v_ar[0].getShape()[0]; // dimensionality of the data
 
-  // TODO: CACHE: tmp_nfeatures1, tmp_nfeatures2
-  blitz::Array<double,1> tmp_nfeatures1(n_features);
-  blitz::Array<double,1> tmp_nfeatures2(n_features);
   sigma = 0.;
   size_t n_IJ=0; /// counts the number of samples
   for(size_t i=0; i<v_ar.size(); ++i)
@@ -526,17 +530,17 @@ void train::PLDABaseTrainer::updateSigma(mach::PLDABaseMachine& machine,
     // Loop over the samples
     for(size_t j=0; j<v_ar[i].size(); ++j)
     {
-      // tmp_nfeatures = x_ij-mu
-      tmp_nfeatures1 = v_ar[i].get<double,1>(j) - mu;
+      // m_cache_D_1 = x_ij-mu
+      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu;
       // sigma += Diag{(x_ij-mu).(x_ij-mu)^T}
-      sigma += blitz::pow2(tmp_nfeatures1);
+      sigma += blitz::pow2(m_cache_D_1);
 
       // z_first_order_ij = E{z_ij}
       blitz::Array<double,1> z_first_order_ij = m_z_first_order[i](j, blitz::Range::all());
-      // tmp_nfeatures = B.E{z_ij}
-      Torch::math::prod(m_B, z_first_order_ij, tmp_nfeatures2);
+      // m_cache_D_2 = B.E{z_ij}
+      Torch::math::prod(m_B, z_first_order_ij, m_cache_D_2);
       // sigma -= Diag{B.E{z_ij}.(x_ij-mu)
-      sigma -= (tmp_nfeatures1 * tmp_nfeatures2);
+      sigma -= (m_cache_D_1 * m_cache_D_2);
       ++n_IJ;
     }
   }
