@@ -176,12 +176,10 @@ void train::PLDABaseTrainer::initMembers(const std::vector<io::Arrayset>& v_ar)
   size_t n_identities = v_ar.size();
 
   m_S.resize(n_features,n_features);
-//  m_z_first_order.resize(n_identities,n_features);
   m_sum_z_second_order.resize(m_nf+m_ng, m_nf+m_ng);
   m_f_log2pi = n_features * log(2*M_PI);
-// m_y_first_order: size depends on number of training example per identity
-// m_y_second_order: size depends on number of training example per identity
 
+  // Loops over the identities
   for(size_t i=0; i<n_identities; ++i) 
   {
     // Number of training samples for this identity
