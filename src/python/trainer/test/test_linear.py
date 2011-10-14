@@ -15,7 +15,7 @@ import random
 class TrainerTest(unittest.TestCase):
   """Performs various trainer tests."""
   
-  def test01_pca_via_svd(self):
+  def test01a_pca_via_svd(self):
 
     # Tests our SVD/PCA extractor.
     data = torch.io.Arrayset()
@@ -40,6 +40,25 @@ class TrainerTest(unittest.TestCase):
     # Makes sure results are good
     self.assertTrue( ((machine.weights - eig_vec_correct) < 1e-6).all() )
     self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
+
+  def test01b_pca_via_svd(self):
+
+    # Tests our SVD/PCA extractor.
+    data = torch.io.Arrayset()
+    data.append(torch.core.array.float64_1([1,2, 3,5,7], (5,)))
+    data.append(torch.core.array.float64_1([2,4,19,0,2], (5,)))
+    data.append(torch.core.array.float64_1([3,6, 5,3,3], (5,)))
+    data.append(torch.core.array.float64_1([4,8,13,4,2], (5,)))
+
+    # Expected results
+    eig_val_correct = torch.core.array.array([61.9870996, 9.49613738, 1.85009634, 0.], 'float64')
+
+    T = torch.trainer.SVDPCATrainer()
+    machine, eig_vals = T.train(data)
+
+    # Makes sure results are good
+    self.assertTrue( ((eig_vals - eig_val_correct) < 1e-6).all() )
+    self.assertTrue( machine.weights.shape()[0] == 5 and machine.weights.shape()[1] == 4 )
 
   def test02_fisher_lda(self):
 
