@@ -11,6 +11,7 @@ set(pysrc
    "src/jfa.cc"
    "src/wiener.cc"
    "src/empca.cc"
+   "src/plda.cc"
    "src/main.cc"
    )
 
@@ -45,6 +46,9 @@ torch_python_add_test(python-trainer-mlp-backprop-tests
 
 torch_python_add_test(python-trainer-jfa-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_jfa.py)
+
+torch_python_add_test(python-trainer-plda-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_plda.py)
 
 torch_python_add_test(python-trainer-gmm_train
   ${CMAKE_CURRENT_SOURCE_DIR}/script/gmm_train.py --self-test)

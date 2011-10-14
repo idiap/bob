@@ -22,6 +22,7 @@ set(src
     "src/ZTNorm.cc"
     "src/JFAMachine.cc"
     "src/WienerMachine.cc"
+    "src/PLDAMachine.cc"
 )
 
 include(../../cmake/macros.cmake)

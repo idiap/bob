@@ -21,6 +21,7 @@ set(src
     "src/JFATrainer.cc"
     "src/WienerTrainer.cc"
     "src/EMPCATrainer.cc"
+    "src/PLDATrainer.cc"
 )
 
 include(../../cmake/macros.cmake)

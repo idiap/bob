@@ -11,6 +11,7 @@ set(pysrc
    "src/ztnorm.cc"
    "src/jfa.cc"
    "src/wiener.cc"
+   "src/plda.cc"
    "src/main.cc"
    )
 
