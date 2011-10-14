@@ -85,4 +85,13 @@ const char* train::IncompatibleMachine::IncompatibleMachine::what() const throw(
  return what_string;
 }
 
+train::EmptyTrainingSet::EmptyTrainingSet() throw() {
+}
 
+train::EmptyTrainingSet::~EmptyTrainingSet() throw() {
+}
+
+const char* train::EmptyTrainingSet::EmptyTrainingSet::what() const throw() {
+ static const char* what_string = "trainer::EmptyTrainingSet: you are trying to train a machine without any data";
+ return what_string;
+}

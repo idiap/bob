@@ -66,6 +66,17 @@ namespace Torch { namespace trainer {
       virtual const char* what() const throw();
   };
 
+  /**
+   * Raised when the training set is empty.
+   */
+  class EmptyTrainingSet: public Exception {
+    public:
+      EmptyTrainingSet() throw();
+      virtual ~EmptyTrainingSet() throw();
+      virtual const char* what() const throw();
+  };
+
+
 }}
 
 #endif /* TORCH5SPRO_TRAINER_EXCEPTION_H */

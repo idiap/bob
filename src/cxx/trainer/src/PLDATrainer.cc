@@ -12,6 +12,7 @@
 #include "trainer/PLDATrainer.h"
 #include "math/linear.h"
 #include "math/lu_det.h"
+#include "trainer/Exception.h"
 
 
 namespace tca = Torch::core::array;
@@ -138,8 +139,7 @@ void train::PLDABaseTrainer::checkTrainingData(const std::vector<io::Arrayset>& 
 {
   // Checks that the vector of Arraysets is not empty
   if(v_ar.size() == 0)
-    // TODO:specialized exception
-    throw Torch::core::Exception();
+    throw Torch::trainer::EmptyTrainingSet();
 
   // Gets dimension (first Arrayset)
   size_t n_features = v_ar[0].getShape()[0];
@@ -154,8 +154,8 @@ void train::PLDABaseTrainer::checkTrainingData(const std::vector<io::Arrayset>& 
       throw Torch::io::DimensionError(v_ar[i].getNDim(), 1);
     }
     if(v_ar[i].getShape()[0] != n_features)
-      // TODO:specialized exception
-      throw Torch::core::Exception();
+      throw Torch::trainer::WrongNumberOfFeatures(v_ar[i].getShape()[0], 
+                                                  n_features, i);
   } 
 }
 
@@ -497,7 +497,8 @@ void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
   Torch::math::prod(tmp_nfeatures_nfng2, m_cache_nfng_nfng, m_B);
 
   // 4/ Updates the machine 
-  // TODO: B as cache in the trainer?
+  // TODO: Use B as cache in the trainer, and only sets F and G when calling
+  //       finalization()
   blitz::Array<double, 2>& F = machine.updateF();
   blitz::Array<double, 2>& G = machine.updateG();
   F = m_B(blitz::Range::all(), blitz::Range(0,m_nf-1));
