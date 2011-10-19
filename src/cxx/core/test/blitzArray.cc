@@ -16,6 +16,9 @@
 #include "core/array_check.h"
 #include "core/logging.h"
 
+#include <map>
+#include <vector>
+
 #ifdef __APPLE__
 # include <sys/types.h>
 # include <sys/sysctl.h>
@@ -418,5 +421,37 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_check_C_fortran)
   BOOST_CHECK_EQUAL( tca::isFortranContiguous(f), true);
   BOOST_CHECK_EQUAL( tca::isFortranOneBaseContiguous(f), false);
 }
+
+BOOST_AUTO_TEST_CASE( test_blitz_array_vector_map_ccopy )
+{
+  blitz::Array<uint8_t,1> x1(4), x2(4);
+  x1 = 1, 2, 3, 4;
+  x2 = 5, 6, 7, 8;
+
+  // 1/ vector
+  std::vector<blitz::Array<uint8_t,1> > v1, v2;
+  v1.push_back(x1);
+  v1.push_back(x2);
+  // Copies the vector
+  Torch::core::array::contCopy(v1, v2);
+  // Checks that the vectors are equal
+  BOOST_CHECK_EQUAL( v1.size(), v2.size());
+  checkBlitzEqual(v1[0], v2[0]);
+  checkBlitzEqual(v1[1], v2[1]);
+
+  // 2/ map
+  std::map<size_t,blitz::Array<uint8_t,1> > m1, m2;
+  m1[1].resize(x1.shape());
+  m1[1] = x1;
+  m1[4].resize(x2.shape());
+  m1[4] = x2;
+  // Copies the map
+  Torch::core::array::contCopy(m1, m2);
+  // Checks that the vectors are equal
+  BOOST_CHECK_EQUAL( m1.size(), m2.size());
+  checkBlitzEqual(m1[1], m2[1]);
+  checkBlitzEqual(m1[4], m2[4]);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
