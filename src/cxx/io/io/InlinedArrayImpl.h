@@ -11,7 +11,7 @@
 
 #include <cstdlib>
 #include <blitz/array.h>
-#include "core/array_check.h"
+#include "core/array_copy.h"
 #include "core/array_type.h"
 #include "io/Exception.h"
 #include "core/cast.h"

@@ -12,7 +12,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "core/array_check.h"
+#include "core/array_copy.h"
 #include "io/Arrayset.h"
 #include "machine/JFAMachine.h"
 

@@ -13,7 +13,7 @@
 
 #include "trainer/EMPCATrainer.h"
 #include "io/Exception.h"
-#include "core/array_check.h"
+#include "core/array_copy.h"
 #include "core/array_type.h"
 #include "math/linear.h"
 #include "math/lu_det.h"

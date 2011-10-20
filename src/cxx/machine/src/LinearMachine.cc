@@ -7,7 +7,7 @@
 
 #include <cmath>
 
-#include "core/array_check.h"
+#include "core/array_copy.h"
 #include "io/Arrayset.h"
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"

@@ -10,6 +10,7 @@
 
 #include "core/Exception.h"
 #include "core/array_assert.h"
+#include "core/array_copy.h"
 #include "core/array_index.h"
 #include <algorithm>
 #include <blitz/array.h>

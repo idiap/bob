@@ -19,6 +19,7 @@
  */
 
 #include "core/array_check.h"
+#include "core/array_copy.h"
 #include "io/T3BinaryArrayCodec.h"
 #include "io/ArrayCodecRegistry.h"
 #include "io/Exception.h"

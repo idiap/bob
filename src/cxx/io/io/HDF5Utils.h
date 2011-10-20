@@ -40,6 +40,7 @@
 
 #include "core/Exception.h"
 #include "core/array_assert.h"
+#include "core/array_copy.h"
 
 #include "io/HDF5Exception.h"
 #include "io/HDF5Types.h"

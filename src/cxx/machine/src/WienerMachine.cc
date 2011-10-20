@@ -5,7 +5,7 @@
  * @brief Implements a WienerMachine
  */
 
-#include "core/array_check.h"
+#include "core/array_copy.h"
 #include "core/cast.h"
 #include "io/Arrayset.h"
 #include "machine/WienerMachine.h"

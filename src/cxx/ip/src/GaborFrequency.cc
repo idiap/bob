@@ -7,6 +7,7 @@
  */
 
 #include "core/array_assert.h"
+#include "core/array_copy.h"
 #include "ip/GaborFrequency.h"
 #include "sp/FFT2D.h"
 #include "sp/fftshift.h"

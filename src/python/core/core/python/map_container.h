@@ -14,7 +14,7 @@
 #include <boost/python.hpp>
 #include <blitz/array.h>
 #include "core/python/exception.h"
-#include "core/array_check.h"
+#include "core/array_copy.h"
 
 namespace Torch { namespace python {
 

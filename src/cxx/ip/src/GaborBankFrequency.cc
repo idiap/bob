@@ -7,6 +7,7 @@
 
 #include "ip/GaborBankFrequency.h"
 #include "core/array_assert.h"
+#include "core/array_copy.h"
 
 #include <iostream>
 

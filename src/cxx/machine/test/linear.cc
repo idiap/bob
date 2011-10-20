@@ -16,7 +16,7 @@
 #include "machine/LinearMachine.h"
 #include "machine/Exception.h"
 #include "core/logging.h"
-#include "core/array_check.h"
+#include "core/array_copy.h"
 #include "io/HDF5File.h"
 #include "math/linear.h"
 

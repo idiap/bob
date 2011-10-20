@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 
 #include "core/array_check.h"
+#include "core/array_copy.h"
 #include "core/array_assert.h"
 #include "io/Arrayset.h"
 #include "machine/MLP.h"

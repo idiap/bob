@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include "core/array_check.h"
+#include "core/array_copy.h"
 #include "math/linear.h"
 #include "machine/MLPException.h"
 #include "trainer/Exception.h"
