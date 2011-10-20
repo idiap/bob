@@ -38,11 +38,13 @@ namespace Torch {
     /**
      * @brief Copies a std::vector of blitz arrays, making deep copies of the 
      * arrays.
+     * @warning Previous content of the destination will be erased
      */
     template <typename T, int D>
     void ccopy(const std::vector<blitz::Array<T,D> >& src,
                std::vector<blitz::Array<T,D> >& dst)
     {
+      dst.clear(); // makes sure dst is empty
       for(typename std::vector<blitz::Array<T,D> >::const_iterator 
             it=src.begin(); it!=src.end(); ++it)
         dst.push_back(ccopy(*it));
@@ -51,11 +53,13 @@ namespace Torch {
     /**
      * @brief Copies a std::map of blitz arrays, making deep copies of the 
      * arrays.
+     * @warning Previous content of the destination will be erased
      */
     template <typename K, typename T, int D>
     void ccopy(const std::map<K, blitz::Array<T,D> >& src,
                std::map<K, blitz::Array<T,D> >& dst)
     {
+      dst.clear(); // makes sure dst is empty
       for(typename std::map<K, blitz::Array<T,D> >::const_iterator 
             it=src.begin(); it!=src.end(); ++it)
         dst[it->first].reference(ccopy(it->second));
