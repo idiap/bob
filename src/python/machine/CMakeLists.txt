@@ -30,6 +30,8 @@ torch_python_add_test(python-machine-mlp-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_mlp.py)
 torch_python_add_test(python-machine-linearscoring-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_linearscoring.py)
+torch_python_add_test(python-machine-plda-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_plda.py)
 torch_python_add_test(python-machine-ztnorm-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ztnorm.py)
 
