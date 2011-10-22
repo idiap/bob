@@ -518,9 +518,9 @@ train::PLDATrainer::PLDATrainer(mach::PLDAMachine& plda_machine,
     train::PLDABaseTrainer& base_trainer): 
   m_plda_machine(plda_machine),
   m_base_trainer(base_trainer),
-  m_cache_D_1(plda_machine.getPLDABase()->getDimD()),
-  m_cache_D_2(plda_machine.getPLDABase()->getDimD()),
-  m_cache_nf_1(plda_machine.getPLDABase()->getDimF())
+  m_cache_D_1(plda_machine.getDimD()),
+  m_cache_D_2(plda_machine.getDimD()),
+  m_cache_nf_1(plda_machine.getDimF())
 {
 }
 
@@ -576,7 +576,7 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
   const blitz::Array<double, 2>& FtBeta = m_plda_machine.getPLDABase()->getFtBeta();
 
   // Resizes the PLDA machine
-  m_plda_machine.resize(m_plda_machine.getPLDABase()->getDimF(),m_plda_machine.getPLDABase()->getDimG());
+  m_plda_machine.resize(m_plda_machine.getDimF(),m_plda_machine.getDimG());
 
   // Updates the PLDA machine
   m_plda_machine.setNSamples(n_samples);

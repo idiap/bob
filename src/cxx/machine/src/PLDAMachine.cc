@@ -343,7 +343,7 @@ void mach::PLDAMachine::setWeightedSum(const blitz::Array<double,1>& ws) {
 
 double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& samples)
 {
-  int n_samples = samples.extent(0);// + m_enrolled_samples.extent(0);
+  int n_samples = samples.extent(0) + m_n_samples;
   // 1/ first term of the likelihood: -Nsamples*D/2*log(2*PI)
   // TODO: value in cache
   // TODO: check samples dimensionality
@@ -376,34 +376,24 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
   //      -1/2*sumWeighted^T*(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1).F)^-1*sumWeighted
   //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
-  // TODO: loop over enrolled samples as well
-  double terma = 0.;
-  blitz::Array<double,2> Ft = getPLDABase()->getF().transpose(1,0);
-  blitz::Array<double,2> Gt = getPLDABase()->getG().transpose(1,0);
+  const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
+  const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
   // TODO: cache
-  blitz::Array<double,1> samp_gproj(ng);
-  blitz::Array<double,1> samp_alphagproj(ng);
-  blitz::Array<double,2> GtISigma(ng,d);
-  blitz::firstIndex i;
-  blitz::secondIndex j;
-  GtISigma = Gt(i,j) / sigma(j);
+  blitz::Array<double,1> beta_samp(ng);
   // sumWeighted
   blitz::Array<double,1> sumWeighted(nf);
-  blitz::Array<double,1> tmp_d(d);
   blitz::Array<double,1> tmp_nf(nf);
-  sumWeighted = 0;
+  double terma = m_nh_sum_xit_beta_xi;
+  sumWeighted = m_weighted_sum;
   for(int k=0; k<samples.extent(0); ++k) 
   {
     blitz::Array<double,1> samp = samples(k,blitz::Range::all());
-    // samp_gproj = G^T*sigma^-1.xi
-    Torch::math::prod(GtISigma, samp, samp_gproj);
-    // (I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
-    Torch::math::prod(getPLDABase()->getAlpha(), samp_gproj, samp_alphagproj);
-    terma += -1 / 2. * (blitz::sum(samp*samp/sigma) - blitz::sum(samp_alphagproj*samp_gproj));
+    // terma += -1 / 2. * (xi^t*beta*xi)
+    Torch::math::prod(beta, samp, beta_samp);
+    terma += -1 / 2. * (blitz::sum(samp*beta_samp));
     
     // sumWeighted
-    Torch::math::prod(getPLDABase()->getBeta(), samp, tmp_d);
-    Torch::math::prod(Ft, tmp_d, tmp_nf);
+    Torch::math::prod(Ft_beta, samp, tmp_nf);
     sumWeighted += tmp_nf;
   }
   Torch::core::info << "-1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi)= " << terma << std::endl;
