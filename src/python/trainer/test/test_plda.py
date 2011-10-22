@@ -17,7 +17,7 @@ def equals(x, y, epsilon):
 class PLDATrainerTest(unittest.TestCase):
   """Performs various PLDA trainer tests."""
   
-  def test01_plda(self):
+  def test01_plda_EM(self):
     # Data used for performing the tests
     # Features and subspaces dimensionality
     D = 7
@@ -151,9 +151,9 @@ class PLDATrainerTest(unittest.TestCase):
     # Calls the initialization methods and resets randomly initialized values
     # to new reference ones (to make the tests deterministic)
     t.initialization(m,l)
-    m.F = F_init
-    m.G = G_init
     m.sigma = sigma_init
+    m.G = G_init
+    m.F = F_init
 
     # E-step 1
     t.eStep(m,l)
@@ -182,6 +182,64 @@ class PLDATrainerTest(unittest.TestCase):
     self.assertTrue(equals(m.F, F_2, 1e-10))
     self.assertTrue(equals(m.G, G_2, 1e-10))
     self.assertTrue(equals(m.sigma, sigma_2, 1e-10))
+
+
+
+  def test02_plda_likelihood(self):
+    # Data used for performing the tests
+    # Features and subspaces dimensionality
+    D = 7
+    nf = 2
+    ng = 3
+
+    # initial values for F, G and sigma
+    G_init=torch.core.array.float64_2([-1.1424, -0.5044, -0.1917,
+                                       -0.6249,  0.1021, -0.8658,
+                                       -1.1687,  1.1963,  0.1807,
+                                        0.3926,  0.1203,  1.2665,
+                                        1.3018, -1.0368, -0.2512,
+                                       -0.5936, -0.8571, -0.2046,
+                                        0.4364, -0.1699, -2.2015], (D,ng))
+    # F <-> PCA on G
+    F_init=torch.core.array.float64_2([-0.054222647972093, -0.000000000783146, 
+                                        0.596449127693018,  0.000000006265167, 
+                                        0.298224563846509,  0.000000003132583, 
+                                        0.447336845769764,  0.000000009397750, 
+                                       -0.108445295944185, -0.000000001566292, 
+                                       -0.501559493741856, -0.000000006265167, 
+                                       -0.298224563846509, -0.000000003132583], (D,nf))
+    sigma_init = torch.core.array.float64_1((D,))
+    sigma_init.fill(0.01)
+    mean_zero = torch.core.array.float64_1((D,))
+    mean_zero.fill(0)
+
+    # base machine
+    mb = torch.machine.PLDABaseMachine(D,nf,ng)
+    mb.sigma = sigma_init
+    mb.G = G_init
+    mb.F = F_init
+    mb.mu = mean_zero
+
+    # Data for likelihood computation
+    x1 = torch.core.array.float64_1([0.8032, 0.3503, 0.4587, 0.9511, 0.1330, 0.0703, 0.7061], (D,))
+    x2 = torch.core.array.float64_1([0.9317, 0.1089, 0.6517, 0.1461, 0.6940, 0.6256, 0.0437], (D,))
+    x3 = torch.core.array.float64_1([0.7979, 0.9862, 0.4367, 0.3447, 0.0488, 0.2252, 0.5810], (D,))
+    X = torch.core.array.float64_2((3,D))
+    X[0,:] = x1
+    X[1,:] = x2
+    X[2,:] = x3
+    a = torch.io.Arrayset()
+    a.append(x1)
+    a.append(x2)
+    a.append(x3)
+
+    # reference likelihood from Prince implementation
+    ll_ref = -182.8880743535197
+
+    # machine
+    m = torch.machine.PLDAMachine(mb)
+    ll = m.computeLikelihood(X)
+    self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
 
 if __name__ == '__main__':

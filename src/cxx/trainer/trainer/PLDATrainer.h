@@ -92,7 +92,6 @@ namespace Torch { namespace trainer {
         */
       inline int getSeed() const { return m_seed; }
 
-
       /**
         * Gets the z first order statistics (mostly for test purposes)
         */
@@ -106,46 +105,36 @@ namespace Torch { namespace trainer {
 
     private: 
       //representation
-      size_t m_nf;
-      size_t m_ng;
+      int m_nf;
+      int m_ng;
       blitz::Array<double,2> m_S; /// Covariance of the training data
       std::vector<blitz::Array<double,2> > m_z_first_order; /// Current mean of the z_{n} latent variable (1 for each sample)
       blitz::Array<double,2> m_sum_z_second_order; /// Current sum of the covariance of the z_{n} latent variable
-      double m_f_log2pi; /// The constant n_features * log(2*PI) used during the likelihood computation
       int m_seed; /// The seed for the random initialization of W and sigma2
 
       std::vector<blitz::Array<double,1> > m_y_first_order; /// Current mean of the y_{n} latent variable
       std::vector<blitz::Array<double,2> > m_y_second_order; /// Current covariance of the y_{n} latent variable
 
+      // Precomputed
+
       // Number of training samples for each individual in the training set
       std::vector<size_t> m_n_samples_per_id;
       // Tells if there is an identity with a 'key'/particular number of 
       // training samples, and if corresponding matrices are up to date
-      // (m_I_AT_SI_A[key], m_inv_I_AT_SI_A[key]).
       std::map<size_t,bool> m_n_samples_in_training;
-      std::map<size_t,blitz::Array<double,2> > m_I_AT_SI_A;
-      std::map<size_t,blitz::Array<double,2> > m_inv_I_AT_SI_A;
-      blitz::Array<double,2> m_B; /// B = [F G] (size nfeatures x (m_nf+m_ng) )
 
-      // Precomputed
-      blitz::Array<double,1> m_SI; // sigma^-1
-      blitz::Array<double,2> m_FT_SI; // F^T.sigma^-1
-      blitz::Array<double,2> m_GT_SI; // G^T.sigma^-1
-      blitz::Array<double,2> m_FT_SI_F; // F^T.sigma^-1.F
-      blitz::Array<double,2> m_FT_SI_G; // F^T.sigma^-1.G
-      blitz::Array<double,2> m_GT_SI_F; // G^T.sigma^-1.F
-      blitz::Array<double,2> m_GT_SI_G; // G^T.sigma^-1.G
-      blitz::Array<double,2> m_I_FT_SI_F; // Id + F^T.sigma^-1.F
-      blitz::Array<double,2> m_I_GT_SI_G; // Id + G^T.sigma^-1.G
+      blitz::Array<double,2> m_B; /// B = [F G] (size nfeatures x (m_nf+m_ng) )
+      blitz::Array<double,2> m_Ft_isigma_G; // F^T.sigma^-1.G
+      blitz::Array<double,2> m_eta; // F^T.sigma^-1.G.alpha
+      // Blocks (with gamma_a) of (Id + A^T.sigma'^-1.A)^-1 (efficient inversion)
+      std::map<size_t,blitz::Array<double,2> > m_zeta; // zeta_a = alpha + eta^T.gamma_a.eta
+      std::map<size_t,blitz::Array<double,2> > m_iota; // iota_a = - gamma_a.eta
 
       // Cache
       mutable blitz::Array<double,1> m_cache_nf;
-      mutable blitz::Array<double,1> m_cache_ng;
       mutable blitz::Array<double,1> m_cache_D_1; // D=nb features
       mutable blitz::Array<double,1> m_cache_D_2; // D=nb features
       mutable std::map<size_t,blitz::Array<double,1> > m_cache_for_y_first_order;
-      mutable blitz::Array<double,2> m_cache_nf_nf;
-      mutable blitz::Array<double,2> m_cache_ng_ng;
       mutable blitz::Array<double,2> m_cache_nfng_nfng;
       mutable blitz::Array<double,2> m_cache_D_nfng_1; // D=nb features, nfng=nf+ng
       mutable blitz::Array<double,2> m_cache_D_nfng_2; // D=nb features, nfng=nf+ng
@@ -158,13 +147,52 @@ namespace Torch { namespace trainer {
 
       void checkTrainingData(const std::vector<Torch::io::Arrayset>& v_ar);
       void precomputeFromFGSigma(Torch::machine::PLDABaseMachine& machine);
-      void precompute_I_AT_SI_A(size_t n_i);
-      void precompute_inv_I_AT_SI_A(size_t n_i);
 
       void updateFG(Torch::machine::PLDABaseMachine& machine,
         const std::vector<Torch::io::Arrayset>& v_ar);
       void updateSigma(Torch::machine::PLDABaseMachine& machine,
         const std::vector<Torch::io::Arrayset>& v_ar);
+  };
+
+
+
+  class PLDATrainer {
+
+    public:
+      /**
+       * Initializes a new PLDA trainer.
+       */
+      PLDATrainer(Torch::machine::PLDAMachine& plda_machine, Torch::trainer::PLDABaseTrainer& base_trainer);
+
+      /**
+        * Copy constructor.
+        */
+      PLDATrainer(const PLDATrainer& other);
+
+      /**
+       * Destructor virtualisation
+       */
+      virtual ~PLDATrainer();
+
+      /**
+        * Copy operator
+        */
+      PLDATrainer& operator=(const PLDATrainer& other);
+
+      /**
+        * Main procedure for enrolling with this PLDA trainer
+        */
+      void enrol(const Torch::io::Arrayset& ar);
+
+    private:
+
+      Torch::machine::PLDAMachine& m_plda_machine; // PLDAMachine
+      Torch::trainer::PLDABaseTrainer& m_base_trainer; // PLDABaseTrainer
+
+      // cache
+      mutable blitz::Array<double,1> m_cache_D_1; // D=nb features 
+      mutable blitz::Array<double,1> m_cache_D_2; // D=nb features 
+      mutable blitz::Array<double,1> m_cache_nf_1; // nf 
   };
 
 }}

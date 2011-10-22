@@ -119,4 +119,11 @@ void bind_trainer_plda() {
     .def("mStep", &plda_mStep, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the mStep method of the training procedure.")
     .def("finalization", &plda_finalization, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the finalization method of the training procedure.")
     ;
+
+
+  class_<train::PLDATrainer, boost::noncopyable>("PLDATrainer", "Create a trainer for the JFA.", init<mach::PLDAMachine&, train::PLDABaseTrainer&>((arg("plda"), arg("base_trainer")),"Initializes a new PLDATrainer."))
+    .def("enrol", (void (train::PLDATrainer::*)(const io::Arrayset&))&train::PLDATrainer::enrol, (arg("self"), arg("arrayset")), "Call the enrollment procedure.")
+    ;
+
+
 }
