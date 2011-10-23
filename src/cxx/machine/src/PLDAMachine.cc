@@ -379,7 +379,7 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
   const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
   // TODO: cache
-  blitz::Array<double,1> beta_samp(ng);
+  blitz::Array<double,1> beta_samp(d);
   // sumWeighted
   blitz::Array<double,1> sumWeighted(nf);
   blitz::Array<double,1> tmp_nf(nf);
