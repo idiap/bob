@@ -125,6 +125,8 @@ void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
 void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
   const std::vector<io::Arrayset>& v_ar) 
 {
+  // Precomputes constant parts of the log likelihood and (gamma_a)
+  precomputeLogLike(machine, v_ar);  
 }
 
 void train::PLDABaseTrainer::checkTrainingData(const std::vector<io::Arrayset>& v_ar)
@@ -268,6 +270,9 @@ void train::PLDABaseTrainer::initRandomFGSigma(mach::PLDABaseMachine& machine)
   double eps = 1e-5; // Sigma should be invertible...
   for(int j=0; j<sigma.extent(0); ++j)
     sigma(j) = die_01() * ratio + eps;
+
+  // Precompute values
+  machine.precompute();
 }
 
 
@@ -275,7 +280,6 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
   const std::vector<io::Arrayset>& v_ar)
 {  
   // Precomputes useful variables using current estimates of F,G, and sigma
-  machine.precompute();
   precomputeFromFGSigma(machine);
   // Gets the mean mu from the machine
   const blitz::Array<double,1>& mu = machine.getMu();
@@ -370,10 +374,6 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
   // non const because of transpose() (compability with old blitz versions)  
   blitz::Array<double,2>& F = machine.updateF();
   blitz::Array<double,2> Ft = F.transpose(1,0);
-/*
-  blitz::Array<double,2>& G = machine.updateG();
-  blitz::Array<double,2> Gt = G.transpose(1,0);
-*/
   blitz::Array<double,2>& Gt_isigma = machine.updateGtISigma();
   blitz::Array<double,2> Gt_isigma_t = Gt_isigma.transpose(1,0);
   const blitz::Array<double,2>& alpha = machine.getAlpha();
@@ -414,6 +414,23 @@ void train::PLDABaseTrainer::precomputeFromFGSigma(mach::PLDABaseMachine& machin
   }
 }
 
+void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine, 
+  const std::vector<io::Arrayset>& v_ar) 
+{
+  // Precomputes the log determinant of alpha and sigma
+  machine.precomputeLogLike();
+
+  // Precomputes the log likelihood constant term
+  std::map<size_t,bool>::iterator it;
+  for(it=m_n_samples_in_training.begin(); it!=m_n_samples_in_training.end(); 
+      ++it)
+  {
+    // Precomputes the log likelihood constant term for identities with q_i 
+    // training samples, if not already done
+    double res = machine.getAddLogLikeConstTerm(it->first);
+  }
+}
+
 
 void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine, 
   const std::vector<io::Arrayset>& v_ar) 
@@ -426,8 +443,10 @@ void train::PLDABaseTrainer::mStep(mach::PLDABaseMachine& machine,
   // 2/ New estimate of Sigma
   updateSigma(machine, v_ar);
 
-  // 3/ Precomputes new values due
+  // 3/ Precomputes new values after updating F, G and sigma
   machine.precompute();
+  // Precomputes useful variables using current estimates of F,G, and sigma
+  precomputeFromFGSigma(machine);
 }
 
 void train::PLDABaseTrainer::updateFG(mach::PLDABaseMachine& machine,
@@ -576,7 +595,8 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
   const blitz::Array<double, 2>& FtBeta = m_plda_machine.getPLDABase()->getFtBeta();
 
   // Resizes the PLDA machine
-  m_plda_machine.resize(m_plda_machine.getDimF(),m_plda_machine.getDimG());
+  m_plda_machine.resize(m_plda_machine.getDimD(), m_plda_machine.getDimF(), 
+    m_plda_machine.getDimG());
 
   // Updates the PLDA machine
   m_plda_machine.setNSamples(n_samples);

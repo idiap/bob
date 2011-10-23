@@ -147,6 +147,8 @@ namespace Torch { namespace trainer {
 
       void checkTrainingData(const std::vector<Torch::io::Arrayset>& v_ar);
       void precomputeFromFGSigma(Torch::machine::PLDABaseMachine& machine);
+      void precomputeLogLike(Torch::machine::PLDABaseMachine& machine, 
+        const std::vector<Torch::io::Arrayset>& v_ar);
 
       void updateFG(Torch::machine::PLDABaseMachine& machine,
         const std::vector<Torch::io::Arrayset>& v_ar);

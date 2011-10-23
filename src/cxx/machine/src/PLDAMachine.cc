@@ -25,6 +25,7 @@ mach::PLDABaseMachine::PLDABaseMachine():
   m_F(0,0), m_G(0,0), m_sigma(0), m_mu(0), 
   m_isigma(0), m_alpha(0,0), m_beta(0,0), m_gamma(),
   m_Ft_beta(0,0), m_Gt_isigma(0,0),
+  m_logdet_alpha(0), m_logdet_sigma(0), m_loglike_constterm(),
   m_cache_d_ng_1(0,0), m_cache_nf_nf_1(0,0), m_cache_ng_ng_1(0,0)
 {
 }
@@ -34,27 +35,31 @@ mach::PLDABaseMachine::PLDABaseMachine(const size_t d, const size_t nf,
   m_F(d,nf), m_G(d,ng), m_sigma(d), m_mu(d), 
   m_isigma(d), m_alpha(ng,ng), m_beta(d,d), m_gamma(),
   m_Ft_beta(nf,d), m_Gt_isigma(ng,d),
+  m_logdet_alpha(0), m_logdet_sigma(0), m_loglike_constterm(),
   m_cache_d_ng_1(d,ng), m_cache_nf_nf_1(nf,nf), m_cache_ng_ng_1(ng,ng)
 {
 }
 
 
 mach::PLDABaseMachine::PLDABaseMachine(const mach::PLDABaseMachine& other):
-  m_F(Torch::core::array::ccopy(other.m_F)), 
-  m_G(Torch::core::array::ccopy(other.m_G)), 
-  m_sigma(Torch::core::array::ccopy(other.m_sigma)), 
-  m_mu(Torch::core::array::ccopy(other.m_mu)),
-  m_isigma(Torch::core::array::ccopy(other.m_isigma)), 
-  m_alpha(Torch::core::array::ccopy(other.m_alpha)),
-  m_beta(Torch::core::array::ccopy(other.m_beta)),
+  m_F(tca::ccopy(other.m_F)), 
+  m_G(tca::ccopy(other.m_G)), 
+  m_sigma(tca::ccopy(other.m_sigma)), 
+  m_mu(tca::ccopy(other.m_mu)),
+  m_isigma(tca::ccopy(other.m_isigma)), 
+  m_alpha(tca::ccopy(other.m_alpha)),
+  m_beta(tca::ccopy(other.m_beta)),
   m_gamma(),
-  m_Ft_beta(Torch::core::array::ccopy(other.m_Ft_beta)),
-  m_Gt_isigma(Torch::core::array::ccopy(other.m_Gt_isigma)), 
-  m_cache_d_ng_1(Torch::core::array::ccopy(other.m_cache_d_ng_1)), 
-  m_cache_nf_nf_1(Torch::core::array::ccopy(other.m_cache_nf_nf_1)), 
-  m_cache_ng_ng_1(Torch::core::array::ccopy(other.m_cache_ng_ng_1))
+  m_Ft_beta(tca::ccopy(other.m_Ft_beta)),
+  m_Gt_isigma(tca::ccopy(other.m_Gt_isigma)), 
+  m_logdet_alpha(other.m_logdet_alpha),
+  m_logdet_sigma(other.m_logdet_sigma),
+  m_loglike_constterm(other.m_loglike_constterm),
+  m_cache_d_ng_1(tca::ccopy(other.m_cache_d_ng_1)), 
+  m_cache_nf_nf_1(tca::ccopy(other.m_cache_nf_nf_1)), 
+  m_cache_ng_ng_1(tca::ccopy(other.m_cache_ng_ng_1))
 {
-  Torch::core::array::ccopy(other.m_gamma, m_gamma);
+  tca::ccopy(other.m_gamma, m_gamma);
 }
 
 mach::PLDABaseMachine::PLDABaseMachine(Torch::io::HDF5File& config) {
@@ -67,20 +72,23 @@ mach::PLDABaseMachine::~PLDABaseMachine() {
 mach::PLDABaseMachine& mach::PLDABaseMachine::operator=
     (const mach::PLDABaseMachine& other) 
 {
-  m_F.reference(Torch::core::array::ccopy(other.m_F));
-  m_G.reference(Torch::core::array::ccopy(other.m_G));
-  m_sigma.reference(Torch::core::array::ccopy(other.m_sigma));
-  m_mu.reference(Torch::core::array::ccopy(other.m_mu));
-  m_isigma.reference(Torch::core::array::ccopy(other.m_isigma));
-  m_alpha.reference(Torch::core::array::ccopy(other.m_alpha));
-  m_beta.reference(Torch::core::array::ccopy(other.m_beta));
+  m_F.reference(tca::ccopy(other.m_F));
+  m_G.reference(tca::ccopy(other.m_G));
+  m_sigma.reference(tca::ccopy(other.m_sigma));
+  m_mu.reference(tca::ccopy(other.m_mu));
+  m_isigma.reference(tca::ccopy(other.m_isigma));
+  m_alpha.reference(tca::ccopy(other.m_alpha));
+  m_beta.reference(tca::ccopy(other.m_beta));
   m_gamma.clear();
-  m_Ft_beta.reference(Torch::core::array::ccopy(other.m_Ft_beta));
-  m_Gt_isigma.reference(Torch::core::array::ccopy(other.m_Gt_isigma));
-  Torch::core::array::ccopy(other.m_gamma, m_gamma);
-  m_cache_d_ng_1.reference(Torch::core::array::ccopy(other.m_cache_d_ng_1));
-  m_cache_nf_nf_1.reference(Torch::core::array::ccopy(other.m_cache_nf_nf_1));
-  m_cache_ng_ng_1.reference(Torch::core::array::ccopy(other.m_cache_ng_ng_1));
+  tca::ccopy(other.m_gamma, m_gamma);
+  m_Ft_beta.reference(tca::ccopy(other.m_Ft_beta));
+  m_Gt_isigma.reference(tca::ccopy(other.m_Gt_isigma));
+  m_logdet_alpha = other.m_logdet_alpha;
+  m_logdet_sigma = other.m_logdet_sigma;
+  m_loglike_constterm = other.m_loglike_constterm;
+  m_cache_d_ng_1.reference(tca::ccopy(other.m_cache_d_ng_1));
+  m_cache_nf_nf_1.reference(tca::ccopy(other.m_cache_nf_nf_1));
+  m_cache_ng_ng_1.reference(tca::ccopy(other.m_cache_ng_ng_1));
   return *this;
 }
 
@@ -96,16 +104,20 @@ void mach::PLDABaseMachine::load(Torch::io::HDF5File& config) {
   m_isigma.resize(d);
   m_alpha.reference(config.readArray<double,2>("alpha"));
   m_beta.reference(config.readArray<double,2>("beta"));
-  // gamma
-  blitz::Array<uint32_t, 1> gamma_indices;
-  gamma_indices.reference(config.readArray<uint32_t,1>("gamma_indices"));
-  for(int i=0; i<gamma_indices.extent(0); ++i)
+  // gamma and log like constant term (a-dependent terms)
+  blitz::Array<uint32_t, 1> a_indices;
+  a_indices.reference(config.readArray<uint32_t,1>("a_indices"));
+  for(int i=0; i<a_indices.extent(0); ++i)
   {
-    std::string str = "gamma_" + boost::lexical_cast<std::string>(i);
-    m_gamma[i].reference(config.readArray<double,2>(str));
+    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
+    m_gamma[i].reference(config.readArray<double,2>(str1));
+    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
+    config.read(str2, m_loglike_constterm[i]);
   }
   m_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
   m_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
+  config.read("logdet_alpha", m_logdet_alpha);
+  config.read("logdet_sigma", m_logdet_sigma);
   m_cache_d_ng_1.resize(d,ng);
   m_cache_nf_nf_1.resize(nf,nf);
   m_cache_ng_ng_1.resize(ng,ng);
@@ -119,19 +131,24 @@ void mach::PLDABaseMachine::save(Torch::io::HDF5File& config) const {
   config.setArray("alpha", m_alpha);
   config.setArray("beta", m_beta);
   // Gamma
-  blitz::Array<uint32_t, 1> gamma_indices(m_gamma.size());
+  blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
   int i = 0;
   for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
       it=m_gamma.begin(); it!=m_gamma.end(); ++it)
   {
-    gamma_indices(i) = it->first;
-    std::string str = "gamma_" + boost::lexical_cast<std::string>(it->first);
-    config.setArray(str, it->second);
+    a_indices(i) = it->first;
+    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(it->first);
+    config.setArray(str1, it->second);
+    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
+    double v = m_loglike_constterm.find(it->first)->second;
+    config.set(str2, v);
     ++i;
   }
-  config.setArray("gamma_indices", gamma_indices);
+  config.setArray("a_indices", a_indices);
   config.setArray("Ft_beta", m_Ft_beta);
   config.setArray("Gt_isigma", m_Gt_isigma);
+  config.set("logdet_alpha", m_logdet_alpha);
+  config.set("logdet_sigma", m_logdet_sigma);
 }
 
 void mach::PLDABaseMachine::resize(const size_t d, const size_t nf, 
@@ -148,6 +165,7 @@ void mach::PLDABaseMachine::resize(const size_t d, const size_t nf,
   m_cache_d_ng_1.resize(d,ng);
   m_cache_nf_nf_1.resize(nf,nf);
   m_cache_ng_ng_1.resize(ng,ng);
+  m_loglike_constterm.clear();
 }
 
 void mach::PLDABaseMachine::setF(const blitz::Array<double,2>& F) {
@@ -160,15 +178,18 @@ void mach::PLDABaseMachine::setF(const blitz::Array<double,2>& F) {
 void mach::PLDABaseMachine::setG(const blitz::Array<double,2>& G) {
   tca::assertSameShape(G, m_G);
   m_G.reference(Torch::core::array::ccopy(G));
-  // Precomputes useful matrices
+  // Precomputes useful matrices and values
   precompute();
+  precomputeLogDetAlpha();
 }
 
 void mach::PLDABaseMachine::setSigma(const blitz::Array<double,1>& sigma) {
   tca::assertSameShape(sigma, m_sigma);
   m_sigma.reference(Torch::core::array::ccopy(sigma));
-  // Precomputes useful matrices
+  // Precomputes useful matrices and values
   precompute();
+  precomputeLogDetAlpha();
+  precomputeLogDetSigma();
 }
 
 void mach::PLDABaseMachine::setMu(const blitz::Array<double,1>& mu) {
@@ -196,6 +217,12 @@ void mach::PLDABaseMachine::precompute() {
   precomputeBeta();
   m_gamma.clear();
   precomputeFtBeta();
+  m_loglike_constterm.clear();
+}
+
+void mach::PLDABaseMachine::precomputeLogLike() {
+  precomputeLogDetAlpha();
+  precomputeLogDetSigma();
 }
 
 void mach::PLDABaseMachine::precomputeISigma() {
@@ -271,17 +298,68 @@ void mach::PLDABaseMachine::computeGamma(const size_t a,
   Torch::math::inv(m_cache_nf_nf_1, res);
 }
 
+void mach::PLDABaseMachine::precomputeLogDetAlpha()
+{
+  m_logdet_alpha = log(fabs(Torch::math::det(m_alpha)));
+}
+
+void mach::PLDABaseMachine::precomputeLogDetSigma()
+{
+  m_logdet_sigma = log(blitz::product(m_sigma));
+}
+
+double mach::PLDABaseMachine::computeLogLikeConstTerm(const size_t a,
+  const blitz::Array<double,2>& gamma_a)
+{
+  // loglike_constterm[a] = a/2 * 
+  //  ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+  double logdet_gamma_a = log(fabs(Torch::math::det(gamma_a)));
+  double ah = static_cast<double>(a)/2.;
+  double res = ( -ah*static_cast<double>(getDimD())*log(2*M_PI) - 
+      ah*m_logdet_sigma + ah*m_logdet_alpha + logdet_gamma_a/2.);
+  return res;
+}
+
+double mach::PLDABaseMachine::computeLogLikeConstTerm(const size_t a)
+{
+  blitz::Array<double,2>& gamma_a = getAddGamma(a);
+  return computeLogLikeConstTerm(a, gamma_a);
+}
+
+void mach::PLDABaseMachine::precomputeLogLikeConstTerm(const size_t a)
+{
+  double val = computeLogLikeConstTerm(a); 
+  m_loglike_constterm[a] = val;
+}
+
+double mach::PLDABaseMachine::getLogLikeConstTerm(const size_t a)
+{
+  // TODO: specialized exception
+  if(!hasLogLikeConstTerm(a)) throw Torch::machine::Exception();
+  return m_loglike_constterm[a];
+}
+
+double mach::PLDABaseMachine::getAddLogLikeConstTerm(const size_t a)
+{
+  if(!hasLogLikeConstTerm(a)) precomputeLogLikeConstTerm(a);
+  return m_loglike_constterm[a];
+}
+
+
 
 
 mach::PLDAMachine::PLDAMachine():
   m_plda_base(boost::shared_ptr<Torch::machine::PLDABaseMachine>()),
-  m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(0)
+  m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(0),
+  m_cache_d_1(0), m_cache_nf_1(0), m_cache_nf_2(0)
 {
 }
 
 mach::PLDAMachine::PLDAMachine(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base): 
   m_plda_base(plda_base),
-  m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(plda_base->getDimF())
+  m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(plda_base->getDimF()),
+  m_cache_d_1(plda_base->getDimD()), m_cache_nf_1(plda_base->getDimF()), 
+  m_cache_nf_2(plda_base->getDimF())
 {
 }
 
@@ -290,7 +368,10 @@ mach::PLDAMachine::PLDAMachine(const mach::PLDAMachine& other):
   m_plda_base(other.m_plda_base),
   m_n_samples(other.m_n_samples), 
   m_nh_sum_xit_beta_xi(other.m_nh_sum_xit_beta_xi), 
-  m_weighted_sum(Torch::core::array::ccopy(other.m_weighted_sum))
+  m_weighted_sum(tca::ccopy(other.m_weighted_sum)),
+  m_cache_d_1(tca::ccopy(other.m_cache_d_1)),
+  m_cache_nf_1(tca::ccopy(other.m_cache_nf_1)),
+  m_cache_nf_2(tca::ccopy(other.m_cache_nf_2))
 {
 }
 
@@ -306,7 +387,10 @@ mach::PLDAMachine& mach::PLDAMachine::operator=
   m_plda_base = other.m_plda_base;
   m_n_samples = other.m_n_samples;
   m_nh_sum_xit_beta_xi = other.m_nh_sum_xit_beta_xi; 
-  m_weighted_sum.reference(Torch::core::array::ccopy(other.m_weighted_sum));
+  m_weighted_sum.reference(tca::ccopy(other.m_weighted_sum));
+  m_cache_d_1.reference(tca::ccopy(other.m_cache_d_1));
+  m_cache_nf_1.reference(tca::ccopy(other.m_cache_nf_1));
+  m_cache_nf_2.reference(tca::ccopy(other.m_cache_nf_2));
   return *this;
 }
 
@@ -323,14 +407,21 @@ void mach::PLDAMachine::save(Torch::io::HDF5File& config) const {
   config.setArray("weighted_sum", m_weighted_sum);
 }
 
-void mach::PLDAMachine::resize(const size_t nf, const size_t ng) 
+void mach::PLDAMachine::resize(const size_t d, const size_t nf, 
+  const size_t ng)
 {
   m_weighted_sum.resize(nf);
+  m_cache_d_1.resize(d);
+  m_cache_nf_1.resize(nf);
+  m_cache_nf_2.resize(nf);
 }
 
 void mach::PLDAMachine::setPLDABase(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base) {
   m_plda_base = plda_base; 
   m_weighted_sum.resize(plda_base->getDimF());
+  m_cache_d_1.resize(plda_base->getDimD());
+  m_cache_nf_1.resize(plda_base->getDimF());
+  m_cache_nf_2.resize(plda_base->getDimF());
 }
 
 
@@ -338,39 +429,19 @@ void mach::PLDAMachine::setWeightedSum(const blitz::Array<double,1>& ws) {
   if(ws.extent(0) != m_weighted_sum.extent(0)) { //checks dimension
     throw mach::NInputsMismatch(ws.extent(0), m_weighted_sum.extent(0));
   }
-  m_weighted_sum.reference(Torch::core::array::ccopy(ws));
+  m_weighted_sum.reference(tca::ccopy(ws));
 }
 
 double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& samples)
 {
   int n_samples = samples.extent(0) + m_n_samples;
-  // 1/ first term of the likelihood: -Nsamples*D/2*log(2*PI)
-  // TODO: value in cache
-  // TODO: check samples dimensionality
-  double log_likelihood = 0.;
-  double log_term1 = - n_samples * static_cast<double>(getDimD()) / 2. * log(2*M_PI); 
-  Torch::core::info << "-nsamples*D/2.*log(2*pi)= " << log_term1 << std::endl;
-  log_likelihood += log_term1;
-
-  // 2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
-  //    Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
+  // 1/2/ Constant term of the log likelihood:
+  //      1/ First term of the likelihood: -Nsamples*D/2*log(2*PI)
+  //      2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
+  //        Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
   //       -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
-  // a/ -Nsamples/2*log(det(sigma))
-  size_t nf = getDimF();
-  size_t ng = getDimG();
-  size_t d = getDimD();
-  blitz::Array<double,2> gamma_a(nf,nf);
-  getPLDABase()->computeGamma(n_samples,gamma_a);
-  const blitz::Array<double,1>& sigma = getPLDABase()->getSigma();
-  double log_term2a = - n_samples / 2. * log(blitz::product(sigma));
-  Torch::core::info << "-nsamples/2.*log(det(sigma))= " << log_term2a << std::endl;
-  // b/ -Nsamples/2*log(det(I+G^T.sigma^-1.G)) = Nsamples/2*log(det(I+G^T.sigma^-1.G)^-1)
-  double log_term2b = + n_samples / 2. * log(Torch::math::det(getPLDABase()->getAlpha()));
-  Torch::core::info << "-nsamples/2*log(det(I+G^T.sigma^-1.G))= " << log_term2b << std::endl;
-  // c/ -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
-  double log_term2c = 1 / 2. * log(Torch::math::det(gamma_a));
-  Torch::core::info << "-1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))= " << log_term2c << std::endl;
-  log_likelihood += log_term2a + log_term2b + log_term2c;
+  // TODO: check samples dimensionality
+  double log_likelihood = getPLDABase()->getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
 
   // 3/ Third term of the likelihood: -1/2*X^T*(SIGMA+A.A^T)^-1*X
   //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
@@ -378,30 +449,24 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
   const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
   const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
-  // TODO: cache
-  blitz::Array<double,1> beta_samp(d);
-  // sumWeighted
-  blitz::Array<double,1> sumWeighted(nf);
-  blitz::Array<double,1> tmp_nf(nf);
   double terma = m_nh_sum_xit_beta_xi;
-  sumWeighted = m_weighted_sum;
+  // sumWeighted
+  m_cache_nf_1 = m_weighted_sum;
   for(int k=0; k<samples.extent(0); ++k) 
   {
     blitz::Array<double,1> samp = samples(k,blitz::Range::all());
     // terma += -1 / 2. * (xi^t*beta*xi)
-    Torch::math::prod(beta, samp, beta_samp);
-    terma += -1 / 2. * (blitz::sum(samp*beta_samp));
+    Torch::math::prod(beta, samp, m_cache_d_1);
+    terma += -1 / 2. * (blitz::sum(samp*m_cache_d_1));
     
     // sumWeighted
-    Torch::math::prod(Ft_beta, samp, tmp_nf);
-    sumWeighted += tmp_nf;
+    Torch::math::prod(Ft_beta, samp, m_cache_nf_2);
+    m_cache_nf_1 += m_cache_nf_2;
   }
-  Torch::core::info << "-1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi)= " << terma << std::endl;
 
-  Torch::core::info << "sumWeighted = " << sumWeighted << std::endl;
-  Torch::math::prod(gamma_a, sumWeighted, tmp_nf);
-  double termb = 1 / 2. * (blitz::sum(sumWeighted*tmp_nf));
-  Torch::core::info << "-1/2*sumWeighted^T*(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1).F)^-1*sumWeighted= " << termb << std::endl;
+  blitz::Array<double,2> gamma_a = getPLDABase()->getAddGamma(n_samples);
+  Torch::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
+  double termb = 1 / 2. * (blitz::sum(m_cache_nf_1*m_cache_nf_2));
   
   log_likelihood += terma + termb;
   return log_likelihood;

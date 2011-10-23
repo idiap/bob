@@ -176,6 +176,10 @@ namespace Torch { namespace machine {
         */
       void precompute();
       /**
+        * Precomputes useful values for the log likelihood
+        */
+      void precomputeLogLike();
+      /**
         * Gets the inverse vector/diagonal matrix of sigma
         * isigma = sigma^-1
         */
@@ -246,6 +250,57 @@ namespace Torch { namespace machine {
        */
       inline blitz::Array<double, 2>& updateGtISigma()
       { return m_Gt_isigma; }
+      /**
+        * Gets log(det(alpha)) 
+        */
+      inline const double getLogDetAlpha() const 
+      { return m_logdet_alpha; }
+      /**
+        * Gets log(det(sigma)) 
+        */
+      inline const double getLogDetSigma() const 
+      { return m_logdet_sigma; }
+      /**
+        * Computes the log likelihood constant term for a given a 
+        * (number of samples), given the provided gamma_a matrix
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        */
+      double computeLogLikeConstTerm(const size_t a, 
+        const blitz::Array<double,2>& gamma_a);
+      /**
+        * Computes the log likelihood constant term for a given a 
+        * (number of samples)
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        * @warning: gamma_a will be computed and added if it does
+        *  not already exists
+        */
+      double computeLogLikeConstTerm(const size_t a);
+      /**
+        * Tells if the log likelihood constant term for a given a 
+        * (number of samples) exists
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        */
+      inline bool hasLogLikeConstTerm(const size_t a) const
+      { return (m_loglike_constterm.find(a) != m_loglike_constterm.end()); }
+      /**
+        * Gets the log likelihood constant term for a given a \
+        * (number of samples)
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        * @warning an exception is thrown if the value does not exists
+        */
+      double getLogLikeConstTerm(const size_t a);
+      /**
+        * Gets the log likelihood constant term for a given a \
+        * (number of samples)
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        * @warning The value is computed if it does not already exists
+        */
+      double getAddLogLikeConstTerm(const size_t a);
 
       /**
         * Computes the gamma matrix for a given a (number of samples)
@@ -282,6 +337,13 @@ namespace Torch { namespace machine {
       blitz::Array<double,2> m_Ft_beta;
       // Gt_isigma = G^T.sigma^-1
       blitz::Array<double,2> m_Gt_isigma;
+      // log(det(alpha)) and log(det(sigma))
+      double m_logdet_alpha;
+      double m_logdet_sigma;
+      // Log likelihood constant term which depends on the number of samples a
+      // loglike_constterm[a] = a/2 * 
+      //    ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+      std::map<size_t, double> m_loglike_constterm;
 
       // cache
       blitz::Array<double,2> m_cache_d_ng_1;
@@ -294,6 +356,9 @@ namespace Torch { namespace machine {
       void precomputeGamma(const size_t a);
       void precomputeFtBeta();
       void precomputeGtISigma();
+      void precomputeLogDetAlpha();
+      void precomputeLogDetSigma();
+      void precomputeLogLikeConstTerm(const size_t a);
   };
 
 
@@ -343,7 +408,7 @@ namespace Torch { namespace machine {
       /** 
        * Resizes the PLDA Machine.
        */
-      void resize(const size_t nf, const size_t ng);
+      void resize(const size_t d, const size_t nf, const size_t ng);
 
       /**
        * Saves an existing machine to a Configuration object.
@@ -437,7 +502,9 @@ namespace Torch { namespace machine {
         */
       boost::shared_ptr<Torch::machine::PLDABaseMachine> m_plda_base;
 
-      // Number of enrollement samples
+      /**
+        * Number of enrollement samples
+        */
       uint64_t m_n_samples;
       /**
         * Contains the value:
@@ -451,6 +518,11 @@ namespace Torch { namespace machine {
         * used in the likelihood computation (for the second xi dependent term)
         */
       blitz::Array<double,1> m_weighted_sum;
+
+      // cache
+      blitz::Array<double,1> m_cache_d_1;
+      blitz::Array<double,1> m_cache_nf_1;
+      blitz::Array<double,1> m_cache_nf_2;
   };
 
 
