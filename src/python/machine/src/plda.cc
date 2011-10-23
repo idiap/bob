@@ -15,6 +15,37 @@ namespace mach = Torch::machine;
 namespace io = Torch::io;
 namespace tp = Torch::core::python;
 
+static double computeLikelihood1(mach::PLDAMachine& plda, 
+  const blitz::Array<double, 1>& sample, bool with_enrolled_samples=true)
+{
+  return plda.computeLikelihood(sample, with_enrolled_samples);
+}
+
+static double computeLikelihood2(mach::PLDAMachine& plda, 
+  const blitz::Array<double, 2>& samples, bool with_enrolled_samples=true)
+{
+  return plda.computeLikelihood(samples, with_enrolled_samples);
+}
+
+static double plda_forward_sample(mach::PLDAMachine& m, const blitz::Array<double,1>& sample)
+{
+  double score;
+  // Calls the forward function
+  m.forward(sample, score);
+  return score;
+}
+
+static double plda_forward_samples(mach::PLDAMachine& m, const blitz::Array<double,2>& samples)
+{
+  double score;
+  // Calls the forward function
+  m.forward(samples, score);
+  return score;
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(computeLikelihood1_overloads, computeLikelihood1, 2, 3)
+BOOST_PYTHON_FUNCTION_OVERLOADS(computeLikelihood2_overloads, computeLikelihood2, 2, 3)
+
 
 void bind_machine_plda() {
   class_<mach::PLDABaseMachine, boost::shared_ptr<mach::PLDABaseMachine> >("PLDABaseMachine", "A PLDABaseMachine", init<const size_t, const size_t, const size_t>((arg("d"), arg("nf"), arg("ng")), "Builds a new PLDABaseMachine. A PLDABaseMachine can be seen as a container for F, G, sigma and mu when performing Probabilistic Linear Discriminant Analysis (PLDA)."))
@@ -39,13 +70,13 @@ void bind_machine_plda() {
     .def(init<const mach::PLDAMachine&>((arg("machine")), "Copy constructs a PLDAMachine"))
     .def("load", &mach::PLDAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
     .def("save", &mach::PLDAMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
-    .def("computeLikelihood", &mach::PLDAMachine::computeLikelihood, (arg("self"), arg("arrayset")), "Computes the likelihood considering jointly the samples contained in the given Arrayset and the enrolled samples.")
-//    .def("__call__", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
-//    .def("forward", &jfa_forward_sample, (arg("self"), arg("gmm_stats")), "Processes GMM statistics and returns a score.")
-//    .def("__call__", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
-//    .def("forward", &jfa_forward_list, (arg("self"), arg("gmm_stats"), arg("scores")), "Processes a list of GMM statistics and updates a score list.")
+    .def("computeLikelihood", &computeLikelihood1, computeLikelihood1_overloads((arg("self"), arg("sample"), arg("use_enrolled_samples")=true), "Computes the likelihood considering only the probe sample or jointly the probe sample and the enrolled samples."))
+    .def("computeLikelihood", &computeLikelihood2, computeLikelihood2_overloads((arg("self"), arg("samples"), arg("use_enrolled_samples")=true), "Computes the likelihood considering only the probe samples or jointly the probes samples and the enrolled samples."))
+    .def("__call__", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a score.")
+    .def("forward", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a score.")
+    .def("__call__", &plda_forward_samples, (arg("self"), arg("samples")), "Processes the samples and returns a score.")
+    .def("forward", &plda_forward_samples, (arg("self"), arg("samples")), "Processes the samples and returns a score.")
     .add_property("plda_base", &mach::PLDAMachine::getPLDABase, &mach::PLDAMachine::setPLDABase)
-//    .add_property("enrolledSamples", make_function(&mach::PLDAMachine::getEnrolledSamples, return_internal_reference<>()), &mach::PLDAMachine::setEnrolledSamples)
     .add_property("DimD", &mach::PLDAMachine::getDimD)
     .add_property("DimF", &mach::PLDAMachine::getDimF)
     .add_property("DimG", &mach::PLDAMachine::getDimG)

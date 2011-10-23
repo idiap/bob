@@ -126,7 +126,10 @@ void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
   const std::vector<io::Arrayset>& v_ar) 
 {
   // Precomputes constant parts of the log likelihood and (gamma_a)
-  precomputeLogLike(machine, v_ar);  
+  precomputeLogLike(machine, v_ar);
+  // Adds the case 1 sample if not already done (always used for scoring)
+  machine.getAddGamma(1);
+  machine.getAddLogLikeConstTerm(1);
 }
 
 void train::PLDABaseTrainer::checkTrainingData(const std::vector<io::Arrayset>& v_ar)
@@ -427,7 +430,7 @@ void train::PLDABaseTrainer::precomputeLogLike(mach::PLDABaseMachine& machine,
   {
     // Precomputes the log likelihood constant term for identities with q_i 
     // training samples, if not already done
-    double res = machine.getAddLogLikeConstTerm(it->first);
+    machine.getAddLogLikeConstTerm(it->first);
   }
 }
 
@@ -611,4 +614,13 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
     Torch::math::prod(beta, m_cache_D_1, m_cache_D_2);
     ll += blitz::sum(m_cache_D_1 * m_cache_D_2);
   }
+
+  // Adds the precomputed values for the cases N and N+1 if not already 
+  // in the base machine (used by the forward function, 1 already added)
+  m_plda_machine.getAddGamma(n_samples);
+  m_plda_machine.getAddLogLikeConstTerm(n_samples);
+  m_plda_machine.getAddGamma(n_samples+1);
+  m_plda_machine.getAddLogLikeConstTerm(n_samples+1);
+  m_plda_machine.setLogLikelihood(m_plda_machine.computeLikelihood(
+                                    blitz::Array<double,2>(0,0),true));
 }

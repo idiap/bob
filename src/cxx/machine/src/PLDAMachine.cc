@@ -79,7 +79,6 @@ mach::PLDABaseMachine& mach::PLDABaseMachine::operator=
   m_isigma.reference(tca::ccopy(other.m_isigma));
   m_alpha.reference(tca::ccopy(other.m_alpha));
   m_beta.reference(tca::ccopy(other.m_beta));
-  m_gamma.clear();
   tca::ccopy(other.m_gamma, m_gamma);
   m_Ft_beta.reference(tca::ccopy(other.m_Ft_beta));
   m_Gt_isigma.reference(tca::ccopy(other.m_Gt_isigma));
@@ -110,9 +109,9 @@ void mach::PLDABaseMachine::load(Torch::io::HDF5File& config) {
   for(int i=0; i<a_indices.extent(0); ++i)
   {
     std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
-    m_gamma[i].reference(config.readArray<double,2>(str1));
+    m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
     std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-    config.read(str2, m_loglike_constterm[i]);
+    config.read(str2, m_loglike_constterm[a_indices(i)]);
   }
   m_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
   m_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
@@ -350,7 +349,8 @@ double mach::PLDABaseMachine::getAddLogLikeConstTerm(const size_t a)
 
 mach::PLDAMachine::PLDAMachine():
   m_plda_base(boost::shared_ptr<Torch::machine::PLDABaseMachine>()),
-  m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(0),
+  m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(0), 
+  m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
   m_cache_d_1(0), m_cache_nf_1(0), m_cache_nf_2(0)
 {
 }
@@ -358,6 +358,7 @@ mach::PLDAMachine::PLDAMachine():
 mach::PLDAMachine::PLDAMachine(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base): 
   m_plda_base(plda_base),
   m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(plda_base->getDimF()),
+  m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
   m_cache_d_1(plda_base->getDimD()), m_cache_nf_1(plda_base->getDimF()), 
   m_cache_nf_2(plda_base->getDimF())
 {
@@ -369,10 +370,13 @@ mach::PLDAMachine::PLDAMachine(const mach::PLDAMachine& other):
   m_n_samples(other.m_n_samples), 
   m_nh_sum_xit_beta_xi(other.m_nh_sum_xit_beta_xi), 
   m_weighted_sum(tca::ccopy(other.m_weighted_sum)),
+  m_loglikelihood(other.m_loglikelihood), m_gamma(), 
+  m_loglike_constterm(other.m_loglike_constterm),
   m_cache_d_1(tca::ccopy(other.m_cache_d_1)),
   m_cache_nf_1(tca::ccopy(other.m_cache_nf_1)),
   m_cache_nf_2(tca::ccopy(other.m_cache_nf_2))
 {
+  tca::ccopy(other.m_gamma, m_gamma);
 }
 
 mach::PLDAMachine::PLDAMachine(Torch::io::HDF5File& config) {
@@ -388,6 +392,9 @@ mach::PLDAMachine& mach::PLDAMachine::operator=
   m_n_samples = other.m_n_samples;
   m_nh_sum_xit_beta_xi = other.m_nh_sum_xit_beta_xi; 
   m_weighted_sum.reference(tca::ccopy(other.m_weighted_sum));
+  m_loglikelihood = other.m_loglikelihood;
+  tca::ccopy(other.m_gamma, m_gamma);
+  m_loglike_constterm = other.m_loglike_constterm;
   m_cache_d_1.reference(tca::ccopy(other.m_cache_d_1));
   m_cache_nf_1.reference(tca::ccopy(other.m_cache_nf_1));
   m_cache_nf_2.reference(tca::ccopy(other.m_cache_nf_2));
@@ -399,18 +406,47 @@ void mach::PLDAMachine::load(Torch::io::HDF5File& config) {
   config.read("n_samples", m_n_samples);
   config.read("nh_sum_xit_beta_xi", m_nh_sum_xit_beta_xi);
   config.readArray("weighted_sum", m_weighted_sum);
+  config.read("loglikelihood", m_loglikelihood);
+  // gamma and log like constant term (a-dependent terms)
+  blitz::Array<uint32_t, 1> a_indices;
+  a_indices.reference(config.readArray<uint32_t,1>("a_indices"));
+  for(int i=0; i<a_indices.extent(0); ++i)
+  {
+    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
+    m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
+    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
+    config.read(str2, m_loglike_constterm[a_indices(i)]);
+  }
+
 }
 
 void mach::PLDAMachine::save(Torch::io::HDF5File& config) const {
   config.set("n_samples", m_n_samples);
   config.set("nh_sum_xit_beta_xi", m_nh_sum_xit_beta_xi);
   config.setArray("weighted_sum", m_weighted_sum);
+  config.set("loglikelihood", m_loglikelihood);
+  // Gamma
+  blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
+  int i = 0;
+  for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
+      it=m_gamma.begin(); it!=m_gamma.end(); ++it)
+  {
+    a_indices(i) = it->first;
+    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(it->first);
+    config.setArray(str1, it->second);
+    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
+    double v = m_loglike_constterm.find(it->first)->second;
+    config.set(str2, v);
+    ++i;
+  }
 }
 
 void mach::PLDAMachine::resize(const size_t d, const size_t nf, 
   const size_t ng)
 {
   m_weighted_sum.resize(nf);
+  m_gamma.clear();
+  m_loglike_constterm.clear();
   m_cache_d_1.resize(d);
   m_cache_nf_1.resize(nf);
   m_cache_nf_2.resize(nf);
@@ -418,10 +454,7 @@ void mach::PLDAMachine::resize(const size_t d, const size_t nf,
 
 void mach::PLDAMachine::setPLDABase(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base) {
   m_plda_base = plda_base; 
-  m_weighted_sum.resize(plda_base->getDimF());
-  m_cache_d_1.resize(plda_base->getDimD());
-  m_cache_nf_1.resize(plda_base->getDimF());
-  m_cache_nf_2.resize(plda_base->getDimF());
+  resize(getDimD(), getDimF(), getDimG());
 }
 
 
@@ -432,16 +465,55 @@ void mach::PLDAMachine::setWeightedSum(const blitz::Array<double,1>& ws) {
   m_weighted_sum.reference(tca::ccopy(ws));
 }
 
-double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& samples)
+blitz::Array<double,2>& mach::PLDAMachine::getGamma(const size_t a)
 {
-  int n_samples = samples.extent(0) + m_n_samples;
+  // Checks in both base machine and this machine
+  if(m_plda_base->hasGamma(a)) return m_plda_base->getGamma(a);
+  // TODO: specialized exception
+  else if(!hasGamma(a)) throw Torch::machine::Exception();
+  return m_gamma[a];
+}
+
+blitz::Array<double,2>& mach::PLDAMachine::getAddGamma(const size_t a)
+{
+  if(m_plda_base->hasGamma(a)) return m_plda_base->getGamma(a);
+  else if(hasGamma(a)) return m_gamma[a];
+  // else computes it and adds it to this machine
+  blitz::Array<double,2> gamma_a(getDimF(),getDimF());
+  m_gamma[a].reference(gamma_a);
+  m_plda_base->computeGamma(a, gamma_a);
+  return m_gamma[a];
+}
+
+double mach::PLDAMachine::getLogLikeConstTerm(const size_t a)
+{
+  // Checks in both base machine and this machine
+  if(m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
+  // TODO: specialized exception
+  else if(!hasLogLikeConstTerm(a)) throw Torch::machine::Exception();
+  return m_loglike_constterm[a];
+}
+
+double mach::PLDAMachine::getAddLogLikeConstTerm(const size_t a)
+{
+  if(m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
+  else if(hasLogLikeConstTerm(a)) return m_loglike_constterm[a];
+  // else computes it and adds it to this machine
+  m_loglike_constterm[a] = m_plda_base->computeLogLikeConstTerm(a);
+  return m_loglike_constterm[a];
+}
+
+double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,1>& sample,
+  bool enrol)
+{
+   int n_samples = 1 + (enrol?m_n_samples:0);
   // 1/2/ Constant term of the log likelihood:
   //      1/ First term of the likelihood: -Nsamples*D/2*log(2*PI)
   //      2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
   //        Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
   //       -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
   // TODO: check samples dimensionality
-  double log_likelihood = getPLDABase()->getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
+  double log_likelihood = getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
 
   // 3/ Third term of the likelihood: -1/2*X^T*(SIGMA+A.A^T)^-1*X
   //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
@@ -449,9 +521,49 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
   const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
   const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
-  double terma = m_nh_sum_xit_beta_xi;
+  double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
   // sumWeighted
-  m_cache_nf_1 = m_weighted_sum;
+  if(enrol) m_cache_nf_1 = m_weighted_sum;
+  else m_cache_nf_1 = 0;
+  
+  // terma += -1 / 2. * (xi^t*beta*xi)
+  Torch::math::prod(beta, sample, m_cache_d_1);
+  terma += -1 / 2. * (blitz::sum(sample*m_cache_d_1));
+    
+  // sumWeighted
+  Torch::math::prod(Ft_beta, sample, m_cache_nf_2);
+  m_cache_nf_1 += m_cache_nf_2;
+
+  blitz::Array<double,2> gamma_a = getAddGamma(n_samples);
+  Torch::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
+  double termb = 1 / 2. * (blitz::sum(m_cache_nf_1*m_cache_nf_2));
+  
+  log_likelihood += terma + termb;
+  return log_likelihood; 
+}
+
+double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& samples,
+  bool enrol)
+{
+  int n_samples = samples.extent(0) + (enrol?m_n_samples:0);
+  // 1/2/ Constant term of the log likelihood:
+  //      1/ First term of the likelihood: -Nsamples*D/2*log(2*PI)
+  //      2/ Second term of the likelihood: -1/2*log(det(SIGMA+A.A^T))
+  //        Efficient way: -Nsamples/2*log(det(sigma))-Nsamples/2*log(det(I+G^T.sigma^-1.G))
+  //       -1/2*log(det(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)*G^T*sigma^-1).F))
+  // TODO: check samples dimensionality
+  double log_likelihood = getAddLogLikeConstTerm(static_cast<size_t>(n_samples));
+
+  // 3/ Third term of the likelihood: -1/2*X^T*(SIGMA+A.A^T)^-1*X
+  //    Efficient way: -1/2*sum_i(xi^T.sigma^-1.xi - xi^T.sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1.xi
+  //      -1/2*sumWeighted^T*(I+aF^T.(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1).F)^-1*sumWeighted
+  //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
+  const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
+  const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
+  double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
+  // sumWeighted
+  if(enrol) m_cache_nf_1 = m_weighted_sum;
+  else m_cache_nf_1 = 0;
   for(int k=0; k<samples.extent(0); ++k) 
   {
     blitz::Array<double,1> samp = samples(k,blitz::Range::all());
@@ -464,7 +576,7 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
     m_cache_nf_1 += m_cache_nf_2;
   }
 
-  blitz::Array<double,2> gamma_a = getPLDABase()->getAddGamma(n_samples);
+  blitz::Array<double,2> gamma_a = getAddGamma(n_samples);
   Torch::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
   double termb = 1 / 2. * (blitz::sum(m_cache_nf_1*m_cache_nf_2));
   
@@ -472,31 +584,16 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   return log_likelihood;
 }
 
-
 void mach::PLDAMachine::forward(const blitz::Array<double,1>& sample, double& score)
 {
-/*
-  // Ux and GMMStats
-  estimateX(gmm_stats);
-  std::vector<const Torch::machine::GMMStats*> stats;
-  stats.push_back(&m_cache_gmmstats);
-  m_cache_Ux.resize(getDimCD());
-  Torch::math::prod(m_plda_base->getU(), m_x, m_cache_Ux);
-  std::vector<blitz::Array<double,1> > channelOffset;
-  channelOffset.push_back(m_cache_Ux);
+  // Computes the log likelihood ratio
+  score = computeLikelihood(sample, true) - // match
+          (computeLikelihood(sample, false) + m_loglikelihood); // no match
+}
 
-  // m + Vy + Dz
-  m_cache_mVyDz.resize(getDimCD());
-  Torch::math::prod(m_plda_base->getV(), m_y, m_cache_mVyDz);
-  m_cache_mVyDz += m_plda_base->getD()*m_z + m_plda_base->getUbm()->getMeanSupervector();
-  std::vector<blitz::Array<double,1> > models;
-  models.push_back(m_cache_mVyDz);
-
-  // Linear scoring
-  blitz::Array<double,2> scores(1,1);
-  mach::linearScoring(models, 
-    m_plda_base->getUbm()->getMeanSupervector(), m_plda_base->getUbm()->getVarianceSupervector(),
-    stats, channelOffset, true, scores);
-  score = scores(0,0);
-*/
+void mach::PLDAMachine::forward(const blitz::Array<double,2>& samples, double& score)
+{
+  // Computes the log likelihood ratio
+  score = computeLikelihood(samples, true) - // match
+          (computeLikelihood(samples, false) + m_loglikelihood); // no match
 }

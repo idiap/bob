@@ -476,7 +476,16 @@ namespace Torch { namespace machine {
        */
       inline blitz::Array<double, 1>& updateWeightedSum()
       { return m_weighted_sum; }
-
+      /**
+        * Gets the log likelihood of the enrollment samples
+        */
+      inline double getLogLikelihood() const
+      { return m_loglikelihood; }
+      /**
+        * Sets the log likelihood of the enrollment samples
+        */
+      void setLogLikelihood(const double val)
+      { m_loglikelihood = val; }
 
       /**
         * Set the PLDABaseMachine
@@ -485,15 +494,74 @@ namespace Torch { namespace machine {
 
 
       /**
-        * Compute the likelihood the given samples and the enrolled samples
+        * Tells if the gamma matrix for a given a (number of samples) exists
+        * in this machine (does not check the base machine)
+        * gamma_a = (Id + a.F^T.beta.F)^-1
         */
-      double computeLikelihood(const blitz::Array<double,2>& sample);
+      inline bool hasGamma(const size_t a) const
+      { return (m_gamma.find(a) != m_gamma.end()); }
+      /**
+        * Gets the gamma matrix for a given a (number of samples)
+        * gamma_a = (Id + a.F^T.beta.F)^-1
+        * Tries to find it from the base machine and then from this machine
+        * @warning an exception is thrown if gamma does not exists
+        */
+      blitz::Array<double,2>& getGamma(const size_t a);
+      /**
+        * Gets the gamma matrix for a given a (number of samples)
+        * gamma_a = (Id + a.F^T.beta.F)^-1
+        * Tries to find it from the base machine and then from this machine
+        * @warning The matrix is computed if it does not already exists,
+        *   and stored in this machine
+        */
+      blitz::Array<double,2>& getAddGamma(const size_t a);
+      /**
+        * Tells if the log likelihood constant term for a given a 
+        * (number of samples) exists in this machine 
+        * (does not check the base machine)
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        */
+      inline bool hasLogLikeConstTerm(const size_t a) const
+      { return (m_loglike_constterm.find(a) != m_loglike_constterm.end()); }
+      /**
+        * Gets the log likelihood constant term for a given a \
+        * (number of samples)
+        * Tries to find it from the base machine and then from this machine
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        * @warning an exception is thrown if the value does not exists
+        */
+      double getLogLikeConstTerm(const size_t a);
+      /**
+        * Gets the log likelihood constant term for a given a \
+        * (number of samples)
+        * Tries to find it from the base machine and then from this machine
+        * loglike_constterm[a] = a/2 * 
+        *   ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+        * @warning The value is computed if it does not already exists
+        */
+      double getAddLogLikeConstTerm(const size_t a);
+
 
       /**
-        * Computes LLR from a 1D blitz::Array
+        * Compute the likelihood of the given sample and (optionnaly) 
+        * the enrolled samples
+        */
+      double computeLikelihood(const blitz::Array<double,1>& sample,
+        bool with_enrolled_samples=true);
+      /**
+        * Compute the likelihood of the given samples and (optionnaly) 
+        * the enrolled samples
+        */
+      double computeLikelihood(const blitz::Array<double,2>& samples,
+        bool with_enrolled_samples=true);
+
+      /**
+        * Computes LLR from a 1D or 2D blitz::Array
         */
       void forward(const blitz::Array<double,1>& sample, double& score);
-      //void forward(const std::vector<const Torch::machine::GMMStats*>& samples, blitz::Array<double,1>& scores);
+      void forward(const blitz::Array<double,2>& samples, double& score);
 
 
     private:
@@ -518,6 +586,19 @@ namespace Torch { namespace machine {
         * used in the likelihood computation (for the second xi dependent term)
         */
       blitz::Array<double,1> m_weighted_sum;
+      /**
+        * Log likelihood of the enrolled samples
+        */
+      double m_loglikelihood;
+
+      // Values which are not already in the base machine
+      // gamma_a = (Id + a.F^T.beta.F)^-1 (depends on the number of samples)
+      std::map<size_t, blitz::Array<double,2> > m_gamma;
+      // Log likelihood constant term which depends on the number of samples a
+      // loglike_constterm[a] = a/2 * 
+      //    ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
+      std::map<size_t, double> m_loglike_constterm;
+
 
       // cache
       blitz::Array<double,1> m_cache_d_1;
