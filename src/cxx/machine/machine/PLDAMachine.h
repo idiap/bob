@@ -350,6 +350,7 @@ namespace Torch { namespace machine {
       blitz::Array<double,2> m_cache_nf_nf_1;
       blitz::Array<double,2> m_cache_ng_ng_1;
 
+      void initFGSigma();
       void precomputeISigma();
       void precomputeAlpha();
       void precomputeBeta();

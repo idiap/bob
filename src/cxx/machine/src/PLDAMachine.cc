@@ -38,6 +38,7 @@ mach::PLDABaseMachine::PLDABaseMachine(const size_t d, const size_t nf,
   m_logdet_alpha(0), m_logdet_sigma(0), m_loglike_constterm(),
   m_cache_d_ng_1(d,ng), m_cache_nf_nf_1(nf,nf), m_cache_ng_ng_1(ng,ng)
 {
+  initFGSigma();
 }
 
 
@@ -165,6 +166,7 @@ void mach::PLDABaseMachine::resize(const size_t d, const size_t nf,
   m_cache_nf_nf_1.resize(nf,nf);
   m_cache_ng_ng_1.resize(ng,ng);
   m_loglike_constterm.clear();
+  initFGSigma();
 }
 
 void mach::PLDABaseMachine::setF(const blitz::Array<double,2>& F) {
@@ -207,6 +209,13 @@ blitz::Array<double,2>& mach::PLDABaseMachine::getAddGamma(const size_t a)
 {
   if(!hasGamma(a)) precomputeGamma(a);
   return m_gamma[a];
+}
+
+void mach::PLDABaseMachine::initFGSigma() {
+  // To avoid problems related to precomputation
+  Torch::math::eye(m_F);
+  Torch::math::eye(m_G);
+  m_sigma = 1.;
 }
 
 void mach::PLDABaseMachine::precompute() {
