@@ -559,7 +559,7 @@ namespace Torch { namespace machine {
         bool with_enrolled_samples=true);
 
       /**
-        * Computes LLR from a 1D or 2D blitz::Array
+        * Computes a log likelihood ratio from a 1D or 2D blitz::Array
         */
       void forward(const blitz::Array<double,1>& sample, double& score);
       void forward(const blitz::Array<double,2>& samples, double& score);

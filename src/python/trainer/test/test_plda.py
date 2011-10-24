@@ -184,7 +184,6 @@ class PLDATrainerTest(unittest.TestCase):
     self.assertTrue(equals(m.sigma, sigma_2, 1e-10))
 
 
-
   def test02_plda_likelihood(self):
     # Data used for performing the tests
     # Features and subspaces dimensionality
@@ -241,6 +240,20 @@ class PLDATrainerTest(unittest.TestCase):
     ll = m.computeLikelihood(X)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
+    # log likelihood ratio
+    Y = torch.core.array.float64_2((2,D))
+    Y[0,:] = x1
+    Y[1,:] = x2
+    Z = torch.core.array.float64_2((1,D))
+    Z[0,:] = x3
+    llX = m.computeLikelihood(X)
+    llY = m.computeLikelihood(Y)
+    llZ = m.computeLikelihood(Z)
+    # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
+    # and [x3] separately
+    llr_ref = -4.43695386675
+    self.assertTrue(abs((llX - (llY + llZ)) - llr_ref) < 1e-10)
+
 
   def test03_plda_enrollment(self):
     # Data used for performing the tests
@@ -296,6 +309,12 @@ class PLDATrainerTest(unittest.TestCase):
     t.enrol(a_enrol)
     ll = m.computeLikelihood(x3)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
+
+    # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
+    # and [x3] separately
+    llr_ref = -4.43695386675
+    llr = m.forward(x3)
+    self.assertTrue(abs(llr - llr_ref) < 1e-10)
 
 
 if __name__ == '__main__':
