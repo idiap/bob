@@ -9,7 +9,7 @@
 import os, sys
 import unittest
 import torch
-import random
+import random, tempfile
 
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon).all()
@@ -17,7 +17,7 @@ def equals(x, y, epsilon):
 class PLDAMachineTest(unittest.TestCase):
   """Performs various PLDA machine tests."""
   
-  def test01_plda_machine(self):
+  def test01_plda_basemachine(self):
     # Data used for performing the tests
     # Features and subspaces dimensionality
     D = 7
@@ -41,6 +41,9 @@ class PLDAMachineTest(unittest.TestCase):
                                        -0.298224563846509, -0.000000003132583], (D,nf))
     sigma = torch.core.array.float64_1((D,))
     sigma.fill(0.01)
+    mu = torch.core.array.float64_1((D,))
+    mu.fill(0)
+
     # Defines reference results based on matlab
     alpha_ref = torch.core.array.float64_2([ 0.002189051545735,  0.001127099941432, -0.000145483208153,
                                              0.001127099941432,  0.003549267943741, -0.000552001405453,
@@ -70,13 +73,114 @@ class PLDAMachineTest(unittest.TestCase):
     m.sigma = sigma
     m.G = G
     m.F = F
-    gamma3 = torch.core.array.float64_2((nf,nf))
-    m.computeGamma(3, gamma3)
-
+    m.mu = mu
+    gamma3 = m.getAddGamma(3).copy()
+    constTerm3 = m.getAddLogLikeConstTerm(3)
+    
     # Compares precomputed values to matlab reference
-    self.assertTrue(equals(m.alpha, alpha_ref, 1e-10))
-    self.assertTrue(equals(m.beta, beta_ref, 1e-10))
+    self.assertTrue(equals(m.__alpha__, alpha_ref, 1e-10))
+    self.assertTrue(equals(m.__beta__, beta_ref, 1e-10))
     self.assertTrue(equals(gamma3, gamma3_ref, 1e-10))
+
+
+    # values before being saved
+    isigma = m.__isigma__.copy()
+    alpha = m.__alpha__.copy()
+    beta = m.__beta__.copy()
+    FtBeta = m.__FtBeta__.copy()
+    GtISigma = m.__GtISigma__.copy()
+    logdetAlpha = m.__logdetAlpha__
+    logdetSigma = m.__logdetSigma__
+
+    # Saves to file, loads and compares to original
+    filename = str(tempfile.mkstemp(".hdf5")[1])
+    m.save(torch.io.HDF5File(filename))
+    m_loaded = torch.machine.PLDABaseMachine(torch.io.HDF5File(filename))
+
+    # Compares the values loaded with the former ones
+    self.assertTrue(equals(m_loaded.sigma, sigma, 1e-10))
+    self.assertTrue(equals(m_loaded.G, G, 1e-10))
+    self.assertTrue(equals(m_loaded.F, F, 1e-10))
+    self.assertTrue(equals(m_loaded.mu, mu, 1e-10))
+    self.assertTrue(equals(m_loaded.__isigma__, isigma, 1e-10))
+    self.assertTrue(equals(m_loaded.__alpha__, alpha, 1e-10))
+    self.assertTrue(equals(m_loaded.__beta__, beta, 1e-10))
+    self.assertTrue(equals(m_loaded.__FtBeta__, FtBeta, 1e-10))
+    self.assertTrue(equals(m_loaded.__GtISigma__, GtISigma, 1e-10))
+    self.assertTrue(abs(m_loaded.__logdetAlpha__ - logdetAlpha) < 1e-10)
+    self.assertTrue(abs(m_loaded.__logdetSigma__ - logdetSigma) < 1e-10)
+    self.assertTrue(m_loaded.hasGamma(3))
+    self.assertTrue(equals(m_loaded.getAddGamma(3), gamma3_ref, 1e-10))
+    self.assertTrue(m_loaded.hasLogLikeConstTerm(3))
+    self.assertTrue(abs(m_loaded.getAddLogLikeConstTerm(3) - constTerm3) < 1e-10)
+
+
+  def test02_plda_machine(self):
+    # Data used for performing the tests
+    # Features and subspaces dimensionality
+    D = 7
+    nf = 2
+    ng = 3
+    # Values for F, G and sigma
+    G=torch.core.array.float64_2([-1.1424, -0.5044, -0.1917,
+                                       -0.6249,  0.1021, -0.8658,
+                                       -1.1687,  1.1963,  0.1807,
+                                        0.3926,  0.1203,  1.2665,
+                                        1.3018, -1.0368, -0.2512,
+                                       -0.5936, -0.8571, -0.2046,
+                                        0.4364, -0.1699, -2.2015], (D,ng))
+    # F <-> PCA on G
+    F=torch.core.array.float64_2([-0.054222647972093, -0.000000000783146, 
+                                        0.596449127693018,  0.000000006265167, 
+                                        0.298224563846509,  0.000000003132583, 
+                                        0.447336845769764,  0.000000009397750, 
+                                       -0.108445295944185, -0.000000001566292, 
+                                       -0.501559493741856, -0.000000006265167, 
+                                       -0.298224563846509, -0.000000003132583], (D,nf))
+    sigma = torch.core.array.float64_1((D,))
+    sigma.fill(0.01)
+    mu = torch.core.array.float64_1((D,))
+    mu.fill(0)
+
+    # Defines base machine
+    mb = torch.machine.PLDABaseMachine(D,nf,ng)
+    # Sets the current F, G and sigma 
+    # WARNING: order does matter, as this implies some precomputations
+    mb.sigma = sigma
+    mb.G = G
+    mb.F = F
+    mb.mu = mu
+
+    # Defines machine
+    m = torch.machine.PLDAMachine(mb)
+    n_samples = 2
+    WSumXitBetaXi = 0.37
+    weightedSum = torch.core.array.float64_1([1.39,0.54],(nf,))
+    log_likelihood = -0.22
+
+    m.n_samples = n_samples
+    m.WSumXitBetaXi = WSumXitBetaXi
+    m.weightedSum = weightedSum
+    m.log_likelihood = log_likelihood
+
+    gamma3 = m.getAddGamma(3).copy()
+    constTerm3 = m.getAddLogLikeConstTerm(3)
+
+    # Saves to file, loads and compares to original
+    filename = str(tempfile.mkstemp(".hdf5")[1])
+    m.save(torch.io.HDF5File(filename))
+    m_loaded = torch.machine.PLDAMachine(torch.io.HDF5File(filename))
+    m_loaded.plda_base = mb
+
+    # Compares the values loaded with the former ones
+    self.assertTrue(abs(m_loaded.n_samples - n_samples) < 1e-10)
+    self.assertTrue(abs(m_loaded.WSumXitBetaXi - WSumXitBetaXi) < 1e-10)
+    self.assertTrue(equals(m_loaded.weightedSum, weightedSum, 1e-10))
+    self.assertTrue(abs(m_loaded.log_likelihood - log_likelihood) < 1e-10) 
+    self.assertTrue(m_loaded.hasGamma(3))
+    self.assertTrue(equals(m_loaded.getAddGamma(3), gamma3, 1e-10))
+    self.assertTrue(m_loaded.hasLogLikeConstTerm(3))
+    self.assertTrue(abs(m_loaded.getAddLogLikeConstTerm(3) - constTerm3) < 1e-10)
 
 
 if __name__ == '__main__':

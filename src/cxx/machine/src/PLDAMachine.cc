@@ -102,17 +102,21 @@ void mach::PLDABaseMachine::load(Torch::io::HDF5File& config) {
   m_sigma.reference(config.readArray<double,1>("sigma"));
   m_mu.reference(config.readArray<double,1>("mu"));
   m_isigma.resize(d);
+  precomputeISigma();
   m_alpha.reference(config.readArray<double,2>("alpha"));
   m_beta.reference(config.readArray<double,2>("beta"));
   // gamma and log like constant term (a-dependent terms)
-  blitz::Array<uint32_t, 1> a_indices;
-  a_indices.reference(config.readArray<uint32_t,1>("a_indices"));
-  for(int i=0; i<a_indices.extent(0); ++i)
+  if(config.contains("a_indices"))
   {
-    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
-    m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
-    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-    config.read(str2, m_loglike_constterm[a_indices(i)]);
+    blitz::Array<uint32_t, 1> a_indices;
+    a_indices.reference(config.readArray<uint32_t,1>("a_indices"));
+    for(int i=0; i<a_indices.extent(0); ++i)
+    {
+      std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
+      m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
+      std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
+      config.read(str2, m_loglike_constterm[a_indices(i)]);
+    }
   }
   m_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
   m_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
@@ -131,20 +135,23 @@ void mach::PLDABaseMachine::save(Torch::io::HDF5File& config) const {
   config.setArray("alpha", m_alpha);
   config.setArray("beta", m_beta);
   // Gamma
-  blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
-  int i = 0;
-  for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
-      it=m_gamma.begin(); it!=m_gamma.end(); ++it)
+  if(m_gamma.size() > 0)
   {
-    a_indices(i) = it->first;
-    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(it->first);
-    config.setArray(str1, it->second);
-    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
-    double v = m_loglike_constterm.find(it->first)->second;
-    config.set(str2, v);
-    ++i;
+    blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
+    int i = 0;
+    for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
+        it=m_gamma.begin(); it!=m_gamma.end(); ++it)
+    {
+      a_indices(i) = it->first;
+      std::string str1 = "gamma_" + boost::lexical_cast<std::string>(it->first);
+      config.setArray(str1, it->second);
+      std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
+      double v = m_loglike_constterm.find(it->first)->second;
+      config.set(str2, v);
+      ++i;
+    }
+    config.setArray("a_indices", a_indices);
   }
-  config.setArray("a_indices", a_indices);
   config.setArray("Ft_beta", m_Ft_beta);
   config.setArray("Gt_isigma", m_Gt_isigma);
   config.set("logdet_alpha", m_logdet_alpha);
@@ -416,19 +423,21 @@ void mach::PLDAMachine::load(Torch::io::HDF5File& config) {
   //reads all data directly into the member variables
   config.read("n_samples", m_n_samples);
   config.read("nh_sum_xit_beta_xi", m_nh_sum_xit_beta_xi);
-  config.readArray("weighted_sum", m_weighted_sum);
+  m_weighted_sum.reference(config.readArray<double,1>("weighted_sum"));
   config.read("loglikelihood", m_loglikelihood);
   // gamma and log like constant term (a-dependent terms)
-  blitz::Array<uint32_t, 1> a_indices;
-  a_indices.reference(config.readArray<uint32_t,1>("a_indices"));
-  for(int i=0; i<a_indices.extent(0); ++i)
+  if(config.contains("a_indices"))
   {
-    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
-    m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
-    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-    config.read(str2, m_loglike_constterm[a_indices(i)]);
+    blitz::Array<uint32_t, 1> a_indices;
+    a_indices.reference(config.readArray<uint32_t,1>("a_indices"));
+    for(int i=0; i<a_indices.extent(0); ++i)
+    {
+      std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
+      m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
+      std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
+      config.read(str2, m_loglike_constterm[a_indices(i)]);
+    }
   }
-
 }
 
 void mach::PLDAMachine::save(Torch::io::HDF5File& config) const {
@@ -437,18 +446,22 @@ void mach::PLDAMachine::save(Torch::io::HDF5File& config) const {
   config.setArray("weighted_sum", m_weighted_sum);
   config.set("loglikelihood", m_loglikelihood);
   // Gamma
-  blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
-  int i = 0;
-  for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
-      it=m_gamma.begin(); it!=m_gamma.end(); ++it)
+  if(m_gamma.size() > 0)
   {
-    a_indices(i) = it->first;
-    std::string str1 = "gamma_" + boost::lexical_cast<std::string>(it->first);
-    config.setArray(str1, it->second);
-    std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
-    double v = m_loglike_constterm.find(it->first)->second;
-    config.set(str2, v);
-    ++i;
+    blitz::Array<uint32_t, 1> a_indices(m_gamma.size());
+    int i = 0;
+    for(std::map<size_t,blitz::Array<double,2> >::const_iterator 
+        it=m_gamma.begin(); it!=m_gamma.end(); ++it)
+    {
+      a_indices(i) = it->first;
+      std::string str1 = "gamma_" + boost::lexical_cast<std::string>(it->first);
+      config.setArray(str1, it->second);
+      std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(it->first);
+      double v = m_loglike_constterm.find(it->first)->second;
+      config.set(str2, v);
+      ++i;
+    }
+    config.setArray("a_indices", a_indices);
   }
 }
 
@@ -466,7 +479,7 @@ void mach::PLDAMachine::resize(const size_t d, const size_t nf,
 
 void mach::PLDAMachine::setPLDABase(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base) {
   m_plda_base = plda_base; 
-  resize(getDimD(), getDimF(), getDimG());
+//  resize(getDimD(), getDimF(), getDimG());
 }
 
 
@@ -511,7 +524,8 @@ double mach::PLDAMachine::getAddLogLikeConstTerm(const size_t a)
   if(m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
   else if(hasLogLikeConstTerm(a)) return m_loglike_constterm[a];
   // else computes it and adds it to this machine
-  m_loglike_constterm[a] = m_plda_base->computeLogLikeConstTerm(a);
+  m_loglike_constterm[a] = 
+        m_plda_base->computeLogLikeConstTerm(a, getAddGamma(a));
   return m_loglike_constterm[a];
 }
 
