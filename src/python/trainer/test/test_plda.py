@@ -242,6 +242,62 @@ class PLDATrainerTest(unittest.TestCase):
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
 
+  def test03_plda_enrollment(self):
+    # Data used for performing the tests
+    # Features and subspaces dimensionality
+    D = 7
+    nf = 2
+    ng = 3
+
+    # initial values for F, G and sigma
+    G_init=torch.core.array.float64_2([-1.1424, -0.5044, -0.1917,
+                                       -0.6249,  0.1021, -0.8658,
+                                       -1.1687,  1.1963,  0.1807,
+                                        0.3926,  0.1203,  1.2665,
+                                        1.3018, -1.0368, -0.2512,
+                                       -0.5936, -0.8571, -0.2046,
+                                        0.4364, -0.1699, -2.2015], (D,ng))
+    # F <-> PCA on G
+    F_init=torch.core.array.float64_2([-0.054222647972093, -0.000000000783146, 
+                                        0.596449127693018,  0.000000006265167, 
+                                        0.298224563846509,  0.000000003132583, 
+                                        0.447336845769764,  0.000000009397750, 
+                                       -0.108445295944185, -0.000000001566292, 
+                                       -0.501559493741856, -0.000000006265167, 
+                                       -0.298224563846509, -0.000000003132583], (D,nf))
+    sigma_init = torch.core.array.float64_1((D,))
+    sigma_init.fill(0.01)
+    mean_zero = torch.core.array.float64_1((D,))
+    mean_zero.fill(0)
+
+    # base machine
+    mb = torch.machine.PLDABaseMachine(D,nf,ng)
+    mb.sigma = sigma_init
+    mb.G = G_init
+    mb.F = F_init
+    mb.mu = mean_zero
+
+    # Data for likelihood computation
+    x1 = torch.core.array.float64_1([0.8032, 0.3503, 0.4587, 0.9511, 0.1330, 0.0703, 0.7061], (D,))
+    x2 = torch.core.array.float64_1([0.9317, 0.1089, 0.6517, 0.1461, 0.6940, 0.6256, 0.0437], (D,))
+    x3 = torch.core.array.float64_1([0.7979, 0.9862, 0.4367, 0.3447, 0.0488, 0.2252, 0.5810], (D,))
+    a_enrol = torch.io.Arrayset()
+    a_enrol.append(x1)
+    a_enrol.append(x2)
+
+    # reference likelihood from Prince implementation
+    ll_ref = -182.8880743535197
+
+    # Computes the likelihood using x1 and x2 as enrollment samples
+    # and x3 as a probe sample
+    m = torch.machine.PLDAMachine(mb)
+    tb = torch.trainer.PLDABaseTrainer(nf,ng)
+    t = torch.trainer.PLDATrainer(m, tb)
+    t.enrol(a_enrol)
+    ll = m.computeLikelihood(x3)
+    self.assertTrue(abs(ll - ll_ref) < 1e-10)
+
+
 if __name__ == '__main__':
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \

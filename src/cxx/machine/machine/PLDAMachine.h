@@ -603,6 +603,7 @@ namespace Torch { namespace machine {
 
       // cache
       blitz::Array<double,1> m_cache_d_1;
+      blitz::Array<double,1> m_cache_d_2;
       blitz::Array<double,1> m_cache_nf_1;
       blitz::Array<double,1> m_cache_nf_2;
   };

@@ -360,7 +360,7 @@ mach::PLDAMachine::PLDAMachine():
   m_plda_base(boost::shared_ptr<Torch::machine::PLDABaseMachine>()),
   m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(0), 
   m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
-  m_cache_d_1(0), m_cache_nf_1(0), m_cache_nf_2(0)
+  m_cache_d_1(0), m_cache_d_2(0), m_cache_nf_1(0), m_cache_nf_2(0)
 {
 }
 
@@ -368,8 +368,8 @@ mach::PLDAMachine::PLDAMachine(const boost::shared_ptr<Torch::machine::PLDABaseM
   m_plda_base(plda_base),
   m_n_samples(0), m_nh_sum_xit_beta_xi(0), m_weighted_sum(plda_base->getDimF()),
   m_loglikelihood(0), m_gamma(), m_loglike_constterm(),
-  m_cache_d_1(plda_base->getDimD()), m_cache_nf_1(plda_base->getDimF()), 
-  m_cache_nf_2(plda_base->getDimF())
+  m_cache_d_1(plda_base->getDimD()), m_cache_d_2(plda_base->getDimD()),
+  m_cache_nf_1(plda_base->getDimF()), m_cache_nf_2(plda_base->getDimF())
 {
 }
 
@@ -382,6 +382,7 @@ mach::PLDAMachine::PLDAMachine(const mach::PLDAMachine& other):
   m_loglikelihood(other.m_loglikelihood), m_gamma(), 
   m_loglike_constterm(other.m_loglike_constterm),
   m_cache_d_1(tca::ccopy(other.m_cache_d_1)),
+  m_cache_d_2(tca::ccopy(other.m_cache_d_2)),
   m_cache_nf_1(tca::ccopy(other.m_cache_nf_1)),
   m_cache_nf_2(tca::ccopy(other.m_cache_nf_2))
 {
@@ -405,6 +406,7 @@ mach::PLDAMachine& mach::PLDAMachine::operator=
   tca::ccopy(other.m_gamma, m_gamma);
   m_loglike_constterm = other.m_loglike_constterm;
   m_cache_d_1.reference(tca::ccopy(other.m_cache_d_1));
+  m_cache_d_2.reference(tca::ccopy(other.m_cache_d_2));
   m_cache_nf_1.reference(tca::ccopy(other.m_cache_nf_1));
   m_cache_nf_2.reference(tca::ccopy(other.m_cache_nf_2));
   return *this;
@@ -457,6 +459,7 @@ void mach::PLDAMachine::resize(const size_t d, const size_t nf,
   m_gamma.clear();
   m_loglike_constterm.clear();
   m_cache_d_1.resize(d);
+  m_cache_d_2.resize(d);
   m_cache_nf_1.resize(nf);
   m_cache_nf_2.resize(nf);
 }
@@ -530,17 +533,19 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,1>& sample
   //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
   const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
   const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
+  const blitz::Array<double,1>& mu = getPLDABase()->getMu();
   double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
   // sumWeighted
   if(enrol) m_cache_nf_1 = m_weighted_sum;
   else m_cache_nf_1 = 0;
   
   // terma += -1 / 2. * (xi^t*beta*xi)
-  Torch::math::prod(beta, sample, m_cache_d_1);
-  terma += -1 / 2. * (blitz::sum(sample*m_cache_d_1));
+  m_cache_d_1 = sample - mu;
+  Torch::math::prod(beta, m_cache_d_1, m_cache_d_2);
+  terma += -1 / 2. * (blitz::sum(m_cache_d_1*m_cache_d_2));
     
   // sumWeighted
-  Torch::math::prod(Ft_beta, sample, m_cache_nf_2);
+  Torch::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
   m_cache_nf_1 += m_cache_nf_2;
 
   blitz::Array<double,2> gamma_a = getAddGamma(n_samples);
@@ -569,6 +574,7 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   //      where sumWeighted = sum_i(F^T*(sigma^-1-sigma^-1*G*(I+G^T.sigma^-1.G)^-1*G^T*sigma^-1)*xi)
   const blitz::Array<double,2>& beta = getPLDABase()->getBeta();
   const blitz::Array<double,2>& Ft_beta = getPLDABase()->getFtBeta();
+  const blitz::Array<double,1>& mu = getPLDABase()->getMu();
   double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
   // sumWeighted
   if(enrol) m_cache_nf_1 = m_weighted_sum;
@@ -576,12 +582,13 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   for(int k=0; k<samples.extent(0); ++k) 
   {
     blitz::Array<double,1> samp = samples(k,blitz::Range::all());
+    m_cache_d_1 = samp - mu;
     // terma += -1 / 2. * (xi^t*beta*xi)
-    Torch::math::prod(beta, samp, m_cache_d_1);
-    terma += -1 / 2. * (blitz::sum(samp*m_cache_d_1));
+    Torch::math::prod(beta, m_cache_d_1, m_cache_d_2);
+    terma += -1 / 2. * (blitz::sum(m_cache_d_1*m_cache_d_2));
     
     // sumWeighted
-    Torch::math::prod(Ft_beta, samp, m_cache_nf_2);
+    Torch::math::prod(Ft_beta, m_cache_d_1, m_cache_nf_2);
     m_cache_nf_1 += m_cache_nf_2;
   }
 

@@ -603,7 +603,7 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
 
   // Updates the PLDA machine
   m_plda_machine.setNSamples(n_samples);
-  double ll = 0.;
+  double terma = 0.;
   weighted_sum = 0.;
   for(size_t i=0; i<n_samples; ++i) {
     m_cache_D_1 =  ar.get<double,1>(i) - mu;
@@ -612,8 +612,9 @@ void train::PLDATrainer::enrol(const io::Arrayset& ar)
     weighted_sum += m_cache_nf_1;
     // b/ first xi dependent term of the log likelihood
     Torch::math::prod(beta, m_cache_D_1, m_cache_D_2);
-    ll += blitz::sum(m_cache_D_1 * m_cache_D_2);
+    terma += -1 / 2. * blitz::sum(m_cache_D_1 * m_cache_D_2);
   }
+  m_plda_machine.setWSumXitBetaXi(terma);
 
   // Adds the precomputed values for the cases N and N+1 if not already 
   // in the base machine (used by the forward function, 1 already added)
