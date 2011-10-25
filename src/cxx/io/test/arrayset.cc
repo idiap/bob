@@ -130,12 +130,12 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
   c(0) = 3.;
 
   // Create io Arrays from blitz::arrays
-  boost::shared_ptr<Torch::io::Array> db_a(new Torch::io::Array(a));
-  boost::shared_ptr<Torch::io::Array> db_b(new Torch::io::Array(b));
-  boost::shared_ptr<Torch::io::Array> db_c(new Torch::io::Array(c));
+  Torch::io::Array db_a(a);
+  Torch::io::Array db_b(b);
+  Torch::io::Array db_c(c);
 
   // Put these io Arrays in a STL vector
-  std::vector<boost::shared_ptr<Torch::io::Array> > vec;
+  std::vector<Torch::io::Array> vec;
   vec.push_back(db_a);
   vec.push_back(db_b);
   vec.push_back(db_c);
@@ -144,13 +144,11 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
   Torch::io::Arrayset db_Ar(vec);
 
   // Set and get attributes
-  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), true );
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), Torch::core::array::t_float64 );
   BOOST_CHECK_EQUAL(db_Ar.getNDim(), 1 );
   const size_t* shape = db_Ar.getShape();
   BOOST_CHECK_EQUAL(shape[0], 4 );
   BOOST_CHECK_EQUAL(db_Ar.size(), 3 );
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(""), 0 );
 
   // Get the content of the io Arrays in blitz Arrays
   blitz::Array<double,1> a_get = db_Ar[0].get<double,1>();
@@ -164,20 +162,18 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
 
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar.add(g), Torch::io::Exception );
+  BOOST_CHECK_THROW( db_Ar.add(g), std::invalid_argument );
 
 
   // Copy constructor
   Torch::io::Arrayset db_Ar2(db_Ar);
   
   // Check attributes 
-  BOOST_CHECK_EQUAL( db_Ar2.isLoaded(), true );
   BOOST_CHECK_EQUAL( db_Ar2.getElementType(), Torch::core::array::t_float64 );
   BOOST_CHECK_EQUAL( db_Ar2.getNDim(), 1 );
   shape = db_Ar2.getShape();
   BOOST_CHECK_EQUAL( shape[0], 4 );
   BOOST_CHECK_EQUAL( db_Ar2.size(), 3 );
-  BOOST_CHECK_EQUAL( db_Ar2.getFilename().compare(""), 0 );
 
   // Get the content of the io Arrays in blitz Arrays
   a_get = db_Ar2[0].get<double,1>();
@@ -193,14 +189,11 @@ BOOST_AUTO_TEST_CASE( dbArrayset_construction_inline )
   db_Ar2 = db_Ar;
   
   // Check attributes 
-  BOOST_CHECK_EQUAL( db_Ar2.isLoaded(), true );
   BOOST_CHECK_EQUAL( db_Ar2.getElementType(), Torch::core::array::t_float64 );
   BOOST_CHECK_EQUAL( db_Ar2.getNDim(), 1 );
   shape = db_Ar2.getShape();
   BOOST_CHECK_EQUAL( shape[0], 4 );
   BOOST_CHECK_EQUAL( db_Ar2.size(), 3 );
-  BOOST_CHECK_EQUAL( db_Ar2.getFilename().compare(""), 0 );
-  BOOST_CHECK_EQUAL( db_Ar2.getCodec(), db_Ar.getCodec());
 
   // Get the content of the io Arrays in blitz Arrays
   a_get = db_Ar2[0].get<double,1>();
@@ -224,12 +217,12 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   c(0) = 3.;
 
   // Create io Arrays from blitz::arrays
-  boost::shared_ptr<Torch::io::Array> db_a(new Torch::io::Array(a));
-  boost::shared_ptr<Torch::io::Array> db_b(new Torch::io::Array(b));
-  boost::shared_ptr<Torch::io::Array> db_c(new Torch::io::Array(c));
+  Torch::io::Array db_a(a);
+  Torch::io::Array db_b(b);
+  Torch::io::Array db_c(c);
 
   // Put these io Arrays in a STL vector
-  std::vector<boost::shared_ptr<Torch::io::Array> > vec;
+  std::vector<Torch::io::Array > vec;
   vec.push_back(db_a);
   vec.push_back(db_b);
   vec.push_back(db_c);
@@ -237,42 +230,30 @@ BOOST_AUTO_TEST_CASE( dbArrayset_loadsave_inline )
   // Create an Arrayset from the STL vector
   BOOST_REQUIRE_NO_THROW(Torch::io::Arrayset db_Ar(vec));
   Torch::io::Arrayset db_Ar(vec);
-  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_Ar.getNDim(), 1);
   BOOST_CHECK_EQUAL(db_Ar.size(), 3);
   BOOST_CHECK_EQUAL(db_Ar.getShape()[0], 4);
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(""), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec().use_count(), 0);
 
   // Save the Arrayset to a file
   std::string tmp_file = temp_file();
   BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
-  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("hdf5.arrayset.binary"), 0);
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar.add(g), Torch::io::Exception );
+  BOOST_CHECK_THROW( db_Ar.add(g), std::invalid_argument );
   
   // Create an Arrayset from a file and check its properties
   Torch::io::Arrayset db_Ar_read(tmp_file);
-  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), db_Ar_read.isLoaded());
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), db_Ar_read.getElementType());
   BOOST_CHECK_EQUAL(db_Ar.getNDim(), db_Ar_read.getNDim());
   BOOST_CHECK_EQUAL(db_Ar.size(), db_Ar_read.size());
   for( size_t i=0; i<db_Ar.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_Ar.getShape()[i], db_Ar_read.getShape()[i]);
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(db_Ar_read.getFilename()), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare(db_Ar_read.getCodec()->name()), 0); 
   // Check that adding a blitz arrays with different dimensions will raise
   // an exception
-  BOOST_CHECK_THROW( db_Ar_read.add(g), Torch::io::Exception );
+  BOOST_CHECK_THROW( db_Ar_read.add(g), std::invalid_argument );
 
   db_Ar_read.load();
-  BOOST_CHECK_EQUAL(db_Ar_read.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_Ar_read.getFilename().compare(""), 0);
-  BOOST_CHECK_EQUAL(db_Ar_read.getCodec().use_count(), 0);  
 }
 
 BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
@@ -286,25 +267,22 @@ BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
   c(0) = 3.;
 
   // Create io Arrays from blitz::arrays
-  boost::shared_ptr<Torch::io::Array> db_a(new Torch::io::Array(a));
-  boost::shared_ptr<Torch::io::Array> db_b(new Torch::io::Array(b));
-  boost::shared_ptr<Torch::io::Array> db_c(new Torch::io::Array(c));
+  Torch::io::Array db_a(a);
+  Torch::io::Array db_b(b);
+  Torch::io::Array db_c(c);
 
   // Put these io Arrays in a STL vector
-  std::vector<boost::shared_ptr<Torch::io::Array> > vec;
+  std::vector<Torch::io::Array > vec;
   vec.push_back(db_a);
   vec.push_back(db_b);
   vec.push_back(db_c);
 
   // Create an Arrayset from the STL vector
   Torch::io::Arrayset db_Ar(vec);
-  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_Ar.getNDim(), 1);
   BOOST_CHECK_EQUAL(db_Ar.size(), 3);
   BOOST_CHECK_EQUAL(db_Ar.getShape()[0], 4);
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(""), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec().use_count(), 0);
 
   // Check the content
   check_equal(a, db_Ar[0].get<double,1>());
@@ -312,7 +290,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
   check_equal(c, db_Ar[2].get<double,1>());
 
   // Check that an exception is thrown when accessing a non-existent array
-  BOOST_CHECK_THROW(db_Ar[137], Torch::io::IndexError);
+  BOOST_CHECK_THROW(db_Ar[137], std::out_of_range);
 
   // Check the content when using the cast function
   check_equal(a, db_Ar[0].cast<uint32_t,1>());
@@ -331,7 +309,7 @@ BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
   check_equal(b, db_Ar[2].get<double,1>());
 
   // Add a io array and check
-  boost::shared_ptr<Torch::io::Array> db_b2(new Torch::io::Array(b));
+  Torch::io::Array db_b2(b);
   db_Ar.add(db_b2);
   BOOST_CHECK_EQUAL(db_Ar.size(), 4); 
   check_equal(a, db_Ar[0].get<double,1>());
@@ -349,8 +327,8 @@ BOOST_AUTO_TEST_CASE( dbArrayset_cast_remove_inline )
   check_equal(b, db_Ar[4].get<double,1>());
 
   // Add a io array and check
-  boost::shared_ptr<Torch::io::Array> db_b3(new Torch::io::Array(b));
-  db_Ar.add(db_b2);
+  Torch::io::Array db_b3(b);
+  db_Ar.add(db_b3);
   BOOST_CHECK_EQUAL(db_Ar.size(), 6); 
   check_equal(a, db_Ar[0].get<double,1>());
   check_equal(c, db_Ar[1].get<double,1>());
@@ -371,12 +349,12 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   c(0) = 3.;
 
   // Create io Arrays from blitz::arrays
-  boost::shared_ptr<Torch::io::Array> db_a(new Torch::io::Array(a));
-  boost::shared_ptr<Torch::io::Array> db_b(new Torch::io::Array(b));
-  boost::shared_ptr<Torch::io::Array> db_c(new Torch::io::Array(c));
+  Torch::io::Array db_a(a);
+  Torch::io::Array db_b(b);
+  Torch::io::Array db_c(c);
 
   // Put these io Arrays in a STL vector
-  std::vector<boost::shared_ptr<Torch::io::Array> > vec;
+  std::vector<Torch::io::Array > vec;
   vec.push_back(db_a);
   vec.push_back(db_b);
   vec.push_back(db_c);
@@ -384,13 +362,10 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   // Create an Arrayset from the STL vector
   BOOST_REQUIRE_NO_THROW(Torch::io::Arrayset db_Ar(vec));
   Torch::io::Arrayset db_Ar(vec);
-  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), true);
   BOOST_CHECK_EQUAL(db_Ar.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_Ar.getNDim(), 1);
   BOOST_CHECK_EQUAL(db_Ar.size(), 3);
   BOOST_CHECK_EQUAL(db_Ar.getShape()[0], 4);
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(""), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec().use_count(), 0);
   
   // Check the content
   BOOST_CHECK_EQUAL(db_Ar.size(), 3); 
@@ -401,9 +376,6 @@ BOOST_AUTO_TEST_CASE( dbArrayset_remove_external )
   // Save the Arrayset to a file
   std::string tmp_file = temp_file();
   BOOST_REQUIRE_NO_THROW(db_Ar.save( tmp_file ));
-  BOOST_CHECK_EQUAL(db_Ar.isLoaded(), false);
-  BOOST_CHECK_EQUAL(db_Ar.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_Ar.getCodec()->name().compare("hdf5.arrayset.binary"), 0);
   // Check data
   BOOST_CHECK_EQUAL(db_Ar.size(), 3); 
   check_equal( a, db_Ar[0].get<double,1>() );

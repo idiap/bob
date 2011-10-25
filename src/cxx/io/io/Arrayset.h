@@ -1,202 +1,183 @@
 /**
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Tue 25 Oct 17:12:06 2011 CEST
  *
  * @brief A torch representation of an Arrayset for a Dataset.
  */
 
 #ifndef TORCH_IO_ARRAYSET_H
-#define TORCH_IO_ARRAYSET_H 1
+#define TORCH_IO_ARRAYSET_H
 
 #include <string>
+#include <limits>
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 
 #include "io/Array.h"
-#include "io/InlinedArraysetImpl.h"
-#include "io/ExternalArraysetImpl.h"
 
-namespace Torch {   
-  /**
-   * \ingroup libio_api
-   * @{
-   */
-  namespace io {
+namespace Torch { namespace io {
     
-    /**
-     * The arrayset class for a dataset. It is responsible for holding and
-     * allowing access to sets of arrays that share the same element type,
-     * number of dimensions and shape.
-     */
-    class Arrayset {
-
-      public:
-
-        /**
-         * Emtpy constructor. Start a new Arrayset with an empty inlined
-         * arrayset
-         */
-        Arrayset ();
-
-        /**
-         * Constructor. Start a new Arrayset with whatever suits the
-         * InlinedArraysetImpl class
-         */
-        Arrayset (const detail::InlinedArraysetImpl& inlined);
-
-        /**
-         * Builds an Arrayset that contains data from a file.
-         * You can optionally specify the name of a codec.
-         */
-        Arrayset(const std::string& filename, const std::string& codec="");
-
-        /**
-         * Copy construct an Arrayset
-         */
-        Arrayset(const Arrayset& other);
-
-        /**
-         * Destructor
-         */
-        virtual ~Arrayset();
-
-        /**
-         * Assign an arrayset
-         */
-        Arrayset& operator= (const Arrayset& other);
-
-        /**
-         * Adds a copy of the given Array to the Arrayset. This will
-         * potentially trigger file re-writing in case the arrayset is
-         * serialized in an external file.
-         *
-         * @return The assigned id for this array.
-         */
-        size_t add (boost::shared_ptr<const Array> array);
-        size_t add (const Array& array);
-        size_t add (const detail::InlinedArrayImpl& array);
-        size_t add (const std::string& filename, const std::string& codec="");
-        
-        /**
-         * A shortcut to add a blitz::Array<T,D>
-         */
-        template <typename T, int D> 
-          inline size_t add(blitz::Array<T,D>& bz) {
-            return add(detail::InlinedArrayImpl(bz));
-        }
-
-        /**
-         * Sets a specific array to a new value. Note that if the id does not
-         * exist, I'll raise an exception. You can check existing ids with
-         * id < size().
-         */
-        void set (size_t id, boost::shared_ptr<const Array> array);
-        void set (size_t id, const Array& array);
-        void set (size_t id, const detail::InlinedArrayImpl& array);
-        void set (size_t id, const std::string& filename, const std::string& codec="");
-
-        /**
-         * A shortcut to set a blitz::Array<T,D>
-         */
-        template <typename T, int D> 
-          inline void set(size_t id, blitz::Array<T,D>& bz) {
-            set(id, detail::InlinedArrayImpl(bz));
-        }
-
-        /**
-         * Removes an Array with a given id from the Arrayset. Please note that
-         * if this arrayset is encoded in an external file, this will trigger
-         * loading the whole arrayset into memory, deleting the required array
-         * and re-saving the file, which can be time-consuming.
-         *
-         * @return The current size of this arrayset in number of samples
-         */
-        void remove (const size_t id);
-
-        /**
-         * Returns some information from the current Arrayset
-         */
-        inline bool isLoaded() const { return m_inlined; }
-        
-        Torch::core::array::ElementType getElementType() const;
-        size_t getNDim() const;
-        const size_t* getShape() const;
-        size_t size() const;
-
-        /**
-         * Get the filename containing the data if any. An empty string
-         * indicates that the data is stored inlined.
-         */
-        const std::string& getFilename() const;
-
-        /**
-         * Get the codec used to read the data from the external file 
-         * if any. This will be non-empty only if the filename is non-empty.
-         */
-        boost::shared_ptr<const ArraysetCodec> getCodec() const; 
-
-        /**
-         * Saves this arrayset in the given path using the codec indicated (or
-         * by looking at the file extension if that is empty). If the arrayset
-         * was already in a file it is moved/re-encoded as need to fulfill this
-         * request. If the arrayset was in memory, it is serialized, from the
-         * data I have in memory and subsequently erased. If the filename
-         * specifies an existing file, this file is overwritten.
-         */
-        void save(const std::string& filename, const std::string&
-            codecname="");
-
-        /**
-         * If the arrayset is in memory already, this is a noop. If it is in an
-         * external file, the file data is read and I become an inlined
-         * arrayset. The underlying file containing the data is <b>not</b>
-         * erased, we just unlink it from this Arrayset. If you want to read
-         * the arrayset data from the file without switching the internal
-         * representation of this arrayset (from external to inlined), use the
-         * operator[].
-         */
-        void load();
-
-        /**
-         * This set of methods allow you to access the data contained in this
-         * Arrayset. Please note that, if this Arrayset is inlined, you will
-         * get a reference to the pointed data. Changing it, will be reflected
-         * in my internals (would you ever save me again!). If this Arrayset is
-         * serialized in a file, you will get a copy of the data. In this last
-         * case, changing this array will not affect my internals.
-         */
-        const Array operator[] (size_t index) const;
-        Array operator[] (size_t index);
-
-        template<typename T, int D> const blitz::Array<T,D> get (size_t index) const;
-        template<typename T, int D> blitz::Array<T,D> cast (size_t index) const;
-
-        /**
-         * This is a non-templated version of the get() method that returns a
-         * generic array, used for typeless manipulations. 
-         *
-         * @warning You do NOT want to use this!
-         */
-        detail::InlinedArraysetImpl get() const;
-
-      private:
-        boost::shared_ptr<detail::InlinedArraysetImpl> m_inlined;
-        boost::shared_ptr<detail::ExternalArraysetImpl> m_external;
-
-    };
-
-    template<typename T, int D> const blitz::Array<T,D> Arrayset::get (size_t index) const {
-      return (*this)[index].get<T,D>();
-    }
-
-    template<typename T, int D> blitz::Array<T,D> Arrayset::cast (size_t index) const {
-      return (*this)[index].cast<T,D>();
-    }
-
-  }
   /**
-   * @}
+   * The arrayset class for a dataset. It is responsible for holding and
+   * allowing access to sets of arrays that share the same data type and
+   * shape.
    */
-}
+  class Arrayset {
+
+    public:
+
+      /**
+       * Emtpy array set construction.
+       */
+      Arrayset ();
+
+      /**
+       * Start with all or some arrays in a given file. You can select the
+       * start and/or the end. Numbers past the end of the given file are
+       * ignored. For example, if a file contains 5 arrays, this constructor
+       * will work ok if you leave 'end' on its default (maximum possible
+       * unsigned integer).
+       */
+      Arrayset(boost::shared_ptr<File> file, size_t begin=0,
+          size_t end=std::numeric_limits<size_t>::max());
+
+      /**
+       * Builds a new array set using all data available in the given file.
+       * Please note this does not read the file itself, just create pointers
+       * to the several arrays within such a file.
+       *
+       * @warning: This is a compatibility short cut to create a set object
+       * internally to the Array. Don't use this on fresh new code! The
+       * correct way to load an array is to use the (file, *) constructors
+       * above, for which you have more flexibility.
+       */
+      Arrayset(const std::string& path);
+
+      /**
+       * Copy construct an Arrayset
+       */
+      Arrayset(const Arrayset& other);
+
+      /**
+       * A handle to start up from a std container of Arrays.
+       */
+      template <typename T> Arrayset (const T& container) {
+        for (size_t i=0; i<container.size(); ++i) add(container[i]);
+      }
+
+      /**
+       * Destructor
+       */
+      virtual ~Arrayset();
+
+      /**
+       * Assign an arrayset
+       */
+      Arrayset& operator= (const Arrayset& other);
+
+      /**
+       * Appends the given Array to the Arrayset - always by reference
+       */
+      void add (const Array& array);
+
+      /**
+       * A shortcut to add a blitz::Array<T,D> (const and non-const)
+       */
+      template <typename T, int D>
+        inline void add(const blitz::Array<T,D>& bz) {
+        add(Array(bz));
+      }
+
+      template <typename T, int D> inline void add(blitz::Array<T,D>& bz) {
+        add(Array(bz));
+      }
+
+      /**
+       * Sets a specific array to a new value. Note that if the id does not
+       * exist, I'll raise an exception. You can check existing ids with
+       * id < size().
+       */
+      void set (size_t id, const Array& array);
+
+      /**
+       * A shortcut to set a blitz::Array<T,D> (const and non-const)
+       */
+      template <typename T, int D> 
+        inline void set(size_t id, const blitz::Array<T,D>& bz) {
+          set(id, Array(bz));
+        }
+
+      template <typename T, int D> 
+        inline void set(size_t id, blitz::Array<T,D>& bz) {
+          set(id, Array(bz));
+        }
+
+      /**
+       * Removes an Array with a given id from the Arrayset. If the Array count
+       * reaches zero, the internal type information is reset.
+       *
+       * @warning: This does not remove the array from the originating file,
+       * only from this Arrayset object.
+       *
+       * @warning: Internally, the array set is implemented as a
+       * std::vector<Array> which is optimal for element access and, therefore,
+       * erasing elements at the middle of the sequence can be slow.
+       */
+      void remove (size_t id);
+
+      inline const typeinfo& type() const { return m_info; }
+
+      inline size_t getNDim() const { return type().nd; }
+
+      inline Torch::core::array::ElementType getElementType() const {
+        return type().dtype; 
+      }
+
+      inline const size_t* getShape() const { return type().shape; }
+
+      inline const size_t* getStride() const { return type().stride; }
+
+      inline size_t size() const { return m_data.size(); }
+
+      /**
+       * Saves this arrayset to an external file, truncating it first in case
+       * it exists. This will also unload all the data from memory if that is
+       * the case and make all internal arrays point to their new position on
+       * the file.
+       */
+      void save(const std::string& path);
+
+      /**
+       * Loads all data from all arrays in memory. Use this to make
+       */
+      void load();
+
+      /**
+       * This set of methods allow you to access the data contained in this
+       * Arrayset. Please note that, if this Arrayset is inlined, you will
+       * get a reference to the pointed data. Changing it, will be reflected
+       * in my internals (would you ever save me again!). If this Arrayset is
+       * serialized in a file, you will get a copy of the data. In this last
+       * case, changing this array will not affect my internals.
+       */
+      Array& operator[] (size_t index);
+      const Array& operator[] (size_t index) const;
+
+      template<typename T, int D> const blitz::Array<T,D> get (size_t index) const {
+        return (*this)[index].get<T,D>();
+      }
+
+      template<typename T, int D> blitz::Array<T,D> cast (size_t index) const {
+        return (*this)[index].cast<T,D>();
+      }
+
+    private:
+      std::vector<Array> m_data; ///< data pointer
+      typeinfo m_info; ///< information about arrays stored
+
+  };
+
+}}
 
 #endif /* TORCH_IO_ARRAYSET_H */

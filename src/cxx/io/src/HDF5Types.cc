@@ -617,6 +617,7 @@ void io::HDF5Type::copy_to (io::typeinfo& ti) const {
   ti.nd = shape().n();
   if (ti.nd > TORCH_MAX_DIM) throw std::runtime_error("HDF5 type has more than the allowed maximum number of dimensions -- debug me");
   for (size_t i=0; i<ti.nd; ++i) ti.shape[i] = shape()[i];
+  ti.update_strides();
 }
       
 io::HDF5Descriptor::HDF5Descriptor(const HDF5Type& type, size_t size, 

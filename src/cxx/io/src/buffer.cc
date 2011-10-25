@@ -5,7 +5,6 @@
  * @brief Some buffer stuff
  */
 
-#include <stdexcept>
 #include "io/buffer.h"
 
 namespace io = Torch::io;
@@ -21,12 +20,6 @@ io::typeinfo::typeinfo():
 {
 }
 
-io::typeinfo::typeinfo(Torch::core::array::ElementType other_dtype,
-    size_t other_nd, const size_t* other_shape)
-{
-  set(other_dtype, other_nd, other_shape);
-}
-
 io::typeinfo::typeinfo(const io::typeinfo& other): 
   dtype(other.dtype)
 {
@@ -39,12 +32,6 @@ io::typeinfo& io::typeinfo::operator= (const io::typeinfo& other) {
   return *this;
 }
 
-void io::typeinfo::set(Torch::core::array::ElementType other_dtype,
-    size_t other_nd, const size_t* other_shape) {
-  dtype = other_dtype;
-  set_shape(other_nd, other_shape);
-}
-
 void io::typeinfo::reset() {
   dtype = Torch::core::array::t_unknown;
   nd = 0;
@@ -52,14 +39,6 @@ void io::typeinfo::reset() {
 
 bool io::typeinfo::is_valid() {
   return (dtype != Torch::core::array::t_unknown) && (nd > 0) && (nd <= TORCH_MAX_DIM);
-}
-
-void io::typeinfo::set_shape(size_t other_nd, const size_t* other_shape) {
-  if (other_nd == 0 || other_nd > TORCH_MAX_DIM)
-    throw std::invalid_argument("unsupported number of dimensions");
-  nd = other_nd;
-  for (size_t k=0; k<nd; ++k) shape[k] = other_shape[k];
-  update_strides();
 }
 
 void io::typeinfo::update_strides() {

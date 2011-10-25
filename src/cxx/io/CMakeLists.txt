@@ -17,50 +17,44 @@ set(src
 
     "src/buffer.cc"
     "src/carray.cc"
-    "src/filearray.cc"
     
     "src/Array.cc"
-    "src/ArrayCodec.cc"
-    "src/ArrayCodecRegistry.cc"
+    "src/File.cc"
+    "src/CodecRegistry.cc"
     
+    "src/Arrayset.cc"
+
     "src/HDF5Exception.cc"
     "src/HDF5Types.cc"
     "src/HDF5Utils.cc"
     "src/HDF5File.cc"
-    "src/HDF5ArrayCodec.cc"
+    "src/HDF5ArrayFile.cc"
+
+    "src/ImageFile.cc"
 
     "src/BinFileHeader.cc"
     "src/BinFile.cc"
-    "src/BinaryArrayCodec.cc"
+    #"src/BinaryArrayCodec.cc"
     
-    "src/ImageArrayCodec.cc"
     "src/VideoReader.cc"
     "src/VideoException.cc"
     "src/VideoWriter.cc"
-    "src/VideoArrayCodec.cc"
+    #"src/VideoArrayCodec.cc"
 
-    #"src/TensorFileHeader.cc"
-    #"src/TensorFile.cc"
+    "src/TensorFileHeader.cc"
+    "src/TensorFile.cc"
     #"src/TensorArrayCodec.cc"
+
     #"src/T3BinaryArrayCodec.cc"
     
-    #"src/InlinedArraysetImpl.cc"
-    #"src/ArraysetCodec.cc"
-    #"src/ArraysetCodecRegistry.cc"
-    #"src/Arrayset.cc"
-    #"src/BinaryArraysetCodec.cc"
-    #"src/T3BinaryArraysetCodec.cc"
-    #"src/ExternalArraysetImpl.cc"
-    #"src/HDF5ArraysetCodec.cc"
-    
-    #"src/transcode.cc"
     )
 
 # If we have matio installed, enable the compilation of relevant modules
-#if(MATIO_FOUND)
-#  set(shared "${shared};${matio_LIBRARY}")
-#  set(src "${src};src/MatUtils.cc;src/MatArrayCodec.cc;src/MatArraysetCodec.cc")
-#endif(MATIO_FOUND)
+if(MATIO_FOUND)
+  set(shared "${shared};${matio_LIBRARY}")
+  set(src "${src};src/MatUtils.cc")
+  #set(src "${src};src/MatArrayCodec.cc")
+endif(MATIO_FOUND)
 
 include(../../cmake/macros.cmake)
 torch_header_install(io-cxx io "torch::io")
@@ -69,7 +63,7 @@ add_dependencies(torch_io io-cxx_header_install)
 
 # Defines tests for this package
 torch_test(io array test/array.cc)
-#torch_test(io arrayset test/arrayset.cc)
+torch_test(io arrayset test/arrayset.cc)
 torch_test(io hdf5 test/hdf5.cc)
 torch_test(io image_codec test/image_codec.cc)
 #torch_test(io tensor_codec test/tensor_codec.cc)

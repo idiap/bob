@@ -12,6 +12,7 @@
 #include <fstream>
 #include <blitz/array.h>
 #include "core/array_type.h"
+#include "io/buffer.h"
 
 namespace Torch { namespace io { 
 
@@ -46,31 +47,6 @@ namespace Torch { namespace io {
        */
       virtual ~TensorFileHeader();
 
-      /**
-       * Gets the shape of each array in a blitz format
-       */
-      template<int D> void getShape (blitz::TinyVector<int,D>& res) const {
-        for (int i=0; i<D; ++i) res[i] = m_shape[i];
-      }
-
-      /**
-       * Sets the shape of each array
-       */
-      void setShape(size_t ndim, const size_t* shape) {
-        m_n_dimensions = ndim;
-        for(size_t i=0; i<ndim; ++i) m_shape[i] = shape[i];
-      }
-
-      /**
-       * Gets the size along a particular dimension
-       */
-      size_t getSize(size_t dim_index) const;
-
-      /**
-       * Sets the size along a particular dimension
-       */
-      void setSize(const size_t dim_index, size_t val);
-
       /** 
        * Gets the offset of some array in the file
        */
@@ -91,20 +67,10 @@ namespace Torch { namespace io {
        */
       inline size_t getNElements() const {
         size_t tmp = 1;
-        for(size_t i=0; i<m_n_dimensions; ++i) tmp *= m_shape[i];
+        for(size_t i=0; i<m_type.nd; ++i) tmp *= m_type.shape[i];
         return tmp;
       }
 
-      /**
-       * Returns the number of dimensions in this binary file
-       */
-      inline size_t getNDim() const { return m_n_dimensions; }
-
-      /**
-       * Returns the shape in a N-element C-style array
-       */
-      inline const size_t* getShape() const { return m_shape; }
-    
       /**
         * Checks if the header is valid
         */
@@ -116,11 +82,9 @@ namespace Torch { namespace io {
       void update();
 
       //representation
-      Torch::io::TensorType m_tensor_type; ///< array element type 
-      Torch::core::array::ElementType m_elem_type; ///< array element type 
+      TensorType m_tensor_type; ///< array element type 
+      typeinfo m_type; ///< the type information
       size_t m_n_samples; ///< total number of arrays in the file
-      size_t m_n_dimensions; ///< the number of dimensions in each array
-      size_t m_shape[Torch::core::array::N_MAX_DIMENSIONS_ARRAY]; ///< shape of data
       size_t m_tensor_size; ///< the number of dimensions in each array
     };
 

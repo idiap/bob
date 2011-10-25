@@ -1,35 +1,40 @@
 /**
- * @file src/cxx/io/src/Arrayset.cc
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Tue 25 Oct 17:40:17 2011 CEST
  *
  * @brief A torch representation of a list of Arrays
  */
 
 #include "io/Arrayset.h"
+#include "io/CodecRegistry.h"
 
 namespace io = Torch::io;
 
-io::Arrayset::Arrayset ():
-  m_inlined(new io::detail::InlinedArraysetImpl()),
-  m_external()
+io::Arrayset::Arrayset ()
 {
 }
 
-io::Arrayset::Arrayset (const io::detail::InlinedArraysetImpl& inlined):
-  m_inlined(new io::detail::InlinedArraysetImpl(inlined)),
-  m_external()
+io::Arrayset::Arrayset (boost::shared_ptr<File> file, size_t begin, size_t end)
 {
+  if (begin >= file->length()) return;
+  if (end > file->length()) end = file->length();
+  if (begin >= end) return;
+  m_data.reserve(end-begin);
+  for (size_t i=begin; i<end; ++i) m_data.push_back(io::Array(file, i));
+  m_info = file->type();
 }
 
-io::Arrayset::Arrayset(const std::string& filename, const std::string& codec):
-  m_inlined(),
-  m_external(new io::detail::ExternalArraysetImpl(filename, codec))
-{
+io::Arrayset::Arrayset(const std::string& path) {
+  boost::shared_ptr<io::File> file = io::open(path, "", 'a');
+  m_data.reserve(file->length());
+  for (size_t i=0; i<file->length(); ++i) m_data.push_back(io::Array(file, i));
+  m_info = file->type();
 }
 
 io::Arrayset::Arrayset(const io::Arrayset& other):
-  m_inlined(other.m_inlined),
-  m_external(other.m_external)
+  m_data(other.m_data),
+  m_info(other.m_info)
 {
 }
 
@@ -37,113 +42,58 @@ io::Arrayset::~Arrayset() {
 }
 
 io::Arrayset& io::Arrayset::operator= (const io::Arrayset& other) {
-  m_inlined = other.m_inlined;
-  m_external = other.m_external;
+  m_data = other.m_data;
+  m_info = other.m_info;
   return *this;
 }
 
-size_t io::Arrayset::add (boost::shared_ptr<const io::Array> array) {
-  return add(*array.get());
+void io::Arrayset::add (const io::Array& array) {
+
+  if (!m_info.is_valid()) { //first addition
+    m_data.push_back(array);
+    m_info = array.type();
+    return;
+  }
+
+  //else, check type and add.
+  if (!m_info.is_compatible(array.type()))
+    throw std::invalid_argument("array type is incompatible with arrayset");
+  m_data.push_back(array);
+
 }
 
-size_t io::Arrayset::add (const io::Array& array) {
-  if (m_inlined) return m_inlined->add(array);
-  else return m_external->add(array);
-}
+void io::Arrayset::set (size_t id, const Array& array) {
 
-size_t io::Arrayset::add (const io::detail::InlinedArrayImpl& array) {
-  if (m_inlined) return m_inlined->add(array);
-  else return m_external->add(array);
-}
+  if (m_data.size() == 0) 
+    throw std::runtime_error("cannot set array in empty arrayset");
 
-size_t io::Arrayset::add (const std::string& filename, const std::string& codec) {
-  if (m_inlined) return m_inlined->add(io::Array(filename, codec));
-  else return m_external->add(io::Array(filename, codec));
-}
+  if (!m_info.is_compatible(array.type()))
+    throw std::invalid_argument("array type is incompatible with arrayset");
 
-void io::Arrayset::set (size_t id, boost::shared_ptr<const io::Array> array) {
-  set(id, *array.get());
-}
+  m_data[id] = array;
 
-void io::Arrayset::set (size_t id, const io::Array& array) {
-  if (m_inlined) (*m_inlined)[id] = array;
-  else m_external->set(id, array);
-}
-
-void io::Arrayset::set (size_t id, const io::detail::InlinedArrayImpl& array) {
-  if (m_inlined) (*m_inlined)[id] = array;
-  else m_external->set(id, array);
-}
-
-void io::Arrayset::set (size_t id, const std::string& filename, const std::string& codec) {
-  if (m_inlined) (*m_inlined)[id] = io::Array(filename, codec);
-  else m_external->set(id, io::Array(filename, codec));
 }
 
 void io::Arrayset::remove (const size_t id) {
-  if (m_inlined) m_inlined->remove(id);
-  else m_external->remove(id);
+  m_data.erase(m_data.begin() + id);
+  if (m_data.size() == 0) m_info.reset();
 }
 
-Torch::core::array::ElementType io::Arrayset::getElementType() const {
-  if (m_inlined) return m_inlined->getElementType();
-  return m_external->getElementType();
-}
-
-size_t io::Arrayset::getNDim() const {
-  if (m_inlined) return m_inlined->getNDim();
-  return m_external->getNDim();
-}
-
-const size_t* io::Arrayset::getShape() const {
-  if (m_inlined) return m_inlined->getShape();
-  return m_external->getShape();
-}
-
-size_t io::Arrayset::size() const {
-  if (m_inlined) return m_inlined->size();
-  return m_external->size();
-}
-
-void io::Arrayset::save(const std::string& filename, const std::string& codecname) {
-  if (m_inlined) {
-    m_external.reset(new io::detail::ExternalArraysetImpl(filename, codecname, true));
-    m_external->set(*m_inlined);
-    m_inlined.reset();
-    return;
+void io::Arrayset::save(const std::string& path) {
+  boost::shared_ptr<io::File> file = io::open(path, "", 'w');
+  for (size_t i=0; i<m_data.size(); ++i) {
+    file->append(*m_data[i].get());
   }
-  m_external->move(filename, codecname); 
 }
 
-const std::string& io::Arrayset::getFilename() const {
-  if (m_external) return m_external->getFilename();
-  static std::string empty_string;
-  return empty_string;
-}
-
-boost::shared_ptr<const io::ArraysetCodec> io::Arrayset::getCodec() const {
-  if (m_external) return m_external->getCodec();
-  return boost::shared_ptr<ArraysetCodec>(); 
-}
-    
 void io::Arrayset::load() {
-  if (!m_inlined) {
-    m_inlined.reset(new detail::InlinedArraysetImpl(m_external->get()));
-    m_external.reset();
-  }
+  for (size_t i=0; i<m_data.size(); ++i) m_data[i].load();
 }
 
-const io::Array io::Arrayset::operator[] (size_t id) const {
-  if (m_inlined) return (*m_inlined)[id];
-  return (*m_external)[id];
+const io::Array& io::Arrayset::operator[] (size_t id) const {
+  return m_data.at(id);
 }
 
-io::Array io::Arrayset::operator[] (size_t id) {
-  if (m_inlined) return (*m_inlined)[id];
-  return (*m_external)[id];
-}
-
-io::detail::InlinedArraysetImpl io::Arrayset::get() const {
-  if (!m_inlined) return m_external->get();
-  return *m_inlined.get();
+io::Array& io::Arrayset::operator[] (size_t id) {
+  return m_data.at(id);
 }

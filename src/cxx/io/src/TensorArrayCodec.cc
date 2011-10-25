@@ -30,28 +30,21 @@ io::TensorArrayCodec::TensorArrayCodec()
 io::TensorArrayCodec::~TensorArrayCodec() { }
 
 void io::TensorArrayCodec::peek(const std::string& filename, 
-    Torch::core::array::ElementType& eltype, size_t& ndim,
-    size_t* shape) const {
-  io::TensorFile f(filename, io::TensorFile::in);
-  if (!f) {
-    eltype = Torch::core::array::t_unknown;
-    ndim = 0;
-    throw io::FileNotReadable(filename);
-  }
-  eltype = f.getElementType();
-  ndim = f.getNDimensions();
-  for (size_t i=0; i<ndim; ++i) shape[i] = f.getShape()[i]; 
-}
-
-io::detail::InlinedArrayImpl 
-io::TensorArrayCodec::load(const std::string& filename) const {
+    io::typeinfo& info) const {
   io::TensorFile f(filename, io::TensorFile::in);
   if (!f) throw io::FileNotReadable(filename);
-  return f.read();
+  f.peek(info);
+}
+
+void io::TensorArrayCodec::load(const std::string& filename, 
+    io::buffer& buf) const {
+  io::TensorFile f(filename, io::TensorFile::in);
+  if (!f) throw io::FileNotReadable(filename);
+  return f.read(buf);
 }
 
 void io::TensorArrayCodec::save (const std::string& filename, 
-    const io::detail::InlinedArrayImpl& data) const {
+    const io::buffer& data) const {
   io::TensorFile f(filename, io::TensorFile::out);
   f.write(data);
 }

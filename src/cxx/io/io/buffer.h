@@ -8,8 +8,11 @@
 #ifndef TORCH_IO_BUFFER_H 
 #define TORCH_IO_BUFFER_H
 
-#include <blitz/array.h>
+#include <stdexcept>
+
 #include <boost/shared_ptr.hpp>
+#include <blitz/array.h>
+
 #include "core/array_type.h"
 
 namespace Torch { namespace io {
@@ -32,8 +35,10 @@ namespace Torch { namespace io {
     /**
      * Simplification to build a typeinfo from a shape pointer.
      */
-    typeinfo(Torch::core::array::ElementType dtype,
-        size_t nd, const size_t* shape);
+    template <typename T> typeinfo(Torch::core::array::ElementType dtype_,
+        T nd_, const T* shape_) {
+      set(dtype_, nd_, shape_);
+    }
 
     /**
      * Copies information from another typeinfo
@@ -48,8 +53,11 @@ namespace Torch { namespace io {
     /**
      * Set to specific values
      */
-    void set(Torch::core::array::ElementType dtype,
-        size_t nd, const size_t* shape);
+    template <typename T>
+    void set(Torch::core::array::ElementType dtype_, T nd_, const T* shape_) {
+      dtype = dtype_;
+      set_shape(nd_, shape_);
+    }
 
     /**
      * Reset to defaults -- as if uninitialized.
@@ -64,7 +72,13 @@ namespace Torch { namespace io {
     /**
      * sets the shape
      */
-    void set_shape(size_t nd, const size_t* shape);
+    template <typename T> void set_shape(T nd_, const T* shape_) {
+      if (nd_ == 0 || nd_ > TORCH_MAX_DIM)
+        throw std::invalid_argument("unsupported number of dimensions");
+      nd = nd_;
+      for (size_t k=0; k<nd; ++k) shape[k] = shape_[k];
+      update_strides();
+    }
 
     /**
      * Update my own stride vector. Called automatically after any use of
@@ -142,7 +156,7 @@ namespace Torch { namespace io {
     virtual void set (const typeinfo& req) =0;
 
     /**
-     * Element type
+     * Type information for this buffer.
      */
     virtual const typeinfo& type() const =0;
 

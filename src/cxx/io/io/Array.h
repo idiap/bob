@@ -14,10 +14,9 @@
 #include <boost/weak_ptr.hpp>
 #include <blitz/array.h>
 
-#include "io/ArrayCodec.h"
+#include "io/File.h"
 #include "io/carray.h"
 #include "io/utils.h"
-#include "io/filearray.h"
 
 namespace Torch {
 
@@ -42,10 +41,15 @@ namespace Torch {
         Array(boost::shared_ptr<buffer> data);
 
         /**
-         * Builds an Array that contains data from a file. You can optionally
-         * specify the name of a codec.
+         * Reads all the data from the file into this Array.
          */
-        Array(const std::string& filename, const std::string& codec="");
+        Array(boost::shared_ptr<File> file);
+
+        /**
+         * Builds an Array that contains data from a file, specific data from
+         * the file is loaded using this constructor.
+         */
+        Array(boost::shared_ptr<File> file, size_t index);
 
         /**
          * Refers to the Array data from another array.
@@ -53,24 +57,30 @@ namespace Torch {
         Array(const Array& other);
 
         /**
+         * Builds a new array using the first array available in the file path
+         * given.
+         *
+         * @warning: This is a compatibility short cut to create a File object
+         * internally to the Array. Don't use this on fresh new code! The
+         * correct way to load an array is to use the (file, index) constructor
+         * above.
+         */
+        Array(const std::string& path);
+
+        /**
          * Destroys this array. 
          */
         virtual ~Array();
 
         /**
-         * Copies data from another array. 
+         * Copies data from another array.
          */
         Array& operator= (const Array& other);
 
         /**
-         * Saves this array in the given path using the codec indicated (or by
-         * looking at the file extension if that is empty). If the array was
-         * already in a file it is moved/re-encoded as need to fulfill this
-         * request. If the array was in memory, it is serialized, from the data
-         * I have in memory and subsequently erased. If the filename specifies
-         * an existing file, this file is overwritten.
+         * Appends this array contents to an already opened file.
          */
-        void save(const std::string& filename, const std::string& codecname="");
+        void append(boost::shared_ptr<File> file);
 
         /**
          * If the array is in-memory nothing happens. If the array is in a
@@ -87,24 +97,33 @@ namespace Torch {
         boost::shared_ptr<buffer> get() const;
 
         /**
-         * Sets the current data to the given array
+         * Sets the current data to the given array.
          */
         void set(boost::shared_ptr<buffer> data); //refer to data
         void set(const buffer& data); //copy data
 
         inline const typeinfo& type() const {
-          return (m_inlined)?m_inlined->type(): m_external->type(); 
+          return (m_inlined)?m_inlined->type(): m_external->type(m_loadsall);
         }
 
         inline size_t getNDim() const { return type().nd; }
         
-        inline Torch::core::array::ElementType getElementType() const { 
+        inline Torch::core::array::ElementType getElementType() const {
           return type().dtype; 
         }
 
         inline const size_t* getShape() const { return type().shape; }
         
         inline const size_t* getStride() const { return type().stride; }
+
+        inline size_t getIndex() const { return m_index; }
+
+        inline void setIndex(size_t i) { m_index = i; }
+
+        inline bool loadsAll() const { return m_loadsall; }
+
+        inline void setLoadsAll() { m_loadsall = true; }
+        inline void unsetLoadsAll() { m_loadsall = false; }
 
         /**
          * Get the filename containing the data if any. An empty string
@@ -116,12 +135,19 @@ namespace Torch {
          * Get the codec used to read the data from the external file 
          * if any. This will be non-empty only if the filename is non-empty.
          */
-        boost::shared_ptr<const ArrayCodec> getCodec() const;
+        boost::shared_ptr<const File> getCodec() const;
 
         /**
          * Get the flag indicating if the array is loaded in memory
          */
         inline bool isLoaded() const { return m_inlined; }
+
+        /**
+         * Dumps the array contents on a file. The file is truncated if it
+         * exists. No more data may possibly written to this file after calling
+         * this method.
+         */
+        void save(const std::string& path);
 
 
         /******************************************************************
@@ -147,9 +173,10 @@ namespace Torch {
          */
         template <typename T, int N> blitz::Array<T,N> cast() const {
           if (!m_inlined) {
-            const typeinfo& info = m_external->type();
+            const typeinfo& info = m_external->type(m_loadsall);
             carray tmp(info);
-            m_external->load(tmp);
+            if (m_loadsall) m_external->read(tmp);
+            else m_external->read(tmp, m_index);
             return tmp.cast<T,N>();
           }
           else return Torch::io::cast<T,N>(*m_inlined);
@@ -162,9 +189,10 @@ namespace Torch {
          */
         template <typename T, int N> blitz::Array<T,N> get() const {
           if (!m_inlined) {
-            const typeinfo& info = m_external->type();
+            const typeinfo& info = m_external->type(m_loadsall);
             carray tmp(info);
-            m_external->load(tmp);
+            if (m_loadsall) m_external->read(tmp);
+            else m_external->read(tmp, m_index);
             return tmp.get<T,N>();
           }
           else return Torch::io::wrap<T,N>(*m_inlined);
@@ -185,15 +213,8 @@ namespace Torch {
          */
         template <typename T, int N> 
           void set(const blitz::Array<T,N>& bzarray) {
-            if (!m_inlined) {
-              //use the data only for recording, no need to copy anyway...
-              carray tmp(boost::make_shared<blitz::Array<T,N> >(bzarray));
-              m_external->save(tmp);
-            }
-            else {
-              //we copy the data only once!
-              set(boost::make_shared<carray>(bzarray));
-            }
+            //we copy the data only once!
+            set(boost::make_shared<carray>(bzarray));
         }
 
         /**
@@ -201,20 +222,15 @@ namespace Torch {
          */
         template <typename T, int N> 
           void set(boost::shared_ptr<blitz::Array<T,N> >& bzarray) {
-            if (!m_inlined) {
-              //use the data only for recording, no need to copy anyway...
-              carray tmp(bzarray);
-              m_external->save(tmp);
-            }
-            else {
-              //no data copying...
-              set(boost::make_shared<carray>(bzarray));
-            }
+            //no data copying...
+            set(boost::make_shared<carray>(bzarray));
         }
 
       private: //representation
         boost::shared_ptr<buffer> m_inlined;
-        boost::shared_ptr<filearray> m_external;
+        boost::shared_ptr<File> m_external;
+        ptrdiff_t m_index; ///< position on a file.
+        bool m_loadsall; ///< loads all data in file in one shot.
     };
 
   } //closes namespace io

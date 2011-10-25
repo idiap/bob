@@ -1,5 +1,5 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed  6 Apr 22:43:02 2011 
  *
  * @brief Implements a set of utilities to read HDF5 files. 

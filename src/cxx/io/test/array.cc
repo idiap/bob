@@ -73,7 +73,7 @@ std::string temp_file() {
   return res;
 }
 
-const char* CODEC_NAME = "hdf5.array.binary";
+const char* CODEC_NAME = "torch.hdf5";
 
 template<typename T, typename U> 
 void check_equal(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 

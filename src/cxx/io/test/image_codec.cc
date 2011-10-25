@@ -102,10 +102,10 @@ BOOST_AUTO_TEST_CASE( image_gif )
 
   // Save to gif image
   std::string filename = temp_file(".gif");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from gif image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -125,10 +125,10 @@ BOOST_AUTO_TEST_CASE( image_bmp )
 
   // Save to bmp image
   std::string filename = temp_file(".bmp");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from bmp image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -149,10 +149,10 @@ BOOST_AUTO_TEST_CASE( image_jpg )
 
   // Save to jpg image
   std::string filename = temp_file(".jpg");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from jpg image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -173,10 +173,10 @@ BOOST_AUTO_TEST_CASE( image_pbm )
 
   // Save to pbm image
   std::string filename = temp_file(".pbm");
-  db_a.save( filename, "torch.image" );
+  db_a.save( filename);
 
   // Load from pbm image
-  Torch::io::Array db_a_read( filename, "torch.image" );
+  Torch::io::Array db_a_read( filename);
 //  check_equal( db_a_read.get<uint8_t,2>(), a );
 }
 
@@ -195,10 +195,10 @@ BOOST_AUTO_TEST_CASE( image_pgm )
 
   // Save to pgm image
   std::string filename = temp_file(".pgm");
-  db_a.save( filename, "torch.image" );
+  db_a.save( filename);
 
   // Load from pgm image
-  Torch::io::Array db_a_read( filename, "torch.image" );
+  Torch::io::Array db_a_read( filename);
   check_equal( db_a_read.get<uint8_t,2>(), a );
 }
 
@@ -217,10 +217,10 @@ BOOST_AUTO_TEST_CASE( image_png )
 
   // Save to png image
   std::string filename = temp_file(".png");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from png image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -240,10 +240,10 @@ BOOST_AUTO_TEST_CASE( image_ppm )
 
   // Save to ppm image
   std::string filename = temp_file(".ppm");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from ppm image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -263,10 +263,10 @@ BOOST_AUTO_TEST_CASE( image_tiff )
 
   // Save to tiff image
   std::string filename = temp_file(".tiff");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from tiff image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -287,10 +287,10 @@ BOOST_AUTO_TEST_CASE( image_xcf )
 
   // Save to xcf image
   std::string filename = temp_file(".xcf");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from xcf image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
