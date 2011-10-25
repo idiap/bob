@@ -550,7 +550,7 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,1>& sample
   const blitz::Array<double,1>& mu = getPLDABase()->getMu();
   double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
   // sumWeighted
-  if(enrol) m_cache_nf_1 = m_weighted_sum;
+  if(enrol && m_n_samples > 0) m_cache_nf_1 = m_weighted_sum;
   else m_cache_nf_1 = 0;
   
   // terma += -1 / 2. * (xi^t*beta*xi)
@@ -591,7 +591,7 @@ double mach::PLDAMachine::computeLikelihood(const blitz::Array<double,2>& sample
   const blitz::Array<double,1>& mu = getPLDABase()->getMu();
   double terma = (enrol?m_nh_sum_xit_beta_xi:0.);
   // sumWeighted
-  if(enrol) m_cache_nf_1 = m_weighted_sum;
+  if(enrol && m_n_samples > 0) m_cache_nf_1 = m_weighted_sum;
   else m_cache_nf_1 = 0;
   for(int k=0; k<samples.extent(0); ++k) 
   {
