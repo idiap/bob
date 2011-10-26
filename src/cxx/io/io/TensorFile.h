@@ -103,8 +103,7 @@ namespace Torch { namespace io {
        * @warning An exception is thrown if nothing was written so far
        */
       inline size_t size() const { 
-        headerInitialized(); 
-        return m_n_arrays_written; 
+        return (m_header_init)? m_n_arrays_written : 0;
       }
 
       /**

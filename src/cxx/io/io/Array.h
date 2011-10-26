@@ -103,7 +103,7 @@ namespace Torch {
         void set(const buffer& data); //copy data
 
         inline const typeinfo& type() const {
-          return (m_inlined)?m_inlined->type(): m_external->type(m_loadsall);
+          return (m_inlined)?m_inlined->type(): external_type();
         }
 
         inline size_t getNDim() const { return type().nd; }
@@ -173,10 +173,10 @@ namespace Torch {
          */
         template <typename T, int N> blitz::Array<T,N> cast() const {
           if (!m_inlined) {
-            const typeinfo& info = m_external->type(m_loadsall);
+            const typeinfo& info = external_type();
             carray tmp(info);
-            if (m_loadsall) m_external->read(tmp);
-            else m_external->read(tmp, m_index);
+            if (m_loadsall) m_external->array_read(tmp);
+            else m_external->arrayset_read(tmp, m_index);
             return tmp.cast<T,N>();
           }
           else return Torch::io::cast<T,N>(*m_inlined);
@@ -189,10 +189,10 @@ namespace Torch {
          */
         template <typename T, int N> blitz::Array<T,N> get() const {
           if (!m_inlined) {
-            const typeinfo& info = m_external->type(m_loadsall);
+            const typeinfo& info = external_type();
             carray tmp(info);
-            if (m_loadsall) m_external->read(tmp);
-            else m_external->read(tmp, m_index);
+            if (m_loadsall) m_external->array_read(tmp);
+            else m_external->arrayset_read(tmp, m_index);
             return tmp.get<T,N>();
           }
           else return Torch::io::wrap<T,N>(*m_inlined);
@@ -224,6 +224,12 @@ namespace Torch {
           void set(boost::shared_ptr<blitz::Array<T,N> >& bzarray) {
             //no data copying...
             set(boost::make_shared<carray>(bzarray));
+        }
+
+      private: //useful methods
+
+        inline const io::typeinfo& external_type() const {
+          return m_loadsall? m_external->array_type() : m_external->arrayset_type();
         }
 
       private: //representation

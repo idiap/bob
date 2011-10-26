@@ -34,15 +34,22 @@ namespace Torch { namespace io {
       virtual const std::string& filename() const =0;
 
       /**
-       * The typeinfo of data within this file
+       * The typeinfo of data within this file, if it is supposed to be read as
+       * a single array.
        */
-      virtual const typeinfo& type(bool all=false) const =0;
+      virtual const typeinfo& array_type() const =0;
+
+      /**
+       * The typeinfo of data within this file, if it is supposed to be read as
+       * as an array set.
+       */
+      virtual const typeinfo& arrayset_type() const =0;
 
       /**
        * The number of arrays available in this file, if it is supposed to be
-       * read as a multi-array file.
+       * read as an array set.
        */
-      virtual size_t length() const =0;
+      virtual size_t arrayset_size() const =0;
 
       /**
        * Returns the name of the codec, for compatibility reasons.
@@ -57,7 +64,7 @@ namespace Torch { namespace io {
        * reseting the input array and putting the data read from the file
        * inside.
        */
-      virtual void read(buffer& buffer) =0;
+      virtual void array_read(buffer& buffer) =0;
 
       /**
        * Loads the data of the array into memory. If an index is specified
@@ -69,7 +76,7 @@ namespace Torch { namespace io {
        * reseting the input array and putting the data read from the file
        * inside.
        */
-      virtual void read(buffer& buffer, size_t index) =0;
+      virtual void arrayset_read(buffer& buffer, size_t index) =0;
 
       /**
        * Appends the given buffer into a file. If the file does not exist,
@@ -78,14 +85,14 @@ namespace Torch { namespace io {
        *
        * Returns the current position of the newly written array.
        */
-      virtual size_t append (const buffer& buffer) =0;
+      virtual size_t arrayset_append (const buffer& buffer) =0;
 
       /**
        * Writes the data from the given buffer into the file and act like it is
        * the only piece of data that will ever be written to such a file. Not
        * more data appending may happen after a call to this method.
        */
-      virtual void write (const buffer& buffer) =0;
+      virtual void array_write (const buffer& buffer) =0;
 
   };
 

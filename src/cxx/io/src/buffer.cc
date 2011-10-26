@@ -43,6 +43,8 @@ bool io::typeinfo::is_valid() {
 
 void io::typeinfo::update_strides() {
   switch (nd) {
+    case 0:
+      return;
     case 1:
       stride[0] = 1;
       return;

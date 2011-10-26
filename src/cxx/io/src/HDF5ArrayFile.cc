@@ -31,25 +31,29 @@ class HDF5ArrayFile: public io::File {
     HDF5ArrayFile (const std::string& filename, io::HDF5File::mode_t mode):
       m_file(filename, mode), 
       m_filename(filename),
-      m_length(0),
-      m_newfile(true),
-      m_codecname("torch.hdf5") { 
+      m_size_arrayset(0),
+      m_newfile(true) { 
 
         //tries to update the current descriptors
         std::vector<std::string> paths;
         m_file.paths(paths);
         
         if (paths.size()) { //file contains data, read it and establish defaults
-          m_path = paths[0]; ///< selects a default path from now on...
+          m_path = paths[0]; ///< locks on a path name from now on...
           m_newfile = false; ///< blocks re-initialization
-          const io::HDF5Descriptor& desc_single = m_file.describe(m_path)[0];
-          desc_single.type.copy_to(m_type_single);
-          m_length = desc_single.size;
-          m_file.describe(m_path)[1].type.copy_to(m_type_all);
+
+          //arrayset reading
+          const io::HDF5Descriptor& desc_arrayset = m_file.describe(m_path)[0];
+          desc_arrayset.type.copy_to(m_type_arrayset);
+          m_size_arrayset = desc_arrayset.size;
+
+          //array reading
+          m_file.describe(m_path)[1].type.copy_to(m_type_array);
 
           //if m_type_all has extent == 1 on the first dimension, collapse that
-          if (m_type_all.shape[0] == 1) m_type_all = m_type_single;
+          if (m_type_array.shape[0] == 1) m_type_array = m_type_arrayset;
         }
+
         else {
           //default path in case the file is new or has been truncated
           m_path = "/array";
@@ -63,72 +67,76 @@ class HDF5ArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& type (bool all=false) const {
-      return (all)? m_type_all: m_type_single;
+    virtual const io::typeinfo& array_type () const {
+      return m_type_array;
     }
 
-    virtual size_t length() const {
-      return m_length;
+    virtual const io::typeinfo& arrayset_type () const {
+      return m_type_arrayset;
+    }
+
+    virtual size_t arrayset_size() const {
+      return m_size_arrayset;
     }
 
     virtual const std::string& name() const {
-      return m_codecname;
+      return s_codecname;
     }
 
-    virtual void read(io::buffer& buffer) {
+    virtual void array_read(io::buffer& buffer) {
 
       if(m_newfile) 
         throw std::runtime_error("uninitialized HDF5 file cannot be read");
 
-      if(!buffer.type().is_compatible(m_type_all)) buffer.set(m_type_all);
+      if(!buffer.type().is_compatible(m_type_array)) buffer.set(m_type_array);
 
       m_file.read_buffer(m_path, 0, buffer);
     }
 
-    virtual void read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(io::buffer& buffer, size_t index) {
 
       if(m_newfile) 
         throw std::runtime_error("uninitialized HDF5 file cannot be read");
 
-      if(!buffer.type().is_compatible(m_type_single)) buffer.set(m_type_single);
+      if(!buffer.type().is_compatible(m_type_arrayset)) buffer.set(m_type_arrayset);
 
       m_file.read_buffer(m_path, index, buffer);
     }
 
-    virtual size_t append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const io::buffer& buffer) {
 
       if (m_newfile) {
         //creates non-compressible, extensible dataset on HDF5 file
         m_newfile = false;
         m_file.create(m_path, buffer.type(), true, 0);
-        m_file.describe(m_path)[0].type.copy_to(m_type_single);
-        m_file.describe(m_path)[1].type.copy_to(m_type_all);
+        m_file.describe(m_path)[0].type.copy_to(m_type_arrayset);
+        m_file.describe(m_path)[1].type.copy_to(m_type_array);
 
         //if m_type_all has extent == 1 on the first dimension, collapse that
-        if (m_type_all.shape[0] == 1) m_type_all = m_type_single;
+        if (m_type_array.shape[0] == 1) m_type_array = m_type_arrayset;
       }
 
       m_file.extend_buffer(m_path, buffer);
-      ++m_length;
+      ++m_size_arrayset;
       //needs to flush the data to the file
-      return m_length - 1; ///< index of this object in the file
+      return m_size_arrayset - 1; ///< index of this object in the file
 
     }
 
-    virtual void write (const io::buffer& buffer) {
+    virtual void array_write (const io::buffer& buffer) {
 
       if (!m_newfile) {
-        throw std::runtime_error("cannot perform definitive write on file that has already been touched");
+        throw std::runtime_error("cannot perform single (array-style) write on file/dataset that have already been initialized -- try to use a new file");
       }
 
       m_newfile = false;
       m_file.create(m_path, buffer.type(), false, 0);
 
-      m_file.describe(m_path)[0].type.copy_to(m_type_single);
-      m_file.describe(m_path)[1].type.copy_to(m_type_all);
+      m_file.describe(m_path)[0].type.copy_to(m_type_arrayset);
+      m_file.describe(m_path)[1].type.copy_to(m_type_array);
 
       //if m_type_all has extent == 1 on the first dimension, collapse that
-      if (m_type_all.shape[0] == 1) m_type_all = m_type_single;
+      if (m_type_array.shape[0] == 1) m_type_array = m_type_arrayset;
 
       //otherwise, all must be in place...
       m_file.write_buffer(m_path, 0, buffer);
@@ -138,14 +146,17 @@ class HDF5ArrayFile: public io::File {
     
     io::HDF5File m_file;
     std::string  m_filename;
-    io::typeinfo m_type_single; ///< type for reading data by sub-arrays
-    io::typeinfo m_type_all; ///< type for reading all data at once
-    size_t       m_length;
+    io::typeinfo m_type_array;    ///< type for reading all data at once
+    io::typeinfo m_type_arrayset; ///< type for reading data by sub-arrays
+    size_t       m_size_arrayset; ///< number of arrays in arrayset mode
     std::string  m_path; ///< default path to use
     bool         m_newfile; ///< path check optimization
-    std::string  m_codecname;
+
+    static std::string  s_codecname;
 
 };
+
+std::string HDF5ArrayFile::s_codecname = "torch.hdf5";
 
 /**
  * From this point onwards we have the registration procedure. If you are

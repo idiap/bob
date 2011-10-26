@@ -161,7 +161,7 @@ namespace Torch { namespace io {
        * for tracking external data allocation. The exception can be avoided
        * and the referencing mechanism forced if you set the flag "temporary"
        * to "true". In this mode, this method will always suceed, but the
-       * object returned may have its lifetime associated to this buffer. In
+       * object returned will have its lifetime associated to this buffer. In
        * other words, you should make sure this buffer outlives the returned
        * blitz::Array<T,N>.
        */

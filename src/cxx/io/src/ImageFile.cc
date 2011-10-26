@@ -204,8 +204,7 @@ class ImageFile: public io::File {
 
     ImageFile(const std::string& path, char mode):
       m_filename(path),
-      m_newfile(true),
-      m_codecname("torch.image") {
+      m_newfile(true) {
 
         if (mode == 'r' || (mode == 'a' && fs::exists(path))) { //try peeking
           try {
@@ -232,28 +231,35 @@ class ImageFile: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& type(bool) const {
+    virtual const io::typeinfo& array_type() const {
       return m_type;
     }
 
-    virtual size_t length() const {
+    virtual const io::typeinfo& arrayset_type() const {
+      return m_type;
+    }
+
+    virtual size_t arrayset_size() const {
       return m_length;
     }
 
     virtual const std::string& name() const {
-      return m_codecname;
+      return s_codecname;
     }
 
-    virtual void read(io::buffer& buffer) {
-      read(buffer, 0); ///we only have 1 image in an image file anyways
+    virtual void array_read(io::buffer& buffer) {
+      arrayset_read(buffer, 0); ///we only have 1 image in an image file anyways
     }
 
-    virtual void read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(io::buffer& buffer, size_t index) {
 
-      if(m_newfile) 
+      if (m_newfile) 
         throw std::runtime_error("uninitialized image file cannot be read");
 
-      if(!buffer.type().is_compatible(m_type)) buffer.set(m_type);
+      if (!buffer.type().is_compatible(m_type)) buffer.set(m_type);
+
+      if (index != 0)
+        throw std::runtime_error("cannot read image with index > 0 -- there is only one image in an image file");
 
       try {
         Magick::Image image(m_filename);
@@ -266,7 +272,7 @@ class ImageFile: public io::File {
 
     }
 
-    virtual size_t append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const io::buffer& buffer) {
 
       if (m_newfile) {
         im_save(m_filename, buffer);
@@ -280,11 +286,11 @@ class ImageFile: public io::File {
 
     }
 
-    virtual void write (const io::buffer& buffer) {
+    virtual void array_write (const io::buffer& buffer) {
 
       //overwriting position 0 should always work
       if (m_newfile) {
-        append(buffer);
+        arrayset_append(buffer);
         return;
       }
 
@@ -296,9 +302,12 @@ class ImageFile: public io::File {
     bool m_newfile;
     io::typeinfo m_type;
     size_t m_length;
-    std::string m_codecname;
+
+    static std::string s_codecname;
 
 };
+
+std::string ImageFile::s_codecname = "torch.image";
 
 /**
  * From this point onwards we have the registration procedure. If you are

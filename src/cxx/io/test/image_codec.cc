@@ -15,7 +15,6 @@
 #include <blitz/array.h>
 #include "core/logging.h"
 #include "io/Array.h"
-#include "io/ImageArrayCodec.h"
 
 struct T {
   blitz::Array<uint8_t,2> a;

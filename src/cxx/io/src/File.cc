@@ -5,4 +5,6 @@
 
 #include "io/File.h"
 
-Torch::io::File::~File() { }
+namespace io = Torch::io;
+
+io::File::~File() { }

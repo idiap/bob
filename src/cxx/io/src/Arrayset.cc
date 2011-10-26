@@ -17,19 +17,19 @@ io::Arrayset::Arrayset ()
 
 io::Arrayset::Arrayset (boost::shared_ptr<File> file, size_t begin, size_t end)
 {
-  if (begin >= file->length()) return;
-  if (end > file->length()) end = file->length();
+  if (begin >= file->arrayset_size()) return;
+  if (end > file->arrayset_size()) end = file->arrayset_size();
   if (begin >= end) return;
   m_data.reserve(end-begin);
   for (size_t i=begin; i<end; ++i) m_data.push_back(io::Array(file, i));
-  m_info = file->type();
+  m_info = file->arrayset_type();
 }
 
 io::Arrayset::Arrayset(const std::string& path) {
   boost::shared_ptr<io::File> file = io::open(path, "", 'a');
-  m_data.reserve(file->length());
-  for (size_t i=0; i<file->length(); ++i) m_data.push_back(io::Array(file, i));
-  m_info = file->type();
+  m_data.reserve(file->arrayset_size());
+  for (size_t i=0; i<file->arrayset_size(); ++i) m_data.push_back(io::Array(file, i));
+  m_info = file->arrayset_type();
 }
 
 io::Arrayset::Arrayset(const io::Arrayset& other):
@@ -82,7 +82,7 @@ void io::Arrayset::remove (const size_t id) {
 void io::Arrayset::save(const std::string& path) {
   boost::shared_ptr<io::File> file = io::open(path, "", 'w');
   for (size_t i=0; i<m_data.size(); ++i) {
-    file->append(*m_data[i].get());
+    file->arrayset_append(*m_data[i].get());
   }
 }
 

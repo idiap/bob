@@ -14,7 +14,6 @@
 #include <blitz/array.h>
 #include "core/logging.h"
 #include "io/Array.h"
-#include "io/TensorArrayCodec.h"
 
 struct T {
   blitz::Array<int8_t,2> a, b;
@@ -98,7 +97,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d )
 
   // Save to .tensor
   std::string filename = temp_file(".tensor");
-  db_a.save( filename, "torch.array.tensor" );
+  db_a.save(filename);
 
   // Readd .tensor
   Torch::io::Array db_a_read(filename);
@@ -110,10 +109,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )
   // Get path to the XML Schema definition
   char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
-      "is not set. " << "Have you setup your working environment " <<
-      "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw std::runtime_error("Environment variable $TORCH_TESTDATA_DIR is not set. Have you setup your working environment correctly?");
   }
   boost::filesystem::path testdata_path( testdata_cpath);
   testdata_path /= "tensor_char.tensor";

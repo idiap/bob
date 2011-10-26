@@ -62,35 +62,6 @@ namespace Torch { namespace io { namespace detail {
   void write_array(boost::shared_ptr<mat_t> file, 
       const std::string& varname, const Torch::io::buffer& buf);
  
-  /**
-   * Reads all variables on the (already opened) mat_t file.
-   */
-  /**
-  template <typename T, int D> InlinedArraysetImpl read_arrayset
-    (boost::shared_ptr<mat_t> file) {
-      InlinedArraysetImpl retval;
-      boost::shared_ptr<matvar_t> matvar;
-      while ((matvar = make_matvar(file))) {
-        retval.add(assign_array<T,D>(matvar));
-      }
-      return retval;
-    }
-    **/
-
-  /**
-   * Writes all arrays in the given arrayset
-   */
-  /**
-  template <typename T, int D> void write_arrayset
-    (boost::shared_ptr<mat_t> file, boost::format& fmt_varname,
-     const InlinedArraysetImpl& data) {
-      for (size_t i=0; i<data.size(); ++i) {
-        fmt_varname % (i);
-        write_array<T,D>(file, fmt_varname.str(), data[i].get());
-      }
-  }
-  **/
-
 }}}
 
 #endif /* TORCH_IO_MATUTILS_H */

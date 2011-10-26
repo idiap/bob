@@ -32,28 +32,27 @@ set(src
 
     "src/ImageFile.cc"
 
-    "src/BinFileHeader.cc"
-    "src/BinFile.cc"
-    #"src/BinaryArrayCodec.cc"
-    
     "src/VideoReader.cc"
     "src/VideoException.cc"
     "src/VideoWriter.cc"
-    #"src/VideoArrayCodec.cc"
+    "src/VideoFile.cc"
 
+    "src/BinFileHeader.cc"
+    "src/BinFile.cc"
+    "src/BinaryArrayFile.cc"
+    
     "src/TensorFileHeader.cc"
     "src/TensorFile.cc"
-    #"src/TensorArrayCodec.cc"
+    "src/TensorArrayFile.cc"
 
-    #"src/T3BinaryArrayCodec.cc"
-    
+    "src/T3File.cc"
     )
 
 # If we have matio installed, enable the compilation of relevant modules
 if(MATIO_FOUND)
   set(shared "${shared};${matio_LIBRARY}")
   set(src "${src};src/MatUtils.cc")
-  #set(src "${src};src/MatArrayCodec.cc")
+  set(src "${src};src/MatFile.cc")
 endif(MATIO_FOUND)
 
 include(../../cmake/macros.cmake)
@@ -66,8 +65,8 @@ torch_test(io array test/array.cc)
 torch_test(io arrayset test/arrayset.cc)
 torch_test(io hdf5 test/hdf5.cc)
 torch_test(io image_codec test/image_codec.cc)
-#torch_test(io tensor_codec test/tensor_codec.cc)
+torch_test(io tensor_codec test/tensor_codec.cc)
 
 # Defines environment variable used to localize data for the tests
-#set_property(TEST cxx-io-tensor_codec APPEND PROPERTY ENVIRONMENT
-#  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+set_property(TEST cxx-io-tensor_codec APPEND PROPERTY ENVIRONMENT
+  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")

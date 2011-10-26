@@ -45,7 +45,7 @@ io::Array::Array(const Array& other):
 }
 
 io::Array::Array(const std::string& path):
-  m_external(io::open(path, "", 'a')),
+  m_external(io::open(path, "", 'r')),
   m_index(0),
   m_loadsall(true)
 {
@@ -85,9 +85,9 @@ void io::Array::set(boost::shared_ptr<buffer> data) {
 
 boost::shared_ptr<io::buffer> io::Array::get() const {
   if (!m_inlined) {
-    boost::shared_ptr<io::buffer> tmp(new carray(m_external->type(m_loadsall)));
-    if (m_loadsall) m_external->read(*tmp);
-    else m_external->read(*tmp, m_index);
+    boost::shared_ptr<io::buffer> tmp(new carray(external_type()));
+    if (m_loadsall) m_external->array_read(*tmp);
+    else m_external->arrayset_read(*tmp, m_index);
     return tmp;
   }
   return m_inlined;
@@ -95,30 +95,30 @@ boost::shared_ptr<io::buffer> io::Array::get() const {
 
 void io::Array::load() {
   if (!m_inlined) {
-    m_inlined.reset(new carray(m_external->type(m_loadsall)));
-    if (m_loadsall) m_external->read(*m_inlined);
-    else m_external->read(*m_inlined, m_index);
+    m_inlined.reset(new carray(external_type()));
+    if (m_loadsall) m_external->array_read(*m_inlined);
+    else m_external->arrayset_read(*m_inlined, m_index);
     m_external.reset();
   }
 }
 
 void io::Array::append(boost::shared_ptr<File> file) {
   if (m_external) {
-    io::carray tmp(m_external->type(m_loadsall));
-    m_external->read(tmp, m_index);
-    file->append(tmp);
+    io::carray tmp(external_type());
+    m_external->arrayset_read(tmp, m_index);
+    file->arrayset_append(tmp);
   }
   else {
-    file->append(*m_inlined);
+    file->arrayset_append(*m_inlined);
   }
 }
         
 void io::Array::save(const std::string& path) {
   if (m_external) load();
   boost::shared_ptr<File> f = io::open(path, "", 'w');
-  f->write(*m_inlined);
+  f->array_write(*m_inlined);
   f.reset(); //flush data on file
-  m_external = io::open(path, "", 'a');
+  m_external = io::open(path, "", 'r');
   m_index = 0;
   m_loadsall = true;
   m_inlined.reset();
