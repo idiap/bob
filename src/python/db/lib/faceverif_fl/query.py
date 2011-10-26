@@ -58,7 +58,7 @@ class Database(object):
     if os.path.isfile(filename): 
       try: 
         for line in fileinput.input(filename):
-          model_id = re.findall('[\w/]+', line)[1]
+          model_id = re.findall('[\w/-]+', line)[1]
           if not model_id in ids_list:
             ids_list.append(model_id)  
         fileinput.close()
@@ -79,7 +79,7 @@ class Database(object):
     if os.path.isfile(filename): 
       try: 
         for line in fileinput.input(filename):
-          parsed_list = re.findall('[\w/]+', line)
+          parsed_list = re.findall('[\w/-]+', line)
           sfile = parsed_list[0]
           model_id = parsed_list[1]
           if len(parsed_list)>2: real_id = parsed_list[2] 
@@ -99,7 +99,7 @@ class Database(object):
     if os.path.isfile(filename): 
       try: 
         for line in fileinput.input(filename):
-          parsed_list = re.findall('[\w/]+', line)
+          parsed_list = re.findall('[\w/-]+', line)
           sfile = parsed_list[0]
           model_id = parsed_list[1]
           if len(parsed_list)>2: claimed_id = parsed_list[2] 
@@ -123,7 +123,7 @@ class Database(object):
     if os.path.isfile(filename): 
       try: 
         for line in fileinput.input(filename):
-          parsed_list = re.findall('[\w/]+', line)
+          parsed_list = re.findall('[\w/-]+', line)
           sfile = parsed_list[0]
           real_id = parsed_list[1]
           if (not real_ids) or real_id in real_ids:
@@ -140,7 +140,7 @@ class Database(object):
     if os.path.isfile(filename): 
       try: 
         for line in fileinput.input(filename):
-          parsed_list = re.findall('[\w/]+', line)
+          parsed_list = re.findall('[\w/-]+', line)
           sfile = parsed_list[0]
           model_id = parsed_list[1]
           if len(parsed_list)>2: real_id = parsed_list[2] 
