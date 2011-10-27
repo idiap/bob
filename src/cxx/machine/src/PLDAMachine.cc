@@ -396,7 +396,9 @@ mach::PLDAMachine::PLDAMachine(const mach::PLDAMachine& other):
   tca::ccopy(other.m_gamma, m_gamma);
 }
 
-mach::PLDAMachine::PLDAMachine(Torch::io::HDF5File& config) {
+mach::PLDAMachine::PLDAMachine(Torch::io::HDF5File& config):
+  m_plda_base(boost::shared_ptr<Torch::machine::PLDABaseMachine>())
+{
   load(config);
 }
 
@@ -468,7 +470,7 @@ void mach::PLDAMachine::save(Torch::io::HDF5File& config) const {
 void mach::PLDAMachine::resize(const size_t d, const size_t nf, 
   const size_t ng)
 {
-  m_weighted_sum.resize(nf);
+  m_weighted_sum.resizeAndPreserve(nf);
   m_gamma.clear();
   m_loglike_constterm.clear();
   m_cache_d_1.resize(d);
@@ -479,6 +481,11 @@ void mach::PLDAMachine::resize(const size_t d, const size_t nf,
 
 void mach::PLDAMachine::setPLDABase(const boost::shared_ptr<Torch::machine::PLDABaseMachine> plda_base) {
   m_plda_base = plda_base; 
+  m_weighted_sum.resizeAndPreserve(getDimF());
+  m_cache_d_1.resize(getDimD());
+  m_cache_d_2.resize(getDimD());
+  m_cache_nf_1.resize(getDimF());
+  m_cache_nf_2.resize(getDimF());
 //  resize(getDimD(), getDimF(), getDimG());
 }
 
