@@ -320,7 +320,7 @@ void mach::PLDABaseMachine::precomputeLogDetAlpha()
 
 void mach::PLDABaseMachine::precomputeLogDetSigma()
 {
-  m_logdet_sigma = log(blitz::product(m_sigma));
+  m_logdet_sigma = blitz::sum(blitz::log(m_sigma));
 }
 
 double mach::PLDABaseMachine::computeLogLikeConstTerm(const size_t a,
