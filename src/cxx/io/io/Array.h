@@ -78,11 +78,6 @@ namespace Torch {
         Array& operator= (const Array& other);
 
         /**
-         * Appends this array contents to an already opened file.
-         */
-        void append(boost::shared_ptr<File> file);
-
-        /**
          * If the array is in-memory nothing happens. If the array is in a
          * file, the file data is read and I become an inlined array. The
          * underlying file containing the data is <b>not</b> erased, we just

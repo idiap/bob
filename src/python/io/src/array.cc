@@ -7,13 +7,10 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/format.hpp>
-#include <boost/preprocessor.hpp>
 
 #include "io/Array.h"
-#include "core/array_type.h"
 
-#include "core/python/pycore.h"
+#include "io/python/pyio.h"
 
 using namespace boost::python;
 namespace io = Torch::io;
@@ -21,62 +18,23 @@ namespace core = Torch::core;
 namespace array = Torch::core::array;
 namespace tp = Torch::python;
 
-typedef class_<io::Array, boost::shared_ptr<io::Array>, boost::shared_ptr<const io::Array> > PyClass;
-
-template <typename T, int D>
-static boost::shared_ptr<io::Array> make_array(const blitz::Array<T,D>& bz) {
-  return boost::make_shared<io::Array>(bz.copy());
+/**
+ * Creates a new io::Array from a NumPy ndarray
+ */
+static boost::shared_ptr<io::Array> array_from_ndarray(numeric::array a) {
+  return boost::make_shared<io::Array>(boost::make_shared<tp::npyarray>(a));
 }
 
 /**
- * Builds a thin wrapper over the internal data of the Array.
+ * Wraps a buffer with a NumPy array skin
  */
-static numeric::array get(io::Array& a) {
-  io::detail::InlinedArrayImpl ia = a.get();
-  if (a.isLoaded()) { //returns a pointer to the data
-    
-  }
-  else { //returns a copy of the data
-
-  }
+static object get_array(io::Array& a) {
+  return tp::buffer_object(a.get());
 }
 
-template<typename T, int D> static void loop(PyClass& obj) {
-
-  static const char* MAKE_ARRAY_DOC = "Creates a new io.Array from the given numpy ndarray. Note that data is copied internally using this constructor.";
-  static const char* ARRAY_GET_DOC = "Adapts the size of each dimension of the passed blitz array to the ones of the underlying array and *refers* to the data in it. WARNING: Updating the content of the blitz array will update the content of the corresponding array in the dataset. Use this method with care!";
-
-  boost::format f("__%s_%s_%d__");
-
-  obj.def("__init__", make_constructor(&make_array<T,D>, default_call_policies(), arg("array")), MAKE_ARRAY_DOC); \
-  obj.def((f % "get" % array::stringize<T>() % D).str().c_str(), (const blitz::Array<T,D> (io::Array::*)(void) const)&io::Array::get<T,D>, (arg("self")), ARRAY_GET_DOC);
-
-  implicitly_convertible<blitz::Array<T,D>, io::Array>();
+static void set_array(io::Array& a, numeric::array npy) {
+  a.set(boost::make_shared<tp::npyarray>(npy));
 }
-
-static const char* get_filename(const io::Array& a) {
-  return a.getFilename().c_str();
-}
-
-tuple get_shape(const io::Array& as) {
-  size_t ndim = as.getNDim();
-  const size_t* shape = as.getShape();
-  switch (ndim) {
-    case 1:
-      return make_tuple(shape[0]);
-    case 2:
-      return make_tuple(shape[0], shape[1]);
-    case 3:
-      return make_tuple(shape[0], shape[1], shape[2]);
-    case 4:
-      return make_tuple(shape[0], shape[1], shape[2], shape[3]);
-    default:
-      break;
-  }
-  return make_tuple();
-}
-
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(array_save_overloads, save, 1, 2) 
 
 void bind_io_array() {
 
@@ -100,34 +58,18 @@ void bind_io_array() {
     ;
 
   //base class declaration
-  PyClass array("Array", "Dataset Arrays represent pointers to concrete data serialized on a io. You can load or refer to real numpy.ndarray using this type.", init<const std::string&, optional<const std::string&> >((arg("filename"),arg("codecname")=""), "Initializes a new array from an external file. An optional codec may be passed."));
-
-  //attach generic methods
-  array.def("save", &io::Array::save, array_save_overloads((arg("filename"), arg("codecname")=""), "Saves, renames or re-writes the array into a file. It will save if the array is loaded in memory. It will move if the codec used does not change by the filename does. It will re-write if the codec changes."));
-  array.def("load", &io::Array::load);
-  array.add_property("loaded", &io::Array::isLoaded);
-  array.add_property("filename", &get_filename, "Accesses the filename containing the data for this array, if it was stored on a separate file. This string is empty otherwise.");
-  array.add_property("codec", &io::Array::getCodec, "Accesses the codec that decodes and encodes this Array from/to files.");
-  array.add_property("shape", &get_shape, "Accesses the shape of this array");
-  array.add_property("elementType", &io::Array::getElementType, "Accesses the element type of this array");
-
-  //loop for all supported dimensions using the boost preprocessor
-# define BOOST_PP_LOCAL_LIMITS (1, TORCH_MAX_DIM)
-# define BOOST_PP_LOCAL_MACRO(D) \
-  loop<bool,D>(array); \
-  loop<int8_t,D>(array); \
-  loop<int16_t,D>(array); \
-  loop<int32_t,D>(array); \
-  loop<int64_t,D>(array); \
-  loop<uint8_t,D>(array); \
-  loop<uint16_t,D>(array); \
-  loop<uint32_t,D>(array); \
-  loop<uint64_t,D>(array); \
-  loop<float,D>(array); \
-  loop<double,D>(array); \
-  loop<long double,D>(array); \
-  loop<std::complex<float>,D>(array); \
-  loop<std::complex<double>,D>(array); \
-  loop<std::complex<long double>,D>(array);
-# include BOOST_PP_LOCAL_ITERATE()
+  class_<io::Array, boost::shared_ptr<io::Array> >("Array", "Arrays represent pointers to concrete data serialized on a file. You can load or refer to real numpy.ndarrays using this type.", init<const std::string&>((arg("filename")), "Initializes a new array from an external file"))
+    .def(init<boost::shared_ptr<io::File> >((arg("file")), "Builds a new Array from a file opened with io::open. Reads all file contents."))
+    .def(init<boost::shared_ptr<io::File>, size_t>((arg("file"), arg("index")), "Builds a new Array from a specific array in a file opened with io::open"))
+    .def("__init__", make_constructor(array_from_ndarray, default_call_policies(), (arg("array"))), "Builds a new Array from a NumPy Array")
+    .def("get", &get_array, (arg("self")), "Retrieves a representation of myself, as an numpy ndarray in the most efficient way possible.")
+    .def("set", &set_array, (arg("self"), arg("array")), "Sets this array with an numpy ndarray")
+    .add_property("type", make_function(&io::Array::type, return_value_policy<copy_const_reference>()), "Typing information for this array")
+    .def("load", &io::Array::load, "Loads this array into memory, if that is not already the case")
+    .add_property("index", &io::Array::getIndex, &io::Array::setIndex)
+    .add_property("loadsAll", &io::Array::loadsAll)
+    .add_property("filename", make_function(&io::Array::getFilename, return_value_policy<copy_const_reference>()), "Filename -- empty if loaded in memory")
+    .add_property("codec", &io::Array::getCodec, "File object being read, if any")
+    .def("save", &io::Array::save, (arg("self"), arg("filename")), "Save the array contents to a file, truncating it before")
+    ;
 }

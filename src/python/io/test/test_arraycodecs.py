@@ -3,7 +3,7 @@
 # Andre Anjos <andre.dos.anjos@gmail.com>
 # Sat 19 Feb 06:58:47 2011 
 
-"""A combined test for all built-in ArrayCodecs in python.
+"""A combined test for all built-in types of Array/File interaction in python.
 """
 
 import os, sys
@@ -13,7 +13,9 @@ import torch
 import numpy
 import random
 
-# This test implements a generalized framework for testing Torch codecs. It
+DEFAULT_EXTENSION = '.hdf5' # define here the codec you trust
+
+# This test implements a generalized framework for testing codecs. It
 # loads files in the codec native format, convert into torch native binary
 # format and back, comparing the outcomes at every stage. We believe in the
 # quality of the binary codec because that is covered in other tests.
@@ -24,14 +26,14 @@ def tempname(suffix, prefix='torchtest_'):
   os.unlink(name)
   return name
 
-def testcase_transcode(self, codecname, filename):
+def testcase_transcode(self, filename, test_extension):
   """Runs a complete transcoding test, to and from the binary format."""
 
-  testcodec = torch.io.ArrayCodecRegistry.getCodecByName(codecname)
-  bincodec = torch.io.ArrayCodecRegistry.getCodecByName("hdf5.array.binary")
-
   # transcode to binary
-  tmpname = tempname('.hdf5')
+  in_file = torch.io.open(filename, 'r')
+  tmpname = tempname(test_extension)
+  out_file = torch.io.open(tmpname, 'w')
+
   bincodec.save(tmpname, testcodec.load(filename))
   self.assertTrue( numpy.array_equal(bincodec.load(tmpname).get(),
     testcodec.load(filename).get()) )

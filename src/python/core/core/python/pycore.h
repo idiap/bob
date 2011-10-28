@@ -91,6 +91,14 @@ namespace Torch { namespace python {
   void assert_ndarray_writeable(PyArrayObject* arr);
   void assert_ndarray_behaved(PyArrayObject* arr);
 
+  /**
+   * Use this method to wrap non-const references to blitz::Array<>'s that will
+   * **not** be re-allocated during usage - only element values will be
+   * changed. By using this API you can convert any numpy array to a specific
+   * blitz::Array<> and we will do our best to convey the information. If the
+   * type cannot be converted w/o a cast, we will succeed. Otherwise a
+   * TypeError will be raised on your script.
+   */
   template <typename T, int N>
   blitz::Array<T,N> numpy_bz(boost::python::numeric::array& bp_arr) {
 

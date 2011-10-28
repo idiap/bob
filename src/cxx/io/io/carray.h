@@ -89,6 +89,8 @@ namespace Torch { namespace io {
       virtual void* ptr() { return m_ptr; }
       virtual const void* ptr() const { return m_ptr; }
 
+      virtual boost::shared_ptr<void> owner() { return m_data; }
+      virtual boost::shared_ptr<const void> owner() const { return m_data; }
 
       /******************************************************************
        * Blitz Array specific manipulations

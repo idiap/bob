@@ -60,6 +60,20 @@ namespace Torch { namespace io {
     }
 
     /**
+     * Set to specific values, including strides
+     */
+    template <typename T>
+    void set(Torch::core::array::ElementType dtype_, T nd_, const T* shape_,
+        const T* stride_) {
+      dtype = dtype_;
+      nd = nd_;
+      for (size_t k=0; k<nd; ++k) {
+        shape[k] = shape_[k];
+        stride[k] = stride_[k];
+      }
+    }
+
+    /**
      * Reset to defaults -- as if uninitialized.
      */
     void reset();
@@ -167,6 +181,12 @@ namespace Torch { namespace io {
      */
     virtual void* ptr() =0;
     virtual const void* ptr() const =0;
+
+    /**
+     * Returns a representation of the internal cache using shared pointers.
+     */
+    virtual boost::shared_ptr<void> owner() =0;
+    virtual boost::shared_ptr<const void> owner() const =0;
 
   };
 

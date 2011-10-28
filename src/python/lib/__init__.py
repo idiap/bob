@@ -11,12 +11,14 @@ sys.setdlopenflags(default_flags|ctypes.RTLD_GLOBAL)
 import core
 import math
 import io
+"""
 import measure
 import sp
 import ip
 import db
 import machine
 import trainer
+"""
 
 try:
   # the visioner may not be built if Qt4 is not installed
@@ -32,12 +34,14 @@ __all__ = [
     'core', 
     'math',
     'io',
+    """
     'measure',
     'sp',
     'ip',
     'db',
     'machine',
     'trainer'
+    """
     ]
 
 if has_visioner: __all__.append('visioner')

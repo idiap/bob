@@ -102,17 +102,6 @@ void io::Array::load() {
   }
 }
 
-void io::Array::append(boost::shared_ptr<File> file) {
-  if (m_external) {
-    io::carray tmp(external_type());
-    m_external->arrayset_read(tmp, m_index);
-    file->arrayset_append(tmp);
-  }
-  else {
-    file->arrayset_append(*m_inlined);
-  }
-}
-        
 void io::Array::save(const std::string& path) {
   if (m_external) load();
   boost::shared_ptr<File> f = io::open(path, "", 'w');
