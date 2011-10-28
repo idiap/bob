@@ -43,6 +43,12 @@ namespace Torch { namespace python {
    */
   boost::python::object npyarray_object (npyarray& b);
 
+  /**
+   * Try to convert a random type object into a numeric::array. This method is
+   * a wrapper around PyArray_FromAny().
+   */
+  boost::python::object array_from_any (boost::python::object& o);
+
 
 }}
 

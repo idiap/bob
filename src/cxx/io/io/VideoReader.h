@@ -113,7 +113,7 @@ namespace Torch { namespace io {
       /**
        * Returns the typing information for this video
        */
-      inline const io::typeinfo& type() const { return m_typeinfo; }
+      inline const typeinfo& type() const { return m_typeinfo; }
 
       /**
        * Loads all of the video stream in a blitz array organized in this way:
@@ -123,10 +123,10 @@ namespace Torch { namespace io {
       void load(blitz::Array<uint8_t,4>& data) const;
 
       /**
-       * Loads all of the video stream in a io::buffer. Resizes the buffer if
+       * Loads all of the video stream in a buffer. Resizes the buffer if
        * the space and type are not good.
        */
-      void load(io::buffer& b) const;
+      void load(buffer& b) const;
 
     private: //methods
 
@@ -200,6 +200,22 @@ namespace Torch { namespace io {
            */
           bool operator!= (const const_iterator& other);
           
+          /**
+           * Reads the currently pointed frame and advances one position.
+           * Please note that when you call this method in a loop, you don't
+           * need to increment the iterator as it auto-increments itself. The
+           * 'data' format is (color-bands, height, width). If the size does
+           * not match the movie specifications, the array data will be
+           * resized.
+           *
+           * Once the end position is reached, the ffmpeg infrastructure is
+           * automatically destroyed. Rewinding the iterator will cause a
+           * re-load of that infrastructure. If we have reached the end
+           * position, an exception is raised if you try to read() the
+           * iterator.
+           */
+          void read (buffer& b);
+
           /**
            * Reads the currently pointed frame and advances one position.
            * Please note that when you call this method in a loop, you don't
@@ -296,7 +312,7 @@ namespace Torch { namespace io {
       std::string m_codecname; ///< the name of the ffmpeg codec to be used
       std::string m_codecname_long; ///< long version of m_codecname
       std::string m_formatted_info; ///< printable information about the video
-      io::typeinfo m_typeinfo; ///< the io subsystem type information
+      typeinfo m_typeinfo; ///< the io subsystem type information
   };
 
 }}

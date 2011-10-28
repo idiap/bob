@@ -156,7 +156,7 @@ template <> int tp::type_to_num<std::complex<long double> >(void)
 
 void tp::assert_ndarray_shape(PyArrayObject* arr, int N) {
   if (arr->nd != N) {
-    boost::format f("shape mismatch in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<?,%d> wrapping");
+    boost::format f("dimensionality assertion failed for ndarray(dtype='%c%c%d',nd=%d) != %d");
     f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % N;
     PYTHON_ERROR(TypeError, f.str().c_str());
   }
@@ -164,7 +164,7 @@ void tp::assert_ndarray_shape(PyArrayObject* arr, int N) {
 
 void tp::assert_ndarray_type(PyArrayObject* arr, int type_num) {
   if (type_num != arr->descr->type_num) {
-    boost::format f("type mismatch in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%c%c%d,?> wrapping");
+    boost::format f("type assertion failed for ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%c%c%d,?> wrapping");
     PyArray_Descr* bzdescr = tp::describe_ndarray(type_num);
     f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % bzdescr->byteorder % bzdescr->kind % bzdescr->elsize;
     PYTHON_ERROR(TypeError, f.str().c_str());
@@ -177,7 +177,7 @@ bool tp::check_ndarray_byteorder(PyArray_Descr* desc) {
 
 void tp::assert_ndarray_byteorder(PyArrayObject* arr) {
   if (!tp::check_ndarray_byteorder(arr->descr)) {
-    boost::format f("cannot digest non-native byte ordering in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array wrapping");
+    boost::format f("byte ordering assertion failed for ndarray(dtype='%c%c%d',nd=%d)");
     f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd;
     PYTHON_ERROR(TypeError, f.str().c_str());
   }
@@ -185,7 +185,7 @@ void tp::assert_ndarray_byteorder(PyArrayObject* arr) {
 
 void tp::assert_ndarray_writeable(PyArrayObject* arr) {
   if (!PyArray_ISWRITEABLE(arr)) {
-    boost::format f("cannot apply blitz layer on const ndarray in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array wrapping");
+    boost::format f("write-ability assertion failed for ndarray(dtype='%c%c%d',nd=%d)");
     f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd;
     PYTHON_ERROR(TypeError, f.str().c_str());
   }
@@ -193,7 +193,7 @@ void tp::assert_ndarray_writeable(PyArrayObject* arr) {
 
 void tp::assert_ndarray_behaved(PyArrayObject* arr) {
   if (!PyArray_ISBEHAVED(arr)) {
-    boost::format f("cannot apply blitz layer on ndarray that is not well-behaved (search for what this means with PyArray_ISBEHAVE) in ndarray(dtype='%c%c%d',nd=%d) => blitz::Array wrapping");
+    boost::format f("behave-ness assertion failed -- cannot use ndarray that is not well-behaved (search for what this means with PyArray_ISBEHAVED) for ndarray(dtype='%c%c%d',nd=%d)");
     f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd;
     PYTHON_ERROR(TypeError, f.str().c_str());
   }

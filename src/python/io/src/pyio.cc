@@ -25,3 +25,9 @@ bp::object tp::npyarray_object (tp::npyarray& b) {
   bp::object retval = bp::object(bp::handle<>((PyObject*)b.shallow_copy_force()));
   return retval;
 }
+
+bp::object tp::array_from_any (bp::object& o) {
+  PyObject* arr = PyArray_FromAny(o.ptr(), 0, 0, 0, 0, 0);
+  bp::object retval = bp::object(bp::handle<>(arr));
+  return retval;
+}

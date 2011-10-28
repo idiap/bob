@@ -34,7 +34,7 @@ del array_ne
 
 def array_repr(self):
   """A simple representation for generic Arrays"""
-  return "<Array %s@%s>" % (self.type.dtype, self.dtype.shape)
+  return "<Array %s@%s>" % (self.type.dtype, self.type.shape)
 Array.__repr__ = array_repr
 del array_repr
 

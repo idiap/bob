@@ -21,8 +21,12 @@ namespace tp = Torch::python;
 /**
  * Creates a new io::Array from a NumPy ndarray
  */
-static boost::shared_ptr<io::Array> array_from_ndarray(numeric::array a) {
-  return boost::make_shared<io::Array>(boost::make_shared<tp::npyarray>(a));
+static boost::shared_ptr<io::Array> array_from_any1(object o) {
+  return boost::make_shared<io::Array>(boost::make_shared<tp::npyarray>(o, object()));
+}
+
+static boost::shared_ptr<io::Array> array_from_any2(object o, object dtype) {
+  return boost::make_shared<io::Array>(boost::make_shared<tp::npyarray>(o, dtype));
 }
 
 /**
@@ -32,8 +36,12 @@ static object get_array(io::Array& a) {
   return tp::buffer_object(a.get());
 }
 
-static void set_array(io::Array& a, numeric::array npy) {
-  a.set(boost::make_shared<tp::npyarray>(npy));
+static void set_array1(io::Array& a, object o) {
+  a.set(boost::make_shared<tp::npyarray>(o, object()));
+}
+
+static void set_array2(io::Array& a, object o, object dtype) {
+  a.set(boost::make_shared<tp::npyarray>(o, dtype));
 }
 
 void bind_io_array() {
@@ -61,9 +69,11 @@ void bind_io_array() {
   class_<io::Array, boost::shared_ptr<io::Array> >("Array", "Arrays represent pointers to concrete data serialized on a file. You can load or refer to real numpy.ndarrays using this type.", init<const std::string&>((arg("filename")), "Initializes a new array from an external file"))
     .def(init<boost::shared_ptr<io::File> >((arg("file")), "Builds a new Array from a file opened with io::open. Reads all file contents."))
     .def(init<boost::shared_ptr<io::File>, size_t>((arg("file"), arg("index")), "Builds a new Array from a specific array in a file opened with io::open"))
-    .def("__init__", make_constructor(array_from_ndarray, default_call_policies(), (arg("array"))), "Builds a new Array from a NumPy Array")
+    .def("__init__", make_constructor(array_from_any1, default_call_policies(), (arg("array"))), "Builds a new Array from an array-like object using a reference to the data, if possible.")
+    .def("__init__", make_constructor(array_from_any2, default_call_policies(), (arg("array"), arg("dtype"))), "Builds a new Array from an array-like object with an optional data type coertion specification. References the data, if possible.")
     .def("get", &get_array, (arg("self")), "Retrieves a representation of myself, as an numpy ndarray in the most efficient way possible.")
-    .def("set", &set_array, (arg("self"), arg("array")), "Sets this array with an numpy ndarray")
+    .def("set", &set_array1, (arg("self"), arg("array")), "Sets this array with an array-like object. References the data, if possible.")
+    .def("set", &set_array2, (arg("self"), arg("array"), arg("dtype")), "Sets this array with an array-like object, with a data type coertion specification. References the data, if possible.")
     .add_property("type", make_function(&io::Array::type, return_value_policy<copy_const_reference>()), "Typing information for this array")
     .def("load", &io::Array::load, "Loads this array into memory, if that is not already the case")
     .add_property("index", &io::Array::getIndex, &io::Array::setIndex)

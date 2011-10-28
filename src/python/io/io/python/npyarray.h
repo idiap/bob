@@ -53,9 +53,11 @@ namespace Torch { namespace python {
       npyarray(PyArrayObject* array);
 
       /**
-       * Starts by refering to the data from a numpy array.
+       * Starts by refering to the data from an numpy array or a copy of
+       * something that is array-like. Coerces the final array type as
+       * described by the dtype parameter
        */
-      npyarray(boost::python::numeric::array array);
+      npyarray(boost::python::object o, boost::python::object dtype);
 
       /**
        * Starts by copying the data from another buffer.

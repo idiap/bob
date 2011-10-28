@@ -10,6 +10,7 @@
 namespace tp = Torch::python;
 namespace io = Torch::io;
 namespace bp = boost::python;
+namespace tca = Torch::core::array;
 
 static void typeinfo_ndarray (PyArrayObject* npy, io::typeinfo& i) {
   i.set<npy_intp>(tp::num_to_eltype(npy->descr->type_num), npy->nd, 
@@ -28,7 +29,7 @@ static PyArrayObject* new_from_type (const io::typeinfo& ti) {
   npy_intp stride[TORCH_MAX_DIM];
   for (size_t k=0; k<ti.nd; ++k) {
     shape[k] = ti.shape[k];
-    stride[k] = ti.stride[k];
+    stride[k] = tca::getElementSize(ti.dtype)*ti.stride[k];
   }
   return reinterpret_cast<PyArrayObject*>(PyArray_New(&PyArray_Type, ti.nd,
         &shape[0], tp::eltype_to_num(ti.dtype), &stride[0], 0, 0, 0, 0));
@@ -42,10 +43,17 @@ static PyArrayObject* wrap_data (void* data, const io::typeinfo& ti) {
   npy_intp stride[TORCH_MAX_DIM];
   for (size_t k=0; k<ti.nd; ++k) {
     shape[k] = ti.shape[k];
-    stride[k] = ti.stride[k];
+    stride[k] = tca::getElementSize(ti.dtype)*ti.stride[k];
   }
   return reinterpret_cast<PyArrayObject*>(PyArray_New(&PyArray_Type, ti.nd,
         &shape[0], tp::eltype_to_num(ti.dtype), &stride[0], data, 0, 0, 0));
+}
+
+/**
+ * New wrapper of the array
+ */
+static PyArrayObject* wrap_array (PyArrayObject* from, PyArray_Descr* dtype) {
+  return reinterpret_cast<PyArrayObject*>(PyArray_FromArray(from, dtype, 0));
 }
 
 /**
@@ -72,41 +80,14 @@ static PyArrayObject* copy_data (const void* data, const io::typeinfo& ti) {
  * Gets a read-only reference to a certain data. This recipe was originally
  * posted here:
  * http://blog.enthought.com/python/numpy-arrays-with-pre-allocated-memory/
+ *
+ * But a better allocation strategy (that actually works) is posted here:
+ * http://stackoverflow.com/questions/2924827/numpy-array-c-api
  */
-typedef struct {
-  PyObject_HEAD
-  boost::shared_ptr<const void> shared_pointer;
-} SharedPointerObject;
-
-static void SharedPointer_dealloc (PyObject* self) {
-  reinterpret_cast<SharedPointerObject*>(self)->shared_pointer.reset();
-  self->ob_type->tp_free(self);
+static void DeleteSharedPointer (void* ptr) {
+  typedef boost::shared_ptr<const void> type;
+  delete static_cast<type*>(ptr);
 }
-
-static PyTypeObject SharedPointerType = {
-  PyObject_HEAD_INIT(NULL)
-    0, /*ob_size*/
-  "SharedPointer", /*tp_name*/
-  sizeof(SharedPointerObject), /*tp_basicsize*/
-  0, /*tp_itemsize*/
-  SharedPointer_dealloc, /*tp_dealloc*/
-  0, /*tp_print*/
-  0, /*tp_getattr*/
-  0, /*tp_setattr*/
-  0, /*tp_compare*/
-  0, /*tp_repr*/
-  0, /*tp_as_number*/
-  0, /*tp_as_sequence*/
-  0, /*tp_as_mapping*/
-  0, /*tp_hash */
-  0, /*tp_call*/
-  0, /*tp_str*/
-  0, /*tp_getattro*/
-  0, /*tp_setattro*/
-  0, /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT, /*tp_flags*/
-  "Internal boost::shared_ptr<const void> manager object", /* tp_doc */
-};
 
 static PyArrayObject* make_readonly (const void* data, const io::typeinfo& ti,
     boost::shared_ptr<const void> owner) {
@@ -126,16 +107,15 @@ static PyArrayObject* make_readonly (const void* data, const io::typeinfo& ti,
     PYTHON_ERROR(RuntimeError, "could not allocate space for read-only array wrapper");
 
   //creates the shared pointer deallocator
-  SharedPointerObject* deallocator = PyObject_New(SharedPointerObject, &SharedPointerType);
+  boost::shared_ptr<const void>* ptr = new boost::shared_ptr<const void>(owner);
+  PyObject* py_sharedptr = PyCObject_FromVoidPtr(ptr, DeleteSharedPointer);
 
-  if (!deallocator) {
+  if (!py_sharedptr) {
     Py_XDECREF(retval);
     PYTHON_ERROR(RuntimeError, "could not allocate space for deallocation object in read-only io::buffer wrapping");
   }
 
-  //associate the deallocator with the array to be returned
-  deallocator->shared_pointer = owner;
-  PyArray_BASE(retval) = reinterpret_cast<PyObject*>(deallocator);
+  retval->base = py_sharedptr;
 
   return retval;
 }
@@ -162,7 +142,7 @@ tp::npyarray::npyarray(PyArrayObject* npy):
   assert_ndarray_behaved(npy);
 
   //now we capture a pointer to the passed array
-  PyArrayObject* copy = copy_array(npy);
+  PyArrayObject* copy = wrap_array(npy, 0);
   boost::shared_ptr<PyArrayObject> cache(copy, std::ptr_fun(derefer_ndarray));
   m_data = cache;
 
@@ -170,25 +150,44 @@ tp::npyarray::npyarray(PyArrayObject* npy):
   m_ptr = static_cast<void*>(npy->data);
 }
 
-tp::npyarray::npyarray(bp::numeric::array array):
+tp::npyarray::npyarray(bp::object o, bp::object dtype):
   m_is_numpy(true)
 {
-  PyArrayObject* npy = (PyArrayObject*)array.ptr(); ///< this works by definition
+  PyObject* ptr = o.ptr();
+  PyArrayObject* copy = 0;
+
+  PyArray_Descr* npy_dtype = 0;
+  PyArray_DescrConverter2(dtype.ptr(), &npy_dtype);
+
+  if (PyArray_Check(ptr)) {
+
+    PyArrayObject* npy = (PyArrayObject*)ptr;
+
+    //can only deal with behaved C arrays with native byte-order
+    assert_ndarray_byteorder(npy);
+    assert_ndarray_behaved(npy);
+
+    copy = wrap_array(npy, npy_dtype);
+
+  }
+
+  else {
+
+    //see if we can convert it -- this will copy the data, be warned.
+    copy = (PyArrayObject*)PyArray_FromAny(ptr, npy_dtype, 0, 0, 0, 0);
+    if (!copy) PYTHON_ERROR(TypeError, "object is not array-like or can be converted into an ndarray");
+
+  }
 
   //captures data from a numeric::array
-  typeinfo_ndarray(npy, m_type);
-
-  //can only deal with behaved C arrays with native byte-order
-  assert_ndarray_byteorder(npy);
-  assert_ndarray_behaved(npy);
+  typeinfo_ndarray(copy, m_type);
 
   //now we capture a pointer to the passed array
-  PyArrayObject* copy = copy_array(npy);
   boost::shared_ptr<PyArrayObject> cache(copy, std::ptr_fun(derefer_ndarray));
   m_data = cache;
 
   //set-up the C-style pointer to this data
-  m_ptr = static_cast<void*>(npy->data);
+  m_ptr = static_cast<void*>(copy->data);
 }
 
 tp::npyarray::npyarray(const io::buffer& other) {
@@ -242,7 +241,7 @@ void tp::npyarray::set (const io::typeinfo& req) {
 
 PyArrayObject* tp::npyarray::shallow_copy () {
   if (m_is_numpy)
-    return copy_array(boost::static_pointer_cast<PyArrayObject>(m_data).get());
+    return wrap_array(boost::static_pointer_cast<PyArrayObject>(m_data).get(), 0);
 
   return 0;
 }
@@ -253,7 +252,7 @@ PyArrayObject* tp::npyarray::deep_copy () {
 
 PyArrayObject* tp::npyarray::shallow_copy_force () {
   if (m_is_numpy)
-    return copy_array(boost::static_pointer_cast<PyArrayObject>(m_data).get());
+    return wrap_array(boost::static_pointer_cast<PyArrayObject>(m_data).get(), 0);
 
   //if you really want, I can wrap it for you, but in this case I'll make it
   //read-only and will associate the object deletion to my own data pointer.
