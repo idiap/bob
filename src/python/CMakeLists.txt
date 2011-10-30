@@ -22,7 +22,7 @@ if (PYTHONLIBS_FOUND AND PYTHONINTERP_FOUND AND Boost_FOUND)
   #add_subdirectory(db)
   #add_subdirectory(machine)
   #add_subdirectory(trainer)
-add_subdirectory(face_verification)
+  #add_subdirectory(face_verification)
 
   if (NOT QT4_FOUND)
     message(STATUS "Qt4 NOT FOUND, supressing visioner-python from build")

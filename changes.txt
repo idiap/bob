@@ -5,8 +5,9 @@ Things to consider:
   bp::object and is automatically converted to and from python. Accumulate on
   this class all NumPy ndarray functionality for copying and extracting
   information in a safe way.
-* io.arrayset.cat is not implemented!
+* io.arrayset.cat is not implemented
 * io.video subsystem is missing
+* io.codec tests are missing
 
 Modifications on the syntax:
 
