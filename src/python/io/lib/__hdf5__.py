@@ -167,6 +167,3 @@ def hdf5file_replace(self, path, pos, data, dtype=None):
     for k in data: meth(path, pos, k)
 HDF5File.replace = hdf5file_replace
 del hdf5file_replace
-
-
-

@@ -27,7 +27,7 @@ class ArraysetTest(unittest.TestCase):
     self.assertEqual( t.shape, (2,) )
 
     for i, k in enumerate(t):
-      self.assertTrue ( numpy.array_equal(data[i,:], k.get()) )
+      self.assertTrue ( numpy.array_equal(data[i,:], k) )
 
     # we can achieve the same effect with lists
     t = torch.io.Arrayset()
@@ -39,7 +39,7 @@ class ArraysetTest(unittest.TestCase):
     self.assertEqual( t.shape, (2,) )
 
     for i, k in enumerate(t):
-      self.assertTrue ( numpy.array_equal(vdata[i], k.get()) )
+      self.assertTrue ( numpy.array_equal(vdata[i], k) )
 
   def test02_extend2d(self):
 
@@ -54,7 +54,7 @@ class ArraysetTest(unittest.TestCase):
     self.assertEqual( t.shape, (3,3) )
 
     for i, k in enumerate(t):
-      self.assertTrue ( numpy.array_equal(data[:,i,:], k.get()) )
+      self.assertTrue ( numpy.array_equal(data[:,i,:], k) )
 
     # we can achieve the same effect with lists once more
     t = torch.io.Arrayset()
@@ -66,7 +66,7 @@ class ArraysetTest(unittest.TestCase):
     self.assertEqual( t.shape, (3,3) )
 
     for i, k in enumerate(t):
-      self.assertTrue ( numpy.array_equal(vdata[i], k.get()) )
+      self.assertTrue ( numpy.array_equal(vdata[i], k) )
 
   def test03_extend3d(self):
 
@@ -81,7 +81,7 @@ class ArraysetTest(unittest.TestCase):
     self.assertEqual( t.shape, (3,4,3) )
 
     for i, k in enumerate(t):
-      self.assertTrue ( numpy.array_equal(data[:,:,i,:], k.get()) )
+      self.assertTrue ( numpy.array_equal(data[:,:,i,:], k) )
 
     # we can achieve the same effect with lists once more
     t = torch.io.Arrayset()
@@ -93,7 +93,7 @@ class ArraysetTest(unittest.TestCase):
     self.assertEqual( t.shape, (3,4,3) )
 
     for i, k in enumerate(t):
-      self.assertTrue ( numpy.array_equal(vdata[i], k.get()) )
+      self.assertTrue ( numpy.array_equal(vdata[i], k) )
 
   def test04_canLoadMatlab(self):
 

@@ -43,3 +43,16 @@ def array_str(self):
   return str(self.get())
 Array.__str__ = array_str
 del array_str
+
+# Here are some legacy methods to keep up with the api changes
+def array_shape(self):
+  return self.type.shape
+Array.shape = property(array_shape)
+
+def array_eltype(self):
+  return self.type.cxxtype
+Array.elementType = property(array_eltype)
+
+def array_dtype(self):
+  return self.type.dtype
+Array.dtype = property(array_dtype)

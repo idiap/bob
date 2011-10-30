@@ -124,8 +124,10 @@ template <typename T, int N> struct bz_from_npy {
       //"dry-run" cast
       PyArray_Descr* req_dtype = tp::describe_ndarray(tp::type_to_num<T>());
       if (tp::check_ndarray(obj_ptr,req_dtype,0,dtype,ndim,dims,arr) != 0) {
+        Py_XDECREF(req_dtype);
         return 0;
       }
+      Py_XDECREF(req_dtype);
 
       //check dimensions and byteorder
       if (ndim == N     //has to have the number of dimensions == N
@@ -176,6 +178,7 @@ template <typename T, int N> struct bz_from_npy {
      * required specifications.
      */
     if (tp::check_ndarray(obj_ptr, req_dtype, 0, dtype, ndim, dims, arr) != 0) {
+      Py_XDECREF(req_dtype);
       //this should never happen as the object has already been checked
       PYTHON_ERROR(TypeError, "object cannot be converted to blitz::Array");
     }
@@ -188,6 +191,7 @@ template <typename T, int N> struct bz_from_npy {
     else { //needs copying
       arrobj = tp::copy_ndarray(obj_ptr, req_dtype, N);
     }
+    Py_XDECREF(req_dtype); //don't need this anymore...
 
     //mounts the numpy memory at the newly allocated blitz::Array
     shape_type shape;

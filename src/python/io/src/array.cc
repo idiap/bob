@@ -66,14 +66,24 @@ void bind_io_array() {
     ;
 
   //base class declaration
-  class_<io::Array, boost::shared_ptr<io::Array> >("Array", "Arrays represent pointers to concrete data serialized on a file. You can load or refer to real numpy.ndarrays using this type.", init<const std::string&>((arg("filename")), "Initializes a new array from an external file"))
-    .def(init<boost::shared_ptr<io::File> >((arg("file")), "Builds a new Array from a file opened with io::open. Reads all file contents."))
-    .def(init<boost::shared_ptr<io::File>, size_t>((arg("file"), arg("index")), "Builds a new Array from a specific array in a file opened with io::open"))
+  class_<io::Array, boost::shared_ptr<io::Array> >("Array", "Arrays represent pointers to concrete data serialized on a file. You can load or refer to real numpy.ndarrays using this type.", no_init)
+
+    //attention: order here is crucial - last defined is tried first by the
+    //boost::python overloading resolution system; the last thing we want to
+    //try are the numpy handlers.
     .def("__init__", make_constructor(array_from_any1, default_call_policies(), (arg("array"))), "Builds a new Array from an array-like object using a reference to the data, if possible.")
     .def("__init__", make_constructor(array_from_any2, default_call_policies(), (arg("array"), arg("dtype"))), "Builds a new Array from an array-like object with an optional data type coertion specification. References the data, if possible.")
-    .def("get", &get_array, (arg("self")), "Retrieves a representation of myself, as an numpy ndarray in the most efficient way possible.")
+    .def(init<boost::shared_ptr<io::File> >((arg("file")), "Builds a new Array from a file opened with io::open. Reads all file contents."))
+    .def(init<boost::shared_ptr<io::File>, size_t>((arg("file"), arg("index")), "Builds a new Array from a specific array in a file opened with io::open"))
+    .def(init<const std::string&>((arg("filename")), "Initializes a new array from an external file"))
+
+    //attention: order here is crucial - last defined is tried first by the
+    //boost::python overloading resolution system; the last thing we want to
+    //try are the numpy handlers.
     .def("set", &set_array1, (arg("self"), arg("array")), "Sets this array with an array-like object. References the data, if possible.")
     .def("set", &set_array2, (arg("self"), arg("array"), arg("dtype")), "Sets this array with an array-like object, with a data type coertion specification. References the data, if possible.")
+   
+    .def("get", &get_array, (arg("self")), "Retrieves a representation of myself, as an numpy ndarray in the most efficient way possible.")
     .add_property("type", make_function(&io::Array::type, return_value_policy<copy_const_reference>()), "Typing information for this array")
     .def("load", &io::Array::load, "Loads this array into memory, if that is not already the case")
     .add_property("index", &io::Array::getIndex, &io::Array::setIndex)

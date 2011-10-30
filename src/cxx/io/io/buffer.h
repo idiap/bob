@@ -81,7 +81,7 @@ namespace Torch { namespace io {
     /**
      * Is this a valid type information?
      */
-    bool is_valid();
+    bool is_valid() const;
 
     /**
      * sets the shape

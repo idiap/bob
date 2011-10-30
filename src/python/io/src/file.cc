@@ -15,6 +15,16 @@ using namespace boost::python;
 namespace tp = Torch::python;
 namespace io = Torch::io;
 
+static object typeinfo_dtype (const io::typeinfo& info) {
+  if (info.is_valid()) {
+    handle<> hdl((PyObject*)tp::describe_eltype(info.dtype));
+    object retval(hdl);
+    return retval;
+  }
+
+  return object();
+}
+
 static tuple ti_shape(const io::typeinfo& ti) {
   list retval;
   for (size_t i=0; i<ti.nd; ++i) retval.append(ti.shape[i]);
@@ -53,7 +63,8 @@ void bind_io_file() {
   
   class_<io::typeinfo>("typeinfo", "Type information for Torch C++ data", 
       no_init)
-    .def_readonly("dtype", &io::typeinfo::dtype)
+    .add_property("dtype", &typeinfo_dtype)
+    .def_readonly("cxxtype", &io::typeinfo::dtype)
     .def_readonly("nd", &io::typeinfo::nd)
     .add_property("shape", &ti_shape)
     .add_property("stride", &ti_stride)

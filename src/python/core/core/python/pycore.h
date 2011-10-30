@@ -90,6 +90,7 @@ namespace Torch { namespace python {
   void assert_ndarray_byteorder(PyArrayObject* arr);
   void assert_ndarray_writeable(PyArrayObject* arr);
   void assert_ndarray_behaved(PyArrayObject* arr);
+  void assert_ndarray_cstyle(PyArrayObject* arr);
 
   /**
    * Use this method to wrap non-const references to blitz::Array<>'s that will
@@ -159,6 +160,8 @@ namespace Torch { namespace python {
    * Gets the PyArray_Descr* for a given type
    */
   PyArray_Descr* describe_ndarray(int type);
+
+  PyArray_Descr* describe_eltype(Torch::core::array::ElementType eltype);
 
   /**
    * Generates a well behaved copy of an array, starting from any possible

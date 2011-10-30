@@ -37,7 +37,7 @@ void io::typeinfo::reset() {
   nd = 0;
 }
 
-bool io::typeinfo::is_valid() {
+bool io::typeinfo::is_valid() const {
   return (dtype != Torch::core::array::t_unknown) && (nd > 0) && (nd <= TORCH_MAX_DIM);
 }
 

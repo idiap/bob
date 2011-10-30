@@ -167,6 +167,7 @@ void tp::assert_ndarray_type(PyArrayObject* arr, int type_num) {
     boost::format f("type assertion failed for ndarray(dtype='%c%c%d',nd=%d) => blitz::Array<%c%c%d,?> wrapping");
     PyArray_Descr* bzdescr = tp::describe_ndarray(type_num);
     f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd % bzdescr->byteorder % bzdescr->kind % bzdescr->elsize;
+    Py_XDECREF(bzdescr);
     PYTHON_ERROR(TypeError, f.str().c_str());
   }
 }
@@ -199,6 +200,14 @@ void tp::assert_ndarray_behaved(PyArrayObject* arr) {
   }
 }
 
+void tp::assert_ndarray_cstyle(PyArrayObject* arr) {
+  if (!PyArray_ISCARRAY_RO(arr)) {
+    boost::format f("c-style & contiguous & aligned check failed for ndarray (dtype='%c%c%d', nd=%d)");
+    f % arr->descr->byteorder % arr->descr->kind % arr->descr->elsize % arr->nd;
+    PYTHON_ERROR(TypeError, f.str().c_str());
+  }
+}
+
 tp::dtype::dtype(const bp::object& name): _m(0) {
   PyArray_DescrConverter(name.ptr(), &_m);
 }
@@ -215,6 +224,10 @@ PyArrayObject* tp::make_ndarray(int nd, npy_intp* dims, int type) {
 
 PyArray_Descr* tp::describe_ndarray(int type) {
   return PyArray_DescrFromType(type);
+}
+
+PyArray_Descr* tp::describe_eltype(Torch::core::array::ElementType eltype) {
+  return tp::describe_ndarray(tp::eltype_to_num(eltype));
 }
 
 PyArrayObject* tp::copy_ndarray(PyObject* any, PyArray_Descr* dt,
