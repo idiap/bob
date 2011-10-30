@@ -7,6 +7,7 @@
 """
 
 from libpytorch_io import HDF5Type, HDF5File
+import numpy
 
 # Some HDF5 addons
 def hdf5type_str(self):

@@ -266,7 +266,7 @@ class HDF5FileTest(unittest.TestCase):
 
     # Try to save a slice
     tmpname = get_tempfilename()
-    torch.io.save(array[:,0], tmpname, "hdf5.array.binary")
+    torch.io.save(array[:,0], tmpname)
 
   def test06_matlabImport(self):
 

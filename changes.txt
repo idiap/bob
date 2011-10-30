@@ -5,7 +5,12 @@ Things to consider:
   bp::object and is automatically converted to and from python. Accumulate on
   this class all NumPy ndarray functionality for copying and extracting
   information in a safe way.
+* io.arrayset.cat is not implemented!
+* io.video subsystem is missing
 
 Modifications on the syntax:
 
 * io.Arrayset.get() returns io.Array's while operator[] returns NumPy ndarrays
+
+* core.array.load() an core.array.save() supressed. Use io.load() and io.save()
+  to directly load numpy ndarrays to memory or save them.
