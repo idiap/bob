@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <boost/random.hpp>
 #include <vector>
+#include <limits>
 
 #include "trainer/PLDATrainer.h"
 #include "core/array_copy.h"
@@ -251,11 +252,8 @@ void train::PLDABaseTrainer::initRandomFGSigma(mach::PLDABaseMachine& machine)
   if(m_seed != -1)
     rng.seed((uint32_t)m_seed);
   boost::normal_distribution<> range_n;
-  boost::uniform_01<> range_01;
   boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > 
     die_n(rng, range_n);
-  boost::variate_generator<boost::mt19937&, boost::uniform_01<> > 
-    die_01(rng, range_01);
     
   double ratio = 1.; // TODO: check if a ratio is required
   // F initialization
@@ -270,9 +268,9 @@ void train::PLDABaseTrainer::initRandomFGSigma(mach::PLDABaseMachine& machine)
       G(j,i) = die_n() * ratio;
   // sigma2 initialization
   blitz::Array<double,1>& sigma = machine.updateSigma();
-  double eps = 1e-5; // Sigma should be invertible...
+  double eps = std::numeric_limits<double>::epsilon(); // Sigma should be invertible...
   for(int j=0; j<sigma.extent(0); ++j)
-    sigma(j) = die_01() * ratio + eps;
+    sigma(j) = fabs(die_n()) * ratio + eps;
 
   // Precompute values
   machine.precompute();
