@@ -534,10 +534,8 @@ double train::PLDABaseTrainer::computeLikelihood(mach::PLDABaseMachine& machine,
 }
 
 
-train::PLDATrainer::PLDATrainer(mach::PLDAMachine& plda_machine, 
-    train::PLDABaseTrainer& base_trainer): 
+train::PLDATrainer::PLDATrainer(mach::PLDAMachine& plda_machine): 
   m_plda_machine(plda_machine),
-  m_base_trainer(base_trainer),
   m_cache_D_1(plda_machine.getDimD()),
   m_cache_D_2(plda_machine.getDimD()),
   m_cache_nf_1(plda_machine.getDimF())
@@ -546,7 +544,6 @@ train::PLDATrainer::PLDATrainer(mach::PLDAMachine& plda_machine,
 
 train::PLDATrainer::PLDATrainer(const train::PLDATrainer& other):
   m_plda_machine(other.m_plda_machine),
-  m_base_trainer(other.m_base_trainer),
   m_cache_D_1(tca::ccopy(other.m_cache_D_1)),
   m_cache_D_2(tca::ccopy(other.m_cache_D_2)),
   m_cache_nf_1(tca::ccopy(other.m_cache_nf_1))
@@ -560,7 +557,6 @@ train::PLDATrainer& train::PLDATrainer::operator=
 (const train::PLDATrainer& other) 
 {
   m_plda_machine = other.m_plda_machine;
-  m_base_trainer = other.m_base_trainer;
   m_cache_D_1.reference(tca::ccopy(other.m_cache_D_1));
   m_cache_D_2.reference(tca::ccopy(other.m_cache_D_2));
   m_cache_nf_1.reference(tca::ccopy(other.m_cache_nf_1));

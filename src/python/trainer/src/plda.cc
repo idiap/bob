@@ -121,7 +121,7 @@ void bind_trainer_plda() {
     ;
 
 
-  class_<train::PLDATrainer, boost::noncopyable>("PLDATrainer", "Create a trainer for the JFA.", init<mach::PLDAMachine&, train::PLDABaseTrainer&>((arg("plda"), arg("base_trainer")),"Initializes a new PLDATrainer."))
+  class_<train::PLDATrainer, boost::noncopyable>("PLDATrainer", "Create a trainer for the JFA.", init<mach::PLDAMachine&>((arg("plda")),"Initializes a new PLDATrainer."))
     .def("enrol", (void (train::PLDATrainer::*)(const io::Arrayset&))&train::PLDATrainer::enrol, (arg("self"), arg("arrayset")), "Call the enrollment procedure.")
     ;
 

@@ -164,7 +164,7 @@ namespace Torch { namespace trainer {
       /**
        * Initializes a new PLDA trainer.
        */
-      PLDATrainer(Torch::machine::PLDAMachine& plda_machine, Torch::trainer::PLDABaseTrainer& base_trainer);
+      PLDATrainer(Torch::machine::PLDAMachine& plda_machine);
 
       /**
         * Copy constructor.
@@ -189,7 +189,6 @@ namespace Torch { namespace trainer {
     private:
 
       Torch::machine::PLDAMachine& m_plda_machine; // PLDAMachine
-      Torch::trainer::PLDABaseTrainer& m_base_trainer; // PLDABaseTrainer
 
       // cache
       mutable blitz::Array<double,1> m_cache_D_1; // D=nb features 

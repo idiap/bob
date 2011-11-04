@@ -304,8 +304,7 @@ class PLDATrainerTest(unittest.TestCase):
     # Computes the likelihood using x1 and x2 as enrollment samples
     # and x3 as a probe sample
     m = torch.machine.PLDAMachine(mb)
-    tb = torch.trainer.PLDABaseTrainer(nf,ng)
-    t = torch.trainer.PLDATrainer(m, tb)
+    t = torch.trainer.PLDATrainer(m)
     t.enrol(a_enrol)
     ll = m.computeLikelihood(x3)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
