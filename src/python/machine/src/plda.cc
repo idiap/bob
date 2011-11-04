@@ -61,6 +61,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(computeLikelihood2_overloads, computeLikelihood2
 
 void bind_machine_plda() {
   class_<mach::PLDABaseMachine, boost::shared_ptr<mach::PLDABaseMachine> >("PLDABaseMachine", "A PLDABaseMachine", init<const size_t, const size_t, const size_t>((arg("d"), arg("nf"), arg("ng")), "Builds a new PLDABaseMachine. A PLDABaseMachine can be seen as a container for F, G, sigma and mu when performing Probabilistic Linear Discriminant Analysis (PLDA)."))
+    .def(init<>("Constructs a new empty PLDABaseMachine."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new PLDABaseMachine from a configuration file."))
     .def(init<const mach::PLDABaseMachine&>((arg("machine")), "Copy constructs a PLDABaseMachine"))
     .def("load", &mach::PLDABaseMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
@@ -88,6 +89,7 @@ void bind_machine_plda() {
   ;
 
   class_<mach::PLDAMachine, boost::shared_ptr<mach::PLDAMachine> >("PLDAMachine", "A PLDAMachine", init<boost::shared_ptr<mach::PLDABaseMachine> >((arg("plda_base")), "Builds a new PLDAMachine. An attached PLDABaseMachine should be provided, containing the PLDA model (F, G and Sigma). The PLDAMachine only carries information the enrolled samples."))
+    .def(init<>("Constructs a new empty PLDAMachine."))
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new PLDAMachine from a configuration file."))
     .def(init<const mach::PLDAMachine&>((arg("machine")), "Copy constructs a PLDAMachine"))
     .def("load", &mach::PLDAMachine::load, (arg("self"), arg("config")), "Loads the configuration parameters from a configuration file.")
