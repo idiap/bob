@@ -111,6 +111,7 @@ void bind_trainer_plda() {
 
 
   class_<train::PLDABaseTrainer, boost::noncopyable, bases<EMTrainerPLDABase> >("PLDABaseTrainer", "Creates a trainer for a PLDABaseMachine.", init<int, int, optional<double,double,bool> >((arg("nf"), arg("ng"), arg("convergence_threshold"), arg("max_iterations"), arg("compute_likelihood")),"Initializes a new PLDABaseTrainer."))
+    .add_property("seed", &train::PLDABaseTrainer::getSeed, &train::PLDABaseTrainer::setSeed, "The seed used for the random initialization of F, G and sigma.")
     .add_property("z_first_order", make_function(&train::PLDABaseTrainer::getZFirstOrder, return_internal_reference<>()))
     .add_property("z_second_order_sum", make_function(&train::PLDABaseTrainer::getZSecondOrderSum, return_internal_reference<>()))
     .def("train", &plda_train, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the training procedure. This will call initialization(), a loop of eStep() and mStep(), and finalization().")
