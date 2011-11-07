@@ -14,6 +14,7 @@
 #include "core/array_copy.h"
 #include "math/linear.h"
 #include "math/lu_det.h"
+#include "math/svd.h"
 #include "trainer/Exception.h"
 
 
@@ -29,7 +30,10 @@ train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng,
     (convergence_threshold, max_iterations, compute_likelihood), 
   m_nf(nf), m_ng(ng), m_S(0,0),
   m_z_first_order(0), m_sum_z_second_order(0,0),
-  m_seed(-1),
+  m_seed(-1), 
+  m_initF_method(0), m_initF_ratio(1.),
+  m_initG_method(0), m_initG_ratio(1.),
+  m_initSigma_method(0), m_initSigma_ratio(1.),
   m_y_first_order(0), m_y_second_order(0),
   m_n_samples_per_id(0), m_n_samples_in_training(), m_B(0,0),
   m_Ft_isigma_G(0,0), m_eta(0,0), m_zeta(), m_iota(),
@@ -47,6 +51,9 @@ train::PLDABaseTrainer::PLDABaseTrainer(const train::PLDABaseTrainer& other):
   m_z_first_order(),
   m_sum_z_second_order(tca::ccopy(other.m_sum_z_second_order)),
   m_seed(other.m_seed),
+  m_initF_method(other.m_initF_method), m_initF_ratio(other.m_initF_ratio),
+  m_initG_method(other.m_initG_method), m_initG_ratio(other.m_initG_ratio),
+  m_initSigma_method(other.m_initSigma_method), m_initSigma_ratio(other.m_initSigma_ratio),
   m_y_first_order(0), m_y_second_order(0),
   m_n_samples_per_id(other.m_n_samples_per_id),
   m_n_samples_in_training(other.m_n_samples_in_training), 
@@ -83,6 +90,12 @@ train::PLDABaseTrainer& train::PLDABaseTrainer::operator=
   tca::ccopy(other.m_z_first_order, m_z_first_order);
   m_sum_z_second_order = tca::ccopy(other.m_sum_z_second_order);
   m_seed = other.m_seed;
+  m_initF_method = other.m_initF_method;
+  m_initF_ratio = other.m_initF_ratio;
+  m_initG_method = other.m_initG_method;
+  m_initG_ratio = other.m_initG_ratio;
+  m_initSigma_method = other.m_initSigma_method;
+  m_initSigma_ratio = other.m_initSigma_ratio;
   tca::ccopy(other.m_y_first_order, m_y_first_order);
   tca::ccopy(other.m_y_second_order, m_y_second_order);
   m_n_samples_per_id = other.m_n_samples_per_id;
@@ -118,9 +131,8 @@ void train::PLDABaseTrainer::initialization(mach::PLDABaseMachine& machine,
   // Computes the mean and the covariance if required
   computeMeanVariance(machine, v_ar);
 
-  // TODO: add alternative initialization (e.g. using scatter)
-  // Random initialization of F, G and Sigma
-  initRandomFGSigma(machine);
+  // Initialization (e.g. using scatter)
+  initFGSigma(machine, v_ar);
 }
 
 void train::PLDABaseTrainer::finalization(mach::PLDABaseMachine& machine,
@@ -243,6 +255,250 @@ void train::PLDABaseTrainer::computeMeanVariance(mach::PLDABaseMachine& machine,
     }
     mu /= static_cast<double>(n_samples);
   }
+}
+
+void train::PLDABaseTrainer::initFGSigma(mach::PLDABaseMachine& machine, 
+  const std::vector<io::Arrayset>& v_ar) 
+{
+  // Initializes F, G and sigma
+  initF(machine, v_ar);
+  initG(machine, v_ar);
+  initSigma(machine, v_ar);
+
+  // Precomputes values using new F, G and sigma
+  machine.precompute();
+}
+
+void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine, 
+  const std::vector<io::Arrayset>& v_ar) 
+{
+  blitz::Array<double,2>& F = machine.updateF();
+
+  // 1: between-class scatter
+  if(m_initF_method==1) 
+  {
+    // a/ Computes the global mean
+    //    mean = 1/N sum_i x_i
+    blitz::Array<double,1> mean(machine.getDimD());
+    mean = 0.;
+    size_t Ns = 0;
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      for(size_t j=0; j<v_ar[i].size(); ++j) 
+        mean += v_ar[i].get<double,1>(j);
+      Ns += v_ar[i].size();
+    }
+    mean /= static_cast<double>(Ns);
+ 
+    // b/ Computes between-class scatter matrix
+    blitz::firstIndex bi;
+    blitz::secondIndex bj;
+    blitz::Array<double,2> S(machine.getDimD(), machine.getDimD());
+    S = 0.;
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      m_cache_D_2 = 0.;
+      for(size_t j=0; j<v_ar[i].size(); ++j)
+      {
+        // m_cache_D_2 = x_ij
+        m_cache_D_2 += v_ar[i].get<double,1>(j);
+      }
+      // m_cache_D_1 = mean of the samples class i - mean of all the samples
+      m_cache_D_1 = (m_cache_D_2 / static_cast<double>(v_ar[i].size())) - mean;
+      
+      // S += Ni.(mu_i - mu).(mu_i - mu)^T
+      S += static_cast<double>(v_ar[i].size()) * m_cache_D_1(bi) * m_cache_D_1(bj);
+    }
+
+    // c/ Normalizes by the number of samples minus 1
+    S /= static_cast<double>(Ns-1);
+
+    // d/ SVD of the between-class scatter matrix
+    blitz::Array<double,2> U(machine.getDimD(), machine.getDimD());
+    Torch::math::svd(S, U, m_cache_D_1);
+
+    // e/ Updates F
+    blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimF()-1));
+    blitz::Array<double,1> sigma = m_cache_D_1(blitz::Range(0,machine.getDimF()-1));
+    sigma = blitz::sqrt(sigma);
+    F = Uslice(bi,bj) * sigma(bj);
+
+    /*
+    // a/ Computes the global mean
+    //    mean = 1/N sum_i x_i
+    blitz::Array<double,1> mean(machine.getDimD());
+    mean = 0.;
+    size_t N = 0;
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      for(size_t j=0; j<v_ar[i].size(); ++j) {
+        mean += v_ar[i].get<double,1>(j);
+      N += v_ar[i].size();
+    }
+    mean /= static_cast<double>(N);
+    
+    // b/ Computes the R matrix
+    //    R_.i = 1/Ni sum_j (x_ij - mean)
+    m_cache_D_1 = 0;
+    bliz::Array<double,2> R(machine.getDimD(), v_ar.size());
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      m_cache_D_2 = 0.;
+      bliz::Array<double,1> Ri = R(blitz::Range::all(),i);
+      for(size_t j=0; j<v_ar[i].size(); ++j)
+      {
+        // m_cache_D_2 = x_ij - mean
+        m_cache_D_2 += (v_ar[i].get<double,1>(j) - mean);
+      }
+      Ri = (m_cache_D_2 / static_cast<double>(v_ar[i].size()));      
+      m_cache_D_1 += Ri;
+    }
+    m_cache_D_1 /= static_cast<double>(v_ar.size());
+
+    // c/ Removes the mean over the class from the R matrix
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      bliz::Array<double,1> Ri = R(blitz::Range::all(),i);
+      Ri -= m_cache_D_1;
+    }
+    
+    // d/ Computes RtR
+    bliz::Array<double,2> RtR(v_ar.size(), v_ar.size());
+    const bliz::Array<double,2> Rt = R.transpose(0,1);
+    Torch::math::prod(Rt, R, RtR);
+    
+    // e/ SVD of RtR
+    nb_s = std::min(machine.getDimD(), v_ar.size());
+    blitz::Array<double,2> U(machine.getDimD(), nb_s);
+    blitz::Array<double,1> sigma(nb_s);
+    Torch::math::svd(RtR, U, sigma);
+    
+    // f/ Updates F
+    */
+  }
+  // otherwise: random initialization
+  else {
+    // Initializes the random number generator
+    boost::mt19937 rng;
+    if(m_seed != -1)
+      rng.seed((uint32_t)m_seed);
+    boost::normal_distribution<> range_n;
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > 
+      die_n(rng, range_n);
+      
+    // F initialization
+    for(int j=0; j<F.extent(0); ++j)
+      for(int i=0; i<F.extent(1); ++i)
+        F(j,i) = die_n() * m_initF_ratio;
+  }
+}
+
+void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine, 
+  const std::vector<io::Arrayset>& v_ar) 
+{
+  blitz::Array<double,2>& G = machine.updateG();
+
+  // 1: within-class scatter
+  if(m_initG_method==1) 
+  {
+    // a/ Computes within-class scatter matrix
+    blitz::firstIndex bi;
+    blitz::secondIndex bj;
+    blitz::Array<double,2> S(machine.getDimD(), machine.getDimD());
+    S = 0.;
+    size_t Ns = 0;
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      m_cache_D_1 = 0.;
+      // Computes the mean for the current class
+      for(size_t j=0; j<v_ar[i].size(); ++j)
+      {
+        // m_cache_D_1 = x_ij
+        m_cache_D_1 += v_ar[i].get<double,1>(j);
+        ++Ns;
+      }
+      // m_cache_D_1 = mean of the samples class i 
+      m_cache_D_1 = (m_cache_D_1 / static_cast<double>(v_ar[i].size()));
+    
+      // S += (x_ij - mu_i).(x_ij - mu_i)^T
+      for(size_t j=0; j<v_ar[i].size(); ++j)
+      {
+        m_cache_D_2 += v_ar[i].get<double,1>(j) - m_cache_D_1;
+        S += m_cache_D_2(bi) * m_cache_D_2(bj);
+      }
+    }
+
+    // b/ Normalizes by the number of samples minus 1
+    S /= static_cast<double>(Ns-1);
+
+    // c/ SVD of the within-class scatter matrix
+    blitz::Array<double,2> U(machine.getDimD(), machine.getDimD());
+    Torch::math::svd(S, U, m_cache_D_1);
+
+    // d/ Updates G
+    blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimG()-1));
+    blitz::Array<double,1> sigma = m_cache_D_1(blitz::Range(0,machine.getDimG()-1));
+    sigma = blitz::sqrt(sigma);
+    G = Uslice(bi,bj) * sigma(bj);
+  }
+  // otherwise: random initialization
+  else {
+    // Initializes the random number generator
+    boost::mt19937 rng;
+    if(m_seed != -1)
+      rng.seed((uint32_t)m_seed);
+    boost::normal_distribution<> range_n;
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > 
+      die_n(rng, range_n);
+
+    // G initialization
+    for(int j=0; j<G.extent(0); ++j)
+      for(int i=0; i<G.extent(1); ++i)
+        G(j,i) = die_n() * m_initG_ratio;
+  }
+}
+
+void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine, 
+  const std::vector<io::Arrayset>& v_ar) 
+{
+  blitz::Array<double,1>& sigma = machine.updateSigma();
+  double eps = std::numeric_limits<double>::epsilon(); // Sigma should be invertible...
+
+  // 1: percentage of the variance of G
+  if(m_initSigma_method==1) {
+    blitz::Array<double,2>& G = machine.updateG();
+    blitz::secondIndex bj;
+    m_cache_D_1 = blitz::mean(G, bj);
+    m_cache_D_2 = 0.;
+    // Computes the variance of G ( 1/(N-1) estimate of the variance)
+    for(size_t i=0; i<machine.getDimG(); ++i)
+    {
+      blitz::Array<double,1> Gi = G(blitz::Range::all(),i);
+      m_cache_D_2 += blitz::pow2(Gi - m_cache_D_1);
+    }
+    m_cache_D_2 /= static_cast<double>(machine.getDimG()-1);
+    // Updates sigma
+    sigma = m_cache_D_2 * m_initSigma_ratio + eps;
+  }
+  // 2: constant value
+  else if(m_initSigma_method==2) {
+    sigma = m_initSigma_ratio;
+  }
+  // otherwise: random initialization
+  else {
+    // Initializes the random number generator
+    boost::mt19937 rng;
+    if(m_seed != -1)
+      rng.seed((uint32_t)m_seed);
+    boost::normal_distribution<> range_n;
+    boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > 
+      die_n(rng, range_n);
+
+    // sigma initialization
+    for(int j=0; j<sigma.extent(0); ++j)
+      sigma(j) = fabs(die_n()) * m_initSigma_ratio + eps;
+  }
+
 }
 
 void train::PLDABaseTrainer::initRandomFGSigma(mach::PLDABaseMachine& machine)

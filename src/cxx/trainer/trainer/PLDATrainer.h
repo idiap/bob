@@ -93,6 +93,61 @@ namespace Torch { namespace trainer {
       inline int getSeed() const { return m_seed; }
 
       /**
+        * Sets the method used to initialize F
+        */
+      inline void setInitFMethod(int m) { m_initF_method = m; } 
+      /**
+        * Gets the method used to initialize F
+        */
+      inline int getInitFMethod() const { return m_initF_method; }
+      /**
+        * Sets the ratio value used to initialize F
+        */
+      inline void setInitFRatio(double d) { m_initF_ratio = d; } 
+      /**
+        * Gets the ratio value used to initialize F
+        */
+      inline double getInitFRatio() const { return m_initF_ratio; }
+
+      /**
+        * Sets the method used to initialize G
+        */
+      inline void setInitGMethod(int m) { m_initG_method = m; } 
+      /**
+        * Gets the method used to initialize G
+        */
+      inline int getInitGMethod() const { return m_initG_method; }
+      /**
+        * Sets the ratio value used to initialize G
+        */
+      inline void setInitGRatio(double d) { m_initG_ratio = d; } 
+      /**
+        * Gets the ratio value used to initialize G
+        */
+      inline double getInitGRatio() const { return m_initG_ratio; }
+
+      /**
+        * Sets the method used to initialize sigma
+        */
+      inline void setInitSigmaMethod(int m) { m_initSigma_method = m; } 
+      /**
+        * Gets the method used to initialize sigma
+        */
+      inline int getInitSigmaMethod() const { return m_initSigma_method; }
+      /**
+        * Sets the ratio value used to initialize sigma
+        */
+      inline void setInitSigmaRatio(double d) { m_initSigma_ratio = d; } 
+      /**
+        * Gets the ratio value used to initialize sigma
+        */
+      inline double getInitSigmaRatio() const { return m_initSigma_ratio; }
+
+
+
+
+
+      /**
         * Gets the z first order statistics (mostly for test purposes)
         */
       inline const std::vector<blitz::Array<double,2> >& getZFirstOrder() const
@@ -111,6 +166,12 @@ namespace Torch { namespace trainer {
       std::vector<blitz::Array<double,2> > m_z_first_order; /// Current mean of the z_{n} latent variable (1 for each sample)
       blitz::Array<double,2> m_sum_z_second_order; /// Current sum of the covariance of the z_{n} latent variable
       int m_seed; /// The seed for the random initialization of W and sigma2
+      int m_initF_method;
+      double m_initF_ratio;
+      int m_initG_method;
+      double m_initG_ratio;
+      int m_initSigma_method;
+      double m_initSigma_ratio;
 
       std::vector<blitz::Array<double,1> > m_y_first_order; /// Current mean of the y_{n} latent variable
       std::vector<blitz::Array<double,2> > m_y_second_order; /// Current covariance of the y_{n} latent variable
@@ -143,6 +204,14 @@ namespace Torch { namespace trainer {
       void computeMeanVariance(Torch::machine::PLDABaseMachine& machine,
         const std::vector<Torch::io::Arrayset>& v_ar);
       void initMembers(const std::vector<Torch::io::Arrayset>& v_ar);
+      void initFGSigma(Torch::machine::PLDABaseMachine& machine, 
+        const std::vector<Torch::io::Arrayset>& v_ar);
+      void initF(Torch::machine::PLDABaseMachine& machine, 
+        const std::vector<Torch::io::Arrayset>& v_ar);
+      void initG(Torch::machine::PLDABaseMachine& machine, 
+        const std::vector<Torch::io::Arrayset>& v_ar);
+      void initSigma(Torch::machine::PLDABaseMachine& machine, 
+        const std::vector<Torch::io::Arrayset>& v_ar);
       void initRandomFGSigma(Torch::machine::PLDABaseMachine& machine);
 
       void checkTrainingData(const std::vector<Torch::io::Arrayset>& v_ar);
