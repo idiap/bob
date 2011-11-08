@@ -10,59 +10,59 @@
 
 #include "io/Array.h"
 
-#include "io/python/pyio.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = Torch::io;
 namespace core = Torch::core;
-namespace array = Torch::core::array;
+namespace ca = Torch::core::array;
 namespace tp = Torch::python;
 
 /**
  * Creates a new io::Array from a NumPy ndarray
  */
 static boost::shared_ptr<io::Array> array_from_any1(object o) {
-  return boost::make_shared<io::Array>(boost::make_shared<tp::npyarray>(o, object()));
+  return boost::make_shared<io::Array>(boost::make_shared<tp::ndarray>(o, object()));
 }
 
 static boost::shared_ptr<io::Array> array_from_any2(object o, object dtype) {
-  return boost::make_shared<io::Array>(boost::make_shared<tp::npyarray>(o, dtype));
+  return boost::make_shared<io::Array>(boost::make_shared<tp::ndarray>(o, dtype));
 }
 
 /**
  * Wraps a buffer with a NumPy array skin
  */
 static object get_array(io::Array& a) {
-  return tp::buffer_object(a.get());
+  return tp::ndarray(a.get()).pyobject();
 }
 
 static void set_array1(io::Array& a, object o) {
-  a.set(boost::make_shared<tp::npyarray>(o, object()));
+  a.set(boost::make_shared<tp::ndarray>(o, object()));
 }
 
-static void set_array2(io::Array& a, object o, object dtype) {
-  a.set(boost::make_shared<tp::npyarray>(o, dtype));
+static void set_array2(io::Array& a, object o, object d) {
+  a.set(boost::make_shared<tp::ndarray>(o, d));
 }
 
 void bind_io_array() {
 
-  enum_<array::ElementType>("ElementType")
-    .value(array::stringize(array::t_unknown), array::t_unknown)
-    .value(array::stringize(array::t_bool), array::t_bool)
-    .value(array::stringize(array::t_int8), array::t_int8)
-    .value(array::stringize(array::t_int16), array::t_int16)
-    .value(array::stringize(array::t_int32), array::t_int32)
-    .value(array::stringize(array::t_int64), array::t_int64)
-    .value(array::stringize(array::t_uint8), array::t_uint8)
-    .value(array::stringize(array::t_uint16), array::t_uint16)
-    .value(array::stringize(array::t_uint32), array::t_uint32)
-    .value(array::stringize(array::t_uint64), array::t_uint64)
-    .value(array::stringize(array::t_float32), array::t_float32)
-    .value(array::stringize(array::t_float64), array::t_float64)
-    .value(array::stringize(array::t_float128), array::t_float128)
-    .value(array::stringize(array::t_complex64), array::t_complex64)
-    .value(array::stringize(array::t_complex128), array::t_complex128)
-    .value(array::stringize(array::t_complex256), array::t_complex256)
+  enum_<ca::ElementType>("ElementType")
+    .value(ca::stringize(ca::t_unknown), ca::t_unknown)
+    .value(ca::stringize(ca::t_bool), ca::t_bool)
+    .value(ca::stringize(ca::t_int8), ca::t_int8)
+    .value(ca::stringize(ca::t_int16), ca::t_int16)
+    .value(ca::stringize(ca::t_int32), ca::t_int32)
+    .value(ca::stringize(ca::t_int64), ca::t_int64)
+    .value(ca::stringize(ca::t_uint8), ca::t_uint8)
+    .value(ca::stringize(ca::t_uint16), ca::t_uint16)
+    .value(ca::stringize(ca::t_uint32), ca::t_uint32)
+    .value(ca::stringize(ca::t_uint64), ca::t_uint64)
+    .value(ca::stringize(ca::t_float32), ca::t_float32)
+    .value(ca::stringize(ca::t_float64), ca::t_float64)
+    .value(ca::stringize(ca::t_float128), ca::t_float128)
+    .value(ca::stringize(ca::t_complex64), ca::t_complex64)
+    .value(ca::stringize(ca::t_complex128), ca::t_complex128)
+    .value(ca::stringize(ca::t_complex256), ca::t_complex256)
     ;
 
   //base class declaration

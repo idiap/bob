@@ -198,8 +198,19 @@ template <> int tp::ctype_to_num<std::complex<long double> >(void)
 #define TP_DESCR(x) ((PyArray_Descr*)x.ptr())
 
 tp::dtype::dtype (bp::object dtype_like) {
-  PyArray_Descr* tmp = 0;
-  PyArray_DescrConverter2(dtype_like.ptr(), &tmp); //returns new ref
+  if (!dtype_like.is_none()) {
+    PyArray_Descr* tmp = 0;
+    PyArray_DescrConverter2(dtype_like.ptr(), &tmp); //returns new ref
+    m_self = make_non_null_object((PyObject*)tmp);
+  }
+}
+
+tp::dtype::dtype (PyArray_Descr* descr) {
+  if (descr) m_self = make_non_null_object((PyObject*)descr);
+}
+
+tp::dtype::dtype(int typenum) {
+  PyArray_Descr* tmp = PyArray_DescrFromType(typenum); //new ref
   m_self = make_non_null_object((PyObject*)tmp);
 }
 
@@ -208,11 +219,22 @@ tp::dtype::dtype(ca::ElementType eltype) {
   m_self = make_non_null_object((PyObject*)tmp);
 }
 
+tp::dtype::dtype(const tp::dtype& other): m_self(other.m_self)
+{
+}
+
+tp::dtype::dtype() {
+}
+
 tp::dtype::~dtype() { }
 
+tp::dtype& tp::dtype::operator= (const tp::dtype& other) {
+  m_self = other.m_self;
+  return *this;
+}
+
 bool tp::dtype::has_native_byteorder() const {
-  return (PyArray_EquivByteorders(TP_DESCR(m_self)->byteorder, NPY_NATIVE) || 
-      TP_DESCR(m_self)->elsize == 1);
+  return m_self.is_none()? false : (PyArray_EquivByteorders(TP_DESCR(m_self)->byteorder, NPY_NATIVE) || TP_DESCR(m_self)->elsize == 1);
 }
 
 bool tp::dtype::has_type(ca::ElementType _eltype) const {
@@ -220,7 +242,12 @@ bool tp::dtype::has_type(ca::ElementType _eltype) const {
 }
 
 ca::ElementType tp::dtype::eltype() const {
-  return tp::num_to_type(TP_DESCR(m_self)->type_num);
+  return m_self.is_none()? ca::t_unknown : 
+    tp::num_to_type(TP_DESCR(m_self)->type_num);
+}
+      
+int tp::dtype::type_num() const {
+  return m_self.is_none()? -1 : TP_DESCR(m_self)->type_num;
 }
 
 /***************************************************************************
@@ -239,9 +266,10 @@ ca::ElementType tp::dtype::eltype() const {
  * 2. The array is C-style, contiguous and aligned
  */
 static bp::object try_refer_ndarray (boost::python::object array_like, 
-    boost::python::object dtype) {
+    tp::dtype _dtype) {
   
   PyArrayObject* candidate = TP_ARRAY(array_like);
+  bp::object dtype = _dtype.self();
 
   bool can_refer = true;
 
@@ -250,8 +278,7 @@ static bp::object try_refer_ndarray (boost::python::object array_like,
   if (!(PyArray_EquivByteorders(candidate->descr->byteorder, NPY_NATIVE) ||
         candidate->descr->elsize == 1)) can_refer = false; //check 1.a
         
-  if (!dtype.is_none() && 
-      candidate->descr->type_num != TP_DESCR(dtype)->type_num)
+  if (!dtype.is_none() && candidate->descr->type_num != _dtype.type_num())
     can_refer = false; //check 1.b
  
   //tests the following: NPY_ARRAY_C_CONTIGUOUS and NPY_ARRAY_ALIGNED
@@ -291,10 +318,9 @@ static boost::shared_ptr<void> shared_from_ndarray (bp::object& o) {
 }
 
 tp::ndarray::ndarray(bp::object o, bp::object _dtype):
-  m_is_numpy(true),
-  m_dtype(_dtype)
+  m_is_numpy(true)
 {
-  bp::object mine = try_refer_ndarray(o, m_dtype);
+  bp::object mine = try_refer_ndarray(o, tp::dtype(_dtype));
 
   //captures data from a numeric::array
   typeinfo_ndarray(mine, m_type);
@@ -310,7 +336,7 @@ tp::ndarray::ndarray(const ca::interface& other) {
   set(other);
 }
 
-tp::ndarray::ndarray(boost::shared_ptr<ca::interface>& other) {
+tp::ndarray::ndarray(boost::shared_ptr<ca::interface> other) {
   set(other);
 }
 
@@ -390,7 +416,7 @@ void tp::ndarray::set(const ca::interface& other) {
   m_is_numpy = true;
 }
 
-void tp::ndarray::set(boost::shared_ptr<ca::interface>& other) {
+void tp::ndarray::set(boost::shared_ptr<ca::interface> other) {
   m_type = other->type();
   m_is_numpy = false;
   m_ptr = other->ptr();

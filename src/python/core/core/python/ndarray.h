@@ -88,14 +88,41 @@ namespace Torch { namespace python {
       dtype (boost::python::object dtype_like);
 
       /**
+       * Builds a new dtype object from a PyArray_Descr object that will have
+       * its own reference counting increased internally. So, the object is
+       * *not* borrowed/stolen and you can delete it when done if you so wish.
+       */
+      dtype (PyArray_Descr* descr);
+
+      /**
+       * Builds a new dtype object from a numpy type_num integer
+       */
+      dtype(int npy_typenum);
+
+      /**
        * Builds a new dtype object from a torch element type
        */
       dtype(Torch::core::array::ElementType eltype);
 
       /**
+       * Copy constructor
+       */
+      dtype(const dtype& other);
+
+      /**
+       * Default constructor -- use default dtype from NumPy
+       */
+      dtype();
+
+      /**
        * D'tor virtualization
        */ 
       virtual ~dtype();
+
+      /**
+       * Assignment
+       */
+      dtype& operator= (const dtype& other);
 
       /**
        * Somme checks
@@ -107,6 +134,11 @@ namespace Torch { namespace python {
        * Returns the current element type
        */
       Torch::core::array::ElementType eltype() const;
+
+      /**
+       * Returns the current type num or -1, if I'm None
+       */
+      int type_num() const;
 
       /**
        * Returns a boost::python representation of this object - maybe None.
@@ -144,7 +176,7 @@ namespace Torch { namespace python {
       /**
        * Builds a new array by referring to the data of an existing buffer.
        */
-      ndarray(boost::shared_ptr<Torch::core::array::interface>& buffer);
+      ndarray(boost::shared_ptr<Torch::core::array::interface> buffer);
 
       /**
        * Builds a new array from scratch using the typeinfo. This array will be
@@ -165,7 +197,7 @@ namespace Torch { namespace python {
       /**
        * Refers to the data of another buffer.
        */
-      virtual void set(boost::shared_ptr<Torch::core::array::interface>& buffer);
+      virtual void set(boost::shared_ptr<Torch::core::array::interface> buffer);
 
       /**
        * Re-allocates this buffer taking into consideration new requirements.
@@ -200,11 +232,6 @@ namespace Torch { namespace python {
         (const boost::python::object& dtype = boost::python::object());
 
       /**
-       * Returns the data type of this array.
-       */
-      inline boost::python::object pytype() { return m_dtype; }
-
-      /**
        * Gets a shallow copy of this array, if internally it is a NumPy array.
        * Otherwise, returns a wrapper around the internal buffer memory and
        * correctly reference counts it so the given object becomes responsible
@@ -226,7 +253,6 @@ namespace Torch { namespace python {
       Torch::core::array::typeinfo m_type; ///< type information
       void* m_ptr; ///< pointer to the data
       bool m_is_numpy; ///< true if initiated with a NumPy array
-      boost::python::object m_dtype; ///< Description type pointer
       boost::shared_ptr<void> m_data; ///< Pointer to the data owner
 
   };

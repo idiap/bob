@@ -9,44 +9,23 @@
 #include "io/File.h"
 #include "io/CodecRegistry.h"
 
-#include "io/python/pyio.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace tp = Torch::python;
 namespace io = Torch::io;
-
-static object typeinfo_dtype (const io::typeinfo& info) {
-  if (info.is_valid()) {
-    handle<> hdl((PyObject*)tp::describe_eltype(info.dtype));
-    object retval(hdl);
-    return retval;
-  }
-
-  return object();
-}
-
-static tuple ti_shape(const io::typeinfo& ti) {
-  list retval;
-  for (size_t i=0; i<ti.nd; ++i) retval.append(ti.shape[i]);
-  return tuple(retval);
-}
-
-static tuple ti_stride(const io::typeinfo& ti) {
-  list retval;
-  for (size_t i=0; i<ti.nd; ++i) retval.append(ti.stride[i]);
-  return tuple(retval);
-}
+namespace ca = Torch::core::array;
 
 static object file_array_read(io::File& f) {
-  tp::npyarray a(f.array_type());
+  tp::ndarray a(f.array_type());
   f.array_read(a);
-  return tp::npyarray_object(a);
+  return a.pyobject(); //shallow copy
 }
 
 static object file_arrayset_read(io::File& f, size_t index) {
-  tp::npyarray a(f.array_type());
+  tp::ndarray a(f.array_type());
   f.arrayset_read(a, index);
-  return tp::npyarray_object(a);
+  return a.pyobject(); //shallow copy
 }
 
 static boost::shared_ptr<io::File> string_open1 (const std::string& filename,
@@ -61,15 +40,6 @@ static boost::shared_ptr<io::File> string_open2 (const std::string& filename,
 
 void bind_io_file() {
   
-  class_<io::typeinfo>("typeinfo", "Type information for Torch C++ data", 
-      no_init)
-    .add_property("dtype", &typeinfo_dtype)
-    .def_readonly("cxxtype", &io::typeinfo::dtype)
-    .def_readonly("nd", &io::typeinfo::nd)
-    .add_property("shape", &ti_shape)
-    .add_property("stride", &ti_stride)
-    ;
-
   class_<io::File, boost::shared_ptr<io::File>, boost::noncopyable>("File", "Abstract base class for all Array/Arrayset i/o operations", no_init)
     .add_property("filename", make_function(&io::File::filename, return_value_policy<copy_const_reference>()), "The path to the file being read/written")
     .add_property("array_type", make_function(&io::File::array_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")

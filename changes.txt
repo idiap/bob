@@ -1,10 +1,5 @@
 Things to consider:
 
-* move io::buffer and io::typeinfo => core
-* create a class called tp::ndarray that inherits from both core::buffer and
-  bp::object and is automatically converted to and from python. Accumulate on
-  this class all NumPy ndarray functionality for copying and extracting
-  information in a safe way.
 * io.arrayset.cat is not implemented
 * io.video subsystem is missing
 * io.codec tests are missing

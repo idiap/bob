@@ -9,6 +9,7 @@
 
 void bind_core_bz_numpy();
 void bind_core_array_tinyvector();
+void bind_core_array_typeinfo();
 //void bind_core_array_examples(); ///< examples
 
 BOOST_PYTHON_MODULE(libpytorch_core_ndarray) {
@@ -16,5 +17,6 @@ BOOST_PYTHON_MODULE(libpytorch_core_ndarray) {
 
   bind_core_bz_numpy();
   bind_core_array_tinyvector();
+  bind_core_array_typeinfo();
   //bind_core_array_examples(); ///< examples
 }

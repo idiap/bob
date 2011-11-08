@@ -15,9 +15,6 @@ set(pysrc
    
    "src/datetime.cc"
 
-   "src/npyarray.cc"
-   "src/pyio.cc"
-   
    "src/main.cc"
    )
  
@@ -26,8 +23,6 @@ include(../../cmake/macros.cmake)
 torch_python_package_bindings(io "${pysrc}")
 add_dependencies(pytorch_io python-core_header_install)
 target_link_libraries(pytorch_io pytorch_core_ndarray)
-
-torch_header_install(python-io io "torch::python::io")
 
 torch_python_install(io)
 

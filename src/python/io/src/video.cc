@@ -10,8 +10,7 @@
 
 #include "io/Video.h"
 #include "core/python/exception.h"
-
-#include "io/python/pyio.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = Torch::io;
@@ -39,9 +38,9 @@ struct iterator_wrapper {
       PYTHON_ERROR(StopIteration, "no more data");
     }
 
-    tp::npyarray retval(reader->frame_type());
+    tp::ndarray retval(reader->frame_type());
     o.read(retval); //note that this will advance the iterator
-    return tp::npyarray_object(retval);
+    return retval.pyobject();
   }
 
   /**
@@ -68,11 +67,11 @@ static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
     PYTHON_ERROR(IndexError, "invalid index");
   }
 
-  tp::npyarray retval(v.frame_type());
+  tp::ndarray retval(v.frame_type());
   io::VideoReader::const_iterator it = v.begin();
   it += frame;
   it.read(retval);
-  return tp::npyarray_object(retval);
+  return retval.pyobject();
 }
 
 /**
@@ -115,24 +114,23 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   io::VideoReader::const_iterator it = v.begin();
   it += start;
   for (size_t i=start, j=0; i<stop; i+=step, ++j, it+=(step-1)) {
-    tp::npyarray tmp(v.frame_type());
+    tp::ndarray tmp(v.frame_type());
     it.read(tmp);
-    retval.append(tp::npyarray_object(tmp));
+    retval.append(tmp.pyobject());
   }
  
   return tuple(retval);
 }
 
 static object videoreader_load(io::VideoReader& reader) {
-  tp::npyarray tmp(reader.video_type());
+  tp::ndarray tmp(reader.video_type());
   reader.load(tmp);
-  return tp::npyarray_object(tmp);
+  return tmp.pyobject();
 }
 
 static void videowriter_append(io::VideoWriter& writer, object a) {
-  handle<> hdl((PyObject*)tp::describe_eltype(writer.video_type().dtype));
-  object dtype(hdl);
-  tp::npyarray tmp(a, dtype);
+  tp::dtype dtype(writer.video_type().dtype);
+  tp::ndarray tmp(a, dtype.self());
   writer.append(tmp);
 }
 

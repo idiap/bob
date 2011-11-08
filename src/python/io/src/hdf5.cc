@@ -10,13 +10,14 @@
 #include <boost/format.hpp>
 
 #include "core/python/exception.h"
-#include "io/python/pyio.h"
+#include "core/python/ndarray.h"
 
 #include "io/HDF5File.h"
 
 using namespace boost::python;
 namespace io = Torch::io;
 namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
 /**
  * Allows us to write HDF5File("filename.hdf5", "rb")
@@ -121,11 +122,11 @@ static object hdf5file_xread(io::HDF5File& f, const std::string& p,
   }
 
   //read as an numpy array
-  io::typeinfo atype;
+  ca::typeinfo atype;
   type.copy_to(atype);
-  tp::npyarray retval(atype);
+  tp::ndarray retval(atype);
   f.read_buffer(p, pos, retval);
-  return tp::npyarray_object(retval);
+  return retval.pyobject();
 }
 
 static object hdf5file_lread(io::HDF5File& f, const std::string& p,
@@ -151,19 +152,19 @@ template <typename T> static void hdf5file_replace_scalar(io::HDF5File& f, const
 
 static void hdf5file_replace_array(io::HDF5File& f, const std::string& p, 
     size_t pos, object array_like) {
-  f.write_buffer(p, pos, tp::npyarray(array_like, object()));
+  f.write_buffer(p, pos, tp::ndarray(array_like, object()));
 }
 
 static void hdf5file_append_array(io::HDF5File& f, 
     const std::string& path, object array_like, size_t compression) {
-  tp::npyarray tmp(array_like, object());
+  tp::ndarray tmp(array_like, object());
   if (!f.contains(path)) f.create(path, tmp.type(), true, compression);
   f.extend_buffer(path, tmp);
 }
 
 static void hdf5file_set_array(io::HDF5File& f, 
     const std::string& path, object array_like, size_t compression) {
-  tp::npyarray tmp(array_like, object());
+  tp::ndarray tmp(array_like, object());
   if (!f.contains(path)) f.create(path, tmp.type(), false, compression);
   f.write_buffer(path, 0, tmp);
 }
