@@ -26,6 +26,8 @@ set(src
     "src/logging.cc"
     "src/array_exception.cc"
     "src/array_type.cc"
+    "src/array.cc"
+    "src/blitz_array.cc"
     "src/cast.cc"
     "src/reshape_exception.cc"
     "src/repmat_exception.cc"

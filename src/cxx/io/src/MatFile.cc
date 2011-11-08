@@ -15,6 +15,7 @@
 
 namespace fs = boost::filesystem;
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 class MatFile: public io::File {
 
@@ -51,11 +52,11 @@ class MatFile: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& array_type () const {
+    virtual const ca::typeinfo& array_type () const {
       return m_type;
     }
 
-    virtual const io::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& arrayset_type () const {
       return m_type;
     }
 
@@ -67,7 +68,7 @@ class MatFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(io::buffer& buffer) {
+    virtual void array_read(ca::interface& buffer) {
 
       boost::shared_ptr<mat_t> mat = 
         io::detail::make_matfile(m_filename, m_mode);
@@ -82,7 +83,7 @@ class MatFile: public io::File {
 
     }
 
-    virtual void arrayset_read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
       boost::shared_ptr<mat_t> mat = 
         io::detail::make_matfile(m_filename, m_mode);
@@ -97,7 +98,7 @@ class MatFile: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const ca::interface& buffer) {
 
       boost::shared_ptr<mat_t> mat =
         io::detail::make_matfile(m_filename, m_mode);
@@ -135,7 +136,7 @@ class MatFile: public io::File {
       return m_size-1;
     }
     
-    virtual void array_write (const io::buffer& buffer) {
+    virtual void array_write (const ca::interface& buffer) {
 
       static std::string varname("array");
 
@@ -143,7 +144,8 @@ class MatFile: public io::File {
       fs::path path (m_filename);
       if (fs::exists(m_filename)) fs::remove(m_filename);
 
-      boost::shared_ptr<mat_t> mat = io::detail::make_matfile(m_filename, m_mode);
+      boost::shared_ptr<mat_t> mat = io::detail::make_matfile(m_filename, 
+          m_mode);
       if (!mat)
         throw std::runtime_error("cannot open matlab file for writing");
 
@@ -160,12 +162,12 @@ class MatFile: public io::File {
 
   private: //representation
 
-    typedef std::map<size_t, std::pair<std::string, io::typeinfo> > map_type;
+    typedef std::map<size_t, std::pair<std::string, ca::typeinfo> > map_type;
 
     std::string m_filename;
     enum mat_acc m_mode;
     boost::shared_ptr<map_type> m_map;
-    io::typeinfo m_type;
+    ca::typeinfo m_type;
     size_t       m_size;
     std::vector<size_t> m_id;
 

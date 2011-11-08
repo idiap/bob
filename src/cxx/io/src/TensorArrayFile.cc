@@ -10,6 +10,7 @@
 #include "io/CodecRegistry.h"
 
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 class TensorArrayFile: public io::File {
 
@@ -27,11 +28,11 @@ class TensorArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& array_type () const {
+    virtual const ca::typeinfo& array_type () const {
       return m_type;
     }
 
-    virtual const io::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& arrayset_type () const {
       return m_type;
     }
 
@@ -43,7 +44,7 @@ class TensorArrayFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(io::buffer& buffer) {
+    virtual void array_read(ca::interface& buffer) {
 
       if(!m_file) 
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -52,7 +53,7 @@ class TensorArrayFile: public io::File {
 
     }
 
-    virtual void arrayset_read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
       if(!m_file) 
         throw std::runtime_error("uninitialized binary file cannot be read");
@@ -61,7 +62,7 @@ class TensorArrayFile: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const ca::interface& buffer) {
 
       m_file.write(buffer);
 
@@ -71,7 +72,7 @@ class TensorArrayFile: public io::File {
 
     }
     
-    virtual void array_write (const io::buffer& buffer) {
+    virtual void array_write (const ca::interface& buffer) {
 
       //we don't have a special way to treat write()'s like in HDF5.
       arrayset_append(buffer);
@@ -81,7 +82,7 @@ class TensorArrayFile: public io::File {
   private: //representation
 
     io::TensorFile m_file;
-    io::typeinfo m_type;
+    ca::typeinfo m_type;
     std::string m_filename;
 
     static std::string s_codecname;

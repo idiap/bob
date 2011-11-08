@@ -6,17 +6,17 @@
  * goodies.
  */
 
-#ifndef TORCH_IO_UTILS_H 
-#define TORCH_IO_UTILS_H
+#ifndef TORCH_CORE_ARRAY_UTILS_H 
+#define TORCH_CORE_ARRAY_UTILS_H
 
 #include <blitz/array.h>
 #include <stdint.h>
 #include <stdexcept>
 
-#include "io/buffer.h"
+#include "core/array.h"
 #include "core/cast.h"
 
-namespace Torch { namespace io {
+namespace Torch { namespace core { namespace array {
 
   /**
    * Fills in shape and stride starting from a typeinfo object
@@ -38,7 +38,7 @@ namespace Torch { namespace io {
    * that the buffer outlives the returned blitz::Array<>.
    */
   template <typename T, int N>
-  blitz::Array<T,N> wrap(const io::buffer& buf) {
+  blitz::Array<T,N> wrap(const interface& buf) {
     
     const typeinfo& type = buf.type();
 
@@ -67,7 +67,7 @@ namespace Torch { namespace io {
    * be raised.
    */
   template <typename T, int N>
-  blitz::Array<T,N> cast(const io::buffer& buf) {
+  blitz::Array<T,N> cast(const interface& buf) {
 
     const typeinfo& type = buf.type();
 
@@ -113,7 +113,6 @@ namespace Torch { namespace io {
 
   }
 
-}}
+}}}
 
-#endif /* TORCH_IO_UTILS_H */
-
+#endif /* TORCH_CORE_ARRAY_UTILS_H */

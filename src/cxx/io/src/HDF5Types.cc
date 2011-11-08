@@ -527,7 +527,7 @@ static io::hdf5type array_to_hdf5 (Torch::core::array::ElementType eltype) {
   throw std::runtime_error("unsupported dtyle <=> hdf5 type conversion -- debug me");
 }
 
-io::HDF5Type::HDF5Type(const io::typeinfo& ti): 
+io::HDF5Type::HDF5Type(const Torch::core::array::typeinfo& ti): 
   m_type(array_to_hdf5(ti.dtype)),
   m_shape(ti.nd, ti.shape)
 {
@@ -612,7 +612,7 @@ Torch::core::array::ElementType io::HDF5Type::element_type() const {
   return Torch::core::array::t_unknown;
 }
 
-void io::HDF5Type::copy_to (io::typeinfo& ti) const {
+void io::HDF5Type::copy_to (Torch::core::array::typeinfo& ti) const {
   ti.dtype = element_type();
   ti.nd = shape().n();
   if (ti.nd > TORCH_MAX_DIM) throw std::runtime_error("HDF5 type has more than the allowed maximum number of dimensions -- debug me");

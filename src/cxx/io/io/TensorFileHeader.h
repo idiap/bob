@@ -11,8 +11,7 @@
 
 #include <fstream>
 #include <blitz/array.h>
-#include "core/array_type.h"
-#include "io/buffer.h"
+#include "core/array.h"
 
 namespace Torch { namespace io { 
 
@@ -83,7 +82,7 @@ namespace Torch { namespace io {
 
       //representation
       TensorType m_tensor_type; ///< array element type 
-      typeinfo m_type; ///< the type information
+      Torch::core::array::typeinfo m_type; ///< the type information
       size_t m_n_samples; ///< total number of arrays in the file
       size_t m_tensor_size; ///< the number of dimensions in each array
     };

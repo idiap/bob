@@ -11,59 +11,69 @@
 
 #include <stdexcept>
 #include <boost/make_shared.hpp>
+#include <blitz/array.h>
 
-#include "io/buffer.h"
-#include "io/utils.h"
+#include "core/array.h"
+#include "core/array_utils.h"
 
 #include "core/array_check.h"
 #include "core/array_type.h"
 #include "core/cast.h"
 
-namespace Torch { namespace io {
+namespace Torch { namespace core { namespace array {
 
-  class carray: public buffer {
+  /**
+   * A blitz::Array representation of an array.
+   */
+  class blitz_array: public interface {
 
     public:
 
       /**
-       * Starts by refering to the data from another carray.
+       * Starts by refering to the data from another blitz array.
        */
-      carray(boost::shared_ptr<carray> other);
+      blitz_array(boost::shared_ptr<blitz_array> other);
 
       /**
-       * Starts by copying the data from another carray.
+       * Starts by copying the data from another blitz array.
        */
-      carray(const carray& other);
+      blitz_array(const blitz_array& other);
 
       /**
        * Starts by refering to the data from another buffer.
        */
-      carray(boost::shared_ptr<buffer> other);
+      blitz_array(boost::shared_ptr<interface> other);
 
       /**
        * Starts by copying the data from another buffer.
        */
-      carray(const buffer& other);
+      blitz_array(const interface& other);
 
       /**
        * Starts with an uninitialized, pre-allocated array.
        */
-      carray(const typeinfo& info);
+      blitz_array(const typeinfo& info);
+
+      /**
+       * Borrows the given pointer - if you use this constructor, you must make
+       * sure the pointed data outlives this object.
+       */
+      blitz_array(void* data, const typeinfo& info);
 
       /**
        * Destroyes me
        */
-      virtual ~carray();
+      virtual ~blitz_array();
 
       /**
        * Copies the data from another buffer.
        */
-      virtual void set(const buffer& other);
+      virtual void set(const interface& other);
 
       /**
        * Refers to the data of another buffer.
        */
-      virtual void set(boost::shared_ptr<buffer> other);
+      virtual void set(boost::shared_ptr<interface> other);
 
       /**
        * Re-allocates this buffer taking into consideration new requirements.
@@ -72,9 +82,9 @@ namespace Torch { namespace io {
       virtual void set (const typeinfo& req);
 
       /**
-       * Refers to the data of another carray.
+       * Refers to the data of another blitz array.
        */
-      void set(boost::shared_ptr<carray> other);
+      void set(boost::shared_ptr<blitz_array> other);
 
       /**
        * Element type
@@ -92,6 +102,7 @@ namespace Torch { namespace io {
       virtual boost::shared_ptr<void> owner() { return m_data; }
       virtual boost::shared_ptr<const void> owner() const { return m_data; }
 
+
       /******************************************************************
        * Blitz Array specific manipulations
        ******************************************************************/
@@ -103,7 +114,7 @@ namespace Torch { namespace io {
        * you don't want that to be the case, use the const variant.
        */
       template <typename T, int N> 
-        carray(boost::shared_ptr<blitz::Array<T,N> > data) {
+        blitz_array(boost::shared_ptr<blitz::Array<T,N> > data) {
           set(data);
         }
 
@@ -114,7 +125,7 @@ namespace Torch { namespace io {
        * reference.
        */
       template <typename T, int N> 
-        carray(const blitz::Array<T,N>& data) {
+        blitz_array(const blitz::Array<T,N>& data) {
           set(data);
         }
 
@@ -125,13 +136,12 @@ namespace Torch { namespace io {
       template <typename T, int N>
         void set(boost::shared_ptr<blitz::Array<T,N> > data) {
           
-          if (Torch::core::array::getElementType<T>() == 
-              Torch::core::array::t_unknown)
+          if (getElementType<T>() == t_unknown)
             throw std::invalid_argument("unsupported element type on blitz::Array<>");
           if (N > TORCH_MAX_DIM) 
             throw std::invalid_argument("unsupported number of dimensions on blitz::Array<>");
 
-          if (!Torch::core::array::isCContiguous(*data.get()))
+          if (!isCContiguous(*data.get()))
             throw std::invalid_argument("cannot buffer'ize non-c contiguous array");
 
           m_type.set(data);
@@ -146,7 +156,7 @@ namespace Torch { namespace io {
        * will do this by copying the data you gave.
        */
       template <typename T, int N> void set(const blitz::Array<T,N>& data) {
-        set(boost::make_shared<blitz::Array<T,N> >(Torch::core::array::ccopy(data)));
+        set(boost::make_shared<blitz::Array<T,N> >(ccopy(data)));
       }
 
       /**
@@ -158,7 +168,7 @@ namespace Torch { namespace io {
        * throw an exception.
        *
        * 2) If this buffer was started by refering to another buffer's data
-       * which is not a carray, an exception will be raised.
+       * which is not a blitz array, an exception will be raised.
        * Unfortunately, blitz::Array<>'s do not offer a management mechanism
        * for tracking external data allocation. The exception can be avoided
        * and the referencing mechanism forced if you set the flag "temporary"
@@ -171,9 +181,9 @@ namespace Torch { namespace io {
         
         if (m_is_blitz) {
 
-          if (!m_data) throw std::runtime_error("empty blitz buffer");
+          if (!m_data) throw std::runtime_error("empty blitz array");
           
-          if (m_type.dtype != Torch::core::array::getElementType<T>()) throw std::runtime_error("cannot efficiently retrieve blitz::Array<> from buffer containing a different dtype");
+          if (m_type.dtype != getElementType<T>()) throw std::runtime_error("cannot efficiently retrieve blitz::Array<> from buffer containing a different dtype");
           
           if (m_type.nd != N) throw std::runtime_error("cannot retrieve blitz::Array<> from buffer containing different dimensionality");
           
@@ -183,11 +193,11 @@ namespace Torch { namespace io {
         else {
         
           if (temporary) { //returns a temporary reference
-            return Torch::io::wrap<T,N>(*this);
+            return Torch::core::array::wrap<T,N>(*this);
           }
           
           else {
-            throw std::runtime_error("cannot get() external non-temporary non-blitz buffer array -- for a temporary object, set temporary=true; if you need the returned object to outlive this buffer; use copy() or cast()");
+            throw std::runtime_error("cannot get() external non-temporary non-blitz array buffer -- for a temporary object, set temporary=true; if you need the returned object to outlive this buffer; use copy() or cast()");
           }
         }
 
@@ -200,7 +210,7 @@ namespace Torch { namespace io {
        * data at. Only get the number of dimensions right!
        */
       template <typename T, int N> blitz::Array<T,N> cast() const {
-        return Torch::io::cast<T,N>(*this);
+        return Torch::core::array::cast<T,N>(*this);
       }
 
     private: //representation
@@ -212,6 +222,6 @@ namespace Torch { namespace io {
 
   };
 
-}}
+}}}
 
 #endif /* TORCH_IO_CARRAY_H */

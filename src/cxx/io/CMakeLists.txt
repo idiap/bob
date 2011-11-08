@@ -15,9 +15,6 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 set(src
     "src/Exception.cc"
 
-    "src/buffer.cc"
-    "src/carray.cc"
-    
     "src/Array.cc"
     "src/File.cc"
     "src/CodecRegistry.cc"

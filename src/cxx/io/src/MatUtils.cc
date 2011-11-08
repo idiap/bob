@@ -11,7 +11,7 @@
 
 namespace io = Torch::io;
 namespace iod = io::detail;
-namespace array = Torch::core::array;
+namespace ca = Torch::core::array;
 
 boost::shared_ptr<mat_t> iod::make_matfile(const std::string& filename,
     int flags) {
@@ -54,68 +54,68 @@ static boost::shared_ptr<matvar_t> make_matvar(boost::shared_ptr<mat_t>& file,
 /**
  * Returns the MAT_C_* enumeration for the given ElementType
  */
-static enum matio_classes mio_class_type (array::ElementType i) {
+static enum matio_classes mio_class_type (ca::ElementType i) {
   switch (i) {
-    case array::t_int8: 
+    case ca::t_int8: 
       return MAT_C_INT8;
-    case array::t_int16: 
+    case ca::t_int16: 
       return MAT_C_INT16;
-    case array::t_int32: 
+    case ca::t_int32: 
       return MAT_C_INT32;
-    case array::t_int64: 
+    case ca::t_int64: 
       return MAT_C_INT64;
-    case array::t_uint8: 
+    case ca::t_uint8: 
       return MAT_C_UINT8;
-    case array::t_uint16: 
+    case ca::t_uint16: 
       return MAT_C_UINT16;
-    case array::t_uint32: 
+    case ca::t_uint32: 
       return MAT_C_UINT32;
-    case array::t_uint64: 
+    case ca::t_uint64: 
       return MAT_C_UINT64;
-    case array::t_float32:
+    case ca::t_float32:
       return MAT_C_SINGLE;
-    case array::t_complex64:
+    case ca::t_complex64:
       return MAT_C_SINGLE;
-    case array::t_float64:
+    case ca::t_float64:
       return MAT_C_DOUBLE;
-    case array::t_complex128:
+    case ca::t_complex128:
       return MAT_C_DOUBLE;
     default:
-      throw io::TypeError(i, array::t_float32);
+      throw io::TypeError(i, ca::t_float32);
   }
 }
 
 /**
  * Returns the MAT_T_* enumeration for the given ElementType
  */
-static enum matio_types mio_data_type (array::ElementType i) {
+static enum matio_types mio_data_type (ca::ElementType i) {
   switch (i) {
-    case array::t_int8: 
+    case ca::t_int8: 
       return MAT_T_INT8;
-    case array::t_int16: 
+    case ca::t_int16: 
       return MAT_T_INT16;
-    case array::t_int32: 
+    case ca::t_int32: 
       return MAT_T_INT32;
-    case array::t_int64: 
+    case ca::t_int64: 
       return MAT_T_INT64;
-    case array::t_uint8: 
+    case ca::t_uint8: 
       return MAT_T_UINT8;
-    case array::t_uint16: 
+    case ca::t_uint16: 
       return MAT_T_UINT16;
-    case array::t_uint32: 
+    case ca::t_uint32: 
       return MAT_T_UINT32;
-    case array::t_uint64: 
+    case ca::t_uint64: 
       return MAT_T_UINT64;
-    case array::t_float32:
+    case ca::t_float32:
       return MAT_T_SINGLE;
-    case array::t_complex64:
+    case ca::t_complex64:
       return MAT_T_SINGLE;
-    case array::t_float64:
+    case ca::t_float64:
       return MAT_T_DOUBLE;
-    case array::t_complex128:
+    case ca::t_complex128:
       return MAT_T_DOUBLE;
     default:
-      throw io::TypeError(i, array::t_float32);
+      throw io::TypeError(i, ca::t_float32);
   }
 }
 
@@ -123,51 +123,51 @@ static enum matio_types mio_data_type (array::ElementType i) {
  * Returns the ElementType given the matio MAT_T_* enum and a flag indicating
  * if the array is complex or not (also returned by matio at matvar_t)
  */
-static array::ElementType torch_element_type (int mio_type, bool is_complex) {
+static ca::ElementType torch_element_type (int mio_type, bool is_complex) {
 
-  array::ElementType eltype = array::t_unknown;
+  ca::ElementType eltype = ca::t_unknown;
 
   switch(mio_type) {
 
     case(MAT_T_INT8): 
-      eltype = array::t_int8;
+      eltype = ca::t_int8;
       break;
     case(MAT_T_INT16): 
-      eltype = array::t_int16;
+      eltype = ca::t_int16;
       break;
     case(MAT_T_INT32):
-      eltype = array::t_int32;
+      eltype = ca::t_int32;
       break;
     case(MAT_T_INT64):
-      eltype = array::t_int64;
+      eltype = ca::t_int64;
       break;
     case(MAT_T_UINT8):
-      eltype = array::t_uint8;
+      eltype = ca::t_uint8;
       break;
     case(MAT_T_UINT16):
-      eltype = array::t_uint16;
+      eltype = ca::t_uint16;
       break;
     case(MAT_T_UINT32):
-      eltype = array::t_uint32;
+      eltype = ca::t_uint32;
       break;
     case(MAT_T_UINT64):
-      eltype = array::t_uint64;
+      eltype = ca::t_uint64;
       break;
     case(MAT_T_SINGLE):
-      eltype = array::t_float32;
+      eltype = ca::t_float32;
       break;
     case(MAT_T_DOUBLE):
-      eltype = array::t_float64;
+      eltype = ca::t_float64;
       break;
     default:
-      return array::t_unknown;
+      return ca::t_unknown;
   }
 
   //if type is complex, it is signalled slightly different
   if (is_complex) {
-    if (eltype == array::t_float32) return array::t_complex64;
-    else if (eltype == array::t_float64) return array::t_complex128;
-    else return array::t_unknown;
+    if (eltype == ca::t_float32) return ca::t_complex64;
+    else if (eltype == ca::t_float64) return ca::t_complex128;
+    else return ca::t_unknown;
   }
   
   return eltype;
@@ -180,9 +180,9 @@ static array::ElementType torch_element_type (int mio_type, bool is_complex) {
  * size and the type information.
  */
 static void row_to_col_order(const void* src_, void* dst_, 
-    const io::typeinfo& info) {
+    const ca::typeinfo& info) {
 
-  size_t dsize = Torch::core::array::getElementSize(info.dtype);
+  size_t dsize = info.item_size();
 
   //cast to byte type so we can manipulate the pointers...
   const uint8_t* src = static_cast<const uint8_t*>(src_);
@@ -246,9 +246,9 @@ static void row_to_col_order(const void* src_, void* dst_,
  * size and the type information.
  */
 static void row_to_col_order_complex(const void* src_, void* dst_re_,
-    void* dst_im_, const io::typeinfo& info) {
+    void* dst_im_, const ca::typeinfo& info) {
 
-  size_t dsize = Torch::core::array::getElementSize(info.dtype);
+  size_t dsize = info.item_size();
   size_t dsize2 = dsize/2; ///< size of each complex component (real, imaginary)
 
   //cast to byte type so we can manipulate the pointers...
@@ -320,9 +320,9 @@ static void row_to_col_order_complex(const void* src_, void* dst_re_,
  * same size and the type information.
  */
 static void col_to_row_order(const void* src_, void* dst_, 
-    const Torch::io::typeinfo& info) {
+    const ca::typeinfo& info) {
 
-  size_t dsize = Torch::core::array::getElementSize(info.dtype);
+  size_t dsize = info.item_size();
 
   //cast to byte type so we can manipulate the pointers...
   const uint8_t* src = static_cast<const uint8_t*>(src_);
@@ -386,9 +386,9 @@ static void col_to_row_order(const void* src_, void* dst_,
  * same size and the type information.
  */
 static void col_to_row_order_complex(const void* src_re_, const void* src_im_,
-    void* dst_, const Torch::io::typeinfo& info) {
+    void* dst_, const ca::typeinfo& info) {
 
-  size_t dsize = Torch::core::array::getElementSize(info.dtype);
+  size_t dsize = info.item_size();
   size_t dsize2 = dsize/2; ///< size of each complex component (real, imaginary)
 
   //cast to byte type so we can manipulate the pointers...
@@ -454,9 +454,9 @@ static void col_to_row_order_complex(const void* src_re_, const void* src_im_,
 }
   
 boost::shared_ptr<matvar_t> make_matvar
-(const std::string& varname, const Torch::io::buffer& buf) {
+(const std::string& varname, const ca::interface& buf) {
 
-  const Torch::io::typeinfo& info = buf.type();
+  const ca::typeinfo& info = buf.type();
   void* fdata = static_cast<void*>(new char[info.buffer_size()]);
   
   //matio gets dimensions as integers
@@ -464,9 +464,9 @@ boost::shared_ptr<matvar_t> make_matvar
   for (size_t i=0; i<info.nd; ++i) mio_dims[i] = info.shape[i];
 
   switch (info.dtype) {
-    case Torch::core::array::t_complex64:
-    case Torch::core::array::t_complex128:
-    case Torch::core::array::t_complex256:
+    case ca::t_complex64:
+    case ca::t_complex128:
+    case ca::t_complex256:
       {
         //special treatment for complex arrays
         uint8_t* real = static_cast<uint8_t*>(fdata);
@@ -491,12 +491,12 @@ boost::shared_ptr<matvar_t> make_matvar
 }
 
 /**
- * Assigns a single matvar variable to an io::buffer. Re-allocates the buffer
+ * Assigns a single matvar variable to an ca::interface. Re-allocates the buffer
  * if required.
  */
-static void assign_array (boost::shared_ptr<matvar_t> matvar, io::buffer& buf) {
+static void assign_array (boost::shared_ptr<matvar_t> matvar, ca::interface& buf) {
 
-  io::typeinfo info(torch_element_type(matvar->data_type, matvar->isComplex),
+  ca::typeinfo info(torch_element_type(matvar->data_type, matvar->isComplex),
       matvar->rank, matvar->dims);
 
   if(!buf.type().is_compatible(info)) buf.set(info);
@@ -509,7 +509,7 @@ static void assign_array (boost::shared_ptr<matvar_t> matvar, io::buffer& buf) {
 
 }
 
-void iod::read_array (boost::shared_ptr<mat_t> file, io::buffer& buf,
+void iod::read_array (boost::shared_ptr<mat_t> file, ca::interface& buf,
     const std::string& varname) {
 
   boost::shared_ptr<matvar_t> matvar;
@@ -521,7 +521,7 @@ void iod::read_array (boost::shared_ptr<mat_t> file, io::buffer& buf,
 }
 
 void iod::write_array(boost::shared_ptr<mat_t> file, 
-    const std::string& varname, const Torch::io::buffer& buf) {
+    const std::string& varname, const ca::interface& buf) {
 
   boost::shared_ptr<matvar_t> matvar = make_matvar(varname, buf);
   Mat_VarWrite(file.get(), matvar.get(), 0);
@@ -529,15 +529,15 @@ void iod::write_array(boost::shared_ptr<mat_t> file,
 }
 
 /**
- * Given a matvar_t object, returns our equivalent io::typeinfo struct.
+ * Given a matvar_t object, returns our equivalent ca::typeinfo struct.
  */
 static void get_var_info(boost::shared_ptr<const matvar_t> matvar,
-    io::typeinfo& info) {
+    ca::typeinfo& info) {
   info.set(torch_element_type(matvar->data_type, matvar->isComplex),
       matvar->rank, matvar->dims);
 }
 
-void iod::mat_peek(const std::string& filename, io::typeinfo& info) {
+void iod::mat_peek(const std::string& filename, ca::typeinfo& info) {
 
   boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw io::FileNotReadable(filename);
@@ -546,7 +546,7 @@ void iod::mat_peek(const std::string& filename, io::typeinfo& info) {
 
 }
 
-void iod::mat_peek_set(const std::string& filename, io::typeinfo& info) {
+void iod::mat_peek_set(const std::string& filename, ca::typeinfo& info) {
 
   static const boost::regex allowed_varname("^array_(\\d*)$");
   boost::cmatch what;
@@ -566,13 +566,13 @@ void iod::mat_peek_set(const std::string& filename, io::typeinfo& info) {
   get_var_info(matvar, info);
 }
 
-boost::shared_ptr<std::map<size_t, std::pair<std::string, io::typeinfo> > >
+boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > >
   iod::list_variables(const std::string& filename) {
 
   static const boost::regex allowed_varname("^array_(\\d*)$");
   boost::cmatch what;
 
-  boost::shared_ptr<std::map<size_t, std::pair<std::string, io::typeinfo> > > retval(new std::map<size_t, std::pair<std::string, io::typeinfo> >());
+  boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > > retval(new std::map<size_t, std::pair<std::string, ca::typeinfo> >());
 
   boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw io::FileNotReadable(filename);
@@ -590,12 +590,12 @@ boost::shared_ptr<std::map<size_t, std::pair<std::string, io::typeinfo> > >
  
   //now that we have found a variable under our name convention, fill the array
   //properties taking that variable as basis
-  (*retval)[id] = std::make_pair(matvar->name, io::typeinfo());
+  (*retval)[id] = std::make_pair(matvar->name, ca::typeinfo());
   get_var_info(matvar, (*retval)[id].second);
-  const io::typeinfo& type_cache = (*retval)[id].second;
+  const ca::typeinfo& type_cache = (*retval)[id].second;
 
-  if ((*retval)[id].second.dtype == array::t_unknown) {
-    throw io::TypeError((*retval)[id].second.dtype, array::t_float32);
+  if ((*retval)[id].second.dtype == ca::t_unknown) {
+    throw io::TypeError((*retval)[id].second.dtype, ca::t_float32);
   }
 
   //if we got here, just continue counting the variables inside. we

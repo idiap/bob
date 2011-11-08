@@ -17,8 +17,7 @@
 #include <map>
 #include <string>
 
-#include "io/buffer.h"
-#include "io/utils.h"
+#include "core/array.h"
 #include "io/Exception.h"
 
 namespace Torch { namespace io { namespace detail {
@@ -32,20 +31,22 @@ namespace Torch { namespace io { namespace detail {
   /**
    * Retrieves information about the first variable found on a file. 
    */
-  void mat_peek(const std::string& filename, Torch::io::typeinfo& info);
+  void mat_peek(const std::string& filename,
+      Torch::core::array::typeinfo& info);
 
   /**
    * Retrieves information about the first variable with a certain name
    * (array_%d) that exists in a .mat file (if it exists)
    */
-  void mat_peek_set(const std::string& filename, Torch::io::typeinfo& info);
+  void mat_peek_set(const std::string& filename,
+      Torch::core::array::typeinfo& info);
 
   /**
    * Retrieves information about all variables with a certain name (array_%d)
    * that exist in a .mat file
    */
   boost::shared_ptr<std::map<size_t, 
-    std::pair<std::string, Torch::io::typeinfo> > > 
+    std::pair<std::string, Torch::core::array::typeinfo> > > 
       list_variables(const std::string& filename);
 
   /**
@@ -53,14 +54,14 @@ namespace Torch { namespace io { namespace detail {
    * specify the variable name, I'll just read the next one. Re-allocates the
    * buffer if required.
    */
-  void read_array (boost::shared_ptr<mat_t> file, Torch::io::buffer& buf,
-      const std::string& varname="");
+  void read_array (boost::shared_ptr<mat_t> file,
+      Torch::core::array::interface& buf, const std::string& varname="");
 
   /**
    * Appends a single Array into the given matlab file and with a given name
    */
   void write_array(boost::shared_ptr<mat_t> file, 
-      const std::string& varname, const Torch::io::buffer& buf);
+      const std::string& varname, const Torch::core::array::interface& buf);
  
 }}}
 

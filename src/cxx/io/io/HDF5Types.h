@@ -28,8 +28,7 @@
   (H5_VERS_MAJOR>Maj))
 #endif
 
-#include "io/buffer.h"
-#include "core/array_type.h"
+#include "core/array.h"
 
 namespace Torch { namespace io {
 
@@ -397,9 +396,9 @@ namespace Torch { namespace io {
       HDF5Type(hdf5type type);
 
       /**
-       * Creates a HDF5Type from an io::typeinfo
+       * Creates a HDF5Type from an Torch::core::array::typeinfo
        */
-      HDF5Type(const io::typeinfo& ti);
+      HDF5Type(const Torch::core::array::typeinfo& ti);
 
       /**
        * Creates a HDF5Type from a type enumeration and an explicit shape
@@ -486,9 +485,9 @@ namespace Torch { namespace io {
       Torch::core::array::ElementType element_type() const;
 
       /**
-       * Copies this type information to a stock io::typeinfo
+       * Copies this type information to a stock Torch::core::array::typeinfo
        */
-      void copy_to (io::typeinfo& ti) const;
+      void copy_to (Torch::core::array::typeinfo& ti) const;
 
     private: //representation
 

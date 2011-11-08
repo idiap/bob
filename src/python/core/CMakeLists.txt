@@ -12,15 +12,12 @@ set(pysrc
    "src/main.cc"
    )
 
-set(pysrc_pycore
-   "src/pycore.cc"
-   )
-
-set(pysrc_array
+set(pysrc_ndarray
+   "src/ndarray.cc"
    "src/blitz_numpy.cc"
    "src/tinyvector.cc"
-   "src/array_wrapper_example.cc"
-   "src/main_array.cc"
+   #"src/array_wrapper_example.cc"
+   "src/main_ndarray.cc"
    )
 
 set(pysrc_vector
@@ -54,19 +51,22 @@ torch_python_package_bindings(core "${pysrc}")
 
 torch_header_install(python-core core "torch::python::core")
 
-torch_python_submodule_bindings(core utils "${pysrc_pycore}")
-add_dependencies(pytorch_core_utils python-core_header_install)
-
-torch_python_submodule_bindings(core array "${pysrc_array}")
-add_dependencies(pytorch_core_array python-core_header_install)
-target_link_libraries(pytorch_core_array pytorch_core_utils)
+torch_python_submodule_bindings(core ndarray "${pysrc_ndarray}")
+add_dependencies(pytorch_core_ndarray python-core_header_install)
 
 torch_python_submodule_bindings(core vector "${pysrc_vector}")
-target_link_libraries(pytorch_core_vector pytorch_core_utils)
+add_dependencies(pytorch_core_vector python-core_header_install)
+target_link_libraries(pytorch_core_vector pytorch_core_ndarray)
 
 torch_python_submodule_bindings(core mapstring "${pysrc_mapstring}")
+add_dependencies(pytorch_core_mapstring python-core_header_install)
+
 torch_python_submodule_bindings(core tuple "${pysrc_tuple}")
+add_dependencies(pytorch_core_tuple python-core_header_install)
+
 torch_python_submodule_bindings(core random "${pysrc_random}")
+add_dependencies(pytorch_core_random python-core_header_install)
+
 torch_python_install(core)
 
 # Our test units

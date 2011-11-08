@@ -5,43 +5,39 @@
  * @brief Some buffer stuff
  */
 
-#include "io/buffer.h"
+#include <boost/format.hpp>
+#include "core/array.h"
 
-namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
-Torch::core::array::ElementType dtype; ///< data type
-size_t nd; ///< number of dimensions
-size_t shape[TORCH_MAX_DIM]; ///< length along each dimension
-size_t stride[TORCH_MAX_DIM]; ///< strides along each dimension
-
-io::typeinfo::typeinfo():
-  dtype(Torch::core::array::t_unknown),
+ca::typeinfo::typeinfo():
+  dtype(ca::t_unknown),
   nd(0)
 {
 }
 
-io::typeinfo::typeinfo(const io::typeinfo& other): 
+ca::typeinfo::typeinfo(const ca::typeinfo& other): 
   dtype(other.dtype)
 {
   set_shape(other.nd, other.shape);
 }
 
-io::typeinfo& io::typeinfo::operator= (const io::typeinfo& other) {
+ca::typeinfo& ca::typeinfo::operator= (const ca::typeinfo& other) {
   dtype = other.dtype;
   set_shape(other.nd, other.shape);
   return *this;
 }
 
-void io::typeinfo::reset() {
-  dtype = Torch::core::array::t_unknown;
+void ca::typeinfo::reset() {
+  dtype = ca::t_unknown;
   nd = 0;
 }
 
-bool io::typeinfo::is_valid() const {
-  return (dtype != Torch::core::array::t_unknown) && (nd > 0) && (nd <= TORCH_MAX_DIM);
+bool ca::typeinfo::is_valid() const {
+  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= TORCH_MAX_DIM);
 }
 
-void io::typeinfo::update_strides() {
+void ca::typeinfo::update_strides() {
   switch (nd) {
     case 0:
       return;
@@ -69,14 +65,14 @@ void io::typeinfo::update_strides() {
   throw std::invalid_argument("unsupported number of dimensions");
 }
 
-size_t io::typeinfo::size() const {
+size_t ca::typeinfo::size() const {
   size_t retval = 1;
   for (size_t k=0; k<nd; ++k) retval *= shape[k];
   return retval;
 }
 
-size_t io::typeinfo::buffer_size() const {
-  return size()*Torch::core::array::getElementSize(dtype);
+size_t ca::typeinfo::buffer_size() const {
+  return size()*ca::getElementSize(dtype);
 }
 
 static bool same_shape(size_t nd, const size_t* s1, const size_t* s2) {
@@ -84,6 +80,12 @@ static bool same_shape(size_t nd, const size_t* s1, const size_t* s2) {
   return true;
 }
 
-bool io::typeinfo::is_compatible(const io::typeinfo& other) const {
+bool ca::typeinfo::is_compatible(const ca::typeinfo& other) const {
   return (dtype == other.dtype) && (nd == other.nd) && same_shape(nd, shape, other.shape);
+}
+
+std::string ca::typeinfo::str() const {
+  boost::format s("%dD, %s (%d bytes), %d bytes");
+  s % nd % item_str() % item_size() % buffer_size();
+  return s.str();
 }

@@ -10,13 +10,14 @@
 #include <boost/filesystem.hpp>
 #include <boost/make_shared.hpp>
 
-#include "io/carray.h"
+#include "core/blitz_array.h"
 
 #include "io/CodecRegistry.h"
 #include "io/Video.h"
 
 namespace fs = boost::filesystem;
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 class VideoFile: public io::File {
 
@@ -33,7 +34,7 @@ class VideoFile: public io::File {
         else if (mode == 'a' && fs::exists(path)) {
           // to be able to append must load all data and save in VideoWriter
           m_reader = boost::make_shared<io::VideoReader>(m_filename);
-          io::carray data(m_reader->type());
+          ca::blitz_array data(m_reader->video_type());
           m_reader->load(data);
           size_t height = m_reader->height();
           size_t width = m_reader->width();
@@ -55,12 +56,12 @@ class VideoFile: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& array_type() const {
-      return (m_reader)? m_reader->type() : m_writer->type();
+    virtual const ca::typeinfo& array_type() const {
+      return (m_reader)? m_reader->video_type() : m_writer->video_type();
     }
 
-    virtual const io::typeinfo& arrayset_type() const {
-      return (m_reader)? m_reader->type() : m_writer->type();
+    virtual const ca::typeinfo& arrayset_type() const {
+      return (m_reader)? m_reader->video_type() : m_writer->video_type();
     }
 
     virtual size_t arrayset_size() const {
@@ -71,11 +72,11 @@ class VideoFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(io::buffer& buffer) {
+    virtual void array_read(ca::interface& buffer) {
       arrayset_read(buffer, 0); ///we only have 1 video in a video file anyways
     }
 
-    virtual void arrayset_read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
       if (index != 0) 
         throw std::runtime_error("can only read all frames at once in video codecs");
@@ -83,15 +84,15 @@ class VideoFile: public io::File {
       if (!m_reader)
         throw std::runtime_error("can only read if opened video in 'r' mode");
 
-      if(!buffer.type().is_compatible(m_reader->type())) 
-        buffer.set(m_reader->type());
+      if(!buffer.type().is_compatible(m_reader->video_type())) 
+        buffer.set(m_reader->video_type());
 
       m_reader->load(buffer);
     }
 
-    virtual size_t arrayset_append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const ca::interface& buffer) {
 
-      const io::typeinfo& type = buffer.type();
+      const ca::typeinfo& type = buffer.type();
   
       if (type.nd != 3 and type.nd != 4)
         throw std::invalid_argument("input buffer for videos must have 3 or 4 dimensions");
@@ -109,7 +110,7 @@ class VideoFile: public io::File {
       return 1;
     }
 
-    virtual void array_write (const io::buffer& buffer) {
+    virtual void array_write (const ca::interface& buffer) {
 
       arrayset_append(buffer);
 

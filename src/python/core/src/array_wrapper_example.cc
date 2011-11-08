@@ -7,8 +7,8 @@
 
 #include <blitz/array.h>
 #include <stdint.h>
-#include <boost/python.hpp>
-#include "core/python/pycore.h"
+
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace tp = Torch::python;

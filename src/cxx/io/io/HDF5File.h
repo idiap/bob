@@ -18,7 +18,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/filesystem.hpp>
 
-#include "io/buffer.h"
+#include "core/array.h"
 #include "io/HDF5Utils.h"
 
 namespace Torch { namespace io {
@@ -332,8 +332,9 @@ namespace Torch { namespace io {
        * creates a new dataset. If the dataset already exists, checks if the
        * existing data is compatible with the required type.
        */
-      void create (const std::string& path, const io::typeinfo& dest,
-          bool list, size_t compression);
+      void create (const std::string& path,
+          const Torch::core::array::typeinfo& dest, bool list,
+          size_t compression);
 
       /**
        * Reads data from the file into a buffer. The given buffer contains
@@ -341,18 +342,21 @@ namespace Torch { namespace io {
        * exception if the type is incompatible with the expected data in the
        * file. Relative paths are accepted.
        */
-      void read_buffer (const std::string& path, size_t pos, buffer& b);
+      void read_buffer (const std::string& path, size_t pos,
+          Torch::core::array::interface& b);
 
       /**
        * writes the contents of a given buffer into the file. the area that the
        * data will occupy should have been selected beforehand.
        */
-      void write_buffer (const std::string& path, size_t pos, const buffer& b);
+      void write_buffer (const std::string& path, size_t pos,
+          const Torch::core::array::interface& b);
 
       /**
        * extend the dataset with one extra variable.
        */
-      void extend_buffer (const std::string& path, const buffer& b);
+      void extend_buffer (const std::string& path,
+          const Torch::core::array::interface& b);
 
     private: //not implemented
 

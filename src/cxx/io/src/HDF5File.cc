@@ -9,6 +9,7 @@
 
 namespace io = Torch::io;
 namespace fs = boost::filesystem;
+namespace ca = Torch::core::array;
 
 static unsigned int getH5Access (io::HDF5File::mode_t v) {
   switch(v)
@@ -109,7 +110,7 @@ void io::HDF5File::copy (HDF5File& other) {
   //TODO
 }
 
-void io::HDF5File::create (const std::string& path, const io::typeinfo& ti,
+void io::HDF5File::create (const std::string& path, const ca::typeinfo& ti,
     bool list, size_t compression) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) {
@@ -124,7 +125,7 @@ void io::HDF5File::create (const std::string& path, const io::typeinfo& ti,
 }
 
 void io::HDF5File::read_buffer (const std::string& path, size_t pos, 
-    io::buffer& b) {
+    ca::interface& b) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) 
     throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
@@ -132,14 +133,15 @@ void io::HDF5File::read_buffer (const std::string& path, size_t pos,
 }
 
 void io::HDF5File::write_buffer (const std::string& path, 
-    size_t pos, const io::buffer& b) {
+    size_t pos, const ca::interface& b) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) 
     throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
   m_index[absolute]->write_buffer(pos, io::HDF5Type(b.type()), b.ptr());
 }
 
-void io::HDF5File::extend_buffer(const std::string& path, const io::buffer& b) {
+void io::HDF5File::extend_buffer(const std::string& path,
+    const ca::interface& b) {
   std::string absolute = resolve(path);
   if (!contains(absolute)) 
     throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);

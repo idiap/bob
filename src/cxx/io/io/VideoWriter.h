@@ -13,7 +13,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "io/buffer.h"
+#include "core/array.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -124,7 +124,14 @@ namespace Torch { namespace io {
       /**
        * Compatibility layer type information
        */ 
-      const typeinfo& type() const { return m_typeinfo; }
+      const Torch::core::array::typeinfo& video_type() const 
+      { return m_typeinfo_video; }
+
+      /**
+       * Compatibility layer type information
+       */ 
+      const Torch::core::array::typeinfo& frame_type() const 
+      { return m_typeinfo_frame; }
 
       /**
        * Writes a set of frames to the file. The frame set should be setup as a
@@ -150,10 +157,10 @@ namespace Torch { namespace io {
 
       /**
        * Writes a set of frames to the file. The frame set should be setup as a
-       * io::buffer organized this way: (frame-number, RGB color-bands, height,
-       * width) or (RGB color-bands, height, width).
+       * Torch::core::array::interface organized this way: (frame-number, 
+       * RGB color-bands, height, width) or (RGB color-bands, height, width).
        */
-      void append(const io::buffer& data);
+      void append(const Torch::core::array::interface& data);
     
     private: //not implemented
 
@@ -199,7 +206,8 @@ namespace Torch { namespace io {
       size_t m_gop;
       std::string m_codecname;
       std::string m_codecname_long;
-      io::typeinfo m_typeinfo;
+      Torch::core::array::typeinfo m_typeinfo_video;
+      Torch::core::array::typeinfo m_typeinfo_frame;
 
       AVOutputFormat* m_oformat_ctxt;
       AVFormatContext* m_format_ctxt;

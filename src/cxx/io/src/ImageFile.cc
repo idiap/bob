@@ -20,8 +20,9 @@
 
 namespace fs = boost::filesystem;
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
-static int im_peek(Magick::Image& image, io::typeinfo& info) {
+static int im_peek(Magick::Image& image, ca::typeinfo& info) {
   int retval = 0;
 
     // Assume Grayscale image
@@ -76,8 +77,8 @@ template <> Magick::StorageType magick_storage_type<uint16_t>() {
 }
 
 template <typename T>
-static void im_save_gray(const io::buffer& b, const std::string& name) {
-  const io::typeinfo& info = b.type();
+static void im_save_gray(const ca::interface& b, const std::string& name) {
+  const ca::typeinfo& info = b.type();
 
   Magick::Image image;
   image.size(Magick::Geometry(info.shape[1], info.shape[0]));
@@ -98,8 +99,8 @@ void rgb_to_imbuffer(size_t size, const T* r, const T* g, const T* b, T* im) {
 }
 
 template <typename T>
-static void im_save_color(const io::buffer& b, const std::string& name) {
-  const io::typeinfo& info = b.type();
+static void im_save_color(const ca::interface& b, const std::string& name) {
+  const ca::typeinfo& info = b.type();
 
   Magick::Image image;
   image.size(Magick::Geometry(info.shape[2], info.shape[1]));
@@ -126,16 +127,16 @@ void imbuffer_to_rgb(size_t size, const T* im, T* r, T* g, T* b) {
 }
 
 template <typename T> static
-void im_load_gray(Magick::Image& image, io::buffer& b) {
-  const io::typeinfo& info = b.type();
+void im_load_gray(Magick::Image& image, ca::interface& b) {
+  const ca::typeinfo& info = b.type();
 
   image.write(0, 0, info.shape[1], info.shape[0], "I", 
       magick_storage_type<T>(), static_cast<T*>(b.ptr()));
 }
 
 template <typename T> static
-void im_load_color(Magick::Image& image, io::buffer& b) {
-  const io::typeinfo& info = b.type();
+void im_load_color(Magick::Image& image, ca::interface& b) {
+  const ca::typeinfo& info = b.type();
 
   long unsigned int frame_size = info.shape[2] * info.shape[1];
   boost::shared_array<T> tmp(new T[3*frame_size]);
@@ -150,9 +151,9 @@ void im_load_color(Magick::Image& image, io::buffer& b) {
 /**
  * Reads the data.
  */
-static void im_load (Magick::Image& image, io::buffer& b) {
+static void im_load (Magick::Image& image, ca::interface& b) {
 
-  const io::typeinfo& info = b.type();
+  const ca::typeinfo& info = b.type();
 
   if (info.dtype == Torch::core::array::t_uint8) {
     if(info.nd == 2) im_load_gray<uint8_t>(image, b);
@@ -169,9 +170,9 @@ static void im_load (Magick::Image& image, io::buffer& b) {
   else throw io::ImageUnsupportedType(info.dtype);
 }
 
-static void im_save (const std::string& filename, const io::buffer& array) {
+static void im_save (const std::string& filename, const ca::interface& array) {
 
-  const io::typeinfo& info = array.type();
+  const ca::typeinfo& info = array.type();
 
   if(info.dtype == Torch::core::array::t_uint8) {
 
@@ -231,11 +232,11 @@ class ImageFile: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& array_type() const {
+    virtual const ca::typeinfo& array_type() const {
       return m_type;
     }
 
-    virtual const io::typeinfo& arrayset_type() const {
+    virtual const ca::typeinfo& arrayset_type() const {
       return m_type;
     }
 
@@ -247,11 +248,11 @@ class ImageFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(io::buffer& buffer) {
+    virtual void array_read(ca::interface& buffer) {
       arrayset_read(buffer, 0); ///we only have 1 image in an image file anyways
     }
 
-    virtual void arrayset_read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
       if (m_newfile) 
         throw std::runtime_error("uninitialized image file cannot be read");
@@ -272,7 +273,7 @@ class ImageFile: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const ca::interface& buffer) {
 
       if (m_newfile) {
         im_save(m_filename, buffer);
@@ -286,7 +287,7 @@ class ImageFile: public io::File {
 
     }
 
-    virtual void array_write (const io::buffer& buffer) {
+    virtual void array_write (const ca::interface& buffer) {
 
       //overwriting position 0 should always work
       if (m_newfile) {
@@ -300,7 +301,7 @@ class ImageFile: public io::File {
   private: //representation
     std::string m_filename;
     bool m_newfile;
-    io::typeinfo m_type;
+    ca::typeinfo m_type;
     size_t m_length;
 
     static std::string s_codecname;

@@ -15,6 +15,7 @@
 
 namespace fs = boost::filesystem;
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 /**
  * Required initialization by the HDF5 sub-system
@@ -67,11 +68,11 @@ class HDF5ArrayFile: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& array_type () const {
+    virtual const ca::typeinfo& array_type () const {
       return m_type_array;
     }
 
-    virtual const io::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& arrayset_type () const {
       return m_type_arrayset;
     }
 
@@ -83,7 +84,7 @@ class HDF5ArrayFile: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(io::buffer& buffer) {
+    virtual void array_read(ca::interface& buffer) {
 
       if(m_newfile) 
         throw std::runtime_error("uninitialized HDF5 file cannot be read");
@@ -93,7 +94,7 @@ class HDF5ArrayFile: public io::File {
       m_file.read_buffer(m_path, 0, buffer);
     }
 
-    virtual void arrayset_read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
       if(m_newfile) 
         throw std::runtime_error("uninitialized HDF5 file cannot be read");
@@ -103,7 +104,7 @@ class HDF5ArrayFile: public io::File {
       m_file.read_buffer(m_path, index, buffer);
     }
 
-    virtual size_t arrayset_append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const ca::interface& buffer) {
 
       if (m_newfile) {
         //creates non-compressible, extensible dataset on HDF5 file
@@ -123,7 +124,7 @@ class HDF5ArrayFile: public io::File {
 
     }
 
-    virtual void array_write (const io::buffer& buffer) {
+    virtual void array_write (const ca::interface& buffer) {
 
       if (!m_newfile) {
         throw std::runtime_error("cannot perform single (array-style) write on file/dataset that have already been initialized -- try to use a new file");
@@ -146,8 +147,8 @@ class HDF5ArrayFile: public io::File {
     
     io::HDF5File m_file;
     std::string  m_filename;
-    io::typeinfo m_type_array;    ///< type for reading all data at once
-    io::typeinfo m_type_arrayset; ///< type for reading data by sub-arrays
+    ca::typeinfo m_type_array;    ///< type for reading all data at once
+    ca::typeinfo m_type_arrayset; ///< type for reading data by sub-arrays
     size_t       m_size_arrayset; ///< number of arrays in arrayset mode
     std::string  m_path; ///< default path to use
     bool         m_newfile; ///< path check optimization

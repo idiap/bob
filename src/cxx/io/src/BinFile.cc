@@ -12,6 +12,7 @@
 
 namespace io = Torch::io;
 namespace core = Torch::core;
+namespace ca = Torch::core::array;
 
 io::BinFile::BinFile(const std::string& filename, io::BinFile::openmode flag):
   m_header_init(false),
@@ -95,7 +96,7 @@ void io::BinFile::initHeader(const Torch::core::array::ElementType type,
   m_header_init = true;
 }
 
-void io::BinFile::write(const io::buffer& data) {
+void io::BinFile::write(const ca::interface& data) {
 
   /**
    * @warning: Please convert your files to HDF5, this format is
@@ -125,10 +126,10 @@ void io::BinFile::write(const io::buffer& data) {
   if (m_current_array>m_n_arrays_written) ++m_n_arrays_written;
 }
 
-void io::BinFile::read (io::buffer& a) {
+void io::BinFile::read (ca::interface& a) {
   if(!m_header_init) throw Uninitialized();
 
-  io::typeinfo compat(getElementType(), m_header.getNDim(), m_header.getShape());
+  ca::typeinfo compat(getElementType(), m_header.getNDim(), m_header.getShape());
   
   if(!a.type().is_compatible(compat)) a.set(compat);
 
@@ -136,7 +137,7 @@ void io::BinFile::read (io::buffer& a) {
   ++m_current_array;
 }
 
-void io::BinFile::read (size_t index, io::buffer& a) {
+void io::BinFile::read (size_t index, ca::interface& a) {
   // Check that we are reaching an existing array
   if( index >= m_header.m_n_samples ) {
     throw IndexError(index);

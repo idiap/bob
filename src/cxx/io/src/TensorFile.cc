@@ -12,6 +12,7 @@
 
 namespace io = Torch::io;
 namespace core = Torch::core;
+namespace ca = Torch::core::array;
 
 io::TensorFile::TensorFile(const std::string& filename, 
     io::TensorFile::openmode flag):
@@ -72,7 +73,7 @@ io::TensorFile::~TensorFile() {
   close();
 }
 
-void io::TensorFile::peek(io::typeinfo& info) const {
+void io::TensorFile::peek(ca::typeinfo& info) const {
   info = m_header.m_type;
 }
 
@@ -84,7 +85,7 @@ void io::TensorFile::close() {
   m_stream.close();
 }
 
-void io::TensorFile::initHeader(const io::typeinfo& info) {
+void io::TensorFile::initHeader(const ca::typeinfo& info) {
   // Check that data have not already been written
   if (m_n_arrays_written > 0 ) {
     Torch::core::error << "Cannot init the header of an output stream in which data" <<
@@ -99,9 +100,9 @@ void io::TensorFile::initHeader(const io::typeinfo& info) {
   m_header_init = true;
 }
 
-void io::TensorFile::write(const io::buffer& data) {
+void io::TensorFile::write(const ca::interface& data) {
 
-  const io::typeinfo& info = data.type();
+  const ca::typeinfo& info = data.type();
 
   if (!m_header_init) initHeader(info);
   else {
@@ -117,7 +118,7 @@ void io::TensorFile::write(const io::buffer& data) {
   if (m_current_array>m_n_arrays_written) ++m_n_arrays_written;
 }
 
-void io::TensorFile::read (io::buffer& buf) {
+void io::TensorFile::read (ca::interface& buf) {
   
   if(!m_header_init) throw Uninitialized();
   if(!buf.type().is_compatible(m_header.m_type)) buf.set(m_header.m_type);
@@ -127,7 +128,7 @@ void io::TensorFile::read (io::buffer& buf) {
   ++m_current_array;
 }
 
-void io::TensorFile::read (size_t index, io::buffer& buf) {
+void io::TensorFile::read (size_t index, ca::interface& buf) {
   // Check that we are reaching an existing array
   if( index > m_header.m_n_samples ) {
     throw IndexError(index);

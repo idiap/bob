@@ -16,7 +16,7 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
-#include "io/buffer.h"
+#include "core/array.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -113,7 +113,14 @@ namespace Torch { namespace io {
       /**
        * Returns the typing information for this video
        */
-      inline const typeinfo& type() const { return m_typeinfo; }
+      inline const Torch::core::array::typeinfo& video_type() const 
+      { return m_typeinfo_video; }
+
+      /**
+       * Returns the typing information for this video
+       */
+      inline const Torch::core::array::typeinfo& frame_type() const 
+      { return m_typeinfo_frame; }
 
       /**
        * Loads all of the video stream in a blitz array organized in this way:
@@ -126,7 +133,7 @@ namespace Torch { namespace io {
        * Loads all of the video stream in a buffer. Resizes the buffer if
        * the space and type are not good.
        */
-      void load(buffer& b) const;
+      void load(Torch::core::array::interface& b) const;
 
     private: //methods
 
@@ -214,7 +221,7 @@ namespace Torch { namespace io {
            * position, an exception is raised if you try to read() the
            * iterator.
            */
-          void read (buffer& b);
+          void read (Torch::core::array::interface& b);
 
           /**
            * Reads the currently pointed frame and advances one position.
@@ -312,7 +319,8 @@ namespace Torch { namespace io {
       std::string m_codecname; ///< the name of the ffmpeg codec to be used
       std::string m_codecname_long; ///< long version of m_codecname
       std::string m_formatted_info; ///< printable information about the video
-      typeinfo m_typeinfo; ///< the io subsystem type information
+      Torch::core::array::typeinfo m_typeinfo_video; ///< read whole video type
+      Torch::core::array::typeinfo m_typeinfo_frame; ///< read single frame type
   };
 
 }}

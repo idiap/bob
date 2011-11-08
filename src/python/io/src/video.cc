@@ -9,12 +9,14 @@
 #include <boost/python/slice.hpp>
 
 #include "io/Video.h"
-#include "io/VideoArrayCodec.h"
 #include "core/python/exception.h"
+
+#include "io/python/pyio.h"
 
 using namespace boost::python;
 namespace io = Torch::io;
-namespace py = Torch::core::python;
+namespace pyc = Torch::core::python;
+namespace tp = Torch::python;
 
 /**
  * Helper method for the the iterator wrapping
@@ -30,17 +32,16 @@ struct iterator_wrapper {
   /**
    * Method to return the value pointed by the iterator and advance it
    */
-  static blitz::Array<uint8_t,3> next (io::VideoReader::const_iterator& o) {
+  static object next (io::VideoReader::const_iterator& o) {
     const io::VideoReader* reader = o.parent();
 
     if (!reader) { //stop iteration immediately
-      PyErr_SetString(PyExc_StopIteration, "No more data.");
-      throw_error_already_set();
+      PYTHON_ERROR(StopIteration, "no more data");
     }
 
-    blitz::Array<uint8_t,3> retval(3, reader->height(), reader->width());
+    tp::npyarray retval(reader->frame_type());
     o.read(retval); //note that this will advance the iterator
-    return retval;
+    return tp::npyarray_object(retval);
   }
 
   /**
@@ -59,20 +60,19 @@ struct iterator_wrapper {
  * Python wrapper to read a single frame from a video sequence, allowing the
  * implementation of a __getitem__() functionality on VideoReader objects.
  */
-static blitz::Array<uint8_t,3> videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
+static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
   size_t frame = sframe;
   if (sframe < 0) frame = v.numberOfFrames() + sframe;
 
   if (frame >= v.numberOfFrames()) { //basic check
-    PyErr_SetString(PyExc_IndexError, "Invalid index");
-    throw_error_already_set();
+    PYTHON_ERROR(IndexError, "invalid index");
   }
 
-  blitz::Array<uint8_t,3> retval(3, v.height(), v.width());
+  tp::npyarray retval(v.frame_type());
   io::VideoReader::const_iterator it = v.begin();
   it += frame;
   it.read(retval);
-  return retval;
+  return tp::npyarray_object(retval);
 }
 
 /**
@@ -89,8 +89,7 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   }
 
   if (start >= v.numberOfFrames()) { //basic check
-    PyErr_SetString(PyExc_IndexError, "Invalid start");
-    throw_error_already_set();
+    PYTHON_ERROR(IndexError, "invalid start");
   }
 
   //the stop value may be None
@@ -116,38 +115,32 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   io::VideoReader::const_iterator it = v.begin();
   it += start;
   for (size_t i=start, j=0; i<stop; i+=step, ++j, it+=(step-1)) {
-    blitz::Array<uint8_t,3> tmp(3, v.height(), v.width());
+    tp::npyarray tmp(v.frame_type());
     it.read(tmp);
-    retval.append(tmp);
+    retval.append(tp::npyarray_object(tmp));
   }
  
   return tuple(retval);
 }
 
-static blitz::Array<uint8_t,4> videoreader_load(io::VideoReader& reader) {
-  blitz::Array<uint8_t,4> retval(reader.numberOfFrames(), 3,
-      reader.height(), reader.width());
-  reader.load(retval);
-  return retval;
+static object videoreader_load(io::VideoReader& reader) {
+  tp::npyarray tmp(reader.video_type());
+  reader.load(tmp);
+  return tp::npyarray_object(tmp);
 }
 
-static tuple extensions() {
-  io::VideoArrayCodec c;
-  list retval;
-  for (size_t i=0; i<c.extensions().size(); ++i) {
-    retval.append(c.extensions()[i]);
-  }
-  return tuple(retval);
+static void videowriter_append(io::VideoWriter& writer, object a) {
+  handle<> hdl((PyObject*)tp::describe_eltype(writer.video_type().dtype));
+  object dtype(hdl);
+  tp::npyarray tmp(a, dtype);
+  writer.append(tmp);
 }
 
 void bind_io_video() {
   //special exceptions for videos
-  py::register_exception_translator<Torch::io::VideoIsClosed>(PyExc_IOError);
+  pyc::register_exception_translator<Torch::io::VideoIsClosed>(PyExc_IOError);
 
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
-
-  //supported extensions for video files
-  def("video_extensions", &extensions, "Returns all extensions supported by the video loading subsystem");
 
   class_<io::VideoReader, boost::shared_ptr<io::VideoReader> >("VideoReader",
       "VideoReader objects can read data from video files. The current implementation uses FFMPEG which is a stable freely available implementation for these tasks. You can read an entire video in memory by using the 'load()' method or use video iterators to read frame-by-frame and avoid overloading your machine's memory. The maximum precision FFMPEG will output is a 24-bit (8-bit per band) representation of each pixel (32-bit with transparency when supported by Torch, which is not the case presently). So, the input of data using this class uses uint8_t as base element type. Output will be colored using the RGB standard, with each band varying between 0 and 255, with zero meaning pure black and 255, pure white (color).", init<const std::string&>((arg("filename")), "Initializes a new VideoReader object by giving the input file name to read"))
@@ -161,8 +154,9 @@ void bind_io_video() {
     .add_property("codecLongName", make_function(&io::VideoReader::codecLongName, return_value_policy<copy_const_reference>()))
     .add_property("frameRate", &io::VideoReader::frameRate)
     .add_property("info", make_function(&io::VideoReader::info, return_value_policy<copy_const_reference>()))
-    .def("load", &io::VideoReader::load, (arg("self"), arg("array")), "Loads all of the video stream in a blitz array organized in this way: (frames, color-bands, height, width). The 'array' parameter will be resized if required.")
-    .def("load", &videoreader_load, (arg("self")), "Loads all of the video stream in a blitz array organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you. This is only (very) marginally worst than using the other variant of this method. It will only make a difference using the other (faster) load() implementation when video sequences are very short and you are not doing any network readout. Otherwise, stick to this variant, it is safer!")
+    .add_property("video_type", make_function(&io::VideoReader::video_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
+    .add_property("frame_type", make_function(&io::VideoReader::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
+    .def("load", &videoreader_load, (arg("self")), "Loads all of the video stream in a numpy ndarray organized in this way: (frames, color-bands, height, width). I'll dynamically allocate the output array and return it to you.")
     .def("__iter__", &io::VideoReader::begin)
     .def("__getitem__", &videoreader_getitem)
     .def("__getitem__", &videoreader_getslice)
@@ -185,7 +179,8 @@ void bind_io_video() {
     .add_property("info", &io::VideoWriter::info)
     .add_property("is_opened", &io::VideoWriter::is_opened)
     .def("close", &io::VideoWriter::close, "Closes the current video stream and forces writing the trailer. After this point the video is finalized and cannot be written to anymore.")
-    .def("append", (void (io::VideoWriter::*)(const blitz::Array<uint8_t,3>&))&io::VideoWriter::append, (arg("self"), arg("frame")), "Writes a new frame to the file. The frame should be setup as a array with 3 dimensions organized in this way (RGB color-bands, height, width). WARNING: At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
-    .def("append", (void (io::VideoWriter::*)(const blitz::Array<uint8_t,4>&))&io::VideoWriter::append, (arg("self"), arg("frame")), "Writes a set of frames to the file. The frame set should be setup as a array with 4 dimensions organized in this way: (frame-number, RGB color-bands, height, width). WARNING: At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
+    .add_property("video_type", make_function(&io::VideoWriter::video_type, return_value_policy<copy_const_reference>()), "Typing information to load all of the file at once")
+    .add_property("frame_type", make_function(&io::VideoWriter::frame_type, return_value_policy<copy_const_reference>()), "Typing information to load the file frame by frame.")
+    .def("append", &videowriter_append, (arg("self"), arg("frame")), "Writes a new frame or set of frames to the file. The frame should be setup as a array with 3 dimensions organized in this way (RGB color-bands, height, width). Sets of frames should be setup as a 4D array in this way: (frame-number, RGB color-bands, height, width). WARNING: At present time we only support arrays that have C-style storages (if you pass reversed arrays or arrays with Fortran-style storage, the result is undefined).")
     ;
 }

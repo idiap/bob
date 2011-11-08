@@ -10,9 +10,9 @@
 #define TORCH_IO_BINFILE_H
 
 #include "core/cast.h"
+#include "core/array.h"
 #include "io/BinFileHeader.h"
 #include "io/Exception.h"
-#include "io/buffer.h"
 
 namespace Torch { namespace io {
 
@@ -72,14 +72,14 @@ namespace Torch { namespace io {
        * @warning: Please convert your files to HDF5, this format is
        * deprecated starting on 16.04.2011 - AA
        */
-      void write(const Torch::io::buffer& a);
+      void write(const Torch::core::array::interface& a);
 
       /**
        * Loads a single array from the file. Checks if the array has the
        * necessary space, otherwise re-allocates it. 
        */
-      void read(Torch::io::buffer& a);
-      void read(size_t index, Torch::io::buffer& a);
+      void read(Torch::core::array::interface& a);
+      void read(size_t index, Torch::core::array::interface& a);
 
       /**
        * Gets the Element type

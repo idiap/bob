@@ -126,7 +126,7 @@ namespace Torch { namespace io {
        */
       void remove (size_t id);
 
-      inline const typeinfo& type() const { return m_info; }
+      inline const Torch::core::array::typeinfo& type() const { return m_info; }
 
       inline size_t getNDim() const { return type().nd; }
 
@@ -174,7 +174,7 @@ namespace Torch { namespace io {
 
     private:
       std::vector<Array> m_data; ///< data pointer
-      typeinfo m_info; ///< information about arrays stored
+      Torch::core::array::typeinfo m_info; ///< information about arrays stored
 
   };
 

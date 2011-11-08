@@ -14,7 +14,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "io/buffer.h"
+#include "core/array.h"
 
 namespace Torch { namespace io {
       
@@ -37,13 +37,13 @@ namespace Torch { namespace io {
        * The typeinfo of data within this file, if it is supposed to be read as
        * a single array.
        */
-      virtual const typeinfo& array_type() const =0;
+      virtual const Torch::core::array::typeinfo& array_type() const =0;
 
       /**
        * The typeinfo of data within this file, if it is supposed to be read as
        * as an array set.
        */
-      virtual const typeinfo& arrayset_type() const =0;
+      virtual const Torch::core::array::typeinfo& arrayset_type() const =0;
 
       /**
        * The number of arrays available in this file, if it is supposed to be
@@ -64,7 +64,7 @@ namespace Torch { namespace io {
        * reseting the input array and putting the data read from the file
        * inside.
        */
-      virtual void array_read(buffer& buffer) =0;
+      virtual void array_read(Torch::core::array::interface& buffer) =0;
 
       /**
        * Loads the data of the array into memory. If an index is specified
@@ -76,7 +76,8 @@ namespace Torch { namespace io {
        * reseting the input array and putting the data read from the file
        * inside.
        */
-      virtual void arrayset_read(buffer& buffer, size_t index) =0;
+      virtual void arrayset_read(Torch::core::array::interface& buffer, 
+          size_t index) =0;
 
       /**
        * Appends the given buffer into a file. If the file does not exist,
@@ -85,14 +86,15 @@ namespace Torch { namespace io {
        *
        * Returns the current position of the newly written array.
        */
-      virtual size_t arrayset_append (const buffer& buffer) =0;
+      virtual size_t arrayset_append 
+        (const Torch::core::array::interface& buffer) =0;
 
       /**
        * Writes the data from the given buffer into the file and act like it is
        * the only piece of data that will ever be written to such a file. Not
        * more data appending may happen after a call to this method.
        */
-      virtual void array_write (const buffer& buffer) =0;
+      virtual void array_write (const Torch::core::array::interface& buffer) =0;
 
   };
 

@@ -27,6 +27,7 @@
 #include "io/VideoException.h"
 
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
     size_t width, float framerate, float bitrate, size_t gop):
@@ -52,12 +53,13 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
   m_sws_context(0)
 {
   //sets up the io layer typeinfo
-  m_typeinfo.dtype = Torch::core::array::t_uint8;
-  m_typeinfo.nd = 4;
-  m_typeinfo.shape[0] = 0;
-  m_typeinfo.shape[1] = 3;
-  m_typeinfo.shape[2] = height;
-  m_typeinfo.shape[3] = width;
+  m_typeinfo_video.dtype = m_typeinfo_frame.dtype = Torch::core::array::t_uint8;
+  m_typeinfo_video.nd = 4;
+  m_typeinfo_frame.nd = 4;
+  m_typeinfo_video.shape[0] = 0;
+  m_typeinfo_video.shape[1] = m_typeinfo_frame.shape[0] = 3;
+  m_typeinfo_video.shape[2] = m_typeinfo_frame.shape[1] = height;
+  m_typeinfo_video.shape[3] = m_typeinfo_frame.shape[2] = width;
 
   //opens the video file and wait for user input
 
@@ -383,7 +385,7 @@ void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
 
   // OK
   ++m_current_frame;
-  m_typeinfo.shape[0] += 1;
+  m_typeinfo_video.shape[0] += 1;
 }
 
 void io::VideoWriter::close_video() {
@@ -427,11 +429,11 @@ void io::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
   }
 }
 
-void io::VideoWriter::append(const io::buffer& data) {
+void io::VideoWriter::append(const ca::interface& data) {
   //are we still opened?
   if (!m_isopen) throw io::VideoIsClosed(m_filename.c_str());
 
-  const io::typeinfo& type = data.type();
+  const ca::typeinfo& type = data.type();
 
   if ( type.dtype != Torch::core::array::t_uint8 ) {
     throw io::FFmpegException(m_filename.c_str(), 

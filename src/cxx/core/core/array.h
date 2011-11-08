@@ -2,27 +2,29 @@
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed  5 Oct 08:47:12 2011 
  *
- * @brief The buffer API describes a non-specific way to handle data.
+ * @brief The array API describes a non-specific way to handle N dimensional
+ * array data.
  */
 
-#ifndef TORCH_IO_BUFFER_H 
-#define TORCH_IO_BUFFER_H
+#ifndef TORCH_CORE_ARRAY_INTERFACE_H 
+#define TORCH_CORE_ARRAY_INTERFACE_H
 
 #include <stdexcept>
+#include <string>
 
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
 
 #include "core/array_type.h"
 
-namespace Torch { namespace io {
+namespace Torch { namespace core { namespace array {
 
   /**
-   * Encapsulation of special type information of buffers.
+   * Encapsulation of special type information of interfaces.
    */
   struct typeinfo {
 
-    Torch::core::array::ElementType dtype; ///< data type
+    ElementType dtype; ///< data type
     size_t nd; ///< number of dimensions
     size_t shape[TORCH_MAX_DIM]; ///< length along each dimension
     size_t stride[TORCH_MAX_DIM]; ///< strides along each dimension
@@ -35,8 +37,7 @@ namespace Torch { namespace io {
     /**
      * Simplification to build a typeinfo from a shape pointer.
      */
-    template <typename T> typeinfo(Torch::core::array::ElementType dtype_,
-        T nd_, const T* shape_) {
+    template <typename T> typeinfo(ElementType dtype_, T nd_, const T* shape_) {
       set(dtype_, nd_, shape_);
     }
 
@@ -54,7 +55,7 @@ namespace Torch { namespace io {
      * Set to specific values
      */
     template <typename T>
-    void set(Torch::core::array::ElementType dtype_, T nd_, const T* shape_) {
+    void set(ElementType dtype_, T nd_, const T* shape_) {
       dtype = dtype_;
       set_shape(nd_, shape_);
     }
@@ -63,7 +64,7 @@ namespace Torch { namespace io {
      * Set to specific values, including strides
      */
     template <typename T>
-    void set(Torch::core::array::ElementType dtype_, T nd_, const T* shape_,
+    void set(ElementType dtype_, T nd_, const T* shape_,
         const T* stride_) {
       dtype = dtype_;
       nd = nd_;
@@ -106,9 +107,20 @@ namespace Torch { namespace io {
     size_t size() const;
 
     /**
-     * Returns the total size (in bytes) of the buffer being pointed by me.
+     * Returns the size of each element
+     */
+    inline size_t item_size() const { return getElementSize(dtype); }
+
+    /**
+     * Returns the total size (in bytes) of the buffer that I'm associated
+     * with.
      */
     size_t buffer_size() const;
+
+    /**
+     * Returns the item type description
+     */
+    const char* item_str() const { return stringize(dtype); }
 
     /**
      * Checks compatibility with other typeinfo
@@ -116,16 +128,21 @@ namespace Torch { namespace io {
     bool is_compatible(const typeinfo& other) const;
 
     /**
+     * Formats and returns a string containing the full typeinfo description.
+     */
+    std::string str() const;
+
+    /**
      * Make it easy to set for blitz::Array<T,N>
      */ 
     template <typename T, int N> void set(const blitz::Array<T,N>& array) {
-      dtype = Torch::core::array::getElementType<T>();
+      dtype = getElementType<T>();
       set_shape(array.shape());
     }
 
     template <typename T, int N> 
       void set(boost::shared_ptr<blitz::Array<T,N> >& array) {
-        dtype = Torch::core::array::getElementType<T>();
+        dtype = getElementType<T>();
         set_shape(array->shape());
       }
 
@@ -138,58 +155,60 @@ namespace Torch { namespace io {
   };
 
   /**
-   * The buffer manager introduces a concept for managing the buffers that
+   * The interface manager introduces a concept for managing the interfaces that
    * can be handled as C-style arrays. It encapsulates methods to store and
    * delete the buffer contents in a safe way.
    *
-   * The buffer is an entity that either stores a copy of its own data or
-   * refers to data belonging to another buffer.
+   * The interface is an entity that either stores a copy of its own data or
+   * refers to data belonging to another interface.
    */
-  struct buffer {
+  class interface {
 
-    /**
-     * By default, the buffer is never freed. You must override this method
-     * to do something special for your class type.
-     */
-    virtual ~buffer() { }
+    public: //api
 
-    /**
-     * Copies the data from another buffer.
-     */
-    virtual void set(const buffer& other) =0;
+      /**
+       * By default, the interface is never freed. You must override this method
+       * to do something special for your class type.
+       */
+      virtual ~interface() { }
 
-    /**
-     * Refers to the data of another buffer.
-     */
-    virtual void set(boost::shared_ptr<buffer> other) =0;
+      /**
+       * Copies the data from another interface.
+       */
+      virtual void set(const interface& other) =0;
 
-    /**
-     * Re-allocates this buffer taking into consideration new requirements. The
-     * internal memory should be considered uninitialized.
-     */
-    virtual void set (const typeinfo& req) =0;
+      /**
+       * Refers to the data of another interface.
+       */
+      virtual void set(boost::shared_ptr<interface> other) =0;
 
-    /**
-     * Type information for this buffer.
-     */
-    virtual const typeinfo& type() const =0;
+      /**
+       * Re-allocates this interface taking into consideration new requirements.
+       * The internal memory should be considered uninitialized.
+       */
+      virtual void set (const typeinfo& req) =0;
 
-    /**
-     * Borrows a reference from the underlying memory. This means this object
-     * continues to be responsible for deleting the memory and you should
-     * make sure that it outlives the usage of the returned pointer.
-     */
-    virtual void* ptr() =0;
-    virtual const void* ptr() const =0;
+      /**
+       * Type information for this interface.
+       */
+      virtual const typeinfo& type() const =0;
 
-    /**
-     * Returns a representation of the internal cache using shared pointers.
-     */
-    virtual boost::shared_ptr<void> owner() =0;
-    virtual boost::shared_ptr<const void> owner() const =0;
+      /**
+       * Borrows a reference from the underlying memory. This means this object
+       * continues to be responsible for deleting the memory and you should
+       * make sure that it outlives the usage of the returned pointer.
+       */
+      virtual void* ptr() =0;
+      virtual const void* ptr() const =0;
+
+      /**
+       * Returns a representation of the internal cache using shared pointers.
+       */
+      virtual boost::shared_ptr<void> owner() =0;
+      virtual boost::shared_ptr<const void> owner() const =0;
 
   };
 
-}}
+}}}
 
-#endif /* TORCH_IO_BUFFER_H */
+#endif /* TORCH_CORE_ARRAY_INTERFACE_H */

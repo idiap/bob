@@ -9,14 +9,15 @@
 #include "io/CodecRegistry.h"
 
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
-io::Array::Array(const io::buffer& data):
-  m_inlined(new io::carray(data)),
+io::Array::Array(const ca::interface& data):
+  m_inlined(new ca::blitz_array(data)),
   m_loadsall(false)
 {
 }
 
-io::Array::Array(boost::shared_ptr<buffer> data):
+io::Array::Array(boost::shared_ptr<ca::interface> data):
   m_inlined(data),
   m_loadsall(false)
 {
@@ -73,19 +74,19 @@ boost::shared_ptr<const io::File> io::Array::getCodec() const {
   return boost::shared_ptr<File>(); 
 }
     
-void io::Array::set(const io::buffer& data) {
+void io::Array::set(const ca::interface& data) {
   m_external.reset();
-  m_inlined = boost::make_shared<carray>(data);
+  m_inlined = boost::make_shared<ca::blitz_array>(data);
 }
         
-void io::Array::set(boost::shared_ptr<buffer> data) {
+void io::Array::set(boost::shared_ptr<ca::interface> data) {
   m_external.reset();
   m_inlined = data; 
 }
 
-boost::shared_ptr<io::buffer> io::Array::get() const {
+boost::shared_ptr<ca::interface> io::Array::get() const {
   if (!m_inlined) {
-    boost::shared_ptr<io::buffer> tmp(new carray(external_type()));
+    boost::shared_ptr<ca::interface> tmp(new ca::blitz_array(external_type()));
     if (m_loadsall) m_external->array_read(*tmp);
     else m_external->arrayset_read(*tmp, m_index);
     return tmp;
@@ -95,7 +96,7 @@ boost::shared_ptr<io::buffer> io::Array::get() const {
 
 void io::Array::load() {
   if (!m_inlined) {
-    m_inlined.reset(new carray(external_type()));
+    m_inlined.reset(new ca::blitz_array(external_type()));
     if (m_loadsall) m_external->array_read(*m_inlined);
     else m_external->arrayset_read(*m_inlined, m_index);
     m_external.reset();

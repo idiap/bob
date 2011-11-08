@@ -2,49 +2,57 @@
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed  5 Oct 12:34:11 2011
  *
- * @brief Implementation of non-templated methods of the carray
+ * @brief Implementation of non-templated methods of the blitz
  */
 
-#include "io/carray.h"
+#include "core/blitz_array.h"
+#include "core/logging.h"
 
-namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
-io::carray::carray(boost::shared_ptr<io::carray> other) {
+ca::blitz_array::blitz_array(boost::shared_ptr<ca::blitz_array> other) {
   set(other);
 }
 
-io::carray::carray(const io::carray& other) {
+ca::blitz_array::blitz_array(const ca::blitz_array& other) {
   set(other);
 }
 
-io::carray::carray(boost::shared_ptr<io::buffer> other) {
+ca::blitz_array::blitz_array(boost::shared_ptr<ca::interface> other) {
   set(other);
 }
 
-io::carray::carray(const io::buffer& other) {
+ca::blitz_array::blitz_array(const ca::interface& other) {
   set(other);
 }
 
-io::carray::carray(const typeinfo& info) {
+ca::blitz_array::blitz_array(const typeinfo& info) {
   set(info);
 }
 
-io::carray::~carray() {
+ca::blitz_array::blitz_array(void* data, const typeinfo& info):
+  m_type(info),
+  m_ptr(data),
+  m_is_blitz(false) {
 }
 
-void io::carray::set(boost::shared_ptr<io::carray> other) {
+ca::blitz_array::~blitz_array() {
+}
+
+void ca::blitz_array::set(boost::shared_ptr<ca::blitz_array> other) {
   m_type = other->m_type;
   m_ptr = other->m_ptr;
   m_is_blitz = other->m_is_blitz;
   m_data = other->m_data;
 }
 
-void io::carray::set(const io::buffer& other) {
+void ca::blitz_array::set(const ca::interface& other) {
+  TDEBUG1("[non-optimal] buffer data copy requested: " << other.type().str());
   set(other.type());
   memcpy(m_ptr, other.ptr(), m_type.buffer_size());
 }
 
-void io::carray::set(boost::shared_ptr<io::buffer> other) {
+void ca::blitz_array::set(boost::shared_ptr<ca::interface> other) {
   m_type = other->type();
   m_ptr = other->ptr();
   m_is_blitz = false;
@@ -97,53 +105,57 @@ static boost::shared_ptr<void> make_array(size_t nd, const size_t* shape,
   throw std::runtime_error("unsupported number of dimensions -- debug me");
 }
 
-void io::carray::set (const io::typeinfo& req) {
+void ca::blitz_array::set (const ca::typeinfo& req) {
+  if (m_type.is_compatible(req)) return; ///< double-check requirement first!
+
+  //ok, have to go through reallocation
+  TDEBUG1("[non-optimal] buffer re-allocation requested from " << m_type.str() << " to " << req.str());
   m_type = req;
   m_is_blitz = true;
   switch (m_type.dtype) {
-    case Torch::core::array::t_bool:
+    case ca::t_bool:
       m_data = make_array<bool>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_int8: 
+    case ca::t_int8: 
       m_data = make_array<int8_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_int16: 
+    case ca::t_int16: 
       m_data = make_array<int16_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_int32: 
+    case ca::t_int32: 
       m_data = make_array<int32_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_int64: 
+    case ca::t_int64: 
       m_data = make_array<int64_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_uint8: 
+    case ca::t_uint8: 
       m_data = make_array<uint8_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_uint16: 
+    case ca::t_uint16: 
       m_data = make_array<uint16_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_uint32: 
+    case ca::t_uint32: 
       m_data = make_array<uint32_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_uint64: 
+    case ca::t_uint64: 
       m_data = make_array<uint64_t>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_float32: 
+    case ca::t_float32: 
       m_data = make_array<float>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_float64: 
+    case ca::t_float64: 
       m_data = make_array<double>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_float128: 
+    case ca::t_float128: 
       m_data = make_array<long double>(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_complex64: 
+    case ca::t_complex64: 
       m_data = make_array<std::complex<float> >(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_complex128: 
+    case ca::t_complex128: 
       m_data = make_array<std::complex<double> >(req.nd, req.shape, m_ptr);
       return;
-    case Torch::core::array::t_complex256: 
+    case ca::t_complex256: 
       m_data = make_array<std::complex<long double> >(req.nd, req.shape, m_ptr);
       return;
     default:
@@ -151,5 +163,5 @@ void io::carray::set (const io::typeinfo& req) {
   }
 
   //if we get to this point, there is nothing much we can do...
-  throw std::runtime_error("invalid data type on blitz buffer reset -- debug me");
+  throw std::runtime_error("invalid data type on blitz array reset -- debug me");
 }

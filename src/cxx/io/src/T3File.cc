@@ -34,6 +34,7 @@
 
 namespace fs = boost::filesystem;
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 static inline size_t get_filesize(const std::string& filename) {
   struct stat filestatus;
@@ -91,11 +92,11 @@ class T3File: public io::File {
       return m_filename;
     }
 
-    virtual const io::typeinfo& array_type () const {
+    virtual const ca::typeinfo& array_type () const {
       return m_type_array;
     }
 
-    virtual const io::typeinfo& arrayset_type () const {
+    virtual const ca::typeinfo& arrayset_type () const {
       return m_type_arrayset;
     }
 
@@ -107,7 +108,7 @@ class T3File: public io::File {
       return s_codecname;
     }
 
-    virtual void array_read(io::buffer& buffer) {
+    virtual void array_read(ca::interface& buffer) {
 
       if (m_newfile) throw std::runtime_error("cannot read uninitialized t3 binary file");
 
@@ -122,11 +123,11 @@ class T3File: public io::File {
 
     }
 
-    virtual void arrayset_read(io::buffer& buffer, size_t index) {
+    virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
       if (m_newfile) throw std::runtime_error("cannot read uninitialized t3 binary file");
 
-      const io::typeinfo& type = buffer.type();
+      const ca::typeinfo& type = buffer.type();
 
       if (!buffer.type().is_compatible(m_type_arrayset)) buffer.set(m_type_arrayset);
 
@@ -139,9 +140,9 @@ class T3File: public io::File {
 
     }
 
-    virtual size_t arrayset_append (const io::buffer& buffer) {
+    virtual size_t arrayset_append (const ca::interface& buffer) {
 
-      const io::typeinfo& info = buffer.type();
+      const ca::typeinfo& info = buffer.type();
 
       if (!m_newfile && !info.is_compatible(m_type_arrayset)) 
         throw std::invalid_argument("input buffer does not conform to already initialized torch3vision binary file");
@@ -189,7 +190,7 @@ class T3File: public io::File {
       
     }
 
-    virtual void array_write (const io::buffer& buffer) {
+    virtual void array_write (const ca::interface& buffer) {
 
       m_newfile = true; //force file re-setting
       arrayset_append(buffer);
@@ -200,8 +201,8 @@ class T3File: public io::File {
 
     std::string m_filename;
     bool m_newfile;
-    io::typeinfo m_type_array;
-    io::typeinfo m_type_arrayset;
+    ca::typeinfo m_type_array;
+    ca::typeinfo m_type_arrayset;
     size_t m_length;
 
     static std::string s_codecname;

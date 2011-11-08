@@ -9,11 +9,8 @@
 #ifndef TORCH_IO_TENSORFILE_H
 #define TORCH_IO_TENSORFILE_H
 
-#include "core/cast.h"
+#include "core/blitz_array.h"
 #include "io/TensorFileHeader.h"
-#include "io/buffer.h"
-#include "io/carray.h"
-#include "io/utils.h"
 #include "io/Exception.h"
 
 namespace Torch { namespace io {
@@ -77,25 +74,25 @@ namespace Torch { namespace io {
        * @warning: Please convert your files to HDF5, this format is
        * deprecated starting on 16.04.2011 - AA
        */
-      void write(const buffer& data);
+      void write(const Torch::core::array::interface& data);
 
       /**
-       * Reads the file data into a buffer - this variant reads the next
-       * variable. The buffer size will be reset if required.
+       * Reads the file data into a Torch::core::array::interface - this variant reads the next
+       * variable. The Torch::core::array::interface size will be reset if required.
        */
-      void read(buffer& data); 
+      void read(Torch::core::array::interface& data); 
 
       /**
-       * Reads the file data into a buffer - this variant allows the
-       * specification of a position to read data from. The buffer size will be
+       * Reads the file data into a Torch::core::array::interface - this variant allows the
+       * specification of a position to read data from. The Torch::core::array::interface size will be
        * reset if required.
        */
-      void read (size_t index, buffer& data);
+      void read (size_t index, Torch::core::array::interface& data);
 
       /**
        * Peeks the file and returns the currently set typeinfo
        */
-      void peek(typeinfo& info) const;
+      void peek(Torch::core::array::typeinfo& info) const;
 
       /**
        * Gets the number of samples/arrays written so far
@@ -129,7 +126,7 @@ namespace Torch { namespace io {
       /**
        * Initializes the tensor file with the given type and shape.
        */
-      inline void initTensorFile(const typeinfo& info) {
+      inline void initTensorFile(const Torch::core::array::typeinfo& info) {
         initHeader(info);
       }
 
@@ -155,7 +152,7 @@ namespace Torch { namespace io {
        * Initializes the header of the (output) stream with the given type
        * and shape
        */
-      void initHeader(const typeinfo& info);
+      void initHeader(const Torch::core::array::typeinfo& info);
 
     public:
 
@@ -172,7 +169,7 @@ namespace Torch { namespace io {
        */
       template <typename T, int D> 
         inline void write(blitz::Array<T,D>& bz) {
-          write(carray(bz));
+          write(Torch::core::array::blitz_array(bz));
         }
 
       /**
@@ -180,16 +177,16 @@ namespace Torch { namespace io {
        * multiarrays saved have the same dimensions.
        */
       template <typename T, int D> inline blitz::Array<T,D> read() {
-        buffer buf;
+        Torch::core::array::interface buf;
         read(buf);
-        return cast<T,D>(buf);
+        return Torch::core::array::cast<T,D>(buf);
       }
 
       template <typename T, int D> inline blitz::Array<T,D> read(size_t
           index) { 
-        buffer buf;
+        Torch::core::array::interface buf;
         read(index, buf);
-        return cast<T,D>(buf);
+        return Torch::core::array::cast<T,D>(buf);
       }
 
     private: //representation
