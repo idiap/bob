@@ -321,7 +321,7 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
     blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimF()-1));
     blitz::Array<double,1> sigma = m_cache_D_1(blitz::Range(0,machine.getDimF()-1));
     sigma = blitz::sqrt(sigma);
-    F = Uslice(bi,bj) * sigma(bj);
+    F = Uslice(bi,bj) / sigma(bj);
 
     /*
     // a/ Computes the global mean
@@ -439,7 +439,7 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
     blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimG()-1));
     blitz::Array<double,1> sigma = m_cache_D_1(blitz::Range(0,machine.getDimG()-1));
     sigma = blitz::sqrt(sigma);
-    G = Uslice(bi,bj) * sigma(bj);
+    G = Uslice(bi,bj) / sigma(bj);
   }
   // otherwise: random initialization
   else {
@@ -469,16 +469,16 @@ void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine,
     blitz::Array<double,2>& G = machine.updateG();
     blitz::secondIndex bj;
     m_cache_D_1 = blitz::mean(G, bj);
-    m_cache_D_2 = 0.;
+/*    m_cache_D_2 = 0.;
     // Computes the variance of G ( 1/(N-1) estimate of the variance)
     for(size_t i=0; i<machine.getDimG(); ++i)
     {
       blitz::Array<double,1> Gi = G(blitz::Range::all(),i);
       m_cache_D_2 += blitz::pow2(Gi - m_cache_D_1);
     }
-    m_cache_D_2 /= static_cast<double>(machine.getDimG()-1);
+    m_cache_D_2 /= static_cast<double>(machine.getDimG()-1);*/
     // Updates sigma
-    sigma = m_cache_D_2 * m_initSigma_ratio + eps;
+    sigma = m_cache_D_1 * m_initSigma_ratio + eps;
   }
   // 2: constant value
   else if(m_initSigma_method==2) {
