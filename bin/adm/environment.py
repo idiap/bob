@@ -132,6 +132,12 @@ def parse_args(argv):
                     default=self_root(),
                     help="Switch to a different base installation (defaults to %default)",
                    )
+  parser.add_option("-B", "--build-environment",
+                    action="store_true",
+                    dest="building",
+                    default=False,
+                    help="Switch to remove environment variables that may cause problems during builds such as the current installation directories",
+                   )
                     
 
   options, arguments = parser.parse_args(argv[1:])
@@ -289,13 +295,16 @@ def generate_environment(options):
     if options.verbose >= 3: print("No python interpreter detected - using current")
     pyver = 'python%d.%d' % sys.version_info[0:2]
 
-  P.before('PATH', J('bin'), JIA('bin'))
-  P.before('PYTHONPATH', JIA('lib', pyver), JIA('lib'))
-  P.before('LD_LIBRARY_PATH', JIA('lib'))
-  if options.arch.split('-')[0] == 'macosx': # we are under OSX
-    P.before('DYLD_LIBRARY_PATH', JIA('lib'))
-  P.before('CMAKE_PREFIX_PATH', JIA('share', 'cmake'))
-  #P.before('TORCH_SCHEMA_PATH', JIA('share', 'torch', 'schema'))
+  if not options.building:
+    # Avoids inserting the installation directories during at the build 
+    # environment, what may confuse cmake in certain platforms.
+    P.before('PATH', J('bin'), JIA('bin'))
+    P.before('PYTHONPATH', JIA('lib', pyver), JIA('lib'))
+    P.before('LD_LIBRARY_PATH', JIA('lib'))
+    if options.arch.split('-')[0] == 'macosx': # we are under OSX
+      P.before('DYLD_LIBRARY_PATH', JIA('lib'))
+    P.before('CMAKE_PREFIX_PATH', JIA('share', 'cmake'))
+    #P.before('TORCH_SCHEMA_PATH', JIA('share', 'torch', 'schema'))
 
   #this will place a few TORCH_ variables into the game, so the user can make
   #adjust its shell behavior accordinly, if he/she ever wants it.
