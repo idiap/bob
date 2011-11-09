@@ -468,7 +468,7 @@ void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine,
     }
     m_cache_D_2 /= static_cast<double>(machine.getDimG()-1);*/
     // Updates sigma
-    sigma = m_cache_D_1 * m_initSigma_ratio + eps;
+    sigma = blitz::fabs(m_cache_D_1) * m_initSigma_ratio + eps;
   }
   // 2: constant value
   else if(m_initSigma_method==2) {
