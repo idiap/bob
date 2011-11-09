@@ -7,20 +7,17 @@ set(pysrc
    "src/file.cc"
    "src/array.cc"
    "src/arrayset.cc"
-   
    "src/hdf5_extras.cc"
    "src/hdf5.cc"
-
    "src/video.cc"
-   
    "src/datetime.cc"
-
    "src/main.cc"
    )
  
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(io "${pysrc}")
+
 add_dependencies(pytorch_io python-core_header_install)
 target_link_libraries(pytorch_io pytorch_core_ndarray)
 
