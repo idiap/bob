@@ -143,8 +143,15 @@ namespace Torch { namespace trainer {
         */
       inline double getInitSigmaRatio() const { return m_initSigma_ratio; }
 
-
-
+      /**
+        * Sets the limited memory option such that large maps of data are not
+        * preallocated.
+        */
+      inline void setLimitedMemory(bool v) { m_limited_memory = v; }
+      /**
+        * Gets the seed
+        */
+      inline bool getLimitedMemory() const { return m_limited_memory; }
 
 
       /**
@@ -162,6 +169,7 @@ namespace Torch { namespace trainer {
       //representation
       int m_nf;
       int m_ng;
+      bool m_limited_memory; /// If set, this avoids allocation of large maps of data
       blitz::Array<double,2> m_S; /// Covariance of the training data
       std::vector<blitz::Array<double,2> > m_z_first_order; /// Current mean of the z_{n} latent variable (1 for each sample)
       blitz::Array<double,2> m_sum_z_second_order; /// Current sum of the covariance of the z_{n} latent variable
@@ -174,7 +182,6 @@ namespace Torch { namespace trainer {
       double m_initSigma_ratio;
 
       std::vector<blitz::Array<double,1> > m_y_first_order; /// Current mean of the y_{n} latent variable
-      std::vector<blitz::Array<double,2> > m_y_second_order; /// Current covariance of the y_{n} latent variable
 
       // Precomputed
 
@@ -192,10 +199,11 @@ namespace Torch { namespace trainer {
       std::map<size_t,blitz::Array<double,2> > m_iota; // iota_a = - gamma_a.eta
 
       // Cache
-      mutable blitz::Array<double,1> m_cache_nf;
+      mutable blitz::Array<double,1> m_cache_nf_1;
+      mutable blitz::Array<double,1> m_cache_nf_2;
+      mutable blitz::Array<double,1> m_cache_ng_1;
       mutable blitz::Array<double,1> m_cache_D_1; // D=nb features
       mutable blitz::Array<double,1> m_cache_D_2; // D=nb features
-      mutable std::map<size_t,blitz::Array<double,1> > m_cache_for_y_first_order;
       mutable blitz::Array<double,2> m_cache_nfng_nfng;
       mutable blitz::Array<double,2> m_cache_D_nfng_1; // D=nb features, nfng=nf+ng
       mutable blitz::Array<double,2> m_cache_D_nfng_2; // D=nb features, nfng=nf+ng
