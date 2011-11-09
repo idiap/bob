@@ -19,8 +19,8 @@ torch_library(config "${src}" "${deps}" "${shared}")
 add_dependencies(torch_config config-cxx_header_install)
 
 # Defines tests for this package
-torch_test(config basic test/basic.cc)
+#torch_test(config basic test/basic.cc)
 
 # Defines environment variable used to localize data for the tests
-set_property(TEST cxx-config-basic APPEND PROPERTY ENVIRONMENT
-  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
+#set_property(TEST cxx-config-basic APPEND PROPERTY ENVIRONMENT
+#  "TORCH_TESTDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/test/data")
