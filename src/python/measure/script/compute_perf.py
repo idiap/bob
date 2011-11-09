@@ -157,7 +157,7 @@ def get_options():
       help="Name of the file containing the development scores (defaults to %default)", metavar="FILE")
   parser.add_option('-t', '--test', dest="test", default=None,
       help="Name of the file containing the test scores (defaults to %default)", metavar="FILE")
-  parser.add_option('-n', '--points', dest="npoints", default=100,
+  parser.add_option('-n', '--points', dest="npoints", default=100, type="int",
       help="Number of points to use in the curves (defaults to %default)",
       metavar="INT(>0)")
   parser.add_option('-o', '--output', dest="plotfile", default="curves.pdf",
