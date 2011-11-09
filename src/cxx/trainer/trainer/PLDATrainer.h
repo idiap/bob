@@ -181,8 +181,6 @@ namespace Torch { namespace trainer {
       int m_initSigma_method;
       double m_initSigma_ratio;
 
-      std::vector<blitz::Array<double,1> > m_y_first_order; /// Current mean of the y_{n} latent variable
-
       // Precomputed
 
       // Number of training samples for each individual in the training set

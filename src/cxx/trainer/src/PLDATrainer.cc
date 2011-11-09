@@ -34,7 +34,6 @@ train::PLDABaseTrainer::PLDABaseTrainer(int nf, int ng,
   m_initF_method(0), m_initF_ratio(1.),
   m_initG_method(0), m_initG_ratio(1.),
   m_initSigma_method(0), m_initSigma_ratio(1.),
-  m_y_first_order(0), 
   m_n_samples_per_id(0), m_n_samples_in_training(), m_B(0,0),
   m_Ft_isigma_G(0,0), m_eta(0,0), m_zeta(), m_iota(),
   m_cache_nf_1(0), m_cache_nf_2(0), m_cache_ng_1(0),
@@ -55,7 +54,6 @@ train::PLDABaseTrainer::PLDABaseTrainer(const train::PLDABaseTrainer& other):
   m_initF_method(other.m_initF_method), m_initF_ratio(other.m_initF_ratio),
   m_initG_method(other.m_initG_method), m_initG_ratio(other.m_initG_ratio),
   m_initSigma_method(other.m_initSigma_method), m_initSigma_ratio(other.m_initSigma_ratio),
-  m_y_first_order(0), 
   m_n_samples_per_id(other.m_n_samples_per_id),
   m_n_samples_in_training(other.m_n_samples_in_training), 
   m_B(tca::ccopy(other.m_B)), 
@@ -71,7 +69,6 @@ train::PLDABaseTrainer::PLDABaseTrainer(const train::PLDABaseTrainer& other):
   m_cache_D_nfng_2(tca::ccopy(other.m_cache_D_nfng_2))
 {
   tca::ccopy(other.m_z_first_order, m_z_first_order);
-  tca::ccopy(other.m_y_first_order, m_y_first_order);
   tca::ccopy(other.m_zeta, m_zeta);
   tca::ccopy(other.m_iota, m_iota);
 }
@@ -97,7 +94,6 @@ train::PLDABaseTrainer& train::PLDABaseTrainer::operator=
   m_initG_ratio = other.m_initG_ratio;
   m_initSigma_method = other.m_initSigma_method;
   m_initSigma_ratio = other.m_initSigma_ratio;
-  tca::ccopy(other.m_y_first_order, m_y_first_order);
   m_n_samples_per_id = other.m_n_samples_per_id;
   m_n_samples_in_training = other.m_n_samples_in_training;
   m_B = tca::ccopy(other.m_B); 
@@ -187,11 +183,6 @@ void train::PLDABaseTrainer::initMembers(const std::vector<io::Arrayset>& v_ar)
     // m_z_first_order
     blitz::Array<double,2> z_i(n_i, m_nf+m_ng);
     m_z_first_order.push_back(z_i);
-
-    size_t q_i = m_nf + n_i * m_ng;
-    // m_y_first_order
-    blitz::Array<double,1> yi1(q_i);
-    m_y_first_order.push_back(yi1);
 
     // m_n_samples_per_id
     m_n_samples_per_id.push_back(n_i);
@@ -551,12 +542,10 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
   m_sum_z_second_order = 0.;
   for(size_t i=0; i<v_ar.size(); ++i)
   {
-    // 1/ First order statistics of y
-    blitz::Array<double,1>& y_first_order_i = m_y_first_order[i];
+    // Computes expectation of z_ij = [h_i w_ij]
+    // 1/a/ Computes expectation of h_i
     // Loop over the samples
     m_cache_nf_1 = 0.;
-    // Computes expectation of y_i = [h_i w_i1 ... w_iJ]
-    // 1/a/ Computes expectation of h_i
     for(size_t j=0; j<v_ar[i].size(); ++j)
     {
       // m_cache_D_1 = x_sj-mu
@@ -569,25 +558,12 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
     }
     const blitz::Array<double,2>& gamma_a = machine.getAddGamma(v_ar[i].size());
     blitz::Range r_hi(0, m_nf-1);
-    blitz::Array<double,1> y_first_order_i_slice = y_first_order_i(r_hi);
-    // y_first_order_i_slice = gamma_A  sum_j F^T.beta.(x_sj-mu)
-    Torch::math::prod(gamma_a, m_cache_nf_1, y_first_order_i_slice);
+    // m_cache_nf_2 = E(h_i) = gamma_A  sum_j F^T.beta.(x_sj-mu)
+    Torch::math::prod(gamma_a, m_cache_nf_1, m_cache_nf_2);
 
-    // 1/b/ Computes expectation of w_ij
-    // m_cache_D_2 = F.E{h_i}
-    Torch::math::prod(F, y_first_order_i_slice, m_cache_D_2);
-    for(size_t j=0; j<v_ar[i].size(); ++j)
-    {
-      // m_cache_D_1 = x_sj - mu - F.E{h_i}
-      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu - m_cache_D_2;
-      // y_i_slice = G^T.sigma^-1.(x_sj-mu-fhi)
-      Torch::math::prod(GtISigma, m_cache_D_1, m_cache_ng_1);
-      // y_first_order_i_slice = (Id+G^T.sigma^-1.G)^-1.G^T.sigma^-1.(x_sj-mu)
-      blitz::Range r_sample_j(m_nf + j*m_ng, m_nf + (j+1)*m_ng -1);
-      blitz::Array<double,1> y_first_order_i_slice = y_first_order_i(r_sample_j);
-      Torch::math::prod(alpha, m_cache_ng_1, y_first_order_i_slice);
-    }
-    
+    // 1/b/ Precomputes: m_cache_D_2 = F.E{h_i}
+    Torch::math::prod(F, m_cache_nf_2, m_cache_D_2);
+
     // 2/ First and second order statistics of z
     // Precomputed values 
     blitz::Array<double,2>& zeta_a = m_zeta[v_ar[i].size()];
@@ -601,10 +577,14 @@ void train::PLDABaseTrainer::eStep(mach::PLDABaseMachine& machine,
     {
       // 1/ First order statistics of z
       blitz::Array<double,1> z_first_order_ij_1 = m_z_first_order[i](j,r1);
-      z_first_order_ij_1 = y_first_order_i(r1); // h_i
+      z_first_order_ij_1 = m_cache_nf_2; // E{h_i}
+      // m_cache_D_1 = x_sj - mu - F.E{h_i}
+      m_cache_D_1 = v_ar[i].get<double,1>(j) - mu - m_cache_D_2;
+      // m_cache_ng_1 = G^T.sigma^-1.(x_sj-mu-fhi)
+      Torch::math::prod(GtISigma, m_cache_D_1, m_cache_ng_1);
+      // z_first_order_ij_2 = (Id+G^T.sigma^-1.G)^-1.G^T.sigma^-1.(x_sj-mu) = E{w_ij}
       blitz::Array<double,1> z_first_order_ij_2 = m_z_first_order[i](j,r2);
-      blitz::Range rj(m_nf + j*m_ng, m_nf + (j+1)*m_ng-1);
-      z_first_order_ij_2 = y_first_order_i(rj); // w_ij
+      Torch::math::prod(alpha, m_cache_ng_1, z_first_order_ij_2); 
 
       // 2/ Second order statistics of z
       blitz::Array<double,2> z_so_11 = m_sum_z_second_order(r1,r1);
