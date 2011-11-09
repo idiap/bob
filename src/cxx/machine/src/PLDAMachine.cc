@@ -360,7 +360,11 @@ double mach::PLDABaseMachine::getAddLogLikeConstTerm(const size_t a)
   return m_loglike_constterm[a];
 }
 
-
+void mach::PLDABaseMachine::clearMaps()
+{
+  m_gamma.clear();
+  m_loglike_constterm.clear();
+}
 
 
 mach::PLDAMachine::PLDAMachine():
@@ -634,3 +638,10 @@ void mach::PLDAMachine::forward(const blitz::Array<double,2>& samples, double& s
   score = computeLikelihood(samples, true) - // match
           (computeLikelihood(samples, false) + m_loglikelihood); // no match
 }
+
+void mach::PLDAMachine::clearMaps()
+{
+  m_gamma.clear();
+  m_loglike_constterm.clear();
+}
+

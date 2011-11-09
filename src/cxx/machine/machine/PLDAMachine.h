@@ -314,7 +314,10 @@ namespace Torch { namespace machine {
         */
       inline bool hasGamma(const size_t a) const
       { return (m_gamma.find(a) != m_gamma.end()); }
-
+      /**
+        * Clears the maps (gamma_a and m_loglike_constterm).
+        */
+      void clearMaps();
 
     private:
       // F, G and sigma matrices, and mu vector
@@ -543,6 +546,10 @@ namespace Torch { namespace machine {
         * @warning The value is computed if it does not already exists
         */
       double getAddLogLikeConstTerm(const size_t a);
+      /**
+        * Clears the maps (gamma_a and m_loglike_constterm).
+        */
+      void clearMaps();
 
 
       /**
