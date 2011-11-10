@@ -378,6 +378,7 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
     for(size_t i=0; i<v_ar.size(); ++i)
     {
       blitz::Array<double,1> Si = S(i, blitz::Range::all());
+      Si = 0.;
       for(size_t j=0; j<v_ar[i].size(); ++j)
       {
         // Si += x_ij
@@ -403,7 +404,7 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
 
     // e/ Updates F
     blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimF()-1));
-    blitz::Array<double,1> sigma_slice = m_cache_D_1(blitz::Range(0,machine.getDimF()-1));
+    blitz::Array<double,1> sigma_slice = sigma(blitz::Range(0,machine.getDimF()-1));
     sigma_slice = blitz::sqrt(sigma_slice);
     F = Uslice(bi,bj) / sigma_slice(bj);
   }
@@ -508,16 +509,11 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
         m_cache_D_1 += Si;
         ++counter;
       }
-
     }
     m_cache_D_1 /= static_cast<double>(Nsamples);
 
     // b/ Removes the mean
-    for(size_t i=0; i<v_ar.size(); ++i)
-    {
-      blitz::Array<double,1> Si = S(i, blitz::Range::all());
-      Si -= m_cache_D_1;
-    }
+    S = S(bi,bj) - m_cache_D_1(bj);
 
     // c/ SVD of the between-class scatter matrix
     blitz::Array<double,2> U(machine.getDimD(), std::min(machine.getDimD(),Nsamples));
@@ -526,7 +522,7 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
 
     // d/ Updates G
     blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimG()-1));
-    blitz::Array<double,1> sigma_slice = m_cache_D_1(blitz::Range(0,machine.getDimG()-1));
+    blitz::Array<double,1> sigma_slice = sigma(blitz::Range(0,machine.getDimG()-1));
     sigma_slice = blitz::sqrt(sigma_slice);
     G = Uslice(bi,bj) / sigma_slice(bj);
   }
