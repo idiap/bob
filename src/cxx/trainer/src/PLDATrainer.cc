@@ -366,6 +366,47 @@ void train::PLDABaseTrainer::initF(mach::PLDABaseMachine& machine,
     // f/ Updates F
     */
   }
+  // 2: between-class scatter 2
+  else if(m_initF_method==2) 
+  {
+    // a/ Computes between-class scatter matrix
+    blitz::firstIndex bi;
+    blitz::secondIndex bj;
+    blitz::Array<double,2> S(v_ar.size(), machine.getDimD());
+    S = 0.;
+    m_cache_D_1 = 0.;
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      blitz::Array<double,1> Si = S(i, blitz::Range::all());
+      for(size_t j=0; j<v_ar[i].size(); ++j)
+      {
+        // Si += x_ij
+        Si += v_ar[i].get<double,1>(j);
+      }
+      // Si = mean of the samples class i
+      Si /= static_cast<double>(v_ar[i].size());
+      m_cache_D_1 += Si;
+    }
+    m_cache_D_1 /= static_cast<double>(v_ar.size());
+
+    // b/ Removes the mean
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      blitz::Array<double,1> Si = S(i, blitz::Range::all());
+      Si -= m_cache_D_1;
+    }
+
+    // d/ SVD of the between-class scatter matrix
+    blitz::Array<double,2> U(machine.getDimD(), std::min(machine.getDimD(),v_ar.size()));
+    blitz::Array<double,1> sigma( std::min(machine.getDimD(),v_ar.size()) );
+    Torch::math::svd(S, U, sigma);
+
+    // e/ Updates F
+    blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimF()-1));
+    blitz::Array<double,1> sigma_slice = m_cache_D_1(blitz::Range(0,machine.getDimF()-1));
+    sigma_slice = blitz::sqrt(sigma_slice);
+    F = Uslice(bi,bj) / sigma_slice(bj);
+  }
   // otherwise: random initialization
   else {
     // Initializes the random number generator
@@ -430,6 +471,64 @@ void train::PLDABaseTrainer::initG(mach::PLDABaseMachine& machine,
     blitz::Array<double,1> sigma = m_cache_D_1(blitz::Range(0,machine.getDimG()-1));
     sigma = blitz::sqrt(sigma);
     G = Uslice(bi,bj) / sigma(bj);
+  }
+  // 2: within-class scatter 2
+  else if(m_initG_method==2) 
+  {
+    // a/ Computes within-class scatter matrix
+    blitz::firstIndex bi;
+    blitz::secondIndex bj;
+    size_t Nsamples=0;
+    for(size_t i=0; i<v_ar.size(); ++i)
+      Nsamples += v_ar[i].size();
+        
+    blitz::Array<double,2> S(Nsamples, machine.getDimD());
+    S = 0.;
+    m_cache_D_1 = 0.;
+    int counter = 0;
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      // Computes the mean of the samples class i
+      m_cache_D_2 = 0.;
+      for(size_t j=0; j<v_ar[i].size(); ++j)
+      {
+        // m_cache_D_2 += x_ij
+        m_cache_D_2 += v_ar[i].get<double,1>(j);
+      }
+      // m_cache_D_2 = mean of the samples class i
+      m_cache_D_2 /= static_cast<double>(v_ar[i].size());
+
+      // Generates the scatter
+      for(size_t j=0; j<v_ar[i].size(); ++j)
+      {
+        blitz::Array<double,1> Si = S(counter, blitz::Range::all());
+        // Si = x_ij - mean_i
+        Si = v_ar[i].get<double,1>(j) - m_cache_D_2;
+        // mean of the within class
+        m_cache_D_1 += Si;
+        ++counter;
+      }
+
+    }
+    m_cache_D_1 /= static_cast<double>(Nsamples);
+
+    // b/ Removes the mean
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      blitz::Array<double,1> Si = S(i, blitz::Range::all());
+      Si -= m_cache_D_1;
+    }
+
+    // c/ SVD of the between-class scatter matrix
+    blitz::Array<double,2> U(machine.getDimD(), std::min(machine.getDimD(),Nsamples));
+    blitz::Array<double,1> sigma( std::min(machine.getDimD(),Nsamples) );
+    Torch::math::svd(S, U, sigma);
+
+    // d/ Updates G
+    blitz::Array<double,2> Uslice = U(blitz::Range::all(), blitz::Range(0,machine.getDimG()-1));
+    blitz::Array<double,1> sigma_slice = m_cache_D_1(blitz::Range(0,machine.getDimG()-1));
+    sigma_slice = blitz::sqrt(sigma_slice);
+    G = Uslice(bi,bj) / sigma_slice(bj);
   }
   // otherwise: random initialization
   else {
