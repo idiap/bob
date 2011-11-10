@@ -474,6 +474,27 @@ void train::PLDABaseTrainer::initSigma(mach::PLDABaseMachine& machine,
   else if(m_initSigma_method==2) {
     sigma = m_initSigma_ratio;
   }
+  // 3: percentage of the variance of the data
+  else if(m_initSigma_method==3) {
+    // a/ Computes the global mean
+    //    m_cache_D_1 = 1/N sum_i x_i
+    m_cache_D_1 = 0.;
+    size_t Ns = 0;
+    for(size_t i=0; i<v_ar.size(); ++i)
+    {
+      for(size_t j=0; j<v_ar[i].size(); ++j) 
+        m_cache_D_1 += v_ar[i].get<double,1>(j);
+      Ns += v_ar[i].size();
+    }
+    m_cache_D_1 /= static_cast<double>(Ns);
+  
+    // b/ Computes the variance:
+    m_cache_D_2 = 0.;
+    for(size_t i=0; i<v_ar.size(); ++i)
+      for(size_t j=0; j<v_ar[i].size(); ++j) 
+        m_cache_D_2 += blitz::pow2(v_ar[i].get<double,1>(j) - m_cache_D_1);
+    sigma = m_initSigma_ratio * m_cache_D_2 / static_cast<double>(Ns-1);
+  }
   // otherwise: random initialization
   else {
     // Initializes the random number generator
