@@ -129,9 +129,18 @@ static object videoreader_load(io::VideoReader& reader) {
 }
 
 static void videowriter_append(io::VideoWriter& writer, object a) {
-  tp::dtype dtype(writer.video_type().dtype);
-  tp::ndarray tmp(a, dtype.self());
-  writer.append(tmp);
+  tp::convert_t result = tp::convertible_to(a, writer.frame_type(),
+      false, true);
+  if (result != tp::IMPOSSIBLE) {
+    tp::dtype dtype(writer.frame_type().dtype);
+    tp::ndarray tmp(a, dtype.self());
+    writer.append(tmp);
+  }
+  else {
+    tp::dtype dtype(writer.video_type().dtype);
+    tp::ndarray tmp(a, dtype.self());
+    writer.append(tmp);
+  }
 }
 
 void bind_io_video() {

@@ -78,6 +78,78 @@ namespace Torch { namespace python {
    */
   int type_to_num(Torch::core::array::ElementType type);
 
+  /**
+   * Handles conversion checking possibilities
+   */
+  typedef enum {
+    IMPOSSIBLE = 0,    ///< not possible to get array from object
+    BYREFERENCE = 1,   ///< possible, by only referencing the array
+    WITHARRAYCOPY = 2, ///< possible, object is an array, but has to copy
+    WITHCOPY = 3       ///< possible, object is not an array, has to copy
+  } convert_t;
+
+  /**
+   * Checks if an array-like object is convertible to become a NumPy ndarray
+   * (boost::python::numeric::array). If so, write the typeinfo information
+   * that such array would have upon automatic conversion to "info". 
+   *
+   * Optionally, you can specify you do *not* want writeable or behavior to be
+   * checked. Write-ability means that an array area can be extracted from the
+   * "array_like" object and changes done to the converted ndarray will be
+   * reflected upon the original object.
+   *
+   * Behavior refers to two settings: first, the data type byte-order should be
+   * native (i.e., little-endian on little-endian machines and big-endian on
+   * big-endian machines). Secondly, the array must be C-Style, have its memory
+   * aligned and on a contiguous block.
+   *
+   * This method is more efficient than actually performing the conversion,
+   * unless you compile the project against NumPy < 1.6 in which case the
+   * built-in checks are not available and you we will emulate them with
+   * brute-force conversion if required. A level-1 DEBUG message will be output
+   * if a brute-force copy is required so you can debug for that.
+   *
+   * This method returns the convertibility status for the array-like object,
+   * which is one of:
+   *
+   * * IMPOSSIBLE: The object cannot, possibly, be converted into an ndarray
+   * * BYREFERENCE: The object will successfuly be converted to a ndarray, i.e.
+   *                in the most optimal way - by referring to it.
+   * * WITHARRAYCOPY: The object will successfuly be converted to a ndarray,
+   *                  but that will require an array copy. That means the
+   *                  object is already an array, but not of the type you
+   *                  requested.
+   * * WITHCOPY: The object will successfuly be converted to a ndarray, but
+   *             we will need to convert the object from its current format
+   *             (non-ndarray) to a ndarray format. In this case, we will not
+   *             be able to implement write-back.
+   */
+  convert_t convertible(boost::python::object array_like, 
+      Torch::core::array::typeinfo& info, bool writeable=true,
+      bool behaved=true);
+
+  /**
+   * This method does the same as convertible(), but specifies a type
+   * information to which the destination array needs to have. Same rules
+   * apply.
+   *
+   * The typeinfo input is honoured like this:
+   *
+   * 1. The "dtype" component is enforced on the array object
+   * 2. If "nd" != 0, the number of dimensions is checked.
+   * 3. If 2. holds, shape values that are **different** than zero are checked.
+   */
+  convert_t convertible_to (boost::python::object array_like,
+      const Torch::core::array::typeinfo& info, bool writeable=true,
+      bool behaved=true);
+
+  /**
+   * Same as above, but only requires dtype convertibility.
+   */
+  convert_t convertible_to (boost::python::object array_like, 
+      boost::python::object dtype_like, bool writeable=true, 
+      bool behaved=true);
+
   class dtype {
 
     public: //api

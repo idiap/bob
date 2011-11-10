@@ -6,6 +6,7 @@
  */
 
 #include <boost/python/numeric.hpp>
+#include <boost/format.hpp>
 #include <stdexcept>
 #include <dlfcn.h>
 
@@ -18,6 +19,11 @@
 namespace bp = boost::python;
 namespace tp = Torch::python;
 namespace ca = Torch::core::array;
+
+#define TP_ARRAY(x) ((PyArrayObject*)x.ptr())
+#define TP_OBJECT(x) (x.ptr())
+
+#define NUMPY16_API 0x00000006
 
 void tp::setup_python(const char* module_docstring) {
 
@@ -45,6 +51,19 @@ void tp::setup_python(const char* module_docstring) {
   //Sets the bp::numeric::array interface to use numpy.ndarray
   //as basis. This is not strictly required, but good to set as a baseline.
   bp::numeric::array::set_module_and_type("numpy", "ndarray");
+
+  // Make sure we are not running against the wrong version of NumPy
+  if (NPY_VERSION != PyArray_GetNDArrayCVersion()) {
+    boost::format s("module compiled against ABI version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions");
+    s % (int) NPY_VERSION % (int) PyArray_GetNDArrayCVersion();
+    PYTHON_ERROR(RuntimeError, s.str().c_str());
+  }
+  if (NPY_FEATURE_VERSION > PyArray_GetNDArrayCFeatureVersion()) {
+    boost::format s("module compiled against API version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions");
+    s % (int) NPY_FEATURE_VERSION, (int) PyArray_GetNDArrayCFeatureVersion();
+    PYTHON_ERROR(RuntimeError, s.str().c_str());
+  }
+
 }
 
 /***************************************************************************
@@ -52,7 +71,13 @@ void tp::setup_python(const char* module_docstring) {
  ***************************************************************************/
 
 /**
- * Creates an auto-deletable bp::object out of a standard Python object.
+ * Creates an auto-deletable bp::object out of a standard Python object that
+ * cannot be NULL. Can be Py_NONE.
+ *
+ * Effects:
+ *
+ * The PyObject* is **not** XINCREF'ed at construction.
+ * The PyObject* is XDECREF'ed at destruction.
  */
 bp::object make_non_null_object(PyObject* obj) {
   bp::handle<> hdl(obj); //< raises if NULL
@@ -61,7 +86,13 @@ bp::object make_non_null_object(PyObject* obj) {
 }
 
 /**
- * Creates an auto-deletable bp::object out of a standard Python object.
+ * Creates an auto-deletable bp::object out of a standard Python object, that
+ * may be NULL (or Py_NONE).
+ *
+ * Effects:
+ *
+ * The PyObject* is **not** XINCREF'ed at construction.
+ * The PyObject* is XDECREF'ed at destruction.
  */
 bp::object make_maybe_null_object(PyObject* obj) {
   bp::handle<> hdl(bp::allow_null(obj));
@@ -70,7 +101,13 @@ bp::object make_maybe_null_object(PyObject* obj) {
 }
 
 /**
- * Creates an auto-deletable bp::object out of a standard Python object.
+ * Creates an auto-deletable bp::object out of a standard Python object. The
+ * input object cannot be NULL, but can be Py_NONE.
+ *
+ * Effects:
+ *
+ * The PyObject* is XINCREF'ed at construction.
+ * The PyObject* is XDECREF'ed at destruction.
  */
 bp::object make_non_null_borrowed_object(PyObject* obj) {
   bp::handle<> hdl(bp::borrowed(obj));
@@ -250,15 +287,256 @@ int tp::dtype::type_num() const {
   return m_self.is_none()? -1 : TP_DESCR(m_self)->type_num;
 }
 
+/****************************************************************************
+ * Free methods                                                             *
+ ****************************************************************************/
+
+static void typeinfo_ndarray (const bp::object& o, ca::typeinfo& i) {
+  PyArrayObject* npy = TP_ARRAY(o);
+  npy_intp strides[NPY_MAXDIMS];
+  for (int k=0; k<npy->nd; ++k) strides[k] = npy->strides[k]/npy->descr->elsize;
+  i.set<npy_intp>(tp::num_to_type(npy->descr->type_num), npy->nd,
+      npy->dimensions, strides);
+}
+
+/**
+ * This method emulates the behavior of PyArray_GetArrayParamsFromObject from
+ * NumPy >= 1.6 and is used when compiling and liking against older versions of
+ * NumPy.
+ */
+static int _GetArrayParamsFromObject(PyObject* op, 
+    PyArray_Descr* requested_dtype, 
+    npy_bool writeable, 
+    PyArray_Descr** out_dtype, 
+    int* out_ndim,
+    npy_intp* out_dims, 
+    PyArrayObject** out_arr, 
+    PyObject*) {
+  
+  if (PyArray_Check(op)) { //it is already an array, easy
+    
+    PyArrayObject* arr = reinterpret_cast<PyArrayObject*>(op);
+
+    if (requested_dtype && !PyArray_EquivTypes(arr->descr, requested_dtype)) {
+
+      if (PyArray_CanCastTo(arr->descr, requested_dtype)) {
+        (*out_arr) = 0;
+        (*out_dtype) = PyArray_DESCR(arr);
+        (*out_ndim) = PyArray_NDIM(arr);
+        for (int i=0; i<PyArray_NDIM(arr); ++i) 
+          out_dims[i] = PyArray_DIM(arr,i);
+        return writeable? PyArray_ISWRITEABLE(arr) : 1;
+      }
+      
+      else {
+        return 0;
+      }
+
+    }
+
+    //if you get to this point, the types are equivalent or there was no type
+    (*out_arr) = arr;
+    (*out_dtype) = 0;
+    (*out_ndim) = 0;
+    return writeable? PyArray_ISWRITEABLE(arr) : 1;
+
+  }
+
+  else { //it is not an array -- try a brute-force conversion
+
+    TDEBUG1("[non-optimal] using NumPy version < 1.6 requires we convert input data for convertibility check - compile against NumPy >= 1.6 to improve performance");
+    bp::object array = 
+      make_maybe_null_object(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0));
+    
+    if (array.is_none()) return 0;
+
+    //if the conversion worked, you can now fill in the parameters
+    (*out_arr) = 0;
+    (*out_dtype) = requested_dtype;
+    (*out_ndim) = PyArray_NDIM(TP_ARRAY(array));
+    for (int i=0; i<PyArray_NDIM(TP_ARRAY(array)); ++i) 
+      out_dims[i] = PyArray_DIM(TP_ARRAY(array),i);
+
+    //in this mode, the resulting object will never be write-able.
+    return writeable? 0 : 1;
+
+  }
+
+  return 0; //turn-off c compiler warnings...
+
+}
+
+tp::convert_t tp::convertible(bp::object array_like, ca::typeinfo& info,
+    bool writeable, bool behaved) {
+
+  int ndim = 0;
+  npy_intp dims[NPY_MAXDIMS];
+  PyArrayObject* arr = 0;
+  PyArray_Descr* dtype = 0;
+
+  int not_convertible =
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version < 1.6 */
+    PyArray_GetArrayParamsFromObject
+#else
+    _GetArrayParamsFromObject
+#endif
+    (array_like.ptr(), //input object pointer
+     0,                //requested dtype (if need to enforce)
+     writeable,        //writeable?
+     &dtype,           //dtype assessment
+     &ndim,            //assessed number of dimensions
+     dims,             //assessed shape
+     &arr,             //if obj_ptr is ndarray, return it here
+     0)                //context?
+    ;
+
+  if (not_convertible) return tp::IMPOSSIBLE;
+
+  convert_t retval = tp::BYREFERENCE;
+    
+  if (arr) { //the passed object is an array
+
+    //checks behavior.
+    if (behaved) {
+      if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
+            arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
+      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+    }
+
+    info.set<npy_intp>(tp::num_to_type(arr->descr->type_num),
+        PyArray_NDIM(arr), PyArray_DIMS(arr));
+  }
+
+  else { //the passed object is not an array
+    info.set<npy_intp>(tp::num_to_type(dtype->type_num), ndim, dims);
+    retval = tp::WITHCOPY;
+  }
+
+  return retval;
+}
+
+tp::convert_t tp::convertible_to (bp::object array_like,
+    const ca::typeinfo& info, bool writeable, bool behaved) {
+  
+  tp::dtype req_dtype(info.dtype);
+
+  int ndim = 0;
+  npy_intp dims[NPY_MAXDIMS];
+  PyArrayObject* arr = 0;
+  PyArray_Descr* dtype = 0;
+
+  int not_convertible =
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version < 1.6 */
+    PyArray_GetArrayParamsFromObject
+#else
+    _GetArrayParamsFromObject
+#endif
+    (array_like.ptr(), //input object pointer
+     0,                //requested dtype (if need to enforce)
+     writeable,        //writeable?
+     &dtype,           //dtype assessment
+     &ndim,            //assessed number of dimensions
+     dims,             //assessed shape
+     &arr,             //if obj_ptr is ndarray, return it here
+     0)                //context?
+    ;
+
+  if (not_convertible) return tp::IMPOSSIBLE;
+
+  convert_t retval = tp::BYREFERENCE;
+    
+  if (arr) { //the passed object is an array -- check compatibility
+  
+    if (info.nd) { //check number of dimensions and shape
+      if (PyArray_NDIM(arr) != (int)info.nd) return tp::IMPOSSIBLE;
+      for (size_t i=0; i<info.nd; ++i)
+        if (info.shape[i] && 
+            (int)info.shape[i] != PyArray_DIM(arr,i)) return tp::IMPOSSIBLE;
+    }
+
+    //checks behavior.
+    if (behaved) {
+      if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
+            arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
+      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+    }
+
+    return retval;
+
+  }
+
+  else { //the passed object is not an array
+
+     if (info.nd) { //check number of dimensions and shape
+      if (ndim != (int)info.nd) return tp::IMPOSSIBLE;
+      for (size_t i=0; i<info.nd; ++i) 
+        if (info.shape[i] && 
+            (int)info.shape[i] != dims[i]) return tp::WITHCOPY;
+     }
+
+     retval = tp::WITHCOPY;
+
+  }
+
+  return retval;
+}
+
+tp::convert_t tp::convertible_to(bp::object array_like, bp::object dtype_like,
+    bool writeable, bool behaved) {
+
+  tp::dtype req_dtype(dtype_like);
+
+  int ndim = 0;
+  npy_intp dims[NPY_MAXDIMS];
+  PyArrayObject* arr = 0;
+  PyArray_Descr* dtype = 0;
+
+  int not_convertible =
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version < 1.6 */
+    PyArray_GetArrayParamsFromObject
+#else
+    _GetArrayParamsFromObject
+#endif
+    (array_like.ptr(), //input object pointer
+     0,                //requested dtype (if need to enforce)
+     writeable,        //writeable?
+     &dtype,           //dtype assessment
+     &ndim,            //assessed number of dimensions
+     dims,             //assessed shape
+     &arr,             //if obj_ptr is ndarray, return it here
+     0)                //context?
+    ;
+
+  if (not_convertible) return tp::IMPOSSIBLE;
+
+  convert_t retval = tp::BYREFERENCE;
+    
+  if (arr) { //the passed object is an array -- check compatibility
+
+    //checks behavior.
+    if (behaved) {
+      if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
+            arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
+      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+    }
+
+  }
+
+  else { //the passed object is not an array
+
+     retval = tp::WITHCOPY;
+
+  }
+
+  return retval;
+}
+
 /***************************************************************************
  * Ndarray (PyArrayObject) manipulations                                   *
  ***************************************************************************/
 
-#define TP_ARRAY(x) ((PyArrayObject*)x.ptr())
-#define TP_OBJECT(x) (x.ptr())
-
 /**
- * Returns either a reference or a copy to the given array_like object,
+ * Returns either a reference or a copy of the given array_like object,
  * depending on the following requirements for referral:
  *
  * 0. The pointed object is a numpy.ndarray
@@ -298,12 +576,6 @@ static bp::object try_refer_ndarray (boost::python::object array_like,
   }
 
   return make_non_null_object(tmp);
-}
-
-static void typeinfo_ndarray (const bp::object& o, ca::typeinfo& i) {
-  PyArrayObject* npy = TP_ARRAY(o);
-  i.set<npy_intp>(tp::num_to_type(npy->descr->type_num), npy->nd, 
-      npy->dimensions, npy->strides);
 }
 
 static void derefer_ndarray (PyArrayObject* array) {
@@ -482,7 +754,7 @@ static bp::object make_readonly (const void* data, const ca::typeinfo& ti,
 
   //resets the "WRITEABLE" flag
   TP_ARRAY(retval)->flags &= 
-#if C_API_VERSION >= 6 /* NumPy C-API version > 1.6 */
+#if NPY_FEATURE_VERSION > NUMPY16_API /* NumPy C-API version > 1.6 */
     ~NPY_ARRAY_WRITEABLE
 #else
     ~NPY_WRITEABLE

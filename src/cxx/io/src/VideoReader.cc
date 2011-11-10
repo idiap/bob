@@ -200,6 +200,8 @@ void io::VideoReader::open() {
   m_typeinfo_video.shape[1] = m_typeinfo_frame.shape[0] = 3;
   m_typeinfo_video.shape[2] = m_typeinfo_frame.shape[1] = m_height;
   m_typeinfo_video.shape[3] = m_typeinfo_frame.shape[2] = m_width;
+  m_typeinfo_frame.update_strides();
+  m_typeinfo_video.update_strides();
 
   //closes the codec we used
   avcodec_close(codec_ctxt);
