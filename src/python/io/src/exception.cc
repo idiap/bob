@@ -8,7 +8,7 @@
 #include "io/Exception.h"
 #include "core/python/exception.h"
 
-using namespace Torch::core::python;
+using namespace Torch::python;
 namespace io = Torch::io;
 
 void bind_io_exception() {

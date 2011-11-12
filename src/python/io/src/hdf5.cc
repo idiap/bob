@@ -24,19 +24,14 @@ namespace ca = Torch::core::array;
  */
 static boost::shared_ptr<io::HDF5File>
 hdf5file_make_fromstr(const std::string& filename, const std::string& opmode) {
-  static const char* help = "Supported flags are 'r' (read-only), 'w' (read/append), 't' (read/write/truncate) or 'x' (exclusive)";
-  if (opmode.size() > 1) {
-    PyErr_SetString(PyExc_RuntimeError, help);
-    throw_error_already_set();
-  }
+  if (opmode.size() > 1) PYTHON_ERROR(RuntimeError, "Supported flags are 'r' (read-only), 'w' (read/append), 't' (read/write/truncate) or 'x' (exclusive), but you tried to use '%s'", opmode.c_str());
   io::HDF5File::mode_t mode = io::HDF5File::inout;
   if (opmode[0] == 'r') mode = io::HDF5File::in;
   else if (opmode[0] == 'w') mode = io::HDF5File::inout;
   else if (opmode[0] == 't') mode = io::HDF5File::trunc;
   else if (opmode[0] == 'x') mode = io::HDF5File::excl;
   else { //anything else is just unsupported for the time being
-    PyErr_SetString(PyExc_RuntimeError, help);
-    throw_error_already_set();
+    PYTHON_ERROR(RuntimeError, "Supported flags are 'r' (read-only), 'w' (read/append), 't' (read/write/truncate) or 'x' (exclusive), but you tried to use '%s'", opmode.c_str());
   }
   return boost::make_shared<io::HDF5File>(filename, mode);
 }
@@ -115,9 +110,7 @@ static object hdf5file_xread(io::HDF5File& f, const std::string& p,
       case io::c256:
         return object(f.read<std::complex<long double> >(p, pos));
       default:
-        boost::format s("unsupported HDF5 type: %s");
-        s % type.str();
-        PYTHON_ERROR(TypeError, s.str().c_str());
+        PYTHON_ERROR(TypeError, "unsupported HDF5 type: %s", type.str().c_str());
     }
   }
 

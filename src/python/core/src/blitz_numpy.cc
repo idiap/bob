@@ -116,9 +116,11 @@ template <typename T, int N> struct bz_from_npy {
     
     //mounts the numpy memory at the "newly allocated" blitz::Array
     shape_type shape;
-    for (int k=0; k<N; ++k) shape[k] = arr->dimensions[k];
     shape_type stride;
-    for (int k=0; k<N; ++k) stride[k] = (arr->strides[k]/sizeof(T));
+    for (int k=0; k<N; ++k) {
+      shape[k] = arr->dimensions[k];
+      stride[k] = (arr->strides[k]/sizeof(T));
+    }
     new (storage) array_type((T*)arr->data, shape, stride,
         blitz::neverDeleteData); //place operator
     data->convertible = storage;

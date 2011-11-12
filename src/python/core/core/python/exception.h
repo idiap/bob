@@ -12,15 +12,15 @@
 #include <boost/python.hpp>
 
 /**
-  * Raise a python exception from c++
-  */
-#define PYTHON_ERROR(TYPE, REASON) \
+ * Raises a python exception with a formatted message
+ */
+#define PYTHON_ERROR(TYPE, ...) \
 { \
-  PyErr_SetString(PyExc_##TYPE, REASON); \
+  PyErr_Format(PyExc_##TYPE, __VA_ARGS__); \
   throw boost::python::error_already_set(); \
-} 
+}
 
-namespace Torch { namespace core { namespace python {
+namespace Torch { namespace python {
 
   /**
    * This is a generalized exception translator for boost python. It simplifies
@@ -74,6 +74,6 @@ namespace Torch { namespace core { namespace python {
     ExceptionTranslator<T> my_translator(e);
   }
 
-}}}
+}}
 
 #endif /* TORCH_PYTHON_CORE_EXCEPTION_H */

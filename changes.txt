@@ -7,6 +7,13 @@ Things to consider:
 Modifications on the syntax:
 
 * io.Arrayset.get() returns io.Array's while operator[] returns NumPy ndarrays
-
 * core.array.load() an core.array.save() supressed. Use io.load() and io.save()
   to directly load numpy ndarrays to memory or save them.
+* All operations called directly on blitz::Array's that were done in Python
+  need to be migrated to a NumPy equivalent, if necessary. Here is an example:
+
+  Before: a.tanh()
+  After: numpy.tanh(a)
+
+  There are operations that don't need migration such as sum() or mean() as
+  NumPy also implements them on the ndarray object.

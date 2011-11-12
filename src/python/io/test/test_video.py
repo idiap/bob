@@ -91,9 +91,8 @@ class VideoTest(unittest.TestCase):
     # them into an output video, possibly transcoding it.
     iv = torch.io.VideoReader(INPUT_VIDEO)
     ov = torch.io.VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
-    for frame in iv: 
-      ov.append(frame)
-    
+    for k, frame in enumerate(iv): ov.append(frame)
+   
     # We verify that both videos have similar properties
     self.assertEqual(len(iv), len(ov))
     self.assertEqual(iv.width, ov.width)
@@ -114,7 +113,7 @@ class VideoTest(unittest.TestCase):
 
     # This shows you can use the array interface to read an entire video
     # sequence in a single shot
-    array = torch.core.array.load(INPUT_VIDEO)
+    array = torch.io.load(INPUT_VIDEO)
     iv = torch.io.VideoReader(INPUT_VIDEO)
    
     for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):

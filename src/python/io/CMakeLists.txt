@@ -27,6 +27,8 @@ torch_python_install(io)
 file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
 
 # Our test units
+torch_python_add_test(python-io-array-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_array.py)
 torch_python_add_test(python-io-arrayset-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_arrayset.py)
 torch_python_add_test(python-io-video-tests

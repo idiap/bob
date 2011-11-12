@@ -54,14 +54,10 @@ void tp::setup_python(const char* module_docstring) {
 
   // Make sure we are not running against the wrong version of NumPy
   if (NPY_VERSION != PyArray_GetNDArrayCVersion()) {
-    boost::format s("module compiled against ABI version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions");
-    s % (int) NPY_VERSION % (int) PyArray_GetNDArrayCVersion();
-    PYTHON_ERROR(RuntimeError, s.str().c_str());
+    PYTHON_ERROR(ImportError, "module compiled against ABI version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions", (int) NPY_VERSION % (int) PyArray_GetNDArrayCVersion());
   }
   if (NPY_FEATURE_VERSION > PyArray_GetNDArrayCFeatureVersion()) {
-    boost::format s("module compiled against API version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions");
-    s % (int) NPY_FEATURE_VERSION, (int) PyArray_GetNDArrayCFeatureVersion();
-    PYTHON_ERROR(RuntimeError, s.str().c_str());
+    PYTHON_ERROR(ImportError, "module compiled against API version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions", (int) NPY_FEATURE_VERSION, (int) PyArray_GetNDArrayCFeatureVersion());
   }
 
 }
@@ -70,46 +66,19 @@ void tp::setup_python(const char* module_docstring) {
  * Dtype (PyArray_Descr) manipulations                                     *
  ***************************************************************************/
 
-/**
- * Creates an auto-deletable bp::object out of a standard Python object that
- * cannot be NULL. Can be Py_NONE.
- *
- * Effects:
- *
- * The PyObject* is **not** XINCREF'ed at construction.
- * The PyObject* is XDECREF'ed at destruction.
- */
-bp::object make_non_null_object(PyObject* obj) {
+bp::object tp::make_non_null_object(PyObject* obj) {
   bp::handle<> hdl(obj); //< raises if NULL
   bp::object retval(hdl);
   return retval;
 }
 
-/**
- * Creates an auto-deletable bp::object out of a standard Python object, that
- * may be NULL (or Py_NONE).
- *
- * Effects:
- *
- * The PyObject* is **not** XINCREF'ed at construction.
- * The PyObject* is XDECREF'ed at destruction.
- */
-bp::object make_maybe_null_object(PyObject* obj) {
+bp::object tp::make_maybe_null_object(PyObject* obj) {
   bp::handle<> hdl(bp::allow_null(obj));
   bp::object retval(hdl);
   return retval;
 }
 
-/**
- * Creates an auto-deletable bp::object out of a standard Python object. The
- * input object cannot be NULL, but can be Py_NONE.
- *
- * Effects:
- *
- * The PyObject* is XINCREF'ed at construction.
- * The PyObject* is XDECREF'ed at destruction.
- */
-bp::object make_non_null_borrowed_object(PyObject* obj) {
+bp::object tp::make_non_null_borrowed_object(PyObject* obj) {
   bp::handle<> hdl(bp::borrowed(obj));
   bp::object retval(hdl);
   return retval;
@@ -235,25 +204,25 @@ template <> int tp::ctype_to_num<std::complex<long double> >(void)
 #define TP_DESCR(x) ((PyArray_Descr*)x.ptr())
 
 tp::dtype::dtype (bp::object dtype_like) {
-  if (!dtype_like.is_none()) {
-    PyArray_Descr* tmp = 0;
-    PyArray_DescrConverter2(dtype_like.ptr(), &tmp); //returns new ref
-    m_self = make_non_null_object((PyObject*)tmp);
+  PyArray_Descr* tmp = 0;
+  if (!PyArray_DescrConverter2(dtype_like.ptr(), &tmp)) {
+    PYTHON_ERROR(TypeError, "cannot convert input dtype-like object (%s) to proper dtype", bp::extract<const char*>(bp::str(dtype_like)));
   }
+  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
 }
 
 tp::dtype::dtype (PyArray_Descr* descr) {
-  if (descr) m_self = make_non_null_object((PyObject*)descr);
+  if (descr) m_self = tp::make_non_null_object((PyObject*)descr);
 }
 
 tp::dtype::dtype(int typenum) {
-  PyArray_Descr* tmp = PyArray_DescrFromType(typenum); //new ref
-  m_self = make_non_null_object((PyObject*)tmp);
+  PyArray_Descr* tmp = PyArray_DescrFromType(typenum);
+  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
 }
 
 tp::dtype::dtype(ca::ElementType eltype) {
   PyArray_Descr* tmp = PyArray_DescrFromType(tp::type_to_num(eltype)); //new ref
-  m_self = make_non_null_object((PyObject*)tmp);
+  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
 }
 
 tp::dtype::dtype(const tp::dtype& other): m_self(other.m_self)
@@ -291,12 +260,19 @@ int tp::dtype::type_num() const {
  * Free methods                                                             *
  ****************************************************************************/
 
-static void typeinfo_ndarray (const bp::object& o, ca::typeinfo& i) {
+void tp::typeinfo_ndarray_ (const bp::object& o, ca::typeinfo& i) {
   PyArrayObject* npy = TP_ARRAY(o);
   npy_intp strides[NPY_MAXDIMS];
   for (int k=0; k<npy->nd; ++k) strides[k] = npy->strides[k]/npy->descr->elsize;
   i.set<npy_intp>(tp::num_to_type(npy->descr->type_num), npy->nd,
       npy->dimensions, strides);
+}
+
+void tp::typeinfo_ndarray (const bp::object& o, ca::typeinfo& i) {
+  if (!PyArray_Check(o.ptr())) {
+    throw std::invalid_argument("invalid input: cannot extract typeinfo object from anything else than ndarray");
+  }
+  tp::typeinfo_ndarray_(o, i);
 }
 
 /**
@@ -346,7 +322,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
 
     TDEBUG1("[non-optimal] using NumPy version < 1.6 requires we convert input data for convertibility check - compile against NumPy >= 1.6 to improve performance");
     bp::object array = 
-      make_maybe_null_object(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0));
+      tp::make_maybe_null_object(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0));
     
     if (array.is_none()) return 0;
 
@@ -383,7 +359,7 @@ tp::convert_t tp::convertible(bp::object array_like, ca::typeinfo& info,
     (array_like.ptr(), //input object pointer
      0,                //requested dtype (if need to enforce)
      writeable,        //writeable?
-     &dtype,           //dtype assessment
+     &dtype,           //dtype assessment - borrowed
      &ndim,            //assessed number of dimensions
      dims,             //assessed shape
      &arr,             //if obj_ptr is ndarray, return it here
@@ -544,38 +520,38 @@ tp::convert_t tp::convertible_to(bp::object array_like, bp::object dtype_like,
  * 2. The array is C-style, contiguous and aligned
  */
 static bp::object try_refer_ndarray (boost::python::object array_like, 
-    tp::dtype _dtype) {
-  
+    bp::object dtype_like) {
+
   PyArrayObject* candidate = TP_ARRAY(array_like);
-  bp::object dtype = _dtype.self();
+  PyArray_Descr* req_dtype = 0;
+  PyArray_DescrConverter2(dtype_like.ptr(), &req_dtype); //new ref!
 
-  bool can_refer = true;
+  bool can_refer = true; //< flags a copy of the data
 
-  if (!PyArray_Check((PyObject*)candidate)) can_refer = false; //check 0
-  
-  if (!(PyArray_EquivByteorders(candidate->descr->byteorder, NPY_NATIVE) ||
-        candidate->descr->elsize == 1)) can_refer = false; //check 1.a
-        
-  if (!dtype.is_none() && candidate->descr->type_num != _dtype.type_num())
-    can_refer = false; //check 1.b
- 
-  //tests the following: NPY_ARRAY_C_CONTIGUOUS and NPY_ARRAY_ALIGNED
-  if (!PyArray_ISCARRAY_RO(candidate)) can_refer = false; //check 2
+  if (!PyArray_Check((PyObject*)candidate)) can_refer = false;
 
-  PyObject* tmp = 0;
+  if (can_refer && req_dtype &&
+      !PyArray_EquivTypes(candidate->descr, req_dtype))
+    can_refer = false;
 
-  if (can_refer) { //wrap
-    tmp = PyArray_FromArray(candidate, 0, 0);
+  if (can_refer && !PyArray_ISCARRAY_RO(candidate)) can_refer = false;
+
+  if (can_refer) {
+    PyObject* tmp = PyArray_FromArray(candidate, 0, 0);
+    return tp::make_non_null_object(tmp);
   }
 
-  else { //copy
-    TDEBUG1("[non-optimal] copying array-like object - cannot refer");
-    PyObject* _ptr = (PyObject*)candidate;
-    if (dtype.is_none())  tmp = PyArray_FromAny(_ptr, 0, 0, 0, 0, 0);
-    else tmp = PyArray_FromAny(_ptr, TP_DESCR(dtype), 0, 0, 0, 0);
-  }
+  //copy
+  TDEBUG1("[non-optimal] copying array-like object - cannot refer");
+  PyObject* _ptr = (PyObject*)candidate;
+#if NPY_FEATURE_VERSION > NUMPY16_API /* NumPy C-API version > 1.6 */
+  int flags = NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ENSURECOPY|NPY_ARRAY_ENSUREARRAY;
+#else
+  int flags = NPY_C_CONTIGUOUS|NPY_ENSURECOPY|NPY_ENSUREARRAY;
+#endif
+  PyObject* tmp = PyArray_FromAny(_ptr, req_dtype, 0, 0, flags, 0);
+  return tp::make_non_null_object(tmp);
 
-  return make_non_null_object(tmp);
 }
 
 static void derefer_ndarray (PyArrayObject* array) {
@@ -592,10 +568,11 @@ static boost::shared_ptr<void> shared_from_ndarray (bp::object& o) {
 tp::ndarray::ndarray(bp::object o, bp::object _dtype):
   m_is_numpy(true)
 {
-  bp::object mine = try_refer_ndarray(o, tp::dtype(_dtype));
+  //bp::object mine = try_refer_ndarray(o, tp::dtype(_dtype));
+  bp::object mine = try_refer_ndarray(o, _dtype);
 
   //captures data from a numeric::array
-  typeinfo_ndarray(mine, m_type);
+  typeinfo_ndarray_(mine, m_type);
 
   //transforms the from boost::python ref counting to boost::shared_ptr<void>
   m_data = shared_from_ndarray(mine);
@@ -631,7 +608,7 @@ static bp::object wrap_data (void* data, const ca::typeinfo& ti) {
   }
   PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd,
         &shape[0], tp::type_to_num(ti.dtype), &stride[0], data, 0, 0, 0);
-  return make_non_null_object(tmp);
+  return tp::make_non_null_object(tmp);
 }
 
 /**
@@ -639,7 +616,7 @@ static bp::object wrap_data (void* data, const ca::typeinfo& ti) {
  */
 static bp::object wrap_ndarray (const bp::object& a) {
   PyObject* tmp = PyArray_FromArray(TP_ARRAY(a), 0, 0); 
-  return make_non_null_object(tmp);
+  return tp::make_non_null_object(tmp);
 }
 
 /**
@@ -647,7 +624,7 @@ static bp::object wrap_ndarray (const bp::object& a) {
  */
 static bp::object make_ndarray(int nd, npy_intp* dims, int type) {
   PyObject* tmp = PyArray_SimpleNew(nd, dims, type);
-  return make_non_null_object(tmp);
+  return tp::make_non_null_object(tmp);
 }
 
 /**
@@ -677,7 +654,7 @@ void tp::ndarray::set(const ca::interface& other) {
   bp::object mine = copy_data(other.ptr(), m_type);
 
   //captures data from a numeric::array
-  typeinfo_ndarray(mine, m_type);
+  typeinfo_ndarray_(mine, m_type);
 
   //transforms the from boost::python ref counting to boost::shared_ptr<void>
   m_data = shared_from_ndarray(mine);
@@ -707,7 +684,7 @@ static bp::object new_from_type (const ca::typeinfo& ti) {
   }
   PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd, &shape[0], 
       tp::type_to_num(ti.dtype), &stride[0], 0, 0, 0, 0);
-  return make_non_null_object(tmp);
+  return tp::make_non_null_object(tmp);
 }
 
 void tp::ndarray::set (const ca::typeinfo& req) {
@@ -719,7 +696,7 @@ void tp::ndarray::set (const ca::typeinfo& req) {
   bp::object mine = new_from_type(req);
 
   //captures data from a numeric::array
-  typeinfo_ndarray(mine, m_type);
+  typeinfo_ndarray_(mine, m_type);
 
   //transforms the from boost::python ref counting to boost::shared_ptr<void>
   m_data = shared_from_ndarray(mine);
@@ -776,7 +753,7 @@ static bp::object make_readonly (const void* data, const ca::typeinfo& ti,
 
 bp::object tp::ndarray::pyobject() {
   if (m_is_numpy) {
-    bp::object mine = make_non_null_borrowed_object(boost::static_pointer_cast<PyObject>(m_data).get());
+    bp::object mine = tp::make_non_null_borrowed_object(boost::static_pointer_cast<PyObject>(m_data).get());
     return wrap_ndarray(mine);
   }
 

@@ -37,6 +37,7 @@ void bind_core_array_typeinfo() {
     .def_readonly("nd", &ca::typeinfo::nd)
     .add_property("shape", &ti_shape)
     .add_property("stride", &ti_stride)
+    .def("__str__", &ca::typeinfo::str)
     ;
 
 }

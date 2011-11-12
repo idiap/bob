@@ -43,6 +43,39 @@ namespace Torch { namespace python {
   void setup_python(const char* module_docstring);
 
   /**
+   * Creates an auto-deletable bp::object out of a standard Python object that
+   * cannot be NULL. Can be Py_NONE.
+   *
+   * Effects:
+   *
+   * The PyObject* is **not** XINCREF'ed at construction.
+   * The PyObject* is XDECREF'ed at destruction.
+   */
+  boost::python::object make_non_null_object(PyObject* obj);
+
+  /**
+   * Creates an auto-deletable bp::object out of a standard Python object, that
+   * may be NULL (or Py_NONE).
+   *
+   * Effects:
+   *
+   * The PyObject* is **not** XINCREF'ed at construction.
+   * The PyObject* is XDECREF'ed at destruction.
+   */
+  boost::python::object make_maybe_null_object(PyObject* obj);
+
+  /**
+   * Creates an auto-deletable bp::object out of a standard Python object. The
+   * input object cannot be NULL, but can be Py_NONE.
+   *
+   * Effects:
+   *
+   * The PyObject* is XINCREF'ed at construction.
+   * The PyObject* is XDECREF'ed at destruction.
+   */
+  boost::python::object make_non_null_borrowed_object(PyObject* obj);
+
+  /**
    * A generic method to convert from ndarray type_num to torch's ElementType
    */
   Torch::core::array::ElementType num_to_type(int num);
@@ -87,6 +120,21 @@ namespace Torch { namespace python {
     WITHARRAYCOPY = 2, ///< possible, object is an array, but has to copy
     WITHCOPY = 3       ///< possible, object is not an array, has to copy
   } convert_t;
+
+  /**
+   * Extracts the typeinfo object from a numeric::array (passed as
+   * boost::python::object). We check the input object to assure it is a valid
+   * ndarray. An exception may be thrown otherwise.
+   */
+  void typeinfo_ndarray (const boost::python::object& o, 
+      Torch::core::array::typeinfo& i);
+
+  /**
+   * This is the same as above, but does not run any check on the input object
+   * "o".
+   */
+  void typeinfo_ndarray_ (const boost::python::object& o, 
+      Torch::core::array::typeinfo& i);
 
   /**
    * Checks if an array-like object is convertible to become a NumPy ndarray
@@ -162,7 +210,7 @@ namespace Torch { namespace python {
       /**
        * Builds a new dtype object from a PyArray_Descr object that will have
        * its own reference counting increased internally. So, the object is
-       * *not* borrowed/stolen and you can delete it when done if you so wish.
+       * *not* stolen and you can Py_(X)DECREF() it when done if you so wish.
        */
       dtype (PyArray_Descr* descr);
 

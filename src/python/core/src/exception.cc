@@ -13,7 +13,7 @@
 #include "core/convert_exception.h"
 #include "core/python/exception.h"
 
-using namespace Torch::core::python;
+using namespace Torch::python;
 using namespace boost::python;
 
 /**

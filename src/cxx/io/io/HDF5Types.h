@@ -449,6 +449,11 @@ namespace Torch { namespace io {
       }
 
       /**
+       * Checks if an existing object is compatible with my type
+       */
+      bool compatible (const Torch::core::array::typeinfo& value) const;
+
+      /**
        * Returns the HDF5Shape of this type
        */
       const HDF5Shape& shape() const { return m_shape; }

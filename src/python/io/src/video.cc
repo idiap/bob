@@ -14,7 +14,6 @@
 
 using namespace boost::python;
 namespace io = Torch::io;
-namespace pyc = Torch::core::python;
 namespace tp = Torch::python;
 
 /**
@@ -64,7 +63,8 @@ static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
   if (sframe < 0) frame = v.numberOfFrames() + sframe;
 
   if (frame >= v.numberOfFrames()) { //basic check
-    PYTHON_ERROR(IndexError, "invalid index");
+    PYTHON_ERROR(IndexError, "invalid index (%lu) >= number of frames (%lu)",
+        frame, v.numberOfFrames());
   }
 
   tp::ndarray retval(v.frame_type());
@@ -88,7 +88,8 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   }
 
   if (start >= v.numberOfFrames()) { //basic check
-    PYTHON_ERROR(IndexError, "invalid start");
+    PYTHON_ERROR(IndexError, "invalid start (%lu) >= number of frames (%lu)",
+        start, v.numberOfFrames());
   }
 
   //the stop value may be None
@@ -145,7 +146,7 @@ static void videowriter_append(io::VideoWriter& writer, object a) {
 
 void bind_io_video() {
   //special exceptions for videos
-  pyc::register_exception_translator<Torch::io::VideoIsClosed>(PyExc_IOError);
+  tp::register_exception_translator<Torch::io::VideoIsClosed>(PyExc_IOError);
 
   iterator_wrapper().wrap(); //wraps io::VideoReader::const_iterator
 

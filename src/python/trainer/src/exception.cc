@@ -9,7 +9,5 @@
 #include "core/python/exception.h"
 #include "trainer/Exception.h"
 
-using namespace Torch::core::python;
-
 void bind_trainer_exception() {
 }

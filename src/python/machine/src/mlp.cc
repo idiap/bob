@@ -13,7 +13,7 @@
 using namespace boost::python;
 namespace mach = Torch::machine;
 namespace io = Torch::io;
-namespace tp = Torch::core::python;
+namespace tp = Torch::python;
 
 static tuple get_shape(const mach::MLP& m) {
   list retval;

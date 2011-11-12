@@ -5,12 +5,8 @@
  * @brief Machine exception bindings
  */
 
-#include <Python.h>
 #include "machine/Exception.h"
-#include "core/python/exception.h"
-
-using namespace Torch::core::python;
-namespace mach = Torch::machine;
+#include "core/python/ndarray.h"
 
 void bind_machine_exception() {
 }

@@ -6,7 +6,7 @@
 
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
-#include "core/python/exception.h"
+#include "core/python/ndarray.h"
 #include "core/python/vector.h"
 #include "machine/JFAMachine.h"
 #include "machine/GMMMachine.h"
@@ -14,8 +14,7 @@
 using namespace boost::python;
 namespace mach = Torch::machine;
 namespace io = Torch::io;
-namespace tp = Torch::core::python;
-
+namespace tp = Torch::python;
 
 static void jfa_forward_list(mach::JFAMachine& m, list stats, blitz::Array<double,1>& score)
 {

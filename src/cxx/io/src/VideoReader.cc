@@ -222,8 +222,11 @@ void io::VideoReader::load(ca::interface& b) const {
 
   //checks if the output array shape conforms to the video specifications,
   //otherwise, throw.
-  if (m_typeinfo_video.is_compatible(b.type())) 
-    throw std::invalid_argument("input buffer does not conform to the video size specifications");
+  if (!m_typeinfo_video.is_compatible(b.type())) {
+    boost::format s("input buffer (%s) does not conform to the video size specifications (%s)");
+    s % b.type().str() % m_typeinfo_video.str();
+    throw std::invalid_argument(s.str().c_str());
+  }
 
   unsigned long int frame_size = m_typeinfo_frame.buffer_size();
   uint8_t* ptr = static_cast<uint8_t*>(b.ptr());
@@ -466,7 +469,9 @@ void io::VideoReader::const_iterator::read(ca::interface& data) {
   //checks if the output array shape conforms to the video specifications,
   //otherwise, throw
   if (!info.is_compatible(m_parent->m_typeinfo_frame)) {
-    throw std::runtime_error("input buffer does not conform to the frame size specifications");
+    boost::format s("input buffer (%s) does not conform to the video frame size specifications (%s)");
+    s % info.str() % m_parent->m_typeinfo_frame.str();
+    throw std::invalid_argument(s.str().c_str());
   }
 
   int gotPicture = 0;
@@ -513,19 +518,19 @@ void io::VideoReader::const_iterator::read(ca::interface& data) {
   // Note: The FFmpeg way to read and write image data is hard-coded and
   // impossible to circumvent by passing a different stride setup.
 
-  // Implementation of inplace 3D array transposition:
-  // dest[i,j,k] = source[k,i,j];
-  uint8_t* dst = static_cast<uint8_t*>(data.ptr());
-  size_t rgb_stride[3] = {3 * m_parent->m_height, 3, 1};
-  for (size_t i=0; i<info.shape[0]; ++i) {
-    for (size_t j=0; j<info.shape[1]; ++j) {
-      for (size_t k=0; k<info.shape[2]; ++k) {
-        size_t dst_pos = i*info.stride[0] + j*info.stride[1] + k*info.stride[2];
-        size_t src_pos = j* rgb_stride[0] + k* rgb_stride[1] + i* rgb_stride[2];
-        dst[dst_pos] = m_rgb_frame_buffer->data[0][src_pos];
-      }
-    }
-  }
+  // transpose the data.
+  blitz::TinyVector<int,3> shape;
+  blitz::TinyVector<int,3> stride;
+  
+  shape = info.shape[0], info.shape[1], info.shape[2];
+  stride = info.stride[0], info.stride[1], info.stride[2];
+  blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), shape, stride,
+      blitz::neverDeleteData);
+  
+  shape = info.shape[1], info.shape[2], info.shape[0];
+  blitz::Array<uint8_t,3> src(m_rgb_frame_buffer->data[0], shape, 
+      blitz::neverDeleteData);
+  dst = src.transpose(2,0,1);
 
   if (m_current_frame >= m_parent->numberOfFrames()) {
     //transform the current iterator in "end"

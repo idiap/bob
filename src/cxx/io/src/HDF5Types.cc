@@ -353,6 +353,11 @@ static io::hdf5type get_datatype
   throw io::HDF5UnsupportedTypeError(dt);
 }
 
+bool io::HDF5Type::compatible (const Torch::core::array::typeinfo& value) const
+{
+  return *this == HDF5Type(value);
+}
+
 /**
  * Given a datatype, returns the supported HDF5 datatype equivalent or -1
  */

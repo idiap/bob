@@ -44,7 +44,6 @@ class ArraysetTest(unittest.TestCase):
   def test02_extend2d(self):
 
     # shows how to use the extend() method on arraysets.
-
     t = torch.io.Arrayset()
     data = numpy.array(range(90), 'float64').reshape(3,10,3)
     t.extend(data, 1)
@@ -122,6 +121,47 @@ class ArraysetTest(unittest.TestCase):
     self.assertEqual( t.elementType.name, 'float64' )
 
 if __name__ == '__main__':
+  import gc
+  import inspect
+
+  exclude = [
+      "function",
+      "type",
+      "list",
+      "dict",
+      "tuple",
+      "wrapper_descriptor",
+      "module",
+      "method_descriptor",
+      "member_descriptor",
+      "instancemethod",
+      "builtin_function_or_method",
+      "frame",
+      "classmethod",
+      "classmethod_descriptor",
+      "_Environ",
+      "MemoryError",
+      "_Printer",
+      "_Helper",
+      "getset_descriptor",
+      ]
+
+  def dumpObjects():
+    gc.collect()
+    oo = gc.get_objects()
+    for o in oo:
+      if getattr(o, "__class__", None):
+        name = o.__class__.__name__
+        if name not in exclude:
+          try:
+            filename = inspect.getabsfile(o.__class__)
+          except Exception, e:
+            print "Cannot get filename of %s" % o.__class__.__name__
+            continue
+
+          print "Object of class:", name, "...",
+          print "defined in file:", filename
+  
   sys.argv.append('-v')
   if os.environ.has_key('TORCH_PROFILE') and \
       os.environ['TORCH_PROFILE'] and \
@@ -129,9 +169,13 @@ if __name__ == '__main__':
     torch.core.ProfilerStart(os.environ['TORCH_PROFILE'])
   os.chdir(os.path.realpath(os.path.dirname(sys.argv[0])))
   os.chdir('data')
-  unittest.main()
+
+  suite = unittest.TestLoader().loadTestsFromTestCase(ArraysetTest)
+  unittest.TextTestRunner(verbosity=2).run(suite)
+  
   if os.environ.has_key('TORCH_PROFILE') and \
       os.environ['TORCH_PROFILE'] and \
       hasattr(torch.core, 'ProfilerStop'):
     torch.core.ProfilerStop()
 
+  #dumpObjects()

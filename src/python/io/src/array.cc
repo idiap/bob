@@ -66,7 +66,7 @@ void bind_io_array() {
     ;
 
   //base class declaration
-  class_<io::Array, boost::shared_ptr<io::Array> >("Array", "Arrays represent pointers to concrete data serialized on a file. You can load or refer to real numpy.ndarrays using this type.", no_init)
+  class_<io::Array, boost::shared_ptr<io::Array> >("Array", "Arrays represent pointers to concrete data loaded or serialized on a file. You can load or refer to real numpy.ndarrays using this type.", no_init)
 
     //attention: order here is crucial - last defined is tried first by the
     //boost::python overloading resolution system; the last thing we want to

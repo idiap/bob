@@ -5,6 +5,7 @@
  */
 
 #include <boost/python.hpp>
+#include <boost/python/slice.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
@@ -60,30 +61,17 @@ static void extend_with_ndarray(io::Arrayset& s, numeric::array a, size_t D) {
     PYTHON_ERROR(RuntimeError, "the maximum number of dimensions for the array to be iterated on is TORCH_MAX_DIM+1 - you have exceeded that value");
   }
 
-  //setup the shape of the arrays to be appended
-  npy_intp shape[TORCH_MAX_DIM];
-  npy_intp stride[TORCH_MAX_DIM];
-  for (size_t k=0, i=0; k<ndim; ++k) {
-    if (k != D) {
-      shape[i] = PyArray_DIMS(arr)[k];
-      stride[i++] = PyArray_STRIDES(arr)[k];
-    }
-  }
-
   //reads the default type, if any
   object dtype = arrayset_dtype(s);
 
+  //the indexing
+  list index;
+  for (size_t i=0; i<ndim; ++i) index.append(slice());
+
   for (npy_intp k=0; k<PyArray_DIMS(arr)[D]; ++k) {
-    void* ptr = (void*)((int8_t*)PyArray_DATA(arr) + 
-        (k * PyArray_STRIDES(arr)[D]));
-    PyObject* subarr_ptr = PyArray_New(&PyArray_Type, ndim-1, shape,
-        PyArray_DESCR(arr)->type_num, stride, ptr, 0, 0, 0);
-    PyObject* subarr_cpy = PyArray_NewCopy((PyArrayObject*)subarr_ptr, 
-        NPY_CORDER);
-    Py_DECREF(subarr_ptr);
-    handle<> tmp(borrowed(subarr_cpy));
-    numeric::array subarr(tmp);
-    s.add(io::Array(boost::make_shared<tp::ndarray>(subarr, dtype)));
+    //gets a slice of the array, makes a contiguous copy of it and append
+    index[D] = k;
+    s.add(io::Array(boost::make_shared<tp::ndarray>(a[index], dtype)));
     if (dtype.is_none()) dtype = arrayset_dtype(s); ///< may need a refresh
   }
 }

@@ -5,12 +5,8 @@
  * @brief Image processing exceptions 
  */
 
-#include <Python.h>
 #include "ip/Exception.h"
-#include "core/python/exception.h"
-#include <string>
-
-using namespace Torch::core::python;
+#include "core/python/ndarray.h"
 
 void bind_ip_exception() {
 }
