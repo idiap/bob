@@ -80,10 +80,20 @@ void io::Arrayset::remove (const size_t id) {
 }
 
 void io::Arrayset::save(const std::string& path) {
+
+  //save data to file.
   boost::shared_ptr<io::File> file = io::open(path, "", 'w');
-  for (size_t i=0; i<m_data.size(); ++i) {
-    file->arrayset_append(*m_data[i].get());
-  }
+  std::vector<size_t> order;
+  order.reserve(m_data.size());
+  for (size_t i=0; i<m_data.size(); ++i)
+    order.push_back(file->arrayset_append(*m_data[i].get()));
+
+  //flush contents.
+  file.reset(); ///< forces closing of the file.
+
+  //reset internal structures
+  file = io::open(path, "", 'a');
+  for (size_t i=0; i<order.size(); ++i) m_data[i] = Array(file, order[i]);
 }
 
 void io::Arrayset::load() {

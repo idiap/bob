@@ -221,8 +221,10 @@ tp::dtype::dtype(int typenum) {
 }
 
 tp::dtype::dtype(ca::ElementType eltype) {
-  PyArray_Descr* tmp = PyArray_DescrFromType(tp::type_to_num(eltype)); //new ref
-  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+  if (eltype != ca::t_unknown) {
+    PyArray_Descr* tmp = PyArray_DescrFromType(tp::type_to_num(eltype));
+    m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+  }
 }
 
 tp::dtype::dtype(const tp::dtype& other): m_self(other.m_self)

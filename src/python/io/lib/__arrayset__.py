@@ -7,6 +7,7 @@
 """
 
 from libpytorch_io import Arrayset
+import numpy
 
 def arrayset_iter(self):
   """Allows Arraysets to be iterated in native python"""
@@ -28,7 +29,7 @@ def arrayset_eq(self, other):
   if self.shape != other.shape: return False 
   if len(self) != len(other): return False
   for i in range(len(self)):
-    if self[i] != other[i]: return False
+    if not numpy.array_equal(self[i], other[i]): return False
   return True
 Arrayset.__eq__ = arrayset_eq
 

@@ -136,6 +136,8 @@ class ArrayTest(unittest.TestCase):
 
     self.assertTrue (A1.filename, tname)
 
+    os.unlink(tname)
+
 if __name__ == '__main__':
   import gc
   import inspect
