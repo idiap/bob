@@ -167,6 +167,8 @@ void mach::PLDABaseMachine::resize(const size_t d, const size_t nf,
   m_mu.resize(d);
   m_alpha.resize(ng,ng);
   m_beta.resize(d,d);
+  m_Ft_beta.resize(nf,d);
+  m_Gt_isigma.resize(ng,d);
   m_gamma.clear();
   m_isigma.resize(d);
   m_cache_d_ng_1.resize(d,ng);
