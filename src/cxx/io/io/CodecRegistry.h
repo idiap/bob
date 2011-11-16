@@ -31,15 +31,15 @@ namespace Torch { namespace io {
        */
       static boost::shared_ptr<CodecRegistry> instance();
 
-      template <typename T>
-      static void getExtensions (T& t) {
+      static const std::map<std::string, std::string>& getExtensions () {
         boost::shared_ptr<CodecRegistry> ptr = instance();
-        for (std::map<std::string, file_factory_t>::const_iterator it = ptr->s_extension2codec.begin(); it != ptr->s_extension2codec.end(); ++it) t.push_back(it->first);
+        return ptr->s_extension2description;
       }
 
     public: //object access
 
       void registerExtension(const std::string& extension,
+          const std::string& description,
           file_factory_t factory);
 
       void deregisterFactory(file_factory_t factory);
@@ -56,6 +56,7 @@ namespace Torch { namespace io {
       CodecRegistry( const CodecRegistry&);
 
       std::map<std::string, file_factory_t> s_extension2codec;
+      std::map<std::string, std::string> s_extension2description;
     
   };
 

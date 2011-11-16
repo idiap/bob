@@ -602,8 +602,8 @@ tp::ndarray::~ndarray() {
  * Wrap a C-style pointer with a PyArrayObject
  */
 static bp::object wrap_data (void* data, const ca::typeinfo& ti) {
-  npy_intp shape[TORCH_MAX_DIM];
-  npy_intp stride[TORCH_MAX_DIM];
+  npy_intp shape[NPY_MAXDIMS];
+  npy_intp stride[NPY_MAXDIMS];
   for (size_t k=0; k<ti.nd; ++k) {
     shape[k] = ti.shape[k];
     stride[k] = ti.item_size()*ti.stride[k];
@@ -678,8 +678,8 @@ void tp::ndarray::set(boost::shared_ptr<ca::interface> other) {
  * Creates a new numpy array from a Torch::io::typeinfo object.
  */
 static bp::object new_from_type (const ca::typeinfo& ti) {
-  npy_intp shape[TORCH_MAX_DIM];
-  npy_intp stride[TORCH_MAX_DIM];
+  npy_intp shape[NPY_MAXDIMS];
+  npy_intp stride[NPY_MAXDIMS];
   for (size_t k=0; k<ti.nd; ++k) {
     shape[k] = ti.shape[k];
     stride[k] = ti.item_size()*ti.stride[k];

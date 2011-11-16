@@ -7,6 +7,7 @@
 
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 
 #include "io/CodecRegistry.h"
 
@@ -86,8 +87,11 @@ class HDF5ArrayFile: public io::File {
 
     virtual void array_read(ca::interface& buffer) {
 
-      if(m_newfile) 
-        throw std::runtime_error("uninitialized HDF5 file cannot be read");
+      if(m_newfile) {
+        boost::format f("uninitialized HDF5 file at '%s' cannot be read");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       if(!buffer.type().is_compatible(m_type_array)) buffer.set(m_type_array);
 
@@ -96,8 +100,11 @@ class HDF5ArrayFile: public io::File {
 
     virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
-      if(m_newfile) 
-        throw std::runtime_error("uninitialized HDF5 file cannot be read");
+      if(m_newfile) {
+        boost::format f("uninitialized HDF5 file at '%s' cannot be read");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       if(!buffer.type().is_compatible(m_type_arrayset)) buffer.set(m_type_arrayset);
 
@@ -127,7 +134,9 @@ class HDF5ArrayFile: public io::File {
     virtual void array_write (const ca::interface& buffer) {
 
       if (!m_newfile) {
-        throw std::runtime_error("cannot perform single (array-style) write on file/dataset that have already been initialized -- try to use a new file");
+        boost::format f("cannot perform single (array-style) write on file/dataset at '%s' that have already been initialized -- try to use a new file");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
       }
 
       m_newfile = false;
@@ -202,13 +211,14 @@ make_file (const std::string& path, char mode) {
  * Takes care of codec registration per se.
  */
 static bool register_codec() {
+  static const char* description = "Hierarchical Data Format v5 (default)";
 
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".h5", &make_file);
-  instance->registerExtension(".hdf5", &make_file);
-  instance->registerExtension(".hdf", &make_file);
+  instance->registerExtension(".h5", description, &make_file);
+  instance->registerExtension(".hdf5", description, &make_file);
+  instance->registerExtension(".hdf", description, &make_file);
 
   return true;
 

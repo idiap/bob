@@ -165,29 +165,30 @@ make_file (const std::string& path, char mode) {
  * Takes care of codec registration per se.
  */
 static bool register_codec() {
+  static const char* descr = "Video file (FFmpeg)";
 
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".avi", &make_file);
-  instance->registerExtension(".dv", &make_file);
-  instance->registerExtension(".filmstrip", &make_file);
-  instance->registerExtension(".flv", &make_file);
-  instance->registerExtension(".h261", &make_file);
-  instance->registerExtension(".h263", &make_file);
-  instance->registerExtension(".h264", &make_file);
-  instance->registerExtension(".mov", &make_file);
-  instance->registerExtension(".image2", &make_file);
-  instance->registerExtension(".image2pipe", &make_file);
-  instance->registerExtension(".m4v", &make_file);
-  instance->registerExtension(".mjpeg", &make_file);
-  instance->registerExtension(".mpeg", &make_file);
-  instance->registerExtension(".mpegts", &make_file);
-  instance->registerExtension(".ogg", &make_file);
-  instance->registerExtension(".rawvideo", &make_file);
-  instance->registerExtension(".rm", &make_file);
-  instance->registerExtension(".rtsp", &make_file);
-  instance->registerExtension(".yuv4mpegpipe", &make_file);
+  instance->registerExtension(".avi", descr, &make_file);
+  instance->registerExtension(".dv", descr, &make_file);
+  instance->registerExtension(".filmstrip", descr, &make_file);
+  instance->registerExtension(".flv", descr, &make_file);
+  instance->registerExtension(".h261", descr, &make_file);
+  instance->registerExtension(".h263", descr, &make_file);
+  instance->registerExtension(".h264", descr, &make_file);
+  instance->registerExtension(".mov", descr, &make_file);
+  instance->registerExtension(".image2", descr, &make_file);
+  instance->registerExtension(".image2pipe", descr, &make_file);
+  instance->registerExtension(".m4v", descr, &make_file);
+  instance->registerExtension(".mjpeg", descr, &make_file);
+  instance->registerExtension(".mpeg", descr, &make_file);
+  instance->registerExtension(".mpegts", descr, &make_file);
+  instance->registerExtension(".ogg", descr, &make_file);
+  instance->registerExtension(".rawvideo", descr, &make_file);
+  instance->registerExtension(".rm", descr, &make_file);
+  instance->registerExtension(".rtsp", descr, &make_file);
+  instance->registerExtension(".yuv4mpegpipe", descr, &make_file);
 
   return true;
 

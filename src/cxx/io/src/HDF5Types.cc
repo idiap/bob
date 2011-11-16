@@ -620,7 +620,11 @@ Torch::core::array::ElementType io::HDF5Type::element_type() const {
 void io::HDF5Type::copy_to (Torch::core::array::typeinfo& ti) const {
   ti.dtype = element_type();
   ti.nd = shape().n();
-  if (ti.nd > TORCH_MAX_DIM) throw std::runtime_error("HDF5 type has more than the allowed maximum number of dimensions -- debug me");
+  if (ti.nd > (TORCH_MAX_DIM+1)) {
+    boost::format f("HDF5 type has more (%d) than the allowed maximum number of dimensions (%d)");
+    f % ti.nd % (TORCH_MAX_DIM+1);
+    throw std::runtime_error(f.str().c_str());
+  }
   for (size_t i=0; i<ti.nd; ++i) ti.shape[i] = shape()[i];
   ti.update_strides();
 }

@@ -129,6 +129,7 @@ void io::TensorFile::read (ca::interface& buf) {
 }
 
 void io::TensorFile::read (size_t index, ca::interface& buf) {
+  
   // Check that we are reaching an existing array
   if( index > m_header.m_n_samples ) {
     throw IndexError(index);

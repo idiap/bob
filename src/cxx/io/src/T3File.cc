@@ -22,6 +22,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/format.hpp>
 
 //some infrastructure to check the file size
 #include <sys/types.h>
@@ -29,6 +30,7 @@
 #include <unistd.h>
 
 #include "core/array_check.h"
+#include "core/blitz_array.h"
 #include "io/CodecRegistry.h"
 #include "io/Exception.h"
 
@@ -68,15 +70,18 @@ class T3File: public io::File {
           
           // are those floats or doubles?
           if (fsize == (nsamples*framesize*sizeof(float))) {
-            m_type_array.dtype = Torch::core::array::t_float32;
-            m_type_arrayset.dtype = Torch::core::array::t_float32;
+            m_type_array.dtype = ca::t_float32;
+            m_type_arrayset.dtype = ca::t_float32;
           }
           else if (fsize == (nsamples*framesize*sizeof(double))) {
-            m_type_array.dtype = Torch::core::array::t_float64;
-            m_type_arrayset.dtype = Torch::core::array::t_float64;
+            m_type_array.dtype = ca::t_float64;
+            m_type_arrayset.dtype = ca::t_float64;
           }
-          else 
-            throw io::TypeError(Torch::core::array::t_float32, Torch::core::array::t_unknown);
+          else { 
+            boost::format s("Cannot read file '%s', mode = '%c': fsize (%d) != %d*%d*sizeof(float32) nor *sizeof(float64)");
+            s % path % mode % fsize % nsamples % framesize;
+            throw std::invalid_argument(s.str().c_str());
+          }
 
           size_t shape[2] = {nsamples, framesize};
           m_type_array.set_shape<size_t>(2, &shape[0]);
@@ -110,7 +115,11 @@ class T3File: public io::File {
 
     virtual void array_read(ca::interface& buffer) {
 
-      if (m_newfile) throw std::runtime_error("cannot read uninitialized t3 binary file");
+      if (m_newfile) {
+        boost::format f("cannot read uninitialized t3 binary file at '%s'");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       if (!buffer.type().is_compatible(m_type_array)) buffer.set(m_type_array);
 
@@ -118,14 +127,18 @@ class T3File: public io::File {
       std::ifstream ifile(m_filename.c_str(), std::ios::binary|std::ios::in);
 
       //skip the first 8 bytes, that contain the header that we already read
-      ifile.seekg(8);
+      ifile.seekg(8, std::ios::beg);
       ifile.read(static_cast<char*>(buffer.ptr()), buffer.type().buffer_size());
 
     }
 
     virtual void arrayset_read(ca::interface& buffer, size_t index) {
 
-      if (m_newfile) throw std::runtime_error("cannot read uninitialized t3 binary file");
+      if (m_newfile) {
+        boost::format f("cannot read uninitialized t3 binary file at '%s'");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       const ca::typeinfo& type = buffer.type();
 
@@ -135,7 +148,7 @@ class T3File: public io::File {
       std::ifstream ifile(m_filename.c_str(), std::ios::binary|std::ios::in);
 
       //skip the first 8 bytes, that contain the header that we already read
-      ifile.seekg(8 + (index*type.buffer_size()));
+      ifile.seekg(8 + (index*type.buffer_size()), std::ios::beg);
       ifile.read(static_cast<char*>(buffer.ptr()), type.buffer_size());
 
     }
@@ -144,8 +157,11 @@ class T3File: public io::File {
 
       const ca::typeinfo& info = buffer.type();
 
-      if (!m_newfile && !info.is_compatible(m_type_arrayset)) 
-        throw std::invalid_argument("input buffer does not conform to already initialized torch3vision binary file");
+      if (!m_newfile && !info.is_compatible(m_type_arrayset)) {
+        boost::format f("input buffer of type %s cannot be appended to already initialized torch3vision binary file of type %s");
+        f % info.str() % m_type_arrayset.str();
+        throw std::invalid_argument(f.str().c_str());
+      }
 
       std::ofstream ofile;
       if (m_newfile) {
@@ -154,9 +170,11 @@ class T3File: public io::File {
         if (info.nd != 1) throw io::DimensionError(info.nd, 1);
 
         //can only save float32 or float64, otherwise, throw.
-        if ((info.dtype != Torch::core::array::t_float32) && 
-            (info.dtype != Torch::core::array::t_float64)) {
-          throw io::UnsupportedTypeError(info.dtype);
+        if ((info.dtype != ca::t_float32) && 
+            (info.dtype != ca::t_float64)) {
+          boost::format f("cannot have T3 bindata files with type %s - only float32 or float64");
+          f % ca::stringize(info.dtype);
+          throw std::invalid_argument(f.str().c_str());
         }
         
         ofile.open(m_filename.c_str(), std::ios::binary|std::ios::out|std::ios::trunc);
@@ -166,6 +184,7 @@ class T3File: public io::File {
         const uint32_t framesize = info.shape[0];
         ofile.write((const char*)&nsamples, sizeof(uint32_t));
         ofile.write((const char*)&framesize, sizeof(uint32_t));
+
         m_type_arrayset = info;
         m_type_array.dtype = info.dtype;
         m_newfile = false; ///< block re-initialization
@@ -177,23 +196,61 @@ class T3File: public io::File {
         ofile.open(m_filename.c_str(), std::ios::binary|std::ios::out|std::ios::app);
       }
 
-      if (!ofile) throw std::runtime_error("cannot open output file for writing");
+      if (!ofile) {
+        boost::format f("cannot open output file '%s' for writing");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       ofile.write(static_cast<const char*>(buffer.ptr()), info.buffer_size());
+      ofile.close();
 
       //setup new type information
       ++m_length;
       size_t shape[2] = {m_length, info.shape[0]};
       m_type_array.set_shape<size_t>(2, &shape[0]);
 
+      //update the header information on the file
+      ofile.open(m_filename.c_str(), std::ios::binary|std::ios::in|std::ios::out);
+      const uint32_t nsamples = m_length;
+      ofile.write((const char*)&nsamples, sizeof(uint32_t));
+      ofile.flush();
       return m_length-1;
       
     }
 
+    /**
+     * Supports writing a single vector or a set of vectors represented as a
+     * matrix. In this last case, vectors are formed from the rows of the given
+     * matrix.
+     */
     virtual void array_write (const ca::interface& buffer) {
 
       m_newfile = true; //force file re-setting
-      arrayset_append(buffer);
+      const ca::typeinfo& info = buffer.type();
+
+      if (info.nd == 1) {//just do a normal append
+        arrayset_append(buffer);
+      }
+
+      else if (info.nd == 2) { //append every array individually
+
+        const uint8_t* ptr = static_cast<const uint8_t*>(buffer.ptr());
+        ca::typeinfo slice_info(info.dtype, static_cast<size_t>(1), 
+            &info.shape[1]);
+        for (size_t k=0; k<info.shape[0]; ++k) {
+          const void* slice_ptr=static_cast<const void*>(ptr+k*slice_info.buffer_size());
+          ca::blitz_array slice(const_cast<void*>(slice_ptr), slice_info);
+          arrayset_append(slice);
+        }
+
+      }
+
+      else {
+        boost::format f("cannot do single write of torch3vision .bindata file with array with type '%s' - only supports 1D or 2D arrays of types float32 or float64");
+        f % info.str();
+        throw std::invalid_argument(f.str().c_str());
+      }
 
     }
 
@@ -252,7 +309,7 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".bindata", &make_file);
+  instance->registerExtension(".bindata", "Torch3 binary data format", &make_file);
 
   return true;
 

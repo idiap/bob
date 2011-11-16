@@ -35,6 +35,8 @@ torch_python_add_test(python-io-video-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_video.py)
 torch_python_add_test(python-io-hdf5-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_hdf5.py)
+torch_python_add_test(python-io-file-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_file.py)
 
 # Our examples (run and install)
 torch_python_add_test(python-io-video2frame-example

@@ -140,7 +140,7 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".bin", &make_file);
+  instance->registerExtension(".bin", "Torch5spro alpha binary data format (DEPRECATED)", &make_file);
 
   return true;
 

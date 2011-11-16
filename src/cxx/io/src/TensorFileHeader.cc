@@ -4,6 +4,7 @@
  * This class defines an header for storing multiarrays into .tensor files.
  */
 
+#include <boost/format.hpp>
 #include "core/logging.h"
 
 #include "io/TensorFileHeader.h"

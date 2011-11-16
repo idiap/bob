@@ -7,6 +7,7 @@
 
 #include <boost/make_shared.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <algorithm>
 
 #include "io/MatUtils.h"
@@ -17,6 +18,12 @@ namespace fs = boost::filesystem;
 namespace io = Torch::io;
 namespace ca = Torch::core::array;
 
+/**
+ * TODO:
+ * 1. Current known limitation: does not support full read-out of all data if
+ * an array_read() is issued. What we do, presently, is just to read the first
+ * variable.
+ */
 class MatFile: public io::File {
 
   public: //api
@@ -24,28 +31,32 @@ class MatFile: public io::File {
     MatFile(const std::string& path, char mode):
       m_filename(path),
       m_mode( (mode=='r')? MAT_ACC_RDONLY : MAT_ACC_RDWR ),
+      m_map(new std::map<size_t, std::pair<std::string, ca::typeinfo> >()),
       m_size(0) {
-        if (mode == 'r' || (mode == 'a' && fs::exists(path))) reload_map();
+        if (mode == 'r' || mode == 'a') try_reload_map();
+        if (mode == 'w' && fs::exists(path)) fs::remove(path);
       }
 
     virtual ~MatFile() { }
 
-    void reload_map () {
-      m_map = io::detail::list_variables(m_filename);
-      m_type = m_map->begin()->second.second;
-      m_size = m_map->size();
-      m_id.reserve(m_size);
-      for (map_type::iterator
-          it = m_map->begin(); it != m_map->end(); ++it) {
-        m_id.push_back(it->first);
-      }
-      std::sort(m_id.begin(), m_id.end()); //get the right order...
+    void try_reload_map () {
+      if (fs::exists(m_filename)) {
+        m_map = io::detail::list_variables(m_filename);
+        m_type = m_map->begin()->second.second;
+        m_size = m_map->size();
+        m_id.reserve(m_size);
+        for (map_type::iterator
+            it = m_map->begin(); it != m_map->end(); ++it) {
+          m_id.push_back(it->first);
+        }
+        std::sort(m_id.begin(), m_id.end()); //get the right order...
 
-      //double checks some parameters
-      if (m_type.nd == 0 || m_type.nd > 4) 
-        throw io::DimensionError(m_type.nd, TORCH_MAX_DIM);
-      if (m_type.dtype == Torch::core::array::t_unknown) 
-        throw io::UnsupportedTypeError(m_type.dtype);
+        //double checks some parameters
+        if (m_type.nd == 0 || m_type.nd > 4) 
+          throw io::DimensionError(m_type.nd, TORCH_MAX_DIM);
+        if (m_type.dtype == Torch::core::array::t_unknown) 
+          throw io::UnsupportedTypeError(m_type.dtype);
+      }
     }
 
     virtual const std::string& filename() const {
@@ -69,30 +80,38 @@ class MatFile: public io::File {
     }
 
     virtual void array_read(ca::interface& buffer) {
+      
+      //do we need to reload the file?
+      if (!m_type.is_valid()) try_reload_map();
 
+      //now open it for reading
       boost::shared_ptr<mat_t> mat = 
         io::detail::make_matfile(m_filename, m_mode);
 
-      if (!mat)
-        throw std::runtime_error("uninitialized matlab file cannot be read");
-
-      //do we need to reload the file?
-      if (!m_type.is_valid()) reload_map();
+      if (!mat) {
+        boost::format f("uninitialized matlab file (%s) cannot be read");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       io::detail::read_array(mat, buffer);
 
     }
 
     virtual void arrayset_read(ca::interface& buffer, size_t index) {
+      
+      //do we need to reload the file?
+      if (!m_type.is_valid()) try_reload_map();
 
+      //now open it for reading
       boost::shared_ptr<mat_t> mat = 
         io::detail::make_matfile(m_filename, m_mode);
 
-      if (!mat)
-        throw std::runtime_error("uninitialized matlab file cannot be read");
-
-      //do we need to reload the file?
-      if (!m_type.is_valid()) reload_map();
+      if (!mat) {
+        boost::format f("uninitialized matlab file (%s) cannot be read");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       io::detail::read_array(mat, buffer, (*m_map)[m_id[index]].first);
 
@@ -100,18 +119,25 @@ class MatFile: public io::File {
 
     virtual size_t arrayset_append (const ca::interface& buffer) {
 
+      //do we need to reload the file?
+      if (!m_type.is_valid()) try_reload_map();
+
+      //now open it for writing.
       boost::shared_ptr<mat_t> mat =
         io::detail::make_matfile(m_filename, m_mode);
 
-      if (!mat)
-        throw std::runtime_error("cannot open matlab file for writing");
-
-      //do we need to reload the file?
-      if (!m_type.is_valid()) reload_map();
+      if (!mat) {
+        boost::format f("cannot open matlab file at '%s' for writing");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       //checks typing is right
-      if (m_type.is_valid() && !m_type.is_compatible(buffer.type()))
-        throw std::invalid_argument("cannot append with different buffer type than the one already initialized");
+      if (m_type.is_valid() && !m_type.is_compatible(buffer.type())) {
+        boost::format f("cannot append with different buffer type (%s) than the one already initialized (%s)");
+        f % buffer.type().str() % m_type.str();
+        throw std::invalid_argument(f.str().c_str());
+      }
 
       //all is good at this point, just write it. 
 
@@ -125,7 +151,7 @@ class MatFile: public io::File {
 
       mat.reset(); ///< force data flushing
 
-      if (!m_type.is_valid()) reload_map();
+      if (!m_type.is_valid()) try_reload_map();
       else {
         //optimization: don't reload the map, just update internal cache
         ++m_size;
@@ -146,8 +172,11 @@ class MatFile: public io::File {
 
       boost::shared_ptr<mat_t> mat = io::detail::make_matfile(m_filename, 
           m_mode);
-      if (!mat)
-        throw std::runtime_error("cannot open matlab file for writing");
+      if (!mat) {
+        boost::format f("cannot open matlab file at '%s' for writing");
+        f % m_filename;
+        throw std::runtime_error(f.str().c_str());
+      }
 
       io::detail::write_array(mat, varname, buffer);
 
@@ -218,7 +247,7 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".mat", &make_file);
+  instance->registerExtension(".mat", "Matlab binary files (v4 and superior)", &make_file);
 
   return true;
 

@@ -26,8 +26,8 @@ namespace Torch { namespace core { namespace array {
 
     ElementType dtype; ///< data type
     size_t nd; ///< number of dimensions
-    size_t shape[TORCH_MAX_DIM]; ///< length along each dimension
-    size_t stride[TORCH_MAX_DIM]; ///< strides along each dimension
+    size_t shape[TORCH_MAX_DIM+1]; ///< length along each dimension
+    size_t stride[TORCH_MAX_DIM+1]; ///< strides along each dimension
 
     /**
      * Default constructor
@@ -88,7 +88,7 @@ namespace Torch { namespace core { namespace array {
      * sets the shape
      */
     template <typename T> void set_shape(T nd_, const T* shape_) {
-      if (nd_ > TORCH_MAX_DIM)
+      if (nd_ > (TORCH_MAX_DIM+1))
         throw std::invalid_argument("unsupported number of dimensions");
       nd = nd_;
       for (size_t k=0; k<nd; ++k) shape[k] = shape_[k];

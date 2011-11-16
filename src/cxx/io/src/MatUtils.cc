@@ -6,8 +6,7 @@
  */
 
 #include "io/MatUtils.h"
-#include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 
 namespace io = Torch::io;
 namespace iod = io::detail;
@@ -81,7 +80,11 @@ static enum matio_classes mio_class_type (ca::ElementType i) {
     case ca::t_complex128:
       return MAT_C_DOUBLE;
     default:
-      throw io::TypeError(i, ca::t_float32);
+      {
+        boost::format f("data type '%s' is not supported by matio backend");
+        f % ca::stringize(i);
+        throw std::invalid_argument(f.str().c_str());
+      }
   }
 }
 
@@ -115,7 +118,11 @@ static enum matio_types mio_data_type (ca::ElementType i) {
     case ca::t_complex128:
       return MAT_T_DOUBLE;
     default:
-      throw io::TypeError(i, ca::t_float32);
+      {
+        boost::format f("data type '%s' is not supported by matio backend");
+        f % ca::stringize(i);
+        throw std::invalid_argument(f.str().c_str());
+      }
   }
 }
 
@@ -174,6 +181,47 @@ static ca::ElementType torch_element_type (int mio_type, bool is_complex) {
 }
 
 /**
+ * Returns, on the first argument, the linear indexes by calculating the linear
+ * positions relative to both row-major and column-major order matrixes given a
+ * certain index accessing a position in the matrix and the matrix shape
+ *
+ * @param linear indexes (row, col): a 2-tuple with the results: row-major and
+ *        column-major linear indexes
+ * @param indexes (i,j) a 2-tuple with the indexes as would be accessed
+ *        [col][row]; this is the same as accessing the matrix like on
+ *        directions [y][x]
+ * @param shape a 2-tuple with the matrix shape like [col][row]; this is the
+ *        same as thinking about the extends of the matrix like on directions
+ *        [y][x]
+ *
+ * Detailed arithmetics with graphics and explanations can be found here:
+ * http://webster.cs.ucr.edu/AoA/Windows/HTML/Arraysa2.html
+ */
+static void rc2d(size_t& row, size_t& col, const size_t i, const size_t j,
+    const size_t* shape) {
+  row = (i * shape[1]) + j;
+  col = (j * shape[0]) + i;
+}
+
+/**
+ * Same as above, but for a 3D array organized as [depth][column][row]
+ */
+static void rc3d(size_t& row, size_t& col, const size_t i, const size_t j,
+    const size_t k, const size_t* shape) {
+  row = ( (i * shape[1]) + j ) * shape[2] + k;
+  col = ( (k * shape[1]) + j ) * shape[0] + i;
+}
+
+/**
+ * Same as above, but for a 4D array organized as [time][depth][column][row]
+ */
+static void rc4d(size_t& row, size_t& col, const size_t i, const size_t j,
+    const size_t k, const size_t l, const size_t* shape) {
+  row = ( ( i * shape[1] + j ) * shape[2] + k ) * shape[3] + l;
+  col = ( ( l * shape[2] + k ) * shape[1] + j ) * shape[0] + i;
+}
+
+/**
  * Converts the data from row-major order (C-Style) to column major order
  * (Fortran style), which is required by matio. Input parameters are the src
  * data in row-major order, the destination (pre-allocated) array of the same
@@ -186,7 +234,7 @@ static void row_to_col_order(const void* src_, void* dst_,
 
   //cast to byte type so we can manipulate the pointers...
   const uint8_t* src = static_cast<const uint8_t*>(src_);
-  uint8_t* dst = static_cast<uint8_t*>(dst);
+  uint8_t* dst = static_cast<uint8_t*>(dst_);
 
   switch(info.nd) {
 
@@ -197,8 +245,10 @@ static void row_to_col_order(const void* src_, void* dst_,
     case 2:
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major = dsize * (i*info.shape[0]+j);
-          size_t col_major = dsize * (j*info.shape[0]+i);
+          size_t row_major, col_major;
+          rc2d(row_major, col_major, i, j, info.shape);
+          row_major *= dsize;
+          col_major *= dsize;
           memcpy(&dst[col_major], &src[row_major], dsize);
         }
       break;
@@ -207,8 +257,10 @@ static void row_to_col_order(const void* src_, void* dst_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major = dsize * ((i*info.shape[0])+(j*info.shape[1])+k);
-            size_t col_major = dsize * ((k*info.shape[0])+(j*info.shape[1])+i);
+            size_t row_major, col_major;
+            rc3d(row_major, col_major, i, j, k, info.shape);
+            row_major *= dsize;
+            col_major *= dsize;
             memcpy(&dst[col_major], &src[row_major], dsize);
           }
       break;
@@ -218,18 +270,10 @@ static void row_to_col_order(const void* src_, void* dst_,
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major = dsize * (
-                  (i*info.shape[0]) + 
-                  (j*info.shape[1]) + 
-                  (k*info.shape[2]) + 
-                  l
-                  );
-              size_t col_major = dsize * (
-                  (l*info.shape[0]) + 
-                  (k*info.shape[1]) + 
-                  (j*info.shape[2]) + 
-                  i
-                  );
+              size_t row_major, col_major;
+              rc4d(row_major, col_major, i, j, k, l, info.shape);
+              row_major *= dsize;
+              col_major *= dsize;
               memcpy(&dst[col_major], &src[row_major], dsize);
             }
       break;
@@ -268,8 +312,10 @@ static void row_to_col_order_complex(const void* src_, void* dst_re_,
     case 2:
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major = dsize  * (i*info.shape[0]+j);
-          size_t col_major = dsize2 * (j*info.shape[0]+i);
+          size_t row_major, col_major;
+          rc2d(row_major, col_major, i, j, info.shape);
+          row_major *= dsize;
+          col_major *= dsize2;
           memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
           memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
         }
@@ -279,10 +325,12 @@ static void row_to_col_order_complex(const void* src_, void* dst_re_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major = dsize  * ((i*info.shape[0])+(j*info.shape[1])+k);
-            size_t col_major = dsize2 * ((k*info.shape[0])+(j*info.shape[1])+i);
-          memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
-          memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
+            size_t row_major, col_major;
+            rc3d(row_major, col_major, i, j, k, info.shape);
+            row_major *= dsize;
+            col_major *= dsize2;
+            memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
+            memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
           }
       break;
 
@@ -291,18 +339,10 @@ static void row_to_col_order_complex(const void* src_, void* dst_re_,
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major = dsize * (
-                  (i*info.shape[0]) + 
-                  (j*info.shape[1]) + 
-                  (k*info.shape[2]) + 
-                  l
-                  ); 
-              size_t col_major = dsize2 * (
-                  (l*info.shape[0]) + 
-                  (k*info.shape[1]) + 
-                  (j*info.shape[2]) + 
-                  i
-                  );
+              size_t row_major, col_major;
+              rc4d(row_major, col_major, i, j, k, l, info.shape);
+              row_major *= dsize;
+              col_major *= dsize2;
               memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
               memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
             }
@@ -326,7 +366,7 @@ static void col_to_row_order(const void* src_, void* dst_,
 
   //cast to byte type so we can manipulate the pointers...
   const uint8_t* src = static_cast<const uint8_t*>(src_);
-  uint8_t* dst = static_cast<uint8_t*>(dst);
+  uint8_t* dst = static_cast<uint8_t*>(dst_);
 
   switch(info.nd) {
 
@@ -337,8 +377,10 @@ static void col_to_row_order(const void* src_, void* dst_,
     case 2:
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major = dsize * (i*info.shape[0]+j);
-          size_t col_major = dsize * (j*info.shape[0]+i);
+          size_t row_major, col_major;
+          rc2d(row_major, col_major, i, j, info.shape);
+          row_major *= dsize;
+          col_major *= dsize;
           memcpy(&dst[row_major], &src[col_major], dsize);
         }
       break;
@@ -347,8 +389,10 @@ static void col_to_row_order(const void* src_, void* dst_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major = dsize * ((i*info.shape[0])+(j*info.shape[1])+k);
-            size_t col_major = dsize * ((k*info.shape[0])+(j*info.shape[1])+i);
+            size_t row_major, col_major;
+            rc3d(row_major, col_major, i, j, k, info.shape);
+            row_major *= dsize;
+            col_major *= dsize;
             memcpy(&dst[row_major], &src[col_major], dsize);
           }
       break;
@@ -358,18 +402,10 @@ static void col_to_row_order(const void* src_, void* dst_,
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major = dsize * (
-                  (i*info.shape[0]) + 
-                  (j*info.shape[1]) + 
-                  (k*info.shape[2]) + 
-                  l
-                  );
-              size_t col_major = dsize * (
-                  (l*info.shape[0]) + 
-                  (k*info.shape[1]) + 
-                  (j*info.shape[2]) + 
-                  i
-                  );
+              size_t row_major, col_major;
+              rc4d(row_major, col_major, i, j, k, l, info.shape);
+              row_major *= dsize;
+              col_major *= dsize;
               memcpy(&dst[row_major], &src[col_major], dsize);
             }
       break;
@@ -392,9 +428,9 @@ static void col_to_row_order_complex(const void* src_re_, const void* src_im_,
   size_t dsize2 = dsize/2; ///< size of each complex component (real, imaginary)
 
   //cast to byte type so we can manipulate the pointers...
-  const uint8_t* src_re = static_cast<const uint8_t*>(src_re);
-  const uint8_t* src_im = static_cast<const uint8_t*>(src_im);
-  uint8_t* dst = static_cast<uint8_t*>(dst);
+  const uint8_t* src_re = static_cast<const uint8_t*>(src_re_);
+  const uint8_t* src_im = static_cast<const uint8_t*>(src_im_);
+  uint8_t* dst = static_cast<uint8_t*>(dst_);
 
   switch(info.nd) {
 
@@ -408,8 +444,10 @@ static void col_to_row_order_complex(const void* src_re_, const void* src_im_,
     case 2:
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major = dsize  * (i*info.shape[0]+j);
-          size_t col_major = dsize2 * (j*info.shape[0]+i);
+          size_t row_major, col_major;
+          rc2d(row_major, col_major, i, j, info.shape);
+          row_major *= dsize;
+          col_major *= dsize2;
           memcpy(&dst[row_major],        &src_re[col_major], dsize2);
           memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2);
         }
@@ -419,30 +457,25 @@ static void col_to_row_order_complex(const void* src_re_, const void* src_im_,
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major = dsize  * ((i*info.shape[0])+(j*info.shape[1])+k);
-            size_t col_major = dsize2 * ((k*info.shape[0])+(j*info.shape[1])+i);
+            size_t row_major, col_major;
+            rc3d(row_major, col_major, i, j, k, info.shape);
+            row_major *= dsize;
+            col_major *= dsize2;
             memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
             memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
           }
       break;
 
     case 4:
+      //i = left; j = depth; k = column; l = row
       for (size_t i=0; i<info.shape[0]; ++i)
         for (size_t j=0; j<info.shape[1]; ++j)
           for (size_t k=0; k<info.shape[2]; ++k)
             for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major = dsize * (
-                  (i*info.shape[0]) + 
-                  (j*info.shape[1]) + 
-                  (k*info.shape[2]) + 
-                  l
-                  ); 
-              size_t col_major = dsize2 * (
-                  (l*info.shape[0]) + 
-                  (k*info.shape[1]) + 
-                  (j*info.shape[2]) + 
-                  i
-                  );
+              size_t row_major, col_major;
+              rc4d(row_major, col_major, i, j, k, l, info.shape);
+              row_major *= dsize;
+              col_major *= dsize2;
               memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
               memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
             }
@@ -547,30 +580,14 @@ void iod::mat_peek(const std::string& filename, ca::typeinfo& info) {
 }
 
 void iod::mat_peek_set(const std::string& filename, ca::typeinfo& info) {
-
-  static const boost::regex allowed_varname("^array_(\\d*)$");
-  boost::cmatch what;
-
   boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw io::FileNotReadable(filename);
-  
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
-
-  //we continue reading until we find a variable that matches our naming
-  //convention.
-  while (matvar && !boost::regex_match(matvar->name, what, allowed_varname)) {
-    matvar = make_matvar(mat); //gets the next variable
-  }
-
-  if (!what.size()) throw io::Uninitialized();
   get_var_info(matvar, info);
 }
 
 boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > >
   iod::list_variables(const std::string& filename) {
-
-  static const boost::regex allowed_varname("^array_(\\d*)$");
-  boost::cmatch what;
 
   boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > > retval(new std::map<size_t, std::pair<std::string, ca::typeinfo> >());
 
@@ -578,17 +595,9 @@ boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > >
   if (!mat) throw io::FileNotReadable(filename);
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
 
-  //we continue reading until we find a variable that matches our naming
-  //convention.
-  while (matvar && !boost::regex_match(matvar->name, what, allowed_varname)) {
-    matvar = make_matvar(mat); //gets the next variable
-  }
-
-  if (!what.size()) throw io::Uninitialized();
-
-  size_t id = boost::lexical_cast<size_t>(what[1]);
+  size_t id = 0;
  
-  //now that we have found a variable under our name convention, fill the array
+  //now that we have found a variable, fill the array
   //properties taking that variable as basis
   (*retval)[id] = std::make_pair(matvar->name, ca::typeinfo());
   get_var_info(matvar, (*retval)[id].second);
@@ -604,10 +613,7 @@ boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > >
   //read variable and hope for the best.
 
   while ((matvar = make_matvar_info(mat))) {
-    if (boost::regex_match(matvar->name, what, allowed_varname)) {
-      id = boost::lexical_cast<size_t>(what[1]);
-      (*retval)[id] = std::make_pair(matvar->name, type_cache);
-    }
+    (*retval)[++id] = std::make_pair(matvar->name, type_cache);
   }
 
   return retval;

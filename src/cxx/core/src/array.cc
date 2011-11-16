@@ -34,7 +34,7 @@ void ca::typeinfo::reset() {
 }
 
 bool ca::typeinfo::is_valid() const {
-  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= TORCH_MAX_DIM);
+  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= (TORCH_MAX_DIM+1));
 }
 
 void ca::typeinfo::update_strides() {
@@ -58,6 +58,13 @@ void ca::typeinfo::update_strides() {
       stride[2] = shape[3];
       stride[1] = shape[2]*shape[3];
       stride[0] = shape[1]*shape[2]*shape[3];
+      return;
+    case 5:
+      stride[4] = 1;
+      stride[3] = shape[4];
+      stride[2] = shape[3]*shape[4];
+      stride[1] = shape[2]*shape[3]*shape[4];
+      stride[0] = shape[1]*shape[2]*shape[3]*shape[4];
       return;
     default:
       break;

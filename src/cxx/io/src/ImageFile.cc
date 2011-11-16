@@ -351,19 +351,19 @@ static bool register_codec() {
   boost::shared_ptr<io::CodecRegistry> instance =
     io::CodecRegistry::instance();
   
-  instance->registerExtension(".bmp", &make_file);
-  instance->registerExtension(".eps", &make_file);
-  instance->registerExtension(".gif", &make_file);
-  instance->registerExtension(".jpg", &make_file);
-  instance->registerExtension(".jpeg", &make_file);
-  instance->registerExtension(".pbm", &make_file);
-  instance->registerExtension(".pdf", &make_file);
-  instance->registerExtension(".pgm", &make_file);
-  instance->registerExtension(".png", &make_file);
-  instance->registerExtension(".ppm", &make_file);
-  instance->registerExtension(".ps", &make_file);
-  instance->registerExtension(".tiff", &make_file);
-  instance->registerExtension(".xcf", &make_file);
+  instance->registerExtension(".bmp", "Windows bitmap (Image Magick)", &make_file);
+  instance->registerExtension(".eps", "Encapsulated Postscript (Image Magick)", &make_file);
+  instance->registerExtension(".gif", "GIF, indexed (Image Magick)", &make_file);
+  instance->registerExtension(".jpg", "JPG, compressed (Image Magick)", &make_file);
+  instance->registerExtension(".jpeg", "JPEG, compressed (Image Magick)", &make_file);
+  instance->registerExtension(".pbm", "PBM, indexed (Image Magick)", &make_file);
+  instance->registerExtension(".pdf", "Portable Document Format (Image Magick)", &make_file);
+  instance->registerExtension(".pgm", "PGM, indexed (Image Magick)", &make_file);
+  instance->registerExtension(".png", "Portable Network Graphics, indexed (Image Magick)", &make_file);
+  instance->registerExtension(".ppm", "PPM, indexed (Image Magick)", &make_file);
+  instance->registerExtension(".ps", "Postscript (Image Magick)", &make_file);
+  instance->registerExtension(".tiff", "TIFF, uncompressed (Image Magick)", &make_file);
+  instance->registerExtension(".xcf", "Gimp Native format (ImageMagick)", &make_file);
 
   return true;
 
