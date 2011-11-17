@@ -5,9 +5,8 @@
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
-void bind_ip_exception();
 void bind_ip_ipcore();
 void bind_ip_color();
 void bind_ip_lbp();
@@ -39,7 +38,6 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
 
   Torch::python::setup_python("Torch image processing classes and sub-classes");
 
-  bind_ip_exception();
   bind_ip_ipcore();
   bind_ip_color();
   bind_ip_lbp();

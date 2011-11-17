@@ -24,7 +24,6 @@ set(pysrc
    "src/FaceEyesNorm.cc"
    "src/Rotate.cc"
    "src/TanTriggs.cc"
-   "src/exception.cc"
    "src/histo.cc"
    "src/LBP.cc"
    "src/MultiscaleRetinex.cc"
@@ -36,8 +35,10 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(ip "${pysrc}")
-target_link_libraries(pytorch_ip pytorch_core_utils)
+
 add_dependencies(pytorch_ip python-core_header_install)
+target_link_libraries(pytorch_ip pytorch_core_ndarray)
+
 torch_python_install(ip)
   
 # Our test units

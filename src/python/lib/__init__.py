@@ -13,8 +13,8 @@ import io
 import math
 import measure
 import sp
-"""
 import ip
+"""
 import db
 import machine
 import trainer
@@ -34,10 +34,10 @@ __all__ = [
     'core', 
     'math',
     'io',
-    """
     'measure',
     'sp',
     'ip',
+    """
     'db',
     'machine',
     'trainer'
