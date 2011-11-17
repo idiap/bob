@@ -51,11 +51,10 @@ def relevance (input, machine):
   with features arranged column-wise while different examples are arranged
   row-wise.
   """
-  from ..core.array import float64_1
-
+  
   o = machine(input)
   i2 = input.copy()
-  retval = float64_1(input.shape[1])
+  retval = numpy.ndarray((input.shape[1],), 'float64')
   retval.fill(0)
   for k in range(input.shape[1]):
     i2[:,:] = input #reset

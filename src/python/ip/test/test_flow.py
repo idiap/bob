@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
 def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
@@ -21,7 +22,7 @@ def load_known_flow(relative_filename):
   filename = os.path.join("data", "flow", relative_filename)
   array = torch.io.Array(filename)
   data = array.get()
-  return data[:,:,0].cast('float64'), data[:,:,1].cast('float64')
+  return data[:,:,0].astype('float64'), data[:,:,1].astype('float64')
 
 def make_image_tripplet():
   """Creates two images for you to calculate the flow
@@ -33,20 +34,17 @@ def make_image_tripplet():
   255 255 255 255 255    255 255 255 255 255    255 255 255   0   0
   
   """
-  im1 = torch.core.array.uint8_2(5,5)
-  im1.fill(255)
+  im1 = 255 * numpy.ones((5,5), 'uint8')
   im1[1:3, 1:] = 0
-  im2 = torch.core.array.uint8_2(5,5)
-  im2.fill(255)
+  im2 = 255 * numpy.ones((5,5), 'uint8')
   im2[2:4, 2:] = 0
-  im3 = torch.core.array.uint8_2(5,5)
-  im3.fill(255)
+  im3 = 255 * numpy.ones((5,5), 'uint8')
   im3[3:, 3:] = 0
-  return im1.cast('float64')/255., im2.cast('float64')/255., im3.cast('float64')/255.
+  return im1.astype('float64')/255., im2.astype('float64')/255., im3.astype('float64')/255.
 
 def HornAndSchunckFlowPython(alpha, im1, im2, im3, u0, v0):
   """Calculates the H&S flow in pure python"""
-  grad = torch.ip.HornAndSchunckGradient(im1.shape())
+  grad = torch.ip.HornAndSchunckGradient(im1.shape)
   ex, ey, et = grad(im1, im2)
   u = torch.ip.laplacian_avg_hs(u0)
   v = torch.ip.laplacian_avg_hs(v0)
@@ -83,11 +81,11 @@ class FlowTest(unittest.TestCase):
     # the image input. The output has the same rank and extents but is in
     # doubles.
     i1, i2, i3 = make_image_tripplet()
-    u_cxx = torch.core.array.float64_2(i1.shape()); u_cxx.fill(0)
-    v_cxx = torch.core.array.float64_2(i1.shape()); v_cxx.fill(0)
-    u_py = torch.core.array.float64_2(i1.shape()); u_py.fill(0)
-    v_py = torch.core.array.float64_2(i1.shape()); v_py.fill(0)
-    flow = torch.ip.VanillaHornAndSchunckFlow(i1.shape())
+    u_cxx = numpy.zeros(i1.shape, 'float64')
+    v_cxx = numpy.zeros(i1.shape, 'float64')
+    u_py  = numpy.zeros(i1.shape, 'float64')
+    v_py  = numpy.zeros(i1.shape, 'float64')
+    flow  = torch.ip.VanillaHornAndSchunckFlow(i1.shape)
     for i in range(N):
       flow(alpha, 1, i1, i2, u_cxx, v_cxx)
       u_py, v_py = HornAndSchunckFlowPython(alpha, i1, i2, i3, u_py, v_py)
@@ -109,8 +107,8 @@ class FlowTest(unittest.TestCase):
            py_avg_err**0.5
           )
       '''
-    self.assertTrue( u_cxx.numeq(u_py) )
-    self.assertTrue( v_cxx.numeq(v_py) )
+    self.assertTrue( numpy.array_equal(u_cxx, u_py) )
+    self.assertTrue( numpy.array_equal(v_cxx, v_py) )
 
   def notest02_VanillaHornAndSchunckDemo(self):
     
@@ -122,12 +120,12 @@ class FlowTest(unittest.TestCase):
     i1 = load_gray(if1)
     i2 = load_gray(if2)
 
-    u = torch.core.array.float64_2(i1.shape()); u.fill(0)
-    v = torch.core.array.float64_2(i1.shape()); v.fill(0)
-    flow = torch.ip.VanillaHornAndSchunckFlow(i1.shape())
+    u = numpy.zeros(i1.shape, 'float64')
+    v = numpy.zeros(i1.shape, 'float64')
+    flow = torch.ip.VanillaHornAndSchunckFlow(i1.shape)
     for i in range(N): 
       flow(alpha, 1, i1, i2, u, v)
-      #array = (255.0*torch.ip.flowutils.flow2hsv(u,v)).cast('uint8')
+      #array = (255.0*torch.ip.flowutils.flow2hsv(u,v)).astype('uint8')
       #array.save("hs_rubberwhale-%d.png" % i)
       se2 = flow.evalEc2(u, v)
       be = flow.evalEb(i1, i2, u, v)
@@ -165,9 +163,9 @@ class FlowTest(unittest.TestCase):
     i1 = load_gray(if1)
     i2 = load_gray(if2)
 
-    u_cxx = torch.core.array.float64_2(i1.shape()); u_cxx.fill(0)
-    v_cxx = torch.core.array.float64_2(i1.shape()); v_cxx.fill(0)
-    flow = torch.ip.VanillaHornAndSchunckFlow(i1.shape())
+    u_cxx = numpy.zeros(i1.shape, 'float64')
+    v_cxx = numpy.zeros(i1.shape, 'float64')
+    flow = torch.ip.VanillaHornAndSchunckFlow(i1.shape)
     flow(alpha, N, i1, i2, u_cxx, v_cxx)
     se2 = flow.evalEc2(u_cxx, v_cxx)
     be = flow.evalEb(i1, i2, u_cxx, v_cxx)

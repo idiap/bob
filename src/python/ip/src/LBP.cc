@@ -1,6 +1,5 @@
 /**
- * @file src/python/ip/src/LBP.cc
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  * @date Tue 26 Apr 17:18:40 2011
  *
  * @brief Binds the LBP class to python
@@ -22,7 +21,8 @@ static const char* lbp4r_doc = "Objects of this class, after configuration, can 
 static const char* lbp8r_doc = "Objects of this class, after configuration, can compute Local Binary Features using 8 neighbour pixels.";
 
 template<typename T>
-static object lbp_apply( ip::LBPHSFeatures& lbphs_features, const blitz::Array<T,2>& src) {
+static object lbp_apply(ip::LBPHSFeatures& lbphs_features,
+    const blitz::Array<T,2>& src) {
   std::vector<blitz::Array<uint64_t,1> > dst;
   lbphs_features( src, dst);
   list t;

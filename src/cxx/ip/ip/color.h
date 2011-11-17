@@ -87,12 +87,12 @@ namespace Torch { namespace ip {
       uint16_t& h, uint16_t& s, uint16_t& v);
 
   /**
-   * Converts a RGB color-pixel (each band as a float between 0 and 1) to HSV
+   * Converts a RGB color-pixel (each band as a double between 0 and 1) to HSV
    * as defined in:
    * http://en.wikipedia.org/wiki/HSL_and_HSV
    */
-  template <> void rgb_to_hsv_one (float r, float g, float b,
-      float& h, float& s, float& v);
+  template <> void rgb_to_hsv_one (double r, double g, double b,
+      double& h, double& s, double& v);
 
   /**
    * Converts a HSV color-coded pixel to RGB as defined in:
@@ -120,11 +120,11 @@ namespace Torch { namespace ip {
       uint16_t& r, uint16_t& g, uint16_t& b);
 
   /**
-   * Converts a HSV color-pixel (each band as a float between 0 and 1) to RGB
+   * Converts a HSV color-pixel (each band as a double between 0 and 1) to RGB
    * as defined in: http://en.wikipedia.org/wiki/HSL_and_HSV
    */
-  template <> void hsv_to_rgb_one (float h, float s, float v,
-      float& r, float& g, float& b);
+  template <> void hsv_to_rgb_one (double h, double s, double v,
+      double& r, double& g, double& b);
 
   /** ------------------- **/
   /** HSL TO RGB AND BACK **/
@@ -156,11 +156,11 @@ namespace Torch { namespace ip {
       uint16_t& h, uint16_t& s, uint16_t& l);
 
   /**
-   * Converts a RGB color-pixel (each band as a float between 0 and 1) to HSL
+   * Converts a RGB color-pixel (each band as a double between 0 and 1) to HSL
    * as defined in: http://en.wikipedia.org/wiki/HSL_and_HSV
    */
-  template <> void rgb_to_hsl_one (float r, float g, float b,
-      float& h, float& s, float& l);
+  template <> void rgb_to_hsl_one (double r, double g, double b,
+      double& h, double& s, double& l);
 
   /**
    * Converts a HSL color-coded pixel to RGB as defined in:
@@ -188,11 +188,11 @@ namespace Torch { namespace ip {
       uint16_t& r, uint16_t& g, uint16_t& b);
 
   /**
-   * Converts a HSL color-pixel (floats between 0 and 1) to RGB as defined in:
+   * Converts a HSL color-pixel (doubles between 0 and 1) to RGB as defined in:
    * http://en.wikipedia.org/wiki/HSL_and_HSV
    */
-  template <> void hsl_to_rgb_one (float h, float s, float l,
-      float& r, float& g, float& b);
+  template <> void hsl_to_rgb_one (double h, double s, double l,
+      double& r, double& g, double& b);
 
   /** ------------------- **/
   /** YUV TO RGB AND BACK **/
@@ -237,7 +237,7 @@ namespace Torch { namespace ip {
       uint16_t& y, uint16_t& u, uint16_t& v);
 
   /**
-   * Converts a RGB color-coded pixel (3-bands of floats between 0 and 1) to
+   * Converts a RGB color-coded pixel (3-bands of doubles between 0 and 1) to
    * YUV (Y'CbCr) using the CCIR 601 (Kb = 0.114, Kr = 0.299) norm as discussed
    * here: http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
@@ -245,8 +245,8 @@ namespace Torch { namespace ip {
    * @warn: This implementation returns U and V values varying from 0 to 1
    * for mapping norm ranges [-0.5, 0.5] into a more standard setting.
    */
-  template <> void rgb_to_yuv_one (float r, float g, float b,
-      float& y, float& u, float& v);
+  template <> void rgb_to_yuv_one (double r, double g, double b,
+      double& y, double& u, double& v);
 
   /**
    * Converts a YUV (Y'CbCr) color-coded pixel using the CCIR 601 (Kb = 0.114,
@@ -279,13 +279,13 @@ namespace Torch { namespace ip {
       uint16_t& r, uint16_t& g, uint16_t& b);
 
   /**
-   * Converts a YUV (Y'CbCr) color-coded pixel (3-bands of floats between 0 and
+   * Converts a YUV (Y'CbCr) color-coded pixel (3-bands of doubles between 0 and
    * 1) using the CCIR 601 (Kb = 0.114, Kr = 0.299) to RGB as discussed here:
    * http://en.wikipedia.org/wiki/YCbCr and here:
    * http://www.fourcc.org/fccyvrgb.php
    */
-  template <> void yuv_to_rgb_one (float y, float u, float v,
-      float& r, float& g, float& b);
+  template <> void yuv_to_rgb_one (double y, double u, double v,
+      double& r, double& g, double& b);
 
   /** ------------------------- **/
   /** Grayscale TO RGB AND BACK **/
@@ -317,11 +317,11 @@ namespace Torch { namespace ip {
   template <> void rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b, uint16_t& gray);
 
   /**
-   * Converts a RGB color-coded pixel (each band as a float between 0 and 1) to
+   * Converts a RGB color-coded pixel (each band as a double between 0 and 1) to
    * grayscale using the CCIR 601 (Kb = 0.114, Kr = 0.299) "Y'" (luma)
    * component conversion as discussed here: http://www.fourcc.org/fccyvrgb.php
    */
-  template <> void rgb_to_gray_one (float r, float g, float b, float& gray);
+  template <> void rgb_to_gray_one (double r, double g, double b, double& gray);
 
   /**
    * Converts a grayscale pixel to RGB by copying all components:

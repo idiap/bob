@@ -6,6 +6,8 @@
 """A set of utilities to load score files with different formats.
 """
 
+import numpy
+
 def four_column(filename):
   """Loads a score set from a single file to memory. 
 
@@ -52,8 +54,6 @@ def split_four_column(filename):
   arrays of float64.
   """
   
-  from ..core.array import array
-  
   neg = []
   pos = []
   for i, l in enumerate(open(filename, 'rt')):
@@ -70,7 +70,7 @@ def split_four_column(filename):
     except:
       raise SyntaxError, 'Cannot convert score to float at line %d of file "%s": %s' % (i, filename, l)
 
-  return (array(neg, 'float64'), array(pos, 'float64'))
+  return (numpy.array(neg, 'float64'), numpy.array(pos, 'float64'))
 
 def five_column(filename):
   """Loads a score set from a single file to memory. 
@@ -120,8 +120,6 @@ def split_five_column(filename):
   arrays of float64.
   """
 
-  from ..core.array import array
-
   neg = []
   pos = []
   for i, l in enumerate(open(filename, 'rt')):
@@ -138,5 +136,4 @@ def split_five_column(filename):
     except:
       raise SyntaxError, 'Cannot convert score to float at line %d of file "%s": %s' % (i, filename, l)
  
-  return (array(neg, 'float64'), array(pos, 'float64'))
-
+  return (numpy.array(neg, 'float64'), numpy.array(pos, 'float64'))

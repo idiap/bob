@@ -10,8 +10,12 @@ resulting movie. It is possible that you use the string "%(stem)s" to imply the
 original filename stem (basename minus extension). Example:
 "outdir/%(stem)s.avi"."""
 
-import sys, os, optparse
-import tempfile, shutil #for package tests
+import sys
+import os
+import optparse
+import numpy
+import tempfile
+import shutil
 import torch
 
 def optflowHS(movie, iterations, alpha, template, stop=0):
@@ -46,8 +50,8 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
   previous = None
   
   # These are the output vectors from the flow computation
-  u = torch.core.array.float64_2(video.height, video.width)
-  v = torch.core.array.float64_2(video.height, video.width)
+  u = numpy.ndarray((video.height, video.width), 'float64')
+  v = numpy.ndarray((video.height, video.width), 'float64')
   
   # Creates the output video (frame rate by default)
   outvideo = torch.io.VideoWriter(output, video.height, video.width)
@@ -69,7 +73,7 @@ def optflowHS(movie, iterations, alpha, template, stop=0):
     # please note the HS algorithm output is as float64 and that the flow2hsv
     # method outputs in float32 (read respective documentations)
     float_rgb = torch.ip.flowutils.flow2hsv(u,v)
-    outvideo.append((255.0*float_rgb).cast('uint8'))
+    outvideo.append((255.0*float_rgb).astype('uint8'))
 
     # reset the "previous" frame
     previous = current
