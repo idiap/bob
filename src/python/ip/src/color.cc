@@ -5,11 +5,13 @@
  * @brief Binds color converters to python 
  */
 
-#include <boost/python.hpp>
 #include "ip/color.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace ip = Torch::ip;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
 template <typename T> static tuple rgb_to_hsv_one_python(T r, T g, T b) {
   T h, s, v;
@@ -108,60 +110,62 @@ template <> tuple gray_to_rgb_one_python(uint8_t y) {
 }
 
 //a few methods to return a dynamically allocated converted object
-template <typename T> blitz::Array<T,3> py_rgb_to_hsv 
-  (const blitz::Array<T,3>& from) {
-    blitz::Array<T,3> to(from.shape());
-    ip::rgb_to_hsv(from, to);
-    return to;
+template <typename T> object py_rgb_to_hsv (tp::const_ndarray from) {
+  tp::ndarray to(from.type());
+  blitz::Array<T,3> to_ = to.bz<T,3>();
+  ip::rgb_to_hsv(from.bz<T,3>(), to_);
+  return to.self();
 }
 
-template <typename T> blitz::Array<T,3> py_hsv_to_rgb
-  (const blitz::Array<T,3>& from) {
-    blitz::Array<T,3> to(from.shape());
-    ip::hsv_to_rgb(from, to);
-    return to;
+template <typename T> object py_hsv_to_rgb (tp::const_ndarray from) {
+  tp::ndarray to(from.type());
+  blitz::Array<T,3> to_ = to.bz<T,3>();
+  ip::hsv_to_rgb(from.bz<T,3>(), to_);
+  return to.self();
 }
 
-template <typename T> blitz::Array<T,3> py_rgb_to_hsl 
-  (const blitz::Array<T,3>& from) {
-    blitz::Array<T,3> to(from.shape());
-    ip::rgb_to_hsl(from, to);
-    return to;
+template <typename T> object py_rgb_to_hsl (tp::const_ndarray from) {
+  tp::ndarray to(from.type());
+  blitz::Array<T,3> to_ = to.bz<T,3>();
+  ip::rgb_to_hsl(from.bz<T,3>(), to_);
+  return to.self();
 }
 
-template <typename T> blitz::Array<T,3> py_hsl_to_rgb
-  (const blitz::Array<T,3>& from) {
-    blitz::Array<T,3> to(from.shape());
-    ip::hsl_to_rgb(from, to);
-    return to;
+template <typename T> object py_hsl_to_rgb (tp::const_ndarray from) {
+  tp::ndarray to(from.type());
+  blitz::Array<T,3> to_ = to.bz<T,3>();
+  ip::hsl_to_rgb(from.bz<T,3>(), to_);
+  return to.self();
 }
 
-template <typename T> blitz::Array<T,3> py_rgb_to_yuv
-  (const blitz::Array<T,3>& from) {
-    blitz::Array<T,3> to(from.shape());
-    ip::rgb_to_yuv(from, to);
-    return to;
+template <typename T> object py_rgb_to_yuv (tp::const_ndarray from) {
+  tp::ndarray to(from.type());
+  blitz::Array<T,3> to_ = to.bz<T,3>();
+  ip::rgb_to_yuv(from.bz<T,3>(), to_);
+  return to.self();
 }
 
-template <typename T> blitz::Array<T,3> py_yuv_to_rgb
-  (const blitz::Array<T,3>& from) {
-    blitz::Array<T,3> to(from.shape());
-    ip::yuv_to_rgb(from, to);
-    return to;
+template <typename T> object py_yuv_to_rgb (tp::const_ndarray from) {
+  tp::ndarray to(from.type());
+  blitz::Array<T,3> to_ = to.bz<T,3>();
+  ip::yuv_to_rgb(from.bz<T,3>(), to_);
+  return to.self();
 }
 
-template <typename T> blitz::Array<T,2> py_rgb_to_gray
-  (const blitz::Array<T,3>& from) {
-    blitz::Array<T,2> to(from.extent(1), from.extent(2));
-    ip::rgb_to_gray(from, to);
-    return to;
+template <typename T> object py_rgb_to_gray (tp::const_ndarray from) {
+  const ca::typeinfo& info = from.type();
+  tp::ndarray to(info.dtype, info.shape[1], info.shape[2]);
+  blitz::Array<T,2> to_ = to.bz<T,2>();
+  ip::rgb_to_gray(from.bz<T,3>(), to_);
+  return to.self();
 }
 
-template <typename T> blitz::Array<T,3> py_gray_to_rgb
-  (const blitz::Array<T,2>& from) {
-    blitz::Array<T,3> to(3, from.extent(0), from.extent(1));
-    ip::gray_to_rgb(from, to);
-    return to;
+template <typename T> object py_gray_to_rgb (tp::const_ndarray from) {
+  const ca::typeinfo& info = from.type();
+  tp::ndarray to(info.dtype, (size_t)3, info.shape[0], info.shape[1]);
+  blitz::Array<T,3> to_ = to.bz<T,3>();
+  ip::gray_to_rgb(from.bz<T,2>(), to_);
+  return to.self();
 }
 
 template <typename T> static void bind_type() {
