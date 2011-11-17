@@ -251,7 +251,7 @@ void bind_sp_convolution()
  
   def("convolve", &convolve, convolve_overloads((arg("b"), arg("c"), arg("a"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array. The option field allows to give information about the size of the output (FULL, SAME, VALID)"));
 
-  def("getconvolveoutputsize", &convolve_size, convolve_size_overloads((arg("b"), arg("c"), arg("size_opt")="full"), "gets the required size of the result of a 1 or 2D convolution product"));
+  def("getConvolveOutputSize", &convolve_size, convolve_size_overloads((arg("b"), arg("c"), arg("size_opt")="full"), "gets the required size of the result of a 1 or 2D convolution product"));
 
   def("convolveSep", &convolve_sep, convolve_sep_overloads((arg("b"), arg("c"), arg("a"), arg("dim"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Computes the convolution product of a 2, 3 or 4D blitz array with a 1D one, along the given dimension. (useful for separable convolution)"));
 
