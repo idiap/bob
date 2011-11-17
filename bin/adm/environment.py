@@ -138,6 +138,11 @@ def parse_args(argv):
                     default=False,
                     help="Switch to remove environment variables that may cause problems during builds such as the current installation directories",
                    )
+  parser.add_option("-F", "--full-environment",
+                    action="store_false",
+                    dest="building",
+                    help="Switch to back to having environment variables that may cause problems during builds such as the current installation directories",
+                   )
                     
 
   options, arguments = parser.parse_args(argv[1:])
