@@ -35,11 +35,11 @@ static void extend_with_iterable(io::Arrayset& s, object iter) {
   stl_input_iterator<object> end;
   for (stl_input_iterator<object> it(iter); it != end; ++it) {
     if (dtype.is_none()) {
-      s.add(io::Array(boost::make_shared<tp::ndarray>(*it, object())));
+      s.add(io::Array(boost::make_shared<tp::py_array>(*it, object())));
       dtype = arrayset_dtype(s);
     }
     else {
-      s.add(io::Array(boost::make_shared<tp::ndarray>(*it, dtype)));
+      s.add(io::Array(boost::make_shared<tp::py_array>(*it, dtype)));
     }
   }
 }
@@ -71,7 +71,7 @@ static void extend_with_ndarray(io::Arrayset& s, numeric::array a, size_t D) {
   for (npy_intp k=0; k<PyArray_DIMS(arr)[D]; ++k) {
     //gets a slice of the array, makes a contiguous copy of it and append
     index[D] = k;
-    s.add(io::Array(boost::make_shared<tp::ndarray>(a[index], dtype)));
+    s.add(io::Array(boost::make_shared<tp::py_array>(a[index], dtype)));
     if (dtype.is_none()) dtype = arrayset_dtype(s); ///< may need a refresh
   }
 }
@@ -82,11 +82,11 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable1(object iter) {
   stl_input_iterator<object> end;
   for (stl_input_iterator<object> it(iter); it != end; ++it) {
     if (dtype.is_none()) {
-      retval->add(io::Array(boost::make_shared<tp::ndarray>(*it, object())));
+      retval->add(io::Array(boost::make_shared<tp::py_array>(*it, object())));
       dtype = arrayset_dtype(*retval);
     }
     else {
-      retval->add(io::Array(boost::make_shared<tp::ndarray>(*it, dtype)));
+      retval->add(io::Array(boost::make_shared<tp::py_array>(*it, dtype)));
     }
   }
   return retval;
@@ -98,11 +98,11 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable2(object iter,
   stl_input_iterator<object> end;
   for (stl_input_iterator<object> it(iter); it != end; ++it) {
     if (dtype.is_none()) {
-      retval->add(io::Array(boost::make_shared<tp::ndarray>(*it, object())));
+      retval->add(io::Array(boost::make_shared<tp::py_array>(*it, object())));
       dtype = arrayset_dtype(*retval);
     }
     else {
-      retval->add(io::Array(boost::make_shared<tp::ndarray>(*it, dtype)));
+      retval->add(io::Array(boost::make_shared<tp::py_array>(*it, dtype)));
     }
   }
   return retval;
@@ -121,11 +121,11 @@ static void append_array(io::Arrayset& s, const io::Array& a) {
 }
 
 static object get_ndarray(io::Arrayset& s, size_t index) {
-  return tp::ndarray(s[index].get()).pyobject();
+  return tp::py_array(s[index].get()).pyobject();
 }
 
 static void set_ndarray(io::Arrayset& s, size_t index, object o) {
-  s.set(index, io::Array(tp::ndarray(o, arrayset_dtype(s))));
+  s.set(index, io::Array(tp::py_array(o, arrayset_dtype(s))));
 }
 
 static void set_string(io::Arrayset& s, size_t index, const std::string& filename) {
@@ -134,7 +134,7 @@ static void set_string(io::Arrayset& s, size_t index, const std::string& filenam
 
 static void append_ndarray(io::Arrayset& s, object o, object dtype=object()) {
   if (dtype.is_none()) dtype = arrayset_dtype(s); ///try something better...
-  s.add(io::Array(boost::make_shared<tp::ndarray>(o, dtype)));
+  s.add(io::Array(boost::make_shared<tp::py_array>(o, dtype)));
 }
 
 BOOST_PYTHON_FUNCTION_OVERLOADS(append_ndarray_overloads, append_ndarray, 2, 3)

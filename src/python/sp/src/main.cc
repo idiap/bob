@@ -1,11 +1,11 @@
 /**
- * @file src/python/sp/src/main.cc 
- * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Thu 17 Nov 13:45:45 2011 CET
  *
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
 void bind_sp_spcore();
 void bind_sp_convolution();

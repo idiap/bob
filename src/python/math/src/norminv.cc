@@ -1,5 +1,4 @@
 /**
- * @file src/python/math/src/norminv.cc 
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
  *
  * @brief Binds the inverse normal cumulative distribution into python

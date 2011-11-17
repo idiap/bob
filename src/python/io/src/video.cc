@@ -37,7 +37,7 @@ struct iterator_wrapper {
       PYTHON_ERROR(StopIteration, "no more data");
     }
 
-    tp::ndarray retval(reader->frame_type());
+    tp::py_array retval(reader->frame_type());
     o.read(retval); //note that this will advance the iterator
     return retval.pyobject();
   }
@@ -67,7 +67,7 @@ static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
         frame, v.numberOfFrames());
   }
 
-  tp::ndarray retval(v.frame_type());
+  tp::py_array retval(v.frame_type());
   io::VideoReader::const_iterator it = v.begin();
   it += frame;
   it.read(retval);
@@ -115,7 +115,7 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   io::VideoReader::const_iterator it = v.begin();
   it += start;
   for (size_t i=start, j=0; i<stop; i+=step, ++j, it+=(step-1)) {
-    tp::ndarray tmp(v.frame_type());
+    tp::py_array tmp(v.frame_type());
     it.read(tmp);
     retval.append(tmp.pyobject());
   }
@@ -124,7 +124,7 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
 }
 
 static object videoreader_load(io::VideoReader& reader) {
-  tp::ndarray tmp(reader.video_type());
+  tp::py_array tmp(reader.video_type());
   reader.load(tmp);
   return tmp.pyobject();
 }
@@ -134,12 +134,12 @@ static void videowriter_append(io::VideoWriter& writer, object a) {
       false, true);
   if (result != tp::IMPOSSIBLE) {
     tp::dtype dtype(writer.frame_type().dtype);
-    tp::ndarray tmp(a, dtype.self());
+    tp::py_array tmp(a, dtype.self());
     writer.append(tmp);
   }
   else {
     tp::dtype dtype(writer.video_type().dtype);
-    tp::ndarray tmp(a, dtype.self());
+    tp::py_array tmp(a, dtype.self());
     writer.append(tmp);
   }
 }

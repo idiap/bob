@@ -34,7 +34,7 @@ void ca::typeinfo::reset() {
 }
 
 bool ca::typeinfo::is_valid() const {
-  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= (TORCH_MAX_DIM+1));
+  return (dtype != ca::t_unknown) && (nd > 0) && (nd <= (TORCH_MAX_DIM+1)) && has_valid_shape();
 }
 
 void ca::typeinfo::update_strides() {
@@ -95,4 +95,12 @@ std::string ca::typeinfo::str() const {
   boost::format s("%dD, %s (%d bytes), %d bytes");
   s % nd % item_str() % item_size() % buffer_size();
   return s.str();
+}
+
+void ca::typeinfo::reset_shape() {
+  shape[0] = 0;
+}
+
+bool ca::typeinfo::has_valid_shape() const {
+  return shape[0] != 0;
 }

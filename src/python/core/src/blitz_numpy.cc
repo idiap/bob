@@ -5,16 +5,7 @@
  * @brief Automatic converters to-from python for blitz::Array's
  */
 
-#include <boost/python.hpp>
 #include "core/python/ndarray.h"
-
-#include <blitz/array.h>
-#include <stdint.h>
-
-#include <boost/preprocessor.hpp>
-
-#include "core/array.h"
-#include "core/logging.h"
 
 namespace bp = boost::python;
 namespace tp = Torch::python;
@@ -22,7 +13,7 @@ namespace ca = Torch::core::array;
       
 template<typename T, int N>
 void npy_copy_cast(blitz::Array<T,N>& bz, PyArrayObject* arrobj) {
-  PYTHON_ERROR(TypeError, "Unsupported number of dimensions"); 
+  PYTHON_ERROR(TypeError, "unsupported number of dimensions: %d", N);
 }
 
 template<typename T>
@@ -89,9 +80,7 @@ template <typename T, int N> struct bz_from_npy {
     bp::handle<> hdl(bp::borrowed(bp::allow_null(obj_ptr)));
     bp::object obj(hdl);
 
-    ca::typeinfo tinfo;
-    tinfo.dtype = ca::getElementType<T>();
-    tinfo.nd = N;
+    ca::typeinfo tinfo(ca::getElementType<T>(), N);
 
     tp::convert_t result = tp::convertible_to(obj, tinfo, false, true);
 

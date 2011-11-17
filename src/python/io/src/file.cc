@@ -17,13 +17,13 @@ namespace io = Torch::io;
 namespace ca = Torch::core::array;
 
 static object file_array_read(io::File& f) {
-  tp::ndarray a(f.array_type());
+  tp::py_array a(f.array_type());
   f.array_read(a);
   return a.pyobject(); //shallow copy
 }
 
 static object file_arrayset_read(io::File& f, size_t index) {
-  tp::ndarray a(f.array_type());
+  tp::py_array a(f.array_type());
   f.arrayset_read(a, index);
   return a.pyobject(); //shallow copy
 }
@@ -39,12 +39,12 @@ static boost::shared_ptr<io::File> string_open2 (const std::string& filename,
 }
 
 static void file_array_write(io::File& f, object array) {
-  tp::ndarray a(array, object());
+  tp::py_array a(array, object());
   f.array_write(a);
 }
 
 static void file_arrayset_append(io::File& f, object array) {
-  tp::ndarray a(array, object());
+  tp::py_array a(array, object());
   f.arrayset_append(a);
 }
 

@@ -1,11 +1,10 @@
 /**
- * @file src/python/math/src/main.cc 
  * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
  *
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
 void bind_math_eig();
 void bind_math_linsolve();

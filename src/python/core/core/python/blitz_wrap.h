@@ -35,7 +35,7 @@ namespace Torch { namespace python {
     if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
           arr->descr->elsize == 1)) return false;
         
-    if (arr->descr->type_num != tp::ctype_to_num<T>()) return false;
+    if (arr->descr->type_num != ctype_to_num<T>()) return false;
 
     //tests the following: NPY_ARRAY_C_CONTIGUOUS and NPY_ARRAY_ALIGNED
     if (!PyArray_ISCARRAY_RO(arr)) return false;
@@ -65,19 +65,19 @@ namespace Torch { namespace python {
 
     if (PyArray_NDIM(arr) != N) {
       boost::format mesg("cannot wrap as blitz::Array<%s,%s>, ndarray %d dimensions.");
-      mesg % Torch::core::array::stringize<T>() % N % PyArray_NDIM;
-      PYTHON_ERROR(RuntimeEror, mesg.str().c_str());
+      mesg % Torch::core::array::stringize<T>() % N % PyArray_NDIM(arr);
+      throw std::runtime_error(mesg.str().c_str());
     }
 
     if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
           arr->descr->elsize == 1)) 
       PYTHON_ERROR(RuntimeError, "can only wrap as blitz::Array<>, ndarrays with native byte-ordering");
         
-    if (arr->descr->type_num != tp::ctype_to_num<T>()) {
-      boost::format mesg("cannot wrap blitz::Array<%s,%s> with ndarray having elements of type %s");
+    if (arr->descr->type_num != ctype_to_num<T>()) {
+      boost::format mesg("cannot wrap blitz::Array<%s,%d> with ndarray having elements of type %s");
       mesg % Torch::core::array::stringize<T>() % N;
       mesg % Torch::core::array::stringize(num_to_type(arr->descr->type_num));
-      PYTHON_ERROR(RuntimeError, mesg.str().c_str());
+      throw std::runtime_error(mesg.str().c_str());
     }
 
     //tests the following: NPY_ARRAY_C_CONTIGUOUS and NPY_ARRAY_ALIGNED

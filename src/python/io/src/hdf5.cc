@@ -117,7 +117,7 @@ static object hdf5file_xread(io::HDF5File& f, const std::string& p,
   //read as an numpy array
   ca::typeinfo atype;
   type.copy_to(atype);
-  tp::ndarray retval(atype);
+  tp::py_array retval(atype);
   f.read_buffer(p, pos, retval);
   return retval.pyobject();
 }
@@ -145,19 +145,19 @@ template <typename T> static void hdf5file_replace_scalar(io::HDF5File& f, const
 
 static void hdf5file_replace_array(io::HDF5File& f, const std::string& p, 
     size_t pos, object array_like) {
-  f.write_buffer(p, pos, tp::ndarray(array_like, object()));
+  f.write_buffer(p, pos, tp::py_array(array_like, object()));
 }
 
 static void hdf5file_append_array(io::HDF5File& f, 
     const std::string& path, object array_like, size_t compression) {
-  tp::ndarray tmp(array_like, object());
+  tp::py_array tmp(array_like, object());
   if (!f.contains(path)) f.create(path, tmp.type(), true, compression);
   f.extend_buffer(path, tmp);
 }
 
 static void hdf5file_set_array(io::HDF5File& f, 
     const std::string& path, object array_like, size_t compression) {
-  tp::ndarray tmp(array_like, object());
+  tp::py_array tmp(array_like, object());
   if (!f.contains(path)) f.create(path, tmp.type(), false, compression);
   f.write_buffer(path, 0, tmp);
 }

@@ -22,26 +22,26 @@ namespace tp = Torch::python;
  * Creates a new io::Array from a NumPy ndarray
  */
 static boost::shared_ptr<io::Array> array_from_any1(object o) {
-  return boost::make_shared<io::Array>(boost::make_shared<tp::ndarray>(o, object()));
+  return boost::make_shared<io::Array>(boost::make_shared<tp::py_array>(o, object()));
 }
 
 static boost::shared_ptr<io::Array> array_from_any2(object o, object dtype) {
-  return boost::make_shared<io::Array>(boost::make_shared<tp::ndarray>(o, dtype));
+  return boost::make_shared<io::Array>(boost::make_shared<tp::py_array>(o, dtype));
 }
 
 /**
  * Wraps a buffer with a NumPy array skin
  */
 static object get_array(io::Array& a) {
-  return tp::ndarray(a.get()).pyobject();
+  return tp::py_array(a.get()).pyobject();
 }
 
 static void set_array1(io::Array& a, object o) {
-  a.set(boost::make_shared<tp::ndarray>(o, object()));
+  a.set(boost::make_shared<tp::py_array>(o, object()));
 }
 
 static void set_array2(io::Array& a, object o, object d) {
-  a.set(boost::make_shared<tp::ndarray>(o, d));
+  a.set(boost::make_shared<tp::py_array>(o, d));
 }
 
 void bind_io_array() {

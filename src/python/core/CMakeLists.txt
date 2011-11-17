@@ -15,6 +15,7 @@ set(pysrc
 set(pysrc_ndarray
    "src/ndarray.cc"
    "src/blitz_numpy.cc"
+   "src/ndarray_numpy.cc"
    "src/tinyvector.cc"
    "src/typeinfo.cc"
    #"src/array_wrapper_example.cc"

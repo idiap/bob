@@ -9,11 +9,11 @@ default_flags = sys.getdlopenflags()
 sys.setdlopenflags(default_flags|ctypes.RTLD_GLOBAL)
 
 import core
-import math
 import io
-"""
+import math
 import measure
 import sp
+"""
 import ip
 import db
 import machine

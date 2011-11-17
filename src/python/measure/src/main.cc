@@ -5,7 +5,7 @@
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
 void bind_measure_error();
 

@@ -18,188 +18,278 @@
 #include "sp/DCT2DNaive.h"
 #include "sp/fftshift.h"
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace sp = Torch::sp;
 namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
+// documentation for classes
 static const char* FFT1D_DOC = "Objects of this class, after configuration, can compute the direct FFT of a 1D array/signal.";
 static const char* IFFT1D_DOC = "Objects of this class, after configuration, can compute the inverse FFT of a 1D array/signal.";
 static const char* FFT2D_DOC = "Objects of this class, after configuration, can compute the direct FFT of a 2D array/signal.";
 static const char* IFFT2D_DOC = "Objects of this class, after configuration, can compute the inverse FFT of a 2D array/signal.";
-
+ 
 static const char* DCT1D_DOC = "Objects of this class, after configuration, can compute the direct DCT of a 1D array/signal.";
 static const char* IDCT1D_DOC = "Objects of this class, after configuration, can compute the inverse DCT of a 1D array/signal.";
 static const char* DCT2D_DOC = "Objects of this class, after configuration, can compute the direct DCT of a 2D array/signal.";
 static const char* IDCT2D_DOC = "Objects of this class, after configuration, can compute the inverse DCT of a 2D array/signal.";
 
-static const char* FFT1_DOC = "Compute the direct FFT of a 1D array/signal.";
-static const char* IFFT1_DOC = "Compute the inverse FFT of a 1D array/signal.";
-static const char* FFT2_DOC = "Compute the direct FFT of a 2D array/signal.";
-static const char* IFFT2_DOC = "Compute the inverse FFT of a 2D array/signal.";
+// free methods documentation
+static const char* FFT_DOC = "Compute the direct FFT of a 1 or 2D array/signal of type complex128.";
+static const char* IFFT_DOC = "Compute the inverse FFT of a 1 or 2D array/signalof type complex128.";
 
-static const char* DCT1_DOC = "Compute the direct DCT of a 1D array/signal.";
-static const char* IDCT1_DOC = "Compute the inverse DCT of a 1D array/signal.";
-static const char* DCT2_DOC = "Compute the direct DCT of a 2D array/signal.";
-static const char* IDCT2_DOC = "Compute the inverse DCT of a 2D array/signal.";
+static const char* DCT_DOC = "Compute the direct DCT of a 1 or 2D array/signal of type float64.";
+static const char* IDCT_DOC = "Compute the inverse DCT of a 1 or 2D array/signal of type float64.";
 
-static const char* FFTSHIFT1_DOC = "Inverse the two halves of a 1D blitz array and return the result as a blitz array.";
-static const char* IFFTSHIFT1_DOC = "Inverse the two halves of a 1D blitz array and return the result as a blitz array. Calling iffshift over an fftshifted array should give the original array back.";
-static const char* FFTSHIFT2_DOC = "Swap the four quadrants of a 2D blitz array and return the result as a blitz array.";
-static const char* IFFTSHIFT2_DOC = "Swap the four quadrants of a 2D blitz array and return the result as a blitz array. Calling iffshift over an fftshifted array should give the original array back.";
+static const char* FFTSHIFT_DOC = "If a 1D complex128 array is passed, inverses the two halves of that array and returns the result as a new array. If a 2D complex128 array is passed, swaps the four quadrants of the array and returns the result as a new array.";
+static const char* IFFTSHIFT_DOC = "This method undo what fftshift() does. Accepts 1 or 2D array of type complex128.";
 
-
-static blitz::Array<std::complex<double>,1> script_fft(const blitz::Array<std::complex<double>,1>& ar)
-{
-  Torch::sp::FFT1D fft(ar.extent(0));
-  blitz::Array<std::complex<double>,1> res(ar.shape());
-  fft( ar, res);
-  return res;
+static object script_fft(tp::const_ndarray ar) {
+  typedef std::complex<double> dcplx;
+  const ca::typeinfo& info = ar.type();
+  if (info.dtype != ca::t_complex128) {
+    PYTHON_ERROR(TypeError, "FFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  tp::ndarray res(info);
+  switch (info.nd) {
+    case 1:
+      {
+        Torch::sp::FFT1D op(info.shape[0]);
+        blitz::Array<dcplx,1> res_ = res.bz<dcplx,1>();
+        op(ar.bz<dcplx,1>(), res_);
+      }
+      break;
+    case 2:
+      {
+        Torch::sp::FFT2D op(info.shape[0], info.shape[1]);
+        blitz::Array<dcplx,2> res_ = res.bz<dcplx,2>();
+        op(ar.bz<dcplx,2>(), res_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "FFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  return res.self();
 }
 
-static blitz::Array<std::complex<double>,1> script_ifft(const blitz::Array<std::complex<double>,1>& ar)
-{
-  Torch::sp::IFFT1D ifft(ar.extent(0));
-  blitz::Array<std::complex<double>,1> res(ar.shape());
-  ifft( ar, res);
-  return res;
+static object script_ifft(tp::const_ndarray ar) {
+  typedef std::complex<double> dcplx;
+  const ca::typeinfo& info = ar.type();
+  if (info.dtype != ca::t_complex128) {
+    PYTHON_ERROR(TypeError, "iFFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  tp::ndarray res(info);
+  switch (info.nd) {
+    case 1:
+      {
+        Torch::sp::IFFT1D op(info.shape[0]);
+        blitz::Array<dcplx,1> res_ = res.bz<dcplx,1>();
+        op(ar.bz<dcplx,1>(), res_);
+      }
+      break;
+    case 2:
+      {
+        Torch::sp::IFFT2D op(info.shape[0], info.shape[1]);
+        blitz::Array<dcplx,2> res_ = res.bz<dcplx,2>();
+        op(ar.bz<dcplx,2>(), res_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "iFFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  return res.self();
 }
 
-static blitz::Array<std::complex<double>,2> script_fft(const blitz::Array<std::complex<double>,2>& ar)
-{
-  Torch::sp::FFT2D fft(ar.extent(0),ar.extent(1));
-  blitz::Array<std::complex<double>,2> res(ar.shape());
-  fft( ar, res);
-  return res;
+static object script_dct(tp::const_ndarray ar) {
+  const ca::typeinfo& info = ar.type();
+  if (info.dtype != ca::t_float64) {
+    PYTHON_ERROR(TypeError, "DCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
+  }
+  tp::ndarray res(info);
+  switch (info.nd) {
+    case 1:
+      {
+        Torch::sp::DCT1D op(info.shape[0]);
+        blitz::Array<double,1> res_ = res.bz<double,1>();
+        op(ar.bz<double,1>(), res_);
+      }
+      break;
+    case 2:
+      {
+        Torch::sp::DCT2D op(info.shape[0], info.shape[1]);
+        blitz::Array<double,2> res_ = res.bz<double,2>();
+        op(ar.bz<double,2>(), res_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "DCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
+  }
+  return res.self();
 }
 
-static blitz::Array<std::complex<double>,2> script_ifft(const blitz::Array<std::complex<double>,2>& ar)
-{
-  Torch::sp::IFFT2D ifft(ar.extent(0),ar.extent(1));
-  blitz::Array<std::complex<double>,2> res(ar.shape());
-  ifft( ar, res);
-  return res;
+static object script_idct(tp::const_ndarray ar) {
+  const ca::typeinfo& info = ar.type();
+  if (info.dtype != ca::t_float64) {
+    PYTHON_ERROR(TypeError, "iDCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
+  }
+  tp::ndarray res(info);
+  switch (info.nd) {
+    case 1:
+      {
+        Torch::sp::IDCT1D op(info.shape[0]);
+        blitz::Array<double,1> res_ = res.bz<double,1>();
+        op(ar.bz<double,1>(), res_);
+      }
+      break;
+    case 2:
+      {
+        Torch::sp::IDCT2D op(info.shape[0], info.shape[1]);
+        blitz::Array<double,2> res_ = res.bz<double,2>();
+        op(ar.bz<double,2>(), res_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "iDCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
+  }
+  return res.self();
 }
 
-static blitz::Array<double,1> script_dct(const blitz::Array<double,1>& ar)
-{
-  Torch::sp::DCT1D dct(ar.extent(0));
-  blitz::Array<double,1> res(ar.shape());
-  dct( ar, res);
-  return res;
+static object script_fftshift(tp::const_ndarray ar) {
+  typedef std::complex<double> dcplx;
+  const ca::typeinfo& info = ar.type();
+  if (info.dtype != ca::t_complex128) {
+    PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  tp::ndarray res(info);
+  switch (info.nd) {
+    case 1:
+      {
+        blitz::Array<dcplx,1> res_ = res.bz<dcplx,1>();
+        sp::fftshift(ar.bz<dcplx,1>(), res_);
+      }
+      break;
+    case 2:
+      {
+        blitz::Array<dcplx,2> res_ = res.bz<dcplx,2>();
+        sp::fftshift(ar.bz<dcplx,2>(), res_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  return res.self();
 }
 
-static blitz::Array<double,1> script_idct(const blitz::Array<double,1>& ar)
-{
-  Torch::sp::IDCT1D idct(ar.extent(0));
-  blitz::Array<double,1> res(ar.shape());
-  idct( ar, res);
-  return res;
+static object script_ifftshift(tp::const_ndarray ar) {
+  typedef std::complex<double> dcplx;
+  const ca::typeinfo& info = ar.type();
+  if (info.dtype != ca::t_complex128) {
+    PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  tp::ndarray res(info);
+  switch (info.nd) {
+    case 1:
+      {
+        blitz::Array<dcplx,1> res_ = res.bz<dcplx,1>();
+        sp::ifftshift(ar.bz<dcplx,1>(), res_);
+      }
+      break;
+    case 2:
+      {
+        blitz::Array<dcplx,2> res_ = res.bz<dcplx,2>();
+        sp::ifftshift(ar.bz<dcplx,2>(), res_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
+  return res.self();
 }
 
-static blitz::Array<double,2> script_dct(const blitz::Array<double,2>& ar)
-{
-  Torch::sp::DCT2D dct(ar.extent(0),ar.extent(1));
-  blitz::Array<double,2> res(ar.shape());
-  dct( ar, res);
-  return res;
+static void py_fft1d_call(sp::FFT1D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<std::complex<double>,1> c_ = c.bz<std::complex<double>,1>();
+  a(b.bz<std::complex<double>,1>(), c_);
 }
 
-static blitz::Array<double,2> script_idct(const blitz::Array<double,2>& ar)
-{
-  Torch::sp::IDCT2D idct(ar.extent(0),ar.extent(1));
-  blitz::Array<double,2> res(ar.shape());
-  idct( ar, res);
-  return res;
+static void py_ifft1d_call(sp::IFFT1D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<std::complex<double>,1> c_ = c.bz<std::complex<double>,1>();
+  a(b.bz<std::complex<double>,1>(), c_);
 }
 
-static blitz::Array<std::complex<double>,1> script_fftshift(const blitz::Array<std::complex<double>,1>& ar)
-{
-  blitz::Array<std::complex<double>,1> res(ar.shape());
-  Torch::sp::fftshift( ar, res);
-  return res;
+static void py_fft2d_call(sp::FFT2D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<std::complex<double>,2> c_ = c.bz<std::complex<double>,2>();
+  a(b.bz<std::complex<double>,2>(), c_);
 }
 
-static blitz::Array<std::complex<double>,1> script_ifftshift(const blitz::Array<std::complex<double>,1>& ar)
-{
-  blitz::Array<std::complex<double>,1> res(ar.shape());
-  Torch::sp::ifftshift( ar, res);
-  return res;
+static void py_ifft2d_call(sp::IFFT2D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<std::complex<double>,2> c_ = c.bz<std::complex<double>,2>();
+  a(b.bz<std::complex<double>,2>(), c_);
 }
 
-static blitz::Array<std::complex<double>,2> script_fftshift(const blitz::Array<std::complex<double>,2>& ar)
-{
-  blitz::Array<std::complex<double>,2> res(ar.shape());
-  Torch::sp::fftshift( ar, res);
-  return res;
+static void py_dct1d_call(sp::DCT1D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<double,1> c_ = c.bz<double,1>();
+  a(b.bz<double,1>(), c_);
 }
 
-static blitz::Array<std::complex<double>,2> script_ifftshift(const blitz::Array<std::complex<double>,2>& ar)
-{
-  blitz::Array<std::complex<double>,2> res(ar.shape());
-  Torch::sp::ifftshift( ar, res);
-  return res;
+static void py_idct1d_call(sp::IDCT1D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<double,1> c_ = c.bz<double,1>();
+  a(b.bz<double,1>(), c_);
 }
 
-static void py_fft1d_call(sp::FFT1D& a, const blitz::Array<std::complex<double>,1>& b, numeric::array c) {
-  blitz::Array<std::complex<double>,1> c_ =
-    tp::numpy_bz<std::complex<double>,1>(c);
-  a(b, c_);
+static void py_dct2d_call(sp::DCT2D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<double,2> c_ = c.bz<double,2>();
+  a(b.bz<double,2>(), c_);
 }
 
-static void py_ifft1d_call(sp::IFFT1D& a, const blitz::Array<std::complex<double>,1>& b, numeric::array c) {
-  blitz::Array<std::complex<double>,1> c_ =
-    tp::numpy_bz<std::complex<double>,1>(c);
-  a(b, c_);
+static void py_idct2d_call(sp::IDCT2D& a, tp::const_ndarray b, tp::ndarray c) {
+  blitz::Array<double,2> c_ = c.bz<double,2>();
+  a(b.bz<double,2>(), c_);
 }
 
-static void py_fft2d_call(sp::FFT2D& a, const blitz::Array<std::complex<double>,2>& b, numeric::array c) {
-  blitz::Array<std::complex<double>,2> c_ =
-    tp::numpy_bz<std::complex<double>,2>(c);
-  a(b, c_);
+static void py_fftshift(tp::const_ndarray ar, tp::ndarray t) {
+  const ca::typeinfo& info = ar.type();
+  switch (info.nd) {
+    case 1:
+      {
+        blitz::Array<std::complex<double>,1> t_ =
+          t.bz<std::complex<double>,1>();
+        sp::fftshift(ar.bz<std::complex<double>,1>(), t_);
+      }
+      break;
+    case 2:
+      {
+        blitz::Array<std::complex<double>,2> t_ =
+          t.bz<std::complex<double>,2>();
+        sp::fftshift(ar.bz<std::complex<double>,2>(), t_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
 }
 
-static void py_ifft2d_call(sp::IFFT2D& a, const blitz::Array<std::complex<double>,2>& b, numeric::array c) {
-  blitz::Array<std::complex<double>,2> c_ =
-    tp::numpy_bz<std::complex<double>,2>(c);
-  a(b, c_);
-}
-
-static void py_dct1d_call(sp::DCT1D& a, const blitz::Array<double,1>& b, numeric::array c) {
-  blitz::Array<double,1> c_ = tp::numpy_bz<double,1>(c);
-  a(b, c_);
-}
-
-static void py_idct1d_call(sp::IDCT1D& a, const blitz::Array<double,1>& b, numeric::array c) {
-  blitz::Array<double,1> c_ = tp::numpy_bz<double,1>(c);
-  a(b, c_);
-}
-
-static void py_dct2d_call(sp::DCT2D& a, const blitz::Array<double,2>& b, numeric::array c) {
-  blitz::Array<double,2> c_ = tp::numpy_bz<double,2>(c);
-  a(b, c_);
-}
-
-static void py_idct2d_call(sp::IDCT2D& a, const blitz::Array<double,2>& b, numeric::array c) {
-  blitz::Array<double,2> c_ = tp::numpy_bz<double,2>(c);
-  a(b, c_);
-}
-
-template <int N>
-static void py_fftshift(const blitz::Array<std::complex<double>,N>& ar, 
-    numeric::array t) {
-  blitz::Array<std::complex<double>,N> t_ = 
-    tp::numpy_bz<std::complex<double>,N>(t);
-  Torch::sp::fftshift(ar, t_);
-}
-
-template <int N>
-static void py_ifftshift(const blitz::Array<std::complex<double>,N>& ar, 
-    numeric::array t) {
-  blitz::Array<std::complex<double>,N> t_ = 
-    tp::numpy_bz<std::complex<double>,N>(t);
-  Torch::sp::ifftshift(ar, t_);
+static void py_ifftshift(tp::const_ndarray ar, tp::ndarray t) {
+  const ca::typeinfo& info = ar.type();
+  switch (info.nd) {
+    case 1:
+      {
+        blitz::Array<std::complex<double>,1> t_ =
+          t.bz<std::complex<double>,1>();
+        sp::ifftshift(ar.bz<std::complex<double>,1>(), t_);
+      }
+      break;
+    case 2:
+      {
+        blitz::Array<std::complex<double>,2> t_ =
+          t.bz<std::complex<double>,2>();
+        sp::ifftshift(ar.bz<std::complex<double>,2>(), t_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+  }
 }
 
 void bind_sp_fft_dct()
@@ -260,27 +350,18 @@ void bind_sp_fft_dct()
     .def("__call__", &py_idct2d_call, (arg("self"),arg("input"), arg("output")), "Call an object of this type to compute the IDCT of the input 1D array/signal.")
     ;
 
-
   // fft and dct function-like 
-  def("fft", (blitz::Array<std::complex<double>,1> (*)(const blitz::Array<std::complex<double>,1>& ar))&script_fft, (arg("array")), FFT1_DOC);
-  def("ifft", (blitz::Array<std::complex<double>,1> (*)(const blitz::Array<std::complex<double>,1>& ar))&script_ifft, (arg("array")), IFFT1_DOC);
-  def("fft", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_fft, (arg("array")), FFT2_DOC);
-  def("ifft", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_ifft, (arg("array")), IFFT2_DOC);
+  def("fft", &script_fft, (arg("array")), FFT_DOC);
+  def("ifft", &script_ifft, (arg("array")), IFFT_DOC);
 
-  def("dct", (blitz::Array<double,1> (*)(const blitz::Array<double,1>& ar))&script_dct, (arg("array")), DCT1_DOC);
-  def("idct", (blitz::Array<double,1> (*)(const blitz::Array<double,1>& ar))&script_idct, (arg("array")), IDCT1_DOC);
-  def("dct", (blitz::Array<double,2> (*)(const blitz::Array<double,2>& ar))&script_dct, (arg("array")), DCT2_DOC);
-  def("idct", (blitz::Array<double,2> (*)(const blitz::Array<double,2>& ar))&script_idct, (arg("array")), IDCT2_DOC);
+  def("dct", &script_dct, (arg("array")), DCT_DOC);
+  def("idct", &script_idct, (arg("array")), IDCT_DOC);
 
 
   // fftshift
-  def("fftshift", (blitz::Array<std::complex<double>,1> (*)(const blitz::Array<std::complex<double>,1>& ar))&script_fftshift, (arg("array")), FFTSHIFT1_DOC);
-  def("ifftshift", (blitz::Array<std::complex<double>,1> (*)(const blitz::Array<std::complex<double>,1>& ar))&script_ifftshift, (arg("array")), IFFTSHIFT1_DOC);
-  def("fftshift", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_fftshift, (arg("array")), FFTSHIFT2_DOC);
-  def("ifftshift", (blitz::Array<std::complex<double>,2> (*)(const blitz::Array<std::complex<double>,2>& ar))&script_ifftshift, (arg("array")), IFFTSHIFT2_DOC);
-  def("fftshift", &py_fftshift<1>, (arg("input"),arg("output")), FFTSHIFT1_DOC);
-  def("ifftshift", &py_ifftshift<1>, (arg("input"),arg("output")), IFFTSHIFT1_DOC);
-  def("fftshift", &py_fftshift<2>, (arg("input"),arg("output")), FFTSHIFT2_DOC);
-  def("ifftshift", &py_ifftshift<2>, (arg("input"),arg("output")), IFFTSHIFT2_DOC);
-}
+  def("fftshift", &script_fftshift, (arg("array")), FFTSHIFT_DOC);
+  def("ifftshift", &script_ifftshift, (arg("array")), IFFTSHIFT_DOC);
 
+  def("fftshift", &py_fftshift, (arg("input"),arg("output")), FFTSHIFT_DOC);
+  def("ifftshift", &py_ifftshift, (arg("input"),arg("output")), IFFTSHIFT_DOC);
+}

@@ -5,9 +5,6 @@
  * @brief A set of example blitz::Array <-> NumPy wrappers
  */
 
-#include <blitz/array.h>
-#include <stdint.h>
-
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
@@ -112,13 +109,14 @@ const blitz::Array<double,2>& get_const_data() {
 
 object py_zeroes_2d(int rows, int cols, object dtype=object()) {
   tp::dtype dt(dtype);
-  switch(dt.type()) {
+  switch(dt.type_num()) {
     case NPY_FLOAT32:
       return object(zeroes_2d<float>(rows, cols));
     case NPY_FLOAT64:
       return object(zeroes_2d<double>(rows,cols));
     default:
-      PYTHON_ERROR(TypeError, "no support for data type");
+      PYTHON_ERROR(TypeError, "no support for data type '%s'",
+          dt.cxx_str().c_str());
   }
 }
 BOOST_PYTHON_FUNCTION_OVERLOADS(py_zeroes_2d_overloads, py_zeroes_2d, 2, 3)

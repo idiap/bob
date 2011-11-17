@@ -10,6 +10,7 @@
 #define TORCH_PYTHON_NDARRAY_H
 
 #include <boost/python.hpp> //this has to come before the next declaration!
+#include <boost/format.hpp>
 
 // ============================================================================
 // Note: Header files that are distributed and include numpy/arrayobject.h need
@@ -31,6 +32,9 @@
 
 #include "core/python/exception.h"
 #include "core/array.h"
+
+#include <blitz/array.h>
+#include <stdint.h>
 
 namespace Torch { namespace python {
 
@@ -81,6 +85,16 @@ namespace Torch { namespace python {
   Torch::core::array::ElementType num_to_type(int num);
 
   /**
+   * A method to retrieve the type of element of an array
+   */
+  Torch::core::array::ElementType array_to_type(const boost::python::numeric::array& a);
+
+  /**
+   * Retrieves the number of dimensions in an array
+   */
+  size_t array_to_ndim(const boost::python::numeric::array& a);
+
+  /**
    * Converts from C/C++ type to ndarray type_num.
    */
   template <typename T> int ctype_to_num(void) {
@@ -88,23 +102,23 @@ namespace Torch { namespace python {
   }
 
   // The C/C++ types we support should be declared here.
-  template <> int ctype_to_num<bool>(void); 
-  template <> int ctype_to_num<signed char>(void); 
-  template <> int ctype_to_num<unsigned char>(void); 
-  template <> int ctype_to_num<short>(void); 
-  template <> int ctype_to_num<unsigned short>(void); 
-  template <> int ctype_to_num<int>(void); 
-  template <> int ctype_to_num<unsigned int>(void); 
+  template <> int ctype_to_num<bool>(void);
+  template <> int ctype_to_num<signed char>(void);
+  template <> int ctype_to_num<unsigned char>(void);
+  template <> int ctype_to_num<short>(void);
+  template <> int ctype_to_num<unsigned short>(void);
+  template <> int ctype_to_num<int>(void);
+  template <> int ctype_to_num<unsigned int>(void);
   template <> int ctype_to_num<long>(void);
   template <> int ctype_to_num<unsigned long>(void);
   template <> int ctype_to_num<long long>(void);
   template <> int ctype_to_num<unsigned long long>(void);
   template <> int ctype_to_num<float>(void);
-  template <> int ctype_to_num<double>(void); 
-  template <> int ctype_to_num<long double>(void); 
+  template <> int ctype_to_num<double>(void);
+  template <> int ctype_to_num<long double>(void);
   template <> int ctype_to_num<std::complex<float> >(void);
-  template <> int ctype_to_num<std::complex<double> >(void); 
-  template <> int ctype_to_num<std::complex<long double> >(void); 
+  template <> int ctype_to_num<std::complex<double> >(void);
+  template <> int ctype_to_num<std::complex<long double> >(void);
 
   /**
    * Converts from torch's Element type to ndarray type_num
@@ -185,7 +199,7 @@ namespace Torch { namespace python {
    *
    * 1. The "dtype" component is enforced on the array object
    * 2. If "nd" != 0, the number of dimensions is checked.
-   * 3. If 2. holds, shape values that are **different** than zero are checked.
+   * 3. If 2. holds, shape values are checked if has_valid_shape() is 'true'
    */
   convert_t convertible_to (boost::python::object array_like,
       const Torch::core::array::typeinfo& info, bool writeable=true,
@@ -197,6 +211,12 @@ namespace Torch { namespace python {
   convert_t convertible_to (boost::python::object array_like, 
       boost::python::object dtype_like, bool writeable=true, 
       bool behaved=true);
+
+  /**
+   * Same as above, but requires nothing, just simple convertibility.
+   */
+  convert_t convertible_to (boost::python::object array_like, 
+      bool writeable=true, bool behaved=true);
 
   class dtype {
 
@@ -265,13 +285,23 @@ namespace Torch { namespace python {
        */
       inline boost::python::object self() const { return m_self; }
 
+      /**
+       * Returns the bp::str() object for myself
+       */
+      boost::python::str str() const;
+
+      /**
+       * Returns str(*this) as a std::string
+       */
+      std::string cxx_str() const;
+
     private: //representation
 
       boost::python::object m_self;
 
   };
 
-  class ndarray: public Torch::core::array::interface {
+  class py_array: public Torch::core::array::interface {
 
     public: //api
 
@@ -285,29 +315,55 @@ namespace Torch { namespace python {
        *
        * @param dtype_like Anything that can be cast to a description type.
        */
-      ndarray(boost::python::object array_like,
+      py_array(boost::python::object array_like,
               boost::python::object dtype_like);
 
       /**
        * Builds a new array copying the data of an existing buffer.
        */
-      ndarray(const Torch::core::array::interface& buffer);
+      py_array(const Torch::core::array::interface& buffer);
 
       /**
        * Builds a new array by referring to the data of an existing buffer.
        */
-      ndarray(boost::shared_ptr<Torch::core::array::interface> buffer);
+      py_array(boost::shared_ptr<Torch::core::array::interface> buffer);
 
       /**
        * Builds a new array from scratch using the typeinfo. This array will be
        * a NumPy ndarray internally.
        */
-      ndarray(const Torch::core::array::typeinfo& info);
+      py_array(const Torch::core::array::typeinfo& info);
 
+      template <typename T>
+      py_array(Torch::core::array::ElementType t, T d0) {
+        set(Torch::core::array::typeinfo(t, (T)1, &d0));
+      }
+      template <typename T>
+      py_array(Torch::core::array::ElementType t, T d0, T d1) {
+        T shape[2] = {d0, d1};
+        set(Torch::core::array::typeinfo(t, (T)2, &shape[0]));
+      }
+      template <typename T>
+      py_array(Torch::core::array::ElementType t, T d0, T d1, T d2) {
+        T shape[3] = {d0, d1, d2};
+        set(Torch::core::array::typeinfo(t, (T)3, &shape[0]));
+      }
+      template <typename T>
+      py_array(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3) {
+        T shape[4] = {d0, d1, d2, d3};
+        set(Torch::core::array::typeinfo(t, (T)4, &shape[0]));
+      }
+      template <typename T>
+      py_array(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3, T d4) 
+      {
+        T shape[5] = {d0, d1, d2, d3, d4};
+        set(Torch::core::array::typeinfo(t, (T)5, &shape[0]));
+      }
+      
       /**
        * D'tor virtualization
        */
-      virtual ~ndarray();
+      virtual ~py_array();
 
       /**
        * Copies the data from another buffer.
@@ -348,7 +404,7 @@ namespace Torch { namespace python {
        * Cast the array to a different type by copying. If the type is omitted,
        * we just make a plain copy of this array.
        */
-      boost::python::object copy
+      virtual boost::python::object copy
         (const boost::python::object& dtype = boost::python::object());
 
       /**
@@ -361,12 +417,12 @@ namespace Torch { namespace python {
        * generating the numpy arrays with a special de-allocator as found here:
        * http://blog.enthought.com/python/numpy-arrays-with-pre-allocated-memory
        */
-      boost::python::object pyobject();
+      virtual boost::python::object pyobject();
 
       /**
        * Tells if the buffer is writeable
        */
-      bool is_writeable() const; ///< PyArray_ISWRITEABLE
+      virtual bool is_writeable() const; ///< PyArray_ISWRITEABLE
 
     private: //representation
 
@@ -377,7 +433,161 @@ namespace Torch { namespace python {
 
   };
 
+  /**
+   * The ndarray class is just a smart pointer wrapper over the concrete
+   * implementation of py_array.
+   */
+  class ndarray {
+
+    public: //api
+
+      /**
+       * Builds a new array from an array-like object but coerces to a certain
+       * type.
+       *
+       * @param array_like An ndarray object, inherited type or any object that
+       * can be cast into an array. Note that, in case of casting, we will need
+       * to copy the data. Otherwise, we just refer.
+       *
+       * @param dtype_like Anything that can be cast to a description type.
+       */
+      ndarray(boost::python::object array_like, 
+          boost::python::object dtype_like);
+
+      /**
+       * Builds a new array from an array-like object but coerces to a certain
+       * type.
+       *
+       * @param array_like An ndarray object, inherited type or any object that
+       * can be cast into an array. Note that, in case of casting, we will need
+       * to copy the data. Otherwise, we just refer.
+       */
+      ndarray(boost::python::object array_like);
+
+      /**
+       * Builds a new array from scratch using a type and shape
+       */
+      ndarray(const Torch::core::array::typeinfo& info);
+
+      template <typename T>
+      ndarray(Torch::core::array::ElementType t, T d0)
+        : px(new py_array(t, d0)) { }
+      template <typename T>
+      ndarray(Torch::core::array::ElementType t, T d0, T d1) 
+        : px(new py_array(t, d0, d1)) { }
+      template <typename T>
+      ndarray(Torch::core::array::ElementType t, T d0, T d1, T d2)
+        : px(new py_array(t, d0, d1, d2)) { }
+      template <typename T>
+      ndarray(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3) 
+        : px(new py_array(t, d0, d1, d2, d3)) { }
+      template <typename T>
+      ndarray(Torch::core::array::ElementType t, T d0, T d1, T d2, T d3, T d4) 
+        : px(new py_array(t, d0, d1, d2, d3, d4)) { }
+      
+      /**
+       * D'tor virtualization
+       */
+      virtual ~ndarray();
+
+      /**
+       * Returns the type information
+       */
+      virtual const Torch::core::array::typeinfo& type() const;
+
+      /**
+       * Returns the underlying python representation.
+       */
+      virtual boost::python::object self();
+
+      /**
+       * Returns a temporary blitz::Array<> skin over this ndarray. 
+       *
+       * Attention: If you use this method, you have to make sure that this
+       * ndarray outlives the blitz::Array<> and that such blitz::Array<> will
+       * not be re-allocated or have any other changes made to it, except for
+       * the data contents.
+       */
+      template <typename T, int N> blitz::Array<T,N> bz () {
+
+        typedef blitz::Array<T,N> array_type;
+        typedef blitz::TinyVector<int,N> shape_type;
+
+        const Torch::core::array::typeinfo& info = px->type();
+
+        if (info.nd != N) {
+          boost::format mesg("cannot wrap numpy.ndarray(%s,%d) as blitz::Array<%s,%s> - dimensions do not match");
+          mesg % Torch::core::array::stringize(info.dtype) % info.nd;
+          mesg % Torch::core::array::stringize<T>() % N;
+          throw std::invalid_argument(mesg.str().c_str());
+        }
+
+        if (info.dtype != Torch::core::array::getElementType<T>()) {
+          boost::format mesg("cannot wrap numpy.ndarray(%s,%d) as blitz::Array<%s,%s> - data type does not match");
+          mesg % Torch::core::array::stringize(info.dtype) % info.nd;
+          mesg % Torch::core::array::stringize<T>() % N;
+          throw std::invalid_argument(mesg.str().c_str());
+        }
+
+        shape_type shape;
+        shape_type stride;
+        for (size_t k=0; k<info.nd; ++k) {
+          shape[k] = info.shape[k];
+          stride[k] = info.stride[k];
+        }
+
+        //finally, we return the wrapper.
+        return array_type((T*)px->ptr(), shape, stride, blitz::neverDeleteData);
+      }
+
+    private: //representation
+
+      boost::shared_ptr<py_array> px;
+
+  };
+
+  /**
+   * A specialization of ndarray that is used to cast types from python that
+   * will **not** be modified in C++.
+   *
+   * Conversion requirements for this type can be made less restrictive since
+   * we consider the user just wants to pass a value to the method or function
+   * using this type. This opposes to the plain ndarray, in which the user may
+   * want to modify its contents by skinning it with a blitz::Array<> layer.
+   */
+  class const_ndarray: public ndarray {
+
+    public: //api
+      
+      /**
+       * Builds a new array from an array-like object but coerces to a certain
+       * type.
+       *
+       * @param array_like An ndarray object, inherited type or any object that
+       * can be cast into an array. Note that, in case of casting, we will need
+       * to copy the data. Otherwise, we just refer.
+       */
+      const_ndarray(boost::python::object array_like);
+
+      /**
+       * D'tor virtualization
+       */
+      virtual ~const_ndarray();
+
+      /**
+       * Returns a temporary blitz::Array<> skin over this const_ndarray. 
+       *
+       * Attention: If you use this method, you have to make sure that this
+       * ndarray outlives the blitz::Array<> and that such blitz::Array<> will
+       * not be re-allocated or have any other changes made to it, except for
+       * the data contents.
+       */
+      template <typename T, int N> blitz::Array<T,N> bz () {
+        return ndarray::bz<T,N>();
+      }
+
+  };
+
 }}
 
 #endif /* TORCH_PYTHON_NDARRAY_H */
-

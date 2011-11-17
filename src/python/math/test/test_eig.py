@@ -19,14 +19,10 @@ class EigTest(unittest.TestCase):
 
     N = 3
     # Matrix to decompose
-    A=numpy.array([1,2,3,2,4,5,3,5,6], dtype='float64').reshape(3,3)
-
-    # Matrix/vector for storing the eigenvectors/values
-    V=numpy.zeros((3,3), 'float64')
-    D=numpy.zeros((3,), 'float64')
+    A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
 
     # Do the decomposition
-    torch.math.eigSymReal(A,V,D)
+    V, D = torch.math.eigSymReal(A)
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([-0.5157, 0.1709, 11.3448], 'float64')
@@ -41,15 +37,11 @@ class EigTest(unittest.TestCase):
 
     N = 3
     # Input matrices to decompose
-    A=numpy.array([1,2,3,2,4,5,3,5,6],'float64').reshape(3,3)
-    B=numpy.array([2,-1,0,-1,2,-1,0,-1,2],'float64').reshape(3,3)
-
-    # Matrix/vector for storing the eigenvectors/values
-    V=numpy.zeros((3,3), 'float64')
-    D=numpy.zeros((3,), 'float64')
+    A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
+    B = [[2.,-1.,0.],[-1.,2.,-1.],[0.,-1.,2.]]
 
     # Do the decomposition
-    torch.math.eigSym(A,B,V,D)
+    V, D = torch.math.eigSym(A,B)
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([17.9718,0.510,-0.2728], 'float64')
@@ -64,15 +56,15 @@ class EigTest(unittest.TestCase):
 
     N = 3
     # Input matrices to decompose
-    A=numpy.array([1,2,3,2,4,5,3,5,6],'float64').reshape(3,3)
-    B=numpy.array([2,-1,0,-1,2,-1,0,-1,2],'float64').reshape(3,3)
+    A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
+    B = [[2.,-1.,0.],[-1.,2.,-1.],[0.,-1.,2.]]
 
     # Matrix/vector for storing the eigenvectors/values
-    V=numpy.zeros((3,3), 'float64')
-    D=numpy.zeros((3,), 'float64')
+    V = numpy.zeros((3,3), 'float64')
+    D = numpy.zeros((3,), 'float64')
 
     # Do the decomposition
-    torch.math.eig(A,B,V,D)
+    torch.math.eig(A, B, V, D)
 
     # Compare eigenvalues to matlab reference
     ref=numpy.array([-0.2728,0.0510,17.9718], 'float64')

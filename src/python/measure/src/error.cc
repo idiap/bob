@@ -5,19 +5,20 @@
  * @brief Implements python bindings to the Torch configuration system 
  */
 
-#include <boost/python.hpp>
 #include "measure/error.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace err = Torch::measure;
+namespace tp = Torch::python;
 
 /**
  * A nicer python wrapper for the FAR x FRR computation
  */
-static tuple farfrr(const blitz::Array<double,1>& negatives, 
-  const blitz::Array<double,1>& positives, double threshold) {
-  std::pair<double, double> retval = err::farfrr(negatives, positives,
-      threshold);
+static tuple farfrr(tp::const_ndarray negatives, tp::const_ndarray positives,
+    double threshold) {
+  std::pair<double, double> retval = err::farfrr(negatives.bz<double,1>(),
+      positives.bz<double,1>(), threshold);
   return make_tuple(retval.first, retval.second);
 }
 

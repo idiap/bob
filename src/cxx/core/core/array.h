@@ -35,6 +35,13 @@ namespace Torch { namespace core { namespace array {
     typeinfo();
 
     /**
+     * Simplification to build a typeinfo from a size
+     */
+    template <typename T> typeinfo(ElementType dtype_, T nd_) {
+      set(dtype_, nd_);
+    }
+
+    /**
      * Simplification to build a typeinfo from a shape pointer.
      */
     template <typename T> typeinfo(ElementType dtype_, T nd_, const T* shape_) {
@@ -50,6 +57,17 @@ namespace Torch { namespace core { namespace array {
      * Assignment
      */
     typeinfo& operator= (const typeinfo& other);
+
+    /**
+     * Builds with type and number of dimensions, but set the shape and strides
+     * to all zeros.
+     */
+    template <typename T>
+    void set(ElementType dtype_, T nd_) {
+      dtype = dtype_;
+      nd = nd_;
+      reset_shape();
+    }
 
     /**
      * Set to specific values
@@ -85,6 +103,11 @@ namespace Torch { namespace core { namespace array {
     bool is_valid() const;
 
     /**
+     * Does this has a valid shape information?
+     */
+    bool has_valid_shape() const;
+
+    /**
      * sets the shape
      */
     template <typename T> void set_shape(T nd_, const T* shape_) {
@@ -94,6 +117,11 @@ namespace Torch { namespace core { namespace array {
       for (size_t k=0; k<nd; ++k) shape[k] = shape_[k];
       update_strides();
     }
+
+    /**
+     * resets the shape to all zeros
+     */
+    void reset_shape();
 
     /**
      * Update my own stride vector. Called automatically after any use of

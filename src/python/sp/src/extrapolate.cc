@@ -1,72 +1,278 @@
 /**
- * @file src/python/sp/src/extrapolate.cc 
  * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @date Thu 17 Nov 14:30:52 2011 CET
  *
  * @brief Binds extrapolation to python 
  */
 
+#include "core/python/ndarray.h"
 #include "sp/extrapolate.h"
-#include "core/python/pycore.h"
 
 using namespace boost::python;
 namespace tp = Torch::python;
+namespace sp = Torch::sp;
+namespace ca = Torch::core::array;
 
 template <typename T, int N>
-static void extrapolateConstant(const blitz::Array<T,N>& a,
-    numeric::array b, T c) {
-  blitz::Array<T,N> b_ = tp::numpy_bz<T,N>(b);
-  Torch::sp::extrapolateConstant<T>(a, b_, c);
+static void inner_extrapolateConstant_dim_size(tp::const_ndarray a,
+    tp::ndarray b, object c) {
+  blitz::Array<T,N> b_ = b.bz<T,N>();
+  sp::extrapolateConstant<T>(a.bz<T,N>(), b_, extract<T>(c));
+}
+
+template <typename T>
+static void inner_extrapolateConstant_dim(size_t nd, tp::const_ndarray a,
+    tp::ndarray b, object c) {
+  switch (nd) {
+    case 1: return inner_extrapolateConstant_dim_size<T,1>(a,b,c);
+    case 2: return inner_extrapolateConstant_dim_size<T,2>(a,b,c);
+    default: PYTHON_ERROR(TypeError, "constant extrapolation not supported for array with %lu dimensions", nd);
+  }
+}
+
+static void extrapolateConstant(tp::const_ndarray a, tp::ndarray b, object c) {
+  const ca::typeinfo& info = a.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_extrapolateConstant_dim<bool>(info.nd, a,b,c);
+    case ca::t_int8: 
+      return inner_extrapolateConstant_dim<int8_t>(info.nd, a,b,c);
+    case ca::t_int16: 
+      return inner_extrapolateConstant_dim<int16_t>(info.nd, a,b,c);
+    case ca::t_int32: 
+      return inner_extrapolateConstant_dim<int32_t>(info.nd, a,b,c);
+    case ca::t_int64: 
+      return inner_extrapolateConstant_dim<int64_t>(info.nd, a,b,c);
+    case ca::t_uint8: 
+      return inner_extrapolateConstant_dim<uint8_t>(info.nd, a,b,c);
+    case ca::t_uint16:
+      return inner_extrapolateConstant_dim<uint16_t>(info.nd, a,b,c);
+    case ca::t_uint32: 
+      return inner_extrapolateConstant_dim<uint32_t>(info.nd, a,b,c);
+    case ca::t_uint64: 
+      return inner_extrapolateConstant_dim<uint64_t>(info.nd, a,b,c);
+    case ca::t_float32:
+      return inner_extrapolateConstant_dim<float>(info.nd, a,b,c);
+    case ca::t_float64: 
+      return inner_extrapolateConstant_dim<double>(info.nd, a,b,c);
+    case ca::t_complex64: 
+      return inner_extrapolateConstant_dim<std::complex<float> >(info.nd, a,b,c);
+    case ca::t_complex128: 
+      return inner_extrapolateConstant_dim<std::complex<double> >(info.nd, a,b,c);
+    default: PYTHON_ERROR(TypeError, "constant extrapolation not supported for array with type '%s'", info.str().c_str());
+  }
 }
 
 template <typename T, int N>
-static void extrapolateZero(const blitz::Array<T,N>& a, numeric::array b) {
-  blitz::Array<T,N> b_ = tp::numpy_bz<T,N>(b);
-  Torch::sp::extrapolateZero<T>(a, b_);
+static void inner_extrapolateZero_dim_size(tp::const_ndarray a,
+    tp::ndarray b) {
+  blitz::Array<T,N> b_ = b.bz<T,N>();
+  sp::extrapolateZero<T>(a.bz<T,N>(), b_);
+}
+
+template <typename T>
+static void inner_extrapolateZero_dim(size_t nd, tp::const_ndarray a,
+    tp::ndarray b) {
+  switch (nd) {
+    case 1: return inner_extrapolateZero_dim_size<T,1>(a,b);
+    case 2: return inner_extrapolateZero_dim_size<T,2>(a,b);
+    default: PYTHON_ERROR(TypeError, "zero extrapolation not supported for array with %lu dimensions", nd);
+  }
+}
+
+static void extrapolateZero(tp::const_ndarray a, tp::ndarray b) {
+  const ca::typeinfo& info = a.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_extrapolateZero_dim<bool>(info.nd, a,b);
+    case ca::t_int8: 
+      return inner_extrapolateZero_dim<int8_t>(info.nd, a,b);
+    case ca::t_int16: 
+      return inner_extrapolateZero_dim<int16_t>(info.nd, a,b);
+    case ca::t_int32: 
+      return inner_extrapolateZero_dim<int32_t>(info.nd, a,b);
+    case ca::t_int64: 
+      return inner_extrapolateZero_dim<int64_t>(info.nd, a,b);
+    case ca::t_uint8: 
+      return inner_extrapolateZero_dim<uint8_t>(info.nd, a,b);
+    case ca::t_uint16:
+      return inner_extrapolateZero_dim<uint16_t>(info.nd, a,b);
+    case ca::t_uint32: 
+      return inner_extrapolateZero_dim<uint32_t>(info.nd, a,b);
+    case ca::t_uint64: 
+      return inner_extrapolateZero_dim<uint64_t>(info.nd, a,b);
+    case ca::t_float32:
+      return inner_extrapolateZero_dim<float>(info.nd, a,b);
+    case ca::t_float64: 
+      return inner_extrapolateZero_dim<double>(info.nd, a,b);
+    case ca::t_complex64: 
+      return inner_extrapolateZero_dim<std::complex<float> >(info.nd, a,b);
+    case ca::t_complex128: 
+      return inner_extrapolateZero_dim<std::complex<double> >(info.nd, a,b);
+    default: PYTHON_ERROR(TypeError, "zero extrapolation not supported for array with type '%s'", info.str().c_str());
+  }
 }
 
 template <typename T, int N>
-static void extrapolateNearest(const blitz::Array<T,N>& a, numeric::array b) {
-  blitz::Array<T,N> b_ = tp::numpy_bz<T,N>(b);
-  Torch::sp::extrapolateNearest<T>(a, b_);
+static void inner_extrapolateNearest_dim_size(tp::const_ndarray a,
+    tp::ndarray b) {
+  blitz::Array<T,N> b_ = b.bz<T,N>();
+  sp::extrapolateNearest<T>(a.bz<T,N>(), b_);
+}
+
+template <typename T>
+static void inner_extrapolateNearest_dim(size_t nd, tp::const_ndarray a,
+    tp::ndarray b) {
+  switch (nd) {
+    case 1: return inner_extrapolateNearest_dim_size<T,1>(a,b);
+    case 2: return inner_extrapolateNearest_dim_size<T,2>(a,b);
+    default: PYTHON_ERROR(TypeError, "nearest extrapolation not supported for array with %lu dimensions", nd);
+  }
+}
+
+static void extrapolateNearest(tp::const_ndarray a, tp::ndarray b) {
+  const ca::typeinfo& info = a.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_extrapolateNearest_dim<bool>(info.nd, a,b);
+    case ca::t_int8: 
+      return inner_extrapolateNearest_dim<int8_t>(info.nd, a,b);
+    case ca::t_int16: 
+      return inner_extrapolateNearest_dim<int16_t>(info.nd, a,b);
+    case ca::t_int32: 
+      return inner_extrapolateNearest_dim<int32_t>(info.nd, a,b);
+    case ca::t_int64: 
+      return inner_extrapolateNearest_dim<int64_t>(info.nd, a,b);
+    case ca::t_uint8: 
+      return inner_extrapolateNearest_dim<uint8_t>(info.nd, a,b);
+    case ca::t_uint16:
+      return inner_extrapolateNearest_dim<uint16_t>(info.nd, a,b);
+    case ca::t_uint32: 
+      return inner_extrapolateNearest_dim<uint32_t>(info.nd, a,b);
+    case ca::t_uint64: 
+      return inner_extrapolateNearest_dim<uint64_t>(info.nd, a,b);
+    case ca::t_float32:
+      return inner_extrapolateNearest_dim<float>(info.nd, a,b);
+    case ca::t_float64: 
+      return inner_extrapolateNearest_dim<double>(info.nd, a,b);
+    case ca::t_complex64: 
+      return inner_extrapolateNearest_dim<std::complex<float> >(info.nd, a,b);
+    case ca::t_complex128: 
+      return inner_extrapolateNearest_dim<std::complex<double> >(info.nd, a,b);
+    default: PYTHON_ERROR(TypeError, "nearest extrapolation not supported for array with type '%s'", info.str().c_str());
+  }
 }
 
 template <typename T, int N>
-static void extrapolateCircular(const blitz::Array<T,N>& a, numeric::array b) {
-  blitz::Array<T,N> b_ = tp::numpy_bz<T,N>(b);
-  Torch::sp::extrapolateCircular<T>(a, b_);
+static void inner_extrapolateCircular_dim_size(tp::const_ndarray a,
+    tp::ndarray b) {
+  blitz::Array<T,N> b_ = b.bz<T,N>();
+  sp::extrapolateCircular<T>(a.bz<T,N>(), b_);
+}
+
+template <typename T>
+static void inner_extrapolateCircular_dim(size_t nd, tp::const_ndarray a,
+    tp::ndarray b) {
+  switch (nd) {
+    case 1: return inner_extrapolateCircular_dim_size<T,1>(a,b);
+    case 2: return inner_extrapolateCircular_dim_size<T,2>(a,b);
+    default: PYTHON_ERROR(TypeError, "circular extrapolation not supported for array with %lu dimensions", nd);
+  }
+}
+
+static void extrapolateCircular(tp::const_ndarray a, tp::ndarray b) {
+  const ca::typeinfo& info = a.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_extrapolateCircular_dim<bool>(info.nd, a,b);
+    case ca::t_int8: 
+      return inner_extrapolateCircular_dim<int8_t>(info.nd, a,b);
+    case ca::t_int16: 
+      return inner_extrapolateCircular_dim<int16_t>(info.nd, a,b);
+    case ca::t_int32: 
+      return inner_extrapolateCircular_dim<int32_t>(info.nd, a,b);
+    case ca::t_int64: 
+      return inner_extrapolateCircular_dim<int64_t>(info.nd, a,b);
+    case ca::t_uint8: 
+      return inner_extrapolateCircular_dim<uint8_t>(info.nd, a,b);
+    case ca::t_uint16:
+      return inner_extrapolateCircular_dim<uint16_t>(info.nd, a,b);
+    case ca::t_uint32: 
+      return inner_extrapolateCircular_dim<uint32_t>(info.nd, a,b);
+    case ca::t_uint64: 
+      return inner_extrapolateCircular_dim<uint64_t>(info.nd, a,b);
+    case ca::t_float32:
+      return inner_extrapolateCircular_dim<float>(info.nd, a,b);
+    case ca::t_float64: 
+      return inner_extrapolateCircular_dim<double>(info.nd, a,b);
+    case ca::t_complex64: 
+      return inner_extrapolateCircular_dim<std::complex<float> >(info.nd, a,b);
+    case ca::t_complex128: 
+      return inner_extrapolateCircular_dim<std::complex<double> >(info.nd, a,b);
+    default: PYTHON_ERROR(TypeError, "circular extrapolation not supported for array with type '%s'", info.str().c_str());
+  }
 }
 
 template <typename T, int N>
-static void extrapolateMirror(const blitz::Array<T,N>& a, numeric::array b) {
-  blitz::Array<T,N> b_ = tp::numpy_bz<T,N>(b);
-  Torch::sp::extrapolateMirror<T>(a, b_);
+static void inner_extrapolateMirror_dim_size(tp::const_ndarray a,
+    tp::ndarray b) {
+  blitz::Array<T,N> b_ = b.bz<T,N>();
+  sp::extrapolateMirror<T>(a.bz<T,N>(), b_);
 }
 
-#define EXTRAPOLATE_DEF(T) \
-  def("extrapolateConstant", &extrapolateConstant<T,1>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with a constant, given a 1D input array."); \
-  def("extrapolateZero", &extrapolateZero<T,1>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with zeros, given a 1D input array."); \
-  def("extrapolateNearest", &extrapolateNearest<T,1>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with nearest values, given a 1D input array."); \
-  def("extrapolateCircular", &extrapolateCircular<T,1>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using circular extrapolation, given a 1D input array."); \
-  def("extrapolateMirror", &extrapolateMirror<T,1>, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using mirroring, given a 1D input array."); \
-  def("extrapolateConstant", &extrapolateConstant<T,2>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array with a constant, given a 2D input array."); \
-  def("extrapolateZero", &extrapolateZero<T,2>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array with zeros, given a 2D input array."); \
-  def("extrapolateNearest", &extrapolateNearest<T,2>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array with nearest values, given a 2D input array."); \
-  def("extrapolateCircular", &extrapolateCircular<T,2>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array using circular extrapolation, given a 2D input array."); \
-  def("extrapolateMirror", &extrapolateMirror<T,2>, (arg("src"), arg("dst")), "Extrapolates the values of a 2D array using mirroring, given a 2D input array.");
+template <typename T>
+static void inner_extrapolateMirror_dim(size_t nd, tp::const_ndarray a,
+    tp::ndarray b) {
+  switch (nd) {
+    case 1: return inner_extrapolateMirror_dim_size<T,1>(a,b);
+    case 2: return inner_extrapolateMirror_dim_size<T,2>(a,b);
+    default: PYTHON_ERROR(TypeError, "mirror extrapolation not supported for array with %lu dimensions", nd);
+  }
+}
 
-void bind_sp_extrapolate()
-{
-  EXTRAPOLATE_DEF(bool)
-  EXTRAPOLATE_DEF(int8_t)
-  EXTRAPOLATE_DEF(int16_t)
-  EXTRAPOLATE_DEF(int32_t)
-  EXTRAPOLATE_DEF(int64_t)
-  EXTRAPOLATE_DEF(uint8_t)
-  EXTRAPOLATE_DEF(uint16_t)
-  EXTRAPOLATE_DEF(uint32_t)
-  EXTRAPOLATE_DEF(uint64_t)
-  EXTRAPOLATE_DEF(float)
-  EXTRAPOLATE_DEF(double)
-  EXTRAPOLATE_DEF(std::complex<float>)
-  EXTRAPOLATE_DEF(std::complex<double>)
+static void extrapolateMirror(tp::const_ndarray a, tp::ndarray b) {
+  const ca::typeinfo& info = a.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_extrapolateMirror_dim<bool>(info.nd, a,b);
+    case ca::t_int8: 
+      return inner_extrapolateMirror_dim<int8_t>(info.nd, a,b);
+    case ca::t_int16: 
+      return inner_extrapolateMirror_dim<int16_t>(info.nd, a,b);
+    case ca::t_int32: 
+      return inner_extrapolateMirror_dim<int32_t>(info.nd, a,b);
+    case ca::t_int64: 
+      return inner_extrapolateMirror_dim<int64_t>(info.nd, a,b);
+    case ca::t_uint8: 
+      return inner_extrapolateMirror_dim<uint8_t>(info.nd, a,b);
+    case ca::t_uint16:
+      return inner_extrapolateMirror_dim<uint16_t>(info.nd, a,b);
+    case ca::t_uint32: 
+      return inner_extrapolateMirror_dim<uint32_t>(info.nd, a,b);
+    case ca::t_uint64: 
+      return inner_extrapolateMirror_dim<uint64_t>(info.nd, a,b);
+    case ca::t_float32:
+      return inner_extrapolateMirror_dim<float>(info.nd, a,b);
+    case ca::t_float64: 
+      return inner_extrapolateMirror_dim<double>(info.nd, a,b);
+    case ca::t_complex64: 
+      return inner_extrapolateMirror_dim<std::complex<float> >(info.nd, a,b);
+    case ca::t_complex128: 
+      return inner_extrapolateMirror_dim<std::complex<double> >(info.nd, a,b);
+    default: PYTHON_ERROR(TypeError, "mirror extrapolation not supported for array with type '%s'", info.str().c_str());
+  }
+}
+
+void bind_sp_extrapolate() {
+
+  def("extrapolateConstant", &extrapolateConstant, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with a constant, given a 1 or 2D input array.");
+
+  def("extrapolateZero", &extrapolateZero, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with zeros, given a 1 or 2D input array.");
+
+  def("extrapolateNearest", &extrapolateNearest, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array with nearest values, given a 1 or 2D input array.");
+
+  def("extrapolateCircular", &extrapolateCircular, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using circular extrapolation, given a 1 or 2D input array.");
+
+  def("extrapolateMirror", &extrapolateMirror, (arg("src"), arg("dst")), "Extrapolates the values of a 1D array using mirroring, given a 1 or 2D input array.");
+
 }

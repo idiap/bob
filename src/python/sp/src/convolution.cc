@@ -1,68 +1,238 @@
 /**
- * @file src/python/sp/src/convolution.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author Laurent El-Shafey <Laurent.El-Shafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Thu 17 Nov 13:02:03 2011 CET
  *
  * @brief Binds convolution product to python 
  */
 
-#include <boost/python.hpp>
-
-#include "core/logging.h"
 #include "sp/convolution.h"
-
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
-static const char* CONVOLVE_DOC = "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array. The option field allows to give information about the size of the output (FULL, SAME, VALID)";
-
-template <typename T, int N>
-static void py_convolve(const blitz::Array<T,N>& a, const blitz::Array<T,N>& b, numeric::array c, const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full, const enum Torch::sp::Convolution::BorderOption e=Torch::sp::Convolution::Zero) {
-  blitz::Array<T,N> c_ = tp::numpy_bz<T,N>(c);
-  Torch::sp::convolve(a, b, c_, d, e);
+template <typename T, int N> static void inner_convolve_type_dim
+(tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, 
+ const enum Torch::sp::Convolution::SizeOption d, 
+ const enum Torch::sp::Convolution::BorderOption e) {
+  blitz::Array<T,N> c_ = c.bz<T,N>();
+  Torch::sp::convolve(a.bz<T,N>(), b.bz<T,N>(), c_, d, e);
 }
 
-template <typename T, int N>
-static void py_convolveSep(const blitz::Array<T,N>& a, const blitz::Array<T,1>& b, numeric::array c, const int d, const enum Torch::sp::Convolution::SizeOption e=Torch::sp::Convolution::Full, const enum Torch::sp::Convolution::BorderOption f=Torch::sp::Convolution::Zero) {
-  blitz::Array<T,N> c_ = tp::numpy_bz<T,N>(c);
-  Torch::sp::convolveSep(a, b, c_, d, e, f);
+template <typename T> static void inner_convolve_dim
+(size_t nd, tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c,
+ const enum Torch::sp::Convolution::SizeOption d, 
+ const enum Torch::sp::Convolution::BorderOption e) {
+  switch (nd) {
+    case 1: return inner_convolve_type_dim<T,1>(a,b,c,d,e);
+    case 2: return inner_convolve_type_dim<T,2>(a,b,c,d,e);
+    default: PYTHON_ERROR(TypeError, "non-separable convolution does not support input array with %lu dimensions", nd);
+  }
 }
 
-#define CONVOLVE_DECL(T,N) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(getConvolveOutputSize_overloads_ ## N, Torch::sp::getConvolveOutputSize<T>, 2, 3) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(getConvolveSepOutputSize_overloads_ ## N, Torch::sp::getConvolveSepOutputSize<T>, 3, 4) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_overloads_1_ ## N, (py_convolve<T,1>), 3, 5) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_overloads_2_ ## N, (py_convolve<T,2>), 3, 5) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(convolveSep_overloads_2_ ## N, (py_convolveSep<T,2>), 4, 6) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(convolveSep_overloads_3_ ## N, (py_convolveSep<T,3>), 4, 6) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(convolveSep_overloads_4_ ## N, (py_convolveSep<T,4>), 4, 6)
+static void convolve(tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, 
+ const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full, 
+ const enum Torch::sp::Convolution::BorderOption e=Torch::sp::Convolution::Zero)
+{
+  const ca::typeinfo& info = a.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_convolve_dim<bool>(info.nd, a,b,c,d,e);
+    case ca::t_int8: 
+      return inner_convolve_dim<int8_t>(info.nd, a,b,c,d,e);
+    case ca::t_int16: 
+      return inner_convolve_dim<int16_t>(info.nd, a,b,c,d,e);
+    case ca::t_int32: 
+      return inner_convolve_dim<int32_t>(info.nd, a,b,c,d,e);
+    case ca::t_int64: 
+      return inner_convolve_dim<int64_t>(info.nd, a,b,c,d,e);
+    case ca::t_uint8: 
+      return inner_convolve_dim<uint8_t>(info.nd, a,b,c,d,e);
+    case ca::t_uint16:
+      return inner_convolve_dim<uint16_t>(info.nd, a,b,c,d,e);
+    case ca::t_uint32: 
+      return inner_convolve_dim<uint32_t>(info.nd, a,b,c,d,e);
+    case ca::t_uint64: 
+      return inner_convolve_dim<uint64_t>(info.nd, a,b,c,d,e);
+    case ca::t_float32:
+      return inner_convolve_dim<float>(info.nd, a,b,c,d,e);
+    case ca::t_float64: 
+      return inner_convolve_dim<double>(info.nd, a,b,c,d,e);
+    case ca::t_complex64: 
+      return inner_convolve_dim<std::complex<float> >(info.nd, a,b,c,d,e);
+    case ca::t_complex128: 
+      return inner_convolve_dim<std::complex<double> >(info.nd, a,b,c,d,e);
+    default: PYTHON_ERROR(TypeError, "non-separable convolution computation does not support with array with type '%s'", info.str().c_str());
+  }
+}
 
-#define CONVOLVE_DEF(T,N) \
-  def("getConvolveOutputSize", (const blitz::TinyVector<int,1> (*)(const blitz::Array<T,1>&, const blitz::Array<T,1>&, const enum Torch::sp::Convolution::SizeOption))&Torch::sp::getConvolveOutputSize<T>, getConvolveOutputSize_overloads_ ## N ((arg("b"), arg("c"), arg("size_opt")="Full"), "Gets the required size of the result of a 1D convolution product")); \
-  def("getConvolveOutputSize", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const blitz::Array<T,2>&, const enum Torch::sp::Convolution::SizeOption))&Torch::sp::getConvolveOutputSize<T>, getConvolveOutputSize_overloads_ ## N ((arg("b"), arg("c"), arg("size_opt")="Full"), "Gets the required size of the result of a 2D convolution product")); \
-  def("getConvolveSepOutputSize", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const blitz::Array<T,1>&, const int, const enum Torch::sp::Convolution::SizeOption))&Torch::sp::getConvolveSepOutputSize<T>, getConvolveSepOutputSize_overloads_ ## N ((arg("b"), arg("c"), arg("dim"), arg("size_opt")="Full"), "Gets the required size of the result of a 2D separable convolution product")); \
-  def("getConvolveSepOutputSize", (const blitz::TinyVector<int,3> (*)(const blitz::Array<T,3>&, const blitz::Array<T,1>&, const int, const enum Torch::sp::Convolution::SizeOption))&Torch::sp::getConvolveSepOutputSize<T>, getConvolveSepOutputSize_overloads_ ## N ((arg("b"), arg("c"), arg("dim"), arg("size_opt")="Full"), "Gets the required size of the result of a 3D separable convolution product")); \
-  def("getConvolveSepOutputSize", (const blitz::TinyVector<int,4> (*)(const blitz::Array<T,4>&, const blitz::Array<T,1>&, const int, const enum Torch::sp::Convolution::SizeOption))&Torch::sp::getConvolveSepOutputSize<T>, getConvolveSepOutputSize_overloads_ ## N ((arg("b"), arg("c"), arg("dim"), arg("size_opt")="Full"), "Gets the required size of the result of a 4D separable convolution product")); \
-  def("convolve", &py_convolve<T,1>, convolve_overloads_1_ ## N ((arg("b"), arg("c"), arg("a"), arg("size_opt")="Full", arg("border_opt")="Zero"), CONVOLVE_DOC)); \
-  def("convolve", &py_convolve<T,2>, convolve_overloads_2_ ## N ((arg("b"), arg("c"), arg("a"), arg("size_opt")="Full", arg("border_opt")="Zero"), CONVOLVE_DOC)); \
-  def("convolveSep", &py_convolveSep<T,2>, convolveSep_overloads_2_ ## N ((arg("b"), arg("c"), arg("a"), arg("dim"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Computes the convolution product of a 2D blitz array with a 1D one, along the given dimension. (useful for separable convolution)")); \
-  def("convolveSep", &py_convolveSep<T,3>, convolveSep_overloads_3_ ## N ((arg("b"), arg("c"), arg("a"), arg("dim"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Computes the convolution product of a 3D blitz array with a 1D one, along the given dimension. (useful for separable convolution)")); \
-  def("convolveSep", &py_convolveSep<T,4>, convolveSep_overloads_4_ ## N ((arg("b"), arg("c"), arg("a"), arg("dim"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Computes the convolution product of a 4D blitz array with a 1D one, along the given dimension. (useful for separable convolution)"));
+template <typename T, int N> static object inner_convolve_size_type_dim
+(tp::const_ndarray b, tp::const_ndarray c, 
+ const enum Torch::sp::Convolution::SizeOption d) {
+  return object(Torch::sp::getConvolveOutputSize(b.bz<T,N>(), c.bz<T,N>(), d));
+}
 
-CONVOLVE_DECL(bool,bool)
-CONVOLVE_DECL(int8_t,int8)
-CONVOLVE_DECL(int16_t,int16)
-CONVOLVE_DECL(int32_t,int32)
-CONVOLVE_DECL(int64_t,int64)
-CONVOLVE_DECL(uint8_t,uint8)
-CONVOLVE_DECL(uint16_t,uint16)
-CONVOLVE_DECL(uint32_t,uint32)
-CONVOLVE_DECL(uint64_t,uint64)
-CONVOLVE_DECL(float,float32)
-CONVOLVE_DECL(double,float64)
-CONVOLVE_DECL(std::complex<float>,complex64)
-CONVOLVE_DECL(std::complex<double>,complex128)
+template <typename T> static object inner_convolve_size_dim
+(size_t nd, tp::const_ndarray b, tp::const_ndarray c,
+ const enum Torch::sp::Convolution::SizeOption d) {
+  switch (nd) {
+    case 1: return inner_convolve_size_type_dim<T,1>(b,c,d);
+    case 2: return inner_convolve_size_type_dim<T,2>(b,c,d);
+    default: PYTHON_ERROR(TypeError, "non-separable convolution does not support input array with %lu dimensions", nd);
+  }
+}
+
+static object convolve_size(tp::const_ndarray b, tp::const_ndarray c, 
+ const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full)
+{
+  const ca::typeinfo& info = b.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_convolve_size_dim<bool>(info.nd, b,c,d);
+    case ca::t_int8: 
+      return inner_convolve_size_dim<int8_t>(info.nd, b,c,d);
+    case ca::t_int16: 
+      return inner_convolve_size_dim<int16_t>(info.nd, b,c,d);
+    case ca::t_int32: 
+      return inner_convolve_size_dim<int32_t>(info.nd, b,c,d);
+    case ca::t_int64: 
+      return inner_convolve_size_dim<int64_t>(info.nd, b,c,d);
+    case ca::t_uint8: 
+      return inner_convolve_size_dim<uint8_t>(info.nd, b,c,d);
+    case ca::t_uint16:
+      return inner_convolve_size_dim<uint16_t>(info.nd, b,c,d);
+    case ca::t_uint32: 
+      return inner_convolve_size_dim<uint32_t>(info.nd, b,c,d);
+    case ca::t_uint64: 
+      return inner_convolve_size_dim<uint64_t>(info.nd, b,c,d);
+    case ca::t_float32:
+      return inner_convolve_size_dim<float>(info.nd, b,c,d);
+    case ca::t_float64: 
+      return inner_convolve_size_dim<double>(info.nd, b,c,d);
+    case ca::t_complex64: 
+      return inner_convolve_size_dim<std::complex<float> >(info.nd, b,c,d);
+    case ca::t_complex128: 
+      return inner_convolve_size_dim<std::complex<double> >(info.nd, b,c,d);
+    default: PYTHON_ERROR(TypeError, "non-separable convolution computation does not support with array with type '%s'", info.str().c_str());
+  }
+}
+
+template <typename T, int N> static void inner_convolve_sep_type_dim
+(tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, int dim,
+ const enum Torch::sp::Convolution::SizeOption d, 
+ const enum Torch::sp::Convolution::BorderOption e) {
+  blitz::Array<T,N> c_ = c.bz<T,N>();
+  Torch::sp::convolveSep(a.bz<T,N>(), b.bz<T,1>(), c_, dim, d, e);
+}
+
+template <typename T> static void inner_convolve_sep_dim
+(size_t nd, tp::const_ndarray a, tp::const_ndarray b, tp::ndarray c, int dim,
+ const enum Torch::sp::Convolution::SizeOption d, 
+ const enum Torch::sp::Convolution::BorderOption e) {
+  switch (nd) {
+    case 2: return inner_convolve_sep_type_dim<T,2>(a,b,c,dim,d,e);
+    case 3: return inner_convolve_sep_type_dim<T,3>(a,b,c,dim,d,e);
+    case 4: return inner_convolve_sep_type_dim<T,4>(a,b,c,dim,d,e);
+    default: PYTHON_ERROR(TypeError, "separable convolution does not support input array with %lu dimensions", nd);
+  }
+}
+
+static void convolve_sep(tp::const_ndarray a, tp::const_ndarray b,
+ tp::ndarray c, int dim,
+ const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full, 
+ const enum Torch::sp::Convolution::BorderOption e=Torch::sp::Convolution::Zero)
+{
+  const ca::typeinfo& info = a.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_convolve_sep_dim<bool>(info.nd, a,b,c,dim,d,e);
+    case ca::t_int8: 
+      return inner_convolve_sep_dim<int8_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_int16:
+      return inner_convolve_sep_dim<int16_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_int32: 
+      return inner_convolve_sep_dim<int32_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_int64: 
+      return inner_convolve_sep_dim<int64_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_uint8: 
+      return inner_convolve_sep_dim<uint8_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_uint16: 
+      return inner_convolve_sep_dim<uint16_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_uint32: 
+      return inner_convolve_sep_dim<uint32_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_uint64: 
+      return inner_convolve_sep_dim<uint64_t>(info.nd, a,b,c,dim,d,e);
+    case ca::t_float32:
+      return inner_convolve_sep_dim<float>(info.nd, a,b,c,dim,d,e);
+    case ca::t_float64: 
+      return inner_convolve_sep_dim<double>(info.nd, a,b,c,dim,d,e);
+    case ca::t_complex64:
+      return inner_convolve_sep_dim<std::complex<float> >(info.nd, a,b,c,dim,d,e);
+    case ca::t_complex128: 
+      return inner_convolve_sep_dim<std::complex<double> >(info.nd, a,b,c,dim,d,e);
+    default: PYTHON_ERROR(TypeError, "separable convolution computation does not support input array with type '%s'", info.str().c_str());
+  }
+}
+
+template <typename T, int N> static object inner_convolve_sep_size_type_dim
+(tp::const_ndarray b, tp::const_ndarray c, int dim,
+ const enum Torch::sp::Convolution::SizeOption d) {
+  return object(Torch::sp::getConvolveSepOutputSize(b.bz<T,N>(), c.bz<T,1>(), 
+        dim, d));
+}
+
+template <typename T> static object inner_convolve_sep_size_dim
+(size_t nd, tp::const_ndarray b, tp::const_ndarray c, int dim,
+ const enum Torch::sp::Convolution::SizeOption d) {
+  switch (nd) {
+    case 2: return inner_convolve_sep_size_type_dim<T,2>(b,c,dim,d);
+    case 3: return inner_convolve_sep_size_type_dim<T,3>(b,c,dim,d);
+    case 4: return inner_convolve_sep_size_type_dim<T,4>(b,c,dim,d);
+    default: PYTHON_ERROR(TypeError, "separable convolution does not support input array with %lu dimensions", nd);
+  }
+}
+
+static object convolve_sep_size(tp::const_ndarray b, tp::const_ndarray c,
+ int dim, const enum Torch::sp::Convolution::SizeOption d=Torch::sp::Convolution::Full)
+{
+  const ca::typeinfo& info = b.type();
+  switch (info.dtype) {
+    case ca::t_bool: 
+      return inner_convolve_sep_size_dim<bool>(info.nd, b,c,dim,d);
+    case ca::t_int8: 
+      return inner_convolve_sep_size_dim<int8_t>(info.nd, b,c,dim,d);
+    case ca::t_int16: 
+      return inner_convolve_sep_size_dim<int16_t>(info.nd, b,c,dim,d);
+    case ca::t_int32: 
+      return inner_convolve_sep_size_dim<int32_t>(info.nd, b,c,dim,d);
+    case ca::t_int64: 
+      return inner_convolve_sep_size_dim<int64_t>(info.nd, b,c,dim,d);
+    case ca::t_uint8: 
+      return inner_convolve_sep_size_dim<uint8_t>(info.nd, b,c,dim,d);
+    case ca::t_uint16:
+      return inner_convolve_sep_size_dim<uint16_t>(info.nd, b,c,dim,d);
+    case ca::t_uint32: 
+      return inner_convolve_sep_size_dim<uint32_t>(info.nd, b,c,dim,d);
+    case ca::t_uint64: 
+      return inner_convolve_sep_size_dim<uint64_t>(info.nd, b,c,dim,d);
+    case ca::t_float32:
+      return inner_convolve_sep_size_dim<float>(info.nd, b,c,dim,d);
+    case ca::t_float64: 
+      return inner_convolve_sep_size_dim<double>(info.nd, b,c,dim,d);
+    case ca::t_complex64: 
+      return inner_convolve_sep_size_dim<std::complex<float> >(info.nd, b,c,dim,d);
+    case ca::t_complex128: 
+      return inner_convolve_sep_size_dim<std::complex<double> >(info.nd, b,c,dim,d);
+    default: PYTHON_ERROR(TypeError, "separable convolution computation does not support with array with type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_overloads, convolve, 3, 5)
+BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_size_overloads, convolve_size, 2, 3)
+BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_sep_overloads, convolve_sep, 4, 6)
+BOOST_PYTHON_FUNCTION_OVERLOADS(convolve_sep_size_overloads, convolve_sep_size, 3, 4)
 
 void bind_sp_convolution()
 {
@@ -79,18 +249,11 @@ void bind_sp_convolution()
     .value("Mirror", Torch::sp::Convolution::Mirror)
     ;
  
-  CONVOLVE_DEF(bool,bool)
-  CONVOLVE_DEF(int8_t,int8)
-  CONVOLVE_DEF(int16_t,int16)
-  CONVOLVE_DEF(int32_t,int32)
-  CONVOLVE_DEF(int64_t,int64)
-  CONVOLVE_DEF(uint8_t,uint8)
-  CONVOLVE_DEF(uint16_t,uint16)
-  CONVOLVE_DEF(uint32_t,uint32)
-  CONVOLVE_DEF(uint64_t,uint64)
-  CONVOLVE_DEF(float,float32)
-  CONVOLVE_DEF(double,float64)
-  CONVOLVE_DEF(std::complex<float>,complex64)
-  CONVOLVE_DEF(std::complex<double>,complex128)
-}
+  def("convolve", &convolve, convolve_overloads((arg("b"), arg("c"), arg("a"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Compute the convolution product of two blitz arrays using zero padding and return the results as a blitz array. The option field allows to give information about the size of the output (FULL, SAME, VALID)"));
 
+  def("getconvolveoutputsize", &convolve_size, convolve_size_overloads((arg("b"), arg("c"), arg("size_opt")="full"), "gets the required size of the result of a 1 or 2D convolution product"));
+
+  def("convolveSep", &convolve_sep, convolve_sep_overloads((arg("b"), arg("c"), arg("a"), arg("dim"), arg("size_opt")="Full", arg("border_opt")="Zero"), "Computes the convolution product of a 2, 3 or 4D blitz array with a 1D one, along the given dimension. (useful for separable convolution)"));
+
+  def("getConvolveSepOutputSize", &convolve_sep_size, convolve_sep_size_overloads((arg("b"), arg("c"), arg("dim"), arg("size_opt")="Full"), "Gets the required size of the result of a 2, 3 or 4D separable convolution product"));
+}
