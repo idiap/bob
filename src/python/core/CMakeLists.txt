@@ -75,6 +75,8 @@ torch_python_install(core)
 # Our test units
 torch_python_add_test(python-core-exception-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_exception.py)
+torch_python_add_test(python-core-conversion-tests 
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_convert.py)
 
 # Installs all python scripts
 file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")

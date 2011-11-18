@@ -14,8 +14,8 @@ import math
 import measure
 import sp
 import ip
-"""
 import db
+"""
 import machine
 import trainer
 """
@@ -37,8 +37,8 @@ __all__ = [
     'measure',
     'sp',
     'ip',
-    """
     'db',
+    """
     'machine',
     'trainer'
     """
