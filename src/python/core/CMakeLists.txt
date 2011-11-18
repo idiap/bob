@@ -18,6 +18,7 @@ set(pysrc_ndarray
    "src/ndarray_numpy.cc"
    "src/tinyvector.cc"
    "src/typeinfo.cc"
+   "src/convert.cc"
    #"src/array_wrapper_example.cc"
    "src/main_ndarray.cc"
    )

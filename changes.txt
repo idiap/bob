@@ -17,3 +17,13 @@ Modifications on the syntax:
 
   There are operations that don't need migration such as sum() or mean() as
   NumPy also implements them on the ndarray object.
+* The construction torch.core.array.*.convert() is deprecated: use
+  torch.core.convert(array...)
+* The construction torch.core.array.numeq() is depreated: use
+  numpy.array_equal(a, b)
+* For array constructions:
+  numpy.ndarray(shape, type) -- uninitialzed numpy ndarray
+  numpy.zeros(shape, type)
+  numpy.ones(shape, type)
+  ...
+  numpy.array(array_like, type) -- with specific initialization

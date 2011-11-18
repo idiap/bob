@@ -25,7 +25,7 @@ def tantriggs(line, A_OUTPUT_DIR, A_OUT_H, A_OUT_W,
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(line))[0] + ".hdf5")
 
   # Save output file
-  torch.io.Array(preprocessed_img.convert('uint8', sourceRange=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
+  torch.io.Array(torch.core.array.convert(preprocessed_img, 'uint8', sourceRange=(preprocessed_img.min(), preprocessed_img.max()))).save(output_file)
   print output_file
 
 
