@@ -6,7 +6,7 @@
  * @brief Binds the Gabor filters to python
  */
 
-#include <boost/python.hpp>
+#include "core/python/ndarray.h"
 
 #include "sp/convolution.h"
 #include "ip/GaborSpatial.h"
@@ -16,12 +16,41 @@
 
 using namespace boost::python;
 namespace ip = Torch::ip;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
 static const char* gabor_spatial_doc = "Objects of this class, after configuration, can filter images with a Gabor kernel, performing the operation in the spatial domain.";
 static const char* gabor_bank_spatial_doc = "Objects of this class, after configuration, can filter images with a bank of Gabor kernels, performing the operation in the spatial domain.";
 static const char* gabor_frequency_doc = "Objects of this class, after configuration, can filter images with a Gabor kernel, performing the operation in the frequency domain.";
 static const char* gabor_bank_frequency_doc = "Objects of this class, after configuration, can filter images with a bank of Gabor kernels, performing the operation in the frequency domain.";
 
+static void call_gabsap(ip::GaborSpatial& op, tp::const_ndarray input,
+    tp::ndarray output) {
+  blitz::Array<std::complex<double>,2> output_ = 
+    output.bz<std::complex<double>,2>();
+  op(input.bz<std::complex<double>,2>(), output_);
+}
+
+static void call_gabfreq(ip::GaborFrequency& op, tp::const_ndarray input,
+    tp::ndarray output) {
+  blitz::Array<std::complex<double>,2> output_ = 
+    output.bz<std::complex<double>,2>();
+  op(input.bz<std::complex<double>,2>(), output_);
+}
+
+static void call_gabbspa(ip::GaborBankSpatial& op, tp::const_ndarray input,
+    tp::ndarray output) {
+  blitz::Array<std::complex<double>,3> output_ = 
+    output.bz<std::complex<double>,3>();
+  op(input.bz<std::complex<double>,2>(), output_);
+}
+
+static void call_gabbfreq(ip::GaborBankFrequency& op, tp::const_ndarray input,
+    tp::ndarray output) {
+  blitz::Array<std::complex<double>,3> output_ = 
+    output.bz<std::complex<double>,3>();
+  op(input.bz<std::complex<double>,2>(), output_);
+}
 
 void bind_ip_gabor() {
   enum_<Torch::ip::Gabor::NormOption>("GaborNorm")
@@ -40,7 +69,7 @@ void bind_ip_gabor() {
     .add_property("norm_option", &ip::GaborSpatial::getNormOption, &ip::GaborSpatial::setNormOption)
     .add_property("border_option", &ip::GaborSpatial::getBorderOption, &ip::GaborSpatial::setBorderOption)
     .add_property("kernel", make_function(&ip::GaborSpatial::getKernel, return_value_policy<copy_const_reference>()))
-    .def("__call__", (void (ip::GaborSpatial::*)(const blitz::Array<std::complex<double>,2>&, blitz::Array<std::complex<double>,2>&))&ip::GaborSpatial::operator(), (arg("input"), arg("output")), "Call an object of this type to filter an image.")
+    .def("__call__", &call_gabsap, (arg("input"), arg("output")), "Call an object of this type to filter an image.")
     ;
 
   class_<ip::GaborFrequency, boost::shared_ptr<ip::GaborFrequency> >("GaborFrequency", gabor_frequency_doc, init<const int, const int, optional<const double, const double, const double, const double, const double, const bool, const bool, const bool> >((arg("height"), arg("width"), arg("f")=0.25, arg("theta")=0., arg("gamma")=1., arg("eta")=1., arg("pf")=0.99, arg("cancel_dc")=false, arg("use_envelope")=false, arg("output_in_frequency")=false), "Constructs a new Gabor filter in the frequency domain."))
@@ -56,7 +85,7 @@ void bind_ip_gabor() {
     .add_property("kernel", make_function(&ip::GaborFrequency::getKernel, return_value_policy<copy_const_reference>()))
     .add_property("kernel_shifted", make_function(&ip::GaborFrequency::getKernelShifted, return_value_policy<copy_const_reference>()))
     .add_property("kernel_envelope", &ip::GaborFrequency::getKernelEnvelope)
-    .def("__call__", (void (ip::GaborFrequency::*)(const blitz::Array<std::complex<double>,2>&, blitz::Array<std::complex<double>,2>&))&ip::GaborFrequency::operator(), (arg("input"), arg("output")), "Call an object of this type to filter an image.")
+    .def("__call__", &call_gabfreq, "Call an object of this type to filter an image.")
     ;
 
   class_<ip::GaborBankSpatial, boost::shared_ptr<ip::GaborBankSpatial> >("GaborBankSpatial", gabor_bank_spatial_doc, init<optional<const int, const int, const double, const bool, const double, const double, const double, const double, const int, const bool, const enum Torch::ip::Gabor::NormOption, const enum Torch::sp::Convolution::BorderOption> >((arg("n_orient"), arg("n_freq"), arg("fmax")=0.25, arg("orientation_full")=false, arg("k")=1.414, arg("p")=0.5, arg("gamma")=1., arg("eta")=1., arg("spatial_size")=35, arg("cancel_dc")=false, arg("norm")=ip::Gabor::SpatialFactor, arg("border_opt")=Torch::sp::Convolution::Mirror), "Constructs a new Gabor filter bank in the spatial domain."))
@@ -72,7 +101,8 @@ void bind_ip_gabor() {
     .add_property("cancel_dc", &ip::GaborBankSpatial::getCancelDc, &ip::GaborBankSpatial::setCancelDc)
     .add_property("norm_option", &ip::GaborBankSpatial::getNormOption, &ip::GaborBankSpatial::setNormOption)
     .add_property("border_option", &ip::GaborBankSpatial::getBorderOption, &ip::GaborBankSpatial::setBorderOption)
-    .def("__call__", (void (ip::GaborBankSpatial::*)(const blitz::Array<std::complex<double>,2>&, blitz::Array<std::complex<double>,3>&))&ip::GaborBankSpatial::operator(), (arg("input"), arg("output")), "Call an object of this type to filter an image.")
+    .def("__call__", &call_gabbspa, (arg("input"), arg("output")), "Call an object of this type to filter an image.")
+
     ;
 
   class_<ip::GaborBankFrequency, boost::shared_ptr<ip::GaborBankFrequency> >("GaborBankFrequency", gabor_bank_frequency_doc, init<const int, const int, optional<const int, const int, const double, const bool, const double, const double, const bool, const double, const double, const double, const bool/*, const bool, const bool*/> >((arg("height"), arg("width"), arg("n_orient")=8, arg("n_freq")=5, arg("fmax")=0.25, arg("orientation_full")=false, arg("k")=1.414, arg("p")=0.5, arg("optimal_gamma_eta")=false, arg("gamma")=1., arg("eta")=1., arg("pf")=0.99, arg("cancel_dc")=false/*, arg("use_envelope")=true, arg("output_in_frequency")=false*/), "Constructs a new Gabor filter in the frequency domain."))
@@ -90,7 +120,7 @@ void bind_ip_gabor() {
     .add_property("pf", &ip::GaborBankFrequency::getPf, &ip::GaborBankFrequency::setPf)
     .add_property("cancel_dc", &ip::GaborBankFrequency::getCancelDc, &ip::GaborBankFrequency::setCancelDc)
     .add_property("use_envelope", &ip::GaborBankFrequency::getUseEnvelope, &ip::GaborBankFrequency::setUseEnvelope)
-    .def("__call__", (void (ip::GaborBankFrequency::*)(const blitz::Array<std::complex<double>,2>&, blitz::Array<std::complex<double>,3>&))&ip::GaborBankFrequency::operator(), (arg("input"), arg("output")), "Call an object of this type to filter an image.")
+    .def("__call__", &call_gabbfreq, (arg("input"), arg("output")), "Call an object of this type to filter an image.")
     ;
 
 

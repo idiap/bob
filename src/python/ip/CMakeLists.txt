@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/ipcore.cc"
    "src/color.cc"
-   "src/oldlbp.cc"
    "src/filters.cc"
    "src/block.cc"
    "src/crop_shift.cc"
@@ -42,8 +41,6 @@ target_link_libraries(pytorch_ip pytorch_core_ndarray)
 torch_python_install(ip)
   
 # Our test units
-torch_python_add_test(python-ip-lbp-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp.py)
 torch_python_add_test(python-ip-lbp-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp_new.py)
 torch_python_add_test(python-ip-filter_new-tests 

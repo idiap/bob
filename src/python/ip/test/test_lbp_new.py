@@ -11,6 +11,7 @@ import os, sys
 import unittest
 import torch
 import math
+import numpy
 
 def generate_3x3_image(image, values):
   """Generates a 3x3 image from a 9-position value vector using the following
@@ -110,7 +111,7 @@ class Processor:
     self.generator = generator
     self.x = center[0]
     self.y = center[1]
-    self.image = torch.core.array.uint8_2(3, 3)
+    self.image = numpy.ndarray((3, 3), 'uint8')
 
   def __call__(self, value):
     image = self.generator(self.image, value)

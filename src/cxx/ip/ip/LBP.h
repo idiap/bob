@@ -1,6 +1,6 @@
 /**
- * @file src/cxx/ip/ip/LBP.h
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @date Fri 18 Nov 14:52:00 2011 CET
  *
  * @brief This file defines classes to compute LBP and variants
  */
