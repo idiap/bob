@@ -10,7 +10,7 @@ import os, sys
 import unittest
 import torch
 import random
-
+import numpy
 
 def load_gray(relative_filename):
   # Please note our PNG loader will always load in RGB, but since that is a
@@ -43,29 +43,29 @@ class HistogramTest(unittest.TestCase):
     histo3 = torch.ip.histogram(input_image, 0, 255)
     histo4 = torch.ip.histogram(input_image, 0, 255, 256)
     
-    histo5 = torch.core.array.uint64_1(256)
-    histo6 = torch.core.array.uint64_1(256)
-    histo7 = torch.core.array.uint64_1(256)
-    histo8 = torch.core.array.uint64_1(256)
+    histo5 = numpy.ndarray((256,), 'uint64')
+    histo6 = numpy.ndarray((256,), 'uint64')
+    histo7 = numpy.ndarray((256,), 'uint64')
+    histo8 = numpy.ndarray((256,), 'uint64')
     
-    torch.ip.histogram(input_image, histo5)
-    torch.ip.histogram(input_image, histo6, 255)
-    torch.ip.histogram(input_image, histo7, 0, 255)
-    torch.ip.histogram(input_image, histo8, 0, 255, 256)
+    torch.ip.histogram_(input_image, histo5)
+    torch.ip.histogram_(input_image, histo6, 255)
+    torch.ip.histogram_(input_image, histo7, 0, 255)
+    torch.ip.histogram_(input_image, histo8, 0, 255, 256)
     
     # Save the computed data
     #torch.io.Array(histo1).save(os.path.join('data', 'histo','image_histo.hdf5'))
     
     histo_ref = torch.io.Array(os.path.join('data', 'histo','image_histo.hdf5')).get()
 
-    self.assertTrue(input_image.size() == histo1.sum())
-    self.assertTrue(input_image.size() == histo2.sum())
-    self.assertTrue(input_image.size() == histo3.sum())
-    self.assertTrue(input_image.size() == histo4.sum())
-    self.assertTrue(input_image.size() == histo5.sum())
-    self.assertTrue(input_image.size() == histo6.sum())
-    self.assertTrue(input_image.size() == histo7.sum())
-    self.assertTrue(input_image.size() == histo8.sum())
+    self.assertTrue(input_image.size == histo1.sum())
+    self.assertTrue(input_image.size == histo2.sum())
+    self.assertTrue(input_image.size == histo3.sum())
+    self.assertTrue(input_image.size == histo4.sum())
+    self.assertTrue(input_image.size == histo5.sum())
+    self.assertTrue(input_image.size == histo6.sum())
+    self.assertTrue(input_image.size == histo7.sum())
+    self.assertTrue(input_image.size == histo8.sum())
     self.assertTrue((histo_ref == histo1).all())
     self.assertTrue((histo_ref == histo2).all())
     self.assertTrue((histo_ref == histo3).all())
@@ -79,7 +79,7 @@ class HistogramTest(unittest.TestCase):
     """Compute the histogram of a uint16 random array"""
     
     # Generate random uint16 array
-    #input_array = torch.core.array.uint16_2(50, 70)
+    #input_array = numpy.ndarray((50, 70), 'uint16')
     #random_int(input_array, 0, 65535)
     #torch.io.Array(input_array).save(os.path.join('data', 'histo','input_uint16.hdf5'))
     
@@ -90,29 +90,29 @@ class HistogramTest(unittest.TestCase):
     histo3 = torch.ip.histogram(input_array, 0, 65535)
     histo4 = torch.ip.histogram(input_array, 0, 65535, 65536)
     
-    histo5 = torch.core.array.uint64_1(65536)
-    histo6 = torch.core.array.uint64_1(65536)
-    histo7 = torch.core.array.uint64_1(65536)
-    histo8 = torch.core.array.uint64_1(65536)
+    histo5 = numpy.ndarray((65536,), 'uint64')
+    histo6 = numpy.ndarray((65536,), 'uint64')
+    histo7 = numpy.ndarray((65536,), 'uint64')
+    histo8 = numpy.ndarray((65536,), 'uint64')
     
-    torch.ip.histogram(input_array, histo5)
-    torch.ip.histogram(input_array, histo6, 65535)
-    torch.ip.histogram(input_array, histo7, 0, 65535)
-    torch.ip.histogram(input_array, histo8, 0, 65535, 65536)
+    torch.ip.histogram_(input_array, histo5)
+    torch.ip.histogram_(input_array, histo6, 65535)
+    torch.ip.histogram_(input_array, histo7, 0, 65535)
+    torch.ip.histogram_(input_array, histo8, 0, 65535, 65536)
     
     # Save computed data
     #torch.io.Array(histo1).save(os.path.join('data', 'histo','input_uint16.histo.hdf5'))
     
     histo_ref = torch.io.Array(os.path.join('data', 'histo','input_uint16.histo.hdf5')).get()
     
-    self.assertTrue(input_array.size() == histo1.sum())
-    self.assertTrue(input_array.size() == histo2.sum())
-    self.assertTrue(input_array.size() == histo3.sum())
-    self.assertTrue(input_array.size() == histo4.sum())
-    self.assertTrue(input_array.size() == histo5.sum())
-    self.assertTrue(input_array.size() == histo6.sum())
-    self.assertTrue(input_array.size() == histo7.sum())
-    self.assertTrue(input_array.size() == histo8.sum())
+    self.assertTrue(input_array.size == histo1.sum())
+    self.assertTrue(input_array.size == histo2.sum())
+    self.assertTrue(input_array.size == histo3.sum())
+    self.assertTrue(input_array.size == histo4.sum())
+    self.assertTrue(input_array.size == histo5.sum())
+    self.assertTrue(input_array.size == histo6.sum())
+    self.assertTrue(input_array.size == histo7.sum())
+    self.assertTrue(input_array.size == histo8.sum())
     self.assertTrue((histo_ref == histo1).all())
     self.assertTrue((histo_ref == histo2).all())
     self.assertTrue((histo_ref == histo3).all())
@@ -126,24 +126,24 @@ class HistogramTest(unittest.TestCase):
     """Compute the histogram of a float random array"""
     
     # Generate random float32 array
-    #input_array = torch.core.array.float32_2(50, 70)
+    #input_array = numpy.ndarray((50, 70), 'float32')
     #random_float(input_array, 0, 1)
     #torch.io.Array(input_array).save(os.path.join('data', 'histo','input_float.hdf5'))
     
     input_array = torch.io.Array(os.path.join('data', 'histo','input_float.hdf5')).get()
     
-    histo2 = torch.core.array.uint64_1(10)
+    histo2 = numpy.ndarray((10,), 'uint64')
     
     histo1 = torch.ip.histogram(input_array, 0, 1, 10)
-    torch.ip.histogram(input_array, histo2, 0, 1, 10)
+    torch.ip.histogram_(input_array, histo2, 0, 1, 10)
     
     # Save computed data
     #torch.io.Array(histo1).save(os.path.join('data', 'histo','input_float.histo.hdf5'))
     
     histo_ref = torch.io.Array(os.path.join('data', 'histo','input_float.histo.hdf5')).get()
     
-    self.assertTrue(input_array.size() == histo1.sum())
-    self.assertTrue(input_array.size() == histo2.sum())
+    self.assertTrue(input_array.size == histo1.sum())
+    self.assertTrue(input_array.size == histo2.sum())
     self.assertTrue((histo_ref == histo1).all())
     self.assertTrue((histo_ref == histo2).all())  
 
@@ -151,24 +151,24 @@ class HistogramTest(unittest.TestCase):
     """Compute the histogram of a int32 random array"""
     
     # Generate random int32 array
-    #input_array = torch.core.array.int32_2(50, 70)
+    #input_array = numpy.ndarray((50, 70), 'int32')
     #random_int(input_array, -20,20)
     #torch.io.Array(input_array).save(os.path.join('data', 'histo','input_int32.hdf5'))
     
     input_array = torch.io.Array(os.path.join('data', 'histo','input_int32.hdf5')).get()
     
-    histo2 = torch.core.array.uint64_1(41)
+    histo2 = numpy.ndarray((41,), 'uint64')
 
     histo1 = torch.ip.histogram(input_array, -20, 20, 41)
-    torch.ip.histogram(input_array, histo2, -20, 20, 41)
+    torch.ip.histogram_(input_array, histo2, -20, 20, 41)
     
     # Save computed data
     #torch.io.Array(histo).save(os.path.join('data', 'histo','input_int32.histo.hdf5'))
     
     histo_ref = torch.io.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
     
-    self.assertTrue(input_array.size() == histo1.sum())
-    self.assertTrue(input_array.size() == histo2.sum())
+    self.assertTrue(input_array.size == histo1.sum())
+    self.assertTrue(input_array.size == histo2.sum())
     self.assertTrue((histo_ref == histo1).all())
     self.assertTrue((histo_ref == histo2).all())
     
@@ -179,19 +179,19 @@ class HistogramTest(unittest.TestCase):
     
     histo = torch.ip.histogram(input_array, -20, 20, 41)
     
-    torch.ip.histogramAccumulate(input_array, histo, -20, 20, 41)
+    torch.ip.histogram_(input_array, histo, -20, 20, 41, True)
 
     histo_ref = torch.io.Array(os.path.join('data', 'histo','input_int32.histo.hdf5')).get()
 
-    self.assertTrue(input_array.size() * 2 == histo.sum())
+    self.assertTrue(input_array.size * 2 == histo.sum())
     self.assertTrue((histo_ref * 2 == histo).all())
 
   def test06_uint16(self):
     """Simple test as described in ticket #101"""
-    x = torch.core.array.array([[-1., 1.],[-1., 1.]])
+    x = numpy.array([[-1., 1.],[-1., 1.]])
     res = torch.ip.histogram(x, -2, +2, 2)
 
-    histo_ref = torch.core.array.array([2, 2], 'uint64')
+    histo_ref = numpy.array([2, 2], 'uint64')
     self.assertTrue((histo_ref == res).all())
     
 if __name__ == '__main__':

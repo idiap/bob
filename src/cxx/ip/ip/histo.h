@@ -155,7 +155,7 @@ namespace Torch {
      * @param accumulate if true the result is added to @c histo
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, bool accumulate = false) {
+    void histogram(const blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, bool accumulate = false) {
       // GetHistoSize returns an exception if T is not uint8_t or uint16_t
       int histo_size = detail::getHistoSize<T>();
       
@@ -189,7 +189,7 @@ namespace Torch {
      * @param accumulate if true the result is added to @c histo
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins, bool accumulate = false) {
+    void histogram(const blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins, bool accumulate = false) {
       tca::ElementType element_type = Torch::core::array::getElementType<T>();
       
       // Check that the given type is supported
