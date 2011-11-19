@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
 class DrawingTest(unittest.TestCase):
   """Various drawing tests."""
@@ -16,7 +17,7 @@ class DrawingTest(unittest.TestCase):
   def test01_gray_point(self):
 
     # Tests single point drawing using gray-scaled images
-    image = torch.core.array.uint8_2(100, 100)
+    image = numpy.ndarray((100, 100), 'uint8')
     image.fill(0)
 
     # Draws a white point on the middle
@@ -26,7 +27,7 @@ class DrawingTest(unittest.TestCase):
     # Try drawing on an unexisting location, should not raise
     imcopy = image.copy()
     torch.ip.try_draw_point(imcopy, 100, 100, 255)
-    self.assertTrue(image.numeq(imcopy)) # no change is made
+    self.assertTrue( numpy.array_equal(image, imcopy) ) # no change is made
 
     # Try drawing with draw_point on an unexisting location, should raise
     self.assertRaises(IndexError, torch.ip.draw_point, imcopy, 100, 100, 255) 
@@ -35,21 +36,21 @@ class DrawingTest(unittest.TestCase):
 
     # color
     white = (255, 255, 255) #rgb
-    a1    = torch.core.array.uint8_1(3)
+    a1    = numpy.ndarray((3,), 'uint8')
     a1.fill(255) #a comparision array
 
     # Tests single point drawing using gray-scaled images
-    image = torch.core.array.uint8_3(3, 100, 100)
+    image = numpy.ndarray((3, 100, 100), 'uint8')
     image.fill(0)
 
     # Draws a white point on the middle
     torch.ip.draw_point(image, 50, 50, white)
-    self.assertTrue(image[:,50, 50].numeq(a1))
+    self.assertTrue(numpy.array_equal(image[:,50, 50],a1))
 
     # Try drawing on an unexisting location, should not raise
     imcopy = image.copy()
     torch.ip.try_draw_point(imcopy, 100, 100, white)
-    self.assertTrue(image.numeq(imcopy)) # no change is made
+    self.assertTrue(numpy.array_equal(image, imcopy)) # no change is made
 
     # Try drawing with draw_point on an unexisting location, should raise
     self.assertRaises(IndexError, torch.ip.draw_point, imcopy, 100, 100, white)
@@ -59,7 +60,7 @@ class DrawingTest(unittest.TestCase):
     # draws a gray line, test to see if works; note the same algorithm is used
     # for color line plotting, so we only test the gray one.
 
-    image = torch.core.array.uint8_2(100, 100)
+    image = numpy.ndarray((100, 100), 'uint8')
     image.fill(0)
 
     # Draws a white line on the middle (horizontal)
@@ -87,7 +88,7 @@ class DrawingTest(unittest.TestCase):
     # draws a box on the image, only test gray as color uses the same
     # algorithm.
 
-    image = torch.core.array.uint8_2(100, 100)
+    image = numpy.ndarray((100, 100), 'uint8')
     image.fill(0)
 
     # Draws a white line on the middle (horizontal)
