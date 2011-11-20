@@ -2,7 +2,6 @@ project(machine-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
-   "src/exception.cc"
    "src/gmm.cc"
    "src/activation.cc"
    "src/linear.cc"
@@ -16,8 +15,10 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(machine "${pysrc}")
-add_dependencies(pytorch_machine python-core_header_install machine-cxx_header_install)
-target_link_libraries(pytorch_machine pytorch_core_utils)
+
+add_dependencies(pytorch_machine python-core_header_install)
+target_link_libraries(pytorch_machine pytorch_core_ndarray)
+
 torch_python_install(machine)
   
 # Our test units

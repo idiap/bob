@@ -1,30 +1,37 @@
+/**
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @date Sun 20 Nov 20:27:26 2011 CET
+ *
+ * @brief Binds ZT-normalization to python
+ */
+
+#include "core/python/ndarray.h"
+
 #include <boost/python.hpp>
 #include <machine/ZTNorm.h>
-
-#include "core/python/pycore.h"
 
 using namespace boost::python;
 namespace tp = Torch::python;
 
-static blitz::Array<double, 2> ztnorm1(
-    numeric::array eval_tests_on_eval_models,
-    numeric::array znorm_tests_on_eval_models,
-    numeric::array eval_tests_on_tnorm_models,
-    numeric::array znorm_tests_on_tnorm_models,
-    numeric::array znorm_tests_tnorm_models_same_spk_ids) {
-
-  blitz::Array<double,2> eval_tests_on_eval_models_ = 
-    tp::numpy_bz<double,2>(eval_tests_on_eval_models);
-  blitz::Array<double,2> znorm_tests_on_eval_models_ =
-    tp::numpy_bz<double,2>(znorm_tests_on_eval_models);
-  blitz::Array<double,2> eval_tests_on_tnorm_models_ = 
-    tp::numpy_bz<double,2>(eval_tests_on_tnorm_models);
-  blitz::Array<double,2> znorm_tests_on_tnorm_models_ =
-    tp::numpy_bz<double,2>(znorm_tests_on_tnorm_models);
-  blitz::Array<bool,2> znorm_tests_tnorm_models_same_spk_ids_ = 
-    tp::numpy_bz<bool,2>(znorm_tests_tnorm_models_same_spk_ids);
+static object ztnorm1(
+    tp::const_ndarray eval_tests_on_eval_models,
+    tp::const_ndarray znorm_tests_on_eval_models,
+    tp::const_ndarray eval_tests_on_tnorm_models,
+    tp::const_ndarray znorm_tests_on_tnorm_models,
+    tp::const_ndarray znorm_tests_tnorm_models_same_spk_ids) {
 
   blitz::Array<double, 2> ret;
+
+  blitz::Array<double,2> eval_tests_on_eval_models_ = 
+    eval_tests_on_eval_models.bz<double,2>();
+  blitz::Array<double,2> znorm_tests_on_eval_models_ =
+    znorm_tests_on_eval_models.bz<double,2>();
+  blitz::Array<double,2> eval_tests_on_tnorm_models_ = 
+    eval_tests_on_tnorm_models.bz<double,2>();
+  blitz::Array<double,2> znorm_tests_on_tnorm_models_ =
+    znorm_tests_on_tnorm_models.bz<double,2>();
+  blitz::Array<bool,2> znorm_tests_tnorm_models_same_spk_ids_ =
+    znorm_tests_tnorm_models_same_spk_ids.bz<bool,2>();
 
   Torch::machine::ztNorm(eval_tests_on_eval_models_,
                          znorm_tests_on_eval_models_,
@@ -33,25 +40,25 @@ static blitz::Array<double, 2> ztnorm1(
                          znorm_tests_tnorm_models_same_spk_ids_,
                          ret);
 
-  return ret;
+  return object(ret); //full copy!
 }
 
-static blitz::Array<double, 2> ztnorm2(
-    numeric::array eval_tests_on_eval_models,
-    numeric::array znorm_tests_on_eval_models,
-    numeric::array eval_tests_on_tnorm_models,
-    numeric::array znorm_tests_on_tnorm_models) {
+static object ztnorm2(
+    tp::const_ndarray eval_tests_on_eval_models,
+    tp::const_ndarray znorm_tests_on_eval_models,
+    tp::const_ndarray eval_tests_on_tnorm_models,
+    tp::const_ndarray znorm_tests_on_tnorm_models) {
 
   blitz::Array<double,2> eval_tests_on_eval_models_ = 
-    tp::numpy_bz<double,2>(eval_tests_on_eval_models);
+    eval_tests_on_eval_models.bz<double,2>();
   blitz::Array<double,2> znorm_tests_on_eval_models_ =
-    tp::numpy_bz<double,2>(znorm_tests_on_eval_models);
+    znorm_tests_on_eval_models.bz<double,2>();
   blitz::Array<double,2> eval_tests_on_tnorm_models_ = 
-    tp::numpy_bz<double,2>(eval_tests_on_tnorm_models);
+    eval_tests_on_tnorm_models.bz<double,2>();
   blitz::Array<double,2> znorm_tests_on_tnorm_models_ =
-    tp::numpy_bz<double,2>(znorm_tests_on_tnorm_models);
+    znorm_tests_on_tnorm_models.bz<double,2>();
 
-  blitz::Array<double, 2> ret;
+  blitz::Array<double, 2> ret; //full copy!
 
   Torch::machine::ztNorm(eval_tests_on_eval_models_,
                          znorm_tests_on_eval_models_,
@@ -59,7 +66,7 @@ static blitz::Array<double, 2> ztnorm2(
                          znorm_tests_on_tnorm_models_,
                          ret);
 
-  return ret;
+  return object(ret);
 }
 
 void bind_machine_ztnorm() {

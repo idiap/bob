@@ -5,7 +5,7 @@
 #include "machine/GMMMachine.h"
 #include "machine/GMMLLRMachine.h"
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace io = Torch::io;
@@ -54,14 +54,14 @@ static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
 }
 
 static void gmmmach_getmeansupervector(const mach::GMMMachine& m,
-    numeric::array a) {
-  blitz::Array<double,1> a_ = tp::numpy_bz<double,1>(a);
+    tp::ndarray a) {
+  blitz::Array<double,1> a_ = a.bz<double,1>();
   m.getMeanSupervector(a_);
 }
 
 static void gmmmach_getvariancesupervector(const mach::GMMMachine& m,
-    numeric::array a) {
-  blitz::Array<double,1> a_ = tp::numpy_bz<double,1>(a);
+    tp::ndarray a) {
+  blitz::Array<double,1> a_ = a.bz<double,1>();
   m.getVarianceSupervector(a_);
 }
 

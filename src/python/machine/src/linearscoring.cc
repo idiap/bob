@@ -2,7 +2,7 @@
 #include <machine/LinearScoring.h>
 #include <vector>
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
 namespace tp = Torch::python;
@@ -33,8 +33,8 @@ static blitz::Array<double, 2> linearScoring(list models,
     Torch::machine::linearScoring(models_c, ubm, test_stats_c, 0, frame_length_normalisation, ret);
   }
   else { //object is not None => must by a 2D double array
-    numeric::array tmp = extract<numeric::array>(test_channelOffset);
-    blitz::Array<double, 2> test_channelOffset_ = tp::numpy_bz<double,2>(tmp); //wrap
+    tp::ndarray tmp = extract<tp::ndarray>(test_channelOffset);
+    blitz::Array<double, 2> test_channelOffset_ = tmp.bz<double,2>(); //wrap
     Torch::machine::linearScoring(models_c, ubm, test_stats_c, &test_channelOffset_, frame_length_normalisation, ret);
   }
   

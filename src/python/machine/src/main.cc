@@ -7,9 +7,8 @@
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
-void bind_machine_exception();
 void bind_machine_gmm();
 void bind_machine_activation();
 void bind_machine_linear();
@@ -22,7 +21,6 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
 {
   Torch::python::setup_python("Torch classes and sub-classes for machine access");
 
-  bind_machine_exception();
   bind_machine_gmm();
   bind_machine_activation();
   bind_machine_linear();

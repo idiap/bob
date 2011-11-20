@@ -30,8 +30,9 @@ set_target_properties(pytorch_visioner PROPERTIES LINK_FLAGS "${save} -L${baseli
 # Visioner depends on Qt4
 include (${QT_USE_FILE})
 
-target_link_libraries(pytorch_visioner pytorch_core_utils)
-add_dependencies(pytorch_visioner python-core_header_install visioner)
+add_dependencies(pytorch_visioner python-core_header_install)
+target_link_libraries(pytorch_visioner pytorch_core_ndarray)
+
 torch_python_install(visioner)
   
 # Our test units

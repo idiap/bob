@@ -7,9 +7,8 @@
  * @brief Combines all modules to make up the complete bindings
  */
 
-#include "core/python/pycore.h"
+#include "core/python/ndarray.h"
 
-void bind_trainer_exception();
 void bind_trainer_linear();
 void bind_trainer_gmm();
 void bind_trainer_kmeans();
@@ -21,7 +20,6 @@ BOOST_PYTHON_MODULE(libpytorch_trainer) {
 
   Torch::python::setup_python("Torch classes and sub-classes for trainers");
   
-  bind_trainer_exception();
   bind_trainer_linear();
   bind_trainer_gmm();
   bind_trainer_kmeans();
