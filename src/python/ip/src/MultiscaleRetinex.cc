@@ -13,8 +13,6 @@ namespace ip = Torch::ip;
 namespace tp = Torch::python;
 namespace ca = Torch::core::array;
 
-static const char* msr_doc = "Applies the Multiscale Retinex algorithm";
-
 template <typename T> static void inner_call (ip::MultiscaleRetinex& obj, 
     tp::const_ndarray input, tp::ndarray output) {
   blitz::Array<double,2> output_ = output.bz<double,2>();
@@ -33,7 +31,7 @@ static void py_call (ip::MultiscaleRetinex& obj, tp::const_ndarray input,
 }
 
 void bind_ip_msr() {
-	class_<ip::MultiscaleRetinex, boost::shared_ptr<ip::MultiscaleRetinex> >("MultiscaleRetinex", msr_doc, init<optional<const size_t, const int, const int, const double> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=5.), "Creates a MultiscaleRetinex object."))
+	class_<ip::MultiscaleRetinex, boost::shared_ptr<ip::MultiscaleRetinex> >("MultiscaleRetinex", "Applies the Multiscale Retinex algorithm", init<optional<const size_t, const int, const int, const double> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma")=5.), "Creates a MultiscaleRetinex object."))
 		.def("__call__", &py_call, (arg("self"), arg("src"), arg("dst")), "Applies the Multiscale Retinex algorithm to an image of type uint8, uint16 or double")
 		;
 }

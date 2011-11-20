@@ -7,22 +7,13 @@
 
 #include <boost/python.hpp>
 
-//#include "ip/ipCrop.h"
-//#include "ip/ipFlip.h"
-//#include "ip/ipHisto.h"
 #include "ip/ipHistoEqual.h"
-//#include "ip/ipIntegral.h"
 #include "ip/ipMSRSQIGaussian.h"
 #include "ip/ipMultiscaleRetinex.h"
 #include "ip/ipRelaxation.h"
-//#include "ip/ipRescaleGray.h"
-//#include "ip/ipRotate.h"
-//#include "ip/ipScaleYX.h"
 #include "ip/ipSelfQuotientImage.h"
-//#include "ip/ipShift.h"
 #include "ip/ipSmoothGaussian.h"
 #include "ip/ipSobel.h"
-//#include "ip/ipTanTriggs.h"
 #include "ip/ipVcycle.h"
 
 using namespace boost::python;

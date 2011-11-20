@@ -1,76 +1,120 @@
 /**
- * @file src/python/ip/src/scale.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Sun 20 Nov 18:57:07 2011 CET
  *
  * @brief Binds scaling operation to python 
  */
 
-#include <boost/python.hpp>
-
+#include "core/python/ndarray.h"
 #include "ip/scale.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ip = Torch::ip;
+namespace ca = Torch::core::array;
 
-static const char* SCALEAS_DOC = "Gives back a scaled version of the original blitz array (image)";
-static const char* SCALE2D_DOC = "Rescale a 2D blitz array/image with the given dimensions.";
-static const char* SCALE2D_MASK_DOC = "Rescale a 2D blitz array/image with the given dimensions, taking mask into account.";
+template <typename T, int N>
+static void inner_scale (tp::const_ndarray src, tp::ndarray dst,
+    ip::Rescale::Algorithm algo) {
+  blitz::Array<double,N> dst_ = dst.bz<double,N>();
+  ip::scale<T>(src.bz<T,N>(), dst_, algo);
+}
 
+static void scale (tp::const_ndarray src, tp::ndarray dst,
+    ip::Rescale::Algorithm algo=ip::Rescale::BilinearInterp) {
 
-#define SCALE_DECL(T,N) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(scale_overloads_ ## N, Torch::ip::scale<T>, 2, 3) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(scale_mask_overloads_ ## N, Torch::ip::scale<T>, 4, 5) \
+  const ca::typeinfo& info = src.type();
 
-#define SCALE_DEF(T,N) \
-  def("scale", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const enum Torch::ip::Rescale::Algorithm))&Torch::ip::scale<T>, scale_overloads_ ## N ((arg("src"), arg("dst"), arg("algorithm")="BilinearInterp"), SCALE2D_DOC)); \
-  def("scale", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<double,2>&, blitz::Array<bool,2>&, const enum Torch::ip::Rescale::Algorithm))&Torch::ip::scale<T>, scale_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("algorithm")="BilinearInterp"), SCALE2D_MASK_DOC)); \
-	def("scaleAs", (blitz::Array<T,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::scaleAs<T>, (arg("original"), arg("scale_factor")), SCALEAS_DOC); \
-	def("scaleAs", (blitz::Array<T,3> (*)(const blitz::Array<T,3>&, const double))&Torch::ip::scaleAs<T>, (arg("original"), arg("scale_factor")), SCALEAS_DOC); \
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "image scaling does not support type '%s'", info.str().c_str());
 
-/*
-SCALE_DECL(bool,bool)
-SCALE_DECL(int8_t,int8)
-SCALE_DECL(int16_t,int16)
-SCALE_DECL(int32_t,int32)
-SCALE_DECL(int64_t,int64)
-*/
-SCALE_DECL(uint8_t,uint8)
-SCALE_DECL(uint16_t,uint16)
-/*
-SCALE_DECL(uint32_t,uint32)
-SCALE_DECL(uint64_t,uint64)
-SCALE_DECL(float,float32)
-*/
-SCALE_DECL(double,float64)
-/*
-SCALE_DECL(std::complex<float>,complex64)
-SCALE_DECL(std::complex<double>,complex128)
-*/
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_scale<uint8_t,2>(src, dst, algo);
+    case ca::t_uint16:
+      return inner_scale<uint16_t,2>(src, dst, algo);
+    case ca::t_float64:
+      return inner_scale<double,2>(src, dst, algo);
+    default:
+      PYTHON_ERROR(TypeError, "image scaling does not support type '%s'", info.str().c_str());
+  }
 
+}
 
-void bind_ip_scale()
-{
+BOOST_PYTHON_FUNCTION_OVERLOADS(scale_overloads, scale, 2, 3) 
+
+template <typename T, int N>
+static void inner_scale2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask, ip::Rescale::Algorithm algo) {
+  blitz::Array<double,N> dst_ = dst.bz<double,N>();
+  blitz::Array<bool,N> dmask_ = dmask.bz<bool,N>();
+  ip::scale<T>(src.bz<T,N>(), smask.bz<bool,N>(), dst_, dmask_, algo);
+}
+
+static void scale2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask,
+    ip::Rescale::Algorithm algo=ip::Rescale::BilinearInterp) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "image scaling does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_scale2<uint8_t,2>(src, smask, dst, dmask, algo);
+    case ca::t_uint16:
+      return inner_scale2<uint16_t,2>(src, smask, dst, dmask, algo);
+    case ca::t_float64:
+      return inner_scale2<double,2>(src, smask, dst, dmask, algo);
+    default:
+      PYTHON_ERROR(TypeError, "image scaling does not support type '%s'", info.str().c_str());
+  }
+
+}
+
+template <typename T, int N>
+static object inner_scale_as (tp::const_ndarray src, double f) {
+  return object(ip::scaleAs<T>(src.bz<T,N>(), f)); //copying!
+}
+
+template <typename T>
+static object inner_scale_as_dim (tp::const_ndarray src, double f) {
+  const ca::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_scale_as<T,2>(src, f);
+    case 3: return inner_scale_as<T,3>(src, f);
+    default:
+      PYTHON_ERROR(TypeError, "image scaling does not support type '%s'", info.str().c_str());
+  }
+}
+
+static object scale_as (tp::const_ndarray src, double f) {
+  const ca::typeinfo& info = src.type();
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_scale_as_dim<uint8_t>(src, f);
+    case ca::t_uint16:
+      return inner_scale_as_dim<uint16_t>(src, f);
+    case ca::t_float64:
+      return inner_scale_as_dim<double>(src, f);
+    default:
+      PYTHON_ERROR(TypeError, "image scaling does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(scale2_overloads, scale2, 4, 5)
+
+void bind_ip_scale() {
   enum_<Torch::ip::Rescale::Algorithm>("RescaleAlgorithm")
     .value("NearesetNeighbour", Torch::ip::Rescale::NearestNeighbour)
     .value("BilinearInterp", Torch::ip::Rescale::BilinearInterp)
     ;
 
-/*
-  SCALE_DEF(bool,bool)
-  SCALE_DEF(int8_t,int8)
-  SCALE_DEF(int16_t,int16)
-  SCALE_DEF(int32_t,int32)
-  SCALE_DEF(int64_t,int64)
-*/
-  SCALE_DEF(uint8_t,uint8)
-  SCALE_DEF(uint16_t,uint16)
-/*
-  SCALE_DEF(uint32_t,uint32)
-  SCALE_DEF(uint64_t,uint64)
-  SCALE_DEF(float,float32)
-*/
-  SCALE_DEF(double,float64)
-/*
-  SCALE_DEF(std::complex<float>,complex64)
-  SCALE_DEF(std::complex<double>,complex128)
-*/
+  def("scale", &scale, scale_overloads((arg("src"), arg("dst"), arg("algorithm")="BilinearInterp"), "Rescale a 2D array/image with the given dimensions."));
+
+  def("scale", &scale2, scale2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("algorithm")="BilinearInterp"), "Rescale a 2D array/image with the given dimensions, taking mask into account."));
+
+	def("scaleAs", &scale_as, (arg("original"), arg("scale_factor")), "Gives back a scaled version of the original 2 or 3D array (image)");
 }

@@ -5,37 +5,39 @@
  * @brief Binds gamma correction into python 
  */
 
-#include <boost/python.hpp>
 
+#include "core/python/ndarray.h"
 #include "ip/gammaCorrection.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ip = Torch::ip;
+namespace ca = Torch::core::array;
 
-static const char* GAMMACORRECTION2D_DOC = "Perform a power-law gamma correction on a 2D blitz array/image.";
+template <typename T, int N>
+static void inner_gammaCorrection (tp::const_ndarray src, tp::ndarray dst,
+    double g) {
+  blitz::Array<double,N> dst_ = dst.bz<double,N>();
+  ip::gammaCorrection<T>(src.bz<T,N>(), dst_, g);
+}
 
+static void gammaCorrection (tp::const_ndarray src, tp::ndarray dst, double g) {
+  const ca::typeinfo& info = src.type();
 
-#define GAMMACORRECTION_DEF(T,N) \
-  def("gammaCorrection", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double))&Torch::ip::gammaCorrection<T>, (arg("src"), arg("dst"), arg("gamma")), GAMMACORRECTION2D_DOC); \
+  if (info.nd != 2) PYTHON_ERROR(TypeError, "gamma correction does not support input of type '%s'", info.str().c_str());
 
-void bind_ip_gamma_correction()
-{
-/*
-  GAMMACORRECTION_DEF(bool,bool)
-  GAMMACORRECTION_DEF(int8_t,int8)
-  GAMMACORRECTION_DEF(int16_t,int16)
-  GAMMACORRECTION_DEF(int32_t,int32)
-  GAMMACORRECTION_DEF(int64_t,int64)
-*/
-  GAMMACORRECTION_DEF(uint8_t,uint8)
-  GAMMACORRECTION_DEF(uint16_t,uint16)
-/*
-  GAMMACORRECTION_DEF(uint32_t,uint32)
-  GAMMACORRECTION_DEF(uint64_t,uint64)
-  GAMMACORRECTION_DEF(float,float32)
-*/
-  GAMMACORRECTION_DEF(double,float64)
-/*
-  GAMMACORRECTION_DEF(std::complex<float>,complex64)
-  GAMMACORRECTION_DEF(std::complex<double>,complex128)
-*/
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_gammaCorrection<uint8_t,2>(src, dst, g);
+    case ca::t_uint16:
+      return inner_gammaCorrection<uint16_t,2>(src, dst, g);
+    case ca::t_float64:
+      return inner_gammaCorrection<double,2>(src, dst, g);
+    default:
+      PYTHON_ERROR(TypeError, "gamma correction does not support type '%s'", info.str().c_str());
+  }
+}
+
+void bind_ip_gamma_correction() {
+  def("gammaCorrection", &gammaCorrection, (arg("src"), arg("dst"), arg("gamma")), "Perform a power-law gamma correction on a 2D blitz array/image.");
 }

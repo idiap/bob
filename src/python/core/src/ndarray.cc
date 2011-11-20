@@ -635,6 +635,8 @@ static boost::shared_ptr<void> shared_from_ndarray (bp::object& o) {
 tp::py_array::py_array(bp::object o, bp::object _dtype):
   m_is_numpy(true)
 {
+  if (o.is_none()) PYTHON_ERROR(TypeError, "You cannot pass 'None' as input parameter to C++-bound Torch methods that expect NumPy ndarrays (or blitz::Array<T,N>'s). Double-check your input!");
+
   bp::object mine = try_refer_ndarray(o, _dtype);
 
   //captures data from a numeric::array

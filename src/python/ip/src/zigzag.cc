@@ -21,7 +21,7 @@ static void inner_zigzag(tp::const_ndarray src, tp::ndarray dst, int nc,
   ip::zigzag<T>(src.bz<T,2>(), dst_, nc, rf);
 }
 
-static void zigzag (tp::const_ndarray src, tp::const_ndarray dst,
+static void zigzag (tp::const_ndarray src, tp::ndarray dst,
     int nc=0, bool rf=false) {
   
   const ca::typeinfo& info = src.type();

@@ -35,9 +35,16 @@ Arrayset.__eq__ = arrayset_eq
 
 def arrayset_cat(self, axis=-1):
   """Concatenates all data from all individual arrays to create a N+1
-  dimensional output array. You can choose which dimension to for the
+  dimensional output array. You can choose which dimension to use for the
   concatenation. By default, we use the last dimension (axis=-1)."""
-  pass
+
+  if axis == -1: axis = self.type.nd
+
+  if axis == 0: return numpy.hstack([k for k in self])
+  elif axis == 1: return numpy.vstack([k for k in self])
+  elif axis == 2: return numpy.dstack([k for k in self])
+  else:
+    raise RuntimeError, "Arrayset concatenation can only be performed on axis 0 (horizontally), 1 (vertically) or 2 (depth)"
 
 Arrayset.cat = arrayset_cat
 
