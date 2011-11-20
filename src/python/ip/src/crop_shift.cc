@@ -1,83 +1,175 @@
 /**
- * @file src/python/ip/src/crop_shift.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @Sun 20 Nov 17:13:34 2011 CET
  *
  * @brief Binds crop and shift operations into python 
  */
 
-#include <boost/python.hpp>
-
+#include "core/python/ndarray.h"
 #include "ip/crop.h"
 #include "ip/shift.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ip = Torch::ip;
+namespace ca = Torch::core::array;
 
-static const char* CROP2D_DOC = "Crop a 2D blitz array/image.";
-static const char* CROP2D_MASK_DOC = "Crop a 2D blitz array/image, taking mask into account.";
-static const char* CROP3D_DOC = "Crop a 3D blitz array/image.";
-static const char* CROP3D_MASK_DOC = "Crop a 3D blitz array/image, taking mask into account.";
-static const char* SHIFT2D_DOC = "Shift a 2D blitz array/image.";
-static const char* SHIFT2D_MASK_DOC = "Shift a 2D blitz array/image, taking mask into account.";
-static const char* SHIFT3D_DOC = "Shift a 3D blitz array/image.";
-static const char* SHIFT3D_MASK_DOC = "Shift a 3D blitz array/image, taking mask into account.";
+template <typename T, int N>
+static void inner_crop1 (tp::const_ndarray src, tp::ndarray dst,
+    int y, int x, int h, int w, bool allow_out, bool zero_out) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  ip::crop<T>(src.bz<T,N>(), dst_, y, x, h, w, allow_out, zero_out);
+}
 
-#define CROPSHIFT_DECL(T,N) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(crop_overloads_ ## N, Torch::ip::crop<T>, 6, 8) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(crop_mask_overloads_ ## N, Torch::ip::crop<T>, 8, 10) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(shift_overloads_ ## N, Torch::ip::shift<T>, 4, 6) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(shift_mask_overloads_ ## N, Torch::ip::shift<T>, 6, 8)
+template <typename T>
+static void inner_crop1_dim (tp::const_ndarray src, tp::ndarray dst,
+    int y, int x, int h, int w, bool allow_out, bool zero_out) {
+  const ca::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_crop1<T,2>(src, dst, y, x, h, w, allow_out, zero_out);
+    case 3: return inner_crop1<T,3>(src, dst, y, x, h, w, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "cropping does not support type '%s'", info.str().c_str());
+  }
+}
 
-#define CROPSHIFT_DEF(T,N) \
-  def("crop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), CROP2D_DOC)); \
-  def("crop", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<T,2>&, blitz::Array<bool,2>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), CROP2D_MASK_DOC)); \
-  def("crop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_overloads_ ## N ((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), CROP3D_DOC)); \
-  def("crop", (void (*)(const blitz::Array<T,3>&, const blitz::Array<bool,3>&, blitz::Array<T,3>&, blitz::Array<bool,3>&, const int, const int, const int, const int, const bool, const bool))&Torch::ip::crop<T>, crop_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), CROP3D_MASK_DOC)); \
-  def("shift", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")=false, arg("zero_out")=false), SHIFT2D_DOC)); \
-  def("shift", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<T,2>&, blitz::Array<bool,2>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("shift_y"), arg("shift_x"), arg("allow_out")=false, arg("zero_out")=false), SHIFT2D_MASK_DOC)); \
-  def("shift", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_overloads_ ## N ((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")=false, arg("zero_out")=false), SHIFT3D_DOC)); \
-  def("shift", (void (*)(const blitz::Array<T,3>&, const blitz::Array<bool,3>&, blitz::Array<T,3>&, blitz::Array<bool,3>&, const int, const int, const bool, const bool))&Torch::ip::shift<T>, shift_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("shift_y"), arg("shift_x"), arg("allow_out")=false, arg("zero_out")=false), SHIFT3D_MASK_DOC)); \
+static void crop1 (tp::const_ndarray src, tp::ndarray dst,
+    int y, int x, int h, int w, bool allow_out=false, bool zero_out=false) {
+  const ca::typeinfo& info = src.type();
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_crop1_dim<uint8_t>(src, dst, y,x,h,w, allow_out, zero_out);
+    case ca::t_uint16:
+      return inner_crop1_dim<uint16_t>(src, dst, y,x,h,w, allow_out, zero_out);
+    case ca::t_float64:
+      return inner_crop1_dim<double>(src, dst, y,x,h,w, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "cropping does not support type '%s'", info.str().c_str());
+  }
+}
 
+BOOST_PYTHON_FUNCTION_OVERLOADS(crop1_overloads, crop1, 6, 8)
 
-/*
-CROPSHIFT_DECL(bool,bool)
-CROPSHIFT_DECL(int8_t,int8)
-CROPSHIFT_DECL(int16_t,int16)
-CROPSHIFT_DECL(int32_t,int32)
-CROPSHIFT_DECL(int64_t,int64)
-*/
-CROPSHIFT_DECL(uint8_t,uint8)
-CROPSHIFT_DECL(uint16_t,uint16)
-/*
-CROPSHIFT_DECL(uint32_t,uint32)
-CROPSHIFT_DECL(uint64_t,uint64)
-CROPSHIFT_DECL(float,float32)
-*/
-CROPSHIFT_DECL(double,float64)
-/*
-CROPSHIFT_DECL(std::complex<float>,complex64)
-CROPSHIFT_DECL(std::complex<double>,complex128)
-*/
+template <typename T, int N>
+static void inner_crop2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask,
+    int y, int x, int h, int w, bool allow_out, bool zero_out) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  blitz::Array<bool,N> dmask_ = dmask.bz<bool,N>();
+  ip::crop<T>(src.bz<T,N>(), smask.bz<bool,N>(), dst_, dmask_, y, x, h, w, allow_out, zero_out);
+}
 
+template <typename T>
+static void inner_crop2_dim (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask,
+    int y, int x, int h, int w, bool allow_out, bool zero_out) {
+  const ca::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_crop2<T,2>(src, smask, dst, dmask, y, x, h, w, allow_out, zero_out);
+    case 3: return inner_crop2<T,3>(src, smask, dst, dmask, y, x, h, w, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "cropping does not support type '%s'", info.str().c_str());
+  }
+}
 
-void bind_ip_crop_shift()
-{
-/*
-  CROPSHIFT_DEF(bool,bool)
-  CROPSHIFT_DEF(int8_t,int8)
-  CROPSHIFT_DEF(int16_t,int16)
-  CROPSHIFT_DEF(int32_t,int32)
-  CROPSHIFT_DEF(int64_t,int64)
-*/
-  CROPSHIFT_DEF(uint8_t,uint8)
-  CROPSHIFT_DEF(uint16_t,uint16)
-/*
-  CROPSHIFT_DEF(uint32_t,uint32)
-  CROPSHIFT_DEF(uint64_t,uint64)
-  CROPSHIFT_DEF(float,float32)
-*/
-  CROPSHIFT_DEF(double,float64)
-/*
-  CROPSHIFT_DEF(std::complex<float>,complex64)
-  CROPSHIFT_DEF(std::complex<double>,complex128)
-*/
+static void crop2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask,
+    int y, int x, int h, int w, bool allow_out=false, bool zero_out=false) {
+  const ca::typeinfo& info = src.type();
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_crop2_dim<uint8_t>(src, smask, dst, dmask, y,x,h,w, allow_out, zero_out);
+    case ca::t_uint16:
+      return inner_crop2_dim<uint16_t>(src, smask, dst, dmask, y,x,h,w, allow_out, zero_out);
+    case ca::t_float64:
+      return inner_crop2_dim<double>(src, smask, dst, dmask, y,x,h,w, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "cropping does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(crop2_overloads, crop2, 8, 10)
+
+template <typename T, int N>
+static void inner_shift1 (tp::const_ndarray src, tp::ndarray dst,
+    int y, int x, bool allow_out, bool zero_out) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  ip::shift<T>(src.bz<T,N>(), dst_, y, x, allow_out, zero_out);
+}
+
+template <typename T>
+static void inner_shift1_dim (tp::const_ndarray src, tp::ndarray dst,
+    int y, int x, bool allow_out, bool zero_out) {
+  const ca::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_shift1<T,2>(src, dst, y, x, allow_out, zero_out);
+    case 3: return inner_shift1<T,3>(src, dst, y, x, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "shifting does not support type '%s'", info.str().c_str());
+  }
+}
+
+static void shift1 (tp::const_ndarray src, tp::ndarray dst,
+    int y, int x, bool allow_out=false, bool zero_out=false) {
+  const ca::typeinfo& info = src.type();
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_shift1_dim<uint8_t>(src, dst, y,x, allow_out, zero_out);
+    case ca::t_uint16:
+      return inner_shift1_dim<uint16_t>(src, dst, y,x, allow_out, zero_out);
+    case ca::t_float64:
+      return inner_shift1_dim<double>(src, dst, y,x, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "shifting does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(shift1_overloads, shift1, 4, 6)
+
+template <typename T, int N>
+static void inner_shift2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask,
+    int y, int x, bool allow_out, bool zero_out) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  blitz::Array<bool,N> dmask_ = dmask.bz<bool,N>();
+  ip::shift<T>(src.bz<T,N>(), smask.bz<bool,N>(), dst_, dmask_, y, x, allow_out, zero_out);
+}
+
+template <typename T>
+static void inner_shift2_dim (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask,
+    int y, int x, bool allow_out, bool zero_out) {
+  const ca::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_shift2<T,2>(src, smask, dst, dmask, y, x, allow_out, zero_out);
+    case 3: return inner_shift2<T,3>(src, smask, dst, dmask, y, x, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "shifting does not support type '%s'", info.str().c_str());
+  }
+}
+
+static void shift2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask,
+    int y, int x, bool allow_out=false, bool zero_out=false) {
+  const ca::typeinfo& info = src.type();
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_shift2_dim<uint8_t>(src, smask, dst, dmask, y,x, allow_out, zero_out);
+    case ca::t_uint16:
+      return inner_shift2_dim<uint16_t>(src, smask, dst, dmask, y,x, allow_out, zero_out);
+    case ca::t_float64:
+      return inner_shift2_dim<double>(src, smask, dst, dmask, y,x, allow_out, zero_out);
+    default:
+      PYTHON_ERROR(TypeError, "shifting does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(shift2_overloads, shift2, 6, 8)
+
+void bind_ip_crop_shift() {
+  def("crop", &crop1, crop1_overloads((arg("src"), arg("dst"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), "Crop a 2 or 3D array/image."));
+  def("crop", &crop2, crop2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("crop_y"), arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false, arg("zero_out")=false), "Crop a 2 or 3D array/image, taking mask into account."));
+  def("shift", &shift1, shift1_overloads((arg("src"), arg("dst"), arg("shift_y"), arg("shift_x"), arg("allow_out")=false, arg("zero_out")=false), "Shift a 2 or 3D array/image."));
+  def("shift", &shift2, shift2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("shift_y"), arg("shift_x"), arg("allow_out")=false, arg("zero_out")=false), "Shift a 2 or 3D array/image, taking mask into account."));
 }

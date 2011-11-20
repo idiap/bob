@@ -2,17 +2,18 @@
 
 import torch
 
-import os, sys
+import os
+import sys
 import optparse
 import math
-
+import numpy
 
 def facenorm(image_file, pos_file, A_OUTPUT_DIR,
 A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW):
 
   # Initialize cropper and destination array
   FEN = torch.ip.FaceEyesNorm(A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW)
-  cropped_img = torch.core.array.float64_2(A_CROP_H, A_CROP_W)
+  cropped_img = numpy.ndarray((A_CROP_H, A_CROP_W), 'float64')
 
   # Display file processed
   print >> sys.stderr, "Crop: " + image_file
@@ -34,7 +35,7 @@ A_CROP_EYES_D, A_CROP_H, A_CROP_W, A_CROP_OH, A_CROP_OW):
   output_file = os.path.join(A_OUTPUT_DIR, os.path.splitext(os.path.basename(image_file))[0] + '.hdf5')
 
   # Save the outpu file
-  torch.io.Array(cropped_img.cast('uint8')).save(output_file)
+  torch.io.Array(cropped_img.astype('uint8')).save(output_file)
   print output_file
 
   # Close the .pos file
@@ -101,17 +102,16 @@ if options.test:
     os.remove("/tmp/input.pos")
     
   options.output_dir = "/tmp/facenorm"
-  array = torch.core.array.array([[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9],
-                                  [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-                                  [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
-                                  [30, 31, 32,  0, 34, 35,  0, 37, 38, 39],
-                                  [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
-                                  [50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
-                                  [60, 61, 62, 63, 64, 65, 66, 67, 68, 69],
-                                  [70, 71, 72, 73, 74, 75, 76, 77, 78, 79],
-                                  [80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
-                                  [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]],
-                                  'uint8')
+  array = numpy.array([[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9],
+                       [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+                       [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+                       [30, 31, 32,  0, 34, 35,  0, 37, 38, 39],
+                       [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                       [50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
+                       [60, 61, 62, 63, 64, 65, 66, 67, 68, 69],
+                       [70, 71, 72, 73, 74, 75, 76, 77, 78, 79],
+                       [80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
+                       [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]], 'uint8')
 
   options.crop_eyes_d = 3
   options.crop_eyes_h = 7

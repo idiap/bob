@@ -27,3 +27,7 @@ Modifications on the syntax:
   numpy.ones(shape, type)
   ...
   numpy.array(array_like, type) -- with specific initialization
+* Array extents:
+
+  Before: x.extent(0)
+  After: x.shape[0]
