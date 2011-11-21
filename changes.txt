@@ -15,6 +15,17 @@ Modifications on the syntax:
 
   There are operations that don't need migration such as sum() or mean() as
   NumPy also implements them on the ndarray object.
+* Differences between torch.core.array.*  and numpy.ndarray:
+  
+  ============= ========================
+   torch         NumPy
+  ============= ========================
+   a.shape()      a.shape
+   a.rank()       len(a.shape)
+   a.save(...)    torch.io.save(a, ...)
+   a.cast(...)    a.astype(...)
+  ============= ========================
+
 * The construction torch.core.array.*.convert() is deprecated: use
   torch.core.convert(array...)
 * The construction torch.core.array.numeq() is depreated: use
@@ -34,3 +45,5 @@ Modifications on the syntax:
   just say Arrayset.cat(axis=1). If you set it false (the default), you don't
   have to change anything. This method is a little bit unstable and things may
   change stil.
+* Arrayset.extend() not longer accepts Arrays for extension. You must do a
+  get() on the io.Array() before passing the result to Arrayset.extend().
