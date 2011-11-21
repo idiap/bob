@@ -148,6 +148,33 @@ static void estimate_zandd(tp::const_ndarray F, tp::const_ndarray N,
       spk_ids.bz<uint32_t,1>());
 }
 
+template <typename T, int N>
+tuple as_tuple (const std::vector<blitz::Array<T,N> >& obj) {
+  list retval;
+  for (size_t k=0; k<obj.size(); ++k) retval.append(obj[k]); //copy
+  return tuple(retval);
+}
+
+static tuple get_n (const train::JFABaseTrainer& obj) {
+  return as_tuple(obj.getN()); 
+}
+
+static tuple get_f (const train::JFABaseTrainer& obj) {
+  return as_tuple(obj.getF());
+}
+
+static tuple get_x (const train::JFABaseTrainer& obj) {
+  return as_tuple(obj.getX());
+}
+
+static tuple get_y (const train::JFABaseTrainer& obj) {
+  return as_tuple(obj.getY());
+}
+
+static tuple get_z (const train::JFABaseTrainer& obj) {
+  return as_tuple(obj.getZ());
+}
+
 void bind_trainer_jfa() {
   def("jfa_updateEigen", &update_eigen, (arg("A"), arg("C"), arg("uv")), "Updates eigenchannels (or eigenvoices) from accumulators A and C.");
   def("jfa_estimateXandU", &estimate_xandu, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the channel factors.");
@@ -155,16 +182,18 @@ void bind_trainer_jfa() {
   def("jfa_estimateZandD", &estimate_zandd, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
 
   class_<train::JFABaseTrainer, boost::noncopyable>("JFABaseTrainer", "Create a trainer for the JFA.", init<mach::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainer."))
-    .add_property("N", make_function(&train::JFABaseTrainer::getN, return_internal_reference<>()), &train::JFABaseTrainer::setN)
-    .add_property("F", make_function(&train::JFABaseTrainer::getF, return_internal_reference<>()), &train::JFABaseTrainer::setF)
-    .add_property("X", make_function(&train::JFABaseTrainer::getX, return_internal_reference<>()), &train::JFABaseTrainer::setX)
-    .add_property("Y", make_function(&train::JFABaseTrainer::getY, return_internal_reference<>()), &train::JFABaseTrainer::setY)
-    .add_property("Z", make_function(&train::JFABaseTrainer::getZ, return_internal_reference<>()), &train::JFABaseTrainer::setZ)
-    .add_property("VtSigmaInv", make_function(&train::JFABaseTrainer::getVtSigmaInv, return_internal_reference<>()), &train::JFABaseTrainer::setVtSigmaInv)
-    .add_property("IdPlusVProd_i", make_function(&train::JFABaseTrainer::getIdPlusVProd_i, return_internal_reference<>()), &train::JFABaseTrainer::setIdPlusVProd_i)
-    .add_property("Fn_y_i", make_function(&train::JFABaseTrainer::getFn_y_i, return_internal_reference<>()), &train::JFABaseTrainer::setFn_y_i)
-    .add_property("A1_y", make_function(&train::JFABaseTrainer::getA1_y, return_internal_reference<>()), &train::JFABaseTrainer::setA1_y)
-    .add_property("A2_y", make_function(&train::JFABaseTrainer::getA2_y, return_internal_reference<>()), &train::JFABaseTrainer::setA2_y)
+
+    .add_property("N", &get_n, &train::JFABaseTrainer::setN)
+    .add_property("F", &get_f, &train::JFABaseTrainer::setF)
+    .add_property("X", &get_x, &train::JFABaseTrainer::setX)
+    .add_property("Y", &get_y, &train::JFABaseTrainer::setY)
+    .add_property("Z", &get_z, &train::JFABaseTrainer::setZ)
+
+    .add_property("VtSigmaInv", make_function(&train::JFABaseTrainer::getVtSigmaInv, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setVtSigmaInv)
+    .add_property("IdPlusVProd_i", make_function(&train::JFABaseTrainer::getIdPlusVProd_i, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setIdPlusVProd_i)
+    .add_property("Fn_y_i", make_function(&train::JFABaseTrainer::getFn_y_i, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setFn_y_i)
+    .add_property("A1_y", make_function(&train::JFABaseTrainer::getA1_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA1_y)
+    .add_property("A2_y", make_function(&train::JFABaseTrainer::getA2_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA2_y)
     .def("setStatistics", &train::JFABaseTrainer::setStatistics, (arg("self"), arg("N"), arg("F")), "Set the zeroth and first order statistics.")
     .def("setSpeakerFactors", &train::JFABaseTrainer::setSpeakerFactors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
     .def("train", (void (train::JFABaseTrainer::*)(const std::vector<blitz::Array<double,2> >&, const std::vector<blitz::Array<double,2> >&, const size_t))&train::JFABaseTrainer::train, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
