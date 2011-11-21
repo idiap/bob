@@ -145,24 +145,18 @@ bp::ndarray::ndarray(const bp::object& obj)
   : m_obj(obj)
 {
   check_obj(obj);
-  bp::incref(obj.ptr());
 }
 
 bp::ndarray::ndarray(const bp::ndarray& obj)
   : m_obj(obj)
 {
-  //no need to check, of course
-  bp::incref(obj.ptr());
 }
 
 bp::ndarray::~ndarray() {
-  bp::decref(m_obj.ptr());
 }
 
 bp::ndarray& bp::ndarray::operator=
 (const bp::ndarray& other) {
-  bp::incref(other.m_obj.ptr()); //get other's
-  bp::decref(m_obj.ptr()); //release self
   m_obj = other.m_obj;
   return *this;
 }
