@@ -1,6 +1,6 @@
 /**
  * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Tue  1 Nov 11:24:40 2011
+ * @date Mon 21 Nov 2011 12:10:13 CET
  *
  * @brief Implementation of the ndarray class
  */
@@ -24,6 +24,7 @@ namespace ca = Torch::core::array;
 #define TP_OBJECT(x) (x.ptr())
 
 #define NUMPY16_API 0x00000006
+#define NUMPY14_API 0x00000004
 
 void tp::setup_python(const char* module_docstring) {
 
@@ -56,9 +57,12 @@ void tp::setup_python(const char* module_docstring) {
   if (NPY_VERSION != PyArray_GetNDArrayCVersion()) {
     PYTHON_ERROR(ImportError, "module compiled against ABI version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions", (int) NPY_VERSION, (int) PyArray_GetNDArrayCVersion());
   }
+
+#if NPY_FEATURE_VERSION >= NUMPY14_API /* NumPy C-API version >= 1.4 */
   if (NPY_FEATURE_VERSION > PyArray_GetNDArrayCFeatureVersion()) {
     PYTHON_ERROR(ImportError, "module compiled against API version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions", (int) NPY_FEATURE_VERSION, (int) PyArray_GetNDArrayCFeatureVersion());
   }
+#endif
 
 }
 
@@ -242,7 +246,7 @@ tp::dtype& tp::dtype::operator= (const tp::dtype& other) {
 }
 
 bool tp::dtype::has_native_byteorder() const {
-  return m_self.is_none()? false : (PyArray_EquivByteorders(TP_DESCR(m_self)->byteorder, NPY_NATIVE) || TP_DESCR(m_self)->elsize == 1);
+  return TPY_ISNONE(m_self)? false : (PyArray_EquivByteorders(TP_DESCR(m_self)->byteorder, NPY_NATIVE) || TP_DESCR(m_self)->elsize == 1);
 }
 
 bool tp::dtype::has_type(ca::ElementType _eltype) const {
@@ -250,12 +254,12 @@ bool tp::dtype::has_type(ca::ElementType _eltype) const {
 }
 
 ca::ElementType tp::dtype::eltype() const {
-  return m_self.is_none()? ca::t_unknown : 
+  return TPY_ISNONE(m_self)? ca::t_unknown : 
     tp::num_to_type(TP_DESCR(m_self)->type_num);
 }
       
 int tp::dtype::type_num() const {
-  return m_self.is_none()? -1 : TP_DESCR(m_self)->type_num;
+  return TPY_ISNONE(m_self)? -1 : TP_DESCR(m_self)->type_num;
 }
 
 bp::str tp::dtype::str() const {
@@ -334,7 +338,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
     bp::object array = 
       tp::make_maybe_null_object(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0));
     
-    if (array.is_none()) return 0;
+    if (TPY_ISNONE(array)) return 0;
 
     //if the conversion worked, you can now fill in the parameters
     (*out_arr) = 0;
@@ -361,7 +365,7 @@ tp::convert_t tp::convertible(bp::object array_like, ca::typeinfo& info,
   PyArray_Descr* dtype = 0;
 
   int not_convertible =
-#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version < 1.6 */
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
     PyArray_GetArrayParamsFromObject
 #else
     _GetArrayParamsFromObject
@@ -412,7 +416,7 @@ tp::convert_t tp::convertible_to (bp::object array_like,
   PyArray_Descr* dtype = 0;
 
   int not_convertible =
-#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version < 1.6 */
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
     PyArray_GetArrayParamsFromObject
 #else
     _GetArrayParamsFromObject
@@ -478,7 +482,7 @@ tp::convert_t tp::convertible_to(bp::object array_like, bp::object dtype_like,
   PyArray_Descr* dtype = 0;
 
   int not_convertible =
-#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version < 1.6 */
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
     PyArray_GetArrayParamsFromObject
 #else
     _GetArrayParamsFromObject
@@ -526,7 +530,7 @@ tp::convert_t tp::convertible_to(bp::object array_like, bool writeable,
   PyArray_Descr* dtype = 0;
 
   int not_convertible =
-#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version < 1.6 */
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
     PyArray_GetArrayParamsFromObject
 #else
     _GetArrayParamsFromObject
@@ -626,7 +630,7 @@ static boost::shared_ptr<void> shared_from_ndarray (bp::object& o) {
 tp::py_array::py_array(bp::object o, bp::object _dtype):
   m_is_numpy(true)
 {
-  if (o.is_none()) PYTHON_ERROR(TypeError, "You cannot pass 'None' as input parameter to C++-bound Torch methods that expect NumPy ndarrays (or blitz::Array<T,N>'s). Double-check your input!");
+  if (TPY_ISNONE(o)) PYTHON_ERROR(TypeError, "You cannot pass 'None' as input parameter to C++-bound Torch methods that expect NumPy ndarrays (or blitz::Array<T,N>'s). Double-check your input!");
 
   bp::object mine = try_refer_ndarray(o, _dtype);
 

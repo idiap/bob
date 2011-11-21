@@ -5,6 +5,8 @@
  * @brief Bindings for type conversion with re-calibration of values
  */
 
+#include <boost/version.hpp>
+
 #include "core/python/ndarray.h"
 #include "core/convert.h"
 
@@ -17,10 +19,11 @@ template <typename Tdst, typename Tsrc, int N>
 static object inner_convert (tp::const_ndarray src,
     object dst_range, object src_range) {
 
-  if (!src_range.is_none()) {
+  if (!TPY_ISNONE(src_range)) {
     Tsrc src_min = extract<Tsrc>(src_range[0]);
     Tsrc src_max = extract<Tsrc>(src_range[1]);
-    if (!dst_range.is_none()) { //both src_range and dst_range are valid
+    if (!TPY_ISNONE(dst_range)) { //both src_range and dst_range are valid
+
       Tdst dst_min = extract<Tdst>(dst_range[0]);
       Tdst dst_max = extract<Tdst>(dst_range[1]);
       blitz::Array<Tdst,N> dst = tc::convert<Tdst,Tsrc>(src.bz<Tsrc,N>(),
@@ -35,7 +38,7 @@ static object inner_convert (tp::const_ndarray src,
   }
 
   else {
-    if (!dst_range.is_none()) { //only dst_range is valid
+    if (!TPY_ISNONE(dst_range)) { //only dst_range is valid
       Tdst dst_min = extract<Tdst>(dst_range[0]);
       Tdst dst_max = extract<Tdst>(dst_range[1]);
       blitz::Array<Tdst,N> dst = 
@@ -98,7 +101,7 @@ static object convert_to (tp::const_ndarray src,
 }
 
 static void assert_2tuple_or_none (object o) {
-  if (o.is_none()) return;
+  if (TPY_ISNONE(o)) return;
 
   //must be a tuple with 2 entries
   extract<tuple> t_ext(o);

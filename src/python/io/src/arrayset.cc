@@ -34,7 +34,7 @@ static void extend_with_iterable(io::Arrayset& s, object iter) {
   object dtype = arrayset_dtype(s);
   stl_input_iterator<object> end;
   for (stl_input_iterator<object> it(iter); it != end; ++it) {
-    if (dtype.is_none()) {
+    if (TPY_ISNONE(dtype)) {
       s.add(io::Array(boost::make_shared<tp::py_array>(*it, object())));
       dtype = arrayset_dtype(s);
     }
@@ -72,7 +72,7 @@ static void extend_with_ndarray(io::Arrayset& s, numeric::array a, size_t D) {
     //gets a slice of the array, makes a contiguous copy of it and append
     index[D] = k;
     s.add(io::Array(boost::make_shared<tp::py_array>(a[index], dtype)));
-    if (dtype.is_none()) dtype = arrayset_dtype(s); ///< may need a refresh
+    if (TPY_ISNONE(dtype)) dtype = arrayset_dtype(s); ///< may need a refresh
   }
 }
 
@@ -81,7 +81,7 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable1(object iter) {
   object dtype = object();
   stl_input_iterator<object> end;
   for (stl_input_iterator<object> it(iter); it != end; ++it) {
-    if (dtype.is_none()) {
+    if (TPY_ISNONE(dtype)) {
       retval->add(io::Array(boost::make_shared<tp::py_array>(*it, object())));
       dtype = arrayset_dtype(*retval);
     }
@@ -97,7 +97,7 @@ static boost::shared_ptr<io::Arrayset> make_from_array_iterable2(object iter,
   boost::shared_ptr<io::Arrayset> retval = boost::make_shared<io::Arrayset>();
   stl_input_iterator<object> end;
   for (stl_input_iterator<object> it(iter); it != end; ++it) {
-    if (dtype.is_none()) {
+    if (TPY_ISNONE(dtype)) {
       retval->add(io::Array(boost::make_shared<tp::py_array>(*it, object())));
       dtype = arrayset_dtype(*retval);
     }
@@ -133,7 +133,7 @@ static void set_string(io::Arrayset& s, size_t index, const std::string& filenam
 }
 
 static void append_ndarray(io::Arrayset& s, object o, object dtype=object()) {
-  if (dtype.is_none()) dtype = arrayset_dtype(s); ///try something better...
+  if (TPY_ISNONE(dtype)) dtype = arrayset_dtype(s); ///try something better...
   s.add(io::Array(boost::make_shared<tp::py_array>(o, dtype)));
 }
 

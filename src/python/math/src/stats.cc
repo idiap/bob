@@ -12,7 +12,7 @@
 
 using namespace boost::python;
 namespace tp = Torch::python;
-namespace tm = Torch::math;
+namespace math = Torch::math;
 namespace ca = Torch::core::array;
 
 static const char* SCATTER_DOC1 = "Computes the scatter matrix of a 2D array considering data is organized column-wise (each sample is a column, each feature is a row). The resulting matrix 'S' has to be square with extents equal to the number of rows in A.";
@@ -27,7 +27,7 @@ template <typename T> static tuple scatter_inner(tp::const_ndarray A) {
   blitz::Array<T,2> S_ = S.bz<T,2>();
   tp::ndarray M(info.dtype, info.shape[0]);
   blitz::Array<T,1> M_ = M.bz<T,1>();
-  tm::scatter(A.bz<T,2>(), S_, M_);
+  math::scatter(A.bz<T,2>(), S_, M_);
   return make_tuple(S,M);
 }
 
@@ -46,7 +46,7 @@ static tuple scatter(tp::const_ndarray A) {
 template <typename T>
 static void scatter_nocheck_inner(tp::const_ndarray A, tp::ndarray S) {
   blitz::Array<T,2> S_ = S.bz<T,2>();
-  tm::scatter_<T>(A.bz<T,2>(), S_);
+  math::scatter_<T>(A.bz<T,2>(), S_);
 }
 
 static void scatter_nocheck(tp::const_ndarray A, tp::ndarray S) {
@@ -64,7 +64,7 @@ static void scatter_nocheck(tp::const_ndarray A, tp::ndarray S) {
 template <typename T>
 static void scatter_check_inner(tp::const_ndarray A, tp::ndarray S) {
   blitz::Array<T,2> S_ = S.bz<T,2>();
-  tm::scatter<T>(A.bz<T,2>(), S_);
+  math::scatter<T>(A.bz<T,2>(), S_);
 }
 
 static void scatter_check(tp::const_ndarray A, tp::ndarray S) {
@@ -84,7 +84,7 @@ static void scatter_M_nocheck_inner(tp::const_ndarray A, tp::ndarray S,
     tp::ndarray M) {
   blitz::Array<T,2> S_ = S.bz<T,2>();
   blitz::Array<T,1> M_ = M.bz<T,1>();
-  tm::scatter_<T>(A.bz<T,2>(), S_, M_);
+  math::scatter_<T>(A.bz<T,2>(), S_, M_);
 }
 
 static void scatter_M_nocheck(tp::const_ndarray A, tp::ndarray S,
@@ -105,7 +105,7 @@ static void scatter_M_check_inner(tp::const_ndarray A, tp::ndarray S,
     tp::ndarray M) {
   blitz::Array<T,2> S_ = S.bz<T,2>();
   blitz::Array<T,1> M_ = M.bz<T,1>();
-  tm::scatter<T>(A.bz<T,2>(), S_, M_);
+  math::scatter<T>(A.bz<T,2>(), S_, M_);
 }
 
 static void scatter_M_check(tp::const_ndarray A, tp::ndarray S,

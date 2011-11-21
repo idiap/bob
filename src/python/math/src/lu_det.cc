@@ -10,7 +10,7 @@
 #include "core/python/ndarray.h"
 
 using namespace boost::python;
-namespace tm = Torch::math;
+namespace math = Torch::math;
 namespace tp = Torch::python;
 namespace ca = Torch::core::array;
 
@@ -23,12 +23,12 @@ static void lu(tp::const_ndarray A, tp::ndarray L,
   blitz::Array<double,2> L_ = L.bz<double,2>();
   blitz::Array<double,2> U_ = U.bz<double,2>();
   blitz::Array<double,2> P_ = P.bz<double,2>();
-  tm::lu(A.bz<double,2>(), L_, U_, P_);
+  math::lu(A.bz<double,2>(), L_, U_, P_);
 }
 
 static void inv(tp::const_ndarray A, tp::ndarray B) {
   blitz::Array<double,2> B_ = B.bz<double,2>();
-  tm::inv(A.bz<double,2>(), B_);
+  math::inv(A.bz<double,2>(), B_);
 }
 
 void bind_math_lu_det()

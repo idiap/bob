@@ -36,6 +36,15 @@
 #include <blitz/array.h>
 #include <stdint.h>
 
+/**
+ * The method object::is_none() was only introduced in boost v1.43.
+ */
+#if BOOST_VERSION >= 104300
+#define TPY_ISNONE(x) x.is_none()
+#else
+#define TPY_ISNONE(x) (x.ptr() == Py_None)
+#endif
+
 namespace Torch { namespace python {
 
   /**
