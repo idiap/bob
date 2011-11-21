@@ -35,7 +35,7 @@ def generate_testdata(data, target):
   retval.fill(0)
   cur = 0
   for k, d in enumerate(data):
-    retval[cur:(cur+len(d)),:] = d.cat(firstDim=True)
+    retval[cur:(cur+len(d)),:] = d.cat()
     for i in range(len(d)):
       t_retval[i+cur,:] = target[k]
     cur += len(d)

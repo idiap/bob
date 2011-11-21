@@ -90,33 +90,33 @@ int tp::type_to_num(ca::ElementType type) {
     case ca::t_bool:
       return NPY_BOOL;
     case ca::t_int8:
-      return NPY_BYTE;
+      return NPY_INT8;
     case ca::t_int16:
-      return NPY_SHORT;
+      return NPY_INT16;
     case ca::t_int32:
-      return NPY_INT;
+      return NPY_INT32;
     case ca::t_int64:
-      return (sizeof(long) == 8)?NPY_LONG:NPY_LONGLONG;
+      return NPY_INT64;
     case ca::t_uint8:
-      return NPY_UBYTE;
+      return NPY_UINT8;
     case ca::t_uint16:
-      return NPY_USHORT;
+      return NPY_UINT16;
     case ca::t_uint32:
-      return NPY_UINT;
+      return NPY_UINT32;
     case ca::t_uint64:
-      return (sizeof(unsigned long) == 8)?NPY_ULONG:NPY_ULONGLONG;
+      return NPY_UINT64;
     case ca::t_float32:
-      return NPY_FLOAT;
+      return NPY_FLOAT32;
     case ca::t_float64:
-      return NPY_DOUBLE;
+      return NPY_FLOAT64;
     case ca::t_float128:
-      return NPY_LONGDOUBLE;
+      return NPY_FLOAT128;
     case ca::t_complex64:
-      return NPY_CFLOAT;
+      return NPY_COMPLEX64;
     case ca::t_complex128:
-      return NPY_CDOUBLE;
+      return NPY_COMPLEX128;
     case ca::t_complex256:
-      return NPY_CLONGDOUBLE;
+      return NPY_COMPLEX256;
     default:
       PYTHON_ERROR(TypeError, "unsupported C++ element type -- debug me!");
   }
@@ -124,41 +124,36 @@ int tp::type_to_num(ca::ElementType type) {
 }
 
 ca::ElementType tp::num_to_type(int num) {
-
   switch(num) {
     case NPY_BOOL:
-      return ca::t_uint8;
-    case NPY_BYTE:
+      return ca::t_bool;
+    case NPY_INT8:
       return ca::t_int8;
-    case NPY_SHORT:
+    case NPY_INT16:
       return ca::t_int16;
-    case NPY_INT:
+    case NPY_INT32:
       return ca::t_int32;
-    case NPY_LONG:
-      return (sizeof(long) == 8)?ca::t_int64:ca::t_int32;
-    case NPY_LONGLONG:
+    case NPY_INT64:
       return ca::t_int64;
-    case NPY_UBYTE:
+    case NPY_UINT8:
       return ca::t_uint8;
-    case NPY_USHORT:
+    case NPY_UINT16:
       return ca::t_uint16;
-    case NPY_UINT:
+    case NPY_UINT32:
       return ca::t_uint32;
-    case NPY_ULONG:
-      return (sizeof(unsigned long) == 8)?ca::t_uint64:ca::t_uint32;
-    case NPY_ULONGLONG:
+    case NPY_UINT64:
       return ca::t_uint64;
-    case NPY_FLOAT:
+    case NPY_FLOAT32:
       return ca::t_float32;
-    case NPY_DOUBLE:
+    case NPY_FLOAT64:
       return ca::t_float64;
-    case NPY_LONGDOUBLE:
+    case NPY_FLOAT128:
       return ca::t_float128;
-    case NPY_CFLOAT:
+    case NPY_COMPLEX64:
       return ca::t_complex64;
-    case NPY_CDOUBLE:
+    case NPY_COMPLEX128:
       return ca::t_complex128;
-    case NPY_CLONGDOUBLE:
+    case NPY_COMPLEX256:
       return ca::t_complex256;
     default:
       PYTHON_ERROR(TypeError, "unsupported NumPy element type -- debug me!");
@@ -168,38 +163,34 @@ ca::ElementType tp::num_to_type(int num) {
 
 template <> int tp::ctype_to_num<bool>(void) 
 { return NPY_BOOL; }
-template <> int tp::ctype_to_num<signed char>(void) 
-{ return NPY_BYTE; }
-template <> int tp::ctype_to_num<unsigned char>(void) 
-{ return NPY_UBYTE; }
-template <> int tp::ctype_to_num<short>(void) 
-{ return NPY_SHORT; }
-template <> int tp::ctype_to_num<unsigned short>(void) 
-{ return NPY_USHORT; }
-template <> int tp::ctype_to_num<int>(void) 
-{ return NPY_INT; }
-template <> int tp::ctype_to_num<unsigned int>(void) 
-{ return NPY_UINT; }
-template <> int tp::ctype_to_num<long>(void)
-{ return NPY_LONG; }
-template <> int tp::ctype_to_num<unsigned long>(void)
-{ return NPY_ULONG; }
-template <> int tp::ctype_to_num<long long>(void)
-{ return NPY_LONGLONG; }
-template <> int tp::ctype_to_num<unsigned long long>(void)
-{ return NPY_ULONGLONG; }
+template <> int tp::ctype_to_num<int8_t>(void) 
+{ return NPY_INT8; }
+template <> int tp::ctype_to_num<uint8_t>(void) 
+{ return NPY_UINT8; }
+template <> int tp::ctype_to_num<int16_t>(void) 
+{ return NPY_INT16; }
+template <> int tp::ctype_to_num<uint16_t>(void) 
+{ return NPY_UINT16; }
+template <> int tp::ctype_to_num<int32_t>(void) 
+{ return NPY_INT32; }
+template <> int tp::ctype_to_num<uint32_t>(void) 
+{ return NPY_UINT32; }
+template <> int tp::ctype_to_num<int64_t>(void)
+{ return NPY_INT64; }
+template <> int tp::ctype_to_num<uint64_t>(void)
+{ return NPY_UINT64; }
 template <> int tp::ctype_to_num<float>(void)
-{ return NPY_FLOAT; }
+{ return NPY_FLOAT32; }
 template <> int tp::ctype_to_num<double>(void) 
-{ return NPY_DOUBLE; }
+{ return NPY_FLOAT64; }
 template <> int tp::ctype_to_num<long double>(void) 
-{ return NPY_LONGDOUBLE; }
+{ return NPY_FLOAT128; }
 template <> int tp::ctype_to_num<std::complex<float> >(void)
-{ return NPY_CFLOAT; }
+{ return NPY_COMPLEX64; }
 template <> int tp::ctype_to_num<std::complex<double> >(void) 
-{ return NPY_CDOUBLE; }
+{ return NPY_COMPLEX128; }
 template <> int tp::ctype_to_num<std::complex<long double> >(void) 
-{ return NPY_CLONGDOUBLE; }
+{ return NPY_COMPLEX256; }
 
 ca::ElementType tp::array_to_type(const bp::numeric::array& a) {
   return tp::num_to_type(TP_ARRAY(a)->descr->type_num);

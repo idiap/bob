@@ -1,8 +1,6 @@
 Things to consider:
 
-* io.arrayset.cat is not implemented
-* io.video subsystem is missing
-* io.codec tests are missing
+* Arrayset.cat() implementation needs some work.
 
 Modifications on the syntax:
 
@@ -31,3 +29,8 @@ Modifications on the syntax:
 
   Before: x.extent(0)
   After: x.shape[0]
+* Arrayset.cat() has been revamped to use the numpy functions hstack, vstack
+  and dstack. If you used the parameter "firstDim" before with a True setting,
+  just say Arrayset.cat(axis=1). If you set it false (the default), you don't
+  have to change anything. This method is a little bit unstable and things may
+  change stil.

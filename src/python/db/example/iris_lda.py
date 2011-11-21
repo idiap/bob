@@ -104,8 +104,6 @@ if __name__ == '__main__':
   machine = create_machine(data)
   output = process_data(machine, data)
 
-  import pdb; pdb.set_trace()
-
   if options.selftest:
     (fd, filename) = tempfile.mkstemp('.pdf', 'torchtest_')
     os.close(fd)

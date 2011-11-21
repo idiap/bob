@@ -22,7 +22,9 @@ class ZTNormTest(unittest.TestCase):
 
   def test01_ztnorm_simple(self):
     # 3x5
-    my_A = numpy.array([[1, 2, 3, 4, 5],[6, 7, 8, 9, 8],[7, 6, 5, 4, 3]],'float64')
+    my_A = numpy.array([[1, 2, 3, 4, 5],
+                        [6, 7, 8, 9, 8],
+                        [7, 6, 5, 4, 3]],'float64')
     # 3x4
     my_B = numpy.array([[5, 4, 7, 8],[9, 8, 7, 4],[5, 6, 3, 2]],'float64')
     # 2x5
@@ -35,7 +37,8 @@ class ZTNormTest(unittest.TestCase):
     # 2x1
     tnorm_id = numpy.array([1, 5],'uint32')
 
-    scores = torch.machine.ztnorm(my_A, my_B, my_C, my_D, sameValue(tnorm_id, znorm_id))
+    scores = torch.machine.ztnorm(my_A, my_B, my_C, my_D,
+        sameValue(tnorm_id, znorm_id))
 
     ref_scores = numpy.array([[-4.45473107e+00, -3.29289322e+00, -1.50519101e+01, -8.42086557e-01, 6.46544511e-03], [-8.27619927e-01,  7.07106781e-01,  1.13757710e+01,  2.01641412e+00, 7.63765080e-01], [ 2.52913570e+00,  2.70710678e+00,  1.24400233e+01,  7.07106781e-01, 6.46544511e-03]], 'float64')
     
