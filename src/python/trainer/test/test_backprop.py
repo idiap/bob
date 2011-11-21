@@ -41,13 +41,13 @@ class PythonBackProp:
   def train(self, machine, input, target):
 
     def logistic(x):
-      return 1 / (1 + numpy.math.exp(-x))
+      return 1 / (1 + numpy.exp(-x))
 
     def logistic_bwd(x):
       return x * (1-x)
 
     def tanh(x):
-      return numpy.math.tanh(x)
+      return numpy.tanh(x)
 
     def tanh_bwd(x):
       return (1 - x**2)
@@ -162,7 +162,7 @@ class BackPropTest(unittest.TestCase):
 
     # trains with our C++ implementation
     trainer.train_(machine, d0, t0)
-    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
+    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
 
   def test03_FisherWithOneHiddenLayer(self):
 

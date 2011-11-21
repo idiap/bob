@@ -48,13 +48,13 @@ class PythonRProp:
       return +1
 
     def logistic(x):
-      return 1 / (1 + numpy.math.exp(-x))
+      return 1 / (1 + numpy.exp(-x))
 
     def logistic_bwd(x):
       return x * (1-x)
 
     def tanh(x):
-      return numpy.math.tanh(x)
+      return numpy.tanh(x)
 
     def tanh_bwd(x):
       return (1 - x**2)
@@ -378,9 +378,9 @@ class RPropTest(unittest.TestCase):
       #print "[Python] MSE:", torch.measure.mse(pymachine(input), target).sqrt()
       #print "[C++] MSE:", torch.measure.mse(machine(input), target).sqrt()
       for i, w in enumerate(pymachine.weights):
-        self.assertTrue( w.numeq(machine.weights[i]) )
+        self.assertTrue( numpy.array_equal(w, machine.weights[i]) )
       for i, b in enumerate(pymachine.biases):
-        self.assertTrue( b.numeq(machine.biases[i]) )
+        self.assertTrue( numpy.array_equal(b, machine.biases[i]) )
 
 if __name__ == '__main__':
   sys.argv.append('-v')

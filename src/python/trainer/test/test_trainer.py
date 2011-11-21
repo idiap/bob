@@ -13,26 +13,26 @@ import numpy
 def loadGMM():
   gmm = torch.machine.GMMMachine(2, 2)
 
-  gmm.weights = torch.core.array.load('data/gmm.init_weights.hdf5')
-  gmm.means = torch.core.array.load('data/gmm.init_means.hdf5')
-  gmm.variances = torch.core.array.load('data/gmm.init_variances.hdf5')
-  gmm.varianceThreshold = torch.core.array.array([0.001, 0.001], 'float64')
+  gmm.weights = torch.io.load('data/gmm.init_weights.hdf5')
+  gmm.means = torch.io.load('data/gmm.init_means.hdf5')
+  gmm.variances = torch.io.load('data/gmm.init_variances.hdf5')
+  gmm.varianceThreshold = numpy.array([0.001, 0.001], 'float64')
 
   return gmm
 
 def multiplyVectorsByFactors(matrix, vector):
-  for i in range(0, matrix.rows()):
-    for j in range(0, matrix.columns()):
+  for i in range(0, matrix.shape[0]):
+    for j in range(0, matrix.shape[1]):
       matrix[i, j] *= vector[j]
 
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon).all()
 
 def flipRows(array):
-  if type(array).__name__ == 'float64_2':
-    return torch.core.array.array([numpy.array(array[1, :]), numpy.array(array[0, :])], 'float64')
-  elif type(array).__name__ == 'float64_1':
-    return torch.core.array.array([array[1], array[0]], 'float64')
+  if len(array.shape) == 2:
+    return numpy.array([numpy.array(array[1, :]), numpy.array(array[0, :])], 'float64')
+  elif len(array.shape) == 1:
+    return numpy.array([array[1], array[0]], 'float64')
   else:
     raise Exception('Input type not supportd by flipRows')
 
@@ -42,15 +42,15 @@ def NormalizeStdArrayset(path):
 
   length = arrayset.shape[0]
   n_samples = len(arrayset)
-  mean = torch.core.array.float64_1(length)
-  std = torch.core.array.float64_1(length)
+  mean = numpy.ndarray(length, 'float64')
+  std = numpy.ndarray(length, 'float64')
 
   mean.fill(0)
   std.fill(0)
 
   
   for i in range(0, n_samples):
-    x = arrayset[i].get().cast('float64')
+    x = arrayset[i].astype('float64')
     mean += x
     std += (x ** 2)
 
@@ -61,7 +61,7 @@ def NormalizeStdArrayset(path):
 
   arStd = torch.io.Arrayset()
   for i in range(0, n_samples):
-    x = arrayset[i].get().cast('float64')
+    x = arrayset[i].astype('float64')
     arStd.append(x / std)
 
   return (arStd,std)
@@ -73,9 +73,9 @@ class MyTrainer1(torch.trainer.KMeansTrainer):
     torch.trainer.KMeansTrainer.__init__(self)
   
   def train(self, machine, data):
-    a = torch.core.array.float64_2(2, 2)
-    a[0, :] = data[1].get()
-    a[1, :] = data[2].get()
+    a = numpy.ndarray((2, 2), 'float64')
+    a[0, :] = data[1]
+    a[1, :] = data[2]
     machine.means = a
 
 
@@ -111,13 +111,11 @@ class TrainerTest(unittest.TestCase):
     m2 = machine.getMean(1)
 
     # Check means [-10,10] / variances [1,1] / weights [0.5,0.5]
-    if(m1<m2):
-      means=torch.core.array.float64_1([m1[0],m2[0]],(2,))
-    else:
-      means=torch.core.array.float64_1([m2[0],m1[0]],(2,))
-    self.assertTrue(equals(means, torch.core.array.float64_1([-10.,10.], (2,)), 2e-1))
-    self.assertTrue(equals(variances,torch.core.array.float64_2([1.,1.], (2,1)), 2e-1))
-    self.assertTrue(equals(weights,torch.core.array.float64_1([0.5,0.5], (2,)), 1e-3))
+    if(m1<m2): means=numpy.array(([m1[0],m2[0]]), 'float64')
+    else: means=numpy.array(([m2[0],m1[0]]), 'float64')
+    self.assertTrue(equals(means, numpy.array([-10.,10.]), 2e-1))
+    self.assertTrue(equals(variances, numpy.array([1.,1.]), 2e-1))
+    self.assertTrue(equals(weights, numpy.array([0.5,0.5]), 1e-3))
 
   def test01_kmeans(self):
     """Train a KMeansMachine"""
@@ -137,9 +135,9 @@ class TrainerTest(unittest.TestCase):
     multiplyVectorsByFactors(means, std)
     multiplyVectorsByFactors(variances, std ** 2)
 
-    gmmWeights = torch.core.array.load('data/gmm.init_weights.hdf5')
-    gmmMeans = torch.core.array.load('data/gmm.init_means.hdf5')
-    gmmVariances = torch.core.array.load('data/gmm.init_variances.hdf5')
+    gmmWeights = torch.io.load('data/gmm.init_weights.hdf5')
+    gmmMeans = torch.io.load('data/gmm.init_means.hdf5')
+    gmmVariances = torch.io.load('data/gmm.init_variances.hdf5')
 
     if (means[0, 0] < means[1, 0]):
       means = flipRows(means)
@@ -176,9 +174,9 @@ class TrainerTest(unittest.TestCase):
 
     # Initialize GMMMachine
     gmm = torch.machine.GMMMachine(5, 45)
-    gmm.means = torch.core.array.load("data/meansAfterKMeans.hdf5").cast('float64')
-    gmm.variances = torch.core.array.load("data/variancesAfterKMeans.hdf5").cast('float64')
-    gmm.weights = torch.core.array.load("data/weightsAfterKMeans.hdf5").cast('float64').exp()
+    gmm.means = torch.io.load("data/meansAfterKMeans.hdf5").astype('float64')
+    gmm.variances = torch.io.load("data/variancesAfterKMeans.hdf5").astype('float64')
+    gmm.weights = numpy.exp(torch.io.load("data/weightsAfterKMeans.hdf5").astype('float64'))
    
     threshold = 0.001
     gmm.setVarianceThresholds(threshold)
@@ -196,9 +194,9 @@ class TrainerTest(unittest.TestCase):
 
     # Test results
     # Load Torch3vision reference
-    meansML_ref = torch.core.array.load("data/meansAfterML.hdf5")
-    variancesML_ref = torch.core.array.load("data/variancesAfterML.hdf5")
-    weightsML_ref = torch.core.array.load("data/weightsAfterML.hdf5")
+    meansML_ref = torch.io.load("data/meansAfterML.hdf5")
+    variancesML_ref = torch.io.load("data/variancesAfterML.hdf5")
+    weightsML_ref = torch.io.load("data/weightsAfterML.hdf5")
 
     # Compare to current results
     self.assertTrue(equals(gmm.means, meansML_ref, 3e-3))
@@ -229,10 +227,10 @@ class TrainerTest(unittest.TestCase):
     """Train a GMMMachine with MAP_GMMTrainer and compare with matlab reference"""
 
     map_adapt = torch.trainer.MAP_GMMTrainer(4., True, False, False, 0.)
-    data = torch.core.array.load('../../machine/test/data/data.hdf5')
-    means = torch.core.array.load('../../machine/test/data/means.hdf5')
-    variances = torch.core.array.load('../../machine/test/data/variances.hdf5')
-    weights = torch.core.array.load('../../machine/test/data/weights.hdf5')
+    data = torch.io.load('../../machine/test/data/data.hdf5')
+    means = torch.io.load('../../machine/test/data/means.hdf5')
+    variances = torch.io.load('../../machine/test/data/variances.hdf5')
+    weights = torch.io.load('../../machine/test/data/weights.hdf5')
 
     gmm = torch.machine.GMMMachine(2,50)
     gmm.means = means
@@ -252,7 +250,7 @@ class TrainerTest(unittest.TestCase):
     map_adapt.maxIterations = 1
     map_adapt.train(gmm_adapted,arrayset)
 
-    new_means = torch.core.array.load('data/new_adapted_mean.hdf5')
+    new_means = torch.io.load('data/new_adapted_mean.hdf5')
 
     # Compare to matlab reference
     self.assertTrue(equals(new_means[0,:], gmm_adapted.means[:,0], 1e-4))
@@ -267,9 +265,9 @@ class TrainerTest(unittest.TestCase):
     n_gaussians = 5
     n_inputs = 45
     prior_gmm = torch.machine.GMMMachine(n_gaussians, n_inputs)
-    prior_gmm.means = torch.core.array.load("data/meansAfterML.hdf5")
-    prior_gmm.variances = torch.core.array.load("data/variancesAfterML.hdf5")
-    prior_gmm.weights = torch.core.array.load("data/weightsAfterML.hdf5")
+    prior_gmm.means = torch.io.load("data/meansAfterML.hdf5")
+    prior_gmm.variances = torch.io.load("data/variancesAfterML.hdf5")
+    prior_gmm.weights = torch.io.load("data/weightsAfterML.hdf5")
   
     threshold = 0.001
     prior_gmm.setVarianceThresholds(threshold)
@@ -294,9 +292,9 @@ class TrainerTest(unittest.TestCase):
  
     # Test results
     # Load Torch3vision reference
-    meansMAP_ref = torch.core.array.load("data/meansAfterMAP.hdf5")
-    variancesMAP_ref = torch.core.array.load("data/variancesAfterMAP.hdf5")
-    weightsMAP_ref = torch.core.array.load("data/weightsAfterMAP.hdf5")
+    meansMAP_ref = torch.io.load("data/meansAfterMAP.hdf5")
+    variancesMAP_ref = torch.io.load("data/variancesAfterMAP.hdf5")
+    weightsMAP_ref = torch.io.load("data/weightsAfterMAP.hdf5")
 
     # Compare to current results
     # Gaps are quite large. This might be explained by the fact that there is no 
@@ -316,9 +314,9 @@ class TrainerTest(unittest.TestCase):
     n_gaussians = 5
     n_inputs = 45
     gmm = torch.machine.GMMMachine(n_gaussians, n_inputs)
-    gmm.means = torch.core.array.load("data/meansAfterML.hdf5")
-    gmm.variances = torch.core.array.load("data/variancesAfterML.hdf5")
-    gmm.weights = torch.core.array.load("data/weightsAfterML.hdf5")
+    gmm.means = torch.io.load("data/meansAfterML.hdf5")
+    gmm.variances = torch.io.load("data/variancesAfterML.hdf5")
+    gmm.weights = torch.io.load("data/weightsAfterML.hdf5")
   
     threshold = 0.001
     gmm.setVarianceThresholds(threshold)
@@ -326,8 +324,7 @@ class TrainerTest(unittest.TestCase):
     # Test against the model
     score_mean_ref = -1.50379e+06
     score = 0.
-    for v in ar:
-      score += gmm.forward(v.get())
+    for v in ar: score += gmm.forward(v)
     score /= len(ar)
   
     # Compare current results to Torch3vision
@@ -345,7 +342,7 @@ class TrainerTest(unittest.TestCase):
     
     for i in range(0, 2):
       print machine.means[i,:]
-      self.assertTrue((ar[i+1].get() == machine.means[i, :]).all())
+      self.assertTrue((ar[i+1] == machine.means[i, :]).all())
 
   def test09_custom_initialization(self):
     ar = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
