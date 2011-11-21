@@ -113,9 +113,9 @@ def process_image_data(args):
   if args.verbose: print "Loading file %s..." % args.input
   input = torch.io.load(args.input) #load the image
 
-  if input.rank() == 3: #it is a color image
+  if len(input.shape) == 3: #it is a color image
     graydata = torch.ip.rgb_to_gray(input).astype('int16')
-  elif input.rank() == 2: #it is a gray-scale image
+  elif len(input.shape) == 2: #it is a gray-scale image
     graydata = input.astype('int16')
 
   start = time.clock()
@@ -136,7 +136,7 @@ def process_image_data(args):
   else: #user wants to record an image with the output
 
     if data:
-      if input.rank() == 3: color = (255, 0, 0) #red
+      if len(input.shape) == 3: color = (255, 0, 0) #red
       else: color = 255
       bbox = [r(v) for v in data[:4]]
       if sum(bbox):
@@ -146,7 +146,7 @@ def process_image_data(args):
         torch.ip.draw_box(input, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
             color)
 
-    input.save(args.output)
+    torch.io.save(input, args.output)
 
     if args.verbose:
       print "Output file (with detections, if any) saved at %s" % args.output
@@ -206,7 +206,7 @@ def main():
   if args.verbose:
     print "Model loading took %.2f seconds" % total
 
-  is_video = (os.path.splitext(args.input)[1] in torch.io.video_extensions())
+  is_video = (os.path.splitext(args.input)[1] in ('.avi', '.h261', '.h263', '.h264', '.mov', '.m4v', '.mjpeg', '.mpeg', '.ogg', '.rawvideo'))
 
   if is_video:
     process_video_data(args)

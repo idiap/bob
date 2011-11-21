@@ -57,7 +57,7 @@ def process_video_data(args):
         (input.numberOfFrames, args.input))
   for k in input:
     torch.ip.rgb_to_gray(k, gray_buffer)
-    int16_buffer = gray_buffer.cast('int16')
+    int16_buffer = gray_buffer.astype('int16')
     start = time.clock()
     detections = args.processor(int16_buffer)
     total += time.clock() - start
@@ -125,10 +125,10 @@ def process_image_data(args):
   if args.verbose: print "Loading file %s..." % args.input
   input = torch.io.load(args.input) #load the image
 
-  if input.rank() == 3: #it is a color image
-    graydata = torch.ip.rgb_to_gray(input).cast('int16')
-  elif input.rank() == 2: #it is a gray-scale image
-    graydata = input.cast('int16')
+  if len(input.shape) == 3: #it is a color image
+    graydata = torch.ip.rgb_to_gray(input).astype('int16')
+  elif len(input.shape) == 2: #it is a gray-scale image
+    graydata = input.astype('int16')
 
   start = time.clock()
   data = args.processor(graydata)
@@ -154,7 +154,7 @@ def process_image_data(args):
 
     if bbox and sum(bbox):
       
-      if input.rank() == 3: 
+      if len(input.shape) == 3: 
         face = (255, 0, 0) #red
         cross = (255, 255, 0) #yellow
       else: 
@@ -171,7 +171,7 @@ def process_image_data(args):
         p = tuple([r(v) for v in p])
         torch.ip.draw_cross(input, p[0], p[1], 2, cross)
 
-    input.save(args.output)
+    torch.io.save(input, args.output)
 
     if args.verbose:
       print "Output file (with detections, if any) saved at %s" % args.output
@@ -230,7 +230,7 @@ def main():
   if args.verbose:
     print "Model loading took %.2f seconds" % total
 
-  is_video = (os.path.splitext(args.input)[1] in torch.io.video_extensions())
+  is_video = (os.path.splitext(args.input)[1] in ('.avi', '.h261', '.h263', '.h264', '.mov', '.m4v', '.mjpeg', '.mpeg', '.ogg', '.rawvideo'))
 
   if is_video:
     process_video_data(args)
