@@ -5,25 +5,33 @@
  * @brief Bindings for a LinearMachine
  */
 
-#include <boost/python.hpp>
+#include "core/python/ndarray.h"
 #include "machine/LinearMachine.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 namespace mach = Torch::machine;
 namespace io = Torch::io;
 
-static blitz::Array<double,1> forward(const mach::LinearMachine& m,
-    const blitz::Array<double,1>& input) {
-  blitz::Array<double,1> output(m.outputSize());
-  m.forward(input, output);
-  return output;
+static object forward(const mach::LinearMachine& m, tp::const_ndarray input) {
+  tp::ndarray output(ca::t_float64, m.outputSize());
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  m.forward(input.bz<double,1>(), output_);
+  return output.self();
+}
+
+static void forward2(const mach::LinearMachine& m, tp::const_ndarray input,
+    tp::ndarray output) {
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  m.forward(input.bz<double,1>(), output_);
 }
 
 static tuple get_shape(const mach::LinearMachine& m) {
   return make_tuple(m.inputSize(), m.outputSize());
 }
 
-static void set_shape(mach::LinearMachine& m, 
+static void set_shape(mach::LinearMachine& m,
     const blitz::TinyVector<int,2>& s) {
   m.resize(s(0), s(1));
 }
@@ -107,8 +115,8 @@ void bind_machine_linear() {
     .add_property("activation", &mach::LinearMachine::getActivation, &mach::LinearMachine::setActivation)
     .add_property("shape", &get_shape, &set_shape)
     .def("resize", &mach::LinearMachine::resize, (arg("self"), arg("input"), arg("output")), "Resizes the machine. If either the input or output increases in size, the weights and other factors should be considered uninitialized. If the size is preserved or reduced, already initialized values will not be changed.\n\nTip: Use this method to force data compression. All will work out given most relevant factors to be preserved are organized on the top of the weight matrix. In this way, reducing the system size will supress less relevant projections.")
-    .def("__call__", &mach::LinearMachine::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
-    .def("forward", &mach::LinearMachine::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
+    .def("__call__", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
+    .def("forward", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
     .def("__call__", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
     .def("forward", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
     ;

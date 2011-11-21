@@ -47,9 +47,9 @@ GETTER(mach::GMMMachine, mach_GMMMachine, getMeanSupervector, double, 1)
 GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceSupervector, double, 1)
 
 static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
-    const blitz::Array<double,1>& input) {
+    tp::const_ndarray input) {
   double output;
-  m.forward(input, output);
+  m.forward(input.bz<double,1>(), output);
   return output;
 }
 
@@ -69,24 +69,24 @@ static blitz::Array<double,1> gmmstats_get_n(mach::GMMStats& s) {
   return s.n;
 }
 
-static void gmmstats_set_n(mach::GMMStats& s, const blitz::Array<double,1>& n) {
-  s.n = n;
+static void gmmstats_set_n(mach::GMMStats& s, tp::const_ndarray n) {
+  s.n = n.bz<double,1>();
 }
 
 static blitz::Array<double,2> gmmstats_get_sumpx(mach::GMMStats& s) {
   return s.sumPx;
 }
 
-static void gmmstats_set_sumpx(mach::GMMStats& s, const blitz::Array<double,2>& n) {
-  s.sumPx = n;
+static void gmmstats_set_sumpx(mach::GMMStats& s, tp::const_ndarray n) {
+  s.sumPx = n.bz<double,2>();
 }
 
 static blitz::Array<double,2> gmmstats_get_sumpxx(mach::GMMStats& s) {
   return s.sumPxx;
 }
 
-static void gmmstats_set_sumpxx(mach::GMMStats& s, const blitz::Array<double,2>& n) {
-  s.sumPxx = n;
+static void gmmstats_set_sumpxx(mach::GMMStats& s, tp::const_ndarray n) {
+  s.sumPxx = n.bz<double,2>();
 }
 
 void bind_machine_gmm() {
