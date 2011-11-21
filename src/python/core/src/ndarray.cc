@@ -315,11 +315,12 @@ static int _GetArrayParamsFromObject(PyObject* op,
         (*out_ndim) = PyArray_NDIM(arr);
         for (int i=0; i<PyArray_NDIM(arr); ++i) 
           out_dims[i] = PyArray_DIM(arr,i);
-        return writeable? PyArray_ISWRITEABLE(arr) : 1;
+        // we need to cast the array, write-ability will not hold...
+        return writeable? 1 : 0;
       }
       
       else {
-        return 0;
+        return 1;
       }
 
     }
@@ -328,7 +329,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
     (*out_arr) = arr;
     (*out_dtype) = 0;
     (*out_ndim) = 0;
-    return writeable? PyArray_ISWRITEABLE(arr) : 1;
+    return writeable? (!PyArray_ISWRITEABLE(arr)) : 0;
 
   }
 
@@ -338,7 +339,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
     bp::object array = 
       tp::make_maybe_null_object(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0));
     
-    if (TPY_ISNONE(array)) return 0;
+    if (TPY_ISNONE(array)) return 1;
 
     //if the conversion worked, you can now fill in the parameters
     (*out_arr) = 0;
@@ -348,7 +349,7 @@ static int _GetArrayParamsFromObject(PyObject* op,
       out_dims[i] = PyArray_DIM(TP_ARRAY(array),i);
 
     //in this mode, the resulting object will never be write-able.
-    return writeable? 0 : 1;
+    return writeable? 1 : 0;
 
   }
 
@@ -388,8 +389,6 @@ tp::convert_t tp::convertible(bp::object array_like, ca::typeinfo& info,
 
     //checks behavior.
     if (behaved) {
-      if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
-            arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
       if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
 
@@ -448,7 +447,9 @@ tp::convert_t tp::convertible_to (bp::object array_like,
     if (behaved) {
       if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
             arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
-      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+      if (!PyArray_ISCONTIGUOUS(arr)) retval = tp::WITHARRAYCOPY;
+      if (!PyArray_ISALIGNED(arr)) retval = tp::WITHARRAYCOPY;
+      //if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
 
     return retval;
@@ -505,8 +506,6 @@ tp::convert_t tp::convertible_to(bp::object array_like, bp::object dtype_like,
 
     //checks behavior.
     if (behaved) {
-      if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
-            arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
       if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
 
@@ -553,8 +552,6 @@ tp::convert_t tp::convertible_to(bp::object array_like, bool writeable,
 
     //checks behavior.
     if (behaved) {
-      if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
-            arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
       if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
 
@@ -591,10 +588,6 @@ static bp::object try_refer_ndarray (boost::python::object array_like,
   bool can_refer = true; //< flags a copy of the data
 
   if (!PyArray_Check((PyObject*)candidate)) can_refer = false;
-
-  if (can_refer && req_dtype &&
-      !PyArray_EquivTypes(candidate->descr, req_dtype))
-    can_refer = false;
 
   if (can_refer && !PyArray_ISCARRAY_RO(candidate)) can_refer = false;
 
@@ -662,7 +655,8 @@ tp::py_array::~py_array() {
 /**
  * Wrap a C-style pointer with a PyArrayObject
  */
-static bp::object wrap_data (void* data, const ca::typeinfo& ti) {
+static bp::object wrap_data (void* data, const ca::typeinfo& ti,
+    bool writeable=true) {
   npy_intp shape[NPY_MAXDIMS];
   npy_intp stride[NPY_MAXDIMS];
   for (size_t k=0; k<ti.nd; ++k) {
@@ -670,7 +664,13 @@ static bp::object wrap_data (void* data, const ca::typeinfo& ti) {
     stride[k] = ti.item_size()*ti.stride[k];
   }
   PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd,
-        &shape[0], tp::type_to_num(ti.dtype), &stride[0], data, 0, 0, 0);
+        &shape[0], tp::type_to_num(ti.dtype), &stride[0], data, 0, 
+#if NPY_FEATURE_VERSION > NUMPY16_API /* NumPy C-API version > 1.6 */
+        writeable? NPY_ARRAY_CARRAY : NPY_ARRAY_CARRAY_RO
+#else
+        writeable? NPY_CARRAY : NPY_CARRAY_RO
+#endif
+        ,0);
   return tp::make_non_null_object(tmp);
 }
 
@@ -790,16 +790,7 @@ static void DeleteSharedPointer (void* ptr) {
 static bp::object make_readonly (const void* data, const ca::typeinfo& ti,
     boost::shared_ptr<const void> owner) {
 
-  bp::object retval = wrap_data(const_cast<void*>(data), ti);
-
-  //resets the "WRITEABLE" flag
-  TP_ARRAY(retval)->flags &= 
-#if NPY_FEATURE_VERSION > NUMPY16_API /* NumPy C-API version > 1.6 */
-    ~NPY_ARRAY_WRITEABLE
-#else
-    ~NPY_WRITEABLE
-#endif
-    ;
+  bp::object retval = wrap_data(const_cast<void*>(data), ti, false);
 
   //creates the shared pointer deallocator
   boost::shared_ptr<const void>* ptr = new boost::shared_ptr<const void>(owner);
