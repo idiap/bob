@@ -29,7 +29,7 @@ class JFATrainerTest(unittest.TestCase):
       0.5797, 0.8530, 0.5132, 0.2399, 0.2400, 0.9027, 0.4893,
       0.3692]).reshape(3,8)
 
-    uv = numpy.ndarray((3,8), 'float32')
+    uv = numpy.ndarray((3,8), 'float64')
 
     # call the update_u function
     torch.trainer.jfa_updateEigen(A,C,uv)
@@ -62,12 +62,12 @@ class JFATrainerTest(unittest.TestCase):
       0.7710, 0.0427, 0.3782, 0.7043, 0.7295]).reshape(2,6)
     y = numpy.array([0.2243, 0.2691, 0.6730, 0.4775]).reshape(2,2)
     x = numpy.ndarray((4,2), 'float64')
-    spk_ids = numpy.ndarray([0,0,1,1], 'uint32')
+    spk_ids = numpy.array([0,0,1,1], 'uint32')
 
     # call the estimateXandU function
     torch.trainer.jfa_estimateXandU(F,N,m,E,d,v,u,z,y,x,spk_ids)
     # Expected results(JFA cookbook, matlab)
-    x_ref = numpy.ndarray([0.2143, 3.1979, 1.8275, 0.1227, -1.3861, 5.3326,
+    x_ref = numpy.array([0.2143, 3.1979, 1.8275, 0.1227, -1.3861, 5.3326,
       0.2359,  -0.7914]).reshape(4,2)
 
     # Makes sure results are good

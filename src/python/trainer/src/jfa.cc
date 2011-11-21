@@ -4,13 +4,15 @@
  * @brief Python bindings to Joint Factor Analysis trainers
  */
 
-#include <boost/python.hpp>
+#include "core/python/ndarray.h"
 #include "trainer/JFATrainer.h"
 #include "machine/JFAMachine.h"
 
 using namespace boost::python;
 namespace train = Torch::trainer;
 namespace mach = Torch::machine;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
 static void jfa_train(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
 {
@@ -102,12 +104,55 @@ static void jfa_enrol(train::JFATrainer& t, list stats, const size_t n_iter)
   t.enrol(gmm_stats, n_iter);
 }
 
+static void update_eigen(tp::const_ndarray A, tp::const_ndarray C, 
+    tp::ndarray uv) {
+  blitz::Array<double,2> uv_ = uv.bz<double,2>();
+  train::jfa::updateEigen(A.bz<double,3>(), C.bz<double,2>(), uv_);
+}
+
+static void estimate_xandu(tp::const_ndarray F, tp::const_ndarray N,
+    tp::const_ndarray m, tp::const_ndarray E,
+    tp::const_ndarray d, tp::const_ndarray v,
+    tp::const_ndarray u, tp::const_ndarray z,
+    tp::const_ndarray y, tp::ndarray x,
+    tp::const_ndarray spk_ids) {
+  blitz::Array<double,2> x_ = x.bz<double,2>();
+  train::jfa::estimateXandU(F.bz<double,2>(), N.bz<double,2>(),
+      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
+      u.bz<double,2>(), z.bz<double,2>(), y.bz<double,2>(), x_,
+      spk_ids.bz<uint32_t,1>());
+}
+
+static void estimate_yandv(tp::const_ndarray F, tp::const_ndarray N,
+  tp::const_ndarray m, tp::const_ndarray E, 
+  tp::const_ndarray d, tp::const_ndarray v, 
+  tp::const_ndarray u, tp::const_ndarray z, 
+  tp::ndarray y, tp::const_ndarray x, tp::const_ndarray spk_ids) {
+  blitz::Array<double,2> y_ = y.bz<double,2>();
+  train::jfa::estimateYandV(F.bz<double,2>(), N.bz<double,2>(),
+      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
+      u.bz<double,2>(), z.bz<double,2>(), y_, x.bz<double,2>(), 
+      spk_ids.bz<uint32_t,1>());
+}
+
+static void estimate_zandd(tp::const_ndarray F, tp::const_ndarray N,
+  tp::const_ndarray m, tp::const_ndarray E,
+  tp::const_ndarray d, tp::const_ndarray v,
+  tp::const_ndarray u, tp::ndarray z,
+  tp::const_ndarray y, tp::const_ndarray x,
+  tp::const_ndarray spk_ids) {
+  blitz::Array<double,2> z_ = z.bz<double,2>();
+  train::jfa::estimateZandD(F.bz<double,2>(), N.bz<double,2>(),
+      m.bz<double,1>(), E.bz<double,1>(), d.bz<double,1>(), v.bz<double,2>(),
+      u.bz<double,2>(), z_, y.bz<double,2>(), x.bz<double,2>(),
+      spk_ids.bz<uint32_t,1>());
+}
 
 void bind_trainer_jfa() {
-  def("jfa_updateEigen", &train::jfa::updateEigen, (arg("A"), arg("C"), arg("uv")), "Updates eigenchannels (or eigenvoices) from accumulators A and C.");
-  def("jfa_estimateXandU", &train::jfa::estimateXandU, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the channel factors.");
-  def("jfa_estimateYandV", &train::jfa::estimateYandV, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors y.");
-  def("jfa_estimateZandD", &train::jfa::estimateZandD, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
+  def("jfa_updateEigen", &update_eigen, (arg("A"), arg("C"), arg("uv")), "Updates eigenchannels (or eigenvoices) from accumulators A and C.");
+  def("jfa_estimateXandU", &estimate_xandu, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the channel factors.");
+  def("jfa_estimateYandV", &estimate_yandv, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors y.");
+  def("jfa_estimateZandD", &estimate_zandd, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the speaker factors z.");
 
   class_<train::JFABaseTrainer, boost::noncopyable>("JFABaseTrainer", "Create a trainer for the JFA.", init<mach::JFABaseMachine&>((arg("jfa_base")),"Initializes a new JFABaseTrainer."))
     .add_property("N", make_function(&train::JFABaseTrainer::getN, return_internal_reference<>()), &train::JFABaseTrainer::setN)
