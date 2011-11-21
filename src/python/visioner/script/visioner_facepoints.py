@@ -34,6 +34,7 @@ import time
 import argparse
 import torch
 import tempfile #for package tests
+import numpy
 
 def testfile(path):
   """Computes the path to a test file"""
@@ -48,7 +49,7 @@ def process_video_data(args):
   """A more efficienty (memory-wise) way to process video data"""
 
   input = torch.io.VideoReader(args.input)
-  gray_buffer = torch.core.array.uint8_2(input.height, input.width)
+  gray_buffer = numpy.ndarray((input.height, input.width), 'uint8')
   data = []
   total = 0
   if args.verbose:
@@ -122,7 +123,7 @@ def process_image_data(args):
   """Process any kind of image data"""
 
   if args.verbose: print "Loading file %s..." % args.input
-  input = torch.core.array.load(args.input) #load the image
+  input = torch.io.load(args.input) #load the image
 
   if input.rank() == 3: #it is a color image
     graydata = torch.ip.rgb_to_gray(input).cast('int16')

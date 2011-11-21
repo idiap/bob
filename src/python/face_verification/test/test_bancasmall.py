@@ -7,12 +7,13 @@
 import os, sys, tempfile, shutil, math
 import unittest
 import torch
+import numpy
 
 def normalizeBlocks(src):
-  for i in range(src.extent(0)):
+  for i in range(src.shape[0]):
     block = src[i, :, :]
-    mean = torch.core.array.float64_2.mean(block)
-    std = torch.core.array.float64_2.sum((block - mean) ** 2) / block.size()
+    mean = block.mean()
+    std = ((block - mean) ** 2).sum() / block.size
     if std == 0:
       std = 1
     else:
@@ -21,10 +22,10 @@ def normalizeBlocks(src):
     src[i, :, :] = (block - mean) / std
     
 def normalizeDCT(src):
-  for i in range(src.extent(1)):
+  for i in range(src.shape[1]):
     col = src[:, i]
-    mean = torch.core.array.float64_1.mean(col)
-    std = torch.core.array.float64_1.sum((col - mean) ** 2) / col.size()
+    mean = col.mean()
+    std = ((col - mean) ** 2).sum() / col.size
     if std == 0:
       std = 1
     else:
@@ -37,7 +38,7 @@ def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W,
     A_N_DCT_COEF, norm_before, norm_after, add_xy):
   
   blockShape = torch.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
-  blocks = torch.core.array.float64_3(blockShape)
+  blocks = numpy.ndarray(blockShape, 'float64')
   torch.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
 
   if norm_before:
@@ -70,7 +71,7 @@ def dctfeatures(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W,
     dct_blocks_max -= 2
     TMP_tensor_min += 2
   
-  TMP_tensor = torch.core.array.float64_2(n_blocks, TMP_tensor_max)
+  TMP_tensor = numpy.ndarray((n_blocks, TMP_tensor_max), 'float64')
   
   nBlocks = torch.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   for by in range(nBlocks[0]):
@@ -113,11 +114,11 @@ def face_normalized(img_input, pos_input, features_output):
 
   # Initialize cropper and destination array
   FEN = torch.ip.FaceEyesNorm( CROP_EYES_D, CROP_H, CROP_W, CROP_OH, CROP_OW)
-  cropped_img = torch.core.array.float64_2(CROP_H, CROP_W)
+  cropped_img = numpy.ndarray((CROP_H, CROP_W), 'float64')
 
   # Initialize the Tan and Triggs preprocessing
   TT = torch.ip.TanTriggs( GAMMA, SIGMA0, SIGMA1, SIZE, THRESHOLD, ALPHA)
-  preprocessed_img = torch.core.array.float64_2(CROP_H, CROP_W)
+  preprocessed_img = numpy.ndarray((CROP_H, CROP_W), 'float64')
 
   # Initialize the DCT feature extractor
   DCTF = torch.ip.DCTFeatures( BLOCK_H, BLOCK_W, OVERLAP_H, OVERLAP_W, N_DCT_COEF)
@@ -125,7 +126,7 @@ def face_normalized(img_input, pos_input, features_output):
   # process the 'dictionary of files'
   for k in img_input:
     # input image file
-    img_rgb = torch.core.array.load( str(img_input[k]) )
+    img_rgb = torch.io.load( str(img_input[k]) )
     # input eyes position file
     LW, LH, RW, RH = [int(j.strip()) for j in open(pos_input[k]).read().split()]
 
@@ -166,14 +167,14 @@ def NormalizeStdArrayset(arrayset):
 
   length = arrayset.shape[0]
   n_samples = len(arrayset)
-  mean = torch.core.array.float64_1(length)
-  std = torch.core.array.float64_1(length)
+  mean = numpy.ndarray(length, 'float64')
+  std = numpy.ndarray(length, 'float64')
 
   mean.fill(0)
   std.fill(0)
 
   for array in arrayset:
-    x = array.get().cast('float64')
+    x = array.get().astype('float64')
     mean += x
     std += (x ** 2)
 
@@ -184,7 +185,7 @@ def NormalizeStdArrayset(arrayset):
 
   arStd = torch.io.Arrayset()
   for array in arrayset:
-    arStd.append(array.get().cast('float64') / std)
+    arStd.append(array.get().astype('float64') / std)
 
   return (arStd,std)
 
@@ -198,7 +199,7 @@ def multiplyVectorsByFactors(matrix, vector):
 def loadData(files):
   data = torch.io.Arrayset()
   for f in files:
-    data.extend(torch.io.Array(str(f)))
+    data.extend(torch.io.Array(str(f)).get())
 
   return data
 
@@ -345,7 +346,7 @@ class GMMExperiment:
     # Loading data for ZTnorm ... done"
     
   def sameValue(self, vect_A, vect_B):
-    sameMatrix = torch.core.array.bool_2(len(vect_A), len(vect_B))
+    sameMatrix = numpy.ndarray((len(vect_A), len(vect_B)), 'bool')
 
     for j in range(len(vect_A)):
       for i in range(len(vect_B)):
@@ -397,7 +398,7 @@ class GMMExperiment:
       
       scores = torch.machine.linearScoring(models, self.wm, list_stats)
     else:
-      scores = torch.core.array.float64_2(len(models), len(files))
+      scores = numpy.ndarray((len(models), len(files)), 'float64')
       
       nb_scores = len(models)*len(files)
       i=0
@@ -460,7 +461,7 @@ class GMMExperiment:
 
     i=0
     total=len(models)
-    scores4 = torch.core.array.float64_1((4,))
+    scores4 = numpy.ndarray(4, 'float64')
     for c in models:
       scores=self.scores_client(c)
       scores4[0] = scores[0][4]
@@ -604,9 +605,9 @@ class TestBancaSmall(unittest.TestCase):
     scores=exp.run('dev', open(os.path.join(result_dir, 'scores-dev'), 'w'))
 
     # Check results (scores)
-    #scores_ref = torch.core.array.float64_1([2.073368737400600, 1.524833680242284, 
-    #  2.468051383113884, 1.705402816531652], (4,))
-    scores_ref = torch.core.array.float64_1([0.97241023, 0.54142182, 1.57735219, 1.25594364], (4,))
+    #scores_ref = numpy.array([2.073368737400600, 1.524833680242284, 
+    #  2.468051383113884, 1.705402816531652])
+    scores_ref = numpy.array([0.97241023, 0.54142182, 1.57735219, 1.25594364])
     self.assertTrue( (abs(scores - scores_ref) < 1e-4).all() )
 
   def test03_jfa(self):
@@ -640,9 +641,9 @@ class TestBancaSmall(unittest.TestCase):
     jfa_train_relevance_factor = 4
     base_machine = torch.machine.JFABaseMachine(ubm_model, jfa_ru, jfa_rv) 
     T = torch.trainer.JFABaseTrainer(base_machine)
-    Vinit = torch.core.array.load(os.path.join(data_dir, 'jfa_Vinit.hdf5'))
-    Uinit = torch.core.array.load(os.path.join(data_dir, 'jfa_Uinit.hdf5'))
-    Dinit = torch.core.array.load(os.path.join(data_dir, 'jfa_Dinit.hdf5'))
+    Vinit = torch.io.load(os.path.join(data_dir, 'jfa_Vinit.hdf5'))
+    Uinit = torch.io.load(os.path.join(data_dir, 'jfa_Uinit.hdf5'))
+    Dinit = torch.io.load(os.path.join(data_dir, 'jfa_Dinit.hdf5'))
     base_machine.V = Vinit
     base_machine.U = Uinit
     base_machine.D = Dinit
