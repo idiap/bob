@@ -735,11 +735,13 @@ class Database(object):
     """
 
     import os
+    from ...io import save
+
     fobj = self.session.query(File).filter_by(id=id).one()
     fullpath = os.path.join(directory, str(fobj.path) + extension)
     fulldir = os.path.dirname(fullpath)
     utils.makedirs_safe(fulldir)
-    obj.save(fullpath)
+    save(obj, fullpath)
 
   def save(self, data, directory, extension):
     """This method takes a dictionary of blitz arrays or torch.database.Array's
