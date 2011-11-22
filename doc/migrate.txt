@@ -1,8 +1,4 @@
-Things to consider:
-
-* Arrayset.cat() implementation needs some work.
-
-Modifications on the syntax:
+A little help for you to migrate:
 
 * io.Arrayset.get() returns io.Array's while operator[] returns NumPy ndarrays
 * core.array.load() an core.array.save() supressed. Use io.load() and io.save()
