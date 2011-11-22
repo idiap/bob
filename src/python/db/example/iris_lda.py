@@ -100,7 +100,7 @@ if __name__ == '__main__':
   options, args = parser.parse_args()
 
   # Loads the dataset and performs LDA
-  data = torch.db.iris.data()
+  data = torch.db.iris.data() #NOT RETURNING GOOD VALUES! STOPPED HERE!
   machine = create_machine(data)
   output = process_data(machine, data)
 

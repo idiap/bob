@@ -7,7 +7,8 @@
 different format.
 """
 
-import os, sys
+import os
+import sys
 
 try:
   import torch
@@ -19,12 +20,13 @@ except ImportError, ex:
 def print_codecs():
   """Prints all installed codecs and the extensions they cover"""
   print
-  print "Torch built-in codecs:"
-  print " %-20s | %s" % ("Codecname", "Extensions supported")
-  print "----------------------+------------------------------"
-  for k in torch.io.ArrayCodecRegistry.getCodecNames():
-    codec = torch.io.ArrayCodecRegistry.getCodecByName(k)
-    print " %-20s | %s" % (codec.name(), ", ".join(codec.extensions()))
+  print "Built-in extension support:"
+  print "----------------+" + 60 * '-'
+  print " %-14s | %s" % ("Extension", "Description")
+  print "----------------+" + 60 * '-'
+  for k, v in torch.io.extensions().iteritems():
+    print " %-14s | %s" % (k, v)
+  print "----------------+" + 60 * '-'
 
 if len(sys.argv) != 3:
   print __doc__
@@ -32,4 +34,4 @@ if len(sys.argv) != 3:
   print_codecs()
   sys.exit(1)
 
-torch.io.array_transcode(sys.argv[1], sys.argv[2])
+torch.io.open(sys.argv[2], 'w').write(torch.io.open(sys.argv[1], 'r').read())

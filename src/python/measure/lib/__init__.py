@@ -1,6 +1,7 @@
 from libpytorch_measure import *
 from . import plot
 from . import load
+import numpy
 
 def mse (estimation, target):
   """Calculates the mean square error between a set of outputs and target
@@ -15,7 +16,7 @@ def mse (estimation, target):
   features in the estimated values or targets are organized as different
   columns.
   """
-  return ((estimation - target)**2).transpose(1,0).partial_mean()
+  return numpy.mean((estimation - target)**2, 0)
 
 def rmse (estimation, target):
   """Calculates the root mean square error between a set of outputs and target
@@ -30,7 +31,7 @@ def rmse (estimation, target):
   features in the estimated values or targets are organized as different
   columns.
   """
-  return mse(estimation, target).sqrt()
+  return numpy.sqrt(mse(estimation, target))
 
 def relevance (input, machine):
   """Calculates the relevance of every input feature to the estimation process
@@ -50,15 +51,14 @@ def relevance (input, machine):
   with features arranged column-wise while different examples are arranged
   row-wise.
   """
-  from ..core.array import float64_1
-
+  
   o = machine(input)
   i2 = input.copy()
-  retval = float64_1(input.extent(1))
+  retval = numpy.ndarray((input.shape[1],), 'float64')
   retval.fill(0)
-  for k in range(input.extent(1)):
+  for k in range(input.shape[1]):
     i2[:,:] = input #reset
-    i2[:,k] = input[:,k].mean()
+    i2[:,k] = numpy.mean(input[:,k])
     retval[k] = (mse(machine(i2), o).sum())**0.5
 
   return retval

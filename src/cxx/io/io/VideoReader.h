@@ -1,12 +1,27 @@
 /**
- * @file io/VideoReader.h
- * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @file cxx/io/io/VideoReader.h
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * Implements a class to read Video files and convert the frames into something
  * that torch can understand (i.e. blitz::Array<>'s). This implementation is
  * heavily based on FFmpeg and the excellent tutorial here:
  * http://dranger.com/ffmpeg/, with some personal modifications. In doubt,
  * consult the ffmpeg documentation: http://ffmpeg.org/documentation.html
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TORCH_IO_DETAIL_VIDEOREADER_H
@@ -15,6 +30,8 @@
 #include <string>
 #include <blitz/array.h>
 #include <stdint.h>
+
+#include "core/array.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -109,11 +126,29 @@ namespace Torch { namespace io {
       inline const std::string& info() const { return m_formatted_info; }
 
       /**
+       * Returns the typing information for this video
+       */
+      inline const Torch::core::array::typeinfo& video_type() const 
+      { return m_typeinfo_video; }
+
+      /**
+       * Returns the typing information for this video
+       */
+      inline const Torch::core::array::typeinfo& frame_type() const 
+      { return m_typeinfo_frame; }
+
+      /**
        * Loads all of the video stream in a blitz array organized in this way:
        * (frames, color-bands, height, width). The 'data' parameter will be
        * resized if required.
        */
       void load(blitz::Array<uint8_t,4>& data) const;
+
+      /**
+       * Loads all of the video stream in a buffer. Resizes the buffer if
+       * the space and type are not good.
+       */
+      void load(Torch::core::array::interface& b) const;
 
     private: //methods
 
@@ -187,6 +222,22 @@ namespace Torch { namespace io {
            */
           bool operator!= (const const_iterator& other);
           
+          /**
+           * Reads the currently pointed frame and advances one position.
+           * Please note that when you call this method in a loop, you don't
+           * need to increment the iterator as it auto-increments itself. The
+           * 'data' format is (color-bands, height, width). If the size does
+           * not match the movie specifications, the array data will be
+           * resized.
+           *
+           * Once the end position is reached, the ffmpeg infrastructure is
+           * automatically destroyed. Rewinding the iterator will cause a
+           * re-load of that infrastructure. If we have reached the end
+           * position, an exception is raised if you try to read() the
+           * iterator.
+           */
+          void read (Torch::core::array::interface& b);
+
           /**
            * Reads the currently pointed frame and advances one position.
            * Please note that when you call this method in a loop, you don't
@@ -283,6 +334,8 @@ namespace Torch { namespace io {
       std::string m_codecname; ///< the name of the ffmpeg codec to be used
       std::string m_codecname_long; ///< long version of m_codecname
       std::string m_formatted_info; ///< printable information about the video
+      Torch::core::array::typeinfo m_typeinfo_video; ///< read whole video type
+      Torch::core::array::typeinfo m_typeinfo_frame; ///< read single frame type
   };
 
 }}

@@ -1,48 +1,98 @@
 /**
- * @file src/python/ip/src/flipflop.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file python/ip/src/flipflop.cc
+ * @date Sun Jun 26 18:59:21 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Binds the flip and flop operations into python 
+ * @brief Binds the flip and flop operations into python
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
-
+#include "core/python/ndarray.h"
 #include "ip/flipflop.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ip = Torch::ip;
+namespace ca = Torch::core::array;
 
-static const char* FLIP2D_DOC = "Flip a 2D blitz array/image upside-down.";
-static const char* FLIP3D_DOC = "Flip a 3D blitz array/image upside-down.";
-static const char* FLOP2D_DOC = "Flop a 2D blitz array/image left-right.";
-static const char* FLOP3D_DOC = "Flop a 3D blitz array/image left-right.";
+template <typename T, int N>
+static void inner_flip (tp::const_ndarray src, tp::ndarray dst) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  ip::flip<T>(src.bz<T,N>(), dst_);
+}
 
+template <typename T>
+static void inner_flip_dim (tp::const_ndarray src, tp::ndarray dst) {
+  const ca::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_flip<T,2>(src, dst);
+    case 3: return inner_flip<T,3>(src, dst);
+    default:
+      PYTHON_ERROR(TypeError, "image flipping does not support type '%s'", info.str().c_str());
+  }
+}
 
-#define FLIPFLOP_DEF(T,N) \
-  def("flip", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP2D_DOC); \
-  def("flip", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flip<T>, (arg("src"), arg("dst")), FLIP3D_DOC); \
-  def("flop", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP2D_DOC); \
-  def("flop", (void (*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&Torch::ip::flop<T>, (arg("src"), arg("dst")), FLOP3D_DOC); \
+static void flip (tp::const_ndarray src, tp::ndarray dst) {
+  const ca::typeinfo& info = src.type();
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_flip_dim<uint8_t>(src, dst);
+    case ca::t_uint16:
+      return inner_flip_dim<uint16_t>(src, dst);
+    case ca::t_float64:
+      return inner_flip_dim<double>(src, dst);
+    default:
+      PYTHON_ERROR(TypeError, "image flipping does not support type '%s'", info.str().c_str());
+  }
+}
 
+template <typename T, int N>
+static void inner_flop (tp::const_ndarray src, tp::ndarray dst) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  ip::flop<T>(src.bz<T,N>(), dst_);
+}
 
-void bind_ip_flipflop()
-{
-/*
-  FLIPFLOP_DEF(bool,bool)
-  FLIPFLOP_DEF(int8_t,int8)
-  FLIPFLOP_DEF(int16_t,int16)
-  FLIPFLOP_DEF(int32_t,int32)
-  FLIPFLOP_DEF(int64_t,int64)
-*/
-  FLIPFLOP_DEF(uint8_t,uint8)
-  FLIPFLOP_DEF(uint16_t,uint16)
-/*
-  FLIPFLOP_DEF(uint32_t,uint32)
-  FLIPFLOP_DEF(uint64_t,uint64)
-  FLIPFLOP_DEF(float,float32)
-*/
-  FLIPFLOP_DEF(double,float64)
-/*
-  FLIPFLOP_DEF(std::complex<float>,complex64)
-  FLIPFLOP_DEF(std::complex<double>,complex128)
-*/
+template <typename T>
+static void inner_flop_dim (tp::const_ndarray src, tp::ndarray dst) {
+  const ca::typeinfo& info = src.type();
+  switch (info.nd) {
+    case 2: return inner_flop<T,2>(src, dst);
+    case 3: return inner_flop<T,3>(src, dst);
+    default:
+      PYTHON_ERROR(TypeError, "image flopping does not support type '%s'", info.str().c_str());
+  }
+}
+
+static void flop (tp::const_ndarray src, tp::ndarray dst) {
+  const ca::typeinfo& info = src.type();
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_flop_dim<uint8_t>(src, dst);
+    case ca::t_uint16:
+      return inner_flop_dim<uint16_t>(src, dst);
+    case ca::t_float64:
+      return inner_flop_dim<double>(src, dst);
+    default:
+      PYTHON_ERROR(TypeError, "image flopping does not support type '%s'", info.str().c_str());
+  }
+}
+
+void bind_ip_flipflop() {
+  static const char* FLIP_DOC = "Flip a 2 or 3D array/image upside-down.";
+  static const char* FLOP_DOC = "Flop a 2 or 3D array/image left-right.";
+  def("flip", &flip, (arg("src"), arg("dst")), FLIP_DOC); 
+  def("flop", &flop, (arg("src"), arg("dst")), FLOP_DOC); 
 }

@@ -8,11 +8,16 @@
 
 import os, sys
 import unittest
+import numpy
 import torch
 
 def load(fname):
   """Loads a single array from the 'data' directory."""
   return torch.io.Array(os.path.join('data', fname)).get()
+
+def count(array, value=True):
+  """Counts occurrences of a certain value in an array"""
+  return list(array == value).count(True)
 
 def save(fname, data):
   """Saves a single array into a file in the 'data' directory."""
@@ -90,9 +95,9 @@ class ErrorTest(unittest.TestCase):
     threshold = torch.measure.eerThreshold(negatives, positives)
 
     # Of course we have to make sure that will set the EER correctly:
-    self.assertEqual(torch.measure.correctlyClassifiedPositives(positives,
-      threshold), torch.measure.correctlyClassifiedNegatives(negatives,
-      threshold))
+    ccp = count(torch.measure.correctlyClassifiedPositives(positives,threshold))
+    ccn = count(torch.measure.correctlyClassifiedNegatives(negatives,threshold))
+    self.assertTrue( (ccp - ccn) <= 1 )
 
     # If the set is separable, the calculation of the threshold is a little bit
     # trickier, as you have no points in the middle of the range to compare
@@ -104,9 +109,9 @@ class ErrorTest(unittest.TestCase):
     # the result here is 3.242 (which is what is expect ;-)
 
     # Of course we have to make sure that will set the EER correctly:
-    self.assertEqual(torch.measure.correctlyClassifiedPositives(positives,
-      threshold), torch.measure.correctlyClassifiedNegatives(negatives,
-      threshold))
+    ccp = count(torch.measure.correctlyClassifiedPositives(positives,threshold))
+    ccn = count(torch.measure.correctlyClassifiedNegatives(negatives,threshold))
+    self.assertEqual(ccp, ccn)
 
     # The second option for the calculation of the threshold is to use the
     # minimum HTER.
@@ -115,9 +120,9 @@ class ErrorTest(unittest.TestCase):
     self.assertEqual(threshold, threshold2) #in this particular case
 
     # Of course we have to make sure that will set the EER correctly:
-    self.assertEqual(torch.measure.correctlyClassifiedPositives(positives,
-      threshold2), torch.measure.correctlyClassifiedNegatives(negatives,
-      threshold2))
+    ccp = count(torch.measure.correctlyClassifiedPositives(positives,threshold2))
+    ccn = count(torch.measure.correctlyClassifiedNegatives(negatives,threshold2))
+    self.assertEqual(ccp, ccn)
 
   def test04_plots(self):
 
@@ -131,29 +136,29 @@ class ErrorTest(unittest.TestCase):
     # uncomment the next line to save a reference value
     # save('nonsep-roc.hdf5', xy)
     xyref = load('nonsep-roc.hdf5')
-    self.assertEqual(xy, xyref)
+    self.assertTrue( numpy.array_equal(xy, xyref) )
 
     # This example will test the DET plot calculation functionality.
     det_xyzw = torch.measure.det(negatives, positives, 100)
     # uncomment the next line to save a reference value
     # save('nonsep-det.hdf5', det_xyzw)
     det_xyzw_ref = load('nonsep-det.hdf5')
-    self.assertEqual(det_xyzw, det_xyzw_ref)
+    self.assertTrue( numpy.array_equal(det_xyzw, det_xyzw_ref) )
 
     # This example will test the EPC plot calculation functionality. For the
     # EPC curve, you need to have a development and a test set. We will split,
     # by the middle, the negatives and positives sample we have, just for the
     # sake of testing
-    dev_negatives = negatives[:(negatives.extent(0)/2)]
-    test_negatives = negatives[(negatives.extent(0)/2):]
-    dev_positives = positives[:(positives.extent(0)/2)]
-    test_positives = positives[(positives.extent(0)/2):]
+    dev_negatives = negatives[:(negatives.shape[0]/2)]
+    test_negatives = negatives[(negatives.shape[0]/2):]
+    dev_positives = positives[:(positives.shape[0]/2)]
+    test_positives = positives[(positives.shape[0]/2):]
     xy = torch.measure.epc(dev_negatives, dev_positives, 
         test_negatives, test_positives, 100)
     # uncomment the next line to save a reference value
     # save('nonsep-epc.hdf5', xy)
     xyref = load('nonsep-epc.hdf5')
-    self.assertEqual(xy, xyref)
+    self.assertTrue( numpy.array_equal(xy, xyref) )
 
 if __name__ == '__main__':
   sys.argv.append('-v')

@@ -9,31 +9,32 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
-A_org    = torch.core.array.float64_2((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), (4,4))
-A_ans_3  = torch.core.array.float64_1((1, 2, 5), (3,))
-A_ans_6  = torch.core.array.float64_1((1, 2, 5, 9, 6, 3), (6,))
-A_ans_10 = torch.core.array.float64_1((1, 2, 5, 9, 6, 3, 4, 7, 10, 13), (10,))
+A_org    = numpy.array(range(1,17), 'float64').reshape((4,4))
+A_ans_3  = numpy.array((1, 2, 5), 'float64')
+A_ans_6  = numpy.array((1, 2, 5, 9, 6, 3), 'float64')
+A_ans_10 = numpy.array((1, 2, 5, 9, 6, 3, 4, 7, 10, 13), 'float64')
 
 class FilterNewTest(unittest.TestCase):
   """Performs various combined filter tests."""
   def test01_zigzag(self):
 
-    B = torch.core.array.float64_1((0, 0, 0), (3,))
+    B = numpy.array((0, 0, 0), 'float64')
     torch.ip.zigzag(A_org, B, 3)
 
     self.assertEqual( (B == A_ans_3).all(), True)
     
   def test02_zigzag(self):
 
-    B = torch.core.array.float64_1((0, 0, 0, 0, 0, 0), (6,))
+    B = numpy.array((0, 0, 0, 0, 0, 0), 'float64')
     torch.ip.zigzag(A_org, B, 6)
 
     self.assertEqual( (B == A_ans_6).all(), True)
 
   def test03_zigzag(self):
 
-    B = torch.core.array.float64_1((0, 0, 0, 0, 0, 0, 0, 0, 0, 0), (10,))
+    B = numpy.array((0, 0, 0, 0, 0, 0, 0, 0, 0, 0), 'float64')
     torch.ip.zigzag(A_org, B, 10)
 
     self.assertEqual( (B == A_ans_10).all(), True)

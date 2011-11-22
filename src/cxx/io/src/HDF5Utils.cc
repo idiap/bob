@@ -1,8 +1,23 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Wed  6 Apr 22:43:02 2011 
+ * @file cxx/io/src/HDF5Utils.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Implements a set of utilities to read HDF5 files. 
+ * @brief Implements a set of utilities to read HDF5 files.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <boost/make_shared.hpp>
@@ -325,7 +340,7 @@ h5::Dataset::select (size_t index, const io::HDF5Type& dest) {
   return it;
 }
 
-void h5::Dataset::read (size_t index, const io::HDF5Type& dest, void* buffer) {
+void h5::Dataset::read_buffer (size_t index, const io::HDF5Type& dest, void* buffer) {
 
   std::vector<io::HDF5Descriptor>::iterator it = select(index, dest);
 
@@ -335,7 +350,7 @@ void h5::Dataset::read (size_t index, const io::HDF5Type& dest, void* buffer) {
   if (status < 0) throw io::HDF5StatusError("H5Dread", status);
 }
 
-void h5::Dataset::write (size_t index, const io::HDF5Type& dest, 
+void h5::Dataset::write_buffer (size_t index, const io::HDF5Type& dest, 
     const void* buffer) {
 
   std::vector<io::HDF5Descriptor>::iterator it = select(index, dest);
@@ -346,7 +361,7 @@ void h5::Dataset::write (size_t index, const io::HDF5Type& dest,
   if (status < 0) throw io::HDF5StatusError("H5Dwrite", status);
 }
     
-void h5::Dataset::extend (const Torch::io::HDF5Type& dest, const void* buffer) {
+void h5::Dataset::extend_buffer (const Torch::io::HDF5Type& dest, const void* buffer) {
   
   //finds compatibility type
   std::vector<io::HDF5Descriptor>::iterator it = find_type_index(m_descr, dest);
@@ -379,7 +394,7 @@ void h5::Dataset::extend (const Torch::io::HDF5Type& dest, const void* buffer) {
       
   m_filespace = open_filespace(m_parent, m_path, m_id); //update filespace
 
-  write(tmp[0]-1, dest, buffer);
+  write_buffer(tmp[0]-1, dest, buffer);
 }
 
 /**

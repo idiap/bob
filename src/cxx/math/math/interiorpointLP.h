@@ -1,10 +1,24 @@
 /**
- * @file src/cxx/math/math/interiorpointLP.h
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file cxx/math/math/interiorpointLP.h
+ * @date Thu Mar 31 14:32:14 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief This file defines interior point methods which allow to solve a 
+ * @brief This file defines interior point methods which allow to solve a
  *        linear program (LP).
- * 
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TORCH5SPRO_MATH_INTERIOR_POINT_LP_H

@@ -1,63 +1,81 @@
 /**
- * @file src/python/ip/src/integral.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file python/ip/src/integral.cc
+ * @date Sun Jun 26 18:59:21 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Binds integral image implementation to python 
+ * @brief Binds integral image implementation to python
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
-
+#include "core/python/ndarray.h"
 #include "ip/integral.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ip = Torch::ip;
+namespace ca = Torch::core::array;
 
-static const char* INTEGRAL2D_DOC = "Compute the integral image of a 2D blitz array (image).";
+template <typename T, typename U, int N>
+static void inner_integral (tp::const_ndarray src, tp::ndarray dst, bool b) {
+  blitz::Array<U,N> dst_ = dst.bz<U,N>();
+  ip::integral(src.bz<T,N>(), dst_, b);
+}
 
-template <typename U>
-static inline void integral_uint8(const blitz::Array<uint8_t,2>& src, blitz::Array<U,2>& dst, const bool addZeroBorder=false)
-  { Torch::ip::integral<uint8_t,U>(src,dst,addZeroBorder); }
+template <typename T, int N>
+static void integral2 (tp::const_ndarray src, tp::ndarray dst, bool b) {
+  const ca::typeinfo& info = dst.type();
 
-template <typename U>
-static inline void integral_uint16(const blitz::Array<uint16_t,2>& src, blitz::Array<U,2>& dst, const bool addZeroBorder=false)
-  { Torch::ip::integral<uint16_t,U>(src,dst,addZeroBorder); }
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "integral image operator does not support output type '%s'", info.str().c_str());
 
-template <typename U>
-static inline void integral_float64(const blitz::Array<double,2>& src, blitz::Array<U,2>& dst, const bool addZeroBorder=false)
-  { Torch::ip::integral<double,U>(src,dst,addZeroBorder); }
+  switch (info.dtype) {
+    case ca::t_int8: return inner_integral<T,int8_t,N>(src, dst, b);
+    case ca::t_int16: return inner_integral<T,int16_t,N>(src, dst, b);
+    case ca::t_int32: return inner_integral<T,int32_t,N>(src, dst, b);
+    case ca::t_int64: return inner_integral<T,int64_t,N>(src, dst, b);
+    case ca::t_uint8: return inner_integral<T,uint8_t,N>(src, dst, b);
+    case ca::t_uint16: return inner_integral<T,uint16_t,N>(src, dst, b);
+    case ca::t_uint32: return inner_integral<T,uint32_t,N>(src, dst, b);
+    case ca::t_uint64: return inner_integral<T,uint64_t,N>(src, dst, b);
+    case ca::t_float32: return inner_integral<T,float,N>(src, dst, b);
+    case ca::t_float64: return inner_integral<T,double,N>(src, dst, b);
+    default:
+      PYTHON_ERROR(TypeError, "integral image operator does not support output type '%s'", info.str().c_str());
+  }
 
-#define INTEGRAL_DECL(U,N) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads_uint8_ ## N, integral_uint8<U>, 2, 3) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads_uint16_ ## N, integral_uint16<U>, 2, 3) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads_float64_ ## N, integral_float64<U>, 2, 3)
+}
 
-#define INTEGRAL_DEF(U,N) \
-  def(BOOST_PP_STRINGIZE(integral), (void (*)(const blitz::Array<uint8_t,2>&, blitz::Array<U,2>&, const bool))&integral_uint8<U>, integral_overloads_uint8_ ## N ((arg("src"), arg("dst"), arg("addZeroBorder")=false), INTEGRAL2D_DOC)); \
-  def(BOOST_PP_STRINGIZE(integral), (void (*)(const blitz::Array<uint16_t,2>&, blitz::Array<U,2>&, const bool))&integral_uint16<U>, integral_overloads_uint16_ ## N ((arg("src"), arg("dst"), arg("addZeroBorder")=false), INTEGRAL2D_DOC)); \
-  def(BOOST_PP_STRINGIZE(integral), (void (*)(const blitz::Array<double,2>&, blitz::Array<U,2>&, const bool))&integral_float64<U>, integral_overloads_float64_ ## N ((arg("src"), arg("dst"), arg("addZeroBorder")=false), INTEGRAL2D_DOC)); 
+static void integral (tp::const_ndarray src, tp::ndarray dst, bool b=false) {
+  const ca::typeinfo& info = src.type();
 
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "integral image operator does not support input type '%s'", info.str().c_str());
 
-INTEGRAL_DECL(int8_t,int8)
-INTEGRAL_DECL(int16_t,int16)
-INTEGRAL_DECL(int32_t,int32)
-INTEGRAL_DECL(int64_t,int64)
-INTEGRAL_DECL(uint8_t,uint8)
-INTEGRAL_DECL(uint16_t,uint16)
-INTEGRAL_DECL(uint32_t,uint32)
-INTEGRAL_DECL(uint64_t,uint64)
-INTEGRAL_DECL(float,float32)
-INTEGRAL_DECL(double,float64)
+  switch (info.dtype) {
+    case ca::t_uint8: return integral2<uint8_t,2>(src, dst, b);
+    case ca::t_uint16: return integral2<uint16_t,2>(src, dst, b);
+    case ca::t_float64: return integral2<double,2>(src, dst, b);
+    default:
+      PYTHON_ERROR(TypeError, "integral image operator does not support input type '%s'", info.str().c_str());
+  }
 
+}
 
-void bind_ip_integral()
-{
-  INTEGRAL_DEF(int8_t,int8)
-  INTEGRAL_DEF(int16_t,int16)
-  INTEGRAL_DEF(int32_t,int32)
-  INTEGRAL_DEF(int64_t,int64)
-  INTEGRAL_DEF(uint8_t,uint8)
-  INTEGRAL_DEF(uint16_t,uint16)
-  INTEGRAL_DEF(uint32_t,uint32)
-  INTEGRAL_DEF(uint64_t,uint64)
-  INTEGRAL_DEF(float,float32)
-  INTEGRAL_DEF(double,float64)
+BOOST_PYTHON_FUNCTION_OVERLOADS(integral_overloads, integral, 2, 3)
+
+void bind_ip_integral() {
+  def(BOOST_PP_STRINGIZE(integral), &integral, integral_overloads((arg("src"), arg("dst"), arg("addZeroBorder")=false), "Compute the integral image of a 2D blitz array (image).")); 
 }

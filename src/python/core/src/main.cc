@@ -1,8 +1,23 @@
 /**
- * @file src/python/core/src/main.cc 
- * @author <a href="mailto:andre.dos.anjos@cern.ch">Andre Anjos</a> 
+ * @file python/core/src/main.cc
+ * @date Tue Jan 18 17:07:26 2011 +0100
+ * @author André Anjos <andre.anjos@idiap.ch>
  *
  * @brief Combines all modules to make up the complete bindings
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <boost/python.hpp>
@@ -15,9 +30,6 @@ void bind_core_logging();
 void bind_core_object();
 void bind_core_tensor();
 void bind_core_profiler();
-void bind_core_array_check();
-void bind_core_repmat();
-void bind_core_reshape();
 
 BOOST_PYTHON_MODULE(libpytorch_core) {
   docstring_options docopt; 
@@ -31,7 +43,4 @@ BOOST_PYTHON_MODULE(libpytorch_core) {
   bind_core_object();
   bind_core_tensor();
   bind_core_profiler();
-  bind_core_array_check();
-  bind_core_repmat();
-  bind_core_reshape();
 }

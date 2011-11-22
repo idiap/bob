@@ -25,10 +25,10 @@ endif(TORCH_FORCE_32BITS)
 # Set the compiler flags and build type(release or debug)
 set(COMMON_FLAGS "${COMMON_FLAGS} -D__STDC_CONSTANT_MACROS -pthread -g -Wall -pedantic")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-long-long -O2 -mtune=generic")
+set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_Fortran_FLAGS_RELEASE "${COMMON_FLAGS} -O2 -funroll-loops")
-set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-long-long -DTORCH_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DTORCH_DEBUG")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(CMAKE_Fortran_FLAGS_DEBUG "${COMMON_FLAGS}")
 

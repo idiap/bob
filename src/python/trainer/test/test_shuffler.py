@@ -18,22 +18,22 @@ class DataShufferTest(unittest.TestCase):
   def setUp(self):
     
     self.set1 = torch.io.Arrayset()
-    self.data1 = torch.core.array.array([1, 0, 0], dtype='float64')
-    self.target1 = torch.core.array.array([1], dtype='float64')
+    self.data1 = numpy.array([1, 0, 0], dtype='float64')
+    self.target1 = numpy.array([1], dtype='float64')
     self.set1.append(self.data1)
     self.set1.append(self.data1*2)
     self.set1.append(self.data1*3)
 
     self.set2 = torch.io.Arrayset()
-    self.data2 = torch.core.array.array([0, 1, 0], dtype='float64')
-    self.target2 = torch.core.array.array([2], dtype='float64')
+    self.data2 = numpy.array([0, 1, 0], dtype='float64')
+    self.target2 = numpy.array([2], dtype='float64')
     self.set2.append(self.data2)
     self.set2.append(self.data2*2)
     self.set2.append(self.data2*3)
 
     self.set3 = torch.io.Arrayset()
-    self.data3 = torch.core.array.array([0, 0, 1], dtype='float64')
-    self.target3 = torch.core.array.array([3], dtype='float64')
+    self.data3 = numpy.array([0, 0, 1], dtype='float64')
+    self.target3 = numpy.array([3], dtype='float64')
     self.set3.append(self.data3)
     self.set3.append(self.data3*2)
     self.set3.append(self.data3*3)
@@ -59,38 +59,38 @@ class DataShufferTest(unittest.TestCase):
 
     [data, target] = shuffle(N)
 
-    self.assertEqual(data.shape(), (N, shuffle.dataWidth))
-    self.assertEqual(target.shape(), (N, shuffle.targetWidth))
+    self.assertEqual(data.shape, (N, shuffle.dataWidth))
+    self.assertEqual(target.shape, (N, shuffle.targetWidth))
 
     # Finally, we also test if the data is well separated. We have to have 2 
     # of each class since N is multiple of 9
     class1_count = len([data[i,:] for i in range(N) \
-        if torch.math.dot_(data[i,:], self.data1) != 0]) 
+        if numpy.dot(data[i,:], self.data1) != 0])
     self.assertEqual(class1_count, 2)
     class2_count = len([data[i,:] for i in range(N) \
-        if torch.math.dot_(data[i,:], self.data2) != 0]) 
+        if numpy.dot(data[i,:], self.data2) != 0]) 
     self.assertEqual(class2_count, 2)
     class3_count = len([data[i,:] for i in range(N) \
-        if torch.math.dot_(data[i,:], self.data3) != 0]) 
+        if numpy.dot(data[i,:], self.data3) != 0]) 
     self.assertEqual(class3_count, 2)
 
     N = 28 #not multiple anymore
 
     [data, target] = shuffle(N)
 
-    self.assertEqual(data.shape(), (N, shuffle.dataWidth))
-    self.assertEqual(target.shape(), (N, shuffle.targetWidth))
+    self.assertEqual(data.shape, (N, shuffle.dataWidth))
+    self.assertEqual(target.shape, (N, shuffle.targetWidth))
 
     # Finally, we also test if the data is well separated. We have to have 2 
     # of each class since N is multiple of 9
     class1_count = len([data[i,:] for i in range(N) \
-        if torch.math.dot_(data[i,:], self.data1) != 0]) 
+        if numpy.dot(data[i,:], self.data1) != 0]) 
     self.assertEqual(class1_count, 10)
     class2_count = len([data[i,:] for i in range(N) \
-        if torch.math.dot_(data[i,:], self.data2) != 0]) 
+        if numpy.dot(data[i,:], self.data2) != 0]) 
     self.assertEqual(class2_count, 9)
     class3_count = len([data[i,:] for i in range(N) \
-        if torch.math.dot_(data[i,:], self.data3) != 0]) 
+        if numpy.dot(data[i,:], self.data3) != 0]) 
     self.assertEqual(class3_count, 9)
 
   def test03_Seeding(self):
@@ -141,9 +141,11 @@ class DataShufferTest(unittest.TestCase):
     shuffle = torch.trainer.DataShuffler([self.set1, self.set2, self.set3],
         [self.target1, self.target2, self.target3])
   
-    npy = numpy.array([[1,0,0], [2,0,0], [3,0,0], [0,1,0], [0,2,0], [0,3,0], [0,0,1], [0,0,2], [0,0,3]])
-    precalc_mean = torch.core.array.array(numpy.mean(npy,0))
-    precalc_stddev = torch.core.array.array(numpy.std(npy,0, ddof=1))
+    npy = numpy.array([[1,0,0], [2,0,0], [3,0,0], 
+      [0,1,0], [0,2,0], [0,3,0],
+      [0,0,1], [0,0,2], [0,0,3]], 'float64')
+    precalc_mean = numpy.array(numpy.mean(npy,0))
+    precalc_stddev = numpy.array(numpy.std(npy,0, ddof=1))
     [mean, stddev] = shuffle.stdnorm()
 
     self.assertTrue( (mean == precalc_mean).all() )
@@ -160,7 +162,7 @@ class DataShufferTest(unittest.TestCase):
     # Note: Results will not be of a better precision because we only have 9
     # samples in the Shuffler...
     self.assertEqual( round(data.mean()), 0 )
-    self.assertEqual( round(numpy.std(data.as_ndarray(), ddof=1)), 1 )
+    self.assertEqual( round(numpy.std(data, ddof=1)), 1 )
 
   def test05_NormalizationBig(self):
 
@@ -169,14 +171,14 @@ class DataShufferTest(unittest.TestCase):
     set1 = torch.io.Arrayset()
     draw25 = torch.core.random.normal_float64(mean=2.0, sigma=5.0)
     for i in range(10000):
-      set1.append(torch.core.array.array([draw25(rng)], dtype='float64'))
-    target1 = torch.core.array.array([1], dtype='float64')
+      set1.append(numpy.array([draw25(rng)], dtype='float64'))
+    target1 = numpy.array([1], dtype='float64')
 
     set2 = torch.io.Arrayset()
     draw32 = torch.core.random.normal_float64(mean=3.0, sigma=2.0)
     for i in range(10000):
-      set2.append(torch.core.array.array([draw32(rng)], dtype='float64'))
-    target2 = torch.core.array.array([2], dtype='float64')
+      set2.append(numpy.array([draw32(rng)], dtype='float64'))
+    target2 = numpy.array([2], dtype='float64')
 
     shuffle = torch.trainer.DataShuffler([set1, set2], [target1, target2])
     shuffle.auto_stdnorm = True
@@ -184,7 +186,7 @@ class DataShufferTest(unittest.TestCase):
 
     [data, target] = shuffle(200000)
     self.assertTrue( abs(data.mean()) < 1e-1 )
-    self.assertTrue( abs(numpy.std(data.as_ndarray(), ddof=1) - 1.0) < 1e-1 )
+    self.assertTrue( abs(numpy.std(data, ddof=1) - 1.0) < 1e-1 )
 
     #note that resetting auto_stdnorm will make the whole go back to normal,
     #but the std normalization values remain the same...

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps "core") #other torch subprojects
-set(shared "${Boost_REGEX_LIBRARY_RELEASE};${ImageMagick_LIBRARIES};${ffmpeg_LIBRARIES};${HDF5_hdf5_LIBRARY_RELEASE}")
+set(shared "${ImageMagick_LIBRARIES};${ffmpeg_LIBRARIES};${HDF5_hdf5_LIBRARY_RELEASE}")
 
 # If we have google-perftools installed, enable the HAS_GOOGLE_PERFTOOLS flag,
 # so profiling extensions can be compiled in.
@@ -13,44 +13,44 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 
 # This defines the list of source files inside this package.
 set(src
-    "src/InlinedArrayImpl.cc"
-    "src/ArrayCodec.cc"
-    "src/ArrayCodecRegistry.cc"
-    "src/ExternalArrayImpl.cc"
-    "src/Array.cc"
-    "src/BinFileHeader.cc"
-    "src/BinFile.cc"
-    "src/BinaryArrayCodec.cc"
-    "src/ImageArrayCodec.cc"
-    "src/T3BinaryArrayCodec.cc"
-    "src/InlinedArraysetImpl.cc"
-    "src/ArraysetCodec.cc"
-    "src/ArraysetCodecRegistry.cc"
-    "src/BinaryArraysetCodec.cc"
-    "src/T3BinaryArraysetCodec.cc"
-    "src/ExternalArraysetImpl.cc"
-    "src/Arrayset.cc"
     "src/Exception.cc"
-    "src/transcode.cc"
-    "src/VideoReader.cc"
-    "src/VideoException.cc"
-    "src/VideoWriter.cc"
-    "src/VideoArrayCodec.cc"
+    "src/reorder.cc"
+
+    "src/Array.cc"
+    "src/File.cc"
+    "src/CodecRegistry.cc"
+    
+    "src/Arrayset.cc"
+
     "src/HDF5Exception.cc"
     "src/HDF5Types.cc"
     "src/HDF5Utils.cc"
     "src/HDF5File.cc"
-    "src/HDF5ArrayCodec.cc"
-    "src/HDF5ArraysetCodec.cc"
+    "src/HDF5ArrayFile.cc"
+
+    "src/ImageFile.cc"
+
+    "src/VideoReader.cc"
+    "src/VideoException.cc"
+    "src/VideoWriter.cc"
+    "src/VideoFile.cc"
+
+    "src/BinFileHeader.cc"
+    "src/BinFile.cc"
+    "src/BinaryArrayFile.cc"
+    
     "src/TensorFileHeader.cc"
     "src/TensorFile.cc"
-    "src/TensorArrayCodec.cc"
+    "src/TensorArrayFile.cc"
+
+    "src/T3File.cc"
     )
 
 # If we have matio installed, enable the compilation of relevant modules
 if(MATIO_FOUND)
   set(shared "${shared};${matio_LIBRARY}")
-  set(src "${src};src/MatUtils.cc;src/MatArrayCodec.cc;src/MatArraysetCodec.cc")
+  set(src "${src};src/MatUtils.cc")
+  set(src "${src};src/MatFile.cc")
 endif(MATIO_FOUND)
 
 include(../../cmake/macros.cmake)

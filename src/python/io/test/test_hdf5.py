@@ -26,14 +26,14 @@ def readWriteTest(self, outfile, dname, data, dtype=None):
   outfile.append(dname + '_single', data[0], dtype=dtype)
 
   # Makes sure we can read the value out
-  self.assertEqual(outfile.lread(dname + '_single', 0), data[0])
+  self.assertTrue( numpy.array_equal(outfile.lread(dname + '_single', 0), data[0]) )
 
   # Now we go for the full set
   outfile.append(dname, data, dtype=dtype)
 
   # And that we can read it back
   back = outfile.lread(dname) #we read all at once as it is simpler
-  for i, b in enumerate(back): self.assertEqual(b, data[i])
+  for i, b in enumerate(back): self.assertTrue( numpy.array_equal(b, data[i]) )
 
 unittest.TestCase.readWriteTest = readWriteTest
 
@@ -43,8 +43,8 @@ def readWriteTestArray(self, outfile, dtype):
   arrays = []
   for k in range(N):
     data = [random.uniform(0,N) for z in range(numpy.product(SHAPE))]
-    nparray = numpy.array(data).reshape(SHAPE)
-    arrays.append(torch.core.array.array(nparray, dtype))
+    nparray = numpy.array(data, dtype=dtype).reshape(SHAPE)
+    arrays.append(nparray)
   self.readWriteTest(outfile, dtype + '_array', arrays)
 
 unittest.TestCase.readWriteTestArray = readWriteTestArray
@@ -65,7 +65,7 @@ class HDF5FileTest(unittest.TestCase):
     arrays = []
     for k in range(N):
       data = [int(random.uniform(0,10)) for z in range(NELEMENT)]
-      arrays.append(torch.core.array.int32_2(data, SHAPE))
+      arrays.append(numpy.array(data, 'int32').reshape(SHAPE))
 
     # Now we create a new binary output file in a temporary location and save
     # the data there.
@@ -81,7 +81,7 @@ class HDF5FileTest(unittest.TestCase):
     # And all the data is *exactly* the same recorded, bit by bit
     back = outfile.lread('testdata') # this is how to read the whole data back
     for i, b in enumerate(back):
-      self.assertTrue( b.numeq(arrays[i]) )
+      self.assertTrue( numpy.array_equal(b, arrays[i]) )
 
     # If you want to immediately close the HDF5 file, just delete the object
     del outfile
@@ -106,7 +106,7 @@ class HDF5FileTest(unittest.TestCase):
     # And all the data is *exactly* the same recorded, bit by bit
     back = readonly.lread('testdata') # this is how to read the whole data back
     for i, b in enumerate(back):
-      self.assertTrue( b.numeq(arrays[i]) )
+      self.assertTrue( numpy.array_equal(b, arrays[i]) )
 
     os.unlink(tmpname)
 
@@ -262,11 +262,37 @@ class HDF5FileTest(unittest.TestCase):
     SHAPE = (2, 3) #6 elements
     NELEMENT = SHAPE[0] * SHAPE[1]
     data = [int(random.uniform(0,10)) for z in range(NELEMENT)]
-    array = torch.core.array.int32_2(data, SHAPE)
+    array = numpy.array(data, 'int32').reshape(SHAPE)
 
     # Try to save a slice
     tmpname = get_tempfilename()
-    array[:,0].save(tmpname, "hdf5.array.binary")
+    torch.io.save(array[:,0], tmpname)
+
+  def test06_canLoadMatlab(self):
+
+    # shows we can load a 2D matlab array and interpret it as a bunch of 1D
+    # arrays, correctly
+
+    t = torch.io.Arrayset('matlab_1d.hdf5')
+    self.assertEqual( len(t), 512 )
+    self.assertEqual( t.shape, (1,) )
+    self.assertEqual( t.elementType.name, 'float64' )
+
+    t = torch.io.Arrayset('matlab_2d.hdf5')
+    self.assertEqual( len(t), 512 )
+    self.assertEqual( t.shape, (2,) )
+    self.assertEqual( t.elementType.name, 'float64' )
+
+    # interestingly enough, if you load those files as arrays, you will read
+    # the whole data at once:
+
+    t = torch.io.Array('matlab_1d.hdf5')
+    self.assertEqual( t.shape, (512,) )
+    self.assertEqual( t.elementType.name, 'float64' )
+
+    t = torch.io.Array('matlab_2d.hdf5')
+    self.assertEqual( t.shape, (512,2) )
+    self.assertEqual( t.elementType.name, 'float64' )
 
   def test06_matlabImport(self):
 

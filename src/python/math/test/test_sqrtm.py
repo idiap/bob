@@ -8,6 +8,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
 class SqrtmTest(unittest.TestCase):
   """Tests the square root of a matrix computation based on Lapack"""
@@ -18,23 +19,22 @@ class SqrtmTest(unittest.TestCase):
 
     N = 4
     # Matrix to decompose
-    A=torch.core.array.float64_2(
-        [1, -1, 0, 0,  -1, 2, -1, 0,
-         0, -1, 2, -1, 0, 0, -1, 1],(N,N))
+    A = numpy.array([1, -1, 0, 0,  -1, 2, -1, 0, 0, -1, 2, -1, 0, 0, -1, 1],
+    'float64').reshape(N,N)
 
     # Matrix for storing the result
-    C=torch.core.array.float64_2((4,4))
+    C = numpy.ndarray((4,4), 'float64')
 
     # Computes the square root (using the two different python methods)
     torch.math.sqrtSymReal(A,C)
     B=torch.math.sqrtSymReal(A)
 
     # Compare square root to matlab reference
-    ref=torch.core.array.float64_2(
+    ref=numpy.array(
       [ 0.81549316, -0.54489511, -0.16221167, -0.10838638,
        -0.54489510,  1.19817659, -0.49106981, -0.16221167,
        -0.16221167, -0.49106981,  1.19817659, -0.54489511,
-       -0.10838638, -0.16221167, -0.54489511,  0.81549316], (4,4))
+       -0.10838638, -0.16221167, -0.54489511,  0.81549316]).reshape(4,4)
     self.assertEqual( ((B-ref) < 1e-4).all(), True )
     self.assertEqual( ((C-ref) < 1e-4).all(), True )
    

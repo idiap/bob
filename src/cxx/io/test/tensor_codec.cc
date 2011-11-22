@@ -1,7 +1,23 @@
 /**
- * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file cxx/io/test/tensor_codec.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief ImageArrayCodec tests
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define BOOST_TEST_DYN_LINK
@@ -14,7 +30,6 @@
 #include <blitz/array.h>
 #include "core/logging.h"
 #include "io/Array.h"
-#include "io/TensorArrayCodec.h"
 
 struct T {
   blitz::Array<int8_t,2> a, b;
@@ -34,10 +49,11 @@ struct T {
 
 };
 
-
 /**
- * @brief Generates a unique temporary filename, and returns the file
- * descriptor
+ * @brief Generates a unique temporary filename, closes the file and return
+ * its name. 
+ *
+ * Yes, I know this is not 100% secure...
  */
 std::string temp_file(const std::string& ext) {
   boost::filesystem::path tpl = Torch::core::tmpdir();
@@ -65,23 +81,7 @@ void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   }
 }
 
-template<typename T, typename U> 
-void check_equal(const blitz::Array<T,3>& a, const blitz::Array<U,3>& b) 
-{
-  BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
-  BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
-  BOOST_REQUIRE_EQUAL(a.extent(2), b.extent(2));
-  for (int i=0; i<a.extent(0); ++i) {
-    for (int j=0; j<a.extent(1); ++j) {
-      for (int k=0; k<a.extent(2); ++k) {
-        BOOST_CHECK_EQUAL(a(i,j,k), Torch::core::cast<T>(b(i,j,k)));
-      }
-    }
-  }
-}
-
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
-
 
 BOOST_AUTO_TEST_CASE( tensor_2d )
 {
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d )
 
   // Save to .tensor
   std::string filename = temp_file(".tensor");
-  db_a.save( filename, "torch.array.tensor" );
+  db_a.save(filename);
 
   // Readd .tensor
   Torch::io::Array db_a_read(filename);
@@ -110,10 +110,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )
   // Get path to the XML Schema definition
   char *testdata_cpath = getenv("TORCH_TESTDATA_DIR");
   if( !testdata_cpath || !strcmp( testdata_cpath, "") ) {
-    Torch::core::error << "Environment variable $TORCH_TESTDATA_DIR " <<
-      "is not set. " << "Have you setup your working environment " <<
-      "correctly?" << std::endl;
-    throw Torch::core::Exception();
+    throw std::runtime_error("Environment variable $TORCH_TESTDATA_DIR is not set. Have you setup your working environment correctly?");
   }
   boost::filesystem::path testdata_path( testdata_cpath);
   testdata_path /= "tensor_char.tensor";

@@ -1,10 +1,25 @@
 /**
-  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-  * @date Fri 8 Jul 2011 11:25:10
-  *
-  * A machine that combines the posterior scores of a client and 
+ * @file cxx/machine/machine/GMMLLRMachine.h
+ * @date Fri Jul 8 13:01:03 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ *
+  * A machine that combines the posterior scores of a client and
   * a UBM models and generates log likelihood ratios.
-  */
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
  
 #ifndef TORCH_MACHINE_GMMLLRMACHINE_H
 #define TORCH_MACHINE_GMMLLRMACHINE_H

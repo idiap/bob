@@ -1,8 +1,23 @@
 /**
- * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Wed  6 Jul 17:57:01 2011 
+ * @file cxx/machine/src/MLP.cc
+ * @date Tue Jan 18 17:07:26 2011 +0100
+ * @author André Anjos <andre.anjos@idiap.ch>
  *
- * @brief Implementation of MLPs 
+ * @brief Implementation of MLPs
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <sys/time.h>
@@ -119,8 +134,7 @@ mach::MLP& mach::MLP::operator= (const MLP& other) {
 }
 
 void mach::MLP::load (Torch::io::HDF5File& config) {
-  uint8_t nhidden;
-  config.read("nhidden", nhidden);
+  uint8_t nhidden = config.read<uint8_t>("nhidden");
   m_weight.resize(nhidden+1);
   m_bias.resize(nhidden+1);
   m_buffer.resize(nhidden+1);
@@ -140,8 +154,7 @@ void mach::MLP::load (Torch::io::HDF5File& config) {
   }
 
   //reads the activation function
-  uint32_t act = 0;
-  config.read("activation", act);
+  uint32_t act = config.read<uint32_t>("activation");
   setActivation(static_cast<mach::Activation>(act));
 
   //setup buffers: first, input

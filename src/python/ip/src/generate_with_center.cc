@@ -1,48 +1,141 @@
 /**
- * @file src/python/ip/src/generate_with_center.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file python/ip/src/generate_with_center.cc
+ * @date Sun Jun 26 18:59:21 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Binds the generateWithCenter operation into python 
+ * @brief Binds the generateWithCenter operation into python
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
-
+#include "core/python/ndarray.h"
 #include "ip/generateWithCenter.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ip = Torch::ip;
+namespace ca = Torch::core::array;
 
-static const char* GENERATEWITHCENTER2D_DOC = "Extend a 2D blitz array/image, putting a given point in the center.";
-static const char* GENERATEWITHCENTER2D_MASK_DOC = "Extend a 2D blitz array/image, putting a given point in the center, taking mask into account.";
-static const char* GET_GENERATEWITHCENTER_SHAPE2D_DOC = "Return the shape of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.";
-static const char* GET_GENERATEWITHCENTER_OFFSET2D_DOC = "Return the offset of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.";
+template <typename T, int N>
+static void inner_gwc (tp::const_ndarray src, tp::ndarray dst, int y, int x) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  ip::generateWithCenter<T>(src.bz<T,N>(), dst_, y, x);
+}
 
+static void gwc (tp::const_ndarray src, tp::ndarray dst, int y, int x) {
+  const ca::typeinfo& info = src.type();
 
-#define GENERATEWITHCENTER_DEF(T,N) \
-  def("getGenerateWithCenterShape", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const int, const int))&Torch::ip::getGenerateWithCenterShape<T>, (arg("src"), arg("center_y"), arg("center_x")), GET_GENERATEWITHCENTER_SHAPE2D_DOC); \
-  def("getGenerateWithCenterOffset", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const int, const int))&Torch::ip::getGenerateWithCenterOffset<T>, (arg("src"), arg("center_y"), arg("center_x")), GET_GENERATEWITHCENTER_OFFSET2D_DOC); \
-  def("generateWithCenter", (void (*)(const blitz::Array<T,2>&, blitz::Array<T,2>&, const int, const int))&Torch::ip::generateWithCenter<T>, (arg("src"), arg("dst"), arg("center_y"), arg("center_x")), GENERATEWITHCENTER2D_DOC); \
-  def("generateWithCenter", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<T,2>&, blitz::Array<bool,2>&, const int, const int))&Torch::ip::generateWithCenter<T>, (arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("center_y"), arg("center_x")), GENERATEWITHCENTER2D_MASK_DOC); \
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
 
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_gwc<uint8_t,2>(src, dst, y, x);
+    case ca::t_uint16:
+      return inner_gwc<uint16_t,2>(src, dst, y, x);
+    case ca::t_float64:
+      return inner_gwc<double,2>(src, dst, y, x);
+    default:
+      PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
+  }
+}
 
-void bind_ip_generate_with_center()
-{
-/*
-  GENERATEWITHCENTER_DEF(bool,bool)
-  GENERATEWITHCENTER_DEF(int8_t,int8)
-  GENERATEWITHCENTER_DEF(int16_t,int16)
-  GENERATEWITHCENTER_DEF(int32_t,int32)
-  GENERATEWITHCENTER_DEF(int64_t,int64)
-*/
-  GENERATEWITHCENTER_DEF(uint8_t,uint8)
-  GENERATEWITHCENTER_DEF(uint16_t,uint16)
-/*
-  GENERATEWITHCENTER_DEF(uint32_t,uint32)
-  GENERATEWITHCENTER_DEF(uint64_t,uint64)
-  GENERATEWITHCENTER_DEF(float,float32)
-*/
-  GENERATEWITHCENTER_DEF(double,float64)
-/*
-  GENERATEWITHCENTER_DEF(std::complex<float>,complex64)
-  GENERATEWITHCENTER_DEF(std::complex<double>,complex128)
-*/
+template <typename T, int N>
+static void inner_gwc2 (tp::const_ndarray src, tp::const_ndarray smask, 
+    tp::ndarray dst, tp::ndarray dmask, int y, int x) {
+  blitz::Array<T,N> dst_ = dst.bz<T,N>();
+  blitz::Array<bool,N> dmask_ = dmask.bz<bool,N>();
+  ip::generateWithCenter<T>(src.bz<T,N>(), smask.bz<bool,N>(), dst_, dmask_, y, x);
+}
+
+static void gwc2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask, int y, int x) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_gwc2<uint8_t,2>(src, smask, dst, dmask, y, x);
+    case ca::t_uint16:
+      return inner_gwc2<uint16_t,2>(src, smask, dst, dmask, y, x);
+    case ca::t_float64:
+      return inner_gwc2<double,2>(src, smask, dst, dmask, y, x);
+    default:
+      PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
+  }
+}
+
+template <typename T, int N>
+static object inner_gwc_shape (tp::const_ndarray src, int y, int x) {
+  return object(ip::getGenerateWithCenterShape<T>(src.bz<T,N>(), y, x));
+}
+
+static object gwc_shape (tp::const_ndarray src, int y, int x) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_gwc_shape<uint8_t,2>(src, y, x);
+    case ca::t_uint16:
+      return inner_gwc_shape<uint16_t,2>(src, y, x);
+    case ca::t_float64:
+      return inner_gwc_shape<double,2>(src, y, x);
+    default:
+      PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
+  }
+}
+
+template <typename T, int N>
+static object inner_gwc_offset (tp::const_ndarray src, int y, int x) {
+  return object(ip::getGenerateWithCenterOffset<T>(src.bz<T,N>(), y, x));
+}
+
+static object gwc_offset (tp::const_ndarray src, int y, int x) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8: 
+      return inner_gwc_offset<uint8_t,2>(src, y, x);
+    case ca::t_uint16:
+      return inner_gwc_offset<uint16_t,2>(src, y, x);
+    case ca::t_float64:
+      return inner_gwc_offset<double,2>(src, y, x);
+    default:
+      PYTHON_ERROR(TypeError, "generate with center does not support type '%s'", info.str().c_str());
+  }
+}
+
+void bind_ip_generate_with_center() {
+
+  def("generateWithCenter", &gwc, (arg("src"), arg("dst"), arg("center_y"), arg("center_x")), "Extend a 2D blitz array/image, putting a given point in the center.");
+
+  def("generateWithCenter", &gwc2, (arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("center_y"), arg("center_x")), "Extend a 2D blitz array/image, putting a given point in the center, taking mask into account.");
+
+  def("getGenerateWithCenterShape", &gwc_shape, (arg("src"), arg("center_y"), arg("center_x")), "Return the shape of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.");
+  
+  def("getGenerateWithCenterOffset", &gwc_offset, (arg("src"), arg("center_y"), arg("center_x")), "Return the offset of the output 2D blitz array/image, when calling generateWithCenter which puts a given point of an image in the center.");
+
 }

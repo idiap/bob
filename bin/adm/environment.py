@@ -144,7 +144,6 @@ def parse_args(argv):
                     help="Switch to back to having environment variables that may cause problems during builds such as the current installation directories",
                    )
                     
-
   options, arguments = parser.parse_args(argv[1:])
   if options.no_externals: options.externals = []
   del options.no_externals

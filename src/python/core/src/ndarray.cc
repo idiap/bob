@@ -1,367 +1,857 @@
 /**
- * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a>
+ * @file python/core/src/ndarray.cc
+ * @date Tue Jan 18 17:07:26 2011 +0100
+ * @author André Anjos <andre.anjos@idiap.ch>
  *
- * @brief Automatic converters for numpy.ndarray.
+ * @brief Implementation of the ndarray class
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Take note on inclusion guidelines for NumPy C/C++ extensions!
+#include <boost/python/numeric.hpp>
+#include <boost/format.hpp>
+#include <stdexcept>
+#include <dlfcn.h>
+
 #define torch_IMPORT_ARRAY
 #include "core/python/ndarray.h"
 #undef torch_IMPORT_ARRAY
 
-#include "core/python/TypeMapper.h"
-
-#include <boost/python/refcount.hpp>
-#include <boost/python/type_id.hpp>
-#include <boost/format.hpp>
-#include <valarray>
-#include <stdexcept>
-#include <dlfcn.h>
+#include "core/logging.h"
 
 namespace bp = boost::python;
 namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
-template<typename T>
-static bp::ndarray from_blitz_1(const blitz::Array<T,1>& b) {
-  //if we get called, it is because we have one of the allowed types and the
-  //number of dimensions was already checked.
-  npy_intp dims[1];
-  for (size_t i=0; i<1; ++i) dims[i] = b.extent(i);
-  bp::ndarray npy = bp::new_ndarray(1, dims, tp::TYPEMAP.type_to_enum<T>());
-  blitz::Array<T,1> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
-  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2) dest(i) = b(i2);
-  return npy;
-}
+#define TP_ARRAY(x) ((PyArrayObject*)x.ptr())
+#define TP_OBJECT(x) (x.ptr())
 
-template<typename T>
-static bp::ndarray from_blitz_2(const blitz::Array<T,2>& b) {
-  //if we get called, it is because we have one of the allowed types and the
-  //number of dimensions was already checked.
-  npy_intp dims[2];
-  for (size_t i=0; i<2; ++i) dims[i] = b.extent(i);
-  bp::ndarray npy = bp::new_ndarray(2, dims, tp::TYPEMAP.type_to_enum<T>());
-  blitz::Array<T,2> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
-  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2)
-    for (int j=0, j2=b.base(1); j<b.extent(1); ++j, ++j2) dest(i,j) = b(i2,j2);
-  return npy;
-}
+#define NUMPY16_API 0x00000006
+#define NUMPY14_API 0x00000004
 
-template<typename T>
-static bp::ndarray from_blitz_3(const blitz::Array<T,3>& b) {
-  //if we get called, it is because we have one of the allowed types and the
-  //number of dimensions was already checked.
-  npy_intp dims[3];
-  for (size_t i=0; i<3; ++i) dims[i] = b.extent(i);
-  bp::ndarray npy = bp::new_ndarray(3, dims, tp::TYPEMAP.type_to_enum<T>());
-  blitz::Array<T,3> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
-  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2)
-    for (int j=0, j2=b.base(1); j<b.extent(1); ++j, ++j2)
-      for (int k=0, k2=b.base(2); k<b.extent(2); ++k, ++k2) 
-        dest(i,j,k) = b(i2,j2,k2);
-  return npy;
-}
+void tp::setup_python(const char* module_docstring) {
 
-template<typename T>
-static bp::ndarray from_blitz_4(const blitz::Array<T,4>& b) {
-  //if we get called, it is because we have one of the allowed types and the
-  //number of dimensions was already checked.
-  npy_intp dims[4];
-  for (size_t i=0; i<4; ++i) dims[i] = b.extent(i);
-  bp::ndarray npy = bp::new_ndarray(4, dims, tp::TYPEMAP.type_to_enum<T>());
-  blitz::Array<T,4> dest((T*)npy.data(), b.shape(), blitz::neverDeleteData);
-  for (int i=0, i2=b.base(0); i<b.extent(0); ++i, ++i2)
-    for (int j=0, j2=b.base(1); j<b.extent(1); ++j, ++j2)
-      for (int k=0, k2=b.base(2); k<b.extent(2); ++k, ++k2) 
-        for (int l=0, l2=b.base(3); l<b.extent(3); ++l, ++l2) 
-          dest(i,j,k,l) = b(i2,j2,k2,l2);
-  return npy;
-}
+  // Documentation options
+  bp::docstring_options docopt;
+# if !defined(TORCH_DEBUG)
+  docopt.disable_cpp_signatures();
+# endif
+  if (module_docstring) bp::scope().attr("__doc__") = module_docstring;
 
-#define NDARRAY_CTOR(BZ_ELEMENT_TYPE) \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz) : m_obj() { *this = from_blitz_1(bz); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz) : m_obj() { *this = from_blitz_2(bz); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz) : m_obj() { *this = from_blitz_3(bz); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz) : m_obj() { *this = from_blitz_4(bz); } 
-NDARRAY_CTOR(bool)
-NDARRAY_CTOR(int8_t)
-NDARRAY_CTOR(uint8_t)
-NDARRAY_CTOR(int16_t)
-NDARRAY_CTOR(uint16_t)
-NDARRAY_CTOR(int32_t)
-NDARRAY_CTOR(uint32_t)
-NDARRAY_CTOR(int64_t)
-NDARRAY_CTOR(uint64_t)
-NDARRAY_CTOR(float)
-NDARRAY_CTOR(double)
-NDARRAY_CTOR(long double)
-NDARRAY_CTOR(std::complex<float>)
-NDARRAY_CTOR(std::complex<double>)
-NDARRAY_CTOR(std::complex<long double>)
-#undef NDARRAY_CTOR
-
-template<typename T> static inline 
-bp::ndarray from_blitz_1(const blitz::Array<T,1>& b, NPY_TYPES cast_to) {
-  return from_blitz_1(b).astype(cast_to);
-}
-
-template<typename T> static inline 
-bp::ndarray from_blitz_2(const blitz::Array<T,2>& b, NPY_TYPES cast_to) {
-  return from_blitz_2(b).astype(cast_to);
-}
-
-template<typename T> static inline 
-bp::ndarray from_blitz_3(const blitz::Array<T,3>& b, NPY_TYPES cast_to) {
-  return from_blitz_3(b).astype(cast_to);
-}
-
-template<typename T> static inline 
-bp::ndarray from_blitz_4(const blitz::Array<T,4>& b, NPY_TYPES cast_to) {
-  return from_blitz_4(b).astype(cast_to);
-}
-
-#define NDARRAY_CTOR(BZ_ELEMENT_TYPE) \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,1>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_1(bz, cast_to); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,2>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_2(bz, cast_to); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,3>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_3(bz, cast_to); } \
-template<> bp::ndarray::ndarray(const blitz::Array<BZ_ELEMENT_TYPE,4>& bz, NPY_TYPES cast_to) : m_obj() { *this = from_blitz_4(bz, cast_to); } 
-NDARRAY_CTOR(bool)
-NDARRAY_CTOR(int8_t)
-NDARRAY_CTOR(uint8_t)
-NDARRAY_CTOR(int16_t)
-NDARRAY_CTOR(uint16_t)
-NDARRAY_CTOR(int32_t)
-NDARRAY_CTOR(uint32_t)
-NDARRAY_CTOR(int64_t)
-NDARRAY_CTOR(uint64_t)
-NDARRAY_CTOR(float)
-NDARRAY_CTOR(double)
-NDARRAY_CTOR(long double)
-NDARRAY_CTOR(std::complex<float>)
-NDARRAY_CTOR(std::complex<double>)
-NDARRAY_CTOR(std::complex<long double>)
-#undef NDARRAY_CTOR
-
-bp::ndarray::ndarray(const bp::object& obj)
-  : m_obj(obj)
-{
-  check_obj(obj);
-}
-
-bp::ndarray::ndarray(const bp::ndarray& obj)
-  : m_obj(obj)
-{
-}
-
-bp::ndarray::~ndarray() {
-}
-
-bp::ndarray& bp::ndarray::operator=
-(const bp::ndarray& other) {
-  m_obj = other.m_obj;
-  return *this;
-}
-
-void bp::ndarray::check_obj(const bp::object& obj) const {
-  if(obj.ptr() != Py_None && !PyArray_Check(obj.ptr())) {
-    PyErr_SetString(PyExc_TypeError, "Not a numpy.ndarray");
-    throw bp::error_already_set();
-  }
-}
-
-const bp::object& bp::ndarray::get_obj() const { 
-  return m_obj; 
-}
-
-Py_ssize_t bp::ndarray::ndim() const { 
-  return PyArray_NDIM(m_obj.ptr()); 
-}
-
-Py_ssize_t bp::ndarray::size() const { 
-  return PyArray_SIZE(m_obj.ptr());
-}
-
-const npy_intp* bp::ndarray::shape() const { 
-  return PyArray_DIMS(m_obj.ptr()); 
-}
-
-const npy_intp* bp::ndarray::strides() const { 
-  return PyArray_STRIDES(m_obj.ptr()); 
-}
-
-Py_ssize_t bp::ndarray::itemsize() const { 
-  return PyArray_ITEMSIZE(m_obj.ptr()); 
-}
-
-NPY_TYPES bp::ndarray::dtype() const { 
-  return (NPY_TYPES)PyArray_TYPE(m_obj.ptr());
-}
-
-const void* bp::ndarray::data() const { 
-  return PyArray_DATA(m_obj.ptr()); 
-}
-
-static inline bool can_cast(NPY_TYPES t1, NPY_TYPES t2) {
-  return PyArray_CanCastSafely((int)t1, (int)t2);
-}
-
-static inline bool are_equivalent(NPY_TYPES t1, NPY_TYPES t2) {
-  return PyArray_EquivTypenums((int)t1, (int)t2);
-}
-
-template <int N> static void assert_ndim(const bp::ndarray& self) {
-  if (self.ndim() != N) {
-    boost::format err("expected blitz::Array<T,%d>, got instead %d");
-    err % self.ndim() % N;
-    PyErr_SetString(PyExc_RuntimeError, err.str().c_str());
-    boost::python::throw_error_already_set();
-  }
-}
-
-template <typename T> static void assert_type(const bp::ndarray& self) {
-  if (!can_cast(self.dtype(), tp::TYPEMAP.type_to_enum<T>())) {
-    boost::format err("expected blitz::Array<%s,N> (or cast'able in the PyArray_CanCastSafely() sense - see the numpy C-API manual), got instead %s");
-    err % tp::TYPEMAP.enum_to_name(self.dtype());
-    err % tp::TYPEMAP.type_to_typename<T>();
-    PyErr_SetString(PyExc_TypeError, err.str().c_str());
-    boost::python::throw_error_already_set();
-  }
-}
-
-/**
- * Converts a Numpy array to a blitz one copying the data and casting to
- * the destination element type. Please note that this is just a place
- * holder, only the full specializations are actual valid
- * implementations.
- */
-template<typename T, int N> static boost::shared_ptr<blitz::Array<T,N> > 
-convert_to_blitz (const bp::ndarray& self) {
-  typedef blitz::Array<T,N> bz_type;
-  typedef blitz::TinyVector<int,N> bz_shape;
-  
-  assert_ndim<N>(self);
-  /**
-   * Because we are dealing all the time with very simple types, we don't need
-   * to make sure the types are castable between themselves, just do it if
-   * needed.
-   */
-  //assert_type<T>(self);
-
-  bz_shape shape;
-  bz_shape stride;
-
-  //if the type is exactly the same, no need to cast - this is by far
-  //the most performant option.
-  if (are_equivalent(self.dtype(), tp::TYPEMAP.type_to_enum<T>())) {
-    const npy_intp* npy_shape = self.shape();
-    const npy_intp* npy_stride = self.strides();
-    for (npy_intp i=0;i<N;++i) {
-      shape[i] = npy_shape[i];
-      stride[i] = npy_stride[i] / sizeof(T);
-    }
-    return boost::shared_ptr<bz_type>(new bz_type((T*)self.data(), shape, stride, blitz::duplicateData));
-  }
-
-  //if you get to this point, there is no other option than casting
-  //which may make you loose precision -- be warned ;-)
-  bp::ndarray casted = self.astype(tp::TYPEMAP.type_to_enum<T>());
-  const npy_intp* npy_shape = casted.shape();
-  const npy_intp* npy_stride = casted.strides();
-  for (npy_intp i=0;i<N;++i) {
-    shape[i] = npy_shape[i];
-    stride[i] = npy_stride[i] / sizeof(T);
-  }
-  return boost::shared_ptr<bz_type>(new bz_type((T*)casted.data(), shape, stride, blitz::duplicateData));
-}
-
-#define NDARRAY_TO_BLITZ(BZ_ELEMENT_TYPE) \
-template<> boost::shared_ptr<blitz::Array<BZ_ELEMENT_TYPE,1> > bp::ndarray::to_blitz<BZ_ELEMENT_TYPE,1>() const { return convert_to_blitz<BZ_ELEMENT_TYPE,1>(*this); } \
-template<> boost::shared_ptr<blitz::Array<BZ_ELEMENT_TYPE,2> > bp::ndarray::to_blitz<BZ_ELEMENT_TYPE,2>() const { return convert_to_blitz<BZ_ELEMENT_TYPE,2>(*this); } \
-template<> boost::shared_ptr<blitz::Array<BZ_ELEMENT_TYPE,3> > bp::ndarray::to_blitz<BZ_ELEMENT_TYPE,3>() const { return convert_to_blitz<BZ_ELEMENT_TYPE,3>(*this); } \
-template<> boost::shared_ptr<blitz::Array<BZ_ELEMENT_TYPE,4> > bp::ndarray::to_blitz<BZ_ELEMENT_TYPE,4>() const { return convert_to_blitz<BZ_ELEMENT_TYPE,4>(*this); } 
-NDARRAY_TO_BLITZ(bool)
-NDARRAY_TO_BLITZ(int8_t)
-NDARRAY_TO_BLITZ(uint8_t)
-NDARRAY_TO_BLITZ(int16_t)
-NDARRAY_TO_BLITZ(uint16_t)
-NDARRAY_TO_BLITZ(int32_t)
-NDARRAY_TO_BLITZ(uint32_t)
-NDARRAY_TO_BLITZ(int64_t)
-NDARRAY_TO_BLITZ(uint64_t)
-NDARRAY_TO_BLITZ(float)
-NDARRAY_TO_BLITZ(double)
-NDARRAY_TO_BLITZ(long double)
-NDARRAY_TO_BLITZ(std::complex<float>)
-NDARRAY_TO_BLITZ(std::complex<double>)
-NDARRAY_TO_BLITZ(std::complex<long double>)
-#undef NDARRAY_TO_BLITZ
-
-static inline bp::object get_borrowed_object(PyObject* obj) {
-  return bp::object(bp::handle<>(bp::borrowed(obj)));
-}
-
-static inline bp::object get_new_object(PyObject* obj) {
-  return bp::object(bp::handle<>(obj));
-}
-
-bp::ndarray bp::ndarray::astype(NPY_TYPES dtype) const {
-  return get_new_object(PyArray_Cast((PyArrayObject*)get_obj().ptr(), 
-        (int)dtype));
-}
-
-bp::ndarray bp::new_ndarray(int len, npy_intp* shape, NPY_TYPES dtype) {
-  return get_new_object(PyArray_SimpleNew(len, shape, (int)dtype));
-}
-
-struct ndarray_to_python {
-  static PyObject* convert(const bp::ndarray& array) {
-    return bp::incref(array.get_obj().ptr()); 
-  }
-  static const PyTypeObject* get_pytype() { return &PyArray_Type; }
-};
-
-//to and from python converters
-void bind_ndarray () {
   // Gets the current dlopenflags and save it
   PyThreadState *tstate = PyThreadState_GET();
-  if(!tstate)
-    throw std::runtime_error("Can not get python dlopenflags.");
+  if(!tstate) throw std::runtime_error("Can not get python dlopenflags.");
   int old_value = tstate->interp->dlopenflags;
 
   // Unsets the RTLD_GLOBAL flag
   tstate->interp->dlopenflags = old_value & (~RTLD_GLOBAL);
+
   // Loads numpy with the RTLD_GLOBAL flag unset
   import_array();
+
   // Resets the RTLD_GLOBAL flag
   tstate->interp->dlopenflags = old_value;
 
-  struct from_python {
-    static void* convertible(PyObject *py_obj) {
-      return PyArray_Check(py_obj) ? py_obj : 0;
-    }
+  //Sets the bp::numeric::array interface to use numpy.ndarray
+  //as basis. This is not strictly required, but good to set as a baseline.
+  bp::numeric::array::set_module_and_type("numpy", "ndarray");
 
-    static void construct(PyObject *py_obj, 
-        bp::converter::rvalue_from_python_stage1_data *data) {
-      typedef bp::converter::rvalue_from_python_storage<bp::ndarray> storage_t;
-      storage_t* the_storage = reinterpret_cast<storage_t*>(data);
-      void* memory_chunk = the_storage->storage.bytes;
-      new (memory_chunk) bp::ndarray(get_borrowed_object(py_obj));
-      data->convertible = memory_chunk;
-    }
+  // Make sure we are not running against the wrong version of NumPy
+  if (NPY_VERSION != PyArray_GetNDArrayCVersion()) {
+    PYTHON_ERROR(ImportError, "module compiled against ABI version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions", (int) NPY_VERSION, (int) PyArray_GetNDArrayCVersion());
+  }
 
-    static const PyTypeObject* get_pytype() { return &PyArray_Type; }
-  };
-
-  bp::to_python_converter<bp::ndarray, ndarray_to_python
-#if defined BOOST_PYTHON_SUPPORTS_PY_SIGNATURES
-                          ,true
+#if NPY_FEATURE_VERSION >= NUMPY14_API /* NumPy C-API version >= 1.4 */
+  if (NPY_FEATURE_VERSION > PyArray_GetNDArrayCFeatureVersion()) {
+    PYTHON_ERROR(ImportError, "module compiled against API version 0x%08x but this version of numpy is 0x%08x - make sure you compile and execute against the same or compatible versions", (int) NPY_FEATURE_VERSION, (int) PyArray_GetNDArrayCFeatureVersion());
+  }
 #endif
-    >();
 
-  bp::converter::registry::push_back(&from_python::convertible,
-      &from_python::construct,
-      bp::type_id<bp::ndarray>()
-#if defined BOOST_PYTHON_SUPPORTS_PY_SIGNATURES
-      , &from_python::get_pytype
-#endif
-      );
 }
+
+/***************************************************************************
+ * Dtype (PyArray_Descr) manipulations                                     *
+ ***************************************************************************/
+
+bp::object tp::make_non_null_object(PyObject* obj) {
+  bp::handle<> hdl(obj); //< raises if NULL
+  bp::object retval(hdl);
+  return retval;
+}
+
+bp::object tp::make_maybe_null_object(PyObject* obj) {
+  bp::handle<> hdl(bp::allow_null(obj));
+  bp::object retval(hdl);
+  return retval;
+}
+
+bp::object tp::make_non_null_borrowed_object(PyObject* obj) {
+  bp::handle<> hdl(bp::borrowed(obj));
+  bp::object retval(hdl);
+  return retval;
+}
+
+int tp::type_to_num(ca::ElementType type) {
+
+  switch(type) {
+    case ca::t_bool:
+      return NPY_BOOL;
+    case ca::t_int8:
+      return NPY_INT8;
+    case ca::t_int16:
+      return NPY_INT16;
+    case ca::t_int32:
+      return NPY_INT32;
+    case ca::t_int64:
+      return NPY_INT64;
+    case ca::t_uint8:
+      return NPY_UINT8;
+    case ca::t_uint16:
+      return NPY_UINT16;
+    case ca::t_uint32:
+      return NPY_UINT32;
+    case ca::t_uint64:
+      return NPY_UINT64;
+    case ca::t_float32:
+      return NPY_FLOAT32;
+    case ca::t_float64:
+      return NPY_FLOAT64;
+    case ca::t_float128:
+      return NPY_FLOAT128;
+    case ca::t_complex64:
+      return NPY_COMPLEX64;
+    case ca::t_complex128:
+      return NPY_COMPLEX128;
+    case ca::t_complex256:
+      return NPY_COMPLEX256;
+    default:
+      PYTHON_ERROR(TypeError, "unsupported C++ element type -- debug me!");
+  }
+
+}
+
+ca::ElementType tp::num_to_type(int num) {
+  switch(num) {
+    case NPY_BOOL:
+      return ca::t_bool;
+    case NPY_INT8:
+      return ca::t_int8;
+    case NPY_INT16:
+      return ca::t_int16;
+    case NPY_INT32:
+      return ca::t_int32;
+    case NPY_INT64:
+      return ca::t_int64;
+    case NPY_UINT8:
+      return ca::t_uint8;
+    case NPY_UINT16:
+      return ca::t_uint16;
+    case NPY_UINT32:
+      return ca::t_uint32;
+    case NPY_UINT64:
+      return ca::t_uint64;
+    case NPY_FLOAT32:
+      return ca::t_float32;
+    case NPY_FLOAT64:
+      return ca::t_float64;
+    case NPY_FLOAT128:
+      return ca::t_float128;
+    case NPY_COMPLEX64:
+      return ca::t_complex64;
+    case NPY_COMPLEX128:
+      return ca::t_complex128;
+    case NPY_COMPLEX256:
+      return ca::t_complex256;
+    default:
+      PYTHON_ERROR(TypeError, "unsupported NumPy element type -- debug me!");
+  }
+
+}
+
+template <> int tp::ctype_to_num<bool>(void) 
+{ return NPY_BOOL; }
+template <> int tp::ctype_to_num<int8_t>(void) 
+{ return NPY_INT8; }
+template <> int tp::ctype_to_num<uint8_t>(void) 
+{ return NPY_UINT8; }
+template <> int tp::ctype_to_num<int16_t>(void) 
+{ return NPY_INT16; }
+template <> int tp::ctype_to_num<uint16_t>(void) 
+{ return NPY_UINT16; }
+template <> int tp::ctype_to_num<int32_t>(void) 
+{ return NPY_INT32; }
+template <> int tp::ctype_to_num<uint32_t>(void) 
+{ return NPY_UINT32; }
+template <> int tp::ctype_to_num<int64_t>(void)
+{ return NPY_INT64; }
+template <> int tp::ctype_to_num<uint64_t>(void)
+{ return NPY_UINT64; }
+template <> int tp::ctype_to_num<float>(void)
+{ return NPY_FLOAT32; }
+template <> int tp::ctype_to_num<double>(void) 
+{ return NPY_FLOAT64; }
+template <> int tp::ctype_to_num<long double>(void) 
+{ return NPY_FLOAT128; }
+template <> int tp::ctype_to_num<std::complex<float> >(void)
+{ return NPY_COMPLEX64; }
+template <> int tp::ctype_to_num<std::complex<double> >(void) 
+{ return NPY_COMPLEX128; }
+template <> int tp::ctype_to_num<std::complex<long double> >(void) 
+{ return NPY_COMPLEX256; }
+
+ca::ElementType tp::array_to_type(const bp::numeric::array& a) {
+  return tp::num_to_type(TP_ARRAY(a)->descr->type_num);
+}
+
+size_t tp::array_to_ndim(const bp::numeric::array& a) {
+  return PyArray_NDIM(a.ptr());
+}
+
+#define TP_DESCR(x) ((PyArray_Descr*)x.ptr())
+
+tp::dtype::dtype (bp::object dtype_like) {
+  PyArray_Descr* tmp = 0;
+  if (!PyArray_DescrConverter2(dtype_like.ptr(), &tmp)) {
+    std::string dtype_str = bp::extract<std::string>(bp::str(dtype_like));
+    PYTHON_ERROR(TypeError, "cannot convert input dtype-like object (%s) to proper dtype", dtype_str.c_str());
+  }
+  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+}
+
+tp::dtype::dtype (PyArray_Descr* descr) {
+  if (descr) m_self = tp::make_non_null_object((PyObject*)descr);
+}
+
+tp::dtype::dtype(int typenum) {
+  PyArray_Descr* tmp = PyArray_DescrFromType(typenum);
+  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+}
+
+tp::dtype::dtype(ca::ElementType eltype) {
+  if (eltype != ca::t_unknown) {
+    PyArray_Descr* tmp = PyArray_DescrFromType(tp::type_to_num(eltype));
+    m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+  }
+}
+
+tp::dtype::dtype(const tp::dtype& other): m_self(other.m_self)
+{
+}
+
+tp::dtype::dtype() {
+}
+
+tp::dtype::~dtype() { }
+
+tp::dtype& tp::dtype::operator= (const tp::dtype& other) {
+  m_self = other.m_self;
+  return *this;
+}
+
+bool tp::dtype::has_native_byteorder() const {
+  return TPY_ISNONE(m_self)? false : (PyArray_EquivByteorders(TP_DESCR(m_self)->byteorder, NPY_NATIVE) || TP_DESCR(m_self)->elsize == 1);
+}
+
+bool tp::dtype::has_type(ca::ElementType _eltype) const {
+  return eltype() == _eltype;
+}
+
+ca::ElementType tp::dtype::eltype() const {
+  return TPY_ISNONE(m_self)? ca::t_unknown : 
+    tp::num_to_type(TP_DESCR(m_self)->type_num);
+}
+      
+int tp::dtype::type_num() const {
+  return TPY_ISNONE(m_self)? -1 : TP_DESCR(m_self)->type_num;
+}
+
+bp::str tp::dtype::str() const {
+  return bp::str(m_self);
+}
+
+std::string tp::dtype::cxx_str() const {
+  return bp::extract<std::string>(this->str());
+}
+
+/****************************************************************************
+ * Free methods                                                             *
+ ****************************************************************************/
+
+void tp::typeinfo_ndarray_ (const bp::object& o, ca::typeinfo& i) {
+  PyArrayObject* npy = TP_ARRAY(o);
+  npy_intp strides[NPY_MAXDIMS];
+  for (int k=0; k<npy->nd; ++k) strides[k] = npy->strides[k]/npy->descr->elsize;
+  i.set<npy_intp>(tp::num_to_type(npy->descr->type_num), npy->nd,
+      npy->dimensions, strides);
+}
+
+void tp::typeinfo_ndarray (const bp::object& o, ca::typeinfo& i) {
+  if (!PyArray_Check(o.ptr())) {
+    throw std::invalid_argument("invalid input: cannot extract typeinfo object from anything else than ndarray");
+  }
+  tp::typeinfo_ndarray_(o, i);
+}
+
+/**
+ * This method emulates the behavior of PyArray_GetArrayParamsFromObject from
+ * NumPy >= 1.6 and is used when compiling and liking against older versions of
+ * NumPy.
+ */
+static int _GetArrayParamsFromObject(PyObject* op, 
+    PyArray_Descr* requested_dtype, 
+    npy_bool writeable, 
+    PyArray_Descr** out_dtype, 
+    int* out_ndim,
+    npy_intp* out_dims, 
+    PyArrayObject** out_arr, 
+    PyObject*) {
+  
+  if (PyArray_Check(op)) { //it is already an array, easy
+    
+    PyArrayObject* arr = reinterpret_cast<PyArrayObject*>(op);
+
+    if (requested_dtype && !PyArray_EquivTypes(arr->descr, requested_dtype)) {
+
+      if (PyArray_CanCastTo(arr->descr, requested_dtype)) {
+        (*out_arr) = 0;
+        (*out_dtype) = PyArray_DESCR(arr);
+        (*out_ndim) = PyArray_NDIM(arr);
+        for (int i=0; i<PyArray_NDIM(arr); ++i) 
+          out_dims[i] = PyArray_DIM(arr,i);
+        // we need to cast the array, write-ability will not hold...
+        return writeable? 1 : 0;
+      }
+      
+      else {
+        return 1;
+      }
+
+    }
+
+    //if you get to this point, the types are equivalent or there was no type
+    (*out_arr) = arr;
+    (*out_dtype) = 0;
+    (*out_ndim) = 0;
+    return writeable? (!PyArray_ISWRITEABLE(arr)) : 0;
+
+  }
+
+  else { //it is not an array -- try a brute-force conversion
+
+    TDEBUG1("[non-optimal] using NumPy version < 1.6 requires we convert input data for convertibility check - compile against NumPy >= 1.6 to improve performance");
+    bp::object array = 
+      tp::make_maybe_null_object(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0));
+    
+    if (TPY_ISNONE(array)) return 1;
+
+    //if the conversion worked, you can now fill in the parameters
+    (*out_arr) = 0;
+    (*out_dtype) = requested_dtype;
+    (*out_ndim) = PyArray_NDIM(TP_ARRAY(array));
+    for (int i=0; i<PyArray_NDIM(TP_ARRAY(array)); ++i) 
+      out_dims[i] = PyArray_DIM(TP_ARRAY(array),i);
+
+    //in this mode, the resulting object will never be write-able.
+    return writeable? 1 : 0;
+
+  }
+
+  return 0; //turn-off c compiler warnings...
+
+}
+
+tp::convert_t tp::convertible(bp::object array_like, ca::typeinfo& info,
+    bool writeable, bool behaved) {
+
+  int ndim = 0;
+  npy_intp dims[NPY_MAXDIMS];
+  PyArrayObject* arr = 0;
+  PyArray_Descr* dtype = 0;
+
+  int not_convertible =
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+    PyArray_GetArrayParamsFromObject
+#else
+    _GetArrayParamsFromObject
+#endif
+    (array_like.ptr(), //input object pointer
+     0,                //requested dtype (if need to enforce)
+     writeable,        //writeable?
+     &dtype,           //dtype assessment - borrowed
+     &ndim,            //assessed number of dimensions
+     dims,             //assessed shape
+     &arr,             //if obj_ptr is ndarray, return it here
+     0)                //context?
+    ;
+
+  if (not_convertible) return tp::IMPOSSIBLE;
+
+  convert_t retval = tp::BYREFERENCE;
+    
+  if (arr) { //the passed object is an array
+
+    //checks behavior.
+    if (behaved && !PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+
+    info.set<npy_intp>(tp::num_to_type(arr->descr->type_num),
+        PyArray_NDIM(arr), PyArray_DIMS(arr));
+  }
+
+  else { //the passed object is not an array
+    info.set<npy_intp>(tp::num_to_type(dtype->type_num), ndim, dims);
+    retval = tp::WITHCOPY;
+  }
+
+  return retval;
+}
+
+tp::convert_t tp::convertible_to (bp::object array_like,
+    const ca::typeinfo& info, bool writeable, bool behaved) {
+  
+  tp::dtype req_dtype(info.dtype);
+
+  int ndim = 0;
+  npy_intp dims[NPY_MAXDIMS];
+  PyArrayObject* arr = 0;
+  PyArray_Descr* dtype = 0;
+
+  int not_convertible =
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+    PyArray_GetArrayParamsFromObject
+#else
+    _GetArrayParamsFromObject
+#endif
+    (array_like.ptr(),           //input object pointer
+     TP_DESCR(req_dtype.self()), //requested dtype (if need to enforce)
+     writeable,                  //writeable?
+     &dtype,                     //dtype assessment
+     &ndim,                      //assessed number of dimensions
+     dims,                       //assessed shape
+     &arr,                       //if obj_ptr is ndarray, return it here
+     0)                          //context?
+    ;
+
+  if (not_convertible) return tp::IMPOSSIBLE;
+
+  convert_t retval = tp::BYREFERENCE;
+    
+  if (arr) { //the passed object is an array -- check compatibility
+  
+    if (info.nd) { //check number of dimensions and shape, if needs to
+      if (PyArray_NDIM(arr) != (int)info.nd) return tp::IMPOSSIBLE;
+      if (info.has_valid_shape())
+        for (size_t i=0; i<info.nd; ++i)
+          if ((int)info.shape[i] != PyArray_DIM(arr,i)) return tp::IMPOSSIBLE;
+    }
+
+    //checks behavior.
+    if (behaved) {
+      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+    }
+
+    return retval;
+
+  }
+
+  else { //the passed object is not an array
+
+     if (info.nd) { //check number of dimensions and shape
+      if (ndim != (int)info.nd) return tp::IMPOSSIBLE;
+      for (size_t i=0; i<info.nd; ++i) 
+        if (info.shape[i] && 
+            (int)info.shape[i] != dims[i]) return tp::WITHCOPY;
+     }
+
+     retval = tp::WITHCOPY;
+
+  }
+
+  return retval;
+}
+
+tp::convert_t tp::convertible_to(bp::object array_like, bp::object dtype_like,
+    bool writeable, bool behaved) {
+
+  tp::dtype req_dtype(dtype_like);
+
+  int ndim = 0;
+  npy_intp dims[NPY_MAXDIMS];
+  PyArrayObject* arr = 0;
+  PyArray_Descr* dtype = 0;
+
+  int not_convertible =
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+    PyArray_GetArrayParamsFromObject
+#else
+    _GetArrayParamsFromObject
+#endif
+    (array_like.ptr(),           //input object pointer
+     TP_DESCR(req_dtype.self()), //requested dtype (if need to enforce)
+     writeable,                  //writeable?
+     &dtype,                     //dtype assessment
+     &ndim,                      //assessed number of dimensions
+     dims,                       //assessed shape
+     &arr,                       //if obj_ptr is ndarray, return it here
+     0)                          //context?
+    ;
+
+  if (not_convertible) return tp::IMPOSSIBLE;
+
+  convert_t retval = tp::BYREFERENCE;
+    
+  if (arr) { //the passed object is an array -- check compatibility
+
+    //checks behavior.
+    if (behaved) {
+      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+    }
+
+  }
+
+  else { //the passed object is not an array
+
+     retval = tp::WITHCOPY;
+
+  }
+
+  return retval;
+}
+
+tp::convert_t tp::convertible_to(bp::object array_like, bool writeable,
+    bool behaved) {
+
+  int ndim = 0;
+  npy_intp dims[NPY_MAXDIMS];
+  PyArrayObject* arr = 0;
+  PyArray_Descr* dtype = 0;
+
+  int not_convertible =
+#if NPY_FEATURE_VERSION >= NUMPY16_API /* NumPy C-API version >= 1.6 */
+    PyArray_GetArrayParamsFromObject
+#else
+    _GetArrayParamsFromObject
+#endif
+    (array_like.ptr(), //input object pointer
+     0,                //requested dtype (if need to enforce)
+     writeable,        //writeable?
+     &dtype,           //dtype assessment
+     &ndim,            //assessed number of dimensions
+     dims,             //assessed shape
+     &arr,             //if obj_ptr is ndarray, return it here
+     0)                //context?
+    ;
+
+  if (not_convertible) return tp::IMPOSSIBLE;
+
+  convert_t retval = tp::BYREFERENCE;
+    
+  if (arr) { //the passed object is an array -- check compatibility
+
+    //checks behavior.
+    if (behaved) {
+      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+    }
+
+  }
+
+  else { //the passed object is not an array
+
+     retval = tp::WITHCOPY;
+
+  }
+
+  return retval;
+}
+
+/***************************************************************************
+ * Ndarray (PyArrayObject) manipulations                                   *
+ ***************************************************************************/
+
+/**
+ * Returns either a reference or a copy of the given array_like object,
+ * depending on the following requirements for referral:
+ *
+ * 0. The pointed object is a numpy.ndarray
+ * 1. The array type description type_num matches
+ * 2. The array is C-style, contiguous and aligned
+ */
+static bp::object try_refer_ndarray (boost::python::object array_like, 
+    bp::object dtype_like) {
+
+  PyArrayObject* candidate = TP_ARRAY(array_like);
+  PyArray_Descr* req_dtype = 0;
+  PyArray_DescrConverter2(dtype_like.ptr(), &req_dtype); //new ref!
+
+  bool can_refer = true; //< flags a copy of the data
+
+  if (!PyArray_Check((PyObject*)candidate)) can_refer = false;
+
+  if (can_refer && !PyArray_ISCARRAY_RO(candidate)) can_refer = false;
+
+  if (can_refer) {
+    PyObject* tmp = PyArray_FromArray(candidate, 0, 0);
+    return tp::make_non_null_object(tmp);
+  }
+
+  //copy
+  TDEBUG1("[non-optimal] copying array-like object - cannot refer");
+  PyObject* _ptr = (PyObject*)candidate;
+#if NPY_FEATURE_VERSION > NUMPY16_API /* NumPy C-API version > 1.6 */
+  int flags = NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ENSURECOPY|NPY_ARRAY_ENSUREARRAY;
+#else
+  int flags = NPY_C_CONTIGUOUS|NPY_ENSURECOPY|NPY_ENSUREARRAY;
+#endif
+  PyObject* tmp = PyArray_FromAny(_ptr, req_dtype, 0, 0, flags, 0);
+  return tp::make_non_null_object(tmp);
+
+}
+
+static void derefer_ndarray (PyArrayObject* array) {
+  Py_XDECREF(array);
+}
+
+static boost::shared_ptr<void> shared_from_ndarray (bp::object& o) {
+  boost::shared_ptr<PyArrayObject> cache(TP_ARRAY(o), 
+      std::ptr_fun(derefer_ndarray));
+  Py_XINCREF(TP_OBJECT(o)); ///< makes sure it outlives this scope!
+  return cache; //casts to b::shared_ptr<void>
+}
+
+tp::py_array::py_array(bp::object o, bp::object _dtype):
+  m_is_numpy(true)
+{
+  if (TPY_ISNONE(o)) PYTHON_ERROR(TypeError, "You cannot pass 'None' as input parameter to C++-bound Torch methods that expect NumPy ndarrays (or blitz::Array<T,N>'s). Double-check your input!");
+
+  bp::object mine = try_refer_ndarray(o, _dtype);
+
+  //captures data from a numeric::array
+  typeinfo_ndarray_(mine, m_type);
+
+  //transforms the from boost::python ref counting to boost::shared_ptr<void>
+  m_data = shared_from_ndarray(mine);
+
+  //set-up the C-style pointer to this data
+  m_ptr = static_cast<void*>(TP_ARRAY(mine)->data);
+}
+
+tp::py_array::py_array(const ca::interface& other) {
+  set(other);
+}
+
+tp::py_array::py_array(boost::shared_ptr<ca::interface> other) {
+  set(other);
+}
+
+tp::py_array::py_array(const ca::typeinfo& info) {
+  set(info);
+}
+
+tp::py_array::~py_array() {
+}
+
+/**
+ * Wrap a C-style pointer with a PyArrayObject
+ */
+static bp::object wrap_data (void* data, const ca::typeinfo& ti,
+    bool writeable=true) {
+  npy_intp shape[NPY_MAXDIMS];
+  npy_intp stride[NPY_MAXDIMS];
+  for (size_t k=0; k<ti.nd; ++k) {
+    shape[k] = ti.shape[k];
+    stride[k] = ti.item_size()*ti.stride[k];
+  }
+  PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd,
+        &shape[0], tp::type_to_num(ti.dtype), &stride[0], data, 0, 
+#if NPY_FEATURE_VERSION > NUMPY16_API /* NumPy C-API version > 1.6 */
+        writeable? NPY_ARRAY_CARRAY : NPY_ARRAY_CARRAY_RO
+#else
+        writeable? NPY_CARRAY : NPY_CARRAY_RO
+#endif
+        ,0);
+  return tp::make_non_null_object(tmp);
+}
+
+/**
+ * New wrapper of the array
+ */
+static bp::object wrap_ndarray (const bp::object& a) {
+  PyObject* tmp = PyArray_FromArray(TP_ARRAY(a), 0, 0); 
+  return tp::make_non_null_object(tmp);
+}
+
+/**
+ * Creates a new array from specifications
+ */
+static bp::object make_ndarray(int nd, npy_intp* dims, int type) {
+  PyObject* tmp = PyArray_SimpleNew(nd, dims, type);
+  return tp::make_non_null_object(tmp);
+}
+
+/**
+ * New copy of the array from another array
+ */
+static bp::object copy_array (const bp::object& array) {
+  PyArrayObject* _p = TP_ARRAY(array);
+  bp::object retval = make_ndarray(_p->nd, _p->dimensions, _p->descr->type_num);
+  PyArray_CopyInto(TP_ARRAY(retval), TP_ARRAY(array));
+  return retval;
+}
+
+/**
+ * Copies a data pointer and type into a new numpy array.
+ */
+static bp::object copy_data (const void* data, const ca::typeinfo& ti) {
+  bp::object wrapped = wrap_data(const_cast<void*>(data), ti);
+  bp::object retval = copy_array (wrapped);
+  return retval;
+}
+
+void tp::py_array::set(const ca::interface& other) {
+  TDEBUG1("[non-optimal] buffer copying operation being performed for " 
+      << other.type().str());
+
+  //performs a copy of the data into a numpy array
+  bp::object mine = copy_data(other.ptr(), m_type);
+
+  //captures data from a numeric::array
+  typeinfo_ndarray_(mine, m_type);
+
+  //transforms the from boost::python ref counting to boost::shared_ptr<void>
+  m_data = shared_from_ndarray(mine);
+
+  //set-up the C-style pointer to this data
+  m_ptr = static_cast<void*>(TP_ARRAY(mine)->data);
+
+  m_is_numpy = true;
+}
+
+void tp::py_array::set(boost::shared_ptr<ca::interface> other) {
+  m_type = other->type();
+  m_is_numpy = false;
+  m_ptr = other->ptr();
+  m_data = other->owner();
+}
+
+/**
+ * Creates a new numpy array from a Torch::io::typeinfo object.
+ */
+static bp::object new_from_type (const ca::typeinfo& ti) {
+  npy_intp shape[NPY_MAXDIMS];
+  npy_intp stride[NPY_MAXDIMS];
+  for (size_t k=0; k<ti.nd; ++k) {
+    shape[k] = ti.shape[k];
+    stride[k] = ti.item_size()*ti.stride[k];
+  }
+  PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd, &shape[0], 
+      tp::type_to_num(ti.dtype), &stride[0], 0, 0, 0, 0);
+  return tp::make_non_null_object(tmp);
+}
+
+void tp::py_array::set (const ca::typeinfo& req) {
+  if (m_type.is_compatible(req)) return; ///< nothing to do!
+  
+  TDEBUG1("[non-optimal?] buffer re-size being performed from " << m_type.str()
+      << " to " << req.str());
+
+  bp::object mine = new_from_type(req);
+
+  //captures data from a numeric::array
+  typeinfo_ndarray_(mine, m_type);
+
+  //transforms the from boost::python ref counting to boost::shared_ptr<void>
+  m_data = shared_from_ndarray(mine);
+
+  //set-up the C-style pointer to this data
+  m_ptr = static_cast<void*>(TP_ARRAY(mine)->data);
+
+  m_is_numpy = true;
+}
+
+bp::object tp::py_array::copy(const bp::object& dtype) {
+  return copy_data(m_ptr, m_type);
+}
+
+/**
+ * Gets a read-only reference to a certain data. This recipe was originally
+ * posted here:
+ * http://blog.enthought.com/python/numpy-arrays-with-pre-allocated-memory/
+ *
+ * But a better allocation strategy (that actually works) is posted here:
+ * http://stackoverflow.com/questions/2924827/numpy-array-c-api
+ */
+static void DeleteSharedPointer (void* ptr) {
+  typedef boost::shared_ptr<const void> type;
+  delete static_cast<type*>(ptr);
+}
+
+static bp::object make_readonly (const void* data, const ca::typeinfo& ti,
+    boost::shared_ptr<const void> owner) {
+
+  bp::object retval = wrap_data(const_cast<void*>(data), ti, false);
+
+  //creates the shared pointer deallocator
+  boost::shared_ptr<const void>* ptr = new boost::shared_ptr<const void>(owner);
+  PyObject* py_sharedptr = PyCObject_FromVoidPtr(ptr, DeleteSharedPointer);
+
+  if (!py_sharedptr) {
+    PYTHON_ERROR(RuntimeError, "could not allocate space for deallocation object in read-only array::interface wrapping");
+  }
+
+  TP_ARRAY(retval)->base = py_sharedptr;
+
+  return retval;
+}
+
+bp::object tp::py_array::pyobject() {
+  if (m_is_numpy) {
+    bp::object mine = tp::make_non_null_borrowed_object(boost::static_pointer_cast<PyObject>(m_data).get());
+    return wrap_ndarray(mine);
+  }
+
+  //if you really want, I can wrap it for you, but in this case I'll make it
+  //read-only and will associate the object deletion to my own data pointer.
+  return make_readonly(m_ptr, m_type, m_data);
+}
+
+bool tp::py_array::is_writeable() const {
+  return (!m_is_numpy || PyArray_ISWRITEABLE(boost::static_pointer_cast<PyArrayObject>(m_data).get()));
+}
+
+tp::ndarray::ndarray(bp::object array_like, bp::object dtype_like)
+  : px(new tp::py_array(array_like, dtype_like)) { 
+}
+
+tp::ndarray::ndarray(bp::object array_like)
+  : px(new tp::py_array(array_like, bp::object())) { 
+  }
+
+tp::ndarray::ndarray(const ca::typeinfo& info)
+  : px(new tp::py_array(info)) { 
+  }
+
+tp::ndarray::~ndarray() { }
+
+const ca::typeinfo& tp::ndarray::type() const {
+  return px->type();
+}
+
+bp::object tp::ndarray::self() { return px->pyobject(); }
+
+tp::const_ndarray::const_ndarray(bp::object array_like)
+  : tp::ndarray(array_like) { 
+  }
+
+tp::const_ndarray::~const_ndarray() { }
+

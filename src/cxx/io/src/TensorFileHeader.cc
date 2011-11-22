@@ -1,9 +1,26 @@
 /**
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file cxx/io/src/TensorFileHeader.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * This class defines an header for storing multiarrays into .tensor files.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
 #include "core/logging.h"
 
 #include "io/TensorFileHeader.h"
@@ -15,12 +32,10 @@ namespace core = Torch::core;
 
 iod::TensorFileHeader::TensorFileHeader()
   : m_tensor_type(io::Char),
-    m_elem_type(core::array::t_unknown), 
+    m_type(),
     m_n_samples(0),
-    m_n_dimensions(0), 
     m_tensor_size(0)
 {
-  for (size_t i=0; i<core::array::N_MAX_DIMENSIONS_ARRAY; ++i) m_shape[i] = 0;
 }
 
 iod::TensorFileHeader::~TensorFileHeader() { }
@@ -30,11 +45,6 @@ size_t iod::TensorFileHeader::getArrayIndex (size_t index) const {
   return header_size + index * m_tensor_size;
 }
 
-size_t iod::TensorFileHeader::getSize(size_t dim_index) const {
-  if(dim_index >= m_n_dimensions) throw io::DimensionError(dim_index, m_n_dimensions);
-  return m_shape[dim_index]; 
-}
-
 void iod::TensorFileHeader::read(std::istream& str) {
   // Start reading at the beginning of the stream
   str.seekg(std::ios_base::beg);
@@ -42,19 +52,26 @@ void iod::TensorFileHeader::read(std::istream& str) {
   int val;
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
   m_tensor_type = (io::TensorType)val;
-  m_elem_type = io::tensorTypeToArrayType(m_tensor_type);
+  m_type.dtype = io::tensorTypeToArrayType(m_tensor_type);
+
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
   m_n_samples = (size_t)val;
+  
+  int nd;
+  str.read(reinterpret_cast<char*>(&nd), sizeof(int));
+
+  int shape[TORCH_MAX_DIM];
+  
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
-  m_n_dimensions = (size_t)val;
+  shape[0] = (size_t)val;
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
-  m_shape[0] = (size_t)val;
+  shape[1] = (size_t)val;
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
-  m_shape[1] = (size_t)val;
+  shape[2] = (size_t)val;
   str.read( reinterpret_cast<char*>(&val), sizeof(int));
-  m_shape[2] = (size_t)val;
-  str.read( reinterpret_cast<char*>(&val), sizeof(int));
-  m_shape[3] = (size_t)val;
+  shape[3] = (size_t)val;
+
+  m_type.set_shape(nd, shape);
 
   header_ok();
 }
@@ -69,15 +86,15 @@ void iod::TensorFileHeader::write(std::ostream& str) const
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
   val = (int)m_n_samples;
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
-  val = (int)m_n_dimensions;
+  val = (int)m_type.nd;
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
-  val = (int)m_shape[0];
+  val = (int)m_type.shape[0];
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
-  val = (int)m_shape[1];
+  val = (int)m_type.shape[1];
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
-  val = (int)m_shape[2];
+  val = (int)m_type.shape[2];
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
-  val = (int)m_shape[3];
+  val = (int)m_type.shape[3];
   str.write( reinterpret_cast<char*>(&val), sizeof(int));
 }
 
@@ -100,9 +117,8 @@ void iod::TensorFileHeader::header_ok()
   }
 
   // Check the number of samples and dimensions
-  if( m_n_samples < 0 || m_n_dimensions < 1 ||
-      m_n_dimensions > 4)
-    throw io::DimensionError(m_n_dimensions,4);
+  if( m_n_samples < 0 || m_type.nd < 1 || m_type.nd > 4)
+    throw io::DimensionError(m_type.nd,4);
 
   // OK
   update();
@@ -124,8 +140,7 @@ void iod::TensorFileHeader::update()
   }
 
   size_t tsize = 1;
-  for(size_t i = 0; i < m_n_dimensions; ++i)
-    tsize *= m_shape[i];
+  for(size_t i = 0; i < m_type.nd; ++i) tsize *= m_type.shape[i];
 
   m_tensor_size = tsize * base_size;
 }

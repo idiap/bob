@@ -1,27 +1,69 @@
 /**
- * @file io/src/Array.cc
- * @author <a href="mailto:andre.anjos@idiap.ch">Andre Anjos</a> 
+ * @file cxx/io/src/Array.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implementation of the Array class.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "io/Array.h"
+#include "io/CodecRegistry.h"
 
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
-io::Array::Array(const io::detail::InlinedArrayImpl& data) :
-  m_inlined(new io::detail::InlinedArrayImpl(data))
+io::Array::Array(const ca::interface& data):
+  m_inlined(new ca::blitz_array(data)),
+  m_loadsall(false)
 {
 }
 
-io::Array::Array(const std::string& filename, const std::string& codec) :
-  m_external(new io::detail::ExternalArrayImpl(filename, codec))
+io::Array::Array(boost::shared_ptr<ca::interface> data):
+  m_inlined(data),
+  m_loadsall(false)
 {
 }
 
-io::Array::Array(const Array& other) : 
+io::Array::Array(boost::shared_ptr<File> file):
+  m_external(file),
+  m_index(0),
+  m_loadsall(true)
+{
+}
+
+io::Array::Array(boost::shared_ptr<File> file, size_t index):
+  m_external(file),
+  m_index(index),
+  m_loadsall(false)
+{
+}
+
+io::Array::Array(const Array& other): 
   m_inlined(other.m_inlined),
-  m_external(other.m_external)
+  m_external(other.m_external),
+  m_index(other.m_index),
+  m_loadsall(other.m_loadsall)
+{
+}
+
+io::Array::Array(const std::string& path):
+  m_external(io::open(path, "", 'r')),
+  m_index(0),
+  m_loadsall(true)
 {
 }
 
@@ -31,59 +73,58 @@ io::Array::~Array() {
 io::Array& io::Array::operator= (const io::Array& other) {
   m_inlined = other.m_inlined;
   m_external = other.m_external;
+  m_index = other.m_index;
+  m_loadsall = other.m_loadsall;
   return *this;
 }
 
-size_t io::Array::getNDim() const {
-  if (m_inlined) return m_inlined->getNDim(); 
-  return m_external->getNDim();
-}
-
-Torch::core::array::ElementType io::Array::getElementType() const {
-  if (m_inlined) return m_inlined->getElementType(); 
-  return m_external->getElementType();
-}
-
-const size_t* io::Array::getShape() const {
-  if (m_inlined) return m_inlined->getShape(); 
-  return m_external->getShape();
-}
-
-void io::Array::save(const std::string& filename, const std::string& codecname) 
-{
-  if (m_inlined) {
-    m_external.reset(new io::detail::ExternalArrayImpl(filename, codecname, true));
-    m_external->set(*m_inlined);
-    m_inlined.reset();
-    return;
-  }
-  m_external->move(filename, codecname); 
-}
-
 const std::string& io::Array::getFilename() const {
-  if (m_external) return m_external->getFilename();
+  if (m_external) return m_external->filename();
   static std::string empty_string;
   return empty_string;
 }
 
-boost::shared_ptr<const io::ArrayCodec> io::Array::getCodec() const {
-  if (m_external) return m_external->getCodec();
-  return boost::shared_ptr<ArrayCodec>(); 
+boost::shared_ptr<const io::File> io::Array::getCodec() const {
+  if (m_external) return m_external;
+  return boost::shared_ptr<File>(); 
 }
     
-void io::Array::set(const io::detail::InlinedArrayImpl& data) {
-  if (m_external) m_external.reset();
-  m_inlined.reset(new detail::InlinedArrayImpl(data));
+void io::Array::set(const ca::interface& data) {
+  m_external.reset();
+  m_inlined = boost::make_shared<ca::blitz_array>(data);
+}
+        
+void io::Array::set(boost::shared_ptr<ca::interface> data) {
+  m_external.reset();
+  m_inlined = data; 
 }
 
-io::detail::InlinedArrayImpl io::Array::get() const {
-  if (!m_inlined) return m_external->get();
-  return *m_inlined.get();
+boost::shared_ptr<ca::interface> io::Array::get() const {
+  if (!m_inlined) {
+    boost::shared_ptr<ca::interface> tmp(new ca::blitz_array(external_type()));
+    if (m_loadsall) m_external->array_read(*tmp);
+    else m_external->arrayset_read(*tmp, m_index);
+    return tmp;
+  }
+  return m_inlined;
 }
 
 void io::Array::load() {
   if (!m_inlined) {
-    m_inlined.reset(new detail::InlinedArrayImpl(m_external->get()));
+    m_inlined.reset(new ca::blitz_array(external_type()));
+    if (m_loadsall) m_external->array_read(*m_inlined);
+    else m_external->arrayset_read(*m_inlined, m_index);
     m_external.reset();
   }
+}
+
+void io::Array::save(const std::string& path) {
+  if (m_external) load();
+  boost::shared_ptr<File> f = io::open(path, "", 'w');
+  f->array_write(*m_inlined);
+  f.reset(); //flush data on file
+  m_external = io::open(path, "", 'r');
+  m_index = 0;
+  m_loadsall = true;
+  m_inlined.reset();
 }

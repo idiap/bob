@@ -1,3 +1,22 @@
+/**
+ * @file cxx/machine/src/GMMLLRMachine.cc
+ * @date Fri Jul 8 13:01:03 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "machine/GMMLLRMachine.h"
 #include "machine/Exception.h"
 
@@ -115,7 +134,7 @@ void Torch::machine::GMMLLRMachine::save(Torch::io::HDF5File& config) const {
 }
 
 void Torch::machine::GMMLLRMachine::load(Torch::io::HDF5File& config) {
-  config.read("m_n_inputs", m_n_inputs);
+  m_n_inputs = config.read<int64_t>("m_n_inputs");
 
   std::ostringstream oss_client;
   oss_client << "m_gmm_client";

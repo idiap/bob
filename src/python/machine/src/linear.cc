@@ -1,29 +1,52 @@
 /**
+ * @file python/machine/src/linear.cc
+ * @date Tue May 31 13:33:31 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Tue 31 May 2011 13:29:08 CEST
  *
  * @brief Bindings for a LinearMachine
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
+#include "core/python/ndarray.h"
 #include "machine/LinearMachine.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 namespace mach = Torch::machine;
 namespace io = Torch::io;
 
-static blitz::Array<double,1> forward(const mach::LinearMachine& m,
-    const blitz::Array<double,1>& input) {
-  blitz::Array<double,1> output(m.outputSize());
-  m.forward(input, output);
-  return output;
+static object forward(const mach::LinearMachine& m, tp::const_ndarray input) {
+  tp::ndarray output(ca::t_float64, m.outputSize());
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  m.forward(input.bz<double,1>(), output_);
+  return output.self();
+}
+
+static void forward2(const mach::LinearMachine& m, tp::const_ndarray input,
+    tp::ndarray output) {
+  blitz::Array<double,1> output_ = output.bz<double,1>();
+  m.forward(input.bz<double,1>(), output_);
 }
 
 static tuple get_shape(const mach::LinearMachine& m) {
   return make_tuple(m.inputSize(), m.outputSize());
 }
 
-static void set_shape(mach::LinearMachine& m, 
+static void set_shape(mach::LinearMachine& m,
     const blitz::TinyVector<int,2>& s) {
   m.resize(s(0), s(1));
 }
@@ -100,15 +123,15 @@ void bind_machine_linear() {
     .def(init<>("Default constructor, builds a machine as with 'LinearMachine(0,0)' which, of course, does not accept inputs or produce outputs."))
     .def("load", &mach::LinearMachine::load, (arg("self"), arg("config")), "Loads the weights and biases from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency.")
     .def("save", &mach::LinearMachine::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
-    .add_property("input_subtract", make_function(&mach::LinearMachine::getInputSubraction, return_internal_reference<>()), &set_input_sub)
-    .add_property("input_divide", make_function(&mach::LinearMachine::getInputDivision, return_internal_reference<>()), &set_input_div)
-    .add_property("weights", make_function(&mach::LinearMachine::getWeights, return_internal_reference<>()), &set_weight)
-    .add_property("biases", make_function(&mach::LinearMachine::getBiases, return_internal_reference<>()), &set_bias)
+    .add_property("input_subtract", make_function(&mach::LinearMachine::getInputSubraction, return_value_policy<copy_const_reference>()), &set_input_sub)
+    .add_property("input_divide", make_function(&mach::LinearMachine::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div)
+    .add_property("weights", make_function(&mach::LinearMachine::getWeights, return_value_policy<copy_const_reference>()), &set_weight)
+    .add_property("biases", make_function(&mach::LinearMachine::getBiases, return_value_policy<copy_const_reference>()), &set_bias)
     .add_property("activation", &mach::LinearMachine::getActivation, &mach::LinearMachine::setActivation)
     .add_property("shape", &get_shape, &set_shape)
     .def("resize", &mach::LinearMachine::resize, (arg("self"), arg("input"), arg("output")), "Resizes the machine. If either the input or output increases in size, the weights and other factors should be considered uninitialized. If the size is preserved or reduced, already initialized values will not be changed.\n\nTip: Use this method to force data compression. All will work out given most relevant factors to be preserved are organized on the top of the weight matrix. In this way, reducing the system size will supress less relevant projections.")
-    .def("__call__", &mach::LinearMachine::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
-    .def("forward", &mach::LinearMachine::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
+    .def("__call__", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
+    .def("forward", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output")
     .def("__call__", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
     .def("forward", &forward, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
     ;

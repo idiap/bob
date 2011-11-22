@@ -1,10 +1,10 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Wed  6 Apr 19:41:27 2011 
+ * @file cxx/io/io/HDF5Utils.h
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A bunch of private utilities to make programming against the HDF5
  * library a little bit more confortable.
- *
  * Classes and non-member methods in this file handle the low-level HDF5 C-API
  * and try to make it a little bit safer and higher-level for use by the
  * publicly visible HDF5File class. The functionality here is heavily based on
@@ -14,14 +14,27 @@
  * way: create one, rename an object or delete one. The Dataset object
  * encapsulates reading and writing of data from a specific HDF5 dataset.
  * Everything is handled automatically and the user should not have to worry
- * about it too much. 
- *
+ * about it too much.
  * @todo Missing support for std::string, list<std::string>
  * @todo Missing support for attributes
  * @todo Missing support for arbitrary groups (80% done see TODOs)
  * @todo Inprint file creation time, author, comments?
  * @todo Missing support for automatic endianness conversion
  * @todo Missing true support for scalars
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TORCH_IO_HDF5UTILS_H 
@@ -179,7 +192,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T> void read(size_t index, T& value) {
         Torch::io::HDF5Type dest_type(value);
-        read(index, dest_type, reinterpret_cast<void*>(&value));
+        read_buffer(index, dest_type, reinterpret_cast<void*>(&value));
       }
 
       /**
@@ -190,14 +203,6 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         T retval;
         read(index, retval);
         return retval;
-      }
-
-      /**
-       * Reads data from the file into a scalar. This is equivalent to using
-       * read(0, value). The same conditions as for read(index=0, value) apply.
-       */
-      template <typename T> void read(T& value) {
-        read(0, value);
       }
 
       /**
@@ -235,7 +240,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
         void readArray(size_t index, blitz::Array<T,N>& value) {
           Torch::core::array::assertCZeroBaseContiguous(value);
           Torch::io::HDF5Type dest_type(value);
-          read(index, dest_type, reinterpret_cast<void*>(value.data()));
+          read_buffer(index, dest_type, reinterpret_cast<void*>(value.data()));
         }
 
       /**
@@ -305,7 +310,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T> void replace(size_t index, const T& value) {
         Torch::io::HDF5Type dest_type(value);
-        write(index, dest_type, reinterpret_cast<const void*>(&value));
+        write_buffer(index, dest_type, reinterpret_cast<const void*>(&value));
       }
 
       /**
@@ -332,7 +337,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
        */
       template <typename T> void add(const T& value) {
         Torch::io::HDF5Type dest_type(value);
-        extend(dest_type, reinterpret_cast<const void*>(&value));
+        extend_buffer(dest_type, reinterpret_cast<const void*>(&value));
       }
 
       /**
@@ -362,10 +367,10 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
           Torch::io::HDF5Type dest_type(value);
           if(!Torch::core::array::isCZeroBaseContiguous(value)) {
             blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
-            write(index, dest_type, reinterpret_cast<const void*>(tmp.data()));
+            write_buffer(index, dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {
-            write(index, dest_type,
+            write_buffer(index, dest_type,
                 reinterpret_cast<const void*>(value.data()));
           }
         }
@@ -398,10 +403,10 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
           Torch::io::HDF5Type dest_type(value);
           if(!Torch::core::array::isCZeroBaseContiguous(value)) {
             blitz::Array<T,N> tmp = Torch::core::array::ccopy(value);
-            extend(dest_type, reinterpret_cast<const void*>(tmp.data()));
+            extend_buffer(dest_type, reinterpret_cast<const void*>(tmp.data()));
           }
           else {
-            extend(dest_type, reinterpret_cast<const void*>(value.data()));
+            extend_buffer(dest_type, reinterpret_cast<const void*>(value.data()));
           }
       }
 
@@ -411,7 +416,7 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
 
       Dataset& operator= (const Dataset& other);
 
-    private: //some tricks
+    private: //apis
 
       /**
        * Selects a bit of the file to be affected at the next read or write
@@ -423,22 +428,24 @@ namespace Torch { namespace io { namespace detail { namespace hdf5 {
       std::vector<Torch::io::HDF5Descriptor>::iterator select (size_t index,
           const Torch::io::HDF5Type& dest);
 
+    public: //direct access for other bindings -- don't use these!
+
       /**
        * Reads a previously selected area into the given (user) buffer.
        */
-      void read (size_t index, const Torch::io::HDF5Type& dest, void* buffer);
+      void read_buffer (size_t index, const Torch::io::HDF5Type& dest, void* buffer);
 
       /**
        * Writes the contents of a given buffer into the file. The area that the
        * data will occupy should have been selected beforehand.
        */
-      void write (size_t index, const Torch::io::HDF5Type& dest, 
+      void write_buffer (size_t index, const Torch::io::HDF5Type& dest, 
           const void* buffer);
 
       /**
        * Extend the dataset with one extra variable.
        */
-      void extend (const Torch::io::HDF5Type& dest, const void* buffer);
+      void extend_buffer (const Torch::io::HDF5Type& dest, const void* buffer);
 
     public: //representation
   

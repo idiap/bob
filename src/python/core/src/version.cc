@@ -1,9 +1,24 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Wed 27 Apr 19:21:25 2011 
+ * @file python/core/src/version.cc
+ * @date Wed Apr 27 23:16:03 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Describes ways to retrieve version information about all dependent
  * packages.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <boost/python.hpp>

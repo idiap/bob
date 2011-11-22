@@ -56,13 +56,13 @@ def print_crit(dev_neg, dev_pos, test_neg, test_pos, crit):
 
   print("[Min. criterium: %s] Threshold on Development set: %e" % (crit, thres))
   
-  dev_ni = dev_neg.extent(0) #number of impostors
+  dev_ni = dev_neg.shape[0] #number of impostors
   dev_fa = int(round(dev_far*dev_ni)) #number of false accepts
-  dev_nc = dev_pos.extent(0) #number of clients
+  dev_nc = dev_pos.shape[0] #number of clients
   dev_fr = int(round(dev_frr*dev_nc)) #number of false rejects
-  test_ni = test_neg.extent(0) #number of impostors
+  test_ni = test_neg.shape[0] #number of impostors
   test_fa = int(round(test_far*test_ni)) #number of false accepts
-  test_nc = test_pos.extent(0) #number of clients
+  test_nc = test_pos.shape[0] #number of clients
   test_fr = int(round(test_frr*test_nc)) #number of false rejects
 
   dev_far_str = "%.3f%% (%d/%d)" % (100*dev_far, dev_fa, dev_ni)

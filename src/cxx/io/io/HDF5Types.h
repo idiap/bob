@@ -1,8 +1,23 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Wed 13 Apr 18:02:16 2011 
+ * @file cxx/io/io/HDF5Types.h
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A few helpers to handle HDF5 datasets in a more abstract way.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TORCH_IO_HDF5TYPES_H
@@ -28,7 +43,7 @@
   (H5_VERS_MAJOR>Maj))
 #endif
 
-#include "core/array_type.h"
+#include "core/array.h"
 
 namespace Torch { namespace io {
 
@@ -396,6 +411,16 @@ namespace Torch { namespace io {
       HDF5Type(hdf5type type);
 
       /**
+       * Creates a HDF5Type from an Torch::core::array::typeinfo
+       */
+      HDF5Type(const Torch::core::array::typeinfo& ti);
+
+      /**
+       * Creates a HDF5Type from a type enumeration and an explicit shape
+       */
+      HDF5Type(Torch::core::array::ElementType eltype, const HDF5Shape& extents);
+
+      /**
        * Creates a HDF5Type from a type enumeration and an explicit shape
        */
       HDF5Type(hdf5type type, const HDF5Shape& extents);
@@ -439,6 +464,11 @@ namespace Torch { namespace io {
       }
 
       /**
+       * Checks if an existing object is compatible with my type
+       */
+      bool compatible (const Torch::core::array::typeinfo& value) const;
+
+      /**
        * Returns the HDF5Shape of this type
        */
       const HDF5Shape& shape() const { return m_shape; }
@@ -473,6 +503,11 @@ namespace Torch { namespace io {
        * types in Torch::core::array
        */
       Torch::core::array::ElementType element_type() const;
+
+      /**
+       * Copies this type information to a stock Torch::core::array::typeinfo
+       */
+      void copy_to (Torch::core::array::typeinfo& ti) const;
 
     private: //representation
 

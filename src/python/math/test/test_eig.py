@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 
 class EigTest(unittest.TestCase):
   """Tests the eigenvalue decomposition based on Lapack"""
@@ -18,17 +19,13 @@ class EigTest(unittest.TestCase):
 
     N = 3
     # Matrix to decompose
-    A=torch.core.array.float64_2([1,2,3,2,4,5,3,5,6],(3,3))
-
-    # Matrix/vector for storing the eigenvectors/values
-    V=torch.core.array.float64_2((3,3))
-    D=torch.core.array.float64_1((3,))
+    A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
 
     # Do the decomposition
-    torch.math.eigSymReal(A,V,D)
+    V, D = torch.math.eigSymReal(A)
 
     # Compare eigenvalues to matlab reference
-    ref=torch.core.array.float64_1([-0.5157, 0.1709, 11.3448], (3,))
+    ref=numpy.array([-0.5157, 0.1709, 11.3448], 'float64')
 
     self.assertEqual( ((D-ref) < 1e-3).all(), True )
 
@@ -40,18 +37,14 @@ class EigTest(unittest.TestCase):
 
     N = 3
     # Input matrices to decompose
-    A=torch.core.array.float64_2([1,2,3,2,4,5,3,5,6],(3,3))
-    B=torch.core.array.float64_2([2,-1,0,-1,2,-1,0,-1,2],(3,3))
-
-    # Matrix/vector for storing the eigenvectors/values
-    V=torch.core.array.float64_2((3,3))
-    D=torch.core.array.float64_1((3,))
+    A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
+    B = [[2.,-1.,0.],[-1.,2.,-1.],[0.,-1.,2.]]
 
     # Do the decomposition
-    torch.math.eigSym(A,B,V,D)
+    V, D = torch.math.eigSym(A,B)
 
     # Compare eigenvalues to matlab reference
-    ref=torch.core.array.float64_1([17.9718,0.510,-0.2728], (3,))
+    ref=numpy.array([17.9718,0.510,-0.2728], 'float64')
 
     self.assertEqual( ((D-ref) < 1e-3).all(), True )
 
@@ -63,18 +56,18 @@ class EigTest(unittest.TestCase):
 
     N = 3
     # Input matrices to decompose
-    A=torch.core.array.float64_2([1,2,3,2,4,5,3,5,6],(3,3))
-    B=torch.core.array.float64_2([2,-1,0,-1,2,-1,0,-1,2],(3,3))
+    A = [[1.,2.,3.],[2.,4.,5.],[3.,5.,6.]]
+    B = [[2.,-1.,0.],[-1.,2.,-1.],[0.,-1.,2.]]
 
     # Matrix/vector for storing the eigenvectors/values
-    V=torch.core.array.float64_2((3,3))
-    D=torch.core.array.float64_1((3,))
+    V = numpy.zeros((3,3), 'float64')
+    D = numpy.zeros((3,), 'float64')
 
     # Do the decomposition
-    torch.math.eig(A,B,V,D)
+    torch.math.eig(A, B, V, D)
 
     # Compare eigenvalues to matlab reference
-    ref=torch.core.array.float64_1([-0.2728,0.0510,17.9718], (3,))
+    ref=numpy.array([-0.2728,0.0510,17.9718], 'float64')
 
     # TODO: needs to reorder the eigenvalues
     # self.assertEqual( ((D-ref) < 1e-3).all(), True )

@@ -1,160 +1,216 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Tue  8 Mar 15:12:40 2011 
+ * @file python/ip/src/flow.cc
+ * @date Wed Mar 16 15:01:13 2011 +0100
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Binds a few Optical Flow methods to python
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
-#include "core/cast.h"
 #include "ip/HornAndSchunckFlow.h"
+#include "core/python/ndarray.h"
+#include "core/cast.h"
 
 using namespace boost::python;
-namespace of = Torch::ip::optflow;
+namespace ip = Torch::ip;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 namespace tc = Torch::core;
+namespace of = Torch::ip::optflow;
 
-tuple vanillahs_call_d(const of::VanillaHornAndSchunckFlow& f,
-    double alpha, size_t iterations,
-    const blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2) {
-  blitz::Array<double,2> u(i1.shape());
-  u = 0;
-  blitz::Array<double,2> v(i1.shape());
-  v = 0;
-  f(alpha, iterations, i1, i2, u, v);
-  return make_tuple(u, v);
+static tuple vanillahs_call(const of::VanillaHornAndSchunckFlow& f,
+    double alpha, size_t iterations, tp::const_ndarray i1,
+    tp::const_ndarray i2) {
+  const ca::typeinfo& info = i1.type();
+  tp::ndarray u(ca::t_float64, info.shape[0], info.shape[1]);
+  tp::ndarray v(ca::t_float64, info.shape[0], info.shape[1]);
+  blitz::Array<double,2> u_ = u.bz<double,2>();
+  u_ = 0;
+  blitz::Array<double,2> v_ = v.bz<double,2>();
+  v_ = 0;
+  switch (info.nd) {
+    case ca::t_uint8:
+      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u_, v_);
+      break;
+    case ca::t_float64:
+      f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(), u_, v_);
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "vanilla Horn&Schunck operator does not support array with type '%s'", info.str().c_str());
+  }
+  return make_tuple(u.self(), v.self());
 }
 
-tuple vanillahs_call_u8(const of::VanillaHornAndSchunckFlow& f,
-    double alpha, size_t iterations,
-    const blitz::Array<uint8_t,2>& i1, const blitz::Array<uint8_t,2>& i2) {
-  blitz::Array<double,2> u(i1.shape());
-  u = 0;
-  blitz::Array<double,2> v(i1.shape());
-  v = 0;
-  f(alpha, iterations, tc::cast<double,uint8_t>(i1), 
-      tc::cast<double,uint8_t>(i2), u, v);
-  return make_tuple(u, v);
+static void vanillahs_call2(const of::VanillaHornAndSchunckFlow& f,
+    double alpha, size_t iterations, tp::const_ndarray i1,
+    tp::const_ndarray i2, tp::ndarray u, tp::ndarray v) {
+  blitz::Array<double,2> u_ = u.bz<double,2>();
+  blitz::Array<double,2> v_ = v.bz<double,2>();
+  switch (i1.type().dtype) {
+    case ca::t_uint8:
+      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u_, v_);
+      break;
+    case ca::t_float64:
+      f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(), u_, v_);
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "vanilla Horn&Schunck operator does not support array with type '%s'", i1.type().str().c_str());
+  }
 }
 
-void vanillahs_call_u8_2(const of::VanillaHornAndSchunckFlow& f,
-    double alpha, size_t iterations,
-    const blitz::Array<uint8_t,2>& i1, const blitz::Array<uint8_t,2>& i2,
-    blitz::Array<double,2>& u, blitz::Array<double,2>& v) {
-  f(alpha, iterations, tc::cast<double,uint8_t>(i1), 
-      tc::cast<double,uint8_t>(i2), u, v);
+static object vanillahs_ec2(const of::VanillaHornAndSchunckFlow& f,
+    tp::const_ndarray u, tp::const_ndarray v) {
+  const ca::typeinfo& info = u.type();
+  tp::ndarray error(info);
+  blitz::Array<double,2> error_ = error.bz<double,2>();
+  f.evalEc2(u.bz<double,2>(), v.bz<double,2>(), error_);
+  return error.self();
 }
 
-blitz::Array<double,2> vanillahs_ec2(const of::VanillaHornAndSchunckFlow& f,
-    const blitz::Array<double,2>& u, const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  f.evalEc2(u, v, error);
-  return error;
+static object vanillahs_eb(const of::VanillaHornAndSchunckFlow& f,
+    tp::const_ndarray i1, tp::const_ndarray i2,
+    tp::const_ndarray u, tp::const_ndarray v) {
+  const ca::typeinfo& info = u.type();
+  tp::ndarray error(info);
+  blitz::Array<double,2> error_ = error.bz<double,2>();
+  switch (i1.type().dtype) {
+    case ca::t_uint8:
+      f.evalEb(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+          u.bz<double,2>(), v.bz<double,2>(), error_);
+      break;
+    case ca::t_float64:
+      f.evalEb(i1.bz<double,2>(), i2.bz<double,2>(),
+          u.bz<double,2>(), v.bz<double,2>(), error_);
+      break;
+    default: PYTHON_ERROR(TypeError, "vanilla Horn&Schunck error on brightness operator does not support array with type '%s'", info.str().c_str());
+  }
+  return error.self();
 }
 
-blitz::Array<double,2> vanillahs_eb_d(const of::VanillaHornAndSchunckFlow& f,
-    const blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2,
-    const blitz::Array<double,2>& u, const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  f.evalEb(i1, i2, u, v, error);
-  return error;
+static tuple hs_call(const of::HornAndSchunckFlow& f,
+    double alpha, size_t iterations, tp::const_ndarray i1, 
+    tp::const_ndarray i2, tp::const_ndarray i3) {
+  const ca::typeinfo& info = i1.type();
+  tp::ndarray u(ca::t_float64, info.shape[0], info.shape[1]);
+  tp::ndarray v(ca::t_float64, info.shape[0], info.shape[1]);
+  blitz::Array<double,2> u_ = u.bz<double,2>();
+  u_ = 0;
+  blitz::Array<double,2> v_ = v.bz<double,2>();
+  v_ = 0;
+  switch (info.nd) {
+    case ca::t_uint8:
+      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i3.bz<uint8_t,2>()), u_, v_);
+      break;
+    case ca::t_float64:
+      f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(), 
+          i3.bz<double,2>(), u_, v_);
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "Horn&Schunck operator does not support array with type '%s'", info.str().c_str());
+  }
+  return make_tuple(u.self(), v.self());
 }
 
-blitz::Array<double,2> vanillahs_eb_u8(const of::VanillaHornAndSchunckFlow& f,
-    const blitz::Array<uint8_t,2>& i1, const blitz::Array<uint8_t,2>& i2,
-    const blitz::Array<double,2>& u, const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  f.evalEb(tc::cast<double,uint8_t>(i1), tc::cast<double,uint8_t>(i2), u, v, 
-      error);
-  return error;
+static void hs_call2(const of::HornAndSchunckFlow& f,
+    double alpha, size_t iterations, tp::const_ndarray i1, tp::const_ndarray i2,
+    tp::const_ndarray i3, tp::ndarray u, tp::ndarray v) {
+  blitz::Array<double,2> u_ = u.bz<double,2>();
+  blitz::Array<double,2> v_ = v.bz<double,2>();
+  switch (i1.type().dtype) {
+    case ca::t_uint8:
+      f(alpha, iterations, tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i3.bz<uint8_t,2>()), u_, v_);
+      break;
+    case ca::t_float64:
+      f(alpha, iterations, i1.bz<double,2>(), i2.bz<double,2>(),
+          i3.bz<double,2>(), u_, v_);
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "Horn&Schunck operator does not support array with type '%s'", i1.type().str().c_str());
+  }
 }
 
-tuple hs_call_d(const of::HornAndSchunckFlow& f,
-    double alpha, size_t iterations,
-    const blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2,
-    const blitz::Array<double,2>& i3) {
-  blitz::Array<double,2> u(i1.shape());
-  u = 0;
-  blitz::Array<double,2> v(i1.shape());
-  v = 0;
-  f(alpha, iterations, i1, i2, i3, u, v);
-  return make_tuple(u, v);
+static object hs_ec2(const of::HornAndSchunckFlow& f,
+    tp::const_ndarray u, tp::const_ndarray v) {
+  const ca::typeinfo& info = u.type();
+  tp::ndarray error(info);
+  blitz::Array<double,2> error_ = error.bz<double,2>();
+  f.evalEc2(u.bz<double,2>(), v.bz<double,2>(), error_);
+  return error.self();
 }
 
-tuple hs_call_u8(const of::HornAndSchunckFlow& f,
-    double alpha, size_t iterations,
-    const blitz::Array<uint8_t,2>& i1, const blitz::Array<uint8_t,2>& i2,
-    const blitz::Array<uint8_t,2>& i3) {
-  blitz::Array<double,2> u(i1.shape());
-  u = 0;
-  blitz::Array<double,2> v(i1.shape());
-  v = 0;
-  f(alpha, iterations, tc::cast<double,uint8_t>(i1), 
-      tc::cast<double,uint8_t>(i2), tc::cast<double,uint8_t>(i3), u, v);
-  return make_tuple(u, v);
+static object hs_eb(const of::HornAndSchunckFlow& f,
+    tp::const_ndarray i1, tp::const_ndarray i2, tp::const_ndarray i3,
+    tp::const_ndarray u, tp::const_ndarray v) {
+  const ca::typeinfo& info = u.type();
+  tp::ndarray error(info);
+  blitz::Array<double,2> error_ = error.bz<double,2>();
+  switch (i1.type().dtype) {
+    case ca::t_uint8:
+      f.evalEb(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i3.bz<uint8_t,2>()),
+          u.bz<double,2>(), v.bz<double,2>(), error_);
+      break;
+    case ca::t_float64:
+      f.evalEb(i1.bz<double,2>(), i2.bz<double,2>(), i3.bz<double,2>(),
+          u.bz<double,2>(), v.bz<double,2>(), error_);
+      break;
+    default: PYTHON_ERROR(TypeError, "Horn&Schunck error on brightness operator does not support array with type '%s'", info.str().c_str());
+  }
+  return error.self();
 }
 
-void hs_call_u8_2(const of::HornAndSchunckFlow& f,
-    double alpha, size_t iterations,
-    const blitz::Array<uint8_t,2>& i1, const blitz::Array<uint8_t,2>& i2,
-    const blitz::Array<uint8_t,2>& i3,
-    blitz::Array<double,2>& u, blitz::Array<double,2>& v) {
-  f(alpha, iterations, tc::cast<double,uint8_t>(i1), 
-      tc::cast<double,uint8_t>(i2), tc::cast<double,uint8_t>(i3), u, v);
+static object flow_error(tp::const_ndarray i1, tp::const_ndarray i2,
+    tp::const_ndarray u, tp::const_ndarray v) {
+  tp::ndarray error(u.type());
+  blitz::Array<double,2> error_ = error.bz<double,2>();
+  switch (i1.type().dtype) {
+    case ca::t_uint8:
+      of::flowError(tc::cast<double,uint8_t>(i1.bz<uint8_t,2>()), 
+          tc::cast<double,uint8_t>(i2.bz<uint8_t,2>()), u.bz<double,2>(),
+          v.bz<double,2>(), error_);
+      break;
+    case ca::t_float64:
+      of::flowError(i1.bz<double,2>(), i2.bz<double,2>(), u.bz<double,2>(),
+          v.bz<double,2>(), error_);
+      break;
+    default: PYTHON_ERROR(TypeError, "flow error operator does not support array with type '%s'", i1.type().str().c_str());
+  }
+  return error.self();
 }
 
-blitz::Array<double,2> hs_ec2(const of::HornAndSchunckFlow& f,
-    const blitz::Array<double,2>& u, const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  f.evalEc2(u, v, error);
-  return error;
+static object laplacian_avg_hs_opencv(tp::const_ndarray i) {
+  tp::ndarray o(i.type());
+  blitz::Array<double,2> o_ = o.bz<double,2>();
+  of::laplacian_avg_hs_opencv(i.bz<double,2>(), o_);
+  return o.self();
 }
 
-blitz::Array<double,2> hs_eb_d(const of::HornAndSchunckFlow& f,
-    const blitz::Array<double,2>& i1, const blitz::Array<double,2>& i2,
-    const blitz::Array<double,2>& i3, const blitz::Array<double,2>& u,
-    const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  f.evalEb(i1, i2, i3, u, v, error);
-  return error;
-}
-
-blitz::Array<double,2> hs_eb_u8(const of::HornAndSchunckFlow& f,
-    const blitz::Array<uint8_t,2>& i1, const blitz::Array<uint8_t,2>& i2,
-    const blitz::Array<uint8_t,2>& i3, const blitz::Array<double,2>& u,
-    const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  f.evalEb(tc::cast<double,uint8_t>(i1), tc::cast<double,uint8_t>(i2), 
-      tc::cast<double,uint8_t>(i3), u, v, error);
-  return error;
-}
-
-blitz::Array<double,2> flow_error_d(const blitz::Array<double,2>& i1,
-    const blitz::Array<double,2>& i2, const blitz::Array<double,2>& u,
-    const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  of::flowError(i1, i2, u, v, error);
-  return error;
-}
-
-blitz::Array<double,2> flow_error_u8(const blitz::Array<uint8_t,2>& i1,
-    const blitz::Array<uint8_t,2>& i2, const blitz::Array<double,2>& u,
-    const blitz::Array<double,2>& v) {
-  blitz::Array<double,2> error(u.shape());
-  of::flowError(tc::cast<double,uint8_t>(i1), tc::cast<double,uint8_t>(i2), 
-      u, v, error);
-  return error;
-}
-
-static blitz::Array<double, 2> laplacian_avg_hs_opencv(const blitz::Array<double,2>& i) {
-  blitz::Array<double,2> o(i.shape());
-  of::laplacian_avg_hs_opencv(i, o);
-  return o;
-}
-
-static blitz::Array<double, 2> laplacian_avg_hs(const blitz::Array<double,2>& i) {
-  blitz::Array<double,2> o(i.shape());
-  of::laplacian_avg_hs(i, o);
-  return o;
+static object laplacian_avg_hs(tp::const_ndarray i) {
+  tp::ndarray o(i.type());
+  blitz::Array<double,2> o_ = o.bz<double,2>();
+  of::laplacian_avg_hs(i.bz<double,2>(), o_);
+  return o.self();
 }
 
 static const char laplacian_avg_hs_opencv_doc[] = "An approximation to the Laplacian (averaging) operator. Using the following (non-separable) kernel for the Laplacian:\n\n[ 0 -1  0]\n[-1  4 -1]\n[ 0 -1  0]\n\nThis is used as the Laplacian operator on OpenCV. To calculate the u_bar value we must remove the central mean and multiply by -1/4, yielding:\n\n[ 0  1/4  0  ]\n[1/4  0  1/4 ]\n[ 0  1/4  0  ]\n\nNote that you will get the WRONG results if you use the Laplacian kernel directly...";
@@ -164,35 +220,28 @@ static const char laplacian_avg_hs_doc[] = "An approximation to the Laplacian op
 void bind_ip_flow() {
   //Horn & Schunck 
   class_<of::VanillaHornAndSchunckFlow>("VanillaHornAndSchunckFlow", "Calculates the Optical Flow between two sequences of images (i1, the starting image and i2, the final image). It does this using the iterative method described by Horn & Schunck in the paper titled \"Determining Optical Flow\", published in 1981, Artificial Intelligence, Vol. 17, No. 1-3, pp. 185-203. Parameters: i1 -- first frame, i2 -- second frame, (u,v) -- estimates of the speed in x,y directions (zero if uninitialized)", init<const blitz::TinyVector<int,2>&>((arg("shape")), "Initializes the vanilla Horn&Schunck operator with the size of images to be fed"))
-      .def("__call__", &of::VanillaHornAndSchunckFlow::operator(), (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("u"), arg("v")))
-      .def("__call__", &vanillahs_call_d, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2")))
-      .def("__call__", &vanillahs_call_u8, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2")))
-      .def("__call__", &vanillahs_call_u8_2, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("u"), arg("v")))
-      .def("evalEc2", &of::VanillaHornAndSchunckFlow::evalEc2, (arg("self"), arg("u"), arg("v"), arg("square_error")), "Calculates the square of the smoothness error (Ec^2) by using the formula described in the paper: Ec^2 = (u_bar - u)^2 + (v_bar - v)^2. Sets the input matrix with the discrete values.")
-      .def("evalEb", &of::VanillaHornAndSchunckFlow::evalEb, (arg("self"), arg("i1"), arg("i2"), arg("u"), arg("v"), arg("error")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
+      .def("__call__", &vanillahs_call, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2")))
+      .def("__call__", &vanillahs_call2, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("u"), arg("v")))
+      //.def("evalEc2", &of::VanillaHornAndSchunckFlow::evalEc2, (arg("self"), arg("u"), arg("v"), arg("square_error")), "Calculates the square of the smoothness error (Ec^2) by using the formula described in the paper: Ec^2 = (u_bar - u)^2 + (v_bar - v)^2. Sets the input matrix with the discrete values.")
+      //.def("evalEb", &of::VanillaHornAndSchunckFlow::evalEb, (arg("self"), arg("i1"), arg("i2"), arg("u"), arg("v"), arg("error")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
       .def("evalEc2", &vanillahs_ec2, (arg("self"), arg("u"), arg("v")), "Calculates the square of the smoothness error (Ec^2) by using the formula described in the paper: Ec^2 = (u_bar - u)^2 + (v_bar - v)^2. Sets the input matrix with the discrete values.")
-      .def("evalEb", &vanillahs_eb_d, (arg("self"), arg("i1"), arg("i2"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
-      .def("evalEb", &vanillahs_eb_u8, (arg("self"), arg("i1"), arg("i2"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
+      .def("evalEb", &vanillahs_eb, (arg("self"), arg("i1"), arg("i2"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
       ;
 
   class_<of::HornAndSchunckFlow>("HornAndSchunckFlow", "This is a clone of the Vanilla HornAndSchunck method that uses a Sobel gradient estimator instead of the forward estimator used by the classical method. The Laplacian operator is also replaced with a more common method.", init<const blitz::TinyVector<int,2>&>((arg("shape")), "Initializes the vanilla Horn&Schunck operator with the size of images to be fed"))
-      .def("__call__", &of::HornAndSchunckFlow::operator(), (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("image3"), arg("u"), arg("v")))
-      .def("__call__", &hs_call_d, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("image3")))
-      .def("__call__", &hs_call_u8, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("image3")))
-      .def("__call__", &hs_call_u8_2, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("image3"), arg("u"), arg("v")))
-      .def("evalEc2", &of::HornAndSchunckFlow::evalEc2, (arg("self"), arg("u"), arg("v"), arg("square_error")), "Calculates the square of the smoothness error (Ec^2) by using the formula described in the paper: Ec^2 = (u_bar - u)^2 + (v_bar - v)^2. Sets the input matrix with the discrete values.")
-      .def("evalEb", &of::HornAndSchunckFlow::evalEb, (arg("self"), arg("i1"), arg("i2"), arg("i3"), arg("u"), arg("v"), arg("error")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
+      .def("__call__", &hs_call, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("image3")))
+      .def("__call__", &hs_call2, (arg("self"), arg("alpha"), arg("iterations"), arg("image1"), arg("image2"), arg("image3"), arg("u"), arg("v")))
+      //.def("evalEc2", &of::HornAndSchunckFlow::evalEc2, (arg("self"), arg("u"), arg("v"), arg("square_error")), "Calculates the square of the smoothness error (Ec^2) by using the formula described in the paper: Ec^2 = (u_bar - u)^2 + (v_bar - v)^2. Sets the input matrix with the discrete values.")
+      //.def("evalEb", &of::HornAndSchunckFlow::evalEb, (arg("self"), arg("i1"), arg("i2"), arg("i3"), arg("u"), arg("v"), arg("error")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
       .def("evalEc2", &hs_ec2, (arg("self"), arg("u"), arg("v")), "Calculates the square of the smoothness error (Ec^2) by using the formula described in the paper: Ec^2 = (u_bar - u)^2 + (v_bar - v)^2. Sets the input matrix with the discrete values.")
-      .def("evalEb", &hs_eb_d, (arg("self"), arg("i1"), arg("i2"), arg("i3"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
-      .def("evalEb", &hs_eb_u8, (arg("self"), arg("i1"), arg("i2"), arg("i3"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
+      .def("evalEb", &hs_eb, (arg("self"), arg("i1"), arg("i2"), arg("i3"), arg("u"), arg("v")), "Calculates the brightness error (Eb) as defined in the paper: Eb = (Ex*u + Ey*v + Et). Sets the input matrix with the discrete values")
       ;
 
   def("laplacian_avg_hs_opencv", &laplacian_avg_hs_opencv, (arg("input")), laplacian_avg_hs_opencv_doc);
-  def("laplacian_avg_hs_opencv", &of::laplacian_avg_hs_opencv, (arg("input"), arg("output")), laplacian_avg_hs_doc);
   def("laplacian_avg_hs", &laplacian_avg_hs, (arg("input")), laplacian_avg_hs_doc);
-  def("laplacian_avg_hs", &of::laplacian_avg_hs, (arg("input"), arg("output")), laplacian_avg_hs_doc);
+  //def("laplacian_avg_hs_opencv", &of::laplacian_avg_hs_opencv, (arg("input"), arg("output")), laplacian_avg_hs_doc);
+  //def("laplacian_avg_hs", &of::laplacian_avg_hs, (arg("input"), arg("output")), laplacian_avg_hs_doc);
 
-  def("flowError", &of::flowError, (arg("i1"), arg("i2"), arg("u"), arg("v"), arg("error")), "Computes the generalized flow error: E = i2(x-u,y-v) - i1(x,y))");
-  def("flowError", &flow_error_d, (arg("i1"), arg("i2"), arg("u"), arg("v")), "Computes the generalized flow error: E = i2(x-u,y-v) - i1(x,y))");
-  def("flowError", &flow_error_u8, (arg("i1"), arg("i2"), arg("u"), arg("v")), "Computes the generalized flow error: E = i2(x-u,y-v) - i1(x,y))");
+  def("flowError", &flow_error, (arg("i1"), arg("i2"), arg("u"), arg("v")), "Computes the generalized flow error: E = i2(x-u,y-v) - i1(x,y))");
+  //def("flowError", &of::flowError, (arg("i1"), arg("i2"), arg("u"), arg("v"), arg("error")), "Computes the generalized flow error: E = i2(x-u,y-v) - i1(x,y))");
 }

@@ -1,8 +1,23 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Sat 19 Mar 15:58:02 2011 
+ * @file cxx/ip/src/color.cc
+ * @date Fri Mar 25 09:59:18 2011 +0100
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements many sorts of color transformations using standards
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <cmath>
@@ -52,21 +67,21 @@ const char* ip::UnsupportedRowExtent::what() const throw() {
 }
 
 /**
- * This method will scale and cast to integer a single float value, using the
+ * This method will scale and cast to integer a single double value, using the
  * standard library
  */
 template <typename T>
-static inline T scale (float value) {
+static inline T scale (double value) {
   return static_cast<T>(rintf(std::numeric_limits<T>::max()*value));
 }
 
 /**
- * This method will scale and cast to float a single integer value, using the
+ * This method will scale and cast to double a single integer value, using the
  * standard library
  */
 template <typename T>
-static inline float normalize (T value) {
-  return static_cast<float>(value)/static_cast<float>(std::numeric_limits<T>::max());
+static inline double normalize (T value) {
+  return static_cast<double>(value)/static_cast<double>(std::numeric_limits<T>::max());
 }
 
 /**
@@ -96,42 +111,42 @@ static T tmin (T c1, T c2, T c3) {
 }
 
 /**
- * This method clamps the float value between 0 and 1
+ * This method clamps the double value between 0 and 1
  */
-static float clamp (float f) {
+static double clamp (double f) {
   return (f<0)? 0.f : (f>1)? 1.f: f;
 }
 
 template <> void ip::rgb_to_hsv_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& h, uint8_t& s, uint8_t& v) {
-  float H, S, V;
+  double H, S, V;
   rgb_to_hsv_one(normalize(r), normalize(g), normalize(b), H, S, V);
   h = scale<uint8_t>(H); s = scale<uint8_t>(S); v = scale<uint8_t>(V);
 }
 
 template <> void ip::rgb_to_hsv_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& h, uint16_t& s, uint16_t& v) {
-  float H, S, V;
+  double H, S, V;
   rgb_to_hsv_one(normalize(r), normalize(g), normalize(b), H, S, V);
   h = scale<uint16_t>(H); s = scale<uint16_t>(S); v = scale<uint16_t>(V);
 }
 
-template <> void ip::rgb_to_hsv_one (float r, float g, float b,
-    float& h, float& s, float& v) {
+template <> void ip::rgb_to_hsv_one (double r, double g, double b,
+    double& h, double& s, double& v) {
   v = tmax(r, g, b); //value
   
   //if the Value is 0, then we also set the other values to zero
-  if (v == 0.0f) { 
+  if (v == 0.0) { 
     h = s = v;
     return;
   }
 
   //computing the saturation
-  float C = v - tmin(r, g, b);
+  double C = v - tmin(r, g, b);
   s = C / v;
 
   //if the Saturation value is zero, set Hue to zero and return
-  if (s == 0.0f) {
+  if (s == 0.0) {
     h = s;
     return;
   }
@@ -150,38 +165,38 @@ template <> void ip::rgb_to_hsv_one (float r, float g, float b,
     if (g >= b) h = clamp((g - b)/C); //first sextant
     else h = clamp(1 - ((b - g)/C)); //sextant 6
   }
-  else if (v == g) h = clamp(1.0f/3 + (b - r)/C); //sextants 2/3
-  else h = clamp(2.0f/3 + (r - g)/C); //sextants 4/5
+  else if (v == g) h = clamp(1.0/3 + (b - r)/C); //sextants 2/3
+  else h = clamp(2.0/3 + (r - g)/C); //sextants 4/5
 }
 
 template <> void ip::hsv_to_rgb_one (uint8_t h, uint8_t s, uint8_t v,
     uint8_t& r, uint8_t& g, uint8_t& b) {
-  float R, G, B;
+  double R, G, B;
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
 template <> void ip::hsv_to_rgb_one (uint16_t h, uint16_t s, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
-  float R, G, B;
+  double R, G, B;
   hsv_to_rgb_one(normalize(h), normalize(s), normalize(v), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
 	
-template <> void ip::hsv_to_rgb_one (float h, float s, float v,
-    float& r, float& g, float& b) {
+template <> void ip::hsv_to_rgb_one (double h, double s, double v,
+    double& r, double& g, double& b) {
 	
   if(s == 0) { // achromatic (gray)
 		r = g = b = v;
 		return;
 	}
 
-  const float Hp = 6*h;
+  const double Hp = 6*h;
   const uint8_t sextant = static_cast<uint8_t>(Hp);
-  const float Hpmod2 = Hp - (2 * static_cast<uint8_t>(Hp/2)); //Hp%2
-  float C = v * s;
-  const float m = v - C;
-  const float X = C * (1 - fabsf(Hpmod2 - 1)) + m;
+  const double Hpmod2 = Hp - (2 * static_cast<uint8_t>(Hp/2)); //Hp%2
+  double C = v * s;
+  const double m = v - C;
+  const double X = C * (1 - fabsf(Hpmod2 - 1)) + m;
   C += m;
 
 	switch(sextant) {
@@ -220,23 +235,23 @@ template <> void ip::hsv_to_rgb_one (float h, float s, float v,
 
 template <> void ip::rgb_to_hsl_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& h, uint8_t& s, uint8_t& l) {
-  float H, S, L;
+  double H, S, L;
   rgb_to_hsl_one(normalize(r), normalize(g), normalize(b), H, S, L);
   h = scale<uint8_t>(H); s = scale<uint8_t>(S); l = scale<uint8_t>(L);
 }
 
 template <> void ip::rgb_to_hsl_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& h, uint16_t& s, uint16_t& l) {
-  float H, S, L;
+  double H, S, L;
   rgb_to_hsl_one(normalize(r), normalize(g), normalize(b), H, S, L);
   h = scale<uint16_t>(H); s = scale<uint16_t>(S); l = scale<uint16_t>(L);
 }
 
-template <> void ip::rgb_to_hsl_one (float r, float g, float b,
-    float& h, float& s, float& l) {
+template <> void ip::rgb_to_hsl_one (double r, double g, double b,
+    double& h, double& s, double& l) {
   //lightness calculation: L = (M + m)/2
-  const float M = tmax(r, g, b);
-  const float m = tmin(r, g, b);
+  const double M = tmax(r, g, b);
+  const double m = tmin(r, g, b);
   l = 0.5 * (M+m);
   
   //if the lightness is 0, then we also set the other values to zero
@@ -247,7 +262,7 @@ template <> void ip::rgb_to_hsl_one (float r, float g, float b,
 
   //computing the saturation based on the lightness:
   //S = C / (1 - |2*L -1|)
-  float C = M - m; //chroma
+  double C = M - m; //chroma
   s = clamp(C / (1-fabsf(2*l - 1)));
 
   //if the Saturation value is zero, set Hue to zero and return
@@ -270,40 +285,40 @@ template <> void ip::rgb_to_hsl_one (float r, float g, float b,
     if (g >= b) h = clamp((g - b)/C); //first sextant
     else h = clamp(1 - ((b - g)/C)); //sextant 6
   }
-  else if (M == g) h = clamp(1.0f/3 + (b - r)/C); //sextants 2/3
-  else h = clamp(2.0f/3 + (r - g)/C); //sextants 4/5
+  else if (M == g) h = clamp(1.0/3 + (b - r)/C); //sextants 2/3
+  else h = clamp(2.0/3 + (r - g)/C); //sextants 4/5
 }
 
 template <> void ip::hsl_to_rgb_one (uint8_t h, uint8_t s, uint8_t l,
     uint8_t& r, uint8_t& g, uint8_t& b) {
-  float R, G, B;
+  double R, G, B;
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
 template <> void ip::hsl_to_rgb_one (uint16_t h, uint16_t s, uint16_t l,
     uint16_t& r, uint16_t& g, uint16_t& b) {
-  float R, G, B;
+  double R, G, B;
   hsl_to_rgb_one(normalize(h), normalize(s), normalize(l), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
 	
-template <> void ip::hsl_to_rgb_one (float h, float s, float l,
-    float& r, float& g, float& b) {
+template <> void ip::hsl_to_rgb_one (double h, double s, double l,
+    double& r, double& g, double& b) {
   
-  float C = s*(1-fabsf(2*l - 1)); //Chroma [0,1]
-  const float v = (2*l + C)/2; //Value [0,1]
+  double C = s*(1-fabsf(2*l - 1)); //Chroma [0,1]
+  const double v = (2*l + C)/2; //Value [0,1]
   
   if(v == 0.f) { // achromatic (gray)
 		r = g = b = v; //Value
 		return;
 	}
 
-  const float Hp = 6*h;
+  const double Hp = 6*h;
   const uint8_t sextant = static_cast<uint8_t>(Hp);
-  const float Hpmod2 = Hp - (2 * static_cast<uint8_t>(Hp/2)); //Hp%2
-  const float m = l - C/2;
-  const float X = C * (1 - fabsf(Hpmod2 - 1)) + m;
+  const double Hpmod2 = Hp - (2 * static_cast<uint8_t>(Hp/2)); //Hp%2
+  const double m = l - C/2;
+  const double X = C * (1 - fabsf(Hpmod2 - 1)) + m;
   C += m;
 
 	switch(sextant) {
@@ -342,14 +357,14 @@ template <> void ip::hsl_to_rgb_one (float h, float s, float l,
 
 template <> void ip::rgb_to_yuv_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& y, uint8_t& u, uint8_t& v) {
-  float Y, U, V;
+  double Y, U, V;
   rgb_to_yuv_one(normalize(r), normalize(g), normalize(b), Y, U, V);
   y = scale<uint8_t>(Y); u = scale<uint8_t>(U); v = scale<uint8_t>(V);
 }
 
 template <> void ip::rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& y, uint16_t& u, uint16_t& v) {
-  float Y, U, V;
+  double Y, U, V;
   rgb_to_yuv_one(normalize(r), normalize(g), normalize(b), Y, U, V);
   y = scale<uint16_t>(Y); u = scale<uint16_t>(U); v = scale<uint16_t>(V);
 }
@@ -357,23 +372,23 @@ template <> void ip::rgb_to_yuv_one (uint16_t r, uint16_t g, uint16_t b,
 /**
  * Using the JPEG YUV conversion scheme
  */
-template <> void ip::rgb_to_yuv_one (float r, float g, float b,
-    float& y, float& u, float& v) {
+template <> void ip::rgb_to_yuv_one (double r, double g, double b,
+    double& y, double& u, double& v) {
   ip::rgb_to_gray_one(r, g, b, y); //Y'
-  u = clamp(0.5f - 0.168736f*r - 0.331264f*g + 0.5f*b); //Cb [0, 1]
-  v = clamp(0.5f + 0.5f*r - 0.418688f*g - 0.081312*b); //Cr [0, 1]
+  u = clamp(0.5 - 0.168736*r - 0.331264*g + 0.5*b); //Cb [0, 1]
+  v = clamp(0.5 + 0.5*r - 0.418688*g - 0.081312*b); //Cr [0, 1]
 }
 
 template <> void ip::yuv_to_rgb_one (uint8_t y, uint8_t u, uint8_t v,
     uint8_t& r, uint8_t& g, uint8_t& b) {
-  float R, G, B;
+  double R, G, B;
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
   r = scale<uint8_t>(R); g = scale<uint8_t>(G); b = scale<uint8_t>(B);
 }
 	
 template <> void ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
     uint16_t& r, uint16_t& g, uint16_t& b) {
-  float R, G, B;
+  double R, G, B;
   yuv_to_rgb_one(normalize(y), normalize(u), normalize(v), R, G, B);
   r = scale<uint16_t>(R); g = scale<uint16_t>(G); b = scale<uint16_t>(B);
 }
@@ -381,23 +396,23 @@ template <> void ip::yuv_to_rgb_one (uint16_t y, uint16_t u, uint16_t v,
 /**
  * We are doing the inverse of the rgb_to_yuv_one() method above
  */
-template <> void ip::yuv_to_rgb_one (float y, float u, float v,
-    float& r, float& g, float& b) {
-  r = clamp(y + 1.40199959f*(v-0.5f));
-  b = clamp(y + 1.772000066f*(u-0.5f));
-  g = clamp(y - 0.344135678f*(u-0.5f) - 0.714136156f*(v-0.5f));
+template <> void ip::yuv_to_rgb_one (double y, double u, double v,
+    double& r, double& g, double& b) {
+  r = clamp(y + 1.40199959*(v-0.5));
+  b = clamp(y + 1.772000066*(u-0.5));
+  g = clamp(y - 0.344135678*(u-0.5) - 0.714136156*(v-0.5));
 }
 
 template <> void ip::rgb_to_gray_one (uint8_t r, uint8_t g, uint8_t b,
     uint8_t& y) {
-  float Y;
+  double Y;
   rgb_to_gray_one(normalize(r), normalize(g), normalize(b), Y);
   y = scale<uint8_t>(Y);
 }
 
 template <> void ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
     uint16_t& y) {
-  float Y;
+  double Y;
   rgb_to_gray_one(normalize(r), normalize(g), normalize(b), Y);
   y = scale<uint16_t>(Y);
 }
@@ -405,7 +420,7 @@ template <> void ip::rgb_to_gray_one (uint16_t r, uint16_t g, uint16_t b,
 /**
  * Y = 0.299R+0.587G+0.114B
  */
-template <> void ip::rgb_to_gray_one (float r, float g, float b, 
-    float& gray) {
-  gray = clamp(0.299f*r + 0.587f*g + 0.114f*b);
+template <> void ip::rgb_to_gray_one (double r, double g, double b, 
+    double& gray) {
+  gray = clamp(0.299*r + 0.587*g + 0.114*b);
 }

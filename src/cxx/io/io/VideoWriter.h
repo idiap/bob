@@ -1,9 +1,24 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Sun 27 Mar 10:36:18 2011 
+ * @file cxx/io/io/VideoWriter.h
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A class to help you write videos. This code originates from the
  * example program: http://cekirdek.pardus.org.tr/~ismail/ffmpeg-docs/output-example_8c-source.html with a few personal modifications.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TORCH_IO_DETAIL_VIDEOWRITER_H 
@@ -12,6 +27,8 @@
 #include <string>
 #include <blitz/array.h>
 #include <stdint.h>
+
+#include "core/array.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -120,6 +137,18 @@ namespace Torch { namespace io {
       std::string info() const;
 
       /**
+       * Compatibility layer type information
+       */ 
+      const Torch::core::array::typeinfo& video_type() const 
+      { return m_typeinfo_video; }
+
+      /**
+       * Compatibility layer type information
+       */ 
+      const Torch::core::array::typeinfo& frame_type() const 
+      { return m_typeinfo_frame; }
+
+      /**
        * Writes a set of frames to the file. The frame set should be setup as a
        * blitz::Array<> with 4 dimensions organized in this way:
        * (frame-number, RGB color-bands, height, width).
@@ -141,6 +170,13 @@ namespace Torch { namespace io {
        */
       void append(const blitz::Array<uint8_t,3>& data);
 
+      /**
+       * Writes a set of frames to the file. The frame set should be setup as a
+       * Torch::core::array::interface organized this way: (frame-number, 
+       * RGB color-bands, height, width) or (RGB color-bands, height, width).
+       */
+      void append(const Torch::core::array::interface& data);
+    
     private: //not implemented
 
       VideoWriter(const VideoWriter& other);
@@ -185,6 +221,8 @@ namespace Torch { namespace io {
       size_t m_gop;
       std::string m_codecname;
       std::string m_codecname_long;
+      Torch::core::array::typeinfo m_typeinfo_video;
+      Torch::core::array::typeinfo m_typeinfo_frame;
 
       AVOutputFormat* m_oformat_ctxt;
       AVFormatContext* m_format_ctxt;

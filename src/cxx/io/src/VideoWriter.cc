@@ -1,11 +1,11 @@
 /**
+ * @file cxx/io/src/VideoWriter.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Sun 27 Mar 16:10:24 2011 
  *
  * Implementation of a video writer based on ffmpeg, from example output
  * program:
  * http://cekirdek.pardus.org.tr/~ismail/ffmpeg-docs/output-example_8c-source.html.
- *
  * FFMpeg versions for your reference
  * ffmpeg | avformat | avcodec  | avutil  | swscale | old style | swscale GPL?
  * =======+==========+==========+=========+=========+===========+==============
@@ -18,6 +18,20 @@
  * 0.7    | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
  * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
  * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <boost/format.hpp>
@@ -27,6 +41,7 @@
 #include "io/VideoException.h"
 
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
     size_t width, float framerate, float bitrate, size_t gop):
@@ -51,6 +66,17 @@ io::VideoWriter::VideoWriter(const std::string& filename, size_t height,
   m_current_frame(0),
   m_sws_context(0)
 {
+  //sets up the io layer typeinfo
+  m_typeinfo_video.dtype = m_typeinfo_frame.dtype = Torch::core::array::t_uint8;
+  m_typeinfo_video.nd = 4;
+  m_typeinfo_frame.nd = 4;
+  m_typeinfo_video.shape[0] = 0;
+  m_typeinfo_video.shape[1] = m_typeinfo_frame.shape[0] = 3;
+  m_typeinfo_video.shape[2] = m_typeinfo_frame.shape[1] = height;
+  m_typeinfo_video.shape[3] = m_typeinfo_frame.shape[2] = width;
+  m_typeinfo_frame.update_strides();
+  m_typeinfo_video.update_strides();
+
   //opens the video file and wait for user input
 
   if (m_height%2 != 0 || m_height == 0 || m_width%2 != 0 || m_width == 0) {
@@ -375,6 +401,7 @@ void io::VideoWriter::write_video_frame(const blitz::Array<uint8_t,3>& data) {
 
   // OK
   ++m_current_frame;
+  m_typeinfo_video.shape[0] += 1;
 }
 
 void io::VideoWriter::close_video() {
@@ -416,6 +443,59 @@ void io::VideoWriter::append(const blitz::Array<uint8_t,4>& data) {
   for(int i=data.lbound(0); i<(data.extent(0)+data.lbound(0)); ++i) {
     write_video_frame(data(i, a, a, a));
   }
+}
+
+void io::VideoWriter::append(const ca::interface& data) {
+  //are we still opened?
+  if (!m_isopen) throw io::VideoIsClosed(m_filename.c_str());
+
+  const ca::typeinfo& type = data.type();
+
+  if ( type.dtype != Torch::core::array::t_uint8 ) {
+    throw io::FFmpegException(m_filename.c_str(), 
+        "input data type does not conform with video specifications");
+  }
+
+  if ( type.nd == 3 ) { //appends single frame
+    if ( (type.shape[0] != 3) || 
+         (type.shape[1] != m_height) || 
+         (type.shape[2] != m_width) ) {
+      throw io::FFmpegException(m_filename.c_str(), 
+          "input data shape does not conform with video specifications");
+    }
+    
+    blitz::TinyVector<int,3> shape;
+    shape = 3, m_height, m_width;
+    blitz::Array<uint8_t,3> tmp(const_cast<uint8_t*>(static_cast<const uint8_t*>(data.ptr())), shape,
+        blitz::neverDeleteData);
+    write_video_frame(tmp);
+  }
+  
+  else if ( type.nd == 4 ) { //appends a sequence of frames
+    if ( (type.shape[1] != 3) || 
+         (type.shape[2] != m_height) || 
+         (type.shape[3] != m_width) ) {
+      throw io::FFmpegException(m_filename.c_str(), 
+          "input data shape does not conform with video specifications");
+    }
+    
+    blitz::TinyVector<int,3> shape;
+    shape = 3, m_height, m_width;
+    unsigned long int frame_size = 3 * m_height * m_width;
+    uint8_t* ptr = const_cast<uint8_t*>(static_cast<const uint8_t*>(data.ptr()));
+
+    for(size_t i=0; i<type.shape[0]; ++i) {
+      blitz::Array<uint8_t,3> tmp(ptr, shape, blitz::neverDeleteData);
+      write_video_frame(tmp);
+      ptr += frame_size;
+    }
+  }
+
+  else {
+    throw io::FFmpegException(m_filename.c_str(), 
+        "input data dimensions do not conform with video specifications");
+  }
+
 }
 
 std::string io::VideoWriter::info() const {

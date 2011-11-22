@@ -115,13 +115,13 @@ void mach::PLDABaseMachine::load(Torch::io::HDF5File& config) {
       std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
       m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
       std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-      config.read(str2, m_loglike_constterm[a_indices(i)]);
+      m_loglike_constterm[a_indices(i)] = config.read<double>(str2);
     }
   }
   m_Ft_beta.reference(config.readArray<double,2>("Ft_beta"));
   m_Gt_isigma.reference(config.readArray<double,2>("Gt_isigma"));
-  config.read("logdet_alpha", m_logdet_alpha);
-  config.read("logdet_sigma", m_logdet_sigma);
+  m_logdet_alpha = config.read<double>("logdet_alpha");
+  m_logdet_sigma = config.read<double>("logdet_sigma");
   m_cache_d_ng_1.resize(d,ng);
   m_cache_nf_nf_1.resize(nf,nf);
   m_cache_ng_ng_1.resize(ng,ng);
@@ -429,10 +429,10 @@ mach::PLDAMachine& mach::PLDAMachine::operator=
 
 void mach::PLDAMachine::load(Torch::io::HDF5File& config) {
   //reads all data directly into the member variables
-  config.read("n_samples", m_n_samples);
-  config.read("nh_sum_xit_beta_xi", m_nh_sum_xit_beta_xi);
+  m_n_samples = config.read<uint64_t>("n_samples");
+  m_nh_sum_xit_beta_xi = config.read<double>("nh_sum_xit_beta_xi");
   m_weighted_sum.reference(config.readArray<double,1>("weighted_sum"));
-  config.read("loglikelihood", m_loglikelihood);
+  m_loglikelihood = config.read<double>("loglikelihood");
   // gamma and log like constant term (a-dependent terms)
   if(config.contains("a_indices"))
   {
@@ -443,7 +443,7 @@ void mach::PLDAMachine::load(Torch::io::HDF5File& config) {
       std::string str1 = "gamma_" + boost::lexical_cast<std::string>(a_indices(i));
       m_gamma[a_indices(i)].reference(config.readArray<double,2>(str1));
       std::string str2 = "loglikeconstterm_" + boost::lexical_cast<std::string>(a_indices(i));
-      config.read(str2, m_loglike_constterm[a_indices(i)]);
+      m_loglike_constterm[a_indices(i)] = config.read<double>(str2);
     }
   }
 }

@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 2.6)
 set(pysrc
    "src/ipcore.cc"
    "src/color.cc"
-   "src/oldlbp.cc"
    "src/filters.cc"
    "src/block.cc"
    "src/crop_shift.cc"
@@ -25,7 +24,6 @@ set(pysrc
    "src/FaceEyesNorm.cc"
    "src/Rotate.cc"
    "src/TanTriggs.cc"
-   "src/exception.cc"
    "src/histo.cc"
    "src/LBP.cc"
    "src/MultiscaleRetinex.cc"
@@ -37,12 +35,13 @@ set(pysrc
 include(../../cmake/macros.cmake)
 
 torch_python_package_bindings(ip "${pysrc}")
-add_dependencies(pytorch_ip core-array-python_header_install)
+
+add_dependencies(pytorch_ip python-core_header_install)
+target_link_libraries(pytorch_ip pytorch_core_ndarray)
+
 torch_python_install(ip)
   
 # Our test units
-torch_python_add_test(python-ip-lbp-tests 
-  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp.py)
 torch_python_add_test(python-ip-lbp-tests 
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_lbp_new.py)
 torch_python_add_test(python-ip-filter_new-tests 

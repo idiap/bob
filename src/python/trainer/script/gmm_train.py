@@ -4,20 +4,21 @@ import torch
 import os, sys
 import optparse
 import math
+import numpy
 
 def NormalizeStdArrayset(arrayset):
   arrayset.load()
 
   length = arrayset.shape[0]
   n_samples = len(arrayset)
-  mean = torch.core.array.float64_1(length)
-  std = torch.core.array.float64_1(length)
+  mean = numpy.ndarray(length)
+  std = numpy.ndarray(length)
 
   mean.fill(0)
   std.fill(0)
 
   for array in arrayset:
-    x = array.get().cast('float64')
+    x = array.astype('float64')
     mean += x
     std += (x ** 2)
 
@@ -28,14 +29,14 @@ def NormalizeStdArrayset(arrayset):
 
   arStd = torch.io.Arrayset()
   for array in arrayset:
-    arStd.append(array.get().cast('float64') / std)
+    arStd.append(array.astype('float64') / std)
 
   return (arStd,std)
 
 
 def multiplyVectorsByFactors(matrix, vector):
-  for i in range(0, matrix.rows()):
-    for j in range(0, matrix.columns()):
+  for i in range(0, matrix.shape[0]):
+    for j in range(0, matrix.shape[1]):
       matrix[i, j] *= vector[j]
 
 
@@ -115,15 +116,15 @@ if options.test:
   
   options.output_file = "/tmp/wm.hdf5"
   arrayset = torch.io.Arrayset()
-  array1 = torch.core.array.array([ 0,  1,  2,  3], 'float64')
+  array1 = numpy.array([ 0,  1,  2,  3], 'float64')
   arrayset.append(array1)
-  array2 = torch.core.array.array([ 3,  1,  5,  2], 'float64')
+  array2 = numpy.array([ 3,  1,  5,  2], 'float64')
   arrayset.append(array2)
-  array3 = torch.core.array.array([ 6,  7,  2,  5], 'float64')
+  array3 = numpy.array([ 6,  7,  2,  5], 'float64')
   arrayset.append(array3)
-  array4 = torch.core.array.array([ 3,  6,  2,  3], 'float64')
+  array4 = numpy.array([ 3,  6,  2,  3], 'float64')
   arrayset.append(array4)
-  array5 = torch.core.array.array([ 9,  8,  6,  4], 'float64')
+  array5 = numpy.array([ 9,  8,  6,  4], 'float64')
   arrayset.append(array5)
 
   options.n_gaussians = 1
@@ -146,9 +147,7 @@ ar = torch.io.Arrayset()
 for myfile in filelist:
   myarrayset = torch.io.Arrayset(myfile)
   n_blocks = len(myarrayset)
-  for b in range(0,n_blocks):
-    x = myarrayset[b].get()
-    ar.append(x)
+  for b in range(0,n_blocks): ar.append(myarrayset[b])
 
 # Compute input size
 input_size = ar.shape[0]

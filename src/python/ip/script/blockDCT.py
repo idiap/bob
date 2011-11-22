@@ -4,12 +4,13 @@ import torch
 import os, sys
 import optparse
 import math
+import numpy
 
 def normalizeBlocks(src):
-  for i in range(src.extent(0)):
+  for i in range(src.shape[0]):
     block = src[i, :, :]
-    mean = torch.core.array.float64_2.mean(block)
-    std = torch.core.array.float64_2.sum((block - mean) ** 2) / block.size()
+    mean = block.mean()
+    std = ((block - mean) ** 2).sum() / block.size
     if std == 0:
       std = 1
     else:
@@ -18,10 +19,10 @@ def normalizeBlocks(src):
     src[i, :, :] = (block - mean) / std
     
 def normalizeDCT(src):
-  for i in range(src.extent(1)):
+  for i in range(src.shape[1]):
     col = src[:, i]
-    mean = torch.core.array.float64_1.mean(col)
-    std = torch.core.array.float64_1.sum((col - mean) ** 2) / col.size()
+    mean = col.mean()
+    std = ((col - mean) ** 2).sum() / col.size
     if std == 0:
       std = 1
     else:
@@ -38,10 +39,10 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
   print >> sys.stderr, "DCT: " + line
   
   # Process one file
-  prep = torch.io.Array(line).get().cast('float64')
+  prep = torch.io.Array(line).get().astype('float64')
 
   blockShape = torch.ip.getBlockShape(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
-  blocks = torch.core.array.float64_3(blockShape)
+  blocks = numpy.ndarray(blockShape, 'float64')
   torch.ip.block(prep, blocks, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
 
   if norm_before:
@@ -74,7 +75,7 @@ def dctfeatures(line, A_OUTPUT_DIR, A_OUTPUT_EXTENSION,
     dct_blocks_max -= 2
     TMP_tensor_min += 2
   
-  TMP_tensor = torch.core.array.float64_2(n_blocks, TMP_tensor_max)
+  TMP_tensor = numpy.ndarray((n_blocks, TMP_tensor_max), 'float64')
   
   nBlocks = torch.ip.getNBlocks(prep, A_BLOCK_H, A_BLOCK_W, A_OVERLAP_H, A_OVERLAP_W)
   for by in range(nBlocks[0]):
@@ -170,34 +171,16 @@ parser.add_option('--self-test',
 (options, args) = parser.parse_args()
 
 if options.test:
-  array = torch.core.array.array([[[ 8,  2],
-                                   [ 2,  8]
-                                   ]],
-                                  'float64')
+  array = numpy.array([[[ 8,  2], [ 2,  8] ]], 'float64')
 
-  array_ref = torch.core.array.array([[[ 1, -1],
-                                       [-1,  1]
-                                       ]],
-                                       'float64')
+  array_ref = numpy.array([[[ 1, -1], [-1,  1] ]], 'float64')
   normalizeBlocks(array)
   if not (array == array_ref).all():
     print "Problem with normalizeBlocks"
     sys.exit(1)
   
-  array = torch.core.array.array([[ 2,  8],
-                                  [ 8,  2],
-                                  [ 2,  8],
-                                  [ 8,  2]
-                                  ],
-                                  'float64')
-
-
-  array_ref = torch.core.array.array([[-1,  1],
-                                      [ 1, -1],
-                                      [-1,  1],
-                                      [ 1, -1]
-                                      ],
-                                      'float64')
+  array = numpy.array([[ 2,  8], [ 8,  2], [ 2,  8], [ 8,  2] ], 'float64')
+  array_ref = numpy.array([[-1,  1], [ 1, -1], [-1,  1], [ 1, -1] ], 'float64')
   normalizeDCT(array)
   if not (array == array_ref).all():
     print "Problem with normalizeDCT"
@@ -206,17 +189,17 @@ if options.test:
   if os.path.exists("/tmp/input.hdf5"):
     os.remove("/tmp/input.hdf5")
   options.output_dir = "/tmp/blockDCT"
-  array = torch.core.array.array([[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9],
-                                  [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
-                                  [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
-                                  [30, 31, 32,  0, 34, 35,  0, 37, 38, 39],
-                                  [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
-                                  [50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
-                                  [60, 61, 62, 63, 64, 65, 66, 67, 68, 69],
-                                  [70, 71, 72, 73, 74, 75, 76, 77, 78, 79],
-                                  [80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
-                                  [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]],
-                                  'uint8')
+  array = numpy.array([[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9],
+                       [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+                       [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+                       [30, 31, 32,  0, 34, 35,  0, 37, 38, 39],
+                       [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                       [50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
+                       [60, 61, 62, 63, 64, 65, 66, 67, 68, 69],
+                       [70, 71, 72, 73, 74, 75, 76, 77, 78, 79],
+                       [80, 81, 82, 83, 84, 85, 86, 87, 88, 89],
+                       [90, 91, 92, 93, 94, 95, 96, 97, 98, 99]],
+                       'uint8')
 
   torch.io.Array(array).save("/tmp/input.hdf5")
 

@@ -7,6 +7,7 @@
 import os, sys
 import unittest
 import torch
+import numpy
 import random
 
 #############################################################################
@@ -19,12 +20,12 @@ def compare(v1, v2, width):
 
 def test_dct1D(N, t, eps, obj):
   # process using DCT
-  u_dct = torch.core.array.float64_1(N)
+  u_dct = numpy.zeros((N,), 'float64')
   dct = torch.sp.DCT1D(N)
   dct(t,u_dct)
 
   # process using inverse DCT 
-  u_dct_idct = torch.core.array.float64_1(N)
+  u_dct_idct = numpy.zeros((N,), 'float64')
   idct = torch.sp.IDCT1D(N)
   idct(u_dct,u_dct_idct)
 
@@ -32,15 +33,14 @@ def test_dct1D(N, t, eps, obj):
   for i in range(N):
     obj.assertTrue(compare(u_dct_idct[i], t[i], 1e-3))
 
-
 def test_dct2D(M, N, t, eps, obj):
   # process using DCT
-  u_dct = torch.core.array.float64_2(M,N)
+  u_dct = numpy.zeros((M,N), 'float64')
   dct = torch.sp.DCT2D(M,N)
   dct(t,u_dct)
 
   # process using inverse DCT 
-  u_dct_idct = torch.core.array.float64_2(M,N)
+  u_dct_idct = numpy.zeros((M,N), 'float64')
   idct = torch.sp.IDCT2D(M,N)
   idct(u_dct,u_dct_idct)
 
@@ -52,12 +52,12 @@ def test_dct2D(M, N, t, eps, obj):
 
 def test_fft1D(N, t, eps, obj):
   # process using FFT
-  u_fft = torch.core.array.complex128_1(N)
+  u_fft = numpy.zeros((N,), 'complex128')
   fft = torch.sp.FFT1D(N)
   fft(t,u_fft)
 
   # process using inverse FFT 
-  u_fft_ifft = torch.core.array.complex128_1(N)
+  u_fft_ifft = numpy.zeros((N,), 'complex128')
   ifft = torch.sp.IFFT1D(N)
   ifft(u_fft,u_fft_ifft)
 
@@ -68,12 +68,12 @@ def test_fft1D(N, t, eps, obj):
 
 def test_fft2D(M, N, t, eps, obj):
   # process using FFT
-  u_fft = torch.core.array.complex128_2(M,N)
+  u_fft = numpy.zeros((M,N), 'complex128')
   fft = torch.sp.FFT2D(M,N)
   fft(t,u_fft)
 
   # process using inverse FFT 
-  u_fft_ifft = torch.core.array.complex128_2(M,N)
+  u_fft_ifft = numpy.zeros((M,N), 'complex128')
   ifft = torch.sp.IFFT2D(M,N)
   ifft(u_fft,u_fft_ifft)
 
@@ -93,7 +93,7 @@ class TransformTest(unittest.TestCase):
     # size of the data
     for N in range(1,65):
       # set up simple 1D tensor
-      t = torch.core.array.float64_1(N)
+      t = numpy.zeros((N,), 'float64')
       for i in range(N):
         t[i] = 1.0+i
 
@@ -108,7 +108,7 @@ class TransformTest(unittest.TestCase):
       N = random.randint(1,2048)
 
       # set up simple 1D random tensor 
-      t = torch.core.array.float64_1(N)
+      t = numpy.zeros((N,), 'float64')
       for i in range(N):
         t[i] = random.uniform(1, 10)
 
@@ -121,7 +121,7 @@ class TransformTest(unittest.TestCase):
     for M in range(1,9):
       for N in range(1,9):
         # set up simple 2D tensor
-        t = torch.core.array.float64_2(M,N)
+        t = numpy.zeros((M,N), 'float64')
         for i in range(M):
           for j in range(N):
             t[i,j] = 1.+i+j
@@ -139,7 +139,7 @@ class TransformTest(unittest.TestCase):
       N = random.randint(1,64)
 
       # set up simple 1D random tensor 
-      t = torch.core.array.float64_2(M,N)
+      t = numpy.zeros((M,N), 'float64')
       for i in range(M):
         for j in range(N):
           t[i,j] = random.uniform(1, 10)
@@ -153,7 +153,7 @@ class TransformTest(unittest.TestCase):
     # size of the data
     for N in range(1,65):
       # set up simple 1D tensor
-      t = torch.core.array.complex128_1(N)
+      t = numpy.zeros((N,), 'complex128')
       for i in range(N):
         t[i] = 1.0+i
 
@@ -168,7 +168,7 @@ class TransformTest(unittest.TestCase):
       N = random.randint(1,2048)
 
       # set up simple 1D random tensor 
-      t = torch.core.array.complex128_1(N)
+      t = numpy.zeros((N,), 'complex128')
       for i in range(N):
         t[i] = random.uniform(1, 10)
 
@@ -181,7 +181,7 @@ class TransformTest(unittest.TestCase):
     for M in range(1,9):
       for N in range(1,9):
         # set up simple 2D tensor
-        t = torch.core.array.complex128_2(M,N)
+        t = numpy.zeros((M,N), 'complex128')
         for i in range(M):
           for j in range(N):
             t[i,j] = 1.+i+j
@@ -199,7 +199,7 @@ class TransformTest(unittest.TestCase):
       N = random.randint(1,64)
 
       # set up simple 2D random tensor 
-      t = torch.core.array.complex128_2(M,N)
+      t = numpy.zeros((M,N), 'complex128')
       for i in range(M):
         for j in range(N):
           t[i,j] = random.uniform(1, 10)

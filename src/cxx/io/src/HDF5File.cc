@@ -1,14 +1,30 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Thu 31 Mar 07:42:23 2011 
+ * @file cxx/io/src/HDF5File.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Implementation of the read/write functionality for HDF5 files 
+ * @brief Implementation of the read/write functionality for HDF5 files
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "io/HDF5File.h"
 
 namespace io = Torch::io;
 namespace fs = boost::filesystem;
+namespace ca = Torch::core::array;
 
 static unsigned int getH5Access (io::HDF5File::mode_t v) {
   switch(v)
@@ -107,4 +123,42 @@ void io::HDF5File::rename (const std::string& from, const std::string& to) {
 
 void io::HDF5File::copy (HDF5File& other) {
   //TODO
+}
+
+void io::HDF5File::create (const std::string& path, const ca::typeinfo& ti,
+    bool list, size_t compression) {
+  std::string absolute = resolve(path);
+  if (!contains(absolute)) {
+    m_index[absolute] =
+      boost::make_shared<detail::hdf5::Dataset>(boost::ref(m_file),
+          absolute, io::HDF5Type(ti), list, compression);
+  }
+  else {
+    //still make sure the type is usable -- that will throw if not
+    m_index[absolute]->size(io::HDF5Type(ti));
+  }
+}
+
+void io::HDF5File::read_buffer (const std::string& path, size_t pos, 
+    ca::interface& b) {
+  std::string absolute = resolve(path);
+  if (!contains(absolute)) 
+    throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+  m_index[absolute]->read_buffer(pos, io::HDF5Type(b.type()), b.ptr());
+}
+
+void io::HDF5File::write_buffer (const std::string& path, 
+    size_t pos, const ca::interface& b) {
+  std::string absolute = resolve(path);
+  if (!contains(absolute)) 
+    throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+  m_index[absolute]->write_buffer(pos, io::HDF5Type(b.type()), b.ptr());
+}
+
+void io::HDF5File::extend_buffer(const std::string& path,
+    const ca::interface& b) {
+  std::string absolute = resolve(path);
+  if (!contains(absolute)) 
+    throw Torch::io::HDF5InvalidPath(m_file->m_path.string(), absolute);
+  m_index[absolute]->extend_buffer(io::HDF5Type(b.type()), b.ptr());
 }

@@ -87,8 +87,8 @@ mach::WienerMachine& mach::WienerMachine::operator=
 void mach::WienerMachine::load (Torch::io::HDF5File& config) {
   //reads all data directly into the member variables
   m_Ps.reference(config.readArray<double,2>("Ps"));
-  config.read("Pn", m_Pn);
-  config.read("variance_threshold", m_variance_threshold);
+  m_Pn = config.read<double>("Pn");
+  m_variance_threshold = config.read<double>("variance_threshold");
   m_W.reference(config.readArray<double,2>("W"));
   m_fft.reset(new Torch::sp::FFT2D(m_Ps.extent(0),m_Ps.extent(1)));
   m_ifft.reset(new Torch::sp::IFFT2D(m_Ps.extent(0),m_Ps.extent(1)));

@@ -1,3 +1,22 @@
+/**
+ * @file cxx/machine/machine/GMMStats.h
+ * @date Tue May 10 11:35:58 2011 +0200
+ * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /// @file GMMStats.h
 /// @author <a href="mailto:Roy.Wallace@idiap.ch">Roy Wallace</a> 
 /// @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 

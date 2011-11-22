@@ -1,8 +1,23 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Wed 13 Apr 18:06:45 2011 
+ * @file cxx/io/src/HDF5Types.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A few helpers to handle HDF5 datasets in a more abstract way.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <boost/format.hpp>
@@ -353,6 +368,11 @@ static io::hdf5type get_datatype
   throw io::HDF5UnsupportedTypeError(dt);
 }
 
+bool io::HDF5Type::compatible (const Torch::core::array::typeinfo& value) const
+{
+  return *this == HDF5Type(value);
+}
+
 /**
  * Given a datatype, returns the supported HDF5 datatype equivalent or -1
  */
@@ -489,6 +509,57 @@ io::HDF5Type::HDF5Type(io::hdf5type type, const io::HDF5Shape& extents):
 {
 }
 
+static io::hdf5type array_to_hdf5 (Torch::core::array::ElementType eltype) {
+  switch(eltype) {
+    case Torch::core::array::t_unknown:
+      return io::unsupported;
+    case Torch::core::array::t_bool:
+      return io::u8;
+    case Torch::core::array::t_int8:
+      return io::i8;
+    case Torch::core::array::t_int16:
+      return io::i16;
+    case Torch::core::array::t_int32:
+      return io::i32;
+    case Torch::core::array::t_int64:
+      return io::i64;
+    case Torch::core::array::t_uint8:
+      return io::u8;
+    case Torch::core::array::t_uint16:
+      return io::u16;
+    case Torch::core::array::t_uint32:
+      return io::u32;
+    case Torch::core::array::t_uint64:
+      return io::u64;
+    case Torch::core::array::t_float32:
+      return io::f32;
+    case Torch::core::array::t_float64:
+      return io::f64;
+    case Torch::core::array::t_float128:
+      return io::f128;
+    case Torch::core::array::t_complex64:
+      return io::c64;
+    case Torch::core::array::t_complex128:
+      return io::c128;
+    case Torch::core::array::t_complex256:
+      return io::c256;
+  }
+  throw std::runtime_error("unsupported dtyle <=> hdf5 type conversion -- debug me");
+}
+
+io::HDF5Type::HDF5Type(const Torch::core::array::typeinfo& ti): 
+  m_type(array_to_hdf5(ti.dtype)),
+  m_shape(ti.nd, ti.shape)
+{
+}
+
+io::HDF5Type::HDF5Type(Torch::core::array::ElementType eltype, 
+    const HDF5Shape& extents): 
+  m_type(array_to_hdf5(eltype)),
+  m_shape(extents)
+{
+}
+
 io::HDF5Type::HDF5Type(const boost::shared_ptr<hid_t>& type,
     const io::HDF5Shape& extents):
   m_type(get_datatype(type)),
@@ -559,6 +630,18 @@ Torch::core::array::ElementType io::HDF5Type::element_type() const {
       break;
   }
   return Torch::core::array::t_unknown;
+}
+
+void io::HDF5Type::copy_to (Torch::core::array::typeinfo& ti) const {
+  ti.dtype = element_type();
+  ti.nd = shape().n();
+  if (ti.nd > (TORCH_MAX_DIM+1)) {
+    boost::format f("HDF5 type has more (%d) than the allowed maximum number of dimensions (%d)");
+    f % ti.nd % (TORCH_MAX_DIM+1);
+    throw std::runtime_error(f.str().c_str());
+  }
+  for (size_t i=0; i<ti.nd; ++i) ti.shape[i] = shape()[i];
+  ti.update_strides();
 }
       
 io::HDF5Descriptor::HDF5Descriptor(const HDF5Type& type, size_t size, 

@@ -1,238 +1,321 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Mon 21 Feb 13:54:28 2011 
+ * @file cxx/io/src/MatUtils.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implementation of MatUtils (handling of matlab .mat files)
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
+
 #include "io/MatUtils.h"
-#include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
+#include "io/reorder.h"
 
 namespace io = Torch::io;
 namespace iod = io::detail;
-namespace array = Torch::core::array;
-
-bool iod::ArrayTypeInfo::operator== (const iod::ArrayTypeInfo& other) const {
-  if (eltype != other.eltype) return false;
-  if (ndim != other.ndim) return false;
-  for (size_t i=0; i<ndim; ++i) if (shape[i] != other.shape[i]) return false;
-  //if you get here, all is equal
-  return true;
-}
+namespace ca = Torch::core::array;
 
 boost::shared_ptr<mat_t> iod::make_matfile(const std::string& filename,
     int flags) {
   return boost::shared_ptr<mat_t>(Mat_Open(filename.c_str(), flags), std::ptr_fun(Mat_Close));
 }
 
-boost::shared_ptr<matvar_t> iod::make_matvar(boost::shared_ptr<mat_t>& file) {
+/**
+ * This method will create a new boost::shared_ptr to matvar_t that knows how
+ * to delete itself
+ *
+ * You pass it the file and the variable name to be read out or a combination
+ * of parameters required to build a new matvar_t from scratch (see matio API
+ * for details).
+ */
+static boost::shared_ptr<matvar_t> make_matvar(boost::shared_ptr<mat_t>& file) {
+
   return boost::shared_ptr<matvar_t>(Mat_VarReadNext(file.get()), std::ptr_fun(Mat_VarFree));
+
 }
 
-boost::shared_ptr<matvar_t> iod::make_matvar_info(boost::shared_ptr<mat_t>& file) {
+/**
+ * This is essentially like make_matvar(), but uses VarReadNextInfo() instead
+ * of VarReadNext(), so it does not load the data, but it is faster.
+ */
+static boost::shared_ptr<matvar_t> 
+make_matvar_info(boost::shared_ptr<mat_t>& file) {
+
   return boost::shared_ptr<matvar_t>(Mat_VarReadNextInfo(file.get()), std::ptr_fun(Mat_VarFree));
+
 }
 
-boost::shared_ptr<matvar_t> iod::make_matvar(boost::shared_ptr<mat_t>& file,
+static boost::shared_ptr<matvar_t> make_matvar(boost::shared_ptr<mat_t>& file,
    const std::string& varname) {
+
   if (!varname.size()) throw io::Uninitialized();
   return boost::shared_ptr<matvar_t>(Mat_VarRead(file.get(), const_cast<char*>(varname.c_str())), std::ptr_fun(Mat_VarFree));
+
 }
 
-enum matio_classes iod::mio_class_type (array::ElementType i) {
+/**
+ * Returns the MAT_C_* enumeration for the given ElementType
+ */
+static enum matio_classes mio_class_type (ca::ElementType i) {
   switch (i) {
-    case array::t_int8: 
+    case ca::t_int8: 
       return MAT_C_INT8;
-    case array::t_int16: 
+    case ca::t_int16: 
       return MAT_C_INT16;
-    case array::t_int32: 
+    case ca::t_int32: 
       return MAT_C_INT32;
-    case array::t_int64: 
+    case ca::t_int64: 
       return MAT_C_INT64;
-    case array::t_uint8: 
+    case ca::t_uint8: 
       return MAT_C_UINT8;
-    case array::t_uint16: 
+    case ca::t_uint16: 
       return MAT_C_UINT16;
-    case array::t_uint32: 
+    case ca::t_uint32: 
       return MAT_C_UINT32;
-    case array::t_uint64: 
+    case ca::t_uint64: 
       return MAT_C_UINT64;
-    case array::t_float32:
+    case ca::t_float32:
       return MAT_C_SINGLE;
-    case array::t_complex64:
+    case ca::t_complex64:
       return MAT_C_SINGLE;
-    case array::t_float64:
+    case ca::t_float64:
       return MAT_C_DOUBLE;
-    case array::t_complex128:
+    case ca::t_complex128:
       return MAT_C_DOUBLE;
     default:
-      throw io::TypeError(i, array::t_float32);
+      {
+        boost::format f("data type '%s' is not supported by matio backend");
+        f % ca::stringize(i);
+        throw std::invalid_argument(f.str().c_str());
+      }
   }
 }
 
-enum matio_types iod::mio_data_type (array::ElementType i) {
+/**
+ * Returns the MAT_T_* enumeration for the given ElementType
+ */
+static enum matio_types mio_data_type (ca::ElementType i) {
   switch (i) {
-    case array::t_int8: 
+    case ca::t_int8: 
       return MAT_T_INT8;
-    case array::t_int16: 
+    case ca::t_int16: 
       return MAT_T_INT16;
-    case array::t_int32: 
+    case ca::t_int32: 
       return MAT_T_INT32;
-    case array::t_int64: 
+    case ca::t_int64: 
       return MAT_T_INT64;
-    case array::t_uint8: 
+    case ca::t_uint8: 
       return MAT_T_UINT8;
-    case array::t_uint16: 
+    case ca::t_uint16: 
       return MAT_T_UINT16;
-    case array::t_uint32: 
+    case ca::t_uint32: 
       return MAT_T_UINT32;
-    case array::t_uint64: 
+    case ca::t_uint64: 
       return MAT_T_UINT64;
-    case array::t_float32:
+    case ca::t_float32:
       return MAT_T_SINGLE;
-    case array::t_complex64:
+    case ca::t_complex64:
       return MAT_T_SINGLE;
-    case array::t_float64:
+    case ca::t_float64:
       return MAT_T_DOUBLE;
-    case array::t_complex128:
+    case ca::t_complex128:
       return MAT_T_DOUBLE;
     default:
-      throw io::TypeError(i, array::t_float32);
+      {
+        boost::format f("data type '%s' is not supported by matio backend");
+        f % ca::stringize(i);
+        throw std::invalid_argument(f.str().c_str());
+      }
   }
 }
 
-array::ElementType iod::torch_element_type (int mio_type, bool is_complex) {
+/**
+ * Returns the ElementType given the matio MAT_T_* enum and a flag indicating
+ * if the array is complex or not (also returned by matio at matvar_t)
+ */
+static ca::ElementType torch_element_type (int mio_type, bool is_complex) {
 
-  array::ElementType eltype = array::t_unknown;
+  ca::ElementType eltype = ca::t_unknown;
 
   switch(mio_type) {
 
     case(MAT_T_INT8): 
-      eltype = array::t_int8;
+      eltype = ca::t_int8;
       break;
     case(MAT_T_INT16): 
-      eltype = array::t_int16;
+      eltype = ca::t_int16;
       break;
     case(MAT_T_INT32):
-      eltype = array::t_int32;
+      eltype = ca::t_int32;
       break;
     case(MAT_T_INT64):
-      eltype = array::t_int64;
+      eltype = ca::t_int64;
       break;
     case(MAT_T_UINT8):
-      eltype = array::t_uint8;
+      eltype = ca::t_uint8;
       break;
     case(MAT_T_UINT16):
-      eltype = array::t_uint16;
+      eltype = ca::t_uint16;
       break;
     case(MAT_T_UINT32):
-      eltype = array::t_uint32;
+      eltype = ca::t_uint32;
       break;
     case(MAT_T_UINT64):
-      eltype = array::t_uint64;
+      eltype = ca::t_uint64;
       break;
     case(MAT_T_SINGLE):
-      eltype = array::t_float32;
+      eltype = ca::t_float32;
       break;
     case(MAT_T_DOUBLE):
-      eltype = array::t_float64;
+      eltype = ca::t_float64;
       break;
     default:
-      return array::t_unknown;
+      return ca::t_unknown;
   }
 
   //if type is complex, it is signalled slightly different
   if (is_complex) {
-    if (eltype == array::t_float32) return array::t_complex64;
-    else if (eltype == array::t_float64) return array::t_complex128;
-    else return array::t_unknown;
+    if (eltype == ca::t_float32) return ca::t_complex64;
+    else if (eltype == ca::t_float64) return ca::t_complex128;
+    else return ca::t_unknown;
   }
   
   return eltype;
 }
+
+boost::shared_ptr<matvar_t> make_matvar
+(const std::string& varname, const ca::interface& buf) {
+
+  const ca::typeinfo& info = buf.type();
+  void* fdata = static_cast<void*>(new char[info.buffer_size()]);
   
-template <> blitz::TinyVector<int,1> iod::make_shape<1> (const int* shape) {
-  return blitz::shape(shape[0]);
+  //matio gets dimensions as integers
+  int mio_dims[TORCH_MAX_DIM];
+  for (size_t i=0; i<info.nd; ++i) mio_dims[i] = info.shape[i];
+
+  switch (info.dtype) {
+    case ca::t_complex64:
+    case ca::t_complex128:
+    case ca::t_complex256:
+      {
+        //special treatment for complex arrays
+        uint8_t* real = static_cast<uint8_t*>(fdata);
+        uint8_t* imag = real + (info.buffer_size()/2);
+        io::row_to_col_order_complex(buf.ptr(), real, imag, info); 
+        ComplexSplit mio_complex = {real, imag};
+        return boost::shared_ptr<matvar_t>(Mat_VarCreate(varname.c_str(),
+              mio_class_type(info.dtype), mio_data_type(info.dtype),
+              info.nd, mio_dims, static_cast<void*>(&mio_complex),
+              MAT_F_COMPLEX),
+            std::ptr_fun(Mat_VarFree));
+      }
+    default:
+      break;
+  }
+
+  io::row_to_col_order(buf.ptr(), fdata, info); ///< data copying!
+
+  return boost::shared_ptr<matvar_t>(Mat_VarCreate(varname.c_str(),
+        mio_class_type(info.dtype), mio_data_type(info.dtype),
+        info.nd, mio_dims, fdata, 0), std::ptr_fun(Mat_VarFree));
 }
 
-template <> blitz::TinyVector<int,2> iod::make_shape<2> (const int* shape) {
-  return blitz::shape(shape[0], shape[1]);
+/**
+ * Assigns a single matvar variable to an ca::interface. Re-allocates the buffer
+ * if required.
+ */
+static void assign_array (boost::shared_ptr<matvar_t> matvar, ca::interface& buf) {
+
+  ca::typeinfo info(torch_element_type(matvar->data_type, matvar->isComplex),
+      matvar->rank, matvar->dims);
+
+  if(!buf.type().is_compatible(info)) buf.set(info);
+
+  if (matvar->isComplex) {
+    ComplexSplit mio_complex = *static_cast<ComplexSplit*>(matvar->data);
+    io::col_to_row_order_complex(mio_complex.Re, mio_complex.Im, buf.ptr(), info);
+  }
+  else io::col_to_row_order(matvar->data, buf.ptr(), info);
+
 }
 
-template <> blitz::TinyVector<int,3> iod::make_shape<3> (const int* shape) {
-  return blitz::shape(shape[0], shape[1], shape[2]);
+void iod::read_array (boost::shared_ptr<mat_t> file, ca::interface& buf,
+    const std::string& varname) {
+
+  boost::shared_ptr<matvar_t> matvar;
+  if (varname.size()) matvar = make_matvar(file, varname);
+  else matvar = make_matvar(file);
+  if (!matvar) throw Torch::io::Uninitialized();
+  assign_array(matvar, buf);
+
 }
 
-template <> blitz::TinyVector<int,4> iod::make_shape<4> (const int* shape) {
-  return blitz::shape(shape[0], shape[1], shape[2], shape[3]);
+void iod::write_array(boost::shared_ptr<mat_t> file, 
+    const std::string& varname, const ca::interface& buf) {
+
+  boost::shared_ptr<matvar_t> matvar = make_matvar(varname, buf);
+  Mat_VarWrite(file.get(), matvar.get(), 0);
+
 }
 
-void iod::get_info(boost::shared_ptr<const matvar_t> matvar,
-    iod::ArrayTypeInfo& info) {
-  info.ndim = matvar->rank;
-  for (size_t i=0; i<info.ndim; ++i) info.shape[i] = matvar->dims[i];
-  info.eltype = io::detail::torch_element_type(matvar->data_type,
-      matvar->isComplex);
+/**
+ * Given a matvar_t object, returns our equivalent ca::typeinfo struct.
+ */
+static void get_var_info(boost::shared_ptr<const matvar_t> matvar,
+    ca::typeinfo& info) {
+  info.set(torch_element_type(matvar->data_type, matvar->isComplex),
+      matvar->rank, matvar->dims);
 }
 
-void iod::get_info_first(const std::string& filename, iod::ArrayTypeInfo& info) {
-
-  static const boost::regex allowed_varname("^array_(\\d*)$");
-  boost::cmatch what;
-
-  boost::shared_ptr<std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> > > retval(new std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> >());
+void iod::mat_peek(const std::string& filename, ca::typeinfo& info) {
 
   boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw io::FileNotReadable(filename);
-  
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
+  get_var_info(matvar, info);
 
-  //we continue reading until we find a variable that matches our naming
-  //convention.
-  while (matvar && !boost::regex_match(matvar->name, what, allowed_varname)) {
-    matvar = make_matvar(mat); //gets the next variable
-  }
-
-  if (!what.size()) throw io::Uninitialized();
-  get_info(matvar, info);
 }
 
-boost::shared_ptr<std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> > >
+void iod::mat_peek_set(const std::string& filename, ca::typeinfo& info) {
+  boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
+  if (!mat) throw io::FileNotReadable(filename);
+  boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
+  get_var_info(matvar, info);
+}
+
+boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > >
   iod::list_variables(const std::string& filename) {
 
-  static const boost::regex allowed_varname("^array_(\\d*)$");
-  boost::cmatch what;
-
-  boost::shared_ptr<std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> > > retval(new std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> >());
+  boost::shared_ptr<std::map<size_t, std::pair<std::string, ca::typeinfo> > > retval(new std::map<size_t, std::pair<std::string, ca::typeinfo> >());
 
   boost::shared_ptr<mat_t> mat = iod::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) throw io::FileNotReadable(filename);
   boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
 
-  //we continue reading until we find a variable that matches our naming
-  //convention.
-  while (matvar && !boost::regex_match(matvar->name, what, allowed_varname)) {
-    matvar = make_matvar(mat); //gets the next variable
-  }
-
-  if (!what.size()) throw io::Uninitialized();
-
-  size_t id = boost::lexical_cast<size_t>(what[1]);
+  size_t id = 0;
  
-  //now that we have found a variable under our name convention, fill the array
+  //now that we have found a variable, fill the array
   //properties taking that variable as basis
-  (*retval)[id] = std::make_pair(matvar->name, iod::ArrayTypeInfo());
-  get_info(matvar, (*retval)[id].second);
-  const ArrayTypeInfo& type_cache = (*retval)[id].second;
+  (*retval)[id] = std::make_pair(matvar->name, ca::typeinfo());
+  get_var_info(matvar, (*retval)[id].second);
+  const ca::typeinfo& type_cache = (*retval)[id].second;
 
-  //checks our support and see if we can load this...
-  if ((*retval)[id].second.ndim > 4) {
-    throw io::DimensionError((*retval)[id].second.ndim, 
-        array::N_MAX_DIMENSIONS_ARRAY);
-  }
-  if ((*retval)[id].second.eltype == array::t_unknown) {
-    throw io::TypeError((*retval)[id].second.eltype, array::t_float32);
+  if ((*retval)[id].second.dtype == ca::t_unknown) {
+    throw io::TypeError((*retval)[id].second.dtype, ca::t_float32);
   }
 
   //if we got here, just continue counting the variables inside. we
@@ -241,10 +324,7 @@ boost::shared_ptr<std::map<size_t, std::pair<std::string, iod::ArrayTypeInfo> > 
   //read variable and hope for the best.
 
   while ((matvar = make_matvar_info(mat))) {
-    if (boost::regex_match(matvar->name, what, allowed_varname)) {
-      id = boost::lexical_cast<size_t>(what[1]);
-      (*retval)[id] = std::make_pair(matvar->name, type_cache);
-    }
+    (*retval)[++id] = std::make_pair(matvar->name, type_cache);
   }
 
   return retval;

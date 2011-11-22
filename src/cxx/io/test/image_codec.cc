@@ -1,8 +1,23 @@
 /**
- * @file src/cxx/io/test/image_codec.cc
- * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file cxx/io/test/image_codec.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief ImageArrayCodec tests
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define BOOST_TEST_DYN_LINK
@@ -15,7 +30,6 @@
 #include <blitz/array.h>
 #include "core/logging.h"
 #include "io/Array.h"
-#include "io/ImageArrayCodec.h"
 
 struct T {
   blitz::Array<uint8_t,2> a;
@@ -87,6 +101,28 @@ void check_equal(const blitz::Array<T,3>& a, const blitz::Array<U,3>& b)
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
+BOOST_AUTO_TEST_CASE( image_gif ) 
+{
+  // Prepare io Array from blitz array
+  Torch::io::Array db_b(b);
+  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
+  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
+  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
+  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
+  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
+  for(size_t i=0; i<db_b.getNDim(); ++i)
+    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
+  check_equal( db_b.get<uint8_t,3>(), b );
+
+  // Save to gif image
+  std::string filename = temp_file(".gif");
+  db_b.save( filename);
+
+  // Load from gif image
+  Torch::io::Array db_b_read( filename);
+  db_b_read.get<uint8_t,3>();
+  check_equal( db_b_read.get<uint8_t,3>(), b );
+}
 
 BOOST_AUTO_TEST_CASE( image_bmp )
 {
@@ -103,33 +139,10 @@ BOOST_AUTO_TEST_CASE( image_bmp )
 
   // Save to bmp image
   std::string filename = temp_file(".bmp");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from bmp image
-  Torch::io::Array db_b_read( filename, "torch.image" );
-  db_b_read.get<uint8_t,3>();
-  check_equal( db_b_read.get<uint8_t,3>(), b );
-}
-
-BOOST_AUTO_TEST_CASE( image_gif ) 
-{
-  // Prepare io Array from blitz array
-  Torch::io::Array db_b(b);
-  BOOST_CHECK_EQUAL(db_b.getNDim(), b.dimensions());
-  BOOST_CHECK_EQUAL(db_b.getElementType(), Torch::core::array::t_uint8);
-  BOOST_CHECK_EQUAL(db_b.isLoaded(), true);
-  BOOST_CHECK_EQUAL(db_b.getFilename().size(), 0);
-  BOOST_CHECK_EQUAL(db_b.getCodec().use_count(), 0);
-  for(size_t i=0; i<db_b.getNDim(); ++i)
-    BOOST_CHECK_EQUAL(db_b.getShape()[i], b.extent(i));
-  check_equal( db_b.get<uint8_t,3>(), b );
-
-  // Save to gif image
-  std::string filename = temp_file(".gif");
-  db_b.save( filename, "torch.image" );
-
-  // Load from gif image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -150,10 +163,10 @@ BOOST_AUTO_TEST_CASE( image_jpg )
 
   // Save to jpg image
   std::string filename = temp_file(".jpg");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from jpg image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -174,10 +187,10 @@ BOOST_AUTO_TEST_CASE( image_pbm )
 
   // Save to pbm image
   std::string filename = temp_file(".pbm");
-  db_a.save( filename, "torch.image" );
+  db_a.save( filename);
 
   // Load from pbm image
-  Torch::io::Array db_a_read( filename, "torch.image" );
+  Torch::io::Array db_a_read( filename);
 //  check_equal( db_a_read.get<uint8_t,2>(), a );
 }
 
@@ -196,10 +209,10 @@ BOOST_AUTO_TEST_CASE( image_pgm )
 
   // Save to pgm image
   std::string filename = temp_file(".pgm");
-  db_a.save( filename, "torch.image" );
+  db_a.save( filename);
 
   // Load from pgm image
-  Torch::io::Array db_a_read( filename, "torch.image" );
+  Torch::io::Array db_a_read( filename);
   check_equal( db_a_read.get<uint8_t,2>(), a );
 }
 
@@ -218,10 +231,10 @@ BOOST_AUTO_TEST_CASE( image_png )
 
   // Save to png image
   std::string filename = temp_file(".png");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from png image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -241,10 +254,10 @@ BOOST_AUTO_TEST_CASE( image_ppm )
 
   // Save to ppm image
   std::string filename = temp_file(".ppm");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from ppm image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -264,10 +277,10 @@ BOOST_AUTO_TEST_CASE( image_tiff )
 
   // Save to tiff image
   std::string filename = temp_file(".tiff");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from tiff image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }
@@ -288,10 +301,10 @@ BOOST_AUTO_TEST_CASE( image_xcf )
 
   // Save to xcf image
   std::string filename = temp_file(".xcf");
-  db_b.save( filename, "torch.image" );
+  db_b.save( filename);
 
   // Load from xcf image
-  Torch::io::Array db_b_read( filename, "torch.image" );
+  Torch::io::Array db_b_read( filename);
   db_b_read.get<uint8_t,3>();
   check_equal( db_b_read.get<uint8_t,3>(), b );
 }

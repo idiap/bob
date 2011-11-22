@@ -10,6 +10,7 @@ import os, sys
 import math
 import unittest
 import torch
+import numpy
 
 class PythonBackProp:
   """A simplified (and slower) version of BackProp training written in python.
@@ -40,13 +41,13 @@ class PythonBackProp:
   def train(self, machine, input, target):
 
     def logistic(x):
-      return 1 / (1 + (-x).exp())
+      return 1 / (1 + numpy.exp(-x))
 
     def logistic_bwd(x):
       return x * (1-x)
 
     def tanh(x):
-      return x.tanh()
+      return numpy.tanh(x)
 
     def tanh_bwd(x):
       return (1 - x**2)
@@ -73,14 +74,14 @@ class PythonBackProp:
       raise RuntimeError, "Cannot deal with activation %s" % machine.activation
     
     #simulated bias input...
-    BI = [torch.core.array.float64_1(input.extent(0)) for k in B]
+    BI = [numpy.zeros((input.shape[0],), 'float64') for k in B]
     for k in BI: k.fill(1)
 
     #state
     if self.DW is None: #first run or just after a reset()
-      self.PDW = [k.empty_like() for k in W]
+      self.PDW = [numpy.empty_like(k) for k in W]
       for k in self.PDW: k.fill(0)
-      self.PDB = [k.empty_like() for k in B]
+      self.PDB = [numpy.empty_like(k) for k in B]
       for k in self.PDB: k.fill(0)
 
     # Instantiate partial outputs and errors
@@ -90,21 +91,21 @@ class PythonBackProp:
 
     # Feeds forward
     for k in range(len(W)):
-      O[k+1] = torch.math.prod(O[k], W[k])
-      for sample in range(O[k+1].extent(0)):
+      O[k+1] = numpy.dot(O[k], W[k])
+      for sample in range(O[k+1].shape[0]):
         O[k+1][sample,:] += B[k]
       O[k+1] = forward(O[k+1])
 
     # Feeds backward
     E[-1] = backward(O[-1]) * (target - O[-1]) #last layer
     for k in reversed(range(len(W)-1)): #for all remaining layers
-      E[k] = backward(O[k+1]) * torch.math.prod(E[k+1], W[k+1].transpose(1,0))
+      E[k] = backward(O[k+1]) * numpy.dot(E[k+1], W[k+1].transpose(1,0))
 
     # Calculates partial derivatives, accumulate
-    batch_size = E[-1].extent(0)
-    self.DW = [torch.math.prod(O[k].transpose(1,0), E[k]) for k in range(len(W))]
+    batch_size = E[-1].shape[0]
+    self.DW = [numpy.dot(O[k].transpose(1,0), E[k]) for k in range(len(W))]
     for k in self.DW: k *= (self.learning_rate / batch_size)
-    self.DB = [torch.math.prod(BI[k], E[k]) for k in range(len(W))]
+    self.DB = [numpy.dot(BI[k], E[k]) for k in range(len(W))]
     for k in self.DB: k *= (self.learning_rate / batch_size)
 
     # Updates weights and biases
@@ -146,13 +147,13 @@ class BackPropTest(unittest.TestCase):
     machine = torch.machine.MLP((2, 2, 1))
     machine.activation = torch.machine.Activation.LOG
     machine.biases = 0
-    w0 = torch.core.array.array([[.23, .1],[-0.79, 0.21]])
-    w1 = torch.core.array.array([[-.12], [-0.88]])
+    w0 = numpy.array([[.23, .1],[-0.79, 0.21]])
+    w1 = numpy.array([[-.12], [-0.88]])
     machine.weights = [w0, w1]
     trainer = torch.trainer.MLPBackPropTrainer(machine, 1)
     trainer.trainBiases = False
-    d0 = torch.core.array.array([[.3, .7]])
-    t0 = torch.core.array.array([[.0]])
+    d0 = numpy.array([[.3, .7]])
+    t0 = numpy.array([[.0]])
 
     # trains in python first
     pytrainer = PythonBackProp(train_biases=trainer.trainBiases)
@@ -161,7 +162,7 @@ class BackPropTest(unittest.TestCase):
 
     # trains with our C++ implementation
     trainer.train_(machine, d0, t0)
-    self.assertTrue( pymachine.weights[0].numeq(machine.weights[0]) )
+    self.assertTrue( numpy.array_equal(pymachine.weights[0], machine.weights[0]) )
 
   def test03_FisherWithOneHiddenLayer(self):
 
@@ -178,9 +179,9 @@ class BackPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([+1., -1., -1.]), #setosa
-        torch.core.array.array([-1., +1., -1.]), #versicolor
-        torch.core.array.array([-1., -1., +1.]), #virginica
+        numpy.array([+1., -1., -1.]), #setosa
+        numpy.array([-1., +1., -1.]), #versicolor
+        numpy.array([-1., -1., +1.]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
     data = torch.db.iris.data()
@@ -197,8 +198,8 @@ class BackPropTest(unittest.TestCase):
       input, target = S(N)
       pytrainer.train(pymachine, input, target)
       trainer.train_(machine, input, target)
-      #print "[Python] |RMSE|@%d:" % k, torch.math.norm(torch.measure.rmse(pymachine(input), target))
-      #print "[C++] |RMSE|@%d:" % k, torch.math.norm(torch.measure.rmse(machine(input), target))
+      #print "[Python] |RMSE|@%d:" % k, numpy.linalg.norm(torch.measure.rmse(pymachine(input), target))
+      #print "[C++] |RMSE|@%d:" % k, numpy.linalg.norm(torch.measure.rmse(machine(input), target))
       # Note we will face precision problems when comparing to the Pythonic
       # implementation. So, let's not be too demanding here. If all values are
       # approximately equal to 1e-10, we consider this is OK.
@@ -222,9 +223,9 @@ class BackPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([-1.0]), #setosa
-        torch.core.array.array([0.5]), #versicolor
-        torch.core.array.array([+1.0]), #virginica
+        numpy.array([-1.0]), #setosa
+        numpy.array([0.5]), #versicolor
+        numpy.array([+1.0]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
     data = torch.db.iris.data()
@@ -267,9 +268,9 @@ class BackPropTest(unittest.TestCase):
 
     # A helper to select and shuffle the data
     targets = [ #we choose the approximate Fisher response!
-        torch.core.array.array([-1.0]), #setosa
-        torch.core.array.array([0.5]), #versicolor
-        torch.core.array.array([+1.0]), #virginica
+        numpy.array([-1.0]), #setosa
+        numpy.array([0.5]), #versicolor
+        numpy.array([+1.0]), #virginica
         ]
     # Associate the data to targets, by setting the arrayset order explicetly
     data = torch.db.iris.data()

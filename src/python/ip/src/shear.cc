@@ -1,78 +1,195 @@
 /**
- * @file src/python/ip/src/shear.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file python/ip/src/shear.cc
+ * @date Sun Jun 26 18:59:21 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * @brief Binds shearing operation into python 
+ * @brief Binds shearing operation into python
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
-
+#include "core/python/ndarray.h"
 #include "ip/shear.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
+namespace ip = Torch::ip;
+namespace ca = Torch::core::array;
 
-static const char* GET_SHEARX_SHAPE2D_DOC = "Return the shape of the output 2D blitz array/image, when calling shearX.";
-static const char* GET_SHEARY_SHAPE2D_DOC = "Return the shape of the output 2D blitz array/image, when calling shearY.";
-static const char* SHEARX2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the X-dimension.";
-static const char* SHEARY2D_DOC = "Shear a 2D blitz array/image with the given shear parameter along the Y-dimension.";
-static const char* SHEARX2D_MASK_DOC = "Shear a 2D blitz array/image with the given shear parameter along the X-dimension, taking mask into account.";
-static const char* SHEARY2D_MASK_DOC = "Shear a 2D blitz array/image with the given shear parameter along the Y-dimension, taking mask into account.";
+template <typename T, int N>
+static object inner_shear_x_shape (tp::const_ndarray src, double s) {
+  return object(ip::getShearXShape<T>(src.bz<T,N>(), s));
+}
 
+static object shear_x_shape (tp::const_ndarray src, double s) {
 
-#define SHEAR_DECL(T,N) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(shearX_overloads_ ## N, Torch::ip::shearX<T>, 3, 4) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(shearX_mask_overloads_ ## N, Torch::ip::shearX<T>, 5, 6) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(shearY_overloads_ ## N, Torch::ip::shearY<T>, 3, 4) \
-  BOOST_PYTHON_FUNCTION_OVERLOADS(shearY_mask_overloads_ ## N, Torch::ip::shearY<T>, 5, 6) 
+  const ca::typeinfo& info = src.type();
 
-#define SHEAR_DEF(T,N) \
-  def("getShearXShape", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::getShearXShape<T>, (arg("src"), arg("shear")), GET_SHEARX_SHAPE2D_DOC); \
-  def("getShearYShape", (const blitz::TinyVector<int,2> (*)(const blitz::Array<T,2>&, const double))&Torch::ip::getShearYShape<T>, (arg("src"), arg("shear")), GET_SHEARY_SHAPE2D_DOC); \
-  def("shearX", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), SHEARX2D_DOC)); \
-  def("shearY", (void (*)(const blitz::Array<T,2>&, blitz::Array<double,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_overloads_ ## N ((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), SHEARY2D_DOC)); \
-  def("shearX", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<double,2>&, blitz::Array<bool,2>&, const double, const bool))&Torch::ip::shearX<T>, shearX_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), SHEARX2D_MASK_DOC)); \
-  def("shearY", (void (*)(const blitz::Array<T,2>&, const blitz::Array<bool,2>&, blitz::Array<double,2>&, blitz::Array<bool,2>&, const double, const bool))&Torch::ip::shearY<T>, shearY_mask_overloads_ ## N ((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), SHEARY2D_MASK_DOC)); \
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
 
-/*
-SHEAR_DECL(bool,bool)
-SHEAR_DECL(int8_t,int8)
-SHEAR_DECL(int16_t,int16)
-SHEAR_DECL(int32_t,int32)
-SHEAR_DECL(int64_t,int64)
-*/
-SHEAR_DECL(uint8_t,uint8)
-SHEAR_DECL(uint16_t,uint16)
-/*
-SHEAR_DECL(uint32_t,uint32)
-SHEAR_DECL(uint64_t,uint64)
-SHEAR_DECL(float,float32)
-*/
-SHEAR_DECL(double,float64)
-/*
-SHEAR_DECL(std::complex<float>,complex64)
-SHEAR_DECL(std::complex<double>,complex128)
-*/
+  switch (info.dtype) {
+    case ca::t_uint8: return inner_shear_x_shape<uint8_t,2>(src, s);
+    case ca::t_uint16: return inner_shear_x_shape<uint16_t,2>(src, s);
+    case ca::t_float64: return inner_shear_x_shape<double,2>(src, s);
+    default:
+      PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+  }
+}
 
+template <typename T, int N>
+static object inner_shear_y_shape (tp::const_ndarray src, double s) {
+  return object(ip::getShearYShape<T>(src.bz<T,N>(), s));
+}
 
-void bind_ip_shear()
-{
-/*
-  SHEAR_DEF(bool,bool)
-  SHEAR_DEF(int8_t,int8)
-  SHEAR_DEF(int16_t,int16)
-  SHEAR_DEF(int32_t,int32)
-  SHEAR_DEF(int64_t,int64)
-*/
-  SHEAR_DEF(uint8_t,uint8)
-  SHEAR_DEF(uint16_t,uint16)
-/*
-  SHEAR_DEF(uint32_t,uint32)
-  SHEAR_DEF(uint64_t,uint64)
-  SHEAR_DEF(float,float32)
-*/
-  SHEAR_DEF(double,float64)
-/*
-  SHEAR_DEF(std::complex<float>,complex64)
-  SHEAR_DEF(std::complex<double>,complex128)
-*/
+static object shear_y_shape (tp::const_ndarray src, double s) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2)
+    PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8: return inner_shear_y_shape<uint8_t,2>(src, s);
+    case ca::t_uint16: return inner_shear_y_shape<uint16_t,2>(src, s);
+    case ca::t_float64: return inner_shear_y_shape<double,2>(src, s);
+    default:
+      PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+  }
+}
+
+template <typename T, int N>
+static void inner_shear_x (tp::const_ndarray src, tp::ndarray dst,
+    double a, bool aa) {
+  blitz::Array<double,N> dst_ = dst.bz<double,N>();
+  ip::shearX<T>(src.bz<T,N>(), dst_, a, aa);
+}
+
+static void shear_x (tp::const_ndarray src, tp::ndarray dst, 
+    double a, bool aa=true) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2) PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8: return inner_shear_x<uint8_t,2>(src, dst, a, aa);
+    case ca::t_uint16: return inner_shear_x<uint16_t,2>(src, dst, a, aa);
+    case ca::t_float64: return inner_shear_x<double,2>(src, dst, a, aa);
+    default:
+      PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(shear_x_overloads, shear_x, 3, 4) 
+
+template <typename T, int N>
+static void inner_shear_y (tp::const_ndarray src, tp::ndarray dst,
+    double a, bool aa) {
+  blitz::Array<double,N> dst_ = dst.bz<double,N>();
+  ip::shearY<T>(src.bz<T,N>(), dst_, a, aa);
+}
+
+static void shear_y (tp::const_ndarray src, tp::ndarray dst, 
+    double a, bool aa=true) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2) PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8: return inner_shear_y<uint8_t,2>(src, dst, a, aa);
+    case ca::t_uint16: return inner_shear_y<uint16_t,2>(src, dst, a, aa);
+    case ca::t_float64: return inner_shear_y<double,2>(src, dst, a, aa);
+    default:
+      PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(shear_y_overloads, shear_y, 3, 4)
+
+template <typename T, int N>
+static void inner_shear_x2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask, double a, bool aa) {
+  blitz::Array<double,N> dst_ = dst.bz<double,N>();
+  blitz::Array<bool,N> dmask_ = dmask.bz<bool,N>();
+  ip::shearX<T>(src.bz<T,N>(), src.bz<bool,N>(), dst_, dmask_, a, aa);
+}
+
+static void shear_x2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask, double a, bool aa=true) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2) PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8:
+      return inner_shear_x2<uint8_t,2>(src, smask, dst, dmask, a, aa);
+    case ca::t_uint16:
+      return inner_shear_x2<uint16_t,2>(src, smask, dst, dmask, a, aa);
+    case ca::t_float64:
+      return inner_shear_x2<double,2>(src, smask, dst, dmask, a, aa);
+    default:
+      PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(shear_x2_overloads, shear_x2, 5, 6) 
+
+template <typename T, int N>
+static void inner_shear_y2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask, double a, bool aa) {
+  blitz::Array<double,N> dst_ = dst.bz<double,N>();
+  blitz::Array<bool,N> dmask_ = dmask.bz<bool,N>();
+  ip::shearY<T>(src.bz<T,N>(), src.bz<bool,N>(), dst_, dmask_, a, aa);
+}
+
+static void shear_y2 (tp::const_ndarray src, tp::const_ndarray smask,
+    tp::ndarray dst, tp::ndarray dmask, double a, bool aa=true) {
+
+  const ca::typeinfo& info = src.type();
+
+  if (info.nd != 2) PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+
+  switch (info.dtype) {
+    case ca::t_uint8:
+      return inner_shear_y2<uint8_t,2>(src, smask, dst, dmask, a, aa);
+    case ca::t_uint16:
+      return inner_shear_y2<uint16_t,2>(src, smask, dst, dmask, a, aa);
+    case ca::t_float64:
+      return inner_shear_y2<double,2>(src, smask, dst, dmask, a, aa);
+    default:
+      PYTHON_ERROR(TypeError, "shear does not support type '%s'", info.str().c_str());
+  }
+}
+
+BOOST_PYTHON_FUNCTION_OVERLOADS(shear_y2_overloads, shear_x2, 5, 6) 
+
+void bind_ip_shear() {
+
+  def("getShearXShape", &shear_x_shape, (arg("src"), arg("shear")), "Return the shape of the output 2D array/image, when calling shearX.");
+
+  def("getShearYShape", &shear_y_shape, (arg("src"), arg("shear")), "Return the shape of the output 2D array/image, when calling shearY.");
+
+  def("shearX", &shear_x, shear_x_overloads((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the X-dimension."));
+  
+  def("shearY", &shear_y, shear_y_overloads((arg("src"), arg("dst"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the Y-dimension."));
+
+  def("shearX", &shear_x2, shear_x2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the X-dimension, taking mask into account."));
+  
+  def("shearX", &shear_y2, shear_y2_overloads((arg("src"), arg("src_mask"), arg("dst"), arg("dst_mask"), arg("angle"), arg("antialias")=true), "Shear a 2D array/image with the given shear parameter along the Y-dimension, taking mask into account."));
+
 }

@@ -9,6 +9,7 @@
 import os, sys
 import unittest
 import math
+import numpy
 import torch
 
 MACHINE = 'data/mlp-test.hdf5'
@@ -25,30 +26,30 @@ class MLPTest(unittest.TestCase):
     # Two inputs and 1 output
     m = torch.machine.MLP((2,1))
     self.assertEqual(m.shape, (2,1))
-    self.assertEqual(m.input_divide.extent(0), 2)
-    self.assertEqual(m.input_subtract.extent(0), 2)
+    self.assertEqual(m.input_divide.shape[0], 2)
+    self.assertEqual(m.input_subtract.shape[0], 2)
     self.assertEqual(len(m.weights), 1)
-    self.assertEqual(m.weights[0].shape(), (2,1))
+    self.assertEqual(m.weights[0].shape, (2,1))
     self.assertTrue((m.weights[0] == 0.0).all())
     self.assertEqual(len(m.biases), 1)
-    self.assertEqual(m.biases[0].shape(), (1,))
+    self.assertEqual(m.biases[0].shape, (1,))
     self.assertTrue((m.biases[0] == 0.0).all())
     self.assertEqual(m.activation, torch.machine.Activation.TANH)
 
     # 1 hidden layer
     m = torch.machine.MLP((2,3,1))
     self.assertEqual(m.shape, (2,3,1))
-    self.assertEqual(m.input_divide.extent(0), 2)
-    self.assertEqual(m.input_subtract.extent(0), 2)
+    self.assertEqual(m.input_divide.shape[0], 2)
+    self.assertEqual(m.input_subtract.shape[0], 2)
     self.assertEqual(len(m.weights), 2)
-    self.assertEqual(m.weights[0].shape(), (2,3))
+    self.assertEqual(m.weights[0].shape, (2,3))
     self.assertTrue((m.weights[0] == 0.0).all())
-    self.assertEqual(m.weights[1].shape(), (3,1))
+    self.assertEqual(m.weights[1].shape, (3,1))
     self.assertTrue((m.weights[1] == 0.0).all())
     self.assertEqual(len(m.biases), 2)
-    self.assertEqual(m.biases[0].shape(), (3,))
+    self.assertEqual(m.biases[0].shape, (3,))
     self.assertTrue((m.biases[0] == 0.0).all())
-    self.assertEqual(m.biases[1].shape(), (1,))
+    self.assertEqual(m.biases[1].shape, (1,))
     self.assertTrue((m.biases[1] == 0.0).all())
     self.assertEqual(m.activation, torch.machine.Activation.TANH)
 
@@ -56,21 +57,21 @@ class MLPTest(unittest.TestCase):
     m = torch.machine.MLP((2,3,5,1))
     m.activation = torch.machine.Activation.LOG
     self.assertEqual(m.shape, (2,3,5,1))
-    self.assertEqual(m.input_divide.extent(0), 2)
-    self.assertEqual(m.input_subtract.extent(0), 2)
+    self.assertEqual(m.input_divide.shape[0], 2)
+    self.assertEqual(m.input_subtract.shape[0], 2)
     self.assertEqual(len(m.weights), 3)
-    self.assertEqual(m.weights[0].shape(), (2,3))
+    self.assertEqual(m.weights[0].shape, (2,3))
     self.assertTrue((m.weights[0] == 0.0).all())
-    self.assertEqual(m.weights[1].shape(), (3,5))
+    self.assertEqual(m.weights[1].shape, (3,5))
     self.assertTrue((m.weights[1] == 0.0).all())
-    self.assertEqual(m.weights[2].shape(), (5,1))
+    self.assertEqual(m.weights[2].shape, (5,1))
     self.assertTrue((m.weights[2] == 0.0).all())
     self.assertEqual(len(m.biases), 3)
-    self.assertEqual(m.biases[0].shape(), (3,))
+    self.assertEqual(m.biases[0].shape, (3,))
     self.assertTrue((m.biases[0] == 0.0).all())
-    self.assertEqual(m.biases[1].shape(), (5,))
+    self.assertEqual(m.biases[1].shape, (5,))
     self.assertTrue((m.biases[1] == 0.0).all())
-    self.assertEqual(m.biases[2].shape(), (1,))
+    self.assertEqual(m.biases[2].shape, (1,))
     self.assertTrue((m.biases[2] == 0.0).all())
     self.assertEqual(m.activation, torch.machine.Activation.LOG)
 
@@ -78,12 +79,12 @@ class MLPTest(unittest.TestCase):
     # like the first again
     m.shape = (2,1)
     self.assertEqual(m.shape, (2,1))
-    self.assertEqual(m.input_divide.extent(0), 2)
-    self.assertEqual(m.input_subtract.extent(0), 2)
+    self.assertEqual(m.input_divide.shape[0], 2)
+    self.assertEqual(m.input_subtract.shape[0], 2)
     self.assertEqual(len(m.weights), 1)
-    self.assertEqual(m.weights[0].shape(), (2,1))
+    self.assertEqual(m.weights[0].shape, (2,1))
     self.assertEqual(len(m.biases), 1)
-    self.assertEqual(m.biases[0].shape(), (1,))
+    self.assertEqual(m.biases[0].shape, (1,))
     self.assertEqual(m.activation, torch.machine.Activation.LOG)
 
   def test02_Checks(self):
@@ -96,20 +97,20 @@ class MLPTest(unittest.TestCase):
 
     # you cannot set the weights vector with the wrong size
     self.assertRaises(RuntimeError,
-        setattr, m, 'weights', [torch.core.array.float64_2((3,1))])
+        setattr, m, 'weights', [numpy.zeros((3,1), 'float64')])
 
     # the same for the bias
     self.assertRaises(RuntimeError,
-        setattr, m, 'biases', [torch.core.array.float64_1((5,))])
+        setattr, m, 'biases', [numpy.zeros((5,), 'float64')])
     
     # it works though if the sizes are correct
-    new_weights = [torch.core.array.float64_2((2,1))]
+    new_weights = [numpy.zeros((2,1), 'float64')]
     new_weights[0].fill(3.14)
     m.weights = new_weights
     self.assertEqual(len(m.weights), 1)
     self.assertTrue( (m.weights[0] == new_weights[0]).all() )
 
-    new_biases = [torch.core.array.float64_1((1,))]
+    new_biases = [numpy.zeros((1,), 'float64')]
     new_biases[0].fill(5.71)
     m.biases = new_biases
     self.assertEqual(len(m.biases), 1)
@@ -119,11 +120,11 @@ class MLPTest(unittest.TestCase):
 
     # make shure we can save an load an MLP machine
     weights = []
-    weights.append(torch.core.array.array([[.2, -.1, .2], [.2, .3, .9]]))
-    weights.append(torch.core.array.array([[.1, .5], [-.1, .2], [-.1, 1.1]])) 
+    weights.append(numpy.array([[.2, -.1, .2], [.2, .3, .9]]))
+    weights.append(numpy.array([[.1, .5], [-.1, .2], [-.1, 1.1]])) 
     biases = []
-    biases.append(torch.core.array.array([-.1, .3, .1]))
-    biases.append(torch.core.array.array([.2, -.1]))
+    biases.append(numpy.array([-.1, .3, .1]))
+    biases.append(numpy.array([.2, -.1]))
     
     m = torch.machine.MLP((2,3,2))
     m.weights = weights
@@ -143,21 +144,21 @@ class MLPTest(unittest.TestCase):
 
     # makes sure the outputs of the MLP are correct
     m = torch.machine.MLP(torch.io.HDF5File(MACHINE))
-    i = torch.core.array.array([.1, .7])
+    i = numpy.array([.1, .7])
     y = m(i)
-    y_exp = torch.core.array.array([0.09596993, 0.6175601])
+    y_exp = numpy.array([0.09596993, 0.6175601])
     self.assertTrue( (abs(y - y_exp) < 1e-6).all() )
 
     # compares a simple (logistic activation, 1 layer) MLP with a LinearMachine
     mlinear = torch.machine.LinearMachine(2,1)
     mlinear.activation = torch.machine.Activation.LOG
-    mlinear.weights = torch.core.array.array([[.3], [-.42]])
-    mlinear.biases = torch.core.array.array([-.7])
+    mlinear.weights = numpy.array([[.3], [-.42]])
+    mlinear.biases = numpy.array([-.7])
 
     mlp = torch.machine.MLP((2,1))
     mlp.activation = torch.machine.Activation.LOG
-    mlp.weights = [torch.core.array.array([[.3], [-.42]])]
-    mlp.biases = [torch.core.array.array([-.7])]
+    mlp.weights = [numpy.array([[.3], [-.42]])]
+    mlp.biases = [numpy.array([-.7])]
 
     self.assertTrue( (mlinear(i) == mlp(i)).all() )
 
@@ -184,9 +185,9 @@ class MLPTest(unittest.TestCase):
     m = torch.machine.MLP(torch.io.HDF5File(COMPLICATED))
     data = torch.io.HDF5File(COMPLICATED_OUTPUT)
     pat_descr = data.describe('pattern')[0]
-    input = torch.core.array.float64_2(pat_descr.size, pat_descr.type.shape()[0])
+    input = numpy.zeros((pat_descr.size, pat_descr.type.shape()[0]), 'float64')
     res_descr = data.describe('result')[0]
-    target = torch.core.array.float64_2(res_descr.size, res_descr.type.shape()[0])
+    target = numpy.zeros((res_descr.size, res_descr.type.shape()[0]), 'float64')
     for i, (pattern, expected) in enumerate(zip(data.lread("pattern"), data.lread("result"))):
       input[i,:] = pattern
       target[i,:] = expected

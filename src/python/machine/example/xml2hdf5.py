@@ -18,6 +18,7 @@ converted to an HDF5-compatible neural network representation.
 
 from xml.dom.minidom import parse as xml_parse
 import torch
+import numpy
 
 def acttext_to_enum(s):
   """Converts the XML activation representation to a torch value"""
@@ -48,8 +49,8 @@ def set_input(mach, inputs, verbose):
       print "  Input %d, sub: %.5e; div: %.5e" % (identity,
           input_subtract[-1], input_divide[-1])
 
-  mach.input_subtract = torch.core.array.array(input_subtract)
-  mach.input_divide = torch.core.array.array(input_divide)
+  mach.input_subtract = numpy.array(input_subtract)
+  mach.input_divide = numpy.array(input_divide)
 
   return identities
 
@@ -139,14 +140,14 @@ def organize_synapses(mach, inputs, hidden, outputs, bias, synapses):
     weight0.append([])
     for hidden_neuron in sorted(hidden):
       weight0[-1].append(emitter[input_neuron][hidden_neuron])
-  weight0 = torch.core.array.array(weight0)
+  weight0 = numpy.array(weight0)
 
   weight1 = []
   for hidden_neuron in sorted(hidden):
     weight1.append([])
     for output_neuron in sorted(outputs):
       weight1[-1].append(emitter[hidden_neuron][output_neuron])
-  weight1 = torch.core.array.array(weight1)
+  weight1 = numpy.array(weight1)
 
   mach.weights = [weight0, weight1]
 
@@ -154,12 +155,12 @@ def organize_synapses(mach, inputs, hidden, outputs, bias, synapses):
     hidden_bias = []
     for hidden_neuron in sorted(hidden):
       hidden_bias.append(emitter[bias][hidden_neuron])
-    hidden_bias = torch.core.array.array(hidden_bias)
+    hidden_bias = numpy.array(hidden_bias)
 
     output_bias = []
     for output_neuron in sorted(outputs):
       output_bias.append(emitter[bias][output_neuron])
-    output_bias = torch.core.array.array(output_bias)
+    output_bias = numpy.array(output_bias)
 
     mach.biases = [hidden_bias, output_bias]
 

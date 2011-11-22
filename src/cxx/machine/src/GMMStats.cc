@@ -1,3 +1,22 @@
+/**
+ * @file cxx/machine/src/GMMStats.cc
+ * @date Tue May 10 11:35:58 2011 +0200
+ * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "machine/GMMStats.h"
 #include "core/logging.h"
 
@@ -88,12 +107,10 @@ void mach::GMMStats::save(Torch::io::HDF5File& config) const {
 }
 
 void mach::GMMStats::load(Torch::io::HDF5File& config) {
-  config.read("log_liklihood", log_likelihood);
-  int64_t n_gaussians;
-  config.read("n_gaussians", n_gaussians);
-  int64_t n_inputs;
-  config.read("n_inputs", n_inputs);
-  config.read("T", T);
+  log_likelihood = config.read<double>("log_liklihood");
+  int64_t n_gaussians = config.read<int64_t>("n_gaussians");
+  int64_t n_inputs = config.read<int64_t>("n_inputs");
+  T = config.read<int64_t>("T");
   
   //resize arrays to prepare for HDF5 readout
   n.resize(n_gaussians);

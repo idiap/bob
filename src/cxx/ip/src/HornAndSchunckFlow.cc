@@ -1,8 +1,23 @@
 /**
+ * @file cxx/ip/src/HornAndSchunckFlow.cc
+ * @date Wed Mar 16 15:01:13 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Thu 08 Sep 2011 14:28:02 CEST
  *
  * @brief Defines the HornAndSchunckFlow methods
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "core/array_assert.h"

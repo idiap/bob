@@ -32,9 +32,9 @@ def apthres(neg, pos, thres):
   far, frr = torch.measure.farfrr(neg, pos, thres)
   hter = (far + frr)/2.0
 
-  ni = neg.extent(0) #number of impostors
+  ni = neg.shape[0] #number of impostors
   fa = int(round(far*ni)) #number of false accepts
-  nc = pos.extent(0) #number of clients
+  nc = pos.shape[0] #number of clients
   fr = int(round(frr*nc)) #number of false rejects
 
   print("FAR : %.3f%% (%d/%d)" % (100*far, fa, ni))

@@ -1,3 +1,22 @@
+/**
+ * @file cxx/ip/ip/histo.h
+ * @date Mon Apr 18 16:08:34 2011 +0200
+ * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef TORCH5SPRO_IP_HISTO_H
 #define TORCH5SPRO_IP_HISTO_H
 
@@ -155,7 +174,7 @@ namespace Torch {
      * @param accumulate if true the result is added to @c histo
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, bool accumulate = false) {
+    void histogram(const blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, bool accumulate = false) {
       // GetHistoSize returns an exception if T is not uint8_t or uint16_t
       int histo_size = detail::getHistoSize<T>();
       
@@ -189,7 +208,7 @@ namespace Torch {
      * @param accumulate if true the result is added to @c histo
      */
     template<typename T>
-    void histogram(blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins, bool accumulate = false) {
+    void histogram(const blitz::Array<T, 2>& src, blitz::Array<uint64_t, 1>& histo, T min, T max, uint32_t nb_bins, bool accumulate = false) {
       tca::ElementType element_type = Torch::core::array::getElementType<T>();
       
       // Check that the given type is supported

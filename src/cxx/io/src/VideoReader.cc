@@ -1,11 +1,12 @@
 /**
+ * @file cxx/io/src/VideoReader.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * Implements a class to read and write Video files and convert the frames into
  * something that torch can understand. This implementation is heavily based on
  * the excellent tutorial here: http://dranger.com/ffmpeg/, with some personal
  * modifications.
- *
  * FFMpeg versions for your reference
  * ffmpeg | avformat | avcodec  | avutil  | swscale | old style | swscale GPL?
  * =======+==========+==========+=========+=========+===========+==============
@@ -18,6 +19,20 @@
  * 0.7    | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
  * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
  * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdexcept>
@@ -30,11 +45,14 @@ extern "C" {
 #include <libavutil/avutil.h>
 }
 
+#include "core/array_check.h"
 #include "io/VideoReader.h"
 #include "io/Exception.h"
 #include "io/VideoException.h"
+#include "core/blitz_array.h"
 
 namespace io = Torch::io;
+namespace ca = Torch::core::array;
 
 /**
  * When called, initializes the ffmpeg library
@@ -187,6 +205,19 @@ void io::VideoReader::open() {
   fmt % m_height;
   m_formatted_info = fmt.str();
 
+  /**
+   * This will make sure we can interface with the io subsystem
+   */
+  m_typeinfo_video.dtype = m_typeinfo_frame.dtype = core::array::t_uint8;
+  m_typeinfo_video.nd = 4;
+  m_typeinfo_frame.nd = 3;
+  m_typeinfo_video.shape[0] = m_nframes;
+  m_typeinfo_video.shape[1] = m_typeinfo_frame.shape[0] = 3;
+  m_typeinfo_video.shape[2] = m_typeinfo_frame.shape[1] = m_height;
+  m_typeinfo_video.shape[3] = m_typeinfo_frame.shape[2] = m_width;
+  m_typeinfo_frame.update_strides();
+  m_typeinfo_video.update_strides();
+
   //closes the codec we used
   avcodec_close(codec_ctxt);
 
@@ -198,19 +229,29 @@ io::VideoReader::~VideoReader() {
 }
 
 void io::VideoReader::load(blitz::Array<uint8_t,4>& data) const {
-  //checks if the output array shape conforms to the video specifications,
-  //otherwise, resize it.
-  if ((size_t)data.extent(0) != numberOfFrames() || data.extent(1) != 3 ||
-      (size_t)data.extent(2) != height() || 
-      (size_t)data.extent(3) != width() ||
-      !data.isStorageContiguous())
-    data.resize(numberOfFrames(), 3, height(), width());
+  ca::blitz_array tmp(data);
+  load(tmp);
+}
 
-  blitz::Range a = blitz::Range::all();
-  for (const_iterator it=begin(); it!=end();) {
-    blitz::Array<uint8_t,3> ref = data(it.cur(), a, a, a);
-    it.read(ref);
+void io::VideoReader::load(ca::interface& b) const {
+
+  //checks if the output array shape conforms to the video specifications,
+  //otherwise, throw.
+  if (!m_typeinfo_video.is_compatible(b.type())) {
+    boost::format s("input buffer (%s) does not conform to the video size specifications (%s)");
+    s % b.type().str() % m_typeinfo_video.str();
+    throw std::invalid_argument(s.str().c_str());
   }
+
+  unsigned long int frame_size = m_typeinfo_frame.buffer_size();
+  uint8_t* ptr = static_cast<uint8_t*>(b.ptr());
+
+  for (const_iterator it=begin(); it!=end();) {
+    ca::blitz_array ref(static_cast<void*>(ptr), m_typeinfo_frame);
+    it.read(ref);
+    ptr += frame_size;
+  }
+
 }
 
 io::VideoReader::const_iterator io::VideoReader::begin() const {
@@ -427,17 +468,26 @@ void io::VideoReader::const_iterator::reset() {
 }
 
 void io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data) {
+  ca::blitz_array tmp(data);
+  read(tmp);
+}
+
+void io::VideoReader::const_iterator::read(ca::interface& data) {
+
   //checks if we have not passed the end of the video sequence already
   if(m_current_frame > m_parent->numberOfFrames()) {
     throw io::IndexError(m_current_frame);
   }
 
+  const ca::typeinfo& info = data.type();
+
   //checks if the output array shape conforms to the video specifications,
-  //otherwise, resize it.
-  if (data.extent(0) != 3 || 
-      (size_t)data.extent(1) != m_parent->height() || 
-      (size_t)data.extent(2) != m_parent->width())
-    data.resize(3, m_parent->height(), m_parent->width());
+  //otherwise, throw
+  if (!info.is_compatible(m_parent->m_typeinfo_frame)) {
+    boost::format s("input buffer (%s) does not conform to the video frame size specifications (%s)");
+    s % info.str() % m_parent->m_typeinfo_frame.str();
+    throw std::invalid_argument(s.str().c_str());
+  }
 
   int gotPicture = 0;
   AVPacket packet;
@@ -478,22 +528,78 @@ void io::VideoReader::const_iterator::read(blitz::Array<uint8_t,3>& data) {
   // arranges the data for a colored image like: (color-bands, height, width).
   // That makes it easy to extract a given band from the image as its memory is
   // contiguous. FFmpeg prefers the following encoding (height, width,
-  // color-bands). So, we have no other choice than copying the data twice. The
-  // most practical would be, of course, to have the software scaler lay down
-  // the data directly onto the blitz::Array memory, but with the current
-  // settings, that is not possible. 
+  // color-bands).
   //
-  // The FFmpeg way to read and write image data is hard-coded and impossible
-  // to circumvent by passing a different stride setup.
-  data = blitz::Array<uint8_t,3>(m_rgb_frame_buffer->data[0],
-      blitz::shape(m_parent->height(), m_parent->width(), 3),
-      blitz::neverDeleteData).transpose(2,0,1);
+  // Note: The FFmpeg way to read and write image data is hard-coded and
+  // impossible to circumvent by passing a different stride setup.
+
+  // transpose the data.
+  blitz::TinyVector<int,3> shape;
+  blitz::TinyVector<int,3> stride;
+  
+  shape = info.shape[0], info.shape[1], info.shape[2];
+  stride = info.stride[0], info.stride[1], info.stride[2];
+  blitz::Array<uint8_t,3> dst(static_cast<uint8_t*>(data.ptr()), shape, stride,
+      blitz::neverDeleteData);
+  
+  shape = info.shape[1], info.shape[2], info.shape[0];
+  blitz::Array<uint8_t,3> src(m_rgb_frame_buffer->data[0], shape, 
+      blitz::neverDeleteData);
+  dst = src.transpose(2,0,1);
 
   if (m_current_frame >= m_parent->numberOfFrames()) {
     //transform the current iterator in "end"
     reset();
   }
 }
+
+/**
+ * frame seek functions extracted from:
+ * http://stackoverflow.com/questions/5261658/how-to-seek-in-ffmpeg-c-c
+ * TODO: Based on the methods bellow, implement better frame seeking.
+ */
+
+/**
+bool seekMs(int tsms)
+{
+   //printf("**** SEEK TO ms %d. LLT: %d. LT: %d. LLF: %d. LF: %d. LastFrameOk: %d\n",tsms,LastLastFrameTime,LastFrameTime,LastLastFrameNumber,LastFrameNumber,(int)LastFrameOk);
+
+   // Convert time into frame number
+   DesiredFrameNumber = ffmpeg::av_rescale(tsms,pFormatCtx->streams[videoStream]->time_base.den,pFormatCtx->streams[videoStream]->time_base.num);
+   DesiredFrameNumber/=1000;
+
+   return seekFrame(DesiredFrameNumber);
+}
+
+bool seekFrame(ffmpeg::int64_t frame)
+{
+
+   //printf("**** seekFrame to %d. LLT: %d. LT: %d. LLF: %d. LF: %d. LastFrameOk: %d\n",(int)frame,LastLastFrameTime,LastFrameTime,LastLastFrameNumber,LastFrameNumber,(int)LastFrameOk);
+
+   // Seek if:
+   // - we don't know where we are (Ok=false)
+   // - we know where we are but:
+   //    - the desired frame is after the last decoded frame (this could be optimized: if the distance is small, calling decodeSeekFrame may be faster than seeking from the last key frame)
+   //    - the desired frame is smaller or equal than the previous to the last decoded frame. Equal because if frame==LastLastFrameNumber we don't want the LastFrame, but the one before->we need to seek there
+   if( (LastFrameOk==false) || ((LastFrameOk==true) && (frame<=LastLastFrameNumber || frame>LastFrameNumber) ) )
+   {
+      //printf("\t avformat_seek_file\n");
+      if(ffmpeg::avformat_seek_file(pFormatCtx,videoStream,0,frame,frame,AVSEEK_FLAG_FRAME)<0)
+         return false;
+
+      avcodec_flush_buffers(pCodecCtx);
+
+      DesiredFrameNumber = frame;
+      LastFrameOk=false;
+   }
+   //printf("\t decodeSeekFrame\n");
+
+   return decodeSeekFrame(frame);
+
+   return true;
+}
+
+**/
 
 /**
  * This method does essentially the same as read(), except it skips a few

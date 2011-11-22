@@ -1,0 +1,55 @@
+Things to consider:
+
+* Arrayset.cat() implementation needs some work.
+
+Modifications on the syntax:
+
+* io.Arrayset.get() returns io.Array's while operator[] returns NumPy ndarrays
+* core.array.load() an core.array.save() supressed. Use io.load() and io.save()
+  to directly load numpy ndarrays to memory or save them.
+* All operations called directly on blitz::Array's that were done in Python
+  need to be migrated to a NumPy equivalent, if necessary. Here is an example:
+
+  Before: a.tanh()
+  After: numpy.tanh(a)
+
+  There are operations that don't need migration such as sum() or mean() as
+  NumPy also implements them on the ndarray object.
+* Differences between torch.core.array.*  and numpy.ndarray:
+  
+  ============= ========================
+   torch         NumPy
+  ============= ========================
+   a.shape()      a.shape
+   a.rank()       len(a.shape)
+   a.save(...)    torch.io.save(a, ...)
+   a.cast(...)    a.astype(...)
+  ============= ========================
+
+* The construction torch.core.array.*.convert() is deprecated: use
+  torch.core.convert(array...)
+* The construction torch.core.array.numeq() is depreated: use
+  numpy.array_equal(a, b)
+* For array constructions:
+  numpy.ndarray(shape, type) -- uninitialzed numpy ndarray
+  numpy.zeros(shape, type)
+  numpy.ones(shape, type)
+  ...
+  numpy.array(array_like, type) -- with specific initialization
+* Array extents:
+
+  Before: x.extent(0)
+  After: x.shape[0]
+* Arrayset.cat() has been revamped to use the numpy functions hstack, vstack
+  and dstack. If you used the parameter "firstDim" before with a True setting,
+  just say Arrayset.cat(axis=1). If you set it false (the default), you don't
+  have to change anything. This method is a little bit unstable and things may
+  change stil.
+* Arrayset.extend() not longer accepts Arrays for extension. You must do a
+  get() on the io.Array() before passing the result to Arrayset.extend().
+* Note that numpy.ndarray.fill() does not fill the array contents, but reset
+  it:
+
+  numpy.ndarray([1,2,3]).fill(4) => array now is [4]
+
+  This is different from the old torch.core.array blitz bindings.

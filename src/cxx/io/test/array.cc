@@ -1,7 +1,23 @@
 /**
- * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
+ * @file cxx/io/test/array.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief IO Array tests
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define BOOST_TEST_DYN_LINK
@@ -72,6 +88,8 @@ std::string temp_file() {
   std::string res = char_tpl.get();
   return res;
 }
+
+const char* CODEC_NAME = "torch.hdf5";
 
 template<typename T, typename U> 
 void check_equal(const blitz::Array<T,1>& a, const blitz::Array<U,1>& b) 
@@ -212,7 +230,7 @@ BOOST_AUTO_TEST_CASE( dbArray_creation_binaryfile )
   BOOST_CHECK_EQUAL(db_a_read.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a_read.getFilename().compare(tmp_file), 0);
   BOOST_CHECK_EQUAL(
-    db_a_read.getCodec()->name().compare("hdf5.array.binary"), 0);
+    db_a_read.getCodec()->name().compare(CODEC_NAME), 0);
   for(size_t i=0; i<db_a_read.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a_read.getShape()[i], a.extent(i));
 
@@ -244,7 +262,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 
@@ -254,7 +272,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_getload )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   // Check that the 'get' array is unchanged
@@ -295,7 +313,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   // Check that the 'get' array is unchanged
@@ -308,7 +326,7 @@ BOOST_AUTO_TEST_CASE( dbArray_transform_move )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file2), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
   check_equal( a, db_a.get<double,1>());
@@ -455,7 +473,7 @@ BOOST_AUTO_TEST_CASE( dbArray_copy_constructor_external )
   BOOST_CHECK_EQUAL(db_a.getElementType(), Torch::core::array::t_float64);
   BOOST_CHECK_EQUAL(db_a.isLoaded(), false);
   BOOST_CHECK_EQUAL(db_a.getFilename().compare(tmp_file), 0);
-  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare("hdf5.array.binary"), 0);
+  BOOST_CHECK_EQUAL(db_a.getCodec()->name().compare(CODEC_NAME), 0);
   for(size_t i=0; i<db_a.getNDim(); ++i)
     BOOST_CHECK_EQUAL(db_a.getShape()[i], a.extent(i));
 

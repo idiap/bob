@@ -1,3 +1,22 @@
+/**
+ * @file python/machine/src/gmm.cc
+ * @date Tue Jul 26 15:11:33 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include <boost/python.hpp>
 #include <boost/concept_check.hpp>
 #include "io/Arrayset.h"
@@ -5,23 +24,25 @@
 #include "machine/GMMMachine.h"
 #include "machine/GMMLLRMachine.h"
 
+#include "core/python/ndarray.h"
+
 using namespace boost::python;
 namespace io = Torch::io;
 namespace mach = Torch::machine;
-
+namespace tp = Torch::python;
 
 static tuple getVariancesAndWeightsForEachCluster(const mach::KMeansMachine& machine, io::Arrayset& ar) {
-  boost::shared_ptr<blitz::Array<double, 2> > variances(new blitz::Array<double, 2>);
-  boost::shared_ptr<blitz::Array<double, 1> > weights(new blitz::Array<double, 1>);
-  machine.getVariancesAndWeightsForEachCluster(ar, *variances.get(), *weights.get());
+  blitz::Array<double, 2> variances;
+  blitz::Array<double, 1> weights;
+  machine.getVariancesAndWeightsForEachCluster(ar, variances, weights);
   return boost::python::make_tuple(variances, weights);
 }
 
 
 #define GETTER(class, class_name, fct, type, dim) \
-static boost::shared_ptr<blitz::Array<type, dim> > class_name##_##fct(const class& c) {\
-  boost::shared_ptr<blitz::Array<type, dim> > v(new blitz::Array<type, dim>);\
-  c.fct(*v.get());\
+static blitz::Array<type, dim> class_name##_##fct(const class& c) {\
+  blitz::Array<type, dim> v;\
+  c.fct(v);\
   return v;\
 }
 
@@ -31,9 +52,9 @@ GETTER(mach::Gaussian, mach_Gaussian, getVarianceThresholds, double, 1)
 
 GETTER(mach::KMeansMachine, mach_KMeansMachine, getMeans, double, 2)
 
-static boost::shared_ptr<blitz::Array<double, 1> > mach_KMeansMachine_getMean(const mach::KMeansMachine& kMeansMachine, int i) {
-  boost::shared_ptr<blitz::Array<double, 1> > mean(new blitz::Array<double, 1>);
-  kMeansMachine.getMean(i, *mean.get());
+static blitz::Array<double, 1> mach_KMeansMachine_getMean(const mach::KMeansMachine& kMeansMachine, int i) {
+  blitz::Array<double, 1> mean;
+  kMeansMachine.getMean(i, mean);
   return mean;
 }
 
@@ -45,12 +66,47 @@ GETTER(mach::GMMMachine, mach_GMMMachine, getMeanSupervector, double, 1)
 GETTER(mach::GMMMachine, mach_GMMMachine, getVarianceSupervector, double, 1)
 
 static double forward(const mach::Machine<blitz::Array<double,1>, double>& m,
-    const blitz::Array<double,1>& input) {
+    tp::const_ndarray input) {
   double output;
-  m.forward(input, output);
+  m.forward(input.bz<double,1>(), output);
   return output;
 }
 
+static void gmmmach_getmeansupervector(const mach::GMMMachine& m,
+    tp::ndarray a) {
+  blitz::Array<double,1> a_ = a.bz<double,1>();
+  m.getMeanSupervector(a_);
+}
+
+static void gmmmach_getvariancesupervector(const mach::GMMMachine& m,
+    tp::ndarray a) {
+  blitz::Array<double,1> a_ = a.bz<double,1>();
+  m.getVarianceSupervector(a_);
+}
+
+static blitz::Array<double,1> gmmstats_get_n(mach::GMMStats& s) {
+  return s.n;
+}
+
+static void gmmstats_set_n(mach::GMMStats& s, tp::const_ndarray n) {
+  s.n = n.bz<double,1>();
+}
+
+static blitz::Array<double,2> gmmstats_get_sumpx(mach::GMMStats& s) {
+  return s.sumPx;
+}
+
+static void gmmstats_set_sumpx(mach::GMMStats& s, tp::const_ndarray n) {
+  s.sumPx = n.bz<double,2>();
+}
+
+static blitz::Array<double,2> gmmstats_get_sumpxx(mach::GMMStats& s) {
+  return s.sumPxx;
+}
+
+static void gmmstats_set_sumpxx(mach::GMMStats& s, tp::const_ndarray n) {
+  s.sumPxx = n.bz<double,2>();
+}
 
 void bind_machine_gmm() {
 
@@ -134,15 +190,9 @@ void bind_machine_gmm() {
   .def_readwrite("T",
                  &mach::GMMStats::T,
                  "The accumulated number of samples")
-  .def_readwrite("n",
-                 &mach::GMMStats::n,
-                 "For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)")
-  .def_readwrite("sumPx",
-                 &mach::GMMStats::sumPx,
-                 "For each Gaussian, the accumulated sum of responsibility times the sample ")
-  .def_readwrite("sumPxx",
-                 &mach::GMMStats::sumPxx,
-                 "For each Gaussian, the accumulated sum of responsibility times the sample squared")
+  .add_property("n", &gmmstats_get_n, &gmmstats_set_n, "For each Gaussian, the accumulated sum of responsibilities, i.e. the sum of P(gaussian_i|x)")
+  .add_property("sumPx", &gmmstats_get_sumpx, &gmmstats_set_sumpx, "For each Gaussian, the accumulated sum of responsibility times the sample ")
+  .add_property("sumPxx", &gmmstats_get_sumpxx, &gmmstats_set_sumpxx, "For each Gaussian, the accumulated sum of responsibility times the sample squared")
   .def("resize",
        &mach::GMMStats::resize, args("n_gaussians", "n_inputs"),
        " Allocates space for the statistics and resets to zero.")
@@ -222,24 +272,22 @@ void bind_machine_gmm() {
        args("x"),
        " Output the log likelihood of the sample, x, i.e. log(p(x|GMM))")
   .def("accStatistics",
-       (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
-       args("sampler", "stats"),
-       "Accumulates the GMM statistics over a set of samples.")
-  .def("accStatistics",
        (void (mach::GMMMachine::*)(const blitz::Array<double,1>&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
        args("x", "stats"),
        "Accumulate the GMM statistics for this sample.")
+  .def("accStatistics",
+       (void (mach::GMMMachine::*)(const io::Arrayset&, mach::GMMStats&) const)&mach::GMMMachine::accStatistics,
+       args("sampler", "stats"),
+       "Accumulates the GMM statistics over a set of samples.")
   .def("getGaussian",
        &mach::GMMMachine::getGaussian, return_value_policy<reference_existing_object>(),
        args("i"),
        "Get a pointer to a particular Gaussian component")
-  .def("getMeanSupervector",
-       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getMeanSupervector,
+  .def("getMeanSupervector", &gmmmach_getmeansupervector,
        args("mean_supervector"),
        "Get the mean supervector of the GMMMachine "
        "(concatenation of the mean vectors of each Gaussian of the GMMMachine)")
-  .def("getVarianceSupervector",
-       (void (mach::GMMMachine::*)(blitz::Array<double,1>&) const)&mach::GMMMachine::getVarianceSupervector,
+  .def("getVarianceSupervector", &gmmmach_getvariancesupervector,
        args("variance_supervector"),
        "Get the variance supervector of the GMMMachine "
        "(concatenation of the variance vectors of each Gaussian of the GMMMachine)")

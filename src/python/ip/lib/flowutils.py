@@ -6,9 +6,8 @@
 """A few common utilities that are useful in Optical Flow studies.
 """
 
-from ..core.array import radius, atan2, float64_3, float32_3
-from . import hsv_to_rgb
 import math
+import numpy
 
 def flow2hsv(u, v):
   """Calculates a color-coded image that represents the Optical Flow from a
@@ -26,22 +25,22 @@ def flow2hsv(u, v):
   u -- x-direction (width) velocities as floats
   v -- y-direction (height) velocities as floats
 
-  Outputs a HSV image representation (float32_3).
+  Outputs a HSV image representation (3D, float32).
   """
+  from . import hsv_to_rgb
   
   # polar coordinate conversion using blitz
-  r = radius(u, v)
-  t = atan2(u, v)
+  t = numpy.arctan2(v, u)
+  r = numpy.sqrt(u**2 + v**2)
 
   # calculates hue and saturation (value is always == 1)
-  hsv = float64_3(3, u.extent(0), u.extent(1))
+  hsv = numpy.ndarray((3, u.shape[0], u.shape[1]), 'float64')
   hsv[0,:,:] = abs(t)/math.pi #hue
   r /= r.max()
   hsv[1,:,:] = r #saturation
   hsv[2,:,:] = 1.0 #value
 
   # convert to rgb
-  rgb = float32_3(hsv.shape())
-  rgb.fill(0)
-  hsv_to_rgb(hsv.cast('float32'), rgb)
+  rgb = numpy.zeros(hsv.shape, 'float64')
+  hsv_to_rgb(hsv, rgb)
   return rgb

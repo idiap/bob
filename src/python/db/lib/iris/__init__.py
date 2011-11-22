@@ -32,8 +32,7 @@ References:
 
 import os
 import sys
-from ...io import Arrayset
-from ...core.array import array
+import numpy
 
 names = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width']
 """Names of the features for each entry in the dataset."""
@@ -61,6 +60,7 @@ def data():
   of 64-bit floats and 50 entries. Each entry is an Array with 4
   features as described by "names". 
   """
+  from ...io import Arrayset
   
   data = os.path.join(os.path.dirname(__file__), 'iris.data')
 
@@ -76,13 +76,13 @@ def data():
     s = [k.strip() for k in line.split(',') if line.strip()]
 
     if s[4].find('setosa') != -1:
-      retval['setosa'].append(array([float(k) for k in s[0:4]], 'float64'))
+      retval['setosa'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
 
     elif s[4].find('versicolor') != -1:
-      retval['versicolor'].append(array([float(k) for k in s[0:4]], 'float64'))
+      retval['versicolor'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
 
     elif s[4].find('virginica') != -1:
-      retval['virginica'].append(array([float(k) for k in s[0:4]], 'float64'))
+      retval['virginica'].append(numpy.array([float(k) for k in s[0:4]], 'float64'))
 
   return retval
 
@@ -103,8 +103,7 @@ def dump(args):
 
   for k, v in d.items():
     for array in v:
-      bz = array.get()
-      s = ','.join(['%.1f' % bz[i] for i in range(bz.extent(0))] + [k])
+      s = ','.join(['%.1f' % array[i] for i in range(array.shape[0])] + [k])
       output.write('%s\n' % (s,))
 
 def add_commands(parser):

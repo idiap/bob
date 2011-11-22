@@ -5,13 +5,14 @@
 
 import os, sys
 import unittest
+import numpy
 import torch
 
 def sameValue(vect_A, vect_B):
-  sameMatrix = torch.core.array.bool_2(vect_A.extent(0), vect_B.extent(0))
+  sameMatrix = numpy.zeros((vect_A.shape[0], vect_B.shape[0]), 'bool')
 
-  for j in range(vect_A.extent(0)):
-    for i in range(vect_B.extent(0)):
+  for j in range(vect_A.shape[0]):
+    for i in range(vect_B.shape[0]):
       sameMatrix[j, i] = (vect_A[j] == vect_B[i])
 
   return sameMatrix
@@ -21,25 +22,25 @@ class ZTNormTest(unittest.TestCase):
 
   def test01_ztnorm_simple(self):
     # 3x5
-    my_A = torch.core.array.array([[1, 2, 3, 4, 5],[6, 7, 8, 9, 8],[7, 6, 5, 4, 3]],'float64')
+    my_A = numpy.array([[1, 2, 3, 4, 5],
+                        [6, 7, 8, 9, 8],
+                        [7, 6, 5, 4, 3]],'float64')
     # 3x4
-    my_B = torch.core.array.array([[5, 4, 7, 8],[9, 8, 7, 4],[5, 6, 3, 2]],'float64')
+    my_B = numpy.array([[5, 4, 7, 8],[9, 8, 7, 4],[5, 6, 3, 2]],'float64')
     # 2x5
-    my_C = torch.core.array.array([[5, 4, 3, 2, 1],[2, 1, 2, 3, 4]],'float64')
+    my_C = numpy.array([[5, 4, 3, 2, 1],[2, 1, 2, 3, 4]],'float64')
     # 2x4
-    my_D = torch.core.array.array([[8, 6, 4, 2],[0, 2, 4, 6]],'float64')
+    my_D = numpy.array([[8, 6, 4, 2],[0, 2, 4, 6]],'float64')
     
     # 4x1
-    znorm_id = torch.core.array.array([1, 2, 3, 4],'uint32')
+    znorm_id = numpy.array([1, 2, 3, 4],'uint32')
     # 2x1
-    tnorm_id = torch.core.array.array([1, 5],'uint32')
+    tnorm_id = numpy.array([1, 5],'uint32')
 
-    scores = torch.machine.ztnorm(my_A, my_B, my_C, my_D, sameValue(tnorm_id, znorm_id))
+    scores = torch.machine.ztnorm(my_A, my_B, my_C, my_D,
+        sameValue(tnorm_id, znorm_id))
 
-    ref_scores = torch.core.array.array([[-4.45473107e+00, -3.29289322e+00, -1.50519101e+01, -8.42086557e-01, 6.46544511e-03],
-                                         [-8.27619927e-01,  7.07106781e-01,  1.13757710e+01,  2.01641412e+00, 7.63765080e-01],
-                                         [ 2.52913570e+00,  2.70710678e+00,  1.24400233e+01,  7.07106781e-01, 6.46544511e-03]],
-                                        'float64')
+    ref_scores = numpy.array([[-4.45473107e+00, -3.29289322e+00, -1.50519101e+01, -8.42086557e-01, 6.46544511e-03], [-8.27619927e-01,  7.07106781e-01,  1.13757710e+01,  2.01641412e+00, 7.63765080e-01], [ 2.52913570e+00,  2.70710678e+00,  1.24400233e+01,  7.07106781e-01, 6.46544511e-03]], 'float64')
     
     self.assertTrue((abs(scores - ref_scores) < 1e-7).all())
 

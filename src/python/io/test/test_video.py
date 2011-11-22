@@ -23,6 +23,7 @@ INPUT_VIDEO = test_file('test.mov')
 OUTPUT_VIDEO = get_tempfilename()
 
 import unittest
+import numpy
 import torch
 
 class VideoTest(unittest.TestCase):
@@ -50,11 +51,11 @@ class VideoTest(unittest.TestCase):
       # So, you can use them as you please. The organization of the data
       # follows the other encoding systems in torch: (color-bands, height,
       # width).
-      self.assertTrue(torch.core.array.is_blitz_array(frame))
-      self.assertEqual(frame.dimensions(), 3)
-      self.assertEqual(frame.extent(0), 3) #color-bands (RGB)
-      self.assertEqual(frame.extent(1), 240) #height
-      self.assertEqual(frame.extent(2), 320) #width
+      self.assertTrue(isinstance(frame, numpy.ndarray))
+      self.assertEqual(len(frame.shape), 3)
+      self.assertEqual(frame.shape[0], 3) #color-bands (RGB)
+      self.assertEqual(frame.shape[1], 240) #height
+      self.assertEqual(frame.shape[2], 320) #width
 
   def test03_CanGetSpecificFrames(self):
 
@@ -65,24 +66,24 @@ class VideoTest(unittest.TestCase):
     # get frame 27 (we start counting at zero)
     f27 = v[27]
 
-    self.assertTrue(torch.core.array.is_blitz_array(f27))
-    self.assertEqual(f27.dimensions(), 3)
-    self.assertEqual(f27.shape(), (3, 240, 320))
+    self.assertTrue(isinstance(f27, numpy.ndarray))
+    self.assertEqual(len(f27.shape), 3)
+    self.assertEqual(f27.shape, (3, 240, 320))
 
     # you can also use negative notation...
-    self.assertTrue(torch.core.array.is_blitz_array(v[-1]))
-    self.assertEqual(v[-1].dimensions(), 3)
-    self.assertEqual(v[-1].shape(), (3, 240, 320))
+    self.assertTrue(isinstance(v[-1], numpy.ndarray))
+    self.assertEqual(len(v[-1].shape), 3)
+    self.assertEqual(v[-1].shape, (3, 240, 320))
 
     # get frames 18 a 30 (exclusive), skipping 3: 18, 21, 24, 27
     f18_30 = v[18:30:3]
     for k in f18_30:
-      self.assertTrue(torch.core.array.is_blitz_array(k))
-      self.assertEqual(k.dimensions(), 3)
-      self.assertEqual(k.shape(), (3, 240, 320))
+      self.assertTrue(isinstance(k, numpy.ndarray))
+      self.assertEqual(len(k.shape), 3)
+      self.assertEqual(k.shape, (3, 240, 320))
 
     # the last frame in the sequence is frame 27 as you can check
-    self.assertEqual(f18_30[-1], f27)
+    self.assertTrue( numpy.array_equal(f18_30[-1], f27) )
 
   def test04_CanWriteVideo(self):
 
@@ -90,8 +91,8 @@ class VideoTest(unittest.TestCase):
     # them into an output video, possibly transcoding it.
     iv = torch.io.VideoReader(INPUT_VIDEO)
     ov = torch.io.VideoWriter(OUTPUT_VIDEO, iv.height, iv.width)
-    for frame in iv: ov.append(frame)
-    
+    for k, frame in enumerate(iv): ov.append(frame)
+   
     # We verify that both videos have similar properties
     self.assertEqual(len(iv), len(ov))
     self.assertEqual(iv.width, ov.width)
@@ -103,8 +104,8 @@ class VideoTest(unittest.TestCase):
 
     # We verify that both videos have similar frames
     for orig, copied in zip(iv.__iter__(), iv2.__iter__()):
-      diff = abs(orig.cast('float32')-copied.cast('float32'))
-      m = diff.mean()
+      diff = abs(orig.astype('float32')-copied.astype('float32'))
+      m = numpy.mean(diff)
       self.assertTrue(m < 3.0) # average difference is less than 3 gray levels
     os.unlink(OUTPUT_VIDEO)
 
@@ -112,11 +113,11 @@ class VideoTest(unittest.TestCase):
 
     # This shows you can use the array interface to read an entire video
     # sequence in a single shot
-    array = torch.core.array.load(INPUT_VIDEO)
+    array = torch.io.load(INPUT_VIDEO)
     iv = torch.io.VideoReader(INPUT_VIDEO)
    
-    for frame_id, frame in zip(range(array.extent(0)), iv.__iter__()):
-      self.assertTrue ( array[frame_id,:,:,:].numeq(frame) )
+    for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
+      self.assertTrue ( numpy.array_equal(array[frame_id,:,:,:], frame) )
 
 if __name__ == '__main__':
   import sys

@@ -1,3 +1,22 @@
+/**
+ * @file cxx/machine/src/Gaussian.cc
+ * @date Tue May 10 11:35:58 2011 +0200
+ * @author Francois Moulin <Francois.Moulin@idiap.ch>
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "machine/Gaussian.h"
 #include <cfloat>
 #include <io/Array.h>
@@ -188,7 +207,7 @@ void Torch::machine::Gaussian::save(Torch::io::HDF5File& config) const {
 }
 
 void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {
-  config.read("m_n_inputs", m_n_inputs);
+  m_n_inputs = config.read<int64_t>("m_n_inputs");
   
   m_mean.resize(m_n_inputs);
   m_variance.resize(m_n_inputs);
@@ -198,7 +217,7 @@ void Torch::machine::Gaussian::load(Torch::io::HDF5File& config) {
   config.readArray("m_variance", m_variance);
   config.readArray("m_variance_thresholds", m_variance_thresholds);
 
-  config.read("g_norm", g_norm);
+  g_norm = config.read<double>("g_norm");
 }
 
 namespace Torch{

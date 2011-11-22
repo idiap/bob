@@ -1,11 +1,26 @@
 /**
+ * @file python/machine/src/mlp.cc
+ * @date Thu Jul 7 16:49:35 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Thu  7 Jul 15:26:09 2011
  *
  * @brief Python bindings to MLPs
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
+#include "core/python/ndarray.h"
 #include "core/python/vector.h"
 #include "machine/MLP.h"
 #include "machine/MLPException.h"
@@ -13,7 +28,8 @@
 using namespace boost::python;
 namespace mach = Torch::machine;
 namespace io = Torch::io;
-namespace tp = Torch::core::python;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
 static tuple get_shape(const mach::MLP& m) {
   list retval;
@@ -23,18 +39,83 @@ static tuple get_shape(const mach::MLP& m) {
   return tuple(retval);
 }
 
-static blitz::Array<double,1> forward1(const mach::MLP& m,
-    const blitz::Array<double,1>& input) {
-  blitz::Array<double,1> output(m.outputSize());
-  m.forward(input, output);
-  return output;
+static object forward1(const mach::MLP& m, tp::const_ndarray input) {
+
+  const ca::typeinfo& info = input.type();
+
+  if (info.dtype != ca::t_float64)
+    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+
+  switch(info.nd) {
+    case 1:
+      {
+        tp::ndarray output(ca::t_float64, m.outputSize());
+        blitz::Array<double,1> output_ = output.bz<double,1>();
+        m.forward(input.bz<double,1>(), output_);
+        return output.self();
+      }
+      break;
+    case 2:
+      {
+        tp::ndarray output(ca::t_float64, input.type().shape[0],m.outputSize());
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        m.forward(input.bz<double,2>(), output_);
+        return output.self();
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+  }
 }
 
-static blitz::Array<double,2> forward2(const mach::MLP& m,
-    const blitz::Array<double,2>& input) {
-  blitz::Array<double,2> output(input.extent(0), m.outputSize());
-  m.forward(input, output);
-  return output;
+static void forward2(const mach::MLP& m, tp::const_ndarray input,
+    tp::ndarray output) {
+  const ca::typeinfo& info = input.type();
+
+  if (info.dtype != ca::t_float64)
+    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+
+  switch(info.nd) {
+    case 1:
+      {
+        blitz::Array<double,1> output_ = output.bz<double,1>();
+        m.forward(input.bz<double,1>(), output_);
+      }
+      break;
+    case 2:
+      {
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        m.forward(input.bz<double,2>(), output_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+  }
+}
+
+static void forward2_(const mach::MLP& m, tp::const_ndarray input,
+    tp::ndarray output) {
+  const ca::typeinfo& info = input.type();
+
+  if (info.dtype != ca::t_float64)
+    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+
+  switch(info.nd) {
+    case 1:
+      {
+        blitz::Array<double,1> output_ = output.bz<double,1>();
+        m.forward_(input.bz<double,1>(), output_);
+      }
+      break;
+    case 2:
+      {
+        blitz::Array<double,2> output_ = output.bz<double,2>();
+        m.forward_(input.bz<double,2>(), output_);
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+  }
 }
 
 static void set_input_sub(mach::MLP& m, object o) {
@@ -69,6 +150,15 @@ static void set_input_div(mach::MLP& m, object o) {
   }
 }
 
+static tuple get_weight(mach::MLP& m) {
+  list retval;
+  for (std::vector<blitz::Array<double,2> >::const_iterator
+      it = m.getWeights().begin(); it != m.getWeights().end(); ++it) {
+    retval.append(*it);
+  }
+  return tuple(retval);
+}
+
 static void set_weight(mach::MLP& m, object o) {
   extract<int> int_check(o);
   extract<double> float_check(o);
@@ -82,6 +172,15 @@ static void set_weight(mach::MLP& m, object o) {
     //try hard-core extraction - throws TypeError, if not possible
     m.setWeights(extract<std::vector<blitz::Array<double,2> > >(o));
   }
+}
+
+static tuple get_bias(mach::MLP& m) {
+  list retval;
+  for (std::vector<blitz::Array<double,1> >::const_iterator
+      it = m.getBiases().begin(); it != m.getBiases().end(); ++it) {
+    retval.append(*it);
+  }
+  return tuple(retval);
 }
 
 static void set_bias(mach::MLP& m, object o) {
@@ -124,22 +223,17 @@ void bind_machine_mlp() {
     .def(init<const mach::MLP&>((arg("machine")), "Copy constructs an MLP machine"))
     .def("load", &mach::MLP::load, (arg("self"), arg("config")), "Loads the weights, biases and other configuration parameter sfrom a configuration file.")
     .def("save", &mach::MLP::save, (arg("self"), arg("config")), "Saves the weights and biases to a configuration file.")
-    .add_property("input_subtract", make_function(&mach::MLP::getInputSubraction, return_internal_reference<>()), &set_input_sub)
-    .add_property("input_divide", make_function(&mach::MLP::getInputDivision, return_internal_reference<>()), &set_input_div)
-    .add_property("weights", make_function(&mach::MLP::getWeights, return_internal_reference<>()), &set_weight)
-    .add_property("biases", make_function(&mach::MLP::getBiases, return_internal_reference<>()), &set_bias)
+    .add_property("input_subtract", make_function(&mach::MLP::getInputSubraction, return_value_policy<copy_const_reference>()), &set_input_sub)
+    .add_property("input_divide", make_function(&mach::MLP::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div)
+    .add_property("weights", &get_weight, &set_weight)
+    .add_property("biases", &get_bias, &set_bias)
     .add_property("activation", &mach::MLP::getActivation, &mach::MLP::setActivation)
     .add_property("shape", &get_shape, (void (mach::MLP::*)(const std::vector<size_t>&))&mach::MLP::resize)
-    .def("__call__", (void (mach::MLP::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output.")
-    .def("forward", (void (mach::MLP::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output.")
-    .def("forward_", (void (mach::MLP::*)(const blitz::Array<double,1>&, blitz::Array<double,1>&) const)&mach::MLP::forward_, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output.")
-    .def("__call__", (void (mach::MLP::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
-    .def("forward", (void (mach::MLP::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&) const)&mach::MLP::forward, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
-    .def("forward_", (void (mach::MLP::*)(const blitz::Array<double,2>&, blitz::Array<double,2>&) const)&mach::MLP::forward_, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
-    .def("__call__", &forward1, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
-    .def("forward", &forward1, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one.")
-    .def("__call__", &forward2, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
-    .def("forward", &forward2, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one. This variant will take a number of inputs in one single input matrix with inputs arranged row-wise (i.e., every row contains an individual input).")
+    .def("__call__", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
+    .def("forward", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
+    .def("forward_", &forward2_, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
+    .def("__call__", &forward1, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
+    .def("forward", &forward1, (arg("self"), arg("input")), "Projects the input to the weights and biases and returns the output. This method implies in copying out the output data and is, therefore, less efficient as its counterpart that sets the output given as parameter. If you have to do a tight loop, consider using that variant instead of this one. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
     .def("randomize", &random0, (arg("self")), "Sets all weights and biases of this MLP, with random values between [-0.1, 0.1) as advised in textbooks.\n\nValues are drawn using boost::uniform_real class. The seed is picked using a time-based algorithm. Different calls spaced of at least 1 microsecond (machine clock) will be seeded differently. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
     .def("randomize", &random1, (arg("self"), arg("lower_bound"), arg("upper_bound")), "Sets all weights and biases of this MLP, with random values between [lower_bound, upper_bound).\n\nValues are drawn using boost::uniform_real class. The seed is picked using a time-based algorithm. Different calls spaced of at least 1 microsecond (machine clock) will be seeded differently. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")
     .def("randomize", &random2, (arg("self"), arg("rng")), "Sets all weights and biases of this MLP, with random values between [-0.1, 0.1) as advised in textbooks.\n\nValues are drawn using boost::uniform_real class. You should pass the generator in this variant. You can seed it the way it pleases you. Values are taken from the range [lower_bound, upper_bound) according to the boost::random documentation.")

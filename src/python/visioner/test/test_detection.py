@@ -24,7 +24,7 @@ class Loader:
 
     if not hasattr(self, 'video'):
       self.video = torch.io.VideoReader(TEST_VIDEO)
-      self.images = [torch.ip.rgb_to_gray(k).cast('int16') for k in self.video[:100]]
+      self.images = [torch.ip.rgb_to_gray(k).astype('int16') for k in self.video[:100]]
 
 data = Loader()
 

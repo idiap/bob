@@ -7,6 +7,7 @@
 
 import os, sys
 import unittest
+import numpy
 import torch
 import itertools
 
@@ -49,9 +50,9 @@ class MachineTest(unittest.TestCase):
     weis, means, varis = read_lightsaber("data/tan-triggs-64x80-normalised-D91-gmm512-B24-BANCA.data.s")
     print means
 
-    gmm.weights   = torch.core.array.array(weis, 'float64')
-    gmm.means     = torch.core.array.array(means, 'float64')
-    gmm.variances = torch.core.array.array(varis, 'float64')
+    gmm.weights   = numpy.array(weis, 'float64')
+    gmm.means     = numpy.array(means, 'float64')
+    gmm.variances = numpy.array(varis, 'float64')
 
     gmm.print_()
 

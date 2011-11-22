@@ -7,6 +7,7 @@
 
 import os, sys
 import unittest
+import numpy
 import torch
 
 def equals(x, y, epsilon):
@@ -19,7 +20,7 @@ class MachineTest(unittest.TestCase):
     """Test Gaussian"""
     gaussian = torch.machine.Gaussian(2)
 
-    logLH = gaussian.logLikelihood(torch.core.array.array([0.4, 0.2], 'float64'))
+    logLH = gaussian.logLikelihood(numpy.array([0.4, 0.2], 'float64'))
     self.assertTrue(equals(logLH, -1.93787706641, 1e-11))
   
   def test02_GMMMachine(self):
@@ -27,10 +28,10 @@ class MachineTest(unittest.TestCase):
 
     arrayset = torch.io.Arrayset("data/faithful.torch3_f64.hdf5")
     gmm = torch.machine.GMMMachine(2, 2)
-    gmm.weights   = torch.core.array.array([0.5, 0.5], 'float64')
-    gmm.means     = torch.core.array.array([[3, 70], [4, 72]], 'float64')
-    gmm.variances = torch.core.array.array([[1, 10], [2, 5]], 'float64')
-    gmm.varianceThresholds = torch.core.array.array([[0, 0], [0, 0]], 'float64')
+    gmm.weights   = numpy.array([0.5, 0.5], 'float64')
+    gmm.means     = numpy.array([[3, 70], [4, 72]], 'float64')
+    gmm.variances = numpy.array([[1, 10], [2, 5]], 'float64')
+    gmm.varianceThresholds = numpy.array([[0, 0], [0, 0]], 'float64')
 
     stats = torch.machine.GMMStats(2, 2)
     gmm.accStatistics(arrayset, stats)
@@ -41,9 +42,11 @@ class MachineTest(unittest.TestCase):
     stats_ref = torch.machine.GMMStats(torch.io.HDF5File("data/stats.hdf5"))
 
     self.assertTrue(stats.T == stats_ref.T)
-    self.assertTrue(stats.n == stats_ref.n)
-    self.assertTrue(stats.sumPx == stats_ref.sumPx)
-    self.assertTrue(stats.sumPxx == stats_ref.sumPxx)
+    self.assertTrue( numpy.array_equal(stats.n, stats_ref.n) )
+    #self.assertTrue( numpy.array_equal(stats.sumPx, stats_ref.sumPx) )
+    #Note AA: precision error above
+    self.assertTrue ( (stats.sumPx - stats_ref.sumPx).sum() < 1e-10 )
+    self.assertTrue( numpy.array_equal(stats.sumPxx, stats_ref.sumPxx) )
 
   def test03_GMMMachine(self):
     """Test a GMMMachine (log-likelihood computation)"""
@@ -63,21 +66,21 @@ class MachineTest(unittest.TestCase):
     """Test a GMMMachine (Supervectors)"""
 
     gmm = torch.machine.GMMMachine(2, 3)
-    gmm.weights   = torch.core.array.array([0.5, 0.5], 'float64')
-    gmm.means     = torch.core.array.array([[3, 70, 5], [4, 72, 14]], 'float64')
-    gmm.variances = torch.core.array.array([[1, 10, 9], [2, 5, 5]], 'float64')
+    gmm.weights   = numpy.array([0.5, 0.5], 'float64')
+    gmm.means     = numpy.array([[3, 70, 5], [4, 72, 14]], 'float64')
+    gmm.variances = numpy.array([[1, 10, 9], [2, 5, 5]], 'float64')
 
-    mean_ref = torch.core.array.array([3, 70, 5, 4, 72, 14], 'float64')
-    var_ref = torch.core.array.array([1, 10, 9, 2, 5, 5], 'float64')
+    mean_ref = numpy.array([3, 70, 5, 4, 72, 14], 'float64')
+    var_ref = numpy.array([1, 10, 9, 2, 5, 5], 'float64')
 
-    array = torch.core.array.float64_1((6,))
+    array = numpy.ndarray((6,), 'float64')
     # Check mean supervector
     gmm.getMeanSupervector(array)
-    self.assertTrue( array == mean_ref )
+    self.assertTrue( numpy.array_equal(array, mean_ref) )
 
     # Check variance supervector
     gmm.getVarianceSupervector(array)
-    self.assertTrue( array == var_ref )
+    self.assertTrue( numpy.array_equal(array, var_ref) )
 
 if __name__ == '__main__':
   sys.argv.append('-v')

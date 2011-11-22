@@ -1,16 +1,34 @@
 /**
- * @file src/python/math/src/lu_det.cc 
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a>
+ * @file python/math/src/lu_det.cc
+ * @date Tue Jun 7 01:00:21 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Binds the LU Decomposition based on LAPACK into python.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <boost/python.hpp>
 
 #include "math/lu_det.h"
-#include <algorithm>
+#include "core/python/ndarray.h"
 
 using namespace boost::python;
+namespace math = Torch::math;
+namespace tp = Torch::python;
+namespace ca = Torch::core::array;
 
 namespace math = Torch::math;
 
@@ -19,6 +37,22 @@ static const char* LU_P_DOC = "Decompose a matrix A into L and U, s.t P*A = L*U.
 static const char* DET_DOC = "Compute the determinant of a square matrix. The computation is based on the LU decomposition.";
 static const char* INV_DOC = "Compute the inverse of a square matrix. The computation is based on the LU decomposition.";
 static const char* INV_P_DOC = "Compute the inverse of a square matrix. The computation is based on the LU decomposition. This function will allocate the resulting array 'B' internally every time it is called.";
+
+static void lu(tp::const_ndarray A, tp::ndarray L, 
+    tp::ndarray U, tp::ndarray P) {
+  blitz::Array<double,2> L_ = L.bz<double,2>();
+  blitz::Array<double,2> U_ = U.bz<double,2>();
+  blitz::Array<double,2> P_ = P.bz<double,2>();
+  math::lu(A.bz<double,2>(), L_, U_, P_);
+}
+
+static void lu_(tp::const_ndarray A, tp::ndarray L, 
+    tp::ndarray U, tp::ndarray P) {
+  blitz::Array<double,2> L_ = L.bz<double,2>();
+  blitz::Array<double,2> U_ = U.bz<double,2>();
+  blitz::Array<double,2> P_ = P.bz<double,2>();
+  math::lu_(A.bz<double,2>(), L_, U_, P_);
+}
 
 static tuple py_lu(const blitz::Array<double,2>& A) {
   int M = A.extent(0);
@@ -35,25 +69,32 @@ static tuple py_lu(const blitz::Array<double,2>& A) {
   return make_tuple(L, U, P);
 }
 
+static void inv(tp::const_ndarray A, tp::ndarray B) {
+  blitz::Array<double,2> B_ = B.bz<double,2>();
+  math::inv(A.bz<double,2>(), B_);
+}
+
+static void inv_(tp::const_ndarray A, tp::ndarray B) {
+  blitz::Array<double,2> B_ = B.bz<double,2>();
+  math::inv_(A.bz<double,2>(), B_);
+}
+
 static object py_inv(const blitz::Array<double,2>& A) {
   blitz::Array<double,2> B(A.shape());
   math::inv(A, B);
   return object(B);
 }
 
-
-void bind_math_lu_det()
-{
+void bind_math_lu_det() {
   // LU Decomposition
-  def("lu", (void (*)(const blitz::Array<double,2>& A, blitz::Array<double,2>& L, blitz::Array<double,2>& U, blitz::Array<double,2>& P))&Torch::math::lu, (arg("A"), arg("L"), arg("U"), arg("P")), LU_DOC);
-  def("lu_", (void (*)(const blitz::Array<double,2>& A, blitz::Array<double,2>& L, blitz::Array<double,2>& U, blitz::Array<double,2>& P))&Torch::math::lu, (arg("A"), arg("L"), arg("U"), arg("P")), LU_DOC);
+  def("lu", &lu, (arg("A"), arg("L"), arg("U"), arg("P")), LU_DOC);
+  def("lu_", &lu_, (arg("A"), arg("L"), arg("U"), arg("P")), LU_DOC);
   def("lu", &py_lu, (arg("A")), LU_P_DOC);
   // Compute the determinant of a square matrix, based on an LU decomposition
-  def("det_", (double (*)(const blitz::Array<double,2>& A))&Torch::math::det, (arg("A")), DET_DOC);
+  def("det_", (double (*)(const blitz::Array<double,2>& A))&Torch::math::det_, (arg("A")), DET_DOC);
   def("det", (double (*)(const blitz::Array<double,2>& A))&Torch::math::det, (arg("A")), DET_DOC);
   // Compute the inverse of a square matrix, based on an LU decomposition
-  def("inv", (void (*)(const blitz::Array<double,2>& A, blitz::Array<double,2>& B))&Torch::math::inv, (arg("A"), arg("B")), INV_DOC);
-  def("inv_", (void (*)(const blitz::Array<double,2>& A, blitz::Array<double,2>& B))&Torch::math::inv, (arg("A"), arg("B")), INV_DOC);
+  def("inv", &inv, (arg("A"), arg("B")), INV_DOC);
+  def("inv_", &inv_, (arg("A"), arg("B")), INV_DOC);
   def("inv", &py_inv, (arg("A")), INV_P_DOC);
 }
-
