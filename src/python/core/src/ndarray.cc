@@ -388,9 +388,7 @@ tp::convert_t tp::convertible(bp::object array_like, ca::typeinfo& info,
   if (arr) { //the passed object is an array
 
     //checks behavior.
-    if (behaved) {
-      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
-    }
+    if (behaved && !PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
 
     info.set<npy_intp>(tp::num_to_type(arr->descr->type_num),
         PyArray_NDIM(arr), PyArray_DIMS(arr));
@@ -445,11 +443,7 @@ tp::convert_t tp::convertible_to (bp::object array_like,
 
     //checks behavior.
     if (behaved) {
-      if (!(PyArray_EquivByteorders(arr->descr->byteorder, NPY_NATIVE) ||
-            arr->descr->elsize == 1)) retval = tp::WITHARRAYCOPY;
-      if (!PyArray_ISCONTIGUOUS(arr)) retval = tp::WITHARRAYCOPY;
-      if (!PyArray_ISALIGNED(arr)) retval = tp::WITHARRAYCOPY;
-      //if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
+      if (!PyArray_ISCARRAY_RO(arr)) retval = tp::WITHARRAYCOPY;
     }
 
     return retval;
