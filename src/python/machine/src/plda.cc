@@ -28,20 +28,35 @@ static double computeLikelihood2(mach::PLDAMachine& plda,
   return plda.computeLikelihood(samples, with_enrolled_samples);
 }
 
-static double plda_forward_sample(mach::PLDAMachine& m,
-    tp::const_ndarray sample) {
-  double score;
-  // Calls the forward function
-  m.forward(sample.bz<double,1>(), score);
-  return score;
-}
-
-static double plda_forward_samples(mach::PLDAMachine& m, 
+static double plda_forward_sample(mach::PLDAMachine& m, 
     tp::const_ndarray samples) {
-  double score;
-  // Calls the forward function
-  m.forward(samples.bz<double,2>(), score);
-  return score;
+  const ca::typeinfo& info = samples.type();
+
+  if (info.dtype != ca::t_float64) 
+    PYTHON_ERROR(TypeError, "PLDA forwarding does not accept type '%s'",
+        info.str().c_str());
+
+  switch (info.nd) {
+    case 1:
+      {
+        double score;
+        // Calls the forward function
+        m.forward(samples.bz<double,1>(), score);
+        return score;
+      }
+      break;
+    case 2:
+      {
+        double score;
+        // Calls the forward function
+        m.forward(samples.bz<double,2>(), score);
+        return score;
+      }
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "PLDA forwarding does not accept type '%s'",
+          info.str().c_str());
+  }
 }
 
 static object pldabase_getAddGamma(mach::PLDABaseMachine& m, const size_t a) {
@@ -109,10 +124,5 @@ void bind_machine_plda() {
     .def("computeLikelihood", &computeLikelihood2, computeLikelihood2_overloads((arg("self"), arg("samples"), arg("use_enrolled_samples")=true), "Computes the likelihood considering only the probe samples or jointly the probes samples and the enrolled samples."))
     .def("__call__", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a score.")
     .def("forward", &plda_forward_sample, (arg("self"), arg("sample")), "Processes a sample and returns a score.")
-    .def("__call__", &plda_forward_samples, (arg("self"), arg("samples")), "Processes the samples and returns a score.")
-    .def("forward", &plda_forward_samples, (arg("self"), arg("samples")), "Processes the samples and returns a score.")
   ;
-
-
-
 }

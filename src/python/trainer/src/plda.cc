@@ -91,7 +91,12 @@ static void plda_finalization(train::PLDABaseTrainer& t, mach::PLDABaseMachine& 
   t.finalization(m, v_arraysets);
 }
 
-
+static object get_z_first_order(train::PLDABaseTrainer& m) {
+  const std::vector<blitz::Array<double,2> >& v = m.getZFirstOrder();
+  list retval;
+  for (size_t k=0; k<v.size(); ++k) retval.append(v[k]); //copy
+  return tuple(retval);
+}
 
 void bind_trainer_plda() {
   typedef train::EMTrainerNew<mach::PLDABaseMachine, std::vector<io::Arrayset> > EMTrainerPLDABase; 
@@ -118,8 +123,8 @@ void bind_trainer_plda() {
     .add_property("initG_ratio", &train::PLDABaseTrainer::getInitGRatio, &train::PLDABaseTrainer::setInitGRatio, "The ratio used for the initialization of G.")
     .add_property("initSigma_method", &train::PLDABaseTrainer::getInitSigmaMethod, &train::PLDABaseTrainer::setInitSigmaMethod, "The method used for the initialization of sigma.")
     .add_property("initSigma_ratio", &train::PLDABaseTrainer::getInitSigmaRatio, &train::PLDABaseTrainer::setInitSigmaRatio, "The ratio used for the initialization of sigma.")
-    .add_property("z_first_order", make_function(&train::PLDABaseTrainer::getZFirstOrder, return_internal_reference<>()))
-    .add_property("z_second_order_sum", make_function(&train::PLDABaseTrainer::getZSecondOrderSum, return_internal_reference<>()))
+    .add_property("z_first_order", &get_z_first_order)
+    .add_property("z_second_order_sum", make_function(&train::PLDABaseTrainer::getZSecondOrderSum, return_value_policy<copy_const_reference>()))
     .def("train", &plda_train, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the training procedure. This will call initialization(), a loop of eStep() and mStep(), and finalization().")
     .def("initialization", &plda_initialization, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the initialization method of the training procedure.")
     .def("eStep", &plda_eStep, (arg("self"), arg("machine"), arg("list_arraysets")), "Calls the eStep method of the training procedure.")
