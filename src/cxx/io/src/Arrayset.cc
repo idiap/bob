@@ -20,6 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/format.hpp>
 #include "io/Arrayset.h"
 #include "io/CodecRegistry.h"
 
@@ -70,8 +71,11 @@ void io::Arrayset::add (const io::Array& array) {
   }
 
   //else, check type and add.
-  if (!m_info.is_compatible(array.type()))
-    throw std::invalid_argument("array type is incompatible with arrayset");
+  if (!m_info.is_compatible(array.type())) {
+    boost::format s("input array type (%s) is incompatible with this arrayset of type '%s'");
+    s % array.type().str() % m_info.str();
+    throw std::invalid_argument(s.str().c_str());
+  }
   m_data.push_back(array);
 
 }
@@ -81,8 +85,11 @@ void io::Arrayset::set (size_t id, const Array& array) {
   if (m_data.size() == 0) 
     throw std::runtime_error("cannot set array in empty arrayset");
 
-  if (!m_info.is_compatible(array.type()))
-    throw std::invalid_argument("array type is incompatible with arrayset");
+  if (!m_info.is_compatible(array.type())) {
+    boost::format s("input array type (%s) is incompatible with this arrayset of type '%s'");
+    s % array.type().str() % m_info.str();
+    throw std::invalid_argument(s.str().c_str());
+  }
 
   m_data[id] = array;
 
