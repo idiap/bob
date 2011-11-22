@@ -14,6 +14,7 @@ endif(GOOGLE_PERFTOOLS_FOUND)
 # This defines the list of source files inside this package.
 set(src
     "src/Exception.cc"
+    "src/reorder.cc"
 
     "src/Array.cc"
     "src/File.cc"

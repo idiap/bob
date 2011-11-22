@@ -9,6 +9,7 @@
 #include "core/array_type.h"
 
 #include "io/TensorFile.h"
+#include "io/reorder.h"
 
 namespace io = Torch::io;
 namespace core = Torch::core;
@@ -27,6 +28,7 @@ io::TensorFile::TensorFile(const std::string& filename,
     if(m_stream)
     {
       m_header.read(m_stream);
+      m_buffer.reset(new char[m_header.m_type.buffer_size()]);
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
 
@@ -41,6 +43,7 @@ io::TensorFile::TensorFile(const std::string& filename,
       m_stream.open(filename.c_str(), std::ios::out | std::ios::in |
           std::ios::binary);
       m_header.read(m_stream);
+      m_buffer.reset(new char[m_header.m_type.buffer_size()]);
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
       m_stream.seekp(0, std::ios::end);
@@ -53,6 +56,7 @@ io::TensorFile::TensorFile(const std::string& filename,
     m_stream.open(filename.c_str(), std::ios::in | std::ios::binary);
     if(m_stream) {
       m_header.read(m_stream);
+      m_buffer.reset(new char[m_header.m_type.buffer_size()]);
       m_header_init = true;
       m_n_arrays_written = m_header.m_n_samples;
 
@@ -88,8 +92,7 @@ void io::TensorFile::close() {
 void io::TensorFile::initHeader(const ca::typeinfo& info) {
   // Check that data have not already been written
   if (m_n_arrays_written > 0 ) {
-    Torch::core::error << "Cannot init the header of an output stream in which data" <<
-      " have already been written." << std::endl;
+    Torch::core::error << "Cannot init the header of an output stream in which data have already been written." << std::endl;
     throw Torch::core::Exception();
   }
 
@@ -97,6 +100,10 @@ void io::TensorFile::initHeader(const ca::typeinfo& info) {
   m_header.m_type = info;
   m_header.m_tensor_type = io::arrayTypeToTensorType(info.dtype);
   m_header.write(m_stream);
+
+  // Temporary buffer to help with data transposition...
+  m_buffer.reset(new char[m_header.m_type.buffer_size()]);
+  
   m_header_init = true;
 }
 
@@ -110,8 +117,10 @@ void io::TensorFile::write(const ca::interface& data) {
     if (!m_header.m_type.is_compatible(info))
       throw std::runtime_error("buffer does not conform to expected type");
   }
+
+  io::row_to_col_order(data.ptr(), m_buffer.get(), info);
           
-  m_stream.write(static_cast<const char*>(data.ptr()), info.buffer_size());
+  m_stream.write(static_cast<const char*>(m_buffer.get()), info.buffer_size());
 
   // increment m_n_arrays_written and m_current_array
   ++m_current_array;
@@ -123,8 +132,11 @@ void io::TensorFile::read (ca::interface& buf) {
   if(!m_header_init) throw Uninitialized();
   if(!buf.type().is_compatible(m_header.m_type)) buf.set(m_header.m_type);
 
-  m_stream.read(reinterpret_cast<char*>(buf.ptr()), 
+  m_stream.read(reinterpret_cast<char*>(m_buffer.get()), 
       m_header.m_type.buffer_size());
+  
+  io::col_to_row_order(m_buffer.get(), buf.ptr(), m_header.m_type);
+
   ++m_current_array;
 }
 

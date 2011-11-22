@@ -1,5 +1,5 @@
 /**
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * This class defines an header for storing multiarrays into .tensor files.
  */

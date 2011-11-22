@@ -1,5 +1,6 @@
 /**
- * @author <a href="mailto:laurent.el-shafey@idiap.ch">Laurent El Shafey</a> 
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @date Tue 22 Nov 07:28:53 2011 CET
  *
  * @brief ImageArrayCodec tests
  */
@@ -33,10 +34,11 @@ struct T {
 
 };
 
-
 /**
- * @brief Generates a unique temporary filename, and returns the file
- * descriptor
+ * @brief Generates a unique temporary filename, closes the file and return
+ * its name. 
+ *
+ * Yes, I know this is not 100% secure...
  */
 std::string temp_file(const std::string& ext) {
   boost::filesystem::path tpl = Torch::core::tmpdir();
@@ -64,23 +66,7 @@ void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
   }
 }
 
-template<typename T, typename U> 
-void check_equal(const blitz::Array<T,3>& a, const blitz::Array<U,3>& b) 
-{
-  BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
-  BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
-  BOOST_REQUIRE_EQUAL(a.extent(2), b.extent(2));
-  for (int i=0; i<a.extent(0); ++i) {
-    for (int j=0; j<a.extent(1); ++j) {
-      for (int k=0; k<a.extent(2); ++k) {
-        BOOST_CHECK_EQUAL(a(i,j,k), Torch::core::cast<T>(b(i,j,k)));
-      }
-    }
-  }
-}
-
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
-
 
 BOOST_AUTO_TEST_CASE( tensor_2d )
 {

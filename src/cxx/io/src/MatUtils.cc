@@ -5,8 +5,10 @@
  * @brief Implementation of MatUtils (handling of matlab .mat files)
  */
 
-#include "io/MatUtils.h"
 #include <boost/format.hpp>
+
+#include "io/MatUtils.h"
+#include "io/reorder.h"
 
 namespace io = Torch::io;
 namespace iod = io::detail;
@@ -180,312 +182,6 @@ static ca::ElementType torch_element_type (int mio_type, bool is_complex) {
   return eltype;
 }
 
-/**
- * Returns, on the first argument, the linear indexes by calculating the linear
- * positions relative to both row-major and column-major order matrixes given a
- * certain index accessing a position in the matrix and the matrix shape
- *
- * @param linear indexes (row, col): a 2-tuple with the results: row-major and
- *        column-major linear indexes
- * @param indexes (i,j) a 2-tuple with the indexes as would be accessed
- *        [col][row]; this is the same as accessing the matrix like on
- *        directions [y][x]
- * @param shape a 2-tuple with the matrix shape like [col][row]; this is the
- *        same as thinking about the extends of the matrix like on directions
- *        [y][x]
- *
- * Detailed arithmetics with graphics and explanations can be found here:
- * http://webster.cs.ucr.edu/AoA/Windows/HTML/Arraysa2.html
- */
-static void rc2d(size_t& row, size_t& col, const size_t i, const size_t j,
-    const size_t* shape) {
-  row = (i * shape[1]) + j;
-  col = (j * shape[0]) + i;
-}
-
-/**
- * Same as above, but for a 3D array organized as [depth][column][row]
- */
-static void rc3d(size_t& row, size_t& col, const size_t i, const size_t j,
-    const size_t k, const size_t* shape) {
-  row = ( (i * shape[1]) + j ) * shape[2] + k;
-  col = ( (k * shape[1]) + j ) * shape[0] + i;
-}
-
-/**
- * Same as above, but for a 4D array organized as [time][depth][column][row]
- */
-static void rc4d(size_t& row, size_t& col, const size_t i, const size_t j,
-    const size_t k, const size_t l, const size_t* shape) {
-  row = ( ( i * shape[1] + j ) * shape[2] + k ) * shape[3] + l;
-  col = ( ( l * shape[2] + k ) * shape[1] + j ) * shape[0] + i;
-}
-
-/**
- * Converts the data from row-major order (C-Style) to column major order
- * (Fortran style), which is required by matio. Input parameters are the src
- * data in row-major order, the destination (pre-allocated) array of the same
- * size and the type information.
- */
-static void row_to_col_order(const void* src_, void* dst_, 
-    const ca::typeinfo& info) {
-
-  size_t dsize = info.item_size();
-
-  //cast to byte type so we can manipulate the pointers...
-  const uint8_t* src = static_cast<const uint8_t*>(src_);
-  uint8_t* dst = static_cast<uint8_t*>(dst_);
-
-  switch(info.nd) {
-
-    case 1:
-      memcpy(dst, src, info.buffer_size());
-      break;
-
-    case 2:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major, col_major;
-          rc2d(row_major, col_major, i, j, info.shape);
-          row_major *= dsize;
-          col_major *= dsize;
-          memcpy(&dst[col_major], &src[row_major], dsize);
-        }
-      break;
-
-    case 3:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major, col_major;
-            rc3d(row_major, col_major, i, j, k, info.shape);
-            row_major *= dsize;
-            col_major *= dsize;
-            memcpy(&dst[col_major], &src[row_major], dsize);
-          }
-      break;
-
-    case 4:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k)
-            for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major, col_major;
-              rc4d(row_major, col_major, i, j, k, l, info.shape);
-              row_major *= dsize;
-              col_major *= dsize;
-              memcpy(&dst[col_major], &src[row_major], dsize);
-            }
-      break;
-
-    default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
-  }
-}
-  
-/**
- * Converts the data from row-major order (C-Style) to column major order
- * (Fortran style), which is required by matio. Input parameters are the src
- * data in row-major order, the destination (pre-allocated) array of the same
- * size and the type information.
- */
-static void row_to_col_order_complex(const void* src_, void* dst_re_,
-    void* dst_im_, const ca::typeinfo& info) {
-
-  size_t dsize = info.item_size();
-  size_t dsize2 = dsize/2; ///< size of each complex component (real, imaginary)
-
-  //cast to byte type so we can manipulate the pointers...
-  const uint8_t* src = static_cast<const uint8_t*>(src_);
-  uint8_t* dst_re = static_cast<uint8_t*>(dst_re_);
-  uint8_t* dst_im = static_cast<uint8_t*>(dst_im_);
-
-  switch(info.nd) {
-
-    case 1:
-      for (size_t i=0; i<info.shape[0]; ++i) {
-        memcpy(&dst_re[dsize2*i], &src[dsize*i]       , dsize2);
-        memcpy(&dst_im[dsize2*i], &src[dsize*i]+dsize2, dsize2);
-      }
-      break;
-
-    case 2:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major, col_major;
-          rc2d(row_major, col_major, i, j, info.shape);
-          row_major *= dsize;
-          col_major *= dsize2;
-          memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
-          memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
-        }
-      break;
-
-    case 3:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major, col_major;
-            rc3d(row_major, col_major, i, j, k, info.shape);
-            row_major *= dsize;
-            col_major *= dsize2;
-            memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
-            memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
-          }
-      break;
-
-    case 4:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k)
-            for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major, col_major;
-              rc4d(row_major, col_major, i, j, k, l, info.shape);
-              row_major *= dsize;
-              col_major *= dsize2;
-              memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
-              memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
-            }
-      break;
-
-    default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
-  }
-}
-  
-/**
- * Converts the data from column-major order (Fortran-Style) to row major order
- * (C style), which is required by torch. Input parameters are the src
- * data in column-major order, the destination (pre-allocated) array of the
- * same size and the type information.
- */
-static void col_to_row_order(const void* src_, void* dst_, 
-    const ca::typeinfo& info) {
-
-  size_t dsize = info.item_size();
-
-  //cast to byte type so we can manipulate the pointers...
-  const uint8_t* src = static_cast<const uint8_t*>(src_);
-  uint8_t* dst = static_cast<uint8_t*>(dst_);
-
-  switch(info.nd) {
-
-    case 1:
-      memcpy(dst, src, info.buffer_size());
-      break;
-
-    case 2:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major, col_major;
-          rc2d(row_major, col_major, i, j, info.shape);
-          row_major *= dsize;
-          col_major *= dsize;
-          memcpy(&dst[row_major], &src[col_major], dsize);
-        }
-      break;
-
-    case 3:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major, col_major;
-            rc3d(row_major, col_major, i, j, k, info.shape);
-            row_major *= dsize;
-            col_major *= dsize;
-            memcpy(&dst[row_major], &src[col_major], dsize);
-          }
-      break;
-
-    case 4:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k)
-            for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major, col_major;
-              rc4d(row_major, col_major, i, j, k, l, info.shape);
-              row_major *= dsize;
-              col_major *= dsize;
-              memcpy(&dst[row_major], &src[col_major], dsize);
-            }
-      break;
-
-    default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
-  }
-}
-  
-/**
- * Converts the data from column-major order (Fortran-Style) to row major order
- * (C style), which is required by torch. Input parameters are the src
- * data in column-major order, the destination (pre-allocated) array of the
- * same size and the type information.
- */
-static void col_to_row_order_complex(const void* src_re_, const void* src_im_,
-    void* dst_, const ca::typeinfo& info) {
-
-  size_t dsize = info.item_size();
-  size_t dsize2 = dsize/2; ///< size of each complex component (real, imaginary)
-
-  //cast to byte type so we can manipulate the pointers...
-  const uint8_t* src_re = static_cast<const uint8_t*>(src_re_);
-  const uint8_t* src_im = static_cast<const uint8_t*>(src_im_);
-  uint8_t* dst = static_cast<uint8_t*>(dst_);
-
-  switch(info.nd) {
-
-    case 1:
-      for (size_t i=0; i<info.shape[0]; ++i) {
-        memcpy(&dst[dsize*i]       , &src_re[dsize2*i], dsize2);
-        memcpy(&dst[dsize*i]+dsize2, &src_im[dsize2*i], dsize2);
-      }
-      break;
-
-    case 2:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j) {
-          size_t row_major, col_major;
-          rc2d(row_major, col_major, i, j, info.shape);
-          row_major *= dsize;
-          col_major *= dsize2;
-          memcpy(&dst[row_major],        &src_re[col_major], dsize2);
-          memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2);
-        }
-      break;
-
-    case 3:
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k) {
-            size_t row_major, col_major;
-            rc3d(row_major, col_major, i, j, k, info.shape);
-            row_major *= dsize;
-            col_major *= dsize2;
-            memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
-            memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
-          }
-      break;
-
-    case 4:
-      //i = left; j = depth; k = column; l = row
-      for (size_t i=0; i<info.shape[0]; ++i)
-        for (size_t j=0; j<info.shape[1]; ++j)
-          for (size_t k=0; k<info.shape[2]; ++k)
-            for (size_t l=0; l<info.shape[3]; ++l) {
-              size_t row_major, col_major;
-              rc4d(row_major, col_major, i, j, k, l, info.shape);
-              row_major *= dsize;
-              col_major *= dsize2;
-              memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
-              memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
-            }
-      break;
-
-    default:
-      throw io::DimensionError(info.nd, TORCH_MAX_DIM);
-  }
-}
-  
 boost::shared_ptr<matvar_t> make_matvar
 (const std::string& varname, const ca::interface& buf) {
 
@@ -504,7 +200,7 @@ boost::shared_ptr<matvar_t> make_matvar
         //special treatment for complex arrays
         uint8_t* real = static_cast<uint8_t*>(fdata);
         uint8_t* imag = real + (info.buffer_size()/2);
-        row_to_col_order_complex(buf.ptr(), real, imag, info); 
+        io::row_to_col_order_complex(buf.ptr(), real, imag, info); 
         ComplexSplit mio_complex = {real, imag};
         return boost::shared_ptr<matvar_t>(Mat_VarCreate(varname.c_str(),
               mio_class_type(info.dtype), mio_data_type(info.dtype),
@@ -516,7 +212,7 @@ boost::shared_ptr<matvar_t> make_matvar
       break;
   }
 
-  row_to_col_order(buf.ptr(), fdata, info); ///< data copying!
+  io::row_to_col_order(buf.ptr(), fdata, info); ///< data copying!
 
   return boost::shared_ptr<matvar_t>(Mat_VarCreate(varname.c_str(),
         mio_class_type(info.dtype), mio_data_type(info.dtype),
@@ -536,9 +232,9 @@ static void assign_array (boost::shared_ptr<matvar_t> matvar, ca::interface& buf
 
   if (matvar->isComplex) {
     ComplexSplit mio_complex = *static_cast<ComplexSplit*>(matvar->data);
-    col_to_row_order_complex(mio_complex.Re, mio_complex.Im, buf.ptr(), info);
+    io::col_to_row_order_complex(mio_complex.Re, mio_complex.Im, buf.ptr(), info);
   }
-  else col_to_row_order(matvar->data, buf.ptr(), info);
+  else io::col_to_row_order(matvar->data, buf.ptr(), info);
 
 }
 

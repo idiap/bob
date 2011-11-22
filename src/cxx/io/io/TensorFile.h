@@ -197,6 +197,7 @@ namespace Torch { namespace io {
       std::fstream m_stream;
       detail::TensorFileHeader m_header;
       openmode m_openmode;
+      boost::shared_ptr<void> m_buffer; 
   };
 
   inline _TensorFileFlag operator&(_TensorFileFlag a, _TensorFileFlag b) { 
