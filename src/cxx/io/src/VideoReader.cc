@@ -1,11 +1,12 @@
 /**
+ * @file cxx/io/src/VideoReader.cc
+ * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * Implements a class to read and write Video files and convert the frames into
  * something that torch can understand. This implementation is heavily based on
  * the excellent tutorial here: http://dranger.com/ffmpeg/, with some personal
  * modifications.
- *
  * FFMpeg versions for your reference
  * ffmpeg | avformat | avcodec  | avutil  | swscale | old style | swscale GPL?
  * =======+==========+==========+=========+=========+===========+==============
@@ -18,6 +19,20 @@
  * 0.7    | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
  * 0.7.1  | 52.110.0 | 52.122.0 | 50.43.0 | 0.14.1  | no        | no
  * 0.8    | 53.4.0   | 53.7.0   | 51.9.1  | 2.0.0   | no        | no
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdexcept>

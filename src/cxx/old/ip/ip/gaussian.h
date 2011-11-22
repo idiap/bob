@@ -1,20 +1,17 @@
 /**
- * @file src/cxx/ip/ip/gaussian.h
- * @author <a href="mailto:Laurent.El-Shafey@idiap.ch">Laurent El Shafey</a> 
- * @author <a href="mailto:Niklas.Johansson@idiap.ch">Niklas Johansson</a> 
+ * @file cxx/old/ip/ip/gaussian.h
+ * @date Sat Apr 30 17:54:16 2011 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to extract DCT features as described in:
- *
  * This class is designed to smooth an image
  * by convolving a NxM Gaussian filter.
  * The result will be a image having the same number of planes.
- * 
  * \TEX{
  * \begin{eqnarray}
  * O(x,y) = G(x,y) * I(x,y)
  * G(x,y) = \frac{exp(x^2 + y^2)}{\sigma}
  * \end{eqnarray}
- * 
  * \begin{itemize}
  * \li $I(x,y)$ is the input image,
  * \li $O(x,y)$ is the output image,
@@ -23,12 +20,24 @@
  * \li $\sigma$ is the variance of the kernel,
  * \li * is the convolution operator.
  * \end{itemize}
- * 
  * - PARAMETERS (name, type, default value, description):
  * "RadiusX"	int	1	"Kernel radius on Ox"
  * "RadiusY"	int	1	"Kernel radius on Oy"
  * "Sigma"		double	0.25	"Variance of the kernel"
- * 
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef GAUSSIAN_H__

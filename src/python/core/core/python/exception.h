@@ -1,9 +1,24 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Fri 25 Mar 15:05:55 2011 
+ * @file python/core/core/python/exception.h
+ * @date Fri Mar 25 15:21:36 2011 +0100
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements a few classes that are useful for binding Torch exceptions
  * to python.
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TORCH_PYTHON_CORE_EXCEPTION_H 

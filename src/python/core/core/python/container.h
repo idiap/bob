@@ -1,22 +1,32 @@
 /**
- * @author Andre Anjos <andre.anjos@idiap.ch> 
- * @date Tue 21 Jun 2011 15:42:12 CEST 
+ * @file python/core/core/python/container.h
+ * @date Tue Jun 21 17:28:25 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Generic container conversions for boost::python, extracted from: http://cctbx.cvs.sourceforge.net/viewvc/cctbx/scitbx/include/scitbx/boost_python/container_conversions.h
- *
  * version 1.16 (not touched for at least 5 years).
- *
  * How to bind your container using this code:
- *
  * 1) to bind a std::vector use variable_capacity_policy:
  * from_python_sequence<std::vector<double, 3>, variable_capacity_policy>();
- *
  * 2) to bind a std::list use linked_list_policy:
  * from_python_sequence<std::list<double, 3>, linked_list_policy>();
- *
  * 3) to bind a container that has fixed capacity, use fixed_size_policy:
  * from_python_sequence<boost::array<double,3>, fixed_size_policy>();
- **/
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef TORCH_CORE_PYTHON_CONTAINER_H 
 #define TORCH_CORE_PYTHON_CONTAINER_H

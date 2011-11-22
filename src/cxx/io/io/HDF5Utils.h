@@ -1,10 +1,10 @@
 /**
- * @author <a href="mailto:andre.dos.anjos@gmail.com">Andre Anjos</a> 
- * @date Wed  6 Apr 19:41:27 2011 
+ * @file cxx/io/io/HDF5Utils.h
+ * @date Wed Jun 22 17:50:08 2011 +0200
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A bunch of private utilities to make programming against the HDF5
  * library a little bit more confortable.
- *
  * Classes and non-member methods in this file handle the low-level HDF5 C-API
  * and try to make it a little bit safer and higher-level for use by the
  * publicly visible HDF5File class. The functionality here is heavily based on
@@ -14,14 +14,27 @@
  * way: create one, rename an object or delete one. The Dataset object
  * encapsulates reading and writing of data from a specific HDF5 dataset.
  * Everything is handled automatically and the user should not have to worry
- * about it too much. 
- *
+ * about it too much.
  * @todo Missing support for std::string, list<std::string>
  * @todo Missing support for attributes
  * @todo Missing support for arbitrary groups (80% done see TODOs)
  * @todo Inprint file creation time, author, comments?
  * @todo Missing support for automatic endianness conversion
  * @todo Missing true support for scalars
+ *
+ * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef TORCH_IO_HDF5UTILS_H 
