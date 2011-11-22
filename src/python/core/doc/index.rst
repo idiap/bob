@@ -14,18 +14,3 @@
    UsingBlitzArrays
 
    random
-
-   Tutorial01
-
-   Tutorial02
-
-   Tutorial03
-
-   Tutorial04
-
-   Tutorial05
-   
-   Tutorial10
-
-   PCA
-

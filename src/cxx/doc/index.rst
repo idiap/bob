@@ -12,4 +12,3 @@ This section includes information required to write C++ code using |project|.
    :maxdepth: 2
 
    ../core/doc/index
-   ../config/doc/index

@@ -15,7 +15,6 @@ Most of the |project| C++ functionality is bound to Python using
    ../core/doc/index
    ../math/doc/index
    ../io/doc/index
-   ../config/doc/index
    ../measure/doc/index
    ../sp/doc/index
    ../ip/doc/index
