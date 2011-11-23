@@ -128,14 +128,18 @@ int tp::type_to_num(ca::ElementType type) {
       return NPY_FLOAT32;
     case ca::t_float64:
       return NPY_FLOAT64;
+#ifdef NPY_FLOAT128
     case ca::t_float128:
       return NPY_FLOAT128;
+#endif
     case ca::t_complex64:
       return NPY_COMPLEX64;
     case ca::t_complex128:
       return NPY_COMPLEX128;
+#ifdef NPY_COMPLEX256
     case ca::t_complex256:
       return NPY_COMPLEX256;
+#endif
     default:
       PYTHON_ERROR(TypeError, "unsupported C++ element type (%s)", ca::stringize(type));
   }
@@ -166,14 +170,18 @@ ca::ElementType tp::num_to_type(int num) {
       return ca::t_float32;
     case NPY_FLOAT64:
       return ca::t_float64;
+#ifdef NPY_FLOAT128
     case NPY_FLOAT128:
       return ca::t_float128;
+#endif
     case NPY_COMPLEX64:
       return ca::t_complex64;
     case NPY_COMPLEX128:
       return ca::t_complex128;
+#ifdef NPY_COMPLEX256
     case NPY_COMPLEX256:
       return ca::t_complex256;
+#endif
     default:
       PYTHON_ERROR(TypeError, "unsupported NumPy element type (%d)", num);
   }
@@ -202,14 +210,18 @@ template <> int tp::ctype_to_num<float>(void)
 { return NPY_FLOAT32; }
 template <> int tp::ctype_to_num<double>(void) 
 { return NPY_FLOAT64; }
+#ifdef NPY_FLOAT128
 template <> int tp::ctype_to_num<long double>(void) 
 { return NPY_FLOAT128; }
+#endif
 template <> int tp::ctype_to_num<std::complex<float> >(void)
 { return NPY_COMPLEX64; }
 template <> int tp::ctype_to_num<std::complex<double> >(void) 
 { return NPY_COMPLEX128; }
+#ifdef NPY_COMPLEX256
 template <> int tp::ctype_to_num<std::complex<long double> >(void) 
 { return NPY_COMPLEX256; }
+#endif
 
 ca::ElementType tp::array_to_type(const bp::numeric::array& a) {
   return tp::num_to_type(TP_ARRAY(a)->descr->type_num);

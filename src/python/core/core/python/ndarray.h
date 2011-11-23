@@ -148,10 +148,14 @@ namespace Torch { namespace python {
   template <> int ctype_to_num<unsigned long long>(void);
   template <> int ctype_to_num<float>(void);
   template <> int ctype_to_num<double>(void);
+#ifdef NPY_FLOAT128
   template <> int ctype_to_num<long double>(void);
+#endif
   template <> int ctype_to_num<std::complex<float> >(void);
   template <> int ctype_to_num<std::complex<double> >(void);
+#ifdef NPY_COMPLEX256
   template <> int ctype_to_num<std::complex<long double> >(void);
+#endif
 
   /**
    * Converts from torch's Element type to ndarray type_num
