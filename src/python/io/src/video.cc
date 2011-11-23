@@ -78,8 +78,7 @@ static object videoreader_getitem (io::VideoReader& v, Py_ssize_t sframe) {
   if (sframe < 0) frame = v.numberOfFrames() + sframe;
 
   if (frame >= v.numberOfFrames()) { //basic check
-    PYTHON_ERROR(IndexError, "invalid index (%lu) >= number of frames (%lu)",
-        frame, v.numberOfFrames());
+    PYTHON_ERROR(IndexError, "invalid index (" SIZE_T_FMT ") >= number of frames (" SIZE_T_FMT ")", frame, v.numberOfFrames());
   }
 
   tp::py_array retval(v.frame_type());
@@ -103,8 +102,7 @@ static tuple videoreader_getslice (io::VideoReader& v, slice sobj) {
   }
 
   if (start >= v.numberOfFrames()) { //basic check
-    PYTHON_ERROR(IndexError, "invalid start (%lu) >= number of frames (%lu)",
-        start, v.numberOfFrames());
+    PYTHON_ERROR(IndexError, "invalid start (" SIZE_T_FMT ") >= number of frames (" SIZE_T_FMT ")", start, v.numberOfFrames());
   }
 
   //the stop value may be None

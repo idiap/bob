@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
+#include <cstring> //for memcpy
 #include "io/reorder.h"
 #include "io/Exception.h"
 
@@ -57,7 +57,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
   switch(info.nd) {
 
     case 1:
-      memcpy(dst, src, info.buffer_size());
+      std::memcpy(dst, src, info.buffer_size());
       break;
 
     case 2:
@@ -67,7 +67,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
           io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize;
-          memcpy(&dst[col_major], &src[row_major], dsize);
+          std::memcpy(&dst[col_major], &src[row_major], dsize);
         }
       break;
 
@@ -79,7 +79,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
             io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize;
-            memcpy(&dst[col_major], &src[row_major], dsize);
+            std::memcpy(&dst[col_major], &src[row_major], dsize);
           }
       break;
 
@@ -92,7 +92,7 @@ void io::row_to_col_order(const void* src_, void* dst_,
               io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize;
-              memcpy(&dst[col_major], &src[row_major], dsize);
+              std::memcpy(&dst[col_major], &src[row_major], dsize);
             }
       break;
 
@@ -113,7 +113,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
   switch(info.nd) {
 
     case 1:
-      memcpy(dst, src, info.buffer_size());
+      std::memcpy(dst, src, info.buffer_size());
       break;
 
     case 2:
@@ -123,7 +123,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
           io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize;
-          memcpy(&dst[row_major], &src[col_major], dsize);
+          std::memcpy(&dst[row_major], &src[col_major], dsize);
         }
       break;
 
@@ -135,7 +135,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
             io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize;
-            memcpy(&dst[row_major], &src[col_major], dsize);
+            std::memcpy(&dst[row_major], &src[col_major], dsize);
           }
       break;
 
@@ -148,7 +148,7 @@ void io::col_to_row_order(const void* src_, void* dst_,
               io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize;
-              memcpy(&dst[row_major], &src[col_major], dsize);
+              std::memcpy(&dst[row_major], &src[col_major], dsize);
             }
       break;
 
@@ -172,8 +172,8 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
 
     case 1:
       for (size_t i=0; i<info.shape[0]; ++i) {
-        memcpy(&dst_re[dsize2*i], &src[dsize*i]       , dsize2);
-        memcpy(&dst_im[dsize2*i], &src[dsize*i]+dsize2, dsize2);
+        std::memcpy(&dst_re[dsize2*i], &src[dsize*i]       , dsize2);
+        std::memcpy(&dst_im[dsize2*i], &src[dsize*i]+dsize2, dsize2);
       }
       break;
 
@@ -184,8 +184,8 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
           io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize2;
-          memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
-          memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
+          std::memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
+          std::memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
         }
       break;
 
@@ -197,8 +197,8 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
             io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize2;
-            memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
-            memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
+            std::memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
+            std::memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
           }
       break;
 
@@ -211,8 +211,8 @@ void io::row_to_col_order_complex(const void* src_, void* dst_re_,
               io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize2;
-              memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
-              memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
+              std::memcpy(&dst_re[col_major], &src[row_major]       , dsize2);
+              std::memcpy(&dst_im[col_major], &src[row_major]+dsize2, dsize2);
             }
       break;
 
@@ -236,8 +236,8 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
 
     case 1:
       for (size_t i=0; i<info.shape[0]; ++i) {
-        memcpy(&dst[dsize*i]       , &src_re[dsize2*i], dsize2);
-        memcpy(&dst[dsize*i]+dsize2, &src_im[dsize2*i], dsize2);
+        std::memcpy(&dst[dsize*i]       , &src_re[dsize2*i], dsize2);
+        std::memcpy(&dst[dsize*i]+dsize2, &src_im[dsize2*i], dsize2);
       }
       break;
 
@@ -248,8 +248,8 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
           io::rc2d(row_major, col_major, i, j, info.shape);
           row_major *= dsize;
           col_major *= dsize2;
-          memcpy(&dst[row_major],        &src_re[col_major], dsize2);
-          memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2);
+          std::memcpy(&dst[row_major],        &src_re[col_major], dsize2);
+          std::memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2);
         }
       break;
 
@@ -261,8 +261,8 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
             io::rc3d(row_major, col_major, i, j, k, info.shape);
             row_major *= dsize;
             col_major *= dsize2;
-            memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
-            memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
+            std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
+            std::memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
           }
       break;
 
@@ -275,8 +275,8 @@ void io::col_to_row_order_complex(const void* src_re_, const void* src_im_,
               io::rc4d(row_major, col_major, i, j, k, l, info.shape);
               row_major *= dsize;
               col_major *= dsize2;
-              memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
-              memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
+              std::memcpy(&dst[row_major]       , &src_re[col_major], dsize2); 
+              std::memcpy(&dst[row_major]+dsize2, &src_im[col_major], dsize2); 
             }
       break;
 

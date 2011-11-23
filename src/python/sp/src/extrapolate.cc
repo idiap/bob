@@ -41,7 +41,7 @@ static void inner_extrapolateConstant_dim(size_t nd, tp::const_ndarray a,
   switch (nd) {
     case 1: return inner_extrapolateConstant_dim_size<T,1>(a,b,c);
     case 2: return inner_extrapolateConstant_dim_size<T,2>(a,b,c);
-    default: PYTHON_ERROR(TypeError, "constant extrapolation not supported for array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "constant extrapolation not supported for array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
@@ -91,7 +91,7 @@ static void inner_extrapolateZero_dim(size_t nd, tp::const_ndarray a,
   switch (nd) {
     case 1: return inner_extrapolateZero_dim_size<T,1>(a,b);
     case 2: return inner_extrapolateZero_dim_size<T,2>(a,b);
-    default: PYTHON_ERROR(TypeError, "zero extrapolation not supported for array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "zero extrapolation not supported for array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
@@ -141,7 +141,7 @@ static void inner_extrapolateNearest_dim(size_t nd, tp::const_ndarray a,
   switch (nd) {
     case 1: return inner_extrapolateNearest_dim_size<T,1>(a,b);
     case 2: return inner_extrapolateNearest_dim_size<T,2>(a,b);
-    default: PYTHON_ERROR(TypeError, "nearest extrapolation not supported for array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "nearest extrapolation not supported for array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
@@ -191,7 +191,7 @@ static void inner_extrapolateCircular_dim(size_t nd, tp::const_ndarray a,
   switch (nd) {
     case 1: return inner_extrapolateCircular_dim_size<T,1>(a,b);
     case 2: return inner_extrapolateCircular_dim_size<T,2>(a,b);
-    default: PYTHON_ERROR(TypeError, "circular extrapolation not supported for array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "circular extrapolation not supported for array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
@@ -241,7 +241,7 @@ static void inner_extrapolateMirror_dim(size_t nd, tp::const_ndarray a,
   switch (nd) {
     case 1: return inner_extrapolateMirror_dim_size<T,1>(a,b);
     case 2: return inner_extrapolateMirror_dim_size<T,2>(a,b);
-    default: PYTHON_ERROR(TypeError, "mirror extrapolation not supported for array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "mirror extrapolation not supported for array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 

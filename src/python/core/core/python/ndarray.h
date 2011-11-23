@@ -60,6 +60,15 @@
 #define TPY_ISNONE(x) (x.ptr() == Py_None)
 #endif
 
+/**
+ * A macro that is replaced by the proper format definition for size_t
+ */
+#if NUMBITS == 32
+#  define SIZE_T_FMT "%u"
+#else
+#  define SIZE_T_FMT "%lu"
+#endif
+
 namespace Torch { namespace python {
 
   /**
@@ -122,7 +131,7 @@ namespace Torch { namespace python {
    * Converts from C/C++ type to ndarray type_num.
    */
   template <typename T> int ctype_to_num(void) {
-    PYTHON_ERROR(TypeError, "unsupported C/C++ type");
+    PYTHON_ERROR(TypeError, "unsupported C/C++ type (%s)", Torch::core::array::stringize<T>());
   }
 
   // The C/C++ types we support should be declared here.

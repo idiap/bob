@@ -79,7 +79,7 @@ static object convert_to_dim (tp::const_ndarray src,
     case 3: return inner_convert<Tdst, Tsrc, 3>(src, dst_range, src_range);
     case 4: return inner_convert<Tdst, Tsrc, 4>(src, dst_range, src_range);
     default:
-      PYTHON_ERROR(TypeError, "conversion does not support %lu dimensions", src_type.nd);
+      PYTHON_ERROR(TypeError, "conversion does not support " SIZE_T_FMT " dimensions", src_type.nd);
   }
 }
 

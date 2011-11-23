@@ -137,7 +137,7 @@ int tp::type_to_num(ca::ElementType type) {
     case ca::t_complex256:
       return NPY_COMPLEX256;
     default:
-      PYTHON_ERROR(TypeError, "unsupported C++ element type -- debug me!");
+      PYTHON_ERROR(TypeError, "unsupported C++ element type (%s)", ca::stringize(type));
   }
 
 }
@@ -175,7 +175,7 @@ ca::ElementType tp::num_to_type(int num) {
     case NPY_COMPLEX256:
       return ca::t_complex256;
     default:
-      PYTHON_ERROR(TypeError, "unsupported NumPy element type -- debug me!");
+      PYTHON_ERROR(TypeError, "unsupported NumPy element type (%d)", num);
   }
 
 }

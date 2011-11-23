@@ -42,7 +42,7 @@ template <typename T> static void inner_convolve_dim
   switch (nd) {
     case 1: return inner_convolve_type_dim<T,1>(a,b,c,d,e);
     case 2: return inner_convolve_type_dim<T,2>(a,b,c,d,e);
-    default: PYTHON_ERROR(TypeError, "non-separable convolution does not support input array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "non-separable convolution does not support input array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
@@ -94,7 +94,7 @@ template <typename T> static object inner_convolve_size_dim
   switch (nd) {
     case 1: return inner_convolve_size_type_dim<T,1>(b,c,d);
     case 2: return inner_convolve_size_type_dim<T,2>(b,c,d);
-    default: PYTHON_ERROR(TypeError, "non-separable convolution does not support input array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "non-separable convolution does not support input array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
@@ -149,7 +149,7 @@ template <typename T> static void inner_convolve_sep_dim
     case 2: return inner_convolve_sep_type_dim<T,2>(a,b,c,dim,d,e);
     case 3: return inner_convolve_sep_type_dim<T,3>(a,b,c,dim,d,e);
     case 4: return inner_convolve_sep_type_dim<T,4>(a,b,c,dim,d,e);
-    default: PYTHON_ERROR(TypeError, "separable convolution does not support input array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "separable convolution does not support input array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
@@ -204,7 +204,7 @@ template <typename T> static object inner_convolve_sep_size_dim
     case 2: return inner_convolve_sep_size_type_dim<T,2>(b,c,dim,d);
     case 3: return inner_convolve_sep_size_type_dim<T,3>(b,c,dim,d);
     case 4: return inner_convolve_sep_size_type_dim<T,4>(b,c,dim,d);
-    default: PYTHON_ERROR(TypeError, "separable convolution does not support input array with %lu dimensions", nd);
+    default: PYTHON_ERROR(TypeError, "separable convolution does not support input array with " SIZE_T_FMT " dimensions", nd);
   }
 }
 
