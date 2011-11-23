@@ -63,10 +63,10 @@
 /**
  * A macro that is replaced by the proper format definition for size_t
  */
-#if NUMBITS == 32
-#  define SIZE_T_FMT "%u"
-#else
+#ifdef __LP64__
 #  define SIZE_T_FMT "%lu"
+#else
+#  define SIZE_T_FMT "%u"
 #endif
 
 namespace Torch { namespace python {
