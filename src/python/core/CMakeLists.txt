@@ -32,12 +32,6 @@ set(pysrc_vector
    "src/main_vector.cc"
    )
 
-set(pysrc_mapstring
-   "src/mapstring.cc"
-   "src/arraymapstring.cc"
-   "src/main_mapstring.cc"
-   )
-
 set(pysrc_tuple
    "src/tuple.cc"
    "src/main_tuple.cc"
@@ -60,9 +54,6 @@ add_dependencies(pytorch_core_ndarray python-core_header_install)
 torch_python_submodule_bindings(core vector "${pysrc_vector}")
 add_dependencies(pytorch_core_vector python-core_header_install)
 target_link_libraries(pytorch_core_vector pytorch_core_ndarray)
-
-torch_python_submodule_bindings(core mapstring "${pysrc_mapstring}")
-add_dependencies(pytorch_core_mapstring python-core_header_install)
 
 torch_python_submodule_bindings(core tuple "${pysrc_tuple}")
 add_dependencies(pytorch_core_tuple python-core_header_install)
