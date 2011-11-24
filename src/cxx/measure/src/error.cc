@@ -167,10 +167,10 @@ blitz::Array<double,2> err::epc
  const blitz::Array<double,1>& dev_positives, 
  const blitz::Array<double,1>& test_negatives,
  const blitz::Array<double,1>& test_positives, size_t points) {
-  double step = 1.0/(points-1);
+  double step = 1.0/((double)points-1.0);
   blitz::Array<double,2> retval(2, points);
   for (int i=0; i<(int)points; ++i) {
-    double alpha = i*step;
+    double alpha = (double)i*step;
     retval(0,i) = alpha;
     double threshold = err::minWeightedErrorRateThreshold(dev_negatives, 
         dev_positives, alpha);
