@@ -78,7 +78,7 @@ blitz::Array<double,2> err::roc(const blitz::Array<double,1>& negatives,
  const blitz::Array<double,1>& positives, size_t points) {
   double min = std::min(blitz::min(negatives), blitz::min(positives));
   double max = std::max(blitz::max(negatives), blitz::max(positives));
-  double step = (max-min)/(points-1);
+  double step = (max-min)/((double)points-1.0);
   blitz::Array<double,2> retval(2, points);
   for (int i=0; i<(int)points; ++i) {
     std::pair<double, double> ratios =

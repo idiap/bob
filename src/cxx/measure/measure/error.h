@@ -112,7 +112,7 @@ namespace Torch { namespace measure {
     //if the difference between max and min is too small, we quit.
     if ( too_small < QUIT_THRESHOLD ) return min; //or max, does not matter...
 
-    double step_size = diff/steps;
+    double step_size = diff/(double)steps;
     double min_value = predicate(1.0, 0.0); ///< to the left of the range
    
     //the accumulator holds the thresholds that given the minimum value for the
@@ -121,7 +121,7 @@ namespace Torch { namespace measure {
     accumulator.reserve(steps);
 
     for (size_t i=0; i<steps; ++i) {
-      double threshold = (i * step_size) + min;
+      double threshold = ((double)i * step_size) + min;
       
       std::pair<double, double> ratios = 
         farfrr(negatives, positives, threshold);
