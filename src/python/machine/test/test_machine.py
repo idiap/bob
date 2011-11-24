@@ -42,11 +42,11 @@ class MachineTest(unittest.TestCase):
     stats_ref = torch.machine.GMMStats(torch.io.HDF5File("data/stats.hdf5"))
 
     self.assertTrue(stats.T == stats_ref.T)
-    self.assertTrue( numpy.array_equal(stats.n, stats_ref.n) )
+    self.assertTrue( numpy.allclose(stats.n, stats_ref.n, atol=1e-10) )
     #self.assertTrue( numpy.array_equal(stats.sumPx, stats_ref.sumPx) )
     #Note AA: precision error above
-    self.assertTrue ( (stats.sumPx - stats_ref.sumPx).sum() < 1e-10 )
-    self.assertTrue( numpy.array_equal(stats.sumPxx, stats_ref.sumPxx) )
+    self.assertTrue ( numpy.allclose(stats.sumPx, stats_ref.sumPx, atol=1e-10) )
+    self.assertTrue( numpy.allclose(stats.sumPxx, stats_ref.sumPxx, atol=1e-10) )
 
   def test03_GMMMachine(self):
     """Test a GMMMachine (log-likelihood computation)"""
