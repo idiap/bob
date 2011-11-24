@@ -62,7 +62,7 @@ class weighted_error {
   }
 
   inline double operator() (double far, double frr) const {
-    return (m_weight*far) + ((1-m_weight)*frr);
+    return (m_weight*far) + ((1.0-m_weight)*frr);
   }
 
 };

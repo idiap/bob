@@ -133,7 +133,8 @@ namespace Torch { namespace measure {
         accumulator.clear(); ///< clean-up, we got a better minima
         accumulator.push_back(threshold); ///< remember this threshold
       }
-      else if (current_cost == min_value) { //accumulate to later decide...
+      else if (std::abs(current_cost - min_value) < 1e-16) {
+        //accumulate to later decide...
         accumulator.push_back(threshold);
       }
     }
@@ -146,7 +147,7 @@ namespace Torch { namespace measure {
           accumulator[accumulator.size()/2]+step_size,
           steps);
     }
-   
+
     return accumulator[accumulator.size()/2];
   }
 

@@ -143,7 +143,7 @@ class ErrorTest(unittest.TestCase):
     # uncomment the next line to save a reference value
     # save('nonsep-det.hdf5', det_xyzw)
     det_xyzw_ref = load('nonsep-det.hdf5')
-    self.assertTrue( numpy.allclose(det_xyzw, det_xyzw_ref, atol=1e-10) )
+    self.assertTrue( numpy.allclose(det_xyzw, det_xyzw_ref, atol=1e-15) )
 
     # This example will test the EPC plot calculation functionality. For the
     # EPC curve, you need to have a development and a test set. We will split,
@@ -158,7 +158,7 @@ class ErrorTest(unittest.TestCase):
     # uncomment the next line to save a reference value
     # save('nonsep-epc.hdf5', xy)
     xyref = load('nonsep-epc.hdf5')
-    self.assertTrue( numpy.allclose(xy, xyref, atol=1e-10) )
+    self.assertTrue( numpy.allclose(xy, xyref, atol=1e-15) )
 
 if __name__ == '__main__':
   sys.argv.append('-v')
