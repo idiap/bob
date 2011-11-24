@@ -139,7 +139,7 @@ class FileTest(unittest.TestCase):
     # array writing tests
     a1 = numpy.random.normal(size=(3,4)).astype('float32') #good, supported
     a2 = numpy.random.normal(size=(3,4)).astype('float64') #good, supported
-    a3 = numpy.random.normal(size=(3,4)).astype('complex256') #not supported
+    a3 = numpy.random.normal(size=(3,4)).astype('complex128') #not supported
 
     self.array_readwrite('.bindata', a1)
     self.array_readwrite(".bindata", a2)
@@ -153,7 +153,7 @@ class FileTest(unittest.TestCase):
     for k in range(10):
       a1.append(numpy.random.normal(size=(24,)).astype('float32')) #supported
       a2.append(numpy.random.normal(size=(24,)).astype('float64')) #supported
-      a3.append(numpy.random.normal(size=(24,)).astype('complex256')) #unsupp.
+      a3.append(numpy.random.normal(size=(24,)).astype('complex128')) #unsupp.
       a4.append(numpy.random.normal(size=(3,3))) #not supported
 
     self.arrayset_readwrite('.bindata', a1)
