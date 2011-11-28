@@ -15,39 +15,41 @@ dependence is required for the project and installation instructions for
 specific platforms.
 
 +----------------------+--------------+------------------------------------+
-| Package Name         | Min. Version | License                            | 
-+======================+==============+====================================+ 
-| |project|            | -            | BSD license                        | 
+| Package Name         | Min. Version | License                            |
++======================+==============+====================================+
+| |project|            | -            | BSD license                        |
 +----------------------+--------------+------------------------------------+
-| **Required Runtime Dependencies**                                        | 
+| **Required Runtime Dependencies**                                        |
 +----------------------+--------------+------------------------------------+
-| Std. C/C++ Libraries | gcc 4.2?     | Depends on the compiler            | 
+| Std. C/C++ Libraries | gcc 4.2?     | Depends on the compiler            |
 +----------------------+--------------+------------------------------------+
-| `Blitz++`_           | 0.9          | **Artistic** or LGPLv3+ or GPLv3+  | 
+| `Blitz++`_           | 0.9          | **Artistic** or LGPLv3+ or GPLv3+  |
 +----------------------+--------------+------------------------------------+
-| CBlas, Lapack, Atlas | -            | BSD-style                          | 
+| CBlas, Lapack, Atlas | -            | BSD-style                          |
 +----------------------+--------------+------------------------------------+
-| `Python`_            | 2.5          | PSF license (BSD-style)            | 
+| `Python`_            | 2.5          | PSF license (BSD-style)            |
 +----------------------+--------------+------------------------------------+
-| `Boost`_             | 1.34         | Boost license (BSD-style)          | 
+| `Boost`_             | 1.34         | Boost license (BSD-style)          |
 +----------------------+--------------+------------------------------------+
-| `NumPy`_             | 1.3?         | BSD license                        | 
+| `NumPy`_             | 1.3          | BSD license                        |
 +----------------------+--------------+------------------------------------+
-| `Matplotlib`_        | 0.99?        | PSF license (BSD-style)            | 
+| `Matplotlib`_        | 0.99?        | PSF license (BSD-style)            |
 +----------------------+--------------+------------------------------------+
-| **Data Access (runtime)**                                                | 
+| `fftw`_              | 3.0?         | GPLv3+ (also commercial)           |
 +----------------------+--------------+------------------------------------+
-| `SQLAlchemy`_        | 0.5          | MIT license (BSD-style)            | 
+| **Data Access (runtime)**                                                |
 +----------------------+--------------+------------------------------------+
-| `FFMpeg`_            | 0.5          | **LGPLv3+** or GPLv3+              | 
+| `SQLAlchemy`_        | 0.5          | MIT license (BSD-style)            |
 +----------------------+--------------+------------------------------------+
-| `ImageMagick`_       | 6.5?         | Apache 2.0                         | 
+| `FFMpeg`_            | 0.5          | **LGPLv3+** or GPLv3+              |
 +----------------------+--------------+------------------------------------+
-| `HDF5`_              | 1.8.4        | BSD-style                          | 
+| `ImageMagick`_       | 6.5          | Apache 2.0                         |
 +----------------------+--------------+------------------------------------+
-| `argparse`_          | 1.1?         | PSF License (BSD-style)            | 
+| `HDF5`_              | 1.8.4        | BSD-style                          |
 +----------------------+--------------+------------------------------------+
-| **Building and Debugging Dependencies** (not required for runtime)       | 
+| `argparse`_          | 1.1?         | PSF License (BSD-style)            |
++----------------------+--------------+------------------------------------+
+| **Building and Debugging Dependencies** (not required for runtime)       |
 +----------------------+--------------+------------------------------------+
 | `Git`_               | 1.6?         | GPLv2                              |
 +----------------------+--------------+------------------------------------+
@@ -76,6 +78,8 @@ specific platforms.
 | `MatIO`_             | 1.3.3?       | LGPLv2.1 (.mat array/set support)  | 
 +----------------------+--------------+------------------------------------+
 | `Qt4`_               | 4.7?         | **LGPLv2**, GPLv3 (face localiz.)  |
++----------------------+--------------+------------------------------------+
+| `VLFeat`_            | 0.9?         | GPLV2+                             |
 +----------------------+--------------+------------------------------------+
 
 
@@ -118,14 +122,15 @@ Core dependencies
   the CVS version. This is true to the date (18/January/2011);
 * `Cblas/Lapack/Atlas`_: We use these libraries for mathematical operations
   on vectors and matrices. Any modern version of this library will do;
+* `FFTW`_: Provides fast computation of Fourier, Sine and Cosine transforms
 * `Boost`_: is used for our unit test framework and python bindings. Any
   version superior to 1.34 will work;
 * `Python`_: if you want to compile our python bindings we recommend using
   Python 2.5 or up;
-* `NumPy`_: this dependence is used to bind blitz::Arrays to python.
+* `NumPy`_: this dependence is used to bridge blitz::Arrays to python.
 * `Matplotlib`_: A matlab-like python plotting environment
 * `Qt4`_: This library is used as the basis for the face detection and
-  localization framework (Visioner). This dependence is optional. Face
+  localization framework (Visioner). This dependence is *optional*. Face
   localization and detection will only be compiled if you have that installed.
 
 Data access
@@ -150,6 +155,9 @@ Data access
   Our nightly builds compile against version 1.34, but version 1.33 is known to
   work. Other versions should also work. Please note this dependence is
   *optional*.
+* `VLFeat`_: is used for calculating SIFT features. This is an *optional*
+  dependencies. If you have VLFeat installed, additional C++ and Python
+  bindings will be compiled and integrated to |project|.
 * `argparse`_: is used for argument parsing in some of our python utilities. If
   you are not compiling against Python 2.7 or superior, you need to install it
   separately.
@@ -435,3 +443,5 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _dvipng: http://savannah.nongnu.org/projects/dvipng/
 .. _qt4: http://qt.nokia.com/ 
 .. _git: http://git-scm.com/
+.. _vlfeat: http://www.vlfeat.org/
+.. _fftw: http://www.fftw.org/
