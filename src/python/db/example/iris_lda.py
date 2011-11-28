@@ -68,7 +68,14 @@ def plotting(output, filename=None):
   import matplotlib.pyplot as mpl
 
   histo = {}
-  for k in output.keys(): histo[k] = output[k].cat()[0,:]
+  for k in output.keys(): 
+    #histo[k] = output[k].cat()[0,:]
+    import numpy as np
+    histo[k] = np.array([output[k][0]])
+    for i in range(1,len(output[k])):
+      histo[k] = np.append(histo[k], [output[k][i]], axis=0)
+
+  print histo
 
   # Plots the class histograms
   mpl.hist(histo['setosa'], bins=8, color='green', label='Setosa', alpha=0.5)
