@@ -23,17 +23,14 @@
 
 #include "sp/DCT1D.h"
 #include "core/array_assert.h"
+#include <fftw3.h>
 
-// Declaration of FORTRAN functions from FFTPACK4.1
-extern "C" void cosqi_( int *n, double *wsave);
-extern "C" void cosqf_( int *n, double *x, double *wsave);
-extern "C" void cosqb_( int *n, double *x, double *wsave);
 
 namespace tca = Torch::core::array;
 namespace sp = Torch::sp;
 
 sp::DCT1DAbstract::DCT1DAbstract( const int length):
-  m_length(length), m_wsave(0)
+  m_length(length)
 {
   // Initialize working array and normalization factors
   reset();
@@ -55,9 +52,6 @@ void sp::DCT1DAbstract::reset()
 {
   // Precompute some normalization factors
   initNormFactors();
-
-  // Precompute working array to save computation time
-  initWorkingArray();
 }
 
 sp::DCT1DAbstract::~DCT1DAbstract()
@@ -74,16 +68,7 @@ void sp::DCT1DAbstract::initNormFactors()
   m_sqrt_2l=sqrt(2.*m_length);
 }
 
-void sp::DCT1DAbstract::initWorkingArray() 
-{
-  int n_wsave = 3*m_length+15;
-  m_wsave = new double[n_wsave];
-  cosqi_( &m_length, m_wsave);
-}
-
 void sp::DCT1DAbstract::cleanup() {
-  if(m_wsave)
-    delete [] m_wsave;
 }
 
 sp::DCT1D::DCT1D( const int length):
@@ -95,22 +80,27 @@ void sp::DCT1D::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // check input
-  tca::assertZeroBase(src);
+  tca::assertCZeroBaseContiguous(src);
 
   // Check output
   tca::assertCZeroBaseContiguous(dst);
   tca::assertSameShape( dst, src);
 
-  // Copy content from src to dst
-  dst = src;
-
-  // Compute the FCT
-  cosqb_( &m_length, dst.data(), m_wsave);
+  // Reinterpret cast to fftw format
+  double* src_ = const_cast<double*>(src.data());
+  double* dst_ = dst.data();
+  
+  fftw_plan p;
+  // FFTW_ESTIMATE -> The planner is computed quickly but may not be optimized 
+  // for large arrays
+  p = fftw_plan_r2r_1d(src.extent(0), src_, dst_, FFTW_REDFT10, FFTW_ESTIMATE);
+  fftw_execute(p);
+  fftw_destroy_plan(p);
 
   // Normalize
-  dst(0) *= m_sqrt_1byl/4.;
+  dst(0) *= m_sqrt_1byl/2.;
   blitz::Range r_dst(1, dst.ubound(0) );
-  dst(r_dst) *= m_sqrt_2byl/4.;
+  dst(r_dst) *= m_sqrt_2byl/2.;
 }
 
 
@@ -123,7 +113,7 @@ void sp::IDCT1D::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst)
 {
   // check input
-  tca::assertZeroBase(src);
+  tca::assertCZeroBaseContiguous(src);
 
   // Check output
   tca::assertCZeroBaseContiguous(dst);
@@ -137,7 +127,14 @@ void sp::IDCT1D::operator()(const blitz::Array<double,1>& src,
   blitz::Range r_dst(1, dst.ubound(0) );
   dst(r_dst) /= m_sqrt_2l;
 
-  // Compute the FCT
-  cosqf_( &m_length, dst.data(), m_wsave);
+  // Reinterpret cast to fftw format
+  double* dst_ = dst.data();
+ 
+  fftw_plan p;
+  // FFTW_ESTIMATE -> The planner is computed quickly but may not be optimized 
+  // for large arrays
+  p = fftw_plan_r2r_1d(src.extent(0), dst_, dst_, FFTW_REDFT01, FFTW_ESTIMATE);
+  fftw_execute(p);
+  fftw_destroy_plan(p);
 }
 

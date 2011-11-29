@@ -27,6 +27,7 @@
 #define TORCH5SPRO_IP_DCT_FEATURES_H
 
 #include "core/cast.h"
+#include "core/array_copy.h"
 #include "ip/Exception.h"
 
 #include <list>
@@ -34,6 +35,7 @@
 #include "ip/block.h"
 #include "sp/DCT2D.h"
 #include "ip/zigzag.h"
+
 
 namespace Torch {
 /**
@@ -130,7 +132,8 @@ namespace Torch {
     {
       // extract dct using operator()
       blitz::Array<double,2> dct_tmp_block(m_block_h, m_block_w);
-      m_dct2d->operator()(*it, dct_tmp_block);
+      // TODO: avoid the copy if possible
+      m_dct2d->operator()(Torch::core::array::ccopy(*it), dct_tmp_block);
 
       // extract the required number of coefficients using the zigzag pattern
       blitz::Array<double,1> dct_block_zigzag(m_n_dct_coefs);

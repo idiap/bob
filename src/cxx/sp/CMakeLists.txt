@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps core dfftpack41) #other torch subprojects
+set(shared "${FFTW3_LIBRARY}")
 
 # This defines the list of source files inside this package.
 set(src 
@@ -19,7 +20,7 @@ set(src
 
 include(../../cmake/macros.cmake)
 torch_header_install(sp-cxx sp "torch::sp")
-torch_library(sp "${src}" "${deps}" "")
+torch_library(sp "${src}" "${deps}" "${shared}")
 add_dependencies(torch_sp sp-cxx_header_install)
 
 # Defines tests for this package

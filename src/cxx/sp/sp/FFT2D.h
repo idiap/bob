@@ -76,11 +76,6 @@ namespace Torch {
 
       private:
         /**
-          * @brief Initialize the working arrays
-          */
-        void initWorkingArrays();
-
-        /**
           * @brief Call the initialization procedures
           */
         void reset();
@@ -96,13 +91,6 @@ namespace Torch {
           */
         int m_height;
         int m_width;
-
-        /**
-          * Working arrays
-          */
-        double *m_wsave_w; 
-        double *m_wsave_h; 
-        std::complex<double> *m_col_tmp;
     };
 
 

@@ -80,11 +80,6 @@ namespace Torch {
         void initNormFactors();
 
         /**
-          * @brief Initialize the working arrays
-          */
-        void initWorkingArrays();
-
-        /**
           * @brief Call the initialization procedures
           */
         void reset();
@@ -100,13 +95,6 @@ namespace Torch {
           */
         int m_height;
         int m_width;
-
-        /**
-          * Working arrays
-          */
-        double *m_wsave_w; 
-        double *m_wsave_h; 
-        double *m_col_tmp;
 
         /**
           * Normalization factors
