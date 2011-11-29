@@ -23,7 +23,7 @@
 
 #include <boost/python.hpp>
 #ifdef HAVE_QT4
-#include <Qt/qglobal.h>
+#include <qglobal.h>
 #endif
 
 using namespace boost::python;
