@@ -26,17 +26,15 @@
 #include <blitz/blitz.h>
 #include <boost/version.hpp>
 #include <boost/format.hpp>
-#include <ImageMagick/Magick++.h> 
+#include <cstring>
+#ifdef HAVE_GOOGLE_PERFTOOLS
+#include <google/tcmalloc.h>
+#endif
 
 extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/avutil.h>
-#include <libswscale/swscale.h>
 #include <numpy/arrayobject.h>
-#include <hdf5.h>
-#ifdef HAVE_MATIO
-#include <matio.h>
+#ifdef HAVE_VLFEAT
+#include <vl/generic.h>
 #endif
 }
 
@@ -45,7 +43,7 @@ using namespace boost::python;
 /**
  * Describes the blitz version and information
  */
-str blitz_version() {
+static str blitz_version() {
   std::string retval(BZ_VERSION);
 # if defined(HAVE_BLITZ_SPECIAL_TYPES)
   //this is a temporary hack to identify support for more than 2GB big arrays
@@ -57,7 +55,7 @@ str blitz_version() {
 /**
  * Describes the version of Boost libraries installed
  */
-str boost_version() {
+static str boost_version() {
   boost::format f("%d.%d.%d");
   f % (BOOST_VERSION / 100000);
   f % (BOOST_VERSION / 100 % 1000);
@@ -68,7 +66,7 @@ str boost_version() {
 /**
  * Describes the compiler version
  */
-tuple compiler_version() {
+static tuple compiler_version() {
 # if defined(__GNUC__)
   boost::format f("%s.%s.%s");
   f % BOOST_PP_STRINGIZE(__GNUC__);
@@ -91,7 +89,7 @@ tuple compiler_version() {
 /**
  * Python version with which we compiled the extensions
  */
-str python_version() {
+static str python_version() {
   boost::format f("%s.%s.%s");
   f % BOOST_PP_STRINGIZE(PY_MAJOR_VERSION);
   f % BOOST_PP_STRINGIZE(PY_MINOR_VERSION);
@@ -100,64 +98,35 @@ str python_version() {
 }
 
 /**
- * Version of HDF5 support
- */
-str hdf5_version() {
-  boost::format f("%s.%s.%s");
-  f % BOOST_PP_STRINGIZE(H5_VERS_MAJOR);
-  f % BOOST_PP_STRINGIZE(H5_VERS_MINOR);
-  f % BOOST_PP_STRINGIZE(H5_VERS_RELEASE);
-  return str(f.str());
-}
-
-/**
- * FFmpeg version
- */
-tuple ffmpeg_version() {
-  tuple avformat = make_tuple(str("avformat"), str(BOOST_PP_STRINGIZE(LIBAVFORMAT_VERSION)));
-  tuple avcodec = make_tuple(str("avcodec"), str(BOOST_PP_STRINGIZE(LIBAVCODEC_VERSION)));
-  tuple avutil = make_tuple(str("avutil"), str(BOOST_PP_STRINGIZE(LIBAVUTIL_VERSION)));
-  tuple swscale = make_tuple(str("swscale"), str(BOOST_PP_STRINGIZE(LIBSWSCALE_VERSION)));
-  return make_tuple(avformat, avcodec, avutil, swscale);
-}
-
-/**
- * ImageMagick version
- */
-str magick_version() {
-  return str(MagickLibVersionText);
-}
-
-/**
  * Numpy version
  */
-str numpy_version() {
+static str numpy_version() {
   return str(BOOST_PP_STRINGIZE(NPY_VERSION));
 }
 
 /**
- * Matio, if compiled with such support
+ * Google profiler version, if available
  */
-str matio_version() {
-#ifdef HAVE_MATIO
+static str perftools_version() {
+#ifdef HAVE_GOOGLE_PERFTOOLS
   boost::format f("%s.%s.%s");
-  f % BOOST_PP_STRINGIZE(MATIO_MAJOR_VERSION);
-  f % BOOST_PP_STRINGIZE(MATIO_MINOR_VERSION);
-  f % BOOST_PP_STRINGIZE(MATIO_RELEASE_LEVEL);
+  f % BOOST_PP_STRINGIZE(TC_VERSION_MAJOR);
+  f % BOOST_PP_STRINGIZE(TC_VERSION_MINOR);
+  if (std::strlen(TC_VERSION_PATCH) == 0) f % "0";
+  else f % BOOST_PP_STRINGIZE(TC_VERSION_PATCH);
   return str(f.str());
 #else
   return str("unavailable");
 #endif
 }
 
-void bind_version_info() {
-  def("blitz_version", &blitz_version);
-  def("boost_version", &boost_version);
-  def("compiler_version", &compiler_version);
-  def("python_version", &python_version);
-  def("hdf5_version", &hdf5_version);
-  def("ffmpeg_version", &ffmpeg_version);
-  def("magick_version", &magick_version);
-  def("numpy_version", &numpy_version);
-  def("matio_version", &matio_version);
+void bind_core_version() {
+  dict vdict;
+  vdict["Blitz++"] = blitz_version();
+  vdict["Boost"] = boost_version();
+  vdict["Compiler"] = compiler_version();
+  vdict["Python"] = python_version();
+  vdict["NumPy"] = numpy_version();
+  vdict["Google Perftools"] = perftools_version();
+  scope().attr("version") = vdict;
 }

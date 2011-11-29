@@ -41,30 +41,3 @@ def variable_dict(self):
 
 Object.variables = variables
 Object.variable_dict = variable_dict
-
-def version_table():
-  """Returns a summarized version table of all software we depend on."""
-  retval = {} 
-
-  retval['compiler'] = '-'.join(compiler_version())
-  retval['blitz++'] = blitz_version()
-  retval['boost'] = boost_version()
-  retval['python'] = python_version()
-  retval['hdf5'] = hdf5_version()
-  retval['numpy'] = numpy_version()
-  retval['ffmpeg'] = ';'.join(['-'.join(k) for k in ffmpeg_version()])
-  retval['image magick'] = magick_version()
-  retval['matio'] = matio_version()
-
-  return retval
-
-def version_string():
-  """Returns a string representation of the return value of version_table()"""
-
-  retval = [] 
-  
-  table = version_table()
-  for key in sorted(table.keys()):
-    retval.append(key.capitalize() + ': ' + table[key])
-
-  return '\n'.join(retval)

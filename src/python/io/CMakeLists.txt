@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # Python bindings
 set(pysrc
+   "src/version.cc"
    "src/exception.cc"
    "src/file.cc"
    "src/array.cc"

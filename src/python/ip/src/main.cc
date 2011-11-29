@@ -22,6 +22,7 @@
 
 #include "core/python/ndarray.h"
 
+void bind_ip_version();
 void bind_ip_ipcore();
 void bind_ip_color();
 void bind_ip_filters();
@@ -53,6 +54,7 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
 
   Torch::python::setup_python("Torch image processing classes and sub-classes");
 
+  bind_ip_version();
   bind_ip_ipcore();
   bind_ip_color();
   bind_ip_filters();

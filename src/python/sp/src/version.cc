@@ -1,9 +1,10 @@
 /**
- * @file python/core/src/main.cc
- * @date Tue Jan 18 17:07:26 2011 +0100
- * @author André Anjos <andre.anjos@idiap.ch>
+ * @file python/sp/src/version.cc
+ * @author Andre Anjos <andre.anjos@idiap.ch>
+ * @date Tue 29 Nov 2011 11:02:26 CET
  *
- * @brief Combines all modules to make up the complete bindings
+ * @brief Describes ways to retrieve version information about all dependent
+ * packages.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -21,27 +22,21 @@
  */
 
 #include <boost/python.hpp>
+#include <fftw3.h>
 
 using namespace boost::python;
 
-void bind_core_version();
-void bind_core_exception();
-void bind_core_logging();
-void bind_core_object();
-void bind_core_tensor();
-void bind_core_profiler();
+/**
+ * FFTW3 support
+ */
+static tuple fftw3_version() {
+  return make_tuple((const char*)fftw_version, 
+                    (const char*)fftw_cc, 
+                    (const char*)fftw_codelet_optim);
+}
 
-BOOST_PYTHON_MODULE(libpytorch_core) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch core classes and sub-classes";
-
-  bind_core_version();
-  bind_core_exception();
-  bind_core_logging();
-  bind_core_object();
-  bind_core_tensor();
-  bind_core_profiler();
+void bind_sp_version() {
+  dict vdict;
+  vdict["FFTW"] = fftw3_version();
+  scope().attr("version") = vdict;
 }
