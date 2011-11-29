@@ -2,6 +2,7 @@ project(visioner-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/version.cc"
    "src/localize.cc"
    "src/main.cc"
    )

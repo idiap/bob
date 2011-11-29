@@ -1,9 +1,10 @@
 /**
- * @file python/core/src/main.cc
- * @date Tue Jan 18 17:07:26 2011 +0100
- * @author André Anjos <andre.anjos@idiap.ch>
+ * @file python/visioner/src/version.cc
+ * @date Tue 29 Nov 2011 11:16:35 CET
+ * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * @brief Combines all modules to make up the complete bindings
+ * @brief Describes ways to retrieve version information about all dependent
+ * packages.
  *
  * Copyright (C) 2011 Idiap Reasearch Institute, Martigny, Switzerland
  *
@@ -21,27 +22,25 @@
  */
 
 #include <boost/python.hpp>
+#ifdef HAVE_QT4
+#include <Qt/qglobal.h>
+#endif
 
 using namespace boost::python;
 
-void bind_core_version();
-void bind_core_exception();
-void bind_core_logging();
-void bind_core_object();
-void bind_core_tensor();
-void bind_core_profiler();
+/**
+ * Qt4 version, if available
+ */
+static tuple qt4_version() {
+#ifdef HAVE_QT4
+  return make_tuple(str(QT_VERSION_STR), str(QT_PACKAGEDATE_STR));
+#else
+  return str("unavailable");
+#endif
+}
 
-BOOST_PYTHON_MODULE(libpytorch_core) {
-  docstring_options docopt; 
-# if !defined(TORCH_DEBUG)
-  docopt.disable_cpp_signatures();
-# endif
-  scope().attr("__doc__") = "Torch core classes and sub-classes";
-
-  bind_core_version();
-  bind_core_exception();
-  bind_core_logging();
-  bind_core_object();
-  bind_core_tensor();
-  bind_core_profiler();
+void bind_visioner_version() {
+  dict vdict;
+  vdict["Qt4"] = qt4_version();
+  scope().attr("version") = vdict;
 }

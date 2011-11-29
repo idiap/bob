@@ -49,7 +49,7 @@ Guidelines on building against Google perftools
 
   if(googlePerfTools_FOUND)
     set(shared "${googlePerfTools_LIBRARIES}") #or make sure you link against "libprofile.so"
-    add_definitions(-DHAS_GOOGLE_PERFTOOLS)
+    add_definitions(-DHAVE_GOOGLE_PERFTOOLS)
   endif(googlePerfTools_FOUND)
 
 2. At your code, include **optional** usage of perftools in the following
@@ -58,24 +58,24 @@ Guidelines on building against Google perftools
 .. code-block:: c++
 
   #include <cstdlib> // for std::getenv()
-  #ifdef HAS_GOOGLE_PERFTOOLS
+  #ifdef HAVE_GOOGLE_PERFTOOLS
   #include <google/profiler.h>
   #endif
 
   int main(void) {
     const char* profile_output = std::getenv("TORCH_PROFILE");
     if (profile_output && std::strlen(profile_output)) {
-  #ifdef HAS_GOOGLE_PERFTOOLS
+  #ifdef HAVE_GOOGLE_PERFTOOLS
       std::cout << "Google perftools profile output set to " << profile_output << std::endl;
       ProfilerStart(profile_output);
   #else
       std::cout << "Google perftools were not found. Make sure they are available on your system and recompile." << std::endl;
-  #endif HAS_GOOGLE_PERFTOOLS
+  #endif HAVE_GOOGLE_PERFTOOLS
     }
 
     run_code_to_be_profiled();
 
-  #ifdef HAS_GOOGLE_PERFTOOLS
+  #ifdef HAVE_GOOGLE_PERFTOOLS
     if (profile_output && std::strlen(profile_output)) ProfilerStop();
   #endif
   }

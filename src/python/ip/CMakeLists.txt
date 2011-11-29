@@ -2,6 +2,7 @@ project(ip-python)
 cmake_minimum_required(VERSION 2.6)
 
 set(pysrc
+   "src/version.cc"
    "src/ipcore.cc"
    "src/color.cc"
    "src/filters.cc"

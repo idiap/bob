@@ -22,6 +22,7 @@
 
 #include "core/python/ndarray.h"
 
+void bind_sp_version();
 void bind_sp_spcore();
 void bind_sp_convolution();
 void bind_sp_extrapolate();
@@ -31,6 +32,7 @@ BOOST_PYTHON_MODULE(libpytorch_sp) {
 
   Torch::python::setup_python("Torch signal processing classes and sub-classes");
 
+  bind_sp_version();
   bind_sp_spcore();
   bind_sp_convolution();
   bind_sp_extrapolate();

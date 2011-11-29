@@ -23,3 +23,7 @@ include(FindPkgConfig)
 pkg_check_modules(ffmpeg REQUIRED libavformat>=52.31.0 libavcodec>=52.20.0 libavutil>=49.15.0 libswscale>=0.7.1)
 link_directories(${ffmpeg_LIBRARY_DIRS})
 add_definitions("-DHAVE_FFMPEG=1")
+
+# Setup the FFMPEG "official version"
+execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bin/ffmpeg-version.sh OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+add_definitions("-DFFMPEG_VERSION=\"${FFMPEG_VERSION}\"")

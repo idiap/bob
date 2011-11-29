@@ -12,10 +12,10 @@ find_library(GOOGLE_PERFTOOLS_LIBRARY NAMES profiler)
 set(GOOGLE_PERFTOOLS_LIBRARIES ${GOOGLE_PERFTOOLS_LIBRARY} CACHE INTERNAL "libraries")
 
 if(GOOGLE_PERFTOOLS_INCLUDE AND GOOGLE_PERFTOOLS_LIBRARY)
-  message( STATUS "Google Perftools FOUND: Enabling compilation flags...")
+  message( STATUS "Google Perftools FOUND: Compiling add-on modules...")
   set(GOOGLE_PERFTOOLS_FOUND "YES" CACHE INTERNAL "package")
   include_directories(SYSTEM ${GOOGLE_PERFTOOLS_INCLUDE_DIRS})
-  add_definitions(-DHAS_GOOGLE_PERFTOOLS)
+  add_definitions(-DHAVE_GOOGLE_PERFTOOLS=1)
 else(GOOGLE_PERFTOOLS_INCLUDE AND GOOGLE_PERFTOOLS_LIBRARY)
   # This will say why we have got to that conclusion
   set(GOOGLE_PERFTOOLS_FOUND "NO")
