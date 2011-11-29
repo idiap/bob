@@ -23,15 +23,22 @@
 
 #include <boost/python.hpp>
 #include <boost/format.hpp>
-#include <ImageMagick/Magick++.h> 
 #include <cstdlib>
 
+#if defined(HAVE_IMAGE_MAGICK_PP)
+#include <ImageMagick/Magick++.h>
+#endif
+
 extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/avutil.h>
-#include <libswscale/swscale.h>
 #include <hdf5.h>
+
+#if defined(HAVE_FFMPEG)
+#  include <libavformat/avformat.h>
+#  include <libavcodec/avcodec.h>
+#  include <libavutil/avutil.h>
+#  include <libswscale/swscale.h>
+#endif 
+
 #ifdef HAVE_MATIO
 #include <matio.h>
 #endif
@@ -73,7 +80,11 @@ static dict ffmpeg_version() {
  * ImageMagick version
  */
 static str magick_version() {
+#if defined(HAVE_IMAGE_MAGICK_PP)
   return str(MagickLibVersionText);
+#else
+  return str("unavailable");
+#endif
 }
 
 /**

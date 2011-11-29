@@ -63,14 +63,6 @@ set(src_ip
 )
 #   "src/ipHOG.cc"
 
-
-#set(src_imagefiles
-#   "src/pgmImageFile.cc"
-#   "src/ppmImageFile.cc"
-#   "src/gifImageFile.cc"
-#   "src/jpegImageFile.cc"
-#   "src/tiffImageFile.cc")
-
 set(src_geometry
    "src/Affine2D.cc"
    "src/Circle2D.cc"

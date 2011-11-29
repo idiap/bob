@@ -20,10 +20,17 @@ include(FindPkgConfig)
 # Our base build requires ffmpeg >= 0.5. This is available on most platforms,
 # but please note that if you link to anything <= 0.6, your code will become
 # GPL'd. See table above for details.
-pkg_check_modules(ffmpeg REQUIRED libavformat>=52.31.0 libavcodec>=52.20.0 libavutil>=49.15.0 libswscale>=0.7.1)
-link_directories(${ffmpeg_LIBRARY_DIRS})
-add_definitions("-DHAVE_FFMPEG=1")
+pkg_check_modules(FFMPEG libavformat>=52.31.0 libavcodec>=52.20.0 libavutil>=49.15.0 libswscale>=0.7.1)
 
-# Setup the FFMPEG "official version"
-execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bin/ffmpeg-version.sh OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-add_definitions("-DFFMPEG_VERSION=\"${FFMPEG_VERSION}\"")
+if(FFMPEG_FOUND)
+  link_directories(${FFMPEG_LIBRARY_DIRS})
+  add_definitions("-DHAVE_FFMPEG=1")
+
+  # Setup the FFMPEG "official version"
+  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/bin/ffmpeg-version.sh OUTPUT_VARIABLE FFMPEG_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+  add_definitions("-DFFMPEG_VERSION=\"${FFMPEG_VERSION}\"")
+
+  message( STATUS "FFmpeg ${FFMPEG_VERSION} FOUND: Compiling add-on modules...")
+else(FFMPEG_FOUND)
+  message( STATUS "FFmpeg NOT FOUND: Disabling...")
+endif(FFMPEG_FOUND)
