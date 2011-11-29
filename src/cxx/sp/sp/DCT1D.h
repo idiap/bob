@@ -75,11 +75,6 @@ namespace Torch {
         void initNormFactors();
 
         /**
-          * @brief Initialize the working array
-          */
-        void initWorkingArray();
-
-        /**
           * @brief Call the initialization procedures
           */
         void reset();
@@ -94,11 +89,6 @@ namespace Torch {
           * Private attributes
           */
         int m_length;
-
-        /**
-          * Working array
-          */
-        double *m_wsave; 
 
         /**
           * Normalization factors

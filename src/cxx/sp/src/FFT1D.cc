@@ -23,17 +23,14 @@
 
 #include "sp/FFT1D.h"
 #include "core/array_assert.h"
+#include <fftw3.h>
 
-// Declaration of FORTRAN functions from FFTPACK4.1
-extern "C" void cffti_( int *n, double *wsave);
-extern "C" void cfftf_( int *n, std::complex<double> *x, double *wsave);
-extern "C" void cfftb_( int *n, std::complex<double> *x, double *wsave);
 
 namespace tca = Torch::core::array;
 namespace sp = Torch::sp;
 
 sp::FFT1DAbstract::FFT1DAbstract( const int length):
-  m_length(length), m_wsave(0)
+  m_length(length)
 {
   // Initialize working array and normalization factors
   reset();
@@ -54,8 +51,6 @@ void sp::FFT1DAbstract::reset(const int length)
  
 void sp::FFT1DAbstract::reset()
 {
-  // Precompute working array to save computation time
-  initWorkingArray();
 }
 
 sp::FFT1DAbstract::~FFT1DAbstract()
@@ -63,16 +58,7 @@ sp::FFT1DAbstract::~FFT1DAbstract()
   cleanup();
 }
 
-void sp::FFT1DAbstract::initWorkingArray() 
-{
-  int n_wsave = 4*m_length+15;
-  m_wsave = new double[n_wsave];
-  cffti_( &m_length, m_wsave);
-}
-
 void sp::FFT1DAbstract::cleanup() {
-  if(m_wsave)
-    delete [] m_wsave;
 }
 
 sp::FFT1D::FFT1D( const int length):
@@ -84,17 +70,22 @@ void sp::FFT1D::operator()(const blitz::Array<std::complex<double>,1>& src,
   blitz::Array<std::complex<double>,1>& dst)
 {
   // check input
-  tca::assertZeroBase(src);
+  tca::assertCZeroBaseContiguous(src);
 
   // Check output
   tca::assertCZeroBaseContiguous(dst);
   tca::assertSameShape( dst, src);
 
-  // Copy content from src to dst
-  dst = src;
-
-  // Compute the FFT
-  cfftf_( &m_length, dst.data(), m_wsave);
+  // Reinterpret cast to fftw format
+  fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
+  fftw_complex* dst_ = reinterpret_cast<fftw_complex*>(dst.data());
+  
+  fftw_plan p;
+  // FFTW_ESTIMATE -> The planner is computed quickly but may not be optimized 
+  // for large arrays
+  p = fftw_plan_dft_1d(src.extent(0), src_, dst_, FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(p);
+  fftw_destroy_plan(p);
 }
 
 
@@ -107,18 +98,24 @@ void sp::IFFT1D::operator()(const blitz::Array<std::complex<double>,1>& src,
   blitz::Array<std::complex<double>,1>& dst)
 {
   // check input
-  tca::assertZeroBase(src);
+  tca::assertCZeroBaseContiguous(src);
 
   // Check output
   tca::assertCZeroBaseContiguous(dst);
   tca::assertSameShape( dst, src);
 
-  // Copy content from src to dst
-  dst = src;
+  // Reinterpret cast to fftw format
+  fftw_complex* src_ = reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>* >(src.data()));
+  fftw_complex* dst_ = reinterpret_cast<fftw_complex*>(dst.data());
+  
+  fftw_plan p;
+  // FFTW_ESTIMATE -> The planner is computed quickly but may not be optimized 
+  // for large arrays
+  p = fftw_plan_dft_1d(src.extent(0), src_, dst_, FFTW_BACKWARD, FFTW_ESTIMATE);
+  fftw_execute(p); /* repeat as needed */
+  fftw_destroy_plan(p);
 
-  // Compute the FFT
-  cfftb_( &m_length, dst.data(), m_wsave);
-
+  // Rescale as FFTW is not doing it
   dst /= static_cast<double>(m_length);
 }
 
