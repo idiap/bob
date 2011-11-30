@@ -11,6 +11,11 @@ set(PYTHON_VERSION ${PYTHON_VERSION} CACHE INTERNAL "python")
 set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
 
 include(FindPythonInterp)
+
+# Preferably, detect libraries on the same path of executable
+get_filename_component(TORCH_PYTHON_PREFIX1 ${PYTHON_EXECUTABLE} PATH CACHE)
+get_filename_component(TORCH_PYTHON_PREFIX ${TORCH_PYTHON_PREFIX1} PATH CACHE)
+set(CMAKE_SYSTEM_PREFIX_PATH "${TORCH_PYTHON_PREFIX};${CMAKE_SYSTEM_PREFIX_PATH}")
 include(FindPythonLibs)
 
 # This calculates the correct python installation prefix for the current
