@@ -14,6 +14,9 @@ if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
   # Bogus on OSX?
   set(CMAKE_INCLUDE_SYSTEM_FLAG_C "-isystem ")
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
+
+  # Sets up MacPorts installations
+  set(CMAKE_SYSTEM_PREFIX_PATH "/opt/local;${CMAKE_SYSTEM_PREFIX_PATH}")
 endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
 
 # We allow you to force the compilation to be done using a base 32-bit

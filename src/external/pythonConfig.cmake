@@ -10,8 +10,8 @@ set(PYTHON_VERSION ${PYTHON_VERSION} CACHE INTERNAL "python")
 # We then set the preference to use that
 set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
 
-include(FindPythonLibs)
 include(FindPythonInterp)
+include(FindPythonLibs)
 
 # This calculates the correct python installation prefix for the current
 # interpreter
@@ -35,5 +35,9 @@ execute_process(COMMAND python -c "import sys; print '%d.%d.%d' % (sys.version_i
 
 execute_process(COMMAND python -c "import numpy; print numpy.version.version" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-message( STATUS "Python ${PYTHON_VERSION_COMPLETE} FOUND at ${PYTHON_PREFIX}")
-message( STATUS "NumPy ${NUMPY_VERSION_COMPLETE} FOUND at ${PYTHON_NUMPY_INCLUDE_DIR}")
+message( STATUS "Python ${PYTHON_VERSION_COMPLETE} and NumPy ${NUMPY_VERSION_COMPLETE} FOUND. Details for this build are:")
+message( STATUS "  executable: ${PYTHON_EXECUTABLE}")
+#message( STATUS "  prefix    : ${PYTHON_PREFIX}")
+message( STATUS "  library   : ${PYTHON_LIBRARY}")
+#message( STATUS "  libdirs   : ${python_LIBRARY_DIRS}")
+message( STATUS "  includes  : ${python_INCLUDE_DIRS}")
