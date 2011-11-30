@@ -30,3 +30,10 @@ set(PYTHON_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}
   CACHE INTERNAL "python")
 
 include_directories(SYSTEM ${python_INCLUDE_DIRS})
+  
+execute_process(COMMAND python -c "import sys; print '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])" OUTPUT_VARIABLE PYTHON_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+execute_process(COMMAND python -c "import numpy; print numpy.version.version" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+message( STATUS "Python ${PYTHON_VERSION_COMPLETE} FOUND at ${PYTHON_PREFIX}")
+message( STATUS "NumPy ${NUMPY_VERSION_COMPLETE} FOUND at ${PYTHON_NUMPY_INCLUDE_DIR}")
