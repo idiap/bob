@@ -34,6 +34,7 @@
 namespace bp = boost::python;
 namespace tp = Torch::python;
 namespace ca = Torch::core::array;
+namespace tc = Torch::core;
 
 #define TP_ARRAY(x) ((PyArrayObject*)x.ptr())
 #define TP_OBJECT(x) (x.ptr())
@@ -51,8 +52,7 @@ void tp::setup_python(const char* module_docstring) {
   if (module_docstring) bp::scope().attr("__doc__") = module_docstring;
 
   // Gets the current dlopenflags and save it
-  PyThreadState *tstate = PyThreadState_GET();
-  if(!tstate) throw std::runtime_error("Can not get python dlopenflags.");
+  PyThreadState* tstate = PyThreadState_Get();
   int old_value = tstate->interp->dlopenflags;
 
   // Unsets the RTLD_GLOBAL flag
