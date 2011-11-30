@@ -33,9 +33,6 @@
 
 extern "C" {
 #include <numpy/arrayobject.h>
-#ifdef HAVE_VLFEAT
-#include <vl/generic.h>
-#endif
 }
 
 using namespace boost::python;
