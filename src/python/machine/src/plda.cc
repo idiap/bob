@@ -6,7 +6,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include "core/python/exception.h"
-#include "core/python/vector.h"
 #include "machine/PLDAMachine.h"
 #include "core/python/ndarray.h"
 

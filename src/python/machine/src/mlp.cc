@@ -21,7 +21,6 @@
  */
 
 #include "core/python/ndarray.h"
-#include "core/python/vector.h"
 #include "machine/MLP.h"
 #include "machine/MLPException.h"
 

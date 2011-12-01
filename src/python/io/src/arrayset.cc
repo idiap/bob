@@ -22,6 +22,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/slice.hpp>
+#include <boost/python/stl_iterator.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/format.hpp>
@@ -29,7 +30,6 @@
 
 #include "io/Arrayset.h"
 #include "core/array_assert.h"
-#include "core/python/vector.h"
 #include "core/python/exception.h"
 
 #include "core/python/ndarray.h"
@@ -198,6 +198,4 @@ void bind_io_arrayset() {
     .def("extend", &extend_with_ndarray, (arg("self"), arg("array"), arg("axis")), "Extends this array set with an ndarray one more dimension than what my type has (or will have), iterating over the specified axis. If this arrayset is not new, extension may be subject to type coertion.")
     .def("extend", &extend_with_iterable, (arg("self"), arg("iterable")), "Extends this array set with array-like objects coming from the given iterable. The current arrayset dtype is inforced on all required coertions.")
     ;
-
-  tp::vector_no_compare<io::Arrayset>("ArraysetVector");
 }

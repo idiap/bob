@@ -23,7 +23,6 @@
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 #include "core/python/ndarray.h"
-#include "core/python/vector.h"
 #include "machine/JFAMachine.h"
 #include "machine/GMMMachine.h"
 

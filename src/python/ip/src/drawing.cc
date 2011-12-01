@@ -41,8 +41,11 @@ static void inner_draw_point_ (tp::ndarray image, int x, int y, object color) {
     case 3:
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
-        boost::tuple<T,T,T> tcolor = 
-          extract<boost::tuple<T,T,T> >(color);
+        tuple c = extract<tuple>(color);
+        T c0 = extract<T>(c[0]); 
+        T c1 = extract<T>(c[1]); 
+        T c2 = extract<T>(c[2]);
+        boost::tuple<T,T,T> tcolor(c0, c1, c2);
         ip::draw_point_(image_, x, y, tcolor);
       }
       break;
@@ -73,8 +76,11 @@ static void inner_draw_point (tp::ndarray image, int x, int y, object color) {
     case 3:
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
-        boost::tuple<T,T,T> tcolor = 
-          extract<boost::tuple<T,T,T> >(color);
+        tuple c = extract<tuple>(color);
+        T c0 = extract<T>(c[0]); 
+        T c1 = extract<T>(c[1]); 
+        T c2 = extract<T>(c[2]);
+        boost::tuple<T,T,T> tcolor(c0, c1, c2);
         ip::draw_point(image_, x, y, tcolor);
       }
       break;
@@ -105,8 +111,11 @@ static void inner_try_draw_point (tp::ndarray image, int x, int y, object color)
     case 3:
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
-        boost::tuple<T,T,T> tcolor = 
-          extract<boost::tuple<T,T,T> >(color);
+        tuple c = extract<tuple>(color);
+        T c0 = extract<T>(c[0]); 
+        T c1 = extract<T>(c[1]); 
+        T c2 = extract<T>(c[2]);
+        boost::tuple<T,T,T> tcolor(c0, c1, c2);
         ip::try_draw_point(image_, x, y, tcolor);
       }
       break;
@@ -137,8 +146,11 @@ static void inner_draw_line (tp::ndarray image, int x1, int y1, int x2, int y2, 
     case 3:
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
-        boost::tuple<T,T,T> tcolor = 
-          extract<boost::tuple<T,T,T> >(color);
+        tuple c = extract<tuple>(color);
+        T c0 = extract<T>(c[0]); 
+        T c1 = extract<T>(c[1]); 
+        T c2 = extract<T>(c[2]);
+        boost::tuple<T,T,T> tcolor(c0, c1, c2);
         ip::draw_line(image_, x1, y1, x2, y2, tcolor);
       }
       break;
@@ -169,8 +181,11 @@ static void inner_draw_cross (tp::ndarray image, int x, int y, int radius, objec
     case 3:
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
-        boost::tuple<T,T,T> tcolor = 
-          extract<boost::tuple<T,T,T> >(color);
+        tuple c = extract<tuple>(color);
+        T c0 = extract<T>(c[0]); 
+        T c1 = extract<T>(c[1]); 
+        T c2 = extract<T>(c[2]);
+        boost::tuple<T,T,T> tcolor(c0, c1, c2);
         ip::draw_cross(image_, x, y, radius, tcolor);
       }
       break;
@@ -202,8 +217,11 @@ static void inner_draw_cross_plus (tp::ndarray image, int x, int y, int radius, 
     case 3:
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
-        boost::tuple<T,T,T> tcolor = 
-          extract<boost::tuple<T,T,T> >(color);
+        tuple c = extract<tuple>(color);
+        T c0 = extract<T>(c[0]); 
+        T c1 = extract<T>(c[1]); 
+        T c2 = extract<T>(c[2]);
+        boost::tuple<T,T,T> tcolor(c0, c1, c2);
         ip::draw_cross_plus(image_, x, y, radius, tcolor);
       }
       break;
@@ -235,8 +253,11 @@ static void inner_draw_box (tp::ndarray image, int x, int y, int w, int h, objec
     case 3:
       {
         blitz::Array<T,3> image_ = image.bz<T,3>();
-        boost::tuple<T,T,T> tcolor = 
-          extract<boost::tuple<T,T,T> >(color);
+        tuple c = extract<tuple>(color);
+        T c0 = extract<T>(c[0]); 
+        T c1 = extract<T>(c[1]); 
+        T c2 = extract<T>(c[2]);
+        boost::tuple<T,T,T> tcolor(c0, c1, c2);
         ip::draw_box(image_, x, y, w, h, tcolor);
       }
       break;

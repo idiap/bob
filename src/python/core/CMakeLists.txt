@@ -23,20 +23,6 @@ set(pysrc_ndarray
    "src/main_ndarray.cc"
    )
 
-set(pysrc_vector
-   "src/vector.cc"
-   "src/array_vector_1.cc"
-   "src/array_vector_2.cc"
-   "src/array_vector_3.cc"
-   "src/array_vector_4.cc"
-   "src/main_vector.cc"
-   )
-
-set(pysrc_tuple
-   "src/tuple.cc"
-   "src/main_tuple.cc"
-   )
-
 set(pysrc_random
    "src/random.cc"
    "src/main_random.cc"
@@ -50,13 +36,6 @@ torch_header_install(python-core core "torch::python::core")
 
 torch_python_submodule_bindings(core ndarray "${pysrc_ndarray}")
 add_dependencies(pytorch_core_ndarray python-core_header_install)
-
-torch_python_submodule_bindings(core vector "${pysrc_vector}")
-add_dependencies(pytorch_core_vector python-core_header_install)
-target_link_libraries(pytorch_core_vector pytorch_core_ndarray)
-
-torch_python_submodule_bindings(core tuple "${pysrc_tuple}")
-add_dependencies(pytorch_core_tuple python-core_header_install)
 
 torch_python_submodule_bindings(core random "${pysrc_random}")
 add_dependencies(pytorch_core_random python-core_header_install)
