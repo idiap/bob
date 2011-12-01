@@ -221,13 +221,19 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
 
 .. note::
 
   Support for libgoogle-perftools-dev in Ubuntu 10.04 LTS is broken so you will
   not be able to profile |project| using this support. You may still use
   Valgrind or other profiling tools of your choice.
+
+.. note::
+
+  You will not find a pre-packaged version of VLfeat (SIFT feature extraction)
+  on Ubuntu distributions by default. You can still add the PPA by following
+  instructions on the `VLfeat launchpad webpage`_.
 
 .. warning::
 
@@ -240,15 +246,21 @@ A single command line that will install all required packages under Ubuntu
   the CMAKE_PREFIX_PATH environment variable as explained before at
   :ref:`basic-build`.
 
-Ubuntu 11.04
+Ubuntu 11.10
 ============
 
 A single command line that will install all required packages under Ubuntu
-(tested on Ubuntu 11.04):
+(tested on Ubuntu 11.10):
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran libatlas-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev
+   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
+
+.. note::
+
+  You will not find a pre-packaged version of VLfeat (SIFT feature extraction)
+  on Ubuntu distributions by default. You can still add the PPA by following
+  instructions on the `VLfeat launchpad webpage`_.
 
 .. warning::
 
@@ -277,7 +289,7 @@ your shell prompt:
 
 .. code-block:: sh
 
-   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas
+   $ sudo port install cmake blitz ffmpeg python26 python_select gcc44 gcc_select py26-numpy -atlas matio imagemagick py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-bin hdf5-18 py26-h5py py26-tables py26-argparse qt4-mac boost +python26 python26-scipy +no_atlas fftw-3 vlfeat
    $ # go for a long coffee 
 
 .. note::
@@ -444,4 +456,5 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _qt4: http://qt.nokia.com/ 
 .. _git: http://git-scm.com/
 .. _vlfeat: http://www.vlfeat.org/
+.. _vlfeat launchpad page: https://launchpad.net/~gezakovacs/+archive/vlfeat
 .. _fftw: http://www.fftw.org/
