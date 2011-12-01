@@ -102,6 +102,14 @@ template <typename T, int N> struct bz_from_npy {
     // we cannot afford copying, only referencing.
     if (result == tp::BYREFERENCE) return obj_ptr;
 
+    // but, if the user passed an array of the right type, but we still need to
+    // copy, warn the user as this is a tricky case to debug.
+    PyArrayObject* arr = reinterpret_cast<PyArrayObject*>(obj_ptr);
+    if (result == tp::WITHARRAYCOPY && 
+        tp::ctype_to_num<T>() == arr->descr->type_num) {
+      PYTHON_ERROR(RuntimeError, "The bindings you are trying to use to this C++ method require a numpy.ndarray -> blitz::Array<%s,%d> conversion, but the array you passed, despite the correct type, is not C-style contiguous and/or properly aligned, so I cannot automatically wrap it. You can check this by yourself by printing the flags on such a variable with the command 'print(<varname>.flags)'. The only way to circumvent this problem, from python, is to create a copy the variable by issuing '<varname>.copy()' before calling the bound method. Otherwise, if you wish the copy to be executed automatically, you have to re-bind the method to use our custom 'const_ndarray' type.", ca::stringize<T>(), N);
+    }
+
     return 0;
   }
 
