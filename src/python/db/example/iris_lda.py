@@ -24,6 +24,7 @@ showing that Fisher's solution was approximately correct.
 
 import os
 import sys
+import numpy
 import torch
 import optparse
 import tempfile #for package tests
@@ -69,10 +70,7 @@ def plotting(output, filename=None):
 
   histo = {}
   for k in output.keys(): 
-    import numpy as np
-    histo[k] = np.array([output[k][0]])
-    for i in range(1,len(output[k])):
-      histo[k] = np.append(histo[k], [output[k][i]], axis=0)
+    histo[k] = numpy.vstack(output[k])[:,0]
 
   # Plots the class histograms
   mpl.hist(histo['setosa'], bins=8, color='green', label='Setosa', alpha=0.5)
