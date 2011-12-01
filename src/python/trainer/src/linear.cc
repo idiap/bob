@@ -20,7 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
+#include "core/python/ndarray.h"
+#include <boost/python/stl_iterator.hpp>
 #include "trainer/SVDPCATrainer.h"
 #include "trainer/FisherLDATrainer.h"
 
@@ -43,18 +44,21 @@ object eig_train2 (const train::SVDPCATrainer& t, mach::LinearMachine& m,
   return object(eig_val);
 }
 
-tuple lda_train1 (const train::FisherLDATrainer& t,
-    const std::vector<io::Arrayset>& data) {
-  blitz::Array<double,1> eig_val(data[0].getShape()[0]);
+tuple lda_train1 (const train::FisherLDATrainer& t, object data) {
+  stl_input_iterator<io::Arrayset> dbegin(data), dend;
+  std::vector<io::Arrayset> vdata(dbegin, dend);
+  blitz::Array<double,1> eig_val(vdata[0].getShape()[0]);
   mach::LinearMachine m;
-  t.train(m, eig_val, data);
+  t.train(m, eig_val, vdata);
   return make_tuple(m, eig_val);
 }
 
 object lda_train2 (const train::FisherLDATrainer& t, mach::LinearMachine& m,
-    const std::vector<io::Arrayset>& data) {
-  blitz::Array<double,1> eig_val(data[0].getShape()[0]);
-  t.train(m, eig_val, data);
+    object data) {
+  stl_input_iterator<io::Arrayset> dbegin(data), dend;
+  std::vector<io::Arrayset> vdata(dbegin, dend);
+  blitz::Array<double,1> eig_val(vdata[0].getShape()[0]);
+  t.train(m, eig_val, vdata);
   return object(eig_val);
 }
 

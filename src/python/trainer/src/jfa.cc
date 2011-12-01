@@ -21,6 +21,7 @@
  */
 
 #include "core/python/ndarray.h"
+#include <boost/python/stl_iterator.hpp>
 #include "trainer/JFATrainer.h"
 #include "machine/JFAMachine.h"
 
@@ -47,6 +48,23 @@ static void jfa_train(train::JFABaseTrainer& t, list list_stats, const size_t n_
 
   // Calls the train function
   t.train(gmm_stats, n_iter);
+}
+
+static void jfa_train_vector(train::JFABaseTrainer& t, 
+    object N, object F, size_t n_iter) {
+  //N
+  stl_input_iterator<tp::const_ndarray> it(N), end;
+  std::vector<blitz::Array<double,2> > Nref;
+  Nref.reserve(len(N));
+  for (; it != end; ++it) Nref.push_back((*it).bz<double,2>());
+
+  //F
+  stl_input_iterator<tp::const_ndarray> it2(F);
+  std::vector<blitz::Array<double,2> > Fref;
+  Fref.reserve(len(F));
+  for (; it2 != end; ++it2) Fref.push_back((*it2).bz<double,2>());
+
+  t.train(Nref, Fref, n_iter);
 }
 
 static void jfa_train_noinit(train::JFABaseTrainer& t, list list_stats, const size_t n_iter)
@@ -191,6 +209,46 @@ static tuple get_z (const train::JFABaseTrainer& obj) {
   return as_tuple(obj.getZ());
 }
 
+static void jfa_set_stats(train::JFABaseTrainer& t, object N,
+    object F) {
+  //N
+  stl_input_iterator<tp::const_ndarray> it(N), end;
+  std::vector<blitz::Array<double,2> > Nref;
+  Nref.reserve(len(N));
+  for (; it != end; ++it) Nref.push_back((*it).bz<double,2>());
+
+  //F
+  stl_input_iterator<tp::const_ndarray> it2(F);
+  std::vector<blitz::Array<double,2> > Fref;
+  Fref.reserve(len(F));
+  for (; it2 != end; ++it2) Fref.push_back((*it2).bz<double,2>());
+
+  t.setStatistics(Nref, Fref);
+}
+
+static void jfa_set_speaker_factors(train::JFABaseTrainer& t, 
+    object x, object y, object z) {
+  //x
+  stl_input_iterator<tp::const_ndarray> it(x), end;
+  std::vector<blitz::Array<double,2> > xref;
+  xref.reserve(len(x));
+  for (; it != end; ++it) xref.push_back((*it).bz<double,2>());
+
+  //y
+  stl_input_iterator<tp::const_ndarray> it2(y);
+  std::vector<blitz::Array<double,1> > yref;
+  yref.reserve(len(y));
+  for (; it2 != end; ++it2) yref.push_back((*it2).bz<double,1>());
+
+  //z
+  stl_input_iterator<tp::const_ndarray> it3(z);
+  std::vector<blitz::Array<double,1> > zref;
+  zref.reserve(len(z));
+  for (; it3 != end; ++it3) zref.push_back((*it3).bz<double,1>());
+
+  t.setSpeakerFactors(xref, yref, zref);
+}
+
 void bind_trainer_jfa() {
   def("jfa_updateEigen", &update_eigen, (arg("A"), arg("C"), arg("uv")), "Updates eigenchannels (or eigenvoices) from accumulators A and C.");
   def("jfa_estimateXandU", &estimate_xandu, (arg("F"), arg("N"), arg("m"), arg("E"), arg("d"), arg("v"), arg("u"), arg("z"), arg("y"), arg("x"), arg("spk_ids")), "Estimates the channel factors.");
@@ -210,9 +268,9 @@ void bind_trainer_jfa() {
     .add_property("Fn_y_i", make_function(&train::JFABaseTrainer::getFn_y_i, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setFn_y_i)
     .add_property("A1_y", make_function(&train::JFABaseTrainer::getA1_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA1_y)
     .add_property("A2_y", make_function(&train::JFABaseTrainer::getA2_y, return_value_policy<copy_const_reference>()), &train::JFABaseTrainer::setA2_y)
-    .def("setStatistics", &train::JFABaseTrainer::setStatistics, (arg("self"), arg("N"), arg("F")), "Set the zeroth and first order statistics.")
-    .def("setSpeakerFactors", &train::JFABaseTrainer::setSpeakerFactors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
-    .def("train", (void (train::JFABaseTrainer::*)(const std::vector<blitz::Array<double,2> >&, const std::vector<blitz::Array<double,2> >&, const size_t))&train::JFABaseTrainer::train, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
+    .def("setStatistics", &jfa_set_stats, (arg("self"), arg("N"), arg("F")), "Set the zeroth and first order statistics.")
+    .def("setSpeakerFactors", &jfa_set_speaker_factors, (arg("self"), arg("x"), arg("y"), arg("z")), "Set the speaker factors.")
+    .def("train", &jfa_train_vector, (arg("self"), arg("N"), arg("F"), arg("n_iter")), "Call the training procedure.")
     .def("train", &jfa_train, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     .def("trainNoInit", &jfa_train_noinit, (arg("self"), arg("gmm_stats"), arg("n_iter")), "Call the training procedure.")
     .def("trainISV", &jfa_train_ISV, (arg("self"), arg("gmm_stats"), arg("n_iter"), arg("relevance")), "Call the ISV training procedure.")

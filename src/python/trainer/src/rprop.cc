@@ -20,11 +20,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/python.hpp>
+#include "core/python/ndarray.h"
+#include <boost/python/stl_iterator.hpp>
+#include <boost/make_shared.hpp>
 #include "trainer/DataShuffler.h"
 #include "trainer/MLPRPropTrainer.h"
 
 using namespace boost::python;
+namespace tp = Torch::python;
 namespace io = Torch::io;
 namespace mach = Torch::machine;
 namespace train = Torch::trainer;
@@ -51,9 +54,44 @@ static tuple stdnorm(train::DataShuffler& s) {
   return make_tuple(mean, stddev);
 }
 
+static boost::shared_ptr<train::DataShuffler> shuffler_from_arrays
+(object data, object target) {
+  //data
+  stl_input_iterator<tp::const_ndarray> vdata(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  vdata_ref.reserve(len(data));
+  for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,2>());
+
+  //target
+  stl_input_iterator<tp::const_ndarray> vtarget(target), tend;
+  std::vector<blitz::Array<double,1> > vtarget_ref;
+  vtarget_ref.reserve(len(target));
+  for (; vtarget != tend; ++vtarget) 
+    vtarget_ref.push_back((*vtarget).bz<double,1>());
+
+  return boost::make_shared<train::DataShuffler>(vdata_ref, vtarget_ref);
+}
+
+static boost::shared_ptr<train::DataShuffler> shuffler_from_arraysets
+(object data, object target) {
+  //data
+  stl_input_iterator<io::Arrayset> dbegin(data), dend;
+  std::vector<io::Arrayset> vdata_ref(dbegin, dend);
+
+  //target
+  stl_input_iterator<tp::const_ndarray> vtarget(target), tend;
+  std::vector<blitz::Array<double,1> > vtarget_ref;
+  vtarget_ref.reserve(len(target));
+  for (; vtarget != tend; ++vtarget) 
+    vtarget_ref.push_back((*vtarget).bz<double,1>());
+
+  return boost::make_shared<train::DataShuffler>(vdata_ref, vtarget_ref);
+}
+
 void bind_trainer_rprop() {
-  class_<train::DataShuffler>("DataShuffler", "A data shuffler is capable of being populated with data from one or multiple classes and matching target values. Once setup, the shuffer can randomly select a number of vectors and accompaning targets for the different classes, filling up user containers.\n\nData shufflers are particular useful for training neural networks.", init<const std::vector<blitz::Array<double,2> >&, const std::vector<blitz::Array<double,1> >&>((arg("data"), arg("target")), "Initializes the shuffler with some data classes and corresponding targets. The data is read by considering examples are lying on different rows of the input data."))
-    .def(init<const std::vector<io::Arrayset>&, const std::vector<blitz::Array<double,1> >&>((arg("data"), arg("target")), "Initializes the shuffler with some data classes and corresponding targets. The Arrayset data is copied internally for efficiency reasons."))
+  class_<train::DataShuffler, boost::shared_ptr<train::DataShuffler> >("DataShuffler", "A data shuffler is capable of being populated with data from one or multiple classes and matching target values. Once setup, the shuffer can randomly select a number of vectors and accompaning targets for the different classes, filling up user containers.\n\nData shufflers are particular useful for training neural networks.", no_init)
+    .def("__init__", make_constructor(&shuffler_from_arrays, default_call_policies(), (arg("data"), arg("target"))), "Initializes the shuffler with some data classes and corresponding targets. The data is read by considering examples are lying on different rows of the input data.")
+    .def("__init__", make_constructor(&shuffler_from_arraysets, default_call_policies(), (arg("data"), arg("target"))), "Initializes the shuffler with some data classes and corresponding targets. The Arrayset data is copied internally for efficiency reasons.")
     .def("stdnorm", &train::DataShuffler::getStdNorm, (arg("self"), arg("mean"), arg("stddev")), "Calculates and returns mean and standard deviation from the input data.")
     .def("stdnorm", &stdnorm, (arg("self")), "Calculates and returns mean and standard deviation from the input data.")
     .add_property("auto_stdnorm", &train::DataShuffler::getAutoStdNorm, &train::DataShuffler::setAutoStdNorm)

@@ -20,7 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/make_shared.hpp>
 #include "core/python/ndarray.h"
+#include <boost/python/stl_iterator.hpp>
 #include "machine/MLP.h"
 #include "machine/MLPException.h"
 
@@ -36,6 +38,12 @@ static tuple get_shape(const mach::MLP& m) {
   const std::vector<blitz::Array<double,1> >& bias = m.getBiases();
   for (size_t i=0; i<bias.size(); ++i) retval.append(bias[i].extent(0));
   return tuple(retval);
+}
+
+static void set_shape(mach::MLP& m, object shape) {
+  stl_input_iterator<size_t> begin(shape), end;
+  std::vector<size_t> vshape(begin, end);
+  m.resize(vshape);
 }
 
 static object forward1(const mach::MLP& m, tp::const_ndarray input) {
@@ -169,7 +177,9 @@ static void set_weight(mach::MLP& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    m.setWeights(extract<std::vector<blitz::Array<double,2> > >(o));
+    stl_input_iterator<blitz::Array<double,2> > begin(o), end;
+    std::vector<blitz::Array<double,2> > vec(begin, end);
+    m.setWeights(vec);
   }
 }
 
@@ -193,7 +203,9 @@ static void set_bias(mach::MLP& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    m.setBiases(extract<std::vector<blitz::Array<double,1> > >(o));
+    stl_input_iterator<blitz::Array<double,1> > begin(o), end;
+    std::vector<blitz::Array<double,1> > vec(begin, end);
+    m.setBiases(vec);
   }
 }
 
@@ -215,9 +227,15 @@ static void random3(Torch::machine::MLP& M,
   M.randomize(rng, lower_bound, upper_bound);
 }
 
+static boost::shared_ptr<mach::MLP> mlp_from_shape(object shape) {
+  stl_input_iterator<size_t> begin(shape), end;
+  std::vector<size_t> vshape(begin, end);
+  return boost::make_shared<mach::MLP>(vshape);
+}
+
 void bind_machine_mlp() {
-  class_<mach::MLP, boost::shared_ptr<mach::MLP>
-    >("MLP", "An MLP object is a representation of a Multi-Layer Perceptron. This implementation is feed-forward and fully-connected. The implementation allows setting of input normalization values and a global activation function. References to fully-connected feed-forward networks: Bishop's Pattern Recognition and Machine Learning, Chapter 5. Figure 5.1 shows what we mean.\n\nMLPs normally are multi-layered systems, with 1 or more hidden layers. As a special case, this implementation also supports connecting the input directly to the output by means of a single weight matrix. This is equivalent of a LinearMachine, with the advantage it can be trained by MLP trainers.", init<const std::vector<size_t>&>((arg("shape")), "Builds a new MLP with a shape containing the number of inputs (first element), number of outputs (last element) and the number of neurons in each hidden layer (elements between the first and last element of given tuple). The default activation function will be set to hyperbolic tangent."))
+  class_<mach::MLP, boost::shared_ptr<mach::MLP> >("MLP", "An MLP object is a representation of a Multi-Layer Perceptron. This implementation is feed-forward and fully-connected. The implementation allows setting of input normalization values and a global activation function. References to fully-connected feed-forward networks: Bishop's Pattern Recognition and Machine Learning, Chapter 5. Figure 5.1 shows what we mean.\n\nMLPs normally are multi-layered systems, with 1 or more hidden layers. As a special case, this implementation also supports connecting the input directly to the output by means of a single weight matrix. This is equivalent of a LinearMachine, with the advantage it can be trained by MLP trainers.", no_init)
+    .def("__init__", make_constructor(&mlp_from_shape, default_call_policies(), (arg("shape"))), "Builds a new MLP with a shape containing the number of inputs (first element), number of outputs (last element) and the number of neurons in each hidden layer (elements between the first and last element of given tuple). The default activation function will be set to hyperbolic tangent.")
     .def(init<io::HDF5File&>((arg("config")), "Constructs a new MLP from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
     .def(init<const mach::MLP&>((arg("machine")), "Copy constructs an MLP machine"))
     .def("load", &mach::MLP::load, (arg("self"), arg("config")), "Loads the weights, biases and other configuration parameter sfrom a configuration file.")
@@ -227,7 +245,7 @@ void bind_machine_mlp() {
     .add_property("weights", &get_weight, &set_weight)
     .add_property("biases", &get_bias, &set_bias)
     .add_property("activation", &mach::MLP::getActivation, &mach::MLP::setActivation)
-    .add_property("shape", &get_shape, (void (mach::MLP::*)(const std::vector<size_t>&))&mach::MLP::resize)
+    .add_property("shape", &get_shape, &set_shape)
     .def("__call__", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
     .def("forward", &forward2, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
     .def("forward_", &forward2_, (arg("self"), arg("input"), arg("output")), "Projects the input to the weights and biases and saves results on the output. You can either pass an input with 1 or 2 dimensions. If 2D, it is the same as running the 1D case many times considering as input to be every row in the input matrix.")
