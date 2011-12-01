@@ -36,11 +36,8 @@ A little help for you to migrate:
 
   Before: x.extent(0)
   After: x.shape[0]
-* Arrayset.cat() has been revamped to use the numpy functions hstack, vstack
-  and dstack. If you used the parameter "firstDim" before with a True setting,
-  just say Arrayset.cat(axis=1). If you set it false (the default), you don't
-  have to change anything. This method is a little bit unstable and things may
-  change stil.
+* Arrayset.cat() has been removed. Please use one of the numpy.?stack variants
+  (i.e., hstack, vstack or dstack).
 * Arrayset.extend() not longer accepts Arrays for extension. You must do a
   get() on the io.Array() before passing the result to Arrayset.extend().
 * Note that numpy.ndarray.fill() does not fill the array contents, but reset

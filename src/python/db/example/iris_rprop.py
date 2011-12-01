@@ -35,7 +35,7 @@ def generate_testdata(data, target):
   retval.fill(0)
   cur = 0
   for k, d in enumerate(data):
-    retval[cur:(cur+len(d)),:] = d.cat()
+    retval[cur:(cur+len(d)),:] = numpy.vstack(d)
     for i in range(len(d)):
       t_retval[i+cur,:] = target[k]
     cur += len(d)
@@ -92,13 +92,6 @@ def process_data(machine, data):
 
   return output
 
-def vcat(a1, a2):
-  """Concatenates 2 1D arrays"""
-  retval = a1.__class__(a1.shape[0] + a2.shape[0])
-  retval[:a1.shape[0]] = a1
-  retval[a1.shape[0]:] = a2
-  return retval
-
 def plot(output):
   """Plots each of the outputs, with the classes separated by colors.
   """
@@ -108,7 +101,7 @@ def plot(output):
   histo = [{}, {}, {}]
   for k in output.keys():
     for i in range(len(histo)):
-      histo[i][k] = output[k].cat()[i,:]
+      histo[i][k] = numpy.vstack(output[k])[:,i]
 
   order = ['setosa', 'versicolor', 'virginica']
   color = ['green', 'blue', 'red']
@@ -119,8 +112,8 @@ def plot(output):
 
   # Calculates separability
   for i, O in enumerate(order):
-    positives = histo[i][O]
-    negatives = vcat(*[histo[i][k] for k in order if k != O])
+    positives = histo[i][O].copy() #make it C-style contiguous
+    negatives = numpy.hstack([histo[i][k] for k in order if k != O])
     # note: threshold a posteriori! (don't do this at home, kids ;-)
     thres = torch.measure.eerThreshold(negatives, positives)
     far, frr = torch.measure.farfrr(negatives, positives, thres)

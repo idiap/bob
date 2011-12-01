@@ -16,7 +16,7 @@ class StatsTest(unittest.TestCase):
 
   def setUp(self):
 
-    self.data = torch.db.iris.data()['setosa'].cat()
+    self.data = numpy.vstack(torch.db.iris.data()['setosa'])
  
   def test01_scatter(self):
 
