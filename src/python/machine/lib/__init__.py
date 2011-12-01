@@ -76,3 +76,5 @@ def ztnormSameValue(vect_A, vect_B):
     for i in range(len(vect_B)):
       sameMatrix[j, i] = (vect_A[j] == vect_B[i])
   return sameMatrix
+
+__all__ = dir()

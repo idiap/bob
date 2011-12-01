@@ -456,5 +456,5 @@ versions of the external dependencies so we can try to reproduce the failure.
 .. _qt4: http://qt.nokia.com/ 
 .. _git: http://git-scm.com/
 .. _vlfeat: http://www.vlfeat.org/
-.. _vlfeat launchpad page: https://launchpad.net/~gezakovacs/+archive/vlfeat
+.. _vlfeat launchpad webpage: https://launchpad.net/~gezakovacs/+archive/vlfeat
 .. _fftw: http://www.fftw.org/
