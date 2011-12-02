@@ -4,7 +4,6 @@
 project(torch-cxx)
 cmake_minimum_required(VERSION 2.6)
 
-add_subdirectory(dfftpack41)
 add_subdirectory(lbfgs)
 add_subdirectory(core)
 add_subdirectory(io)

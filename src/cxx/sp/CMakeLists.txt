@@ -2,7 +2,7 @@ project(sp-cxx)
 cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
-set(deps core dfftpack41) #other torch subprojects
+set(deps core) #other torch subprojects
 set(shared "${FFTW3_LIBRARY}")
 
 # This defines the list of source files inside this package.

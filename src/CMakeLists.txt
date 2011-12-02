@@ -27,10 +27,8 @@ set(COMMON_FLAGS "${COMMON_FLAGS} -D__STDC_CONSTANT_MACROS -pthread -g -Wall -pe
 
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_Fortran_FLAGS_RELEASE "${COMMON_FLAGS} -O2 -funroll-loops")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DTORCH_DEBUG")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
-set(CMAKE_Fortran_FLAGS_DEBUG "${COMMON_FLAGS}")
 
 # This is our RPATH policy
 # use, i.e. don't skip the full RPATH for the build tree

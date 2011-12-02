@@ -221,7 +221,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools0 ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-argparse python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
 
 .. note::
 
@@ -254,7 +254,7 @@ A single command line that will install all required packages under Ubuntu
 
 .. code-block:: sh
 
-   $ sudo apt-get install git-core cmake gfortran liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
+   $ sudo apt-get install git-core cmake liblapack-dev libatlas-base-dev libblitz0-dev libgoogle-perftools-dev ffmpeg libavcodec-dev libswscale-dev libboost-all-dev libavformat-dev graphviz libxml2-dev libmatio-dev libmagick++9-dev python-scipy python-numpy python-matplotlib ipython h5utils hdf5-tools libhdf5-doc python-h5py python-tables python-tables-doc libhdf5-serial-dev python-sqlalchemy python-sphinx dvipng libqt4-dev libfftw3-dev
 
 .. note::
 
@@ -321,17 +321,6 @@ plain gcc. After running the command above, do the following:
      $ sudo gcc_select llvm-gcc42
      #or
      $ sudo gcc_select mp-llvm-gcc42
-
-We also have fortran files that need compilation. Make sure ``gfortran`` is
-accessible from the command line before trying to compile. Specifically, the
-MacPorts installation may not put ``gfortran`` on the command line if you
-select specific compilers which don't have a gfortran frontend.  To make cmake
-find the fortran compiler you will have to create, manually, a symbolic link
-from this binary. Here are the instructions:
-
-.. code-block:: sh
-
-   $ cd /opt/local/bin; sudo ln -s gfortran-mp-4.4 gfortran
 
 .. warning::
    * Torch/Blitz python bindings will not compile in **release** mode with plain
