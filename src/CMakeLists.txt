@@ -8,27 +8,39 @@ cmake_minimum_required(VERSION 2.6)
 set(TORCH_DATABASE_URL "http://www.idiap.ch/software/torch5spro/chrome/site/databases/")
 set(TORCH_DATABASE_VERSION "nightlies/last")
 
-# Force __LP64__ scheme on OSX
-if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+# Force __LP64__ scheme on Mac OSX
+if(APPLE)
   set(COMMON_FLAGS "-m64")
   # Bogus on OSX?
   set(CMAKE_INCLUDE_SYSTEM_FLAG_C "-isystem ")
   set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX "-isystem ")
-endif((${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+endif(APPLE)
 
-# We allow you to force the compilation to be done using a base 32-bit
-# architecture if you call cmake with "-DTORCH_FORCE_32BITS=yes"
-if(TORCH_FORCE_32BITS)
-  set(COMMON_FLAGS "-m32")
-endif(TORCH_FORCE_32BITS)
+set(COMMON_FLAGS "${COMMON_FLAGS} -D__STDC_CONSTANT_MACROS -g -Wall -pedantic")
 
-# Set the compiler flags and build type(release or debug)
-set(COMMON_FLAGS "${COMMON_FLAGS} -D__STDC_CONSTANT_MACROS -pthread -g -Wall -pedantic")
+if (CMAKE_COMPILER_IS_GNUCC)
 
-set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DTORCH_DEBUG")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  # Set the compiler flags and build type(release or debug)
+  set(COMMON_FLAGS "${COMMON_FLAGS} -pthread")
+
+  set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
+
+  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DTORCH_DEBUG")
+
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+
+else (CMAKE_COMPILER_IS_GNUCC)
+
+  # Then, it must be clang/clang++
+  set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -O2 -mtune=generic")
+
+  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -Wno-variadic-macros -Wno-long-long -DTORCH_DEBUG")
+
+  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+
+endif (CMAKE_COMPILER_IS_GNUCC)
 
 # This is our RPATH policy
 # use, i.e. don't skip the full RPATH for the build tree

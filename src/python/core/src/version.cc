@@ -64,20 +64,16 @@ static str boost_version() {
  * Describes the compiler version
  */
 static tuple compiler_version() {
-# if defined(__GNUC__)
+# if defined(__GNUC__) && !defined(__llvm__)
   boost::format f("%s.%s.%s");
   f % BOOST_PP_STRINGIZE(__GNUC__);
   f % BOOST_PP_STRINGIZE(__GNUC_MINOR__);
   f % BOOST_PP_STRINGIZE(__GNUC_PATCHLEVEL__);
   return make_tuple(str("gcc"), str(f.str()));
-# elif defined(__llvm__)
-  return make_tuple(str("llvm"), str(BOOST_PP_STRINGIZE(__llvm__)));
+# elif defined(__llvm__) && !defined(__clang__)
+  return make_tuple(str("llvm-gcc"), str(__VERSION__));
 # elif defined(__clang__)
-  boost::format f("clang %s.%s.%s");
-  f % BOOST_PP_STRINGIZE(__clang_major__);
-  f % BOOST_PP_STRINGIZE(__clang_minor__);
-  f % BOOST_PP_STRINGIZE(__clang_patchlevel__);
-  return make_tuple(str("clang"), str(f.str()));
+  return make_tuple(str("clang"), str(__clang_version__));
 # else
   return str("unsupported");
 # endif

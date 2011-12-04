@@ -509,10 +509,6 @@ def platform(option):
   if arch == '32bit': arch = 'i686'
   elif arch == '64bit': arch = 'x86_64'
 
-  if hasattr(option, "force_32bits") and option.force_32bits: 
-    logging.warn("Forcing 32-bits compilation")
-    arch = 'i686'
-
   return '%s-%s-%s' % (base, arch, option.build_type)
 
 def action(what, option, *args):

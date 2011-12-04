@@ -191,14 +191,18 @@ namespace Torch { namespace io {
        * multiarrays saved have the same dimensions.
        */
       template <typename T, int D> inline blitz::Array<T,D> read() {
-        Torch::core::array::interface buf;
+        Torch::core::array::typeinfo info;
+        peek(info);
+        Torch::core::array::blitz_array buf(info);
         read(buf);
         return Torch::core::array::cast<T,D>(buf);
       }
 
       template <typename T, int D> inline blitz::Array<T,D> read(size_t
           index) { 
-        Torch::core::array::interface buf;
+        Torch::core::array::typeinfo info;
+        peek(info);
+        Torch::core::array::blitz_array buf(info);
         read(index, buf);
         return Torch::core::array::cast<T,D>(buf);
       }

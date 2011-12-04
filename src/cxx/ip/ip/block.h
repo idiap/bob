@@ -151,35 +151,6 @@ namespace Torch {
     }
 
     /**
-      * @brief Function which performs a decomposition by block of a 2D 
-      *   blitz::array/image of a given type.
-      *   The first dimension is the height (y-axis), whereas the second
-      *   one is the width (x-axis).
-      * @param src The input blitz array
-      * @param dst The STL container of 2D block blitz arrays. The STL 
-      *   container requires to support the push_back method, such as
-      *   a STL vector or list.
-      * @param block_w The desired width of the blocks.
-      * @param block_h The desired height of the blocks.
-      * @param overlap_w The overlap between each block along the x axis.
-      * @param overlap_h The overlap between each block along the y axis.
-      */
-    template<typename T>
-    void block(const blitz::Array<T,2>& src, blitz::Array<T,3>& dst, 
-      const int block_h, const int block_w, const int overlap_h, 
-      const int overlap_w)
-    {
-      // Check input
-      detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
-      blitz::TinyVector<int,3> shape = 
-        getBlockShape(src, block_h, block_w, overlap_h, overlap_w);
-      Torch::core::array::assertSameShape( dst, shape);
-
-      // Crop the 2D array
-      detail::blockNoCheck(src, dst, block_h, block_w, overlap_h, overlap_w);
-    }
-
-    /**
       * @brief Function which returns the number of blocks when applying 
       *   a decomposition by block of a 2D blitz::array/image of a given type.
       *   The first dimension is the height (y-axis), whereas the second
@@ -209,6 +180,35 @@ namespace Torch {
       // Return the shape of the output
       blitz::TinyVector<int,3> res( n_blocks_h*n_blocks_w, block_h, block_w);
       return res;
+    }
+
+    /**
+      * @brief Function which performs a decomposition by block of a 2D 
+      *   blitz::array/image of a given type.
+      *   The first dimension is the height (y-axis), whereas the second
+      *   one is the width (x-axis).
+      * @param src The input blitz array
+      * @param dst The STL container of 2D block blitz arrays. The STL 
+      *   container requires to support the push_back method, such as
+      *   a STL vector or list.
+      * @param block_w The desired width of the blocks.
+      * @param block_h The desired height of the blocks.
+      * @param overlap_w The overlap between each block along the x axis.
+      * @param overlap_h The overlap between each block along the y axis.
+      */
+    template<typename T>
+    void block(const blitz::Array<T,2>& src, blitz::Array<T,3>& dst, 
+      const int block_h, const int block_w, const int overlap_h, 
+      const int overlap_w)
+    {
+      // Check input
+      detail::blockCheckInput( src, block_h, block_w, overlap_h, overlap_w);
+      blitz::TinyVector<int,3> shape = 
+        getBlockShape(src, block_h, block_w, overlap_h, overlap_w);
+      Torch::core::array::assertSameShape( dst, shape);
+
+      // Crop the 2D array
+      detail::blockNoCheck(src, dst, block_h, block_w, overlap_h, overlap_w);
     }
 
     /**

@@ -37,51 +37,6 @@ namespace Torch {
 	 */
 	namespace ip {
 
-    namespace detail {
-      /**
-        * @brief Update the output array by making the point with the given
-        * coordinates on the input array/image, the center of the output 
-        * (larger) array/image.
-        * @param src The input array
-        * @param src_mask The input blitz array mask, specifying the valid
-        *   pixels of src.
-        * @param dst The output array which should have the expected size. This 
-        *   size can be obtained calling the getGenerateWithCenterShape() 
-        *   function
-        * @param dst_mask The input blitz array mask, specifying the valid
-        *   pixels of dst.
-        * @param target_center_h The y-coordinates of the point of the input 
-        *   image which will becomes the center of the output array/image.
-        * @param target_center_w The x-coordinates of the point of the input 
-        *   image which will becomes the center of the output array/image.
-        */
-      template <typename T, bool mask>
-      void generateWithCenterNoCheck( const blitz::Array<T,2>& src, 
-        const blitz::Array<bool,2>& src_mask, blitz::Array<T,2>& dst,
-        blitz::Array<bool,2>& dst_mask, const int target_center_h, 
-        const int target_center_w)
-      {
-        // Compute offsets
-        const blitz::TinyVector<int,2> offset =
-          getGenerateWithCenterOffset(src,target_center_h,target_center_w);
-
-        // Update output mask
-        dst_mask = false;
-
-        /// Update output content
-        dst = 0.;
-        blitz::Range src_h(0,src.extent(0)-1);
-        blitz::Range src_w(0,src.extent(1)-1);
-        blitz::Range dst1_h(offset(0),offset(0)+src.extent(0)-1);
-        blitz::Range dst1_w(offset(1),offset(1)+src.extent(1)-1);
-        dst(dst1_h,dst1_w) = src(src_h,src_w);
-
-        // Output mask
-        if(mask)
-          dst_mask(dst1_h,dst1_w) = src_mask(src_h,src_w);
-      }
-    }
-
     /**
       * @brief Return the shape of an image, where the point with the given 
       * coordinates on the input array/image, will be the center on a new 
@@ -127,6 +82,51 @@ namespace Torch {
         floor(2*fabs(src_center_w-target_center_w)) );
 
       return res;
+    }
+
+    namespace detail {
+      /**
+        * @brief Update the output array by making the point with the given
+        * coordinates on the input array/image, the center of the output 
+        * (larger) array/image.
+        * @param src The input array
+        * @param src_mask The input blitz array mask, specifying the valid
+        *   pixels of src.
+        * @param dst The output array which should have the expected size. This 
+        *   size can be obtained calling the getGenerateWithCenterShape() 
+        *   function
+        * @param dst_mask The input blitz array mask, specifying the valid
+        *   pixels of dst.
+        * @param target_center_h The y-coordinates of the point of the input 
+        *   image which will becomes the center of the output array/image.
+        * @param target_center_w The x-coordinates of the point of the input 
+        *   image which will becomes the center of the output array/image.
+        */
+      template <typename T, bool mask>
+      void generateWithCenterNoCheck( const blitz::Array<T,2>& src, 
+        const blitz::Array<bool,2>& src_mask, blitz::Array<T,2>& dst,
+        blitz::Array<bool,2>& dst_mask, const int target_center_h, 
+        const int target_center_w)
+      {
+        // Compute offsets
+        const blitz::TinyVector<int,2> offset =
+          getGenerateWithCenterOffset(src,target_center_h,target_center_w);
+
+        // Update output mask
+        dst_mask = false;
+
+        /// Update output content
+        dst = 0.;
+        blitz::Range src_h(0,src.extent(0)-1);
+        blitz::Range src_w(0,src.extent(1)-1);
+        blitz::Range dst1_h(offset(0),offset(0)+src.extent(0)-1);
+        blitz::Range dst1_w(offset(1),offset(1)+src.extent(1)-1);
+        dst(dst1_h,dst1_w) = src(src_h,src_w);
+
+        // Output mask
+        if(mask)
+          dst_mask(dst1_h,dst1_w) = src_mask(src_h,src_w);
+      }
     }
 
     /**
