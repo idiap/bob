@@ -83,22 +83,21 @@ namespace Torch {
       /**
        * Transpose 2 dimensions of a tensor
        */
-      virtual void transpose(const Tensor *src, int dimension1_, 
-          int dimension2_);
+      void transpose(const Tensor *src, int dimension1_, int dimension2_);
 
       /**
        * Narrow a tensor along dimension #dimension_# starting at slice
        * #firstIndex_# and of #size_# slices
        */
-      virtual void narrow(const Tensor *src, int dimension_, long firstIndex_,
+      void narrow(const Tensor *src, int dimension_, long firstIndex_,
           long size_);
 
       // select a tensor along dimension #dimension_# at slice #sliceIndex_#
-      virtual void select(const Tensor *src, int dimension_, long sliceIndex_);
+      void select(const Tensor *src, int dimension_, long sliceIndex_);
 
       // select a new tensor along dimension #dimension_# at slice
       // #sliceIndex_#
-      virtual Tensor* select(int dimension_, long sliceIndex_) const;
+      Tensor* select(int dimension_, long sliceIndex_) const;
 
       /**
        * Print the tensor

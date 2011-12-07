@@ -17,8 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef _ZTNORM_H
-#define _ZTNORM_H
+
+#ifndef TORCH_ZTNORM_H
+#define TORCH_ZTNORM_H
 
 #include <blitz/array.h>
 #include <machine/GMMMachine.h>
@@ -65,4 +66,4 @@ namespace Torch { namespace machine {
 }
 }
 
-#endif // _ZTNORM_H
+#endif /* TORCH_ZTNORM_H */

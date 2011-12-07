@@ -105,7 +105,7 @@ namespace Torch
        * @param dimension1_ index of the (first) dimension to transpose
        * @param dimension2_ index of the (second) dimension to transpose
        */
-      virtual void transpose(const TensorTemplate<T> *src, int dimension1_,
+      void transpose(const TensorTemplate<T> *src, int dimension1_,
           int dimension2_);
       /**
        * Create a reference to a part of a Tensor
@@ -119,7 +119,7 @@ namespace Torch
        * @param size_ The number of indices to keep along dimension_ starting
        * from firstIndex_
        */
-      virtual void narrow(const TensorTemplate<T> *src, int dimension_,
+      void narrow(const TensorTemplate<T> *src, int dimension_,
           long firstIndex_, long size_);
 
       /**
@@ -130,15 +130,14 @@ namespace Torch
        * @param sliceIndex The index along dimension_ from which values are
        * selected
        */
-      virtual void select(const TensorTemplate<T> *src, int dimension_, 
+      void select(const TensorTemplate<T> *src, int dimension_, 
           long sliceIndex_);
 
       /**
        * Select values from this Tensor and return a new one
        * @see select()
        */
-      virtual TensorTemplate<T>* select(int dimension_, 
-          long sliceIndex_) const;
+      TensorTemplate<T>* select(int dimension_, long sliceIndex_) const;
 
       /**
        * Print a Tensor

@@ -80,39 +80,6 @@ namespace Torch { namespace python {
   void setup_python(const char* module_docstring);
 
   /**
-   * Creates an auto-deletable bp::object out of a standard Python object that
-   * cannot be NULL. Can be Py_NONE.
-   *
-   * Effects:
-   *
-   * The PyObject* is **not** XINCREF'ed at construction.
-   * The PyObject* is XDECREF'ed at destruction.
-   */
-  boost::python::object make_non_null_object(PyObject* obj);
-
-  /**
-   * Creates an auto-deletable bp::object out of a standard Python object, that
-   * may be NULL (or Py_NONE).
-   *
-   * Effects:
-   *
-   * The PyObject* is **not** XINCREF'ed at construction.
-   * The PyObject* is XDECREF'ed at destruction.
-   */
-  boost::python::object make_maybe_null_object(PyObject* obj);
-
-  /**
-   * Creates an auto-deletable bp::object out of a standard Python object. The
-   * input object cannot be NULL, but can be Py_NONE.
-   *
-   * Effects:
-   *
-   * The PyObject* is XINCREF'ed at construction.
-   * The PyObject* is XDECREF'ed at destruction.
-   */
-  boost::python::object make_non_null_borrowed_object(PyObject* obj);
-
-  /**
    * A generic method to convert from ndarray type_num to torch's ElementType
    */
   Torch::core::array::ElementType num_to_type(int num);

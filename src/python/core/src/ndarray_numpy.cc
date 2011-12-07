@@ -68,7 +68,9 @@ struct ndarray_from_npy {
     //black-magic required to setup the tp::ndarray storage area
     void* storage = ((bp::converter::rvalue_from_python_storage<tp::ndarray>*)data)->storage.bytes;
 
-    new (storage) tp::ndarray(tp::make_non_null_borrowed_object(obj_ptr));
+    bp::handle<> hdl(bp::borrowed(obj_ptr));
+    bp::object tmp(hdl);
+    new (storage) tp::ndarray(tmp);
     data->convertible = storage;
 
   }
@@ -118,7 +120,8 @@ struct const_ndarray_from_npy {
    * an ndarray. To do that, the object has to convertible to a NumPy ndarray.
    */
   static void* convertible(PyObject* obj_ptr) {
-    bp::object obj = tp::make_non_null_borrowed_object(obj_ptr);
+    bp::handle<> hdl(bp::borrowed(obj_ptr));
+    bp::object obj(hdl);
     if (tp::convertible_to(obj, false, true)) //writeable=false, behaved=true
       return obj_ptr;
     return 0;
@@ -135,7 +138,9 @@ struct const_ndarray_from_npy {
     //black-magic required to setup the tp::ndarray storage area
     void* storage = ((bp::converter::rvalue_from_python_storage<tp::const_ndarray>*)data)->storage.bytes;
 
-    new (storage) tp::const_ndarray(tp::make_non_null_borrowed_object(obj_ptr));
+    bp::handle<> hdl(bp::borrowed(obj_ptr));
+    bp::object tmp(hdl);
+    new (storage) tp::const_ndarray(tmp);
     data->convertible = storage;
 
   }

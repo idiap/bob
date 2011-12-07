@@ -85,24 +85,6 @@ void tp::setup_python(const char* module_docstring) {
  * Dtype (PyArray_Descr) manipulations                                     *
  ***************************************************************************/
 
-bp::object tp::make_non_null_object(PyObject* obj) {
-  bp::handle<> hdl(obj); //< raises if NULL
-  bp::object retval(hdl);
-  return retval;
-}
-
-bp::object tp::make_maybe_null_object(PyObject* obj) {
-  bp::handle<> hdl(bp::allow_null(obj));
-  bp::object retval(hdl);
-  return retval;
-}
-
-bp::object tp::make_non_null_borrowed_object(PyObject* obj) {
-  bp::handle<> hdl(bp::borrowed(obj));
-  bp::object retval(hdl);
-  return retval;
-}
-
 int tp::type_to_num(ca::ElementType type) {
 
   switch(type) {
@@ -239,22 +221,28 @@ tp::dtype::dtype (bp::object dtype_like) {
     std::string dtype_str = bp::extract<std::string>(bp::str(dtype_like));
     PYTHON_ERROR(TypeError, "cannot convert input dtype-like object (%s) to proper dtype", dtype_str.c_str());
   }
-  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+  bp::handle<> hdl(bp::borrowed((PyObject*)tmp));
+  m_self = bp::object(hdl);
 }
 
 tp::dtype::dtype (PyArray_Descr* descr) {
-  if (descr) m_self = tp::make_non_null_object((PyObject*)descr);
+  if (descr) {
+    bp::handle<> hdl((PyObject*)descr); //< raises if NULL
+    m_self = bp::object(hdl);
+  }
 }
 
 tp::dtype::dtype(int typenum) {
   PyArray_Descr* tmp = PyArray_DescrFromType(typenum);
-  m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+  bp::handle<> hdl(bp::borrowed((PyObject*)tmp));
+  m_self = bp::object(hdl);
 }
 
 tp::dtype::dtype(ca::ElementType eltype) {
   if (eltype != ca::t_unknown) {
     PyArray_Descr* tmp = PyArray_DescrFromType(tp::type_to_num(eltype));
-    m_self = tp::make_non_null_borrowed_object((PyObject*)tmp);
+    bp::handle<> hdl(bp::borrowed((PyObject*)tmp));
+    m_self = bp::object(hdl);
   }
 }
 
@@ -363,8 +351,8 @@ static int _GetArrayParamsFromObject(PyObject* op,
   else { //it is not an array -- try a brute-force conversion
 
     TDEBUG1("[non-optimal] using NumPy version < 1.6 requires we convert input data for convertibility check - compile against NumPy >= 1.6 to improve performance");
-    bp::object array = 
-      tp::make_maybe_null_object(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0));
+    bp::handle<> hdl(bp::allow_null(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0)));
+    bp::object array(hdl);
     
     if (TPY_ISNONE(array)) return 1;
 
@@ -614,7 +602,9 @@ static bp::object try_refer_ndarray (boost::python::object array_like,
 
   if (can_refer) {
     PyObject* tmp = PyArray_FromArray(candidate, 0, 0);
-    return tp::make_non_null_object(tmp);
+    bp::handle<> hdl(tmp); //< raises if NULL
+    bp::object retval(hdl);
+    return retval;
   }
 
   //copy
@@ -626,7 +616,9 @@ static bp::object try_refer_ndarray (boost::python::object array_like,
   int flags = NPY_C_CONTIGUOUS|NPY_ENSURECOPY|NPY_ENSUREARRAY;
 #endif
   PyObject* tmp = PyArray_FromAny(_ptr, req_dtype, 0, 0, flags, 0);
-  return tp::make_non_null_object(tmp);
+  bp::handle<> hdl(tmp); //< raises if NULL
+  bp::object retval(hdl);
+  return retval;
 
 }
 
@@ -678,6 +670,7 @@ tp::py_array::~py_array() {
  */
 static bp::object wrap_data (void* data, const ca::typeinfo& ti,
     bool writeable=true) {
+  
   npy_intp shape[NPY_MAXDIMS];
   npy_intp stride[NPY_MAXDIMS];
   for (size_t k=0; k<ti.nd; ++k) {
@@ -685,14 +678,17 @@ static bp::object wrap_data (void* data, const ca::typeinfo& ti,
     stride[k] = ti.item_size()*ti.stride[k];
   }
   PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd,
-        &shape[0], tp::type_to_num(ti.dtype), &stride[0], data, 0, 
+        &shape[0], tp::type_to_num(ti.dtype), &stride[0], data, 0,
 #if NPY_FEATURE_VERSION > NUMPY16_API /* NumPy C-API version > 1.6 */
         writeable? NPY_ARRAY_CARRAY : NPY_ARRAY_CARRAY_RO
 #else
         writeable? NPY_CARRAY : NPY_CARRAY_RO
 #endif
         ,0);
-  return tp::make_non_null_object(tmp);
+
+  bp::handle<> hdl(tmp);
+  bp::object retval(hdl);
+  return retval;
 }
 
 /**
@@ -700,7 +696,9 @@ static bp::object wrap_data (void* data, const ca::typeinfo& ti,
  */
 static bp::object wrap_ndarray (const bp::object& a) {
   PyObject* tmp = PyArray_FromArray(TP_ARRAY(a), 0, 0); 
-  return tp::make_non_null_object(tmp);
+  bp::handle<> hdl(tmp); //< raises if NULL
+  bp::object retval(hdl);
+  return retval;
 }
 
 /**
@@ -708,7 +706,9 @@ static bp::object wrap_ndarray (const bp::object& a) {
  */
 static bp::object make_ndarray(int nd, npy_intp* dims, int type) {
   PyObject* tmp = PyArray_SimpleNew(nd, dims, type);
-  return tp::make_non_null_object(tmp);
+  bp::handle<> hdl(tmp); //< raises if NULL
+  bp::object retval(hdl);
+  return retval;
 }
 
 /**
@@ -768,7 +768,9 @@ static bp::object new_from_type (const ca::typeinfo& ti) {
   }
   PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd, &shape[0], 
       tp::type_to_num(ti.dtype), &stride[0], 0, 0, 0, 0);
-  return tp::make_non_null_object(tmp);
+  bp::handle<> hdl(tmp); //< raises if NULL
+  bp::object retval(hdl);
+  return retval;
 }
 
 void tp::py_array::set (const ca::typeinfo& req) {
@@ -828,7 +830,8 @@ static bp::object make_readonly (const void* data, const ca::typeinfo& ti,
 
 bp::object tp::py_array::pyobject() {
   if (m_is_numpy) {
-    bp::object mine = tp::make_non_null_borrowed_object(boost::static_pointer_cast<PyObject>(m_data).get());
+    bp::handle<> hdl(bp::borrowed(boost::static_pointer_cast<PyObject>(m_data).get()));
+    bp::object mine(hdl);
     return wrap_ndarray(mine);
   }
 

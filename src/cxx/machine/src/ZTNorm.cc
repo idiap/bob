@@ -17,10 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <machine/ZTNorm.h>
 
 namespace Torch { namespace machine {
+
   namespace detail {
+
     void ztNorm(blitz::Array<double, 2>& eval_tests_on_eval_models,
                 blitz::Array<double, 2>& znorm_tests_on_eval_models,
                 blitz::Array<double, 2>& eval_tests_on_tnorm_models,
@@ -128,5 +131,5 @@ namespace Torch { namespace machine {
     detail::ztNorm(eval_tests_on_eval_models, znorm_tests_on_eval_models, eval_tests_on_tnorm_models,
                    znorm_tests_on_tnorm_models, NULL, scores);
   }
-}
-}
+
+}}

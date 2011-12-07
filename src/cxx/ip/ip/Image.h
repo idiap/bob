@@ -55,7 +55,7 @@ namespace Torch {
 		~Image();
 
 		/// Resize the image (to new dimensions, no of planes and storage type)
-		bool			resize(int width, int height, int n_planes);
+		bool resize(int width, int height, int n_planes);
 
 		/// Copy from some 3D tensor (should have the same dimension)
 		///	- all planes are copied
