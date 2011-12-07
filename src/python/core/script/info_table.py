@@ -24,7 +24,8 @@ def version_table():
   version_dict.update(torch.io.version)
   version_dict.update(torch.sp.version)
   version_dict.update(torch.ip.version)
-  version_dict.update(torch.machine.version)
+  if hasattr(torch.machine, 'version'): 
+    version_dict.update(torch.machine.version)
 
   try: #the visioner may be compiled in, or not
     version_dict.update(torch.visioner.version)
