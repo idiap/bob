@@ -41,7 +41,8 @@ namespace Torch {
 
     /**
      * The device is what tells the sink where to actually send the messages
-     * to. If the AutoOutputDevice does not have a device, the messages are discarded.
+     * to. If the AutoOutputDevice does not have a device, the messages are
+     * discarded.
      */
     struct OutputDevice {
       /**
