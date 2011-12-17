@@ -42,6 +42,8 @@ torch_python_add_test(python-machine-plda-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_plda.py)
 torch_python_add_test(python-machine-ztnorm-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_ztnorm.py)
+torch_python_add_test(python-machine-svm-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_svm.py)
 
 # Installs all python scripts
 #file(COPY script/ DESTINATION ${CMAKE_INSTALL_PREFIX}/bin FILES_MATCHING PATTERN "*.py")
