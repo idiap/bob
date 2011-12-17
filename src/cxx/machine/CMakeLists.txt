@@ -25,6 +25,13 @@ set(src
     "src/PLDAMachine.cc"
 )
 
+# If we have libsvm installed, enable the compilation of relevant modules
+if(LIBSVM_FOUND)
+  include_directories(${LIBSVM_INCLUDE_DIR})
+  set(shared "${shared};${LIBSVM_LIBRARY}")
+  set(src "${src};src/SVM.cc")
+endif(LIBSVM_FOUND)
+
 include(../../cmake/macros.cmake)
 torch_header_install(machine-cxx machine "torch::machine")
 torch_library(machine "${src}" "${deps}" "${shared}")

@@ -11,10 +11,16 @@ set(pysrc
    "src/jfa.cc"
    "src/wiener.cc"
    "src/plda.cc"
+   "src/version.cc"
    "src/main.cc"
    )
 
 include(../../cmake/macros.cmake)
+
+# If we have libsvm installed, enable the compilation of relevant modules
+if(LIBSVM_FOUND)
+  set(pysrc "src/svm.cc;${pysrc}")
+endif()
 
 torch_python_package_bindings(machine "${pysrc}")
 

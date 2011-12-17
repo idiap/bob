@@ -22,6 +22,10 @@
 
 #include "core/python/ndarray.h"
 
+#if defined(HAVE_LIBSVM)
+void bind_machine_svm();
+#endif
+
 void bind_machine_gmm();
 void bind_machine_activation();
 void bind_machine_linear();
@@ -31,10 +35,15 @@ void bind_machine_ztnorm();
 void bind_machine_jfa();
 void bind_machine_plda();
 void bind_machine_wiener();
+void bind_machine_version();
 
 BOOST_PYTHON_MODULE(libpytorch_machine)
 {
   Torch::python::setup_python("Torch classes and sub-classes for machine access");
+
+#if defined(HAVE_LIBSVM)
+  bind_machine_svm();
+#endif
 
   bind_machine_gmm();
   bind_machine_activation();
@@ -45,4 +54,5 @@ BOOST_PYTHON_MODULE(libpytorch_machine)
   bind_machine_jfa();
   bind_machine_plda();
   bind_machine_wiener();
+  bind_machine_version();
 }
