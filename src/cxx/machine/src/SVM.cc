@@ -229,7 +229,12 @@ int mach::SupportVector::predictClassAndScores_
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& scores) const {
   copy(input, m_input_cache);
+#if LIBSVM_VERSION > 290
   int retval = round(svm_predict_values(m_model.get(), m_input_cache.get(), scores.data()));
+#else
+  svm_predict_values(m_model.get(), m_input_cache.get(), scores.data());
+  int retval = round(svm_predict(m_model.get(), m_input_cache.get()));
+#endif
   return retval;
 }
 
