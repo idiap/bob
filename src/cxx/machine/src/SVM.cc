@@ -121,7 +121,7 @@ static void my_model_free(svm_model*& m) {
 #if LIBSVM_VERSION >= 300
   svm_free_and_destroy_model(&m);
 #else
-  svm_destroy_model(&m);
+  svm_destroy_model(m);
 #endif
 }
 
