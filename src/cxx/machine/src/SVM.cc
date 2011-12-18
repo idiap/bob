@@ -26,6 +26,30 @@
 #include "machine/SVM.h"
 #include "core/array_check.h"
 
+// We need to declare the svm_model type for libsvm < 3.0.0. The next bit of
+// code was cut and pasted from version 2.9.1 of libsvm, file svm.cpp.
+#if LIBSVM_VERSION < 300
+struct svm_model {
+	struct svm_parameter param;	/* parameter */
+	int nr_class;		      /* number of classes, = 2 in regression/one class svm */
+	int l;			          /* total #SV */
+	struct svm_node **SV;	/* SVs (SV[l]) */
+	double **sv_coef;	    /* coefficients for SVs in decision functions (sv_coef[k-1][l]) */
+	double *rho;		      /* constants in decision functions (rho[k*(k-1)/2]) */
+	double *probA;		    /* pariwise probability information */
+	double *probB;
+
+	/* for classification only */
+
+	int *label;  /* label of each class (label[k]) */
+	int *nSV;		 /* number of SVs for each class (nSV[k]) */
+				       /* nSV[0] + nSV[1] + ... + nSV[k-1] = l */
+	/* XXX */
+	int free_sv; /* 1 if svm_model is created by svm_load_model*/
+				       /* 0 if svm_model is created by svm_train */
+};
+#endif
+
 namespace mach = Torch::machine;
 namespace array = Torch::core::array;
 
@@ -50,7 +74,7 @@ void mach::SVMFile::reset() {
 }
 
 bool mach::SVMFile::read(int& label, blitz::Array<double,1>& values) {
-  if (values.extent(0) != m_shape) {
+  if ((size_t)values.extent(0) != m_shape) {
     boost::format s("file '%s' contains %d entries per sample, but you gave me an array with only %d positions");
     s % m_filename % m_shape % values.extent(0);
     throw std::invalid_argument(s.str().c_str());
@@ -94,7 +118,11 @@ bool mach::SVMFile::read_(int& label, blitz::Array<double,1>& values) {
  * A wrapper, to standardize this function.
  */
 static void my_model_free(svm_model*& m) {
+#if LIBSVM_VERSION >= 300
   svm_free_and_destroy_model(&m);
+#else
+  svm_destroy_model(&m);
+#endif
 }
 
 mach::SupportVector::SupportVector(const char* model_file):
