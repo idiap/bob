@@ -44,7 +44,7 @@ static int predict_class_(const mach::SupportVector& m,
 static object predict_class_n(const mach::SupportVector& m,
     tp::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
-  if (i_.extent(1) != m.inputSize()) {
+  if ((size_t)i_.extent(1) != m.inputSize()) {
     PYTHON_ERROR(RuntimeError, "Input array should have %lu columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   blitz::Range all = blitz::Range::all();
@@ -79,7 +79,7 @@ static tuple predict_class_and_scores2(const mach::SupportVector& m,
 static object predict_class_and_scores_n(const mach::SupportVector& m,
     tp::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
-  if (i_.extent(1) != m.inputSize()) {
+  if ((size_t)i_.extent(1) != m.inputSize()) {
     PYTHON_ERROR(RuntimeError, "Input array should have %lu columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   blitz::Range all = blitz::Range::all();
@@ -117,7 +117,7 @@ static tuple predict_class_and_probs2(const mach::SupportVector& m,
 static object predict_class_and_probs_n(const mach::SupportVector& m,
     tp::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
-  if (i_.extent(1) != m.inputSize()) {
+  if ((size_t)i_.extent(1) != m.inputSize()) {
     PYTHON_ERROR(RuntimeError, "Input array should have %lu columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   if (!m.supportsProbability()) {
