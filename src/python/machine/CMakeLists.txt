@@ -19,6 +19,7 @@ include(../../cmake/macros.cmake)
 
 # If we have libsvm installed, enable the compilation of relevant modules
 if(LIBSVM_FOUND)
+  include_directories(${LIBSVM_INCLUDE_DIR})
   set(pysrc "src/svm.cc;${pysrc}")
 endif()
 
