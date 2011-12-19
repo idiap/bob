@@ -36,15 +36,9 @@ ip::VLSIFT::VLSIFT(const int height, const int width, const int n_intervals,
     const double peak_thres, const double edge_thres, const double magnif): 
   m_height(height), m_width(width), m_n_intervals(n_intervals), 
   m_n_octaves(n_octaves), m_octave_min(octave_min),
-  m_peak_thres(peak_thres), m_edge_thres(edge_thres), m_magnif(magnif),
-  m_firstoct_conv_req(false)
+  m_peak_thres(peak_thres), m_edge_thres(edge_thres), m_magnif(magnif)
 {
   const int npixels = height * width;
-  VlPgmImage pim;
-  pim.width = width;
-  pim.height = height;
-  pim.max_value = 255;
-  pim.is_raw = 1;
 
   // Allocates buffers
   m_data  = (vl_uint8*)malloc(npixels * sizeof(vl_uint8)); 

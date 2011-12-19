@@ -80,14 +80,9 @@ namespace Torch {
         double m_peak_thres;
         double m_edge_thres;
         double m_magnif;
-        double m_sigma;
-        double m_sigma_init;
-        int m_kernel_size;
         VlSiftFilt *m_filt;
         vl_uint8 *m_data;
         vl_sift_pix *m_fdata;
-
-        bool m_firstoct_conv_req; // indicates if the first scale of the first octave requires a convolution
     };
 
   }
