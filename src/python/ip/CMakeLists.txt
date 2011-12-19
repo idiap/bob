@@ -58,6 +58,8 @@ torch_python_add_test(python-ip-drawing-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_drawing.py)
 torch_python_add_test(python-ip-histo-tests
   ${CMAKE_CURRENT_SOURCE_DIR}/test/test_histo.py)
+torch_python_add_test(python-ip-vlsift-tests
+  ${CMAKE_CURRENT_SOURCE_DIR}/test/test_vlsift.py)
 
 torch_python_add_test(python-ip-facenorm
   ${CMAKE_CURRENT_SOURCE_DIR}/script/facenorm.py --self-test)

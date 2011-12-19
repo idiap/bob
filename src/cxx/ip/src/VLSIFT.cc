@@ -121,10 +121,8 @@ void ip::VLSIFT::operator()(const blitz::Array<uint8_t,2>& src,
         res(1) = k->y;
         res(2) = k->sigma;
         res(3) = angles[q];
-        for(l=0; l<128; ++l) {
-          double x = 512. * descr[l];
-          res(4+l) = (x < 255.) ? x : 255.;
-        }
+        for(l=0; l<128; ++l)
+          res(4+l) = 512. * descr[l];
 
         // Adds it to the vector
         dst.push_back(res);
