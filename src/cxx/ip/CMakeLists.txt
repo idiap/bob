@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps core io math sp) #other torch subprojects
-set(shared "")
+set(shared "${VLFEAT_LIBRARY}")
 
 # This defines the list of source files inside this package.
 set(src_ip
@@ -60,6 +60,7 @@ set(src_ip
    "src/Gaussian.cc"
    "src/MultiscaleRetinex.cc"
    "src/SpatioTemporalGradient.cc"
+   "src/VLSIFT.cc"
 )
 #   "src/ipHOG.cc"
 

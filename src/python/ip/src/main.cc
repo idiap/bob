@@ -49,6 +49,7 @@ void bind_ip_gaussian();
 void bind_ip_median();
 void bind_ip_drawing();
 void bind_ip_spatiotempgrad();
+void bind_ip_vlsift();
 
 BOOST_PYTHON_MODULE(libpytorch_ip) {
 
@@ -81,4 +82,5 @@ BOOST_PYTHON_MODULE(libpytorch_ip) {
   bind_ip_median();
   bind_ip_drawing();
   bind_ip_spatiotempgrad();
+  bind_ip_vlsift();
 }

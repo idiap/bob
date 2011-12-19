@@ -30,6 +30,7 @@ set(pysrc
    "src/MultiscaleRetinex.cc"
    "src/drawing.cc"
    "src/SpatioTemporalGradient.cc"
+   "src/vlsift.cc"
    "src/main.cc"
    )
 
