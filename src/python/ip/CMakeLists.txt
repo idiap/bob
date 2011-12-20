@@ -30,11 +30,16 @@ set(pysrc
    "src/MultiscaleRetinex.cc"
    "src/drawing.cc"
    "src/SpatioTemporalGradient.cc"
-   "src/vlsift.cc"
    "src/main.cc"
    )
 
 include(../../cmake/macros.cmake)
+
+# If we have VLFeat installed, enable the compilation of relevant modules
+if(VLFEAT_FOUND)
+  include_directories(${VLFEAT_INCLUDE_DIR})
+  set(pysrc "src/vlsift.cc;${pysrc}")
+endif()
 
 torch_python_package_bindings(ip "${pysrc}")
 

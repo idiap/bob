@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 
 # This defines the dependencies of this package
 set(deps core io math sp) #other torch subprojects
-set(shared "${VLFEAT_LIBRARY}")
+set(shared "")
 
 # This defines the list of source files inside this package.
 set(src_ip
@@ -60,7 +60,6 @@ set(src_ip
    "src/Gaussian.cc"
    "src/MultiscaleRetinex.cc"
    "src/SpatioTemporalGradient.cc"
-   "src/VLSIFT.cc"
 )
 #   "src/ipHOG.cc"
 
@@ -87,6 +86,13 @@ set(src
    "${src_ip}" 
 #   "${src_imagefiles}"
    "${src_geometry}")
+
+# If we have VLFeat installed, enable the compilation of relevant modules
+if(VLFEAT_FOUND)
+  include_directories(${VLFEAT_INCLUDE_DIR})
+  set(shared "${shared};${VLFEAT_LIBRARY}")
+  set(src "${src};src/VLSIFT.cc")
+endif(VLFEAT_FOUND)
 
 include(../../cmake/macros.cmake)
 torch_header_install(ip-cxx ip "torch::ip")
